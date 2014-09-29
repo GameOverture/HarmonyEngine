@@ -1,0 +1,42 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons16x16/atlas.png</file>
+        <file>icons16x16/atlas-assemble.png</file>
+        <file>icons16x16/atlas-file.png</file>
+        <file>icons16x16/edit-copy.png</file>
+        <file>icons16x16/edit-cut.png</file>
+        <file>icons16x16/edit-delete.png</file>
+        <file>icons16x16/edit-paste.png</file>
+        <file>icons16x16/edit-redo.png</file>
+        <file>icons16x16/edit-undo.png</file>
+        <file>icons16x16/file-newProj.png</file>
+        <file>icons16x16/file-openProject.png</file>
+        <file>icons16x16/file-save.png</file>
+        <file>icons16x16/file-saveAll.png</file>
+        <file>icons16x16/project.png</file>
+        <file>icons16x16/sprite-alignBottom.Image.png</file>
+        <file>icons16x16/sprite-alignHorzCenter.png</file>
+        <file>icons16x16/sprite-alignLeft.png</file>
+        <file>icons16x16/sprite-alignRight.png</file>
+        <file>icons16x16/sprite-alignUp.png</file>
+        <file>icons16x16/sprite-alignVertCenter.png</file>
+        <file>icons16x16/view-explorer.png</file>
+        <file>icons16x16/view-outputLog.png</file>
+        <file>icons16x16/view-properties.png</file>
+        <file>icons16x16/file-closeProj.png</file>
+        <file>icons16x16/file-exit.png</file>
+        <file>icons16x16/sprite-document.png</file>
+        <file>icons16x16/sprite-folder.png</file>
+        <file>icons16x16/audio-document.png</file>
+        <file>icons16x16/audio-folder.png</file>
+        <file>icons16x16/folder.png</file>
+        <file>icons16x16/font-document.png</file>
+        <file>icons16x16/font-folder.png</file>
+        <file>icons16x16/entity-folder.png</file>
+        <file>icons16x16/particle-folder.png</file>
+        <file>icons16x16/shader-folder.png</file>
+        <file>icons16x16/spine-folder.png</file>
+        <file>icons16x16/particle-document.png</file>
+        <file>icons16x16/spine-document.png</file>
+    </qresource>
+</RCC>

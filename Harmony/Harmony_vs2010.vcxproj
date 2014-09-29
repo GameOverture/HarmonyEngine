@@ -1,0 +1,348 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="GuiDebug|Win32">
+      <Configuration>GuiDebug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="GuiRelease|Win32">
+      <Configuration>GuiRelease</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="include\Gamepad\Gamepad_private.c" />
+    <ClCompile Include="include\Gamepad\Gamepad_windows.c" />
+    <ClCompile Include="include\Harmony\FileIO\stb_image.c" />
+    <ClCompile Include="include\Harmony\Threading\BasicSync.cpp" />
+    <ClCompile Include="include\Harmony\Threading\InteropUnix.cpp" />
+    <ClCompile Include="include\Harmony\Threading\stdafx.cpp" />
+    <ClCompile Include="include\Harmony\Threading\Threading.cpp" />
+    <ClCompile Include="include\Harmony\Threading\TLSEntry.cpp" />
+    <ClCompile Include="include\Harmony\Threading\Utils.cpp" />
+    <ClCompile Include="include\Harmony\Threading\WaitObject.cpp" />
+    <ClCompile Include="include\Harmony\Threading\WaitObjectEx.cpp" />
+    <ClCompile Include="src\Audio\HyAudio.cpp" />
+    <ClCompile Include="src\Creator\Data\HySpine2dData.cpp" />
+    <ClCompile Include="src\Creator\Data\HyMesh3dData.cpp" />
+    <ClCompile Include="src\Creator\Data\HySfxData.cpp" />
+    <ClCompile Include="src\Creator\Data\HySprite2dData.cpp" />
+    <ClCompile Include="src\Creator\Data\HyText2dData.cpp" />
+    <ClCompile Include="src\Creator\Data\IData.cpp" />
+    <ClCompile Include="src\Creator\HyCreator.cpp" />
+    <ClCompile Include="src\Creator\HyEntity2d.cpp" />
+    <ClCompile Include="src\Creator\HyPhysEntity2d.cpp" />
+    <ClCompile Include="src\Creator\Instances\HySpine2d.cpp" />
+    <ClCompile Include="src\Creator\Instances\HyMesh3d.cpp" />
+    <ClCompile Include="src\Creator\Instances\HyPrimitive2d.cpp" />
+    <ClCompile Include="src\Creator\Instances\HySound.cpp" />
+    <ClCompile Include="src\Creator\Instances\HySprite2d.cpp" />
+    <ClCompile Include="src\Creator\Instances\HyText2d.cpp" />
+    <ClCompile Include="src\Creator\Instances\IObjInst2d.cpp" />
+    <ClCompile Include="src\Creator\Viewport\HyCamera2d.cpp" />
+    <ClCompile Include="src\Creator\Viewport\HyCamera3d.cpp" />
+    <ClCompile Include="src\Creator\Viewport\HyViewport.cpp" />
+    <ClCompile Include="src\FileIO\HyFileIO.cpp" />
+    <ClCompile Include="src\FileIO\HyTexture.cpp" />
+    <ClCompile Include="src\FileIO\jasonxx.cc" />
+    <ClCompile Include="src\HyEngine.cpp" />
+    <ClCompile Include="src\IApplication.cpp" />
+    <ClCompile Include="src\Input\HyInput.cpp" />
+    <ClCompile Include="src\Input\Mappings\HyInputMapping.cpp" />
+    <ClCompile Include="src\Memory\HyMemoryHeap.cpp" />
+    <ClCompile Include="src\Renderer\DrawData\HyDrawSpine2d.cpp" />
+    <ClCompile Include="src\Renderer\DrawData\HyDrawPrimitive2d.cpp" />
+    <ClCompile Include="src\Renderer\DrawData\HyDrawSprite2d.cpp" />
+    <ClCompile Include="src\Renderer\DrawData\HyDrawText2d.cpp" />
+    <ClCompile Include="src\Renderer\HyGfxComms.cpp" />
+    <ClCompile Include="src\Renderer\HyRenderer.cpp" />
+    <ClCompile Include="src\Renderer\Interop\GLFW\HyGlfw.cpp" />
+    <ClCompile Include="src\Renderer\Interop\GLFW\HyGlfwInput.cpp" />
+    <ClCompile Include="src\Renderer\Interop\IGfxApi.cpp" />
+    <ClCompile Include="src\Renderer\Interop\OpenGL\HyOpenGL.cpp" />
+    <ClCompile Include="src\Renderer\Interop\OpenGL\HyOpenGLShader.cpp" />
+    <ClCompile Include="src\Time\Interop\HyTimeApi_Win.cpp" />
+    <ClCompile Include="src\Time\ITimeApi.cpp" />
+    <ClCompile Include="src\Time\Watches\HyStopwatch.cpp" />
+    <ClCompile Include="src\Time\Watches\HyTimerWatch.cpp" />
+    <ClCompile Include="src\Time\Watches\HyWatch.cpp" />
+    <ClCompile Include="src\Utilities\Animation\HyAnimFloat.cpp" />
+    <ClCompile Include="src\Utilities\Animation\HyEaseFuncs.cpp" />
+    <ClCompile Include="src\Utilities\HyBitManip.cpp" />
+    <ClCompile Include="src\Utilities\HyDebugPhys2d.cpp" />
+    <ClCompile Include="src\Utilities\HyHardwareInfo.cpp" />
+    <ClCompile Include="src\Utilities\HyMath.cpp" />
+    <ClCompile Include="src\Utilities\HyBox2dRuntime.cpp" />
+    <ClCompile Include="src\Utilities\HySpineRuntime.cpp" />
+    <ClCompile Include="src\Utilities\HyStrManip.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Gamepad\Gamepad.h" />
+    <ClInclude Include="include\Gamepad\Gamepad_private.h" />
+    <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler.h" />
+    <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler_GNU.h" />
+    <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler_MSVC.h" />
+    <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler_MWerks.h" />
+    <ClInclude Include="include\Harmony\Afx\HyStdAfx.h" />
+    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform.h" />
+    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_OSX.h" />
+    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
+    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
+    <ClInclude Include="include\Harmony\Audio\HyAudio.h" />
+    <ClInclude Include="include\Harmony\Creator\Data\HyMesh3dData.h" />
+    <ClInclude Include="include\Harmony\Creator\Data\HyFactory.h" />
+    <ClInclude Include="include\Harmony\Creator\Data\HySfxData.h" />
+    <ClInclude Include="include\Harmony\Creator\Data\HySpine2dData.h" />
+    <ClInclude Include="include\Harmony\Creator\Data\HySprite2dData.h" />
+    <ClInclude Include="include\Harmony\Creator\Data\HyText2dData.h" />
+    <ClInclude Include="include\Harmony\Creator\Data\IData.h" />
+    <ClInclude Include="include\Harmony\Creator\HyCreator.h" />
+    <ClInclude Include="include\Harmony\Creator\HyEntity2d.h" />
+    <ClInclude Include="include\Harmony\Creator\HyPhysEntity2d.h" />
+    <ClInclude Include="include\Harmony\Creator\Instances\HyMesh3d.h" />
+    <ClInclude Include="include\Harmony\Creator\Instances\HyPrimitive2d.h" />
+    <ClInclude Include="include\Harmony\Creator\Instances\HySound.h" />
+    <ClInclude Include="include\Harmony\Creator\Instances\HySpine2d.h" />
+    <ClInclude Include="include\Harmony\Creator\Instances\HySprite2d.h" />
+    <ClInclude Include="include\Harmony\Creator\Instances\HyText2d.h" />
+    <ClInclude Include="include\Harmony\Creator\Instances\IObjInst2d.h" />
+    <ClInclude Include="include\Harmony\Creator\Viewport\HyCamera2d.h" />
+    <ClInclude Include="include\Harmony\Creator\Viewport\HyCamera3d.h" />
+    <ClInclude Include="include\Harmony\Creator\Viewport\HyViewport.h" />
+    <ClInclude Include="include\Harmony\FileIO\HyFileIO.h" />
+    <ClInclude Include="include\Harmony\FileIO\HyTexture.h" />
+    <ClInclude Include="include\Harmony\FileIO\jsonxx.h" />
+    <ClInclude Include="include\Harmony\FileIO\stb_image.h" />
+    <ClInclude Include="include\Harmony\HyEngine.h" />
+    <ClInclude Include="include\Harmony\IApplication.h" />
+    <ClInclude Include="include\Harmony\Input\HyInput.h" />
+    <ClInclude Include="include\Harmony\Input\Mappings\HyInputAfx.h" />
+    <ClInclude Include="include\Harmony\Input\Mappings\HyInputMapping.h" />
+    <ClInclude Include="include\Harmony\Memory\HyMemoryHeap.h" />
+    <ClInclude Include="include\Harmony\Memory\Interop\HyMemAPI_Windows.h" />
+    <ClInclude Include="include\Harmony\Memory\PageTypes\HyMedHeapPage.h" />
+    <ClInclude Include="include\Harmony\Memory\PageTypes\HySmlHeapPage.h" />
+    <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawSpine2d.h" />
+    <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawPrimitive2d.h" />
+    <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawSprite2d.h" />
+    <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawText2d.h" />
+    <ClInclude Include="include\Harmony\Renderer\DrawData\IDraw2d.h" />
+    <ClInclude Include="include\Harmony\Renderer\HyGfxComms.h" />
+    <ClInclude Include="include\Harmony\Renderer\HyRenderer.h" />
+    <ClInclude Include="include\Harmony\Renderer\Interop\GLFW\HyGlfw.h" />
+    <ClInclude Include="include\Harmony\Renderer\Interop\GLFW\HyGlfwInput.h" />
+    <ClInclude Include="include\Harmony\Renderer\Interop\IGfxApi.h" />
+    <ClInclude Include="include\Harmony\Renderer\Interop\OpenGL\HyOpenGL.h" />
+    <ClInclude Include="include\Harmony\Renderer\Interop\OpenGL\HyOpenGLShader.h" />
+    <ClInclude Include="include\Harmony\Threading\BaseMacro.h" />
+    <ClInclude Include="include\Harmony\Threading\BasicSync.h" />
+    <ClInclude Include="include\Harmony\Threading\Error.h" />
+    <ClInclude Include="include\Harmony\Threading\InteropUnix.h" />
+    <ClInclude Include="include\Harmony\Threading\InteropWin.h" />
+    <ClInclude Include="include\Harmony\Threading\PlatformInterop.h" />
+    <ClInclude Include="include\Harmony\Threading\PrimitiveTypeDefs.h" />
+    <ClInclude Include="include\Harmony\Threading\stdafx.h" />
+    <ClInclude Include="include\Harmony\Threading\Threading.h" />
+    <ClInclude Include="include\Harmony\Threading\TLSEntry.h" />
+    <ClInclude Include="include\Harmony\Threading\Utils.h" />
+    <ClInclude Include="include\Harmony\Threading\WaitObject.h" />
+    <ClInclude Include="include\Harmony\Threading\WaitObjectEx.h" />
+    <ClInclude Include="include\Harmony\Time\Interop\HyTimeApi_Win.h" />
+    <ClInclude Include="include\Harmony\Time\ITimeApi.h" />
+    <ClInclude Include="include\Harmony\Time\Watches\HyStopwatch.h" />
+    <ClInclude Include="include\Harmony\Time\Watches\HyTimerWatch.h" />
+    <ClInclude Include="include\Harmony\Time\Watches\HyWatch.h" />
+    <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimFloat.h" />
+    <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec2.h" />
+    <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec3.h" />
+    <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec4.h" />
+    <ClInclude Include="include\Harmony\Utilities\Animation\HyEaseFuncs.h" />
+    <ClInclude Include="include\Harmony\Utilities\Animation\ITransform.h" />
+    <ClInclude Include="include\Harmony\Utilities\Containers\HyStaticArray.h" />
+    <ClInclude Include="include\Harmony\Utilities\HyBitManip.h" />
+    <ClInclude Include="include\Harmony\Utilities\HyDebugPhys2d.h" />
+    <ClInclude Include="include\Harmony\Utilities\HyHardwareInfo.h" />
+    <ClInclude Include="include\Harmony\Utilities\HyMath.h" />
+    <ClInclude Include="include\Harmony\Utilities\HyBox2dRuntime.h" />
+    <ClInclude Include="include\Harmony\Utilities\HySpineRuntime.h" />
+    <ClInclude Include="include\Harmony\Utilities\HyStrManip.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>HyEngine</RootNamespace>
+    <ProjectName>Harmony</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)\bin\</OutDir>
+    <IntDir>$(ProjectDir)\bin\obj\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">
+    <OutDir>$(ProjectDir)\bin\</OutDir>
+    <IntDir>$(ProjectDir)\bin\obj\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)Qtd</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)\bin\</OutDir>
+    <IntDir>$(ProjectDir)\bin\obj\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
+    <OutDir>$(ProjectDir)\bin\</OutDir>
+    <IntDir>$(ProjectDir)\bin\obj\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)Qt</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>box2Dd.lib;glfw3d.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glew32s.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>AdvAPI32.lib;box2Dd.lib;glfw3d.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glew32s.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>box2D.lib;glfw3.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew32s.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>AdvAPI32.lib;box2D.lib;glfw3.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew32s.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

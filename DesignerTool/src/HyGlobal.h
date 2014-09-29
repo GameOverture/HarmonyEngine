@@ -1,0 +1,171 @@
+#ifndef HYGLOBALS_H
+#define HYGLOBALS_H
+
+#include <QString>
+#include <QIcon>
+#include <QValidator>
+#include <QAction>
+#include <QStringBuilder>
+#include <QDir>
+
+#include "WidgetOutputLog.h"
+
+enum eItemType
+{
+    ITEM_Unknown = -1,
+    
+    ITEM_Project = 0,
+    ITEM_DirAudio,
+    ITEM_DirParticles,
+    ITEM_DirFonts,
+    ITEM_DirSpine,
+    ITEM_DirSprites,
+    ITEM_DirShaders,
+    ITEM_DirEntities,
+    ITEM_Prefix,
+    ITEM_Audio,
+    ITEM_Particles,
+    ITEM_Font,
+    ITEM_Spine,
+    ITEM_Sprite,
+    ITEM_Shader,
+    ITEM_Entity,
+    
+    ITEM_TextureAtlas,
+
+    NUMITEM
+};
+
+class HyGlobal
+{
+    static QString                  sm_sItemNames[NUMITEM];
+    static QString                  sm_sItemExt[NUMITEM];
+    static QIcon                    sm_ItemIcons[NUMITEM];
+
+    static QRegExpValidator *       sm_pFileNameValidator;
+    static QRegExpValidator *       sm_pFilePathValidator;
+
+public:
+    static void Initialize()
+    {
+        // 'Dir' and 'item' both require the same name
+        sm_sItemNames[ITEM_DirAudio] = sm_sItemNames[ITEM_Audio] = "Audio";
+        sm_sItemNames[ITEM_DirParticles] = sm_sItemNames[ITEM_Particles] = "Particles";
+        sm_sItemNames[ITEM_DirFonts] = sm_sItemNames[ITEM_Font] = "Font";
+        sm_sItemNames[ITEM_DirSpine] = sm_sItemNames[ITEM_Spine] = "Spine";
+        sm_sItemNames[ITEM_DirSprites] = sm_sItemNames[ITEM_Sprite] = "Sprite";
+        sm_sItemNames[ITEM_DirShaders] = sm_sItemNames[ITEM_Shader] = "Shader";
+        sm_sItemNames[ITEM_DirEntities] = sm_sItemNames[ITEM_Entity] = "Entity";
+        
+        sm_sItemExt[ITEM_Project] = "/";
+        sm_sItemExt[ITEM_DirAudio] = "/";
+        sm_sItemExt[ITEM_DirParticles] = "/";
+        sm_sItemExt[ITEM_DirFonts] = "/";
+        sm_sItemExt[ITEM_DirShaders] = "/";
+        sm_sItemExt[ITEM_DirSpine] = "/";
+        sm_sItemExt[ITEM_DirSprites] = "/";
+        sm_sItemExt[ITEM_DirEntities] = "/";
+        sm_sItemExt[ITEM_Prefix] = "/";
+        sm_sItemExt[ITEM_Audio] = ".hyaud";
+        sm_sItemExt[ITEM_Particles] = ".hypfx";
+        sm_sItemExt[ITEM_Font] = ".hyfnt";
+        sm_sItemExt[ITEM_Spine] = ".hyspi";
+        sm_sItemExt[ITEM_Sprite] = ".hyspr";
+        sm_sItemExt[ITEM_Shader] = "";
+        sm_sItemExt[ITEM_Entity] = ".hyent";
+        sm_sItemExt[ITEM_TextureAtlas] = ".atlas";
+        
+        sm_ItemIcons[ITEM_Project].addFile(QString(":/icons16x16/project.png"));
+        sm_ItemIcons[ITEM_DirAudio].addFile(QString(":/icons16x16/audio-folder.png"));
+        sm_ItemIcons[ITEM_DirParticles].addFile(QString(":/icons16x16/particle-folder.png"));
+        sm_ItemIcons[ITEM_DirFonts].addFile(QString(":/icons16x16/font-folder.png"));
+        sm_ItemIcons[ITEM_DirSpine].addFile(QString(":/icons16x16/spine-folder.png"));
+        sm_ItemIcons[ITEM_DirSprites].addFile(QString(":/icons16x16/sprite-folder.png"));
+        sm_ItemIcons[ITEM_DirShaders].addFile(QString(":/icons16x16/shader-folder.png"));
+        sm_ItemIcons[ITEM_DirEntities].addFile(QString(":/icons16x16/entity-folder.png"));
+        sm_ItemIcons[ITEM_Prefix].addFile(QString(":/icons16x16/folder.png"));
+        sm_ItemIcons[ITEM_Audio].addFile(QString(":/icons16x16/audio-document.png"));
+        sm_ItemIcons[ITEM_Particles].addFile(QString(":/icons16x16/particle-document.png"));
+        sm_ItemIcons[ITEM_Font].addFile(QString(":/icons16x16/font-document.png"));
+        sm_ItemIcons[ITEM_Spine].addFile(QString(":/icons16x16/spine-document.png"));
+        sm_ItemIcons[ITEM_Sprite].addFile(QString(":/icons16x16/sprite-document.png"));
+        sm_ItemIcons[ITEM_Entity].addFile(QString(":/icons16x16/entity-document.png"));
+        
+        sm_ItemIcons[ITEM_TextureAtlas].addFile(QString(":/icons16x16/atlas-document.png"));
+
+        sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_-]*"));
+        sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_-]*"));
+    }
+
+    
+    static QList<eItemType> SubDirList()
+    {
+        QList<eItemType> list;
+        list.append(ITEM_DirAudio);
+        list.append(ITEM_DirParticles);
+        list.append(ITEM_DirFonts);
+        list.append(ITEM_DirSpine);
+        list.append(ITEM_DirSprites);
+        list.append(ITEM_DirShaders);
+        list.append(ITEM_DirEntities);
+        
+        return list;
+    }
+    
+    static QStringList SubDirNameList()
+    {
+        QList<eItemType> itemList = SubDirList();
+        
+        QStringList list;
+        foreach(eItemType eType, itemList)
+            list.append(sm_sItemNames[eType]);
+        
+        return list;
+    }
+    
+    static const QString &ItemName(eItemType eItm)        { return sm_sItemNames[eItm]; }
+
+    static const QString &ItemExt(int iIndex)            { Q_ASSERT(iIndex >= 0 && iIndex < NUMITEM); return sm_sItemExt[iIndex]; }
+    static const QString &ItemExt(eItemType eItm)        { return sm_sItemExt[eItm]; }
+    
+    static const QIcon &ItemIcon(int iIndex)            { Q_ASSERT(iIndex >= 0 && iIndex < NUMITEM); return sm_ItemIcons[iIndex]; }
+    static const QIcon &ItemIcon(eItemType eItm)        { return sm_ItemIcons[eItm]; }
+
+    static const QRegExpValidator *FileNameValidator()  { return sm_pFileNameValidator; }
+    static const QRegExpValidator *FilePathValidator()  { return sm_pFilePathValidator; }
+    
+    static bool IsWorkspaceValid(const QDir &projDir)
+    {
+        QDir dir(projDir);
+        dir.cd("data");
+        if(dir.exists() == false)
+            return false;
+        
+        QStringList dirList = HyGlobal::SubDirNameList();
+        foreach(QString sDir, dirList)
+        {
+            if(dir.cd(sDir) == false)
+                return false;
+            
+            if(dir.exists() == false)
+                return false;
+            
+            dir.cdUp();
+        }
+        
+        dir.cdUp();
+        dir.cd("metaData");
+        if(dir.exists() == false)
+            return false;
+        
+        return true;
+    }
+};
+
+QAction *FindAction(QList<QAction *> list, QString sName);
+#define FINDACTION(str) FindAction(this->actions(), str)
+
+#define HYLOG(msg, type) { QString sHyLogTmpStr = msg; WidgetOutputLog::Log(sHyLogTmpStr, type); }
+
+
+#endif // HYGLOBALS_H

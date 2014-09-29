@@ -1,0 +1,138 @@
+
+spineboy-1.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+eyes
+  rotate: false
+  xy: 119, 2
+  size: 34, 27
+  orig: 34, 27
+  offset: 0, 0
+  index: -1
+eyes-closed
+  rotate: false
+  xy: 155, 2
+  size: 34, 27
+  orig: 34, 27
+  offset: 0, 0
+  index: -1
+head
+  rotate: false
+  xy: 345, 122
+  size: 121, 132
+  orig: 121, 132
+  offset: 0, 0
+  index: -1
+left-arm
+  rotate: true
+  xy: 436, 85
+  size: 35, 29
+  orig: 35, 29
+  offset: 0, 0
+  index: -1
+left-foot
+  rotate: true
+  xy: 468, 120
+  size: 65, 30
+  orig: 65, 30
+  offset: 0, 0
+  index: -1
+left-hand
+  rotate: false
+  xy: 399, 82
+  size: 35, 38
+  orig: 35, 38
+  offset: 0, 0
+  index: -1
+left-lower-leg
+  rotate: true
+  xy: 197, 58
+  size: 49, 64
+  orig: 49, 64
+  offset: 0, 0
+  index: -1
+left-shoulder
+  rotate: true
+  xy: 194, 22
+  size: 34, 53
+  orig: 34, 53
+  offset: 0, 0
+  index: -1
+left-upper-leg
+  rotate: false
+  xy: 468, 187
+  size: 33, 67
+  orig: 33, 67
+  offset: 0, 0
+  index: -1
+neck
+  rotate: true
+  xy: 249, 22
+  size: 34, 28
+  orig: 34, 28
+  offset: 0, 0
+  index: -1
+pelvis
+  rotate: false
+  xy: 263, 60
+  size: 63, 47
+  orig: 63, 47
+  offset: 0, 0
+  index: -1
+right-arm
+  rotate: true
+  xy: 72, 20
+  size: 21, 45
+  orig: 21, 45
+  offset: 0, 0
+  index: -1
+right-foot
+  rotate: false
+  xy: 125, 31
+  size: 67, 30
+  orig: 67, 30
+  offset: 0, 0
+  index: -1
+right-hand
+  rotate: false
+  xy: 467, 86
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+right-lower-leg
+  rotate: false
+  xy: 72, 43
+  size: 51, 64
+  orig: 51, 64
+  offset: 0, 0
+  index: -1
+right-shoulder
+  rotate: false
+  xy: 345, 69
+  size: 52, 51
+  orig: 52, 51
+  offset: 0, 0
+  index: -1
+right-upper-leg
+  rotate: true
+  xy: 125, 63
+  size: 44, 70
+  orig: 44, 70
+  offset: 0, 0
+  index: -1
+spineboy
+  rotate: true
+  xy: 2, 109
+  size: 145, 341
+  orig: 145, 341
+  offset: 0, 0
+  index: -1
+torso
+  rotate: false
+  xy: 2, 15
+  size: 68, 92
+  orig: 68, 92
+  offset: 0, 0
+  index: -1

@@ -1,0 +1,25 @@
+/**************************************************************************
+ *	HyStrManip.h
+ *	
+ *	Harmony Engine
+ *	Copyright (c) 2013 Jason Knobler
+ *
+ *	The zlib License (zlib)
+ *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *************************************************************************/
+#ifndef __HyStrManip_h__
+#define __HyStrManip_h__
+
+#include <string>
+
+// Takes the dst char ptr and dynamically allocates the size of src and copies its contents.
+void DynamicStringCopy(char *&dst, const char *src);
+
+// converts a string into a wstring
+std::wstring StringToWString(const std::string& p_Str);
+
+// converts a wstring into a string
+std::string WStringToString(const std::wstring& p_Str);
+
+#endif /* __HyStrManip_h__ */
+
