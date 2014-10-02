@@ -32,7 +32,7 @@ SOURCES += main.cpp \
     scriptum/imagepacker.cpp \
     scriptum/imagesort.cpp \
     scriptum/maxrects.cpp \
-    WidgetAtlases.cpp
+    WidgetAtlas.cpp
 
 HEADERS  += \
     HyApp.h \
@@ -52,7 +52,7 @@ HEADERS  += \
     DlgNewItem.h \
     scriptum/imagepacker.h \
     scriptum/maxrects.h \
-    WidgetAtlases.h
+    WidgetAtlas.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -63,20 +63,20 @@ FORMS    += \
     WidgetGlyphCreator.ui \
     WidgetFontMap.ui \
     DlgNewItem.ui \
-    WidgetAtlases.ui
+    WidgetAtlas.ui
 
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/bin/vs2010/ -lHarmonyQt
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../Harmony/bin/vs2010/ -lHarmonyQtd
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/bin/ -lHarmonyQt
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../Harmony/bin/ -lHarmonyQtd
 
 INCLUDEPATH += "$$PWD/../../Harmony/include"
 DEPENDPATH += "$$PWD/../../Harmony/include"
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/vs2010/libHarmonyQt.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/vs2010/libHarmonyQtd.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/vs2010/HarmonyQt.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/vs2010/HarmonyQtd.lib
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/libHarmonyQt.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/libHarmonyQtd.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/HarmonyQt.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/HarmonyQtd.lib
 
 win32: LIBS += -lAdvAPI32
 

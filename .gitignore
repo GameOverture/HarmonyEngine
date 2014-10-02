@@ -1,9 +1,13 @@
-obj/*
-bin/*
-Debug/*
-Release/*
+obj/
+bin/
+Debug/
+GuiDebug/
+Release/
+GuiRelease/
 
 *.sdf
 *.opensdf
 *.suo
 *.user
+
+*.lib
