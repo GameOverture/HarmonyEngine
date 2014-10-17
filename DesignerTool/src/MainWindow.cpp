@@ -30,11 +30,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->actionCloseProject->setEnabled(false);
     ui->actionNewSprite->setEnabled(false);
     ui->actionNewFont->setEnabled(false);
+    ui->actionNewParticle->setEnabled(false);
+    ui->actionNewAudio->setEnabled(false);
+    ui->actionNewAtlas->setEnabled(false);
     
     // Link the actions to their proper widgets
     ui->explorer->addAction(ui->actionCloseProject);
     ui->explorer->addAction(ui->actionCopy);
     ui->explorer->addAction(ui->actionCut);
+    ui->explorer->addAction(ui->actionNewAtlas);
     ui->explorer->addAction(ui->actionNewProject);
     ui->explorer->addAction(ui->actionNewAudio);
     ui->explorer->addAction(ui->actionNewParticle);

@@ -29,6 +29,7 @@ public:
     
     Item *GetCurProjSelected();
     Item *GetCurItemSelected();
+    Item *GetCurDirSelected(bool bIncludePrefixDirs);
     
     QStringList GetOpenProjectPaths();
 

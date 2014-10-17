@@ -296,6 +296,32 @@ Item *WidgetExplorer::GetCurItemSelected()
     return v.value<Item *>();
 }
 
+Item *WidgetExplorer::GetCurDirSelected(bool bIncludePrefixDirs)
+{
+    QTreeWidgetItem *pCurTreeItem = ui->treeWidget->currentItem();
+    if(pCurTreeItem == NULL)
+        return NULL;
+    
+    Item *pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<Item *>();
+    while(pCurItem->GetType() != ITEM_DirAudio &&
+          pCurItem->GetType() != ITEM_DirParticles &&
+          pCurItem->GetType() != ITEM_DirFonts &&
+          pCurItem->GetType() != ITEM_DirSpine &&
+          pCurItem->GetType() != ITEM_DirSprites &&
+          pCurItem->GetType() != ITEM_DirShaders &&
+          pCurItem->GetType() != ITEM_DirEntities &&
+          (pCurItem->GetType() != ITEM_Prefix && bIncludePrefixDirs))
+    {
+        pCurTreeItem = pCurItem->GetTreeItem()->parent();
+        if(pCurTreeItem == NULL)
+            return NULL;
+        
+        pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<Item *>();
+    }
+    
+    return pCurItem;
+}
+
 void WidgetExplorer::OnContextMenu(const QPoint &pos)
 {
     QPoint globalPos = ui->treeWidget->mapToGlobal(pos);
@@ -338,10 +364,18 @@ void WidgetExplorer::on_treeWidget_currentItemChanged(QTreeWidgetItem *current, 
     FINDACTION("actionNewParticle")->setEnabled(bValidItem);
     FINDACTION("actionNewFont")->setEnabled(bValidItem);
     FINDACTION("actionNewSprite")->setEnabled(bValidItem);
+    FINDACTION("actionNewParticle")->setEnabled(bValidItem);
+    FINDACTION("actionNewAudio")->setEnabled(bValidItem);
     
-//    if(!bValidItem)
-//        return;
-    
+    if(bValidItem)
+    {
+        bValidItem = false;
+        
+        Item *pItemDir = GetCurDirSelected(false);
+        bValidItem = pItemDir->GetType() == ITEM_DirSprites || pItemDir->GetType() == ITEM_DirFonts;
+    }
+    FINDACTION("actionNewAtlas")->setEnabled(bValidItem);
+        
 //    QVariant v = current->data(0, Qt::UserRole);
 //    Item *pItemVariant = v.value<Item *>();
 }

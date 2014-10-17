@@ -59,6 +59,7 @@
     <addaction name="actionCloseProject"/>
     <addaction name="separator"/>
     <addaction name="menu_New_Item"/>
+    <addaction name="actionNewAtlas"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSaveAll"/>
@@ -469,6 +470,18 @@
    </property>
    <property name="toolTip">
     <string>Add a new audio bank in the currently selected project</string>
+   </property>
+  </action>
+  <action name="actionNewAtlas">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/atlas-file.png</normaloff>:/icons16x16/atlas-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>New Atlas</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a new texture at the currently selected item's location</string>
    </property>
   </action>
  </widget>
