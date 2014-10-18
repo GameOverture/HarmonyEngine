@@ -4,6 +4,7 @@ Debug/
 GuiDebug/
 Release/
 GuiRelease/
+ipch/
 
 *.sdf
 *.opensdf

@@ -44,6 +44,8 @@ private slots:
     
     void on_actionNewAudio_triggered();
     
+    void on_actionViewExplorer_triggered();
+    
 private:
     Ui::MainWindow *ui;
 

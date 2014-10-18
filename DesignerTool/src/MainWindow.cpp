@@ -50,11 +50,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->explorer->addAction(ui->actionRename);
     ui->explorer->addAction(ui->actionSave);
     
-    HYLOG("Recovering previously opened session...", LOGTYPE_Normal);
+    ui->dockWidgetAtlas->hide();
+    ui->dockWidgetGlyphCreator->hide();
     
+    HYLOG("Recovering previously opened session...", LOGTYPE_Normal);
     //m_Settings.clear();
     LoadSettings();
-    
 }
 
 MainWindow::~MainWindow()
@@ -225,3 +226,8 @@ void MainWindow::UpdateActions()
 
 
 
+
+void MainWindow::on_actionViewExplorer_triggered()
+{
+    
+}
