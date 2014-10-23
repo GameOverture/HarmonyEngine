@@ -422,7 +422,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="sortOrder">
+      <widget class="QComboBox" name="cmbSortOrder">
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sorting of images significantly increases packing effectivity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
@@ -535,7 +535,7 @@
          <number>0</number>
         </property>
         <item row="2" column="2">
-         <widget class="QSpinBox" name="borderTop">
+         <widget class="QSpinBox" name="sbFrameMarginTop">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -554,7 +554,7 @@
          </widget>
         </item>
         <item row="4" column="2">
-         <widget class="QSpinBox" name="borderBottom">
+         <widget class="QSpinBox" name="sbFrameMarginBottom">
           <property name="maximumSize">
            <size>
             <width>60</width>
@@ -567,7 +567,7 @@
          </widget>
         </item>
         <item row="3" column="3">
-         <widget class="QSpinBox" name="borderRight">
+         <widget class="QSpinBox" name="sbFrameMarginRight">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -586,7 +586,7 @@
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QSpinBox" name="borderLeft">
+         <widget class="QSpinBox" name="sbFrameMarginLeft">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -607,7 +607,7 @@
            <string>Border around each image. If atlas will be saled (OpenGL), keep at least 1 px border.</string>
           </property>
           <property name="text">
-           <string>Border</string>
+           <string>Margin</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -619,14 +619,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="btnAddFiles">
           <property name="text">
            <string>Add File(s)</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="btnAddDir">
           <property name="text">
            <string>Add Directory</string>
           </property>
