@@ -24,7 +24,7 @@ public:
     explicit WidgetExplorer(QWidget *parent = 0);
     ~WidgetExplorer();
     
-    void AddItem(eItemType eNewItemType, const QString sNewItemPath);
+    void AddItem(eItemType eNewItemType, const QString sNewItemPath, bool bOpenAfterAdd);
     void RemoveItem(Item *pItem);
     
     Item *GetCurProjSelected();

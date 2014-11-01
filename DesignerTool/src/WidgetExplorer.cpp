@@ -6,7 +6,6 @@
 #include "ItemFont.h"
 
 #include <QDirIterator>
-#include <QMessageBox>
 
 WidgetExplorer::WidgetExplorer(QWidget *parent) :
     QWidget(parent),
@@ -28,7 +27,7 @@ WidgetExplorer::~WidgetExplorer()
     delete ui;
 }
 
-void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath)
+void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath, bool bOpenAfterAdd)
 {
     if(eNewItemType == ITEM_Unknown)
     {
@@ -63,7 +62,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath)
     {
         if(HyGlobal::IsWorkspaceValid(QDir(pItem->GetPath())) == false)
         {
-            QMessageBox::warning(this, "Harmony Designer Tool", "Project workspace is invalid.");
+            
             HYLOG("Could not open project: " % pItem->GetPath(), LOGTYPE_Warning);
             return;
         }
@@ -128,6 +127,11 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath)
                     CreateTreeItem(pCurParentTreeItem, pPrefixItem);
                 }
             }
+        }
+        
+        if(bOpenAfterAdd)
+        {
+            ui->treeWidget->expandItem(pProjTreeItem);
         }
     }
     else
@@ -217,6 +221,18 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath)
         {
             HYLOG("Did not add item: " % pItem->GetName() % " successfully", LOGTYPE_Error);
             return;
+        }
+        else if(bOpenAfterAdd)
+        {
+            // TODO: expand doesn't work, might need to expand every parent of pItem
+            QTreeWidgetItem *pExpandItem = pItem->GetTreeItem();
+            while(pExpandItem->parent() != NULL)
+            {
+                ui->treeWidget->expandItem(pExpandItem->parent());
+                pExpandItem = pExpandItem->parent();
+            }
+            
+            MainWindow::OpenItem(pItem);
         }
     }
 }

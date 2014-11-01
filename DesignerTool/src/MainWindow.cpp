@@ -82,6 +82,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 /*static*/ void MainWindow::OpenItem(Item *pItem)
 {
     sm_pInstance->ui->renderer->OpenItem(pItem);
+    pItem->GetTreeItem()->setSelected(true);
 }
 
 /*static*/ void MainWindow::CloseItem(Item *pItem)
@@ -97,7 +98,7 @@ void MainWindow::on_actionNewProject_triggered()
     {
         QString sProjDirPath = pDlg->GetProjPath();
 
-        ui->explorer->AddItem(ITEM_Project, sProjDirPath);
+        ui->explorer->AddItem(ITEM_Project, sProjDirPath, true);
     }
 }
 
@@ -113,7 +114,7 @@ void MainWindow::on_actionOpenProject_triggered()
 
     if(pDlg->exec() == QDialog::Accepted)
     {
-        ui->explorer->AddItem(ITEM_Project, pDlg->selectedFiles()[0]);
+        ui->explorer->AddItem(ITEM_Project, pDlg->selectedFiles()[0], true);
     }
 }
 
@@ -151,7 +152,7 @@ void MainWindow::NewItem(eItemType eItem)
     if(pDlg->exec())
     {
         QString sPath = QDir::cleanPath(sSpritePath % pDlg->GetPrefix() % "/" % pDlg->GetName() % HyGlobal::ItemExt(eItem));
-        ui->explorer->AddItem(eItem, sPath);
+        ui->explorer->AddItem(eItem, sPath, true);
     }
 }
 
@@ -192,7 +193,7 @@ void MainWindow::LoadSettings()
         QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
         foreach(QString sProjPath, sListOpenProjs)
         {
-            ui->explorer->AddItem(ITEM_Project, sProjPath);
+            ui->explorer->AddItem(ITEM_Project, sProjPath, false);
         }
     }
     m_Settings.endGroup();
