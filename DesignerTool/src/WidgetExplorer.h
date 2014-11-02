@@ -27,6 +27,8 @@ public:
     void AddItem(eItemType eNewItemType, const QString sNewItemPath, bool bOpenAfterAdd);
     void RemoveItem(Item *pItem);
     
+    void SelectItem(Item *pItem);
+    
     Item *GetCurProjSelected();
     Item *GetCurItemSelected();
     Item *GetCurDirSelected(bool bIncludePrefixDirs);

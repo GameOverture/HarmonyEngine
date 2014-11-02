@@ -82,7 +82,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 /*static*/ void MainWindow::OpenItem(Item *pItem)
 {
     sm_pInstance->ui->renderer->OpenItem(pItem);
-    pItem->GetTreeItem()->setSelected(true);
+    sm_pInstance->ui->explorer->SelectItem(pItem);
 }
 
 /*static*/ void MainWindow::CloseItem(Item *pItem)

@@ -252,6 +252,21 @@ void WidgetExplorer::RemoveItem(Item *pItem)
     delete pItem;
 }
 
+void WidgetExplorer::SelectItem(Item *pItem)
+{
+    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
+    {
+        QTreeWidgetItemIterator it(ui->treeWidget->topLevelItem(i));
+        while (*it)
+        {
+            (*it)->setSelected(false);
+            ++it;
+        }
+    }
+    
+    pItem->GetTreeItem()->setSelected(true);
+}
+
 QTreeWidgetItem *WidgetExplorer::CreateTreeItem(QTreeWidgetItem *pParent, Item *pItem)
 {
     QTreeWidgetItem *pNewTreeItem;
