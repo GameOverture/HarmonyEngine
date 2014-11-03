@@ -61,7 +61,13 @@ HyApp::HyApp(HarmonyInit &initStruct) :     IApplication(initStruct),
 
 void HyApp::SetItem(Item *pItem)
 {
+    if(m_pCurItem != NULL)
+        m_pCurItem->Hide();
+    
     m_pCurItem = pItem;
+    
+    if(m_pCurItem != NULL)
+        m_pCurItem->Show();
 }
 
 HyViewport &HyApp::GetViewport()
