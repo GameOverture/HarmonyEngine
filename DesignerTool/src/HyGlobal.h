@@ -56,6 +56,7 @@ public:
         sm_sItemNames[ITEM_DirSprites] = sm_sItemNames[ITEM_Sprite] = "Sprite";
         sm_sItemNames[ITEM_DirShaders] = sm_sItemNames[ITEM_Shader] = "Shader";
         sm_sItemNames[ITEM_DirEntities] = sm_sItemNames[ITEM_Entity] = "Entity";
+        sm_sItemNames[ITEM_TextureAtlas] = "Atlas";
         
         sm_sItemExt[ITEM_Project] = "/";
         sm_sItemExt[ITEM_DirAudio] = "/";
@@ -90,7 +91,6 @@ public:
         sm_ItemIcons[ITEM_Spine].addFile(QString(":/icons16x16/spine-document.png"));
         sm_ItemIcons[ITEM_Sprite].addFile(QString(":/icons16x16/sprite-document.png"));
         sm_ItemIcons[ITEM_Entity].addFile(QString(":/icons16x16/entity-document.png"));
-        
         sm_ItemIcons[ITEM_TextureAtlas].addFile(QString(":/icons16x16/atlas-document.png"));
 
         sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_-]*"));

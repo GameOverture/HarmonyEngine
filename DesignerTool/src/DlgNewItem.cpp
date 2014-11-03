@@ -16,6 +16,7 @@ DlgNewItem::DlgNewItem(const QString &sSubDirPath, eItemType eItem, QWidget *par
     setWindowIcon(HyGlobal::ItemIcon(eItem));
     
     m_sSubDirPath = sSubDirPath;
+    m_sItemExt = HyGlobal::ItemExt(eItem);
     
     QDir subDir(m_sSubDirPath);
     Q_ASSERT(0 == QString::compare(subDir.dirName(), HyGlobal::ItemName(eItem), Qt::CaseInsensitive));
@@ -113,8 +114,8 @@ void DlgNewItem::ErrorCheck()
     else if(ui->cmbPrefixList->currentIndex() != 0)
         newItemPath = newItemPath % '/' % ui->cmbPrefixList->currentText();
     
-    newItemPath = newItemPath % '/' % ui->txtName->text();
-    QDir spriteDir(newItemPath);
+    newItemPath = newItemPath % '/' % ui->txtName->text() % m_sItemExt;
+    QDir newItemDir(newItemPath);
     
     bool bIsError = false;
     do
@@ -126,7 +127,7 @@ void DlgNewItem::ErrorCheck()
             break;
         }
         
-        if(spriteDir.exists())
+        if(newItemDir.exists())
         {
             ui->lblError->setText("Error: An item with this name at this location already exists.");
             bIsError = true;

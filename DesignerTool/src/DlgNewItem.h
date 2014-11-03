@@ -14,6 +14,7 @@ class DlgNewItem : public QDialog
     Q_OBJECT
 
     QString         m_sSubDirPath;
+    QString         m_sItemExt;
 
 public:
     explicit DlgNewItem(const QString &sSubDirPath, eItemType eItem, QWidget *parent = 0);

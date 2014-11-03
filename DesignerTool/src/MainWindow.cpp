@@ -3,6 +3,7 @@
 
 #include "DlgNewProject.h"
 #include "DlgNewItem.h"
+#include "DlgInputName.h"
 
 #include "WidgetExplorer.h"
 
@@ -156,6 +157,20 @@ void MainWindow::NewItem(eItemType eItem)
     }
 }
 
+void MainWindow::on_actionNewAtlas_triggered()
+{
+    QString sCurPath = ui->explorer->GetCurDirSelected(true)->GetPath();
+    Item *pDirItem = ui->explorer->GetCurDirSelected(false);
+    //QString sAtlasPath = sCurPath % "/" % HyGlobal::ItemName(eItem) % "/";
+    
+    DlgInputName *pDlg = new DlgInputName("Enter name for " % HyGlobal::ItemName(pDirItem->GetType()) % " " % HyGlobal::ItemName(ITEM_TextureAtlas), ITEM_TextureAtlas, sCurPath);
+    if(pDlg->exec())
+    {
+        QString sPath = QDir::cleanPath(pDlg->GetFullPathNameMinusExt());
+        ui->explorer->AddItem(ITEM_TextureAtlas, sPath, true);
+    }
+}
+
 void MainWindow::closeEvent(QCloseEvent * event)
 {
     SaveSettings();
@@ -232,3 +247,4 @@ void MainWindow::on_actionViewExplorer_triggered()
 {
     
 }
+

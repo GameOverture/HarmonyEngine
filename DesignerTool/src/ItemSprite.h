@@ -8,13 +8,15 @@ class ItemSprite : public Item
 {
     friend class WidgetExplorer;
     
-    HyPrimitive2d       m_primOriginVert;
     HyPrimitive2d       m_primOriginHorz;
+    HyPrimitive2d       m_primOriginVert;
     
     ItemSprite();
     
 protected:
     
+    virtual void Hide();
+    virtual void Show();
     virtual void Draw(HyApp *pHyApp);
     
     virtual void Save();

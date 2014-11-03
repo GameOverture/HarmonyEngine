@@ -7,8 +7,35 @@ ItemSprite::ItemSprite() : Item()
     
     vec2 vLinePts[2];
     
-    //vLinePts
-    //m_primOriginVert.SetAsEdgeChain(
+    vLinePts[0].x = -2048.0f;
+    vLinePts[0].y = 0.0f;
+    vLinePts[1].x = 2048.0f;
+    vLinePts[1].y = 0.0f;
+    m_primOriginHorz.SetAsEdgeChain(vLinePts, 2, false);
+    
+    vLinePts[0].x = 0.0f;
+    vLinePts[0].y = -2048.0f;
+    vLinePts[1].x = 0.0f;
+    vLinePts[1].y = 2048.0f;
+    m_primOriginVert.SetAsEdgeChain(vLinePts, 2, false);
+    
+    m_primOriginHorz.Color().Set(1.0f, 0.0f, 0.0f, 1.0f);
+    m_primOriginVert.Color().Set(1.0f, 0.0f, 0.0f, 1.0f);
+    
+    m_primOriginHorz.Load();
+    m_primOriginVert.Load();
+}
+
+/*virtual*/ void ItemSprite::Hide()
+{
+    m_primOriginHorz.SetEnabled(false);
+    m_primOriginVert.SetEnabled(false);
+}
+
+/*virtual*/ void ItemSprite::Show()
+{
+    m_primOriginHorz.SetEnabled(true);
+    m_primOriginVert.SetEnabled(true);
 }
 
 /*virtual*/ void ItemSprite::Draw(HyApp *pHyApp)

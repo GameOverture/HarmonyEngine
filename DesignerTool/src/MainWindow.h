@@ -46,6 +46,8 @@ private slots:
     
     void on_actionViewExplorer_triggered();
     
+    void on_actionNewAtlas_triggered();
+    
 private:
     Ui::MainWindow *ui;
 

@@ -4,6 +4,7 @@
 #include "MainWindow.h"
 #include "ItemSprite.h"
 #include "ItemFont.h"
+#include "ItemAtlas.h"
 
 #include <QDirIterator>
 
@@ -46,11 +47,15 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     case ITEM_DirSprites:
     case ITEM_Prefix:
         pItem = new Item();
+        break;
     case ITEM_Sprite:
         pItem = new ItemSprite();
         break;
     case ITEM_Font:
         pItem = new ItemFont();
+        break;
+    case ITEM_TextureAtlas:
+        pItem = new ItemAtlas();
         break;
     default:
         HYLOG("Item: " % sNewItemPath % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
@@ -136,7 +141,9 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     }
     else
     {
-        // Find parent tree item
+        // NOTE: Cannot use GetCurProjSelected() because this function may be called without anything selected in explorer widget. AKA opening an existing project and adding all its contents
+        //
+        // Find the proper project tree item
         QTreeWidgetItem *pParentTreeItem = NULL;
         QDir projDir;
         for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
@@ -158,6 +165,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
             return;
         }
         
+        // Get the relative path from [ProjectDir->ItemPath] e.g. "data/Sprites/SpritePrefix/MySprite.hyspi"
         QString sRelativePath = projDir.relativeFilePath(pItem->GetPath());
         
         QStringList sPathSplitList = sRelativePath.split(QChar('/'));
@@ -167,15 +175,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
             return;
         }
         
-//        for(int i = 0; i < pParentTreeItem->childCount(); ++i)
-//        {
-//            if(QString::compare(sPathSplitList[1], pParentTreeItem->child(i)->text(0), Qt::CaseInsensitive) == 0)
-//            {
-//                pParentTreeItem = pParentTreeItem->child(i);
-//                break;
-//            }
-//        }
-        
+        // Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
         bool bSucceeded = false;
         for(int i = 1; i < sPathSplitList.size(); ++i)
         {
@@ -200,6 +200,8 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
                 
                 if(i != sPathSplitList.size()-1)
                 {
+                    // Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
+                    //
                     QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetPath() % "/" % sPathSplitList[i];
                     
                     Item *pPrefixItem = new Item();
@@ -209,6 +211,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
                 }
                 else
                 {
+                    // At the final traversal, which is the item itself.
                     CreateTreeItem(pParentTreeItem, pItem);
                     
                     bSucceeded = true;
@@ -224,7 +227,6 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         }
         else if(bOpenAfterAdd)
         {
-            // TODO: expand doesn't work, might need to expand every parent of pItem
             QTreeWidgetItem *pExpandItem = pItem->GetTreeItem();
             while(pExpandItem->parent() != NULL)
             {

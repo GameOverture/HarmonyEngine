@@ -33,7 +33,9 @@ SOURCES += main.cpp \
     scriptum/imagesort.cpp \
     scriptum/maxrects.cpp \
     WidgetAtlas.cpp \
-    WidgetSprite.cpp
+    WidgetSprite.cpp \
+    DlgInputName.cpp \
+    ItemAtlas.cpp
 
 HEADERS  += \
     HyApp.h \
@@ -54,7 +56,9 @@ HEADERS  += \
     scriptum/imagepacker.h \
     scriptum/maxrects.h \
     WidgetAtlas.h \
-    WidgetSprite.h
+    WidgetSprite.h \
+    DlgInputName.h \
+    ItemAtlas.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -66,7 +70,8 @@ FORMS    += \
     WidgetFontMap.ui \
     DlgNewItem.ui \
     WidgetAtlas.ui \
-    WidgetSprite.ui
+    WidgetSprite.ui \
+    DlgInputName.ui
 
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER
 
