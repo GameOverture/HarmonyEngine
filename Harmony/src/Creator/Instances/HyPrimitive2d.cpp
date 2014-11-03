@@ -21,6 +21,7 @@ HyPrimitive2d::HyPrimitive2d() :	IObjInst2d(HYINST_Primitive2d, NULL, NULL),
 
 HyPrimitive2d::~HyPrimitive2d(void)
 {
+	delete [] m_pVertices;
 }
 
 const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
@@ -43,6 +44,8 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 void HyPrimitive2d::SetAsBox(float fHalfWidth, float fHalfHeight, bool bWireframe, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
 {
 	delete [] m_pVertices;
+	m_pVertices = NULL;
+	m_uiNumVerts = 0;
 
 	float fCoordMod = eCoordType == HYCOORD_Meter ? HyCreator::PixelsPerMeter() : 1.0f;
 	fHalfWidth *= fCoordMod;
@@ -86,6 +89,8 @@ void HyPrimitive2d::SetAsBox(float fHalfWidth, float fHalfHeight, bool bWirefram
 void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
 {
 	delete [] m_pVertices;
+	m_pVertices = NULL;
+	m_uiNumVerts = 0;
 
 	if(bWireframe)
 	{
@@ -119,6 +124,8 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 void HyPrimitive2d::SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
 {
 	delete [] m_pVertices;
+	m_pVertices = NULL;
+	m_uiNumVerts = 0;
 
 	m_uiRenderStates &= ~RS_DRAWMODEMASK;
 	m_uiRenderStates |= bChainLoop ? RS_DRAWMODE_LINELOOP : RS_DRAWMODE_LINESTRIP; //GL_LINE_STRIP;
