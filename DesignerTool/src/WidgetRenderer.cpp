@@ -83,8 +83,5 @@ void WidgetRenderer::on_tabWidget_currentChanged(int index)
         return;
     
     TabPage *pTabPage = reinterpret_cast<TabPage *>(ui->tabWidget->widget(index));
-    
-    pTabPage->GetItem();
-    
-    
+    m_pHyApp->SetItem(pTabPage->GetItem());    
 }

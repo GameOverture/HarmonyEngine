@@ -4,6 +4,9 @@
 #include <QTreeWidget>
 
 #include "HyGlobal.h"
+#include "HyApp.h"
+
+class HyApp;
 
 class Item
 {
@@ -30,7 +33,9 @@ public:
     
     void SetTreeItem(QTreeWidgetItem *pTreeItem)    { m_pTreeItemPtr = pTreeItem; }
     
-    virtual void Draw();
+    virtual void Draw(HyApp *pHyApp);
+    
+    virtual void Save();
     
 signals:
     

@@ -1,4 +1,5 @@
 #include "HyApp.h"
+#include "Item.h"
 
 HyApp::HyApp(HarmonyInit &initStruct) :     IApplication(initStruct),
                                             m_pCurItem(NULL)
@@ -46,8 +47,9 @@ HyApp::HyApp(HarmonyInit &initStruct) :     IApplication(initStruct),
     // update() belongs to QGLWidget. This will invoke QGLWidget's paintGL, which inturn will invoke Harmony's IGfxApi::Update()
     //m_pGfx->update();
     
+    
     if(m_pCurItem)
-        m_pCurItem->Draw();
+        m_pCurItem->Draw(this);
 
     return true;
 }
@@ -55,4 +57,14 @@ HyApp::HyApp(HarmonyInit &initStruct) :     IApplication(initStruct),
 /*virtual*/ bool HyApp::Shutdown()
 {
     return true;
+}
+
+void HyApp::SetItem(Item *pItem)
+{
+    m_pCurItem = pItem;
+}
+
+HyViewport &HyApp::GetViewport()
+{
+    return m_Viewport;
 }

@@ -4,7 +4,7 @@
 #include "Harmony/HyEngine.h"
 #include "Spine.h"
 
-#include "Item.h"
+class Item;
 
 class HyApp : public IApplication
 {
@@ -20,6 +20,10 @@ public:
     virtual bool Initialize();
     virtual bool Update();
     virtual bool Shutdown();
+    
+    void SetItem(Item *pItem);
+    
+    HyViewport &GetViewport();
 };
 
 #endif // HYAPP_H

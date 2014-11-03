@@ -51,7 +51,12 @@ QString Item::GetName() const
     return itemInfo.baseName();
 }
 
-/*virtual*/ void Item::Draw()
+/*virtual*/ void Item::Draw(HyApp *pHyApp)
 {
-    HYLOG("Tried to draw a non-derived item: " % GetName(), LOGTYPE_Normal);
+    HYLOG("Tried to draw a non-derived item: " % GetName(), LOGTYPE_Error);
+}
+
+/*virtual*/ void Item::Save()
+{
+    HYLOG("Tried to save a non-derived item: " % GetName(), LOGTYPE_Error);
 }
