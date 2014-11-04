@@ -28,7 +28,7 @@ public:
 	uint32 GetNumVerts()		{ return m_uiNumVerts; }
 	vec4 *GetVertexDataPtr()	{ return m_pVertices; }
 
-	void SetAsBox(float fHalfWidth, float fHalfHeight, bool bWireframe, HyCoordinateType eCoordType = HYCOORD_Pixel, vec2 &vOffset = vec2(0.0f));
+	void SetAsQuad(float fHalfWidth, float fHalfHeight, bool bWireframe, HyCoordinateType eCoordType = HYCOORD_Pixel, vec2 &vOffset = vec2(0.0f));
 
 	void SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, HyCoordinateType eCoordType = HYCOORD_Pixel, vec2 &vOffset = vec2(0.0f));
 

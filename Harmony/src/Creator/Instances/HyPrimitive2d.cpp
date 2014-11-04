@@ -41,7 +41,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 	return *this;
 }
 
-void HyPrimitive2d::SetAsBox(float fHalfWidth, float fHalfHeight, bool bWireframe, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
+void HyPrimitive2d::SetAsQuad(float fHalfWidth, float fHalfHeight, bool bWireframe, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
 {
 	delete [] m_pVertices;
 	m_pVertices = NULL;
@@ -82,7 +82,7 @@ void HyPrimitive2d::SetAsBox(float fHalfWidth, float fHalfHeight, bool bWirefram
 	}
 	else
 	{
-		HyError("HyPrimitive2d::SetAsBox() doesn't support non-wireframe yet");
+		HyError("HyPrimitive2d::SetAsQuad() doesn't support non-wireframe yet");
 	}
 }
 

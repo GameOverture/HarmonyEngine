@@ -38,7 +38,6 @@ public:
 	virtual ~HySpine2d(void);
 
 	spSkeleton *GetSkeleton()		{ return m_pSpineSkeleton; }
-	uint32 GetTextureId();
 
 	/************************************************************************************************
 											ANIMATION CALLS
