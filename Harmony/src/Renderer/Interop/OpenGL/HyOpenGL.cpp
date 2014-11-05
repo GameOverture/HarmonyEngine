@@ -92,26 +92,30 @@ HyOpenGL::~HyOpenGL(void)
 
 
 	//////////////////////////////////////////////////////////////////////////
-	// Init Shaders
+	// Init Built-in Shaders
 	//////////////////////////////////////////////////////////////////////////
-	m_ShaderEnt2d.CompileFromFile("Ent2d", HyGlfwShader::VERTEX);
-	m_ShaderEnt2d.CompileFromFile("Ent2d", HyGlfwShader::FRAGMENT);
+	m_ShaderEnt2d.CompileFromFile("Ent2d", HyOpenGLShader::VERTEX);
+	m_ShaderEnt2d.CompileFromFile("Ent2d", HyOpenGLShader::FRAGMENT);
+
+	m_ShaderEnt2d.BindAttribLocation(0, "position");
+	m_ShaderEnt2d.BindAttribLocation(1, "color");
+	m_ShaderEnt2d.BindAttribLocation(2, "uv");
 
 	if(!m_ShaderEnt2d.Link())
 		HyError("Shader program failed to link!\n" << m_ShaderEnt2d.Log().c_str() << "\n");
 
 	//////////////////////////////////////////////////////////////////////////
 
-	m_ShaderPrimitive2d.CompileFromFile("Prim2d", HyGlfwShader::VERTEX);
-	m_ShaderPrimitive2d.CompileFromFile("Prim2d", HyGlfwShader::FRAGMENT);
+	m_ShaderPrimitive2d.CompileFromFile("Prim2d", HyOpenGLShader::VERTEX);
+	m_ShaderPrimitive2d.CompileFromFile("Prim2d", HyOpenGLShader::FRAGMENT);
 
 	if(!m_ShaderPrimitive2d.Link())
 		HyError("Shader program failed to link!\n" << m_ShaderPrimitive2d.Log().c_str() << "\n");
 
 	//////////////////////////////////////////////////////////////////////////
 
-	m_ShaderText2d.CompileFromFile("Txt2d", HyGlfwShader::VERTEX);
-	m_ShaderText2d.CompileFromFile("Txt2d", HyGlfwShader::FRAGMENT);
+	m_ShaderText2d.CompileFromFile("Txt2d", HyOpenGLShader::VERTEX);
+	m_ShaderText2d.CompileFromFile("Txt2d", HyOpenGLShader::FRAGMENT);
 
 	if(!m_ShaderText2d.Link())
 		HyError("Shader program failed to link!\n" << m_ShaderText2d.Log().c_str() << "\n");
@@ -194,19 +198,6 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ bool HyOpenGL::Begin_3d()
 {
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
-	//glFrontFace(GL_CW);
-
-	//glEnable(GL_DEPTH_TEST);
-	//glDepthMask(GL_TRUE);
-	//glDepthFunc(GL_LEQUAL);
-
-	//m_Shader3d.SetUniform("Kd", 0.4f, 0.4f, 0.4f);
-	//m_Shader3d.SetUniform("Ks", 0.9f, 0.9f, 0.9f);
-	//m_Shader3d.SetUniform("Ka", 0.1f, 0.1f, 0.1f);
-	//m_Shader3d.SetUniform("Shininess", 180.0f);
-
 	return false;
 }
 
@@ -325,9 +316,9 @@ HyOpenGL::~HyOpenGL(void)
 
 			m_ShaderEnt2d.SetUniform("cameraToClipMatrix", m_mtxProj);
 
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-			glEnableVertexAttribArray(2);
+			glEnableVertexAttribArray(m_ShaderEnt2d.GetAttribLocation("position"));
+			glEnableVertexAttribArray(m_ShaderEnt2d.GetAttribLocation("color"));
+			glEnableVertexAttribArray(m_ShaderEnt2d.GetAttribLocation("uv"));
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
 			glPrimitiveRestartIndex(HY_RESTART_INDEX);
@@ -347,9 +338,9 @@ HyOpenGL::~HyOpenGL(void)
 	pThis->m_ShaderEnt2d.SetUniform("localToWorld", pInst->GetTransformMtx());
 
 	uint32 uiByteOffset = pInst->GetVertexDataOffset();
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)uiByteOffset);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(4*sizeof(GLfloat))));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(8*sizeof(GLfloat))));
+	glVertexAttribPointer(pThis->m_ShaderEnt2d.GetAttribLocation("position"), 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)uiByteOffset);
+	glVertexAttribPointer(pThis->m_ShaderEnt2d.GetAttribLocation("color"), 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(4*sizeof(GLfloat))));
+	glVertexAttribPointer(pThis->m_ShaderEnt2d.GetAttribLocation("uv"), 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(8*sizeof(GLfloat))));
 
 	GLuint uiTexId = pInst->GetTextureId();
 	glBindTexture(GL_TEXTURE_2D, uiTexId);

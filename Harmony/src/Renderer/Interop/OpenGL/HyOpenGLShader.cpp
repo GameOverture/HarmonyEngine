@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyGlfwShader.cpp
+ *	HyOpenGLShader.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -11,11 +11,11 @@
 #include "FileIO/HyFileIO.h"
 #include "Utilities/HyStrManip.h"
 
-HyGlfwShader::HyGlfwShader() : m_hProgHandle(0), m_bLinked(false) 
+HyOpenGLShader::HyOpenGLShader() : m_hProgHandle(0), m_bLinked(false) 
 {
 }
 
-HyGlfwShader::~HyGlfwShader()
+HyOpenGLShader::~HyOpenGLShader()
 {
 	// Delete shader objects, shader program, and uniforms allocated in the constructor
 
@@ -24,7 +24,7 @@ HyGlfwShader::~HyGlfwShader()
 		glDeleteProgram(m_hProgHandle);
 }
 
-bool HyGlfwShader::CompileFromFile(const char *szFileName, eGLSLShaderType eType)
+bool HyOpenGLShader::CompileFromFile(const char *szFileName, eGLSLShaderType eType)
 {
 	// check if the user passed us null for either filename
 	if (szFileName == NULL)
@@ -91,7 +91,7 @@ bool HyGlfwShader::CompileFromFile(const char *szFileName, eGLSLShaderType eType
 	return CompileFromString(m_sCurSrcCode.c_str(), eType);
 }
 
-bool HyGlfwShader::CompileFromString(const char *szSource, eGLSLShaderType type)
+bool HyOpenGLShader::CompileFromString(const char *szSource, eGLSLShaderType type)
 {
 	// Create main program handle if one hasn't been created yet (first shader compile)
 	if(m_hProgHandle <= 0)
@@ -152,7 +152,7 @@ bool HyGlfwShader::CompileFromString(const char *szSource, eGLSLShaderType type)
 	}
 }
 
-bool HyGlfwShader::Link()
+bool HyOpenGLShader::Link()
 {
 	if( m_bLinked )
 		return true;
@@ -194,7 +194,7 @@ bool HyGlfwShader::Link()
 	}
 }
 
-void HyGlfwShader::Use()
+void HyOpenGLShader::Use()
 {
 	if(m_hProgHandle <= 0 || (! m_bLinked))
 		return;
@@ -202,93 +202,98 @@ void HyGlfwShader::Use()
 	glUseProgram(m_hProgHandle);
 }
 
-std::string HyGlfwShader::Log()
+std::string HyOpenGLShader::Log()
 {
 	return m_sLogStr;
 }
 
-GLint HyGlfwShader::GetHandle()
+GLint HyOpenGLShader::GetHandle()
 {
 	return m_hProgHandle;
 }
 
-bool HyGlfwShader::IsLinked()
+bool HyOpenGLShader::IsLinked()
 {
 	return m_bLinked;
 }
 
-void HyGlfwShader::BindAttribLocation(GLuint location, const char *name)
+void HyOpenGLShader::BindAttribLocation(GLuint location, const char *szName)
 {
-	glBindAttribLocation(m_hProgHandle, location, name);
+	glBindAttribLocation(m_hProgHandle, location, szName);
 }
 
-void HyGlfwShader::BindFragDataLocation(GLuint location, const char *name)
+uint32 HyOpenGLShader::GetAttribLocation(const char *szName)
 {
-	glBindFragDataLocation(m_hProgHandle, location, name);
+	return glGetAttribLocation(m_hProgHandle, szName);
 }
 
-void HyGlfwShader::SetUniform(const char *name, float x, float y, float z)
+void HyOpenGLShader::BindFragDataLocation(GLuint location, const char *szName)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, name);
+	glBindFragDataLocation(m_hProgHandle, location, szName);
+}
+
+void HyOpenGLShader::SetUniform(const char *szName, float x, float y, float z)
+{
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniform3f(loc,x,y,z);
 }
 
-void HyGlfwShader::SetUniform(const char *name, const vec3 &v)
+void HyOpenGLShader::SetUniform(const char *szName, const vec3 &v)
 {
-	this->SetUniform(name, v.x, v.y, v.z);
+	this->SetUniform(szName, v.x, v.y, v.z);
 }
 
-void HyGlfwShader::SetUniform(const char *name, const vec4 &v)
+void HyOpenGLShader::SetUniform(const char *szName, const vec4 &v)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, name);
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if( loc >= 0 )
 		glUniform4f(loc, v.x, v.y, v.z, v.w);
 }
 
-void HyGlfwShader::SetUniform(const char *name, const mat4 &m)
+void HyOpenGLShader::SetUniform(const char *szName, const mat4 &m)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, name);
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &m[0][0]);
 }
 
-void HyGlfwShader::SetUniform(const char *name, const mat3 &m)
+void HyOpenGLShader::SetUniform(const char *szName, const mat3 &m)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, name);
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniformMatrix3fv(loc, 1, GL_FALSE, &m[0][0]);
 }
 
-void HyGlfwShader::SetUniform(const char *name, float val )
+void HyOpenGLShader::SetUniform(const char *szName, float val )
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, name);
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniform1f(loc, val);
 }
 
-void HyGlfwShader::SetUniform(const char *name, int32 val)
+void HyOpenGLShader::SetUniform(const char *szName, int32 val)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, name);
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniform1i(loc, val);
 }
 
-void HyGlfwShader::SetUniform(const char *name, uint32 val)
+void HyOpenGLShader::SetUniform(const char *szName, uint32 val)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, name);
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniform1ui(loc, val);
 }
 
-void HyGlfwShader::SetUniform(const char *name, bool val)
+void HyOpenGLShader::SetUniform(const char *szName, bool val)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, name);
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniform1i(loc, val);
 }
 
-void HyGlfwShader::PrintActiveUniforms()
+void HyOpenGLShader::PrintActiveUniforms()
 {
 	GLint nUniforms, size, location, maxLen;
 	GLchar * name;
@@ -312,7 +317,7 @@ void HyGlfwShader::PrintActiveUniforms()
 	free(name);
 }
 
-void HyGlfwShader::PrintActiveAttribs()
+void HyOpenGLShader::PrintActiveAttribs()
 {
 
 	GLint written, size, location, maxLength, nAttribs;

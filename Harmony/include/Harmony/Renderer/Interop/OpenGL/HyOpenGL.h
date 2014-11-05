@@ -29,9 +29,9 @@ protected:
 	int32					m_iNumPasses3d;
 
 	///////// 2D MEMBERS ////////////////////
-	HyGlfwShader			m_ShaderEnt2d;
-	HyGlfwShader			m_ShaderPrimitive2d;
-	HyGlfwShader			m_ShaderText2d;
+	HyOpenGLShader			m_ShaderEnt2d;
+	HyOpenGLShader			m_ShaderPrimitive2d;
+	HyOpenGLShader			m_ShaderText2d;
 
 	GLuint					m_hVAO2d;
 	GLuint					m_hVBO2d;
