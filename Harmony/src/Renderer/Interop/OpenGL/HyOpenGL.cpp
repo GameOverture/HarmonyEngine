@@ -432,8 +432,8 @@ HyOpenGL::~HyOpenGL(void)
 	}
 
 	// This is probable unnecessary
-	GLint iLocation = glGetUniformLocation(m_ShaderEnt2d.GetHandle(), "Tex");
-	glUniform1i(iLocation, 0);
+	//GLint iLocation = glGetUniformLocation(m_ShaderEnt2d.GetHandle(), "Tex");
+	//glUniform1i(iLocation, 0);
 
 	return hGLTexture;
 }

@@ -10,6 +10,6 @@ out vec4 outputColor;
 void main()
 {
 	// Blend interpColor with whatever texel I get from interpUV
-	vec4 texelClr = texture(Tex, interpUV);
+	vec4 texelClr = texture2D(Tex, interpUV);
 	outputColor = interpColor * texelClr;
 }
