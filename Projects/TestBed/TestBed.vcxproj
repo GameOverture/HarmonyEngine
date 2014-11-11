@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\Shaders\Ent2d.frag" />
-    <None Include="Data\Shaders\Ent2d.vert" />
+    <None Include="Data\Shaders\HyQuadBatch.frag" />
+    <None Include="Data\Shaders\HyQuadBatch.vert" />
     <None Include="Data\Shaders\Prim2d.frag" />
     <None Include="Data\Shaders\Prim2d.vert" />
     <None Include="data\shaders\Txt2d.frag" />

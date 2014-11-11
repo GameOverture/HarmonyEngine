@@ -23,7 +23,7 @@ HySpine2d::HySpine2d(const char *szPrefix, const char *szName) :	IObjInst2d(HYIN
 											m_uiCurAnimState(0),
 											m_spSkeletonBounds(NULL)
 {
-	m_uiRenderStates |= (RS_SHADER_SPINE | RS_DRAWMODE_TRIANGLESTRIP);
+	m_uiRenderStates |= (RS_SHADER_QUADBATCH | RS_DRAWMODE_TRIANGLESTRIP);
 }
 
 HySpine2d::~HySpine2d(void)

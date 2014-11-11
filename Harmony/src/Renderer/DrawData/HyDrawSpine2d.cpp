@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyDrawSpine2d.cpp
+ *	HyDrawQuadBatch2d.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -10,7 +10,7 @@
 #include "Renderer/DrawData/HyDrawSpine2d.h"
 #include "Utilities/HySpineRuntime.h"
 
-HyDrawSpine2d::HyDrawSpine2d(HySpine2d &inst, uint32 uiVertexDataOffset, char *&pCurVertexWritePos) :	IDraw2d(inst.GetRenderState(), uiVertexDataOffset, sizeof(HyDrawSpine2d)),
+HyDrawQuadBatch2d::HyDrawQuadBatch2d(HySpine2d &inst, uint32 uiVertexDataOffset, char *&pCurVertexWritePos) :	IDraw2d(inst.GetRenderState(), uiVertexDataOffset, sizeof(HyDrawQuadBatch2d)),
 																										m_uiTextureId(0)
 {
 	inst.GetWorldTransform(m_mtxTransform);
@@ -52,11 +52,11 @@ HyDrawSpine2d::HyDrawSpine2d(HySpine2d &inst, uint32 uiVertexDataOffset, char *&
 }
 
 
-HyDrawSpine2d::~HyDrawSpine2d(void)
+HyDrawQuadBatch2d::~HyDrawQuadBatch2d(void)
 {
 }
 
-void HyDrawSpine2d::WriteVertexData(int32 iVertIndex, float *pVertexPositions, spRegionAttachment* regionAttachment, const vec4 *pVertColorRGBA, char *&pCurVertexWritePos)
+void HyDrawQuadBatch2d::WriteVertexData(int32 iVertIndex, float *pVertexPositions, spRegionAttachment* regionAttachment, const vec4 *pVertColorRGBA, char *&pCurVertexWritePos)
 {
 	vec4 ptVertPosition;
 	ptVertPosition.x = pVertexPositions[iVertIndex*2];

@@ -12,12 +12,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\Shaders\Ent2d.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Data\Shaders\Ent2d.vert">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Data\Shaders\Prim2d.frag">
       <Filter>Shaders</Filter>
     </None>
@@ -28,6 +22,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="data\shaders\Txt2d.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\HyQuadBatch.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Shaders\HyQuadBatch.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

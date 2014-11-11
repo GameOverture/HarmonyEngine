@@ -286,13 +286,13 @@ void HyCreator::WriteDrawBuffers()
 	m_pCurWritePos = m_GfxCommsRef.GetWriteBufferPtr();
 	
 	HyGfxComms::tDrawHeader *pDrawHeader = new (m_pCurWritePos) HyGfxComms::tDrawHeader;
-	pDrawHeader->_uiReturnFlags = 0;
+	pDrawHeader->uiReturnFlags = 0;
 	m_pCurWritePos += sizeof(HyGfxComms::tDrawHeader);
 
 	mat4 mtxView;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 3d CAMERA(S) BUFFER
-	pDrawHeader->_uiOffsetTo3dCameras = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
+	pDrawHeader->uiOffsetToCameras3d = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
 	char *pWriteNum3dCamsHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 	
@@ -317,7 +317,7 @@ void HyCreator::WriteDrawBuffers()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 2d CAMERA(S) BUFFER
-	pDrawHeader->_uiOffsetTo2dCameras = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
+	pDrawHeader->uiOffsetToCameras2d = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
 	char *pWriteNum2dCamsHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 
@@ -341,7 +341,7 @@ void HyCreator::WriteDrawBuffers()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 3d DRAW BUFFER
-	pDrawHeader->_uiOffsetToEnt3d = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
+	pDrawHeader->uiOffsetToInst3d = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
 	char *pWriteNum3dInstsHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 
@@ -361,7 +361,7 @@ void HyCreator::WriteDrawBuffers()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 2d DRAW BUFFER
-	pDrawHeader->_uiOffsetToEnt2d = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
+	pDrawHeader->uiOffsetToInst2d = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
 	char *pWriteNum2dInstsHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 
@@ -369,7 +369,7 @@ void HyCreator::WriteDrawBuffers()
 	iTotalNumInsts = m_vLoadedInst2d.size();
 
 	char *pStartVertexWritePos = m_pCurWritePos + (iTotalNumInsts * HyRenderer::GetLargest2dDrawSize());
-	pDrawHeader->_uiOffsetToVertexData2d = pStartVertexWritePos - m_GfxCommsRef.GetWriteBufferPtr();
+	pDrawHeader->uiOffsetToVertexData2d = pStartVertexWritePos - m_GfxCommsRef.GetWriteBufferPtr();
 	char *pCurVertexWritePos = pStartVertexWritePos;
 
 	uint32	uiVertexDataOffset = 0;
@@ -387,8 +387,8 @@ void HyCreator::WriteDrawBuffers()
 				m_pCurWritePos += sizeof(HyDrawText2d);
 				break;
 			case HYINST_Spine2d:
-				new (m_pCurWritePos) HyDrawSpine2d(*reinterpret_cast<HySpine2d *>(m_vLoadedInst2d[i]), uiVertexDataOffset, pCurVertexWritePos);
-				m_pCurWritePos += sizeof(HyDrawSpine2d);
+				new (m_pCurWritePos) HyDrawQuadBatch2d(*reinterpret_cast<HySpine2d *>(m_vLoadedInst2d[i]), uiVertexDataOffset, pCurVertexWritePos);
+				m_pCurWritePos += sizeof(HyDrawQuadBatch2d);
 				break;
 			case HYINST_Primitive2d:
 				new (m_pCurWritePos) HyDrawPrimitive2d(*reinterpret_cast<HyPrimitive2d *>(m_vLoadedInst2d[i]), uiVertexDataOffset, pCurVertexWritePos);
@@ -418,7 +418,7 @@ void HyCreator::WriteDrawBuffers()
 	}
 
 	*(reinterpret_cast<int32 *>(pWriteNum2dInstsHere)) = iNumInsts;
-	pDrawHeader->_uiVertexBufferSize2d = pCurVertexWritePos - pStartVertexWritePos;
+	pDrawHeader->uiVertexBufferSize2d = pCurVertexWritePos - pStartVertexWritePos;
 
 	// Do final check to see if we wrote passed our bounds
 	HyAssert((m_pCurWritePos-m_GfxCommsRef.GetWriteBufferPtr()) < RENDER_BUFFER_SIZE, "HyGfxComms::WriteUpdateBuffer() has written passed its bounds! Embiggen 'RENDER_BUFFER_SIZE'");

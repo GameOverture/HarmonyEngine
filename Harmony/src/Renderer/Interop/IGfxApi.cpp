@@ -65,7 +65,7 @@ bool IGfxApi::Update()
 
 	FinishRender();
 
-	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr)->_uiReturnFlags |= GFXFLAG_HasRendered;
+	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr)->uiReturnFlags |= GFXFLAG_HasRendered;
 }
 
 void IGfxApi::ProcessGameMsgs()
@@ -87,12 +87,12 @@ void IGfxApi::ProcessGameMsgs()
 
 void IGfxApi::Draw2d()
 {
-	int32 iNumInstances = GetNumInsts2d();// *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->_uiOffsetToEnt2d));
+	int32 iNumInstances = GetNumInsts2d();// *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d));
 
 	// Set the render state of the first instance to be rendered. This render state will be compared with other instances
 	// to determine whether we need to switch states. The order of these instances should be depth sorted with render states
 	// batched together to reduce state changes.
-	m_pCurDataPtr = m_pDrawBufferPtr + m_DrawpBufferHeader->_uiOffsetToEnt2d + sizeof(int32); // Last sizeof(int32) is skipping number of 2dInsts
+	m_pCurDataPtr = m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d + sizeof(int32); // Last sizeof(int32) is skipping number of 2dInsts
 	m_pCurDrawData = reinterpret_cast<IDraw2d *>(m_pCurDataPtr);
 
 	m_uiCurRenderState = 0;

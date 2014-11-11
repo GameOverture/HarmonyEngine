@@ -58,6 +58,17 @@ const float primitiveVertexDataEmulate[] = {
 	50.0f, -50.0f, 0.0f, 1.0f
 };
 
+const float g_fUnitQuadVertPos[16] = {
+	0.0f, 0.0f, 0.0f, 1.0f,
+	1.0f, 0.0f, 0.0f, 1.0f,
+	0.0f, 1.0f, 0.0f, 1.0f,
+	1.0f, 1.0f, 0.0f, 1.0f
+};
+
+const short g_i16UnitQuadVertIndices[6] = {
+	0, 1, 2, 2, 1, 3
+};
+
 
 
 HyOpenGL::HyOpenGL() :	IGfxApi(),
@@ -94,15 +105,15 @@ HyOpenGL::~HyOpenGL(void)
 	//////////////////////////////////////////////////////////////////////////
 	// Init Built-in Shaders
 	//////////////////////////////////////////////////////////////////////////
-	m_ShaderEnt2d.CompileFromFile("Ent2d", HyOpenGLShader::VERTEX);
-	m_ShaderEnt2d.CompileFromFile("Ent2d", HyOpenGLShader::FRAGMENT);
+	m_ShaderQuadBatch.CompileFromFile("HyQuadBatch", HyOpenGLShader::VERTEX);
+	m_ShaderQuadBatch.CompileFromFile("HyQuadBatch", HyOpenGLShader::FRAGMENT);
 
-	m_ShaderEnt2d.BindAttribLocation(0, "position");
-	m_ShaderEnt2d.BindAttribLocation(1, "color");
-	m_ShaderEnt2d.BindAttribLocation(2, "uv");
+	m_ShaderQuadBatch.BindAttribLocation(0, "position");
+	m_ShaderQuadBatch.BindAttribLocation(1, "color");
+	m_ShaderQuadBatch.BindAttribLocation(2, "uv");
 
-	if(!m_ShaderEnt2d.Link())
-		HyError("Shader program failed to link!\n" << m_ShaderEnt2d.Log().c_str() << "\n");
+	if(!m_ShaderQuadBatch.Link())
+		HyError("Shader program failed to link!\n" << m_ShaderQuadBatch.Log().c_str() << "\n");
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -129,47 +140,50 @@ HyOpenGL::~HyOpenGL(void)
 	glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
 	//glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-	/* Set up vertex array object */
+	// Set up vertex array object
 	glGenVertexArrays(1, &m_hVAO2d);
 	glBindVertexArray(m_hVAO2d);
 
+	// Initialize 2d quad buffer
 	glGenBuffers(1, &m_hVBO2d);
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
+
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexDataEmulate), vertexDataEmulate, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(primitiveVertexDataEmulate), primitiveVertexDataEmulate, GL_STATIC_DRAW);
+	//-----------------------------------------------------------------------------------------------------------------
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, g_fUnitQuadVertPos, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	// Initialize 2d vertex buffer
-	/* Set up vertex data */
-
-
 	/* Set up index data */
-	m_pGenericIndexBuffer2d = new uint16[HY_INDEX_BUFFER_SIZE/sizeof(uint16)];
-	uint16 *pCurWriteShort = m_pGenericIndexBuffer2d;
-	uint16 uiIndexCount = 0;
-	uint32 uiResetIndexCount = 0;
-	for(int i = 0; i < (HY_INDEX_BUFFER_SIZE/2); ++i)
-	{
-		uiResetIndexCount++;
-		if(uiResetIndexCount == 5)
-		{
-			*pCurWriteShort = HY_RESTART_INDEX;
-			uiResetIndexCount = 0;
-		}
-		else
-		{
-			*pCurWriteShort = uiIndexCount;
-			uiIndexCount++;
-		}
-
-		pCurWriteShort++;
-	}
-
 	glGenBuffers(1, &m_hIBO2d);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, HY_INDEX_BUFFER_SIZE, m_pGenericIndexBuffer2d, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(short)*6, g_i16UnitQuadVertIndices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	glPrimitiveRestartIndex(HY_RESTART_INDEX);
-	glEnable(GL_PRIMITIVE_RESTART);
+
+	//m_pGenericIndexBuffer2d = new uint16[HY_INDEX_BUFFER_SIZE/sizeof(uint16)];
+	//uint16 *pCurWriteShort = m_pGenericIndexBuffer2d;
+	//uint16 uiIndexCount = 0;
+	//uint32 uiResetIndexCount = 0;
+	//for(int i = 0; i < (HY_INDEX_BUFFER_SIZE/2); ++i)
+	//{
+	//	uiResetIndexCount++;
+	//	if(uiResetIndexCount == 5)
+	//	{
+	//		*pCurWriteShort = HY_RESTART_INDEX;
+	//		uiResetIndexCount = 0;
+	//	}
+	//	else
+	//	{
+	//		*pCurWriteShort = uiIndexCount;
+	//		uiIndexCount++;
+	//	}
+
+	//	pCurWriteShort++;
+	//}
+	//glPrimitiveRestartIndex(HY_RESTART_INDEX);
+	//glEnable(GL_PRIMITIVE_RESTART);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -217,20 +231,12 @@ HyOpenGL::~HyOpenGL(void)
 	// Without disabling glDepthMask, sprites fragments that overlap will be discarded
 	glDepthMask(false);
 
-	glPrimitiveRestartIndex(HY_RESTART_INDEX);
-	glEnable(GL_PRIMITIVE_RESTART);
+	//glPrimitiveRestartIndex(HY_RESTART_INDEX);
+	//glEnable(GL_PRIMITIVE_RESTART);
 
 	glBindVertexArray(m_hVAO2d);
 
-	// Initialize 2d vertex buffer
-	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
-
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexDataEmulate), vertexDataEmulate, GL_STATIC_DRAW);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(primitiveVertexDataEmulate), primitiveVertexDataEmulate, GL_STATIC_DRAW);
-	//-----------------------------------------------------------------------------------------------------------------
-	float *pVertexData = GetVertexData2d();
-	glBufferData(GL_ARRAY_BUFFER, m_DrawpBufferHeader->_uiVertexBufferSize2d, pVertexData, GL_DYNAMIC_DRAW);
+	
 	//-----------------------------------------------------------------------------------------------------------------
 
 
@@ -278,50 +284,50 @@ HyOpenGL::~HyOpenGL(void)
 
 			m_fpDraw2d = DrawPrim2dInst;
 		}
-		else if(uiNewRenderState & IObjInst2d::RS_SHADER_TEXT)
+		//else if(uiNewRenderState & IObjInst2d::RS_SHADER_TEXT)
+		//{
+		//	glUseProgram(0);
+		//	m_ShaderText2d.Use();
+
+		//	if(uiNewRenderState & IObjInst2d::RS_USINGLOCALCOORDS)
+		//		m_ShaderText2d.SetUniform("worldToCameraMatrix", m_kmtxIdentity);
+		//	else
+		//		m_ShaderText2d.SetUniform("worldToCameraMatrix", m_mtxView);
+
+		//	m_ShaderText2d.SetUniform("cameraToClipMatrix", m_mtxProj);
+
+		//	glEnableVertexAttribArray(0);
+		//	glEnableVertexAttribArray(1);
+		//	glDisableVertexAttribArray(2);
+
+		//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
+		//	//glPrimitiveRestartIndex(HY_RESTART_INDEX);
+		//	//glEnable(GL_PRIMITIVE_RESTART);
+
+		//	glEnable(GL_BLEND);
+		//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//	glEnable(GL_TEXTURE_2D);
+
+		//	m_fpDraw2d = DrawTxt2dInst;
+		//}
+		else if(uiNewRenderState & IObjInst2d::RS_SHADER_QUADBATCH)
 		{
 			glUseProgram(0);
-			m_ShaderText2d.Use();
+			m_ShaderQuadBatch.Use();
 
 			if(uiNewRenderState & IObjInst2d::RS_USINGLOCALCOORDS)
-				m_ShaderText2d.SetUniform("worldToCameraMatrix", m_kmtxIdentity);
+				m_ShaderQuadBatch.SetUniform("worldToCameraMatrix", m_kmtxIdentity);
 			else
-				m_ShaderText2d.SetUniform("worldToCameraMatrix", m_mtxView);
+				m_ShaderQuadBatch.SetUniform("worldToCameraMatrix", m_mtxView);
 
-			m_ShaderText2d.SetUniform("cameraToClipMatrix", m_mtxProj);
+			m_ShaderQuadBatch.SetUniform("cameraToClipMatrix", m_mtxProj);
 
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-			glDisableVertexAttribArray(2);
+			glEnableVertexAttribArray(m_ShaderQuadBatch.GetAttribLocation("position"));
+			glEnableVertexAttribArray(m_ShaderQuadBatch.GetAttribLocation("color"));
+			glEnableVertexAttribArray(m_ShaderQuadBatch.GetAttribLocation("uv"));
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
-			glPrimitiveRestartIndex(HY_RESTART_INDEX);
-			glEnable(GL_PRIMITIVE_RESTART);
-
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glEnable(GL_TEXTURE_2D);
-
-			m_fpDraw2d = DrawTxt2dInst;
-		}
-		else if(uiNewRenderState & IObjInst2d::RS_SHADER_SPINE)
-		{
-			glUseProgram(0);
-			m_ShaderEnt2d.Use();
-
-			if(uiNewRenderState & IObjInst2d::RS_USINGLOCALCOORDS)
-				m_ShaderEnt2d.SetUniform("worldToCameraMatrix", m_kmtxIdentity);
-			else
-				m_ShaderEnt2d.SetUniform("worldToCameraMatrix", m_mtxView);
-
-			m_ShaderEnt2d.SetUniform("cameraToClipMatrix", m_mtxProj);
-
-			glEnableVertexAttribArray(m_ShaderEnt2d.GetAttribLocation("position"));
-			glEnableVertexAttribArray(m_ShaderEnt2d.GetAttribLocation("color"));
-			glEnableVertexAttribArray(m_ShaderEnt2d.GetAttribLocation("uv"));
-
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
-			glPrimitiveRestartIndex(HY_RESTART_INDEX);
+			//glPrimitiveRestartIndex(HY_RESTART_INDEX);
 			glEnable(GL_PRIMITIVE_RESTART);
 
 			m_fpDraw2d = DrawSpine2dInst;
@@ -332,15 +338,15 @@ HyOpenGL::~HyOpenGL(void)
 
 /*static*/ void HyOpenGL::DrawSpine2dInst(IDraw2d *pBaseInst, void *pApi)
 {
-	HyDrawSpine2d *pInst = reinterpret_cast<HyDrawSpine2d *>(pBaseInst);
+	HyDrawQuadBatch2d *pInst = reinterpret_cast<HyDrawQuadBatch2d *>(pBaseInst);
 	HyOpenGL *pThis = reinterpret_cast<HyOpenGL *>(pApi);
 
-	pThis->m_ShaderEnt2d.SetUniform("localToWorld", pInst->GetTransformMtx());
+	pThis->m_ShaderQuadBatch.SetUniform("localToWorld", pInst->GetTransformMtx());
 
 	uint32 uiByteOffset = pInst->GetVertexDataOffset();
-	glVertexAttribPointer(pThis->m_ShaderEnt2d.GetAttribLocation("position"), 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)uiByteOffset);
-	glVertexAttribPointer(pThis->m_ShaderEnt2d.GetAttribLocation("color"), 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(4*sizeof(GLfloat))));
-	glVertexAttribPointer(pThis->m_ShaderEnt2d.GetAttribLocation("uv"), 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(8*sizeof(GLfloat))));
+	glVertexAttribPointer(pThis->m_ShaderQuadBatch.GetAttribLocation("position"), 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)uiByteOffset);
+	glVertexAttribPointer(pThis->m_ShaderQuadBatch.GetAttribLocation("color"), 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(4*sizeof(GLfloat))));
+	glVertexAttribPointer(pThis->m_ShaderQuadBatch.GetAttribLocation("uv"), 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(8*sizeof(GLfloat))));
 
 	GLuint uiTexId = pInst->GetTextureId();
 	glBindTexture(GL_TEXTURE_2D, uiTexId);
@@ -432,7 +438,7 @@ HyOpenGL::~HyOpenGL(void)
 	}
 
 	// This is probable unnecessary
-	//GLint iLocation = glGetUniformLocation(m_ShaderEnt2d.GetHandle(), "Tex");
+	//GLint iLocation = glGetUniformLocation(m_ShaderQuadBatch.GetHandle(), "Tex");
 	//glUniform1i(iLocation, 0);
 
 	return hGLTexture;

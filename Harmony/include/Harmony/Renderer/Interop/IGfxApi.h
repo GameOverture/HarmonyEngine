@@ -68,14 +68,14 @@ public:
 	virtual uint32 AddTexture(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, void *pPixelData) = 0;
 	virtual void DeleteTexture(uint32 uiTextureId) = 0;
 
-	int32 GetNumCameras2d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->_uiOffsetTo2dCameras)); }
-	mat4 *GetCameraView2d(int iIndex)		{ return reinterpret_cast<mat4 *>(m_pDrawBufferPtr+m_DrawpBufferHeader->_uiOffsetTo2dCameras+sizeof(int32)+(iIndex * (sizeof(HyRectangle)+sizeof(mat4))) + sizeof(HyRectangle) ); }
+	int32 GetNumCameras2d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras2d)); }
+	mat4 *GetCameraView2d(int iIndex)		{ return reinterpret_cast<mat4 *>(m_pDrawBufferPtr+m_DrawpBufferHeader->uiOffsetToCameras2d+sizeof(int32)+(iIndex * (sizeof(HyRectangle)+sizeof(mat4))) + sizeof(HyRectangle) ); }
 	
-	int32 GetNumInsts3d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->_uiOffsetTo3dCameras)); }
-	int32 GetNumCameras3d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->_uiOffsetTo3dCameras)); }
+	int32 GetNumInsts3d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras3d)); }
+	int32 GetNumCameras3d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras3d)); }
 
-	int32 GetNumInsts2d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->_uiOffsetToEnt2d)); }
-	float *GetVertexData2d()				{ return reinterpret_cast<float *>(m_pDrawBufferPtr+m_DrawpBufferHeader->_uiOffsetToVertexData2d); } 
+	int32 GetNumInsts2d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d)); }
+	float *GetVertexData2d()				{ return reinterpret_cast<float *>(m_pDrawBufferPtr+m_DrawpBufferHeader->uiOffsetToVertexData2d); } 
 
 	bool Update();
 	void UpdateLoop();

@@ -15,8 +15,8 @@
 #include "Renderer/Interop/IGfxApi.h"
 #include "Renderer/Interop/OpenGL/HyOpenGLShader.h"
 
-#define HY_INDEX_BUFFER_SIZE (128 * 1024)
-#define HY_RESTART_INDEX 65535
+//#define HY_INDEX_BUFFER_SIZE (128 * 1024)
+//#define HY_RESTART_INDEX 65535
 
 class HyOpenGL : public IGfxApi
 {
@@ -29,9 +29,9 @@ protected:
 	int32					m_iNumPasses3d;
 
 	///////// 2D MEMBERS ////////////////////
-	HyOpenGLShader			m_ShaderEnt2d;
+	HyOpenGLShader			m_ShaderQuadBatch;
 	HyOpenGLShader			m_ShaderPrimitive2d;
-	HyOpenGLShader			m_ShaderText2d;
+	//HyOpenGLShader			m_ShaderText2d;
 
 	GLuint					m_hVAO2d;
 	GLuint					m_hVBO2d;
@@ -39,7 +39,7 @@ protected:
 
 	GLenum					m_eDrawMode;
 
-	uint16 *				m_pGenericIndexBuffer2d;
+	//uint16 *				m_pGenericIndexBuffer2d;
 
 public:
 	HyOpenGL();

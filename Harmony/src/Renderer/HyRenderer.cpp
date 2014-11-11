@@ -25,8 +25,8 @@ uint32 HyRenderer::sm_uiLargest2dDrawSize = 0;
 HyRenderer::HyRenderer(HyViewport &gameViewportRef, HY_GFX_API *pSuppliedGfx /*= NULL*/)
 {
 	sm_uiLargest2dDrawSize = 0;
-	if(sizeof(HyDrawSpine2d) > sm_uiLargest2dDrawSize)
-		sm_uiLargest2dDrawSize = sizeof(HyDrawSpine2d);
+	if(sizeof(HyDrawQuadBatch2d) > sm_uiLargest2dDrawSize)
+		sm_uiLargest2dDrawSize = sizeof(HyDrawQuadBatch2d);
 	if(sizeof(HyDrawSprite2d) > sm_uiLargest2dDrawSize)
 		sm_uiLargest2dDrawSize = sizeof(HyDrawSprite2d);
 	if(sizeof(HyDrawPrimitive2d) > sm_uiLargest2dDrawSize)

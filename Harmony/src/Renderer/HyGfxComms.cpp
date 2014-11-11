@@ -113,7 +113,7 @@ bool HyGfxComms::Render_GetSharedPtrs(queue<IData *> *&pMsgQueuePtr, queue<IData
 
 	// Check to see if these buffers have already been rendered, if so return false to try next update.
 	HyGfxComms::tDrawHeader *pTest = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pBuffer_Shared);
-	if(reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pBuffer_Shared)->_uiReturnFlags != 0)
+	if(reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pBuffer_Shared)->uiReturnFlags != 0)
 	{
 		UnlockBuffers();
 		return false;

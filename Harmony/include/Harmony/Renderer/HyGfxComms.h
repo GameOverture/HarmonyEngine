@@ -39,16 +39,16 @@ public:
 	// Note: All offsets below are from the beginning of the buffer pointer, containing this structure
 	struct tDrawHeader
 	{
-		uint16		_uiReturnFlags;
+		uint32		uiReturnFlags;
 
-		uint32		_uiOffsetToEnt3d;
+		uint32		uiOffsetToInst3d;
 		
-		uint32		_uiOffsetToEnt2d;
-		uint32		_uiOffsetToVertexData2d;
-		uint32		_uiVertexBufferSize2d;
+		uint32		uiOffsetToInst2d;
+		uint32		uiOffsetToVertexData2d;
+		uint32		uiVertexBufferSize2d;
 
-		uint32		_uiOffsetTo3dCameras;
-		uint32		_uiOffsetTo2dCameras;
+		uint32		uiOffsetToCameras3d;
+		uint32		uiOffsetToCameras2d;
 	};
 
 	struct tGfxInit
