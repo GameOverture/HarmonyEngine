@@ -387,6 +387,8 @@ void HyCreator::WriteDrawBuffers()
 		// BUFFER HEADER (contains offsets from here)-| Num 3d Cams (4bytes)-|-Cam3d-|-Cam3d-|...|-Num 2d Cams (4bytes)-|-Cam2d-|-Cam2d-|...|-Num 3d Draws (4bytes)-|-Draw3d-|-Draw3d-|-Draw3d...-|-Num 2d Draws (4bytes)-|-Draw2d-|-Draw2d-|-Draw2d...-|-<possible empty data (skipping non-visible Ents)>-|-Vertex Data-
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+		IDraw2d::BatchInst(m_vLoadedInst2d[i], )
+
 		if(pCurDraw2d && pCurDraw2d->TryBatchInst(m_vLoadedInst2d[i]))
 		{
 		}

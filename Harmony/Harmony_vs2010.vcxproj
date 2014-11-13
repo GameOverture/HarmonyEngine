@@ -58,10 +58,11 @@
     <ClCompile Include="src\Input\HyInput.cpp" />
     <ClCompile Include="src\Input\Mappings\HyInputMapping.cpp" />
     <ClCompile Include="src\Memory\HyMemoryHeap.cpp" />
-    <ClCompile Include="src\Renderer\DrawData\HyDrawSpine2d.cpp" />
+    <ClCompile Include="src\Renderer\DrawData\HyDrawQuadBatch2d.cpp" />
     <ClCompile Include="src\Renderer\DrawData\HyDrawPrimitive2d.cpp" />
     <ClCompile Include="src\Renderer\DrawData\HyDrawSprite2d.cpp" />
     <ClCompile Include="src\Renderer\DrawData\HyDrawText2d.cpp" />
+    <ClCompile Include="src\Renderer\DrawData\IDraw2d.cpp" />
     <ClCompile Include="src\Renderer\HyGfxComms.cpp" />
     <ClCompile Include="src\Renderer\HyRenderer.cpp" />
     <ClCompile Include="src\Renderer\Interop\GLFW\HyGlfw.cpp" />
@@ -130,7 +131,7 @@
     <ClInclude Include="include\Harmony\Memory\Interop\HyMemAPI_Windows.h" />
     <ClInclude Include="include\Harmony\Memory\PageTypes\HyMedHeapPage.h" />
     <ClInclude Include="include\Harmony\Memory\PageTypes\HySmlHeapPage.h" />
-    <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawSpine2d.h" />
+    <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawQuadBatch2d.h" />
     <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawPrimitive2d.h" />
     <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawSprite2d.h" />
     <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawText2d.h" />

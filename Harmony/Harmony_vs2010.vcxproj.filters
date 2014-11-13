@@ -107,9 +107,6 @@
     <ClCompile Include="src\Utilities\HyBox2dRuntime.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DrawData\HyDrawSpine2d.cpp">
-      <Filter>Renderer\DrawData</Filter>
-    </ClCompile>
     <ClCompile Include="src\Creator\Instances\HySprite2d.cpp">
       <Filter>Creator\Instances</Filter>
     </ClCompile>
@@ -188,6 +185,12 @@
     </ClCompile>
     <ClCompile Include="src\FileIO\HyTexture.cpp">
       <Filter>FileIO</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DrawData\HyDrawQuadBatch2d.cpp">
+      <Filter>Renderer\DrawData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DrawData\IDraw2d.cpp">
+      <Filter>Renderer\DrawData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -458,9 +461,6 @@
     <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec4.h">
       <Filter>Utilities\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawSpine2d.h">
-      <Filter>Renderer\DrawData</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Creator\Instances\HySprite2d.h">
       <Filter>Creator\Instances</Filter>
     </ClInclude>
@@ -536,6 +536,9 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\FileIO\HyTexture.h">
       <Filter>FileIO</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawQuadBatch2d.h">
+      <Filter>Renderer\DrawData</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

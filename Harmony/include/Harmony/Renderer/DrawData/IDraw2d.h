@@ -17,6 +17,8 @@ class IObjInst2d;
 
 class IDraw2d
 {
+	static IDraw2d *	sm_pCurBatchDraw;
+
 	const uint32		m_kuiRenderState;
 	const uint32		m_kuiVertexDataOffset;
 	const uint32		m_kuiClassSizeBtyes;
@@ -40,7 +42,7 @@ public:
 
 	const mat4 &GetTransformMtx()		{ return m_mtxTransform; }
 
-	virtual bool TryBatchInst(IObjInst2d *pInst) = 0;
+	static bool BatchInst(IObjInst2d *pInst, char *pCurBatchWritePos, uint32 uiVertexDataOffset, char *&pCurVertexWritePos);
 };
 
 #endif /* __IDraw2d_h__ */
