@@ -68,7 +68,7 @@ public:
 	virtual void DeleteTexture(uint32 uiTextureId);
 
 private:
-	static void DrawSpine2dInst(IDraw2d *pInst, void *pApi);
+	static void DrawBatchedQuads2d(IDraw2d *pInst, void *pApi);
 	static void DrawPrim2dInst(IDraw2d *pBaseInst, void *pApi);
 	static void DrawTxt2dInst(IDraw2d *pBaseInst, void *pApi);
 };

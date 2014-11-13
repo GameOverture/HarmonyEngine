@@ -28,6 +28,8 @@ public:
 
 	const vec4 & GetColorAlpha()			{ return m_vColorAlpha; }
 	uint32 GetNumVerts()					{ return m_uiNumVerts; }
+
+	virtual bool TryBatchInst(IObjInst2d *pInst);
 };
 
 #endif /* __HyDrawPrimitive2d_h__ */

@@ -40,6 +40,22 @@ HySpine2d::~HySpine2d(void)
 	}
 }
 
+uint32 HySpine2d::GetTextureId()
+{
+	for (int i = 0; i < m_pSpineSkeleton->slotCount; ++i)
+	{
+		spAttachment* attachment = m_pSpineSkeleton->drawOrder[i]->attachment;
+		if(attachment == NULL || attachment->type != SP_ATTACHMENT_REGION)
+			continue;
+
+		spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
+
+		return reinterpret_cast<HyTexture *>(reinterpret_cast<spAtlasRegion *>(regionAttachment->rendererObject)->page->rendererObject)->GetId();
+	}
+
+	return 0;
+}
+
 //uint32 HySpine2d::GetTextureId()
 //{
 //	if(m_uiTextureid == 0)

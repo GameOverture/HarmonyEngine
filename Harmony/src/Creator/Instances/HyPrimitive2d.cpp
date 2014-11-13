@@ -13,7 +13,8 @@
 
 HyPrimitive2d::HyPrimitive2d() :	IObjInst2d(HYINST_Primitive2d, NULL, NULL),
 									m_pVertices(NULL),
-									m_uiNumVerts(0)
+									m_uiNumVerts(0),
+									m_uiTextureId(0)
 {
 	m_uiRenderStates |= RS_SHADER_PRIMITIVEDRAW | RS_DRAWMODE_LINELOOP;
 }
@@ -41,15 +42,15 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 	return *this;
 }
 
-void HyPrimitive2d::SetAsQuad(float fHalfWidth, float fHalfHeight, bool bWireframe, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
+void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
 {
 	delete [] m_pVertices;
 	m_pVertices = NULL;
 	m_uiNumVerts = 0;
 
 	float fCoordMod = eCoordType == HYCOORD_Meter ? HyCreator::PixelsPerMeter() : 1.0f;
-	fHalfWidth *= fCoordMod;
-	fHalfHeight *= fCoordMod;
+	fWidth *= fCoordMod;
+	fHeight *= fCoordMod;
 	vOffset *= fCoordMod;
 
 	if(bWireframe)
@@ -57,33 +58,37 @@ void HyPrimitive2d::SetAsQuad(float fHalfWidth, float fHalfHeight, bool bWirefra
 		m_uiRenderStates &= ~RS_DRAWMODEMASK;
 		m_uiRenderStates |= RS_DRAWMODE_LINELOOP;
 
-		m_uiNumVerts = 4;
-		m_pVertices = new vec4[m_uiNumVerts];
-
-		m_pVertices[0].x = -fHalfWidth + vOffset.x;
-		m_pVertices[0].y = -fHalfHeight + vOffset.y;
-		m_pVertices[0].z = 0.0f;
-		m_pVertices[0].w = 1.0f;
 		
-		m_pVertices[1].x = -fHalfWidth + vOffset.x;
-		m_pVertices[1].y = fHalfHeight + vOffset.y;
-		m_pVertices[1].z = 0.0f;
-		m_pVertices[1].w = 1.0f;
-
-		m_pVertices[2].x = fHalfWidth + vOffset.x;
-		m_pVertices[2].y = fHalfHeight + vOffset.y;
-		m_pVertices[2].z = 0.0f;
-		m_pVertices[2].w = 1.0f;
-
-		m_pVertices[3].x = fHalfWidth + vOffset.x;
-		m_pVertices[3].y = -fHalfHeight + vOffset.y;
-		m_pVertices[3].z = 0.0f;
-		m_pVertices[3].w = 1.0f;
 	}
 	else
 	{
-		HyError("HyPrimitive2d::SetAsQuad() doesn't support non-wireframe yet");
+		m_uiRenderStates &= ~RS_DRAWMODEMASK;
+		m_uiRenderStates |= RS_DRAWMODE_TRIANGLESTRIP;
+		//HyError("HyPrimitive2d::SetAsQuad() doesn't support non-wireframe yet");
 	}
+
+	m_uiNumVerts = 4;
+	m_pVertices = new vec4[m_uiNumVerts];
+
+	m_pVertices[0].x = vOffset.x;
+	m_pVertices[0].y = vOffset.y;
+	m_pVertices[0].z = 0.0f;
+	m_pVertices[0].w = 1.0f;
+
+	m_pVertices[1].x = fWidth + vOffset.x;
+	m_pVertices[1].y = vOffset.y;
+	m_pVertices[1].z = 0.0f;
+	m_pVertices[1].w = 1.0f;
+
+	m_pVertices[2].x = vOffset.x;
+	m_pVertices[2].y = fHeight + vOffset.y;
+	m_pVertices[2].z = 0.0f;
+	m_pVertices[2].w = 1.0f;
+
+	m_pVertices[3].x = fWidth + vOffset.x;
+	m_pVertices[3].y = fHeight + vOffset.y;
+	m_pVertices[3].z = 0.0f;
+	m_pVertices[3].w = 1.0f;
 }
 
 void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)

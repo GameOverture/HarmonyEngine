@@ -125,11 +125,11 @@ HyOpenGL::~HyOpenGL(void)
 
 	//////////////////////////////////////////////////////////////////////////
 
-	m_ShaderText2d.CompileFromFile("Txt2d", HyOpenGLShader::VERTEX);
-	m_ShaderText2d.CompileFromFile("Txt2d", HyOpenGLShader::FRAGMENT);
+	//m_ShaderText2d.CompileFromFile("Txt2d", HyOpenGLShader::VERTEX);
+	//m_ShaderText2d.CompileFromFile("Txt2d", HyOpenGLShader::FRAGMENT);
 
-	if(!m_ShaderText2d.Link())
-		HyError("Shader program failed to link!\n" << m_ShaderText2d.Log().c_str() << "\n");
+	//if(!m_ShaderText2d.Link())
+	//	HyError("Shader program failed to link!\n" << m_ShaderText2d.Log().c_str() << "\n");
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -330,13 +330,13 @@ HyOpenGL::~HyOpenGL(void)
 			//glPrimitiveRestartIndex(HY_RESTART_INDEX);
 			glEnable(GL_PRIMITIVE_RESTART);
 
-			m_fpDraw2d = DrawSpine2dInst;
+			m_fpDraw2d = DrawBatchedQuads2d;
 		}
 	}
 }
 
 
-/*static*/ void HyOpenGL::DrawSpine2dInst(IDraw2d *pBaseInst, void *pApi)
+/*static*/ void HyOpenGL::DrawBatchedQuads2d(IDraw2d *pBaseInst, void *pApi)
 {
 	HyDrawQuadBatch2d *pInst = reinterpret_cast<HyDrawQuadBatch2d *>(pBaseInst);
 	HyOpenGL *pThis = reinterpret_cast<HyOpenGL *>(pApi);
@@ -350,7 +350,7 @@ HyOpenGL::~HyOpenGL(void)
 
 	GLuint uiTexId = pInst->GetTextureId();
 	glBindTexture(GL_TEXTURE_2D, uiTexId);
-	glDrawElements(pThis->m_eDrawMode, pInst->GetNumSprites() * 5, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(pThis->m_eDrawMode, pInst->GetNumQuads() * 5, GL_UNSIGNED_SHORT, 0);
 }
 
 /*static*/ void HyOpenGL::DrawPrim2dInst(IDraw2d *pBaseInst, void *pApi)
@@ -368,22 +368,22 @@ HyOpenGL::~HyOpenGL(void)
 	glDrawArrays(pThis->m_eDrawMode, 0, pInst->GetNumVerts());
 }
 
-/*static*/ void HyOpenGL::DrawTxt2dInst(IDraw2d *pBaseInst, void *pApi)
-{
-	HyDrawText2d *pInst = reinterpret_cast<HyDrawText2d *>(pBaseInst);
-	HyOpenGL *pThis = reinterpret_cast<HyOpenGL *>(pApi);
-
-	pThis->m_ShaderText2d.SetUniform("textColor", pInst->GetColorAlpha());
-	pThis->m_ShaderText2d.SetUniform("transformMtx", pInst->GetTransformMtx());
-
-	uint32 uiByteOffset = pInst->GetVertexDataOffset();
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void *)uiByteOffset);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void *)(uiByteOffset+(4*sizeof(GLfloat))));
-
-	GLuint uiTexId = pInst->GetTextureId();
-	glBindTexture(GL_TEXTURE_2D, uiTexId);
-	glDrawElements(pThis->m_eDrawMode, pInst->GetNumChars() * 5, GL_UNSIGNED_SHORT, 0);
-}
+///*static*/ void HyOpenGL::DrawTxt2dInst(IDraw2d *pBaseInst, void *pApi)
+//{
+//	HyDrawText2d *pInst = reinterpret_cast<HyDrawText2d *>(pBaseInst);
+//	HyOpenGL *pThis = reinterpret_cast<HyOpenGL *>(pApi);
+//
+//	pThis->m_ShaderText2d.SetUniform("textColor", pInst->GetColorAlpha());
+//	pThis->m_ShaderText2d.SetUniform("transformMtx", pInst->GetTransformMtx());
+//
+//	uint32 uiByteOffset = pInst->GetVertexDataOffset();
+//	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void *)uiByteOffset);
+//	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void *)(uiByteOffset+(4*sizeof(GLfloat))));
+//
+//	GLuint uiTexId = pInst->GetTextureId();
+//	glBindTexture(GL_TEXTURE_2D, uiTexId);
+//	glDrawElements(pThis->m_eDrawMode, pInst->GetNumChars() * 5, GL_UNSIGNED_SHORT, 0);
+//}
 
 /*virtual*/ void HyOpenGL::End_2d()
 {

@@ -20,17 +20,21 @@
 
 class HyDrawQuadBatch2d : public IDraw2d
 {
-	uint32		m_uiNumSprites;
+	uint32		m_uiNumQuads;
 	uint32		m_uiTextureId;
 
+	char *		m_pCurDataWritePos;
+
 public:
-	HyDrawQuadBatch2d(HySpine2d &inst, uint32 uiVertexDataOffset, char *&pCurVertexWritePos);
+	HyDrawQuadBatch2d(IObjInst2d *pInst, uint32 uiVertexDataOffset, char *&pCurVertexWritePos);
 	virtual ~HyDrawQuadBatch2d(void);
 
-	inline uint32 GetNumSprites()				{ return m_uiNumSprites; }
-	inline uint32 GetTextureId()				{ return m_uiTextureId; }
+	inline uint32 GetNumQuads()				{ return m_uiNumQuads; }
+	inline uint32 GetTextureId()			{ return m_uiTextureId; }
 
 	void WriteVertexData(int32 iVertIndex, float *pVertexPositions, spRegionAttachment* regionAttachment, const vec4 *pVertColorRGBA, char *&pCurVertexWritePos);
+
+	virtual bool TryBatchInst(IObjInst2d *pInst);
 };
 
 #endif /* __HyDrawData2d_h__ */

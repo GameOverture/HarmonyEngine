@@ -31,3 +31,8 @@ HyDrawPrimitive2d::HyDrawPrimitive2d(HyPrimitive2d &inst, uint32 uiVertexDataOff
 HyDrawPrimitive2d::~HyDrawPrimitive2d(void)
 {
 }
+
+/*virtual*/ bool HyDrawPrimitive2d::TryBatchInst(IObjInst2d *pInst)
+{
+	return false;
+}

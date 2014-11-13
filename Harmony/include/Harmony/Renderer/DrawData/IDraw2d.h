@@ -12,6 +12,9 @@
 
 #include "Afx/HyStdAfx.h"
 
+// Forward declaration
+class IObjInst2d;
+
 class IDraw2d
 {
 	const uint32		m_kuiRenderState;
@@ -37,7 +40,7 @@ public:
 
 	const mat4 &GetTransformMtx()		{ return m_mtxTransform; }
 
-	static uint32 Write
+	virtual bool TryBatchInst(IObjInst2d *pInst) = 0;
 };
 
 #endif /* __IDraw2d_h__ */

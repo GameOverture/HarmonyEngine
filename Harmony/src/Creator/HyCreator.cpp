@@ -374,19 +374,33 @@ void HyCreator::WriteDrawBuffers()
 
 	uint32	uiVertexDataOffset = 0;
 
+	IDraw2d *pCurDraw2d = NULL;
+
 	for(uint32 i = 0; i < iTotalNumInsts; ++i)
 	{
-		if(m_vLoadedInst2d[i]->IsEnabled())
-		{
-			m_vLoadedInst2d[i]->Update();
+		if(m_vLoadedInst2d[i]->IsEnabled() == false)
+			continue;
 
-			switch(m_vLoadedInst2d[i]->GetInstType())
+		m_vLoadedInst2d[i]->Update();
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// BUFFER HEADER (contains offsets from here)-| Num 3d Cams (4bytes)-|-Cam3d-|-Cam3d-|...|-Num 2d Cams (4bytes)-|-Cam2d-|-Cam2d-|...|-Num 3d Draws (4bytes)-|-Draw3d-|-Draw3d-|-Draw3d...-|-Num 2d Draws (4bytes)-|-Draw2d-|-Draw2d-|-Draw2d...-|-<possible empty data (skipping non-visible Ents)>-|-Vertex Data-
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		if(pCurDraw2d && pCurDraw2d->TryBatchInst(m_vLoadedInst2d[i]))
+		{
+		}
+		else if(m_vLoadedInst2d[i]->GetRenderState() & 
+		{
+			switch(GetInstType())
 			{
-			case HYISNT_Text2d:
-				new (m_pCurWritePos) HyDrawText2d(*reinterpret_cast<HyText2d *>(m_vLoadedInst2d[i]), uiVertexDataOffset, pCurVertexWritePos);
-				m_pCurWritePos += sizeof(HyDrawText2d);
-				break;
+			//case HYISNT_Text2d:
+			//	new (m_pCurWritePos) HyDrawText2d(*reinterpret_cast<HyText2d *>(m_vLoadedInst2d[i]), uiVertexDataOffset, pCurVertexWritePos);
+			//	m_pCurWritePos += sizeof(HyDrawText2d);
+			//	break;
+			case HYINST_Sprite2d:
 			case HYINST_Spine2d:
+			case HYISNT_Text2d:
 				new (m_pCurWritePos) HyDrawQuadBatch2d(*reinterpret_cast<HySpine2d *>(m_vLoadedInst2d[i]), uiVertexDataOffset, pCurVertexWritePos);
 				m_pCurWritePos += sizeof(HyDrawQuadBatch2d);
 				break;
