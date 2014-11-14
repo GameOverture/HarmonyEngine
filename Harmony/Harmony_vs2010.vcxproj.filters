@@ -192,6 +192,9 @@
     <ClCompile Include="src\Renderer\DrawData\IDraw2d.cpp">
       <Filter>Renderer\DrawData</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\HyRenderState.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -539,6 +542,9 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawQuadBatch2d.h">
       <Filter>Renderer\DrawData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\HyRenderState.h">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

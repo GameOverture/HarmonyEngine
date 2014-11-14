@@ -15,24 +15,24 @@
 	#include "Renderer/Interop/OpenGL/HyOpenGL.h"
 #endif
 
-#include "Renderer/DrawData/HyDrawSprite2d.h"
-#include "Renderer/DrawData/HyDrawText2d.h"
-#include "Renderer/DrawData/HyDrawSpine2d.h"
-#include "Renderer/DrawData/HyDrawPrimitive2d.h"
+//#include "Renderer/DrawData/HyDrawSprite2d.h"
+//#include "Renderer/DrawData/HyDrawText2d.h"
+//#include "Renderer/DrawData/HyDrawSpine2d.h"
+//#include "Renderer/DrawData/HyDrawPrimitive2d.h"
 
-uint32 HyRenderer::sm_uiLargest2dDrawSize = 0;
+//uint32 HyRenderer::sm_uiLargest2dDrawSize = 0;
 
 HyRenderer::HyRenderer(HyViewport &gameViewportRef, HY_GFX_API *pSuppliedGfx /*= NULL*/)
 {
-	sm_uiLargest2dDrawSize = 0;
-	if(sizeof(HyDrawQuadBatch2d) > sm_uiLargest2dDrawSize)
-		sm_uiLargest2dDrawSize = sizeof(HyDrawQuadBatch2d);
-	if(sizeof(HyDrawSprite2d) > sm_uiLargest2dDrawSize)
-		sm_uiLargest2dDrawSize = sizeof(HyDrawSprite2d);
-	if(sizeof(HyDrawPrimitive2d) > sm_uiLargest2dDrawSize)
-		sm_uiLargest2dDrawSize = sizeof(HyDrawPrimitive2d);
-	if(sizeof(HyDrawText2d) > sm_uiLargest2dDrawSize)
-		sm_uiLargest2dDrawSize = sizeof(HyDrawText2d);
+	//sm_uiLargest2dDrawSize = 0;
+	//if(sizeof(HyDrawQuadBatch2d) > sm_uiLargest2dDrawSize)
+	//	sm_uiLargest2dDrawSize = sizeof(HyDrawQuadBatch2d);
+	//if(sizeof(HyDrawSprite2d) > sm_uiLargest2dDrawSize)
+	//	sm_uiLargest2dDrawSize = sizeof(HyDrawSprite2d);
+	//if(sizeof(HyDrawPrimitive2d) > sm_uiLargest2dDrawSize)
+	//	sm_uiLargest2dDrawSize = sizeof(HyDrawPrimitive2d);
+	//if(sizeof(HyDrawText2d) > sm_uiLargest2dDrawSize)
+	//	sm_uiLargest2dDrawSize = sizeof(HyDrawText2d);
 
 
 	HyGfxComms::tGfxInit *pGfxInit = new HyGfxComms::tGfxInit();

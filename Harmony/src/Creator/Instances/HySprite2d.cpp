@@ -9,17 +9,10 @@
  *************************************************************************/
 #include "Creator/Instances/HySprite2d.h"
 
-HySprite2d::HySprite2d(HyTexture *pTexture, HyRectangle rSrcRect) :	IObjInst2d(HYINST_Sprite2d, NULL, NULL),
-																	m_pTexture(pTexture),
-																	m_rSrcRect(rSrcRect)
-{
-	m_uiRenderStates |= (RS_SHADER_QUADBATCH | RS_DRAWMODE_TRIANGLESTRIP);
-}
-
 HySprite2d::HySprite2d(const char *szPrefix, const char *szName) :	IObjInst2d(HYINST_Sprite2d, szPrefix, szName),
 																	m_pTexture(NULL)
 {
-	m_uiRenderStates |= (RS_SHADER_QUADBATCH | RS_DRAWMODE_TRIANGLESTRIP);
+	m_RenderState.SetAttributes(HyRenderState::RS_DRAWMODE_TRIANGLESTRIP | HyRenderState::RS_SHADER_QUADBATCH);
 }
 
 

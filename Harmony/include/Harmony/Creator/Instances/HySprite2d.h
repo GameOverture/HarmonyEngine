@@ -18,10 +18,6 @@
 
 class HySprite2d : public IObjInst2d
 {
-	// These only used when this is a basic sprite
-	HyTexture *	m_pTexture;
-	HyRectangle	m_rSrcRect;
-
 	// Array of BYTE's where each BYTE describes how each animation state is supposed to play
 	enum eStateAttribs
 	{
@@ -39,13 +35,8 @@ class HySprite2d : public IObjInst2d
 	bool		m_bIsBouncing;		// True if anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
 
 public:
-	HySprite2d(HyTexture *pTexture, HyRectangle rSrcRect);
 	HySprite2d(const char *szPrefix, const char *szName);
 	virtual ~HySprite2d(void);
-
-	bool IsSimpleSprite()													{ return reinterpret_cast<HySprite2dData *>(m_pDataPtr)->IsSimpleSprite(); }
-	void GetSimpleSpriteData(uint32 &iTexIdOut, HyRectangle &rRectOut)		{ iTexIdOut = m_pTexture->GetId(); rRectOut = m_rSrcRect; }
-
 	
 	inline int32 GetNumStates()				;//{ return reinterpret_cast<HySprite2dData *>(m_pDataPtr)->m_iNumStates; }
 	inline int32 GetState()					;//{ return m_iCurAnimState; }

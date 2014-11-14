@@ -14,34 +14,18 @@
 #include "Creator/Data/HyFactory.h"
 
 #include "Utilities/Animation/HyAnimVec4.h"
+#include "Renderer/HyRenderState.h"
 
 class IObjInst2d : public ITransform<HyAnimVec2>
 {
 	friend class HyCreator;
 	static HyCreator *			sm_pCtor;
 
-public:
-	enum eRenderState
-	{
-		RS_SCISSORTEST				= 1 << 0,
-		RS_USINGLOCALCOORDS			= 1 << 1,	// If disabled, then using world coordinates
-
-		RS_SHADER_PRIMITIVEDRAW		= 1 << 2,
-		RS_SHADER_QUADBATCH			= 1 << 3,
-		RS_SHADER_CUSTOM			= 1 << 4,
-		RS_SHADERMASK				= RS_SHADER_PRIMITIVEDRAW | RS_SHADER_QUADBATCH | RS_SHADER_CUSTOM,
-
-		RS_DRAWMODE_TRIANGLESTRIP	= 1 << 5,
-		RS_DRAWMODE_LINELOOP		= 1 << 6,
-		RS_DRAWMODE_LINESTRIP		= 1 << 7,
-		RS_DRAWMODEMASK				= RS_DRAWMODE_TRIANGLESTRIP | RS_DRAWMODE_LINELOOP | RS_DRAWMODE_LINESTRIP
-
-		//RS_CUSTOMSHADER_ID			= // Bits 8-13, store index to custom shader vector. Valid entries [0-63]
-	};
-
 protected:
 	const HyInstanceType		m_keInstType;
 	const std::string			m_ksPath;
+	
+	HyRenderState				m_RenderState;
 
 	// Data loading
 	IData *						m_pDataPtr;
@@ -57,7 +41,6 @@ protected:
 	bool						m_bEnabled;
 	HyAnimVec4					m_vColor;
 	float						m_fDisplayOrder;	// Higher values are displayed front-most
-	uint32						m_uiRenderStates;	// Uses flags from eRenderState
 	int32						m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 
 public:
@@ -75,8 +58,8 @@ public:
 	float GetDisplayOrder() const								{ return m_fDisplayOrder; }
 	void SetDisplayOrder(float fOrderValue);
 
-	inline uint32 GetRenderState() const						{ return m_uiRenderStates; }
-	void SetUsingLocalCoordinates(bool bUseLocalCoords)			{ if(bUseLocalCoords) m_uiRenderStates |= RS_USINGLOCALCOORDS; else m_uiRenderStates &= ~RS_USINGLOCALCOORDS; }
+	inline HyRenderState GetRenderState() const					{ return m_RenderState; }
+	void SetUsingLocalCoordinates(bool bUseLocalCoords)			{ if(bUseLocalCoords) m_RenderState.Enable(HyRenderState::RS_USINGLOCALCOORDS); else m_RenderState.Disable(HyRenderState::RS_USINGLOCALCOORDS); }
 
 	inline HyAnimVec4 &Color()									{ return m_vColor; }
 

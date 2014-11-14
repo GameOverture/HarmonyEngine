@@ -20,7 +20,7 @@ class HY_GFX_API;
 
 class HyRenderer
 {
-	static uint32			sm_uiLargest2dDrawSize;
+	//static uint32			sm_uiLargest2dDrawSize;
 
 #ifdef HY_MULTITHREADING
 	ThreadInfoPtr			m_pRenderThread;
@@ -33,7 +33,7 @@ public:
 	HyRenderer(HyViewport &gameWindowRef, HY_GFX_API *pSuppliedGfx = NULL);
 	~HyRenderer();
 
-	static uint32 GetLargest2dDrawSize()	{ return sm_uiLargest2dDrawSize; }
+	//static uint32 GetLargest2dDrawSize()	{ return sm_uiLargest2dDrawSize; }
 	HyGfxComms &			GetGfxComms()	{ return m_GfxComms; }
 
 #ifdef HY_MULTITHREADING

@@ -38,8 +38,7 @@ IObjInst2d::IObjInst2d(HyInstanceType eInstType, const char *szPrefix, const cha
 																								m_eLoadState(HYLOADSTATE_Inactive),
 																								m_pParent(NULL),
 																								m_bDirty(true),
-																								m_bEnabled(true),
-																								m_uiRenderStates(0)
+																								m_bEnabled(true)
 {
 	m_vColor.Set(1.0f);
 	SetOnDirtyCallback(OnDirty, this);

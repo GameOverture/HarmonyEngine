@@ -65,6 +65,7 @@
     <ClCompile Include="src\Renderer\DrawData\IDraw2d.cpp" />
     <ClCompile Include="src\Renderer\HyGfxComms.cpp" />
     <ClCompile Include="src\Renderer\HyRenderer.cpp" />
+    <ClCompile Include="src\Renderer\HyRenderState.cpp" />
     <ClCompile Include="src\Renderer\Interop\GLFW\HyGlfw.cpp" />
     <ClCompile Include="src\Renderer\Interop\GLFW\HyGlfwInput.cpp" />
     <ClCompile Include="src\Renderer\Interop\IGfxApi.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="include\Harmony\Renderer\DrawData\IDraw2d.h" />
     <ClInclude Include="include\Harmony\Renderer\HyGfxComms.h" />
     <ClInclude Include="include\Harmony\Renderer\HyRenderer.h" />
+    <ClInclude Include="include\Harmony\Renderer\HyRenderState.h" />
     <ClInclude Include="include\Harmony\Renderer\Interop\GLFW\HyGlfw.h" />
     <ClInclude Include="include\Harmony\Renderer\Interop\GLFW\HyGlfwInput.h" />
     <ClInclude Include="include\Harmony\Renderer\Interop\IGfxApi.h" />

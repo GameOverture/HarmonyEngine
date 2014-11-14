@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Renderer/Interop/OpenGL/HyOpenGL.h"
 
-#include "Renderer/DrawData/HyDrawSpine2d.h"
+#include "Renderer/DrawData/HyDrawQuadBatch2d.h"
 #include "Renderer/DrawData/HyDrawPrimitive2d.h"
 #include "Renderer/DrawData/HyDrawText2d.h"
 
@@ -250,25 +250,25 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::SetRenderState_2d(uint32 uiNewRenderState)
 {
-	if((m_uiCurRenderState & IObjInst2d::RS_DRAWMODEMASK) != (uiNewRenderState & IObjInst2d::RS_DRAWMODEMASK))
+	if((m_uiCurRenderState & HyRenderState::RS_DRAWMODEMASK) != (uiNewRenderState & HyRenderState::RS_DRAWMODEMASK))
 	{
-		if(uiNewRenderState & IObjInst2d::RS_DRAWMODE_LINELOOP)
+		if(uiNewRenderState & HyRenderState::RS_DRAWMODE_LINELOOP)
 			m_eDrawMode = GL_LINE_LOOP;
-		else if(uiNewRenderState & IObjInst2d::RS_DRAWMODE_LINESTRIP)
+		else if(uiNewRenderState & HyRenderState::RS_DRAWMODE_LINESTRIP)
 			m_eDrawMode = GL_LINE_STRIP;
-		else if(uiNewRenderState & IObjInst2d::RS_DRAWMODE_TRIANGLESTRIP)
+		else if(uiNewRenderState & HyRenderState::RS_DRAWMODE_TRIANGLESTRIP)
 			m_eDrawMode = GL_TRIANGLE_STRIP;
 	}
 
-	if((m_uiCurRenderState & IObjInst2d::RS_SHADERMASK) != (uiNewRenderState & IObjInst2d::RS_SHADERMASK))
+	if((m_uiCurRenderState & HyRenderState::RS_SHADERMASK) != (uiNewRenderState & HyRenderState::RS_SHADERMASK))
 	{
 		// Change shader program based on render state flags and set uniforms
-		if(uiNewRenderState & IObjInst2d::RS_SHADER_PRIMITIVEDRAW)
+		if(uiNewRenderState & HyRenderState::RS_SHADER_PRIMITIVEDRAW)
 		{
 			glUseProgram(0);
 			m_ShaderPrimitive2d.Use();
 
-			if(uiNewRenderState & IObjInst2d::RS_USINGLOCALCOORDS)
+			if(uiNewRenderState & HyRenderState::RS_USINGLOCALCOORDS)
 				m_ShaderPrimitive2d.SetUniform("worldToCameraMatrix", m_kmtxIdentity);
 			else
 				m_ShaderPrimitive2d.SetUniform("worldToCameraMatrix", m_mtxView);
@@ -310,12 +310,12 @@ HyOpenGL::~HyOpenGL(void)
 
 		//	m_fpDraw2d = DrawTxt2dInst;
 		//}
-		else if(uiNewRenderState & IObjInst2d::RS_SHADER_QUADBATCH)
+		else if(uiNewRenderState & HyRenderState::RS_SHADER_QUADBATCH)
 		{
 			glUseProgram(0);
 			m_ShaderQuadBatch.Use();
 
-			if(uiNewRenderState & IObjInst2d::RS_USINGLOCALCOORDS)
+			if(uiNewRenderState & HyRenderState::RS_USINGLOCALCOORDS)
 				m_ShaderQuadBatch.SetUniform("worldToCameraMatrix", m_kmtxIdentity);
 			else
 				m_ShaderQuadBatch.SetUniform("worldToCameraMatrix", m_mtxView);
