@@ -374,7 +374,7 @@ void HyCreator::WriteDrawBuffers()
 
 	uint32	uiVertexDataOffset = 0;
 
-	IDraw2d *pCurDraw2d = NULL;
+	HyRenderState *pCurRenderState2d = NULL;
 
 	for(uint32 i = 0; i < iTotalNumInsts; ++i)
 	{
@@ -384,8 +384,12 @@ void HyCreator::WriteDrawBuffers()
 		m_vLoadedInst2d[i]->Update();
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// BUFFER HEADER (contains offsets from here)-| Num 3d Cams (4bytes)-|-Cam3d-|-Cam3d-|...|-Num 2d Cams (4bytes)-|-Cam2d-|-Cam2d-|...|-Num 3d Draws (4bytes)-|-Draw3d-|-Draw3d-|-Draw3d...-|-Num 2d Draws (4bytes)-|-Draw2d-|-Draw2d-|-Draw2d...-|-<possible empty data (skipping non-visible Ents)>-|-Vertex Data-
+		// BUFFER HEADER (contains offsets from here)-| Num 3d Cams (4bytes)-|-Cam3d-|-Cam3d-|...|-Num 2d Cams (4bytes)-|-Cam2d-|-Cam2d-|...|-Num 3d Draws (4bytes)-|-Draw3d-|-Draw3d-|-Draw3d...-|-Num 2d Draws/RenderStates (4bytes)-|-RS2d-|-RS2d-|-RS2d...-|-<possible empty data (skipping non-visible Ents)>-|-Vertex Data-
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		if(pCurRenderState2d && m_vLoadedInst2d[i]->GetRenderState() == *pCurRenderState2d)
+		{
+		}
 
 		IDraw2d::BatchInst(m_vLoadedInst2d[i], )
 

@@ -8,14 +8,18 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/HyRenderState.h"
+#include "Creator/Instances/IObjInst2d.h"
 
-
-HyRenderState::HyRenderState(void) : m_uiAttributeFlags(0)
+HyRenderState::HyRenderState(IObjInst2d *pInst, uint32 uiVertexDataOffset) : m_uiAttributeFlags(0)
 {
 	memset(m_pTextureBinds, 0, sizeof(m_pTextureBinds[0])*HY_MAX_TEXTURE_BINDS);
 }
 
 HyRenderState::~HyRenderState(void)
+{
+}
+
+void Set(IObjInst2d *pInst, uint32 uiVertexDataOffset)
 {
 }
 

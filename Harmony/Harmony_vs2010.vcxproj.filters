@@ -278,6 +278,9 @@
     <Filter Include="Utilities\Animation">
       <UniqueIdentifier>{42349797-5c4d-4251-912a-03d57d552c86}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer\RenderState">
+      <UniqueIdentifier>{416bf495-efec-4c0d-a6f3-27f82e59fd94}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Harmony\HyEngine.h" />

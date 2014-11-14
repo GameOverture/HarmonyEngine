@@ -12,7 +12,10 @@
 
 #include "Afx/HyStdAfx.h"
 
-#define HY_MAX_TEXTURE_BINDS 8
+// Forward declaration
+class IObjInst2d;
+
+#define HY_MAX_TEXTURE_BINDS 3 // increase as needed up to glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &texture_units)
 
 class HyRenderState
 {
@@ -36,18 +39,20 @@ public:
 	};
 
 private:
-	uint32		m_uiAttributeFlags;
-
-	uint32		m_pTextureBinds[HY_MAX_TEXTURE_BINDS];
+	uint32			m_uiAttributeFlags;
+	uint32			m_pTextureBinds[HY_MAX_TEXTURE_BINDS];
+	
+	uint32			m_uiVertexDataOffset;
 
 public:
-	HyRenderState(void);
+	HyRenderState();
 	~HyRenderState(void);
 
-	bool operator==(const HyRenderState &right) const;
-
+	void Set(IObjInst2d *pInst, uint32 uiVertexDataOffset);
 	void Enable(uint32 uiAttributes);
 	void Disable(uint32 uiAttributes);
+
+	bool operator==(const HyRenderState &right) const;
 };
 
 #endif /* __HyRenderState_h__ */

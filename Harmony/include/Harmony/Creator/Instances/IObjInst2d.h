@@ -58,7 +58,7 @@ public:
 	float GetDisplayOrder() const								{ return m_fDisplayOrder; }
 	void SetDisplayOrder(float fOrderValue);
 
-	inline HyRenderState GetRenderState() const					{ return m_RenderState; }
+	const HyRenderState &GetRenderState() const					{ return m_RenderState; }
 	void SetUsingLocalCoordinates(bool bUseLocalCoords)			{ if(bUseLocalCoords) m_RenderState.Enable(HyRenderState::RS_USINGLOCALCOORDS); else m_RenderState.Disable(HyRenderState::RS_USINGLOCALCOORDS); }
 
 	inline HyAnimVec4 &Color()									{ return m_vColor; }
@@ -76,6 +76,7 @@ public:
 protected:
 	virtual void OnDataLoaded() = 0;
 	virtual void Update() = 0;
+	virtual void WriteDrawBufferData(
 
 private:
 	void SetData(IData *pData);
