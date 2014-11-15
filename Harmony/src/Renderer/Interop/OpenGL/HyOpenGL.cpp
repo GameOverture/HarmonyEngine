@@ -9,11 +9,6 @@
  *************************************************************************/
 #include "Renderer/Interop/OpenGL/HyOpenGL.h"
 
-#include "Renderer/DrawData/HyDrawQuadBatch2d.h"
-#include "Renderer/DrawData/HyDrawPrimitive2d.h"
-#include "Renderer/DrawData/HyDrawText2d.h"
-
-
 // THIS WORKS BELOW!
 const float vertexDataEmulate[] = {
 	0.0f, 0.0f, 0.0f, 1.0f,
@@ -57,18 +52,6 @@ const float primitiveVertexDataEmulate[] = {
 	50.0f, 50.0f, 0.0f, 1.0f,
 	50.0f, -50.0f, 0.0f, 1.0f
 };
-
-const float g_fUnitQuadVertPos[16] = {
-	0.0f, 0.0f, 0.0f, 1.0f,
-	1.0f, 0.0f, 0.0f, 1.0f,
-	0.0f, 1.0f, 0.0f, 1.0f,
-	1.0f, 1.0f, 0.0f, 1.0f
-};
-
-const short g_i16UnitQuadVertIndices[6] = {
-	0, 1, 2, 2, 1, 3
-};
-
 
 
 HyOpenGL::HyOpenGL() :	IGfxApi(),
@@ -145,21 +128,30 @@ HyOpenGL::~HyOpenGL(void)
 	glBindVertexArray(m_hVAO2d);
 
 	// Initialize 2d quad buffer
-	glGenBuffers(1, &m_hVBO2d);
-	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
+	glGenBuffers(1, &m_hVBO2d_UnitQuad);
+	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d_UnitQuad);
+	const float fUnitQuadVertPos[16] = {
+		0.0f, 0.0f, 0.0f, 1.0f,
+		1.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+		1.0f, 1.0f, 0.0f, 1.0f
+	};
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, fUnitQuadVertPos, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexDataEmulate), vertexDataEmulate, GL_STATIC_DRAW);
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(primitiveVertexDataEmulate), primitiveVertexDataEmulate, GL_STATIC_DRAW);
 	//-----------------------------------------------------------------------------------------------------------------
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, g_fUnitQuadVertPos, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	/* Set up index data */
-	glGenBuffers(1, &m_hIBO2d);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(short)*6, g_i16UnitQuadVertIndices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	// Initialize 2d quad index bufferSet up index data
+	//const short g_i16UnitQuadVertIndices[6] = {
+	//	0, 1, 2, 2, 1, 3
+	//};
+	//glGenBuffers(1, &m_hIBO2d);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(short)*6, g_i16UnitQuadVertIndices, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
 	//m_pGenericIndexBuffer2d = new uint16[HY_INDEX_BUFFER_SIZE/sizeof(uint16)];
@@ -187,8 +179,6 @@ HyOpenGL::~HyOpenGL(void)
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glBindVertexArray(0);
 
 	return true;
 }
@@ -225,7 +215,7 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ bool HyOpenGL::Begin_2d()
 {
-	if(GetNumInsts2d() == 0 || m_iNumCams2d == 0)
+	if(GetNumRenderStates2d() == 0 || m_iNumCams2d == 0)
 		return false;
 
 	// Without disabling glDepthMask, sprites fragments that overlap will be discarded
@@ -248,27 +238,28 @@ HyOpenGL::~HyOpenGL(void)
 	return true;
 }
 
-/*virtual*/ void HyOpenGL::SetRenderState_2d(uint32 uiNewRenderState)
+/*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderState &renderState)
 {
-	if((m_uiCurRenderState & HyRenderState::RS_DRAWMODEMASK) != (uiNewRenderState & HyRenderState::RS_DRAWMODEMASK))
+	if((m_uiCurRenderState & HyRenderState::DRAWMODEMASK) != (uiNewRenderState & HyRenderState::DRAWMODEMASK))
 	{
-		if(uiNewRenderState & HyRenderState::RS_DRAWMODE_LINELOOP)
+		if(uiNewRenderState & HyRenderState::DRAWMODE_LINELOOP)
 			m_eDrawMode = GL_LINE_LOOP;
-		else if(uiNewRenderState & HyRenderState::RS_DRAWMODE_LINESTRIP)
+		else if(uiNewRenderState & HyRenderState::DRAWMODE_LINESTRIP)
 			m_eDrawMode = GL_LINE_STRIP;
-		else if(uiNewRenderState & HyRenderState::RS_DRAWMODE_TRIANGLESTRIP)
+		else if(uiNewRenderState & HyRenderState::DRAWMODE_TRIANGLESTRIP)
 			m_eDrawMode = GL_TRIANGLE_STRIP;
+		else if(
 	}
 
-	if((m_uiCurRenderState & HyRenderState::RS_SHADERMASK) != (uiNewRenderState & HyRenderState::RS_SHADERMASK))
+	if((m_uiCurRenderState & HyRenderState::SHADERMASK) != (uiNewRenderState & HyRenderState::SHADERMASK))
 	{
 		// Change shader program based on render state flags and set uniforms
-		if(uiNewRenderState & HyRenderState::RS_SHADER_PRIMITIVEDRAW)
+		if(uiNewRenderState & HyRenderState::SHADER_PRIMITIVEDRAW)
 		{
 			glUseProgram(0);
 			m_ShaderPrimitive2d.Use();
 
-			if(uiNewRenderState & HyRenderState::RS_USINGLOCALCOORDS)
+			if(uiNewRenderState & HyRenderState::USINGLOCALCOORDS)
 				m_ShaderPrimitive2d.SetUniform("worldToCameraMatrix", m_kmtxIdentity);
 			else
 				m_ShaderPrimitive2d.SetUniform("worldToCameraMatrix", m_mtxView);
@@ -289,7 +280,7 @@ HyOpenGL::~HyOpenGL(void)
 		//	glUseProgram(0);
 		//	m_ShaderText2d.Use();
 
-		//	if(uiNewRenderState & IObjInst2d::RS_USINGLOCALCOORDS)
+		//	if(uiNewRenderState & IObjInst2d::USINGLOCALCOORDS)
 		//		m_ShaderText2d.SetUniform("worldToCameraMatrix", m_kmtxIdentity);
 		//	else
 		//		m_ShaderText2d.SetUniform("worldToCameraMatrix", m_mtxView);
@@ -310,12 +301,12 @@ HyOpenGL::~HyOpenGL(void)
 
 		//	m_fpDraw2d = DrawTxt2dInst;
 		//}
-		else if(uiNewRenderState & HyRenderState::RS_SHADER_QUADBATCH)
+		else if(uiNewRenderState & HyRenderState::SHADER_QUADBATCH)
 		{
 			glUseProgram(0);
 			m_ShaderQuadBatch.Use();
 
-			if(uiNewRenderState & HyRenderState::RS_USINGLOCALCOORDS)
+			if(uiNewRenderState & HyRenderState::USINGLOCALCOORDS)
 				m_ShaderQuadBatch.SetUniform("worldToCameraMatrix", m_kmtxIdentity);
 			else
 				m_ShaderQuadBatch.SetUniform("worldToCameraMatrix", m_mtxView);
@@ -326,22 +317,19 @@ HyOpenGL::~HyOpenGL(void)
 			glEnableVertexAttribArray(m_ShaderQuadBatch.GetAttribLocation("color"));
 			glEnableVertexAttribArray(m_ShaderQuadBatch.GetAttribLocation("uv"));
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
+			glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d_UnitQuad);
+			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
 			//glPrimitiveRestartIndex(HY_RESTART_INDEX);
-			glEnable(GL_PRIMITIVE_RESTART);
+			//glEnable(GL_PRIMITIVE_RESTART);
 
 			m_fpDraw2d = DrawBatchedQuads2d;
 		}
 	}
 }
 
-
-/*static*/ void HyOpenGL::DrawBatchedQuads2d(IDraw2d *pBaseInst, void *pApi)
+void HyOpenGL::DrawBatchedQuads2d(char *pData)
 {
-	HyDrawQuadBatch2d *pInst = reinterpret_cast<HyDrawQuadBatch2d *>(pBaseInst);
-	HyOpenGL *pThis = reinterpret_cast<HyOpenGL *>(pApi);
-
-	pThis->m_ShaderQuadBatch.SetUniform("localToWorld", pInst->GetTransformMtx());
+	m_ShaderQuadBatch.SetUniform("localToWorld", pInst->GetTransformMtx());
 
 	uint32 uiByteOffset = pInst->GetVertexDataOffset();
 	glVertexAttribPointer(pThis->m_ShaderQuadBatch.GetAttribLocation("position"), 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)uiByteOffset);

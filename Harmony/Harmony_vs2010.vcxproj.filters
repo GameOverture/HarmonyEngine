@@ -40,9 +40,6 @@
     <ClCompile Include="src\Input\Mappings\HyInputMapping.cpp">
       <Filter>Input\Mappings</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DrawData\HyDrawPrimitive2d.cpp">
-      <Filter>Renderer\DrawData</Filter>
-    </ClCompile>
     <ClCompile Include="src\Creator\Instances\HyPrimitive2d.cpp">
       <Filter>Creator\Instances</Filter>
     </ClCompile>
@@ -125,9 +122,6 @@
     <ClCompile Include="src\Renderer\Interop\GLFW\HyGlfwInput.cpp">
       <Filter>Renderer\Interop\GLFW</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DrawData\HyDrawSprite2d.cpp">
-      <Filter>Renderer\DrawData</Filter>
-    </ClCompile>
     <ClCompile Include="src\Creator\Instances\HyMesh3d.cpp">
       <Filter>Creator\Instances</Filter>
     </ClCompile>
@@ -136,9 +130,6 @@
     </ClCompile>
     <ClCompile Include="src\Creator\Data\HyText2dData.cpp">
       <Filter>Creator\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\DrawData\HyDrawText2d.cpp">
-      <Filter>Renderer\DrawData</Filter>
     </ClCompile>
     <ClCompile Include="src\Creator\HyEntity2d.cpp">
       <Filter>Creator</Filter>
@@ -185,12 +176,6 @@
     </ClCompile>
     <ClCompile Include="src\FileIO\HyTexture.cpp">
       <Filter>FileIO</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\DrawData\HyDrawQuadBatch2d.cpp">
-      <Filter>Renderer\DrawData</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\DrawData\IDraw2d.cpp">
-      <Filter>Renderer\DrawData</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\HyRenderState.cpp">
       <Filter>Renderer</Filter>
@@ -241,9 +226,6 @@
     </Filter>
     <Filter Include="Threading">
       <UniqueIdentifier>{59688164-7112-4eaf-8c36-916756f2726a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Renderer\DrawData">
-      <UniqueIdentifier>{68aca667-3675-4ce4-923d-ed4efd8de447}</UniqueIdentifier>
     </Filter>
     <Filter Include="Input">
       <UniqueIdentifier>{9adb3b5b-b561-45a5-844e-8419105d02f4}</UniqueIdentifier>
@@ -365,12 +347,6 @@
     <ClInclude Include="include\Harmony\Renderer\HyRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawPrimitive2d.h">
-      <Filter>Renderer\DrawData</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\DrawData\IDraw2d.h">
-      <Filter>Renderer\DrawData</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Time\Watches\HyStopwatch.h">
       <Filter>Time\Watches</Filter>
     </ClInclude>
@@ -485,9 +461,6 @@
     <ClInclude Include="include\Harmony\Renderer\Interop\GLFW\HyGlfwInput.h">
       <Filter>Renderer\Interop\GLFW</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawSprite2d.h">
-      <Filter>Renderer\DrawData</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Creator\Instances\HyMesh3d.h">
       <Filter>Creator\Instances</Filter>
     </ClInclude>
@@ -496,9 +469,6 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Creator\Data\HyText2dData.h">
       <Filter>Creator\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawText2d.h">
-      <Filter>Renderer\DrawData</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Creator\HyEntity2d.h">
       <Filter>Creator</Filter>
@@ -542,9 +512,6 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\FileIO\HyTexture.h">
       <Filter>FileIO</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\DrawData\HyDrawQuadBatch2d.h">
-      <Filter>Renderer\DrawData</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\HyRenderState.h">
       <Filter>Renderer</Filter>

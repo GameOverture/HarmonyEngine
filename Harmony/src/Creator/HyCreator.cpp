@@ -11,9 +11,6 @@
 
 #include "Renderer/HyRenderer.h"
 #include "Renderer/HyGfxComms.h"
-#include "Renderer/DrawData/HyDrawSpine2d.h"
-#include "Renderer/DrawData/HyDrawPrimitive2d.h"
-#include "Renderer/DrawData/HyDrawText2d.h"
 
 #include "Creator/Instances/IObjInst2d.h"
 #include "Creator/Instances/HySound.h"
@@ -368,12 +365,11 @@ void HyCreator::WriteDrawBuffers()
 	iNumInsts = 0;
 	iTotalNumInsts = m_vLoadedInst2d.size();
 
-	char *pStartVertexWritePos = m_pCurWritePos + (iTotalNumInsts * HyRenderer::GetLargest2dDrawSize());
+	char *pStartVertexWritePos = m_pCurWritePos + (iTotalNumInsts * sizeof(HyRenderState));
 	pDrawHeader->uiOffsetToVertexData2d = pStartVertexWritePos - m_GfxCommsRef.GetWriteBufferPtr();
 	char *pCurVertexWritePos = pStartVertexWritePos;
 
 	uint32	uiVertexDataOffset = 0;
-
 	HyRenderState *pCurRenderState2d = NULL;
 
 	for(uint32 i = 0; i < iTotalNumInsts; ++i)
@@ -383,59 +379,35 @@ void HyCreator::WriteDrawBuffers()
 
 		m_vLoadedInst2d[i]->Update();
 
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// BUFFER HEADER (contains offsets from here)-| Num 3d Cams (4bytes)-|-Cam3d-|-Cam3d-|...|-Num 2d Cams (4bytes)-|-Cam2d-|-Cam2d-|...|-Num 3d Draws (4bytes)-|-Draw3d-|-Draw3d-|-Draw3d...-|-Num 2d Draws/RenderStates (4bytes)-|-RS2d-|-RS2d-|-RS2d...-|-<possible empty data (skipping non-visible Ents)>-|-Vertex Data-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		if(pCurRenderState2d && m_vLoadedInst2d[i]->GetRenderState() == *pCurRenderState2d)
+		// If previously written instance has equal render state by "operator ==" then it's to be assumed the instance data can be batched and doesn't need to write another render state
+		if(pCurRenderState2d == NULL || false == (m_vLoadedInst2d[i]->GetRenderState() == *pCurRenderState2d))
 		{
-		}
+			memcpy(m_pCurWritePos, &m_vLoadedInst2d[i]->GetRenderState(), sizeof(HyRenderState));
+			reinterpret_cast<HyRenderState *>(m_pCurWritePos)->SetDataOffset(uiVertexDataOffset);
+			m_pCurWritePos += sizeof(HyRenderState);
 
-		IDraw2d::BatchInst(m_vLoadedInst2d[i], )
-
-		if(pCurDraw2d && pCurDraw2d->TryBatchInst(m_vLoadedInst2d[i]))
-		{
-		}
-		else if(m_vLoadedInst2d[i]->GetRenderState() & 
-		{
-			switch(GetInstType())
-			{
-			//case HYISNT_Text2d:
-			//	new (m_pCurWritePos) HyDrawText2d(*reinterpret_cast<HyText2d *>(m_vLoadedInst2d[i]), uiVertexDataOffset, pCurVertexWritePos);
-			//	m_pCurWritePos += sizeof(HyDrawText2d);
-			//	break;
-			case HYINST_Sprite2d:
-			case HYINST_Spine2d:
-			case HYISNT_Text2d:
-				new (m_pCurWritePos) HyDrawQuadBatch2d(*reinterpret_cast<HySpine2d *>(m_vLoadedInst2d[i]), uiVertexDataOffset, pCurVertexWritePos);
-				m_pCurWritePos += sizeof(HyDrawQuadBatch2d);
-				break;
-			case HYINST_Primitive2d:
-				new (m_pCurWritePos) HyDrawPrimitive2d(*reinterpret_cast<HyPrimitive2d *>(m_vLoadedInst2d[i]), uiVertexDataOffset, pCurVertexWritePos);
-				m_pCurWritePos += sizeof(HyDrawPrimitive2d);
-				break;
-			}
-
-			uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
 			iNumInsts++;
 		}
+		
+		m_vLoadedInst2d[i]->WriteDrawBufferData(pCurVertexWritePos);
+		uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
 	}
 
-	if(m_DrawPhys2d.IsDrawEnabled())
-	{
-		m_DrawPhys2d.Reset();
-		m_b2World.DrawDebugData();
+	//if(m_DrawPhys2d.IsDrawEnabled())
+	//{
+	//	m_DrawPhys2d.Reset();
+	//	m_b2World.DrawDebugData();
 
-		uint32 uiNumPhysDraws = m_DrawPhys2d.GetNumPhysDraws();
-		for(uint32 i = 0; i < uiNumPhysDraws; ++i)
-		{
-			new (m_pCurWritePos) HyDrawPrimitive2d(*m_DrawPhys2d.GetInstPtr(i)->GetPrimitive(), uiVertexDataOffset, pCurVertexWritePos);
-			m_pCurWritePos += sizeof(HyDrawPrimitive2d);
+	//	uint32 uiNumPhysDraws = m_DrawPhys2d.GetNumPhysDraws();
+	//	for(uint32 i = 0; i < uiNumPhysDraws; ++i)
+	//	{
+	//		new (m_pCurWritePos) HyDrawPrimitive2d(*m_DrawPhys2d.GetInstPtr(i)->GetPrimitive(), uiVertexDataOffset, pCurVertexWritePos);
+	//		m_pCurWritePos += sizeof(HyDrawPrimitive2d);
 
-			uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
-			iNumInsts++;
-		}
-	}
+	//		uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
+	//		iNumInsts++;
+	//	}
+	//}
 
 	*(reinterpret_cast<int32 *>(pWriteNum2dInstsHere)) = iNumInsts;
 	pDrawHeader->uiVertexBufferSize2d = pCurVertexWritePos - pStartVertexWritePos;

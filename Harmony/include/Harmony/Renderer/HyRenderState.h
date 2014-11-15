@@ -22,20 +22,21 @@ class HyRenderState
 public:
 	enum eAttributes
 	{
-		RS_SCISSORTEST				= 1 << 0,
-		RS_USINGLOCALCOORDS			= 1 << 1,	// If disabled, then using world coordinates
+		SCISSORTEST				= 1 << 0,
+		USINGLOCALCOORDS		= 1 << 1,	// If disabled, then using world coordinates
 
-		RS_SHADER_PRIMITIVEDRAW		= 1 << 2,
-		RS_SHADER_QUADBATCH			= 1 << 3,
-		RS_SHADER_CUSTOM			= 1 << 4,
-		RS_SHADERMASK				= RS_SHADER_PRIMITIVEDRAW | RS_SHADER_QUADBATCH | RS_SHADER_CUSTOM,
+		SHADER_PRIMITIVEDRAW	= 1 << 2,
+		SHADER_QUADBATCH		= 1 << 3,
+		SHADER_CUSTOM			= 1 << 4,
+		SHADERMASK				= SHADER_PRIMITIVEDRAW | SHADER_QUADBATCH | SHADER_CUSTOM,
 
-		RS_DRAWMODE_TRIANGLESTRIP	= 1 << 5,
-		RS_DRAWMODE_LINELOOP		= 1 << 6,
-		RS_DRAWMODE_LINESTRIP		= 1 << 7,
-		RS_DRAWMODEMASK				= RS_DRAWMODE_TRIANGLESTRIP | RS_DRAWMODE_LINELOOP | RS_DRAWMODE_LINESTRIP
+		DRAWMODE_TRIANGLESTRIP	= 1 << 5,
+		DRAWMODE_TRIANGLEFAN	= 1 << 6,
+		DRAWMODE_LINELOOP		= 1 << 7,
+		DRAWMODE_LINESTRIP		= 1 << 8,
+		DRAWMODEMASK			= DRAWMODE_TRIANGLESTRIP | DRAWMODE_TRIANGLEFAN | DRAWMODE_LINELOOP | DRAWMODE_LINESTRIP,
 
-		//RS_CUSTOMSHADER_ID			= // Bits 8-13, store index to custom shader vector. Valid entries [0-63]
+		//RS_CUSTOMSHADER_ID			= // Bits 9-14, store index to custom shader vector. Valid entries [0-63]
 	};
 
 private:
@@ -48,7 +49,7 @@ public:
 	HyRenderState();
 	~HyRenderState(void);
 
-	void Set(IObjInst2d *pInst, uint32 uiVertexDataOffset);
+	void SetDataOffset(uint32 uiVertexDataOffset);
 	void Enable(uint32 uiAttributes);
 	void Disable(uint32 uiAttributes);
 

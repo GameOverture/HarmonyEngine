@@ -43,6 +43,9 @@ public:
 	void OffsetVerts(vec2 vOffset, float fAngleOffset, HyCoordinateType eCoordType = HYCOORD_Pixel);
 
 private:
+
+	void ClearData();
+
 	virtual void OnDataLoaded()	{ }
 	virtual void Update()		{ }
 };

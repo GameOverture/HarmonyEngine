@@ -34,12 +34,14 @@ protected:
 	//HyOpenGLShader			m_ShaderText2d;
 
 	GLuint					m_hVAO2d;
-	GLuint					m_hVBO2d;
+	GLuint					m_hVBO2d_UnitQuad;
 	GLuint					m_hIBO2d;
 
 	GLenum					m_eDrawMode;
 
 	//uint16 *				m_pGenericIndexBuffer2d;
+
+	void (HyOpenGL::*m_fpDraw2d)(char *pData);
 
 public:
 	HyOpenGL();
@@ -56,7 +58,7 @@ public:
 	virtual void End_3d();
 
 	virtual bool Begin_2d();
-	virtual void SetRenderState_2d(uint32 uiNewRenderState);
+	virtual void DrawRenderState_2d(HyRenderState &renderState);
 	virtual void End_2d();
 
 	virtual void FinishRender();
@@ -68,7 +70,7 @@ public:
 	virtual void DeleteTexture(uint32 uiTextureId);
 
 private:
-	static void DrawBatchedQuads2d(IDraw2d *pInst, void *pApi);
+	void DrawBatchedQuads2d(char *pData);
 	static void DrawPrim2dInst(IDraw2d *pBaseInst, void *pApi);
 	static void DrawTxt2dInst(IDraw2d *pBaseInst, void *pApi);
 };

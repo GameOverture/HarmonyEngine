@@ -74,14 +74,6 @@ IObjInst2d *HyEntity2d::Set(HyInstanceType eType, const char *szPrefix, const ch
 	return pNewInst;
 }
 
-HySprite2d *HyEntity2d::SetSprite(HyTexture *pTexture, HyRectangle rSrcRect)
-{
-	HySprite2d *pNewInst = new HySprite2d(pTexture, rSrcRect);
-	LinkInst(pNewInst);
-
-	return pNewInst;
-}
-
 HySprite2d *HyEntity2d::SetSprite(const char *szPrefix, const char *szName)
 {
 	HySprite2d *pNewInst = new HySprite2d(szPrefix, szName);

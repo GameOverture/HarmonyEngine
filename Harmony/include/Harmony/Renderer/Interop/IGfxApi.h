@@ -19,7 +19,7 @@ using std::queue;
 
 // Forward declarations
 class IData;
-class IDraw2d;
+class HyRenderState;
 
 class IGfxApi
 {
@@ -30,12 +30,9 @@ protected:
 	queue<IData *> *			m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
 	char *						m_pDrawBufferPtr;	// The pointer to the currently active draw buffer
 
-	char *						m_pCurDataPtr;
 	HyGfxComms::tDrawHeader *	m_DrawpBufferHeader;
-	IDraw2d *					m_pCurDrawData;
-
-	uint32						m_uiCurRenderState;
-	void (*m_fpDraw2d)(IDraw2d *pInst, void *pApi);
+	HyRenderState *				m_pCurRenderState;
+	HyRenderState				m_PrevRenderState;
 
 public:
 	IGfxApi();
@@ -55,7 +52,7 @@ public:
 	virtual void End_3d() = 0;
 
 	virtual bool Begin_2d() = 0;
-	virtual void SetRenderState_2d(uint32 uiNewRenderState) = 0;
+	virtual void DrawRenderState_2d(HyRenderState &renderState) = 0;
 	virtual void End_2d() = 0;
 
 	virtual void FinishRender() = 0;
@@ -74,8 +71,9 @@ public:
 	int32 GetNumInsts3d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras3d)); }
 	int32 GetNumCameras3d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras3d)); }
 
-	int32 GetNumInsts2d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d)); }
-	float *GetVertexData2d()				{ return reinterpret_cast<float *>(m_pDrawBufferPtr+m_DrawpBufferHeader->uiOffsetToVertexData2d); } 
+	int32 GetNumRenderStates2d()			{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d)); }
+	HyRenderState *GetRenderStatesPtr2d()	{ return reinterpret_cast<HyRenderState *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d + sizeof(int32)); } // Last sizeof(int32) is skipping number of 2dInsts
+	float *GetVertexData2d()				{ return reinterpret_cast<float *>(m_pDrawBufferPtr+m_DrawpBufferHeader->uiOffsetToVertexData2d); }
 
 	bool Update();
 	void UpdateLoop();

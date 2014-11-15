@@ -10,7 +10,7 @@
 #include "Renderer/HyRenderState.h"
 #include "Creator/Instances/IObjInst2d.h"
 
-HyRenderState::HyRenderState(IObjInst2d *pInst, uint32 uiVertexDataOffset) : m_uiAttributeFlags(0)
+HyRenderState::HyRenderState() : m_uiAttributeFlags(0)
 {
 	memset(m_pTextureBinds, 0, sizeof(m_pTextureBinds[0])*HY_MAX_TEXTURE_BINDS);
 }
@@ -19,8 +19,9 @@ HyRenderState::~HyRenderState(void)
 {
 }
 
-void Set(IObjInst2d *pInst, uint32 uiVertexDataOffset)
+void HyRenderState::SetDataOffset(uint32 uiVertexDataOffset)
 {
+	m_uiVertexDataOffset = uiVertexDataOffset;
 }
 
 void HyRenderState::Enable(uint32 uiAttributes)

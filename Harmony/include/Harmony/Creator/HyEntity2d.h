@@ -51,7 +51,6 @@ public:
 	void CtorInit();
 
 	IObjInst2d *Set(HyInstanceType eType, const char *szPrefix, const char *szName);
-	HySprite2d *SetSprite(HyTexture *pTexture, HyRectangle rSrcRect);
 	HySprite2d *SetSprite(const char *szPrefix, const char *szName);
 	HySpine2d *SetSpine(const char *szPrefix, const char *szName);
 	HyText2d *SetText(const char *szPrefix, const char *szName);

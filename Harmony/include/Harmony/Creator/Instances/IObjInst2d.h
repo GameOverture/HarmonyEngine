@@ -59,7 +59,7 @@ public:
 	void SetDisplayOrder(float fOrderValue);
 
 	const HyRenderState &GetRenderState() const					{ return m_RenderState; }
-	void SetUsingLocalCoordinates(bool bUseLocalCoords)			{ if(bUseLocalCoords) m_RenderState.Enable(HyRenderState::RS_USINGLOCALCOORDS); else m_RenderState.Disable(HyRenderState::RS_USINGLOCALCOORDS); }
+	void SetUsingLocalCoordinates(bool bUseLocalCoords)			{ if(bUseLocalCoords) m_RenderState.Enable(HyRenderState::USINGLOCALCOORDS); else m_RenderState.Disable(HyRenderState::USINGLOCALCOORDS); }
 
 	inline HyAnimVec4 &Color()									{ return m_vColor; }
 
@@ -76,7 +76,9 @@ public:
 protected:
 	virtual void OnDataLoaded() = 0;
 	virtual void Update() = 0;
-	virtual void WriteDrawBufferData(
+
+	// This function is responsible for incrementing the passed in reference pointer the size of the data written
+	virtual void WriteDrawBufferData(char *&pRefDataWritePos) = 0;
 
 private:
 	void SetData(IData *pData);

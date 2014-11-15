@@ -16,23 +16,20 @@ HyPrimitive2d::HyPrimitive2d() :	IObjInst2d(HYINST_Primitive2d, NULL, NULL),
 									m_uiNumVerts(0),
 									m_uiTextureId(0)
 {
-	m_uiRenderStates |= RS_SHADER_PRIMITIVEDRAW | RS_DRAWMODE_LINELOOP;
 }
 
 
 HyPrimitive2d::~HyPrimitive2d(void)
 {
-	delete [] m_pVertices;
+	ClearData();
 }
 
 const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 {
-	delete [] m_pVertices;
-	m_pVertices = NULL;
-
-	m_uiRenderStates = p.m_uiRenderStates;
+	m_RenderState = p.m_RenderState;
 	m_uiNumVerts = p.m_uiNumVerts;
 
+	ClearData();
 	if(m_uiNumVerts != 0)
 	{
 		m_pVertices = new vec4[m_uiNumVerts];
@@ -44,28 +41,17 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 
 void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
 {
-	delete [] m_pVertices;
-	m_pVertices = NULL;
-	m_uiNumVerts = 0;
+	ClearData();
+
+	if(bWireframe)
+		m_RenderState.Enable(HyRenderState::DRAWMODE_LINELOOP | HyRenderState::SHADER_PRIMITIVEDRAW);
+	else
+		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::SHADER_PRIMITIVEDRAW);
 
 	float fCoordMod = eCoordType == HYCOORD_Meter ? HyCreator::PixelsPerMeter() : 1.0f;
 	fWidth *= fCoordMod;
 	fHeight *= fCoordMod;
 	vOffset *= fCoordMod;
-
-	if(bWireframe)
-	{
-		m_uiRenderStates &= ~RS_DRAWMODEMASK;
-		m_uiRenderStates |= RS_DRAWMODE_LINELOOP;
-
-		
-	}
-	else
-	{
-		m_uiRenderStates &= ~RS_DRAWMODEMASK;
-		m_uiRenderStates |= RS_DRAWMODE_TRIANGLESTRIP;
-		//HyError("HyPrimitive2d::SetAsQuad() doesn't support non-wireframe yet");
-	}
 
 	m_uiNumVerts = 4;
 	m_pVertices = new vec4[m_uiNumVerts];
@@ -93,47 +79,40 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, HyCo
 
 void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
 {
-	delete [] m_pVertices;
-	m_pVertices = NULL;
-	m_uiNumVerts = 0;
+	ClearData();
 
 	if(bWireframe)
-	{
-		m_uiRenderStates &= ~RS_DRAWMODEMASK;
-		m_uiRenderStates |= RS_DRAWMODE_LINELOOP;
-
-		m_uiNumVerts = iNumSegments;
-		m_pVertices = new vec4[m_uiNumVerts];
-
-		float fCoordMod = eCoordType == HYCOORD_Meter ? HyCreator::PixelsPerMeter() : 1.0f;
-		fRadius *= fCoordMod;
-		vOffset *= fCoordMod;
-
-		float t = 0.0f;
-		for(uint32 n = 0; n <= m_uiNumVerts; ++n)
-		{
-			t = 2.0f * HY_PI * static_cast<float>(n) / static_cast<float>(m_uiNumVerts);
-
-			m_pVertices[n].x = (sin(t) * fRadius) + vOffset.x;
-			m_pVertices[n].y = (cos(t) * fRadius) + vOffset.y;
-			m_pVertices[n].z = 0.0f;
-			m_pVertices[n].w = 1.0f;
-		}
-	}
+		m_RenderState.Enable(HyRenderState::DRAWMODE_LINELOOP | HyRenderState::SHADER_PRIMITIVEDRAW);
 	else
+		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLEFAN | HyRenderState::SHADER_PRIMITIVEDRAW);
+
+	m_uiNumVerts = iNumSegments;
+	m_pVertices = new vec4[m_uiNumVerts];
+
+	float fCoordMod = eCoordType == HYCOORD_Meter ? HyCreator::PixelsPerMeter() : 1.0f;
+	fRadius *= fCoordMod;
+	vOffset *= fCoordMod;
+
+	float t = 0.0f;
+	for(uint32 n = 0; n <= m_uiNumVerts; ++n)
 	{
-		HyError("HyPrimitive2d::SetAsCircle() doesn't support non-wireframe yet");
+		t = 2.0f * HY_PI * static_cast<float>(n) / static_cast<float>(m_uiNumVerts);
+
+		m_pVertices[n].x = (sin(t) * fRadius) + vOffset.x;
+		m_pVertices[n].y = (cos(t) * fRadius) + vOffset.y;
+		m_pVertices[n].z = 0.0f;
+		m_pVertices[n].w = 1.0f;
 	}
 }
 
 void HyPrimitive2d::SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
 {
-	delete [] m_pVertices;
-	m_pVertices = NULL;
-	m_uiNumVerts = 0;
+	ClearData();
 
-	m_uiRenderStates &= ~RS_DRAWMODEMASK;
-	m_uiRenderStates |= bChainLoop ? RS_DRAWMODE_LINELOOP : RS_DRAWMODE_LINESTRIP; //GL_LINE_STRIP;
+	if(bChainLoop)
+		m_RenderState.Enable(HyRenderState::DRAWMODE_LINELOOP | HyRenderState::SHADER_PRIMITIVEDRAW);
+	else
+		m_RenderState.Enable(HyRenderState::DRAWMODE_LINESTRIP | HyRenderState::SHADER_PRIMITIVEDRAW);
 
 	m_uiNumVerts = uiNumVerts;
 	m_pVertices = new vec4[m_uiNumVerts];
@@ -171,3 +150,11 @@ void HyPrimitive2d::OffsetVerts(vec2 vOffset, float fAngleOffset, HyCoordinateTy
 	}
 }
 
+void HyPrimitive2d::ClearData()
+{
+	delete [] m_pVertices;
+	m_pVertices = NULL;
+	m_uiNumVerts = 0;
+
+	m_RenderState.Disable(HyRenderState::DRAWMODEMASK | HyRenderState::SHADERMASK);
+}

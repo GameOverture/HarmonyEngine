@@ -1,14 +1,15 @@
 #version 330
 
-layout(location = 0) in vec4 position;
+layout(location = 0) in vec4 unitQuadPos;
+
 layout(location = 1) in vec2 size
-layout(location = 1) in vec2 offset;
-layout(location = 2) in vec4 tint;
-layout(location = 3) in vec2 UVcoord0;
-layout(location = 4) in vec2 UVcoord1;
-layout(location = 5) in vec2 UVcoord2;
-layout(location = 6) in vec2 UVcoord3;
-layout(location = 7) in mat4 mtxLocalToWorld;
+layout(location = 2) in vec2 offset;
+layout(location = 3) in vec4 tint;
+layout(location = 4) in vec2 UVcoord0;
+layout(location = 5) in vec2 UVcoord1;
+layout(location = 6) in vec2 UVcoord2;
+layout(location = 7) in vec2 UVcoord3;
+layout(location = 8) in mat4 mtxLocalToWorld;
 
 smooth out vec4 interpColor;
 smooth out vec2 interpUV;
