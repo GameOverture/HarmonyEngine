@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Renderer/Interop/IGfxApi.h"
 
-IGfxApi::IGfxApi() :	m_pGfxComms(NULL),
+IGfxApi::IGfxApi() :	m_pGfxComms(NULL)
 {
 }
 
@@ -87,7 +87,7 @@ void IGfxApi::Draw2d()
 	// Each render state will require its own draw. The order of these render states should be 
 	// depth sorted with render states batched together to reduce state changes.
 	m_pCurRenderState = GetRenderStatesPtr2d();
-	memset(m_PrevRenderState, 0, sizeof(HyRenderState));
+	memset(&m_PrevRenderState, 0, sizeof(HyRenderState));
 
 	int32 iNumRenderStates = GetNumRenderStates2d();
 	for(int32 i = 0; i < iNumRenderStates; ++i, ++m_pCurRenderState)

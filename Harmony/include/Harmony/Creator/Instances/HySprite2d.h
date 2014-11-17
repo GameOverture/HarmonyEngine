@@ -118,6 +118,8 @@ public:
 private:
 	virtual void OnDataLoaded();
 	virtual void Update();
+
+	virtual void WriteDrawBufferData(char *&pRefDataWritePos);
 };
 
 #endif /* __HySprite2d_h__ */

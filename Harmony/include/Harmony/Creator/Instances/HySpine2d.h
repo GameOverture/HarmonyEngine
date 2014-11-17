@@ -113,6 +113,7 @@ public:
 private:
 	virtual void Update();
 	virtual void OnDataLoaded();
+	virtual void WriteDrawBufferData(char *&pRefDataWritePos);
 };
 
 #endif /* __HySpine2d_h__ */

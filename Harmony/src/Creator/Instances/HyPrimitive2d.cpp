@@ -158,3 +158,7 @@ void HyPrimitive2d::ClearData()
 
 	m_RenderState.Disable(HyRenderState::DRAWMODEMASK | HyRenderState::SHADERMASK);
 }
+
+/*virtual*/ void HyPrimitive2d::WriteDrawBufferData(char *&pRefDataWritePos)
+{
+}

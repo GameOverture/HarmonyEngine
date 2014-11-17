@@ -43,15 +43,25 @@ private:
 	uint32			m_uiAttributeFlags;
 	uint32			m_pTextureBinds[HY_MAX_TEXTURE_BINDS];
 	
-	uint32			m_uiVertexDataOffset;
+	uint32			m_uiAux;
+	uint32			m_uiDataOffset;
 
 public:
 	HyRenderState();
 	~HyRenderState(void);
 
 	void SetDataOffset(uint32 uiVertexDataOffset);
+	uint32 GetDataOffset();
+	
+	void SetAux(uint32 uiAux);
+	uint32 GetAux();
+
 	void Enable(uint32 uiAttributes);
 	void Disable(uint32 uiAttributes);
+	bool CompareAttribute(const HyRenderState &rs, uint32 uiMask);
+	bool IsEnabled(eAttributes eAttrib);
+
+	uint32 GetTextureHandle(uint32 uiTextureIndex);
 
 	bool operator==(const HyRenderState &right) const;
 };

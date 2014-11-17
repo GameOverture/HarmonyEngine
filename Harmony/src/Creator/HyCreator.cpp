@@ -384,6 +384,7 @@ void HyCreator::WriteDrawBuffers()
 		{
 			memcpy(m_pCurWritePos, &m_vLoadedInst2d[i]->GetRenderState(), sizeof(HyRenderState));
 			reinterpret_cast<HyRenderState *>(m_pCurWritePos)->SetDataOffset(uiVertexDataOffset);
+			pCurRenderState2d = reinterpret_cast<HyRenderState *>(m_pCurWritePos);
 			m_pCurWritePos += sizeof(HyRenderState);
 
 			iNumInsts++;
@@ -461,7 +462,7 @@ void HyCreator::WriteDrawBuffers()
 /*static*/ bool HyCreator::Inst2dSortPredicate(const IObjInst2d *pInst1, const IObjInst2d *pInst2)
 {
 	if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
-		return pInst1->GetRenderState() < pInst2->GetRenderState();
+		return pInst1->GetRenderState() == pInst2->GetRenderState();
 
 	return pInst1->GetDisplayOrder() < pInst2->GetDisplayOrder();
 }

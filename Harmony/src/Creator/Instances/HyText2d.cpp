@@ -27,11 +27,6 @@ HyText2d::~HyText2d(void)
 {
 }
 
-/*virtual*/ void HyText2d::Update()
-{
-
-}
-
 void HyText2d::SetString(const HyChar *szString, ...)
 {
 	va_list vl;
@@ -112,10 +107,19 @@ void HyText2d::CalcVertexBuffer()
 	}
 }
 
+/*virtual*/ void HyText2d::Update()
+{
+
+}
+
 /*virtual*/ void HyText2d::OnDataLoaded()
 {
 	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pDataPtr);
 	//m_uiCurFontSize = pTextData->GetMinFontSize();
 
 	CalcVertexBuffer();
+}
+
+/*virtual*/ void HyText2d::WriteDrawBufferData(char *&pRefDataWritePos)
+{
 }
