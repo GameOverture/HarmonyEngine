@@ -34,7 +34,7 @@ protected:
 	//HyOpenGLShader			m_ShaderText2d;
 
 	GLuint					m_hVAO2d;
-	GLuint					m_hVBO2d_UnitQuad;
+	GLuint					m_hVBO2d;
 	GLuint					m_hIBO2d;
 
 	GLenum					m_eDrawMode;

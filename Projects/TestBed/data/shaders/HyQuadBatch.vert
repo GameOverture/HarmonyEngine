@@ -1,7 +1,7 @@
 #version 330
 
-layout(location = 0) in vec2 offset;
-layout(location = 1) in vec2 size;
+layout(location = 0) in vec2 size;
+layout(location = 1) in vec2 offset;
 layout(location = 2) in vec4 tint;
 layout(location = 3) in vec2 UVcoord0;
 layout(location = 4) in vec2 UVcoord1;

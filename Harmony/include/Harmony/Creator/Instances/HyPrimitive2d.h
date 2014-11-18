@@ -48,7 +48,7 @@ private:
 
 	virtual void OnDataLoaded()	{ }
 	virtual void Update()		{ }
-	virtual void WriteDrawBufferData(char *&pRefDataWritePos);
+	virtual void WriteDrawBufferData(HyRenderState &associatedRenderState, char *&pRefDataWritePos);
 };
 
 #endif /* __HyPrimitive2d_h__ */

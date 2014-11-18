@@ -43,7 +43,7 @@ private:
 	uint32			m_uiAttributeFlags;
 	uint32			m_pTextureBinds[HY_MAX_TEXTURE_BINDS];
 	
-	uint32			m_uiAux;
+	uint32			m_uiNumInstances;
 	uint32			m_uiDataOffset;
 
 public:
@@ -53,8 +53,8 @@ public:
 	void SetDataOffset(uint32 uiVertexDataOffset);
 	uint32 GetDataOffset();
 	
-	void SetAux(uint32 uiAux);
-	uint32 GetAux();
+	void AppendInstances(uint32 uiNumInstsToAppend);
+	uint32 GetNumInstances();
 
 	void Enable(uint32 uiAttributes);
 	void Disable(uint32 uiAttributes);

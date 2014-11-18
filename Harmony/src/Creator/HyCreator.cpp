@@ -293,7 +293,7 @@ void HyCreator::WriteDrawBuffers()
 	char *pWriteNum3dCamsHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 	
-	int32 iNumInsts = 0;
+	int32 iCount = 0;
 	uint32 iTotalNumInsts = m_ViewportRef.m_vCams3d.size();
 	for(uint32 i = 0; i < iTotalNumInsts; ++i)
 	{
@@ -307,10 +307,10 @@ void HyCreator::WriteDrawBuffers()
 			*(reinterpret_cast<mat4 *>(m_pCurWritePos)) = mtxView;
 			m_pCurWritePos += sizeof(mat4);
 
-			iNumInsts++;
+			iCount++;
 		}
 	}
-	*(reinterpret_cast<int32 *>(pWriteNum3dCamsHere)) = iNumInsts;
+	*(reinterpret_cast<int32 *>(pWriteNum3dCamsHere)) = iCount;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 2d CAMERA(S) BUFFER
@@ -318,7 +318,7 @@ void HyCreator::WriteDrawBuffers()
 	char *pWriteNum2dCamsHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 
-	iNumInsts = 0;
+	iCount = 0;
 	iTotalNumInsts = m_ViewportRef.m_vCams2d.size();
 	for(uint32 i = 0; i < iTotalNumInsts; ++i)
 	{
@@ -331,10 +331,10 @@ void HyCreator::WriteDrawBuffers()
 			*(reinterpret_cast<mat4 *>(m_pCurWritePos)) = mtxView;
 			m_pCurWritePos += sizeof(mat4);
 
-			iNumInsts++;
+			iCount++;
 		}
 	}
-	*(reinterpret_cast<int32 *>(pWriteNum2dCamsHere)) = iNumInsts;
+	*(reinterpret_cast<int32 *>(pWriteNum2dCamsHere)) = iCount;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 3d DRAW BUFFER
@@ -342,7 +342,7 @@ void HyCreator::WriteDrawBuffers()
 	char *pWriteNum3dInstsHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 
-	iNumInsts = 0;
+	iCount = 0;
 	iTotalNumInsts = m_vInst3d.size();
 	for(uint32 i = 0; i < iTotalNumInsts; ++i)
 	{
@@ -351,10 +351,10 @@ void HyCreator::WriteDrawBuffers()
 			// TODO: 
 			//new (m_pCurWritePos) HyDrawText2d(reinterpret_cast<HyText2d *>(m_vLoadedInst2d[i]), uiVertexDataOffset, pCurVertexWritePos);
 			//m_pCurWritePos += sizeof(HyDrawText2d);
-			iNumInsts++;
+			iCount++;
 		}
 	}
-	*(reinterpret_cast<int32 *>(pWriteNum3dInstsHere)) = iNumInsts;
+	*(reinterpret_cast<int32 *>(pWriteNum3dInstsHere)) = iCount;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 2d DRAW BUFFER
@@ -362,7 +362,7 @@ void HyCreator::WriteDrawBuffers()
 	char *pWriteNum2dInstsHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 
-	iNumInsts = 0;
+	iCount = 0;
 	iTotalNumInsts = m_vLoadedInst2d.size();
 
 	char *pStartVertexWritePos = m_pCurWritePos + (iTotalNumInsts * sizeof(HyRenderState));
@@ -387,10 +387,10 @@ void HyCreator::WriteDrawBuffers()
 			pCurRenderState2d = reinterpret_cast<HyRenderState *>(m_pCurWritePos);
 			m_pCurWritePos += sizeof(HyRenderState);
 
-			iNumInsts++;
+			iCount++;
 		}
 		
-		m_vLoadedInst2d[i]->WriteDrawBufferData(pCurVertexWritePos);
+		m_vLoadedInst2d[i]->WriteDrawBufferData(*pCurRenderState2d, pCurVertexWritePos);
 		uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
 	}
 
@@ -406,11 +406,11 @@ void HyCreator::WriteDrawBuffers()
 	//		m_pCurWritePos += sizeof(HyDrawPrimitive2d);
 
 	//		uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
-	//		iNumInsts++;
+	//		iCount++;
 	//	}
 	//}
 
-	*(reinterpret_cast<int32 *>(pWriteNum2dInstsHere)) = iNumInsts;
+	*(reinterpret_cast<int32 *>(pWriteNum2dInstsHere)) = iCount;
 	pDrawHeader->uiVertexBufferSize2d = pCurVertexWritePos - pStartVertexWritePos;
 
 	// Do final check to see if we wrote passed our bounds

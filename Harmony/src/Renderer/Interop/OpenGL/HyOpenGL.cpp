@@ -127,9 +127,9 @@ HyOpenGL::~HyOpenGL(void)
 	glGenVertexArrays(1, &m_hVAO2d);
 	glBindVertexArray(m_hVAO2d);
 
-	//// Initialize 2d quad buffer
-	//glGenBuffers(1, &m_hVBO2d_UnitQuad);
-	//glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d_UnitQuad);
+	// Initialize 2d quad buffer
+	glGenBuffers(1, &m_hVBO2d);
+	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 	//const float fUnitQuadVertPos[16] = {
 	//	0.0f, 0.0f, 0.0f, 1.0f,
 	//	1.0f, 0.0f, 0.0f, 1.0f,
@@ -226,6 +226,11 @@ HyOpenGL::~HyOpenGL(void)
 
 	glBindVertexArray(m_hVAO2d);
 
+	float *pTest = reinterpret_cast<float *>(GetVertexData2d());
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
+	glBufferData(GL_ARRAY_BUFFER, m_DrawpBufferHeader->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
+
 	
 	//-----------------------------------------------------------------------------------------------------------------
 
@@ -276,11 +281,13 @@ HyOpenGL::~HyOpenGL(void)
 			//glEnableVertexAttribArray(m_ShaderQuadBatch.GetAttribLocation("color"));
 			//glEnableVertexAttribArray(m_ShaderQuadBatch.GetAttribLocation("uv"));
 
-			glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d_UnitQuad);
+		
 			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
 			//glPrimitiveRestartIndex(HY_RESTART_INDEX);
 			//glEnable(GL_PRIMITIVE_RESTART);
 
+
+			glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 
 			//m_ShaderQuadBatch.SetUniform("localToWorld", pInst->GetTransformMtx());
 
@@ -305,14 +312,29 @@ HyOpenGL::~HyOpenGL(void)
 			GLuint uv3 = m_ShaderQuadBatch.GetAttribLocation("UVcoord3");
 			GLuint mtx = m_ShaderQuadBatch.GetAttribLocation("mtxLocalToWorld");
 
-			glVertexAttribPointer(size, 2, GL_FLOAT, GL_FALSE, 128*sizeof(GLfloat), (void *)uiDataOffset);
-			glVertexAttribPointer(offset, 2, GL_FLOAT, GL_FALSE, 128*sizeof(GLfloat), (void *)(uiDataOffset + (2*sizeof(GLfloat))));
-			glVertexAttribPointer(tint, 4, GL_FLOAT, GL_FALSE, 128*sizeof(GLfloat), (void *)(uiDataOffset + (4*sizeof(GLfloat))));
-			glVertexAttribPointer(uv0, 2, GL_FLOAT, GL_FALSE, 128*sizeof(GLfloat), (void *)(uiDataOffset + (8*sizeof(GLfloat))));
-			glVertexAttribPointer(uv1, 2, GL_FLOAT, GL_FALSE, 128*sizeof(GLfloat), (void *)(uiDataOffset + (10*sizeof(GLfloat))));
-			glVertexAttribPointer(uv2, 2, GL_FLOAT, GL_FALSE, 128*sizeof(GLfloat), (void *)(uiDataOffset + (12*sizeof(GLfloat))));
-			glVertexAttribPointer(uv3, 2, GL_FLOAT, GL_FALSE, 128*sizeof(GLfloat), (void *)(uiDataOffset + (14*sizeof(GLfloat))));
-			glVertexAttribPointer(mtx, 16, GL_FLOAT, GL_FALSE, 128*sizeof(GLfloat), (void *)(uiDataOffset + (16*sizeof(GLfloat))));
+			glEnableVertexAttribArray(size);
+			glEnableVertexAttribArray(offset);
+			glEnableVertexAttribArray(tint);
+			glEnableVertexAttribArray(uv0);
+			glEnableVertexAttribArray(uv1);
+			glEnableVertexAttribArray(uv2);
+			glEnableVertexAttribArray(uv3);
+			glEnableVertexAttribArray(mtx+0);
+			glEnableVertexAttribArray(mtx+1);
+			glEnableVertexAttribArray(mtx+2);
+			glEnableVertexAttribArray(mtx+3);
+
+			glVertexAttribPointer(size, 2, GL_FLOAT, GL_FALSE, 128, (void *)uiDataOffset);
+			glVertexAttribPointer(offset, 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (2*sizeof(GLfloat))));
+			glVertexAttribPointer(tint, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (4*sizeof(GLfloat))));
+			glVertexAttribPointer(uv0, 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (8*sizeof(GLfloat))));
+			glVertexAttribPointer(uv1, 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (10*sizeof(GLfloat))));
+			glVertexAttribPointer(uv2, 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (12*sizeof(GLfloat))));
+			glVertexAttribPointer(uv3, 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (14*sizeof(GLfloat))));
+			glVertexAttribPointer(mtx+0, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (16*sizeof(GLfloat))));
+			glVertexAttribPointer(mtx+1, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (20*sizeof(GLfloat))));
+			glVertexAttribPointer(mtx+2, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (24*sizeof(GLfloat))));
+			glVertexAttribPointer(mtx+3, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (28*sizeof(GLfloat))));
 			
 			glVertexAttribDivisor(size, 1);
 			glVertexAttribDivisor(offset, 1);
@@ -321,18 +343,21 @@ HyOpenGL::~HyOpenGL(void)
 			glVertexAttribDivisor(uv1, 1);
 			glVertexAttribDivisor(uv2, 1);
 			glVertexAttribDivisor(uv3, 1);
-			glVertexAttribDivisor(mtx, 1);
+			glVertexAttribDivisor(mtx+0, 1);
+			glVertexAttribDivisor(mtx+1, 1);
+			glVertexAttribDivisor(mtx+2, 1);
+			glVertexAttribDivisor(mtx+3, 1);
 
 			//uint32 uiByteOffset = pInst->GetVertexDataOffset();
 			//glVertexAttribPointer(m_ShaderQuadBatch.GetAttribLocation("unitQuadPos"), 4, GL_FLOAT, GL_FALSE, 0, (void *)uiByteOffset);
 			//glVertexAttribPointer(m_ShaderQuadBatch.GetAttribLocation("color"), 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(4*sizeof(GLfloat))));
 			//glVertexAttribPointer(m_ShaderQuadBatch.GetAttribLocation("uv"), 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(8*sizeof(GLfloat))));
 
-			GLuint uiNumInsts = renderState.GetAux();
 			glBindTexture(GL_TEXTURE_2D, renderState.GetTextureHandle(0));
 			//glDrawElements(pThis->m_eDrawMode, pInst->GetNumQuads() * 5, GL_UNSIGNED_SHORT, 0);
 
-			glDrawArraysInstanced(m_eDrawMode, 0, 4, uiNumInsts);
+			//glDrawArrays(m_eDrawMode, 0, 4);
+			glDrawArraysInstanced(m_eDrawMode, 0, 4, renderState.GetNumInstances());
 
 			//m_fpDraw2d = DrawBatchedQuads2d;
 		}

@@ -73,7 +73,7 @@ public:
 
 	int32 GetNumRenderStates2d()			{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d)); }
 	HyRenderState *GetRenderStatesPtr2d()	{ return reinterpret_cast<HyRenderState *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d + sizeof(int32)); } // Last sizeof(int32) is skipping number of 2dInsts
-	float *GetVertexData2d()				{ return reinterpret_cast<float *>(m_pDrawBufferPtr+m_DrawpBufferHeader->uiOffsetToVertexData2d); }
+	char *GetVertexData2d()					{ return reinterpret_cast<char *>(m_pDrawBufferPtr+m_DrawpBufferHeader->uiOffsetToVertexData2d); }
 
 	bool Update();
 	void UpdateLoop();
