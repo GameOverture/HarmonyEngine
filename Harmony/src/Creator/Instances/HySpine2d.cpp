@@ -40,22 +40,6 @@ HySpine2d::~HySpine2d(void)
 	}
 }
 
-uint32 HySpine2d::GetTextureId()
-{
-	for (int i = 0; i < m_pSpineSkeleton->slotCount; ++i)
-	{
-		spAttachment* attachment = m_pSpineSkeleton->drawOrder[i]->attachment;
-		if(attachment == NULL || attachment->type != SP_ATTACHMENT_REGION)
-			continue;
-
-		spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
-
-		return reinterpret_cast<HyTexture *>(reinterpret_cast<spAtlasRegion *>(regionAttachment->rendererObject)->page->rendererObject)->GetId();
-	}
-
-	return 0;
-}
-
 //uint32 HySpine2d::GetTextureId()
 //{
 //	if(m_uiTextureid == 0)
@@ -195,73 +179,69 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 	m_ppSpineAnims		= pSpineData->GetSkeletonData()->animations;
 	m_pAnimStateData	= spAnimationStateData_create(pSpineData->GetSkeletonData());
 
+	m_uiNumSprites = 0;
+	for (int i = 0; i < m_pSpineSkeleton->slotCount; ++i)
+	{
+		spAttachment* attachment = m_pSpineSkeleton->drawOrder[i]->attachment;
+		if(attachment == NULL || attachment->type != SP_ATTACHMENT_REGION)
+			continue;
+
+		spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
+		m_RenderState.SetTextureHandle(0, reinterpret_cast<HyTexture *>(reinterpret_cast<spAtlasRegion *>(regionAttachment->rendererObject)->page->rendererObject)->GetId());
+
+		m_uiNumSprites++;
+	}
+
 	//AnimSetState(m_uiNumAnims, m_bLooping);
-}
-
-void HyDrawQuadBatch2d::WriteVertexData(int32 iVertIndex, float *pVertexPositions, spRegionAttachment* regionAttachment, const vec4 *pVertColorRGBA, char *&pCurVertexWritePos)
-{
-	vec4 ptVertPosition;
-	ptVertPosition.x = pVertexPositions[iVertIndex*2];
-	ptVertPosition.y = pVertexPositions[iVertIndex*2+1];
-	ptVertPosition.z = 0.0f;
-	ptVertPosition.w = 1.0f;
-
-	vec2 vVertUVs;
-	vVertUVs.x = regionAttachment->uvs[iVertIndex*2];
-	vVertUVs.y = regionAttachment->uvs[iVertIndex*2+1];
-
-	// Write data
-	memcpy(pCurVertexWritePos, &ptVertPosition, sizeof(vec4));
-	pCurVertexWritePos += sizeof(vec4);
-
-	memcpy(pCurVertexWritePos, pVertColorRGBA, sizeof(vec4));
-	pCurVertexWritePos += sizeof(vec4);
-
-	memcpy(pCurVertexWritePos, &vVertUVs, sizeof(vec2));
-	pCurVertexWritePos += sizeof(vec2);
 }
 
 /*virtual*/ void HySpine2d::WriteDrawBufferData(char *&pRefDataWritePos)
 {
-	mat4 mtxTransform;
-	GetWorldTransform(mtxTransform);
-
-
-	m_uiNumQuads = 0;
 	spSlot *pCurSlot;
-	for (int i = 0; i < inst.GetSkeleton()->slotCount; ++i)
+	for (int i = 0; i < m_pSpineSkeleton->slotCount; ++i)
 	{
-		pCurSlot = inst.GetSkeleton()->drawOrder[i];
+		pCurSlot = m_pSpineSkeleton->drawOrder[i];
 
 		spAttachment* attachment = pCurSlot->attachment;
 		if(attachment == NULL || attachment->type != SP_ATTACHMENT_REGION)
 			continue;
-		
-		m_uiNumQuads++;
 
 		spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
 
-		m_uiTextureId = reinterpret_cast<HyTexture *>(reinterpret_cast<spAtlasRegion *>(regionAttachment->rendererObject)->page->rendererObject)->GetId();
+		float pPos[8];
+		spRegionAttachment_computeWorldVertices(regionAttachment, pCurSlot->skeleton->x, pCurSlot->skeleton->y, pCurSlot->bone, pPos);
+#define vertX(index) pPos[index*2]
+#define vertY(index) pPos[index*2+1]
+#define vertU(index) regionAttachment->uvs[index*2]
+#define vertV(index) regionAttachment->uvs[index*2+1]
 
-		float fVertexPositions[8];
+		vec2 vSize(abs(vertX(0) - vertX(3)), abs(vertY(2) - vertY(3)));
+		vec2 vOffset(vertX(0), vertY(0));
 
-		spRegionAttachment_computeWorldVertices(regionAttachment, pCurSlot->skeleton->x, pCurSlot->skeleton->y, pCurSlot->bone, fVertexPositions);
+		*reinterpret_cast<vec2 *>(pRefDataWritePos) = vSize;
+		pRefDataWritePos += sizeof(vec2);
+		*reinterpret_cast<vec2 *>(pRefDataWritePos) = vOffset;
+		pRefDataWritePos += sizeof(vec2);
 
 		vec4 vVertColorRGBA;
-		vVertColorRGBA.r = inst.GetSkeleton()->r * pCurSlot->r;
-		vVertColorRGBA.g = inst.GetSkeleton()->g * pCurSlot->g;
-		vVertColorRGBA.b = inst.GetSkeleton()->b * pCurSlot->b;
-		vVertColorRGBA.a = inst.GetSkeleton()->a * pCurSlot->a;
+		vVertColorRGBA.r = m_pSpineSkeleton->r * pCurSlot->r;
+		vVertColorRGBA.g = m_pSpineSkeleton->g * pCurSlot->g;
+		vVertColorRGBA.b = m_pSpineSkeleton->b * pCurSlot->b;
+		vVertColorRGBA.a = m_pSpineSkeleton->a * pCurSlot->a;
+		*reinterpret_cast<vec4 *>(pRefDataWritePos) = vVertColorRGBA;
+		pRefDataWritePos += sizeof(vec4);
 
-		// Write each vertex and its attributes [POS->COLOR->UV]
-		//
-		// Special Case OpenGL: In order to terminate primitives in TRIANGLE_STRIP properly, I need to flip the [3]rd and [4]th vertex in the quad
-		WriteVertexData(0, fVertexPositions, regionAttachment, &vVertColorRGBA, m_pCurDataWritePos);
-		WriteVertexData(1, fVertexPositions, regionAttachment, &vVertColorRGBA, m_pCurDataWritePos);
-		WriteVertexData(3, fVertexPositions, regionAttachment, &vVertColorRGBA, m_pCurDataWritePos);
-		WriteVertexData(2, fVertexPositions, regionAttachment, &vVertColorRGBA, m_pCurDataWritePos);
+		vec2 vUV;
+		for(int i = 0; i < 4; ++i)
+		{
+			vUV.x = vertU(i);
+			vUV.y = vertV(i);
+
+			*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
+			pRefDataWritePos += sizeof(vec2);
 		}
-	}
 
-	return false;
+		GetWorldTransform(*reinterpret_cast<mat4 *>(pRefDataWritePos));
+		pRefDataWritePos += sizeof(mat4);
+	}
 }

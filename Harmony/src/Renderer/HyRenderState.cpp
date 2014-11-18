@@ -64,6 +64,11 @@ uint32 HyRenderState::GetTextureHandle(uint32 uiTextureIndex)
 	return m_pTextureBinds[uiTextureIndex];
 }
 
+void HyRenderState::SetTextureHandle(uint32 uiIndex, uint32 uiHandleId)
+{
+	m_pTextureBinds[uiIndex] = uiHandleId;
+}
+
 bool HyRenderState::operator==(const HyRenderState &right) const
 {
 	return this->m_uiAttributeFlags == right.m_uiAttributeFlags &&
