@@ -61,7 +61,7 @@ IObjInst2d *HyEntity2d::Set(HyInstanceType eType, const char *szPrefix, const ch
 	{
 	case HYINST_Sprite2d:	pNewInst = new HySprite2d(szPrefix, szName);	break;
 	case HYINST_Spine2d:	pNewInst = new HySpine2d(szPrefix, szName);		break;
-	case HYISNT_Text2d:		pNewInst = new HyText2d(szPrefix, szName);		break;
+	case HYINST_Text2d:		pNewInst = new HyText2d(szPrefix, szName);		break;
 	default:
 		break;
 	}
@@ -128,7 +128,7 @@ HyText2d *HyEntity2d::GetText()
 {
 	for(uint32 i = 0; i < m_vInstList.size(); ++i)
 	{
-		if(m_vInstList[i]->GetInstType() == HYISNT_Text2d)
+		if(m_vInstList[i]->GetInstType() == HYINST_Text2d)
 			return reinterpret_cast<HyText2d *>(m_vInstList[i]);
 	}
 	return NULL;

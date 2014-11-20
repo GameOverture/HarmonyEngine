@@ -23,7 +23,7 @@ enum HyInstanceType
 	HYINST_Sprite2d,
 	HYINST_Spine2d,
 	HYINST_Primitive2d,
-	HYISNT_Text2d,
+	HYINST_Text2d,
 	HYINST_Mesh3d,
 
 	HYINST_Shader

@@ -45,3 +45,4 @@ void main()
 	//gl_Position = mtxWorldToCameraMatrix * gl_Position;
 	//gl_Position = mtxCameraToClipMatrix * gl_Position;
 }
+

@@ -26,7 +26,7 @@ void HyRenderState::SetDataOffset(uint32 uiVertexDataOffset)
 	m_uiDataOffset = uiVertexDataOffset;
 }
 
-uint32 HyRenderState::GetDataOffset()
+uint32 HyRenderState::GetDataOffset() const
 {
 	return m_uiDataOffset;
 }
@@ -36,9 +36,14 @@ void HyRenderState::AppendInstances(uint32 uiNumInstsToAppend)
 	m_uiNumInstances += uiNumInstsToAppend;
 }
 
-uint32 HyRenderState::GetNumInstances()
+uint32 HyRenderState::GetNumInstances() const
 {
 	return m_uiNumInstances;
+}
+
+void HyRenderState::SetNumInstances(uint32 uiNumInsts)
+{
+	m_uiNumInstances = uiNumInsts;
 }
 
 void HyRenderState::Enable(uint32 uiAttributes)

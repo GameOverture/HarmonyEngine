@@ -43,7 +43,7 @@ public:
 private:
 	virtual void Update();
 	virtual void OnDataLoaded();
-	virtual void WriteDrawBufferData(HyRenderState &associatedRenderState, char *&pRefDataWritePos);
+	virtual void WriteDrawBufferData(char *&pRefDataWritePos);
 	
 	void CalcVertexBuffer();
 };

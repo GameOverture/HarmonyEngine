@@ -16,7 +16,7 @@
 
 /*static*/ HyChar HyText2d::sm_pTempTextBuffer[HY_TEMP_TEXTBUFFER_SIZE] = { 0 };
 
-HyText2d::HyText2d(const char *szPrefix, const char *szName) :	IObjInst2d(HYISNT_Text2d, szPrefix, szName),
+HyText2d::HyText2d(const char *szPrefix, const char *szName) :	IObjInst2d(HYINST_Text2d, szPrefix, szName),
 																m_pVertexBuffer(NULL),
 																m_uiCurFontIndex(0)
 {
@@ -120,6 +120,6 @@ void HyText2d::CalcVertexBuffer()
 	CalcVertexBuffer();
 }
 
-/*virtual*/ void HyText2d::WriteDrawBufferData(HyRenderState &associatedRenderState, char *&pRefDataWritePos)
+/*virtual*/ void HyText2d::WriteDrawBufferData(char *&pRefDataWritePos)
 {
 }

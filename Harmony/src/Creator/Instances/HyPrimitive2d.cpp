@@ -159,6 +159,19 @@ void HyPrimitive2d::ClearData()
 	m_RenderState.Disable(HyRenderState::DRAWMODEMASK | HyRenderState::SHADERMASK);
 }
 
-/*virtual*/ void HyPrimitive2d::WriteDrawBufferData(HyRenderState &associatedRenderState, char *&pRefDataWritePos)
+/*virtual*/ void HyPrimitive2d::WriteDrawBufferData(char *&pRefDataWritePos)
 {
+	memcpy(pRefDataWritePos, &Color().Get(), sizeof(vec4));
+	pRefDataWritePos += sizeof(vec4);
+
+	mat4 mtx;
+	GetWorldTransform(mtx);
+	memcpy(pRefDataWritePos, &mtx, sizeof(mat4));
+	pRefDataWritePos += sizeof(mat4);
+
+	memcpy(pRefDataWritePos, &m_uiNumVerts, sizeof(uint32));
+	pRefDataWritePos += sizeof(uint32);
+
+	memcpy(pRefDataWritePos, m_pVertices, m_uiNumVerts * sizeof(vec4));
+	pRefDataWritePos += m_uiNumVerts * sizeof(vec4);
 }

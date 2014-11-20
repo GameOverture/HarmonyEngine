@@ -21,7 +21,6 @@ class HySpine2d : public IObjInst2d
 {
 	spSkeleton*				m_pSpineSkeleton;
 	spAnimation **			m_ppSpineAnims;
-	uint32					m_uiNumSprites;
 	uint32					m_uiNumAnims;
 
 	spAnimationStateData *	m_pAnimStateData;
@@ -39,7 +38,6 @@ public:
 	virtual ~HySpine2d(void);
 
 	spSkeleton *GetSkeleton()		{ return m_pSpineSkeleton; }
-	uint32 GetNumSprites()			{ return m_uiNumSprites; }
 
 	/************************************************************************************************
 											ANIMATION CALLS
@@ -113,7 +111,7 @@ public:
 private:
 	virtual void Update();
 	virtual void OnDataLoaded();
-	virtual void WriteDrawBufferData(HyRenderState &associatedRenderState, char *&pRefDataWritePos);
+	virtual void WriteDrawBufferData(char *&pRefDataWritePos);
 };
 
 #endif /* __HySpine2d_h__ */

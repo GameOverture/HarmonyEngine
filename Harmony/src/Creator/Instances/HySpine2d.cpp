@@ -179,7 +179,7 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 	m_ppSpineAnims		= pSpineData->GetSkeletonData()->animations;
 	m_pAnimStateData	= spAnimationStateData_create(pSpineData->GetSkeletonData());
 
-	m_uiNumSprites = 0;
+	m_RenderState.SetNumInstances(0);
 	for (int i = 0; i < m_pSpineSkeleton->slotCount; ++i)
 	{
 		spAttachment* attachment = m_pSpineSkeleton->drawOrder[i]->attachment;
@@ -188,14 +188,13 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 
 		spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
 		m_RenderState.SetTextureHandle(0, reinterpret_cast<HyTexture *>(reinterpret_cast<spAtlasRegion *>(regionAttachment->rendererObject)->page->rendererObject)->GetId());
-
-		m_uiNumSprites++;
+		m_RenderState.AppendInstances(1);
 	}
 
 	//AnimSetState(m_uiNumAnims, m_bLooping);
 }
 
-/*virtual*/ void HySpine2d::WriteDrawBufferData(HyRenderState &associatedRenderState, char *&pRefDataWritePos)
+/*virtual*/ void HySpine2d::WriteDrawBufferData(char *&pRefDataWritePos)
 {
 	spSlot *pCurSlot;
 	for (int i = 0; i < m_pSpineSkeleton->slotCount; ++i)
@@ -244,6 +243,4 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 		GetWorldTransform(*reinterpret_cast<mat4 *>(pRefDataWritePos));
 		pRefDataWritePos += sizeof(mat4);
 	}
-
-	associatedRenderState.AppendInstances(GetNumSprites());
 }

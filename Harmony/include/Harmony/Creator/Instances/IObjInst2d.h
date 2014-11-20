@@ -78,7 +78,7 @@ protected:
 	virtual void Update() = 0;
 
 	// This function is responsible for incrementing the passed in reference pointer the size of the data written
-	virtual void WriteDrawBufferData(HyRenderState &associatedRenderState, char *&pRefDataWritePos) = 0;
+	virtual void WriteDrawBufferData(char *&pRefDataWritePos) = 0;
 
 private:
 	void SetData(IData *pData);

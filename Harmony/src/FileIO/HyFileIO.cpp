@@ -39,7 +39,7 @@ std::string HyFileIO::sm_sLogStr = "";
 	case HYINST_Sound2d:		sFilePath += "audio/";		break;
 	case HYINST_Sprite2d:		sFilePath += "sprites/";	break;
 	case HYINST_Spine2d:		sFilePath += "spine/";		break;
-	case HYISNT_Text2d:			sFilePath += "fonts/";		break;
+	case HYINST_Text2d:			sFilePath += "fonts/";		break;
 	case HYINST_Shader:			sFilePath += "shaders/";	break;
 	case HYINST_Primitive2d:
 	case HYINST_Mesh3d:
@@ -57,7 +57,7 @@ std::string HyFileIO::sm_sLogStr = "";
 	switch(eType)
 	{
 	case HYINST_Sound2d:	sFilePath += ".hyaud";	break;
-	case HYISNT_Text2d:		sFilePath += ".hyfnt";	break;
+	case HYINST_Text2d:		sFilePath += ".hyfnt";	break;
 	case HYINST_Sprite2d:	sFilePath += ".hyspr";	break;
 	}
 

@@ -51,10 +51,11 @@ public:
 	~HyRenderState(void);
 
 	void SetDataOffset(uint32 uiVertexDataOffset);
-	uint32 GetDataOffset();
+	uint32 GetDataOffset() const;
 	
 	void AppendInstances(uint32 uiNumInstsToAppend);
-	uint32 GetNumInstances();
+	uint32 GetNumInstances() const;
+	void SetNumInstances(uint32 uiNumInsts);
 
 	void Enable(uint32 uiAttributes);
 	void Disable(uint32 uiAttributes);
