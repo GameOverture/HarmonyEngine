@@ -124,12 +124,14 @@ HyOpenGL::~HyOpenGL(void)
 	//glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Set up vertex array object
-	glGenVertexArrays(1, &m_hVAO2d);
-	glBindVertexArray(m_hVAO2d);
+	glGenVertexArrays(NUM_VAOTYPES, m_pVAO2d);
+	glBindVertexArray(m_pVAO2d[QUADBATCH]);
 
 	// Initialize 2d quad buffer
-	glGenBuffers(1, &m_hVBO2d);
-	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
+	GLuint hVBO;
+	glGenBuffers(1, &hVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, hVBO);
+
 	//const float fUnitQuadVertPos[16] = {
 	//	0.0f, 0.0f, 0.0f, 1.0f,
 	//	1.0f, 0.0f, 0.0f, 1.0f,
@@ -390,6 +392,13 @@ HyOpenGL::~HyOpenGL(void)
 			glEnableVertexAttribArray(0);
 			glDisableVertexAttribArray(1);
 			glDisableVertexAttribArray(2);
+			glDisableVertexAttribArray(3);
+			glDisableVertexAttribArray(4);
+			glDisableVertexAttribArray(5);
+			glDisableVertexAttribArray(6);
+			glDisableVertexAttribArray(7);
+			glDisableVertexAttribArray(8);
+			glDisableVertexAttribArray(9);
 
 			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)uiDataOffset);
 			//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void *)(pInst->GetVertexDataOffset()+(4*sizeof(GLfloat))));

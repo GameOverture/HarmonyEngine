@@ -33,9 +33,14 @@ protected:
 	HyOpenGLShader			m_ShaderPrimitive2d;
 	//HyOpenGLShader			m_ShaderText2d;
 
-	GLuint					m_hVAO2d;
-	GLuint					m_hVBO2d;
-	GLuint					m_hIBO2d;
+	enum eVAOTypes
+	{
+		QUADBATCH,
+		PRIMITIVE,
+
+		NUM_VAOTYPES
+	};
+	GLuint					m_pVAO2d[NUM_VAOTYPES];
 
 	GLenum					m_eDrawMode;
 
