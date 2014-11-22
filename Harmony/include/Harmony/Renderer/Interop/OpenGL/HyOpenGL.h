@@ -29,19 +29,18 @@ protected:
 	int32					m_iNumPasses3d;
 
 	///////// 2D MEMBERS ////////////////////
-	HyOpenGLShader			m_ShaderQuadBatch;
-	HyOpenGLShader			m_ShaderPrimitive2d;
-	//HyOpenGLShader			m_ShaderText2d;
-
 	enum eVAOTypes
 	{
 		QUADBATCH,
 		PRIMITIVE,
+		CUSTOM,
 
 		NUM_VAOTYPES
 	};
 	GLuint					m_pVAO2d[NUM_VAOTYPES];
-
+	HyOpenGLShader			m_pShader2d[NUM_VAOTYPES];
+	
+	GLuint					m_hVBO2d;
 	GLenum					m_eDrawMode;
 
 	//uint16 *				m_pGenericIndexBuffer2d;

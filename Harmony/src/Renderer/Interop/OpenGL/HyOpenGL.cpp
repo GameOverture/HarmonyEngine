@@ -83,54 +83,83 @@ HyOpenGL::~HyOpenGL(void)
 	//printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
 
 	glEnable(GL_DEPTH_TEST);
-
-
-	//////////////////////////////////////////////////////////////////////////
-	// Init Built-in Shaders
-	//////////////////////////////////////////////////////////////////////////
-	m_ShaderQuadBatch.CompileFromFile("HyQuadBatch", HyOpenGLShader::VERTEX);
-	m_ShaderQuadBatch.CompileFromFile("HyQuadBatch", HyOpenGLShader::FRAGMENT);
-
-	m_ShaderQuadBatch.BindAttribLocation(0, "position");
-	m_ShaderQuadBatch.BindAttribLocation(1, "color");
-	m_ShaderQuadBatch.BindAttribLocation(2, "uv");
-
-	if(!m_ShaderQuadBatch.Link())
-		HyError("Shader program failed to link!\n" << m_ShaderQuadBatch.Log().c_str() << "\n");
-
-	//////////////////////////////////////////////////////////////////////////
-
-	m_ShaderPrimitive2d.CompileFromFile("Prim2d", HyOpenGLShader::VERTEX);
-	m_ShaderPrimitive2d.CompileFromFile("Prim2d", HyOpenGLShader::FRAGMENT);
-
-	if(!m_ShaderPrimitive2d.Link())
-		HyError("Shader program failed to link!\n" << m_ShaderPrimitive2d.Log().c_str() << "\n");
-
-	//////////////////////////////////////////////////////////////////////////
-
-	//m_ShaderText2d.CompileFromFile("Txt2d", HyOpenGLShader::VERTEX);
-	//m_ShaderText2d.CompileFromFile("Txt2d", HyOpenGLShader::FRAGMENT);
-
-	//if(!m_ShaderText2d.Link())
-	//	HyError("Shader program failed to link!\n" << m_ShaderText2d.Log().c_str() << "\n");
-
+	glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
 
 	//////////////////////////////////////////////////////////////////////////
 	// 2D setup
 	//////////////////////////////////////////////////////////////////////////
 
-	//glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-	glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
-	//glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-	// Set up vertex array object
 	glGenVertexArrays(NUM_VAOTYPES, m_pVAO2d);
+
+	glGenBuffers(1, &m_hVBO2d);
+	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
+
+	// Quad batch //////////////////////////////////////////////////////////////////////////
+	m_pShader2d[QUADBATCH].CompileFromFile("HyQuadBatch", HyOpenGLShader::VERTEX);
+	m_pShader2d[QUADBATCH].CompileFromFile("HyQuadBatch", HyOpenGLShader::FRAGMENT);
+
+	if(!m_pShader2d[QUADBATCH].Link())
+		HyError("Shader program failed to link!\n" << m_pShader2d[QUADBATCH].Log().c_str() << "\n");
+
 	glBindVertexArray(m_pVAO2d[QUADBATCH]);
 
-	// Initialize 2d quad buffer
-	GLuint hVBO;
-	glGenBuffers(1, &hVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, hVBO);
+	GLuint size = m_pShader2d[QUADBATCH].GetAttribLocation("size");
+	GLuint offset = m_pShader2d[QUADBATCH].GetAttribLocation("offset");
+	GLuint tint = m_pShader2d[QUADBATCH].GetAttribLocation("tint");
+	GLuint uv0 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord0");
+	GLuint uv1 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord1");
+	GLuint uv2 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord2");
+	GLuint uv3 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord3");
+	GLuint mtx = m_pShader2d[QUADBATCH].GetAttribLocation("mtxLocalToWorld");
+
+	glEnableVertexAttribArray(size);
+	glEnableVertexAttribArray(offset);
+	glEnableVertexAttribArray(tint);
+	glEnableVertexAttribArray(uv0);
+	glEnableVertexAttribArray(uv1);
+	glEnableVertexAttribArray(uv2);
+	glEnableVertexAttribArray(uv3);
+	glEnableVertexAttribArray(mtx+0);
+	glEnableVertexAttribArray(mtx+1);
+	glEnableVertexAttribArray(mtx+2);
+	glEnableVertexAttribArray(mtx+3);
+
+	glVertexAttribPointer(size, 2, GL_FLOAT, GL_FALSE, 128, (void *)0);
+	glVertexAttribPointer(offset, 2, GL_FLOAT, GL_FALSE, 128, (void *)(2*sizeof(GLfloat)));
+	glVertexAttribPointer(tint, 4, GL_FLOAT, GL_FALSE, 128, (void *)(4*sizeof(GLfloat)));
+	glVertexAttribPointer(uv0, 2, GL_FLOAT, GL_FALSE, 128, (void *)(8*sizeof(GLfloat)));
+	glVertexAttribPointer(uv1, 2, GL_FLOAT, GL_FALSE, 128, (void *)(10*sizeof(GLfloat)));
+	glVertexAttribPointer(uv2, 2, GL_FLOAT, GL_FALSE, 128, (void *)(12*sizeof(GLfloat)));
+	glVertexAttribPointer(uv3, 2, GL_FLOAT, GL_FALSE, 128, (void *)(14*sizeof(GLfloat)));
+	glVertexAttribPointer(mtx+0, 4, GL_FLOAT, GL_FALSE, 128, (void *)(16*sizeof(GLfloat)));
+	glVertexAttribPointer(mtx+1, 4, GL_FLOAT, GL_FALSE, 128, (void *)(20*sizeof(GLfloat)));
+	glVertexAttribPointer(mtx+2, 4, GL_FLOAT, GL_FALSE, 128, (void *)(24*sizeof(GLfloat)));
+	glVertexAttribPointer(mtx+3, 4, GL_FLOAT, GL_FALSE, 128, (void *)(28*sizeof(GLfloat)));
+
+	glVertexAttribDivisor(size, 1);
+	glVertexAttribDivisor(offset, 1);
+	glVertexAttribDivisor(tint, 1);
+	glVertexAttribDivisor(uv0, 1);
+	glVertexAttribDivisor(uv1, 1);
+	glVertexAttribDivisor(uv2, 1);
+	glVertexAttribDivisor(uv3, 1);
+	glVertexAttribDivisor(mtx+0, 1);
+	glVertexAttribDivisor(mtx+1, 1);
+	glVertexAttribDivisor(mtx+2, 1);
+	glVertexAttribDivisor(mtx+3, 1);
+
+	// Primitive //////////////////////////////////////////////////////////////////////////
+	m_pShader2d[PRIMITIVE].CompileFromFile("Prim2d", HyOpenGLShader::VERTEX);
+	m_pShader2d[PRIMITIVE].CompileFromFile("Prim2d", HyOpenGLShader::FRAGMENT);
+
+	if(!m_pShader2d[PRIMITIVE].Link())
+		HyError("Shader program failed to link!\n" << m_pShader2d[PRIMITIVE].Log().c_str() << "\n");
+
+	glBindVertexArray(m_pVAO2d[PRIMITIVE]);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
+
 
 	//const float fUnitQuadVertPos[16] = {
 	//	0.0f, 0.0f, 0.0f, 1.0f,
@@ -226,13 +255,13 @@ HyOpenGL::~HyOpenGL(void)
 	//glPrimitiveRestartIndex(HY_RESTART_INDEX);
 	//glEnable(GL_PRIMITIVE_RESTART);
 
-	glBindVertexArray(m_hVAO2d);
-
-	char *pTest = GetVertexData2d();//reinterpret_cast<float *>(GetVertexData2d());
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 	glBufferData(GL_ARRAY_BUFFER, m_DrawpBufferHeader->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexDataEmulate), vertexDataEmulate, GL_DYNAMIC_DRAW);
 
+	//char *pTest = GetVertexData2d();
+	float *pTest = reinterpret_cast<float *>(GetVertexData2d());
 	
 	//-----------------------------------------------------------------------------------------------------------------
 
@@ -269,174 +298,77 @@ HyOpenGL::~HyOpenGL(void)
 	{
 		if(renderState.IsEnabled(HyRenderState::SHADER_QUADBATCH))
 		{
-			glUseProgram(0);
-			m_ShaderQuadBatch.Use();
+			glBindVertexArray(m_pVAO2d[QUADBATCH]);
+			m_pShader2d[QUADBATCH].Use();
 
 			if(renderState.IsEnabled(HyRenderState::USINGLOCALCOORDS))
-				m_ShaderQuadBatch.SetUniform("worldToCameraMatrix", m_kmtxIdentity);
+				m_pShader2d[QUADBATCH].SetUniform("mtxWorldToCameraMatrix", m_kmtxIdentity);
 			else
-				m_ShaderQuadBatch.SetUniform("worldToCameraMatrix", m_mtxView);
+				m_pShader2d[QUADBATCH].SetUniform("mtxWorldToCameraMatrix", m_mtxView);
 
-			m_ShaderQuadBatch.SetUniform("cameraToClipMatrix", m_mtxProj);
+			m_pShader2d[QUADBATCH].SetUniform("mtxCameraToClipMatrix", m_mtxProj);
 
-			//glEnableVertexAttribArray(m_ShaderQuadBatch.GetAttribLocation("position"));
-			//glEnableVertexAttribArray(m_ShaderQuadBatch.GetAttribLocation("color"));
-			//glEnableVertexAttribArray(m_ShaderQuadBatch.GetAttribLocation("uv"));
-
-		
-			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
-			//glPrimitiveRestartIndex(HY_RESTART_INDEX);
-			//glEnable(GL_PRIMITIVE_RESTART);
-
-
-			glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
-
-			//m_ShaderQuadBatch.SetUniform("localToWorld", m_kmtxIdentity);
-			//GLuint pos = m_ShaderQuadBatch.GetAttribLocation("position");
-			//GLuint color = m_ShaderQuadBatch.GetAttribLocation("color");
-			//GLuint uv = m_ShaderQuadBatch.GetAttribLocation("uv");
-			//glVertexAttribPointer(pos, 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)uiDataOffset);
-			//glVertexAttribPointer(color, 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiDataOffset+(4*sizeof(GLfloat))));
-			//glVertexAttribPointer(uv, 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiDataOffset+(8*sizeof(GLfloat))));
+			//m_pShader2d[QUADBATCH].SetUniform("mtxLocalToWorld", m_kmtxIdentity/**reinterpret_cast<mat4 *>(pDrawData)*/);
 
 			uint32 uiDataOffset = renderState.GetDataOffset();
 
-			GLuint size = m_ShaderQuadBatch.GetAttribLocation("size");
-			GLuint offset = m_ShaderQuadBatch.GetAttribLocation("offset");
-			GLuint tint = m_ShaderQuadBatch.GetAttribLocation("tint");
-			GLuint uv0 = m_ShaderQuadBatch.GetAttribLocation("UVcoord0");
-			GLuint uv1 = m_ShaderQuadBatch.GetAttribLocation("UVcoord1");
-			GLuint uv2 = m_ShaderQuadBatch.GetAttribLocation("UVcoord2");
-			GLuint uv3 = m_ShaderQuadBatch.GetAttribLocation("UVcoord3");
-			GLuint mtx = m_ShaderQuadBatch.GetAttribLocation("mtxLocalToWorld");
 
-			glEnableVertexAttribArray(size);
-			glEnableVertexAttribArray(offset);
-			glEnableVertexAttribArray(tint);
-			glEnableVertexAttribArray(uv0);
-			glEnableVertexAttribArray(uv1);
-			glEnableVertexAttribArray(uv2);
-			glEnableVertexAttribArray(uv3);
-			glEnableVertexAttribArray(mtx+0);
-			glEnableVertexAttribArray(mtx+1);
-			glEnableVertexAttribArray(mtx+2);
-			glEnableVertexAttribArray(mtx+3);
+			//glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)0);
+			//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(0+(4*sizeof(GLfloat))));
+			//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(0+(8*sizeof(GLfloat))));
 
-			glVertexAttribPointer(size, 2, GL_FLOAT, GL_FALSE, 128, (void *)uiDataOffset);
-			glVertexAttribPointer(offset, 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (2*sizeof(GLfloat))));
-			glVertexAttribPointer(tint, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (4*sizeof(GLfloat))));
-			glVertexAttribPointer(uv0, 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (8*sizeof(GLfloat))));
-			glVertexAttribPointer(uv1, 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (10*sizeof(GLfloat))));
-			glVertexAttribPointer(uv2, 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (12*sizeof(GLfloat))));
-			glVertexAttribPointer(uv3, 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (14*sizeof(GLfloat))));
+
+			GLuint mtx = m_pShader2d[QUADBATCH].GetAttribLocation("mtxLocalToWorld");
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("size"), 2, GL_FLOAT, GL_FALSE, 128, (void *)uiDataOffset);
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("offset"), 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (2*sizeof(GLfloat))));
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("tint"), 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (4*sizeof(GLfloat))));
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord0"), 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (8*sizeof(GLfloat))));
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord1"), 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (10*sizeof(GLfloat))));
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord2"), 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (12*sizeof(GLfloat))));
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord3"), 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (14*sizeof(GLfloat))));
 			glVertexAttribPointer(mtx+0, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (16*sizeof(GLfloat))));
 			glVertexAttribPointer(mtx+1, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (20*sizeof(GLfloat))));
 			glVertexAttribPointer(mtx+2, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (24*sizeof(GLfloat))));
 			glVertexAttribPointer(mtx+3, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (28*sizeof(GLfloat))));
 
-			glVertexAttribDivisor(size, 1);
-			glVertexAttribDivisor(offset, 1);
-			glVertexAttribDivisor(tint, 1);
-			glVertexAttribDivisor(uv0, 1);
-			glVertexAttribDivisor(uv1, 1);
-			glVertexAttribDivisor(uv2, 1);
-			glVertexAttribDivisor(uv3, 1);
-			glVertexAttribDivisor(mtx+0, 1);
-			glVertexAttribDivisor(mtx+1, 1);
-			glVertexAttribDivisor(mtx+2, 1);
-			glVertexAttribDivisor(mtx+3, 1);
-
-			//glCullFace(GL_FRONT_AND_BACK);
-
-			//uint32 uiByteOffset = pInst->GetVertexDataOffset();
-			//glVertexAttribPointer(m_ShaderQuadBatch.GetAttribLocation("unitQuadPos"), 4, GL_FLOAT, GL_FALSE, 0, (void *)uiByteOffset);
-			//glVertexAttribPointer(m_ShaderQuadBatch.GetAttribLocation("color"), 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(4*sizeof(GLfloat))));
-			//glVertexAttribPointer(m_ShaderQuadBatch.GetAttribLocation("uv"), 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(8*sizeof(GLfloat))));
-
 			glBindTexture(GL_TEXTURE_2D, renderState.GetTextureHandle(0));
-			//glDrawElements(pThis->m_eDrawMode, pInst->GetNumQuads() * 5, GL_UNSIGNED_SHORT, 0);
 
-			//glDrawArrays(m_eDrawMode, 0, 4);
 			int iNumInsts = renderState.GetNumInstances();
 			glDrawArraysInstanced(m_eDrawMode, 0, 4, iNumInsts);
-
+			//glDrawArrays(m_eDrawMode, 0, 4);
+			
 			//m_fpDraw2d = DrawBatchedQuads2d;
 		}
 		else if(renderState.IsEnabled(HyRenderState::SHADER_PRIMITIVEDRAW))
 		{
-			glUseProgram(0);
-			m_ShaderPrimitive2d.Use();
+			glBindVertexArray(m_pVAO2d[PRIMITIVE]);
+			m_pShader2d[PRIMITIVE].Use();
 
 			if(renderState.IsEnabled(HyRenderState::USINGLOCALCOORDS))
-				m_ShaderPrimitive2d.SetUniform("worldToCameraMatrix", m_kmtxIdentity);
+				m_pShader2d[PRIMITIVE].SetUniform("worldToCameraMatrix", m_kmtxIdentity);
 			else
-				m_ShaderPrimitive2d.SetUniform("worldToCameraMatrix", m_mtxView);
+				m_pShader2d[PRIMITIVE].SetUniform("worldToCameraMatrix", m_mtxView);
 
-			m_ShaderPrimitive2d.SetUniform("cameraToClipMatrix", m_mtxProj);
+			m_pShader2d[PRIMITIVE].SetUniform("cameraToClipMatrix", m_mtxProj);
 
 			uint32 uiDataOffset = renderState.GetDataOffset();
 
 			char *pDrawData = GetVertexData2d();
 			pDrawData += uiDataOffset;
-			m_ShaderPrimitive2d.SetUniform("primitiveColor", *reinterpret_cast<vec4 *>(pDrawData));
+			m_pShader2d[PRIMITIVE].SetUniform("primitiveColor", *reinterpret_cast<vec4 *>(pDrawData));
 			pDrawData += sizeof(vec4);
 			uiDataOffset += sizeof(vec4);
 			
-			m_ShaderPrimitive2d.SetUniform("transformMtx", *reinterpret_cast<mat4 *>(pDrawData));
+			m_pShader2d[PRIMITIVE].SetUniform("transformMtx", *reinterpret_cast<mat4 *>(pDrawData));
 			pDrawData += sizeof(mat4);
 			uiDataOffset += sizeof(mat4);
 
 			uint32 iNumVerts = *reinterpret_cast<uint32 *>(pDrawData);
 			uiDataOffset += sizeof(uint32);
 			
-			glEnableVertexAttribArray(0);
-			glDisableVertexAttribArray(1);
-			glDisableVertexAttribArray(2);
-			glDisableVertexAttribArray(3);
-			glDisableVertexAttribArray(4);
-			glDisableVertexAttribArray(5);
-			glDisableVertexAttribArray(6);
-			glDisableVertexAttribArray(7);
-			glDisableVertexAttribArray(8);
-			glDisableVertexAttribArray(9);
-
 			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)uiDataOffset);
-			//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void *)(pInst->GetVertexDataOffset()+(4*sizeof(GLfloat))));
-			//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(pInst->GetVertexDataOffset()+(8*sizeof(GLfloat))));
-			
 			glDrawArrays(m_eDrawMode, 0, iNumVerts);
-
-			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			//glDisable(GL_PRIMITIVE_RESTART);
-
-			//m_fpDraw2d = DrawPrim2dInst;
 		}
-		//else if(uiNewRenderState & IObjInst2d::RS_SHADER_TEXT)
-		//{
-		//	glUseProgram(0);
-		//	m_ShaderText2d.Use();
-
-		//	if(uiNewRenderState & IObjInst2d::USINGLOCALCOORDS)
-		//		m_ShaderText2d.SetUniform("worldToCameraMatrix", m_kmtxIdentity);
-		//	else
-		//		m_ShaderText2d.SetUniform("worldToCameraMatrix", m_mtxView);
-
-		//	m_ShaderText2d.SetUniform("cameraToClipMatrix", m_mtxProj);
-
-		//	glEnableVertexAttribArray(0);
-		//	glEnableVertexAttribArray(1);
-		//	glDisableVertexAttribArray(2);
-
-		//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
-		//	//glPrimitiveRestartIndex(HY_RESTART_INDEX);
-		//	//glEnable(GL_PRIMITIVE_RESTART);
-
-		//	glEnable(GL_BLEND);
-		//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//	glEnable(GL_TEXTURE_2D);
-
-		//	m_fpDraw2d = DrawTxt2dInst;
-		//}
 	}
 }
 
@@ -491,11 +423,6 @@ HyOpenGL::~HyOpenGL(void)
 	glDepthMask(true);
 
 	glBindVertexArray(0);
-
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
-
 	glUseProgram(0);
 }
 
@@ -539,7 +466,7 @@ HyOpenGL::~HyOpenGL(void)
 	}
 
 	// This is probable unnecessary
-	//GLint iLocation = glGetUniformLocation(m_ShaderQuadBatch.GetHandle(), "Tex");
+	//GLint iLocation = glGetUniformLocation(m_pShader2d[QUADBATCH].GetHandle(), "Tex");
 	//glUniform1i(iLocation, 0);
 
 	return hGLTexture;

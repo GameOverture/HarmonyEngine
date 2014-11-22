@@ -231,15 +231,27 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 		pRefDataWritePos += sizeof(vec4);
 
 		vec2 vUV;
-		for(int i = 0; i < 4; ++i)
-		{
-			vUV.x = vertU(i);
-			vUV.y = vertV(i);
 
-			*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
-			pRefDataWritePos += sizeof(vec2);
-		}
+		vUV.x = vertU(0);
+		vUV.y = vertV(0);
+		*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
+		pRefDataWritePos += sizeof(vec2);
 
+		vUV.x = vertU(1);
+		vUV.y = vertV(1);
+		*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
+		pRefDataWritePos += sizeof(vec2);
+
+		vUV.x = vertU(3);
+		vUV.y = vertV(3);
+		*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
+		pRefDataWritePos += sizeof(vec2);
+
+		vUV.x = vertU(2);
+		vUV.y = vertV(2);
+		*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
+		pRefDataWritePos += sizeof(vec2);
+		
 		GetWorldTransform(*reinterpret_cast<mat4 *>(pRefDataWritePos));
 		pRefDataWritePos += sizeof(mat4);
 	}
