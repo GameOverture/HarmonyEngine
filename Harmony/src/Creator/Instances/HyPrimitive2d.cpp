@@ -66,13 +66,22 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, HyCo
 	m_pVertices[1].z = 0.0f;
 	m_pVertices[1].w = 1.0f;
 
-	m_pVertices[2].x = vOffset.x;
-	m_pVertices[2].y = fHeight + vOffset.y;
+	if(bWireframe)
+	{
+		m_pVertices[2].x = fWidth + vOffset.x;
+		m_pVertices[2].y = fHeight + vOffset.y;
+		m_pVertices[3].x = vOffset.x;
+		m_pVertices[3].y = fHeight + vOffset.y;
+	}
+	else
+	{
+		m_pVertices[2].x = vOffset.x;
+		m_pVertices[2].y = fHeight + vOffset.y;
+		m_pVertices[3].x = fWidth + vOffset.x;
+		m_pVertices[3].y = fHeight + vOffset.y;
+	}
 	m_pVertices[2].z = 0.0f;
 	m_pVertices[2].w = 1.0f;
-
-	m_pVertices[3].x = fWidth + vOffset.x;
-	m_pVertices[3].y = fHeight + vOffset.y;
 	m_pVertices[3].z = 0.0f;
 	m_pVertices[3].w = 1.0f;
 }

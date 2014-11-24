@@ -308,15 +308,7 @@ HyOpenGL::~HyOpenGL(void)
 
 			m_pShader2d[QUADBATCH].SetUniform("mtxCameraToClipMatrix", m_mtxProj);
 
-			//m_pShader2d[QUADBATCH].SetUniform("mtxLocalToWorld", m_kmtxIdentity/**reinterpret_cast<mat4 *>(pDrawData)*/);
-
 			uint32 uiDataOffset = renderState.GetDataOffset();
-
-
-			//glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)0);
-			//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(0+(4*sizeof(GLfloat))));
-			//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(0+(8*sizeof(GLfloat))));
-
 
 			GLuint mtx = m_pShader2d[QUADBATCH].GetAttribLocation("mtxLocalToWorld");
 			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("size"), 2, GL_FLOAT, GL_FALSE, 128, (void *)uiDataOffset);
@@ -335,9 +327,6 @@ HyOpenGL::~HyOpenGL(void)
 
 			int iNumInsts = renderState.GetNumInstances();
 			glDrawArraysInstanced(m_eDrawMode, 0, 4, iNumInsts);
-			//glDrawArrays(m_eDrawMode, 0, 4);
-			
-			//m_fpDraw2d = DrawBatchedQuads2d;
 		}
 		else if(renderState.IsEnabled(HyRenderState::SHADER_PRIMITIVEDRAW))
 		{
