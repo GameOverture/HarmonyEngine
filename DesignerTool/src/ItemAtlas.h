@@ -9,6 +9,7 @@ class ItemAtlas : public Item
     
     ItemAtlas();
     
+    
 protected:
     
     virtual void Hide();

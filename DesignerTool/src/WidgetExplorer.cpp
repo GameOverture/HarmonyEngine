@@ -407,8 +407,6 @@ void WidgetExplorer::on_treeWidget_currentItemChanged(QTreeWidgetItem *current, 
         Item *pItemDir = GetCurDirSelected(false);
         bValidItem = pItemDir->GetType() == ITEM_DirSprites || pItemDir->GetType() == ITEM_DirFonts;
     }
-    FINDACTION("actionNewAtlas")->setEnabled(bValidItem);
-        
 //    QVariant v = current->data(0, Qt::UserRole);
 //    Item *pItemVariant = v.value<Item *>();
 }

@@ -48,6 +48,10 @@ private slots:
     
     void on_actionNewAtlas_triggered();
     
+    void on_actionViewAtlasManager_triggered();
+    
+    void on_actionViewOutputLog_triggered();
+    
 private:
     Ui::MainWindow *ui;
 

@@ -33,13 +33,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->actionNewFont->setEnabled(false);
     ui->actionNewParticle->setEnabled(false);
     ui->actionNewAudio->setEnabled(false);
-    ui->actionNewAtlas->setEnabled(false);
     
     // Link the actions to their proper widgets
     ui->explorer->addAction(ui->actionCloseProject);
     ui->explorer->addAction(ui->actionCopy);
     ui->explorer->addAction(ui->actionCut);
-    ui->explorer->addAction(ui->actionNewAtlas);
     ui->explorer->addAction(ui->actionNewProject);
     ui->explorer->addAction(ui->actionNewAudio);
     ui->explorer->addAction(ui->actionNewParticle);
@@ -203,6 +201,10 @@ void MainWindow::LoadSettings()
     }
     m_Settings.endGroup();
     
+    ui->actionViewAtlasManager->setChecked(!ui->dockWidgetAtlas->isHidden());
+    ui->actionViewExplorer->setChecked(!ui->dockWidgetExplorer->isHidden());
+    ui->actionViewOutputLog->setChecked(!ui->dockWidgetOutputLog->isHidden());
+    
     m_Settings.beginGroup("OpenData");
     {
         QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
@@ -245,6 +247,16 @@ void MainWindow::UpdateActions()
 
 void MainWindow::on_actionViewExplorer_triggered()
 {
-    
+    ui->dockWidgetExplorer->setHidden(!ui->dockWidgetExplorer->isHidden());
 }
 
+
+void MainWindow::on_actionViewAtlasManager_triggered()
+{
+    ui->dockWidgetAtlas->setHidden(!ui->dockWidgetAtlas->isHidden());
+}
+
+void MainWindow::on_actionViewOutputLog_triggered()
+{
+    ui->dockWidgetOutputLog->setHidden(!ui->dockWidgetOutputLog->isHidden());
+}

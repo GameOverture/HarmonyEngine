@@ -15,6 +15,8 @@ class WidgetAtlas : public QWidget
     
     ImagePacker         m_packer;
     
+    bool                m_bDirty;
+    
 public:
     explicit WidgetAtlas(QWidget *parent = 0);
     ~WidgetAtlas();
@@ -45,6 +47,8 @@ private slots:
     void on_sbFrameMarginBottom_valueChanged(int arg1);
     
     void on_sbFrameMarginLeft_valueChanged(int arg1);
+    
+    void on_tabWidget_currentChanged(int index);
     
 private:
     Ui::WidgetAtlas *ui;

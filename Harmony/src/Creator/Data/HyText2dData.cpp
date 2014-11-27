@@ -50,7 +50,6 @@ HyText2dData::~HyText2dData(void)
 			m_vFonts[m_vFonts.size() - 1]->outline_type = 1;
 			m_vFonts[m_vFonts.size() - 1]->outline_thickness = 2;
 			missed += texture_font_load_glyphs(m_vFonts[m_vFonts.size() - 1], szCharCodes);
-
 		}
 		HyAssert(missed == 0, "Default engine font does not fit on texture");
 

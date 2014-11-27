@@ -59,7 +59,6 @@
     <addaction name="actionCloseProject"/>
     <addaction name="separator"/>
     <addaction name="menu_New_Item"/>
-    <addaction name="actionNewAtlas"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSaveAll"/>
@@ -84,8 +83,8 @@
      <string>&amp;View</string>
     </property>
     <addaction name="actionViewExplorer"/>
-    <addaction name="actionViewProperties"/>
     <addaction name="actionViewOutputLog"/>
+    <addaction name="actionViewAtlasManager"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
@@ -196,15 +195,27 @@
   </widget>
   <widget class="QDockWidget" name="dockWidgetAtlas">
    <property name="windowTitle">
-    <string>Associated Atlases</string>
+    <string>Atlas Manager</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
      <item>
-      <widget class="QWidget" name="widget" native="true"/>
+      <widget class="WidgetAtlas" name="widget" native="true"/>
      </item>
     </layout>
    </widget>
@@ -472,16 +483,22 @@
     <string>Add a new audio bank in the currently selected project</string>
    </property>
   </action>
-  <action name="actionNewAtlas">
+  <action name="actionViewAtlasManager">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/atlas-file.png</normaloff>:/icons16x16/atlas-file.png</iconset>
    </property>
    <property name="text">
-    <string>New Atlas</string>
+    <string>Atlas Manager</string>
    </property>
    <property name="toolTip">
-    <string>Adds a new texture at the currently selected item's location</string>
+    <string>Dockable tool panel that manages all textures used in the game</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+A</string>
    </property>
   </action>
  </widget>
@@ -509,6 +526,12 @@
    <class>WidgetRenderer</class>
    <extends>QWidget</extends>
    <header>WidgetRenderer.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WidgetAtlas</class>
+   <extends>QWidget</extends>
+   <header>WidgetAtlas.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
