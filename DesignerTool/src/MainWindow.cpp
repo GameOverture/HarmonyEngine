@@ -115,6 +115,8 @@ void MainWindow::on_actionOpenProject_triggered()
     {
         ui->explorer->AddItem(ITEM_Project, pDlg->selectedFiles()[0], true);
     }
+    
+    delete pDlg;
 }
 
 void MainWindow::on_actionCloseProject_triggered()

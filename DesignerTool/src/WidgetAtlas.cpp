@@ -2,6 +2,7 @@
 #include "ui_WidgetAtlas.h"
 
 #include <QTreeWidget>
+#include <QFileDialog>
 
 WidgetAtlas::WidgetAtlas(QWidget *parent) :
     QWidget(parent),
@@ -49,7 +50,22 @@ void WidgetAtlas::on_btnTexSize2048_clicked()
 
 void WidgetAtlas::on_btnAddFiles_clicked()
 {
+    QFileDialog *pDlg = new QFileDialog(this);
+    pDlg->setFileMode(QFileDialog::Directory);
+    pDlg->setOption(QFileDialog::ShowDirsOnly, true);
+
+    pDlg->setViewMode(QFileDialog::Detail);
+    pDlg->setWindowModality( Qt::ApplicationModal );
+    pDlg->setModal(true);
+
+    if(pDlg->exec() == QDialog::Accepted)
+    {
+        m_packer.addItem(
+        pDlg->selectedFiles()
+        ui->explorer->AddItem(ITEM_Project, , true);
+    }
     
+    delete pDlg;
 }
 
 void WidgetAtlas::on_btnAddDir_clicked()
