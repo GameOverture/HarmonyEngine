@@ -87,10 +87,10 @@ void WidgetAtlas::on_btnAddDir_clicked()
     QStringList sDirs = pDlg->selectedFiles();
     for(int iDirIndex = 0; iDirIndex < sDirs.size(); ++iDirIndex)
     {
-        QDir dirEnt(sDirs[iDirIndex]);
+        QDir dirEntry(sDirs[iDirIndex]);
         
         
-        QFileInfoList list = dirEnt.entryInfoList();
+        QFileInfoList list = dirEntry.entryInfoList();
         QStack<QFileInfoList> dirStack;
         dirStack.push(list);
         
@@ -100,28 +100,27 @@ void WidgetAtlas::on_btnAddDir_clicked()
             for(int i = 0; i < list.count(); i++)
             {
                 QFileInfo info = list[i];
-        
-                QString filePath = info.filePath();
-                QString fileExt = info.suffix().toLower();
-                QString name = dir + QDir::separator();
+
                 if(info.isDir() && info.fileName() != ".." && info.fileName() != ".")
                 {
-                    QDir subDir(filePath);
+                    QDir subDir(info.filePath());
                     QFileInfoList subList = subDir.entryInfoList();
                     
                     dirStack.push(subList);
                 }
-                else if(fileExt == "png") // Only supporting PNG for now
+                else if(info.suffix().toLower() == "png") // Only supporting PNG for now
                 {
-                    if(!QFile::exists(name + info.completeBaseName() + QString(".atlas")))
-                    {
-                        ui-> tilesList->addItem(filePath.replace(topImageDir, ""));
+                    ImportImage(info.filePath());
+//                    AddFrame
+//                    if(!QFile::exists(name + info.completeBaseName() + QString(".atlas")))
+//                    {
+//                        ui-> tilesList->addItem(filePath.replace(topImageDir, ""));
                         
-                        packerData *data = new packerData;
-                        data->listItem = ui->tilesList->item(ui->tilesList->count() - 1);
-                        data->path = info.absoluteFilePath();
-                        m_packer.addItem(data->path, data);
-                    }
+//                        packerData *data = new packerData;
+//                        data->listItem = ui->tilesList->item(ui->tilesList->count() - 1);
+//                        data->path = info.absoluteFilePath();
+//                        m_Atlases.addItem(data->path, data);
+//                    }
                 }
             }
         }
@@ -172,3 +171,42 @@ void WidgetAtlas::on_tabWidget_currentChanged(int index)
         ui->frameList->topLevelItemCount();
     }
 }
+
+void WidgetAtlas::ImportImage(QString sImagePath)
+{
+    QImage img(sImagePath);
+    
+    m_Textures[0].packer.area
+    img.save(
+    int iLastIndex = m_Textures.size() - 1;
+    
+    //                        packerData *data = new packerData;
+    //                        data->listItem = ui->tilesList->item(ui->tilesList->count() - 1);
+    //                        data->path = info.absoluteFilePath();
+    //                        m_Atlases.addItem(data->path, data);
+    
+    m_Textures[iLastIndex].addItem(sImagePath, 
+    sImagePath
+}
+
+QTreeWidgetItem *WidgetAtlas::CreateTreeItem(QTreeWidgetItem *pParent)
+{
+    QTreeWidgetItem *pNewTreeItem;
+    if(pParent == NULL)
+        pNewTreeItem = new QTreeWidgetItem(ui->frameList);
+    else
+        pNewTreeItem = new QTreeWidgetItem();
+    
+    pNewTreeItem->setText(0, pItem->GetName());
+    pNewTreeItem->setIcon(0, pItem->GetIcon());
+//    pNewTreeItem->setFlags(pNewItem->flags() | Qt::ItemIsEditable);
+    
+    QVariant v; v.setValue(pItem);
+    pNewTreeItem->setData(0, Qt::UserRole, v);
+    
+    if(pParent)
+        pParent->addChild(pNewTreeItem);
+    
+    return pNewTreeItem;
+}
+

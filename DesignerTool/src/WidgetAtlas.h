@@ -2,6 +2,8 @@
 #define WIDGETATLAS_H
 
 #include <QWidget>
+#include <QTreeWidget>
+#include <QList>
 
 #include "scriptum/imagepacker.h"
 
@@ -13,9 +15,16 @@ class WidgetAtlas : public QWidget
 {
     Q_OBJECT
     
-    ImagePacker         m_packer;
+    struct tTexture
+    {
+        ImagePacker         packer;
+        QTreeWidgetItem     treeItem;
+     
+    };
     
-    bool                m_bDirty;
+    QList<tTexture>         m_Textures;
+    
+    bool                    m_bDirty;
     
 public:
     explicit WidgetAtlas(QWidget *parent = 0);
@@ -52,6 +61,10 @@ private slots:
     
 private:
     Ui::WidgetAtlas *ui;
+    
+    void ImportImage(QString sImagePath);
+    
+    QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent);
 };
 
 #endif // WIDGETATLAS_H
