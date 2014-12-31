@@ -108,7 +108,7 @@ void MainWindow::on_actionOpenProject_triggered()
     pDlg->setOption(QFileDialog::ShowDirsOnly, true);
 
     pDlg->setViewMode(QFileDialog::Detail);
-    pDlg->setWindowModality( Qt::ApplicationModal );
+    pDlg->setWindowModality(Qt::ApplicationModal);
     pDlg->setModal(true);
 
     if(pDlg->exec() == QDialog::Accepted)
@@ -154,20 +154,6 @@ void MainWindow::NewItem(eItemType eItem)
     {
         QString sPath = QDir::cleanPath(sSpritePath % pDlg->GetPrefix() % "/" % pDlg->GetName() % HyGlobal::ItemExt(eItem));
         ui->explorer->AddItem(eItem, sPath, true);
-    }
-}
-
-void MainWindow::on_actionNewAtlas_triggered()
-{
-    QString sCurPath = ui->explorer->GetCurDirSelected(true)->GetPath();
-    Item *pDirItem = ui->explorer->GetCurDirSelected(false);
-    //QString sAtlasPath = sCurPath % "/" % HyGlobal::ItemName(eItem) % "/";
-    
-    DlgInputName *pDlg = new DlgInputName("Enter name for " % HyGlobal::ItemName(pDirItem->GetType()) % " " % HyGlobal::ItemName(ITEM_TextureAtlas), ITEM_TextureAtlas, sCurPath);
-    if(pDlg->exec())
-    {
-        QString sPath = QDir::cleanPath(pDlg->GetFullPathNameMinusExt());
-        ui->explorer->AddItem(ITEM_TextureAtlas, sPath, true);
     }
 }
 

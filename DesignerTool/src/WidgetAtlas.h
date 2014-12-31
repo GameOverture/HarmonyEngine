@@ -5,6 +5,7 @@
 #include <QTreeWidget>
 #include <QList>
 
+#include "ItemProject.h"
 #include "scriptum/imagepacker.h"
 
 namespace Ui {
@@ -15,20 +16,30 @@ class WidgetAtlas : public QWidget
 {
     Q_OBJECT
     
+    ItemProject * const     m_pProjOwner;
+    
     struct tTexture
     {
         ImagePacker         packer;
         QTreeWidgetItem     treeItem;
-     
+        
+        bool                bDirty;
+        
+        tTexture() : bDirty(true)
+        { }
     };
     
-    QList<tTexture>         m_Textures;
+    QList<tTexture *>       m_Textures;
     
     bool                    m_bDirty;
     
+    
+    
 public:
-    explicit WidgetAtlas(QWidget *parent = 0);
+    explicit WidgetAtlas(ItemProject *pProjOwner, QWidget *parent = 0);
     ~WidgetAtlas();
+    
+    
     
 private slots:
     void on_btnTexSize256_clicked();
@@ -62,9 +73,13 @@ private slots:
 private:
     Ui::WidgetAtlas *ui;
     
-    void ImportImage(QString sImagePath);
+    bool ImportImage(QString sImagePath);
     
-    QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent);
+    bool TryPackNew(QString sImagePath, tTexture *pTex);
+    
+    QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType);
+    
+    void RebuildDirtyTextures();
 };
 
 #endif // WIDGETATLAS_H

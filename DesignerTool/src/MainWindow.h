@@ -46,8 +46,6 @@ private slots:
     
     void on_actionViewExplorer_triggered();
     
-    void on_actionNewAtlas_triggered();
-    
     void on_actionViewAtlasManager_triggered();
     
     void on_actionViewOutputLog_triggered();

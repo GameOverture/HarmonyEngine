@@ -1,19 +1,29 @@
 #include "WidgetAtlas.h"
 #include "ui_WidgetAtlas.h"
 
+#include "MainWindow.h"
+
 #include <QTreeWidget>
 #include <QFileDialog>
 #include <QStack>
 
-WidgetAtlas::WidgetAtlas(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::WidgetAtlas)
+WidgetAtlas::WidgetAtlas(ItemProject *pProjOwner, QWidget *parent) :    QWidget(parent),
+                                                                        ui(new Ui::WidgetAtlas),
+                                                                        m_pProjOwner(pProjOwner)
 {
     ui->setupUi(this);
 }
 
 WidgetAtlas::~WidgetAtlas()
 {
+    while(m_Textures.empty() == false)
+    {
+        tTexture *pTex = m_Textures.front();
+        delete pTex;
+        
+        m_Textures.pop_front();
+    }
+    
     delete ui;
 }
 
@@ -89,11 +99,11 @@ void WidgetAtlas::on_btnAddDir_clicked()
     {
         QDir dirEntry(sDirs[iDirIndex]);
         
-        
         QFileInfoList list = dirEntry.entryInfoList();
         QStack<QFileInfoList> dirStack;
         dirStack.push(list);
         
+        bool bErrorOccurred = false;
         while(dirStack.isEmpty() == false)
         {
             list = dirStack.pop();
@@ -110,21 +120,18 @@ void WidgetAtlas::on_btnAddDir_clicked()
                 }
                 else if(info.suffix().toLower() == "png") // Only supporting PNG for now
                 {
-                    ImportImage(info.filePath());
-//                    AddFrame
-//                    if(!QFile::exists(name + info.completeBaseName() + QString(".atlas")))
-//                    {
-//                        ui-> tilesList->addItem(filePath.replace(topImageDir, ""));
-                        
-//                        packerData *data = new packerData;
-//                        data->listItem = ui->tilesList->item(ui->tilesList->count() - 1);
-//                        data->path = info.absoluteFilePath();
-//                        m_Atlases.addItem(data->path, data);
-//                    }
+                    if(ImportImage(info.filePath()) == false)
+                        bErrorOccurred = true;
                 }
             }
         }
+        
+        if(bErrorOccurred)
+            HYLOG("Could not import image(s). Check log.", LOGTYPE_Warning);
     }
+    
+    // Display texture
+    MainWindow::OpenItem(this->m_pProjOwner);
 }
 
 void WidgetAtlas::on_cmbHeuristic_currentIndexChanged(const QString &arg1)
@@ -172,24 +179,90 @@ void WidgetAtlas::on_tabWidget_currentChanged(int index)
     }
 }
 
-void WidgetAtlas::ImportImage(QString sImagePath)
+bool WidgetAtlas::ImportImage(QString sImagePath)
 {
-    QImage img(sImagePath);
+    bool bIsPacked = false;
+    tTexture *pTexture = NULL;
     
-    m_Textures[0].packer.area
-    img.save(
-    int iLastIndex = m_Textures.size() - 1;
+    for(int i = 0; i < m_Textures.size(); ++i)
+    {
+        if(TryPackNew(sImagePath, m_Textures[i]))
+        {
+            pTexture = m_Textures[i];
+            bIsPacked = true;
+            break;
+        }
+    }
     
-    //                        packerData *data = new packerData;
-    //                        data->listItem = ui->tilesList->item(ui->tilesList->count() - 1);
-    //                        data->path = info.absoluteFilePath();
-    //                        m_Atlases.addItem(data->path, data);
+    // Could not fit this image on any available atlas texture, try one more
+    // time with a new, empty texture
+    if(bIsPacked == false)
+    {
+        pTexture = new tTexture;
+        m_Textures.append(pTexture);
+        
+        if(TryPackNew(sImagePath, pTexture))
+        {
+            QString sName;
+            sName.sprintf("%05i", m_Textures.size() - 1);
+            CreateTreeItem(NULL, sName, ATLAS_Texture);
+            
+            bIsPacked = true;
+        }
+        else
+        {
+            HYLOG("Cannot pack image: " % sImagePath, LOGTYPE_Info);
+            m_Textures.removeOne(pTexture);
+            
+            delete pTexture;
+            pTexture = NULL;
+        }
+    }
     
-    m_Textures[iLastIndex].addItem(sImagePath, 
-    sImagePath
+    if(bIsPacked)
+        pTexture->bDirty = true;
+    
+    return bIsPacked;
 }
 
-QTreeWidgetItem *WidgetAtlas::CreateTreeItem(QTreeWidgetItem *pParent)
+bool WidgetAtlas::TryPackNew(QString sImagePath, tTexture *pTex)
+{
+    QImage *pImg = new QImage(sImagePath);
+    
+    int iNeededSpace = pImg->width() * pImg->height();
+    int iRemainingSpace = ((ui->sbTextureWidth->value() * ui->sbTextureHeight->value()) - pTex->packer.area);
+    if(iNeededSpace <= iRemainingSpace)
+    {
+        pTex->packer.addItem(sImagePath, pImg);
+        pTex->packer.pack(ui->cmbHeuristic->currentIndex(), ui->sbTextureWidth->value(), ui->sbTextureHeight->value());
+        
+        if(pTex->packer.missingImages)
+        {
+            pTex->packer.removeId(pImg);
+            
+            delete pImg;
+            return false;
+        }
+        
+        QFileInfo imagePathInfo(sImagePath);
+        
+        // Add tree item
+        CreateTreeItem(&pTex->treeItem, imagePathInfo.baseName(), ATLAS_Frame);
+       
+        // Save the source image in the _metaData, which is needed for whenever the texture needs to be rebuilt.
+        QString sPath;
+        // TODO: Check to see when loading that 'textureId' matches in both the 'packer' and the filename.
+        sPath.sprintf("atlases/%05i-%05i-%s", m_Textures.size() - 1, pTex->packer.images.last().textureId, imagePathInfo.fileName());
+        pImg->save(m_pProjOwner->GetMetaDataPath() % sPath);
+        
+        return true;
+    }
+    
+    delete pImg;
+    return false;
+}
+
+QTreeWidgetItem *WidgetAtlas::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType)
 {
     QTreeWidgetItem *pNewTreeItem;
     if(pParent == NULL)
@@ -197,16 +270,33 @@ QTreeWidgetItem *WidgetAtlas::CreateTreeItem(QTreeWidgetItem *pParent)
     else
         pNewTreeItem = new QTreeWidgetItem();
     
-    pNewTreeItem->setText(0, pItem->GetName());
-    pNewTreeItem->setIcon(0, pItem->GetIcon());
-//    pNewTreeItem->setFlags(pNewItem->flags() | Qt::ItemIsEditable);
+    pNewTreeItem->setText(0, sName);
+    pNewTreeItem->setIcon(0, HyGlobal::AtlasIcon(eType));
     
-    QVariant v; v.setValue(pItem);
-    pNewTreeItem->setData(0, Qt::UserRole, v);
-    
+//    QVariant v; v.setValue(pItem);
+//    v.in
+//    pNewTreeItem->setData(0, Qt::UserRole, v);
+
     if(pParent)
         pParent->addChild(pNewTreeItem);
-    
+
     return pNewTreeItem;
+
+    return NULL;
+}
+
+void WidgetAtlas::RebuildDirtyTextures()
+{
+    for(int i = 0; i < m_Textures.size(); ++i)
+    {
+        if(m_Textures[i]->bDirty)
+        {
+            QList<inputImage> imgs = m_Textures[i]->packer.images;
+            for(int j = 0; j < imgs.size(); ++j)
+            {
+                //imgs[j].
+            }
+        }
+    }
 }
 
