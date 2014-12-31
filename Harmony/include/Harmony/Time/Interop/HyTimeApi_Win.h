@@ -10,9 +10,9 @@
 #ifndef __HyTimeApi_Win_h__
 #define __HyTimeApi_Win_h__
 
-#include "Time/ITimeApi.h"
+#include "Time/HyTime.h"
 
-class HyTimeApi_Win : public ITimeApi
+class HyTimeApi_Win : public HyTime
 {
 	bool						m_bUsingPerformanceTimer;	// Timer Selection Flag
 

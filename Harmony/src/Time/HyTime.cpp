@@ -1,5 +1,5 @@
 /**************************************************************************
- *	ITimeApi.cpp
+ *	HyTime.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,24 +7,24 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Time/ITimeApi.h"
+#include "Time/HyTime.h"
 
 #include "Input/HyInput.h"
 
-/*static*/ const uint32			ITimeApi::sm_kuiUpdateStep = 10;
-/*static*/ const double			ITimeApi::sm_kdUpdateStep = ITimeApi::sm_kuiUpdateStep / 1000.0;
+/*static*/ const uint32			HyTime::sm_kuiUpdateStep = 10;
+/*static*/ const double			HyTime::sm_kdUpdateStep = HyTime::sm_kuiUpdateStep / 1000.0;
 
-ITimeApi::ITimeApi(HyInput &hyInputRef) :	m_InputRef(hyInputRef),
-											m_dTimeManipulation(1.0f),
-											m_eJournalState(REPLAY_Off),
-											m_dCurDeltaTime(0.0),
-											m_dTotalElapsedTime(0.0),
-											m_dThrottledTime(0.0),
-											m_uiJournalCount(0)
+HyTime::HyTime(HyInput &hyInputRef) :	m_InputRef(hyInputRef),
+										m_dTimeManipulation(1.0f),
+										m_eJournalState(REPLAY_Off),
+										m_dCurDeltaTime(0.0),
+										m_dTotalElapsedTime(0.0),
+										m_dThrottledTime(0.0),
+										m_uiJournalCount(0)
 {
 }
 
-ITimeApi::~ITimeApi(void)
+HyTime::~HyTime(void)
 {
 	while(m_TimeInstList.size() != 0)
 	{
@@ -33,7 +33,7 @@ ITimeApi::~ITimeApi(void)
 	}
 }
 
-bool ITimeApi::ThrottleTime()
+bool HyTime::ThrottleTime()
 {
 	// m_dCurDeltaTime will be set within SetCurDeltaTime()
 	SetCurDeltaTime();// glfwGetTime();
@@ -70,7 +70,7 @@ bool ITimeApi::ThrottleTime()
 	return false;
 }
 
-HyTimerWatch *ITimeApi::CreateTimer()
+HyTimerWatch *HyTime::CreateTimer()
 {
 	HyTimerWatch *pNewTimeInst = new HyTimerWatch();
 
@@ -78,7 +78,7 @@ HyTimerWatch *ITimeApi::CreateTimer()
 	return pNewTimeInst;
 }
 
-HyStopwatch *ITimeApi::CreateStopwatch()
+HyStopwatch *HyTime::CreateStopwatch()
 {
 	HyStopwatch *pNewTimeInst = new HyStopwatch();
 
@@ -86,7 +86,7 @@ HyStopwatch *ITimeApi::CreateStopwatch()
 	return pNewTimeInst;
 }
 
-void ITimeApi::Remove(HyWatch *&pTimeInst)
+void HyTime::Remove(HyWatch *&pTimeInst)
 {
 	if(pTimeInst == NULL)
 		return;

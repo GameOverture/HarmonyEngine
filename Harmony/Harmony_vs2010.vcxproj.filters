@@ -146,9 +146,6 @@
     <ClCompile Include="src\Creator\Data\HySprite2dData.cpp">
       <Filter>Creator\Data</Filter>
     </ClCompile>
-    <ClCompile Include="src\Time\ITimeApi.cpp">
-      <Filter>Time</Filter>
-    </ClCompile>
     <ClCompile Include="src\Time\Interop\HyTimeApi_Win.cpp">
       <Filter>Time\Interop</Filter>
     </ClCompile>
@@ -185,6 +182,9 @@
     </ClCompile>
     <ClCompile Include="src\GuiTool\HyLiveWatchManager.cpp">
       <Filter>GuiTool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Time\HyTime.cpp">
+      <Filter>Time</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -494,9 +494,6 @@
     <ClInclude Include="include\Harmony\Creator\Data\HySprite2dData.h">
       <Filter>Creator\Data</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Time\ITimeApi.h">
-      <Filter>Time</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Time\Interop\HyTimeApi_Win.h">
       <Filter>Time\Interop</Filter>
     </ClInclude>
@@ -530,6 +527,9 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\GuiTool\HyLiveWatchManager.h">
       <Filter>GuiTool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Time\HyTime.h">
+      <Filter>Time</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

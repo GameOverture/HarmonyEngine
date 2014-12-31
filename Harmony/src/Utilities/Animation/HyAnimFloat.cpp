@@ -11,7 +11,7 @@
 
 #include "Creator/HyCreator.h"
 
-#include "Time/ITimeApi.h"
+#include "Time/HyTime.h"
 
 #include "Utilities/HyMath.h"
 
@@ -240,7 +240,7 @@ HyAnimFloat &HyAnimFloat::operator/=(const HyAnimFloat &rhs)
 //////////////////////////////////////////////////////////////////////////
 bool HyAnimFloat::Tween()
 {
-	m_fElapsedTime = HyClamp(m_fElapsedTime + ITimeApi::GetUpdateStepSeconds(), 0.0f, m_fDuration);
+	m_fElapsedTime = HyClamp(m_fElapsedTime + HyTime::GetUpdateStepSeconds(), 0.0f, m_fDuration);
 	
 	float fFromVal = m_fValueRef;
 	m_fValueRef = m_fStart + (m_fTarget - m_fStart) * m_fpEaseFunc(m_fElapsedTime / m_fDuration);

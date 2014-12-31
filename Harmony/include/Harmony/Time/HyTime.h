@@ -1,5 +1,5 @@
 /**************************************************************************
- *	ITimeApi.h
+ *	HyTime.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __ITimeApi_h__
-#define __ITimeApi_h__
+#ifndef __HyTime_h__
+#define __HyTime_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -23,7 +23,7 @@ class HyInput;
 class HyWatch;
 class HyStopwatch;
 
-class ITimeApi
+class HyTime
 {
 	static const uint32			sm_kuiUpdateStep;
 	static const double			sm_kdUpdateStep;
@@ -54,8 +54,8 @@ protected:
 	double						m_dCurDeltaTime;
 
 public:
-	ITimeApi(HyInput &hyInputRef);
-	~ITimeApi(void);
+	HyTime(HyInput &hyInputRef);
+	~HyTime(void);
 
 	static uint32 GetUpdateMilliseconds()	{ return sm_kuiUpdateStep; }
 	static float GetUpdateStepSeconds()		{ return static_cast<float>(sm_kdUpdateStep); }
@@ -77,4 +77,4 @@ public:
 	void Remove(HyWatch *&pTimeInst);
 };
 
-#endif /* __ITimeApi_h__ */
+#endif /* __HyTime_h__ */
