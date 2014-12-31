@@ -9,7 +9,7 @@ class WidgetOutputLog;
 
 enum eLogType
 {
-    LOGTYPE_Normal,
+    LOGTYPE_Normal = 0,
     LOGTYPE_Warning,
     LOGTYPE_Error,
     LOGTYPE_Info,

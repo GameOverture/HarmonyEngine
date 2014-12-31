@@ -4,7 +4,7 @@
 #include "MainWindow.h"
 #include "ItemSprite.h"
 #include "ItemFont.h"
-#include "ItemAtlas.h"
+#include "ItemProject.h"
 
 #include <QDirIterator>
 
@@ -40,6 +40,8 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     switch(eNewItemType)
     {
     case ITEM_Project:
+        pItem = new ItemProject();
+        break;
     case ITEM_DirAudio:
     case ITEM_DirFonts:
     case ITEM_DirShaders:
@@ -53,9 +55,6 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         break;
     case ITEM_Font:
         pItem = new ItemFont();
-        break;
-    case ITEM_TextureAtlas:
-        pItem = new ItemAtlas();
         break;
     default:
         HYLOG("Item: " % sNewItemPath % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);

@@ -2,17 +2,22 @@
 #define HYAPP_H
 
 #include "Harmony/HyEngine.h"
-#include "Spine.h"
+
+#include <QTcpServer>
+#include <QTcpSocket>
 
 class Item;
 
 class HyApp : public IApplication
 {
     HyCamera2d *    m_pCam;
-
-    Player          m_Player;
     
     Item *          m_pCurItem;
+    
+    // Network connection
+    QTcpServer      m_TcpServer;
+    QTcpSocket      m_TcpClient;
+    QTcpSocket *    m_pTcpServerConnection;
     
 public:
     HyApp(HarmonyInit &initStruct);

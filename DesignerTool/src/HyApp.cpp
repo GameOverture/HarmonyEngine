@@ -29,8 +29,6 @@ HyApp::HyApp(HarmonyInit &initStruct) :     IApplication(initStruct),
 
     m_pCam = m_Viewport.CreateCamera2d();
 
-    m_Player.Initialize();
-
     //HyGfxWindow::tResolution tRes;
     //m_Window.GetResolution(tRes);
     //m_Camera.SetOrthographic(static_cast<float>(tRes.iWidth), static_cast<float>(tRes.iHeight));
@@ -43,9 +41,6 @@ HyApp::HyApp(HarmonyInit &initStruct) :     IApplication(initStruct),
 
 /*virtual*/ bool HyApp::Update()
 {
-
-    // update() belongs to QGLWidget. This will invoke QGLWidget's paintGL, which inturn will invoke Harmony's IGfxApi::Update()
-    //m_pGfx->update();
     
     
     if(m_pCurItem)
