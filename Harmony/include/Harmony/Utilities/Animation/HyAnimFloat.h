@@ -17,6 +17,8 @@
 // Forward declaration
 class HyCreator;
 
+// NOTE: The constructor that takes a float reference will not invoke its 'dirty callback' if
+//		 manipulated outside of this class.
 class HyAnimFloat
 {
 	friend class HyCreator;
@@ -28,6 +30,8 @@ class HyAnimFloat
 	float					m_fDuration;
 	float					m_fElapsedTime;
 
+	const bool				m_kbSelfAllocated;
+
 	EaseUpdateFunc			m_fpEaseFunc;
 	//float (HyEase::*m_fpEaseFunc)(float);
 
@@ -36,7 +40,7 @@ class HyAnimFloat
 	void *					m_pOnChangeParam;
 
 public:
-	// TODO: Make HyAnimFloat() default ctor with (*(new float)) in member initializer
+	HyAnimFloat();
 	HyAnimFloat(float &valueReference);
 	~HyAnimFloat(void);
 

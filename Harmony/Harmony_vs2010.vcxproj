@@ -53,6 +53,8 @@
     <ClCompile Include="src\FileIO\HyFileIO.cpp" />
     <ClCompile Include="src\FileIO\HyTexture.cpp" />
     <ClCompile Include="src\FileIO\jasonxx.cc" />
+    <ClCompile Include="src\GuiTool\HyGuiComms.cpp" />
+    <ClCompile Include="src\GuiTool\HyLiveWatchManager.cpp" />
     <ClCompile Include="src\HyEngine.cpp" />
     <ClCompile Include="src\IApplication.cpp" />
     <ClCompile Include="src\Input\HyInput.cpp" />
@@ -118,6 +120,8 @@
     <ClInclude Include="include\Harmony\FileIO\HyTexture.h" />
     <ClInclude Include="include\Harmony\FileIO\jsonxx.h" />
     <ClInclude Include="include\Harmony\FileIO\stb_image.h" />
+    <ClInclude Include="include\Harmony\GuiTool\HyGuiComms.h" />
+    <ClInclude Include="include\Harmony\GuiTool\HyLiveWatchManager.h" />
     <ClInclude Include="include\Harmony\HyEngine.h" />
     <ClInclude Include="include\Harmony\IApplication.h" />
     <ClInclude Include="include\Harmony\Input\HyInput.h" />
@@ -249,7 +253,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>box2Dd.lib;glfw3d.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glew32s.lib</AdditionalDependencies>
+      <AdditionalDependencies>netLinkd.lib;box2Dd.lib;glfw3d.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glew32s.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib</AdditionalLibraryDirectories>
@@ -274,7 +278,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>AdvAPI32.lib;box2Dd.lib;glfw3d.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glew32s.lib</AdditionalDependencies>
+      <AdditionalDependencies>AdvAPI32.lib;netLinkd.lib;box2Dd.lib;glfw3d.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glew32s.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib</AdditionalLibraryDirectories>
@@ -303,7 +307,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>box2D.lib;glfw3.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew32s.lib</AdditionalDependencies>
+      <AdditionalDependencies>netLink.lib;box2D.lib;glfw3.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew32s.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib</AdditionalLibraryDirectories>
@@ -327,7 +331,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>AdvAPI32.lib;box2D.lib;glfw3.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew32s.lib</AdditionalDependencies>
+      <AdditionalDependencies>AdvAPI32.lib;netLink.lib;box2D.lib;glfw3.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew32s.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib</AdditionalLibraryDirectories>

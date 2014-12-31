@@ -49,8 +49,8 @@ void HyEngine::operator delete(void *ptr)
 
 	while(sm_pInstance->Update())
 	{ }
-
-	sm_pInstance->Shutdown();
+	gameRef.Shutdown();
+	
 	delete sm_pInstance;
 }
 
@@ -71,20 +71,23 @@ bool HyEngine::Update()
 	{
 		// Update all game and engine by one 'step'
 		m_Creator.PreUpdate();
+		
 		if(m_AppRef.Update() == false)
 			return false;
+
+#ifndef HY_PLATFORM_GUI
+		m_GuiComms.Update();
+#endif
+
 		m_Creator.PostUpdate();
+
 
 #ifdef HY_MULTITHREADING
 		if(m_Renderer.IsRenderThreadActive() == false)
 			return false;
-#endif		
+#endif
 	}
 
 	return true;
 }
 
-void HyEngine::Shutdown()
-{
-	m_AppRef.Shutdown();
-}

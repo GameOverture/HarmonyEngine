@@ -19,6 +19,7 @@
 #include "Renderer/HyRenderer.h"
 #include "Creator/HyCreator.h"
 #include "Audio/HyAudio.h"
+#include "GuiTool/HyGuiComms.h"
 
 #include "Creator/Instances/HySprite2d.h"
 #include "Creator/Instances/HySpine2d.h"
@@ -45,12 +46,14 @@ class HyEngine
 	HyRenderer				m_Renderer;
 	HyCreator				m_Creator;
 	HyAudio					m_Audio;
-	//HyConsole				m_Con;
 
-#ifdef HY_PLATFORM_GUI
+#ifndef HY_PLATFORM_GUI
+	HyGuiComms				m_GuiComms;
+#else
 public:
 #endif
-	// Private ctor() invoked from RunGame(), once.
+	// Private ctor invoked from RunGame(), once.
+	// If HY_PLATFORM_GUI, make this ctor public as GuiTool requires special usage.
 	HyEngine(IApplication &gameRef);
 
 public:
@@ -59,7 +62,6 @@ public:
 	void *operator new(tMEMSIZE size);
 	void operator delete (void *ptr);
 
-
 	static void RunGame(IApplication &gameRef);
 
 #ifndef HY_PLATFORM_GUI
@@ -67,7 +69,6 @@ private:
 #endif
 	void Initialize();
 	bool Update();
-	void Shutdown();
 };
 
 #endif /* __HyEngine_h__ */

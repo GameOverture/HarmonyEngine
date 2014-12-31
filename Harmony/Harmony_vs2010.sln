@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "box2d", "lib\box2d\box2d.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glfw3", "lib\glfw3\glfw3.vcxproj", "{E8110AF3-5A69-45FC-89E6-722BB8A7D8FC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "netLink", "lib\netLink\netLink.vcxproj", "{05B7CCCA-285E-4C5B-90A9-55CD0E849056}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -65,6 +67,14 @@ Global
 		{E8110AF3-5A69-45FC-89E6-722BB8A7D8FC}.GuiRelease|Win32.Build.0 = Release|Win32
 		{E8110AF3-5A69-45FC-89E6-722BB8A7D8FC}.Release|Win32.ActiveCfg = Release|Win32
 		{E8110AF3-5A69-45FC-89E6-722BB8A7D8FC}.Release|Win32.Build.0 = Release|Win32
+		{05B7CCCA-285E-4C5B-90A9-55CD0E849056}.Debug|Win32.ActiveCfg = Debug|Win32
+		{05B7CCCA-285E-4C5B-90A9-55CD0E849056}.Debug|Win32.Build.0 = Debug|Win32
+		{05B7CCCA-285E-4C5B-90A9-55CD0E849056}.GuiDebug|Win32.ActiveCfg = Debug|Win32
+		{05B7CCCA-285E-4C5B-90A9-55CD0E849056}.GuiDebug|Win32.Build.0 = Debug|Win32
+		{05B7CCCA-285E-4C5B-90A9-55CD0E849056}.GuiRelease|Win32.ActiveCfg = Release|Win32
+		{05B7CCCA-285E-4C5B-90A9-55CD0E849056}.GuiRelease|Win32.Build.0 = Release|Win32
+		{05B7CCCA-285E-4C5B-90A9-55CD0E849056}.Release|Win32.ActiveCfg = Release|Win32
+		{05B7CCCA-285E-4C5B-90A9-55CD0E849056}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

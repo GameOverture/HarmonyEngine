@@ -38,7 +38,7 @@
       <Filter>Input</Filter>
     </ClCompile>
     <ClCompile Include="src\Input\Mappings\HyInputMapping.cpp">
-      <Filter>Input\Mappings</Filter>
+      <Filter>Input\Gamepad\Mappings</Filter>
     </ClCompile>
     <ClCompile Include="src\Creator\Instances\HyPrimitive2d.cpp">
       <Filter>Creator\Instances</Filter>
@@ -180,6 +180,12 @@
     <ClCompile Include="src\Renderer\HyRenderState.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\GuiTool\HyGuiComms.cpp">
+      <Filter>GuiTool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GuiTool\HyLiveWatchManager.cpp">
+      <Filter>GuiTool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -233,9 +239,6 @@
     <Filter Include="Input\Gamepad">
       <UniqueIdentifier>{49331082-4fa2-4958-82de-fbdbdf78f9c4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Input\Mappings">
-      <UniqueIdentifier>{f8b1513f-1385-4506-b22d-1bedcd21a33d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Audio">
       <UniqueIdentifier>{674f9d66-c4d9-4b21-84bf-e4591c4ac684}</UniqueIdentifier>
     </Filter>
@@ -262,6 +265,12 @@
     </Filter>
     <Filter Include="Renderer\RenderState">
       <UniqueIdentifier>{416bf495-efec-4c0d-a6f3-27f82e59fd94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input\Gamepad\Mappings">
+      <UniqueIdentifier>{f8b1513f-1385-4506-b22d-1bedcd21a33d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GuiTool">
+      <UniqueIdentifier>{f30ad593-855a-4f2f-9687-8e618b4ed676}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -327,10 +336,10 @@
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Input\Mappings\HyInputAfx.h">
-      <Filter>Input\Mappings</Filter>
+      <Filter>Input\Gamepad\Mappings</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Input\Mappings\HyInputMapping.h">
-      <Filter>Input\Mappings</Filter>
+      <Filter>Input\Gamepad\Mappings</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Memory\HyMemoryHeap.h">
       <Filter>Memory</Filter>
@@ -515,6 +524,12 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\HyRenderState.h">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\GuiTool\HyGuiComms.h">
+      <Filter>GuiTool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\GuiTool\HyLiveWatchManager.h">
+      <Filter>GuiTool</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

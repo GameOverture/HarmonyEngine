@@ -17,6 +17,19 @@
 
 /*static*/ HyCreator *HyAnimFloat::sm_pCtor = NULL;
 
+HyAnimFloat::HyAnimFloat() :	m_fValueRef(*(new float)),
+								m_fStart(0.0f),
+								m_fTarget(0.0f),
+								m_fDuration(0.0f),
+								m_fElapsedTime(0.0f),
+								m_fpEaseFunc(NULL),
+								m_fpBehaviorUpdate(NULL),
+								m_fpOnDirty(HyAnimFloat::_NullOnChange),
+								m_pOnChangeParam(NULL),
+								m_kbSelfAllocated(true)
+{
+}
+
 HyAnimFloat::HyAnimFloat(float &valueReference) :	m_fValueRef(valueReference), 
 													m_fStart(0.0f),
 													m_fTarget(0.0f),
@@ -25,13 +38,16 @@ HyAnimFloat::HyAnimFloat(float &valueReference) :	m_fValueRef(valueReference),
 													m_fpEaseFunc(NULL),
 													m_fpBehaviorUpdate(NULL),
 													m_fpOnDirty(HyAnimFloat::_NullOnChange),
-													m_pOnChangeParam(NULL)
+													m_pOnChangeParam(NULL),
+													m_kbSelfAllocated(false)
 {
 }
 
 
 HyAnimFloat::~HyAnimFloat(void)
 {
+	if(m_kbSelfAllocated)
+		delete &m_fValueRef;	// This looks dangerous, but it should be fine.
 }
 
 void HyAnimFloat::Set(float fValue)
