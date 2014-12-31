@@ -30,10 +30,18 @@ enum eItemType
     ITEM_Sprite,
     ITEM_Shader,
     ITEM_Entity,
-    
-    ITEM_TextureAtlas,
 
     NUMITEM
+};
+
+enum eAtlasNodeType
+{
+    ATLAS_Texture = 0,
+    ATLAS_Frame,
+    ATLAS_Spine,
+    ATLAS_Font,
+    
+    NUMATLAS
 };
 
 class HyGlobal
@@ -41,6 +49,8 @@ class HyGlobal
     static QString                  sm_sItemNames[NUMITEM];
     static QString                  sm_sItemExt[NUMITEM];
     static QIcon                    sm_ItemIcons[NUMITEM];
+    
+    static QIcon                    sm_AtlasIcons[NUMATLAS];
 
     static QRegExpValidator *       sm_pFileNameValidator;
     static QRegExpValidator *       sm_pFilePathValidator;
@@ -56,7 +66,6 @@ public:
         sm_sItemNames[ITEM_DirSprites] = sm_sItemNames[ITEM_Sprite] = "Sprite";
         sm_sItemNames[ITEM_DirShaders] = sm_sItemNames[ITEM_Shader] = "Shader";
         sm_sItemNames[ITEM_DirEntities] = sm_sItemNames[ITEM_Entity] = "Entity";
-        sm_sItemNames[ITEM_TextureAtlas] = "Atlas";
         
         sm_sItemExt[ITEM_Project] = "/";
         sm_sItemExt[ITEM_DirAudio] = "/";
@@ -74,7 +83,6 @@ public:
         sm_sItemExt[ITEM_Sprite] = ".hyspr";
         sm_sItemExt[ITEM_Shader] = "";
         sm_sItemExt[ITEM_Entity] = ".hyent";
-        sm_sItemExt[ITEM_TextureAtlas] = ".atlas";
         
         sm_ItemIcons[ITEM_Project].addFile(QString(":/icons16x16/project.png"));
         sm_ItemIcons[ITEM_DirAudio].addFile(QString(":/icons16x16/audio-folder.png"));
@@ -91,7 +99,11 @@ public:
         sm_ItemIcons[ITEM_Spine].addFile(QString(":/icons16x16/spine-document.png"));
         sm_ItemIcons[ITEM_Sprite].addFile(QString(":/icons16x16/sprite-document.png"));
         sm_ItemIcons[ITEM_Entity].addFile(QString(":/icons16x16/entity-document.png"));
-        sm_ItemIcons[ITEM_TextureAtlas].addFile(QString(":/icons16x16/atlas-document.png"));
+        
+        sm_AtlasIcons[ATLAS_Texture].addFile(QString(":/icons16x16/atlas-document.png"));
+        sm_AtlasIcons[ATLAS_Frame].addFile(QString(":/icons16x16/atlas-document.png"));
+        sm_AtlasIcons[ATLAS_Spine].addFile(QString(":/icons16x16/spine-document.png"));
+        sm_AtlasIcons[ATLAS_Font].addFile(QString(":/icons16x16/font-document.png"));
 
         sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_-]*"));
         sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_-]*"));
@@ -123,16 +135,18 @@ public:
         return list;
     }
     
-    static const QString &ItemName(eItemType eItm)        { return sm_sItemNames[eItm]; }
+    static const QString &ItemName(eItemType eItm)          { return sm_sItemNames[eItm]; }
 
-    static const QString &ItemExt(int iIndex)            { Q_ASSERT(iIndex >= 0 && iIndex < NUMITEM); return sm_sItemExt[iIndex]; }
-    static const QString &ItemExt(eItemType eItm)        { return sm_sItemExt[eItm]; }
+    static const QString &ItemExt(int iIndex)               { Q_ASSERT(iIndex >= 0 && iIndex < NUMITEM); return sm_sItemExt[iIndex]; }
+    static const QString &ItemExt(eItemType eItm)           { return sm_sItemExt[eItm]; }
     
-    static const QIcon &ItemIcon(int iIndex)            { Q_ASSERT(iIndex >= 0 && iIndex < NUMITEM); return sm_ItemIcons[iIndex]; }
-    static const QIcon &ItemIcon(eItemType eItm)        { return sm_ItemIcons[eItm]; }
+    static const QIcon &ItemIcon(int iIndex)                { Q_ASSERT(iIndex >= 0 && iIndex < NUMITEM); return sm_ItemIcons[iIndex]; }
+    static const QIcon &ItemIcon(eItemType eItm)            { return sm_ItemIcons[eItm]; }
+    
+    static const QIcon &AtlasIcon(eAtlasNodeType eNode)     { return sm_AtlasIcons[eNode]; }
 
-    static const QRegExpValidator *FileNameValidator()  { return sm_pFileNameValidator; }
-    static const QRegExpValidator *FilePathValidator()  { return sm_pFilePathValidator; }
+    static const QRegExpValidator *FileNameValidator()      { return sm_pFileNameValidator; }
+    static const QRegExpValidator *FilePathValidator()      { return sm_pFilePathValidator; }
     
     static bool IsWorkspaceValid(const QDir &projDir)
     {
