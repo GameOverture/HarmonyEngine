@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl
+QT       += core gui opengl network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,7 +14,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     HyApp.cpp \
-    Spine.cpp \
     DlgNewProject.cpp \
     WidgetExplorer.cpp \
     WidgetOutputLog.cpp \
@@ -35,11 +34,12 @@ SOURCES += main.cpp \
     WidgetAtlas.cpp \
     WidgetSprite.cpp \
     DlgInputName.cpp \
-    ItemAtlas.cpp
+    ItemProject.cpp \
+    WidgetLiveVariable.cpp \
+    WidgetLiveVarManager.cpp
 
 HEADERS  += \
     HyApp.h \
-    Spine.h \
     DlgNewProject.h \
     WidgetExplorer.h \
     WidgetOutputLog.h \
@@ -58,7 +58,9 @@ HEADERS  += \
     WidgetAtlas.h \
     WidgetSprite.h \
     DlgInputName.h \
-    ItemAtlas.h
+    ItemProject.h \
+    WidgetLiveVariable.h \
+    WidgetLiveVarManager.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -71,7 +73,9 @@ FORMS    += \
     DlgNewItem.ui \
     WidgetAtlas.ui \
     WidgetSprite.ui \
-    DlgInputName.ui
+    DlgInputName.ui \
+    WidgetLiveVariable.ui \
+    WidgetLiveVarManager.ui
 
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER
 
