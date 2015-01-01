@@ -120,6 +120,8 @@ HY_INLINE uint32 EndianSwap32(uint32 var)
 // Misc
 //-----------------------------------------------------------------------------------------
 
+#define HY_TCP_PORT 1313
+
 // Some simple constants to replace the C++ types of 
 // true and false.
 // Most platforms define these too, so use ifndef 

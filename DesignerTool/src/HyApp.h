@@ -14,11 +14,6 @@ class HyApp : public IApplication
     
     Item *          m_pCurItem;
     
-    // Network connection
-    QTcpServer      m_TcpServer;
-    QTcpSocket      m_TcpClient;
-    QTcpSocket *    m_pTcpServerConnection;
-    
 public:
     HyApp(HarmonyInit &initStruct);
 
