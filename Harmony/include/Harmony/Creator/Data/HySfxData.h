@@ -14,7 +14,7 @@
 
 #include "IData.h"
 
-#include "SFML/Audio.hpp"
+//#include "SFML/Audio.hpp"
 
 class HySound;
 
@@ -22,7 +22,7 @@ class HySfxData : public IData
 {
 	friend class HyFactory<HySfxData>;
 
-	sf::SoundBuffer			m_SoundBuffer;
+	//sf::SoundBuffer			m_SoundBuffer;
 
 	// Only allow HyFactory instantiate
 	HySfxData(const std::string &sPath);
