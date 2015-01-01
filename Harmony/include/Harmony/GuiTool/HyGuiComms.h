@@ -29,6 +29,11 @@ class HyGuiComms
 
 	char					m_pPacketBuffer[HYNETWORKING_MAX_PACKET_SIZE];
 
+	bool					m_bConnected;
+	float					m_fReconnectWaitInterval;
+
+	void Connect();
+
 	// Because netlink library doesn't use function pointers for some reason, these "callback classes" exist.
 	class OnReadCallbackClass : public NL::SocketGroupCmd
 	{

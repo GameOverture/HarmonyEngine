@@ -11,6 +11,8 @@
 
 #ifndef HY_PLATFORM_GUI
 
+#include "Time/HyTime.h"
+
 HyGuiComms *HyGuiComms::sm_pInstance = NULL;
 
 HyGuiComms::HyGuiComms(void)
@@ -18,14 +20,7 @@ HyGuiComms::HyGuiComms(void)
 	HyAssert(sm_pInstance == NULL, "HyGuiComms was instantiated twice");
 	NL::init();
 
-	m_pSocket = new NL::Socket("localhost", 1313);
-	m_pSocket->blocking(false);
-
-	m_pSocketGroup = new NL::SocketGroup();
-	m_pSocketGroup->add(m_pSocket);
-
-	m_pSocketGroup->setCmdOnRead(&m_OnRead);
-	m_pSocketGroup->setCmdOnDisconnect(&m_OnDisconnect);
+	Connect();
 
 	sm_pInstance = this;
 }
@@ -33,6 +28,34 @@ HyGuiComms::HyGuiComms(void)
 HyGuiComms::~HyGuiComms(void)
 {
 	delete m_pSocket;
+}
+
+void HyGuiComms::Connect()
+{
+	try 
+	{
+		m_bConnected = true;	// Assume true, the exception below will set otherwise
+
+		m_pSocket = new NL::Socket("localhost", 1313);
+		m_pSocket->blocking(false);
+
+		m_pSocketGroup = new NL::SocketGroup();
+		m_pSocketGroup->add(m_pSocket);
+
+		m_pSocketGroup->setCmdOnRead(&m_OnRead);
+		m_pSocketGroup->setCmdOnDisconnect(&m_OnDisconnect);
+	}
+	catch(NL::Exception e)
+	{
+		// Catch exception that we did not connect
+		NL::Exception::CODE eCode = e.code();
+		if(NL::Exception::ERROR_CONNECT_SOCKET != eCode)
+		{
+			HyError("Netlink exception occured: " << eCode);
+		}
+
+		m_bConnected = false;
+	}
 }
 
 void HyGuiComms::Update()
@@ -72,6 +95,16 @@ void HyGuiComms::Update()
 	//}
 
 	// Check for connectivity
+	if(m_bConnected == false)
+	{
+		m_fReconnectWaitInterval += HyTime::GetUpdateStepSeconds();
+		if(m_fReconnectWaitInterval >= 1.0f)
+		{
+			Connect();
+			m_fReconnectWaitInterval = 0.0f;
+		}
+		return;
+	}
 
 	// Send any dirty live params
 
@@ -82,6 +115,9 @@ void HyGuiComms::Update()
 
 void HyGuiComms::SendPacket(ePacketType eType, uint32 uiDataSize, const void *pDataToCopy)
 {
+	if(m_bConnected == false)
+		return;
+
 	HyAssert(uiDataSize > HYNETWORKING_MAX_PACKET_SIZE - 8, "InitPacket received data larger than [HYNETWORKING_MAX_PACKET_SIZE - 8]");
 
 	*reinterpret_cast<uint32 *>(&m_pPacketBuffer[4]) = eType;

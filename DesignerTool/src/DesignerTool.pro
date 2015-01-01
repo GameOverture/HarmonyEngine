@@ -36,7 +36,9 @@ SOURCES += main.cpp \
     DlgInputName.cpp \
     ItemProject.cpp \
     WidgetLiveVariable.cpp \
-    WidgetLiveVarManager.cpp
+    WidgetLiveVarManager.cpp \
+    HyTcpServer.cpp \
+    HyGuiTexture.cpp
 
 HEADERS  += \
     HyApp.h \
@@ -60,7 +62,9 @@ HEADERS  += \
     DlgInputName.h \
     ItemProject.h \
     WidgetLiveVariable.h \
-    WidgetLiveVarManager.h
+    WidgetLiveVarManager.h \
+    HyTcpServer.h \
+    HyGuiTexture.h
 
 FORMS    += \
     DlgNewProject.ui \

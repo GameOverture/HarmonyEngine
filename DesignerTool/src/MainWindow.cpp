@@ -52,7 +52,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->dockWidgetAtlas->hide();
     ui->dockWidgetGlyphCreator->hide();
     
-    HYLOG("Recovering previously opened session...", LOGTYPE_Normal);
+    // Network initialization
+    m_pTcpServer = new QTcpServer(this);
+    connect(m_pTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
+    if(!m_pTcpServer->listen(QHostAddress::LocalHost, HY_TCP_PORT))
+        HYLOG("Cannot start TCP server", LOGTYPE_Error)
+    else
+        HYLOG("TCP server initialized", LOGTYPE_Normal);
+    
+    
+    
+    HYLOG("Recovering previously opened session...", LOGTYPE_Normal);    
     //m_Settings.clear();
     LoadSettings();
 }
@@ -230,7 +240,18 @@ void MainWindow::UpdateActions()
     //ui->explorer->GetCurProjPath(
 }
 
-
+void MainWindow::newConnection()
+{
+    QTcpSocket *pSocket = m_pTcpServer->nextPendingConnection();
+    
+    pSocket->write("Hello client\r\n");
+    pSocket->flush();
+    
+    pSocket->waitForBytesWritten(3000);
+    
+    pSocket->close();
+    //m_TcpClients
+}
 
 
 void MainWindow::on_actionViewExplorer_triggered()

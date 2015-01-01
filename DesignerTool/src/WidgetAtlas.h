@@ -6,40 +6,36 @@
 #include <QList>
 
 #include "ItemProject.h"
-#include "scriptum/imagepacker.h"
 
 namespace Ui {
 class WidgetAtlas;
 }
 
+// Forward declaration
+class HyGuiTexture;
+class ImagePacker;
+
 class WidgetAtlas : public QWidget
 {
     Q_OBJECT
     
-    ItemProject * const     m_pProjOwner;
+    ItemProject * const         m_pProjOwner;
+    QList<HyGuiTexture *>       m_Textures;
     
-    struct tTexture
-    {
-        ImagePacker         packer;
-        QTreeWidgetItem     treeItem;
-        
-        bool                bDirty;
-        
-        tTexture() : bDirty(true)
-        { }
-    };
-    
-    QList<tTexture *>       m_Textures;
-    
-    bool                    m_bDirty;
-    
-    
+    bool                        m_bSettingsDirty;
     
 public:
     explicit WidgetAtlas(ItemProject *pProjOwner, QWidget *parent = 0);
     ~WidgetAtlas();
     
+    ItemProject *GetProjOwner()     { return m_pProjOwner; }
     
+    void SetPackerSettings(ImagePacker *pPacker);
+    int GetTexWidth();
+    int GetTexHeight();
+    int GetHeuristicIndex();
+    
+    QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType);
     
 private slots:
     void on_btnTexSize256_clicked();
@@ -73,13 +69,10 @@ private slots:
 private:
     Ui::WidgetAtlas *ui;
     
-    bool ImportImage(QString sImagePath);
+    HyGuiTexture *GetActiveTexture();
     
-    bool TryPackNew(QString sImagePath, tTexture *pTex);
+    void GenTextureSheets();
     
-    QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType);
-    
-    void RebuildDirtyTextures();
 };
 
 #endif // WIDGETATLAS_H

@@ -22,6 +22,9 @@ class MainWindow : public QMainWindow
     bool                m_bIsInitialized;
     
     //QMenu *             m_pEditContextMenu;
+    
+    //HyTcpServer         m_TcpServer;
+    QTcpServer *        m_pTcpServer;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -33,6 +36,8 @@ public:
     static void CloseItem(Item *pItem);
 
 private slots:
+    void newConnection();
+    
     void on_actionNewProject_triggered();
     void on_actionOpenProject_triggered();
     void on_actionCloseProject_triggered();
