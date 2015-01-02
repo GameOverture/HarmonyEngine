@@ -6,6 +6,7 @@
 #include <QList>
 
 #include "ItemProject.h"
+#include "scriptum/imagepacker.h"
 
 namespace Ui {
 class WidgetAtlas;
@@ -13,22 +14,31 @@ class WidgetAtlas;
 
 // Forward declaration
 class HyGuiTexture;
-class ImagePacker;
 
 class WidgetAtlas : public QWidget
 {
     Q_OBJECT
     
-    ItemProject * const         m_pProjOwner;
+    ItemProject *               m_pProjOwner;
     QList<HyGuiTexture *>       m_Textures;
     
     bool                        m_bSettingsDirty;
     
+    ImagePacker                 m_cachedImagePackerSettings;
+    
+    enum ePageType
+    {
+        PAGE_Settings = 0,
+        PAGE_Frames
+    };
+    
 public:
+    explicit WidgetAtlas(QWidget *parent = 0);
     explicit WidgetAtlas(ItemProject *pProjOwner, QWidget *parent = 0);
     ~WidgetAtlas();
     
-    ItemProject *GetProjOwner()     { return m_pProjOwner; }
+    void SetProjOwner(ItemProject *pProjOwner)  { m_pProjOwner = pProjOwner; }
+    ItemProject *GetProjOwner()                 { return m_pProjOwner; }
     
     void SetPackerSettings(ImagePacker *pPacker);
     int GetTexWidth();
@@ -65,6 +75,8 @@ private slots:
     void on_sbFrameMarginLeft_valueChanged(int arg1);
     
     void on_tabWidget_currentChanged(int index);
+    
+    void on_btnSaveSettings_clicked();
     
 private:
     Ui::WidgetAtlas *ui;

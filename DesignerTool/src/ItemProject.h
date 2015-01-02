@@ -24,6 +24,8 @@ public:
     QString GetDataPath() const      { return GetPath() % "data/"; }
     QString GetMetaDataPath() const  { return GetPath() % "_metaData/"; }
     
+    WidgetAtlas *GetAtlasWidget()       { return m_pAtlases; }
+    
     virtual void Hide();
     virtual void Show();
     virtual void Draw(HyApp *pHyApp);

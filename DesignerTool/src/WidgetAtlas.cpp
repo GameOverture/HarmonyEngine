@@ -6,15 +6,24 @@
 #include <QTreeWidget>
 #include <QFileDialog>
 #include <QStack>
+#include <QMessageBox>
 
 #include "HyGuiTexture.h"
-#include "scriptum/imagepacker.h"
 
-WidgetAtlas::WidgetAtlas(ItemProject *pProjOwner, QWidget *parent) :    QWidget(parent),
-                                                                        ui(new Ui::WidgetAtlas),
-                                                                        m_pProjOwner(pProjOwner)
+WidgetAtlas::WidgetAtlas(QWidget *parent /*= 0*/) : QWidget(parent),
+                                                    ui(new Ui::WidgetAtlas),
+                                                    m_pProjOwner(NULL)
 {
     ui->setupUi(this);
+    //SetPackerSettings(&m_cachedImagePackerSettings);
+}
+
+WidgetAtlas::WidgetAtlas(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :    QWidget(parent),
+                                                                                ui(new Ui::WidgetAtlas),
+                                                                                m_pProjOwner(pProjOwner)
+{
+    ui->setupUi(this);
+    //SetPackerSettings(&m_cachedImagePackerSettings);
 }
 
 WidgetAtlas::~WidgetAtlas()
@@ -270,3 +279,44 @@ QTreeWidgetItem *WidgetAtlas::CreateTreeItem(QTreeWidgetItem *pParent, QString s
     return NULL;
 }
 
+
+void WidgetAtlas::on_btnSaveSettings_clicked()
+{
+    if(m_bSettingsDirty && m_Textures.size() != 0 && m_Textures[0]->GetTreeItem()->childCount() != 0)
+    {
+        QMessageBox dlg(QMessageBox::Question, "Harmony Designer Tool", "Atlas texture settings have changed. Would you like to save settings and regenerate all textures?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        switch(dlg.exec())
+        {
+        case QMessageBox::Yes:
+            // Save was clicked. Reload every texture with new settings, then show 'frames'
+            for(int i = 0; i < m_Textures.size(); ++i)
+            {
+                QList<QStringList> missingFrames = m_Textures[i]->RepackImgs();
+            }
+            break;
+        case QMessageBox::No:
+            // Don't Save was clicked. Restore the cached settings and show the 'frames'
+            ui->cmbSortOrder->setCurrentIndex(m_cachedImagePackerSettings.sortOrder);
+            ui->sbFrameMarginTop->setValue(m_cachedImagePackerSettings.border.t);
+            ui->sbFrameMarginLeft->setValue(m_cachedImagePackerSettings.border.l);
+            ui->sbFrameMarginRight->setValue(m_cachedImagePackerSettings.border.r);
+            ui->sbFrameMarginBottom->setValue(m_cachedImagePackerSettings.border.b);
+            ui->extrude->setValue(m_cachedImagePackerSettings.extrude);
+            ui->chkMerge->setChecked(m_cachedImagePackerSettings.merge);
+            ui->chkSquare->setChecked(m_cachedImagePackerSettings.square);
+            ui->chkAutosize->setChecked(m_cachedImagePackerSettings.autosize);
+            ui->minFillRate->setValue(m_cachedImagePackerSettings.minFillRate);
+            ui->cmbRotationStrategy->setCurrentIndex(m_cachedImagePackerSettings.rotate);
+            break;
+        case QMessageBox::Cancel:
+            // Cancel was clicked. Don't do anything and stay on the 'settings'
+            return;
+        default:
+            // should never be reached
+            break;
+        }
+    }
+    
+    ui->stackedWidget->setCurrentIndex(PAGE_Frames);
+    m_bSettingsDirty = false;
+}

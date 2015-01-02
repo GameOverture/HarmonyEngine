@@ -27,6 +27,10 @@ public:
     // Each entry in the QList are hints towards what new texture each missing image belongs to.
     QList<QStringList> ImportImgs(const QStringList sImportList);
     
+    // Returns a list of string lists that contain all the image paths that didn't fit on this texture
+    // Each entry in the QList are hints towards what new texture each missing image belongs to.
+    QList<QStringList> RepackImgs();
+    
 public:
     
     WidgetAtlas *const GetAtlasOwner()  { return m_pAtlasOwner; }
@@ -46,6 +50,7 @@ public:
     HyGuiFrameData(HyGuiTexture *const pTexOwner, int iTag, QString sName, QString sPath);
     
     int GetTag()        { return m_iTag; }
+    QString GetName()   { return m_pTreeItem->text(0); }
 };
 
 #endif // HYGUITEXTURE_H

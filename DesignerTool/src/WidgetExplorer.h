@@ -7,7 +7,7 @@
 #include <QMenu>
 
 #include "HyGlobal.h"
-#include "Item.h"
+#include "ItemProject.h"
 
 #include <vector>
 using std::vector;
@@ -29,7 +29,7 @@ public:
     
     void SelectItem(Item *pItem);
     
-    Item *GetCurProjSelected();
+    ItemProject *GetCurProjSelected();
     Item *GetCurItemSelected();
     Item *GetCurDirSelected(bool bIncludePrefixDirs);
     

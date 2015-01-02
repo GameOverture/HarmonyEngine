@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QSettings>
 
-#include "Item.h"
+#include "ItemProject.h"
 
 namespace Ui {
 class MainWindow;
@@ -21,6 +21,8 @@ class MainWindow : public QMainWindow
 
     bool                m_bIsInitialized;
     
+    ItemProject *       m_pCurSelectedProj;
+    
     //QMenu *             m_pEditContextMenu;
     
     //HyTcpServer         m_TcpServer;
@@ -34,6 +36,8 @@ public:
     
     static void OpenItem(Item *pItem);
     static void CloseItem(Item *pItem);
+    
+    static void SetSelectedProj(ItemProject *pProj);
 
 private slots:
     void newConnection();

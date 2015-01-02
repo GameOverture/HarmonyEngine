@@ -115,3 +115,25 @@ QList<QStringList> HyGuiTexture::ImportImgs(const QStringList sImportList)
     m_bDirty = (m_Packer.bins.count() > 0);
     return missingImgPaths;
 }
+
+// Returns a list of string lists that contain all the image paths that didn't fit on this texture
+// Each entry in the QList are hints towards what new texture each missing image belongs to.
+QList<QStringList> HyGuiTexture::RepackImgs()
+{
+    // Create tmp directory
+    QDir tmpDir(m_MetaDir.path());
+    tmpDir.cdUp();
+    if(tmpDir.cd("tmp") == false)
+        tmpDir.mkpath(".");
+    
+    // Move images to tmp dir
+    for(int i = 0; i < m_Packer.images.size(); ++i)
+    {
+        QFileInfo info(m_Packer.images[i].path);
+        QString sImgName = reinterpret_cast<HyGuiFrameData *>(m_Packer.images[i].id)->GetName();
+        QFile::copy(m_Packer.images[i].path, QDir::cleanPath(tmpDir.path() % "/" % sImgName % "." % info.suffix()));
+    }
+    
+    // TODO: Reimport images but somehow avoid images with same name within tmp directory
+    return QList<QStringList>();
+}

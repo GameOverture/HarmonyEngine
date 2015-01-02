@@ -6,6 +6,7 @@
 #include "DlgInputName.h"
 
 #include "WidgetExplorer.h"
+#include "WidgetAtlas.h"
 
 #include "ItemSprite.h"
 
@@ -14,16 +15,19 @@
 #include <QFileDialog>
 #include <QShowEvent>
 #include <QStringBuilder>
+#include <QVBoxLayout>
 
 /*static*/ MainWindow * MainWindow::sm_pInstance = NULL;
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
-                                ui(new Ui::MainWindow),
-                                m_Settings("Overture Games", "Harmony Designer Tool"),
-                                m_bIsInitialized(false)
+MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
+                                            ui(new Ui::MainWindow),
+                                            m_Settings("Overture Games", "Harmony Designer Tool"),
+                                            m_bIsInitialized(false)
 {
     ui->setupUi(this);
     sm_pInstance = this;
+    
+    SetSelectedProj(NULL);
 
     HYLOG("Harmony Designer Tool v0.0.1", LOGTYPE_Title);
     HYLOG("Initializing...", LOGTYPE_Normal);
@@ -98,6 +102,23 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 {
     // TODO: Ask to save file if changes have been made
     sm_pInstance->ui->renderer->CloseItem(pItem);
+}
+
+/*static*/ void MainWindow::SetSelectedProj(ItemProject *pProj)
+{
+    if(sm_pInstance->m_pCurSelectedProj == pProj)
+        return;
+        
+    sm_pInstance->m_pCurSelectedProj = pProj;
+    if(sm_pInstance->m_pCurSelectedProj)
+    {
+        sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasWidget());
+        sm_pInstance->m_pCurSelectedProj->GetAtlasWidget()->show();
+    }
+    else
+    {
+        sm_pInstance->ui->dockWidgetAtlas->setWidget(NULL);
+    }
 }
 
 void MainWindow::on_actionNewProject_triggered()

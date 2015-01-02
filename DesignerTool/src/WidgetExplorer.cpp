@@ -305,7 +305,7 @@ QStringList WidgetExplorer::GetOpenProjectPaths()
     return sListOpenProjs;
 }
 
-Item *WidgetExplorer::GetCurProjSelected()
+ItemProject *WidgetExplorer::GetCurProjSelected()
 {
     QTreeWidgetItem *pCurProjItem = ui->treeWidget->currentItem();
     if(pCurProjItem == NULL)
@@ -315,7 +315,7 @@ Item *WidgetExplorer::GetCurProjSelected()
         pCurProjItem = pCurProjItem->parent();
     
     QVariant v = pCurProjItem->data(0, Qt::UserRole);
-    return v.value<Item *>();
+    return reinterpret_cast<ItemProject *>(v.value<Item *>());
 }
 
 Item *WidgetExplorer::GetCurItemSelected()
@@ -406,8 +406,11 @@ void WidgetExplorer::on_treeWidget_currentItemChanged(QTreeWidgetItem *current, 
         Item *pItemDir = GetCurDirSelected(false);
         bValidItem = pItemDir->GetType() == ITEM_DirSprites || pItemDir->GetType() == ITEM_DirFonts;
     }
-//    QVariant v = current->data(0, Qt::UserRole);
-//    Item *pItemVariant = v.value<Item *>();
+    
+    MainWindow::SetSelectedProj(GetCurProjSelected());
+
+    // QVariant v = current->data(0, Qt::UserRole);
+    // Item *pItemVariant = v.value<Item *>();
 }
 
 void WidgetExplorer::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
