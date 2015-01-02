@@ -1,11 +1,13 @@
+#include <QUuid>
+
 #include "HyGuiTexture.h"
 #include "WidgetAtlas.h"
 
-HyGuiFrameData::HyGuiFrameData(HyGuiTexture *const pTexOwner, int iTag, QString sPath) :    m_pTexOwner(pTexOwner),
-                                                                                            m_iTag(iTag),
-                                                                                            m_sPath(sPath)
+HyGuiFrameData::HyGuiFrameData(HyGuiTexture *const pTexOwner, int iTag, QString sName, QString sPath) : m_pTexOwner(pTexOwner),
+                                                                                                        m_iTag(iTag),
+                                                                                                        m_sPath(sPath)
 {
-    //m_pTreeItem = m_pTexOwner->GetAtlasOwner()->
+    m_pTreeItem = m_pTexOwner->GetAtlasOwner()->CreateTreeItem(m_pTexOwner->GetTreeItem(), sName, ATLAS_Frame);
 }
 
 HyGuiTexture::HyGuiTexture(WidgetAtlas *const pAtlasOwner) :    m_pAtlasOwner(pAtlasOwner),
@@ -56,13 +58,20 @@ QList<QStringList> HyGuiTexture::ImportImgs(const QStringList sImportList)
         
         // Change sPath from (the passed) imported path, to new meta data path location
         QFileInfo fileInfo(sPath);
-        sPath = m_MetaDir.path() % fileInfo.fileName();
+        QString sFileName;
+        
+        // Create unique filename for metadata image (is this overkill?), and save it out
+        QUuid uniqueId = QUuid::createUuid();
+        sFileName = uniqueId.toString();
+        sFileName.replace(QChar('{'), "");
+        sFileName.replace(QChar('}'), "");
+        sFileName += ("." % fileInfo.suffix());
+        sPath = m_MetaDir.path() % sFileName;
+        img.save(sPath);
         
         // TODO: Delete pData somewhere
-        HyGuiFrameData *pData = new HyGuiFrameData(this, i, sPath);
-        
+        HyGuiFrameData *pData = new HyGuiFrameData(this, i, fileInfo.baseName(), sPath);
         m_Packer.addItem(img, pData, sPath);
-        img.save(sPath);
     }
 
     m_Packer.pack(m_pAtlasOwner->GetHeuristicIndex(), m_pAtlasOwner->GetTexWidth(), m_pAtlasOwner->GetTexHeight());
@@ -74,6 +83,14 @@ QList<QStringList> HyGuiTexture::ImportImgs(const QStringList sImportList)
         for(int i = 1; i < m_Packer.bins.size(); ++i)
             missingImgPaths.push_back(QStringList());
         
+        // NOTE: The wacky scriptum library needs to call ClearBin, before removing any images associated with the removed bins
+        while(m_Packer.bins.size() > 1)
+        {
+            m_Packer.bins.removeLast();
+            m_Packer.ClearBin(m_Packer.bins.count());
+        }
+        
+        QList<HyGuiFrameData *> imagesToRemove;
         for(int i = 0; i < m_Packer.images.size(); ++i)
         {
             if(m_Packer.images[i].textureId != 0)
@@ -81,16 +98,20 @@ QList<QStringList> HyGuiTexture::ImportImgs(const QStringList sImportList)
                 QString sImportPath = sImportList[reinterpret_cast<HyGuiFrameData *>(m_Packer.images[i].id)->GetTag()];
                 missingImgPaths[m_Packer.images[i].textureId - 1].push_back(sImportPath);
                 
-                // TODO: Remove this image entirely from this texture
+                imagesToRemove.push_back(reinterpret_cast<HyGuiFrameData *>(m_Packer.images[i].id));
             }
+        }
+        
+        for(int i = 0; i < imagesToRemove.size(); ++i)
+        {
+            m_Packer.removeId(imagesToRemove[i]);
+            
+            HyGuiFrameData *pData = imagesToRemove[i];
+            delete pData;
+            // TODO: Delete the metadata image sitting on disk
         }
     }
     
-    m_bDirty = (m_Packer.bins.empty() == false);
+    m_bDirty = (m_Packer.bins.count() > 0);
     return missingImgPaths;
-}
-
-WidgetAtlas *const HyGuiTexture::GetAtlasOwner()
-{
-    return m_pAtlasOwner;
 }

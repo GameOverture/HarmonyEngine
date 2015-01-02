@@ -29,7 +29,8 @@ public:
     
 public:
     
-    WidgetAtlas *const GetAtlasOwner();
+    WidgetAtlas *const GetAtlasOwner()  { return m_pAtlasOwner; }
+    QTreeWidgetItem *GetTreeItem()      { return m_pTreeItem; }
    
 };
 
@@ -42,7 +43,7 @@ class HyGuiFrameData
     QTreeWidgetItem *   m_pTreeItem;
     
 public:
-    HyGuiFrameData(HyGuiTexture *const pTexOwner, int iTag, QString sPath);
+    HyGuiFrameData(HyGuiTexture *const pTexOwner, int iTag, QString sName, QString sPath);
     
     int GetTag()        { return m_iTag; }
 };
