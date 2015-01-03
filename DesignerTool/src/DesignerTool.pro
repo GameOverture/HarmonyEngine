@@ -38,7 +38,8 @@ SOURCES += main.cpp \
     WidgetLiveVariable.cpp \
     WidgetLiveVarManager.cpp \
     HyTcpServer.cpp \
-    HyGuiTexture.cpp
+    HyGuiTexture.cpp \
+    DlgOpenProject.cpp
 
 HEADERS  += \
     HyApp.h \
@@ -64,7 +65,8 @@ HEADERS  += \
     WidgetLiveVariable.h \
     WidgetLiveVarManager.h \
     HyTcpServer.h \
-    HyGuiTexture.h
+    HyGuiTexture.h \
+    DlgOpenProject.h
 
 FORMS    += \
     DlgNewProject.ui \

@@ -37,11 +37,11 @@ void DlgNewProject::on_buttonBox_accepted()
     projDir.mkdir(ui->txtGameTitle->text());
 
     projDir.cd(ui->txtGameTitle->text());
-    projDir.mkdir(QString("data"));
-    projDir.mkdir(QString("metaData"));
-    projDir.mkdir(QString("src"));
+    projDir.mkdir(QString(HYGUIPATH_RelDataDir));
+    projDir.mkdir(QString(HYGUIPATH_RelMetaDataDir));
+    projDir.mkdir(QString(HYGUIPATH_RelSrcDataDir));
 
-    projDir.cd("data");
+    projDir.cd(HYGUIPATH_RelDataDir);
     
     QStringList dirList = HyGlobal::SubDirNameList();
     foreach(QString sDir, dirList)

@@ -78,7 +78,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         QList<eItemType> subDirList = HyGlobal::SubDirList();
         foreach(eItemType eType, subDirList)
         {
-            QString sSubDirPath = pItem->GetPath() % "data/" % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
+            QString sSubDirPath = pItem->GetPath() % HYGUIPATH_RelDataDir % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
             Item *pSubDirItem = new Item();
             pSubDirItem->Set(eType, sSubDirPath);
             

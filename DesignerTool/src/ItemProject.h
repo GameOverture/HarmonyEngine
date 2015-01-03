@@ -21,8 +21,8 @@ public:
     ItemProject();
     ~ItemProject();
     
-    QString GetDataPath() const      { return GetPath() % "data/"; }
-    QString GetMetaDataPath() const  { return GetPath() % "_metaData/"; }
+    QString GetDataPath() const         { return GetPath() % HYGUIPATH_RelDataDir; }
+    QString GetMetaDataPath() const     { return GetPath() % HYGUIPATH_RelMetaDataDir; }
     
     WidgetAtlas *GetAtlasWidget()       { return m_pAtlases; }
     

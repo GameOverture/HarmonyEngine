@@ -20,8 +20,13 @@ HyGuiTexture::HyGuiTexture(WidgetAtlas *const pAtlasOwner) :    m_pAtlasOwner(pA
     
     // All dirs are named "00000", "00001", "00002", etc. and are supposed to always be in order
     QFileInfoList list = m_MetaDir.entryInfoList(QDir::Dirs, QDir::Name);
-    QString sNewTexDir = list[list.count() - 1].baseName();
-    int iTexId = sNewTexDir.toInt() + 1;  // + 1 will create new dir, following existing order
+    QString sNewTexDir;
+    int iTexId = 0;
+    if(list.count() > 0)
+    {
+        sNewTexDir = list[list.count() - 1].baseName();
+        iTexId = sNewTexDir.toInt() + 1;  // + 1 will create new dir, following existing order
+    }
     sNewTexDir.sprintf("%05d", iTexId);
     
     m_pTreeItem = m_pAtlasOwner->CreateTreeItem(NULL, sNewTexDir, ATLAS_Texture);

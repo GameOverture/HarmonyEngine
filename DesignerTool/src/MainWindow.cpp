@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+#include "DlgOpenProject.h"
 #include "DlgNewProject.h"
 #include "DlgNewItem.h"
 #include "DlgInputName.h"
@@ -134,17 +135,10 @@ void MainWindow::on_actionNewProject_triggered()
 
 void MainWindow::on_actionOpenProject_triggered()
 {
-    QFileDialog *pDlg = new QFileDialog(this);
-    pDlg->setFileMode(QFileDialog::Directory);
-    pDlg->setOption(QFileDialog::ShowDirsOnly, true);
-
-    pDlg->setViewMode(QFileDialog::Detail);
-    pDlg->setWindowModality(Qt::ApplicationModal);
-    pDlg->setModal(true);
-
-    if(pDlg->exec() == QDialog::Accepted)
+    DlgOpenProject *pDlg = new DlgOpenProject(this);
+    if(pDlg->Exec() == QDialog::Accepted)
     {
-        ui->explorer->AddItem(ITEM_Project, pDlg->selectedFiles()[0], true);
+        ui->explorer->AddItem(ITEM_Project, pDlg->SelectedDir(), true);
     }
     
     delete pDlg;
@@ -178,7 +172,7 @@ void MainWindow::on_actionNewFont_triggered()
 void MainWindow::NewItem(eItemType eItem)
 {
     QString sProjPath = ui->explorer->GetCurProjSelected()->GetPath();
-    QString sSpritePath = sProjPath % "data/" % HyGlobal::ItemName(eItem) % "/";
+    QString sSpritePath = sProjPath % HYGUIPATH_RelDataDir % HyGlobal::ItemName(eItem) % "/";
             
     DlgNewItem *pDlg = new DlgNewItem(sSpritePath, eItem, this);
     if(pDlg->exec())

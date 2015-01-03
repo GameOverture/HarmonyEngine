@@ -44,6 +44,10 @@ enum eAtlasNodeType
     NUMATLAS
 };
 
+#define HYGUIPATH_RelDataDir "data/"
+#define HYGUIPATH_RelMetaDataDir "_metaData/"
+#define HYGUIPATH_RelSrcDataDir "src/"
+
 class HyGlobal
 {
     static QString                  sm_sItemNames[NUMITEM];
@@ -151,7 +155,7 @@ public:
     static bool IsWorkspaceValid(const QDir &projDir)
     {
         QDir dir(projDir);
-        dir.cd("data");
+        dir.cd(HYGUIPATH_RelDataDir);
         if(dir.exists() == false)
             return false;
         
@@ -168,7 +172,12 @@ public:
         }
         
         dir.cdUp();
-        dir.cd("metaData");
+        dir.cd(HYGUIPATH_RelSrcDataDir);
+        if(dir.exists() == false)
+            return false;
+        
+        dir.cdUp();
+        dir.cd(HYGUIPATH_RelMetaDataDir);
         if(dir.exists() == false)
             return false;
         
