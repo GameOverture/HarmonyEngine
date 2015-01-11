@@ -1,42 +1,46 @@
 #include <QUuid>
+#include <QPainter>
+
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 #include "HyGuiTexture.h"
 #include "WidgetAtlas.h"
 
-HyGuiFrameData::HyGuiFrameData(HyGuiTexture *const pTexOwner, int iTag, QString sName, QString sPath) : m_pTexOwner(pTexOwner),
-                                                                                                        m_iTag(iTag),
-                                                                                                        m_sPath(sPath)
+HyGuiFrameData::HyGuiFrameData(HyGuiTexture *const pTexOwner, int iTextureId, QString sName, QString sPath) :   m_pTexOwner(pTexOwner),
+                                                                                                                m_iTextureId(iTextureId),
+                                                                                                                m_sPath(sPath)
 {
     m_pTreeItem = m_pTexOwner->GetAtlasOwner()->CreateTreeItem(m_pTexOwner->GetTreeItem(), sName, ATLAS_Frame);
 }
 
 HyGuiTexture::HyGuiTexture(WidgetAtlas *const pAtlasOwner) :    m_pAtlasOwner(pAtlasOwner),
-                                                                m_bDirty(false)
+                                                                m_bDirty(true)
 {
     m_pAtlasOwner->SetPackerSettings(&m_Packer);
     
-    QString sAtlasMetaDataPath = pAtlasOwner->GetProjOwner()->GetMetaDataPath() % "atlas/";
-    m_MetaDir.setPath(sAtlasMetaDataPath);
+    m_MetaDir.setPath(pAtlasOwner->GetProjOwner()->GetMetaDataPath() % "atlas/");
+    m_DataDir.setPath(pAtlasOwner->GetProjOwner()->GetDataPath() % "atlas/");
     
-    // All dirs are named "00000", "00001", "00002", etc. and are supposed to always be in order
-    QFileInfoList list = m_MetaDir.entryInfoList(QDir::Dirs, QDir::Name);
-    QString sNewTexDir;
+    // All textures are named "00000", "00001", "00002", etc. and will be in order
+    QStringList sFilters;
+    sFilters << "*.png";
+    QFileInfoList list = m_DataDir.entryInfoList(sFilters, QDir::Files, QDir::Name);
+    
+    QString sNewTexName;
     int iTexId = 0;
     if(list.count() > 0)
     {
-        sNewTexDir = list[list.count() - 1].baseName();
-        iTexId = sNewTexDir.toInt() + 1;  // + 1 will create new dir, following existing order
+        sNewTexName = list[list.count() - 1].baseName();
+        iTexId = sNewTexName.toInt() + 1;  // + 1 will create new dir, following existing order
     }
-    sNewTexDir.sprintf("%05d", iTexId);
+    sNewTexName.sprintf("%05d", iTexId);
     
-    m_pTreeItem = m_pAtlasOwner->CreateTreeItem(NULL, sNewTexDir, ATLAS_Texture);
+    m_AtlasImg.setFile(m_DataDir.path() % sNewTextName % ".png");
+    m_AtlasTxt.setFile(m_DataDir.path() % sNewTextName % ".atlas");
     
-    sNewTexDir += '/';
-    
-    if(m_MetaDir.mkdir(sAtlasMetaDataPath % sNewTexDir) && QFile::exists(sAtlasMetaDataPath % sNewTexDir))
-        m_MetaDir.setPath(sAtlasMetaDataPath % sNewTexDir);
-    else
-        HYLOG("Could not create atlas meta directory: " % sNewTexDir, LOGTYPE_Error);
+    m_pTreeItem = m_pAtlasOwner->CreateTreeItem(NULL, sNewTexName, ATLAS_Texture);
 }
 
 HyGuiTexture::~HyGuiTexture()
@@ -45,6 +49,94 @@ HyGuiTexture::~HyGuiTexture()
     
     // TODO: Properly remove all the HyFrameData's
     delete m_pTreeItem;
+}
+
+void HyGuiTexture::GetFrameList(QJsonObject &frameList)
+{
+    for(int i = 0; i < m_Packer.images.size(); ++i)
+    {
+        inputImage &imgInfoRef = m_Packer.images[i];
+        HyGuiFrameData *pFrameData = reinterpret_cast<HyGuiFrameData *>(imgInfoRef.id);
+        
+        QJsonObject frame;
+        frame["id"] = pFrameData->GetTextureId();
+        frame["x"] = imgInfoRef.pos.x();
+        frame["y"] = imgInfoRef.pos.y();
+        frame["width"] = imgInfoRef.size.width();
+        frame["height"] = imgInfoRef.size.height();
+        frame["rotated"] = imgInfoRef.rotated;
+        
+        QFileInfo uniqueKey(pFrameData->GetPath());
+        frameList.insert(uniqueKey.baseName(), frame);
+    }
+}
+
+void HyGuiTexture::GenerateImg()
+{
+    m_bDirty = false;
+    
+    QImage imgTexture(m_pAtlasOwner->GetTexWidth(), m_pAtlasOwner->GetTexHeight(), QImage::Format_ARGB32);
+    imgTexture.fill(Qt::transparent);
+    
+    if(m_Packer.bins.size() == 0)
+    {
+        imgTexture.save(m_AtlasImg.path());
+        return;
+    }
+    
+    HyAssert(m_pAtlasOwner->GetTexWidth() == m_Packer.bins[0].width() && m_pAtlasOwner->GetTexHeight() == m_Packer.bins[0].height(), "Mismatching texture dimentions");
+
+    QPainter p(&imgTexture);
+    for(int i = 0; i < m_Packer.images.size(); ++i)
+    {
+        inputImage &imgInfoRef = m_Packer.images[i];
+        
+        HyGuiFrameData *pFrameData = reinterpret_cast<HyGuiFrameData *>(imgInfoRef.id);
+        QImage imgFrame(pFrameData->GetPath());
+        
+        if(imgInfoRef.rotated)
+        {
+            QTransform rotateTransform;
+            rotateTransform.rotate(90);
+            imgFrame = imgFrame.transformed(rotateTransform);
+            
+            //size.transpose();
+            //crop = QRect(packer.images.at(i).size.height() - crop.y() - crop.height(), crop.x(), crop.height(), crop.width());
+        }
+        
+        p.drawImage(imgInfoRef.pos, imgFrame);
+    }
+    
+    imgTexture.save(m_AtlasImg.path());
+}
+
+void HyGuiTexture::LoadTxt()
+{
+    QString sFileContents;
+    
+    QFile file;
+    file.setFileName(m_AtlasTxt.path());
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    sFileContents = file.readAll();
+    file.close();
+    
+    //qWarning() << sFileContents;
+    QJsonDocument d = QJsonDocument::fromJson(sFileContents.toUtf8());
+//    QJsonObject sett2 = d.object();
+//    QJsonValue value = sett2.value(QString("appName"));
+//    qWarning() << value;
+//    QJsonObject item = value.toObject();
+//    qWarning() << tr("QJsonObject of description: ") << item;
+    
+//    /* incase of string value get value and convert into string*/
+//    qWarning() << tr("QJsonObject[appName] of description: ") << item["description"];
+//    QJsonValue subobj = item["description"];
+//    qWarning() << subobj.toString();
+    
+//    /* incase of array get array and convert into string*/
+//    qWarning() << tr("QJsonObject[appName] of value: ") << item["imp"];
+//    QJsonArray test = item["imp"].toArray();
+//    qWarning() << test[1].toString();
 }
 
 // Returns a list of string lists that contain all the image paths that didn't fit on this texture
@@ -95,23 +187,23 @@ QList<QStringList> HyGuiTexture::ImportImgs(const QStringList sImportList)
             m_Packer.ClearBin(m_Packer.bins.count());
         }
         
-        QList<HyGuiFrameData *> imagesToRemove;
+        QList<HyGuiFrameData *> framesToRemove;
         for(int i = 0; i < m_Packer.images.size(); ++i)
         {
             if(m_Packer.images[i].textureId != 0)
             {
-                QString sImportPath = sImportList[reinterpret_cast<HyGuiFrameData *>(m_Packer.images[i].id)->GetTag()];
+                QString sImportPath = sImportList[reinterpret_cast<HyGuiFrameData *>(m_Packer.images[i].id)->GetTextureId()];
                 missingImgPaths[m_Packer.images[i].textureId - 1].push_back(sImportPath);
                 
-                imagesToRemove.push_back(reinterpret_cast<HyGuiFrameData *>(m_Packer.images[i].id));
+                framesToRemove.push_back(reinterpret_cast<HyGuiFrameData *>(m_Packer.images[i].id));
             }
         }
         
-        for(int i = 0; i < imagesToRemove.size(); ++i)
+        for(int i = 0; i < framesToRemove.size(); ++i)
         {
-            m_Packer.removeId(imagesToRemove[i]);
+            m_Packer.removeId(framesToRemove[i]);
             
-            HyGuiFrameData *pData = imagesToRemove[i];
+            HyGuiFrameData *pData = framesToRemove[i];
             delete pData;
             // TODO: Delete the metadata image sitting on disk
         }
@@ -125,6 +217,8 @@ QList<QStringList> HyGuiTexture::ImportImgs(const QStringList sImportList)
 // Each entry in the QList are hints towards what new texture each missing image belongs to.
 QList<QStringList> HyGuiTexture::RepackImgs()
 {
+    m_bDirty = true;
+    
     // Create tmp directory
     QDir tmpDir(m_MetaDir.path());
     tmpDir.cdUp();

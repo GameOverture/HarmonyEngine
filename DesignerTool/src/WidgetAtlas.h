@@ -20,11 +20,12 @@ class WidgetAtlas : public QWidget
     Q_OBJECT
     
     ItemProject *               m_pProjOwner;
+    
+    QFileInfo                   m_DataFile;
+    QFileInfo                   m_MetaDataFile;
     QList<HyGuiTexture *>       m_Textures;
     
     bool                        m_bSettingsDirty;
-    
-    ImagePacker                 m_cachedImagePackerSettings;
     
     enum ePageType
     {
@@ -81,10 +82,14 @@ private slots:
 private:
     Ui::WidgetAtlas *ui;
     
-    HyGuiTexture *GetActiveTexture();
     
+    void LoadSettings();
+    void SaveSettings();
+    HyGuiTexture *GetActiveTexture();
     void GenTextureSheets();
     
+    void ImportFrames();
+    void RepackFrames();
 };
 
 #endif // WIDGETATLAS_H

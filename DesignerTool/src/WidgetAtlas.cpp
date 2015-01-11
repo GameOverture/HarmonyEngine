@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QStack>
 #include <QMessageBox>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 #include "HyGuiTexture.h"
 
@@ -15,15 +17,31 @@ WidgetAtlas::WidgetAtlas(QWidget *parent /*= 0*/) : QWidget(parent),
                                                     m_pProjOwner(NULL)
 {
     ui->setupUi(this);
-    //SetPackerSettings(&m_cachedImagePackerSettings);
+    
+    // NOTE: THIS CONSTRUCTOR IS INVALID TO USE. IT EXISTS FOR QT TO ALLOW Q_OBJECT TO WORK
 }
 
 WidgetAtlas::WidgetAtlas(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :    QWidget(parent),
                                                                                 ui(new Ui::WidgetAtlas),
+                                                                                m_bSettingsDirty(true),
                                                                                 m_pProjOwner(pProjOwner)
 {
     ui->setupUi(this);
-    //SetPackerSettings(&m_cachedImagePackerSettings);
+    
+    m_DataFile.setFile(m_pProjOwner->GetDataPath() % HYGUIPATH_RelDataAtlasFile);
+    m_MetaDataFile.setFile(m_pProjOwner->GetMetaDataPath() % HYGUIPATH_RelMetaDataAtlasFile);
+    
+    // Search for packer settings file. If none exist create one with defaults and show settings page, else load setting from it and show frames page.
+    if(m_MetaDataFile.exists() == false)
+    {
+        SaveSettings();
+        ui->stackedWidget->setCurrentIndex(PAGE_Settings);
+    }
+    else
+    {
+        LoadSettings();
+        ui->stackedWidget->setCurrentIndex(PAGE_Frames);
+    }
 }
 
 WidgetAtlas::~WidgetAtlas()
@@ -41,6 +59,8 @@ WidgetAtlas::~WidgetAtlas()
 
 void WidgetAtlas::SetPackerSettings(ImagePacker *pPacker)
 {
+    //LoadSettings();
+    
     pPacker->sortOrder = ui->cmbSortOrder->currentIndex();
     pPacker->border.t = ui->sbFrameMarginTop->value();
     pPacker->border.l = ui->sbFrameMarginLeft->value();
@@ -102,40 +122,39 @@ void WidgetAtlas::on_btnTexSize2048_clicked()
 
 void WidgetAtlas::on_btnAddFiles_clicked()
 {
-    QFileDialog *pDlg = new QFileDialog(this);
-    pDlg->setFileMode(QFileDialog::Directory);
-    pDlg->setOption(QFileDialog::ShowDirsOnly, true);
+    QFileDialog dlg(this);
+    dlg.setFileMode(QFileDialog::ExistingFile);
+    dlg.setViewMode(QFileDialog::Detail);
+    dlg.setWindowModality( Qt::ApplicationModal );
+    dlg.setModal(true);
 
-    pDlg->setViewMode(QFileDialog::Detail);
-    pDlg->setWindowModality( Qt::ApplicationModal );
-    pDlg->setModal(true);
-
-//    if(pDlg->exec() == QDialog::Accepted)
-//    {
-//        m_packer.addItem(
-//        pDlg->selectedFiles()
-//        ui->explorer->AddItem(ITEM_Project, , true);
-//    }
+    QString sSelectedFilter(tr("PNG (*.png)"));
+    QStringList sImageList = QFileDialog::getOpenFileNames(this,
+                                                           "Import image(s) into atlases",
+                                                           QString(),
+                                                           tr("All files (*.*);;PNG (*.png)"),
+                                                           &sSelectedFilter);
     
-    delete pDlg;
+    ImportFrames(sImageList);
+    GenTextureSheets();
+    
+    // Display texture
+    MainWindow::OpenItem(this->m_pProjOwner);
 }
 
 void WidgetAtlas::on_btnAddDir_clicked()
 {
-    QFileDialog *pDlg = new QFileDialog(this);
-    pDlg->setFileMode(QFileDialog::Directory);
-    pDlg->setOption(QFileDialog::ShowDirsOnly, true);
+    QFileDialog dlg(this);
+    dlg.setFileMode(QFileDialog::Directory);
+    dlg.setOption(QFileDialog::ShowDirsOnly, true);
+    dlg.setViewMode(QFileDialog::Detail);
+    dlg.setWindowModality(Qt::ApplicationModal);
+    dlg.setModal(true);
 
-    pDlg->setViewMode(QFileDialog::Detail);
-    pDlg->setWindowModality(Qt::ApplicationModal);
-    pDlg->setModal(true);
-
-    if(pDlg->exec() == QDialog::Accepted)
-    {
-        pDlg->selectedFiles();
-    }
+    if(dlg.exec() == QDialog::Rejected)
+        return;
     
-    QStringList sDirs = pDlg->selectedFiles();
+    QStringList sDirs = dlg.selectedFiles();
     QStringList sImportImgList;
     for(int iDirIndex = 0; iDirIndex < sDirs.size(); ++iDirIndex)
     {
@@ -167,29 +186,8 @@ void WidgetAtlas::on_btnAddDir_clicked()
         }
     }
     
-    QList<QStringList> sMissingImgPaths = GetActiveTexture()->ImportImgs(sImportImgList);
-    bool bFailedToPack = false;
-    for(int i = 0; i < sMissingImgPaths.size(); ++i)
-    {
-        HyGuiTexture *pNewTexture = new HyGuiTexture(this);
-        m_Textures.append(pNewTexture);
-    
-        QList<QStringList> tmp = pNewTexture->ImportImgs(sMissingImgPaths[i]);
-        if(tmp.size() > 0)
-        {
-            bFailedToPack = true;
-            for(int j = 0; j < tmp.size(); ++j)
-            {
-                foreach(const QString sPath, tmp[j])
-                    HYLOG("Could not import: " % sPath, LOGTYPE_Info);
-            }
-        }
-    }
-    
+    ImportFrames(sImportImgList);
     GenTextureSheets();
-    
-    if(bFailedToPack)
-        HYLOG("Imported image(s) failed to pack into current texture settings. Check log for info.", LOGTYPE_Warning);
     
     // Display texture
     MainWindow::OpenItem(this->m_pProjOwner);
@@ -240,22 +238,6 @@ void WidgetAtlas::on_tabWidget_currentChanged(int index)
     }
 }
 
-HyGuiTexture *WidgetAtlas::GetActiveTexture()
-{
-    if(m_Textures.empty())
-        m_Textures.append(new HyGuiTexture(this));
-    
-    return m_Textures.last();
-}
-
-void WidgetAtlas::GenTextureSheets()
-{
-    for(int i = 0; i < m_Textures.size(); ++i)
-    {
-        
-    }
-}
-
 QTreeWidgetItem *WidgetAtlas::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType)
 {
     QTreeWidgetItem *pNewTreeItem;
@@ -279,7 +261,6 @@ QTreeWidgetItem *WidgetAtlas::CreateTreeItem(QTreeWidgetItem *pParent, QString s
     return NULL;
 }
 
-
 void WidgetAtlas::on_btnSaveSettings_clicked()
 {
     if(m_bSettingsDirty && m_Textures.size() != 0 && m_Textures[0]->GetTreeItem()->childCount() != 0)
@@ -289,24 +270,12 @@ void WidgetAtlas::on_btnSaveSettings_clicked()
         {
         case QMessageBox::Yes:
             // Save was clicked. Reload every texture with new settings, then show 'frames'
-            for(int i = 0; i < m_Textures.size(); ++i)
-            {
-                QList<QStringList> missingFrames = m_Textures[i]->RepackImgs();
-            }
+            SaveSettings();
+            RepackFrames();
             break;
         case QMessageBox::No:
             // Don't Save was clicked. Restore the cached settings and show the 'frames'
-            ui->cmbSortOrder->setCurrentIndex(m_cachedImagePackerSettings.sortOrder);
-            ui->sbFrameMarginTop->setValue(m_cachedImagePackerSettings.border.t);
-            ui->sbFrameMarginLeft->setValue(m_cachedImagePackerSettings.border.l);
-            ui->sbFrameMarginRight->setValue(m_cachedImagePackerSettings.border.r);
-            ui->sbFrameMarginBottom->setValue(m_cachedImagePackerSettings.border.b);
-            ui->extrude->setValue(m_cachedImagePackerSettings.extrude);
-            ui->chkMerge->setChecked(m_cachedImagePackerSettings.merge);
-            ui->chkSquare->setChecked(m_cachedImagePackerSettings.square);
-            ui->chkAutosize->setChecked(m_cachedImagePackerSettings.autosize);
-            ui->minFillRate->setValue(m_cachedImagePackerSettings.minFillRate);
-            ui->cmbRotationStrategy->setCurrentIndex(m_cachedImagePackerSettings.rotate);
+            LoadSettings();
             break;
         case QMessageBox::Cancel:
             // Cancel was clicked. Don't do anything and stay on the 'settings'
@@ -319,4 +288,123 @@ void WidgetAtlas::on_btnSaveSettings_clicked()
     
     ui->stackedWidget->setCurrentIndex(PAGE_Frames);
     m_bSettingsDirty = false;
+}
+
+void WidgetAtlas::LoadSettings()
+{
+    QFile file(m_MetaDataFile.path());
+    if(file.open(QIODevice::ReadOnly) == false)
+    {
+        HYLOG("Could not open atlas settings file for reading", LOGTYPE_Error);
+        return;
+    }
+    QByteData data = file.readAll();
+    QJsonDocument doc = QJsonDocument::fromBinaryData(data);
+    file.close();
+    
+    QJsonObject settings = doc.object();
+    ui->cmbSortOrder->setCurrentIndex(settings["cmbSortOrder"].toInt());
+    ui->sbFrameMarginTop->setValue(settings["sbFrameMarginTop"].toInt());
+    ui->sbFrameMarginLeft->setValue(settings["sbFrameMarginLeft"].toInt());
+    ui->sbFrameMarginRight->setValue(settings["sbFrameMarginRight"].toInt());
+    ui->sbFrameMarginBottom->setValue(settings["sbFrameMarginBottom"].toInt());
+    ui->extrude->setValue(settings["extrude"].toInt());
+    ui->chkMerge->setChecked(settings["chkMerge"].toBool());
+    ui->chkSquare->setChecked(settings["chkSquare"].toBool());
+    ui->chkAutosize->setChecked(settings["chkAutosize"].toBool());
+    ui->minFillRate->setValue(settings["minFillRate"].toInt());
+    ui->cmbRotationStrategy->setCurrentIndex(settings["cmbRotationStrategy"].toInt());
+}
+
+void WidgetAtlas::SaveSettings()
+{
+    QJsonObject settings;
+    settings.insert("cmbSortOrder", QJsonValue(ui->cmbSortOrder->currentIndex());
+    settings.insert("sbFrameMarginTop", QJsonValue(ui->sbFrameMarginTop->value());
+    settings.insert("sbFrameMarginLeft", QJsonValue(ui->sbFrameMarginLeft->value());
+    settings.insert("sbFrameMarginRight", QJsonValue(ui->sbFrameMarginRight->value());
+    settings.insert("sbFrameMarginBottom", QJsonValue(ui->sbFrameMarginBottom->value());
+    settings.insert("extrude", QJsonValue(ui->extrude->value());
+    settings.insert("chkMerge", QJsonValue(ui->chkMerge->isChecked());
+    settings.insert("chkSquare", QJsonValue(ui->chkSquare->isChecked());
+    settings.insert("chkAutosize", QJsonValue(ui->chkAutosize->isChecked());
+    settings.insert("minFillRate", QJsonValue(ui->minFillRate->value());
+    settings.insert("cmbRotationStrategy", QJsonValue(ui->cmbRotationStrategy->currentIndex());
+            
+    QFile file(m_MetaDataFile.path());
+    if(!file.open(QIODevice::WriteOnly))
+    {
+        HYLOG("Couldn't open atlas settings file for writing", LOGTYPE_Error);
+        return;
+    }
+    QJsonDocument doc(settings);
+    file.write(doc.toBinaryData());
+}
+
+HyGuiTexture *WidgetAtlas::GetActiveTexture()
+{
+    if(m_Textures.empty())
+        m_Textures.append(new HyGuiTexture(this));
+    
+    return m_Textures.last();
+}
+
+void WidgetAtlas::GenTextureSheets()
+{
+    // Write global atlas information
+    QJsonObject atlasInfo;
+    atlasInfo.insert("NumTextures", QJsonValue(m_Textures.size()));
+    
+    for(int i = 0; i < m_Textures.size(); ++i)
+    {
+        // Save any changed textures to disk
+        if(m_Textures[i]->IsDirty())
+            m_Textures[i]->GenerateImg();
+        
+        m_Textures[i]->GetFrameList(atlasInfo);
+    }
+    
+    QFile file(m_DataFile.path());
+    if(!file.open(QIODevice::WriteOnly))
+    {
+        HYLOG("Couldn't open atlas data file for writing", LOGTYPE_Error);
+        return;
+    }
+    QJsonDocument doc(atlasInfo);
+    file.write(doc.toJson());
+}
+
+void WidgetAtlas::ImportFrames()
+{
+    QList<QStringList> sMissingImgPaths = GetActiveTexture()->ImportImgs(sImportImgList);
+    bool bFailedToPack = false;
+    for(int i = 0; i < sMissingImgPaths.size(); ++i)
+    {
+        HyGuiTexture *pNewTexture = new HyGuiTexture(this);
+    
+        QList<QStringList> sFailedImgPaths = pNewTexture->ImportImgs(sMissingImgPaths[i]);
+        if(sFailedImgPaths.size() > 0)
+        {
+            bFailedToPack = true;
+            for(int j = 0; j < sFailedImgPaths.size(); ++j)
+            {
+                foreach(const QString sPath, sFailedImgPaths[j])
+                    HYLOG("Could not import: " % sPath, LOGTYPE_Info);
+            }
+        }
+        else
+            m_Textures.append(pNewTexture); // Becomes active texture
+    }
+    
+    if(bFailedToPack)
+        HYLOG("Imported image(s) failed to pack into current texture settings. Check log for info.", LOGTYPE_Warning);
+}
+
+void WidgetAtlas::RepackFrames()
+{
+    for(int i = 0; i < m_Textures.size(); ++i)
+    {
+        QList<QStringList> missingFrames = m_Textures[i]->RepackImgs();
+        // TODO: handle missing frames
+    }
 }

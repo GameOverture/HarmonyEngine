@@ -48,6 +48,12 @@ enum eAtlasNodeType
 #define HYGUIPATH_RelMetaDataDir "_metaData/"
 #define HYGUIPATH_RelSrcDataDir "src/"
 
+
+#define HYGUIPATH_RelDataAtlasDir HYGUIPATH_RelDataDir "Atlas/"
+#define HYGUIPATH_RelDataAtlasFile HYGUIPATH_RelDataDir "/atlasInfo.json"
+#define HYGUIPATH_RelMetaDataAtlasDir HYGUIPATH_RelMetaDataDir "atlas/"
+#define HYGUIPATH_RelMetaDataAtlasFile HYGUIPATH_RelMetaDataAtlasDir "/settings.hygui"
+
 class HyGlobal
 {
     static QString                  sm_sItemNames[NUMITEM];
@@ -155,30 +161,26 @@ public:
     static bool IsWorkspaceValid(const QDir &projDir)
     {
         QDir dir(projDir);
-        dir.cd(HYGUIPATH_RelDataDir);
-        if(dir.exists() == false)
+        if(!dir.exists(HYGUIPATH_RelDataDir))
             return false;
         
         QStringList dirList = HyGlobal::SubDirNameList();
         foreach(QString sDir, dirList)
         {
-            if(dir.cd(sDir) == false)
+            if(!dir.exists(HYGUIPATH_RelDataDir + sDir))
                 return false;
-            
-            if(dir.exists() == false)
-                return false;
-            
-            dir.cdUp();
         }
         
-        dir.cdUp();
-        dir.cd(HYGUIPATH_RelSrcDataDir);
-        if(dir.exists() == false)
+        if(!dir.exists(HYGUIPATH_RelDataAtlasDir))
             return false;
         
-        dir.cdUp();
-        dir.cd(HYGUIPATH_RelMetaDataDir);
-        if(dir.exists() == false)
+        if(!dir.exists(HYGUIPATH_RelMetaDataDir))
+            return false;
+        
+        if(!dir.exists(HYGUIPATH_RelMetaDataAtlasDir))
+            return false;
+
+        if(!dir.exists(HYGUIPATH_RelSrcDataDir))
             return false;
         
         return true;

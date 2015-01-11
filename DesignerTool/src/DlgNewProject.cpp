@@ -33,19 +33,30 @@ QString DlgNewProject::GetProjPath()
 
 void DlgNewProject::on_buttonBox_accepted()
 {
+    // Create workspace file tree
     QDir projDir(ui->txtGameLocation->text());
+    
     projDir.mkdir(ui->txtGameTitle->text());
-
     projDir.cd(ui->txtGameTitle->text());
-    projDir.mkdir(QString(HYGUIPATH_RelDataDir));
-    projDir.mkdir(QString(HYGUIPATH_RelMetaDataDir));
-    projDir.mkdir(QString(HYGUIPATH_RelSrcDataDir));
+    
+    projDir.mkdir(HYGUIPATH_RelDataDir);
+    projDir.mkdir(HYGUIPATH_RelDataAtlasDir);
+    projDir.mkdir(HYGUIPATH_RelMetaDataDir);
+    projDir.mkdir(HYGUIPATH_RelMetaDataAtlasDir);
+    
+    // TODO: Create code projects
+    projDir.mkdir(HYGUIPATH_RelSrcDataDir);
 
     projDir.cd(HYGUIPATH_RelDataDir);
     
     QStringList dirList = HyGlobal::SubDirNameList();
     foreach(QString sDir, dirList)
         projDir.mkdir(sDir);
+    
+    projDir.cd(ui->txtGameLocation->text());
+    projDir.cd(ui->txtGameTitle->text());
+    if(HyGlobal::IsWorkspaceValid(projDir) == false)
+        HYLOG("DlgNewProject generated an invalid workspace", LOGTYPE_Error);
 }
 
 void DlgNewProject::on_btnBrowse_clicked()
