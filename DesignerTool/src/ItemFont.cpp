@@ -1,6 +1,6 @@
 #include "ItemFont.h"
 
-ItemFont::ItemFont()
+ItemFont::ItemFont(const QString sPath) : Item(ITEM_Font, sPath)
 {
 }
 

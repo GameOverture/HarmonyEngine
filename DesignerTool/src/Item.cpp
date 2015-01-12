@@ -4,14 +4,15 @@
 
 #include <QFileInfo>
 
-Item::Item() :  m_eType(ITEM_Unknown),
+Item::Item(eItemType eType, const QString sPath) :  m_eType(ITEM_Unknown),
                 m_pTreeItemPtr(NULL)
 {
+    Initialize(eType, sPath);
 }
 
 Item::Item(const Item &other)
 {
-    Set(other.GetType(), other.GetPath());
+    Initialize(other.GetType(), other.GetPath());
 }
 
 Item::~Item()
@@ -21,7 +22,7 @@ Item::~Item()
     delete m_pTreeItemPtr;
 }
 
-void Item::Set(eItemType eType, const QString sPath)
+void Item::Initialize(eItemType eType, const QString sPath)
 {
     m_eType = eType;
     

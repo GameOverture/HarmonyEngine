@@ -1,7 +1,8 @@
 #include "ItemProject.h"
 #include "WidgetAtlas.h"
 
-ItemProject::ItemProject() : m_eState(DRAWSTATE_AtlasManager)
+ItemProject::ItemProject(const QString sPath) : Item(ITEM_Project, sPath),
+                                                m_eState(DRAWSTATE_AtlasManager)
 {
     m_pAtlases = new WidgetAtlas(this);
 }

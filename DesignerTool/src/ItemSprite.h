@@ -11,7 +11,7 @@ class ItemSprite : public Item
     HyPrimitive2d       m_primOriginHorz;
     HyPrimitive2d       m_primOriginVert;
     
-    ItemSprite();
+    ItemSprite(const QString sPath);
     
 protected:
     

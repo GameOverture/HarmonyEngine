@@ -8,6 +8,8 @@ class WidgetAtlas;
 
 class ItemProject : public Item
 {
+    friend class WidgetExplorer;
+    
     WidgetAtlas *       m_pAtlases;
     HyPrimitive2d       m_CurAtlas;
     
@@ -17,12 +19,10 @@ class ItemProject : public Item
     };
     eDrawState          m_eState;
     
-public:
-    ItemProject();
-    ~ItemProject();
+    ItemProject(const QString sPath);
     
-    QString GetDataPath() const         { return GetPath() % HYGUIPATH_RelDataDir; }
-    QString GetMetaDataPath() const     { return GetPath() % HYGUIPATH_RelMetaDataDir; }
+public:
+    ~ItemProject();
     
     WidgetAtlas *GetAtlasWidget()       { return m_pAtlases; }
     

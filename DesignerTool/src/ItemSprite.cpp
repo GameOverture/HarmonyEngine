@@ -1,10 +1,8 @@
 #include "ItemSprite.h"
 
 
-ItemSprite::ItemSprite() : Item()
+ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
 {
-    m_eType = ITEM_Sprite;
-    
     vec2 vLinePts[2];
     
     vLinePts[0].x = -2048.0f;

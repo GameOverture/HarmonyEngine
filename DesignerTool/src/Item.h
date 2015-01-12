@@ -18,12 +18,12 @@ protected:
     
     QTreeWidgetItem *   m_pTreeItemPtr;
     
-    Item();
+    Item(eItemType eType, const QString sPath);
     Item(const Item &other);
     ~Item();
     
 public:
-    void Set(eItemType eType, const QString sPath);
+    virtual void Initialize(eItemType eType, const QString sPath);
     
     eItemType GetType() const                       { return m_eType; }
     QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
