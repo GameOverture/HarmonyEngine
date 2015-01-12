@@ -18,7 +18,6 @@ class HyGuiTexture
     QDir                    m_DataDir;
     
     QFileInfo               m_AtlasImg;
-    QFileInfo               m_AtlasTxt;
     
     ImagePacker             m_Packer;
     QTreeWidgetItem *       m_pTreeItem;

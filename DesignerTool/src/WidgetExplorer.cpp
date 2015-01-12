@@ -40,7 +40,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     switch(eNewItemType)
     {
     case ITEM_Project:
-        pItem = new ItemProject();
+        pItem = new ItemProject(sNewItemPath);
         break;
     case ITEM_DirAudio:
     case ITEM_DirFonts:
@@ -48,19 +48,19 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     case ITEM_DirSpine:
     case ITEM_DirSprites:
     case ITEM_Prefix:
-        pItem = new Item();
+        pItem = new Item(eNewItemType, sNewItemPath);
         break;
     case ITEM_Sprite:
-        pItem = new ItemSprite();
+        pItem = new ItemSprite(sNewItemPath);
         break;
     case ITEM_Font:
-        pItem = new ItemFont();
+        pItem = new ItemFont(sNewItemPath);
         break;
     default:
         HYLOG("Item: " % sNewItemPath % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
         return;
     }
-    pItem->Set(eNewItemType, sNewItemPath);
+    pItem->Initialize(eNewItemType, sNewItemPath);
     
     if(pItem->GetType() == ITEM_Project)
     {
@@ -79,8 +79,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         foreach(eItemType eType, subDirList)
         {
             QString sSubDirPath = pItem->GetPath() % HYGUIPATH_RelDataDir % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
-            Item *pSubDirItem = new Item();
-            pSubDirItem->Set(eType, sSubDirPath);
+            Item *pSubDirItem = new Item(eType, sSubDirPath);
             
             QTreeWidgetItem *pSubDirTreeItem = CreateTreeItem(pProjTreeItem, pSubDirItem);
             QTreeWidgetItem *pCurParentTreeItem = pSubDirTreeItem;
@@ -106,8 +105,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
                 Item *pPrefixItem;
                 if(dirIter.fileInfo().isDir())
                 {
-                    pPrefixItem = new Item();
-                    pPrefixItem->Set(ITEM_Prefix, sCurPath);
+                    pPrefixItem = new Item(ITEM_Prefix, sCurPath);
                     pCurParentTreeItem = CreateTreeItem(pCurParentTreeItem, pPrefixItem);
                 }
                 else if(dirIter.fileInfo().isFile())
@@ -124,10 +122,9 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
                     
                     switch(eType)
                     {
-                    case ITEM_Sprite:   pPrefixItem = new ItemSprite(); break;
+                    case ITEM_Sprite:   pPrefixItem = new ItemSprite(sCurPath); break;
                     }
                     
-                    pPrefixItem->Set(eType, sCurPath);
                     CreateTreeItem(pCurParentTreeItem, pPrefixItem);
                 }
             }
@@ -203,8 +200,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
                     //
                     QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetPath() % "/" % sPathSplitList[i];
                     
-                    Item *pPrefixItem = new Item();
-                    pPrefixItem->Set(ITEM_Prefix, sPath);
+                    Item *pPrefixItem = new Item(ITEM_Prefix, sPath);
                     
                     CreateTreeItem(pParentTreeItem, pPrefixItem);
                 }

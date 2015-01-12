@@ -79,6 +79,8 @@ private slots:
     
     void on_btnSaveSettings_clicked();
     
+    void on_btnChangeSettings_clicked();
+    
 private:
     Ui::WidgetAtlas *ui;
     
@@ -88,7 +90,7 @@ private:
     HyGuiTexture *GetActiveTexture();
     void GenTextureSheets();
     
-    void ImportFrames();
+    void ImportFrames(QStringList sImportImgList);
     void RepackFrames();
 };
 

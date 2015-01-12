@@ -20,8 +20,8 @@ HyGuiTexture::HyGuiTexture(WidgetAtlas *const pAtlasOwner) :    m_pAtlasOwner(pA
 {
     m_pAtlasOwner->SetPackerSettings(&m_Packer);
     
-    m_MetaDir.setPath(pAtlasOwner->GetProjOwner()->GetMetaDataPath() % "atlas/");
-    m_DataDir.setPath(pAtlasOwner->GetProjOwner()->GetDataPath() % "atlas/");
+    m_MetaDir.setPath(pAtlasOwner->GetProjOwner()->GetPath() % HYGUIPATH_RelMetaDataAtlasDir);
+    m_DataDir.setPath(pAtlasOwner->GetProjOwner()->GetPath() % HYGUIPATH_RelDataAtlasDir);
     
     // All textures are named "00000", "00001", "00002", etc. and will be in order
     QStringList sFilters;
@@ -37,8 +37,7 @@ HyGuiTexture::HyGuiTexture(WidgetAtlas *const pAtlasOwner) :    m_pAtlasOwner(pA
     }
     sNewTexName.sprintf("%05d", iTexId);
     
-    m_AtlasImg.setFile(m_DataDir.path() % sNewTextName % ".png");
-    m_AtlasTxt.setFile(m_DataDir.path() % sNewTextName % ".atlas");
+    m_AtlasImg.setFile(m_DataDir.path() % "/" % sNewTexName % ".png");
     
     m_pTreeItem = m_pAtlasOwner->CreateTreeItem(NULL, sNewTexName, ATLAS_Texture);
 }
@@ -80,7 +79,7 @@ void HyGuiTexture::GenerateImg()
     
     if(m_Packer.bins.size() == 0)
     {
-        imgTexture.save(m_AtlasImg.path());
+        imgTexture.save(m_AtlasImg.absoluteFilePath());
         return;
     }
     
@@ -107,36 +106,7 @@ void HyGuiTexture::GenerateImg()
         p.drawImage(imgInfoRef.pos, imgFrame);
     }
     
-    imgTexture.save(m_AtlasImg.path());
-}
-
-void HyGuiTexture::LoadTxt()
-{
-    QString sFileContents;
-    
-    QFile file;
-    file.setFileName(m_AtlasTxt.path());
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    sFileContents = file.readAll();
-    file.close();
-    
-    //qWarning() << sFileContents;
-    QJsonDocument d = QJsonDocument::fromJson(sFileContents.toUtf8());
-//    QJsonObject sett2 = d.object();
-//    QJsonValue value = sett2.value(QString("appName"));
-//    qWarning() << value;
-//    QJsonObject item = value.toObject();
-//    qWarning() << tr("QJsonObject of description: ") << item;
-    
-//    /* incase of string value get value and convert into string*/
-//    qWarning() << tr("QJsonObject[appName] of description: ") << item["description"];
-//    QJsonValue subobj = item["description"];
-//    qWarning() << subobj.toString();
-    
-//    /* incase of array get array and convert into string*/
-//    qWarning() << tr("QJsonObject[appName] of value: ") << item["imp"];
-//    QJsonArray test = item["imp"].toArray();
-//    qWarning() << test[1].toString();
+    imgTexture.save(m_AtlasImg.absoluteFilePath());
 }
 
 // Returns a list of string lists that contain all the image paths that didn't fit on this texture
@@ -163,7 +133,7 @@ QList<QStringList> HyGuiTexture::ImportImgs(const QStringList sImportList)
         sFileName.replace(QChar('{'), "");
         sFileName.replace(QChar('}'), "");
         sFileName += ("." % fileInfo.suffix());
-        sPath = m_MetaDir.path() % sFileName;
+        sPath = m_MetaDir.path() % "/" % sFileName;
         img.save(sPath);
         
         // TODO: Delete pData somewhere

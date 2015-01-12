@@ -48,11 +48,11 @@ enum eAtlasNodeType
 #define HYGUIPATH_RelMetaDataDir "_metaData/"
 #define HYGUIPATH_RelSrcDataDir "src/"
 
-
 #define HYGUIPATH_RelDataAtlasDir HYGUIPATH_RelDataDir "Atlas/"
-#define HYGUIPATH_RelDataAtlasFile HYGUIPATH_RelDataDir "/atlasInfo.json"
+#define HYGUIPATH_RelDataAtlasFile HYGUIPATH_RelDataAtlasDir "atlasInfo.json"
+
 #define HYGUIPATH_RelMetaDataAtlasDir HYGUIPATH_RelMetaDataDir "atlas/"
-#define HYGUIPATH_RelMetaDataAtlasFile HYGUIPATH_RelMetaDataAtlasDir "/settings.hygui"
+#define HYGUIPATH_RelMetaDataAtlasFile HYGUIPATH_RelMetaDataAtlasDir "settings.hygui"
 
 class HyGlobal
 {

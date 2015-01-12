@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QByteArray>
 
 #include "HyGuiTexture.h"
 
@@ -28,8 +29,8 @@ WidgetAtlas::WidgetAtlas(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :    
 {
     ui->setupUi(this);
     
-    m_DataFile.setFile(m_pProjOwner->GetDataPath() % HYGUIPATH_RelDataAtlasFile);
-    m_MetaDataFile.setFile(m_pProjOwner->GetMetaDataPath() % HYGUIPATH_RelMetaDataAtlasFile);
+    m_DataFile.setFile(m_pProjOwner->GetPath() % HYGUIPATH_RelDataAtlasFile);
+    m_MetaDataFile.setFile(m_pProjOwner->GetPath() % HYGUIPATH_RelMetaDataAtlasFile);
     
     // Search for packer settings file. If none exist create one with defaults and show settings page, else load setting from it and show frames page.
     if(m_MetaDataFile.exists() == false)
@@ -263,7 +264,9 @@ QTreeWidgetItem *WidgetAtlas::CreateTreeItem(QTreeWidgetItem *pParent, QString s
 
 void WidgetAtlas::on_btnSaveSettings_clicked()
 {
-    if(m_bSettingsDirty && m_Textures.size() != 0 && m_Textures[0]->GetTreeItem()->childCount() != 0)
+    if(m_Textures.size() == 0)
+        SaveSettings();
+    else if(m_bSettingsDirty)
     {
         QMessageBox dlg(QMessageBox::Question, "Harmony Designer Tool", "Atlas texture settings have changed. Would you like to save settings and regenerate all textures?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
         switch(dlg.exec())
@@ -290,15 +293,20 @@ void WidgetAtlas::on_btnSaveSettings_clicked()
     m_bSettingsDirty = false;
 }
 
+void WidgetAtlas::on_btnChangeSettings_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(PAGE_Settings);
+}
+
 void WidgetAtlas::LoadSettings()
 {
-    QFile file(m_MetaDataFile.path());
+    QFile file(m_MetaDataFile.absoluteFilePath());
     if(file.open(QIODevice::ReadOnly) == false)
     {
         HYLOG("Could not open atlas settings file for reading", LOGTYPE_Error);
         return;
     }
-    QByteData data = file.readAll();
+    QByteArray data = file.readAll();
     QJsonDocument doc = QJsonDocument::fromBinaryData(data);
     file.close();
     
@@ -314,31 +322,46 @@ void WidgetAtlas::LoadSettings()
     ui->chkAutosize->setChecked(settings["chkAutosize"].toBool());
     ui->minFillRate->setValue(settings["minFillRate"].toInt());
     ui->cmbRotationStrategy->setCurrentIndex(settings["cmbRotationStrategy"].toInt());
+    
+    ui->sbTextureWidth->setValue(settings["sbTextureWidth"].toInt());
+    ui->sbTextureHeight->setValue(settings["sbTextureHeight"].toInt());
+    ui->cmbHeuristic->setCurrentIndex(settings["cmbHeuristic"].toInt());
 }
 
 void WidgetAtlas::SaveSettings()
 {
     QJsonObject settings;
-    settings.insert("cmbSortOrder", QJsonValue(ui->cmbSortOrder->currentIndex());
-    settings.insert("sbFrameMarginTop", QJsonValue(ui->sbFrameMarginTop->value());
-    settings.insert("sbFrameMarginLeft", QJsonValue(ui->sbFrameMarginLeft->value());
-    settings.insert("sbFrameMarginRight", QJsonValue(ui->sbFrameMarginRight->value());
-    settings.insert("sbFrameMarginBottom", QJsonValue(ui->sbFrameMarginBottom->value());
-    settings.insert("extrude", QJsonValue(ui->extrude->value());
-    settings.insert("chkMerge", QJsonValue(ui->chkMerge->isChecked());
-    settings.insert("chkSquare", QJsonValue(ui->chkSquare->isChecked());
-    settings.insert("chkAutosize", QJsonValue(ui->chkAutosize->isChecked());
-    settings.insert("minFillRate", QJsonValue(ui->minFillRate->value());
-    settings.insert("cmbRotationStrategy", QJsonValue(ui->cmbRotationStrategy->currentIndex());
+    settings.insert("cmbSortOrder", QJsonValue(ui->cmbSortOrder->currentIndex()));
+    settings.insert("sbFrameMarginTop", QJsonValue(ui->sbFrameMarginTop->value()));
+    settings.insert("sbFrameMarginLeft", QJsonValue(ui->sbFrameMarginLeft->value()));
+    settings.insert("sbFrameMarginRight", QJsonValue(ui->sbFrameMarginRight->value()));
+    settings.insert("sbFrameMarginBottom", QJsonValue(ui->sbFrameMarginBottom->value()));
+    settings.insert("extrude", QJsonValue(ui->extrude->value()));
+    settings.insert("chkMerge", QJsonValue(ui->chkMerge->isChecked()));
+    settings.insert("chkSquare", QJsonValue(ui->chkSquare->isChecked()));
+    settings.insert("chkAutosize", QJsonValue(ui->chkAutosize->isChecked()));
+    settings.insert("minFillRate", QJsonValue(ui->minFillRate->value()));
+    settings.insert("cmbRotationStrategy", QJsonValue(ui->cmbRotationStrategy->currentIndex()));
+    
+    settings.insert("sbTextureWidth", QJsonValue(ui->sbTextureWidth->value()));
+    settings.insert("sbTextureHeight", QJsonValue(ui->sbTextureHeight->value()));
+    settings.insert("cmbHeuristic", QJsonValue(ui->cmbHeuristic->currentIndex()));
+    
             
-    QFile file(m_MetaDataFile.path());
-    if(!file.open(QIODevice::WriteOnly))
+    QFile file(m_MetaDataFile.absoluteFilePath());
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
         HYLOG("Couldn't open atlas settings file for writing", LOGTYPE_Error);
         return;
     }
+
     QJsonDocument doc(settings);
-    file.write(doc.toBinaryData());
+    qint64 iBytesWritten = file.write(doc.toBinaryData());
+    if(0 == iBytesWritten || -1 == iBytesWritten)
+    {
+        HYLOG("Could not write to atlas settings file: " % file.errorString(), LOGTYPE_Error);
+        return;
+    }
 }
 
 HyGuiTexture *WidgetAtlas::GetActiveTexture()
@@ -364,17 +387,24 @@ void WidgetAtlas::GenTextureSheets()
         m_Textures[i]->GetFrameList(atlasInfo);
     }
     
-    QFile file(m_DataFile.path());
-    if(!file.open(QIODevice::WriteOnly))
+    QFile file(m_DataFile.absoluteFilePath());
+    if(file.exists())
     {
-        HYLOG("Couldn't open atlas data file for writing", LOGTYPE_Error);
-        return;
+        if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        {
+            HYLOG("Couldn't open atlas data file for writing", LOGTYPE_Error);
+            return;
+        }
     }
     QJsonDocument doc(atlasInfo);
-    file.write(doc.toJson());
+    if(0 == file.write(doc.toJson()))
+    {
+        HYLOG("Could not write to atlas data file", LOGTYPE_Error);
+        return;
+    }
 }
 
-void WidgetAtlas::ImportFrames()
+void WidgetAtlas::ImportFrames(QStringList sImportImgList)
 {
     QList<QStringList> sMissingImgPaths = GetActiveTexture()->ImportImgs(sImportImgList);
     bool bFailedToPack = false;
@@ -408,3 +438,4 @@ void WidgetAtlas::RepackFrames()
         // TODO: handle missing frames
     }
 }
+
