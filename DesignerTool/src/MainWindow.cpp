@@ -67,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     
     
     
-    HYLOG("Recovering previously opened session...", LOGTYPE_Normal);    
+    HYLOG("Recovering previously opened session...", LOGTYPE_Normal);
     //m_Settings.clear();
     LoadSettings();
 }
@@ -136,7 +136,7 @@ void MainWindow::on_actionNewProject_triggered()
 void MainWindow::on_actionOpenProject_triggered()
 {
     DlgOpenProject *pDlg = new DlgOpenProject(this);
-    if(pDlg->Exec() == QDialog::Accepted)
+    if(pDlg->exec() == QDialog::Accepted)
     {
         ui->explorer->AddItem(ITEM_Project, pDlg->SelectedDir(), true);
     }

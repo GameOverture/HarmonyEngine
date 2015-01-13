@@ -81,7 +81,8 @@ FORMS    += \
     WidgetSprite.ui \
     DlgInputName.ui \
     WidgetLiveVariable.ui \
-    WidgetLiveVarManager.ui
+    WidgetLiveVarManager.ui \
+    DlgOpenProject.ui
 
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER
 

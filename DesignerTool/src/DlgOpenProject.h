@@ -1,26 +1,38 @@
 #ifndef DLGOPENPROJECT_H
 #define DLGOPENPROJECT_H
 
-#include <QFileDialog>
+#include <QDialog>
+#include <QFileSystemModel>
+#include <QShowEvent>
 
-class DlgOpenProject : public QObject
+namespace Ui {
+class DlgOpenProject;
+}
+
+class DlgOpenProject : public QDialog
 {
     Q_OBJECT
     
-    QFileDialog         m_Dlg;
-    
 public:
-    explicit DlgOpenProject(QObject *parent = 0);
+    explicit DlgOpenProject(QWidget *parent = 0);
+    ~DlgOpenProject();
     
-    int Exec();
+    void showEvent(QShowEvent *pEvent);
     
     QString SelectedDir();
     
-signals:
+private slots:
+    void on_treeView_clicked(const QModelIndex &index);
     
-public slots:
-    void dirEntered(const QString &sDir);
+    void on_listView_doubleClicked(const QModelIndex &index);
     
+    void on_txtCurDirectory_editingFinished();
+    
+private:
+    Ui::DlgOpenProject *ui;
+    
+    QFileSystemModel *m_pDirModel;
+    QFileSystemModel *m_pFileModel;
 };
 
 #endif // DLGOPENPROJECT_H

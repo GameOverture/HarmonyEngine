@@ -1,36 +1,70 @@
 #include "DlgOpenProject.h"
+#include "ui_DlgOpenProject.h"
 
-#include "HyGlobal.h"
 
-DlgOpenProject::DlgOpenProject(QObject *parent) : QObject(parent)
+
+DlgOpenProject::DlgOpenProject(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::DlgOpenProject)
 {
-    m_Dlg.setFileMode(QFileDialog::Directory);
-    m_Dlg.setOption(QFileDialog::ShowDirsOnly, true);
-
-    m_Dlg.setViewMode(QFileDialog::Detail);
-    m_Dlg.setWindowModality(Qt::ApplicationModal);
-    m_Dlg.setModal(true);
+    ui->setupUi(this);
     
-    //m_Dlg.setAcceptMode(
+    QString sTempDir = "C:/soft";
     
-    connect(&m_Dlg, SIGNAL(directoryEntered(QString)), this, SLOT(dirEntered(QString)));
+    m_pDirModel = new QFileSystemModel(this);
+    m_pDirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
+    m_pDirModel->setRootPath(QDir::currentPath());
+    
+    ui->treeView->setModel(m_pDirModel);
+    
+    m_pFileModel = new QFileSystemModel(this);
+    m_pFileModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
+    m_pFileModel->setRootPath(QDir::currentPath());
+    
+    ui->listView->setModel(m_pFileModel);
 }
 
-int DlgOpenProject::Exec()
+DlgOpenProject::~DlgOpenProject()
 {
-    return m_Dlg.exec();
+    delete ui;
+}
+
+void DlgOpenProject::showEvent(QShowEvent *pEvent)
+{
+    QDialog::showEvent(pEvent);
+    if(pEvent->spontaneous())
+        return;
+
+    ui->treeView->setColumnWidth(0, ui->treeView->width());
 }
 
 QString DlgOpenProject::SelectedDir()
 {
-    return m_Dlg.selectedFiles()[0];
+    return ui->txtCurDirectory->text();
 }
 
-void DlgOpenProject::dirEntered(const QString &sDir)
+void DlgOpenProject::on_treeView_clicked(const QModelIndex &index)
 {
-    // TODO: none of this works because QFileDialog can't update once opened.
-    if(HyGlobal::IsWorkspaceValid(sDir))
-        m_Dlg.setLabelText(QFileDialog::Accept, QString("Valid Project!"));
-    else
-        m_Dlg.setLabelText(QFileDialog::Accept, QString("Invalid"));
+    QString sPath = m_pDirModel->fileInfo(index).absoluteFilePath();
+    ui->listView->setRootIndex(m_pFileModel->setRootPath(sPath));
+    
+    ui->txtCurDirectory->setText(sPath);
+}
+
+void DlgOpenProject::on_listView_doubleClicked(const QModelIndex &index)
+{
+    QString sPath = m_pFileModel->fileInfo(index).absoluteFilePath();
+    
+    ui->listView->setRootIndex(index);
+    ui->treeView->setSelectionModel(ui->listView->selectionModel());// setRootIndex(m_pDirModel->setRootPath(sPath));
+    
+    ui->txtCurDirectory->setText(sPath);
+}
+
+void DlgOpenProject::on_txtCurDirectory_editingFinished()
+{
+    QString sPath = ui->txtCurDirectory->text();// m_pDirModel->fileInfo(index).absoluteFilePath();
+    ui->listView->setRootIndex(m_pFileModel->setRootPath(sPath));
+    
+    //ui->txtCurDirectory->setText(sPath);
 }
