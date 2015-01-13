@@ -40,10 +40,12 @@ private:
     
     QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, Item *pItem);
     
+    QTreeWidgetItem *GetSelectedTreeItem();
+    
 private slots:
     void OnContextMenu(const QPoint &pos);
-    void on_treeWidget_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *);
     void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_treeWidget_itemSelectionChanged();
 };
 
 #endif // WIDGETEXPLORER_H

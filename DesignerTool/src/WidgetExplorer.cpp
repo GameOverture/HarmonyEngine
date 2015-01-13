@@ -287,6 +287,15 @@ QTreeWidgetItem *WidgetExplorer::CreateTreeItem(QTreeWidgetItem *pParent, Item *
     return pNewTreeItem;
 }
 
+QTreeWidgetItem *WidgetExplorer::GetSelectedTreeItem()
+{
+    QTreeWidgetItem *pCurSelected = NULL;
+    if(ui->treeWidget->selectedItems().empty() == false)
+        pCurSelected = ui->treeWidget->selectedItems()[0];  // Only single selection is allowed in explorer
+    
+    return pCurSelected;
+}
+
 QStringList WidgetExplorer::GetOpenProjectPaths()
 {
     QStringList sListOpenProjs;
@@ -303,7 +312,7 @@ QStringList WidgetExplorer::GetOpenProjectPaths()
 
 ItemProject *WidgetExplorer::GetCurProjSelected()
 {
-    QTreeWidgetItem *pCurProjItem = ui->treeWidget->currentItem();
+    QTreeWidgetItem *pCurProjItem = GetSelectedTreeItem();
     if(pCurProjItem == NULL)
         return NULL;
     
@@ -316,7 +325,7 @@ ItemProject *WidgetExplorer::GetCurProjSelected()
 
 Item *WidgetExplorer::GetCurItemSelected()
 {
-    QTreeWidgetItem *pCurItem = ui->treeWidget->currentItem();
+    QTreeWidgetItem *pCurItem = GetSelectedTreeItem();
     if(pCurItem == NULL)
         return NULL;
     
@@ -326,7 +335,7 @@ Item *WidgetExplorer::GetCurItemSelected()
 
 Item *WidgetExplorer::GetCurDirSelected(bool bIncludePrefixDirs)
 {
-    QTreeWidgetItem *pCurTreeItem = ui->treeWidget->currentItem();
+    QTreeWidgetItem *pCurTreeItem = GetSelectedTreeItem();
     if(pCurTreeItem == NULL)
         return NULL;
     
@@ -384,31 +393,6 @@ void WidgetExplorer::OnContextMenu(const QPoint &pos)
     }
 }
 
-void WidgetExplorer::on_treeWidget_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *)
-{
-    bool bValidItem = (current != NULL);
-    FINDACTION("actionCloseProject")->setEnabled(bValidItem);
-    FINDACTION("actionNewAudio")->setEnabled(bValidItem);
-    FINDACTION("actionNewParticle")->setEnabled(bValidItem);
-    FINDACTION("actionNewFont")->setEnabled(bValidItem);
-    FINDACTION("actionNewSprite")->setEnabled(bValidItem);
-    FINDACTION("actionNewParticle")->setEnabled(bValidItem);
-    FINDACTION("actionNewAudio")->setEnabled(bValidItem);
-    
-    if(bValidItem)
-    {
-        bValidItem = false;
-        
-        Item *pItemDir = GetCurDirSelected(false);
-        bValidItem = pItemDir->GetType() == ITEM_DirSprites || pItemDir->GetType() == ITEM_DirFonts;
-    }
-    
-    MainWindow::SetSelectedProj(GetCurProjSelected());
-
-    // QVariant v = current->data(0, Qt::UserRole);
-    // Item *pItemVariant = v.value<Item *>();
-}
-
 void WidgetExplorer::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     // setCurrentItem() required if this function is manually invoked. E.g. AddItem()
@@ -440,4 +424,31 @@ void WidgetExplorer::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int 
         MainWindow::OpenItem(pTreeVariantItem);
         break;
     }
+}
+
+void WidgetExplorer::on_treeWidget_itemSelectionChanged()
+{
+    QTreeWidgetItem *pCurSelected = GetSelectedTreeItem();
+    
+    bool bValidItem = (pCurSelected != NULL);
+    FINDACTION("actionCloseProject")->setEnabled(bValidItem);
+    FINDACTION("actionNewAudio")->setEnabled(bValidItem);
+    FINDACTION("actionNewParticle")->setEnabled(bValidItem);
+    FINDACTION("actionNewFont")->setEnabled(bValidItem);
+    FINDACTION("actionNewSprite")->setEnabled(bValidItem);
+    FINDACTION("actionNewParticle")->setEnabled(bValidItem);
+    FINDACTION("actionNewAudio")->setEnabled(bValidItem);
+    
+    if(bValidItem)
+    {
+        bValidItem = false;
+        
+        Item *pItemDir = GetCurDirSelected(false);
+        bValidItem = pItemDir->GetType() == ITEM_DirSprites || pItemDir->GetType() == ITEM_DirFonts;
+    }
+    
+    MainWindow::SetSelectedProj(GetCurProjSelected());
+
+    // QVariant v = current->data(0, Qt::UserRole);
+    // Item *pItemVariant = v.value<Item *>();
 }
