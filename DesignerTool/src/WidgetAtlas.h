@@ -46,6 +46,8 @@ public:
     int GetTexHeight();
     int GetHeuristicIndex();
     
+    int GetNextTextureId();
+    
     QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType);
     
 private slots:

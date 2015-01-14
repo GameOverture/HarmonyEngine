@@ -23,22 +23,15 @@ HyGuiTexture::HyGuiTexture(WidgetAtlas *const pAtlasOwner) :    m_pAtlasOwner(pA
     m_MetaDir.setPath(pAtlasOwner->GetProjOwner()->GetPath() % HYGUIPATH_RelMetaDataAtlasDir);
     m_DataDir.setPath(pAtlasOwner->GetProjOwner()->GetPath() % HYGUIPATH_RelDataAtlasDir);
     
-    // All textures are named "00000", "00001", "00002", etc. and will be in order
-    QStringList sFilters;
-    sFilters << "*.png";
-    QFileInfoList list = m_DataDir.entryInfoList(sFilters, QDir::Files, QDir::Name);
+    
+    // All textures are named "00000", "00001", "00002", etc.
+    int iTexId = pAtlasOwner->GetNextTextureId();
     
     QString sNewTexName;
-    int iTexId = 0;
-    if(list.count() > 0)
-    {
-        sNewTexName = list[list.count() - 1].baseName();
-        iTexId = sNewTexName.toInt() + 1;  // + 1 will create new dir, following existing order
-    }
     sNewTexName.sprintf("%05d", iTexId);
-    
     m_AtlasImg.setFile(m_DataDir.path() % "/" % sNewTexName % ".png");
     
+    sNewTexName.sprintf("Texture: %d", iTexId);
     m_pTreeItem = m_pAtlasOwner->CreateTreeItem(NULL, sNewTexName, ATLAS_Texture);
 }
 
@@ -90,6 +83,26 @@ void HyGuiTexture::GenerateImg()
     {
         inputImage &imgInfoRef = m_Packer.images[i];
         
+        if(imgInfoRef.duplicateId != NULL && m_Packer.merge)
+        {
+            continue;
+        }
+        
+        QSize size;
+        QRect crop;
+        QPoint pos(imgInfoRef.pos.x() + m_Packer.border.l, imgInfoRef.pos.y() + m_Packer.border.t);
+        
+        if(!m_Packer.cropThreshold)
+        {
+            size = imgInfoRef.size;
+            crop = QRect(0, 0, size.width(), size.height());
+        }
+        else
+        {
+            size = imgInfoRef.crop.size();
+            crop = imgInfoRef.crop;
+        }
+        
         HyGuiFrameData *pFrameData = reinterpret_cast<HyGuiFrameData *>(imgInfoRef.id);
         QImage imgFrame(pFrameData->GetPath());
         
@@ -99,11 +112,56 @@ void HyGuiTexture::GenerateImg()
             rotateTransform.rotate(90);
             imgFrame = imgFrame.transformed(rotateTransform);
             
-            //size.transpose();
-            //crop = QRect(packer.images.at(i).size.height() - crop.y() - crop.height(), crop.x(), crop.height(), crop.width());
+            size.transpose();
+            crop = QRect(imgInfoRef.size.height() - crop.y() - crop.height(),
+                         crop.x(), crop.height(), crop.width());
         }
         
-        p.drawImage(imgInfoRef.pos, imgFrame);
+        if(m_Packer.extrude)
+        {
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            QColor color1 = QColor::fromRgba(imgFrame.pixel(crop.x(), crop.y()));
+            p.setPen(color1);
+            p.setBrush(color1);
+            if(m_Packer.extrude == 1)
+                p.drawPoint(QPoint(pos.x(), pos.y()));
+            else
+                p.drawRect(QRect(pos.x(), pos.y(), m_Packer.extrude - 1, m_Packer.extrude - 1));
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            QColor color2 = QColor::fromRgba(imgFrame.pixel(crop.x(), crop.y() + crop.height() - 1));
+            p.setPen(color2);
+            p.setBrush(color2);
+            if(m_Packer.extrude == 1)
+                p.drawPoint(QPoint(pos.x(), pos.y() + crop.height() + m_Packer.extrude));
+            else
+                p.drawRect(QRect(pos.x(), pos.y() + crop.height() + m_Packer.extrude, m_Packer.extrude - 1, m_Packer.extrude - 1));
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            QColor color3 = QColor::fromRgba(imgFrame.pixel(crop.x() + crop.width() - 1, crop.y()));
+            p.setPen(color3);
+            p.setBrush(color3);
+            if(m_Packer.extrude == 1)
+                p.drawPoint(QPoint(pos.x() + crop.width() + m_Packer.extrude, pos.y()));
+            else
+                p.drawRect(QRect(pos.x() + crop.width() + m_Packer.extrude, pos.y(), m_Packer.extrude - 1, m_Packer.extrude - 1));
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            QColor color4 = QColor::fromRgba(imgFrame.pixel(crop.x() + crop.width() - 1, crop.y() + crop.height() - 1));
+            p.setPen(color4);
+            p.setBrush(color4);
+            if(m_Packer.extrude == 1)
+                p.drawPoint(QPoint(pos.x() + crop.width() + m_Packer.extrude, pos.y() + crop.height() + m_Packer.extrude));
+            else
+                p.drawRect(QRect(pos.x() + crop.width() + m_Packer.extrude, pos.y() + crop.height() + m_Packer.extrude, m_Packer.extrude - 1, m_Packer.extrude - 1));
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            
+            p.drawImage(QRect(pos.x(), pos.y() + m_Packer.extrude, m_Packer.extrude, crop.height()), imgFrame, QRect(crop.x(), crop.y(), 1, crop.height()));
+            p.drawImage(QRect(pos.x() + crop.width() + m_Packer.extrude, pos.y() + m_Packer.extrude, m_Packer.extrude, crop.height()), imgFrame, QRect(crop.x() + crop.width() - 1, crop.y(), 1, crop.height()));
+            p.drawImage(QRect(pos.x() + m_Packer.extrude, pos.y(), crop.width(), m_Packer.extrude), imgFrame, QRect(crop.x(), crop.y(), crop.width(), 1));
+            p.drawImage(QRect(pos.x() + m_Packer.extrude, pos.y() + crop.height() + m_Packer.extrude, crop.width(), m_Packer.extrude), imgFrame, QRect(crop.x(), crop.y() + crop.height() - 1, crop.width(), 1));
+
+            p.drawImage(pos.x() + m_Packer.extrude, pos.y() + m_Packer.extrude, imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
+        }
+        else
+            p.drawImage(pos.x(), pos.y(), imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
     }
     
     imgTexture.save(m_AtlasImg.absoluteFilePath());
@@ -174,8 +232,12 @@ QList<QStringList> HyGuiTexture::ImportImgs(const QStringList sImportList)
             m_Packer.removeId(framesToRemove[i]);
             
             HyGuiFrameData *pData = framesToRemove[i];
+            
+            // Delete the metadata image sitting on disk
+            if(QFile::remove(pData->GetPath()) == false)
+                HYLOG("Could not remove metafile: " % pData->GetPath(), LOGTYPE_Warning);
+            
             delete pData;
-            // TODO: Delete the metadata image sitting on disk
         }
     }
     

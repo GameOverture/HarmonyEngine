@@ -89,6 +89,11 @@ int WidgetAtlas::GetHeuristicIndex()
     return ui->cmbHeuristic->currentIndex();
 }
 
+int WidgetAtlas::GetNextTextureId()
+{
+    return ui->frameList->topLevelItemCount();
+}
+
 void WidgetAtlas::on_btnTexSize256_clicked()
 {
     ui->sbTextureWidth->setValue(256);
