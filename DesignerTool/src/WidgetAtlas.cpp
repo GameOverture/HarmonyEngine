@@ -352,6 +352,18 @@ void WidgetAtlas::SaveSettings()
     settings.insert("sbTextureHeight", QJsonValue(ui->sbTextureHeight->value()));
     settings.insert("cmbHeuristic", QJsonValue(ui->cmbHeuristic->currentIndex()));
     
+    QJsonArray frameNames;
+    for(int i = 0; i < ui->frameList->topLevelItemCount(); ++i)
+    {
+        QTreeWidgetItem *pTexItem = ui->frameList->topLevelItem(i);
+        for(int j = 0; j < pTexItem->childCount(); ++j)
+        {
+            QTreeWidgetItem *pFrameItem = pTexItem->child(j);
+        }
+    }
+    frameNames
+    settings.insert("frameNames", QJsonValue(
+    
             
     QFile file(m_MetaDataFile.absoluteFilePath());
     if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
