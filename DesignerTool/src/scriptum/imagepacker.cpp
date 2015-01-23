@@ -187,47 +187,6 @@ void ImagePacker::pack(int heur, int w, int h)
             }
 }
 
-quint32 rc_crc32(quint32 crc, const uchar *buf, size_t len)
-{
-    static quint32 table[256];
-    static int have_table = 0;
-    quint32 rem, octet;
-    const uchar *p, *q;
-
-    /* This check is not thread safe; there is no mutex. */
-    if(have_table == 0)
-    {
-        /* Calculate CRC table. */
-        for(int i = 0; i < 256; i++)
-        {
-            rem = i;  /* remainder from polynomial division */
-            for(int j = 0; j < 8; j++)
-            {
-                if(rem & 1)
-                {
-                    rem >>= 1;
-                    rem ^= 0xedb88320;
-                }
-                else
-                {
-                    rem >>= 1;
-                }
-            }
-            table[i] = rem;
-        }
-        have_table = 1;
-    }
-
-    crc = ~crc;
-    q = buf + len;
-    for(p = buf; p < q; p++)
-    {
-        octet = *p;  /* Cast to unsigned octet. */
-        crc = (crc >> 8) ^ table[(crc & 0xff) ^ octet];
-    }
-    return ~crc;
-}
-
 void ImagePacker::UpdateCrop()
 {
     for(int i = 0; i < images.size(); ++i)
@@ -236,14 +195,14 @@ void ImagePacker::UpdateCrop()
     }
 }
 
-void ImagePacker::addItem(const QImage &img, void *data, QString path)
+void ImagePacker::addItem(const QImage &img, quint32 uiHash, void *data, QString path)
 {
     inputImage i;
     if(img.width() == 0 || img.height() == 0)
     {
         return;
     }
-    i.hash = rc_crc32(0, img.bits(), img.byteCount());
+    i.hash = uiHash;//rc_crc32(0, img.bits(), img.byteCount());
     i.crop = crop(img);
     i.size = img.size();
     i.id = data;
@@ -251,9 +210,9 @@ void ImagePacker::addItem(const QImage &img, void *data, QString path)
     images << i;
 }
 
-void ImagePacker::addItem(QString path, void *data)
+void ImagePacker::addItem(QString path, quint32 uiHash, void *data)
 {
-    addItem(QImage(path), data, path);
+    addItem(QImage(path), uiHash, data, path);
 }
 
 void ImagePacker::clear()

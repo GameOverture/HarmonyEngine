@@ -48,6 +48,9 @@ public:
     
     int GetNextTextureId();
     
+    // Finds what index (aka ID) the passed-in texture is. Returns -1 if it can't find it
+    int FindTextureId(HyGuiTexture *pTex);
+    
     QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType);
     
 private slots:
@@ -88,9 +91,11 @@ private:
     
     
     void LoadSettings();
+    void LoadData();
     void SaveSettings();
+    void SaveData();
+    
     HyGuiTexture *GetActiveTexture();
-    void GenTextureSheets();
     
     void ImportFrames(QStringList sImportImgList);
     void RepackFrames();

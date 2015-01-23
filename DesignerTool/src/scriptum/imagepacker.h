@@ -65,8 +65,8 @@ class ImagePacker : public QObject
 
         QRect crop(const QImage &img);
         void sort();
-        void addItem(const QImage &img, void *data, QString path);
-        void addItem(QString path, void *data);
+        void addItem(const QImage &img, quint32 uiHash, void *data, QString path);
+        void addItem(QString path, quint32 uiHash, void *data);
         const inputImage *find(void *data);
         void removeId(void *);
         void realculateDuplicates();
