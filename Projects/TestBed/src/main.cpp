@@ -30,7 +30,6 @@ int main(int argc, char **argv)
 	initStruct.uiNumInputMappings = 1;
 
 	TestBed test(initStruct);
-
 	HyEngine::RunGame(test);
 
 	return 0;

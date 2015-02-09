@@ -15,7 +15,7 @@
 
 HyGuiComms *HyGuiComms::sm_pInstance = NULL;
 
-HyGuiComms::HyGuiComms(void)
+HyGuiComms::HyGuiComms(void) : m_pSocket(NULL)
 {
 	HyAssert(sm_pInstance == NULL, "HyGuiComms was instantiated twice");
 	NL::init();
