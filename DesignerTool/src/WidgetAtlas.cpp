@@ -356,41 +356,43 @@ void WidgetAtlas::LoadData()
         return;
     }
     
-//    QFile dataFile(m_DataFile.absoluteFilePath());
-//    if(dataFile.open(QIODevice::ReadOnly))
-//    {
-//        QJsonDocument dataJsonDoc = QJsonDocument::fromJson(dataFile.readAll());
-//        QJsonObject contents = dataJsonDoc.object();
+    QStringList srcFrameImgList = QDir(m_pProjOwner->GetPath() % HYGUIPATH_RelMetaDataAtlasDir).entryList();
+    
+    QFile dataFile(m_DataFile.absoluteFilePath());
+    if(dataFile.open(QIODevice::ReadOnly))
+    {
+        QJsonDocument dataJsonDoc = QJsonDocument::fromJson(dataFile.readAll());
+        QJsonObject contents = dataJsonDoc.object();
         
-//        QJsonArray textureArray = contents["textures"].toArray();
-//        foreach (const QJsonValue &textureInfo, textureArray)
-//        {
-//            QJsonObject srcFrames = textureInfo.toObject()["srcFrames"].toObject();
-//            for(QJsonArray::const_iterator iter = srcFrames.begin(); iter != srcFrames.end(); ++iter)
-//            {
+        QJsonArray textureArray = contents["textures"].toArray();
+        foreach (const QJsonValue &textureInfo, textureArray)
+        {
+            HyGuiTexture *pNewTexture = new HyGuiTexture(this);
+            
+            QJsonArray srcFramesArray = textureInfo.toObject()["srcFrames"].toArray();
+            foreach(const QJsonValue &frameInfo, srcFramesArray)
+            {
+                quint32 uiHash = static_cast<quint32>(frameInfo.toObject()["hash"].toInt());
+                foreach(const QString sImgPath, srcFrameImgList)
+                {
+                    if(uiHash == static_cast<quint32>(sImgPath.left(sImgPath.indexOf(QChar('-'))).toInt()))
+                    {
+                        QString sImgName = sImgPath.right(sImgPath.indexOf(QChar('-')));
+                        pNewTexture->LoadFrame(QImage(sImgPath), uiHash, sImgName, sImgPath);
+                    }
+                }
                 
-//            }
-//        }
-//        {
-//            QJsonObject textureInfo = iter. .reference.toObject();
+            }
             
-//            m_Textures.append(new HyGuiTexture(this));
+            QList<QStringList> unPackedList = pNewTexture->PackFrames();
+            if(unPackedList.empty() == false)
+                HYLOG("Loading an atlas failed to pack properly", LOGTYPE_Error);
             
-            
-//            QStringList frameList;
-//            frameList.append(
-//            QList<QStringList> failedList = m_Textures[textureInfo["id"].toInt()]->ImportFrames(frameList);
-            
-//        }
-        
-//        for(QJsonObject::const_iterator iter = contents.begin(); iter != contents.end(); ++iter)
-//        {
-//            iter.key() iter.value()
-//        }
-//        arrayctns.i
-//    }
-//    else
-//        HYLOG("Could not open: " % m_DataFile.absoluteFilePath(), LOGTYPE_Warning);
+            m_Textures.append(pNewTexture);
+        }
+    }
+    else
+        HYLOG("Could not open: " % m_DataFile.absoluteFilePath(), LOGTYPE_Warning);
 }
 
 void WidgetAtlas::SaveSettings()
@@ -412,22 +414,7 @@ void WidgetAtlas::SaveSettings()
     settings.insert("sbTextureHeight", QJsonValue(ui->sbTextureHeight->value()));
     settings.insert("cmbHeuristic", QJsonValue(ui->cmbHeuristic->currentIndex()));
     
-    QJsonArray frameNames;
-    for(int i = 0; i < m_Textures.size(); ++i)
-    {
-        QMap<QString, QString> frameMap = m_Textures[i]->GetFrameNames();
-        for (QMap<QString, QString>::iterator iter = frameMap.begin(); iter != frameMap.end(); ++iter)
-        {
-            QJsonArray nameEntry;
-            nameEntry.append(QJsonValue(iter.key()));
-            nameEntry.append(QJsonValue(*iter));
-            
-            frameNames.append(nameEntry);
-        }
-    }
-    settings.insert("frameNames", frameNames);
     
-            
     QFile file(m_MetaDataFile.absoluteFilePath());
     if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
@@ -520,7 +507,7 @@ void WidgetAtlas::RepackFrames()
 {
     for(int i = 0; i < m_Textures.size(); ++i)
     {
-        QList<QStringList> missingFrames = m_Textures[i]->RepackFrames();
+        QList<QStringList> missingFrames = m_Textures[i]->PackFrames();
         // TODO: handle missing frames
     }
 }

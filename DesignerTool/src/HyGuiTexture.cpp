@@ -105,19 +105,6 @@ QJsonArray HyGuiTexture::GetFrameArray()
     return frameArray;
 }
 
-QMap<QString, QString> HyGuiTexture::GetFrameNames()
-{
-    QMap<QString, QString> frameMap;
-    for(int i = 0; i < m_Packer.images.size(); ++i)
-    {
-        HyGuiFrameData *pFrameData = static_cast<HyGuiFrameData *>(m_Packer.images[i].id);
-        QFileInfo srcImage(m_Packer.images[i].path);
-        frameMap[srcImage.baseName()] = pFrameData->GetName();
-    }
-    
-    return frameMap;
-}
-
 void HyGuiTexture::GenerateImg()
 {
     m_bDirty = false;
@@ -227,8 +214,6 @@ QList<QStringList> HyGuiTexture::ImportFrames(const QStringList sImportImgPathLi
 {
     m_pAtlasOwner->SetPackerSettings(&m_Packer);
     
-    // TODO: Track packer's missingImages and store them in the returned QList<QStringList>
-    
     // Place all the imported images into this current texture (whether they will all fit or not)
     for(int i = 0; i < sImportImgPathList.size(); ++i)
     {
@@ -238,7 +223,7 @@ QList<QStringList> HyGuiTexture::ImportFrames(const QStringList sImportImgPathLi
         
         // Create unique filename for metadata image (is this overkill (QUuid::createUuid)?), and save it out
         QString sNewMetaImgPath;
-        sNewMetaImgPath = sNewMetaImgPath.sprintf("%010u", uiHash);
+        sNewMetaImgPath = sNewMetaImgPath.sprintf("%010u-%s", uiHash, fileInfo.baseName().toStdString().c_str());
         sNewMetaImgPath += ("." % fileInfo.suffix());
         sNewMetaImgPath = m_MetaDir.path() % "/" % sNewMetaImgPath;
         img.save(sNewMetaImgPath);
@@ -246,6 +231,19 @@ QList<QStringList> HyGuiTexture::ImportFrames(const QStringList sImportImgPathLi
         m_Packer.addItem(img, uiHash, new HyGuiFrameData(this, i, fileInfo.baseName()), sNewMetaImgPath);
     }
 
+    return PackFrames();
+}
+
+void HyGuiTexture::LoadFrame(const QImage &img, quint32 uiHash, QString sName, QString sPath)
+{
+    m_pAtlasOwner->SetPackerSettings(&m_Packer);
+    m_Packer.addItem(img, uiHash, new HyGuiFrameData(this, -1, sName), sPath);
+}
+
+// Returns a list of string lists that contain all the image paths that didn't fit on this texture
+// Each entry in the QList are hints towards what new texture each missing image belongs to.
+QList<QStringList> HyGuiTexture::PackFrames()
+{
     m_Packer.pack(m_pAtlasOwner->GetHeuristicIndex(), m_pAtlasOwner->GetTexWidth(), m_pAtlasOwner->GetTexHeight());
     
     // If number of packer's bins (aka texture sheets) exceed '1', remove them, and store the paths split them into other Texture objects
@@ -289,28 +287,6 @@ QList<QStringList> HyGuiTexture::ImportFrames(const QStringList sImportImgPathLi
     
     m_bDirty = (m_Packer.bins.count() > 0);
     return missingImgPaths;
-}
-
-// Returns a list of string lists that contain all the image paths that didn't fit on this texture
-// Each entry in the QList are hints towards what new texture each missing image belongs to.
-QList<QStringList> HyGuiTexture::RepackFrames()
-{
-    m_bDirty = true;
-    
-    m_Packer.clear();
-    m_pAtlasOwner->SetPackerSettings(&m_Packer);
-    
-    
-//    // Move images to tmp dir
-//    for(int i = 0; i < m_Packer.images.size(); ++i)
-//    {
-//        QFileInfo info(m_Packer.images[i].path);
-//        QString sImgName = reinterpret_cast<HyGuiFrameData *>(m_Packer.images[i].id)->GetName();
-//        QFile::copy(m_Packer.images[i].path, QDir::cleanPath(tmpDir.path() % "/" % sImgName % "." % info.suffix()));
-//    }
-    
-    // TODO: Reimport images but somehow avoid images with same name within tmp directory
-    return QList<QStringList>();
 }
 
 // Finds what texture ID (or index) this texture is and returns it

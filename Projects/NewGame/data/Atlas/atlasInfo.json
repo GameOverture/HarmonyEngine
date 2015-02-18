@@ -1,0 +1,119 @@
+{
+    "numTextures": 2,
+    "textures": [
+        {
+            "id": 0,
+            "srcFrames": [
+                {
+                    "hash": 3434770035,
+                    "height": 720,
+                    "rotated": false,
+                    "width": 1280,
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "hash": 3215832120,
+                    "height": 647,
+                    "rotated": false,
+                    "width": 1280,
+                    "x": 0,
+                    "y": 723
+                },
+                {
+                    "hash": 3741636112,
+                    "height": 200,
+                    "rotated": true,
+                    "width": 979,
+                    "x": 1283,
+                    "y": 0
+                },
+                {
+                    "hash": 3553256708,
+                    "height": 448,
+                    "rotated": false,
+                    "width": 460,
+                    "x": 1486,
+                    "y": 0
+                },
+                {
+                    "hash": 3885649063,
+                    "height": 448,
+                    "rotated": false,
+                    "width": 460,
+                    "x": 1486,
+                    "y": 421
+                },
+                {
+                    "hash": 1837956568,
+                    "height": 448,
+                    "rotated": false,
+                    "width": 460,
+                    "x": 1643,
+                    "y": 838
+                },
+                {
+                    "hash": 3734291258,
+                    "height": 448,
+                    "rotated": false,
+                    "width": 460,
+                    "x": 1643,
+                    "y": 1247
+                },
+                {
+                    "hash": 3857134321,
+                    "height": 448,
+                    "rotated": false,
+                    "width": 460,
+                    "x": 1238,
+                    "y": 1363
+                },
+                {
+                    "hash": 1673274911,
+                    "height": 448,
+                    "rotated": false,
+                    "width": 460,
+                    "x": 836,
+                    "y": 1363
+                },
+                {
+                    "hash": 921127971,
+                    "height": 78,
+                    "rotated": true,
+                    "width": 320,
+                    "x": 1903,
+                    "y": 0
+                },
+                {
+                    "hash": 729586879,
+                    "height": 78,
+                    "rotated": true,
+                    "width": 320,
+                    "x": 1959,
+                    "y": 0
+                },
+                {
+                    "hash": 3274792406,
+                    "height": 78,
+                    "rotated": true,
+                    "width": 320,
+                    "x": 1988,
+                    "y": 275
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "srcFrames": [
+                {
+                    "hash": 1776727906,
+                    "height": 1079,
+                    "rotated": false,
+                    "width": 1076,
+                    "x": 0,
+                    "y": 0
+                }
+            ]
+        }
+    ]
+}

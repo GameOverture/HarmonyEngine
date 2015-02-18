@@ -49,16 +49,17 @@ public:
     // Each entry in the QList are hints towards what new texture each missing image belongs to.
     QList<QStringList> ImportFrames(const QStringList sImportList);
     
+    void LoadFrame(const QImage &img, quint32 uiHash, QString sName, QString sPath);
+    
     // Returns a list of string lists that contain all the image paths that didn't fit on this texture
     // Each entry in the QList are hints towards what new texture each missing image belongs to.
-    QList<QStringList> RepackFrames();
+    QList<QStringList> PackFrames();
     
     WidgetAtlas *const GetAtlasOwner()  { return m_pAtlasOwner; }
     QTreeWidgetItem *GetTreeItem()      { return m_pTreeItem; }
    
     // Generates a texture and atlas file
     QJsonArray GetFrameArray();
-    QMap<QString, QString> GetFrameNames();
     void GenerateImg();
     
     // Finds what texture ID (or index) this texture is and returns it
