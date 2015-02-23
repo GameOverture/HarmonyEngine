@@ -327,20 +327,20 @@ void WidgetAtlas::LoadSettings()
     file.close();
     
     QJsonObject settings = doc.object();
-    ui->cmbSortOrder->setCurrentIndex(settings["cmbSortOrder"].toInt());
-    ui->sbFrameMarginTop->setValue(settings["sbFrameMarginTop"].toInt());
-    ui->sbFrameMarginLeft->setValue(settings["sbFrameMarginLeft"].toInt());
-    ui->sbFrameMarginRight->setValue(settings["sbFrameMarginRight"].toInt());
-    ui->sbFrameMarginBottom->setValue(settings["sbFrameMarginBottom"].toInt());
-    ui->extrude->setValue(settings["extrude"].toInt());
+    ui->cmbSortOrder->setCurrentIndex(JSONOBJ_TOINT(settings, "cmbSortOrder"));
+    ui->sbFrameMarginTop->setValue(JSONOBJ_TOINT(settings, "sbFrameMarginTop"));
+    ui->sbFrameMarginLeft->setValue(JSONOBJ_TOINT(settings, "sbFrameMarginLeft"));
+    ui->sbFrameMarginRight->setValue(JSONOBJ_TOINT(settings, "sbFrameMarginRight"));
+    ui->sbFrameMarginBottom->setValue(JSONOBJ_TOINT(settings, "sbFrameMarginBottom"));
+    ui->extrude->setValue(JSONOBJ_TOINT(settings, "extrude"));
     ui->chkMerge->setChecked(settings["chkMerge"].toBool());
     ui->chkSquare->setChecked(settings["chkSquare"].toBool());
     ui->chkAutosize->setChecked(settings["chkAutosize"].toBool());
-    ui->minFillRate->setValue(settings["minFillRate"].toInt());
-    ui->cmbRotationStrategy->setCurrentIndex(settings["cmbRotationStrategy"].toInt());
-    ui->sbTextureWidth->setValue(settings["sbTextureWidth"].toInt());
-    ui->sbTextureHeight->setValue(settings["sbTextureHeight"].toInt());
-    ui->cmbHeuristic->setCurrentIndex(settings["cmbHeuristic"].toInt());
+    ui->minFillRate->setValue(JSONOBJ_TOINT(settings, "minFillRate"));
+    ui->cmbRotationStrategy->setCurrentIndex(JSONOBJ_TOINT(settings, "cmbRotationStrategy"));
+    ui->sbTextureWidth->setValue(JSONOBJ_TOINT(settings, "sbTextureWidth"));
+    ui->sbTextureHeight->setValue(JSONOBJ_TOINT(settings, "sbTextureHeight"));
+    ui->cmbHeuristic->setCurrentIndex(JSONOBJ_TOINT(settings, "cmbHeuristic"));
     
     //
     ui->stackedWidget->setCurrentIndex(PAGE_Frames);
@@ -372,7 +372,7 @@ void WidgetAtlas::LoadData()
             QJsonArray srcFramesArray = textureInfo.toObject()["srcFrames"].toArray();
             foreach(const QJsonValue &frameInfo, srcFramesArray)
             {
-                quint32 uiHash = static_cast<quint32>(frameInfo.toObject()["hash"].toInt());
+                quint32 uiHash = JSONOBJ_TOINT(frameInfo.toObject(), "hash");
                 foreach(const QString sImgPath, srcFrameImgList)
                 {
                     if(uiHash == static_cast<quint32>(sImgPath.left(sImgPath.indexOf(QChar('-'))).toInt()))

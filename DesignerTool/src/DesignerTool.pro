@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = DesignerTool
 TEMPLATE = app
 
+QMAKE_CXXFLAGS += /FS
 
 SOURCES += main.cpp \
     HyApp.cpp \

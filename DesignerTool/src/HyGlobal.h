@@ -192,5 +192,6 @@ QAction *FindAction(QList<QAction *> list, QString sName);
 
 #define HYLOG(msg, type) { QString sHyLogTmpStr = msg; WidgetOutputLog::Log(sHyLogTmpStr, type); }
 
+#define JSONOBJ_TOINT(obj, key) obj.value(key).toVariant().toLongLong()
 
 #endif // HYGLOBALS_H

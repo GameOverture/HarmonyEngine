@@ -92,7 +92,7 @@ QJsonArray HyGuiTexture::GetFrameArray()
         inputImage &imgInfoRef = m_Packer.images[i];
        
         QJsonObject frame;
-        frame.insert("hash", QJsonValue(static_cast<qint64>(imgInfoRef.hash)));
+        frame.insert("hash", QJsonValue(static_cast<qint32>(imgInfoRef.hash)));
         frame["x"] = imgInfoRef.pos.x();
         frame["y"] = imgInfoRef.pos.y();
         frame["width"] = imgInfoRef.size.width();
