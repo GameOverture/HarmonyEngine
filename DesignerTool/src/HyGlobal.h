@@ -44,15 +44,17 @@ enum eAtlasNodeType
     NUMATLAS
 };
 
-#define HYGUIPATH_RelDataDir "data/"
-#define HYGUIPATH_RelMetaDataDir "_metaData/"
-#define HYGUIPATH_RelSrcDataDir "src/"
+#define HYGUIPATH_RelDataDir                "data/"
+#define HYGUIPATH_RelMetaDataDir            "_metaData/"
+#define HYGUIPATH_RelSrcDataDir             "src/"
 
-#define HYGUIPATH_RelDataAtlasDir HYGUIPATH_RelDataDir "Atlas/"
-#define HYGUIPATH_RelDataAtlasFile HYGUIPATH_RelDataAtlasDir "atlasInfo.json"
+#define HYGUIPATH_RelDataAtlasDir           HYGUIPATH_RelDataDir "Atlas/"
+#define HYGUIPATH_RelDataAtlasFile          HYGUIPATH_RelDataAtlasDir "atlasInfo.json"
 
-#define HYGUIPATH_RelMetaDataAtlasDir HYGUIPATH_RelMetaDataDir "atlas/"
-#define HYGUIPATH_RelMetaDataAtlasFile HYGUIPATH_RelMetaDataAtlasDir "settings.hygui"
+#define HYGUIPATH_RelMetaDataTmpDir         HYGUIPATH_RelMetaDataDir "tmp/"
+
+#define HYGUIPATH_RelMetaDataAtlasDir       HYGUIPATH_RelMetaDataDir "atlas/"
+#define HYGUIPATH_RelMetaDataAtlasFile      HYGUIPATH_RelMetaDataAtlasDir "settings.hygui"
 
 class HyGlobal
 {

@@ -30,6 +30,7 @@ class HyGuiTexture
     WidgetAtlas *const      m_pAtlasOwner;
     
     QDir                    m_MetaDir;
+    QDir                    m_MetaTmpDir;
     QDir                    m_DataDir;
     
     QFileInfo               m_AtlasImg;

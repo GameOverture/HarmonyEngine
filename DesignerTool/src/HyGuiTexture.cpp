@@ -61,6 +61,7 @@ HyGuiTexture::HyGuiTexture(WidgetAtlas *const pAtlasOwner) :    m_pAtlasOwner(pA
     m_pAtlasOwner->SetPackerSettings(&m_Packer);
     
     m_MetaDir.setPath(pAtlasOwner->GetProjOwner()->GetPath() % HYGUIPATH_RelMetaDataAtlasDir);
+    m_MetaTmpDir.setPath(pAtlasOwner->GetProjOwner()->GetPath() % HYGUIPATH_RelMetaDataTmpDir);
     m_DataDir.setPath(pAtlasOwner->GetProjOwner()->GetPath() % HYGUIPATH_RelDataAtlasDir);
     
     
@@ -241,7 +242,8 @@ void HyGuiTexture::LoadFrame(const QImage &img, quint32 uiHash, QString sName, Q
 }
 
 // Returns a list of string lists that contain all the image paths that didn't fit on this texture
-// Each entry in the QList are hints towards what new texture each missing image belongs to.
+// The _metaData source images will be moved to the _metaData's "tmp" directory.
+// Each entry in the QList are hints towards what additional texture each missing image could belong to.
 QList<QStringList> HyGuiTexture::PackFrames()
 {
     m_Packer.pack(m_pAtlasOwner->GetHeuristicIndex(), m_pAtlasOwner->GetTexWidth(), m_pAtlasOwner->GetTexHeight());
@@ -260,32 +262,29 @@ QList<QStringList> HyGuiTexture::PackFrames()
             m_Packer.ClearBin(m_Packer.bins.count());
         }
         
-        QList<inputImage *> framesToRemove;
+        // Find all source images that aren't on texture '0' and store them off in containers
         for(int i = 0; i < m_Packer.images.size(); ++i)
         {
             if(m_Packer.images[i].textureId != 0)
             {
-                QString sImportPath = sImportImgPathList[static_cast<HyGuiFrameData *>(m_Packer.images[i].id)->GetTag()];
-                missingImgPaths[m_Packer.images[i].textureId - 1].push_back(sImportPath);
+                missingImgPaths[m_Packer.images[i].textureId - 1].push_back(m_Packer.images[i].path);
                 
-                framesToRemove.push_back(static_cast<inputImage *>(&m_Packer.images[i]));
+                //  Move the source image frame that didn't fit on texture to the _MetaData's temp directory
+                QFile srcImg(m_Packer.images[i].path);
+                if(srcImg.rename(m_MetaTmpDir.path() % srcImg.fileName()) == false)
+                    HYLOG("Could not move image src metafile to tmp directory: " % m_Packer.images[i].path, LOGTYPE_Warning);
+                
+                // Remove the inputImage from packer and delete the HyGuiFrameData (aka inputImage's id)
+                HyGuiFrameData *pData = static_cast<HyGuiFrameData *>(m_Packer.images[i].id);
+                m_Packer.removeId(pData);
+                delete pData;
             }
-        }
-        
-        for(int i = 0; i < framesToRemove.size(); ++i)
-        {
-            // Delete the metadata image sitting on disk
-            if(QFile::remove(framesToRemove[i]->path) == false)
-                HYLOG("Could not remove metafile: " % framesToRemove[i]->path, LOGTYPE_Warning);
-            
-            HyGuiFrameData *pData = static_cast<HyGuiFrameData *>(framesToRemove[i]->id);
-            m_Packer.removeId(pData);
-            
-            delete pData;
         }
     }
     
     m_bDirty = (m_Packer.bins.count() > 0);
+    HyAssert(m_Packer.bins.count() <= 1, "HyGuiTexture::PackFrames() resulted in a packer with more than one texture");
+    
     return missingImgPaths;
 }
 
