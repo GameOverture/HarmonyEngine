@@ -12,15 +12,15 @@
 
 #include "Afx/HyStdAfx.h"
 
-template <uint32 TPageSize, uint32 TGranularity>
+template <size_t TPageSize, size_t TGranularity>
 class HyMedHeapPage
 {
 	// This struct situated as the very last few bytes in the allocated page.
 	struct Tail
 	{
-		uint32                mBigBlockIndex; // index in blocks, not bytes
-		uint32                mBigBlockSize;  // counted in blocks, not bytes
-		uint32                mFreeBits;
+		size_t                mBigBlockIndex; // index in blocks, not bytes
+		size_t                mBigBlockSize;  // counted in blocks, not bytes
+		size_t                mFreeBits;
 		HyMedHeapPage *mNext;
 		HyMedHeapPage *mPrev;
 	};
@@ -52,11 +52,11 @@ public:
 	// When an allocation occurs, we push the page it allocated from to the head. 
 	// Generally this will cause allocations to be close together in time and space,
 	// but also open space tends to flock together and get used together with fewer traversals.
-	void *Alloc(uint32 sz);
+	void *Alloc(size_t sz);
 
 	// allocSize is filled out with the number of bytes the allocation ACTUALLY took.
 	// This returns true if the entire page is freed now.  That indicates the system should release the page back to the OSAPI.
-	bool Free (void *ptr, uint32 *allocSize);
+	bool Free (void *ptr, size_t *allocSize);
 
 	// When a new page is added by the system, this function manages the pointers.
 	void InsertNewHeadPage(HyMedHeapPage **headPtr);
@@ -65,7 +65,7 @@ public:
 	void RemoveFromList(HyMedHeapPage **headPtr);
 
 	// fast accessor for the number of bits in the big block
-	uint32 GetBigBlockSize(void) { return GetPageTail()->mBigBlockSize; }
+	size_t GetBigBlockSize(void) { return GetPageTail()->mBigBlockSize; }
 
 	// This makes sure everything checks out internally.
 	void SanityCheck(void);
@@ -73,7 +73,7 @@ public:
 
 //-------------------
 
-template <uint32 TPageSize, uint32 TGranularity>
+template <size_t TPageSize, size_t TGranularity>
 void HyMedHeapPage<TPageSize, TGranularity>::Initialize(void)
 {
 	Tail *tail = GetPageTail();
@@ -94,8 +94,8 @@ void HyMedHeapPage<TPageSize, TGranularity>::Initialize(void)
 
 //-------------------
 
-template <uint32 TPageSize, uint32 TGranularity>
-void *HyMedHeapPage<TPageSize, TGranularity>::Alloc(uint32 sz)
+template <size_t TPageSize, size_t TGranularity>
+void *HyMedHeapPage<TPageSize, TGranularity>::Alloc(size_t sz)
 {
 	// The algorithm for allocation is pretty straightforward.
 	// 1. Compute how many blocks this allocation requires.
@@ -103,7 +103,7 @@ void *HyMedHeapPage<TPageSize, TGranularity>::Alloc(uint32 sz)
 	// 3. Scan the bits in that page and see if there's a block of bits that is long enough.
 	// 4. If so, mark those bits as zero, reduce the free bits count, move that page to the head of the list, and return the pointer.
 	// 5. If not, go to #2 and continue the scan for good pages.
-	uint32 const allocBitsRequired = (sz + TGranularity - 1) / TGranularity;
+	size_t const allocBitsRequired = (sz + TGranularity - 1) / TGranularity;
 
 	Tail *tail = GetPageTail();
 	HyAssert(tail->mFreeBits >= allocBitsRequired, "Not enough free bits for allocation");
@@ -132,21 +132,21 @@ void *HyMedHeapPage<TPageSize, TGranularity>::Alloc(uint32 sz)
 
 //-------------------
 
-template <uint32 TPageSize, uint32 TGranularity>
-bool HyMedHeapPage<TPageSize, TGranularity>::Free(void *ptr, uint32 *allocSize)
+template <size_t TPageSize, size_t TGranularity>
+bool HyMedHeapPage<TPageSize, TGranularity>::Free(void *ptr, size_t *allocSize)
 {
-	HyAssert((((uint32)ptr - (uint32)this) % TGranularity) == 0, "if this is false, it means we're trying to delete some random address in a page.");
+	HyAssert((((size_t)ptr - (size_t)this) % TGranularity) == 0, "if this is false, it means we're trying to delete some random address in a page.");
 
 	// Freeing an object is as simple as walking a bit mask and marking allocated granules as free, until we find the end of the alloc in the AllocEnd mask.
 	// We can also tell if there is corruption of some sort by asserting that bits are marked allocated when they should be.
-	uint32 const startingBit = ((uint32)ptr - (uint32)this) / TGranularity;
+	size_t const startingBit = ((size_t)ptr - (size_t)this) / TGranularity;
 
 	Tail *tail                 = GetPageTail();
 	void *bitmaskStartFree     = GetStartFree();	
 	void *bitmaskStartAllocEnd = GetStartAllocEnd();
 
 	// find the end of the allocation by scanning the bitmask for a 1 bit
-	uint32 const endOfAlloc = FindFirst1BitInRange(bitmaskStartAllocEnd, startingBit, kNumGranules);
+	size_t const endOfAlloc = FindFirst1BitInRange(bitmaskStartAllocEnd, startingBit, kNumGranules);
 	HyAssert(endOfAlloc<kNumGranules, "never found the end of the allocation.  That means something is busted.");
 
 	// mark the region of memory as free
@@ -170,7 +170,7 @@ bool HyMedHeapPage<TPageSize, TGranularity>::Free(void *ptr, uint32 *allocSize)
 
 //-------------------
 
-template <uint32 TPageSize, uint32 TGranularity>
+template <size_t TPageSize, size_t TGranularity>
 void HyMedHeapPage<TPageSize, TGranularity>::UpdateBigBlock(void)
 {
 	Tail *tail             = GetPageTail();
@@ -178,20 +178,20 @@ void HyMedHeapPage<TPageSize, TGranularity>::UpdateBigBlock(void)
 
 	// note, as biggest block gets bigger, it becomes less important to check every last 
 	// bit because beyond some point, no block CAN be bigger than what we already have.
-	uint32 biggestBlock = 0;
-	uint32 biggestBlockIndex = 0;
-	for (uint32 bit=0; bit<kNumGranules - biggestBlock; )  
+	size_t biggestBlock = 0;
+	size_t biggestBlockIndex = 0;
+	for (size_t bit=0; bit<kNumGranules - biggestBlock; )  
 	{
 		// scan forward to find the first free bit, then scan to find where the next allocated bit is
-		uint32 const oneBitIndex = FindFirst1BitInRange(bitmaskStartFree, bit, kNumGranules-1);	
+		size_t const oneBitIndex = FindFirst1BitInRange(bitmaskStartFree, bit, kNumGranules-1);	
 		if (oneBitIndex==kNumGranules)  // no more free space
 		{
 			break;
 		}
 
 		// found an allocated region, so let's scan for the end of it
-		uint32 const zeroBitIndex = FindFirst0BitInRange(bitmaskStartFree, oneBitIndex+1, kNumGranules-1);
-		uint32 const currentBlockLength = zeroBitIndex - oneBitIndex;
+		size_t const zeroBitIndex = FindFirst0BitInRange(bitmaskStartFree, oneBitIndex+1, kNumGranules-1);
+		size_t const currentBlockLength = zeroBitIndex - oneBitIndex;
 		if (currentBlockLength > biggestBlock)
 		{
 			biggestBlock      = currentBlockLength;
@@ -207,7 +207,7 @@ void HyMedHeapPage<TPageSize, TGranularity>::UpdateBigBlock(void)
 
 //-------------------
 
-template <uint32 TPageSize, uint32 TGranularity>
+template <size_t TPageSize, size_t TGranularity>
 void HyMedHeapPage<TPageSize, TGranularity>::RemoveFromList(HyMedHeapPage **headPtr)
 {
 	// very simply, insert this ahead of the head page.
@@ -232,7 +232,7 @@ void HyMedHeapPage<TPageSize, TGranularity>::RemoveFromList(HyMedHeapPage **head
 
 //-------------------
 
-template <uint32 TPageSize, uint32 TGranularity>
+template <size_t TPageSize, size_t TGranularity>
 void HyMedHeapPage<TPageSize, TGranularity>::InsertNewHeadPage(HyMedHeapPage **headPtr)
 {
 	// insert this ahead of the head page.
@@ -249,7 +249,7 @@ void HyMedHeapPage<TPageSize, TGranularity>::InsertNewHeadPage(HyMedHeapPage **h
 
 //-------------------
 
-template <uint32 TPageSize, uint32 TGranularity>
+template <size_t TPageSize, size_t TGranularity>
 void HyMedHeapPage<TPageSize, TGranularity>::SanityCheck(void)
 {
 	HyMedHeapPage *currentPage = this;
@@ -262,8 +262,8 @@ void HyMedHeapPage<TPageSize, TGranularity>::SanityCheck(void)
 
 		// we're going to walk ALL the free bits and see if the count matches the tail's count.
 		void *bitmaskStartFree = GetStartFree();
-		uint32 bitsSet = 0;
-		for (uint32 i=0; i<kNumGranules; i++)
+		size_t bitsSet = 0;
+		for (size_t i=0; i<kNumGranules; i++)
 		{
 			if (FindFirst1BitInRange(bitmaskStartFree, i, i)==i)
 				bitsSet++;
@@ -272,8 +272,8 @@ void HyMedHeapPage<TPageSize, TGranularity>::SanityCheck(void)
 
 		// now, if we know how many bits are FREE, we can also tell what the upper limit of end-of-allocations there should be (numGranules - freeBits).
 		void *bitmaskStartAllocEnd = GetStartAllocEnd();
-		uint32 allocBits = 0;
-		for (uint32 i=0; i<kNumGranules; i++)
+		size_t allocBits = 0;
+		for (size_t i=0; i<kNumGranules; i++)
 		{
 			if (FindFirst1BitInRange(bitmaskStartAllocEnd, i, i)==i)
 			{

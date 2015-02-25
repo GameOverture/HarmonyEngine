@@ -57,7 +57,7 @@ HyText2dData::~HyText2dData(void)
 		stringStream << "[" << uiMinSize << "-" << uiMaxSize << "]";
 		sFontName += stringStream.str();
 
-		m_pTexture = LoadTexture(sFontName.c_str(), atlas->width, atlas->height, atlas->depth, atlas->data);
+		m_pTexture = LoadTexture(sFontName.c_str(), static_cast<int32>(atlas->width), static_cast<int32>(atlas->height), static_cast<int32>(atlas->depth), atlas->data);
 
 		printf( "Matched pFont               : %s\n", sFontName.c_str() );
 		printf( "Number of fonts            : %ld\n", uiNumFonts );

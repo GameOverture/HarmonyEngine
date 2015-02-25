@@ -48,7 +48,7 @@ int32 HyPhysEntity2d::AddBoxFixture(float fHalfWidth, float fHalfHeight, float f
 	m_Fixtures.push_back(newFixture);
 	newFixture.pFixture->SetUserData(&m_Fixtures[m_Fixtures.size()-1]);
 
-	return m_Fixtures.size()-1;
+	return static_cast<int32>(m_Fixtures.size()-1);
 }	
 
 int32 HyPhysEntity2d::AddCircleFixture(float fRadius, float fDensity, vec2 vOffset /*= vec2(0.0f)*/)
@@ -72,7 +72,7 @@ int32 HyPhysEntity2d::AddCircleFixture(float fRadius, float fDensity, vec2 vOffs
 	m_Fixtures.push_back(newFixture);
 	newFixture.pFixture->SetUserData(&m_Fixtures[m_Fixtures.size()-1]);
 
-	return m_Fixtures.size()-1;
+	return static_cast<int32>(m_Fixtures.size() - 1);
 }
 
 int32 HyPhysEntity2d::AddEdgeChainFixture(vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, vec2 vOffset /*= vec2(0.0f)*/, float fAngleOffset /*= 0.0f*/)
@@ -107,7 +107,7 @@ int32 HyPhysEntity2d::AddEdgeChainFixture(vec2 *pVertices, uint32 uiNumVerts, bo
 
 	m_Fixtures.push_back(newFixture);
 	newFixture.pFixture->SetUserData(&m_Fixtures[m_Fixtures.size()-1]);
-	return m_Fixtures.size()-1;
+	return static_cast<int32>(m_Fixtures.size() - 1);
 }
 
 /*virtual*/ void HyPhysEntity2d::Update()

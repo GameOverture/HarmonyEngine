@@ -67,7 +67,7 @@ HyHardwareInfo::eEndian HyHardwareInfo::GetEndian()	{ return m_eEndian; }
 uint32 HyHardwareInfo::GetNumCPUs()			{ return m_uiNumCPUs; }
 uint32 HyHardwareInfo::GetCPUSpeed()			{ return 0; }
 uint32 HyHardwareInfo::GetNumMemoryBanks()		{ return m_uiNumMemBanks; }
-uint32 HyHardwareInfo::GetMemorySize()			{ return m_uiRAMsize; }
+size_t HyHardwareInfo::GetMemorySize()			{ return m_uiRAMsize; }
 
 void HyHardwareInfo::DumpStats(void)
 {

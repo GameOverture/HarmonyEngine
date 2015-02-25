@@ -44,7 +44,7 @@ public:
 
 	~HyMemoryHeap();
 	
-	void *Alloc(uint32 sz);
+	void *Alloc(size_t sz);
 	bool  Free (void *ptr);
 };
 

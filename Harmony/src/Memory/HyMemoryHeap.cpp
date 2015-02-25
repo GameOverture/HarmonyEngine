@@ -24,7 +24,7 @@ HyMemoryHeap::~HyMemoryHeap()
 }
 
 
-void *HyMemoryHeap::Alloc(uint32 sz)
+void *HyMemoryHeap::Alloc(size_t sz)
 {
 	//if(sz <= kSmlBlockSize)
 	//{

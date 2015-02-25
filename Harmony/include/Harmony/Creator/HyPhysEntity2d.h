@@ -56,7 +56,7 @@ public:
 	void GetVelocity(vec2 &vVelOut)									{ memcpy(&vVelOut, &m_b2Body->GetLinearVelocity(), sizeof(vec2)); }
 	float GetVelocityX()											{ return m_b2Body->GetLinearVelocity().x; }
 	float GetVelocityY()											{ return m_b2Body->GetLinearVelocity().y; }
-	uint32 GetNumFixtures()											{ return m_Fixtures.size(); }
+	size_t GetNumFixtures()											{ return m_Fixtures.size(); }
 
 	void SetLinearVelocity(vec2 vVel)								{ b2Vec2 vb2Vel(vVel.x, vVel.y); m_b2Body->SetLinearVelocity(vb2Vel); }
 	void SetLinearVelocity(float fX, float fY)						{ b2Vec2 vb2Vel(fX, fY); m_b2Body->SetLinearVelocity(vb2Vel); }

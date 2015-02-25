@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-template <uint32 TPageSize>
+template <size_t TPageSize>
 class HySmlHeapPage
 {
 protected:
@@ -22,8 +22,8 @@ protected:
 		// immediately following PRIOR TO this begins the allocation bitmask,
 		// which are used as bitwise markers for which chunks in the page are allocated.
 		// Note, a FREE block has a SET bit.	
-		uint32             mFreeCount;  // improves alloc and free speed, both.
-		uint32             mBlockSize;  // necessary for Free() to be fast
+		size_t             mFreeCount;  // improves alloc and free speed, both.
+		size_t             mBlockSize;  // necessary for Free() to be fast
 		HySmlHeapPage *	mPrev;		// makes restructuring the list faster
 		HySmlHeapPage *	mNext;
 	};
@@ -41,7 +41,7 @@ protected:
 
 public:
 	// This is called only when a new one is allocated.
-	void Initialize(uint32 blockSize);
+	void Initialize(size_t blockSize);
 
 	// The page literally has no place to store any data except a bitmask 
 	// and a pointer at the end of the page, so we calculate where the tail
@@ -51,7 +51,7 @@ public:
 	// variables, anyway.
 	// The isFull bool is filled out so that the system knows when the page should
 	// be moved to the full pages bucket.
-	void *Alloc(uint32 blockSize, bool *isFull);
+	void *Alloc(size_t blockSize, bool *isFull);
 
 	// The hard part of figuring out what page this pointer came from is handled 
 	// at a higher level, mainly because all that depends on the policy the user creates.
@@ -66,7 +66,7 @@ public:
 	// block size so we can pass in the head pointer of the page list, otherwise if a page
 	// needs to be freed, it will unlink stuff without the system knowing about it and it
 	// will lose track of the page list.
-	uint32 GetBlockSize(void) const;
+	size_t GetBlockSize(void) const;
 
 	// When a new page is added by the system, it asks us to handle the pointer handling.
 	void InsertNewHeadPage(HySmlHeapPage **headPtr);
@@ -80,16 +80,16 @@ public:
 
 //-------------------
 
-template <uint32 TPageSize>
-inline uint32 HySmlHeapPage<TPageSize>::GetBlockSize() const
+template <size_t TPageSize>
+inline size_t HySmlHeapPage<TPageSize>::GetBlockSize() const
 {
 	return GetPageTail()->mBlockSize;
 }
 
 //-------------------
 
-template <uint32 TPageSize>
-void HySmlHeapPage<TPageSize>::Initialize(uint32 blockSize)
+template <size_t TPageSize>
+void HySmlHeapPage<TPageSize>::Initialize(size_t blockSize)
 {
 	// get a pointer to the tail so we can initialize it
 	PageTail *pTail = GetPageTail();
@@ -97,13 +97,13 @@ void HySmlHeapPage<TPageSize>::Initialize(uint32 blockSize)
 	// figure out how many allocatable blocks are actually in this page, 
 	// taking into account the size of the tail structure (which includes 
 	// a bitmask that depends on the number of blocks in this page!)
-	const uint32 uiMaxAllocsPerPage     = (TPageSize - sizeof(PageTail))/blockSize;
-	const uint32 uiBytesRequiredForTail = (uiMaxAllocsPerPage+31)/32*4 + sizeof(PageTail);  // in bytes.  Rounded to nearest 32-bit value for performance.
-	const uint32 uiNumBlocks            = (TPageSize - uiBytesRequiredForTail) / blockSize;
-	const uint32 uiNumBytesInBitmask    = (uiNumBlocks+31)/32*4;
+	const size_t uiMaxAllocsPerPage     = (TPageSize - sizeof(PageTail))/blockSize;
+	const size_t uiBytesRequiredForTail = (uiMaxAllocsPerPage+31)/32*4 + sizeof(PageTail);  // in bytes.  Rounded to nearest 32-bit value for performance.
+	const size_t uiNumBlocks            = (TPageSize - uiBytesRequiredForTail) / blockSize;
+	const size_t uiNumBytesInBitmask    = (uiNumBlocks+31)/32*4;
 
-	pTail->mBlockSize = (uint32)blockSize;
-	pTail->mFreeCount = (uint32)uiNumBlocks;
+	pTail->mBlockSize = (size_t)blockSize;
+	pTail->mFreeCount = (size_t)uiNumBlocks;
 	pTail->mNext = NULL;
 	pTail->mPrev = NULL;
 
@@ -113,8 +113,8 @@ void HySmlHeapPage<TPageSize>::Initialize(uint32 blockSize)
 
 //-------------------
 // This function never fails.  It is assumed the system knows there is space available before calling.
-template <uint32 TPageSize>
-void *HySmlHeapPage<TPageSize>::Alloc(uint32 blockSize, bool *isFull)
+template <size_t TPageSize>
+void *HySmlHeapPage<TPageSize>::Alloc(size_t blockSize, bool *isFull)
 {
 	// treat this as a block of memory with a piece of data at the end that we want to access
 	PageTail *pTail = GetPageTail();
@@ -123,14 +123,14 @@ void *HySmlHeapPage<TPageSize>::Alloc(uint32 blockSize, bool *isFull)
 	// figure out how many allocatable blocks are actually in this page, 
 	// taking into account the size of the tail structure (which includes 
 	// a bitmask that depends on the number of blocks in this page!)
-	const uint32 maxAllocsPerPage     = (TPageSize - sizeof(PageTail))/blockSize;
-	const uint32 bytesRequiredForTail = (maxAllocsPerPage+31)/32*4 + sizeof(PageTail);  // in bytes.  Rounded to nearest 32-bit value for performance.
-	const uint32 numBlocks            = (TPageSize - bytesRequiredForTail) / blockSize;
-	const uint32 numBytesInBitmask    = (numBlocks+31)/32*4;
+	const size_t maxAllocsPerPage     = (TPageSize - sizeof(PageTail))/blockSize;
+	const size_t bytesRequiredForTail = (maxAllocsPerPage+31)/32*4 + sizeof(PageTail);  // in bytes.  Rounded to nearest 32-bit value for performance.
+	const size_t numBlocks            = (TPageSize - bytesRequiredForTail) / blockSize;
+	const size_t numBytesInBitmask    = (numBlocks+31)/32*4;
 
 	// scan for a free bit, which absolutely should be there
 	unsigned char *bitmask = (unsigned char*)pTail - numBytesInBitmask;
-	uint32 oneBitIndex = FindFirst1BitInRange(bitmask, 0, numBlocks-1);
+	size_t oneBitIndex = FindFirst1BitInRange(bitmask, 0, numBlocks-1);
 	HyAssert(oneBitIndex!=numBlocks, "No free bit for allocation!? Should never fail here");
 
 	// clear the free bit
@@ -146,22 +146,22 @@ void *HySmlHeapPage<TPageSize>::Alloc(uint32 blockSize, bool *isFull)
 
 //-------------------
 
-template <uint32 TPageSize>
+template <size_t TPageSize>
 bool HySmlHeapPage<TPageSize>::Free(void *ptr, bool *wasFull)
 {
 	// treat this as a block of memory with a piece of data at the end that we want to access
 	PageTail *pTail = GetPageTail();
 
-	const uint32 blockSize		      = pTail->mBlockSize;  // MEMORY ACCESS at the end of the page.  Fetches an L2 cache line.
-	const uint32 maxAllocsPerPage     = (TPageSize - sizeof(PageTail))/blockSize;
-	const uint32 bytesRequiredForTail = (maxAllocsPerPage+31)/32*4 + sizeof(PageTail);  // in bytes.  Rounded to nearest 32-bit value for performance.
-	const uint32 numBlocks            = (TPageSize - bytesRequiredForTail) / blockSize;
-	const uint32 numBytesInBitmask    = (numBlocks+31)/32*4;
+	const size_t blockSize		      = pTail->mBlockSize;  // MEMORY ACCESS at the end of the page.  Fetches an L2 cache line.
+	const size_t maxAllocsPerPage     = (TPageSize - sizeof(PageTail))/blockSize;
+	const size_t bytesRequiredForTail = (maxAllocsPerPage+31)/32*4 + sizeof(PageTail);  // in bytes.  Rounded to nearest 32-bit value for performance.
+	const size_t numBlocks            = (TPageSize - bytesRequiredForTail) / blockSize;
+	const size_t numBytesInBitmask    = (numBlocks+31)/32*4;
 
 	HyAssert(pTail->mFreeCount<numBlocks, "Should be at least one allocated block in this page, or somethin's broke!");
-	HyAssert((((uint32)ptr - (uint32)this) % blockSize) == 0, "The address of our pointer should line up evenly on a block start, or somethin's broke!");
+	HyAssert((((size_t)ptr - (size_t)this) % blockSize) == 0, "The address of our pointer should line up evenly on a block start, or somethin's broke!");
 	unsigned char *bitmask = (unsigned char*)pTail - numBytesInBitmask;  // the bitmask comes right BEFORE the tail structure	
-	uint32 const blockNumber = ((uint32)ptr - (uint32)this) / blockSize;
+	size_t const blockNumber = ((size_t)ptr - (size_t)this) / blockSize;
 
 	HyAssert(FindFirst0BitInRange(bitmask, blockNumber, blockNumber)==blockNumber, "Make sure this block is currently free");
 	SetBitTo1(bitmask, blockNumber);  // mark this block as used
@@ -175,7 +175,7 @@ bool HySmlHeapPage<TPageSize>::Free(void *ptr, bool *wasFull)
 
 //-------------------
 
-template <uint32 TPageSize>
+template <size_t TPageSize>
 void HySmlHeapPage<TPageSize>::InsertNewHeadPage(HySmlHeapPage **headPtr)
 {
 	// very simply, insert 'newPage' ahead of this, fixing up both sets of pointers, then assign newPage to *headPtr.
@@ -193,7 +193,7 @@ void HySmlHeapPage<TPageSize>::InsertNewHeadPage(HySmlHeapPage **headPtr)
 
 //-------------------
 
-template <uint32 TPageSize>
+template <size_t TPageSize>
 void HySmlHeapPage<TPageSize>::SanityCheck(void)
 {
 	HySmlHeapPage *currentPage = this;
@@ -204,15 +204,15 @@ void HySmlHeapPage<TPageSize>::SanityCheck(void)
 		HyAssert(tail->mNext==NULL || tail->mNext->GetPageTail()->mPrev==currentPage, "Next page linked-list isn't pointing to current page.");
 
 		// count the bits that are marked as FREE and make sure they match the count in the tail
-		const uint32 blockSize            = tail->mBlockSize;  // MEMORY ACCESS at the end of the page.  Fetches an L2 cache line.
-		const uint32 maxAllocsPerPage     = (TPageSize - sizeof(PageTail))/blockSize;
-		const uint32 bytesRequiredForTail = (maxAllocsPerPage+31)/32*4 + sizeof(PageTail);  // in bytes.  Rounded to nearest 32-bit value for performance.
-		const uint32 numBlocks            = (TPageSize - bytesRequiredForTail) / blockSize;
-		const uint32 numBytesInBitmask    = (numBlocks+31)/32*4;		
+		const size_t blockSize            = tail->mBlockSize;  // MEMORY ACCESS at the end of the page.  Fetches an L2 cache line.
+		const size_t maxAllocsPerPage     = (TPageSize - sizeof(PageTail))/blockSize;
+		const size_t bytesRequiredForTail = (maxAllocsPerPage+31)/32*4 + sizeof(PageTail);  // in bytes.  Rounded to nearest 32-bit value for performance.
+		const size_t numBlocks            = (TPageSize - bytesRequiredForTail) / blockSize;
+		const size_t numBytesInBitmask    = (numBlocks+31)/32*4;		
 
 		unsigned char *bitmask = (unsigned char*)tail - numBytesInBitmask;  // the bitmask comes right BEFORE the tail structure
-		uint32 bitsSet = 0;
-		for (uint32 i=0; i<numBlocks; i++)
+		size_t bitsSet = 0;
+		for (size_t i=0; i<numBlocks; i++)
 		{
 			if (FindFirst1BitInRange(bitmask, i, i)==i)
 			{
@@ -227,7 +227,7 @@ void HySmlHeapPage<TPageSize>::SanityCheck(void)
 
 //-------------------
 
-template <uint32 TPageSize>
+template <size_t TPageSize>
 void HySmlHeapPage<TPageSize>::RemoveFromList(HySmlHeapPage **headPtr)
 {
 	// very simply, insert this ahead of the head page.

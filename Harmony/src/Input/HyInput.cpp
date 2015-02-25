@@ -63,8 +63,8 @@ void HyInput::ProcessInputs()
 		
 		vector<std::pair<eActionButton, HyInputKey> > &vBtnMappings = m_pInputMappings[i].m_vBtnMappings;
 		convertedInputStateRef.uiButtonFlags = 0;
-		uint32 uiNumBtnMappings = vBtnMappings.size();
-		for(uint32 j = 0; j < uiNumBtnMappings; ++j)
+		size_t uiNumBtnMappings = vBtnMappings.size();
+		for(size_t j = 0; j < uiNumBtnMappings; ++j)
 		{
 			switch(vBtnMappings[j].second.m_eType)
 			{
@@ -86,12 +86,12 @@ void HyInput::ProcessInputs()
 		}
 
 		vector<std::pair<eActionAxis, HyInputKey> > &vAxisMappings = m_pInputMappings[i].m_vAxisMappings;
-		uint32 uiNumAxisMappings = vAxisMappings.size();
+		size_t uiNumAxisMappings = vAxisMappings.size();
 		
 		for(uint32 j = 0; j < Action_MaxAxes; ++j)
 			convertedInputStateRef.pAxisStates[j] = 0.0f;
 
-		for(uint32 j = 0; j < uiNumAxisMappings; ++j)
+		for(size_t j = 0; j < uiNumAxisMappings; ++j)
 		{
 			switch(vAxisMappings[j].second.m_eType)
 			{

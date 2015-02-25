@@ -35,7 +35,7 @@ public:
 
 	void Reset();
 
-	uint32 GetNumPhysDraws()					{ return m_vDrawInsts.size(); }
+	size_t GetNumPhysDraws()					{ return m_vDrawInsts.size(); }
 	HyEntity2d *GetInstPtr(int32 iIndex)		{ return m_vDrawInsts[iIndex]; }
 
 	/// Draw a closed polygon provided in CCW order.

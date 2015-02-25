@@ -41,14 +41,15 @@ public:
 	{
 		uint32		uiReturnFlags;
 
-		uint32		uiOffsetToInst3d;
+		size_t		uiOffsetToInst3d;
 		
-		uint32		uiOffsetToInst2d;
-		uint32		uiOffsetToVertexData2d;
-		uint32		uiVertexBufferSize2d;
+		size_t		uiOffsetToInst2d;
 
-		uint32		uiOffsetToCameras3d;
-		uint32		uiOffsetToCameras2d;
+		size_t		uiOffsetToVertexData2d;
+		size_t		uiVertexBufferSize2d;
+
+		size_t		uiOffsetToCameras3d;
+		size_t		uiOffsetToCameras2d;
 	};
 
 	struct tGfxInit

@@ -32,8 +32,8 @@ public:
 	tData *GetOrCreateData(const std::string &sPath)
 	{
 		// Check to determine this data with these parameters doesn't already exist, if it does return the 'tData' associated with it.
-		uint32 uiNumDatas = m_vData.size();
-		for(uint32 i = 0; i < uiNumDatas; ++i)
+		size_t uiNumDatas = m_vData.size();
+		for(size_t i = 0; i < uiNumDatas; ++i)
 		{
 			if(m_vData[i]->IsMatch(sPath))
 				return m_vData[i];

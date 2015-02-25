@@ -50,7 +50,7 @@ public:
 	uint32		GetNumCPUs();
 	uint32		GetCPUSpeed();
 	uint32		GetNumMemoryBanks();
-	uint32		GetMemorySize();
+	size_t		GetMemorySize();
 
 	void        DumpStats();
 

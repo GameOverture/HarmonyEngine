@@ -308,7 +308,7 @@ HyOpenGL::~HyOpenGL(void)
 
 			m_pShader2d[QUADBATCH].SetUniform("mtxCameraToClipMatrix", m_mtxProj);
 
-			uint32 uiDataOffset = renderState.GetDataOffset();
+			size_t uiDataOffset = renderState.GetDataOffset();
 
 			GLuint mtx = m_pShader2d[QUADBATCH].GetAttribLocation("mtxLocalToWorld");
 			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("size"), 2, GL_FLOAT, GL_FALSE, 128, (void *)uiDataOffset);
@@ -340,7 +340,7 @@ HyOpenGL::~HyOpenGL(void)
 
 			m_pShader2d[PRIMITIVE].SetUniform("cameraToClipMatrix", m_mtxProj);
 
-			uint32 uiDataOffset = renderState.GetDataOffset();
+			size_t uiDataOffset = renderState.GetDataOffset();
 
 			char *pDrawData = GetVertexData2d();
 			pDrawData += uiDataOffset;

@@ -57,14 +57,14 @@ void HyText2d::CalcVertexBuffer()
 	vec2 vUVs[4];
 	vec2 ptPenPos(0.0f);
 
-	uint32 uiNumCharacters = m_sString.size();
+	size_t uiNumCharacters = m_sString.size();
 	m_uiBufferSizeBytes = uiNumCharacters * (4 * (sizeof(vec4) + sizeof(vec2)));
 	m_pVertexBuffer = new unsigned char[m_uiBufferSizeBytes];
 
 	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pDataPtr);
 
 	unsigned char *pCurVertexWritePos = m_pVertexBuffer;
-	for(uint32 i = 0; i < uiNumCharacters; ++i)
+	for(size_t i = 0; i < uiNumCharacters; ++i)
 	{
 		texture_glyph_t *glyph = pTextData->GetGlyph(m_uiCurFontIndex, m_sString[i]);
 		if( glyph != NULL )

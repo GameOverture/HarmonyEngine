@@ -21,12 +21,12 @@ HyRenderState::~HyRenderState(void)
 {
 }
 
-void HyRenderState::SetDataOffset(uint32 uiVertexDataOffset)
+void HyRenderState::SetDataOffset(size_t uiVertexDataOffset)
 {
 	m_uiDataOffset = uiVertexDataOffset;
 }
 
-uint32 HyRenderState::GetDataOffset() const
+size_t HyRenderState::GetDataOffset() const
 {
 	return m_uiDataOffset;
 }

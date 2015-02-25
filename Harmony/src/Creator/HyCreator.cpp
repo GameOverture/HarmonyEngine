@@ -296,8 +296,8 @@ void HyCreator::WriteDrawBuffers()
 	m_pCurWritePos += sizeof(int32);
 	
 	int32 iCount = 0;
-	uint32 iTotalNumInsts = m_ViewportRef.m_vCams3d.size();
-	for(uint32 i = 0; i < iTotalNumInsts; ++i)
+	size_t uiTotalNumInsts = m_ViewportRef.m_vCams3d.size();
+	for(size_t i = 0; i < uiTotalNumInsts; ++i)
 	{
 		if(m_ViewportRef.m_vCams3d[i]->IsEnabled())
 		{
@@ -321,8 +321,8 @@ void HyCreator::WriteDrawBuffers()
 	m_pCurWritePos += sizeof(int32);
 
 	iCount = 0;
-	iTotalNumInsts = m_ViewportRef.m_vCams2d.size();
-	for(uint32 i = 0; i < iTotalNumInsts; ++i)
+	uiTotalNumInsts = m_ViewportRef.m_vCams2d.size();
+	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
 		if(m_ViewportRef.m_vCams2d[i]->IsEnabled())
 		{
@@ -345,8 +345,8 @@ void HyCreator::WriteDrawBuffers()
 	m_pCurWritePos += sizeof(int32);
 
 	iCount = 0;
-	iTotalNumInsts = m_vInst3d.size();
-	for(uint32 i = 0; i < iTotalNumInsts; ++i)
+	uiTotalNumInsts = m_vInst3d.size();
+	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
 		if(m_vInst3d[i]->IsEnabled())
 		{
@@ -365,16 +365,16 @@ void HyCreator::WriteDrawBuffers()
 	m_pCurWritePos += sizeof(int32);
 
 	iCount = 0;
-	iTotalNumInsts = m_vLoadedInst2d.size();
+	uiTotalNumInsts = m_vLoadedInst2d.size();
 
-	char *pStartVertexWritePos = m_pCurWritePos + (iTotalNumInsts * sizeof(HyRenderState));
+	char *pStartVertexWritePos = m_pCurWritePos + (uiTotalNumInsts * sizeof(HyRenderState));
 	pDrawHeader->uiOffsetToVertexData2d = pStartVertexWritePos - m_GfxCommsRef.GetWriteBufferPtr();
 	char *pCurVertexWritePos = pStartVertexWritePos;
 
-	uint32	uiVertexDataOffset = 0;
+	size_t	uiVertexDataOffset = 0;
 	HyRenderState *pCurRenderState2d = NULL;
 
-	for(uint32 i = 0; i < iTotalNumInsts; ++i)
+	for(size_t i = 0; i < uiTotalNumInsts; ++i)
 	{
 		if(m_vLoadedInst2d[i]->IsEnabled() == false)
 			continue;

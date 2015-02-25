@@ -44,14 +44,14 @@ private:
 	uint32			m_pTextureBinds[HY_MAX_TEXTURE_BINDS];
 	
 	uint32			m_uiNumInstances;
-	uint32			m_uiDataOffset;
+	size_t			m_uiDataOffset;
 
 public:
 	HyRenderState();
 	~HyRenderState(void);
 
-	void SetDataOffset(uint32 uiVertexDataOffset);
-	uint32 GetDataOffset() const;
+	void SetDataOffset(size_t uiVertexDataOffset);
+	size_t GetDataOffset() const;
 	
 	void AppendInstances(uint32 uiNumInstsToAppend);
 	uint32 GetNumInstances() const;

@@ -20,7 +20,7 @@ class HyText2d : public IObjInst2d
 
 	HyString			m_sString;
 	unsigned char *		m_pVertexBuffer;
-	uint32				m_uiBufferSizeBytes;
+	size_t				m_uiBufferSizeBytes;
 
 	uint32				m_uiCurFontIndex;
 
@@ -30,12 +30,12 @@ public:
 
 	uint32 GetCurFontIndex()			{ return m_uiCurFontIndex; }
 
-	uint32 GetBufferSizeBytes()			{ return m_uiBufferSizeBytes; }
+	size_t GetBufferSizeBytes()			{ return m_uiBufferSizeBytes; }
 	unsigned char *GetBufferDataPtr()	{ return m_pVertexBuffer; }
 
 	void SetString(const HyChar *szString, ...);
 	//HyString &GetString()				{ return m_sString; }
-	uint32 GetStrLen()					{ return m_sString.length(); }
+	size_t GetStrLen()					{ return m_sString.length(); }
 
 	uint32 GetTextureId()				{ return (m_pDataPtr == NULL) ? 0 : reinterpret_cast<HyText2dData *>(m_pDataPtr)->GetTexturePtr()->GetId(); }
 
