@@ -13,6 +13,7 @@ HyGfx::HyGfx(QWidget *parent) : QGLWidget(parent)
     format.setSampleBuffers(true);
 
     setFormat(format);
+    makeCurrent();
 }
 
 void HyGfx::initializeGL()

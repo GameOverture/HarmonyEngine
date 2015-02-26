@@ -71,6 +71,15 @@ HyOpenGL::~HyOpenGL(void)
 	//////////////////////////////////////////////////////////////////////////
 	GLenum err = glewInit();
 
+	if(err != GLEW_OK)
+	{
+		GLenum error = glGetError();
+		if(error != GL_NO_ERROR)
+			std::cout << "OpenGL Error: " << error << std::endl;
+
+		exit(EXIT_FAILURE);
+	}
+
 	//if (glewIsSupported("GL_VERSION_3_3"))
 	//	printf("Ready for OpenGL 3.3\n");
 	//else {
