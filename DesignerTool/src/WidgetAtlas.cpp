@@ -356,7 +356,7 @@ void WidgetAtlas::LoadData()
         return;
     }
     
-    QStringList srcFrameImgList = QDir(m_pProjOwner->GetPath() % HYGUIPATH_RelMetaDataAtlasDir).entryList();
+    QFileInfoList srcFrameImgList = QDir(m_pProjOwner->GetPath() % HYGUIPATH_RelMetaDataAtlasDir).entryInfoList();
     
     QFile dataFile(m_DataFile.absoluteFilePath());
     if(dataFile.open(QIODevice::ReadOnly))
@@ -373,12 +373,15 @@ void WidgetAtlas::LoadData()
             foreach(const QJsonValue &frameInfo, srcFramesArray)
             {
                 quint32 uiHash = JSONOBJ_TOINT(frameInfo.toObject(), "hash");
-                foreach(const QString sImgPath, srcFrameImgList)
+                foreach(const QFileInfo imgInfo, srcFrameImgList)
                 {
-                    if(uiHash == static_cast<quint32>(sImgPath.left(sImgPath.indexOf(QChar('-'))).toInt()))
+                    QString sImgName = imgInfo.baseName();
+                    quint32 uiTestHash = static_cast<quint32>(sImgName.left(sImgName.indexOf(QChar('-'))).toInt());
+                    if(uiHash == uiTestHash)
                     {
-                        QString sImgName = sImgPath.right(sImgPath.indexOf(QChar('-')));
-                        pNewTexture->LoadFrame(QImage(sImgPath), uiHash, sImgName, sImgPath);
+                        int iSplitIndex = sImgName.indexOf(QChar('-'));
+                        sImgName = sImgName.right(sImgName.length() - iSplitIndex - 1); // -1 so we don't include the '-'
+                        pNewTexture->LoadFrame(QImage(imgInfo.absoluteFilePath()), uiHash, sImgName, imgInfo.absoluteFilePath());
                     }
                 }
                 

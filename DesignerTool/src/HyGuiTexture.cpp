@@ -229,16 +229,18 @@ QList<QStringList> HyGuiTexture::ImportFrames(const QStringList sImportImgPathLi
         sNewMetaImgPath = m_MetaDir.path() % "/" % sNewMetaImgPath;
         img.save(sNewMetaImgPath);
         
-        m_Packer.addItem(img, uiHash, new HyGuiFrameData(this, i, fileInfo.baseName()), sNewMetaImgPath);
+        LoadFrame(img, uiHash, fileInfo.baseName(), sNewMetaImgPath, false);
     }
 
     return PackFrames();
 }
 
-void HyGuiTexture::LoadFrame(const QImage &img, quint32 uiHash, QString sName, QString sPath)
+void HyGuiTexture::LoadFrame(const QImage &img, quint32 uiHash, QString sName, QString sAbsolutePath, bool bSetPackerSettings /*= true*/)
 {
-    m_pAtlasOwner->SetPackerSettings(&m_Packer);
-    m_Packer.addItem(img, uiHash, new HyGuiFrameData(this, -1, sName), sPath);
+    if(bSetPackerSettings)
+        m_pAtlasOwner->SetPackerSettings(&m_Packer);
+    
+    m_Packer.addItem(img, uiHash, new HyGuiFrameData(this, -1, sName), sAbsolutePath);
 }
 
 // Returns a list of string lists that contain all the image paths that didn't fit on this texture

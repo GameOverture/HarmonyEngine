@@ -40,12 +40,12 @@ WidgetOutputLog::~WidgetOutputLog()
     case LOGTYPE_Normal:
         sLogMsg = sm_ksNormalHtml % sLogMsg; break;
     case LOGTYPE_Warning:
-        sLogMsg = sm_ksWarningHtml % sLogMsg; 
         QMessageBox::warning(sm_pInstance->parentWidget(), "Harmony Designer Tool", sLogMsg);
+        sLogMsg = sm_ksWarningHtml % sLogMsg; 
         break;
     case LOGTYPE_Error:
-        sLogMsg = sm_ksErrorHtml % sLogMsg;
         QMessageBox::critical(sm_pInstance->parentWidget(), "Harmony Designer Tool", sLogMsg);
+        sLogMsg = sm_ksErrorHtml % sLogMsg;
         break;
     case LOGTYPE_Info:
         sLogMsg = sm_ksInfoHtml % sLogMsg; break;
