@@ -376,7 +376,7 @@ void WidgetAtlas::LoadData()
                 foreach(const QFileInfo imgInfo, srcFrameImgList)
                 {
                     QString sImgName = imgInfo.baseName();
-                    quint32 uiTestHash = static_cast<quint32>(sImgName.left(sImgName.indexOf(QChar('-'))).toInt());
+                    quint32 uiTestHash = static_cast<quint32>(sImgName.left(sImgName.indexOf(QChar('-'))).toLongLong());
                     if(uiHash == uiTestHash)
                     {
                         int iSplitIndex = sImgName.indexOf(QChar('-'));
