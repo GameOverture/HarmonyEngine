@@ -28,6 +28,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spine-c", "lib\src\spine-c\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freetype", "lib\src\freetype\freetype.vcxproj", "{ED050BDE-20F4-4B07-97B9-30FCAA6B36B3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glew", "lib\src\glew\glew.vcxproj", "{079E3143-4D45-4B8D-9FBA-204B1313B3D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -208,6 +210,26 @@ Global
 		{ED050BDE-20F4-4B07-97B9-30FCAA6B36B3}.Release|Win32.ActiveCfg = Release|Win32
 		{ED050BDE-20F4-4B07-97B9-30FCAA6B36B3}.Release|Win32.Build.0 = Release|Win32
 		{ED050BDE-20F4-4B07-97B9-30FCAA6B36B3}.Release|x64.ActiveCfg = Release|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.Debug|Win32.Build.0 = Debug|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.Debug|x64.ActiveCfg = Debug|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.GuiDebug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.GuiDebug|Mixed Platforms.Build.0 = Debug|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.GuiDebug|Win32.ActiveCfg = Debug|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.GuiDebug|Win32.Build.0 = Debug|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.GuiDebug|x64.ActiveCfg = Debug|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.GuiRelease|Mixed Platforms.ActiveCfg = Release|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.GuiRelease|Mixed Platforms.Build.0 = Release|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.GuiRelease|Win32.ActiveCfg = Release|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.GuiRelease|Win32.Build.0 = Release|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.GuiRelease|x64.ActiveCfg = Release|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.Release|Win32.ActiveCfg = Release|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.Release|Win32.Build.0 = Release|Win32
+		{079E3143-4D45-4B8D-9FBA-204B1313B3D9}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
