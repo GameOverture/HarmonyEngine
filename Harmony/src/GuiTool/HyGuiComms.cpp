@@ -168,7 +168,7 @@ void HyGuiComms::ProcessPacket(char *&pCurReadPos)
 
 void HyGuiComms::Log(const char *szMessage, uint32 uiLevel)
 {
-	sm_pInstance->SendPacket(static_cast<ePacketType>(uiLevel), strlen(szMessage), szMessage);
+	sm_pInstance->SendPacket(static_cast<ePacketType>(uiLevel), static_cast<uint32>(strlen(szMessage)), szMessage);
 }
 
 #endif
