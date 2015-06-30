@@ -26,7 +26,6 @@ class HySprite2d;
 class HySpine2d;
 class HyText2d;
 class HyPrimitive2d;
-class HyTexture;
 
 class HyEntity2d : public ITransform<HyAnimVec2>
 {

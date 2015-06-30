@@ -52,6 +52,7 @@
     <ClCompile Include="src\Creator\Data\HySfxData.cpp" />
     <ClCompile Include="src\Creator\Data\HySprite2dData.cpp" />
     <ClCompile Include="src\Creator\Data\HyText2dData.cpp" />
+    <ClCompile Include="src\Creator\Data\HyTexturedQuad2dData.cpp" />
     <ClCompile Include="src\Creator\Data\IData.cpp" />
     <ClCompile Include="src\Creator\HyCreator.cpp" />
     <ClCompile Include="src\Creator\HyEntity2d.cpp" />
@@ -62,12 +63,14 @@
     <ClCompile Include="src\Creator\Instances\HySound.cpp" />
     <ClCompile Include="src\Creator\Instances\HySprite2d.cpp" />
     <ClCompile Include="src\Creator\Instances\HyText2d.cpp" />
+    <ClCompile Include="src\Creator\Instances\HyTexturedQuad2d.cpp" />
     <ClCompile Include="src\Creator\Instances\IObjInst2d.cpp" />
     <ClCompile Include="src\Creator\Viewport\HyCamera2d.cpp" />
     <ClCompile Include="src\Creator\Viewport\HyCamera3d.cpp" />
     <ClCompile Include="src\Creator\Viewport\HyViewport.cpp" />
+    <ClCompile Include="src\FileIO\Atlas\HyAtlas.cpp" />
+    <ClCompile Include="src\FileIO\Atlas\HyTexture.cpp" />
     <ClCompile Include="src\FileIO\HyFileIO.cpp" />
-    <ClCompile Include="src\FileIO\HyTexture.cpp" />
     <ClCompile Include="src\FileIO\jasonxx.cc" />
     <ClCompile Include="src\GuiTool\HyGuiComms.cpp" />
     <ClCompile Include="src\GuiTool\HyLiveWatchManager.cpp" />
@@ -118,6 +121,7 @@
     <ClInclude Include="include\Harmony\Creator\Data\HySpine2dData.h" />
     <ClInclude Include="include\Harmony\Creator\Data\HySprite2dData.h" />
     <ClInclude Include="include\Harmony\Creator\Data\HyText2dData.h" />
+    <ClInclude Include="include\Harmony\Creator\Data\HyTexturedQuad2dData.h" />
     <ClInclude Include="include\Harmony\Creator\Data\IData.h" />
     <ClInclude Include="include\Harmony\Creator\HyCreator.h" />
     <ClInclude Include="include\Harmony\Creator\HyEntity2d.h" />
@@ -128,12 +132,14 @@
     <ClInclude Include="include\Harmony\Creator\Instances\HySpine2d.h" />
     <ClInclude Include="include\Harmony\Creator\Instances\HySprite2d.h" />
     <ClInclude Include="include\Harmony\Creator\Instances\HyText2d.h" />
+    <ClInclude Include="include\Harmony\Creator\Instances\HyTexturedQuad2d.h" />
     <ClInclude Include="include\Harmony\Creator\Instances\IObjInst2d.h" />
     <ClInclude Include="include\Harmony\Creator\Viewport\HyCamera2d.h" />
     <ClInclude Include="include\Harmony\Creator\Viewport\HyCamera3d.h" />
     <ClInclude Include="include\Harmony\Creator\Viewport\HyViewport.h" />
+    <ClInclude Include="include\Harmony\FileIO\Atlas\HyAtlas.h" />
+    <ClInclude Include="include\Harmony\FileIO\Atlas\HyTexture.h" />
     <ClInclude Include="include\Harmony\FileIO\HyFileIO.h" />
-    <ClInclude Include="include\Harmony\FileIO\HyTexture.h" />
     <ClInclude Include="include\Harmony\FileIO\jsonxx.h" />
     <ClInclude Include="include\Harmony\FileIO\stb_image.h" />
     <ClInclude Include="include\Harmony\GuiTool\HyGuiComms.h" />

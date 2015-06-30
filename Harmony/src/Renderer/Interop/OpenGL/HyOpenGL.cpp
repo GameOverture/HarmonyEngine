@@ -470,7 +470,8 @@ HyOpenGL::~HyOpenGL(void)
 	return hGLTexture;
 }
 
-/*virtual*/ void HyOpenGL::DeleteTexture(uint32 uiTextureId)
+/*virtual*/ void HyOpenGL::DeleteTexture(HyTexture &texture)
 {
-	glDeleteTextures(1, &uiTextureId);
+	uint32 uiTexId = texture.GetId();
+	glDeleteTextures(1, &uiTexId);
 }

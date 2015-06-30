@@ -33,20 +33,32 @@
 /*static*/ HyCreator *IObjInst2d::sm_pCtor = NULL;
 
 IObjInst2d::IObjInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName) :	m_keInstType(eInstType),
-																								m_ksPath(HyFileIO::GetFilePath(m_keInstType, szPrefix, szName)),
-																								m_pDataPtr(NULL),
-																								m_eLoadState(HYLOADSTATE_Inactive),
-																								m_pParent(NULL),
-																								m_bDirty(true),
-																								m_bEnabled(true)
+																								m_ksPath(HyFileIO::GetFilePath(m_keInstType, szPrefix, szName))
 {
-	m_vColor.Set(1.0f);
-	SetOnDirtyCallback(OnDirty, this);
+	CtorInit();
+}
+
+IObjInst2d::IObjInst2d(HyInstanceType eInstType, uint32 uiTextureIndex) :	m_keInstType(eInstType),
+																			m_ksPath(std::to_string(uiTextureIndex))
+{
+	CtorInit();
 }
 
 /*virtual*/ IObjInst2d::~IObjInst2d(void)
 {
 	Unload();
+}
+
+void IObjInst2d::CtorInit()
+{
+	m_pDataPtr = NULL;
+	m_eLoadState = HYLOADSTATE_Inactive;
+	m_pParent = NULL;
+	m_bDirty = true;
+	m_bEnabled = true;
+
+	m_vColor.Set(1.0f);
+	SetOnDirtyCallback(OnDirty, this);
 }
 
 void IObjInst2d::Load()

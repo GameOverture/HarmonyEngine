@@ -45,7 +45,10 @@ protected:
 
 public:
 	IObjInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName);
+	IObjInst2d(HyInstanceType eInstType, uint32 uiTextureIndex);
 	virtual ~IObjInst2d(void);
+
+	void CtorInit();
 
 	HyInstanceType GetInstType()								{ return m_keInstType; }
 	const std::string &GetPath()								{ return m_ksPath; }

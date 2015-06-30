@@ -55,5 +55,5 @@ HySpine2dData::~HySpine2dData()
 /*virtual*/ void HySpine2dData::OnGfxRemove(IGfxApi &gfxApi)
 {
 	HyTexture *pTexture = reinterpret_cast<HyTexture *>(m_SpineAtlasData->pages->rendererObject);
-	gfxApi.DeleteTexture(pTexture->GetId());
+	gfxApi.DeleteTexture(*pTexture);
 }

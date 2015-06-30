@@ -13,8 +13,7 @@
 
 HyPrimitive2d::HyPrimitive2d() :	IObjInst2d(HYINST_Primitive2d, NULL, NULL),
 									m_pVertices(NULL),
-									m_uiNumVerts(0),
-									m_uiTextureId(0)
+									m_uiNumVerts(0)
 {
 }
 

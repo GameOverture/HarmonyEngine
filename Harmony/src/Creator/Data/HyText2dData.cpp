@@ -57,7 +57,8 @@ HyText2dData::~HyText2dData(void)
 		stringStream << "[" << uiMinSize << "-" << uiMaxSize << "]";
 		sFontName += stringStream.str();
 
-		m_pTexture = LoadTexture(sFontName.c_str(), static_cast<int32>(atlas->width), static_cast<int32>(atlas->height), static_cast<int32>(atlas->depth), atlas->data);
+		HyError("Text2dData's DoFileLoad() is not implemented");
+		//m_pTexture = LoadTexture(sFontName.c_str(), static_cast<int32>(atlas->width), static_cast<int32>(atlas->height), static_cast<int32>(atlas->depth), atlas->data);
 
 		printf( "Matched pFont               : %s\n", sFontName.c_str() );
 		printf( "Number of fonts            : %ld\n", uiNumFonts );
@@ -92,5 +93,5 @@ _texture_glyph_t *HyText2dData::GetGlyph(uint32 uiFontIndex, wchar_t charcode)
 
 /*virtual*/ void HyText2dData::OnGfxRemove(IGfxApi &gfxApi)
 {
-	gfxApi.DeleteTexture(m_pTexture->GetId());
+	gfxApi.DeleteTexture(*m_pTexture);
 }

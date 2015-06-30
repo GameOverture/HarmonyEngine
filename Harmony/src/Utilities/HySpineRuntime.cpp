@@ -9,14 +9,16 @@
  *************************************************************************/
 #include "Utilities/HySpineRuntime.h"
 
-#include "Creator/Data/IData.h"
+#include "FileIO/HyFileIO.h"
 
 void _spAtlasPage_createTexture(spAtlasPage* self, const char* path)
 {
 	// THIS IS INVOKED FROM THE LOAD THREAD from any IData::DoLoad()
 
-	// Texture manager avoids loading repeats
-	HyTexture *pNewTexture = IData::LoadTexture(path);
+	// TODO: Convert 'path' to Atlas texture index
+	uint32 uiTextureIndex = 0;
+	
+	HyTexture *pNewTexture = HyFileIO::GetAtlasTexture(uiTextureIndex);
 	self->rendererObject = pNewTexture;
 
 	self->width = pNewTexture->GetWidth();

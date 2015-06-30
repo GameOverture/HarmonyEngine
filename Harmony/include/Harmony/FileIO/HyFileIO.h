@@ -12,19 +12,27 @@
 
 #include "Afx/HyStdAfx.h"
 #include "FileIO/jsonxx.h"
+#include "Atlas/HyAtlas.h"
 
 class HyFileIO
 {
 	static std::string		sm_sDataDir;
 
-	static std::string		sm_sLogStr;
+
+	static HyAtlas			sm_Atlas;
 
 public:
 	static void SetDataDir(const char *szPath);
-	static const std::string &GetDataDir()			{ return sm_sDataDir; }
+
+	static void InitAtlasData();
+
+	// Will load the texture from the file system if not already loaded
+	static HyTexture *GetAtlasTexture(int iTextureIndex);
 
 	// Do not include the file extension in 'szName'
 	static std::string GetFilePath(HyInstanceType eDataDirType, const char *szPrefix, const char *szName);
+
+	static std::string GetAtlasTexturePath(int iTextureIndex);
 
 	static bool FileExists(const std::string &sFilePath);
 

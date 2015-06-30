@@ -14,7 +14,9 @@
 #include <algorithm>
 
 std::string	HyFileIO::sm_sDataDir = "";
-std::string HyFileIO::sm_sLogStr = "";
+//std::string HyFileIO::sm_sLogStr = "";
+
+HyAtlas HyFileIO::sm_Atlas;
 
 /*static*/ void HyFileIO::SetDataDir(const char *szPath)
 {
@@ -26,6 +28,20 @@ std::string HyFileIO::sm_sLogStr = "";
 		sm_sDataDir.append("/");
 
 	// TODO: Error check whether pData dir and all the sub dirs exists
+}
+
+/*static*/ void HyFileIO::InitAtlasData()
+{
+	std::string sFilePath = sm_sDataDir;
+	sFilePath += "Atlas/atlasInfo.json";
+
+	sm_Atlas.Initialize(sFilePath);
+}
+
+// Will load the texture from the file system if not already loaded
+/*static*/ HyTexture *HyFileIO::GetAtlasTexture(int iTextureIndex)
+{
+	return sm_Atlas.GetTexture(iTextureIndex, GetAtlasTexturePath(iTextureIndex));
 }
 
 /*static*/ std::string HyFileIO::GetFilePath(HyInstanceType eType, const char *szPrefix, const char *szName)
@@ -65,6 +81,20 @@ std::string HyFileIO::sm_sLogStr = "";
 	return sFilePath;
 }
 
+/*static*/ std::string HyFileIO::GetAtlasTexturePath(int iTextureIndex)
+{
+	HyAssert(iTextureIndex >= 0, "HyFileIO::GetTexturePath() was passed a negative texture index");
+
+	std::string sFilePath = sm_sDataDir;
+	sFilePath += "Atlas/";
+
+	char szFileName[12];
+	sprintf(szFileName, "%05d.png", iTextureIndex);
+	sFilePath += szFileName;
+
+	return sFilePath;
+}
+
 /*static*/ bool HyFileIO::FileExists(const std::string &sFilePath)
 {
 	return true;
@@ -98,14 +128,14 @@ std::string HyFileIO::sm_sLogStr = "";
 {
 	if (szFilePath == NULL)
 	{
-		sm_sLogStr = "ReadTextFile - filename is NULL\n";
+		//sm_sLogStr = "ReadTextFile - filename is NULL\n";
 		return std::string();
 	}
 
 	std::ifstream infile(szFilePath, std::ios::binary);
 	if(!infile)
 	{
-		sm_sLogStr = "ReadTextFile() - invalid filename\n";
+		//sm_sLogStr = "ReadTextFile() - invalid filename\n";
 		return std::string();
 	}
 

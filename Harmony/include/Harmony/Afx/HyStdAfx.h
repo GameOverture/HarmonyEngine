@@ -22,6 +22,7 @@ enum HyInstanceType
 	HYINST_Sound2d,
 	HYINST_Sprite2d,
 	HYINST_Spine2d,
+	HYINST_TexturedQuad2d,
 	HYINST_Primitive2d,
 	HYINST_Text2d,
 	HYINST_Mesh3d,

@@ -15,7 +15,6 @@
 #include "HyFactory.h"
 
 #include "FileIO/HyFileIO.h"
-#include "FileIO/HyTexture.h"
 
 // Forward declarations
 class IGfxApi;
@@ -23,8 +22,6 @@ class IGfxApi;
 class IData
 {
 protected:
-	static vector<HyTexture *>		sm_vTextures;
-
 	const HyInstanceType			m_keDataType;
 	const std::string				m_ksPath;
 	
@@ -63,10 +60,6 @@ public:
 	// Only invoked on the Render thread
 	virtual void OnGfxLoad(IGfxApi &gfxApi) = 0;
 	virtual void OnGfxRemove(IGfxApi &gfxApi) = 0;
-
-	// Only invoked on the Load thread
-	static HyTexture *LoadTexture(const std::string &sPath);
-	static HyTexture *LoadTexture(const std::string &sPath, int32 iWidth, int32 iHeight, int32 iNum8bitClrChannels, unsigned char *pPixelData);
 };
 
 #endif /* __IData_h__ */

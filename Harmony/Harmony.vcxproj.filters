@@ -171,9 +171,6 @@
     <ClCompile Include="src\Creator\Data\IData.cpp">
       <Filter>Creator\Data</Filter>
     </ClCompile>
-    <ClCompile Include="src\FileIO\HyTexture.cpp">
-      <Filter>FileIO</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\HyRenderState.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
@@ -185,6 +182,18 @@
     </ClCompile>
     <ClCompile Include="src\Time\HyTime.cpp">
       <Filter>Time</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FileIO\Atlas\HyTexture.cpp">
+      <Filter>FileIO\Atlas</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FileIO\Atlas\HyAtlas.cpp">
+      <Filter>FileIO\Atlas</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Creator\Instances\HyTexturedQuad2d.cpp">
+      <Filter>Creator\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Creator\Data\HyTexturedQuad2dData.cpp">
+      <Filter>Creator\Data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -263,14 +272,14 @@
     <Filter Include="Utilities\Animation">
       <UniqueIdentifier>{42349797-5c4d-4251-912a-03d57d552c86}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer\RenderState">
-      <UniqueIdentifier>{416bf495-efec-4c0d-a6f3-27f82e59fd94}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Input\Gamepad\Mappings">
       <UniqueIdentifier>{f8b1513f-1385-4506-b22d-1bedcd21a33d}</UniqueIdentifier>
     </Filter>
     <Filter Include="GuiTool">
       <UniqueIdentifier>{f30ad593-855a-4f2f-9687-8e618b4ed676}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileIO\Atlas">
+      <UniqueIdentifier>{e45bffd8-5f02-42e3-b8bc-a90540b648cd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -516,9 +525,6 @@
     <ClInclude Include="include\Harmony\FileIO\jsonxx.h">
       <Filter>FileIO</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\FileIO\HyTexture.h">
-      <Filter>FileIO</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\HyRenderState.h">
       <Filter>Renderer</Filter>
     </ClInclude>
@@ -530,6 +536,18 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Time\HyTime.h">
       <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\FileIO\Atlas\HyTexture.h">
+      <Filter>FileIO\Atlas</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\FileIO\Atlas\HyAtlas.h">
+      <Filter>FileIO\Atlas</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Creator\Instances\HyTexturedQuad2d.h">
+      <Filter>Creator\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Creator\Data\HyTexturedQuad2dData.h">
+      <Filter>Creator\Data</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

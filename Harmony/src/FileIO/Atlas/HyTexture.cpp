@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "FileIO/HyTexture.h"
+#include "FileIO/Atlas/HyTexture.h"
 #include "FileIO/stb_image.h"
 #include "Utilities/HyStrManip.h"
 #include "Renderer/Interop/IGfxApi.h"

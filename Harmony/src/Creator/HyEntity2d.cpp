@@ -15,8 +15,6 @@
 #include "Creator/Instances/HyText2d.h"
 #include "Creator/Instances/HyPrimitive2d.h"
 
-#include "FileIO/HyTexture.h"
-
 /*static*/ HyCreator *HyEntity2d::sm_pCtor = NULL;
 
 // Hidden ctor used within AddChild()
