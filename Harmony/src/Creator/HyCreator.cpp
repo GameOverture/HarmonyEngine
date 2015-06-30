@@ -470,8 +470,13 @@ void HyCreator::WriteDrawBuffers()
 
 /*static*/ bool HyCreator::Inst2dSortPredicate(const IObjInst2d *pInst1, const IObjInst2d *pInst2)
 {
-	if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
-		return pInst1->GetRenderState() == pInst2->GetRenderState();
+	// TODO: Below is commented out because std::sort expects less-than operator to supply a transitive relationship, 
+	//		 i.e. when the sort sees A < B is true and B < C is true, it implies that A < C is true as well.
+	//
+	//		...for some reason this fails that?
+
+	//if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
+	//	return pInst1->GetRenderState() == pInst2->GetRenderState();
 
 	return pInst1->GetDisplayOrder() < pInst2->GetDisplayOrder();
 }
