@@ -13,6 +13,7 @@
 #include "HyApp.h"
 
 #include "Item.h"
+#include "ItemProject.h"
 
 namespace Ui {
 class WidgetRenderer;
@@ -42,6 +43,8 @@ class WidgetRenderer : public QWidget
     HyEngine *          m_pHyEngine;
     
     bool                m_bInitialized;
+    
+    ItemProject *       m_pCurProj;
 
 public:
     explicit WidgetRenderer(QWidget *parent = 0);

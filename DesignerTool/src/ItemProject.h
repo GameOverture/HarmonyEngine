@@ -13,11 +13,15 @@ class ItemProject : public Item
     WidgetAtlas *       m_pAtlases;
     HyPrimitive2d       m_CurAtlas;
     
+public:
     enum eDrawState
     {
         DRAWSTATE_AtlasManager,
     };
+    
+private:
     eDrawState          m_eState;
+    int                 m_iDrawStateIndex;
     
     ItemProject(const QString sPath);
     
@@ -29,6 +33,8 @@ public:
     virtual void Hide();
     virtual void Show();
     virtual void Draw(HyApp *pHyApp);
+    
+    void SetDrawState(eDrawState eState, int iDrawStateIndex);
 };
 
 #endif // ITEMPROJECT_H

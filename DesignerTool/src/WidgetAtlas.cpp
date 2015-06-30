@@ -33,6 +33,8 @@ WidgetAtlas::WidgetAtlas(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :    
     m_DataFile.setFile(m_pProjOwner->GetPath() % HYGUIPATH_RelDataAtlasFile);
     m_MetaDataFile.setFile(m_pProjOwner->GetPath() % HYGUIPATH_RelMetaDataAtlasFile);
     
+    ui->frameList->setSelectionMode(QAbstractItemView::MultiSelection);
+    
     // Search for packer settings file. If none exist create one with defaults and show settings page, else load setting from it and show frames page.
     LoadSettings();
     LoadData();
@@ -147,7 +149,7 @@ void WidgetAtlas::on_btnAddFiles_clicked()
     SaveData();
     
     // Display texture
-    MainWindow::OpenItem(this->m_pProjOwner);
+    RenderAtlas();
 }
 
 void WidgetAtlas::on_btnAddDir_clicked()
@@ -198,7 +200,7 @@ void WidgetAtlas::on_btnAddDir_clicked()
     SaveData();
     
     // Display texture
-    MainWindow::OpenItem(this->m_pProjOwner);
+    RenderAtlas();
 }
 
 void WidgetAtlas::on_cmbHeuristic_currentIndexChanged(const QString &arg1)
@@ -515,3 +517,36 @@ void WidgetAtlas::RepackFrames()
     }
 }
 
+void WidgetAtlas::RenderAtlas()
+{
+    if(ui->frameList->selectedItems().empty())
+        return;
+            
+    // Determine what's the last frame/texture selected, and display that texture in the renderer
+    QTreeWidgetItem *pTreeItem = ui->frameList->selectedItems()[ui->frameList->selectedItems().count() - 1];
+    while(pTreeItem->parent() != NULL)
+        pTreeItem = pTreeItem->parent();
+    
+    int iTextureId = 0;
+    for(int i = 0; i < ui->frameList->topLevelItemCount(); ++i)
+    {
+        if(ui->frameList->topLevelItem(i) == pTreeItem)
+        {
+            iTextureId = i;
+            break;
+        }
+    }
+            
+    m_pProjOwner->SetDrawState(ItemProject::DRAWSTATE_AtlasManager, iTextureId);
+    MainWindow::OpenItem(m_pProjOwner);
+}
+
+void WidgetAtlas::on_frameList_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    //item->ic
+}
+
+void WidgetAtlas::on_frameList_itemClicked(QTreeWidgetItem *item, int column)
+{
+    RenderAtlas();
+}

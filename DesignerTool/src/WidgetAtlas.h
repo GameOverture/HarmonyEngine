@@ -86,6 +86,10 @@ private slots:
     
     void on_btnChangeSettings_clicked();
     
+    void on_frameList_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    
+    void on_frameList_itemClicked(QTreeWidgetItem *item, int column);
+    
 private:
     Ui::WidgetAtlas *ui;
     
@@ -99,6 +103,8 @@ private:
     
     void ImportFrames(QStringList sImportImgList);
     void RepackFrames();
+    
+    void RenderAtlas();
 };
 
 #endif // WIDGETATLAS_H

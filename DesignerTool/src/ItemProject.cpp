@@ -33,3 +33,11 @@ ItemProject::~ItemProject()
     //pHyApp->GetViewport().GetResolution().iWidth
     //pHyApp->GetViewport().GetResolution().iHeight
 }
+
+void ItemProject::SetDrawState(eDrawState eState, int iDrawStateIndex)
+{
+    m_eState = eState;
+    m_iDrawStateIndex = iDrawStateIndex;
+    
+    //m_CurAtlas.SetAsTexturedQuad(
+}

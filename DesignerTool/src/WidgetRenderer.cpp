@@ -7,6 +7,7 @@ WidgetRenderer::WidgetRenderer(QWidget *parent) :   QWidget(parent),
 {
     ui->setupUi(this);
     ui->tabWidget->clear();
+    //ui->tabWidget->setTabBarAutoHide(true);
     m_bInitialized = true;    
 
     HarmonyInit initStruct;
@@ -24,6 +25,8 @@ WidgetRenderer::WidgetRenderer(QWidget *parent) :   QWidget(parent),
     m_pHyApp = new HyApp(initStruct);
     m_pHyEngine = new HyEngine(*m_pHyApp);
     m_pHyEngine->Initialize();
+    
+    HyFileIO::SetDataDir("../data");
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(Render()));
@@ -42,11 +45,22 @@ void WidgetRenderer::ClearItems()
 
 void WidgetRenderer::OpenItem(Item *pItem)
 {
+    if(pItem->GetType() == ITEM_Project)
+    {
+        m_pCurProj = static_cast<ItemProject *>(pItem);
+        m_pHyApp->SetItem(m_pCurProj);
+        
+        return;
+    }
+    
+    m_pCurProj = NULL;
+    
     for(int i = 0; i < ui->tabWidget->count(); ++i)
     {
+        // Determine if already opened
         if(reinterpret_cast<TabPage *>(ui->tabWidget->widget(i))->GetItem() == pItem)
         {
-            // Already opened
+            ui->tabWidget->setCurrentIndex(i);
             return;
         }
     }

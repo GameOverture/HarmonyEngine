@@ -22,7 +22,7 @@ enum eItemType
     ITEM_DirSprites,
     ITEM_DirShaders,
     ITEM_DirEntities,
-    ITEM_Prefix,
+    ITEM_Prefix,        // Essentially a sub-directory
     ITEM_Audio,
     ITEM_Particles,
     ITEM_Font,
