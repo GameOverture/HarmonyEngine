@@ -28,11 +28,11 @@ void Player::Initialize()
 	m_primBox.SetDisplayOrder(1.2f);
 	
 	m_spineBoy.Load();
-	m_spineBoy.SetDisplayOrder(1.0f);
+	//m_spineBoy.SetDisplayOrder(1.0f);
 
-	m_txtName.Load();
-	m_txtName.SetString(L"Testing");
-	m_txtName.Pos().Offset(0.0f, 0.0f);
+	//m_txtName.Load();
+	//m_txtName.SetString(L"Testing");
+	//m_txtName.Pos().Offset(0.0f, 0.0f);
 	
 	//m_spineBoy.AddChild(m_txtName);
 	//m_spineBoy.AddChild(m_primBox);
