@@ -14,6 +14,8 @@
 
 class HyTexturedQuad2dData : public IData
 {
+	friend class HyFactory<HyTexturedQuad2dData>;
+
 	HyTexture *				m_pTexture;
 
 	// Only allow HyFactory instantiate

@@ -41,7 +41,9 @@ class HySfxData;
 class HySprite2dData;
 class HySpine2dData;
 class HyText2dData;
+class HyTexturedQuad2dData;
 class HyMesh3dData;
+
 class HyGfxComms;
 class HyPhysics2d;
 class HyAnimVec2;
@@ -89,6 +91,7 @@ class HyCreator
 	HyFactory<HySpine2dData>							m_Spine2d;
 	HyFactory<HyMesh3dData>								m_Mesh3d;
 	HyFactory<HyText2dData>								m_Txt2d;
+	HyFactory<HyTexturedQuad2dData>						m_Quad2d;
 
 	// Pointers to all instances
 	bool												m_bInst2dOrderingDirty;

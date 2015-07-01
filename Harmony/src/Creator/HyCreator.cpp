@@ -17,6 +17,7 @@
 #include "Creator/Instances/HySprite2d.h"
 #include "Creator/Instances/HySpine2d.h"
 #include "Creator/Instances/HyPrimitive2d.h"
+#include "Creator/Instances/HyTexturedQuad2d.h"
 #include "Creator/HyPhysEntity2d.h"
 #include "Creator/Viewport/HyViewport.h"
 #include "Creator/HyEntity2d.h"
@@ -31,6 +32,7 @@ HyCreator::HyCreator(HyGfxComms &gfxCommsRef, HyViewport &gameViewport, HyCoordi
 																																		m_Spine2d(HYINST_Spine2d),
 																																		m_Txt2d(HYINST_Text2d),
 																																		m_Mesh3d(HYINST_Mesh3d),
+																																		m_Quad2d(HYINST_TexturedQuad2d),
 																																		m_b2World(b2Vec2(0.0f, -10.0f)),
 																																		m_iPhysVelocityIterations(8),
 																																		m_iPhysPositionIterations(3),
@@ -81,6 +83,9 @@ void HyCreator::LoadInst2d(IObjInst2d *pInst)
 		break;
 	case HYINST_Text2d:
 		pLoadData = m_Txt2d.GetOrCreateData(pInst->GetPath());
+		break;
+	case HYINST_TexturedQuad2d:
+		pLoadData = m_Quad2d.GetOrCreateData(pInst->GetPath());
 		break;
 	}
 
@@ -262,10 +267,11 @@ void HyCreator::DeleteData(IData *pData)
 
 	switch(pData->GetType())
 	{
-	case HYINST_Sound2d:	m_Sfx.DeleteData(reinterpret_cast<HySfxData *>(pData));			break;
-	case HYINST_Sprite2d:	m_Sprite2d.DeleteData(reinterpret_cast<HySprite2dData *>(pData));	break;
-	case HYINST_Spine2d:	m_Spine2d.DeleteData(reinterpret_cast<HySpine2dData *>(pData));	break;
-	case HYINST_Text2d:		m_Txt2d.DeleteData(reinterpret_cast<HyText2dData *>(pData));	break;
+	case HYINST_Sound2d:		m_Sfx.DeleteData(static_cast<HySfxData *>(pData));				break;
+	case HYINST_Sprite2d:		m_Sprite2d.DeleteData(static_cast<HySprite2dData *>(pData));	break;
+	case HYINST_Spine2d:		m_Spine2d.DeleteData(static_cast<HySpine2dData *>(pData));		break;
+	case HYINST_Text2d:			m_Txt2d.DeleteData(static_cast<HyText2dData *>(pData));			break;
+	case HYINST_TexturedQuad2d:	m_Quad2d.DeleteData(static_cast<HyTexturedQuad2dData *>(pData));break;
 	}
 }
 

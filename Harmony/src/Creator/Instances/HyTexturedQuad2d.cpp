@@ -16,3 +16,17 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiTextureIndex) : IObjInst2d(HYINST_Te
 HyTexturedQuad2d::~HyTexturedQuad2d()
 {
 }
+
+/*virtual*/ void HyTexturedQuad2d::OnDataLoaded()
+{
+	HyTexturedQuad2dData *pSpineData = static_cast<HyTexturedQuad2dData *>(m_pDataPtr);
+}
+
+/*virtual*/ void HyTexturedQuad2d::Update()
+{
+}
+
+/*virtual*/ void HyTexturedQuad2d::WriteDrawBufferData(char *&pRefDataWritePos)
+{
+	// START HERE:
+}

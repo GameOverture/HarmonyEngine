@@ -21,6 +21,7 @@ HyTexturedQuad2dData::~HyTexturedQuad2dData()
 
 /*virtual*/ void HyTexturedQuad2dData::DoFileLoad()
 {
+
 }
 
 /*virtual*/ void HyTexturedQuad2dData::OnGfxLoad(IGfxApi &gfxApi)
