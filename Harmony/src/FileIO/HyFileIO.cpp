@@ -52,11 +52,11 @@ HyAtlas HyFileIO::sm_Atlas;
 	std::string sFilePath = sm_sDataDir;
 	switch(eType)
 	{
-	case HYINST_Sound2d:		sFilePath += "audio/";		break;
-	case HYINST_Sprite2d:		sFilePath += "sprites/";	break;
-	case HYINST_Spine2d:		sFilePath += "spine/";		break;
-	case HYINST_Text2d:			sFilePath += "fonts/";		break;
-	case HYINST_Shader:			sFilePath += "shaders/";	break;
+	case HYINST_Sound2d:		sFilePath += "Audio/";	break;
+	case HYINST_Sprite2d:		sFilePath += "Sprite/";	break;
+	case HYINST_Spine2d:		sFilePath += "Spine/";	break;
+	case HYINST_Text2d:			sFilePath += "Font/";	break;
+	case HYINST_Shader:			sFilePath += "Shader/";	break;
 	case HYINST_Primitive2d:
 	case HYINST_Mesh3d:
 		break;

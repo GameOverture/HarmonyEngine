@@ -25,6 +25,8 @@ HyEngine::HyEngine(IApplication &appRef) :	m_AppRef(appRef),
 											m_Creator(m_Renderer.GetGfxComms(), m_AppRef.m_Viewport, m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
+
+	HyFileIO::InitAtlasData();
 }
 
 HyEngine::~HyEngine()
