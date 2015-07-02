@@ -83,6 +83,18 @@ FORMS    += \
     WidgetLiveVarManager.ui \
     DlgOpenProject.ui
 
+Release:DESTDIR = ../release
+Release:OBJECTS_DIR = ../release/.obj
+Release:MOC_DIR = ../release/.moc
+Release:RCC_DIR = ../release/.rcc
+Release:UI_DIR = ../release/.ui
+
+Debug:DESTDIR = ../debug
+Debug:OBJECTS_DIR = ../debug/.obj
+Debug:MOC_DIR = ../debug/.moc
+Debug:RCC_DIR = ../debug/.rcc
+Debug:UI_DIR = ../debug/.ui
+
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/bin/x64/ -lHarmonyQt
