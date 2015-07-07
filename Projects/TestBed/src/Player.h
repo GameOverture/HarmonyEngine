@@ -14,11 +14,11 @@
 
 class Player
 {
-	HySpine2d		m_spineBoy;
-	HyPrimitive2d	m_primBox;
-	HyText2d		m_txtName;
+	HySpine2d			m_spineBoy;
+	HyPrimitive2d		m_primBox;
+	HyText2d			m_txtName;
 
-	HySprite2d		m_testSprite;
+	HyTexturedQuad2d	m_testSprite;
 
 public:
 	Player(void);

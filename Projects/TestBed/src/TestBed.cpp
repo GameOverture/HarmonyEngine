@@ -56,7 +56,7 @@ TestBed::~TestBed(void)
 
 /*virtual*/ bool TestBed::Update()
 {
-	//if(m_pInputMapArray->GpBtnDown(GP360_ButtonB))
+	//if(m_pInputArray->SetReadKeyCallback GpBtnDown(GP360_ButtonB))
 	//{
 	//	if(m_pInputMapArray->GpBtnDown(GP360_ButtonB))
 	//		m_EntSpineBoy.ProcTranslate(Procedrual_QuadraticIn, vec2(-100.0f, 100.0f), 1.0f);

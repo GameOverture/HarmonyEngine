@@ -13,7 +13,7 @@
 Player::Player(void) :	m_spineBoy(NULL, "SpineBoy"),
 						m_primBox(),
 						m_txtName(NULL, NULL),
-						m_testSprite("Test", "TestSprite")
+						m_testSprite(0)
 { }
 
 Player::~Player(void)
