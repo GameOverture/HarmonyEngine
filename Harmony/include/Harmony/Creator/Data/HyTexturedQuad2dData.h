@@ -24,6 +24,8 @@ class HyTexturedQuad2dData : public IData
 public:
 	virtual ~HyTexturedQuad2dData();
 
+	const HyTexture *GetTexture() const;
+
 	virtual void DoFileLoad();
 	virtual void OnGfxLoad(IGfxApi &gfxApi);
 	virtual void OnGfxRemove(IGfxApi &gfxApi);

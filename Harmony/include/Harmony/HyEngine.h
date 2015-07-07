@@ -24,6 +24,7 @@
 #include "Creator/Instances/HySprite2d.h"
 #include "Creator/Instances/HySpine2d.h"
 #include "Creator/Instances/HyPrimitive2d.h"
+#include "Creator/Instances/HyTexturedQuad2d.h"
 #include "Creator/HyPhysEntity2d.h"
 
 #if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)

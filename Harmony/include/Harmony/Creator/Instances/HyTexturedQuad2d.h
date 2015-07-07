@@ -18,8 +18,6 @@
 
 class HyTexturedQuad2d : public IObjInst2d
 {
-	HyTexture *			m_pTexture;
-
 public:
 	HyTexturedQuad2d(uint32 uiTextureIndex);
 	virtual ~HyTexturedQuad2d();

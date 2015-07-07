@@ -50,12 +50,12 @@ public:
 	HyTexture(const std::string &sPath, int32 iWidth, int32 iHeight, int32 iNum8bitClrChannels, unsigned char *pPixelData);
 	~HyTexture(void);
 
-	int32 GetWidth()				{ return m_iWidth; }
-	int32 GetHeight()				{ return m_iHeight; }
-	int32 GetNumClrChannels()		{ return m_iNum8bitClrChannels; }
+	int32 GetWidth() const				{ return m_iWidth; }
+	int32 GetHeight() const				{ return m_iHeight; }
+	int32 GetNumClrChannels() const		{ return m_iNum8bitClrChannels; }
 
-	const std::string &GetPath()	{ return m_ksPath; }
-	uint32 GetId()					{ return m_uiId; }
+	const std::string &GetPath() const	{ return m_ksPath; }
+	uint32 GetId() const				{ return m_uiId; }
 
 	void Upload(IGfxApi &gfxApi);
 

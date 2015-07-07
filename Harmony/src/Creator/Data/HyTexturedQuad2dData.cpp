@@ -19,9 +19,15 @@ HyTexturedQuad2dData::~HyTexturedQuad2dData()
 {
 }
 
+const HyTexture *HyTexturedQuad2dData::GetTexture() const
+{
+	return m_pTexture;
+}
+
 /*virtual*/ void HyTexturedQuad2dData::DoFileLoad()
 {
-
+	int32 iTextureIndex = atoi(m_ksPath.c_str());
+	m_pTexture = HyFileIO::GetAtlasTexture(iTextureIndex);
 }
 
 /*virtual*/ void HyTexturedQuad2dData::OnGfxLoad(IGfxApi &gfxApi)

@@ -30,7 +30,9 @@ HyTexturedQuad2d::~HyTexturedQuad2d()
 
 /*virtual*/ void HyTexturedQuad2d::WriteDrawBufferData(char *&pRefDataWritePos)
 {
-	vec2 vSize(m_pTexture->GetWidth(), m_pTexture->GetHeight());
+	const HyTexture *pTexture = static_cast<HyTexturedQuad2dData *>(m_pDataPtr)->GetTexture();
+
+	vec2 vSize(pTexture->GetWidth(), pTexture->GetHeight());
 	vec2 vOffset(m_ptPosition.X(), m_ptPosition.Y());
 
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vSize;
