@@ -38,7 +38,7 @@
       <Filter>Input</Filter>
     </ClCompile>
     <ClCompile Include="src\Input\Mappings\HyInputMapping.cpp">
-      <Filter>Input\Gamepad\Mappings</Filter>
+      <Filter>Input\Mappings</Filter>
     </ClCompile>
     <ClCompile Include="src\Creator\Instances\HyPrimitive2d.cpp">
       <Filter>Creator\Instances</Filter>
@@ -272,14 +272,14 @@
     <Filter Include="Utilities\Animation">
       <UniqueIdentifier>{42349797-5c4d-4251-912a-03d57d552c86}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Input\Gamepad\Mappings">
-      <UniqueIdentifier>{f8b1513f-1385-4506-b22d-1bedcd21a33d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GuiTool">
       <UniqueIdentifier>{f30ad593-855a-4f2f-9687-8e618b4ed676}</UniqueIdentifier>
     </Filter>
     <Filter Include="FileIO\Atlas">
       <UniqueIdentifier>{e45bffd8-5f02-42e3-b8bc-a90540b648cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input\Mappings">
+      <UniqueIdentifier>{f8b1513f-1385-4506-b22d-1bedcd21a33d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -345,10 +345,10 @@
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Input\Mappings\HyInputAfx.h">
-      <Filter>Input\Gamepad\Mappings</Filter>
+      <Filter>Input\Mappings</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Input\Mappings\HyInputMapping.h">
-      <Filter>Input\Gamepad\Mappings</Filter>
+      <Filter>Input\Mappings</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Memory\HyMemoryHeap.h">
       <Filter>Memory</Filter>
