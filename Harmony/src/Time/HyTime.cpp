@@ -55,10 +55,12 @@ bool HyTime::ThrottleTime()
 
 		if(m_eJournalState != REPLAY_Off)
 		{
-			if(m_eJournalState == REPLAY_Saving)
-				m_InputRef.SaveInputs(m_uiJournalCount);
-			else // REPLAY_Replaying
-				m_InputRef.ApplyInputs(m_uiJournalCount);
+			// TODO: Need to implement gainput's input record/playback
+			//
+			//if(m_eJournalState == REPLAY_Saving)
+			//	m_InputRef.SaveInputs(m_uiJournalCount);
+			//else // REPLAY_Replaying
+			//	m_InputRef.ApplyInputs(m_uiJournalCount);
 			
 			m_uiJournalCount++;
 		}
