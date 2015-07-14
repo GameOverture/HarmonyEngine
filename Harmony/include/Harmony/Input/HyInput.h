@@ -13,40 +13,52 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Mappings/HyInputMapping.h"
+#include "gainput/gainput.h"
 
-#include <vector>
-#include <map>
-using std::vector;
-using std::map;
+//#include <vector>
+//#include <map>
+//using std::vector;
+//using std::map;
 
 class HyInput
 {
 	friend class ITimeApi;
 
+	gainput::InputManager			m_Manager;
+
+	gainput::DeviceId				m_idKB;
+	gainput::DeviceId				m_idMouse;
+	gainput::DeviceId				m_idGamePad;
+	gainput::DeviceId				m_idTouch;
+
 	HyInputMapping *				m_pInputMappings;
 	uint32							m_uiNumInputMappings;
 
 	float							m_fDeadZoneAmt;
-	map<uint32, tInputState>		m_mapGamePads;
+	//map<uint32, tInputState>		m_mapGamePads;
 
-	uint64							m_ui64KeyFlags[HYINPUT_KEYBOARD_CODE_NUMFLAGS];		// Offset of '32', Offset of '256', Offset of '320'
+	//uint64							m_ui64KeyFlags[HYINPUT_KEYBOARD_CODE_NUMFLAGS];		// Offset of '32', Offset of '256', Offset of '320'
 
 public:
 	HyInput(uint32 uiNumInputMaps, HyInputMapping *pInputMapping);
 	virtual ~HyInput(void);
 
-	map<uint32, tInputState> &		GetGamePadMapRef()	{ return m_mapGamePads; }
+	gainput::InputManager &GetManager();
+
+	void GiveDeviceIds(gainput::DeviceId &idKBOut, gainput::DeviceId &idMouseOut, gainput::DeviceId &idGamePadOut, gainput::DeviceId &idTouchOut);
+
+	//map<uint32, tInputState> &		GetGamePadMapRef()	{ return m_mapGamePads; }
 
 	void ProcessInputs();
 
-	void SaveInputs(uint32 uiUpdateIndex);
-	void ApplyInputs(uint32 uiUpdateIndex);
-	static void OnGamepadAttached(struct Gamepad_device * device, void * context);
-	static void OnGamepadRemoved(struct Gamepad_device * device, void * context);
+	//void SaveInputs(uint32 uiUpdateIndex);
+	//void ApplyInputs(uint32 uiUpdateIndex);
+	//static void OnGamepadAttached(struct Gamepad_device * device, void * context);
+	//static void OnGamepadRemoved(struct Gamepad_device * device, void * context);
 
-	static void OnButtonDown(struct Gamepad_device * device, unsigned int buttonID, void * context);
-	static void OnButtonUp(struct Gamepad_device * device, unsigned int buttonID, void * context);
-	static void OnAxisMove(struct Gamepad_device * device, unsigned int axisID, float value, float lastValue, void * context);
+	//static void OnButtonDown(struct Gamepad_device * device, unsigned int buttonID, void * context);
+	//static void OnButtonUp(struct Gamepad_device * device, unsigned int buttonID, void * context);
+	//static void OnAxisMove(struct Gamepad_device * device, unsigned int axisID, float value, float lastValue, void * context);
 };
 
 #endif /* __HyInput_h__ */

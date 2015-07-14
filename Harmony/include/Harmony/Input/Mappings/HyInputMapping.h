@@ -11,13 +11,14 @@
 #define __HyInputProfile_h__
 
 #include "Afx/HyStdAfx.h"
+#include "gainput/gainput.h"
 
-#include "HyInputAfx.h"
+//#include "HyInputAfx.h"
 
-#include <vector>
-#include <map>
-using std::vector;
-using std::map;
+//#include <vector>
+//#include <map>
+//using std::vector;
+//using std::map;
 
 // Forward declaration
 class HyInput;
@@ -27,34 +28,40 @@ class HyInputMapping
 	friend class HyInput;
 
 	HyInput *										m_pHyInput;
+	gainput::InputMap *								m_pInputMap;
 
-	vector<std::pair<eActionButton, HyInputKey> >	m_vBtnMappings;
-	vector<std::pair<eActionAxis, HyInputKey> >		m_vAxisMappings;
+	gainput::DeviceId								m_idKB;
+	gainput::DeviceId								m_idMouse;
+	gainput::DeviceId								m_idGamePad;
+	gainput::DeviceId								m_idTouch;
 
-	tInputState										m_tCurConvertedInput;
-	uint32											m_uiPrevConvertedBtnFlags;
+	//vector<std::pair<eActionButton, HyInputKey> >	m_vBtnMappings;
+	//vector<std::pair<eActionAxis, HyInputKey> >		m_vAxisMappings;
+
+	//tInputState										m_tCurConvertedInput;
+	//uint32											m_uiPrevConvertedBtnFlags;
 
 public:
 	HyInputMapping();
 	~HyInputMapping(void);
 
-	void BindBtnMap(eActionButton eActionBtn, HyInputKey &tKey);
-	void BindAxisMap(eActionAxis eActionBtn, HyInputKey &tKey);
-	void BindAxisMapPos(eActionAxis eAxis, HyInputKey &tKey);
-	void BindAxisMapNeg(eActionAxis eAxis, HyInputKey &tKey);
+	//void BindBtnMap(eActionButton eActionBtn, HyInputKey &tKey);
+	//void BindAxisMap(eActionAxis eActionBtn, HyInputKey &tKey);
+	//void BindAxisMapPos(eActionAxis eAxis, HyInputKey &tKey);
+	//void BindAxisMapNeg(eActionAxis eAxis, HyInputKey &tKey);
 
-	void GetGamePadIds(vector<uint32> &vGamePadIdsOut);
-	HyString GetGamePadName(uint32 uiGamePadId);
+	//void GetGamePadIds(vector<uint32> &vGamePadIdsOut);
+	//HyString GetGamePadName(uint32 uiGamePadId);
 
-	bool GpBtnDown(eActionButton eBtn);
-	bool GpBtnDownBuff(eActionButton eBtn);
-	bool GpBtnUp(eActionButton eBtn);
-	float GpAxis(eActionAxis eAxis);
+	//bool GpBtnDown(eActionButton eBtn);
+	//bool GpBtnDownBuff(eActionButton eBtn);
+	//bool GpBtnUp(eActionButton eBtn);
+	//float GpAxis(eActionAxis eAxis);
 
-	static void SetReadKeyCallback(void (*fpCallback)(HyInputKey &tKey, void *pParam), void *pParam = NULL);
+	//static void SetReadKeyCallback(void (*fpCallback)(HyInputKey &tKey, void *pParam), void *pParam = NULL);
 
 private:
-	void SetHyInputPtr(HyInput *pHyInput)	{ m_pHyInput = pHyInput; }
+	void SetHyInputPtr(HyInput *pHyInput);
 };
 
 #endif /* __HyInputProfile_h__ */

@@ -22,23 +22,23 @@ TestBed::~TestBed(void)
 
 /*virtual*/ bool TestBed::Initialize()
 {
-	m_pInputArray->GetGamePadIds(m_vGamePadIds);
+	//m_pInputArray->GetGamePadIds(m_vGamePadIds);
 
-	if(m_vGamePadIds.empty() == false)
-	{
-		m_pInputArray->BindBtnMap(GP360_ButtonA, HyInputKey(m_vGamePadIds[0], GP360_ButtonA));
-		m_pInputArray->BindBtnMap(GP360_ButtonB, HyInputKey(m_vGamePadIds[0], GP360_ButtonB));
+	//if(m_vGamePadIds.empty() == false)
+	//{
+	//	m_pInputArray->BindBtnMap(GP360_ButtonA, HyInputKey(m_vGamePadIds[0], GP360_ButtonA));
+	//	m_pInputArray->BindBtnMap(GP360_ButtonB, HyInputKey(m_vGamePadIds[0], GP360_ButtonB));
 
-		m_pInputArray->BindAxisMap(GP_RStickX, HyInputKey(m_vGamePadIds[0], GP_RStickX));
-		m_pInputArray->BindAxisMap(GP_RStickY, HyInputKey(m_vGamePadIds[0], GP_RStickY));
-		m_pInputArray->BindAxisMap(GP_Triggers, HyInputKey(m_vGamePadIds[0], GP_Triggers));
+	//	m_pInputArray->BindAxisMap(GP_RStickX, HyInputKey(m_vGamePadIds[0], GP_RStickX));
+	//	m_pInputArray->BindAxisMap(GP_RStickY, HyInputKey(m_vGamePadIds[0], GP_RStickY));
+	//	m_pInputArray->BindAxisMap(GP_Triggers, HyInputKey(m_vGamePadIds[0], GP_Triggers));
 
-		m_pInputArray->BindAxisMap(GP_LStickX, HyInputKey(m_vGamePadIds[0], GP_LStickX));
-	}
-	m_pInputArray->BindAxisMapPos(GP_LStickX, HyInputKey('D'));
-	m_pInputArray->BindAxisMapNeg(GP_LStickX, HyInputKey('A'));
+	//	m_pInputArray->BindAxisMap(GP_LStickX, HyInputKey(m_vGamePadIds[0], GP_LStickX));
+	//}
+	//m_pInputArray->BindAxisMapPos(GP_LStickX, HyInputKey('D'));
+	//m_pInputArray->BindAxisMapNeg(GP_LStickX, HyInputKey('A'));
 
-	m_pInputArray->BindBtnMap(GP360_ButtonA, HyInputKey(' '));
+	//m_pInputArray->BindBtnMap(GP360_ButtonA, HyInputKey(' '));
 
 	m_pCam = m_Viewport.CreateCamera2d();
 	
@@ -68,8 +68,8 @@ TestBed::~TestBed(void)
 	//	m_Player.Jump(2.75f);
 
 	//m_pCam->Pos().Set(m_Player.GetPos());
-	m_pCam->Pos().Offset(m_pInputArray->GpAxis(GP_RStickX) * 2.0f, -m_pInputArray->GpAxis(GP_RStickY) * 2.0f);
-	m_pCam->SetZoom(m_pCam->GetZoom() + m_pInputArray->GpAxis(GP_Triggers) * 0.05f);
+	//m_pCam->Pos().Offset(m_pInputArray->GpAxis(GP_RStickX) * 2.0f, -m_pInputArray->GpAxis(GP_RStickY) * 2.0f);
+	//m_pCam->SetZoom(m_pCam->GetZoom() + m_pInputArray->GpAxis(GP_Triggers) * 0.05f);
 
 
 	//m_TxtInst.SetString(HyStr("CamX: %f\tCamY:%f"), m_pCam->Pos().X(), m_pCam->Pos().Y());
