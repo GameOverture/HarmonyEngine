@@ -41,23 +41,23 @@ HyGlfw::~HyGlfw(void)
 	// Setup the error callback for GLFW
 	glfwSetErrorCallback(OnErrorCallback);
 
-	switch(m_pGfxComms->GetGfxInit()->eWindowType)
-	{
-	case HYWINDOW_WindowedFixed:
-		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-		break;
-	case HYWINDOW_WindowedSizeable:
-		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-		break;
+	//switch(m_pGfxComms->GetGfxInit()->eWindowType)
+	//{
+	//case HYWINDOW_WindowedFixed:
+	//	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	//	break;
+	//case HYWINDOW_WindowedSizeable:
+	//	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+	//	break;
 
-	case HYWINDOW_FullScreen:
-		break;
+	//case HYWINDOW_FullScreen:
+	//	break;
 
-	case HYWINDOW_BorderlessWindow:
-		glfwWindowHint(GLFW_DECORATED, GL_FALSE);
-		break;
-	}
-	
+	//case HYWINDOW_BorderlessWindow:
+	//	glfwWindowHint(GLFW_DECORATED, GL_FALSE);
+	//	break;
+	//}
+	//
 	
 	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -69,34 +69,34 @@ HyGlfw::~HyGlfw(void)
 	// TODO: Use glGet() ? with argument GL_MAX_ELEMENTS_VERTICES and GL_MAX_ELEMENTS_INDICES and check bounds
 
 
-	// Query resolutions (video modes) and store them.
-	const GLFWvidmode *		pGLFWvidModeList;
+	//// Query resolutions (video modes) and store them.
+	//const GLFWvidmode *		pGLFWvidModeList;
 
-	pGLFWvidModeList = glfwGetVideoModes(glfwGetPrimaryMonitor(), &pGfxInfo->uiNumNativeResolutions);
-	pGfxInfo->pResolutionList = new HyResolution[pGfxInfo->uiNumNativeResolutions];
-	for(int32 i = 0; i < pGfxInfo->uiNumNativeResolutions; ++i)
-	{
-		pGfxInfo->pResolutionList[i].iRedBits = pGLFWvidModeList[i].redBits;
-		pGfxInfo->pResolutionList[i].iGreenBits = pGLFWvidModeList[i].greenBits;
-		pGfxInfo->pResolutionList[i].iBlueBits = pGLFWvidModeList[i].blueBits;
+	//pGLFWvidModeList = glfwGetVideoModes(glfwGetPrimaryMonitor(), &pGfxInfo->uiNumNativeResolutions);
+	//pGfxInfo->pResolutionList = new HyResolution[pGfxInfo->uiNumNativeResolutions];
+	//for(int32 i = 0; i < pGfxInfo->uiNumNativeResolutions; ++i)
+	//{
+	//	pGfxInfo->pResolutionList[i].iRedBits = pGLFWvidModeList[i].redBits;
+	//	pGfxInfo->pResolutionList[i].iGreenBits = pGLFWvidModeList[i].greenBits;
+	//	pGfxInfo->pResolutionList[i].iBlueBits = pGLFWvidModeList[i].blueBits;
 
-		pGfxInfo->pResolutionList[i].iWidth = pGLFWvidModeList[i].width;
-		pGfxInfo->pResolutionList[i].iHeight = pGLFWvidModeList[i].height;
-	}
+	//	pGfxInfo->pResolutionList[i].iWidth = pGLFWvidModeList[i].width;
+	//	pGfxInfo->pResolutionList[i].iHeight = pGLFWvidModeList[i].height;
+	//}
 
-	const HyResolution &curResolution = m_pGfxComms->GetGfxInit()->startResolution;
-	const char *szWindowName = m_pGfxComms->GetGfxInit()->szWindowName.c_str();
+	//const HyResolution &curResolution = m_pGfxComms->GetGfxInit()->startResolution;
+	//const char *szWindowName = m_pGfxComms->GetGfxInit()->szWindowName.c_str();
 
-	// Open an OpenGL window
-	sm_pGLFWwindow = glfwCreateWindow(curResolution.iWidth, curResolution.iHeight, szWindowName, NULL, NULL);
+	//// Open an OpenGL window
+	//sm_pGLFWwindow = glfwCreateWindow(curResolution.iWidth, curResolution.iHeight, szWindowName, NULL, NULL);
 
 	if(!sm_pGLFWwindow)
 	{
 		return false;
 	}
 
-	sm_vWindowSize.x = curResolution.iWidth;
-	sm_vWindowSize.y = curResolution.iHeight;
+	//sm_vWindowSize.x = curResolution.iWidth;
+	//sm_vWindowSize.y = curResolution.iHeight;
 	sm_bViewportDirty = true;
 
 	// Make sure the window context is current with this render thread

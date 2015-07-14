@@ -9,14 +9,28 @@
  *************************************************************************/
 #include "Creator/Viewport/HyViewport.h"
 
-HyViewport::HyViewport(const HarmonyInit &initStruct)
+HyViewport::HyViewport(const HarmonyInit &initStruct) : m_uiNumWindows(initStruct.uiNumWindows)
 {
-	m_CurResolution.iWidth = initStruct.vStartResolution.x;
-	m_CurResolution.iHeight = initStruct.vStartResolution.y;
+	HyAssert(m_uiNumWindows > 0, "HyViewport was initialized with '0' windows");
+	m_pWindows = new HyWindowInfo[m_uiNumWindows];
 
-	m_sWindowName = initStruct.szGameName;
+	for(uint32 i = 0; i < m_uiNumWindows; ++i)
+		m_pWindows[i] = initStruct.windowInfo[i];
+}
 
-	m_eWindowType = initStruct.eWindowType;
+HyViewport::~HyViewport(void)
+{
+	delete [] m_pWindows;
+}
+
+uint32 HyViewport::GetNumWindows()
+{
+	return m_uiNumWindows;
+}
+
+HyWindowInfo &HyViewport::GetWindowInfo(uint32 uiIndex)
+{
+	return m_pWindows[uiIndex];
 }
 
 HyCamera2d *HyViewport::CreateCamera2d()
@@ -59,8 +73,4 @@ void HyViewport::RemoveCamera(HyCamera3d *&pCam)
 			return;
 		}
 	}
-}
-
-HyViewport::~HyViewport(void)
-{
 }

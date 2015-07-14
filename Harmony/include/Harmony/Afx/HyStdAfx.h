@@ -53,6 +53,15 @@ enum HyWindowType
 	HYWINDOW_BorderlessWindow
 };
 
+struct HyWindowInfo
+{
+	std::string		sName;
+	glm::ivec2		vResolution;
+	glm::ivec2		vLocation;
+	HyWindowType	eType;
+};
+
+#define HY_MAXWINDOWS 6
 
 // Client supplies these initialization parameters to the engine
 class HY_GFX_API;
@@ -60,8 +69,8 @@ struct HarmonyInit
 {
 	const char *			szGameName;
 	const char *			szDataDir;
-	HyWindowType			eWindowType;
-	glm::ivec2				vStartResolution;
+	uint32					uiNumWindows;
+	HyWindowInfo			windowInfo[HY_MAXWINDOWS];
 	HyCoordinateType		eDefaultCoordinateType;
 	float					fPixelsPerMeter;
 	uint32					uiNumInputMappings;
@@ -70,14 +79,23 @@ struct HarmonyInit
 
 	HarmonyInit() :	szGameName("Untitled Game"),
 					szDataDir("./data"),
-					eWindowType(HYWINDOW_WindowedFixed),
-					vStartResolution(512, 256),
+					uiNumWindows(1),
 					eDefaultCoordinateType(HYCOORD_Pixel),
 					fPixelsPerMeter(80),
 					uiNumInputMappings(1),
 					pSuppliedGfx(NULL),
 					szDefaultFont("Vera.ttf")
-	{ }
+	{
+		for(int i = 0; i < HY_MAXWINDOWS; ++i)
+		{
+			windowInfo[i].sName = "Window: " + std::to_string(i);
+			windowInfo[i].eType = HYWINDOW_WindowedFixed;
+			windowInfo[i].vResolution.x = 512;
+			windowInfo[i].vResolution.x = 256;
+			windowInfo[i].vLocation.x = i * windowInfo[i].vResolution.x;
+			windowInfo[i].vLocation.y = 0;
+		}
+	}
 };
 
 #endif // __HyStdAfx_h__

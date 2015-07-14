@@ -54,20 +54,19 @@ public:
 
 	struct tGfxInit
 	{
-		std::string				szWindowName;
-		HyResolution			startResolution;
-		HyWindowType			eWindowType;
+		uint32			uiNumWindows;
+		HyWindowInfo	windowInfo[HY_MAXWINDOWS];
 	};
 
 	struct tGfxInfo
 	{
 		int32			uiNumNativeResolutions;
-		HyResolution *	pResolutionList;
+		//HyResolution *	pResolutionList;
 	};
 
 private:
 
-	tGfxInit *					m_pGfxInit;
+	tGfxInit					m_GfxInit;
 	tGfxInfo *					m_pGfxInfo;
 
 	char *						m_pBuffer_Update;
@@ -91,8 +90,8 @@ public:
 	HyGfxComms();
 	~HyGfxComms();
 
-	void SetGfxInit(tGfxInit *pInit);
-	const tGfxInit *GetGfxInit();
+	void SetGfxInit(HyViewport &gameViewportRef);
+	tGfxInit GetGfxInit();
 
 	void SetGfxInfo(tGfxInfo *pInfo);
 	const tGfxInfo *GetGfxInfo();

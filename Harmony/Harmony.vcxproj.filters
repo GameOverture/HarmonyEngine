@@ -195,6 +195,9 @@
     <ClCompile Include="src\Creator\Data\HyTexturedQuad2dData.cpp">
       <Filter>Creator\Data</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\Interop\Window\HyWindow_Win.cpp">
+      <Filter>Renderer\Interop\Window</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -280,6 +283,9 @@
     </Filter>
     <Filter Include="Input\Mappings">
       <UniqueIdentifier>{f8b1513f-1385-4506-b22d-1bedcd21a33d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Interop\Window">
+      <UniqueIdentifier>{74f94cea-0fbb-478a-85f4-97ddddf26e85}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -548,6 +554,9 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Creator\Data\HyTexturedQuad2dData.h">
       <Filter>Creator\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\Interop\Window\HyWindow_Win.h">
+      <Filter>Renderer\Interop\Window</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

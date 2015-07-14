@@ -34,12 +34,7 @@ HyRenderer::HyRenderer(HyViewport &gameViewportRef, HY_GFX_API *pSuppliedGfx /*=
 	//if(sizeof(HyDrawText2d) > sm_uiLargest2dDrawSize)
 	//	sm_uiLargest2dDrawSize = sizeof(HyDrawText2d);
 
-
-	HyGfxComms::tGfxInit *pGfxInit = new HyGfxComms::tGfxInit();
-	pGfxInit->szWindowName = gameViewportRef.GetWindowName();
-	pGfxInit->startResolution = gameViewportRef.GetResolution();
-	pGfxInit->eWindowType = gameViewportRef.GetWindowType();
-	m_GfxComms.SetGfxInit(pGfxInit);
+	m_GfxComms.SetGfxInit(gameViewportRef);
 
 	if(pSuppliedGfx)
 		m_pGfxApi = pSuppliedGfx;

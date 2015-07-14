@@ -11,7 +11,6 @@
 
 HyGfxComms::HyGfxComms()
 {
-	m_pGfxInit = NULL;
 	m_pGfxInfo = NULL;
 
 	m_pBuffer_Update = m_pBuffer_Shared = m_pBuffer_Render = NULL;
@@ -50,22 +49,19 @@ HyGfxComms::~HyGfxComms()
 	delete m_pReceiveData_Render;
 }
 
-void HyGfxComms::SetGfxInit(tGfxInit *pInit)
+void HyGfxComms::SetGfxInit(HyViewport &gameViewportRef)
 {
 	LockInfo();
-	HyAssert(m_pGfxInit == NULL, "SetGfxInit() was invoked with already set 'm_pGfxInit'");
-	m_pGfxInit = pInit;
+	m_GfxInit.uiNumWindows = gameViewportRef.GetNumWindows();
+
+	for(uint32 i = 0; i < m_GfxInit.uiNumWindows; ++i)
+		m_GfxInit.windowInfo[i] = gameViewportRef.GetWindowInfo(i);
+
 	UnlockInfo();
 }
-const HyGfxComms::tGfxInit *HyGfxComms::GetGfxInit()
+HyGfxComms::tGfxInit HyGfxComms::GetGfxInit()
 {
-	const tGfxInit *pInit;
-
-	LockInfo();
-	pInit = m_pGfxInit;
-	UnlockInfo(); 
-
-	return pInit;
+	return m_GfxInit;
 }
 
 void HyGfxComms::SetGfxInfo(tGfxInfo *pInfo)

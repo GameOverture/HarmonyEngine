@@ -87,6 +87,7 @@
     <ClCompile Include="src\Renderer\Interop\IGfxApi.cpp" />
     <ClCompile Include="src\Renderer\Interop\OpenGL\HyOpenGL.cpp" />
     <ClCompile Include="src\Renderer\Interop\OpenGL\HyOpenGLShader.cpp" />
+    <ClCompile Include="src\Renderer\Interop\Window\HyWindow_Win.cpp" />
     <ClCompile Include="src\Time\Interop\HyTimeApi_Win.cpp" />
     <ClCompile Include="src\Time\HyTime.cpp" />
     <ClCompile Include="src\Time\Watches\HyStopwatch.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="include\Harmony\Renderer\Interop\IGfxApi.h" />
     <ClInclude Include="include\Harmony\Renderer\Interop\OpenGL\HyOpenGL.h" />
     <ClInclude Include="include\Harmony\Renderer\Interop\OpenGL\HyOpenGLShader.h" />
+    <ClInclude Include="include\Harmony\Renderer\Interop\Window\HyWindow_Win.h" />
     <ClInclude Include="include\Harmony\Threading\BaseMacro.h" />
     <ClInclude Include="include\Harmony\Threading\BasicSync.h" />
     <ClInclude Include="include\Harmony\Threading\Error.h" />
