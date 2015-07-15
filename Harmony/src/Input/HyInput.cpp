@@ -20,7 +20,7 @@ HyInput::HyInput(uint32 uiNumInputMaps, HyInputMapping *pInputMapping) :	m_fDead
 
 	m_idKB = m_Manager.CreateDevice<gainput::InputDeviceKeyboard>();
 	m_idMouse = m_Manager.CreateDevice<gainput::InputDeviceMouse>();
-	m_idGamePad = m_Manager.CreateDevice<gainput::InputDevicePad>();
+	//m_idGamePad = m_Manager.CreateDevice<gainput::InputDevicePad>();
 	m_idTouch = m_Manager.CreateDevice<gainput::InputDeviceTouch>();
 
 	for(uint32 i = 0; i < m_uiNumInputMappings; ++i)
