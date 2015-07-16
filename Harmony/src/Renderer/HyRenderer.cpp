@@ -9,10 +9,14 @@
  *************************************************************************/
 #include "Renderer/HyRenderer.h"
 
-#if (defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)) && !defined(HY_PLATFORM_GUI)
-	#include "Renderer/Interop/GLFW/HyGlfw.h"
+#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
+	#include "Renderer/GfxApi/OpenGL/Interop/HyOpenGL_Win.h"
+#elif defined(HY_PLATFORM_OSX) && !defined(HY_PLATFORM_GUI)
+	#include "Renderer/GfxApi/OpenGL/Interop/HyOpenGL_OSX.h"
+#elif defined(HY_PLATFORM_LINUX) && !defined(HY_PLATFORM_GUI)
+	#include "Renderer/GfxApi/OpenGL/Interop/HyOpenGL_Linux.h"
 #elif defined(HY_PLATFORM_GUI)
-	#include "Renderer/Interop/OpenGL/HyOpenGL.h"
+	#include "Renderer/GfxApi/OpenGL/HyOpenGL.h"
 #endif
 
 //#include "Renderer/DrawData/HyDrawSprite2d.h"
@@ -64,7 +68,11 @@ HyRenderer::~HyRenderer()
 {
 	HY_GFX_API *pGfxApi = reinterpret_cast<HY_GFX_API *>(pParam);
 
-	pGfxApi->Initialize();
+	if(pGfxApi->Initialize() == false)
+	{
+		HyError("Graphics API's Initialize() failed");
+	}
+
 	HyAssert(pGfxApi->GetGfxInfo(), "Graphics API must m_GfxComms.SetGfxInfo() within its Initialize()");
 
 	while (pGfxApi->PollApi())

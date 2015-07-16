@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Creator/Data/HyTexturedQuad2dData.h"
 
-#include "Renderer/Interop/IGfxApi.h"
+#include "Renderer/GfxApi/IGfxApi.h"
 
 HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath) : IData(HYINST_TexturedQuad2d, sPath)
 {

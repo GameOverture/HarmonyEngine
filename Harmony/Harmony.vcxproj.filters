@@ -116,12 +116,6 @@
     <ClCompile Include="src\Creator\Viewport\HyCamera2d.cpp">
       <Filter>Creator\Viewport</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Interop\GLFW\HyGlfw.cpp">
-      <Filter>Renderer\Interop\GLFW</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\Interop\GLFW\HyGlfwInput.cpp">
-      <Filter>Renderer\Interop\GLFW</Filter>
-    </ClCompile>
     <ClCompile Include="src\Creator\Instances\HyMesh3d.cpp">
       <Filter>Creator\Instances</Filter>
     </ClCompile>
@@ -149,16 +143,7 @@
     <ClCompile Include="src\Time\Interop\HyTimeApi_Win.cpp">
       <Filter>Time\Interop</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Interop\IGfxApi.cpp">
-      <Filter>Renderer\Interop</Filter>
-    </ClCompile>
     <ClCompile Include="src\IApplication.cpp" />
-    <ClCompile Include="src\Renderer\Interop\OpenGL\HyOpenGL.cpp">
-      <Filter>Renderer\Interop\OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\Interop\OpenGL\HyOpenGLShader.cpp">
-      <Filter>Renderer\Interop\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="src\FileIO\HyFileIO.cpp">
       <Filter>FileIO</Filter>
     </ClCompile>
@@ -195,8 +180,17 @@
     <ClCompile Include="src\Creator\Data\HyTexturedQuad2dData.cpp">
       <Filter>Creator\Data</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Interop\Window\HyWindow_Win.cpp">
-      <Filter>Renderer\Interop\Window</Filter>
+    <ClCompile Include="src\Renderer\GfxApi\IGfxApi.cpp">
+      <Filter>Renderer\GfxApi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\GfxApi\OpenGL\HyOpenGL.cpp">
+      <Filter>Renderer\GfxApi\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\GfxApi\OpenGL\HyOpenGLShader.cpp">
+      <Filter>Renderer\GfxApi\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\GfxApi\OpenGL\Interop\HyOpenGL_Win.cpp">
+      <Filter>Renderer\GfxApi\OpenGL\Interop</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -221,9 +215,6 @@
     <Filter Include="Afx\Platforms">
       <UniqueIdentifier>{6cfd5e75-2b18-4340-a6e5-3f2f1530aa7e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer\Interop">
-      <UniqueIdentifier>{f3daebb6-b6cf-46d6-b959-6b861f40e3dc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Memory\PageTypes">
       <UniqueIdentifier>{158d1934-0b29-46ec-b547-1d4f16b9fdfb}</UniqueIdentifier>
     </Filter>
@@ -235,9 +226,6 @@
     </Filter>
     <Filter Include="Creator\Instances">
       <UniqueIdentifier>{ec58a594-4c25-450e-8da2-18f7aba82257}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Renderer\Interop\GLFW">
-      <UniqueIdentifier>{5e0d33d9-140d-4374-808e-c82adffe8cf2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Creator\Data">
       <UniqueIdentifier>{00592c5a-ab78-4b8a-b040-c6180ab6fa8c}</UniqueIdentifier>
@@ -260,9 +248,6 @@
     <Filter Include="Time\Interop">
       <UniqueIdentifier>{b2ff0804-0605-43fa-bfbd-c41b8a6dfd92}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer\Interop\OpenGL">
-      <UniqueIdentifier>{35acf398-7264-458b-a5de-5e9183faf177}</UniqueIdentifier>
-    </Filter>
     <Filter Include="FileIO">
       <UniqueIdentifier>{e2b21351-8df2-464a-9b03-dde1640d06dc}</UniqueIdentifier>
     </Filter>
@@ -284,8 +269,14 @@
     <Filter Include="Input\Mappings">
       <UniqueIdentifier>{f8b1513f-1385-4506-b22d-1bedcd21a33d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer\Interop\Window">
-      <UniqueIdentifier>{74f94cea-0fbb-478a-85f4-97ddddf26e85}</UniqueIdentifier>
+    <Filter Include="Renderer\GfxApi">
+      <UniqueIdentifier>{6363bd36-1c70-40ae-8e27-cdb4e7dedc66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\GfxApi\OpenGL">
+      <UniqueIdentifier>{de087e1e-abaf-4e4a-be29-4ba8a1fe15b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\GfxApi\OpenGL\Interop">
+      <UniqueIdentifier>{a0ce4c78-e583-4b40-8248-7615acb5c2e9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -479,12 +470,6 @@
     <ClInclude Include="include\Harmony\Creator\Viewport\HyCamera2d.h">
       <Filter>Creator\Viewport</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\Interop\GLFW\HyGlfw.h">
-      <Filter>Renderer\Interop\GLFW</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\Interop\GLFW\HyGlfwInput.h">
-      <Filter>Renderer\Interop\GLFW</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Creator\Instances\HyMesh3d.h">
       <Filter>Creator\Instances</Filter>
     </ClInclude>
@@ -512,16 +497,7 @@
     <ClInclude Include="include\Harmony\Time\Interop\HyTimeApi_Win.h">
       <Filter>Time\Interop</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\Interop\IGfxApi.h">
-      <Filter>Renderer\Interop</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\IApplication.h" />
-    <ClInclude Include="include\Harmony\Renderer\Interop\OpenGL\HyOpenGL.h">
-      <Filter>Renderer\Interop\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\Interop\OpenGL\HyOpenGLShader.h">
-      <Filter>Renderer\Interop\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\FileIO\stb_image.h">
       <Filter>FileIO</Filter>
     </ClInclude>
@@ -555,8 +531,17 @@
     <ClInclude Include="include\Harmony\Creator\Data\HyTexturedQuad2dData.h">
       <Filter>Creator\Data</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\Interop\Window\HyWindow_Win.h">
-      <Filter>Renderer\Interop\Window</Filter>
+    <ClInclude Include="include\Harmony\Renderer\GfxApi\IGfxApi.h">
+      <Filter>Renderer\GfxApi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\GfxApi\OpenGL\HyOpenGL.h">
+      <Filter>Renderer\GfxApi\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\GfxApi\OpenGL\HyOpenGLShader.h">
+      <Filter>Renderer\GfxApi\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\GfxApi\OpenGL\Interop\HyOpenGL_Win.h">
+      <Filter>Renderer\GfxApi\OpenGL\Interop</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -12,8 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Renderer/Interop/IGfxApi.h"
-#include "Renderer/Interop/OpenGL/HyOpenGLShader.h"
+#include "Renderer/GfxApi/IGfxApi.h"
+#include "Renderer/GfxApi/OpenGL/HyOpenGLShader.h"
 
 //#define HY_INDEX_BUFFER_SIZE (128 * 1024)
 //#define HY_RESTART_INDEX 65535

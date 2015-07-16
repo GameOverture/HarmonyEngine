@@ -10,7 +10,7 @@
 #include "FileIO/Atlas/HyTexture.h"
 #include "FileIO/stb_image.h"
 #include "Utilities/HyStrManip.h"
-#include "Renderer/Interop/IGfxApi.h"
+#include "Renderer/GfxApi/IGfxApi.h"
 
 HyTexture::HyTexture(const std::string &sPath, HyRectangle *pSrcRects /*= NULL*/, uint32 uiNumRects /*= 0*/) :	m_ksPath(sPath),
 													m_iWidth(0),

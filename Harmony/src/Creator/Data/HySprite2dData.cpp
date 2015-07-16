@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Creator/Data/HySprite2dData.h"
 
-#include "Renderer/Interop/IGfxApi.h"
+#include "Renderer/GfxApi/IGfxApi.h"
 
 HySprite2dData::HySprite2dData(const std::string &sPath) :	IData(HYINST_Spine2d, sPath)
 {

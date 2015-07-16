@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Renderer/Interop/IGfxApi.h"
+#include "Renderer/GfxApi/IGfxApi.h"
 
 IGfxApi::IGfxApi() :	m_pGfxComms(NULL)
 {

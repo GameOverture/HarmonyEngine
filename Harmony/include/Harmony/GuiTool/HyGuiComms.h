@@ -86,7 +86,7 @@ public:
 #define HyLogInfo(msg) {\
 	std::stringstream ss; \
 	ss << msg; \
-	HyGuiComms::Log(ss.c_str(), 3); }
+	HyGuiComms::Log(ss.str(), 3); }
 #define HyLogTitle(msg) {\
 	std::stringstream ss; \
 	ss << msg; \

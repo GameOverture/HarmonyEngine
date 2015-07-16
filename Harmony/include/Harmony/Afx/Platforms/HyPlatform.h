@@ -155,7 +155,7 @@ HY_INLINE uint32 EndianSwap32(uint32 var)
 	#else
 		// This includes only the necessary parts of Windows.h if it isn't included above
 		#include "GLFW/glfw3.h"
-		#define HY_GFX_API HyGlfw
+		#define HY_GFX_API HyOpenGL_Win
 	#endif
 
 	#define HY_TIME_API HyTimeApi_Win

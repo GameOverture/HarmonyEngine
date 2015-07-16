@@ -10,8 +10,6 @@
 #include "Input/HyInput.h"
 //#include "Gamepad/Gamepad.h"
 
-#include "Renderer/Interop/GLFW/HyGlfwInput.h"
-
 HyInput::HyInput(uint32 uiNumInputMaps, HyInputMapping *pInputMapping) :	m_fDeadZoneAmt(0.2f),
 																			m_uiNumInputMappings(uiNumInputMaps),
 																			m_pInputMappings(pInputMapping)

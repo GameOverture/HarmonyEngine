@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Creator/Data/HySpine2dData.h"
-#include "Renderer/Interop/IGfxApi.h"
+#include "Renderer/GfxApi/IGfxApi.h"
 
 HySpine2dData::HySpine2dData(const std::string &sPath) :	IData(HYINST_Spine2d, sPath)
 {

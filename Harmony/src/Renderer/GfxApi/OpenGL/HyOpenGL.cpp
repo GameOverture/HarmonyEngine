@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Renderer/Interop/OpenGL/HyOpenGL.h"
+#include "Renderer/GfxApi/OpenGL/HyOpenGL.h"
 
 // THIS WORKS BELOW!
 const float vertexDataEmulate[] = {
