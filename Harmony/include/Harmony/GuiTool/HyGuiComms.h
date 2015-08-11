@@ -73,24 +73,24 @@ public:
 
 #define HyLog(msg) {\
 	std::stringstream ss; \
-	ss << msg; \
-	HyGuiComms::Log(ss.c_str(), 0); }
+	ss << msg << std::endl \
+	HyGuiComms::Log(ss.str().c_str(), 0); }
 #define HyLogWarning(msg) {\
 	std::stringstream ss; \
-	ss << msg; \
-	HyGuiComms::Log(ss.c_str(), 1); }
+	ss << msg << std::endl; \
+	HyGuiComms::Log(ss.str().c_str(), 1); }
 #define HyLogError(msg) {\
 	std::stringstream ss; \
-	ss << msg; \
-	HyGuiComms::Log(ss.c_str(), 2); }
+	ss << msg << std::endl; \
+	HyGuiComms::Log(ss.str().c_str(), 2); }
 #define HyLogInfo(msg) {\
 	std::stringstream ss; \
-	ss << msg; \
-	HyGuiComms::Log(ss.str(), 3); }
+	ss << msg << std::endl; \
+	HyGuiComms::Log(ss.str().c_str(), 3); }
 #define HyLogTitle(msg) {\
 	std::stringstream ss; \
-	ss << msg; \
-	HyGuiComms::Log(ss.c_str(), 4); }
+	ss << msg << std::endl; \
+	HyGuiComms::Log(ss.str().c_str(), 4); }
 
 #endif
 
