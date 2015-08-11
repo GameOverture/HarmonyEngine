@@ -64,6 +64,11 @@ HyOpenGL::~HyOpenGL(void)
 {
 }
 
+/*virtual*/ bool HyOpenGL::CreateWindows()
+{
+	return true;
+}
+
 /*virtual*/ bool HyOpenGL::Initialize()
 {
 	//////////////////////////////////////////////////////////////////////////

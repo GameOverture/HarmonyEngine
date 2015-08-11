@@ -25,7 +25,7 @@ HyOpenGL_Win::~HyOpenGL_Win()
 {
 }
 
-/*virtual*/ bool HyOpenGL_Win::Initialize()
+/*virtual*/ bool HyOpenGL_Win::CreateWindows()
 {
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 
@@ -45,14 +45,29 @@ HyOpenGL_Win::~HyOpenGL_Win()
 
 	m_hWnd = CreateWindowA(wc.lpszClassName, "", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, 640, 480, 0, 0, hInstance, 0);
 
+	if(m_hWnd == NULL)
+	{
+		DWORD dwError = GetLastError();
+		HyLogError("CreateWindowA() returned the error: " << dwError);
+	}
+
 	SetPropA(m_hWnd, "ThisPtr", this);
 
-	while(PeekMessageA(&msg, m_hWnd, 0, 0, PM_REMOVE))
-		DispatchMessageA(&msg);
-
-	m_pGfxComms->SetGfxInfo(reinterpret_cast<HyGfxComms::tGfxInfo *>(1));
-
 	return true;
+}
+
+/*virtual*/ bool HyOpenGL_Win::Initialize()
+{
+	MSG msg = { 0 };
+	while(GetMessage(&msg, m_hWnd, 0, 0) != 0)
+	{
+		DispatchMessage(&msg);
+
+		if(WM_CREATE == msg.message || WM_NCCREATE == msg.message)
+			break;
+	}
+
+	return HyOpenGL::Initialize();
 }
 
 /*virtual*/ bool HyOpenGL_Win::PollApi()
@@ -73,6 +88,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch(message)
 	{
+	case WM_GETMINMAXINFO:
+	{
+		int asdf = 0;
+		asdf++;
+		break;
+	}
+	case WM_NCCREATE:
 	case WM_CREATE:
 		{
 			PIXELFORMATDESCRIPTOR pfd =
@@ -103,7 +125,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pThis->m_hGLContext = wglCreateContext(hDeviceContext);
 			wglMakeCurrent(hDeviceContext, pThis->m_hGLContext);
 
-			pThis->HyOpenGL::Initialize();
+			pThis->m_pGfxComms->SetGfxInfo(reinterpret_cast<HyGfxComms::tGfxInfo *>(1));
 
 			//char *pVersion = (char *)glGetString(GL_VERSION);
 			//HyLogInfo(pVersion);

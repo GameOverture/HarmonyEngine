@@ -41,6 +41,8 @@ public:
 	void SetGfxComms(HyGfxComms *pGfxComms)	{ m_pGfxComms = pGfxComms; }
 	const HyGfxComms::tGfxInfo *GetGfxInfo(){ return m_pGfxComms->GetGfxInfo(); }
 
+	virtual bool CreateWindows() = 0;
+
 	virtual bool Initialize() = 0;
 	virtual bool PollApi() = 0;
 	virtual bool CheckDevice() = 0;

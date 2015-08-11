@@ -51,6 +51,8 @@ public:
 	HyOpenGL();
 	virtual ~HyOpenGL(void);
 
+	virtual bool CreateWindows();
+
 	virtual bool Initialize();
 	virtual bool PollApi();
 	virtual bool CheckDevice();

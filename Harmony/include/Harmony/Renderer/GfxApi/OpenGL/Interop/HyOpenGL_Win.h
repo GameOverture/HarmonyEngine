@@ -25,6 +25,8 @@ public:
 	HyOpenGL_Win();
 	~HyOpenGL_Win();
 
+	virtual bool CreateWindows();
+
 	virtual bool Initialize();
 	virtual bool PollApi();
 };
