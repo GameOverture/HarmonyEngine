@@ -78,11 +78,10 @@ HyOpenGL::~HyOpenGL(void)
 
 	if(err != GLEW_OK)
 	{
-		GLenum error = glGetError();
-		if(error != GL_NO_ERROR)
-			std::cout << "OpenGL Error: " << error << std::endl;
-
-		exit(EXIT_FAILURE);
+		GLenum eError = glGetError();
+		//const GLubyte *szErrorStr;
+		//szErrorStr = gluErrorString(eError);
+		HyError("OpenGL Error: " << eError/* << std::endl << szErrorStr*/);
 	}
 
 	//if (glewIsSupported("GL_VERSION_3_3"))

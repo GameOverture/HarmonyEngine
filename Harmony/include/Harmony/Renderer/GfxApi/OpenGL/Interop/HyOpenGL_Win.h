@@ -18,8 +18,14 @@ class HyOpenGL_Win : public HyOpenGL
 {
 	friend LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	HGLRC m_hGLContext;
-	HWND m_hWnd;
+	struct DeviceContext
+	{
+		HWND m_hWnd;
+		HGLRC m_hGLContext;
+	};
+
+	DeviceContext *		m_pDeviceContexes;
+	uint32				m_uiNumDCs;
 
 public:
 	HyOpenGL_Win();

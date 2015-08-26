@@ -69,14 +69,10 @@ HyRenderer::~HyRenderer()
 	HY_GFX_API *pGfxApi = reinterpret_cast<HY_GFX_API *>(pParam);
 
 	if(pGfxApi->CreateWindows() == false)
-	{
 		HyError("Graphics API's CreateWindows() failed");
-	}
 
 	if(pGfxApi->Initialize() == false)
-	{
 		HyError("Graphics API's Initialize() failed");
-	}
 
 	HyAssert(pGfxApi->GetGfxInfo(), "Graphics API must m_GfxComms.SetGfxInfo() within its Initialize()");
 
