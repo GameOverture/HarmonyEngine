@@ -49,7 +49,6 @@ HyOpenGL_Win::~HyOpenGL_Win()
 		{
 			HyError("HyOpenGL_Win::HyOpenGL_Win() - RegisterClass() failed");
 		}
-
 		
 		m_pDeviceContexes[i].m_hWnd = CreateWindow(wc.lpszClassName, StringToWString(wndInfo.sName).c_str(), WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, 640, 480, 0, 0, hInstance, this);
 
@@ -58,7 +57,6 @@ HyOpenGL_Win::~HyOpenGL_Win()
 			DWORD dwError = GetLastError();
 			HyLogError("CreateWindowA() returned the error: " << dwError);
 		}
-		
 	}
 
 	return true;
@@ -66,19 +64,6 @@ HyOpenGL_Win::~HyOpenGL_Win()
 
 /*virtual*/ bool HyOpenGL_Win::Initialize()
 {
-	MSG msg = { 0 };
-	// TODO: fix this so it PeekMessage() on each window every loop. Continue once all windows have been created.
-	for(uint32 i = 0; i < m_uiNumDCs; ++i)
-	{
-		while(GetMessage(&msg, m_pDeviceContexes[i].m_hWnd, 0, 0) != 0)
-		{
-			DispatchMessage(&msg);
-
-			if(WM_CREATE == msg.message || WM_NCCREATE == msg.message)
-				break;
-		}
-	}
-
 	m_pGfxComms->SetGfxInfo(reinterpret_cast<HyGfxComms::tGfxInfo *>(1));
 
 	return HyOpenGL::Initialize();
@@ -92,10 +77,33 @@ HyOpenGL_Win::~HyOpenGL_Win()
 	{
 		while(PeekMessageA(&msg, m_pDeviceContexes[i].m_hWnd, 0, 0, PM_REMOVE))
 			DispatchMessageA(&msg);
+
+		HDC hDeviceContext = GetDC(m_pDeviceContexes[i].m_hWnd);
+		SwapBuffers(hDeviceContext);
 	}
 
 	return true;
 }
+
+PIXELFORMATDESCRIPTOR pfd =
+{
+	sizeof(PIXELFORMATDESCRIPTOR),
+	1,
+	PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    //Flags
+	PFD_TYPE_RGBA,            //The kind of framebuffer. RGBA or palette.
+	32,                        //Colordepth of the framebuffer.
+	0, 0, 0, 0, 0, 0,
+	0,
+	0,
+	0,
+	0, 0, 0, 0,
+	24,                        //Number of bits for the depthbuffer
+	8,                        //Number of bits for the stencilbuffer
+	0,                        //Number of Aux buffers in the framebuffer.
+	PFD_MAIN_PLANE,
+	0,
+	0, 0, 0
+};
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -103,32 +111,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 		{
-			PIXELFORMATDESCRIPTOR pfd = 
-			{
-				sizeof(PIXELFORMATDESCRIPTOR),
-				1,
-				PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    //Flags
-				PFD_TYPE_RGBA,            //The kind of framebuffer. RGBA or palette.
-				32,                        //Colordepth of the framebuffer.
-				0, 0, 0, 0, 0, 0,
-				0,
-				0,
-				0,
-				0, 0, 0, 0,
-				24,                        //Number of bits for the depthbuffer
-				8,                        //Number of bits for the stencilbuffer
-				0,                        //Number of Aux buffers in the framebuffer.
-				PFD_MAIN_PLANE,
-				0,
-				0, 0, 0
-			};
-
 			HDC hDeviceContext = GetDC(hWnd);
 
 			int iPixelFormat = ChoosePixelFormat(hDeviceContext, &pfd);
 			SetPixelFormat(hDeviceContext, iPixelFormat, &pfd);
 
-			HyOpenGL_Win *pThis = reinterpret_cast<HyOpenGL_Win *>(lParam);
+			CREATESTRUCT *pCreateStruct = reinterpret_cast<CREATESTRUCT *>(lParam);
+			HyOpenGL_Win *pThis = reinterpret_cast<HyOpenGL_Win *>(pCreateStruct->lpCreateParams);
+
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG>(pThis));
 
 			pThis->m_pDeviceContexes[0].m_hGLContext = wglCreateContext(hDeviceContext);
 			wglMakeCurrent(hDeviceContext, pThis->m_pDeviceContexes[0].m_hGLContext);
@@ -140,10 +131,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_DESTROY:
 		{
-			HyOpenGL_Win *pThis = reinterpret_cast<HyOpenGL_Win *>(lParam);
+			HyOpenGL_Win *pThis = reinterpret_cast<HyOpenGL_Win *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
 			wglDeleteContext(pThis->m_pDeviceContexes[0].m_hGLContext);
 			PostQuitMessage(0);
+
+			DefWindowProc(hWnd, message, wParam, lParam);
 		}
 		break;
 

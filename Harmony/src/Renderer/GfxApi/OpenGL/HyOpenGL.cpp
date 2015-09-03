@@ -96,7 +96,8 @@ HyOpenGL::~HyOpenGL(void)
 	//printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
 
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	//////////////////////////////////////////////////////////////////////////
 	// 2D setup
@@ -369,6 +370,8 @@ HyOpenGL::~HyOpenGL(void)
 			uiDataOffset += sizeof(uint32);
 			
 			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)uiDataOffset);
+			//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)(pInst->GetVertexDataOffset() + (4 * sizeof(GLfloat))));
+			//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(pInst->GetVertexDataOffset()+(8*sizeof(GLfloat))))
 			glDrawArrays(m_eDrawMode, 0, iNumVerts);
 		}
 	}
