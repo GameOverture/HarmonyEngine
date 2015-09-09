@@ -22,9 +22,13 @@ class HyOpenGL_Win : public HyOpenGL
 	{
 		HWND m_hWnd;
 		HGLRC m_hGLContext;
-	};
 
-	DeviceContext *		m_pDeviceContexes;
+		DeviceContext(HyWindowInfo &wndInfo);
+		~DeviceContext();
+
+		void Resize(GLsizei width, GLsizei height);
+	};
+	DeviceContext **	m_ppDeviceContexes;
 	uint32				m_uiNumDCs;
 
 public:
@@ -35,6 +39,8 @@ public:
 
 	virtual bool Initialize();
 	virtual bool PollApi();
+
+	virtual void FinishRender();
 };
 
 #endif /* __HyOpenGL_Win_h__ */

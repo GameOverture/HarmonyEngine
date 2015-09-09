@@ -129,7 +129,7 @@ void ITransform<tVec>::GetLocalTransform_SRT(mat4 &outMtx) const
 	ptPos.x = m_ptPosition.X();
 	ptPos.y = m_ptPosition.Y();
 
-	vec3 vScale(0.0f);
+	vec3 vScale(1.0f);
 	vScale.x = m_vScale.X();
 	vScale.y = m_vScale.Y();
 

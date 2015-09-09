@@ -59,6 +59,7 @@ struct HyWindowInfo
 	glm::ivec2		vResolution;
 	glm::ivec2		vLocation;
 	HyWindowType	eType;
+	int32			iBitsPerPixel;
 };
 
 #define HY_MAXWINDOWS 6
@@ -94,6 +95,7 @@ struct HarmonyInit
 			windowInfo[i].vResolution.x = 256;
 			windowInfo[i].vLocation.x = i * windowInfo[i].vResolution.x;
 			windowInfo[i].vLocation.y = 0;
+			windowInfo[i].iBitsPerPixel = 32;
 		}
 	}
 };

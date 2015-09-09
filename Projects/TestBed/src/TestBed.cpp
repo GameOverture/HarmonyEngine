@@ -48,7 +48,8 @@ TestBed::~TestBed(void)
 	//m_Window.GetResolution(tRes);
 	//m_Camera.SetOrthographic(static_cast<float>(tRes.iWidth), static_cast<float>(tRes.iHeight));
 
-	m_pCam->Pos().Set(0.0f, 0.0f);
+	m_pCam->Pos().Set(1.0f, 1.0f);
+	//m_pCam->Pos().Set(.5f, 1.0f);
 	m_pCam->SetZoom(0.8f);
 
 	return true;
