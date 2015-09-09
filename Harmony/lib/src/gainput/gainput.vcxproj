@@ -18,6 +18,67 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\gainput\gainput.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputAllocator.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputContainers.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputDebugRenderer.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputInputDevice.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputInputDeviceBuiltIn.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputInputDeviceKeyboard.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputInputDeviceMouse.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputInputDevicePad.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputInputDeviceTouch.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputInputListener.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputInputManager.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputInputMap.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputInputState.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputIos.h" />
+    <ClInclude Include="..\..\..\include\gainput\GainputMapFilters.h" />
+    <ClInclude Include="..\..\..\include\gainput\gestures\GainputButtonStickGesture.h" />
+    <ClInclude Include="..\..\..\include\gainput\gestures\GainputDoubleClickGesture.h" />
+    <ClInclude Include="..\..\..\include\gainput\gestures\GainputGestures.h" />
+    <ClInclude Include="..\..\..\include\gainput\gestures\GainputHoldGesture.h" />
+    <ClInclude Include="..\..\..\include\gainput\gestures\GainputPinchGesture.h" />
+    <ClInclude Include="..\..\..\include\gainput\gestures\GainputRotateGesture.h" />
+    <ClInclude Include="..\..\..\include\gainput\gestures\GainputSimultaneouslyDownGesture.h" />
+    <ClInclude Include="..\..\..\include\gainput\gestures\GainputTapGesture.h" />
+    <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputPlayer.h" />
+    <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputRecorder.h" />
+    <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputRecording.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\builtin\GainputInputDeviceBuiltIn.cpp" />
+    <ClCompile Include="src\dev\GainputDev.cpp" />
+    <ClCompile Include="src\dev\GainputMemoryStream.cpp" />
+    <ClCompile Include="src\dev\GainputNetAddress.cpp" />
+    <ClCompile Include="src\dev\GainputNetConnection.cpp" />
+    <ClCompile Include="src\dev\GainputNetListener.cpp" />
+    <ClCompile Include="src\gainput.cpp" />
+    <ClCompile Include="src\GainputAllocator.cpp" />
+    <ClCompile Include="src\GainputInputDeltaState.cpp" />
+    <ClCompile Include="src\GainputInputDevice.cpp" />
+    <ClCompile Include="src\GainputInputManager.cpp" />
+    <ClCompile Include="src\GainputInputMap.cpp" />
+    <ClCompile Include="src\GainputInputState.cpp" />
+    <ClCompile Include="src\GainputMapFilters.cpp" />
+    <ClCompile Include="src\gestures\GainputButtonStickGesture.cpp" />
+    <ClCompile Include="src\gestures\GainputDoubleClickGesture.cpp" />
+    <ClCompile Include="src\gestures\GainputHoldGesture.cpp" />
+    <ClCompile Include="src\gestures\GainputPinchGesture.cpp" />
+    <ClCompile Include="src\gestures\GainputRotateGesture.cpp" />
+    <ClCompile Include="src\gestures\GainputSimultaneouslyDownGesture.cpp" />
+    <ClCompile Include="src\gestures\GainputTapGesture.cpp" />
+    <ClCompile Include="src\keyboard\GainputInputDeviceKeyboard.cpp" />
+    <ClCompile Include="src\keyboard\GainputInputDeviceKeyboardMac.cpp" />
+    <ClCompile Include="src\mouse\GainputInputDeviceMouse.cpp" />
+    <ClCompile Include="src\pad\GainputInputDevicePad.cpp" />
+    <ClCompile Include="src\pad\GainputInputDevicePadMac.cpp" />
+    <ClCompile Include="src\recorder\GainputInputPlayer.cpp" />
+    <ClCompile Include="src\recorder\GainputInputRecorder.cpp" />
+    <ClCompile Include="src\recorder\GainputInputRecording.cpp" />
+    <ClCompile Include="src\touch\GainputInputDeviceTouch.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1D5D3417-254B-4727-98AA-3E4E315AA1B9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -148,65 +209,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\include\gainput\gainput.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputAllocator.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputContainers.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputDebugRenderer.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputDevice.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputDeviceBuiltIn.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputDeviceKeyboard.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputDeviceMouse.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputDevicePad.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputDeviceTouch.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputListener.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputManager.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputMap.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputState.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputIos.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputButtonStickGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputDoubleClickGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputGestures.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputHoldGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputPinchGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputRotateGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputSimultaneouslyDownGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputTapGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputPlayer.h" />
-    <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputRecorder.h" />
-    <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputRecording.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\builtin\GainputInputDeviceBuiltIn.cpp" />
-    <ClCompile Include="src\dev\GainputDev.cpp" />
-    <ClCompile Include="src\dev\GainputMemoryStream.cpp" />
-    <ClCompile Include="src\dev\GainputNetAddress.cpp" />
-    <ClCompile Include="src\dev\GainputNetConnection.cpp" />
-    <ClCompile Include="src\dev\GainputNetListener.cpp" />
-    <ClCompile Include="src\gainput.cpp" />
-    <ClCompile Include="src\GainputAllocator.cpp" />
-    <ClCompile Include="src\GainputInputDeltaState.cpp" />
-    <ClCompile Include="src\GainputInputDevice.cpp" />
-    <ClCompile Include="src\GainputInputManager.cpp" />
-    <ClCompile Include="src\GainputInputMap.cpp" />
-    <ClCompile Include="src\GainputInputState.cpp" />
-    <ClCompile Include="src\gestures\GainputButtonStickGesture.cpp" />
-    <ClCompile Include="src\gestures\GainputDoubleClickGesture.cpp" />
-    <ClCompile Include="src\gestures\GainputHoldGesture.cpp" />
-    <ClCompile Include="src\gestures\GainputPinchGesture.cpp" />
-    <ClCompile Include="src\gestures\GainputRotateGesture.cpp" />
-    <ClCompile Include="src\gestures\GainputSimultaneouslyDownGesture.cpp" />
-    <ClCompile Include="src\gestures\GainputTapGesture.cpp" />
-    <ClCompile Include="src\keyboard\GainputInputDeviceKeyboard.cpp" />
-    <ClCompile Include="src\keyboard\GainputInputDeviceKeyboardMac.cpp" />
-    <ClCompile Include="src\mouse\GainputInputDeviceMouse.cpp" />
-    <ClCompile Include="src\pad\GainputInputDevicePad.cpp" />
-    <ClCompile Include="src\pad\GainputInputDevicePadMac.cpp" />
-    <ClCompile Include="src\recorder\GainputInputPlayer.cpp" />
-    <ClCompile Include="src\recorder\GainputInputRecorder.cpp" />
-    <ClCompile Include="src\recorder\GainputInputRecording.cpp" />
-    <ClCompile Include="src\touch\GainputInputDeviceTouch.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
