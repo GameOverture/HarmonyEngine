@@ -75,6 +75,13 @@ TestBed::~TestBed(void)
 
 	//m_TxtInst.SetString(HyStr("CamX: %f\tCamY:%f"), m_pCam->Pos().X(), m_pCam->Pos().Y());
 
+
+
+
+
+	if(m_pInputArray->
+
+
 	return true;
 }
 
