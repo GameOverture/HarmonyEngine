@@ -334,7 +334,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>Winmm.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;glfw3d.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -361,7 +361,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>Winmm.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;glfw3d.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -388,7 +388,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;glfw3d.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -417,7 +417,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;glfw3d.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -448,7 +448,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>gainput.lib;netLink.lib;box2D.lib;glfw3.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>gainput.lib;netLink.lib;box2D.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -473,7 +473,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>gainput.lib;netLink.lib;box2D.lib;glfw3.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>gainput.lib;netLink.lib;box2D.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -499,7 +499,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;glfw3.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -527,7 +527,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;glfw3.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
