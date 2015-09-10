@@ -23,11 +23,6 @@ IApplication::IApplication(HarmonyInit &initStruct) : m_Viewport(initStruct)
 
 IApplication::~IApplication()
 {
-	// TODO: Determine what thread I need to call glfwTerminate() from!?
-#if (defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)) && !defined(HY_PLATFORM_GUI)
-	// Shutdown GLFW
-	glfwTerminate();
-#endif
 }
 
 void IApplication::CtorInit()
@@ -37,13 +32,6 @@ void IApplication::CtorInit()
 
 	HyAssert(m_Init.uiNumInputMappings >= 0, "HarmonyInit::uiNumInputMappings cannot be a negative value");
 	m_pInputArray = new HyInputMapping[m_Init.uiNumInputMappings];
-
-	// TODO: Determine what thread I need to call glfwInit() from!?
-#if (defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)) && !defined(HY_PLATFORM_GUI)
-	// Initialize GLFW
-	if(!glfwInit())
-		HyError("glfwInit() failed!");
-#endif
 }
 
 void * IApplication::operator new(tMEMSIZE size)

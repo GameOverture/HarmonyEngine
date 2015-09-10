@@ -25,11 +25,11 @@
 //
 // Switch off the most annoying warnings
 //
-#pragma warning(disable : 4100)      // unreferenced formal parameter
-#pragma warning(disable : 4511)      // copy constructor could not be generated
-#pragma warning(disable : 4512)      // assignment constructor could not be generated
-#pragma warning(disable : 4663)      // C++ language change
-#pragma warning(disable : 4786)      // identifier was truncated to '255' characters
+//#pragma warning(disable : 4100)      // unreferenced formal parameter
+//#pragma warning(disable : 4511)      // copy constructor could not be generated
+//#pragma warning(disable : 4512)      // assignment constructor could not be generated
+//#pragma warning(disable : 4663)      // C++ language change
+//#pragma warning(disable : 4786)      // identifier was truncated to '255' characters
 
 // This undefines the macros MIN and MAX which are specified in the windows headers. Use the stl versions instead.
 #define NOMINMAX

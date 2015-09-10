@@ -25,8 +25,8 @@ class HyMemoryHeap
 {
 	enum
 	{
-		kNumSmlPageBuckets = HY_MEMPLAT::kNumSmlPages,
-		kSmlPageSize = HY_MEMPLAT::kSmlPageSize,
+		kNumSmlPageBuckets = HY_MEM_API::kNumSmlPages,
+		kSmlPageSize = HY_MEM_API::kSmlPageSize,
 	};
 
 	// SMALL PAGES //
@@ -37,7 +37,7 @@ class HyMemoryHeap
 
 	//HyMedHeapPage< *		m_pMedPages[kNumSmallPages];
 
-	HY_MEMPLAT		m_MemAPI;
+	HY_MEM_API		m_MemAPI;
 
 public:
 	HyMemoryHeap();

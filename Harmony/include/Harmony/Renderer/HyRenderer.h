@@ -11,12 +11,12 @@
 #define __HyRenderer_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Afx/HyInteropAfx.h"
 
 #include "Threading/Threading.h"
 #include "Renderer/HyGfxComms.h"
 
 class HyViewport;
-class HY_GFX_API;
 
 class HyRenderer
 {

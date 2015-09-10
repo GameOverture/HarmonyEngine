@@ -543,5 +543,11 @@
     <ClInclude Include="include\Harmony\Renderer\GfxApi\OpenGL\Interop\HyOpenGL_Win.h">
       <Filter>Renderer\GfxApi\OpenGL\Interop</Filter>
     </ClInclude>
+    <ClInclude Include="include\Harmony\Afx\HyInteropAfx.h">
+      <Filter>Afx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatAfx.h">
+      <Filter>Afx\Platforms</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

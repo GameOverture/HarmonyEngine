@@ -15,18 +15,22 @@
 #include <sstream>
 #include <tchar.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/transform2.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/transform2.hpp"
 
-// TODO: typedef these to HyVec2, etc.
+#include "GL/glew.h"
+#include "GL/gl.h"
+#include "GL/glext.h"
+
+
+// Data types
 using glm::vec2;
 using glm::vec3;
 using glm::vec4;
 using glm::mat3;
 using glm::mat4;
 
-// Data types
 typedef signed char			char8;
 typedef unsigned char		uchar8;
 typedef signed char			int8;
@@ -37,6 +41,18 @@ typedef signed int			int32;
 typedef unsigned int		uint32;
 typedef __int64				int64;
 typedef unsigned __int64	uint64;
+
+#if defined(HY_PLATFORM_GUI)
+	#define HY_GFX_API HyOpenGL
+#else
+	#define HY_GFX_API HyOpenGL_Win
+#endif
+
+#define HY_TIME_API HyTimeApi_Win
+
+#define HY_MEM_API HyMemoryAPI_Windows
+
+#define HY_INPUT_API HyInput
 
 // Support for the endian issues
 #define HY_ENDIAN_LITTLE	1
@@ -70,11 +86,5 @@ typedef unsigned __int64	uint64;
 
 //#define HyGetTickCount()				((uint32)::GetTickCount())
 
-//
-//---------------------------------------------------------------------------------------------------------------------------------
-// MEMORY AFX
-//---------------------------------------------------------------------------------------------------------------------------------
-//
-#define HY_MEMPLAT HyMemoryAPI_Windows
 
 #endif /* __HyPlatform_Windows_h__ */

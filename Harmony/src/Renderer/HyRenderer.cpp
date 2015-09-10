@@ -9,16 +9,6 @@
  *************************************************************************/
 #include "Renderer/HyRenderer.h"
 
-#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
-	#include "Renderer/GfxApi/OpenGL/Interop/HyOpenGL_Win.h"
-#elif defined(HY_PLATFORM_OSX) && !defined(HY_PLATFORM_GUI)
-	#include "Renderer/GfxApi/OpenGL/Interop/HyOpenGL_OSX.h"
-#elif defined(HY_PLATFORM_LINUX) && !defined(HY_PLATFORM_GUI)
-	#include "Renderer/GfxApi/OpenGL/Interop/HyOpenGL_Linux.h"
-#elif defined(HY_PLATFORM_GUI)
-	#include "Renderer/GfxApi/OpenGL/HyOpenGL.h"
-#endif
-
 //#include "Renderer/DrawData/HyDrawSprite2d.h"
 //#include "Renderer/DrawData/HyDrawText2d.h"
 //#include "Renderer/DrawData/HyDrawSpine2d.h"

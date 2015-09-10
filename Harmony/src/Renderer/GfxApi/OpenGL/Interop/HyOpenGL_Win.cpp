@@ -161,6 +161,7 @@ void HyOpenGL_Win::DeviceContext::Resize(GLsizei iWidth, GLsizei iHeight)
 }
 
 
+
 PIXELFORMATDESCRIPTOR pfd =
 {
 	sizeof(PIXELFORMATDESCRIPTOR),
@@ -186,62 +187,63 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch(message)
 	{
 	case WM_CREATE:
-		{
-			HDC hDeviceContext = GetDC(hWnd);
+	{
+		HDC hDeviceContext = GetDC(hWnd);
 
-			int iPixelFormat = ChoosePixelFormat(hDeviceContext, &pfd);
-			SetPixelFormat(hDeviceContext, iPixelFormat, &pfd);
+		int iPixelFormat = ChoosePixelFormat(hDeviceContext, &pfd);
+		SetPixelFormat(hDeviceContext, iPixelFormat, &pfd);
 
-			CREATESTRUCT *pCreateStruct = reinterpret_cast<CREATESTRUCT *>(lParam);
-			HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(pCreateStruct->lpCreateParams);
+		CREATESTRUCT *pCreateStruct = reinterpret_cast<CREATESTRUCT *>(lParam);
+		HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(pCreateStruct->lpCreateParams);
 
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG>(pThis));
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG>(pThis));
 
-			pThis->m_hGLContext = wglCreateContext(hDeviceContext);
-			wglMakeCurrent(hDeviceContext, pThis->m_hGLContext);
-		}
-		break;
+		pThis->m_hGLContext = wglCreateContext(hDeviceContext);
+		wglMakeCurrent(hDeviceContext, pThis->m_hGLContext);
+	}
+	break;
 
 	case WM_DESTROY:
-		{
-			HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	{
+		HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
-			HDC hDeviceContext = GetDC(hWnd);
-			wglMakeCurrent(hDeviceContext, pThis->m_hGLContext);
+		HDC hDeviceContext = GetDC(hWnd);
+		wglMakeCurrent(hDeviceContext, pThis->m_hGLContext);
 
-			wglDeleteContext(pThis->m_hGLContext);
-			PostQuitMessage(0);
+		wglDeleteContext(pThis->m_hGLContext);
+		PostQuitMessage(0);
 
-			DefWindowProc(hWnd, message, wParam, lParam);
-		}
-		break;
+		DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	break;
 
 	case WM_CLOSE:
-		{
-			PostQuitMessage(0);
-			return 0;
-		}
+	{
+		PostQuitMessage(0);
+		return 0;
+	}
 
 	case WM_SYSCOMMAND:
+	{
+		switch(wParam)
 		{
-			switch(wParam)
-			{
-			case SC_SCREENSAVE:		// Screen saver Trying To Start?
-			case SC_MONITORPOWER:	// Monitor Trying To Enter Powersave?
-				// Prevent From Happening
-				return 0;							
-			}
-			break;
-		}
-
-	case WM_SIZE:
-		{
-			HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
-
-			pThis->Resize(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
+		case SC_SCREENSAVE:		// Screen saver Trying To Start?
+		case SC_MONITORPOWER:	// Monitor Trying To Enter Powersave?
+			// Prevent From Happening
 			return 0;
 		}
+		break;
+	}
+
+	case WM_SIZE:
+	{
+		HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+
+		pThis->Resize(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
+		return 0;
+	}
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
+

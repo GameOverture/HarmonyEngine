@@ -10,35 +10,7 @@
 #ifndef __HyPlatform_h__
 #define __HyPlatform_h__
 
-// Which platform are we on?
-#if !defined(HARMONY_PLATFORM_DEFINED)
-
-	#if defined(_WIN64) || defined(__LP64__) || defined(__LP64)
-		#define HY_PLATFORM_64BIT	// 64 bit environment
-	#else
-		#define HY_PLATFORM_32BIT	// 32 bit environment
-	#endif
-
-	#if (defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__))
-		#define HY_PLATFORM_WINDOWS
-		#include "HyPlatform_Windows.h"
-	#elif ((defined(__APPLE__) && defined(__MACH__)) || defined(__APPLE_CC__))
-		#if ((defined(__APPLE__) && defined(__MACH__))
-			#define HY_PLATFORM_OSX
-			#include "HyPlatform_OSX.h"
-		#endif
-		#define HY_PLATFORM_APPLE
-		#define HY_PLATFORM_UNIX
-	#elif defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
-		#define HY_PLATFORM_LINUX
-		#define HY_PLATFORM_UNIX
-		#include "HyPlatform_Unix.h"
-	#else
-		#define HY_PLATFORM_UNKNOWN
-	#endif
-
-	#define HARMONY_PLATFORM_DEFINED
-#endif
+#include "Afx/Platforms/HyPlatAfx.h"
 
 #if defined(HY_PLATFORM_32BIT)	// 32 bit environment
 	typedef int32 intx;
@@ -145,22 +117,6 @@ HY_INLINE uint32 EndianSwap32(uint32 var)
 // of any enumeration we use that's intended for saving to disc
 #define HY_ENUM_PADDING	0x7fffffff
 
-
-#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
-	#include "GL/glew.h"
-	#include "GL/gl.h"
-	#include "GL/glext.h"
-	#if defined(HY_PLATFORM_GUI)
-		#define HY_GFX_API HyOpenGL
-	#else
-		// This includes only the necessary parts of Windows.h if it isn't included above
-		#include "GLFW/glfw3.h"
-		#define HY_GFX_API HyOpenGL_Win
-	#endif
-
-	#define HY_TIME_API HyTimeApi_Win
-#endif
-
 //-----------------------------------------------------------------------------------------
 // Safety checks
 //-----------------------------------------------------------------------------------------
@@ -180,12 +136,20 @@ HY_INLINE uint32 EndianSwap32(uint32 var)
 #error HyPlatform.h: HyError is not defined!
 #endif
 
+#ifndef HY_MEM_API
+#error HyPlatform.h: HY_MEM_API is not defined!
+#endif
+
 #ifndef HY_GFX_API
 #error HyPlatform.h: HY_GFX_API is not defined!
 #endif
 
 #ifndef HY_TIME_API
 #error HyPlatform.h: HY_TIME_API is not defined!
+#endif
+
+#ifndef HY_INPUT_API
+#error HyPlatform.h: HY_INPUT_API is not defined!
 #endif
 
 #endif // __HyPlatform_h__

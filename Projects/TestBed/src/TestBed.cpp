@@ -79,7 +79,7 @@ TestBed::~TestBed(void)
 
 
 
-	if(m_pInputArray->
+	//if(m_pInputArray->
 
 
 	return true;

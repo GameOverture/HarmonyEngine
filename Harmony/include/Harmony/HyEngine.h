@@ -27,17 +27,10 @@
 #include "Creator/Instances/HyTexturedQuad2d.h"
 #include "Creator/HyPhysEntity2d.h"
 
-//#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
-//	#include "Renderer/Interop/OpenGL/HyOpenGL.h"
-//#endif
-
-#if defined(HY_PLATFORM_WINDOWS)
-	#include "Time/Interop/HyTimeApi_Win.h"
-#endif
 
 class HyEngine
 {
-	static HyEngine *	sm_pInstance;
+	static HyEngine *		sm_pInstance;
 	static HyMemoryHeap &	sm_Mem;
 
 	IApplication &			m_AppRef;
