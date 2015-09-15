@@ -49,21 +49,6 @@ HyGfxComms::~HyGfxComms()
 	delete m_pReceiveData_Render;
 }
 
-void HyGfxComms::SetGfxInit(HyViewport &gameViewportRef)
-{
-	LockInfo();
-	m_GfxInit.uiNumWindows = gameViewportRef.GetNumWindows();
-
-	for(uint32 i = 0; i < m_GfxInit.uiNumWindows; ++i)
-		m_GfxInit.windowInfo[i] = gameViewportRef.GetWindowInfo(i);
-
-	UnlockInfo();
-}
-HyGfxComms::tGfxInit HyGfxComms::GetGfxInit()
-{
-	return m_GfxInit;
-}
-
 void HyGfxComms::SetGfxInfo(tGfxInfo *pInfo)
 {
 	LockInfo();

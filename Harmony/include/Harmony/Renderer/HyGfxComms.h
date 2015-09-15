@@ -52,12 +52,6 @@ public:
 		size_t		uiOffsetToCameras2d;
 	};
 
-	struct tGfxInit
-	{
-		uint32			uiNumWindows;
-		HyWindowInfo	windowInfo[HY_MAXWINDOWS];
-	};
-
 	struct tGfxInfo
 	{
 		int32			uiNumNativeResolutions;
@@ -65,8 +59,6 @@ public:
 	};
 
 private:
-
-	tGfxInit					m_GfxInit;
 	tGfxInfo *					m_pGfxInfo;
 
 	char *						m_pBuffer_Update;
@@ -89,9 +81,6 @@ private:
 public:
 	HyGfxComms();
 	~HyGfxComms();
-
-	void SetGfxInit(HyViewport &gameViewportRef);
-	tGfxInit GetGfxInit();
 
 	void SetGfxInfo(tGfxInfo *pInfo);
 	const tGfxInfo *GetGfxInfo();

@@ -9,28 +9,77 @@
  *************************************************************************/
 #include "Creator/Viewport/HyViewport.h"
 
-HyViewport::HyViewport(const HarmonyInit &initStruct) : m_uiNumWindows(initStruct.uiNumWindows)
+HyViewport::HyViewport() : m_uiDirtyFlags(0)
 {
-	HyAssert(m_uiNumWindows > 0, "HyViewport was initialized with '0' windows");
-	m_pWindows = new HyWindowInfo[m_uiNumWindows];
-
-	for(uint32 i = 0; i < m_uiNumWindows; ++i)
-		m_pWindows[i] = initStruct.windowInfo[i];
 }
 
 HyViewport::~HyViewport(void)
 {
-	delete [] m_pWindows;
+	while(m_vCams2d.empty() == false)
+		RemoveCamera(m_vCams2d[0]);
+
+	while(m_vCams3d.empty() == false)
+		RemoveCamera(m_vCams3d[0]);
 }
 
-uint32 HyViewport::GetNumWindows()
+const HyWindowInfo &HyViewport::GetWindowInfo()
 {
-	return m_uiNumWindows;
+	return m_Info;
 }
 
-HyWindowInfo &HyViewport::GetWindowInfo(uint32 uiIndex)
+std::string HyViewport::GetTitle()
 {
-	return m_pWindows[uiIndex];
+	return m_Info.sName;
+}
+
+void HyViewport::SetTitle(std::string sTitle)
+{
+	m_Info.sName = sTitle;
+	m_uiDirtyFlags |= FLAG_Title;
+}
+
+glm::ivec2 HyViewport::GetResolution()
+{
+	return m_Info.vResolution;
+}
+
+void HyViewport::SetResolution(glm::ivec2 vResolution)
+{
+	m_Info.vResolution = vResolution;
+	m_uiDirtyFlags |= FLAG_Resolution;
+}
+
+glm::ivec2 HyViewport::GetLocation()
+{
+	return m_Info.vLocation;
+}
+
+void HyViewport::SetLocation(glm::ivec2 ptLocation)
+{
+	m_Info.vLocation = ptLocation;
+	m_uiDirtyFlags |= FLAG_Location;
+}
+
+HyWindowType HyViewport::GetType()
+{
+	return m_Info.eType;
+}
+
+void HyViewport::SetType(HyWindowType eType)
+{
+	m_Info.eType = eType;
+	m_uiDirtyFlags |= FLAG_Type;
+}
+
+int32 HyViewport::GetBitsPerPixel()
+{
+	return m_Info.iBitsPerPixel;
+}
+
+void HyViewport::SetBitsPerPixel(int32 iBitsPerPixel)
+{
+	m_Info.iBitsPerPixel = iBitsPerPixel;
+	m_uiDirtyFlags |= FLAG_BitsPerPix;
 }
 
 HyCamera2d *HyViewport::CreateCamera2d()

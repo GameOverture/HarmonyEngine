@@ -24,8 +24,8 @@ class IApplication
 	HarmonyInit				m_Init;
 	static HyMemoryHeap		sm_Mem;
 
-	HyViewport *			m_pViewports;
-	HyInputMapping *		m_pInputMaps;
+	vector<HyViewport>		m_vViewports;
+	//HyInput					m_Input;
 
 	virtual bool Initialize() = 0;
 	virtual bool Update() = 0;

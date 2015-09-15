@@ -23,7 +23,7 @@ class HyRenderer
 	HY_GFX_API *			m_pGfxApi;
 
 public:
-	HyRenderer(HyViewport &gameWindowRef, HY_GFX_API *pSuppliedGfx = NULL);
+	HyRenderer(vector<HyViewport> &vViewportsRef, HY_GFX_API *pSuppliedGfx = NULL);
 	~HyRenderer();
 
 	HyGfxComms &			GetGfxComms()	{ return m_GfxComms; }

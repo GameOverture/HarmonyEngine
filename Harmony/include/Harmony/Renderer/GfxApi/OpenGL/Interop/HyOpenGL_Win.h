@@ -23,7 +23,7 @@ class HyOpenGL_Win : public HyOpenGL
 		HWND m_hWnd;
 		HGLRC m_hGLContext;
 
-		DeviceContext(HyWindowInfo &wndInfo);
+		DeviceContext(const HyWindowInfo &wndInfo);
 		~DeviceContext();
 
 		void Resize(GLsizei width, GLsizei height);

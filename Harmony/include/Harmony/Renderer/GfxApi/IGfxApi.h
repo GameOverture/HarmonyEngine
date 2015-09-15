@@ -25,6 +25,7 @@ class IGfxApi
 {
 protected:
 	HyGfxComms *				m_pGfxComms;
+	vector<HyViewport> *		m_pViewportsRef;
 
 	queue<IData *> *			m_pMsgQueuePtr;		// The pointer to the currently active render message queue
 	queue<IData *> *			m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
@@ -40,6 +41,8 @@ public:
 
 	void SetGfxComms(HyGfxComms *pGfxComms)	{ m_pGfxComms = pGfxComms; }
 	const HyGfxComms::tGfxInfo *GetGfxInfo(){ return m_pGfxComms->GetGfxInfo(); }
+
+	void SetViewportRef(vector<HyViewport> *pViewportsRef)	{ m_pViewportsRef = pViewportsRef; }
 
 	virtual bool CreateWindows() = 0;
 
@@ -78,7 +81,6 @@ public:
 	char *GetVertexData2d()					{ return reinterpret_cast<char *>(m_pDrawBufferPtr+m_DrawpBufferHeader->uiOffsetToVertexData2d); }
 
 	bool Update();
-	void UpdateLoop();
 	void ProcessGameMsgs();
 	void Draw2d();
 };

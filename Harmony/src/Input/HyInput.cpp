@@ -10,21 +10,20 @@
 #include "Input/HyInput.h"
 //#include "Gamepad/Gamepad.h"
 
-HyInput::HyInput(uint32 uiNumInputMaps, HyInputMapping *pInputMapping) :	m_fDeadZoneAmt(0.2f),
-																			m_eReplayState(REPLAY_Off),
-																			m_uiRecordCount(0),
-																			m_uiNumInputMappings(uiNumInputMaps),
-																			m_pInputMappings(pInputMapping)
+HyInput::HyInput() :	m_fDeadZoneAmt(0.2f),
+						m_eReplayState(REPLAY_Off),
+						m_uiRecordCount(0)
 {
 	HyAssert(m_uiNumInputMappings > 0, "HyInput uiNumInputMaps is <= 0");
 
-	m_idKB = m_Manager.CreateDevice<gainput::InputDeviceKeyboard>();
+	gainput::InputDeviceKeyboard *pKeyboardDevice = m_Manager.CreateAndGetDevice<gainput::InputDeviceKeyboard>();
+
 	m_idMouse = m_Manager.CreateDevice<gainput::InputDeviceMouse>();
 	//m_idGamePad = m_Manager.CreateDevice<gainput::InputDevicePad>();
 	m_idTouch = m_Manager.CreateDevice<gainput::InputDeviceTouch>();
 
-	for(uint32 i = 0; i < m_uiNumInputMappings; ++i)
-		m_pInputMappings[i].SetHyInputPtr(this);
+	//for(uint32 i = 0; i < m_uiNumInputMappings; ++i)
+	//	m_pInputMappings[i].SetHyInputPtr(this);
 
 //#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
 //	Gamepad_deviceAttachFunc(OnGamepadAttached, this);

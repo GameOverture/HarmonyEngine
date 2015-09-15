@@ -18,7 +18,16 @@ IApplication::IApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
 	if(m_Init.eDefaultCoordinateType == HYCOORD_Default)
 		m_Init.eDefaultCoordinateType = HYCOORD_Pixel;
 
-	m_pViewports = new HyViewport(m_Init);
+	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
+	{
+		m_vViewports.push_back(HyViewport());
+
+		m_vViewports[i].SetTitle(m_Init.windowInfo[i].sName);
+		m_vViewports[i].SetResolution(m_Init.windowInfo[i].vResolution);
+		m_vViewports[i].SetLocation(m_Init.windowInfo[i].vLocation);
+		m_vViewports[i].SetType(m_Init.windowInfo[i].eType);
+		m_vViewports[i].SetBitsPerPixel(m_Init.windowInfo[i].iBitsPerPixel);
+	}
 	//m_pInputArray = new HyInputMapping[m_Init.uiNumInputMappings];
 
 	HyFileIO::SetDataDir(m_Init.szDataDir);
@@ -26,6 +35,12 @@ IApplication::IApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
 
 IApplication::~IApplication()
 {
+}
+
+HyViewport &IApplication::Viewport(uint32 uiIndex /*= 0*/)
+{
+	HyAssert(uiIndex < m_Init.uiNumWindows, "IApplication::Viewport() took an invalid index: " << uiIndex);
+	return m_vViewports[uiIndex];
 }
 
 void * IApplication::operator new(tMEMSIZE size)

@@ -25,7 +25,7 @@ HyOpenGL_Win::~HyOpenGL_Win()
 {
 }
 
-HyOpenGL_Win::DeviceContext::DeviceContext(HyWindowInfo &wndInfo)
+HyOpenGL_Win::DeviceContext::DeviceContext(const HyWindowInfo &wndInfo)
 {
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 
@@ -122,11 +122,11 @@ void HyOpenGL_Win::DeviceContext::Resize(GLsizei iWidth, GLsizei iHeight)
 
 /*virtual*/ bool HyOpenGL_Win::CreateWindows()
 {
-	m_uiNumDCs = m_pGfxComms->GetGfxInit().uiNumWindows;
+	m_uiNumDCs = m_pViewportsRef->size();
 	m_ppDeviceContexes = new DeviceContext *[m_uiNumDCs];
 
 	for(uint32 i = 0; i < m_uiNumDCs; ++i)
-		m_ppDeviceContexes[i] = new DeviceContext(m_pGfxComms->GetGfxInit().windowInfo[i]);
+		m_ppDeviceContexes[i] = new DeviceContext((*m_pViewportsRef)[i].GetWindowInfo());
 
 	return true;
 }

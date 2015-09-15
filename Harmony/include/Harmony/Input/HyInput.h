@@ -15,15 +15,8 @@
 #include "Mappings/HyInputMapping.h"
 #include "gainput/gainput.h"
 
-//#include <vector>
-//#include <map>
-//using std::vector;
-//using std::map;
-
 class HyInput
 {
-	friend class ITimeApi;
-
 	gainput::InputManager			m_Manager;
 
 	gainput::DeviceId				m_idKB;
@@ -47,7 +40,7 @@ class HyInput
 	float							m_fDeadZoneAmt;
 
 public:
-	HyInput(uint32 uiNumInputMaps, HyInputMapping *pInputMapping);
+	HyInput();
 	virtual ~HyInput(void);
 
 	gainput::InputManager &GetManager();

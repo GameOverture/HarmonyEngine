@@ -9,16 +9,15 @@
  *************************************************************************/
 #include "Renderer/HyRenderer.h"
 
-HyRenderer::HyRenderer(HyViewport &gameViewportRef, HY_GFX_API *pSuppliedGfx /*= NULL*/)
+HyRenderer::HyRenderer(vector<HyViewport> &vViewportsRef, HY_GFX_API *pSuppliedGfx /*= NULL*/)
 {
-	m_GfxComms.SetGfxInit(gameViewportRef);
-
 	if(pSuppliedGfx)
 		m_pGfxApi = pSuppliedGfx;
 	else
 		m_pGfxApi = new HY_GFX_API();
 
 	m_pGfxApi->SetGfxComms(&m_GfxComms);
+	m_pGfxApi->SetViewportRef(&vViewportsRef);
 
 	if(m_pGfxApi->CreateWindows() == false)
 		HyError("Graphics API's CreateWindows() failed");

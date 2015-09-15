@@ -9,7 +9,8 @@
  *************************************************************************/
 #include "Renderer/GfxApi/IGfxApi.h"
 
-IGfxApi::IGfxApi() :	m_pGfxComms(NULL)
+IGfxApi::IGfxApi() :	m_pGfxComms(NULL),
+						m_pViewportsRef(NULL)
 {
 }
 
