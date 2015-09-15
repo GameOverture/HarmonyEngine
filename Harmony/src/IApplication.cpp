@@ -13,25 +13,19 @@
 
 HyMemoryHeap	IApplication::sm_Mem;
 
-IApplication::IApplication(HarmonyInit &initStruct) : m_Viewport(initStruct)
+IApplication::IApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
 {
-	m_Init = initStruct;
-	CtorInit();
+	if(m_Init.eDefaultCoordinateType == HYCOORD_Default)
+		m_Init.eDefaultCoordinateType = HYCOORD_Pixel;
+
+	m_pViewports = new HyViewport(m_Init);
+	//m_pInputArray = new HyInputMapping[m_Init.uiNumInputMappings];
 
 	HyFileIO::SetDataDir(m_Init.szDataDir);
 }
 
 IApplication::~IApplication()
 {
-}
-
-void IApplication::CtorInit()
-{
-	if(m_Init.eDefaultCoordinateType == HYCOORD_Default)
-		m_Init.eDefaultCoordinateType = HYCOORD_Pixel;
-
-	HyAssert(m_Init.uiNumInputMappings >= 0, "HarmonyInit::uiNumInputMappings cannot be a negative value");
-	m_pInputArray = new HyInputMapping[m_Init.uiNumInputMappings];
 }
 
 void * IApplication::operator new(tMEMSIZE size)

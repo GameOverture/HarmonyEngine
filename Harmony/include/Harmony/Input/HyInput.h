@@ -31,13 +31,20 @@ class HyInput
 	gainput::DeviceId				m_idGamePad;
 	gainput::DeviceId				m_idTouch;
 
+	enum eReplayState
+	{
+		REPLAY_Off = 0,
+		REPLAY_Saving,
+		REPLAY_Replaying
+	};
+	eReplayState					m_eReplayState;
+	uint64							m_uiRecordCount;
+
+
 	HyInputMapping *				m_pInputMappings;
 	uint32							m_uiNumInputMappings;
 
 	float							m_fDeadZoneAmt;
-	//map<uint32, tInputState>		m_mapGamePads;
-
-	//uint64							m_ui64KeyFlags[HYINPUT_KEYBOARD_CODE_NUMFLAGS];		// Offset of '32', Offset of '256', Offset of '320'
 
 public:
 	HyInput(uint32 uiNumInputMaps, HyInputMapping *pInputMapping);
@@ -49,7 +56,7 @@ public:
 
 	//map<uint32, tInputState> &		GetGamePadMapRef()	{ return m_mapGamePads; }
 
-	void ProcessInputs();
+	void Update();
 
 	//void SaveInputs(uint32 uiUpdateIndex);
 	//void ApplyInputs(uint32 uiUpdateIndex);

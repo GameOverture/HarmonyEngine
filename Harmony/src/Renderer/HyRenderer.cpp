@@ -9,25 +9,8 @@
  *************************************************************************/
 #include "Renderer/HyRenderer.h"
 
-//#include "Renderer/DrawData/HyDrawSprite2d.h"
-//#include "Renderer/DrawData/HyDrawText2d.h"
-//#include "Renderer/DrawData/HyDrawSpine2d.h"
-//#include "Renderer/DrawData/HyDrawPrimitive2d.h"
-
-//uint32 HyRenderer::sm_uiLargest2dDrawSize = 0;
-
 HyRenderer::HyRenderer(HyViewport &gameViewportRef, HY_GFX_API *pSuppliedGfx /*= NULL*/)
 {
-	//sm_uiLargest2dDrawSize = 0;
-	//if(sizeof(HyDrawQuadBatch2d) > sm_uiLargest2dDrawSize)
-	//	sm_uiLargest2dDrawSize = sizeof(HyDrawQuadBatch2d);
-	//if(sizeof(HyDrawSprite2d) > sm_uiLargest2dDrawSize)
-	//	sm_uiLargest2dDrawSize = sizeof(HyDrawSprite2d);
-	//if(sizeof(HyDrawPrimitive2d) > sm_uiLargest2dDrawSize)
-	//	sm_uiLargest2dDrawSize = sizeof(HyDrawPrimitive2d);
-	//if(sizeof(HyDrawText2d) > sm_uiLargest2dDrawSize)
-	//	sm_uiLargest2dDrawSize = sizeof(HyDrawText2d);
-
 	m_GfxComms.SetGfxInit(gameViewportRef);
 
 	if(pSuppliedGfx)
@@ -37,39 +20,21 @@ HyRenderer::HyRenderer(HyViewport &gameViewportRef, HY_GFX_API *pSuppliedGfx /*=
 
 	m_pGfxApi->SetGfxComms(&m_GfxComms);
 
-#ifdef HY_MULTITHREADING
-	// Setup and run/start render thread
-	m_pRenderThread = ThreadManager::Get()->BeginThread(_T("Render Thread"), THREAD_START_PROCEDURE(RenderThread), m_pGfxApi);
-#endif
+	if(m_pGfxApi->CreateWindows() == false)
+		HyError("Graphics API's CreateWindows() failed");
+
+	if(m_pGfxApi->Initialize() == false)
+		HyError("Graphics API's Initialize() failed");
+
+	HyAssert(m_pGfxApi->GetGfxInfo(), "Graphics API must m_GfxComms.SetGfxInfo() within its Initialize()");
 }
 
 HyRenderer::~HyRenderer()
 {
 }
 
-#ifdef HY_MULTITHREADING
-//-------------------------------------------------------------------------
-// Render
-//
-// Will initialize the gfx API and start a looping thread update which 
-// draws a render description buffer.
-//-------------------------------------------------------------------------
-/*static*/ void HyRenderer::RenderThread(void *pParam)
+bool HyRenderer::Update()
 {
-	HY_GFX_API *pGfxApi = reinterpret_cast<HY_GFX_API *>(pParam);
-
-	if(pGfxApi->CreateWindows() == false)
-		HyError("Graphics API's CreateWindows() failed");
-
-	if(pGfxApi->Initialize() == false)
-		HyError("Graphics API's Initialize() failed");
-
-	HyAssert(pGfxApi->GetGfxInfo(), "Graphics API must m_GfxComms.SetGfxInfo() within its Initialize()");
-
-	while (pGfxApi->PollApi())
-		pGfxApi->Update();
-
-	pGfxApi->Shutdown();
+	return m_pGfxApi->Update();
 }
-#endif
 

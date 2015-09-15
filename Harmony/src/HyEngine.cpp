@@ -20,7 +20,7 @@ HyMemoryHeap &	HyEngine::sm_Mem = IApplication::GetMemoryHeap();
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IApplication &appRef) :	m_AppRef(appRef),
 											m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_pInputArray),
-											m_Time(m_Input),
+											m_Time(),
 											m_Renderer(m_AppRef.m_Viewport, m_AppRef.m_Init.pSuppliedGfx),
 											m_Creator(m_Renderer.GetGfxComms(), m_AppRef.m_Viewport, m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter)
 {
@@ -51,6 +51,7 @@ void HyEngine::operator delete(void *ptr)
 
 	while(sm_pInstance->Update())
 	{ }
+
 	gameRef.Shutdown();
 	
 	delete sm_pInstance;
@@ -58,12 +59,6 @@ void HyEngine::operator delete(void *ptr)
 
 void HyEngine::Initialize()
 {
-#ifdef HY_MULTITHREADING
-	// Block here until renderThread initializes
-	while(sm_pInstance->m_Creator.m_GfxCommsRef.IsRendererInitialized() == false)
-		InteropSleep(30);
-#endif
-
 	m_AppRef.Initialize();
 }
 
@@ -71,7 +66,7 @@ bool HyEngine::Update()
 {
 	while(m_Time.ThrottleTime())
 	{
-		// Update all game and engine by one 'step'
+		m_Input.Update();
 		m_Creator.PreUpdate();
 		
 		if(m_AppRef.Update() == false)
@@ -82,14 +77,8 @@ bool HyEngine::Update()
 #endif
 
 		m_Creator.PostUpdate();
-
-
-#ifdef HY_MULTITHREADING
-		if(m_Renderer.IsRenderThreadActive() == false)
-			return false;
-#endif
 	}
 
-	return true;
+	return m_Renderer.Update();
 }
 

@@ -11,6 +11,8 @@
 //#include "Gamepad/Gamepad.h"
 
 HyInput::HyInput(uint32 uiNumInputMaps, HyInputMapping *pInputMapping) :	m_fDeadZoneAmt(0.2f),
+																			m_eReplayState(REPLAY_Off),
+																			m_uiRecordCount(0),
 																			m_uiNumInputMappings(uiNumInputMaps),
 																			m_pInputMappings(pInputMapping)
 {
@@ -56,7 +58,7 @@ void HyInput::GiveDeviceIds(gainput::DeviceId &idKBOut, gainput::DeviceId &idMou
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void HyInput::ProcessInputs()
+void HyInput::Update()
 {
 //#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
 //	// Get gamepad input
@@ -72,14 +74,14 @@ void HyInput::ProcessInputs()
 //	//Gamepad_detectDevices()
 //#endif
 
-	// TODO: This needs to be 
-	MSG msg;
-	while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-	{
-		m_Manager.HandleMessage(msg);
-	}
+	//// TODO: This needs to be 
+	//MSG msg;
+	//while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	//{
+	//	m_Manager.HandleMessage(msg);
+	//}
 
-	m_Manager.Update();
+	//m_Manager.Update();
 		
 	//for(uint32 i = 0; i < m_uiNumInputMappings; ++i)
 	//{

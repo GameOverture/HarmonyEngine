@@ -11,7 +11,7 @@
 
 #include <mmsystem.h>
 
-HyTimeApi_Win::HyTimeApi_Win(HyInput &hyInputRef) : HyTime(hyInputRef)
+HyTimeApi_Win::HyTimeApi_Win() : HyTime()
 {
 	int64 i64PerfCnt;
 	if (QueryPerformanceFrequency((LARGE_INTEGER *) &i64PerfCnt)) 

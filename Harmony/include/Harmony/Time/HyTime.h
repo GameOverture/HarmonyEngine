@@ -19,7 +19,6 @@
 using std::vector;
 
 // Forward declarations
-class HyInput;
 class HyWatch;
 class HyStopwatch;
 
@@ -28,21 +27,11 @@ class HyTime
 	static const uint32			sm_kuiUpdateStep;
 	static const double			sm_kdUpdateStep;
 
-	HyInput &					m_InputRef;
 	vector<HyWatch *>			m_TimeInstList;
 
 	double						m_dTotalElapsedTime;
 	double						m_dThrottledTime;
 	double						m_dTimeManipulation;
-
-	enum eReplayState
-	{
-		REPLAY_Off = 0,
-		REPLAY_Saving,
-		REPLAY_Replaying
-	};
-	eReplayState				m_eJournalState;
-	unsigned int				m_uiJournalCount;
 
 	// FPS members
 	int							m_iFPSUpdateFrames;
@@ -54,7 +43,7 @@ protected:
 	double						m_dCurDeltaTime;
 
 public:
-	HyTime(HyInput &hyInputRef);
+	HyTime();
 	~HyTime(void);
 
 	static uint32 GetUpdateMilliseconds()	{ return sm_kuiUpdateStep; }

@@ -22,7 +22,7 @@ class HyTimeApi_Win : public HyTime
 	int64						m_i64CurTime;				// Current timer value
 
 public:
-	HyTimeApi_Win(HyInput &hyInputRef);
+	HyTimeApi_Win();
 	virtual ~HyTimeApi_Win(void);
 
 	// Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)

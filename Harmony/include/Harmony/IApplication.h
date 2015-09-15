@@ -21,14 +21,11 @@ class IApplication
 {
 	friend class HyEngine;
 
-protected:
 	HarmonyInit				m_Init;
 	static HyMemoryHeap		sm_Mem;
 
-	HyViewport				m_Viewport;
-	HyInputMapping *		m_pInputArray;
-
-	void CtorInit();
+	HyViewport *			m_pViewports;
+	HyInputMapping *		m_pInputMaps;
 
 	virtual bool Initialize() = 0;
 	virtual bool Update() = 0;
@@ -39,6 +36,9 @@ public:
 	~IApplication();
 
 	static HyMemoryHeap &GetMemoryHeap()					{ return sm_Mem; }
+
+	HyViewport &Viewport(uint32 uiIndex = 0);
+	//HyInput &Input(uint32 uiIndex = 0);
 
 	void *operator new(tMEMSIZE size);
 	void operator delete (void *ptr);

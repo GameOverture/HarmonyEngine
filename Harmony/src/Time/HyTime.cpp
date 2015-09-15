@@ -14,13 +14,10 @@
 /*static*/ const uint32			HyTime::sm_kuiUpdateStep = 10;
 /*static*/ const double			HyTime::sm_kdUpdateStep = HyTime::sm_kuiUpdateStep / 1000.0;
 
-HyTime::HyTime(HyInput &hyInputRef) :	m_InputRef(hyInputRef),
-										m_dTimeManipulation(1.0f),
-										m_eJournalState(REPLAY_Off),
-										m_dCurDeltaTime(0.0),
-										m_dTotalElapsedTime(0.0),
-										m_dThrottledTime(0.0),
-										m_uiJournalCount(0)
+HyTime::HyTime() :	m_dTimeManipulation(1.0f),
+					m_dCurDeltaTime(0.0),
+					m_dTotalElapsedTime(0.0),
+					m_dThrottledTime(0.0)
 {
 }
 
@@ -36,7 +33,7 @@ HyTime::~HyTime(void)
 bool HyTime::ThrottleTime()
 {
 	// m_dCurDeltaTime will be set within SetCurDeltaTime()
-	SetCurDeltaTime();// glfwGetTime();
+	SetCurDeltaTime();
 	m_dTotalElapsedTime += m_dCurDeltaTime;
 
 	m_dThrottledTime += m_dCurDeltaTime * m_dTimeManipulation;
@@ -51,20 +48,6 @@ bool HyTime::ThrottleTime()
 
 	if(m_dThrottledTime >= sm_kdUpdateStep)
 	{
-		m_InputRef.ProcessInputs();
-
-		if(m_eJournalState != REPLAY_Off)
-		{
-			// TODO: Need to implement gainput's input record/playback
-			//
-			//if(m_eJournalState == REPLAY_Saving)
-			//	m_InputRef.SaveInputs(m_uiJournalCount);
-			//else // REPLAY_Replaying
-			//	m_InputRef.ApplyInputs(m_uiJournalCount);
-			
-			m_uiJournalCount++;
-		}
-
 		m_dThrottledTime -= sm_kdUpdateStep;
 		return true;
 	}
