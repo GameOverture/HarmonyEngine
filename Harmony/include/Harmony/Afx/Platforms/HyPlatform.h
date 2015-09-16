@@ -136,20 +136,4 @@ HY_INLINE uint32 EndianSwap32(uint32 var)
 #error HyPlatform.h: HyError is not defined!
 #endif
 
-#ifndef HY_MEM_API
-#error HyPlatform.h: HY_MEM_API is not defined!
-#endif
-
-#ifndef HY_GFX_API
-#error HyPlatform.h: HY_GFX_API is not defined!
-#endif
-
-#ifndef HY_TIME_API
-#error HyPlatform.h: HY_TIME_API is not defined!
-#endif
-
-#ifndef HY_INPUT_API
-#error HyPlatform.h: HY_INPUT_API is not defined!
-#endif
-
 #endif // __HyPlatform_h__

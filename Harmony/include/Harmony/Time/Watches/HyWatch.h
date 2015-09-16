@@ -10,8 +10,12 @@
 #ifndef __HyWatch_h__
 #define __HyWatch_h__
 
+class HyTime;
+
 class HyWatch
 {
+	static HyTime *sm_pTime;
+
 public:
 	HyWatch(void);
 	virtual ~HyWatch(void);

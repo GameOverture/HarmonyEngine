@@ -61,9 +61,8 @@ public:
 	//int GetUpdateFPS()		{ return m_iCurFPSUpdate; }
 	//void ToggleFPSOutput()	{ m_bDumpFPSToConsole = !m_bDumpFPSToConsole; }
 
-	HyTimerWatch *CreateTimer();
-	HyStopwatch *CreateStopwatch();
-	void Remove(HyWatch *&pTimeInst);
+	void AddTimeInst(HyWatch *pTimeInst);
+	void RemoveTimeInst(HyWatch *pTimeInst);
 };
 
 #endif /* __HyTime_h__ */

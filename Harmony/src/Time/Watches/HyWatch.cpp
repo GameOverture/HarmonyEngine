@@ -9,6 +9,10 @@
  *************************************************************************/
 #include "Time/Watches/HyWatch.h"
 
+#include "Time/HyTime.h"
+
+HyTime *HyWatch::sm_pTime = NULL;
+
 HyWatch::HyWatch(void)
 {
 }
@@ -16,8 +20,10 @@ HyWatch::HyWatch(void)
 
 HyWatch::~HyWatch(void)
 {
+	sm_pTime->RemoveTimeInst(this);
 }
 
 void HyWatch::Update(double dDelta)
 {
 }
+

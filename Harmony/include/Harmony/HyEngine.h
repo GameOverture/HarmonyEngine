@@ -11,12 +11,12 @@
 #define __HyEngine_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Afx/HyInteropAfx.h"
+
 #include "IApplication.h"
 
 #include "Memory/HyMemoryHeap.h"
 
-#include "Input/HyInput.h"
-#include "Renderer/HyRenderer.h"
 #include "Creator/HyCreator.h"
 #include "Audio/HyAudio.h"
 #include "GuiTool/HyGuiComms.h"
@@ -35,11 +35,12 @@ class HyEngine
 
 	IApplication &			m_AppRef;
 	
-	HY_TIME_API				m_Time;
-	HyInput					m_Input;
-	HyRenderer				m_Renderer;
-	HyCreator				m_Creator;
+	HyTimeInterop			m_Time;
+	HyInputInterop			m_Input;
+	HyRendererInterop		m_Renderer;
 	HyAudio					m_Audio;
+
+	HyCreator				m_Creator;
 
 #ifndef HY_PLATFORM_GUI
 	HyGuiComms				m_GuiComms;

@@ -13,10 +13,24 @@
 #include "Afx/Platforms/HyPlatAfx.h"
 
 #if defined(HY_PLATFORM_WINDOWS)
-	#include "Time/Interop/HyTimeApi_Win.h"
-	#if !defined(HY_PLATFORM_GUI)
+	
+	#if defined(HY_PLATFORM_GUI)
+		#include "Renderer/GfxApi/OpenGL/HyOpenGL.h"
+		typedef HyOpenGL HyRendererInterop;
+	#else
 		#include "Renderer/GfxApi/OpenGL/Interop/HyOpenGL_Win.h"
+		typedef HyOpenGL_Win HyRendererInterop;
 	#endif
+
+	#include "Time/Interop/HyTimeApi_Win.h"
+	typedef HyTimeApi_Win HyTimeInterop;
+
+	#include "Memory/Interop/HyMemAPI_Windows.h"
+	typedef HyMemoryAPI_Windows HyMemoryInterop;
+
+	#include "Input/HyInput.h"
+	typedef HyInput HyInputInterop;
+
 #elif defined(HY_PLATFORM_OSX) && !defined(HY_PLATFORM_GUI)
 	#include "Renderer/GfxApi/OpenGL/Interop/HyOpenGL_OSX.h"
 #elif defined(HY_PLATFORM_LINUX) && !defined(HY_PLATFORM_GUI)

@@ -42,18 +42,6 @@ typedef unsigned int		uint32;
 typedef __int64				int64;
 typedef unsigned __int64	uint64;
 
-#if defined(HY_PLATFORM_GUI)
-	#define HY_GFX_API HyOpenGL
-#else
-	#define HY_GFX_API HyOpenGL_Win
-#endif
-
-#define HY_TIME_API HyTimeApi_Win
-
-#define HY_MEM_API HyMemoryAPI_Windows
-
-#define HY_INPUT_API HyInput
-
 // Support for the endian issues
 #define HY_ENDIAN_LITTLE	1
 #define HY_ENDIAN_BIG		0

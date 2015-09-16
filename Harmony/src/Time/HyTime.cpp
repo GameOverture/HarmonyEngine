@@ -24,10 +24,7 @@ HyTime::HyTime() :	m_dTimeManipulation(1.0f),
 HyTime::~HyTime(void)
 {
 	while(m_TimeInstList.size() != 0)
-	{
-		HyWatch *pInst = m_TimeInstList[0];
-		Remove(pInst);
-	}
+		RemoveTimeInst(m_TimeInstList[0]);
 }
 
 bool HyTime::ThrottleTime()
@@ -55,23 +52,15 @@ bool HyTime::ThrottleTime()
 	return false;
 }
 
-HyTimerWatch *HyTime::CreateTimer()
+void HyTime::AddTimeInst(HyWatch *pTimeInst)
 {
-	HyTimerWatch *pNewTimeInst = new HyTimerWatch();
+	if(pTimeInst == NULL)
+		return;
 
-	m_TimeInstList.push_back(pNewTimeInst);
-	return pNewTimeInst;
+	m_TimeInstList.push_back(pTimeInst);
 }
 
-HyStopwatch *HyTime::CreateStopwatch()
-{
-	HyStopwatch *pNewTimeInst = new HyStopwatch();
-
-	m_TimeInstList.push_back(pNewTimeInst);
-	return pNewTimeInst;
-}
-
-void HyTime::Remove(HyWatch *&pTimeInst)
+void HyTime::RemoveTimeInst(HyWatch *pTimeInst)
 {
 	if(pTimeInst == NULL)
 		return;
@@ -81,8 +70,6 @@ void HyTime::Remove(HyWatch *&pTimeInst)
 		if((*it) == pTimeInst)
 		{
 			it = m_TimeInstList.erase(it);
-			delete pTimeInst;
-			pTimeInst = NULL;
 			break;
 		}
 	}
