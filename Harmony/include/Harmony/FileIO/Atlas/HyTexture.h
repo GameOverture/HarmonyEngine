@@ -18,7 +18,7 @@
 using std::vector;
 
 // Forward declarations
-class IGfxApi;
+class HyRenderer;
 
 class HyTexture
 {
@@ -57,7 +57,7 @@ public:
 	const std::string &GetPath() const	{ return m_ksPath; }
 	uint32 GetId() const				{ return m_uiId; }
 
-	void Upload(IGfxApi &gfxApi);
+	void Upload(HyRenderer &gfxApi);
 
 	void DeletePixelData();
 };

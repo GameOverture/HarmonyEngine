@@ -180,17 +180,14 @@
     <ClCompile Include="src\Creator\Data\HyTexturedQuad2dData.cpp">
       <Filter>Creator\Data</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\GfxApi\IGfxApi.cpp">
-      <Filter>Renderer\GfxApi</Filter>
+    <ClCompile Include="src\Renderer\OpenGL\HyOpenGL.cpp">
+      <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\GfxApi\OpenGL\HyOpenGL.cpp">
-      <Filter>Renderer\GfxApi\OpenGL</Filter>
+    <ClCompile Include="src\Renderer\OpenGL\HyOpenGLShader.cpp">
+      <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\GfxApi\OpenGL\HyOpenGLShader.cpp">
-      <Filter>Renderer\GfxApi\OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\GfxApi\OpenGL\Interop\HyOpenGL_Win.cpp">
-      <Filter>Renderer\GfxApi\OpenGL\Interop</Filter>
+    <ClCompile Include="src\Renderer\OpenGL\Interop\HyOpenGL_Win.cpp">
+      <Filter>Renderer\OpenGL\Interop</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -269,14 +266,11 @@
     <Filter Include="Input\Mappings">
       <UniqueIdentifier>{f8b1513f-1385-4506-b22d-1bedcd21a33d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer\GfxApi">
-      <UniqueIdentifier>{6363bd36-1c70-40ae-8e27-cdb4e7dedc66}</UniqueIdentifier>
+    <Filter Include="Renderer\OpenGL">
+      <UniqueIdentifier>{266ff3c9-2890-44c9-90f1-b987c1598bc6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer\GfxApi\OpenGL">
-      <UniqueIdentifier>{de087e1e-abaf-4e4a-be29-4ba8a1fe15b2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Renderer\GfxApi\OpenGL\Interop">
-      <UniqueIdentifier>{a0ce4c78-e583-4b40-8248-7615acb5c2e9}</UniqueIdentifier>
+    <Filter Include="Renderer\OpenGL\Interop">
+      <UniqueIdentifier>{167448ad-d1cc-45b8-a402-87e7ee0e363b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -531,23 +525,20 @@
     <ClInclude Include="include\Harmony\Creator\Data\HyTexturedQuad2dData.h">
       <Filter>Creator\Data</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\GfxApi\IGfxApi.h">
-      <Filter>Renderer\GfxApi</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\GfxApi\OpenGL\HyOpenGL.h">
-      <Filter>Renderer\GfxApi\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\GfxApi\OpenGL\HyOpenGLShader.h">
-      <Filter>Renderer\GfxApi\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\GfxApi\OpenGL\Interop\HyOpenGL_Win.h">
-      <Filter>Renderer\GfxApi\OpenGL\Interop</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Afx\HyInteropAfx.h">
       <Filter>Afx</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatAfx.h">
       <Filter>Afx\Platforms</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGL.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGLShader.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Win.h">
+      <Filter>Renderer\OpenGL\Interop</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

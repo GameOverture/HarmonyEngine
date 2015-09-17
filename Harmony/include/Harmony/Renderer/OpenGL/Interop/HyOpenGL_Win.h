@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Renderer/GfxApi/OpenGL/HyOpenGL.h"
+#include "Renderer/OpenGL/HyOpenGL.h"
 
 class HyOpenGL_Win : public HyOpenGL
 {
@@ -32,7 +32,7 @@ class HyOpenGL_Win : public HyOpenGL
 	uint32				m_uiNumDCs;
 
 public:
-	HyOpenGL_Win();
+	HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef);
 	~HyOpenGL_Win();
 
 	virtual bool CreateWindows();

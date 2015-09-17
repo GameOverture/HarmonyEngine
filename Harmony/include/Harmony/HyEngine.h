@@ -40,6 +40,7 @@ class HyEngine
 	HyRendererInterop		m_Renderer;
 	HyAudio					m_Audio;
 
+	HyGfxComms				m_GfxBuffer;
 	HyCreator				m_Creator;
 
 #ifndef HY_PLATFORM_GUI

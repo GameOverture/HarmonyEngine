@@ -9,31 +9,91 @@
  *************************************************************************/
 #include "Renderer/HyRenderer.h"
 
-HyRenderer::HyRenderer(vector<HyViewport> &vViewportsRef, HY_GFX_API *pSuppliedGfx /*= NULL*/)
+HyRenderer::HyRenderer(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : m_GfxCommsRef(gfxCommsRef),
+																					m_ViewportsRef(viewportsRef)
 {
-	if(pSuppliedGfx)
-		m_pGfxApi = pSuppliedGfx;
-	else
-		m_pGfxApi = new HY_GFX_API();
-
-	m_pGfxApi->SetGfxComms(&m_GfxComms);
-	m_pGfxApi->SetViewportRef(&vViewportsRef);
-
-	if(m_pGfxApi->CreateWindows() == false)
-		HyError("Graphics API's CreateWindows() failed");
-
-	if(m_pGfxApi->Initialize() == false)
-		HyError("Graphics API's Initialize() failed");
-
-	HyAssert(m_pGfxApi->GetGfxInfo(), "Graphics API must m_GfxComms.SetGfxInfo() within its Initialize()");
 }
 
-HyRenderer::~HyRenderer()
+HyRenderer::~HyRenderer(void)
 {
 }
 
 bool HyRenderer::Update()
 {
-	return m_pGfxApi->Update();
+	if(PollApi())
+	{
+		DrawBuffers();
+		return true;
+	}
+	else
+	{
+		Shutdown();
+		return false;
+	}
 }
 
+/*virtual*/ void HyRenderer::DrawBuffers()
+{
+	// Swap to newest draw buffers (is only threadsafe on Render thread)
+	if(!m_GfxCommsRef.Render_GetSharedPtrs(m_pMsgQueuePtr, m_pSendMsgQueuePtr, m_pDrawBufferPtr))
+	{
+		InteropSleep(10);
+		return;
+	}
+	m_DrawpBufferHeader = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr);
+
+	ProcessGameMsgs();
+
+	if(CheckDevice() == false)
+		return;
+
+	StartRender();
+
+	while(Begin_3d())
+	{
+		//Draw3d();
+		End_3d();
+	}
+
+	while(Begin_2d())
+	{
+		Draw2d();
+		End_2d();
+	}
+
+	FinishRender();
+
+	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr)->uiReturnFlags |= GFXFLAG_HasRendered;
+}
+
+void HyRenderer::ProcessGameMsgs()
+{
+	// Handle each command message first. Which loads/unloads gfx resources.
+	while(!m_pMsgQueuePtr->empty())
+	{
+		IData *pData = m_pMsgQueuePtr->front();
+		m_pMsgQueuePtr->pop();
+
+		if(pData->GetLoadState() == HYLOADSTATE_Queued)
+			pData->OnGfxLoad(*this);
+		else
+			pData->OnGfxRemove(*this);
+
+		m_pSendMsgQueuePtr->push(pData);
+	}
+}
+
+void HyRenderer::Draw2d()
+{
+	// Each render state will require its own draw. The order of these render states should be 
+	// depth sorted with render states batched together to reduce state changes.
+	m_pCurRenderState = GetRenderStatesPtr2d();
+	memset(&m_PrevRenderState, 0, sizeof(HyRenderState));
+
+	int32 iNumRenderStates = GetNumRenderStates2d();
+	for(int32 i = 0; i < iNumRenderStates; ++i, ++m_pCurRenderState)
+	{
+		DrawRenderState_2d(*m_pCurRenderState);
+		m_PrevRenderState = *m_pCurRenderState;
+	}
+}

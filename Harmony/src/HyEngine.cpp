@@ -57,6 +57,22 @@ void HyEngine::operator delete(void *ptr)
 
 void HyEngine::Initialize()
 {
+	if(pSuppliedGfx)
+		m_pGfxApi = pSuppliedGfx;
+	else
+		m_pGfxApi = new HY_GFX_API();
+
+	m_Renderer.SetGfxComms(&m_GfxComms);
+	m_Renderer.SetViewportRef(&vViewportsRef);
+
+	if(m_Renderer.CreateWindows() == false)
+		HyError("Graphics API's CreateWindows() failed");
+
+	if(m_Renderer.Initialize() == false)
+		HyError("Graphics API's Initialize() failed");
+
+	HyAssert(m_Renderer.GetGfxInfo(), "Graphics API must m_GfxComms.SetGfxInfo() within its Initialize()");
+
 	m_AppRef.Initialize();
 }
 

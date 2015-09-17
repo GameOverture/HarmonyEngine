@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Renderer/GfxApi/OpenGL/HyOpenGL.h"
+#include "Renderer/OpenGL/HyOpenGL.h"
 
 // THIS WORKS BELOW!
 const float vertexDataEmulate[] = {
@@ -54,9 +54,9 @@ const float primitiveVertexDataEmulate[] = {
 };
 
 
-HyOpenGL::HyOpenGL() :	IGfxApi(),
-						m_mtxView(1.0f),
-						m_kmtxIdentity(1.0f)
+HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : HyRenderer(gfxCommsRef, viewportsRef),
+																				m_mtxView(1.0f),
+																				m_kmtxIdentity(1.0f)
 {
 }
 

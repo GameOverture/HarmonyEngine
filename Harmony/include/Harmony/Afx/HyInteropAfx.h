@@ -15,10 +15,10 @@
 #if defined(HY_PLATFORM_WINDOWS)
 	
 	#if defined(HY_PLATFORM_GUI)
-		#include "Renderer/GfxApi/OpenGL/HyOpenGL.h"
+		#include "Renderer/OpenGL/HyOpenGL.h"
 		typedef HyOpenGL HyRendererInterop;
 	#else
-		#include "Renderer/GfxApi/OpenGL/Interop/HyOpenGL_Win.h"
+		#include "Renderer/OpenGL/Interop/HyOpenGL_Win.h"
 		typedef HyOpenGL_Win HyRendererInterop;
 	#endif
 
@@ -32,11 +32,11 @@
 	typedef HyInput HyInputInterop;
 
 #elif defined(HY_PLATFORM_OSX) && !defined(HY_PLATFORM_GUI)
-	#include "Renderer/GfxApi/OpenGL/Interop/HyOpenGL_OSX.h"
+	#include "Renderer/OpenGL/Interop/HyOpenGL_OSX.h"
 #elif defined(HY_PLATFORM_LINUX) && !defined(HY_PLATFORM_GUI)
-	#include "Renderer/GfxApi/OpenGL/Interop/HyOpenGL_Linux.h"
+	#include "Renderer/OpenGL/Interop/HyOpenGL_Linux.h"
 #elif defined(HY_PLATFORM_GUI)
-	#include "Renderer/GfxApi/OpenGL/HyOpenGL.h"
+	#include "Renderer/OpenGL/HyOpenGL.h"
 #endif
 
 #endif __HyInteropAfx_h__

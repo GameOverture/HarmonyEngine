@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 
-#include "Harmony/Renderer/GfxApi/OpenGL/Interop/HyOpenGL_Win.h"
+#include "Harmony/Renderer/OpenGL/Interop/HyOpenGL_Win.h"
 
 #include "GuiTool/HyGuiComms.h"
 #include "Utilities/HyStrManip.h"
@@ -16,7 +16,7 @@
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 
-HyOpenGL_Win::HyOpenGL_Win()
+HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : HyOpenGL(gfxCommsRef, viewportsRef)
 {
 	
 }
@@ -122,18 +122,18 @@ void HyOpenGL_Win::DeviceContext::Resize(GLsizei iWidth, GLsizei iHeight)
 
 /*virtual*/ bool HyOpenGL_Win::CreateWindows()
 {
-	m_uiNumDCs = m_pViewportsRef->size();
+	m_uiNumDCs = m_ViewportsRef.size();
 	m_ppDeviceContexes = new DeviceContext *[m_uiNumDCs];
 
 	for(uint32 i = 0; i < m_uiNumDCs; ++i)
-		m_ppDeviceContexes[i] = new DeviceContext((*m_pViewportsRef)[i].GetWindowInfo());
+		m_ppDeviceContexes[i] = new DeviceContext(m_ViewportsRef[i].GetWindowInfo());
 
 	return true;
 }
 
 /*virtual*/ bool HyOpenGL_Win::Initialize()
 {
-	m_pGfxComms->SetGfxInfo(reinterpret_cast<HyGfxComms::tGfxInfo *>(1));
+	m_GfxCommsRef.SetGfxInfo(reinterpret_cast<HyGfxComms::tGfxInfo *>(1));
 
 	return HyOpenGL::Initialize();
 }

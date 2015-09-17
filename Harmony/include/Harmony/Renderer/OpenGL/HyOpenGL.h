@@ -12,13 +12,13 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Renderer/GfxApi/IGfxApi.h"
-#include "Renderer/GfxApi/OpenGL/HyOpenGLShader.h"
+#include "Renderer/HyRenderer.h"
+#include "Renderer/OpenGL/HyOpenGLShader.h"
 
 //#define HY_INDEX_BUFFER_SIZE (128 * 1024)
 //#define HY_RESTART_INDEX 65535
 
-class HyOpenGL : public IGfxApi
+class HyOpenGL : public HyRenderer
 {
 protected:
 	mat4					m_mtxView;
@@ -48,7 +48,7 @@ protected:
 	//void (HyOpenGL::*m_fpDraw2d)(char *pData);
 
 public:
-	HyOpenGL();
+	HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef);
 	virtual ~HyOpenGL(void);
 
 	virtual bool CreateWindows();

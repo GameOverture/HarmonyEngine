@@ -25,9 +25,6 @@ using std::queue;
 
 #define RENDER_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
 
-// Forward declaration
-class IGfxResource;
-
 enum eGfxReturnFlags
 {
 	GFXFLAG_HasRendered			= 1 << 0
