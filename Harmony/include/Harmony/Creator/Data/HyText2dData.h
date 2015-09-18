@@ -39,8 +39,8 @@ public:
 	_texture_glyph_t *GetGlyph(uint32 uiFontIndex, wchar_t charcode);
 
 	virtual void DoFileLoad();
-	virtual void OnGfxLoad(IGfxApi &gfxApi);
-	virtual void OnGfxRemove(IGfxApi &gfxApi);
+	virtual void OnGfxLoad(HyRenderer &gfxApi);
+	virtual void OnGfxRemove(HyRenderer &gfxApi);
 };
 
 #endif /* __HyText2dData_h__ */
