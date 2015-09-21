@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Creator/Data/HyText2dData.h"
-#include "Renderer/GfxApi/IGfxApi.h"
+#include "Renderer/HyRenderer.h"
 
 #include "freetype-gl/freetype-gl.h"
 
@@ -86,12 +86,12 @@ _texture_glyph_t *HyText2dData::GetGlyph(uint32 uiFontIndex, wchar_t charcode)
 	return texture_font_get_glyph(m_vFonts[uiFontIndex], charcode);
 }
 
-/*virtual*/ void HyText2dData::OnGfxLoad(IGfxApi &gfxApi)
+/*virtual*/ void HyText2dData::OnGfxLoad(HyRenderer &gfxApi)
 {
 	m_pTexture->Upload(gfxApi);
 }
 
-/*virtual*/ void HyText2dData::OnGfxRemove(IGfxApi &gfxApi)
+/*virtual*/ void HyText2dData::OnGfxRemove(HyRenderer &gfxApi)
 {
 	gfxApi.DeleteTexture(*m_pTexture);
 }

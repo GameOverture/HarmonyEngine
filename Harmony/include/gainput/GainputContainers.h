@@ -136,7 +136,7 @@ public:
 	{
 		if (size_ + 1 > capacity_)
 		{
-			reserve(size_ + 1);
+			reserve(static_cast<uint32_t>(size_ + 1));
 		}
 		data_[size_++] = val;
 	}
@@ -151,7 +151,7 @@ public:
 	{
 		if (capacity <= capacity_)
 			return;
-		capacity = (capacity_*capacity_) < capacity ? capacity : (capacity_*capacity_);
+		capacity = static_cast<uint32_t>((capacity_*capacity_) < capacity ? capacity : (capacity_*capacity_));
 		T* newData = static_cast<T*>(allocator_.Allocate(sizeof(T)*capacity));
 		memcpy(newData, data_, sizeof(T)*capacity_);
 		allocator_.Deallocate(data_);
@@ -319,7 +319,7 @@ public:
 
 		if (vi == InvalidKey)
 		{
-			keys_[ha] = values_.size();
+			keys_[ha] = static_cast<uint32_t>(values_.size());
 		}
 		else
 		{
@@ -327,7 +327,7 @@ public:
 			{
 				if (values_[vi].next == InvalidKey)
 				{
-					values_[vi].next = values_.size();
+					values_[vi].next = static_cast<uint32_t>(values_.size());
 					break;
 				}
 				else
@@ -345,7 +345,7 @@ public:
 
 		++size_;
 
-		return &values_[values_.size()-1];
+		return &values_[static_cast<uint32_t>(values_.size() - 1)];
 	}
 
 	V& operator[] (const K& k)

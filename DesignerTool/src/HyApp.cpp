@@ -8,26 +8,26 @@ HyApp::HyApp(HarmonyInit &initStruct) :     IApplication(initStruct),
 
 /*virtual*/ bool HyApp::Initialize()
 {
-    vector<uint32>	vGamePadIds;
-    m_pInputArray->GetGamePadIds(vGamePadIds);
+//    vector<uint32>	vGamePadIds;
+//    m_pInputArray->GetGamePadIds(vGamePadIds);
 
-    if(vGamePadIds.empty() == false)
-    {
-        m_pInputArray->BindBtnMap(GP360_ButtonA, HyInputKey(vGamePadIds[0], GP360_ButtonA));
-        m_pInputArray->BindBtnMap(GP360_ButtonB, HyInputKey(vGamePadIds[0], GP360_ButtonB));
+//    if(vGamePadIds.empty() == false)
+//    {
+//        m_pInputArray->BindBtnMap(GP360_ButtonA, HyInputKey(vGamePadIds[0], GP360_ButtonA));
+//        m_pInputArray->BindBtnMap(GP360_ButtonB, HyInputKey(vGamePadIds[0], GP360_ButtonB));
 
-        m_pInputArray->BindAxisMap(GP_RStickX, HyInputKey(vGamePadIds[0], GP_RStickX));
-        m_pInputArray->BindAxisMap(GP_RStickY, HyInputKey(vGamePadIds[0], GP_RStickY));
-        m_pInputArray->BindAxisMap(GP_Triggers, HyInputKey(vGamePadIds[0], GP_Triggers));
+//        m_pInputArray->BindAxisMap(GP_RStickX, HyInputKey(vGamePadIds[0], GP_RStickX));
+//        m_pInputArray->BindAxisMap(GP_RStickY, HyInputKey(vGamePadIds[0], GP_RStickY));
+//        m_pInputArray->BindAxisMap(GP_Triggers, HyInputKey(vGamePadIds[0], GP_Triggers));
 
-        m_pInputArray->BindAxisMap(GP_LStickX, HyInputKey(vGamePadIds[0], GP_LStickX));
-    }
-    m_pInputArray->BindAxisMapPos(GP_LStickX, HyInputKey('D'));
-    m_pInputArray->BindAxisMapNeg(GP_LStickX, HyInputKey('A'));
+//        m_pInputArray->BindAxisMap(GP_LStickX, HyInputKey(vGamePadIds[0], GP_LStickX));
+//    }
+//    m_pInputArray->BindAxisMapPos(GP_LStickX, HyInputKey('D'));
+//    m_pInputArray->BindAxisMapNeg(GP_LStickX, HyInputKey('A'));
 
-    m_pInputArray->BindBtnMap(GP360_ButtonA, HyInputKey(' '));
+//    m_pInputArray->BindBtnMap(GP360_ButtonA, HyInputKey(' '));
 
-    m_pCam = m_Viewport.CreateCamera2d();
+    m_pCam = GetViewport().CreateCamera2d();
 
     //HyGfxWindow::tResolution tRes;
     //m_Window.GetResolution(tRes);
@@ -63,9 +63,4 @@ void HyApp::SetItem(Item *pItem)
     
     if(m_pCurItem != NULL)
         m_pCurItem->Show();
-}
-
-HyViewport &HyApp::GetViewport()
-{
-    return m_Viewport;
 }

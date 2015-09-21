@@ -6,12 +6,12 @@
 #include <QGLWidget>
 #include "Harmony/HyEngine.h"
 
-class HyGfx : public QGLWidget, public HyOpenGL
+class HyGuiRenderer : public QGLWidget, public HyOpenGL
 {
     Q_OBJECT
 
 public:
-    explicit HyGfx(QWidget *parent = 0);
+    explicit HyGuiRenderer(QWidget *parent = 0);
 
     void initializeGL();
     void paintGL();

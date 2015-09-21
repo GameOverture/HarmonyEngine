@@ -40,8 +40,8 @@ public:
 	void AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInterpDur);
 
 	virtual void DoFileLoad();
-	virtual void OnGfxLoad(IGfxApi &gfxApi);
-	virtual void OnGfxRemove(IGfxApi &gfxApi);
+	virtual void OnGfxLoad(HyRenderer &gfxApi);
+	virtual void OnGfxRemove(HyRenderer &gfxApi);
 };
 
 #endif /* __HyEnt2dData_h__ */

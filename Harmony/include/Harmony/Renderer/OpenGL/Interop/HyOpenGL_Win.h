@@ -29,7 +29,7 @@ class HyOpenGL_Win : public HyOpenGL
 		void Resize(GLsizei width, GLsizei height);
 	};
 	DeviceContext **	m_ppDeviceContexes;
-	uint32				m_uiNumDCs;
+	size_t				m_uiNumDCs;
 
 public:
 	HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef);

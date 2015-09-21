@@ -17,7 +17,6 @@ SOURCES += main.cpp \
     WidgetExplorer.cpp \
     WidgetOutputLog.cpp \
     WidgetRenderer.cpp \
-    HyGfx.cpp \
     MainWindow.cpp \
     HyGlobal.cpp \
     Item.cpp \
@@ -38,7 +37,8 @@ SOURCES += main.cpp \
     WidgetLiveVarManager.cpp \
     HyTcpServer.cpp \
     HyGuiTexture.cpp \
-    DlgOpenProject.cpp
+    DlgOpenProject.cpp \
+    HyGuiRenderer.cpp
 
 HEADERS  += \
     HyApp.h \
@@ -46,7 +46,6 @@ HEADERS  += \
     WidgetExplorer.h \
     WidgetOutputLog.h \
     WidgetRenderer.h \
-    HyGfx.h \
     MainWindow.h \
     HyGlobal.h \
     Item.h \
@@ -65,7 +64,8 @@ HEADERS  += \
     WidgetLiveVarManager.h \
     HyTcpServer.h \
     HyGuiTexture.h \
-    DlgOpenProject.h
+    DlgOpenProject.h \
+    HyGuiRenderer.h
 
 FORMS    += \
     DlgNewProject.ui \

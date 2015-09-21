@@ -1,11 +1,11 @@
-#include "HyGfx.h"
+#include "HyGuiRenderer.h"
 
 #include <QGLFormat>
 #include <QDir>
 
 #include "HyGlobal.h"
 
-HyGfx::HyGfx(QWidget *parent) : QGLWidget(parent)
+HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QGLWidget(parent)
 {
     QGLFormat format;
     format.setVersion(4, 2);
@@ -16,7 +16,7 @@ HyGfx::HyGfx(QWidget *parent) : QGLWidget(parent)
     makeCurrent();
 }
 
-void HyGfx::initializeGL()
+void HyGuiRenderer::initializeGL()
 {
     QString test = QDir::currentPath();
 
@@ -24,7 +24,7 @@ void HyGfx::initializeGL()
     HyOpenGL::Initialize();
 }
 
-void HyGfx::paintGL()
+void HyGuiRenderer::paintGL()
 {
     if(m_pGfxComms == NULL)
         return;
@@ -33,7 +33,7 @@ void HyGfx::paintGL()
         HYLOG("Harmony Gfx requested exit program.", LOGTYPE_Info);
 }
 
-void HyGfx::resizeGL(int w, int h)
+void HyGuiRenderer::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
     m_mtxProj = glm::ortho(w * -0.5f, w * 0.5f, h * -0.5f, h * 0.5f);
