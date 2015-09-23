@@ -4,9 +4,9 @@
 #include <QTreeWidget>
 
 #include "HyGlobal.h"
-#include "HyApp.h"
+#include "HyGuiApp.h"
 
-class HyApp;
+class HyGuiApp;
 
 class Item
 {
@@ -35,7 +35,7 @@ public:
     
     virtual void Hide();
     virtual void Show();
-    virtual void Draw(HyApp *pHyApp);
+    virtual void Draw(HyGuiApp *pHyApp);
     
     virtual void Save();
     

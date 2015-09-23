@@ -28,7 +28,7 @@ ItemProject::~ItemProject()
 //    }
 }
 
-/*virtual*/ void ItemProject::Draw(HyApp *pHyApp)
+/*virtual*/ void ItemProject::Draw(HyGuiApp *pHyApp)
 {
     //pHyApp->GetViewport().GetResolution().iWidth
     //pHyApp->GetViewport().GetResolution().iHeight

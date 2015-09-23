@@ -1,35 +1,39 @@
 #include "HyGuiRenderer.h"
 
-#include <QGLFormat>
+#include <QTimer>
+//#include <QGLFormat>
 #include <QDir>
 
 #include "HyGlobal.h"
 
 HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QGLWidget(parent)
 {
-    QGLFormat format;
-    format.setVersion(4, 2);
-    format.setProfile(QGLFormat::CoreProfile);
-    format.setSampleBuffers(true);
+    // Todo: test to see if QWidget parent works for HyEngine()'s ctor
 
-    setFormat(format);
-    makeCurrent();
+//    QTimer *timer = new QTimer(this);
+//    connect(timer, SIGNAL(timeout()), this, SLOT(Render()));
+//    timer->start(17);
+}
+
+HyGuiRenderer::~HyGuiRenderer()
+{
+    delete m_pHyApp;
 }
 
 void HyGuiRenderer::initializeGL()
 {
-    QString test = QDir::currentPath();
+    //    QGLFormat format;
+    //    format.setVersion(4, 2);
+    //    format.setProfile(QGLFormat::CoreProfile);
+    //    format.setSampleBuffers(true);
+    //    setFormat(format);
 
-    glewExperimental = GL_TRUE;
-    HyOpenGL::Initialize();
+    m_pHyEngine = new HyEngine(*reinterpret_cast<IApplication *>(parent()));
 }
 
 void HyGuiRenderer::paintGL()
 {
-    if(m_pGfxComms == NULL)
-        return;
-
-    if(Update() == false)
+    if(m_pHyEngine->Update() == false)
         HYLOG("Harmony Gfx requested exit program.", LOGTYPE_Info);
 }
 

@@ -25,6 +25,12 @@ HyEngine::HyEngine(IApplication &appRef) :	m_AppRef(appRef),
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
 	HyFileIO::InitAtlasData();
+
+	if(m_Renderer.Initialize() == false)
+		HyError("Graphics API's Initialize() failed");
+
+	if(m_AppRef.Initialize() == false)
+		HyError("IApplication Initialize() failed");
 }
 
 HyEngine::~HyEngine()
@@ -45,27 +51,12 @@ void HyEngine::operator delete(void *ptr)
 {
 	sm_pInstance = new HyEngine(gameRef);
 	
-	sm_pInstance->Initialize();
-
 	while(sm_pInstance->Update())
 	{ }
 
 	gameRef.Shutdown();
 	
 	delete sm_pInstance;
-}
-
-void HyEngine::Initialize()
-{
-	if(m_Renderer.CreateWindows() == false)
-		HyError("Graphics API's CreateWindows() failed");
-
-	if(m_Renderer.Initialize() == false)
-		HyError("Graphics API's Initialize() failed");
-
-	HyAssert(m_Renderer.GetGfxInfo(), "Graphics API must m_GfxComms.SetGfxInfo() within its Initialize()");
-
-	m_AppRef.Initialize();
 }
 
 bool HyEngine::Update()

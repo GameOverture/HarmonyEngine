@@ -51,8 +51,6 @@ public:
 	HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef);
 	virtual ~HyOpenGL(void);
 
-	virtual bool CreateWindows();
-
 	virtual bool Initialize();
 	virtual bool PollApi();
 	virtual bool CheckDevice();

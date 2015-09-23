@@ -120,20 +120,13 @@ void HyOpenGL_Win::DeviceContext::Resize(GLsizei iWidth, GLsizei iHeight)
 	//glLoadIdentity();									// Reset The Modelview Matrix
 }
 
-/*virtual*/ bool HyOpenGL_Win::CreateWindows()
+/*virtual*/ bool HyOpenGL_Win::Initialize()
 {
 	m_uiNumDCs = m_ViewportsRef.size();
 	m_ppDeviceContexes = new DeviceContext *[m_uiNumDCs];
 
 	for(uint32 i = 0; i < m_uiNumDCs; ++i)
 		m_ppDeviceContexes[i] = new DeviceContext(m_ViewportsRef[i].GetWindowInfo());
-
-	return true;
-}
-
-/*virtual*/ bool HyOpenGL_Win::Initialize()
-{
-	m_GfxCommsRef.SetGfxInfo(reinterpret_cast<HyGfxComms::tGfxInfo *>(1));
 
 	return HyOpenGL::Initialize();
 }

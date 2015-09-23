@@ -62,7 +62,7 @@ QString Item::GetName() const
     HYLOG("Tried to Show() a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
-/*virtual*/ void Item::Draw(HyApp *pHyApp)
+/*virtual*/ void Item::Draw(HyGuiApp *pHyApp)
 {
     HYLOG("Tried to draw a non-derived item: " % GetName(), LOGTYPE_Error);
 }

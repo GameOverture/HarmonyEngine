@@ -36,7 +36,7 @@ ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
     m_primOriginVert.SetEnabled(true);
 }
 
-/*virtual*/ void ItemSprite::Draw(HyApp *pHyApp)
+/*virtual*/ void ItemSprite::Draw(HyGuiApp *pHyApp)
 {
     
     //pHyApp->GetViewport().GetResolution().iWidth

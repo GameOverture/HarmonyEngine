@@ -65,7 +65,6 @@ struct HyWindowInfo
 #define HY_MAXWINDOWS 6
 
 // Client supplies these initialization parameters to the engine
-class HY_GFX_API;
 struct HarmonyInit
 {
 	const char *			szGameName;
@@ -75,7 +74,6 @@ struct HarmonyInit
 	HyCoordinateType		eDefaultCoordinateType;
 	float					fPixelsPerMeter;
 	uint32					uiNumInputMappings;
-	HY_GFX_API *			pSuppliedGfx;
 	const char *			szDefaultFont;
 
 	HarmonyInit() :	szGameName("Untitled Game"),
@@ -84,7 +82,6 @@ struct HarmonyInit
 					eDefaultCoordinateType(HYCOORD_Pixel),
 					fPixelsPerMeter(80),
 					uiNumInputMappings(1),
-					pSuppliedGfx(NULL),
 					szDefaultFont("Vera.ttf")
 	{
 		for(int i = 0; i < HY_MAXWINDOWS; ++i)

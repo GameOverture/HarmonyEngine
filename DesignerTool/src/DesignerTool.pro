@@ -12,7 +12,6 @@ TARGET = DesignerTool
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    HyApp.cpp \
     DlgNewProject.cpp \
     WidgetExplorer.cpp \
     WidgetOutputLog.cpp \
@@ -41,7 +40,6 @@ SOURCES += main.cpp \
     HyGuiRenderer.cpp
 
 HEADERS  += \
-    HyApp.h \
     DlgNewProject.h \
     WidgetExplorer.h \
     WidgetOutputLog.h \

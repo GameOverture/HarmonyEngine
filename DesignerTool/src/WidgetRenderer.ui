@@ -56,16 +56,15 @@
     </widget>
    </item>
    <item>
-    <widget class="HyGfx" name="renderer" native="true"/>
+    <widget class="HyGuiRenderer" name="openGLWidget"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>HyGfx</class>
-   <extends>QWidget</extends>
-   <header>HyGfx.h</header>
-   <container>1</container>
+   <class>HyGuiRenderer</class>
+   <extends>QOpenGLWidget</extends>
+   <header>HyGuiRenderer.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

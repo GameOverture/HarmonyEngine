@@ -2,6 +2,7 @@
 #include "ui_WidgetRenderer.h"
 
 WidgetRenderer::WidgetRenderer(QWidget *parent) :   QWidget(parent),
+                                                    IApplication(HarmonyInit()),
                                                     ui(new Ui::WidgetRenderer),
                                                     m_bInitialized(false)
 {
@@ -10,32 +11,63 @@ WidgetRenderer::WidgetRenderer(QWidget *parent) :   QWidget(parent),
     //ui->tabWidget->setTabBarAutoHide(true);
     m_bInitialized = true;    
 
-    HarmonyInit initStruct;
-
-    initStruct.szGameName = "Harmony Designer Tool";
-#ifdef QT_DEBUG
-    initStruct.szDataDir = "../data";    // This is used for production, default is fine for release
-#endif
-    initStruct.vStartResolution = vec2(1024.0f, 512.0f);
-    initStruct.eWindowType = HYWINDOW_WindowedSizeable;
-    initStruct.fPixelsPerMeter = 180.0f;
-    initStruct.uiNumInputMappings = 1;
-    initStruct.pSuppliedGfx = ui->renderer;
-
-    m_pHyApp = new HyApp(initStruct);
-    m_pHyEngine = new HyEngine(*m_pHyApp);
-    m_pHyEngine->Initialize();
-    
-    HyFileIO::SetDataDir("../data");
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(Render()));
-    timer->start(17);
+    ui->renderer->SetAppPtr(this);
 }
 
 WidgetRenderer::~WidgetRenderer()
 {
     delete ui;
+}
+
+/*virtual*/ bool WidgetRenderer::Initialize()
+{
+//    vector<uint32>	vGamePadIds;
+//    m_pInputArray->GetGamePadIds(vGamePadIds);
+
+//    if(vGamePadIds.empty() == false)
+//    {
+//        m_pInputArray->BindBtnMap(GP360_ButtonA, HyInputKey(vGamePadIds[0], GP360_ButtonA));
+//        m_pInputArray->BindBtnMap(GP360_ButtonB, HyInputKey(vGamePadIds[0], GP360_ButtonB));
+
+//        m_pInputArray->BindAxisMap(GP_RStickX, HyInputKey(vGamePadIds[0], GP_RStickX));
+//        m_pInputArray->BindAxisMap(GP_RStickY, HyInputKey(vGamePadIds[0], GP_RStickY));
+//        m_pInputArray->BindAxisMap(GP_Triggers, HyInputKey(vGamePadIds[0], GP_Triggers));
+
+//        m_pInputArray->BindAxisMap(GP_LStickX, HyInputKey(vGamePadIds[0], GP_LStickX));
+//    }
+//    m_pInputArray->BindAxisMapPos(GP_LStickX, HyInputKey('D'));
+//    m_pInputArray->BindAxisMapNeg(GP_LStickX, HyInputKey('A'));
+
+//    m_pInputArray->BindBtnMap(GP360_ButtonA, HyInputKey(' '));
+
+    m_pCam = GetViewport().CreateCamera2d();
+
+    //HyGfxWindow::tResolution tRes;
+    //m_Window.GetResolution(tRes);
+    //m_Camera.SetOrthographic(static_cast<float>(tRes.iWidth), static_cast<float>(tRes.iHeight));
+
+    m_pCam->Pos().Set(0.0f, 0.0f);
+    m_pCam->SetZoom(0.8f);
+
+    return true;
+}
+
+/*virtual*/ bool WidgetRenderer::Update()
+{
+    if(GetCurItem())
+        GetCurItem()->Draw(this);
+
+    return true;
+}
+
+/*virtual*/ bool WidgetRenderer::Shutdown()
+{
+    return true;
+}
+
+Item *WidgetRenderer::GetCurItem()
+{
+    return static_cast<TabPage *>(ui->tabWidget->currentWidget());
 }
 
 void WidgetRenderer::ClearItems()
@@ -69,6 +101,17 @@ void WidgetRenderer::OpenItem(Item *pItem)
     ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName());
 }
 
+void WidgetRenderer::SetItem(Item *pItem)
+{
+    if(m_pCurItem != NULL)
+        m_pCurItem->Hide();
+    m_pCurItem = pItem;
+
+    if(m_pCurItem != NULL)
+        m_pCurItem->Show();
+}
+
+
 void WidgetRenderer::CloseItem(Item *pItem)
 {
     for(int i = 0; i < ui->tabWidget->count(); ++i)
@@ -81,15 +124,15 @@ void WidgetRenderer::CloseItem(Item *pItem)
     }
 }
 
-void WidgetRenderer::Render()
-{
-    // HyGfx::update() belongs to QGLWidget. This will invoke QGLWidget's
-    // paintGL, which inturn will invoke Harmony's IGfxApi::Update()
-    ui->renderer->update();
+//void WidgetRenderer::Render()
+//{
+//    // HyGfx::update() belongs to QGLWidget. This will invoke QGLWidget's
+//    // paintGL, which inturn will invoke Harmony's IGfxApi::Update()
+//    ui->renderer->update();
 
-    // This updates the Harmony engine as per usual
-    m_pHyEngine->Update();
-}
+//    // This updates the Harmony engine as per usual
+//    m_pHyEngine->Update();
+//}
 
 void WidgetRenderer::on_tabWidget_currentChanged(int index)
 {

@@ -5,12 +5,7 @@
 
 #include <QWidget>
 
-#include "GL/glew.h"
-#include <QGLFormat>
-#include <QTimer>
-
 #include "Harmony/HyEngine.h"
-#include "HyApp.h"
 
 #include "Item.h"
 #include "ItemProject.h"
@@ -33,22 +28,21 @@ public:
     Item *GetItem() { return m_pItem; }
 };
 
-class WidgetRenderer : public QWidget
+class WidgetRenderer : public QWidget, public IApplication
 {
     Q_OBJECT
-
-    QGLFormat           m_glFormat;
-
-    HyApp *             m_pHyApp;
-    HyEngine *          m_pHyEngine;
     
     bool                m_bInitialized;
-    
-    ItemProject *       m_pCurProj;
 
 public:
     explicit WidgetRenderer(QWidget *parent = 0);
     ~WidgetRenderer();
+
+    virtual bool Initialize();
+    virtual bool Update();
+    virtual bool Shutdown();
+
+    Item *GetCurItem();
 
     void ClearItems();
 
@@ -59,7 +53,6 @@ private:
     Ui::WidgetRenderer *ui;
 
 private slots:
-    void Render();
     void on_tabWidget_currentChanged(int index);
 };
 

@@ -15,8 +15,8 @@
 #if defined(HY_PLATFORM_WINDOWS)
 	
 	#if defined(HY_PLATFORM_GUI)
-		#include "../../../../DesignerTool/src/HyGuiRenderer.h"
-		typedef HyGuiRenderer HyRendererInterop;
+		#include "Renderer/OpenGL/HyOpenGL.h"
+		typedef HyOpenGL HyRendererInterop;
 	#else
 		#include "Renderer/OpenGL/Interop/HyOpenGL_Win.h"
 		typedef HyOpenGL_Win HyRendererInterop;

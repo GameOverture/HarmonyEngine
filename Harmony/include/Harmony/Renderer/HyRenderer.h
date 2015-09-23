@@ -36,8 +36,6 @@ public:
 
 	const HyGfxComms::tGfxInfo *GetGfxInfo()				{ return m_GfxCommsRef.GetGfxInfo(); }
 
-	virtual bool CreateWindows() = 0;
-
 	virtual bool Initialize() = 0;
 	virtual bool PollApi() = 0;
 	virtual bool CheckDevice() = 0;

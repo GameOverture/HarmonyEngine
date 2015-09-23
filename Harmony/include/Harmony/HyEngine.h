@@ -63,7 +63,8 @@ public:
 #ifndef HY_PLATFORM_GUI
 private:
 #endif
-	void Initialize();
+	HyRendererInterop &GetRenderer()	{ return m_Renderer; }
+
 	bool Update();
 };
 
