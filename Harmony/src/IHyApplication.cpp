@@ -7,13 +7,13 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "IApplication.h"
+#include "IHyApplication.h"
 
 #include "FileIO/HyFileIO.h"
 
-HyMemoryHeap	IApplication::sm_Mem;
+HyMemoryHeap	IHyApplication::sm_Mem;
 
-IApplication::IApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
+IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
 {
 	if(m_Init.eDefaultCoordinateType == HYCOORD_Default)
 		m_Init.eDefaultCoordinateType = HYCOORD_Pixel;
@@ -33,22 +33,22 @@ IApplication::IApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
 	HyFileIO::SetDataDir(m_Init.szDataDir);
 }
 
-IApplication::~IApplication()
+IHyApplication::~IHyApplication()
 {
 }
 
-HyViewport &IApplication::Viewport(uint32 uiIndex /*= 0*/)
+HyViewport &IHyApplication::Viewport(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(uiIndex < m_Init.uiNumWindows, "IApplication::Viewport() took an invalid index: " << uiIndex);
 	return m_vViewports[uiIndex];
 }
 
-void * IApplication::operator new(tMEMSIZE size)
+void * IHyApplication::operator new(tMEMSIZE size)
 {
 	return sm_Mem.Alloc(size);
 }
 
-void IApplication::operator delete(void *ptr)
+void IHyApplication::operator delete(void *ptr)
 {
 	sm_Mem.Free(ptr);
 }

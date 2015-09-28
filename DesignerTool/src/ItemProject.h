@@ -32,7 +32,7 @@ public:
     
     virtual void Hide();
     virtual void Show();
-    virtual void Draw(HyGuiApp *pHyApp);
+    virtual void Draw(WidgetRenderer &renderer);
     
     void SetDrawState(eDrawState eState, int iDrawStateIndex);
 };

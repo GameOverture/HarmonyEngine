@@ -43,10 +43,6 @@ protected:
 	GLuint					m_hVBO2d;
 	GLenum					m_eDrawMode;
 
-	//uint16 *				m_pGenericIndexBuffer2d;
-
-	//void (HyOpenGL::*m_fpDraw2d)(char *pData);
-
 public:
 	HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef);
 	virtual ~HyOpenGL(void);
@@ -72,11 +68,6 @@ public:
 	// Returns the texture ID used for API specific drawing.
 	virtual uint32 AddTexture(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, void *pPixelData);
 	virtual void DeleteTexture(HyTexture &texture);
-
-//private:
-//	void DrawBatchedQuads2d(char *pData);
-//	static void DrawPrim2dInst(IDraw2d *pBaseInst, void *pApi);
-//	static void DrawTxt2dInst(IDraw2d *pBaseInst, void *pApi);
 };
 
 #endif /* __HyOpenGL_h__ */

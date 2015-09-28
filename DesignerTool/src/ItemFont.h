@@ -39,7 +39,7 @@ class ItemFont : public Item
     ItemFont(const QString sPath);
     
 public:
-    virtual void Draw();
+    virtual void Draw(WidgetRenderer &renderer);
 };
 
 #endif // ITEMFONT_H

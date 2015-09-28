@@ -5,7 +5,6 @@
 #include <QOpenGLWidget>
 
 #include "Harmony/HyEngine.h"
-#include "HyGuiApp.h"
 
 class HyGuiRenderer : public QOpenGLWidget
 {
@@ -15,13 +14,9 @@ class HyGuiRenderer : public QOpenGLWidget
 
     bool                m_bInitialized;
 
-    ItemProject *       m_pCurProj;
-
 public:
     HyGuiRenderer(QWidget *parent = 0);
     ~HyGuiRenderer();
-
-    void SetRendererPtr(HyOpenGL *pRenderer) { m_pRenderer = pRenderer; }
 
     void initializeGL();
     void paintGL();

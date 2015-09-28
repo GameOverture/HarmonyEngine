@@ -4,7 +4,7 @@ ItemFont::ItemFont(const QString sPath) : Item(ITEM_Font, sPath)
 {
 }
 
-/*virtual*/ void ItemFont::Draw()
+/*virtual*/ void ItemFont::Draw(WidgetRenderer &renderer)
 {
     
 }

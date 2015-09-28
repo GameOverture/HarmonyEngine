@@ -143,7 +143,6 @@
     <ClCompile Include="src\Time\Interop\HyTimeApi_Win.cpp">
       <Filter>Time\Interop</Filter>
     </ClCompile>
-    <ClCompile Include="src\IApplication.cpp" />
     <ClCompile Include="src\FileIO\HyFileIO.cpp">
       <Filter>FileIO</Filter>
     </ClCompile>
@@ -189,6 +188,7 @@
     <ClCompile Include="src\Renderer\OpenGL\Interop\HyOpenGL_Win.cpp">
       <Filter>Renderer\OpenGL\Interop</Filter>
     </ClCompile>
+    <ClCompile Include="src\IHyApplication.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -491,7 +491,6 @@
     <ClInclude Include="include\Harmony\Time\Interop\HyTimeApi_Win.h">
       <Filter>Time\Interop</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\IApplication.h" />
     <ClInclude Include="include\Harmony\FileIO\stb_image.h">
       <Filter>FileIO</Filter>
     </ClInclude>
@@ -539,6 +538,10 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Win.h">
       <Filter>Renderer\OpenGL\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\IHyApplication.h" />
+    <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h">
+      <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

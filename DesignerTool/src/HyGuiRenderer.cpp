@@ -6,7 +6,7 @@
 
 #include "HyGlobal.h"
 
-HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QGLWidget(parent)
+HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent)
 {
     // Todo: test to see if QWidget parent works for HyEngine()'s ctor
 
@@ -17,7 +17,6 @@ HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QGLWidget(parent)
 
 HyGuiRenderer::~HyGuiRenderer()
 {
-    delete m_pHyApp;
 }
 
 void HyGuiRenderer::initializeGL()
@@ -28,7 +27,7 @@ void HyGuiRenderer::initializeGL()
     //    format.setSampleBuffers(true);
     //    setFormat(format);
 
-    m_pHyEngine = new HyEngine(*reinterpret_cast<IApplication *>(parent()));
+    m_pHyEngine = new HyEngine(*reinterpret_cast<IHyApplication *>(parent()));
 }
 
 void HyGuiRenderer::paintGL()
@@ -40,5 +39,5 @@ void HyGuiRenderer::paintGL()
 void HyGuiRenderer::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
-    m_mtxProj = glm::ortho(w * -0.5f, w * 0.5f, h * -0.5f, h * 0.5f);
+   // m_mtxProj = glm::ortho(w * -0.5f, w * 0.5f, h * -0.5f, h * 0.5f);
 }

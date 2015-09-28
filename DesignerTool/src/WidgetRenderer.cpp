@@ -2,16 +2,14 @@
 #include "ui_WidgetRenderer.h"
 
 WidgetRenderer::WidgetRenderer(QWidget *parent) :   QWidget(parent),
-                                                    IApplication(HarmonyInit()),
+                                                    IHyApplication(HarmonyInit()),
                                                     ui(new Ui::WidgetRenderer),
                                                     m_bInitialized(false)
 {
     ui->setupUi(this);
     ui->tabWidget->clear();
     //ui->tabWidget->setTabBarAutoHide(true);
-    m_bInitialized = true;    
-
-    ui->renderer->SetAppPtr(this);
+    m_bInitialized = true;
 }
 
 WidgetRenderer::~WidgetRenderer()
@@ -40,7 +38,7 @@ WidgetRenderer::~WidgetRenderer()
 
 //    m_pInputArray->BindBtnMap(GP360_ButtonA, HyInputKey(' '));
 
-    m_pCam = GetViewport().CreateCamera2d();
+    m_pCam = Viewport().CreateCamera2d();
 
     //HyGfxWindow::tResolution tRes;
     //m_Window.GetResolution(tRes);
@@ -54,8 +52,8 @@ WidgetRenderer::~WidgetRenderer()
 
 /*virtual*/ bool WidgetRenderer::Update()
 {
-    if(GetCurItem())
-        GetCurItem()->Draw(this);
+    if(GetItem())
+        GetItem()->Draw(*this);
 
     return true;
 }
@@ -65,9 +63,12 @@ WidgetRenderer::~WidgetRenderer()
     return true;
 }
 
-Item *WidgetRenderer::GetCurItem()
+Item *WidgetRenderer::GetItem(int iIndex /*= -1*/)
 {
-    return static_cast<TabPage *>(ui->tabWidget->currentWidget());
+    if(iIndex < 0)
+        return static_cast<TabPage *>(ui->tabWidget->currentWidget())->GetItem();
+    else
+        return static_cast<TabPage *>(ui->tabWidget->widget(iIndex))->GetItem();
 }
 
 void WidgetRenderer::ClearItems()
@@ -77,16 +78,6 @@ void WidgetRenderer::ClearItems()
 
 void WidgetRenderer::OpenItem(Item *pItem)
 {
-    if(pItem->GetType() == ITEM_Project)
-    {
-        m_pCurProj = static_cast<ItemProject *>(pItem);
-        m_pHyApp->SetItem(m_pCurProj);
-        
-        return;
-    }
-    
-    m_pCurProj = NULL;
-    
     for(int i = 0; i < ui->tabWidget->count(); ++i)
     {
         // Determine if already opened
@@ -99,18 +90,8 @@ void WidgetRenderer::OpenItem(Item *pItem)
     
     TabPage *pNewTab = new TabPage(pItem, this);
     ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName());
+
 }
-
-void WidgetRenderer::SetItem(Item *pItem)
-{
-    if(m_pCurItem != NULL)
-        m_pCurItem->Hide();
-    m_pCurItem = pItem;
-
-    if(m_pCurItem != NULL)
-        m_pCurItem->Show();
-}
-
 
 void WidgetRenderer::CloseItem(Item *pItem)
 {
@@ -124,21 +105,16 @@ void WidgetRenderer::CloseItem(Item *pItem)
     }
 }
 
-//void WidgetRenderer::Render()
-//{
-//    // HyGfx::update() belongs to QGLWidget. This will invoke QGLWidget's
-//    // paintGL, which inturn will invoke Harmony's IGfxApi::Update()
-//    ui->renderer->update();
-
-//    // This updates the Harmony engine as per usual
-//    m_pHyEngine->Update();
-//}
-
 void WidgetRenderer::on_tabWidget_currentChanged(int index)
 {
     if(m_bInitialized == false)
         return;
-    
-    TabPage *pTabPage = reinterpret_cast<TabPage *>(ui->tabWidget->widget(index));
-    m_pHyApp->SetItem(pTabPage->GetItem());
+
+    for(int i = 0; i < ui->tabWidget->count(); ++i)
+    {
+        if(i != index)
+            GetItem(i)->Hide();
+        else
+            GetItem(i)->Show();
+    }
 }

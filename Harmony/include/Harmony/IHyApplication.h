@@ -17,7 +17,7 @@
 #include "Creator/Viewport/HyViewport.h"
 #include "Input/Mappings/HyInputMapping.h"
 
-class IApplication
+class IHyApplication
 {
 	friend class HyEngine;
 
@@ -32,8 +32,8 @@ class IApplication
 	virtual bool Shutdown() = 0;
 
 public:
-	IApplication(HarmonyInit &initStruct);
-	~IApplication();
+	IHyApplication(HarmonyInit &initStruct);
+	~IHyApplication();
 
 	static HyMemoryHeap &GetMemoryHeap()					{ return sm_Mem; }
 

@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
 
-#include "IApplication.h"
+#include "IHyApplication.h"
 
 #include "Memory/HyMemoryHeap.h"
 
@@ -33,7 +33,7 @@ class HyEngine
 	static HyEngine *		sm_pInstance;
 	static HyMemoryHeap &	sm_Mem;
 
-	IApplication &			m_AppRef;
+	IHyApplication &			m_AppRef;
 	
 	HyTimeInterop			m_Time;
 	HyInputInterop			m_Input;
@@ -50,7 +50,7 @@ public:
 #endif
 	// Private ctor invoked from RunGame(), once.
 	// If HY_PLATFORM_GUI, make this ctor public as GuiTool requires special usage.
-	HyEngine(IApplication &gameRef);
+	HyEngine(IHyApplication &gameRef);
 
 public:
 	~HyEngine();
@@ -58,7 +58,7 @@ public:
 	void *operator new(tMEMSIZE size);
 	void operator delete (void *ptr);
 
-	static void RunGame(IApplication &gameRef);
+	static void RunGame(IHyApplication &gameRef);
 
 #ifndef HY_PLATFORM_GUI
 private:

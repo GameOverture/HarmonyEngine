@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QSettings>
+#include <QTcpServer>
 
 #include "ItemProject.h"
 

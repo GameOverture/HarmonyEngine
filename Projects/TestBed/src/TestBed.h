@@ -14,7 +14,7 @@
 
 #include "Player.h"
 
-class TestBed : public IApplication
+class TestBed : public IHyApplication
 {
 	HyCamera2d *	m_pCam;
 	vector<uint32>	m_vGamePadIds;

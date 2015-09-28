@@ -15,10 +15,10 @@
 HyEngine *		HyEngine::sm_pInstance = NULL;
 
 
-HyMemoryHeap &	HyEngine::sm_Mem = IApplication::GetMemoryHeap();
+HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::GetMemoryHeap();
 
 // Private ctor() invoked from RunGame()
-HyEngine::HyEngine(IApplication &appRef) :	m_AppRef(appRef),
+HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 											m_Renderer(m_GfxBuffer, m_AppRef.m_vViewports),
 											m_Creator(m_GfxBuffer, m_AppRef.m_vViewports[0], m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter)
 {
@@ -47,7 +47,7 @@ void HyEngine::operator delete(void *ptr)
 	sm_Mem.Free(ptr);
 }
 
-/*static*/ void HyEngine::RunGame(IApplication &gameRef)
+/*static*/ void HyEngine::RunGame(IHyApplication &gameRef)
 {
 	sm_pInstance = new HyEngine(gameRef);
 	

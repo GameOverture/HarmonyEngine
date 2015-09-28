@@ -1,6 +1,7 @@
 #include "Item.h"
 
 #include "MainWindow.h"
+#include "WidgetRenderer.h"
 
 #include <QFileInfo>
 
@@ -20,24 +21,6 @@ Item::~Item()
     MainWindow::CloseItem(this);
     
     delete m_pTreeItemPtr;
-}
-
-void Item::Initialize(eItemType eType, const QString sPath)
-{
-    m_eType = eType;
-    
-    if(m_eType == ITEM_Unknown)
-    {
-        HYLOG("Setting path of unknown item (" % m_sPath % ")", LOGTYPE_Error);
-        return;
-    }
-    
-    m_sPath = sPath;
-    m_sPath.replace(QChar('\\'), QChar('/'));
-            
-    QString sExt = HyGlobal::ItemExt(m_eType);
-    if(m_sPath.right(sExt.size()) != sExt)
-        m_sPath.append(sExt);
 }
 
 QString Item::GetName() const
@@ -62,7 +45,7 @@ QString Item::GetName() const
     HYLOG("Tried to Show() a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
-/*virtual*/ void Item::Draw(HyGuiApp *pHyApp)
+/*virtual*/ void Item::Draw(WidgetRenderer &renderer)
 {
     HYLOG("Tried to draw a non-derived item: " % GetName(), LOGTYPE_Error);
 }
@@ -71,3 +54,22 @@ QString Item::GetName() const
 {
     HYLOG("Tried to save a non-derived item: " % GetName(), LOGTYPE_Error);
 }
+
+void Item::Initialize(eItemType eType, const QString sPath)
+{
+    m_eType = eType;
+
+    if(m_eType == ITEM_Unknown)
+    {
+        HYLOG("Setting path of unknown item (" % m_sPath % ")", LOGTYPE_Error);
+        return;
+    }
+
+    m_sPath = sPath;
+    m_sPath.replace(QChar('\\'), QChar('/'));
+
+    QString sExt = HyGlobal::ItemExt(m_eType);
+    if(m_sPath.right(sExt.size()) != sExt)
+        m_sPath.append(sExt);
+}
+

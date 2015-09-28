@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "TestBed.h"
 
-TestBed::TestBed(HarmonyInit &initStruct) : IApplication(initStruct)
+TestBed::TestBed(HarmonyInit &initStruct) : IHyApplication(initStruct)
 							//						m_physBox2("Box", b2_dynamicBody),
 								//					m_physGround("Ground", b2_staticBody),
 									//				m_TxtInst("Vera", 48, 48)

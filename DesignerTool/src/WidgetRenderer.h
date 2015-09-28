@@ -28,10 +28,11 @@ public:
     Item *GetItem() { return m_pItem; }
 };
 
-class WidgetRenderer : public QWidget, public IApplication
+class WidgetRenderer : public QWidget, public IHyApplication
 {
     Q_OBJECT
     
+    HyCamera2d *        m_pCam;
     bool                m_bInitialized;
 
 public:
@@ -42,7 +43,7 @@ public:
     virtual bool Update();
     virtual bool Shutdown();
 
-    Item *GetCurItem();
+    Item *GetItem(int iIndex = -1);
 
     void ClearItems();
 

@@ -8,6 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGL.h"
+#include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
 
 // THIS WORKS BELOW!
 const float vertexDataEmulate[] = {
@@ -104,8 +105,8 @@ HyOpenGL::~HyOpenGL(void)
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 
 	// Quad batch //////////////////////////////////////////////////////////////////////////
-	m_pShader2d[QUADBATCH].CompileFromFile("HyQuadBatch", HyOpenGLShader::VERTEX);
-	m_pShader2d[QUADBATCH].CompileFromFile("HyQuadBatch", HyOpenGLShader::FRAGMENT);
+	m_pShader2d[QUADBATCH].CompileFromString(szHYQUADBATCH_VERTEXSHADER, HyOpenGLShader::VERTEX);
+	m_pShader2d[QUADBATCH].CompileFromString(szHYQUADBATCH_FRAGMENTSHADER, HyOpenGLShader::FRAGMENT);
 
 	if(!m_pShader2d[QUADBATCH].Link())
 		HyError("Shader program failed to link!\n" << m_pShader2d[QUADBATCH].Log().c_str() << "\n");
@@ -158,8 +159,8 @@ HyOpenGL::~HyOpenGL(void)
 	glVertexAttribDivisor(mtx+3, 1);
 
 	// Primitive //////////////////////////////////////////////////////////////////////////
-	m_pShader2d[PRIMITIVE].CompileFromFile("Prim2d", HyOpenGLShader::VERTEX);
-	m_pShader2d[PRIMITIVE].CompileFromFile("Prim2d", HyOpenGLShader::FRAGMENT);
+	m_pShader2d[PRIMITIVE].CompileFromString(szHYPRIMATIVE_VERTEXSHADER, HyOpenGLShader::VERTEX);
+	m_pShader2d[PRIMITIVE].CompileFromString(szHYPRIMATIVE_FRAGMENTSHADER, HyOpenGLShader::FRAGMENT);
 
 	if(!m_pShader2d[PRIMITIVE].Link())
 		HyError("Shader program failed to link!\n" << m_pShader2d[PRIMITIVE].Log().c_str() << "\n");

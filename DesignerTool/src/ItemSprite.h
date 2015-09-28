@@ -17,7 +17,7 @@ protected:
     
     virtual void Hide();
     virtual void Show();
-    virtual void Draw(HyGuiApp *pHyApp);
+    virtual void Draw(WidgetRenderer &renderer);
     
     virtual void Save();
 };

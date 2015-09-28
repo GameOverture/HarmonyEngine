@@ -17,6 +17,7 @@
 #include <QShowEvent>
 #include <QStringBuilder>
 #include <QVBoxLayout>
+#include <QTcpSocket>
 
 /*static*/ MainWindow * MainWindow::sm_pInstance = NULL;
 

@@ -28,7 +28,7 @@ ItemProject::~ItemProject()
 //    }
 }
 
-/*virtual*/ void ItemProject::Draw(HyGuiApp *pHyApp)
+/*virtual*/ void ItemProject::Draw(WidgetRenderer &renderer)
 {
     //pHyApp->GetViewport().GetResolution().iWidth
     //pHyApp->GetViewport().GetResolution().iHeight

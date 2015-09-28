@@ -4,9 +4,9 @@
 #include <QTreeWidget>
 
 #include "HyGlobal.h"
-#include "HyGuiApp.h"
+#include "Harmony/HyEngine.h"
 
-class HyGuiApp;
+class WidgetRenderer;
 
 class Item
 {
@@ -23,8 +23,8 @@ protected:
     ~Item();
     
 public:
-    virtual void Initialize(eItemType eType, const QString sPath);
-    
+
+
     eItemType GetType() const                       { return m_eType; }
     QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
     QString GetName() const;
@@ -35,13 +35,16 @@ public:
     
     virtual void Hide();
     virtual void Show();
-    virtual void Draw(HyGuiApp *pHyApp);
+    virtual void Draw(WidgetRenderer &renderer);
     
     virtual void Save();
     
 signals:
     
 public slots:
+
+private:
+    void Initialize(eItemType eType, const QString sPath);
     
 };
 Q_DECLARE_METATYPE(Item *)

@@ -75,7 +75,7 @@
     <ClCompile Include="src\GuiTool\HyGuiComms.cpp" />
     <ClCompile Include="src\GuiTool\HyLiveWatchManager.cpp" />
     <ClCompile Include="src\HyEngine.cpp" />
-    <ClCompile Include="src\IApplication.cpp" />
+    <ClCompile Include="src\IHyApplication.cpp" />
     <ClCompile Include="src\Input\HyInput.cpp" />
     <ClCompile Include="src\Input\Mappings\HyInputMapping.cpp" />
     <ClCompile Include="src\Memory\HyMemoryHeap.cpp" />
@@ -145,7 +145,7 @@
     <ClInclude Include="include\Harmony\GuiTool\HyGuiComms.h" />
     <ClInclude Include="include\Harmony\GuiTool\HyLiveWatchManager.h" />
     <ClInclude Include="include\Harmony\HyEngine.h" />
-    <ClInclude Include="include\Harmony\IApplication.h" />
+    <ClInclude Include="include\Harmony\IHyApplication.h" />
     <ClInclude Include="include\Harmony\Input\HyInput.h" />
     <ClInclude Include="include\Harmony\Input\Mappings\HyInputAfx.h" />
     <ClInclude Include="include\Harmony\Input\Mappings\HyInputMapping.h" />
@@ -158,6 +158,7 @@
     <ClInclude Include="include\Harmony\Renderer\HyRenderState.h" />
     <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGL.h" />
     <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGLShader.h" />
+    <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h" />
     <ClInclude Include="include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Win.h" />
     <ClInclude Include="include\Harmony\Threading\BaseMacro.h" />
     <ClInclude Include="include\Harmony\Threading\BasicSync.h" />
@@ -388,7 +389,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -417,7 +418,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;freetype-gld.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -499,7 +500,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -527,7 +528,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;freetype-gl.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
