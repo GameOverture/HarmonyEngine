@@ -12,13 +12,13 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Renderer/HyRenderer.h"
+#include "Renderer/IHyRenderer.h"
 #include "Renderer/OpenGL/HyOpenGLShader.h"
 
 //#define HY_INDEX_BUFFER_SIZE (128 * 1024)
 //#define HY_RESTART_INDEX 65535
 
-class HyOpenGL : public HyRenderer
+class HyOpenGL : public IHyRenderer
 {
 protected:
 	mat4					m_mtxView;

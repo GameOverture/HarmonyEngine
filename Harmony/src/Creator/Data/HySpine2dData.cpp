@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Creator/Data/HySpine2dData.h"
-#include "Renderer/HyRenderer.h"
+#include "Renderer/IHyRenderer.h"
 
 HySpine2dData::HySpine2dData(const std::string &sPath) :	IData(HYINST_Spine2d, sPath)
 {
@@ -45,14 +45,14 @@ HySpine2dData::~HySpine2dData()
 	printf("Default skin name: %s\n", m_SpineSkeletonData->defaultSkin->name);
 }
 
-/*virtual*/ void HySpine2dData::OnGfxLoad(HyRenderer &gfxApi)
+/*virtual*/ void HySpine2dData::OnGfxLoad(IHyRenderer &gfxApi)
 {
 	// TODO: possibly support multiple textures (aka rendererObject's)
 	HyTexture *pTexture = reinterpret_cast<HyTexture *>(m_SpineAtlasData->pages->rendererObject);
 	pTexture->Upload(gfxApi);
 }
 
-/*virtual*/ void HySpine2dData::OnGfxRemove(HyRenderer &gfxApi)
+/*virtual*/ void HySpine2dData::OnGfxRemove(IHyRenderer &gfxApi)
 {
 	HyTexture *pTexture = reinterpret_cast<HyTexture *>(m_SpineAtlasData->pages->rendererObject);
 	gfxApi.DeleteTexture(*pTexture);

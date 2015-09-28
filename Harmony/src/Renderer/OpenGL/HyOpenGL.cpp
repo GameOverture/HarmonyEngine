@@ -55,7 +55,7 @@ const float primitiveVertexDataEmulate[] = {
 };
 
 
-HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : HyRenderer(gfxCommsRef, viewportsRef),
+HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : IHyRenderer(gfxCommsRef, viewportsRef),
 																				m_mtxView(1.0f),
 																				m_kmtxIdentity(1.0f)
 {

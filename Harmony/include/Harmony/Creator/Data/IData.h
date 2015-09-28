@@ -17,7 +17,7 @@
 #include "FileIO/HyFileIO.h"
 
 // Forward declarations
-class HyRenderer;
+class IHyRenderer;
 
 class IData
 {
@@ -58,8 +58,8 @@ public:
 	virtual void DoFileLoad() = 0;
 
 	// Only invoked on the Render thread
-	virtual void OnGfxLoad(HyRenderer &gfxApi) = 0;
-	virtual void OnGfxRemove(HyRenderer &gfxApi) = 0;
+	virtual void OnGfxLoad(IHyRenderer &gfxApi) = 0;
+	virtual void OnGfxRemove(IHyRenderer &gfxApi) = 0;
 };
 
 #endif /* __IData_h__ */

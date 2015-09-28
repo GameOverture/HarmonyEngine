@@ -10,7 +10,7 @@
 #include "FileIO/Atlas/HyTexture.h"
 #include "FileIO/stb_image.h"
 #include "Utilities/HyStrManip.h"
-#include "Renderer/HyRenderer.h"
+#include "Renderer/IHyRenderer.h"
 
 HyTexture::HyTexture(const std::string &sPath, HyRectangle *pSrcRects /*= NULL*/, uint32 uiNumRects /*= 0*/) :	m_ksPath(sPath),
 													m_iWidth(0),
@@ -48,7 +48,7 @@ HyTexture::~HyTexture(void)
 }
 
 // To be invoked on the render thread
-void HyTexture::Upload(HyRenderer &gfxApi)
+void HyTexture::Upload(IHyRenderer &gfxApi)
 {
 	m_uiId = gfxApi.AddTexture(m_iNum8bitClrChannels, m_iWidth, m_iHeight, m_pPixelData);
 	DeletePixelData();

@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyRenderer_OpenGL.cpp
+ *	IHyRenderer.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2012 Jason Knobler
@@ -7,18 +7,18 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Renderer/HyRenderer.h"
+#include "Renderer/IHyRenderer.h"
 
-HyRenderer::HyRenderer(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : m_GfxCommsRef(gfxCommsRef),
+IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : m_GfxCommsRef(gfxCommsRef),
 																					m_ViewportsRef(viewportsRef)
 {
 }
 
-HyRenderer::~HyRenderer(void)
+IHyRenderer::~IHyRenderer(void)
 {
 }
 
-bool HyRenderer::Update()
+bool IHyRenderer::Update()
 {
 	if(PollApi())
 	{
@@ -32,7 +32,7 @@ bool HyRenderer::Update()
 	}
 }
 
-/*virtual*/ void HyRenderer::DrawBuffers()
+/*virtual*/ void IHyRenderer::DrawBuffers()
 {
 	// Swap to newest draw buffers (is only threadsafe on Render thread)
 	if(!m_GfxCommsRef.Render_GetSharedPtrs(m_pMsgQueuePtr, m_pSendMsgQueuePtr, m_pDrawBufferPtr))
@@ -66,7 +66,7 @@ bool HyRenderer::Update()
 	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr)->uiReturnFlags |= GFXFLAG_HasRendered;
 }
 
-void HyRenderer::ProcessGameMsgs()
+void IHyRenderer::ProcessGameMsgs()
 {
 	// Handle each command message first. Which loads/unloads gfx resources.
 	while(!m_pMsgQueuePtr->empty())
@@ -83,7 +83,7 @@ void HyRenderer::ProcessGameMsgs()
 	}
 }
 
-void HyRenderer::Draw2d()
+void IHyRenderer::Draw2d()
 {
 	// Each render state will require its own draw. The order of these render states should be 
 	// depth sorted with render states batched together to reduce state changes.

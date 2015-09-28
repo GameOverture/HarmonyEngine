@@ -54,8 +54,8 @@ public:
 	bool IsSimpleSprite()			{ return m_bIsSimpleSprite; }
 
 	virtual void DoFileLoad();
-	virtual void OnGfxLoad(HyRenderer &gfxApi);
-	virtual void OnGfxRemove(HyRenderer &gfxApi);
+	virtual void OnGfxLoad(IHyRenderer &gfxApi);
+	virtual void OnGfxRemove(IHyRenderer &gfxApi);
 };
 
 #endif /* __HySprite2dData_h__ */

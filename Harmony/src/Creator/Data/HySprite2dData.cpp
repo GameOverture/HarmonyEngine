@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Creator/Data/HySprite2dData.h"
 
-#include "Renderer/HyRenderer.h"
+#include "Renderer/IHyRenderer.h"
 
 HySprite2dData::HySprite2dData(const std::string &sPath) :	IData(HYINST_Spine2d, sPath)
 {
@@ -71,10 +71,10 @@ HySprite2dData::~HySprite2dData(void)
 	//printf("Default skin name: %s\n", m_SpineSkeletonData->defaultSkin->name);
 }
 
-/*virtual*/ void HySprite2dData::OnGfxLoad(HyRenderer &gfxApi)
+/*virtual*/ void HySprite2dData::OnGfxLoad(IHyRenderer &gfxApi)
 {
 }
 
-/*virtual*/ void HySprite2dData::OnGfxRemove(HyRenderer &gfxApi)
+/*virtual*/ void HySprite2dData::OnGfxRemove(IHyRenderer &gfxApi)
 {
 }

@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\Renderer\HyRenderer.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="src\Creator\HyCreator.cpp">
       <Filter>Creator</Filter>
     </ClCompile>
@@ -183,6 +180,9 @@
     <ClCompile Include="src\Renderer\Viewport\HyViewport.cpp">
       <Filter>Renderer\Viewport</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\IHyRenderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -346,9 +346,6 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Memory\PageTypes\HySmlHeapPage.h">
       <Filter>Memory\PageTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\HyRenderer.h">
-      <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Time\Watches\HyStopwatch.h">
       <Filter>Time\Watches</Filter>
@@ -530,6 +527,9 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\Viewport\HyViewport.h">
       <Filter>Renderer\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\IHyRenderer.h">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

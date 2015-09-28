@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Creator/HyCreator.h"
 
-#include "Renderer/HyRenderer.h"
+#include "Renderer/IHyRenderer.h"
 #include "Renderer/HyGfxComms.h"
 #include "Renderer/Viewport/HyViewport.h"
 

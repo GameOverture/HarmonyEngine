@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyRenderer.h
+ *	IHyRenderer.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2012 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyRenderer_h__
-#define __HyRenderer_h__
+#ifndef __IHyRenderer_h__
+#define __IHyRenderer_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -17,7 +17,7 @@
 
 class HyViewport;
 
-class HyRenderer
+class IHyRenderer
 {
 protected:
 	HyGfxComms &				m_GfxCommsRef;
@@ -32,8 +32,8 @@ protected:
 	HyRenderState				m_PrevRenderState;
 
 public:
-	HyRenderer(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef);
-	virtual ~HyRenderer(void);
+	IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef);
+	virtual ~IHyRenderer(void);
 
 	const HyGfxComms::tGfxInfo *GetGfxInfo()				{ return m_GfxCommsRef.GetGfxInfo(); }
 
@@ -76,4 +76,4 @@ public:
 	void Draw2d();
 };
 
-#endif
+#endif /* __IHyRenderer_h__ */

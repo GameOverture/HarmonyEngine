@@ -75,7 +75,7 @@
     <ClCompile Include="src\Input\Mappings\HyInputMapping.cpp" />
     <ClCompile Include="src\Memory\HyMemoryHeap.cpp" />
     <ClCompile Include="src\Renderer\HyGfxComms.cpp" />
-    <ClCompile Include="src\Renderer\HyRenderer.cpp" />
+    <ClCompile Include="src\Renderer\IHyRenderer.cpp" />
     <ClCompile Include="src\Renderer\HyRenderState.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\HyOpenGL.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\HyOpenGLShader.cpp" />
@@ -147,7 +147,7 @@
     <ClInclude Include="include\Harmony\Memory\PageTypes\HyMedHeapPage.h" />
     <ClInclude Include="include\Harmony\Memory\PageTypes\HySmlHeapPage.h" />
     <ClInclude Include="include\Harmony\Renderer\HyGfxComms.h" />
-    <ClInclude Include="include\Harmony\Renderer\HyRenderer.h" />
+    <ClInclude Include="include\Harmony\Renderer\IHyRenderer.h" />
     <ClInclude Include="include\Harmony\Renderer\HyRenderState.h" />
     <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGL.h" />
     <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGLShader.h" />
