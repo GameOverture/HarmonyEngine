@@ -40,25 +40,13 @@ class HyInput
 	float							m_fDeadZoneAmt;
 
 public:
-	HyInput();
-	virtual ~HyInput(void);
+	HyInput(HyInputMapping *pInputMaps, uint32 uiNumInputMaps);
+	virtual ~HyInput();
 
-	gainput::InputManager &GetManager();
-
-	void GiveDeviceIds(gainput::DeviceId &idKBOut, gainput::DeviceId &idMouseOut, gainput::DeviceId &idGamePadOut, gainput::DeviceId &idTouchOut);
-
-	//map<uint32, tInputState> &		GetGamePadMapRef()	{ return m_mapGamePads; }
+	static void StartRecording();
+	static void PlayRecording();
 
 	void Update();
-
-	//void SaveInputs(uint32 uiUpdateIndex);
-	//void ApplyInputs(uint32 uiUpdateIndex);
-	//static void OnGamepadAttached(struct Gamepad_device * device, void * context);
-	//static void OnGamepadRemoved(struct Gamepad_device * device, void * context);
-
-	//static void OnButtonDown(struct Gamepad_device * device, unsigned int buttonID, void * context);
-	//static void OnButtonUp(struct Gamepad_device * device, unsigned int buttonID, void * context);
-	//static void OnAxisMove(struct Gamepad_device * device, unsigned int axisID, float value, float lastValue, void * context);
 };
 
 #endif /* __HyInput_h__ */

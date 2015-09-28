@@ -8,13 +8,18 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Input/HyInput.h"
-//#include "Gamepad/Gamepad.h"
 
-HyInput::HyInput() :	m_fDeadZoneAmt(0.2f),
-						m_eReplayState(REPLAY_Off),
-						m_uiRecordCount(0)
+HyInput::HyInput(HyInputMapping *pInputMaps, uint32 uiNumInputMaps) :	m_pInputMappings(pInputMaps),
+																		m_uiNumInputMappings(uiNumInputMaps),
+																		m_fDeadZoneAmt(0.2f),
+																		m_eReplayState(REPLAY_Off),
+																		m_uiRecordCount(0)
 {
-	HyAssert(m_uiNumInputMappings > 0, "HyInput uiNumInputMaps is <= 0");
+	m_pInputMappings = new HyInputMapping [m_uiNumInputMappings];
+	for(uint32 i = 0; i < m_uiNumInputMappings; ++i)
+	{
+
+	}
 
 	gainput::InputDeviceKeyboard *pKeyboardDevice = m_Manager.CreateAndGetDevice<gainput::InputDeviceKeyboard>();
 

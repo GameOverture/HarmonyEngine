@@ -1,5 +1,5 @@
 /**************************************************************************
- *	IApplication.cpp
+ *	IHyApplication.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler

@@ -10,9 +10,9 @@
 #ifndef __HyStopwatch_h__
 #define __HyStopwatch_h__
 
-#include "HyWatch.h"
+#include "IHyTimeInst.h"
 
-class HyStopwatch : public HyWatch
+class HyStopwatch : public IHyTimeInst
 {
 public:
 	HyStopwatch(void);

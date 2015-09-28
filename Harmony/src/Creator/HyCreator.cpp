@@ -22,7 +22,7 @@
 #include "Creator/Viewport/HyViewport.h"
 #include "Creator/HyEntity2d.h"
 
-#include "Time/HyTime.h"
+#include "Time/IHyTime.h"
 
 HyCoordinateType	HyCreator::sm_eDefaultCoordType = HYCOORD_Default;
 float				HyCreator::sm_fPixelsPerMeter = 0.0f;
@@ -152,7 +152,7 @@ void HyCreator::RemoveInst(IObjInst2d *pInst)
 
 void HyCreator::PreUpdate()
 {
-	m_b2World.Step(HyTime::GetUpdateStepSeconds(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+	m_b2World.Step(IHyTime::GetUpdateStepSeconds(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 
 	// Update any currently active AnimFloat in the game, and remove any of them that are finished.
 	for (vector<HyAnimFloat *>::iterator iter = m_vActiveAnimFloats.begin(); iter != m_vActiveAnimFloats.end(); )

@@ -11,7 +11,7 @@
 
 #include "Creator/HyCreator.h"
 
-#include "Time/HyTime.h"
+#include "Time/IHyTime.h"
 
 HySpine2d::HySpine2d(const char *szPrefix, const char *szName) :	IObjInst2d(HYINST_Spine2d, szPrefix, szName),
 											m_pSpineSkeleton(NULL),
@@ -135,14 +135,14 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 /*virtual*/ void HySpine2d::Update()
 {
 	// Update the time field used for attachments and such
-	spSkeleton_update(m_pSpineSkeleton, HyTime::GetUpdateStepSeconds());
+	spSkeleton_update(m_pSpineSkeleton, IHyTime::GetUpdateStepSeconds());
 
 	// Calculate the animation state
 	for(uint32 i = 0; i < m_uiNumAnimStates; ++i)
 	{
 		if(m_pIsAnimStateEnabled[i])
 		{
-			spAnimationState_update(m_ppAnimStates[i], HyTime::GetUpdateStepSeconds() * m_fAnimPlayRate);
+			spAnimationState_update(m_ppAnimStates[i], IHyTime::GetUpdateStepSeconds() * m_fAnimPlayRate);
 			spAnimationState_apply(m_ppAnimStates[i], m_pSpineSkeleton);
 		}
 	}

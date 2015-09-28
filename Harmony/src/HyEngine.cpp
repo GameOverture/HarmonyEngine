@@ -19,8 +19,9 @@ HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::GetMemoryHeap();
 
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
-											m_Renderer(m_GfxBuffer, m_AppRef.m_vViewports),
-											m_Creator(m_GfxBuffer, m_AppRef.m_vViewports[0], m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter)
+												m_Input(m_AppRef.m_pInputMap, m_AppRef.m_Init.uiNumInputMappings),
+												m_Renderer(m_GfxBuffer, m_AppRef.m_vViewports),
+												m_Creator(m_GfxBuffer, m_AppRef.m_vViewports[0], m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 

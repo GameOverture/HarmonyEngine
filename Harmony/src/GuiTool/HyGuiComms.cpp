@@ -11,7 +11,7 @@
 
 #ifndef HY_PLATFORM_GUI
 
-#include "Time/HyTime.h"
+#include "Time/IHyTime.h"
 
 HyGuiComms *HyGuiComms::sm_pInstance = NULL;
 
@@ -97,7 +97,7 @@ void HyGuiComms::Update()
 	// Check for connectivity
 	if(m_bConnected == false)
 	{
-		m_fReconnectWaitInterval += HyTime::GetUpdateStepSeconds();
+		m_fReconnectWaitInterval += IHyTime::GetUpdateStepSeconds();
 		if(m_fReconnectWaitInterval >= 1.0f)
 		{
 			Connect();
