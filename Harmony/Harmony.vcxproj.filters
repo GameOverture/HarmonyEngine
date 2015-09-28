@@ -25,12 +25,6 @@
     <ClCompile Include="src\Utilities\HySpineRuntime.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Input\HyInput.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Input\Mappings\HyInputMapping.cpp">
-      <Filter>Input\Mappings</Filter>
-    </ClCompile>
     <ClCompile Include="src\Creator\Instances\HyPrimitive2d.cpp">
       <Filter>Creator\Instances</Filter>
     </ClCompile>
@@ -183,6 +177,15 @@
     <ClCompile Include="src\Renderer\IHyRenderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Input\Interop\HyInput_Gainput.cpp">
+      <Filter>Input\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\IHyInput.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Interop\HyInputMap_Gainput.cpp">
+      <Filter>Input\Interop</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -250,9 +253,6 @@
     </Filter>
     <Filter Include="FileIO\Atlas">
       <UniqueIdentifier>{e45bffd8-5f02-42e3-b8bc-a90540b648cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Input\Mappings">
-      <UniqueIdentifier>{f8b1513f-1385-4506-b22d-1bedcd21a33d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Renderer\OpenGL">
       <UniqueIdentifier>{266ff3c9-2890-44c9-90f1-b987c1598bc6}</UniqueIdentifier>
@@ -325,15 +325,6 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Creator\Instances\HyText2d.h">
       <Filter>Creator\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Input\HyInput.h">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Input\Mappings\HyInputAfx.h">
-      <Filter>Input\Mappings</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Input\Mappings\HyInputMapping.h">
-      <Filter>Input\Mappings</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Memory\HyMemoryHeap.h">
       <Filter>Memory</Filter>
@@ -530,6 +521,18 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\IHyRenderer.h">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Input\Interop\HyInput_Gainput.h">
+      <Filter>Input\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Input\IHyInput.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Input\IHyInputMap.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Input\Interop\HyInputMap_Gainput.h">
+      <Filter>Input\Interop</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

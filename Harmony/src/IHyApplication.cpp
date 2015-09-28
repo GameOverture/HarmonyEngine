@@ -28,7 +28,9 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
 		m_vViewports[i].SetType(m_Init.windowInfo[i].eType);
 		m_vViewports[i].SetBitsPerPixel(m_Init.windowInfo[i].iBitsPerPixel);
 	}
-	//m_pInputArray = new HyInputMapping[m_Init.uiNumInputMappings];
+
+	for(uint32 i = 0; i < m_Init.uiNumInputMappings; ++i)
+		m_vInputMaps.push_back(HyInputMapInterop());
 
 	HyFileIO::SetDataDir(m_Init.szDataDir);
 }
@@ -43,7 +45,13 @@ HyViewport &IHyApplication::Viewport(uint32 uiIndex /*= 0*/)
 	return m_vViewports[uiIndex];
 }
 
-void * IHyApplication::operator new(tMEMSIZE size)
+HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
+{
+	HyAssert(uiIndex < m_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
+	return m_vInputMaps[uiIndex];
+}
+
+void *IHyApplication::operator new(tMEMSIZE size)
 {
 	return sm_Mem.Alloc(size);
 }

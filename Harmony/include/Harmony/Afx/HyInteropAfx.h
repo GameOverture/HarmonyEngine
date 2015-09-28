@@ -28,8 +28,10 @@
 	#include "Memory/Interop/HyMemAPI_Windows.h"
 	typedef HyMemoryAPI_Windows HyMemoryInterop;
 
-	#include "Input/HyInput.h"
-	typedef HyInput HyInputInterop;
+	#include "Input/Interop/HyInput_Gainput.h"
+	#include "Input/Interop/HyInputMap_Gainput.h"
+	typedef HyInput_Gainput HyInputInterop;
+	typedef HyInputMap_Gainput HyInputMapInterop;
 
 #elif defined(HY_PLATFORM_OSX) && !defined(HY_PLATFORM_GUI)
 	#include "Renderer/OpenGL/Interop/HyOpenGL_OSX.h"

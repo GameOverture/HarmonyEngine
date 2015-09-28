@@ -19,7 +19,7 @@ HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::GetMemoryHeap();
 
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
-												m_Input(m_AppRef.m_pInputMap, m_AppRef.m_Init.uiNumInputMappings),
+												m_Input(m_AppRef.m_vInputMaps),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_vViewports),
 												m_Creator(m_GfxBuffer, m_AppRef.m_vViewports[0], m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter)
 {
@@ -65,16 +65,15 @@ bool HyEngine::Update()
 	while(m_Time.ThrottleTime())
 	{
 		m_Input.Update();
-		m_Creator.PreUpdate();
 		
+		m_Creator.PreUpdate();
 		if(m_AppRef.Update() == false)
 			return false;
+		m_Creator.PostUpdate();
 
 #ifndef HY_PLATFORM_GUI
 		m_GuiComms.Update();
 #endif
-
-		m_Creator.PostUpdate();
 	}
 
 	return m_Renderer.Update();

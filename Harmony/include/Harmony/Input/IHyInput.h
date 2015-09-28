@@ -12,17 +12,14 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Mappings/HyInputMapping.h"
-#include "gainput/gainput.h"
+#include "Input/IHyInputMap.h"
 
-class HyInput
+#include <vector>
+using std::vector;
+
+class IHyInput
 {
-	gainput::InputManager			m_Manager;
-
-	gainput::DeviceId				m_idKB;
-	gainput::DeviceId				m_idMouse;
-	gainput::DeviceId				m_idGamePad;
-	gainput::DeviceId				m_idTouch;
+	vector<IHyInputMap> &		m_vInputMapsRef;
 
 	enum eReplayState
 	{
@@ -33,15 +30,11 @@ class HyInput
 	eReplayState					m_eReplayState;
 	uint64							m_uiRecordCount;
 
-
-	HyInputMapping *				m_pInputMappings;
-	uint32							m_uiNumInputMappings;
-
-	float							m_fDeadZoneAmt;
-
 public:
-	HyInput(HyInputMapping *pInputMaps, uint32 uiNumInputMaps);
-	virtual ~HyInput();
+	IHyInput(vector<IHyInputMap> &vInputMapsRef);
+	virtual ~IHyInput();
+
+	virtual void ProcessInput() = 0;
 
 	static void StartRecording();
 	static void PlayRecording();

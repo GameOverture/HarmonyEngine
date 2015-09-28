@@ -71,8 +71,9 @@
     <ClCompile Include="src\GuiTool\HyLiveWatchManager.cpp" />
     <ClCompile Include="src\HyEngine.cpp" />
     <ClCompile Include="src\IHyApplication.cpp" />
-    <ClCompile Include="src\Input\HyInput.cpp" />
-    <ClCompile Include="src\Input\Mappings\HyInputMapping.cpp" />
+    <ClCompile Include="src\Input\IHyInput.cpp" />
+    <ClCompile Include="src\Input\Interop\HyInputMap_Gainput.cpp" />
+    <ClCompile Include="src\Input\Interop\HyInput_Gainput.cpp" />
     <ClCompile Include="src\Memory\HyMemoryHeap.cpp" />
     <ClCompile Include="src\Renderer\HyGfxComms.cpp" />
     <ClCompile Include="src\Renderer\IHyRenderer.cpp" />
@@ -139,9 +140,10 @@
     <ClInclude Include="include\Harmony\GuiTool\HyLiveWatchManager.h" />
     <ClInclude Include="include\Harmony\HyEngine.h" />
     <ClInclude Include="include\Harmony\IHyApplication.h" />
-    <ClInclude Include="include\Harmony\Input\HyInput.h" />
-    <ClInclude Include="include\Harmony\Input\Mappings\HyInputAfx.h" />
-    <ClInclude Include="include\Harmony\Input\Mappings\HyInputMapping.h" />
+    <ClInclude Include="include\Harmony\Input\IHyInput.h" />
+    <ClInclude Include="include\Harmony\Input\IHyInputMap.h" />
+    <ClInclude Include="include\Harmony\Input\Interop\HyInputMap_Gainput.h" />
+    <ClInclude Include="include\Harmony\Input\Interop\HyInput_Gainput.h" />
     <ClInclude Include="include\Harmony\Memory\HyMemoryHeap.h" />
     <ClInclude Include="include\Harmony\Memory\Interop\HyMemAPI_Windows.h" />
     <ClInclude Include="include\Harmony\Memory\PageTypes\HyMedHeapPage.h" />

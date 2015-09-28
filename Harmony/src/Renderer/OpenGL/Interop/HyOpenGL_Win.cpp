@@ -137,7 +137,7 @@ void HyOpenGL_Win::DeviceContext::Resize(GLsizei iWidth, GLsizei iHeight)
 	for(uint32 i = 0; i < m_uiNumDCs; ++i)
 	{
 		while(PeekMessageA(&msg, m_ppDeviceContexes[i]->m_hWnd, 0, 0, PM_REMOVE))
-			DispatchMessageA(&msg);		
+			DispatchMessageA(&msg);
 	}
 
 	return true;
