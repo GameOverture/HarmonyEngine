@@ -12,8 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Creator/Viewport/HyCamera2d.h"
-#include "Creator/Viewport/HyCamera3d.h"
+#include "Renderer/Viewport/HyCamera2d.h"
+#include "Renderer/Viewport/HyCamera3d.h"
 
 class HyViewport
 {

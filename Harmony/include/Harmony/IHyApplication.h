@@ -14,7 +14,7 @@
 
 #include "Memory/HyMemoryHeap.h"
 
-#include "Creator/Viewport/HyViewport.h"
+#include "Renderer/Viewport/HyViewport.h"
 #include "Input/Mappings/HyInputMapping.h"
 
 class IHyApplication

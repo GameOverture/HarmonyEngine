@@ -63,9 +63,6 @@
     <ClCompile Include="src\Creator\Instances\HyText2d.cpp" />
     <ClCompile Include="src\Creator\Instances\HyTexturedQuad2d.cpp" />
     <ClCompile Include="src\Creator\Instances\IObjInst2d.cpp" />
-    <ClCompile Include="src\Creator\Viewport\HyCamera2d.cpp" />
-    <ClCompile Include="src\Creator\Viewport\HyCamera3d.cpp" />
-    <ClCompile Include="src\Creator\Viewport\HyViewport.cpp" />
     <ClCompile Include="src\FileIO\Atlas\HyAtlas.cpp" />
     <ClCompile Include="src\FileIO\Atlas\HyTexture.cpp" />
     <ClCompile Include="src\FileIO\HyFileIO.cpp" />
@@ -83,6 +80,9 @@
     <ClCompile Include="src\Renderer\OpenGL\HyOpenGL.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\HyOpenGLShader.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\Interop\HyOpenGL_Win.cpp" />
+    <ClCompile Include="src\Renderer\Viewport\HyCamera2d.cpp" />
+    <ClCompile Include="src\Renderer\Viewport\HyCamera3d.cpp" />
+    <ClCompile Include="src\Renderer\Viewport\HyViewport.cpp" />
     <ClCompile Include="src\Time\Interop\HyTime_Win.cpp" />
     <ClCompile Include="src\Time\IHyTime.cpp" />
     <ClCompile Include="src\Time\Watches\HyStopwatch.cpp" />
@@ -130,9 +130,6 @@
     <ClInclude Include="include\Harmony\Creator\Instances\HyText2d.h" />
     <ClInclude Include="include\Harmony\Creator\Instances\HyTexturedQuad2d.h" />
     <ClInclude Include="include\Harmony\Creator\Instances\IObjInst2d.h" />
-    <ClInclude Include="include\Harmony\Creator\Viewport\HyCamera2d.h" />
-    <ClInclude Include="include\Harmony\Creator\Viewport\HyCamera3d.h" />
-    <ClInclude Include="include\Harmony\Creator\Viewport\HyViewport.h" />
     <ClInclude Include="include\Harmony\FileIO\Atlas\HyAtlas.h" />
     <ClInclude Include="include\Harmony\FileIO\Atlas\HyTexture.h" />
     <ClInclude Include="include\Harmony\FileIO\HyFileIO.h" />
@@ -156,6 +153,9 @@
     <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGLShader.h" />
     <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h" />
     <ClInclude Include="include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Win.h" />
+    <ClInclude Include="include\Harmony\Renderer\Viewport\HyCamera2d.h" />
+    <ClInclude Include="include\Harmony\Renderer\Viewport\HyCamera3d.h" />
+    <ClInclude Include="include\Harmony\Renderer\Viewport\HyViewport.h" />
     <ClInclude Include="include\Harmony\Threading\BaseMacro.h" />
     <ClInclude Include="include\Harmony\Threading\BasicSync.h" />
     <ClInclude Include="include\Harmony\Threading\Error.h" />

@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyCamera3d.cpp
+ *	HyCamera2d.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,23 +7,23 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Creator/Viewport/HyCamera3d.h"
-#include "Creator/Viewport/HyViewport.h"
+#include "Renderer/Viewport/HyCamera2d.h"
+#include "Renderer/Viewport/HyViewport.h"
 
-HyCamera3d::HyCamera3d(HyViewport *pViewport) :	ITransform<HyAnimVec3>(),
-												m_kpViewportPtr(pViewport),
+HyCamera2d::HyCamera2d(HyViewport *pViewport) :	ITransform<HyAnimVec2>(),
+												m_pViewportPtr(pViewport),
 												m_bEnabled(true)
 {
 	m_RenderRect.x = m_RenderRect.y = 0.0f;
 	m_RenderRect.width = m_RenderRect.height = 1.0f;
 }
 
-HyCamera3d::~HyCamera3d(void)
+HyCamera2d::~HyCamera2d(void)
 {
 }
 
 // All values are [0.0 - 1.0] representing percentages of the entire game window
-void HyCamera3d::SetRenderPercentageCoordinates(float fPosX, float fPosY, float fWidth, float fHeight)
+void HyCamera2d::SetRenderPercentageCoordinates(float fPosX, float fPosY, float fWidth, float fHeight)
 {
 	m_RenderRect.x = fPosX;
 	m_RenderRect.y = fPosY;

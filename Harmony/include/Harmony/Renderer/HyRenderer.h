@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Renderer/HyGfxComms.h"
+#include "Renderer/HyRenderState.h"
 
 class HyViewport;
 

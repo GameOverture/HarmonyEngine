@@ -12,11 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
+#include "Creator/Data/IData.h"
 #include "Threading/BasicSync.h"
-#include "Creator/Instances/HyText2d.h"
-#include "Creator/Viewport/HyCamera2d.h"
-
-#include "Creator/Viewport/HyViewport.h"
 
 #include <vector>
 #include <queue>

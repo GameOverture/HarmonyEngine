@@ -11,8 +11,9 @@
 #define __HyOpenGL_Win_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Renderer/OpenGL/HyOpenGL.h"
+
+#include "Renderer/Viewport/HyViewport.h"
 
 class HyOpenGL_Win : public HyOpenGL
 {

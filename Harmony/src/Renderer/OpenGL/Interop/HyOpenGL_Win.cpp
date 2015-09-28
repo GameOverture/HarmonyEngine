@@ -7,7 +7,6 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-
 #include "Harmony/Renderer/OpenGL/Interop/HyOpenGL_Win.h"
 
 #include "GuiTool/HyGuiComms.h"

@@ -11,16 +11,17 @@
 
 #include "Renderer/HyRenderer.h"
 #include "Renderer/HyGfxComms.h"
+#include "Renderer/Viewport/HyViewport.h"
 
 #include "Creator/Instances/IObjInst2d.h"
 #include "Creator/Instances/HySound.h"
 #include "Creator/Instances/HySprite2d.h"
 #include "Creator/Instances/HySpine2d.h"
 #include "Creator/Instances/HyPrimitive2d.h"
+#include "Creator/Instances/HyText2d.h"
 #include "Creator/Instances/HyTexturedQuad2d.h"
-#include "Creator/HyPhysEntity2d.h"
-#include "Creator/Viewport/HyViewport.h"
 #include "Creator/HyEntity2d.h"
+#include "Creator/HyPhysEntity2d.h"
 
 #include "Time/IHyTime.h"
 

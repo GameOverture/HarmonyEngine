@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Creator/Viewport/HyViewport.h"
+#include "Renderer/Viewport/HyViewport.h"
 
 HyViewport::HyViewport() : m_uiDirtyFlags(0)
 {
