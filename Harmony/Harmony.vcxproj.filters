@@ -13,12 +13,6 @@
     <ClCompile Include="src\Time\Watches\HyStopwatch.cpp">
       <Filter>Time\Watches</Filter>
     </ClCompile>
-    <ClCompile Include="src\Time\Watches\HyTimerWatch.cpp">
-      <Filter>Time\Watches</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Time\Watches\HyWatch.cpp">
-      <Filter>Time\Watches</Filter>
-    </ClCompile>
     <ClCompile Include="src\Utilities\HyBitManip.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -64,12 +58,6 @@
     </ClCompile>
     <ClCompile Include="src\Creator\Data\HySpine2dData.cpp">
       <Filter>Creator\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="include\Gamepad\Gamepad_private.c">
-      <Filter>Input\Gamepad</Filter>
-    </ClCompile>
-    <ClCompile Include="include\Gamepad\Gamepad_windows.c">
-      <Filter>Input\Gamepad</Filter>
     </ClCompile>
     <ClCompile Include="include\Harmony\Threading\BasicSync.cpp">
       <Filter>Threading</Filter>
@@ -140,9 +128,6 @@
     <ClCompile Include="src\Creator\Data\HySprite2dData.cpp">
       <Filter>Creator\Data</Filter>
     </ClCompile>
-    <ClCompile Include="src\Time\Interop\HyTimeApi_Win.cpp">
-      <Filter>Time\Interop</Filter>
-    </ClCompile>
     <ClCompile Include="src\FileIO\HyFileIO.cpp">
       <Filter>FileIO</Filter>
     </ClCompile>
@@ -163,9 +148,6 @@
     </ClCompile>
     <ClCompile Include="src\GuiTool\HyLiveWatchManager.cpp">
       <Filter>GuiTool</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Time\HyTime.cpp">
-      <Filter>Time</Filter>
     </ClCompile>
     <ClCompile Include="src\FileIO\Atlas\HyTexture.cpp">
       <Filter>FileIO\Atlas</Filter>
@@ -189,6 +171,18 @@
       <Filter>Renderer\OpenGL\Interop</Filter>
     </ClCompile>
     <ClCompile Include="src\IHyApplication.cpp" />
+    <ClCompile Include="src\Time\Watches\IHyTimeInst.cpp">
+      <Filter>Time\Watches</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Time\Watches\HyTimer.cpp">
+      <Filter>Time\Watches</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Time\Interop\HyTime_Win.cpp">
+      <Filter>Time\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Time\IHyTime.cpp">
+      <Filter>Time</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -233,9 +227,6 @@
     <Filter Include="Input">
       <UniqueIdentifier>{9adb3b5b-b561-45a5-844e-8419105d02f4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Input\Gamepad">
-      <UniqueIdentifier>{49331082-4fa2-4958-82de-fbdbdf78f9c4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Audio">
       <UniqueIdentifier>{674f9d66-c4d9-4b21-84bf-e4591c4ac684}</UniqueIdentifier>
     </Filter>
@@ -271,6 +262,9 @@
     </Filter>
     <Filter Include="Renderer\OpenGL\Interop">
       <UniqueIdentifier>{167448ad-d1cc-45b8-a402-87e7ee0e363b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input\Interop">
+      <UniqueIdentifier>{da3e46b7-a390-4cf8-a227-8f59da37b6c8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -359,12 +353,6 @@
     <ClInclude Include="include\Harmony\Time\Watches\HyStopwatch.h">
       <Filter>Time\Watches</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Time\Watches\HyTimerWatch.h">
-      <Filter>Time\Watches</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Time\Watches\HyWatch.h">
-      <Filter>Time\Watches</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Utilities\HyBitManip.h">
       <Filter>Utilities</Filter>
     </ClInclude>
@@ -388,12 +376,6 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Utilities\Containers\HyStaticArray.h">
       <Filter>Utilities\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Gamepad\Gamepad.h">
-      <Filter>Input\Gamepad</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Gamepad\Gamepad_private.h">
-      <Filter>Input\Gamepad</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Threading\BaseMacro.h">
       <Filter>Threading</Filter>
@@ -488,9 +470,6 @@
     <ClInclude Include="include\Harmony\Creator\Data\HySprite2dData.h">
       <Filter>Creator\Data</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Time\Interop\HyTimeApi_Win.h">
-      <Filter>Time\Interop</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\FileIO\stb_image.h">
       <Filter>FileIO</Filter>
     </ClInclude>
@@ -508,9 +487,6 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\GuiTool\HyLiveWatchManager.h">
       <Filter>GuiTool</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Time\HyTime.h">
-      <Filter>Time</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\FileIO\Atlas\HyTexture.h">
       <Filter>FileIO\Atlas</Filter>
@@ -542,6 +518,18 @@
     <ClInclude Include="include\Harmony\IHyApplication.h" />
     <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h">
       <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Time\Watches\IHyTimeInst.h">
+      <Filter>Time\Watches</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Time\Watches\HyTimer.h">
+      <Filter>Time\Watches</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Time\Interop\HyTime_Win.h">
+      <Filter>Time\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Time\IHyTime.h">
+      <Filter>Time</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

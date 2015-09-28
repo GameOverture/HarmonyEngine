@@ -22,8 +22,8 @@
 		typedef HyOpenGL_Win HyRendererInterop;
 	#endif
 
-	#include "Time/Interop/HyTimeApi_Win.h"
-	typedef HyTimeApi_Win HyTimeInterop;
+	#include "Time/Interop/HyTime_Win.h"
+	typedef HyTime_Win HyTimeInterop;
 
 	#include "Memory/Interop/HyMemAPI_Windows.h"
 	typedef HyMemoryAPI_Windows HyMemoryInterop;

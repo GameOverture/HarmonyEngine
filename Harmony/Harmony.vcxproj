@@ -35,8 +35,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\Gamepad\Gamepad_private.c" />
-    <ClCompile Include="include\Gamepad\Gamepad_windows.c" />
     <ClCompile Include="include\Harmony\FileIO\stb_image.c" />
     <ClCompile Include="include\Harmony\Threading\BasicSync.cpp" />
     <ClCompile Include="include\Harmony\Threading\InteropUnix.cpp" />
@@ -85,11 +83,11 @@
     <ClCompile Include="src\Renderer\OpenGL\HyOpenGL.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\HyOpenGLShader.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\Interop\HyOpenGL_Win.cpp" />
-    <ClCompile Include="src\Time\Interop\HyTimeApi_Win.cpp" />
-    <ClCompile Include="src\Time\HyTime.cpp" />
+    <ClCompile Include="src\Time\Interop\HyTime_Win.cpp" />
+    <ClCompile Include="src\Time\IHyTime.cpp" />
     <ClCompile Include="src\Time\Watches\HyStopwatch.cpp" />
-    <ClCompile Include="src\Time\Watches\HyTimerWatch.cpp" />
-    <ClCompile Include="src\Time\Watches\HyWatch.cpp" />
+    <ClCompile Include="src\Time\Watches\HyTimer.cpp" />
+    <ClCompile Include="src\Time\Watches\IHyTimeInst.cpp" />
     <ClCompile Include="src\Utilities\Animation\HyAnimFloat.cpp" />
     <ClCompile Include="src\Utilities\Animation\HyEaseFuncs.cpp" />
     <ClCompile Include="src\Utilities\HyBitManip.cpp" />
@@ -101,8 +99,6 @@
     <ClCompile Include="src\Utilities\HyStrManip.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Gamepad\Gamepad.h" />
-    <ClInclude Include="include\Gamepad\Gamepad_private.h" />
     <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler.h" />
     <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler_GNU.h" />
     <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler_MSVC.h" />
@@ -173,11 +169,11 @@
     <ClInclude Include="include\Harmony\Threading\Utils.h" />
     <ClInclude Include="include\Harmony\Threading\WaitObject.h" />
     <ClInclude Include="include\Harmony\Threading\WaitObjectEx.h" />
-    <ClInclude Include="include\Harmony\Time\Interop\HyTimeApi_Win.h" />
-    <ClInclude Include="include\Harmony\Time\HyTime.h" />
+    <ClInclude Include="include\Harmony\Time\Interop\HyTime_Win.h" />
+    <ClInclude Include="include\Harmony\Time\IHyTime.h" />
     <ClInclude Include="include\Harmony\Time\Watches\HyStopwatch.h" />
-    <ClInclude Include="include\Harmony\Time\Watches\HyTimerWatch.h" />
-    <ClInclude Include="include\Harmony\Time\Watches\HyWatch.h" />
+    <ClInclude Include="include\Harmony\Time\Watches\HyTimer.h" />
+    <ClInclude Include="include\Harmony\Time\Watches\IHyTimeInst.h" />
     <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimFloat.h" />
     <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec2.h" />
     <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec3.h" />

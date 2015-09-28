@@ -33,7 +33,7 @@ class HyEngine
 	static HyEngine *		sm_pInstance;
 	static HyMemoryHeap &	sm_Mem;
 
-	IHyApplication &			m_AppRef;
+	IHyApplication &		m_AppRef;
 	
 	HyTimeInterop			m_Time;
 	HyInputInterop			m_Input;

@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyTimerWatch.h
+ *	HyTimer.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,16 +7,16 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyTimerWatch_h__
-#define __HyTimerWatch_h__
+#ifndef __HyTimer_h__
+#define __HyTimer_h__
 
-#include "HyWatch.h"
+#include "IHyTimeInst.h"
 
-class HyTimerWatch : public HyWatch
+class HyTimer : public IHyTimeInst
 {
 public:
-	HyTimerWatch(void);
-	virtual ~HyTimerWatch(void);
+	HyTimer(void);
+	virtual ~HyTimer(void);
 };
 
-#endif /* __HyTimerWatch_h__ */
+#endif /* __HyTimer_h__ */

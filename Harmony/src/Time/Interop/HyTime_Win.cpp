@@ -7,11 +7,11 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Time/Interop/HyTimeApi_Win.h"
+#include "Time/Interop/HyTime_Win.h"
 
 #include <mmsystem.h>
 
-HyTimeApi_Win::HyTimeApi_Win() : HyTime()
+HyTime_Win::HyTime_Win() : IHyTime()
 {
 	int64 i64PerfCnt;
 	if (QueryPerformanceFrequency((LARGE_INTEGER *) &i64PerfCnt)) 
@@ -36,13 +36,13 @@ HyTimeApi_Win::HyTimeApi_Win() : HyTime()
 	}
 }
 
-HyTimeApi_Win::~HyTimeApi_Win(void)
+HyTime_Win::~HyTime_Win(void)
 {
 }
 
 // Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
 // Delta time is in seconds.
-/*virtual*/ void HyTimeApi_Win::SetCurDeltaTime()
+/*virtual*/ void HyTime_Win::SetCurDeltaTime()
 {
 	// read appropriate counter
 	if (m_bUsingPerformanceTimer)

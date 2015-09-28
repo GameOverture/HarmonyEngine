@@ -1,5 +1,5 @@
 /**************************************************************************
- *	IApplication.h
+ *	IHyApplication.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2012 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __IGame_h__
-#define __IGame_h__
+#ifndef __IHyApplication_h__
+#define __IHyApplication_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -25,7 +25,7 @@ class IHyApplication
 	static HyMemoryHeap		sm_Mem;
 
 	vector<HyViewport>		m_vViewports;
-	//HyInput					m_Input;
+	HyInputMapping *		m_pInputMaps;
 
 	virtual bool Initialize() = 0;
 	virtual bool Update() = 0;
@@ -38,10 +38,10 @@ public:
 	static HyMemoryHeap &GetMemoryHeap()					{ return sm_Mem; }
 
 	HyViewport &Viewport(uint32 uiIndex = 0);
-	//HyInput &Input(uint32 uiIndex = 0);
+	HyInputMapping &Input(uint32 uiIndex = 0);
 
 	void *operator new(tMEMSIZE size);
 	void operator delete (void *ptr);
 };
 
-#endif /* __IGame_h__ */
+#endif /* __IHyApplication_h__ */

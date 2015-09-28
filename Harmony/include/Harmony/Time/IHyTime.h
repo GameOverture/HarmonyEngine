@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyTime.h
+ *	IHyTime.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,27 +7,27 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyTime_h__
-#define __HyTime_h__
+#ifndef __IHyTime_h__
+#define __IHyTime_h__
 
 #include "Afx/HyStdAfx.h"
 
-#include "Watches/HyTimerWatch.h"
+#include "Watches/HyTimer.h"
 #include "Watches/HyStopwatch.h"
 
 #include <vector>
 using std::vector;
 
 // Forward declarations
-class HyWatch;
+class IHyTimeInst;
 class HyStopwatch;
 
-class HyTime
+class IHyTime
 {
 	static const uint32			sm_kuiUpdateStep;
 	static const double			sm_kdUpdateStep;
 
-	vector<HyWatch *>			m_TimeInstList;
+	vector<IHyTimeInst *>		m_vTimeInsts;
 
 	double						m_dTotalElapsedTime;
 	double						m_dThrottledTime;
@@ -43,8 +43,8 @@ protected:
 	double						m_dCurDeltaTime;
 
 public:
-	HyTime();
-	~HyTime(void);
+	IHyTime();
+	~IHyTime(void);
 
 	static uint32 GetUpdateMilliseconds()	{ return sm_kuiUpdateStep; }
 	static float GetUpdateStepSeconds()		{ return static_cast<float>(sm_kdUpdateStep); }
@@ -61,8 +61,8 @@ public:
 	//int GetUpdateFPS()		{ return m_iCurFPSUpdate; }
 	//void ToggleFPSOutput()	{ m_bDumpFPSToConsole = !m_bDumpFPSToConsole; }
 
-	void AddTimeInst(HyWatch *pTimeInst);
-	void RemoveTimeInst(HyWatch *pTimeInst);
+	void AddTimeInst(IHyTimeInst *pTimeInst);
+	void RemoveTimeInst(IHyTimeInst *pTimeInst);
 };
 
-#endif /* __HyTime_h__ */
+#endif /* __IHyTime_h__ */

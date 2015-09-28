@@ -7,27 +7,27 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Time/HyTime.h"
+#include "Time/IHyTime.h"
 
 #include "Input/HyInput.h"
 
-/*static*/ const uint32			HyTime::sm_kuiUpdateStep = 10;
-/*static*/ const double			HyTime::sm_kdUpdateStep = HyTime::sm_kuiUpdateStep / 1000.0;
+/*static*/ const uint32			IHyTime::sm_kuiUpdateStep = 10;
+/*static*/ const double			IHyTime::sm_kdUpdateStep = IHyTime::sm_kuiUpdateStep / 1000.0;
 
-HyTime::HyTime() :	m_dTimeManipulation(1.0f),
+IHyTime::IHyTime() :	m_dTimeManipulation(1.0f),
 					m_dCurDeltaTime(0.0),
 					m_dTotalElapsedTime(0.0),
 					m_dThrottledTime(0.0)
 {
 }
 
-HyTime::~HyTime(void)
+IHyTime::~IHyTime(void)
 {
-	while(m_TimeInstList.size() != 0)
-		RemoveTimeInst(m_TimeInstList[0]);
+	while(m_vTimeInsts.size() != 0)
+		RemoveTimeInst(m_vTimeInsts[0]);
 }
 
-bool HyTime::ThrottleTime()
+bool IHyTime::ThrottleTime()
 {
 	// m_dCurDeltaTime will be set within SetCurDeltaTime()
 	SetCurDeltaTime();
@@ -36,11 +36,11 @@ bool HyTime::ThrottleTime()
 	m_dThrottledTime += m_dCurDeltaTime * m_dTimeManipulation;
 
 	// Update all timers
-	if(m_TimeInstList.empty() == false)
+	if(m_vTimeInsts.empty() == false)
 	{
-		size_t iNumTimers = m_TimeInstList.size();
+		size_t iNumTimers = m_vTimeInsts.size();
 		for(unsigned int i = 0; i < iNumTimers; i++)
-			m_TimeInstList[i]->Update(m_dCurDeltaTime);
+			m_vTimeInsts[i]->Update(m_dCurDeltaTime);
 	}
 
 	if(m_dThrottledTime >= sm_kdUpdateStep)
@@ -52,24 +52,24 @@ bool HyTime::ThrottleTime()
 	return false;
 }
 
-void HyTime::AddTimeInst(HyWatch *pTimeInst)
+void IHyTime::AddTimeInst(IHyTimeInst *pTimeInst)
 {
 	if(pTimeInst == NULL)
 		return;
 
-	m_TimeInstList.push_back(pTimeInst);
+	m_vTimeInsts.push_back(pTimeInst);
 }
 
-void HyTime::RemoveTimeInst(HyWatch *pTimeInst)
+void IHyTime::RemoveTimeInst(IHyTimeInst *pTimeInst)
 {
 	if(pTimeInst == NULL)
 		return;
 
-	for(vector<HyWatch*>::iterator it = m_TimeInstList.begin(); it != m_TimeInstList.end(); ++it)
+	for(vector<IHyTimeInst*>::iterator it = m_vTimeInsts.begin(); it != m_vTimeInsts.end(); ++it)
 	{
 		if((*it) == pTimeInst)
 		{
-			it = m_TimeInstList.erase(it);
+			it = m_vTimeInsts.erase(it);
 			break;
 		}
 	}
