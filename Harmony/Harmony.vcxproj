@@ -72,6 +72,7 @@
     <ClCompile Include="src\HyEngine.cpp" />
     <ClCompile Include="src\IHyApplication.cpp" />
     <ClCompile Include="src\Input\IHyInput.cpp" />
+    <ClCompile Include="src\Input\IHyInputMap.cpp" />
     <ClCompile Include="src\Input\Interop\HyInputMap_Gainput.cpp" />
     <ClCompile Include="src\Input\Interop\HyInput_Gainput.cpp" />
     <ClCompile Include="src\Memory\HyMemoryHeap.cpp" />

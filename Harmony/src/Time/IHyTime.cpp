@@ -9,15 +9,13 @@
  *************************************************************************/
 #include "Time/IHyTime.h"
 
-#include "Input/IHyInput.h"
-
 /*static*/ const uint32			IHyTime::sm_kuiUpdateStep = 10;
 /*static*/ const double			IHyTime::sm_kdUpdateStep = IHyTime::sm_kuiUpdateStep / 1000.0;
 
 IHyTime::IHyTime() :	m_dTimeManipulation(1.0f),
-					m_dCurDeltaTime(0.0),
-					m_dTotalElapsedTime(0.0),
-					m_dThrottledTime(0.0)
+						m_dCurDeltaTime(0.0),
+						m_dTotalElapsedTime(0.0),
+						m_dThrottledTime(0.0)
 {
 }
 

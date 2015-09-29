@@ -130,19 +130,6 @@ void HyOpenGL_Win::DeviceContext::Resize(GLsizei iWidth, GLsizei iHeight)
 	return HyOpenGL::Initialize();
 }
 
-/*virtual*/ bool HyOpenGL_Win::PollApi()
-{
-	// TODO: return false when windows close message comes in or something similar
-	MSG msg = { 0 };
-	for(uint32 i = 0; i < m_uiNumDCs; ++i)
-	{
-		while(PeekMessageA(&msg, m_ppDeviceContexes[i]->m_hWnd, 0, 0, PM_REMOVE))
-			DispatchMessageA(&msg);
-	}
-
-	return true;
-}
-
 /*virtual*/ void HyOpenGL_Win::FinishRender()
 {
 	for(uint32 i = 0; i < m_uiNumDCs; ++i)

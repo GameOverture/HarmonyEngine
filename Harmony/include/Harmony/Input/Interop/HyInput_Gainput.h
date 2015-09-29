@@ -16,20 +16,46 @@
 
 class HyInput_Gainput : public IHyInput
 {
-	gainput::InputManager			m_Manager;
+	gainput::InputManager		m_Manager;
 
-	gainput::DeviceId				m_idKB;
-	gainput::DeviceId				m_idMouse;
-	vector<gainput::DeviceId>		m_idGamePads;
-	gainput::DeviceId				m_idTouch;
+	gainput::DeviceId			m_uiKeyboardId;
+	gainput::DeviceId			m_uiMouseId;
+	vector<gainput::DeviceId>	m_vGamePadIds;
 
-	gainput::InputMap *				m_pInputMap;
+	enum eRecordState
+	{
+		RECORD_Off = 0,
+		RECORD_Saving,
+		RECORD_Replaying
+	};
+	eRecordState				m_eRecordState;
+	uint64						m_uiRecordCount;
 
 public:
-	HyInput_Gainput(vector<IHyInputMap> &vInputMapsRef);
-	virtual ~HyInput_Gainput();
+	HyInput_Gainput(vector<IHyInputMap *> &vInputMapsRef);
+	~HyInput_Gainput();
 
-	virtual void ProcessInput();
+	gainput::InputManager &GetGainputManager();
+
+	virtual void Update();
+
+	virtual void StartRecording();
+	virtual void StopRecording();
+	virtual void SerializeRecording();
+
+	virtual void StartPlayback();
+	virtual void StopPlayback();
+
+#ifdef HY_PLATFORM_WINDOWS
+	void HandleMsg(const MSG& msg);
+#endif
+
+	gainput::DeviceId GetKeyboardDeviceId();
+
+	gainput::DeviceId GetMouseDeviceId();
+
+	gainput::DeviceId GetGamePadDeviceId(uint32 uiIndex);
+
 };
 
 #endif /* __HyInput_Gainput_h__ */

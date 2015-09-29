@@ -29,14 +29,18 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
 		m_vViewports[i].SetBitsPerPixel(m_Init.windowInfo[i].iBitsPerPixel);
 	}
 
-	for(uint32 i = 0; i < m_Init.uiNumInputMappings; ++i)
-		m_vInputMaps.push_back(HyInputMapInterop());
+	for(uint32 i = 0; i < m_vInputMaps.size(); ++i)
+		m_vInputMaps.push_back(new HyInputMapInterop());
 
 	HyFileIO::SetDataDir(m_Init.szDataDir);
 }
 
 IHyApplication::~IHyApplication()
 {
+	for(uint32 i = 0; i < m_vInputMaps.size(); ++i)
+		delete m_vInputMaps[i];
+
+	m_vInputMaps.clear();
 }
 
 HyViewport &IHyApplication::Viewport(uint32 uiIndex /*= 0*/)
@@ -48,7 +52,7 @@ HyViewport &IHyApplication::Viewport(uint32 uiIndex /*= 0*/)
 HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(uiIndex < m_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
-	return m_vInputMaps[uiIndex];
+	return *static_cast<HyInputMapInterop *>(m_vInputMaps[uiIndex]);
 }
 
 void *IHyApplication::operator new(tMEMSIZE size)

@@ -65,6 +65,9 @@ bool HyEngine::Update()
 	while(m_Time.ThrottleTime())
 	{
 		m_Input.Update();
+
+		if(PollPlatformApi() == false)
+			return false;
 		
 		m_Creator.PreUpdate();
 		if(m_AppRef.Update() == false)
@@ -76,6 +79,29 @@ bool HyEngine::Update()
 #endif
 	}
 
-	return m_Renderer.Update();
+	m_Renderer.Update();
+	return true;
+}
+
+bool HyEngine::PollPlatformApi()
+{
+#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
+	// TODO: return false when windows close message comes in or something similar
+	MSG msg = { 0 };
+	for(uint32 i = 0; i < m_Renderer.GetNumDeviceContexts(); ++i)
+	{
+		while(PeekMessage(&msg, m_Renderer.GetDeviceContextHWND(i), 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+			
+			// Only take input from the main window
+			if(i == 0)
+				m_Input.HandleMsg(msg);
+		}
+	}
+#endif
+
+	return true;
 }
 

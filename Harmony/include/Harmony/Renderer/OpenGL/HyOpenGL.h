@@ -48,8 +48,6 @@ public:
 	virtual ~HyOpenGL(void);
 
 	virtual bool Initialize();
-	virtual bool PollApi();
-	virtual bool CheckDevice();
 
 	virtual void StartRender();
 	
@@ -62,8 +60,6 @@ public:
 	virtual void End_2d();
 
 	virtual void FinishRender();
-
-	virtual bool Shutdown();
 
 	// Returns the texture ID used for API specific drawing.
 	virtual uint32 AddTexture(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, void *pPixelData);

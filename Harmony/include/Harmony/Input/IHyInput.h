@@ -12,34 +12,25 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Input/IHyInputMap.h"
-
 #include <vector>
 using std::vector;
 
+class IHyInputMap;
+
 class IHyInput
 {
-	vector<IHyInputMap> &		m_vInputMapsRef;
-
-	enum eReplayState
-	{
-		REPLAY_Off = 0,
-		REPLAY_Saving,
-		REPLAY_Replaying
-	};
-	eReplayState					m_eReplayState;
-	uint64							m_uiRecordCount;
-
 public:
-	IHyInput(vector<IHyInputMap> &vInputMapsRef);
+	IHyInput(vector<IHyInputMap *> &vInputMapsRef);
 	virtual ~IHyInput();
 
-	virtual void ProcessInput() = 0;
+	virtual void Update() = 0;
 
-	static void StartRecording();
-	static void PlayRecording();
+	virtual void StartRecording() = 0;
+	virtual void StopRecording() = 0;
+	virtual void SerializeRecording() = 0;
 
-	void Update();
+	virtual void StartPlayback() = 0;
+	virtual void StopPlayback() = 0;
 };
 
 #endif /* __HyInput_h__ */

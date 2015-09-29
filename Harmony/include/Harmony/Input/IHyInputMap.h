@@ -392,9 +392,12 @@ class IHyInputMap
 {
 	friend class IHyInput;
 
+protected:
+	static IHyInput *		sm_pInputManager;
+
 public:
 	IHyInputMap();
-	~IHyInputMap(void);
+	virtual ~IHyInputMap(void);
 
 	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn) = 0;
 	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn) = 0;
@@ -412,6 +415,19 @@ public:
 	
 	virtual float GetAxis(uint32 iUserId) const = 0;
 	virtual float GetAxisDelta(uint32 iUserId) const = 0;
+
+	static void StartRecording();
+	static void StopRecording();
+	static void SerializeRecording();
+
+	static void StartPlayback();
+	static void StopPlayback();
+
+private:
+	static void SetManagerPtr(IHyInput *pInputManager);
+
+	// Is invoked once per input map after the static 'sm_pInputManager' has been set.
+	virtual void Initialize() = 0;
 };
 
 #endif /* __IHyInputMap_h__ */

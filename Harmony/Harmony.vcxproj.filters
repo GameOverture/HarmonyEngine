@@ -186,6 +186,9 @@
     <ClCompile Include="src\Input\Interop\HyInputMap_Gainput.cpp">
       <Filter>Input\Interop</Filter>
     </ClCompile>
+    <ClCompile Include="src\Input\IHyInputMap.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">

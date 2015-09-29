@@ -11,11 +11,14 @@
 #define __HyInputMap_Gainput_h__
 
 #include "Input/IHyInputMap.h"
+#include "Input/Interop/HyInput_Gainput.h"
 
 #include "gainput/gainput.h"
 
 class HyInputMap_Gainput : public IHyInputMap
 {
+	friend class HyInput_Gainput;
+
 	gainput::InputMap *			m_pInputMap;
 
 public:
@@ -38,6 +41,9 @@ public:
 
 	virtual float GetAxis(uint32 iUserId) const;
 	virtual float GetAxisDelta(uint32 iUserId) const;
+
+private:
+	virtual void Initialize();
 };
 
 #endif /* __HyInputMap_Gainput_h__ */

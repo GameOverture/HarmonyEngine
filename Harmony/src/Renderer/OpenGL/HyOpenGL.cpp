@@ -224,16 +224,6 @@ HyOpenGL::~HyOpenGL(void)
 	return true;
 }
 
-/*virtual*/ bool HyOpenGL::PollApi()
-{
-	return true;
-}
-
-/*virtual*/ bool HyOpenGL::CheckDevice()
-{
-	return true;
-}
-
 /*virtual*/ void HyOpenGL::StartRender()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -430,11 +420,6 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::FinishRender()
 {
 
-}
-
-/*virtual*/ bool HyOpenGL::Shutdown()
-{
-	return true;
 }
 
 // Returns the texture ID used for API specific drawing.

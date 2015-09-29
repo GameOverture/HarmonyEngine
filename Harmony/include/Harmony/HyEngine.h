@@ -66,6 +66,8 @@ private:
 	HyRendererInterop &GetRenderer()	{ return m_Renderer; }
 
 	bool Update();
+
+	bool PollPlatformApi();
 };
 
 #endif /* __HyEngine_h__ */

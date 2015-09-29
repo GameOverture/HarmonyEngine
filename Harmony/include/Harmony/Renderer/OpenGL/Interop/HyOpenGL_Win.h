@@ -30,14 +30,16 @@ class HyOpenGL_Win : public HyOpenGL
 		void Resize(GLsizei width, GLsizei height);
 	};
 	DeviceContext **	m_ppDeviceContexes;
-	size_t				m_uiNumDCs;
+	uint32				m_uiNumDCs;
 
 public:
 	HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef);
 	~HyOpenGL_Win();
 
+	uint32 GetNumDeviceContexts()				{ return m_uiNumDCs; }
+	HWND GetDeviceContextHWND(uint32 uiIndex)	{ return m_ppDeviceContexes[uiIndex]->m_hWnd; }
+
 	virtual bool Initialize();
-	virtual bool PollApi();
 
 	virtual void FinishRender();
 };

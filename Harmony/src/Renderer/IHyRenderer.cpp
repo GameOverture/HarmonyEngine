@@ -18,21 +18,7 @@ IHyRenderer::~IHyRenderer(void)
 {
 }
 
-bool IHyRenderer::Update()
-{
-	if(PollApi())
-	{
-		DrawBuffers();
-		return true;
-	}
-	else
-	{
-		Shutdown();
-		return false;
-	}
-}
-
-/*virtual*/ void IHyRenderer::DrawBuffers()
+void IHyRenderer::Update()
 {
 	// Swap to newest draw buffers (is only threadsafe on Render thread)
 	if(!m_GfxCommsRef.Render_GetSharedPtrs(m_pMsgQueuePtr, m_pSendMsgQueuePtr, m_pDrawBufferPtr))
@@ -43,9 +29,6 @@ bool IHyRenderer::Update()
 	m_DrawpBufferHeader = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr);
 
 	ProcessGameMsgs();
-
-	if(CheckDevice() == false)
-		return;
 
 	StartRender();
 

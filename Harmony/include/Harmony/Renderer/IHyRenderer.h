@@ -38,8 +38,6 @@ public:
 	const HyGfxComms::tGfxInfo *GetGfxInfo()				{ return m_GfxCommsRef.GetGfxInfo(); }
 
 	virtual bool Initialize() = 0;
-	virtual bool PollApi() = 0;
-	virtual bool CheckDevice() = 0;
 
 	virtual void StartRender() = 0;
 
@@ -52,10 +50,6 @@ public:
 	virtual void End_2d() = 0;
 
 	virtual void FinishRender() = 0;
-
-	virtual bool Shutdown() = 0;
-
-	virtual void DrawBuffers();
 
 	// Returns the texture ID used for API specific drawing.
 	virtual uint32 AddTexture(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, void *pPixelData) = 0;
@@ -71,7 +65,7 @@ public:
 	HyRenderState *GetRenderStatesPtr2d()	{ return reinterpret_cast<HyRenderState *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d + sizeof(int32)); } // Last sizeof(int32) is skipping number of 2dInsts
 	char *GetVertexData2d()					{ return reinterpret_cast<char *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToVertexData2d); }
 
-	bool Update();
+	void Update();
 	void ProcessGameMsgs();
 	void Draw2d();
 };

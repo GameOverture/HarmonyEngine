@@ -16,7 +16,6 @@
 #include "Memory/HyMemoryHeap.h"
 
 #include "Renderer/Viewport/HyViewport.h"
-#include "Input/IHyInputMap.h"
 
 class IHyApplication
 {
@@ -26,7 +25,7 @@ class IHyApplication
 	static HyMemoryHeap			sm_Mem;
 
 	vector<HyViewport>			m_vViewports;
-	vector<HyInputMapInterop>	m_vInputMaps;
+	vector<IHyInputMap *>		m_vInputMaps;
 
 	virtual bool Initialize() = 0;
 	virtual bool Update() = 0;
