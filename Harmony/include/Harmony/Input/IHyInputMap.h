@@ -328,66 +328,6 @@ enum HyGamePadBtn
 	PadButtonCount_ = PadButtonMax_ - PadButtonAxisCount_
 };
 
-#define HYINPUT_KEYBOARD_CODE_STD 32
-#define HYINPUT_KEYBOARD_CODE_EXT 256
-#define HYINPUT_KEYBOARD_CODE_NUMPAD 320
-#define HYINPUT_KEYBOARD_CODE_NUMFLAGS 3
-
-enum eActionButton // binary [on..off]
-{
-	Action_Btn0 = 0,
-	Action_Btn1 = 1,
-	Action_Btn2 = 2,
-	Action_Btn3 = 3,
-	Action_Btn4 = 4,
-	Action_Btn5 = 5,
-	Action_Btn6 = 6,
-	Action_Btn7 = 7,
-	Action_Btn8 = 8,
-	Action_Btn9 = 9,
-	Action_Btn10 = 10,
-	Action_Btn11 = 11,
-	Action_Btn12 = 12,
-	Action_Btn13 = 13,
-	Action_Btn14 = 14,
-	Action_Btn15 = 15,
-	Action_MaxBtns = 16,
-
-	GP360_ButtonA = Action_Btn0,
-	GP360_ButtonB = Action_Btn1,
-	GP360_ButtonX = Action_Btn2,
-	GP360_ButtonY = Action_Btn3,
-	GP360_ButtonLB = Action_Btn4,
-	GP360_ButtonRB = Action_Btn5,
-	GP360_ButtonSelect = Action_Btn6,
-	GP360_ButtonStart = Action_Btn7,
-	GP360_ButtonLS = Action_Btn8,
-	GP360_ButtonRS = Action_Btn9,
-};
-
-enum eActionAxis // float range [-1..1]
-{
-	Action_Axis0 = 0,
-	Action_Axis1 = 1,
-	Action_Axis2 = 2,
-	Action_Axis3 = 3,
-	Action_Axis4 = 4,
-	Action_Axis5 = 5,
-	Action_Axis6 = 6,
-	Action_Axis7 = 7,
-	Action_Axis8 = 8,
-	Action_Axis9 = 9,
-	Action_MaxAxes = 10,
-
-	GP_LStickX = Action_Axis0,
-	GP_LStickY = Action_Axis1,
-	GP_RStickX = Action_Axis4,
-	GP_RStickY = Action_Axis3,
-	GP_Triggers = Action_Axis2,
-	GP_DPadX = Action_Axis5,
-	GP_DPadY = Action_Axis6,
-};
-
 class IHyInputMap
 {
 	friend class IHyInput;
@@ -401,7 +341,7 @@ public:
 
 	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn) = 0;
 	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn) = 0;
-	virtual bool MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn) = 0;
+	virtual bool MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn, uint32 uiGamePadIndex) = 0;
 
 	virtual bool MapAxis_MO(uint32 iUserId, HyMouseBtn eAxis, float fMin = 0.0f, float fMax = 1.0f) = 0;
 	virtual bool MapAxis_GP(uint32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f) = 0;

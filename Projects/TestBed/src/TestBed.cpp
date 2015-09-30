@@ -48,9 +48,15 @@ TestBed::~TestBed(void)
 	//m_Window.GetResolution(tRes);
 	//m_Camera.SetOrthographic(static_cast<float>(tRes.iWidth), static_cast<float>(tRes.iHeight));
 
-	m_pCam->Pos().Set(1.0f, 1.0f);
+	//m_pCam->Pos().Set(1.0f, 1.0f);
 	//m_pCam->Pos().Set(.5f, 1.0f);
 	m_pCam->SetZoom(0.8f);
+
+	Input().MapBtn_KB(CAM_LEFT, KeyLeft);
+	Input().MapBtn_KB(CAM_RIGHT, KeyRight);
+	Input().MapBtn_KB(CAM_UP, KeyUp);
+	Input().MapBtn_KB(CAM_DOWN, KeyDown);
+
 
 	return true;
 }
@@ -69,14 +75,24 @@ TestBed::~TestBed(void)
 	//	m_Player.Jump(2.75f);
 
 	//m_pCam->Pos().Set(m_Player.GetPos());
-	//m_pCam->Pos().Offset(m_pInputArray->GpAxis(GP_RStickX) * 2.0f, -m_pInputArray->GpAxis(GP_RStickY) * 2.0f);
+	//m_pCam->Pos().Offset(m_pInputArray->GpAxis(GP_RStickX) * 2.0f, -m_pInputArray->GpAxis(GP_RStickY) * 2.0f);Z
 	//m_pCam->SetZoom(m_pCam->GetZoom() + m_pInputArray->GpAxis(GP_Triggers) * 0.05f);
 
 
 	//m_TxtInst.SetString(HyStr("CamX: %f\tCamY:%f"), m_pCam->Pos().X(), m_pCam->Pos().Y());
 
 
+	if(Input().IsBtnDown(CAM_LEFT))
+		m_pCam->Pos().Offset(-0.05f, 0.0f);
 
+	if(Input().IsBtnDown(CAM_RIGHT))
+		m_pCam->Pos().Offset(0.05f, 0.0f);
+
+	if(Input().IsBtnDown(CAM_UP))
+		m_pCam->Pos().Offset(0.0f, 0.05f);
+
+	if(Input().IsBtnDown(CAM_DOWN))
+		m_pCam->Pos().Offset(0.0f, -0.05f);
 
 
 	//if(m_pInputArray->

@@ -27,7 +27,7 @@ public:
 
 	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn);
 	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn);
-	virtual bool MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn);
+	virtual bool MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn, uint32 uiGamePadIndex);
 
 	virtual bool MapAxis_MO(uint32 iUserId, HyMouseBtn eAxis, float fMin = 0.0f, float fMax = 1.0f);
 	virtual bool MapAxis_GP(uint32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f);

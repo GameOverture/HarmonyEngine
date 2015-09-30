@@ -29,7 +29,7 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
 		m_vViewports[i].SetBitsPerPixel(m_Init.windowInfo[i].iBitsPerPixel);
 	}
 
-	for(uint32 i = 0; i < m_vInputMaps.size(); ++i)
+	for(uint32 i = 0; i < m_Init.uiNumInputMappings; ++i)
 		m_vInputMaps.push_back(new HyInputMapInterop());
 
 	HyFileIO::SetDataDir(m_Init.szDataDir);

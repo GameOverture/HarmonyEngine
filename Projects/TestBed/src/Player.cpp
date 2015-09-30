@@ -23,7 +23,7 @@ Player::~Player(void)
 void Player::Initialize()
 {
 	m_primBox.Load();
-	m_primBox.Color().Set(1.0f, 0.0f, 0.0f, 1.0f);
+	m_primBox.Color().Set(0.0f, 0.0f, 1.0f, 1.0f);
 	m_primBox.SetAsQuad(15.0f, 15.0f, false);
 	m_primBox.SetDisplayOrder(1.2f);
 	

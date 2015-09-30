@@ -16,6 +16,14 @@
 
 class TestBed : public IHyApplication
 {
+	enum eControls
+	{
+		CAM_LEFT,
+		CAM_RIGHT,
+		CAM_UP,
+		CAM_DOWN
+	};
+
 	HyCamera2d *	m_pCam;
 	vector<uint32>	m_vGamePadIds;
 

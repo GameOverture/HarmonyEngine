@@ -23,18 +23,17 @@ HyInputMap_Gainput::~HyInputMap_Gainput()
 {
 	HyAssert(m_pInputMap, "HyInputMap_Gainput::MapBtn_KB() used before manager initialized");
 
-	//return m_pInputMap->MapBool(iUserId, GetGainputManager().GetKeyboardDeviceId(), eBtn);
-	return true;
+	return m_pInputMap->MapBool(iUserId, HY_GAINPUT_MANAGER.GetKeyboardDeviceId(), eBtn);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn)
 {
-	return true;
+	return m_pInputMap->MapBool(iUserId, HY_GAINPUT_MANAGER.GetMouseDeviceId(), eBtn);
 }
 
-/*virtual*/ bool HyInputMap_Gainput::MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn)
+/*virtual*/ bool HyInputMap_Gainput::MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn, uint32 uiGamePadIndex)
 {
-	return true;
+	return m_pInputMap->MapBool(iUserId, HY_GAINPUT_MANAGER.GetGamePadDeviceId(uiGamePadIndex), eBtn);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::MapAxis_MO(uint32 iUserId, HyMouseBtn eAxis, float fMin /*= 0.0f*/, float fMax /*= 1.0f*/)
