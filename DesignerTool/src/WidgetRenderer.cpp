@@ -65,6 +65,9 @@ WidgetRenderer::~WidgetRenderer()
 
 Item *WidgetRenderer::GetItem(int iIndex /*= -1*/)
 {
+    if(ui->tabWidget->currentWidget() == NULL)
+        return NULL;
+
     if(iIndex < 0)
         return static_cast<TabPage *>(ui->tabWidget->currentWidget())->GetItem();
     else

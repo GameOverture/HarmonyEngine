@@ -6,6 +6,8 @@
 
 #include "HyGlobal.h"
 
+#include "WidgetRenderer.h"
+
 HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent)
 {
     // Todo: test to see if QWidget parent works for HyEngine()'s ctor
@@ -27,7 +29,10 @@ void HyGuiRenderer::initializeGL()
     //    format.setSampleBuffers(true);
     //    setFormat(format);
 
-    m_pHyEngine = new HyEngine(*reinterpret_cast<IHyApplication *>(parent()));
+    WidgetRenderer *pGameApp = reinterpret_cast<WidgetRenderer *>(parent());
+    IHyApplication *pTest = static_cast<IHyApplication *>(pGameApp);
+
+    m_pHyEngine = new HyEngine(*pTest);
 }
 
 void HyGuiRenderer::paintGL()
