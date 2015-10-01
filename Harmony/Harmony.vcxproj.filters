@@ -119,9 +119,6 @@
     <ClCompile Include="src\FileIO\jasonxx.cc">
       <Filter>FileIO</Filter>
     </ClCompile>
-    <ClCompile Include="src\Creator\Data\IData.cpp">
-      <Filter>Creator\Data</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\HyRenderState.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
@@ -312,9 +309,6 @@
       <Filter>Creator\Data</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Creator\Data\HySpine2dData.h">
-      <Filter>Creator\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\Data\IData.h">
       <Filter>Creator\Data</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Creator\Instances\HyPrimitive2d.h">
@@ -536,6 +530,9 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Input\Interop\HyInputMap_Gainput.h">
       <Filter>Input\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Creator\Data\IHyData.h">
+      <Filter>Creator\Data</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

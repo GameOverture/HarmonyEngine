@@ -23,8 +23,8 @@ protected:
 	HyGfxComms &				m_GfxCommsRef;
 	vector<HyViewport> &		m_ViewportsRef;
 
-	queue<IData *> *			m_pMsgQueuePtr;		// The pointer to the currently active render message queue
-	queue<IData *> *			m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
+	queue<IHyData *> *			m_pMsgQueuePtr;		// The pointer to the currently active render message queue
+	queue<IHyData *> *			m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
 	char *						m_pDrawBufferPtr;	// The pointer to the currently active draw buffer
 
 	HyGfxComms::tDrawHeader *	m_DrawpBufferHeader;

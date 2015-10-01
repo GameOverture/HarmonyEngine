@@ -73,7 +73,7 @@ void HyCreator::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
 
 void HyCreator::LoadInst2d(IObjInst2d *pInst)
 {
-	IData *pLoadData = NULL;
+	IHyData *pLoadData = NULL;
 	switch(pInst->GetInstType())
 	{
 	case HYINST_Sprite2d:
@@ -122,7 +122,7 @@ void HyCreator::RemoveInst(IObjInst2d *pInst)
 		{
 			if((*it) == pInst)
 			{
-				IData *pInstData = pInst->GetData();
+				IHyData *pInstData = pInst->GetData();
 				if(pInstData && pInstData->DecRef())
 					DiscardData(pInstData);
 
@@ -197,7 +197,7 @@ void HyCreator::UpdateLoading()
 	{
 		while(m_LoadQueue_Retrieval.empty() == false)
 		{
-			IData *pData = m_LoadQueue_Retrieval.front();
+			IHyData *pData = m_LoadQueue_Retrieval.front();
 			m_LoadQueue_Retrieval.pop();
 
 			if(pData->GetType() != HYINST_Sound2d)
@@ -212,7 +212,7 @@ void HyCreator::UpdateLoading()
 	m_pGfxQueue_Retrieval = m_GfxCommsRef.Update_RetrieveData();
 	while(!m_pGfxQueue_Retrieval->empty())
 	{
-		IData *pData = m_pGfxQueue_Retrieval->front();
+		IHyData *pData = m_pGfxQueue_Retrieval->front();
 		m_pGfxQueue_Retrieval->pop();
 
 		if(pData->GetLoadState() == HYLOADSTATE_Queued)
@@ -222,7 +222,7 @@ void HyCreator::UpdateLoading()
 	}
 }
 
-void HyCreator::OnDataLoaded(IData *pData)
+void HyCreator::OnDataLoaded(IHyData *pData)
 {
 	bool bDataIsUsed = false;
 	for (vector<IObjInst2d *>::iterator iter = m_vQueuedInst2d.begin(); iter != m_vQueuedInst2d.end(); )
@@ -250,7 +250,7 @@ void HyCreator::OnDataLoaded(IData *pData)
 		DiscardData(pData);
 }
 
-void HyCreator::DiscardData(IData *pData)
+void HyCreator::DiscardData(IHyData *pData)
 {
 	HyAssert(pData->GetRefCount() <= 0, "HyCreator::DeleteData() tried to remove an IData with active references");
 
@@ -262,7 +262,7 @@ void HyCreator::DiscardData(IData *pData)
 		DeleteData(pData);
 }
 
-void HyCreator::DeleteData(IData *pData)
+void HyCreator::DeleteData(IHyData *pData)
 {
 	HyAssert(pData->GetRefCount() <= 0, "HyCreator::DeleteData() tried to delete an IData with active references");
 
@@ -438,7 +438,7 @@ void HyCreator::WriteDrawBuffers()
 /*static*/ void HyCreator::LoadingThread(void *pParam)
 {
 	LoadThreadCtrl *pLoadingCtrl = reinterpret_cast<LoadThreadCtrl *>(pParam);
-	vector<IData *>	vCurLoadData;
+	vector<IHyData *>	vCurLoadData;
 
 	while(true)
 	{

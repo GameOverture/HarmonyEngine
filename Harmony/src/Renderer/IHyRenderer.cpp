@@ -54,7 +54,7 @@ void IHyRenderer::ProcessGameMsgs()
 	// Handle each command message first. Which loads/unloads gfx resources.
 	while(!m_pMsgQueuePtr->empty())
 	{
-		IData *pData = m_pMsgQueuePtr->front();
+		IHyData *pData = m_pMsgQueuePtr->front();
 		m_pMsgQueuePtr->pop();
 
 		if(pData->GetLoadState() == HYLOADSTATE_Queued)

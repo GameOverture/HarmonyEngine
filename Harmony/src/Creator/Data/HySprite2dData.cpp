@@ -11,7 +11,7 @@
 
 #include "Renderer/IHyRenderer.h"
 
-HySprite2dData::HySprite2dData(const std::string &sPath) :	IData(HYINST_Spine2d, sPath)
+HySprite2dData::HySprite2dData(const std::string &sPath) :	IHyData(HYINST_Spine2d, sPath)
 {
 }
 

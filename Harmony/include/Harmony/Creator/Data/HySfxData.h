@@ -12,13 +12,13 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "IData.h"
+#include "IHyData.h"
 
 //#include "SFML/Audio.hpp"
 
 class HySound;
 
-class HySfxData : public IData
+class HySfxData : public IHyData
 {
 	friend class HyFactory<HySfxData>;
 

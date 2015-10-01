@@ -12,11 +12,11 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "IData.h"
+#include "IHyData.h"
 
 class HyMesh3d;
 
-class HyMesh3dData : public IData
+class HyMesh3dData : public IHyData
 {
 	friend class HyFactory<HyMesh3dData>;
 

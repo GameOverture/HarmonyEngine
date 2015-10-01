@@ -11,14 +11,14 @@
 #define __HyEnt2dData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Creator\Data\IData.h"
+#include "Creator\Data\IHyData.h"
 
 #include "Utilities/HySpineRuntime.h"
 
 class HyTexture;
 class IGfxApi;
 
-class HySpine2dData : public IData
+class HySpine2dData : public IHyData
 {
 	friend class HyFactory<HySpine2dData>;
 

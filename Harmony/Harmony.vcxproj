@@ -51,7 +51,6 @@
     <ClCompile Include="src\Creator\Data\HySprite2dData.cpp" />
     <ClCompile Include="src\Creator\Data\HyText2dData.cpp" />
     <ClCompile Include="src\Creator\Data\HyTexturedQuad2dData.cpp" />
-    <ClCompile Include="src\Creator\Data\IData.cpp" />
     <ClCompile Include="src\Creator\HyCreator.cpp" />
     <ClCompile Include="src\Creator\HyEntity2d.cpp" />
     <ClCompile Include="src\Creator\HyPhysEntity2d.cpp" />
@@ -120,7 +119,7 @@
     <ClInclude Include="include\Harmony\Creator\Data\HySprite2dData.h" />
     <ClInclude Include="include\Harmony\Creator\Data\HyText2dData.h" />
     <ClInclude Include="include\Harmony\Creator\Data\HyTexturedQuad2dData.h" />
-    <ClInclude Include="include\Harmony\Creator\Data\IData.h" />
+    <ClInclude Include="include\Harmony\Creator\Data\IHyData.h" />
     <ClInclude Include="include\Harmony\Creator\HyCreator.h" />
     <ClInclude Include="include\Harmony\Creator\HyEntity2d.h" />
     <ClInclude Include="include\Harmony\Creator\HyPhysEntity2d.h" />

@@ -11,7 +11,7 @@
 
 
 
-HySfxData::HySfxData(const std::string &sPath) : IData(HYINST_Sound2d, sPath)
+HySfxData::HySfxData(const std::string &sPath) : IHyData(HYINST_Sound2d, sPath)
 {
 }
 

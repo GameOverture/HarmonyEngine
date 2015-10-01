@@ -10,9 +10,9 @@
 #ifndef __HyTexturedQuad2dData_h__
 #define __HyTexturedQuad2dData_h__
 
-#include "Creator\Data\IData.h"
+#include "Creator\Data\IHyData.h"
 
-class HyTexturedQuad2dData : public IData
+class HyTexturedQuad2dData : public IHyData
 {
 	friend class HyFactory<HyTexturedQuad2dData>;
 

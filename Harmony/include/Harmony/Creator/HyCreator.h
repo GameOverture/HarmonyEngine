@@ -36,7 +36,7 @@ class HyMesh3d;
 class HyText2d;
 class HyPrimitive2d;
 
-class IData;
+class IHyData;
 class HySfxData;
 class HySprite2dData;
 class HySpine2dData;
@@ -66,8 +66,8 @@ class HyCreator
 	{
 		WaitEvent		m_WaitEvent_HasNewData;
 
-		queue<IData *> *m_pLoadQueue_Shared;
-		queue<IData *> *m_pLoadQueue_Retrieval;
+		queue<IHyData *> *m_pLoadQueue_Shared;
+		queue<IHyData *> *m_pLoadQueue_Retrieval;
 
 		BasicSection	m_csSharedQueue;
 		BasicSection	m_csRetrievalQueue;
@@ -106,11 +106,11 @@ class HyCreator
 	char *												m_pCurWritePos;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
-	queue<IData *>										m_LoadQueue_Prepare;
-	queue<IData *>										m_LoadQueue_Shared;
-	queue<IData *>										m_LoadQueue_Retrieval;
+	queue<IHyData *>										m_LoadQueue_Prepare;
+	queue<IHyData *>										m_LoadQueue_Shared;
+	queue<IHyData *>										m_LoadQueue_Retrieval;
 
-	queue<IData *> *									m_pGfxQueue_Retrieval;
+	queue<IHyData *> *									m_pGfxQueue_Retrieval;
 
 	// Loading thread info pointer
 	ThreadInfoPtr										m_pLoadingThread;
@@ -136,9 +136,9 @@ private:
 	void PostUpdate();
 
 	void UpdateLoading();
-	void OnDataLoaded(IData *pData);
-	void DiscardData(IData *pData);
-	void DeleteData(IData *pData);
+	void OnDataLoaded(IHyData *pData);
+	void DiscardData(IHyData *pData);
+	void DeleteData(IHyData *pData);
 	
 	void WriteDrawBuffers();
 	

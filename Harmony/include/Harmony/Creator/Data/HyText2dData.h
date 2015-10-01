@@ -11,7 +11,7 @@
 #define __HyText2dData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Creator/Data/IData.h"
+#include "Creator/Data/IHyData.h"
 
 #include <map>
 using std::map;
@@ -21,7 +21,7 @@ struct _texture_glyph_t;
 
 class HyText2d;
 
-class HyText2dData : public IData
+class HyText2dData : public IHyData
 {
 	friend class HyFactory<HyText2dData>;
 

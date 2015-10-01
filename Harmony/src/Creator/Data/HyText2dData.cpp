@@ -12,7 +12,7 @@
 
 #include "freetype-gl/freetype-gl.h"
 
-HyText2dData::HyText2dData(const std::string &sPath) :	IData(HYINST_Text2d, sPath)
+HyText2dData::HyText2dData(const std::string &sPath) :	IHyData(HYINST_Text2d, sPath)
 {
 }
 

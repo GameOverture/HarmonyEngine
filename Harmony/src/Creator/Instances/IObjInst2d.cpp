@@ -26,7 +26,7 @@
  *     distribution. 
  *********************************************************************************/
 #include "Creator/Instances/IObjInst2d.h"
-#include "Creator/Data/IData.h"
+#include "Creator/Data/IHyData.h"
 
 #include "FileIO/HyFileIO.h"
 
@@ -125,7 +125,7 @@ void IObjInst2d::SetDisplayOrder(float fOrderValue)
 	sm_pCtor->SetInstOrderingDirty();
 }
 
-void IObjInst2d::SetData(IData *pData)
+void IObjInst2d::SetData(IHyData *pData)
 {
 	m_pDataPtr = pData;
 	

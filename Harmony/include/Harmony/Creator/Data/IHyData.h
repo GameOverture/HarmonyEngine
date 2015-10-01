@@ -19,7 +19,7 @@
 // Forward declarations
 class IHyRenderer;
 
-class IData
+class IHyData
 {
 protected:
 	const HyInstanceType			m_keDataType;
@@ -29,13 +29,13 @@ protected:
 	int32							m_iRefCount;
 
 public:
-	IData(HyInstanceType eDataType, const std::string &sPath) :	m_keDataType(eDataType),
+	IHyData(HyInstanceType eDataType, const std::string &sPath) :	m_keDataType(eDataType),
 																m_ksPath(sPath),
 																m_eLoadState(HYLOADSTATE_Inactive),
 																m_iRefCount(0)
 	{ }
 
-	virtual ~IData(void)
+	virtual ~IHyData(void)
 	{ }
 
 	HyInstanceType GetType()							{ return m_keDataType; }

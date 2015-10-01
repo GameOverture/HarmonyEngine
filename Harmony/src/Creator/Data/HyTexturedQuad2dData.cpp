@@ -12,7 +12,7 @@
 #include "Renderer/IHyRenderer.h"
 
 
-HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath) : IData(HYINST_TexturedQuad2d, sPath)
+HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath) : IHyData(HYINST_TexturedQuad2d, sPath)
 {
 }
 

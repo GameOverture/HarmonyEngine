@@ -10,7 +10,7 @@
 #include "Creator/Data/HySpine2dData.h"
 #include "Renderer/IHyRenderer.h"
 
-HySpine2dData::HySpine2dData(const std::string &sPath) :	IData(HYINST_Spine2d, sPath)
+HySpine2dData::HySpine2dData(const std::string &sPath) :	IHyData(HYINST_Spine2d, sPath)
 {
 	
 }

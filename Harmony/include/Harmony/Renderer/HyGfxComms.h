@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Creator/Data/IData.h"
+#include "Creator/Data/IHyData.h"
 #include "Threading/BasicSync.h"
 
 #include <vector>
@@ -59,13 +59,13 @@ private:
 	char *						m_pBuffer_Shared;
 	char *						m_pBuffer_Render;
 
-	queue<IData *> *			m_pSendMsg_Update;
-	queue<IData *> *			m_pSendMsg_Shared;
-	queue<IData *> *			m_pSendMsg_Render;
+	queue<IHyData *> *			m_pSendMsg_Update;
+	queue<IHyData *> *			m_pSendMsg_Shared;
+	queue<IHyData *> *			m_pSendMsg_Render;
 
-	queue<IData *> *			m_pReceiveData_Update;
-	queue<IData *> *			m_pReceiveData_Shared;
-	queue<IData *> *			m_pReceiveData_Render;
+	queue<IHyData *> *			m_pReceiveData_Update;
+	queue<IHyData *> *			m_pReceiveData_Shared;
+	queue<IHyData *> *			m_pReceiveData_Render;
 
 	BasicSection				m_csBuffers;
 	BasicSection				m_csInfo;
@@ -85,16 +85,16 @@ public:
 	inline char *GetWriteBufferPtr()		{ return m_pBuffer_Update; }
 
 	// This should only be invoked from the Update/Game thread
-	void Update_SendData(IData *pMsg)		{ m_pSendMsg_Update->push(pMsg); }
+	void Update_SendData(IHyData *pMsg)		{ m_pSendMsg_Update->push(pMsg); }
 
 	// This should only be invoked from the Update/Game thread
-	queue<IData *> *Update_RetrieveData()	{ return m_pReceiveData_Update; }
+	queue<IHyData *> *Update_RetrieveData()	{ return m_pReceiveData_Update; }
 
 	// This should only be invoked from the Update/Game thread
 	void Update_SetSharedPtrs();
 
 	// This should only be invoked from the Render thread
-	bool Render_GetSharedPtrs(queue<IData *> *&pMsgQueuePtr, queue<IData *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr);
+	bool Render_GetSharedPtrs(queue<IHyData *> *&pMsgQueuePtr, queue<IHyData *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr);
 	
 private:
 

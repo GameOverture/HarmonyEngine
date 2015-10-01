@@ -25,13 +25,13 @@ HyGfxComms::HyGfxComms()
 	m_pBuffer_Render = new char[RENDER_BUFFER_SIZE];
 	memset(m_pBuffer_Render, 0, RENDER_BUFFER_SIZE);
 
-	m_pSendMsg_Update = new queue<IData *>();
-	m_pSendMsg_Shared = new queue<IData *>();
-	m_pSendMsg_Render = new queue<IData *>();
+	m_pSendMsg_Update = new queue<IHyData *>();
+	m_pSendMsg_Shared = new queue<IHyData *>();
+	m_pSendMsg_Render = new queue<IHyData *>();
 
-	m_pReceiveData_Update = new queue<IData *>();
-	m_pReceiveData_Shared = new queue<IData *>();
-	m_pReceiveData_Render = new queue<IData *>();
+	m_pReceiveData_Update = new queue<IHyData *>();
+	m_pReceiveData_Shared = new queue<IHyData *>();
+	m_pReceiveData_Render = new queue<IHyData *>();
 }
 
 HyGfxComms::~HyGfxComms()
@@ -72,7 +72,7 @@ void HyGfxComms::Update_SetSharedPtrs()
 {
 	LockBuffers();
 
-	queue<IData *> *pTmpQueue = m_pSendMsg_Shared;
+	queue<IHyData *> *pTmpQueue = m_pSendMsg_Shared;
 	m_pSendMsg_Shared = m_pSendMsg_Update;
 	m_pSendMsg_Update = pTmpQueue;
 
@@ -88,7 +88,7 @@ void HyGfxComms::Update_SetSharedPtrs()
 }
 
 // This should only be invoked from the Render thread
-bool HyGfxComms::Render_GetSharedPtrs(queue<IData *> *&pMsgQueuePtr, queue<IData *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr)
+bool HyGfxComms::Render_GetSharedPtrs(queue<IHyData *> *&pMsgQueuePtr, queue<IHyData *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr)
 {
 	LockBuffers();
 
@@ -101,7 +101,7 @@ bool HyGfxComms::Render_GetSharedPtrs(queue<IData *> *&pMsgQueuePtr, queue<IData
 	}
 
 	// Message queues
-	queue<IData *> *pTmpQueue = m_pSendMsg_Render;
+	queue<IHyData *> *pTmpQueue = m_pSendMsg_Render;
 	m_pSendMsg_Render = m_pSendMsg_Shared;
 	m_pSendMsg_Shared = pTmpQueue;
 	pMsgQueuePtr =  m_pSendMsg_Render;

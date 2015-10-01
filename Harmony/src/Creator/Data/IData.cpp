@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Creator/Data/IData.h"
+#include "Creator/Data/IHyData.h"
 
 #include <algorithm>
 

@@ -12,9 +12,9 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Creator/Data/IData.h"
+#include "Creator/Data/IHyData.h"
 
-class HySprite2dData : public IData
+class HySprite2dData : public IHyData
 {
 	friend class HyFactory<HySprite2dData>;
 

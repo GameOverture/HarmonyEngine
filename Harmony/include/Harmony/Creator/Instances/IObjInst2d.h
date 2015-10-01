@@ -28,7 +28,7 @@ protected:
 	HyRenderState				m_RenderState;
 
 	// Data loading
-	IData *						m_pDataPtr;
+	IHyData *						m_pDataPtr;
 	HyLoadState					m_eLoadState;
 
 	// Scene graph hierarchy 
@@ -84,9 +84,9 @@ protected:
 	virtual void WriteDrawBufferData(char *&pRefDataWritePos) = 0;
 
 private:
-	void SetData(IData *pData);
+	void SetData(IHyData *pData);
 	void SetLoaded();
-	IData *GetData()											{ return m_pDataPtr; }
+	IHyData *GetData()											{ return m_pDataPtr; }
 
 	void SetDirty();
 	static void OnDirty(void *);
