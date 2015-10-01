@@ -15,13 +15,13 @@
 /*static*/ HyCreator *IHyInst2d::sm_pCtor = NULL;
 
 IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName) :	m_keInstType(eInstType),
-																								m_ksPath(HyFileIO::GetFilePath(m_keInstType, szPrefix, szName))
+																							m_ksPath(HyFileIO::GetFilePath(m_keInstType, szPrefix, szName))
 {
 	CtorInit();
 }
 
 IHyInst2d::IHyInst2d(HyInstanceType eInstType, uint32 uiTextureIndex) :	m_keInstType(eInstType),
-																			m_ksPath(std::to_string(uiTextureIndex))
+																		m_ksPath(std::to_string(uiTextureIndex))
 {
 	CtorInit();
 }

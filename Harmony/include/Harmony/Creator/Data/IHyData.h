@@ -30,9 +30,9 @@ protected:
 
 public:
 	IHyData(HyInstanceType eDataType, const std::string &sPath) :	m_keDataType(eDataType),
-																m_ksPath(sPath),
-																m_eLoadState(HYLOADSTATE_Inactive),
-																m_iRefCount(0)
+																	m_ksPath(sPath),
+																	m_eLoadState(HYLOADSTATE_Inactive),
+																	m_iRefCount(0)
 	{ }
 
 	virtual ~IHyData(void)

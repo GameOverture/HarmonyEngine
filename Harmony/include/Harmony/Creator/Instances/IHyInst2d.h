@@ -28,14 +28,14 @@ protected:
 	HyRenderState				m_RenderState;
 
 	// Data loading
-	IHyData *						m_pDataPtr;
+	IHyData *					m_pDataPtr;
 	HyLoadState					m_eLoadState;
 
 	// Scene graph hierarchy 
-	IHyInst2d *				m_pParent;
+	IHyInst2d *					m_pParent;
 	bool						m_bDirty;
 	mat4						m_mtxCached;
-	vector<IHyInst2d *>		m_vChildList;
+	vector<IHyInst2d *>			m_vChildList;
 
 	// Attributes
 	bool						m_bEnabled;
