@@ -1,5 +1,5 @@
 /**************************************************************************
- *	IObjInst2d.h
+ *	IHyInst2d.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __IObjInst2d_h__
-#define __IObjInst2d_h__
+#ifndef __IHyInst2d_h__
+#define __IHyInst2d_h__
 
 #include "Creator/HyEntity2d.h"
 #include "Creator/Data/HyFactory.h"
@@ -16,7 +16,7 @@
 #include "Utilities/Animation/HyAnimVec4.h"
 #include "Renderer/HyRenderState.h"
 
-class IObjInst2d : public ITransform<HyAnimVec2>
+class IHyInst2d : public ITransform<HyAnimVec2>
 {
 	friend class HyCreator;
 	static HyCreator *			sm_pCtor;
@@ -32,10 +32,10 @@ protected:
 	HyLoadState					m_eLoadState;
 
 	// Scene graph hierarchy 
-	IObjInst2d *				m_pParent;
+	IHyInst2d *				m_pParent;
 	bool						m_bDirty;
 	mat4						m_mtxCached;
-	vector<IObjInst2d *>		m_vChildList;
+	vector<IHyInst2d *>		m_vChildList;
 
 	// Attributes
 	bool						m_bEnabled;
@@ -44,9 +44,9 @@ protected:
 	int32						m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 
 public:
-	IObjInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName);
-	IObjInst2d(HyInstanceType eInstType, uint32 uiTextureIndex);
-	virtual ~IObjInst2d(void);
+	IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName);
+	IHyInst2d(HyInstanceType eInstType, uint32 uiTextureIndex);
+	virtual ~IHyInst2d(void);
 
 	void CtorInit();
 
@@ -73,7 +73,7 @@ public:
 	void Unload();
 	void GetWorldTransform(mat4 &outMtx);
 	
-	void AddChild(IObjInst2d &childInst);
+	void AddChild(IHyInst2d &childInst);
 	void Detach();
 	
 protected:
@@ -92,4 +92,4 @@ private:
 	static void OnDirty(void *);
 };
 
-#endif /* __IObjInst2d_h__ */
+#endif /* __IHyInst2d_h__ */

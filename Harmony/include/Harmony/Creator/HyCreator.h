@@ -28,7 +28,7 @@ using std::queue;
 using std::map;
 
 // Forward declarations
-class IObjInst2d;
+class IHyInst2d;
 
 class HySound;
 class HySpine2d;
@@ -95,10 +95,10 @@ class HyCreator
 
 	// Pointers to all instances
 	bool												m_bInst2dOrderingDirty;
-	vector<IObjInst2d *>								m_vQueuedInst2d;
-	vector<IObjInst2d *>								m_vLoadedInst2d;
+	vector<IHyInst2d *>								m_vQueuedInst2d;
+	vector<IHyInst2d *>								m_vLoadedInst2d;
 
-	vector<IObjInst2d *>								m_vInst3d;
+	vector<IHyInst2d *>								m_vInst3d;
 
 	vector<HyAnimFloat *>								m_vActiveAnimFloats;
 
@@ -128,8 +128,8 @@ public:
 
 	void InsertActiveAnimFloat(HyAnimFloat *pAnimFloat);
 
-	void LoadInst2d(IObjInst2d *pInst);
-	void RemoveInst(IObjInst2d *pInst);
+	void LoadInst2d(IHyInst2d *pInst);
+	void RemoveInst(IHyInst2d *pInst);
 
 private:
 	void PreUpdate();
@@ -143,7 +143,7 @@ private:
 	void WriteDrawBuffers();
 	
 	static void LoadingThread(void *pParam);
-	static bool Inst2dSortPredicate(const IObjInst2d *pInst1, const IObjInst2d *pInst2);
+	static bool Inst2dSortPredicate(const IHyInst2d *pInst1, const IHyInst2d *pInst2);
 };
 
 #endif /* __HyCreator_h__ */

@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Creator/Instances/HyTexturedQuad2d.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiTextureIndex) : IObjInst2d(HYINST_TexturedQuad2d, uiTextureIndex)
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiTextureIndex) : IHyInst2d(HYINST_TexturedQuad2d, uiTextureIndex)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::SHADER_QUADBATCH);
 	m_RenderState.SetNumInstances(1);

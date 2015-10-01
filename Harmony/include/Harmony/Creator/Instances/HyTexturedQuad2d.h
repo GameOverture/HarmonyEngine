@@ -11,12 +11,12 @@
 #define __HyTexturedQuad2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Creator/Instances/IObjInst2d.h"
+#include "Creator/Instances/IHyInst2d.h"
 #include "Creator/Data/HyTexturedQuad2dData.h"
 
 #include "FileIO/Atlas/HyTexture.h"
 
-class HyTexturedQuad2d : public IObjInst2d
+class HyTexturedQuad2d : public IHyInst2d
 {
 public:
 	HyTexturedQuad2d(uint32 uiTextureIndex);

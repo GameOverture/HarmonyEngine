@@ -10,7 +10,7 @@
 #ifndef __HySound_h__
 #define __HySound_h__
 
-#include "IObjInst2d.h"
+#include "IHyInst2d.h"
 
 #include "Creator/Data/HySfxData.h"
 

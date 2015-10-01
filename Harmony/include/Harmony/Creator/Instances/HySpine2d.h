@@ -12,12 +12,12 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "IObjInst2d.h"
+#include "IHyInst2d.h"
 #include "Utilities/HySpineRuntime.h"
 
 #include "Creator/Data/HySpine2dData.h"
 
-class HySpine2d : public IObjInst2d
+class HySpine2d : public IHyInst2d
 {
 	spSkeleton*				m_pSpineSkeleton;
 	spAnimation **			m_ppSpineAnims;

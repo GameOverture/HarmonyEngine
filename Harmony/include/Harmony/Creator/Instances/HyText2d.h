@@ -10,11 +10,11 @@
 #ifndef __HyText2d_h__
 #define __HyText2d_h__
 
-#include "Creator/Instances/IObjInst2d.h"
+#include "Creator/Instances/IHyInst2d.h"
 
 #include "Creator/Data/HyText2dData.h"
 
-class HyText2d : public IObjInst2d
+class HyText2d : public IHyInst2d
 {
 	static HyChar		sm_pTempTextBuffer[HY_TEMP_TEXTBUFFER_SIZE];
 

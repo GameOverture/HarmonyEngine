@@ -10,9 +10,9 @@
 #ifndef __HyMesh3d_h__
 #define __HyMesh3d_h__
 
-#include "Creator/Instances/IObjInst2d.h"
+#include "Creator/Instances/IHyInst2d.h"
 
-class HyMesh3d : public IObjInst2d
+class HyMesh3d : public IHyInst2d
 {
 	
 public:

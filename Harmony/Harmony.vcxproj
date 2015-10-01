@@ -61,7 +61,7 @@
     <ClCompile Include="src\Creator\Instances\HySprite2d.cpp" />
     <ClCompile Include="src\Creator\Instances\HyText2d.cpp" />
     <ClCompile Include="src\Creator\Instances\HyTexturedQuad2d.cpp" />
-    <ClCompile Include="src\Creator\Instances\IObjInst2d.cpp" />
+    <ClCompile Include="src\Creator\Instances\IHyInst2d.cpp" />
     <ClCompile Include="src\FileIO\Atlas\HyAtlas.cpp" />
     <ClCompile Include="src\FileIO\Atlas\HyTexture.cpp" />
     <ClCompile Include="src\FileIO\HyFileIO.cpp" />
@@ -130,7 +130,7 @@
     <ClInclude Include="include\Harmony\Creator\Instances\HySprite2d.h" />
     <ClInclude Include="include\Harmony\Creator\Instances\HyText2d.h" />
     <ClInclude Include="include\Harmony\Creator\Instances\HyTexturedQuad2d.h" />
-    <ClInclude Include="include\Harmony\Creator\Instances\IObjInst2d.h" />
+    <ClInclude Include="include\Harmony\Creator\Instances\IHyInst2d.h" />
     <ClInclude Include="include\Harmony\FileIO\Atlas\HyAtlas.h" />
     <ClInclude Include="include\Harmony\FileIO\Atlas\HyTexture.h" />
     <ClInclude Include="include\Harmony\FileIO\HyFileIO.h" />

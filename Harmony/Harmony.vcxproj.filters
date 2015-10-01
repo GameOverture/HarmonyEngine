@@ -104,9 +104,6 @@
     <ClCompile Include="src\Renderer\HyGfxComms.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Creator\Instances\IObjInst2d.cpp">
-      <Filter>Creator\Instances</Filter>
-    </ClCompile>
     <ClCompile Include="src\Creator\Data\HySprite2dData.cpp">
       <Filter>Creator\Data</Filter>
     </ClCompile>
@@ -185,6 +182,9 @@
     </ClCompile>
     <ClCompile Include="src\Input\IHyInputMap.cpp">
       <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Creator\Instances\IHyInst2d.cpp">
+      <Filter>Creator\Instances</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -440,9 +440,6 @@
     <ClInclude Include="include\Harmony\Renderer\HyGfxComms.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\Instances\IObjInst2d.h">
-      <Filter>Creator\Instances</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Creator\Data\HySprite2dData.h">
       <Filter>Creator\Data</Filter>
     </ClInclude>
@@ -533,6 +530,9 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Creator\Data\IHyData.h">
       <Filter>Creator\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Creator\Instances\IHyInst2d.h">
+      <Filter>Creator\Instances</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

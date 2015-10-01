@@ -21,7 +21,7 @@
 using std::vector;
 
 // Forward declarations
-class IObjInst2d;
+class IHyInst2d;
 class HySprite2d;
 class HySpine2d;
 class HyText2d;
@@ -37,7 +37,7 @@ class HyEntity2d : public ITransform<HyAnimVec2>
 	bool							m_bDirty;
 	mat4							m_mtxCached;
 
-	vector<IObjInst2d *>			m_vInstList;
+	vector<IHyInst2d *>			m_vInstList;
 	vector<HyEntity2d *>			m_vChildNodes;
 
 	// Hidden ctor used within AddChild()
@@ -49,7 +49,7 @@ public:
 
 	void CtorInit();
 
-	IObjInst2d *Set(HyInstanceType eType, const char *szPrefix, const char *szName);
+	IHyInst2d *Set(HyInstanceType eType, const char *szPrefix, const char *szName);
 	HySprite2d *SetSprite(const char *szPrefix, const char *szName);
 	HySpine2d *SetSpine(const char *szPrefix, const char *szName);
 	HyText2d *SetText(const char *szPrefix, const char *szName);
@@ -60,7 +60,7 @@ public:
 	HyText2d *GetText();
 	HyPrimitive2d *GetPrimitive();
 
-	bool Remove(IObjInst2d *pInst);
+	bool Remove(IHyInst2d *pInst);
 	void Clear(bool bClearChildren);
 
 	HyEntity2d *GetParent()						{ return m_kpParent; }
@@ -74,9 +74,9 @@ public:
 private:
 	virtual void Update();
 
-	void LinkInst(IObjInst2d *pInst);
+	void LinkInst(IHyInst2d *pInst);
 
-	void Erase(vector<IObjInst2d *>::iterator &iterRef);
+	void Erase(vector<IHyInst2d *>::iterator &iterRef);
 	void SetDirty();
 	static void OnDirty(void *);
 };

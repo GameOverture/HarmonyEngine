@@ -11,11 +11,11 @@
 #define __HyPrimitive2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Creator/Instances/IObjInst2d.h"
+#include "Creator/Instances/IHyInst2d.h"
 
 class HyTexture;
 
-class HyPrimitive2d : public IObjInst2d
+class HyPrimitive2d : public IHyInst2d
 {
 	vec4 *			m_pVertices;
 	uint32			m_uiNumVerts;

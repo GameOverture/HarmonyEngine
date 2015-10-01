@@ -11,12 +11,12 @@
 #define __HySprite2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Creator/Instances/IObjInst2d.h"
+#include "Creator/Instances/IHyInst2d.h"
 #include "Creator/Data/HySprite2dData.h"
 
 #include "Utilities/HyMath.h"
 
-class HySprite2d : public IObjInst2d
+class HySprite2d : public IHyInst2d
 {
 	// Array of BYTE's where each BYTE describes how each animation state is supposed to play
 	enum eStateAttribs

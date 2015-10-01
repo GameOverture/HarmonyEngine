@@ -50,11 +50,11 @@ void HyEntity2d::Update()
 	
 }
 
-IObjInst2d *HyEntity2d::Set(HyInstanceType eType, const char *szPrefix, const char *szName)
+IHyInst2d *HyEntity2d::Set(HyInstanceType eType, const char *szPrefix, const char *szName)
 {
 	HyAssert(sm_pCtor, "HyEntity2d::Set() cannot be used before IGame::Initialize() is invoked.");
 
-	IObjInst2d *pNewInst = NULL;
+	IHyInst2d *pNewInst = NULL;
 	switch(eType)
 	{
 	case HYINST_Sprite2d:	pNewInst = new HySprite2d(szPrefix, szName);	break;
@@ -141,7 +141,7 @@ HyPrimitive2d *HyEntity2d::GetPrimitive()
 	return NULL;
 }
 
-void HyEntity2d::LinkInst(IObjInst2d *pInst)
+void HyEntity2d::LinkInst(IHyInst2d *pInst)
 {
 	//// TODO: fix this code. Handle default more eloquently
 	//if(GetCoordinateType() == HYCOORD_Default && HyCreator::DefaultCoordinateType() != HYCOORD_Default)
@@ -155,11 +155,11 @@ void HyEntity2d::LinkInst(IObjInst2d *pInst)
 	//m_vInstList.push_back(pInst);
 }
 
-bool HyEntity2d::Remove(IObjInst2d *pInst)
+bool HyEntity2d::Remove(IHyInst2d *pInst)
 {
 	HyAssert(sm_pCtor, "HyEntity2d::Remove() cannot be used before IGame::Initialize() is invoked.");
 	
-	for (vector<IObjInst2d *>::iterator iter = m_vInstList.begin(); iter != m_vInstList.end(); ++iter)
+	for (vector<IHyInst2d *>::iterator iter = m_vInstList.begin(); iter != m_vInstList.end(); ++iter)
 	{
 		if((*iter) == pInst)
 		{
@@ -205,7 +205,7 @@ void HyEntity2d::RemoveChild(HyEntity2d *pEnt2d)
 	}
 }
 
-void HyEntity2d::Erase(vector<IObjInst2d *>::iterator &iterRef)
+void HyEntity2d::Erase(vector<IHyInst2d *>::iterator &iterRef)
 {
 	//sm_pCtor->RemoveInst((*iterRef));
 	//(*iterRef)->RemoveParent();

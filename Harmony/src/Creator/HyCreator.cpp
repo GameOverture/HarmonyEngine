@@ -13,7 +13,7 @@
 #include "Renderer/HyGfxComms.h"
 #include "Renderer/Viewport/HyViewport.h"
 
-#include "Creator/Instances/IObjInst2d.h"
+#include "Creator/Instances/IHyInst2d.h"
 #include "Creator/Instances/HySound.h"
 #include "Creator/Instances/HySprite2d.h"
 #include "Creator/Instances/HySpine2d.h"
@@ -53,7 +53,7 @@ HyCreator::HyCreator(HyGfxComms &gfxCommsRef, HyViewport &gameViewport, HyCoordi
 
 	// Link HyCreator to all classes that access it
 	HyPhysEntity2d::sm_b2WorldRef = &m_b2World;
-	IObjInst2d::sm_pCtor = this;
+	IHyInst2d::sm_pCtor = this;
 	HyAnimFloat::sm_pCtor = this;
 
 	// Start up Loading thread
@@ -71,7 +71,7 @@ void HyCreator::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
 	m_vActiveAnimFloats.push_back(pAnimFloat);
 }
 
-void HyCreator::LoadInst2d(IObjInst2d *pInst)
+void HyCreator::LoadInst2d(IHyInst2d *pInst)
 {
 	IHyData *pLoadData = NULL;
 	switch(pInst->GetInstType())
@@ -113,12 +113,12 @@ void HyCreator::LoadInst2d(IObjInst2d *pInst)
 	}
 }
 
-void HyCreator::RemoveInst(IObjInst2d *pInst)
+void HyCreator::RemoveInst(IHyInst2d *pInst)
 {
 	switch(pInst->GetLoadState())
 	{
 	case HYLOADSTATE_Loaded:
-		for(vector<IObjInst2d *>::iterator it = m_vLoadedInst2d.begin(); it != m_vLoadedInst2d.end(); ++it)
+		for(vector<IHyInst2d *>::iterator it = m_vLoadedInst2d.begin(); it != m_vLoadedInst2d.end(); ++it)
 		{
 			if((*it) == pInst)
 			{
@@ -134,7 +134,7 @@ void HyCreator::RemoveInst(IObjInst2d *pInst)
 		break;
 
 	case HYLOADSTATE_Queued:
-		for(vector<IObjInst2d *>::iterator it = m_vQueuedInst2d.begin(); it != m_vQueuedInst2d.end(); ++it)
+		for(vector<IHyInst2d *>::iterator it = m_vQueuedInst2d.begin(); it != m_vQueuedInst2d.end(); ++it)
 		{
 			if((*it) == pInst)
 			{
@@ -225,7 +225,7 @@ void HyCreator::UpdateLoading()
 void HyCreator::OnDataLoaded(IHyData *pData)
 {
 	bool bDataIsUsed = false;
-	for (vector<IObjInst2d *>::iterator iter = m_vQueuedInst2d.begin(); iter != m_vQueuedInst2d.end(); )
+	for (vector<IHyInst2d *>::iterator iter = m_vQueuedInst2d.begin(); iter != m_vQueuedInst2d.end(); )
 	{
 		if((*iter)->GetData() == pData)
 		{
@@ -475,7 +475,7 @@ void HyCreator::WriteDrawBuffers()
 	}
 }
 
-/*static*/ bool HyCreator::Inst2dSortPredicate(const IObjInst2d *pInst1, const IObjInst2d *pInst2)
+/*static*/ bool HyCreator::Inst2dSortPredicate(const IHyInst2d *pInst1, const IHyInst2d *pInst2)
 {
 	// TODO: Below is commented out because std::sort expects less-than operator to supply a transitive relationship, 
 	//		 i.e. when the sort sees A < B is true and B < C is true, it implies that A < C is true as well.

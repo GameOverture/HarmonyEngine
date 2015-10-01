@@ -13,7 +13,7 @@
 
 #include "Time/IHyTime.h"
 
-HySpine2d::HySpine2d(const char *szPrefix, const char *szName) :	IObjInst2d(HYINST_Spine2d, szPrefix, szName),
+HySpine2d::HySpine2d(const char *szPrefix, const char *szName) :	IHyInst2d(HYINST_Spine2d, szPrefix, szName),
 											m_pSpineSkeleton(NULL),
 											m_ppSpineAnims(NULL),
 											m_ppAnimStates(NULL),
