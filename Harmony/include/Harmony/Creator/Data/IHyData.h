@@ -1,5 +1,5 @@
 /**************************************************************************
- *	IData.h
+ *	IHyData.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __IData_h__
-#define __IData_h__
+#ifndef __IHyData_h__
+#define __IHyData_h__
 
 #include "Utilities/HyStrManip.h"
 #include "Utilities/Animation/HyAnimVec2.h"
@@ -62,4 +62,4 @@ public:
 	virtual void OnGfxRemove(IHyRenderer &gfxApi) = 0;
 };
 
-#endif /* __IData_h__ */
+#endif /* __IHyData_h__ */
