@@ -45,6 +45,7 @@ class HyCreator
 
 	static HyCoordinateType								sm_eDefaultCoordType;
 	static float										sm_fPixelsPerMeter;
+	static bool											sm_bInst2dOrderingDirty;
 
 	b2World												m_b2World;
 	int32												m_iPhysVelocityIterations;
@@ -56,7 +57,6 @@ class HyCreator
 	HyViewport &										m_ViewportRef;
 
 	// Pointers to all instances
-	bool												m_bInst2dOrderingDirty;
 	
 	vector<IHyInst2d *>								m_vLoadedInst2d;
 
@@ -73,10 +73,13 @@ public:
 
 	static float PixelsPerMeter()					{ return sm_fPixelsPerMeter; }
 	static HyCoordinateType DefaultCoordinateType()	{ return sm_eDefaultCoordType; }
+	static void SetInstOrderingDirty()				{ sm_bInst2dOrderingDirty = true; }
+
+	void AddInstance(IHyInst2d *pInst);
+	void RemoveInst(IHyInst2d *pInst);
 
 	void DebugDrawPhysics2d(bool bDraw)				{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
 
-	void SetInstOrderingDirty()						{ m_bInst2dOrderingDirty = true; }
 
 	void InsertActiveAnimFloat(HyAnimFloat *pAnimFloat);
 

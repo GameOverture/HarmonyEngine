@@ -23,6 +23,8 @@
 
 class IHyInst2d : public ITransform<HyAnimVec2>
 {
+	friend class HyCreator;
+
 	friend class IHyFileIO;
 	static IHyFileIO *			sm_pCtor;
 

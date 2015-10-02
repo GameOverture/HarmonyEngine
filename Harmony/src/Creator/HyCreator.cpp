@@ -27,13 +27,13 @@
 
 HyCoordinateType	HyCreator::sm_eDefaultCoordType = HYCOORD_Default;
 float				HyCreator::sm_fPixelsPerMeter = 0.0f;
+bool				HyCreator::sm_bInst2dOrderingDirty = false;
 
 HyCreator::HyCreator(HyGfxComms &gfxCommsRef, HyViewport &gameViewport, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter) :	m_b2World(b2Vec2(0.0f, -10.0f)),
 																																		m_iPhysVelocityIterations(8),
 																																		m_iPhysPositionIterations(3),
 																																		m_GfxCommsRef(gfxCommsRef),
-																																		m_ViewportRef(gameViewport),
-																																		m_bInst2dOrderingDirty(false)
+																																		m_ViewportRef(gameViewport)
 {
 	sm_eDefaultCoordType = eDefaultCoordType;
 	sm_fPixelsPerMeter = fPixelsPerMeter;
@@ -51,6 +51,25 @@ HyCreator::HyCreator(HyGfxComms &gfxCommsRef, HyViewport &gameViewport, HyCoordi
 
 HyCreator::~HyCreator(void)
 {
+}
+
+void HyCreator::AddInstance(IHyInst2d *pInst)
+{
+	m_vLoadedInst2d.push_back(pInst);
+	sm_bInst2dOrderingDirty = true;
+}
+
+void HyCreator::RemoveInst(IHyInst2d *pInst)
+{
+	for(vector<IHyInst2d *>::iterator it = m_vLoadedInst2d.begin(); it != m_vLoadedInst2d.end(); ++it)
+	{
+		if((*it) == pInst)
+		{
+			// TODO: Log about erasing instance
+			m_vLoadedInst2d.erase(it);
+			break;
+		}
+	}
 }
 
 void HyCreator::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
@@ -80,10 +99,10 @@ void HyCreator::PreUpdate()
 
 void HyCreator::PostUpdate()
 {
-	if(m_bInst2dOrderingDirty)
+	if(sm_bInst2dOrderingDirty)
 	{
 		std::sort(m_vLoadedInst2d.begin(), m_vLoadedInst2d.end(), &Inst2dSortPredicate);
-		m_bInst2dOrderingDirty = false;
+		sm_bInst2dOrderingDirty = false;
 	}
 
 	WriteDrawBuffers();

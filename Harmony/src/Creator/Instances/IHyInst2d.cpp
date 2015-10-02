@@ -103,8 +103,7 @@ void IHyInst2d::SetDisplayOrder(float fOrderValue)
 {
 	m_fDisplayOrder = fOrderValue;
 
-	HyAssert(sm_pCtor, "IObjInst2d::SetDisplayOrder() cannot be used before IGame::Initialize() is invoked.");
-	sm_pCtor->SetInstOrderingDirty();
+	HyCreator::SetInstOrderingDirty();
 }
 
 void IHyInst2d::SetData(IHyData *pData)

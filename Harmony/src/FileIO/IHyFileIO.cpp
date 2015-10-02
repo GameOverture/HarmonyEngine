@@ -17,13 +17,14 @@
 #include "FileIO/Data/HyText2dData.h"
 #include "FileIO/Data/HyTexturedQuad2dData.h"
 
-IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef) :	m_GfxCommsRef(gfxCommsRef),
-																			m_Sfx(HYINST_Sound2d),
-																			m_Sprite2d(HYINST_Sprite2d),
-																			m_Spine2d(HYINST_Spine2d),
-																			m_Txt2d(HYINST_Text2d),
-																			m_Mesh3d(HYINST_Mesh3d),
-																			m_Quad2d(HYINST_TexturedQuad2d)
+IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyCreator &sceneRef) :	m_GfxCommsRef(gfxCommsRef),
+																								m_SceneRef(sceneRef),
+																								m_Sfx(HYINST_Sound2d),
+																								m_Sprite2d(HYINST_Sprite2d),
+																								m_Spine2d(HYINST_Spine2d),
+																								m_Txt2d(HYINST_Text2d),
+																								m_Mesh3d(HYINST_Mesh3d),
+																								m_Quad2d(HYINST_TexturedQuad2d)
 {
 	//std::string sFilePath = sm_sDataDir;
 	//sFilePath += "Atlas/atlasInfo.json";
@@ -117,11 +118,10 @@ void IHyFileIO::LoadInst2d(IHyInst2d *pInst)
 	if(pLoadData == NULL || pLoadData->GetLoadState() == HYLOADSTATE_Loaded)
 	{
 		pInst->SetLoaded();
-		m_vLoadedInst2d.push_back(pInst);
-		m_bInst2dOrderingDirty = true;
-
 		if(pLoadData)
 			pLoadData->IncRef();
+
+		m_SceneRef.AddInstance(pInst);
 	}
 	else
 	{
@@ -137,22 +137,16 @@ void IHyFileIO::LoadInst2d(IHyInst2d *pInst)
 
 void IHyFileIO::RemoveInst(IHyInst2d *pInst)
 {
+	IHyData *pInstData = NULL;
+
 	switch(pInst->GetLoadState())
 	{
 	case HYLOADSTATE_Loaded:
-		for(vector<IHyInst2d *>::iterator it = m_vLoadedInst2d.begin(); it != m_vLoadedInst2d.end(); ++it)
-		{
-			if((*it) == pInst)
-			{
-				IHyData *pInstData = pInst->GetData();
-				if(pInstData && pInstData->DecRef())
-					DiscardData(pInstData);
+		m_SceneRef.RemoveInst(pInst);
 
-				// TODO: Log about erasing data
-				m_vLoadedInst2d.erase(it);
-				break;
-			}
-		}
+		pInstData = pInst->GetData();
+		if(pInstData && pInstData->DecRef())
+			DiscardData(pInstData);
 		break;
 
 	case HYLOADSTATE_Queued:
@@ -167,7 +161,7 @@ void IHyFileIO::RemoveInst(IHyInst2d *pInst)
 		break;
 
 	default:
-		HyError("HyCreator::RemoveInst() passed an invalid HyLoadState");
+		HyError("IHyFileIO::RemoveInst() passed an invalid HyLoadState");
 	}
 }
 
@@ -178,9 +172,9 @@ void IHyFileIO::OnDataLoaded(IHyData *pData)
 	{
 		if((*iter)->GetData() == pData)
 		{
-			pData->IncRef();
 			(*iter)->SetLoaded();
-			m_vLoadedInst2d.push_back(*iter);
+			pData->IncRef();
+			m_SceneRef.AddInstance(*iter);
 
 			bDataIsUsed = true;
 
@@ -191,18 +185,16 @@ void IHyFileIO::OnDataLoaded(IHyData *pData)
 	}
 
 	if(bDataIsUsed)
-	{
-		m_bInst2dOrderingDirty = true;
 		pData->SetLoadState(HYLOADSTATE_Loaded);
-	}
 	else
 		DiscardData(pData);
 }
 
 void IHyFileIO::DiscardData(IHyData *pData)
 {
-	HyAssert(pData->GetRefCount() <= 0, "HyCreator::DeleteData() tried to remove an IData with active references");
+	HyAssert(pData->GetRefCount() <= 0, "IHyFileIO::DiscardData() tried to remove an IData with active references");
 
+	// TODO: Log about erasing data
 	pData->SetLoadState(HYLOADSTATE_Discarded);
 
 	if(pData->GetType() != HYINST_Sound2d)
@@ -213,7 +205,7 @@ void IHyFileIO::DiscardData(IHyData *pData)
 
 void IHyFileIO::DeleteData(IHyData *pData)
 {
-	HyAssert(pData->GetRefCount() <= 0, "HyCreator::DeleteData() tried to delete an IData with active references");
+	HyAssert(pData->GetRefCount() <= 0, "IHyFileIO::DeleteData() tried to delete an IData with active references");
 
 	switch(pData->GetType())
 	{
