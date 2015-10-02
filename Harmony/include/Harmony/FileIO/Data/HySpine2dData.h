@@ -11,7 +11,7 @@
 #define __HyEnt2dData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Creator\Data\IHyData.h"
+#include "FileIO\Data\IHyData.h"
 
 #include "Utilities/HySpineRuntime.h"
 

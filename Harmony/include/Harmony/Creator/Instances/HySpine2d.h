@@ -15,7 +15,7 @@
 #include "IHyInst2d.h"
 #include "Utilities/HySpineRuntime.h"
 
-#include "Creator/Data/HySpine2dData.h"
+#include "FileIO/Data/HySpine2dData.h"
 
 class HySpine2d : public IHyInst2d
 {

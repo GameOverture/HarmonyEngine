@@ -7,8 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Creator/Data/HySfxData.h"
-
+#include "FileIO/Data/HySfxData.h"
 
 
 HySfxData::HySfxData(const std::string &sPath) : IHyData(HYINST_Sound2d, sPath)

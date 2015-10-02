@@ -11,6 +11,7 @@
 #define __HyPrimitive2d_h__
 
 #include "Afx/HyStdAfx.h"
+
 #include "Creator/Instances/IHyInst2d.h"
 
 class HyTexture;

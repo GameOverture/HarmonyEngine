@@ -8,11 +8,11 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *********************************************************************************/
 #include "Creator/Instances/IHyInst2d.h"
-#include "Creator/Data/IHyData.h"
 
-#include "FileIO/HyFileIO.h"
+#include "FileIO/Data/IHyData.h"
+#include "FileIO/IHyFileIO.h"
 
-/*static*/ HyCreator *IHyInst2d::sm_pCtor = NULL;
+/*static*/ IHyFileIO *IHyInst2d::sm_pCtor = NULL;
 
 IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName) :	m_keInstType(eInstType),
 																							m_ksPath(HyFileIO::GetFilePath(m_keInstType, szPrefix, szName))

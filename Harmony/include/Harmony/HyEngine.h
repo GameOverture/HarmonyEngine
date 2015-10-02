@@ -38,6 +38,7 @@ class HyEngine
 	HyTimeInterop			m_Time;
 	HyInputInterop			m_Input;
 	HyRendererInterop		m_Renderer;
+	HyFileIOInterop			m_FileIO;
 	HyAudio					m_Audio;
 
 	HyGfxComms				m_GfxBuffer;

@@ -11,7 +11,8 @@
 #define __HyText2dData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Creator/Data/IHyData.h"
+
+#include "FileIO/Data/IHyData.h"
 
 #include <map>
 using std::map;

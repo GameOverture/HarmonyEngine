@@ -24,7 +24,7 @@ class HyDebugPhys2d : public b2Draw
 {
 	bool					m_bDrawEnabled;
 
-	vector<HyEntity2d *>	m_vDrawInsts;
+	//vector<HyEntity2d *>	m_vDrawInsts;
 
 public:
 	HyDebugPhys2d(void);
@@ -35,8 +35,8 @@ public:
 
 	void Reset();
 
-	size_t GetNumPhysDraws()					{ return m_vDrawInsts.size(); }
-	HyEntity2d *GetInstPtr(int32 iIndex)		{ return m_vDrawInsts[iIndex]; }
+	//size_t GetNumPhysDraws()					{ return m_vDrawInsts.size(); }
+	//HyEntity2d *GetInstPtr(int32 iIndex)		{ return m_vDrawInsts[iIndex]; }
 
 	/// Draw a closed polygon provided in CCW order.
 	virtual void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);

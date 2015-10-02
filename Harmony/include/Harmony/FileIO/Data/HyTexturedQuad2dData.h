@@ -10,7 +10,10 @@
 #ifndef __HyTexturedQuad2dData_h__
 #define __HyTexturedQuad2dData_h__
 
-#include "Creator\Data\IHyData.h"
+#include "Afx/HyStdAfx.h"
+
+#include "FileIO\Data\IHyData.h"
+
 
 class HyTexturedQuad2dData : public IHyData
 {

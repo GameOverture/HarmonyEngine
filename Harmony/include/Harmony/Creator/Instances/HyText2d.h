@@ -12,7 +12,7 @@
 
 #include "Creator/Instances/IHyInst2d.h"
 
-#include "Creator/Data/HyText2dData.h"
+#include "FileIO/Data/HyText2dData.h"
 
 class HyText2d : public IHyInst2d
 {

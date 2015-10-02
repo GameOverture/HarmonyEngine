@@ -10,16 +10,21 @@
 #ifndef __IHyInst2d_h__
 #define __IHyInst2d_h__
 
-#include "Creator/HyEntity2d.h"
-#include "Creator/Data/HyFactory.h"
+#include "Afx/HyStdAfx.h"
+
+#include "Utilities/Animation/ITransform.h"
+#include "Utilities/Animation/HyAnimVec2.h"
+
+//#include "Creator/HyEntity2d.h"
+#include "FileIO/Data/IHyData.h"
 
 #include "Utilities/Animation/HyAnimVec4.h"
 #include "Renderer/HyRenderState.h"
 
 class IHyInst2d : public ITransform<HyAnimVec2>
 {
-	friend class HyCreator;
-	static HyCreator *			sm_pCtor;
+	friend class IHyFileIO;
+	static IHyFileIO *			sm_pCtor;
 
 protected:
 	const HyInstanceType		m_keInstType;

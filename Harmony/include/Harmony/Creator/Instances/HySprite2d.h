@@ -11,8 +11,9 @@
 #define __HySprite2d_h__
 
 #include "Afx/HyStdAfx.h"
+
 #include "Creator/Instances/IHyInst2d.h"
-#include "Creator/Data/HySprite2dData.h"
+#include "FileIO/Data/HySprite2dData.h"
 
 #include "Utilities/HyMath.h"
 

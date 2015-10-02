@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Creator/Data/HyMesh3dData.h"
+#include "FileIO/Data/HyMesh3dData.h"
 
 HyMesh3dData::HyMesh3dData(const std::string &sPath) :	IHyData(HYINST_Mesh3d, sPath)
 {

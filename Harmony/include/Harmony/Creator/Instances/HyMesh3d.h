@@ -10,6 +10,8 @@
 #ifndef __HyMesh3d_h__
 #define __HyMesh3d_h__
 
+#include "Afx/HyStdAfx.h"
+
 #include "Creator/Instances/IHyInst2d.h"
 
 class HyMesh3d : public IHyInst2d

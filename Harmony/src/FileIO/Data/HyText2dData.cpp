@@ -7,9 +7,9 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Creator/Data/HyText2dData.h"
-#include "Renderer/IHyRenderer.h"
+#include "FileIO/Data/HyText2dData.h"
 
+#include "Renderer/IHyRenderer.h"
 #include "freetype-gl/freetype-gl.h"
 
 HyText2dData::HyText2dData(const std::string &sPath) :	IHyData(HYINST_Text2d, sPath)
