@@ -80,8 +80,6 @@ void HyCreator::PreUpdate()
 
 void HyCreator::PostUpdate()
 {
-	UpdateLoading();
-
 	if(m_bInst2dOrderingDirty)
 	{
 		std::sort(m_vLoadedInst2d.begin(), m_vLoadedInst2d.end(), &Inst2dSortPredicate);
