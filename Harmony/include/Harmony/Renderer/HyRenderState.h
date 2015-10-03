@@ -61,11 +61,17 @@ public:
 	void Disable(uint32 uiAttributes);
 	bool CompareAttribute(const HyRenderState &rs, uint32 uiMask);
 	bool IsEnabled(eAttributes eAttrib);
+	uint32 GetAttributeBitFlags() const;
 
 	uint32 GetTextureHandle(uint32 uiTextureIndex);
 	void SetTextureHandle(uint32 uiIndex, uint32 uiHandleId);
 
 	bool operator==(const HyRenderState &right) const;
+	bool operator!=(const HyRenderState &right) const;
+	bool operator< (const HyRenderState &right) const;
+	bool operator> (const HyRenderState &right) const;
+	bool operator<=(const HyRenderState &right) const;
+	bool operator>=(const HyRenderState &right) const;
 };
 
 #endif /* __HyRenderState_h__ */

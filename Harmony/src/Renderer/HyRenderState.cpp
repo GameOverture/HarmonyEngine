@@ -66,6 +66,11 @@ bool HyRenderState::IsEnabled(eAttributes eAttrib)
 	return 0 != (m_uiAttributeFlags & eAttrib);
 }
 
+uint32 HyRenderState::GetAttributeBitFlags() const
+{
+	return m_uiAttributeFlags;
+}
+
 uint32 HyRenderState::GetTextureHandle(uint32 uiTextureIndex)
 {
 	return m_pTextureBinds[uiTextureIndex];
@@ -80,4 +85,32 @@ bool HyRenderState::operator==(const HyRenderState &right) const
 {
 	return this->m_uiAttributeFlags == right.m_uiAttributeFlags &&
 		   0 == memcmp(this->m_pTextureBinds, right.m_pTextureBinds, sizeof(m_pTextureBinds[0])*HY_MAX_TEXTURE_BINDS);
+}
+
+bool HyRenderState::operator!=(const HyRenderState &right) const
+{
+	return !(*this == right);
+}
+
+bool HyRenderState::operator< (const HyRenderState &right) const
+{
+	if(m_uiAttributeFlags == right.m_uiAttributeFlags)
+		return (memcmp(this->m_pTextureBinds, right.m_pTextureBinds, sizeof(m_pTextureBinds[0])*HY_MAX_TEXTURE_BINDS) < 0);
+
+	return m_uiAttributeFlags < right.m_uiAttributeFlags;
+}
+
+bool HyRenderState::operator> (const HyRenderState &right) const
+{
+	return *this < right;
+}
+
+bool HyRenderState::operator<=(const HyRenderState &right) const
+{
+	return !(*this > right);
+}
+
+bool HyRenderState::operator>=(const HyRenderState &right) const
+{
+	return !(*this < right);
 }

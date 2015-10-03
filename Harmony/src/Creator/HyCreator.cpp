@@ -268,11 +268,18 @@ void HyCreator::WriteDrawBuffers()
 	// TODO: Below is commented out because std::sort expects less-than operator to supply a transitive relationship, 
 	//		 i.e. when the sort sees A < B is true and B < C is true, it implies that A < C is true as well.
 	//
-	//		...for some reason this fails that?
+	//		...for some reason this fails that? 
+	//	(testing something new, if no problem delete TODO)
 
-	//if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
-	//	return pInst1->GetRenderState() == pInst2->GetRenderState();
+	
+	if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
+	{
+		if(pInst1->GetRenderState() == pInst2->GetRenderState())
+			return reinterpret_cast<const char *>(pInst1) > reinterpret_cast<const char *>(pInst2);
 
-	return pInst1->GetDisplayOrder() < pInst2->GetDisplayOrder();
+		return pInst1->GetRenderState() > pInst2->GetRenderState();
+	}
+
+	return pInst1->GetDisplayOrder() > pInst2->GetDisplayOrder();
 }
 

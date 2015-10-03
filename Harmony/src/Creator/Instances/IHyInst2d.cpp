@@ -99,10 +99,9 @@ void IHyInst2d::Detach()
 	HyError("IObjInst2d::Detach() could not find itself in parent's child list");
 }
 
-void IHyInst2d::SetDisplayOrder(float fOrderValue)
+void IHyInst2d::SetDisplayOrder(uint32 uiOrderValue)
 {
-	m_fDisplayOrder = fOrderValue;
-
+	m_uiDisplayOrder = uiOrderValue;
 	HyCreator::SetInstOrderingDirty();
 }
 
