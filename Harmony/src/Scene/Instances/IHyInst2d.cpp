@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *********************************************************************************/
-#include "Creator/Instances/IHyInst2d.h"
+#include "Scene/Instances/IHyInst2d.h"
 
 #include "FileIO/Data/IHyData.h"
 #include "FileIO/IHyFileIO.h"
@@ -46,8 +46,8 @@ void IHyInst2d::CtorInit()
 void IHyInst2d::Load()
 {
 	// TODO: fix this code. Handle default more eloquently
-	if(GetCoordinateType() == HYCOORD_Default && HyCreator::DefaultCoordinateType() != HYCOORD_Default)
-		SetCoordinateType(HyCreator::DefaultCoordinateType(), true);
+	if(GetCoordinateType() == HYCOORD_Default && HyScene::DefaultCoordinateType() != HYCOORD_Default)
+		SetCoordinateType(HyScene::DefaultCoordinateType(), true);
 
 	sm_pCtor->LoadInst2d(this);
 }
@@ -102,7 +102,7 @@ void IHyInst2d::Detach()
 void IHyInst2d::SetDisplayOrder(uint32 uiOrderValue)
 {
 	m_uiDisplayOrder = uiOrderValue;
-	HyCreator::SetInstOrderingDirty();
+	HyScene::SetInstOrderingDirty();
 }
 
 void IHyInst2d::SetData(IHyData *pData)

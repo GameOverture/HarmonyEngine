@@ -15,7 +15,7 @@
 #include "Utilities/Animation/ITransform.h"
 #include "Utilities/Animation/HyAnimVec2.h"
 
-//#include "Creator/HyEntity2d.h"
+//#include "Scene/HyEntity2d.h"
 #include "FileIO/Data/IHyData.h"
 
 #include "Utilities/Animation/HyAnimVec4.h"
@@ -23,7 +23,7 @@
 
 class IHyInst2d : public ITransform<HyAnimVec2>
 {
-	friend class HyCreator;
+	friend class HyScene;
 
 	friend class IHyFileIO;
 	static IHyFileIO *			sm_pCtor;

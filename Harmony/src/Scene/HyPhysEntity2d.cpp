@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Creator/HyPhysEntity2d.h"
+#include "Scene/HyPhysEntity2d.h"
 
 /*static*/ b2World *HyPhysEntity2d::sm_b2WorldRef = NULL;
 
@@ -34,7 +34,7 @@ int32 HyPhysEntity2d::AddBoxFixture(float fHalfWidth, float fHalfHeight, float f
 	HyAssert(m_b2Body, "HyPhysEntity2d::AddBoxFixture() was invoked with an uninitialized instance");
 
 	if(m_eCoordType == HYCOORD_Pixel)
-		vOffset /= HyCreator::PixelsPerMeter();
+		vOffset /= HyScene::PixelsPerMeter();
 
 	b2PolygonShape poly;
 	poly.SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(vOffset.x, vOffset.y), fAngleOffset);
@@ -56,7 +56,7 @@ int32 HyPhysEntity2d::AddCircleFixture(float fRadius, float fDensity, vec2 vOffs
 	HyAssert(m_b2Body, "HyPhysEntity2d::SetAsBox() was invoked with an uninitialized instance");
 
 	if(m_eCoordType == HYCOORD_Pixel)
-		vOffset /= HyCreator::PixelsPerMeter();
+		vOffset /= HyScene::PixelsPerMeter();
 
 	b2CircleShape poly;
 	poly.m_radius = fRadius;
@@ -81,9 +81,9 @@ int32 HyPhysEntity2d::AddEdgeChainFixture(vec2 *pVertices, uint32 uiNumVerts, bo
 
 	if(m_eCoordType == HYCOORD_Pixel)
 	{
-		vOffset /= HyCreator::PixelsPerMeter();
+		vOffset /= HyScene::PixelsPerMeter();
 		for(uint32 i = 0; i < uiNumVerts; ++i)
-			pVertices[i] /= HyCreator::PixelsPerMeter();
+			pVertices[i] /= HyScene::PixelsPerMeter();
 	}
 
 	b2ChainShape chain;
@@ -121,7 +121,7 @@ int32 HyPhysEntity2d::AddEdgeChainFixture(vec2 *pVertices, uint32 uiNumVerts, bo
 			m_vRotation.Z(b2Trans.q.GetAngle());
 
 		if(m_eCoordType == HYCOORD_Pixel)
-			m_b2Body->SetTransform(b2Vec2(m_ptPosition.X() / HyCreator::PixelsPerMeter(), m_ptPosition.Y() / HyCreator::PixelsPerMeter()), m_vRotation.Z());
+			m_b2Body->SetTransform(b2Vec2(m_ptPosition.X() / HyScene::PixelsPerMeter(), m_ptPosition.Y() / HyScene::PixelsPerMeter()), m_vRotation.Z());
 		else
 			m_b2Body->SetTransform(b2Vec2(m_ptPosition.X(), m_ptPosition.Y()), m_vRotation.Z());
 	}
@@ -135,8 +135,8 @@ int32 HyPhysEntity2d::AddEdgeChainFixture(vec2 *pVertices, uint32 uiNumVerts, bo
 		// Grab position and convert it if necessary from box2d 
 		if(m_eCoordType == HYCOORD_Pixel)
 		{
-			m_ptPosition.X(b2Trans.p.x * HyCreator::PixelsPerMeter());
-			m_ptPosition.Y(b2Trans.p.y * HyCreator::PixelsPerMeter());
+			m_ptPosition.X(b2Trans.p.x * HyScene::PixelsPerMeter());
+			m_ptPosition.Y(b2Trans.p.y * HyScene::PixelsPerMeter());
 		}
 		else
 		{

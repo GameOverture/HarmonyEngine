@@ -34,7 +34,7 @@ class HyMesh3dData;
 class IHyFileIO
 {
 	HyGfxComms &										m_GfxCommsRef;
-	HyCreator &											m_SceneRef;
+	HyScene &											m_SceneRef;
 
 	// Thread control structure to help sync loading of factory data
 	struct LoadThreadCtrl
@@ -75,7 +75,7 @@ class IHyFileIO
 	uint32			m_uiNumTextures;
 
 public:
-	IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyCreator &sceneRef);
+	IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
 	virtual ~IHyFileIO();
 
 	void Update();

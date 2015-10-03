@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/HyRenderState.h"
-#include "Creator/Instances/IHyInst2d.h"
+#include "Scene/Instances/IHyInst2d.h"
 
 HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
 									m_uiNumInstances(0),

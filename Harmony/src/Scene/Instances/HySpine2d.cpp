@@ -7,9 +7,9 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Creator/Instances/HySpine2d.h"
+#include "Scene/Instances/HySpine2d.h"
 
-#include "Creator/HyCreator.h"
+#include "Scene/HyScene.h"
 
 #include "Time/IHyTime.h"
 

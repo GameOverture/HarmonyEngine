@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Creator/Instances/HyPrimitive2d.h"
+#include "Scene/Instances/HyPrimitive2d.h"
 
 #include "Utilities/HyMath.h"
 
@@ -47,7 +47,7 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, HyCo
 	else
 		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::SHADER_PRIMITIVEDRAW);
 
-	float fCoordMod = eCoordType == HYCOORD_Meter ? HyCreator::PixelsPerMeter() : 1.0f;
+	float fCoordMod = eCoordType == HYCOORD_Meter ? HyScene::PixelsPerMeter() : 1.0f;
 	fWidth *= fCoordMod;
 	fHeight *= fCoordMod;
 	vOffset *= fCoordMod;
@@ -97,7 +97,7 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	m_uiNumVerts = iNumSegments;
 	m_pVertices = new vec4[m_uiNumVerts];
 
-	float fCoordMod = eCoordType == HYCOORD_Meter ? HyCreator::PixelsPerMeter() : 1.0f;
+	float fCoordMod = eCoordType == HYCOORD_Meter ? HyScene::PixelsPerMeter() : 1.0f;
 	fRadius *= fCoordMod;
 	vOffset *= fCoordMod;
 
@@ -125,7 +125,7 @@ void HyPrimitive2d::SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, boo
 	m_uiNumVerts = uiNumVerts;
 	m_pVertices = new vec4[m_uiNumVerts];
 
-	float fCoordMod = eCoordType == HYCOORD_Meter ? HyCreator::PixelsPerMeter() : 1.0f;
+	float fCoordMod = eCoordType == HYCOORD_Meter ? HyScene::PixelsPerMeter() : 1.0f;
 	
 	for(uint32 i = 0; i < m_uiNumVerts; ++i)
 	{
@@ -140,7 +140,7 @@ void HyPrimitive2d::OffsetVerts(vec2 vOffset, float fAngleOffset, HyCoordinateTy
 {
 	HyAssert(m_pVertices, "HyPrimitive2d::OffsetVerts() was invoked with an unset instance.");
 
-	float fCoordMod = eCoordType == HYCOORD_Meter ? HyCreator::PixelsPerMeter() : 1.0f;
+	float fCoordMod = eCoordType == HYCOORD_Meter ? HyScene::PixelsPerMeter() : 1.0f;
 	vOffset *= fCoordMod;
 
 	b2Transform xf;

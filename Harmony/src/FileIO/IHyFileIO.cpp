@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "FileIO/IHyFileIO.h"
 
-#include "Creator/Instances/IHyInst2d.h"
+#include "Scene/Instances/IHyInst2d.h"
 
 #include "FileIO/Data/HySfxData.h"
 #include "FileIO/Data/HySpine2dData.h"
@@ -17,7 +17,7 @@
 #include "FileIO/Data/HyText2dData.h"
 #include "FileIO/Data/HyTexturedQuad2dData.h"
 
-IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyCreator &sceneRef) :	m_GfxCommsRef(gfxCommsRef),
+IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_GfxCommsRef(gfxCommsRef),
 																								m_SceneRef(sceneRef),
 																								m_Sfx(HYINST_Sound2d),
 																								m_Sprite2d(HYINST_Sprite2d),

@@ -15,14 +15,14 @@
 #include "Utilities/Animation/HyEaseFuncs.h"
 
 // Forward declaration
-class HyCreator;
+class HyScene;
 
 // NOTE: The constructor that takes a float reference will not invoke its 'dirty callback' if
 //		 manipulated outside of this class.
 class HyAnimFloat
 {
-	friend class HyCreator;
-	static HyCreator *		sm_pCtor;
+	friend class HyScene;
+	static HyScene *		sm_pCtor;
 
 	float &					m_fValueRef;
 	float					m_fStart;
@@ -56,7 +56,7 @@ public:
 
 	//void Follow(float &fToFollow, float fOffsetAmt);
 
-	// Returns true if updating is still continuing. False otherwise, to signal HyCreator to remove this instance from the ActiveAnimFloat vector
+	// Returns true if updating is still continuing. False otherwise, to signal HyScene to remove this instance from the ActiveAnimFloat vector
 	bool Update();
 
 	HyAnimFloat &operator=(const float &rhs);

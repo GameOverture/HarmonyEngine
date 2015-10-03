@@ -7,7 +7,7 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Creator/Instances/HyTexturedQuad2d.h"
+#include "Scene/Instances/HyTexturedQuad2d.h"
 
 HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiTextureIndex) : IHyInst2d(HYINST_TexturedQuad2d, uiTextureIndex)
 {

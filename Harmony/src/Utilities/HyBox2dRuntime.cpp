@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Utilities/HyBox2dRuntime.h"
 
-#include "Creator/HyPhysEntity2d.h"
+#include "Scene/HyPhysEntity2d.h"
 
 HyBox2dRuntime::HyBox2dRuntime(void)
 {

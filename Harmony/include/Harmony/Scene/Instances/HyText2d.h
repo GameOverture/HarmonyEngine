@@ -10,7 +10,7 @@
 #ifndef __HyText2d_h__
 #define __HyText2d_h__
 
-#include "Creator/Instances/IHyInst2d.h"
+#include "Scene/Instances/IHyInst2d.h"
 
 #include "FileIO/Data/HyText2dData.h"
 

@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Creator/HyCreator.h"
+#include "Scene/HyScene.h"
 #include "Utilities/Animation/HyAnimVec3.h"
 
 
@@ -76,7 +76,7 @@ template<typename tVec>
 		m_fpOnDirty(m_pOnDirtyParam);
 
 	if(m_eCoordType == HYCOORD_Default)
-		m_eCoordType = HyCreator::DefaultCoordinateType();
+		m_eCoordType = HyScene::DefaultCoordinateType();
 	else if(m_eCoordType == eCoordType)
 		return;
 	else
@@ -86,9 +86,9 @@ template<typename tVec>
 		return;
 
 	if(m_eCoordType == HYCOORD_Meter)
-		m_ptPosition /= HyCreator::PixelsPerMeter();
+		m_ptPosition /= HyScene::PixelsPerMeter();
 	else
-		m_ptPosition *= HyCreator::PixelsPerMeter();
+		m_ptPosition *= HyScene::PixelsPerMeter();
 }
 
 template<typename tVec>
@@ -108,7 +108,7 @@ void ITransform<tVec>::GetLocalTransform(mat4 &outMtx) const
 	vScale.y = m_vScale.Y();
 
 	if(m_eCoordType == HYCOORD_Meter)
-		outMtx = glm::translate(outMtx, ptPos * HyCreator::PixelsPerMeter());
+		outMtx = glm::translate(outMtx, ptPos * HyScene::PixelsPerMeter());
 	else
 		outMtx = glm::translate(outMtx, ptPos);
 
@@ -139,7 +139,7 @@ void ITransform<tVec>::GetLocalTransform_SRT(mat4 &outMtx) const
 	outMtx = glm::rotate(outMtx, m_vRotation.Get().z, vec3(0, 0, 1));
 	
 	if(m_eCoordType == HYCOORD_Meter)
-		outMtx = glm::translate(outMtx, ptPos * HyCreator::PixelsPerMeter());
+		outMtx = glm::translate(outMtx, ptPos * HyScene::PixelsPerMeter());
 	else
 		outMtx = glm::translate(outMtx, ptPos);
 }

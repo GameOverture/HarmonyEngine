@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyCreator.h
+ *	HyScene.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,15 +7,13 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyCreator_h__
-#define __HyCreator_h__
+#ifndef __HyScene_h__
+#define __HyScene_h__
 
 #include "Afx/HyStdAfx.h"
 
 #include "Utilities/HyDebugPhys2d.h"
 #include "Utilities/HyBox2dRuntime.h"
-
-#include <Box2D/Box2D.h>
 
 #include <vector>
 using std::vector;
@@ -39,7 +37,7 @@ class HyEntity2d;
 class HyAnimFloat;
 
 //////////////////////////////////////////////////////////////////////////
-class HyCreator
+class HyScene
 {
 	friend class HyEngine;
 
@@ -58,9 +56,9 @@ class HyCreator
 
 	// Pointers to all instances
 	
-	vector<IHyInst2d *>								m_vLoadedInst2d;
+	vector<IHyInst2d *>									m_vLoadedInst2d;
 
-	vector<IHyInst2d *>								m_vInst3d;
+	vector<IHyInst2d *>									m_vInst3d;
 
 	vector<HyAnimFloat *>								m_vActiveAnimFloats;
 
@@ -68,8 +66,8 @@ class HyCreator
 	char *												m_pCurWritePos;
 
 public:
-	HyCreator(HyGfxComms &gfxCommsRef, HyViewport &gameViewport, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter);
-	~HyCreator(void);
+	HyScene(HyGfxComms &gfxCommsRef, HyViewport &gameViewport, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter);
+	~HyScene(void);
 
 	static float PixelsPerMeter()					{ return sm_fPixelsPerMeter; }
 	static HyCoordinateType DefaultCoordinateType()	{ return sm_eDefaultCoordType; }
@@ -92,5 +90,5 @@ private:
 	static bool Inst2dSortPredicate(const IHyInst2d *pInst1, const IHyInst2d *pInst2);
 };
 
-#endif /* __HyCreator_h__ */
+#endif /* __HyScene_h__ */
 

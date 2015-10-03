@@ -7,15 +7,15 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Creator/HyEntity2d.h"
+#include "Scene/HyEntity2d.h"
 
-#include "Creator/HyCreator.h"
-#include "Creator/Instances/HySprite2d.h"
-#include "Creator/Instances/HySpine2d.h"
-#include "Creator/Instances/HyText2d.h"
-#include "Creator/Instances/HyPrimitive2d.h"
+#include "Scene/HyScene.h"
+#include "Scene/Instances/HySprite2d.h"
+#include "Scene/Instances/HySpine2d.h"
+#include "Scene/Instances/HyText2d.h"
+#include "Scene/Instances/HyPrimitive2d.h"
 
-/*static*/ HyCreator *HyEntity2d::sm_pCtor = NULL;
+/*static*/ HyScene *HyEntity2d::sm_pCtor = NULL;
 
 // Hidden ctor used within AddChild()
 HyEntity2d::HyEntity2d(HyEntity2d *pParent) : m_kpParent(pParent)
@@ -40,7 +40,7 @@ HyEntity2d::~HyEntity2d(void)
 void HyEntity2d::CtorInit()
 {
 	m_bDirty = true;
-	m_eCoordType = HyCreator::DefaultCoordinateType();
+	m_eCoordType = HyScene::DefaultCoordinateType();
 	SetOnDirtyCallback(OnDirty, this);
 
 }
@@ -144,8 +144,8 @@ HyPrimitive2d *HyEntity2d::GetPrimitive()
 void HyEntity2d::LinkInst(IHyInst2d *pInst)
 {
 	//// TODO: fix this code. Handle default more eloquently
-	//if(GetCoordinateType() == HYCOORD_Default && HyCreator::DefaultCoordinateType() != HYCOORD_Default)
-	//	SetCoordinateType(HyCreator::DefaultCoordinateType(), true);
+	//if(GetCoordinateType() == HYCOORD_Default && HyScene::DefaultCoordinateType() != HYCOORD_Default)
+	//	SetCoordinateType(HyScene::DefaultCoordinateType(), true);
 
 	//// Call LoadInst2d() before SetParent() to prevent accidentially deleting the instance's IData if
 	//// it's the only associated instance of the data.

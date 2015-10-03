@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Creator/Instances/IHyInst2d.h"
+#include "Scene/Instances/IHyInst2d.h"
 
 class HyTexture;
 

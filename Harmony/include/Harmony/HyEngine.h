@@ -20,13 +20,13 @@
 #include "Audio/HyAudio.h"
 #include "GuiTool/HyGuiComms.h"
 
-#include "Creator/HyCreator.h"
-#include "Creator/Instances/HySprite2d.h"
-#include "Creator/Instances/HySpine2d.h"
-#include "Creator/Instances/HyPrimitive2d.h"
-#include "Creator/Instances/HyText2d.h"
-#include "Creator/Instances/HyTexturedQuad2d.h"
-#include "Creator/HyPhysEntity2d.h"
+#include "Scene/HyScene.h"
+#include "Scene/Instances/HySprite2d.h"
+#include "Scene/Instances/HySpine2d.h"
+#include "Scene/Instances/HyPrimitive2d.h"
+#include "Scene/Instances/HyText2d.h"
+#include "Scene/Instances/HyTexturedQuad2d.h"
+#include "Scene/HyPhysEntity2d.h"
 
 class HyEngine
 {
@@ -42,7 +42,7 @@ class HyEngine
 	HyAudio					m_Audio;
 
 	HyGfxComms				m_GfxBuffer;
-	HyCreator				m_Creator;
+	HyScene				m_Creator;
 
 #ifndef HY_PLATFORM_GUI
 	HyGuiComms				m_GuiComms;

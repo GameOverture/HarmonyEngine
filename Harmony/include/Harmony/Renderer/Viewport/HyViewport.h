@@ -17,7 +17,7 @@
 
 class HyViewport
 {
-	friend class HyCreator;
+	friend class HyScene;
 
 	HyWindowInfo			m_Info;
 	

@@ -9,13 +9,13 @@
  *************************************************************************/
 #include "Utilities/Animation/HyAnimFloat.h"
 
-#include "Creator/HyCreator.h"
+#include "Scene/HyScene.h"
 
 #include "Time/IHyTime.h"
 
 #include "Utilities/HyMath.h"
 
-/*static*/ HyCreator *HyAnimFloat::sm_pCtor = NULL;
+/*static*/ HyScene *HyAnimFloat::sm_pCtor = NULL;
 
 HyAnimFloat::HyAnimFloat() :	m_fValueRef(*(new float)),
 								m_fStart(0.0f),
@@ -123,7 +123,7 @@ void HyAnimFloat::SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam /*=
 //	m_pT
 //}
 
-// Returns true if updating is still continuing. False otherwise, to signal HyCreator to remove this instance from the ActiveAnimFloat vector
+// Returns true if updating is still continuing. False otherwise, to signal HyScene to remove this instance from the ActiveAnimFloat vector
 bool HyAnimFloat::Update()
 {
 	if(m_fpBehaviorUpdate == NULL)

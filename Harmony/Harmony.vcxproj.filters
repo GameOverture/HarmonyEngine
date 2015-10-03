@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\Creator\HyCreator.cpp">
-      <Filter>Creator</Filter>
-    </ClCompile>
     <ClCompile Include="src\Memory\HyMemoryHeap.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
@@ -25,22 +22,10 @@
     <ClCompile Include="src\Utilities\HySpineRuntime.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Creator\Instances\HyPrimitive2d.cpp">
-      <Filter>Creator\Instances</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Creator\Instances\HyText2d.cpp">
-      <Filter>Creator\Instances</Filter>
-    </ClCompile>
     <ClCompile Include="src\Audio\HyAudio.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
-    <ClCompile Include="src\Creator\Instances\HySound.cpp">
-      <Filter>Creator\Instances</Filter>
-    </ClCompile>
     <ClCompile Include="src\HyEngine.cpp" />
-    <ClCompile Include="src\Creator\Instances\HySpine2d.cpp">
-      <Filter>Creator\Instances</Filter>
-    </ClCompile>
     <ClCompile Include="src\Utilities\Animation\HyAnimFloat.cpp">
       <Filter>Utilities\Animation</Filter>
     </ClCompile>
@@ -77,18 +62,6 @@
     <ClCompile Include="src\Utilities\HyBox2dRuntime.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Creator\Instances\HySprite2d.cpp">
-      <Filter>Creator\Instances</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Creator\Instances\HyMesh3d.cpp">
-      <Filter>Creator\Instances</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Creator\HyEntity2d.cpp">
-      <Filter>Creator</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Creator\HyPhysEntity2d.cpp">
-      <Filter>Creator</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\HyGfxComms.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
@@ -115,9 +88,6 @@
     </ClCompile>
     <ClCompile Include="src\FileIO\Atlas\HyAtlas.cpp">
       <Filter>FileIO\Atlas</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Creator\Instances\HyTexturedQuad2d.cpp">
-      <Filter>Creator\Instances</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL\HyOpenGL.cpp">
       <Filter>Renderer\OpenGL</Filter>
@@ -165,9 +135,6 @@
     <ClCompile Include="src\Input\IHyInputMap.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\Creator\Instances\IHyInst2d.cpp">
-      <Filter>Creator\Instances</Filter>
-    </ClCompile>
     <ClCompile Include="src\FileIO\IHyFileIO.cpp">
       <Filter>FileIO</Filter>
     </ClCompile>
@@ -189,6 +156,39 @@
     <ClCompile Include="src\FileIO\Data\HyTexturedQuad2dData.cpp">
       <Filter>FileIO\Data</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene\HyEntity2d.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\HyPhysEntity2d.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\HyScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HyMesh3d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HyPrimitive2d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HySound.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HySpine2d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HySprite2d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HyText2d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HyTexturedQuad2d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\IHyInst2d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -199,9 +199,6 @@
     </Filter>
     <Filter Include="Memory">
       <UniqueIdentifier>{63ed057b-9193-4adc-869f-0681e8edf56b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Creator">
-      <UniqueIdentifier>{7668908e-889b-483c-9168-628a32f105bb}</UniqueIdentifier>
     </Filter>
     <Filter Include="Afx">
       <UniqueIdentifier>{625b30bd-af25-4a04-a1f7-668ca1153071}</UniqueIdentifier>
@@ -220,9 +217,6 @@
     </Filter>
     <Filter Include="Time\Watches">
       <UniqueIdentifier>{66025e53-50ae-4470-871b-48b025afe0b1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Creator\Instances">
-      <UniqueIdentifier>{ec58a594-4c25-450e-8da2-18f7aba82257}</UniqueIdentifier>
     </Filter>
     <Filter Include="Threading">
       <UniqueIdentifier>{59688164-7112-4eaf-8c36-916756f2726a}</UniqueIdentifier>
@@ -269,6 +263,12 @@
     <Filter Include="FileIO\Data">
       <UniqueIdentifier>{75f6d162-2a22-4e05-af9b-a8f087468af3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{30a426c0-032d-4dbc-a560-acaad120a43f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Instances">
+      <UniqueIdentifier>{80660438-416c-412c-a17e-9611b2f4d248}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Harmony\HyEngine.h" />
@@ -301,21 +301,6 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Audio\HyAudio.h">
       <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\HyCreator.h">
-      <Filter>Creator</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\Instances\HyPrimitive2d.h">
-      <Filter>Creator\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\Instances\HySound.h">
-      <Filter>Creator\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\Instances\HySpine2d.h">
-      <Filter>Creator\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\Instances\HyText2d.h">
-      <Filter>Creator\Instances</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Memory\HyMemoryHeap.h">
       <Filter>Memory</Filter>
@@ -413,18 +398,6 @@
     <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec4.h">
       <Filter>Utilities\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\Instances\HySprite2d.h">
-      <Filter>Creator\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\Instances\HyMesh3d.h">
-      <Filter>Creator\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\HyEntity2d.h">
-      <Filter>Creator</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\HyPhysEntity2d.h">
-      <Filter>Creator</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\HyGfxComms.h">
       <Filter>Renderer</Filter>
     </ClInclude>
@@ -451,9 +424,6 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\FileIO\Atlas\HyAtlas.h">
       <Filter>FileIO\Atlas</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\Instances\HyTexturedQuad2d.h">
-      <Filter>Creator\Instances</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Afx\HyInteropAfx.h">
       <Filter>Afx</Filter>
@@ -510,9 +480,6 @@
     <ClInclude Include="include\Harmony\Input\Interop\HyInputMap_Gainput.h">
       <Filter>Input\Interop</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Creator\Instances\IHyInst2d.h">
-      <Filter>Creator\Instances</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\FileIO\IHyFileIO.h">
       <Filter>FileIO</Filter>
     </ClInclude>
@@ -539,6 +506,39 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\FileIO\Data\IHyData.h">
       <Filter>FileIO\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\HyEntity2d.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\HyPhysEntity2d.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\HyScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HyMesh3d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HyPrimitive2d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HySound.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HySpine2d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HySprite2d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HyText2d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HyTexturedQuad2d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\IHyInst2d.h">
+      <Filter>Scene\Instances</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

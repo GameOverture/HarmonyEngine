@@ -7,29 +7,29 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Creator/HyCreator.h"
+#include "Scene/HyScene.h"
 
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/HyGfxComms.h"
 #include "Renderer/Viewport/HyViewport.h"
 
-#include "Creator/Instances/IHyInst2d.h"
-#include "Creator/Instances/HySound.h"
-#include "Creator/Instances/HySprite2d.h"
-#include "Creator/Instances/HySpine2d.h"
-#include "Creator/Instances/HyPrimitive2d.h"
-#include "Creator/Instances/HyText2d.h"
-#include "Creator/Instances/HyTexturedQuad2d.h"
-#include "Creator/HyEntity2d.h"
-#include "Creator/HyPhysEntity2d.h"
+#include "Scene/Instances/IHyInst2d.h"
+#include "Scene/Instances/HySound.h"
+#include "Scene/Instances/HySprite2d.h"
+#include "Scene/Instances/HySpine2d.h"
+#include "Scene/Instances/HyPrimitive2d.h"
+#include "Scene/Instances/HyText2d.h"
+#include "Scene/Instances/HyTexturedQuad2d.h"
+#include "Scene/HyEntity2d.h"
+#include "Scene/HyPhysEntity2d.h"
 
 #include "Time/IHyTime.h"
 
-HyCoordinateType	HyCreator::sm_eDefaultCoordType = HYCOORD_Default;
-float				HyCreator::sm_fPixelsPerMeter = 0.0f;
-bool				HyCreator::sm_bInst2dOrderingDirty = false;
+HyCoordinateType	HyScene::sm_eDefaultCoordType = HYCOORD_Default;
+float				HyScene::sm_fPixelsPerMeter = 0.0f;
+bool				HyScene::sm_bInst2dOrderingDirty = false;
 
-HyCreator::HyCreator(HyGfxComms &gfxCommsRef, HyViewport &gameViewport, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter) :	m_b2World(b2Vec2(0.0f, -10.0f)),
+HyScene::HyScene(HyGfxComms &gfxCommsRef, HyViewport &gameViewport, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter) :	m_b2World(b2Vec2(0.0f, -10.0f)),
 																																		m_iPhysVelocityIterations(8),
 																																		m_iPhysPositionIterations(3),
 																																		m_GfxCommsRef(gfxCommsRef),
@@ -49,17 +49,17 @@ HyCreator::HyCreator(HyGfxComms &gfxCommsRef, HyViewport &gameViewport, HyCoordi
 	HyAnimFloat::sm_pCtor = this;
 }
 
-HyCreator::~HyCreator(void)
+HyScene::~HyScene(void)
 {
 }
 
-void HyCreator::AddInstance(IHyInst2d *pInst)
+void HyScene::AddInstance(IHyInst2d *pInst)
 {
 	m_vLoadedInst2d.push_back(pInst);
 	sm_bInst2dOrderingDirty = true;
 }
 
-void HyCreator::RemoveInst(IHyInst2d *pInst)
+void HyScene::RemoveInst(IHyInst2d *pInst)
 {
 	for(vector<IHyInst2d *>::iterator it = m_vLoadedInst2d.begin(); it != m_vLoadedInst2d.end(); ++it)
 	{
@@ -72,7 +72,7 @@ void HyCreator::RemoveInst(IHyInst2d *pInst)
 	}
 }
 
-void HyCreator::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
+void HyScene::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
 {
 	m_vActiveAnimFloats.push_back(pAnimFloat);
 }
@@ -81,7 +81,7 @@ void HyCreator::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
 
 //PRIVATE//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void HyCreator::PreUpdate()
+void HyScene::PreUpdate()
 {
 	m_b2World.Step(IHyTime::GetUpdateStepSeconds(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 
@@ -97,7 +97,7 @@ void HyCreator::PreUpdate()
 
 }
 
-void HyCreator::PostUpdate()
+void HyScene::PostUpdate()
 {
 	if(sm_bInst2dOrderingDirty)
 	{
@@ -110,7 +110,7 @@ void HyCreator::PostUpdate()
 
 
 
-void HyCreator::WriteDrawBuffers()
+void HyScene::WriteDrawBuffers()
 {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// BUFFER HEADER (contains offsets from here)-| Num 3d Cams (4bytes)-|-Cam3d-|-Cam3d-|...|-Num 2d Cams (4bytes)-|-Cam2d-|-Cam2d-|...|-Num 3d Insts (4bytes)-|-Ent3d-|-Ent3d-|-Ent3d...-|-Num 2d Insts (4bytes)-|-Inst2d-|-Inst2d-|-Inst2d...-|-<possible empty data (skipping non-visible Ents)>-|-Vertex Data-
@@ -263,7 +263,7 @@ void HyCreator::WriteDrawBuffers()
 	m_GfxCommsRef.Update_SetSharedPtrs();
 }
 
-/*static*/ bool HyCreator::Inst2dSortPredicate(const IHyInst2d *pInst1, const IHyInst2d *pInst2)
+/*static*/ bool HyScene::Inst2dSortPredicate(const IHyInst2d *pInst1, const IHyInst2d *pInst2)
 {
 	// TODO: Below is commented out because std::sort expects less-than operator to supply a transitive relationship, 
 	//		 i.e. when the sort sees A < B is true and B < C is true, it implies that A < C is true as well.

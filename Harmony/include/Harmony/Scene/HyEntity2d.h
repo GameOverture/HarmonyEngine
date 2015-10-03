@@ -29,9 +29,9 @@ class HyPrimitive2d;
 
 class HyEntity2d : public ITransform<HyAnimVec2>
 {
-	friend class HyCreator;
+	friend class HyScene;
 
-	static HyCreator *				sm_pCtor;
+	static HyScene *				sm_pCtor;
 	HyEntity2d * const				m_kpParent;
 
 	bool							m_bDirty;

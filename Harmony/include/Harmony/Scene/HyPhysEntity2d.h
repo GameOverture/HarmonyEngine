@@ -13,13 +13,13 @@
 #include "Afx/HyStdAfx.h"
 #include "Box2D/Box2D.h"
 
-#include "Creator/Instances/HyPrimitive2d.h"
-#include "Harmony/Creator/HyEntity2d.h"
+#include "Scene/Instances/HyPrimitive2d.h"
+#include "Scene/HyEntity2d.h"
 
 class HyPhysEntity2d : public HyEntity2d
 {
 	friend class HyBox2dRuntime;
-	friend class HyCreator;
+	friend class HyScene;
 	static b2World *	sm_b2WorldRef;
 
 	bool				m_bEnabled;
