@@ -37,8 +37,6 @@ public:
 
 	const HyGfxComms::tGfxInfo *GetGfxInfo()				{ return m_GfxCommsRef.GetGfxInfo(); }
 
-	virtual bool Initialize() = 0;
-
 	virtual void StartRender() = 0;
 
 	virtual bool Begin_3d() = 0;

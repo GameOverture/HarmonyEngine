@@ -26,10 +26,18 @@ IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene
 																								m_Mesh3d(HYINST_Mesh3d),
 																								m_Quad2d(HYINST_TexturedQuad2d)
 {
-	//std::string sFilePath = sm_sDataDir;
-	//sFilePath += "Atlas/atlasInfo.json";
+	m_sDataDir = szDataDirPath;
+
+	std::replace(m_sDataDir.begin(), m_sDataDir.end(), '\\', '/');
+	if(m_sDataDir[m_sDataDir.length() - 1] != '/')
+		m_sDataDir.append("/");
+
+	
+	std::string sAtlasFilePath = m_sDataDir;
+	sAtlasFilePath += "Atlas/atlasInfo.json";
 
 	//sm_Atlas.Initialize(sFilePath);
+
 
 	// Start up Loading thread
 	m_LoadingCtrl.m_pLoadQueue_Shared = &m_LoadQueue_Shared;

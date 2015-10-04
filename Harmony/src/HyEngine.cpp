@@ -20,16 +20,11 @@ HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::GetMemoryHeap();
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Input(m_AppRef.m_vInputMaps),
-												m_Renderer(m_GfxBuffer, m_AppRef.m_vViewports),
 												m_Creator(m_GfxBuffer, m_AppRef.m_vViewports[0], m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter),
-												m_FileIO(m_AppRef.m_Init.szDataDir, m_GfxBuffer, m_Creator)
+												m_FileIO(m_AppRef.m_Init.szDataDir, m_GfxBuffer, m_Creator),
+												m_Renderer(m_GfxBuffer, m_AppRef.m_vViewports)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
-
-	HyFileIO::InitAtlasData();
-
-	if(m_Renderer.Initialize() == false)
-		HyError("Graphics API's Initialize() failed");
 
 	if(m_AppRef.Initialize() == false)
 		HyError("IApplication Initialize() failed");

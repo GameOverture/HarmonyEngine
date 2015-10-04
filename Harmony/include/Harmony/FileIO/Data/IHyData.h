@@ -21,12 +21,15 @@ class IHyRenderer;
 
 class IHyData
 {
+	static HyFactory<HyTexture>		sm_AtlasTextures;
+
 protected:
 	const HyInstanceType			m_keDataType;
 	const std::string				m_ksPath;
 	
 	HyLoadState						m_eLoadState;
 	int32							m_iRefCount;
+
 
 public:
 	IHyData(HyInstanceType eDataType, const std::string &sPath) :	m_keDataType(eDataType),

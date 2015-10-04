@@ -39,8 +39,6 @@ public:
 	uint32 GetNumDeviceContexts()				{ return m_uiNumDCs; }
 	HWND GetDeviceContextHWND(uint32 uiIndex)	{ return m_ppDeviceContexes[uiIndex]->m_hWnd; }
 
-	virtual bool Initialize();
-
 	virtual void FinishRender();
 };
 

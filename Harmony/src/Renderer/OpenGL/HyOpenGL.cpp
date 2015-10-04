@@ -59,173 +59,13 @@ HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : 
 																				m_mtxView(1.0f),
 																				m_kmtxIdentity(1.0f)
 {
+#ifdef HY_PLATFORM_GUI
+	Initialize();
+#endif
 }
 
 HyOpenGL::~HyOpenGL(void)
 {
-}
-
-/*virtual*/ bool HyOpenGL::Initialize()
-{
-	//////////////////////////////////////////////////////////////////////////
-	// Init GLEW
-	//////////////////////////////////////////////////////////////////////////
-	GLenum err = glewInit();
-
-	if(err != GLEW_OK)
-	{
-		GLenum eError = glGetError();
-		//const GLubyte *szErrorStr;
-		//szErrorStr = gluErrorString(eError);
-		HyError("OpenGL Error: " << eError/* << std::endl << szErrorStr*/);
-	}
-
-	//if (glewIsSupported("GL_VERSION_3_3"))
-	//	printf("Ready for OpenGL 3.3\n");
-	//else {
-	//	printf("OpenGL 3.3 not supported\n");
-	//	exit(1);
-	//}
-	//printf ("Vendor: %s\n", glGetString (GL_VENDOR));
-	//printf ("Renderer: %s\n", glGetString (GL_RENDERER));
-	//printf ("Version: %s\n", glGetString (GL_VERSION));
-	//printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
-
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-	//glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-
-	//////////////////////////////////////////////////////////////////////////
-	// 2D setup
-	//////////////////////////////////////////////////////////////////////////
-
-	glGenVertexArrays(NUM_VAOTYPES, m_pVAO2d);
-
-	glGenBuffers(1, &m_hVBO2d);
-	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
-
-	// Quad batch //////////////////////////////////////////////////////////////////////////
-	m_pShader2d[QUADBATCH].CompileFromString(szHYQUADBATCH_VERTEXSHADER, HyOpenGLShader::VERTEX);
-	m_pShader2d[QUADBATCH].CompileFromString(szHYQUADBATCH_FRAGMENTSHADER, HyOpenGLShader::FRAGMENT);
-
-	if(!m_pShader2d[QUADBATCH].Link())
-		HyError("Shader program failed to link!\n" << m_pShader2d[QUADBATCH].Log().c_str() << "\n");
-
-	glBindVertexArray(m_pVAO2d[QUADBATCH]);
-
-	GLuint size = m_pShader2d[QUADBATCH].GetAttribLocation("size");
-	GLuint offset = m_pShader2d[QUADBATCH].GetAttribLocation("offset");
-	GLuint tint = m_pShader2d[QUADBATCH].GetAttribLocation("tint");
-	GLuint uv0 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord0");
-	GLuint uv1 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord1");
-	GLuint uv2 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord2");
-	GLuint uv3 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord3");
-	GLuint mtx = m_pShader2d[QUADBATCH].GetAttribLocation("mtxLocalToWorld");
-
-	glEnableVertexAttribArray(size);
-	glEnableVertexAttribArray(offset);
-	glEnableVertexAttribArray(tint);
-	glEnableVertexAttribArray(uv0);
-	glEnableVertexAttribArray(uv1);
-	glEnableVertexAttribArray(uv2);
-	glEnableVertexAttribArray(uv3);
-	glEnableVertexAttribArray(mtx+0);
-	glEnableVertexAttribArray(mtx+1);
-	glEnableVertexAttribArray(mtx+2);
-	glEnableVertexAttribArray(mtx+3);
-
-	glVertexAttribPointer(size, 2, GL_FLOAT, GL_FALSE, 128, (void *)0);
-	glVertexAttribPointer(offset, 2, GL_FLOAT, GL_FALSE, 128, (void *)(2*sizeof(GLfloat)));
-	glVertexAttribPointer(tint, 4, GL_FLOAT, GL_FALSE, 128, (void *)(4*sizeof(GLfloat)));
-	glVertexAttribPointer(uv0, 2, GL_FLOAT, GL_FALSE, 128, (void *)(8*sizeof(GLfloat)));
-	glVertexAttribPointer(uv1, 2, GL_FLOAT, GL_FALSE, 128, (void *)(10*sizeof(GLfloat)));
-	glVertexAttribPointer(uv2, 2, GL_FLOAT, GL_FALSE, 128, (void *)(12*sizeof(GLfloat)));
-	glVertexAttribPointer(uv3, 2, GL_FLOAT, GL_FALSE, 128, (void *)(14*sizeof(GLfloat)));
-	glVertexAttribPointer(mtx+0, 4, GL_FLOAT, GL_FALSE, 128, (void *)(16*sizeof(GLfloat)));
-	glVertexAttribPointer(mtx+1, 4, GL_FLOAT, GL_FALSE, 128, (void *)(20*sizeof(GLfloat)));
-	glVertexAttribPointer(mtx+2, 4, GL_FLOAT, GL_FALSE, 128, (void *)(24*sizeof(GLfloat)));
-	glVertexAttribPointer(mtx+3, 4, GL_FLOAT, GL_FALSE, 128, (void *)(28*sizeof(GLfloat)));
-
-	glVertexAttribDivisor(size, 1);
-	glVertexAttribDivisor(offset, 1);
-	glVertexAttribDivisor(tint, 1);
-	glVertexAttribDivisor(uv0, 1);
-	glVertexAttribDivisor(uv1, 1);
-	glVertexAttribDivisor(uv2, 1);
-	glVertexAttribDivisor(uv3, 1);
-	glVertexAttribDivisor(mtx+0, 1);
-	glVertexAttribDivisor(mtx+1, 1);
-	glVertexAttribDivisor(mtx+2, 1);
-	glVertexAttribDivisor(mtx+3, 1);
-
-	// Primitive //////////////////////////////////////////////////////////////////////////
-	m_pShader2d[PRIMITIVE].CompileFromString(szHYPRIMATIVE_VERTEXSHADER, HyOpenGLShader::VERTEX);
-	m_pShader2d[PRIMITIVE].CompileFromString(szHYPRIMATIVE_FRAGMENTSHADER, HyOpenGLShader::FRAGMENT);
-
-	if(!m_pShader2d[PRIMITIVE].Link())
-		HyError("Shader program failed to link!\n" << m_pShader2d[PRIMITIVE].Log().c_str() << "\n");
-
-	glBindVertexArray(m_pVAO2d[PRIMITIVE]);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-
-	//const float fUnitQuadVertPos[16] = {
-	//	0.0f, 0.0f, 0.0f, 1.0f,
-	//	1.0f, 0.0f, 0.0f, 1.0f,
-	//	0.0f, 1.0f, 0.0f, 1.0f,
-	//	1.0f, 1.0f, 0.0f, 1.0f
-	//};
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, fUnitQuadVertPos, GL_STATIC_DRAW);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexDataEmulate), vertexDataEmulate, GL_STATIC_DRAW);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(primitiveVertexDataEmulate), primitiveVertexDataEmulate, GL_STATIC_DRAW);
-	//-----------------------------------------------------------------------------------------------------------------
-
-	// Initialize 2d quad index bufferSet up index data
-	//const short g_i16UnitQuadVertIndices[6] = {
-	//	0, 1, 2, 2, 1, 3
-	//};
-	//glGenBuffers(1, &m_hIBO2d);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(short)*6, g_i16UnitQuadVertIndices, GL_STATIC_DRAW);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
-	//m_pGenericIndexBuffer2d = new uint16[HY_INDEX_BUFFER_SIZE/sizeof(uint16)];
-	//uint16 *pCurWriteShort = m_pGenericIndexBuffer2d;
-	//uint16 uiIndexCount = 0;
-	//uint32 uiResetIndexCount = 0;
-	//for(int i = 0; i < (HY_INDEX_BUFFER_SIZE/2); ++i)
-	//{
-	//	uiResetIndexCount++;
-	//	if(uiResetIndexCount == 5)
-	//	{
-	//		*pCurWriteShort = HY_RESTART_INDEX;
-	//		uiResetIndexCount = 0;
-	//	}
-	//	else
-	//	{
-	//		*pCurWriteShort = uiIndexCount;
-	//		uiIndexCount++;
-	//	}
-
-	//	pCurWriteShort++;
-	//}
-	//glPrimitiveRestartIndex(HY_RESTART_INDEX);
-	//glEnable(GL_PRIMITIVE_RESTART);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	// Atlas Textures
-	//HyFileIO::GetAtlasTexture
-	//glGenTextures(
-
-	return true;
 }
 
 /*virtual*/ void HyOpenGL::StartRender()
@@ -468,4 +308,167 @@ HyOpenGL::~HyOpenGL(void)
 {
 	uint32 uiTexId = texture.GetId();
 	glDeleteTextures(1, &uiTexId);
+}
+
+bool HyOpenGL::Initialize()
+{
+	//////////////////////////////////////////////////////////////////////////
+	// Init GLEW
+	//////////////////////////////////////////////////////////////////////////
+	GLenum err = glewInit();
+
+	if(err != GLEW_OK)
+	{
+		GLenum eError = glGetError();
+		//const GLubyte *szErrorStr;
+		//szErrorStr = gluErrorString(eError);
+		HyError("OpenGL Error: " << eError/* << std::endl << szErrorStr*/);
+	}
+
+	//if (glewIsSupported("GL_VERSION_3_3"))
+	//	printf("Ready for OpenGL 3.3\n");
+	//else {
+	//	printf("OpenGL 3.3 not supported\n");
+	//	exit(1);
+	//}
+	//printf ("Vendor: %s\n", glGetString (GL_VENDOR));
+	//printf ("Renderer: %s\n", glGetString (GL_RENDERER));
+	//printf ("Version: %s\n", glGetString (GL_VERSION));
+	//printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
+
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+	//glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+
+	//////////////////////////////////////////////////////////////////////////
+	// 2D setup
+	//////////////////////////////////////////////////////////////////////////
+
+	glGenVertexArrays(NUM_VAOTYPES, m_pVAO2d);
+
+	glGenBuffers(1, &m_hVBO2d);
+	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
+
+	// Quad batch //////////////////////////////////////////////////////////////////////////
+	m_pShader2d[QUADBATCH].CompileFromString(szHYQUADBATCH_VERTEXSHADER, HyOpenGLShader::VERTEX);
+	m_pShader2d[QUADBATCH].CompileFromString(szHYQUADBATCH_FRAGMENTSHADER, HyOpenGLShader::FRAGMENT);
+
+	if(!m_pShader2d[QUADBATCH].Link())
+		HyError("Shader program failed to link!\n" << m_pShader2d[QUADBATCH].Log().c_str() << "\n");
+
+	glBindVertexArray(m_pVAO2d[QUADBATCH]);
+
+	GLuint size = m_pShader2d[QUADBATCH].GetAttribLocation("size");
+	GLuint offset = m_pShader2d[QUADBATCH].GetAttribLocation("offset");
+	GLuint tint = m_pShader2d[QUADBATCH].GetAttribLocation("tint");
+	GLuint uv0 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord0");
+	GLuint uv1 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord1");
+	GLuint uv2 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord2");
+	GLuint uv3 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord3");
+	GLuint mtx = m_pShader2d[QUADBATCH].GetAttribLocation("mtxLocalToWorld");
+
+	glEnableVertexAttribArray(size);
+	glEnableVertexAttribArray(offset);
+	glEnableVertexAttribArray(tint);
+	glEnableVertexAttribArray(uv0);
+	glEnableVertexAttribArray(uv1);
+	glEnableVertexAttribArray(uv2);
+	glEnableVertexAttribArray(uv3);
+	glEnableVertexAttribArray(mtx + 0);
+	glEnableVertexAttribArray(mtx + 1);
+	glEnableVertexAttribArray(mtx + 2);
+	glEnableVertexAttribArray(mtx + 3);
+
+	glVertexAttribPointer(size, 2, GL_FLOAT, GL_FALSE, 128, (void *)0);
+	glVertexAttribPointer(offset, 2, GL_FLOAT, GL_FALSE, 128, (void *)(2 * sizeof(GLfloat)));
+	glVertexAttribPointer(tint, 4, GL_FLOAT, GL_FALSE, 128, (void *)(4 * sizeof(GLfloat)));
+	glVertexAttribPointer(uv0, 2, GL_FLOAT, GL_FALSE, 128, (void *)(8 * sizeof(GLfloat)));
+	glVertexAttribPointer(uv1, 2, GL_FLOAT, GL_FALSE, 128, (void *)(10 * sizeof(GLfloat)));
+	glVertexAttribPointer(uv2, 2, GL_FLOAT, GL_FALSE, 128, (void *)(12 * sizeof(GLfloat)));
+	glVertexAttribPointer(uv3, 2, GL_FLOAT, GL_FALSE, 128, (void *)(14 * sizeof(GLfloat)));
+	glVertexAttribPointer(mtx + 0, 4, GL_FLOAT, GL_FALSE, 128, (void *)(16 * sizeof(GLfloat)));
+	glVertexAttribPointer(mtx + 1, 4, GL_FLOAT, GL_FALSE, 128, (void *)(20 * sizeof(GLfloat)));
+	glVertexAttribPointer(mtx + 2, 4, GL_FLOAT, GL_FALSE, 128, (void *)(24 * sizeof(GLfloat)));
+	glVertexAttribPointer(mtx + 3, 4, GL_FLOAT, GL_FALSE, 128, (void *)(28 * sizeof(GLfloat)));
+
+	glVertexAttribDivisor(size, 1);
+	glVertexAttribDivisor(offset, 1);
+	glVertexAttribDivisor(tint, 1);
+	glVertexAttribDivisor(uv0, 1);
+	glVertexAttribDivisor(uv1, 1);
+	glVertexAttribDivisor(uv2, 1);
+	glVertexAttribDivisor(uv3, 1);
+	glVertexAttribDivisor(mtx + 0, 1);
+	glVertexAttribDivisor(mtx + 1, 1);
+	glVertexAttribDivisor(mtx + 2, 1);
+	glVertexAttribDivisor(mtx + 3, 1);
+
+	// Primitive //////////////////////////////////////////////////////////////////////////
+	m_pShader2d[PRIMITIVE].CompileFromString(szHYPRIMATIVE_VERTEXSHADER, HyOpenGLShader::VERTEX);
+	m_pShader2d[PRIMITIVE].CompileFromString(szHYPRIMATIVE_FRAGMENTSHADER, HyOpenGLShader::FRAGMENT);
+
+	if(!m_pShader2d[PRIMITIVE].Link())
+		HyError("Shader program failed to link!\n" << m_pShader2d[PRIMITIVE].Log().c_str() << "\n");
+
+	glBindVertexArray(m_pVAO2d[PRIMITIVE]);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
+
+
+	//const float fUnitQuadVertPos[16] = {
+	//	0.0f, 0.0f, 0.0f, 1.0f,
+	//	1.0f, 0.0f, 0.0f, 1.0f,
+	//	0.0f, 1.0f, 0.0f, 1.0f,
+	//	1.0f, 1.0f, 0.0f, 1.0f
+	//};
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, fUnitQuadVertPos, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexDataEmulate), vertexDataEmulate, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(primitiveVertexDataEmulate), primitiveVertexDataEmulate, GL_STATIC_DRAW);
+	//-----------------------------------------------------------------------------------------------------------------
+
+	// Initialize 2d quad index bufferSet up index data
+	//const short g_i16UnitQuadVertIndices[6] = {
+	//	0, 1, 2, 2, 1, 3
+	//};
+	//glGenBuffers(1, &m_hIBO2d);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(short)*6, g_i16UnitQuadVertIndices, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+
+	//m_pGenericIndexBuffer2d = new uint16[HY_INDEX_BUFFER_SIZE/sizeof(uint16)];
+	//uint16 *pCurWriteShort = m_pGenericIndexBuffer2d;
+	//uint16 uiIndexCount = 0;
+	//uint32 uiResetIndexCount = 0;
+	//for(int i = 0; i < (HY_INDEX_BUFFER_SIZE/2); ++i)
+	//{
+	//	uiResetIndexCount++;
+	//	if(uiResetIndexCount == 5)
+	//	{
+	//		*pCurWriteShort = HY_RESTART_INDEX;
+	//		uiResetIndexCount = 0;
+	//	}
+	//	else
+	//	{
+	//		*pCurWriteShort = uiIndexCount;
+	//		uiIndexCount++;
+	//	}
+
+	//	pCurWriteShort++;
+	//}
+	//glPrimitiveRestartIndex(HY_RESTART_INDEX);
+	//glEnable(GL_PRIMITIVE_RESTART);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Atlas Textures
+	//HyFileIO::GetAtlasTexture
+	//glGenTextures(
+
+	return true;
 }

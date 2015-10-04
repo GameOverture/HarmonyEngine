@@ -33,8 +33,12 @@ class HyMesh3dData;
 
 class IHyFileIO
 {
+	std::string											m_sDataDir;
+
 	HyGfxComms &										m_GfxCommsRef;
 	HyScene &											m_SceneRef;
+
+	HyAtlas												m_Atlas;
 
 	// Thread control structure to help sync loading of factory data
 	struct LoadThreadCtrl

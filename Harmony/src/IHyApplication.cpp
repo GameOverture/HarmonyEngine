@@ -31,8 +31,6 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
 
 	for(uint32 i = 0; i < m_Init.uiNumInputMappings; ++i)
 		m_vInputMaps.push_back(new HyInputMapInterop());
-
-	HyFileIO::SetDataDir(m_Init.szDataDir);
 }
 
 IHyApplication::~IHyApplication()

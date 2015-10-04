@@ -17,7 +17,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : HyOpenGL(gfxCommsRef, viewportsRef)
 {
-	
+	m_uiNumDCs = m_ViewportsRef.size();
+	m_ppDeviceContexes = new DeviceContext *[m_uiNumDCs];
+
+	for(uint32 i = 0; i < m_uiNumDCs; ++i)
+		m_ppDeviceContexes[i] = new DeviceContext(m_ViewportsRef[i].GetWindowInfo());
+
+	if(HyOpenGL::Initialize() == false)
+		HyError("OpenGL API's Initialize() failed");
 }
 
 HyOpenGL_Win::~HyOpenGL_Win()
@@ -119,17 +126,6 @@ void HyOpenGL_Win::DeviceContext::Resize(GLsizei iWidth, GLsizei iHeight)
 	//glLoadIdentity();									// Reset The Modelview Matrix
 }
 
-/*virtual*/ bool HyOpenGL_Win::Initialize()
-{
-	m_uiNumDCs = m_ViewportsRef.size();
-	m_ppDeviceContexes = new DeviceContext *[m_uiNumDCs];
-
-	for(uint32 i = 0; i < m_uiNumDCs; ++i)
-		m_ppDeviceContexes[i] = new DeviceContext(m_ViewportsRef[i].GetWindowInfo());
-
-	return HyOpenGL::Initialize();
-}
-
 /*virtual*/ void HyOpenGL_Win::FinishRender()
 {
 	for(uint32 i = 0; i < m_uiNumDCs; ++i)
@@ -138,8 +134,6 @@ void HyOpenGL_Win::DeviceContext::Resize(GLsizei iWidth, GLsizei iHeight)
 		SwapBuffers(hDeviceContext);
 	}
 }
-
-
 
 PIXELFORMATDESCRIPTOR pfd =
 {

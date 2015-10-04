@@ -9,8 +9,8 @@
  *************************************************************************/
 #include "Renderer/IHyRenderer.h"
 
-IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : m_GfxCommsRef(gfxCommsRef),
-																					m_ViewportsRef(viewportsRef)
+IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) :	m_GfxCommsRef(gfxCommsRef),
+																						m_ViewportsRef(viewportsRef)
 {
 }
 
