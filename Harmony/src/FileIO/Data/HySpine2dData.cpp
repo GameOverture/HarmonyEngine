@@ -49,12 +49,37 @@ HySpine2dData::~HySpine2dData()
 /*virtual*/ void HySpine2dData::OnGfxLoad(IHyRenderer &gfxApi)
 {
 	// TODO: possibly support multiple textures (aka rendererObject's)
-	HyTexture *pTexture = reinterpret_cast<HyTexture *>(m_SpineAtlasData->pages->rendererObject);
+	HyAtlas *pTexture = reinterpret_cast<HyAtlas *>(m_SpineAtlasData->pages->rendererObject);
 	pTexture->Upload(gfxApi);
 }
 
 /*virtual*/ void HySpine2dData::OnGfxRemove(IHyRenderer &gfxApi)
 {
-	HyTexture *pTexture = reinterpret_cast<HyTexture *>(m_SpineAtlasData->pages->rendererObject);
+	HyAtlas *pTexture = reinterpret_cast<HyAtlas *>(m_SpineAtlasData->pages->rendererObject);
 	gfxApi.DeleteTexture(*pTexture);
+}
+
+// Below functions are invoked within the Spine API and expect to be overloaded
+void _spAtlasPage_createTexture(spAtlasPage* self, const char* path)
+{
+	// THIS IS INVOKED FROM THE LOAD THREAD from any IData::DoLoad()
+
+	// TODO: Convert 'path' to Atlas texture index
+	uint32 uiTextureIndex = 0;
+
+	HyAtlas *pNewTexture = HyFileIO::GetAtlasTexture(uiTextureIndex);
+	self->rendererObject = pNewTexture;
+
+	self->width = pNewTexture->GetWidth();
+	self->height = pNewTexture->GetHeight();
+}
+
+void _spAtlasPage_disposeTexture(spAtlasPage* self)
+{
+}
+
+char* _spUtil_readFile(const char* path, int* length)
+{
+	// The returned data is freed within the spine API
+	return IHyFileIO::ReadTextFile(path, length);
 }

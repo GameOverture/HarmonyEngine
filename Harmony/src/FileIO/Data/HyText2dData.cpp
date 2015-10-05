@@ -88,10 +88,10 @@ _texture_glyph_t *HyText2dData::GetGlyph(uint32 uiFontIndex, wchar_t charcode)
 
 /*virtual*/ void HyText2dData::OnGfxLoad(IHyRenderer &gfxApi)
 {
-	m_pTexture->Upload(gfxApi);
+	//m_pTexture->Upload(gfxApi);
 }
 
 /*virtual*/ void HyText2dData::OnGfxRemove(IHyRenderer &gfxApi)
 {
-	gfxApi.DeleteTexture(*m_pTexture);
+	//gfxApi.DeleteTexture(*m_pTexture);
 }

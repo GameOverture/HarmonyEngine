@@ -29,8 +29,9 @@ class IHyInst2d : public ITransform<HyAnimVec2>
 	static IHyFileIO *			sm_pCtor;
 
 protected:
-	const HyInstanceType		m_keInstType;
-	const std::string			m_ksPath;
+	const HyInstanceType		m_eTYPE;
+	const std::string			m_sNAME;
+	const std::string			m_sPREFIX;
 	
 	HyRenderState				m_RenderState;
 
@@ -52,13 +53,11 @@ protected:
 
 public:
 	IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName);
-	IHyInst2d(HyInstanceType eInstType, uint32 uiTextureIndex);
 	virtual ~IHyInst2d(void);
 
-	void CtorInit();
-
-	HyInstanceType GetInstType()								{ return m_keInstType; }
-	const std::string &GetPath()								{ return m_ksPath; }
+	HyInstanceType GetInstType()								{ return m_eTYPE; }
+	const std::string &GetName()								{ return m_sNAME; }
+	const std::string &GetPrefix()								{ return m_sPREFIX; }
 
 	HyLoadState GetLoadState()									{ return m_eLoadState; }
 

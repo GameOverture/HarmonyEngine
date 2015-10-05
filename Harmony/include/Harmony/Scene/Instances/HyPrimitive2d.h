@@ -14,7 +14,7 @@
 
 #include "Scene/Instances/IHyInst2d.h"
 
-class HyTexture;
+class HyAtlas;
 
 class HyPrimitive2d : public IHyInst2d
 {

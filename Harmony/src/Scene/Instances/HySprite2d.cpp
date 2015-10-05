@@ -21,8 +21,6 @@ HySprite2d::~HySprite2d(void)
 
 /*virtual*/ void HySprite2d::OnDataLoaded()
 {
-	if(m_ksPath.empty())
-		return;
 }
 
 /*virtual*/ void HySprite2d::Update()

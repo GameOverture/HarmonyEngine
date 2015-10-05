@@ -17,6 +17,12 @@
 #include "FileIO/Data/HyText2dData.h"
 #include "FileIO/Data/HyTexturedQuad2dData.h"
 
+#include "Utilities/jsonxx.h"
+
+#include "stdio.h"
+#include <fstream>
+#include <algorithm>
+
 IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_GfxCommsRef(gfxCommsRef),
 																								m_SceneRef(sceneRef),
 																								m_Sfx(HYINST_Sound2d),
@@ -35,6 +41,33 @@ IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene
 	
 	std::string sAtlasFilePath = m_sDataDir;
 	sAtlasFilePath += "Atlas/atlasInfo.json";
+
+	jsonxx::Object atlasObject;
+	atlasObject.parse(ReadTextFile(sAtlasFilePath.c_str()));
+
+	uint32 uiNumTextures = static_cast<uint32>(atlasObject.get<jsonxx::Number>("numTextures"));
+
+	jsonxx::Array texturesArray = atlasObject.get<jsonxx::Array>("textures");
+	HyAssert(texturesArray.size() == uiNumTextures, "atlasInfo.json reported wrong amount of textures");
+
+	for(uint32 i = 0; i < uiNumTextures; ++i)
+	{
+		jsonxx::Object texObj = texturesArray.get<jsonxx::Object>(i);
+		HyAssert(texObj.get<jsonxx::Number>("id") == i, "atlasInfo.json reported wrong texture Id");
+
+		jsonxx::Array srcFramesArray = texObj.get<jsonxx::Array>("srcFrames");
+		uint32 uiNumSrcFrames = srcFramesArray.size();
+		for(uint32 j = 0; j < uiNumSrcFrames; ++j)
+		{
+			jsonxx::Object srcFrameObj = srcFramesArray.get<jsonxx::Object>(j);
+
+			uint32 uiHeight = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("height"));
+			uint32 uiWidth = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("width"));
+			uint32 uiX = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("x"));
+			uint32 uiY = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("y"));
+			bool bRotated = srcFrameObj.get<jsonxx::Boolean>("rotated");
+		}
+	}
 
 	//sm_Atlas.Initialize(sFilePath);
 
@@ -171,6 +204,59 @@ void IHyFileIO::RemoveInst(IHyInst2d *pInst)
 	default:
 		HyError("IHyFileIO::RemoveInst() passed an invalid HyLoadState");
 	}
+}
+
+/*static*/ char *IHyFileIO::ReadTextFile(const char *szFilePath, int *iLength)
+{
+	char *pData;
+	FILE *pFile = fopen(szFilePath, "rb");
+	if(!pFile)
+		return 0;
+
+	fseek(pFile, 0, SEEK_END);
+	*iLength = ftell(pFile);
+	fseek(pFile, 0, SEEK_SET);
+
+	pData = new char[*iLength];
+	fread(pData, 1, *iLength, pFile);
+	fclose(pFile);
+
+	return pData;
+}
+
+/*static*/ std::string IHyFileIO::ReadTextFile(const char *szFilePath)
+{
+	if(szFilePath == NULL)
+	{
+		//sm_sLogStr = "ReadTextFile - filename is NULL\n";
+		return std::string();
+	}
+
+	std::ifstream infile(szFilePath, std::ios::binary);
+	if(!infile)
+	{
+		//sm_sLogStr = "ReadTextFile() - invalid filename\n";
+		return std::string();
+	}
+
+	// TODO: Make this a lot more safer!
+	std::istreambuf_iterator<char> begin(infile), end;
+
+	std::string sReadOutput;
+	sReadOutput.append(begin, end);
+
+	return sReadOutput;
+}
+
+/*static*/ bool IHyFileIO::FileExists(const std::string &sFilePath)
+{
+	return true;
+
+	//struct stat info;
+	//uint32 ret = -1;
+
+	//ret = stat(sFilePath.c_str(), &info);
+	//return 0 == ret;
 }
 
 void IHyFileIO::OnDataLoaded(IHyData *pData)

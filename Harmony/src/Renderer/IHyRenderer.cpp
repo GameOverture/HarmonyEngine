@@ -28,7 +28,19 @@ void IHyRenderer::Update()
 	}
 	m_DrawpBufferHeader = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr);
 
-	ProcessGameMsgs();
+	// Handle each command message first. Which loads/unloads gfx resources.
+	while(!m_pMsgQueuePtr->empty())
+	{
+		IHyData *pData = m_pMsgQueuePtr->front();
+		m_pMsgQueuePtr->pop();
+
+		if(pData->GetLoadState() == HYLOADSTATE_Queued)
+			pData->OnGfxLoad(*this);
+		else
+			pData->OnGfxRemove(*this);
+
+		m_pSendMsgQueuePtr->push(pData);
+	}
 
 	StartRender();
 
@@ -47,23 +59,6 @@ void IHyRenderer::Update()
 	FinishRender();
 
 	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr)->uiReturnFlags |= GFXFLAG_HasRendered;
-}
-
-void IHyRenderer::ProcessGameMsgs()
-{
-	// Handle each command message first. Which loads/unloads gfx resources.
-	while(!m_pMsgQueuePtr->empty())
-	{
-		IHyData *pData = m_pMsgQueuePtr->front();
-		m_pMsgQueuePtr->pop();
-
-		if(pData->GetLoadState() == HYLOADSTATE_Queued)
-			pData->OnGfxLoad(*this);
-		else
-			pData->OnGfxRemove(*this);
-
-		m_pSendMsgQueuePtr->push(pData);
-	}
 }
 
 void IHyRenderer::Draw2d()

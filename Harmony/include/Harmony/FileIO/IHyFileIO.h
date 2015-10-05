@@ -11,9 +11,9 @@
 #define __IHyFileIO_h__
 
 #include "Afx/HyStdAfx.h"
-#include "FileIO/Atlas/HyTexture.h"
+#include "FileIO/Data/HyAtlas.h"
 
-#include "Data/HyFactory.h"
+#include "FileIO/HyFactory.h"
 #include "Threading/Threading.h"
 
 #include "Renderer/HyGfxComms.h"
@@ -37,8 +37,6 @@ class IHyFileIO
 
 	HyGfxComms &										m_GfxCommsRef;
 	HyScene &											m_SceneRef;
-
-	HyAtlas												m_Atlas;
 
 	// Thread control structure to help sync loading of factory data
 	struct LoadThreadCtrl
@@ -75,7 +73,7 @@ class IHyFileIO
 	// Loading thread info pointer
 	ThreadInfoPtr										m_pLoadingThread;
 
-	HyTexture **	m_ppTextures;
+	HyAtlas **	m_ppTextures;
 	uint32			m_uiNumTextures;
 
 public:
@@ -86,6 +84,10 @@ public:
 
 	void LoadInst2d(IHyInst2d *pInst);
 	void RemoveInst(IHyInst2d *pInst);
+
+	static char *ReadTextFile(const char *szFilePath, int *iLength);
+	static std::string ReadTextFile(const char *szFilePath);
+	static bool FileExists(const std::string &sFilePath);
 
 private:
 	void OnDataLoaded(IHyData *pData);

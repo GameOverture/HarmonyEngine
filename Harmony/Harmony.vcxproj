@@ -35,7 +35,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\Harmony\FileIO\stb_image.c" />
     <ClCompile Include="include\Harmony\Threading\BasicSync.cpp" />
     <ClCompile Include="include\Harmony\Threading\InteropUnix.cpp" />
     <ClCompile Include="include\Harmony\Threading\stdafx.cpp" />
@@ -45,17 +44,14 @@
     <ClCompile Include="include\Harmony\Threading\WaitObject.cpp" />
     <ClCompile Include="include\Harmony\Threading\WaitObjectEx.cpp" />
     <ClCompile Include="src\Audio\HyAudio.cpp" />
-    <ClCompile Include="src\FileIO\Atlas\HyAtlas.cpp" />
-    <ClCompile Include="src\FileIO\Atlas\HyTexture.cpp" />
+    <ClCompile Include="src\FileIO\Data\HyAtlas.cpp" />
     <ClCompile Include="src\FileIO\Data\HyMesh3dData.cpp" />
     <ClCompile Include="src\FileIO\Data\HySfxData.cpp" />
     <ClCompile Include="src\FileIO\Data\HySpine2dData.cpp" />
     <ClCompile Include="src\FileIO\Data\HySprite2dData.cpp" />
     <ClCompile Include="src\FileIO\Data\HyText2dData.cpp" />
     <ClCompile Include="src\FileIO\Data\HyTexturedQuad2dData.cpp" />
-    <ClCompile Include="src\FileIO\HyFileIO.cpp" />
     <ClCompile Include="src\FileIO\IHyFileIO.cpp" />
-    <ClCompile Include="src\FileIO\jasonxx.cc" />
     <ClCompile Include="src\GuiTool\HyGuiComms.cpp" />
     <ClCompile Include="src\GuiTool\HyLiveWatchManager.cpp" />
     <ClCompile Include="src\HyEngine.cpp" />
@@ -97,8 +93,9 @@
     <ClCompile Include="src\Utilities\HyHardwareInfo.cpp" />
     <ClCompile Include="src\Utilities\HyMath.cpp" />
     <ClCompile Include="src\Utilities\HyBox2dRuntime.cpp" />
-    <ClCompile Include="src\Utilities\HySpineRuntime.cpp" />
     <ClCompile Include="src\Utilities\HyStrManip.cpp" />
+    <ClCompile Include="src\Utilities\jasonxx.cc" />
+    <ClCompile Include="src\Utilities\stb_image.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler.h" />
@@ -113,9 +110,7 @@
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
     <ClInclude Include="include\Harmony\Audio\HyAudio.h" />
-    <ClInclude Include="include\Harmony\FileIO\Atlas\HyAtlas.h" />
-    <ClInclude Include="include\Harmony\FileIO\Atlas\HyTexture.h" />
-    <ClInclude Include="include\Harmony\FileIO\Data\HyFactory.h" />
+    <ClInclude Include="include\Harmony\FileIO\Data\HyAtlas.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HyMesh3dData.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HySfxData.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HySpine2dData.h" />
@@ -123,10 +118,8 @@
     <ClInclude Include="include\Harmony\FileIO\Data\HyText2dData.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HyTexturedQuad2dData.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\IHyData.h" />
-    <ClInclude Include="include\Harmony\FileIO\HyFileIO.h" />
+    <ClInclude Include="include\Harmony\FileIO\HyFactory.h" />
     <ClInclude Include="include\Harmony\FileIO\IHyFileIO.h" />
-    <ClInclude Include="include\Harmony\FileIO\jsonxx.h" />
-    <ClInclude Include="include\Harmony\FileIO\stb_image.h" />
     <ClInclude Include="include\Harmony\GuiTool\HyGuiComms.h" />
     <ClInclude Include="include\Harmony\GuiTool\HyLiveWatchManager.h" />
     <ClInclude Include="include\Harmony\HyEngine.h" />
@@ -190,8 +183,9 @@
     <ClInclude Include="include\Harmony\Utilities\HyHardwareInfo.h" />
     <ClInclude Include="include\Harmony\Utilities\HyMath.h" />
     <ClInclude Include="include\Harmony\Utilities\HyBox2dRuntime.h" />
-    <ClInclude Include="include\Harmony\Utilities\HySpineRuntime.h" />
     <ClInclude Include="include\Harmony\Utilities\HyStrManip.h" />
+    <ClInclude Include="include\Harmony\Utilities\jsonxx.h" />
+    <ClInclude Include="include\Harmony\Utilities\stb_image.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}</ProjectGuid>

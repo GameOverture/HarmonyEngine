@@ -19,9 +19,6 @@
     <ClCompile Include="src\Utilities\HyMath.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utilities\HySpineRuntime.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="src\Audio\HyAudio.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
@@ -65,15 +62,6 @@
     <ClCompile Include="src\Renderer\HyGfxComms.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\FileIO\HyFileIO.cpp">
-      <Filter>FileIO</Filter>
-    </ClCompile>
-    <ClCompile Include="include\Harmony\FileIO\stb_image.c">
-      <Filter>FileIO</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FileIO\jasonxx.cc">
-      <Filter>FileIO</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\HyRenderState.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
@@ -82,12 +70,6 @@
     </ClCompile>
     <ClCompile Include="src\GuiTool\HyLiveWatchManager.cpp">
       <Filter>GuiTool</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FileIO\Atlas\HyTexture.cpp">
-      <Filter>FileIO\Atlas</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FileIO\Atlas\HyAtlas.cpp">
-      <Filter>FileIO\Atlas</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL\HyOpenGL.cpp">
       <Filter>Renderer\OpenGL</Filter>
@@ -189,6 +171,15 @@
     <ClCompile Include="src\Scene\Instances\IHyInst2d.cpp">
       <Filter>Scene\Instances</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utilities\jasonxx.cc">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\stb_image.c">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FileIO\Data\HyAtlas.cpp">
+      <Filter>FileIO\Data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -244,9 +235,6 @@
     </Filter>
     <Filter Include="GuiTool">
       <UniqueIdentifier>{f30ad593-855a-4f2f-9687-8e618b4ed676}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="FileIO\Atlas">
-      <UniqueIdentifier>{e45bffd8-5f02-42e3-b8bc-a90540b648cd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Renderer\OpenGL">
       <UniqueIdentifier>{266ff3c9-2890-44c9-90f1-b987c1598bc6}</UniqueIdentifier>
@@ -326,9 +314,6 @@
     <ClInclude Include="include\Harmony\Utilities\HyMath.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Utilities\HySpineRuntime.h">
-      <Filter>Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Utilities\HyStrManip.h">
       <Filter>Utilities</Filter>
     </ClInclude>
@@ -401,15 +386,6 @@
     <ClInclude Include="include\Harmony\Renderer\HyGfxComms.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\FileIO\stb_image.h">
-      <Filter>FileIO</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\FileIO\HyFileIO.h">
-      <Filter>FileIO</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\FileIO\jsonxx.h">
-      <Filter>FileIO</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\HyRenderState.h">
       <Filter>Renderer</Filter>
     </ClInclude>
@@ -418,12 +394,6 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\GuiTool\HyLiveWatchManager.h">
       <Filter>GuiTool</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\FileIO\Atlas\HyTexture.h">
-      <Filter>FileIO\Atlas</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\FileIO\Atlas\HyAtlas.h">
-      <Filter>FileIO\Atlas</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Afx\HyInteropAfx.h">
       <Filter>Afx</Filter>
@@ -483,9 +453,6 @@
     <ClInclude Include="include\Harmony\FileIO\IHyFileIO.h">
       <Filter>FileIO</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\FileIO\Data\HyFactory.h">
-      <Filter>FileIO\Data</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\FileIO\Data\HyMesh3dData.h">
       <Filter>FileIO\Data</Filter>
     </ClInclude>
@@ -539,6 +506,18 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Scene\Instances\IHyInst2d.h">
       <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\stb_image.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\jsonxx.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\FileIO\Data\HyAtlas.h">
+      <Filter>FileIO\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\FileIO\HyFactory.h">
+      <Filter>FileIO</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

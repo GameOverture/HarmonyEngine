@@ -14,24 +14,9 @@
 
 /*static*/ IHyFileIO *IHyInst2d::sm_pCtor = NULL;
 
-IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName) :	m_keInstType(eInstType),
-																							m_ksPath(HyFileIO::GetFilePath(m_keInstType, szPrefix, szName))
-{
-	CtorInit();
-}
-
-IHyInst2d::IHyInst2d(HyInstanceType eInstType, uint32 uiTextureIndex) :	m_keInstType(eInstType),
-																		m_ksPath(std::to_string(uiTextureIndex))
-{
-	CtorInit();
-}
-
-/*virtual*/ IHyInst2d::~IHyInst2d(void)
-{
-	Unload();
-}
-
-void IHyInst2d::CtorInit()
+IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName) :	m_eTYPE(eInstType),
+																							m_sPREFIX(szPrefix),
+																							m_sNAME(szName)
 {
 	m_pDataPtr = NULL;
 	m_eLoadState = HYLOADSTATE_Inactive;
@@ -41,6 +26,11 @@ void IHyInst2d::CtorInit()
 
 	m_vColor.Set(1.0f);
 	SetOnDirtyCallback(OnDirty, this);
+}
+
+/*virtual*/ IHyInst2d::~IHyInst2d(void)
+{
+	Unload();
 }
 
 void IHyInst2d::Load()

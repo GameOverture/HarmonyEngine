@@ -15,10 +15,12 @@
 #include "Scene/Instances/IHyInst2d.h"
 #include "FileIO/Data/HyTexturedQuad2dData.h"
 
-#include "FileIO/Atlas/HyTexture.h"
+#include "FileIO/Data/HyAtlas.h"
 
 class HyTexturedQuad2d : public IHyInst2d
 {
+	HyAtlas *			m_pTexture;
+
 public:
 	HyTexturedQuad2d(uint32 uiTextureIndex);
 	virtual ~HyTexturedQuad2d();

@@ -20,23 +20,23 @@ HyTexturedQuad2dData::~HyTexturedQuad2dData()
 {
 }
 
-const HyTexture *HyTexturedQuad2dData::GetTexture() const
-{
-	return m_pTexture;
-}
+//const HyTexture *HyTexturedQuad2dData::GetTexture() const
+//{
+//	return m_pTexture;
+//}
 
 /*virtual*/ void HyTexturedQuad2dData::DoFileLoad()
 {
-	int32 iTextureIndex = atoi(m_ksPath.c_str());
-	m_pTexture = HyFileIO::GetAtlasTexture(iTextureIndex);
+	//int32 iTextureIndex = atoi(m_ksPath.c_str());
+	//m_pTexture = HyFileIO::GetAtlasTexture(iTextureIndex);
 }
 
 /*virtual*/ void HyTexturedQuad2dData::OnGfxLoad(IHyRenderer &gfxApi)
 {
-	m_pTexture->Upload(gfxApi);
+	//m_pTexture->Upload(gfxApi);
 }
 
 /*virtual*/ void HyTexturedQuad2dData::OnGfxRemove(IHyRenderer &gfxApi)
 {
-	gfxApi.DeleteTexture(*m_pTexture);
+	//gfxApi.DeleteTexture(*m_pTexture);
 }

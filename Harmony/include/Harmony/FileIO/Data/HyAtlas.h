@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyTexture.h
+ *	HyAtlas.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyTexture_h__
-#define __HyTexture_h__
+#ifndef __HyAtlas_h__
+#define __HyAtlas_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -20,7 +20,7 @@ using std::vector;
 // Forward declarations
 class IHyRenderer;
 
-class HyTexture
+class HyAtlas
 {
 	uint32				m_uiId;
 
@@ -40,15 +40,12 @@ class HyTexture
 	// get RGBA output, but you can check *comp to easily see if it's opaque.
 	unsigned char *		m_pPixelData;
 
-	bool				m_bLoadedWithStbi;
-
 	HyRectangle *		m_pSrcRects;
 	uint32				m_uiNumRects;
 
 public:
-	HyTexture(const std::string &sPath, HyRectangle *pSrcRects = NULL, uint32 uiNumRects = 0);
-	HyTexture(const std::string &sPath, int32 iWidth, int32 iHeight, int32 iNum8bitClrChannels, unsigned char *pPixelData);
-	~HyTexture(void);
+	HyAtlas(const std::string &sPath, HyRectangle *pSrcRects = NULL, uint32 uiNumRects = 0);
+	~HyAtlas(void);
 
 	int32 GetWidth() const				{ return m_iWidth; }
 	int32 GetHeight() const				{ return m_iHeight; }
@@ -62,4 +59,4 @@ public:
 	void DeletePixelData();
 };
 
-#endif /* __HyTexture_h__ */
+#endif /* __HyAtlas_h__ */

@@ -13,7 +13,6 @@
 #include "Afx/HyStdAfx.h"
 
 #include "IHyInst2d.h"
-#include "Utilities/HySpineRuntime.h"
 
 #include "FileIO/Data/HySpine2dData.h"
 

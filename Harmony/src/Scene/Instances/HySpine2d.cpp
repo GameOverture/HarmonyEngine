@@ -187,7 +187,7 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 			continue;
 
 		spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
-		m_RenderState.SetTextureHandle(0, reinterpret_cast<HyTexture *>(reinterpret_cast<spAtlasRegion *>(regionAttachment->rendererObject)->page->rendererObject)->GetId());
+		m_RenderState.SetTextureHandle(0, reinterpret_cast<HyAtlas *>(reinterpret_cast<spAtlasRegion *>(regionAttachment->rendererObject)->page->rendererObject)->GetId());
 		m_RenderState.AppendInstances(1);
 	}
 

@@ -11,11 +11,13 @@
 #define __HyEnt2dData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "FileIO\Data\IHyData.h"
+#include "FileIO/Data/IHyData.h"
+#include "FileIO/HyFactory.h"
 
-#include "Utilities/HySpineRuntime.h"
+#include "spine/spine.h"
+#include "spine/extension.h"
 
-class HyTexture;
+class HyAtlas;
 class IGfxApi;
 
 class HySpine2dData : public IHyData

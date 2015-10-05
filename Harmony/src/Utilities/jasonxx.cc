@@ -5,7 +5,7 @@
 //   Sean Middleditch <sean@middleditch.us>
 //   rlyeh <https://github.com/r-lyeh>
 
-#include "Harmony/FileIO/jsonxx.h"
+#include "Harmony/Utilities/jsonxx.h"
 
 #include <cctype>
 #include <iostream>

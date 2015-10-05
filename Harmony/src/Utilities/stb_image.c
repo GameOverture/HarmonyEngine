@@ -60,7 +60,7 @@
  If your name should be here but isn't, let Sean know.
 
 */
-#include "stb_image.h"
+#include "Utilities/stb_image.h"
 
 #ifndef STBI_HEADER_FILE_ONLY
 

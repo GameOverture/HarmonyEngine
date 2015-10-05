@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Scene/Instances/HyTexturedQuad2d.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiTextureIndex) : IHyInst2d(HYINST_TexturedQuad2d, uiTextureIndex)
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiTextureIndex) : IHyInst2d(HYINST_TexturedQuad2d, NULL, std::to_string(uiTextureIndex).c_str())
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::SHADER_QUADBATCH);
 	m_RenderState.SetNumInstances(1);
@@ -30,9 +30,10 @@ HyTexturedQuad2d::~HyTexturedQuad2d()
 
 /*virtual*/ void HyTexturedQuad2d::WriteDrawBufferData(char *&pRefDataWritePos)
 {
-	const HyTexture *pTexture = static_cast<HyTexturedQuad2dData *>(m_pDataPtr)->GetTexture();
+	//const HyTexture *pTexture = static_cast<HyTexturedQuad2dData *>(m_pDataPtr)->GetTexture();
 
-	vec2 vSize(pTexture->GetWidth(), pTexture->GetHeight());
+	HyError("Need texture dimentions");
+	vec2 vSize(1.0f/*pTexture->GetWidth(), pTexture->GetHeight()*/);
 	vec2 vOffset(m_ptPosition.X(), m_ptPosition.Y());
 
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vSize;

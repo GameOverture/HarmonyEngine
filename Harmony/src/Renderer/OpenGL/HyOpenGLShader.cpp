@@ -24,72 +24,72 @@ HyOpenGLShader::~HyOpenGLShader()
 		glDeleteProgram(m_hProgHandle);
 }
 
-bool HyOpenGLShader::CompileFromFile(const char *szFileName, eGLSLShaderType eType)
-{
-	// check if the user passed us null for either filename
-	if (szFileName == NULL)
-	{
-		m_sLogStr = "szFileName was empty.";
-		return false;
-	}
-
-	// Combine full path and filename to shaders
-	std::string sFullFilePath;
-	sFullFilePath = HyFileIO::GetFilePath(HYINST_Shader, "", szFileName);
-
-	switch(eType)
-	{
-	case VERTEX:
-		if(0 != strcmp(&sFullFilePath[sFullFilePath.size() - 5], ".vert"))
-			sFullFilePath += ".vert";
-		break;
-	case FRAGMENT:
-		if(0 != strcmp(&sFullFilePath[sFullFilePath.size() - 5], ".frag"))
-			sFullFilePath += ".frag";
-		break;
-	case GEOMETRY:
-		if(0 != strcmp(&sFullFilePath[sFullFilePath.size() - 5], ".geom"))
-			sFullFilePath += ".geom";
-		break;
-	case TESS_CONTROL:
-	case TESS_EVALUATION:
-		if(0 != strcmp(&sFullFilePath[sFullFilePath.size() - 5], ".tess"))
-			sFullFilePath += ".tess";
-		break;
-	default:
-		m_sLogStr = "Unknown shader type";
-		return false;
-	}
-
-	/** Get Vertex And Fragment Shader Sources **/
-
-
-	//  read the shader source code from constructed file path
-	if(!HyFileIO::FileExists(sFullFilePath))
-	{
-		m_sLogStr = "File not found.";
-		return false;
-	}
-	m_sCurSrcCode = HyFileIO::ReadTextFile(sFullFilePath.c_str());
-	if(m_sCurSrcCode.empty())
-	{
-		m_sLogStr = "CreateShaderProgram - Vertex shader was not read correctly";
-		return false;
-	}
-
-	// Create main program handle if one hasn't been created yet (first shader compile)
-	if(m_hProgHandle <= 0)
-	{
-		m_hProgHandle = glCreateProgram();
-		if(m_hProgHandle == 0)
-		{
-			m_sLogStr = "Unable to create shader program.";
-			return false;
-		}
-	}
-
-	return CompileFromString(m_sCurSrcCode.c_str(), eType);
-}
+//bool HyOpenGLShader::CompileFromFile(const char *szFileName, eGLSLShaderType eType)
+//{
+//	// check if the user passed us null for either filename
+//	if (szFileName == NULL)
+//	{
+//		m_sLogStr = "szFileName was empty.";
+//		return false;
+//	}
+//
+//	// Combine full path and filename to shaders
+//	std::string sFullFilePath;
+//	sFullFilePath = HyFileIO::GetFilePath(HYINST_Shader, "", szFileName);
+//
+//	switch(eType)
+//	{
+//	case VERTEX:
+//		if(0 != strcmp(&sFullFilePath[sFullFilePath.size() - 5], ".vert"))
+//			sFullFilePath += ".vert";
+//		break;
+//	case FRAGMENT:
+//		if(0 != strcmp(&sFullFilePath[sFullFilePath.size() - 5], ".frag"))
+//			sFullFilePath += ".frag";
+//		break;
+//	case GEOMETRY:
+//		if(0 != strcmp(&sFullFilePath[sFullFilePath.size() - 5], ".geom"))
+//			sFullFilePath += ".geom";
+//		break;
+//	case TESS_CONTROL:
+//	case TESS_EVALUATION:
+//		if(0 != strcmp(&sFullFilePath[sFullFilePath.size() - 5], ".tess"))
+//			sFullFilePath += ".tess";
+//		break;
+//	default:
+//		m_sLogStr = "Unknown shader type";
+//		return false;
+//	}
+//
+//	/** Get Vertex And Fragment Shader Sources **/
+//
+//
+//	//  read the shader source code from constructed file path
+//	if(!HyFileIO::FileExists(sFullFilePath))
+//	{
+//		m_sLogStr = "File not found.";
+//		return false;
+//	}
+//	m_sCurSrcCode = HyFileIO::ReadTextFile(sFullFilePath.c_str());
+//	if(m_sCurSrcCode.empty())
+//	{
+//		m_sLogStr = "CreateShaderProgram - Vertex shader was not read correctly";
+//		return false;
+//	}
+//
+//	// Create main program handle if one hasn't been created yet (first shader compile)
+//	if(m_hProgHandle <= 0)
+//	{
+//		m_hProgHandle = glCreateProgram();
+//		if(m_hProgHandle == 0)
+//		{
+//			m_sLogStr = "Unable to create shader program.";
+//			return false;
+//		}
+//	}
+//
+//	return CompileFromString(m_sCurSrcCode.c_str(), eType);
+//}
 
 bool HyOpenGLShader::CompileFromString(const char *szSource, eGLSLShaderType type)
 {

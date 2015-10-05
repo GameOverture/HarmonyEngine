@@ -37,9 +37,6 @@ public:
 	//HyString &GetString()				{ return m_sString; }
 	size_t GetStrLen()					{ return m_sString.length(); }
 
-	uint32 GetTextureId()				{ return (m_pDataPtr == NULL) ? 0 : reinterpret_cast<HyText2dData *>(m_pDataPtr)->GetTexturePtr()->GetId(); }
-
-
 private:
 	virtual void Update();
 	virtual void OnDataLoaded();

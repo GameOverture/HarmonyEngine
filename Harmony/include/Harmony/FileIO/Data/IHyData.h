@@ -10,26 +10,22 @@
 #ifndef __IHyData_h__
 #define __IHyData_h__
 
-#include "Utilities/HyStrManip.h"
-#include "Utilities/Animation/HyAnimVec2.h"
-#include "HyFactory.h"
+#include "Afx/HyStdAfx.h"
 
-#include "FileIO/HyFileIO.h"
+#include <vector>
+using std::vector;
 
 // Forward declarations
 class IHyRenderer;
 
 class IHyData
 {
-	static HyFactory<HyTexture>		sm_AtlasTextures;
-
 protected:
 	const HyInstanceType			m_keDataType;
 	const std::string				m_ksPath;
 	
 	HyLoadState						m_eLoadState;
 	int32							m_iRefCount;
-
 
 public:
 	IHyData(HyInstanceType eDataType, const std::string &sPath) :	m_keDataType(eDataType),

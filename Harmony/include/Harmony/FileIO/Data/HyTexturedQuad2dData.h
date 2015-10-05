@@ -13,13 +13,13 @@
 #include "Afx/HyStdAfx.h"
 
 #include "FileIO\Data\IHyData.h"
-
+#include "FileIO\HyFactory.h"
 
 class HyTexturedQuad2dData : public IHyData
 {
 	friend class HyFactory<HyTexturedQuad2dData>;
 
-	HyTexture *				m_pTexture;
+	//HyTexture *				m_pTexture;
 
 	// Only allow HyFactory instantiate
 	HyTexturedQuad2dData(const std::string &sPath);
@@ -27,7 +27,7 @@ class HyTexturedQuad2dData : public IHyData
 public:
 	virtual ~HyTexturedQuad2dData();
 
-	const HyTexture *GetTexture() const;
+	//const HyTexture *GetTexture() const;
 
 	virtual void DoFileLoad();
 	virtual void OnGfxLoad(IHyRenderer &gfxApi);
