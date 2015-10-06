@@ -17,7 +17,7 @@
 #include "spine/spine.h"
 #include "spine/extension.h"
 
-class HyAtlas;
+class HyAtlasGroupData;
 class IGfxApi;
 
 class HySpine2dData : public IHyData

@@ -27,6 +27,8 @@ enum HyInstanceType
 	HYINST_Text2d,
 	HYINST_Mesh3d,
 
+	HYINST_AtlasGroup,
+
 	HYINST_Shader
 };
 

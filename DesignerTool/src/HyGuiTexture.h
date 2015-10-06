@@ -37,6 +37,7 @@ class HyGuiTexture
     
     ImagePacker             m_Packer;
     QTreeWidgetItem *       m_pTreeItem;
+    int                     m_iLoadGroup;
     
     bool                    m_bDirty;
     
@@ -61,6 +62,7 @@ public:
    
     // Generates a texture and atlas file
     QJsonArray GetFrameArray();
+    int GetLoadGroup()                  { return m_iLoadGroup; }
     void GenerateImg();
     
     // Finds what texture ID (or index) this texture is and returns it

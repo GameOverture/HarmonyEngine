@@ -12,7 +12,7 @@
 #include "Utilities/HyStrManip.h"
 #include "Renderer/IHyRenderer.h"
 
-HyAtlas::HyAtlas(const std::string &sPath, HyRectangle *pSrcRects /*= NULL*/, uint32 uiNumRects /*= 0*/) :	m_ksPath(sPath),
+HyAtlasGroupData::HyAtlasGroupData(const std::string &sPath, HyRectangle *pSrcRects /*= NULL*/, uint32 uiNumRects /*= 0*/) :	m_ksPath(sPath),
 																												m_iWidth(0),
 																												m_iHeight(0),
 																												m_iNum8bitClrChannels(0),
@@ -41,19 +41,19 @@ HyAtlas::HyAtlas(const std::string &sPath, HyRectangle *pSrcRects /*= NULL*/, ui
 //	memcpy(m_pPixelData, pPixelData, uiDataSizeBytes);
 //}
 
-HyAtlas::~HyAtlas(void)
+HyAtlasGroupData::~HyAtlasGroupData(void)
 {
 	DeletePixelData();
 }
 
 // To be invoked on the render thread
-void HyAtlas::Upload(IHyRenderer &gfxApi)
+void HyAtlasGroupData::Upload(IHyRenderer &gfxApi)
 {
 	m_uiId = gfxApi.AddTexture(m_iNum8bitClrChannels, m_iWidth, m_iHeight, m_pPixelData);
 	DeletePixelData();
 }
 
-void HyAtlas::DeletePixelData()
+void HyAtlasGroupData::DeletePixelData()
 {
 	stbi_image_free(m_pPixelData);
 	m_pPixelData = NULL;

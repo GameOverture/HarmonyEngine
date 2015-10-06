@@ -441,6 +441,8 @@ void WidgetAtlas::SaveData()
     // Write global atlas information
     QJsonObject atlasInfo;
     atlasInfo.insert("numTextures", QJsonValue(m_Textures.size()));
+    atlasInfo.insert("width", ui->sbTextureWidth->value());
+    atlasInfo.insert("height", ui->sbTextureHeight->value());
     
     QJsonArray textureArray;
     for(int i = 0; i < m_Textures.size(); ++i)
@@ -448,10 +450,11 @@ void WidgetAtlas::SaveData()
         // Save any changed textures to disk
         if(m_Textures[i]->IsDirty())
             m_Textures[i]->GenerateImg();
-        
-        QJsonObject textureInfo;
+
         textureInfo.insert("id", QJsonValue(i));
-        
+        textureInfo.insert("loadGroup", QJsonValue(m_Textures[i]->GetLoadGroup()));
+
+        QJsonObject textureInfo;
         QJsonArray frameArray = m_Textures[i]->GetFrameArray();
         textureInfo.insert("srcFrames", frameArray);
         

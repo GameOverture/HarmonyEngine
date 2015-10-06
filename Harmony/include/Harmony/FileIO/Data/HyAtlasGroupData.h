@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Utilities/HyMath.h"
+#include "FileIO/Data/IHyData.h"
 
 #include <vector>
 using std::vector;
@@ -20,7 +20,7 @@ using std::vector;
 // Forward declarations
 class IHyRenderer;
 
-class HyAtlas
+class HyAtlasGroupData : public IHyData
 {
 	uint32				m_uiId;
 
@@ -44,8 +44,8 @@ class HyAtlas
 	uint32				m_uiNumRects;
 
 public:
-	HyAtlas(const std::string &sPath, HyRectangle *pSrcRects = NULL, uint32 uiNumRects = 0);
-	~HyAtlas(void);
+	HyAtlasGroupData(const std::string &sPath, HyRectangle *pSrcRects = NULL, uint32 uiNumRects = 0);
+	~HyAtlasGroupData(void);
 
 	int32 GetWidth() const				{ return m_iWidth; }
 	int32 GetHeight() const				{ return m_iHeight; }

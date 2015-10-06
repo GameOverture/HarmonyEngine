@@ -51,7 +51,7 @@ public:
 
 	// Returns the texture ID used for API specific drawing.
 	virtual uint32 AddTexture(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, void *pPixelData) = 0;
-	virtual void DeleteTexture(HyAtlas &texture) = 0;
+	virtual void DeleteTexture(HyAtlasGroupData &texture) = 0;
 
 	int32 GetNumCameras2d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras2d)); }
 	mat4 *GetCameraView2d(int iIndex)		{ return reinterpret_cast<mat4 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iIndex * (sizeof(HyRectangle) + sizeof(mat4))) + sizeof(HyRectangle)); }

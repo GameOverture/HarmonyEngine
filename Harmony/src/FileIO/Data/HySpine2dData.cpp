@@ -49,13 +49,13 @@ HySpine2dData::~HySpine2dData()
 /*virtual*/ void HySpine2dData::OnGfxLoad(IHyRenderer &gfxApi)
 {
 	// TODO: possibly support multiple textures (aka rendererObject's)
-	HyAtlas *pTexture = reinterpret_cast<HyAtlas *>(m_SpineAtlasData->pages->rendererObject);
+	HyAtlasGroupData *pTexture = reinterpret_cast<HyAtlasGroupData *>(m_SpineAtlasData->pages->rendererObject);
 	pTexture->Upload(gfxApi);
 }
 
 /*virtual*/ void HySpine2dData::OnGfxRemove(IHyRenderer &gfxApi)
 {
-	HyAtlas *pTexture = reinterpret_cast<HyAtlas *>(m_SpineAtlasData->pages->rendererObject);
+	HyAtlasGroupData *pTexture = reinterpret_cast<HyAtlasGroupData *>(m_SpineAtlasData->pages->rendererObject);
 	gfxApi.DeleteTexture(*pTexture);
 }
 
@@ -67,7 +67,7 @@ void _spAtlasPage_createTexture(spAtlasPage* self, const char* path)
 	// TODO: Convert 'path' to Atlas texture index
 	uint32 uiTextureIndex = 0;
 
-	HyAtlas *pNewTexture = HyFileIO::GetAtlasTexture(uiTextureIndex);
+	HyAtlasGroupData *pNewTexture = HyFileIO::GetAtlasTexture(uiTextureIndex);
 	self->rendererObject = pNewTexture;
 
 	self->width = pNewTexture->GetWidth();

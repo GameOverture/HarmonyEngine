@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "IHyData.h"
+#include "FileIO/Data/IHyData.h"
 
 class HyMesh3d;
 

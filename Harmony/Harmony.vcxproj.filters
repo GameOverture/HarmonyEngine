@@ -177,7 +177,10 @@
     <ClCompile Include="src\Utilities\stb_image.c">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="src\FileIO\Data\HyAtlas.cpp">
+    <ClCompile Include="include\Harmony\FileIO\Data\IHyData.cpp">
+      <Filter>FileIO\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FileIO\Data\HyAtlasGroupData.cpp">
       <Filter>FileIO\Data</Filter>
     </ClCompile>
   </ItemGroup>
@@ -513,11 +516,11 @@
     <ClInclude Include="include\Harmony\Utilities\jsonxx.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\FileIO\Data\HyAtlas.h">
-      <Filter>FileIO\Data</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\FileIO\HyFactory.h">
       <Filter>FileIO</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\FileIO\Data\HyAtlasGroupData.h">
+      <Filter>FileIO\Data</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

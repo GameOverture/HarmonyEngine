@@ -35,6 +35,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\Harmony\FileIO\Data\IHyData.cpp" />
     <ClCompile Include="include\Harmony\Threading\BasicSync.cpp" />
     <ClCompile Include="include\Harmony\Threading\InteropUnix.cpp" />
     <ClCompile Include="include\Harmony\Threading\stdafx.cpp" />
@@ -44,7 +45,7 @@
     <ClCompile Include="include\Harmony\Threading\WaitObject.cpp" />
     <ClCompile Include="include\Harmony\Threading\WaitObjectEx.cpp" />
     <ClCompile Include="src\Audio\HyAudio.cpp" />
-    <ClCompile Include="src\FileIO\Data\HyAtlas.cpp" />
+    <ClCompile Include="src\FileIO\Data\HyAtlasGroupData.cpp" />
     <ClCompile Include="src\FileIO\Data\HyMesh3dData.cpp" />
     <ClCompile Include="src\FileIO\Data\HySfxData.cpp" />
     <ClCompile Include="src\FileIO\Data\HySpine2dData.cpp" />
@@ -110,7 +111,7 @@
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
     <ClInclude Include="include\Harmony\Audio\HyAudio.h" />
-    <ClInclude Include="include\Harmony\FileIO\Data\HyAtlas.h" />
+    <ClInclude Include="include\Harmony\FileIO\Data\HyAtlasGroupData.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HyMesh3dData.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HySfxData.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HySpine2dData.h" />

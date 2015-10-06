@@ -12,11 +12,14 @@
 
 #include "Afx/HyStdAfx.h"
 
+#include "FileIO/HyFactory.h"
+
 #include <vector>
 using std::vector;
 
 // Forward declarations
 class IHyRenderer;
+class HyAtlasGroupData;
 
 class IHyData
 {
@@ -26,6 +29,8 @@ protected:
 	
 	HyLoadState						m_eLoadState;
 	int32							m_iRefCount;
+
+	static HyFactory<HyAtlasGroupData> *		sm_pAtlasesRef;
 
 public:
 	IHyData(HyInstanceType eDataType, const std::string &sPath) :	m_keDataType(eDataType),
@@ -52,6 +57,8 @@ public:
 	{
 		return sPath == m_ksPath;
 	}
+
+	static void SetAtlasesRef(HyFactory<HyAtlasGroupData> &atlasesRef);
 	
 	// Only invoked on the Load thread
 	virtual void DoFileLoad() = 0;

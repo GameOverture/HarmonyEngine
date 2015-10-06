@@ -30,7 +30,8 @@ IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene
 																								m_Spine2d(HYINST_Spine2d),
 																								m_Txt2d(HYINST_Text2d),
 																								m_Mesh3d(HYINST_Mesh3d),
-																								m_Quad2d(HYINST_TexturedQuad2d)
+																								m_Quad2d(HYINST_TexturedQuad2d),
+																								m_Atlases(HYINST_AtlasGroup)
 {
 	m_sDataDir = szDataDirPath;
 
@@ -45,27 +46,34 @@ IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene
 	jsonxx::Object atlasObject;
 	atlasObject.parse(ReadTextFile(sAtlasFilePath.c_str()));
 
-	uint32 uiNumTextures = static_cast<uint32>(atlasObject.get<jsonxx::Number>("numTextures"));
-
-	jsonxx::Array texturesArray = atlasObject.get<jsonxx::Array>("textures");
-	HyAssert(texturesArray.size() == uiNumTextures, "atlasInfo.json reported wrong amount of textures");
-
-	for(uint32 i = 0; i < uiNumTextures; ++i)
+	jsonxx::Array loadGroupArray = atlasObject.get<jsonxx::Array>("loadGroups");
+	for(uint32 i = 0; i < loadGroupArray.size(); ++i)
 	{
-		jsonxx::Object texObj = texturesArray.get<jsonxx::Object>(i);
-		HyAssert(texObj.get<jsonxx::Number>("id") == i, "atlasInfo.json reported wrong texture Id");
+		jsonxx::Object loadGroupObj = loadGroupArray.get<jsonxx::Object>(i);
 
-		jsonxx::Array srcFramesArray = texObj.get<jsonxx::Array>("srcFrames");
-		uint32 uiNumSrcFrames = srcFramesArray.size();
-		for(uint32 j = 0; j < uiNumSrcFrames; ++j)
+		HyAtlasGroupData *pAtlasData = m_Atlases.GetOrCreateData(std::to_string(static_cast<int32>(loadGroupObj.get<jsonxx::Number>("id"))));
+
+		jsonxx::Array texturesArray = loadGroupObj.get<jsonxx::Array>("textures");
+		for(uint32 j = 0; j < texturesArray.size(); ++j)
 		{
-			jsonxx::Object srcFrameObj = srcFramesArray.get<jsonxx::Object>(j);
+			jsonxx::Object texObj = texturesArray.get<jsonxx::Object>(j);
 
-			uint32 uiHeight = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("height"));
-			uint32 uiWidth = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("width"));
-			uint32 uiX = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("x"));
-			uint32 uiY = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("y"));
-			bool bRotated = srcFrameObj.get<jsonxx::Boolean>("rotated");
+			uint32 uiTextureId = texObj.get<jsonxx::Number>("id");
+
+			//pAtlasData->AddTexture(uiTextureId,
+
+			jsonxx::Array srcFramesArray = texObj.get<jsonxx::Array>("srcFrames");
+			uint32 uiNumSrcFrames = srcFramesArray.size();
+			for(uint32 k = 0; k < uiNumSrcFrames; ++k)
+			{
+				jsonxx::Object srcFrameObj = srcFramesArray.get<jsonxx::Object>(k);
+
+				uint32 uiHeight = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("height"));
+				uint32 uiWidth = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("width"));
+				uint32 uiX = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("x"));
+				uint32 uiY = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("y"));
+				bool bRotated = srcFrameObj.get<jsonxx::Boolean>("rotated");
+			}
 		}
 	}
 
@@ -141,7 +149,7 @@ void IHyFileIO::LoadInst2d(IHyInst2d *pInst)
 	switch(pInst->GetInstType())
 	{
 	case HYINST_Sprite2d:
-		pLoadData = m_Sprite2d.GetOrCreateData(pInst->GetPath());
+		pLoadData = m_Sprite2d.GetOrCreateData(pInst->GetName());
 		break;
 	case HYINST_Spine2d:
 		pLoadData = m_Spine2d.GetOrCreateData(pInst->GetPath());
