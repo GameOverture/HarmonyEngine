@@ -7,10 +7,15 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "FileIO/Atlas/HyAtlas.h"
-#include "FileIO/stb_image.h"
+#include "FileIO/Data/HyAtlasGroupData.h"
+
+#include "Utilities/stb_image.h"
 #include "Utilities/HyStrManip.h"
 #include "Renderer/IHyRenderer.h"
+
+int32	HyAtlasGroupData::sm_iWidth = -1;
+int32	HyAtlasGroupData::sm_iHeight = -1;
+int32	HyAtlasGroupData::sm_iNum8bitClrChannels = -1;
 
 HyAtlasGroupData::HyAtlasGroupData(const std::string &sPath, HyRectangle *pSrcRects /*= NULL*/, uint32 uiNumRects /*= 0*/) :	m_ksPath(sPath),
 																												m_iWidth(0),
@@ -57,4 +62,11 @@ void HyAtlasGroupData::DeletePixelData()
 {
 	stbi_image_free(m_pPixelData);
 	m_pPixelData = NULL;
+}
+
+/*static*/ void HyAtlasGroupData::SetAtlasInfo(int32 iWidth, int32 iHeight, int32 iNum8bitClrChannels)
+{
+	sm_iWidth = iWidth;
+	sm_iHeight = iHeight;
+	sm_iNum8bitClrChannels = iNum8bitClrChannels;
 }

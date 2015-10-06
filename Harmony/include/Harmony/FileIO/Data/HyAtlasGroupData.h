@@ -22,41 +22,56 @@ class IHyRenderer;
 
 class HyAtlasGroupData : public IHyData
 {
-	uint32				m_uiId;
+	friend class IHyFileIO;
 
-	const std::string	m_ksPath;
-	int32				m_iWidth;
-	int32				m_iHeight;
-	int32				m_iNum8bitClrChannels;
+	static int32			sm_iWidth;
+	static int32			sm_iHeight;
+	static int32			sm_iNum8bitClrChannels;
 
-	// The return value from the 'stb_image' loader is an 'unsigned char *' which points
-	// to the pixel data. The pixel data consists of *y scanlines of *x pixels,
-	// with each pixel consisting of N interleaved 8-bit components; the first
-	// pixel pointed to is top-left-most in the image. There is no padding between
-	// image scanlines or between pixels, regardless of format. The number of
-	// components N is 'req_comp' if req_comp is non-zero, or *comp otherwise.
-	// If req_comp is non-zero, *comp has the number of components that _would_
-	// have been output otherwise. E.g. if you set req_comp to 4, you will always
-	// get RGBA output, but you can check *comp to easily see if it's opaque.
-	unsigned char *		m_pPixelData;
+	uint32					m_iGraphicsApiId;
 
-	HyRectangle *		m_pSrcRects;
-	uint32				m_uiNumRects;
+	struct Texture
+	{
+		const uint32		uiID;
+		const std::string	sPATH;
+
+		// The return value from the 'stb_image' loader is an 'unsigned char *' which points
+		// to the pixel data. The pixel data consists of *y scanlines of *x pixels,
+		// with each pixel consisting of N interleaved 8-bit components; the first
+		// pixel pointed to is top-left-most in the image. There is no padding between
+		// image scanlines or between pixels, regardless of format. The number of
+		// components N is 'req_comp' if req_comp is non-zero, or *comp otherwise.
+		// If req_comp is non-zero, *comp has the number of components that _would_
+		// have been output otherwise. E.g. if you set req_comp to 4, you will always
+		// get RGBA output, but you can check *comp to easily see if it's opaque.
+		unsigned char *		m_pPixelData;
+
+		struct Frame
+		{
+			HyRectangle		rSrcRect;
+			bool			bRotated;
+		};
+		vector<Frame>		m_vFrames;
+
+		uint32 GetId() const						{ return uiID; }
+		const std::string &GetPath() const			{ return sPATH; }
+	};
+	vector<Texture>			m_vTextures;
 
 public:
 	HyAtlasGroupData(const std::string &sPath, HyRectangle *pSrcRects = NULL, uint32 uiNumRects = 0);
 	~HyAtlasGroupData(void);
 
-	int32 GetWidth() const				{ return m_iWidth; }
-	int32 GetHeight() const				{ return m_iHeight; }
-	int32 GetNumClrChannels() const		{ return m_iNum8bitClrChannels; }
-
-	const std::string &GetPath() const	{ return m_ksPath; }
-	uint32 GetId() const				{ return m_uiId; }
+	static int32 GetWidth()							{ return sm_iWidth; }
+	static int32 GetHeight() 						{ return sm_iHeight; }
+	static int32 GetNumClrChannels() 				{ return sm_iNum8bitClrChannels; }
 
 	void Upload(IHyRenderer &gfxApi);
 
 	void DeletePixelData();
+
+private:
+	static void SetAtlasInfo(int32 iWidth, int32 iHeight, int32 iNum8bitClrChannels);
 };
 
 #endif /* __HyAtlas_h__ */

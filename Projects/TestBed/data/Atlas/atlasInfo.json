@@ -1,6 +1,7 @@
 {
     "width": 512,
     "height": 512,
+	"num8BitClrChannels": 4,
     "loadGroups": [
         {
             "id": 0,

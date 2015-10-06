@@ -42,15 +42,19 @@ IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene
 	
 	std::string sAtlasFilePath = m_sDataDir;
 	sAtlasFilePath += "Atlas/atlasInfo.json";
-
 	jsonxx::Object atlasObject;
 	atlasObject.parse(ReadTextFile(sAtlasFilePath.c_str()));
+
+	int32 iAtlasWidth = static_cast<int32>(atlasObject.get<jsonxx::Number>("width"));
+	int32 iAtlasHeight = static_cast<int32>(atlasObject.get<jsonxx::Number>("height"));
+	int32 iNum8BitClrChannels = static_cast<int32>(atlasObject.get<jsonxx::Number>("num8BitClrChannels"));
+
+	HyAtlasGroupData::SetAtlasInfo(iAtlasWidth, iAtlasHeight, iNum8BitClrChannels);
 
 	jsonxx::Array loadGroupArray = atlasObject.get<jsonxx::Array>("loadGroups");
 	for(uint32 i = 0; i < loadGroupArray.size(); ++i)
 	{
 		jsonxx::Object loadGroupObj = loadGroupArray.get<jsonxx::Object>(i);
-
 		HyAtlasGroupData *pAtlasData = m_Atlases.GetOrCreateData(std::to_string(static_cast<int32>(loadGroupObj.get<jsonxx::Number>("id"))));
 
 		jsonxx::Array texturesArray = loadGroupObj.get<jsonxx::Array>("textures");
