@@ -29,7 +29,7 @@ public:
 
 	//const HyTexture *GetTexture() const;
 
-	virtual void DoFileLoad();
+	virtual void DoFileLoad(HyAtlasManager &atlasManagerRef);
 	virtual void OnGfxLoad(IHyRenderer &gfxApi);
 	virtual void OnGfxRemove(IHyRenderer &gfxApi);
 };

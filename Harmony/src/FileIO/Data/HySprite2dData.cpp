@@ -19,7 +19,7 @@ HySprite2dData::~HySprite2dData(void)
 {
 }
 
-/*virtual*/ void HySprite2dData::DoFileLoad()
+/*virtual*/ void HySprite2dData::DoFileLoad(HyAtlasManager &atlasManagerRef)
 {
 	// Empty path is an indicator to construct a simple sprite
 	if(m_ksPath.empty())

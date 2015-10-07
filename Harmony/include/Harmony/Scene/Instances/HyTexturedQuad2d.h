@@ -13,14 +13,9 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Scene/Instances/IHyInst2d.h"
-#include "FileIO/Data/HyTexturedQuad2dData.h"
-
-#include "FileIO/Data/HyAtlasGroupData.h"
 
 class HyTexturedQuad2d : public IHyInst2d
 {
-	HyAtlasGroupData *			m_pTexture;
-
 public:
 	HyTexturedQuad2d(uint32 uiTextureIndex);
 	virtual ~HyTexturedQuad2d();

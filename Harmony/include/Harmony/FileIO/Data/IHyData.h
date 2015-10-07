@@ -53,11 +53,9 @@ public:
 	{
 		return sPath == m_ksPath;
 	}
-
-	static void SetAtlasRef(HyAtlasManager &atlasRef);
 	
 	// Only invoked on the Load thread
-	virtual void DoFileLoad() = 0;
+	virtual void DoFileLoad(HyAtlasManager &atlasManagerRef) = 0;
 
 	// Only invoked on the Render thread
 	virtual void OnGfxLoad(IHyRenderer &gfxApi) = 0;

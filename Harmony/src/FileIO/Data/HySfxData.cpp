@@ -18,7 +18,7 @@ HySfxData::~HySfxData(void)
 {
 }
 
-/*virtual*/ void HySfxData::DoFileLoad()
+/*virtual*/ void HySfxData::DoFileLoad(HyAtlasManager &atlasManagerRef)
 {
 	std::string sFilePath;
 	//HyFileIO::GetDataDir(DIR_Audio, sFilePath);

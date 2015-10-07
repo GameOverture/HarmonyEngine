@@ -25,7 +25,7 @@ HyTexturedQuad2dData::~HyTexturedQuad2dData()
 //	return m_pTexture;
 //}
 
-/*virtual*/ void HyTexturedQuad2dData::DoFileLoad()
+/*virtual*/ void HyTexturedQuad2dData::DoFileLoad(HyAtlasManager &atlasManagerRef)
 {
 	//int32 iTextureIndex = atoi(m_ksPath.c_str());
 	//m_pTexture = HyFileIO::GetAtlasTexture(iTextureIndex);

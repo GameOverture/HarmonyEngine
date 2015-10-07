@@ -54,7 +54,7 @@ public:
 
 	bool IsSimpleSprite()			{ return m_bIsSimpleSprite; }
 
-	virtual void DoFileLoad();
+	virtual void DoFileLoad(HyAtlasManager &atlasManagerRef);
 	virtual void OnGfxLoad(IHyRenderer &gfxApi);
 	virtual void OnGfxRemove(IHyRenderer &gfxApi);
 };

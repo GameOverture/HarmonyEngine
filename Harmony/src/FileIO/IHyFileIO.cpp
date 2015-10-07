@@ -25,13 +25,14 @@
 
 IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_GfxCommsRef(gfxCommsRef),
 																								m_SceneRef(sceneRef),
+																								m_AtlasManager(szDataDirPath),
+																								m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval, m_AtlasManager),
 																								m_Sfx(HYINST_Sound2d),
 																								m_Sprite2d(HYINST_Sprite2d),
 																								m_Spine2d(HYINST_Spine2d),
 																								m_Txt2d(HYINST_Text2d),
 																								m_Mesh3d(HYINST_Mesh3d),
 																								m_Quad2d(HYINST_TexturedQuad2d),
-																								m_AtlasManager(szDataDirPath)
 {
 	m_sDataDir = szDataDirPath;
 
@@ -40,8 +41,6 @@ IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene
 		m_sDataDir.append("/");
 
 	// Start up Loading thread
-	m_LoadingCtrl.m_pLoadQueue_Shared = &m_LoadQueue_Shared;
-	m_LoadingCtrl.m_pLoadQueue_Retrieval = &m_LoadQueue_Retrieval;
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
 
 	IHyInst2d::sm_pCtor = this;
@@ -297,23 +296,23 @@ void IHyFileIO::DeleteData(IHyData *pData)
 		// Copy all the IData ptrs into the 'vCurLoadData' to be processed, while emptying the shared queue
 		pLoadingCtrl->m_csSharedQueue.Lock();
 		{
-			while(pLoadingCtrl->m_pLoadQueue_Shared->empty() == false)
+			while(pLoadingCtrl->m_LoadQueueRef_Shared.empty() == false)
 			{
-				vCurLoadData.push_back(pLoadingCtrl->m_pLoadQueue_Shared->front());
-				pLoadingCtrl->m_pLoadQueue_Shared->pop();
+				vCurLoadData.push_back(pLoadingCtrl->m_LoadQueueRef_Shared.front());
+				pLoadingCtrl->m_LoadQueueRef_Shared.pop();
 			}
 		}
 		pLoadingCtrl->m_csSharedQueue.Unlock();
 
 		// Load everything that is enqueued (outside of any critical section)
 		for(uint32 i = 0; i < vCurLoadData.size(); ++i)
-			vCurLoadData[i]->DoFileLoad();
+			vCurLoadData[i]->DoFileLoad(pLoadingCtrl->m_AtlasManagerRef);
 
 		// Copy all the (loaded) IData ptrs to the retrieval vector
 		pLoadingCtrl->m_csRetrievalQueue.Lock();
 		{
 			for(uint32 i = 0; i < vCurLoadData.size(); ++i)
-				pLoadingCtrl->m_pLoadQueue_Retrieval->push(vCurLoadData[i]);
+				pLoadingCtrl->m_LoadQueueRef_Retrieval.push(vCurLoadData[i]);
 		}
 		pLoadingCtrl->m_csRetrievalQueue.Unlock();
 

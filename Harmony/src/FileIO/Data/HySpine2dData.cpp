@@ -22,7 +22,7 @@ HySpine2dData::~HySpine2dData()
 	spAtlas_dispose(m_SpineAtlasData);
 }
 
-/*virtual*/ void HySpine2dData::DoFileLoad()
+/*virtual*/ void HySpine2dData::DoFileLoad(HyAtlasManager &atlasManagerRef)
 {
 	std::string sAtlasPath(m_ksPath);
 	sAtlasPath += ".atlas";

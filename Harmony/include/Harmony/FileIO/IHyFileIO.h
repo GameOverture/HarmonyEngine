@@ -42,15 +42,18 @@ class IHyFileIO
 	// Thread control structure to help sync loading of factory data
 	struct LoadThreadCtrl
 	{
+		queue<IHyData *> &	m_LoadQueueRef_Shared;
+		queue<IHyData *> &	m_LoadQueueRef_Retrieval;
+		HyAtlasManager &	m_AtlasManagerRef;
+
 		WaitEvent		m_WaitEvent_HasNewData;
-
-		queue<IHyData *> *m_pLoadQueue_Shared;
-		queue<IHyData *> *m_pLoadQueue_Retrieval;
-
 		BasicSection	m_csSharedQueue;
 		BasicSection	m_csRetrievalQueue;
 
-		LoadThreadCtrl() : m_WaitEvent_HasNewData(L"Thread Idler", true)
+		LoadThreadCtrl(queue<IHyData *> &LoadQueueRef_Shared, queue<IHyData *> &LoadQueueRef_Retrieval, HyAtlasManager &AtlasManagerRef) :	m_LoadQueueRef_Shared(LoadQueueRef_Shared),
+																																			m_LoadQueueRef_Retrieval(LoadQueueRef_Retrieval),
+																																			m_AtlasManagerRef(AtlasManagerRef),
+																																			m_WaitEvent_HasNewData(L"Thread Idler", true)
 		{}
 	};
 	LoadThreadCtrl										m_LoadingCtrl;

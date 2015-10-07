@@ -38,7 +38,7 @@ public:
 
 	_texture_glyph_t *GetGlyph(uint32 uiFontIndex, wchar_t charcode);
 
-	virtual void DoFileLoad();
+	virtual void DoFileLoad(HyAtlasManager &atlasManagerRef);
 	virtual void OnGfxLoad(IHyRenderer &gfxApi);
 	virtual void OnGfxRemove(IHyRenderer &gfxApi);
 };

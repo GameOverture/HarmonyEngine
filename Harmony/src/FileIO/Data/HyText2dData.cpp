@@ -24,7 +24,7 @@ HyText2dData::~HyText2dData(void)
 	m_vFonts.clear();
 }
 
-/*virtual*/ void HyText2dData::DoFileLoad()
+/*virtual*/ void HyText2dData::DoFileLoad(HyAtlasManager &atlasManagerRef)
 {
 	// If path is empty, then use default engine font
 	if(m_ksPath.empty())
