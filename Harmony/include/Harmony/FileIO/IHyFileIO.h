@@ -11,9 +11,10 @@
 #define __IHyFileIO_h__
 
 #include "Afx/HyStdAfx.h"
-#include "FileIO/Data/HyAtlasGroupData.h"
 
 #include "FileIO/HyFactory.h"
+#include "FileIO/HyAtlasManager.h"
+
 #include "Threading/Threading.h"
 
 #include "Renderer/HyGfxComms.h"
@@ -63,7 +64,7 @@ class IHyFileIO
 	HyFactory<HyText2dData>								m_Txt2d;
 	HyFactory<HyTexturedQuad2dData>						m_Quad2d;
 
-	HyFactory<HyAtlasGroupData>							m_Atlases;
+	HyAtlasManager										m_AtlasManager;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
 	queue<IHyData *>									m_LoadQueue_Prepare;

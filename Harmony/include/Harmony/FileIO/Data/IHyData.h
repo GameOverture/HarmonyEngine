@@ -17,7 +17,7 @@ using std::vector;
 
 // Forward declarations
 class IHyRenderer;
-class HyAtlasGroupData;
+class HyAtlasManager;
 
 class IHyData
 {
@@ -54,7 +54,7 @@ public:
 		return sPath == m_ksPath;
 	}
 
-	static void SetAtlasesRef(HyFactory<HyAtlasGroupData> &atlasesRef);
+	static void SetAtlasRef(HyAtlasManager &atlasRef);
 	
 	// Only invoked on the Load thread
 	virtual void DoFileLoad() = 0;

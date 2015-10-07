@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "FileIO/Data/IHyData.h"
 
-HyFactory<HyAtlasGroupData> *	IHyData::sm_pAtlasesRef = NULL;
+HyAtlasManager *	IHyData::sm_pAtlasesRef = NULL;
 
 /*static*/ void IHyData::SetAtlasesRef(HyFactory<HyAtlasGroupData> *pAtlasesRef)
 {

@@ -16,14 +16,13 @@
 
 IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName) :	m_eTYPE(eInstType),
 																							m_sPREFIX(szPrefix),
-																							m_sNAME(szName)
+																							m_sNAME(szName),
+																							m_pDataPtr(NULL),
+																							m_eLoadState(HYLOADSTATE_Inactive),
+																							m_pParent(NULL),
+																							m_bDirty(true),
+																							m_bEnabled(true)
 {
-	m_pDataPtr = NULL;
-	m_eLoadState = HYLOADSTATE_Inactive;
-	m_pParent = NULL;
-	m_bDirty = true;
-	m_bEnabled = true;
-
 	m_vColor.Set(1.0f);
 	SetOnDirtyCallback(OnDirty, this);
 }

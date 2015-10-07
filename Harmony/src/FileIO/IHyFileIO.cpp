@@ -31,58 +31,13 @@ IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene
 																								m_Txt2d(HYINST_Text2d),
 																								m_Mesh3d(HYINST_Mesh3d),
 																								m_Quad2d(HYINST_TexturedQuad2d),
-																								m_Atlases(HYINST_AtlasGroup)
+																								m_AtlasManager(szDataDirPath)
 {
 	m_sDataDir = szDataDirPath;
 
 	std::replace(m_sDataDir.begin(), m_sDataDir.end(), '\\', '/');
 	if(m_sDataDir[m_sDataDir.length() - 1] != '/')
 		m_sDataDir.append("/");
-
-	
-	std::string sAtlasFilePath = m_sDataDir;
-	sAtlasFilePath += "Atlas/atlasInfo.json";
-	jsonxx::Object atlasObject;
-	atlasObject.parse(ReadTextFile(sAtlasFilePath.c_str()));
-
-	int32 iAtlasWidth = static_cast<int32>(atlasObject.get<jsonxx::Number>("width"));
-	int32 iAtlasHeight = static_cast<int32>(atlasObject.get<jsonxx::Number>("height"));
-	int32 iNum8BitClrChannels = static_cast<int32>(atlasObject.get<jsonxx::Number>("num8BitClrChannels"));
-
-	HyAtlasGroupData::SetAtlasInfo(iAtlasWidth, iAtlasHeight, iNum8BitClrChannels);
-
-	jsonxx::Array loadGroupArray = atlasObject.get<jsonxx::Array>("loadGroups");
-	for(uint32 i = 0; i < loadGroupArray.size(); ++i)
-	{
-		jsonxx::Object loadGroupObj = loadGroupArray.get<jsonxx::Object>(i);
-		HyAtlasGroupData *pAtlasData = m_Atlases.GetOrCreateData(std::to_string(static_cast<int32>(loadGroupObj.get<jsonxx::Number>("id"))));
-
-		jsonxx::Array texturesArray = loadGroupObj.get<jsonxx::Array>("textures");
-		for(uint32 j = 0; j < texturesArray.size(); ++j)
-		{
-			jsonxx::Object texObj = texturesArray.get<jsonxx::Object>(j);
-
-			uint32 uiTextureId = texObj.get<jsonxx::Number>("id");
-
-			//pAtlasData->AddTexture(uiTextureId,
-
-			jsonxx::Array srcFramesArray = texObj.get<jsonxx::Array>("srcFrames");
-			uint32 uiNumSrcFrames = srcFramesArray.size();
-			for(uint32 k = 0; k < uiNumSrcFrames; ++k)
-			{
-				jsonxx::Object srcFrameObj = srcFramesArray.get<jsonxx::Object>(k);
-
-				uint32 uiHeight = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("height"));
-				uint32 uiWidth = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("width"));
-				uint32 uiX = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("x"));
-				uint32 uiY = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("y"));
-				bool bRotated = srcFrameObj.get<jsonxx::Boolean>("rotated");
-			}
-		}
-	}
-
-	//sm_Atlas.Initialize(sFilePath);
-
 
 	// Start up Loading thread
 	m_LoadingCtrl.m_pLoadQueue_Shared = &m_LoadQueue_Shared;
@@ -194,6 +149,9 @@ void IHyFileIO::RemoveInst(IHyInst2d *pInst)
 
 	switch(pInst->GetLoadState())
 	{
+	case HYLOADSTATE_Inactive:
+		break;
+
 	case HYLOADSTATE_Loaded:
 		m_SceneRef.RemoveInst(pInst);
 

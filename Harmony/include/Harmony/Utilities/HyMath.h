@@ -51,12 +51,15 @@ float Ease_QuadraticInOut(float fTime, float fStart, float fDist, float fDur);
 
 float Ease_AngleLinear(float angleA, float angleB, int32 spin, float t);
 
+template<typename T>
 struct HyRectangle
 {
-	float x;
-	float y;
-	float width;
-	float height;
+	T x;
+	T y;
+	T width;
+	T height;
+
+	int32 iTag;
 
 	std::string ToString()
 	{
@@ -65,7 +68,7 @@ struct HyRectangle
 		return s.str();
 	}
 
-	HyRectangle() : x(0.0f), y(0.0f), width(0.0f), height(0.0f)
+	HyRectangle() : x(0), y(0), width(0), height(0), iTag(0)
 	{ }
 };
 

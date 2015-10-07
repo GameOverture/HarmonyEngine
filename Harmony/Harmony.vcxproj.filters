@@ -180,8 +180,8 @@
     <ClCompile Include="include\Harmony\FileIO\Data\IHyData.cpp">
       <Filter>FileIO\Data</Filter>
     </ClCompile>
-    <ClCompile Include="src\FileIO\Data\HyAtlasGroupData.cpp">
-      <Filter>FileIO\Data</Filter>
+    <ClCompile Include="src\FileIO\HyAtlasManager.cpp">
+      <Filter>FileIO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -519,8 +519,8 @@
     <ClInclude Include="include\Harmony\FileIO\HyFactory.h">
       <Filter>FileIO</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\FileIO\Data\HyAtlasGroupData.h">
-      <Filter>FileIO\Data</Filter>
+    <ClInclude Include="include\Harmony\FileIO\HyAtlasManager.h">
+      <Filter>FileIO</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
