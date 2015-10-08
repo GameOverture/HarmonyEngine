@@ -93,12 +93,12 @@ void IHyFileIO::Update()
 
 	while(vAtlasGrpsNeedingUpload.empty() == false)
 	{
-		m_GfxCommsRef.Update_SendData(vAtlasGrpsNeedingUpload.front());
+		m_GfxCommsRef.SendAtlasGroup(vAtlasGrpsNeedingUpload.front());
 		vAtlasGrpsNeedingUpload.pop();
 	}
 	
 	// Grab and process any returning IData's from the Render thread
-	m_pGfxQueue_Retrieval = m_GfxCommsRef.Update_RetrieveData();
+	m_pGfxQueue_Retrieval = m_GfxCommsRef.RetrieveAtlasGroups();
 	while(!m_pGfxQueue_Retrieval->empty())
 	{
 		IHyData *pData = m_pGfxQueue_Retrieval->front();

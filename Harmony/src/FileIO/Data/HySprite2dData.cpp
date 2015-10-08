@@ -10,6 +10,7 @@
 #include "FileIO/Data/HySprite2dData.h"
 
 #include "Renderer/IHyRenderer.h"
+#include "Utilities/jsonxx.h"
 
 HySprite2dData::HySprite2dData(const std::string &sPath) :	IHyData(HYINST_Spine2d, sPath)
 {
@@ -21,11 +22,10 @@ HySprite2dData::~HySprite2dData(void)
 
 /*virtual*/ void HySprite2dData::DoFileLoad(HyAtlasManager &atlasManagerRef)
 {
-	// Empty path is an indicator to construct a simple sprite
+
+
 	if(m_ksPath.empty())
 	{
-		m_bIsSimpleSprite = true;
-
 		m_iNumStates = 1;
 		m_pAnimStates = new AnimState[1];
 		m_pAnimStates->sName = "SimpleSprite";
@@ -44,7 +44,6 @@ HySprite2dData::~HySprite2dData(void)
 	}
 	else
 	{
-		m_bIsSimpleSprite = false;
 	}
 
 	//std::string sAtlasPath(sFilePath);

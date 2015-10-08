@@ -49,13 +49,16 @@ HyAtlasManager::~HyAtlasManager()
 {
 }
 
-bool HyAtlasManager::RequestTexture(IHyData *pData, uint32 uiTextureId)
+HyTextureHandle HyAtlasManager::RequestTexture(IHyData *pData, uint32 uiTextureId)
 {
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 	{
 		if(m_pAtlasGroups[i].ContainsTexture(uiTextureId))
 		{
-			if(m_pAtlasGroups[i].Request(pData))
+			bool bWasJustLoaded = false;
+			HyTextureHandle hTexHandle = m_pAtlasGroups[i].Request(pData, bWasJustLoaded);
+
+			if(bWasJustLoaded)
 			{
 				m_cs.Lock();
 				m_vDataWaitingForAtlasUpload.push_back(pData);
@@ -63,11 +66,12 @@ bool HyAtlasManager::RequestTexture(IHyData *pData, uint32 uiTextureId)
 				m_cs.Unlock();
 			}
 
-			return true;
+			return hTexHandle;
 		}
 	}
 
-	return false;
+	HyError("HyAtlasManager::RequestTexture() could not find the atlas group containing texture ID: " << uiTextureId);
+	return NULL;
 }
 
 void HyAtlasManager::RelinquishTexture(IHyData *pData, uint32 uiTextureId)
@@ -118,7 +122,7 @@ void HyAtlasManager::GetAtlasesThatNeedUpload(queue<HyAtlasGroup *> &vAtlasesTha
 
 //////////////////////////////////////////////////////////////////////////
 HyAtlasGroup::HyAtlasGroup(int32 iLoadGroupId, jsonxx::Array &texturesArrayRef) :	m_iLOADGROUPID(iLoadGroupId),
-																					m_uiGraphicsApiId(0),
+																					m_uiGfxApiHandle(0),
 																					m_eLoadState(HYLOADSTATE_Inactive)
 {
 	m_pAtlases = reinterpret_cast<HyAtlas *>(new unsigned char[sizeof(HyAtlas) * texturesArrayRef.size()]);
@@ -151,7 +155,7 @@ bool HyAtlasGroup::ContainsTexture(uint32 uiTextureId)
 }
 
 // Returns 'true' if texture was just loaded
-bool HyAtlasGroup::Request(IHyData *pData)
+HyTextureHandle HyAtlasGroup::Request(IHyData *pData, bool &bWasJustLoadedOut)
 {
 	m_cs.Lock();
 
@@ -167,13 +171,15 @@ bool HyAtlasGroup::Request(IHyData *pData)
 		m_cs.Lock();
 		// State is 'queued' to be uploaded to graphics ram
 		m_eLoadState = HYLOADSTATE_Queued;
-		m_cs.Unlock();
 
-		return true;
+		bWasJustLoadedOut = true;
 	}
+	else
+		bWasJustLoadedOut = false;
+
 	m_cs.Unlock();
 
-	return false;
+	return &m_uiGfxApiHandle;
 }
 
 bool HyAtlasGroup::IsUploadNeeded()

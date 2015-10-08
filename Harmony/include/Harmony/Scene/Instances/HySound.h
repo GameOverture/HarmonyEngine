@@ -20,7 +20,6 @@
 
 //class HySound : public IObjInst
 //{
-//	friend class HyCreator;
 //
 //	HySfxData *						m_pDataPtr;
 //

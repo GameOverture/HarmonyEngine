@@ -22,7 +22,7 @@ class HyScene;
 class HyAnimFloat
 {
 	friend class HyScene;
-	static HyScene *		sm_pCtor;
+	static HyScene *		sm_pScene;
 
 	float &					m_fValueRef;
 	float					m_fStart;

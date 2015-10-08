@@ -41,7 +41,7 @@ public:
 
 private:
 	uint32			m_uiAttributeFlags;
-	uint32			m_pTextureBinds[HY_MAX_TEXTURE_BINDS];
+	uint32			m_uiTextureBindHandle;
 	
 	uint32			m_uiNumInstances;
 	size_t			m_uiDataOffset;
@@ -64,7 +64,7 @@ public:
 	uint32 GetAttributeBitFlags() const;
 
 	uint32 GetTextureHandle(uint32 uiTextureIndex);
-	void SetTextureHandle(uint32 uiIndex, uint32 uiHandleId);
+	void SetTextureHandle(uint32 uiHandleId);
 
 	bool operator==(const HyRenderState &right) const;
 	bool operator!=(const HyRenderState &right) const;

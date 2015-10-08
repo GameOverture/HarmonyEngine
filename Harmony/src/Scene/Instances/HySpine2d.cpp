@@ -148,7 +148,7 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 	}
 	
 	// Update the transform
-	//float fCoordModifier = m_eCoordType == HYCOORD_Meter ? HyCreator::PixelsPerMeter() : 1.0f;
+	//float fCoordModifier = m_eCoordType == HYCOORD_Meter ? HyScene::PixelsPerMeter() : 1.0f;
 	//m_pSpineSkeleton->x = m_ptPosition.Get().x * fCoordModifier;
 	//m_pSpineSkeleton->y = m_ptPosition.Get().y * fCoordModifier;
 	

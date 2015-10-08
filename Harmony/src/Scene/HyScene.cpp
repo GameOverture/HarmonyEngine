@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyCreator.cpp
+ *	HyScene.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -43,10 +43,9 @@ HyScene::HyScene(HyGfxComms &gfxCommsRef, HyViewport &gameViewport, HyCoordinate
 	
 	m_DrawPhys2d.SetFlags(b2Draw::e_shapeBit);// | b2Draw::e_jointBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
 
-	// Link HyCreator to all classes that access it
+	// Link HyScene to all classes that access it
 	HyPhysEntity2d::sm_b2WorldRef = &m_b2World;
-
-	HyAnimFloat::sm_pCtor = this;
+	HyAnimFloat::sm_pScene = this;
 }
 
 HyScene::~HyScene(void)

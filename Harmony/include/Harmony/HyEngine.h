@@ -42,7 +42,7 @@ class HyEngine
 	HyAudio					m_Audio;
 
 	HyGfxComms				m_GfxBuffer;
-	HyScene					m_Creator;
+	HyScene					m_Scene;
 
 #ifndef HY_PLATFORM_GUI
 	HyGuiComms				m_GuiComms;

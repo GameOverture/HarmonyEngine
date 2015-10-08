@@ -23,6 +23,8 @@ using std::queue;
 class HyAtlasGroup;
 class HyAtlas;
 
+typedef uint32 *const HyTextureHandle;
+
 //////////////////////////////////////////////////////////////////////////
 class HyAtlasManager
 {
@@ -43,7 +45,7 @@ public:
 	HyAtlasManager(const char *szDataDirPath);
 	~HyAtlasManager();
 
-	bool RequestTexture(IHyData *pData, uint32 uiTextureId);
+	HyTextureHandle RequestTexture(IHyData *pData, uint32 uiTextureId);
 	void RelinquishTexture(IHyData *pData, uint32 uiTextureId);
 
 	bool IsDataWaitingForUpload(IHyData *pData);
@@ -56,7 +58,7 @@ public:
 class HyAtlasGroup
 {
 	const int32					m_iLOADGROUPID;
-	uint32						m_uiGraphicsApiId;
+	uint32						m_uiGfxApiHandle;
 
 	HyAtlas *					m_pAtlases;
 	uint32						m_uiNumAtlases;
@@ -73,7 +75,7 @@ public:
 	bool ContainsTexture(uint32 uiTextureId);
 
 	// Returns 'true' if texture was just loaded
-	bool Request(IHyData *pData);
+	HyTextureHandle Request(IHyData *pData, bool &bWasJustLoadedOut);
 
 	bool IsUploadNeeded();
 

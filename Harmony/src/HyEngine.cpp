@@ -20,8 +20,8 @@ HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::GetMemoryHeap();
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Input(m_AppRef.m_vInputMaps),
-												m_Creator(m_GfxBuffer, m_AppRef.m_vViewports[0], m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter),
-												m_FileIO(m_AppRef.m_Init.szDataDir, m_GfxBuffer, m_Creator),
+												m_Scene(m_GfxBuffer, m_AppRef.m_vViewports[0], m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter),
+												m_FileIO(m_AppRef.m_Init.szDataDir, m_GfxBuffer, m_Scene),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_vViewports)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
@@ -65,12 +65,12 @@ bool HyEngine::Update()
 		if(PollPlatformApi() == false)
 			return false;
 		
-		m_Creator.PreUpdate();
+		m_Scene.PreUpdate();
 		if(m_AppRef.Update() == false)
 			return false;
 
 		m_FileIO.Update();
-		m_Creator.PostUpdate();
+		m_Scene.PostUpdate();
 
 #ifndef HY_PLATFORM_GUI
 		m_GuiComms.Update();

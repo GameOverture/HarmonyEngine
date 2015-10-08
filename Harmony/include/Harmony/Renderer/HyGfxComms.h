@@ -15,6 +15,8 @@
 #include "FileIO/Data/IHyData.h"
 #include "Threading/BasicSync.h"
 
+#include "FileIO/HyAtlasManager.h"
+
 #include <vector>
 #include <queue>
 using std::vector;
@@ -59,13 +61,13 @@ private:
 	char *						m_pBuffer_Shared;
 	char *						m_pBuffer_Render;
 
-	queue<HyAtlasGroup *> *		m_pSendMsg_Update;
-	queue<HyAtlasGroup *> *		m_pSendMsg_Shared;
-	queue<HyAtlasGroup *> *		m_pSendMsg_Render;
+	queue<HyAtlasGroup *> *		m_pAtlasSendQueue_Update;
+	queue<HyAtlasGroup *> *		m_pAtlasSendQueue_Shared;
+	queue<HyAtlasGroup *> *		m_pAtlasSendQueue_Render;
 
-	queue<HyAtlasGroup *> *		m_pReceiveData_Update;
-	queue<HyAtlasGroup *> *		m_pReceiveData_Shared;
-	queue<HyAtlasGroup *> *		m_pReceiveData_Render;
+	queue<HyAtlasGroup *> *		m_pAtlasReceiveQueue_Update;
+	queue<HyAtlasGroup *> *		m_pAtlasReceiveQueue_Shared;
+	queue<HyAtlasGroup *> *		m_pAtlasReceiveQueue_Render;
 
 	BasicSection				m_csBuffers;
 	BasicSection				m_csInfo;
@@ -85,10 +87,10 @@ public:
 	inline char *GetWriteBufferPtr()		{ return m_pBuffer_Update; }
 
 	// This should only be invoked from the Update/Game thread
-	void Update_SendData(HyAtlasGroup *pAtlasGrp)		{ m_pSendMsg_Update->push(pAtlasGrp); }
+	void SendAtlasGroup(HyAtlasGroup *pAtlasGrp)		{ m_pAtlasSendQueue_Update->push(pAtlasGrp); }
 
 	// This should only be invoked from the Update/Game thread
-	queue<HyAtlasGroup *> *Update_RetrieveData()	{ return m_pReceiveData_Update; }
+	queue<HyAtlasGroup *> *RetrieveAtlasGroups()	{ return m_pAtlasReceiveQueue_Update; }
 
 	// This should only be invoked from the Update/Game thread
 	void Update_SetSharedPtrs();

@@ -15,7 +15,7 @@
 
 #include "Utilities/HyMath.h"
 
-/*static*/ HyScene *HyAnimFloat::sm_pCtor = NULL;
+/*static*/ HyScene *HyAnimFloat::sm_pScene = NULL;
 
 HyAnimFloat::HyAnimFloat() :	m_fValueRef(*(new float)),
 								m_fStart(0.0f),
@@ -70,7 +70,7 @@ void HyAnimFloat::Offset(float fValue)
 
 void HyAnimFloat::Animate(float fFrom, float fTo, float fSeconds, EaseUpdateFunc fpEase)
 {
-	HyAssert(sm_pCtor, "HyAnimFloat::Animate() cannot be used before IGame::Initialize() is invoked.");
+	HyAssert(sm_pScene, "HyAnimFloat::Animate() cannot be used before the engine is initialized.");
 
 	if(m_fValueRef != fFrom)
 		m_fpOnDirty(m_pOnChangeParam);
@@ -81,12 +81,12 @@ void HyAnimFloat::Animate(float fFrom, float fTo, float fSeconds, EaseUpdateFunc
 	m_fElapsedTime = 0.0f;
 	m_fpBehaviorUpdate = &HyAnimFloat::Tween;
 
-	sm_pCtor->InsertActiveAnimFloat(this);
+	sm_pScene->InsertActiveAnimFloat(this);
 }
 
 void HyAnimFloat::Animate(float fTo, float fSeconds, EaseUpdateFunc fpEase)
 {
-	HyAssert(sm_pCtor, "HyAnimFloat::Animate() cannot be used before IGame::Initialize() is invoked.");
+	HyAssert(sm_pScene, "HyAnimFloat::Animate() cannot be used before the engine is initialized.");
 
 	m_fStart = m_fValueRef;
 	m_fTarget = fTo;
@@ -95,12 +95,12 @@ void HyAnimFloat::Animate(float fTo, float fSeconds, EaseUpdateFunc fpEase)
 	m_fElapsedTime = 0.0f;
 	m_fpBehaviorUpdate = &HyAnimFloat::Tween;
 
-	sm_pCtor->InsertActiveAnimFloat(this);
+	sm_pScene->InsertActiveAnimFloat(this);
 }
 
 void HyAnimFloat::AnimateOffset(float fOffsetAmt, float fSeconds, EaseUpdateFunc fpEase)
 {
-	HyAssert(sm_pCtor, "HyAnimFloat::AnimateOffset() cannot be used before IGame::Initialize() is invoked.");
+	HyAssert(sm_pScene, "HyAnimFloat::AnimateOffset() cannot be used before the engine is initialized.");
 
 	m_fStart = m_fValueRef;
 	m_fTarget = m_fValueRef + fOffsetAmt;
@@ -109,7 +109,7 @@ void HyAnimFloat::AnimateOffset(float fOffsetAmt, float fSeconds, EaseUpdateFunc
 	m_fElapsedTime = 0.0f;
 	m_fpBehaviorUpdate = &HyAnimFloat::Tween;
 
-	sm_pCtor->InsertActiveAnimFloat(this);
+	sm_pScene->InsertActiveAnimFloat(this);
 }
 
 void HyAnimFloat::SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam /*= NULL*/)

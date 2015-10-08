@@ -19,8 +19,6 @@ class HySprite2dData : public IHyData
 {
 	friend class HyFactory<HySprite2dData>;
 
-	bool				m_bIsSimpleSprite;
-
 	struct AnimState
 	{
 		std::string		sName;
@@ -30,29 +28,25 @@ class HySprite2dData : public IHyData
 
 		struct Frame
 		{
-			int			m_iTextureIndex;
-			int			m_iRectIndex;
+			HyAtlasGroup &	m_AtlasGrpRef;
+			int				m_iRectIndex;
 
-			vec2		m_vOffset;
-			float		m_fRot;
-			vec2		m_vScale;	// negative values will flip image
-			float		m_fDur;
+			vec2			m_vOffset;
+			float			m_fRot;
+			vec2			m_vScale;	// negative values will flip image
+			float			m_fDur;
 		};
-
 		Frame *			m_pFrames;
 		int				m_iNumFrames;
 	};
-
-	int					m_iNumStates;
 	AnimState *			m_pAnimStates;
+	int					m_iNumStates;
 
 	// Only allow HyFactory instantiate
 	HySprite2dData(const std::string &sPath);
 
 public:
 	virtual ~HySprite2dData(void);
-
-	bool IsSimpleSprite()			{ return m_bIsSimpleSprite; }
 
 	virtual void DoFileLoad(HyAtlasManager &atlasManagerRef);
 	virtual void OnGfxLoad(IHyRenderer &gfxApi);
