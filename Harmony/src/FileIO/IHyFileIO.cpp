@@ -25,14 +25,13 @@
 
 IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_GfxCommsRef(gfxCommsRef),
 																								m_SceneRef(sceneRef),
-																								m_AtlasManager(szDataDirPath),
 																								m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval, m_AtlasManager),
 																								m_Sfx(HYINST_Sound2d),
 																								m_Sprite2d(HYINST_Sprite2d),
 																								m_Spine2d(HYINST_Spine2d),
 																								m_Txt2d(HYINST_Text2d),
 																								m_Mesh3d(HYINST_Mesh3d),
-																								m_Quad2d(HYINST_TexturedQuad2d),
+																								m_Quad2d(HYINST_TexturedQuad2d)
 {
 	m_sDataDir = szDataDirPath;
 
@@ -79,14 +78,25 @@ void IHyFileIO::Update()
 			IHyData *pData = m_LoadQueue_Retrieval.front();
 			m_LoadQueue_Retrieval.pop();
 
-			if(pData->GetType() != HYINST_Sound2d)
-				m_GfxCommsRef.Update_SendData(pData);
-			else
+			// Only set as loaded if no associated atlases need to be uploaded
+			if(m_AtlasManager.IsDataWaitingForUpload(pData) == false)
 				OnDataLoaded(pData);
 		}
 	}
 	m_LoadingCtrl.m_csRetrievalQueue.Unlock();
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	// Send atlases that are loaded from the file system and need to but uploaded to graphics ram
+	queue<HyAtlasGroup *> vAtlasGrpsNeedingUpload;
+	m_AtlasManager.GetAtlasesThatNeedUpload(vAtlasGrpsNeedingUpload);
+
+	while(vAtlasGrpsNeedingUpload.empty() == false)
+	{
+		m_GfxCommsRef.Update_SendData(vAtlasGrpsNeedingUpload.front());
+		vAtlasGrpsNeedingUpload.pop();
+	}
+	
 	// Grab and process any returning IData's from the Render thread
 	m_pGfxQueue_Retrieval = m_GfxCommsRef.Update_RetrieveData();
 	while(!m_pGfxQueue_Retrieval->empty())

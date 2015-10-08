@@ -59,13 +59,13 @@ private:
 	char *						m_pBuffer_Shared;
 	char *						m_pBuffer_Render;
 
-	queue<IHyData *> *			m_pSendMsg_Update;
-	queue<IHyData *> *			m_pSendMsg_Shared;
-	queue<IHyData *> *			m_pSendMsg_Render;
+	queue<HyAtlasGroup *> *		m_pSendMsg_Update;
+	queue<HyAtlasGroup *> *		m_pSendMsg_Shared;
+	queue<HyAtlasGroup *> *		m_pSendMsg_Render;
 
-	queue<IHyData *> *			m_pReceiveData_Update;
-	queue<IHyData *> *			m_pReceiveData_Shared;
-	queue<IHyData *> *			m_pReceiveData_Render;
+	queue<HyAtlasGroup *> *		m_pReceiveData_Update;
+	queue<HyAtlasGroup *> *		m_pReceiveData_Shared;
+	queue<HyAtlasGroup *> *		m_pReceiveData_Render;
 
 	BasicSection				m_csBuffers;
 	BasicSection				m_csInfo;
@@ -85,10 +85,10 @@ public:
 	inline char *GetWriteBufferPtr()		{ return m_pBuffer_Update; }
 
 	// This should only be invoked from the Update/Game thread
-	void Update_SendData(IHyData *pMsg)		{ m_pSendMsg_Update->push(pMsg); }
+	void Update_SendData(HyAtlasGroup *pAtlasGrp)		{ m_pSendMsg_Update->push(pAtlasGrp); }
 
 	// This should only be invoked from the Update/Game thread
-	queue<IHyData *> *Update_RetrieveData()	{ return m_pReceiveData_Update; }
+	queue<HyAtlasGroup *> *Update_RetrieveData()	{ return m_pReceiveData_Update; }
 
 	// This should only be invoked from the Update/Game thread
 	void Update_SetSharedPtrs();

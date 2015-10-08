@@ -17,6 +17,9 @@
 #include "Utilities/HyMath.h"
 #include "Utilities/jsonxx.h"
 
+#include <queue>
+using std::queue;
+
 class HyAtlasGroup;
 class HyAtlas;
 
@@ -25,12 +28,16 @@ class HyAtlasManager
 {
 	static std::string	sm_sAtlasDirPath;
 
-	int32				m_iWidth;
-	int32				m_iHeight;
-	int32				m_iNum8bitClrChannels;
+	int32					m_iWidth;
+	int32					m_iHeight;
+	int32					m_iNum8bitClrChannels;
 
-	HyAtlasGroup *		m_pAtlasGroups;
-	uint32				m_uiNumAtlasGroups;
+	HyAtlasGroup *			m_pAtlasGroups;
+	uint32					m_uiNumAtlasGroups;
+
+	BasicSection			m_cs;
+	vector<IHyData *>		m_vDataWaitingForAtlasUpload;
+	queue<HyAtlasGroup *>	m_AtlasesWaitingForAtlasUpload;
 
 public:
 	HyAtlasManager(const char *szDataDirPath);
@@ -39,6 +46,9 @@ public:
 	bool RequestTexture(IHyData *pData, uint32 uiTextureId);
 	void RelinquishTexture(IHyData *pData, uint32 uiTextureId);
 
+	bool IsDataWaitingForUpload(IHyData *pData);
+	void GetAtlasesThatNeedUpload(queue<HyAtlasGroup *> &vAtlasesThatNeedUpload);
+	
 	static std::string GetTexturePath(uint32 uiTextureId);
 };
 
@@ -61,7 +71,11 @@ public:
 	~HyAtlasGroup();
 
 	bool ContainsTexture(uint32 uiTextureId);
-	void Request(IHyData *pData);
+
+	// Returns 'true' if texture was just loaded
+	bool Request(IHyData *pData);
+
+	bool IsUploadNeeded();
 
 	//void Upload(IHyRenderer &gfxApi);
 

@@ -55,7 +55,14 @@ bool HyAtlasManager::RequestTexture(IHyData *pData, uint32 uiTextureId)
 	{
 		if(m_pAtlasGroups[i].ContainsTexture(uiTextureId))
 		{
-			m_pAtlasGroups[i].Request(pData);
+			if(m_pAtlasGroups[i].Request(pData))
+			{
+				m_cs.Lock();
+				m_vDataWaitingForAtlasUpload.push_back(pData);
+				m_AtlasesWaitingForAtlasUpload.push(&m_pAtlasGroups[i]);
+				m_cs.Unlock();
+			}
+
 			return true;
 		}
 	}
@@ -65,6 +72,35 @@ bool HyAtlasManager::RequestTexture(IHyData *pData, uint32 uiTextureId)
 
 void HyAtlasManager::RelinquishTexture(IHyData *pData, uint32 uiTextureId)
 {
+}
+
+bool HyAtlasManager::IsDataWaitingForUpload(IHyData *pData)
+{
+	m_cs.Lock();
+	for(uint32 i = 0; i < m_vDataWaitingForAtlasUpload.size(); ++i)
+	{
+		if(m_vDataWaitingForAtlasUpload[i] == pData)
+		{
+			m_cs.Unlock();
+			return true;
+		}
+	}
+	m_cs.Unlock();
+
+	return false;
+}
+
+void HyAtlasManager::GetAtlasesThatNeedUpload(queue<HyAtlasGroup *> &vAtlasesThatNeedUpload)
+{
+	m_cs.Lock();
+	
+	while(m_AtlasesWaitingForAtlasUpload.empty() == false)
+	{
+		vAtlasesThatNeedUpload.push(m_AtlasesWaitingForAtlasUpload.front());
+		m_AtlasesWaitingForAtlasUpload.pop();
+	}
+
+	m_cs.Unlock();
 }
 
 /*static*/ std::string HyAtlasManager::GetTexturePath(uint32 uiTextureId)
@@ -114,7 +150,8 @@ bool HyAtlasGroup::ContainsTexture(uint32 uiTextureId)
 	return false;
 }
 
-void HyAtlasGroup::Request(IHyData *pData)
+// Returns 'true' if texture was just loaded
+bool HyAtlasGroup::Request(IHyData *pData)
 {
 	m_cs.Lock();
 
@@ -122,13 +159,31 @@ void HyAtlasGroup::Request(IHyData *pData)
 
 	if(m_eLoadState == HYLOADSTATE_Inactive)
 	{
+		m_cs.Unlock();
+
 		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 			m_pAtlases[i].Load();
 
-		m_eLoadState = HYLOADSTATE_Loaded;
-	}
+		m_cs.Lock();
+		// State is 'queued' to be uploaded to graphics ram
+		m_eLoadState = HYLOADSTATE_Queued;
+		m_cs.Unlock();
 
+		return true;
+	}
 	m_cs.Unlock();
+
+	return false;
+}
+
+bool HyAtlasGroup::IsUploadNeeded()
+{
+	bool bUploadNeeded = false;
+	m_cs.Lock();
+	bUploadNeeded = (m_eLoadState == HYLOADSTATE_Queued);
+	m_cs.Unlock();
+
+	return bUploadNeeded;
 }
 
 //////////////////////////////////////////////////////////////////////////
