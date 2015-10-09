@@ -135,8 +135,8 @@ void HyScene::WriteDrawBuffers()
 	{
 		if(m_ViewportRef.m_vCams3d[i]->IsEnabled())
 		{
-			*(reinterpret_cast<HyRectangle *>(m_pCurWritePos)) = m_ViewportRef.m_vCams3d[i]->GetRenderRect();
-			m_pCurWritePos += sizeof(HyRectangle);
+			*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_ViewportRef.m_vCams3d[i]->GetRenderRect();
+			m_pCurWritePos += sizeof(HyRectangle<float>);
 			
 			HyError("GetLocalTransform_SRT should be 3d");
 			m_ViewportRef.m_vCams3d[i]->GetLocalTransform_SRT(mtxView);
@@ -160,8 +160,8 @@ void HyScene::WriteDrawBuffers()
 	{
 		if(m_ViewportRef.m_vCams2d[i]->IsEnabled())
 		{
-			*(reinterpret_cast<HyRectangle *>(m_pCurWritePos)) = m_ViewportRef.m_vCams2d[i]->GetRenderRect();
-			m_pCurWritePos += sizeof(HyRectangle);
+			*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_ViewportRef.m_vCams2d[i]->GetRenderRect();
+			m_pCurWritePos += sizeof(HyRectangle<float>);
 
 			m_ViewportRef.m_vCams2d[i]->GetLocalTransform_SRT(mtxView);
 			*(reinterpret_cast<mat4 *>(m_pCurWritePos)) = mtxView;

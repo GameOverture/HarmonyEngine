@@ -9,8 +9,6 @@
  *************************************************************************/
 #include "IHyApplication.h"
 
-#include "FileIO/HyFileIO.h"
-
 HyMemoryHeap	IHyApplication::sm_Mem;
 
 IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_Init(initStruct)

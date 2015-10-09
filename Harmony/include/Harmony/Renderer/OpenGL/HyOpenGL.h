@@ -61,7 +61,7 @@ public:
 
 	// Returns the texture ID used for API specific drawing.
 	virtual uint32 AddTexture(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, void *pPixelData);
-	virtual void DeleteTexture(HyAtlasGroupData &texture);
+	virtual void DeleteTexture(uint32 uiTextureHandle);
 
 protected:
 	bool Initialize();

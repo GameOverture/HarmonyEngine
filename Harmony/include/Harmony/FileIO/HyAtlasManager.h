@@ -17,18 +17,20 @@
 #include "Utilities/HyMath.h"
 #include "Utilities/jsonxx.h"
 
-#include <queue>
-using std::queue;
+#include <vector>
+using std::vector;
 
 class HyAtlasGroup;
 class HyAtlas;
 
-typedef uint32 *const HyTextureHandle;
+class IHyData;
+
+
 
 //////////////////////////////////////////////////////////////////////////
 class HyAtlasManager
 {
-	static std::string	sm_sAtlasDirPath;
+	static std::string		sm_sAtlasDirPath;
 
 	int32					m_iWidth;
 	int32					m_iHeight;
@@ -37,20 +39,13 @@ class HyAtlasManager
 	HyAtlasGroup *			m_pAtlasGroups;
 	uint32					m_uiNumAtlasGroups;
 
-	BasicSection			m_cs;
-	vector<IHyData *>		m_vDataWaitingForAtlasUpload;
-	queue<HyAtlasGroup *>	m_AtlasesWaitingForAtlasUpload;
-
 public:
-	HyAtlasManager(const char *szDataDirPath);
+	HyAtlasManager(std::string sAtlasDataDir);
 	~HyAtlasManager();
 
-	HyTextureHandle RequestTexture(IHyData *pData, uint32 uiTextureId);
+	HyAtlasGroup &RequestTexture(IHyData *pData, uint32 uiTextureId);
 	void RelinquishTexture(IHyData *pData, uint32 uiTextureId);
 
-	bool IsDataWaitingForUpload(IHyData *pData);
-	void GetAtlasesThatNeedUpload(queue<HyAtlasGroup *> &vAtlasesThatNeedUpload);
-	
 	static std::string GetTexturePath(uint32 uiTextureId);
 };
 
@@ -75,7 +70,7 @@ public:
 	bool ContainsTexture(uint32 uiTextureId);
 
 	// Returns 'true' if texture was just loaded
-	HyTextureHandle Request(IHyData *pData, bool &bWasJustLoadedOut);
+	void Request(IHyData *pData);
 
 	bool IsUploadNeeded();
 

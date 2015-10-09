@@ -12,16 +12,18 @@
 #include "FileIO/Data/IHyData.h"
 #include "FileIO/IHyFileIO.h"
 
-/*static*/ IHyFileIO *IHyInst2d::sm_pCtor = NULL;
+/*static*/ IHyFileIO *IHyInst2d::sm_pFileIO = NULL;
 
 IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName) :	m_eTYPE(eInstType),
-																							m_sPREFIX(szPrefix),
-																							m_sNAME(szName),
+																							m_sPREFIX(szPrefix ? szPrefix : ""),
+																							m_sNAME(szName ? szName : ""),
 																							m_pDataPtr(NULL),
 																							m_eLoadState(HYLOADSTATE_Inactive),
 																							m_pParent(NULL),
 																							m_bDirty(true),
-																							m_bEnabled(true)
+																							m_bEnabled(true),
+																							m_uiDisplayOrder(0),
+																							m_iTag(0)
 {
 	m_vColor.Set(1.0f);
 	SetOnDirtyCallback(OnDirty, this);
@@ -38,12 +40,12 @@ void IHyInst2d::Load()
 	if(GetCoordinateType() == HYCOORD_Default && HyScene::DefaultCoordinateType() != HYCOORD_Default)
 		SetCoordinateType(HyScene::DefaultCoordinateType(), true);
 
-	sm_pCtor->LoadInst2d(this);
+	sm_pFileIO->LoadInst2d(this);
 }
 
 void IHyInst2d::Unload()
 {
-	sm_pCtor->RemoveInst(this);
+	sm_pFileIO->RemoveInst(this);
 }
 
 void IHyInst2d::GetWorldTransform(mat4 &outMtx)

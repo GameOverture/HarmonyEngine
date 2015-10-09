@@ -20,6 +20,7 @@ enum HyInstanceType
 {
 	HYINST_Unknown = 0,
 	HYINST_Sound2d,
+	HYINST_Particles2d,
 	HYINST_Sprite2d,
 	HYINST_Spine2d,
 	HYINST_TexturedQuad2d,

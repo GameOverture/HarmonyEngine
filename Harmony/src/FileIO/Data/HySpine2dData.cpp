@@ -24,7 +24,7 @@ HySpine2dData::~HySpine2dData()
 
 /*virtual*/ void HySpine2dData::DoFileLoad(HyAtlasManager &atlasManagerRef)
 {
-	std::string sAtlasPath(m_ksPath);
+	std::string sAtlasPath(m_sFILEPATH);
 	sAtlasPath += ".atlas";
 
 	m_SpineAtlasData = spAtlas_createFromFile(sAtlasPath.c_str(), this);
@@ -35,7 +35,7 @@ HySpine2dData::~HySpine2dData()
 
 	spSkeletonJson * pSpineJsonData = spSkeletonJson_create(m_SpineAtlasData);
 
-	std::string sJsonPath(m_ksPath);
+	std::string sJsonPath(m_sFILEPATH);
 	sJsonPath += ".json";
 
 	m_SpineSkeletonData = spSkeletonJson_readSkeletonDataFile(pSpineJsonData, sJsonPath.c_str());

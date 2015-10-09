@@ -17,32 +17,28 @@
 #include "FileIO/Data/HyText2dData.h"
 #include "FileIO/Data/HyTexturedQuad2dData.h"
 
+#include "Utilities/HyStrManip.h"
 #include "Utilities/jsonxx.h"
 
 #include "stdio.h"
 #include <fstream>
-#include <algorithm>
 
-IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_GfxCommsRef(gfxCommsRef),
+IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(szDataDirPath, "/")),
+																								m_GfxCommsRef(gfxCommsRef),
 																								m_SceneRef(sceneRef),
-																								m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval, m_AtlasManager),
-																								m_Sfx(HYINST_Sound2d),
-																								m_Sprite2d(HYINST_Sprite2d),
-																								m_Spine2d(HYINST_Spine2d),
-																								m_Txt2d(HYINST_Text2d),
-																								m_Mesh3d(HYINST_Mesh3d),
-																								m_Quad2d(HYINST_TexturedQuad2d)
+																								m_AtlasManager(m_sDATADIR + "Atlas/"),
+																								m_Sfx(HYINST_Sound2d, m_sDATADIR + "Sound/"),
+																								m_Sprite2d(HYINST_Sprite2d, m_sDATADIR + "Sprite/"),
+																								m_Spine2d(HYINST_Spine2d, m_sDATADIR + "Spine/"),
+																								m_Txt2d(HYINST_Text2d, m_sDATADIR + "Font/"),
+																								m_Mesh3d(HYINST_Mesh3d, m_sDATADIR + "Mesh/"),
+																								m_Quad2d(HYINST_TexturedQuad2d, ""),
+																								m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval, m_AtlasManager)
 {
-	m_sDataDir = szDataDirPath;
-
-	std::replace(m_sDataDir.begin(), m_sDataDir.end(), '\\', '/');
-	if(m_sDataDir[m_sDataDir.length() - 1] != '/')
-		m_sDataDir.append("/");
-
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
 
-	IHyInst2d::sm_pCtor = this;
+	IHyInst2d::sm_pFileIO = this;
 }
 
 
@@ -78,24 +74,12 @@ void IHyFileIO::Update()
 			IHyData *pData = m_LoadQueue_Retrieval.front();
 			m_LoadQueue_Retrieval.pop();
 
-			// Only set as loaded if no associated atlases need to be uploaded
-			if(m_AtlasManager.IsDataWaitingForUpload(pData) == false)
-				OnDataLoaded(pData);
+			m_GfxCommsRef.SendAtlasGroup(pData);
 		}
 	}
 	m_LoadingCtrl.m_csRetrievalQueue.Unlock();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	// Send atlases that are loaded from the file system and need to but uploaded to graphics ram
-	queue<HyAtlasGroup *> vAtlasGrpsNeedingUpload;
-	m_AtlasManager.GetAtlasesThatNeedUpload(vAtlasGrpsNeedingUpload);
-
-	while(vAtlasGrpsNeedingUpload.empty() == false)
-	{
-		m_GfxCommsRef.SendAtlasGroup(vAtlasGrpsNeedingUpload.front());
-		vAtlasGrpsNeedingUpload.pop();
-	}
 	
 	// Grab and process any returning IData's from the Render thread
 	m_pGfxQueue_Retrieval = m_GfxCommsRef.RetrieveAtlasGroups();
@@ -104,10 +88,7 @@ void IHyFileIO::Update()
 		IHyData *pData = m_pGfxQueue_Retrieval->front();
 		m_pGfxQueue_Retrieval->pop();
 
-		if(pData->GetLoadState() == HYLOADSTATE_Queued)
-			OnDataLoaded(pData);
-		else
-			DeleteData(pData);
+		FinalizeData(pData);
 	}
 }
 
@@ -117,16 +98,16 @@ void IHyFileIO::LoadInst2d(IHyInst2d *pInst)
 	switch(pInst->GetInstType())
 	{
 	case HYINST_Sprite2d:
-		pLoadData = m_Sprite2d.GetOrCreateData(pInst->GetName());
+		pLoadData = m_Sprite2d.GetOrCreateData(pInst->GetPrefix(), pInst->GetName());
 		break;
 	case HYINST_Spine2d:
-		pLoadData = m_Spine2d.GetOrCreateData(pInst->GetPath());
+		pLoadData = m_Spine2d.GetOrCreateData(pInst->GetPrefix(), pInst->GetName());
 		break;
 	case HYINST_Text2d:
-		pLoadData = m_Txt2d.GetOrCreateData(pInst->GetPath());
+		pLoadData = m_Txt2d.GetOrCreateData(pInst->GetPrefix(), pInst->GetName());
 		break;
 	case HYINST_TexturedQuad2d:
-		pLoadData = m_Quad2d.GetOrCreateData(pInst->GetPath());
+		pLoadData = m_Quad2d.GetOrCreateData(pInst->GetPrefix(), pInst->GetName());
 		break;
 	}
 
@@ -238,29 +219,51 @@ void IHyFileIO::RemoveInst(IHyInst2d *pInst)
 	//return 0 == ret;
 }
 
-void IHyFileIO::OnDataLoaded(IHyData *pData)
+void IHyFileIO::FinalizeData(IHyData *pData)
 {
-	bool bDataIsUsed = false;
-	for(vector<IHyInst2d *>::iterator iter = m_vQueuedInst2d.begin(); iter != m_vQueuedInst2d.end();)
+	if(pData->GetLoadState() == HYLOADSTATE_Queued)
 	{
-		if((*iter)->GetData() == pData)
+		bool bDataIsUsed = false;
+		for(vector<IHyInst2d *>::iterator iter = m_vQueuedInst2d.begin(); iter != m_vQueuedInst2d.end();)
 		{
-			(*iter)->SetLoaded();
-			pData->IncRef();
-			m_SceneRef.AddInstance(*iter);
+			if((*iter)->GetData() == pData)
+			{
+				(*iter)->SetLoaded();
+				pData->IncRef();
+				m_SceneRef.AddInstance(*iter);
 
-			bDataIsUsed = true;
+				bDataIsUsed = true;
 
-			iter = m_vQueuedInst2d.erase(iter);
+				iter = m_vQueuedInst2d.erase(iter);
+			}
+			else
+				++iter;
 		}
-		else
-			++iter;
-	}
 
-	if(bDataIsUsed)
-		pData->SetLoadState(HYLOADSTATE_Loaded);
+		if(bDataIsUsed)
+			pData->SetLoadState(HYLOADSTATE_Loaded);
+		else
+			DiscardData(pData);
+	}
+	else if(pData->GetLoadState() == HYLOADSTATE_Discarded)
+	{
+		HyAssert(pData->GetRefCount() <= 0, "IHyFileIO::Update() tried to delete an IData with active references. Num Refs: " << pData->GetRefCount());
+
+		switch(pData->GetType())
+		{
+		case HYINST_Sound2d:		m_Sfx.DeleteData(static_cast<HySfxData *>(pData));					break;
+		case HYINST_Sprite2d:		m_Sprite2d.DeleteData(static_cast<HySprite2dData *>(pData));		break;
+		case HYINST_Spine2d:		m_Spine2d.DeleteData(static_cast<HySpine2dData *>(pData));			break;
+		case HYINST_Text2d:			m_Txt2d.DeleteData(static_cast<HyText2dData *>(pData));				break;
+		case HYINST_TexturedQuad2d:	m_Quad2d.DeleteData(static_cast<HyTexturedQuad2dData *>(pData));	break;
+		default:
+			HyError("IHyFileIO::Update() got a returned IHyData from gfx comms with an invalid type: " << pData->GetType());
+		}
+	}
 	else
-		DiscardData(pData);
+	{
+		HyError("IHyFileIO::Update() got a returned IHyData from gfx comms with an invalid state: " << pData->GetLoadState());
+	}
 }
 
 void IHyFileIO::DiscardData(IHyData *pData)
@@ -269,25 +272,7 @@ void IHyFileIO::DiscardData(IHyData *pData)
 
 	// TODO: Log about erasing data
 	pData->SetLoadState(HYLOADSTATE_Discarded);
-
-	if(pData->GetType() != HYINST_Sound2d)
-		m_GfxCommsRef.Update_SendData(pData);
-	else
-		DeleteData(pData);
-}
-
-void IHyFileIO::DeleteData(IHyData *pData)
-{
-	HyAssert(pData->GetRefCount() <= 0, "IHyFileIO::DeleteData() tried to delete an IData with active references");
-
-	switch(pData->GetType())
-	{
-	case HYINST_Sound2d:		m_Sfx.DeleteData(static_cast<HySfxData *>(pData));				break;
-	case HYINST_Sprite2d:		m_Sprite2d.DeleteData(static_cast<HySprite2dData *>(pData));	break;
-	case HYINST_Spine2d:		m_Spine2d.DeleteData(static_cast<HySpine2dData *>(pData));		break;
-	case HYINST_Text2d:			m_Txt2d.DeleteData(static_cast<HyText2dData *>(pData));			break;
-	case HYINST_TexturedQuad2d:	m_Quad2d.DeleteData(static_cast<HyTexturedQuad2dData *>(pData)); break;
-	}
+	m_GfxCommsRef.SendAtlasGroup(pData);
 }
 
 /*static*/ void IHyFileIO::LoadingThread(void *pParam)

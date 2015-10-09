@@ -15,9 +15,10 @@
 #include "FileIO/HyFactory.h"
 #include "FileIO/HyAtlasManager.h"
 
-#include "Threading/Threading.h"
-
 #include "Renderer/HyGfxComms.h"
+#include "Scene/HyScene.h"
+
+#include "Threading/Threading.h"
 
 #include <queue>
 using std::queue;
@@ -34,7 +35,7 @@ class HyMesh3dData;
 
 class IHyFileIO
 {
-	std::string											m_sDataDir;
+	const std::string									m_sDATADIR;
 
 	HyGfxComms &										m_GfxCommsRef;
 	HyScene &											m_SceneRef;
@@ -94,9 +95,8 @@ public:
 	static bool FileExists(const std::string &sFilePath);
 
 private:
-	void OnDataLoaded(IHyData *pData);
+	void FinalizeData(IHyData *pData);
 	void DiscardData(IHyData *pData);
-	void DeleteData(IHyData *pData);
 
 	static void LoadingThread(void *pParam);
 };

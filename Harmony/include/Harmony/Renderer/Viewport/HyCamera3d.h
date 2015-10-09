@@ -26,15 +26,15 @@ class HyCamera3d : public ITransform<HyAnimVec3>
 
 	bool				m_bEnabled;
 
-	HyRectangle			m_RenderRect;	// Values are [0.0-1.0] representing percentages
+	HyRectangle<float>	m_RenderRect;	// Values are [0.0-1.0] representing percentages
 
 	HyCamera3d(HyViewport *pViewport);
 public:
 	~HyCamera3d(void);
 
-	void SetEnabled(bool bEnable)			{ m_bEnabled = bEnable; }
-	bool IsEnabled()						{ return m_bEnabled; }
-	const HyRectangle &GetRenderRect()		{ return m_RenderRect; }
+	void SetEnabled(bool bEnable)				{ m_bEnabled = bEnable; }
+	bool IsEnabled()							{ return m_bEnabled; }
+	const HyRectangle<float> &GetRenderRect()	{ return m_RenderRect; }
 
 	// All values are [0.0 - 1.0] representing percentages of the entire game window
 	void SetRenderPercentageCoordinates(float fPosX, float fPosY, float fWidth, float fHeight);

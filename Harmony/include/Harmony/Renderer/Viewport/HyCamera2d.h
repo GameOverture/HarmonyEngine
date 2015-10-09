@@ -23,21 +23,21 @@ class HyCamera2d : public ITransform<HyAnimVec2>
 
 	bool				m_bEnabled;
 
-	HyRectangle			m_RenderRect;	// Values are [0.0-1.0] representing percentages
+	HyRectangle<float>	m_RenderRect;	// Values are [0.0-1.0] representing percentages
 	
 	HyCamera2d(HyViewport *pViewport);
 public:
 	~HyCamera2d(void);
 
-	void SetEnabled(bool bEnable)			{ m_bEnabled = bEnable; }
-	bool IsEnabled()						{ return m_bEnabled; }
-	const HyRectangle &GetRenderRect()		{ return m_RenderRect; }
+	void SetEnabled(bool bEnable)				{ m_bEnabled = bEnable; }
+	bool IsEnabled()							{ return m_bEnabled; }
+	const HyRectangle<float> &GetRenderRect()	{ return m_RenderRect; }
 
 	// All values are [0.0 - 1.0] representing percentages of the entire game window
 	void SetRenderPercentageCoordinates(float fPosX, float fPosY, float fWidth, float fHeight);
 
-	inline void SetZoom(const float fZoom)	{ m_vScale.Set(fZoom, fZoom); }
-	inline float GetZoom() const			{ return m_vScale.Get().x; }
+	inline void SetZoom(const float fZoom)		{ m_vScale.Set(fZoom, fZoom); }
+	inline float GetZoom() const				{ return m_vScale.Get().x; }
 };
 
 #endif /* __HyCamera2d_h__ */

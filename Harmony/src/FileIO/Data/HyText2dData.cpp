@@ -27,7 +27,7 @@ HyText2dData::~HyText2dData(void)
 /*virtual*/ void HyText2dData::DoFileLoad(HyAtlasManager &atlasManagerRef)
 {
 	// If path is empty, then use default engine font
-	if(m_ksPath.empty())
+	if(m_sFILEPATH.empty())
 	{
 		std::string sFontName = "./data/fonts/Vera.ttf";
 		uint32 uiMaxSize = 20;

@@ -14,6 +14,9 @@
 
 #include "FileIO/Data/IHyData.h"
 #include "FileIO/HyFactory.h"
+#include "FileIO/HyAtlasManager.h"
+
+#include "Utilities/jsonxx.h"
 
 class HySprite2dData : public IHyData
 {
@@ -21,10 +24,10 @@ class HySprite2dData : public IHyData
 
 	struct AnimState
 	{
-		std::string		sName;
-		bool			bLoop;
-		bool			bReverse;
-		bool			bBounce;
+		const std::string	sNAME;
+		const bool			bLOOP;
+		const bool			bREVERSE;
+		const bool			bBOUNCE;
 
 		struct Frame
 		{
@@ -38,9 +41,11 @@ class HySprite2dData : public IHyData
 		};
 		Frame *			m_pFrames;
 		int				m_iNumFrames;
+
+		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HyAtlasManager &atlasManagerRef);
 	};
 	AnimState *			m_pAnimStates;
-	int					m_iNumStates;
+	uint32				m_uiNumStates;
 
 	// Only allow HyFactory instantiate
 	HySprite2dData(const std::string &sPath);

@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Utilities/HyStrManip.h"
 
+#include <algorithm>
 #include <vector>
 
 // Takes the dst char ptr and dynamically allocates the size of src and copies its contents.
@@ -18,6 +19,20 @@ void DynamicStringCopy(char *&dst, const char *src)
 	size_t iStrSize = strlen(src) + 1; // +1 for NULL terminator
 	dst = new char[iStrSize];
 	strcpy(dst, src);
+}
+
+std::string MakeStringProperPath(const char *szPath, const char *szExtension)
+{
+	std::string sPath(szPath);
+
+	std::replace(sPath.begin(), sPath.end(), '\\', '/');
+
+	if(0 != strcmp(&sPath[sPath.length() - strlen(szExtension) - 1], szExtension))
+		sPath.append(szExtension);
+	
+	transform(sPath.begin(), sPath.end(), sPath.begin(), ::tolower);
+
+	return sPath;
 }
 
 // code from http://www.c-plusplus.de/forum/viewtopic-var-t-is-168607.html

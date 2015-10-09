@@ -104,8 +104,6 @@ HyOpenGL::~HyOpenGL(void)
 	glBufferData(GL_ARRAY_BUFFER, m_DrawpBufferHeader->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexDataEmulate), vertexDataEmulate, GL_DYNAMIC_DRAW);
 
-	//char *pTest = GetVertexData2d();
-	float *pTest = reinterpret_cast<float *>(GetVertexData2d());
 	
 	//-----------------------------------------------------------------------------------------------------------------
 
@@ -304,10 +302,9 @@ HyOpenGL::~HyOpenGL(void)
 	return hGLTexture;
 }
 
-/*virtual*/ void HyOpenGL::DeleteTexture(HyAtlasGroupData &texture)
+/*virtual*/ void HyOpenGL::DeleteTexture(uint32 uiTextureHandle)
 {
-	uint32 uiTexId = texture.GetId();
-	glDeleteTextures(1, &uiTexId);
+	glDeleteTextures(1, &uiTextureHandle);
 }
 
 bool HyOpenGL::Initialize()

@@ -26,14 +26,12 @@ class IHyInst2d : public ITransform<HyAnimVec2>
 	friend class HyScene;
 
 	friend class IHyFileIO;
-	static IHyFileIO *			sm_pCtor;
+	static IHyFileIO *			sm_pFileIO;
 
 protected:
 	const HyInstanceType		m_eTYPE;
 	const std::string			m_sNAME;
 	const std::string			m_sPREFIX;
-	
-	HyRenderState				m_RenderState;
 
 	// Data loading
 	IHyData *					m_pDataPtr;
@@ -49,6 +47,7 @@ protected:
 	bool						m_bEnabled;
 	HyAnimVec4					m_vColor;
 	uint32						m_uiDisplayOrder;	// Lower values are displayed front-most
+	HyRenderState				m_RenderState;
 	int32						m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 
 public:
@@ -68,7 +67,7 @@ public:
 	void SetDisplayOrder(uint32 uiOrderValue);
 
 	const HyRenderState &GetRenderState() const					{ return m_RenderState; }
-	void SetUsingLocalCoordinates(bool bUseLocalCoords)			{ if(bUseLocalCoords) m_RenderState.Enable(HyRenderState::USINGLOCALCOORDS); else m_RenderState.Disable(HyRenderState::USINGLOCALCOORDS); }
+	void SetUsingLocalCoordinates(bool bUseLocalCoords)			{ bUseLocalCoords ? m_RenderState.Enable(HyRenderState::USINGLOCALCOORDS) : m_RenderState.Disable(HyRenderState::USINGLOCALCOORDS); }
 
 	inline HyAnimVec4 &Color()									{ return m_vColor; }
 
@@ -78,6 +77,7 @@ public:
 	void Load();
 	void Unload();
 	void GetWorldTransform(mat4 &outMtx);
+	void GetRenderState(HyRenderState &renderStateOut) const;
 	
 	void AddChild(IHyInst2d &childInst);
 	void Detach();

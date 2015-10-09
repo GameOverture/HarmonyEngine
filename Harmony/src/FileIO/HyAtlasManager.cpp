@@ -15,12 +15,11 @@
 
 std::string	HyAtlasManager::sm_sAtlasDirPath;
 
-HyAtlasManager::HyAtlasManager(const char *szDataDirPath)
+HyAtlasManager::HyAtlasManager(std::string sAtlasDataDir)
 {
-	jsonxx::Object atlasObject;
+	sm_sAtlasDirPath = sAtlasDataDir;
 
-	sm_sAtlasDirPath = szDataDirPath;
-	sm_sAtlasDirPath += "Atlas/";
+	jsonxx::Object atlasObject;
 
 	std::string sAtlasInfoFilePath(sm_sAtlasDirPath);
 	sAtlasInfoFilePath += "atlasInfo.json";
@@ -31,10 +30,11 @@ HyAtlasManager::HyAtlasManager(const char *szDataDirPath)
 	m_iNum8bitClrChannels = static_cast<int32>(atlasObject.get<jsonxx::Number>("num8BitClrChannels"));
 	jsonxx::Array loadGroupArray = atlasObject.get<jsonxx::Array>("loadGroups");
 
-	m_pAtlasGroups = reinterpret_cast<HyAtlasGroup *>(new unsigned char[sizeof(HyAtlasGroup) * loadGroupArray.size()]);
+	m_uiNumAtlasGroups = loadGroupArray.size();
+	m_pAtlasGroups = reinterpret_cast<HyAtlasGroup *>(new unsigned char[sizeof(HyAtlasGroup) * m_uiNumAtlasGroups]);
 	HyAtlasGroup *pAtlasGroupWriteLocation = m_pAtlasGroups;
 
-	for(uint32 i = 0; i < loadGroupArray.size(); ++i, ++pAtlasGroupWriteLocation)
+	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i, ++pAtlasGroupWriteLocation)
 	{
 		jsonxx::Object loadGroupObj = loadGroupArray.get<jsonxx::Object>(i);
 
@@ -49,62 +49,23 @@ HyAtlasManager::~HyAtlasManager()
 {
 }
 
-HyTextureHandle HyAtlasManager::RequestTexture(IHyData *pData, uint32 uiTextureId)
+HyAtlasGroup &HyAtlasManager::RequestTexture(IHyData *pData, uint32 uiTextureId)
 {
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 	{
 		if(m_pAtlasGroups[i].ContainsTexture(uiTextureId))
 		{
-			bool bWasJustLoaded = false;
-			HyTextureHandle hTexHandle = m_pAtlasGroups[i].Request(pData, bWasJustLoaded);
-
-			if(bWasJustLoaded)
-			{
-				m_cs.Lock();
-				m_vDataWaitingForAtlasUpload.push_back(pData);
-				m_AtlasesWaitingForAtlasUpload.push(&m_pAtlasGroups[i]);
-				m_cs.Unlock();
-			}
-
-			return hTexHandle;
+			m_pAtlasGroups[i].Request(pData);
+			return m_pAtlasGroups[i];
 		}
 	}
 
 	HyError("HyAtlasManager::RequestTexture() could not find the atlas group containing texture ID: " << uiTextureId);
-	return NULL;
+	return m_pAtlasGroups[0];
 }
 
 void HyAtlasManager::RelinquishTexture(IHyData *pData, uint32 uiTextureId)
 {
-}
-
-bool HyAtlasManager::IsDataWaitingForUpload(IHyData *pData)
-{
-	m_cs.Lock();
-	for(uint32 i = 0; i < m_vDataWaitingForAtlasUpload.size(); ++i)
-	{
-		if(m_vDataWaitingForAtlasUpload[i] == pData)
-		{
-			m_cs.Unlock();
-			return true;
-		}
-	}
-	m_cs.Unlock();
-
-	return false;
-}
-
-void HyAtlasManager::GetAtlasesThatNeedUpload(queue<HyAtlasGroup *> &vAtlasesThatNeedUpload)
-{
-	m_cs.Lock();
-	
-	while(m_AtlasesWaitingForAtlasUpload.empty() == false)
-	{
-		vAtlasesThatNeedUpload.push(m_AtlasesWaitingForAtlasUpload.front());
-		m_AtlasesWaitingForAtlasUpload.pop();
-	}
-
-	m_cs.Unlock();
 }
 
 /*static*/ std::string HyAtlasManager::GetTexturePath(uint32 uiTextureId)
@@ -132,7 +93,7 @@ HyAtlasGroup::HyAtlasGroup(int32 iLoadGroupId, jsonxx::Array &texturesArrayRef) 
 	{
 		jsonxx::Object texObj = texturesArrayRef.get<jsonxx::Object>(j);
 
-		uint32 uiTextureId = texObj.get<jsonxx::Number>("id");
+		uint32 uiTextureId = static_cast<uint32>(texObj.get<jsonxx::Number>("id"));
 		jsonxx::Array srcFramesArray = texObj.get<jsonxx::Array>("srcFrames");
 
 		new (pAtlasWriteLocation)HyAtlas(uiTextureId, srcFramesArray);
@@ -155,7 +116,7 @@ bool HyAtlasGroup::ContainsTexture(uint32 uiTextureId)
 }
 
 // Returns 'true' if texture was just loaded
-HyTextureHandle HyAtlasGroup::Request(IHyData *pData, bool &bWasJustLoadedOut)
+void HyAtlasGroup::Request(IHyData *pData)
 {
 	m_cs.Lock();
 
@@ -171,15 +132,9 @@ HyTextureHandle HyAtlasGroup::Request(IHyData *pData, bool &bWasJustLoadedOut)
 		m_cs.Lock();
 		// State is 'queued' to be uploaded to graphics ram
 		m_eLoadState = HYLOADSTATE_Queued;
-
-		bWasJustLoadedOut = true;
 	}
-	else
-		bWasJustLoadedOut = false;
 
 	m_cs.Unlock();
-
-	return &m_uiGfxApiHandle;
 }
 
 bool HyAtlasGroup::IsUploadNeeded()

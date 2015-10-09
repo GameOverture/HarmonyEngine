@@ -22,15 +22,15 @@ class HyAtlasManager;
 class IHyData
 {
 protected:
-	const HyInstanceType			m_keDataType;
-	const std::string				m_ksPath;
+	const HyInstanceType			m_eTYPE;
+	const std::string				m_sFILEPATH;
 	
 	HyLoadState						m_eLoadState;
 	int32							m_iRefCount;
 
 public:
-	IHyData(HyInstanceType eDataType, const std::string &sPath) :	m_keDataType(eDataType),
-																	m_ksPath(sPath),
+	IHyData(HyInstanceType eDataType, const std::string &sPath) :	m_eTYPE(eDataType),
+																	m_sFILEPATH(sPath),
 																	m_eLoadState(HYLOADSTATE_Inactive),
 																	m_iRefCount(0)
 	{ }
@@ -38,9 +38,8 @@ public:
 	virtual ~IHyData(void)
 	{ }
 
-	HyInstanceType GetType()							{ return m_keDataType; }
-
-	const std::string &GetPath()						{ return m_ksPath; }
+	HyInstanceType GetType()							{ return m_eTYPE; }
+	const std::string &GetPath()						{ return m_sFILEPATH; }
 
 	void SetLoadState(HyLoadState eState)				{ m_eLoadState = eState; }
 	HyLoadState GetLoadState()							{ return m_eLoadState; }
@@ -48,11 +47,6 @@ public:
 	void IncRef()										{ m_iRefCount++; }
 	bool DecRef()										{ m_iRefCount--; return m_iRefCount <= 0; }
 	int32 GetRefCount()									{ return m_iRefCount; }
-
-	bool IsMatch(const std::string &sPath)
-	{
-		return sPath == m_ksPath;
-	}
 	
 	// Only invoked on the Load thread
 	virtual void DoFileLoad(HyAtlasManager &atlasManagerRef) = 0;
