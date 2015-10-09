@@ -35,7 +35,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\Harmony\FileIO\Data\IHyData.cpp" />
     <ClCompile Include="include\Harmony\Threading\BasicSync.cpp" />
     <ClCompile Include="include\Harmony\Threading\InteropUnix.cpp" />
     <ClCompile Include="include\Harmony\Threading\stdafx.cpp" />

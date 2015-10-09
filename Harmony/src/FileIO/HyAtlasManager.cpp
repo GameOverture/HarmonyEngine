@@ -120,7 +120,7 @@ void HyAtlasGroup::Request(IHyData *pData)
 {
 	m_cs.Lock();
 
-	m_vAssociatedData.push_back(pData);
+	m_vAssociatedData.insert(pData);
 
 	if(m_eLoadState == HYLOADSTATE_Inactive)
 	{
@@ -137,14 +137,19 @@ void HyAtlasGroup::Request(IHyData *pData)
 	m_cs.Unlock();
 }
 
-bool HyAtlasGroup::IsUploadNeeded()
+void HyAtlasGroup::Upload()
 {
-	bool bUploadNeeded = false;
 	m_cs.Lock();
-	bUploadNeeded = (m_eLoadState == HYLOADSTATE_Queued);
-	m_cs.Unlock();
 
-	return bUploadNeeded;
+	if(m_eLoadState == HYLOADSTATE_Queued)
+	{
+	}
+
+	m_cs.Unlock();
+}
+
+void HyAtlasGroup::Delete()
+{
 }
 
 //////////////////////////////////////////////////////////////////////////

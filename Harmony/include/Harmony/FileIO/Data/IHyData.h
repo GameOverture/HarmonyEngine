@@ -52,8 +52,7 @@ public:
 	virtual void DoFileLoad(HyAtlasManager &atlasManagerRef) = 0;
 
 	// Only invoked on the Render thread
-	virtual void OnGfxLoad(IHyRenderer &gfxApi) = 0;
-	virtual void OnGfxRemove(IHyRenderer &gfxApi) = 0;
+	virtual void GetAssociatedAtlases(std::set<HyAtlasGroup> &atlasGrp) = 0;
 };
 
 #endif /* __IHyData_h__ */

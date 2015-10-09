@@ -49,7 +49,8 @@ HySpine2dData::~HySpine2dData()
 /*virtual*/ void HySpine2dData::OnGfxLoad(IHyRenderer &gfxApi)
 {
 	// TODO: possibly support multiple textures (aka rendererObject's)
-	HyAtlasGroupData *pTexture = reinterpret_cast<HyAtlasGroupData *>(m_SpineAtlasData->pages->rendererObject);
+	//HyAtlasGroup *pTexture = reinterpret_cast<HyAtlasGroupData *>(m_SpineAtlasData->pages->rendererObject);
+	gfxApi
 	pTexture->Upload(gfxApi);
 }
 

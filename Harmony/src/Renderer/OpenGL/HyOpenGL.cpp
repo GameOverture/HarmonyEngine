@@ -267,39 +267,77 @@ HyOpenGL::~HyOpenGL(void)
 }
 
 // Returns the texture ID used for API specific drawing.
-/*virtual*/ uint32 HyOpenGL::AddTexture(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, void *pPixelData)
+/*virtual*/ void HyOpenGL::AddTextureArray(HyAtlasGroup &atlasGroupRef) //uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, void *pPixelData)
 {
-	GLuint hGLTexture;
-	glGenTextures(1, &hGLTexture);
+	GLuint hGLTextureArray;
+	glGenTextures(1, &hGLTextureArray);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, hGLTextureArray);
 
-	glBindTexture( GL_TEXTURE_2D, hGLTexture);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);//GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	//Create storage for the texture. (100 layers of 1x1 texels)
+	glTexStorage3D(GL_TEXTURE_2D_ARRAY,
+		1,                    //No mipmaps as textures are 1x1
+		GL_RGB8,              //Internal format
+		1, 1,                 //width,height
+		100                   //Number of layers
+		);
 
-	if(uiNumColorChannels == 4 )
+	for(unsigned int i(0); i != 100; ++i)
 	{
-		//	#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
-		//		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, uiWidth, uiHeight, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pPixelData);
-		//	#else
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, uiWidth, uiHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pPixelData);
-		//	#endif
-	}
-	else if(uiNumColorChannels == 3 )
-	{
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, uiWidth, uiHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, pPixelData);
-	}
-	else
-	{
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, uiWidth, uiHeight, 0, GL_RED, GL_UNSIGNED_BYTE, pPixelData);
+		//Choose a random color for the i-essim image
+		GLubyte color[3] = { rand() % 255, rand() % 255, rand() % 255 };
+
+		//Specify i-essim image
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+			0,                     //Mipmap number
+			0, 0, i,                 //xoffset, yoffset, zoffset
+			1, 1, 1,                 //width, height, depth
+			GL_RGB,                //format
+			GL_UNSIGNED_BYTE,      //type
+			color);                //pointer to data
 	}
 
-	// This is probable unnecessary
-	//GLint iLocation = glGetUniformLocation(m_pShader2d[QUADBATCH].GetHandle(), "Tex");
-	//glUniform1i(iLocation, 0);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	return hGLTexture;
+	atlasGroupRef.SetUploaded(hGLTextureArray);
+
+
+
+
+	//GLuint hGLTexture;
+	//glGenTextures(1, &hGLTexture);
+
+	//glBindTexture( GL_TEXTURE_2D, hGLTexture);
+	//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//GL_CLAMP_TO_EDGE );
+	//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);//GL_CLAMP_TO_EDGE );
+	//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
+	//if(uiNumColorChannels == 4 )
+	//{
+	//	//	#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
+	//	//		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, uiWidth, uiHeight, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pPixelData);
+	//	//	#else
+	//	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, uiWidth, uiHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pPixelData);
+	//	//	#endif
+	//}
+	//else if(uiNumColorChannels == 3 )
+	//{
+	//	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, uiWidth, uiHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, pPixelData);
+	//}
+	//else
+	//{
+	//	glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, uiWidth, uiHeight, 0, GL_RED, GL_UNSIGNED_BYTE, pPixelData);
+	//}
+
+	//// This is probable unnecessary
+	////GLint iLocation = glGetUniformLocation(m_pShader2d[QUADBATCH].GetHandle(), "Tex");
+	////glUniform1i(iLocation, 0);
+
+	//return hGLTexture;
 }
 
 /*virtual*/ void HyOpenGL::DeleteTexture(uint32 uiTextureHandle)

@@ -17,15 +17,13 @@
 #include "Utilities/HyMath.h"
 #include "Utilities/jsonxx.h"
 
-#include <vector>
-using std::vector;
+#include <set>
+using std::set;
 
 class HyAtlasGroup;
 class HyAtlas;
 
 class IHyData;
-
-
 
 //////////////////////////////////////////////////////////////////////////
 class HyAtlasManager
@@ -59,7 +57,7 @@ class HyAtlasGroup
 	uint32						m_uiNumAtlases;
 
 	HyLoadState					m_eLoadState;
-	vector<IHyData *>			m_vAssociatedData;
+	set<IHyData *>				m_vAssociatedData;
 
 	BasicSection				m_cs;
 
@@ -68,15 +66,10 @@ public:
 	~HyAtlasGroup();
 
 	bool ContainsTexture(uint32 uiTextureId);
-
-	// Returns 'true' if texture was just loaded
 	void Request(IHyData *pData);
 
-	bool IsUploadNeeded();
-
-	//void Upload(IHyRenderer &gfxApi);
-
-	//void DeletePixelData();
+	void Upload();
+	void Delete();
 };
 
 //////////////////////////////////////////////////////////////////////////
