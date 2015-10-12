@@ -64,10 +64,6 @@ HyAtlasGroup &HyAtlasManager::RequestTexture(IHyData *pData, uint32 uiTextureId)
 	return m_pAtlasGroups[0];
 }
 
-void HyAtlasManager::RelinquishTexture(IHyData *pData, uint32 uiTextureId)
-{
-}
-
 /*static*/ std::string HyAtlasManager::GetTexturePath(uint32 uiTextureId)
 {
 	std::string sTexturePath(sm_sAtlasDirPath);
@@ -132,6 +128,22 @@ void HyAtlasGroup::Request(IHyData *pData)
 		m_cs.Lock();
 		// State is 'queued' to be uploaded to graphics ram
 		m_eLoadState = HYLOADSTATE_Queued;
+	}
+
+	m_cs.Unlock();
+}
+
+void HyAtlasGroup::Relinquish(IHyData *pData)
+{
+	m_cs.Lock();
+
+	for(set<IHyData *>::iterator iter = m_AssociatedDataSet.begin(); iter != m_AssociatedDataSet.end(); ++iter)
+	{
+		if((*iter) == pData)
+		{
+			m_AssociatedDataSet.erase(iter);
+			break;
+		}
 	}
 
 	m_cs.Unlock();

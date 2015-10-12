@@ -54,7 +54,7 @@ public:
 		{
 			for(std::set<HyAtlasGroup *>::iterator iter = m_AssociatedAtlasRefs.begin(); iter != m_AssociatedAtlasRefs.end(); ++iter)
 			{
-				//iter.
+				iter.
 			}
 		}
 		else if(m_eLoadState == HYLOADSTATE_ReloadGfx)
