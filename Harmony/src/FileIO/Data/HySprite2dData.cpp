@@ -48,19 +48,23 @@ HySprite2dData::~HySprite2dData(void)
 HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HyAtlasManager &atlasManagerRef) :	sNAME(sName),
 																																								bLOOP(bLoop),
 																																								bREVERSE(bReverse),
-																																								bBOUNCE(bBounce)
+																																								bBOUNCE(bBounce),
+																																								uiNUMFRAMES(frameArray.size())
 {
-	//m_iNumFrames = m_iNumFrames
-	//frameArray.get<jsonxx::Object>();
+	pFrames = reinterpret_cast<Frame *>(new unsigned char[sizeof(Frame) * uiNUMFRAMES]);
+	Frame *pFrameWriteLocation = pFrames;
 
-	//m_pAnimStates->m_iNumFrames = 1;
-	//m_pAnimStates->m_pFrames = new AnimState::Frame[1];
-	//m_pAnimStates->m_pFrames[0].m_fDur = 0.0f;
-	//m_pAnimStates->m_pFrames[0].m_fRot = 0.0f;
-	//m_pAnimStates->m_pFrames[0].m_iRectIndex = 0;
-	//m_pAnimStates->m_pFrames[0].m_iTextureIndex = 0;
-	//m_pAnimStates->m_pFrames[0].m_vOffset.x = m_pAnimStates->m_pFrames[0].m_vOffset.y = 0.0f;
-	//m_pAnimStates->m_pFrames[0].m_vScale.x = m_pAnimStates->m_pFrames[0].m_vScale.y = 1.0f;
+	for(uint32 i = 0; i < uiNUMFRAMES; ++i)
+	{
+		jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
+
+		new (pFrameWriteLocation)Frame(atlasManagerRef.RequestTexture(, static_cast<uint32>(frameObj.get<jsonxx::Number>("textureId"))),
+									   static_cast<uint32>(frameObj.get<jsonxx::Number>("rectIndex")),
+									   vec2(frameObj.get<jsonxx::Number>("xOffset"), frameObj.get<jsonxx::Number>("yOffset")),
+									   frameObj.get<jsonxx::Number>("rotation"),
+									   vec2(frameObj.get<jsonxx::Number>("xScale"), frameObj.get<jsonxx::Number>("yScale")),
+									   frameObj.get<jsonxx::Number>("duration"));
+	}
 }
 
 /*virtual*/ void HySprite2dData::OnGfxLoad(IHyRenderer &gfxApi)

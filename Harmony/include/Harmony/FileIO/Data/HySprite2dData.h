@@ -31,16 +31,24 @@ class HySprite2dData : public IHyData
 
 		struct Frame
 		{
-			HyAtlasGroup &	m_AtlasGrpRef;
-			int				m_iRectIndex;
+			HyAtlasGroup &		AtlasGrpRef;
+			const uint32		uiRECTINDEX;
 
-			vec2			m_vOffset;
-			float			m_fRot;
-			vec2			m_vScale;	// negative values will flip image
-			float			m_fDur;
+			const vec2			vOFFSET;
+			const float			fROTATION;
+			const vec2			vSCALE;	// negative values will flip image
+			const float			fDURATION;
+
+			Frame(HyAtlasGroup &atlasGrpRef, uint32 uiRectIndex, vec2 vOffset, float fRotation, vec2 vScale, float fDuration) : AtlasGrpRef(atlasGrpRef),
+																																uiRECTINDEX(uiRectIndex),
+																																vOFFSET(vOffset),
+																																fROTATION(fRotation),
+																																vSCALE(vScale),
+																																fDURATION(fDuration)
+			{ }
 		};
-		Frame *			m_pFrames;
-		int				m_iNumFrames;
+		Frame *			pFrames;
+		const uint32	uiNUMFRAMES;
 
 		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HyAtlasManager &atlasManagerRef);
 	};

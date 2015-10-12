@@ -120,7 +120,7 @@ void HyAtlasGroup::Request(IHyData *pData)
 {
 	m_cs.Lock();
 
-	m_vAssociatedData.insert(pData);
+	m_AssociatedDataSet.insert(pData);
 
 	if(m_eLoadState == HYLOADSTATE_Inactive)
 	{

@@ -12,8 +12,10 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include <vector>
-using std::vector;
+#include "FileIO/HyAtlasManager.h"
+
+#include <set>
+using std::set;
 
 // Forward declarations
 class IHyRenderer;
@@ -25,8 +27,11 @@ protected:
 	const HyInstanceType			m_eTYPE;
 	const std::string				m_sFILEPATH;
 	
+
 	HyLoadState						m_eLoadState;
 	int32							m_iRefCount;
+
+	std::set<HyAtlasGroup *>		m_AssociatedAtlasRefs;
 
 public:
 	IHyData(HyInstanceType eDataType, const std::string &sPath) :	m_eTYPE(eDataType),
@@ -38,21 +43,36 @@ public:
 	virtual ~IHyData(void)
 	{ }
 
-	HyInstanceType GetType()							{ return m_eTYPE; }
-	const std::string &GetPath()						{ return m_sFILEPATH; }
+	HyInstanceType GetType()										{ return m_eTYPE; }
+	const std::string &GetPath()									{ return m_sFILEPATH; }
 
-	void SetLoadState(HyLoadState eState)				{ m_eLoadState = eState; }
-	HyLoadState GetLoadState()							{ return m_eLoadState; }
+	void SetLoadState(HyLoadState eState)
+	{
+		m_eLoadState = eState;
 
-	void IncRef()										{ m_iRefCount++; }
-	bool DecRef()										{ m_iRefCount--; return m_iRefCount <= 0; }
-	int32 GetRefCount()									{ return m_iRefCount; }
+		if(m_eLoadState == HYLOADSTATE_Discarded)
+		{
+			for(std::set<HyAtlasGroup *>::iterator iter = m_AssociatedAtlasRefs.begin(); iter != m_AssociatedAtlasRefs.end(); ++iter)
+			{
+				//iter.
+			}
+		}
+		else if(m_eLoadState == HYLOADSTATE_ReloadGfx)
+		{
+
+		}
+	}
+	HyLoadState GetLoadState()										{ return m_eLoadState; }
+	const std::set<HyAtlasGroup *> &GetAssociatedAtlases()			{ return m_AssociatedAtlasRefs; }
+
+	void IncRef()													{ m_iRefCount++; }
+	bool DecRef()													{ m_iRefCount--; return m_iRefCount <= 0; }
+	int32 GetRefCount()												{ return m_iRefCount; }
 	
 	// Only invoked on the Load thread
 	virtual void DoFileLoad(HyAtlasManager &atlasManagerRef) = 0;
 
 	// Only invoked on the Render thread
-	virtual void GetAssociatedAtlases(std::set<HyAtlasGroup> &atlasGrp) = 0;
 };
 
 #endif /* __IHyData_h__ */

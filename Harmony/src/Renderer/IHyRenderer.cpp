@@ -28,16 +28,23 @@ void IHyRenderer::Update()
 	}
 	m_DrawpBufferHeader = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr);
 
-	// Handle each command message first. Which loads/unloads gfx resources.
+	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
 	while(!m_pMsgQueuePtr->empty())
 	{
 		IHyData *pData = m_pMsgQueuePtr->front();
 		m_pMsgQueuePtr->pop();
 
-		if(pData->GetLoadState() == HYLOADSTATE_Queued)
-			pData->OnGfxLoad(*this);
-		else
-			pData->OnGfxRemove(*this);
+		std::set<HyAtlasGroup *> associatedAtlasesSet = pData->GetAssociatedAtlases();
+
+		for(std::set<HyAtlasGroup *>::iterator iter = associatedAtlasesSet.begin(); iter != associatedAtlasesSet.end(); ++iter)
+		{
+			iter->OnGfxThread(*this);
+		}
+
+		//if(pData->GetLoadState() == HYLOADSTATE_Queued)
+		//	pData->OnGfxLoad(*this);
+		//else
+		//	pData->OnGfxRemove(*this);
 
 		m_pSendMsgQueuePtr->push(pData);
 	}

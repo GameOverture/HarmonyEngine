@@ -36,6 +36,9 @@ IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char 
 
 void IHyInst2d::Load()
 {
+	if(m_eLoadState != HYLOADSTATE_Inactive)
+		return;
+
 	// TODO: fix this code. Handle default more eloquently
 	if(GetCoordinateType() == HYCOORD_Default && HyScene::DefaultCoordinateType() != HYCOORD_Default)
 		SetCoordinateType(HyScene::DefaultCoordinateType(), true);
@@ -46,6 +49,7 @@ void IHyInst2d::Load()
 void IHyInst2d::Unload()
 {
 	sm_pFileIO->RemoveInst(this);
+	m_eLoadState = HYLOADSTATE_Inactive;
 }
 
 void IHyInst2d::GetWorldTransform(mat4 &outMtx)

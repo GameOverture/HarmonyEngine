@@ -88,7 +88,13 @@ void IHyFileIO::Update()
 		IHyData *pData = m_pGfxQueue_Retrieval->front();
 		m_pGfxQueue_Retrieval->pop();
 
-		FinalizeData(pData);
+		if(pData->GetLoadState() == HYLOADSTATE_ReloadGfx)
+		{
+			pData->SetLoadState(HYLOADSTATE_Queued);
+			m_GfxCommsRef.SendAtlasGroup(pData);
+		}
+		else
+			FinalizeData(pData);
 	}
 }
 
@@ -112,13 +118,12 @@ void IHyFileIO::LoadInst2d(IHyInst2d *pInst)
 	}
 
 	pInst->SetData(pLoadData);
+	if(pLoadData)
+		pLoadData->IncRef();
 
 	if(pLoadData == NULL || pLoadData->GetLoadState() == HYLOADSTATE_Loaded)
 	{
 		pInst->SetLoaded();
-		if(pLoadData)
-			pLoadData->IncRef();
-
 		m_SceneRef.AddInstance(pInst);
 	}
 	else
@@ -129,6 +134,10 @@ void IHyFileIO::LoadInst2d(IHyInst2d *pInst)
 		{
 			pLoadData->SetLoadState(HYLOADSTATE_Queued);
 			m_LoadQueue_Prepare.push(pLoadData);
+		}
+		else if(pLoadData->GetLoadState() == HYLOADSTATE_Discarded)
+		{
+			pLoadData->SetLoadState(HYLOADSTATE_ReloadGfx);
 		}
 	}
 }
@@ -151,6 +160,7 @@ void IHyFileIO::RemoveInst(IHyInst2d *pInst)
 		break;
 
 	case HYLOADSTATE_Queued:
+	case HYLOADSTATE_ReloadGfx:
 		for(vector<IHyInst2d *>::iterator it = m_vQueuedInst2d.begin(); it != m_vQueuedInst2d.end(); ++it)
 		{
 			if((*it) == pInst)
@@ -229,7 +239,6 @@ void IHyFileIO::FinalizeData(IHyData *pData)
 			if((*iter)->GetData() == pData)
 			{
 				(*iter)->SetLoaded();
-				pData->IncRef();
 				m_SceneRef.AddInstance(*iter);
 
 				bDataIsUsed = true;
@@ -259,6 +268,10 @@ void IHyFileIO::FinalizeData(IHyData *pData)
 		default:
 			HyError("IHyFileIO::Update() got a returned IHyData from gfx comms with an invalid type: " << pData->GetType());
 		}
+	}
+	else if(pData->GetLoadState() == HYLOADSTATE_Reload)
+	{
+
 	}
 	else
 	{

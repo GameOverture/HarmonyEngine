@@ -57,7 +57,7 @@ class HyAtlasGroup
 	uint32						m_uiNumAtlases;
 
 	HyLoadState					m_eLoadState;
-	set<IHyData *>				m_vAssociatedData;
+	set<IHyData *>				m_AssociatedDataSet;
 
 	BasicSection				m_cs;
 
