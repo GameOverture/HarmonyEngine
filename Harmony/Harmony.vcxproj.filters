@@ -180,6 +180,9 @@
     <ClCompile Include="src\FileIO\HyAtlasManager.cpp">
       <Filter>FileIO</Filter>
     </ClCompile>
+    <ClCompile Include="src\FileIO\Data\IHyData.cpp">
+      <Filter>FileIO\Data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">

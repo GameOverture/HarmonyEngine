@@ -267,44 +267,38 @@ HyOpenGL::~HyOpenGL(void)
 }
 
 // Returns the texture ID used for API specific drawing.
-/*virtual*/ void HyOpenGL::AddTextureArray(HyAtlasGroup &atlasGroupRef) //uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, void *pPixelData)
+/*virtual*/ void HyOpenGL::AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, uint32 uiNumTextures, void *pPixelData)
 {
 	GLuint hGLTextureArray;
 	glGenTextures(1, &hGLTextureArray);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, hGLTextureArray);
 
+	GLenum eInternalFormat = uiNumColorChannels == 4 ? GL_RGBA8 : (uiNumColorChannels == 3 ? GL_RGB8 : GL_R8);
+	GLenum eFormat = uiNumColorChannels == 4 ? GL_RGBA : (uiNumColorChannels == 3 ? GL_RGB : GL_RED);
+
 	//Create storage for the texture. (100 layers of 1x1 texels)
 	glTexStorage3D(GL_TEXTURE_2D_ARRAY,
-		1,                    //No mipmaps as textures are 1x1
-		GL_RGB8,              //Internal format
-		1, 1,                 //width,height
-		100                   //Number of layers
-		);
+					1,                    //No mipmaps as textures are 1x1
+					eInternalFormat,              //Internal format
+					uiWidth, uiHeight,                 //width,height
+					uiNumTextures);
 
 	for(unsigned int i(0); i != 100; ++i)
 	{
-		//Choose a random color for the i-essim image
-		GLubyte color[3] = { rand() % 255, rand() % 255, rand() % 255 };
-
-		//Specify i-essim image
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
-			0,                     //Mipmap number
-			0, 0, i,                 //xoffset, yoffset, zoffset
-			1, 1, 1,                 //width, height, depth
-			GL_RGB,                //format
-			GL_UNSIGNED_BYTE,      //type
-			color);                //pointer to data
+						0,									//Mipmap number
+						0, 0, i,							//xoffset, yoffset, zoffset
+						uiWidth, uiHeight, uiNumTextures,	//width, height, depth
+						eFormat,							//format
+						GL_UNSIGNED_BYTE,					//type
+						pPixelData);						//pointer to data
 	}
 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	atlasGroupRef.SetUploaded(hGLTextureArray);
-
-
 
 
 	//GLuint hGLTexture;

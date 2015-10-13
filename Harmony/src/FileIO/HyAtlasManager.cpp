@@ -49,13 +49,13 @@ HyAtlasManager::~HyAtlasManager()
 {
 }
 
-HyAtlasGroup &HyAtlasManager::RequestTexture(IHyData *pData, uint32 uiTextureId)
+HyAtlasGroup &HyAtlasManager::RequestTexture(uint32 uiTextureId)
 {
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 	{
 		if(m_pAtlasGroups[i].ContainsTexture(uiTextureId))
 		{
-			m_pAtlasGroups[i].Request(pData);
+			m_pAtlasGroups[i].Load();
 			return m_pAtlasGroups[i];
 		}
 	}
@@ -111,6 +111,15 @@ bool HyAtlasGroup::ContainsTexture(uint32 uiTextureId)
 	return false;
 }
 
+void HyAtlasGroup::Load()
+{
+	if(m_uiGfxApiHandle == 0)
+	{
+		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+			m_pAtlases[i].Load();
+	}
+}
+
 // Returns 'true' if texture was just loaded
 void HyAtlasGroup::Request(IHyData *pData)
 {
@@ -146,18 +155,24 @@ void HyAtlasGroup::Relinquish(IHyData *pData)
 		}
 	}
 
+	if(m_AssociatedDataSet.empty())
+		m_eLoadState = HYLOADSTATE_Discarded;
+
 	m_cs.Unlock();
 }
 
-void HyAtlasGroup::Upload()
+void HyAtlasGroup::Upload(IHyRenderer &rendererRef)
 {
 	m_cs.Lock();
 
 	if(m_eLoadState == HYLOADSTATE_Queued)
 	{
+		m_eL
+		m_cs.Unlock();
+
+		rendererRef.AddTextureArray(
 	}
 
-	m_cs.Unlock();
 }
 
 void HyAtlasGroup::Delete()
@@ -165,7 +180,8 @@ void HyAtlasGroup::Delete()
 }
 
 //////////////////////////////////////////////////////////////////////////
-HyAtlas::HyAtlas(uint32 uiTextureId, jsonxx::Array &srcFramesArrayRef) : m_uiTEXTUREID(uiTextureId)
+HyAtlas::HyAtlas(uint32 uiTextureId, jsonxx::Array &srcFramesArrayRef) :	m_uiTEXTUREID(uiTextureId),
+																			m_pPixelData(NULL)
 {
 	m_uiNumFrames = srcFramesArrayRef.size();
 	m_pFrames = new HyRectangle<int32>[m_uiNumFrames];
@@ -193,10 +209,13 @@ uint32 HyAtlas::GetId()
 
 void HyAtlas::Load()
 {
+	if(m_pPixelData)
+		return;
+
 	int iWidth, iHeight, iNum8bitClrChannels;
 	m_pPixelData = stbi_load(HyAtlasManager::GetTexturePath(m_uiTEXTUREID).c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 0);
 
-	HyAssert(m_pPixelData != NULL, "HyTexture failed to load image data");
+	HyAssert(m_pPixelData != NULL, "HyAtlas failed to load image data");
 }
 
 //HyAtlasGroupData::~HyAtlasGroupData(void)

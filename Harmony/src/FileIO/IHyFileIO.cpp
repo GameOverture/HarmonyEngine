@@ -38,6 +38,7 @@ IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
 
+	IHyData::InitAtlases(m_sDATADIR + "Atlas/");
 	IHyInst2d::sm_pFileIO = this;
 }
 
@@ -74,6 +75,7 @@ void IHyFileIO::Update()
 			IHyData *pData = m_LoadQueue_Retrieval.front();
 			m_LoadQueue_Retrieval.pop();
 
+			pData->SetLoadState(HYLOADSTATE_Queued);
 			m_GfxCommsRef.SendAtlasGroup(pData);
 		}
 	}

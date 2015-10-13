@@ -50,6 +50,7 @@
     <ClCompile Include="src\FileIO\Data\HySprite2dData.cpp" />
     <ClCompile Include="src\FileIO\Data\HyText2dData.cpp" />
     <ClCompile Include="src\FileIO\Data\HyTexturedQuad2dData.cpp" />
+    <ClCompile Include="src\FileIO\Data\IHyData.cpp" />
     <ClCompile Include="src\FileIO\HyAtlasManager.cpp" />
     <ClCompile Include="src\FileIO\IHyFileIO.cpp" />
     <ClCompile Include="src\GuiTool\HyGuiComms.cpp" />
