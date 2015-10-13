@@ -21,10 +21,10 @@ HySprite2dData::~HySprite2dData(void)
 {
 }
 
-/*virtual*/ void HySprite2dData::DoFileLoad(HyAtlasManager &atlasManagerRef)
+/*virtual*/ void HySprite2dData::DoFileLoad()
 {
 	jsonxx::Object spriteObj;
-	spriteObj.parse(IHyFileIO::ReadTextFile(m_sFILEPATH.c_str()));
+	spriteObj.parse(IHyFileIO::ReadTextFile(GetPath().c_str()));
 
 	jsonxx::Array animStatesArray = spriteObj.get<jsonxx::Array>("animStates");
 
@@ -41,15 +41,15 @@ HySprite2dData::~HySprite2dData(void)
 											   animStateObj.get<jsonxx::Boolean>("reverse"),
 											   animStateObj.get<jsonxx::Boolean>("bounce"),
 											   animStateObj.get<jsonxx::Array>("frames"),
-											   atlasManagerRef);
+											   *this);
 	}
 }
 
-HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HyAtlasManager &atlasManagerRef) :	sNAME(sName),
-																																								bLOOP(bLoop),
-																																								bREVERSE(bReverse),
-																																								bBOUNCE(bBounce),
-																																								uiNUMFRAMES(frameArray.size())
+HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HySprite2dData &dataRef) :	sNAME(sName),
+																																						bLOOP(bLoop),
+																																						bREVERSE(bReverse),
+																																						bBOUNCE(bBounce),
+																																						uiNUMFRAMES(frameArray.size())
 {
 	pFrames = reinterpret_cast<Frame *>(new unsigned char[sizeof(Frame) * uiNUMFRAMES]);
 	Frame *pFrameWriteLocation = pFrames;
@@ -58,7 +58,7 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 	{
 		jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
 
-		new (pFrameWriteLocation)Frame(atlasManagerRef.RequestTexture(, static_cast<uint32>(frameObj.get<jsonxx::Number>("textureId"))),
+		new (pFrameWriteLocation)Frame(dataRef.RequestTexture(static_cast<uint32>(frameObj.get<jsonxx::Number>("textureId"))),
 									   static_cast<uint32>(frameObj.get<jsonxx::Number>("rectIndex")),
 									   vec2(frameObj.get<jsonxx::Number>("xOffset"), frameObj.get<jsonxx::Number>("yOffset")),
 									   frameObj.get<jsonxx::Number>("rotation"),

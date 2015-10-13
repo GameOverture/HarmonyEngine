@@ -49,19 +49,19 @@ HyAtlasManager::~HyAtlasManager()
 {
 }
 
-HyAtlasGroup &HyAtlasManager::RequestTexture(uint32 uiTextureId)
+HyAtlasGroup *HyAtlasManager::RequestTexture(uint32 uiTextureId)
 {
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 	{
 		if(m_pAtlasGroups[i].ContainsTexture(uiTextureId))
 		{
 			m_pAtlasGroups[i].Load();
-			return m_pAtlasGroups[i];
+			return &m_pAtlasGroups[i];
 		}
 	}
 
 	HyError("HyAtlasManager::RequestTexture() could not find the atlas group containing texture ID: " << uiTextureId);
-	return m_pAtlasGroups[0];
+	return &m_pAtlasGroups[0];
 }
 
 /*static*/ std::string HyAtlasManager::GetTexturePath(uint32 uiTextureId)
@@ -121,30 +121,30 @@ void HyAtlasGroup::Load()
 }
 
 // Returns 'true' if texture was just loaded
-void HyAtlasGroup::Request(IHyData *pData)
+void HyAtlasGroup::Assign(IHyData *pData)
 {
-	m_cs.Lock();
+	//m_cs.Lock();
 
 	m_AssociatedDataSet.insert(pData);
 
-	if(m_eLoadState == HYLOADSTATE_Inactive)
-	{
-		m_cs.Unlock();
+	//if(m_eLoadState == HYLOADSTATE_Inactive)
+	//{
+	//	m_cs.Unlock();
 
-		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
-			m_pAtlases[i].Load();
+	//	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+	//		m_pAtlases[i].Load();
 
-		m_cs.Lock();
-		// State is 'queued' to be uploaded to graphics ram
-		m_eLoadState = HYLOADSTATE_Queued;
-	}
+	//	m_cs.Lock();
+	//	// State is 'queued' to be uploaded to graphics ram
+	//	m_eLoadState = HYLOADSTATE_Queued;
+	//}
 
-	m_cs.Unlock();
+	//m_cs.Unlock();
 }
 
 void HyAtlasGroup::Relinquish(IHyData *pData)
 {
-	m_cs.Lock();
+	//m_cs.Lock();
 
 	for(set<IHyData *>::iterator iter = m_AssociatedDataSet.begin(); iter != m_AssociatedDataSet.end(); ++iter)
 	{
@@ -155,10 +155,10 @@ void HyAtlasGroup::Relinquish(IHyData *pData)
 		}
 	}
 
-	if(m_AssociatedDataSet.empty())
-		m_eLoadState = HYLOADSTATE_Discarded;
+	//if(m_AssociatedDataSet.empty())
+	//	m_eLoadState = HYLOADSTATE_Discarded;
 
-	m_cs.Unlock();
+	//m_cs.Unlock();
 }
 
 void HyAtlasGroup::Upload(IHyRenderer &rendererRef)

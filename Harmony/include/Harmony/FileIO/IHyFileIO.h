@@ -45,16 +45,14 @@ class IHyFileIO
 	{
 		queue<IHyData *> &	m_LoadQueueRef_Shared;
 		queue<IHyData *> &	m_LoadQueueRef_Retrieval;
-		HyAtlasManager &	m_AtlasManagerRef;
 
 		WaitEvent		m_WaitEvent_HasNewData;
 		BasicSection	m_csSharedQueue;
 		BasicSection	m_csRetrievalQueue;
 
-		LoadThreadCtrl(queue<IHyData *> &LoadQueueRef_Shared, queue<IHyData *> &LoadQueueRef_Retrieval, HyAtlasManager &AtlasManagerRef) :	m_LoadQueueRef_Shared(LoadQueueRef_Shared),
-																																			m_LoadQueueRef_Retrieval(LoadQueueRef_Retrieval),
-																																			m_AtlasManagerRef(AtlasManagerRef),
-																																			m_WaitEvent_HasNewData(L"Thread Idler", true)
+		LoadThreadCtrl(queue<IHyData *> &LoadQueueRef_Shared, queue<IHyData *> &LoadQueueRef_Retrieval) :	m_LoadQueueRef_Shared(LoadQueueRef_Shared),
+																											m_LoadQueueRef_Retrieval(LoadQueueRef_Retrieval),
+																											m_WaitEvent_HasNewData(L"Thread Idler", true)
 		{}
 	};
 	LoadThreadCtrl										m_LoadingCtrl;
@@ -101,4 +99,4 @@ private:
 	static void LoadingThread(void *pParam);
 };
 
-#endif __IHyFileIO_h__
+#endif /* __IHyFileIO_h__ */

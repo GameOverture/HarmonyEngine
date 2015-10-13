@@ -41,7 +41,7 @@ public:
 	HyAtlasManager(std::string sAtlasDataDir);
 	~HyAtlasManager();
 
-	HyAtlasGroup &RequestTexture(uint32 uiTextureId);
+	HyAtlasGroup *RequestTexture(uint32 uiTextureId);
 
 	static std::string GetTexturePath(uint32 uiTextureId);
 };
@@ -66,7 +66,7 @@ public:
 
 	bool ContainsTexture(uint32 uiTextureId);
 	void Load();
-	void Request(IHyData *pData);
+	void Assign(IHyData *pData);
 	void Relinquish(IHyData *pData);
 
 	void Upload(IHyRenderer &rendererRef);

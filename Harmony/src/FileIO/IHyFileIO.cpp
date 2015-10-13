@@ -33,12 +33,12 @@ IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene
 																								m_Txt2d(HYINST_Text2d, m_sDATADIR + "Font/"),
 																								m_Mesh3d(HYINST_Mesh3d, m_sDATADIR + "Mesh/"),
 																								m_Quad2d(HYINST_TexturedQuad2d, ""),
-																								m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval, m_AtlasManager)
+																								m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval)
 {
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
 
-	IHyData::InitAtlases(m_sDATADIR + "Atlas/");
+	IHyData2d::sm_pAtlasManager = &m_AtlasManager;
 	IHyInst2d::sm_pFileIO = this;
 }
 
@@ -316,7 +316,7 @@ void IHyFileIO::DiscardData(IHyData *pData)
 
 		// Load everything that is enqueued (outside of any critical section)
 		for(uint32 i = 0; i < vCurLoadData.size(); ++i)
-			vCurLoadData[i]->DoFileLoad(pLoadingCtrl->m_AtlasManagerRef);
+			vCurLoadData[i]->DoFileLoad();
 
 		// Copy all the (loaded) IData ptrs to the retrieval vector
 		pLoadingCtrl->m_csRetrievalQueue.Lock();

@@ -50,7 +50,7 @@
     <ClCompile Include="src\FileIO\Data\HySprite2dData.cpp" />
     <ClCompile Include="src\FileIO\Data\HyText2dData.cpp" />
     <ClCompile Include="src\FileIO\Data\HyTexturedQuad2dData.cpp" />
-    <ClCompile Include="src\FileIO\Data\IHyData.cpp" />
+    <ClCompile Include="src\FileIO\Data\IHyData2d.cpp" />
     <ClCompile Include="src\FileIO\HyAtlasManager.cpp" />
     <ClCompile Include="src\FileIO\IHyFileIO.cpp" />
     <ClCompile Include="src\GuiTool\HyGuiComms.cpp" />
@@ -118,6 +118,7 @@
     <ClInclude Include="include\Harmony\FileIO\Data\HyText2dData.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HyTexturedQuad2dData.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\IHyData.h" />
+    <ClInclude Include="include\Harmony\FileIO\Data\IHyData2d.h" />
     <ClInclude Include="include\Harmony\FileIO\HyAtlasManager.h" />
     <ClInclude Include="include\Harmony\FileIO\HyFactory.h" />
     <ClInclude Include="include\Harmony\FileIO\IHyFileIO.h" />
