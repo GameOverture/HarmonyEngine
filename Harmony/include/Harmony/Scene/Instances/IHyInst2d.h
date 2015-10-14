@@ -34,7 +34,7 @@ protected:
 	const std::string			m_sPREFIX;
 
 	// Data loading
-	IHyData *					m_pDataPtr;
+	IHyData *					m_pData;
 	HyLoadState					m_eLoadState;
 
 	// Scene graph hierarchy 
@@ -92,7 +92,7 @@ protected:
 private:
 	void SetData(IHyData *pData);
 	void SetLoaded();
-	IHyData *GetData()											{ return m_pDataPtr; }
+	IHyData *GetData()											{ return m_pData; }
 
 	void SetDirty();
 	static void OnDirty(void *);

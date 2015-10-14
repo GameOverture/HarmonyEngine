@@ -61,7 +61,7 @@ void HyText2d::CalcVertexBuffer()
 	m_uiBufferSizeBytes = uiNumCharacters * (4 * (sizeof(vec4) + sizeof(vec2)));
 	m_pVertexBuffer = new unsigned char[m_uiBufferSizeBytes];
 
-	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pDataPtr);
+	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pData);
 
 	unsigned char *pCurVertexWritePos = m_pVertexBuffer;
 	for(size_t i = 0; i < uiNumCharacters; ++i)
@@ -114,7 +114,7 @@ void HyText2d::CalcVertexBuffer()
 
 /*virtual*/ void HyText2d::OnDataLoaded()
 {
-	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pDataPtr);
+	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pData);
 	//m_uiCurFontSize = pTextData->GetMinFontSize();
 
 	CalcVertexBuffer();

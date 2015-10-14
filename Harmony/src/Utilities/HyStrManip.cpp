@@ -23,12 +23,12 @@ void DynamicStringCopy(char *&dst, const char *src)
 
 std::string MakeStringProperPath(const char *szPath, const char *szExtension)
 {
-	std::string sPath(szPath);
+	std::string sPath(szPath ? szPath : "");
 
 	std::replace(sPath.begin(), sPath.end(), '\\', '/');
 
-	if(0 != strcmp(&sPath[sPath.length() - strlen(szExtension) - 1], szExtension))
-		sPath.append(szExtension);
+	if(sPath.empty() || 0 != strcmp(&sPath[sPath.length() - strlen(szExtension) - 1], szExtension))
+		sPath.append(szExtension ? szExtension : "");
 	
 	transform(sPath.begin(), sPath.end(), sPath.begin(), ::tolower);
 

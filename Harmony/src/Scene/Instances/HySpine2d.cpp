@@ -169,7 +169,7 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 
 /*virtual*/ void HySpine2d::OnDataLoaded()
 {
-	HySpine2dData *pSpineData = reinterpret_cast<HySpine2dData *>(m_pDataPtr);
+	HySpine2dData *pSpineData = reinterpret_cast<HySpine2dData *>(m_pData);
 
 	m_pSpineSkeleton	= spSkeleton_create(pSpineData->GetSkeletonData());
 

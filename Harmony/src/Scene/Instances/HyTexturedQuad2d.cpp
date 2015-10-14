@@ -23,7 +23,7 @@ HyTexturedQuad2d::~HyTexturedQuad2d()
 
 /*virtual*/ void HyTexturedQuad2d::OnDataLoaded()
 {
-	HyTexturedQuad2dData *pSpineData = static_cast<HyTexturedQuad2dData *>(m_pDataPtr);
+	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);
 }
 
 /*virtual*/ void HyTexturedQuad2d::Update()

@@ -17,7 +17,7 @@
 IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName) :	m_eTYPE(eInstType),
 																							m_sPREFIX(szPrefix ? szPrefix : ""),
 																							m_sNAME(szName ? szName : ""),
-																							m_pDataPtr(NULL),
+																							m_pData(NULL),
 																							m_eLoadState(HYLOADSTATE_Inactive),
 																							m_pParent(NULL),
 																							m_bDirty(true),
@@ -102,12 +102,12 @@ void IHyInst2d::SetDisplayOrder(uint32 uiOrderValue)
 
 void IHyInst2d::SetData(IHyData *pData)
 {
-	m_pDataPtr = pData;
+	m_pData = pData;
 	
-	if(m_pDataPtr == NULL)
+	if(m_pData == NULL)
 		m_eLoadState = HYLOADSTATE_Loaded;
 	else
-		m_eLoadState = (m_pDataPtr->GetLoadState() == HYLOADSTATE_Loaded) ? HYLOADSTATE_Loaded : HYLOADSTATE_Queued;
+		m_eLoadState = (m_pData->GetLoadState() == HYLOADSTATE_Loaded) ? HYLOADSTATE_Loaded : HYLOADSTATE_Queued;
 }
 
 void IHyInst2d::SetLoaded()
