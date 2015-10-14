@@ -12,14 +12,12 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "FileIO\Data\IHyData.h"
+#include "FileIO\Data\IHyData2d.h"
 #include "FileIO\HyFactory.h"
 
-class HyTexturedQuad2dData : public IHyData
+class HyTexturedQuad2dData : public IHyData2d
 {
 	friend class HyFactory<HyTexturedQuad2dData>;
-
-	//HyTexture *				m_pTexture;
 
 	// Only allow HyFactory instantiate
 	HyTexturedQuad2dData(const std::string &sPath);
@@ -27,11 +25,7 @@ class HyTexturedQuad2dData : public IHyData
 public:
 	virtual ~HyTexturedQuad2dData();
 
-	//const HyTexture *GetTexture() const;
-
-	virtual void DoFileLoad(HyAtlasManager &atlasManagerRef);
-	virtual void OnGfxLoad(IHyRenderer &gfxApi);
-	virtual void OnGfxRemove(IHyRenderer &gfxApi);
+	virtual void DoFileLoad();
 };
 
 #endif /* __HyTexturedQuad2dData_h__ */

@@ -11,7 +11,7 @@
 #define __HyEnt2dData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "FileIO/Data/IHyData.h"
+#include "FileIO/Data/IHyData2d.h"
 #include "FileIO/HyFactory.h"
 
 #include "spine/spine.h"
@@ -20,7 +20,7 @@
 class HyAtlasGroupData;
 class IGfxApi;
 
-class HySpine2dData : public IHyData
+class HySpine2dData : public IHyData2d
 {
 	friend class HyFactory<HySpine2dData>;
 
@@ -41,9 +41,7 @@ public:
 	void AnimInitBlend(const char *szAnimFrom, const char *szAnimTo, float fInterpDur);
 	void AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInterpDur);
 
-	virtual void DoFileLoad(HyAtlasManager &atlasManagerRef);
-	virtual void OnGfxLoad(IHyRenderer &gfxApi);
-	virtual void OnGfxRemove(IHyRenderer &gfxApi);
+	virtual void DoFileLoad();
 };
 
 #endif /* __HyEnt2dData_h__ */

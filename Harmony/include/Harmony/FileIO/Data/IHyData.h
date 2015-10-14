@@ -21,7 +21,8 @@ class HyAtlasManager;
 
 class IHyData
 {
-	const HyInstanceType			m_eTYPE;
+	const HyDataType				m_eDATATYPE;
+	const HyInstanceType			m_eINSTTYPE;
 	const std::string				m_sFILEPATH;
 
 	int32							m_iRefCount;
@@ -29,16 +30,18 @@ class IHyData
 	HyLoadState						m_eLoadState;
 
 public:
-	IHyData(HyInstanceType eDataType, const std::string &sPath) :	m_eTYPE(eDataType),
-																	m_sFILEPATH(sPath),
-																	m_eLoadState(HYLOADSTATE_Inactive),
-																	m_iRefCount(0)
+	IHyData(HyDataType eDataType, HyInstanceType eInstType, const std::string &sPath) : m_eDATATYPE(eDataType),
+																						m_eINSTTYPE(eInstType),
+																						m_sFILEPATH(sPath),
+																						m_eLoadState(HYLOADSTATE_Inactive),
+																						m_iRefCount(0)
 	{ }
 
 	virtual ~IHyData(void)
 	{ }
 
-	HyInstanceType GetType()										{ return m_eTYPE; }
+	HyDataType GetDataType()										{ return m_eDATATYPE; }
+	HyInstanceType GetInstType()									{ return m_eINSTTYPE; }
 	const std::string &GetPath()									{ return m_sFILEPATH; }
 
 	virtual void SetLoadState(HyLoadState eState)					{ m_eLoadState = eState; }

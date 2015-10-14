@@ -9,9 +9,9 @@
 *************************************************************************/
 #include "FileIO/Data/IHyData2d.h"
 
-HyAtlasManager *sm_pAtlasManager = NULL;
+HyAtlasManager *IHyData2d::sm_pAtlasManager = NULL;
 
-IHyData2d::IHyData2d(HyInstanceType eDataType, const std::string &sPath) : IHyData(eDataType, sPath)
+IHyData2d::IHyData2d(HyInstanceType eInstType, const std::string &sPath) : IHyData(HYDATA_2d, eInstType, sPath)
 {
 }
 
@@ -32,10 +32,6 @@ IHyData2d::~IHyData2d()
 	{
 		for(std::set<HyAtlasGroup *>::iterator iter = m_AssociatedAtlases.begin(); iter != m_AssociatedAtlases.end(); ++iter)
 			(*iter)->Relinquish(this);
-	}
-	else if(GetLoadState() == HYLOADSTATE_ReloadGfx)
-	{
-
 	}
 }
 

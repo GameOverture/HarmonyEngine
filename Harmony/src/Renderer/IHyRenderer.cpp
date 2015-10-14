@@ -20,7 +20,7 @@ IHyRenderer::~IHyRenderer(void)
 
 void IHyRenderer::Update()
 {
-	// Swap to newest draw buffers (is only threadsafe on Render thread)
+	// Swap to newest draw buffers (is only thread-safe on Render thread)
 	if(!m_GfxCommsRef.Render_GetSharedPtrs(m_pMsgQueuePtr, m_pSendMsgQueuePtr, m_pDrawBufferPtr))
 	{
 		InteropSleep(10);
@@ -31,20 +31,13 @@ void IHyRenderer::Update()
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
 	while(!m_pMsgQueuePtr->empty())
 	{
-		IHyData *pData = m_pMsgQueuePtr->front();
+		IHyData2d *pData = m_pMsgQueuePtr->front();
 		m_pMsgQueuePtr->pop();
 
-		std::set<HyAtlasGroup *> associatedAtlasesSet = pData->GetAssociatedAtlases();
+		const std::set<HyAtlasGroup *> &associatedAtlasesSetRef = pData->GetAssociatedAtlases();
 
-		for(std::set<HyAtlasGroup *>::iterator iter = associatedAtlasesSet.begin(); iter != associatedAtlasesSet.end(); ++iter)
-		{
-			iter->OnGfxThread(*this);
-		}
-
-		//if(pData->GetLoadState() == HYLOADSTATE_Queued)
-		//	pData->OnGfxLoad(*this);
-		//else
-		//	pData->OnGfxRemove(*this);
+		for(std::set<HyAtlasGroup *>::const_iterator iter = associatedAtlasesSetRef.begin(); iter != associatedAtlasesSetRef.end(); ++iter)
+			(*iter)->OnRenderThread(*this);
 
 		m_pSendMsgQueuePtr->push(pData);
 	}

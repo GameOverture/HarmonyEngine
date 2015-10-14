@@ -267,7 +267,7 @@ HyOpenGL::~HyOpenGL(void)
 }
 
 // Returns the texture ID used for API specific drawing.
-/*virtual*/ void HyOpenGL::AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, uint32 uiNumTextures, void *pPixelData)
+/*virtual*/ uint32 HyOpenGL::AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, vector<unsigned char *> &vPixelData)
 {
 	GLuint hGLTextureArray;
 	glGenTextures(1, &hGLTextureArray);
@@ -277,22 +277,23 @@ HyOpenGL::~HyOpenGL(void)
 	GLenum eInternalFormat = uiNumColorChannels == 4 ? GL_RGBA8 : (uiNumColorChannels == 3 ? GL_RGB8 : GL_R8);
 	GLenum eFormat = uiNumColorChannels == 4 ? GL_RGBA : (uiNumColorChannels == 3 ? GL_RGB : GL_RED);
 
-	//Create storage for the texture. (100 layers of 1x1 texels)
+	// Create storage for the texture
 	glTexStorage3D(GL_TEXTURE_2D_ARRAY,
-					1,                    //No mipmaps as textures are 1x1
-					eInternalFormat,              //Internal format
-					uiWidth, uiHeight,                 //width,height
-					uiNumTextures);
+					1,						// Number of mipmaps
+					eInternalFormat,		// Internal format
+					uiWidth, uiHeight,		// width, height
+					vPixelData.size());
 
-	for(unsigned int i(0); i != 100; ++i)
+	for(unsigned int i = 0; i != vPixelData.size(); ++i)
 	{
+		// Write each texture into storage
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
-						0,									//Mipmap number
-						0, 0, i,							//xoffset, yoffset, zoffset
-						uiWidth, uiHeight, uiNumTextures,	//width, height, depth
-						eFormat,							//format
-						GL_UNSIGNED_BYTE,					//type
-						pPixelData);						//pointer to data
+						0,										// Mipmap number
+						0, 0, i,								// xoffset, yoffset, zoffset
+						uiWidth, uiHeight, vPixelData.size(),	// width, height, depth
+						eFormat,								// format
+						GL_UNSIGNED_BYTE,						// type
+						vPixelData[i]);							// pointer to pixel data
 	}
 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -300,41 +301,10 @@ HyOpenGL::~HyOpenGL(void)
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-
-	//GLuint hGLTexture;
-	//glGenTextures(1, &hGLTexture);
-
-	//glBindTexture( GL_TEXTURE_2D, hGLTexture);
-	//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//GL_CLAMP_TO_EDGE );
-	//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);//GL_CLAMP_TO_EDGE );
-	//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-
-	//if(uiNumColorChannels == 4 )
-	//{
-	//	//	#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
-	//	//		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, uiWidth, uiHeight, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pPixelData);
-	//	//	#else
-	//	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, uiWidth, uiHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pPixelData);
-	//	//	#endif
-	//}
-	//else if(uiNumColorChannels == 3 )
-	//{
-	//	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, uiWidth, uiHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, pPixelData);
-	//}
-	//else
-	//{
-	//	glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, uiWidth, uiHeight, 0, GL_RED, GL_UNSIGNED_BYTE, pPixelData);
-	//}
-
-	//// This is probable unnecessary
-	////GLint iLocation = glGetUniformLocation(m_pShader2d[QUADBATCH].GetHandle(), "Tex");
-	////glUniform1i(iLocation, 0);
-
-	//return hGLTexture;
+	return hGLTextureArray;
 }
 
-/*virtual*/ void HyOpenGL::DeleteTexture(uint32 uiTextureHandle)
+/*virtual*/ void HyOpenGL::DeleteTextureArray(uint32 uiTextureHandle)
 {
 	glDeleteTextures(1, &uiTextureHandle);
 }

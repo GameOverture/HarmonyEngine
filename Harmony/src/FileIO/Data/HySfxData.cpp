@@ -10,7 +10,7 @@
 #include "FileIO/Data/HySfxData.h"
 
 
-HySfxData::HySfxData(const std::string &sPath) : IHyData(HYINST_Sound2d, sPath)
+HySfxData::HySfxData(const std::string &sPath) : IHyData(HYDATA_Regular, HYINST_Sound2d, sPath)
 {
 }
 

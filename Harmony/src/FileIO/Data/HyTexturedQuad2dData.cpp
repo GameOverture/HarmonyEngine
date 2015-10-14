@@ -12,7 +12,7 @@
 #include "Renderer/IHyRenderer.h"
 
 
-HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath) : IHyData(HYINST_TexturedQuad2d, sPath)
+HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath) : IHyData2d(HYINST_TexturedQuad2d, sPath)
 {
 }
 
@@ -20,23 +20,8 @@ HyTexturedQuad2dData::~HyTexturedQuad2dData()
 {
 }
 
-//const HyTexture *HyTexturedQuad2dData::GetTexture() const
-//{
-//	return m_pTexture;
-//}
-
-/*virtual*/ void HyTexturedQuad2dData::DoFileLoad(HyAtlasManager &atlasManagerRef)
+/*virtual*/ void HyTexturedQuad2dData::DoFileLoad()
 {
 	//int32 iTextureIndex = atoi(m_ksPath.c_str());
 	//m_pTexture = HyFileIO::GetAtlasTexture(iTextureIndex);
-}
-
-/*virtual*/ void HyTexturedQuad2dData::OnGfxLoad(IHyRenderer &gfxApi)
-{
-	//m_pTexture->Upload(gfxApi);
-}
-
-/*virtual*/ void HyTexturedQuad2dData::OnGfxRemove(IHyRenderer &gfxApi)
-{
-	//gfxApi.DeleteTexture(*m_pTexture);
 }

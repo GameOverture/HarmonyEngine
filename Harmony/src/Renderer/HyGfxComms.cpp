@@ -25,13 +25,13 @@ HyGfxComms::HyGfxComms()
 	m_pBuffer_Render = new char[RENDER_BUFFER_SIZE];
 	memset(m_pBuffer_Render, 0, RENDER_BUFFER_SIZE);
 
-	m_pAtlasSendQueue_Update = new queue<IHyData *>();
-	m_pAtlasSendQueue_Shared = new queue<IHyData *>();
-	m_pAtlasSendQueue_Render = new queue<IHyData *>();
+	m_pAtlasSendQueue_Update = new queue<IHyData2d *>();
+	m_pAtlasSendQueue_Shared = new queue<IHyData2d *>();
+	m_pAtlasSendQueue_Render = new queue<IHyData2d *>();
 
-	m_pAtlasReceiveQueue_Update = new queue<IHyData *>();
-	m_pAtlasReceiveQueue_Shared = new queue<IHyData *>();
-	m_pAtlasReceiveQueue_Render = new queue<IHyData *>();
+	m_pAtlasReceiveQueue_Update = new queue<IHyData2d *>();
+	m_pAtlasReceiveQueue_Shared = new queue<IHyData2d *>();
+	m_pAtlasReceiveQueue_Render = new queue<IHyData2d *>();
 }
 
 HyGfxComms::~HyGfxComms()
@@ -72,7 +72,7 @@ void HyGfxComms::Update_SetSharedPtrs()
 {
 	LockBuffers();
 
-	queue<IHyData *> *pTmpQueue = m_pAtlasSendQueue_Shared;
+	queue<IHyData2d *> *pTmpQueue = m_pAtlasSendQueue_Shared;
 	m_pAtlasSendQueue_Shared = m_pAtlasSendQueue_Update;
 	m_pAtlasSendQueue_Update = pTmpQueue;
 
@@ -88,7 +88,7 @@ void HyGfxComms::Update_SetSharedPtrs()
 }
 
 // This should only be invoked from the Render thread
-bool HyGfxComms::Render_GetSharedPtrs(queue<IHyData *> *&pMsgQueuePtr, queue<IHyData *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr)
+bool HyGfxComms::Render_GetSharedPtrs(queue<IHyData2d *> *&pMsgQueuePtr, queue<IHyData2d *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr)
 {
 	LockBuffers();
 
@@ -101,7 +101,7 @@ bool HyGfxComms::Render_GetSharedPtrs(queue<IHyData *> *&pMsgQueuePtr, queue<IHy
 	}
 
 	// Message queues
-	queue<IHyData *> *pTmpQueue = m_pAtlasSendQueue_Render;
+	queue<IHyData2d *> *pTmpQueue = m_pAtlasSendQueue_Render;
 	m_pAtlasSendQueue_Render = m_pAtlasSendQueue_Shared;
 	m_pAtlasSendQueue_Shared = pTmpQueue;
 	pMsgQueuePtr =  m_pAtlasSendQueue_Render;

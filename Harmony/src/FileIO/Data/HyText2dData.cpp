@@ -12,7 +12,7 @@
 #include "Renderer/IHyRenderer.h"
 #include "freetype-gl/freetype-gl.h"
 
-HyText2dData::HyText2dData(const std::string &sPath) :	IHyData(HYINST_Text2d, sPath)
+HyText2dData::HyText2dData(const std::string &sPath) :	IHyData2d(HYINST_Text2d, sPath)
 {
 }
 
@@ -24,10 +24,10 @@ HyText2dData::~HyText2dData(void)
 	m_vFonts.clear();
 }
 
-/*virtual*/ void HyText2dData::DoFileLoad(HyAtlasManager &atlasManagerRef)
+/*virtual*/ void HyText2dData::DoFileLoad()
 {
 	// If path is empty, then use default engine font
-	if(m_sFILEPATH.empty())
+	if(GetPath().empty())
 	{
 		std::string sFontName = "./data/fonts/Vera.ttf";
 		uint32 uiMaxSize = 20;
@@ -86,12 +86,3 @@ _texture_glyph_t *HyText2dData::GetGlyph(uint32 uiFontIndex, wchar_t charcode)
 	return texture_font_get_glyph(m_vFonts[uiFontIndex], charcode);
 }
 
-/*virtual*/ void HyText2dData::OnGfxLoad(IHyRenderer &gfxApi)
-{
-	//m_pTexture->Upload(gfxApi);
-}
-
-/*virtual*/ void HyText2dData::OnGfxRemove(IHyRenderer &gfxApi)
-{
-	//gfxApi.DeleteTexture(*m_pTexture);
-}

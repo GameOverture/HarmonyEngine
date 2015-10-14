@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "FileIO/Data/IHyData.h"
+#include "FileIO/HyFactory.h"
 
 class HyMesh3d;
 

@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "FileIO/Data/IHyData.h"
+#include "FileIO/Data/IHyData2d.h"
 #include "FileIO/HyFactory.h"
 
 #include <map>
@@ -23,7 +23,7 @@ struct _texture_glyph_t;
 
 class HyText2d;
 
-class HyText2dData : public IHyData
+class HyText2dData : public IHyData2d
 {
 	friend class HyFactory<HyText2dData>;
 
@@ -38,9 +38,7 @@ public:
 
 	_texture_glyph_t *GetGlyph(uint32 uiFontIndex, wchar_t charcode);
 
-	virtual void DoFileLoad(HyAtlasManager &atlasManagerRef);
-	virtual void OnGfxLoad(IHyRenderer &gfxApi);
-	virtual void OnGfxRemove(IHyRenderer &gfxApi);
+	virtual void DoFileLoad();
 };
 
 #endif /* __HyText2dData_h__ */

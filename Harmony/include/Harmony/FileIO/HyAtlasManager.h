@@ -24,11 +24,12 @@ class HyAtlasGroup;
 class HyAtlas;
 
 class IHyData;
+class IHyRenderer;
 
 //////////////////////////////////////////////////////////////////////////
 class HyAtlasManager
 {
-	static std::string		sm_sAtlasDirPath;
+	std::string				m_sAtlasDirPath;
 
 	int32					m_iWidth;
 	int32					m_iHeight;
@@ -41,36 +42,41 @@ public:
 	HyAtlasManager(std::string sAtlasDataDir);
 	~HyAtlasManager();
 
-	HyAtlasGroup *RequestTexture(uint32 uiTextureId);
+	int32 GetNumColorChannels();
+	int32 GetWidth();
+	int32 GetHeight();
 
-	static std::string GetTexturePath(uint32 uiTextureId);
+	HyAtlasGroup *RequestTexture(uint32 uiTextureId);
+	std::string GetTexturePath(uint32 uiTextureId);
 };
 
 //////////////////////////////////////////////////////////////////////////
 class HyAtlasGroup
 {
+	friend class HyAtlasManager;
+
+	HyAtlasManager &			m_ManagerRef;
+
 	const int32					m_iLOADGROUPID;
 	uint32						m_uiGfxApiHandle;
 
 	HyAtlas *					m_pAtlases;
 	uint32						m_uiNumAtlases;
 
-	HyLoadState					m_eLoadState;
+	BasicSection				m_cs;
 	set<IHyData *>				m_AssociatedDataSet;
 
-	BasicSection				m_cs;
-
 public:
-	HyAtlasGroup(int32 iLoadGroupId, jsonxx::Array &texturesArrayRef);
+	HyAtlasGroup(HyAtlasManager &managerRef, int32 iLoadGroupId, jsonxx::Array &texturesArrayRef);
 	~HyAtlasGroup();
 
 	bool ContainsTexture(uint32 uiTextureId);
 	void Load();
+
 	void Assign(IHyData *pData);
 	void Relinquish(IHyData *pData);
 
-	void Upload(IHyRenderer &rendererRef);
-	void Delete(IHyRenderer &rendererRef);
+	void OnRenderThread(IHyRenderer &rendererRef);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -98,7 +104,10 @@ public:
 
 	uint32 GetId();
 
-	void Load();
+	void Load(const char *szFilePath);
+
+	unsigned char *GetPixelData();
+	void DeletePixelData();
 };
 
 #endif __HyAtlasManager_h__

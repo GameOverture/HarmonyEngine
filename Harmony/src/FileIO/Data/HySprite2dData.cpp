@@ -13,7 +13,7 @@
 
 #include "Renderer/IHyRenderer.h"
 
-HySprite2dData::HySprite2dData(const std::string &sPath) :	IHyData(HYINST_Spine2d, sPath)
+HySprite2dData::HySprite2dData(const std::string &sPath) :	IHyData2d(HYINST_Spine2d, sPath)
 {
 }
 
@@ -60,17 +60,9 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 
 		new (pFrameWriteLocation)Frame(dataRef.RequestTexture(static_cast<uint32>(frameObj.get<jsonxx::Number>("textureId"))),
 									   static_cast<uint32>(frameObj.get<jsonxx::Number>("rectIndex")),
-									   vec2(frameObj.get<jsonxx::Number>("xOffset"), frameObj.get<jsonxx::Number>("yOffset")),
-									   frameObj.get<jsonxx::Number>("rotation"),
-									   vec2(frameObj.get<jsonxx::Number>("xScale"), frameObj.get<jsonxx::Number>("yScale")),
-									   frameObj.get<jsonxx::Number>("duration"));
+									   vec2(static_cast<float>(frameObj.get<jsonxx::Number>("xOffset")), static_cast<float>(frameObj.get<jsonxx::Number>("yOffset"))),
+									   static_cast<float>(frameObj.get<jsonxx::Number>("rotation")),
+									   vec2(static_cast<float>(frameObj.get<jsonxx::Number>("xScale")), static_cast<float>(frameObj.get<jsonxx::Number>("yScale"))),
+									   static_cast<float>(frameObj.get<jsonxx::Number>("duration")));
 	}
-}
-
-/*virtual*/ void HySprite2dData::OnGfxLoad(IHyRenderer &gfxApi)
-{
-}
-
-/*virtual*/ void HySprite2dData::OnGfxRemove(IHyRenderer &gfxApi)
-{
 }

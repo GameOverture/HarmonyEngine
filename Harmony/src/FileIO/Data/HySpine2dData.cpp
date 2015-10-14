@@ -9,9 +9,12 @@
  *************************************************************************/
 #include "FileIO/Data/HySpine2dData.h"
 
-#include "Renderer/IHyRenderer.h"
+#include "FileIO/IHyFileIO.h"
 
-HySpine2dData::HySpine2dData(const std::string &sPath) :	IHyData(HYINST_Spine2d, sPath)
+#include "Renderer/IHyRenderer.h"
+#include "GuiTool/HyGuiComms.h"
+
+HySpine2dData::HySpine2dData(const std::string &sPath) :	IHyData2d(HYINST_Spine2d, sPath)
 {
 	
 }
@@ -22,20 +25,20 @@ HySpine2dData::~HySpine2dData()
 	spAtlas_dispose(m_SpineAtlasData);
 }
 
-/*virtual*/ void HySpine2dData::DoFileLoad(HyAtlasManager &atlasManagerRef)
+/*virtual*/ void HySpine2dData::DoFileLoad()
 {
-	std::string sAtlasPath(m_sFILEPATH);
+	std::string sAtlasPath(GetPath());
 	sAtlasPath += ".atlas";
 
 	m_SpineAtlasData = spAtlas_createFromFile(sAtlasPath.c_str(), this);
 	HyAssert(m_SpineAtlasData, "Could not read atlas file at \"" << sAtlasPath.c_str() << "\".");
 
-	printf("First region name: %s, x: %d, y: %d\n", m_SpineAtlasData->regions->name, m_SpineAtlasData->regions->x, m_SpineAtlasData->regions->y);
+	HyLogInfo("First region name: " << m_SpineAtlasData->regions->name << " x: " << m_SpineAtlasData->regions->x << " y: " << m_SpineAtlasData->regions->y);
 	printf("First page name: %s, size: %d, %d\n", m_SpineAtlasData->pages->name, m_SpineAtlasData->pages->width, m_SpineAtlasData->pages->height);
 
 	spSkeletonJson * pSpineJsonData = spSkeletonJson_create(m_SpineAtlasData);
 
-	std::string sJsonPath(m_sFILEPATH);
+	std::string sJsonPath(GetPath());
 	sJsonPath += ".json";
 
 	m_SpineSkeletonData = spSkeletonJson_readSkeletonDataFile(pSpineJsonData, sJsonPath.c_str());
@@ -46,20 +49,6 @@ HySpine2dData::~HySpine2dData()
 	printf("Default skin name: %s\n", m_SpineSkeletonData->defaultSkin->name);
 }
 
-/*virtual*/ void HySpine2dData::OnGfxLoad(IHyRenderer &gfxApi)
-{
-	// TODO: possibly support multiple textures (aka rendererObject's)
-	//HyAtlasGroup *pTexture = reinterpret_cast<HyAtlasGroupData *>(m_SpineAtlasData->pages->rendererObject);
-	gfxApi
-	pTexture->Upload(gfxApi);
-}
-
-/*virtual*/ void HySpine2dData::OnGfxRemove(IHyRenderer &gfxApi)
-{
-	HyAtlasGroupData *pTexture = reinterpret_cast<HyAtlasGroupData *>(m_SpineAtlasData->pages->rendererObject);
-	gfxApi.DeleteTexture(*pTexture);
-}
-
 // Below functions are invoked within the Spine API and expect to be overloaded
 void _spAtlasPage_createTexture(spAtlasPage* self, const char* path)
 {
@@ -68,11 +57,11 @@ void _spAtlasPage_createTexture(spAtlasPage* self, const char* path)
 	// TODO: Convert 'path' to Atlas texture index
 	uint32 uiTextureIndex = 0;
 
-	HyAtlasGroupData *pNewTexture = HyFileIO::GetAtlasTexture(uiTextureIndex);
-	self->rendererObject = pNewTexture;
+	//HyAtlasGroupData *pNewTexture = HyFileIO::GetAtlasTexture(uiTextureIndex);
+	//self->rendererObject = pNewTexture;
 
-	self->width = pNewTexture->GetWidth();
-	self->height = pNewTexture->GetHeight();
+	//self->width = pNewTexture->GetWidth();
+	//self->height = pNewTexture->GetHeight();
 }
 
 void _spAtlasPage_disposeTexture(spAtlasPage* self)

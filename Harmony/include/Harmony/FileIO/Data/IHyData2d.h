@@ -23,7 +23,7 @@ class IHyData2d : public IHyData
 	std::set<HyAtlasGroup *>			m_AssociatedAtlases;
 
 public:
-	IHyData2d(HyInstanceType eDataType, const std::string &sPath);
+	IHyData2d(HyInstanceType eInstType, const std::string &sPath);
 	virtual ~IHyData2d();
 
 	virtual void SetLoadState(HyLoadState eState);

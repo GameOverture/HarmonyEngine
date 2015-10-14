@@ -26,6 +26,7 @@ using std::queue;
 class IHyInst2d;
 
 class IHyData;
+class IHyData2d;
 class HySfxData;
 class HySprite2dData;
 class HySpine2dData;
@@ -73,7 +74,7 @@ class IHyFileIO
 	queue<IHyData *>									m_LoadQueue_Shared;
 	queue<IHyData *>									m_LoadQueue_Retrieval;
 
-	queue<IHyData *> *									m_pGfxQueue_Retrieval;
+	queue<IHyData2d *> *								m_pGfxQueue_Retrieval;
 
 	// Loading thread info pointer
 	ThreadInfoPtr										m_pLoadingThread;

@@ -76,18 +76,20 @@ void IHyFileIO::Update()
 			m_LoadQueue_Retrieval.pop();
 
 			pData->SetLoadState(HYLOADSTATE_Queued);
-			m_GfxCommsRef.SendAtlasGroup(pData);
+
+			if(pData->GetDataType() == HYDATA_2d)
+				m_GfxCommsRef.SendAtlasGroup(static_cast<IHyData2d *>(pData));
 		}
 	}
 	m_LoadingCtrl.m_csRetrievalQueue.Unlock();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	// Grab and process any returning IData's from the Render thread
+	// Grab and process any returning IHyData2d's from the Render thread
 	m_pGfxQueue_Retrieval = m_GfxCommsRef.RetrieveAtlasGroups();
 	while(!m_pGfxQueue_Retrieval->empty())
 	{
-		IHyData *pData = m_pGfxQueue_Retrieval->front();
+		IHyData2d *pData = m_pGfxQueue_Retrieval->front();
 		m_pGfxQueue_Retrieval->pop();
 
 		if(pData->GetLoadState() == HYLOADSTATE_ReloadGfx)
@@ -260,7 +262,7 @@ void IHyFileIO::FinalizeData(IHyData *pData)
 	{
 		HyAssert(pData->GetRefCount() <= 0, "IHyFileIO::Update() tried to delete an IData with active references. Num Refs: " << pData->GetRefCount());
 
-		switch(pData->GetType())
+		switch(pData->GetInstType())
 		{
 		case HYINST_Sound2d:		m_Sfx.DeleteData(static_cast<HySfxData *>(pData));					break;
 		case HYINST_Sprite2d:		m_Sprite2d.DeleteData(static_cast<HySprite2dData *>(pData));		break;
@@ -268,12 +270,8 @@ void IHyFileIO::FinalizeData(IHyData *pData)
 		case HYINST_Text2d:			m_Txt2d.DeleteData(static_cast<HyText2dData *>(pData));				break;
 		case HYINST_TexturedQuad2d:	m_Quad2d.DeleteData(static_cast<HyTexturedQuad2dData *>(pData));	break;
 		default:
-			HyError("IHyFileIO::Update() got a returned IHyData from gfx comms with an invalid type: " << pData->GetType());
+			HyError("IHyFileIO::Update() got a returned IHyData from gfx comms with an invalid type: " << pData->GetInstType());
 		}
-	}
-	else if(pData->GetLoadState() == HYLOADSTATE_Reload)
-	{
-
 	}
 	else
 	{
@@ -287,7 +285,9 @@ void IHyFileIO::DiscardData(IHyData *pData)
 
 	// TODO: Log about erasing data
 	pData->SetLoadState(HYLOADSTATE_Discarded);
-	m_GfxCommsRef.SendAtlasGroup(pData);
+
+	if(pData->GetDataType() == HYDATA_2d)
+		m_GfxCommsRef.SendAtlasGroup(static_cast<IHyData2d *>(pData));
 }
 
 /*static*/ void IHyFileIO::LoadingThread(void *pParam)

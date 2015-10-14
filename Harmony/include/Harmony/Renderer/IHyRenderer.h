@@ -23,8 +23,8 @@ protected:
 	HyGfxComms &				m_GfxCommsRef;
 	vector<HyViewport> &		m_ViewportsRef;
 
-	queue<IHyData *> *			m_pMsgQueuePtr;		// The pointer to the currently active render message queue
-	queue<IHyData *> *			m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
+	queue<IHyData2d *> *		m_pMsgQueuePtr;		// The pointer to the currently active render message queue
+	queue<IHyData2d *> *		m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
 	char *						m_pDrawBufferPtr;	// The pointer to the currently active draw buffer
 
 	HyGfxComms::tDrawHeader *	m_DrawpBufferHeader;
@@ -50,8 +50,8 @@ public:
 	virtual void FinishRender() = 0;
 
 	// Returns the texture ID used for API specific drawing.
-	virtual void AddTextureArray(HyAtlasGroup &atlasGroupRef) = 0;
-	virtual void DeleteTextureArray(HyAtlasGroup &atlasGroupRef) = 0;
+	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, vector<unsigned char *> &vPixelData) = 0;
+	virtual void DeleteTextureArray(uint32 uiTextureHandle) = 0;
 
 	int32 GetNumCameras2d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras2d)); }
 	mat4 *GetCameraView2d(int iIndex)		{ return reinterpret_cast<mat4 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iIndex * (sizeof(HyRectangle<float>) + sizeof(mat4))) + sizeof(HyRectangle<float>)); }

@@ -10,18 +10,17 @@
 #include "FileIO/HyAtlasManager.h"
 
 #include "FileIO/IHyFileIO.h"
+#include "Renderer/IHyRenderer.h"
 
 #include "Utilities/stb_image.h"
 
-std::string	HyAtlasManager::sm_sAtlasDirPath;
-
 HyAtlasManager::HyAtlasManager(std::string sAtlasDataDir)
 {
-	sm_sAtlasDirPath = sAtlasDataDir;
+	m_sAtlasDirPath = sAtlasDataDir;
 
 	jsonxx::Object atlasObject;
 
-	std::string sAtlasInfoFilePath(sm_sAtlasDirPath);
+	std::string sAtlasInfoFilePath(m_sAtlasDirPath);
 	sAtlasInfoFilePath += "atlasInfo.json";
 	atlasObject.parse(IHyFileIO::ReadTextFile(sAtlasInfoFilePath.c_str()));
 
@@ -41,12 +40,31 @@ HyAtlasManager::HyAtlasManager(std::string sAtlasDataDir)
 		int32 iLoadGroupId = static_cast<int32>(loadGroupObj.get<jsonxx::Number>("id"));
 		jsonxx::Array texturesArray = loadGroupObj.get<jsonxx::Array>("textures");
 
-		new (pAtlasGroupWriteLocation)HyAtlasGroup(iLoadGroupId, texturesArray);
+		new (pAtlasGroupWriteLocation)HyAtlasGroup(*this, iLoadGroupId, texturesArray);
 	}
 }
 
 HyAtlasManager::~HyAtlasManager()
 {
+	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
+		m_pAtlasGroups->~HyAtlasGroup();
+
+	delete m_pAtlasGroups;
+}
+
+int32 HyAtlasManager::GetNumColorChannels()
+{
+	return m_iNum8bitClrChannels;
+}
+
+int32 HyAtlasManager::GetWidth()
+{
+	return m_iWidth;
+}
+
+int32 HyAtlasManager::GetHeight()
+{
+	return m_iHeight;
 }
 
 HyAtlasGroup *HyAtlasManager::RequestTexture(uint32 uiTextureId)
@@ -64,9 +82,9 @@ HyAtlasGroup *HyAtlasManager::RequestTexture(uint32 uiTextureId)
 	return &m_pAtlasGroups[0];
 }
 
-/*static*/ std::string HyAtlasManager::GetTexturePath(uint32 uiTextureId)
+std::string HyAtlasManager::GetTexturePath(uint32 uiTextureId)
 {
-	std::string sTexturePath(sm_sAtlasDirPath);
+	std::string sTexturePath(m_sAtlasDirPath);
 
 	char szTmpBuffer[16];
 	sprintf(szTmpBuffer, "%05d", uiTextureId);
@@ -78,14 +96,15 @@ HyAtlasGroup *HyAtlasManager::RequestTexture(uint32 uiTextureId)
 }
 
 //////////////////////////////////////////////////////////////////////////
-HyAtlasGroup::HyAtlasGroup(int32 iLoadGroupId, jsonxx::Array &texturesArrayRef) :	m_iLOADGROUPID(iLoadGroupId),
-																					m_uiGfxApiHandle(0),
-																					m_eLoadState(HYLOADSTATE_Inactive)
+HyAtlasGroup::HyAtlasGroup(HyAtlasManager &managerRef, int32 iLoadGroupId, jsonxx::Array &texturesArrayRef) :	m_ManagerRef(managerRef),
+																												m_iLOADGROUPID(iLoadGroupId),
+																												m_uiGfxApiHandle(0)
 {
-	m_pAtlases = reinterpret_cast<HyAtlas *>(new unsigned char[sizeof(HyAtlas) * texturesArrayRef.size()]);
+	m_uiNumAtlases = texturesArrayRef.size();
+	m_pAtlases = reinterpret_cast<HyAtlas *>(new unsigned char[sizeof(HyAtlas) * m_uiNumAtlases]);
 	HyAtlas *pAtlasWriteLocation = m_pAtlases;
 
-	for(uint32 j = 0; j < texturesArrayRef.size(); ++j)
+	for(uint32 j = 0; j < m_uiNumAtlases; ++j)
 	{
 		jsonxx::Object texObj = texturesArrayRef.get<jsonxx::Object>(j);
 
@@ -98,6 +117,10 @@ HyAtlasGroup::HyAtlasGroup(int32 iLoadGroupId, jsonxx::Array &texturesArrayRef) 
 
 HyAtlasGroup::~HyAtlasGroup()
 {
+	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+		m_pAtlases->~HyAtlas();
+
+	delete m_pAtlases;
 }
 
 bool HyAtlasGroup::ContainsTexture(uint32 uiTextureId)
@@ -116,35 +139,21 @@ void HyAtlasGroup::Load()
 	if(m_uiGfxApiHandle == 0)
 	{
 		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
-			m_pAtlases[i].Load();
+			m_pAtlases[i].Load(m_ManagerRef.GetTexturePath(m_pAtlases[i].GetId()).c_str());
 	}
 }
 
 // Returns 'true' if texture was just loaded
 void HyAtlasGroup::Assign(IHyData *pData)
 {
-	//m_cs.Lock();
-
+	m_cs.Lock();
 	m_AssociatedDataSet.insert(pData);
-
-	//if(m_eLoadState == HYLOADSTATE_Inactive)
-	//{
-	//	m_cs.Unlock();
-
-	//	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
-	//		m_pAtlases[i].Load();
-
-	//	m_cs.Lock();
-	//	// State is 'queued' to be uploaded to graphics ram
-	//	m_eLoadState = HYLOADSTATE_Queued;
-	//}
-
-	//m_cs.Unlock();
+	m_cs.Unlock();
 }
 
 void HyAtlasGroup::Relinquish(IHyData *pData)
 {
-	//m_cs.Lock();
+	m_cs.Lock();
 
 	for(set<IHyData *>::iterator iter = m_AssociatedDataSet.begin(); iter != m_AssociatedDataSet.end(); ++iter)
 	{
@@ -155,28 +164,28 @@ void HyAtlasGroup::Relinquish(IHyData *pData)
 		}
 	}
 
-	//if(m_AssociatedDataSet.empty())
-	//	m_eLoadState = HYLOADSTATE_Discarded;
-
-	//m_cs.Unlock();
+	m_cs.Unlock();
 }
 
-void HyAtlasGroup::Upload(IHyRenderer &rendererRef)
+void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef)
 {
+	bool bUpload;
+	
 	m_cs.Lock();
-
-	if(m_eLoadState == HYLOADSTATE_Queued)
+	bUpload = m_AssociatedDataSet.empty() == false;
+	m_cs.Unlock();
+	
+	if(bUpload)
 	{
-		m_eL
-		m_cs.Unlock();
+		vector<unsigned char *> vTextureArrayData;
+		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+			vTextureArrayData.push_back(m_pAtlases[i].GetPixelData());
 
-		rendererRef.AddTextureArray(
+		m_uiGfxApiHandle = rendererRef.AddTextureArray(m_ManagerRef.GetNumColorChannels(), m_ManagerRef.GetWidth(), m_ManagerRef.GetHeight(), vTextureArrayData);
+
+		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+			m_pAtlases[i].DeletePixelData();
 	}
-
-}
-
-void HyAtlasGroup::Delete()
-{
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -200,6 +209,8 @@ HyAtlas::HyAtlas(uint32 uiTextureId, jsonxx::Array &srcFramesArrayRef) :	m_uiTEX
 
 HyAtlas::~HyAtlas()
 {
+	delete [] m_pFrames;
+	DeletePixelData();
 }
 
 uint32 HyAtlas::GetId()
@@ -207,31 +218,24 @@ uint32 HyAtlas::GetId()
 	return m_uiTEXTUREID;
 }
 
-void HyAtlas::Load()
+void HyAtlas::Load(const char *szFilePath)
 {
 	if(m_pPixelData)
 		return;
 
 	int iWidth, iHeight, iNum8bitClrChannels;
-	m_pPixelData = stbi_load(HyAtlasManager::GetTexturePath(m_uiTEXTUREID).c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 0);
+	m_pPixelData = stbi_load(szFilePath, &iWidth, &iHeight, &iNum8bitClrChannels, 0);
 
 	HyAssert(m_pPixelData != NULL, "HyAtlas failed to load image data");
 }
 
-//HyAtlasGroupData::~HyAtlasGroupData(void)
-//{
-//	DeletePixelData();
-//}
-//
-//// To be invoked on the render thread
-//void HyAtlasGroupData::Upload(IHyRenderer &gfxApi)
-//{
-//	m_uiId = gfxApi.AddTexture(m_iNum8bitClrChannels, m_iWidth, m_iHeight, m_pPixelData);
-//	DeletePixelData();
-//}
-//
-//void HyAtlasGroupData::DeletePixelData()
-//{
-//	stbi_image_free(m_pPixelData);
-//	m_pPixelData = NULL;
-//}
+unsigned char *HyAtlas::GetPixelData()
+{
+	return m_pPixelData;
+}
+
+void HyAtlas::DeletePixelData()
+{
+	stbi_image_free(m_pPixelData);
+	m_pPixelData = NULL;
+}
