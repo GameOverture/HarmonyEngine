@@ -8,7 +8,7 @@
 #include "scriptum/imagepacker.h"
 
 // Forward declaration
-class WidgetAtlas;
+class WidgetAtlasManager;
 
 class HyGuiTexture
 {
@@ -27,7 +27,7 @@ class HyGuiTexture
         QString GetName()       { return m_pTreeItem->text(0); }
     };
     
-    WidgetAtlas *const      m_pAtlasOwner;
+    WidgetAtlasManager *const      m_pAtlasOwner;
     
     QDir                    m_MetaDir;
     QDir                    m_MetaTmpDir;
@@ -42,7 +42,7 @@ class HyGuiTexture
     bool                    m_bDirty;
     
 public:
-    HyGuiTexture(WidgetAtlas *const pAtlasOwner);
+    HyGuiTexture(WidgetAtlasManager *const pAtlasOwner);
     ~HyGuiTexture();
     
     bool IsDirty()          { return m_bDirty; }
@@ -57,16 +57,13 @@ public:
     // Each entry in the QList are hints towards what new texture each missing image belongs to.
     QList<QStringList> PackFrames();
     
-    WidgetAtlas *const GetAtlasOwner()  { return m_pAtlasOwner; }
+    WidgetAtlasManager *const GetAtlasOwner()  { return m_pAtlasOwner; }
     QTreeWidgetItem *GetTreeItem()      { return m_pTreeItem; }
    
     // Generates a texture and atlas file
     QJsonArray GetFrameArray();
     int GetLoadGroup()                  { return m_iLoadGroup; }
     void GenerateImg();
-    
-    // Finds what texture ID (or index) this texture is and returns it
-    int GetId();
 };
 
 #endif // HYGUITEXTURE_H

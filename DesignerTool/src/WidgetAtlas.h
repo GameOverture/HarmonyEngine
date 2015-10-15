@@ -6,6 +6,7 @@
 #include <QList>
 
 #include "ItemProject.h"
+#include "HyGuiAtlasGroup.h"
 #include "scriptum/imagepacker.h"
 
 namespace Ui {
@@ -15,7 +16,7 @@ class WidgetAtlas;
 // Forward declaration
 class HyGuiTexture;
 
-class WidgetAtlas : public QWidget
+class WidgetAtlasManager : public QWidget
 {
     Q_OBJECT
     
@@ -23,7 +24,7 @@ class WidgetAtlas : public QWidget
     
     QFileInfo                   m_DataFile;
     QFileInfo                   m_MetaDataFile;
-    QList<HyGuiTexture *>       m_Textures;
+    QList<HyGuiAtlasGroup *>    m_AtlasGroups;
     
     bool                        m_bSettingsDirty;
     
@@ -34,9 +35,9 @@ class WidgetAtlas : public QWidget
     };
     
 public:
-    explicit WidgetAtlas(QWidget *parent = 0);
-    explicit WidgetAtlas(ItemProject *pProjOwner, QWidget *parent = 0);
-    ~WidgetAtlas();
+    explicit WidgetAtlasManager(QWidget *parent = 0);
+    explicit WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent = 0);
+    ~WidgetAtlasManager();
     
     void SetProjOwner(ItemProject *pProjOwner)  { m_pProjOwner = pProjOwner; }
     ItemProject *GetProjOwner()                 { return m_pProjOwner; }
@@ -47,9 +48,6 @@ public:
     int GetHeuristicIndex();
     
     int GetNextTextureId();
-    
-    // Finds what index (aka ID) the passed-in texture is. Returns -1 if it can't find it
-    int FindTextureId(HyGuiTexture *pTex);
     
     QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType);
     
@@ -96,7 +94,6 @@ private:
     
     void LoadSettings();
     void LoadData();
-    void SaveSettings();
     void SaveData();
     
     HyGuiTexture *GetActiveTexture();

@@ -17,7 +17,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : HyOpenGL(gfxCommsRef, viewportsRef)
 {
-	m_uiNumDCs = m_ViewportsRef.size();
+	m_uiNumDCs = static_cast<uint32>(m_ViewportsRef.size());
 	m_ppDeviceContexes = new DeviceContext *[m_uiNumDCs];
 
 	for(uint32 i = 0; i < m_uiNumDCs; ++i)

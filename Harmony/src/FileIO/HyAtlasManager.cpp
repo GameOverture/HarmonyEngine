@@ -24,7 +24,7 @@ HyAtlasManager::HyAtlasManager(std::string sAtlasDataDir)
 	sAtlasInfoFilePath += "atlasInfo.json";
 	atlasGroupArray.parse(IHyFileIO::ReadTextFile(sAtlasInfoFilePath.c_str()));
 
-	m_uiNumAtlasGroups = atlasGroupArray.size();
+	m_uiNumAtlasGroups = static_cast<uint32>(atlasGroupArray.size());
 	m_pAtlasGroups = reinterpret_cast<HyAtlasGroup *>(new unsigned char[sizeof(HyAtlasGroup) * m_uiNumAtlasGroups]);
 	HyAtlasGroup *pAtlasGroupWriteLocation = m_pAtlasGroups;
 
@@ -83,7 +83,7 @@ HyAtlasGroup::HyAtlasGroup(HyAtlasManager &managerRef, uint32 uiLoadGroupId, uin
 																																											m_uiWIDTH(uiWidth),
 																																											m_uiHEIGHT(uiHeight),
 																																											m_uiNUM_8BIT_CHANNELS(uiNumClrChannels),
-																																											m_uiNUM_ATLASES(texturesArrayRef.size()),
+																																											m_uiNUM_ATLASES(static_cast<uint32>(texturesArrayRef.size())),
 																																											m_uiGfxApiHandle(0)
 {
 	m_pAtlases = reinterpret_cast<HyAtlas *>(new unsigned char[sizeof(HyAtlas) * m_uiNUM_ATLASES]);
@@ -209,7 +209,7 @@ void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef)
 HyAtlas::HyAtlas(uint32 uiTextureId, jsonxx::Array &srcFramesArrayRef) :	m_uiTEXTUREID(uiTextureId),
 																			m_pPixelData(NULL)
 {
-	m_uiNumFrames = srcFramesArrayRef.size();
+	m_uiNumFrames = static_cast<uint32>(srcFramesArrayRef.size());
 	m_pFrames = new HyRectangle<int32>[m_uiNumFrames];
 
 	for(uint32 k = 0; k < m_uiNumFrames; ++k)

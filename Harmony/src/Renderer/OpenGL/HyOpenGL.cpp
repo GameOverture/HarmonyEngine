@@ -285,7 +285,7 @@ HyOpenGL::~HyOpenGL(void)
 					1,						// Number of mipmaps
 					eInternalFormat,		// Internal format
 					uiWidth, uiHeight,		// width, height
-					vPixelData.size());
+					static_cast<int32>(vPixelData.size()));
 
 	for(unsigned int i = 0; i != vPixelData.size(); ++i)
 	{
@@ -293,7 +293,7 @@ HyOpenGL::~HyOpenGL(void)
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
 						0,										// Mipmap number
 						0, 0, i,								// xoffset, yoffset, zoffset
-						uiWidth, uiHeight, vPixelData.size(),	// width, height, depth
+						uiWidth, uiHeight, static_cast<uint32>(vPixelData.size()),	// width, height, depth
 						eFormat,								// format
 						GL_UNSIGNED_BYTE,						// type
 						vPixelData[i]);							// pointer to pixel data

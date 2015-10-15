@@ -4,13 +4,13 @@
 #include "Item.h"
 
 // Forward declaration
-class WidgetAtlas;
+class WidgetAtlasManager;
 
 class ItemProject : public Item
 {
     friend class WidgetExplorer;
     
-    WidgetAtlas *       m_pAtlases;
+    WidgetAtlasManager *       m_pAtlases;
     HyPrimitive2d       m_CurAtlas;
     
 public:
@@ -28,7 +28,7 @@ private:
 public:
     ~ItemProject();
     
-    WidgetAtlas *GetAtlasWidget()       { return m_pAtlases; }
+    WidgetAtlasManager *GetAtlasWidget()       { return m_pAtlases; }
     
     virtual void Hide();
     virtual void Show();

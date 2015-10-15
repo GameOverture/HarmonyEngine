@@ -55,7 +55,7 @@ HyGuiTexture::HyGuiFrameData::HyGuiFrameData(HyGuiTexture *const pTexOwner, int 
     m_pTreeItem = m_pTexOwner->GetAtlasOwner()->CreateTreeItem(m_pTexOwner->GetTreeItem(), sName, ATLAS_Frame);
 }
 
-HyGuiTexture::HyGuiTexture(WidgetAtlas *const pAtlasOwner) :    m_pAtlasOwner(pAtlasOwner),
+HyGuiTexture::HyGuiTexture(WidgetAtlasManager *const pAtlasOwner) :    m_pAtlasOwner(pAtlasOwner),
                                                                 m_bDirty(true)
 {
     m_pAtlasOwner->SetPackerSettings(&m_Packer);
@@ -290,8 +290,3 @@ QList<QStringList> HyGuiTexture::PackFrames()
     return missingImgPaths;
 }
 
-// Finds what texture ID (or index) this texture is and returns it
-int HyGuiTexture::GetId()
-{
-    return m_pAtlasOwner->FindTextureId(this);
-}

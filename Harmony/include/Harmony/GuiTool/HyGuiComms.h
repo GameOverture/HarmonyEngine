@@ -92,6 +92,12 @@ public:
 	ss << msg << std::endl; \
 	HyGuiComms::Log(ss.str().c_str(), 4); }
 
+#else
+#define HyLog(msg) do { } while (false)
+#define HyLogWarning(msg) do { } while (false)
+#define HyLogError(msg) do { } while (false)
+#define HyLogInfo(msg) do { } while (false)
+#define HyLogTitle(msg) do { } while (false)
 #endif
 
 #endif /* __HyGuiComms_h__ */

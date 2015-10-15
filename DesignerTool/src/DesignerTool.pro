@@ -37,7 +37,9 @@ SOURCES += main.cpp \
     HyTcpServer.cpp \
     HyGuiTexture.cpp \
     DlgOpenProject.cpp \
-    HyGuiRenderer.cpp
+    HyGuiRenderer.cpp \
+    HyGuiAtlasGroup.cpp \
+    DlgAtlasGroupSettings.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -63,7 +65,9 @@ HEADERS  += \
     HyTcpServer.h \
     HyGuiTexture.h \
     DlgOpenProject.h \
-    HyGuiRenderer.h
+    HyGuiRenderer.h \
+    HyGuiAtlasGroup.h \
+    DlgAtlasGroupSettings.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -79,7 +83,8 @@ FORMS    += \
     DlgInputName.ui \
     WidgetLiveVariable.ui \
     WidgetLiveVarManager.ui \
-    DlgOpenProject.ui
+    DlgOpenProject.ui \
+    DlgAtlasGroupSettings.ui
 
 Release:DESTDIR = ../release
 Release:OBJECTS_DIR = ../release/.obj

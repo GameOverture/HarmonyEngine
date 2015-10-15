@@ -14,7 +14,7 @@
 
 #include "HyGuiTexture.h"
 
-WidgetAtlas::WidgetAtlas(QWidget *parent /*= 0*/) : QWidget(parent),
+WidgetAtlasManager::WidgetAtlasManager(QWidget *parent /*= 0*/) : QWidget(parent),
                                                     ui(new Ui::WidgetAtlas),
                                                     m_pProjOwner(NULL)
 {
@@ -23,7 +23,7 @@ WidgetAtlas::WidgetAtlas(QWidget *parent /*= 0*/) : QWidget(parent),
     // NOTE: THIS CONSTRUCTOR IS INVALID TO USE. IT EXISTS FOR QT TO ALLOW Q_OBJECT TO WORK
 }
 
-WidgetAtlas::WidgetAtlas(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :    QWidget(parent),
+WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :    QWidget(parent),
                                                                                 ui(new Ui::WidgetAtlas),
                                                                                 m_bSettingsDirty(true),
                                                                                 m_pProjOwner(pProjOwner)
@@ -40,20 +40,20 @@ WidgetAtlas::WidgetAtlas(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :    
     LoadData();
 }
 
-WidgetAtlas::~WidgetAtlas()
+WidgetAtlasManager::~WidgetAtlasManager()
 {
-    while(m_Textures.empty() == false)
+    while(m_AtlasGroups.empty() == false)
     {
-        HyGuiTexture *pTex = m_Textures.front();
-        delete pTex;
+        HyGuiAtlasGroup *pAtlasGrp = m_AtlasGroups.front();
+        delete pAtlasGrp;
         
-        m_Textures.pop_front();
+        m_AtlasGroups.pop_front();
     }
     
     delete ui;
 }
 
-void WidgetAtlas::SetPackerSettings(ImagePacker *pPacker)
+void WidgetAtlasManager::SetPackerSettings(ImagePacker *pPacker)
 {
     pPacker->sortOrder = ui->cmbSortOrder->currentIndex();
     pPacker->border.t = ui->sbFrameMarginTop->value();
@@ -69,36 +69,25 @@ void WidgetAtlas::SetPackerSettings(ImagePacker *pPacker)
     pPacker->rotate = ui->cmbRotationStrategy->currentIndex();
 }
 
-int WidgetAtlas::GetTexWidth()
+int WidgetAtlasManager::GetTexWidth()
 {
     return ui->sbTextureWidth->value();
 }
-int WidgetAtlas::GetTexHeight()
+int WidgetAtlasManager::GetTexHeight()
 {
     return ui->sbTextureHeight->value();
 }
-int WidgetAtlas::GetHeuristicIndex()
+int WidgetAtlasManager::GetHeuristicIndex()
 {
     return ui->cmbHeuristic->currentIndex();
 }
 
-int WidgetAtlas::GetNextTextureId()
+int WidgetAtlasManager::GetNextTextureId()
 {
     return ui->frameList->topLevelItemCount();
 }
 
-int WidgetAtlas::FindTextureId(HyGuiTexture *pTex)
-{
-    for(int i = 0; i < m_Textures.size(); ++i)
-    {
-        if(pTex == m_Textures[i])
-            return i;
-    }
-    
-    return -1;
-}
-
-void WidgetAtlas::on_btnTexSize256_clicked()
+void WidgetAtlasManager::on_btnTexSize256_clicked()
 {
     ui->sbTextureWidth->setValue(256);
     ui->sbTextureHeight->setValue(256);
@@ -106,7 +95,7 @@ void WidgetAtlas::on_btnTexSize256_clicked()
     m_bSettingsDirty = true;
 }
 
-void WidgetAtlas::on_btnTexSize512_clicked()
+void WidgetAtlasManager::on_btnTexSize512_clicked()
 {
     ui->sbTextureWidth->setValue(512);
     ui->sbTextureHeight->setValue(512);
@@ -114,7 +103,7 @@ void WidgetAtlas::on_btnTexSize512_clicked()
     m_bSettingsDirty = true;
 }
 
-void WidgetAtlas::on_btnTexSize1024_clicked()
+void WidgetAtlasManager::on_btnTexSize1024_clicked()
 {
     ui->sbTextureWidth->setValue(1024);
     ui->sbTextureHeight->setValue(1024);
@@ -122,7 +111,7 @@ void WidgetAtlas::on_btnTexSize1024_clicked()
     m_bSettingsDirty = true;
 }
 
-void WidgetAtlas::on_btnTexSize2048_clicked()
+void WidgetAtlasManager::on_btnTexSize2048_clicked()
 {
     ui->sbTextureWidth->setValue(2048);
     ui->sbTextureHeight->setValue(2048);
@@ -130,7 +119,7 @@ void WidgetAtlas::on_btnTexSize2048_clicked()
     m_bSettingsDirty = true;
 }
 
-void WidgetAtlas::on_btnAddFiles_clicked()
+void WidgetAtlasManager::on_btnAddFiles_clicked()
 {
     QFileDialog dlg(this);
     dlg.setFileMode(QFileDialog::ExistingFile);
@@ -152,7 +141,7 @@ void WidgetAtlas::on_btnAddFiles_clicked()
     RenderAtlas();
 }
 
-void WidgetAtlas::on_btnAddDir_clicked()
+void WidgetAtlasManager::on_btnAddDir_clicked()
 {
     QFileDialog dlg(this);
     dlg.setFileMode(QFileDialog::Directory);
@@ -203,44 +192,44 @@ void WidgetAtlas::on_btnAddDir_clicked()
     RenderAtlas();
 }
 
-void WidgetAtlas::on_cmbHeuristic_currentIndexChanged(const QString &arg1)
+void WidgetAtlasManager::on_cmbHeuristic_currentIndexChanged(const QString &arg1)
 {
     m_bSettingsDirty = true;
 }
 
 
-void WidgetAtlas::on_cmbSortOrder_currentIndexChanged(const QString &arg1)
+void WidgetAtlasManager::on_cmbSortOrder_currentIndexChanged(const QString &arg1)
 {
     m_bSettingsDirty = true;
 }
 
-void WidgetAtlas::on_cmbRotationStrategy_currentIndexChanged(const QString &arg1)
+void WidgetAtlasManager::on_cmbRotationStrategy_currentIndexChanged(const QString &arg1)
 {
     m_bSettingsDirty = true;
 }
 
 
-void WidgetAtlas::on_sbFrameMarginTop_valueChanged(int arg1)
+void WidgetAtlasManager::on_sbFrameMarginTop_valueChanged(int arg1)
 {
     m_bSettingsDirty = true;
 }
 
-void WidgetAtlas::on_sbFrameMarginRight_valueChanged(int arg1)
+void WidgetAtlasManager::on_sbFrameMarginRight_valueChanged(int arg1)
 {
     m_bSettingsDirty = true;
 }
 
-void WidgetAtlas::on_sbFrameMarginBottom_valueChanged(int arg1)
+void WidgetAtlasManager::on_sbFrameMarginBottom_valueChanged(int arg1)
 {
     m_bSettingsDirty = true;
 }
 
-void WidgetAtlas::on_sbFrameMarginLeft_valueChanged(int arg1)
+void WidgetAtlasManager::on_sbFrameMarginLeft_valueChanged(int arg1)
 {
     m_bSettingsDirty = true;
 }
 
-void WidgetAtlas::on_tabWidget_currentChanged(int index)
+void WidgetAtlasManager::on_tabWidget_currentChanged(int index)
 {
     if(m_bSettingsDirty)
     {
@@ -248,7 +237,7 @@ void WidgetAtlas::on_tabWidget_currentChanged(int index)
     }
 }
 
-QTreeWidgetItem *WidgetAtlas::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType)
+QTreeWidgetItem *WidgetAtlasManager::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType)
 {
     QTreeWidgetItem *pNewTreeItem;
     if(pParent == NULL)
@@ -271,9 +260,9 @@ QTreeWidgetItem *WidgetAtlas::CreateTreeItem(QTreeWidgetItem *pParent, QString s
     return NULL;
 }
 
-void WidgetAtlas::on_btnSaveSettings_clicked()
+void WidgetAtlasManager::on_btnSaveSettings_clicked()
 {
-    if(m_Textures.size() == 0)
+    if(m_AtlasGroups.size() == 0)
         SaveSettings();
     else if(m_bSettingsDirty)
     {
@@ -302,53 +291,12 @@ void WidgetAtlas::on_btnSaveSettings_clicked()
     m_bSettingsDirty = false;
 }
 
-void WidgetAtlas::on_btnChangeSettings_clicked()
+void WidgetAtlasManager::on_btnChangeSettings_clicked()
 {
     ui->stackedWidget->setCurrentIndex(PAGE_Settings);
 }
 
-void WidgetAtlas::LoadSettings()
-{
-    if(m_MetaDataFile.exists() == false)
-    {
-        HYLOG("Atlas settings file not found. Generating new one.", LOGTYPE_Info);
-        SaveSettings();
-        ui->stackedWidget->setCurrentIndex(PAGE_Settings);
-        
-        return;
-    }
-    
-    QFile file(m_MetaDataFile.absoluteFilePath());
-    if(file.open(QIODevice::ReadOnly) == false)
-    {
-        HYLOG("Could not open atlas settings file for reading", LOGTYPE_Error);
-        return;
-    }
-    QByteArray data = file.readAll();
-    QJsonDocument doc = QJsonDocument::fromBinaryData(data);
-    file.close();
-    
-    QJsonObject settings = doc.object();
-    ui->cmbSortOrder->setCurrentIndex(JSONOBJ_TOINT(settings, "cmbSortOrder"));
-    ui->sbFrameMarginTop->setValue(JSONOBJ_TOINT(settings, "sbFrameMarginTop"));
-    ui->sbFrameMarginLeft->setValue(JSONOBJ_TOINT(settings, "sbFrameMarginLeft"));
-    ui->sbFrameMarginRight->setValue(JSONOBJ_TOINT(settings, "sbFrameMarginRight"));
-    ui->sbFrameMarginBottom->setValue(JSONOBJ_TOINT(settings, "sbFrameMarginBottom"));
-    ui->extrude->setValue(JSONOBJ_TOINT(settings, "extrude"));
-    ui->chkMerge->setChecked(settings["chkMerge"].toBool());
-    ui->chkSquare->setChecked(settings["chkSquare"].toBool());
-    ui->chkAutosize->setChecked(settings["chkAutosize"].toBool());
-    ui->minFillRate->setValue(JSONOBJ_TOINT(settings, "minFillRate"));
-    ui->cmbRotationStrategy->setCurrentIndex(JSONOBJ_TOINT(settings, "cmbRotationStrategy"));
-    ui->sbTextureWidth->setValue(JSONOBJ_TOINT(settings, "sbTextureWidth"));
-    ui->sbTextureHeight->setValue(JSONOBJ_TOINT(settings, "sbTextureHeight"));
-    ui->cmbHeuristic->setCurrentIndex(JSONOBJ_TOINT(settings, "cmbHeuristic"));
-    
-    //
-    ui->stackedWidget->setCurrentIndex(PAGE_Frames);
-}
-
-void WidgetAtlas::LoadData()
+void WidgetAtlasManager::LoadData()
 {
     if(m_DataFile.exists() == false)
     {
@@ -400,84 +348,51 @@ void WidgetAtlas::LoadData()
         HYLOG("Could not open: " % m_DataFile.absoluteFilePath(), LOGTYPE_Warning);
 }
 
-void WidgetAtlas::SaveSettings()
+void WidgetAtlasManager::SaveData()
 {
-    QJsonObject settings;
-    settings.insert("cmbSortOrder", QJsonValue(ui->cmbSortOrder->currentIndex()));
-    settings.insert("sbFrameMarginTop", QJsonValue(ui->sbFrameMarginTop->value()));
-    settings.insert("sbFrameMarginLeft", QJsonValue(ui->sbFrameMarginLeft->value()));
-    settings.insert("sbFrameMarginRight", QJsonValue(ui->sbFrameMarginRight->value()));
-    settings.insert("sbFrameMarginBottom", QJsonValue(ui->sbFrameMarginBottom->value()));
-    settings.insert("extrude", QJsonValue(ui->extrude->value()));
-    settings.insert("chkMerge", QJsonValue(ui->chkMerge->isChecked()));
-    settings.insert("chkSquare", QJsonValue(ui->chkSquare->isChecked()));
-    settings.insert("chkAutosize", QJsonValue(ui->chkAutosize->isChecked()));
-    settings.insert("minFillRate", QJsonValue(ui->minFillRate->value()));
-    settings.insert("cmbRotationStrategy", QJsonValue(ui->cmbRotationStrategy->currentIndex()));
+    //QJsonArray atlasGroupArray;
+    //atlasGroupArray.append(
     
-    settings.insert("sbTextureWidth", QJsonValue(ui->sbTextureWidth->value()));
-    settings.insert("sbTextureHeight", QJsonValue(ui->sbTextureHeight->value()));
-    settings.insert("cmbHeuristic", QJsonValue(ui->cmbHeuristic->currentIndex()));
+//    // Write global atlas information
+//    QJsonObject atlasInfo;
+//    atlasInfo.insert("numTextures", QJsonValue(m_Textures.size()));
+//    atlasInfo.insert("width", ui->sbTextureWidth->value());
+//    atlasInfo.insert("height", ui->sbTextureHeight->value());
     
-    
-    QFile file(m_MetaDataFile.absoluteFilePath());
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        HYLOG("Couldn't open atlas settings file for writing", LOGTYPE_Error);
-        return;
-    }
+//    QJsonArray textureArray;
+//    for(int i = 0; i < m_Textures.size(); ++i)
+//    {
+//        // Save any changed textures to disk
+//        if(m_Textures[i]->IsDirty())
+//            m_Textures[i]->GenerateImg();
 
-    QJsonDocument doc(settings);
-    qint64 iBytesWritten = file.write(doc.toBinaryData());
-    if(0 == iBytesWritten || -1 == iBytesWritten)
-    {
-        HYLOG("Could not write to atlas settings file: " % file.errorString(), LOGTYPE_Error);
-        return;
-    }
-}
+//        textureInfo.insert("id", QJsonValue(i));
+//        textureInfo.insert("loadGroup", QJsonValue(m_Textures[i]->GetLoadGroup()));
 
-void WidgetAtlas::SaveData()
-{
-    // Write global atlas information
-    QJsonObject atlasInfo;
-    atlasInfo.insert("numTextures", QJsonValue(m_Textures.size()));
-    atlasInfo.insert("width", ui->sbTextureWidth->value());
-    atlasInfo.insert("height", ui->sbTextureHeight->value());
-    
-    QJsonArray textureArray;
-    for(int i = 0; i < m_Textures.size(); ++i)
-    {
-        // Save any changed textures to disk
-        if(m_Textures[i]->IsDirty())
-            m_Textures[i]->GenerateImg();
-
-        textureInfo.insert("id", QJsonValue(i));
-        textureInfo.insert("loadGroup", QJsonValue(m_Textures[i]->GetLoadGroup()));
-
-        QJsonObject textureInfo;
-        QJsonArray frameArray = m_Textures[i]->GetFrameArray();
-        textureInfo.insert("srcFrames", frameArray);
+//        QJsonObject textureInfo;
+//        QJsonArray frameArray = m_Textures[i]->GetFrameArray();
+//        textureInfo.insert("srcFrames", frameArray);
         
-        textureArray.append(textureInfo);
-    }
-    atlasInfo.insert("textures", textureArray);
+//        textureArray.append(textureInfo);
+//    }
+//    atlasInfo.insert("textures", textureArray);
     
-    QFile file(m_DataFile.absoluteFilePath());
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        HYLOG("Couldn't open atlas data file for writing", LOGTYPE_Error);
-        return;
-    }
+//    QFile file(m_DataFile.absoluteFilePath());
+//    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+//    {
+//        HYLOG("Couldn't open atlas data file for writing", LOGTYPE_Error);
+//        return;
+//    }
 
-    QJsonDocument doc(atlasInfo);
-    if(0 == file.write(doc.toJson()))
-    {
-        HYLOG("Could not write to atlas data file", LOGTYPE_Error);
-        return;
-    }
+//    QJsonDocument doc(atlasInfo);
+//    if(0 == file.write(doc.toJson()))
+//    {
+//        HYLOG("Could not write to atlas data file", LOGTYPE_Error);
+//        return;
+//    }
 }
 
-HyGuiTexture *WidgetAtlas::GetActiveTexture()
+HyGuiTexture *WidgetAtlasManager::GetActiveTexture()
 {
     if(m_Textures.empty())
         m_Textures.append(new HyGuiTexture(this));
@@ -485,7 +400,7 @@ HyGuiTexture *WidgetAtlas::GetActiveTexture()
     return m_Textures.last();
 }
 
-void WidgetAtlas::ImportFrames(QStringList sImportImgList)
+void WidgetAtlasManager::ImportFrames(QStringList sImportImgList)
 {
     QList<QStringList> sMissingImgPaths = GetActiveTexture()->ImportFrames(sImportImgList);
     bool bFailedToPack = false;
@@ -511,7 +426,7 @@ void WidgetAtlas::ImportFrames(QStringList sImportImgList)
         HYLOG("Imported image(s) failed to pack into current texture settings. Check log for info.", LOGTYPE_Warning);
 }
 
-void WidgetAtlas::RepackFrames()
+void WidgetAtlasManager::RepackFrames()
 {
     for(int i = 0; i < m_Textures.size(); ++i)
     {
@@ -520,7 +435,7 @@ void WidgetAtlas::RepackFrames()
     }
 }
 
-void WidgetAtlas::RenderAtlas()
+void WidgetAtlasManager::RenderAtlas()
 {
     if(ui->frameList->selectedItems().empty())
         return;
@@ -544,12 +459,12 @@ void WidgetAtlas::RenderAtlas()
     MainWindow::OpenItem(m_pProjOwner);
 }
 
-void WidgetAtlas::on_frameList_itemDoubleClicked(QTreeWidgetItem *item, int column)
+void WidgetAtlasManager::on_frameList_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     //item->ic
 }
 
-void WidgetAtlas::on_frameList_itemClicked(QTreeWidgetItem *item, int column)
+void WidgetAtlasManager::on_frameList_itemClicked(QTreeWidgetItem *item, int column)
 {
     RenderAtlas();
 }

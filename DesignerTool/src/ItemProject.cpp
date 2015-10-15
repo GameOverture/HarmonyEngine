@@ -4,7 +4,7 @@
 ItemProject::ItemProject(const QString sPath) : Item(ITEM_Project, sPath),
                                                 m_eState(DRAWSTATE_AtlasManager)
 {
-    m_pAtlases = new WidgetAtlas(this);
+    m_pAtlases = new WidgetAtlasManager(this);
 }
 
 ItemProject::~ItemProject()
