@@ -50,7 +50,7 @@ TestBed::~TestBed(void)
 
 	//m_pCam->Pos().Set(1.0f, 1.0f);
 	//m_pCam->Pos().Set(.5f, 1.0f);
-	m_pCam->SetZoom(0.8f);
+	//m_pCam->SetZoom(0.8f);
 
 	Input().MapBtn_KB(CAM_LEFT, KeyLeft);
 	Input().MapBtn_KB(CAM_RIGHT, KeyRight);
@@ -83,16 +83,16 @@ TestBed::~TestBed(void)
 
 
 	if(Input().IsBtnDown(CAM_LEFT))
-		m_pCam->Pos().Offset(-0.05f, 0.0f);
+		m_pCam->Pos().Offset(-0.5f, 0.0f);
 
 	if(Input().IsBtnDown(CAM_RIGHT))
-		m_pCam->Pos().Offset(0.05f, 0.0f);
+		m_pCam->Pos().Offset(0.5f, 0.0f);
 
 	if(Input().IsBtnDown(CAM_UP))
-		m_pCam->Pos().Offset(0.0f, 0.05f);
+		m_pCam->Pos().Offset(0.0f, 0.5f);
 
 	if(Input().IsBtnDown(CAM_DOWN))
-		m_pCam->Pos().Offset(0.0f, -0.05f);
+		m_pCam->Pos().Offset(0.0f, -0.5f);
 
 
 	//if(m_pInputArray->

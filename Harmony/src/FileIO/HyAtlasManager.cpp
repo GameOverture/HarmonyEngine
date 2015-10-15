@@ -18,29 +18,26 @@ HyAtlasManager::HyAtlasManager(std::string sAtlasDataDir)
 {
 	m_sAtlasDirPath = sAtlasDataDir;
 
-	jsonxx::Object atlasObject;
+	jsonxx::Array atlasGroupArray;
 
 	std::string sAtlasInfoFilePath(m_sAtlasDirPath);
 	sAtlasInfoFilePath += "atlasInfo.json";
-	atlasObject.parse(IHyFileIO::ReadTextFile(sAtlasInfoFilePath.c_str()));
+	atlasGroupArray.parse(IHyFileIO::ReadTextFile(sAtlasInfoFilePath.c_str()));
 
-	m_iWidth = static_cast<int32>(atlasObject.get<jsonxx::Number>("width"));
-	m_iHeight = static_cast<int32>(atlasObject.get<jsonxx::Number>("height"));
-	m_iNum8bitClrChannels = static_cast<int32>(atlasObject.get<jsonxx::Number>("num8BitClrChannels"));
-	jsonxx::Array loadGroupArray = atlasObject.get<jsonxx::Array>("loadGroups");
-
-	m_uiNumAtlasGroups = loadGroupArray.size();
+	m_uiNumAtlasGroups = atlasGroupArray.size();
 	m_pAtlasGroups = reinterpret_cast<HyAtlasGroup *>(new unsigned char[sizeof(HyAtlasGroup) * m_uiNumAtlasGroups]);
 	HyAtlasGroup *pAtlasGroupWriteLocation = m_pAtlasGroups;
 
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i, ++pAtlasGroupWriteLocation)
 	{
-		jsonxx::Object loadGroupObj = loadGroupArray.get<jsonxx::Object>(i);
+		jsonxx::Object atlasGroupObj = atlasGroupArray.get<jsonxx::Object>(i);
 
-		int32 iLoadGroupId = static_cast<int32>(loadGroupObj.get<jsonxx::Number>("id"));
-		jsonxx::Array texturesArray = loadGroupObj.get<jsonxx::Array>("textures");
-
-		new (pAtlasGroupWriteLocation)HyAtlasGroup(*this, iLoadGroupId, texturesArray);
+		new (pAtlasGroupWriteLocation)HyAtlasGroup(*this,
+													static_cast<uint32>(atlasGroupObj.get<jsonxx::Number>("id")),
+													static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("width")),
+													static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("height")),
+													static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("num8BitClrChannels")),
+													atlasGroupObj.get<jsonxx::Array>("textures"));
 	}
 }
 
@@ -50,21 +47,6 @@ HyAtlasManager::~HyAtlasManager()
 		m_pAtlasGroups->~HyAtlasGroup();
 
 	delete m_pAtlasGroups;
-}
-
-int32 HyAtlasManager::GetNumColorChannels()
-{
-	return m_iNum8bitClrChannels;
-}
-
-int32 HyAtlasManager::GetWidth()
-{
-	return m_iWidth;
-}
-
-int32 HyAtlasManager::GetHeight()
-{
-	return m_iHeight;
 }
 
 HyAtlasGroup *HyAtlasManager::RequestTexture(uint32 uiTextureId)
@@ -96,15 +78,18 @@ std::string HyAtlasManager::GetTexturePath(uint32 uiTextureId)
 }
 
 //////////////////////////////////////////////////////////////////////////
-HyAtlasGroup::HyAtlasGroup(HyAtlasManager &managerRef, int32 iLoadGroupId, jsonxx::Array &texturesArrayRef) :	m_ManagerRef(managerRef),
-																												m_iLOADGROUPID(iLoadGroupId),
-																												m_uiGfxApiHandle(0)
+HyAtlasGroup::HyAtlasGroup(HyAtlasManager &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef) :	m_ManagerRef(managerRef),
+																																											m_uiLOADGROUPID(uiLoadGroupId),
+																																											m_uiWIDTH(uiWidth),
+																																											m_uiHEIGHT(uiHeight),
+																																											m_uiNUM_8BIT_CHANNELS(uiNumClrChannels),
+																																											m_uiNUM_ATLASES(texturesArrayRef.size()),
+																																											m_uiGfxApiHandle(0)
 {
-	m_uiNumAtlases = texturesArrayRef.size();
-	m_pAtlases = reinterpret_cast<HyAtlas *>(new unsigned char[sizeof(HyAtlas) * m_uiNumAtlases]);
+	m_pAtlases = reinterpret_cast<HyAtlas *>(new unsigned char[sizeof(HyAtlas) * m_uiNUM_ATLASES]);
 	HyAtlas *pAtlasWriteLocation = m_pAtlases;
 
-	for(uint32 j = 0; j < m_uiNumAtlases; ++j)
+	for(uint32 j = 0; j < m_uiNUM_ATLASES; ++j)
 	{
 		jsonxx::Object texObj = texturesArrayRef.get<jsonxx::Object>(j);
 
@@ -117,15 +102,35 @@ HyAtlasGroup::HyAtlasGroup(HyAtlasManager &managerRef, int32 iLoadGroupId, jsonx
 
 HyAtlasGroup::~HyAtlasGroup()
 {
-	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+	for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
 		m_pAtlases->~HyAtlas();
 
 	delete m_pAtlases;
 }
 
+uint32 HyAtlasGroup::GetGfxApiHandle()
+{
+	return m_uiGfxApiHandle;
+}
+
+uint32 HyAtlasGroup::GetNumColorChannels()
+{
+	return m_uiNUM_8BIT_CHANNELS;
+}
+
+uint32 HyAtlasGroup::GetWidth()
+{
+	return m_uiWIDTH;
+}
+
+uint32 HyAtlasGroup::GetHeight()
+{
+	return m_uiHEIGHT;
+}
+
 bool HyAtlasGroup::ContainsTexture(uint32 uiTextureId)
 {
-	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+	for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
 	{
 		if(m_pAtlases[i].GetId() == uiTextureId)
 			return true;
@@ -136,24 +141,28 @@ bool HyAtlasGroup::ContainsTexture(uint32 uiTextureId)
 
 void HyAtlasGroup::Load()
 {
+	m_csTextures.Lock();
+
 	if(m_uiGfxApiHandle == 0)
 	{
-		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
 			m_pAtlases[i].Load(m_ManagerRef.GetTexturePath(m_pAtlases[i].GetId()).c_str());
 	}
+
+	m_csTextures.Unlock();
 }
 
 // Returns 'true' if texture was just loaded
 void HyAtlasGroup::Assign(IHyData *pData)
 {
-	m_cs.Lock();
+	m_csDataRefs.Lock();
 	m_AssociatedDataSet.insert(pData);
-	m_cs.Unlock();
+	m_csDataRefs.Unlock();
 }
 
 void HyAtlasGroup::Relinquish(IHyData *pData)
 {
-	m_cs.Lock();
+	m_csDataRefs.Lock();
 
 	for(set<IHyData *>::iterator iter = m_AssociatedDataSet.begin(); iter != m_AssociatedDataSet.end(); ++iter)
 	{
@@ -164,28 +173,36 @@ void HyAtlasGroup::Relinquish(IHyData *pData)
 		}
 	}
 
-	m_cs.Unlock();
+	m_csDataRefs.Unlock();
 }
 
 void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef)
 {
 	bool bUpload;
 	
-	m_cs.Lock();
+	m_csDataRefs.Lock();
 	bUpload = m_AssociatedDataSet.empty() == false;
-	m_cs.Unlock();
+	m_csDataRefs.Unlock();
 	
+
+	m_csTextures.Lock();
 	if(bUpload)
 	{
 		vector<unsigned char *> vTextureArrayData;
-		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
 			vTextureArrayData.push_back(m_pAtlases[i].GetPixelData());
 
-		m_uiGfxApiHandle = rendererRef.AddTextureArray(m_ManagerRef.GetNumColorChannels(), m_ManagerRef.GetWidth(), m_ManagerRef.GetHeight(), vTextureArrayData);
+		m_uiGfxApiHandle = rendererRef.AddTextureArray(m_uiNUM_8BIT_CHANNELS, m_uiWIDTH, m_uiHEIGHT, vTextureArrayData);
 
-		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
 			m_pAtlases[i].DeletePixelData();
 	}
+	else
+	{
+		rendererRef.DeleteTextureArray(m_uiGfxApiHandle);
+		m_uiGfxApiHandle = 0;
+	}
+	m_csTextures.Unlock();
 }
 
 //////////////////////////////////////////////////////////////////////////

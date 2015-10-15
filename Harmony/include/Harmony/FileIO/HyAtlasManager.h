@@ -31,20 +31,12 @@ class HyAtlasManager
 {
 	std::string				m_sAtlasDirPath;
 
-	int32					m_iWidth;
-	int32					m_iHeight;
-	int32					m_iNum8bitClrChannels;
-
 	HyAtlasGroup *			m_pAtlasGroups;
 	uint32					m_uiNumAtlasGroups;
 
 public:
 	HyAtlasManager(std::string sAtlasDataDir);
 	~HyAtlasManager();
-
-	int32 GetNumColorChannels();
-	int32 GetWidth();
-	int32 GetHeight();
 
 	HyAtlasGroup *RequestTexture(uint32 uiTextureId);
 	std::string GetTexturePath(uint32 uiTextureId);
@@ -57,18 +49,29 @@ class HyAtlasGroup
 
 	HyAtlasManager &			m_ManagerRef;
 
-	const int32					m_iLOADGROUPID;
-	uint32						m_uiGfxApiHandle;
+	const uint32				m_uiLOADGROUPID;
+	const uint32				m_uiWIDTH;
+	const uint32				m_uiHEIGHT;
+	const uint32				m_uiNUM_8BIT_CHANNELS;
+
 
 	HyAtlas *					m_pAtlases;
-	uint32						m_uiNumAtlases;
+	const uint32				m_uiNUM_ATLASES;
 
-	BasicSection				m_cs;
+	uint32						m_uiGfxApiHandle;
+
 	set<IHyData *>				m_AssociatedDataSet;
+	BasicSection				m_csDataRefs;
+	BasicSection				m_csTextures;
 
 public:
-	HyAtlasGroup(HyAtlasManager &managerRef, int32 iLoadGroupId, jsonxx::Array &texturesArrayRef);
+	HyAtlasGroup(HyAtlasManager &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
 	~HyAtlasGroup();
+
+	uint32 GetGfxApiHandle();
+	uint32 GetNumColorChannels();
+	uint32 GetWidth();
+	uint32 GetHeight();
 
 	bool ContainsTexture(uint32 uiTextureId);
 	void Load();

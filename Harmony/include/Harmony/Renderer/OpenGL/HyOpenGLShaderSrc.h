@@ -18,20 +18,16 @@ const char *szHYQUADBATCH_VERTEXSHADER = "#version 330						\n\
 layout(location = 0) in vec2 size;											\n\
 layout(location = 1) in vec2 offset;										\n\
 layout(location = 2) in vec4 tint;											\n\
-layout(location = 3) in vec2 UVcoord0;										\n\
-layout(location = 4) in vec2 UVcoord1;										\n\
-layout(location = 5) in vec2 UVcoord2;										\n\
-layout(location = 6) in vec2 UVcoord3;										\n\
-layout(location = 7) in mat4 mtxLocalToWorld;								\n\
+layout(location = 3) in int textureIndex;									\n\
+layout(location = 4) in vec2 UVcoord0;										\n\
+layout(location = 5) in vec2 UVcoord1;										\n\
+layout(location = 6) in vec2 UVcoord2;										\n\
+layout(location = 7) in vec2 UVcoord3;										\n\
+layout(location = 8) in mat4 mtxLocalToWorld;								\n\
 																			\n\
-/*																			\n\
-layout(location = 0) in vec4 position;										\n\
-layout(location = 1) in vec4 color;											\n\
-layout(location = 2) in vec2 uv;											\n\
-*/																			\n\
 																			\n\
 smooth out vec4 interpColor;												\n\
-smooth out vec2 interpUV;													\n\
+smooth out vec3 interpUV;													\n\
 																			\n\
 uniform mat4 mtxCameraToClipMatrix;											\n\
 uniform mat4 mtxWorldToCameraMatrix;										\n\
@@ -39,11 +35,18 @@ uniform mat4 mtxWorldToCameraMatrix;										\n\
 																			\n\
 																			\n\
 const vec2 position[] = vec2[4](											\n\
-	vec2(0.0f, 0.0f),														\n\
+	vec2(1.0f, 1.0f),														\n\
 	vec2(0.0f, 1.0f),														\n\
 	vec2(1.0f, 0.0f),														\n\
-	vec2(1.0f, 1.0f)														\n\
+	vec2(0.0f, 0.0f)														\n\
 	);																		\n\
+																			\n\
+/* const vec2 position[] = vec2[4](				\n\
+	vec2(0.0f, 0.0f), \n\
+	vec2(0.0f, 1.0f), \n\
+	vec2(1.0f, 0.0f), \n\
+	vec2(1.0f, 1.0f)														\n\
+	);*/																	\n\
 																			\n\
 																			\n\
 void main()																	\n\
@@ -63,18 +66,23 @@ void main()																	\n\
 	switch(gl_VertexID)														\n\
 	{																		\n\
 	case 0:																	\n\
-		interpUV = UVcoord0;												\n\
+		interpUV.x = UVcoord0.x;											\n\
+		interpUV.y = UVcoord0.y;											\n\
 		break;																\n\
 	case 1:																	\n\
-		interpUV = UVcoord1;												\n\
+		interpUV.x = UVcoord1.x;											\n\
+		interpUV.y = UVcoord1.y;											\n\
 		break;																\n\
 	case 2:																	\n\
-		interpUV = UVcoord2;												\n\
+		interpUV.x = UVcoord2.x;											\n\
+		interpUV.y = UVcoord2.y;											\n\
 		break;																\n\
 	case 3:																	\n\
-		interpUV = UVcoord3;												\n\
+		interpUV.x = UVcoord3.x;											\n\
+		interpUV.y = UVcoord3.y;											\n\
 		break;																\n\
 	}																		\n\
+	interpUV.z = textureIndex;												\n\
 																			\n\
 	interpColor = tint;														\n\
 																			\n\
@@ -102,16 +110,16 @@ const char *szHYQUADBATCH_FRAGMENTSHADER = "								\n\
 #version 330																\n\
 																			\n\
 smooth in vec4 interpColor;													\n\
-smooth in vec2 interpUV;													\n\
+smooth in vec3 interpUV;													\n\
 																			\n\
-uniform sampler2D Tex;														\n\
+uniform sampler2DArray Tex;													\n\
 																			\n\
 out vec4 outputColor;														\n\
 																			\n\
 void main()																	\n\
 {																			\n\
 	// Blend interpColor with whatever texel I get from interpUV			\n\
-	vec4 texelClr = texture2D(Tex, interpUV);								\n\
+	vec4 texelClr = texture(Tex, interpUV);									\n\
 	outputColor = interpColor * texelClr;									\n\
 }";
 

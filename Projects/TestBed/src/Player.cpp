@@ -41,5 +41,5 @@ void Player::Initialize()
 	//m_primBox.Pos().Animate(-1.0f, 0.0f, 5.0f, HyEase::linear);
 
 	m_testSprite.Load();
-	m_testSprite.SetDisplayOrder(1.5);
+	m_testSprite.SetDisplayOrder(150);
 }

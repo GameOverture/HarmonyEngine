@@ -24,6 +24,7 @@ HyTexturedQuad2d::~HyTexturedQuad2d()
 /*virtual*/ void HyTexturedQuad2d::OnDataLoaded()
 {
 	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);
+	m_RenderState.SetTextureHandle(pData->GetAtlasGroup()->GetGfxApiHandle());
 }
 
 /*virtual*/ void HyTexturedQuad2d::Update()
@@ -32,10 +33,9 @@ HyTexturedQuad2d::~HyTexturedQuad2d()
 
 /*virtual*/ void HyTexturedQuad2d::WriteDrawBufferData(char *&pRefDataWritePos)
 {
-	//const HyTexture *pTexture = static_cast<HyTexturedQuad2dData *>(m_pDataPtr)->GetTexture();
+	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);
 
-	HyError("Need texture dimensions");
-	vec2 vSize(1.0f/*pTexture->GetWidth(), pTexture->GetHeight()*/);
+	vec2 vSize(pData->GetAtlasGroup()->GetWidth(), pData->GetAtlasGroup()->GetHeight());
 	vec2 vOffset(m_ptPosition.X(), m_ptPosition.Y());
 
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vSize;
@@ -46,12 +46,10 @@ HyTexturedQuad2d::~HyTexturedQuad2d()
 	*reinterpret_cast<vec4 *>(pRefDataWritePos) = m_vColor.Get();
 	pRefDataWritePos += sizeof(vec4);
 
-	vec2 vUV;
+	*reinterpret_cast<uint32 *>(pRefDataWritePos) = pData->GetTextureIndex();
+	pRefDataWritePos += sizeof(uint32);
 
-	vUV.x = 0.0f;
-	vUV.y = 0.0f;
-	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(vec2);
+	vec2 vUV;
 
 	vUV.x = 1.0f;
 	vUV.y = 0.0f;
@@ -59,11 +57,16 @@ HyTexturedQuad2d::~HyTexturedQuad2d()
 	pRefDataWritePos += sizeof(vec2);
 
 	vUV.x = 0.0f;
+	vUV.y = 0.0f;
+	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
+	pRefDataWritePos += sizeof(vec2);
+
+	vUV.x = 1.0f;
 	vUV.y = 1.0f;
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(vec2);
 
-	vUV.x = 1.0f;
+	vUV.x = 0.0f;
 	vUV.y = 1.0f;
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(vec2);

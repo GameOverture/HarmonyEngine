@@ -19,6 +19,10 @@ class HyTexturedQuad2dData : public IHyData2d
 {
 	friend class HyFactory<HyTexturedQuad2dData>;
 
+	uint32				m_uiTextureId;
+	uint32				m_uiTextureIndex;
+	HyAtlasGroup *		m_pAtlas;
+
 	// Only allow HyFactory instantiate
 	HyTexturedQuad2dData(const std::string &sPath);
 
@@ -26,6 +30,9 @@ public:
 	virtual ~HyTexturedQuad2dData();
 
 	virtual void DoFileLoad();
+
+	HyAtlasGroup *GetAtlasGroup();
+	uint32 GetTextureIndex();
 };
 
 #endif /* __HyTexturedQuad2dData_h__ */
