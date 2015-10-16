@@ -49,7 +49,7 @@ enum eAtlasNodeType
 #define HYGUIPATH_RelSrcDataDir             "src/"
 
 #define HYGUIPATH_RelDataAtlasDir           HYGUIPATH_RelDataDir "Atlas/"
-#define HYGUIPATH_RelDataAtlasFile          HYGUIPATH_RelDataAtlasDir "atlasInfo.json"
+#define HYGUIPATH_DataAtlasFileName         "atlasInfo.json"
 
 #define HYGUIPATH_RelMetaDataTmpDir         HYGUIPATH_RelMetaDataDir "tmp/"
 

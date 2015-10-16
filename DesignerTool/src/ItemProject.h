@@ -10,8 +10,8 @@ class ItemProject : public Item
 {
     friend class WidgetExplorer;
     
-    WidgetAtlasManager *       m_pAtlases;
-    HyPrimitive2d       m_CurAtlas;
+    WidgetAtlasManager *    m_pAtlases;
+    HyPrimitive2d           m_CurAtlas;
     
 public:
     enum eDrawState

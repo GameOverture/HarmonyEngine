@@ -7,13 +7,27 @@
     <x>0</x>
     <y>0</y>
     <width>280</width>
-    <height>433</height>
+    <height>461</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
+    <layout class="QFormLayout" name="formLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Name:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="txtName"/>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
@@ -35,31 +49,31 @@
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sorting of images significantly increases packing effectivity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="currentIndex">
-           <number>4</number>
+           <number>0</number>
           </property>
           <item>
            <property name="text">
+            <string>Largest edges</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Total area</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Widths</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Heights</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>Don't sort</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Width</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Height</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Area</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Max</string>
            </property>
           </item>
          </widget>
@@ -445,7 +459,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_11">
+         <widget class="QPushButton" name="btnMatchTextureWidthHeight">
           <property name="maximumSize">
            <size>
             <width>20</width>

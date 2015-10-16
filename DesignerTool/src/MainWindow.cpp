@@ -132,6 +132,7 @@ void MainWindow::on_actionNewProject_triggered()
 
         ui->explorer->AddItem(ITEM_Project, sProjDirPath, true);
     }
+    delete pDlg;
 }
 
 void MainWindow::on_actionOpenProject_triggered()
@@ -141,7 +142,6 @@ void MainWindow::on_actionOpenProject_triggered()
     {
         ui->explorer->AddItem(ITEM_Project, pDlg->SelectedDir(), true);
     }
-    
     delete pDlg;
 }
 
@@ -181,6 +181,7 @@ void MainWindow::NewItem(eItemType eItem)
         QString sPath = QDir::cleanPath(sSpritePath % pDlg->GetPrefix() % "/" % pDlg->GetName() % HyGlobal::ItemExt(eItem));
         ui->explorer->AddItem(eItem, sPath, true);
     }
+    delete pDlg;
 }
 
 void MainWindow::closeEvent(QCloseEvent * event)

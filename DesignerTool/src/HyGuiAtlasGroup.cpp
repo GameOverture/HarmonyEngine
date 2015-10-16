@@ -14,21 +14,21 @@ HyGuiAtlasGroup::~HyGuiAtlasGroup()
 void HyGuiAtlasGroup::SaveSettings()
 {
     QJsonObject settings;
-    settings.insert("cmbSortOrder", QJsonValue(ui->cmbSortOrder->currentIndex()));
-    settings.insert("sbFrameMarginTop", QJsonValue(ui->sbFrameMarginTop->value()));
-    settings.insert("sbFrameMarginLeft", QJsonValue(ui->sbFrameMarginLeft->value()));
-    settings.insert("sbFrameMarginRight", QJsonValue(ui->sbFrameMarginRight->value()));
-    settings.insert("sbFrameMarginBottom", QJsonValue(ui->sbFrameMarginBottom->value()));
-    settings.insert("extrude", QJsonValue(ui->extrude->value()));
-    settings.insert("chkMerge", QJsonValue(ui->chkMerge->isChecked()));
-    settings.insert("chkSquare", QJsonValue(ui->chkSquare->isChecked()));
-    settings.insert("chkAutosize", QJsonValue(ui->chkAutosize->isChecked()));
-    settings.insert("minFillRate", QJsonValue(ui->minFillRate->value()));
+    settings.insert("cmbSortOrder", QJsonValue(m_dlgSettings->ui->cmbSortOrder->currentIndex()));
+    settings.insert("sbFrameMarginTop", QJsonValue(m_dlgSettings->ui->sbFrameMarginTop->value()));
+    settings.insert("sbFrameMarginLeft", QJsonValue(m_dlgSettings->ui->sbFrameMarginLeft->value()));
+    settings.insert("sbFrameMarginRight", QJsonValue(m_dlgSettings->ui->sbFrameMarginRight->value()));
+    settings.insert("sbFrameMarginBottom", QJsonValue(m_dlgSettings->ui->sbFrameMarginBottom->value()));
+    settings.insert("extrude", QJsonValue(m_dlgSettings->ui->extrude->value()));
+    settings.insert("chkMerge", QJsonValue(m_dlgSettings->ui->chkMerge->isChecked()));
+    settings.insert("chkSquare", QJsonValue(m_dlgSettings->ui->chkSquare->isChecked()));
+    settings.insert("chkAutosize", QJsonValue(m_dlgSettings->ui->chkAutosize->isChecked()));
+    settings.insert("minFillRate", QJsonValue(m_dlgSettings->ui->minFillRate->value()));
     settings.insert("cmbRotationStrategy", QJsonValue(ui->cmbRotationStrategy->currentIndex()));
     
-    settings.insert("sbTextureWidth", QJsonValue(ui->sbTextureWidth->value()));
-    settings.insert("sbTextureHeight", QJsonValue(ui->sbTextureHeight->value()));
-    settings.insert("cmbHeuristic", QJsonValue(ui->cmbHeuristic->currentIndex()));
+    settings.insert("sbTextureWidth", QJsonValue(m_dlgSettings->ui->sbTextureWidth->value()));
+    settings.insert("sbTextureHeight", QJsonValue(m_dlgSettings->ui->sbTextureHeight->value()));
+    settings.insert("cmbHeuristic", QJsonValue(m_dlgSettings->ui->cmbHeuristic->currentIndex()));
     
     
     QFile file(m_MetaDataFile.absoluteFilePath());

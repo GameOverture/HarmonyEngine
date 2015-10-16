@@ -8,9 +8,8 @@
 
 #include <QDirIterator>
 
-WidgetExplorer::WidgetExplorer(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::WidgetExplorer)
+WidgetExplorer::WidgetExplorer(QWidget *parent) :   QWidget(parent),
+                                                    ui(new Ui::WidgetExplorer)
 {
     ui->setupUi(this);
 

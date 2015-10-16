@@ -12,31 +12,28 @@
 #include <QJsonDocument>
 #include <QByteArray>
 
+#include "HyGuiAtlasGroup.h"
 #include "HyGuiTexture.h"
 
-WidgetAtlasManager::WidgetAtlasManager(QWidget *parent /*= 0*/) : QWidget(parent),
-                                                    ui(new Ui::WidgetAtlas),
-                                                    m_pProjOwner(NULL)
+WidgetAtlasManager::WidgetAtlasManager(QWidget *parent /*= 0*/) :   QWidget(parent),
+                                                                    ui(new Ui::WidgetAtlasManager),
+                                                                    m_pProjOwner(NULL)
 {
     ui->setupUi(this);
     
     // NOTE: THIS CONSTRUCTOR IS INVALID TO USE. IT EXISTS FOR QT TO ALLOW Q_OBJECT TO WORK
 }
 
-WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :    QWidget(parent),
-                                                                                ui(new Ui::WidgetAtlas),
-                                                                                m_bSettingsDirty(true),
-                                                                                m_pProjOwner(pProjOwner)
+WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :   QWidget(parent),
+                                                                                             ui(new Ui::WidgetAtlasManager),
+                                                                                             m_pProjOwner(pProjOwner)
 {
     ui->setupUi(this);
     
-    m_DataFile.setFile(m_pProjOwner->GetPath() % HYGUIPATH_RelDataAtlasFile);
     m_MetaDataFile.setFile(m_pProjOwner->GetPath() % HYGUIPATH_RelMetaDataAtlasFile);
     
     ui->frameList->setSelectionMode(QAbstractItemView::MultiSelection);
     
-    // Search for packer settings file. If none exist create one with defaults and show settings page, else load setting from it and show frames page.
-    LoadSettings();
     LoadData();
 }
 
@@ -192,43 +189,6 @@ void WidgetAtlasManager::on_btnAddDir_clicked()
     RenderAtlas();
 }
 
-void WidgetAtlasManager::on_cmbHeuristic_currentIndexChanged(const QString &arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-
-void WidgetAtlasManager::on_cmbSortOrder_currentIndexChanged(const QString &arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void WidgetAtlasManager::on_cmbRotationStrategy_currentIndexChanged(const QString &arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-
-void WidgetAtlasManager::on_sbFrameMarginTop_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void WidgetAtlasManager::on_sbFrameMarginRight_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void WidgetAtlasManager::on_sbFrameMarginBottom_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void WidgetAtlasManager::on_sbFrameMarginLeft_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
 void WidgetAtlasManager::on_tabWidget_currentChanged(int index)
 {
     if(m_bSettingsDirty)
@@ -260,92 +220,66 @@ QTreeWidgetItem *WidgetAtlasManager::CreateTreeItem(QTreeWidgetItem *pParent, QS
     return NULL;
 }
 
-void WidgetAtlasManager::on_btnSaveSettings_clicked()
-{
-    if(m_AtlasGroups.size() == 0)
-        SaveSettings();
-    else if(m_bSettingsDirty)
-    {
-        QMessageBox dlg(QMessageBox::Question, "Harmony Designer Tool", "Atlas texture settings have changed. Would you like to save settings and regenerate all textures?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
-        switch(dlg.exec())
-        {
-        case QMessageBox::Yes:
-            // Save was clicked. Reload every texture with new settings, then show 'frames'
-            SaveSettings();
-            RepackFrames();
-            break;
-        case QMessageBox::No:
-            // Don't Save was clicked. Restore the cached settings and show the 'frames'
-            LoadSettings();
-            break;
-        case QMessageBox::Cancel:
-            // Cancel was clicked. Don't do anything and stay on the 'settings'
-            return;
-        default:
-            // should never be reached
-            break;
-        }
-    }
-    
-    ui->stackedWidget->setCurrentIndex(PAGE_Frames);
-    m_bSettingsDirty = false;
-}
-
-void WidgetAtlasManager::on_btnChangeSettings_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(PAGE_Settings);
-}
-
 void WidgetAtlasManager::LoadData()
 {
-    if(m_DataFile.exists() == false)
+    QDir metaAtlasDir(m_pProjOwner->GetPath() % HYGUIPATH_RelMetaDataAtlasDir);
+
+    QFileInfoList atlasGroupsList = metaAtlasDir.entryInfoList(NoFilter, QDir::Name);
+    if(atlasGroupsList.empty())
     {
-        HYLOG("Atlas data file not found. Generating new one.", LOGTYPE_Info);
-        SaveData();
-        
+        metaAtlasDir.mkdir("00001");
+        m_AtlasGroups.push_back(new HyGuiAtlasGroup());
+
         return;
     }
-    
-    QFileInfoList srcFrameImgList = QDir(m_pProjOwner->GetPath() % HYGUIPATH_RelMetaDataAtlasDir).entryInfoList();
-    
-    QFile dataFile(m_DataFile.absoluteFilePath());
-    if(dataFile.open(QIODevice::ReadOnly))
+
+    for(unsigned int i = 0; i < atlasGroupsList.size(); ++i)
     {
-        QJsonDocument dataJsonDoc = QJsonDocument::fromJson(dataFile.readAll());
-        QJsonObject contents = dataJsonDoc.object();
-        
-        QJsonArray textureArray = contents["textures"].toArray();
-        foreach (const QJsonValue &textureInfo, textureArray)
+        if(atlasGroupsList[i].isDir() == false)
+            continue;
+
+        QFileInfo atlasGrpSettings(atlasGroupsList[i].absolutePath() % HYGUIPATH_DataAtlasFileName);
+        QFile dataFile(atlasGrpSettings.absoluteFilePath());
+        if(dataFile.open(QIODevice::ReadOnly))
         {
-            HyGuiTexture *pNewTexture = new HyGuiTexture(this);
-            
-            QJsonArray srcFramesArray = textureInfo.toObject()["srcFrames"].toArray();
-            foreach(const QJsonValue &frameInfo, srcFramesArray)
+            QJsonDocument dataJsonDoc = QJsonDocument::fromJson(dataFile.readAll());
+            QJsonObject contents = dataJsonDoc.object();
+
+            QJsonArray textureArray = contents["textures"].toArray();
+            foreach (const QJsonValue &textureInfo, textureArray)
             {
-                quint32 uiHash = JSONOBJ_TOINT(frameInfo.toObject(), "hash");
-                foreach(const QFileInfo imgInfo, srcFrameImgList)
+                HyGuiTexture *pNewTexture = new HyGuiTexture(this);
+
+                QJsonArray srcFramesArray = textureInfo.toObject()["srcFrames"].toArray();
+                foreach(const QJsonValue &frameInfo, srcFramesArray)
                 {
-                    QString sImgName = imgInfo.baseName();
-                    quint32 uiTestHash = static_cast<quint32>(sImgName.left(sImgName.indexOf(QChar('-'))).toLongLong());
-                    if(uiHash == uiTestHash)
+                    quint32 uiHash = JSONOBJ_TOINT(frameInfo.toObject(), "hash");
+                    foreach(const QFileInfo imgInfo, srcFrameImgList)
                     {
-                        int iSplitIndex = sImgName.indexOf(QChar('-'));
-                        sImgName = sImgName.right(sImgName.length() - iSplitIndex - 1); // -1 so we don't include the '-'
-                        pNewTexture->LoadFrame(QImage(imgInfo.absoluteFilePath()), uiHash, sImgName, imgInfo.absoluteFilePath());
+                        QString sImgName = imgInfo.baseName();
+                        quint32 uiTestHash = static_cast<quint32>(sImgName.left(sImgName.indexOf(QChar('-'))).toLongLong());
+                        if(uiHash == uiTestHash)
+                        {
+                            int iSplitIndex = sImgName.indexOf(QChar('-'));
+                            sImgName = sImgName.right(sImgName.length() - iSplitIndex - 1); // -1 so we don't include the '-'
+                            pNewTexture->LoadFrame(QImage(imgInfo.absoluteFilePath()), uiHash, sImgName, imgInfo.absoluteFilePath());
+                        }
                     }
+
                 }
-                
+
+                QList<QStringList> unPackedList = pNewTexture->PackFrames();
+                if(unPackedList.empty() == false)
+                    HYLOG("Loading an atlas failed to pack properly", LOGTYPE_Error);
+
+                m_Textures.append(pNewTexture);
             }
-            
-            QList<QStringList> unPackedList = pNewTexture->PackFrames();
-            if(unPackedList.empty() == false)
-                HYLOG("Loading an atlas failed to pack properly", LOGTYPE_Error);
-            
-            m_Textures.append(pNewTexture);
         }
+        else
+            HYLOG("Atlas group settings file not found. Generating new one.", LOGTYPE_Info);
+
+        QFileInfoList atlasGrp = QDir(atlasGroupsList[i].absolutePath())..entryInfoList(NoFilter, QDir::Name);
     }
-    else
-        HYLOG("Could not open: " % m_DataFile.absoluteFilePath(), LOGTYPE_Warning);
 }
 
 void WidgetAtlasManager::SaveData()
@@ -467,4 +401,9 @@ void WidgetAtlasManager::on_frameList_itemDoubleClicked(QTreeWidgetItem *item, i
 void WidgetAtlasManager::on_frameList_itemClicked(QTreeWidgetItem *item, int column)
 {
     RenderAtlas();
+}
+
+void WidgetAtlasManager::on_btnSettings_clicked()
+{
+
 }
