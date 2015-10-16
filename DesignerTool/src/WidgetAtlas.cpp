@@ -50,22 +50,6 @@ WidgetAtlasManager::~WidgetAtlasManager()
     delete ui;
 }
 
-void WidgetAtlasManager::SetPackerSettings(ImagePacker *pPacker)
-{
-    pPacker->sortOrder = ui->cmbSortOrder->currentIndex();
-    pPacker->border.t = ui->sbFrameMarginTop->value();
-    pPacker->border.l = ui->sbFrameMarginLeft->value();
-    pPacker->border.r = ui->sbFrameMarginRight->value();
-    pPacker->border.b = ui->sbFrameMarginBottom->value();
-    pPacker->extrude = ui->extrude->value();
-    pPacker->merge = ui->chkMerge->isChecked();
-    pPacker->square = ui->chkSquare->isChecked();
-    pPacker->autosize = ui->chkAutosize->isChecked();
-    pPacker->minFillRate = ui->minFillRate->value();
-    pPacker->mergeBF = false;
-    pPacker->rotate = ui->cmbRotationStrategy->currentIndex();
-}
-
 int WidgetAtlasManager::GetTexWidth()
 {
     return ui->sbTextureWidth->value();
@@ -324,14 +308,6 @@ void WidgetAtlasManager::SaveData()
 //        HYLOG("Could not write to atlas data file", LOGTYPE_Error);
 //        return;
 //    }
-}
-
-HyGuiTexture *WidgetAtlasManager::GetActiveTexture()
-{
-    if(m_Textures.empty())
-        m_Textures.append(new HyGuiTexture(this));
-    
-    return m_Textures.last();
 }
 
 void WidgetAtlasManager::ImportFrames(QStringList sImportImgList)

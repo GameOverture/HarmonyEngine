@@ -6,7 +6,6 @@
 #include <QList>
 
 #include "ItemProject.h"
-#include "scriptum/imagepacker.h"
 
 namespace Ui {
 class WidgetAtlasManager;
@@ -33,7 +32,6 @@ public:
     void SetProjOwner(ItemProject *pProjOwner)  { m_pProjOwner = pProjOwner; }
     ItemProject *GetProjOwner()                 { return m_pProjOwner; }
     
-    void SetPackerSettings(ImagePacker *pPacker);
     int GetTexWidth();
     int GetTexHeight();
     int GetHeuristicIndex();
@@ -56,12 +54,10 @@ private slots:
     void on_btnSettings_clicked();
 
 private:
-    Ui::WidgetAtlas *ui;
+    Ui::WidgetAtlasManager *ui;
     
     void LoadData();
     void SaveData();
-    
-    HyGuiTexture *GetActiveTexture();
     
     void ImportFrames(QStringList sImportImgList);
     void RepackFrames();

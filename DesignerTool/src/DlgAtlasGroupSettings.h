@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "scriptum/imagepacker.h"
+
 namespace Ui {
 class DlgAtlasGroupSettings;
 }
@@ -41,6 +43,12 @@ private slots:
     void on_btnTexSize2048_clicked();
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
+    
+private:
+    void SetPackerSettings(ImagePacker *pPacker);
+    
+    void SaveSettings();
+    void LoadSettings();
 };
 
 #endif // DLGATLASGROUPSETTINGS_H
