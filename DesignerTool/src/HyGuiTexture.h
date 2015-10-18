@@ -1,5 +1,5 @@
-#ifndef HYGUITEXTURE_H
-#define HYGUITEXTURE_H
+#ifndef HYGUIATLAS_H
+#define HYGUIATLAS_H
 
 #include <QTreeWidgetItem>
 #include <QDir>
@@ -10,17 +10,17 @@
 // Forward declaration
 class WidgetAtlasManager;
 
-class HyGuiTexture
+class HyGuiAtlas
 {
-    class HyGuiFrameData
+    class Frame
     {
-        HyGuiTexture *const m_pTexOwner;
+        HyGuiAtlas *const m_pTexOwner;
         
         int                 m_iTag;         // Used as a temp integer index to an import array, and will become the integer index to what texture it belongs to.
         QTreeWidgetItem *   m_pTreeItem;
         
     public:
-        HyGuiFrameData(HyGuiTexture *const pTexOwner, int iTag, QString sName);
+        Frame(HyGuiAtlas *const pTexOwner, int iTag, QString sName);
         
         int GetTag()            { return m_iTag; }
         void SetTag(int iTag)   { m_iTag = iTag; }
@@ -36,14 +36,15 @@ class HyGuiTexture
     QFileInfo               m_AtlasImg;
     
     ImagePacker             m_Packer;
+
     QTreeWidgetItem *       m_pTreeItem;
     int                     m_iLoadGroup;
     
     bool                    m_bDirty;
     
 public:
-    HyGuiTexture(WidgetAtlasManager *const pAtlasOwner);
-    ~HyGuiTexture();
+    HyGuiAtlas(WidgetAtlasManager *const pAtlasOwner);
+    ~HyGuiAtlas();
     
     bool IsDirty()          { return m_bDirty; }
     
@@ -66,4 +67,4 @@ public:
     void GenerateImg();
 };
 
-#endif // HYGUITEXTURE_H
+#endif // HYGUIATLAS_H

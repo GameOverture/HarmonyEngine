@@ -28,7 +28,6 @@ SOURCES += main.cpp \
     scriptum/imagepacker.cpp \
     scriptum/imagesort.cpp \
     scriptum/maxrects.cpp \
-    WidgetAtlas.cpp \
     WidgetSprite.cpp \
     DlgInputName.cpp \
     ItemProject.cpp \
@@ -38,8 +37,9 @@ SOURCES += main.cpp \
     HyGuiTexture.cpp \
     DlgOpenProject.cpp \
     HyGuiRenderer.cpp \
-    HyGuiAtlasGroup.cpp \
-    DlgAtlasGroupSettings.cpp
+    DlgAtlasGroupSettings.cpp \
+    WidgetAtlasManager.cpp \
+    WidgetAtlasGroup.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -56,7 +56,6 @@ HEADERS  += \
     DlgNewItem.h \
     scriptum/imagepacker.h \
     scriptum/maxrects.h \
-    WidgetAtlas.h \
     WidgetSprite.h \
     DlgInputName.h \
     ItemProject.h \
@@ -66,8 +65,9 @@ HEADERS  += \
     HyGuiTexture.h \
     DlgOpenProject.h \
     HyGuiRenderer.h \
-    HyGuiAtlasGroup.h \
-    DlgAtlasGroupSettings.h
+    DlgAtlasGroupSettings.h \
+    WidgetAtlasManager.h \
+    WidgetAtlasGroup.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -78,13 +78,14 @@ FORMS    += \
     WidgetGlyphCreator.ui \
     WidgetFontMap.ui \
     DlgNewItem.ui \
-    WidgetAtlas.ui \
     WidgetSprite.ui \
     DlgInputName.ui \
     WidgetLiveVariable.ui \
     WidgetLiveVarManager.ui \
     DlgOpenProject.ui \
-    DlgAtlasGroupSettings.ui
+    DlgAtlasGroupSettings.ui \
+    WidgetAtlasManager.ui \
+    WidgetAtlasGroup.ui
 
 Release:DESTDIR = ../release
 Release:OBJECTS_DIR = ../release/.obj

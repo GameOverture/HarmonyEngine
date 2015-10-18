@@ -6,61 +6,20 @@
 #include <QJsonArray>
 
 #include "HyGuiTexture.h"
-#include "WidgetAtlas.h"
+#include "WidgetAtlasManager.h"
 
-quint32 rc_crc32(quint32 crc, const uchar *buf, size_t len)
-{
-    static quint32 table[256];
-    static int have_table = 0;
-    quint32 rem, octet;
-    const uchar *p, *q;
-
-    /* This check is not thread safe; there is no mutex. */
-    if(have_table == 0)
-    {
-        /* Calculate CRC table. */
-        for(int i = 0; i < 256; i++)
-        {
-            rem = i;  /* remainder from polynomial division */
-            for(int j = 0; j < 8; j++)
-            {
-                if(rem & 1)
-                {
-                    rem >>= 1;
-                    rem ^= 0xedb88320;
-                }
-                else
-                {
-                    rem >>= 1;
-                }
-            }
-            table[i] = rem;
-        }
-        have_table = 1;
-    }
-
-    crc = ~crc;
-    q = buf + len;
-    for(p = buf; p < q; p++)
-    {
-        octet = *p;  /* Cast to unsigned octet. */
-        crc = (crc >> 8) ^ table[(crc & 0xff) ^ octet];
-    }
-    return ~crc;
-}
-
-HyGuiTexture::HyGuiFrameData::HyGuiFrameData(HyGuiTexture *const pTexOwner, int iTag, QString sName) :  m_pTexOwner(pTexOwner),
+HyGuiAtlas::Frame::Frame(HyGuiAtlas *const pTexOwner, int iTag, QString sName) :  m_pTexOwner(pTexOwner),
                                                                                                         m_iTag(iTag)
 {
     m_pTreeItem = m_pTexOwner->GetAtlasOwner()->CreateTreeItem(m_pTexOwner->GetTreeItem(), sName, ATLAS_Frame);
 }
 
-HyGuiTexture::HyGuiTexture(WidgetAtlasManager *const pAtlasOwner) :    m_pAtlasOwner(pAtlasOwner),
+HyGuiAtlas::HyGuiAtlas(WidgetAtlasManager *const pAtlasOwner) :    m_pAtlasOwner(pAtlasOwner),
                                                                 m_bDirty(true)
 {
     m_pAtlasOwner->SetPackerSettings(&m_Packer);
     
-    m_MetaDir.setPath(pAtlasOwner->GetProjOwner()->GetPath() % HYGUIPATH_RelMetaDataAtlasDir);
+    m_MetaDir.setPath(pAtlasOwner->GetProjOwner()->GetPath() % HYGUIPATH_RelMetaAtlasDir);
     m_MetaTmpDir.setPath(pAtlasOwner->GetProjOwner()->GetPath() % HYGUIPATH_RelMetaDataTmpDir);
     m_DataDir.setPath(pAtlasOwner->GetProjOwner()->GetPath() % HYGUIPATH_RelDataAtlasDir);
     
@@ -68,15 +27,14 @@ HyGuiTexture::HyGuiTexture(WidgetAtlasManager *const pAtlasOwner) :    m_pAtlasO
     // All textures are named "00000", "00001", "00002", etc.
     int iTexId = pAtlasOwner->GetNextTextureId();
     
-    QString sNewTexName;
-    sNewTexName.sprintf("%05d", iTexId);
+    QString sNewTexName = HyGlobal::MakeFileNameFromCounter(iTexId);
     m_AtlasImg.setFile(m_DataDir.path() % "/" % sNewTexName % ".png");
     
     sNewTexName.sprintf("Texture: %d", iTexId);
     m_pTreeItem = m_pAtlasOwner->CreateTreeItem(NULL, sNewTexName, ATLAS_Texture);
 }
 
-HyGuiTexture::~HyGuiTexture()
+HyGuiAtlas::~HyGuiAtlas()
 {
     // TODO: Remove meta dir for this texture, then rename all other Texture objects (if necessary) to be in order
     
@@ -84,7 +42,7 @@ HyGuiTexture::~HyGuiTexture()
     delete m_pTreeItem;
 }
 
-QJsonArray HyGuiTexture::GetFrameArray()
+QJsonArray HyGuiAtlas::GetFrameArray()
 {
     QJsonArray frameArray;
     
@@ -106,7 +64,7 @@ QJsonArray HyGuiTexture::GetFrameArray()
     return frameArray;
 }
 
-void HyGuiTexture::GenerateImg()
+void HyGuiAtlas::GenerateImg()
 {
     m_bDirty = false;
     
@@ -211,7 +169,7 @@ void HyGuiTexture::GenerateImg()
 
 // Returns a list of string lists that contain all the image paths that didn't fit on this texture
 // Each entry in the QList are hints towards what new texture each missing image belongs to.
-QList<QStringList> HyGuiTexture::ImportFrames(const QStringList sImportImgPathList)
+QList<QStringList> HyGuiAtlas::ImportFrames(const QStringList sImportImgPathList)
 {
     m_pAtlasOwner->SetPackerSettings(&m_Packer);
     
@@ -235,18 +193,18 @@ QList<QStringList> HyGuiTexture::ImportFrames(const QStringList sImportImgPathLi
     return PackFrames();
 }
 
-void HyGuiTexture::LoadFrame(const QImage &img, quint32 uiHash, QString sName, QString sAbsolutePath, bool bSetPackerSettings /*= true*/)
+void HyGuiAtlas::LoadFrame(const QImage &img, quint32 uiHash, QString sName, QString sAbsolutePath, bool bSetPackerSettings /*= true*/)
 {
     if(bSetPackerSettings)
         m_pAtlasOwner->SetPackerSettings(&m_Packer);
     
-    m_Packer.addItem(img, uiHash, new HyGuiFrameData(this, -1, sName), sAbsolutePath);
+    m_Packer.addItem(img, uiHash, new Frame(this, -1, sName), sAbsolutePath);
 }
 
 // Returns a list of string lists that contain all the image paths that didn't fit on this texture
 // The _metaData source images will be moved to the _metaData's "tmp" directory.
 // Each entry in the QList are hints towards what additional texture each missing image could belong to.
-QList<QStringList> HyGuiTexture::PackFrames()
+QList<QStringList> HyGuiAtlas::PackFrames()
 {
     m_Packer.pack(m_pAtlasOwner->GetHeuristicIndex(), m_pAtlasOwner->GetTexWidth(), m_pAtlasOwner->GetTexHeight());
     
@@ -277,7 +235,7 @@ QList<QStringList> HyGuiTexture::PackFrames()
                     HYLOG("Could not move image src metafile to tmp directory: " % m_Packer.images[i].path, LOGTYPE_Warning);
                 
                 // Remove the inputImage from packer and delete the HyGuiFrameData (aka inputImage's id)
-                HyGuiFrameData *pData = static_cast<HyGuiFrameData *>(m_Packer.images[i].id);
+                Frame *pData = static_cast<Frame *>(m_Packer.images[i].id);
                 m_Packer.removeId(pData);
                 delete pData;
             }

@@ -10,7 +10,7 @@ class ItemProject : public Item
 {
     friend class WidgetExplorer;
     
-    WidgetAtlasManager *    m_pAtlases;
+    WidgetAtlasManager *    m_pAtlasManager;
     HyPrimitive2d           m_CurAtlas;
     
 public:
@@ -28,7 +28,8 @@ private:
 public:
     ~ItemProject();
     
-    WidgetAtlasManager *GetAtlasWidget()       { return m_pAtlases; }
+    WidgetAtlasManager *GetAtlasManager()               { return m_pAtlasManager; }
+    QString GetPath(QString sAppendRelativePath) const  { return m_sPath % sAppendRelativePath; }
     
     virtual void Hide();
     virtual void Show();

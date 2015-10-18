@@ -20,6 +20,12 @@ public:
     ~DlgAtlasGroupSettings();
     
     Ui::DlgAtlasGroupSettings *ui;
+
+    void SetPackerSettings(ImagePacker *pPacker);
+
+    QJsonObject GetSettings();
+    void LoadSettings(QJsonObject settings);
+
 private slots:
     void on_cmbSortOrder_currentIndexChanged(int index);
     void on_cmbRotationStrategy_currentIndexChanged(int index);
@@ -43,12 +49,6 @@ private slots:
     void on_btnTexSize2048_clicked();
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
-    
-private:
-    void SetPackerSettings(ImagePacker *pPacker);
-    
-    void SaveSettings();
-    void LoadSettings();
 };
 
 #endif // DLGATLASGROUPSETTINGS_H

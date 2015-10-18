@@ -1,15 +1,15 @@
 #include "ItemProject.h"
-#include "WidgetAtlas.h"
+#include "WidgetAtlasManager.h"
 
 ItemProject::ItemProject(const QString sPath) : Item(ITEM_Project, sPath),
                                                 m_eState(DRAWSTATE_AtlasManager)
 {
-    m_pAtlases = new WidgetAtlasManager(this);
+    m_pAtlasManager = new WidgetAtlasManager(this);
 }
 
 ItemProject::~ItemProject()
 {
-    delete m_pAtlases;
+    delete m_pAtlasManager;
 }
 
 /*virtual*/ void ItemProject::Hide()

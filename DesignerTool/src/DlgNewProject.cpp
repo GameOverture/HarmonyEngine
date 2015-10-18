@@ -42,7 +42,7 @@ void DlgNewProject::on_buttonBox_accepted()
     projDir.mkdir(HYGUIPATH_RelDataDir);
     projDir.mkdir(HYGUIPATH_RelDataAtlasDir);
     projDir.mkdir(HYGUIPATH_RelMetaDataDir);
-    projDir.mkdir(HYGUIPATH_RelMetaDataAtlasDir);
+    projDir.mkdir(HYGUIPATH_RelMetaAtlasDir);
     
     // TODO: Create code projects
     projDir.mkdir(HYGUIPATH_RelSrcDataDir);

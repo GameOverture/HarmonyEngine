@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -45,7 +45,7 @@
           <item>
            <widget class="QToolBox" name="toolBox_2">
             <property name="currentIndex">
-             <number>2</number>
+             <number>1</number>
             </property>
             <property name="tabSpacing">
              <number>0</number>
@@ -186,11 +186,27 @@
              </attribute>
             </widget>
             <widget class="QWidget" name="page_3">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>285</width>
+               <height>33</height>
+              </rect>
+             </property>
              <attribute name="label">
               <string>Page</string>
              </attribute>
             </widget>
             <widget class="QWidget" name="page_4">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>285</width>
+               <height>33</height>
+              </rect>
+             </property>
              <attribute name="label">
               <string>Page</string>
              </attribute>
@@ -253,8 +269,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>100</width>
-                   <height>30</height>
+                   <width>98</width>
+                   <height>28</height>
                   </rect>
                  </property>
                  <attribute name="label">
@@ -279,8 +295,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>100</width>
-                   <height>30</height>
+                   <width>98</width>
+                   <height>28</height>
                   </rect>
                  </property>
                  <attribute name="label">
@@ -305,8 +321,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>100</width>
-                   <height>30</height>
+                   <width>98</width>
+                   <height>28</height>
                   </rect>
                  </property>
                  <attribute name="label">
@@ -339,7 +355,7 @@
               <item>
                <widget class="QToolBox" name="toolBox_4">
                 <property name="currentIndex">
-                 <number>2</number>
+                 <number>1</number>
                 </property>
                 <property name="tabSpacing">
                  <number>0</number>
@@ -349,8 +365,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>100</width>
-                   <height>30</height>
+                   <width>248</width>
+                   <height>83</height>
                   </rect>
                  </property>
                  <attribute name="label">
@@ -375,8 +391,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>100</width>
-                   <height>30</height>
+                   <width>248</width>
+                   <height>83</height>
                   </rect>
                  </property>
                  <attribute name="label">
@@ -401,8 +417,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>100</width>
-                   <height>30</height>
+                   <width>98</width>
+                   <height>28</height>
                   </rect>
                  </property>
                  <attribute name="label">

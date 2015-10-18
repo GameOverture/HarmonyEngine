@@ -53,8 +53,8 @@ enum eAtlasNodeType
 
 #define HYGUIPATH_RelMetaDataTmpDir         HYGUIPATH_RelMetaDataDir "tmp/"
 
-#define HYGUIPATH_RelMetaDataAtlasDir       HYGUIPATH_RelMetaDataDir "atlas/"
-#define HYGUIPATH_RelMetaDataAtlasFile      HYGUIPATH_RelMetaDataAtlasDir "settings.hygui"
+#define HYGUIPATH_RelMetaAtlasDir       HYGUIPATH_RelMetaDataDir "atlas/"
+#define HYGUIPATH_MetaDataAtlasFileName     "settings.hygui"
 
 class HyGlobal
 {
@@ -179,13 +179,62 @@ public:
         if(!dir.exists(HYGUIPATH_RelMetaDataDir))
             return false;
         
-        if(!dir.exists(HYGUIPATH_RelMetaDataAtlasDir))
+        if(!dir.exists(HYGUIPATH_RelMetaAtlasDir))
             return false;
 
         if(!dir.exists(HYGUIPATH_RelSrcDataDir))
             return false;
         
         return true;
+    }
+
+    static quint32 CRCData(quint32 crc, const uchar *buf, size_t len)
+    {
+        static quint32 table[256];
+        static int have_table = 0;
+        quint32 rem, octet;
+        const uchar *p, *q;
+
+        /* This check is not thread safe; there is no mutex. */
+        if(have_table == 0)
+        {
+            /* Calculate CRC table. */
+            for(int i = 0; i < 256; i++)
+            {
+                rem = i;  /* remainder from polynomial division */
+                for(int j = 0; j < 8; j++)
+                {
+                    if(rem & 1)
+                    {
+                        rem >>= 1;
+                        rem ^= 0xedb88320;
+                    }
+                    else
+                    {
+                        rem >>= 1;
+                    }
+                }
+                table[i] = rem;
+            }
+            have_table = 1;
+        }
+
+        crc = ~crc;
+        q = buf + len;
+        for(p = buf; p < q; p++)
+        {
+            octet = *p;  /* Cast to unsigned octet. */
+            crc = (crc >> 8) ^ table[(crc & 0xff) ^ octet];
+        }
+        return ~crc;
+    }
+
+    static QString MakeFileNameFromCounter(int iCount)
+    {
+        QString sNewString;
+        sNewString.sprintf("%05d", iCount);
+
+        return sNewString;
     }
 };
 
