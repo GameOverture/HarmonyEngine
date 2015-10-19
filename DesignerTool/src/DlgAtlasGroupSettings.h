@@ -19,7 +19,8 @@ public:
     explicit DlgAtlasGroupSettings(QWidget *parent = 0);
     ~DlgAtlasGroupSettings();
     
-    Ui::DlgAtlasGroupSettings *ui;
+    int TextureWidth();
+    int TextureHeight();
 
     void SetPackerSettings(ImagePacker *pPacker);
 
@@ -49,6 +50,9 @@ private slots:
     void on_btnTexSize2048_clicked();
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
+
+private:
+    Ui::DlgAtlasGroupSettings *ui;
 };
 
 #endif // DLGATLASGROUPSETTINGS_H

@@ -171,10 +171,10 @@ void WidgetAtlasManager::LoadData()
 
 void WidgetAtlasManager::SaveData()
 {
-    QJsonDocument atlasInfoDoc;
+//    QJsonDocument atlasInfoDoc;
 
-    QJsonArray atlasGroupArray;
-    // Fill out array
+//    QJsonArray atlasGroupArray;
+//    // Fill out array
 
-    atlasInfoDoc.setArray(atlasGroupArray);
+//    atlasInfoDoc.setArray(atlasGroupArray);
 }

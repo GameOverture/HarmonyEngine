@@ -19,6 +19,16 @@ DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
     delete ui;
 }
 
+int DlgAtlasGroupSettings::TextureWidth()
+{
+    return ui->sbTextureWidth->value();
+}
+
+int DlgAtlasGroupSettings::TextureHeight()
+{
+    return ui->sbTextureHeight->value();
+}
+
 void DlgAtlasGroupSettings::SetPackerSettings(ImagePacker *pPacker)
 {
     pPacker->sortOrder = ui->cmbSortOrder->currentIndex();

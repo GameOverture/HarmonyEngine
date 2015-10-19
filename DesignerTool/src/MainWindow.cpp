@@ -7,7 +7,6 @@
 #include "DlgInputName.h"
 
 #include "WidgetExplorer.h"
-#include "WidgetAtlas.h"
 
 #include "ItemSprite.h"
 
