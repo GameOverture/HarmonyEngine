@@ -14,7 +14,7 @@ namespace Ui {
 class WidgetAtlasGroup;
 }
 
-struct Image
+struct HyGuiFrame
 {
     quint32             uiHash;
     QString             sName;
@@ -27,7 +27,7 @@ struct Image
     QStringList         sLinks;
     QTreeWidgetItem *   pTreeItem;
 
-    Image(quint32 uiCRC, QString sN, int iW, int iH, bool bRot, int iX, int iY) :   uiHash(uiCRC),
+    HyGuiFrame(quint32 uiCRC, QString sN, int iW, int iH, bool bRot, int iX, int iY) :   uiHash(uiCRC),
                                                                                     sName(sN),
                                                                                     iWidth(iW),
                                                                                     iHeight(iH),
@@ -56,21 +56,24 @@ struct Image
         pTreeItem->setData(0, QTreeWidgetItem::UserType, v);
     }
 };
-Q_DECLARE_METATYPE(Image *)
+Q_DECLARE_METATYPE(HyGuiFrame *)
 
 class WidgetAtlasGroup : public QWidget
 {
     Q_OBJECT
 
-    QDir                    m_MetaDir;
-    DlgAtlasGroupSettings   m_dlgSettings;
+    QDir                        m_MetaDir;
+    QDir                        m_DataDir;
+
+    DlgAtlasGroupSettings       m_dlgSettings;
     
-    QList<Image *>          m_ImageList;
-    ImagePacker             m_Packer;
+    QList<QTreeWidgetItem *>    m_TextureList;
+    QList<HyGuiFrame *>         m_ImageList;
+    ImagePacker                 m_Packer;
 
 public:
     explicit WidgetAtlasGroup(QWidget *parent = 0);
-    explicit WidgetAtlasGroup(QDir metaDir, QWidget *parent = 0);
+    explicit WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent = 0);
     ~WidgetAtlasGroup();
 
     QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType);

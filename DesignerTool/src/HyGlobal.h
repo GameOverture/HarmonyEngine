@@ -38,6 +38,7 @@ enum eAtlasNodeType
 {
     ATLAS_Texture = 0,
     ATLAS_Frame,
+    ATLAS_Frame_Warning,
     ATLAS_Spine,
     ATLAS_Font,
     
@@ -113,7 +114,8 @@ public:
         sm_ItemIcons[ITEM_Entity].addFile(QString(":/icons16x16/entity-document.png"));
         
         sm_AtlasIcons[ATLAS_Texture].addFile(QString(":/icons16x16/atlas-document.png"));
-        sm_AtlasIcons[ATLAS_Frame].addFile(QString(":/icons16x16/atlas-document.png"));
+        sm_AtlasIcons[ATLAS_Frame].addFile(QString(":/icons16x16/atlas-frame.png"));
+        sm_AtlasIcons[ATLAS_Frame_Warning].addFile(QString(":/icons16x16/atlas-frameWarning.png"));
         sm_AtlasIcons[ATLAS_Spine].addFile(QString(":/icons16x16/spine-document.png"));
         sm_AtlasIcons[ATLAS_Font].addFile(QString(":/icons16x16/font-document.png"));
 

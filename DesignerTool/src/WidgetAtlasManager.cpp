@@ -32,24 +32,24 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
         return;
     }
 
-    QFileInfoList atlasDirs = m_MetaDir.entryInfoList(QDir::Dirs, QDir::Name);
-    if(atlasDirs.empty())
+    QFileInfoList metaAtlasDirs = m_MetaDir.entryInfoList(QDir::Dirs, QDir::Name);
+    if(metaAtlasDirs.empty())
     {
         HYLOG("Empty atlas directory, creating new empty group", LOGTYPE_Info);
-        MakeNewAtlasGroup();
-        SaveData();
-        return;
+        AddAtlasGroup();
     }
-    
-    foreach(QFileInfo info, atlasDirs)
+    else
     {
-        if(info.isDir())
+        foreach(QFileInfo dir, metaAtlasDirs)
         {
-            bool bWorked = false;
-            int iId = info.baseName().toInt(&bWorked);
-            
-            if(bWorked && iId >= 0)
-                MakeNewAtlasGroup(iId);
+            if(dir.isDir())
+            {
+                bool bWorked = false;
+                int iId = dir.baseName().toInt(&bWorked);
+
+                if(bWorked && iId >= 0)
+                    AddAtlasGroup(iId);
+            }
         }
     }
 
@@ -78,33 +78,38 @@ WidgetAtlasManager::~WidgetAtlasManager()
     delete ui;
 }
 
-void WidgetAtlasManager::MakeNewAtlasGroup(int iId /*= -1*/)
+void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
 {
-    // Find first available directory name
-    QFileInfoList atlasDirs = m_MetaDir.entryInfoList(QDir::Dirs, QDir::Name);
-    
     if(iId == -1)
     {
+        // Find first available directory name
         iId = 0;
+        QFileInfoList atlasDirs = m_MetaDir.entryInfoList(QDir::Dirs, QDir::Name);
         foreach(QFileInfo info, atlasDirs)
         {
             if(info.isDir() && info.baseName().toInt() == iId)
                 iId++;
         }
         
+        // Make new atlas group in both meta and data directories
         if(false == m_MetaDir.mkdir(HyGlobal::MakeFileNameFromCounter(iId)))
-        {
-            HYLOG("Failed to create new meta-atlas directory", LOGTYPE_Error);
-        }
+            HYLOG("Failed to create new meta-atlas directory", LOGTYPE_Error)
         else
-        {
-            HYLOG("Created new atlas group: " + iId, LOGTYPE_Info);
-        }
+            HYLOG("Created new meta-atlas group: " + iId, LOGTYPE_Info)
+
+        if(false == m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(iId)))
+            HYLOG("Failed to create new data-atlas directory", LOGTYPE_Error)
+        else
+            HYLOG("Created new data-atlas group: " + iId, LOGTYPE_Info)
     }
     
     QDir newMetaAtlasDir(m_MetaDir);
     newMetaAtlasDir.cd(HyGlobal::MakeFileNameFromCounter(iId));
-    m_AtlasGroups.insert(iId, new WidgetAtlasGroup(newMetaAtlasDir, this));
+
+    QDir newDataAtlasDir(m_DataDir);
+    newDataAtlasDir.cd(HyGlobal::MakeFileNameFromCounter(iId));
+
+    ui->atlasGroups->addWidget(new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this));
 }
 
 void WidgetAtlasManager::LoadData()

@@ -20,8 +20,6 @@ class WidgetAtlasManager : public QWidget
     QDir                            m_MetaDir;
     QDir                            m_DataDir;
 
-    QMap<int, WidgetAtlasGroup *>   m_AtlasGroups;
-
 public:
     explicit WidgetAtlasManager(QWidget *parent = 0);
     explicit WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent = 0);
@@ -30,7 +28,7 @@ public:
 private:
     Ui::WidgetAtlasManager *ui;
 
-    void MakeNewAtlasGroup(int iId = -1);
+    void AddAtlasGroup(int iId = -1);
 
     void LoadData();
     void SaveData();

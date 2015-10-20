@@ -30,6 +30,7 @@ public:
     
     WidgetAtlasManager *GetAtlasManager()               { return m_pAtlasManager; }
     QString GetPath(QString sAppendRelativePath) const  { return m_sPath % sAppendRelativePath; }
+    QString GetPath() const                             { return m_sPath; }
     
     virtual void Hide();
     virtual void Show();

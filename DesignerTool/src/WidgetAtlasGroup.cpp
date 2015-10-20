@@ -17,54 +17,53 @@ WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
     HYLOG("WidgetAtlasGroup::WidgetAtlasGroup() invalid constructor used", LOGTYPE_Error);
 }
 
-WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QWidget *parent) : QWidget(parent),
-                                                                    m_MetaDir(metaDir),
-                                                                    ui(new Ui::WidgetAtlasGroup)
+WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) :   QWidget(parent),
+                                                                                    m_MetaDir(metaDir),
+                                                                                    m_DataDir(dataDir),
+                                                                                    ui(new Ui::WidgetAtlasGroup)
 {
     ui->setupUi(this);
 
     ui->atlasList->setSelectionMode(QAbstractItemView::MultiSelection);
 
-    QFileInfoList metaFileList = m_MetaDir.entryInfoList();
-    foreach(QFileInfo info, metaFileList)
+    QFile metaAtlasFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaDataAtlasFileName));
+    if(metaAtlasFile.exists())
     {
-        if(info.isFile() && info.fileName() == HYGUIPATH_MetaDataAtlasFileName)
+        QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
+        metaAtlasFile.close();
+
+        QJsonObject settingsObj = settingsDoc.object();
+        m_dlgSettings.LoadSettings(settingsObj);
+
+        QJsonArray frameArray = settingsObj["frames"].toArray();
+        for(int i = 0; i < frameArray.size(); ++i)
         {
-            QFile file(info.absoluteFilePath());
-            QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(file.readAll());
-            file.close();
+            QJsonObject frameObj = frameArray[i].toObject();
 
-            QJsonObject settingsObj = settingsDoc.object();
-            m_dlgSettings.LoadSettings(settingsObj);
+            HyGuiFrame newImage(frameObj["hash"].toInt(),
+                               frameObj["name"].toString(),
+                               frameObj["width"].toInt(),
+                               frameObj["height"].toInt(),
+                               frameObj["rotate"].toBool(),
+                               frameObj["x"].toInt(),
+                               frameObj["y"].toInt());
 
-            QJsonArray textureArray = settingsObj["textures"].toArray();
-            for(unsigned int i = 0; i < textureArray.size(); ++i)
+            QJsonArray frameLinksArray = frameObj["links"].toArray();
+            for(int k = 0; k < frameLinksArray.size(); ++k)
+                newImage.SetLink(frameLinksArray[k].toString());
+
+            QTreeWidgetItem *pTextureTreeItem = NULL;
+            eAtlasNodeType eIconType = ATLAS_Frame_Warning;
+            if(frameObj["textureIndex"].toInt() >= 0)
             {
-                QString sTexName("Texture: ");
-                sTexName += HyGlobal::MakeFileNameFromCounter(i);
+                while(m_TextureList.empty() || m_TextureList.size() <= frameObj["textureIndex"].toInt())
+                    m_TextureList.append(CreateTreeItem(NULL, QString("Texture: " + m_TextureList.size()), ATLAS_Texture));
 
-                QTreeWidgetItem *pTextureTreeItem = CreateTreeItem(NULL, sTexName, ATLAS_Texture);
-
-                QJsonArray frameArray = textureArray[i].toArray();
-                for(unsigned int j = 0; j < frameArray.size(); ++j)
-                {
-                    QJsonObject frameObj = frameArray[j].toObject();
-
-                    Image newImage(frameObj["hash"].toInt(),
-                                   frameObj["name"].toString(),
-                                   frameObj["width"].toInt(),
-                                   frameObj["height"].toInt(),
-                                   frameObj["rotate"].toBool(),
-                                   frameObj["x"].toInt(),
-                                   frameObj["y"].toInt());
-
-                    QJsonArray frameLinksArray = frameObj["links"].toArray();
-                    for(unsigned int k = 0; k < frameLinksArray.size(); ++k)
-                        newImage.SetLink(frameLinksArray[k].toString());
-
-                    newImage.SetTreeWidgetItem(CreateTreeItem(pTextureTreeItem, frameObj["name"].toString(), ATLAS_Frame));
-                }
+                pTextureTreeItem = m_TextureList[frameObj["textureIndex"].toInt()];
+                eIconType = ATLAS_Frame;
             }
+
+            newImage.SetTreeWidgetItem(CreateTreeItem(pTextureTreeItem, frameObj["name"].toString(), eIconType));
         }
     }
 }
@@ -198,103 +197,106 @@ void WidgetAtlasGroup::Refresh()
     // Display texture
     //RenderAtlas();
 
-    QImage imgTexture(m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight(), QImage::Format_ARGB32);
-    imgTexture.fill(Qt::transparent);
-
     if(m_Packer.bins.size() == 0)
-    {
-        imgTexture.save(m_AtlasImg.absoluteFilePath());
         return;
-    }
 
-    HyAssert(m_pAtlasOwner->GetTexWidth() == m_Packer.bins[0].width() && m_pAtlasOwner->GetTexHeight() == m_Packer.bins[0].height(), "Mismatching texture dimentions");
-
-    QPainter p(&imgTexture);
-    for(int i = 0; i < m_Packer.images.size(); ++i)
+    for(int iBinIndex = 0; iBinIndex < m_Packer.bins.size(); ++iBinIndex)
     {
-        inputImage &imgInfoRef = m_Packer.images[i];
+        if(m_dlgSettings.TextureWidth() == m_Packer.bins[iBinIndex].width() || m_dlgSettings.TextureHeight() == m_Packer.bins[iBinIndex].height())
+            HYLOG("WidgetAtlasGroup::Refresh() Mismatching texture dimentions", LOGTYPE_Error);
 
-        if(imgInfoRef.duplicateId != NULL && m_Packer.merge)
+        QImage imgTexture(m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight(), QImage::Format_ARGB32);
+        imgTexture.fill(Qt::transparent);
+
+
+        QPainter p(&imgTexture);
+        for(int i = 0; i < m_Packer.images.size(); ++i)
         {
-            continue;
-        }
+            inputImage &imgInfoRef = m_Packer.images[i];
 
-        QSize size;
-        QRect crop;
-        QPoint pos(imgInfoRef.pos.x() + m_Packer.border.l, imgInfoRef.pos.y() + m_Packer.border.t);
+            if(imgInfoRef.textureId != iBinIndex)
+                continue;
 
-        if(!m_Packer.cropThreshold)
-        {
-            size = imgInfoRef.size;
-            crop = QRect(0, 0, size.width(), size.height());
-        }
-        else
-        {
-            size = imgInfoRef.crop.size();
-            crop = imgInfoRef.crop;
-        }
+            if(imgInfoRef.duplicateId != NULL && m_Packer.merge)
+                continue;
 
-        QImage imgFrame(imgInfoRef.path);
+            QSize size;
+            QRect crop;
+            QPoint pos(imgInfoRef.pos.x() + m_Packer.border.l, imgInfoRef.pos.y() + m_Packer.border.t);
 
-        if(imgInfoRef.rotated)
-        {
-            QTransform rotateTransform;
-            rotateTransform.rotate(90);
-            imgFrame = imgFrame.transformed(rotateTransform);
-
-            size.transpose();
-            crop = QRect(imgInfoRef.size.height() - crop.y() - crop.height(),
-                         crop.x(), crop.height(), crop.width());
-        }
-
-        if(m_Packer.extrude)
-        {
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            QColor color1 = QColor::fromRgba(imgFrame.pixel(crop.x(), crop.y()));
-            p.setPen(color1);
-            p.setBrush(color1);
-            if(m_Packer.extrude == 1)
-                p.drawPoint(QPoint(pos.x(), pos.y()));
+            if(!m_Packer.cropThreshold)
+            {
+                size = imgInfoRef.size;
+                crop = QRect(0, 0, size.width(), size.height());
+            }
             else
-                p.drawRect(QRect(pos.x(), pos.y(), m_Packer.extrude - 1, m_Packer.extrude - 1));
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            QColor color2 = QColor::fromRgba(imgFrame.pixel(crop.x(), crop.y() + crop.height() - 1));
-            p.setPen(color2);
-            p.setBrush(color2);
-            if(m_Packer.extrude == 1)
-                p.drawPoint(QPoint(pos.x(), pos.y() + crop.height() + m_Packer.extrude));
-            else
-                p.drawRect(QRect(pos.x(), pos.y() + crop.height() + m_Packer.extrude, m_Packer.extrude - 1, m_Packer.extrude - 1));
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            QColor color3 = QColor::fromRgba(imgFrame.pixel(crop.x() + crop.width() - 1, crop.y()));
-            p.setPen(color3);
-            p.setBrush(color3);
-            if(m_Packer.extrude == 1)
-                p.drawPoint(QPoint(pos.x() + crop.width() + m_Packer.extrude, pos.y()));
-            else
-                p.drawRect(QRect(pos.x() + crop.width() + m_Packer.extrude, pos.y(), m_Packer.extrude - 1, m_Packer.extrude - 1));
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            QColor color4 = QColor::fromRgba(imgFrame.pixel(crop.x() + crop.width() - 1, crop.y() + crop.height() - 1));
-            p.setPen(color4);
-            p.setBrush(color4);
-            if(m_Packer.extrude == 1)
-                p.drawPoint(QPoint(pos.x() + crop.width() + m_Packer.extrude, pos.y() + crop.height() + m_Packer.extrude));
-            else
-                p.drawRect(QRect(pos.x() + crop.width() + m_Packer.extrude, pos.y() + crop.height() + m_Packer.extrude, m_Packer.extrude - 1, m_Packer.extrude - 1));
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            {
+                size = imgInfoRef.crop.size();
+                crop = imgInfoRef.crop;
+            }
 
-            p.drawImage(QRect(pos.x(), pos.y() + m_Packer.extrude, m_Packer.extrude, crop.height()), imgFrame, QRect(crop.x(), crop.y(), 1, crop.height()));
-            p.drawImage(QRect(pos.x() + crop.width() + m_Packer.extrude, pos.y() + m_Packer.extrude, m_Packer.extrude, crop.height()), imgFrame, QRect(crop.x() + crop.width() - 1, crop.y(), 1, crop.height()));
-            p.drawImage(QRect(pos.x() + m_Packer.extrude, pos.y(), crop.width(), m_Packer.extrude), imgFrame, QRect(crop.x(), crop.y(), crop.width(), 1));
-            p.drawImage(QRect(pos.x() + m_Packer.extrude, pos.y() + crop.height() + m_Packer.extrude, crop.width(), m_Packer.extrude), imgFrame, QRect(crop.x(), crop.y() + crop.height() - 1, crop.width(), 1));
+            QImage imgFrame(imgInfoRef.path);
 
-            p.drawImage(pos.x() + m_Packer.extrude, pos.y() + m_Packer.extrude, imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
+            if(imgInfoRef.rotated)
+            {
+                QTransform rotateTransform;
+                rotateTransform.rotate(90);
+                imgFrame = imgFrame.transformed(rotateTransform);
+
+                size.transpose();
+                crop = QRect(imgInfoRef.size.height() - crop.y() - crop.height(),
+                             crop.x(), crop.height(), crop.width());
+            }
+
+            if(m_Packer.extrude)
+            {
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                QColor color1 = QColor::fromRgba(imgFrame.pixel(crop.x(), crop.y()));
+                p.setPen(color1);
+                p.setBrush(color1);
+                if(m_Packer.extrude == 1)
+                    p.drawPoint(QPoint(pos.x(), pos.y()));
+                else
+                    p.drawRect(QRect(pos.x(), pos.y(), m_Packer.extrude - 1, m_Packer.extrude - 1));
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                QColor color2 = QColor::fromRgba(imgFrame.pixel(crop.x(), crop.y() + crop.height() - 1));
+                p.setPen(color2);
+                p.setBrush(color2);
+                if(m_Packer.extrude == 1)
+                    p.drawPoint(QPoint(pos.x(), pos.y() + crop.height() + m_Packer.extrude));
+                else
+                    p.drawRect(QRect(pos.x(), pos.y() + crop.height() + m_Packer.extrude, m_Packer.extrude - 1, m_Packer.extrude - 1));
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                QColor color3 = QColor::fromRgba(imgFrame.pixel(crop.x() + crop.width() - 1, crop.y()));
+                p.setPen(color3);
+                p.setBrush(color3);
+                if(m_Packer.extrude == 1)
+                    p.drawPoint(QPoint(pos.x() + crop.width() + m_Packer.extrude, pos.y()));
+                else
+                    p.drawRect(QRect(pos.x() + crop.width() + m_Packer.extrude, pos.y(), m_Packer.extrude - 1, m_Packer.extrude - 1));
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                QColor color4 = QColor::fromRgba(imgFrame.pixel(crop.x() + crop.width() - 1, crop.y() + crop.height() - 1));
+                p.setPen(color4);
+                p.setBrush(color4);
+                if(m_Packer.extrude == 1)
+                    p.drawPoint(QPoint(pos.x() + crop.width() + m_Packer.extrude, pos.y() + crop.height() + m_Packer.extrude));
+                else
+                    p.drawRect(QRect(pos.x() + crop.width() + m_Packer.extrude, pos.y() + crop.height() + m_Packer.extrude, m_Packer.extrude - 1, m_Packer.extrude - 1));
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                p.drawImage(QRect(pos.x(), pos.y() + m_Packer.extrude, m_Packer.extrude, crop.height()), imgFrame, QRect(crop.x(), crop.y(), 1, crop.height()));
+                p.drawImage(QRect(pos.x() + crop.width() + m_Packer.extrude, pos.y() + m_Packer.extrude, m_Packer.extrude, crop.height()), imgFrame, QRect(crop.x() + crop.width() - 1, crop.y(), 1, crop.height()));
+                p.drawImage(QRect(pos.x() + m_Packer.extrude, pos.y(), crop.width(), m_Packer.extrude), imgFrame, QRect(crop.x(), crop.y(), crop.width(), 1));
+                p.drawImage(QRect(pos.x() + m_Packer.extrude, pos.y() + crop.height() + m_Packer.extrude, crop.width(), m_Packer.extrude), imgFrame, QRect(crop.x(), crop.y() + crop.height() - 1, crop.width(), 1));
+
+                p.drawImage(pos.x() + m_Packer.extrude, pos.y() + m_Packer.extrude, imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
+            }
+            else
+                p.drawImage(pos.x(), pos.y(), imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
         }
-        else
-            p.drawImage(pos.x(), pos.y(), imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
+
+        imgTexture.save(m_DataDir.absolutePath() % "/" % HyGlobal::MakeFileNameFromCounter(iBinIndex) % ".png");
     }
-
-    imgTexture.save(m_AtlasImg.absoluteFilePath());
 }
 
 QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType)
