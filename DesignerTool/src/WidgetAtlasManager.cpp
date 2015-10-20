@@ -32,7 +32,7 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
         return;
     }
 
-    QFileInfoList metaAtlasDirs = m_MetaDir.entryInfoList(QDir::Dirs, QDir::Name);
+    QFileInfoList metaAtlasDirs = m_MetaDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     if(metaAtlasDirs.empty())
     {
         HYLOG("Empty atlas directory, creating new empty group", LOGTYPE_Info);
@@ -110,6 +110,7 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
     newDataAtlasDir.cd(HyGlobal::MakeFileNameFromCounter(iId));
 
     ui->atlasGroups->addWidget(new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this));
+    ui->atlasGroups->setCurrentIndex(ui->atlasGroups->count() - 1);
 }
 
 void WidgetAtlasManager::LoadData()

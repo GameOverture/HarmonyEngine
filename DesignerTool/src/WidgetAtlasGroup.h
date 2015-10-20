@@ -14,46 +14,70 @@ namespace Ui {
 class WidgetAtlasGroup;
 }
 
-struct HyGuiFrame
+class HyGuiFrame
 {
-    quint32             uiHash;
-    QString             sName;
-    int                 iWidth;
-    int                 iHeight;
-    bool                bRotation;
-    int                 iPosX;
-    int                 iPosY;
+    quint32             m_uiHash;
+    QString             m_sName;
+    int                 m_iWidth;
+    int                 m_iHeight;
+    bool                m_bRotation;
+    int                 m_iPosX;
+    int                 m_iPosY;
     
-    QStringList         sLinks;
-    QTreeWidgetItem *   pTreeItem;
+    QStringList         m_sLinks;
+    QTreeWidgetItem *   m_pTreeItem;
 
-    HyGuiFrame(quint32 uiCRC, QString sN, int iW, int iH, bool bRot, int iX, int iY) :   uiHash(uiCRC),
-                                                                                    sName(sN),
-                                                                                    iWidth(iW),
-                                                                                    iHeight(iH),
-                                                                                    bRotation(bRot),
-                                                                                    iPosX(iX),
-                                                                                    iPosY(iY)
+public:
+    HyGuiFrame(quint32 uiCRC, QString sN, int iW, int iH, bool bRot, int iX, int iY) :  m_uiHash(uiCRC),
+                                                                                        m_sName(sN),
+                                                                                        m_iWidth(iW),
+                                                                                        m_iHeight(iH),
+                                                                                        m_bRotation(bRot),
+                                                                                        m_iPosX(iX),
+                                                                                        m_iPosY(iY),
+                                                                                        m_pTreeItem(NULL)
     { }
     
-    void SetLink(QString sPrefixAndName)
+    HyGuiFrame(quint32 uiCRC, QString sN) : m_uiHash(uiCRC),
+                                            m_sName(sN),
+                                            m_iWidth(-1),
+                                            m_iHeight(-1),
+                                            m_bRotation(false),
+                                            m_iPosX(-1),
+                                            m_iPosY(-1),
+                                            m_pTreeItem(NULL)
+    { }
+    
+    quint32 GetHash()   { return m_uiHash; }
+    
+    void SetLink(QString sFullPath)
     {
-        sLinks.append(sPrefixAndName);
+        m_sLinks.append(sFullPath);
     }
-    void SetLink(QString sPrefix, QString sName)
+    void SetLink(eItemType eType, QString sPrefix, QString sName)
     {
-        QString sLink(sPrefix);
+        QString sLink(HyGlobal::ItemName(eType) % "/");
+        sLink += sPrefix;
         sLink += sName;
         
-        sLinks.append(sLink);
+        m_sLinks.append(sLink);
     }
     
     void SetTreeWidgetItem(QTreeWidgetItem *pItem)
     {
-        pTreeItem = pItem;
+        m_pTreeItem = pItem;
         
         QVariant v; v.setValue(this);
-        pTreeItem->setData(0, QTreeWidgetItem::UserType, v);
+        m_pTreeItem->setData(0, QTreeWidgetItem::UserType, v);
+    }
+    
+    QString ConstructImageFileName()
+    {
+        QString sMetaImgName;
+        sMetaImgName = sMetaImgName.sprintf("%010u-%s", m_uiHash, m_sName.toStdString().c_str());
+        sMetaImgName += ".png";
+        
+        return sMetaImgName;
     }
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)
@@ -68,7 +92,7 @@ class WidgetAtlasGroup : public QWidget
     DlgAtlasGroupSettings       m_dlgSettings;
     
     QList<QTreeWidgetItem *>    m_TextureList;
-    QList<HyGuiFrame *>         m_ImageList;
+    QList<HyGuiFrame *>         m_FrameList;
     ImagePacker                 m_Packer;
 
 public:

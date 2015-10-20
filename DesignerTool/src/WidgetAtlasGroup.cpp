@@ -40,17 +40,17 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
         {
             QJsonObject frameObj = frameArray[i].toObject();
 
-            HyGuiFrame newImage(frameObj["hash"].toInt(),
-                               frameObj["name"].toString(),
-                               frameObj["width"].toInt(),
-                               frameObj["height"].toInt(),
-                               frameObj["rotate"].toBool(),
-                               frameObj["x"].toInt(),
-                               frameObj["y"].toInt());
+            HyGuiFrame *pNewFrame = new HyGuiFrame(frameObj["hash"].toInt(),
+                                                   frameObj["name"].toString(),
+                                                   frameObj["width"].toInt(),
+                                                   frameObj["height"].toInt(),
+                                                   frameObj["rotate"].toBool(),
+                                                   frameObj["x"].toInt(),
+                                                   frameObj["y"].toInt());
 
             QJsonArray frameLinksArray = frameObj["links"].toArray();
             for(int k = 0; k < frameLinksArray.size(); ++k)
-                newImage.SetLink(frameLinksArray[k].toString());
+                pNewFrame->SetLink(frameLinksArray[k].toString());
 
             QTreeWidgetItem *pTextureTreeItem = NULL;
             eAtlasNodeType eIconType = ATLAS_Frame_Warning;
@@ -63,7 +63,9 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
                 eIconType = ATLAS_Frame;
             }
 
-            newImage.SetTreeWidgetItem(CreateTreeItem(pTextureTreeItem, frameObj["name"].toString(), eIconType));
+            pNewFrame->SetTreeWidgetItem(CreateTreeItem(pTextureTreeItem, frameObj["name"].toString(), eIconType));
+            
+            m_FrameList.append(pNewFrame);
         }
     }
 }
@@ -143,17 +145,16 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
     for(int i = 0; i < sImportImgList.size(); ++i)
     {
         QFileInfo fileInfo(sImportImgList[i]);
+
         QImage newImage;
         newImage.load(fileInfo.absoluteFilePath());
-
-        // Create unique filename for metadata image, and save it out
         quint32 uiHash = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
 
-        QString sNewMetaImgPath;
-        sNewMetaImgPath = sNewMetaImgPath.sprintf("%010u-%s", uiHash, fileInfo.baseName().toStdString().c_str());
-        sNewMetaImgPath += ("." % fileInfo.suffix());
-        sNewMetaImgPath = m_MetaDir.path() % "/" % sNewMetaImgPath;
-        newImage.save(sNewMetaImgPath);
+        HyGuiFrame *pNewFrame = new HyGuiFrame(uiHash, fileInfo.baseName());
+        
+        newImage.save(m_MetaDir.path() % "/" % pNewFrame->ConstructImageFileName());
+        
+        m_FrameList.append(pNewFrame);
     }
 
     Refresh();
@@ -163,6 +164,15 @@ void WidgetAtlasGroup::Refresh()
 {
     // Wipe everything and generate
 
+    ui->atlasList->clear();
+    
+    QImage *pImgList = new QImage[m_FrameList.size()];
+    for(int i = 0; i < m_FrameList.size(); ++i)
+    {
+        QString sImageAbsoluteFilePath = m_MetaDir.absoluteFilePath(m_FrameList[i]->ConstructImageFileName());
+        pImgList[i].load(sImageAbsoluteFilePath);
+        m_Packer.addItem(pImgList[i], m_FrameList[i]->GetHash(), &m_FrameList[i], sImageAbsoluteFilePath);
+    }
 
 
 
