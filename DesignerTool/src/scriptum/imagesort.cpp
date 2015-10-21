@@ -36,16 +36,16 @@ void ImagePacker::sort()
 {
     switch(sortOrder)
     {
-    case 1:
+    case WIDTH:
         qSort(images.begin(), images.end(), ImageCompareByWidth);
         break;
-    case 2:
+    case HEIGHT:
         qSort(images.begin(), images.end(), ImageCompareByHeight);
         break;
-    case 3:
+    case SORT_AREA:
         qSort(images.begin(), images.end(), ImageCompareByArea);
         break;
-    case 4:
+    case SORT_MAX:
         qSort(images.begin(), images.end(), ImageCompareByMax);
         break;
     }

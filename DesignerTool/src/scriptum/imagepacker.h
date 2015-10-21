@@ -66,7 +66,7 @@ class ImagePacker : public QObject
         QRect crop(const QImage &img);
         void sort();
         void addItem(const QImage &img, quint32 uiHash, void *data, QString path);
-        void addItem(QString path, quint32 uiHash, void *data);
+        //void addItem(QString path, quint32 uiHash, void *data);
         const inputImage *find(void *data);
         void removeId(void *);
         void realculateDuplicates();
@@ -86,7 +86,7 @@ class ImagePacker : public QObject
         int minTextureSizeY;
         enum {GUILLOTINE, MAXRECTS}; //method
         enum {NONE, TL, BAF, BSSF, BLSF, MINW, MINH, HEURISTIC_NUM}; //heuristic
-        enum {SORT_NONE, WIDTH, HEIGHT, SORT_AREA, SORT_MAX, SORT_NUM}; //sort
+        enum {SORT_MAX, SORT_AREA, WIDTH, HEIGHT, SORT_NONE, SORT_NUM}; //sort
         enum {NEVER, ONLY_WHEN_NEEDED, H2_WIDTH_H, WIDTH_GREATHER_HEIGHT, WIDTH_GREATHER_2HEIGHT, W2_HEIGHT_W, HEIGHT_GREATHER_WIDTH, HEIGHT_GREATHER_2WIDTH, ROTATION_NUM}; //rotation
 };
 

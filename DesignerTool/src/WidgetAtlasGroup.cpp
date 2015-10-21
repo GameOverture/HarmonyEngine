@@ -7,6 +7,9 @@
 #include <QJsonArray>
 #include <QStack>
 #include <QPainter>
+#include <QElapsedTimer>
+
+#include <ctime>
 
 WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
                                                         ui(new Ui::WidgetAtlasGroup)
@@ -150,7 +153,7 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
         newImage.load(fileInfo.absoluteFilePath());
         quint32 uiHash = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
 
-        HyGuiFrame *pNewFrame = new HyGuiFrame(uiHash, fileInfo.baseName());
+        HyGuiFrame *pNewFrame = new HyGuiFrame(uiHash, fileInfo.baseName(), newImage.width(), newImage.height(), false, -1, -1);
         
         newImage.save(m_MetaDir.path() % "/" % pNewFrame->ConstructImageFileName());
         
@@ -162,10 +165,19 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
 
 void WidgetAtlasGroup::Refresh()
 {
-    // Wipe everything and generate
+    clock_t timeStartRefresh = clock();
+    QElapsedTimer timerStartRefresh;
+    timerStartRefresh.start();
 
     ui->atlasList->clear();
+    m_Packer.clear();
+
+    QStringList sTextureNames = m_DataDir.entryList();
+    foreach(QString sTexName, sTextureNames)
+        QFile::remove(sTexName);
     
+    QJsonArray frameArray;
+
     QImage *pImgList = new QImage[m_FrameList.size()];
     for(int i = 0; i < m_FrameList.size(); ++i)
     {
@@ -174,52 +186,24 @@ void WidgetAtlasGroup::Refresh()
         m_Packer.addItem(pImgList[i], m_FrameList[i]->GetHash(), &m_FrameList[i], sImageAbsoluteFilePath);
     }
 
+    clock_t timeStartPack = clock();
+    QElapsedTimer timerStartPack;
+    timerStartRefresh.start();
 
+    m_Packer.pack(m_dlgSettings.GetHeuristic(), m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight());
 
-//    m_pAtlasOwner->SetPackerSettings(&m_Packer);
+    qint64 i64TimePack = timerStartPack.elapsed();
+    clock_t timeEndPack = clock();
 
-//    QList<QStringList> sMissingImgPaths = GetActiveTexture()->ImportFrames(sImportImgList);
-//    bool bFailedToPack = false;
-//    for(int i = 0; i < sMissingImgPaths.size(); ++i)
-//    {
-//        HyGuiTexture *pNewTexture = new HyGuiTexture(this);
-
-//        QList<QStringList> sFailedImgPaths = pNewTexture->ImportFrames(sMissingImgPaths[i]);
-//        if(sFailedImgPaths.size() > 0)
-//        {
-//            bFailedToPack = true;
-//            for(int j = 0; j < sFailedImgPaths.size(); ++j)
-//            {
-//                foreach(const QString sPath, sFailedImgPaths[j])
-//                    HYLOG("Could not import: " % sPath, LOGTYPE_Info);
-//            }
-//        }
-//        else
-//            m_Textures.append(pNewTexture); // Becomes active texture
-//    }
-
-//    if(bFailedToPack)
-//        HYLOG("Imported image(s) failed to pack into current texture settings. Check log for info.", LOGTYPE_Warning);
-
-
-    //SaveData();
-
-    // Display texture
-    //RenderAtlas();
-
-    if(m_Packer.bins.size() == 0)
-        return;
-
+    QImage *pTextures = new QImage[m_Packer.bins.size()];// { m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight(), QImage::Format_ARGB32 };
     for(int iBinIndex = 0; iBinIndex < m_Packer.bins.size(); ++iBinIndex)
     {
         if(m_dlgSettings.TextureWidth() == m_Packer.bins[iBinIndex].width() || m_dlgSettings.TextureHeight() == m_Packer.bins[iBinIndex].height())
             HYLOG("WidgetAtlasGroup::Refresh() Mismatching texture dimentions", LOGTYPE_Error);
 
-        QImage imgTexture(m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight(), QImage::Format_ARGB32);
-        imgTexture.fill(Qt::transparent);
+        pTextures[iBinIndex].fill(Qt::transparent);
 
-
-        QPainter p(&imgTexture);
+        QPainter p(&pTextures[iBinIndex]);
         for(int i = 0; i < m_Packer.images.size(); ++i)
         {
             inputImage &imgInfoRef = m_Packer.images[i];
@@ -305,8 +289,40 @@ void WidgetAtlasGroup::Refresh()
                 p.drawImage(pos.x(), pos.y(), imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
         }
 
-        imgTexture.save(m_DataDir.absolutePath() % "/" % HyGlobal::MakeFileNameFromCounter(iBinIndex) % ".png");
+        pTextures[iBinIndex].save(m_DataDir.absolutePath() % "/" % HyGlobal::MakeFileNameFromCounter(iBinIndex) % ".png");
     }
+
+    QJsonObject settingsDoc = m_dlgSettings.GetSettings();
+    settingsDoc.insert("frames", frameArray);
+
+//                QJsonArray frameArray = settingsObj["frames"].toArray();
+//                for(int i = 0; i < frameArray.size(); ++i)
+//                {
+//                    QJsonObject frameObj = frameArray[i].toObject();
+
+//                    HyGuiFrame *pNewFrame = new HyGuiFrame(frameObj["hash"].toInt(),
+//                                                           frameObj["name"].toString(),
+//                                                           frameObj["width"].toInt(),
+//                                                           frameObj["height"].toInt(),
+//                                                           frameObj["rotate"].toBool(),
+//                                                           frameObj["x"].toInt(),
+//                                                           frameObj["y"].toInt());
+
+//                    QJsonArray frameLinksArray = frameObj["links"].toArray();
+//                    for(int k = 0; k < frameLinksArray.size(); ++k)
+//                        pNewFrame->SetLink(frameLinksArray[k].toString());
+
+//                    QTreeWidgetItem *pTextureTreeItem = NULL;
+//                    eAtlasNodeType eIconType = ATLAS_Frame_Warning;
+//                    if(frameObj["textureIndex"].toInt() >= 0)
+
+    qint64 i64TimeRefresh = timerStartRefresh.elapsed();
+    clock_t timeEndRefresh = clock();
+
+    HYLOG("Atlas Group Refresh done in: " % QString::number(static_cast<float>(i64TimeRefresh / 1000)), LOGTYPE_Normal);
+    HYLOG("Atlas Group Pack done in:    " % QString::number(static_cast<float>(i64TimePack / 1000)), LOGTYPE_Normal);
+    HYLOG("Atlas Group Refresh done in: " % QString::number(static_cast<float>((timeEndRefresh - timeStartRefresh) / CLOCKS_PER_SEC)), LOGTYPE_Info);
+    HYLOG("Atlas Group Pack done in:    " % QString::number(static_cast<float>((timeEndPack - timeStartPack) / CLOCKS_PER_SEC)), LOGTYPE_Info);
 }
 
 QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType)

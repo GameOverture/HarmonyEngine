@@ -212,10 +212,10 @@ void ImagePacker::addItem(const QImage &img, quint32 uiHash, void *data, QString
     images << i;
 }
 
-void ImagePacker::addItem(QString path, quint32 uiHash, void *data)
-{
-    addItem(QImage(path), uiHash, data, path);
-}
+//void ImagePacker::addItem(QString path, quint32 uiHash, void *data)
+//{
+//    addItem(QImage(path), uiHash, data, path);
+//}
 
 void ImagePacker::clear()
 {

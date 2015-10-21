@@ -22,6 +22,8 @@ public:
     int TextureWidth();
     int TextureHeight();
 
+    int GetHeuristic();
+
     void SetPackerSettings(ImagePacker *pPacker);
 
     QJsonObject GetSettings();

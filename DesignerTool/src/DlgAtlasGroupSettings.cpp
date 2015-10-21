@@ -29,6 +29,11 @@ int DlgAtlasGroupSettings::TextureHeight()
     return ui->sbTextureHeight->value();
 }
 
+int DlgAtlasGroupSettings::GetHeuristic()
+{
+    return ui->cmbHeuristic->currentIndex();
+}
+
 void DlgAtlasGroupSettings::SetPackerSettings(ImagePacker *pPacker)
 {
     pPacker->sortOrder = ui->cmbSortOrder->currentIndex();

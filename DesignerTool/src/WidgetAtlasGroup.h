@@ -23,6 +23,7 @@ class HyGuiFrame
     bool                m_bRotation;
     int                 m_iPosX;
     int                 m_iPosY;
+    QRect               m_rAlphaCrop;
     
     QStringList         m_sLinks;
     QTreeWidgetItem *   m_pTreeItem;
