@@ -197,16 +197,16 @@ void ImagePacker::UpdateCrop()
     }
 }
 
-void ImagePacker::addItem(const QImage &img, quint32 uiHash, void *data, QString path)
+void ImagePacker::addItem(QSize imageSize, QRect alphaCrop, quint32 uiHash, void *data, QString path)
 {
     inputImage i;
-    if(img.width() == 0 || img.height() == 0)
+    if(imageSize.width() == 0 || imageSize.height() == 0)
     {
         return;
     }
     i.hash = uiHash;//rc_crc32(0, img.bits(), img.byteCount());
-    i.crop = crop(img);
-    i.size = img.size();
+    i.crop = alphaCrop; // crop(img);
+    i.size = imageSize; // img.size();
     i.id = data;
     i.path = path;
     images << i;

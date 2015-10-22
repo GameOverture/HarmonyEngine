@@ -16,40 +16,44 @@ class WidgetAtlasGroup;
 
 class HyGuiFrame
 {
-    quint32             m_uiHash;
-    QString             m_sName;
-    int                 m_iWidth;
-    int                 m_iHeight;
+    const quint32       m_uiHASH;
+    const QString       m_sNAME;
+    const int           m_iWIDTH;
+    const int           m_iHEIGHT;
+    const QRect         m_rALPHA_CROP;
+
+    int                 m_iTextureIndex;
     bool                m_bRotation;
     int                 m_iPosX;
     int                 m_iPosY;
-    QRect               m_rAlphaCrop;
     
-    QStringList         m_sLinks;
     QTreeWidgetItem *   m_pTreeItem;
+    QStringList         m_sLinks;
 
 public:
-    HyGuiFrame(quint32 uiCRC, QString sN, int iW, int iH, bool bRot, int iX, int iY) :  m_uiHash(uiCRC),
-                                                                                        m_sName(sN),
-                                                                                        m_iWidth(iW),
-                                                                                        m_iHeight(iH),
-                                                                                        m_bRotation(bRot),
-                                                                                        m_iPosX(iX),
-                                                                                        m_iPosY(iY),
-                                                                                        m_pTreeItem(NULL)
+    HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) : m_uiHASH(uiCRC),
+                                                                                                                        m_sNAME(sN),
+                                                                                                                        m_iWIDTH(iW),
+                                                                                                                        m_iHEIGHT(iH),
+                                                                                                                        m_rALPHA_CROP(rAlphaCrop),
+                                                                                                                        m_iTextureIndex(iTexIndex),
+                                                                                                                        m_bRotation(bRot),
+                                                                                                                        m_iPosX(iX),
+                                                                                                                        m_iPosY(iY),
+                                                                                                                        m_pTreeItem(NULL)
     { }
     
-    HyGuiFrame(quint32 uiCRC, QString sN) : m_uiHash(uiCRC),
-                                            m_sName(sN),
-                                            m_iWidth(-1),
-                                            m_iHeight(-1),
-                                            m_bRotation(false),
-                                            m_iPosX(-1),
-                                            m_iPosY(-1),
-                                            m_pTreeItem(NULL)
-    { }
-    
-    quint32 GetHash()   { return m_uiHash; }
+    quint32 GetHash()       { return m_uiHASH; }
+    QString GetName()       { return m_sNAME; }
+    QSize GetSize()         { return QSize(m_iWIDTH, m_iHEIGHT); }
+    QRect GetCrop()         { return m_rALPHA_CROP; }
+    QPoint GetPosition()    { return QPoint(m_iPosX, m_iPosY); }
+    QStringList GetLinks()  { return m_sLinks; }
+
+    bool IsRotated()        { return m_bRotation; }
+    int GetX()              { return m_iPosX; }
+    int GetY()              { return m_iPosY; }
+    int GetTextureIndex()   { return m_iTextureIndex; }
     
     void SetLink(QString sFullPath)
     {
@@ -63,7 +67,6 @@ public:
         
         m_sLinks.append(sLink);
     }
-    
     void SetTreeWidgetItem(QTreeWidgetItem *pItem)
     {
         m_pTreeItem = pItem;
@@ -71,11 +74,18 @@ public:
         QVariant v; v.setValue(this);
         m_pTreeItem->setData(0, QTreeWidgetItem::UserType, v);
     }
+    void SetPackerInfo(int iTextureIndex, bool bRotation, int iX, int iY)
+    {
+        m_iTextureIndex = iTextureIndex;
+        m_bRotation = bRotation;
+        m_iPosX = iX;
+        m_iPosY = iY;
+    }
     
     QString ConstructImageFileName()
     {
         QString sMetaImgName;
-        sMetaImgName = sMetaImgName.sprintf("%010u-%s", m_uiHash, m_sName.toStdString().c_str());
+        sMetaImgName = sMetaImgName.sprintf("%010u-%s", m_uiHASH, m_sNAME.toStdString().c_str());
         sMetaImgName += ".png";
         
         return sMetaImgName;
