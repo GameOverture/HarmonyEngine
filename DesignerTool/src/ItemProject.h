@@ -11,7 +11,7 @@ class ItemProject : public Item
     friend class WidgetExplorer;
     
     WidgetAtlasManager *    m_pAtlasManager;
-    HyPrimitive2d           m_CurAtlas;
+    HyTexturedQuad2d *      m_pCurAtlas;
     
 public:
     enum eDrawState

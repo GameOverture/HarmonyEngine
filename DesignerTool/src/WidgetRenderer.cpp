@@ -81,6 +81,7 @@ void WidgetRenderer::ClearItems()
 
 void WidgetRenderer::OpenItem(Item *pItem)
 {
+    
     for(int i = 0; i < ui->tabWidget->count(); ++i)
     {
         // Determine if already opened
