@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QDir>
+#include <QMouseEvent>
 
 #include "ItemProject.h"
 #include "WidgetAtlasGroup.h"
@@ -25,13 +26,15 @@ public:
     explicit WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent = 0);
     ~WidgetAtlasManager();
 
+    void SaveData();
+
+protected:
+    virtual void mouseMoveEvent(QMouseEvent *pEvent);
+
 private:
     Ui::WidgetAtlasManager *ui;
 
     void AddAtlasGroup(int iId = -1);
-
-    void LoadData();
-    void SaveData();
 };
 
 #endif // WIDGETATLASMANAGER_H

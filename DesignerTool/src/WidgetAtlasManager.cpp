@@ -3,6 +3,8 @@
 #include "HyGlobal.h"
 
 #include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 
 WidgetAtlasManager::WidgetAtlasManager(QWidget *parent) :   QWidget(parent),
                                                             ui(new Ui::WidgetAtlasManager)
@@ -20,6 +22,8 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
                                                                                              m_DataDir(m_pProjOwner->GetPath(HYGUIPATH_RelDataAtlasDir))
 {
     ui->setupUi(this);
+    while(ui->atlasGroups->currentWidget())
+        ui->atlasGroups->removeWidget(ui->atlasGroups->currentWidget());
 
     if(m_MetaDir.exists() == false)
     {
@@ -78,6 +82,47 @@ WidgetAtlasManager::~WidgetAtlasManager()
     delete ui;
 }
 
+void WidgetAtlasManager::SaveData()
+{
+    QJsonArray atlasGroupArray;
+    for(int i = 0; i < ui->atlasGroups->count(); ++i)
+    {
+        QJsonObject atlasGroupObj;
+        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->GetAtlasInfo(atlasGroupObj);
+        atlasGroupArray.append(atlasGroupObj);
+    }
+
+    QJsonDocument atlasInfoDoc;
+    atlasInfoDoc.setArray(atlasGroupArray);
+
+    QFile atlasInfoFile(m_DataDir.absolutePath() % "/" % HYGUIPATH_DataAtlasFileName);
+    if(atlasInfoFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+    {
+       HYLOG("Couldn't open atlas data info file for writing", LOGTYPE_Error);
+    }
+    else
+    {
+        qint64 iBytesWritten = atlasInfoFile.write(atlasInfoDoc.toJson());
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+        {
+            HYLOG("Could not write to atlas settings file: " % atlasInfoFile.errorString(), LOGTYPE_Error);
+        }
+
+        atlasInfoFile.close();
+    }
+}
+
+/*virtual*/ void WidgetAtlasManager::mouseMoveEvent(QMouseEvent *pEvent)
+{
+    if(pEvent->type() == QEvent::Enter)
+    {
+        m_pProjOwner->SetDrawState(DRAWSTATE_AtlasManager, ui->atlasGroups->currentIndex
+    }
+    else if(pEvent->type() == QEvent::Leave)
+    {
+    }
+}
+
 void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
 {
     if(iId == -1)
@@ -109,78 +154,5 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
     QDir newDataAtlasDir(m_DataDir);
     newDataAtlasDir.cd(HyGlobal::MakeFileNameFromCounter(iId));
 
-    ui->atlasGroups->addWidget(new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this));
-    ui->atlasGroups->setCurrentIndex(ui->atlasGroups->count() - 1);
-}
-
-void WidgetAtlasManager::LoadData()
-{
-
-
-//    QFileInfoList atlasGroupsList = metaAtlasDir.entryInfoList(NoFilter, QDir::Name);
-//    if(atlasGroupsList.empty())
-//    {
-//        metaAtlasDir.mkdir("00001");
-//        m_AtlasGroups.push_back(new HyGuiAtlasGroup());
-
-//        return;
-//    }
-
-//    for(unsigned int i = 0; i < atlasGroupsList.size(); ++i)
-//    {
-//        if(atlasGroupsList[i].isDir() == false)
-//            continue;
-
-//        QFileInfo atlasGrpSettings(atlasGroupsList[i].absolutePath() % HYGUIPATH_DataAtlasFileName);
-//        QFile dataFile(atlasGrpSettings.absoluteFilePath());
-//        if(dataFile.open(QIODevice::ReadOnly))
-//        {
-//            QJsonDocument dataJsonDoc = QJsonDocument::fromJson(dataFile.readAll());
-//            QJsonObject contents = dataJsonDoc.object();
-
-//            QJsonArray textureArray = contents["textures"].toArray();
-//            foreach (const QJsonValue &textureInfo, textureArray)
-//            {
-//                HyGuiTexture *pNewTexture = new HyGuiTexture(this);
-
-//                QJsonArray srcFramesArray = textureInfo.toObject()["srcFrames"].toArray();
-//                foreach(const QJsonValue &frameInfo, srcFramesArray)
-//                {
-//                    quint32 uiHash = JSONOBJ_TOINT(frameInfo.toObject(), "hash");
-//                    foreach(const QFileInfo imgInfo, srcFrameImgList)
-//                    {
-//                        QString sImgName = imgInfo.baseName();
-//                        quint32 uiTestHash = static_cast<quint32>(sImgName.left(sImgName.indexOf(QChar('-'))).toLongLong());
-//                        if(uiHash == uiTestHash)
-//                        {
-//                            int iSplitIndex = sImgName.indexOf(QChar('-'));
-//                            sImgName = sImgName.right(sImgName.length() - iSplitIndex - 1); // -1 so we don't include the '-'
-//                            pNewTexture->LoadFrame(QImage(imgInfo.absoluteFilePath()), uiHash, sImgName, imgInfo.absoluteFilePath());
-//                        }
-//                    }
-
-//                }
-
-//                QList<QStringList> unPackedList = pNewTexture->PackFrames();
-//                if(unPackedList.empty() == false)
-//                    HYLOG("Loading an atlas failed to pack properly", LOGTYPE_Error);
-
-//                m_Textures.append(pNewTexture);
-//            }
-//        }
-//        else
-//            HYLOG("Atlas group settings file not found. Generating new one.", LOGTYPE_Info);
-
-//        QFileInfoList atlasGrp = QDir(atlasGroupsList[i].absolutePath())..entryInfoList(NoFilter, QDir::Name);
-//    }
-}
-
-void WidgetAtlasManager::SaveData()
-{
-//    QJsonDocument atlasInfoDoc;
-
-//    QJsonArray atlasGroupArray;
-//    // Fill out array
-
-//    atlasInfoDoc.setArray(atlasGroupArray);
+    ui->atlasGroups->setCurrentIndex(ui->atlasGroups->addWidget(new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this)));
 }

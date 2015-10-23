@@ -12,6 +12,8 @@
 
 #include <ctime>
 
+#include "WidgetAtlasManager.h"
+
 WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
                                                         ui(new Ui::WidgetAtlasGroup)
 {
@@ -89,6 +91,11 @@ WidgetAtlasGroup::~WidgetAtlasGroup()
     delete ui;
 }
 
+void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObj)
+{
+    atlasObj.insert("id", m_DataDir.dirName().toInt());
+}
+
 void WidgetAtlasGroup::on_btnAddImages_clicked()
 {
     QFileDialog dlg(this);
@@ -104,7 +111,8 @@ void WidgetAtlasGroup::on_btnAddImages_clicked()
                                                                tr("All files (*.*);;PNG (*.png)"),
                                                                &sSelectedFilter);
 
-    ImportImages(sImportImgList);
+    if(sImportImgList.empty() == false)
+        ImportImages(sImportImgList);
 }
 
 void WidgetAtlasGroup::on_btnAddDir_clicked()
@@ -364,6 +372,8 @@ void WidgetAtlasGroup::Refresh()
         {
             HYLOG("Could not write to atlas settings file: " % settingsFile.errorString(), LOGTYPE_Error);
         }
+
+        settingsFile.close();
     }
 
     qint64 i64TimeRefresh = timerStartRefresh.elapsed();
@@ -373,6 +383,10 @@ void WidgetAtlasGroup::Refresh()
     HYLOG("Atlas Group Pack done in:    " % QString::number(static_cast<float>(i64TimePack / 1000)), LOGTYPE_Normal);
     HYLOG("Atlas Group Refresh done in: " % QString::number(static_cast<float>((timeEndRefresh - timeStartRefresh) / CLOCKS_PER_SEC)), LOGTYPE_Info);
     HYLOG("Atlas Group Pack done in:    " % QString::number(static_cast<float>((timeEndPack - timeStartPack) / CLOCKS_PER_SEC)), LOGTYPE_Info);
+
+    // Regenerate the atlas data info file
+    WidgetAtlasManager *pAtlasManager = reinterpret_cast<WidgetAtlasManager *>(this->parent()->parent());
+    pAtlasManager->SaveData();
 }
 
 QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType)

@@ -19,6 +19,7 @@ ItemProject::~ItemProject()
 
 /*virtual*/ void ItemProject::Show()
 {
+
 //    switch(m_eState)
 //    {
 //    case DRAWSTATE_AtlasManager:

@@ -111,7 +111,7 @@ public:
     explicit WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent = 0);
     ~WidgetAtlasGroup();
 
-    QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType);
+    void GetAtlasInfo(QJsonObject &atlasObj);
 
 private slots:
     void on_btnAddImages_clicked();
@@ -122,6 +122,8 @@ private:
     
     void ImportImages(QStringList sImportImgList);
     void Refresh();
+
+    QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType);
 };
 
 #endif // WIDGETATLASGROUP_H
