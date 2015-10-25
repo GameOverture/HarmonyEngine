@@ -6,6 +6,8 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
+#include "MainWindow.h"
+
 WidgetAtlasManager::WidgetAtlasManager(QWidget *parent) :   QWidget(parent),
                                                             ui(new Ui::WidgetAtlasManager)
 {
@@ -112,14 +114,24 @@ void WidgetAtlasManager::SaveData()
     }
 }
 
+void WidgetAtlasManager::Hide()
+{
+}
+
+void WidgetAtlasManager::Show()
+{
+}
+
 /*virtual*/ void WidgetAtlasManager::mouseMoveEvent(QMouseEvent *pEvent)
 {
     if(pEvent->type() == QEvent::Enter)
     {
-        m_pProjOwner->SetDrawState(DRAWSTATE_AtlasManager, ui->atlasGroups->currentIndex
+        //m_pProjOwner->SetDrawState(DRAWSTATE_AtlasManager, ui->atlasGroups->currentIndex
+        MainWindow::OpenItem(m_pProjOwner);
     }
     else if(pEvent->type() == QEvent::Leave)
     {
+        MainWindow::CloseItem(m_pProjOwner);
     }
 }
 

@@ -28,6 +28,9 @@ public:
 
     void SaveData();
 
+    void Hide();
+    void Show();
+
 protected:
     virtual void mouseMoveEvent(QMouseEvent *pEvent);
 

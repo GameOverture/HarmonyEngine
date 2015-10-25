@@ -65,7 +65,6 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     {
         if(HyGlobal::IsWorkspaceValid(QDir(pItem->GetPath())) == false)
         {
-            
             HYLOG("Could not open project: " % pItem->GetPath(), LOGTYPE_Warning);
             return;
         }

@@ -18,7 +18,6 @@ class MainWindow : public QMainWindow
     static MainWindow * sm_pInstance;
 
     QSettings           m_Settings;
-    QString             m_sDefaultProjLocation;
 
     bool                m_bIsInitialized;
     
@@ -68,7 +67,6 @@ private:
     void closeEvent(QCloseEvent * event);
 
     void SaveSettings();
-    void LoadSettings();
     
     void UpdateActions();
     

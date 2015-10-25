@@ -44,6 +44,7 @@ public:
     virtual bool Shutdown();
 
     Item *GetItem(int iIndex = -1);
+    void ShowItem(Item *pItem);
 
     void ClearItems();
 
@@ -54,7 +55,7 @@ private:
     Ui::WidgetRenderer *ui;
 
 private slots:
-    void on_tabWidget_currentChanged(int index);
+    void on_tabWidget_currentChanged(int iIndex);
 };
 
 #endif // WIDGETRENDERER_H

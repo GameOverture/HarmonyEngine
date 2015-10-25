@@ -67,10 +67,31 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
         HYLOG("TCP server initialized", LOGTYPE_Normal);
     
     
-    
+    // Restore workspace
     HYLOG("Recovering previously opened session...", LOGTYPE_Normal);
-    //m_Settings.clear();
-    LoadSettings();
+    m_Settings.beginGroup("MainWindow");
+    {
+        restoreGeometry(m_Settings.value("geometry").toByteArray());
+        restoreState(m_Settings.value("windowState").toByteArray());
+    }
+    m_Settings.endGroup();
+
+    ui->actionViewAtlasManager->setChecked(!ui->dockWidgetAtlas->isHidden());
+    ui->actionViewExplorer->setChecked(!ui->dockWidgetExplorer->isHidden());
+    ui->actionViewOutputLog->setChecked(!ui->dockWidgetOutputLog->isHidden());
+
+    m_Settings.beginGroup("OpenData");
+    {
+        QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
+        foreach(QString sProjPath, sListOpenProjs)
+        {
+            ui->explorer->AddItem(ITEM_Project, sProjPath, false);
+        }
+    }
+    m_Settings.endGroup();
+
+    // Restore opened items/tabs
+    ui->renderer->ClearItems();
 }
 
 MainWindow::~MainWindow()
@@ -125,7 +146,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 void MainWindow::on_actionNewProject_triggered()
 {
-    DlgNewProject *pDlg = new DlgNewProject(m_sDefaultProjLocation, this);
+    DlgNewProject *pDlg = new DlgNewProject(QDir::current().path(), this);
     if(pDlg->exec())
     {
         QString sProjDirPath = pDlg->GetProjPath();
@@ -204,52 +225,6 @@ void MainWindow::SaveSettings()
         m_Settings.setValue("openProjs", QVariant(ui->explorer->GetOpenProjectPaths()));
     }
     m_Settings.endGroup();
-}
-
-void MainWindow::LoadSettings()
-{
-    // Restore workspace
-    m_Settings.beginGroup("MainWindow");
-    {
-        restoreGeometry(m_Settings.value("geometry").toByteArray());
-        restoreState(m_Settings.value("windowState").toByteArray());
-    }
-    m_Settings.endGroup();
-    
-    ui->actionViewAtlasManager->setChecked(!ui->dockWidgetAtlas->isHidden());
-    ui->actionViewExplorer->setChecked(!ui->dockWidgetExplorer->isHidden());
-    ui->actionViewOutputLog->setChecked(!ui->dockWidgetOutputLog->isHidden());
-    
-    m_Settings.beginGroup("OpenData");
-    {
-        QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
-        foreach(QString sProjPath, sListOpenProjs)
-        {
-            ui->explorer->AddItem(ITEM_Project, sProjPath, false);
-        }
-    }
-    m_Settings.endGroup();
-
-    // Restore opened items/tabs
-    ui->renderer->ClearItems();
-    //ui->renderer->OpenItem(ITEM_Sprite, QString("Test"));
-    //ui->renderer->OpenItem(ITEM_Sprite, QString("Test2"));
-
-    // Grab additional data
-    m_sDefaultProjLocation = m_Settings.value("defaultProjLoc").toString();
-
-    if(m_sDefaultProjLocation.isEmpty())
-    {
-        QDir defaultProjLocDir = QDir::current();
-        defaultProjLocDir.makeAbsolute();
-#ifdef QT_DEBUG
-        defaultProjLocDir.cd("../../Projects/");
-#else
-        defaultProjLocDir.cd("../Projects/");
-#endif
-
-        m_sDefaultProjLocation = defaultProjLocDir.path();
-    }
 }
 
 void MainWindow::UpdateActions()
