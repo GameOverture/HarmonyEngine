@@ -35,8 +35,6 @@ public:
 	IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef);
 	virtual ~IHyRenderer(void);
 
-	const HyGfxComms::tGfxInfo *GetGfxInfo()				{ return m_GfxCommsRef.GetGfxInfo(); }
-
 	virtual void StartRender() = 0;
 
 	virtual bool Begin_3d() = 0;

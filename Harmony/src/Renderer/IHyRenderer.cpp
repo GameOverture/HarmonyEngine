@@ -58,7 +58,7 @@ void IHyRenderer::Update()
 
 	FinishRender();
 
-	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr)->uiReturnFlags |= GFXFLAG_HasRendered;
+	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr)->uiReturnFlags |= HyGfxComms::GFXFLAG_HasRendered;
 }
 
 void IHyRenderer::Draw2d()

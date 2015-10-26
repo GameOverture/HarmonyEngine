@@ -22,14 +22,39 @@ using std::queue;
 
 #define RENDER_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
 
-enum eGfxReturnFlags
+struct HyDispDeviceInfo
 {
-	GFXFLAG_HasRendered			= 1 << 0
+	std::wstring		sDeviceName;
+
+	struct Resolution
+	{
+		int32 iWidth;
+		int32 iHeight;
+
+		Resolution(int32 iW, int32 iH) : iWidth(iW), iHeight(iH)
+		{ }
+
+		bool operator <(const Resolution &right) const
+		{
+			return (this->iWidth + this->iHeight) < (right.iWidth + right.iHeight);
+		}
+
+		bool operator ==(const Resolution &right) const
+		{
+			return this->iWidth == right.iWidth && this->iHeight == right.iHeight;
+		}
+	};
+	vector<Resolution>	vResolutions;
 };
 
 class HyGfxComms
 {
 public:
+	enum eGfxReturnFlags
+	{
+		GFXFLAG_HasRendered = 1 << 0
+	};
+
 	// Note: All offsets below are from the beginning of the buffer pointer, containing this structure
 	struct tDrawHeader
 	{
@@ -46,14 +71,8 @@ public:
 		size_t		uiOffsetToCameras2d;
 	};
 
-	struct tGfxInfo
-	{
-		int32			uiNumNativeResolutions;
-		//HyResolution *	pResolutionList;
-	};
-
 private:
-	tGfxInfo *					m_pGfxInfo;
+	vector<HyDispDeviceInfo>	m_vDeviceInfo;
 
 	char *						m_pBuffer_Update;
 	char *						m_pBuffer_Shared;
@@ -74,10 +93,8 @@ public:
 	HyGfxComms();
 	~HyGfxComms();
 
-	void SetGfxInfo(tGfxInfo *pInfo);
-	const tGfxInfo *GetGfxInfo();
-
-	bool IsRendererInitialized()			{ return m_pGfxInfo != NULL; }
+	void SetNewDeviceInfo(HyDispDeviceInfo &info);
+	void CloneDeviceInfo(vector<HyDispDeviceInfo> &vDeviceInfoOut);
 	
 	// This should only be invoked from the Update/Game thread
 	inline char *GetWriteBufferPtr()		{ return m_pBuffer_Update; }
@@ -93,14 +110,6 @@ public:
 
 	// This should only be invoked from the Render thread
 	bool Render_GetSharedPtrs(queue<IHyData2d *> *&pMsgQueuePtr, queue<IHyData2d *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr);
-	
-private:
-
-	inline void LockBuffers()				{ m_csBuffers.Lock(); }
-	inline void UnlockBuffers()				{ m_csBuffers.Unlock(); }
-
-	inline void LockInfo()					{ m_csInfo.Lock(); }
-	inline void UnlockInfo()				{ m_csInfo.Unlock(); }
 };
 
 #endif /* __HyGfxBuffers_h__ */

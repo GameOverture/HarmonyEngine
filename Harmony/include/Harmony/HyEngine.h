@@ -35,14 +35,15 @@ class HyEngine
 
 	IHyApplication &		m_AppRef;
 	
+	HyGfxComms				m_GfxBuffer;
+	HyScene					m_Scene;
+
 	HyTimeInterop			m_Time;
 	HyInputInterop			m_Input;
 	HyRendererInterop		m_Renderer;
 	HyFileIOInterop			m_FileIO;
 	HyAudio					m_Audio;
 
-	HyGfxComms				m_GfxBuffer;
-	HyScene					m_Scene;
 
 #ifndef HY_PLATFORM_GUI
 	HyGuiComms				m_GuiComms;

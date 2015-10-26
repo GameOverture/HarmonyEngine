@@ -24,18 +24,26 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewport
 		m_ppDeviceContexes[i] = new DeviceContext(m_ViewportsRef[i].GetWindowInfo());
 
 
+	// TODO: use EnumDisplayMonitors instead of EnumDisplayDevices
+
 	DISPLAY_DEVICE DispDev = { 0 };
 	DispDev.cb = sizeof(DISPLAY_DEVICE);
 	for(int iDeviceIndex = 0; EnumDisplayDevices(NULL, iDeviceIndex, &DispDev, 0); ++iDeviceIndex)
 	{
+		HyDispDeviceInfo deviceInfo;
+		deviceInfo.sDeviceName = DispDev.DeviceName;
 
 		DEVMODE dm = { 0 };
 		dm.dmSize = sizeof(dm);
 		for(int iModeNum = 0; EnumDisplaySettings(DispDev.DeviceName, iModeNum, &dm) != 0; iModeNum++)
 		{
+			deviceInfo.vResolutions.push_back(HyDispDeviceInfo::Resolution(dm.dmPelsWidth, dm.dmPelsHeight));
 			//cout << "Mode #" << iModeNum << " = " << dm.dmPelsWidth << "x" << dm.dmPelsHeight << endl;
 		}
 
+		std::sort(deviceInfo.vResolutions.begin(), deviceInfo.vResolutions.end());
+		deviceInfo.vResolutions.erase(std::unique(deviceInfo.vResolutions.begin(), deviceInfo.vResolutions.end()), deviceInfo.vResolutions.end());
+		m_GfxCommsRef.SetNewDeviceInfo(deviceInfo);
 	}
 	if(HyOpenGL::Initialize() == false)
 		HyError("OpenGL API's Initialize() failed");

@@ -11,8 +11,6 @@
 
 HyGfxComms::HyGfxComms()
 {
-	m_pGfxInfo = NULL;
-
 	m_pBuffer_Update = m_pBuffer_Shared = m_pBuffer_Render = NULL;
 	m_pAtlasSendQueue_Update = m_pAtlasSendQueue_Shared = m_pAtlasSendQueue_Render = NULL;
 
@@ -49,28 +47,29 @@ HyGfxComms::~HyGfxComms()
 	delete m_pAtlasReceiveQueue_Render;
 }
 
-void HyGfxComms::SetGfxInfo(tGfxInfo *pInfo)
+void HyGfxComms::SetNewDeviceInfo(HyDispDeviceInfo &info)
 {
-	LockInfo();
-	HyAssert(m_pGfxInfo == NULL, "SetGfxInfo() was invoked with already initialized 'm_pGfxInfo'");
-	m_pGfxInfo = pInfo;
-	UnlockInfo();
+	m_csInfo.Lock();
+	m_vDeviceInfo.push_back(info);
+	m_csInfo.Unlock();
 }
-const HyGfxComms::tGfxInfo *HyGfxComms::GetGfxInfo()
+
+void HyGfxComms::CloneDeviceInfo(vector<HyDispDeviceInfo> &vDeviceInfoOut)
 {
-	const tGfxInfo *pInfo;
+	vDeviceInfoOut.clear();
 
-	LockInfo();
-	pInfo = m_pGfxInfo;
-	UnlockInfo(); 
+	m_csInfo.Lock();
 
-	return pInfo;
+	for(uint32 i = 0; i < static_cast<uint32>(m_vDeviceInfo.size()); ++i)
+		vDeviceInfoOut.push_back(m_vDeviceInfo[i]);
+
+	m_csInfo.Unlock();
 }
 
 // This should only be invoked from the Update/Game thread
 void HyGfxComms::Update_SetSharedPtrs()
 {
-	LockBuffers();
+	m_csBuffers.Lock();
 
 	queue<IHyData2d *> *pTmpQueue = m_pAtlasSendQueue_Shared;
 	m_pAtlasSendQueue_Shared = m_pAtlasSendQueue_Update;
@@ -84,19 +83,19 @@ void HyGfxComms::Update_SetSharedPtrs()
 	m_pBuffer_Shared = m_pBuffer_Update;
 	m_pBuffer_Update = pTmp;
 
-	UnlockBuffers();
+	m_csBuffers.Unlock();
 }
 
 // This should only be invoked from the Render thread
 bool HyGfxComms::Render_GetSharedPtrs(queue<IHyData2d *> *&pMsgQueuePtr, queue<IHyData2d *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr)
 {
-	LockBuffers();
+	m_csBuffers.Lock();
 
 	// Check to see if these buffers have already been rendered, if so return false to try next update.
 	HyGfxComms::tDrawHeader *pTest = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pBuffer_Shared);
 	if(reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pBuffer_Shared)->uiReturnFlags != 0)
 	{
-		UnlockBuffers();
+		m_csBuffers.Unlock();
 		return false;
 	}
 
@@ -117,7 +116,7 @@ bool HyGfxComms::Render_GetSharedPtrs(queue<IHyData2d *> *&pMsgQueuePtr, queue<I
 	m_pBuffer_Shared = pTmp;
 	pDrawBufferPtr = m_pBuffer_Render;
 
-	UnlockBuffers();
+	m_csBuffers.Unlock();
 
 	return true;
 }
