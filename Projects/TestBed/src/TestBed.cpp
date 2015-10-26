@@ -41,6 +41,8 @@ TestBed::~TestBed(void)
 	//m_pInputArray->BindBtnMap(GP360_ButtonA, HyInputKey(' '));
 
 	m_pCam = Viewport().CreateCamera2d();
+	m_pCam->SetRenderPercentageCoordinates(0.0f, 0.0f, 0.5f, 1.0f);
+	m_pCam2 = Viewport().CreateCamera2d();
 	
 	m_Player.Initialize();
 

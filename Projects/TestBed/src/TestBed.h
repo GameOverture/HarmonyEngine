@@ -25,6 +25,7 @@ class TestBed : public IHyApplication
 	};
 
 	HyCamera2d *	m_pCam;
+	HyCamera2d *	m_pCam2;
 	vector<uint32>	m_vGamePadIds;
 
 	Player			m_Player;

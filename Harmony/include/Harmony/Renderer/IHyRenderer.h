@@ -53,15 +53,16 @@ public:
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, vector<unsigned char *> &vPixelData) = 0;
 	virtual void DeleteTextureArray(uint32 uiTextureHandle) = 0;
 
-	int32 GetNumCameras2d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras2d)); }
-	mat4 *GetCameraView2d(int iIndex)		{ return reinterpret_cast<mat4 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iIndex * (sizeof(HyRectangle<float>) + sizeof(mat4))) + sizeof(HyRectangle<float>)); }
+	int32 GetNumCameras2d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras2d)); }
+	HyRectangle<float> *GetCameraViewportRect2d(int iIndex)	{ return reinterpret_cast<HyRectangle<float> *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iIndex * (sizeof(HyRectangle<float>) + sizeof(mat4)))); }
+	mat4 *GetCameraView2d(int iIndex)						{ return reinterpret_cast<mat4 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iIndex * (sizeof(HyRectangle<float>) + sizeof(mat4))) + sizeof(HyRectangle<float>)); }
 
-	int32 GetNumInsts3d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras3d)); }
-	int32 GetNumCameras3d()					{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras3d)); }
+	int32 GetNumInsts3d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras3d)); }
+	int32 GetNumCameras3d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToCameras3d)); }
 
-	int32 GetNumRenderStates2d()			{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d)); }
-	HyRenderState *GetRenderStatesPtr2d()	{ return reinterpret_cast<HyRenderState *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d + sizeof(int32)); } // Last sizeof(int32) is skipping number of 2dInsts
-	char *GetVertexData2d()					{ return reinterpret_cast<char *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToVertexData2d); }
+	int32 GetNumRenderStates2d()							{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d)); }
+	HyRenderState *GetRenderStatesPtr2d()					{ return reinterpret_cast<HyRenderState *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToInst2d + sizeof(int32)); } // Last sizeof(int32) is skipping number of 2dInsts
+	char *GetVertexData2d()									{ return reinterpret_cast<char *>(m_pDrawBufferPtr + m_DrawpBufferHeader->uiOffsetToVertexData2d); }
 
 	void Update();
 	void Draw2d();

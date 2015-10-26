@@ -25,7 +25,7 @@ protected:
 	mat4					m_mtxProj;
 	const mat4				m_kmtxIdentity;
 
-	int32					m_iNumCams2d;
+	int32					m_iNumRenderPassesLeft2d;
 	int32					m_iNumPasses3d;
 
 	///////// 2D MEMBERS ////////////////////

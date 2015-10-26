@@ -71,7 +71,7 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::StartRender()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	m_iNumCams2d = GetNumCameras2d();
+	m_iNumRenderPassesLeft2d = GetNumCameras2d();
 	m_iNumPasses3d = GetNumCameras3d();
 }
 
@@ -90,33 +90,28 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ bool HyOpenGL::Begin_2d()
 {
-	if(GetNumRenderStates2d() == 0 || m_iNumCams2d == 0)
+	if(GetNumRenderStates2d() == 0 || m_iNumRenderPassesLeft2d == 0)
 		return false;
 
-	// Without disabling glDepthMask, sprites fragments that overlap will be discarded
-	glDepthMask(false);
-
-	//glPrimitiveRestartIndex(HY_RESTART_INDEX);
-	//glEnable(GL_PRIMITIVE_RESTART);
-
-
-	char *pTest = GetVertexData2d();
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
-	glBufferData(GL_ARRAY_BUFFER, m_DrawpBufferHeader->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexDataEmulate), vertexDataEmulate, GL_DYNAMIC_DRAW);
-
+	if(m_iNumRenderPassesLeft2d == GetNumCameras2d())
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
+		glBufferData(GL_ARRAY_BUFFER, m_DrawpBufferHeader->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
+		
+		// Without disabling glDepthMask, sprites fragments that overlap will be discarded
+		glDepthMask(false);
+	}
 	
 	//-----------------------------------------------------------------------------------------------------------------
 
 	m_mtxProj = glm::ortho(1024 * -0.5f, 1024 * 0.5f, 768 * -0.5f, 768 * 0.5f); // 0, 800, 600, 0);
 
 
-	m_mtxView = *GetCameraView2d(GetNumCameras2d() - m_iNumCams2d);
+	m_mtxView = *GetCameraView2d(GetNumCameras2d() - m_iNumRenderPassesLeft2d);
 
 	//m_mtxView = mat4(1.0f);
 
-	m_iNumCams2d--;
+	m_iNumRenderPassesLeft2d--;
 	return true;
 }
 

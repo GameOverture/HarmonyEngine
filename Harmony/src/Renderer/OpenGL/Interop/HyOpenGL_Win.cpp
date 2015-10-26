@@ -23,6 +23,20 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewport
 	for(uint32 i = 0; i < m_uiNumDCs; ++i)
 		m_ppDeviceContexes[i] = new DeviceContext(m_ViewportsRef[i].GetWindowInfo());
 
+
+	DISPLAY_DEVICE DispDev = { 0 };
+	DispDev.cb = sizeof(DISPLAY_DEVICE);
+	for(int iDeviceIndex = 0; EnumDisplayDevices(NULL, iDeviceIndex, &DispDev, 0); ++iDeviceIndex)
+	{
+
+		DEVMODE dm = { 0 };
+		dm.dmSize = sizeof(dm);
+		for(int iModeNum = 0; EnumDisplaySettings(DispDev.DeviceName, iModeNum, &dm) != 0; iModeNum++)
+		{
+			//cout << "Mode #" << iModeNum << " = " << dm.dmPelsWidth << "x" << dm.dmPelsHeight << endl;
+		}
+
+	}
 	if(HyOpenGL::Initialize() == false)
 		HyError("OpenGL API's Initialize() failed");
 }

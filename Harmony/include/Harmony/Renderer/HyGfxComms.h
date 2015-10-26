@@ -70,8 +70,6 @@ private:
 	BasicSection				m_csBuffers;
 	BasicSection				m_csInfo;
 
-	int32						m_iStrTableIndexCount;
-
 public:
 	HyGfxComms();
 	~HyGfxComms();
