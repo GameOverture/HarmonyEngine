@@ -23,6 +23,7 @@ class HyOpenGL : public IHyRenderer
 protected:
 	mat4					m_mtxView;
 	mat4					m_mtxProj;
+	mat4					m_mtxProjLocalCoords;
 	const mat4				m_kmtxIdentity;
 
 	int32					m_iNumRenderPassesLeft2d;

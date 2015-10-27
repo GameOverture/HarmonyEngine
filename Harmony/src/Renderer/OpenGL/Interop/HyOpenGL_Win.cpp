@@ -12,6 +12,7 @@
 #include "GuiTool/HyGuiComms.h"
 #include "Utilities/HyStrManip.h"
 
+BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 
@@ -23,30 +24,47 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewport
 	for(uint32 i = 0; i < m_uiNumDCs; ++i)
 		m_ppDeviceContexes[i] = new DeviceContext(m_ViewportsRef[i].GetWindowInfo());
 
+	vector<HyMonitorDeviceInfo> vMonitorDeviceInfo;
+	if(EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&vMonitorDeviceInfo) == false)
+		HyLogError("EnumDisplayMonitors failed");
 
-	// TODO: use EnumDisplayMonitors instead of EnumDisplayDevices
+	m_GfxCommsRef.SetMonitorDeviceInfo(vMonitorDeviceInfo);
 
-	DISPLAY_DEVICE DispDev = { 0 };
-	DispDev.cb = sizeof(DISPLAY_DEVICE);
-	for(int iDeviceIndex = 0; EnumDisplayDevices(NULL, iDeviceIndex, &DispDev, 0); ++iDeviceIndex)
-	{
-		HyDispDeviceInfo deviceInfo;
-		deviceInfo.sDeviceName = DispDev.DeviceName;
-
-		DEVMODE dm = { 0 };
-		dm.dmSize = sizeof(dm);
-		for(int iModeNum = 0; EnumDisplaySettings(DispDev.DeviceName, iModeNum, &dm) != 0; iModeNum++)
-		{
-			deviceInfo.vResolutions.push_back(HyDispDeviceInfo::Resolution(dm.dmPelsWidth, dm.dmPelsHeight));
-			//cout << "Mode #" << iModeNum << " = " << dm.dmPelsWidth << "x" << dm.dmPelsHeight << endl;
-		}
-
-		std::sort(deviceInfo.vResolutions.begin(), deviceInfo.vResolutions.end());
-		deviceInfo.vResolutions.erase(std::unique(deviceInfo.vResolutions.begin(), deviceInfo.vResolutions.end()), deviceInfo.vResolutions.end());
-		m_GfxCommsRef.SetNewDeviceInfo(deviceInfo);
-	}
 	if(HyOpenGL::Initialize() == false)
 		HyError("OpenGL API's Initialize() failed");
+}
+
+BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
+{
+	vector<HyMonitorDeviceInfo> &vMonitorDeviceInfo = *reinterpret_cast<vector<HyMonitorDeviceInfo> *>(dwData);
+
+	MONITORINFOEX monitorInfo;
+	memset(&monitorInfo, 0, sizeof(monitorInfo));
+	monitorInfo.cbSize = sizeof(monitorInfo);
+
+	if(GetMonitorInfo(hMonitor, &monitorInfo) == false)
+		HyLogError("GetMonitorInfo failed");
+
+	DISPLAY_DEVICE DispDev = { 0 };
+	DispDev.cb = sizeof(DispDev);
+	EnumDisplayDevices(monitorInfo.szDevice, 0, &DispDev, 0);
+	
+	HyMonitorDeviceInfo deviceInfo;
+	deviceInfo.sDeviceName = monitorInfo.szDevice;
+	deviceInfo.sDeviceDescription = DispDev.DeviceString;
+	deviceInfo.bIsPrimaryMonitor = ((monitorInfo.dwFlags & MONITORINFOF_PRIMARY) != 0);
+
+	DEVMODE dm = { 0 };
+	dm.dmSize = sizeof(dm);
+	for(int iModeNum = 0; EnumDisplaySettings(monitorInfo.szDevice, iModeNum, &dm) != 0; ++iModeNum)
+		deviceInfo.vResolutions.push_back(HyMonitorDeviceInfo::Resolution(dm.dmPelsWidth, dm.dmPelsHeight));
+
+	std::sort(deviceInfo.vResolutions.begin(), deviceInfo.vResolutions.end());
+	deviceInfo.vResolutions.erase(std::unique(deviceInfo.vResolutions.begin(), deviceInfo.vResolutions.end()), deviceInfo.vResolutions.end());
+
+	vMonitorDeviceInfo.push_back(deviceInfo);
+
+	return TRUE;
 }
 
 HyOpenGL_Win::~HyOpenGL_Win()

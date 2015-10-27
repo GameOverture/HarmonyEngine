@@ -63,7 +63,7 @@ public:
 	bool IsEnabled(eAttributes eAttrib);
 	uint32 GetAttributeBitFlags() const;
 
-	uint32 GetTextureHandle(uint32 uiTextureIndex);
+	uint32 GetTextureHandle();
 	void SetTextureHandle(uint32 uiHandleId);
 
 	bool operator==(const HyRenderState &right) const;

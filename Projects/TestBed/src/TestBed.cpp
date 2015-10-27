@@ -43,6 +43,7 @@ TestBed::~TestBed(void)
 	m_pCam = Viewport().CreateCamera2d();
 	m_pCam->SetRenderPercentageCoordinates(0.0f, 0.0f, 0.5f, 1.0f);
 	m_pCam2 = Viewport().CreateCamera2d();
+	m_pCam2->SetRenderPercentageCoordinates(0.5f, 0.0f, 0.5f, 1.0f);
 	
 	m_Player.Initialize();
 

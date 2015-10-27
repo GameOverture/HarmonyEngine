@@ -47,14 +47,15 @@ HyGfxComms::~HyGfxComms()
 	delete m_pAtlasReceiveQueue_Render;
 }
 
-void HyGfxComms::SetNewDeviceInfo(HyDispDeviceInfo &info)
+void HyGfxComms::SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info)
 {
 	m_csInfo.Lock();
-	m_vDeviceInfo.push_back(info);
+	m_vDeviceInfo.clear();
+	m_vDeviceInfo = info;
 	m_csInfo.Unlock();
 }
 
-void HyGfxComms::CloneDeviceInfo(vector<HyDispDeviceInfo> &vDeviceInfoOut)
+void HyGfxComms::CloneMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &vDeviceInfoOut)
 {
 	vDeviceInfoOut.clear();
 

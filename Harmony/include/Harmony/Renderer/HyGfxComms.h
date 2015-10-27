@@ -22,9 +22,11 @@ using std::queue;
 
 #define RENDER_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
 
-struct HyDispDeviceInfo
+struct HyMonitorDeviceInfo
 {
+	bool				bIsPrimaryMonitor;
 	std::wstring		sDeviceName;
+	std::wstring		sDeviceDescription;
 
 	struct Resolution
 	{
@@ -72,7 +74,7 @@ public:
 	};
 
 private:
-	vector<HyDispDeviceInfo>	m_vDeviceInfo;
+	vector<HyMonitorDeviceInfo>	m_vDeviceInfo;
 
 	char *						m_pBuffer_Update;
 	char *						m_pBuffer_Shared;
@@ -93,8 +95,8 @@ public:
 	HyGfxComms();
 	~HyGfxComms();
 
-	void SetNewDeviceInfo(HyDispDeviceInfo &info);
-	void CloneDeviceInfo(vector<HyDispDeviceInfo> &vDeviceInfoOut);
+	void SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
+	void CloneMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &vDeviceInfoOut);
 	
 	// This should only be invoked from the Update/Game thread
 	inline char *GetWriteBufferPtr()		{ return m_pBuffer_Update; }

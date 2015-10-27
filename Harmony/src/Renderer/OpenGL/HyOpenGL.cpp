@@ -10,51 +10,6 @@
 #include "Renderer/OpenGL/HyOpenGL.h"
 #include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
 
-// THIS WORKS BELOW!
-const float vertexDataEmulate[] = {
-	0.0f, 0.0f, 0.0f, 1.0f,
-	1.0f, 1.0f, 1.0f, 1.0f,
-	0.0f, 0.2938f,
-
-	0.0f, 100.0f, 0.0f, 1.0f,
-	1.0f, 1.0f, 1.0f, 1.0f,
-	0.0f, 0.0f,
-
-	100.0f, 0.0f, 0.0f, 1.0f,
-	1.0f, 1.0f, 1.0f, 1.0f,
-	1.0f, 0.2938f,
-
-	100.0f, 100.0f, 0.0f, 1.0f,
-	1.0f, 1.0f, 1.0f, 1.0f,
-	1.0f, 0.0f
-};
-
-float vertices[] = {
-	-256.0f, -256.0f,0, 1,
-	1,1,1,1,
-	0,1,
-
-	-256.0f,  256.0f,0, 1,
-	1,1,1,1,
-	0,0, 
-
-	256.0f,  -256.0f,0, 1,
-	1,1,1,1,
-	1,1,
-
-	256.0f,   256.0f,0, 1,
-	1,1,1,1,
-	1,0
-};
-
-const float primitiveVertexDataEmulate[] = {
-	-50.0f, -50.0f, 0.0f, 1.0f,
-	-50.0f, 50.0f, 0.0f, 1.0f,
-	50.0f, 50.0f, 0.0f, 1.0f,
-	50.0f, -50.0f, 0.0f, 1.0f
-};
-
-
 HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : IHyRenderer(gfxCommsRef, viewportsRef),
 																				m_mtxView(1.0f),
 																				m_kmtxIdentity(1.0f)
@@ -93,25 +48,34 @@ HyOpenGL::~HyOpenGL(void)
 	if(GetNumRenderStates2d() == 0 || m_iNumRenderPassesLeft2d == 0)
 		return false;
 
+	// TODO: Don't hardcode these 2 values
+	int iWidth = 1024;
+	int iHeight = 768;
+
 	if(m_iNumRenderPassesLeft2d == GetNumCameras2d())
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 		glBufferData(GL_ARRAY_BUFFER, m_DrawpBufferHeader->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
-		
-		// Without disabling glDepthMask, sprites fragments that overlap will be discarded
-		glDepthMask(false);
+	
+		m_mtxProjLocalCoords = glm::ortho(iWidth * -0.5f, iWidth * 0.5f, iHeight * -0.5f, iHeight * 0.5f);
 	}
 	
-	//-----------------------------------------------------------------------------------------------------------------
+	int iCameraIndex = GetNumCameras2d() - m_iNumRenderPassesLeft2d;
 
-	m_mtxProj = glm::ortho(1024 * -0.5f, 1024 * 0.5f, 768 * -0.5f, 768 * 0.5f); // 0, 800, 600, 0);
+	HyRectangle<float> *pViewportRect = GetCameraViewportRect2d(iCameraIndex);
+	glViewport(static_cast<GLint>(pViewportRect->x * iWidth), static_cast<GLint>(pViewportRect->y * iHeight), static_cast<GLsizei>(pViewportRect->width * iWidth), static_cast<GLsizei>(pViewportRect->height * iHeight));
 
-
-	m_mtxView = *GetCameraView2d(GetNumCameras2d() - m_iNumRenderPassesLeft2d);
-
-	//m_mtxView = mat4(1.0f);
+	float fWidth = (pViewportRect->width * iWidth);
+	float fHeight = (pViewportRect->height * iHeight);
+	
+	m_mtxView = *GetCameraView2d(iCameraIndex);
+	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f);
 
 	m_iNumRenderPassesLeft2d--;
+	
+	// Without disabling glDepthMask, sprites fragments that overlap will be discarded, and primitive draws don't work
+	glDepthMask(false);
+
 	return true;
 }
 
@@ -143,11 +107,15 @@ HyOpenGL::~HyOpenGL(void)
 			m_pShader2d[QUADBATCH].Use();
 
 			if(renderState.IsEnabled(HyRenderState::USINGLOCALCOORDS))
+			{
 				m_pShader2d[QUADBATCH].SetUniform("mtxWorldToCameraMatrix", m_kmtxIdentity);
+				m_pShader2d[QUADBATCH].SetUniform("mtxCameraToClipMatrix", m_mtxProjLocalCoords);
+			}
 			else
+			{
 				m_pShader2d[QUADBATCH].SetUniform("mtxWorldToCameraMatrix", m_mtxView);
-
-			m_pShader2d[QUADBATCH].SetUniform("mtxCameraToClipMatrix", m_mtxProj);
+				m_pShader2d[QUADBATCH].SetUniform("mtxCameraToClipMatrix", m_mtxProj);
+			}
 
 			size_t uiDataOffset = renderState.GetDataOffset();
 
@@ -165,7 +133,7 @@ HyOpenGL::~HyOpenGL(void)
 			glVertexAttribPointer(mtx + 2, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + sizeof(GLuint) + (24 * sizeof(GLfloat))));
 			glVertexAttribPointer(mtx + 3, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + sizeof(GLuint) + (28 * sizeof(GLfloat))));
 
-			glBindTexture(GL_TEXTURE_2D, renderState.GetTextureHandle(0));
+			glBindTexture(GL_TEXTURE_2D_ARRAY, renderState.GetTextureHandle());
 
 			int iNumInsts = renderState.GetNumInstances();
 			glDrawArraysInstanced(m_eDrawMode, 0, 4, iNumInsts);
@@ -176,11 +144,16 @@ HyOpenGL::~HyOpenGL(void)
 			m_pShader2d[PRIMITIVE].Use();
 
 			if(renderState.IsEnabled(HyRenderState::USINGLOCALCOORDS))
+			{
 				m_pShader2d[PRIMITIVE].SetUniform("worldToCameraMatrix", m_kmtxIdentity);
+				m_pShader2d[PRIMITIVE].SetUniform("cameraToClipMatrix", m_mtxProjLocalCoords);
+			}
 			else
+			{
 				m_pShader2d[PRIMITIVE].SetUniform("worldToCameraMatrix", m_mtxView);
+				m_pShader2d[PRIMITIVE].SetUniform("cameraToClipMatrix", m_mtxProj);
+			}
 
-			m_pShader2d[PRIMITIVE].SetUniform("cameraToClipMatrix", m_mtxProj);
 
 			size_t uiDataOffset = renderState.GetDataOffset();
 
@@ -198,58 +171,11 @@ HyOpenGL::~HyOpenGL(void)
 			uiDataOffset += sizeof(uint32);
 			
 			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)uiDataOffset);
-			//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)(pInst->GetVertexDataOffset() + (4 * sizeof(GLfloat))));
-			//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(pInst->GetVertexDataOffset()+(8*sizeof(GLfloat))))
+
 			glDrawArrays(m_eDrawMode, 0, iNumVerts);
 		}
 	}
 }
-
-//void HyOpenGL::DrawBatchedQuads2d(char *pData)
-//{
-//	m_ShaderQuadBatch.SetUniform("localToWorld", pInst->GetTransformMtx());
-//
-//	uint32 uiByteOffset = pInst->GetVertexDataOffset();
-//	glVertexAttribPointer(pThis->m_ShaderQuadBatch.GetAttribLocation("position"), 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)uiByteOffset);
-//	glVertexAttribPointer(pThis->m_ShaderQuadBatch.GetAttribLocation("color"), 4, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(4*sizeof(GLfloat))));
-//	glVertexAttribPointer(pThis->m_ShaderQuadBatch.GetAttribLocation("uv"), 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(uiByteOffset+(8*sizeof(GLfloat))));
-//
-//	GLuint uiTexId = pInst->GetTextureId();
-//	glBindTexture(GL_TEXTURE_2D, uiTexId);
-//	glDrawElements(pThis->m_eDrawMode, pInst->GetNumQuads() * 5, GL_UNSIGNED_SHORT, 0);
-//}
-//
-///*static*/ void HyOpenGL::DrawPrim2dInst(IDraw2d *pBaseInst, void *pApi)
-//{
-//	HyDrawPrimitive2d *pInst = reinterpret_cast<HyDrawPrimitive2d *>(pBaseInst);
-//	HyOpenGL *pThis = reinterpret_cast<HyOpenGL *>(pApi);
-//
-//	pThis->m_ShaderPrimitive2d.SetUniform("primitiveColor", pInst->GetColorAlpha());
-//	pThis->m_ShaderPrimitive2d.SetUniform("transformMtx", pInst->GetTransformMtx());
-//
-//	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)pInst->GetVertexDataOffset());
-//	//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void *)(pInst->GetVertexDataOffset()+(4*sizeof(GLfloat))));
-//	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (void *)(pInst->GetVertexDataOffset()+(8*sizeof(GLfloat))));
-//
-//	glDrawArrays(pThis->m_eDrawMode, 0, pInst->GetNumVerts());
-//}
-
-///*static*/ void HyOpenGL::DrawTxt2dInst(IDraw2d *pBaseInst, void *pApi)
-//{
-//	HyDrawText2d *pInst = reinterpret_cast<HyDrawText2d *>(pBaseInst);
-//	HyOpenGL *pThis = reinterpret_cast<HyOpenGL *>(pApi);
-//
-//	pThis->m_ShaderText2d.SetUniform("textColor", pInst->GetColorAlpha());
-//	pThis->m_ShaderText2d.SetUniform("transformMtx", pInst->GetTransformMtx());
-//
-//	uint32 uiByteOffset = pInst->GetVertexDataOffset();
-//	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void *)uiByteOffset);
-//	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void *)(uiByteOffset+(4*sizeof(GLfloat))));
-//
-//	GLuint uiTexId = pInst->GetTextureId();
-//	glBindTexture(GL_TEXTURE_2D, uiTexId);
-//	glDrawElements(pThis->m_eDrawMode, pInst->GetNumChars() * 5, GL_UNSIGNED_SHORT, 0);
-//}
 
 /*virtual*/ void HyOpenGL::End_2d()
 {
@@ -294,10 +220,11 @@ HyOpenGL::~HyOpenGL(void)
 						vPixelData[i]);							// pointer to pixel data
 	}
 
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
