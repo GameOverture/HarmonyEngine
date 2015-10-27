@@ -81,7 +81,7 @@ HyOpenGL_Win::DeviceContext::DeviceContext(const HyWindowInfo &wndInfo)
 	wc.lpfnWndProc = WndProc;
 	wc.hInstance = hInstance;
 	wc.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);
-	wc.lpszClassName = L"Harmony Engine";
+	wc.lpszClassName = L"Harmony Engine"; // StringToWString(wndInfo.sName).c_str();
 	wc.style = CS_OWNDC;
 	wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);

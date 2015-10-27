@@ -24,11 +24,18 @@ int main(int argc, char **argv)
 	HarmonyInit initStruct;
 	initStruct.szGameName = "Test Game";
 	initStruct.szDataDir = "./data";
-	initStruct.uiNumWindows = 1;
+	initStruct.uiNumWindows = 2;
+	
 	initStruct.windowInfo[0].sName = "Test Window";
-	initStruct.windowInfo[0].vLocation = vec2(100, 100);
+	initStruct.windowInfo[0].vLocation = vec2(100.0f, 100.0f);
 	initStruct.windowInfo[0].vResolution = vec2(1024.0f, 768.0f);
 	initStruct.windowInfo[0].eType = HYWINDOW_WindowedSizeable;
+
+	initStruct.windowInfo[1].sName = "Test Window 2";
+	initStruct.windowInfo[1].vLocation = vec2(2000.0f, 100.0f);
+	initStruct.windowInfo[1].vResolution = vec2(1024.0f, 768.0f);
+	initStruct.windowInfo[1].eType = HYWINDOW_WindowedSizeable;
+
 	initStruct.fPixelsPerMeter = 180.0f;
 	initStruct.uiNumInputMappings = 1;
 
