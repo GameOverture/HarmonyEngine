@@ -15,13 +15,13 @@
 #include "Renderer/HyGfxComms.h"
 #include "Renderer/HyRenderState.h"
 
-class HyViewport;
+class HyWindow;
 
 class IHyRenderer
 {
 protected:
 	HyGfxComms &				m_GfxCommsRef;
-	vector<HyViewport> &		m_ViewportsRef;
+	vector<HyWindow> &		m_ViewportsRef;
 
 	queue<IHyData2d *> *		m_pMsgQueuePtr;		// The pointer to the currently active render message queue
 	queue<IHyData2d *> *		m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
@@ -32,7 +32,7 @@ protected:
 	HyRenderState				m_PrevRenderState;
 
 public:
-	IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef);
+	IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef);
 	virtual ~IHyRenderer(void);
 
 	virtual void StartRender() = 0;

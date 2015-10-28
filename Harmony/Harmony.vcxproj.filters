@@ -99,9 +99,6 @@
     <ClCompile Include="src\Renderer\Viewport\HyCamera3d.cpp">
       <Filter>Renderer\Viewport</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Viewport\HyViewport.cpp">
-      <Filter>Renderer\Viewport</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\IHyRenderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
@@ -182,6 +179,9 @@
     </ClCompile>
     <ClCompile Include="src\FileIO\Data\IHyData2d.cpp">
       <Filter>FileIO\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Viewport\HyWindow.cpp">
+      <Filter>Renderer\Viewport</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -435,9 +435,6 @@
     <ClInclude Include="include\Harmony\Renderer\Viewport\HyCamera3d.h">
       <Filter>Renderer\Viewport</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\Viewport\HyViewport.h">
-      <Filter>Renderer\Viewport</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\IHyRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
@@ -524,6 +521,9 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\FileIO\Data\IHyData2d.h">
       <Filter>FileIO\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\Viewport\HyWindow.h">
+      <Filter>Renderer\Viewport</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -47,26 +47,6 @@ HyGfxComms::~HyGfxComms()
 	delete m_pAtlasReceiveQueue_Render;
 }
 
-void HyGfxComms::SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info)
-{
-	m_csInfo.Lock();
-	m_vDeviceInfo.clear();
-	m_vDeviceInfo = info;
-	m_csInfo.Unlock();
-}
-
-void HyGfxComms::CloneMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &vDeviceInfoOut)
-{
-	vDeviceInfoOut.clear();
-
-	m_csInfo.Lock();
-
-	for(uint32 i = 0; i < static_cast<uint32>(m_vDeviceInfo.size()); ++i)
-		vDeviceInfoOut.push_back(m_vDeviceInfo[i]);
-
-	m_csInfo.Unlock();
-}
-
 // This should only be invoked from the Update/Game thread
 void HyGfxComms::Update_SetSharedPtrs()
 {

@@ -15,7 +15,7 @@
 
 #include "Memory/HyMemoryHeap.h"
 
-#include "Renderer/Viewport/HyViewport.h"
+#include "Renderer/Viewport/HyWindow.h"
 
 class IHyApplication
 {
@@ -24,7 +24,7 @@ class IHyApplication
 	HarmonyInit					m_Init;
 	static HyMemoryHeap			sm_Mem;
 
-	vector<HyViewport>			m_vViewports;
+	vector<HyWindow>			m_vWindows;
 	vector<IHyInputMap *>		m_vInputMaps;
 
 	virtual bool Initialize() = 0;
@@ -37,7 +37,7 @@ public:
 
 	static HyMemoryHeap &GetMemoryHeap()					{ return sm_Mem; }
 
-	HyViewport &Viewport(uint32 uiIndex = 0);
+	HyWindow &Window(uint32 uiIndex = 0);
 	HyInputMapInterop &Input(uint32 uiIndex = 0);
 
 	void *operator new(tMEMSIZE size);

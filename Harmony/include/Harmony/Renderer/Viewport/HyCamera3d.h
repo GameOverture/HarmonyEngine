@@ -21,23 +21,23 @@ using std::vector;
 
 class HyCamera3d : public ITransform<HyAnimVec3>
 {
-	friend class HyViewport;
-	HyViewport *		m_kpViewportPtr;
+	friend class HyWindow;
+	HyWindow *		m_kpViewportPtr;
 
 	bool				m_bEnabled;
 
-	HyRectangle<float>	m_RenderRect;	// Values are [0.0-1.0] representing percentages
+	HyRectangle<float>	m_ViewportRect;	// Values are [0.0-1.0] representing percentages
 
-	HyCamera3d(HyViewport *pViewport);
+	HyCamera3d(HyWindow *pViewport);
 public:
 	~HyCamera3d(void);
 
 	void SetEnabled(bool bEnable)				{ m_bEnabled = bEnable; }
 	bool IsEnabled()							{ return m_bEnabled; }
-	const HyRectangle<float> &GetRenderRect()	{ return m_RenderRect; }
+	const HyRectangle<float> &GetViewport()		{ return m_ViewportRect; }
 
 	// All values are [0.0 - 1.0] representing percentages of the entire game window
-	void SetRenderPercentageCoordinates(float fPosX, float fPosY, float fWidth, float fHeight);
+	void SetViewport(float fPosX, float fPosY, float fWidth, float fHeight);
 };
 
 #endif /* __HyCamera3d_h__ */

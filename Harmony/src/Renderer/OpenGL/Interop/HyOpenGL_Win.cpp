@@ -12,12 +12,17 @@
 #include "GuiTool/HyGuiComms.h"
 #include "Utilities/HyStrManip.h"
 
+#include "Renderer/Viewport/HyWindow.h"
+
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+HGLRC	HyOpenGL_Win::DeviceContext::sm_hGLContext;
 
-HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : HyOpenGL(gfxCommsRef, viewportsRef)
+HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef) : HyOpenGL(gfxCommsRef, viewportsRef)
 {
+	DeviceContext::sm_hGLContext = NULL;
+
 	m_uiNumDCs = static_cast<uint32>(m_ViewportsRef.size());
 	m_ppDeviceContexes = new DeviceContext *[m_uiNumDCs];
 
@@ -28,7 +33,7 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewport
 	if(EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&vMonitorDeviceInfo) == false)
 		HyLogError("EnumDisplayMonitors failed");
 
-	m_GfxCommsRef.SetMonitorDeviceInfo(vMonitorDeviceInfo);
+	HyWindow::SetMonitorDeviceInfo(vMonitorDeviceInfo);
 
 	if(HyOpenGL::Initialize() == false)
 		HyError("OpenGL API's Initialize() failed");
@@ -78,10 +83,12 @@ HyOpenGL_Win::DeviceContext::DeviceContext(const HyWindowInfo &wndInfo)
 	MSG msg = { 0 };
 	WNDCLASS wc = { 0 };
 
+	std::wstring sWindowName = StringToWString(wndInfo.sName);
+
 	wc.lpfnWndProc = WndProc;
 	wc.hInstance = hInstance;
 	wc.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);
-	wc.lpszClassName = L"Harmony Engine"; // StringToWString(wndInfo.sName).c_str();
+	wc.lpszClassName = sWindowName.c_str();
 	wc.style = CS_OWNDC;
 	wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
@@ -142,6 +149,13 @@ HyOpenGL_Win::DeviceContext::DeviceContext(const HyWindowInfo &wndInfo)
 		HyError("CreateWindowA() returned the error: " << dwError);
 	}
 
+	if(DeviceContext::sm_hGLContext == NULL)
+	{
+		HDC hDC = GetDC(m_hWnd);
+		DeviceContext::sm_hGLContext = wglCreateContext(hDC);
+		wglMakeCurrent(hDC, DeviceContext::sm_hGLContext);
+	}
+
 	ShowWindow(m_hWnd, SW_SHOW);						// Show The Window
 	SetForegroundWindow(m_hWnd);						// Slightly Higher Priority
 	SetFocus(m_hWnd);									// Sets Keyboard Focus To The Window
@@ -175,6 +189,7 @@ void HyOpenGL_Win::DeviceContext::Resize(GLsizei iWidth, GLsizei iHeight)
 	}
 }
 
+// TODO: setup this structure based on the HarmonyInit struct info
 PIXELFORMATDESCRIPTOR pfd =
 {
 	sizeof(PIXELFORMATDESCRIPTOR),
@@ -210,9 +225,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(pCreateStruct->lpCreateParams);
 
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG>(pThis));
-
-		pThis->m_hGLContext = wglCreateContext(hDeviceContext);
-		wglMakeCurrent(hDeviceContext, pThis->m_hGLContext);
 	}
 	break;
 
@@ -221,9 +233,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
 		HDC hDeviceContext = GetDC(hWnd);
-		wglMakeCurrent(hDeviceContext, pThis->m_hGLContext);
+		wglMakeCurrent(hDeviceContext, pThis->sm_hGLContext);
 
-		wglDeleteContext(pThis->m_hGLContext);
+		wglDeleteContext(pThis->sm_hGLContext);
 		PostQuitMessage(0);
 
 		DefWindowProc(hWnd, message, wParam, lParam);

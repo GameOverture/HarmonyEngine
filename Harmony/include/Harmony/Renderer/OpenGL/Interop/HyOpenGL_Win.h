@@ -13,16 +13,15 @@
 #include "Afx/HyStdAfx.h"
 #include "Renderer/OpenGL/HyOpenGL.h"
 
-#include "Renderer/Viewport/HyViewport.h"
-
 class HyOpenGL_Win : public HyOpenGL
 {
 	friend LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+
 	struct DeviceContext
 	{
-		HWND m_hWnd;
-		HGLRC m_hGLContext;
+		static HGLRC	sm_hGLContext;
+		HWND			m_hWnd;
 
 		DeviceContext(const HyWindowInfo &wndInfo);
 		~DeviceContext();
@@ -33,7 +32,7 @@ class HyOpenGL_Win : public HyOpenGL
 	uint32				m_uiNumDCs;
 
 public:
-	HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef);
+	HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef);
 	~HyOpenGL_Win();
 
 	uint32 GetNumDeviceContexts()				{ return m_uiNumDCs; }

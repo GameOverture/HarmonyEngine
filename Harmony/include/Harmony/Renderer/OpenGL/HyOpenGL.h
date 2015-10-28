@@ -45,7 +45,7 @@ protected:
 	GLenum					m_eDrawMode;
 
 public:
-	HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef);
+	HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef);
 	virtual ~HyOpenGL(void);
 
 	virtual void StartRender();

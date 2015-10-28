@@ -11,18 +11,52 @@
 #define __HyViewport_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Afx/HyInteropAfx.h"
 
 #include "Renderer/Viewport/HyCamera2d.h"
 #include "Renderer/Viewport/HyCamera3d.h"
 
-class HyViewport
+#include "Threading/BasicSync.h"
+
+struct HyMonitorDeviceInfo
+{
+	bool				bIsPrimaryMonitor;
+	std::wstring		sDeviceName;
+	std::wstring		sDeviceDescription;
+
+	struct Resolution
+	{
+		int32 iWidth;
+		int32 iHeight;
+
+		Resolution(int32 iW, int32 iH) : iWidth(iW), iHeight(iH)
+		{ }
+
+		bool operator <(const Resolution &right) const
+		{
+			return (this->iWidth + this->iHeight) < (right.iWidth + right.iHeight);
+		}
+
+		bool operator ==(const Resolution &right) const
+		{
+			return this->iWidth == right.iWidth && this->iHeight == right.iHeight;
+		}
+	};
+	vector<Resolution>	vResolutions;
+};
+
+class HyWindow
 {
 	friend class HyScene;
+	friend class HyOpenGL_Win;	// <- TODO: remedy this since I can't use a typedef (aka HyRendererInterop)
 
-	HyWindowInfo			m_Info;
+	static vector<HyMonitorDeviceInfo>	sm_vMonitorInfo;
+	static BasicSection					sm_csInfo;
+
+	HyWindowInfo						m_Info;
 	
-	vector<HyCamera2d *>	m_vCams2d;
-	vector<HyCamera3d *>	m_vCams3d;
+	vector<HyCamera2d *>				m_vCams2d;
+	vector<HyCamera3d *>				m_vCams3d;
 
 	enum eDirtyFlags
 	{
@@ -32,11 +66,12 @@ class HyViewport
 		FLAG_Type		= 1 << 3,
 		FLAG_BitsPerPix	= 1 << 4
 	};
-	uint32					m_uiDirtyFlags;
+	uint32								m_uiDirtyFlags;
+
 
 public:
-	HyViewport();
-	~HyViewport(void);
+	HyWindow();
+	~HyWindow(void);
 
 	const HyWindowInfo &GetWindowInfo();
 
@@ -60,6 +95,11 @@ public:
 
 	void				RemoveCamera(HyCamera2d *&pCam);
 	void				RemoveCamera(HyCamera3d *&pCam);
+
+	static void			MonitorDeviceInfo(vector<HyMonitorDeviceInfo> &vDeviceInfoOut);
+
+private:
+	static void			SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
 };
 
 #endif /* __HyViewport_h__ */

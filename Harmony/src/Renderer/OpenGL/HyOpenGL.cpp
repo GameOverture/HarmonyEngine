@@ -10,7 +10,7 @@
 #include "Renderer/OpenGL/HyOpenGL.h"
 #include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
 
-HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyViewport> &viewportsRef) : IHyRenderer(gfxCommsRef, viewportsRef),
+HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef) : IHyRenderer(gfxCommsRef, viewportsRef),
 																				m_mtxView(1.0f),
 																				m_kmtxIdentity(1.0f)
 {

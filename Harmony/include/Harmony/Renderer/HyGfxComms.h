@@ -22,33 +22,6 @@ using std::queue;
 
 #define RENDER_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
 
-struct HyMonitorDeviceInfo
-{
-	bool				bIsPrimaryMonitor;
-	std::wstring		sDeviceName;
-	std::wstring		sDeviceDescription;
-
-	struct Resolution
-	{
-		int32 iWidth;
-		int32 iHeight;
-
-		Resolution(int32 iW, int32 iH) : iWidth(iW), iHeight(iH)
-		{ }
-
-		bool operator <(const Resolution &right) const
-		{
-			return (this->iWidth + this->iHeight) < (right.iWidth + right.iHeight);
-		}
-
-		bool operator ==(const Resolution &right) const
-		{
-			return this->iWidth == right.iWidth && this->iHeight == right.iHeight;
-		}
-	};
-	vector<Resolution>	vResolutions;
-};
-
 class HyGfxComms
 {
 public:
@@ -74,8 +47,6 @@ public:
 	};
 
 private:
-	vector<HyMonitorDeviceInfo>	m_vDeviceInfo;
-
 	char *						m_pBuffer_Update;
 	char *						m_pBuffer_Shared;
 	char *						m_pBuffer_Render;
@@ -89,14 +60,10 @@ private:
 	queue<IHyData2d *> *		m_pAtlasReceiveQueue_Render;
 
 	BasicSection				m_csBuffers;
-	BasicSection				m_csInfo;
 
 public:
 	HyGfxComms();
 	~HyGfxComms();
-
-	void SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
-	void CloneMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &vDeviceInfoOut);
 	
 	// This should only be invoked from the Update/Game thread
 	inline char *GetWriteBufferPtr()		{ return m_pBuffer_Update; }

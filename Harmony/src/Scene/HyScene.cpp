@@ -11,7 +11,7 @@
 
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/HyGfxComms.h"
-#include "Renderer/Viewport/HyViewport.h"
+#include "Renderer/Viewport/HyWindow.h"
 
 #include "Scene/Instances/IHyInst2d.h"
 #include "Scene/Instances/HySound.h"
@@ -29,7 +29,7 @@ HyCoordinateType	HyScene::sm_eDefaultCoordType = HYCOORD_Default;
 float				HyScene::sm_fPixelsPerMeter = 0.0f;
 bool				HyScene::sm_bInst2dOrderingDirty = false;
 
-HyScene::HyScene(HyGfxComms &gfxCommsRef, HyViewport &gameViewport, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter) :	m_b2World(b2Vec2(0.0f, -10.0f)),
+HyScene::HyScene(HyGfxComms &gfxCommsRef, HyWindow &gameViewport, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter) :	m_b2World(b2Vec2(0.0f, -10.0f)),
 																																		m_iPhysVelocityIterations(8),
 																																		m_iPhysPositionIterations(3),
 																																		m_GfxCommsRef(gfxCommsRef),
@@ -135,7 +135,7 @@ void HyScene::WriteDrawBuffers()
 	{
 		if(m_ViewportRef.m_vCams3d[i]->IsEnabled())
 		{
-			*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_ViewportRef.m_vCams3d[i]->GetRenderRect();
+			*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_ViewportRef.m_vCams3d[i]->GetViewport();
 			m_pCurWritePos += sizeof(HyRectangle<float>);
 			
 			HyError("GetLocalTransform_SRT should be 3d");
@@ -160,7 +160,7 @@ void HyScene::WriteDrawBuffers()
 	{
 		if(m_ViewportRef.m_vCams2d[i]->IsEnabled())
 		{
-			*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_ViewportRef.m_vCams2d[i]->GetRenderRect();
+			*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_ViewportRef.m_vCams2d[i]->GetViewport();
 			m_pCurWritePos += sizeof(HyRectangle<float>);
 
 			m_ViewportRef.m_vCams2d[i]->GetLocalTransform_SRT(mtxView);
