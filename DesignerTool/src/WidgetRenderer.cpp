@@ -19,7 +19,7 @@ WidgetRenderer::~WidgetRenderer()
 
 /*virtual*/ bool WidgetRenderer::Initialize()
 {
-    m_pCam = Viewport().CreateCamera2d();
+    m_pCam = Window().CreateCamera2d();
 
     m_pCam->Pos().Set(0.0f, 0.0f);
     m_pCam->SetZoom(0.8f);

@@ -12,9 +12,9 @@ HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent)
 {
     // Todo: test to see if QWidget parent works for HyEngine()'s ctor
 
-//    QTimer *timer = new QTimer(this);
-//    connect(timer, SIGNAL(timeout()), this, SLOT(Render()));
-//    timer->start(17);
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(17);
 }
 
 HyGuiRenderer::~HyGuiRenderer()
