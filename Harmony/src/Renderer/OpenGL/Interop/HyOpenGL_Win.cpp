@@ -23,11 +23,11 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsR
 {
 	DeviceContext::sm_hGLContext = NULL;
 
-	m_uiNumDCs = static_cast<uint32>(m_ViewportsRef.size());
+	m_uiNumDCs = static_cast<uint32>(m_vWindowRef.size());
 	m_ppDeviceContexes = new DeviceContext *[m_uiNumDCs];
 
 	for(uint32 i = 0; i < m_uiNumDCs; ++i)
-		m_ppDeviceContexes[i] = new DeviceContext(m_ViewportsRef[i].GetWindowInfo());
+		m_ppDeviceContexes[i] = new DeviceContext(m_vWindowRef[i].GetWindowInfo());
 
 	vector<HyMonitorDeviceInfo> vMonitorDeviceInfo;
 	if(EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&vMonitorDeviceInfo) == false)
@@ -78,6 +78,25 @@ HyOpenGL_Win::~HyOpenGL_Win()
 
 HyOpenGL_Win::DeviceContext::DeviceContext(const HyWindowInfo &wndInfo)
 {
+	m_PixelFormatDescriptor.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+	m_PixelFormatDescriptor.nVersion = 1;
+	m_PixelFormatDescriptor.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+	m_PixelFormatDescriptor.iPixelType = PFD_TYPE_RGBA;
+	m_PixelFormatDescriptor.cColorBits = 32;
+	m_PixelFormatDescriptor.cRedBits = m_PixelFormatDescriptor.cRedShift = 0;
+	m_PixelFormatDescriptor.cGreenBits = m_PixelFormatDescriptor.cGreenShift = 0;
+	m_PixelFormatDescriptor.cBlueBits = m_PixelFormatDescriptor.cBlueShift = 0;
+	m_PixelFormatDescriptor.cAlphaBits = m_PixelFormatDescriptor.cAlphaShift = 0;
+	m_PixelFormatDescriptor.cAccumBits = m_PixelFormatDescriptor.cAccumRedBits = m_PixelFormatDescriptor.cAccumGreenBits = m_PixelFormatDescriptor.cAccumBlueBits = m_PixelFormatDescriptor.cAccumAlphaBits = 0;
+	m_PixelFormatDescriptor.cDepthBits =24;
+	m_PixelFormatDescriptor.cStencilBits = 8;
+	m_PixelFormatDescriptor.cAuxBuffers = 0;
+	m_PixelFormatDescriptor.iLayerType = PFD_MAIN_PLANE;
+	m_PixelFormatDescriptor.bReserved = 0;
+	m_PixelFormatDescriptor.dwLayerMask = 0;
+	m_PixelFormatDescriptor.dwVisibleMask = 0;
+	m_PixelFormatDescriptor.dwDamageMask = 0;
+
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 
 	MSG msg = { 0 };
@@ -107,7 +126,7 @@ HyOpenGL_Win::DeviceContext::DeviceContext(const HyWindowInfo &wndInfo)
 		dmScreenSettings.dmSize = sizeof(dmScreenSettings);
 		dmScreenSettings.dmPelsWidth = wndInfo.vResolution.x;
 		dmScreenSettings.dmPelsHeight = wndInfo.vResolution.y;
-		dmScreenSettings.dmBitsPerPel = wndInfo.iBitsPerPixel;
+		dmScreenSettings.dmBitsPerPel = m_PixelFormatDescriptor.cColorBits; //wndInfo.iBitsPerPixel;
 		dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
 		if(ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
@@ -149,13 +168,6 @@ HyOpenGL_Win::DeviceContext::DeviceContext(const HyWindowInfo &wndInfo)
 		HyError("CreateWindowA() returned the error: " << dwError);
 	}
 
-	if(DeviceContext::sm_hGLContext == NULL)
-	{
-		HDC hDC = GetDC(m_hWnd);
-		DeviceContext::sm_hGLContext = wglCreateContext(hDC);
-		wglMakeCurrent(hDC, DeviceContext::sm_hGLContext);
-	}
-
 	ShowWindow(m_hWnd, SW_SHOW);						// Show The Window
 	SetForegroundWindow(m_hWnd);						// Slightly Higher Priority
 	SetFocus(m_hWnd);									// Sets Keyboard Focus To The Window
@@ -167,8 +179,10 @@ void HyOpenGL_Win::DeviceContext::Resize(GLsizei iWidth, GLsizei iHeight)
 	if(iHeight == 0)
 		iHeight = 1;
 
+
+
 	// Reset The Current Viewport
-	glViewport(0, 0, iWidth, iHeight);
+	//glViewport(0, 0, iWidth, iHeight);
 
 	//glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
 	//glLoadIdentity();									// Reset The Projection Matrix
@@ -180,93 +194,87 @@ void HyOpenGL_Win::DeviceContext::Resize(GLsizei iWidth, GLsizei iHeight)
 	//glLoadIdentity();									// Reset The Modelview Matrix
 }
 
-/*virtual*/ void HyOpenGL_Win::FinishRender()
+/*virtual*/ void HyOpenGL_Win::SetRenderSurface(eRenderSurfaceType eSurfaceType, uint32 uiIndex, bool bDirty)
 {
-	for(uint32 i = 0; i < m_uiNumDCs; ++i)
+	if(eSurfaceType == IHyRenderer::RENDERSURFACE_Window)
 	{
-		HDC hDeviceContext = GetDC(m_ppDeviceContexes[i]->m_hWnd);
-		SwapBuffers(hDeviceContext);
+		wglMakeCurrent(GetDC(m_ppDeviceContexes[uiIndex]->m_hWnd), DeviceContext::sm_hGLContext);
+
+		//if(bDirty)
+		// TODO: If fullscreen, make change here
 	}
 }
 
-// TODO: setup this structure based on the HarmonyInit struct info
-PIXELFORMATDESCRIPTOR pfd =
+/*virtual*/ void HyOpenGL_Win::FinishRender()
 {
-	sizeof(PIXELFORMATDESCRIPTOR),
-	1,
-	PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    //Flags
-	PFD_TYPE_RGBA,            //The kind of framebuffer. RGBA or palette.
-	32,                        //Colordepth of the framebuffer.
-	0, 0, 0, 0, 0, 0,
-	0,
-	0,
-	0,
-	0, 0, 0, 0,
-	24,                        //Number of bits for the depthbuffer
-	8,                        //Number of bits for the stencilbuffer
-	0,                        //Number of Aux buffers in the framebuffer.
-	PFD_MAIN_PLANE,
-	0,
-	0, 0, 0
-};
+	HDC hDeviceContext = GetDC(m_ppDeviceContexes[m_iWindowIndex]->m_hWnd);
+	SwapBuffers(hDeviceContext);
+}
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message)
 	{
-	case WM_CREATE:
-	{
-		HDC hDeviceContext = GetDC(hWnd);
-
-		int iPixelFormat = ChoosePixelFormat(hDeviceContext, &pfd);
-		SetPixelFormat(hDeviceContext, iPixelFormat, &pfd);
-
-		CREATESTRUCT *pCreateStruct = reinterpret_cast<CREATESTRUCT *>(lParam);
-		HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(pCreateStruct->lpCreateParams);
-
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG>(pThis));
-	}
-	break;
-
-	case WM_DESTROY:
-	{
-		HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
-
-		HDC hDeviceContext = GetDC(hWnd);
-		wglMakeCurrent(hDeviceContext, pThis->sm_hGLContext);
-
-		wglDeleteContext(pThis->sm_hGLContext);
-		PostQuitMessage(0);
-
-		DefWindowProc(hWnd, message, wParam, lParam);
-	}
-	break;
-
-	case WM_CLOSE:
-	{
-		PostQuitMessage(0);
-		return 0;
-	}
-
-	case WM_SYSCOMMAND:
-	{
-		switch(wParam)
+		case WM_CREATE:
 		{
-		case SC_SCREENSAVE:		// Screen saver Trying To Start?
-		case SC_MONITORPOWER:	// Monitor Trying To Enter Powersave?
-			// Prevent From Happening
-			return 0;
+			CREATESTRUCT *pCreateStruct = reinterpret_cast<CREATESTRUCT *>(lParam);
+			HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(pCreateStruct->lpCreateParams);
+
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG>(pThis));
+
+			HDC hDeviceContext = GetDC(hWnd);
+
+			int iPixelFormat = ChoosePixelFormat(hDeviceContext, &pThis->m_PixelFormatDescriptor);
+			SetPixelFormat(hDeviceContext, iPixelFormat, &pThis->m_PixelFormatDescriptor);
+
+			if(pThis->sm_hGLContext == NULL)
+			{
+				HDC hDC = GetDC(hWnd);
+				pThis->sm_hGLContext = wglCreateContext(hDC);
+				wglMakeCurrent(hDC, pThis->sm_hGLContext);
+			}
 		}
 		break;
-	}
 
-	case WM_SIZE:
-	{
-		HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+		case WM_DESTROY:
+		{
+			HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
-		pThis->Resize(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
-		return 0;
-	}
+			HDC hDeviceContext = GetDC(hWnd);
+			wglMakeCurrent(hDeviceContext, pThis->sm_hGLContext);
+
+			wglDeleteContext(pThis->sm_hGLContext);
+			PostQuitMessage(0);
+
+			DefWindowProc(hWnd, message, wParam, lParam);
+		}
+		break;
+
+		case WM_CLOSE:
+		{
+			PostQuitMessage(0);
+			return 0;
+		}
+
+		case WM_SYSCOMMAND:
+		{
+			switch(wParam)
+			{
+			case SC_SCREENSAVE:		// Screen saver Trying To Start?
+			case SC_MONITORPOWER:	// Monitor Trying To Enter Powersave?
+				// Prevent From Happening
+				return 0;
+			}
+			break;
+		}
+
+		case WM_SIZE:
+		{
+			HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+
+			pThis->Resize(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
+			return 0;
+		}
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);

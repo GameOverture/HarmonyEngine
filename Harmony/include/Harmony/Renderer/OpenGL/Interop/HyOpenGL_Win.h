@@ -18,10 +18,13 @@ class HyOpenGL_Win : public HyOpenGL
 	friend LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 
-	struct DeviceContext
+	class DeviceContext
 	{
-		static HGLRC	sm_hGLContext;
-		HWND			m_hWnd;
+	public:
+		static HGLRC			sm_hGLContext;
+
+		PIXELFORMATDESCRIPTOR	m_PixelFormatDescriptor;
+		HWND					m_hWnd;
 
 		DeviceContext(const HyWindowInfo &wndInfo);
 		~DeviceContext();
@@ -37,6 +40,8 @@ public:
 
 	uint32 GetNumDeviceContexts()				{ return m_uiNumDCs; }
 	HWND GetDeviceContextHWND(uint32 uiIndex)	{ return m_ppDeviceContexes[uiIndex]->m_hWnd; }
+
+	virtual void SetRenderSurface(eRenderSurfaceType eSurfaceType, uint32 uiIndex, bool bDirty);
 
 	virtual void FinishRender();
 };

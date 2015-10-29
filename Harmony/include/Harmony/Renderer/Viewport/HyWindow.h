@@ -49,6 +49,7 @@ class HyWindow
 {
 	friend class HyScene;
 	friend class HyOpenGL_Win;	// <- TODO: remedy this since I can't use a typedef (aka HyRendererInterop)
+	friend class IHyRenderer;
 
 	static vector<HyMonitorDeviceInfo>	sm_vMonitorInfo;
 	static BasicSection					sm_csInfo;
@@ -63,11 +64,11 @@ class HyWindow
 		FLAG_Title		= 1 << 0,
 		FLAG_Resolution	= 1 << 1,
 		FLAG_Location	= 1 << 2,
-		FLAG_Type		= 1 << 3,
-		FLAG_BitsPerPix	= 1 << 4
+		FLAG_Type		= 1 << 3
 	};
 	uint32								m_uiDirtyFlags;
 
+	BasicSection						m_cs;
 
 public:
 	HyWindow();
@@ -100,6 +101,8 @@ public:
 
 private:
 	static void			SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
+
+	void				ClearDirtyFlag();
 };
 
 #endif /* __HyViewport_h__ */

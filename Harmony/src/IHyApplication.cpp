@@ -24,7 +24,6 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
 		m_vWindows[i].SetResolution(m_Init.windowInfo[i].vResolution);
 		m_vWindows[i].SetLocation(m_Init.windowInfo[i].vLocation);
 		m_vWindows[i].SetType(m_Init.windowInfo[i].eType);
-		m_vWindows[i].SetBitsPerPixel(m_Init.windowInfo[i].iBitsPerPixel);
 	}
 
 	for(uint32 i = 0; i < m_Init.uiNumInputMappings; ++i)

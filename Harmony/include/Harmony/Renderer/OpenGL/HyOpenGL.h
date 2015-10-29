@@ -48,6 +48,8 @@ public:
 	HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef);
 	virtual ~HyOpenGL(void);
 
+	virtual void SetRenderSurface(eRenderSurfaceType eSurfaceType, uint32 uiIndex, bool bDirty);
+
 	virtual void StartRender();
 	
 	virtual bool Begin_3d();

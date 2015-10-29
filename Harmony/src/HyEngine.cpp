@@ -20,7 +20,7 @@ HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::GetMemoryHeap();
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Input(m_AppRef.m_vInputMaps),
-												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows[0], m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter),
+												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows, m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter),
 												m_FileIO(m_AppRef.m_Init.szDataDir, m_GfxBuffer, m_Scene),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_vWindows)
 {

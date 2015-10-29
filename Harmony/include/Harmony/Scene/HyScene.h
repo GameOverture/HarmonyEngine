@@ -52,7 +52,7 @@ class HyScene
 	HyBox2dRuntime										m_Phys2dContactListener;
 
 	HyGfxComms &										m_GfxCommsRef;
-	HyWindow &										m_ViewportRef;
+	vector<HyWindow> &									m_vWindowRef;
 
 	// Pointers to all instances
 	
@@ -66,7 +66,7 @@ class HyScene
 	char *												m_pCurWritePos;
 
 public:
-	HyScene(HyGfxComms &gfxCommsRef, HyWindow &gameViewport, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter);
+	HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter);
 	~HyScene(void);
 
 	static float PixelsPerMeter()					{ return sm_fPixelsPerMeter; }

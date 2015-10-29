@@ -23,6 +23,10 @@ HyOpenGL::~HyOpenGL(void)
 {
 }
 
+/*virtual*/ void HyOpenGL::SetRenderSurface(eRenderSurfaceType eSurfaceType, uint32 uiIndex, bool bDirty)
+{
+}
+
 /*virtual*/ void HyOpenGL::StartRender()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -48,25 +52,22 @@ HyOpenGL::~HyOpenGL(void)
 	if(GetNumRenderStates2d() == 0 || m_iNumRenderPassesLeft2d == 0)
 		return false;
 
-	// TODO: Don't hardcode these 2 values
-	int iWidth = 1024;
-	int iHeight = 768;
-
 	if(m_iNumRenderPassesLeft2d == GetNumCameras2d())
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
-		glBufferData(GL_ARRAY_BUFFER, m_DrawpBufferHeader->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, m_pDrawBufferHeader->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
 	
-		m_mtxProjLocalCoords = glm::ortho(iWidth * -0.5f, iWidth * 0.5f, iHeight * -0.5f, iHeight * 0.5f);
+		m_mtxProjLocalCoords = glm::ortho(m_uiRenderSurfaceWidth * -0.5f, m_uiRenderSurfaceWidth * 0.5f, m_uiRenderSurfaceHeight * -0.5f, m_uiRenderSurfaceHeight * 0.5f);
 	}
 	
 	int iCameraIndex = GetNumCameras2d() - m_iNumRenderPassesLeft2d;
+	int iWindowIndex = GetCameraWindowIndex2d(iCameraIndex);
 
 	HyRectangle<float> *pViewportRect = GetCameraViewportRect2d(iCameraIndex);
-	glViewport(static_cast<GLint>(pViewportRect->x * iWidth), static_cast<GLint>(pViewportRect->y * iHeight), static_cast<GLsizei>(pViewportRect->width * iWidth), static_cast<GLsizei>(pViewportRect->height * iHeight));
+	glViewport(static_cast<GLint>(pViewportRect->x * m_uiRenderSurfaceWidth), static_cast<GLint>(pViewportRect->y * m_uiRenderSurfaceHeight), static_cast<GLsizei>(pViewportRect->width * m_uiRenderSurfaceWidth), static_cast<GLsizei>(pViewportRect->height * m_uiRenderSurfaceHeight));
 
-	float fWidth = (pViewportRect->width * iWidth);
-	float fHeight = (pViewportRect->height * iHeight);
+	float fWidth = (pViewportRect->width * m_uiRenderSurfaceWidth);
+	float fHeight = (pViewportRect->height * m_uiRenderSurfaceHeight);
 	
 	m_mtxView = *GetCameraView2d(iCameraIndex);
 	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f);

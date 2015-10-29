@@ -74,17 +74,6 @@ void HyWindow::SetType(HyWindowType eType)
 	m_uiDirtyFlags |= FLAG_Type;
 }
 
-int32 HyWindow::GetBitsPerPixel()
-{
-	return m_Info.iBitsPerPixel;
-}
-
-void HyWindow::SetBitsPerPixel(int32 iBitsPerPixel)
-{
-	m_Info.iBitsPerPixel = iBitsPerPixel;
-	m_uiDirtyFlags |= FLAG_BitsPerPix;
-}
-
 HyCamera2d *HyWindow::CreateCamera2d()
 {
 	HyCamera2d *pNewCam = new HyCamera2d(this);
@@ -125,6 +114,13 @@ void HyWindow::RemoveCamera(HyCamera3d *&pCam)
 			return;
 		}
 	}
+}
+
+void HyWindow::ClearDirtyFlag()
+{
+	m_cs.Lock();
+	m_uiDirtyFlags = 0;
+	m_cs.Unlock();
 }
 
 /*static*/ void HyWindow::MonitorDeviceInfo(vector<HyMonitorDeviceInfo> &vDeviceInfoOut)

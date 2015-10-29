@@ -29,11 +29,11 @@ HyCoordinateType	HyScene::sm_eDefaultCoordType = HYCOORD_Default;
 float				HyScene::sm_fPixelsPerMeter = 0.0f;
 bool				HyScene::sm_bInst2dOrderingDirty = false;
 
-HyScene::HyScene(HyGfxComms &gfxCommsRef, HyWindow &gameViewport, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter) :	m_b2World(b2Vec2(0.0f, -10.0f)),
+HyScene::HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter) :	m_b2World(b2Vec2(0.0f, -10.0f)),
 																																		m_iPhysVelocityIterations(8),
 																																		m_iPhysPositionIterations(3),
 																																		m_GfxCommsRef(gfxCommsRef),
-																																		m_ViewportRef(gameViewport)
+																																		m_vWindowRef(vWindowRef)
 {
 	sm_eDefaultCoordType = eDefaultCoordType;
 	sm_fPixelsPerMeter = fPixelsPerMeter;
@@ -123,6 +123,7 @@ void HyScene::WriteDrawBuffers()
 	m_pCurWritePos += sizeof(HyGfxComms::tDrawHeader);
 
 	mat4 mtxView;
+	uint32 uiNumWindows = static_cast<uint32>(m_vWindowRef.size());
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 3d CAMERA(S) BUFFER
 	pDrawHeader->uiOffsetToCameras3d = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
@@ -130,20 +131,26 @@ void HyScene::WriteDrawBuffers()
 	m_pCurWritePos += sizeof(int32);
 	
 	int32 iCount = 0;
-	size_t uiTotalNumInsts = m_ViewportRef.m_vCams3d.size();
-	for(size_t i = 0; i < uiTotalNumInsts; ++i)
+	for(uint32 i = 0; i < uiNumWindows; ++i)
 	{
-		if(m_ViewportRef.m_vCams3d[i]->IsEnabled())
+		uint32 uiNumCameras3d = static_cast<uint32>(m_vWindowRef[i].m_vCams3d.size());
+		for(uint32 j = 0; j < uiNumCameras3d; ++j)
 		{
-			*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_ViewportRef.m_vCams3d[i]->GetViewport();
-			m_pCurWritePos += sizeof(HyRectangle<float>);
-			
-			HyError("GetLocalTransform_SRT should be 3d");
-			m_ViewportRef.m_vCams3d[i]->GetLocalTransform_SRT(mtxView);
-			*(reinterpret_cast<mat4 *>(m_pCurWritePos)) = mtxView;
-			m_pCurWritePos += sizeof(mat4);
+			if(m_vWindowRef[i].m_vCams3d[j]->IsEnabled())
+			{
+				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = i;
+				m_pCurWritePos += sizeof(uint32);
 
-			iCount++;
+				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_vWindowRef[i].m_vCams3d[j]->GetViewport();
+				m_pCurWritePos += sizeof(HyRectangle<float>);
+			
+				HyError("GetLocalTransform_SRT should be 3d");
+				m_vWindowRef[i].m_vCams3d[j]->GetLocalTransform_SRT(mtxView);
+				*(reinterpret_cast<mat4 *>(m_pCurWritePos)) = mtxView;
+				m_pCurWritePos += sizeof(mat4);
+
+				iCount++;
+			}
 		}
 	}
 	*(reinterpret_cast<int32 *>(pWriteNum3dCamsHere)) = iCount;
@@ -155,19 +162,25 @@ void HyScene::WriteDrawBuffers()
 	m_pCurWritePos += sizeof(int32);
 
 	iCount = 0;
-	uiTotalNumInsts = m_ViewportRef.m_vCams2d.size();
-	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
+	for(uint32 i = 0; i < uiNumWindows; ++i)
 	{
-		if(m_ViewportRef.m_vCams2d[i]->IsEnabled())
+		uint32 uiNumCameras2d = m_vWindowRef[i].m_vCams2d.size();
+		for(uint32 j = 0; j < uiNumCameras2d; ++j)
 		{
-			*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_ViewportRef.m_vCams2d[i]->GetViewport();
-			m_pCurWritePos += sizeof(HyRectangle<float>);
+			if(m_vWindowRef[i].m_vCams2d[j]->IsEnabled())
+			{
+				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = i;
+				m_pCurWritePos += sizeof(uint32);
 
-			m_ViewportRef.m_vCams2d[i]->GetLocalTransform_SRT(mtxView);
-			*(reinterpret_cast<mat4 *>(m_pCurWritePos)) = mtxView;
-			m_pCurWritePos += sizeof(mat4);
+				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_vWindowRef[i].m_vCams2d[j]->GetViewport();
+				m_pCurWritePos += sizeof(HyRectangle<float>);
 
-			iCount++;
+				m_vWindowRef[i].m_vCams2d[j]->GetLocalTransform_SRT(mtxView);
+				*(reinterpret_cast<mat4 *>(m_pCurWritePos)) = mtxView;
+				m_pCurWritePos += sizeof(mat4);
+
+				iCount++;
+			}
 		}
 	}
 	*(reinterpret_cast<int32 *>(pWriteNum2dCamsHere)) = iCount;
@@ -179,7 +192,7 @@ void HyScene::WriteDrawBuffers()
 	m_pCurWritePos += sizeof(int32);
 
 	iCount = 0;
-	uiTotalNumInsts = m_vInst3d.size();
+	uint32 uiTotalNumInsts = static_cast<uint32>(m_vInst3d.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
 		if(m_vInst3d[i]->IsEnabled())

@@ -8,9 +8,10 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/IHyRenderer.h"
+#include "Renderer/Viewport/HyWindow.h"
 
-IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef) :	m_GfxCommsRef(gfxCommsRef),
-																						m_ViewportsRef(viewportsRef)
+IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef) :	m_GfxCommsRef(gfxCommsRef),
+																					m_vWindowRef(vWindowRef)
 {
 }
 
@@ -26,7 +27,7 @@ void IHyRenderer::Update()
 		InteropSleep(10);
 		return;
 	}
-	m_DrawpBufferHeader = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr);
+	m_pDrawBufferHeader = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr);
 
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
 	while(!m_pMsgQueuePtr->empty())
@@ -42,23 +43,47 @@ void IHyRenderer::Update()
 		m_pSendMsgQueuePtr->push(pData);
 	}
 
-	StartRender();
-
-	while(Begin_3d())
+	m_iWindowIndex = -1;
+	while(EnumRenderSurface())
 	{
-		//Draw3d();
-		End_3d();
-	}
+		StartRender();
 
-	while(Begin_2d())
-	{
-		Draw2d();
-		End_2d();
-	}
+		while(Begin_3d())
+		{
+			//Draw3d();
+			End_3d();
+		}
 
-	FinishRender();
+		while(Begin_2d())
+		{
+			Draw2d();
+			End_2d();
+		}
+
+		FinishRender();
+	}
 
 	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr)->uiReturnFlags |= HyGfxComms::GFXFLAG_HasRendered;
+}
+
+bool IHyRenderer::EnumRenderSurface()
+{
+	// Render to texture surfaces should be drawn first, as they'd be used and displayed in the window surface(s)
+
+	// TODO: Make m_vWindowRef threadsafe
+	// Now render the game windows
+	m_iWindowIndex++;
+	if(m_iWindowIndex >= m_vWindowRef.size())
+		return false;
+
+	m_uiRenderSurfaceWidth = m_vWindowRef[m_iWindowIndex].GetResolution().x;
+	m_uiRenderSurfaceHeight = m_vWindowRef[m_iWindowIndex].GetResolution().y;
+
+	SetRenderSurface(RENDERSURFACE_Window, m_iWindowIndex, false);
+
+	m_vWindowRef[m_iWindowIndex].ClearDirtyFlag();
+
+	return true;
 }
 
 void IHyRenderer::Draw2d()
