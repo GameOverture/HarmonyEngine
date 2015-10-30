@@ -46,8 +46,6 @@ public:
 
 	inline bool	IsEnabled()										{ return m_bEnabled; }
 	inline void	SetEnabled(bool bVis)							{ m_bEnabled = bVis; }
-
-	inline uint32 GetRenderState() const						{ return m_uiRenderStates; }
 	
 	// Returns the converted pixel position to the specified HyCoordinateType
 	void GetLocalTransform(mat4 &outMtx) const;
