@@ -45,7 +45,7 @@ TestBed::~TestBed(void)
 	m_pCam2 = Window().CreateCamera2d();
 	m_pCam2->SetViewport(0.5f, 0.0f, 0.5f, 1.0f);
 
-	m_pCam_Viewport2 = Window(1).CreateCamera2d();
+	//m_pCam_Viewport2 = Window(1).CreateCamera2d();
 	
 	m_Player.Initialize();
 
@@ -58,9 +58,16 @@ TestBed::~TestBed(void)
 	//m_pCam->SetZoom(0.8f);
 
 	Input().MapBtn_KB(CAM_LEFT, KeyLeft);
+	Input().MapBtn_KB(CAM_LEFT, KeyA);
+
 	Input().MapBtn_KB(CAM_RIGHT, KeyRight);
+	Input().MapBtn_KB(CAM_RIGHT, KeyD);
+
 	Input().MapBtn_KB(CAM_UP, KeyUp);
+	Input().MapBtn_KB(CAM_UP, KeyW);
+
 	Input().MapBtn_KB(CAM_DOWN, KeyDown);
+	Input().MapBtn_KB(CAM_DOWN, KeyS);
 
 
 	return true;
