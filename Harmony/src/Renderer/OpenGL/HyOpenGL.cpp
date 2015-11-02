@@ -49,6 +49,13 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ bool HyOpenGL::Begin_2d()
 {
+	int iCameraIndex;
+	int iWindowIndex;
+
+	iCameraIndex = GetNumCameras2d() - m_iNumRenderPassesLeft2d;
+	iWindowIndex = GetCameraWindowIndex2d(iCameraIndex);
+	if(m_iWindowIndex != iWindowIndex)
+
 	if(GetNumRenderStates2d() == 0 || m_iNumRenderPassesLeft2d == 0)
 		return false;
 
@@ -60,8 +67,6 @@ HyOpenGL::~HyOpenGL(void)
 		m_mtxProjLocalCoords = glm::ortho(m_uiRenderSurfaceWidth * -0.5f, m_uiRenderSurfaceWidth * 0.5f, m_uiRenderSurfaceHeight * -0.5f, m_uiRenderSurfaceHeight * 0.5f);
 	}
 	
-	int iCameraIndex = GetNumCameras2d() - m_iNumRenderPassesLeft2d;
-	int iWindowIndex = GetCameraWindowIndex2d(iCameraIndex);
 
 	HyRectangle<float> *pViewportRect = GetCameraViewportRect2d(iCameraIndex);
 	glViewport(static_cast<GLint>(pViewportRect->x * m_uiRenderSurfaceWidth), static_cast<GLint>(pViewportRect->y * m_uiRenderSurfaceHeight), static_cast<GLsizei>(pViewportRect->width * m_uiRenderSurfaceWidth), static_cast<GLsizei>(pViewportRect->height * m_uiRenderSurfaceHeight));

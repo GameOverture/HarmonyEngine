@@ -31,21 +31,40 @@ protected:
 	HyRenderState *				m_pCurRenderState;
 	HyRenderState				m_PrevRenderState;
 
-	uint32						m_iWindowIndex;
-	uint32						m_uiRenderSurfaceWidth;
-	uint32						m_uiRenderSurfaceHeight;
-
 	enum eRenderSurfaceType
 	{
 		RENDERSURFACE_Texture = 0,
 		RENDERSURFACE_Window
 	};
+	
+	struct RenderSurface
+	{
+		eRenderSurfaceType			m_eType;
+		int32						m_iID;
+		int32						m_iRenderSurfaceWidth;
+		int32						m_iRenderSurfaceHeight;
+		bool						m_bDirty;
+		void *						m_pExData;
+
+		RenderSurface(eRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight) :	m_eType(eType),
+																															m_iID(iID),
+																															m_iRenderSurfaceWidth(iRenderSurfaceWidth),
+																															m_iRenderSurfaceHeight(iRenderSurfaceHeight),
+																															m_bDirty(false),
+																															m_pExData(NULL)
+		{ }
+
+		void Resize(int32 iWidth, int32 iHeight);
+		void ClearDirtyFlag();
+	};
+	set<RenderSurface>				m_RenderSurfaces;
+	set<RenderSurface>::iterator	m_RenderSurfaceIter;
 
 public:
 	IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef);
 	virtual ~IHyRenderer(void);
 
-	virtual void SetRenderSurface(eRenderSurfaceType eSurfaceType, uint32 uiIndex, bool bDirty) = 0;
+	virtual void SetRenderSurface(RenderSurface &renderSurface) = 0;
 
 	virtual void StartRender() = 0;
 

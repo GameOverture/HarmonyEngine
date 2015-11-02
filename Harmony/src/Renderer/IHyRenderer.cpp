@@ -10,9 +10,32 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Viewport/HyWindow.h"
 
+void HyOpenGL_Win::RenderSurface::Resize(int32 iWidth, int32 iHeight)
+{
+	// Prevent A Divide By Zero
+	if(iHeight == 0)
+		iHeight = 1;
+
+	if(m_iRenderSurfaceWidth == iWidth && m_iRenderSurfaceHeight == iHeight)
+		return;
+
+	m_iRenderSurfaceWidth = iWidth;
+	m_iRenderSurfaceHeight = iHeight;
+
+	m_bDirty = true;
+}
+
+void HyOpenGL_Win::RenderSurface::ClearDirtyFlag()
+{
+	m_bDirty = false;
+}
+
 IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef) :	m_GfxCommsRef(gfxCommsRef),
 																					m_vWindowRef(vWindowRef)
 {
+	// TODO: Make m_vWindowRef threadsafe
+	for(uint32 i = 0; i < static_cast<uint32>(m_vWindowRef.size()); ++i)
+		m_RenderSurfaces.insert(RenderSurface(RENDERSURFACE_Window, i, m_vWindowRef[i].GetResolution().x, m_vWindowRef[i].GetResolution().y));
 }
 
 IHyRenderer::~IHyRenderer(void)
@@ -43,7 +66,7 @@ void IHyRenderer::Update()
 		m_pSendMsgQueuePtr->push(pData);
 	}
 
-	m_iWindowIndex = -1;
+	m_RenderSurfaceIter = m_RenderSurfaces.begin();
 	while(EnumRenderSurface())
 	{
 		StartRender();
@@ -70,18 +93,16 @@ bool IHyRenderer::EnumRenderSurface()
 {
 	// Render to texture surfaces should be drawn first, as they'd be used and displayed in the window surface(s)
 
-	// TODO: Make m_vWindowRef threadsafe
+	
 	// Now render the game windows
-	m_iWindowIndex++;
-	if(m_iWindowIndex >= m_vWindowRef.size())
+
+	++m_RenderSurfaceIter;
+	if(m_RenderSurfaceIter == m_RenderSurfaces.end())
 		return false;
 
-	m_uiRenderSurfaceWidth = m_vWindowRef[m_iWindowIndex].GetResolution().x;
-	m_uiRenderSurfaceHeight = m_vWindowRef[m_iWindowIndex].GetResolution().y;
+	SetRenderSurface(*m_RenderSurfaceIter);
 
-	SetRenderSurface(RENDERSURFACE_Window, m_iWindowIndex, false);
-
-	m_vWindowRef[m_iWindowIndex].ClearDirtyFlag();
+	m_RenderSurfaceIter->ClearDirtyFlag();
 
 	return true;
 }

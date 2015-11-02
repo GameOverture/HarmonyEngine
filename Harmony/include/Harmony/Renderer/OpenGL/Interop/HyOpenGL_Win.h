@@ -22,14 +22,14 @@ class HyOpenGL_Win : public HyOpenGL
 	{
 	public:
 		static HGLRC			sm_hGLContext;
-
 		PIXELFORMATDESCRIPTOR	m_PixelFormatDescriptor;
+
 		HWND					m_hWnd;
 
 		DeviceContext(const HyWindowInfo &wndInfo);
 		~DeviceContext();
 
-		void Resize(GLsizei width, GLsizei height);
+		
 	};
 	DeviceContext **	m_ppDeviceContexes;
 	uint32				m_uiNumDCs;

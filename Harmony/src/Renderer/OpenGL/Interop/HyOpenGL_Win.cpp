@@ -173,27 +173,6 @@ HyOpenGL_Win::DeviceContext::DeviceContext(const HyWindowInfo &wndInfo)
 	SetFocus(m_hWnd);									// Sets Keyboard Focus To The Window
 }
 
-void HyOpenGL_Win::DeviceContext::Resize(GLsizei iWidth, GLsizei iHeight)
-{
-	// Prevent A Divide By Zero
-	if(iHeight == 0)
-		iHeight = 1;
-
-
-
-	// Reset The Current Viewport
-	//glViewport(0, 0, iWidth, iHeight);
-
-	//glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
-	//glLoadIdentity();									// Reset The Projection Matrix
-
-	// Calculate The Aspect Ratio Of The Window
-	//gluPerspective(45.0f, (GLfloat)iWidth / (GLfloat)iHeight, 0.1f, 100.0f);
-
-	//glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
-	//glLoadIdentity();									// Reset The Modelview Matrix
-}
-
 /*virtual*/ void HyOpenGL_Win::SetRenderSurface(eRenderSurfaceType eSurfaceType, uint32 uiIndex, bool bDirty)
 {
 	if(eSurfaceType == IHyRenderer::RENDERSURFACE_Window)
