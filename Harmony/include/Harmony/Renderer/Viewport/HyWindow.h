@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyViewport.h
+ *	HyWindow.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
@@ -7,11 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyViewport_h__
-#define __HyViewport_h__
+#ifndef __HyWindow_h__
+#define __HyWindow_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Afx/HyInteropAfx.h"
 
 #include "Renderer/Viewport/HyCamera2d.h"
 #include "Renderer/Viewport/HyCamera3d.h"
@@ -48,7 +47,6 @@ struct HyMonitorDeviceInfo
 class HyWindow
 {
 	friend class HyScene;
-	friend class HyOpenGL_Win;	// <- TODO: remedy this since I can't use a typedef (aka HyRendererInterop)
 	friend class IHyRenderer;
 
 	static vector<HyMonitorDeviceInfo>	sm_vMonitorInfo;
@@ -105,4 +103,4 @@ private:
 	void				ClearDirtyFlag();
 };
 
-#endif /* __HyViewport_h__ */
+#endif /* __HyWindow_h__ */

@@ -15,8 +15,6 @@
 
 #include "Memory/HyMemoryHeap.h"
 
-#include "Renderer/Viewport/HyWindow.h"
-
 class IHyApplication
 {
 	friend class HyEngine;

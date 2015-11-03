@@ -12,8 +12,6 @@
 #include "GuiTool/HyGuiComms.h"
 #include "Utilities/HyStrManip.h"
 
-#include "Renderer/Viewport/HyWindow.h"
-
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -46,7 +44,7 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsR
 	if(EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&vMonitorDeviceInfo) == false)
 		HyError("EnumDisplayMonitors failed");
 
-	HyWindow::SetMonitorDeviceInfo(vMonitorDeviceInfo);
+	SetMonitorDeviceInfo(vMonitorDeviceInfo);
 
 	if(HyOpenGL::Initialize() == false)
 		HyError("OpenGL API's Initialize() failed");

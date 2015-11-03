@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyViewport.cpp
+ *	HyWindow.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler

@@ -15,7 +15,7 @@
 #include "Renderer/HyGfxComms.h"
 #include "Renderer/HyRenderState.h"
 
-class HyWindow;
+#include "Renderer/Viewport/HyWindow.h"
 
 class IHyRenderer
 {
@@ -94,6 +94,7 @@ public:
 
 	void Update();
 	void Draw2d();
+	void SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
 };
 
 #endif /* __IHyRenderer_h__ */

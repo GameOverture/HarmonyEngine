@@ -8,7 +8,6 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/IHyRenderer.h"
-#include "Renderer/Viewport/HyWindow.h"
 
 void IHyRenderer::RenderSurface::Resize(int32 iWidth, int32 iHeight)
 {
@@ -104,4 +103,9 @@ void IHyRenderer::Draw2d()
 		DrawRenderState_2d(*m_pCurRenderState);
 		m_PrevRenderState = *m_pCurRenderState;
 	}
+}
+
+void IHyRenderer::SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info)
+{
+	HyWindow::SetMonitorDeviceInfo(info);
 }

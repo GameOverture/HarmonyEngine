@@ -11,7 +11,6 @@
 
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/HyGfxComms.h"
-#include "Renderer/Viewport/HyWindow.h"
 
 #include "Scene/Instances/IHyInst2d.h"
 #include "Scene/Instances/HySound.h"
@@ -162,7 +161,7 @@ void HyScene::WriteDrawBuffers()
 	iCount = 0;
 	for(uint32 i = 0; i < uiNumWindows; ++i)
 	{
-		uint32 uiNumCameras2d = m_vWindowRef[i].m_vCams2d.size();
+		uint32 uiNumCameras2d = static_cast<uint32>(m_vWindowRef[i].m_vCams2d.size());
 		for(uint32 j = 0; j < uiNumCameras2d; ++j)
 		{
 			if(m_vWindowRef[i].m_vCams2d[j]->IsEnabled())
@@ -210,7 +209,7 @@ void HyScene::WriteDrawBuffers()
 	m_pCurWritePos += sizeof(int32);
 
 	iCount = 0;
-	uiTotalNumInsts = m_vLoadedInst2d.size();
+	uiTotalNumInsts = static_cast<uint32>(m_vLoadedInst2d.size());
 
 	char *pStartVertexWritePos = m_pCurWritePos + (uiTotalNumInsts * sizeof(HyRenderState));
 	pDrawHeader->uiOffsetToVertexData2d = pStartVertexWritePos - m_GfxCommsRef.GetWriteBufferPtr();
