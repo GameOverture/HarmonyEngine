@@ -17,16 +17,12 @@
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-HGLRC	HyOpenGL_Win::DeviceContext::sm_hGLContext;
-
-HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef) : HyOpenGL(gfxCommsRef, viewportsRef)
+HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef) :	HyOpenGL(gfxCommsRef, viewportsRef),
+																						m_hGLContext(NULL)
 {
-	DeviceContext::sm_hGLContext = NULL;
-
-	m_uiNumDCs = static_cast<uint32>(m_vWindowRef.size());
 	m_ppDeviceContexes = new DeviceContext *[m_uiNumDCs];
 
-	for(uint32 i = 0; i < m_uiNumDCs; ++i)
+	for(uint32 i = 0; i < m_RenderSurfaces.size(); ++i)
 		m_ppDeviceContexes[i] = new DeviceContext(m_vWindowRef[i].GetWindowInfo());
 
 	vector<HyMonitorDeviceInfo> vMonitorDeviceInfo;
@@ -177,7 +173,7 @@ HyOpenGL_Win::DeviceContext::DeviceContext(const HyWindowInfo &wndInfo)
 {
 	if(eSurfaceType == IHyRenderer::RENDERSURFACE_Window)
 	{
-		wglMakeCurrent(GetDC(m_ppDeviceContexes[uiIndex]->m_hWnd), DeviceContext::sm_hGLContext);
+		wglMakeCurrent(GetDC(m_ppDeviceContexes[uiIndex]->m_hWnd), m_hGLContext);
 
 		//if(bDirty)
 		// TODO: If fullscreen, make change here
@@ -197,7 +193,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_CREATE:
 		{
 			CREATESTRUCT *pCreateStruct = reinterpret_cast<CREATESTRUCT *>(lParam);
-			HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(pCreateStruct->lpCreateParams);
+			HyOpenGL_Win *pThis = reinterpret_cast<HyOpenGL_Win *>(pCreateStruct->lpCreateParams);
 
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG>(pThis));
 

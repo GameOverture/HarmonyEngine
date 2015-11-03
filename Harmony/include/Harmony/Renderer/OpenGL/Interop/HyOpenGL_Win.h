@@ -17,22 +17,23 @@ class HyOpenGL_Win : public HyOpenGL
 {
 	friend LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+	HGLRC					m_hGLContext;
+	PIXELFORMATDESCRIPTOR	m_PixelFormatDescriptor;
 
-	class DeviceContext
-	{
-	public:
-		static HGLRC			sm_hGLContext;
-		PIXELFORMATDESCRIPTOR	m_PixelFormatDescriptor;
 
-		HWND					m_hWnd;
+	//class DeviceContext
+	//{
+	//public:
 
-		DeviceContext(const HyWindowInfo &wndInfo);
-		~DeviceContext();
+	//	HWND					m_hWnd;
 
-		
-	};
-	DeviceContext **	m_ppDeviceContexes;
-	uint32				m_uiNumDCs;
+	//	DeviceContext(const HyWindowInfo &wndInfo);
+	//	~DeviceContext();
+
+	//	
+	//};
+	//DeviceContext **	m_ppDeviceContexes;
+	//uint32				m_uiNumDCs;
 
 public:
 	HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef);
