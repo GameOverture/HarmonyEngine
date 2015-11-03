@@ -86,9 +86,9 @@ bool HyEngine::PollPlatformApi()
 #if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
 	// TODO: return false when windows close message comes in or something similar
 	MSG msg = { 0 };
-	for(uint32 i = 0; i < m_Renderer.GetNumDeviceContexts(); ++i)
+	for(uint32 i = 0; i < static_cast<uint32>(m_AppRef.m_vWindows.size()); ++i)
 	{
-		while(PeekMessage(&msg, m_Renderer.GetDeviceContextHWND(i), 0, 0, PM_REMOVE))
+		while(PeekMessage(&msg, m_Renderer.GetHWND(i), 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);

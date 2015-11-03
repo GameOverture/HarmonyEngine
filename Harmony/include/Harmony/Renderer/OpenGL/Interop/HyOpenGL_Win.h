@@ -20,30 +20,15 @@ class HyOpenGL_Win : public HyOpenGL
 	HGLRC					m_hGLContext;
 	PIXELFORMATDESCRIPTOR	m_PixelFormatDescriptor;
 
-
-	//class DeviceContext
-	//{
-	//public:
-
-	//	HWND					m_hWnd;
-
-	//	DeviceContext(const HyWindowInfo &wndInfo);
-	//	~DeviceContext();
-
-	//	
-	//};
-	//DeviceContext **	m_ppDeviceContexes;
-	//uint32				m_uiNumDCs;
-
 public:
 	HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef);
 	~HyOpenGL_Win();
 
-	uint32 GetNumDeviceContexts()				{ return m_uiNumDCs; }
-	HWND GetDeviceContextHWND(uint32 uiIndex)	{ return m_ppDeviceContexes[uiIndex]->m_hWnd; }
+	HWND ConstructWindow(const HyWindowInfo &wndInfo);
 
-	virtual void SetRenderSurface(eRenderSurfaceType eSurfaceType, uint32 uiIndex, bool bDirty);
+	HWND GetHWND(int32 iWindowIndex);
 
+	virtual void StartRender();
 	virtual void FinishRender();
 };
 

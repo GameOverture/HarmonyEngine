@@ -35,7 +35,7 @@ IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef) 
 {
 	// TODO: Make m_vWindowRef threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_vWindowRef.size()); ++i)
-		m_RenderSurfaces.insert(RenderSurface(RENDERSURFACE_Window, i, m_vWindowRef[i].GetResolution().x, m_vWindowRef[i].GetResolution().y));
+		m_RenderSurfaces.push_back(RenderSurface(RENDERSURFACE_Window, i, m_vWindowRef[i].GetResolution().x, m_vWindowRef[i].GetResolution().y));
 }
 
 IHyRenderer::~IHyRenderer(void)
@@ -67,9 +67,10 @@ void IHyRenderer::Update()
 	}
 
 	m_RenderSurfaceIter = m_RenderSurfaces.begin();
-	while(EnumRenderSurface())
+	while(m_RenderSurfaceIter != m_RenderSurfaces.end())
 	{
 		StartRender();
+		m_RenderSurfaceIter->ClearDirtyFlag();
 
 		while(Begin_3d())
 		{
@@ -84,27 +85,10 @@ void IHyRenderer::Update()
 		}
 
 		FinishRender();
+		++m_RenderSurfaceIter;
 	}
 
 	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr)->uiReturnFlags |= HyGfxComms::GFXFLAG_HasRendered;
-}
-
-bool IHyRenderer::EnumRenderSurface()
-{
-	// Render to texture surfaces should be drawn first, as they'd be used and displayed in the window surface(s)
-
-	
-	// Now render the game windows
-
-	++m_RenderSurfaceIter;
-	if(m_RenderSurfaceIter == m_RenderSurfaces.end())
-		return false;
-
-	SetRenderSurface(*m_RenderSurfaceIter);
-
-	m_RenderSurfaceIter->ClearDirtyFlag();
-
-	return true;
 }
 
 void IHyRenderer::Draw2d()

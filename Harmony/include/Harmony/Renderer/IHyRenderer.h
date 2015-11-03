@@ -57,14 +57,12 @@ protected:
 		void Resize(int32 iWidth, int32 iHeight);
 		void ClearDirtyFlag();
 	};
-	set<RenderSurface>				m_RenderSurfaces;
-	set<RenderSurface>::iterator	m_RenderSurfaceIter;
+	vector<RenderSurface>			m_RenderSurfaces;
+	vector<RenderSurface>::iterator	m_RenderSurfaceIter;
 
 public:
 	IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef);
 	virtual ~IHyRenderer(void);
-
-	virtual void SetRenderSurface(RenderSurface &renderSurface) = 0;
 
 	virtual void StartRender() = 0;
 
@@ -95,7 +93,6 @@ public:
 	char *GetVertexData2d()									{ return reinterpret_cast<char *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToVertexData2d); }
 
 	void Update();
-	bool EnumRenderSurface();
 	void Draw2d();
 };
 

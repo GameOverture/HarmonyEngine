@@ -20,14 +20,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef) :	HyOpenGL(gfxCommsRef, viewportsRef),
 																						m_hGLContext(NULL)
 {
-	m_ppDeviceContexes = new DeviceContext *[m_uiNumDCs];
+	m_PixelFormatDescriptor.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+	m_PixelFormatDescriptor.nVersion = 1;
+	m_PixelFormatDescriptor.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+	m_PixelFormatDescriptor.iPixelType = PFD_TYPE_RGBA;
+	m_PixelFormatDescriptor.cColorBits = 32;
+	m_PixelFormatDescriptor.cRedBits = m_PixelFormatDescriptor.cRedShift = 0;
+	m_PixelFormatDescriptor.cGreenBits = m_PixelFormatDescriptor.cGreenShift = 0;
+	m_PixelFormatDescriptor.cBlueBits = m_PixelFormatDescriptor.cBlueShift = 0;
+	m_PixelFormatDescriptor.cAlphaBits = m_PixelFormatDescriptor.cAlphaShift = 0;
+	m_PixelFormatDescriptor.cAccumBits = m_PixelFormatDescriptor.cAccumRedBits = m_PixelFormatDescriptor.cAccumGreenBits = m_PixelFormatDescriptor.cAccumBlueBits = m_PixelFormatDescriptor.cAccumAlphaBits = 0;
+	m_PixelFormatDescriptor.cDepthBits = 24;
+	m_PixelFormatDescriptor.cStencilBits = 8;
+	m_PixelFormatDescriptor.cAuxBuffers = 0;
+	m_PixelFormatDescriptor.iLayerType = PFD_MAIN_PLANE;
+	m_PixelFormatDescriptor.bReserved = 0;
+	m_PixelFormatDescriptor.dwLayerMask = 0;
+	m_PixelFormatDescriptor.dwVisibleMask = 0;
+	m_PixelFormatDescriptor.dwDamageMask = 0;
 
 	for(uint32 i = 0; i < m_RenderSurfaces.size(); ++i)
-		m_ppDeviceContexes[i] = new DeviceContext(m_vWindowRef[i].GetWindowInfo());
+		m_RenderSurfaces[i].m_pExData = ConstructWindow(m_vWindowRef[i].GetWindowInfo());
 
 	vector<HyMonitorDeviceInfo> vMonitorDeviceInfo;
 	if(EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&vMonitorDeviceInfo) == false)
-		HyLogError("EnumDisplayMonitors failed");
+		HyError("EnumDisplayMonitors failed");
 
 	HyWindow::SetMonitorDeviceInfo(vMonitorDeviceInfo);
 
@@ -44,7 +61,7 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMoni
 	monitorInfo.cbSize = sizeof(monitorInfo);
 
 	if(GetMonitorInfo(hMonitor, &monitorInfo) == false)
-		HyLogError("GetMonitorInfo failed");
+		HyError("GetMonitorInfo failed");
 
 	DISPLAY_DEVICE DispDev = { 0 };
 	DispDev.cb = sizeof(DispDev);
@@ -72,27 +89,8 @@ HyOpenGL_Win::~HyOpenGL_Win()
 {
 }
 
-HyOpenGL_Win::DeviceContext::DeviceContext(const HyWindowInfo &wndInfo)
+HWND HyOpenGL_Win::ConstructWindow(const HyWindowInfo &wndInfo)
 {
-	m_PixelFormatDescriptor.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-	m_PixelFormatDescriptor.nVersion = 1;
-	m_PixelFormatDescriptor.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-	m_PixelFormatDescriptor.iPixelType = PFD_TYPE_RGBA;
-	m_PixelFormatDescriptor.cColorBits = 32;
-	m_PixelFormatDescriptor.cRedBits = m_PixelFormatDescriptor.cRedShift = 0;
-	m_PixelFormatDescriptor.cGreenBits = m_PixelFormatDescriptor.cGreenShift = 0;
-	m_PixelFormatDescriptor.cBlueBits = m_PixelFormatDescriptor.cBlueShift = 0;
-	m_PixelFormatDescriptor.cAlphaBits = m_PixelFormatDescriptor.cAlphaShift = 0;
-	m_PixelFormatDescriptor.cAccumBits = m_PixelFormatDescriptor.cAccumRedBits = m_PixelFormatDescriptor.cAccumGreenBits = m_PixelFormatDescriptor.cAccumBlueBits = m_PixelFormatDescriptor.cAccumAlphaBits = 0;
-	m_PixelFormatDescriptor.cDepthBits =24;
-	m_PixelFormatDescriptor.cStencilBits = 8;
-	m_PixelFormatDescriptor.cAuxBuffers = 0;
-	m_PixelFormatDescriptor.iLayerType = PFD_MAIN_PLANE;
-	m_PixelFormatDescriptor.bReserved = 0;
-	m_PixelFormatDescriptor.dwLayerMask = 0;
-	m_PixelFormatDescriptor.dwVisibleMask = 0;
-	m_PixelFormatDescriptor.dwDamageMask = 0;
-
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 
 	MSG msg = { 0 };
@@ -145,44 +143,59 @@ HyOpenGL_Win::DeviceContext::DeviceContext(const HyWindowInfo &wndInfo)
 	AdjustWindowRectEx(&rWndRect, dwStyle, FALSE, dwExStyle);
 
 	// Create The Window
-	m_hWnd = CreateWindowEx(dwExStyle,
-							wc.lpszClassName,
-							StringToWString(wndInfo.sName).c_str(),
-							dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-							wndInfo.vLocation.x,
-							wndInfo.vLocation.y,
-							rWndRect.right - rWndRect.left,
-							rWndRect.bottom - rWndRect.top,
-							NULL,
-							NULL,
-							hInstance,
-							this);	// Passed into WM_CREATE lParam
+	HWND hWnd = CreateWindowEx(dwExStyle,
+							   wc.lpszClassName,
+							   StringToWString(wndInfo.sName).c_str(),
+							   dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+							   wndInfo.vLocation.x,
+							   wndInfo.vLocation.y,
+							   rWndRect.right - rWndRect.left,
+							   rWndRect.bottom - rWndRect.top,
+							   NULL,
+							   NULL,
+							   hInstance,
+							   this);	// Passed into WM_CREATE lParam
 
-	if(m_hWnd == NULL)
+	if(hWnd == NULL)
 	{
 		DWORD dwError = GetLastError();
 		HyError("CreateWindowA() returned the error: " << dwError);
 	}
 
-	ShowWindow(m_hWnd, SW_SHOW);						// Show The Window
-	SetForegroundWindow(m_hWnd);						// Slightly Higher Priority
-	SetFocus(m_hWnd);									// Sets Keyboard Focus To The Window
+	ShowWindow(hWnd, SW_SHOW);						// Show The Window
+	SetForegroundWindow(hWnd);						// Slightly Higher Priority
+	SetFocus(hWnd);									// Sets Keyboard Focus To The Window
+
+	return hWnd;
 }
 
-/*virtual*/ void HyOpenGL_Win::SetRenderSurface(eRenderSurfaceType eSurfaceType, uint32 uiIndex, bool bDirty)
+HWND HyOpenGL_Win::GetHWND(int32 iWindowIndex)
 {
-	if(eSurfaceType == IHyRenderer::RENDERSURFACE_Window)
+	for(uint32 i = 0; i < m_RenderSurfaces.size(); ++i)
 	{
-		wglMakeCurrent(GetDC(m_ppDeviceContexes[uiIndex]->m_hWnd), m_hGLContext);
+		if(m_RenderSurfaces[i].m_eType == IHyRenderer::RENDERSURFACE_Window && m_RenderSurfaces[i].m_iID == iWindowIndex)
+			return reinterpret_cast<HWND>(m_RenderSurfaces[i].m_pExData);
+	}
+
+	return NULL;
+}
+
+/*virtual*/ void HyOpenGL_Win::StartRender()
+{
+	if(m_RenderSurfaceIter->m_eType == IHyRenderer::RENDERSURFACE_Window)
+	{
+		wglMakeCurrent(GetDC(reinterpret_cast<HWND>(m_RenderSurfaceIter->m_pExData)), m_hGLContext);
 
 		//if(bDirty)
 		// TODO: If fullscreen, make change here
 	}
+
+	HyOpenGL::StartRender();
 }
 
 /*virtual*/ void HyOpenGL_Win::FinishRender()
 {
-	HDC hDeviceContext = GetDC(m_ppDeviceContexes[m_iWindowIndex]->m_hWnd);
+	HDC hDeviceContext = GetDC(reinterpret_cast<HWND>(m_RenderSurfaceIter->m_pExData));
 	SwapBuffers(hDeviceContext);
 }
 
@@ -202,23 +215,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			int iPixelFormat = ChoosePixelFormat(hDeviceContext, &pThis->m_PixelFormatDescriptor);
 			SetPixelFormat(hDeviceContext, iPixelFormat, &pThis->m_PixelFormatDescriptor);
 
-			if(pThis->sm_hGLContext == NULL)
+			if(pThis->m_hGLContext == NULL)
 			{
 				HDC hDC = GetDC(hWnd);
-				pThis->sm_hGLContext = wglCreateContext(hDC);
-				wglMakeCurrent(hDC, pThis->sm_hGLContext);
+				pThis->m_hGLContext = wglCreateContext(hDC);
+				wglMakeCurrent(hDC, pThis->m_hGLContext);
 			}
 		}
 		break;
 
 		case WM_DESTROY:
 		{
-			HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+			HyOpenGL_Win *pThis = reinterpret_cast<HyOpenGL_Win *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
 			HDC hDeviceContext = GetDC(hWnd);
-			wglMakeCurrent(hDeviceContext, pThis->sm_hGLContext);
+			wglMakeCurrent(hDeviceContext, pThis->m_hGLContext);
 
-			wglDeleteContext(pThis->sm_hGLContext);
+			wglDeleteContext(pThis->m_hGLContext);
 			PostQuitMessage(0);
 
 			DefWindowProc(hWnd, message, wParam, lParam);
@@ -245,9 +258,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		case WM_SIZE:
 		{
-			HyOpenGL_Win::DeviceContext *pThis = reinterpret_cast<HyOpenGL_Win::DeviceContext *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+			HyOpenGL_Win *pThis = reinterpret_cast<HyOpenGL_Win *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
-			pThis->Resize(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
+			for(uint32 i = 0; i < static_cast<uint32>(pThis->m_RenderSurfaces.size()); ++i)
+			{
+				if(reinterpret_cast<HWND>(pThis->m_RenderSurfaces[i].m_pExData) == hWnd)
+					pThis->m_RenderSurfaces[i].Resize(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
+			}
 			return 0;
 		}
 	}

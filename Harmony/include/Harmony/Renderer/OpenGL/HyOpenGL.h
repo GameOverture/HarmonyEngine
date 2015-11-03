@@ -15,9 +15,6 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/OpenGL/HyOpenGLShader.h"
 
-//#define HY_INDEX_BUFFER_SIZE (128 * 1024)
-//#define HY_RESTART_INDEX 65535
-
 class HyOpenGL : public IHyRenderer
 {
 protected:
@@ -47,8 +44,6 @@ protected:
 public:
 	HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef);
 	virtual ~HyOpenGL(void);
-
-	virtual void SetRenderSurface(eRenderSurfaceType eSurfaceType, uint32 uiIndex, bool bDirty);
 
 	virtual void StartRender();
 	

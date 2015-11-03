@@ -23,10 +23,6 @@ HyOpenGL::~HyOpenGL(void)
 {
 }
 
-/*virtual*/ void HyOpenGL::SetRenderSurface(eRenderSurfaceType eSurfaceType, uint32 uiIndex, bool bDirty)
-{
-}
-
 /*virtual*/ void HyOpenGL::StartRender()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -49,30 +45,30 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ bool HyOpenGL::Begin_2d()
 {
-	int iCameraIndex;
-	int iWindowIndex;
-
-	iCameraIndex = GetNumCameras2d() - m_iNumRenderPassesLeft2d;
-	iWindowIndex = GetCameraWindowIndex2d(iCameraIndex);
-	if(m_iWindowIndex != iWindowIndex)
-
+	while(m_RenderSurfaceIter->m_iID != GetCameraWindowIndex2d(GetNumCameras2d() - m_iNumRenderPassesLeft2d) && m_iNumRenderPassesLeft2d > 0)
+	{
+		m_iNumRenderPassesLeft2d--;
+	}
 	if(GetNumRenderStates2d() == 0 || m_iNumRenderPassesLeft2d == 0)
 		return false;
+
+	int iCameraIndex = GetNumCameras2d() - m_iNumRenderPassesLeft2d;
+	int iWindowIndex = GetCameraWindowIndex2d(iCameraIndex);
 
 	if(m_iNumRenderPassesLeft2d == GetNumCameras2d())
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 		glBufferData(GL_ARRAY_BUFFER, m_pDrawBufferHeader->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
 	
-		m_mtxProjLocalCoords = glm::ortho(m_uiRenderSurfaceWidth * -0.5f, m_uiRenderSurfaceWidth * 0.5f, m_uiRenderSurfaceHeight * -0.5f, m_uiRenderSurfaceHeight * 0.5f);
+		m_mtxProjLocalCoords = glm::ortho(m_RenderSurfaceIter->m_iRenderSurfaceWidth * -0.5f, m_RenderSurfaceIter->m_iRenderSurfaceWidth * 0.5f, m_RenderSurfaceIter->m_iRenderSurfaceHeight * -0.5f, m_RenderSurfaceIter->m_iRenderSurfaceHeight * 0.5f);
 	}
 	
 
 	HyRectangle<float> *pViewportRect = GetCameraViewportRect2d(iCameraIndex);
-	glViewport(static_cast<GLint>(pViewportRect->x * m_uiRenderSurfaceWidth), static_cast<GLint>(pViewportRect->y * m_uiRenderSurfaceHeight), static_cast<GLsizei>(pViewportRect->width * m_uiRenderSurfaceWidth), static_cast<GLsizei>(pViewportRect->height * m_uiRenderSurfaceHeight));
+	glViewport(static_cast<GLint>(pViewportRect->x * m_RenderSurfaceIter->m_iRenderSurfaceWidth), static_cast<GLint>(pViewportRect->y * m_RenderSurfaceIter->m_iRenderSurfaceHeight), static_cast<GLsizei>(pViewportRect->width * m_RenderSurfaceIter->m_iRenderSurfaceWidth), static_cast<GLsizei>(pViewportRect->height * m_RenderSurfaceIter->m_iRenderSurfaceHeight));
 
-	float fWidth = (pViewportRect->width * m_uiRenderSurfaceWidth);
-	float fHeight = (pViewportRect->height * m_uiRenderSurfaceHeight);
+	float fWidth = (pViewportRect->width * m_RenderSurfaceIter->m_iRenderSurfaceWidth);
+	float fHeight = (pViewportRect->height * m_RenderSurfaceIter->m_iRenderSurfaceHeight);
 	
 	m_mtxView = *GetCameraView2d(iCameraIndex);
 	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f);
