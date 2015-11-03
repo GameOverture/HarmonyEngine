@@ -10,7 +10,7 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Viewport/HyWindow.h"
 
-void HyOpenGL_Win::RenderSurface::Resize(int32 iWidth, int32 iHeight)
+void IHyRenderer::RenderSurface::Resize(int32 iWidth, int32 iHeight)
 {
 	// Prevent A Divide By Zero
 	if(iHeight == 0)
@@ -25,7 +25,7 @@ void HyOpenGL_Win::RenderSurface::Resize(int32 iWidth, int32 iHeight)
 	m_bDirty = true;
 }
 
-void HyOpenGL_Win::RenderSurface::ClearDirtyFlag()
+void IHyRenderer::RenderSurface::ClearDirtyFlag()
 {
 	m_bDirty = false;
 }
