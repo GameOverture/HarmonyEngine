@@ -66,7 +66,6 @@ void WidgetRenderer::ClearItems()
 
 void WidgetRenderer::OpenItem(Item *pItem)
 {
-    
     for(int i = 0; i < ui->tabWidget->count(); ++i)
     {
         // Determine if already opened
@@ -79,7 +78,6 @@ void WidgetRenderer::OpenItem(Item *pItem)
     
     TabPage *pNewTab = new TabPage(pItem, this);
     ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName());
-
 }
 
 void WidgetRenderer::CloseItem(Item *pItem)

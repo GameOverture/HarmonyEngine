@@ -34,7 +34,6 @@ SOURCES += main.cpp \
     WidgetLiveVariable.cpp \
     WidgetLiveVarManager.cpp \
     HyTcpServer.cpp \
-    HyGuiTexture.cpp \
     DlgOpenProject.cpp \
     HyGuiRenderer.cpp \
     DlgAtlasGroupSettings.cpp \
@@ -62,7 +61,6 @@ HEADERS  += \
     WidgetLiveVariable.h \
     WidgetLiveVarManager.h \
     HyTcpServer.h \
-    HyGuiTexture.h \
     DlgOpenProject.h \
     HyGuiRenderer.h \
     DlgAtlasGroupSettings.h \
