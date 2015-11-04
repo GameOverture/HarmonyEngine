@@ -28,11 +28,8 @@ public:
 
     void SaveData();
 
-    void Hide();
     void Show();
-
-protected:
-    virtual void mouseMoveEvent(QMouseEvent *pEvent);
+    void Hide();
 
 private:
     Ui::WidgetAtlasManager *ui;

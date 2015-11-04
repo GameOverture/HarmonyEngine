@@ -114,25 +114,14 @@ void WidgetAtlasManager::SaveData()
     }
 }
 
-void WidgetAtlasManager::Hide()
-{
-}
-
 void WidgetAtlasManager::Show()
 {
+    //MainWindow::OpenItem(m_pProjOwner);
 }
 
-/*virtual*/ void WidgetAtlasManager::mouseMoveEvent(QMouseEvent *pEvent)
+void WidgetAtlasManager::Hide()
 {
-    if(pEvent->type() == QEvent::Enter)
-    {
-        //m_pProjOwner->SetDrawState(DRAWSTATE_AtlasManager, ui->atlasGroups->currentIndex
-        MainWindow::OpenItem(m_pProjOwner);
-    }
-    else if(pEvent->type() == QEvent::Leave)
-    {
-        MainWindow::CloseItem(m_pProjOwner);
-    }
+    //MainWindow::CloseItem(m_pProjOwner);
 }
 
 void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)

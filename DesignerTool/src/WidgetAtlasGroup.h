@@ -116,6 +116,10 @@ public:
 private slots:
     void on_btnAddImages_clicked();
     void on_btnAddDir_clicked();
+    
+protected:
+    virtual void enterEvent(QEvent *pEvent);
+    virtual void leaveEvent(QEvent *pEvent);
 
 private:
     Ui::WidgetAtlasGroup *ui;
