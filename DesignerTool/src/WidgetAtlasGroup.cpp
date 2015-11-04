@@ -165,14 +165,18 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
 /*virtual*/ void WidgetAtlasGroup::enterEvent(QEvent *pEvent)
 {
     HYLOG("AtlasGroup mouseMoveEvent(): Enter", LOGTYPE_Normal);
-    static_cast<WidgetAtlasManager *>(parent())->Show();
+    WidgetAtlasManager *pAtlasMan = static_cast<WidgetAtlasManager *>(parent()->parent());
+    
+    pAtlasMan->Show();
     QWidget::enterEvent(pEvent);
 }
 
 /*virtual*/ void WidgetAtlasGroup::leaveEvent(QEvent *pEvent)
 {
     HYLOG("AtlasGroup mouseMoveEvent(): Leave", LOGTYPE_Normal);
-    static_cast<WidgetAtlasManager *>(parent())->Hide();
+    WidgetAtlasManager *pAtlasMan = static_cast<WidgetAtlasManager *>(parent()->parent());
+    
+    pAtlasMan->Hide();
     QWidget::leaveEvent(pEvent);
 }
 

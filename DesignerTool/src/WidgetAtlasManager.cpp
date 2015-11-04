@@ -116,12 +116,12 @@ void WidgetAtlasManager::SaveData()
 
 void WidgetAtlasManager::Show()
 {
-    //MainWindow::OpenItem(m_pProjOwner);
+    MainWindow::OpenItem(m_pProjOwner);
 }
 
 void WidgetAtlasManager::Hide()
 {
-    //MainWindow::CloseItem(m_pProjOwner);
+    MainWindow::CloseItem(m_pProjOwner);
 }
 
 void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)

@@ -85,17 +85,17 @@ FORMS    += \
     WidgetAtlasManager.ui \
     WidgetAtlasGroup.ui
 
-Release:DESTDIR = ../release
-Release:OBJECTS_DIR = ../release/.obj
-Release:MOC_DIR = ../release/.moc
-Release:RCC_DIR = ../release/.rcc
-Release:UI_DIR = ../release/.ui
+Release:DESTDIR = ../bin/release
+Release:OBJECTS_DIR = ../bin/release/.obj
+Release:MOC_DIR = ../bin/release/.moc
+Release:RCC_DIR = ../bin/release/.rcc
+Release:UI_DIR = ../bin/release/.ui
 
-Debug:DESTDIR = ../debug
-Debug:OBJECTS_DIR = ../debug/.obj
-Debug:MOC_DIR = ../debug/.moc
-Debug:RCC_DIR = ../debug/.rcc
-Debug:UI_DIR = ../debug/.ui
+Debug:DESTDIR = ../bin/debug
+Debug:OBJECTS_DIR = ../bin/debug/.obj
+Debug:MOC_DIR = ../bin/debug/.moc
+Debug:RCC_DIR = ../bin/debug/.rcc
+Debug:UI_DIR = ../bin/debug/.ui
 
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER
 
