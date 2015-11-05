@@ -12,16 +12,15 @@ class ItemProject : public Item
     
     WidgetAtlasManager *    m_pAtlasManager;
     HyTexturedQuad2d *      m_pCurAtlas;
+    HyCamera2d *            m_pCam;
     
-public:
     enum eDrawState
     {
+        DRAWSTATE_Nothing,
         DRAWSTATE_AtlasManager,
     };
     
-private:
     eDrawState          m_eState;
-    int                 m_iDrawStateIndex;
     
     ItemProject(const QString sPath);
     
@@ -32,11 +31,11 @@ public:
     QString GetPath(QString sAppendRelativePath) const  { return m_sPath % sAppendRelativePath; }
     QString GetPath() const                             { return m_sPath; }
     
-    virtual void Hide();
     virtual void Show();
+    virtual void Hide();
     virtual void Draw(WidgetRenderer &renderer);
     
-    void SetDrawState(eDrawState eState, int iDrawStateIndex);
+    void SetAtlasGroupDrawState(int iAtlasGrpIndex, bool bForceLoad);
 };
 
 #endif // ITEMPROJECT_H

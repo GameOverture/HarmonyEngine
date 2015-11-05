@@ -1,8 +1,12 @@
 #include "ItemProject.h"
 #include "WidgetAtlasManager.h"
 
+#include "WidgetRenderer.h"
+
 ItemProject::ItemProject(const QString sPath) : Item(ITEM_Project, sPath),
-                                                m_eState(DRAWSTATE_AtlasManager)
+                                                m_eState(DRAWSTATE_Nothing),
+                                                m_pCurAtlas(NULL),
+                                                m_pCam(NULL)
 {
     m_pAtlasManager = new WidgetAtlasManager(this);
 }
@@ -10,35 +14,48 @@ ItemProject::ItemProject(const QString sPath) : Item(ITEM_Project, sPath),
 ItemProject::~ItemProject()
 {
     delete m_pAtlasManager;
-}
-
-/*virtual*/ void ItemProject::Hide()
-{
     
+    delete m_pCurAtlas;
+    delete m_pCam;
 }
 
 /*virtual*/ void ItemProject::Show()
 {
+    if(m_pCurAtlas)
+        m_pCurAtlas->SetEnabled(true);
+    
+    if(m_pCam)
+        m_pCam->SetEnabled(true);
+}
 
-//    switch(m_eState)
-//    {
-//    case DRAWSTATE_AtlasManager:
-//        m_pAtlases->m_Textures
-//        m_CurAtlas.SetAsTexturedQuad(
-//        break;
-//    }
+/*virtual*/ void ItemProject::Hide()
+{
+    if(m_pCurAtlas)
+        m_pCurAtlas->SetEnabled(false);
+    
+    if(m_pCam)
+        m_pCam->SetEnabled(false);
 }
 
 /*virtual*/ void ItemProject::Draw(WidgetRenderer &renderer)
 {
-    //pHyApp->GetViewport().GetResolution().iWidth
-    //pHyApp->GetViewport().GetResolution().iHeight
+    if(m_pCam == NULL)
+        m_pCam = renderer.Window().CreateCamera2d();
+    
+    //renderer
+    // well shit
 }
 
-void ItemProject::SetDrawState(eDrawState eState, int iDrawStateIndex)
+void ItemProject::SetAtlasGroupDrawState(int iAtlasGrpIndex, bool bForceLoad)
 {
-    m_eState = eState;
-    m_iDrawStateIndex = iDrawStateIndex;
+    m_eState = DRAWSTATE_AtlasManager;
     
-    //m_CurAtlas.SetAsTexturedQuad(
+    if(bForceLoad == false || iAtlasGrpIndex == -1)
+        return;
+    
+    if(m_pCurAtlas && (m_pCurAtlas->GetAtlasGroupIndex() != iAtlasGrpIndex || bForceLoad))
+        delete m_pCurAtlas;
+    
+    m_pCurAtlas = new HyTexturedQuad2d(iAtlasGrpIndex);
+    m_pCurAtlas->Load();
 }

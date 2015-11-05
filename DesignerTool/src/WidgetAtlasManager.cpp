@@ -114,12 +114,13 @@ void WidgetAtlasManager::SaveData()
     }
 }
 
-void WidgetAtlasManager::Show()
+void WidgetAtlasManager::PreviewAtlasGroup(bool bForceLoad)
 {
+    m_pProjOwner->SetAtlasGroupDrawState(ui->atlasGroups->currentIndex(), bForceLoad);
     MainWindow::OpenItem(m_pProjOwner);
 }
 
-void WidgetAtlasManager::Hide()
+void WidgetAtlasManager::HideAtlasGroup()
 {
     MainWindow::CloseItem(m_pProjOwner);
 }

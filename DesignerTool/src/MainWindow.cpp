@@ -118,7 +118,9 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 /*static*/ void MainWindow::OpenItem(Item *pItem)
 {
     sm_pInstance->ui->renderer->OpenItem(pItem);
-    sm_pInstance->ui->explorer->SelectItem(pItem);
+    
+    if(pItem->GetType() != ITEM_Project)
+        sm_pInstance->ui->explorer->SelectItem(pItem);
 }
 
 /*static*/ void MainWindow::CloseItem(Item *pItem)

@@ -167,7 +167,7 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
     HYLOG("AtlasGroup mouseMoveEvent(): Enter", LOGTYPE_Normal);
     WidgetAtlasManager *pAtlasMan = static_cast<WidgetAtlasManager *>(parent()->parent());
     
-    pAtlasMan->Show();
+    pAtlasMan->PreviewAtlasGroup(false);
     QWidget::enterEvent(pEvent);
 }
 
@@ -176,7 +176,7 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
     HYLOG("AtlasGroup mouseMoveEvent(): Leave", LOGTYPE_Normal);
     WidgetAtlasManager *pAtlasMan = static_cast<WidgetAtlasManager *>(parent()->parent());
     
-    pAtlasMan->Hide();
+    pAtlasMan->HideAtlasGroup();
     QWidget::leaveEvent(pEvent);
 }
 
@@ -405,6 +405,8 @@ void WidgetAtlasGroup::Refresh()
     // Regenerate the atlas data info file
     WidgetAtlasManager *pAtlasManager = reinterpret_cast<WidgetAtlasManager *>(this->parent()->parent());
     pAtlasManager->SaveData();
+    
+    pAtlasManager->PreviewAtlasGroup(true);
 }
 
 QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType)

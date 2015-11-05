@@ -14,6 +14,8 @@ namespace Ui {
 class WidgetRenderer;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class TabPage : public QWidget
 {
     Q_OBJECT
@@ -28,12 +30,15 @@ public:
     Item *GetItem() { return m_pItem; }
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class WidgetRenderer : public QWidget, public IHyApplication
 {
     Q_OBJECT
     
-    HyCamera2d *        m_pCam;
     bool                m_bInitialized;
+    
+    ItemProject *       m_pActiveItemProj;  // Overrides any Item in the current open TabPage
 
 public:
     explicit WidgetRenderer(QWidget *parent = 0);
@@ -43,9 +48,6 @@ public:
     virtual bool Update();
     virtual bool Shutdown();
 
-    Item *GetItem(int iIndex = -1);
-    void ShowItem(Item *pItem);
-
     void ClearItems();
 
     void OpenItem(Item *pItem);
@@ -53,6 +55,9 @@ public:
 
 private:
     Ui::WidgetRenderer *ui;
+    
+    Item *GetItem(int iIndex = -1);
+    void ShowItem(Item *pItem);
 
 private slots:
     void on_tabWidget_currentChanged(int iIndex);

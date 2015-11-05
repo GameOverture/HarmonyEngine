@@ -4,11 +4,12 @@
 WidgetRenderer::WidgetRenderer(QWidget *parent) :   QWidget(parent),
                                                     IHyApplication(HarmonyInit()),
                                                     ui(new Ui::WidgetRenderer),
-                                                    m_bInitialized(false)
+                                                    m_bInitialized(false),
+                                                    m_pActiveItemProj(NULL)
 {
     ui->setupUi(this);
     ui->tabWidget->clear();
-    //ui->tabWidget->setTabBarAutoHide(true);
+
     m_bInitialized = true;
 }
 
@@ -19,11 +20,6 @@ WidgetRenderer::~WidgetRenderer()
 
 /*virtual*/ bool WidgetRenderer::Initialize()
 {
-    m_pCam = Window().CreateCamera2d();
-
-    m_pCam->Pos().Set(0.0f, 0.0f);
-    m_pCam->SetZoom(0.8f);
-
     return true;
 }
 
@@ -40,25 +36,6 @@ WidgetRenderer::~WidgetRenderer()
     return true;
 }
 
-Item *WidgetRenderer::GetItem(int iIndex /*= -1*/)
-{
-    if(ui->tabWidget->currentWidget() == NULL)
-        return NULL;
-
-    if(iIndex < 0)
-        return static_cast<TabPage *>(ui->tabWidget->currentWidget())->GetItem();
-    else
-        return static_cast<TabPage *>(ui->tabWidget->widget(iIndex))->GetItem();
-}
-
-void WidgetRenderer::ShowItem(Item *pItem)
-{
-    for(int i = 0; i < ui->tabWidget->count(); ++i)
-        GetItem(i)->Hide();
-
-    pItem->Show();
-}
-
 void WidgetRenderer::ClearItems()
 {
     ui->tabWidget->clear();
@@ -66,6 +43,12 @@ void WidgetRenderer::ClearItems()
 
 void WidgetRenderer::OpenItem(Item *pItem)
 {
+    if(pItem->GetType() == ITEM_Project)
+    {
+        ShowItem(pItem);
+        return;
+    }
+    
     for(int i = 0; i < ui->tabWidget->count(); ++i)
     {
         // Determine if already opened
@@ -77,19 +60,60 @@ void WidgetRenderer::OpenItem(Item *pItem)
     }
     
     TabPage *pNewTab = new TabPage(pItem, this);
-    ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName());
+    ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName()));
 }
 
 void WidgetRenderer::CloseItem(Item *pItem)
 {
-    for(int i = 0; i < ui->tabWidget->count(); ++i)
+    if(m_pActiveItemProj == pItem)
     {
-        if(reinterpret_cast<TabPage *>(ui->tabWidget->widget(i))->GetItem() == pItem)
+        m_pActiveItemProj->Hide();
+        m_pActiveItemProj = NULL;
+        ShowItem(GetItem());
+    }
+    else
+    {
+        for(int i = 0; i < ui->tabWidget->count(); ++i)
         {
-            ui->tabWidget->removeTab(i);
-            break;
+            TabPage *pTabPage = reinterpret_cast<TabPage *>(ui->tabWidget->widget(i));
+            if(pTabPage->GetItem() == pItem)
+            {
+                ui->tabWidget->removeTab(i);
+                break;
+            }
         }
     }
+}
+
+Item *WidgetRenderer::GetItem(int iIndex /*= -1*/)
+{
+    if(m_pActiveItemProj)
+        return m_pActiveItemProj;
+    
+    if(ui->tabWidget->currentWidget() == NULL)
+        return NULL;
+
+    if(iIndex < 0)
+        return static_cast<TabPage *>(ui->tabWidget->currentWidget())->GetItem();
+    else
+        return static_cast<TabPage *>(ui->tabWidget->widget(iIndex))->GetItem();
+}
+
+void WidgetRenderer::ShowItem(Item *pItem)
+{
+    if(pItem == NULL)
+        return;
+    
+    if(m_pActiveItemProj)
+        m_pActiveItemProj->Hide();
+                
+    for(int i = 0; i < ui->tabWidget->count(); ++i)
+        GetItem(i)->Hide();
+
+    if(pItem->GetType() == ITEM_Project)
+        m_pActiveItemProj = static_cast<ItemProject *>(pItem);
+        
+    pItem->Show();
 }
 
 void WidgetRenderer::on_tabWidget_currentChanged(int iIndex)

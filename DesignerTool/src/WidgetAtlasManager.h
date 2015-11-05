@@ -28,8 +28,8 @@ public:
 
     void SaveData();
 
-    void Show();
-    void Hide();
+    void PreviewAtlasGroup(bool bForceLoad);
+    void HideAtlasGroup();
 
 private:
     Ui::WidgetAtlasManager *ui;
