@@ -58,7 +58,7 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 	{
 		jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
 
-		new (pFrameWriteLocation)Frame(dataRef.RequestTexture(static_cast<uint32>(frameObj.get<jsonxx::Number>("textureId"))),
+		new (pFrameWriteLocation)Frame(dataRef.RequestTexture(static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasId")), static_cast<uint32>(frameObj.get<jsonxx::Number>("textureId"))),
 									   static_cast<uint32>(frameObj.get<jsonxx::Number>("rectIndex")),
 									   vec2(static_cast<float>(frameObj.get<jsonxx::Number>("xOffset")), static_cast<float>(frameObj.get<jsonxx::Number>("yOffset"))),
 									   static_cast<float>(frameObj.get<jsonxx::Number>("rotation")),

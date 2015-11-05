@@ -12,7 +12,7 @@
 #include "FileIO/Data/HyTexturedQuad2dData.h"
 
 HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGroupIndex) :	IHyInst2d(HYINST_TexturedQuad2d, NULL, std::to_string(uiAtlasGroupIndex).c_str()),
-																m_uiATLASGROUPINDEX(uiAtlasGroupIndex)
+																m_uiTextureIndex(0)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::SHADER_QUADBATCH);
 	m_RenderState.SetNumInstances(1);
@@ -22,9 +22,9 @@ HyTexturedQuad2d::~HyTexturedQuad2d()
 {
 }
 
-uint32 HyTexturedQuad2d::GetAtlasGroupIndex() const
+uint32 HyTexturedQuad2d::GetAtlasGroupId() const
 {
-	return m_uiATLASGROUPINDEX;
+	return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetId();
 }
 
 /*virtual*/ void HyTexturedQuad2d::OnDataLoaded()
@@ -52,7 +52,7 @@ uint32 HyTexturedQuad2d::GetAtlasGroupIndex() const
 	*reinterpret_cast<vec4 *>(pRefDataWritePos) = m_vColor.Get();
 	pRefDataWritePos += sizeof(vec4);
 
-	*reinterpret_cast<uint32 *>(pRefDataWritePos) = pData->GetTextureIndex();
+	*reinterpret_cast<uint32 *>(pRefDataWritePos) = m_uiTextureIndex;
 	pRefDataWritePos += sizeof(uint32);
 
 	vec2 vUV;

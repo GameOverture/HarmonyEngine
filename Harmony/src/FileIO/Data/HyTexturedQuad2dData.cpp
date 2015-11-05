@@ -12,11 +12,11 @@
 #include "Renderer/IHyRenderer.h"
 
 
-HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath) : IHyData2d(HYINST_TexturedQuad2d, sPath),
-																		m_uiTextureIndex(0),
+HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath) :	IHyData2d(HYINST_TexturedQuad2d, sPath),
+																		m_uiATLASGROUP_ID(atoi(sPath.c_str())),
 																		m_pAtlas(NULL)
 {
-	m_uiTextureId = atoi(sPath.c_str());
+	
 }
 
 HyTexturedQuad2dData::~HyTexturedQuad2dData()
@@ -25,15 +25,10 @@ HyTexturedQuad2dData::~HyTexturedQuad2dData()
 
 /*virtual*/ void HyTexturedQuad2dData::DoFileLoad()
 {
-	m_pAtlas = RequestTexture(m_uiTextureId);
+	m_pAtlas = RequestTexture(m_uiATLASGROUP_ID, 0);
 }
 
 HyAtlasGroup *HyTexturedQuad2dData::GetAtlasGroup()
 {
 	return m_pAtlas;
-}
-
-uint32 HyTexturedQuad2dData::GetTextureIndex()
-{
-	return m_uiTextureIndex;
 }

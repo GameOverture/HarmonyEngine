@@ -38,8 +38,8 @@ public:
 	HyAtlasManager(std::string sAtlasDataDir);
 	~HyAtlasManager();
 
-	HyAtlasGroup *RequestTexture(uint32 uiTextureId);
-	std::string GetTexturePath(uint32 uiTextureId);
+	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
+	std::string GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -68,12 +68,13 @@ public:
 	HyAtlasGroup(HyAtlasManager &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
 	~HyAtlasGroup();
 
-	uint32 GetGfxApiHandle();
-	uint32 GetNumColorChannels();
-	uint32 GetWidth();
-	uint32 GetHeight();
+	uint32 GetId() const;
+	uint32 GetGfxApiHandle() const;
+	uint32 GetNumColorChannels() const;
+	uint32 GetWidth() const;
+	uint32 GetHeight() const;
 
-	bool ContainsTexture(uint32 uiTextureId);
+	bool ContainsTexture(uint32 uiTextureIndex) const;
 	void Load();
 
 	void Assign(IHyData *pData);
@@ -85,8 +86,6 @@ public:
 //////////////////////////////////////////////////////////////////////////
 class HyAtlas
 {
-	const uint32			m_uiTEXTUREID;
-
 	// The return value from the 'stb_image' loader is an 'unsigned char *' which points
 	// to the pixel data. The pixel data consists of *y scanlines of *x pixels,
 	// with each pixel consisting of N interleaved 8-bit components; the first
@@ -102,10 +101,8 @@ class HyAtlas
 	uint32					m_uiNumFrames;
 
 public:
-	HyAtlas(uint32 uiTextureId, jsonxx::Array &srcFramesArrayRef);
+	HyAtlas(jsonxx::Array &srcFramesArrayRef);
 	~HyAtlas();
-
-	uint32 GetId();
 
 	void Load(const char *szFilePath);
 

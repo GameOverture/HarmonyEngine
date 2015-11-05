@@ -49,29 +49,35 @@ HyAtlasManager::~HyAtlasManager()
 	delete m_pAtlasGroups;
 }
 
-HyAtlasGroup *HyAtlasManager::RequestTexture(uint32 uiTextureId)
+HyAtlasGroup *HyAtlasManager::RequestTexture(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
 {
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 	{
-		if(m_pAtlasGroups[i].ContainsTexture(uiTextureId))
+		if(m_pAtlasGroups[i].GetId() == uiAtlasGroupId)
 		{
+			if(m_pAtlasGroups[i].ContainsTexture(uiTextureIndex) == false)
+				HyError("HyAtlasManager::RequestTexture() Atlas group (" << uiAtlasGroupId << ") does not contain texture index: " << uiTextureIndex);
+
 			m_pAtlasGroups[i].Load();
 			return &m_pAtlasGroups[i];
 		}
 	}
-
-	HyError("HyAtlasManager::RequestTexture() could not find the atlas group containing texture ID: " << uiTextureId);
+	
+	HyError("HyAtlasManager::RequestTexture() could not find the atlas group ID: " << uiAtlasGroupId);
 	return &m_pAtlasGroups[0];
 }
 
-std::string HyAtlasManager::GetTexturePath(uint32 uiTextureId)
+std::string HyAtlasManager::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
 {
 	std::string sTexturePath(m_sAtlasDirPath);
 
 	char szTmpBuffer[16];
-	sprintf(szTmpBuffer, "%05d", uiTextureId);
-	
+	sprintf(szTmpBuffer, "%05d/", uiAtlasGroupId);
 	sTexturePath += szTmpBuffer;
+
+	sprintf(szTmpBuffer, "%05d", uiTextureIndex);
+	sTexturePath += szTmpBuffer;
+
 	sTexturePath += ".png";
 
 	return sTexturePath;
@@ -92,11 +98,9 @@ HyAtlasGroup::HyAtlasGroup(HyAtlasManager &managerRef, uint32 uiLoadGroupId, uin
 	for(uint32 j = 0; j < m_uiNUM_ATLASES; ++j)
 	{
 		jsonxx::Object texObj = texturesArrayRef.get<jsonxx::Object>(j);
-
-		uint32 uiTextureId = static_cast<uint32>(texObj.get<jsonxx::Number>("id"));
 		jsonxx::Array srcFramesArray = texObj.get<jsonxx::Array>("srcFrames");
 
-		new (pAtlasWriteLocation)HyAtlas(uiTextureId, srcFramesArray);
+		new (pAtlasWriteLocation)HyAtlas(srcFramesArray);
 	}
 }
 
@@ -108,35 +112,34 @@ HyAtlasGroup::~HyAtlasGroup()
 	delete m_pAtlases;
 }
 
-uint32 HyAtlasGroup::GetGfxApiHandle()
+uint32 HyAtlasGroup::GetId() const
+{
+	return m_uiLOADGROUPID;
+}
+
+uint32 HyAtlasGroup::GetGfxApiHandle() const
 {
 	return m_uiGfxApiHandle;
 }
 
-uint32 HyAtlasGroup::GetNumColorChannels()
+uint32 HyAtlasGroup::GetNumColorChannels() const
 {
 	return m_uiNUM_8BIT_CHANNELS;
 }
 
-uint32 HyAtlasGroup::GetWidth()
+uint32 HyAtlasGroup::GetWidth() const
 {
 	return m_uiWIDTH;
 }
 
-uint32 HyAtlasGroup::GetHeight()
+uint32 HyAtlasGroup::GetHeight() const
 {
 	return m_uiHEIGHT;
 }
 
-bool HyAtlasGroup::ContainsTexture(uint32 uiTextureId)
+bool HyAtlasGroup::ContainsTexture(uint32 uiTextureIndex) const
 {
-	for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
-	{
-		if(m_pAtlases[i].GetId() == uiTextureId)
-			return true;
-	}
-
-	return false;
+	return (uiTextureIndex < m_uiNUM_ATLASES);
 }
 
 void HyAtlasGroup::Load()
@@ -146,7 +149,7 @@ void HyAtlasGroup::Load()
 	if(m_uiGfxApiHandle == 0)
 	{
 		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
-			m_pAtlases[i].Load(m_ManagerRef.GetTexturePath(m_pAtlases[i].GetId()).c_str());
+			m_pAtlases[i].Load(m_ManagerRef.GetTexturePath(m_uiLOADGROUPID, i).c_str());
 	}
 
 	m_csTextures.Unlock();
@@ -206,8 +209,7 @@ void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef)
 }
 
 //////////////////////////////////////////////////////////////////////////
-HyAtlas::HyAtlas(uint32 uiTextureId, jsonxx::Array &srcFramesArrayRef) :	m_uiTEXTUREID(uiTextureId),
-																			m_pPixelData(NULL)
+HyAtlas::HyAtlas(jsonxx::Array &srcFramesArrayRef) :	m_pPixelData(NULL)
 {
 	m_uiNumFrames = static_cast<uint32>(srcFramesArrayRef.size());
 	m_pFrames = new HyRectangle<int32>[m_uiNumFrames];
@@ -228,11 +230,6 @@ HyAtlas::~HyAtlas()
 {
 	delete [] m_pFrames;
 	DeletePixelData();
-}
-
-uint32 HyAtlas::GetId()
-{
-	return m_uiTEXTUREID;
 }
 
 void HyAtlas::Load(const char *szFilePath)
