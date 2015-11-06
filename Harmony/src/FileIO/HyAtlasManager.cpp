@@ -14,39 +14,14 @@
 
 #include "Utilities/stb_image.h"
 
-HyAtlasManager::HyAtlasManager(std::string sAtlasDataDir)
+HyAtlasManager::HyAtlasManager(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasDataDir)
 {
-	m_sAtlasDirPath = sAtlasDataDir;
-
-	jsonxx::Array atlasGroupArray;
-
-	std::string sAtlasInfoFilePath(m_sAtlasDirPath);
-	sAtlasInfoFilePath += "atlasInfo.json";
-	atlasGroupArray.parse(IHyFileIO::ReadTextFile(sAtlasInfoFilePath.c_str()));
-
-	m_uiNumAtlasGroups = static_cast<uint32>(atlasGroupArray.size());
-	m_pAtlasGroups = reinterpret_cast<HyAtlasGroup *>(new unsigned char[sizeof(HyAtlasGroup) * m_uiNumAtlasGroups]);
-	HyAtlasGroup *pAtlasGroupWriteLocation = m_pAtlasGroups;
-
-	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i, ++pAtlasGroupWriteLocation)
-	{
-		jsonxx::Object atlasGroupObj = atlasGroupArray.get<jsonxx::Object>(i);
-
-		new (pAtlasGroupWriteLocation)HyAtlasGroup(*this,
-													static_cast<uint32>(atlasGroupObj.get<jsonxx::Number>("id")),
-													static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("width")),
-													static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("height")),
-													static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("num8BitClrChannels")),
-													atlasGroupObj.get<jsonxx::Array>("textures"));
-	}
+	Load();
 }
 
 HyAtlasManager::~HyAtlasManager()
 {
-	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
-		m_pAtlasGroups->~HyAtlasGroup();
-
-	delete m_pAtlasGroups;
+	Unload();
 }
 
 HyAtlasGroup *HyAtlasManager::RequestTexture(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
@@ -69,7 +44,7 @@ HyAtlasGroup *HyAtlasManager::RequestTexture(uint32 uiAtlasGroupId, uint32 uiTex
 
 std::string HyAtlasManager::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
 {
-	std::string sTexturePath(m_sAtlasDirPath);
+	std::string sTexturePath(m_sATLAS_DIR_PATH);
 
 	char szTmpBuffer[16];
 	sprintf(szTmpBuffer, "%05d/", uiAtlasGroupId);
@@ -81,6 +56,39 @@ std::string HyAtlasManager::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextu
 	sTexturePath += ".png";
 
 	return sTexturePath;
+}
+
+void HyAtlasManager::Load()
+{
+	jsonxx::Array atlasGroupArray;
+
+	std::string sAtlasInfoFilePath(m_sATLAS_DIR_PATH);
+	sAtlasInfoFilePath += "atlasInfo.json";
+	atlasGroupArray.parse(IHyFileIO::ReadTextFile(sAtlasInfoFilePath.c_str()));
+
+	m_uiNumAtlasGroups = static_cast<uint32>(atlasGroupArray.size());
+	m_pAtlasGroups = reinterpret_cast<HyAtlasGroup *>(new unsigned char[sizeof(HyAtlasGroup) * m_uiNumAtlasGroups]);
+	HyAtlasGroup *pAtlasGroupWriteLocation = m_pAtlasGroups;
+
+	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i, ++pAtlasGroupWriteLocation)
+	{
+		jsonxx::Object atlasGroupObj = atlasGroupArray.get<jsonxx::Object>(i);
+
+		new (pAtlasGroupWriteLocation)HyAtlasGroup(*this,
+			static_cast<uint32>(atlasGroupObj.get<jsonxx::Number>("id")),
+			static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("width")),
+			static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("height")),
+			static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("num8BitClrChannels")),
+			atlasGroupObj.get<jsonxx::Array>("textures"));
+	}
+}
+
+void HyAtlasManager::Unload()
+{
+	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
+		m_pAtlasGroups->~HyAtlasGroup();
+
+	delete m_pAtlasGroups;
 }
 
 //////////////////////////////////////////////////////////////////////////

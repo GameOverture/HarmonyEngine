@@ -49,6 +49,7 @@ void IHyInst2d::Load()
 void IHyInst2d::Unload()
 {
 	sm_pFileIO->RemoveInst(this);
+	m_pData = NULL;
 	m_eLoadState = HYLOADSTATE_Inactive;
 }
 

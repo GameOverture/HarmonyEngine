@@ -76,8 +76,9 @@ public:
 	void AddInstance(IHyInst2d *pInst);
 	void RemoveInst(IHyInst2d *pInst);
 
-	void DebugDrawPhysics2d(bool bDraw)				{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
+	void CopyAllInsts(vector<IHyInst2d *> &vInstsToCopy);
 
+	void DebugDrawPhysics2d(bool bDraw)				{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
 
 	void InsertActiveAnimFloat(HyAnimFloat *pAnimFloat);
 

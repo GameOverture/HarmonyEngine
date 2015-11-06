@@ -70,6 +70,11 @@ void HyScene::RemoveInst(IHyInst2d *pInst)
 	}
 }
 
+void HyScene::CopyAllInsts(vector<IHyInst2d *> &vInstsToCopy)
+{
+	vInstsToCopy = m_vLoadedInst2d;
+}
+
 void HyScene::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
 {
 	m_vActiveAnimFloats.push_back(pAnimFloat);

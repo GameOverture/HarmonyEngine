@@ -33,7 +33,8 @@ IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene
 																								m_Txt2d(HYINST_Text2d, m_sDATADIR + "Font/"),
 																								m_Mesh3d(HYINST_Mesh3d, m_sDATADIR + "Mesh/"),
 																								m_Quad2d(HYINST_TexturedQuad2d, ""),
-																								m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval)
+																								m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval),
+																								m_bReloadingEverything(false)
 {
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
@@ -75,10 +76,13 @@ void IHyFileIO::Update()
 			IHyData *pData = m_LoadQueue_Retrieval.front();
 			m_LoadQueue_Retrieval.pop();
 
-			pData->SetLoadState(HYLOADSTATE_Queued);
-
 			if(pData->GetDataType() == HYDATA_2d)
+			{
+				pData->SetLoadState(HYLOADSTATE_Queued);
 				m_GfxCommsRef.SendAtlasGroup(static_cast<IHyData2d *>(pData));
+			}
+			else
+				FinalizeData(pData);
 		}
 	}
 	m_LoadingCtrl.m_csRetrievalQueue.Unlock();
@@ -178,6 +182,43 @@ void IHyFileIO::RemoveInst(IHyInst2d *pInst)
 	default:
 		HyError("IHyFileIO::RemoveInst() passed an invalid HyLoadState");
 	}
+}
+
+void IHyFileIO::ReloadEverything()
+{
+	if(m_bReloadingEverything)
+		return;
+
+	m_vReloadEverything.clear();
+	m_SceneRef.CopyAllInsts(m_vReloadEverything);
+	
+	for(uint32 i = 0; i < m_vQueuedInst2d.size(); ++i)
+		m_vReloadEverything.push_back(m_vQueuedInst2d[i]);
+
+	for(uint32 i = 0; i < m_vReloadEverything.size(); ++i)
+		m_vReloadEverything[i]->Unload();
+
+	m_bReloadingEverything = true;
+}
+
+bool IHyFileIO::IsReloadingEverything()
+{
+	if(m_bReloadingEverything == false)
+		return false;
+
+	Update();
+
+	if(m_Sfx.IsEmpty() == false || m_Sprite2d.IsEmpty() == false || m_Spine2d.IsEmpty() == false || m_Mesh3d.IsEmpty() == false || m_Txt2d.IsEmpty() == false || m_Quad2d.IsEmpty() == false)
+		return false;
+
+	m_AtlasManager.Unload();
+	m_AtlasManager.Load();
+
+	for(uint32 i = 0; i < m_vReloadEverything.size(); ++i)
+		m_vReloadEverything[i]->Load();
+
+	m_bReloadingEverything = false;
+	return true;
 }
 
 /*static*/ char *IHyFileIO::ReadTextFile(const char *szFilePath, int *iLength)
@@ -288,6 +329,8 @@ void IHyFileIO::DiscardData(IHyData *pData)
 
 	if(pData->GetDataType() == HYDATA_2d)
 		m_GfxCommsRef.SendAtlasGroup(static_cast<IHyData2d *>(pData));
+	else
+		FinalizeData(pData);
 }
 
 /*static*/ void IHyFileIO::LoadingThread(void *pParam)

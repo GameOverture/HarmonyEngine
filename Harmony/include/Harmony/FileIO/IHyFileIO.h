@@ -79,6 +79,8 @@ class IHyFileIO
 	// Loading thread info pointer
 	ThreadInfoPtr										m_pLoadingThread;
 
+	bool												m_bReloadingEverything;
+	vector<IHyInst2d *>									m_vReloadEverything;
 
 public:
 	IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
@@ -88,6 +90,9 @@ public:
 
 	void LoadInst2d(IHyInst2d *pInst);
 	void RemoveInst(IHyInst2d *pInst);
+
+	void ReloadEverything();
+	bool IsReloadingEverything();
 
 	static char *ReadTextFile(const char *szFilePath, int *iLength);
 	static std::string ReadTextFile(const char *szFilePath);

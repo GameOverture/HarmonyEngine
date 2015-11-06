@@ -73,6 +73,11 @@ public:
 			}
 		}
 	}
+
+	bool IsEmpty()
+	{
+		return m_vData.empty();
+	}
 };
 
 #endif /* __HyFactory_h__ */

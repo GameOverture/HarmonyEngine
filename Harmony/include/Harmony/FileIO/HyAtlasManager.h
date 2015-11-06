@@ -29,7 +29,7 @@ class IHyRenderer;
 //////////////////////////////////////////////////////////////////////////
 class HyAtlasManager
 {
-	std::string				m_sAtlasDirPath;
+	const std::string		m_sATLAS_DIR_PATH;
 
 	HyAtlasGroup *			m_pAtlasGroups;
 	uint32					m_uiNumAtlasGroups;
@@ -40,6 +40,9 @@ public:
 
 	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
 	std::string GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
+
+	void Load();
+	void Unload();
 };
 
 //////////////////////////////////////////////////////////////////////////

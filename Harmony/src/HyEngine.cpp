@@ -58,6 +58,9 @@ void HyEngine::operator delete(void *ptr)
 
 bool HyEngine::Update()
 {
+	if(m_FileIO.IsReloadingEverything())	// TODO: Reset m_Time's delta after this completes
+		return true;
+
 	while(m_Time.ThrottleTime())
 	{
 		m_Input.Update();
