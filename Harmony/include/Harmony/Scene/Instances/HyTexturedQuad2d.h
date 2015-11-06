@@ -19,7 +19,7 @@ class HyTexturedQuad2d : public IHyInst2d
 	uint32		m_uiTextureIndex;
 
 public:
-	HyTexturedQuad2d(uint32 uiAtlasGroupIndex);
+	HyTexturedQuad2d(uint32 uiAtlasGroupId);
 	virtual ~HyTexturedQuad2d();
 
 	uint32 GetAtlasGroupId() const;

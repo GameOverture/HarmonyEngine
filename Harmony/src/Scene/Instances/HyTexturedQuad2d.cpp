@@ -11,8 +11,8 @@
 
 #include "FileIO/Data/HyTexturedQuad2dData.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGroupIndex) :	IHyInst2d(HYINST_TexturedQuad2d, NULL, std::to_string(uiAtlasGroupIndex).c_str()),
-																m_uiTextureIndex(0)
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGroupId) :	IHyInst2d(HYINST_TexturedQuad2d, NULL, std::to_string(uiAtlasGroupId).c_str()),
+															m_uiTextureIndex(0)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::SHADER_QUADBATCH);
 	m_RenderState.SetNumInstances(1);

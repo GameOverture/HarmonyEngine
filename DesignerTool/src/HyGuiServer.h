@@ -1,5 +1,5 @@
-#ifndef HYTCPSERVER_H
-#define HYTCPSERVER_H
+#ifndef HYGUISERVER_H
+#define HYGUISERVER_H
 
 #include <QObject>
 #include <QTcpSocket>
@@ -7,23 +7,23 @@
 
 #include <QList>
 
-class HyTcpServer : public QObject
+class HyGuiServer : public QTcpServer
 {
     Q_OBJECT
 public:
-    explicit HyTcpServer(QObject *parent = 0);
+    explicit HyGuiServer(QObject *parent = 0);
     
     void Initialize();
     
 signals:
+    void newConnection();
     
 public slots:
     
     
 private:
-    QTcpServer *        m_pTcpServer;
     QList<QTcpSocket *> m_TcpClients;
     
 };
 
-#endif // HYTCPSERVER_H
+#endif // HYGUISERVER_H

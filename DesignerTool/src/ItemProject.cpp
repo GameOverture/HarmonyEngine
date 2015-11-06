@@ -46,16 +46,16 @@ ItemProject::~ItemProject()
     // well shit
 }
 
-void ItemProject::SetAtlasGroupDrawState(int iAtlasGrpIndex, bool bForceLoad)
+void ItemProject::SetAtlasGroupDrawState(int iAtlasGrpId, bool bForceLoad)
 {
     m_eState = DRAWSTATE_AtlasManager;
     
-    if(bForceLoad == false || iAtlasGrpIndex == -1)
+    if(bForceLoad == false || iAtlasGrpId == -1)
         return;
     
-    if(m_pCurAtlas && (m_pCurAtlas->GetAtlasGroupIndex() != iAtlasGrpIndex || bForceLoad))
+    if(m_pCurAtlas && (m_pCurAtlas->GetAtlasGroupId() != iAtlasGrpId || bForceLoad))
         delete m_pCurAtlas;
     
-    m_pCurAtlas = new HyTexturedQuad2d(iAtlasGrpIndex);
+    m_pCurAtlas = new HyTexturedQuad2d(iAtlasGrpId);
     m_pCurAtlas->Load();
 }

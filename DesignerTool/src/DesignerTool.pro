@@ -33,12 +33,12 @@ SOURCES += main.cpp \
     ItemProject.cpp \
     WidgetLiveVariable.cpp \
     WidgetLiveVarManager.cpp \
-    HyTcpServer.cpp \
     DlgOpenProject.cpp \
     HyGuiRenderer.cpp \
     DlgAtlasGroupSettings.cpp \
     WidgetAtlasManager.cpp \
-    WidgetAtlasGroup.cpp
+    WidgetAtlasGroup.cpp \
+    HyGuiServer.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -60,12 +60,12 @@ HEADERS  += \
     ItemProject.h \
     WidgetLiveVariable.h \
     WidgetLiveVarManager.h \
-    HyTcpServer.h \
     DlgOpenProject.h \
     HyGuiRenderer.h \
     DlgAtlasGroupSettings.h \
     WidgetAtlasManager.h \
-    WidgetAtlasGroup.h
+    WidgetAtlasGroup.h \
+    HyGuiServer.h
 
 FORMS    += \
     DlgNewProject.ui \

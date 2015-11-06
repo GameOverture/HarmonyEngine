@@ -35,7 +35,7 @@ public:
     virtual void Hide();
     virtual void Draw(WidgetRenderer &renderer);
     
-    void SetAtlasGroupDrawState(int iAtlasGrpIndex, bool bForceLoad);
+    void SetAtlasGroupDrawState(int iAtlasGrpId, bool bForceLoad);
 };
 
 #endif // ITEMPROJECT_H
