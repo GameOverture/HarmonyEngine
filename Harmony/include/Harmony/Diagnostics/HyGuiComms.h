@@ -35,6 +35,10 @@ class HyGuiComms
 	void Connect();
 
 	// Because netlink library doesn't use function pointers, these "callback classes" exist.
+	class OnAcceptCallbackClass : public NL::SocketGroupCmd
+	{
+		void exec(NL::Socket *pSocket, NL::SocketGroup *pGroup, void *pParam);
+	};
 	class OnReadCallbackClass : public NL::SocketGroupCmd
 	{
 		void exec(NL::Socket *pSocket, NL::SocketGroup *pGroup, void *pParam);
@@ -44,18 +48,24 @@ class HyGuiComms
 		void exec(NL::Socket *pSocket, NL::SocketGroup *pGroup, void *pParam);
 	};
 
+	OnAcceptCallbackClass				m_OnAccept;
 	OnReadCallbackClass					m_OnRead;
 	OnDisconnectCallbackClass			m_OnDisconnect;
 
 	enum ePacketType
 	{
-		HYPACKET_LogNormal = 0,
-		HYPACKET_LogWarning,
-		HYPACKET_LogError,
-		HYPACKET_LogInfo,
-		HYPACKET_LogTitle,
-		HYPACKET_Int,
-		HYPACKET_Float,
+		PACKET_LogNormal = 0,
+		PACKET_LogWarning,
+		PACKET_LogError,
+		PACKET_LogInfo,
+		PACKET_LogTitle,
+		
+		PACKET_Int,
+		PACKET_Float,
+
+		PACKET_ReloadStart,
+		PACKET_ReloadItem,
+		PACKET_ReloadEnd
 	};
 
 
@@ -65,7 +75,7 @@ public:
 
 	static void Log(const char *szMessage, uint32 uiType);
 	
-	void SendPacket(ePacketType eType, uint32 uiDataSize, const void *pDataToCopy);
+	void SendToGui(ePacketType eType, uint32 uiDataSize, const void *pDataToCopy);
 
 	void Update();
 	void ProcessPacket(char *&pCurReadPos);

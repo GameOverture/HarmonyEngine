@@ -18,7 +18,7 @@
 #include "Memory/HyMemoryHeap.h"
 
 #include "Audio/HyAudio.h"
-#include "GuiTool/HyGuiComms.h"
+#include "Diagnostics/HyGuiComms.h"
 
 #include "Scene/HyScene.h"
 #include "Scene/Instances/HySprite2d.h"

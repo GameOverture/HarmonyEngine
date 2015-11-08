@@ -65,12 +65,6 @@
     <ClCompile Include="src\Renderer\HyRenderState.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\GuiTool\HyGuiComms.cpp">
-      <Filter>GuiTool</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GuiTool\HyLiveWatchManager.cpp">
-      <Filter>GuiTool</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL\HyOpenGL.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
@@ -183,6 +177,12 @@
     <ClCompile Include="src\Renderer\Viewport\HyWindow.cpp">
       <Filter>Renderer\Viewport</Filter>
     </ClCompile>
+    <ClCompile Include="src\Diagnostics\HyGuiComms.cpp">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Diagnostics\HyLiveVarManager.cpp">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -236,9 +236,6 @@
     <Filter Include="Utilities\Animation">
       <UniqueIdentifier>{42349797-5c4d-4251-912a-03d57d552c86}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GuiTool">
-      <UniqueIdentifier>{f30ad593-855a-4f2f-9687-8e618b4ed676}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Renderer\OpenGL">
       <UniqueIdentifier>{266ff3c9-2890-44c9-90f1-b987c1598bc6}</UniqueIdentifier>
     </Filter>
@@ -259,6 +256,9 @@
     </Filter>
     <Filter Include="Scene\Instances">
       <UniqueIdentifier>{80660438-416c-412c-a17e-9611b2f4d248}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Diagnostics">
+      <UniqueIdentifier>{f30ad593-855a-4f2f-9687-8e618b4ed676}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -392,12 +392,6 @@
     <ClInclude Include="include\Harmony\Renderer\HyRenderState.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\GuiTool\HyGuiComms.h">
-      <Filter>GuiTool</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\GuiTool\HyLiveWatchManager.h">
-      <Filter>GuiTool</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Afx\HyInteropAfx.h">
       <Filter>Afx</Filter>
     </ClInclude>
@@ -524,6 +518,12 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\Viewport\HyWindow.h">
       <Filter>Renderer\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Diagnostics\HyGuiComms.h">
+      <Filter>Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Diagnostics\HyLiveVarManager.h">
+      <Filter>Diagnostics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

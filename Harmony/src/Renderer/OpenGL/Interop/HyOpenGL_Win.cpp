@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Harmony/Renderer/OpenGL/Interop/HyOpenGL_Win.h"
 
-#include "GuiTool/HyGuiComms.h"
+#include "Diagnostics/HyGuiComms.h"
 #include "Utilities/HyStrManip.h"
 
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);

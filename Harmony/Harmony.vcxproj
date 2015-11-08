@@ -44,6 +44,8 @@
     <ClCompile Include="include\Harmony\Threading\WaitObject.cpp" />
     <ClCompile Include="include\Harmony\Threading\WaitObjectEx.cpp" />
     <ClCompile Include="src\Audio\HyAudio.cpp" />
+    <ClCompile Include="src\Diagnostics\HyGuiComms.cpp" />
+    <ClCompile Include="src\Diagnostics\HyLiveVarManager.cpp" />
     <ClCompile Include="src\FileIO\Data\HyMesh3dData.cpp" />
     <ClCompile Include="src\FileIO\Data\HySfxData.cpp" />
     <ClCompile Include="src\FileIO\Data\HySpine2dData.cpp" />
@@ -53,8 +55,6 @@
     <ClCompile Include="src\FileIO\Data\IHyData2d.cpp" />
     <ClCompile Include="src\FileIO\HyAtlasManager.cpp" />
     <ClCompile Include="src\FileIO\IHyFileIO.cpp" />
-    <ClCompile Include="src\GuiTool\HyGuiComms.cpp" />
-    <ClCompile Include="src\GuiTool\HyLiveWatchManager.cpp" />
     <ClCompile Include="src\HyEngine.cpp" />
     <ClCompile Include="src\IHyApplication.cpp" />
     <ClCompile Include="src\Input\IHyInput.cpp" />
@@ -111,6 +111,8 @@
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
     <ClInclude Include="include\Harmony\Audio\HyAudio.h" />
+    <ClInclude Include="include\Harmony\Diagnostics\HyGuiComms.h" />
+    <ClInclude Include="include\Harmony\Diagnostics\HyLiveVarManager.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HyMesh3dData.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HySfxData.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HySpine2dData.h" />
@@ -122,8 +124,6 @@
     <ClInclude Include="include\Harmony\FileIO\HyAtlasManager.h" />
     <ClInclude Include="include\Harmony\FileIO\HyFactory.h" />
     <ClInclude Include="include\Harmony\FileIO\IHyFileIO.h" />
-    <ClInclude Include="include\Harmony\GuiTool\HyGuiComms.h" />
-    <ClInclude Include="include\Harmony\GuiTool\HyLiveWatchManager.h" />
     <ClInclude Include="include\Harmony\HyEngine.h" />
     <ClInclude Include="include\Harmony\IHyApplication.h" />
     <ClInclude Include="include\Harmony\Input\IHyInput.h" />

@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyLiveWatchManager.h
+ *	HyLiveVarManager.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
@@ -7,15 +7,15 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyLiveWatchManager_h__
-#define __HyLiveWatchManager_h__
+#ifndef __HyLiveVarManager_h__
+#define __HyLiveVarManager_h__
 
 #include "Afx/HyStdAfx.h"
 
 #include <vector>
 using std::vector;
 
-class HyLiveWatch
+class HyLiveVar
 {
 	static uint32	sm_uiGuidCounter;
 
@@ -50,26 +50,26 @@ class HyLiveWatch
 	vector<tGroup>	m_vGroups;
 
 public:
-	HyLiveWatch();
+	HyLiveVar();
 
 	void AddWatch(const char *szGroupName, int32 *pVariable);
 };
 
-class HyLiveWatchManager
+class HyLiveVarManager
 {
-	static HyLiveWatchManager *		sm_pInstance;
+	static HyLiveVarManager *		sm_pInstance;
 
-	vector<HyLiveWatch>				m_vPages;
+	vector<HyLiveVar>				m_vPages;
 
-	HyLiveWatchManager(void);
+	HyLiveVarManager(void);
 
 public:
-	~HyLiveWatchManager(void);
+	~HyLiveVarManager(void);
 
-	HyLiveWatchManager *GetInstance();
+	HyLiveVarManager *GetInstance();
 
-	static HyLiveWatch *CreateLiveWatchPage(std::string sName);
-	static HyLiveWatch *GetLiveWatchPage(std::string sName);
+	static HyLiveVar *CreateLiveWatchPage(std::string sName);
+	static HyLiveVar *GetLiveWatchPage(std::string sName);
 };
 
-#endif /* __HyLiveWatchManager_h__ */
+#endif /* __HyLiveVarManager_h__ */

@@ -12,7 +12,7 @@
 #include "FileIO/IHyFileIO.h"
 
 #include "Renderer/IHyRenderer.h"
-#include "GuiTool/HyGuiComms.h"
+#include "Diagnostics/HyGuiComms.h"
 
 HySpine2dData::HySpine2dData(const std::string &sPath) :	IHyData2d(HYINST_Spine2d, sPath)
 {

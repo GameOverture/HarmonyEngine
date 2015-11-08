@@ -7,9 +7,11 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "GuiTool/HyGuiComms.h"
+#include "Diagnostics/HyGuiComms.h"
 
 #ifndef HY_PLATFORM_GUI
+
+#define HY_SERVER_PORT 1313
 
 #include "Time/IHyTime.h"
 
@@ -20,7 +22,14 @@ HyGuiComms::HyGuiComms(void) : m_pSocket(NULL)
 	HyAssert(sm_pInstance == NULL, "HyGuiComms was instantiated twice");
 	NL::init();
 
-	Connect();
+	m_pSocket = new NL::Socket(HY_SERVER_PORT);
+	m_pSocket->blocking(false);
+
+	m_pSocketGroup = new NL::SocketGroup();
+	m_pSocketGroup->add(m_pSocket);
+
+	m_pSocketGroup->setCmdOnAccept(&m_OnAccept);
+	m_pSocketGroup->setCmdOnRead(&m_OnRead);
 
 	sm_pInstance = this;
 }
@@ -30,39 +39,32 @@ HyGuiComms::~HyGuiComms(void)
 	delete m_pSocket;
 }
 
-void HyGuiComms::Connect()
-{
-	try 
-	{
-		m_bConnected = true;	// Assume true, the exception below will set otherwise
-
-		m_pSocket = new NL::Socket("localhost", 1313);
-		m_pSocket->blocking(false);
-
-		m_pSocketGroup = new NL::SocketGroup();
-		m_pSocketGroup->add(m_pSocket);
-
-		m_pSocketGroup->setCmdOnRead(&m_OnRead);
-		m_pSocketGroup->setCmdOnDisconnect(&m_OnDisconnect);
-	}
-	catch(NL::Exception e)
-	{
-		// Catch exception that we did not connect
-		NL::Exception::CODE eCode = e.code();
-		if(NL::Exception::ERROR_CONNECT_SOCKET != eCode)
-		{
-			HyError("Netlink exception occured: " << eCode);
-		}
-
-		m_bConnected = false;
-	}
-}
+//void HyGuiComms::Connect()
+//{
+//	try 
+//	{
+//		m_bConnected = true;	// Assume true, the exception below will set otherwise
+//
+//		
+//	}
+//	catch(NL::Exception e)
+//	{
+//		// Catch exception that we did not connect
+//		NL::Exception::CODE eCode = e.code();
+//		if(NL::Exception::ERROR_CONNECT_SOCKET != eCode)
+//		{
+//			HyError("Netlink exception occured: " << eCode);
+//		}
+//
+//		m_bConnected = false;
+//	}
+//}
 
 void HyGuiComms::Update()
 {
 	//NL::Socket *pCli = m_pGuiServer->accept();
 
-
+	m_pSocketGroup->listen();
 
 
 	//char input[256];
@@ -95,16 +97,16 @@ void HyGuiComms::Update()
 	//}
 
 	// Check for connectivity
-	if(m_bConnected == false)
-	{
-		m_fReconnectWaitInterval += IHyTime::GetUpdateStepSeconds();
-		if(m_fReconnectWaitInterval >= 1.0f)
-		{
-			Connect();
-			m_fReconnectWaitInterval = 0.0f;
-		}
-		return;
-	}
+	//if(m_bConnected == false)
+	//{
+	//	m_fReconnectWaitInterval += IHyTime::GetUpdateStepSeconds();
+	//	if(m_fReconnectWaitInterval >= 1.0f)
+	//	{
+	//		Connect();
+	//		m_fReconnectWaitInterval = 0.0f;
+	//	}
+	//	return;
+	//}
 
 	// Send any dirty live params
 
@@ -113,7 +115,7 @@ void HyGuiComms::Update()
 	// Send diagnostics
 }
 
-void HyGuiComms::SendPacket(ePacketType eType, uint32 uiDataSize, const void *pDataToCopy)
+void HyGuiComms::SendToGui(ePacketType eType, uint32 uiDataSize, const void *pDataToCopy)
 {
 	if(m_bConnected == false)
 		return;
@@ -124,6 +126,19 @@ void HyGuiComms::SendPacket(ePacketType eType, uint32 uiDataSize, const void *pD
 	memcpy(&m_pPacketBuffer[8], pDataToCopy, uiDataSize);
 
 	m_pSocket->send(m_pPacketBuffer, uiDataSize+8);
+
+	for(uint32 i = 0; i < static_cast<uint32>(m_pSocketGroup->size()); ++i)
+	{
+		if(m_pSocketGroup->get(i)->type() == NL::CLIENT)
+			m_pSocketGroup->get(i)->send(m_pPacketBuffer, uiDataSize+8);
+	}
+}
+
+void HyGuiComms::OnAcceptCallbackClass::exec(NL::Socket *pSocket, NL::SocketGroup *pGroup, void *pParam)
+{
+	NL::Socket *pNewConnection = pSocket->accept();
+	pGroup->add(pNewConnection);
+	//cout << "\nConnection " << newConnection->hostTo() << ":" << newConnection->portTo() << " added...";
 }
 
 void HyGuiComms::OnReadCallbackClass::exec(NL::Socket *pSocket, NL::SocketGroup *pGroup, void *pParam)
@@ -136,30 +151,31 @@ void HyGuiComms::OnReadCallbackClass::exec(NL::Socket *pSocket, NL::SocketGroup 
 	pSocket->read(pThis->m_pPacketBuffer, HYNETWORKING_MAX_PACKET_SIZE);
 	
 	// Ensure packet is intended for us. Look at first 4 bytes for signature "~Hy" <-(3 characters + '\0')
-	if(strcmp(pThis->m_pPacketBuffer, "~Hy") != 0)
+	if(strcmp(reinterpret_cast<const char *>(&pThis->m_pPacketBuffer[0]), "~Hy") != 0)
 		return;
 
-	char *pCurReadPos = pThis->m_pPacketBuffer + 4;
+	unsigned char *pCurReadPos = pThis->m_pPacketBuffer + 4;
 
 	// The next 4 bytes is the packet type
-	uint32 uiType = *reinterpret_cast<uint32 *>(&pThis->m_pPacketBuffer[3]);
+	uint32 uiType = *reinterpret_cast<uint32 *>(&pCurReadPos);
+	pCurReadPos += sizeof(uint32);
 
 	switch(uiType)
 	{
-	case HYPACKET_Int:
+	case PACKET_Int:
 		break;
 
-	case HYPACKET_Float:
+	case PACKET_Float:
 		break;
 
-	case HYPACKET_LogNormal:
+	case PACKET_LogNormal:
 		break;
 	}
 }
 
 void HyGuiComms::OnDisconnectCallbackClass::exec(NL::Socket *pSocket, NL::SocketGroup *pGroup, void *pParam)
 {
-	
+	pGroup->remove(pSocket);
 }
 
 void HyGuiComms::ProcessPacket(char *&pCurReadPos)
@@ -168,7 +184,7 @@ void HyGuiComms::ProcessPacket(char *&pCurReadPos)
 
 void HyGuiComms::Log(const char *szMessage, uint32 uiLevel)
 {
-	sm_pInstance->SendPacket(static_cast<ePacketType>(uiLevel), static_cast<uint32>(strlen(szMessage)), szMessage);
+	sm_pInstance->SendToGui(static_cast<ePacketType>(uiLevel), static_cast<uint32>(strlen(szMessage)), szMessage);
 }
 
 #endif

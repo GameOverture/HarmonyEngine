@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyLiveWatchManager.cpp
+ *	HyLiveVarManager.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
@@ -7,22 +7,22 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "GuiTool/HyLiveWatchManager.h"
+#include "Diagnostics/HyLiveVarManager.h"
 
-HyLiveWatchManager *HyLiveWatchManager::sm_pInstance = NULL;
+HyLiveVarManager *HyLiveVarManager::sm_pInstance = NULL;
 
-HyLiveWatchManager::HyLiveWatchManager(void)
+HyLiveVarManager::HyLiveVarManager(void)
 {
 }
 
-HyLiveWatchManager::~HyLiveWatchManager(void)
+HyLiveVarManager::~HyLiveVarManager(void)
 {
 }
 
-HyLiveWatchManager *HyLiveWatchManager::GetInstance()
+HyLiveVarManager *HyLiveVarManager::GetInstance()
 {
 	if(sm_pInstance == NULL)
-		sm_pInstance = new HyLiveWatchManager();
+		sm_pInstance = new HyLiveVarManager();
 
 	return sm_pInstance;
 }
