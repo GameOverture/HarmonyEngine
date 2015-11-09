@@ -16,7 +16,6 @@ public:
     void Initialize();
     
 signals:
-    void newConnection();
     
 public slots:
     

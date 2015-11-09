@@ -73,7 +73,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
             if(frameObj["textureIndex"].toInt() >= 0)
             {
                 while(m_TextureList.empty() || m_TextureList.size() <= frameObj["textureIndex"].toInt())
-                    m_TextureList.append(CreateTreeItem(NULL, QString("Texture: " + m_TextureList.size()), ATLAS_Texture));
+                    m_TextureList.append(CreateTreeItem(NULL, "Texture: " % QString::number(m_TextureList.size()), ATLAS_Texture));
 
                 pTextureTreeItem = m_TextureList[frameObj["textureIndex"].toInt()];
                 eIconType = ATLAS_Frame;
@@ -94,6 +94,32 @@ WidgetAtlasGroup::~WidgetAtlasGroup()
 void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObj)
 {
     atlasObj.insert("id", m_DataDir.dirName().toInt());
+    atlasObj.insert("width", m_dlgSettings.TextureWidth());
+    atlasObj.insert("height", m_dlgSettings.TextureHeight());
+    atlasObj.insert("num8BitClrChannels", 4);   // TODO: Actually make this configurable?
+    
+    QJsonArray textureArray;
+    QList<QJsonArray> frameArrayList;
+    
+    for(int i = 0; i < m_FrameList.size(); ++i)
+    {
+        while(frameArrayList.empty() || frameArrayList.size() <= m_FrameList[i]->GetTextureIndex())
+            frameArrayList.append(QJsonArray());
+        
+        QJsonObject frameObj;
+        frameObj.insert("width", QJsonValue(m_FrameList[i]->GetSize().width()));
+        frameObj.insert("height", QJsonValue(m_FrameList[i]->GetSize().height()));
+        frameObj.insert("rotate", QJsonValue(m_FrameList[i]->IsRotated()));
+        frameObj.insert("x", QJsonValue(m_FrameList[i]->GetX()));
+        frameObj.insert("y", QJsonValue(m_FrameList[i]->GetY()));
+        
+        frameArrayList[m_FrameList[i]->GetTextureIndex()].append(frameObj);
+    }
+    
+    foreach(QJsonArray frameArray, frameArrayList)
+        textureArray.append(frameArray);
+    
+    atlasObj.insert("textures", textureArray);
 }
 
 void WidgetAtlasGroup::on_btnAddImages_clicked()
@@ -257,7 +283,7 @@ void WidgetAtlasGroup::Refresh()
 
         ppPainters[i] = new QPainter(pTexture);
 
-        m_TextureList.append(CreateTreeItem(NULL, QString("Texture: " + i), ATLAS_Texture));
+        m_TextureList.append(CreateTreeItem(NULL, "Texture: " % QString::number(i), ATLAS_Texture));
     }
 
     QJsonArray frameArray;
