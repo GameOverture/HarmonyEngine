@@ -17,97 +17,18 @@
 
 HyGuiComms *HyGuiComms::sm_pInstance = NULL;
 
-HyGuiComms::HyGuiComms(void) : m_pSocket(NULL)
+HyGuiComms::HyGuiComms(void)
 {
 	HyAssert(sm_pInstance == NULL, "HyGuiComms was instantiated twice");
-	NL::init();
-
-	m_pSocket = new NL::Socket(HY_SERVER_PORT);
-	m_pSocket->blocking(false);
-
-	m_pSocketGroup = new NL::SocketGroup();
-	m_pSocketGroup->add(m_pSocket);
-
-	m_pSocketGroup->setCmdOnAccept(&m_OnAccept);
-	m_pSocketGroup->setCmdOnRead(&m_OnRead);
-
 	sm_pInstance = this;
 }
 
 HyGuiComms::~HyGuiComms(void)
 {
-	delete m_pSocket;
 }
-
-//void HyGuiComms::Connect()
-//{
-//	try 
-//	{
-//		m_bConnected = true;	// Assume true, the exception below will set otherwise
-//
-//		
-//	}
-//	catch(NL::Exception e)
-//	{
-//		// Catch exception that we did not connect
-//		NL::Exception::CODE eCode = e.code();
-//		if(NL::Exception::ERROR_CONNECT_SOCKET != eCode)
-//		{
-//			HyError("Netlink exception occured: " << eCode);
-//		}
-//
-//		m_bConnected = false;
-//	}
-//}
 
 void HyGuiComms::Update()
 {
-	//NL::Socket *pCli = m_pGuiServer->accept();
-
-	m_pSocketGroup->listen(1);
-
-
-	//char input[256];
-	//input[255] = '\0';
-	//cout << "\n--> ";
-	//cin.getline(input, 255);
-	//if(!strcmp(input, "exit"))
-	//	disconnect = true;
-	//else
-	//	socket.send(input, strlen(input)+1);
-	//group.listen(500);
-
-
-
-
-
-
-	//if(pCli)
-	//{
-	//	pCli->blocking(false);
-	//	m_pClients.push_back(pCli);
-	//}
-
-	//char szBuffer[HYNETWORKING_MAX_PACKET_SIZE];
-	//szBuffer[HYNETWORKING_MAX_PACKET_SIZE-1] = '\0';
-	//for(uint32 i = 0; i < m_pClients.size(); ++i)
-	//{
-	//	m_pClients[i]->read(szBuffer, HYNETWORKING_MAX_PACKET_SIZE-1);
-	//	
-	//}
-
-	// Check for connectivity
-	//if(m_bConnected == false)
-	//{
-	//	m_fReconnectWaitInterval += IHyTime::GetUpdateStepSeconds();
-	//	if(m_fReconnectWaitInterval >= 1.0f)
-	//	{
-	//		Connect();
-	//		m_fReconnectWaitInterval = 0.0f;
-	//	}
-	//	return;
-	//}
-
 	// Send any dirty live params
 
 	// Send all queued up log messages
@@ -116,69 +37,6 @@ void HyGuiComms::Update()
 }
 
 void HyGuiComms::SendToGui(ePacketType eType, uint32 uiDataSize, const void *pDataToCopy)
-{
-	if(m_bConnected == false)
-		return;
-
-	HyAssert(uiDataSize > HYNETWORKING_MAX_PACKET_SIZE - 8, "InitPacket received data larger than [HYNETWORKING_MAX_PACKET_SIZE - 8]");
-
-	*reinterpret_cast<uint32 *>(&m_pPacketBuffer[4]) = eType;
-	memcpy(&m_pPacketBuffer[8], pDataToCopy, uiDataSize);
-
-	m_pSocket->send(m_pPacketBuffer, uiDataSize+8);
-
-	for(uint32 i = 0; i < static_cast<uint32>(m_pSocketGroup->size()); ++i)
-	{
-		if(m_pSocketGroup->get(i)->type() == NL::CLIENT)
-			m_pSocketGroup->get(i)->send(m_pPacketBuffer, uiDataSize+8);
-	}
-}
-
-void HyGuiComms::OnAcceptCallbackClass::exec(NL::Socket *pSocket, NL::SocketGroup *pGroup, void *pParam)
-{
-	NL::Socket *pNewConnection = pSocket->accept();
-	pGroup->add(pNewConnection);
-	//cout << "\nConnection " << newConnection->hostTo() << ":" << newConnection->portTo() << " added...";
-}
-
-void HyGuiComms::OnReadCallbackClass::exec(NL::Socket *pSocket, NL::SocketGroup *pGroup, void *pParam)
-{
-	int32 iReadSize = pSocket->nextReadSize();
-	HyAssert(iReadSize > HYNETWORKING_MAX_PACKET_SIZE, "HyGuiComms received a packet larger than HYNETWORKING_MAX_PACKET_SIZE");
-
-	HyGuiComms *pThis = reinterpret_cast<HyGuiComms *>(pParam);
-
-	pSocket->read(pThis->m_pPacketBuffer, HYNETWORKING_MAX_PACKET_SIZE);
-	
-	// Ensure packet is intended for us. Look at first 4 bytes for signature "~Hy" <-(3 characters + '\0')
-	if(strcmp(reinterpret_cast<const char *>(&pThis->m_pPacketBuffer[0]), "~Hy") != 0)
-		return;
-
-	unsigned char *pCurReadPos = pThis->m_pPacketBuffer + 4;
-
-	// The next 4 bytes is the packet type
-	uint32 uiType = *reinterpret_cast<uint32 *>(&pCurReadPos);
-	pCurReadPos += sizeof(uint32);
-
-	switch(uiType)
-	{
-	case PACKET_Int:
-		break;
-
-	case PACKET_Float:
-		break;
-
-	case PACKET_LogNormal:
-		break;
-	}
-}
-
-void HyGuiComms::OnDisconnectCallbackClass::exec(NL::Socket *pSocket, NL::SocketGroup *pGroup, void *pParam)
-{
-	pGroup->remove(pSocket);
-}
-
-void HyGuiComms::ProcessPacket(char *&pCurReadPos)
 {
 }
 

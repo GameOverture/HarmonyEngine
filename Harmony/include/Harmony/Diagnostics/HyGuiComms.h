@@ -14,43 +14,14 @@
 
 #ifndef HY_PLATFORM_GUI
 
-#include "netlink/socket.h"
-#include "netlink/socket_group.h"
-using namespace NL;
-
-#define HYNETWORKING_MAX_PACKET_SIZE 256
+#include "asio/asio.hpp"
+using asio::ip::tcp;
 
 class HyGuiComms
 {
 	static HyGuiComms *		sm_pInstance;
 
-	NL::Socket *			m_pSocket;
-	NL::SocketGroup *		m_pSocketGroup;
-
-	unsigned char			m_pPacketBuffer[HYNETWORKING_MAX_PACKET_SIZE];
-
-	bool					m_bConnected;
-	float					m_fReconnectWaitInterval;
-
-	void Connect();
-
-	// Because netlink library doesn't use function pointers, these "callback classes" exist.
-	class OnAcceptCallbackClass : public NL::SocketGroupCmd
-	{
-		void exec(NL::Socket *pSocket, NL::SocketGroup *pGroup, void *pParam);
-	};
-	class OnReadCallbackClass : public NL::SocketGroupCmd
-	{
-		void exec(NL::Socket *pSocket, NL::SocketGroup *pGroup, void *pParam);
-	};
-	class OnDisconnectCallbackClass : public NL::SocketGroupCmd
-	{
-		void exec(NL::Socket *pSocket, NL::SocketGroup *pGroup, void *pParam);
-	};
-
-	OnAcceptCallbackClass				m_OnAccept;
-	OnReadCallbackClass					m_OnRead;
-	OnDisconnectCallbackClass			m_OnDisconnect;
+	asio::io_service io_service;
 
 	enum ePacketType
 	{
@@ -78,7 +49,6 @@ public:
 	void SendToGui(ePacketType eType, uint32 uiDataSize, const void *pDataToCopy);
 
 	void Update();
-	void ProcessPacket(char *&pCurReadPos);
 };
 
 #define HyLog(msg) {\
