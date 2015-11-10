@@ -23,6 +23,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
                                             ui(new Ui::MainWindow),
+                                            m_DebugConnection(this),
                                             m_Settings("Overture Games", "Harmony Designer Tool"),
                                             m_bIsInitialized(false)
 {
@@ -57,15 +58,6 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     
     ui->dockWidgetAtlas->hide();
     ui->dockWidgetGlyphCreator->hide();
-    
-    // Network initialization
-    m_pTcpServer = new QTcpServer(this);
-    connect(m_pTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
-    if(!m_pTcpServer->listen(QHostAddress::LocalHost, HY_TCP_PORT))
-        HYLOG("Cannot start TCP server", LOGTYPE_Error)
-    else
-        HYLOG("TCP server initialized", LOGTYPE_Normal);
-    
     
     // Restore workspace
     HYLOG("Recovering previously opened session...", LOGTYPE_Normal);
@@ -234,25 +226,10 @@ void MainWindow::UpdateActions()
     //ui->explorer->GetCurProjPath(
 }
 
-void MainWindow::newConnection()
-{
-    QTcpSocket *pSocket = m_pTcpServer->nextPendingConnection();
-    
-    pSocket->write("Hello client\r\n");
-    pSocket->flush();
-    
-    pSocket->waitForBytesWritten(3000);
-    
-    pSocket->close();
-    //m_TcpClients
-}
-
-
 void MainWindow::on_actionViewExplorer_triggered()
 {
     ui->dockWidgetExplorer->setHidden(!ui->dockWidgetExplorer->isHidden());
 }
-
 
 void MainWindow::on_actionViewAtlasManager_triggered()
 {
@@ -262,4 +239,17 @@ void MainWindow::on_actionViewAtlasManager_triggered()
 void MainWindow::on_actionViewOutputLog_triggered()
 {
     ui->dockWidgetOutputLog->setHidden(!ui->dockWidgetOutputLog->isHidden());
+}
+
+void MainWindow::on_actionConnect_triggered()
+{
+//    // Network initialization
+//    m_pTcpServer = new QTcpServer(this);
+//    connect(m_pTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
+//    if(!m_pTcpServer->listen(QHostAddress::LocalHost, HY_TCP_PORT))
+//        HYLOG("Cannot start TCP server", LOGTYPE_Error)
+//    else
+//        HYLOG("TCP server initialized", LOGTYPE_Normal);
+
+    m_DebugConnection.connectToHost("localhost", 1313);
 }

@@ -6,6 +6,7 @@
 #include <QTcpServer>
 
 #include "ItemProject.h"
+#include "HyGuiDebug.h"
 
 namespace Ui {
 class MainWindow;
@@ -23,10 +24,7 @@ class MainWindow : public QMainWindow
     
     ItemProject *       m_pCurSelectedProj;
     
-    //QMenu *             m_pEditContextMenu;
-    
-    //HyTcpServer         m_TcpServer;
-    QTcpServer *        m_pTcpServer;
+    HyGuiDebug          m_DebugConnection;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -40,8 +38,6 @@ public:
     static void SetSelectedProj(ItemProject *pProj);
 
 private slots:
-    void newConnection();
-    
     void on_actionNewProject_triggered();
     void on_actionOpenProject_triggered();
     void on_actionCloseProject_triggered();
@@ -59,6 +55,8 @@ private slots:
     
     void on_actionViewOutputLog_triggered();
     
+    void on_actionConnect_triggered();
+
 private:
     Ui::MainWindow *ui;
 

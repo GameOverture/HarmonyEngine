@@ -40,5 +40,7 @@
         <file>icons16x16/spine-document.png</file>
         <file>icons16x16/atlas-frame.png</file>
         <file>icons16x16/atlas-frameWarning.png</file>
+        <file>icons16x16/debug-connected.png</file>
+        <file>icons16x16/debug-notConnected.png</file>
     </qresource>
 </RCC>

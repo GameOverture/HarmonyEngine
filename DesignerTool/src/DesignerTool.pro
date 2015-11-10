@@ -38,7 +38,7 @@ SOURCES += main.cpp \
     DlgAtlasGroupSettings.cpp \
     WidgetAtlasManager.cpp \
     WidgetAtlasGroup.cpp \
-    HyGuiServer.cpp
+    HyGuiDebug.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -65,7 +65,7 @@ HEADERS  += \
     DlgAtlasGroupSettings.h \
     WidgetAtlasManager.h \
     WidgetAtlasGroup.h \
-    HyGuiServer.h
+    HyGuiDebug.h
 
 FORMS    += \
     DlgNewProject.ui \
