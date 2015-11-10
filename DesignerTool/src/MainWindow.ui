@@ -101,6 +101,9 @@
    <addaction name="actionOpenProject"/>
    <addaction name="actionCloseProject"/>
    <addaction name="separator"/>
+   <addaction name="actionUndo"/>
+   <addaction name="actionRedo"/>
+   <addaction name="separator"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidgetExplorer">

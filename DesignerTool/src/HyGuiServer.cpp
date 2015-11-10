@@ -3,22 +3,12 @@
 #include "Harmony/HyEngine.h"
 #include "HyGlobal.h"
 
-HyGuiServer::HyGuiServer(QObject *parent) : QObject(parent)
+HyGuiServer::HyGuiServer(QObject *parent) : QTcpSocket(parent)
 {
-    m_TcpServer.listen(QHostAddress::LocalHost, 1313);
+    //m_Socket.connect(
 }
 
 void HyGuiServer::Initialize()
 {
     
-}
-
-void HyGuiServer::newConnection()
-{
-    QTcpSocket *pNewSocket = nextPendingConnection();
-
-    if(QAbstractSocket::ConnectedState == pNewSocket->state())
-    {
-        m_TcpClients.push_back(pNewSocket);
-    }
 }

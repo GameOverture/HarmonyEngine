@@ -7,22 +7,19 @@
 
 #include <QList>
 
-class HyGuiServer : public QTcpServer
+class HyGuiServer : public QTcpSocket
 {
     Q_OBJECT
+
 public:
     explicit HyGuiServer(QObject *parent = 0);
     
     void Initialize();
     
 signals:
-    void newConnection();
     
 public slots:
     
-    
-private:
-    QList<QTcpSocket *> m_TcpClients;
     
 };
 

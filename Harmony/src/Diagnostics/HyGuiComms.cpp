@@ -64,7 +64,7 @@ void HyGuiComms::Update()
 {
 	//NL::Socket *pCli = m_pGuiServer->accept();
 
-	m_pSocketGroup->listen();
+	m_pSocketGroup->listen(1);
 
 
 	//char input[256];
