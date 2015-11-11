@@ -21,7 +21,10 @@ class HyGuiComms
 {
 	static HyGuiComms *		sm_pInstance;
 
-	asio::io_service io_service;
+	asio::ip::tcp::socket	m_Socket;
+	asio::io_service		m_IOService;
+
+	tcp::acceptor			m_Acceptor;
 
 	enum ePacketType
 	{
@@ -49,6 +52,10 @@ public:
 	void SendToGui(ePacketType eType, uint32 uiDataSize, const void *pDataToCopy);
 
 	void Update();
+
+private:
+	void start_accept();
+	void handle_accept(tcp_connection::pointer new_connection, const asio::error_code& error);
 };
 
 #define HyLog(msg) {\
