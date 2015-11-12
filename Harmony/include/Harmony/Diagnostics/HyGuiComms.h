@@ -14,6 +14,15 @@
 
 #ifndef HY_PLATFORM_GUI
 
+// TODO: These below defines might only be necessary for MSVC 2013 (non C++11 compilers)
+#define ASIO_STANDALONE 
+#define ASIO_HAS_STD_ADDRESSOF
+#define ASIO_HAS_STD_ARRAY
+#define ASIO_HAS_CSTDINT
+#define ASIO_HAS_STD_SHARED_PTR
+#define ASIO_HAS_STD_TYPE_TRAITS
+
+#define ASIO_STANDALONE
 #include "asio/asio.hpp"
 using asio::ip::tcp;
 
@@ -21,7 +30,52 @@ class HyGuiComms
 {
 	static HyGuiComms *		sm_pInstance;
 
-	asio::io_service io_service;
+	class session : public std::enable_shared_from_this<session>
+	{
+		enum { max_length = 1024 };
+
+		tcp::socket			m_Socket;
+		char				m_Data[max_length];
+
+	public:
+		session(tcp::socket socket) : m_Socket(std::move(socket))
+		{
+		}
+
+		void start()
+		{
+			do_read();
+		}
+
+	private:
+		void do_read()
+		{
+			auto self(shared_from_this());
+			m_Socket.async_read_some(asio::buffer(m_Data, max_length),	[this, self](std::error_code ec, std::size_t length)
+																		{
+																			if(!ec)
+																			{
+																				do_write(length);
+																			}
+																		});
+		}
+
+		void do_write(std::size_t length)
+		{
+			auto self(shared_from_this());
+			asio::async_write(m_Socket, asio::buffer(m_Data, length),	[this, self](std::error_code ec, std::size_t /*length*/)
+																		{
+																			if(!ec)
+																			{
+																				do_read();
+																			}
+																		});
+		}
+	};
+
+	asio::io_service		m_IOService;
+	tcp::acceptor			m_Acceptor;
+	tcp::socket				m_Socket;
 
 	enum ePacketType
 	{
@@ -41,12 +95,14 @@ class HyGuiComms
 
 
 public:
-	HyGuiComms(void);
+	HyGuiComms(uint16 uiPort);
 	~HyGuiComms(void);
 
 	static void Log(const char *szMessage, uint32 uiType);
 	
 	void SendToGui(ePacketType eType, uint32 uiDataSize, const void *pDataToCopy);
+
+	void DoAcceptConnection();
 
 	void Update();
 };
@@ -73,6 +129,16 @@ public:
 	HyGuiComms::Log(ss.str().c_str(), 4); }
 
 #else
+class HyGuiComms
+{
+public:
+	HyGuiComms(uint16 uiPort)
+	{ }
+
+	void Update()
+	{ }
+};
+
 #define HyLog(msg) do { } while (false)
 #define HyLogWarning(msg) do { } while (false)
 #define HyLogError(msg) do { } while (false)

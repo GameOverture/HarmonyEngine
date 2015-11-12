@@ -22,7 +22,8 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Input(m_AppRef.m_vInputMaps),
 												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows, m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter),
 												m_FileIO(m_AppRef.m_Init.szDataDir, m_GfxBuffer, m_Scene),
-												m_Renderer(m_GfxBuffer, m_AppRef.m_vWindows)
+												m_Renderer(m_GfxBuffer, m_AppRef.m_vWindows),
+												m_GuiComms(m_AppRef.m_Init.uiDebugPort)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
@@ -75,9 +76,7 @@ bool HyEngine::Update()
 		m_FileIO.Update();
 		m_Scene.PostUpdate();
 
-#ifndef HY_PLATFORM_GUI
 		m_GuiComms.Update();
-#endif
 	}
 
 	m_Renderer.Update();

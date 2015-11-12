@@ -44,10 +44,9 @@ class HyEngine
 	HyFileIOInterop			m_FileIO;
 	HyAudio					m_Audio;
 
-
-#ifndef HY_PLATFORM_GUI
 	HyGuiComms				m_GuiComms;
-#else
+
+#ifdef HY_PLATFORM_GUI
 public:
 #endif
 	// Private ctor invoked from RunGame(), once.

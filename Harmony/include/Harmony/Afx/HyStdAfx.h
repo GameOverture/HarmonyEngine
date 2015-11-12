@@ -83,6 +83,7 @@ struct HarmonyInit
 	float					fPixelsPerMeter;
 	uint32					uiNumInputMappings;
 	const char *			szDefaultFont;
+	uint16					uiDebugPort;
 
 	HarmonyInit() :	szGameName("Untitled Game"),
 					szDataDir("./data"),
@@ -90,7 +91,8 @@ struct HarmonyInit
 					eDefaultCoordinateType(HYCOORD_Pixel),
 					fPixelsPerMeter(80),
 					uiNumInputMappings(1),
-					szDefaultFont("Vera.ttf")
+					szDefaultFont("Vera.ttf"),
+					uiDebugPort(1313)
 	{
 		for(int i = 0; i < HY_MAXWINDOWS; ++i)
 		{

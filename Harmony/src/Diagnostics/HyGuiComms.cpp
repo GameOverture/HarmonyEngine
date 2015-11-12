@@ -11,24 +11,38 @@
 
 #ifndef HY_PLATFORM_GUI
 
-#define HY_SERVER_PORT 1313
-
-#include "Time/IHyTime.h"
-
 HyGuiComms *HyGuiComms::sm_pInstance = NULL;
 
-HyGuiComms::HyGuiComms(void)
+HyGuiComms::HyGuiComms(uint16 uiPort) : m_Acceptor(m_IOService, tcp::endpoint(tcp::v4(), uiPort)),
+										m_Socket(m_IOService)
 {
 	HyAssert(sm_pInstance == NULL, "HyGuiComms was instantiated twice");
 	sm_pInstance = this;
+
+	DoAcceptConnection();
 }
 
 HyGuiComms::~HyGuiComms(void)
 {
 }
 
+void HyGuiComms::DoAcceptConnection()
+{
+	m_Acceptor.async_accept(m_Socket,	[this](std::error_code ec)
+										{
+											if(!ec)
+											{
+												std::make_shared<session>(std::move(m_Socket))->start();
+											}
+
+											DoAcceptConnection();
+										});
+}
+
 void HyGuiComms::Update()
 {
+	m_IOService.poll();
+
 	// Send any dirty live params
 
 	// Send all queued up log messages
