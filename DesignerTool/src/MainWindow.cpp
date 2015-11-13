@@ -252,4 +252,5 @@ void MainWindow::on_actionConnect_triggered()
 //        HYLOG("TCP server initialized", LOGTYPE_Normal);
 
     m_DebugConnection.connectToHost("localhost", 1313);
+    //m_DebugConnection.writeData(
 }

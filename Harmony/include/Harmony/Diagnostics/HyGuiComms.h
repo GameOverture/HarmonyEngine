@@ -55,6 +55,8 @@ class HyGuiComms
 																		{
 																			if(!ec)
 																			{
+																				ProcessData();
+																				
 																				do_write(length);
 																			}
 																		});
@@ -70,6 +72,16 @@ class HyGuiComms
 																				do_read();
 																			}
 																		});
+		}
+
+		struct CurrentPacket
+		{
+
+		};
+
+		void ProcessData()
+		{
+
 		}
 	};
 
