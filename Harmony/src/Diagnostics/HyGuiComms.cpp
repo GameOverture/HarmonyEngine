@@ -13,8 +13,9 @@
 
 HyGuiComms *HyGuiComms::sm_pInstance = NULL;
 
-HyGuiComms::HyGuiComms(uint16 uiPort) : m_Acceptor(m_IOService, tcp::endpoint(tcp::v4(), uiPort)),
-										m_Socket(m_IOService)
+HyGuiComms::HyGuiComms(uint16 uiPort, HyFileIOInterop &fileIORef) : m_Acceptor(m_IOService, tcp::endpoint(tcp::v4(), uiPort)),
+																	m_FileIORef(fileIORef),
+																	m_Socket(m_IOService)
 {
 	HyAssert(sm_pInstance == NULL, "HyGuiComms was instantiated twice");
 	sm_pInstance = this;

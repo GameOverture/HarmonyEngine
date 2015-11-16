@@ -11,6 +11,7 @@
 #define __HyGuiComms_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Afx/HyInteropAfx.h"
 
 #ifndef HY_PLATFORM_GUI
 
@@ -29,6 +30,8 @@ using asio::ip::tcp;
 class HyGuiComms
 {
 	static HyGuiComms *		sm_pInstance;
+	
+	HyFileIOInterop &		m_FileIORef;
 
 	class session : public std::enable_shared_from_this<session>
 	{
@@ -107,7 +110,7 @@ class HyGuiComms
 
 
 public:
-	HyGuiComms(uint16 uiPort);
+	HyGuiComms(uint16 uiPort, HyFileIOInterop &fileIORef);
 	~HyGuiComms(void);
 
 	static void Log(const char *szMessage, uint32 uiType);
