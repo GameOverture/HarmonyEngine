@@ -6,7 +6,7 @@
 #include <QTcpServer>
 
 #include "ItemProject.h"
-#include "HyGuiDebug.h"
+#include "HyGuiDebugger.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,7 +24,7 @@ class MainWindow : public QMainWindow
     
     ItemProject *       m_pCurSelectedProj;
     
-    HyGuiDebug          m_DebugConnection;
+    HyGuiDebugger *     m_pDebugConnection;
 
 public:
     explicit MainWindow(QWidget *parent = 0);

@@ -53,6 +53,7 @@ void HyGuiComms::Update()
 
 void HyGuiComms::SendToGui(ePacketType eType, uint32 uiDataSize, const void *pDataToCopy)
 {
+
 }
 
 void HyGuiComms::Log(const char *szMessage, uint32 uiLevel)

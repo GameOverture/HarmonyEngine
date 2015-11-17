@@ -23,7 +23,6 @@
 
 MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
                                             ui(new Ui::MainWindow),
-                                            m_DebugConnection(this),
                                             m_Settings("Overture Games", "Harmony Designer Tool"),
                                             m_bIsInitialized(false)
 {
@@ -55,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->explorer->addAction(ui->actionRemove);
     ui->explorer->addAction(ui->actionRename);
     ui->explorer->addAction(ui->actionSave);
+
+    m_pDebugConnection = new HyGuiDebugger(ui->actionConnect, this);
     
     ui->dockWidgetAtlas->hide();
     ui->dockWidgetGlyphCreator->hide();
@@ -251,6 +252,5 @@ void MainWindow::on_actionConnect_triggered()
 //    else
 //        HYLOG("TCP server initialized", LOGTYPE_Normal);
 
-    m_DebugConnection.connectToHost("localhost", 1313);
-    //m_DebugConnection.writeData(
+    m_DebugConnection
 }
