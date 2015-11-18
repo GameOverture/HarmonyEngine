@@ -8,6 +8,8 @@
 
 #include <QList>
 
+#include "Harmony/HyEngine.h"
+
 class HyGuiDebugger : public QObject
 {
     Q_OBJECT
@@ -26,7 +28,7 @@ public:
     
     void Connect();
 
-    void Write();
+    void Write(eHyPacketType eType, quint32 uiSize, void *pData);
     
 signals:
     

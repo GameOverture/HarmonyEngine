@@ -45,6 +45,7 @@
     <ClCompile Include="include\Harmony\Threading\WaitObjectEx.cpp" />
     <ClCompile Include="src\Audio\HyAudio.cpp" />
     <ClCompile Include="src\Diagnostics\HyGuiComms.cpp" />
+    <ClCompile Include="src\Diagnostics\HyGuiMessage.cpp" />
     <ClCompile Include="src\Diagnostics\HyLiveVarManager.cpp" />
     <ClCompile Include="src\FileIO\Data\HyMesh3dData.cpp" />
     <ClCompile Include="src\FileIO\Data\HySfxData.cpp" />
@@ -112,6 +113,7 @@
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
     <ClInclude Include="include\Harmony\Audio\HyAudio.h" />
     <ClInclude Include="include\Harmony\Diagnostics\HyGuiComms.h" />
+    <ClInclude Include="include\Harmony\Diagnostics\HyGuiMessage.h" />
     <ClInclude Include="include\Harmony\Diagnostics\HyLiveVarManager.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HyMesh3dData.h" />
     <ClInclude Include="include\Harmony\FileIO\Data\HySfxData.h" />

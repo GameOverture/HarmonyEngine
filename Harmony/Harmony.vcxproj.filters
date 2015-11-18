@@ -183,6 +183,9 @@
     <ClCompile Include="src\Diagnostics\HyLiveVarManager.cpp">
       <Filter>Diagnostics</Filter>
     </ClCompile>
+    <ClCompile Include="src\Diagnostics\HyGuiMessage.cpp">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -523,6 +526,9 @@
       <Filter>Diagnostics</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Diagnostics\HyLiveVarManager.h">
+      <Filter>Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Diagnostics\HyGuiMessage.h">
       <Filter>Diagnostics</Filter>
     </ClInclude>
   </ItemGroup>

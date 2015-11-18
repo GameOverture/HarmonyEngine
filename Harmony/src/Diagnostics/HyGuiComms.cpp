@@ -20,45 +20,66 @@ HyGuiComms::HyGuiComms(uint16 uiPort, HyFileIOInterop &fileIORef) : m_Acceptor(m
 	HyAssert(sm_pInstance == NULL, "HyGuiComms was instantiated twice");
 	sm_pInstance = this;
 
-	DoAcceptConnection();
+	AcceptGuiConnection();
 }
 
 HyGuiComms::~HyGuiComms(void)
 {
 }
 
-void HyGuiComms::DoAcceptConnection()
+void HyGuiComms::AcceptGuiConnection()
 {
 	m_Acceptor.async_accept(m_Socket,	[this](std::error_code ec)
 										{
 											if(!ec)
 											{
-												std::make_shared<Session>(std::move(m_Socket));
+												Session_Ptr pSession = std::make_shared<HyGuiSession>(*this, std::move(m_Socket));
+												pSession->Init();
+
+												participants_.insert(pSession);
+
+												// TODO: Send over all the live variables to the newly connected Gui
+												//
+												//for(auto msg : recent_msgs_)
+												//	participant->deliver(msg);
 											}
 
-											DoAcceptConnection();
+											AcceptGuiConnection();
 										});
 }
 
 void HyGuiComms::Update()
 {
-	m_IOService.poll();
-
 	// Send any dirty live params
 
 	// Send all queued up log messages
 
 	// Send diagnostics
+
+	m_IOService.poll();
 }
 
-void HyGuiComms::SendToGui(ePacketType eType, uint32 uiDataSize, const void *pDataToCopy)
+void HyGuiComms::DisconnectGui(Session_Ptr participant)
+{
+	participants_.erase(participant);
+}
+
+void HyGuiComms::ProcessMessage(HyGuiMessage &msgRef)
 {
 
+}
+
+void HyGuiComms::Broadcast(eHyPacketType eType, uint32 uiDataSize, const void *pDataToCopy)
+{
+	HyGuiMessage_Ptr pMsg = std::make_shared<HyGuiMessage>(eType, uiDataSize, pDataToCopy);
+
+	for(auto participant : participants_)
+		participant->QueueMessage(pMsg);
 }
 
 void HyGuiComms::Log(const char *szMessage, uint32 uiLevel)
 {
-	sm_pInstance->SendToGui(static_cast<ePacketType>(uiLevel), static_cast<uint32>(strlen(szMessage)), szMessage);
+	sm_pInstance->Broadcast(static_cast<eHyPacketType>(uiLevel), static_cast<uint32>(strlen(szMessage)), szMessage);
 }
 
 #endif

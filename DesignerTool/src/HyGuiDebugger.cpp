@@ -29,9 +29,21 @@ void HyGuiDebugger::Connect()
     m_Socket.connectToHost(m_Address, m_uiPort);
 }
 
-void HyGuiDebugger::Write()
+void HyGuiDebugger::Write(eHyPacketType eType, quint32 uiSize, void *pData)
 {
-    m_Socket.write("Testing");
+    QByteArray testBuffer;
+    
+    quint32 n = eType;
+    for(int i = 0; i != sizeof(n); ++i)
+        testBuffer.append((char)(n & (0xFF << i) >> i));
+    
+    n = uiSize;
+    for(int i = 0; i != sizeof(n); ++i)
+        testBuffer.append((char)(n & (0xFF << i) >> i));
+    
+    testBuffer.append(reinterpret_cast<char *>(pData), uiSize);
+    
+    m_Socket.write(testBuffer);
 }
 
 void HyGuiDebugger::hostFound()

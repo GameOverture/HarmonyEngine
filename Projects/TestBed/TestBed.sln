@@ -14,10 +14,6 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
-		GuiDebug|Win32 = GuiDebug|Win32
-		GuiDebug|x64 = GuiDebug|x64
-		GuiRelease|Win32 = GuiRelease|Win32
-		GuiRelease|x64 = GuiRelease|x64
 		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
 	EndGlobalSection
@@ -26,12 +22,6 @@ Global
 		{60FAC733-2D98-454C-AE2B-C48962C36EEB}.Debug|Win32.Build.0 = Debug|Win32
 		{60FAC733-2D98-454C-AE2B-C48962C36EEB}.Debug|x64.ActiveCfg = Debug|x64
 		{60FAC733-2D98-454C-AE2B-C48962C36EEB}.Debug|x64.Build.0 = Debug|x64
-		{60FAC733-2D98-454C-AE2B-C48962C36EEB}.GuiDebug|Win32.ActiveCfg = Debug|Win32
-		{60FAC733-2D98-454C-AE2B-C48962C36EEB}.GuiDebug|Win32.Build.0 = Debug|Win32
-		{60FAC733-2D98-454C-AE2B-C48962C36EEB}.GuiDebug|x64.ActiveCfg = Debug|Win32
-		{60FAC733-2D98-454C-AE2B-C48962C36EEB}.GuiRelease|Win32.ActiveCfg = Release|Win32
-		{60FAC733-2D98-454C-AE2B-C48962C36EEB}.GuiRelease|Win32.Build.0 = Release|Win32
-		{60FAC733-2D98-454C-AE2B-C48962C36EEB}.GuiRelease|x64.ActiveCfg = Release|Win32
 		{60FAC733-2D98-454C-AE2B-C48962C36EEB}.Release|Win32.ActiveCfg = Release|Win32
 		{60FAC733-2D98-454C-AE2B-C48962C36EEB}.Release|Win32.Build.0 = Release|Win32
 		{60FAC733-2D98-454C-AE2B-C48962C36EEB}.Release|x64.ActiveCfg = Release|Win32
@@ -39,14 +29,6 @@ Global
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.Debug|Win32.Build.0 = Debug|Win32
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.Debug|x64.ActiveCfg = Debug|x64
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.Debug|x64.Build.0 = Debug|x64
-		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.GuiDebug|Win32.ActiveCfg = GuiDebug|Win32
-		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.GuiDebug|Win32.Build.0 = GuiDebug|Win32
-		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.GuiDebug|x64.ActiveCfg = GuiDebug|x64
-		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.GuiDebug|x64.Build.0 = GuiDebug|x64
-		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.GuiRelease|Win32.ActiveCfg = GuiRelease|Win32
-		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.GuiRelease|Win32.Build.0 = GuiRelease|Win32
-		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.GuiRelease|x64.ActiveCfg = GuiRelease|x64
-		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.GuiRelease|x64.Build.0 = GuiRelease|x64
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.Release|Win32.ActiveCfg = Release|Win32
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.Release|Win32.Build.0 = Release|Win32
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.Release|x64.ActiveCfg = Release|x64
