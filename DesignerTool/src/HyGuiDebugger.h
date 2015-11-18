@@ -25,6 +25,8 @@ public:
     explicit HyGuiDebugger(QAction &actionConnectRef, QObject *parent = 0);
     
     void Connect();
+
+    void Write();
     
 signals:
     

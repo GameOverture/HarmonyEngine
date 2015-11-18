@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->explorer->addAction(ui->actionRename);
     ui->explorer->addAction(ui->actionSave);
 
-    m_pDebugConnection = new HyGuiDebugger(ui->actionConnect, this);
+    m_pDebugConnection = new HyGuiDebugger(*ui->actionConnect, this);
     
     ui->dockWidgetAtlas->hide();
     ui->dockWidgetGlyphCreator->hide();
@@ -252,5 +252,7 @@ void MainWindow::on_actionConnect_triggered()
 //    else
 //        HYLOG("TCP server initialized", LOGTYPE_Normal);
 
-    m_DebugConnection
+    m_pDebugConnection->Connect();
+
+    m_pDebugConnection->Write();
 }

@@ -33,7 +33,7 @@ void HyGuiComms::DoAcceptConnection()
 										{
 											if(!ec)
 											{
-												std::make_shared<session>(std::move(m_Socket))->start();
+												std::make_shared<Session>(std::move(m_Socket));
 											}
 
 											DoAcceptConnection();

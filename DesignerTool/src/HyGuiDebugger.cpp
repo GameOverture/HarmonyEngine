@@ -29,9 +29,13 @@ void HyGuiDebugger::Connect()
     m_Socket.connectToHost(m_Address, m_uiPort);
 }
 
+void HyGuiDebugger::Write()
+{
+    m_Socket.write("Testing");
+}
+
 void HyGuiDebugger::hostFound()
 {
-    m_bConnected = true;
 }
 
 void HyGuiDebugger::ReadData()
@@ -53,14 +57,14 @@ void HyGuiDebugger::ReadData()
     QString nextFortune;
     in >> nextFortune;
 
-    if (nextFortune == currentFortune) {
-        QTimer::singleShot(0, this, SLOT(requestNewFortune()));
-        return;
-    }
+//    if (nextFortune == currentFortune) {
+//        QTimer::singleShot(0, this, SLOT(requestNewFortune()));
+//        return;
+//    }
 
-    currentFortune = nextFortune;
-    statusLabel->setText(currentFortune);
-    getFortuneButton->setEnabled(true);
+//    currentFortune = nextFortune;
+//    statusLabel->setText(currentFortune);
+//    getFortuneButton->setEnabled(true);
 }
 
 void HyGuiDebugger::OnError(QAbstractSocket::SocketError socketError)

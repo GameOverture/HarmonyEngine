@@ -33,28 +33,24 @@ class HyGuiComms
 	
 	HyFileIOInterop &		m_FileIORef;
 
-	class session : public std::enable_shared_from_this<session>
+	class Session : public std::enable_shared_from_this<Session>
 	{
-		enum { max_length = 1024 };
+		enum { DataBufferSize = 1024 };
 
 		tcp::socket			m_Socket;
-		char				m_Data[max_length];
+		unsigned char		m_Data[DataBufferSize];
 
 	public:
-		session(tcp::socket socket) : m_Socket(std::move(socket))
+		Session(tcp::socket socket) : m_Socket(std::move(socket))
 		{
-		}
-
-		void start()
-		{
-			do_read();
+			StartReadAsync();
 		}
 
 	private:
-		void do_read()
+		void StartReadAsync()
 		{
 			auto self(shared_from_this());
-			m_Socket.async_read_some(asio::buffer(m_Data, max_length),	[this, self](std::error_code ec, std::size_t length)
+			m_Socket.async_read_some(asio::buffer(m_Data, DataBufferSize),	[this, self](std::error_code ec, std::size_t length)
 																		{
 																			if(!ec)
 																			{
@@ -72,15 +68,10 @@ class HyGuiComms
 																		{
 																			if(!ec)
 																			{
-																				do_read();
+																				StartReadAsync();
 																			}
 																		});
 		}
-
-		struct CurrentPacket
-		{
-
-		};
 
 		void ProcessData()
 		{
