@@ -21,6 +21,7 @@ class HyGuiDebugger : public QObject
     QHostAddress    m_Address;
     quint16         m_uiPort;
 
+    quint32         m_uiPacketType;
     quint32         m_uiPacketSize;
 
 public:

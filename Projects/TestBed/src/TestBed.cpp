@@ -70,6 +70,8 @@ TestBed::~TestBed(void)
 	Input().MapBtn_KB(CAM_DOWN, KeyDown);
 	Input().MapBtn_KB(CAM_DOWN, KeyS);
 
+	Input().MapBtn_KB(SEND_LOG, KeyF);
+
 
 	return true;
 }
@@ -106,6 +108,9 @@ TestBed::~TestBed(void)
 
 	if(Input().IsBtnDown(CAM_DOWN))
 		m_pCam->Pos().Offset(0.0f, -0.5f);
+
+	if(Input().IsBtnDown(SEND_LOG))
+		HyLog("Testing message! Mo'fucka");
 
 
 	//if(m_pInputArray->

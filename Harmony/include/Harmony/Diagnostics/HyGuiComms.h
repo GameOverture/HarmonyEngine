@@ -54,8 +54,8 @@ public:
 
 	void ProcessMessage(HyGuiMessage &msgRef);
 
-	void Broadcast(eHyPacketType eType, uint32 uiDataSize, const void *pDataToCopy);
-	static void Log(const char *szMessage, uint32 uiType);
+	static void Broadcast(eHyPacketType eType, uint32 uiDataSize, const void *pDataToCopy);
+	//static void Log(const char *szMessage, uint32 uiType);
 
 
 	void Update();
@@ -144,26 +144,27 @@ private:
 	}
 };
 
+// TODO: Have an option to disable logs
 #define HyLog(msg) {\
 	std::stringstream ss; \
-	ss << msg << std::endl \
-	HyGuiComms::Log(ss.str().c_str(), 0); }
+	ss << msg << std::endl; \
+	HyGuiComms::Broadcast(HYPACKET_LogNormal, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
 #define HyLogWarning(msg) {\
 	std::stringstream ss; \
 	ss << msg << std::endl; \
-	HyGuiComms::Log(ss.str().c_str(), 1); }
+	HyGuiComms::Broadcast(HYPACKET_LogWarning, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
 #define HyLogError(msg) {\
 	std::stringstream ss; \
 	ss << msg << std::endl; \
-	HyGuiComms::Log(ss.str().c_str(), 2); }
+	HyGuiComms::Broadcast(HYPACKET_LogError, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
 #define HyLogInfo(msg) {\
 	std::stringstream ss; \
 	ss << msg << std::endl; \
-	HyGuiComms::Log(ss.str().c_str(), 3); }
+	HyGuiComms::Broadcast(HYPACKET_LogInfo, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
 #define HyLogTitle(msg) {\
 	std::stringstream ss; \
 	ss << msg << std::endl; \
-	HyGuiComms::Log(ss.str().c_str(), 4); }
+	HyGuiComms::Broadcast(HYPACKET_LogTitle, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
 
 #else
 class HyGuiComms

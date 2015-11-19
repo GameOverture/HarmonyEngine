@@ -21,7 +21,9 @@ class TestBed : public IHyApplication
 		CAM_LEFT,
 		CAM_RIGHT,
 		CAM_UP,
-		CAM_DOWN
+		CAM_DOWN,
+
+		SEND_LOG
 	};
 
 	HyCamera2d *	m_pCam;

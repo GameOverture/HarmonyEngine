@@ -69,17 +69,20 @@ void HyGuiComms::ProcessMessage(HyGuiMessage &msgRef)
 
 }
 
-void HyGuiComms::Broadcast(eHyPacketType eType, uint32 uiDataSize, const void *pDataToCopy)
+/*static*/ void HyGuiComms::Broadcast(eHyPacketType eType, uint32 uiDataSize, const void *pDataToCopy)
 {
+	if(sm_pInstance->participants_.empty())
+		return;
+
 	HyGuiMessage_Ptr pMsg = std::make_shared<HyGuiMessage>(eType, uiDataSize, pDataToCopy);
 
-	for(auto participant : participants_)
+	for(auto participant : sm_pInstance->participants_)
 		participant->QueueMessage(pMsg);
 }
 
-void HyGuiComms::Log(const char *szMessage, uint32 uiLevel)
-{
-	sm_pInstance->Broadcast(static_cast<eHyPacketType>(uiLevel), static_cast<uint32>(strlen(szMessage)), szMessage);
-}
+//void HyGuiComms::Log(const char *szMessage, uint32 uiLevel)
+//{
+//	sm_pInstance->Broadcast(static_cast<eHyPacketType>(uiLevel), static_cast<uint32>(strlen(szMessage)), szMessage);
+//}
 
 #endif
