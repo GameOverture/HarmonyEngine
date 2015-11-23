@@ -45,6 +45,8 @@ class HyGuiComms
 	typedef std::shared_ptr<HyGuiSession> Session_Ptr;
 	std::set<Session_Ptr>	participants_;
 
+	std::map<uint32, std::vector<std::string> >	m_ReloadMap;
+
 public:
 	HyGuiComms(uint16 uiPort, HyFileIOInterop &fileIORef);
 	~HyGuiComms(void);
@@ -126,7 +128,7 @@ private:
 	void StartWrite()
 	{
 		auto self(shared_from_this());
-		asio::async_write(m_Socket, asio::buffer(write_msgs_.front()->GetData(), write_msgs_.front()->GetLength()),	[this, self](std::error_code ec, std::size_t /*length*/)
+		asio::async_write(m_Socket, asio::buffer(write_msgs_.front()->GetData(), write_msgs_.front()->GetTotalSize()),	[this, self](std::error_code ec, std::size_t /*length*/)
 																													{
 																														if(!ec)
 																														{

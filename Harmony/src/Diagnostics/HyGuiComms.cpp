@@ -66,7 +66,36 @@ void HyGuiComms::DisconnectGui(Session_Ptr participant)
 
 void HyGuiComms::ProcessMessage(HyGuiMessage &msgRef)
 {
+	unsigned char *pCurReadPos = msgRef.body();
+	uint32 uiKey = 0;
 
+	switch(msgRef.GetType())
+	{
+	case HYPACKET_Int:
+		break;
+
+	case HYPACKET_Float:
+		break;
+
+	case HYPACKET_ReloadStart:
+		uiKey = *reinterpret_cast<const uint32 *>(pCurReadPos);
+		m_ReloadMap[uiKey];
+		break;
+
+	case HYPACKET_ReloadItem:
+		uiKey = *reinterpret_cast<const uint32 *>(pCurReadPos);
+		pCurReadPos += sizeof(uint32);
+
+		m_ReloadMap[uiKey].push_back(std::string(reinterpret_cast<const char *>(pCurReadPos)));
+		break;
+
+	case HYPACKET_ReloadEnd:
+		uiKey = *reinterpret_cast<const uint32 *>(pCurReadPos);
+
+		m_FileIORef.ReloadEverything(m_ReloadMap[uiKey]);
+		m_ReloadMap.erase(uiKey);
+		break;
+	}
 }
 
 /*static*/ void HyGuiComms::Broadcast(eHyPacketType eType, uint32 uiDataSize, const void *pDataToCopy)

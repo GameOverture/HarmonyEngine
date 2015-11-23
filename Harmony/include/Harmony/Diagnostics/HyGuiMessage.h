@@ -43,10 +43,12 @@ public:
 	HyGuiMessage(eHyPacketType eType, uint32 uiDataSize, const void *pDataToCopy);
 	virtual ~HyGuiMessage();
 
+	eHyPacketType			GetType() const;
+
 	const unsigned char *	GetData() const;
 	unsigned char *			GetData();
 
-	uint32					GetLength() const;
+	uint32					GetTotalSize() const;
 
 	const unsigned char *	body() const;
 	unsigned char *			body();

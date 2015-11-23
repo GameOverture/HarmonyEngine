@@ -91,7 +91,7 @@ public:
 	void LoadInst2d(IHyInst2d *pInst);
 	void RemoveInst(IHyInst2d *pInst);
 
-	void ReloadEverything();
+	void ReloadEverything(std::vector<std::string> &vPathsRef);
 	bool IsReloadingEverything();
 
 	static char *ReadTextFile(const char *szFilePath, int *iLength);

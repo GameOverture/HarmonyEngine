@@ -3,6 +3,8 @@
 #include "Harmony/HyEngine.h"
 #include "HyGlobal.h"
 
+#include <QDateTime>
+
 HyGuiDebugger::HyGuiDebugger(QAction &actionConnectRef, QObject *parent) :  QObject(parent),
                                                                             m_ActionConnectRef(actionConnectRef),
                                                                             m_Socket(this),
@@ -13,6 +15,7 @@ HyGuiDebugger::HyGuiDebugger(QAction &actionConnectRef, QObject *parent) :  QObj
     //m_Socket.connect(
     //connect(m_pTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 
+    connect(&m_Socket, SIGNAL(hostFound()), this, SLOT(OnHostFound()));
     connect(&m_Socket, SIGNAL(readyRead()), this, SLOT(ReadData()));
     connect(&m_Socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnError(QAbstractSocket::SocketError)));
 }
@@ -44,8 +47,25 @@ void HyGuiDebugger::Write(eHyPacketType eType, quint32 uiSize, void *pData)
     m_Socket.write(testBuffer);
 }
 
-void HyGuiDebugger::hostFound()
+void HyGuiDebugger::OnHostFound()
 {
+    HYLOG("Debugger host found", LOGTYPE_Normal);
+    
+    quint32 id = QTime::currentTime().msecsSinceStartOfDay();
+    Write(HYPACKET_ReloadStart, 4, &id);
+    
+    /////////////////////////////////////////////////////////////////////////////////
+
+    QByteArray testBuffer;
+    testBuffer.append(reinterpret_cast<const char *>(&id), 4);
+    testBuffer.append("TestString/pathsAndStuff");
+    quint32 uiSize = strlen("TestString/pathsAndStuff") + sizeof(quint32);
+    
+    Write(HYPACKET_ReloadItem, uiSize, testBuffer.data());
+    
+    /////////////////////////////////////////////////////////////////////////////////
+    
+    Write(HYPACKET_ReloadEnd, 4, &id);
 }
 
 void HyGuiDebugger::ReadData()

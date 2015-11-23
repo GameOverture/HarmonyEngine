@@ -184,8 +184,10 @@ void IHyFileIO::RemoveInst(IHyInst2d *pInst)
 	}
 }
 
-void IHyFileIO::ReloadEverything()
+void IHyFileIO::ReloadEverything(std::vector<std::string> &vPathsRef)
 {
+	// TODO: Deep copy the vector of strings to this class to only reload the specified contents. vPathsRef will be deleted after this function
+
 	if(m_bReloadingEverything)
 		return;
 

@@ -30,7 +30,13 @@ HyGuiMessage::~HyGuiMessage()
 {
 }
 
-const unsigned char* HyGuiMessage::GetData() const
+eHyPacketType HyGuiMessage::GetType() const
+{
+	uint32 uiType = *reinterpret_cast<const uint32 *>(&m_pData[0]);
+	return static_cast<eHyPacketType>(uiType);
+}
+
+const unsigned char *HyGuiMessage::GetData() const
 {
 	return m_pData;
 }
@@ -40,7 +46,7 @@ unsigned char* HyGuiMessage::GetData()
 	return m_pData;
 }
 
-uint32 HyGuiMessage::GetLength() const
+uint32 HyGuiMessage::GetTotalSize() const
 {
 	return HeaderSize + m_uiBodySize;
 }

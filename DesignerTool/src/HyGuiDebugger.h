@@ -34,7 +34,7 @@ public:
 signals:
     
 public slots:
-    void hostFound();
+    void OnHostFound();
 
 private slots:
     void ReadData();

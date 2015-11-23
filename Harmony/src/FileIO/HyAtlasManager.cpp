@@ -88,7 +88,9 @@ void HyAtlasManager::Unload()
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 		m_pAtlasGroups->~HyAtlasGroup();
 
-	delete m_pAtlasGroups;
+	unsigned char *pAtlasGrps = reinterpret_cast<unsigned char *>(m_pAtlasGroups);
+	delete[] pAtlasGrps;
+	m_pAtlasGroups = NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -117,7 +119,9 @@ HyAtlasGroup::~HyAtlasGroup()
 	for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
 		m_pAtlases->~HyAtlas();
 
-	delete m_pAtlases;
+	unsigned char *pAtlas = reinterpret_cast<unsigned char *>(m_pAtlases);
+	delete[] pAtlas;
+	m_pAtlases = NULL;
 }
 
 uint32 HyAtlasGroup::GetId() const

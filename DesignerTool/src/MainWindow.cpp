@@ -18,7 +18,6 @@
 #include <QStringBuilder>
 #include <QVBoxLayout>
 #include <QTcpSocket>
-#include <QDateTime>
 
 /*static*/ MainWindow * MainWindow::sm_pInstance = NULL;
 
@@ -254,7 +253,4 @@ void MainWindow::on_actionConnect_triggered()
 //        HYLOG("TCP server initialized", LOGTYPE_Normal);
 
     m_pDebugConnection->Connect();
-
-    int id = QTime::currentTime().msecsSinceStartOfDay();
-    m_pDebugConnection->Write(HYPACKET_ReloadStart, 4, &id);
 }
