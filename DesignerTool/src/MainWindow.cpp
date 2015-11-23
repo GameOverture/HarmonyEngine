@@ -139,6 +139,12 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
+/*static*/ void MainWindow::ReloadItems(QStringList &sPaths)
+{
+    sm_pInstance->ui->renderer->ReloadItems(sPaths);
+    sm_pInstance->m_pDebugConnection->WriteReloadPacket(sPaths);
+}
+
 void MainWindow::on_actionNewProject_triggered()
 {
     DlgNewProject *pDlg = new DlgNewProject(QDir::current().path(), this);

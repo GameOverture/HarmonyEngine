@@ -31,6 +31,8 @@ public:
 
     void Write(eHyPacketType eType, quint32 uiSize, void *pData);
     
+    void WriteReloadPacket(QStringList &sPaths);
+    
 signals:
     
 public slots:

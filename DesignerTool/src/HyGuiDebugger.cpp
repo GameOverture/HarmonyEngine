@@ -34,38 +34,43 @@ void HyGuiDebugger::Connect()
 
 void HyGuiDebugger::Write(eHyPacketType eType, quint32 uiSize, void *pData)
 {
-    QByteArray testBuffer;
+    QByteArray packetData;
     
     quint32 n = eType;
-    testBuffer.append(reinterpret_cast<const char *>(&n), 4);
+    packetData.append(reinterpret_cast<const char *>(&n), 4);
 
     n = uiSize;
-    testBuffer.append(reinterpret_cast<const char *>(&n), 4);
+    packetData.append(reinterpret_cast<const char *>(&n), 4);
 
-    testBuffer.append(reinterpret_cast<char *>(pData), uiSize);
+    packetData.append(reinterpret_cast<char *>(pData), uiSize);
     
-    m_Socket.write(testBuffer);
+    m_Socket.write(packetData);
+}
+
+void HyGuiDebugger::WriteReloadPacket(QStringList &sPaths)
+{
+    if(m_Socket.isOpen() == false)
+        return;
+    
+    quint32 id = QTime::currentTime().msecsSinceStartOfDay();
+    Write(HYPACKET_ReloadStart, sizeof(quint32), &id);
+    
+    foreach(QString sPath, sPaths)
+    {
+        QByteArray testBuffer;
+        testBuffer.append(reinterpret_cast<const char *>(&id), sizeof(quint32));
+        testBuffer.append(sPath);
+        quint32 uiSize = sPath.length() + sizeof(quint32) + 1;  // +1 is for null terminator
+        
+        Write(HYPACKET_ReloadItem, uiSize, testBuffer.data());
+    }
+    
+    Write(HYPACKET_ReloadEnd, 4, &id);
 }
 
 void HyGuiDebugger::OnHostFound()
 {
     HYLOG("Debugger host found", LOGTYPE_Normal);
-    
-    quint32 id = QTime::currentTime().msecsSinceStartOfDay();
-    Write(HYPACKET_ReloadStart, 4, &id);
-    
-    /////////////////////////////////////////////////////////////////////////////////
-
-    QByteArray testBuffer;
-    testBuffer.append(reinterpret_cast<const char *>(&id), 4);
-    testBuffer.append("TestString/pathsAndStuff");
-    quint32 uiSize = strlen("TestString/pathsAndStuff") + sizeof(quint32);
-    
-    Write(HYPACKET_ReloadItem, uiSize, testBuffer.data());
-    
-    /////////////////////////////////////////////////////////////////////////////////
-    
-    Write(HYPACKET_ReloadEnd, 4, &id);
 }
 
 void HyGuiDebugger::ReadData()

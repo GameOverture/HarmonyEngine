@@ -228,20 +228,6 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
 
 void WidgetAtlasGroup::Refresh()
 {
-    for(int i = 0; i < m_FrameList.size(); ++i)
-    {
-        QStringList sLinks = m_FrameList[i]->GetLinks();
-        foreach(QString sLink, sLinks)
-        {
-            // TODO: Need to support reloading all affected instances
-
-            // Get instance from HyEngine, and unload it
-            // Place pointer in a queue
-            //
-        }
-    }
-
-
     clock_t timeStartRefresh = clock();
     QElapsedTimer timerStartRefresh;
     timerStartRefresh.start();
@@ -445,6 +431,14 @@ void WidgetAtlasGroup::Refresh()
     // Regenerate the atlas data info file
     WidgetAtlasManager *pAtlasManager = reinterpret_cast<WidgetAtlasManager *>(this->parent()->parent());
     pAtlasManager->SaveData();
+    
+    QStringList sReloadPaths;
+    for(int i = 0; i < m_FrameList.size(); ++i)
+    {
+        QStringList sLinks = m_FrameList[i]->GetLinks();
+        foreach(QString sLink, sLinks)
+            sReloadPaths.append(sLink);
+    }
     
     pAtlasManager->PreviewAtlasGroup(true);
 }

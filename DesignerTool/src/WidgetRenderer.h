@@ -52,6 +52,8 @@ public:
 
     void OpenItem(Item *pItem);
     void CloseItem(Item *pItem);
+    
+    void ReloadItems(QStringList &sPaths);
 
 private:
     Ui::WidgetRenderer *ui;

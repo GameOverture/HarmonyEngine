@@ -36,6 +36,8 @@ public:
     static void CloseItem(Item *pItem);
     
     static void SetSelectedProj(ItemProject *pProj);
+    
+    static void ReloadItems(QStringList &sPaths);
 
 private slots:
     void on_actionNewProject_triggered();

@@ -85,6 +85,11 @@ void WidgetRenderer::CloseItem(Item *pItem)
     }
 }
 
+void WidgetRenderer::ReloadItems(QStringList &sPaths)
+{
+    //ui->openGLWidget->
+}
+
 Item *WidgetRenderer::GetItem(int iIndex /*= -1*/)
 {
     if(m_pActiveItemProj)
