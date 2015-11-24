@@ -130,11 +130,14 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurSelectedProj = pProj;
     if(sm_pInstance->m_pCurSelectedProj)
     {
+        sm_pInstance->ui->renderer->SetRenderer(sm_pInstance->m_pCurSelectedProj->GetRenderer());
+                
         sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasManager());
         sm_pInstance->m_pCurSelectedProj->GetAtlasManager()->show();
     }
     else
     {
+        sm_pInstance->ui->renderer->SetRenderer(NULL);
         sm_pInstance->ui->dockWidgetAtlas->setWidget(NULL);
     }
 }

@@ -12,6 +12,7 @@
 
 #include <ctime>
 
+#include "MainWindow.h"
 #include "WidgetAtlasManager.h"
 
 WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
@@ -439,6 +440,8 @@ void WidgetAtlasGroup::Refresh()
         foreach(QString sLink, sLinks)
             sReloadPaths.append(sLink);
     }
+    
+    MainWindow::ReloadItems(sReloadPaths);
     
     pAtlasManager->PreviewAtlasGroup(true);
 }

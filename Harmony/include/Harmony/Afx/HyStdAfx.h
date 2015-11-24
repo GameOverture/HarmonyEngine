@@ -85,15 +85,28 @@ struct HarmonyInit
 	const char *			szDefaultFont;
 	uint16					uiDebugPort;
 
-	HarmonyInit() :	szGameName("Untitled Game"),
-					szDataDir("./data"),
-					uiNumWindows(1),
-					eDefaultCoordinateType(HYCOORD_Pixel),
-					fPixelsPerMeter(80),
-					uiNumInputMappings(1),
-					szDefaultFont("Vera.ttf"),
-					uiDebugPort(1313)
+	HarmonyInit(const char *szGameName, const char *szDataDir) :	szGameName(szGameName),
+																	szDataDir(szDataDir)
 	{
+		CtorInit();
+	}
+
+	HarmonyInit() :	szGameName("Untitled Game"),
+					szDataDir("./data")
+	{
+		CtorInit();
+	}
+
+private:
+	void CtorInit()
+	{
+		uiNumWindows = 1;
+		eDefaultCoordinateType = HYCOORD_Pixel;
+		fPixelsPerMeter = 80;
+		uiNumInputMappings = 1;
+		szDefaultFont = "Vera.ttf";
+		uiDebugPort = 1313;
+
 		for(int i = 0; i < HY_MAXWINDOWS; ++i)
 		{
 			windowInfo[i].sName = "Window: " + std::to_string(i);

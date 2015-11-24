@@ -64,8 +64,6 @@ public:
 #ifndef HY_PLATFORM_GUI
 private:
 #endif
-	HyRendererInterop &GetRenderer()	{ return m_Renderer; }
-
 	bool Update();
 
 	bool PollPlatformApi();

@@ -23,7 +23,6 @@
 #include "GL/gl.h"
 #include "GL/glext.h"
 
-
 // Data types
 using glm::vec2;
 using glm::vec3;

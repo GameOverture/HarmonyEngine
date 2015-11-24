@@ -12,10 +12,11 @@ class HyGuiRenderer : public QOpenGLWidget
 
     HyEngine *          m_pHyEngine;
 
+    IHyApplication *    m_pHyApp;
     bool                m_bInitialized;
 
 public:
-    HyGuiRenderer(QWidget *parent = 0);
+    HyGuiRenderer(IHyApplication *pHyApp, QWidget *parent = 0);
     ~HyGuiRenderer();
 
     void initializeGL();

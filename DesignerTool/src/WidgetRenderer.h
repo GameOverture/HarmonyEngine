@@ -5,8 +5,6 @@
 
 #include <QWidget>
 
-#include "Harmony/HyEngine.h"
-
 #include "Item.h"
 #include "ItemProject.h"
 
@@ -32,7 +30,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class WidgetRenderer : public QWidget, public IHyApplication
+class WidgetRenderer : public QWidget
 {
     Q_OBJECT
     
@@ -43,10 +41,8 @@ class WidgetRenderer : public QWidget, public IHyApplication
 public:
     explicit WidgetRenderer(QWidget *parent = 0);
     ~WidgetRenderer();
-
-    virtual bool Initialize();
-    virtual bool Update();
-    virtual bool Shutdown();
+    
+    void SetRenderer(HyGuiRenderer *pRenderer);
 
     void ClearItems();
 

@@ -8,13 +8,14 @@
 
 #include "WidgetRenderer.h"
 
-HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent)
+HyGuiRenderer::HyGuiRenderer(IHyApplication *pHyApp, QWidget *parent) : QOpenGLWidget(parent),
+                                                                        m_pHyApp(pHyApp)
 {
     // Todo: test to see if QWidget parent works for HyEngine()'s ctor
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(17);
+//    QTimer *timer = new QTimer(this);
+//    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+//    timer->start(17);
 }
 
 HyGuiRenderer::~HyGuiRenderer()
@@ -29,10 +30,10 @@ void HyGuiRenderer::initializeGL()
     //    format.setSampleBuffers(true);
     //    setFormat(format);
 
-    WidgetRenderer *pGameApp = reinterpret_cast<WidgetRenderer *>(parent());
-    IHyApplication *pTest = static_cast<IHyApplication *>(pGameApp);
+    //WidgetRenderer *pGameApp = reinterpret_cast<WidgetRenderer *>(parent());
+    //IHyApplication *pTest = static_cast<IHyApplication *>(pGameApp);
 
-    m_pHyEngine = new HyEngine(*pTest);
+    m_pHyEngine = new HyEngine(*m_pHyApp);
 }
 
 void HyGuiRenderer::paintGL()
