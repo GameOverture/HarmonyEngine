@@ -2,6 +2,7 @@
 #include "ui_WidgetRenderer.h"
 
 WidgetRenderer::WidgetRenderer(QWidget *parent) :   QWidget(parent),
+                                                    IHyApplication(HarmonyInit()),
                                                     ui(new Ui::WidgetRenderer),
                                                     m_bInitialized(false),
                                                     m_pActiveItemProj(NULL)
@@ -10,14 +11,36 @@ WidgetRenderer::WidgetRenderer(QWidget *parent) :   QWidget(parent),
     ui->tabWidget->clear();
 
     m_bInitialized = true;
-    
-    ui->openGLWidget = NULL;
 }
 
 WidgetRenderer::~WidgetRenderer()
 {
     delete ui;
 }
+
+HyGuiRenderer *WidgetRenderer::GetRenderer()
+{
+    return ui->openGLWidget;
+}
+
+/*virtual*/ bool WidgetRenderer::Initialize()
+{
+    return true;
+}
+
+/*virtual*/ bool WidgetRenderer::Update()
+{
+    //if(GetItem())
+    //    GetItem()->Draw(*this);
+
+    return true;
+}
+
+/*virtual*/ bool WidgetRenderer::Shutdown()
+{
+    return true;
+}
+
 
 void WidgetRenderer::ClearItems()
 {
@@ -66,11 +89,6 @@ void WidgetRenderer::CloseItem(Item *pItem)
             }
         }
     }
-}
-
-void WidgetRenderer::ReloadItems(QStringList &sPaths)
-{
-    //ui->openGLWidget->
 }
 
 Item *WidgetRenderer::GetItem(int iIndex /*= -1*/)

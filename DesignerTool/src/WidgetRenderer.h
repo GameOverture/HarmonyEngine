@@ -30,7 +30,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class WidgetRenderer : public QWidget
+class WidgetRenderer : public QWidget, public IHyApplication
 {
     Q_OBJECT
     
@@ -41,13 +41,18 @@ class WidgetRenderer : public QWidget
 public:
     explicit WidgetRenderer(QWidget *parent = 0);
     ~WidgetRenderer();
+    
+    HyGuiRenderer *GetRenderer();
+    
+    // IHyApplication overrides
+    virtual bool Initialize();
+    virtual bool Update();
+    virtual bool Shutdown();
 
     void ClearItems();
 
     void OpenItem(Item *pItem);
     void CloseItem(Item *pItem);
-    
-    void ReloadItems(QStringList &sPaths);
 
 private:
     Ui::WidgetRenderer *ui;

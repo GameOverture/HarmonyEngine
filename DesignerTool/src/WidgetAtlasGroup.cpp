@@ -194,7 +194,7 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
     HYLOG("AtlasGroup mouseMoveEvent(): Enter", LOGTYPE_Normal);
     WidgetAtlasManager *pAtlasMan = static_cast<WidgetAtlasManager *>(parent()->parent());
     
-    pAtlasMan->PreviewAtlasGroup(false);
+    pAtlasMan->PreviewAtlasGroup();
     QWidget::enterEvent(pEvent);
 }
 
@@ -443,7 +443,7 @@ void WidgetAtlasGroup::Refresh()
     
     MainWindow::ReloadItems(sReloadPaths);
     
-    pAtlasManager->PreviewAtlasGroup(true);
+    pAtlasManager->PreviewAtlasGroup();
 }
 
 QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType)

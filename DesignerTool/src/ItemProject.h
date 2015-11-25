@@ -7,15 +7,13 @@
 // Forward declaration
 class WidgetAtlasManager;
 
-class ItemProject : public Item, public IHyApplication
+class ItemProject : public Item
 {
     friend class WidgetExplorer;
     
-    HyGuiRenderer *         m_pRenderer;
-    
-    WidgetAtlasManager *    m_pAtlasManager;
-    HyTexturedQuad2d *      m_pCurAtlas;
-    HyCamera2d *            m_pCam;
+    WidgetAtlasManager *        m_pAtlasManager;
+    QList<HyTexturedQuad2d *>   m_Atlases;
+    HyCamera2d *                m_pCam;
     
     enum eDrawState
     {
@@ -30,23 +28,16 @@ class ItemProject : public Item, public IHyApplication
 public:
     ~ItemProject();
     
-    HyGuiRenderer *GetRenderer()                        { return m_pRenderer; }
-    
     WidgetAtlasManager *GetAtlasManager()               { return m_pAtlasManager; }
     QString GetPath(QString sAppendRelativePath) const  { return m_sPath % sAppendRelativePath; }
     QString GetPath() const                             { return m_sPath; }
-    
-    // IHyApplication overrides
-    virtual bool Initialize();
-    virtual bool Update();
-    virtual bool Shutdown();
     
     // Item overrides
     virtual void Show();
     virtual void Hide();
     virtual void Draw(WidgetRenderer &renderer);
     
-    void SetAtlasGroupDrawState(int iAtlasGrpId, bool bForceLoad);
+    void SetAtlasGroupDrawState(int iAtlasGrpId);
 };
 
 #endif // ITEMPROJECT_H

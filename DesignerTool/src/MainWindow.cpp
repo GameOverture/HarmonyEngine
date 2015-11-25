@@ -130,6 +130,8 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurSelectedProj = pProj;
     if(sm_pInstance->m_pCurSelectedProj)
     {
+        sm_pInstance->ui->renderer->GetRenderer()->Reload(sm_pInstance->m_pCurSelectedProj->GetPath());
+        
         sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasManager());
         sm_pInstance->m_pCurSelectedProj->GetAtlasManager()->show();
     }
@@ -141,7 +143,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 /*static*/ void MainWindow::ReloadItems(QStringList &sPaths)
 {
-    sm_pInstance->ui->renderer->ReloadItems(sPaths);
+    sm_pInstance->ui->renderer->GetRenderer()->Reload(sPaths);
     sm_pInstance->m_pDebugConnection->WriteReloadPacket(sPaths);
 }
 

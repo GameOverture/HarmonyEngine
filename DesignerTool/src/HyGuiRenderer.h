@@ -7,15 +7,13 @@
 
 #include "Harmony/HyEngine.h"
 
-class HyGuiRenderer : public QOpenGLWidget, protected QOpenGLFunctions
+class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
 {
     Q_OBJECT
 
-    IHyApplication *    m_pHyApp;
     HyEngine *          m_pHyEngine;
 
 public:
-    HyGuiRenderer(IHyApplication *pHyApp, QWidget *parent = 0);
     HyGuiRenderer(QWidget *parent = 0);
     ~HyGuiRenderer();
 
@@ -23,6 +21,10 @@ public:
     virtual void initializeGL();
     virtual void paintGL();
     virtual void resizeGL(int w, int h);
+    
+    void Reload();
+    void Reload(QStringList &sReloadPaths);
+    void Reload(QString &sNewDataDir);
 };
 
 #endif // HYGUIRENDERER_H

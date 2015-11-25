@@ -114,9 +114,9 @@ void WidgetAtlasManager::SaveData()
     }
 }
 
-void WidgetAtlasManager::PreviewAtlasGroup(bool bForceLoad)
+void WidgetAtlasManager::PreviewAtlasGroup()
 {
-    m_pProjOwner->SetAtlasGroupDrawState(ui->atlasGroups->currentIndex(), bForceLoad);
+    m_pProjOwner->SetAtlasGroupDrawState(ui->atlasGroups->currentIndex());
     MainWindow::OpenItem(m_pProjOwner);
 }
 

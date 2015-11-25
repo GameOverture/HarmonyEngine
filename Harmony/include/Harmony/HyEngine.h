@@ -32,6 +32,8 @@
 
 class HyEngine
 {
+	friend class HyGuiRenderer;
+
 	static HyEngine *		sm_pInstance;
 	static HyMemoryHeap &	sm_Mem;
 

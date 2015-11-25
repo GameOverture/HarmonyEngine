@@ -28,7 +28,7 @@ public:
 
     void SaveData();
 
-    void PreviewAtlasGroup(bool bForceLoad);
+    void PreviewAtlasGroup();
     void HideAtlasGroup();
 
 private:
