@@ -22,7 +22,7 @@ HyMesh3dData::~HyMesh3dData(void)
 {
 }
 
-/*virtual*/ void HyMesh3dData::DoFileLoad(HyAtlasManager &atlasManagerRef)
+/*virtual*/ void HyMesh3dData::DoFileLoad(HyTextures &atlasManagerRef)
 {
 
 }

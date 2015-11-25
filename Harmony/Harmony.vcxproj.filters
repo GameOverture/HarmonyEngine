@@ -183,7 +183,7 @@
     <ClCompile Include="src\Assets\HyAssetManager.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
-    <ClCompile Include="src\Assets\HyAtlasManager.cpp">
+    <ClCompile Include="src\Assets\HyTextures.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
   </ItemGroup>
@@ -525,10 +525,10 @@
     <ClInclude Include="include\Harmony\Assets\HyAssetManager.h">
       <Filter>Assets</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Assets\HyAtlasManager.h">
+    <ClInclude Include="include\Harmony\Assets\HyFactory.h">
       <Filter>Assets</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Assets\HyFactory.h">
+    <ClInclude Include="include\Harmony\Assets\HyTextures.h">
       <Filter>Assets</Filter>
     </ClInclude>
   </ItemGroup>

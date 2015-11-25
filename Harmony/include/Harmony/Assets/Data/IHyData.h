@@ -17,7 +17,7 @@ using std::set;
 
 // Forward declarations
 class IHyRenderer;
-class HyAtlasManager;
+class HyTextures;
 
 class IHyData
 {

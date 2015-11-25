@@ -13,14 +13,14 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/HyAtlasManager.h"
+#include "Assets/HyTextures.h"
 
 class IHyData2d : public IHyData
 {
 	friend class HyAssetManager;
 
-	static HyAtlasManager *				sm_pAtlasManager;
-	std::set<HyAtlasGroup *>			m_AssociatedAtlases;
+	static HyTextures *				sm_pTextures;
+	std::set<HyAtlasGroup *>		m_AssociatedAtlases;
 
 public:
 	IHyData2d(HyInstanceType eInstType, const std::string &sPath);

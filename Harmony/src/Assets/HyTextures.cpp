@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyAtlasManager.cpp
+ *	HyTextures.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -7,42 +7,42 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Assets/HyAtlasManager.h"
+#include "Assets/HyTextures.h"
 
 #include "Assets/HyAssetManager.h"
 #include "Renderer/IHyRenderer.h"
 
 #include "Utilities/stb_image.h"
 
-HyAtlasManager::HyAtlasManager(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasDataDir)
+HyTextures::HyTextures(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasDataDir)
 {
 	Load();
 }
 
-HyAtlasManager::~HyAtlasManager()
+HyTextures::~HyTextures()
 {
 	Unload();
 }
 
-HyAtlasGroup *HyAtlasManager::RequestTexture(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
+HyAtlasGroup *HyTextures::RequestTexture(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
 {
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 	{
 		if(m_pAtlasGroups[i].GetId() == uiAtlasGroupId)
 		{
 			if(m_pAtlasGroups[i].ContainsTexture(uiTextureIndex) == false)
-				HyError("HyAtlasManager::RequestTexture() Atlas group (" << uiAtlasGroupId << ") does not contain texture index: " << uiTextureIndex);
+				HyError("HyTextures::RequestTexture() Atlas group (" << uiAtlasGroupId << ") does not contain texture index: " << uiTextureIndex);
 
 			m_pAtlasGroups[i].Load();
 			return &m_pAtlasGroups[i];
 		}
 	}
 	
-	HyError("HyAtlasManager::RequestTexture() could not find the atlas group ID: " << uiAtlasGroupId);
+	HyError("HyTextures::RequestTexture() could not find the atlas group ID: " << uiAtlasGroupId);
 	return &m_pAtlasGroups[0];
 }
 
-std::string HyAtlasManager::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
+std::string HyTextures::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
 {
 	std::string sTexturePath(m_sATLAS_DIR_PATH);
 
@@ -58,7 +58,7 @@ std::string HyAtlasManager::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextu
 	return sTexturePath;
 }
 
-void HyAtlasManager::Load()
+void HyTextures::Load()
 {
 	jsonxx::Array atlasGroupArray;
 
@@ -83,7 +83,7 @@ void HyAtlasManager::Load()
 	}
 }
 
-void HyAtlasManager::Unload()
+void HyTextures::Unload()
 {
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 		m_pAtlasGroups->~HyAtlasGroup();
@@ -94,7 +94,7 @@ void HyAtlasManager::Unload()
 }
 
 //////////////////////////////////////////////////////////////////////////
-HyAtlasGroup::HyAtlasGroup(HyAtlasManager &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef) :	m_ManagerRef(managerRef),
+HyAtlasGroup::HyAtlasGroup(HyTextures &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef) :	m_ManagerRef(managerRef),
 																																											m_uiLOADGROUPID(uiLoadGroupId),
 																																											m_uiWIDTH(uiWidth),
 																																											m_uiHEIGHT(uiHeight),

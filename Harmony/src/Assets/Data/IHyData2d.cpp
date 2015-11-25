@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Assets/Data/IHyData2d.h"
 
-HyAtlasManager *IHyData2d::sm_pAtlasManager = NULL;
+HyTextures *IHyData2d::sm_pTextures = NULL;
 
 IHyData2d::IHyData2d(HyInstanceType eInstType, const std::string &sPath) : IHyData(HYDATA_2d, eInstType, sPath)
 {
@@ -37,7 +37,7 @@ IHyData2d::~IHyData2d()
 
 HyAtlasGroup *IHyData2d::RequestTexture(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
 {
-	HyAtlasGroup *pAtlasGrp = sm_pAtlasManager->RequestTexture(uiAtlasGroupId, uiTextureIndex);
+	HyAtlasGroup *pAtlasGrp = sm_pTextures->RequestTexture(uiAtlasGroupId, uiTextureIndex);
 	m_AssociatedAtlases.insert(pAtlasGrp);
 
 	return pAtlasGrp;

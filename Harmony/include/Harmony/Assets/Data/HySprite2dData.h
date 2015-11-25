@@ -14,7 +14,7 @@
 
 #include "Assets/Data/IHyData2d.h"
 #include "Assets/HyFactory.h"
-#include "Assets/HyAtlasManager.h"
+#include "Assets/HyTextures.h"
 
 #include "Utilities/jsonxx.h"
 

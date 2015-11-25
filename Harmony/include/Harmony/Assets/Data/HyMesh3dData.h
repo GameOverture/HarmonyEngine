@@ -32,7 +32,7 @@ class HyMesh3dData : public IHyData
 public:
 	virtual ~HyMesh3dData(void);
 
-	virtual void DoFileLoad(HyAtlasManager &atlasManagerRef);
+	virtual void DoFileLoad(HyTextures &atlasManagerRef);
 };
 
 #endif /* __HyMesh3dData_h__ */

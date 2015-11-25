@@ -40,7 +40,7 @@ HyAssetManager::HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRe
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
 
-	IHyData2d::sm_pAtlasManager = &m_AtlasManager;
+	IHyData2d::sm_pTextures = &m_AtlasManager;
 	IHyInst2d::sm_pFileIO = this;
 }
 

@@ -51,7 +51,7 @@
     <ClCompile Include="src\Assets\Data\HyTexturedQuad2dData.cpp" />
     <ClCompile Include="src\Assets\Data\IHyData2d.cpp" />
     <ClCompile Include="src\Assets\HyAssetManager.cpp" />
-    <ClCompile Include="src\Assets\HyAtlasManager.cpp" />
+    <ClCompile Include="src\Assets\HyTextures.cpp" />
     <ClCompile Include="src\Audio\HyAudio.cpp" />
     <ClCompile Include="src\Diagnostics\HyGuiComms.cpp" />
     <ClCompile Include="src\Diagnostics\HyGuiMessage.cpp" />
@@ -120,7 +120,7 @@
     <ClInclude Include="include\Harmony\Assets\Data\IHyData.h" />
     <ClInclude Include="include\Harmony\Assets\Data\IHyData2d.h" />
     <ClInclude Include="include\Harmony\Assets\HyAssetManager.h" />
-    <ClInclude Include="include\Harmony\Assets\HyAtlasManager.h" />
+    <ClInclude Include="include\Harmony\Assets\HyTextures.h" />
     <ClInclude Include="include\Harmony\Assets\HyFactory.h" />
     <ClInclude Include="include\Harmony\Audio\HyAudio.h" />
     <ClInclude Include="include\Harmony\Diagnostics\HyGuiComms.h" />

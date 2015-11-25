@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyAtlasManager.h
+ *	HyTextures.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyAtlasManager_h__
-#define __HyAtlasManager_h__
+#ifndef __HyTextures_h__
+#define __HyTextures_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -27,7 +27,7 @@ class IHyData;
 class IHyRenderer;
 
 //////////////////////////////////////////////////////////////////////////
-class HyAtlasManager
+class HyTextures
 {
 	const std::string		m_sATLAS_DIR_PATH;
 
@@ -35,8 +35,8 @@ class HyAtlasManager
 	uint32					m_uiNumAtlasGroups;
 
 public:
-	HyAtlasManager(std::string sAtlasDataDir);
-	~HyAtlasManager();
+	HyTextures(std::string sAtlasDataDir);
+	~HyTextures();
 
 	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
 	std::string GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
@@ -48,9 +48,9 @@ public:
 //////////////////////////////////////////////////////////////////////////
 class HyAtlasGroup
 {
-	friend class HyAtlasManager;
+	friend class HyTextures;
 
-	HyAtlasManager &			m_ManagerRef;
+	HyTextures &			m_ManagerRef;
 
 	const uint32				m_uiLOADGROUPID;
 	const uint32				m_uiWIDTH;
@@ -68,7 +68,7 @@ class HyAtlasGroup
 	BasicSection				m_csTextures;
 
 public:
-	HyAtlasGroup(HyAtlasManager &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
+	HyAtlasGroup(HyTextures &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
 	~HyAtlasGroup();
 
 	uint32 GetId() const;
@@ -113,4 +113,4 @@ public:
 	void DeletePixelData();
 };
 
-#endif __HyAtlasManager_h__
+#endif /* __HyTextures_h__ */
