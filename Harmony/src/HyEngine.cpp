@@ -59,8 +59,19 @@ void HyEngine::operator delete(void *ptr)
 
 bool HyEngine::Update()
 {
-	if(m_FileIO.IsReloadingEverything())	// TODO: Reset m_Time's delta after this completes
+	switch(m_FileIO.IsReloading())
+	{
+	case HYRELOADCODE_Inactive:
+		break;
+			
+	case HYRELOADCODE_InProgress:
 		return true;
+
+	case HYRELOADCODE_ReInit:
+	case HYRELOADCODE_Finished:
+		m_Time.ResetDelta();
+		break;
+	}
 
 	while(m_Time.ThrottleTime())
 	{

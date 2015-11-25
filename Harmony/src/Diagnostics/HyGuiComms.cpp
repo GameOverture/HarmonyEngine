@@ -92,7 +92,7 @@ void HyGuiComms::ProcessMessage(HyGuiMessage &msgRef)
 	case HYPACKET_ReloadEnd:
 		uiKey = *reinterpret_cast<const uint32 *>(pCurReadPos);
 
-		m_FileIORef.ReloadEverything(m_ReloadMap[uiKey]);
+		m_FileIORef.Reload(m_ReloadMap[uiKey]);
 		m_ReloadMap.erase(uiKey);
 		break;
 	}

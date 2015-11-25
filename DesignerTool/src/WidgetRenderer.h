@@ -41,8 +41,6 @@ class WidgetRenderer : public QWidget
 public:
     explicit WidgetRenderer(QWidget *parent = 0);
     ~WidgetRenderer();
-    
-    void SetRenderer(HyGuiRenderer *pRenderer);
 
     void ClearItems();
 

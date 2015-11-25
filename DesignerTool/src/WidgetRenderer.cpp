@@ -19,11 +19,6 @@ WidgetRenderer::~WidgetRenderer()
     delete ui;
 }
 
-void WidgetRenderer::SetRenderer(HyGuiRenderer *pRenderer)
-{
-    ui->openGLWidget = pRenderer;
-}
-
 void WidgetRenderer::ClearItems()
 {
     ui->tabWidget->clear();

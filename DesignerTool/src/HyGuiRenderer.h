@@ -3,25 +3,26 @@
 
 #include "GL/glew.h"
 #include <QOpenGLWidget>
+#include <QOpenGLFunctions>
 
 #include "Harmony/HyEngine.h"
 
-class HyGuiRenderer : public QOpenGLWidget
+class HyGuiRenderer : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 
-    HyEngine *          m_pHyEngine;
-
     IHyApplication *    m_pHyApp;
-    bool                m_bInitialized;
+    HyEngine *          m_pHyEngine;
 
 public:
     HyGuiRenderer(IHyApplication *pHyApp, QWidget *parent = 0);
+    HyGuiRenderer(QWidget *parent = 0);
     ~HyGuiRenderer();
 
-    void initializeGL();
-    void paintGL();
-    void resizeGL(int w, int h);
+    // QOpenGLWidget overrides
+    virtual void initializeGL();
+    virtual void paintGL();
+    virtual void resizeGL(int w, int h);
 };
 
 #endif // HYGUIRENDERER_H

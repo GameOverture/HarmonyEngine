@@ -50,6 +50,12 @@ bool IHyTime::ThrottleTime()
 	return false;
 }
 
+void IHyTime::ResetDelta()
+{
+	SetCurDeltaTime();
+	SetCurDeltaTime();
+}
+
 void IHyTime::AddTimeInst(IHyTimeInst *pTimeInst)
 {
 	if(pTimeInst == NULL)

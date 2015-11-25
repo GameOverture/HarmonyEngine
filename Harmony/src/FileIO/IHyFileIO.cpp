@@ -23,18 +23,19 @@
 #include "stdio.h"
 #include <fstream>
 
-IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(szDataDirPath, "/")),
+IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDataDir(MakeStringProperPath(szDataDirPath, "/")),
 																								m_GfxCommsRef(gfxCommsRef),
 																								m_SceneRef(sceneRef),
-																								m_AtlasManager(m_sDATADIR + "Atlas/"),
-																								m_Sfx(HYINST_Sound2d, m_sDATADIR + "Sound/"),
-																								m_Sprite2d(HYINST_Sprite2d, m_sDATADIR + "Sprite/"),
-																								m_Spine2d(HYINST_Spine2d, m_sDATADIR + "Spine/"),
-																								m_Txt2d(HYINST_Text2d, m_sDATADIR + "Font/"),
-																								m_Mesh3d(HYINST_Mesh3d, m_sDATADIR + "Mesh/"),
+																								m_AtlasManager(m_sDataDir + "Atlas/"),
+																								m_Sfx(HYINST_Sound2d, m_sDataDir + "Sound/"),
+																								m_Sprite2d(HYINST_Sprite2d, m_sDataDir + "Sprite/"),
+																								m_Spine2d(HYINST_Spine2d, m_sDataDir + "Spine/"),
+																								m_Txt2d(HYINST_Text2d, m_sDataDir + "Font/"),
+																								m_Mesh3d(HYINST_Mesh3d, m_sDataDir + "Mesh/"),
 																								m_Quad2d(HYINST_TexturedQuad2d, ""),
 																								m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval),
-																								m_bReloadingEverything(false)
+																								m_bIsReloading(false),
+																								m_sNewDataDirPath("")
 {
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
@@ -184,43 +185,95 @@ void IHyFileIO::RemoveInst(IHyInst2d *pInst)
 	}
 }
 
-void IHyFileIO::ReloadEverything(std::vector<std::string> &vPathsRef)
+// Reload every instance
+bool IHyFileIO::Reload()
 {
-	// TODO: Deep copy the vector of strings to this class to only reload the specified contents. vPathsRef will be deleted after this function
+	if(m_bIsReloading)
+		return false;
 
-	if(m_bReloadingEverything)
-		return;
+	m_vReloadInsts.clear();
+	m_SceneRef.CopyAllInsts(m_vReloadInsts);
 
-	m_vReloadEverything.clear();
-	m_SceneRef.CopyAllInsts(m_vReloadEverything);
-	
 	for(uint32 i = 0; i < m_vQueuedInst2d.size(); ++i)
-		m_vReloadEverything.push_back(m_vQueuedInst2d[i]);
+		m_vReloadInsts.push_back(m_vQueuedInst2d[i]);
 
-	for(uint32 i = 0; i < m_vReloadEverything.size(); ++i)
-		m_vReloadEverything[i]->Unload();
+	for(uint32 i = 0; i < m_vReloadInsts.size(); ++i)
+		m_vReloadInsts[i]->Unload();
 
-	m_bReloadingEverything = true;
+	m_bIsReloading = true;
+
+	return true;
 }
 
-bool IHyFileIO::IsReloadingEverything()
+// Reload only the specified instances
+bool IHyFileIO::Reload(std::vector<std::string> &vPathsRef)
 {
-	if(m_bReloadingEverything == false)
+	// TODO: Deep copy 'vPathsRef' vector of strings to 'm_vReloadInsts' so we only reload the specified contents. vPathsRef can be deleted after this function
+	if(m_bIsReloading)
 		return false;
+
+	m_vReloadInsts.clear();
+	m_SceneRef.CopyAllInsts(m_vReloadInsts);
+	
+	for(uint32 i = 0; i < m_vQueuedInst2d.size(); ++i)
+		m_vReloadInsts.push_back(m_vQueuedInst2d[i]);
+
+	for(uint32 i = 0; i < m_vReloadInsts.size(); ++i)
+		m_vReloadInsts[i]->Unload();
+
+	m_bIsReloading = true;
+	
+	return true;
+}
+
+// Unload everything, and reinitialize to a new data directory. Doesn't load up anything when done.
+bool IHyFileIO::Reload(std::string sNewDataDirPath)
+{
+	if(m_bIsReloading)
+		return false;
+
+	m_sNewDataDirPath = sNewDataDirPath;
+
+	m_vReloadInsts.clear();
+	m_SceneRef.CopyAllInsts(m_vReloadInsts);
+
+	for(uint32 i = 0; i < m_vQueuedInst2d.size(); ++i)
+		m_vReloadInsts.push_back(m_vQueuedInst2d[i]);
+
+	for(uint32 i = 0; i < m_vReloadInsts.size(); ++i)
+		m_vReloadInsts[i]->Unload();
+
+	m_bIsReloading = true;
+
+	return true;
+}
+
+eHyReloadCode IHyFileIO::IsReloading()
+{
+	if(m_bIsReloading == false)
+		return HYRELOADCODE_Inactive;
 
 	Update();
 
 	if(m_Sfx.IsEmpty() == false || m_Sprite2d.IsEmpty() == false || m_Spine2d.IsEmpty() == false || m_Mesh3d.IsEmpty() == false || m_Txt2d.IsEmpty() == false || m_Quad2d.IsEmpty() == false)
-		return false;
+		return HYRELOADCODE_InProgress;
 
 	m_AtlasManager.Unload();
+
+	if(m_sNewDataDirPath.empty() == false)
+	{
+
+		m_vReloadInsts.clear();
+		return HYRELOADCODE_ReInit;
+	}
+
 	m_AtlasManager.Load();
 
-	for(uint32 i = 0; i < m_vReloadEverything.size(); ++i)
-		m_vReloadEverything[i]->Load();
+	for(uint32 i = 0; i < m_vReloadInsts.size(); ++i)
+		m_vReloadInsts[i]->Load();
 
-	m_bReloadingEverything = false;
-	return true;
+	m_bIsReloading = false;
+	return HYRELOADCODE_Finished;
 }
 
 /*static*/ char *IHyFileIO::ReadTextFile(const char *szFilePath, int *iLength)

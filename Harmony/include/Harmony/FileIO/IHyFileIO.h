@@ -34,9 +34,17 @@ class HyText2dData;
 class HyTexturedQuad2dData;
 class HyMesh3dData;
 
+enum eHyReloadCode
+{
+	HYRELOADCODE_Inactive = 0,
+	HYRELOADCODE_InProgress,
+	HYRELOADCODE_Finished,
+	HYRELOADCODE_ReInit
+};
+
 class IHyFileIO
 {
-	const std::string									m_sDATADIR;
+	std::string											m_sDataDir;
 
 	HyGfxComms &										m_GfxCommsRef;
 	HyScene &											m_SceneRef;
@@ -79,8 +87,9 @@ class IHyFileIO
 	// Loading thread info pointer
 	ThreadInfoPtr										m_pLoadingThread;
 
-	bool												m_bReloadingEverything;
-	vector<IHyInst2d *>									m_vReloadEverything;
+	bool												m_bIsReloading;
+	vector<IHyInst2d *>									m_vReloadInsts;
+	std::string											m_sNewDataDirPath;
 
 public:
 	IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
@@ -91,8 +100,10 @@ public:
 	void LoadInst2d(IHyInst2d *pInst);
 	void RemoveInst(IHyInst2d *pInst);
 
-	void ReloadEverything(std::vector<std::string> &vPathsRef);
-	bool IsReloadingEverything();
+	bool Reload();											// Reload every instance
+	bool Reload(std::vector<std::string> &vPathsRef);		// Reload only the specified instances
+	bool Reload(std::string sNewDataDirPath);				// Unload everything, and reinitialize to a new data directory. Doesn't load up anything when done.
+	eHyReloadCode IsReloading();
 
 	static char *ReadTextFile(const char *szFilePath, int *iLength);
 	static std::string ReadTextFile(const char *szFilePath);

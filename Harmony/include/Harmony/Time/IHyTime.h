@@ -58,6 +58,10 @@ public:
 	// Returns 'true' if the engine should update the game
 	bool ThrottleTime();
 
+	// Will eat any delta that exist, and the next invoke to ThrottleTime() will 
+	// produce a delta from this point.
+	void ResetDelta();
+
 	//int GetUpdateFPS()		{ return m_iCurFPSUpdate; }
 	//void ToggleFPSOutput()	{ m_bDumpFPSToConsole = !m_bDumpFPSToConsole; }
 
