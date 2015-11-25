@@ -12,8 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "FileIO/Data/IHyData.h"
-#include "FileIO/HyFactory.h"
+#include "Assets/Data/IHyData.h"
+#include "Assets/HyFactory.h"
 
 class HyMesh3d;
 

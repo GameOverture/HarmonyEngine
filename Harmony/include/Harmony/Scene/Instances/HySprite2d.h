@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Scene/Instances/IHyInst2d.h"
-#include "FileIO/Data/HySprite2dData.h"
+#include "Assets/Data/HySprite2dData.h"
 
 #include "Utilities/HyMath.h"
 

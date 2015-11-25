@@ -7,9 +7,9 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "FileIO/Data/HySpine2dData.h"
+#include "Assets/Data/HySpine2dData.h"
 
-#include "FileIO/IHyFileIO.h"
+#include "Assets/HyAssetManager.h"
 
 #include "Renderer/IHyRenderer.h"
 #include "Diagnostics/HyGuiComms.h"
@@ -71,5 +71,5 @@ void _spAtlasPage_disposeTexture(spAtlasPage* self)
 char* _spUtil_readFile(const char* path, int* length)
 {
 	// The returned data is freed within the spine API
-	return IHyFileIO::ReadTextFile(path, length);
+	return HyAssetManager::ReadTextFile(path, length);
 }

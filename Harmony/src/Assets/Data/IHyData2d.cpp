@@ -7,7 +7,7 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "FileIO/Data/IHyData2d.h"
+#include "Assets/Data/IHyData2d.h"
 
 HyAtlasManager *IHyData2d::sm_pAtlasManager = NULL;
 

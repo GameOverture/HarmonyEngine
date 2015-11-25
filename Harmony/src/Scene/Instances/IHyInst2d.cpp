@@ -9,10 +9,10 @@
  *********************************************************************************/
 #include "Scene/Instances/IHyInst2d.h"
 
-#include "FileIO/Data/IHyData.h"
-#include "FileIO/IHyFileIO.h"
+#include "Assets/Data/IHyData.h"
+#include "Assets/HyAssetManager.h"
 
-/*static*/ IHyFileIO *IHyInst2d::sm_pFileIO = NULL;
+/*static*/ HyAssetManager *IHyInst2d::sm_pFileIO = NULL;
 
 IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName) :	m_eTYPE(eInstType),
 																							m_sPREFIX(szPrefix ? szPrefix : ""),

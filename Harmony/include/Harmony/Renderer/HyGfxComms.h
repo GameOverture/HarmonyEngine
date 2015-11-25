@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "FileIO/Data/IHyData2d.h"
+#include "Assets/Data/IHyData2d.h"
 #include "Threading/BasicSync.h"
 
 #include <vector>

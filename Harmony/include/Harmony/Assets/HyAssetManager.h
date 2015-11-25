@@ -1,5 +1,5 @@
 /**************************************************************************
- *	IHyFileIO.h
+ *	HyAssetManager.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -7,13 +7,13 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __IHyFileIO_h__
-#define __IHyFileIO_h__
+#ifndef __IHyAssetManager_h__
+#define __IHyAssetManager_h__
 
 #include "Afx/HyStdAfx.h"
 
-#include "FileIO/HyFactory.h"
-#include "FileIO/HyAtlasManager.h"
+#include "Assets/HyFactory.h"
+#include "Assets/HyAtlasManager.h"
 
 #include "Renderer/HyGfxComms.h"
 #include "Scene/HyScene.h"
@@ -42,7 +42,7 @@ enum eHyReloadCode
 	HYRELOADCODE_ReInit
 };
 
-class IHyFileIO
+class HyAssetManager
 {
 	std::string											m_sDataDir;
 
@@ -92,8 +92,8 @@ class IHyFileIO
 	std::string											m_sNewDataDirPath;
 
 public:
-	IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
-	virtual ~IHyFileIO();
+	HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
+	virtual ~HyAssetManager();
 
 	void Update();
 
@@ -116,4 +116,4 @@ private:
 	static void LoadingThread(void *pParam);
 };
 
-#endif /* __IHyFileIO_h__ */
+#endif /* __IHyAssetManager_h__ */

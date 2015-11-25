@@ -1,5 +1,5 @@
 /**************************************************************************
- *	IHyFileIO.cpp
+ *	HyAssetManager.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -7,15 +7,15 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "FileIO/IHyFileIO.h"
+#include "Assets/HyAssetManager.h"
 
 #include "Scene/Instances/IHyInst2d.h"
 
-#include "FileIO/Data/HySfxData.h"
-#include "FileIO/Data/HySpine2dData.h"
-#include "FileIO/Data/HySprite2dData.h"
-#include "FileIO/Data/HyText2dData.h"
-#include "FileIO/Data/HyTexturedQuad2dData.h"
+#include "Assets/Data/HySfxData.h"
+#include "Assets/Data/HySpine2dData.h"
+#include "Assets/Data/HySprite2dData.h"
+#include "Assets/Data/HyText2dData.h"
+#include "Assets/Data/HyTexturedQuad2dData.h"
 
 #include "Utilities/HyStrManip.h"
 #include "Utilities/jsonxx.h"
@@ -23,19 +23,19 @@
 #include "stdio.h"
 #include <fstream>
 
-IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDataDir(MakeStringProperPath(szDataDirPath, "/")),
-																								m_GfxCommsRef(gfxCommsRef),
-																								m_SceneRef(sceneRef),
-																								m_AtlasManager(m_sDataDir + "Atlas/"),
-																								m_Sfx(HYINST_Sound2d, m_sDataDir + "Sound/"),
-																								m_Sprite2d(HYINST_Sprite2d, m_sDataDir + "Sprite/"),
-																								m_Spine2d(HYINST_Spine2d, m_sDataDir + "Spine/"),
-																								m_Txt2d(HYINST_Text2d, m_sDataDir + "Font/"),
-																								m_Mesh3d(HYINST_Mesh3d, m_sDataDir + "Mesh/"),
-																								m_Quad2d(HYINST_TexturedQuad2d, ""),
-																								m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval),
-																								m_bIsReloading(false),
-																								m_sNewDataDirPath("")
+HyAssetManager::HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDataDir(MakeStringProperPath(szDataDirPath, "/")),
+																										m_GfxCommsRef(gfxCommsRef),
+																										m_SceneRef(sceneRef),
+																										m_AtlasManager(m_sDataDir + "Atlas/"),
+																										m_Sfx(HYINST_Sound2d, m_sDataDir + "Sound/"),
+																										m_Sprite2d(HYINST_Sprite2d, m_sDataDir + "Sprite/"),
+																										m_Spine2d(HYINST_Spine2d, m_sDataDir + "Spine/"),
+																										m_Txt2d(HYINST_Text2d, m_sDataDir + "Font/"),
+																										m_Mesh3d(HYINST_Mesh3d, m_sDataDir + "Mesh/"),
+																										m_Quad2d(HYINST_TexturedQuad2d, ""),
+																										m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval),
+																										m_bIsReloading(false),
+																										m_sNewDataDirPath("")
 {
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
@@ -45,12 +45,12 @@ IHyFileIO::IHyFileIO(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene
 }
 
 
-IHyFileIO::~IHyFileIO()
+HyAssetManager::~HyAssetManager()
 {
 }
 
 
-void IHyFileIO::Update()
+void HyAssetManager::Update()
 {
 	// Check to see if we have any pending loads to make
 	if(m_LoadQueue_Prepare.empty() == false)
@@ -107,7 +107,7 @@ void IHyFileIO::Update()
 	}
 }
 
-void IHyFileIO::LoadInst2d(IHyInst2d *pInst)
+void HyAssetManager::LoadInst2d(IHyInst2d *pInst)
 {
 	IHyData *pLoadData = NULL;
 	switch(pInst->GetInstType())
@@ -151,7 +151,7 @@ void IHyFileIO::LoadInst2d(IHyInst2d *pInst)
 	}
 }
 
-void IHyFileIO::RemoveInst(IHyInst2d *pInst)
+void HyAssetManager::RemoveInst(IHyInst2d *pInst)
 {
 	IHyData *pInstData = NULL;
 
@@ -181,12 +181,12 @@ void IHyFileIO::RemoveInst(IHyInst2d *pInst)
 		break;
 
 	default:
-		HyError("IHyFileIO::RemoveInst() passed an invalid HyLoadState");
+		HyError("HyAssetManager::RemoveInst() passed an invalid HyLoadState");
 	}
 }
 
 // Reload every instance
-bool IHyFileIO::Reload()
+bool HyAssetManager::Reload()
 {
 	if(m_bIsReloading)
 		return false;
@@ -206,7 +206,7 @@ bool IHyFileIO::Reload()
 }
 
 // Reload only the specified instances
-bool IHyFileIO::Reload(std::vector<std::string> &vPathsRef)
+bool HyAssetManager::Reload(std::vector<std::string> &vPathsRef)
 {
 	// TODO: Deep copy 'vPathsRef' vector of strings to 'm_vReloadInsts' so we only reload the specified contents. vPathsRef can be deleted after this function
 	if(m_bIsReloading)
@@ -227,7 +227,7 @@ bool IHyFileIO::Reload(std::vector<std::string> &vPathsRef)
 }
 
 // Unload everything, and reinitialize to a new data directory. Doesn't load up anything when done.
-bool IHyFileIO::Reload(std::string sNewDataDirPath)
+bool HyAssetManager::Reload(std::string sNewDataDirPath)
 {
 	if(m_bIsReloading)
 		return false;
@@ -248,7 +248,7 @@ bool IHyFileIO::Reload(std::string sNewDataDirPath)
 	return true;
 }
 
-eHyReloadCode IHyFileIO::IsReloading()
+eHyReloadCode HyAssetManager::IsReloading()
 {
 	if(m_bIsReloading == false)
 		return HYRELOADCODE_Inactive;
@@ -276,7 +276,7 @@ eHyReloadCode IHyFileIO::IsReloading()
 	return HYRELOADCODE_Finished;
 }
 
-/*static*/ char *IHyFileIO::ReadTextFile(const char *szFilePath, int *iLength)
+/*static*/ char *HyAssetManager::ReadTextFile(const char *szFilePath, int *iLength)
 {
 	char *pData;
 	FILE *pFile = fopen(szFilePath, "rb");
@@ -294,7 +294,7 @@ eHyReloadCode IHyFileIO::IsReloading()
 	return pData;
 }
 
-/*static*/ std::string IHyFileIO::ReadTextFile(const char *szFilePath)
+/*static*/ std::string HyAssetManager::ReadTextFile(const char *szFilePath)
 {
 	if(szFilePath == NULL)
 	{
@@ -318,7 +318,7 @@ eHyReloadCode IHyFileIO::IsReloading()
 	return sReadOutput;
 }
 
-/*static*/ bool IHyFileIO::FileExists(const std::string &sFilePath)
+/*static*/ bool HyAssetManager::FileExists(const std::string &sFilePath)
 {
 	return true;
 
@@ -329,7 +329,7 @@ eHyReloadCode IHyFileIO::IsReloading()
 	//return 0 == ret;
 }
 
-void IHyFileIO::FinalizeData(IHyData *pData)
+void HyAssetManager::FinalizeData(IHyData *pData)
 {
 	if(pData->GetLoadState() == HYLOADSTATE_Queued)
 	{
@@ -356,7 +356,7 @@ void IHyFileIO::FinalizeData(IHyData *pData)
 	}
 	else if(pData->GetLoadState() == HYLOADSTATE_Discarded)
 	{
-		HyAssert(pData->GetRefCount() <= 0, "IHyFileIO::Update() tried to delete an IData with active references. Num Refs: " << pData->GetRefCount());
+		HyAssert(pData->GetRefCount() <= 0, "HyAssetManager::Update() tried to delete an IData with active references. Num Refs: " << pData->GetRefCount());
 
 		switch(pData->GetInstType())
 		{
@@ -366,18 +366,18 @@ void IHyFileIO::FinalizeData(IHyData *pData)
 		case HYINST_Text2d:			m_Txt2d.DeleteData(static_cast<HyText2dData *>(pData));				break;
 		case HYINST_TexturedQuad2d:	m_Quad2d.DeleteData(static_cast<HyTexturedQuad2dData *>(pData));	break;
 		default:
-			HyError("IHyFileIO::Update() got a returned IHyData from gfx comms with an invalid type: " << pData->GetInstType());
+			HyError("HyAssetManager::Update() got a returned IHyData from gfx comms with an invalid type: " << pData->GetInstType());
 		}
 	}
 	else
 	{
-		HyError("IHyFileIO::Update() got a returned IHyData from gfx comms with an invalid state: " << pData->GetLoadState());
+		HyError("HyAssetManager::Update() got a returned IHyData from gfx comms with an invalid state: " << pData->GetLoadState());
 	}
 }
 
-void IHyFileIO::DiscardData(IHyData *pData)
+void HyAssetManager::DiscardData(IHyData *pData)
 {
-	HyAssert(pData->GetRefCount() <= 0, "IHyFileIO::DiscardData() tried to remove an IData with active references");
+	HyAssert(pData->GetRefCount() <= 0, "HyAssetManager::DiscardData() tried to remove an IData with active references");
 
 	// TODO: Log about erasing data
 	pData->SetLoadState(HYLOADSTATE_Discarded);
@@ -388,7 +388,7 @@ void IHyFileIO::DiscardData(IHyData *pData)
 		FinalizeData(pData);
 }
 
-/*static*/ void IHyFileIO::LoadingThread(void *pParam)
+/*static*/ void HyAssetManager::LoadingThread(void *pParam)
 {
 	LoadThreadCtrl *pLoadingCtrl = reinterpret_cast<LoadThreadCtrl *>(pParam);
 	vector<IHyData *>	vCurLoadData;

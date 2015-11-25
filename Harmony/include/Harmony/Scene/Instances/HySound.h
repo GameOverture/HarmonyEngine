@@ -12,7 +12,7 @@
 
 #include "IHyInst2d.h"
 
-#include "FileIO/Data/HySfxData.h"
+#include "Assets/Data/HySfxData.h"
 
 //#include "SFML/Audio/Sound.hpp"
 

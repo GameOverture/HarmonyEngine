@@ -11,8 +11,8 @@
 #define __HyEnt2dData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "FileIO/Data/IHyData2d.h"
-#include "FileIO/HyFactory.h"
+#include "Assets/Data/IHyData2d.h"
+#include "Assets/HyFactory.h"
 
 #include "spine/spine.h"
 #include "spine/extension.h"

@@ -12,8 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "FileIO\Data\IHyData2d.h"
-#include "FileIO\HyFactory.h"
+#include "Assets\Data\IHyData2d.h"
+#include "Assets\HyFactory.h"
 
 class HyTexturedQuad2dData : public IHyData2d
 {

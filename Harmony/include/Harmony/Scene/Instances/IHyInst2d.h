@@ -16,7 +16,7 @@
 #include "Utilities/Animation/HyAnimVec2.h"
 
 //#include "Scene/HyEntity2d.h"
-#include "FileIO/Data/IHyData.h"
+#include "Assets/Data/IHyData.h"
 
 #include "Utilities/Animation/HyAnimVec4.h"
 #include "Renderer/HyRenderState.h"
@@ -25,8 +25,8 @@ class IHyInst2d : public ITransform<HyAnimVec2>
 {
 	friend class HyScene;
 
-	friend class IHyFileIO;
-	static IHyFileIO *			sm_pFileIO;
+	friend class HyAssetManager;
+	static HyAssetManager *			sm_pFileIO;
 
 protected:
 	const HyInstanceType		m_eTYPE;

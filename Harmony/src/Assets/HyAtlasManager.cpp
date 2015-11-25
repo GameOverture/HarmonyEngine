@@ -7,9 +7,9 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "FileIO/HyAtlasManager.h"
+#include "Assets/HyAtlasManager.h"
 
-#include "FileIO/IHyFileIO.h"
+#include "Assets/HyAssetManager.h"
 #include "Renderer/IHyRenderer.h"
 
 #include "Utilities/stb_image.h"
@@ -64,7 +64,7 @@ void HyAtlasManager::Load()
 
 	std::string sAtlasInfoFilePath(m_sATLAS_DIR_PATH);
 	sAtlasInfoFilePath += "atlasInfo.json";
-	atlasGroupArray.parse(IHyFileIO::ReadTextFile(sAtlasInfoFilePath.c_str()));
+	atlasGroupArray.parse(HyAssetManager::ReadTextFile(sAtlasInfoFilePath.c_str()));
 
 	m_uiNumAtlasGroups = static_cast<uint32>(atlasGroupArray.size());
 	m_pAtlasGroups = reinterpret_cast<HyAtlasGroup *>(new unsigned char[sizeof(HyAtlasGroup) * m_uiNumAtlasGroups]);

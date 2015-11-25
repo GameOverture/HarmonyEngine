@@ -7,9 +7,9 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "FileIO/Data/HySprite2dData.h"
+#include "Assets/Data/HySprite2dData.h"
 
-#include "FileIO/IHyFileIO.h"
+#include "Assets/HyAssetManager.h"
 
 #include "Renderer/IHyRenderer.h"
 
@@ -24,7 +24,7 @@ HySprite2dData::~HySprite2dData(void)
 /*virtual*/ void HySprite2dData::DoFileLoad()
 {
 	jsonxx::Object spriteObj;
-	spriteObj.parse(IHyFileIO::ReadTextFile(GetPath().c_str()));
+	spriteObj.parse(HyAssetManager::ReadTextFile(GetPath().c_str()));
 
 	jsonxx::Array animStatesArray = spriteObj.get<jsonxx::Array>("animStates");
 

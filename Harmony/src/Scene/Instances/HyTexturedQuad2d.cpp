@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Scene/Instances/HyTexturedQuad2d.h"
 
-#include "FileIO/Data/HyTexturedQuad2dData.h"
+#include "Assets/Data/HyTexturedQuad2dData.h"
 
 HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGroupId) :	IHyInst2d(HYINST_TexturedQuad2d, NULL, std::to_string(uiAtlasGroupId).c_str()),
 															m_uiTextureIndex(0)

@@ -12,9 +12,9 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "FileIO/Data/IHyData2d.h"
-#include "FileIO/HyFactory.h"
-#include "FileIO/HyAtlasManager.h"
+#include "Assets/Data/IHyData2d.h"
+#include "Assets/HyFactory.h"
+#include "Assets/HyAtlasManager.h"
 
 #include "Utilities/jsonxx.h"
 

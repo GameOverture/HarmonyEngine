@@ -12,12 +12,12 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "FileIO/Data/IHyData.h"
-#include "FileIO/HyAtlasManager.h"
+#include "Assets/Data/IHyData.h"
+#include "Assets/HyAtlasManager.h"
 
 class IHyData2d : public IHyData
 {
-	friend class IHyFileIO;
+	friend class HyAssetManager;
 
 	static HyAtlasManager *				sm_pAtlasManager;
 	std::set<HyAtlasGroup *>			m_AssociatedAtlases;
