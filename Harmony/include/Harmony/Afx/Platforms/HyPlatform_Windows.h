@@ -71,7 +71,4 @@ typedef unsigned __int64	uint64;
 	#define HyError(message) do { } while (false)
 #endif
 
-//#define HyGetTickCount()				((uint32)::GetTickCount())
-
-
 #endif /* __HyPlatform_Windows_h__ */

@@ -9,10 +9,9 @@
  *************************************************************************/
 #include "Assets/Data/HySpine2dData.h"
 
-#include "Assets/HyAssetManager.h"
-
 #include "Renderer/IHyRenderer.h"
 #include "Diagnostics/HyGuiComms.h"
+#include "Utilities/HyFileIO.h"
 
 HySpine2dData::HySpine2dData(const std::string &sPath) :	IHyData2d(HYINST_Spine2d, sPath)
 {
@@ -56,12 +55,6 @@ void _spAtlasPage_createTexture(spAtlasPage* self, const char* path)
 
 	// TODO: Convert 'path' to Atlas texture index
 	uint32 uiTextureIndex = 0;
-
-	//HyAtlasGroupData *pNewTexture = HyFileIO::GetAtlasTexture(uiTextureIndex);
-	//self->rendererObject = pNewTexture;
-
-	//self->width = pNewTexture->GetWidth();
-	//self->height = pNewTexture->GetHeight();
 }
 
 void _spAtlasPage_disposeTexture(spAtlasPage* self)
@@ -71,5 +64,5 @@ void _spAtlasPage_disposeTexture(spAtlasPage* self)
 char* _spUtil_readFile(const char* path, int* length)
 {
 	// The returned data is freed within the spine API
-	return HyAssetManager::ReadTextFile(path, length);
+	return HyReadTextFile(path, length);
 }

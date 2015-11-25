@@ -68,7 +68,13 @@ bool HyEngine::Update()
 		return true;
 
 	case HYRELOADCODE_ReInit:
-
+	{
+		// Re-instantiate the HyAssetManager on top of the same memory. 
+		std::string sNewDataDir = m_AssetManager.GetNewDataDirPath();
+		m_AssetManager.~HyAssetManager();
+		new (&m_AssetManager) HyAssetManager(sNewDataDir.c_str(), m_GfxBuffer, m_Scene);
+	}
+	// Above should fall through to reset delta
 	case HYRELOADCODE_Finished:
 		m_Time.ResetDelta();
 		break;

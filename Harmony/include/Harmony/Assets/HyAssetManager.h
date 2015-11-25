@@ -44,7 +44,7 @@ enum eHyReloadCode
 
 class HyAssetManager
 {
-	std::string											m_sDataDir;
+	const std::string									m_sDATADIR;
 
 	HyGfxComms &										m_GfxCommsRef;
 	HyScene &											m_SceneRef;
@@ -105,9 +105,9 @@ public:
 	bool Reload(std::string sNewDataDirPath);				// Unload everything, and reinitialize to a new data directory. Doesn't load up anything when done.
 	eHyReloadCode IsReloading();
 
-	static char *ReadTextFile(const char *szFilePath, int *iLength);
-	static std::string ReadTextFile(const char *szFilePath);
-	static bool FileExists(const std::string &sFilePath);
+	std::string GetNewDataDirPath();
+
+	bool DoesAnyDataExist();
 
 private:
 	void FinalizeData(IHyData *pData);

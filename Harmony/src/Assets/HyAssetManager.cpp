@@ -20,18 +20,15 @@
 #include "Utilities/HyStrManip.h"
 #include "Utilities/jsonxx.h"
 
-#include "stdio.h"
-#include <fstream>
-
-HyAssetManager::HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDataDir(MakeStringProperPath(szDataDirPath, "/")),
+HyAssetManager::HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) : m_sDATADIR(MakeStringProperPath(szDataDirPath, "/")),
 																										m_GfxCommsRef(gfxCommsRef),
 																										m_SceneRef(sceneRef),
-																										m_AtlasManager(m_sDataDir + "Atlas/"),
-																										m_Sfx(HYINST_Sound2d, m_sDataDir + "Sound/"),
-																										m_Sprite2d(HYINST_Sprite2d, m_sDataDir + "Sprite/"),
-																										m_Spine2d(HYINST_Spine2d, m_sDataDir + "Spine/"),
-																										m_Txt2d(HYINST_Text2d, m_sDataDir + "Font/"),
-																										m_Mesh3d(HYINST_Mesh3d, m_sDataDir + "Mesh/"),
+																										m_AtlasManager(m_sDATADIR + "Atlas/"),
+																										m_Sfx(HYINST_Sound2d, m_sDATADIR + "Sound/"),
+																										m_Sprite2d(HYINST_Sprite2d, m_sDATADIR + "Sprite/"),
+																										m_Spine2d(HYINST_Spine2d, m_sDATADIR + "Spine/"),
+																										m_Txt2d(HYINST_Text2d, m_sDATADIR + "Font/"),
+																										m_Mesh3d(HYINST_Mesh3d, m_sDATADIR + "Mesh/"),
 																										m_Quad2d(HYINST_TexturedQuad2d, ""),
 																										m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval),
 																										m_bIsReloading(false),
@@ -47,8 +44,8 @@ HyAssetManager::HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRe
 
 HyAssetManager::~HyAssetManager()
 {
+	HyAssert(DoesAnyDataExist() == false, "Tried to destruct the HyAssetManager while data still exists");
 }
-
 
 void HyAssetManager::Update()
 {
@@ -255,7 +252,8 @@ eHyReloadCode HyAssetManager::IsReloading()
 
 	Update();
 
-	if(m_Sfx.IsEmpty() == false || m_Sprite2d.IsEmpty() == false || m_Spine2d.IsEmpty() == false || m_Mesh3d.IsEmpty() == false || m_Txt2d.IsEmpty() == false || m_Quad2d.IsEmpty() == false)
+	// Does data still exist
+	if(DoesAnyDataExist())
 		return HYRELOADCODE_InProgress;
 
 	m_AtlasManager.Unload();
@@ -276,57 +274,14 @@ eHyReloadCode HyAssetManager::IsReloading()
 	return HYRELOADCODE_Finished;
 }
 
-/*static*/ char *HyAssetManager::ReadTextFile(const char *szFilePath, int *iLength)
+std::string HyAssetManager::GetNewDataDirPath()
 {
-	char *pData;
-	FILE *pFile = fopen(szFilePath, "rb");
-	if(!pFile)
-		return 0;
-
-	fseek(pFile, 0, SEEK_END);
-	*iLength = ftell(pFile);
-	fseek(pFile, 0, SEEK_SET);
-
-	pData = new char[*iLength];
-	fread(pData, 1, *iLength, pFile);
-	fclose(pFile);
-
-	return pData;
+	return m_sNewDataDirPath;
 }
 
-/*static*/ std::string HyAssetManager::ReadTextFile(const char *szFilePath)
+bool HyAssetManager::DoesAnyDataExist()
 {
-	if(szFilePath == NULL)
-	{
-		//sm_sLogStr = "ReadTextFile - filename is NULL\n";
-		return std::string();
-	}
-
-	std::ifstream infile(szFilePath, std::ios::binary);
-	if(!infile)
-	{
-		//sm_sLogStr = "ReadTextFile() - invalid filename\n";
-		return std::string();
-	}
-
-	// TODO: Make this a lot more safer!
-	std::istreambuf_iterator<char> begin(infile), end;
-
-	std::string sReadOutput;
-	sReadOutput.append(begin, end);
-
-	return sReadOutput;
-}
-
-/*static*/ bool HyAssetManager::FileExists(const std::string &sFilePath)
-{
-	return true;
-
-	//struct stat info;
-	//uint32 ret = -1;
-
-	//ret = stat(sFilePath.c_str(), &info);
-	//return 0 == ret;
+	return (m_Sfx.IsEmpty() == false || m_Sprite2d.IsEmpty() == false || m_Spine2d.IsEmpty() == false || m_Mesh3d.IsEmpty() == false || m_Txt2d.IsEmpty() == false || m_Quad2d.IsEmpty() == false);
 }
 
 void HyAssetManager::FinalizeData(IHyData *pData)

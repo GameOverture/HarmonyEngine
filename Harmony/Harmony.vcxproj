@@ -92,6 +92,7 @@
     <ClCompile Include="src\Utilities\Animation\HyEaseFuncs.cpp" />
     <ClCompile Include="src\Utilities\HyBitManip.cpp" />
     <ClCompile Include="src\Utilities\HyDebugPhys2d.cpp" />
+    <ClCompile Include="src\Utilities\HyFileIO.cpp" />
     <ClCompile Include="src\Utilities\HyHardwareInfo.cpp" />
     <ClCompile Include="src\Utilities\HyMath.cpp" />
     <ClCompile Include="src\Utilities\HyBox2dRuntime.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="include\Harmony\Utilities\Containers\HyStaticArray.h" />
     <ClInclude Include="include\Harmony\Utilities\HyBitManip.h" />
     <ClInclude Include="include\Harmony\Utilities\HyDebugPhys2d.h" />
+    <ClInclude Include="include\Harmony\Utilities\HyFileIO.h" />
     <ClInclude Include="include\Harmony\Utilities\HyHardwareInfo.h" />
     <ClInclude Include="include\Harmony\Utilities\HyMath.h" />
     <ClInclude Include="include\Harmony\Utilities\HyBox2dRuntime.h" />

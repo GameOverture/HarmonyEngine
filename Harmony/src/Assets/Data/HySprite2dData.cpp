@@ -9,9 +9,8 @@
  *************************************************************************/
 #include "Assets/Data/HySprite2dData.h"
 
-#include "Assets/HyAssetManager.h"
-
 #include "Renderer/IHyRenderer.h"
+#include "Utilities/HyFileIO.h"
 
 HySprite2dData::HySprite2dData(const std::string &sPath) :	IHyData2d(HYINST_Spine2d, sPath)
 {
@@ -24,7 +23,7 @@ HySprite2dData::~HySprite2dData(void)
 /*virtual*/ void HySprite2dData::DoFileLoad()
 {
 	jsonxx::Object spriteObj;
-	spriteObj.parse(HyAssetManager::ReadTextFile(GetPath().c_str()));
+	spriteObj.parse(HyReadTextFile(GetPath().c_str()));
 
 	jsonxx::Array animStatesArray = spriteObj.get<jsonxx::Array>("animStates");
 

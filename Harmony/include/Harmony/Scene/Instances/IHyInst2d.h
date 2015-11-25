@@ -23,9 +23,9 @@
 class IHyInst2d : public ITransform<HyAnimVec2>
 {
 	friend class HyScene;
-
 	friend class HyAssetManager;
-	static HyAssetManager *			sm_pAssetManager;
+
+	static HyAssetManager *		sm_pAssetManager;
 
 protected:
 	const HyInstanceType		m_eTYPE;

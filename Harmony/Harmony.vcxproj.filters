@@ -186,6 +186,9 @@
     <ClCompile Include="src\Assets\HyTextures.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utilities\HyFileIO.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -530,6 +533,9 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Assets\HyTextures.h">
       <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\HyFileIO.h">
+      <Filter>Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

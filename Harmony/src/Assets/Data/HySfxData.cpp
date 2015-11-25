@@ -20,11 +20,4 @@ HySfxData::~HySfxData(void)
 
 /*virtual*/ void HySfxData::DoFileLoad(HyTextures &atlasManagerRef)
 {
-	std::string sFilePath;
-	//HyFileIO::GetDataDir(DIR_Audio, sFilePath);
-	//sFilePath += GetName();
-	//sFilePath += ".wav";
-
-	//if(!m_SoundBuffer.loadFromFile(sFilePath))
-	//	HyError("HySfxData::DoFileLoad() Cannot load from: " << sFilePath.c_str());
 }

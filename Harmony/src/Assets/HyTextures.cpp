@@ -9,9 +9,9 @@
  *************************************************************************/
 #include "Assets/HyTextures.h"
 
-#include "Assets/HyAssetManager.h"
 #include "Renderer/IHyRenderer.h"
 
+#include "Utilities/HyFileIO.h"
 #include "Utilities/stb_image.h"
 
 HyTextures::HyTextures(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasDataDir)
@@ -64,7 +64,7 @@ void HyTextures::Load()
 
 	std::string sAtlasInfoFilePath(m_sATLAS_DIR_PATH);
 	sAtlasInfoFilePath += "atlasInfo.json";
-	atlasGroupArray.parse(HyAssetManager::ReadTextFile(sAtlasInfoFilePath.c_str()));
+	atlasGroupArray.parse(HyReadTextFile(sAtlasInfoFilePath.c_str()));
 
 	m_uiNumAtlasGroups = static_cast<uint32>(atlasGroupArray.size());
 	m_pAtlasGroups = reinterpret_cast<HyAtlasGroup *>(new unsigned char[sizeof(HyAtlasGroup) * m_uiNumAtlasGroups]);
