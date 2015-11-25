@@ -13,9 +13,9 @@
 
 HyGuiComms *HyGuiComms::sm_pInstance = NULL;
 
-HyGuiComms::HyGuiComms(uint16 uiPort, HyFileIOInterop &fileIORef) : m_Acceptor(m_IOService, tcp::endpoint(tcp::v4(), uiPort)),
-																	m_FileIORef(fileIORef),
-																	m_Socket(m_IOService)
+HyGuiComms::HyGuiComms(uint16 uiPort, HyAssetManager &assetManagerRef) :	m_Acceptor(m_IOService, tcp::endpoint(tcp::v4(), uiPort)),
+																			m_AssetManagerRef(assetManagerRef),
+																			m_Socket(m_IOService)
 {
 	HyAssert(sm_pInstance == NULL, "HyGuiComms was instantiated twice");
 	sm_pInstance = this;
@@ -92,7 +92,7 @@ void HyGuiComms::ProcessMessage(HyGuiMessage &msgRef)
 	case HYPACKET_ReloadEnd:
 		uiKey = *reinterpret_cast<const uint32 *>(pCurReadPos);
 
-		m_FileIORef.Reload(m_ReloadMap[uiKey]);
+		m_AssetManagerRef.Reload(m_ReloadMap[uiKey]);
 		m_ReloadMap.erase(uiKey);
 		break;
 	}

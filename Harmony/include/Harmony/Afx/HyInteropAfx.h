@@ -33,9 +33,6 @@
 	typedef HyInput_Gainput HyInputInterop;
 	typedef HyInputMap_Gainput HyInputMapInterop;
 
-	#include "Assets/HyAssetManager.h"
-	typedef HyAssetManager HyFileIOInterop;
-
 #elif defined(HY_PLATFORM_OSX) && !defined(HY_PLATFORM_GUI)
 	#include "Renderer/OpenGL/Interop/HyOpenGL_OSX.h"
 #elif defined(HY_PLATFORM_LINUX) && !defined(HY_PLATFORM_GUI)

@@ -20,10 +20,10 @@ HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::GetMemoryHeap();
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Input(m_AppRef.m_vInputMaps),
-												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows, m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter),
-												m_FileIO(m_AppRef.m_Init.szDataDir, m_GfxBuffer, m_Scene),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_vWindows),
-												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_FileIO)
+												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows, m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter),
+												m_AssetManager(m_AppRef.m_Init.szDataDir, m_GfxBuffer, m_Scene),
+												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_AssetManager)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
@@ -59,7 +59,7 @@ void HyEngine::operator delete(void *ptr)
 
 bool HyEngine::Update()
 {
-	switch(m_FileIO.IsReloading())
+	switch(m_AssetManager.IsReloading())
 	{
 	case HYRELOADCODE_Inactive:
 		break;
@@ -68,6 +68,7 @@ bool HyEngine::Update()
 		return true;
 
 	case HYRELOADCODE_ReInit:
+
 	case HYRELOADCODE_Finished:
 		m_Time.ResetDelta();
 		break;
@@ -84,7 +85,7 @@ bool HyEngine::Update()
 		if(m_AppRef.Update() == false)
 			return false;
 
-		m_FileIO.Update();
+		m_AssetManager.Update();
 		m_Scene.PostUpdate();
 
 		m_GuiComms.Update();

@@ -12,7 +12,7 @@
 #include "Assets/Data/IHyData.h"
 #include "Assets/HyAssetManager.h"
 
-/*static*/ HyAssetManager *IHyInst2d::sm_pFileIO = NULL;
+/*static*/ HyAssetManager *IHyInst2d::sm_pAssetManager = NULL;
 
 IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName) :	m_eTYPE(eInstType),
 																							m_sPREFIX(szPrefix ? szPrefix : ""),
@@ -43,12 +43,12 @@ void IHyInst2d::Load()
 	if(GetCoordinateType() == HYCOORD_Default && HyScene::DefaultCoordinateType() != HYCOORD_Default)
 		SetCoordinateType(HyScene::DefaultCoordinateType(), true);
 
-	sm_pFileIO->LoadInst2d(this);
+	sm_pAssetManager->LoadInst2d(this);
 }
 
 void IHyInst2d::Unload()
 {
-	sm_pFileIO->RemoveInst(this);
+	sm_pAssetManager->RemoveInst(this);
 	m_pData = NULL;
 	m_eLoadState = HYLOADSTATE_Inactive;
 }

@@ -11,8 +11,8 @@
 #define __HyGuiComms_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Afx/HyInteropAfx.h"
 
+#include "Assets/HyAssetManager.h"
 #include "Diagnostics/HyGuiMessage.h"
 
 #ifndef HY_PLATFORM_GUI
@@ -36,7 +36,7 @@ class HyGuiSession;
 class HyGuiComms
 {
 	static HyGuiComms *		sm_pInstance;
-	HyFileIOInterop &		m_FileIORef;
+	HyAssetManager &		m_AssetManagerRef;
 
 	asio::io_service		m_IOService;
 	tcp::acceptor			m_Acceptor;
@@ -48,7 +48,7 @@ class HyGuiComms
 	std::map<uint32, std::vector<std::string> >	m_ReloadMap;
 
 public:
-	HyGuiComms(uint16 uiPort, HyFileIOInterop &fileIORef);
+	HyGuiComms(uint16 uiPort, HyAssetManager &assetManagerRef);
 	~HyGuiComms(void);
 
 	void AcceptGuiConnection();
@@ -172,7 +172,7 @@ private:
 class HyGuiComms
 {
 public:
-	HyGuiComms(uint16 uiPort, HyFileIOInterop &fileIORef)
+	HyGuiComms(uint16 uiPort, HyAssetManager &assetManagerRef)
 	{ }
 
 	void Update()

@@ -75,7 +75,7 @@ class HyAssetManager
 	HyFactory<HyText2dData>								m_Txt2d;
 	HyFactory<HyTexturedQuad2dData>						m_Quad2d;
 
-	HyTextures										m_AtlasManager;
+	HyTextures											m_AtlasManager;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
 	queue<IHyData *>									m_LoadQueue_Prepare;

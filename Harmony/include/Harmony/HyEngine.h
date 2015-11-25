@@ -28,6 +28,8 @@
 #include "Scene/Instances/HyTexturedQuad2d.h"
 #include "Scene/HyPhysEntity2d.h"
 
+#include "Assets/HyAssetManager.h"
+
 class HyEngine
 {
 	static HyEngine *		sm_pInstance;
@@ -37,14 +39,13 @@ class HyEngine
 	
 	HyGfxComms				m_GfxBuffer;
 	HyScene					m_Scene;
+	HyAssetManager			m_AssetManager;
+	HyGuiComms				m_GuiComms;
 
+	HyAudio					m_Audio;
 	HyTimeInterop			m_Time;
 	HyInputInterop			m_Input;
 	HyRendererInterop		m_Renderer;
-	HyFileIOInterop			m_FileIO;
-	HyAudio					m_Audio;
-
-	HyGuiComms				m_GuiComms;
 
 #ifdef HY_PLATFORM_GUI
 public:
