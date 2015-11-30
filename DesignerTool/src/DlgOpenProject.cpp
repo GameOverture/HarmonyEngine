@@ -1,6 +1,7 @@
 #include "DlgOpenProject.h"
 #include "ui_DlgOpenProject.h"
 
+#include <QFileDialog>
 
 
 DlgOpenProject::DlgOpenProject(QWidget *parent) :
@@ -10,6 +11,25 @@ DlgOpenProject::DlgOpenProject(QWidget *parent) :
     ui->setupUi(this);
     
     QString sTempDir = "C:/soft";
+
+
+    QFileDialog *fd = new QFileDialog;
+
+    fd->
+    QTreeView *tree = fd->findChild <QTreeView*>();
+    tree->setRootIsDecorated(true);
+    tree->setItemsExpandable(true);
+    fd->setFileMode(QFileDialog::Directory);
+    fd->setOption(QFileDialog::ShowDirsOnly);
+    fd->setViewMode(QFileDialog::Detail);
+    int result = fd->exec();
+    QString directory;
+    if (result)
+    {
+        directory = fd->selectedFiles()[0];
+        qDebug()<<directory;
+    }
+
     
     m_pDirModel = new QFileSystemModel(this);
     m_pDirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);

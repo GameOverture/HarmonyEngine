@@ -19,6 +19,8 @@
 #include <QVBoxLayout>
 #include <QTcpSocket>
 
+#define HYGUIVERSION_STRING "v0.0.1"
+
 /*static*/ MainWindow * MainWindow::sm_pInstance = NULL;
 
 MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
@@ -31,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     
     SetSelectedProj(NULL);
 
-    HYLOG("Harmony Designer Tool v0.0.1", LOGTYPE_Title);
+    HYLOG("Harmony Designer Tool " % QString(HYGUIVERSION_STRING), LOGTYPE_Title);
     HYLOG("Initializing...", LOGTYPE_Normal);
     
     ui->actionCloseProject->setEnabled(false);
@@ -85,6 +87,11 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
 
     // Restore opened items/tabs
     ui->renderer->ClearItems();
+
+    // Append version to window title
+    setWindowTitle(windowTitle() % " " % HYGUIVERSION_STRING);
+
+    HYLOG("Ready to go!", LOGTYPE_Normal);
 }
 
 MainWindow::~MainWindow()

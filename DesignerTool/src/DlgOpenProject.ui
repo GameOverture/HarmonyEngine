@@ -26,11 +26,6 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QTreeView" name="treeView"/>
-     <widget class="QListView" name="listView">
-      <property name="viewMode">
-       <enum>QListView::ListMode</enum>
-      </property>
-     </widget>
     </widget>
    </item>
    <item>

@@ -26,7 +26,7 @@ class HyGuiDebugger : public QObject
 
 public:
     explicit HyGuiDebugger(QAction &actionConnectRef, QObject *parent = 0);
-    
+
     void Connect();
 
     void Write(eHyPacketType eType, quint32 uiSize, void *pData);

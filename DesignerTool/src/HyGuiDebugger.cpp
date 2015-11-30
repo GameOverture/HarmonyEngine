@@ -28,6 +28,7 @@ void HyGuiDebugger::Connect()
         return;
     }
 
+    HYLOG("Attempting to connect to: " % m_Address.toString() % " [" % QString::number(m_uiPort) % "]", LOGTYPE_Normal);
     m_Socket.abort();
     m_Socket.connectToHost(m_Address, m_uiPort);
 }
@@ -70,7 +71,7 @@ void HyGuiDebugger::WriteReloadPacket(QStringList &sPaths)
 
 void HyGuiDebugger::OnHostFound()
 {
-    HYLOG("Debugger host found", LOGTYPE_Normal);
+    HYLOG("Debugger host lookup has succeeded", LOGTYPE_Normal);
 }
 
 void HyGuiDebugger::ReadData()
@@ -141,11 +142,11 @@ void HyGuiDebugger::OnError(QAbstractSocket::SocketError socketError)
          break;
 
      case QAbstractSocket::HostNotFoundError:
-         HYLOG("The game hosted at [" % m_Address.toString() % "] port: " % QString(m_uiPort) % " was not found", LOGTYPE_Error);
+         HYLOG("The game hosted at [" % m_Address.toString() % "] port: " % QString::number(m_uiPort) % " was not found", LOGTYPE_Error);
          break;
 
      case QAbstractSocket::ConnectionRefusedError:
-         HYLOG("The game hosted at [" % m_Address.toString() % "] port: " % QString(m_uiPort) % " has refused the connection", LOGTYPE_Error);
+         HYLOG("The game hosted at [" % m_Address.toString() % "] port: " % QString::number(m_uiPort) % " has refused the connection", LOGTYPE_Error);
          break;
      default:
          HYLOG("Debugger Socket Error: " % m_Socket.errorString(), LOGTYPE_Error);
