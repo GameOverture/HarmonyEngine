@@ -13,22 +13,22 @@ DlgOpenProject::DlgOpenProject(QWidget *parent) :
     QString sTempDir = "C:/soft";
 
 
-    QFileDialog *fd = new QFileDialog;
+    //QFileDialog *fd = new QFileDialog;
 
-    fd->
-    QTreeView *tree = fd->findChild <QTreeView*>();
-    tree->setRootIsDecorated(true);
-    tree->setItemsExpandable(true);
-    fd->setFileMode(QFileDialog::Directory);
-    fd->setOption(QFileDialog::ShowDirsOnly);
-    fd->setViewMode(QFileDialog::Detail);
-    int result = fd->exec();
-    QString directory;
-    if (result)
-    {
-        directory = fd->selectedFiles()[0];
-        qDebug()<<directory;
-    }
+//    fd->
+//    QTreeView *tree = fd->findChild <QTreeView*>();
+//    tree->setRootIsDecorated(true);
+//    tree->setItemsExpandable(true);
+//    fd->setFileMode(QFileDialog::Directory);
+//    fd->setOption(QFileDialog::ShowDirsOnly);
+//    fd->setViewMode(QFileDialog::Detail);
+//    int result = fd->exec();
+//    QString directory;
+//    if (result)
+//    {
+//        directory = fd->selectedFiles()[0];
+//        qDebug()<<directory;
+//    }
 
     
     m_pDirModel = new QFileSystemModel(this);
@@ -84,7 +84,7 @@ void DlgOpenProject::on_listView_doubleClicked(const QModelIndex &index)
 void DlgOpenProject::on_txtCurDirectory_editingFinished()
 {
     QString sPath = ui->txtCurDirectory->text();// m_pDirModel->fileInfo(index).absoluteFilePath();
-    ui->listView->setRootIndex(m_pFileModel->setRootPath(sPath));
+    ui->treeView->setRootIndex(m_pFileModel->setRootPath(sPath));
     
     //ui->txtCurDirectory->setText(sPath);
 }
