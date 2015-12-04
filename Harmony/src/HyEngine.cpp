@@ -35,7 +35,7 @@ HyEngine::~HyEngine()
 {
 }
 
-void * HyEngine::operator new(tMEMSIZE size)
+void * HyEngine::operator new(size_t size)
 {
 	return sm_Mem.Alloc(size);
 }

@@ -13,6 +13,8 @@ class DlgOpenProject : public QDialog
 {
     Q_OBJECT
     
+    QFileSystemModel *m_pFileModel;
+
 public:
     explicit DlgOpenProject(QWidget *parent = 0);
     ~DlgOpenProject();
@@ -22,17 +24,14 @@ public:
     QString SelectedDir();
     
 private slots:
-    void on_treeView_clicked(const QModelIndex &index);
-    
     void on_listView_doubleClicked(const QModelIndex &index);
     
     void on_txtCurDirectory_editingFinished();
     
 private:
     Ui::DlgOpenProject *ui;
-    
-    QFileSystemModel *m_pDirModel;
-    QFileSystemModel *m_pFileModel;
+
+    void ErrorCheck();
 };
 
 #endif // DLGOPENPROJECT_H

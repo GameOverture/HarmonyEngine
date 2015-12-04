@@ -38,7 +38,7 @@ public:
 	HyWindow &Window(uint32 uiIndex = 0);
 	HyInputMapInterop &Input(uint32 uiIndex = 0);
 
-	void *operator new(tMEMSIZE size);
+	void *operator new(size_t size);
 	void operator delete (void *ptr);
 };
 

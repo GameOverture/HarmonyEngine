@@ -20,32 +20,6 @@
 	typedef uint64 uintx;
 #endif
 
-//#ifndef HARMONY_STATICASSERT_DEFINED
-//	/* Force a compilation error if condition is true */
-//	#define HyAssertCompilation(condition) ((void)HY_BUILD_BUG_ON_ZERO(condition))
-//	/*	Force a compilation error if condition is true, but also produce a
-//		138    result (of value 0 and type size_t), so the expression can be used
-//		139    e.g. in a structure initializer (or where-ever else comma expressions
-//		140    aren't permitted). */
-//	#define HY_BUILD_BUG_ON_ZERO(e) (sizeof(char[1 - 2*!!(e)]))
-//	//#define HY_BUILD_BUG_ON_NULL(e) ((void *)sizeof(struct { int:-!!(e); }))
-//
-//	#define HARMONY_STATICASSERT_DEFINED
-//#endif
-
-//-----------------------------------------------------------------------------------------
-// Generic cross-platform typedefs
-//-----------------------------------------------------------------------------------------
-
-// Other basic types
-typedef unsigned char	tbyte;
-typedef uint32			tbool;
-
-typedef size_t			tMEMSIZE;
-typedef size_t			tDISC_SIZE;
-
-typedef void *			PVOID;
-
 //-----------------------------------------------------------------------------------------
 // Endian - Don't use these functions directly, use the #define's below 'em
 //-----------------------------------------------------------------------------------------

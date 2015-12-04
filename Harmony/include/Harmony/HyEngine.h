@@ -37,6 +37,7 @@ class HyEngine
 	static HyEngine *		sm_pInstance;
 	static HyMemoryHeap &	sm_Mem;
 
+	// The order of these member declarations matter
 	IHyApplication &		m_AppRef;
 	
 	HyGfxComms				m_GfxBuffer;
@@ -49,17 +50,17 @@ class HyEngine
 	HyInputInterop			m_Input;
 	HyRendererInterop		m_Renderer;
 
+// If HY_PLATFORM_GUI, make this ctor public as GuiTool requires special usage.
 #ifdef HY_PLATFORM_GUI
 public:
 #endif
-	// Private ctor invoked from RunGame(), once.
-	// If HY_PLATFORM_GUI, make this ctor public as GuiTool requires special usage.
+	// Otherwise, private ctor invoked from RunGame(), once.
 	HyEngine(IHyApplication &gameRef);
 
 public:
 	~HyEngine();
 
-	void *operator new(tMEMSIZE size);
+	void *operator new(size_t size);
 	void operator delete (void *ptr);
 
 	static void RunGame(IHyApplication &gameRef);

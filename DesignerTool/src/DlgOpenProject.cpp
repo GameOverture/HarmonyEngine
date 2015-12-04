@@ -3,6 +3,8 @@
 
 #include <QFileDialog>
 
+#include "HyGlobal.h"
+
 
 DlgOpenProject::DlgOpenProject(QWidget *parent) :
     QDialog(parent),
@@ -29,19 +31,14 @@ DlgOpenProject::DlgOpenProject(QWidget *parent) :
 //        directory = fd->selectedFiles()[0];
 //        qDebug()<<directory;
 //    }
-
-    
-    m_pDirModel = new QFileSystemModel(this);
-    m_pDirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
-    m_pDirModel->setRootPath(QDir::currentPath());
-    
-    ui->treeView->setModel(m_pDirModel);
     
     m_pFileModel = new QFileSystemModel(this);
     m_pFileModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
     m_pFileModel->setRootPath(QDir::currentPath());
     
     ui->listView->setModel(m_pFileModel);
+
+    ErrorCheck();
 }
 
 DlgOpenProject::~DlgOpenProject()
@@ -63,22 +60,14 @@ QString DlgOpenProject::SelectedDir()
     return ui->txtCurDirectory->text();
 }
 
-void DlgOpenProject::on_treeView_clicked(const QModelIndex &index)
-{
-    QString sPath = m_pDirModel->fileInfo(index).absoluteFilePath();
-    ui->listView->setRootIndex(m_pFileModel->setRootPath(sPath));
-    
-    ui->txtCurDirectory->setText(sPath);
-}
-
 void DlgOpenProject::on_listView_doubleClicked(const QModelIndex &index)
 {
-    QString sPath = m_pFileModel->fileInfo(index).absoluteFilePath();
-    
     ui->listView->setRootIndex(index);
-    ui->treeView->setSelectionModel(ui->listView->selectionModel());// setRootIndex(m_pDirModel->setRootPath(sPath));
     
+    QString sPath = m_pFileModel->fileInfo(index).absoluteFilePath();
     ui->txtCurDirectory->setText(sPath);
+
+
 }
 
 void DlgOpenProject::on_txtCurDirectory_editingFinished()
@@ -87,4 +76,55 @@ void DlgOpenProject::on_txtCurDirectory_editingFinished()
     ui->treeView->setRootIndex(m_pFileModel->setRootPath(sPath));
     
     //ui->txtCurDirectory->setText(sPath);
+}
+
+void DlgOpenProject::ErrorCheck()
+{
+    QString sProjDir = ui->txtCurDirectory->text();
+    QDir projDir(sProjDir);
+
+    bool bIsError = false;
+    do
+    {
+        if(ui->txtCurDirectory->text().isEmpty())
+        {
+            ui->lblError->setText("Error: The directory path cannot be blank");
+            bIsError = true;
+            break;
+        }
+
+        if(projDir.exists() == false)
+        {
+            ui->lblError->setText("Error: This directory does not exist");
+            bIsError = true;
+            break;
+        }
+
+        if(HyGlobal::IsWorkspaceValid(QDir(pItem->GetPath())) == false)
+        {
+        }
+
+        if(ui->chkNewPrefix->isChecked())
+        {
+            QString sPrefixPath = m_sSubDirPath % '/' % ui->txtPrefix->text();
+            QDir prefixDir(sPrefixPath);
+            if(prefixDir.exists())
+            {
+                ui->lblError->setText("Error: This prefix already exists.");
+                bIsError = true;
+                break;
+            }
+        }
+    }while(false);
+
+    if(bIsError)
+        ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
+    else
+    {
+        ui->lblError->setStyleSheet("QLabel { color : black; }");
+        ui->lblError->setText("");
+    }
+    ui->lblError->setVisible(bIsError);
+    //ui->buttonBox->button(QDialogButtonBox::Ok);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!bIsError);
 }

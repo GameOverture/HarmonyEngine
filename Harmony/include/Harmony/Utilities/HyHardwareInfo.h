@@ -35,7 +35,7 @@ private:
 	uint32				m_uiNumCPUs;
 
 	uint32				m_uiNumMemBanks;
-	tMEMSIZE			m_uiRAMsize;
+	size_t				m_uiRAMsize;
 
 public:
 

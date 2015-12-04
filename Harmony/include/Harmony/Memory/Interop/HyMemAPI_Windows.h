@@ -60,7 +60,7 @@ public:
 	// This is very important to be implemented in a fast way, so free is quick.
 	void   *IsSmallBlock (void *ptr) const;  // returns the address of the PAGE this pointer is on
 	void   *IsMediumBlock(void *ptr) const;
-	tbool   IsLargeBlock (void *ptr) const;
+	uint32  IsLargeBlock (void *ptr) const;
 
 	// these functions need to be overridden to change where and how 
 	// the memory manager gets small pages.
@@ -121,7 +121,7 @@ inline void *HyMemoryAPI_Windows::IsMediumBlock(void *ptr) const
 
 //-------------------
 
-inline tbool HyMemoryAPI_Windows::IsLargeBlock(void *ptr) const
+inline uint32 HyMemoryAPI_Windows::IsLargeBlock(void *ptr) const
 {
 	return m_mapLrgAllocs.find(ptr) != m_mapLrgAllocs.end();
 }

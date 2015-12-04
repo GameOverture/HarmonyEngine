@@ -50,7 +50,7 @@ HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 	return *static_cast<HyInputMapInterop *>(m_vInputMaps[uiIndex]);
 }
 
-void *IHyApplication::operator new(tMEMSIZE size)
+void *IHyApplication::operator new(size_t size)
 {
 	return sm_Mem.Alloc(size);
 }

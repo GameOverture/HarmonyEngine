@@ -183,9 +183,6 @@ public:
         
         if(!dir.exists(HYGUIPATH_RelMetaAtlasDir))
             return false;
-
-        if(!dir.exists(HYGUIPATH_RelSrcDataDir))
-            return false;
         
         return true;
     }
