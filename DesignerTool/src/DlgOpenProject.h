@@ -19,8 +19,6 @@ public:
     explicit DlgOpenProject(QWidget *parent = 0);
     ~DlgOpenProject();
     
-    void showEvent(QShowEvent *pEvent);
-    
     QString SelectedDir();
     
 private slots:

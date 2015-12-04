@@ -46,15 +46,6 @@ DlgOpenProject::~DlgOpenProject()
     delete ui;
 }
 
-void DlgOpenProject::showEvent(QShowEvent *pEvent)
-{
-    QDialog::showEvent(pEvent);
-    if(pEvent->spontaneous())
-        return;
-
-    ui->treeView->setColumnWidth(0, ui->treeView->width());
-}
-
 QString DlgOpenProject::SelectedDir()
 {
     return ui->txtCurDirectory->text();
@@ -67,32 +58,34 @@ void DlgOpenProject::on_listView_doubleClicked(const QModelIndex &index)
     QString sPath = m_pFileModel->fileInfo(index).absoluteFilePath();
     ui->txtCurDirectory->setText(sPath);
 
-
+    ErrorCheck();
 }
 
 void DlgOpenProject::on_txtCurDirectory_editingFinished()
 {
     QString sPath = ui->txtCurDirectory->text();// m_pDirModel->fileInfo(index).absoluteFilePath();
-    ui->treeView->setRootIndex(m_pFileModel->setRootPath(sPath));
+    ui->listView->setRootIndex(m_pFileModel->setRootPath(sPath));
     
     //ui->txtCurDirectory->setText(sPath);
+
+    ErrorCheck();
 }
 
 void DlgOpenProject::ErrorCheck()
 {
     QString sProjDir = ui->txtCurDirectory->text();
-    QDir projDir(sProjDir);
 
     bool bIsError = false;
     do
     {
-        if(ui->txtCurDirectory->text().isEmpty())
+        if(sProjDir.isEmpty())
         {
             ui->lblError->setText("Error: The directory path cannot be blank");
             bIsError = true;
             break;
         }
 
+        QDir projDir(sProjDir);
         if(projDir.exists() == false)
         {
             ui->lblError->setText("Error: This directory does not exist");
@@ -100,20 +93,11 @@ void DlgOpenProject::ErrorCheck()
             break;
         }
 
-        if(HyGlobal::IsWorkspaceValid(QDir(pItem->GetPath())) == false)
+        if(HyGlobal::IsWorkspaceValid(projDir) == false)
         {
-        }
-
-        if(ui->chkNewPrefix->isChecked())
-        {
-            QString sPrefixPath = m_sSubDirPath % '/' % ui->txtPrefix->text();
-            QDir prefixDir(sPrefixPath);
-            if(prefixDir.exists())
-            {
-                ui->lblError->setText("Error: This prefix already exists.");
-                bIsError = true;
-                break;
-            }
+            ui->lblError->setText("Error: This is not a valid Harmony workspace directory");
+            bIsError = true;
+            break;
         }
     }while(false);
 
