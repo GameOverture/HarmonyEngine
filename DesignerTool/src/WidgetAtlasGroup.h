@@ -8,7 +8,10 @@
 
 #include "HyGlobal.h"
 #include "DlgAtlasGroupSettings.h"
+#include "IHyGuiDrawItem.h"
+
 #include "scriptum/imagepacker.h"
+#include "Harmony/HyEngine.h"
 
 namespace Ui {
 class WidgetAtlasGroup;
@@ -29,6 +32,9 @@ class HyGuiFrame
     
     QTreeWidgetItem *   m_pTreeItem;
     QStringList         m_sLinks;
+    
+    // Draw members
+    HyPrimitive2d       m_DrawInst;
 
 public:
     HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) : m_uiHASH(uiCRC),
@@ -41,7 +47,11 @@ public:
                                                                                                                         m_iPosX(iX),
                                                                                                                         m_iPosY(iY),
                                                                                                                         m_pTreeItem(NULL)
-    { }
+    {
+        m_DrawInst.Color().Set(1.0f, 0.0f, 0.0f, 1.0f);
+        m_DrawInst.SetAsQuad(15.0f, 15.0f, false);
+        m_DrawInst.SetDisplayOrder(100);
+    }
     
     quint32 GetHash()       { return m_uiHASH; }
     QString GetName()       { return m_sNAME; }
@@ -90,10 +100,15 @@ public:
         
         return sMetaImgName;
     }
+    
+    void LoadDrawInst()
+    {
+        m_DrawInst.Load();
+    }
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)
 
-class WidgetAtlasGroup : public QWidget
+class WidgetAtlasGroup : public QWidget, public IHyGuiDrawItem
 {
     Q_OBJECT
 
@@ -105,6 +120,10 @@ class WidgetAtlasGroup : public QWidget
     QList<QTreeWidgetItem *>    m_TextureList;
     QList<HyGuiFrame *>         m_FrameList;
     ImagePacker                 m_Packer;
+    
+    // Draw members
+    HyTexturedQuad2d *          m_pDrawInst;
+    HyCamera2d *                m_pCam;
 
 public:
     explicit WidgetAtlasGroup(QWidget *parent = 0);
@@ -112,6 +131,12 @@ public:
     ~WidgetAtlasGroup();
 
     void GetAtlasInfo(QJsonObject &atlasObj);
+    
+    int GetId();
+    
+    virtual void Hide();
+    virtual void Show();
+    virtual void Draw(WidgetRenderer &renderer);
 
 private slots:
     void on_btnAddImages_clicked();
@@ -126,6 +151,8 @@ private:
     
     void ImportImages(QStringList sImportImgList);
     void Refresh();
+    
+    void LoadDrawInst();
 
     QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType);
 };

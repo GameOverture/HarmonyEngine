@@ -6,13 +6,14 @@
 #include <QMouseEvent>
 
 #include "ItemProject.h"
-#include "WidgetAtlasGroup.h"
+#include "WidgetAtlasGroup.h"\
+#include "IHyGuiDrawItem.h"
 
 namespace Ui {
 class WidgetAtlasManager;
 }
 
-class WidgetAtlasManager : public QWidget
+class WidgetAtlasManager : public QWidget, public IHyGuiDrawItem
 {
     Q_OBJECT
 
@@ -30,6 +31,10 @@ public:
 
     void PreviewAtlasGroup();
     void HideAtlasGroup();
+    
+    virtual void Hide();
+    virtual void Show();
+    virtual void Draw(WidgetRenderer &renderer);
 
 private:
     Ui::WidgetAtlasManager *ui;

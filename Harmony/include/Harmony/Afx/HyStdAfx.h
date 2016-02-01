@@ -71,6 +71,7 @@ struct HyWindowInfo
 };
 
 #define HY_MAXWINDOWS 6
+#define HY_DATA_DIR "data/"
 
 // Client supplies these initialization parameters to the engine
 struct HarmonyInit
@@ -92,7 +93,7 @@ struct HarmonyInit
 	}
 
 	HarmonyInit() :	szGameName("Untitled Game"),
-					szDataDir("./data")
+					szDataDir("/data")
 	{
 		CtorInit();
 	}

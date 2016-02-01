@@ -12,15 +12,12 @@ class ItemProject : public Item
     friend class WidgetExplorer;
     
     WidgetAtlasManager *        m_pAtlasManager;
-    QList<HyTexturedQuad2d *>   m_Atlases;
-    HyCamera2d *                m_pCam;
     
     enum eDrawState
     {
         DRAWSTATE_Nothing,
         DRAWSTATE_AtlasManager,
     };
-    
     eDrawState          m_eState;
     
     ItemProject(const QString sPath);

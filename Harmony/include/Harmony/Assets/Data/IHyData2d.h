@@ -28,7 +28,7 @@ public:
 
 	virtual void SetLoadState(HyLoadState eState);
 
-	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
+	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId);
 	const std::set<HyAtlasGroup *> &GetAssociatedAtlases();
 
 	// Only invoked on the Load thread

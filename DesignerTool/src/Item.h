@@ -4,11 +4,12 @@
 #include <QTreeWidget>
 
 #include "HyGlobal.h"
+#include "IHyGuiDrawItem.h"
 #include "Harmony/HyEngine.h"
 
 class WidgetRenderer;
 
-class Item
+class Item : public IHyGuiDrawItem
 {
     friend class WidgetExplorer;
     

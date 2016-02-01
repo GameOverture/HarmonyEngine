@@ -137,7 +137,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurSelectedProj = pProj;
     if(sm_pInstance->m_pCurSelectedProj)
     {
-        sm_pInstance->ui->renderer->GetRenderer()->Reload(sm_pInstance->m_pCurSelectedProj->GetPath());
+        sm_pInstance->ui->renderer->GetRenderer()->Reload(sm_pInstance->m_pCurSelectedProj->GetPath(HY_DATA_DIR));
         
         sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasManager());
         sm_pInstance->m_pCurSelectedProj->GetAtlasManager()->show();

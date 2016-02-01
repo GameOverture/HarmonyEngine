@@ -57,7 +57,14 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 	{
 		jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
 
-		new (pFrameWriteLocation)Frame(dataRef.RequestTexture(static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasId")), static_cast<uint32>(frameObj.get<jsonxx::Number>("textureId"))),
+		HyAtlasGroup *pAtlasGroup = dataRef.RequestTexture(static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasId")));
+		uint32 uiTextureIndex = static_cast<uint32>(frameObj.get<jsonxx::Number>("textureId"));
+
+		if(pAtlasGroup->ContainsTexture(uiTextureIndex) == false)
+			HyError("HyTextures::RequestTexture() Atlas group (" << static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasId")) << ") does not contain texture index: " << uiTextureIndex);
+
+		new (pFrameWriteLocation)Frame(pAtlasGroup, 
+									   uiTextureIndex,
 									   static_cast<uint32>(frameObj.get<jsonxx::Number>("rectIndex")),
 									   vec2(static_cast<float>(frameObj.get<jsonxx::Number>("xOffset")), static_cast<float>(frameObj.get<jsonxx::Number>("yOffset"))),
 									   static_cast<float>(frameObj.get<jsonxx::Number>("rotation")),

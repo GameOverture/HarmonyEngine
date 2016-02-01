@@ -65,7 +65,8 @@ HEADERS  += \
     DlgAtlasGroupSettings.h \
     WidgetAtlasManager.h \
     WidgetAtlasGroup.h \
-    HyGuiDebugger.h
+    HyGuiDebugger.h \
+    IHyGuiDrawItem.h
 
 FORMS    += \
     DlgNewProject.ui \

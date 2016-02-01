@@ -4,8 +4,7 @@
 #include "WidgetRenderer.h"
 
 ItemProject::ItemProject(const QString sPath) : Item(ITEM_Project, sPath),
-                                                m_eState(DRAWSTATE_Nothing),
-                                                m_pCam(NULL)
+                                                m_eState(DRAWSTATE_Nothing)
 {
     m_pAtlasManager = new WidgetAtlasManager(this);
 }
@@ -13,40 +12,24 @@ ItemProject::ItemProject(const QString sPath) : Item(ITEM_Project, sPath),
 ItemProject::~ItemProject()
 {
     delete m_pAtlasManager;
-    
-    foreach(HyTexturedQuad2d *pAtlas, m_Atlases)
-    {
-        pAtlas->Unload();
-    }
-    
-    delete m_pCam;
 }
 
 /*virtual*/ void ItemProject::Show()
 {
-    foreach(HyTexturedQuad2d *pAtlas, m_Atlases)
-        pAtlas->SetEnabled(true);
-    
-    if(m_pCam)
-        m_pCam->SetEnabled(true);
+    if(m_eState == DRAWSTATE_AtlasManager)
+        m_pAtlasManager->Show();
 }
 
 /*virtual*/ void ItemProject::Hide()
 {
-    foreach(HyTexturedQuad2d *pAtlas, m_Atlases)
-        pAtlas->SetEnabled(false);
-    
-    if(m_pCam)
-        m_pCam->SetEnabled(false);
+    if(m_eState == DRAWSTATE_AtlasManager)
+        m_pAtlasManager->Hide();
 }
 
 /*virtual*/ void ItemProject::Draw(WidgetRenderer &renderer)
 {
-//    if(m_pCam == NULL)
-//        m_pCam = renderer.Window().CreateCamera2d();
-    
-    //renderer
-    // well shit
+    if(m_eState == DRAWSTATE_AtlasManager)
+        m_pAtlasManager->Draw(renderer);
 }
 
 void ItemProject::SetAtlasGroupDrawState(int iAtlasGrpId)

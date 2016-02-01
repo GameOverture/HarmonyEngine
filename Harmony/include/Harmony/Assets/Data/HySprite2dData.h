@@ -33,18 +33,20 @@ class HySprite2dData : public IHyData2d
 		{
 			HyAtlasGroup *		pAtlasGroup;
 			const uint32		uiRECTINDEX;
+			const uint32		uiTEXTUREINDEX;
 
 			const vec2			vOFFSET;
 			const float			fROTATION;
 			const vec2			vSCALE;	// negative values will flip image
 			const float			fDURATION;
 
-			Frame(HyAtlasGroup *pAtlasGrp, uint32 uiRectIndex, vec2 vOffset, float fRotation, vec2 vScale, float fDuration) :	pAtlasGroup(pAtlasGrp),
-																																uiRECTINDEX(uiRectIndex),
-																																vOFFSET(vOffset),
-																																fROTATION(fRotation),
-																																vSCALE(vScale),
-																																fDURATION(fDuration)
+			Frame(HyAtlasGroup *pAtlasGrp, uint32 uiTextureIndex, uint32 uiRectIndex, vec2 vOffset, float fRotation, vec2 vScale, float fDuration) :	pAtlasGroup(pAtlasGrp),
+																																						uiTEXTUREINDEX(uiTextureIndex),
+																																						uiRECTINDEX(uiRectIndex),
+																																						vOFFSET(vOffset),
+																																						fROTATION(fRotation),
+																																						vSCALE(vScale),
+																																						fDURATION(fDuration)
 			{ }
 		};
 		Frame *			pFrames;

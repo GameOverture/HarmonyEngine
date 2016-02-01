@@ -35,9 +35,9 @@ IHyData2d::~IHyData2d()
 	}
 }
 
-HyAtlasGroup *IHyData2d::RequestTexture(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
+HyAtlasGroup *IHyData2d::RequestTexture(uint32 uiAtlasGroupId)
 {
-	HyAtlasGroup *pAtlasGrp = sm_pTextures->RequestTexture(uiAtlasGroupId, uiTextureIndex);
+	HyAtlasGroup *pAtlasGrp = sm_pTextures->RequestTexture(uiAtlasGroupId);
 	m_AssociatedAtlases.insert(pAtlasGrp);
 
 	return pAtlasGrp;
