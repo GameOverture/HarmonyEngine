@@ -82,6 +82,9 @@ void HyTextures::Load()
 
 void HyTextures::Unload()
 {
+	if(m_pAtlasGroups == NULL)
+		return;
+
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 		m_pAtlasGroups->~HyAtlasGroup();
 

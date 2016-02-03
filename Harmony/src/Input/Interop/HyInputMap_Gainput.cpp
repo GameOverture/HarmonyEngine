@@ -62,7 +62,7 @@ HyInputMap_Gainput::~HyInputMap_Gainput()
 
 /*virtual*/ bool HyInputMap_Gainput::IsBtnDownBuffered(uint32 iUserId) const
 {
-	return true;
+	return m_pInputMap->GetBoolIsNew(iUserId);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::IsBtnReleased(uint32 iUserId) const

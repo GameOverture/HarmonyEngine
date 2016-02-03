@@ -50,7 +50,7 @@ HyGuiRenderer::~HyGuiRenderer()
 void HyGuiRenderer::Reload()
 {
     if(m_pHyEngine)
-        m_pHyEngine->m_AssetManager.Reload();
+        m_pHyEngine->m_pAssetManager->Reload();
 }
 
 void HyGuiRenderer::Reload(QStringList &sReloadPaths)
@@ -62,10 +62,10 @@ void HyGuiRenderer::Reload(QStringList &sReloadPaths)
     foreach(QString sPath, sReloadPaths)
         vReloadPaths.push_back(sPath.toStdString());
     
-    m_pHyEngine->m_AssetManager.Reload(vReloadPaths);
+    m_pHyEngine->m_pAssetManager->Reload(vReloadPaths);
 }
 
 void HyGuiRenderer::Reload(QString &sNewDataDir)
 {
-    m_pHyEngine->m_AssetManager.Reload(sNewDataDir.toStdString());
+    m_pHyEngine->m_pAssetManager->Reload(sNewDataDir.toStdString());
 }
