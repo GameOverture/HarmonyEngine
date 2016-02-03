@@ -93,7 +93,7 @@ void WidgetRenderer::CloseItem(Item *pItem)
 
 Item *WidgetRenderer::GetItem(int iIndex /*= -1*/)
 {
-    if(m_pActiveItemProj)
+    if(m_pActiveItemProj)   // Overrides any Item in the current open TabPage
         return m_pActiveItemProj;
     
     if(ui->tabWidget->currentWidget() == NULL)
