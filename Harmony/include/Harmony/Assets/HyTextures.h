@@ -38,7 +38,7 @@ public:
 	HyTextures(std::string sAtlasDataDir);
 	~HyTextures();
 
-	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
+	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId);
 	std::string GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
 
 	void Load();

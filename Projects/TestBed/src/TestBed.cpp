@@ -109,8 +109,11 @@ TestBed::~TestBed(void)
 	if(Input().IsBtnDown(CAM_DOWN))
 		m_pCam->Pos().Offset(0.0f, -0.5f);
 
-	if(Input().IsBtnDown(SEND_LOG))
-		HyLog("Testing message! Mo'fucka");
+	if(Input().IsBtnDownBuffered(SEND_LOG))
+	{
+		HyEngine::ReloadDataDir(std::string("D:\\soft\\GitHub\\HarmonyEngine\\Projects\\NewGame\\data"));
+		//HyLog("Testing message! Mo'fucka");
+	}
 
 
 	//if(m_pInputArray->

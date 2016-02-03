@@ -42,7 +42,7 @@ class HyEngine
 	
 	HyGfxComms				m_GfxBuffer;
 	HyScene					m_Scene;
-	HyAssetManager			m_AssetManager;
+	HyAssetManager *		m_pAssetManager;
 	HyGuiComms				m_GuiComms;
 
 	HyAudio					m_Audio;
@@ -64,6 +64,8 @@ public:
 	void operator delete (void *ptr);
 
 	static void RunGame(IHyApplication &gameRef);
+
+	static void ReloadDataDir(std::string sNewDataDir);
 
 #ifndef HY_PLATFORM_GUI
 private:

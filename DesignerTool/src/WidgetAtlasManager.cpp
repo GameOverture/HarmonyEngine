@@ -7,6 +7,7 @@
 #include <QJsonObject>
 
 #include "MainWindow.h"
+#include "WidgetRenderer.h"
 
 WidgetAtlasManager::WidgetAtlasManager(QWidget *parent) :   QWidget(parent),
                                                             ui(new Ui::WidgetAtlasManager)
@@ -123,6 +124,22 @@ void WidgetAtlasManager::PreviewAtlasGroup()
 void WidgetAtlasManager::HideAtlasGroup()
 {
     MainWindow::CloseItem(m_pProjOwner);
+}
+
+/*virtual*/ void WidgetAtlasManager::Hide()
+{
+    for(int i = 0; i < ui->atlasGroups->count(); ++i)
+        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->Hide();
+}
+
+/*virtual*/ void WidgetAtlasManager::Show()
+{
+    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->Show();
+}
+
+/*virtual*/ void WidgetAtlasManager::Draw(WidgetRenderer &renderer)
+{
+    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->Draw(renderer);
 }
 
 void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)

@@ -14,6 +14,7 @@
 
 #include "MainWindow.h"
 #include "WidgetAtlasManager.h"
+#include "WidgetRenderer.h"
 
 WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
                                                         ui(new Ui::WidgetAtlasGroup)
@@ -27,7 +28,9 @@ WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
 WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) :   QWidget(parent),
                                                                                     m_MetaDir(metaDir),
                                                                                     m_DataDir(dataDir),
-                                                                                    ui(new Ui::WidgetAtlasGroup)
+                                                                                    ui(new Ui::WidgetAtlasGroup),
+                                                                                    m_pDrawInst(NULL),
+                                                                                    m_pCam(NULL)
 {
     ui->setupUi(this);
 
@@ -84,6 +87,8 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
             
             m_FrameList.append(pNewFrame);
         }
+        
+        m_pDrawInst = new HyTexturedQuad2d(GetId());
     }
 }
 
@@ -121,6 +126,36 @@ void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObj)
         textureArray.append(frameArray);
     
     atlasObj.insert("textures", textureArray);
+}
+
+int WidgetAtlasGroup::GetId()
+{
+    return m_MetaDir.dirName().toInt();
+}
+
+/*virtual*/ void WidgetAtlasGroup::Hide()
+{
+    m_pDrawInst->SetEnabled(false);
+    
+    if(m_pCam)
+        m_pCam->SetEnabled(false);
+}
+
+/*virtual*/ void WidgetAtlasGroup::Show()
+{
+    LoadDrawInst();
+    m_pDrawInst->SetEnabled(true);
+    
+    if(m_pCam)
+         m_pCam->SetEnabled(true);
+}
+
+/*virtual*/ void WidgetAtlasGroup::Draw(WidgetRenderer &renderer)
+{
+    if(m_pCam == NULL)
+    {
+        m_pCam = renderer.Window().CreateCamera2d();
+    }
 }
 
 void WidgetAtlasGroup::on_btnAddImages_clicked()
@@ -441,9 +476,20 @@ void WidgetAtlasGroup::Refresh()
             sReloadPaths.append(sLink);
     }
     
+    delete m_pDrawInst;
+    m_pDrawInst = new HyTexturedQuad2d(GetId());
+    
     MainWindow::ReloadItems(sReloadPaths);
     
     pAtlasManager->PreviewAtlasGroup();
+}
+
+void WidgetAtlasGroup::LoadDrawInst()
+{
+    m_pDrawInst->Load();
+    
+    foreach(HyGuiFrame *pFrame, m_FrameList)
+        pFrame->LoadDrawInst();
 }
 
 QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType)

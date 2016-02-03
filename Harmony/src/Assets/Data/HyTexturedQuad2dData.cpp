@@ -25,7 +25,7 @@ HyTexturedQuad2dData::~HyTexturedQuad2dData()
 
 /*virtual*/ void HyTexturedQuad2dData::DoFileLoad()
 {
-	m_pAtlas = RequestTexture(m_uiATLASGROUP_ID, 0);
+	m_pAtlas = RequestTexture(m_uiATLASGROUP_ID);
 }
 
 HyAtlasGroup *HyTexturedQuad2dData::GetAtlasGroup()

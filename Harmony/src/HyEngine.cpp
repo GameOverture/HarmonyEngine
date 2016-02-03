@@ -20,8 +20,8 @@ HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::GetMemoryHeap();
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows, m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter),
-												m_AssetManager(m_AppRef.m_Init.szDataDir, m_GfxBuffer, m_Scene),
-												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_AssetManager),
+												m_pAssetManager(new HyAssetManager(m_AppRef.m_Init.szDataDir, m_GfxBuffer, m_Scene)),
+												m_GuiComms(m_AppRef.m_Init.uiDebugPort, *m_pAssetManager),
 												m_Input(m_AppRef.m_vInputMaps),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_vWindows)
 {
@@ -57,22 +57,36 @@ void HyEngine::operator delete(void *ptr)
 	delete sm_pInstance;
 }
 
+/*static*/ void HyEngine::ReloadDataDir(std::string sNewDataDir)
+{
+	sm_pInstance->m_pAssetManager->Reload(sNewDataDir);
+}
+
 bool HyEngine::Update()
 {
-	switch(m_AssetManager.IsReloading())
+	bool bUpdateApp = true;
+
+	switch(m_pAssetManager->IsReloading())
 	{
 	case HYRELOADCODE_Inactive:
 		break;
 			
 	case HYRELOADCODE_InProgress:
-		return true;
+
+		bUpdateApp = false;
+		//m_GfxBuffer.Update_SetSharedPtrs();
+		//m_Renderer.Update(); // NOTE: Renderer isn't multi-threaded anymore... so update it here
+							// TODO: Add code to support if renderer is multithreaded
+		break;
+		//return true;
 
 	case HYRELOADCODE_ReInit:
 	{
-		// Re-instantiate the HyAssetManager on top of the same memory. 
-		std::string sNewDataDir = m_AssetManager.GetNewDataDirPath();
-		m_AssetManager.~HyAssetManager();
-		new (&m_AssetManager) HyAssetManager(sNewDataDir.c_str(), m_GfxBuffer, m_Scene);
+		// Re-instantiate the HyAssetManager with new data directory (which will re-parse atlas data)
+		std::string sNewDataDir = m_pAssetManager->GetNewDataDirPath();
+		delete m_pAssetManager;
+
+		m_pAssetManager = new HyAssetManager(sNewDataDir.c_str(), m_GfxBuffer, m_Scene);
 	}
 	// Above should fall through to reset delta
 	case HYRELOADCODE_Finished:
@@ -88,10 +102,13 @@ bool HyEngine::Update()
 			return false;
 		
 		m_Scene.PreUpdate();
-		if(m_AppRef.Update() == false)
-			return false;
+		if(bUpdateApp)
+		{
+			if(m_AppRef.Update() == false)
+				return false;
+		}
 
-		m_AssetManager.Update();
+		m_pAssetManager->Update();
 		m_Scene.PostUpdate();
 
 		m_GuiComms.Update();

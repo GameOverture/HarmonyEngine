@@ -30,8 +30,8 @@ HyGuiRenderer *WidgetRenderer::GetRenderer()
 
 /*virtual*/ bool WidgetRenderer::Update()
 {
-    //if(GetItem())
-    //    GetItem()->Draw(*this);
+    if(GetItem())
+        GetItem()->Draw(*this);
 
     return true;
 }

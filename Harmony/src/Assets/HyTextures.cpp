@@ -24,15 +24,12 @@ HyTextures::~HyTextures()
 	Unload();
 }
 
-HyAtlasGroup *HyTextures::RequestTexture(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
+HyAtlasGroup *HyTextures::RequestTexture(uint32 uiAtlasGroupId)
 {
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 	{
 		if(m_pAtlasGroups[i].GetId() == uiAtlasGroupId)
 		{
-			if(m_pAtlasGroups[i].ContainsTexture(uiTextureIndex) == false)
-				HyError("HyTextures::RequestTexture() Atlas group (" << uiAtlasGroupId << ") does not contain texture index: " << uiTextureIndex);
-
 			m_pAtlasGroups[i].Load();
 			return &m_pAtlasGroups[i];
 		}
@@ -85,6 +82,9 @@ void HyTextures::Load()
 
 void HyTextures::Unload()
 {
+	if(m_pAtlasGroups == NULL)
+		return;
+
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 		m_pAtlasGroups->~HyAtlasGroup();
 
@@ -107,8 +107,7 @@ HyAtlasGroup::HyAtlasGroup(HyTextures &managerRef, uint32 uiLoadGroupId, uint32 
 
 	for(uint32 j = 0; j < m_uiNUM_ATLASES; ++j)
 	{
-		jsonxx::Object texObj = texturesArrayRef.get<jsonxx::Object>(j);
-		jsonxx::Array srcFramesArray = texObj.get<jsonxx::Array>("srcFrames");
+		jsonxx::Array srcFramesArray = texturesArrayRef.get<jsonxx::Array>(j);
 
 		new (pAtlasWriteLocation)HyAtlas(srcFramesArray);
 	}
@@ -234,7 +233,7 @@ HyAtlas::HyAtlas(jsonxx::Array &srcFramesArrayRef) :	m_pPixelData(NULL)
 		m_pFrames[k].width = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("width"));
 		m_pFrames[k].x = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("x"));
 		m_pFrames[k].y = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("y"));
-		m_pFrames[k].iTag = srcFrameObj.get<jsonxx::Boolean>("rotated") ? 1 : 0;
+		m_pFrames[k].iTag = srcFrameObj.get<jsonxx::Boolean>("rotate") ? 1 : 0;
 	}
 }
 

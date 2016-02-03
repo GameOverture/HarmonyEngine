@@ -44,6 +44,7 @@ public:
 		case HYINST_Text2d:			sPath += MakeStringProperPath(sName.c_str(), ".hyfnt");	break;
 		case HYINST_Spine2d:		sPath += MakeStringProperPath(sName.c_str(), ".hyspi");	break;
 		case HYINST_Sprite2d:		sPath += MakeStringProperPath(sName.c_str(), ".hyspr");	break;
+		case HYINST_TexturedQuad2d:	sPath = sName.c_str();									break;
 		}
 
 		// Check to determine this data with these parameters doesn't already exist, if it does return the 'tData' associated with it.
