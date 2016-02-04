@@ -13,6 +13,9 @@ class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
 
     HyEngine *          m_pHyEngine;
 
+    HyPrimitive2d		m_primBox;
+    HyCamera2d *        m_pCam;
+
 public:
     HyGuiRenderer(QWidget *parent = 0);
     ~HyGuiRenderer();

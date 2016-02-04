@@ -265,7 +265,7 @@ bool HyOpenGL::Initialize()
 	//printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
 
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+	glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
 	//glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 
 	//////////////////////////////////////////////////////////////////////////
