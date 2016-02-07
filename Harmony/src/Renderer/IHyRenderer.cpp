@@ -9,6 +9,13 @@
  *************************************************************************/
 #include "Renderer/IHyRenderer.h"
 
+IHyRenderer::RenderSurface::RenderSurface(eRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight) :	m_eType(eType),
+																																			m_iID(iID),
+																																			m_iRenderSurfaceWidth(iRenderSurfaceWidth),
+																																			m_iRenderSurfaceHeight(iRenderSurfaceHeight),
+																																			m_pExData(NULL)
+{ }
+
 void IHyRenderer::RenderSurface::Resize(int32 iWidth, int32 iHeight)
 {
 	// Prevent A Divide By Zero
@@ -20,19 +27,12 @@ void IHyRenderer::RenderSurface::Resize(int32 iWidth, int32 iHeight)
 
 	m_iRenderSurfaceWidth = iWidth;
 	m_iRenderSurfaceHeight = iHeight;
-
-	m_bDirty = true;
-}
-
-void IHyRenderer::RenderSurface::ClearDirtyFlag()
-{
-	m_bDirty = false;
 }
 
 IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef) :	m_GfxCommsRef(gfxCommsRef),
 																					m_vWindowRef(vWindowRef)
 {
-	// TODO: Make m_vWindowRef threadsafe
+	// TODO: Make the application's HyWindow (ref to 'm_vWindowRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_vWindowRef.size()); ++i)
 		m_RenderSurfaces.push_back(RenderSurface(RENDERSURFACE_Window, i, m_vWindowRef[i].GetResolution().x, m_vWindowRef[i].GetResolution().y));
 }
@@ -43,6 +43,34 @@ IHyRenderer::~IHyRenderer(void)
 
 void IHyRenderer::Update()
 {
+	for(uint32 i = 0; i < static_cast<uint32>(m_vWindowRef.size()); ++i)
+	{
+		HyWindowInfo &windowInfoRef = m_vWindowRef[i].Update_Render();
+		if(windowInfoRef.uiDirtyFlags)
+		{
+			RenderSurface *pRenderSurface = NULL;
+			for(uint32 j = 0; j < m_RenderSurfaces.size(); ++j)
+			{
+				if(m_RenderSurfaces[j].m_eType == RENDERSURFACE_Window && m_RenderSurfaces[j].m_iID == i)
+				{
+					pRenderSurface = &m_RenderSurfaces[j];
+					break;
+				}
+			}
+			HyAssert(pRenderSurface, "Could not find associated render surface from application's window reference");
+
+			if(windowInfoRef.uiDirtyFlags & HyWindowInfo::FLAG_Resolution)
+			{
+				glm::ivec2 vResolution = m_vWindowRef[i].GetResolution();
+				pRenderSurface->Resize(vResolution.x, vResolution.y);
+			}
+
+			OnRenderSurfaceChanged(*pRenderSurface, windowInfoRef.uiDirtyFlags);
+
+			windowInfoRef.uiDirtyFlags = 0;
+		}
+	}
+
 	// Swap to newest draw buffers (is only thread-safe on Render thread)
 	if(!m_GfxCommsRef.Render_GetSharedPtrs(m_pMsgQueuePtr, m_pSendMsgQueuePtr, m_pDrawBufferPtr))
 	{
@@ -65,11 +93,11 @@ void IHyRenderer::Update()
 		m_pSendMsgQueuePtr->push(pData);
 	}
 
+	// Render all surfaces
 	m_RenderSurfaceIter = m_RenderSurfaces.begin();
 	while(m_RenderSurfaceIter != m_RenderSurfaces.end())
 	{
 		StartRender();
-		m_RenderSurfaceIter->ClearDirtyFlag();
 
 		while(Begin_3d())
 		{

@@ -43,19 +43,12 @@ protected:
 		int32						m_iID;
 		int32						m_iRenderSurfaceWidth;
 		int32						m_iRenderSurfaceHeight;
-		bool						m_bDirty;
+		
 		void *						m_pExData;
 
-		RenderSurface(eRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight) :	m_eType(eType),
-																															m_iID(iID),
-																															m_iRenderSurfaceWidth(iRenderSurfaceWidth),
-																															m_iRenderSurfaceHeight(iRenderSurfaceHeight),
-																															m_bDirty(false),
-																															m_pExData(NULL)
-		{ }
+		RenderSurface(eRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight);
 
 		void Resize(int32 iWidth, int32 iHeight);
-		void ClearDirtyFlag();
 	};
 	vector<RenderSurface>			m_RenderSurfaces;
 	vector<RenderSurface>::iterator	m_RenderSurfaceIter;
@@ -79,6 +72,8 @@ public:
 	// Returns the texture ID used for API specific drawing.
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, vector<unsigned char *> &vPixelData) = 0;
 	virtual void DeleteTextureArray(uint32 uiTextureHandle) = 0;
+
+	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags) = 0;
 
 	int32 GetNumCameras2d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d)); }
 	uint32 GetCameraWindowIndex2d(int iCameraIndex)			{ return *(reinterpret_cast<uint32 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32)			+ (iCameraIndex		* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(mat4))))); }

@@ -126,10 +126,13 @@ void WidgetAtlasManager::HideAtlasGroup()
     MainWindow::CloseItem(m_pProjOwner);
 }
 
-/*virtual*/ void WidgetAtlasManager::Hide()
+/*virtual*/ void WidgetAtlasManager::Load(IHyApplication &hyApp)
 {
-    for(int i = 0; i < ui->atlasGroups->count(); ++i)
-        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->Hide();
+    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->Load(hyApp);
+}
+
+/*virtual*/ void WidgetAtlasManager::Unload()
+{
 }
 
 /*virtual*/ void WidgetAtlasManager::Show()
@@ -137,9 +140,15 @@ void WidgetAtlasManager::HideAtlasGroup()
     static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->Show();
 }
 
-/*virtual*/ void WidgetAtlasManager::Draw(WidgetRenderer &renderer)
+/*virtual*/ void WidgetAtlasManager::Hide()
 {
-    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->Draw(renderer);
+    for(int i = 0; i < ui->atlasGroups->count(); ++i)
+        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->Hide();
+}
+
+/*virtual*/ void WidgetAtlasManager::Draw(IHyApplication &hyApp)
+{
+    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->Draw(hyApp);
 }
 
 void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)

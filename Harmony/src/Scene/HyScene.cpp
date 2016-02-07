@@ -108,6 +108,9 @@ void HyScene::PostUpdate()
 		sm_bInst2dOrderingDirty = false;
 	}
 
+	for(uint32 i = 0; i < m_vWindowRef.size(); ++i)
+		m_vWindowRef[i].Update();
+
 	WriteDrawBuffers();
 }
 

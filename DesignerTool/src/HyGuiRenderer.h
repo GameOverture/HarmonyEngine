@@ -28,6 +28,9 @@ public:
     void Reload();
     void Reload(QStringList &sReloadPaths);
     void Reload(QString &sNewDataDir);
+
+private:
+    IHyApplication *GetHyApp();
 };
 
 #endif // HYGUIRENDERER_H

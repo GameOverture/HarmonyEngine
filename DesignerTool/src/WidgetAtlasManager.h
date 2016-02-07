@@ -32,9 +32,13 @@ public:
     void PreviewAtlasGroup();
     void HideAtlasGroup();
     
-    virtual void Hide();
+    virtual void Load(IHyApplication &hyApp);
+    virtual void Unload();
+
     virtual void Show();
-    virtual void Draw(WidgetRenderer &renderer);
+    virtual void Hide();
+
+    virtual void Draw(IHyApplication &hyApp);
 
 private:
     Ui::WidgetAtlasManager *ui;

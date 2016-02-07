@@ -61,6 +61,8 @@ public:
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, vector<unsigned char *> &vPixelData);
 	virtual void DeleteTextureArray(uint32 uiTextureHandle);
 
+	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags);
+
 protected:
 	bool Initialize();
 };

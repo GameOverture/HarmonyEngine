@@ -44,6 +44,7 @@ struct HyMonitorDeviceInfo
 	vector<Resolution>	vResolutions;
 };
 
+// TODO: Make this class threadsafe between game app and renderer
 class HyWindow
 {
 	friend class HyScene;
@@ -52,19 +53,12 @@ class HyWindow
 	static vector<HyMonitorDeviceInfo>	sm_vMonitorInfo;
 	static BasicSection					sm_csInfo;
 
-	HyWindowInfo						m_Info;
+	HyWindowInfo						m_Info_Update;	// On the application's update thread
+	HyWindowInfo						m_Info_Shared;
+	HyWindowInfo						m_Info_Render;	// Read-only contents for render thread
 	
 	vector<HyCamera2d *>				m_vCams2d;
 	vector<HyCamera3d *>				m_vCams3d;
-
-	enum eDirtyFlags
-	{
-		FLAG_Title		= 1 << 0,
-		FLAG_Resolution	= 1 << 1,
-		FLAG_Location	= 1 << 2,
-		FLAG_Type		= 1 << 3
-	};
-	uint32								m_uiDirtyFlags;
 
 	BasicSection						m_cs;
 
@@ -100,7 +94,9 @@ public:
 private:
 	static void			SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
 
-	void				ClearDirtyFlag();
+	void				Update();
+
+	HyWindowInfo &		Update_Render();	// Only invoked on the render thread
 };
 
 #endif /* __HyWindow_h__ */

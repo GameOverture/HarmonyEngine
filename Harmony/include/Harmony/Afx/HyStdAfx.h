@@ -68,6 +68,15 @@ struct HyWindowInfo
 	glm::ivec2		vResolution;
 	glm::ivec2		vLocation;
 	HyWindowType	eType;
+
+	enum eDirtyFlags
+	{
+		FLAG_Title = 1 << 0,
+		FLAG_Resolution = 1 << 1,
+		FLAG_Location = 1 << 2,
+		FLAG_Type = 1 << 3
+	};
+	uint32			uiDirtyFlags;
 };
 
 #define HY_MAXWINDOWS 6
@@ -116,6 +125,8 @@ private:
 			windowInfo[i].vResolution.x = 256;
 			windowInfo[i].vLocation.x = i * windowInfo[i].vResolution.x;
 			windowInfo[i].vLocation.y = 0;
+			
+			windowInfo[i].uiDirtyFlags = 0;
 		}
 	}
 };

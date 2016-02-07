@@ -12,7 +12,7 @@
 vector<HyMonitorDeviceInfo>	HyWindow::sm_vMonitorInfo;
 BasicSection				HyWindow::sm_csInfo;
 
-HyWindow::HyWindow() : m_uiDirtyFlags(0)
+HyWindow::HyWindow()
 {
 }
 
@@ -27,51 +27,51 @@ HyWindow::~HyWindow(void)
 
 const HyWindowInfo &HyWindow::GetWindowInfo()
 {
-	return m_Info;
+	return m_Info_Update;
 }
 
 std::string HyWindow::GetTitle()
 {
-	return m_Info.sName;
+	return m_Info_Update.sName;
 }
 
 void HyWindow::SetTitle(std::string sTitle)
 {
-	m_Info.sName = sTitle;
-	m_uiDirtyFlags |= FLAG_Title;
+	m_Info_Update.sName = sTitle;
+	m_Info_Update.uiDirtyFlags |= HyWindowInfo::FLAG_Title;
 }
 
 glm::ivec2 HyWindow::GetResolution()
 {
-	return m_Info.vResolution;
+	return m_Info_Update.vResolution;
 }
 
 void HyWindow::SetResolution(glm::ivec2 vResolution)
 {
-	m_Info.vResolution = vResolution;
-	m_uiDirtyFlags |= FLAG_Resolution;
+	m_Info_Update.vResolution = vResolution;
+	m_Info_Update.uiDirtyFlags |= HyWindowInfo::FLAG_Resolution;
 }
 
 glm::ivec2 HyWindow::GetLocation()
 {
-	return m_Info.vLocation;
+	return m_Info_Update.vLocation;
 }
 
 void HyWindow::SetLocation(glm::ivec2 ptLocation)
 {
-	m_Info.vLocation = ptLocation;
-	m_uiDirtyFlags |= FLAG_Location;
+	m_Info_Update.vLocation = ptLocation;
+	m_Info_Update.uiDirtyFlags |= HyWindowInfo::FLAG_Location;
 }
 
 HyWindowType HyWindow::GetType()
 {
-	return m_Info.eType;
+	return m_Info_Update.eType;
 }
 
 void HyWindow::SetType(HyWindowType eType)
 {
-	m_Info.eType = eType;
-	m_uiDirtyFlags |= FLAG_Type;
+	m_Info_Update.eType = eType;
+	m_Info_Update.uiDirtyFlags |= HyWindowInfo::FLAG_Type;
 }
 
 HyCamera2d *HyWindow::CreateCamera2d()
@@ -116,13 +116,6 @@ void HyWindow::RemoveCamera(HyCamera3d *&pCam)
 	}
 }
 
-void HyWindow::ClearDirtyFlag()
-{
-	m_cs.Lock();
-	m_uiDirtyFlags = 0;
-	m_cs.Unlock();
-}
-
 /*static*/ void HyWindow::MonitorDeviceInfo(vector<HyMonitorDeviceInfo> &vDeviceInfoOut)
 {
 	vDeviceInfoOut.clear();
@@ -143,3 +136,27 @@ void HyWindow::ClearDirtyFlag()
 	sm_csInfo.Unlock();
 }
 
+void HyWindow::Update()
+{
+	if(m_Info_Update.uiDirtyFlags)
+	{
+		m_cs.Lock();
+		m_Info_Shared = m_Info_Update;
+		m_cs.Unlock();
+
+		m_Info_Update.uiDirtyFlags = 0;
+	}
+}
+
+HyWindowInfo &HyWindow::Update_Render()
+{
+	m_cs.Lock();
+	if(m_Info_Shared.uiDirtyFlags)
+	{
+		m_Info_Render = m_Info_Shared;
+		m_Info_Shared.uiDirtyFlags = 0;
+	}
+	m_cs.Unlock();
+
+	return m_Info_Render;
+}

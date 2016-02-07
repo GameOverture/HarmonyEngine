@@ -1,14 +1,18 @@
 #ifndef IHYGUIDRAWITEM
 #define IHYGUIDRAWITEM
 
-class WidgetRenderer;
+#include "Harmony/HyEngine.h"
 
 class IHyGuiDrawItem
 {
 protected:
-    virtual void Hide() = 0;
+    virtual void Load(IHyApplication &hyApp) = 0;
+    virtual void Unload() = 0;
+
     virtual void Show() = 0;
-    virtual void Draw(WidgetRenderer &renderer) = 0;
+    virtual void Hide() = 0;
+
+    virtual void Draw(IHyApplication &hyApp) = 0;
 };
 
 #endif // IHYGUIDRAWITEM

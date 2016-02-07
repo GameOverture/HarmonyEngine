@@ -30,6 +30,8 @@ public:
 
 	virtual void StartRender();
 	virtual void FinishRender();
+
+	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags);
 };
 
 #endif /* __HyOpenGL_Win_h__ */

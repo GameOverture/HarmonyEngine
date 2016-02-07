@@ -134,9 +134,13 @@ public:
     
     int GetId();
     
-    virtual void Hide();
+    virtual void Load(IHyApplication &hyApp);
+    virtual void Unload();
+
     virtual void Show();
-    virtual void Draw(WidgetRenderer &renderer);
+    virtual void Hide();
+
+    virtual void Draw(IHyApplication &hyApp);
 
 private slots:
     void on_btnAddImages_clicked();

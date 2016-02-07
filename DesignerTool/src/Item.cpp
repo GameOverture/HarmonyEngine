@@ -35,9 +35,12 @@ QString Item::GetName() const
     return itemInfo.baseName();
 }
 
-/*virtual*/ void Item::Hide()
+/*virtual*/ void Item::Load(IHyApplication &hyApp)
 {
-    HYLOG("Tried to Hide() a non-derived item: " % GetName(), LOGTYPE_Error);
+}
+
+/*virtual*/ void Item::Unload()
+{
 }
 
 /*virtual*/ void Item::Show()
@@ -45,7 +48,12 @@ QString Item::GetName() const
     HYLOG("Tried to Show() a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
-/*virtual*/ void Item::Draw(WidgetRenderer &renderer)
+/*virtual*/ void Item::Hide()
+{
+    HYLOG("Tried to Hide() a non-derived item: " % GetName(), LOGTYPE_Error);
+}
+
+/*virtual*/ void Item::Draw(IHyApplication &hyApp)
 {
     HYLOG("Tried to draw a non-derived item: " % GetName(), LOGTYPE_Error);
 }

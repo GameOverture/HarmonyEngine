@@ -133,6 +133,32 @@ int WidgetAtlasGroup::GetId()
     return m_MetaDir.dirName().toInt();
 }
 
+/*virtual*/ void WidgetAtlasGroup::Load(IHyApplication &hyApp)
+{
+    if(m_pDrawInst == NULL)
+    {
+
+    }
+
+    if(m_pCam == NULL)
+    {
+        m_pCam = hyApp.Window().CreateCamera2d();
+    }
+}
+
+/*virtual*/ void WidgetAtlasGroup::Unload()
+{
+}
+
+/*virtual*/ void WidgetAtlasGroup::Show()
+{
+    LoadDrawInst();
+    m_pDrawInst->SetEnabled(true);
+
+    if(m_pCam)
+         m_pCam->SetEnabled(true);
+}
+
 /*virtual*/ void WidgetAtlasGroup::Hide()
 {
     m_pDrawInst->SetEnabled(false);
@@ -141,21 +167,9 @@ int WidgetAtlasGroup::GetId()
         m_pCam->SetEnabled(false);
 }
 
-/*virtual*/ void WidgetAtlasGroup::Show()
+/*virtual*/ void WidgetAtlasGroup::Draw(IHyApplication &hyApp)
 {
-    LoadDrawInst();
-    m_pDrawInst->SetEnabled(true);
-    
-    if(m_pCam)
-         m_pCam->SetEnabled(true);
-}
-
-/*virtual*/ void WidgetAtlasGroup::Draw(WidgetRenderer &renderer)
-{
-    if(m_pCam == NULL)
-    {
-        m_pCam = renderer.Window().CreateCamera2d();
-    }
+    //m_pCam
 }
 
 void WidgetAtlasGroup::on_btnAddImages_clicked()

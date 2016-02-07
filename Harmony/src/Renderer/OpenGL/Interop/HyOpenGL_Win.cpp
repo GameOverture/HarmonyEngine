@@ -197,6 +197,13 @@ HWND HyOpenGL_Win::GetHWND(int32 iWindowIndex)
 	SwapBuffers(hDeviceContext);
 }
 
+/*virtual*/ void HyOpenGL_Win::OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags)
+{
+	// TODO: Update window size, change window title, etc based on uiChangedFlags
+
+	HyOpenGL::OnRenderSurfaceChanged(renderSurfaceRef, uiChangedFlags);
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message)

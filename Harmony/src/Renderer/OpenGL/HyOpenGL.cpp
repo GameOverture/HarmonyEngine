@@ -238,6 +238,10 @@ HyOpenGL::~HyOpenGL(void)
 	glDeleteTextures(1, &uiTextureHandle);
 }
 
+/*virtual*/ void HyOpenGL::OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags)
+{
+}
+
 bool HyOpenGL::Initialize()
 {
 	//////////////////////////////////////////////////////////////////////////
