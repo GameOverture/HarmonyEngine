@@ -57,7 +57,7 @@ public:
 	const std::string &GetName()								{ return m_sNAME; }
 	const std::string &GetPrefix()								{ return m_sPREFIX; }
 
-	HyLoadState GetLoadState()									{ return m_eLoadState; }
+	bool IsLoaded()												{ return m_eLoadState == HYLOADSTATE_Loaded; }
 
 	inline bool	IsEnabled()										{ return m_bEnabled; }
 	inline void	SetEnabled(bool bVis)							{ m_bEnabled = bVis; }

@@ -112,6 +112,7 @@ class WidgetAtlasGroup : public QWidget, public IHyGuiDrawItem
 {
     Q_OBJECT
 
+    // NOTE: Order of these member variables matter here for the member initializer list
     QDir                        m_MetaDir;
     QDir                        m_DataDir;
 
@@ -122,7 +123,7 @@ class WidgetAtlasGroup : public QWidget, public IHyGuiDrawItem
     ImagePacker                 m_Packer;
     
     // Draw members
-    HyTexturedQuad2d *          m_pDrawInst;
+    HyTexturedQuad2d            m_DrawInst;
     HyCamera2d *                m_pCam;
 
 public:

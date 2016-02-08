@@ -17,6 +17,7 @@
 #include "WidgetRenderer.h"
 
 WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
+                                                        m_DrawInst(0),
                                                         ui(new Ui::WidgetAtlasGroup)
 {
     ui->setupUi(this);
@@ -28,9 +29,9 @@ WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
 WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) :   QWidget(parent),
                                                                                     m_MetaDir(metaDir),
                                                                                     m_DataDir(dataDir),
-                                                                                    ui(new Ui::WidgetAtlasGroup),
-                                                                                    m_pDrawInst(NULL),
-                                                                                    m_pCam(NULL)
+                                                                                    m_DrawInst(GetId()),
+                                                                                    m_pCam(NULL),
+                                                                                    ui(new Ui::WidgetAtlasGroup)
 {
     ui->setupUi(this);
 
@@ -87,8 +88,6 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
             
             m_FrameList.append(pNewFrame);
         }
-        
-        m_pDrawInst = new HyTexturedQuad2d(GetId());
     }
 }
 
@@ -135,9 +134,9 @@ int WidgetAtlasGroup::GetId()
 
 /*virtual*/ void WidgetAtlasGroup::Load(IHyApplication &hyApp)
 {
-    if(m_pDrawInst == NULL)
+    if(m_DrawInst.IsLoaded() == false)
     {
-
+        m_DrawInst.Load();
     }
 
     if(m_pCam == NULL)
@@ -148,6 +147,7 @@ int WidgetAtlasGroup::GetId()
 
 /*virtual*/ void WidgetAtlasGroup::Unload()
 {
+    m_DrawInst.Unload();
 }
 
 /*virtual*/ void WidgetAtlasGroup::Show()
