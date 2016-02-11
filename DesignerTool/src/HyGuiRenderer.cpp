@@ -36,7 +36,7 @@ HyGuiRenderer::~HyGuiRenderer()
     if(m_pHyEngine->Update() == false)
         HYLOG("Harmony Gfx requested exit program.", LOGTYPE_Info);
 
-    if(m_primBox.GetLoadState() == HYLOADSTATE_Inactive)
+    if(m_primBox.IsLoaded() == false)
     {
         IHyApplication *pApp = GetHyApp();
 

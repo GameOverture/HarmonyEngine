@@ -1,6 +1,6 @@
 /**************************************************************************
  *	IHyInst2d.h
- *	
+ *
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
  *
@@ -20,7 +20,7 @@
 #include "Utilities/Animation/HyAnimVec4.h"
 #include "Renderer/HyRenderState.h"
 
-class IHyInst2d : public ITransform<HyAnimVec2>
+class IHyInst2d : public ITransform < HyAnimVec2 >
 {
 	friend class HyScene;
 	friend class HyAssetManager;
@@ -77,10 +77,10 @@ public:
 	void Unload();
 	void GetWorldTransform(mat4 &outMtx);
 	void GetRenderState(HyRenderState &renderStateOut) const;
-	
+
 	void AddChild(IHyInst2d &childInst);
 	void Detach();
-	
+
 protected:
 	virtual void OnDataLoaded() = 0;
 	virtual void Update() = 0;
@@ -89,6 +89,8 @@ protected:
 	virtual void WriteDrawBufferData(char *&pRefDataWritePos) = 0;
 
 private:
+	HyLoadState GetLoadState()									{ return m_eLoadState; }
+
 	void SetData(IHyData *pData);
 	void SetLoaded();
 	IHyData *GetData()											{ return m_pData; }

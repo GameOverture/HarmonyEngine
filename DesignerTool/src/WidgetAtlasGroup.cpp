@@ -153,7 +153,7 @@ int WidgetAtlasGroup::GetId()
 /*virtual*/ void WidgetAtlasGroup::Show()
 {
     LoadDrawInst();
-    m_pDrawInst->SetEnabled(true);
+    m_DrawInst.SetEnabled(true);
 
     if(m_pCam)
          m_pCam->SetEnabled(true);
@@ -161,7 +161,7 @@ int WidgetAtlasGroup::GetId()
 
 /*virtual*/ void WidgetAtlasGroup::Hide()
 {
-    m_pDrawInst->SetEnabled(false);
+    m_DrawInst.SetEnabled(false);
     
     if(m_pCam)
         m_pCam->SetEnabled(false);
@@ -490,8 +490,8 @@ void WidgetAtlasGroup::Refresh()
             sReloadPaths.append(sLink);
     }
     
-    delete m_pDrawInst;
-    m_pDrawInst = new HyTexturedQuad2d(GetId());
+    m_DrawInst.Unload();
+    m_DrawInst.Load();
     
     MainWindow::ReloadItems(sReloadPaths);
     
@@ -500,7 +500,7 @@ void WidgetAtlasGroup::Refresh()
 
 void WidgetAtlasGroup::LoadDrawInst()
 {
-    m_pDrawInst->Load();
+    m_DrawInst.Load();
     
     foreach(HyGuiFrame *pFrame, m_FrameList)
         pFrame->LoadDrawInst();
