@@ -132,24 +132,6 @@ int WidgetAtlasGroup::GetId()
     return m_MetaDir.dirName().toInt();
 }
 
-/*virtual*/ void WidgetAtlasGroup::Load(IHyApplication &hyApp)
-{
-    if(m_DrawInst.IsLoaded() == false)
-    {
-        m_DrawInst.Load();
-    }
-
-    if(m_pCam == NULL)
-    {
-        m_pCam = hyApp.Window().CreateCamera2d();
-    }
-}
-
-/*virtual*/ void WidgetAtlasGroup::Unload()
-{
-    m_DrawInst.Unload();
-}
-
 /*virtual*/ void WidgetAtlasGroup::Show()
 {
     LoadDrawInst();

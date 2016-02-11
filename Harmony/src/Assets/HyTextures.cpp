@@ -14,7 +14,9 @@
 #include "Utilities/HyFileIO.h"
 #include "Utilities/stb_image.h"
 
-HyTextures::HyTextures(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasDataDir)
+HyTextures::HyTextures(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasDataDir),
+													m_uiNumAtlasGroups(0),
+													m_pAtlasGroups(NULL)
 {
 	Load();
 }
@@ -63,6 +65,9 @@ void HyTextures::Load()
 	sAtlasInfoFilePath += "atlasInfo.json";
 	atlasGroupArray.parse(HyReadTextFile(sAtlasInfoFilePath.c_str()));
 
+	if(atlasGroupArray.size() == 0)
+		return;
+
 	m_uiNumAtlasGroups = static_cast<uint32>(atlasGroupArray.size());
 	m_pAtlasGroups = reinterpret_cast<HyAtlasGroup *>(new unsigned char[sizeof(HyAtlasGroup) * m_uiNumAtlasGroups]);
 	HyAtlasGroup *pAtlasGroupWriteLocation = m_pAtlasGroups;
@@ -82,7 +87,7 @@ void HyTextures::Load()
 
 void HyTextures::Unload()
 {
-	if(m_pAtlasGroups == NULL)
+	if(m_pAtlasGroups == NULL || m_uiNumAtlasGroups == 0)
 		return;
 
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
@@ -105,7 +110,7 @@ HyAtlasGroup::HyAtlasGroup(HyTextures &managerRef, uint32 uiLoadGroupId, uint32 
 	m_pAtlases = reinterpret_cast<HyAtlas *>(new unsigned char[sizeof(HyAtlas) * m_uiNUM_ATLASES]);
 	HyAtlas *pAtlasWriteLocation = m_pAtlases;
 
-	for(uint32 j = 0; j < m_uiNUM_ATLASES; ++j)
+	for(uint32 j = 0; j < m_uiNUM_ATLASES; ++j, ++pAtlasWriteLocation)
 	{
 		jsonxx::Array srcFramesArray = texturesArrayRef.get<jsonxx::Array>(j);
 

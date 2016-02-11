@@ -6,9 +6,6 @@
 class IHyGuiDrawItem
 {
 protected:
-    virtual void Load(IHyApplication &hyApp) = 0;
-    virtual void Unload() = 0;
-
     virtual void Show() = 0;
     virtual void Hide() = 0;
 

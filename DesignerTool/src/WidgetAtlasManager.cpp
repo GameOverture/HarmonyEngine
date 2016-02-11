@@ -126,15 +126,6 @@ void WidgetAtlasManager::HideAtlasGroup()
     MainWindow::CloseItem(m_pProjOwner);
 }
 
-/*virtual*/ void WidgetAtlasManager::Load(IHyApplication &hyApp)
-{
-    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->Load(hyApp);
-}
-
-/*virtual*/ void WidgetAtlasManager::Unload()
-{
-}
-
 /*virtual*/ void WidgetAtlasManager::Show()
 {
     static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->Show();

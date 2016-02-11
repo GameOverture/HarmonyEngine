@@ -135,9 +135,6 @@ public:
     
     int GetId();
     
-    virtual void Load(IHyApplication &hyApp);
-    virtual void Unload();
-
     virtual void Show();
     virtual void Hide();
 

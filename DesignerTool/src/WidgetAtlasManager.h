@@ -31,9 +31,6 @@ public:
 
     void PreviewAtlasGroup();
     void HideAtlasGroup();
-    
-    virtual void Load(IHyApplication &hyApp);
-    virtual void Unload();
 
     virtual void Show();
     virtual void Hide();

@@ -32,7 +32,8 @@ public:
     // Item overrides
     virtual void Show();
     virtual void Hide();
-    virtual void Draw(WidgetRenderer &renderer);
+    
+    virtual void Draw(IHyApplication &hyApp);
     
     void SetAtlasGroupDrawState(int iAtlasGrpId);
 };

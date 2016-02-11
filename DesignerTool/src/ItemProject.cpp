@@ -26,10 +26,10 @@ ItemProject::~ItemProject()
         m_pAtlasManager->Hide();
 }
 
-/*virtual*/ void ItemProject::Draw(WidgetRenderer &renderer)
+/*virtual*/ void ItemProject::Draw(IHyApplication &hyApp)
 {
     if(m_eState == DRAWSTATE_AtlasManager)
-        m_pAtlasManager->Draw(renderer);
+        m_pAtlasManager->Draw(hyApp);
 }
 
 void ItemProject::SetAtlasGroupDrawState(int iAtlasGrpId)

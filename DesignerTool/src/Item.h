@@ -24,8 +24,6 @@ protected:
     ~Item();
     
 public:
-
-
     eItemType GetType() const                       { return m_eType; }
     QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
     QString GetName() const;
@@ -34,9 +32,6 @@ public:
     
     void SetTreeItem(QTreeWidgetItem *pTreeItem)    { m_pTreeItemPtr = pTreeItem; }
     
-    virtual void Load(IHyApplication &hyApp);
-    virtual void Unload();
-
     virtual void Show();
     virtual void Hide();
 
