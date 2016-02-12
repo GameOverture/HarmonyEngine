@@ -1,0 +1,12 @@
+
+skeleton.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+spineboy/head
+  rotate: false
+  xy: 2, 2
+  size: 121, 132
+  orig: 121, 132
+  offset: 0, 0
+  index: -1

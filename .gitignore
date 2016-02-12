@@ -12,5 +12,5 @@ build-DesignerTool-Jay_s_CDB-Debug/
 *.opensdf
 *.suo
 *.user
-
+*.pdb
 *.lib

@@ -195,6 +195,8 @@ HyOpenGL::~HyOpenGL(void)
 // Returns the texture ID used for API specific drawing.
 /*virtual*/ uint32 HyOpenGL::AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, vector<unsigned char *> &vPixelData)
 {
+	glEnable(GL_TEXTURE_3D);
+
 	GLuint hGLTextureArray;
 	glGenTextures(1, &hGLTextureArray);
 	glActiveTexture(GL_TEXTURE0);
@@ -208,7 +210,7 @@ HyOpenGL::~HyOpenGL(void)
 					1,						// Number of mipmaps
 					eInternalFormat,		// Internal format
 					uiWidth, uiHeight,		// width, height
-					static_cast<int32>(vPixelData.size()));
+					static_cast<uint32>(vPixelData.size()));
 
 	for(unsigned int i = 0; i != vPixelData.size(); ++i)
 	{
@@ -216,7 +218,7 @@ HyOpenGL::~HyOpenGL(void)
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
 						0,										// Mipmap number
 						0, 0, i,								// xoffset, yoffset, zoffset
-						uiWidth, uiHeight, static_cast<uint32>(vPixelData.size()),	// width, height, depth
+						uiWidth, uiHeight, 1,					// width, height, depth (of texture you're copying in)
 						eFormat,								// format
 						GL_UNSIGNED_BYTE,						// type
 						vPixelData[i]);							// pointer to pixel data
