@@ -153,6 +153,11 @@ uint32 HyAtlasGroup::GetHeight() const
 	return m_uiHEIGHT;
 }
 
+uint32 HyAtlasGroup::GetNumTextures() const
+{
+	return m_uiNUM_ATLASES;
+}
+
 bool HyAtlasGroup::ContainsTexture(uint32 uiTextureIndex) const
 {
 	return (uiTextureIndex < m_uiNUM_ATLASES);

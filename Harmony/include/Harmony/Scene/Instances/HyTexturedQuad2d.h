@@ -27,6 +27,10 @@ public:
 	void SetTextureIndex(uint32 uiTextureIndex);
 	uint32 GetTextureIndex();
 
+	uint32 GetTextureWidth();
+	uint32 GetTextureHeight();
+	uint32 GetNumTextures();
+
 private:
 	virtual void OnDataLoaded();
 	virtual void Update();

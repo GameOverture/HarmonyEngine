@@ -26,7 +26,8 @@ class HyGuiFrame
     const QRect         m_rALPHA_CROP;
 
     int                 m_iTextureIndex;
-    bool                m_bRotation;
+    bool                m_bRotation;void on_atlasList_itemEntered(QTreeWidgetItem *item, int column);
+
     int                 m_iPosX;
     int                 m_iPosY;
     
@@ -126,6 +127,8 @@ class WidgetAtlasGroup : public QWidget, public IHyGuiDrawItem
     HyTexturedQuad2d            m_DrawInst;
     HyCamera2d *                m_pCam;
 
+    QPoint                      m_MouseLocalCoords;
+
 public:
     explicit WidgetAtlasGroup(QWidget *parent = 0);
     explicit WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent = 0);
@@ -147,6 +150,8 @@ private slots:
 protected:
     virtual void enterEvent(QEvent *pEvent);
     virtual void leaveEvent(QEvent *pEvent);
+
+    virtual void mouseMoveEvent(QMouseEvent *pEvent);
 
 private:
     Ui::WidgetAtlasGroup *ui;

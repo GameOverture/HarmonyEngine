@@ -27,6 +27,31 @@ uint32 HyTexturedQuad2d::GetAtlasGroupId() const
 	return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetId();
 }
 
+void HyTexturedQuad2d::SetTextureIndex(uint32 uiTextureIndex)
+{
+	m_uiTextureIndex = uiTextureIndex;
+}
+
+uint32 HyTexturedQuad2d::GetTextureIndex()
+{
+	return m_uiTextureIndex;
+}
+
+uint32 HyTexturedQuad2d::GetTextureWidth()
+{
+	return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetWidth();
+}
+
+uint32 HyTexturedQuad2d::GetTextureHeight()
+{
+	return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetHeight();
+}
+
+uint32 HyTexturedQuad2d::GetNumTextures()
+{
+	return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetNumTextures();
+}
+
 /*virtual*/ void HyTexturedQuad2d::OnDataLoaded()
 {
 	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);

@@ -35,19 +35,6 @@ HyGuiRenderer::~HyGuiRenderer()
 {
     if(m_pHyEngine->Update() == false)
         HYLOG("Harmony Gfx requested exit program.", LOGTYPE_Info);
-
-    if(m_primBox.IsLoaded() == false)
-    {
-        IHyApplication *pApp = GetHyApp();
-
-        m_pCam = pApp->Window().CreateCamera2d();
-
-        m_primBox.Load();
-        m_primBox.Color().Set(0.0f, 0.0f, 1.0f, 1.0f);
-        m_primBox.SetAsQuad(15.0f, 15.0f, false);
-        m_primBox.Pos().Set(0.0f, 0.0f);
-        m_primBox.SetDisplayOrder(100);
-    }
 }
 
 /*virtual*/ void HyGuiRenderer::resizeGL(int w, int h)

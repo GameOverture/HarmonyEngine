@@ -88,6 +88,8 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
             
             m_FrameList.append(pNewFrame);
         }
+
+        ui->atlasList->expandAll();
     }
 }
 
@@ -137,6 +139,8 @@ int WidgetAtlasGroup::GetId()
     LoadDrawInst();
     m_DrawInst.SetEnabled(true);
 
+    m_DrawInst.SetTextureIndex(m_DrawInst.GetTextureIndex() + 1);
+
     if(m_pCam)
          m_pCam->SetEnabled(true);
 }
@@ -151,7 +155,21 @@ int WidgetAtlasGroup::GetId()
 
 /*virtual*/ void WidgetAtlasGroup::Draw(IHyApplication &hyApp)
 {
-    //m_pCam
+    if(m_pCam == NULL)
+        m_pCam = hyApp.Window().CreateCamera2d();
+
+
+    QTreeWidgetItem *pItemMouseHover = ui->atlasList->itemAt(m_MouseLocalCoords);
+
+    //m_DrawInst.SetTextureIndex(3);
+
+//    for(int i = 0; i < ui->atlasList->topLevelItemCount(); ++i)
+//    {
+//        if(ui->atlasList->topLevelItem(i) == pItemMouseHover)
+//            m_DrawInst.SetTextureIndex(i);
+//    }
+
+    //m_DrawInst.SetTextureIndex(
 }
 
 void WidgetAtlasGroup::on_btnAddImages_clicked()
@@ -236,6 +254,14 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
     
     pAtlasMan->HideAtlasGroup();
     QWidget::leaveEvent(pEvent);
+}
+
+/*virtual*/ void WidgetAtlasGroup::mouseMoveEvent(QMouseEvent *pEvent)
+{
+    m_MouseLocalCoords = pEvent->pos();
+    HYLOG("AtlasGroup Mouse Coords: " + QString::number(m_MouseLocalCoords.x()) + ", " + QString::number(m_MouseLocalCoords.y()), LOGTYPE_Normal);
+
+    QWidget::mouseMoveEvent(pEvent);
 }
 
 void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
@@ -476,6 +502,8 @@ void WidgetAtlasGroup::Refresh()
     m_DrawInst.Load();
     
     MainWindow::ReloadItems(sReloadPaths);
+
+    ui->atlasList->expandAll();
     
     pAtlasManager->PreviewAtlasGroup();
 }

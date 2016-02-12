@@ -10,12 +10,18 @@
     <height>711</height>
    </rect>
   </property>
+  <property name="mouseTracking">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="mouseTracking">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Atlas Group 1</string>
      </property>
@@ -134,6 +140,9 @@
       </item>
       <item>
        <widget class="QTreeWidget" name="atlasList">
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
         <column>
          <property name="text">
           <string notr="true">1</string>

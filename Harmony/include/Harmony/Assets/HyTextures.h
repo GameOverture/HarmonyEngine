@@ -76,6 +76,7 @@ public:
 	uint32 GetNumColorChannels() const;
 	uint32 GetWidth() const;
 	uint32 GetHeight() const;
+	uint32 GetNumTextures() const;
 
 	bool ContainsTexture(uint32 uiTextureIndex) const;
 	void Load();
