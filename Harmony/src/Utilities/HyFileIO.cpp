@@ -51,6 +51,13 @@ std::string HyReadTextFile(const char *szFilePath)
 	return sReadOutput;
 }
 
+void WriteTextFile(const char *szFilePath, const char *szContentBuffer)
+{
+	std::ofstream outfile(szFilePath);
+	outfile.write(szContentBuffer, strlen(szContentBuffer));
+	outfile.close();
+}
+
 bool HyFileExists(const std::string &sFilePath)
 {
 	// TODO: implement

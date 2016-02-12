@@ -120,20 +120,20 @@ HyOpenGL::~HyOpenGL(void)
 			}
 
 			size_t uiDataOffset = renderState.GetDataOffset();
-
 			GLuint mtx = m_pShader2d[QUADBATCH].GetAttribLocation("mtxLocalToWorld");
-			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("size"), 2, GL_FLOAT, GL_FALSE, 128, (void *)uiDataOffset);
-			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("offset"), 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (2*sizeof(GLfloat))));
-			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("tint"), 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + (4*sizeof(GLfloat))));
-			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("textureIndex"), 1, GL_UNSIGNED_INT, GL_FALSE, 132, (void *)(uiDataOffset + (8 * sizeof(GLfloat))));
-			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord0"), 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + sizeof(GLuint) + (8*sizeof(GLfloat))));
-			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord1"), 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + sizeof(GLuint) + (10 * sizeof(GLfloat))));
-			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord2"), 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + sizeof(GLuint) + (12 * sizeof(GLfloat))));
-			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord3"), 2, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + sizeof(GLuint) + (14 * sizeof(GLfloat))));
-			glVertexAttribPointer(mtx + 0, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + sizeof(GLuint) + (16 * sizeof(GLfloat))));
-			glVertexAttribPointer(mtx + 1, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + sizeof(GLuint) + (20 * sizeof(GLfloat))));
-			glVertexAttribPointer(mtx + 2, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + sizeof(GLuint) + (24 * sizeof(GLfloat))));
-			glVertexAttribPointer(mtx + 3, 4, GL_FLOAT, GL_FALSE, 128, (void *)(uiDataOffset + sizeof(GLuint) + (28 * sizeof(GLfloat))));
+
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("size"),			2, GL_FLOAT,		GL_FALSE, 132, (void *)(uiDataOffset));
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("offset"),		2, GL_FLOAT,		GL_FALSE, 132, (void *)(uiDataOffset + (2*sizeof(GLfloat))));
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("tint"),			4, GL_FLOAT,		GL_FALSE, 132, (void *)(uiDataOffset + (4*sizeof(GLfloat))));
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("textureIndex"), 1, GL_UNSIGNED_INT,	GL_FALSE, 132, (void *)(uiDataOffset + (8*sizeof(GLfloat))));
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord0"),		2, GL_FLOAT,		GL_FALSE, 132, (void *)(uiDataOffset + sizeof(GLuint) + (8*sizeof(GLfloat))));
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord1"),		2, GL_FLOAT,		GL_FALSE, 132, (void *)(uiDataOffset + sizeof(GLuint) + (10*sizeof(GLfloat))));
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord2"),		2, GL_FLOAT,		GL_FALSE, 132, (void *)(uiDataOffset + sizeof(GLuint) + (12*sizeof(GLfloat))));
+			glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord3"),		2, GL_FLOAT,		GL_FALSE, 132, (void *)(uiDataOffset + sizeof(GLuint) + (14*sizeof(GLfloat))));
+			glVertexAttribPointer(mtx + 0,													4, GL_FLOAT,		GL_FALSE, 132, (void *)(uiDataOffset + sizeof(GLuint) + (16*sizeof(GLfloat))));
+			glVertexAttribPointer(mtx + 1,													4, GL_FLOAT,		GL_FALSE, 132, (void *)(uiDataOffset + sizeof(GLuint) + (20*sizeof(GLfloat))));
+			glVertexAttribPointer(mtx + 2,													4, GL_FLOAT,		GL_FALSE, 132, (void *)(uiDataOffset + sizeof(GLuint) + (24*sizeof(GLfloat))));
+			glVertexAttribPointer(mtx + 3,													4, GL_FLOAT,		GL_FALSE, 132, (void *)(uiDataOffset + sizeof(GLuint) + (28*sizeof(GLfloat))));
 
 			glBindTexture(GL_TEXTURE_2D_ARRAY, renderState.GetTextureHandle());
 
@@ -195,42 +195,36 @@ HyOpenGL::~HyOpenGL(void)
 // Returns the texture ID used for API specific drawing.
 /*virtual*/ uint32 HyOpenGL::AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, vector<unsigned char *> &vPixelData)
 {
-	glEnable(GL_TEXTURE_3D);
-
-	GLuint hGLTextureArray;
-	glGenTextures(1, &hGLTextureArray);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, hGLTextureArray);
-
 	GLenum eInternalFormat = uiNumColorChannels == 4 ? GL_RGBA8 : (uiNumColorChannels == 3 ? GL_RGB8 : GL_R8);
 	GLenum eFormat = uiNumColorChannels == 4 ? GL_RGBA : (uiNumColorChannels == 3 ? GL_RGB : GL_RED);
 
-	// Create storage for the texture
-	glTexStorage3D(GL_TEXTURE_2D_ARRAY,
-					1,						// Number of mipmaps
-					eInternalFormat,		// Internal format
-					uiWidth, uiHeight,		// width, height
-					static_cast<uint32>(vPixelData.size()));
+	GLuint hGLTextureArray;
+	glGenTextures(1, &hGLTextureArray);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, hGLTextureArray);
 
-	for(unsigned int i = 0; i != vPixelData.size(); ++i)
+	uint32 uiNumTextures = static_cast<uint32>(vPixelData.size());
+
+	// Create (blank) storage for the texture array
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eFormat, uiWidth, uiHeight, uiNumTextures, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
+
+	for(uint32 i = 0; i != uiNumTextures; ++i)
 	{
 		// Write each texture into storage
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
-						0,										// Mipmap number
-						0, 0, i,								// xoffset, yoffset, zoffset
-						uiWidth, uiHeight, 1,					// width, height, depth (of texture you're copying in)
-						eFormat,								// format
-						GL_UNSIGNED_BYTE,						// type
-						vPixelData[i]);							// pointer to pixel data
+						0,						// Mipmap number
+						0, 0, i,				// xoffset, yoffset, zoffset
+						uiWidth, uiHeight, 1,	// width, height, depth (of texture you're copying in)
+						eFormat,				// format
+						GL_UNSIGNED_BYTE,		// type
+						vPixelData[i]);			// pointer to pixel data
 	}
 
 	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	return hGLTextureArray;
 }
@@ -258,6 +252,9 @@ bool HyOpenGL::Initialize()
 		//szErrorStr = gluErrorString(eError);
 		HyError("OpenGL Error: " << eError/* << std::endl << szErrorStr*/);
 	}
+
+	//const GLubyte *pExtStr = glGetString(GL_EXTENSIONS);
+	//WriteTextFile("GLExtensions.txt", glGetString(GL_EXTENSIONS));
 
 	//if (glewIsSupported("GL_VERSION_3_3"))
 	//	printf("Ready for OpenGL 3.3\n");
@@ -315,21 +312,21 @@ bool HyOpenGL::Initialize()
 	glEnableVertexAttribArray(mtx + 2);
 	glEnableVertexAttribArray(mtx + 3);
 
-	//////////////////////////////////////////////////////////////////////////
-	// ALL HERE IS PROBABLY NOT NEEDED
-	glVertexAttribPointer(size, 2, GL_FLOAT, GL_FALSE, 132, (void *)0);
-	glVertexAttribPointer(offset, 2, GL_FLOAT, GL_FALSE, 132, (void *)(2 * sizeof(GLfloat)));
-	glVertexAttribPointer(tint, 4, GL_FLOAT, GL_FALSE, 132, (void *)(4 * sizeof(GLfloat)));
-	glVertexAttribPointer(textureIndex, 1, GL_UNSIGNED_INT, GL_FALSE, 132, (void *)(sizeof(GLuint)));
-	glVertexAttribPointer(uv0, 2, GL_FLOAT, GL_FALSE, 132, (void *)(8 * sizeof(GLfloat)));
-	glVertexAttribPointer(uv1, 2, GL_FLOAT, GL_FALSE, 132, (void *)(10 * sizeof(GLfloat)));
-	glVertexAttribPointer(uv2, 2, GL_FLOAT, GL_FALSE, 132, (void *)(12 * sizeof(GLfloat)));
-	glVertexAttribPointer(uv3, 2, GL_FLOAT, GL_FALSE, 132, (void *)(14 * sizeof(GLfloat)));
-	glVertexAttribPointer(mtx + 0, 4, GL_FLOAT, GL_FALSE, 132, (void *)(16 * sizeof(GLfloat)));
-	glVertexAttribPointer(mtx + 1, 4, GL_FLOAT, GL_FALSE, 132, (void *)(20 * sizeof(GLfloat)));
-	glVertexAttribPointer(mtx + 2, 4, GL_FLOAT, GL_FALSE, 132, (void *)(24 * sizeof(GLfloat)));
-	glVertexAttribPointer(mtx + 3, 4, GL_FLOAT, GL_FALSE, 132, (void *)(28 * sizeof(GLfloat)));
-	//////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
+	//// ALL HERE IS PROBABLY NOT NEEDED
+	//glVertexAttribPointer(size, 2, GL_FLOAT, GL_FALSE, 132, (void *)0);
+	//glVertexAttribPointer(offset, 2, GL_FLOAT, GL_FALSE, 132, (void *)(2 * sizeof(GLfloat)));
+	//glVertexAttribPointer(tint, 4, GL_FLOAT, GL_FALSE, 132, (void *)(4 * sizeof(GLfloat)));
+	//glVertexAttribPointer(textureIndex, 1, GL_UNSIGNED_INT, GL_FALSE, 132, (void *)(sizeof(GLuint)));
+	//glVertexAttribPointer(uv0, 2, GL_FLOAT, GL_FALSE, 132, (void *)(8 * sizeof(GLfloat)));
+	//glVertexAttribPointer(uv1, 2, GL_FLOAT, GL_FALSE, 132, (void *)(10 * sizeof(GLfloat)));
+	//glVertexAttribPointer(uv2, 2, GL_FLOAT, GL_FALSE, 132, (void *)(12 * sizeof(GLfloat)));
+	//glVertexAttribPointer(uv3, 2, GL_FLOAT, GL_FALSE, 132, (void *)(14 * sizeof(GLfloat)));
+	//glVertexAttribPointer(mtx + 0, 4, GL_FLOAT, GL_FALSE, 132, (void *)(16 * sizeof(GLfloat)));
+	//glVertexAttribPointer(mtx + 1, 4, GL_FLOAT, GL_FALSE, 132, (void *)(20 * sizeof(GLfloat)));
+	//glVertexAttribPointer(mtx + 2, 4, GL_FLOAT, GL_FALSE, 132, (void *)(24 * sizeof(GLfloat)));
+	//glVertexAttribPointer(mtx + 3, 4, GL_FLOAT, GL_FALSE, 132, (void *)(28 * sizeof(GLfloat)));
+	////////////////////////////////////////////////////////////////////////////
 
 	glVertexAttribDivisor(size, 1);
 	glVertexAttribDivisor(offset, 1);

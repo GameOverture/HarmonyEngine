@@ -139,7 +139,7 @@ int WidgetAtlasGroup::GetId()
     LoadDrawInst();
     m_DrawInst.SetEnabled(true);
 
-    m_DrawInst.SetTextureIndex(m_DrawInst.GetTextureIndex() + 1);
+    //m_DrawInst.SetTextureIndex(m_DrawInst.GetTextureIndex() + 1);
 
     if(m_pCam)
          m_pCam->SetEnabled(true);
@@ -159,7 +159,7 @@ int WidgetAtlasGroup::GetId()
         m_pCam = hyApp.Window().CreateCamera2d();
 
 
-    QTreeWidgetItem *pItemMouseHover = ui->atlasList->itemAt(m_MouseLocalCoords);
+    //QTreeWidgetItem *pItemMouseHover = ui->atlasList->itemAt(m_MouseLocalCoords);
 
     //m_DrawInst.SetTextureIndex(3);
 

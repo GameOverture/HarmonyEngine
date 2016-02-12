@@ -42,6 +42,9 @@ void Player::Initialize()
 	//m_primBox.Pos().Animate(-1.0f, 0.0f, 5.0f, HyEase::linear);
 
 	m_testSprite.Load();
+
+	m_testSprite.SetTextureIndex(4);
+
 	//m_testSprite.SetUsingLocalCoordinates(true); <--- TODO: this needs to set glViewport() when detected by the renderstate (within DrawRenderState_2d())
 	m_testSprite.SetDisplayOrder(150);
 }

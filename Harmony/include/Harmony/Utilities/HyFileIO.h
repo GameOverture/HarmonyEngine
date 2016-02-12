@@ -17,6 +17,8 @@ char *HyReadTextFile(const char *szFilePath, int *iLength);
 
 std::string HyReadTextFile(const char *szFilePath);
 
+void WriteTextFile(const char *szFilePath, const char *szContentBuffer);
+
 bool HyFileExists(const std::string &sFilePath);
 
 #endif /* __HyFileIO_h__ */

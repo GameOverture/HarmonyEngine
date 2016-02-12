@@ -19,7 +19,7 @@ HyOpenGLShader::~HyOpenGLShader()
 	// Delete shader objects, shader program, and uniforms allocated in the constructor
 
 	// ... Delete shader objects, etc 
-    if(m_hProgHandle > 0)
+	if(m_hProgHandle > 0)
 		glDeleteProgram(m_hProgHandle);
 }
 
