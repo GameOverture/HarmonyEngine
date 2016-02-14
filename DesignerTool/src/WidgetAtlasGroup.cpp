@@ -365,10 +365,10 @@ void WidgetAtlasGroup::Refresh()
 
         HyGuiFrame *pFrame = reinterpret_cast<HyGuiFrame *>(imgInfoRef.id);
 
-        pFrame->SetPackerInfo(bValid ? imgInfoRef.textureId : -1,
-                              imgInfoRef.rotated,
-                              imgInfoRef.pos.x() + m_Packer.border.l,
-                              imgInfoRef.pos.y() + m_Packer.border.t);
+        pFrame->SetInfoFromPacker(bValid ? imgInfoRef.textureId : -1,
+                                  imgInfoRef.rotated,
+                                  imgInfoRef.pos.x() + m_Packer.border.l,
+                                  imgInfoRef.pos.y() + m_Packer.border.t);
 
         QJsonObject frameObj;
         frameObj.insert("hash", QJsonValue(static_cast<qint64>(pFrame->GetHash())));
@@ -560,4 +560,10 @@ QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QStr
     ResizeAtlasListColumns();
 
     return pNewTreeItem;
+}
+
+void WidgetAtlasGroup::on_btnSettings_clicked()
+{
+    m_dlgSettings.DataToWidgets();
+    m_dlgSettings.exec();
 }

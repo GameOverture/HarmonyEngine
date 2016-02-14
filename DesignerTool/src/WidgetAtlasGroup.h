@@ -69,8 +69,8 @@ public:
     QStringList GetLinks()  { return m_sLinks; }
 
     bool IsRotated()        { return m_bRotation; }
-    int GetX()              { return m_iPosX + m_rALPHA_CROP.left(); }
-    int GetY()              { return m_iPosY + m_rALPHA_CROP.top(); }
+    int GetX()              { return m_iPosX + m_rALPHA_CROP.x(); }
+    int GetY()              { return m_iPosY + m_rALPHA_CROP.y(); }
     int GetTextureIndex()   { return m_iTextureIndex; }
     
     void SetLink(QString sFullPath)
@@ -92,11 +92,12 @@ public:
         QVariant v; v.setValue(this);
         m_pTreeItem->setData(0, QTreeWidgetItem::UserType, v);
     }
-    void SetPackerInfo(int iTextureIndex, bool bRotation, int iX, int iY)
+    void SetInfoFromPacker(int iTextureIndex, bool bRotation, int iX, int iY)
     {
         m_iTextureIndex = iTextureIndex;
         m_bRotation = bRotation;
-        m_iPosX = iX;
+        m_iPosX = iX;void on_btnSettings_clicked();
+
         m_iPosY = iY;
     }
     
@@ -160,6 +161,8 @@ public:
 private slots:
     void on_btnAddImages_clicked();
     void on_btnAddDir_clicked();
+
+    void on_btnSettings_clicked();
     
 protected:
     virtual void enterEvent(QEvent *pEvent);

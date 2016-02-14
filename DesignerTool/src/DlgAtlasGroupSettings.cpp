@@ -12,6 +12,7 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(QWidget *parent) :
     ui(new Ui::DlgAtlasGroupSettings)
 {
     ui->setupUi(this);
+    DataFromWidgets();
 }
 
 DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
@@ -19,76 +20,113 @@ DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
     delete ui;
 }
 
+void DlgAtlasGroupSettings::DataFromWidgets()
+{
+    m_iTextureWidth = ui->sbTextureWidth->value();
+    m_iTextureHeight = ui->sbTextureHeight->value();
+    m_iHeuristicIndex = ui->cmbHeuristic->currentIndex();
+    m_iSortOrderIndex = ui->cmbSortOrder->currentIndex();
+    m_iFrameMarginTop = ui->sbFrameMarginTop->value();
+    m_iFrameMarginLeft = ui->sbFrameMarginLeft->value();
+    m_iFrameMarginRight = ui->sbFrameMarginRight->value();
+    m_iFrameMarginBottom = ui->sbFrameMarginBottom->value();
+    m_iExtrude = ui->extrude->value();
+    m_bMerge = ui->chkMerge->isChecked();
+    m_bAutoSize = ui->chkAutosize->isChecked();
+    m_bSquare = ui->chkSquare->isChecked();
+    m_iFillRate = ui->minFillRate->value();
+    m_iRotationStrategyIndex = ui->cmbRotationStrategy->currentIndex();
+}
+
+void DlgAtlasGroupSettings::DataToWidgets()
+{
+    ui->cmbSortOrder->setCurrentIndex(m_iSortOrderIndex);
+    ui->sbFrameMarginTop->setValue(m_iFrameMarginTop);
+    ui->sbFrameMarginLeft->setValue(m_iFrameMarginLeft);
+    ui->sbFrameMarginRight->setValue(m_iFrameMarginRight);
+    ui->sbFrameMarginBottom->setValue(m_iFrameMarginBottom);
+    ui->extrude->setValue(m_iExtrude);
+    ui->chkMerge->setChecked(m_bMerge);
+    ui->chkSquare->setChecked(m_bSquare);
+    ui->chkAutosize->setChecked(m_bAutoSize);
+    ui->minFillRate->setValue(m_iFillRate);
+    ui->cmbRotationStrategy->setCurrentIndex(m_iRotationStrategyIndex);
+
+    ui->sbTextureWidth->setValue(m_iTextureWidth);
+    ui->sbTextureHeight->setValue(m_iTextureHeight);
+    ui->cmbHeuristic->setCurrentIndex(m_iHeuristicIndex);
+}
+
 int DlgAtlasGroupSettings::TextureWidth()
 {
-    return ui->sbTextureWidth->value();
+    return m_iTextureWidth;//ui->sbTextureWidth->value();
 }
 
 int DlgAtlasGroupSettings::TextureHeight()
 {
-    return ui->sbTextureHeight->value();
+    return m_iTextureHeight;//ui->sbTextureHeight->value();
 }
 
 int DlgAtlasGroupSettings::GetHeuristic()
 {
-    return ui->cmbHeuristic->currentIndex();
+    return m_iHeuristicIndex;//ui->cmbHeuristic->currentIndex();
 }
 
 void DlgAtlasGroupSettings::SetPackerSettings(ImagePacker *pPacker)
 {
-    pPacker->sortOrder = ui->cmbSortOrder->currentIndex();
-    pPacker->border.t = ui->sbFrameMarginTop->value();
-    pPacker->border.l = ui->sbFrameMarginLeft->value();
-    pPacker->border.r = ui->sbFrameMarginRight->value();
-    pPacker->border.b = ui->sbFrameMarginBottom->value();
-    pPacker->extrude = ui->extrude->value();
-    pPacker->merge = ui->chkMerge->isChecked();
-    pPacker->square = ui->chkSquare->isChecked();
-    pPacker->autosize = ui->chkAutosize->isChecked();
-    pPacker->minFillRate = ui->minFillRate->value();
+    pPacker->sortOrder = m_iSortOrderIndex;//ui->cmbSortOrder->currentIndex();
+    pPacker->border.t = m_iFrameMarginTop;//ui->sbFrameMarginTop->value();
+    pPacker->border.l = m_iFrameMarginLeft;//ui->sbFrameMarginLeft->value();
+    pPacker->border.r = m_iFrameMarginRight;//ui->sbFrameMarginRight->value();
+    pPacker->border.b = m_iFrameMarginBottom;//ui->sbFrameMarginBottom->value();
+    pPacker->extrude = m_iExtrude;//ui->extrude->value();
+    pPacker->merge = m_bMerge;//ui->chkMerge->isChecked();
+    pPacker->square = m_bSquare;//ui->chkSquare->isChecked();
+    pPacker->autosize = m_bAutoSize;//ui->chkAutosize->isChecked();
+    pPacker->minFillRate = m_iFillRate;//ui->minFillRate->value();
     pPacker->mergeBF = false;
-    pPacker->rotate = ui->cmbRotationStrategy->currentIndex();
+    pPacker->rotate = m_iRotationStrategyIndex;//ui->cmbRotationStrategy->currentIndex();
 }
 
 QJsonObject DlgAtlasGroupSettings::GetSettings()
 {
     QJsonObject settings;
-    settings.insert("cmbSortOrder", QJsonValue(ui->cmbSortOrder->currentIndex()));
-    settings.insert("sbFrameMarginTop", QJsonValue(ui->sbFrameMarginTop->value()));
-    settings.insert("sbFrameMarginLeft", QJsonValue(ui->sbFrameMarginLeft->value()));
-    settings.insert("sbFrameMarginRight", QJsonValue(ui->sbFrameMarginRight->value()));
-    settings.insert("sbFrameMarginBottom", QJsonValue(ui->sbFrameMarginBottom->value()));
-    settings.insert("extrude", QJsonValue(ui->extrude->value()));
-    settings.insert("chkMerge", QJsonValue(ui->chkMerge->isChecked()));
-    settings.insert("chkSquare", QJsonValue(ui->chkSquare->isChecked()));
-    settings.insert("chkAutosize", QJsonValue(ui->chkAutosize->isChecked()));
-    settings.insert("minFillRate", QJsonValue(ui->minFillRate->value()));
-    settings.insert("cmbRotationStrategy", QJsonValue(ui->cmbRotationStrategy->currentIndex()));
+    settings.insert("cmbSortOrder", QJsonValue(m_iSortOrderIndex/*ui->cmbSortOrder->currentIndex()*/));
+    settings.insert("sbFrameMarginTop", QJsonValue(m_iFrameMarginTop/*ui->sbFrameMarginTop->value()*/));
+    settings.insert("sbFrameMarginLeft", QJsonValue(m_iFrameMarginLeft/*ui->sbFrameMarginLeft->value()*/));
+    settings.insert("sbFrameMarginRight", QJsonValue(m_iFrameMarginRight/*ui->sbFrameMarginRight->value()*/));
+    settings.insert("sbFrameMarginBottom", QJsonValue(m_iFrameMarginBottom/*ui->sbFrameMarginBottom->value()*/));
+    settings.insert("extrude", QJsonValue(m_iExtrude/*ui->extrude->value()*/));
+    settings.insert("chkMerge", QJsonValue(m_bMerge/*ui->chkMerge->isChecked()*/));
+    settings.insert("chkSquare", QJsonValue(m_bSquare/*ui->chkSquare->isChecked()*/));
+    settings.insert("chkAutosize", QJsonValue(m_bAutoSize/*ui->chkAutosize->isChecked()*/));
+    settings.insert("minFillRate", QJsonValue(m_iFillRate/*ui->minFillRate->value()*/));
+    settings.insert("cmbRotationStrategy", QJsonValue(m_iRotationStrategyIndex/*ui->cmbRotationStrategy->currentIndex()*/));
 
-    settings.insert("sbTextureWidth", QJsonValue(ui->sbTextureWidth->value()));
-    settings.insert("sbTextureHeight", QJsonValue(ui->sbTextureHeight->value()));
-    settings.insert("cmbHeuristic", QJsonValue(ui->cmbHeuristic->currentIndex()));
+    settings.insert("sbTextureWidth", QJsonValue(m_iTextureWidth/*ui->sbTextureWidth->value()*/));
+    settings.insert("sbTextureHeight", QJsonValue(m_iTextureHeight/*ui->sbTextureHeight->value()*/));
+    settings.insert("cmbHeuristic", QJsonValue(m_iHeuristicIndex/*ui->cmbHeuristic->currentIndex()*/));
 
     return settings;
 }
 
 void DlgAtlasGroupSettings::LoadSettings(QJsonObject settings)
 {
-    ui->cmbSortOrder->setCurrentIndex(JSONOBJ_TOINT(settings, "cmbSortOrder"));
-    ui->sbFrameMarginTop->setValue(JSONOBJ_TOINT(settings, "sbFrameMarginTop"));
-    ui->sbFrameMarginLeft->setValue(JSONOBJ_TOINT(settings, "sbFrameMarginLeft"));
-    ui->sbFrameMarginRight->setValue(JSONOBJ_TOINT(settings, "sbFrameMarginRight"));
-    ui->sbFrameMarginBottom->setValue(JSONOBJ_TOINT(settings, "sbFrameMarginBottom"));
-    ui->extrude->setValue(JSONOBJ_TOINT(settings, "extrude"));
-    ui->chkMerge->setChecked(settings["chkMerge"].toBool());
-    ui->chkSquare->setChecked(settings["chkSquare"].toBool());
-    ui->chkAutosize->setChecked(settings["chkAutosize"].toBool());
-    ui->minFillRate->setValue(JSONOBJ_TOINT(settings, "minFillRate"));
-    ui->cmbRotationStrategy->setCurrentIndex(JSONOBJ_TOINT(settings, "cmbRotationStrategy"));
+    m_iSortOrderIndex = JSONOBJ_TOINT(settings, "cmbSortOrder");
+    m_iFrameMarginTop = JSONOBJ_TOINT(settings, "sbFrameMarginTop");
+    m_iFrameMarginLeft = JSONOBJ_TOINT(settings, "sbFrameMarginLeft");
+    m_iFrameMarginRight = JSONOBJ_TOINT(settings, "sbFrameMarginRight");
+    m_iFrameMarginBottom = JSONOBJ_TOINT(settings, "sbFrameMarginBottom");
+    m_iExtrude = JSONOBJ_TOINT(settings, "extrude");
+    m_bMerge = settings["chkMerge"].toBool();
+    m_bAutoSize = settings["chkAutosize"].toBool();
+    m_bSquare = settings["chkSquare"].toBool();
+    m_iFillRate = JSONOBJ_TOINT(settings, "minFillRate");
+    m_iRotationStrategyIndex = JSONOBJ_TOINT(settings, "cmbRotationStrategy");
 
-    ui->sbTextureWidth->setValue(JSONOBJ_TOINT(settings, "sbTextureWidth"));
-    ui->sbTextureHeight->setValue(JSONOBJ_TOINT(settings, "sbTextureHeight"));
-    ui->cmbHeuristic->setCurrentIndex(JSONOBJ_TOINT(settings, "cmbHeuristic"));
+    m_iTextureWidth = JSONOBJ_TOINT(settings, "sbTextureWidth");
+    m_iTextureHeight = JSONOBJ_TOINT(settings, "sbTextureHeight");
+    m_iHeuristicIndex = JSONOBJ_TOINT(settings, "cmbHeuristic");
 }
 
 void DlgAtlasGroupSettings::on_cmbSortOrder_currentIndexChanged(int index)
@@ -193,34 +231,10 @@ void DlgAtlasGroupSettings::on_btnTexSize2048_clicked()
 
 void DlgAtlasGroupSettings::on_buttonBox_accepted()
 {
-//    if(m_bSettingsDirty)
-//    {
-//        QMessageBox dlg(QMessageBox::Question, "Harmony Designer Tool", "Atlas texture settings have changed. Would you like to save settings and regenerate all textures?", QMessageBox::Yes | QMessageBox::Cancel);
-//        switch(dlg.exec())
-//        {
-//        case QMessageBox::Yes:
-//            // Save was clicked. Reload every texture with new settings, then show 'frames'
-//            SaveSettings();
-//            RepackFrames();
-//            break;
-//        case QMessageBox::No:
-//            // Don't Save was clicked. Restore the cached settings and show the 'frames'
-
-//            break;
-//        case QMessageBox::Cancel:
-//            // Cancel was clicked. Don't do anything and stay on the 'settings'
-//            return;
-//        default:
-//            // should never be reached
-//            break;
-//        }
-//    }
-
-//    ui->stackedWidget->setCurrentIndex(PAGE_Frames);
-//    m_bSettingsDirty = false;
+    DataFromWidgets();
 }
 
 void DlgAtlasGroupSettings::on_buttonBox_rejected()
 {
-    //LoadSettings();
+    DataToWidgets();
 }

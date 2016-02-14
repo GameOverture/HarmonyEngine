@@ -12,12 +12,32 @@ class DlgAtlasGroupSettings;
 class DlgAtlasGroupSettings : public QDialog
 {
     Q_OBJECT
+
+    QString     m_sName;
     
-    bool                        m_bSettingsDirty;
+    int         m_iTextureWidth;
+    int         m_iTextureHeight;
+    int         m_iHeuristicIndex;
+    int         m_iSortOrderIndex;
+    int         m_iFrameMarginTop;
+    int         m_iFrameMarginLeft;
+    int         m_iFrameMarginRight;
+    int         m_iFrameMarginBottom;
+    int         m_iExtrude;
+    bool        m_bMerge;
+    bool        m_bAutoSize;
+    bool        m_bSquare;
+    int         m_iFillRate;
+    int         m_iRotationStrategyIndex;
+
+    bool        m_bSettingsDirty;
 
 public:
     explicit DlgAtlasGroupSettings(QWidget *parent = 0);
     ~DlgAtlasGroupSettings();
+
+    void DataFromWidgets();
+    void DataToWidgets();
     
     int TextureWidth();
     int TextureHeight();
