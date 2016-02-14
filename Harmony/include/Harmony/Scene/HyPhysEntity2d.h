@@ -60,7 +60,7 @@ public:
 
 	void SetLinearVelocity(vec2 vVel)								{ b2Vec2 vb2Vel(vVel.x, vVel.y); m_b2Body->SetLinearVelocity(vb2Vel); }
 	void SetLinearVelocity(float fX, float fY)						{ b2Vec2 vb2Vel(fX, fY); m_b2Body->SetLinearVelocity(vb2Vel); }
-	void ApplyLinearImpulse(vec2 vLinearImpulse)					{ m_b2Body->ApplyLinearImpulse(b2Vec2(vLinearImpulse.x, vLinearImpulse.y), b2Vec2(m_ptPosition.Get().x, m_ptPosition.Get().y), true); }
+	void ApplyLinearImpulse(vec2 vLinearImpulse)					{ m_b2Body->ApplyLinearImpulse(b2Vec2(vLinearImpulse.x, vLinearImpulse.y), b2Vec2(pos.Get().x, pos.Get().y), true); }
 	void SetFixedRotation(bool bEnable)								{ m_b2Body->SetFixedRotation(bEnable); }
 
 	bool IsGrounded(int32 iFixtureIndex)							{ return (m_Fixtures[iFixtureIndex].m_uiFlags & tFixture::FIXTUREFLAG_IsGrounded) != 0; }

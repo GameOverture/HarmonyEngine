@@ -23,7 +23,7 @@ Player::~Player(void)
 void Player::Initialize()
 {
 	m_primBox.Load();
-	m_primBox.Color().Set(0.0f, 0.0f, 1.0f, 1.0f);
+	m_primBox.color.Set(0.0f, 0.0f, 1.0f, 1.0f);
 	m_primBox.SetAsQuad(15.0f, 15.0f, false);
 	m_primBox.SetDisplayOrder(100);
 
@@ -42,7 +42,7 @@ void Player::Initialize()
 	//m_primBox.Pos().Animate(-1.0f, 0.0f, 5.0f, HyEase::linear);
 
 	m_testSprite.Load();
-	m_testSprite.SetTextureSource(0, 0, 0, 100, 100);
+	m_testSprite.SetTextureSource(0, 0, 0, 107, 160);
 
 
 	//m_testSprite.SetUsingLocalCoordinates(true); <--- TODO: this needs to set glViewport() when detected by the renderstate (within DrawRenderState_2d())

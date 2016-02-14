@@ -22,10 +22,6 @@ class ITransform
 {
 protected:
 	HyCoordinateType	m_eCoordType;
-	
-	tVec				m_ptPosition;
-	HyAnimVec3			m_vRotation;
-	tVec				m_vScale;
 
 	tVec				m_ptRotationAnchor;
 	tVec				m_ptScaleAnchor;
@@ -37,9 +33,10 @@ public:
 	ITransform();
 	virtual ~ITransform(void);
 
-	inline tVec &Pos()											{ return m_ptPosition; }
-	inline HyAnimVec3 &Rot()									{ return m_vRotation; }
-	inline tVec &Scale()										{ return m_vScale; }
+	// Exposing these HyAnimVec's for user API convenience
+	tVec				pos;
+	HyAnimVec3			rot;
+	tVec				scale;
 
 	HyCoordinateType GetCoordinateType()						{ return m_eCoordType; }
 	virtual void SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion);
@@ -57,7 +54,7 @@ public:
 template<typename tVec>
 ITransform<tVec>::ITransform() :	m_eCoordType(HYCOORD_Default), m_fpOnDirty(NULL), m_pOnDirtyParam(NULL)
 {
-	m_vScale.Set(1.0f);
+	scale.Set(1.0f);
 }
 
 template<typename tVec>
@@ -84,9 +81,9 @@ template<typename tVec>
 		return;
 
 	if(m_eCoordType == HYCOORD_Meter)
-		m_ptPosition /= HyScene::PixelsPerMeter();
+		pos /= HyScene::PixelsPerMeter();
 	else
-		m_ptPosition *= HyScene::PixelsPerMeter();
+		pos *= HyScene::PixelsPerMeter();
 }
 
 template<typename tVec>
@@ -98,21 +95,21 @@ void ITransform<tVec>::GetLocalTransform(mat4 &outMtx) const
 
 	vec3 ptPos(0.0f);
 
-	ptPos.x = m_ptPosition.X();
-	ptPos.y = m_ptPosition.Y();
+	ptPos.x = pos.X();
+	ptPos.y = pos.Y();
 
 	vec3 vScale(1.0f);
-	vScale.x = m_vScale.X();
-	vScale.y = m_vScale.Y();
+	vScale.x = scale.X();
+	vScale.y = scale.Y();
 
 	if(m_eCoordType == HYCOORD_Meter)
 		outMtx = glm::translate(outMtx, ptPos * HyScene::PixelsPerMeter());
 	else
 		outMtx = glm::translate(outMtx, ptPos);
 
-	outMtx = glm::rotate(outMtx, m_vRotation.Get().x, vec3(1, 0, 0));
-	outMtx = glm::rotate(outMtx, m_vRotation.Get().y, vec3(0, 1, 0));
-	outMtx = glm::rotate(outMtx, m_vRotation.Get().z, vec3(0, 0, 1));
+	outMtx = glm::rotate(outMtx, rot.Get().x, vec3(1, 0, 0));
+	outMtx = glm::rotate(outMtx, rot.Get().y, vec3(0, 1, 0));
+	outMtx = glm::rotate(outMtx, rot.Get().z, vec3(0, 0, 1));
 	outMtx = glm::scale(outMtx, vScale);
 }
 
@@ -124,17 +121,17 @@ void ITransform<tVec>::GetLocalTransform_SRT(mat4 &outMtx) const
 	// TODO: Make this support 3d by exposing 'NumDimensions' in AnimVec and loop, assign tVec's using bracket overload
 	
 	vec3 ptPos(0.0f);
-	ptPos.x = m_ptPosition.X();
-	ptPos.y = m_ptPosition.Y();
+	ptPos.x = pos.X();
+	ptPos.y = pos.Y();
 
 	vec3 vScale(1.0f);
-	vScale.x = m_vScale.X();
-	vScale.y = m_vScale.Y();
+	vScale.x = scale.X();
+	vScale.y = scale.Y();
 
 	outMtx = glm::scale(outMtx, vScale);
-	outMtx = glm::rotate(outMtx, m_vRotation.Get().x, vec3(1, 0, 0));
-	outMtx = glm::rotate(outMtx, m_vRotation.Get().y, vec3(0, 1, 0));
-	outMtx = glm::rotate(outMtx, m_vRotation.Get().z, vec3(0, 0, 1));
+	outMtx = glm::rotate(outMtx, rot.Get().x, vec3(1, 0, 0));
+	outMtx = glm::rotate(outMtx, rot.Get().y, vec3(0, 1, 0));
+	outMtx = glm::rotate(outMtx, rot.Get().z, vec3(0, 0, 1));
 	
 	if(m_eCoordType == HYCOORD_Meter)
 		outMtx = glm::translate(outMtx, ptPos * HyScene::PixelsPerMeter());
@@ -148,9 +145,9 @@ void ITransform<tVec>::SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pPara
 	m_fpOnDirty = fpOnDirty;
 	m_pOnDirtyParam = pParam;
 
-	m_ptPosition.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
-	m_vRotation.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
-	m_vScale.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
+	pos.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
+	rot.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
+	scale.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
 }
 
 #endif /* __ITransform_h__ */

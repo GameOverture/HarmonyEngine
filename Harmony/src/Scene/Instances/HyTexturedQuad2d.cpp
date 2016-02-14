@@ -107,14 +107,14 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);
 
 	vec2 vSize((m_SrcRect.width - m_SrcRect.x) * pData->GetAtlasGroup()->GetWidth(), (m_SrcRect.height - m_SrcRect.y) * pData->GetAtlasGroup()->GetHeight());
-	vec2 vOffset(m_ptPosition.X(), m_ptPosition.Y());
+	vec2 vOffset(pos.X(), pos.Y());
 
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vSize;
 	pRefDataWritePos += sizeof(vec2);
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vOffset;
 	pRefDataWritePos += sizeof(vec2);
 
-	*reinterpret_cast<vec4 *>(pRefDataWritePos) = m_vColor.Get();
+	*reinterpret_cast<vec4 *>(pRefDataWritePos) = color.Get();
 	pRefDataWritePos += sizeof(vec4);
 
 	*reinterpret_cast<uint32 *>(pRefDataWritePos) = m_uiTextureIndex;

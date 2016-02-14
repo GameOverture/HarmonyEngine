@@ -114,39 +114,39 @@ int32 HyPhysEntity2d::AddEdgeChainFixture(vec2 *pVertices, uint32 uiNumVerts, bo
 {
 	b2Transform b2Trans = m_b2Body->GetTransform();
 
-	if(m_ptPrevPos != m_ptPosition.Get())
+	if(m_ptPrevPos != pos.Get())
 	{
 		// Grab angle from box2d if it hasn't been set manually
-		if(m_fPrevRotation == m_vRotation.Get().z)
-			m_vRotation.Z(b2Trans.q.GetAngle());
+		if(m_fPrevRotation == rot.Get().z)
+			rot.Z(b2Trans.q.GetAngle());
 
 		if(m_eCoordType == HYCOORD_Pixel)
-			m_b2Body->SetTransform(b2Vec2(m_ptPosition.X() / HyScene::PixelsPerMeter(), m_ptPosition.Y() / HyScene::PixelsPerMeter()), m_vRotation.Z());
+			m_b2Body->SetTransform(b2Vec2(pos.X() / HyScene::PixelsPerMeter(), pos.Y() / HyScene::PixelsPerMeter()), rot.Z());
 		else
-			m_b2Body->SetTransform(b2Vec2(m_ptPosition.X(), m_ptPosition.Y()), m_vRotation.Z());
+			m_b2Body->SetTransform(b2Vec2(pos.X(), pos.Y()), rot.Z());
 	}
 	else
 	{
-		if(m_fPrevRotation != m_vRotation.Z())
-			m_b2Body->SetTransform(b2Trans.p, m_vRotation.Z());
+		if(m_fPrevRotation != rot.Z())
+			m_b2Body->SetTransform(b2Trans.p, rot.Z());
 		else
-			m_vRotation.Z(b2Trans.q.GetAngle());
+			rot.Z(b2Trans.q.GetAngle());
 
 		// Grab position and convert it if necessary from box2d 
 		if(m_eCoordType == HYCOORD_Pixel)
 		{
-			m_ptPosition.X(b2Trans.p.x * HyScene::PixelsPerMeter());
-			m_ptPosition.Y(b2Trans.p.y * HyScene::PixelsPerMeter());
+			pos.X(b2Trans.p.x * HyScene::PixelsPerMeter());
+			pos.Y(b2Trans.p.y * HyScene::PixelsPerMeter());
 		}
 		else
 		{
-			m_ptPosition.X(b2Trans.p.x);
-			m_ptPosition.Y(b2Trans.p.y);
+			pos.X(b2Trans.p.x);
+			pos.Y(b2Trans.p.y);
 		}
 	}
 
-	m_ptPrevPos = m_ptPosition.Get();
-	m_fPrevRotation = m_vRotation.Get().z;
+	m_ptPrevPos = pos.Get();
+	m_fPrevRotation = rot.Get().z;
 }
 
 // For internal engine use

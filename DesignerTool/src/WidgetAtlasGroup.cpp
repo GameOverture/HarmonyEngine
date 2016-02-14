@@ -159,9 +159,19 @@ int WidgetAtlasGroup::GetId()
 {
     for(uint i = 0; i < m_FrameList.size(); ++i)
     {
-        m_FrameList[i]->Hide();
+        m_FrameList[i]->SetVisible(false, false);
     }
-    ui->atlasList->selectedItems(
+
+    QList<QTreeWidgetItem *> selectedItems = ui->atlasList->selectedItems();
+
+    for(uint i = 0; i < selectedItems.size(); ++i)
+    {
+        QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
+        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
+
+        if(pFrame)
+            pFrame->SetVisible(true, true);
+    }
 
 
     //QTreeWidgetItem *pItemMouseHover = ui->atlasList->itemAt(m_MouseLocalCoords);

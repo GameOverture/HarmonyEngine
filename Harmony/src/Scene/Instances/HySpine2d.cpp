@@ -152,11 +152,11 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 	//m_pSpineSkeleton->x = m_ptPosition.Get().x * fCoordModifier;
 	//m_pSpineSkeleton->y = m_ptPosition.Get().y * fCoordModifier;
 	
-	const vec4 &color = m_vColor.Get();
-	m_pSpineSkeleton->r = color.r;
-	m_pSpineSkeleton->g = color.g;
-	m_pSpineSkeleton->b = color.b;
-	m_pSpineSkeleton->a = color.a;
+	const vec4 &rawColor = color.Get();
+	m_pSpineSkeleton->r = rawColor.r;
+	m_pSpineSkeleton->g = rawColor.g;
+	m_pSpineSkeleton->b = rawColor.b;
+	m_pSpineSkeleton->a = rawColor.a;
 
 	//m_pSpineSkeleton->root->rotation = m_vRotation.Get().z;
 

@@ -169,7 +169,7 @@ void HyPrimitive2d::ClearData()
 
 /*virtual*/ void HyPrimitive2d::WriteDrawBufferData(char *&pRefDataWritePos)
 {
-	memcpy(pRefDataWritePos, &Color().Get(), sizeof(vec4));
+	memcpy(pRefDataWritePos, &color.Get(), sizeof(vec4));
 	pRefDataWritePos += sizeof(vec4);
 
 	mat4 mtx;

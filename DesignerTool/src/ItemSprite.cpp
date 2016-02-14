@@ -17,8 +17,8 @@ ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
     vLinePts[1].y = 2048.0f;
     m_primOriginVert.SetAsEdgeChain(vLinePts, 2, false);
     
-    m_primOriginHorz.Color().Set(1.0f, 0.0f, 0.0f, 1.0f);
-    m_primOriginVert.Color().Set(1.0f, 0.0f, 0.0f, 1.0f);
+    m_primOriginHorz.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
+    m_primOriginVert.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
     
     m_primOriginHorz.Load();
     m_primOriginVert.Load();

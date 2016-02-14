@@ -98,16 +98,16 @@ TestBed::~TestBed(void)
 
 
 	if(Input().IsBtnDown(CAM_LEFT))
-		m_pCam->Pos().Offset(-0.5f, 0.0f);
+		m_pCam->pos.Offset(-0.5f, 0.0f);
 
 	if(Input().IsBtnDown(CAM_RIGHT))
-		m_pCam->Pos().Offset(0.5f, 0.0f);
+		m_pCam->pos.Offset(0.5f, 0.0f);
 
 	if(Input().IsBtnDown(CAM_UP))
-		m_pCam->Pos().Offset(0.0f, 0.5f);
+		m_pCam->pos.Offset(0.0f, 0.5f);
 
 	if(Input().IsBtnDown(CAM_DOWN))
-		m_pCam->Pos().Offset(0.0f, -0.5f);
+		m_pCam->pos.Offset(0.0f, -0.5f);
 
 	if(Input().IsBtnDownBuffered(SEND_LOG))
 	{

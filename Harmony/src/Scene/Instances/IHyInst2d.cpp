@@ -26,7 +26,7 @@ IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char 
 																							m_uiDisplayOrder(0),
 																							m_iTag(0)
 {
-	m_vColor.Set(1.0f);
+	color.Set(1.0f);
 	SetOnDirtyCallback(OnDirty, this);
 }
 

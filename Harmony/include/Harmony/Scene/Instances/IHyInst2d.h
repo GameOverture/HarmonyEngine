@@ -45,7 +45,6 @@ protected:
 
 	// Attributes
 	bool						m_bEnabled;
-	HyAnimVec4					m_vColor;
 	uint32						m_uiDisplayOrder;	// Lower values are displayed front-most
 	HyRenderState				m_RenderState;
 	int32						m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
@@ -69,7 +68,7 @@ public:
 	const HyRenderState &GetRenderState() const					{ return m_RenderState; }
 	void SetUsingLocalCoordinates(bool bUseLocalCoords)			{ bUseLocalCoords ? m_RenderState.Enable(HyRenderState::USINGLOCALCOORDS) : m_RenderState.Disable(HyRenderState::USINGLOCALCOORDS); }
 
-	inline HyAnimVec4 &Color()									{ return m_vColor; }
+	HyAnimVec4													color;
 
 	inline int32 GetTag()										{ return m_iTag; }
 	inline void SetTag(int32 iTag)								{ m_iTag = iTag; }

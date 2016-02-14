@@ -36,8 +36,8 @@ public:
 	// All values are [0.0 - 1.0] representing percentages of the entire game window
 	void SetViewport(float fPosX, float fPosY, float fWidth, float fHeight);
 
-	inline void SetZoom(const float fZoom)		{ m_vScale.Set(fZoom, fZoom); }
-	inline float GetZoom() const				{ return m_vScale.Get().x; }
+	inline void SetZoom(const float fZoom)		{ scale.Set(fZoom, fZoom); }
+	inline float GetZoom() const				{ return scale.Get().x; }
 };
 
 #endif /* __HyCamera2d_h__ */

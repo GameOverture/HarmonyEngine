@@ -50,27 +50,27 @@ public:
                                                                                                                         m_DrawTexture(uiAtlasGroupIndex),
                                                                                                                         m_pTreeItem(NULL)
     {
-        m_DrawOutline.Color().Set(1.0f, 0.0f, 0.0f, 1.0f);
+        m_DrawOutline.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
         m_DrawOutline.SetAsQuad(iW, iH, true);
         m_DrawOutline.SetDisplayOrder(0);
 
-        m_DrawTexture.SetTextureSource(iTexIndex, iX, iY, iW, iH);
-        m_DrawTexture.Pos().Set(iX, iY);
+        m_DrawTexture.SetTextureSource(iTexIndex, GetX(), GetY(), GetSize().width(), GetSize().height());
         m_DrawTexture.SetDisplayOrder(1);
+        m_DrawTexture.SetEnabled(false);
 
         m_DrawTexture.AddChild(m_DrawOutline);
     }
     
     quint32 GetHash()       { return m_uiHASH; }
     QString GetName()       { return m_sNAME; }
-    QSize GetSize()         { return QSize(m_iWIDTH, m_iHEIGHT); }
+    QSize GetSize()         { return QSize(m_iWIDTH - m_rALPHA_CROP.left() - m_rALPHA_CROP.right(), m_iHEIGHT - m_rALPHA_CROP.top() - m_rALPHA_CROP.bottom()); }
     QRect GetCrop()         { return m_rALPHA_CROP; }
     QPoint GetPosition()    { return QPoint(m_iPosX, m_iPosY); }
     QStringList GetLinks()  { return m_sLinks; }
 
     bool IsRotated()        { return m_bRotation; }
-    int GetX()              { return m_iPosX; }
-    int GetY()              { return m_iPosY; }
+    int GetX()              { return m_iPosX + m_rALPHA_CROP.left(); }
+    int GetY()              { return m_iPosY + m_rALPHA_CROP.top(); }
     int GetTextureIndex()   { return m_iTextureIndex; }
     
     void SetLink(QString sFullPath)
@@ -117,7 +117,7 @@ public:
 
     void SetVisible(bool bOutline, bool bFrame)
     {
-        m_DrawOutline.SetEnabled
+        m_DrawOutline.SetEnabled(bOutline);
     }
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)
