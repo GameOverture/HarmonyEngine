@@ -14,16 +14,16 @@ ItemProject::~ItemProject()
     delete m_pAtlasManager;
 }
 
-/*virtual*/ void ItemProject::Show()
+/*virtual*/ void ItemProject::Show(IHyApplication &hyApp)
 {
     if(m_eState == DRAWSTATE_AtlasManager)
-        m_pAtlasManager->Show();
+        m_pAtlasManager->Show(hyApp);
 }
 
-/*virtual*/ void ItemProject::Hide()
+/*virtual*/ void ItemProject::Hide(IHyApplication &hyApp)
 {
     if(m_eState == DRAWSTATE_AtlasManager)
-        m_pAtlasManager->Hide();
+        m_pAtlasManager->Hide(hyApp);
 }
 
 /*virtual*/ void ItemProject::Draw(IHyApplication &hyApp)

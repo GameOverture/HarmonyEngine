@@ -35,6 +35,7 @@ protected:
 	// Data loading
 	IHyData *					m_pData;
 	HyLoadState					m_eLoadState;
+	bool						m_bInvalidLoad;
 
 	// Scene graph hierarchy 
 	IHyInst2d *					m_pParent;

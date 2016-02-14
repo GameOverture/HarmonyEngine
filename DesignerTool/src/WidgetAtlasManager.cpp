@@ -60,6 +60,8 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
         }
     }
 
+
+
 //    // Find atlasInfo.json file
 //    for(unsigned int i = 0; i < atlasDirs.size(); ++i)
 //    {
@@ -126,15 +128,15 @@ void WidgetAtlasManager::HideAtlasGroup()
     MainWindow::CloseItem(m_pProjOwner);
 }
 
-/*virtual*/ void WidgetAtlasManager::Show()
+/*virtual*/ void WidgetAtlasManager::Show(IHyApplication &hyApp)
 {
-    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->Show();
+    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->Show(hyApp);
 }
 
-/*virtual*/ void WidgetAtlasManager::Hide()
+/*virtual*/ void WidgetAtlasManager::Hide(IHyApplication &hyApp)
 {
     for(int i = 0; i < ui->atlasGroups->count(); ++i)
-        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->Hide();
+        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->Hide(hyApp);
 }
 
 /*virtual*/ void WidgetAtlasManager::Draw(IHyApplication &hyApp)
@@ -173,5 +175,15 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
     QDir newDataAtlasDir(m_DataDir);
     newDataAtlasDir.cd(HyGlobal::MakeFileNameFromCounter(iId));
 
-    ui->atlasGroups->setCurrentIndex(ui->atlasGroups->addWidget(new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this)));
+    WidgetAtlasGroup *pNewAtlas = new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this);
+    ui->atlasGroups->setCurrentIndex(ui->atlasGroups->addWidget(pNewAtlas));
+}
+
+void WidgetAtlasManager::on_atlasGroups_currentChanged(int iIndex)
+{
+//    if(ui->atlasGroups->currentWidget())
+//    {
+//        ui->atlasGroups->currentWidget()->metaObject()
+//        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->ResizeAtlasListColumns();
+//    }
 }

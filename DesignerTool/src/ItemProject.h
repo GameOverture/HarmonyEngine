@@ -30,8 +30,8 @@ public:
     QString GetPath() const                             { return m_sPath; }
     
     // Item overrides
-    virtual void Show();
-    virtual void Hide();
+    virtual void Show(IHyApplication &hyApp);
+    virtual void Hide(IHyApplication &hyApp);
     
     virtual void Draw(IHyApplication &hyApp);
     

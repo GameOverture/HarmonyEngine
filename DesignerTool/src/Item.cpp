@@ -35,12 +35,12 @@ QString Item::GetName() const
     return itemInfo.baseName();
 }
 
-/*virtual*/ void Item::Show()
+/*virtual*/ void Item::Show(IHyApplication &hyApp)
 {
     HYLOG("Tried to Show() a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
-/*virtual*/ void Item::Hide()
+/*virtual*/ void Item::Hide(IHyApplication &hyApp)
 {
     HYLOG("Tried to Hide() a non-derived item: " % GetName(), LOGTYPE_Error);
 }

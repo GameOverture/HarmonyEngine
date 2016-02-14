@@ -30,6 +30,8 @@
 
 #include "Assets/HyAssetManager.h"
 
+#include "Utilities/HyMath.h"
+
 class HyEngine
 {
 	friend class HyGuiRenderer;

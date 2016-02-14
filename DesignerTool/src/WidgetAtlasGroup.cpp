@@ -17,7 +17,6 @@
 #include "WidgetRenderer.h"
 
 WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
-                                                        m_DrawInst(0),
                                                         ui(new Ui::WidgetAtlasGroup)
 {
     ui->setupUi(this);
@@ -29,13 +28,13 @@ WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
 WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) :   QWidget(parent),
                                                                                     m_MetaDir(metaDir),
                                                                                     m_DataDir(dataDir),
-                                                                                    m_DrawInst(GetId()),
                                                                                     m_pCam(NULL),
                                                                                     ui(new Ui::WidgetAtlasGroup)
-{
+{    
     ui->setupUi(this);
 
     ui->atlasList->setSelectionMode(QAbstractItemView::MultiSelection);
+    ui->atlasList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     QFile metaAtlasFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaDataAtlasFileName));
     if(metaAtlasFile.exists())
@@ -62,6 +61,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
             HyGuiFrame *pNewFrame = new HyGuiFrame(frameObj["hash"].toInt(),
                                                    frameObj["name"].toString(),
                                                    rAlphaCrop,
+                                                   GetId(),
                                                    frameObj["width"].toInt(),
                                                    frameObj["height"].toInt(),
                                                    frameObj["textureIndex"].toInt(),
@@ -73,23 +73,24 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
             for(int k = 0; k < frameLinksArray.size(); ++k)
                 pNewFrame->SetLink(frameLinksArray[k].toString());
 
-            QTreeWidgetItem *pTextureTreeItem = NULL;
             eAtlasNodeType eIconType = ATLAS_Frame_Warning;
-            if(frameObj["textureIndex"].toInt() >= 0)
+            int iTexIndex = frameObj["textureIndex"].toInt();
+            if(iTexIndex >= 0)
             {
-                while(m_TextureList.empty() || m_TextureList.size() <= frameObj["textureIndex"].toInt())
-                    m_TextureList.append(CreateTreeItem(NULL, "Texture: " % QString::number(m_TextureList.size()), ATLAS_Texture));
+                //while(m_TextureList.empty() || m_TextureList.size() <= frameObj["textureIndex"].toInt())
+                //    m_TextureList.append(CreateTreeItem(NULL, "Texture: " % QString::number(m_TextureList.size()), ATLAS_Texture));
 
-                pTextureTreeItem = m_TextureList[frameObj["textureIndex"].toInt()];
+                //pTextureTreeItem = m_TextureList[];
                 eIconType = ATLAS_Frame;
             }
 
-            pNewFrame->SetTreeWidgetItem(CreateTreeItem(pTextureTreeItem, frameObj["name"].toString(), eIconType));
+            pNewFrame->SetTreeWidgetItem(CreateTreeItem(NULL, frameObj["name"].toString(), iTexIndex, eIconType));
             
             m_FrameList.append(pNewFrame);
         }
 
         ui->atlasList->expandAll();
+        LoadDrawInst();
     }
 }
 
@@ -134,10 +135,13 @@ int WidgetAtlasGroup::GetId()
     return m_MetaDir.dirName().toInt();
 }
 
-/*virtual*/ void WidgetAtlasGroup::Show()
+/*virtual*/ void WidgetAtlasGroup::Show(IHyApplication &hyApp)
 {
     LoadDrawInst();
-    m_DrawInst.SetEnabled(true);
+    if(m_pCam == NULL)
+        m_pCam = hyApp.Window().CreateCamera2d();
+
+    ResizeAtlasListColumns();
 
     //m_DrawInst.SetTextureIndex(m_DrawInst.GetTextureIndex() + 1);
 
@@ -145,18 +149,19 @@ int WidgetAtlasGroup::GetId()
          m_pCam->SetEnabled(true);
 }
 
-/*virtual*/ void WidgetAtlasGroup::Hide()
+/*virtual*/ void WidgetAtlasGroup::Hide(IHyApplication &hyApp)
 {
-    m_DrawInst.SetEnabled(false);
-    
     if(m_pCam)
         m_pCam->SetEnabled(false);
 }
 
 /*virtual*/ void WidgetAtlasGroup::Draw(IHyApplication &hyApp)
 {
-    if(m_pCam == NULL)
-        m_pCam = hyApp.Window().CreateCamera2d();
+    for(uint i = 0; i < m_FrameList.size(); ++i)
+    {
+        m_FrameList[i]->Hide();
+    }
+    ui->atlasList->selectedItems(
 
 
     //QTreeWidgetItem *pItemMouseHover = ui->atlasList->itemAt(m_MouseLocalCoords);
@@ -170,6 +175,15 @@ int WidgetAtlasGroup::GetId()
 //    }
 
     //m_DrawInst.SetTextureIndex(
+}
+
+void WidgetAtlasGroup::ResizeAtlasListColumns()
+{
+    if(ui->atlasList == NULL)
+        return;
+
+    int iTotalWidth = ui->atlasList->size().width();
+    ui->atlasList->setColumnWidth(0, iTotalWidth - 60);
 }
 
 void WidgetAtlasGroup::on_btnAddImages_clicked()
@@ -242,7 +256,7 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
 {
     HYLOG("AtlasGroup mouseMoveEvent(): Enter", LOGTYPE_Normal);
     WidgetAtlasManager *pAtlasMan = static_cast<WidgetAtlasManager *>(parent()->parent());
-    
+
     pAtlasMan->PreviewAtlasGroup();
     QWidget::enterEvent(pEvent);
 }
@@ -274,7 +288,7 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
         quint32 uiHash = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
         QRect rAlphaCrop = m_Packer.crop(newImage);
 
-        HyGuiFrame *pNewFrame = new HyGuiFrame(uiHash, fileInfo.baseName(), rAlphaCrop, newImage.width(), newImage.height(), -1, false, -1, -1);
+        HyGuiFrame *pNewFrame = new HyGuiFrame(uiHash, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
         
         newImage.save(m_MetaDir.path() % "/" % pNewFrame->ConstructImageFileName());
         
@@ -290,7 +304,6 @@ void WidgetAtlasGroup::Refresh()
     QElapsedTimer timerStartRefresh;
     timerStartRefresh.start();
 
-    m_TextureList.clear();
     ui->atlasList->clear();
     m_Packer.clear();
     QStringList sTextureNames = m_DataDir.entryList();
@@ -326,8 +339,6 @@ void WidgetAtlasGroup::Refresh()
         pTexture->fill(Qt::transparent);
 
         ppPainters[i] = new QPainter(pTexture);
-
-        m_TextureList.append(CreateTreeItem(NULL, "Texture: " % QString::number(i), ATLAS_Texture));
     }
 
     QJsonArray frameArray;
@@ -369,11 +380,11 @@ void WidgetAtlasGroup::Refresh()
 
         if(bValid == false)
         {
-            pFrame->SetTreeWidgetItem(CreateTreeItem(NULL, pFrame->GetName(), ATLAS_Frame_Warning));
+            pFrame->SetTreeWidgetItem(CreateTreeItem(NULL, pFrame->GetName(), -1, ATLAS_Frame_Warning));
             continue;
         }
         else
-            pFrame->SetTreeWidgetItem(CreateTreeItem(m_TextureList[pFrame->GetTextureIndex()], pFrame->GetName(), ATLAS_Frame));
+            pFrame->SetTreeWidgetItem(CreateTreeItem(NULL, pFrame->GetName(), pFrame->GetTextureIndex(), ATLAS_Frame));
 
         QImage imgFrame(imgInfoRef.path);
 
@@ -498,8 +509,7 @@ void WidgetAtlasGroup::Refresh()
             sReloadPaths.append(sLink);
     }
     
-    m_DrawInst.Unload();
-    m_DrawInst.Load();
+    LoadDrawInst();
     
     MainWindow::ReloadItems(sReloadPaths);
 
@@ -510,13 +520,11 @@ void WidgetAtlasGroup::Refresh()
 
 void WidgetAtlasGroup::LoadDrawInst()
 {
-    m_DrawInst.Load();
-    
     foreach(HyGuiFrame *pFrame, m_FrameList)
         pFrame->LoadDrawInst();
 }
 
-QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType)
+QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType)
 {
     QTreeWidgetItem *pNewTreeItem;
     if(pParent == NULL)
@@ -527,6 +535,11 @@ QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QStr
     pNewTreeItem->setText(0, sName);
     pNewTreeItem->setIcon(0, HyGlobal::AtlasIcon(eType));
 
+    if(iTextureIndex >= 0)
+        pNewTreeItem->setText(1, "Tex:" % QString::number(iTextureIndex));
+    else
+        pNewTreeItem->setText(1, "Invalid");
+
 //    QVariant v; v.setValue(pItem);
 //    v.in
 //    pNewTreeItem->setData(0, Qt::UserRole, v);
@@ -534,7 +547,7 @@ QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QStr
     if(pParent)
         pParent->addChild(pNewTreeItem);
 
-    return pNewTreeItem;
+    ResizeAtlasListColumns();
 
-    return NULL;
+    return pNewTreeItem;
 }

@@ -6,8 +6,8 @@
 class IHyGuiDrawItem
 {
 protected:
-    virtual void Show() = 0;
-    virtual void Hide() = 0;
+    virtual void Show(IHyApplication &hyApp) = 0;
+    virtual void Hide(IHyApplication &hyApp) = 0;
 
     virtual void Draw(IHyApplication &hyApp) = 0;
 };

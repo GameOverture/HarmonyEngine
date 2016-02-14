@@ -70,6 +70,9 @@ struct HyRectangle
 
 	HyRectangle() : x(0), y(0), width(0), height(0), iTag(0)
 	{ }
+
+	HyRectangle(T tX, T tY, T tWidth, T tHeight) : x(tX), y(tY), width(tWidth), height(tHeight), iTag(0)
+	{ }
 };
 
 #endif /* __HyMath_h__ */

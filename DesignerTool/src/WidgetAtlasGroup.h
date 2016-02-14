@@ -34,11 +34,11 @@ class HyGuiFrame
     QTreeWidgetItem *   m_pTreeItem;
     QStringList         m_sLinks;
     
-    // Draw members
-    HyPrimitive2d       m_DrawInst;
+    HyTexturedQuad2d    m_DrawTexture;
+    HyPrimitive2d       m_DrawOutline;
 
 public:
-    HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) : m_uiHASH(uiCRC),
+    HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupIndex, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) : m_uiHASH(uiCRC),
                                                                                                                         m_sNAME(sN),
                                                                                                                         m_iWIDTH(iW),
                                                                                                                         m_iHEIGHT(iH),
@@ -47,11 +47,18 @@ public:
                                                                                                                         m_bRotation(bRot),
                                                                                                                         m_iPosX(iX),
                                                                                                                         m_iPosY(iY),
+                                                                                                                        m_DrawTexture(uiAtlasGroupIndex),
                                                                                                                         m_pTreeItem(NULL)
     {
-        m_DrawInst.Color().Set(1.0f, 0.0f, 0.0f, 1.0f);
-        m_DrawInst.SetAsQuad(15.0f, 15.0f, false);
-        m_DrawInst.SetDisplayOrder(100);
+        m_DrawOutline.Color().Set(1.0f, 0.0f, 0.0f, 1.0f);
+        m_DrawOutline.SetAsQuad(iW, iH, true);
+        m_DrawOutline.SetDisplayOrder(0);
+
+        m_DrawTexture.SetTextureSource(iTexIndex, iX, iY, iW, iH);
+        m_DrawTexture.Pos().Set(iX, iY);
+        m_DrawTexture.SetDisplayOrder(1);
+
+        m_DrawTexture.AddChild(m_DrawOutline);
     }
     
     quint32 GetHash()       { return m_uiHASH; }
@@ -104,7 +111,13 @@ public:
     
     void LoadDrawInst()
     {
-        m_DrawInst.Load();
+        m_DrawOutline.Load();
+        m_DrawTexture.Load();
+    }
+
+    void SetVisible(bool bOutline, bool bFrame)
+    {
+        m_DrawOutline.SetEnabled
     }
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)
@@ -119,12 +132,11 @@ class WidgetAtlasGroup : public QWidget, public IHyGuiDrawItem
 
     DlgAtlasGroupSettings       m_dlgSettings;
     
-    QList<QTreeWidgetItem *>    m_TextureList;
+    //QList<QTreeWidgetItem *>    m_TextureList;
     QList<HyGuiFrame *>         m_FrameList;
     ImagePacker                 m_Packer;
     
     // Draw members
-    HyTexturedQuad2d            m_DrawInst;
     HyCamera2d *                m_pCam;
 
     QPoint                      m_MouseLocalCoords;
@@ -138,10 +150,12 @@ public:
     
     int GetId();
     
-    virtual void Show();
-    virtual void Hide();
+    virtual void Show(IHyApplication &hyApp);
+    virtual void Hide(IHyApplication &hyApp);
 
     virtual void Draw(IHyApplication &hyApp);
+
+    void ResizeAtlasListColumns();
 
 private slots:
     void on_btnAddImages_clicked();
@@ -161,7 +175,7 @@ private:
     
     void LoadDrawInst();
 
-    QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, eAtlasNodeType eType);
+    QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType);
 };
 
 #endif // WIDGETATLASGROUP_H

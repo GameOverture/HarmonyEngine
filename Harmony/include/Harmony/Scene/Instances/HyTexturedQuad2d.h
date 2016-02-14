@@ -13,18 +13,21 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Scene/Instances/IHyInst2d.h"
+#include "Utilities/HyMath.h"
 
 class HyTexturedQuad2d : public IHyInst2d
 {
-	uint32		m_uiTextureIndex;
-
+	uint32					m_uiTextureIndex;
+	HyRectangle<float>		m_SrcRect;
 public:
 	HyTexturedQuad2d(uint32 uiAtlasGroupId);
 	virtual ~HyTexturedQuad2d();
 
 	uint32 GetAtlasGroupId() const;
 
-	void SetTextureIndex(uint32 uiTextureIndex);
+	void SetTextureSource(uint32 uiTextureIndex);
+	void SetTextureSource(uint32 uiTextureIndex, int iX, int iY, int iWidth, int iHeight);
+
 	uint32 GetTextureIndex();
 
 	uint32 GetTextureWidth();

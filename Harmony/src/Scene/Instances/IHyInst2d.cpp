@@ -19,6 +19,7 @@ IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char 
 																							m_sNAME(szName ? szName : ""),
 																							m_pData(NULL),
 																							m_eLoadState(HYLOADSTATE_Inactive),
+																							m_bInvalidLoad(false),
 																							m_pParent(NULL),
 																							m_bDirty(true),
 																							m_bEnabled(true),
@@ -43,7 +44,13 @@ void IHyInst2d::Load()
 	if(GetCoordinateType() == HYCOORD_Default && HyScene::DefaultCoordinateType() != HYCOORD_Default)
 		SetCoordinateType(HyScene::DefaultCoordinateType(), true);
 
-	sm_pAssetManager->LoadInst2d(this);
+	if(sm_pAssetManager)
+	{
+		sm_pAssetManager->LoadInst2d(this);
+		m_bInvalidLoad = false;
+	}
+	else
+		m_bInvalidLoad = true;
 }
 
 void IHyInst2d::Unload()

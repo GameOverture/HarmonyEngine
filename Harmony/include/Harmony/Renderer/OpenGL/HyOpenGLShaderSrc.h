@@ -27,7 +27,7 @@ layout(location = 8) in mat4 mtxLocalToWorld;								\n\
 																			\n\
 smooth out vec4 interpColor;												\n\
 smooth out vec2 interpUV;													\n\
-out unsigned int texIndex;													\n\
+flat out unsigned int texIndex;												\n\
 																			\n\
 uniform mat4 mtxCameraToClipMatrix;											\n\
 uniform mat4 mtxWorldToCameraMatrix;										\n\
@@ -78,7 +78,7 @@ const char *szHYQUADBATCH_FRAGMENTSHADER = "								\n\
 																			\n\
 smooth in vec4 interpColor;													\n\
 smooth in vec2 interpUV;													\n\
-in unsigned int texIndex;													\n\
+flat in unsigned int texIndex;												\n\
 																			\n\
 uniform sampler2DArray Tex;													\n\
 																			\n\

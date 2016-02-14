@@ -32,8 +32,8 @@ public:
     
     void SetTreeItem(QTreeWidgetItem *pTreeItem)    { m_pTreeItemPtr = pTreeItem; }
     
-    virtual void Show();
-    virtual void Hide();
+    virtual void Show(IHyApplication &hyApp);
+    virtual void Hide(IHyApplication &hyApp);
 
     virtual void Draw(IHyApplication &hyApp);
     

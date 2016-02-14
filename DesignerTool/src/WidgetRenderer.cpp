@@ -73,7 +73,7 @@ void WidgetRenderer::CloseItem(Item *pItem)
 {
     if(m_pActiveItemProj == pItem)
     {
-        m_pActiveItemProj->Hide();
+        m_pActiveItemProj->Hide(*this);
         m_pActiveItemProj = NULL;
         ShowItem(GetItem());
     }
@@ -111,15 +111,15 @@ void WidgetRenderer::ShowItem(Item *pItem)
         return;
     
     if(m_pActiveItemProj)
-        m_pActiveItemProj->Hide();
+        m_pActiveItemProj->Hide(*this);
                 
     for(int i = 0; i < ui->tabWidget->count(); ++i)
-        GetItem(i)->Hide();
+        GetItem(i)->Hide(*this);
 
     if(pItem->GetType() == ITEM_Project)
         m_pActiveItemProj = static_cast<ItemProject *>(pItem);
         
-    pItem->Show();
+    pItem->Show(*this);
 }
 
 void WidgetRenderer::on_tabWidget_currentChanged(int iIndex)
