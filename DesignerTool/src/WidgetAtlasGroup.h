@@ -63,14 +63,14 @@ public:
     
     quint32 GetHash()       { return m_uiHASH; }
     QString GetName()       { return m_sNAME; }
-    QSize GetSize()         { return QSize(m_iWIDTH - m_rALPHA_CROP.left() - m_rALPHA_CROP.right(), m_iHEIGHT - m_rALPHA_CROP.top() - m_rALPHA_CROP.bottom()); }
+    QSize GetSize()         { return QSize(m_iWIDTH, m_iHEIGHT); }
     QRect GetCrop()         { return m_rALPHA_CROP; }
     QPoint GetPosition()    { return QPoint(m_iPosX, m_iPosY); }
     QStringList GetLinks()  { return m_sLinks; }
 
     bool IsRotated()        { return m_bRotation; }
-    int GetX()              { return m_iPosX + m_rALPHA_CROP.x(); }
-    int GetY()              { return m_iPosY + m_rALPHA_CROP.y(); }
+    int GetX()              { return m_iPosX; }
+    int GetY()              { return m_iPosY; }
     int GetTextureIndex()   { return m_iTextureIndex; }
     
     void SetLink(QString sFullPath)

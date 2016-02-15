@@ -22,6 +22,8 @@ DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
 
 void DlgAtlasGroupSettings::DataFromWidgets()
 {
+    m_sName = ui->txtName->text();
+
     m_iTextureWidth = ui->sbTextureWidth->value();
     m_iTextureHeight = ui->sbTextureHeight->value();
     m_iHeuristicIndex = ui->cmbHeuristic->currentIndex();
@@ -40,6 +42,8 @@ void DlgAtlasGroupSettings::DataFromWidgets()
 
 void DlgAtlasGroupSettings::DataToWidgets()
 {
+    ui->txtName->setText(m_sName);
+
     ui->cmbSortOrder->setCurrentIndex(m_iSortOrderIndex);
     ui->sbFrameMarginTop->setValue(m_iFrameMarginTop);
     ui->sbFrameMarginLeft->setValue(m_iFrameMarginLeft);
@@ -55,6 +59,16 @@ void DlgAtlasGroupSettings::DataToWidgets()
     ui->sbTextureWidth->setValue(m_iTextureWidth);
     ui->sbTextureHeight->setValue(m_iTextureHeight);
     ui->cmbHeuristic->setCurrentIndex(m_iHeuristicIndex);
+}
+
+QString DlgAtlasGroupSettings::GetName()
+{
+    return m_sName;
+}
+
+void DlgAtlasGroupSettings::SetName(QString sName)
+{
+    m_sName = sName;
 }
 
 int DlgAtlasGroupSettings::TextureWidth()
@@ -91,6 +105,9 @@ void DlgAtlasGroupSettings::SetPackerSettings(ImagePacker *pPacker)
 QJsonObject DlgAtlasGroupSettings::GetSettings()
 {
     QJsonObject settings;
+
+    settings.insert("txtName", QJsonValue(m_sName));
+
     settings.insert("cmbSortOrder", QJsonValue(m_iSortOrderIndex/*ui->cmbSortOrder->currentIndex()*/));
     settings.insert("sbFrameMarginTop", QJsonValue(m_iFrameMarginTop/*ui->sbFrameMarginTop->value()*/));
     settings.insert("sbFrameMarginLeft", QJsonValue(m_iFrameMarginLeft/*ui->sbFrameMarginLeft->value()*/));
@@ -112,6 +129,8 @@ QJsonObject DlgAtlasGroupSettings::GetSettings()
 
 void DlgAtlasGroupSettings::LoadSettings(QJsonObject settings)
 {
+    m_sName = settings["txtName"].toString();
+
     m_iSortOrderIndex = JSONOBJ_TOINT(settings, "cmbSortOrder");
     m_iFrameMarginTop = JSONOBJ_TOINT(settings, "sbFrameMarginTop");
     m_iFrameMarginLeft = JSONOBJ_TOINT(settings, "sbFrameMarginLeft");

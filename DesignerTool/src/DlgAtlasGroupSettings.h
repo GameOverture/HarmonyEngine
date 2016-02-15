@@ -38,6 +38,9 @@ public:
 
     void DataFromWidgets();
     void DataToWidgets();
+
+    QString GetName();
+    void SetName(QString sName);
     
     int TextureWidth();
     int TextureHeight();

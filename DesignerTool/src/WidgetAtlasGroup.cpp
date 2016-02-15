@@ -89,6 +89,8 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
             m_FrameList.append(pNewFrame);
         }
 
+        ui->groupBox->setTitle(m_dlgSettings.GetName());
+
         ui->atlasList->expandAll();
         LoadDrawInst();
     }
@@ -115,8 +117,8 @@ void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObj)
             frameArrayList.append(QJsonArray());
         
         QJsonObject frameObj;
-        frameObj.insert("width", QJsonValue(m_FrameList[i]->GetSize().width()));
-        frameObj.insert("height", QJsonValue(m_FrameList[i]->GetSize().height()));
+        frameObj.insert("width", QJsonValue(m_FrameList[i]->GetCrop().right() - m_FrameList[i]->GetCrop().left()));
+        frameObj.insert("height", QJsonValue(m_FrameList[i]->GetCrop().bottom() - m_FrameList[i]->GetCrop().top()));
         frameObj.insert("rotate", QJsonValue(m_FrameList[i]->IsRotated()));
         frameObj.insert("x", QJsonValue(m_FrameList[i]->GetX()));
         frameObj.insert("y", QJsonValue(m_FrameList[i]->GetY()));
@@ -314,12 +316,16 @@ void WidgetAtlasGroup::Refresh()
     QElapsedTimer timerStartRefresh;
     timerStartRefresh.start();
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // CLEARING EXISTING DATA
     ui->atlasList->clear();
     m_Packer.clear();
-    QStringList sTextureNames = m_DataDir.entryList();
+    QStringList sTextureNames = m_DataDir.entryList(QDir::NoDotAndDotDot);
     foreach(QString sTexName, sTextureNames)
         QFile::remove(sTexName);
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // REPOPULATING THE PACKER WITH 'm_FrameList'
     for(int i = 0; i < m_FrameList.size(); ++i)
     {
         m_Packer.addItem(m_FrameList[i]->GetSize(),
@@ -339,18 +345,22 @@ void WidgetAtlasGroup::Refresh()
     qint64 i64TimePack = timerStartPack.elapsed();
     clock_t timeEndPack = clock();
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // CREATE EMPTY TEXTURES
     QPainter **ppPainters = new QPainter *[m_Packer.bins.size()];
     for(int i = 0; i < m_Packer.bins.size(); ++i)
     {
         if(m_dlgSettings.TextureWidth() != m_Packer.bins[i].width() || m_dlgSettings.TextureHeight() != m_Packer.bins[i].height())
             HYLOG("WidgetAtlasGroup::Refresh() Mismatching texture dimentions", LOGTYPE_Error);
 
-        QImage *pTexture = new QImage(m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight(), QImage::Format_ARGB32);
+        QImage *pTexture = new QImage(m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight(), QImage::Format_ARGB32);  // TODO: BitsPerPixel configurable here?
         pTexture->fill(Qt::transparent);
 
         ppPainters[i] = new QPainter(pTexture);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // GO THROUGH PACKER'S IMAGES AND DRAW THEM TO TEXTURES, WHILE KEEPING JSON ARRAY (FOR META-FILE)
     QJsonArray frameArray;
     for(int i = 0; i < m_Packer.images.size(); ++i)
     {
@@ -379,6 +389,10 @@ void WidgetAtlasGroup::Refresh()
         frameObj.insert("rotate", QJsonValue(pFrame->IsRotated()));
         frameObj.insert("x", QJsonValue(pFrame->GetX()));
         frameObj.insert("y", QJsonValue(pFrame->GetY()));
+        frameObj.insert("cropLeft", QJsonValue(pFrame->GetCrop().left()));
+        frameObj.insert("cropTop", QJsonValue(pFrame->GetCrop().top()));
+        frameObj.insert("cropRight", QJsonValue(pFrame->GetCrop().right()));
+        frameObj.insert("cropBottom", QJsonValue(pFrame->GetCrop().bottom()));
 
         QJsonArray frameLinksArray;
         QStringList sLinks = pFrame->GetLinks();
@@ -471,14 +485,16 @@ void WidgetAtlasGroup::Refresh()
             p.drawImage(pos.x(), pos.y(), imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
     }
 
-    // Save all textures out to atlas data dir
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // SAVE ALL TEXTURES OUT TO ATLAS DATA DIR
     for(int i = 0; i < m_Packer.bins.size(); ++i)
     {
         QImage *pTexture = static_cast<QImage *>(ppPainters[i]->device());
         pTexture->save(m_DataDir.absolutePath() % "/" % HyGlobal::MakeFileNameFromCounter(i) % ".png");
     }
 
-    // Write settings file to atlas meta dir
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // WRITE SETTINGS FILE TO ATLAS META DIR
     QJsonObject settingsObj = m_dlgSettings.GetSettings();
     settingsObj.insert("frames", frameArray);
 
@@ -507,7 +523,8 @@ void WidgetAtlasGroup::Refresh()
     HYLOG("Atlas Group Refresh done in: " % QString::number(static_cast<float>((timeEndRefresh - timeStartRefresh) / CLOCKS_PER_SEC)), LOGTYPE_Info);
     HYLOG("Atlas Group Pack done in:    " % QString::number(static_cast<float>((timeEndPack - timeStartPack) / CLOCKS_PER_SEC)), LOGTYPE_Info);
 
-    // Regenerate the atlas data info file
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)
     WidgetAtlasManager *pAtlasManager = reinterpret_cast<WidgetAtlasManager *>(this->parent()->parent());
     pAtlasManager->SaveData();
     
@@ -564,6 +581,9 @@ QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QStr
 
 void WidgetAtlasGroup::on_btnSettings_clicked()
 {
+    if(m_dlgSettings.GetName().isEmpty())
+        m_dlgSettings.SetName("Atlas Group " % QString::number(GetId()));
+
     m_dlgSettings.DataToWidgets();
     m_dlgSettings.exec();
 }
