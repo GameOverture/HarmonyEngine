@@ -39,24 +39,23 @@ class HyGuiFrame
 
 public:
     HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupIndex, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) : m_uiHASH(uiCRC),
-                                                                                                                        m_sNAME(sN),
-                                                                                                                        m_iWIDTH(iW),
-                                                                                                                        m_iHEIGHT(iH),
-                                                                                                                        m_rALPHA_CROP(rAlphaCrop),
-                                                                                                                        m_iTextureIndex(iTexIndex),
-                                                                                                                        m_bRotation(bRot),
-                                                                                                                        m_iPosX(iX),
-                                                                                                                        m_iPosY(iY),
-                                                                                                                        m_DrawTexture(uiAtlasGroupIndex),
-                                                                                                                        m_pTreeItem(NULL)
+                                                                                                                                                m_sNAME(sN),
+                                                                                                                                                m_iWIDTH(iW),
+                                                                                                                                                m_iHEIGHT(iH),
+                                                                                                                                                m_rALPHA_CROP(rAlphaCrop),
+                                                                                                                                                m_iTextureIndex(iTexIndex),
+                                                                                                                                                m_bRotation(bRot),
+                                                                                                                                                m_iPosX(iX),
+                                                                                                                                                m_iPosY(iY),
+                                                                                                                                                m_DrawTexture(uiAtlasGroupIndex),
+                                                                                                                                                m_pTreeItem(NULL)
     {
         m_DrawOutline.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
-        m_DrawOutline.SetAsQuad(iW, iH, true);
+        m_DrawOutline.SetAsQuad(m_rALPHA_CROP.width(), m_rALPHA_CROP.height(), true);
         m_DrawOutline.SetDisplayOrder(0);
 
-        m_DrawTexture.SetTextureSource(iTexIndex, GetX(), GetY(), GetSize().width(), GetSize().height());
+        m_DrawTexture.SetTextureSource(iTexIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
         m_DrawTexture.SetDisplayOrder(1);
-        m_DrawTexture.SetEnabled(false);
 
         m_DrawTexture.AddChild(m_DrawOutline);
     }
@@ -96,9 +95,10 @@ public:
     {
         m_iTextureIndex = iTextureIndex;
         m_bRotation = bRotation;
-        m_iPosX = iX;void on_btnSettings_clicked();
-
+        m_iPosX = iX;
         m_iPosY = iY;
+
+        m_DrawTexture.SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
     }
     
     QString ConstructImageFileName()
@@ -110,10 +110,16 @@ public:
         return sMetaImgName;
     }
     
-    void LoadDrawInst()
+    void DrawLoad()
     {
         m_DrawOutline.Load();
         m_DrawTexture.Load();
+    }
+
+    void DrawUnload()
+    {
+        m_DrawOutline.Unload();
+        m_DrawTexture.Unload();
     }
 
     void SetVisible(bool bOutline, bool bFrame)
@@ -138,8 +144,6 @@ class WidgetAtlasGroup : public QWidget, public IHyGuiDrawItem
     ImagePacker                 m_Packer;
     
     // Draw members
-    HyCamera2d *                m_pCam;
-
     QPoint                      m_MouseLocalCoords;
 
 public:
@@ -150,11 +154,12 @@ public:
     void GetAtlasInfo(QJsonObject &atlasObj);
     
     int GetId();
-    
-    virtual void Show(IHyApplication &hyApp);
-    virtual void Hide(IHyApplication &hyApp);
 
-    virtual void Draw(IHyApplication &hyApp);
+    virtual void OnDraw_Open(IHyApplication &hyApp);
+    virtual void OnDraw_Close(IHyApplication &hyApp);
+    virtual void OnDraw_Show(IHyApplication &hyApp);
+    virtual void OnDraw_Hide(IHyApplication &hyApp);
+    virtual void OnDraw_Update(IHyApplication &hyApp);
 
     void ResizeAtlasListColumns();
 
@@ -175,8 +180,6 @@ private:
     
     void ImportImages(QStringList sImportImgList);
     void Refresh();
-    
-    void LoadDrawInst();
 
     QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType);
 };

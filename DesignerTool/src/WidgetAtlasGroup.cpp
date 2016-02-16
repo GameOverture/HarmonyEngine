@@ -28,7 +28,6 @@ WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
 WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) :   QWidget(parent),
                                                                                     m_MetaDir(metaDir),
                                                                                     m_DataDir(dataDir),
-                                                                                    m_pCam(NULL),
                                                                                     ui(new Ui::WidgetAtlasGroup)
 {    
     ui->setupUi(this);
@@ -92,7 +91,6 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
         ui->groupBox->setTitle(m_dlgSettings.GetName());
 
         ui->atlasList->expandAll();
-        LoadDrawInst();
     }
 }
 
@@ -137,27 +135,29 @@ int WidgetAtlasGroup::GetId()
     return m_MetaDir.dirName().toInt();
 }
 
-/*virtual*/ void WidgetAtlasGroup::Show(IHyApplication &hyApp)
+/*virtual*/ void WidgetAtlasGroup::OnDraw_Open(IHyApplication &hyApp)
 {
-    LoadDrawInst();
-    if(m_pCam == NULL)
-        m_pCam = hyApp.Window().CreateCamera2d();
+    foreach(HyGuiFrame *pFrame, m_FrameList)
+        pFrame->DrawLoad();
 
     ResizeAtlasListColumns();
-
-    //m_DrawInst.SetTextureIndex(m_DrawInst.GetTextureIndex() + 1);
-
-    if(m_pCam)
-         m_pCam->SetEnabled(true);
 }
 
-/*virtual*/ void WidgetAtlasGroup::Hide(IHyApplication &hyApp)
+/*virtual*/ void WidgetAtlasGroup::OnDraw_Close(IHyApplication &hyApp)
 {
-    if(m_pCam)
-        m_pCam->SetEnabled(false);
+    foreach(HyGuiFrame *pFrame, m_FrameList)
+        pFrame->DrawUnload();
 }
 
-/*virtual*/ void WidgetAtlasGroup::Draw(IHyApplication &hyApp)
+/*virtual*/ void WidgetAtlasGroup::OnDraw_Show(IHyApplication &hyApp)
+{
+}
+
+/*virtual*/ void WidgetAtlasGroup::OnDraw_Hide(IHyApplication &hyApp)
+{
+}
+
+/*virtual*/ void WidgetAtlasGroup::OnDraw_Update(IHyApplication &hyApp)
 {
     for(uint i = 0; i < m_FrameList.size(); ++i)
     {
@@ -174,19 +174,6 @@ int WidgetAtlasGroup::GetId()
         if(pFrame)
             pFrame->SetVisible(true, true);
     }
-
-
-    //QTreeWidgetItem *pItemMouseHover = ui->atlasList->itemAt(m_MouseLocalCoords);
-
-    //m_DrawInst.SetTextureIndex(3);
-
-//    for(int i = 0; i < ui->atlasList->topLevelItemCount(); ++i)
-//    {
-//        if(ui->atlasList->topLevelItem(i) == pItemMouseHover)
-//            m_DrawInst.SetTextureIndex(i);
-//    }
-
-    //m_DrawInst.SetTextureIndex(
 }
 
 void WidgetAtlasGroup::ResizeAtlasListColumns()
@@ -536,19 +523,12 @@ void WidgetAtlasGroup::Refresh()
             sReloadPaths.append(sLink);
     }
     
-    LoadDrawInst();
-    
-    MainWindow::ReloadItems(sReloadPaths);
+
+    MainWindow::ReloadItems(sReloadPaths, true);
 
     ui->atlasList->expandAll();
     
     pAtlasManager->PreviewAtlasGroup();
-}
-
-void WidgetAtlasGroup::LoadDrawInst()
-{
-    foreach(HyGuiFrame *pFrame, m_FrameList)
-        pFrame->LoadDrawInst();
 }
 
 QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType)

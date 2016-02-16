@@ -100,9 +100,9 @@ public:
 	void LoadInst2d(IHyInst2d *pInst);
 	void RemoveInst(IHyInst2d *pInst);
 
-	bool Reload();											// Reload every instance
-	bool Reload(std::vector<std::string> &vPathsRef);		// Reload only the specified instances
-	bool Reload(std::string sNewDataDirPath);				// Unload everything, and reinitialize to a new data directory. Doesn't load up anything when done.
+	bool Reload(bool bRefreshAssets);										// Reload every instance
+	bool Reload(std::vector<std::string> &vPathsRef, bool bRefreshAssets);	// Reload only the specified instances
+	bool Reload(std::string sNewDataDirPath);								// Unload everything, and reinitialize to a new data directory. Doesn't load up anything when done.
 	eHyReloadCode IsReloading();
 
 	std::string GetNewDataDirPath();

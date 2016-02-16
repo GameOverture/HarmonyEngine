@@ -37,7 +37,7 @@ public:
     
     static void SetSelectedProj(ItemProject *pProj);
     
-    static void ReloadItems(QStringList &sPaths);
+    static void ReloadItems(QStringList &sPaths, bool bRefreshAssets);
 
 private slots:
     void on_actionNewProject_triggered();

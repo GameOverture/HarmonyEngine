@@ -183,10 +183,16 @@ void HyAssetManager::RemoveInst(IHyInst2d *pInst)
 }
 
 // Reload every instance
-bool HyAssetManager::Reload()
+bool HyAssetManager::Reload(bool bRefreshAssets)
 {
 	if(m_bIsReloading)
 		return false;
+
+	// 'm_sNewDataDirPath' is the indicator within HyEngine whether to refresh the Assets
+	if(bRefreshAssets)
+		m_sNewDataDirPath = m_sDATADIR;
+	else
+		m_sNewDataDirPath.clear();
 
 	m_vReloadInsts.clear();
 	m_SceneRef.CopyAllInsts(m_vReloadInsts);
@@ -203,11 +209,17 @@ bool HyAssetManager::Reload()
 }
 
 // Reload only the specified instances
-bool HyAssetManager::Reload(std::vector<std::string> &vPathsRef)
+bool HyAssetManager::Reload(std::vector<std::string> &vPathsRef, bool bRefreshAssets)
 {
 	// TODO: Deep copy 'vPathsRef' vector of strings to 'm_vReloadInsts' so we only reload the specified contents. vPathsRef can be deleted after this function
 	if(m_bIsReloading)
 		return false;
+
+	// 'm_sNewDataDirPath' is the indicator within HyEngine whether to refresh the Assets
+	if(bRefreshAssets)
+		m_sNewDataDirPath = m_sDATADIR;
+	else
+		m_sNewDataDirPath.clear();
 
 	m_vReloadInsts.clear();
 	m_SceneRef.CopyAllInsts(m_vReloadInsts);
@@ -252,7 +264,6 @@ eHyReloadCode HyAssetManager::IsReloading()
 
 	Update();
 
-	// Does data still exist
 	if(DoesAnyDataExist())
 		return HYRELOADCODE_InProgress;
 
@@ -260,7 +271,6 @@ eHyReloadCode HyAssetManager::IsReloading()
 
 	if(m_sNewDataDirPath.empty() == false)
 	{
-
 		m_vReloadInsts.clear();
 		return HYRELOADCODE_ReInit;
 	}

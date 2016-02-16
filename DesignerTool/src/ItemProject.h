@@ -12,6 +12,8 @@ class ItemProject : public Item
     friend class WidgetExplorer;
     
     WidgetAtlasManager *        m_pAtlasManager;
+
+    QTabWidget *                m_pRendererTabs;
     
     enum eDrawState
     {
@@ -28,12 +30,12 @@ public:
     WidgetAtlasManager *GetAtlasManager()               { return m_pAtlasManager; }
     QString GetPath(QString sAppendRelativePath) const  { return m_sPath % sAppendRelativePath; }
     QString GetPath() const                             { return m_sPath; }
-    
-    // Item overrides
-    virtual void Show(IHyApplication &hyApp);
-    virtual void Hide(IHyApplication &hyApp);
-    
-    virtual void Draw(IHyApplication &hyApp);
+
+    virtual void OnDraw_Open(IHyApplication &hyApp);
+    virtual void OnDraw_Close(IHyApplication &hyApp);
+    virtual void OnDraw_Show(IHyApplication &hyApp);
+    virtual void OnDraw_Hide(IHyApplication &hyApp);
+    virtual void OnDraw_Update(IHyApplication &hyApp);
     
     void SetAtlasGroupDrawState(int iAtlasGrpId);
 };

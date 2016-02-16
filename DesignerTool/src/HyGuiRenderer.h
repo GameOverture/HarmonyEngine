@@ -22,8 +22,8 @@ public:
     virtual void paintGL();
     virtual void resizeGL(int w, int h);
     
-    void Reload();
-    void Reload(QStringList &sReloadPaths);
+    void Reload(bool bRefreshAssets);
+    void Reload(QStringList &sReloadPaths, bool bRefreshAssets);
     void Reload(QString &sNewDataDir);
 
 private:

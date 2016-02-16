@@ -32,10 +32,11 @@ public:
     void PreviewAtlasGroup();
     void HideAtlasGroup();
 
-    virtual void Show(IHyApplication &hyApp);
-    virtual void Hide(IHyApplication &hyApp);
-
-    virtual void Draw(IHyApplication &hyApp);
+    virtual void OnDraw_Open(IHyApplication &hyApp);
+    virtual void OnDraw_Close(IHyApplication &hyApp);
+    virtual void OnDraw_Show(IHyApplication &hyApp);
+    virtual void OnDraw_Hide(IHyApplication &hyApp);
+    virtual void OnDraw_Update(IHyApplication &hyApp);
 
 private slots:
     void on_atlasGroups_currentChanged(int iIndex);

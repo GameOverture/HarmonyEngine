@@ -148,9 +148,9 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
-/*static*/ void MainWindow::ReloadItems(QStringList &sPaths)
+/*static*/ void MainWindow::ReloadItems(QStringList &sPaths, bool bRefreshAssets)
 {
-    sm_pInstance->ui->renderer->GetRenderer()->Reload(sPaths);
+    sm_pInstance->ui->renderer->GetRenderer()->Reload(sPaths, bRefreshAssets);
     sm_pInstance->m_pDebugConnection->WriteReloadPacket(sPaths);
 }
 

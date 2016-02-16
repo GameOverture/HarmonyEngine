@@ -35,19 +35,29 @@ QString Item::GetName() const
     return itemInfo.baseName();
 }
 
-/*virtual*/ void Item::Show(IHyApplication &hyApp)
+/*virtual*/ void Item::OnDraw_Open(IHyApplication &hyApp)
 {
-    HYLOG("Tried to Show() a non-derived item: " % GetName(), LOGTYPE_Error);
+    HYLOG("Tried to OnDraw_Open() a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
-/*virtual*/ void Item::Hide(IHyApplication &hyApp)
+/*virtual*/ void Item::OnDraw_Close(IHyApplication &hyApp)
 {
-    HYLOG("Tried to Hide() a non-derived item: " % GetName(), LOGTYPE_Error);
+    HYLOG("Tried to OnDraw_Close() a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
-/*virtual*/ void Item::Draw(IHyApplication &hyApp)
+/*virtual*/ void Item::OnDraw_Show(IHyApplication &hyApp)
 {
-    HYLOG("Tried to draw a non-derived item: " % GetName(), LOGTYPE_Error);
+    HYLOG("Tried to OnDraw_Show() a non-derived item: " % GetName(), LOGTYPE_Error);
+}
+
+/*virtual*/ void Item::OnDraw_Hide(IHyApplication &hyApp)
+{
+    HYLOG("Tried to OnDraw_Hide() a non-derived item: " % GetName(), LOGTYPE_Error);
+}
+
+/*virtual*/ void Item::OnDraw_Update(IHyApplication &hyApp)
+{
+    HYLOG("Tried to OnDraw_Update() a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
 /*virtual*/ void Item::Save()

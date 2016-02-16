@@ -42,13 +42,13 @@ HyGuiRenderer::~HyGuiRenderer()
     GetHyApp()->Window().SetResolution(glm::ivec2(w, h));
 }
 
-void HyGuiRenderer::Reload()
+void HyGuiRenderer::Reload(bool bRefreshAssets)
 {
     if(m_pHyEngine)
-        m_pHyEngine->m_pAssetManager->Reload();
+        m_pHyEngine->m_pAssetManager->Reload(bRefreshAssets);
 }
 
-void HyGuiRenderer::Reload(QStringList &sReloadPaths)
+void HyGuiRenderer::Reload(QStringList &sReloadPaths, bool bRefreshAssets)
 {
     if(!m_pHyEngine)
         return;
@@ -57,7 +57,7 @@ void HyGuiRenderer::Reload(QStringList &sReloadPaths)
     foreach(QString sPath, sReloadPaths)
         vReloadPaths.push_back(sPath.toStdString());
     
-    m_pHyEngine->m_pAssetManager->Reload(vReloadPaths);
+    m_pHyEngine->m_pAssetManager->Reload(vReloadPaths, bRefreshAssets);
 }
 
 void HyGuiRenderer::Reload(QString &sNewDataDir)

@@ -128,20 +128,30 @@ void WidgetAtlasManager::HideAtlasGroup()
     MainWindow::CloseItem(m_pProjOwner);
 }
 
-/*virtual*/ void WidgetAtlasManager::Show(IHyApplication &hyApp)
+/*virtual*/ void WidgetAtlasManager::OnDraw_Open(IHyApplication &hyApp)
 {
-    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->Show(hyApp);
+    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->OnDraw_Open(hyApp);
 }
 
-/*virtual*/ void WidgetAtlasManager::Hide(IHyApplication &hyApp)
+/*virtual*/ void WidgetAtlasManager::OnDraw_Close(IHyApplication &hyApp)
+{
+    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->OnDraw_Close(hyApp);
+}
+
+/*virtual*/ void WidgetAtlasManager::OnDraw_Show(IHyApplication &hyApp)
+{
+    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->OnDraw_Show(hyApp);
+}
+
+/*virtual*/ void WidgetAtlasManager::OnDraw_Hide(IHyApplication &hyApp)
 {
     for(int i = 0; i < ui->atlasGroups->count(); ++i)
-        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->Hide(hyApp);
+        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->OnDraw_Hide(hyApp);
 }
 
-/*virtual*/ void WidgetAtlasManager::Draw(IHyApplication &hyApp)
+/*virtual*/ void WidgetAtlasManager::OnDraw_Update(IHyApplication &hyApp)
 {
-    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->Draw(hyApp);
+    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->OnDraw_Update(hyApp);
 }
 
 void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)

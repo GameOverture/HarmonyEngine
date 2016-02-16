@@ -31,7 +31,7 @@ HyGuiRenderer *WidgetRenderer::GetRenderer()
 /*virtual*/ bool WidgetRenderer::Update()
 {
     if(GetItem())
-        GetItem()->Draw(*this);
+        GetItem()->OnDraw_Update(*this);
 
     return true;
 }
@@ -46,6 +46,8 @@ void WidgetRenderer::ClearItems()
 {
     ui->tabWidget->clear();
 }
+
+// TODO: NEED TO CALL OPEN AND CLOSE ON THE DRAW ITEMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 void WidgetRenderer::OpenItem(Item *pItem)
 {
@@ -73,7 +75,7 @@ void WidgetRenderer::CloseItem(Item *pItem)
 {
     if(m_pActiveItemProj == pItem)
     {
-        m_pActiveItemProj->Hide(*this);
+        m_pActiveItemProj->DrawHide(*this);
         m_pActiveItemProj = NULL;
         ShowItem(GetItem());
     }
@@ -111,15 +113,15 @@ void WidgetRenderer::ShowItem(Item *pItem)
         return;
     
     if(m_pActiveItemProj)
-        m_pActiveItemProj->Hide(*this);
+        m_pActiveItemProj->DrawHide(*this);
                 
     for(int i = 0; i < ui->tabWidget->count(); ++i)
-        GetItem(i)->Hide(*this);
+        GetItem(i)->DrawHide(*this);
 
     if(pItem->GetType() == ITEM_Project)
         m_pActiveItemProj = static_cast<ItemProject *>(pItem);
         
-    pItem->Show(*this);
+    pItem->DrawShow(*this);
 }
 
 void WidgetRenderer::on_tabWidget_currentChanged(int iIndex)

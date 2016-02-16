@@ -14,22 +14,34 @@ ItemProject::~ItemProject()
     delete m_pAtlasManager;
 }
 
-/*virtual*/ void ItemProject::Show(IHyApplication &hyApp)
+/*virtual*/ void ItemProject::OnDraw_Open(IHyApplication &hyApp)
 {
     if(m_eState == DRAWSTATE_AtlasManager)
-        m_pAtlasManager->Show(hyApp);
+        m_pAtlasManager->OnDraw_Open(hyApp);
 }
 
-/*virtual*/ void ItemProject::Hide(IHyApplication &hyApp)
+/*virtual*/ void ItemProject::OnDraw_Close(IHyApplication &hyApp)
 {
     if(m_eState == DRAWSTATE_AtlasManager)
-        m_pAtlasManager->Hide(hyApp);
+        m_pAtlasManager->OnDraw_Close(hyApp);
 }
 
-/*virtual*/ void ItemProject::Draw(IHyApplication &hyApp)
+/*virtual*/ void ItemProject::OnDraw_Show(IHyApplication &hyApp)
 {
     if(m_eState == DRAWSTATE_AtlasManager)
-        m_pAtlasManager->Draw(hyApp);
+        m_pAtlasManager->OnDraw_Show(hyApp);
+}
+
+/*virtual*/ void ItemProject::OnDraw_Hide(IHyApplication &hyApp)
+{
+    if(m_eState == DRAWSTATE_AtlasManager)
+        m_pAtlasManager->OnDraw_Hide(hyApp);
+}
+
+/*virtual*/ void ItemProject::OnDraw_Update(IHyApplication &hyApp)
+{
+    if(m_eState == DRAWSTATE_AtlasManager)
+        m_pAtlasManager->OnDraw_Update(hyApp);
 }
 
 void ItemProject::SetAtlasGroupDrawState(int iAtlasGrpId)
