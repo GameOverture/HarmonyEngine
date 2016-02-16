@@ -11,8 +11,7 @@
 #include "Renderer/Viewport/HyWindow.h"
 
 HyCamera2d::HyCamera2d(HyWindow *pViewport) :	ITransform<HyAnimVec2>(),
-												m_pViewportPtr(pViewport),
-												m_bEnabled(true)
+												m_pViewportPtr(pViewport)
 {
 	m_ViewportRect.x = m_ViewportRect.y = 0.0f;
 	m_ViewportRect.width = m_ViewportRect.height = 1.0f;

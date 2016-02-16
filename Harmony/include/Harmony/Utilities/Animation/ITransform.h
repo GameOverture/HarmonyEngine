@@ -15,8 +15,6 @@
 #include "Scene/HyScene.h"
 #include "Utilities/Animation/HyAnimVec3.h"
 
-
-
 template<typename tVec>
 class ITransform
 {
@@ -28,6 +26,8 @@ protected:
 
 	void (*m_fpOnDirty)(void *);
 	void *				m_pOnDirtyParam;
+
+	bool				m_bEnabled;
 
 public:
 	ITransform();
@@ -42,7 +42,7 @@ public:
 	virtual void SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion);
 
 	inline bool	IsEnabled()										{ return m_bEnabled; }
-	inline void	SetEnabled(bool bVis)							{ m_bEnabled = bVis; }
+	inline void	SetEnabled(bool bEnabled)						{ m_bEnabled = bEnabled; }
 	
 	// Returns the converted pixel position to the specified HyCoordinateType
 	void GetLocalTransform(mat4 &outMtx) const;
@@ -52,7 +52,10 @@ public:
 };
 
 template<typename tVec>
-ITransform<tVec>::ITransform() :	m_eCoordType(HYCOORD_Default), m_fpOnDirty(NULL), m_pOnDirtyParam(NULL)
+ITransform<tVec>::ITransform() :	m_eCoordType(HYCOORD_Default), 
+									m_fpOnDirty(NULL),
+									m_pOnDirtyParam(NULL),
+									m_bEnabled(true)
 {
 	scale.Set(1.0f);
 }

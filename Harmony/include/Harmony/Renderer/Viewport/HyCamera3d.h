@@ -24,16 +24,12 @@ class HyCamera3d : public ITransform<HyAnimVec3>
 	friend class HyWindow;
 	HyWindow *		m_kpViewportPtr;
 
-	bool				m_bEnabled;
-
 	HyRectangle<float>	m_ViewportRect;	// Values are [0.0-1.0] representing percentages
 
 	HyCamera3d(HyWindow *pViewport);
 public:
 	~HyCamera3d(void);
 
-	void SetEnabled(bool bEnable)				{ m_bEnabled = bEnable; }
-	bool IsEnabled()							{ return m_bEnabled; }
 	const HyRectangle<float> &GetViewport()		{ return m_ViewportRect; }
 
 	// All values are [0.0 - 1.0] representing percentages of the entire game window

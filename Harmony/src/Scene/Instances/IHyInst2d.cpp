@@ -22,7 +22,6 @@ IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char 
 																							m_bInvalidLoad(false),
 																							m_pParent(NULL),
 																							m_bDirty(true),
-																							m_bEnabled(true),
 																							m_uiDisplayOrder(0),
 																							m_iTag(0)
 {

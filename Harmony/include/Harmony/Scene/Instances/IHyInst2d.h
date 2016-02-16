@@ -44,7 +44,6 @@ protected:
 	vector<IHyInst2d *>			m_vChildList;
 
 	// Attributes
-	bool						m_bEnabled;
 	uint32						m_uiDisplayOrder;	// Lower values are displayed front-most
 	HyRenderState				m_RenderState;
 	int32						m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
