@@ -49,8 +49,15 @@ void WidgetRenderer::ClearItems()
 
 // TODO: NEED TO CALL OPEN AND CLOSE ON THE DRAW ITEMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-void WidgetRenderer::OpenItem(Item *pItem)
+void WidgetRenderer::RenderItem(Item *pItem)
 {
+    if(pItem == NULL)
+    {
+        //HyGuiLog(
+        return;
+    }
+    
+    
     if(pItem->GetType() == ITEM_Project)
     {
         ShowItem(pItem);
@@ -71,7 +78,7 @@ void WidgetRenderer::OpenItem(Item *pItem)
     ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName()));
 }
 
-void WidgetRenderer::CloseItem(Item *pItem)
+void WidgetRenderer::HideItem(Item *pItem)
 {
     if(m_pActiveItemProj == pItem)
     {

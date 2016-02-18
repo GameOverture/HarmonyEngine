@@ -37,32 +37,32 @@ QString Item::GetName() const
 
 /*virtual*/ void Item::OnDraw_Open(IHyApplication &hyApp)
 {
-    HYLOG("Tried to OnDraw_Open() a non-derived item: " % GetName(), LOGTYPE_Error);
+    HyGuiLog("Tried to OnDraw_Open() a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
 /*virtual*/ void Item::OnDraw_Close(IHyApplication &hyApp)
 {
-    HYLOG("Tried to OnDraw_Close() a non-derived item: " % GetName(), LOGTYPE_Error);
+    HyGuiLog("Tried to OnDraw_Close() a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
 /*virtual*/ void Item::OnDraw_Show(IHyApplication &hyApp)
 {
-    HYLOG("Tried to OnDraw_Show() a non-derived item: " % GetName(), LOGTYPE_Error);
+    HyGuiLog("Tried to OnDraw_Show() a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
 /*virtual*/ void Item::OnDraw_Hide(IHyApplication &hyApp)
 {
-    HYLOG("Tried to OnDraw_Hide() a non-derived item: " % GetName(), LOGTYPE_Error);
+    HyGuiLog("Tried to OnDraw_Hide() a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
 /*virtual*/ void Item::OnDraw_Update(IHyApplication &hyApp)
 {
-    HYLOG("Tried to OnDraw_Update() a non-derived item: " % GetName(), LOGTYPE_Error);
+    HyGuiLog("Tried to OnDraw_Update() a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
 /*virtual*/ void Item::Save()
 {
-    HYLOG("Tried to save a non-derived item: " % GetName(), LOGTYPE_Error);
+    HyGuiLog("Tried to save a non-derived item: " % GetName(), LOGTYPE_Error);
 }
 
 void Item::Initialize(eItemType eType, const QString sPath)
@@ -71,7 +71,7 @@ void Item::Initialize(eItemType eType, const QString sPath)
 
     if(m_eType == ITEM_Unknown)
     {
-        HYLOG("Setting path of unknown item (" % m_sPath % ")", LOGTYPE_Error);
+        HyGuiLog("Setting path of unknown item (" % m_sPath % ")", LOGTYPE_Error);
         return;
     }
 

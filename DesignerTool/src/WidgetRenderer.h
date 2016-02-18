@@ -51,8 +51,8 @@ public:
 
     void ClearItems();
 
-    void OpenItem(Item *pItem);
-    void CloseItem(Item *pItem);
+    void RenderItem(Item *pItem);
+    void HideItem(Item *pItem);
 
 private:
     Ui::WidgetRenderer *ui;

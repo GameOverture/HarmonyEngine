@@ -67,9 +67,6 @@ private:
     void closeEvent(QCloseEvent * event);
 
     void SaveSettings();
-    
-    void UpdateActions();
-    
 };
 
 #endif // HYGUI_H

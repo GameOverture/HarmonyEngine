@@ -22,7 +22,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
     ui->setupUi(this);
 
     // Invalid constructor. This exists so Q_OBJECT can work.
-    HYLOG("WidgetAtlasGroup::WidgetAtlasGroup() invalid constructor used", LOGTYPE_Error);
+    HyGuiLog("WidgetAtlasGroup::WidgetAtlasGroup() invalid constructor used", LOGTYPE_Error);
 }
 
 WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) :   QWidget(parent),
@@ -42,7 +42,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
         {
             QString sErrorMsg("WidgetAtlasGroup::WidgetAtlasGroup() could not open ");
             sErrorMsg += HYGUIPATH_MetaDataAtlasFileName;
-            HYLOG(sErrorMsg, LOGTYPE_Error);
+            HyGuiLog(sErrorMsg, LOGTYPE_Error);
         }
 
         QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
@@ -253,7 +253,7 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
 
 /*virtual*/ void WidgetAtlasGroup::enterEvent(QEvent *pEvent)
 {
-    HYLOG("AtlasGroup mouseMoveEvent(): Enter", LOGTYPE_Normal);
+    HyGuiLog("AtlasGroup mouseMoveEvent(): Enter", LOGTYPE_Normal);
     WidgetAtlasManager *pAtlasMan = static_cast<WidgetAtlasManager *>(parent()->parent());
 
     pAtlasMan->PreviewAtlasGroup();
@@ -262,7 +262,7 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
 
 /*virtual*/ void WidgetAtlasGroup::leaveEvent(QEvent *pEvent)
 {
-    HYLOG("AtlasGroup mouseMoveEvent(): Leave", LOGTYPE_Normal);
+    HyGuiLog("AtlasGroup mouseMoveEvent(): Leave", LOGTYPE_Normal);
     WidgetAtlasManager *pAtlasMan = static_cast<WidgetAtlasManager *>(parent()->parent());
     
     pAtlasMan->HideAtlasGroup();
@@ -272,7 +272,7 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
 /*virtual*/ void WidgetAtlasGroup::mouseMoveEvent(QMouseEvent *pEvent)
 {
     m_MouseLocalCoords = pEvent->pos();
-    HYLOG("AtlasGroup Mouse Coords: " + QString::number(m_MouseLocalCoords.x()) + ", " + QString::number(m_MouseLocalCoords.y()), LOGTYPE_Normal);
+    HyGuiLog("AtlasGroup Mouse Coords: " + QString::number(m_MouseLocalCoords.x()) + ", " + QString::number(m_MouseLocalCoords.y()), LOGTYPE_Normal);
 
     QWidget::mouseMoveEvent(pEvent);
 }
@@ -338,7 +338,7 @@ void WidgetAtlasGroup::Refresh()
     for(int i = 0; i < m_Packer.bins.size(); ++i)
     {
         if(m_dlgSettings.TextureWidth() != m_Packer.bins[i].width() || m_dlgSettings.TextureHeight() != m_Packer.bins[i].height())
-            HYLOG("WidgetAtlasGroup::Refresh() Mismatching texture dimentions", LOGTYPE_Error);
+            HyGuiLog("WidgetAtlasGroup::Refresh() Mismatching texture dimentions", LOGTYPE_Error);
 
         QImage *pTexture = new QImage(m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight(), QImage::Format_ARGB32);  // TODO: BitsPerPixel configurable here?
         pTexture->fill(Qt::transparent);
@@ -488,7 +488,7 @@ void WidgetAtlasGroup::Refresh()
     QFile settingsFile(m_MetaDir.absolutePath() % "/" % HYGUIPATH_MetaDataAtlasFileName);
     if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
-       HYLOG("Couldn't open atlas settings file for writing", LOGTYPE_Error);
+       HyGuiLog("Couldn't open atlas settings file for writing", LOGTYPE_Error);
     }
     else
     {
@@ -496,7 +496,7 @@ void WidgetAtlasGroup::Refresh()
         qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
         if(0 == iBytesWritten || -1 == iBytesWritten)
         {
-            HYLOG("Could not write to atlas settings file: " % settingsFile.errorString(), LOGTYPE_Error);
+            HyGuiLog("Could not write to atlas settings file: " % settingsFile.errorString(), LOGTYPE_Error);
         }
 
         settingsFile.close();
@@ -505,10 +505,10 @@ void WidgetAtlasGroup::Refresh()
     qint64 i64TimeRefresh = timerStartRefresh.elapsed();
     clock_t timeEndRefresh = clock();
 
-    HYLOG("Atlas Group Refresh done in: " % QString::number(static_cast<float>(i64TimeRefresh / 1000)), LOGTYPE_Normal);
-    HYLOG("Atlas Group Pack done in:    " % QString::number(static_cast<float>(i64TimePack / 1000)), LOGTYPE_Normal);
-    HYLOG("Atlas Group Refresh done in: " % QString::number(static_cast<float>((timeEndRefresh - timeStartRefresh) / CLOCKS_PER_SEC)), LOGTYPE_Info);
-    HYLOG("Atlas Group Pack done in:    " % QString::number(static_cast<float>((timeEndPack - timeStartPack) / CLOCKS_PER_SEC)), LOGTYPE_Info);
+    HyGuiLog("Atlas Group Refresh done in: " % QString::number(static_cast<float>(i64TimeRefresh / 1000)), LOGTYPE_Normal);
+    HyGuiLog("Atlas Group Pack done in:    " % QString::number(static_cast<float>(i64TimePack / 1000)), LOGTYPE_Normal);
+    HyGuiLog("Atlas Group Refresh done in: " % QString::number(static_cast<float>((timeEndRefresh - timeStartRefresh) / CLOCKS_PER_SEC)), LOGTYPE_Info);
+    HyGuiLog("Atlas Group Pack done in:    " % QString::number(static_cast<float>((timeEndPack - timeStartPack) / CLOCKS_PER_SEC)), LOGTYPE_Info);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)

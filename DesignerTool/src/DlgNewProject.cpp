@@ -56,7 +56,7 @@ void DlgNewProject::on_buttonBox_accepted()
     projDir.cd(ui->txtGameLocation->text());
     projDir.cd(ui->txtGameTitle->text());
     if(HyGlobal::IsWorkspaceValid(projDir) == false)
-        HYLOG("DlgNewProject generated an invalid workspace", LOGTYPE_Error);
+        HyGuiLog("DlgNewProject generated an invalid workspace", LOGTYPE_Error);
 }
 
 void DlgNewProject::on_btnBrowse_clicked()

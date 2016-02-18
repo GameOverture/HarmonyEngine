@@ -10,7 +10,7 @@ DlgInputName::DlgInputName(const QString sDlgTitle, Item *pItem, QWidget *parent
 {
     if(m_pItem == NULL)
     {
-        HYLOG("DlgInputName recieved a NULL Item pointer", LOGTYPE_Error);
+        HyGuiLog("DlgInHyGuiLogme recieved a NULL Item pointer", LOGTYPE_Error);
         return;
     }
     

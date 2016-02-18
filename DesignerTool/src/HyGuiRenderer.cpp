@@ -34,7 +34,7 @@ HyGuiRenderer::~HyGuiRenderer()
 /*virtual*/ void HyGuiRenderer::paintGL()
 {
     if(m_pHyEngine->Update() == false)
-        HYLOG("Harmony Gfx requested exit program.", LOGTYPE_Info);
+        HyGuiLog("Harmony Gfx requested exit program.", LOGTYPE_Info);
 }
 
 /*virtual*/ void HyGuiRenderer::resizeGL(int w, int h)

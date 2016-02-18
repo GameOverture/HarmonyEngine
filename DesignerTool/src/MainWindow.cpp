@@ -33,8 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     
     SetSelectedProj(NULL);
 
-    HYLOG("Harmony Designer Tool " % QString(HYGUIVERSION_STRING), LOGTYPE_Title);
-    HYLOG("Initializing...", LOGTYPE_Normal);
+    HyGuiLog("Harmony Designer Tool " % QString(HYGUIVERSION_STRING), LOGTYPE_Title);
+    HyGuiLog("Initializing...", LOGTYPE_Normal);
     
     ui->actionCloseProject->setEnabled(false);
     ui->actionNewSprite->setEnabled(false);
@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->dockWidgetGlyphCreator->hide();
     
     // Restore workspace
-    HYLOG("Recovering previously opened session...", LOGTYPE_Normal);
+    HyGuiLog("Recovering previously opened session...", LOGTYPE_Normal);
     m_Settings.beginGroup("MainWindow");
     {
         restoreGeometry(m_Settings.value("geometry").toByteArray());
@@ -91,7 +91,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     // Append version to window title
     setWindowTitle(windowTitle() % " " % HYGUIVERSION_STRING);
 
-    HYLOG("Ready to go!", LOGTYPE_Normal);
+    HyGuiLog("Ready to go!", LOGTYPE_Normal);
 }
 
 MainWindow::~MainWindow()
@@ -117,7 +117,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 /*static*/ void MainWindow::OpenItem(Item *pItem)
 {
-    sm_pInstance->ui->renderer->OpenItem(pItem);
+    sm_pInstance->ui->renderer->RenderItem(pItem);
     
     if(pItem->GetType() != ITEM_Project)
         sm_pInstance->ui->explorer->SelectItem(pItem);
@@ -126,7 +126,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 /*static*/ void MainWindow::CloseItem(Item *pItem)
 {
     // TODO: Ask to save file if changes have been made
-    sm_pInstance->ui->renderer->CloseItem(pItem);
+    sm_pInstance->ui->renderer->HideItem(pItem);
 }
 
 /*static*/ void MainWindow::SetSelectedProj(ItemProject *pProj)
@@ -235,11 +235,6 @@ void MainWindow::SaveSettings()
         m_Settings.setValue("openProjs", QVariant(ui->explorer->GetOpenProjectPaths()));
     }
     m_Settings.endGroup();
-}
-
-void MainWindow::UpdateActions()
-{
-    //ui->explorer->GetCurProjPath(
 }
 
 void MainWindow::on_actionViewExplorer_triggered()

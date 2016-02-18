@@ -12,8 +12,6 @@ class ItemProject : public Item
     friend class WidgetExplorer;
     
     WidgetAtlasManager *        m_pAtlasManager;
-
-    QTabWidget *                m_pRendererTabs;
     
     enum eDrawState
     {

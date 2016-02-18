@@ -31,7 +31,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
 {
     if(eNewItemType == ITEM_Unknown)
     {
-        HYLOG("Invalid item passed to WidgetExplorer::AddItem()", LOGTYPE_Error);
+        HyGuiLog("Invalid item passed to WidgetExplorer::AddItem()", LOGTYPE_Error);
         return;
     }
     
@@ -56,7 +56,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         pItem = new ItemFont(sNewItemPath);
         break;
     default:
-        HYLOG("Item: " % sNewItemPath % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
+        HyGuiLog("Item: " % sNewItemPath % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
         return;
     }
     pItem->Initialize(eNewItemType, sNewItemPath);
@@ -65,11 +65,11 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     {
         if(HyGlobal::IsWorkspaceValid(QDir(pItem->GetPath())) == false)
         {
-            HYLOG("Could not open project: " % pItem->GetPath(), LOGTYPE_Warning);
+            HyGuiLog("Could not open project: " % pItem->GetPath(), LOGTYPE_Warning);
             return;
         }
         
-        HYLOG("Opening project: " % pItem->GetPath(), LOGTYPE_Info);
+        HyGuiLog("Opening project: " % pItem->GetPath(), LOGTYPE_Info);
         
         QTreeWidgetItem *pProjTreeItem = CreateTreeItem(NULL, pItem);
         
@@ -155,7 +155,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         
         if(pParentTreeItem == NULL)
         {
-            HYLOG("Could not find associated project for item: " % pItem->GetPath(), LOGTYPE_Error);
+            HyGuiLog("Could not find associated project for item: " % pItem->GetPath(), LOGTYPE_Error);
             return;
         }
         
@@ -165,7 +165,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         QStringList sPathSplitList = sRelativePath.split(QChar('/'));
         if(QString::compare(sPathSplitList[0], "data", Qt::CaseInsensitive) != 0)
         {
-            HYLOG("Project path does not begin inside 'data' directory", LOGTYPE_Error);
+            HyGuiLog("Project path does not begin inside 'data' directory", LOGTYPE_Error);
             return;
         }
         
@@ -188,7 +188,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
             {
                 if(i == 1)
                 {
-                    HYLOG("Cannot find valid sub directory: " % sPathSplitList[i], LOGTYPE_Error);
+                    HyGuiLog("Cannot find valid sub directory: " % sPathSplitList[i], LOGTYPE_Error);
                     return;
                 }
                 
@@ -215,7 +215,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         
         if(bSucceeded == false)
         {
-            HYLOG("Did not add item: " % pItem->GetName() % " successfully", LOGTYPE_Error);
+            HyGuiLog("Did not add item: " % pItem->GetName() % " successfully", LOGTYPE_Error);
             return;
         }
         else if(bOpenAfterAdd)
