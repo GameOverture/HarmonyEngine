@@ -7,6 +7,9 @@ IHyGuiDrawItem::IHyGuiDrawItem() :  m_bLoaded(false),
 
 void IHyGuiDrawItem::DrawOpen(IHyApplication &hyApp)
 {
+    if(m_bLoaded)
+        return;
+            
     if(m_pCamera == NULL)
         m_pCamera = hyApp.Window().CreateCamera2d();
 
@@ -24,7 +27,7 @@ void IHyGuiDrawItem::DrawClose(IHyApplication &hyApp)
 
     OnDraw_Close(hyApp);
 
-    m_bLoaded = true;
+    m_bLoaded = false;
 }
 
 void IHyGuiDrawItem::DrawShow(IHyApplication &hyApp)

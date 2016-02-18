@@ -30,6 +30,70 @@ HyGuiRenderer *WidgetRenderer::GetRenderer()
 
 /*virtual*/ bool WidgetRenderer::Update()
 {
+    while(m_ActionQueue.empty() == false)
+    {
+        std::pair<Item *, eQueuedItem> action = m_ActionQueue.dequeue();
+        Item *pItem = action.first;
+        eQueuedItem eActionToTake = action.second;
+        
+        if(eActionToTake == QUEUEDITEM_Render)
+        {
+            if(pItem->GetType() == ITEM_Project)
+            {
+                pItem->DrawOpen(*this);
+                ShowItem(pItem);
+            }
+            else
+            {
+                bool bIsAlreadyOpen = false;
+                for(int i = 0; i < ui->tabWidget->count(); ++i)
+                {
+                    // Determine if already opened
+                    if(reinterpret_cast<TabPage *>(ui->tabWidget->widget(i))->GetItem() == pItem)
+                    {
+                        ui->tabWidget->setCurrentIndex(i);
+                        bIsAlreadyOpen = true;
+                        break;
+                    }
+                }
+                
+                if(bIsAlreadyOpen == false)
+                {
+                    // Below should invoke callback 'on_tabWidget_currentChanged' which will enqueue a QUEUEDITEM_Show action
+                    TabPage *pNewTab = new TabPage(pItem, this);
+                    pItem->DrawOpen(*this);
+                    ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName()));
+                }
+            }
+        }
+        else if(eActionToTake == QUEUEDITEM_Show)
+        {
+            ShowItem(pItem);
+        }
+        else if(eActionToTake == QUEUEDITEM_Close)
+        {
+            if(m_pActiveItemProj == pItem)
+            {
+                m_pActiveItemProj->DrawHide(*this);
+                m_pActiveItemProj = NULL;
+                ShowItem(GetItem());
+            }
+            else
+            {
+                for(int i = 0; i < ui->tabWidget->count(); ++i)
+                {
+                    TabPage *pTabPage = reinterpret_cast<TabPage *>(ui->tabWidget->widget(i));
+                    if(pTabPage->GetItem() == pItem)
+                    {
+                        pItem->DrawClose(*this);
+                        ui->tabWidget->removeTab(i);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
     if(GetItem())
         GetItem()->OnDraw_Update(*this);
 
@@ -41,63 +105,28 @@ HyGuiRenderer *WidgetRenderer::GetRenderer()
     return true;
 }
 
-
-void WidgetRenderer::ClearItems()
-{
-    ui->tabWidget->clear();
-}
-
 // TODO: NEED TO CALL OPEN AND CLOSE ON THE DRAW ITEMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 void WidgetRenderer::RenderItem(Item *pItem)
 {
     if(pItem == NULL)
     {
-        //HyGuiLog(
+        HyGuiLog("WidgetRenderer::RenderItem tried to render NULL item", LOGTYPE_Warning);
         return;
     }
     
-    
-    if(pItem->GetType() == ITEM_Project)
-    {
-        ShowItem(pItem);
-        return;
-    }
-    
-    for(int i = 0; i < ui->tabWidget->count(); ++i)
-    {
-        // Determine if already opened
-        if(reinterpret_cast<TabPage *>(ui->tabWidget->widget(i))->GetItem() == pItem)
-        {
-            ui->tabWidget->setCurrentIndex(i);
-            return;
-        }
-    }
-    
-    TabPage *pNewTab = new TabPage(pItem, this);
-    ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName()));
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedItem>(pItem, QUEUEDITEM_Render));
 }
 
-void WidgetRenderer::HideItem(Item *pItem)
+void WidgetRenderer::CloseItem(Item *pItem)
 {
-    if(m_pActiveItemProj == pItem)
+    if(pItem == NULL)
     {
-        m_pActiveItemProj->DrawHide(*this);
-        m_pActiveItemProj = NULL;
-        ShowItem(GetItem());
+        HyGuiLog("WidgetRenderer::HideItem tried to hide NULL item", LOGTYPE_Warning);
+        return;
     }
-    else
-    {
-        for(int i = 0; i < ui->tabWidget->count(); ++i)
-        {
-            TabPage *pTabPage = reinterpret_cast<TabPage *>(ui->tabWidget->widget(i));
-            if(pTabPage->GetItem() == pItem)
-            {
-                ui->tabWidget->removeTab(i);
-                break;
-            }
-        }
-    }
+    
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedItem>(pItem, QUEUEDITEM_Close));
 }
 
 Item *WidgetRenderer::GetItem(int iIndex /*= -1*/)
@@ -114,6 +143,7 @@ Item *WidgetRenderer::GetItem(int iIndex /*= -1*/)
         return static_cast<TabPage *>(ui->tabWidget->widget(iIndex))->GetItem();
 }
 
+// Do not invoke this function outside of Update()
 void WidgetRenderer::ShowItem(Item *pItem)
 {
     if(pItem == NULL)
@@ -135,6 +165,6 @@ void WidgetRenderer::on_tabWidget_currentChanged(int iIndex)
 {
     if(m_bInitialized == false)
         return;
-
-    ShowItem(GetItem(iIndex));
+    
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedItem>(GetItem(iIndex), QUEUEDITEM_Show));
 }

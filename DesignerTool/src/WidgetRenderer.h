@@ -4,6 +4,7 @@
 #include "HyGlobal.h"
 
 #include <QWidget>
+#include <QQueue>
 
 #include "Item.h"
 #include "ItemProject.h"
@@ -37,6 +38,14 @@ class WidgetRenderer : public QWidget, public IHyApplication
     bool                m_bInitialized;
     
     ItemProject *       m_pActiveItemProj;  // Overrides any Item in the current open TabPage
+    
+    enum eQueuedItem
+    {
+        QUEUEDITEM_Render = 0,
+        QUEUEDITEM_Show,
+        QUEUEDITEM_Close
+    };
+    QQueue<std::pair<Item *, eQueuedItem> > m_ActionQueue;
 
 public:
     explicit WidgetRenderer(QWidget *parent = 0);
@@ -49,15 +58,15 @@ public:
     virtual bool Update();
     virtual bool Shutdown();
 
-    void ClearItems();
-
     void RenderItem(Item *pItem);
-    void HideItem(Item *pItem);
+    void CloseItem(Item *pItem);
 
 private:
     Ui::WidgetRenderer *ui;
     
     Item *GetItem(int iIndex = -1);
+    
+    // Do not invoke this function outside of Update()
     void ShowItem(Item *pItem);
 
 private slots:

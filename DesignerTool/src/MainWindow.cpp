@@ -86,7 +86,6 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     m_Settings.endGroup();
 
     // Restore opened items/tabs
-    ui->renderer->ClearItems();
 
     // Append version to window title
     setWindowTitle(windowTitle() % " " % HYGUIVERSION_STRING);
@@ -126,7 +125,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 /*static*/ void MainWindow::CloseItem(Item *pItem)
 {
     // TODO: Ask to save file if changes have been made
-    sm_pInstance->ui->renderer->HideItem(pItem);
+    sm_pInstance->ui->renderer->CloseItem(pItem);
 }
 
 /*static*/ void MainWindow::SetSelectedProj(ItemProject *pProj)
