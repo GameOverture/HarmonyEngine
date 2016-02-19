@@ -3,8 +3,11 @@
 
 #include "WidgetRenderer.h"
 
-ItemProject::ItemProject(const QString sPath) : Item(ITEM_Project, sPath),
-                                                m_eState(DRAWSTATE_Nothing)
+ItemProject::ItemProject(const QString sPath, const QString sRelPathAssets, const QString sRelPathMetaData, const QString sRelPathSource) : Item(ITEM_Project, sPath),
+                                                                                                                                            m_sRelativeAssetsLocation(sRelPathAssets),
+                                                                                                                                            m_sRelativeMetaDataLocation(sRelPathMetaData),
+                                                                                                                                            m_sRelativeSourceLocation(sRelPathSource),
+                                                                                                                                            m_eState(DRAWSTATE_Nothing)
 {
     m_pAtlasManager = new WidgetAtlasManager(this);
 }

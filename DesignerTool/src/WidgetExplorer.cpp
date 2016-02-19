@@ -27,6 +27,71 @@ WidgetExplorer::~WidgetExplorer()
     delete ui;
 }
 
+void WidgetExplorer::AddItemProject(const QString sNewItemPath, const QString sRelPathAssets, const QString sRelPathMetaData, const QString sRelPathSource)
+{
+    ItemProject *pItem = new ItemProject(sNewItemPath, sRelPathAssets, sRelPathMetaData, sRelPathSource);
+    HyGuiLog("Opening project: " % pItem->GetPath(), LOGTYPE_Info);
+    
+    QTreeWidgetItem *pProjTreeItem = CreateTreeItem(NULL, pItem);
+    
+    QList<eItemType> subDirList = HyGlobal::SubDirList();
+    foreach(eItemType eType, subDirList)
+    {
+        QString sSubDirPath = pItem->GetPath() % HYGUIPATH_RelDataDir % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
+        Item *pSubDirItem = new Item(eType, sSubDirPath);
+        
+        QTreeWidgetItem *pSubDirTreeItem = CreateTreeItem(pProjTreeItem, pSubDirItem);
+        QTreeWidgetItem *pCurParentTreeItem = pSubDirTreeItem;
+        
+        QDirIterator dirIter(sSubDirPath, QDirIterator::Subdirectories);
+        while(dirIter.hasNext())
+        {
+            QString sCurPath = dirIter.next();
+            
+            if(sCurPath.endsWith(QChar('.')))
+                continue;
+            
+            // Ensure pCurParentTreeItem is correct. If not keep moving up the tree until found.
+            QFileInfo curFileInfo(sCurPath);
+            QString sCurFileParentBaseName = curFileInfo.dir().dirName();
+            QString sCurTreeItemName = pCurParentTreeItem->text(0);
+            while(QString::compare(sCurFileParentBaseName, sCurTreeItemName, Qt::CaseInsensitive) != 0)
+            {
+                pCurParentTreeItem = pCurParentTreeItem->parent();
+                sCurTreeItemName = pCurParentTreeItem->text(0);
+            }
+            
+            Item *pPrefixItem;
+            if(dirIter.fileInfo().isDir())
+            {
+                pPrefixItem = new Item(ITEM_Prefix, sCurPath);
+                pCurParentTreeItem = CreateTreeItem(pCurParentTreeItem, pPrefixItem);
+            }
+            else if(dirIter.fileInfo().isFile())
+            {
+                eItemType eType;
+                for(int i = 0; i < NUMITEM; ++i)
+                {
+                    if(sCurPath.endsWith(HyGlobal::ItemExt(i)))
+                    {
+                        eType = static_cast<eItemType>(i);
+                        break;
+                    }
+                }
+                
+                switch(eType)
+                {
+                case ITEM_Sprite:   pPrefixItem = new ItemSprite(sCurPath); break;
+                }
+                
+                CreateTreeItem(pCurParentTreeItem, pPrefixItem);
+            }
+        }
+    }
+    
+    ui->treeWidget->expandItem(pProjTreeItem);
+}
+
 void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath, bool bOpenAfterAdd)
 {
     if(eNewItemType == ITEM_Unknown)
@@ -39,8 +104,8 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     switch(eNewItemType)
     {
     case ITEM_Project:
-        pItem = new ItemProject(sNewItemPath);
-        break;
+        HyGuiLog("Do not use WidgetExplorer::AddItem for projects... use AddProjectItem instead", LOGTYPE_Error);
+        return;
     case ITEM_DirAudio:
     case ITEM_DirFonts:
     case ITEM_DirShaders:
@@ -61,174 +126,99 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     }
     pItem->Initialize(eNewItemType, sNewItemPath);
     
-    if(pItem->GetType() == ITEM_Project)
+    // NOTE: Cannot use GetCurProjSelected() because this function may be called without anything selected in explorer widget. AKA opening an existing project and adding all its contents
+    //
+    // Find the proper project tree item
+    QTreeWidgetItem *pParentTreeItem = NULL;
+    QDir projDir;
+    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
     {
-        if(HyGlobal::IsWorkspaceValid(QDir(pItem->GetPath())) == false)
+        QVariant v = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole);
+        Item *pTopLevelItem = v.value<Item *>();
+        
+        if(pItem->GetPath().contains(pTopLevelItem->GetPath(), Qt::CaseInsensitive))
         {
-            HyGuiLog("Could not open project: " % pItem->GetPath(), LOGTYPE_Warning);
-            return;
-        }
-        
-        HyGuiLog("Opening project: " % pItem->GetPath(), LOGTYPE_Info);
-        
-        QTreeWidgetItem *pProjTreeItem = CreateTreeItem(NULL, pItem);
-        
-        QList<eItemType> subDirList = HyGlobal::SubDirList();
-        foreach(eItemType eType, subDirList)
-        {
-            QString sSubDirPath = pItem->GetPath() % HYGUIPATH_RelDataDir % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
-            Item *pSubDirItem = new Item(eType, sSubDirPath);
-            
-            QTreeWidgetItem *pSubDirTreeItem = CreateTreeItem(pProjTreeItem, pSubDirItem);
-            QTreeWidgetItem *pCurParentTreeItem = pSubDirTreeItem;
-            
-            QDirIterator dirIter(sSubDirPath, QDirIterator::Subdirectories);
-            while(dirIter.hasNext())
-            {
-                QString sCurPath = dirIter.next();
-                
-                if(sCurPath.endsWith(QChar('.')))
-                    continue;
-                
-                // Ensure pCurParentTreeItem is correct. If not keep moving up the tree until found.
-                QFileInfo curFileInfo(sCurPath);
-                QString sCurFileParentBaseName = curFileInfo.dir().dirName();
-                QString sCurTreeItemName = pCurParentTreeItem->text(0);
-                while(QString::compare(sCurFileParentBaseName, sCurTreeItemName, Qt::CaseInsensitive) != 0)
-                {
-                    pCurParentTreeItem = pCurParentTreeItem->parent();
-                    sCurTreeItemName = pCurParentTreeItem->text(0);
-                }
-                
-                Item *pPrefixItem;
-                if(dirIter.fileInfo().isDir())
-                {
-                    pPrefixItem = new Item(ITEM_Prefix, sCurPath);
-                    pCurParentTreeItem = CreateTreeItem(pCurParentTreeItem, pPrefixItem);
-                }
-                else if(dirIter.fileInfo().isFile())
-                {
-                    eItemType eType;
-                    for(int i = 0; i < NUMITEM; ++i)
-                    {
-                        if(sCurPath.endsWith(HyGlobal::ItemExt(i)))
-                        {
-                            eType = static_cast<eItemType>(i);
-                            break;
-                        }
-                    }
-                    
-                    switch(eType)
-                    {
-                    case ITEM_Sprite:   pPrefixItem = new ItemSprite(sCurPath); break;
-                    }
-                    
-                    CreateTreeItem(pCurParentTreeItem, pPrefixItem);
-                }
-            }
-        }
-        
-        if(bOpenAfterAdd)
-        {
-            ui->treeWidget->expandItem(pProjTreeItem);
+            projDir.setPath(pTopLevelItem->GetPath());
+            pParentTreeItem = pTopLevelItem->GetTreeItem();
+            break;
         }
     }
-    else
+    
+    if(pParentTreeItem == NULL)
     {
-        // NOTE: Cannot use GetCurProjSelected() because this function may be called without anything selected in explorer widget. AKA opening an existing project and adding all its contents
-        //
-        // Find the proper project tree item
-        QTreeWidgetItem *pParentTreeItem = NULL;
-        QDir projDir;
-        for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
+        HyGuiLog("Could not find associated project for item: " % pItem->GetPath(), LOGTYPE_Error);
+        return;
+    }
+    
+    // Get the relative path from [ProjectDir->ItemPath] e.g. "data/Sprites/SpritePrefix/MySprite.hyspi"
+    QString sRelativePath = projDir.relativeFilePath(pItem->GetPath());
+    
+    QStringList sPathSplitList = sRelativePath.split(QChar('/'));
+    if(QString::compare(sPathSplitList[0], "data", Qt::CaseInsensitive) != 0)
+    {
+        HyGuiLog("Project path does not begin inside 'data' directory", LOGTYPE_Error);
+        return;
+    }
+    
+    // Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
+    bool bSucceeded = false;
+    for(int i = 1; i < sPathSplitList.size(); ++i)
+    {
+        bool bFound = false;
+        for(int j = 0; j < pParentTreeItem->childCount(); ++j)
         {
-            QVariant v = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole);
-            Item *pTopLevelItem = v.value<Item *>();
-            
-            if(pItem->GetPath().contains(pTopLevelItem->GetPath(), Qt::CaseInsensitive))
+            if(QString::compare(sPathSplitList[i], pParentTreeItem->child(j)->text(0), Qt::CaseInsensitive) == 0)
             {
-                projDir.setPath(pTopLevelItem->GetPath());
-                pParentTreeItem = pTopLevelItem->GetTreeItem();
+                pParentTreeItem = pParentTreeItem->child(j);
+                bFound = true;
                 break;
             }
         }
         
-        if(pParentTreeItem == NULL)
+        if(bFound == false)
         {
-            HyGuiLog("Could not find associated project for item: " % pItem->GetPath(), LOGTYPE_Error);
-            return;
-        }
-        
-        // Get the relative path from [ProjectDir->ItemPath] e.g. "data/Sprites/SpritePrefix/MySprite.hyspi"
-        QString sRelativePath = projDir.relativeFilePath(pItem->GetPath());
-        
-        QStringList sPathSplitList = sRelativePath.split(QChar('/'));
-        if(QString::compare(sPathSplitList[0], "data", Qt::CaseInsensitive) != 0)
-        {
-            HyGuiLog("Project path does not begin inside 'data' directory", LOGTYPE_Error);
-            return;
-        }
-        
-        // Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
-        bool bSucceeded = false;
-        for(int i = 1; i < sPathSplitList.size(); ++i)
-        {
-            bool bFound = false;
-            for(int j = 0; j < pParentTreeItem->childCount(); ++j)
+            if(i == 1)
             {
-                if(QString::compare(sPathSplitList[i], pParentTreeItem->child(j)->text(0), Qt::CaseInsensitive) == 0)
-                {
-                    pParentTreeItem = pParentTreeItem->child(j);
-                    bFound = true;
-                    break;
-                }
+                HyGuiLog("Cannot find valid sub directory: " % sPathSplitList[i], LOGTYPE_Error);
+                return;
             }
             
-            if(bFound == false)
+            if(i != sPathSplitList.size()-1)
             {
-                if(i == 1)
-                {
-                    HyGuiLog("Cannot find valid sub directory: " % sPathSplitList[i], LOGTYPE_Error);
-                    return;
-                }
+                // Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
+                //
+                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetPath() % "/" % sPathSplitList[i];
                 
-                if(i != sPathSplitList.size()-1)
-                {
-                    // Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
-                    //
-                    QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetPath() % "/" % sPathSplitList[i];
-                    
-                    Item *pPrefixItem = new Item(ITEM_Prefix, sPath);
-                    
-                    CreateTreeItem(pParentTreeItem, pPrefixItem);
-                }
-                else
-                {
-                    // At the final traversal, which is the item itself.
-                    CreateTreeItem(pParentTreeItem, pItem);
-                    
-                    bSucceeded = true;
-                    break;
-                }
+                Item *pPrefixItem = new Item(ITEM_Prefix, sPath);
+                
+                CreateTreeItem(pParentTreeItem, pPrefixItem);
             }
+            else
+            {
+                // At the final traversal, which is the item itself.
+                CreateTreeItem(pParentTreeItem, pItem);
+                
+                bSucceeded = true;
+                break;
+            }
+        }
+    }
+    
+    if(bSucceeded == false)
+    {
+        HyGuiLog("Did not add item: " % pItem->GetName() % " successfully", LOGTYPE_Error);
+        return;
+    }
+    else if(bOpenAfterAdd)
+    {
+        QTreeWidgetItem *pExpandItem = pItem->GetTreeItem();
+        while(pExpandItem->parent() != NULL)
+        {
+            ui->treeWidget->expandItem(pExpandItem->parent());
+            pExpandItem = pExpandItem->parent();
         }
         
-        if(bSucceeded == false)
-        {
-            HyGuiLog("Did not add item: " % pItem->GetName() % " successfully", LOGTYPE_Error);
-            return;
-        }
-        else if(bOpenAfterAdd)
-        {
-            QTreeWidgetItem *pExpandItem = pItem->GetTreeItem();
-            while(pExpandItem->parent() != NULL)
-            {
-                ui->treeWidget->expandItem(pExpandItem->parent());
-                pExpandItem = pExpandItem->parent();
-            }
-            
-            MainWindow::OpenItem(pItem);
-        }
+        MainWindow::OpenItem(pItem);
     }
 }
 
@@ -260,6 +250,10 @@ void WidgetExplorer::SelectItem(Item *pItem)
     }
     
     pItem->GetTreeItem()->setSelected(true);
+}
+
+void WidgetExplorer::ProcessItem(Item *pItem)
+{
 }
 
 QTreeWidgetItem *WidgetExplorer::CreateTreeItem(QTreeWidgetItem *pParent, Item *pItem)

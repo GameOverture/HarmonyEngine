@@ -82,7 +82,7 @@ public:
         sm_sItemNames[ITEM_DirShaders] = sm_sItemNames[ITEM_Shader] = "Shader";
         sm_sItemNames[ITEM_DirEntities] = sm_sItemNames[ITEM_Entity] = "Entity";
         
-        sm_sItemExt[ITEM_Project] = "/";
+        sm_sItemExt[ITEM_Project] = ".hyproj";
         sm_sItemExt[ITEM_DirAudio] = "/";
         sm_sItemExt[ITEM_DirParticles] = "/";
         sm_sItemExt[ITEM_DirFonts] = "/";
@@ -163,31 +163,6 @@ public:
 
     static const QRegExpValidator *FileNameValidator()      { return sm_pFileNameValidator; }
     static const QRegExpValidator *FilePathValidator()      { return sm_pFilePathValidator; }
-    
-    static bool IsWorkspaceValid(const QDir &projDir)
-    {
-        QDir dir(projDir);
-        if(!dir.exists(HYGUIPATH_RelDataDir))
-            return false;
-        
-        QStringList dirList = HyGlobal::SubDirNameList();
-        foreach(QString sDir, dirList)
-        {
-            if(!dir.exists(HYGUIPATH_RelDataDir + sDir))
-                return false;
-        }
-        
-        if(!dir.exists(HYGUIPATH_RelDataAtlasDir))
-            return false;
-        
-        if(!dir.exists(HYGUIPATH_RelMetaDataDir))
-            return false;
-        
-        if(!dir.exists(HYGUIPATH_RelMetaAtlasDir))
-            return false;
-        
-        return true;
-    }
     
     static bool IsEngineDirValid(const QDir &engineDir)
     {

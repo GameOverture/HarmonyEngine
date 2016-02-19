@@ -106,7 +106,14 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
         QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
         foreach(QString sProjPath, sListOpenProjs)
         {
-            ui->explorer->AddItem(ITEM_Project, sProjPath, false);
+            //QJsonObject
+            //ui->explorer->AddItemProject(sProjPath, false);
+        }
+        
+        QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
+        foreach(QString sItemPath, sListOpenItems)
+        {
+            //ui->explorer->AddItem(sItemPath, false);
         }
     }
     m_Settings.endGroup();

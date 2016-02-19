@@ -11,6 +11,10 @@ class ItemProject : public Item
 {
     friend class WidgetExplorer;
     
+    const QString               m_sRelativeAssetsLocation;
+    const QString               m_sRelativeMetaDataLocation;
+    const QString               m_sRelativeSourceLocation;
+    
     WidgetAtlasManager *        m_pAtlasManager;
     
     enum eDrawState
@@ -20,7 +24,7 @@ class ItemProject : public Item
     };
     eDrawState          m_eState;
     
-    ItemProject(const QString sPath);
+    ItemProject(const QString sPath, const QString sRelPathAssets, const QString sRelPathMetaData, const QString sRelPathSource);
     
 public:
     ~ItemProject();

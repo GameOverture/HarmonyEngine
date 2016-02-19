@@ -24,6 +24,7 @@ public:
     explicit WidgetExplorer(QWidget *parent = 0);
     ~WidgetExplorer();
     
+    void AddItemProject(const QString sNewItemPath, const QString sRelPathAssets, const QString sRelPathMetaData, const QString sRelPathSource);
     void AddItem(eItemType eNewItemType, const QString sNewItemPath, bool bOpenAfterAdd);
     void RemoveItem(Item *pItem);
     
@@ -37,6 +38,8 @@ public:
 
 private:
     Ui::WidgetExplorer *ui;
+    
+    void ProcessItem(Item *pItem);
     
     QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, Item *pItem);
     
