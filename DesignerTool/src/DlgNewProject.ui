@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>543</width>
-    <height>260</height>
+    <height>357</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,37 +22,31 @@
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="3" column="0">
-      <widget class="QLineEdit" name="txtGameLocation">
+     <item row="4" column="0">
+      <widget class="QLabel" name="label">
        <property name="text">
-        <string/>
+        <string>Game Assets Location:</string>
        </property>
       </widget>
      </item>
-     <item row="7" column="0" colspan="2">
-      <widget class="QDialogButtonBox" name="buttonBox">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="standardButtons">
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0" colspan="2">
-      <widget class="QLabel" name="lblError">
+     <item row="0" column="0">
+      <widget class="QLabel" name="lblGameTitle">
        <property name="text">
-        <string/>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        <string>Game Title:</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="0" colspan="2">
+     <item row="1" column="0">
+      <widget class="QLineEdit" name="txtGameTitle"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QPushButton" name="btnBrowse">
+       <property name="text">
+        <string>Browse...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="0" colspan="2">
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
         <string>Development Environment:</string>
@@ -89,51 +83,98 @@
        </layout>
       </widget>
      </item>
-     <item row="3" column="1">
-      <widget class="QPushButton" name="btnBrowse">
+     <item row="11" column="0" colspan="2">
+      <widget class="QLabel" name="lblError">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="0" colspan="2">
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLineEdit" name="txtGameLocation">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Source Code Location:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLineEdit" name="lineEdit"/>
+     </item>
+     <item row="5" column="1">
+      <widget class="QPushButton" name="btnBrowse_2">
+       <property name="text">
+        <string>Browse...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Meta-data Location:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLineEdit" name="lineEdit_2"/>
+     </item>
+     <item row="7" column="1">
+      <widget class="QPushButton" name="btnBrowse_3">
+       <property name="text">
+        <string>Browse...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLineEdit" name="lineEdit_3"/>
+     </item>
+     <item row="9" column="1">
+      <widget class="QPushButton" name="btnBrowse_4">
        <property name="text">
         <string>Browse...</string>
        </property>
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="lblWorkspaceLocation">
-       <property name="text">
-        <string>Project Location:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLineEdit" name="txtGameTitle"/>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="lblGameTitle">
-       <property name="text">
-        <string>Game Title:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="1" column="0">
-        <widget class="QLineEdit" name="lineEdit"/>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="lblWorkspaceLocation">
          <property name="text">
-          <string>Game Assets:</string>
+          <string>Project Location:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="label_2">
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
-          <string>Meta Data:</string>
+          <string>The location of the project file and game executable will export to.</string>
          </property>
         </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="lineEdit_2"/>
        </item>
       </layout>
      </item>

@@ -1,18 +1,18 @@
-#include "DlgOpenProject.h"
-#include "ui_DlgOpenProject.h"
+#include "DlgSetEngineLocation.h"
+#include "ui_DlgSetEngineLocation.h"
 
 #include <QFileDialog>
 
 #include "HyGlobal.h"
 
 
-DlgOpenProject::DlgOpenProject(QWidget *parent) :
+DlgSetEngineLocation::DlgSetEngineLocation(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::DlgOpenProject)
+    ui(new Ui::DlgSetEngineLocation)
 {
     ui->setupUi(this);
     
-    QString sTempDir = "C:/soft";
+    //QString sTempDir = "C:/soft";
 
 
     //QFileDialog *fd = new QFileDialog;
@@ -41,19 +41,20 @@ DlgOpenProject::DlgOpenProject(QWidget *parent) :
     ErrorCheck();
 }
 
-DlgOpenProject::~DlgOpenProject()
+DlgSetEngineLocation::~DlgSetEngineLocation()
 {
     delete ui;
 }
 
-QString DlgOpenProject::SelectedDir()
+QString DlgSetEngineLocation::SelectedDir()
 {
     return ui->txtCurDirectory->text();
 }
 
-void DlgOpenProject::on_listView_doubleClicked(const QModelIndex &index)
+void DlgSetEngineLocation::on_listView_doubleClicked(const QModelIndex &index)
 {
-    ui->listView->setRootIndex(index);
+    if(ui->buttonBox->button(QDialogButtonBox::Ok)->isEnabled() == false)
+        ui->listView->setRootIndex(index);
     
     QString sPath = m_pFileModel->fileInfo(index).absoluteFilePath();
     ui->txtCurDirectory->setText(sPath);
@@ -61,7 +62,7 @@ void DlgOpenProject::on_listView_doubleClicked(const QModelIndex &index)
     ErrorCheck();
 }
 
-void DlgOpenProject::on_txtCurDirectory_editingFinished()
+void DlgSetEngineLocation::on_txtCurDirectory_editingFinished()
 {
     QString sPath = ui->txtCurDirectory->text();// m_pDirModel->fileInfo(index).absoluteFilePath();
     ui->listView->setRootIndex(m_pFileModel->setRootPath(sPath));
@@ -71,7 +72,7 @@ void DlgOpenProject::on_txtCurDirectory_editingFinished()
     ErrorCheck();
 }
 
-void DlgOpenProject::ErrorCheck()
+void DlgSetEngineLocation::ErrorCheck()
 {
     QString sProjDir = ui->txtCurDirectory->text();
 
@@ -93,9 +94,9 @@ void DlgOpenProject::ErrorCheck()
             break;
         }
 
-        if(HyGlobal::IsWorkspaceValid(projDir) == false)
+        if(HyGlobal::IsEngineDirValid(projDir) == false)
         {
-            ui->lblError->setText("Error: This is not a valid Harmony workspace directory");
+            ui->lblError->setText("Error: This is not the Harmony Engine project directory");
             bIsError = true;
             break;
         }
@@ -111,4 +112,12 @@ void DlgOpenProject::ErrorCheck()
     ui->lblError->setVisible(bIsError);
     //ui->buttonBox->button(QDialogButtonBox::Ok);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!bIsError);
+}
+
+void DlgSetEngineLocation::on_listView_clicked(const QModelIndex &index)
+{
+    QString sPath = m_pFileModel->fileInfo(index).absoluteFilePath();
+    ui->txtCurDirectory->setText(sPath);
+
+    ErrorCheck();
 }

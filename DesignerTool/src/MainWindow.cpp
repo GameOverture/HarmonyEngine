@@ -1,7 +1,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
-#include "DlgOpenProject.h"
+#include "DlgSetEngineLocation.h"
 #include "DlgNewProject.h"
 #include "DlgNewItem.h"
 #include "DlgInputName.h"
@@ -18,6 +18,7 @@
 #include <QStringBuilder>
 #include <QVBoxLayout>
 #include <QTcpSocket>
+#include <QMessageBox>
 
 #define HYGUIVERSION_STRING "v0.0.1"
 
@@ -61,6 +62,31 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     
     ui->dockWidgetAtlas->hide();
     ui->dockWidgetGlyphCreator->hide();
+    
+    HyGuiLog("Checking required initialization parameters...", LOGTYPE_Normal);
+    m_Settings.beginGroup("RequiredParams");
+    {
+        QDir engineDir(m_Settings.value("engineLocation").toString());
+        
+        while(HyGlobal::IsEngineDirValid(engineDir) == false)
+        {
+            QMessageBox::information(parentWidget(), HyDesignerToolName, "First run initialization: Please specify where the Harmony Engine project location is on your machine");
+            
+            DlgSetEngineLocation *pDlg = new DlgSetEngineLocation(this);
+            if(pDlg->exec() == QDialog::Accepted)
+            {
+                engineDir.setPath(pDlg->SelectedDir());
+                m_Settings.setValue("engineLocation", QVariant(pDlg->SelectedDir()));
+            }
+            else
+            {
+                if(QMessageBox::Retry != QMessageBox::critical(parentWidget(), HyDesignerToolName, "You must specify the Harmony Engine project location to continue", QMessageBox::Retry | QMessageBox::Cancel, QMessageBox::Retry))
+                    exit(-1);
+            }
+            delete pDlg;
+        }
+    }
+    m_Settings.endGroup();
     
     // Restore workspace
     HyGuiLog("Recovering previously opened session...", LOGTYPE_Normal);
@@ -167,12 +193,12 @@ void MainWindow::on_actionNewProject_triggered()
 
 void MainWindow::on_actionOpenProject_triggered()
 {
-    DlgOpenProject *pDlg = new DlgOpenProject(this);
-    if(pDlg->exec() == QDialog::Accepted)
-    {
-        ui->explorer->AddItem(ITEM_Project, pDlg->SelectedDir(), true);
-    }
-    delete pDlg;
+//    DlgSetEngineLocation *pDlg = new DlgSetEngineLocation(this);
+//    if(pDlg->exec() == QDialog::Accepted)
+//    {
+//        ui->explorer->AddItem(ITEM_Project, pDlg->SelectedDir(), true);
+//    }
+//    delete pDlg;
 }
 
 void MainWindow::on_actionCloseProject_triggered()

@@ -33,13 +33,13 @@ SOURCES += main.cpp \
     ItemProject.cpp \
     WidgetLiveVariable.cpp \
     WidgetLiveVarManager.cpp \
-    DlgOpenProject.cpp \
     HyGuiRenderer.cpp \
     DlgAtlasGroupSettings.cpp \
     WidgetAtlasManager.cpp \
     WidgetAtlasGroup.cpp \
     HyGuiDebugger.cpp \
-    IHyGuiDrawItem.cpp
+    IHyGuiDrawItem.cpp \
+    DlgSetEngineLocation.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -61,13 +61,13 @@ HEADERS  += \
     ItemProject.h \
     WidgetLiveVariable.h \
     WidgetLiveVarManager.h \
-    DlgOpenProject.h \
     HyGuiRenderer.h \
     DlgAtlasGroupSettings.h \
     WidgetAtlasManager.h \
     WidgetAtlasGroup.h \
     HyGuiDebugger.h \
-    IHyGuiDrawItem.h
+    IHyGuiDrawItem.h \
+    DlgSetEngineLocation.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -82,10 +82,10 @@ FORMS    += \
     DlgInputName.ui \
     WidgetLiveVariable.ui \
     WidgetLiveVarManager.ui \
-    DlgOpenProject.ui \
     DlgAtlasGroupSettings.ui \
     WidgetAtlasManager.ui \
-    WidgetAtlasGroup.ui
+    WidgetAtlasGroup.ui \
+    DlgSetEngineLocation.ui
 
 Release:DESTDIR = ../bin/release
 Release:OBJECTS_DIR = ../bin/release/.obj

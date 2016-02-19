@@ -10,6 +10,8 @@
 
 #include "WidgetOutputLog.h"
 
+#define HyDesignerToolName "Harmony Designer Tool"
+
 enum eItemType
 {
     ITEM_Unknown = -1,
@@ -182,6 +184,18 @@ public:
             return false;
         
         if(!dir.exists(HYGUIPATH_RelMetaAtlasDir))
+            return false;
+        
+        return true;
+    }
+    
+    static bool IsEngineDirValid(const QDir &engineDir)
+    {
+        QDir dir(engineDir);
+        if(!dir.exists())
+            return false;
+        
+        if(!dir.exists("include/") || !dir.exists("lib/") || !dir.exists("src/") || !dir.exists("Harmony.sln") || !dir.exists("Harmony.vcxproj"))
             return false;
         
         return true;

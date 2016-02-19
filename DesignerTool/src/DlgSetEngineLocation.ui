@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DlgOpenProject</class>
- <widget class="QDialog" name="DlgOpenProject">
+ <class>DlgSetEngineLocation</class>
+ <widget class="QDialog" name="DlgSetEngineLocation">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Open Harmony Project Workspace</string>
+   <string>Choose the Harmony Engine project directory</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
@@ -120,7 +120,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>DlgOpenProject</receiver>
+   <receiver>DlgSetEngineLocation</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -136,7 +136,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>DlgOpenProject</receiver>
+   <receiver>DlgSetEngineLocation</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

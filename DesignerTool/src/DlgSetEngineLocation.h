@@ -6,18 +6,18 @@
 #include <QShowEvent>
 
 namespace Ui {
-class DlgOpenProject;
+class DlgSetEngineLocation;
 }
 
-class DlgOpenProject : public QDialog
+class DlgSetEngineLocation : public QDialog
 {
     Q_OBJECT
     
     QFileSystemModel *m_pFileModel;
 
 public:
-    explicit DlgOpenProject(QWidget *parent = 0);
-    ~DlgOpenProject();
+    explicit DlgSetEngineLocation(QWidget *parent = 0);
+    ~DlgSetEngineLocation();
     
     QString SelectedDir();
     
@@ -26,8 +26,10 @@ private slots:
     
     void on_txtCurDirectory_editingFinished();
     
+    void on_listView_clicked(const QModelIndex &index);
+    
 private:
-    Ui::DlgOpenProject *ui;
+    Ui::DlgSetEngineLocation *ui;
 
     void ErrorCheck();
 };

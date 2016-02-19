@@ -1,6 +1,8 @@
 #include "WidgetOutputLog.h"
 #include "ui_WidgetOutputLog.h"
 
+#include "HyGlobal.h"
+
 #include <QStringBuilder>
 #include <QMessageBox>
 
@@ -40,11 +42,11 @@ WidgetOutputLog::~WidgetOutputLog()
     case LOGTYPE_Normal:
         sLogMsg = sm_ksNormalHtml % sLogMsg; break;
     case LOGTYPE_Warning:
-        QMessageBox::warning(sm_pInstance->parentWidget(), "Harmony Designer Tool", sLogMsg);
+        QMessageBox::warning(sm_pInstance->parentWidget(), HyDesignerToolName, sLogMsg);
         sLogMsg = sm_ksWarningHtml % sLogMsg; 
         break;
     case LOGTYPE_Error:
-        QMessageBox::critical(sm_pInstance->parentWidget(), "Harmony Designer Tool", sLogMsg);
+        QMessageBox::critical(sm_pInstance->parentWidget(), HyDesignerToolName, sLogMsg);
         sLogMsg = sm_ksErrorHtml % sLogMsg;
         break;
     case LOGTYPE_Info:
