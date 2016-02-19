@@ -61,7 +61,7 @@ void DlgNewProject::on_buttonBox_accepted()
 
 void DlgNewProject::on_btnBrowse_clicked()
 {
-    QFileDialog *pDlg = new QFileDialog(this, "Choose an empty directory for new game project");
+    QFileDialog *pDlg = new QFileDialog(this, "Choose the location where the game directory will appear");
     pDlg->setFileMode(QFileDialog::Directory);
     pDlg->setOption(QFileDialog::ShowDirsOnly, true);
 
