@@ -147,23 +147,62 @@ void DlgNewProject::ErrorCheck()
             break;
         }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(rootDir.exists(ui->txtAssetsLocation->text()) == false)
         {
             ui->lblError->setText("Error: Assets location (relative to project) does not exist.");
             bIsError = true;
             break;
         }
+        if(rootDir.exists(QDir::cleanPath(ui->txtAssetsLocation->text() + "/" + ui->txtAssetsDirName->text())))
+        {
+            ui->lblError->setText("Error: A directory at the assets location already has the name: " + ui->txtAssetsDirName->text());
+            bIsError = true;
+            break;
+        }
+        if(ui->txtAssetsDirName->text().isEmpty())
+        {
+            ui->lblError->setText("Error: Assets directory name cannot be blank");
+            bIsError = true;
+            break;
+        }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(rootDir.exists(ui->txtMetaDataLocation->text()) == false)
         {
             ui->lblError->setText("Error: Meta-data location (relative to project) does not exist.");
             bIsError = true;
             break;
         }
+        if(rootDir.exists(QDir::cleanPath(ui->txtMetaDataLocation->text() + "/" + ui->txtMetaDataDirName->text())))
+        {
+            ui->lblError->setText("Error: A directory at the meta-data location already has the name: " + ui->txtMetaDataDirName->text());
+            bIsError = true;
+            break;
+        }
+        if(ui->txtMetaDataDirName->text().isEmpty())
+        {
+            ui->lblError->setText("Error: Meta-data directory name cannot be blank");
+            bIsError = true;
+            break;
+        }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(rootDir.exists(ui->txtSourceLocation->text()) == false)
         {
             ui->lblError->setText("Error: Source code location (relative to project) does not exist.");
+            bIsError = true;
+            break;
+        }
+        if(rootDir.exists(QDir::cleanPath(ui->txtSourceLocation->text() + "/" + ui->txtSourceDirName->text())))
+        {
+            ui->lblError->setText("Error: A directory at the source code location already has the name: " + ui->txtSourceDirName->text());
+            bIsError = true;
+            break;
+        }
+        if(ui->txtSourceDirName->text().isEmpty())
+        {
+            ui->lblError->setText("Error: Source code directory name cannot be blank");
             bIsError = true;
             break;
         }
@@ -269,5 +308,20 @@ void DlgNewProject::on_txtSourceLocation_textChanged(const QString &arg1)
         SetRelativePaths();
     }
     
+    ErrorCheck();
+}
+
+void DlgNewProject::on_txtAssetsDirName_textChanged(const QString &arg1)
+{
+    ErrorCheck();
+}
+
+void DlgNewProject::on_txtMetaDataDirName_textChanged(const QString &arg1)
+{
+    ErrorCheck();
+}
+
+void DlgNewProject::on_txtSourceDirName_textChanged(const QString &arg1)
+{
     ErrorCheck();
 }

@@ -45,6 +45,12 @@ private slots:
     
     void on_txtSourceLocation_textChanged(const QString &arg1);
     
+    void on_txtAssetsDirName_textChanged(const QString &arg1);
+
+    void on_txtMetaDataDirName_textChanged(const QString &arg1);
+
+    void on_txtSourceDirName_textChanged(const QString &arg1);
+
 private:
     Ui::DlgNewProject *ui;
     
