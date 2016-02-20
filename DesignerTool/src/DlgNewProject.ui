@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>510</width>
-    <height>365</height>
+    <height>388</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,10 +22,48 @@
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="5" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item row="4" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QLineEdit" name="txtAssetsDirName">
+        <widget class="QCheckBox" name="chkCreateGameDir">
+         <property name="text">
+          <string>Create game directory at location</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblAppendHint">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Appends &quot;&lt;/GAMETITLE&gt;&quot; to above</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLineEdit" name="txtGameLocation">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="14" column="0" colspan="2">
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <widget class="QLineEdit" name="txtMetaDataDirName">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -39,12 +77,12 @@
           </size>
          </property>
          <property name="text">
-          <string>data</string>
+          <string>_metaData</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="txtAssetsLocation">
+        <widget class="QLineEdit" name="txtMetaDataLocation">
          <property name="text">
           <string>./</string>
          </property>
@@ -52,69 +90,37 @@
        </item>
       </layout>
      </item>
-     <item row="2" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item row="6" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
-        <widget class="QLabel" name="lblWorkspaceLocation">
+        <widget class="QLabel" name="label">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>145</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
-          <string>Project Location:</string>
+          <string>Game assets dir name:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_4">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
+        <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>The &quot;root&quot; location of the project and the workspace file</string>
+          <string>Game assets relative location:</string>
          </property>
         </widget>
        </item>
       </layout>
      </item>
-     <item row="1" column="0">
-      <widget class="QLineEdit" name="txtGameTitle"/>
-     </item>
-     <item row="7" column="1">
-      <widget class="QPushButton" name="btnBrowseMetaData">
-       <property name="text">
-        <string>Browse...</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QPushButton" name="btnBrowseAssets">
-       <property name="text">
-        <string>Browse...</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QPushButton" name="btnBrowse">
-       <property name="text">
-        <string>Browse...</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLineEdit" name="txtGameLocation">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
      <item row="12" column="0" colspan="2">
-      <widget class="QDialogButtonBox" name="buttonBox">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="standardButtons">
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="0" colspan="2">
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
         <string>Development Environment:</string>
@@ -151,7 +157,7 @@
        </layout>
       </widget>
      </item>
-     <item row="11" column="0" colspan="2">
+     <item row="13" column="0" colspan="2">
       <widget class="QLabel" name="lblError">
        <property name="text">
         <string/>
@@ -164,13 +170,6 @@
        </property>
       </widget>
      </item>
-     <item row="9" column="1">
-      <widget class="QPushButton" name="btnBrowseSource">
-       <property name="text">
-        <string>Browse...</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="lblGameTitle">
        <property name="text">
@@ -178,40 +177,17 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>145</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Game assets dir name:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Game assets relative location:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+     <item row="11" column="1">
+      <widget class="QPushButton" name="btnBrowseSource">
+       <property name="text">
+        <string>Browse...</string>
+       </property>
+      </widget>
      </item>
-     <item row="7" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item row="11" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_9">
        <item>
-        <widget class="QLineEdit" name="txtMetaDataDirName">
+        <widget class="QLineEdit" name="txtSourceDirName">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -225,12 +201,12 @@
           </size>
          </property>
          <property name="text">
-          <string>_metaData</string>
+          <string>src</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="txtMetaDataLocation">
+        <widget class="QLineEdit" name="txtSourceLocation">
          <property name="text">
           <string>./</string>
          </property>
@@ -238,37 +214,7 @@
        </item>
       </layout>
      </item>
-     <item row="6" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_7">
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>145</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Meta-data dir name:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>Meta-data relative location:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="8" column="0">
+     <item row="10" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout_8">
        <item>
         <widget class="QLabel" name="label_3">
@@ -298,10 +244,40 @@
        </item>
       </layout>
      </item>
-     <item row="9" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <item row="8" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
        <item>
-        <widget class="QLineEdit" name="txtSourceDirName">
+        <widget class="QLabel" name="label_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>145</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Meta-data dir name:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Meta-data relative location:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="7" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QLineEdit" name="txtAssetsDirName">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -315,18 +291,49 @@
           </size>
          </property>
          <property name="text">
-          <string>src</string>
+          <string>data</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="txtSourceLocation">
+        <widget class="QLineEdit" name="txtAssetsLocation">
          <property name="text">
           <string>./</string>
          </property>
         </widget>
        </item>
       </layout>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLineEdit" name="txtGameTitle"/>
+     </item>
+     <item row="9" column="1">
+      <widget class="QPushButton" name="btnBrowseMetaData">
+       <property name="text">
+        <string>Browse...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QPushButton" name="btnBrowseAssets">
+       <property name="text">
+        <string>Browse...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QPushButton" name="btnBrowse">
+       <property name="text">
+        <string>Browse...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lblWorkspaceLocation">
+       <property name="text">
+        <string>Project Location:</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

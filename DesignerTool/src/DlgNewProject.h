@@ -19,7 +19,10 @@ public:
     explicit DlgNewProject(QString &sDefaultLocation, QWidget *parent = 0);
     ~DlgNewProject();
 
-    QString GetProjPath();
+    QString GetProjFilePath();
+    QString GetRelAssetsPath();
+    QString GetRelMetaDataPath();
+    QString GetRelSourcePath();
 
 private slots:
 
@@ -50,6 +53,8 @@ private slots:
     void on_txtMetaDataDirName_textChanged(const QString &arg1);
 
     void on_txtSourceDirName_textChanged(const QString &arg1);
+
+    void on_chkCreateGameDir_clicked();
 
 private:
     Ui::DlgNewProject *ui;

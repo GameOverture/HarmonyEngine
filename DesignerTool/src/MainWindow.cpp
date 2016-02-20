@@ -169,7 +169,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurSelectedProj = pProj;
     if(sm_pInstance->m_pCurSelectedProj)
     {
-        sm_pInstance->ui->renderer->GetRenderer()->Reload(sm_pInstance->m_pCurSelectedProj->GetPath(HY_DATA_DIR));
+        sm_pInstance->ui->renderer->GetRenderer()->Reload(sm_pInstance->m_pCurSelectedProj->GetAssetsAbsPath());
         
         sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasManager());
         sm_pInstance->m_pCurSelectedProj->GetAtlasManager()->show();
@@ -191,9 +191,7 @@ void MainWindow::on_actionNewProject_triggered()
     DlgNewProject *pDlg = new DlgNewProject(QDir::current().path(), this);
     if(pDlg->exec())
     {
-        QString sProjDirPath = pDlg->GetProjPath();
-
-        ui->explorer->AddItem(ITEM_Project, sProjDirPath, true);
+        ui->explorer->AddItemProject(pDlg->GetProjFilePath(), pDlg->GetRelAssetsPath(), pDlg->GetRelMetaDataPath(), pDlg->GetRelSourcePath());
     }
     delete pDlg;
 }
@@ -235,13 +233,12 @@ void MainWindow::on_actionNewFont_triggered()
 
 void MainWindow::NewItem(eItemType eItem)
 {
-    QString sProjPath = ui->explorer->GetCurProjSelected()->GetPath();
-    QString sSpritePath = sProjPath % HYGUIPATH_RelDataDir % HyGlobal::ItemName(eItem) % "/";
+    QString sNewItemPath = ui->explorer->GetCurProjSelected()->GetAssetsAbsPath() % HyGlobal::ItemName(eItem) % "/";
             
-    DlgNewItem *pDlg = new DlgNewItem(sSpritePath, eItem, this);
+    DlgNewItem *pDlg = new DlgNewItem(sNewItemPath, eItem, this);
     if(pDlg->exec())
     {
-        QString sPath = QDir::cleanPath(sSpritePath % pDlg->GetPrefix() % "/" % pDlg->GetName() % HyGlobal::ItemExt(eItem));
+        QString sPath = QDir::cleanPath(sNewItemPath % pDlg->GetPrefix() % "/" % pDlg->GetName() % HyGlobal::ItemExt(eItem));
         ui->explorer->AddItem(eItem, sPath, true);
     }
     delete pDlg;

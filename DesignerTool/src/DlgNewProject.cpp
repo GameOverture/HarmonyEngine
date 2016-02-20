@@ -5,6 +5,9 @@
 
 #include <QDir>
 #include <QFileDialog>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
     QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
@@ -36,41 +39,74 @@ DlgNewProject::~DlgNewProject()
     delete ui;
 }
 
-QString DlgNewProject::GetProjPath()
+QString DlgNewProject::GetProjFilePath()
 {
-    return QDir::cleanPath(ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + HyGlobal::ItemExt(ITEM_Project));
+    if(ui->chkCreateGameDir->isChecked())
+        return QDir::cleanPath(ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + '/' + ui->txtGameTitle->text() + HyGlobal::ItemExt(ITEM_Project));
+    else
+        return QDir::cleanPath(ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + HyGlobal::ItemExt(ITEM_Project));
+}
+
+QString DlgNewProject::GetRelAssetsPath()
+{
+    return QDir::cleanPath(ui->txtAssetsLocation->text() + '/');
+}
+
+QString DlgNewProject::GetRelMetaDataPath()
+{
+    return QDir::cleanPath(ui->txtMetaDataLocation->text() + '/');
+}
+
+QString DlgNewProject::GetRelSourcePath()
+{
+    return QDir::cleanPath(ui->txtSourceLocation->text() + '/');
 }
 
 void DlgNewProject::on_buttonBox_accepted()
 {
-    //
-    //
-    // TODO: Create the workspace based on new relative directories
-    //
-    //
+    QString sRelAssetsPath = QDir::cleanPath(ui->txtAssetsLocation->text() % "/" % ui->txtAssetsDirName->text() % "/");
+    QString sRelMetaDataPath = QDir::cleanPath(ui->txtMetaDataLocation->text() % "/" % ui->txtMetaDataDirName->text() % "/");
+    QString sRelSourcePath = QDir::cleanPath(ui->txtSourceLocation->text() % "/" % ui->txtSourceDirName->text() % "/");
+
+    QJsonObject jsonObj;
+    jsonObj.insert("AssetsPath", sRelAssetsPath);
+    jsonObj.insert("MetaDataPath", sRelMetaDataPath);
+    jsonObj.insert("SourcePath", sRelSourcePath);
+
+    QFile newProjectFile(GetProjFilePath());
+    if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+    {
+       HyGuiLog("Couldn't open new project file for writing", LOGTYPE_Error);
+    }
+    else
+    {
+        QJsonDocument newProjectDoc(jsonObj);
+        qint64 iBytesWritten = newProjectFile.write(newProjectDoc.toJson());
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+        {
+            HyGuiLog("Could not write new project file: " % newProjectFile.errorString(), LOGTYPE_Error);
+        }
+
+        newProjectFile.close();
+    }
     
     // Create workspace file tree
     QDir projDir(ui->txtGameLocation->text());
     
-    projDir.mkdir(ui->txtGameTitle->text());
-    projDir.cd(ui->txtGameTitle->text());
-    
-    projDir.mkdir(HYGUIPATH_RelDataDir);
-    projDir.mkdir(HYGUIPATH_RelDataAtlasDir);
-    projDir.mkdir(HYGUIPATH_RelMetaDataDir);
-    projDir.mkdir(HYGUIPATH_RelMetaAtlasDir);
-    
-    // TODO: Create code projects
-    projDir.mkdir(HYGUIPATH_RelSrcDataDir);
-
-    projDir.cd(HYGUIPATH_RelDataDir);
-    
+    projDir.mkdir(sRelAssetsPath);
+    projDir.cd(sRelAssetsPath);
     QStringList dirList = HyGlobal::SubDirNameList();
     foreach(QString sDir, dirList)
         projDir.mkdir(sDir);
-    
-    projDir.cd(ui->txtGameLocation->text());
-    projDir.cd(ui->txtGameTitle->text());
+
+    projDir.setPath(ui->txtGameLocation->text());
+    projDir.mkdir(sRelMetaDataPath);
+    projDir.cd(sRelAssetsPath);
+    projDir.mkdir("atlas/");
+
+    projDir.setPath(ui->txtGameLocation->text());
+    projDir.mkdir(sRelSourcePath);
+    // TODO: Create code projects
 }
 
 void DlgNewProject::on_btnBrowse_clicked()
@@ -92,6 +128,8 @@ void DlgNewProject::on_btnBrowse_clicked()
 
 void DlgNewProject::on_txtGameTitle_textChanged(const QString &arg1)
 {
+    ui->lblAppendHint->setText("Appends \"/" % ui->txtGameTitle->text() % "/\" to above");
+
     ErrorCheck();
 }
 
@@ -139,7 +177,7 @@ void DlgNewProject::ErrorCheck()
             break;
         }
 
-        QFile projFile(GetProjPath());
+        QFile projFile(GetProjFilePath());
         if(projFile.exists())
         {
             ui->lblError->setText("Error: Project with this name already exists at this location.");
@@ -214,7 +252,7 @@ void DlgNewProject::ErrorCheck()
     else
     {
         ui->lblError->setStyleSheet("QLabel { color : black; }");
-        ui->lblError->setText(GetProjPath() + "is a valid project workspace.");
+        ui->lblError->setText(GetProjFilePath() + "is a valid project workspace.");
     }
     ui->lblError->setVisible(bIsError);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!bIsError);
@@ -322,6 +360,11 @@ void DlgNewProject::on_txtMetaDataDirName_textChanged(const QString &arg1)
 }
 
 void DlgNewProject::on_txtSourceDirName_textChanged(const QString &arg1)
+{
+    ErrorCheck();
+}
+
+void DlgNewProject::on_chkCreateGameDir_clicked()
 {
     ErrorCheck();
 }

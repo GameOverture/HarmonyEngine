@@ -37,7 +37,10 @@ void WidgetExplorer::AddItemProject(const QString sNewItemPath, const QString sR
     QList<eItemType> subDirList = HyGlobal::SubDirList();
     foreach(eItemType eType, subDirList)
     {
-        QString sSubDirPath = pItem->GetPath() % HYGUIPATH_RelDataDir % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
+        if(eType == ITEM_DirAtlases)
+            continue;
+
+        QString sSubDirPath = pItem->GetAssetsAbsPath() % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
         Item *pSubDirItem = new Item(eType, sSubDirPath);
         
         QTreeWidgetItem *pSubDirTreeItem = CreateTreeItem(pProjTreeItem, pSubDirItem);

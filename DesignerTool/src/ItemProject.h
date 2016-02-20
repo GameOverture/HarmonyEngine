@@ -28,10 +28,17 @@ class ItemProject : public Item
     
 public:
     ~ItemProject();
+
+    QString GetDirPath() const;
     
+    QString GetAssetsAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeAssetsLocation + '/'); }
+    QString GetAssetsRelPath() const                    { return m_sRelativeAssetsLocation; }
+    QString GetMetaDataAbsPath() const                  { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeMetaDataLocation + '/'); }
+    QString GetMetaDataRelPath() const                  { return m_sRelativeMetaDataLocation; }
+    QString GetSourceAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation + '/'); }
+    QString GetSourceRelPath() const                    { return m_sRelativeSourceLocation; }
+
     WidgetAtlasManager *GetAtlasManager()               { return m_pAtlasManager; }
-    QString GetPath(QString sAppendRelativePath) const  { return m_sPath % sAppendRelativePath; }
-    QString GetPath() const                             { return m_sPath; }
 
     virtual void OnDraw_Open(IHyApplication &hyApp);
     virtual void OnDraw_Close(IHyApplication &hyApp);

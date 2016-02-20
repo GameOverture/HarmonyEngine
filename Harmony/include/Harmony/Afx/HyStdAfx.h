@@ -80,7 +80,6 @@ struct HyWindowInfo
 };
 
 #define HY_MAXWINDOWS 6
-#define HY_DATA_DIR "data/"
 
 // Client supplies these initialization parameters to the engine
 struct HarmonyInit

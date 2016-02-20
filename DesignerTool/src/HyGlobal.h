@@ -24,6 +24,7 @@ enum eItemType
     ITEM_DirSprites,
     ITEM_DirShaders,
     ITEM_DirEntities,
+    ITEM_DirAtlases,
     ITEM_Prefix,        // Essentially a sub-directory
     ITEM_Audio,
     ITEM_Particles,
@@ -47,16 +48,10 @@ enum eAtlasNodeType
     NUMATLAS
 };
 
-#define HYGUIPATH_RelDataDir                "data/"
-#define HYGUIPATH_RelMetaDataDir            "_metaData/"
-#define HYGUIPATH_RelSrcDataDir             "src/"
-
-#define HYGUIPATH_RelDataAtlasDir           HYGUIPATH_RelDataDir "Atlas/"
+//#define HYGUIPATH_RelDataAtlasDir           HYGUIPATH_RelDataDir "Atlas/"
 #define HYGUIPATH_DataAtlasFileName         "atlasInfo.json"
 
-#define HYGUIPATH_RelMetaDataTmpDir         HYGUIPATH_RelMetaDataDir "tmp/"
-
-#define HYGUIPATH_RelMetaAtlasDir       HYGUIPATH_RelMetaDataDir "atlas/"
+//#define HYGUIPATH_RelMetaAtlasDir       HYGUIPATH_RelMetaDataDir "atlas/"
 #define HYGUIPATH_MetaDataAtlasFileName     "settings.hygui"
 
 class HyGlobal
@@ -76,11 +71,16 @@ public:
         // 'Dir' and 'item' both require the same name
         sm_sItemNames[ITEM_DirAudio] = sm_sItemNames[ITEM_Audio] = "Audio";
         sm_sItemNames[ITEM_DirParticles] = sm_sItemNames[ITEM_Particles] = "Particles";
-        sm_sItemNames[ITEM_DirFonts] = sm_sItemNames[ITEM_Font] = "Font";
+        sm_sItemNames[ITEM_DirFonts] = "Fonts";
+        sm_sItemNames[ITEM_Font] = "Font";
         sm_sItemNames[ITEM_DirSpine] = sm_sItemNames[ITEM_Spine] = "Spine";
-        sm_sItemNames[ITEM_DirSprites] = sm_sItemNames[ITEM_Sprite] = "Sprite";
-        sm_sItemNames[ITEM_DirShaders] = sm_sItemNames[ITEM_Shader] = "Shader";
-        sm_sItemNames[ITEM_DirEntities] = sm_sItemNames[ITEM_Entity] = "Entity";
+        sm_sItemNames[ITEM_DirSprites] = "Sprites";
+        sm_sItemNames[ITEM_Sprite] = "Sprite";
+        sm_sItemNames[ITEM_DirShaders] = "Shaders";
+        sm_sItemNames[ITEM_Shader] = "Shader";
+        sm_sItemNames[ITEM_DirEntities] = "Entities";
+        sm_sItemNames[ITEM_Entity] = "Entity";
+        sm_sItemNames[ITEM_DirAtlases] = "Atlases";
         
         sm_sItemExt[ITEM_Project] = ".hyproj";
         sm_sItemExt[ITEM_DirAudio] = "/";
@@ -90,6 +90,7 @@ public:
         sm_sItemExt[ITEM_DirSpine] = "/";
         sm_sItemExt[ITEM_DirSprites] = "/";
         sm_sItemExt[ITEM_DirEntities] = "/";
+        sm_sItemExt[ITEM_DirAtlases] = "/";
         sm_sItemExt[ITEM_Prefix] = "/";
         sm_sItemExt[ITEM_Audio] = ".hyaud";
         sm_sItemExt[ITEM_Particles] = ".hypfx";
@@ -107,6 +108,7 @@ public:
         sm_ItemIcons[ITEM_DirSprites].addFile(QString(":/icons16x16/sprite-folder.png"));
         sm_ItemIcons[ITEM_DirShaders].addFile(QString(":/icons16x16/shader-folder.png"));
         sm_ItemIcons[ITEM_DirEntities].addFile(QString(":/icons16x16/entity-folder.png"));
+        //sm_ItemIcons[ITEM_DirAtlases].addFile();
         sm_ItemIcons[ITEM_Prefix].addFile(QString(":/icons16x16/folder.png"));
         sm_ItemIcons[ITEM_Audio].addFile(QString(":/icons16x16/audio-document.png"));
         sm_ItemIcons[ITEM_Particles].addFile(QString(":/icons16x16/particle-document.png"));
@@ -136,6 +138,7 @@ public:
         list.append(ITEM_DirSprites);
         list.append(ITEM_DirShaders);
         list.append(ITEM_DirEntities);
+        list.append(ITEM_DirAtlases);
         
         return list;
     }

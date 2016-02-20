@@ -3,10 +3,12 @@
 
 #include "WidgetRenderer.h"
 
+#include <QFileInfo>
+
 ItemProject::ItemProject(const QString sPath, const QString sRelPathAssets, const QString sRelPathMetaData, const QString sRelPathSource) : Item(ITEM_Project, sPath),
-                                                                                                                                            m_sRelativeAssetsLocation(sRelPathAssets),
-                                                                                                                                            m_sRelativeMetaDataLocation(sRelPathMetaData),
-                                                                                                                                            m_sRelativeSourceLocation(sRelPathSource),
+                                                                                                                                            m_sRelativeAssetsLocation(QDir::cleanPath(sRelPathAssets)),
+                                                                                                                                            m_sRelativeMetaDataLocation(QDir::cleanPath(sRelPathMetaData)),
+                                                                                                                                            m_sRelativeSourceLocation(QDir::cleanPath(sRelPathSource)),
                                                                                                                                             m_eState(DRAWSTATE_Nothing)
 {
     m_pAtlasManager = new WidgetAtlasManager(this);
@@ -15,6 +17,12 @@ ItemProject::ItemProject(const QString sPath, const QString sRelPathAssets, cons
 ItemProject::~ItemProject()
 {
     delete m_pAtlasManager;
+}
+
+QString ItemProject::GetDirPath() const
+{
+    QFileInfo file(m_sPath);
+    return file.dir().absolutePath();
 }
 
 /*virtual*/ void ItemProject::OnDraw_Open(IHyApplication &hyApp)
