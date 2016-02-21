@@ -110,7 +110,7 @@ void DlgNewProject::on_buttonBox_accepted()
 
     projDir.setPath(GetProjDirPath());
     projDir.mkdir(sRelMetaDataPath);
-    projDir.cd(sRelAssetsPath);
+    projDir.cd(sRelMetaDataPath);
     projDir.mkdir("atlas/");
 
     projDir.setPath(GetProjDirPath());
