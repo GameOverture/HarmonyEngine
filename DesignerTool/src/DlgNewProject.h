@@ -20,9 +20,12 @@ public:
     ~DlgNewProject();
 
     QString GetProjFilePath();
+    QString GetProjDirPath();
+
     QString GetRelAssetsPath();
     QString GetRelMetaDataPath();
     QString GetRelSourcePath();
+
 
 private slots:
 

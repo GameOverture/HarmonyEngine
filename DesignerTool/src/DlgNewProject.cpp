@@ -47,6 +47,14 @@ QString DlgNewProject::GetProjFilePath()
         return QDir::cleanPath(ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + HyGlobal::ItemExt(ITEM_Project));
 }
 
+QString DlgNewProject::GetProjDirPath()
+{
+    if(ui->chkCreateGameDir->isChecked())
+        return QDir::cleanPath(ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + '/');
+    else
+        return QDir::cleanPath(ui->txtGameLocation->text() + '/');
+}
+
 QString DlgNewProject::GetRelAssetsPath()
 {
     return QDir::cleanPath(ui->txtAssetsLocation->text() + '/');
@@ -64,6 +72,9 @@ QString DlgNewProject::GetRelSourcePath()
 
 void DlgNewProject::on_buttonBox_accepted()
 {
+    QDir projDir(GetProjDirPath());
+    projDir.mkpath(".");
+
     QString sRelAssetsPath = QDir::cleanPath(ui->txtAssetsLocation->text() % "/" % ui->txtAssetsDirName->text() % "/");
     QString sRelMetaDataPath = QDir::cleanPath(ui->txtMetaDataLocation->text() % "/" % ui->txtMetaDataDirName->text() % "/");
     QString sRelSourcePath = QDir::cleanPath(ui->txtSourceLocation->text() % "/" % ui->txtSourceDirName->text() % "/");
@@ -91,20 +102,18 @@ void DlgNewProject::on_buttonBox_accepted()
     }
     
     // Create workspace file tree
-    QDir projDir(ui->txtGameLocation->text());
-    
     projDir.mkdir(sRelAssetsPath);
     projDir.cd(sRelAssetsPath);
     QStringList dirList = HyGlobal::SubDirNameList();
     foreach(QString sDir, dirList)
         projDir.mkdir(sDir);
 
-    projDir.setPath(ui->txtGameLocation->text());
+    projDir.setPath(GetProjDirPath());
     projDir.mkdir(sRelMetaDataPath);
     projDir.cd(sRelAssetsPath);
     projDir.mkdir("atlas/");
 
-    projDir.setPath(ui->txtGameLocation->text());
+    projDir.setPath(GetProjDirPath());
     projDir.mkdir(sRelSourcePath);
     // TODO: Create code projects
 }
@@ -140,19 +149,28 @@ void DlgNewProject::on_txtGameLocation_textChanged(const QString &arg1)
 
 void DlgNewProject::SetRelativePaths()
 {
-    QDir rootLocation(ui->txtGameLocation->text());
+    QDir rootLocation(GetProjDirPath());
     
     ui->txtAssetsLocation->setText(rootLocation.relativeFilePath(m_sAbsoluteAssetsLocation));
     if(ui->txtAssetsLocation->text().isEmpty())
+    {
         ui->txtAssetsLocation->setText("./");
+        m_sAbsoluteAssetsLocation = "";
+    }
     
     ui->txtMetaDataLocation->setText(rootLocation.relativeFilePath(m_sAbsoluteMetaDataLocation));
     if(ui->txtMetaDataLocation->text().isEmpty())
+    {
         ui->txtMetaDataLocation->setText("./");
+        m_sAbsoluteMetaDataLocation = "";
+    }
     
     ui->txtSourceLocation->setText(rootLocation.relativeFilePath(m_sAbsoluteSourceLocation));
     if(ui->txtSourceLocation->text().isEmpty())
+    {
         ui->txtSourceLocation->setText("./");
+        m_sAbsoluteSourceLocation = "";
+    }
     
     ErrorCheck();
 }
@@ -185,8 +203,11 @@ void DlgNewProject::ErrorCheck()
             break;
         }
         
+        rootDir.setPath(GetProjDirPath());
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(rootDir.exists(ui->txtAssetsLocation->text()) == false)
+        if((ui->chkCreateGameDir->isChecked() == false && rootDir.exists(ui->txtAssetsLocation->text()) == false) ||
+           (ui->chkCreateGameDir->isChecked() && ui->txtAssetsLocation->text().left(3) == "../" && rootDir.exists(ui->txtAssetsLocation->text()) == false))
         {
             ui->lblError->setText("Error: Assets location (relative to project) does not exist.");
             bIsError = true;
@@ -206,7 +227,8 @@ void DlgNewProject::ErrorCheck()
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(rootDir.exists(ui->txtMetaDataLocation->text()) == false)
+        if((ui->chkCreateGameDir->isChecked() == false && rootDir.exists(ui->txtMetaDataLocation->text()) == false) ||
+           (ui->chkCreateGameDir->isChecked() && ui->txtMetaDataLocation->text().left(3) == "../" && rootDir.exists(ui->txtMetaDataLocation->text()) == false))
         {
             ui->lblError->setText("Error: Meta-data location (relative to project) does not exist.");
             bIsError = true;
@@ -226,7 +248,8 @@ void DlgNewProject::ErrorCheck()
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(rootDir.exists(ui->txtSourceLocation->text()) == false)
+        if((ui->chkCreateGameDir->isChecked() == false && rootDir.exists(ui->txtSourceLocation->text()) == false) ||
+           (ui->chkCreateGameDir->isChecked() && ui->txtSourceLocation->text().left(3) == "../" && rootDir.exists(ui->txtSourceLocation->text()) == false))
         {
             ui->lblError->setText("Error: Source code location (relative to project) does not exist.");
             bIsError = true;
@@ -366,5 +389,6 @@ void DlgNewProject::on_txtSourceDirName_textChanged(const QString &arg1)
 
 void DlgNewProject::on_chkCreateGameDir_clicked()
 {
+    SetRelativePaths();
     ErrorCheck();
 }
