@@ -31,11 +31,11 @@ public:
 
     QString GetDirPath() const;
     
-    QString GetAssetsAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeAssetsLocation + '/'); }
+    QString GetAssetsAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeAssetsLocation) + '/'; }
     QString GetAssetsRelPath() const                    { return m_sRelativeAssetsLocation; }
-    QString GetMetaDataAbsPath() const                  { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeMetaDataLocation + '/'); }
+    QString GetMetaDataAbsPath() const                  { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeMetaDataLocation) + '/'; }
     QString GetMetaDataRelPath() const                  { return m_sRelativeMetaDataLocation; }
-    QString GetSourceAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation + '/'); }
+    QString GetSourceAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation) + '/'; }
     QString GetSourceRelPath() const                    { return m_sRelativeSourceLocation; }
 
     WidgetAtlasManager *GetAtlasManager()               { return m_pAtlasManager; }

@@ -22,7 +22,7 @@ ItemProject::~ItemProject()
 QString ItemProject::GetDirPath() const
 {
     QFileInfo file(m_sPath);
-    return file.dir().absolutePath();
+    return file.dir().absolutePath() + '/';
 }
 
 /*virtual*/ void ItemProject::OnDraw_Open(IHyApplication &hyApp)
