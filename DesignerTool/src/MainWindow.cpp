@@ -106,8 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
         QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
         foreach(QString sProjPath, sListOpenProjs)
         {
-            //QJsonObject
-            //ui->explorer->AddItemProject(sProjPath, false);
+            ui->explorer->AddItemProject(sProjPath);
         }
         
         QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
@@ -191,7 +190,7 @@ void MainWindow::on_actionNewProject_triggered()
     DlgNewProject *pDlg = new DlgNewProject(QDir::current().path(), this);
     if(pDlg->exec())
     {
-        ui->explorer->AddItemProject(pDlg->GetProjFilePath(), pDlg->GetRelAssetsPath(), pDlg->GetRelMetaDataPath(), pDlg->GetRelSourcePath());
+        ui->explorer->AddItemProject(pDlg->GetProjFilePath());
     }
     delete pDlg;
 }

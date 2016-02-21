@@ -24,7 +24,7 @@ public:
     explicit WidgetExplorer(QWidget *parent = 0);
     ~WidgetExplorer();
     
-    void AddItemProject(const QString sNewItemPath, const QString sRelPathAssets, const QString sRelPathMetaData, const QString sRelPathSource);
+    void AddItemProject(const QString sNewProjectFilePath);
     void AddItem(eItemType eNewItemType, const QString sNewItemPath, bool bOpenAfterAdd);
     void RemoveItem(Item *pItem);
     

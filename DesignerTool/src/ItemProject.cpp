@@ -3,14 +3,32 @@
 
 #include "WidgetRenderer.h"
 
+#include <QFile>
 #include <QFileInfo>
+#include <QJsonDocument>
+#include <QJsonObject>
 
-ItemProject::ItemProject(const QString sPath, const QString sRelPathAssets, const QString sRelPathMetaData, const QString sRelPathSource) : Item(ITEM_Project, sPath),
-                                                                                                                                            m_sRelativeAssetsLocation(QDir::cleanPath(sRelPathAssets)),
-                                                                                                                                            m_sRelativeMetaDataLocation(QDir::cleanPath(sRelPathMetaData)),
-                                                                                                                                            m_sRelativeSourceLocation(QDir::cleanPath(sRelPathSource)),
-                                                                                                                                            m_eState(DRAWSTATE_Nothing)
+ItemProject::ItemProject(const QString sNewProjectFilePath) : Item(ITEM_Project, sNewProjectFilePath),
+                                                              m_eState(DRAWSTATE_Nothing)
 {
+    QFile projFile(sNewProjectFilePath);
+    if(projFile.exists())
+    {
+        if(!projFile.open(QIODevice::ReadOnly))
+            HyGuiLog("ItemProject::ItemProject() could not open the project file: " % sNewProjectFilePath, LOGTYPE_Error);
+    }
+    else
+        HyGuiLog("ItemProject::ItemProject() could not find the project file: " % sNewProjectFilePath, LOGTYPE_Error);
+
+    QJsonDocument settingsDoc = QJsonDocument::fromJson(projFile.readAll());
+    projFile.close();
+
+    QJsonObject projPathsObj = settingsDoc.object();
+
+    m_sRelativeAssetsLocation = projPathsObj["AssetsPath"].toString();
+    m_sRelativeMetaDataLocation = projPathsObj["MetaDataPath"].toString();
+    m_sRelativeSourceLocation = projPathsObj["SourcePath"].toString();
+
     m_pAtlasManager = new WidgetAtlasManager(this);
 }
 

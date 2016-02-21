@@ -27,9 +27,9 @@ WidgetExplorer::~WidgetExplorer()
     delete ui;
 }
 
-void WidgetExplorer::AddItemProject(const QString sNewItemPath, const QString sRelPathAssets, const QString sRelPathMetaData, const QString sRelPathSource)
+void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
 {
-    ItemProject *pItem = new ItemProject(sNewItemPath, sRelPathAssets, sRelPathMetaData, sRelPathSource);
+    ItemProject *pItem = new ItemProject(sNewProjectFilePath);
     HyGuiLog("Opening project: " % pItem->GetPath(), LOGTYPE_Info);
     
     QTreeWidgetItem *pProjTreeItem = CreateTreeItem(NULL, pItem);

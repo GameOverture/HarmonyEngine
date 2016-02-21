@@ -55,21 +55,6 @@ QString DlgNewProject::GetProjDirPath()
         return QDir::cleanPath(ui->txtGameLocation->text() + '/');
 }
 
-QString DlgNewProject::GetRelAssetsPath()
-{
-    return QDir::cleanPath(ui->txtAssetsLocation->text() + '/');
-}
-
-QString DlgNewProject::GetRelMetaDataPath()
-{
-    return QDir::cleanPath(ui->txtMetaDataLocation->text() + '/');
-}
-
-QString DlgNewProject::GetRelSourcePath()
-{
-    return QDir::cleanPath(ui->txtSourceLocation->text() + '/');
-}
-
 void DlgNewProject::on_buttonBox_accepted()
 {
     QDir projDir(GetProjDirPath());
