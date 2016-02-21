@@ -197,12 +197,16 @@ void MainWindow::on_actionNewProject_triggered()
 
 void MainWindow::on_actionOpenProject_triggered()
 {
-//    DlgSetEngineLocation *pDlg = new DlgSetEngineLocation(this);
-//    if(pDlg->exec() == QDialog::Accepted)
-//    {
-//        ui->explorer->AddItem(ITEM_Project, pDlg->SelectedDir(), true);
-//    }
-//    delete pDlg;
+    //DlgSetEngineLocation *pDlg = new DlgSetEngineLocation(this);
+    QFileDialog *pDlg = new QFileDialog();
+    pDlg->setNameFilter(tr("Harmony Project File (*.hyproj)"));
+    pDlg->setModal(true);
+
+    if(pDlg->exec() == QDialog::Accepted)
+    {
+        ui->explorer->AddItemProject(pDlg->selectedFiles()[0]);
+    }
+    delete pDlg;
 }
 
 void MainWindow::on_actionCloseProject_triggered()
