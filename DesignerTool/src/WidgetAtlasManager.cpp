@@ -21,7 +21,7 @@ WidgetAtlasManager::WidgetAtlasManager(QWidget *parent) :   QWidget(parent),
 WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :   QWidget(parent),
                                                                                              ui(new Ui::WidgetAtlasManager),
                                                                                              m_pProjOwner(pProjOwner),
-                                                                                             m_MetaDir(m_pProjOwner->GetMetaDataAbsPath()),
+                                                                                             m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + "atlas/"),
                                                                                              m_DataDir(m_pProjOwner->GetAssetsAbsPath())
 {
     ui->setupUi(this);
@@ -196,4 +196,9 @@ void WidgetAtlasManager::on_atlasGroups_currentChanged(int iIndex)
 //        ui->atlasGroups->currentWidget()->metaObject()
 //        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->ResizeAtlasListColumns();
 //    }
+}
+
+void WidgetAtlasManager::on_btnAddGroup_clicked()
+{
+
 }

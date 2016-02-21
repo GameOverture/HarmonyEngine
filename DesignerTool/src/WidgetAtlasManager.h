@@ -41,6 +41,8 @@ public:
 private slots:
     void on_atlasGroups_currentChanged(int iIndex);
 
+    void on_btnAddGroup_clicked();
+
 private:
     Ui::WidgetAtlasManager *ui;
 
