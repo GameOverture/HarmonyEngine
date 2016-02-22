@@ -103,8 +103,8 @@ class HyAssetManager
 	// Loading thread info pointer
 	ThreadInfoPtr										m_pLoadingThread;
 
-	bool												m_bIsReloading;
-	vector<IHyInst2d *>									m_vReloadInsts;
+	static bool											sm_bIsReloading;
+	static vector<IHyInst2d *>							sm_vReloadInsts;
 	std::string											m_sNewDataDirPath;
 
 public:

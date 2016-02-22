@@ -20,7 +20,10 @@
 #include "Utilities/HyStrManip.h"
 #include "Utilities/jsonxx.h"
 
-const std::string HyAssetManager::sm_sSUBDIRNAMES[NUM_SUBDIRS] = { "Atlases", "Audio", "Particles", "Fonts", "Spine", "Sprites", "Shaders", "Entities", "Meshes" };
+const std::string	HyAssetManager::sm_sSUBDIRNAMES[NUM_SUBDIRS] = { "Atlases/", "Audio/", "Particles/", "Fonts/", "Spine/", "Sprites/", "Shaders/", "Entities/", "Meshes/" };
+
+bool				HyAssetManager::sm_bIsReloading = false;
+vector<IHyInst2d *>	HyAssetManager::sm_vReloadInsts;
 
 HyAssetManager::HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) : m_sDATADIR(MakeStringProperPath(szDataDirPath, "/")),
 																										m_GfxCommsRef(gfxCommsRef),
@@ -33,7 +36,6 @@ HyAssetManager::HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRe
 																										m_Mesh3d(HYINST_Mesh3d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Meshes]),
 																										m_Quad2d(HYINST_TexturedQuad2d, ""),
 																										m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval),
-																										m_bIsReloading(false),
 																										m_sNewDataDirPath("")
 {
 	// Start up Loading thread
@@ -187,7 +189,7 @@ void HyAssetManager::RemoveInst(IHyInst2d *pInst)
 // Reload every instance
 bool HyAssetManager::Reload(bool bRefreshAssets)
 {
-	if(m_bIsReloading)
+	if(sm_bIsReloading)
 		return false;
 
 	// 'm_sNewDataDirPath' is the indicator within HyEngine whether to refresh the Assets
@@ -196,16 +198,15 @@ bool HyAssetManager::Reload(bool bRefreshAssets)
 	else
 		m_sNewDataDirPath.clear();
 
-	m_vReloadInsts.clear();
-	m_SceneRef.CopyAllInsts(m_vReloadInsts);
+	m_SceneRef.CopyAllInsts(sm_vReloadInsts);
 
 	for(uint32 i = 0; i < m_vQueuedInst2d.size(); ++i)
-		m_vReloadInsts.push_back(m_vQueuedInst2d[i]);
+		sm_vReloadInsts.push_back(m_vQueuedInst2d[i]);
 
-	for(uint32 i = 0; i < m_vReloadInsts.size(); ++i)
-		m_vReloadInsts[i]->Unload();
+	for(uint32 i = 0; i < sm_vReloadInsts.size(); ++i)
+		sm_vReloadInsts[i]->Unload();
 
-	m_bIsReloading = true;
+	sm_bIsReloading = true;
 
 	return true;
 }
@@ -214,7 +215,7 @@ bool HyAssetManager::Reload(bool bRefreshAssets)
 bool HyAssetManager::Reload(std::vector<std::string> &vPathsRef, bool bRefreshAssets)
 {
 	// TODO: Deep copy 'vPathsRef' vector of strings to 'm_vReloadInsts' so we only reload the specified contents. vPathsRef can be deleted after this function
-	if(m_bIsReloading)
+	if(sm_bIsReloading)
 		return false;
 
 	// 'm_sNewDataDirPath' is the indicator within HyEngine whether to refresh the Assets
@@ -223,16 +224,15 @@ bool HyAssetManager::Reload(std::vector<std::string> &vPathsRef, bool bRefreshAs
 	else
 		m_sNewDataDirPath.clear();
 
-	m_vReloadInsts.clear();
-	m_SceneRef.CopyAllInsts(m_vReloadInsts);
+	m_SceneRef.CopyAllInsts(sm_vReloadInsts);
 	
 	for(uint32 i = 0; i < m_vQueuedInst2d.size(); ++i)
-		m_vReloadInsts.push_back(m_vQueuedInst2d[i]);
+		sm_vReloadInsts.push_back(m_vQueuedInst2d[i]);
 
-	for(uint32 i = 0; i < m_vReloadInsts.size(); ++i)
-		m_vReloadInsts[i]->Unload();
+	for(uint32 i = 0; i < sm_vReloadInsts.size(); ++i)
+		sm_vReloadInsts[i]->Unload();
 
-	m_bIsReloading = true;
+	sm_bIsReloading = true;
 	
 	return true;
 }
@@ -240,28 +240,30 @@ bool HyAssetManager::Reload(std::vector<std::string> &vPathsRef, bool bRefreshAs
 // Unload everything, and reinitialize to a new data directory. Doesn't load up anything when done.
 bool HyAssetManager::Reload(std::string sNewDataDirPath)
 {
-	if(m_bIsReloading)
+	if(sm_bIsReloading)
 		return false;
 
 	m_sNewDataDirPath = sNewDataDirPath;
 
-	m_vReloadInsts.clear();
-	m_SceneRef.CopyAllInsts(m_vReloadInsts);
+	m_SceneRef.CopyAllInsts(sm_vReloadInsts);
 
 	for(uint32 i = 0; i < m_vQueuedInst2d.size(); ++i)
-		m_vReloadInsts.push_back(m_vQueuedInst2d[i]);
+		sm_vReloadInsts.push_back(m_vQueuedInst2d[i]);
 
-	for(uint32 i = 0; i < m_vReloadInsts.size(); ++i)
-		m_vReloadInsts[i]->Unload();
+	for(uint32 i = 0; i < sm_vReloadInsts.size(); ++i)
+		sm_vReloadInsts[i]->Unload();
 
-	m_bIsReloading = true;
+	// Clear 'sm_vReloadInsts' since we don't want to load anything back up
+	sm_vReloadInsts.clear();
+
+	sm_bIsReloading = true;
 
 	return true;
 }
 
 eHyReloadCode HyAssetManager::IsReloading()
 {
-	if(m_bIsReloading == false)
+	if(sm_bIsReloading == false)
 		return HYRELOADCODE_Inactive;
 
 	Update();
@@ -269,20 +271,15 @@ eHyReloadCode HyAssetManager::IsReloading()
 	if(DoesAnyDataExist())
 		return HYRELOADCODE_InProgress;
 
-	m_AtlasManager.Unload();
-
 	if(m_sNewDataDirPath.empty() == false)
-	{
-		m_vReloadInsts.clear();
 		return HYRELOADCODE_ReInit;
-	}
 
-	m_AtlasManager.Load();
+	for(uint32 i = 0; i < sm_vReloadInsts.size(); ++i)
+		sm_vReloadInsts[i]->Load();
 
-	for(uint32 i = 0; i < m_vReloadInsts.size(); ++i)
-		m_vReloadInsts[i]->Load();
+	sm_vReloadInsts.clear();
+	sm_bIsReloading = false;
 
-	m_bIsReloading = false;
 	return HYRELOADCODE_Finished;
 }
 

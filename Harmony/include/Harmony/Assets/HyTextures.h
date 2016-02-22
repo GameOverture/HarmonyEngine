@@ -40,9 +40,6 @@ public:
 
 	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId);
 	std::string GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
-
-	void Load();
-	void Unload();
 };
 
 //////////////////////////////////////////////////////////////////////////
