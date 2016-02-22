@@ -20,15 +20,17 @@
 #include "Utilities/HyStrManip.h"
 #include "Utilities/jsonxx.h"
 
+const std::string HyAssetManager::sm_sSUBDIRNAMES[NUM_SUBDIRS] = { "Atlases", "Audio", "Particles", "Fonts", "Spine", "Sprites", "Shaders", "Entities", "Meshes" };
+
 HyAssetManager::HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) : m_sDATADIR(MakeStringProperPath(szDataDirPath, "/")),
 																										m_GfxCommsRef(gfxCommsRef),
 																										m_SceneRef(sceneRef),
-																										m_AtlasManager(m_sDATADIR + "Atlas/"),
-																										m_Sfx(HYINST_Sound2d, m_sDATADIR + "Sound/"),
-																										m_Sprite2d(HYINST_Sprite2d, m_sDATADIR + "Sprite/"),
-																										m_Spine2d(HYINST_Spine2d, m_sDATADIR + "Spine/"),
-																										m_Txt2d(HYINST_Text2d, m_sDATADIR + "Font/"),
-																										m_Mesh3d(HYINST_Mesh3d, m_sDATADIR + "Mesh/"),
+																										m_AtlasManager(m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Atlases]),
+																										m_Sfx(HYINST_Sound2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Audio]),
+																										m_Sprite2d(HYINST_Sprite2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Sprites]),
+																										m_Spine2d(HYINST_Spine2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Spine]),
+																										m_Txt2d(HYINST_Text2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Fonts]),
+																										m_Mesh3d(HYINST_Mesh3d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Meshes]),
 																										m_Quad2d(HYINST_TexturedQuad2d, ""),
 																										m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval),
 																										m_bIsReloading(false),

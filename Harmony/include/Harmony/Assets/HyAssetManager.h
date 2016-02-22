@@ -46,6 +46,22 @@ class HyAssetManager
 {
 	const std::string									m_sDATADIR;
 
+	enum eSubDirs
+	{
+		SUBDIR_Atlases = 0,
+		SUBDIR_Audio,
+		SUBDIR_Particles,
+		SUBDIR_Fonts,
+		SUBDIR_Spine,
+		SUBDIR_Sprites,
+		SUBDIR_Shaders,
+		SUBDIR_Entities,
+		SUBDIR_Meshes,
+
+		NUM_SUBDIRS
+	};
+	static const std::string							sm_sSUBDIRNAMES[NUM_SUBDIRS];
+
 	HyGfxComms &										m_GfxCommsRef;
 	HyScene &											m_SceneRef;
 
