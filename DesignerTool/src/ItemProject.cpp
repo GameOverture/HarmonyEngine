@@ -9,16 +9,26 @@
 #include <QJsonObject>
 
 ItemProject::ItemProject(const QString sNewProjectFilePath) : Item(ITEM_Project, sNewProjectFilePath),
-                                                              m_eState(DRAWSTATE_Nothing)
+                                                              m_eState(DRAWSTATE_Nothing),
+                                                              m_bHasError(false)
 {
     QFile projFile(sNewProjectFilePath);
     if(projFile.exists())
     {
         if(!projFile.open(QIODevice::ReadOnly))
+        {
             HyGuiLog("ItemProject::ItemProject() could not open the project file: " % sNewProjectFilePath, LOGTYPE_Error);
+            m_bHasError = true;
+        }
     }
     else
+    {
         HyGuiLog("ItemProject::ItemProject() could not find the project file: " % sNewProjectFilePath, LOGTYPE_Error);
+        m_bHasError = true;
+    }
+
+    if(m_bHasError)
+        return;
 
     QJsonDocument settingsDoc = QJsonDocument::fromJson(projFile.readAll());
     projFile.close();

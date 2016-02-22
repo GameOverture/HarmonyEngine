@@ -96,7 +96,7 @@ void DlgNewProject::on_buttonBox_accepted()
     projDir.setPath(GetProjDirPath());
     projDir.mkdir(sRelMetaDataPath);
     projDir.cd(sRelMetaDataPath);
-    projDir.mkdir("atlas/");
+    projDir.mkdir(HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases));
 
     projDir.setPath(GetProjDirPath());
     projDir.mkdir(sRelSourcePath);

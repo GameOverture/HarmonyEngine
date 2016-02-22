@@ -23,20 +23,24 @@ class ItemProject : public Item
         DRAWSTATE_AtlasManager,
     };
     eDrawState          m_eState;
+
+    bool                m_bHasError;
     
     ItemProject(const QString sNewProjectFilePath);
     
 public:
     ~ItemProject();
 
+    bool HasError() const                               { return m_bHasError; }
+
     QString GetDirPath() const;
     
     QString GetAssetsAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeAssetsLocation) + '/'; }
-    QString GetAssetsRelPath() const                    { return m_sRelativeAssetsLocation; }
+    QString GetAssetsRelPath() const                    { return QDir::cleanPath(m_sRelativeAssetsLocation) + '/'; }
     QString GetMetaDataAbsPath() const                  { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeMetaDataLocation) + '/'; }
-    QString GetMetaDataRelPath() const                  { return m_sRelativeMetaDataLocation; }
+    QString GetMetaDataRelPath() const                  { return QDir::cleanPath(m_sRelativeMetaDataLocation) + '/'; }
     QString GetSourceAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation) + '/'; }
-    QString GetSourceRelPath() const                    { return m_sRelativeSourceLocation; }
+    QString GetSourceRelPath() const                    { return QDir::cleanPath(m_sRelativeSourceLocation) + '/'; }
 
     WidgetAtlasManager *GetAtlasManager()               { return m_pAtlasManager; }
 

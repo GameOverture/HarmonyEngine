@@ -30,7 +30,13 @@ WidgetExplorer::~WidgetExplorer()
 void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
 {
     ItemProject *pItem = new ItemProject(sNewProjectFilePath);
-    HyGuiLog("Opening project: " % pItem->GetPath(), LOGTYPE_Info);
+    if(pItem->HasError())
+    {
+        HyGuiLog("Abort opening project: " % pItem->GetPath(), LOGTYPE_Error);
+        return;
+    }
+    else
+        HyGuiLog("Opening project: " % pItem->GetPath(), LOGTYPE_Info);
     
     QTreeWidgetItem *pProjTreeItem = CreateTreeItem(NULL, pItem);
     

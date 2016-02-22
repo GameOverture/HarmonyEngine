@@ -21,8 +21,8 @@ WidgetAtlasManager::WidgetAtlasManager(QWidget *parent) :   QWidget(parent),
 WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :   QWidget(parent),
                                                                                              ui(new Ui::WidgetAtlasManager),
                                                                                              m_pProjOwner(pProjOwner),
-                                                                                             m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + "atlas/"),
-                                                                                             m_DataDir(m_pProjOwner->GetAssetsAbsPath())
+                                                                                             m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
+                                                                                             m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases))
 {
     ui->setupUi(this);
     while(ui->atlasGroups->currentWidget())
