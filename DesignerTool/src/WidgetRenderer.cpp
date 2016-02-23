@@ -45,7 +45,7 @@ HyGuiRenderer *WidgetRenderer::GetRenderer()
         Item *pItem = action.first;
         eQueuedItem eActionToTake = action.second;
         
-        if(eActionToTake == QUEUEDITEM_Render)
+        if(eActionToTake == QUEUEDITEM_Open)
         {
             if(pItem->GetType() == ITEM_Project)
             {
@@ -114,9 +114,7 @@ HyGuiRenderer *WidgetRenderer::GetRenderer()
     return true;
 }
 
-// TODO: NEED TO CALL OPEN AND CLOSE ON THE DRAW ITEMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-void WidgetRenderer::RenderItem(Item *pItem)
+void WidgetRenderer::OpenItem(Item *pItem)
 {
     if(pItem == NULL)
     {
@@ -124,7 +122,7 @@ void WidgetRenderer::RenderItem(Item *pItem)
         return;
     }
     
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedItem>(pItem, QUEUEDITEM_Render));
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedItem>(pItem, QUEUEDITEM_Open));
 }
 
 void WidgetRenderer::CloseItem(Item *pItem)

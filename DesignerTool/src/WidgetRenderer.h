@@ -50,7 +50,7 @@ class WidgetRenderer : public QWidget, public IHyApplication
     
     enum eQueuedItem
     {
-        QUEUEDITEM_Render = 0,
+        QUEUEDITEM_Open = 0,
         QUEUEDITEM_Show,
         QUEUEDITEM_Close
     };
@@ -67,7 +67,7 @@ public:
     virtual bool Update();
     virtual bool Shutdown();
 
-    void RenderItem(Item *pItem);
+    void OpenItem(Item *pItem);
     void CloseItem(Item *pItem);
 
 private:
