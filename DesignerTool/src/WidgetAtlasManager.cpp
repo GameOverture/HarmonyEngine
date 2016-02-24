@@ -34,6 +34,7 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
                                                                                              m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases))
 {
     ui->setupUi(this);
+    
     while(ui->atlasGroups->currentWidget())
         ui->atlasGroups->removeWidget(ui->atlasGroups->currentWidget());
 

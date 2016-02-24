@@ -122,7 +122,10 @@ public:
     void DrawLoad()
     {
         m_DrawOutline.Load();
+        m_DrawOutline.SetEnabled(false);
+        
         m_DrawTexture.Load();
+        m_DrawTexture.SetEnabled(false);
     }
 
     void DrawUnload()
@@ -134,6 +137,7 @@ public:
     void SetVisible(bool bOutline, bool bFrame)
     {
         m_DrawOutline.SetEnabled(bOutline);
+        m_DrawTexture.SetEnabled(bFrame);
     }
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)
@@ -148,12 +152,8 @@ class WidgetAtlasGroup : public QWidget, public IHyGuiDrawItem
 
     DlgAtlasGroupSettings       m_dlgSettings;
     
-    //QList<QTreeWidgetItem *>    m_TextureList;
     QList<HyGuiFrame *>         m_FrameList;
     ImagePacker                 m_Packer;
-    
-    // Draw members
-    QPoint                      m_MouseLocalCoords;
 
 public:
     explicit WidgetAtlasGroup(QWidget *parent = 0);
@@ -181,8 +181,6 @@ private slots:
 protected:
     virtual void enterEvent(QEvent *pEvent);
     virtual void leaveEvent(QEvent *pEvent);
-
-    virtual void mouseMoveEvent(QMouseEvent *pEvent);
 
 private:
     Ui::WidgetAtlasGroup *ui;

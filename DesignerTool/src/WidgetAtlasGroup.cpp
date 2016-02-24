@@ -172,7 +172,13 @@ int WidgetAtlasGroup::GetId()
     {
         m_FrameList[i]->SetVisible(false, false);
     }
-
+    
+    QTreeWidgetItem *pHoveredItem = ui->atlasList->itemAt(ui->atlasList->mapFromGlobal(QCursor::pos()));
+    if(pHoveredItem)
+    {
+        HyGuiLog(pHoveredItem->text(0), LOGTYPE_Normal);
+    }
+    
     QList<QTreeWidgetItem *> selectedItems = ui->atlasList->selectedItems();
 
     for(uint i = 0; i < selectedItems.size(); ++i)
@@ -276,14 +282,6 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
     
     pAtlasMan->HideAtlasGroup();
     QWidget::leaveEvent(pEvent);
-}
-
-/*virtual*/ void WidgetAtlasGroup::mouseMoveEvent(QMouseEvent *pEvent)
-{
-    m_MouseLocalCoords = pEvent->pos();
-    HyGuiLog("AtlasGroup Mouse Coords: " + QString::number(m_MouseLocalCoords.x()) + ", " + QString::number(m_MouseLocalCoords.y()), LOGTYPE_Normal);
-
-    QWidget::mouseMoveEvent(pEvent);
 }
 
 void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)

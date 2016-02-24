@@ -205,6 +205,9 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidgetAtlas">
+   <property name="mouseTracking">
+    <bool>false</bool>
+   </property>
    <property name="windowTitle">
     <string>Atlas Manager</string>
    </property>
