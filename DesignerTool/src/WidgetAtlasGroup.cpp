@@ -54,6 +54,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
             HyGuiLog(sErrorMsg, LOGTYPE_Error);
         }
 
+        //QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
         QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
         metaAtlasFile.close();
 
