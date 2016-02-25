@@ -18,7 +18,7 @@ const char *szHYQUADBATCH_VERTEXSHADER = "									\n\
 layout(location = 0) in vec2 size;											\n\
 layout(location = 1) in vec2 offset;										\n\
 layout(location = 2) in vec4 tint;											\n\
-layout(location = 3) in unsigned int textureIndex;							\n\
+layout(location = 3) in float textureIndex;									\n\
 layout(location = 4) in vec2 UVcoord0;										\n\
 layout(location = 5) in vec2 UVcoord1;										\n\
 layout(location = 6) in vec2 UVcoord2;										\n\
@@ -27,7 +27,7 @@ layout(location = 8) in mat4 mtxLocalToWorld;								\n\
 																			\n\
 smooth out vec4 interpColor;												\n\
 smooth out vec2 interpUV;													\n\
-flat out unsigned int texIndex;												\n\
+flat out float texIndex;													\n\
 																			\n\
 uniform mat4 mtxCameraToClipMatrix;											\n\
 uniform mat4 mtxWorldToCameraMatrix;										\n\
@@ -78,7 +78,7 @@ const char *szHYQUADBATCH_FRAGMENTSHADER = "								\n\
 																			\n\
 smooth in vec4 interpColor;													\n\
 smooth in vec2 interpUV;													\n\
-flat in unsigned int texIndex;												\n\
+flat in float texIndex;														\n\
 																			\n\
 uniform sampler2DArray Tex;													\n\
 																			\n\
@@ -87,9 +87,9 @@ out vec4 outputColor;														\n\
 void main()																	\n\
 {																			\n\
 	// Blend interpColor with whatever texel I get from interpUV			\n\
-	float fLayer = texIndex;												\n\
+	//float fLayer = (float)texIndex;										\n\
 																			\n\
-	vec4 texelClr = texture(Tex, vec3(interpUV.x, interpUV.y, fLayer));		\n\
+	vec4 texelClr = texture(Tex, vec3(interpUV.x, interpUV.y, texIndex));	\n\
 																			\n\
 	outputColor = interpColor * texelClr;									\n\
 }";

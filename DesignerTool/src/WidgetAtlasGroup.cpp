@@ -164,6 +164,8 @@ int WidgetAtlasGroup::GetId()
 
 /*virtual*/ void WidgetAtlasGroup::OnDraw_Hide(IHyApplication &hyApp)
 {
+    foreach(HyGuiFrame *pFrame, m_FrameList)
+        pFrame->SetVisible(false, false);
 }
 
 /*virtual*/ void WidgetAtlasGroup::OnDraw_Update(IHyApplication &hyApp)
@@ -176,7 +178,9 @@ int WidgetAtlasGroup::GetId()
     QTreeWidgetItem *pHoveredItem = ui->atlasList->itemAt(ui->atlasList->mapFromGlobal(QCursor::pos()));
     if(pHoveredItem)
     {
-        HyGuiLog(pHoveredItem->text(0), LOGTYPE_Normal);
+        //QVariant v = pHoveredItem->data(0, QTreeWidgetItem::UserType);
+        //v.value<HyGuiFrame *>()->SetVisible(true, true);
+        //HyGuiLog(pHoveredItem->text(0), LOGTYPE_Normal);
     }
     
     QList<QTreeWidgetItem *> selectedItems = ui->atlasList->selectedItems();

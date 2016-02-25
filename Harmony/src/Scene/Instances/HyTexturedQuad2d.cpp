@@ -117,8 +117,8 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	*reinterpret_cast<vec4 *>(pRefDataWritePos) = color.Get();
 	pRefDataWritePos += sizeof(vec4);
 
-	*reinterpret_cast<uint32 *>(pRefDataWritePos) = m_uiTextureIndex;
-	pRefDataWritePos += sizeof(uint32);
+	*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(m_uiTextureIndex);
+	pRefDataWritePos += sizeof(float);
 
 	vec2 vUV;
 
