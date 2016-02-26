@@ -65,19 +65,38 @@ uint32 HyTexturedQuad2d::GetTextureIndex()
 	return m_uiTextureIndex;
 }
 
-uint32 HyTexturedQuad2d::GetTextureWidth()
+uint32 HyTexturedQuad2d::GetWidth()
 {
-	return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetWidth();
+	return static_cast<uint32>(m_SrcRect.width * GetEntireTextureWidth());
 }
 
-uint32 HyTexturedQuad2d::GetTextureHeight()
+uint32 HyTexturedQuad2d::GetHeight()
 {
-	return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetHeight();
+	return static_cast<uint32>(m_SrcRect.height * GetEntireTextureHeight());
+}
+
+uint32 HyTexturedQuad2d::GetEntireTextureWidth()
+{
+	if(IsLoaded())
+		return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetWidth();
+	else
+		return 0;
+}
+
+uint32 HyTexturedQuad2d::GetEntireTextureHeight()
+{
+	if(IsLoaded())
+		return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetHeight();
+	else
+		return 0;
 }
 
 uint32 HyTexturedQuad2d::GetNumTextures()
 {
-	return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetNumTextures();
+	if(IsLoaded())
+		return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetNumTextures();
+	else
+		return 0;
 }
 
 /*virtual*/ void HyTexturedQuad2d::OnDataLoaded()

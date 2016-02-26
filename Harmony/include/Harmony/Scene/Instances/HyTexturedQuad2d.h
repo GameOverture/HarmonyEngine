@@ -29,9 +29,11 @@ public:
 	void SetTextureSource(uint32 uiTextureIndex, int iX, int iY, int iWidth, int iHeight);
 
 	uint32 GetTextureIndex();
+	uint32 GetWidth();
+	uint32 GetHeight();
 
-	uint32 GetTextureWidth();
-	uint32 GetTextureHeight();
+	uint32 GetEntireTextureWidth();
+	uint32 GetEntireTextureHeight();
 	uint32 GetNumTextures();
 
 private:
