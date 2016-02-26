@@ -17,7 +17,6 @@ class IHyGuiDrawItem
     friend class WidgetRenderer;
 
     bool                m_bLoaded;
-    HyCamera2d *        m_pCamera;
 
     void DrawOpen(IHyApplication &hyApp);
     void DrawClose(IHyApplication &hyApp);
@@ -25,7 +24,10 @@ class IHyGuiDrawItem
     void DrawShow(IHyApplication &hyApp);
     void DrawHide(IHyApplication &hyApp);
 
+    void DrawUpdate(IHyApplication &hyApp);
+
 protected:
+    HyCamera2d *        m_pCamera;
     IHyGuiDrawItem();
 
     virtual void OnDraw_Open(IHyApplication &hyApp) = 0;

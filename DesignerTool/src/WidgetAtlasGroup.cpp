@@ -100,6 +100,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
 
         ui->groupBox->setTitle(m_dlgSettings.GetName());
 
+        ui->atlasList->sortItems(0, Qt::AscendingOrder);
         ui->atlasList->expandAll();
     }
 }
@@ -166,34 +167,71 @@ int WidgetAtlasGroup::GetId()
 /*virtual*/ void WidgetAtlasGroup::OnDraw_Hide(IHyApplication &hyApp)
 {
     foreach(HyGuiFrame *pFrame, m_FrameList)
-        pFrame->SetVisible(false, false);
+        pFrame->DrawHide();
 }
 
 /*virtual*/ void WidgetAtlasGroup::OnDraw_Update(IHyApplication &hyApp)
 {
     for(uint i = 0; i < m_FrameList.size(); ++i)
     {
-        m_FrameList[i]->SetVisible(false, false);
+        m_FrameList[i]->DrawHide();
     }
-    
-    QTreeWidgetItem *pHoveredItem = ui->atlasList->itemAt(ui->atlasList->mapFromGlobal(QCursor::pos()));
-    if(pHoveredItem)
-    {
-        //QVariant v = pHoveredItem->data(0, QTreeWidgetItem::UserType);
-        //v.value<HyGuiFrame *>()->SetVisible(true, true);
-        //HyGuiLog(pHoveredItem->text(0), LOGTYPE_Normal);
-    }
-    
-    QList<QTreeWidgetItem *> selectedItems = ui->atlasList->selectedItems();
 
+    const uint32 uiRENDERWIDTH = hyApp.Window().GetResolution().x;
+    const uint32 uiRENDERHEIGHT = hyApp.Window().GetResolution().y;
+
+    uint32 uiCurWidth = 0;
+    uint32 uiCurHeight = 0;
+    uint32 uiCurMaxRowHeight = 0;
+
+    QPoint ptDrawPos(0, 0);
+
+    // Display all selected
+    QList<QTreeWidgetItem *> selectedItems = ui->atlasList->selectedItems();
     for(uint i = 0; i < selectedItems.size(); ++i)
     {
         QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
         HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
 
         if(pFrame)
-            pFrame->SetVisible(true, true);
+        {
+            QSize size = pFrame->DrawPreview(ptDrawPos, false);
+
+            uiCurWidth += size.width();
+            if(uiCurMaxRowHeight < size.height())
+                uiCurMaxRowHeight = size.height();
+
+            if(uiCurWidth < uiRENDERWIDTH)
+                ptDrawPos.setX(ptDrawPos.x() + size.width());
+            else
+            {
+                //if(uiCurHeight + uiCurMaxRowHeight < uiRENDERHEIGHT)
+                {
+                    uiCurWidth = 0;
+                    uiCurHeight += uiCurMaxRowHeight;
+
+                    uiCurMaxRowHeight = 0;
+
+                    ptDrawPos.setX(uiCurWidth);
+                    ptDrawPos.setY(uiCurHeight);
+                }
+            }
+        }
     }
+    uiCurHeight += uiCurMaxRowHeight;
+
+    // Preview hover selection
+    QTreeWidgetItem *pHoveredItem = ui->atlasList->itemAt(ui->atlasList->mapFromGlobal(QCursor::pos()));
+    if(pHoveredItem)
+    {
+        QVariant v = pHoveredItem->data(0, QTreeWidgetItem::UserType);
+        v.value<HyGuiFrame *>()->DrawPreview(ptDrawPos, true);
+    }
+
+    // Pan camera over previewed
+    if(m_pCamera)
+        m_pCamera->pos.Animate(uiCurWidth * 0.5f, uiCurHeight * 0.5f, 0.5f, HyEase::quadInOut);
+
 }
 
 void WidgetAtlasGroup::ResizeAtlasListColumns()
@@ -534,11 +572,11 @@ void WidgetAtlasGroup::Refresh()
         foreach(QString sLink, sLinks)
             sReloadPaths.append(sLink);
     }
-    
 
     MainWindow::ReloadItems(sReloadPaths, true);
 
     ui->atlasList->expandAll();
+    ui->atlasList->sortItems(0, Qt::AscendingOrder);
     
     pAtlasManager->PreviewAtlasGroup();
 }

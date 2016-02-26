@@ -59,12 +59,14 @@ public:
                                                                                                                                                 m_DrawTexture(uiAtlasGroupIndex),
                                                                                                                                                 m_pTreeItem(NULL)
     {
-        m_DrawOutline.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
-        m_DrawOutline.SetAsQuad(m_rALPHA_CROP.width(), m_rALPHA_CROP.height(), true);
+        m_DrawOutline.color.Set(1.0f, 0.0f, 0.0f, 0.5f);
+        m_DrawOutline.SetAsQuad(m_rALPHA_CROP.width(), m_rALPHA_CROP.height(), false);
         m_DrawOutline.SetDisplayOrder(0);
+        m_DrawOutline.SetEnabled(false);
 
         m_DrawTexture.SetTextureSource(iTexIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
         m_DrawTexture.SetDisplayOrder(1);
+        m_DrawTexture.SetEnabled(false);
 
         m_DrawTexture.AddChild(m_DrawOutline);
     }
@@ -134,10 +136,20 @@ public:
         m_DrawTexture.Unload();
     }
 
-    void SetVisible(bool bOutline, bool bFrame)
+    void DrawHide()
     {
-        m_DrawOutline.SetEnabled(bOutline);
-        m_DrawTexture.SetEnabled(bFrame);
+        m_DrawOutline.SetEnabled(false);
+        m_DrawTexture.SetEnabled(false);
+    }
+
+    QSize DrawPreview(QPoint ptLocation, bool bHightlight)
+    {
+        m_DrawOutline.SetEnabled(bHightlight);
+        m_DrawTexture.SetEnabled(true);
+
+        m_DrawTexture.pos.Set(ptLocation.x(), ptLocation.y());
+
+        return QSize(m_DrawTexture.GetWidth(), m_DrawTexture.GetHeight());
     }
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)

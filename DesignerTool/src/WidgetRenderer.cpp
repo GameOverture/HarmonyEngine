@@ -104,7 +104,7 @@ HyGuiRenderer *WidgetRenderer::GetRenderer()
     }
     
     if(GetItem())
-        GetItem()->OnDraw_Update(*this);
+        GetItem()->DrawUpdate(*this);
 
     return true;
 }

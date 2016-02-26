@@ -53,3 +53,11 @@ void IHyGuiDrawItem::DrawHide(IHyApplication &hyApp)
 
     OnDraw_Hide(hyApp);
 }
+
+void IHyGuiDrawItem::DrawUpdate(IHyApplication &hyApp)
+{
+    if(m_bLoaded == false)
+        return;
+
+    OnDraw_Update(hyApp);
+}
