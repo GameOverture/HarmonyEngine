@@ -18,11 +18,12 @@
 #include "WidgetRenderer.h"
 
 HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent),
-                                                m_pHyEngine(NULL)
+                                                m_pHyEngine(NULL),
+                                                m_bIsUpdating(false)
 {
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(17);
+    timer->start(20);
 }
 
 HyGuiRenderer::~HyGuiRenderer()
@@ -42,8 +43,14 @@ HyGuiRenderer::~HyGuiRenderer()
 
 /*virtual*/ void HyGuiRenderer::paintGL()
 {
-    if(m_pHyEngine->Update() == false)
-        HyGuiLog("Harmony Gfx requested exit program.", LOGTYPE_Info);
+    if(m_bIsUpdating == false)
+    {
+        m_bIsUpdating = true;
+        if(m_pHyEngine->Update() == false)
+            HyGuiLog("Harmony Gfx requested exit program.", LOGTYPE_Info);
+
+        m_bIsUpdating = false;
+    }
 }
 
 /*virtual*/ void HyGuiRenderer::resizeGL(int w, int h)

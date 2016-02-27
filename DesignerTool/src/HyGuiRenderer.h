@@ -21,6 +21,7 @@ class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
     Q_OBJECT
 
     HyEngine *          m_pHyEngine;
+    bool                m_bIsUpdating;
 
 public:
     HyGuiRenderer(QWidget *parent = 0);
