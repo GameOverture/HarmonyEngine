@@ -54,25 +54,34 @@ float Ease_AngleLinear(float angleA, float angleB, int32 spin, float t);
 template<typename T>
 struct HyRectangle
 {
-	T x;
-	T y;
-	T width;
-	T height;
+	T left;
+	T top;
+	T right;
+	T bottom;
 
 	int32 iTag;
+
+	HyRectangle() : left(0), top(0), right(0), bottom(0), iTag(0)
+	{ }
+
+	HyRectangle(T tX, T tY, T tWidth, T tHeight) : left(tX), top(tY), right(tX + tWidth), bottom(tY + tHeight), iTag(0)
+	{ }
 
 	std::string ToString()
 	{
 		std::ostringstream s;
-		s << "(" << x << "," << y << "," << width << "," << height << ")";
+		s << "(" << left << "," << top << "," << right << "," << bottom << ")";
 		return s.str();
 	}
 
-	HyRectangle() : x(0), y(0), width(0), height(0), iTag(0)
-	{ }
-
-	HyRectangle(T tX, T tY, T tWidth, T tHeight) : x(tX), y(tY), width(tWidth), height(tHeight), iTag(0)
-	{ }
+	T Width()
+	{
+		return right - left;
+	}
+	T Height()
+	{
+		return bottom - top;
+	}
 };
 
 #endif /* __HyMath_h__ */

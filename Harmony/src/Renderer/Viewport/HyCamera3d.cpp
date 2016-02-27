@@ -13,8 +13,8 @@
 HyCamera3d::HyCamera3d(HyWindow *pViewport) :	ITransform<HyAnimVec3>(),
 												m_kpViewportPtr(pViewport)
 {
-	m_ViewportRect.x = m_ViewportRect.y = 0.0f;
-	m_ViewportRect.width = m_ViewportRect.height = 1.0f;
+	m_ViewportRect.left = m_ViewportRect.top = 0.0f;
+	m_ViewportRect.right = m_ViewportRect.bottom = 1.0f;
 }
 
 HyCamera3d::~HyCamera3d(void)
@@ -24,8 +24,8 @@ HyCamera3d::~HyCamera3d(void)
 // All values are [0.0 - 1.0] representing percentages of the entire game window
 void HyCamera3d::SetViewport(float fPosX, float fPosY, float fWidth, float fHeight)
 {
-	m_ViewportRect.x = fPosX;
-	m_ViewportRect.y = fPosY;
-	m_ViewportRect.width = fWidth;
-	m_ViewportRect.height = fHeight;
+	m_ViewportRect.left = fPosX;
+	m_ViewportRect.top = fPosY;
+	m_ViewportRect.right = m_ViewportRect.left + fWidth;
+	m_ViewportRect.bottom = m_ViewportRect.bottom + fHeight;
 }

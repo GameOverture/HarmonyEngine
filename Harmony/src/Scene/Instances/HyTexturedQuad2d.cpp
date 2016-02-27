@@ -44,17 +44,17 @@ void HyTexturedQuad2d::SetTextureSource(uint32 uiTextureIndex, int iX, int iY, i
 		float fTexWidth = static_cast<float>(static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetWidth());
 		float fTexHeight = static_cast<float>(static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetHeight());
 
-		m_SrcRect.x = fX / fTexWidth;
-		m_SrcRect.y = fY / fTexHeight;
-		m_SrcRect.width = fX + (fWidth / fTexWidth);
-		m_SrcRect.height = fY + (fHeight / fTexHeight);
+		m_SrcRect.left = fX / fTexWidth;
+		m_SrcRect.top = fY / fTexHeight;
+		m_SrcRect.right = fX + (fWidth / fTexWidth);
+		m_SrcRect.bottom = fY + (fHeight / fTexHeight);
 	}
 	else
 	{
-		m_SrcRect.x = static_cast<float>(iX);
-		m_SrcRect.y = static_cast<float>(iY);
-		m_SrcRect.width = static_cast<float>(iWidth);
-		m_SrcRect.height = static_cast<float>(iHeight);
+		m_SrcRect.left = static_cast<float>(iX);
+		m_SrcRect.top = static_cast<float>(iY);
+		m_SrcRect.right = m_SrcRect.left + static_cast<float>(iWidth);
+		m_SrcRect.bottom = m_SrcRect.top + static_cast<float>(iHeight);
 	}
 
 	m_uiTextureIndex = uiTextureIndex;
@@ -67,12 +67,12 @@ uint32 HyTexturedQuad2d::GetTextureIndex()
 
 uint32 HyTexturedQuad2d::GetWidth()
 {
-	return static_cast<uint32>(m_SrcRect.width * GetEntireTextureWidth());
+	return static_cast<uint32>(m_SrcRect.Width() * GetEntireTextureWidth());
 }
 
 uint32 HyTexturedQuad2d::GetHeight()
 {
-	return static_cast<uint32>(m_SrcRect.height * GetEntireTextureHeight());
+	return static_cast<uint32>(m_SrcRect.Height() * GetEntireTextureHeight());
 }
 
 uint32 HyTexturedQuad2d::GetEntireTextureWidth()
@@ -105,15 +105,15 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	m_RenderState.SetTextureHandle(pData->GetAtlasGroup()->GetGfxApiHandle());
 
 	// Correct 'm_SrcRect' if using pixel coords
-	if(m_SrcRect.x > 1.0f || m_SrcRect.y > 1.0f || m_SrcRect.width > 1.0f || m_SrcRect.height > 1.0f)
+	if(m_SrcRect.left > 1.0f || m_SrcRect.top > 1.0f || m_SrcRect.right > 1.0f || m_SrcRect.bottom > 1.0f)
 	{
 		float fTexWidth = static_cast<float>(static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetWidth());
 		float fTexHeight = static_cast<float>(static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetHeight());
 
-		m_SrcRect.x = m_SrcRect.x / fTexWidth;
-		m_SrcRect.y = m_SrcRect.y / fTexHeight;
-		m_SrcRect.width = m_SrcRect.x + (m_SrcRect.width / fTexWidth);
-		m_SrcRect.height = m_SrcRect.y + (m_SrcRect.height / fTexHeight);
+		m_SrcRect.left = m_SrcRect.left / fTexWidth;
+		m_SrcRect.top = m_SrcRect.top / fTexHeight;
+		m_SrcRect.right = m_SrcRect.right / fTexWidth;
+		m_SrcRect.bottom = m_SrcRect.bottom / fTexHeight;
 	}
 }
 
@@ -125,7 +125,7 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 {
 	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);
 
-	vec2 vSize((m_SrcRect.width - m_SrcRect.x) * pData->GetAtlasGroup()->GetWidth(), (m_SrcRect.height - m_SrcRect.y) * pData->GetAtlasGroup()->GetHeight());
+	vec2 vSize(m_SrcRect.Width() * pData->GetAtlasGroup()->GetWidth(), m_SrcRect.Height() * pData->GetAtlasGroup()->GetHeight());
 	vec2 vOffset(pos.X(), pos.Y());
 
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vSize;
@@ -141,23 +141,23 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 
 	vec2 vUV;
 
-	vUV.x = m_SrcRect.width;//1.0f;
-	vUV.y = m_SrcRect.y;//0.0f;
+	vUV.x = m_SrcRect.right;//1.0f;
+	vUV.y = m_SrcRect.top;//0.0f;
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(vec2);
 
-	vUV.x = m_SrcRect.x;//0.0f;
-	vUV.y = m_SrcRect.y;//0.0f;
+	vUV.x = m_SrcRect.left;//0.0f;
+	vUV.y = m_SrcRect.top;//0.0f;
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(vec2);
 
-	vUV.x = m_SrcRect.width;//1.0f;
-	vUV.y = m_SrcRect.height;//1.0f;
+	vUV.x = m_SrcRect.right;//1.0f;
+	vUV.y = m_SrcRect.bottom;//1.0f;
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(vec2);
 
-	vUV.x = m_SrcRect.x;//0.0f;
-	vUV.y = m_SrcRect.height;//1.0f;
+	vUV.x = m_SrcRect.left;//0.0f;
+	vUV.y = m_SrcRect.bottom;//1.0f;
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(vec2);
 
