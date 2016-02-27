@@ -138,30 +138,30 @@ void WidgetAtlasManager::HideAtlasGroup()
     MainWindow::CloseItem(m_pProjOwner);
 }
 
-/*virtual*/ void WidgetAtlasManager::OnDraw_Open(IHyApplication &hyApp)
+/*friend*/ void AtlasManager_DrawOpen(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
 {
-    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->OnDraw_Open(hyApp);
+    AtlasGroup_DrawOpen(atlasMan.m_pProjOwner, hyApp, *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget()));
 }
 
-/*virtual*/ void WidgetAtlasManager::OnDraw_Close(IHyApplication &hyApp)
+/*friend*/ void AtlasManager_DrawClose(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
 {
-    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->OnDraw_Close(hyApp);
+    AtlasGroup_DrawClose(atlasMan.m_pProjOwner, hyApp, *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget()));
 }
 
-/*virtual*/ void WidgetAtlasManager::OnDraw_Show(IHyApplication &hyApp)
+/*friend*/ void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
 {
-    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->OnDraw_Show(hyApp);
+    AtlasGroup_DrawShow(atlasMan.m_pProjOwner, hyApp, *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget()));
 }
 
-/*virtual*/ void WidgetAtlasManager::OnDraw_Hide(IHyApplication &hyApp)
+/*friend*/ void AtlasManager_DrawHide(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
 {
-    for(int i = 0; i < ui->atlasGroups->count(); ++i)
-        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->OnDraw_Hide(hyApp);
+    for(int i = 0; i < atlasMan.ui->atlasGroups->count(); ++i)
+        AtlasGroup_DrawHide(atlasMan.m_pProjOwner, hyApp, *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->widget(i)));
 }
 
-/*virtual*/ void WidgetAtlasManager::OnDraw_Update(IHyApplication &hyApp)
+/*friend*/ void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
 {
-    static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->OnDraw_Update(hyApp);
+    AtlasGroup_DrawUpdate(atlasMan.m_pProjOwner, hyApp, *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget()));
 }
 
 void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)

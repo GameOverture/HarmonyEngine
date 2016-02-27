@@ -65,31 +65,31 @@ QString ItemProject::GetDirPath() const
 /*virtual*/ void ItemProject::OnDraw_Open(IHyApplication &hyApp)
 {
     if(m_eState == DRAWSTATE_AtlasManager)
-        m_pAtlasManager->OnDraw_Open(hyApp);
+        AtlasManager_DrawOpen(hyApp, *m_pAtlasManager);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Close(IHyApplication &hyApp)
 {
     if(m_eState == DRAWSTATE_AtlasManager)
-        m_pAtlasManager->OnDraw_Close(hyApp);
+        AtlasManager_DrawClose(hyApp, *m_pAtlasManager);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Show(IHyApplication &hyApp)
 {
     if(m_eState == DRAWSTATE_AtlasManager)
-        m_pAtlasManager->OnDraw_Show(hyApp);
+        AtlasManager_DrawShow(hyApp, *m_pAtlasManager);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Hide(IHyApplication &hyApp)
 {
     if(m_eState == DRAWSTATE_AtlasManager)
-        m_pAtlasManager->OnDraw_Hide(hyApp);
+        AtlasManager_DrawHide(hyApp, *m_pAtlasManager);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Update(IHyApplication &hyApp)
 {
     if(m_eState == DRAWSTATE_AtlasManager)
-        m_pAtlasManager->OnDraw_Update(hyApp);
+        AtlasManager_DrawUpdate(hyApp, *m_pAtlasManager);
 }
 
 void ItemProject::SetAtlasGroupDrawState(int iAtlasGrpId)

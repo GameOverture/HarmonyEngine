@@ -19,6 +19,8 @@
 #include "DlgAtlasGroupSettings.h"
 #include "IHyGuiDrawItem.h"
 
+#include "ItemProject.h"
+
 #include "scriptum/imagepacker.h"
 #include "Harmony/HyEngine.h"
 
@@ -68,7 +70,7 @@ public:
         m_DrawTexture.SetDisplayOrder(1);
         m_DrawTexture.SetEnabled(false);
 
-        m_DrawTexture.AddChild(m_DrawOutline);
+        //m_DrawTexture.AddChild(m_DrawOutline);
     }
     
     quint32 GetHash()       { return m_uiHASH; }
@@ -148,13 +150,14 @@ public:
         m_DrawTexture.SetEnabled(true);
 
         m_DrawTexture.pos.Set(ptLocation.x(), ptLocation.y());
+        m_DrawOutline.pos.Set(ptLocation.x(), ptLocation.y());
 
         return QSize(m_DrawTexture.GetWidth(), m_DrawTexture.GetHeight());
     }
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)
 
-class WidgetAtlasGroup : public QWidget, public IHyGuiDrawItem
+class WidgetAtlasGroup : public QWidget
 {
     Q_OBJECT
 
@@ -176,11 +179,11 @@ public:
     
     int GetId();
 
-    virtual void OnDraw_Open(IHyApplication &hyApp);
-    virtual void OnDraw_Close(IHyApplication &hyApp);
-    virtual void OnDraw_Show(IHyApplication &hyApp);
-    virtual void OnDraw_Hide(IHyApplication &hyApp);
-    virtual void OnDraw_Update(IHyApplication &hyApp);
+    friend void AtlasGroup_DrawOpen(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp);
+    friend void AtlasGroup_DrawClose(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp);
+    friend void AtlasGroup_DrawShow(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp);
+    friend void AtlasGroup_DrawHide(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp);
+    friend void AtlasGroup_DrawUpdate(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp);
 
     void ResizeAtlasListColumns();
 

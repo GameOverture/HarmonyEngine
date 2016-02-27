@@ -126,11 +126,11 @@ void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObj)
             frameArrayList.append(QJsonArray());
         
         QJsonObject frameObj;
-        frameObj.insert("width", QJsonValue(m_FrameList[i]->GetCrop().right() - m_FrameList[i]->GetCrop().left()));
-        frameObj.insert("height", QJsonValue(m_FrameList[i]->GetCrop().bottom() - m_FrameList[i]->GetCrop().top()));
+        frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().right()));
+        frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().bottom()));
         frameObj.insert("rotate", QJsonValue(m_FrameList[i]->IsRotated()));
-        frameObj.insert("x", QJsonValue(m_FrameList[i]->GetX()));
-        frameObj.insert("y", QJsonValue(m_FrameList[i]->GetY()));
+        frameObj.insert("left", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().left()));
+        frameObj.insert("top", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().top()));
         
         frameArrayList[m_FrameList[i]->GetTextureIndex()].append(frameObj);
     }
@@ -146,35 +146,35 @@ int WidgetAtlasGroup::GetId()
     return m_MetaDir.dirName().toInt();
 }
 
-/*virtual*/ void WidgetAtlasGroup::OnDraw_Open(IHyApplication &hyApp)
+/*friend*/ void AtlasGroup_DrawOpen(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
-    foreach(HyGuiFrame *pFrame, m_FrameList)
+    foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
         pFrame->DrawLoad();
 
-    ResizeAtlasListColumns();
+    atlasGrp.ResizeAtlasListColumns();
 }
 
-/*virtual*/ void WidgetAtlasGroup::OnDraw_Close(IHyApplication &hyApp)
+/*friend*/ void AtlasGroup_DrawClose(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
-    foreach(HyGuiFrame *pFrame, m_FrameList)
-        pFrame->DrawUnload();
+    foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
+         pFrame->DrawUnload();
 }
 
-/*virtual*/ void WidgetAtlasGroup::OnDraw_Show(IHyApplication &hyApp)
+/*friend*/ void AtlasGroup_DrawShow(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
 }
 
-/*virtual*/ void WidgetAtlasGroup::OnDraw_Hide(IHyApplication &hyApp)
+/*friend*/ void AtlasGroup_DrawHide(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
-    foreach(HyGuiFrame *pFrame, m_FrameList)
+    foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
         pFrame->DrawHide();
 }
 
-/*virtual*/ void WidgetAtlasGroup::OnDraw_Update(IHyApplication &hyApp)
+/*friend*/ void AtlasGroup_DrawUpdate(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
-    for(uint i = 0; i < m_FrameList.size(); ++i)
+    for(uint i = 0; i < atlasGrp.m_FrameList.size(); ++i)
     {
-        m_FrameList[i]->DrawHide();
+        atlasGrp.m_FrameList[i]->DrawHide();
     }
 
     const uint32 uiRENDERWIDTH = hyApp.Window().GetResolution().x;
@@ -186,8 +186,17 @@ int WidgetAtlasGroup::GetId()
 
     QPoint ptDrawPos(0, 0);
 
+    static int DEBUGCNT = 0;
+    DEBUGCNT++;
+    bool bDebugPrint = false;
+    if((DEBUGCNT % 100) == 0)
+    {
+        bDebugPrint = true;
+        DEBUGCNT = 0;
+    }
+
     // Display all selected
-    QList<QTreeWidgetItem *> selectedItems = ui->atlasList->selectedItems();
+    QList<QTreeWidgetItem *> selectedItems = atlasGrp.ui->atlasList->selectedItems();
     for(uint i = 0; i < selectedItems.size(); ++i)
     {
         QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
@@ -195,7 +204,12 @@ int WidgetAtlasGroup::GetId()
 
         if(pFrame)
         {
-            QSize size = pFrame->DrawPreview(ptDrawPos, false);
+            if(bDebugPrint)
+                HyGuiLog("Sel: " % QString::number(i) % " (" % QString::number(ptDrawPos.x()) % ", " % QString::number(ptDrawPos.y()) % ")", LOGTYPE_Normal);
+
+            QSize size = pFrame->DrawPreview(ptDrawPos, true);
+            if(bDebugPrint)
+                HyGuiLog("Sze: (" % QString::number(size.width()) % ", " % QString::number(size.height()) % ")", LOGTYPE_Normal);
 
             uiCurWidth += size.width();
             if(uiCurMaxRowHeight < size.height())
@@ -221,16 +235,20 @@ int WidgetAtlasGroup::GetId()
     uiCurHeight += uiCurMaxRowHeight;
 
     // Preview hover selection
-    QTreeWidgetItem *pHoveredItem = ui->atlasList->itemAt(ui->atlasList->mapFromGlobal(QCursor::pos()));
+    QTreeWidgetItem *pHoveredItem = atlasGrp.ui->atlasList->itemAt(atlasGrp.ui->atlasList->mapFromGlobal(QCursor::pos()));
     if(pHoveredItem)
     {
         QVariant v = pHoveredItem->data(0, QTreeWidgetItem::UserType);
+
+        if(bDebugPrint)
+            HyGuiLog("Hov: (" % QString::number(ptDrawPos.x()) % ", " % QString::number(ptDrawPos.y()) % ")", LOGTYPE_Normal);
+
         v.value<HyGuiFrame *>()->DrawPreview(ptDrawPos, true);
     }
 
     // Pan camera over previewed
-    if(m_pCamera)
-        m_pCamera->pos.Animate(uiCurWidth * 0.5f, uiCurHeight * 0.5f, 0.5f, HyEase::quadInOut);
+    //if(pProj->m_pCamera)
+    //    pProj->m_pCamera->pos.Animate(uiCurWidth * -0.5f, uiCurHeight * 0.5f, 15.0f, HyEase::quadInOut);
 
 }
 

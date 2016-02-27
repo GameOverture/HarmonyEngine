@@ -27,7 +27,6 @@ class IHyGuiDrawItem
     void DrawUpdate(IHyApplication &hyApp);
 
 protected:
-    HyCamera2d *        m_pCamera;
     IHyGuiDrawItem();
 
     virtual void OnDraw_Open(IHyApplication &hyApp) = 0;
@@ -35,6 +34,9 @@ protected:
     virtual void OnDraw_Show(IHyApplication &hyApp) = 0;
     virtual void OnDraw_Hide(IHyApplication &hyApp) = 0;
     virtual void OnDraw_Update(IHyApplication &hyApp) = 0;
+
+public:
+    HyCamera2d *        m_pCamera;
 };
 
 #endif // IHYGUIDRAWITEM

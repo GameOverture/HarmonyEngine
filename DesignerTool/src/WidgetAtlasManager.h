@@ -16,13 +16,12 @@
 
 #include "ItemProject.h"
 #include "WidgetAtlasGroup.h"\
-#include "IHyGuiDrawItem.h"
 
 namespace Ui {
 class WidgetAtlasManager;
 }
 
-class WidgetAtlasManager : public QWidget, public IHyGuiDrawItem
+class WidgetAtlasManager : public QWidget
 {
     Q_OBJECT
 
@@ -41,11 +40,11 @@ public:
     void PreviewAtlasGroup();
     void HideAtlasGroup();
 
-    virtual void OnDraw_Open(IHyApplication &hyApp);
-    virtual void OnDraw_Close(IHyApplication &hyApp);
-    virtual void OnDraw_Show(IHyApplication &hyApp);
-    virtual void OnDraw_Hide(IHyApplication &hyApp);
-    virtual void OnDraw_Update(IHyApplication &hyApp);
+    friend void AtlasManager_DrawOpen(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
+    friend void AtlasManager_DrawClose(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
+    friend void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
+    friend void AtlasManager_DrawHide(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
+    friend void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
 
 private slots:
     void on_atlasGroups_currentChanged(int iIndex);
