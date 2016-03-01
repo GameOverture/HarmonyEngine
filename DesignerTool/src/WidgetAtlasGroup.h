@@ -70,7 +70,7 @@ public:
         m_DrawTexture.SetDisplayOrder(1);
         m_DrawTexture.SetEnabled(false);
 
-        //m_DrawTexture.AddChild(m_DrawOutline);
+        m_DrawTexture.AddChild(m_DrawOutline);
     }
     
     quint32 GetHash()       { return m_uiHASH; }

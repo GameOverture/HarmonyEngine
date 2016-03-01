@@ -67,6 +67,11 @@ public:
 		m_vAnimFloats[1].AnimateOffset(fOffsetY, fSeconds, fpEase);
 	}
 
+	bool IsTweening()
+	{
+		return (m_vAnimFloats[0].IsTweening() || m_vAnimFloats[1].IsTweening());
+	}
+
 	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam) { for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].SetOnDirtyCallback(fpOnDirty, pParam); }
 
 	HyAnimVec2 &operator+=(float rhs)					{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i] += rhs; return *this; }

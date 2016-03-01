@@ -201,18 +201,7 @@ int WidgetAtlasGroup::GetId()
     // Preview hover selection
     QTreeWidgetItem *pHoveredItem = atlasGrp.ui->atlasList->itemAt(atlasGrp.ui->atlasList->mapFromGlobal(QCursor::pos()));
     if(pHoveredItem)
-    {
         selectedItems.append(pHoveredItem);
-
-//        QVariant v = pHoveredItem->data(0, QTreeWidgetItem::UserType);
-
-//        if(bDebugPrint)
-//            HyGuiLog("Hov: (" % QString::number(ptDrawPos.x()) % ", " % QString::number(ptDrawPos.y()) % ")", LOGTYPE_Normal);
-
-//        QSize size = v.value<HyGuiFrame *>()->DrawPreview(ptDrawPos, true);
-//        uiCurWidth += size.width();
-//        uiCurHeight += uiCurMaxRowHeight;
-    }
 
     // Place frames in rectangle to view all
     for(uint i = 0; i < selectedItems.size(); ++i)
@@ -225,7 +214,11 @@ int WidgetAtlasGroup::GetId()
             if(bDebugPrint)
                 HyGuiLog("Sel: " % QString::number(i) % " (" % QString::number(ptDrawPos.x()) % ", " % QString::number(ptDrawPos.y()) % ")", LOGTYPE_Normal);
 
-            QSize size = pFrame->DrawPreview(ptDrawPos, true);
+            QSize size = pFrame->DrawPreview(ptDrawPos, false);
+            
+            ptDrawPos.setX(ptDrawPos.x() + 25);
+            ptDrawPos.setY(ptDrawPos.y() + 25);
+            
             if(bDebugPrint)
                 HyGuiLog("Sze: (" % QString::number(size.width()) % ", " % QString::number(size.height()) % ")", LOGTYPE_Normal);
 
@@ -233,34 +226,34 @@ int WidgetAtlasGroup::GetId()
             if(uiCurMaxRowHeight < size.height())
                 uiCurMaxRowHeight = size.height();
 
-            if(uiCurWidth < uiRENDERWIDTH)
-                ptDrawPos.setX(ptDrawPos.x() + size.width());
-            else
-            {
-                //if(uiCurHeight + uiCurMaxRowHeight < uiRENDERHEIGHT)
-                {
-                    uiCurWidth = 0;
-                    uiCurHeight += uiCurMaxRowHeight;
+            //if(uiCurWidth < uiRENDERWIDTH)
+                //ptDrawPos.setX(ptDrawPos.x() + size.width());
+//            else
+//            {
+//                //if(uiCurHeight + uiCurMaxRowHeight < uiRENDERHEIGHT)
+//                {
+//                    uiCurWidth = 0;
+//                    uiCurHeight += uiCurMaxRowHeight;
 
-                    uiCurMaxRowHeight = 0;
+//                    uiCurMaxRowHeight = 0;
 
-                    ptDrawPos.setX(uiCurWidth);
-                    ptDrawPos.setY(uiCurHeight);
-                }
-            }
+//                    ptDrawPos.setX(uiCurWidth);
+//                    ptDrawPos.setY(uiCurHeight);
+//                }
+//            }
         }
     }
     uiCurHeight += uiCurMaxRowHeight;
 
 
 
-    QPointF ptCamPos(uiCurHeight * 0.5f, uiCurHeight * 0.5f);
+    QPointF ptCamPos(uiCurWidth * 0.5f, uiCurHeight * 0.5f);
 
     // Pan camera over previewed
     if(bDebugPrint)
         HyGuiLog("Cam: (" % QString::number(ptCamPos.x()) % ", " % QString::number(ptCamPos.y()) % ")", LOGTYPE_Normal);
-    if(pProj->m_pCamera)
-        pProj->m_pCamera->pos.Animate(ptCamPos.x(), ptCamPos.y(), 5.0f, HyEase::quadInOut);
+//    if(pProj->m_pCamera && pProj->m_pCamera->pos.IsTweening() == false)
+//        pProj->m_pCamera->pos.Animate(ptCamPos.x(), ptCamPos.y(), 1.0f, HyEase::quadInOut);
 
 }
 

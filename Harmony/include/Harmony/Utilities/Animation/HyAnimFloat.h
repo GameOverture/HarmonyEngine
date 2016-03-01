@@ -53,6 +53,8 @@ public:
 	void Animate(float fTo, float fSeconds, EaseUpdateFunc fpEase);
 	void AnimateOffset(float fOffsetAmt, float fSeconds, EaseUpdateFunc fpEase);
 
+	bool IsTweening()					{ return m_bAddedToSceneUpdate; }
+
 	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam = NULL);
 
 	//void Follow(float &fToFollow, float fOffsetAmt);
