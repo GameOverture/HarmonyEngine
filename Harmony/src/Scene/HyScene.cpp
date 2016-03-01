@@ -188,7 +188,10 @@ void HyScene::WriteDrawBuffers()
 				m_pCurWritePos += sizeof(HyRectangle<float>);
 
 				m_vWindowRef[i].m_vCams2d[j]->GetLocalTransform_SRT(mtxView);
-				//mtxView = glm::scale(mtxView, 1.0f, 1.0f, 1.0f);
+
+				// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly in the shader)
+				mtxView[3].x *= -1;
+				mtxView[3].y *= -1;
 
 				*(reinterpret_cast<mat4 *>(m_pCurWritePos)) = mtxView;
 				m_pCurWritePos += sizeof(mat4);

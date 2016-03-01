@@ -43,6 +43,7 @@ void Player::Initialize()
 
 	m_testSprite.Load();
 	m_testSprite.SetTextureSource(8, 0, 0, 180, 162);
+	//m_testSprite.pos.Set(100.0f, 100.0f);
 
 
 	//m_testSprite.SetUsingLocalCoordinates(true);

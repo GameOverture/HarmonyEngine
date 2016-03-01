@@ -101,7 +101,7 @@ TestBed::~TestBed(void)
 
 	if(Input().IsBtnDownBuffered(ACTION_1))
 	{
-		m_pCam->pos.Animate(40.0f, 40.0f, 5.0f, HyEase::linear);
+		m_pCam_Viewport2->pos.Animate(40.0f, 40.0f, 5.0f, HyEase::linear);
 	}
 
 	if(Input().IsBtnDown(CAM_LEFT))

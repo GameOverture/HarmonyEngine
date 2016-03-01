@@ -97,7 +97,6 @@ void ITransform<tVec>::GetLocalTransform(mat4 &outMtx) const
 	// TODO: Make this support 3d by exposing 'NumDimensions' in AnimVec and loop, assign tVec's using bracket overload
 
 	vec3 ptPos(0.0f);
-
 	ptPos.x = pos.X();
 	ptPos.y = pos.Y();
 
