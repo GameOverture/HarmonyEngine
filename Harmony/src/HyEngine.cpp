@@ -113,8 +113,8 @@ bool HyEngine::Update()
 
 		m_GuiComms.Update();
 	}
-
 	m_Renderer.Update();
+
 	return true;
 }
 

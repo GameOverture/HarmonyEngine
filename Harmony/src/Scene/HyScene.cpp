@@ -77,7 +77,11 @@ void HyScene::CopyAllInsts(vector<IHyInst2d *> &vInstsToCopy)
 
 void HyScene::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
 {
-	m_vActiveAnimFloats.push_back(pAnimFloat);
+	if(pAnimFloat->m_bAddedToSceneUpdate == false)
+	{
+		pAnimFloat->m_bAddedToSceneUpdate = true;
+		m_vActiveAnimFloats.push_back(pAnimFloat);
+	}
 }
 
 
@@ -91,8 +95,11 @@ void HyScene::PreUpdate()
 	// Update any currently active AnimFloat in the game, and remove any of them that are finished.
 	for (vector<HyAnimFloat *>::iterator iter = m_vActiveAnimFloats.begin(); iter != m_vActiveAnimFloats.end(); )
 	{
-		if(!(*iter)->Update())
+		if(!(*iter)->UpdateFloat())
+		{
+			(*iter)->m_bAddedToSceneUpdate = false;
 			iter = m_vActiveAnimFloats.erase(iter);
+		}
 		else
 			++iter;
 	}
@@ -181,6 +188,8 @@ void HyScene::WriteDrawBuffers()
 				m_pCurWritePos += sizeof(HyRectangle<float>);
 
 				m_vWindowRef[i].m_vCams2d[j]->GetLocalTransform_SRT(mtxView);
+				//mtxView = glm::scale(mtxView, 1.0f, 1.0f, 1.0f);
+
 				*(reinterpret_cast<mat4 *>(m_pCurWritePos)) = mtxView;
 				m_pCurWritePos += sizeof(mat4);
 

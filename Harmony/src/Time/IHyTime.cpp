@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Time/IHyTime.h"
 
-/*static*/ const uint32			IHyTime::sm_kuiUpdateStep = 10;
+/*static*/ const uint32			IHyTime::sm_kuiUpdateStep = 16;
 /*static*/ const double			IHyTime::sm_kdUpdateStep = IHyTime::sm_kuiUpdateStep / 1000.0;
 
 IHyTime::IHyTime() :	m_dTimeManipulation(1.0f),

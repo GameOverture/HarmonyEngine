@@ -92,7 +92,8 @@ void HyGuiComms::ProcessMessage(HyGuiMessage &msgRef)
 	case HYPACKET_ReloadEnd:
 		uiKey = *reinterpret_cast<const uint32 *>(pCurReadPos);
 
-		m_AssetManagerRef.Reload(m_ReloadMap[uiKey]);
+		// TODO: Determine by passing in packet whether I need to refresh assets
+		m_AssetManagerRef.Reload(m_ReloadMap[uiKey], true);
 		m_ReloadMap.erase(uiKey);
 		break;
 	}

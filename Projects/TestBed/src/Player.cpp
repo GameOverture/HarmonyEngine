@@ -32,7 +32,7 @@ void Player::Initialize()
 	//m_spineBoy.SetDisplayOrder(1.0f);
 
 	//m_txtName.Load();
-	//m_txtName.SetString(L"Testing");
+	//m_txtName.SetString(L"Testing");11
 	//m_txtName.Pos().Offset(0.0f, 0.0f);
 	
 	//m_spineBoy.AddChild(m_txtName);
@@ -42,9 +42,9 @@ void Player::Initialize()
 	//m_primBox.Pos().Animate(-1.0f, 0.0f, 5.0f, HyEase::linear);
 
 	m_testSprite.Load();
-	m_testSprite.SetTextureSource(0, 0, 0, 107, 160);
+	m_testSprite.SetTextureSource(8, 0, 0, 180, 162);
 
 
-	//m_testSprite.SetUsingLocalCoordinates(true); <--- TODO: this needs to set glViewport() when detected by the renderstate (within DrawRenderState_2d())
+	//m_testSprite.SetUsingLocalCoordinates(true);
 	m_testSprite.SetDisplayOrder(150);
 }

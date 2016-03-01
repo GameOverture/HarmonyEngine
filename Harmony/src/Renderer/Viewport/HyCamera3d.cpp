@@ -27,5 +27,5 @@ void HyCamera3d::SetViewport(float fPosX, float fPosY, float fWidth, float fHeig
 	m_ViewportRect.left = fPosX;
 	m_ViewportRect.top = fPosY;
 	m_ViewportRect.right = m_ViewportRect.left + fWidth;
-	m_ViewportRect.bottom = m_ViewportRect.bottom + fHeight;
+	m_ViewportRect.bottom = m_ViewportRect.top + fHeight;
 }

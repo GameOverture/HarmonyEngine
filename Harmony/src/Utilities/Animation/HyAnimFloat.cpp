@@ -26,7 +26,8 @@ HyAnimFloat::HyAnimFloat() :	m_fValueRef(*(new float)),
 								m_fpBehaviorUpdate(NULL),
 								m_fpOnDirty(HyAnimFloat::_NullOnChange),
 								m_pOnChangeParam(NULL),
-								m_kbSelfAllocated(true)
+								m_bAddedToSceneUpdate(false),
+								m_bSELF_ALLOCATED(true)
 {
 }
 
@@ -39,14 +40,15 @@ HyAnimFloat::HyAnimFloat(float &valueReference) :	m_fValueRef(valueReference),
 													m_fpBehaviorUpdate(NULL),
 													m_fpOnDirty(HyAnimFloat::_NullOnChange),
 													m_pOnChangeParam(NULL),
-													m_kbSelfAllocated(false)
+													m_bAddedToSceneUpdate(false),
+													m_bSELF_ALLOCATED(false)
 {
 }
 
 
 HyAnimFloat::~HyAnimFloat(void)
 {
-	if(m_kbSelfAllocated)
+	if(m_bSELF_ALLOCATED)
 		delete &m_fValueRef;	// This looks dangerous, but it should be fine.
 }
 
@@ -124,7 +126,7 @@ void HyAnimFloat::SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam /*=
 //}
 
 // Returns true if updating is still continuing. False otherwise, to signal HyScene to remove this instance from the ActiveAnimFloat vector
-bool HyAnimFloat::Update()
+bool HyAnimFloat::UpdateFloat()
 {
 	if(m_fpBehaviorUpdate == NULL)
 		return false;

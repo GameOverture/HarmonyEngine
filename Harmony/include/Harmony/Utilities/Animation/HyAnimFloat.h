@@ -29,8 +29,9 @@ class HyAnimFloat
 	float					m_fTarget;
 	float					m_fDuration;
 	float					m_fElapsedTime;
+	bool					m_bAddedToSceneUpdate;
 
-	const bool				m_kbSelfAllocated;
+	const bool				m_bSELF_ALLOCATED;
 
 	EaseUpdateFunc			m_fpEaseFunc;
 	//float (HyEase::*m_fpEaseFunc)(float);
@@ -57,7 +58,7 @@ public:
 	//void Follow(float &fToFollow, float fOffsetAmt);
 
 	// Returns true if updating is still continuing. False otherwise, to signal HyScene to remove this instance from the ActiveAnimFloat vector
-	bool Update();
+	bool UpdateFloat();
 
 	HyAnimFloat &operator=(const float &rhs);
 	HyAnimFloat &operator+=(const float &rhs);

@@ -46,7 +46,7 @@ TestBed::~TestBed(void)
 	m_pCam2->SetViewport(0.5f, 0.0f, 0.5f, 1.0f);
 
 	m_pCam_Viewport2 = Window(1).CreateCamera2d();
-	m_pCam_Viewport2->SetZoom(0.5f);
+	m_pCam_Viewport2->SetZoom(1.0f);
 	
 	m_Player.Initialize();
 
@@ -72,6 +72,8 @@ TestBed::~TestBed(void)
 
 	Input().MapBtn_KB(SEND_LOG, KeyF);
 
+	Input().MapBtn_KB(ACTION_1, Key1);
+
 
 	return true;
 }
@@ -96,6 +98,11 @@ TestBed::~TestBed(void)
 
 	//m_TxtInst.SetString(HyStr("CamX: %f\tCamY:%f"), m_pCam->Pos().X(), m_pCam->Pos().Y());
 
+
+	if(Input().IsBtnDownBuffered(ACTION_1))
+	{
+		m_pCam->pos.Animate(40.0f, 40.0f, 5.0f, HyEase::linear);
+	}
 
 	if(Input().IsBtnDown(CAM_LEFT))
 		m_pCam->pos.Offset(-0.5f, 0.0f);
