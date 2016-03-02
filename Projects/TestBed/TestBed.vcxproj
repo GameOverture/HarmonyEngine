@@ -28,11 +28,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\TestBed.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Player.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\TestBed.h" />
   </ItemGroup>

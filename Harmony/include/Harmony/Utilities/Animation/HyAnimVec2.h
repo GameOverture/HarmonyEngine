@@ -43,6 +43,7 @@ public:
 	inline float Y() const								{ return m_vAnimFloats[1].Get(); }
 	inline void Y(float fValue)							{ m_vAnimFloats[1] = fValue; }
 
+	// Unwind the loops in these functions
 	inline void Set(float fAll)							{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].Set(fAll); }
 	inline void Set(float fX, float fY)					{ m_vAnimFloats[0] = fX; m_vAnimFloats[1] = fY; }
 	inline void Set(const vec2 &srcVec)					{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].Set(srcVec[i]); }

@@ -149,7 +149,7 @@ int WidgetAtlasGroup::GetId()
 /*friend*/ void AtlasGroup_DrawOpen(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
     foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
-        pFrame->DrawLoad();
+        pFrame->Load();
 
     atlasGrp.ResizeAtlasListColumns();
 }
@@ -157,7 +157,7 @@ int WidgetAtlasGroup::GetId()
 /*friend*/ void AtlasGroup_DrawClose(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
     foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
-         pFrame->DrawUnload();
+         pFrame->Unload();
 }
 
 /*friend*/ void AtlasGroup_DrawShow(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
@@ -167,14 +167,14 @@ int WidgetAtlasGroup::GetId()
 /*friend*/ void AtlasGroup_DrawHide(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
     foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
-        pFrame->DrawHide();
+        pFrame->SetEnabled(false);
 }
 
 /*friend*/ void AtlasGroup_DrawUpdate(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
     for(uint i = 0; i < atlasGrp.m_FrameList.size(); ++i)
     {
-        atlasGrp.m_FrameList[i]->DrawHide();
+        atlasGrp.m_FrameList[i]->SetEnabled(false);
     }
 
     const uint32 uiRENDERWIDTH = hyApp.Window().GetResolution().x;
@@ -198,10 +198,10 @@ int WidgetAtlasGroup::GetId()
     // Display all selected
     QList<QTreeWidgetItem *> selectedItems = atlasGrp.ui->atlasList->selectedItems();
 
-    // Preview hover selection
-    QTreeWidgetItem *pHoveredItem = atlasGrp.ui->atlasList->itemAt(atlasGrp.ui->atlasList->mapFromGlobal(QCursor::pos()));
-    if(pHoveredItem)
-        selectedItems.append(pHoveredItem);
+//    // Preview hover selection
+//    QTreeWidgetItem *pHoveredItem = atlasGrp.ui->atlasList->itemAt(atlasGrp.ui->atlasList->mapFromGlobal(QCursor::pos()));
+//    if(pHoveredItem)
+//        selectedItems.append(pHoveredItem);
 
     // Place frames in rectangle to view all
     for(uint i = 0; i < selectedItems.size(); ++i)
@@ -212,19 +212,24 @@ int WidgetAtlasGroup::GetId()
         if(pFrame)
         {
             if(bDebugPrint)
-                HyGuiLog("Sel: " % QString::number(i) % " (" % QString::number(ptDrawPos.x()) % ", " % QString::number(ptDrawPos.y()) % ")", LOGTYPE_Normal);
+                HyGuiLog("Frame: " % QString::number((UINT)&pFrame), LOGTYPE_Normal);
+                //HyGuiLog("DrawPos: " % QString::number(i) % " (" % QString::number(ptDrawPos.x()) % ", " % QString::number(ptDrawPos.y()) % ")", LOGTYPE_Normal);
 
-            QSize size = pFrame->DrawPreview(ptDrawPos, false);
-            
-            ptDrawPos.setX(ptDrawPos.x() + 25);
-            ptDrawPos.setY(ptDrawPos.y() + 25);
+            pFrame->SetEnabled(true);
+            pFrame->pos.Set(i * 25, i * 25);
             
             if(bDebugPrint)
-                HyGuiLog("Sze: (" % QString::number(size.width()) % ", " % QString::number(size.height()) % ")", LOGTYPE_Normal);
+            {
+                ptDrawPos.setX(ptDrawPos.x() + 25);
+                ptDrawPos.setY(ptDrawPos.y() + 25);
+            }
+            
+            //if(bDebugPrint)
+            //    HyGuiLog("Sze: (" % QString::number(size.width()) % ", " % QString::number(size.height()) % ")", LOGTYPE_Normal);
 
-            uiCurWidth += size.width();
-            if(uiCurMaxRowHeight < size.height())
-                uiCurMaxRowHeight = size.height();
+            uiCurWidth += pFrame->GetWidth();
+            if(uiCurMaxRowHeight < pFrame->GetHeight())
+                uiCurMaxRowHeight = pFrame->GetHeight();
 
             //if(uiCurWidth < uiRENDERWIDTH)
                 //ptDrawPos.setX(ptDrawPos.x() + size.width());
@@ -247,11 +252,11 @@ int WidgetAtlasGroup::GetId()
 
 
 
-    QPointF ptCamPos(uiCurWidth * 0.5f, uiCurHeight * 0.5f);
+    //QPointF ptCamPos(uiCurWidth * 0.5f, uiCurHeight * 0.5f);
 
     // Pan camera over previewed
-    if(bDebugPrint)
-        HyGuiLog("Cam: (" % QString::number(ptCamPos.x()) % ", " % QString::number(ptCamPos.y()) % ")", LOGTYPE_Normal);
+    //if(bDebugPrint)
+    //    HyGuiLog("Cam: (" % QString::number(ptCamPos.x()) % ", " % QString::number(ptCamPos.y()) % ")", LOGTYPE_Normal);
 //    if(pProj->m_pCamera && pProj->m_pCamera->pos.IsTweening() == false)
 //        pProj->m_pCamera->pos.Animate(ptCamPos.x(), ptCamPos.y(), 1.0f, HyEase::quadInOut);
 

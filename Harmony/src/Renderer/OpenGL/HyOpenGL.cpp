@@ -67,6 +67,7 @@ HyOpenGL::~HyOpenGL(void)
 	float fWidth = (pViewportRect->Width() * m_RenderSurfaceIter->m_iRenderSurfaceWidth);
 	float fHeight = (pViewportRect->Height() * m_RenderSurfaceIter->m_iRenderSurfaceHeight);
 
+	// As I hear from the interwebs, calling glViewport every frame has little to no overhead
 	glViewport(static_cast<GLint>(pViewportRect->left * m_RenderSurfaceIter->m_iRenderSurfaceWidth),
 			   static_cast<GLint>(pViewportRect->top * m_RenderSurfaceIter->m_iRenderSurfaceHeight),
 			   static_cast<GLsizei>(fWidth),

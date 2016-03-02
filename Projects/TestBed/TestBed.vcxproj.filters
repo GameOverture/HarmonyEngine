@@ -4,7 +4,6 @@
     <ClCompile Include="src\TestBed.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\TestBed.cpp" />
-    <ClCompile Include="src\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
@@ -34,6 +33,5 @@
   <ItemGroup>
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\TestBed.h" />
-    <ClInclude Include="src\Player.h" />
   </ItemGroup>
 </Project>

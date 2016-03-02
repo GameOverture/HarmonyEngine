@@ -28,7 +28,7 @@ namespace Ui {
 class WidgetAtlasGroup;
 }
 
-class HyGuiFrame
+class HyGuiFrame : public HyTexturedQuad2d
 {
     const quint32       m_uiHASH;
     const QString       m_sNAME;
@@ -44,12 +44,10 @@ class HyGuiFrame
     
     QTreeWidgetItem *   m_pTreeItem;
     QStringList         m_sLinks;
-    
-    HyTexturedQuad2d    m_DrawTexture;
-    HyPrimitive2d       m_DrawOutline;
 
 public:
-    HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupIndex, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) : m_uiHASH(uiCRC),
+    HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupIndex, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) : HyTexturedQuad2d(uiAtlasGroupIndex),
+                                                                                                                                                m_uiHASH(uiCRC),
                                                                                                                                                 m_sNAME(sN),
                                                                                                                                                 m_iWIDTH(iW),
                                                                                                                                                 m_iHEIGHT(iH),
@@ -58,19 +56,11 @@ public:
                                                                                                                                                 m_bRotation(bRot),
                                                                                                                                                 m_iPosX(iX),
                                                                                                                                                 m_iPosY(iY),
-                                                                                                                                                m_DrawTexture(uiAtlasGroupIndex),
                                                                                                                                                 m_pTreeItem(NULL)
     {
-        m_DrawOutline.color.Set(1.0f, 0.0f, 0.0f, 0.5f);
-        m_DrawOutline.SetAsQuad(m_rALPHA_CROP.width(), m_rALPHA_CROP.height(), false);
-        m_DrawOutline.SetDisplayOrder(0);
-        m_DrawOutline.SetEnabled(false);
-
-        m_DrawTexture.SetTextureSource(iTexIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
-        m_DrawTexture.SetDisplayOrder(1);
-        m_DrawTexture.SetEnabled(false);
-
-        m_DrawTexture.AddChild(m_DrawOutline);
+        SetTextureSource(iTexIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
+        SetDisplayOrder(1);
+        SetEnabled(false);
     }
     
     quint32 GetHash()       { return m_uiHASH; }
@@ -111,7 +101,7 @@ public:
         m_iPosX = iX;
         m_iPosY = iY;
 
-        m_DrawTexture.SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
+        SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
     }
     
     QString ConstructImageFileName()
@@ -121,38 +111,6 @@ public:
         sMetaImgName += ".png";
         
         return sMetaImgName;
-    }
-    
-    void DrawLoad()
-    {
-        m_DrawOutline.Load();
-        m_DrawOutline.SetEnabled(false);
-        
-        m_DrawTexture.Load();
-        m_DrawTexture.SetEnabled(false);
-    }
-
-    void DrawUnload()
-    {
-        m_DrawOutline.Unload();
-        m_DrawTexture.Unload();
-    }
-
-    void DrawHide()
-    {
-        m_DrawOutline.SetEnabled(false);
-        m_DrawTexture.SetEnabled(false);
-    }
-
-    QSize DrawPreview(QPoint ptLocation, bool bHightlight)
-    {
-        m_DrawOutline.SetEnabled(bHightlight);
-        m_DrawTexture.SetEnabled(true);
-
-        m_DrawTexture.pos.Set(ptLocation.x(), ptLocation.y());
-        m_DrawOutline.pos.Set(ptLocation.x(), ptLocation.y());
-
-        return QSize(m_DrawTexture.GetWidth(), m_DrawTexture.GetHeight());
     }
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)

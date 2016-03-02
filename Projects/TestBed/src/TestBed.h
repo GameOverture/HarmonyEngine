@@ -12,8 +12,6 @@
 
 #include "stdafx.h"
 
-#include "Player.h"
-
 class TestBed : public IHyApplication
 {
 	enum eControls
@@ -34,7 +32,12 @@ class TestBed : public IHyApplication
 
 	vector<uint32>	m_vGamePadIds;
 
-	Player			m_Player;
+	HySpine2d			m_spineBoy;
+	HyPrimitive2d		m_primBox;
+	HyText2d			m_txtName;
+
+	HyTexturedQuad2d	m_testSprite;
+
 
 public:
 	TestBed(HarmonyInit &initStruct);

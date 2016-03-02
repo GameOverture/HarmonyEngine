@@ -9,10 +9,11 @@
  *************************************************************************/
 #include "TestBed.h"
 
-TestBed::TestBed(HarmonyInit &initStruct) : IHyApplication(initStruct)
-							//						m_physBox2("Box", b2_dynamicBody),
-								//					m_physGround("Ground", b2_staticBody),
-									//				m_TxtInst("Vera", 48, 48)
+TestBed::TestBed(HarmonyInit &initStruct) : IHyApplication(initStruct),
+											m_spineBoy(NULL, "SpineBoy"),
+											m_primBox(),
+											m_txtName(NULL, NULL),
+											m_testSprite(1)
 {
 }
 
@@ -48,7 +49,32 @@ TestBed::~TestBed(void)
 	m_pCam_Viewport2 = Window(1).CreateCamera2d();
 	m_pCam_Viewport2->SetZoom(1.0f);
 	
-	m_Player.Initialize();
+	m_primBox.Load();
+	m_primBox.color.Set(0.0f, 0.0f, 1.0f, 1.0f);
+	m_primBox.SetAsQuad(15.0f, 15.0f, false);
+	m_primBox.SetDisplayOrder(100);
+
+
+	//m_spineBoy.Load();
+	//m_spineBoy.SetDisplayOrder(1.0f);
+
+	//m_txtName.Load();
+	//m_txtName.SetString(L"Testing");11
+	//m_txtName.Pos().Offset(0.0f, 0.0f);
+
+	//m_spineBoy.AddChild(m_txtName);
+	//m_spineBoy.AddChild(m_primBox);
+
+	//m_spineBoy.Pos().Animate(2.0f, 0.0f, 5.0f, HyEase::linear);
+	//m_primBox.Pos().Animate(-1.0f, 0.0f, 5.0f, HyEase::linear);
+
+	m_testSprite.Load();
+	m_testSprite.SetTextureSource(8, 0, 0, 180, 162);
+	//m_testSprite.pos.Set(100.0f, 100.0f);
+
+
+	//m_testSprite.SetUsingLocalCoordinates(true);
+	m_testSprite.SetDisplayOrder(150);
 
 	//HyGfxWindow::tResolution tRes;
 	//m_Window.GetResolution(tRes);
@@ -97,6 +123,8 @@ TestBed::~TestBed(void)
 
 
 	//m_TxtInst.SetString(HyStr("CamX: %f\tCamY:%f"), m_pCam->Pos().X(), m_pCam->Pos().Y());
+
+	m_testSprite.pos.Set(25, 25);
 
 
 	if(Input().IsBtnDownBuffered(ACTION_1))
