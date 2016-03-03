@@ -175,6 +175,7 @@ int WidgetAtlasGroup::GetId()
     for(uint i = 0; i < atlasGrp.m_FrameList.size(); ++i)
     {
         atlasGrp.m_FrameList[i]->SetEnabled(false);
+        atlasGrp.m_FrameList[i]->color.A(1.0f);
     }
 
     const uint32 uiRENDERWIDTH = hyApp.Window().GetResolution().x;
@@ -198,15 +199,11 @@ int WidgetAtlasGroup::GetId()
     // Display all selected
     QList<QTreeWidgetItem *> selectedItems = atlasGrp.ui->atlasList->selectedItems();
 
-//    // Preview hover selection
-//    QTreeWidgetItem *pHoveredItem = atlasGrp.ui->atlasList->itemAt(atlasGrp.ui->atlasList->mapFromGlobal(QCursor::pos()));
-//    if(pHoveredItem)
-//        selectedItems.append(pHoveredItem);
-
     // Place frames in rectangle to view all
-    for(uint i = 0; i < selectedItems.size(); ++i)
+    uint iFrameCount = 0;
+    for(uint iFrameCount = 0; iFrameCount < selectedItems.size(); ++iFrameCount)
     {
-        QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
+        QVariant v = selectedItems[iFrameCount]->data(0, QTreeWidgetItem::UserType);
         HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
 
         if(pFrame)
@@ -216,13 +213,11 @@ int WidgetAtlasGroup::GetId()
                 //HyGuiLog("DrawPos: " % QString::number(i) % " (" % QString::number(ptDrawPos.x()) % ", " % QString::number(ptDrawPos.y()) % ")", LOGTYPE_Normal);
 
             pFrame->SetEnabled(true);
-            pFrame->pos.Set(i * 25, i * 25);
-            
-            if(bDebugPrint)
-            {
-                ptDrawPos.setX(ptDrawPos.x() + 25);
-                ptDrawPos.setY(ptDrawPos.y() + 25);
-            }
+            pFrame->pos.Set(iFrameCount * 25, iFrameCount * 25);
+            pFrame->SetDisplayOrder(iFrameCount);
+
+            ptDrawPos.setX(ptDrawPos.x() + pFrame->GetWidth());
+            ptDrawPos.setY(ptDrawPos.y() + pFrame->GetHeight());
             
             //if(bDebugPrint)
             //    HyGuiLog("Sze: (" % QString::number(size.width()) % ", " % QString::number(size.height()) % ")", LOGTYPE_Normal);
@@ -248,6 +243,24 @@ int WidgetAtlasGroup::GetId()
 //            }
         }
     }
+
+    // Preview hover selection
+    QTreeWidgetItem *pHoveredItem = atlasGrp.ui->atlasList->itemAt(atlasGrp.ui->atlasList->mapFromGlobal(QCursor::pos()));
+    if(pHoveredItem && pHoveredItem->isSelected() == false)
+    {
+        if(iFrameCount != 0)
+            iFrameCount++;
+
+        QVariant v = pHoveredItem->data(0, QTreeWidgetItem::UserType);
+        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
+
+        pFrame->SetEnabled(true);
+        pFrame->pos.Set(iFrameCount * 25, iFrameCount * 25);
+        pFrame->SetDisplayOrder(iFrameCount);
+        pFrame->color.A(0.5f);
+    }
+
+
     uiCurHeight += uiCurMaxRowHeight;
 
 
@@ -257,8 +270,8 @@ int WidgetAtlasGroup::GetId()
     // Pan camera over previewed
     //if(bDebugPrint)
     //    HyGuiLog("Cam: (" % QString::number(ptCamPos.x()) % ", " % QString::number(ptCamPos.y()) % ")", LOGTYPE_Normal);
-//    if(pProj->m_pCamera && pProj->m_pCamera->pos.IsTweening() == false)
-//        pProj->m_pCamera->pos.Animate(ptCamPos.x(), ptCamPos.y(), 1.0f, HyEase::quadInOut);
+    if(pProj->m_pCamera && pProj->m_pCamera->pos.IsTweening() == false)
+        pProj->m_pCamera->pos.Animate(iFrameCount * 12, iFrameCount * 12, 1.0f, HyEase::quadInOut);
 
 }
 

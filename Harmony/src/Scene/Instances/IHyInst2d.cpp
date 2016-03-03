@@ -22,7 +22,7 @@ IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char 
 																							m_bInvalidLoad(false),
 																							m_pParent(NULL),
 																							m_bDirty(true),
-																							m_uiDisplayOrder(0),
+																							m_iDisplayOrder(0),
 																							m_iTag(0)
 {
 	color.Set(1.0f);
@@ -101,9 +101,9 @@ void IHyInst2d::Detach()
 	HyError("IObjInst2d::Detach() could not find itself in parent's child list");
 }
 
-void IHyInst2d::SetDisplayOrder(uint32 uiOrderValue)
+void IHyInst2d::SetDisplayOrder(int32 iOrderValue)
 {
-	m_uiDisplayOrder = uiOrderValue;
+	m_iDisplayOrder = iOrderValue;
 	HyScene::SetInstOrderingDirty();
 }
 

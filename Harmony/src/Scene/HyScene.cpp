@@ -306,9 +306,9 @@ void HyScene::WriteDrawBuffers()
 		if(pInst1->GetRenderState() == pInst2->GetRenderState())
 			return reinterpret_cast<const char *>(pInst1) > reinterpret_cast<const char *>(pInst2);
 
-		return pInst1->GetRenderState() > pInst2->GetRenderState();
+		return pInst1->GetRenderState() < pInst2->GetRenderState();
 	}
 
-	return pInst1->GetDisplayOrder() > pInst2->GetDisplayOrder();
+	return pInst1->GetDisplayOrder() < pInst2->GetDisplayOrder();
 }
 
