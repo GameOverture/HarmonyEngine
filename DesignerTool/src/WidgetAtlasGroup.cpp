@@ -37,6 +37,8 @@ WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
 WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) :   QWidget(parent),
                                                                                     m_MetaDir(metaDir),
                                                                                     m_DataDir(dataDir),
+                                                                                    m_bRefreshDrawUpdate(false),
+                                                                                    m_pMouseHoverFrame(NULL),
                                                                                     ui(new Ui::WidgetAtlasGroup)
 {    
     ui->setupUi(this);
@@ -170,13 +172,40 @@ int WidgetAtlasGroup::GetId()
         pFrame->SetEnabled(false);
 }
 
+void ResetFrame(HyGuiFrame *pFrame)
+{
+    if(pFrame == NULL)
+        return;
+
+    pFrame->SetEnabled(false);
+    pFrame->pos.Set(0.0f, 0.0f);
+    pFrame->SetDisplayOrder(0);
+    pFrame->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+}
+
 /*friend*/ void AtlasGroup_DrawUpdate(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
-    for(uint i = 0; i < atlasGrp.m_FrameList.size(); ++i)
+    // Preview hover selection
+    QTreeWidgetItem *pHoveredItem = atlasGrp.ui->atlasList->itemAt(atlasGrp.ui->atlasList->mapFromGlobal(QCursor::pos()));
+    if(pHoveredItem && pHoveredItem->isSelected() == false)
     {
-        atlasGrp.m_FrameList[i]->SetEnabled(false);
-        atlasGrp.m_FrameList[i]->color.A(1.0f);
+        QVariant v = pHoveredItem->data(0, QTreeWidgetItem::UserType);
+        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
+
+        if(atlasGrp.m_pMouseHoverFrame != pFrame)
+        {
+            ResetFrame(atlasGrp.m_pMouseHoverFrame);
+            atlasGrp.m_pMouseHoverFrame = pFrame;
+        }
+
+        atlasGrp.m_pMouseHoverFrame->SetEnabled(true);
+        atlasGrp.m_pMouseHoverFrame->pos.Set(pFrame->GetWidth() * -0.5f, pFrame->GetHeight() * -0.5f);
+        atlasGrp.m_pMouseHoverFrame->SetDisplayOrder(1000);
+        atlasGrp.m_pMouseHoverFrame->color.A(0.5f);
     }
+
+    if(atlasGrp.m_bRefreshDrawUpdate == false)
+        return;
 
     const uint32 uiRENDERWIDTH = hyApp.Window().GetResolution().x;
     const uint32 uiRENDERHEIGHT = hyApp.Window().GetResolution().y;
@@ -244,22 +273,6 @@ int WidgetAtlasGroup::GetId()
         }
     }
 
-    // Preview hover selection
-    QTreeWidgetItem *pHoveredItem = atlasGrp.ui->atlasList->itemAt(atlasGrp.ui->atlasList->mapFromGlobal(QCursor::pos()));
-    if(pHoveredItem && pHoveredItem->isSelected() == false)
-    {
-        if(iFrameCount != 0)
-            iFrameCount++;
-
-        QVariant v = pHoveredItem->data(0, QTreeWidgetItem::UserType);
-        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
-
-        pFrame->SetEnabled(true);
-        pFrame->pos.Set(iFrameCount * 25, iFrameCount * 25);
-        pFrame->SetDisplayOrder(iFrameCount);
-        pFrame->color.A(0.5f);
-    }
-
 
     uiCurHeight += uiCurMaxRowHeight;
 
@@ -273,6 +286,7 @@ int WidgetAtlasGroup::GetId()
     if(pProj->m_pCamera && pProj->m_pCamera->pos.IsTweening() == false)
         pProj->m_pCamera->pos.Animate(iFrameCount * 12, iFrameCount * 12, 1.0f, HyEase::quadInOut);
 
+    atlasGrp.m_bRefreshDrawUpdate = false;
 }
 
 void WidgetAtlasGroup::ResizeAtlasListColumns()
@@ -657,4 +671,9 @@ void WidgetAtlasGroup::on_btnSettings_clicked()
 
     m_dlgSettings.DataToWidgets();
     m_dlgSettings.exec();
+}
+
+void WidgetAtlasGroup::on_atlasList_itemSelectionChanged()
+{
+    m_bRefreshDrawUpdate = true;
 }

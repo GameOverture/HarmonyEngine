@@ -1,3 +1,4 @@
+void on_atlasList_itemSelectionChanged();
 /**************************************************************************
  *	WidgetAtlasGroup.h
  *
@@ -128,6 +129,9 @@ class WidgetAtlasGroup : public QWidget
     QList<HyGuiFrame *>         m_FrameList;
     ImagePacker                 m_Packer;
 
+    bool                        m_bRefreshDrawUpdate;
+    HyGuiFrame *                m_pMouseHoverFrame;
+
 public:
     explicit WidgetAtlasGroup(QWidget *parent = 0);
     explicit WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent = 0);
@@ -150,6 +154,8 @@ private slots:
     void on_btnAddDir_clicked();
 
     void on_btnSettings_clicked();
+
+    void on_atlasList_itemSelectionChanged();
     
 protected:
     virtual void enterEvent(QEvent *pEvent);
