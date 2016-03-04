@@ -64,12 +64,15 @@ void IHyInst2d::GetWorldTransform(mat4 &outMtx)
 	if(m_bDirty)
 	{
 		if(m_pParent)
+		{
 			m_pParent->GetWorldTransform(m_mtxCached);
+			GetLocalTransform(outMtx);	// Just use 'outMtx' rather than pushing another mat4 on the stack
 
-		mat4 mtxLocal;
-		GetLocalTransform(mtxLocal);
+			m_mtxCached *= outMtx;
+		}
+		else
+			GetLocalTransform(m_mtxCached);
 
-		m_mtxCached *= mtxLocal;
 		m_bDirty = false;
 	}
 
