@@ -199,7 +199,9 @@ void ResetFrame(HyGuiFrame *pFrame)
         }
 
         atlasGrp.m_pMouseHoverFrame->SetEnabled(true);
-        atlasGrp.m_pMouseHoverFrame->pos.Set(pFrame->GetWidth() * -0.5f, pFrame->GetHeight() * -0.5f);
+        atlasGrp.m_pMouseHoverFrame->pos.Set(atlasGrp.m_pMouseHoverFrame->GetWidth() * -0.5f, atlasGrp.m_pMouseHoverFrame->GetHeight() * -0.5f);
+        HyGuiLog("Hover: " % QString::number(atlasGrp.m_pMouseHoverFrame->pos.X()) % ", " % QString::number(atlasGrp.m_pMouseHoverFrame->pos.Y()), LOGTYPE_Normal);
+        HyGuiLog("Cam  : " % QString::number(pProj->m_pCamera->pos.X()) % ", " % QString::number(pProj->m_pCamera->pos.Y()), LOGTYPE_Normal);
         atlasGrp.m_pMouseHoverFrame->SetDisplayOrder(1000);
         atlasGrp.m_pMouseHoverFrame->color.A(0.5f);
     }
@@ -281,10 +283,8 @@ void ResetFrame(HyGuiFrame *pFrame)
     //QPointF ptCamPos(uiCurWidth * 0.5f, uiCurHeight * 0.5f);
 
     // Pan camera over previewed
-    //if(bDebugPrint)
-    //    HyGuiLog("Cam: (" % QString::number(ptCamPos.x()) % ", " % QString::number(ptCamPos.y()) % ")", LOGTYPE_Normal);
-    if(pProj->m_pCamera && pProj->m_pCamera->pos.IsTweening() == false)
-        pProj->m_pCamera->pos.Animate(iFrameCount * 12, iFrameCount * 12, 1.0f, HyEase::quadInOut);
+    //if(pProj->m_pCamera && pProj->m_pCamera->pos.IsTweening() == false)
+        //pProj->m_pCamera->pos.Animate(iFrameCount * 12, iFrameCount * 12, 1.0f, HyEase::quadInOut);
 
     atlasGrp.m_bRefreshDrawUpdate = false;
 }
