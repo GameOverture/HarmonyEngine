@@ -53,9 +53,6 @@
     <ClCompile Include="src\Utilities\HyDebugPhys2d.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utilities\Animation\HyEaseFuncs.cpp">
-      <Filter>Utilities\Animation</Filter>
-    </ClCompile>
     <ClCompile Include="src\Utilities\HyBox2dRuntime.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -188,6 +185,9 @@
     </ClCompile>
     <ClCompile Include="src\Utilities\HyFileIO.cpp">
       <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\Animation\HyTweenFuncs.cpp">
+      <Filter>Utilities\Animation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -327,9 +327,6 @@
       <Filter>Utilities</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimFloat.h">
-      <Filter>Utilities\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Utilities\Animation\HyEaseFuncs.h">
       <Filter>Utilities\Animation</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Utilities\Containers\HyStaticArray.h">
@@ -536,6 +533,9 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Utilities\HyFileIO.h">
       <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\Animation\HyTweenFuncs.h">
+      <Filter>Utilities\Animation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

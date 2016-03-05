@@ -56,21 +56,21 @@ public:
 	inline HyAnimFloat &AnimX()							{ return m_vAnimFloats[0]; }
 	inline HyAnimFloat &AnimY()							{ return m_vAnimFloats[1]; }
 
-	void Animate(float fX, float fY, float fSeconds, EaseUpdateFunc fpEase)
+	void Tween(float fX, float fY, float fSeconds, TweenUpdateFunc fpEase)
 	{
-		m_vAnimFloats[0].Animate(fX, fSeconds, fpEase);
-		m_vAnimFloats[1].Animate(fY, fSeconds, fpEase);
+		m_vAnimFloats[0].Tween(fX, fSeconds, fpEase);
+		m_vAnimFloats[1].Tween(fY, fSeconds, fpEase);
 	}
 
-	void AnimateOffset(float fOffsetX, float fOffsetY, float fSeconds, EaseUpdateFunc fpEase)
+	void TweenOffset(float fOffsetX, float fOffsetY, float fSeconds, TweenUpdateFunc fpEase)
 	{
-		m_vAnimFloats[0].AnimateOffset(fOffsetX, fSeconds, fpEase);
-		m_vAnimFloats[1].AnimateOffset(fOffsetY, fSeconds, fpEase);
+		m_vAnimFloats[0].TweenOffset(fOffsetX, fSeconds, fpEase);
+		m_vAnimFloats[1].TweenOffset(fOffsetY, fSeconds, fpEase);
 	}
 
-	bool IsTweening()
+	bool IsTransforming()
 	{
-		return (m_vAnimFloats[0].IsTweening() || m_vAnimFloats[1].IsTweening());
+		return (m_vAnimFloats[0].IsTransforming() || m_vAnimFloats[1].IsTransforming());
 	}
 
 	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam) { for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].SetOnDirtyCallback(fpOnDirty, pParam); }

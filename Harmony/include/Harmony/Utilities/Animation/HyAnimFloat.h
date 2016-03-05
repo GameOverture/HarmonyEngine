@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Utilities/Animation/HyEaseFuncs.h"
+#include "Utilities/Animation/HyTweenFuncs.h"
 
 // Forward declaration
 class HyScene;
@@ -33,7 +33,7 @@ class HyAnimFloat
 
 	const bool				m_bSELF_ALLOCATED;
 
-	EaseUpdateFunc			m_fpEaseFunc;
+	TweenUpdateFunc			m_fpEaseFunc;
 	//float (HyEase::*m_fpEaseFunc)(float);
 
 	bool (HyAnimFloat::*m_fpBehaviorUpdate)();
@@ -49,11 +49,11 @@ public:
 	void Set(float fValue);
 	void Offset(float fValue);
 
-	void Animate(float fFrom, float fTo, float fSeconds, EaseUpdateFunc fpEase);
-	void Animate(float fTo, float fSeconds, EaseUpdateFunc fpEase);
-	void AnimateOffset(float fOffsetAmt, float fSeconds, EaseUpdateFunc fpEase);
+	void Tween(float fFrom, float fTo, float fSeconds, TweenUpdateFunc fpEase);
+	void Tween(float fTo, float fSeconds, TweenUpdateFunc fpEase);
+	void TweenOffset(float fOffsetAmt, float fSeconds, TweenUpdateFunc fpEase);
 
-	bool IsTweening()					{ return m_bAddedToSceneUpdate; }
+	bool IsTransforming()				{ return m_bAddedToSceneUpdate; }
 
 	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam = NULL);
 

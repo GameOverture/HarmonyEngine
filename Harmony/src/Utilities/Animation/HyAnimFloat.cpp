@@ -70,9 +70,9 @@ void HyAnimFloat::Offset(float fValue)
 	m_fpBehaviorUpdate = NULL;
 }
 
-void HyAnimFloat::Animate(float fFrom, float fTo, float fSeconds, EaseUpdateFunc fpEase)
+void HyAnimFloat::Tween(float fFrom, float fTo, float fSeconds, TweenUpdateFunc fpEase)
 {
-	HyAssert(sm_pScene, "HyAnimFloat::Animate() cannot be used before the engine is initialized.");
+	HyAssert(sm_pScene, "HyAnimFloat::Tween() cannot be used before the engine is initialized.");
 
 	if(m_fValueRef != fFrom)
 		m_fpOnDirty(m_pOnChangeParam);
@@ -86,9 +86,9 @@ void HyAnimFloat::Animate(float fFrom, float fTo, float fSeconds, EaseUpdateFunc
 	sm_pScene->InsertActiveAnimFloat(this);
 }
 
-void HyAnimFloat::Animate(float fTo, float fSeconds, EaseUpdateFunc fpEase)
+void HyAnimFloat::Tween(float fTo, float fSeconds, TweenUpdateFunc fpEase)
 {
-	HyAssert(sm_pScene, "HyAnimFloat::Animate() cannot be used before the engine is initialized.");
+	HyAssert(sm_pScene, "HyAnimFloat::Tween() cannot be used before the engine is initialized.");
 
 	m_fStart = m_fValueRef;
 	m_fTarget = fTo;
@@ -100,9 +100,9 @@ void HyAnimFloat::Animate(float fTo, float fSeconds, EaseUpdateFunc fpEase)
 	sm_pScene->InsertActiveAnimFloat(this);
 }
 
-void HyAnimFloat::AnimateOffset(float fOffsetAmt, float fSeconds, EaseUpdateFunc fpEase)
+void HyAnimFloat::TweenOffset(float fOffsetAmt, float fSeconds, TweenUpdateFunc fpEase)
 {
-	HyAssert(sm_pScene, "HyAnimFloat::AnimateOffset() cannot be used before the engine is initialized.");
+	HyAssert(sm_pScene, "HyAnimFloat::TweenOffset() cannot be used before the engine is initialized.");
 
 	m_fStart = m_fValueRef;
 	m_fTarget = m_fValueRef + fOffsetAmt;

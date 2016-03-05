@@ -52,7 +52,7 @@ class HyEngine
 	HyInputInterop			m_Input;
 	HyRendererInterop		m_Renderer;
 
-// If HY_PLATFORM_GUI, make this ctor public as GuiTool requires special usage.
+// If HY_PLATFORM_GUI, make this ctor public as gui tool requires special usage.
 #ifdef HY_PLATFORM_GUI
 public:
 #endif
