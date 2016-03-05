@@ -185,6 +185,16 @@ void ResetFrame(HyGuiFrame *pFrame)
 
 /*friend*/ void AtlasGroup_DrawUpdate(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
+    static int DEBUGCNT = 0;
+    DEBUGCNT++;
+    bool bDebugPrint = false;
+    if((DEBUGCNT % 100) == 0)
+    {
+        bDebugPrint = true;
+        DEBUGCNT = 0;
+    }
+
+
     // Preview hover selection
     QTreeWidgetItem *pHoveredItem = atlasGrp.ui->atlasList->itemAt(atlasGrp.ui->atlasList->mapFromGlobal(QCursor::pos()));
     if(pHoveredItem && pHoveredItem->isSelected() == false)
@@ -200,8 +210,6 @@ void ResetFrame(HyGuiFrame *pFrame)
 
         atlasGrp.m_pMouseHoverFrame->SetEnabled(true);
         atlasGrp.m_pMouseHoverFrame->pos.Set(atlasGrp.m_pMouseHoverFrame->GetWidth() * -0.5f, atlasGrp.m_pMouseHoverFrame->GetHeight() * -0.5f);
-        HyGuiLog("Hover: " % QString::number(atlasGrp.m_pMouseHoverFrame->pos.X()) % ", " % QString::number(atlasGrp.m_pMouseHoverFrame->pos.Y()), LOGTYPE_Normal);
-        HyGuiLog("Cam  : " % QString::number(pProj->m_pCamera->pos.X()) % ", " % QString::number(pProj->m_pCamera->pos.Y()), LOGTYPE_Normal);
         atlasGrp.m_pMouseHoverFrame->SetDisplayOrder(1000);
         atlasGrp.m_pMouseHoverFrame->color.A(0.5f);
     }
@@ -212,20 +220,7 @@ void ResetFrame(HyGuiFrame *pFrame)
     const uint32 uiRENDERWIDTH = hyApp.Window().GetResolution().x;
     const uint32 uiRENDERHEIGHT = hyApp.Window().GetResolution().y;
 
-    uint32 uiCurWidth = 0;
-    uint32 uiCurHeight = 0;
-    uint32 uiCurMaxRowHeight = 0;
-
     QPoint ptDrawPos(0, 0);
-
-    static int DEBUGCNT = 0;
-    DEBUGCNT++;
-    bool bDebugPrint = false;
-    if((DEBUGCNT % 100) == 0)
-    {
-        bDebugPrint = true;
-        DEBUGCNT = 0;
-    }
 
     // Display all selected
     QList<QTreeWidgetItem *> selectedItems = atlasGrp.ui->atlasList->selectedItems();
@@ -237,52 +232,32 @@ void ResetFrame(HyGuiFrame *pFrame)
         QVariant v = selectedItems[iFrameCount]->data(0, QTreeWidgetItem::UserType);
         HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
 
-        if(pFrame)
+        if(pFrame == NULL)
+            continue;
+
+        if(bDebugPrint)
         {
-            if(bDebugPrint)
-                HyGuiLog("Frame: " % QString::number((UINT)&pFrame), LOGTYPE_Normal);
-                //HyGuiLog("DrawPos: " % QString::number(i) % " (" % QString::number(ptDrawPos.x()) % ", " % QString::number(ptDrawPos.y()) % ")", LOGTYPE_Normal);
-
-            pFrame->SetEnabled(true);
-            pFrame->pos.Set(iFrameCount * 25, iFrameCount * 25);
-            pFrame->SetDisplayOrder(iFrameCount);
-
-            ptDrawPos.setX(ptDrawPos.x() + pFrame->GetWidth());
-            ptDrawPos.setY(ptDrawPos.y() + pFrame->GetHeight());
-            
-            //if(bDebugPrint)
-            //    HyGuiLog("Sze: (" % QString::number(size.width()) % ", " % QString::number(size.height()) % ")", LOGTYPE_Normal);
-
-            uiCurWidth += pFrame->GetWidth();
-            if(uiCurMaxRowHeight < pFrame->GetHeight())
-                uiCurMaxRowHeight = pFrame->GetHeight();
-
-            //if(uiCurWidth < uiRENDERWIDTH)
-                //ptDrawPos.setX(ptDrawPos.x() + size.width());
-//            else
-//            {
-//                //if(uiCurHeight + uiCurMaxRowHeight < uiRENDERHEIGHT)
-//                {
-//                    uiCurWidth = 0;
-//                    uiCurHeight += uiCurMaxRowHeight;
-
-//                    uiCurMaxRowHeight = 0;
-
-//                    ptDrawPos.setX(uiCurWidth);
-//                    ptDrawPos.setY(uiCurHeight);
-//                }
-//            }
+            //HyGuiLog("Frame: " % QString::number((UINT)&pFrame), LOGTYPE_Normal);
+            //HyGuiLog("DrawPos: " % QString::number(i) % " (" % QString::number(ptDrawPos.x()) % ", " % QString::number(ptDrawPos.y()) % ")", LOGTYPE_Normal);
         }
+
+        pFrame->SetEnabled(true);
+        pFrame->pos.Set(iFrameCount * 25, iFrameCount * 25);
+        pFrame->SetDisplayOrder(iFrameCount);
+
+        ptDrawPos.setX(ptDrawPos.x() + pFrame->GetWidth());
+        ptDrawPos.setY(ptDrawPos.y() + pFrame->GetHeight());
+
+        //if(bDebugPrint)
+        //    HyGuiLog("Sze: (" % QString::number(size.width()) % ", " % QString::number(size.height()) % ")", LOGTYPE_Normal);
     }
-
-
-    uiCurHeight += uiCurMaxRowHeight;
-
 
 
     //QPointF ptCamPos(uiCurWidth * 0.5f, uiCurHeight * 0.5f);
 
     // Pan camera over previewed
+    //HyGuiLog("Hover: " % QString::number(atlasGrp.m_pMouseHoverFrame->pos.X()) % ", " % QString::number(atlasGrp.m_pMouseHoverFrame->pos.Y()), LOGTYPE_Normal);
+    //HyGuiLog("Cam  : " % QString::number(pProj->m_pCamera->pos.X()) % ", " % QString::number(pProj->m_pCamera->pos.Y()), LOGTYPE_Normal);
     //if(pProj->m_pCamera && pProj->m_pCamera->pos.IsTweening() == false)
         //pProj->m_pCamera->pos.Animate(iFrameCount * 12, iFrameCount * 12, 1.0f, HyEase::quadInOut);
 
