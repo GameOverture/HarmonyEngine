@@ -34,13 +34,25 @@ IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char 
 	Unload();
 }
 
+/*virtual*/ void IHyInst2d::SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion)
+{
+	if(eCoordType == HYCOORD_Default)
+		eCoordType = HyScene::DefaultCoordinateType();
+
+	if(eCoordType == HYCOORD_ScreenPixel || eCoordType == HYCOORD_ScreenMeter)
+		m_RenderState.Enable(HyRenderState::USINGSCREENCOORDS);
+	else
+		m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
+
+	ITransform<HyAnimVec2>::SetCoordinateType(eCoordType, bDoConversion);
+}
+
 void IHyInst2d::Load()
 {
 	if(m_eLoadState != HYLOADSTATE_Inactive)
 		return;
 
-	// TODO: fix this code. Handle default more eloquently
-	if(GetCoordinateType() == HYCOORD_Default && HyScene::DefaultCoordinateType() != HYCOORD_Default)
+	if(GetCoordinateType() == HYCOORD_Default)
 		SetCoordinateType(HyScene::DefaultCoordinateType(), true);
 
 	if(sm_pAssetManager)

@@ -67,26 +67,21 @@ template<typename tVec>
 template<typename tVec>
 /*virtual*/ void ITransform<tVec>::SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion)
 {
-	if(m_eCoordType == eCoordType)
-		return;
+	if(eCoordType == HYCOORD_Default)
+		eCoordType = HyScene::DefaultCoordinateType();
 
-	if(m_fpOnDirty)
-		m_fpOnDirty(m_pOnDirtyParam);
-
-	if(m_eCoordType == HYCOORD_Default)
-		m_eCoordType = HyScene::DefaultCoordinateType();
-	else if(m_eCoordType == eCoordType)
-		return;
-	else
-		m_eCoordType = eCoordType;
+	m_eCoordType = eCoordType;
 
 	if(bDoConversion == false)
 		return;
 
-	if(m_eCoordType == HYCOORD_Meter)
+	if(m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter)
 		pos /= HyScene::PixelsPerMeter();
 	else
 		pos *= HyScene::PixelsPerMeter();
+
+	if(m_fpOnDirty)
+		m_fpOnDirty(m_pOnDirtyParam);
 }
 
 template<typename tVec>
@@ -104,7 +99,7 @@ void ITransform<tVec>::GetLocalTransform(mat4 &outMtx) const
 	vScale.x = scale.X();
 	vScale.y = scale.Y();
 
-	if(m_eCoordType == HYCOORD_Meter)
+	if(m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter)
 		outMtx = glm::translate(outMtx, ptPos * HyScene::PixelsPerMeter());
 	else
 		outMtx = glm::translate(outMtx, ptPos);
@@ -135,7 +130,7 @@ void ITransform<tVec>::GetLocalTransform_SRT(mat4 &outMtx) const
 	outMtx = glm::rotate(outMtx, rot.Get().y, vec3(0, 1, 0));
 	outMtx = glm::rotate(outMtx, rot.Get().z, vec3(0, 0, 1));
 	
-	if(m_eCoordType == HYCOORD_Meter)
+	if(m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter)
 		outMtx = glm::translate(outMtx, ptPos * HyScene::PixelsPerMeter());
 	else
 		outMtx = glm::translate(outMtx, ptPos);

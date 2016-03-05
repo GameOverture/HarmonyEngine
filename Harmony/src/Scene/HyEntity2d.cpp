@@ -227,22 +227,6 @@ void HyEntity2d::SetInstOrderingDirty()
 	sm_pCtor->SetInstOrderingDirty();
 }
 
-void HyEntity2d::GetWorldTransform(mat4 &outMtx)
-{
-	if(m_bDirty)
-	{
-		if(m_kpParent)
-			m_kpParent->GetWorldTransform(m_mtxCached);
-
-		mat4 mtxLocal;
-		GetLocalTransform(mtxLocal);
-	
-		m_mtxCached *= mtxLocal;
-		m_bDirty = false;
-	}
-	
-	outMtx = m_mtxCached;
-}
 
 /*static*/ void HyEntity2d::OnDirty(void *pParam)
 {

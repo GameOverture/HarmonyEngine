@@ -124,12 +124,13 @@ TestBed::~TestBed(void)
 
 	//m_TxtInst.SetString(HyStr("CamX: %f\tCamY:%f"), m_pCam->Pos().X(), m_pCam->Pos().Y());
 
-	m_testSprite.pos.Set(25, 25);
+	m_testSprite.pos.Set(0, 0);
+	m_testSprite.SetCoordinateType(HYCOORD_ScreenPixel, true);
 
 
 	if(Input().IsBtnDownBuffered(ACTION_1))
 	{
-		m_pCam_Viewport2->pos.Animate(40.0f, 40.0f, 5.0f, HyEase::linear);
+		m_pCam_Viewport2->pos.Tween(40.0f, 40.0f, 5.0f, HyTween::Linear);
 	}
 
 	if(Input().IsBtnDown(CAM_LEFT))

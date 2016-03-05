@@ -28,6 +28,8 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 	m_RenderState = p.m_RenderState;
 	m_uiNumVerts = p.m_uiNumVerts;
 
+	m_eCoordType = p.m_eCoordType;
+
 	ClearData();
 	if(m_uiNumVerts != 0)
 	{
@@ -38,7 +40,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 	return *this;
 }
 
-void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
+void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, vec2 &vOffset /*= vec2(0.0f)*/)
 {
 	ClearData();
 
@@ -47,7 +49,9 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, HyCo
 	else
 		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::SHADER_PRIMITIVEDRAW);
 
-	float fCoordMod = eCoordType == HYCOORD_Meter ? HyScene::PixelsPerMeter() : 1.0f;
+	if(m_eCoordType == HYCOORD_Default)
+		m_eCoordType = HyScene::DefaultCoordinateType();
+	float fCoordMod = (m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter) ? HyScene::PixelsPerMeter() : 1.0f;
 	fWidth *= fCoordMod;
 	fHeight *= fCoordMod;
 	vOffset *= fCoordMod;
@@ -85,7 +89,7 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, HyCo
 	m_pVertices[3].w = 1.0f;
 }
 
-void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
+void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, vec2 &vOffset /*= vec2(0.0f)*/)
 {
 	ClearData();
 
@@ -97,7 +101,9 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	m_uiNumVerts = iNumSegments;
 	m_pVertices = new vec4[m_uiNumVerts];
 
-	float fCoordMod = eCoordType == HYCOORD_Meter ? HyScene::PixelsPerMeter() : 1.0f;
+	if(m_eCoordType == HYCOORD_Default)
+		m_eCoordType = HyScene::DefaultCoordinateType();
+	float fCoordMod = (m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter) ? HyScene::PixelsPerMeter() : 1.0f;
 	fRadius *= fCoordMod;
 	vOffset *= fCoordMod;
 
@@ -113,7 +119,7 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	}
 }
 
-void HyPrimitive2d::SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/, vec2 &vOffset /*= vec2(0.0f)*/)
+void HyPrimitive2d::SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, vec2 &vOffset /*= vec2(0.0f)*/)
 {
 	ClearData();
 
@@ -125,7 +131,9 @@ void HyPrimitive2d::SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, boo
 	m_uiNumVerts = uiNumVerts;
 	m_pVertices = new vec4[m_uiNumVerts];
 
-	float fCoordMod = eCoordType == HYCOORD_Meter ? HyScene::PixelsPerMeter() : 1.0f;
+	if(m_eCoordType == HYCOORD_Default)
+		m_eCoordType = HyScene::DefaultCoordinateType();
+	float fCoordMod = (m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter) ? HyScene::PixelsPerMeter() : 1.0f;
 	
 	for(uint32 i = 0; i < m_uiNumVerts; ++i)
 	{
@@ -136,11 +144,13 @@ void HyPrimitive2d::SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, boo
 	}
 }
 
-void HyPrimitive2d::OffsetVerts(vec2 vOffset, float fAngleOffset, HyCoordinateType eCoordType /*= HYCOORD_Pixel*/)
+void HyPrimitive2d::OffsetVerts(vec2 vOffset, float fAngleOffset)
 {
 	HyAssert(m_pVertices, "HyPrimitive2d::OffsetVerts() was invoked with an unset instance.");
 
-	float fCoordMod = eCoordType == HYCOORD_Meter ? HyScene::PixelsPerMeter() : 1.0f;
+	if(m_eCoordType == HYCOORD_Default)
+		m_eCoordType = HyScene::DefaultCoordinateType();
+	float fCoordMod = (m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter) ? HyScene::PixelsPerMeter() : 1.0f;
 	vOffset *= fCoordMod;
 
 	b2Transform xf;
@@ -156,6 +166,20 @@ void HyPrimitive2d::OffsetVerts(vec2 vOffset, float fAngleOffset, HyCoordinateTy
 		m_pVertices[i].x = tmp.x;
 		m_pVertices[i].y = tmp.y;
 	}
+}
+
+/*virtual*/ void HyPrimitive2d::SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion)
+{
+	if(eCoordType == HYCOORD_Default)
+		eCoordType = HyScene::DefaultCoordinateType();
+
+	if(bDoConversion && m_pVertices)
+	{
+		ClearData();
+		HyError("HyPrimitive2d Needs to recreate itself");
+	}
+
+	IHyInst2d::SetCoordinateType(eCoordType, bDoConversion);
 }
 
 void HyPrimitive2d::ClearData()

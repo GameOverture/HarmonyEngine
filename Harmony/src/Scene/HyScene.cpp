@@ -24,7 +24,7 @@
 
 #include "Time/IHyTime.h"
 
-HyCoordinateType	HyScene::sm_eDefaultCoordType = HYCOORD_Default;
+HyCoordinateType	HyScene::sm_eDefaultCoordType;
 float				HyScene::sm_fPixelsPerMeter = 0.0f;
 bool				HyScene::sm_bInst2dOrderingDirty = false;
 
@@ -34,6 +34,7 @@ HyScene::HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef, HyCoordi
 																																		m_GfxCommsRef(gfxCommsRef),
 																																		m_vWindowRef(vWindowRef)
 {
+	HyAssert(eDefaultCoordType != HYCOORD_Default, "The actual default HyCoordinatetype cannot be 'HYCOORD_Default'");
 	sm_eDefaultCoordType = eDefaultCoordType;
 	sm_fPixelsPerMeter = fPixelsPerMeter;
 

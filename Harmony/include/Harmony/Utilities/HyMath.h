@@ -74,6 +74,14 @@ struct HyRectangle
 		return s.str();
 	}
 
+	void Set(T tX, T tY, T tWidth, T tHeight)
+	{
+		left = tX;
+		top = tY;
+		right = tX + tWidth;
+		bottom = tY + tHeight;
+	}
+
 	T Width()
 	{
 		return right - left;

@@ -23,7 +23,7 @@ public:
 	enum eAttributes
 	{
 		SCISSORTEST				= 1 << 0,
-		USINGLOCALCOORDS		= 1 << 1,	// If disabled, then using world coordinates
+		USINGSCREENCOORDS		= 1 << 1,	// If disabled, then using world coordinates
 
 		SHADER_PRIMITIVEDRAW	= 1 << 2,
 		SHADER_QUADBATCH		= 1 << 3,

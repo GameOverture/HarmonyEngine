@@ -20,11 +20,16 @@ class HyOpenGL : public IHyRenderer
 protected:
 	mat4					m_mtxView;
 	mat4					m_mtxProj;
-	mat4					m_mtxProjLocalCoords;
-	const mat4				m_kmtxIdentity;
 
-	int32					m_iNumRenderPassesLeft2d;
-	int32					m_iNumPasses3d;
+	int32					m_iCurCamIndex;
+	
+	enum eMatrixStack
+	{
+		MTX_NOTSET = 0,
+		MTX_CAMVIEW,
+		MTX_SCREENVIEW
+	};
+	eMatrixStack			m_eMatrixStack;
 
 	///////// 2D MEMBERS ////////////////////
 	enum eVAOTypes
@@ -47,11 +52,13 @@ public:
 
 	virtual void StartRender();
 	
-	virtual bool Begin_3d();
+	virtual void Init_3d();
+	virtual bool BeginPass_3d();
 	virtual void SetRenderState_3d(uint32 uiNewRenderState);
 	virtual void End_3d();
 
-	virtual bool Begin_2d();
+	virtual void Init_2d();
+	virtual bool BeginPass_2d();
 	virtual void DrawRenderState_2d(HyRenderState &renderState);
 	virtual void End_2d();
 
@@ -65,6 +72,8 @@ public:
 
 protected:
 	bool Initialize();
+
+	void SetCameraMatrices_2d(eMatrixStack eMtxStack);
 };
 
 #endif /* __HyOpenGL_h__ */

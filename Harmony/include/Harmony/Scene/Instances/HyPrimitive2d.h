@@ -30,13 +30,15 @@ public:
 	uint32 GetNumVerts()		{ return m_uiNumVerts; }
 	vec4 *GetVertexDataPtr()	{ return m_pVertices; }
 
-	void SetAsQuad(float fWidth, float fHeight, bool bWireframe, HyCoordinateType eCoordType = HYCOORD_Pixel, vec2 &vOffset = vec2(0.0f));
+	void SetAsQuad(float fWidth, float fHeight, bool bWireframe, vec2 &vOffset = vec2(0.0f));
 
-	void SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, HyCoordinateType eCoordType = HYCOORD_Pixel, vec2 &vOffset = vec2(0.0f));
+	void SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, vec2 &vOffset = vec2(0.0f));
 
-	void SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, HyCoordinateType eCoordType = HYCOORD_Pixel, vec2 &vOffset = vec2(0.0f));
+	void SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, vec2 &vOffset = vec2(0.0f));
 
-	void OffsetVerts(vec2 vOffset, float fAngleOffset, HyCoordinateType eCoordType = HYCOORD_Pixel);
+	void OffsetVerts(vec2 vOffset, float fAngleOffset);
+
+	virtual void SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion);
 
 private:
 

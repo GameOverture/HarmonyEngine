@@ -13,9 +13,8 @@ HyMemoryHeap	IHyApplication::sm_Mem;
 
 IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
 {
-	if(m_Init.eDefaultCoordinateType == HYCOORD_Default)
-		m_Init.eDefaultCoordinateType = HYCOORD_Pixel;
-
+	HyAssert(m_Init.eDefaultCoordinateType != HYCOORD_Default, "HarmonyInit's actual 'eDefaultCoordinateType' cannot be 'HYCOORD_Default'");
+	
 	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
 	{
 		m_vWindows.push_back(HyWindow());

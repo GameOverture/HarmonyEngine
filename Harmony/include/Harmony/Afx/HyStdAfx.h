@@ -49,9 +49,12 @@ enum HyLoadState
 
 enum HyCoordinateType
 {
-	HYCOORD_Default = -1,
-	HYCOORD_Pixel = 0,
-	HYCOORD_Meter,
+	HYCOORD_Default = 0,
+
+	HYCOORD_ScreenPixel,
+	HYCOORD_ScreenMeter,
+	HYCOORD_CamPixel,
+	HYCOORD_CamMeter
 };
 
 enum HyWindowType
@@ -110,7 +113,7 @@ private:
 	void CtorInit()
 	{
 		uiNumWindows = 1;
-		eDefaultCoordinateType = HYCOORD_Pixel;
+		eDefaultCoordinateType = HYCOORD_CamPixel;
 		fPixelsPerMeter = 80;
 		uiNumInputMappings = 1;
 		szDefaultFont = "Vera.ttf";

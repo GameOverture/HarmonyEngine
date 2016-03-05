@@ -20,7 +20,7 @@
 #include "Utilities/Animation/HyAnimVec4.h"
 #include "Renderer/HyRenderState.h"
 
-class IHyInst2d : public ITransform < HyAnimVec2 >
+class IHyInst2d : public ITransform<HyAnimVec2>
 {
 	friend class HyScene;
 	friend class HyAssetManager;
@@ -64,13 +64,14 @@ public:
 	int32 GetDisplayOrder() const								{ return m_iDisplayOrder; }
 	void SetDisplayOrder(int32 iOrderValue);
 
-	const HyRenderState &GetRenderState() const					{ return m_RenderState; }
-	void SetUsingLocalCoordinates(bool bUseLocalCoords)			{ bUseLocalCoords ? m_RenderState.Enable(HyRenderState::USINGLOCALCOORDS) : m_RenderState.Disable(HyRenderState::USINGLOCALCOORDS); }
+	const HyRenderState &GetRenderState() const					{ return m_RenderState; }	
 
 	HyAnimVec4													color;
 
 	inline int32 GetTag()										{ return m_iTag; }
 	inline void SetTag(int32 iTag)								{ m_iTag = iTag; }
+	
+	virtual void SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion);
 
 	void Load();
 	void Unload();

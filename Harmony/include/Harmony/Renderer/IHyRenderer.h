@@ -59,11 +59,13 @@ public:
 
 	virtual void StartRender() = 0;
 
-	virtual bool Begin_3d() = 0;
+	virtual void Init_3d() = 0;
+	virtual bool BeginPass_3d() = 0;
 	virtual void SetRenderState_3d(uint32 uiNewRenderState) = 0;
 	virtual void End_3d() = 0;
 
-	virtual bool Begin_2d() = 0;
+	virtual void Init_2d() = 0;
+	virtual bool BeginPass_2d() = 0;
 	virtual void DrawRenderState_2d(HyRenderState &renderState) = 0;
 	virtual void End_2d() = 0;
 

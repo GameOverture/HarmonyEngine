@@ -43,6 +43,7 @@ IHyRenderer::~IHyRenderer(void)
 
 void IHyRenderer::Update()
 {
+	// Iterate through 'm_vWindowRef' to find any dirty RenderSurface's that need processing
 	for(uint32 i = 0; i < static_cast<uint32>(m_vWindowRef.size()); ++i)
 	{
 		HyWindowInfo &windowInfoRef = m_vWindowRef[i].Update_Render();
@@ -99,13 +100,15 @@ void IHyRenderer::Update()
 	{
 		StartRender();
 
-		while(Begin_3d())
+		Init_3d();
+		while(BeginPass_3d())
 		{
 			//Draw3d();
 			End_3d();
 		}
 
-		while(Begin_2d())
+		Init_2d();
+		while(BeginPass_2d())
 		{
 			Draw2d();
 			End_2d();

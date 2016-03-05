@@ -33,7 +33,7 @@ int32 HyPhysEntity2d::AddBoxFixture(float fHalfWidth, float fHalfHeight, float f
 {
 	HyAssert(m_b2Body, "HyPhysEntity2d::AddBoxFixture() was invoked with an uninitialized instance");
 
-	if(m_eCoordType == HYCOORD_Pixel)
+	if(m_eCoordType == HYCOORD_CamPixel || m_eCoordType == HYCOORD_ScreenPixel)
 		vOffset /= HyScene::PixelsPerMeter();
 
 	b2PolygonShape poly;
@@ -55,7 +55,7 @@ int32 HyPhysEntity2d::AddCircleFixture(float fRadius, float fDensity, vec2 vOffs
 {
 	HyAssert(m_b2Body, "HyPhysEntity2d::SetAsBox() was invoked with an uninitialized instance");
 
-	if(m_eCoordType == HYCOORD_Pixel)
+	if(m_eCoordType == HYCOORD_CamPixel || m_eCoordType == HYCOORD_ScreenPixel)
 		vOffset /= HyScene::PixelsPerMeter();
 
 	b2CircleShape poly;
@@ -79,7 +79,7 @@ int32 HyPhysEntity2d::AddEdgeChainFixture(vec2 *pVertices, uint32 uiNumVerts, bo
 {
 	HyAssert(m_b2Body, "HyPhysEntity2d::SetAsBox() was invoked with an uninitialized instance");
 
-	if(m_eCoordType == HYCOORD_Pixel)
+	if(m_eCoordType == HYCOORD_CamPixel || m_eCoordType == HYCOORD_ScreenPixel)
 	{
 		vOffset /= HyScene::PixelsPerMeter();
 		for(uint32 i = 0; i < uiNumVerts; ++i)
@@ -120,7 +120,7 @@ int32 HyPhysEntity2d::AddEdgeChainFixture(vec2 *pVertices, uint32 uiNumVerts, bo
 		if(m_fPrevRotation == rot.Get().z)
 			rot.Z(b2Trans.q.GetAngle());
 
-		if(m_eCoordType == HYCOORD_Pixel)
+		if(m_eCoordType == HYCOORD_CamPixel || m_eCoordType == HYCOORD_ScreenPixel)
 			m_b2Body->SetTransform(b2Vec2(pos.X() / HyScene::PixelsPerMeter(), pos.Y() / HyScene::PixelsPerMeter()), rot.Z());
 		else
 			m_b2Body->SetTransform(b2Vec2(pos.X(), pos.Y()), rot.Z());
@@ -133,7 +133,7 @@ int32 HyPhysEntity2d::AddEdgeChainFixture(vec2 *pVertices, uint32 uiNumVerts, bo
 			rot.Z(b2Trans.q.GetAngle());
 
 		// Grab position and convert it if necessary from box2d 
-		if(m_eCoordType == HYCOORD_Pixel)
+		if(m_eCoordType == HYCOORD_CamPixel || m_eCoordType == HYCOORD_ScreenPixel)
 		{
 			pos.X(b2Trans.p.x * HyScene::PixelsPerMeter());
 			pos.Y(b2Trans.p.y * HyScene::PixelsPerMeter());
