@@ -71,7 +71,7 @@ public:
 	inline int32 GetTag()										{ return m_iTag; }
 	inline void SetTag(int32 iTag)								{ m_iTag = iTag; }
 	
-	virtual void SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion);
+	virtual void SetCoordinateType(HyCoordinateType eCoordType);
 
 	void Load();
 	void Unload();

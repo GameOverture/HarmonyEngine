@@ -38,8 +38,6 @@ public:
 
 	void OffsetVerts(vec2 vOffset, float fAngleOffset);
 
-	virtual void SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion);
-
 private:
 
 	void ClearData();

@@ -12,8 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Renderer/Viewport/HyCamera2d.h"
-#include "Renderer/Viewport/HyCamera3d.h"
+#include "Renderer/Viewport/HyCamera.h"
 
 #include "Threading/BasicSync.h"
 

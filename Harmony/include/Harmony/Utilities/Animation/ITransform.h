@@ -39,7 +39,7 @@ public:
 	tVec				scale;
 
 	HyCoordinateType GetCoordinateType()						{ return m_eCoordType; }
-	virtual void SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion);
+	virtual void SetCoordinateType(HyCoordinateType eCoordType);
 
 	inline bool	IsEnabled()										{ return m_bEnabled; }
 	inline void	SetEnabled(bool bEnabled)						{ m_bEnabled = bEnabled; }
@@ -65,20 +65,12 @@ template<typename tVec>
 { }
 
 template<typename tVec>
-/*virtual*/ void ITransform<tVec>::SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion)
+/*virtual*/ void ITransform<tVec>::SetCoordinateType(HyCoordinateType eCoordType)
 {
 	if(eCoordType == HYCOORD_Default)
 		eCoordType = HyScene::DefaultCoordinateType();
 
 	m_eCoordType = eCoordType;
-
-	if(bDoConversion == false)
-		return;
-
-	if(m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter)
-		pos /= HyScene::PixelsPerMeter();
-	else
-		pos *= HyScene::PixelsPerMeter();
 
 	if(m_fpOnDirty)
 		m_fpOnDirty(m_pOnDirtyParam);

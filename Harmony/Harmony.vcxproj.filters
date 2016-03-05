@@ -84,12 +84,6 @@
     <ClCompile Include="src\Time\IHyTime.cpp">
       <Filter>Time</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Viewport\HyCamera2d.cpp">
-      <Filter>Renderer\Viewport</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\Viewport\HyCamera3d.cpp">
-      <Filter>Renderer\Viewport</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\IHyRenderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
@@ -188,6 +182,9 @@
     </ClCompile>
     <ClCompile Include="src\Utilities\Animation\HyTweenFuncs.cpp">
       <Filter>Utilities\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Viewport\HyCamera.cpp">
+      <Filter>Renderer\Viewport</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -426,12 +423,6 @@
     <ClInclude Include="include\Harmony\Time\IHyTime.h">
       <Filter>Time</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\Viewport\HyCamera2d.h">
-      <Filter>Renderer\Viewport</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Renderer\Viewport\HyCamera3d.h">
-      <Filter>Renderer\Viewport</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\IHyRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
@@ -536,6 +527,9 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Utilities\Animation\HyTweenFuncs.h">
       <Filter>Utilities\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\Viewport\HyCamera.h">
+      <Filter>Renderer\Viewport</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

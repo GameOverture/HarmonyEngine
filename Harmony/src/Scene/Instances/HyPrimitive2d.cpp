@@ -168,20 +168,6 @@ void HyPrimitive2d::OffsetVerts(vec2 vOffset, float fAngleOffset)
 	}
 }
 
-/*virtual*/ void HyPrimitive2d::SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion)
-{
-	if(eCoordType == HYCOORD_Default)
-		eCoordType = HyScene::DefaultCoordinateType();
-
-	if(bDoConversion && m_pVertices)
-	{
-		ClearData();
-		HyError("HyPrimitive2d Needs to recreate itself");
-	}
-
-	IHyInst2d::SetCoordinateType(eCoordType, bDoConversion);
-}
-
 void HyPrimitive2d::ClearData()
 {
 	delete [] m_pVertices;

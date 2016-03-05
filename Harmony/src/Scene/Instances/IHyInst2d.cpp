@@ -34,7 +34,7 @@ IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char 
 	Unload();
 }
 
-/*virtual*/ void IHyInst2d::SetCoordinateType(HyCoordinateType eCoordType, bool bDoConversion)
+/*virtual*/ void IHyInst2d::SetCoordinateType(HyCoordinateType eCoordType)
 {
 	if(eCoordType == HYCOORD_Default)
 		eCoordType = HyScene::DefaultCoordinateType();
@@ -44,7 +44,7 @@ IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char 
 	else
 		m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
 
-	ITransform<HyAnimVec2>::SetCoordinateType(eCoordType, bDoConversion);
+	ITransform<HyAnimVec2>::SetCoordinateType(eCoordType);
 }
 
 void IHyInst2d::Load()
@@ -53,7 +53,7 @@ void IHyInst2d::Load()
 		return;
 
 	if(GetCoordinateType() == HYCOORD_Default)
-		SetCoordinateType(HyScene::DefaultCoordinateType(), true);
+		SetCoordinateType(HyScene::DefaultCoordinateType());
 
 	if(sm_pAssetManager)
 	{
