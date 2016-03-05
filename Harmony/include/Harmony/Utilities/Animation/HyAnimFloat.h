@@ -49,15 +49,15 @@ public:
 	void Set(float fValue);
 	void Offset(float fValue);
 
+	// Procedural transformation functions
+	bool IsTransforming()				{ return m_bAddedToSceneUpdate; }
 	void Tween(float fFrom, float fTo, float fSeconds, TweenUpdateFunc fpEase);
 	void Tween(float fTo, float fSeconds, TweenUpdateFunc fpEase);
 	void TweenOffset(float fOffsetAmt, float fSeconds, TweenUpdateFunc fpEase);
-
-	bool IsTransforming()				{ return m_bAddedToSceneUpdate; }
+	//void Follow(float &fToFollow, float fOffsetAmt);
+	//void Sequence(...);
 
 	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam = NULL);
-
-	//void Follow(float &fToFollow, float fOffsetAmt);
 
 	// Returns true if updating is still continuing. False otherwise, to signal HyScene to remove this instance from the ActiveAnimFloat vector
 	bool UpdateFloat();
