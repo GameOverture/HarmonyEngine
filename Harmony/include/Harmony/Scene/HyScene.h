@@ -70,7 +70,7 @@ public:
 	~HyScene(void);
 
 	static float PixelsPerMeter()					{ return sm_fPixelsPerMeter; }
-	static HyCoordinateType DefaultCoordinateType()	{ return sm_eDefaultCoordType; }
+	static HyCoordinateType DefaultCoordinateType()	{ HyAssert(sm_eDefaultCoordType != HYCOORD_Default, "HyScene::DefaultCoordinateType() invoked before engine initialized"); return sm_eDefaultCoordType; }
 	static void SetInstOrderingDirty()				{ sm_bInst2dOrderingDirty = true; }
 
 	void AddInstance(IHyInst2d *pInst);
