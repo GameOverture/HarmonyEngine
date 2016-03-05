@@ -51,7 +51,7 @@ TestBed::~TestBed(void)
 	
 	m_primBox.Load();
 	m_primBox.color.Set(0.0f, 0.0f, 1.0f, 1.0f);
-	m_primBox.SetAsQuad(15.0f, 15.0f, false);
+	m_primBox.SetAsQuad(180.0f, 160.0f, false);
 	m_primBox.SetDisplayOrder(100);
 
 
@@ -74,7 +74,7 @@ TestBed::~TestBed(void)
 
 
 	//m_testSprite.SetUsingLocalCoordinates(true);
-	m_testSprite.SetDisplayOrder(150);
+	m_testSprite.SetDisplayOrder(0);
 
 	//HyGfxWindow::tResolution tRes;
 	//m_Window.GetResolution(tRes);
@@ -123,9 +123,9 @@ TestBed::~TestBed(void)
 
 
 	//m_TxtInst.SetString(HyStr("CamX: %f\tCamY:%f"), m_pCam->Pos().X(), m_pCam->Pos().Y());
-
-	m_testSprite.pos.Set(0, 0);
-	m_testSprite.SetCoordinateType(HYCOORD_ScreenPixel, true);
+	m_primBox.pos.Set(-45.0f, 0.0f);
+	m_testSprite.pos.Set(-45.0f, 0.0f);
+	//m_testSprite.SetCoordinateType(HYCOORD_ScreenPixel, true);
 
 
 	if(Input().IsBtnDownBuffered(ACTION_1))

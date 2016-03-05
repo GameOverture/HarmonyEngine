@@ -126,10 +126,10 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);
 
 	vec2 vSize(m_SrcRect.Width() * pData->GetAtlasGroup()->GetWidth(), m_SrcRect.Height() * pData->GetAtlasGroup()->GetHeight());
-	vec2 vOffset(pos.X(), pos.Y());
-
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vSize;
 	pRefDataWritePos += sizeof(vec2);
+
+	vec2 vOffset(0.0f, 0.0f);
 	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vOffset;
 	pRefDataWritePos += sizeof(vec2);
 
