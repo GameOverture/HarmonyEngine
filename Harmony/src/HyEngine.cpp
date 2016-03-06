@@ -15,13 +15,13 @@
 HyEngine *		HyEngine::sm_pInstance = NULL;
 
 
-HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::GetMemoryHeap();
+HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::MemoryHeap();
 
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
-												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows, m_AppRef.m_Init.eDefaultCoordinateType, m_AppRef.m_Init.fPixelsPerMeter),
-												m_pAssetManager(new HyAssetManager(m_AppRef.m_Init.szDataDir, m_GfxBuffer, m_Scene)),
-												m_GuiComms(m_AppRef.m_Init.uiDebugPort, *m_pAssetManager),
+												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows),
+												m_pAssetManager(new HyAssetManager(m_AppRef.sm_Init.szDataDir, m_GfxBuffer, m_Scene)),
+												m_GuiComms(m_AppRef.sm_Init.uiDebugPort, *m_pAssetManager),
 												m_Input(m_AppRef.m_vInputMaps),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_vWindows)
 {

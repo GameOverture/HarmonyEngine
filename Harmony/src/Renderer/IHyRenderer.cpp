@@ -9,6 +9,8 @@
  *************************************************************************/
 #include "Renderer/IHyRenderer.h"
 
+#include "Renderer/Viewport/HyWindow.h"
+
 IHyRenderer::RenderSurface::RenderSurface(eRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight) :	m_eType(eType),
 																																			m_iID(iID),
 																																			m_iRenderSurfaceWidth(iRenderSurfaceWidth),

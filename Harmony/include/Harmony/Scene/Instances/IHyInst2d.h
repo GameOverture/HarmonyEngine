@@ -19,6 +19,7 @@
 
 #include "Utilities/Animation/HyAnimVec4.h"
 #include "Renderer/HyRenderState.h"
+#include "Renderer/Viewport/HyCamera.h"
 
 class IHyInst2d : public ITransform<HyAnimVec2>
 {
@@ -44,6 +45,7 @@ protected:
 	vector<IHyInst2d *>			m_vChildList;
 
 	// Attributes
+	HyCoordinateType			m_eCoordType;
 	int32						m_iDisplayOrder;	// Higher values are displayed front-most
 	HyRenderState				m_RenderState;
 	int32						m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
@@ -61,6 +63,9 @@ public:
 	inline bool	IsEnabled()										{ return m_bEnabled; }
 	inline void	SetEnabled(bool bVis)							{ m_bEnabled = bVis; }
 
+	HyCoordinateType GetCoordinateType()						{ return m_eCoordType; }
+	void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);
+
 	int32 GetDisplayOrder() const								{ return m_iDisplayOrder; }
 	void SetDisplayOrder(int32 iOrderValue);
 
@@ -70,8 +75,6 @@ public:
 
 	inline int32 GetTag()										{ return m_iTag; }
 	inline void SetTag(int32 iTag)								{ m_iTag = iTag; }
-	
-	virtual void SetCoordinateType(HyCoordinateType eCoordType);
 
 	void Load();
 	void Unload();

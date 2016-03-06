@@ -41,8 +41,6 @@ class HyScene
 {
 	friend class HyEngine;
 
-	static HyCoordinateType								sm_eDefaultCoordType;
-	static float										sm_fPixelsPerMeter;
 	static bool											sm_bInst2dOrderingDirty;
 
 	b2World												m_b2World;
@@ -54,11 +52,8 @@ class HyScene
 	HyGfxComms &										m_GfxCommsRef;
 	vector<HyWindow> &									m_vWindowRef;
 
-	// Pointers to all instances
-	
 	vector<IHyInst2d *>									m_vLoadedInst2d;
-
-	vector<IHyInst2d *>									m_vInst3d;
+	vector<IHyInst2d *>									m_vLoadedInst3d;
 
 	vector<HyAnimFloat *>								m_vActiveAnimFloats;
 
@@ -66,11 +61,9 @@ class HyScene
 	char *												m_pCurWritePos;
 
 public:
-	HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter);
+	HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef);
 	~HyScene(void);
 
-	static float PixelsPerMeter()					{ return sm_fPixelsPerMeter; }
-	static HyCoordinateType DefaultCoordinateType()	{ HyAssert(sm_eDefaultCoordType != HYCOORD_Default, "HyScene::DefaultCoordinateType() invoked before engine initialized"); return sm_eDefaultCoordType; }
 	static void SetInstOrderingDirty()				{ sm_bInst2dOrderingDirty = true; }
 
 	void AddInstance(IHyInst2d *pInst);

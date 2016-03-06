@@ -40,7 +40,6 @@ HyEntity2d::~HyEntity2d(void)
 void HyEntity2d::CtorInit()
 {
 	m_bDirty = true;
-	m_eCoordType = HyScene::DefaultCoordinateType();
 	SetOnDirtyCallback(OnDirty, this);
 
 }

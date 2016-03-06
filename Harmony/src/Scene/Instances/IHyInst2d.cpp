@@ -9,8 +9,12 @@
  *********************************************************************************/
 #include "Scene/Instances/IHyInst2d.h"
 
+#include "IHyApplication.h"
+
 #include "Assets/Data/IHyData.h"
 #include "Assets/HyAssetManager.h"
+#include "Renderer/Viewport/HyCamera.h"
+#include "Renderer/Viewport/HyWindow.h"
 
 /*static*/ HyAssetManager *IHyInst2d::sm_pAssetManager = NULL;
 
@@ -34,26 +38,15 @@ IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char 
 	Unload();
 }
 
-/*virtual*/ void IHyInst2d::SetCoordinateType(HyCoordinateType eCoordType)
-{
-	if(eCoordType == HYCOORD_Default)
-		eCoordType = HyScene::DefaultCoordinateType();
-
-	if(eCoordType == HYCOORD_ScreenPixel || eCoordType == HYCOORD_ScreenMeter)
-		m_RenderState.Enable(HyRenderState::USINGSCREENCOORDS);
-	else
-		m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
-
-	ITransform<HyAnimVec2>::SetCoordinateType(eCoordType);
-}
-
 void IHyInst2d::Load()
 {
 	if(m_eLoadState != HYLOADSTATE_Inactive)
 		return;
 
-	if(GetCoordinateType() == HYCOORD_Default)
-		SetCoordinateType(HyScene::DefaultCoordinateType());
+	if(GetCoordinateType() == HYCOORDTYPE_Default)
+		SetCoordinateType(IHyApplication::DefaultCoordinateType(), NULL);
+	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
+		SetCoordinateUnit(IHyApplication::DefaultCoordinateUnit(), false);
 
 	if(sm_pAssetManager)
 	{
@@ -114,6 +107,39 @@ void IHyInst2d::Detach()
 	}
 
 	HyError("IObjInst2d::Detach() could not find itself in parent's child list");
+}
+
+void IHyInst2d::SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom)
+{
+	if(eCoordType == HYCOORDTYPE_Default)
+		eCoordType = IHyApplication::DefaultCoordinateType();
+
+	if(pCameraToCovertFrom)
+	{
+		switch(eCoordType)
+		{
+		case HYCOORDTYPE_Camera:
+			if(m_eCoordType == HYCOORDTYPE_Camera)
+				break;
+
+			pos.X(pCameraToCovertFrom->pos.X() + (pCameraToCovertFrom->GetWindow().GetResolution().x * 0.5f));
+			pos.X(pCameraToCovertFrom->GetWindow().GetResolution().y * 0.5f);
+			break;
+
+		case HYCOORDTYPE_Screen:
+			if(m_eCoordType == HYCOORDTYPE_Screen)
+				break;
+
+			//pCameraToCovertFrom->
+			break;
+		}
+	}
+	
+	m_eCoordType = eCoordType;
+	if(m_eCoordType == HYCOORDTYPE_Screen)
+		m_RenderState.Enable(HyRenderState::USINGSCREENCOORDS);
+	else
+		m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
 }
 
 void IHyInst2d::SetDisplayOrder(int32 iOrderValue)

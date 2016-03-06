@@ -9,7 +9,11 @@
  *************************************************************************/
 #include "Scene/Instances/HyPrimitive2d.h"
 
+#include "IHyApplication.h"
 #include "Utilities/HyMath.h"
+
+// TODO: Use more appropriate math lib
+#include "Box2D/Box2D.h"
 
 HyPrimitive2d::HyPrimitive2d() :	IHyInst2d(HYINST_Primitive2d, NULL, NULL),
 									m_pVertices(NULL),
@@ -28,7 +32,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 	m_RenderState = p.m_RenderState;
 	m_uiNumVerts = p.m_uiNumVerts;
 
-	m_eCoordType = p.m_eCoordType;
+	m_eCoordUnit = p.m_eCoordUnit;
 
 	ClearData();
 	if(m_uiNumVerts != 0)
@@ -49,9 +53,9 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, vec2
 	else
 		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::SHADER_PRIMITIVEDRAW);
 
-	if(m_eCoordType == HYCOORD_Default)
-		m_eCoordType = HyScene::DefaultCoordinateType();
-	float fCoordMod = (m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter) ? HyScene::PixelsPerMeter() : 1.0f;
+	if(m_eCoordUnit == HYCOORDUNIT_Default)
+		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
+	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? IHyApplication::PixelsPerMeter() : 1.0f;
 	fWidth *= fCoordMod;
 	fHeight *= fCoordMod;
 	vOffset *= fCoordMod;
@@ -101,9 +105,9 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	m_uiNumVerts = iNumSegments;
 	m_pVertices = new vec4[m_uiNumVerts];
 
-	if(m_eCoordType == HYCOORD_Default)
-		m_eCoordType = HyScene::DefaultCoordinateType();
-	float fCoordMod = (m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter) ? HyScene::PixelsPerMeter() : 1.0f;
+	if(m_eCoordUnit == HYCOORDUNIT_Default)
+		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
+	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? IHyApplication::PixelsPerMeter() : 1.0f;
 	fRadius *= fCoordMod;
 	vOffset *= fCoordMod;
 
@@ -131,9 +135,9 @@ void HyPrimitive2d::SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, boo
 	m_uiNumVerts = uiNumVerts;
 	m_pVertices = new vec4[m_uiNumVerts];
 
-	if(m_eCoordType == HYCOORD_Default)
-		m_eCoordType = HyScene::DefaultCoordinateType();
-	float fCoordMod = (m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter) ? HyScene::PixelsPerMeter() : 1.0f;
+	if(m_eCoordUnit == HYCOORDUNIT_Default)
+		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
+	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? IHyApplication::PixelsPerMeter() : 1.0f;
 	
 	for(uint32 i = 0; i < m_uiNumVerts; ++i)
 	{
@@ -148,9 +152,9 @@ void HyPrimitive2d::OffsetVerts(vec2 vOffset, float fAngleOffset)
 {
 	HyAssert(m_pVertices, "HyPrimitive2d::OffsetVerts() was invoked with an unset instance.");
 
-	if(m_eCoordType == HYCOORD_Default)
-		m_eCoordType = HyScene::DefaultCoordinateType();
-	float fCoordMod = (m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter) ? HyScene::PixelsPerMeter() : 1.0f;
+	if(m_eCoordUnit == HYCOORDUNIT_Default)
+		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
+	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? IHyApplication::PixelsPerMeter() : 1.0f;
 	vOffset *= fCoordMod;
 
 	b2Transform xf;

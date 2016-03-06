@@ -12,14 +12,14 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Scene/HyScene.h"
+#include "IHyApplication.h"
 #include "Utilities/Animation/HyAnimVec3.h"
 
 template<typename tVec>
 class ITransform
 {
 protected:
-	HyCoordinateType	m_eCoordType;
+	HyCoordinateUnit	m_eCoordUnit;
 
 	tVec				m_ptRotationAnchor;
 	tVec				m_ptScaleAnchor;
@@ -38,8 +38,8 @@ public:
 	HyAnimVec3			rot;
 	tVec				scale;
 
-	HyCoordinateType GetCoordinateType()						{ return m_eCoordType; }
-	virtual void SetCoordinateType(HyCoordinateType eCoordType);
+	HyCoordinateUnit GetCoordinateUnit()						{ return m_eCoordUnit; }
+	void SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion);
 
 	inline bool	IsEnabled()										{ return m_bEnabled; }
 	inline void	SetEnabled(bool bEnabled)						{ m_bEnabled = bEnabled; }
@@ -52,7 +52,7 @@ public:
 };
 
 template<typename tVec>
-ITransform<tVec>::ITransform() :	m_eCoordType(HYCOORD_Default), 
+ITransform<tVec>::ITransform() :	m_eCoordUnit(HYCOORDUNIT_Default), 
 									m_fpOnDirty(NULL),
 									m_pOnDirtyParam(NULL),
 									m_bEnabled(true)
@@ -65,12 +65,23 @@ template<typename tVec>
 { }
 
 template<typename tVec>
-/*virtual*/ void ITransform<tVec>::SetCoordinateType(HyCoordinateType eCoordType)
+void ITransform<tVec>::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion)
 {
-	if(eCoordType == HYCOORD_Default)
-		eCoordType = HyScene::DefaultCoordinateType();
+	if(eCoordUnit == HYCOORDUNIT_Default)
+		eCoordUnit = IHyApplication::DefaultCoordinateUnit();
 
-	m_eCoordType = eCoordType;
+	if(m_eCoordUnit == eCoordUnit)
+		return;
+
+	if(bDoConversion)
+	{
+		switch(eCoordUnit)
+		{
+		case HYCOORDUNIT_Meters:	pos *= IHyApplication::PixelsPerMeter();	break;
+		case HYCOORDUNIT_Pixels:	pos /= IHyApplication::PixelsPerMeter();	break;
+		}
+	}
+	m_eCoordUnit = eCoordUnit;
 
 	if(m_fpOnDirty)
 		m_fpOnDirty(m_pOnDirtyParam);
@@ -91,8 +102,8 @@ void ITransform<tVec>::GetLocalTransform(mat4 &outMtx) const
 	vScale.x = scale.X();
 	vScale.y = scale.Y();
 
-	if(m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter)
-		outMtx = glm::translate(outMtx, ptPos * HyScene::PixelsPerMeter());
+	if(m_eCoordUnit == HYCOORDUNIT_Meters)
+		outMtx = glm::translate(outMtx, ptPos * IHyApplication::PixelsPerMeter());
 	else
 		outMtx = glm::translate(outMtx, ptPos);
 
@@ -122,8 +133,8 @@ void ITransform<tVec>::GetLocalTransform_SRT(mat4 &outMtx) const
 	outMtx = glm::rotate(outMtx, rot.Get().y, vec3(0, 1, 0));
 	outMtx = glm::rotate(outMtx, rot.Get().z, vec3(0, 0, 1));
 	
-	if(m_eCoordType == HYCOORD_ScreenMeter || m_eCoordType == HYCOORD_CamMeter)
-		outMtx = glm::translate(outMtx, ptPos * HyScene::PixelsPerMeter());
+	if(m_eCoordUnit == HYCOORDUNIT_Meters)
+		outMtx = glm::translate(outMtx, ptPos * IHyApplication::PixelsPerMeter());
 	else
 		outMtx = glm::translate(outMtx, ptPos);
 }

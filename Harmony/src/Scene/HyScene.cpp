@@ -11,6 +11,7 @@
 
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/HyGfxComms.h"
+#include "Renderer/Viewport/HyWindow.h"
 
 #include "Scene/Instances/IHyInst2d.h"
 #include "Scene/Instances/HySound.h"
@@ -24,20 +25,14 @@
 
 #include "Time/IHyTime.h"
 
-HyCoordinateType	HyScene::sm_eDefaultCoordType;
-float				HyScene::sm_fPixelsPerMeter = 0.0f;
-bool				HyScene::sm_bInst2dOrderingDirty = false;
+bool HyScene::sm_bInst2dOrderingDirty = false;
 
-HyScene::HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef, HyCoordinateType eDefaultCoordType, float fPixelsPerMeter) :	m_b2World(b2Vec2(0.0f, -10.0f)),
-																																		m_iPhysVelocityIterations(8),
-																																		m_iPhysPositionIterations(3),
-																																		m_GfxCommsRef(gfxCommsRef),
-																																		m_vWindowRef(vWindowRef)
+HyScene::HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
+																			m_iPhysVelocityIterations(8),
+																			m_iPhysPositionIterations(3),
+																			m_GfxCommsRef(gfxCommsRef),
+																			m_vWindowRef(vWindowRef)
 {
-	HyAssert(eDefaultCoordType != HYCOORD_Default, "The actual default HyCoordinatetype cannot be 'HYCOORD_Default'");
-	sm_eDefaultCoordType = eDefaultCoordType;
-	sm_fPixelsPerMeter = fPixelsPerMeter;
-
 	m_b2World.SetDebugDraw(&m_DrawPhys2d);
 	m_b2World.SetContactListener(&m_Phys2dContactListener);
 	
@@ -210,10 +205,10 @@ void HyScene::WriteDrawBuffers()
 	m_pCurWritePos += sizeof(int32);
 
 	iCount = 0;
-	uint32 uiTotalNumInsts = static_cast<uint32>(m_vInst3d.size());
+	uint32 uiTotalNumInsts = static_cast<uint32>(m_vLoadedInst3d.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_vInst3d[i]->IsEnabled())
+		if(m_vLoadedInst3d[i]->IsEnabled())
 		{
 			// TODO: 
 			//new (m_pCurWritePos) HyDrawText2d(reinterpret_cast<HyText2d *>(m_vLoadedInst2d[i]), uiVertexDataOffset, pCurVertexWritePos);

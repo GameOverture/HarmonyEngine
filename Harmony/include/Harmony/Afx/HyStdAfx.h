@@ -49,12 +49,18 @@ enum HyLoadState
 
 enum HyCoordinateType
 {
-	HYCOORD_Default = 0,
+	HYCOORDTYPE_Default = 0,
 
-	HYCOORD_ScreenPixel,
-	HYCOORD_ScreenMeter,
-	HYCOORD_CamPixel,
-	HYCOORD_CamMeter
+	HYCOORDTYPE_Camera,
+	HYCOORDTYPE_Screen
+};
+
+enum HyCoordinateUnit
+{
+	HYCOORDUNIT_Default = 0,
+
+	HYCOORDUNIT_Pixels,
+	HYCOORDUNIT_Meters
 };
 
 enum HyWindowType
@@ -92,6 +98,7 @@ struct HarmonyInit
 	uint32					uiNumWindows;
 	HyWindowInfo			windowInfo[HY_MAXWINDOWS];
 	HyCoordinateType		eDefaultCoordinateType;
+	HyCoordinateUnit		eDefaultCoordinateUnit;
 	float					fPixelsPerMeter;
 	uint32					uiNumInputMappings;
 	const char *			szDefaultFont;
@@ -113,8 +120,9 @@ private:
 	void CtorInit()
 	{
 		uiNumWindows = 1;
-		eDefaultCoordinateType = HYCOORD_CamPixel;
-		fPixelsPerMeter = 80;
+		eDefaultCoordinateType = HYCOORDTYPE_Camera;
+		eDefaultCoordinateUnit = HYCOORDUNIT_Pixels;
+		fPixelsPerMeter = 80.0f;
 		uiNumInputMappings = 1;
 		szDefaultFont = "Vera.ttf";
 		uiDebugPort = 1313;

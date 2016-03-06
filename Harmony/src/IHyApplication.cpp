@@ -9,23 +9,29 @@
  *************************************************************************/
 #include "IHyApplication.h"
 
-HyMemoryHeap	IHyApplication::sm_Mem;
+#include "Renderer/Viewport/HyWindow.h"
 
-IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_Init(initStruct)
+HarmonyInit IHyApplication::sm_Init;
+HyMemoryHeap IHyApplication::sm_Mem;
+
+IHyApplication::IHyApplication(HarmonyInit &initStruct)
 {
-	HyAssert(m_Init.eDefaultCoordinateType != HYCOORD_Default, "HarmonyInit's actual 'eDefaultCoordinateType' cannot be 'HYCOORD_Default'");
+	sm_Init = initStruct;
+	HyAssert(sm_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HarmonyInit's actual 'eDefaultCoordinateType' cannot be 'HYCOORDTYPE_Default'");
+	HyAssert(sm_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HarmonyInit's actual 'eDefaultCoordinateUnit' cannot be 'HYCOORDUNIT_Default'");
+	HyAssert(sm_Init.fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	
-	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
+	for(uint32 i = 0; i < sm_Init.uiNumWindows; ++i)
 	{
 		m_vWindows.push_back(HyWindow());
 
-		m_vWindows[i].SetTitle(m_Init.windowInfo[i].sName);
-		m_vWindows[i].SetResolution(m_Init.windowInfo[i].vResolution);
-		m_vWindows[i].SetLocation(m_Init.windowInfo[i].vLocation);
-		m_vWindows[i].SetType(m_Init.windowInfo[i].eType);
+		m_vWindows[i].SetTitle(sm_Init.windowInfo[i].sName);
+		m_vWindows[i].SetResolution(sm_Init.windowInfo[i].vResolution);
+		m_vWindows[i].SetLocation(sm_Init.windowInfo[i].vLocation);
+		m_vWindows[i].SetType(sm_Init.windowInfo[i].eType);
 	}
 
-	for(uint32 i = 0; i < m_Init.uiNumInputMappings; ++i)
+	for(uint32 i = 0; i < sm_Init.uiNumInputMappings; ++i)
 		m_vInputMaps.push_back(new HyInputMapInterop());
 }
 
@@ -39,13 +45,13 @@ IHyApplication::~IHyApplication()
 
 HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)
 {
-	HyAssert(uiIndex < m_Init.uiNumWindows, "IApplication::Viewport() took an invalid index: " << uiIndex);
+	HyAssert(uiIndex < sm_Init.uiNumWindows, "IApplication::Viewport() took an invalid index: " << uiIndex);
 	return m_vWindows[uiIndex];
 }
 
 HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 {
-	HyAssert(uiIndex < m_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
+	HyAssert(uiIndex < sm_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
 	return *static_cast<HyInputMapInterop *>(m_vInputMaps[uiIndex]);
 }
 

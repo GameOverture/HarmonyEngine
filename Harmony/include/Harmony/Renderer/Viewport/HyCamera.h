@@ -16,6 +16,8 @@
 #include "Utilities/Animation/ITransform.h"
 #include "Utilities/Animation/HyAnimVec2.h"
 
+class HyWindow;
+
 class IHyCamera
 {
 	HyWindow *			m_pWindowPtr;
@@ -26,6 +28,7 @@ protected:
 public:
 	virtual ~IHyCamera();
 
+	HyWindow &GetWindow()						{ return *m_pWindowPtr; }
 	const HyRectangle<float> &GetViewport()		{ return m_ViewportRect; }
 
 	// All values are [0.0 - 1.0] representing percentages of the entire game window

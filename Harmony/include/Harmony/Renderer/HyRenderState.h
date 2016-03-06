@@ -15,8 +15,6 @@
 // Forward declaration
 class IHyInst2d;
 
-#define HY_MAX_TEXTURE_BINDS 3 // increase as needed up to glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &texture_units)
-
 class HyRenderState
 {
 public:

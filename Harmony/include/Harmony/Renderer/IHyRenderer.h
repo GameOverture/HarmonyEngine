@@ -15,7 +15,8 @@
 #include "Renderer/HyGfxComms.h"
 #include "Renderer/HyRenderState.h"
 
-#include "Renderer/Viewport/HyWindow.h"
+class HyWindow;
+struct HyMonitorDeviceInfo;
 
 class IHyRenderer
 {

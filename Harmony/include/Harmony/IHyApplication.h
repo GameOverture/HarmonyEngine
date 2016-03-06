@@ -19,7 +19,7 @@ class IHyApplication
 {
 	friend class HyEngine;
 
-	HarmonyInit					m_Init;
+	static HarmonyInit			sm_Init;
 	static HyMemoryHeap			sm_Mem;
 
 	vector<HyWindow>			m_vWindows;
@@ -33,7 +33,10 @@ public:
 	IHyApplication(HarmonyInit &initStruct);
 	~IHyApplication();
 
-	static HyMemoryHeap &GetMemoryHeap()					{ return sm_Mem; }
+	static HyMemoryHeap &MemoryHeap()				{ return sm_Mem; }
+	static HyCoordinateType DefaultCoordinateType()	{ HyAssert(sm_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HyScene::DefaultCoordinateType() invoked before engine initialized"); return sm_Init.eDefaultCoordinateType; }
+	static HyCoordinateUnit DefaultCoordinateUnit()	{ HyAssert(sm_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HyScene::DefaultCoordinateUnit() invoked before engine initialized"); return sm_Init.eDefaultCoordinateUnit; }
+	static float PixelsPerMeter()					{ return sm_Init.fPixelsPerMeter; }
 
 	HyWindow &Window(uint32 uiIndex = 0);
 	HyInputMapInterop &Input(uint32 uiIndex = 0);
