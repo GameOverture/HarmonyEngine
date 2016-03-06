@@ -29,7 +29,6 @@ protected:
 		MTX_CAMVIEW,
 		MTX_SCREENVIEW
 	};
-	eMatrixStack			m_eMatrixStack;
 
 	///////// 2D MEMBERS ////////////////////
 	enum eVAOTypes

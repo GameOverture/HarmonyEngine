@@ -49,27 +49,26 @@ TestBed::~TestBed(void)
 
 	m_pCam_Viewport2 = Window(1).CreateCamera2d();
 	m_pCam_Viewport2->SetZoom(1.0f);
+	m_pCam_Viewport2->SetZoom(0.2f);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	m_primBox.Load();
 	m_primBox.color.Set(0.0f, 0.0f, 1.0f, 1.0f);
 	m_primBox.SetAsQuad(180.0f, 160.0f, false);
-	m_primBox.SetDisplayOrder(100);
-
+	m_primBox.SetDisplayOrder(0);
+	m_primBox.pos.Set(-45.0f, 0.0f);
 
 	m_testSprite.Load();
 	m_testSprite.SetTextureSource(8, 0, 0, 180, 162);
-	m_testSprite.SetDisplayOrder(0);
+	m_testSprite.SetDisplayOrder(1);
+	m_testSprite.pos.Set(0.0f, 0.0f);
 
 	return true;
 }
 
 /*virtual*/ bool TestBed::Update()
 {
-	m_primBox.pos.Set(-45.0f, 0.0f);
-	m_testSprite.pos.Set(-45.0f, 0.0f);
-
 	if(Input().IsBtnDownBuffered(ACTION_1))
 	{
 		m_testSprite.SetCoordinateType(HYCOORDTYPE_Screen, NULL);
@@ -81,17 +80,31 @@ TestBed::~TestBed(void)
 		//m_pCam_Viewport2->pos.Tween(40.0f, 40.0f, 5.0f, HyTween::Linear);
 	}
 
+	const float fMOVEMENTSPEED = 2.0f;
+
 	if(Input().IsBtnDown(CAM_LEFT))
-		m_pCam->pos.Offset(-0.5f, 0.0f);
+	{
+		m_testSprite.pos.Offset(-fMOVEMENTSPEED, 0.0f);
+		//m_pCam->pos.Offset(-fMOVEMENTSPEED, 0.0f);
+	}
 
 	if(Input().IsBtnDown(CAM_RIGHT))
-		m_pCam->pos.Offset(0.5f, 0.0f);
+	{
+		m_testSprite.pos.Offset(fMOVEMENTSPEED, 0.0f);
+		//m_pCam->pos.Offset(fMOVEMENTSPEED, 0.0f);
+	}
 
 	if(Input().IsBtnDown(CAM_UP))
-		m_pCam->pos.Offset(0.0f, 0.5f);
+	{
+		m_testSprite.pos.Offset(0.0f, fMOVEMENTSPEED);
+		//m_pCam->pos.Offset(0.0f, fMOVEMENTSPEED);
+	}
 
 	if(Input().IsBtnDown(CAM_DOWN))
-		m_pCam->pos.Offset(0.0f, -0.5f);
+	{
+		m_testSprite.pos.Offset(0.0f, -fMOVEMENTSPEED);
+		//m_pCam->pos.Offset(0.0f, -fMOVEMENTSPEED);
+	}
 
 	if(Input().IsBtnDownBuffered(SEND_LOG))
 	{

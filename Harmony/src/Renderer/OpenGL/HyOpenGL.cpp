@@ -10,7 +10,7 @@
 #include "Renderer/OpenGL/HyOpenGL.h"
 #include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
 
-HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef) : IHyRenderer(gfxCommsRef, viewportsRef),
+HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyWindow> &viewportsRef) :	IHyRenderer(gfxCommsRef, viewportsRef),
 																				m_mtxView(1.0f)
 {
 #ifdef HY_PLATFORM_GUI
@@ -25,8 +25,6 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::StartRender()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	m_eMatrixStack = MTX_NOTSET;
 }
 
 /*virtual*/ void HyOpenGL::Init_3d()
@@ -382,13 +380,8 @@ bool HyOpenGL::Initialize()
 
 void HyOpenGL::SetCameraMatrices_2d(eMatrixStack eMtxStack)
 {
-	if(m_eMatrixStack == eMtxStack || eMtxStack == MTX_NOTSET)
-		return;
-
-	m_eMatrixStack = eMtxStack;
-
 	HyRectangle<float> viewportRect;
-	if(m_eMatrixStack == MTX_CAMVIEW)
+	if(eMtxStack == MTX_CAMVIEW)
 		viewportRect = *GetCameraViewportRect2d(m_iCurCamIndex);
 	else
 		viewportRect.Set(0.0f, 0.0f, 1.0f, 1.0f);
@@ -401,7 +394,7 @@ void HyOpenGL::SetCameraMatrices_2d(eMatrixStack eMtxStack)
 			   static_cast<GLsizei>(fWidth),
 			   static_cast<GLsizei>(fHeight));
 
-	if(m_eMatrixStack == MTX_CAMVIEW)
+	if(eMtxStack == MTX_CAMVIEW)
 		m_mtxView = *GetCameraView2d(m_iCurCamIndex);
 	else
 	{
