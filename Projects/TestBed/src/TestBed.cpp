@@ -71,12 +71,12 @@ TestBed::~TestBed(void)
 {
 	if(Input().IsBtnDownBuffered(ACTION_1))
 	{
-		m_testSprite.SetCoordinateType(HYCOORDTYPE_Screen, NULL);
+		m_testSprite.SetCoordinateType(HYCOORDTYPE_Screen, m_pCam_Viewport2);
 		//m_pCam_Viewport2->pos.Tween(40.0f, 40.0f, 5.0f, HyTween::Linear);
 	}
 	if(Input().IsBtnDownBuffered(ACTION_2))
 	{
-		m_testSprite.SetCoordinateType(HYCOORDTYPE_Camera, NULL);
+		m_testSprite.SetCoordinateType(HYCOORDTYPE_Camera, m_pCam_Viewport2);
 		//m_pCam_Viewport2->pos.Tween(40.0f, 40.0f, 5.0f, HyTween::Linear);
 	}
 

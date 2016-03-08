@@ -116,6 +116,7 @@ void IHyInst2d::SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCame
 
 	if(pCameraToCovertFrom)
 	{
+		HyError("IHyInst2d::SetCoordinateType() conversion code needs implementation");
 		switch(eCoordType)
 		{
 		case HYCOORDTYPE_Camera:
@@ -130,7 +131,7 @@ void IHyInst2d::SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCame
 			if(m_eCoordType == HYCOORDTYPE_Screen)
 				break;
 
-			//pCameraToCovertFrom->
+			//pos.X(pCameraToCovertFrom->
 			break;
 		}
 	}

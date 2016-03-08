@@ -57,8 +57,11 @@ public:
                                                                                                                                                 m_bRotation(bRot),
                                                                                                                                                 m_iPosX(iX),
                                                                                                                                                 m_iPosY(iY),
-                                                                                                                                                m_pTreeItem(NULL)
+                                                                                                                                                m_pTreeItem(NULL),
+                                                                                                                                                m_iSelectedIndex(-1)
     {
+        m_ptDrawPos.setX(0); m_ptDrawPos.setY(0);
+
         SetTextureSource(iTexIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
         SetDisplayOrder(1);
         SetEnabled(false);
@@ -113,6 +116,10 @@ public:
         
         return sMetaImgName;
     }
+
+    // Preview data members
+    int                 m_iSelectedIndex;   // -1 Means not selected (not counting hovered)
+    QPoint              m_ptDrawPos;
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)
 
@@ -130,7 +137,7 @@ class WidgetAtlasGroup : public QWidget
     ImagePacker                 m_Packer;
 
     bool                        m_bRefreshDrawUpdate;
-    HyGuiFrame *                m_pMouseHoverFrame;
+    QTreeWidgetItem *           m_pMouseHoverItem;
 
 public:
     explicit WidgetAtlasGroup(QWidget *parent = 0);

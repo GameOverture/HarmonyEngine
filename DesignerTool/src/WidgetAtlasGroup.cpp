@@ -25,6 +25,8 @@
 #include "WidgetAtlasManager.h"
 #include "WidgetRenderer.h"
 
+void ResetFrame(HyGuiFrame *pFrame);
+
 WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
                                                         ui(new Ui::WidgetAtlasGroup)
 {
@@ -38,7 +40,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
                                                                                     m_MetaDir(metaDir),
                                                                                     m_DataDir(dataDir),
                                                                                     m_bRefreshDrawUpdate(false),
-                                                                                    m_pMouseHoverFrame(NULL),
+                                                                                    m_pMouseHoverItem(NULL),
                                                                                     ui(new Ui::WidgetAtlasGroup)
 {    
     ui->setupUi(this);
@@ -151,7 +153,10 @@ int WidgetAtlasGroup::GetId()
 /*friend*/ void AtlasGroup_DrawOpen(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
     foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
+    {
         pFrame->Load();
+        ResetFrame(pFrame);
+    }
 
     atlasGrp.ResizeAtlasListColumns();
 }
@@ -164,6 +169,7 @@ int WidgetAtlasGroup::GetId()
 
 /*friend*/ void AtlasGroup_DrawShow(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
+    atlasGrp.m_bRefreshDrawUpdate = true;
 }
 
 /*friend*/ void AtlasGroup_DrawHide(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
@@ -181,6 +187,7 @@ void ResetFrame(HyGuiFrame *pFrame)
     pFrame->pos.Set(0.0f, 0.0f);
     pFrame->SetDisplayOrder(0);
     pFrame->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+    pFrame->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
 }
 
 /*friend*/ void AtlasGroup_DrawUpdate(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
@@ -194,59 +201,75 @@ void ResetFrame(HyGuiFrame *pFrame)
         DEBUGCNT = 0;
     }
 
+    const uint32 uiRENDERWIDTH = hyApp.Window().GetResolution().x;
+    const uint32 uiRENDERHEIGHT = hyApp.Window().GetResolution().y;
 
     // Preview hover selection
     QTreeWidgetItem *pHoveredItem = atlasGrp.ui->atlasList->itemAt(atlasGrp.ui->atlasList->mapFromGlobal(QCursor::pos()));
-    if(pHoveredItem && pHoveredItem->isSelected() == false)
+    if(pHoveredItem && atlasGrp.m_pMouseHoverItem != pHoveredItem && pHoveredItem->isSelected() == false)
     {
-        QVariant v = pHoveredItem->data(0, QTreeWidgetItem::UserType);
-        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
-
-        if(atlasGrp.m_pMouseHoverFrame != pFrame)
+        if(atlasGrp.m_pMouseHoverItem && atlasGrp.m_pMouseHoverItem->isSelected() == false)
         {
-            ResetFrame(atlasGrp.m_pMouseHoverFrame);
-            atlasGrp.m_pMouseHoverFrame = pFrame;
+            QVariant v = atlasGrp.m_pMouseHoverItem->data(0, QTreeWidgetItem::UserType);
+            ResetFrame(v.value<HyGuiFrame *>());
         }
 
-        atlasGrp.m_pMouseHoverFrame->SetEnabled(true);
-        atlasGrp.m_pMouseHoverFrame->pos.Set(atlasGrp.m_pMouseHoverFrame->GetWidth() * -0.5f, atlasGrp.m_pMouseHoverFrame->GetHeight() * -0.5f);
-        atlasGrp.m_pMouseHoverFrame->SetDisplayOrder(1000);
-        atlasGrp.m_pMouseHoverFrame->color.A(0.5f);
+        atlasGrp.m_pMouseHoverItem = pHoveredItem;
+
+        QVariant v = atlasGrp.m_pMouseHoverItem->data(0, QTreeWidgetItem::UserType);
+        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
+
+        pFrame->SetEnabled(true);
+        pFrame->SetDisplayOrder(100);
+        pFrame->pos.Set((uiRENDERWIDTH * 0.5f) + (pFrame->GetWidth() * -0.5f),
+                        (uiRENDERHEIGHT * 0.5f) + (pFrame->GetHeight() * -0.5f));
+        pFrame->color.A(0.5f);
     }
 
     if(atlasGrp.m_bRefreshDrawUpdate == false)
         return;
 
-    const uint32 uiRENDERWIDTH = hyApp.Window().GetResolution().x;
-    const uint32 uiRENDERHEIGHT = hyApp.Window().GetResolution().y;
+    HyGuiFrame *pHoveredFrame = NULL;
+
+    if(atlasGrp.m_pMouseHoverItem)
+    {
+        QVariant v = atlasGrp.m_pMouseHoverItem->data(0, QTreeWidgetItem::UserType);
+        pHoveredFrame = v.value<HyGuiFrame *>();
+    }
+
+    // Reset all frames (except hover) incase any frames got unselected. They will be enabled if selected below
+    foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
+    {
+        if(pHoveredFrame != pFrame)
+            ResetFrame(pFrame);
+    }
 
     QPoint ptDrawPos(0, 0);
 
     // Display all selected
     QList<QTreeWidgetItem *> selectedItems = atlasGrp.ui->atlasList->selectedItems();
-
-    // Place frames in rectangle to view all
-    uint iFrameCount = 0;
-    for(uint iFrameCount = 0; iFrameCount < selectedItems.size(); ++iFrameCount)
+    for(uint i = 0; i < selectedItems.size(); ++i)
     {
-        QVariant v = selectedItems[iFrameCount]->data(0, QTreeWidgetItem::UserType);
+        QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
         HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
 
         if(pFrame == NULL)
             continue;
 
-        if(bDebugPrint)
-        {
-            //HyGuiLog("Frame: " % QString::number((UINT)&pFrame), LOGTYPE_Normal);
-            //HyGuiLog("DrawPos: " % QString::number(i) % " (" % QString::number(ptDrawPos.x()) % ", " % QString::number(ptDrawPos.y()) % ")", LOGTYPE_Normal);
-        }
+        const int iWIDTH_OFFSET = ptDrawPos.x() * 25;
+        const int iHEIGHT_OFFSET = ptDrawPos.y() * 100;
 
         pFrame->SetEnabled(true);
-        pFrame->pos.Set(iFrameCount * 25, iFrameCount * 25);
-        pFrame->SetDisplayOrder(iFrameCount);
+        pFrame->color.A(1.0f);
+        pFrame->SetDisplayOrder(-0x0FFFFFFF + i);
 
-        ptDrawPos.setX(ptDrawPos.x() + pFrame->GetWidth());
-        ptDrawPos.setY(ptDrawPos.y() + pFrame->GetHeight());
+        if(pFrame->pos.IsTransforming() == false &&
+           (pFrame->pos.X() != iWIDTH_OFFSET || pFrame->pos.Y() != iHEIGHT_OFFSET))
+        {
+            pFrame->pos.Tween(ptDrawPos.x() * iWIDTH_OFFSET, ptDrawPos.y() * iHEIGHT_OFFSET, 0.5f, HyTween::QuadInOut);
+        }
+
+        ptDrawPos.setX(ptDrawPos.x() + 1);
 
         //if(bDebugPrint)
         //    HyGuiLog("Sze: (" % QString::number(size.width()) % ", " % QString::number(size.height()) % ")", LOGTYPE_Normal);
