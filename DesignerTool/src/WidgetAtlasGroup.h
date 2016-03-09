@@ -57,11 +57,8 @@ public:
                                                                                                                                                 m_bRotation(bRot),
                                                                                                                                                 m_iPosX(iX),
                                                                                                                                                 m_iPosY(iY),
-                                                                                                                                                m_pTreeItem(NULL),
-                                                                                                                                                m_iSelectedIndex(-1)
+                                                                                                                                                m_pTreeItem(NULL)
     {
-        m_ptDrawPos.setX(0); m_ptDrawPos.setY(0);
-
         if(m_bRotation == false)
             SetTextureSource(iTexIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
         else
@@ -124,10 +121,6 @@ public:
         
         return sMetaImgName;
     }
-
-    // Preview data members
-    int                 m_iSelectedIndex;   // -1 Means not selected (not counting hovered)
-    QPoint              m_ptDrawPos;
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)
 

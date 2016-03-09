@@ -184,11 +184,37 @@ void ResetFrame(HyGuiFrame *pFrame)
         return;
 
     pFrame->SetEnabled(false);
-    pFrame->pos.Set(0.0f, 0.0f);
     pFrame->SetDisplayOrder(0);
     pFrame->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
     pFrame->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
 }
+
+const float fTRANS_DUR = 0.5f;
+const int iPADDING = 2;
+
+struct PreviewRow
+{
+    QList<HyGuiFrame *> m_Frames;
+    int                 m_iLargestHeight;
+
+    void Clear()
+    {
+        m_Frames.clear();
+        m_iLargestHeight = 0;
+    }
+
+    void TweenPosY(int iStartPosY)
+    {
+        float fMidRow = (m_iLargestHeight * 0.5f);
+        float fPosY = 0.0f;
+        foreach(HyGuiFrame *pFrame, m_Frames)
+        {
+            fPosY = pFrame->GetHeight() + iStartPosY + fMidRow;
+            if(pFrame->pos.IsTransforming() == false && pFrame->pos.Y() != fPosY)
+                pFrame->pos.AnimY().Tween(fPosY, fTRANS_DUR, HyTween::QuadInOut);
+        }
+    }
+};
 
 /*friend*/ void AtlasGroup_DrawUpdate(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
 {
@@ -204,6 +230,7 @@ void ResetFrame(HyGuiFrame *pFrame)
     const uint32 uiRENDERWIDTH = hyApp.Window().GetResolution().x;
     const uint32 uiRENDERHEIGHT = hyApp.Window().GetResolution().y;
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Preview hover selection
     QTreeWidgetItem *pHoveredItem = atlasGrp.ui->atlasList->itemAt(atlasGrp.ui->atlasList->mapFromGlobal(QCursor::pos()));
     if(pHoveredItem && atlasGrp.m_pMouseHoverItem != pHoveredItem && pHoveredItem->isSelected() == false)
@@ -226,9 +253,11 @@ void ResetFrame(HyGuiFrame *pFrame)
         pFrame->color.A(0.5f);
     }
 
-    if(atlasGrp.m_bRefreshDrawUpdate == false)
-        return;
+    //if(atlasGrp.m_bRefreshDrawUpdate == false)
+    //    return;
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Reset all frames (except hover) incase any frames got unselected. They will be enabled if selected below
     HyGuiFrame *pHoveredFrame = NULL;
 
     if(atlasGrp.m_pMouseHoverItem)
@@ -237,16 +266,20 @@ void ResetFrame(HyGuiFrame *pFrame)
         pHoveredFrame = v.value<HyGuiFrame *>();
     }
 
-    // Reset all frames (except hover) incase any frames got unselected. They will be enabled if selected below
     foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
     {
         if(pHoveredFrame != pFrame)
             ResetFrame(pFrame);
     }
 
-    QPoint ptDrawPos(0, 0);
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Display all selected
+
+    QPoint ptDrawPos(0, 0);
+    PreviewRow curRow;
+    curRow.Clear();
+
     QList<QTreeWidgetItem *> selectedItems = atlasGrp.ui->atlasList->selectedItems();
     for(uint i = 0; i < selectedItems.size(); ++i)
     {
@@ -256,26 +289,39 @@ void ResetFrame(HyGuiFrame *pFrame)
         if(pFrame == NULL)
             continue;
 
-        const int iWIDTH_OFFSET = ptDrawPos.x() * 25;
-        const int iHEIGHT_OFFSET = ptDrawPos.y() * 100;
 
         pFrame->SetEnabled(true);
         pFrame->color.A(1.0f);
         pFrame->SetDisplayOrder(-0x0FFFFFFF + i);
 
-        if(pFrame->pos.IsTransforming() == false &&
-           (pFrame->pos.X() != iWIDTH_OFFSET || pFrame->pos.Y() != iHEIGHT_OFFSET))
+        float fFrameWidth = pFrame->IsRotated() ? pFrame->GetHeight() : pFrame->GetWidth();
+        float fFrameHeight = pFrame->IsRotated() ? pFrame->GetWidth() : pFrame->GetHeight();
+
+        // Will it fit in this row
+        if(ptDrawPos.x() + fFrameWidth < uiRENDERWIDTH)
         {
-            pFrame->pos.Tween(ptDrawPos.x() * iWIDTH_OFFSET, ptDrawPos.y() * iHEIGHT_OFFSET, 0.5f, HyTween::QuadInOut);
+            if(pFrame->pos.IsTransforming() == false && pFrame->pos.X() != ptDrawPos.x())
+                pFrame->pos.AnimX().Tween(ptDrawPos.x(), fTRANS_DUR, HyTween::QuadInOut);
+
+            ptDrawPos.setX(ptDrawPos.x() + fFrameWidth + iPADDING);
+
+            if(curRow.m_iLargestHeight < fFrameHeight)
+                curRow.m_iLargestHeight = fFrameHeight;
+
+            curRow.m_Frames.append(pFrame);
         }
+        else // Row filled, process it
+        {
+            curRow.TweenPosY(uiRENDERHEIGHT - ptDrawPos.y());
+            ptDrawPos.setY(ptDrawPos.y() + curRow.m_iLargestHeight + iPADDING);
 
-        ptDrawPos.setX(ptDrawPos.x() + 1);
-
-        //if(bDebugPrint)
-        //    HyGuiLog("Sze: (" % QString::number(size.width()) % ", " % QString::number(size.height()) % ")", LOGTYPE_Normal);
+            ptDrawPos.setX(0);
+            curRow.Clear();
+        }
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //QPointF ptCamPos(uiCurWidth * 0.5f, uiCurHeight * 0.5f);
 
     // Pan camera over previewed
