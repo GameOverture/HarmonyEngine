@@ -62,7 +62,15 @@ public:
     {
         m_ptDrawPos.setX(0); m_ptDrawPos.setY(0);
 
-        SetTextureSource(iTexIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
+        if(m_bRotation == false)
+            SetTextureSource(iTexIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
+        else
+        {
+            SetTextureSource(iTexIndex, GetX(), GetY(), m_rALPHA_CROP.height(), m_rALPHA_CROP.width());
+            rot_pivot.Set(m_rALPHA_CROP.height() * 0.5f, m_rALPHA_CROP.width() * 0.5f);
+            rot.Z(90);
+        }
+
         SetDisplayOrder(1);
         SetEnabled(false);
     }

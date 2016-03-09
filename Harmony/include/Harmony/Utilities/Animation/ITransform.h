@@ -36,6 +36,7 @@ public:
 	// Exposing these HyAnimVec's for user API convenience
 	tVec				pos;
 	HyAnimVec3			rot;
+	tVec				rot_pivot;
 	tVec				scale;
 
 	HyCoordinateUnit GetCoordinateUnit()						{ return m_eCoordUnit; }
@@ -102,14 +103,21 @@ void ITransform<tVec>::GetLocalTransform(mat4 &outMtx) const
 	vScale.x = scale.X();
 	vScale.y = scale.Y();
 
+	vec3 ptRotPivot(0.0f);
+	ptRotPivot.x = rot_pivot.X();
+	ptRotPivot.y = rot_pivot.Y();
+
 	if(m_eCoordUnit == HYCOORDUNIT_Meters)
 		outMtx = glm::translate(outMtx, ptPos * IHyApplication::PixelsPerMeter());
 	else
 		outMtx = glm::translate(outMtx, ptPos);
 
+	outMtx = glm::translate(outMtx, ptRotPivot);
 	outMtx = glm::rotate(outMtx, rot.Get().x, vec3(1, 0, 0));
 	outMtx = glm::rotate(outMtx, rot.Get().y, vec3(0, 1, 0));
 	outMtx = glm::rotate(outMtx, rot.Get().z, vec3(0, 0, 1));
+	outMtx = glm::translate(outMtx, ptRotPivot * -1.0f);
+
 	outMtx = glm::scale(outMtx, vScale);
 }
 

@@ -39,6 +39,7 @@ TestBed::~TestBed(void)
 
 	Input().MapBtn_KB(ACTION_1, Key1);
 	Input().MapBtn_KB(ACTION_2, Key2);
+	Input().MapBtn_KB(ACTION_3, Key3);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -78,6 +79,10 @@ TestBed::~TestBed(void)
 	{
 		m_testSprite.SetCoordinateType(HYCOORDTYPE_Camera, m_pCam_Viewport2);
 		//m_pCam_Viewport2->pos.Tween(40.0f, 40.0f, 5.0f, HyTween::Linear);
+	}
+	if(Input().IsBtnDownBuffered(ACTION_3))
+	{
+		m_testSprite.rot.Tween(180.0f, 0.0f, 0.0f, 10.0f, HyTween::BounceInOut);
 	}
 
 	const float fMOVEMENTSPEED = 2.0f;

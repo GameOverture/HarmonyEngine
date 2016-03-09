@@ -23,7 +23,8 @@ class TestBed : public IHyApplication
 
 		SEND_LOG,
 		ACTION_1,
-		ACTION_2
+		ACTION_2,
+		ACTION_3
 	};
 
 	HyCamera2d *	m_pCam;
