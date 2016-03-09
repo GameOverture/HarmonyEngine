@@ -28,28 +28,28 @@ ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
     
     m_primOriginHorz.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
     m_primOriginVert.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
-    
+}
+
+/*virtual*/ void ItemSprite::OnDraw_Open(IHyApplication &hyApp)
+{
     m_primOriginHorz.Load();
     m_primOriginVert.Load();
 }
 
-/*virtual*/ void ItemSprite::Hide()
+/*virtual*/ void ItemSprite::OnDraw_Close(IHyApplication &hyApp)
 {
-    m_primOriginHorz.SetEnabled(false);
-    m_primOriginVert.SetEnabled(false);
 }
 
-/*virtual*/ void ItemSprite::Show()
+/*virtual*/ void ItemSprite::OnDraw_Show(IHyApplication &hyApp)
 {
-    m_primOriginHorz.SetEnabled(true);
-    m_primOriginVert.SetEnabled(true);
 }
 
-/*virtual*/ void ItemSprite::Draw(WidgetRenderer &renderer)
+/*virtual*/ void ItemSprite::OnDraw_Hide(IHyApplication &hyApp)
 {
-    
-    //pHyApp->GetViewport().GetResolution().iWidth
-    //pHyApp->GetViewport().GetResolution().iHeight
+}
+
+/*virtual*/ void ItemSprite::OnDraw_Update(IHyApplication &hyApp)
+{
 }
 
 /*virtual*/ void ItemSprite::Save()

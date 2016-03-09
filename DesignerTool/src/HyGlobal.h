@@ -60,6 +60,13 @@ enum eAtlasNodeType
 #define HYGUIPATH_DataAtlasFileName         "atlasInfo.json"
 #define HYGUIPATH_MetaDataAtlasFileName     "settings.hygui"
 
+QAction *FindAction(QList<QAction *> list, QString sName);
+#define FINDACTION(str) FindAction(this->actions(), str)
+
+#define HyGuiLog(msg, type) { QString sHyLogTmpStr = msg; WidgetOutputLog::Log(sHyLogTmpStr, type); }
+
+#define JSONOBJ_TOINT(obj, key) obj.value(key).toVariant().toLongLong()
+
 class HyGlobal
 {
     static QString                  sm_sItemNames[NUMITEM];
@@ -133,6 +140,22 @@ public:
         sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_-]*"));
     }
 
+    static eItemType GetCorrespondingDirItem(eItemType eItem)
+    {
+        switch(eItem)
+        {
+        case ITEM_Audio:        return ITEM_DirAudio;
+        case ITEM_Particles:    return ITEM_DirParticles;
+        case ITEM_Font:         return ITEM_DirFonts;
+        case ITEM_Spine:        return ITEM_DirSpine;
+        case ITEM_Sprite:       return ITEM_DirSprites;
+        case ITEM_Shader:       return ITEM_DirShaders;
+        default:
+            HyGuiLog("HyGlobal::GetCorrespondingDirItem() could not find the proper directory item", LOGTYPE_Warning);
+        }
+        
+        return ITEM_Unknown;
+    }
     
     static QList<eItemType> SubDirList()
     {
@@ -234,12 +257,5 @@ public:
         return sNewString;
     }
 };
-
-QAction *FindAction(QList<QAction *> list, QString sName);
-#define FINDACTION(str) FindAction(this->actions(), str)
-
-#define HyGuiLog(msg, type) { QString sHyLogTmpStr = msg; WidgetOutputLog::Log(sHyLogTmpStr, type); }
-
-#define JSONOBJ_TOINT(obj, key) obj.value(key).toVariant().toLongLong()
 
 #endif // HYGLOBALS_H

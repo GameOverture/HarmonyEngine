@@ -281,7 +281,7 @@ struct PreviewRow
     curRow.Clear();
 
     QList<QTreeWidgetItem *> selectedItems = atlasGrp.ui->atlasList->selectedItems();
-    for(uint i = 0; i < selectedItems.size(); ++i)
+    for(int i = 0; i < selectedItems.size(); ++i)
     {
         QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
         HyGuiFrame *pFrame = v.value<HyGuiFrame *>();

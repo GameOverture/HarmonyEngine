@@ -240,7 +240,9 @@ bool HyAssetManager::Reload(std::vector<std::string> &vPathsRef, bool bRefreshAs
 // Unload everything, and reinitialize to a new data directory. Doesn't load up anything when done.
 bool HyAssetManager::Reload(std::string sNewDataDirPath)
 {
-	if(sm_bIsReloading)
+	sNewDataDirPath = MakeStringProperPath(sNewDataDirPath.c_str(), "/");
+
+	if(sm_bIsReloading || m_sDATADIR == sNewDataDirPath)
 		return false;
 
 	m_sNewDataDirPath = sNewDataDirPath;

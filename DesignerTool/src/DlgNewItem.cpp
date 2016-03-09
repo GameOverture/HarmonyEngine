@@ -28,7 +28,7 @@ DlgNewItem::DlgNewItem(const QString &sSubDirPath, eItemType eItem, QWidget *par
     m_sItemExt = HyGlobal::ItemExt(eItem);
     
     QDir subDir(m_sSubDirPath);
-    Q_ASSERT(0 == QString::compare(subDir.dirName(), HyGlobal::ItemName(eItem), Qt::CaseInsensitive));
+    Q_ASSERT(0 == QString::compare(subDir.dirName(), HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eItem)), Qt::CaseInsensitive));
 
     ui->txtName->setValidator(HyGlobal::FileNameValidator());
     ui->txtPrefix->setValidator(HyGlobal::FilePathValidator());

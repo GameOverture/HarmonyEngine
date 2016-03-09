@@ -24,9 +24,12 @@ class ItemSprite : public Item
     
 protected:
     
-    virtual void Hide();
-    virtual void Show();
-    virtual void Draw(WidgetRenderer &renderer);
+    virtual void OnDraw_Open(IHyApplication &hyApp);
+    virtual void OnDraw_Close(IHyApplication &hyApp);
+
+    virtual void OnDraw_Show(IHyApplication &hyApp);
+    virtual void OnDraw_Hide(IHyApplication &hyApp);
+    virtual void OnDraw_Update(IHyApplication &hyApp);
     
     virtual void Save();
 };

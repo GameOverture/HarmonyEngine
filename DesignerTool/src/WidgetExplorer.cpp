@@ -147,40 +147,40 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     // NOTE: Cannot use GetCurProjSelected() because this function may be called without anything selected in explorer widget. AKA opening an existing project and adding all its contents
     //
     // Find the proper project tree item
-    QTreeWidgetItem *pParentTreeItem = NULL;
-    QDir projDir;
+    ItemProject *pCurProj = NULL;
     for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
     {
         QVariant v = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole);
         Item *pTopLevelItem = v.value<Item *>();
         
-        if(pItem->GetPath().contains(pTopLevelItem->GetPath(), Qt::CaseInsensitive))
-        {
-            projDir.setPath(pTopLevelItem->GetPath());
-            pParentTreeItem = pTopLevelItem->GetTreeItem();
-            break;
-        }
+        if(pTopLevelItem->GetType() != ITEM_Project && pItem->GetPath().contains(static_cast<ItemProject *>(pTopLevelItem)->GetDirPath(), Qt::CaseInsensitive))
+            continue;
+        
+        pCurProj = static_cast<ItemProject *>(pTopLevelItem);
+        break;
     }
     
-    if(pParentTreeItem == NULL)
+    if(pCurProj == NULL)
     {
         HyGuiLog("Could not find associated project for item: " % pItem->GetPath(), LOGTYPE_Error);
         return;
     }
     
     // Get the relative path from [ProjectDir->ItemPath] e.g. "data/Sprites/SpritePrefix/MySprite.hyspi"
-    QString sRelativePath = projDir.relativeFilePath(pItem->GetPath());
+    QDir assetDir(pCurProj->GetAssetsAbsPath());
+    QString sRelativePath = assetDir.relativeFilePath(pItem->GetPath());
     
     QStringList sPathSplitList = sRelativePath.split(QChar('/'));
-    if(QString::compare(sPathSplitList[0], "data", Qt::CaseInsensitive) != 0)
-    {
-        HyGuiLog("Project path does not begin inside 'data' directory", LOGTYPE_Error);
-        return;
-    }
+//    if(QString::compare(sPathSplitList[0], "data", Qt::CaseInsensitive) != 0)
+//    {
+//        HyGuiLog("Project path does not begin inside 'data' directory", LOGTYPE_Error);
+//        return;
+//    }
     
     // Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
+    QTreeWidgetItem *pParentTreeItem = pCurProj->GetTreeItem();
     bool bSucceeded = false;
-    for(int i = 1; i < sPathSplitList.size(); ++i)
+    for(int i = 0; i < sPathSplitList.size(); ++i)
     {
         bool bFound = false;
         for(int j = 0; j < pParentTreeItem->childCount(); ++j)
@@ -195,7 +195,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         
         if(bFound == false)
         {
-            if(i == 1)
+            if(i == 0)
             {
                 HyGuiLog("Cannot find valid sub directory: " % sPathSplitList[i], LOGTYPE_Error);
                 return;

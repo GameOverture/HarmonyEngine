@@ -245,7 +245,9 @@ void MainWindow::on_actionNewFont_triggered()
 
 void MainWindow::NewItem(eItemType eItem)
 {
-    QString sNewItemPath = ui->explorer->GetCurProjSelected()->GetAssetsAbsPath() % HyGlobal::ItemName(eItem) % "/";
+    eItemType eItemDir = HyGlobal::GetCorrespondingDirItem(eItem);
+    
+    QString sNewItemPath = ui->explorer->GetCurProjSelected()->GetAssetsAbsPath() % HyGlobal::ItemName(eItemDir) % "/";
             
     DlgNewItem *pDlg = new DlgNewItem(sNewItemPath, eItem, this);
     if(pDlg->exec())
