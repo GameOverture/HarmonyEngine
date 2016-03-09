@@ -1,0 +1,84 @@
+[
+    {
+        "height": 256,
+        "id": 1,
+        "num8BitClrChannels": 4,
+        "textures": [
+            [
+                {
+                    "bottom": 225,
+                    "left": 209,
+                    "right": 254,
+                    "rotate": false,
+                    "top": 155
+                },
+                {
+                    "bottom": 39,
+                    "left": 214,
+                    "right": 333,
+                    "rotate": true,
+                    "top": 5
+                },
+                {
+                    "bottom": 257,
+                    "left": 139,
+                    "right": 183,
+                    "rotate": true,
+                    "top": 193
+                },
+                {
+                    "bottom": 194,
+                    "left": 143,
+                    "right": 192,
+                    "rotate": false,
+                    "top": 5
+                },
+                {
+                    "bottom": 223,
+                    "left": 106,
+                    "right": 135,
+                    "rotate": false,
+                    "top": 194
+                },
+                {
+                    "bottom": 192,
+                    "left": 10,
+                    "right": 144,
+                    "rotate": false,
+                    "top": 2
+                },
+                {
+                    "bottom": 19,
+                    "left": 191,
+                    "right": 340,
+                    "rotate": true,
+                    "top": 0
+                }
+            ],
+            [
+                {
+                    "bottom": 181,
+                    "left": 7,
+                    "right": 117,
+                    "rotate": false,
+                    "top": 96
+                },
+                {
+                    "bottom": 87,
+                    "left": 10,
+                    "right": 172,
+                    "rotate": false,
+                    "top": 2
+                },
+                {
+                    "bottom": 167,
+                    "left": 114,
+                    "right": 212,
+                    "rotate": false,
+                    "top": 89
+                }
+            ]
+        ],
+        "width": 256
+    }
+]

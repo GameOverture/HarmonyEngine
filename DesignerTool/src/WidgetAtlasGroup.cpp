@@ -59,7 +59,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
         }
 
         //QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
-        QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
+        QJsonDocument settingsDoc = QJsonDocument::fromJson(metaAtlasFile.readAll());
         metaAtlasFile.close();
 
         QJsonObject settingsObj = settingsDoc.object();
@@ -70,7 +70,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
         {
             QJsonObject frameObj = frameArray[i].toObject();
 
-            QRect rAlphaCrop(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt(), frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt());
+            QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
             HyGuiFrame *pNewFrame = new HyGuiFrame(frameObj["hash"].toInt(),
                                                    frameObj["name"].toString(),
                                                    rAlphaCrop,
@@ -596,7 +596,7 @@ void WidgetAtlasGroup::Refresh()
     else
     {
         QJsonDocument settingsDoc(settingsObj);
-        qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
+        qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());//toBinaryData());
         if(0 == iBytesWritten || -1 == iBytesWritten)
         {
             HyGuiLog("Could not write to atlas settings file: " % settingsFile.errorString(), LOGTYPE_Error);
