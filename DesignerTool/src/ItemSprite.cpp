@@ -20,9 +20,9 @@ ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
     vLinePts[1].y = 0.0f;
     m_primOriginHorz.SetAsEdgeChain(vLinePts, 2, false);
     
-    vLinePts[0].x = 0.0f;
+    vLinePts[0].x = 100.0f;
     vLinePts[0].y = -2048.0f;
-    vLinePts[1].x = 0.0f;
+    vLinePts[1].x = 100.0f;
     vLinePts[1].y = 2048.0f;
     m_primOriginVert.SetAsEdgeChain(vLinePts, 2, false);
     

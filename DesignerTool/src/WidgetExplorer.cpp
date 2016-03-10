@@ -205,11 +205,11 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
             {
                 // Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
                 //
-                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetPath() % "/" % sPathSplitList[i];
+                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetPath() % sPathSplitList[i];
                 
                 Item *pPrefixItem = new Item(ITEM_Prefix, sPath);
                 
-                CreateTreeItem(pParentTreeItem, pPrefixItem);
+                pParentTreeItem = CreateTreeItem(pParentTreeItem, pPrefixItem);
             }
             else
             {

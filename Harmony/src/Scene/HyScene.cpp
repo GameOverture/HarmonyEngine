@@ -246,10 +246,10 @@ void HyScene::WriteDrawBuffers()
 		{
 			// Start a new draw. Write render state to buffer to be sent to render thread
 			memcpy(m_pCurWritePos, &m_vLoadedInst2d[i]->GetRenderState(), sizeof(HyRenderState));
-			reinterpret_cast<HyRenderState *>(m_pCurWritePos)->SetDataOffset(uiVertexDataOffset);
 			pCurRenderState2d = reinterpret_cast<HyRenderState *>(m_pCurWritePos);
-			m_pCurWritePos += sizeof(HyRenderState);
+			pCurRenderState2d->SetDataOffset(uiVertexDataOffset);
 
+			m_pCurWritePos += sizeof(HyRenderState);
 			iCount++;
 		}
 		else
@@ -283,7 +283,7 @@ void HyScene::WriteDrawBuffers()
 	pDrawHeader->uiVertexBufferSize2d = pCurVertexWritePos - pStartVertexWritePos;
 
 	// Do final check to see if we wrote passed our bounds
-	HyAssert((m_pCurWritePos-m_GfxCommsRef.GetWriteBufferPtr()) < RENDER_BUFFER_SIZE, "HyGfxComms::WriteUpdateBuffer() has written passed its bounds! Embiggen 'RENDER_BUFFER_SIZE'");
+	HyAssert(pDrawHeader->uiVertexBufferSize2d < RENDER_BUFFER_SIZE, "HyGfxComms::WriteUpdateBuffer() has written passed its bounds! Embiggen 'RENDER_BUFFER_SIZE'");
 
 	m_GfxCommsRef.Update_SetSharedPtrs();
 }

@@ -81,7 +81,6 @@ class HyGlobal
 public:
     static void Initialize()
     {
-        // 'Dir' and 'item' both require the same name
         sm_sItemNames[ITEM_DirAudio] = sm_sItemNames[ITEM_Audio] = "Audio";
         sm_sItemNames[ITEM_DirParticles] = sm_sItemNames[ITEM_Particles] = "Particles";
         sm_sItemNames[ITEM_DirFonts] = "Fonts";
