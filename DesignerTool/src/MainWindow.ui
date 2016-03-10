@@ -78,13 +78,15 @@
     <addaction name="actionRemove"/>
     <addaction name="actionRename"/>
    </widget>
-   <widget class="QMenu" name="menuWindow">
+   <widget class="QMenu" name="menu_View">
     <property name="title">
      <string>&amp;View</string>
     </property>
     <addaction name="actionViewExplorer"/>
     <addaction name="actionViewOutputLog"/>
     <addaction name="actionViewAtlasManager"/>
+    <addaction name="separator"/>
+    <addaction name="actionViewProperties"/>
    </widget>
    <widget class="QMenu" name="menuDebug">
     <property name="title">
@@ -94,7 +96,7 @@
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
-   <addaction name="menuWindow"/>
+   <addaction name="menu_View"/>
    <addaction name="menuDebug"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -144,12 +146,15 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidgetGlyphCreator">
+  <widget class="QDockWidget" name="dockWidgetCurrentItem">
+   <property name="features">
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
    <property name="allowedAreas">
     <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Glyph Creator</string>
+    <string>&lt;current open item&gt;</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -168,9 +173,6 @@
      <property name="bottomMargin">
       <number>0</number>
      </property>
-     <item>
-      <widget class="WidgetGlyphCreator" name="glyphCreator" native="true"/>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -280,6 +282,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+P</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionViewOutputLog">
@@ -535,12 +540,6 @@
    <class>WidgetExplorer</class>
    <extends>QWidget</extends>
    <header>WidgetExplorer.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>WidgetGlyphCreator</class>
-   <extends>QWidget</extends>
-   <header>WidgetGlyphCreator.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

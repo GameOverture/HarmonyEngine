@@ -69,6 +69,8 @@ public:
 
     void OpenItem(Item *pItem);
     void CloseItem(Item *pItem);
+    
+    QStringList GetOpenItemPaths();
 
 private:
     Ui::WidgetRenderer *ui;

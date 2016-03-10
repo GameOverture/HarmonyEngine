@@ -369,6 +369,22 @@ Item *WidgetExplorer::GetCurDirSelected(bool bIncludePrefixDirs)
     return pCurItem;
 }
 
+Item *WidgetExplorer::GetItemByPath(QString sItemPathAbsolute)
+{
+    QTreeWidgetItemIterator it(ui->treeWidget);
+    while(*it)
+    {
+        Item *pItem = (*it)->data(0, Qt::UserRole).value<Item *>();
+        
+        if(0 == QString::compare(pItem->GetPath(), sItemPathAbsolute, Qt::CaseInsensitive))
+            return pItem;
+        
+        ++it;
+    }
+    
+    return NULL;
+}
+
 void WidgetExplorer::OnContextMenu(const QPoint &pos)
 {
     QPoint globalPos = ui->treeWidget->mapToGlobal(pos);

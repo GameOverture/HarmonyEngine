@@ -46,6 +46,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     HyGuiLog("Harmony Designer Tool " % QString(HYGUIVERSION_STRING), LOGTYPE_Title);
     HyGuiLog("Initializing...", LOGTYPE_Normal);
     
+    ui->actionViewProperties->setVisible(false);
+    
     ui->actionCloseProject->setEnabled(false);
     ui->actionNewSprite->setEnabled(false);
     ui->actionNewFont->setEnabled(false);
@@ -70,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     m_pDebugConnection = new HyGuiDebugger(*ui->actionConnect, this);
     
     ui->dockWidgetAtlas->hide();
-    ui->dockWidgetGlyphCreator->hide();
+    ui->dockWidgetCurrentItem->hide();
     
     HyGuiLog("Checking required initialization parameters...", LOGTYPE_Normal);
     m_Settings.beginGroup("RequiredParams");
@@ -119,9 +121,13 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
         }
         
         QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
+        sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
+        
         foreach(QString sItemPath, sListOpenItems)
         {
-            //ui->explorer->AddItem(sItemPath, false);
+            Item *pItem = ui->explorer->GetItemByPath(sItemPath);
+            if(pItem)
+                OpenItem(pItem);
         }
     }
     m_Settings.endGroup();
@@ -148,7 +154,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     if(m_bIsInitialized == false)
     {
         ui->actionViewExplorer->setChecked(ui->dockWidgetExplorer->isVisible());
-        ui->actionViewProperties->setChecked(ui->dockWidgetGlyphCreator->isVisible());
+        ui->actionViewProperties->setChecked(ui->dockWidgetCurrentItem->isVisible());
         ui->actionViewOutputLog->setChecked(ui->dockWidgetOutputLog->isVisible());
 
         m_bIsInitialized = true;
@@ -167,6 +173,16 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 {
     // TODO: Ask to save file if changes have been made
     sm_pInstance->ui->renderer->CloseItem(pItem);
+}
+
+/*static*/ void MainWindow::SetCurrentItem(Item *pItem)
+{
+    if(pItem == NULL || pItem->GetType() == ITEM_Project)
+        return;
+    
+    if(sm_pInstance->ui->actionViewProperties->setVisible(true))
+    //sm_pInstance->ui->menu_View->addAction
+    //sm_pInstance->ui->menu_View->addSeparator();ui->actionViewProperties
 }
 
 /*static*/ void MainWindow::SetSelectedProj(ItemProject *pProj)
@@ -276,6 +292,8 @@ void MainWindow::SaveSettings()
     m_Settings.beginGroup("OpenData");
     {
         m_Settings.setValue("openProjs", QVariant(ui->explorer->GetOpenProjectPaths()));
+        
+        m_Settings.setValue("openItems", QVariant(ui->renderer->GetOpenItemPaths()));
     }
     m_Settings.endGroup();
 }

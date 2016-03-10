@@ -136,6 +136,16 @@ void WidgetRenderer::CloseItem(Item *pItem)
     m_ActionQueue.enqueue(std::pair<Item *, eQueuedItem>(pItem, QUEUEDITEM_Close));
 }
 
+QStringList WidgetRenderer::GetOpenItemPaths()
+{
+    QStringList sOpenItemList;
+    
+    for(int i = 0; i < ui->tabWidget->count(); ++i)
+        sOpenItemList.append(reinterpret_cast<TabPage *>(ui->tabWidget->widget(i))->GetItem()->GetPath());
+    
+    return sOpenItemList;
+}
+
 Item *WidgetRenderer::GetItem(int iIndex /*= -1*/)
 {
     if(m_pActiveItemProj)   // Overrides any Item in the current open TabPage
