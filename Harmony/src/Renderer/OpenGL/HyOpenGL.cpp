@@ -128,24 +128,31 @@ HyOpenGL::~HyOpenGL(void)
 		m_pShader2d[PRIMITIVE].SetUniform("worldToCameraMatrix", m_mtxView);
 		m_pShader2d[PRIMITIVE].SetUniform("cameraToClipMatrix", m_mtxProj);
 
-		size_t uiDataOffset = renderState.GetDataOffset();
-
 		char *pDrawData = GetVertexData2d();
+		
+		size_t uiDataOffset = renderState.GetDataOffset();
 		pDrawData += uiDataOffset;
-		m_pShader2d[PRIMITIVE].SetUniform("primitiveColor", *reinterpret_cast<vec4 *>(pDrawData));
-		pDrawData += sizeof(vec4);
-		uiDataOffset += sizeof(vec4);
-			
-		m_pShader2d[PRIMITIVE].SetUniform("transformMtx", *reinterpret_cast<mat4 *>(pDrawData));
-		pDrawData += sizeof(mat4);
-		uiDataOffset += sizeof(mat4);
 
-		uint32 iNumVerts = *reinterpret_cast<uint32 *>(pDrawData);
-		uiDataOffset += sizeof(uint32);
+		for(uint32 i = 0; i < renderState.GetNumInstances(); ++i)
+		{
+			m_pShader2d[PRIMITIVE].SetUniform("primitiveColor", *reinterpret_cast<vec4 *>(pDrawData));
+			pDrawData += sizeof(vec4);
+			uiDataOffset += sizeof(vec4);
 			
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)uiDataOffset);
+			m_pShader2d[PRIMITIVE].SetUniform("transformMtx", *reinterpret_cast<mat4 *>(pDrawData));
+			pDrawData += sizeof(mat4);
+			uiDataOffset += sizeof(mat4);
 
-		glDrawArrays(m_eDrawMode, 0, iNumVerts);
+			uint32 iNumVerts = *reinterpret_cast<uint32 *>(pDrawData);
+			pDrawData += sizeof(uint32);
+			uiDataOffset += sizeof(uint32);
+			
+			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)uiDataOffset);
+			glDrawArrays(m_eDrawMode, 0, iNumVerts);
+
+			pDrawData += (sizeof(GLfloat) * 4) * iNumVerts;
+			uiDataOffset += (sizeof(GLfloat) * 4) * iNumVerts;
+		}
 	}
 }
 

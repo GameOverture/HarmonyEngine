@@ -19,6 +19,7 @@ HyPrimitive2d::HyPrimitive2d() :	IHyInst2d(HYINST_Primitive2d, NULL, NULL),
 									m_pVertices(NULL),
 									m_uiNumVerts(0)
 {
+	m_RenderState.SetNumInstances(1);
 }
 
 

@@ -38,6 +38,9 @@ class TestBed : public IHyApplication
 	HyPrimitive2d		m_primBox;
 	HyText2d			m_txtName;
 
+	HyPrimitive2d		m_HorzLine;
+	HyPrimitive2d		m_VertLine;
+
 	HyTexturedQuad2d	m_testSprite;
 
 

@@ -54,16 +54,38 @@ TestBed::~TestBed(void)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	m_primBox.Load();
+	//m_primBox.Load();
 	m_primBox.color.Set(0.0f, 0.0f, 1.0f, 1.0f);
 	m_primBox.SetAsQuad(180.0f, 160.0f, false);
 	m_primBox.SetDisplayOrder(0);
 	m_primBox.pos.Set(-45.0f, 0.0f);
 
-	m_testSprite.Load();
+	//m_testSprite.Load();
 	m_testSprite.SetTextureSource(8, 0, 0, 180, 162);
 	m_testSprite.SetDisplayOrder(1);
 	m_testSprite.pos.Set(0.0f, 0.0f);
+
+
+	vec2 vLinePts[2];
+
+	vLinePts[0].x = -2048.0f;
+	vLinePts[0].y = 0.0f;
+	vLinePts[1].x = 2048.0f;
+	vLinePts[1].y = 0.0f;
+	m_HorzLine.SetAsEdgeChain(vLinePts, 2, false);
+
+	vLinePts[0].x = 0.0f;
+	vLinePts[0].y = -2048.0f;
+	vLinePts[1].x = 0.0f;
+	vLinePts[1].y = 2048.0f;
+	m_VertLine.SetAsEdgeChain(vLinePts, 2, false);
+
+	m_VertLine.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
+	m_HorzLine.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
+
+	m_VertLine.Load();
+	m_HorzLine.Load();
+	
 
 	return true;
 }
@@ -72,12 +94,12 @@ TestBed::~TestBed(void)
 {
 	if(Input().IsBtnDownBuffered(ACTION_1))
 	{
-		m_testSprite.SetCoordinateType(HYCOORDTYPE_Screen, m_pCam_Viewport2);
+		m_testSprite.SetCoordinateType(HYCOORDTYPE_Screen, NULL);//m_pCam_Viewport2);
 		//m_pCam_Viewport2->pos.Tween(40.0f, 40.0f, 5.0f, HyTween::Linear);
 	}
 	if(Input().IsBtnDownBuffered(ACTION_2))
 	{
-		m_testSprite.SetCoordinateType(HYCOORDTYPE_Camera, m_pCam_Viewport2);
+		m_testSprite.SetCoordinateType(HYCOORDTYPE_Camera, NULL);//m_pCam_Viewport2);
 		//m_pCam_Viewport2->pos.Tween(40.0f, 40.0f, 5.0f, HyTween::Linear);
 	}
 	if(Input().IsBtnDownBuffered(ACTION_3))
@@ -90,25 +112,25 @@ TestBed::~TestBed(void)
 	if(Input().IsBtnDown(CAM_LEFT))
 	{
 		m_testSprite.pos.Offset(-fMOVEMENTSPEED, 0.0f);
-		//m_pCam->pos.Offset(-fMOVEMENTSPEED, 0.0f);
+		m_pCam->pos.Offset(-fMOVEMENTSPEED, 0.0f);
 	}
 
 	if(Input().IsBtnDown(CAM_RIGHT))
 	{
 		m_testSprite.pos.Offset(fMOVEMENTSPEED, 0.0f);
-		//m_pCam->pos.Offset(fMOVEMENTSPEED, 0.0f);
+		m_pCam->pos.Offset(fMOVEMENTSPEED, 0.0f);
 	}
 
 	if(Input().IsBtnDown(CAM_UP))
 	{
 		m_testSprite.pos.Offset(0.0f, fMOVEMENTSPEED);
-		//m_pCam->pos.Offset(0.0f, fMOVEMENTSPEED);
+		m_pCam->pos.Offset(0.0f, fMOVEMENTSPEED);
 	}
 
 	if(Input().IsBtnDown(CAM_DOWN))
 	{
 		m_testSprite.pos.Offset(0.0f, -fMOVEMENTSPEED);
-		//m_pCam->pos.Offset(0.0f, -fMOVEMENTSPEED);
+		m_pCam->pos.Offset(0.0f, -fMOVEMENTSPEED);
 	}
 
 	if(Input().IsBtnDownBuffered(SEND_LOG))
