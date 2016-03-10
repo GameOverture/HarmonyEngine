@@ -20,7 +20,7 @@
 using std::vector;
 using std::queue;
 
-#define RENDER_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
+#define HY_GFX_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
 
 class HyGfxComms
 {

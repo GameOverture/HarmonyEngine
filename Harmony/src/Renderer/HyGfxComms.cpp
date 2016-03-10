@@ -14,14 +14,14 @@ HyGfxComms::HyGfxComms()
 	m_pBuffer_Update = m_pBuffer_Shared = m_pBuffer_Render = NULL;
 	m_pAtlasSendQueue_Update = m_pAtlasSendQueue_Shared = m_pAtlasSendQueue_Render = NULL;
 
-	m_pBuffer_Update = new char[RENDER_BUFFER_SIZE];
-	memset(m_pBuffer_Update, 0, RENDER_BUFFER_SIZE);
+	m_pBuffer_Update = new char[HY_GFX_BUFFER_SIZE];
+	memset(m_pBuffer_Update, 0, HY_GFX_BUFFER_SIZE);
 
-	m_pBuffer_Shared = new char[RENDER_BUFFER_SIZE];
-	memset(m_pBuffer_Shared, 0, RENDER_BUFFER_SIZE);
+	m_pBuffer_Shared = new char[HY_GFX_BUFFER_SIZE];
+	memset(m_pBuffer_Shared, 0, HY_GFX_BUFFER_SIZE);
 
-	m_pBuffer_Render = new char[RENDER_BUFFER_SIZE];
-	memset(m_pBuffer_Render, 0, RENDER_BUFFER_SIZE);
+	m_pBuffer_Render = new char[HY_GFX_BUFFER_SIZE];
+	memset(m_pBuffer_Render, 0, HY_GFX_BUFFER_SIZE);
 
 	m_pAtlasSendQueue_Update = new queue<IHyData2d *>();
 	m_pAtlasSendQueue_Shared = new queue<IHyData2d *>();
