@@ -46,8 +46,6 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     HyGuiLog("Harmony Designer Tool " % QString(HYGUIVERSION_STRING), LOGTYPE_Title);
     HyGuiLog("Initializing...", LOGTYPE_Normal);
     
-    ui->actionViewProperties->setVisible(false);
-    
     ui->actionCloseProject->setEnabled(false);
     ui->actionNewSprite->setEnabled(false);
     ui->actionNewFont->setEnabled(false);
@@ -107,6 +105,10 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
         restoreState(m_Settings.value("windowState").toByteArray());
     }
     m_Settings.endGroup();
+    
+    // Start with no open items. "OpenData" below will make this docking window (and Action menu item) visible if any items are to be opened
+    ui->dockWidgetCurrentItem->hide();
+    ui->actionViewProperties->setVisible(false);
 
     ui->actionViewAtlasManager->setChecked(!ui->dockWidgetAtlas->isHidden());
     ui->actionViewExplorer->setChecked(!ui->dockWidgetExplorer->isHidden());
