@@ -5,8 +5,7 @@ GuiDebug/
 Release/
 GuiRelease/
 ipch/
-build-DesignerTool-Jay_s_Desktop_Qt_5_3_MSVC2010_OpenGL_32bit-Debug/
-build-DesignerTool-Jay_s_CDB-Debug/
+build-DesignerTool-*/
 
 *.sdf
 *.opensdf
