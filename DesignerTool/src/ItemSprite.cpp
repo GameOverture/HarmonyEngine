@@ -9,7 +9,6 @@
  *************************************************************************/
 #include "ItemSprite.h"
 
-
 ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
 {
     vec2 vLinePts[2];
@@ -38,14 +37,20 @@ ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
 
 /*virtual*/ void ItemSprite::OnDraw_Close(IHyApplication &hyApp)
 {
+    m_primOriginHorz.Unload();
+    m_primOriginVert.Unload();
 }
 
 /*virtual*/ void ItemSprite::OnDraw_Show(IHyApplication &hyApp)
 {
+    m_primOriginHorz.SetEnabled(true);
+    m_primOriginVert.SetEnabled(true);
 }
 
 /*virtual*/ void ItemSprite::OnDraw_Hide(IHyApplication &hyApp)
 {
+    m_primOriginHorz.SetEnabled(false);
+    m_primOriginVert.SetEnabled(false);
 }
 
 /*virtual*/ void ItemSprite::OnDraw_Update(IHyApplication &hyApp)

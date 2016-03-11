@@ -161,6 +161,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
+// This only requests to the WidgetRenderer to open the item. It will eventually do so, after re-loading any resources
 /*static*/ void MainWindow::OpenItem(Item *pItem)
 {
     sm_pInstance->ui->renderer->OpenItem(pItem);
@@ -175,14 +176,20 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->ui->renderer->CloseItem(pItem);
 }
 
+// This should only be invoked by the WidgetRenderer
 /*static*/ void MainWindow::SetCurrentItem(Item *pItem)
 {
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
     
-    if(sm_pInstance->ui->actionViewProperties->setVisible(true))
-    //sm_pInstance->ui->menu_View->addAction
-    //sm_pInstance->ui->menu_View->addSeparator();ui->actionViewProperties
+    QString sWindowTitle = pItem->GetName() % " Properties";
+    
+    sm_pInstance->ui->actionViewProperties->setVisible(true);
+    sm_pInstance->ui->actionViewProperties->setText(sWindowTitle);
+    
+    sm_pInstance->ui->dockWidgetCurrentItem->setVisible(true);
+    sm_pInstance->ui->dockWidgetCurrentItem->setWindowTitle(sWindowTitle);
+    sm_pInstance->ui->dockWidgetCurrentItem->setWidget(pItem->GetWidget());
 }
 
 /*static*/ void MainWindow::SetSelectedProj(ItemProject *pProj)
@@ -324,4 +331,9 @@ void MainWindow::on_actionConnect_triggered()
 //        HYLOG("TCP server initialized", LOGTYPE_Normal);
 
     m_pDebugConnection->Connect();
+}
+
+void MainWindow::on_actionViewProperties_triggered()
+{
+    ui->dockWidgetCurrentItem->setHidden(!ui->dockWidgetCurrentItem->isHidden());
 }

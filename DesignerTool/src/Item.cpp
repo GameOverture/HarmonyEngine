@@ -12,10 +12,13 @@
 #include "MainWindow.h"
 #include "WidgetRenderer.h"
 
+#include "WidgetSprite.h"
+
 #include <QFileInfo>
 
 Item::Item(eItemType eType, const QString sPath) :  m_eType(ITEM_Unknown),
-                m_pTreeItemPtr(NULL)
+                                                    m_pTreeItemPtr(NULL),
+                                                    m_pWidget(NULL)
 {
     Initialize(eType, sPath);
 }
@@ -90,5 +93,28 @@ void Item::Initialize(eItemType eType, const QString sPath)
     QString sExt = HyGlobal::ItemExt(m_eType);
     if(m_sPath.right(sExt.size()) != sExt)
         m_sPath.append(sExt);
+    
+    switch(m_eType)
+    {
+    case ITEM_Project:
+    case ITEM_DirAudio:
+    case ITEM_DirParticles:
+    case ITEM_DirFonts:
+    case ITEM_DirSpine:
+    case ITEM_DirSprites:
+    case ITEM_DirShaders:
+    case ITEM_DirEntities:
+    case ITEM_DirAtlases:
+    case ITEM_Prefix:
+        break;
+        
+    case ITEM_Sprite:
+        m_pWidget = new WidgetSprite();
+        break;
+        
+    default:
+        HyGuiLog("Item::Initialize() - Widget not specified", LOGTYPE_Error);
+        break;
+    }
 }
 

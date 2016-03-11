@@ -10,6 +10,8 @@
 #include "WidgetRenderer.h"
 #include "ui_WidgetRenderer.h"
 
+#include "MainWindow.h"
+
 WidgetRenderer::WidgetRenderer(QWidget *parent) :   QWidget(parent),
                                                     IHyApplication(HarmonyInit()),
                                                     ui(new Ui::WidgetRenderer),
@@ -174,6 +176,8 @@ void WidgetRenderer::ShowItem(Item *pItem)
 
     if(pItem->GetType() == ITEM_Project)
         m_pActiveItemProj = static_cast<ItemProject *>(pItem);
+    
+    MainWindow::SetCurrentItem(pItem);
         
     pItem->DrawShow(*this);
 }

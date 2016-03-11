@@ -27,6 +27,7 @@ protected:
     QString             m_sPath;
     
     QTreeWidgetItem *   m_pTreeItemPtr;
+    QWidget *           m_pWidget;
     
     Item(eItemType eType, const QString sPath);
     Item(const Item &other);
@@ -35,6 +36,8 @@ protected:
 public:
     eItemType GetType() const                       { return m_eType; }
     QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
+    QWidget *GetWidget() const                      { return m_pWidget; }
+    
     QString GetName() const;
     QString GetPath() const                         { return m_sPath; }
     QIcon GetIcon() const                           { return HyGlobal::ItemIcon(m_eType); }

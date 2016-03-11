@@ -41,8 +41,11 @@ public:
 
     void showEvent(QShowEvent *pEvent);
     
+    // This only requests to the WidgetRenderer to open/close the item. It will eventually do so, after re-loading any resources if need be
     static void OpenItem(Item *pItem);
     static void CloseItem(Item *pItem);
+    
+    // This should only be invoked by the WidgetRenderer
     static void SetCurrentItem(Item *pItem);
     
     static void SetSelectedProj(ItemProject *pProj);
@@ -69,6 +72,8 @@ private slots:
     
     void on_actionConnect_triggered();
 
+    void on_actionViewProperties_triggered();
+    
 private:
     Ui::MainWindow *ui;
 
