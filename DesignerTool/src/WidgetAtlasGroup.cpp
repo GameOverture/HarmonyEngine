@@ -237,6 +237,9 @@ struct SortSelectedFramesPredicate
 
     const uint32 uiRENDERWIDTH = hyApp.Window().GetResolution().x;
     const uint32 uiRENDERHEIGHT = hyApp.Window().GetResolution().y;
+    
+    if(atlasGrp.m_pMouseHoverItem && atlasGrp.m_pMouseHoverItem->isSelected())
+        atlasGrp.m_pMouseHoverItem = NULL;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Preview hover selection
@@ -260,6 +263,8 @@ struct SortSelectedFramesPredicate
                         (uiRENDERHEIGHT * 0.5f) + (pFrame->GetHeight() * -0.5f));
         pFrame->color.A(0.5f);
     }
+    else if(atlasGrp.m_pMouseHoverItem != pHoveredItem)
+        atlasGrp.m_pMouseHoverItem = NULL;
 
     //if(atlasGrp.m_bRefreshDrawUpdate == false)
     //    return;
@@ -279,6 +284,9 @@ struct SortSelectedFramesPredicate
         if(pHoveredFrame != pFrame)
             ResetFrame(pFrame);
     }
+    
+    if(bDebugPrint)
+        HyGuiLog(QString::number(reinterpret_cast<qulonglong>(atlasGrp.m_pMouseHoverItem)), LOGTYPE_Normal);
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
