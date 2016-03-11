@@ -209,10 +209,18 @@ struct PreviewRow
         float fPosY = 0.0f;
         foreach(HyGuiFrame *pFrame, m_Frames)
         {
-            fPosY = pFrame->GetHeight() + iStartPosY + fMidRow;
-            if(pFrame->pos.IsTransforming() == false && pFrame->pos.Y() != fPosY)
+            fPosY = iStartPosY - (pFrame->GetHeight() * 0.5f) - fMidRow;
+            if(pFrame->pos.AnimY().IsTransforming() == false && pFrame->pos.Y() != fPosY)
                 pFrame->pos.AnimY().Tween(fPosY, fTRANS_DUR, HyTween::QuadInOut);
         }
+    }
+};
+
+struct SortSelectedFramesPredicate
+{
+    bool operator()(const QTreeWidgetItem *pA, const QTreeWidgetItem *pB) const
+    {
+        return QString::compare(pA->text(0), pB->text(0)) < 0;
     }
 };
 
@@ -281,6 +289,8 @@ struct PreviewRow
     curRow.Clear();
 
     QList<QTreeWidgetItem *> selectedItems = atlasGrp.ui->atlasList->selectedItems();
+    qSort(selectedItems.begin(), selectedItems.end(), SortSelectedFramesPredicate());
+    
     for(int i = 0; i < selectedItems.size(); ++i)
     {
         QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
@@ -288,7 +298,6 @@ struct PreviewRow
 
         if(pFrame == NULL)
             continue;
-
 
         pFrame->SetEnabled(true);
         pFrame->color.A(1.0f);
@@ -298,28 +307,30 @@ struct PreviewRow
         float fFrameHeight = pFrame->IsRotated() ? pFrame->GetWidth() : pFrame->GetHeight();
 
         // Will it fit in this row
-        if(ptDrawPos.x() + fFrameWidth < uiRENDERWIDTH)
-        {
-            if(pFrame->pos.IsTransforming() == false && pFrame->pos.X() != ptDrawPos.x())
-                pFrame->pos.AnimX().Tween(ptDrawPos.x(), fTRANS_DUR, HyTween::QuadInOut);
-
-            ptDrawPos.setX(ptDrawPos.x() + fFrameWidth + iPADDING);
-
-            if(curRow.m_iLargestHeight < fFrameHeight)
-                curRow.m_iLargestHeight = fFrameHeight;
-
-            curRow.m_Frames.append(pFrame);
-        }
-        else // Row filled, process it
+        if(ptDrawPos.x() + fFrameWidth > uiRENDERWIDTH)
         {
             curRow.TweenPosY(uiRENDERHEIGHT - ptDrawPos.y());
-            ptDrawPos.setY(ptDrawPos.y() + curRow.m_iLargestHeight + iPADDING);
-
+            
             ptDrawPos.setX(0);
+            ptDrawPos.setY(ptDrawPos.y() + curRow.m_iLargestHeight + iPADDING);
+            
             curRow.Clear();
         }
-    }
+        
+        float fPosX = ptDrawPos.x() + (pFrame->IsRotated() ? ((fFrameWidth * 0.5f) - (fFrameHeight * 0.5f)) : 0);
+        
+        if(pFrame->pos.AnimX().IsTransforming() == false && pFrame->pos.X() != ptDrawPos.x())
+            pFrame->pos.AnimX().Tween(fPosX, fTRANS_DUR, HyTween::QuadInOut);
 
+        ptDrawPos.setX(ptDrawPos.x() + fFrameWidth + iPADDING);
+
+        if(curRow.m_iLargestHeight < fFrameHeight)
+            curRow.m_iLargestHeight = fFrameHeight;
+
+        curRow.m_Frames.append(pFrame);
+    }
+    
+    curRow.TweenPosY(uiRENDERHEIGHT - ptDrawPos.y());
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //QPointF ptCamPos(uiCurWidth * 0.5f, uiCurHeight * 0.5f);
