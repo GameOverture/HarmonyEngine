@@ -58,7 +58,7 @@ ItemProject::~ItemProject()
 
 QString ItemProject::GetDirPath() const
 {
-    QFileInfo file(m_sPath);
+    QFileInfo file(m_sPATH);
     return file.dir().absolutePath() + '/';
 }
 

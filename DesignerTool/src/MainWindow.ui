@@ -388,6 +388,9 @@
    <property name="text">
     <string>Remo&amp;ve</string>
    </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
   </action>
   <action name="actionCloseProject">
    <property name="icon">
@@ -457,6 +460,9 @@
    <property name="toolTip">
     <string>Add a new sprite item in the currently selected project</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N, Ctrl+S</string>
+   </property>
   </action>
   <action name="actionRename">
    <property name="text">
@@ -474,6 +480,9 @@
    <property name="text">
     <string>Font</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N, Ctrl+F</string>
+   </property>
   </action>
   <action name="actionNewParticle">
    <property name="icon">
@@ -486,6 +495,9 @@
    <property name="toolTip">
     <string>Add a new particle effect in the currently selected project</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N, Ctrl+P</string>
+   </property>
   </action>
   <action name="actionNewAudio">
    <property name="icon">
@@ -497,6 +509,9 @@
    </property>
    <property name="toolTip">
     <string>Add a new audio bank in the currently selected project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N, Ctrl+A</string>
    </property>
   </action>
   <action name="actionViewAtlasManager">

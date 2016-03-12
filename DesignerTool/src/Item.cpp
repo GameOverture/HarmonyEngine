@@ -16,16 +16,16 @@
 
 #include <QFileInfo>
 
-Item::Item(eItemType eType, const QString sPath) :  m_eType(ITEM_Unknown),
-                                                    m_pTreeItemPtr(NULL),
-                                                    m_pWidget(NULL)
-{
-    Initialize(eType, sPath);
-}
+#include "Harmony/Utilities/HyStrManip.h"
 
-Item::Item(const Item &other)
+Item::Item(eItemType eType, const QString sPath) :  m_eTYPE(eType),
+                                                    m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str()).c_str()),
+                                                    m_pTreeItemPtr(NULL),
+                                                    m_pWidget(NULL),
+                                                    m_pEditMenu(NULL),
+                                                    m_pUndoStack(NULL)
 {
-    Initialize(other.GetType(), other.GetPath());
+
 }
 
 Item::~Item()
@@ -38,8 +38,8 @@ Item::~Item()
 QString Item::GetName() const
 {
     // NOTE: We must remove the extension because dir items use "/", which doesn't work with QFileInfo::baseName()
-    QString sPathWithoutExt = m_sPath;
-    sPathWithoutExt.truncate(m_sPath.size() - HyGlobal::ItemExt(m_eType).size());
+    QString sPathWithoutExt = m_sPATH;
+    sPathWithoutExt.truncate(m_sPATH.size() - HyGlobal::ItemExt(m_eTYPE).size());
     
     QFileInfo itemInfo;
     itemInfo.setFile(sPathWithoutExt);
@@ -76,45 +76,3 @@ QString Item::GetName() const
 {
     HyGuiLog("Tried to save a non-derived item: " % GetName(), LOGTYPE_Error);
 }
-
-void Item::Initialize(eItemType eType, const QString sPath)
-{
-    m_eType = eType;
-
-    if(m_eType == ITEM_Unknown)
-    {
-        HyGuiLog("Setting path of unknown item (" % m_sPath % ")", LOGTYPE_Error);
-        return;
-    }
-
-    m_sPath = sPath;
-    m_sPath.replace(QChar('\\'), QChar('/'));
-
-    QString sExt = HyGlobal::ItemExt(m_eType);
-    if(m_sPath.right(sExt.size()) != sExt)
-        m_sPath.append(sExt);
-    
-    switch(m_eType)
-    {
-    case ITEM_Project:
-    case ITEM_DirAudio:
-    case ITEM_DirParticles:
-    case ITEM_DirFonts:
-    case ITEM_DirSpine:
-    case ITEM_DirSprites:
-    case ITEM_DirShaders:
-    case ITEM_DirEntities:
-    case ITEM_DirAtlases:
-    case ITEM_Prefix:
-        break;
-        
-    case ITEM_Sprite:
-        m_pWidget = new WidgetSprite();
-        break;
-        
-    default:
-        HyGuiLog("Item::Initialize() - Widget not specified", LOGTYPE_Error);
-        break;
-    }
-}
-

@@ -8,9 +8,18 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "ItemSprite.h"
+#include <QAction>
 
 ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
 {
+    m_pWidgetSprite = static_cast<WidgetSprite *>(m_pWidget);
+
+    //QAction
+
+    m_pWidget = new WidgetSprite();
+    m_pEditMenu = new QMenu("Edit");
+    m_pUndoStack = new QUndoStack();
+
     vec2 vLinePts[2];
     
     vLinePts[0].x = -2048.0f;

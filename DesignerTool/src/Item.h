@@ -11,6 +11,8 @@
 #define ITEM_H
 
 #include <QTreeWidget>
+#include <QMenu>
+#include <QUndoStack>
 
 #include "HyGlobal.h"
 #include "IHyGuiDrawItem.h"
@@ -23,24 +25,26 @@ class Item : public IHyGuiDrawItem
     friend class WidgetExplorer;
     
 protected:
-    eItemType           m_eType;
-    QString             m_sPath;
+    const eItemType     m_eTYPE;
+    const QString       m_sPATH;
     
     QTreeWidgetItem *   m_pTreeItemPtr;
     QWidget *           m_pWidget;
+
+    QMenu *             m_pEditMenu;
+    QUndoStack *        m_pUndoStack;
     
     Item(eItemType eType, const QString sPath);
-    Item(const Item &other);
     ~Item();
     
 public:
-    eItemType GetType() const                       { return m_eType; }
+    eItemType GetType() const                       { return m_eTYPE; }
     QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
     QWidget *GetWidget() const                      { return m_pWidget; }
     
     QString GetName() const;
-    QString GetPath() const                         { return m_sPath; }
-    QIcon GetIcon() const                           { return HyGlobal::ItemIcon(m_eType); }
+    QString GetPath() const                         { return m_sPATH; }
+    QIcon GetIcon() const                           { return HyGlobal::ItemIcon(m_eTYPE); }
     
     void SetTreeItem(QTreeWidgetItem *pTreeItem)    { m_pTreeItemPtr = pTreeItem; }
     
@@ -56,9 +60,6 @@ public:
 signals:
     
 public slots:
-
-private:
-    void Initialize(eItemType eType, const QString sPath);
     
 };
 Q_DECLARE_METATYPE(Item *)

@@ -142,7 +142,6 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         HyGuiLog("Item: " % sNewItemPath % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
         return;
     }
-    pItem->Initialize(eNewItemType, sNewItemPath);
     
     // NOTE: Cannot use GetCurProjSelected() because this function may be called without anything selected in explorer widget. AKA opening an existing project and adding all its contents
     //
