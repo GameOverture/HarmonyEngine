@@ -64,8 +64,15 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Add a new state</string>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="res/DesignerTool.qrc">
+            <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
           </property>
          </widget>
         </item>
@@ -77,8 +84,15 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Remove state</string>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="res/DesignerTool.qrc">
+            <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
           </property>
          </widget>
         </item>
@@ -97,8 +111,15 @@
         </item>
         <item>
          <widget class="QPushButton" name="btnRenameState">
+          <property name="toolTip">
+           <string>Rename state</string>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="res/DesignerTool.qrc">
+            <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
           </property>
          </widget>
         </item>
@@ -123,8 +144,15 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Order state upward</string>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="res/DesignerTool.qrc">
+            <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
           </property>
          </widget>
         </item>
@@ -136,8 +164,15 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Order state downward</string>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="res/DesignerTool.qrc">
+            <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
           </property>
          </widget>
         </item>
@@ -296,8 +331,15 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Import frames from Atlas Manager</string>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="res/DesignerTool.qrc">
+            <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
           </property>
          </widget>
         </item>
@@ -309,8 +351,15 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Remove selected frames</string>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="res/DesignerTool.qrc">
+            <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
           </property>
          </widget>
         </item>
@@ -335,8 +384,15 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Order frame upward</string>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="res/DesignerTool.qrc">
+            <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
           </property>
          </widget>
         </item>
@@ -348,8 +404,15 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Order frame downward</string>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="res/DesignerTool.qrc">
+            <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
           </property>
          </widget>
         </item>
@@ -359,7 +422,33 @@
     </widget>
    </item>
   </layout>
+  <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-undo.png</normaloff>:/icons16x16/edit-undo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-redo.png</normaloff>:/icons16x16/edit-redo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Z</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="res/DesignerTool.qrc"/>
+ </resources>
  <connections/>
 </ui>

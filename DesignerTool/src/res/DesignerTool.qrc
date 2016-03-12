@@ -42,5 +42,9 @@
         <file>icons16x16/atlas-frameWarning.png</file>
         <file>icons16x16/debug-connected.png</file>
         <file>icons16x16/debug-notConnected.png</file>
+        <file>icons16x16/generic-add.png</file>
+        <file>icons16x16/generic-rename.png</file>
+        <file>icons16x16/generic-down.png</file>
+        <file>icons16x16/generic-up.png</file>
     </qresource>
 </RCC>
