@@ -39,7 +39,8 @@ SOURCES += main.cpp \
     WidgetAtlasGroup.cpp \
     HyGuiDebugger.cpp \
     IHyGuiDrawItem.cpp \
-    DlgSetEngineLocation.cpp
+    DlgSetEngineLocation.cpp \
+    ItemSpriteCmds.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -67,7 +68,8 @@ HEADERS  += \
     WidgetAtlasGroup.h \
     HyGuiDebugger.h \
     IHyGuiDrawItem.h \
-    DlgSetEngineLocation.h
+    DlgSetEngineLocation.h \
+    ItemSpriteCmds.h
 
 FORMS    += \
     DlgNewProject.ui \

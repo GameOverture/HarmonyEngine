@@ -9,16 +9,16 @@
  *************************************************************************/
 #include "ItemSprite.h"
 #include <QAction>
+#include <QUndoView>
 
 ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
 {
-    m_pWidgetSprite = static_cast<WidgetSprite *>(m_pWidget);
+    m_pWidget = new WidgetSprite(this);
 
-    //QAction
-
-    m_pWidget = new WidgetSprite();
-    m_pEditMenu = new QMenu("Edit");
-    m_pUndoStack = new QUndoStack();
+//    m_pUndoView = new QUndoView(undoStack);
+//    m_pUndoView->setWindowTitle(tr("Command List"));
+//    m_pUndoView->show();
+//    m_pUndoView->setAttribute(Qt::WA_QuitOnClose, false);
 
     vec2 vLinePts[2];
     
@@ -70,3 +70,4 @@ ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
 {
     
 }
+

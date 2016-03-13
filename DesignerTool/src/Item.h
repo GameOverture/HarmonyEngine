@@ -11,8 +11,6 @@
 #define ITEM_H
 
 #include <QTreeWidget>
-#include <QMenu>
-#include <QUndoStack>
 
 #include "HyGlobal.h"
 #include "IHyGuiDrawItem.h"
@@ -30,9 +28,6 @@ protected:
     
     QTreeWidgetItem *   m_pTreeItemPtr;
     QWidget *           m_pWidget;
-
-    QMenu *             m_pEditMenu;
-    QUndoStack *        m_pUndoStack;
     
     Item(eItemType eType, const QString sPath);
     ~Item();

@@ -17,8 +17,6 @@
 class ItemSprite : public Item
 {
     friend class WidgetExplorer;
-
-    WidgetSprite *      m_pWidgetSprite;
     
     HyPrimitive2d       m_primOriginHorz;
     HyPrimitive2d       m_primOriginVert;
