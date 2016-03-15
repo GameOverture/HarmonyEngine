@@ -36,7 +36,8 @@
 MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
                                             ui(new Ui::MainWindow),
                                             m_Settings("Overture Games", "Harmony Designer Tool"),
-                                            m_bIsInitialized(false)
+                                            m_bIsInitialized(false),
+                                            m_pCurEditMenu(NULL)
 {
     ui->setupUi(this);
     sm_pInstance = this;
@@ -163,7 +164,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
-// This only requests to the WidgetRenderer to open the item. It will eventually do so, after re-loading any resources
+// This only requests to the WidgetRenderer to open the item. It will eventually do so, after re-loading any resources it needs to
 /*static*/ void MainWindow::OpenItem(Item *pItem)
 {
     sm_pInstance->ui->renderer->OpenItem(pItem);
@@ -192,6 +193,13 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->ui->dockWidgetCurrentItem->setVisible(true);
     sm_pInstance->ui->dockWidgetCurrentItem->setWindowTitle(sWindowTitle);
     sm_pInstance->ui->dockWidgetCurrentItem->setWidget(pItem->GetWidget());
+
+    if(sm_pInstance->m_pCurEditMenu)
+        sm_pInstance->ui->menuBar->removeAction(sm_pInstance->m_pCurEditMenu->menuAction());
+
+    sm_pInstance->m_pCurEditMenu = pItem->GetEditMenu();
+    if(sm_pInstance->m_pCurEditMenu)
+        sm_pInstance->ui->menuBar->insertMenu(sm_pInstance->ui->menu_View->menuAction(), sm_pInstance->m_pCurEditMenu);
 }
 
 /*static*/ void MainWindow::SetSelectedProj(ItemProject *pProj)

@@ -19,21 +19,20 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :  QWidget(
 {
     ui->setupUi(this);
 
+    QMenu *pEditMenu = m_pItemSprite->GetEditMenu();
 
-    m_pEditMenu = new QMenu("Edit");
     m_pUndoStack = new QUndoStack();
-
-    QAction *pActionUndo = m_pUndoStack->createUndoAction(m_pEditMenu, "&Undo");
+    QAction *pActionUndo = m_pUndoStack->createUndoAction(pEditMenu, "&Undo");
     pActionUndo->setIcon(QIcon(":/icons16x16/generic-undo.png"));
     pActionUndo->setShortcuts(QKeySequence::Undo);
 
-    QAction *pActionRedo = m_pUndoStack->createRedoAction(m_pEditMenu, "&Redo");
+    QAction *pActionRedo = m_pUndoStack->createRedoAction(pEditMenu, "&Redo");
     pActionRedo->setIcon(QIcon(":/icons16x16/generic-redo.png"));
     pActionRedo->setShortcuts(QKeySequence::Redo);
 
-    m_pEditMenu->addAction(pActionUndo);
-    m_pEditMenu->addAction(pActionRedo);
-    m_pEditMenu->addSeparator();
+    pEditMenu->addAction(pActionUndo);
+    pEditMenu->addAction(pActionRedo);
+    pEditMenu->addSeparator();
 }
 
 WidgetSprite::~WidgetSprite()

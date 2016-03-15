@@ -28,6 +28,7 @@ protected:
     
     QTreeWidgetItem *   m_pTreeItemPtr;
     QWidget *           m_pWidget;
+    QMenu *             m_pEditMenu;
     
     Item(eItemType eType, const QString sPath);
     ~Item();
@@ -36,6 +37,7 @@ public:
     eItemType GetType() const                       { return m_eTYPE; }
     QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
     QWidget *GetWidget() const                      { return m_pWidget; }
+    QMenu *GetEditMenu() const                      { return m_pEditMenu; }
     
     QString GetName() const;
     QString GetPath() const                         { return m_sPATH; }

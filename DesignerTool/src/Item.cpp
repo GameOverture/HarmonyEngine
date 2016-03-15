@@ -21,9 +21,32 @@
 Item::Item(eItemType eType, const QString sPath) :  m_eTYPE(eType),
                                                     m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str()).c_str()),
                                                     m_pTreeItemPtr(NULL),
-                                                    m_pWidget(NULL)
+                                                    m_pWidget(NULL),
+                                                    m_pEditMenu(NULL)
 {
-
+    switch(m_eTYPE)
+    {
+    case ITEM_Project:
+    case ITEM_DirAudio:
+    case ITEM_DirParticles:
+    case ITEM_DirFonts:
+    case ITEM_DirSpine:
+    case ITEM_DirSprites:
+    case ITEM_DirShaders:
+    case ITEM_DirEntities:
+    case ITEM_DirAtlases:
+    case ITEM_Prefix:
+        break;
+    case ITEM_Audio:
+    case ITEM_Particles:
+    case ITEM_Font:
+    case ITEM_Spine:
+    case ITEM_Shader:
+    case ITEM_Entity:
+    case ITEM_Sprite:
+        m_pEditMenu = new QMenu("Edit");
+        break;
+    }
 }
 
 Item::~Item()

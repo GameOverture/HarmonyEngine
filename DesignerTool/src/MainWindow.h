@@ -32,6 +32,7 @@ class MainWindow : public QMainWindow
     bool                m_bIsInitialized;
     
     ItemProject *       m_pCurSelectedProj;
+    QMenu *             m_pCurEditMenu;
     
     HyGuiDebugger *     m_pDebugConnection;
 

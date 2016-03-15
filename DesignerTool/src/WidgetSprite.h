@@ -28,7 +28,6 @@ class WidgetSprite : public QWidget
     ItemSprite *        m_pItemSprite;
 
     QUndoStack *        m_pUndoStack;
-    QMenu *             m_pEditMenu;
 
     struct State
     {
