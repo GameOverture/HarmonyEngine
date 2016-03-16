@@ -84,6 +84,8 @@ public:
 	void AddChild(IHyInst2d &childInst);
 	void Detach();
 
+	//void AddShader?
+
 protected:
 	virtual void OnDataLoaded() = 0;
 	virtual void Update() = 0;
