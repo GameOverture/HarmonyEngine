@@ -90,22 +90,18 @@ HyOpenGLShader::~HyOpenGLShader()
 //	return CompileFromString(m_sCurSrcCode.c_str(), eType);
 //}
 
-bool HyOpenGLShader::CompileFromString(const char *szSource, eGLSLShaderType type)
+void HyOpenGLShader::CompileFromString(const char *szSource, eGLSLShaderType type)
 {
 	// Create main program handle if one hasn't been created yet (first shader compile)
 	if(m_hProgHandle <= 0)
 	{
 		m_hProgHandle = glCreateProgram();
-		if( m_hProgHandle == 0) 
-		{
-			m_sLogStr = "Unable to create shader program.";
-			return false;
-		}
+		HyAssert(m_hProgHandle != 0, "Unable to create shader program");
 	}
 
 	GLuint iShaderHandle = 0;
 
-	switch( type )
+	switch(type)
 	{
 	case VERTEX:			iShaderHandle = glCreateShader(GL_VERTEX_SHADER);				break;
 	case FRAGMENT:			iShaderHandle = glCreateShader(GL_FRAGMENT_SHADER);				break;
@@ -113,84 +109,70 @@ bool HyOpenGLShader::CompileFromString(const char *szSource, eGLSLShaderType typ
 	case TESS_CONTROL:		iShaderHandle = glCreateShader(GL_TESS_CONTROL_SHADER);			break;
 	case TESS_EVALUATION:	iShaderHandle = glCreateShader(GL_TESS_EVALUATION_SHADER);		break;
 	default:
-		m_sLogStr = "Unknown shader type";
-		return false;
+		HyError("Unknown shader type");
 	}
 
 	// Compile the shader from the passed in source code
 	glShaderSource(iShaderHandle, 1, &szSource, NULL);
 	glCompileShader(iShaderHandle);
 
+#ifdef HY_DEBUG
 	// Check for errors
 	GLint result;
 	glGetShaderiv(iShaderHandle, GL_COMPILE_STATUS, &result);
 	if(GL_FALSE == result)
 	{
-		// Compile failed, store Log and return false
+		// Compile failed
 		GLint iLength = 0;
-		m_sLogStr.clear();
 		glGetShaderiv(iShaderHandle, GL_INFO_LOG_LENGTH, &iLength);
 		if(iLength > 0)
 		{
 			char *szlog = new char[iLength];
 			GLint written = 0;
 			glGetShaderInfoLog(iShaderHandle, iLength, &written, szlog);
+			
 			HyError(szlog);
-
-			m_sLogStr = szlog;
-			delete [] szlog;
+			delete [] szlog;	// Not that this matters
 		}
-
-		return false;
 	}
-	else
-	{
-		// Compile succeeded, attach shader and return true
-		glAttachShader(m_hProgHandle, iShaderHandle);
-		return true;
-	}
+#endif
+	
+	// Compile succeeded, attach shader
+	glAttachShader(m_hProgHandle, iShaderHandle);
 }
 
-bool HyOpenGLShader::Link()
+void HyOpenGLShader::Link()
 {
-	if( m_bLinked )
-		return true;
+	if(m_bLinked)
+		return;
 
-	if( m_hProgHandle <= 0 )
-	{
-		m_sLogStr = "Shader has not been created yet";
-		return false;
-	}
+	HyAssert(m_hProgHandle > 0, "Shader has not been created yet");
 
 	glLinkProgram(m_hProgHandle);
 
+#ifdef HY_DEBUG
 	GLint status = 0;
 	glGetProgramiv( m_hProgHandle, GL_LINK_STATUS, &status);
 	if(GL_FALSE == status)
 	{
-		// Store Log and return false
 		GLint length = 0;
-		m_sLogStr.clear();
 
 		glGetProgramiv(m_hProgHandle, GL_INFO_LOG_LENGTH, &length);
 
-		if( length > 0 )
+		if( length > 0)
 		{
 			char *szlog = new char[length];
 			GLint written = 0;
 			glGetProgramInfoLog(m_hProgHandle, length, &written, szlog);
 
-			m_sLogStr = szlog;
-			delete [] szlog;
+			HyError("Shader program failed to link!\n" << szlog);
+			delete [] szlog;	// Not that this matters
 		}
+	}
+#endif
 
-		return false;
-	}
-	else
-	{
-		m_bLinked = true;
-		return m_bLinked;
-	}
+	// TODO: After linking (whether successfully or not), it is a good idea to detach all shader objects from the program. Call glDetachShader and glDeleteShader (If not intended to use shader object to link another program)
+	m_bLinked = true;
 }
 
 void HyOpenGLShader::Use()
@@ -199,11 +181,6 @@ void HyOpenGLShader::Use()
 		return;
 
 	glUseProgram(m_hProgHandle);
-}
-
-std::string HyOpenGLShader::Log()
-{
-	return m_sLogStr;
 }
 
 GLint HyOpenGLShader::GetHandle()

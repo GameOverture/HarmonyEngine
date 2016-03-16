@@ -14,7 +14,7 @@
 
 #include <math.h>
 
-typedef float (*TweenUpdateFunc)(float);
+typedef float (*HyTweenUpdateFunc)(float);
 
 class HyTween
 {

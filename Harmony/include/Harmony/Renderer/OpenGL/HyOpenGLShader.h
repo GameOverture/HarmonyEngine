@@ -23,9 +23,6 @@ class HyOpenGLShader
 	bool								m_bLinked;
 	std::string							m_sCurSrcCode;
 
-	// Diagnostics
-	std::string							m_sLogStr;
-
 public:
 	enum eGLSLShaderType
 	{
@@ -36,12 +33,10 @@ public:
 	HyOpenGLShader();
 	virtual HyOpenGLShader::~HyOpenGLShader();
 
-	bool   CompileFromFile(const char *szFileName, eGLSLShaderType eType);
-	bool   CompileFromString(const char *szSource, eGLSLShaderType eType);
-	bool   Link();
-	void   Use();
-
-	std::string Log();
+	bool CompileFromFile(const char *szFileName, eGLSLShaderType eType);
+	void CompileFromString(const char *szSource, eGLSLShaderType eType);
+	void Link();
+	void Use();
 
 	int GetHandle();
 	bool IsLinked();
@@ -63,9 +58,6 @@ public:
 
 	void PrintActiveUniforms();
 	void PrintActiveAttribs();
-
-private:
-	bool FileExists(const HyString & fileName);
 };
 
 #endif /* __HyOpenGLShader_h__ */

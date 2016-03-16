@@ -87,8 +87,6 @@ out vec4 outputColor;														\n\
 void main()																	\n\
 {																			\n\
 	// Blend interpColor with whatever texel I get from interpUV			\n\
-	//float fLayer = (float)texIndex;										\n\
-																			\n\
 	vec4 texelClr = texture(Tex, vec3(interpUV.x, interpUV.y, texIndex));	\n\
 																			\n\
 	outputColor = interpColor * texelClr;									\n\

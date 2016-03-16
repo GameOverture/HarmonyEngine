@@ -186,6 +186,9 @@
     <ClCompile Include="src\Renderer\Viewport\HyCamera.cpp">
       <Filter>Renderer\Viewport</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\IHyShader.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -530,6 +533,9 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\Viewport\HyCamera.h">
       <Filter>Renderer\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\IHyShader.h">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

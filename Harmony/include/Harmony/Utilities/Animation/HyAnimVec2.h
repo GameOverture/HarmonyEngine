@@ -56,13 +56,13 @@ public:
 	inline HyAnimFloat &AnimX()							{ return m_vAnimFloats[0]; }
 	inline HyAnimFloat &AnimY()							{ return m_vAnimFloats[1]; }
 
-	void Tween(float fX, float fY, float fSeconds, TweenUpdateFunc fpEase)
+	void Tween(float fX, float fY, float fSeconds, HyTweenUpdateFunc fpEase)
 	{
 		m_vAnimFloats[0].Tween(fX, fSeconds, fpEase);
 		m_vAnimFloats[1].Tween(fY, fSeconds, fpEase);
 	}
 
-	void TweenOffset(float fOffsetX, float fOffsetY, float fSeconds, TweenUpdateFunc fpEase)
+	void TweenOffset(float fOffsetX, float fOffsetY, float fSeconds, HyTweenUpdateFunc fpEase)
 	{
 		m_vAnimFloats[0].TweenOffset(fOffsetX, fSeconds, fpEase);
 		m_vAnimFloats[1].TweenOffset(fOffsetY, fSeconds, fpEase);

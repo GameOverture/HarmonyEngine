@@ -46,6 +46,7 @@ IHyRenderer::~IHyRenderer(void)
 void IHyRenderer::Update()
 {
 	// Iterate through 'm_vWindowRef' to find any dirty RenderSurface's that need processing
+	// TODO: Make the application's HyWindow (ref to 'm_vWindowRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_vWindowRef.size()); ++i)
 	{
 		HyWindowInfo &windowInfoRef = m_vWindowRef[i].Update_Render();

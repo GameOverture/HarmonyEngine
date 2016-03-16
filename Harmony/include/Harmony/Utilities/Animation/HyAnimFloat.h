@@ -33,7 +33,7 @@ class HyAnimFloat
 
 	const bool				m_bSELF_ALLOCATED;
 
-	TweenUpdateFunc			m_fpEaseFunc;
+	HyTweenUpdateFunc			m_fpEaseFunc;
 	//float (HyEase::*m_fpEaseFunc)(float);
 
 	bool (HyAnimFloat::*m_fpBehaviorUpdate)();
@@ -51,9 +51,9 @@ public:
 
 	// Procedural transformation functions
 	bool IsTransforming()				{ return m_bAddedToSceneUpdate; }
-	void Tween(float fFrom, float fTo, float fSeconds, TweenUpdateFunc fpEase);
-	void Tween(float fTo, float fSeconds, TweenUpdateFunc fpEase);
-	void TweenOffset(float fOffsetAmt, float fSeconds, TweenUpdateFunc fpEase);
+	void Tween(float fFrom, float fTo, float fSeconds, HyTweenUpdateFunc fpEase);
+	void Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpEase);
+	void TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFunc fpEase);
 	//void Follow(float &fToFollow, float fOffsetAmt);
 	//void Sequence(...);
 

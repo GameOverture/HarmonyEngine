@@ -21,34 +21,39 @@
 #include "Renderer/HyRenderState.h"
 #include "Renderer/Viewport/HyCamera.h"
 
+typedef void (*HyWriteDrawBufferDataOverride)(char *&);
+
 class IHyInst2d : public ITransform<HyAnimVec2>
 {
 	friend class HyScene;
 	friend class HyAssetManager;
 
-	static HyAssetManager *		sm_pAssetManager;
+	static HyAssetManager *			sm_pAssetManager;
 
 protected:
-	const HyInstanceType		m_eTYPE;
-	const std::string			m_sNAME;
-	const std::string			m_sPREFIX;
+	const HyInstanceType			m_eTYPE;
+	const std::string				m_sNAME;
+	const std::string				m_sPREFIX;
 
 	// Data loading
-	IHyData *					m_pData;
-	HyLoadState					m_eLoadState;
-	bool						m_bInvalidLoad;
+	IHyData *						m_pData;
+	HyLoadState						m_eLoadState;
+	bool							m_bInvalidLoad;
 
 	// Scene graph hierarchy 
-	IHyInst2d *					m_pParent;
-	bool						m_bDirty;
-	mat4						m_mtxCached;
-	vector<IHyInst2d *>			m_vChildList;
+	IHyInst2d *						m_pParent;
+	bool							m_bDirty;
+	mat4							m_mtxCached;
+	vector<IHyInst2d *>				m_vChildList;
 
 	// Attributes
-	HyCoordinateType			m_eCoordType;
-	int32						m_iDisplayOrder;	// Higher values are displayed front-most
-	HyRenderState				m_RenderState;
-	int32						m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
+	HyCoordinateType				m_eCoordType;
+	int32							m_iDisplayOrder;	// Higher values are displayed front-most
+	HyRenderState					m_RenderState;
+	int32							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
+
+	// Custom shader
+	HyWriteDrawBufferDataOverride	m_fpWriteDrawBufferOverride;
 
 public:
 	IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName);
@@ -84,7 +89,7 @@ public:
 	void AddChild(IHyInst2d &childInst);
 	void Detach();
 
-	//void AddShader?
+	//void SetCustomShader(HyCustomShader *pShader, HyWriteDrawBufferDataOverride = NULL);
 
 protected:
 	virtual void OnDataLoaded() = 0;

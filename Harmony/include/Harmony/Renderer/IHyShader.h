@@ -1,0 +1,22 @@
+/**************************************************************************
+*	IHyShader.h
+*
+*	Harmony Engine
+*	Copyright (c) 2016 Jason Knobler
+*
+*	The zlib License (zlib)
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
+#ifndef __IHyShader_h__
+#define __IHyShader_h__
+
+#include "Afx/HyStdAfx.h"
+
+class IHyShader
+{
+public:
+	IHyShader();
+	virtual ~IHyShader();
+};
+
+#endif /* __IHyShader_h__ */

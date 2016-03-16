@@ -59,13 +59,13 @@ public:
 	inline HyAnimFloat &AnimY()							{ return m_vAnimFloats[1]; }
 	inline HyAnimFloat &AnimZ()							{ return m_vAnimFloats[2]; }
 
-	void Tween(float fX, float fY, float fZ, float fSeconds, TweenUpdateFunc fpEase)
+	void Tween(float fX, float fY, float fZ, float fSeconds, HyTweenUpdateFunc fpEase)
 	{
 		m_vAnimFloats[0].TweenOffset(fX, fSeconds, fpEase);
 		m_vAnimFloats[1].TweenOffset(fY, fSeconds, fpEase);
 		m_vAnimFloats[2].TweenOffset(fZ, fSeconds, fpEase);
 	}
-	void TweenOffset(float fOffsetX, float fOffsetY, float fOffsetZ, float fSeconds, TweenUpdateFunc fpEase);
+	void TweenOffset(float fOffsetX, float fOffsetY, float fOffsetZ, float fSeconds, HyTweenUpdateFunc fpEase);
 
 	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam) { for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].SetOnDirtyCallback(fpOnDirty, pParam); }
 
