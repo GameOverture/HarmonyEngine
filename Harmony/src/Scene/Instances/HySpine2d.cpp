@@ -195,7 +195,7 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 	//AnimSetState(m_uiNumAnims, m_bLooping);
 }
 
-/*virtual*/ void HySpine2d::WriteDrawBufferData(char *&pRefDataWritePos)
+/*virtual*/ void HySpine2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)
 {
 	spSlot *pCurSlot;
 	for (int i = 0; i < m_pSpineSkeleton->slotCount; ++i)

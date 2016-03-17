@@ -89,17 +89,19 @@ public:
 	void AddChild(IHyInst2d &childInst);
 	void Detach();
 
-	//void SetCustomShader(HyCustomShader *pShader, HyWriteDrawBufferDataOverride = NULL);
+	void SetCustomShader(IHyShader *pShader, HyWriteDrawBufferDataOverride fpWriteDrawBufferOverride = NULL);
 
 protected:
 	virtual void OnDataLoaded() = 0;
 	virtual void Update() = 0;
 
 	// This function is responsible for incrementing the passed in reference pointer the size of the data written
-	virtual void WriteDrawBufferData(char *&pRefDataWritePos) = 0;
+	virtual void DefaultWriteDrawBufferData(char *&pRefDataWritePos) = 0;
 
 private:
 	HyLoadState GetLoadState()									{ return m_eLoadState; }
+
+	void WriteDrawBufferData(char *&pRefDataWritePos);
 
 	void SetData(IHyData *pData);
 	void SetLoaded();

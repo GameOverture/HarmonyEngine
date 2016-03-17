@@ -35,7 +35,6 @@ protected:
 	{
 		QUADBATCH,
 		PRIMITIVE,
-		CUSTOM,
 
 		NUM_VAOTYPES
 	};

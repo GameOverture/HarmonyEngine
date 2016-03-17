@@ -121,7 +121,7 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 {
 }
 
-/*virtual*/ void HyTexturedQuad2d::WriteDrawBufferData(char *&pRefDataWritePos)
+/*virtual*/ void HyTexturedQuad2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)
 {
 	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);
 

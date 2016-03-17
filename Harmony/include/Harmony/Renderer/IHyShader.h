@@ -15,6 +15,7 @@
 class IHyShader
 {
 protected:
+	bool				m_bLocked;
 	std::string			m_sSourceCode[HYNUMSHADERS];
 
 	IHyShader();
@@ -22,6 +23,8 @@ public:
 	virtual ~IHyShader();
 
 	void SetSourceCode(const char *szSource, HyShaderType eType);
+
+	void Lock();
 };
 
 #endif /* __IHyShader_h__ */

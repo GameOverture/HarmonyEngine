@@ -40,7 +40,7 @@ public:
 private:
 	virtual void Update();
 	virtual void OnDataLoaded();
-	virtual void WriteDrawBufferData(char *&pRefDataWritePos);
+	virtual void DefaultWriteDrawBufferData(char *&pRefDataWritePos);
 	
 	void CalcVertexBuffer();
 };

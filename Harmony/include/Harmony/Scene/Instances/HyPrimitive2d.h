@@ -44,7 +44,7 @@ private:
 
 	virtual void OnDataLoaded()	{ }
 	virtual void Update()		{ }
-	virtual void WriteDrawBufferData(char *&pRefDataWritePos);
+	virtual void DefaultWriteDrawBufferData(char *&pRefDataWritePos);
 };
 
 #endif /* __HyPrimitive2d_h__ */

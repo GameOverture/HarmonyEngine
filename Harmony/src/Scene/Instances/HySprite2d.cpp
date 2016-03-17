@@ -27,7 +27,7 @@ HySprite2d::~HySprite2d(void)
 {
 }
 
-/*virtual*/ void HySprite2d::WriteDrawBufferData(char *&pRefDataWritePos)
+/*virtual*/ void HySprite2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)
 {
 
 }
