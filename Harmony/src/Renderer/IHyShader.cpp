@@ -16,3 +16,8 @@ IHyShader::IHyShader()
 IHyShader::~IHyShader()
 {
 }
+
+void IHyShader::SetSourceCode(const char *szSource, HyShaderType eType)
+{
+	m_sSourceCode[eType] = szSource;
+}

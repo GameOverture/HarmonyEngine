@@ -12,11 +12,13 @@
 
 #include "Afx/HyStdAfx.h"
 
+#include "Renderer/IHyShader.h"
+
 #include <vector>
 #include <map>
 #include <algorithm>
 
-class HyOpenGLShader
+class HyOpenGLShader : public IHyShader
 {
 	// Shader creation
 	GLuint								m_hProgHandle;
@@ -24,17 +26,11 @@ class HyOpenGLShader
 	std::string							m_sCurSrcCode;
 
 public:
-	enum eGLSLShaderType
-	{
-		VERTEX, FRAGMENT, GEOMETRY,
-		TESS_CONTROL, TESS_EVALUATION
-	};
 
 	HyOpenGLShader();
 	virtual HyOpenGLShader::~HyOpenGLShader();
 
-	bool CompileFromFile(const char *szFileName, eGLSLShaderType eType);
-	void CompileFromString(const char *szSource, eGLSLShaderType eType);
+	void CompileFromString(HyShaderType eType);
 	void Link();
 	void Use();
 

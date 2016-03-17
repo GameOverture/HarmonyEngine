@@ -47,6 +47,17 @@ enum HyLoadState
 	HYLOADSTATE_ReloadGfx
 };
 
+enum HyShaderType
+{
+	HYSHADER_Vertex = 0,
+	HYSHADER_Fragment,
+	HYSHADER_Geometry,
+	HYSHADER_TessControl,
+	HYSHADER_TessEvaluation,
+
+	HYNUMSHADERS
+};
+
 enum HyCoordinateType
 {
 	HYCOORDTYPE_Default = 0,

@@ -37,10 +37,9 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct)
 
 IHyApplication::~IHyApplication()
 {
-	for(uint32 i = 0; i < m_vInputMaps.size(); ++i)
-		delete m_vInputMaps[i];
-
+	m_vWindows.clear();
 	m_vInputMaps.clear();
+	m_mapCustomShaders.clear();
 }
 
 HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)
@@ -55,12 +54,20 @@ HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 	return *static_cast<HyInputMapInterop *>(m_vInputMaps[uiIndex]);
 }
 
-void *IHyApplication::operator new(size_t size)
+IHyShader &IHyApplication::CustomShader(uint32 uiId)
 {
-	return sm_Mem.Alloc(size);
+	if(m_mapCustomShaders.find(uiId) == m_mapCustomShaders.end())
+		m_mapCustomShaders[uiId] = new HyShaderInterop();
+
+	return *m_mapCustomShaders[uiId];
 }
 
-void IHyApplication::operator delete(void *ptr)
+void *IHyApplication::operator new(size_t uiSize)
 {
-	sm_Mem.Free(ptr);
+	return sm_Mem.Alloc(uiSize);
+}
+
+void IHyApplication::operator delete(void *pPtr)
+{
+	sm_Mem.Free(pPtr);
 }

@@ -22,6 +22,8 @@
 		typedef HyOpenGL_Win HyRendererInterop;
 	#endif
 
+	typedef HyOpenGLShader HyShaderInterop;
+
 	#include "Time/Interop/HyTime_Win.h"
 	typedef HyTime_Win HyTimeInterop;
 

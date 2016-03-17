@@ -14,9 +14,14 @@
 
 class IHyShader
 {
-public:
+protected:
+	std::string			m_sSourceCode[HYNUMSHADERS];
+
 	IHyShader();
+public:
 	virtual ~IHyShader();
+
+	void SetSourceCode(const char *szSource, HyShaderType eType);
 };
 
 #endif /* __IHyShader_h__ */

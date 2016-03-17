@@ -262,8 +262,11 @@ bool HyOpenGL::Initialize()
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 
 	// Quad batch //////////////////////////////////////////////////////////////////////////
-	m_pShader2d[QUADBATCH].CompileFromString(szHYQUADBATCH_VERTEXSHADER, HyOpenGLShader::VERTEX);
-	m_pShader2d[QUADBATCH].CompileFromString(szHYQUADBATCH_FRAGMENTSHADER, HyOpenGLShader::FRAGMENT);
+	m_pShader2d[QUADBATCH].SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
+	m_pShader2d[QUADBATCH].CompileFromString(HYSHADER_Vertex);
+
+	m_pShader2d[QUADBATCH].SetSourceCode(szHYQUADBATCH_FRAGMENTSHADER, HYSHADER_Fragment);
+	m_pShader2d[QUADBATCH].CompileFromString(HYSHADER_Fragment);
 
 	m_pShader2d[QUADBATCH].Link();
 
@@ -322,8 +325,11 @@ bool HyOpenGL::Initialize()
 	glVertexAttribDivisor(mtx + 3, 1);
 
 	// Primitive //////////////////////////////////////////////////////////////////////////
-	m_pShader2d[PRIMITIVE].CompileFromString(szHYPRIMATIVE_VERTEXSHADER, HyOpenGLShader::VERTEX);
-	m_pShader2d[PRIMITIVE].CompileFromString(szHYPRIMATIVE_FRAGMENTSHADER, HyOpenGLShader::FRAGMENT);
+	m_pShader2d[PRIMITIVE].SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);
+	m_pShader2d[PRIMITIVE].CompileFromString(HYSHADER_Vertex);
+
+	m_pShader2d[PRIMITIVE].SetSourceCode(szHYPRIMATIVE_FRAGMENTSHADER, HYSHADER_Fragment);
+	m_pShader2d[PRIMITIVE].CompileFromString(HYSHADER_Fragment);
 
 	m_pShader2d[PRIMITIVE].Link();
 

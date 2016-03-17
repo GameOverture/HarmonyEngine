@@ -8,7 +8,6 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGLShader.h"
-#include "Utilities/HyStrManip.h"
 
 HyOpenGLShader::HyOpenGLShader() : m_hProgHandle(0), m_bLinked(false) 
 {
@@ -23,74 +22,7 @@ HyOpenGLShader::~HyOpenGLShader()
 		glDeleteProgram(m_hProgHandle);
 }
 
-//bool HyOpenGLShader::CompileFromFile(const char *szFileName, eGLSLShaderType eType)
-//{
-//	// check if the user passed us null for either filename
-//	if (szFileName == NULL)
-//	{
-//		m_sLogStr = "szFileName was empty.";
-//		return false;
-//	}
-//
-//	// Combine full path and filename to shaders
-//	std::string sFullFilePath;
-//	sFullFilePath = HyFileIO::GetFilePath(HYINST_Shader, "", szFileName);
-//
-//	switch(eType)
-//	{
-//	case VERTEX:
-//		if(0 != strcmp(&sFullFilePath[sFullFilePath.size() - 5], ".vert"))
-//			sFullFilePath += ".vert";
-//		break;
-//	case FRAGMENT:
-//		if(0 != strcmp(&sFullFilePath[sFullFilePath.size() - 5], ".frag"))
-//			sFullFilePath += ".frag";
-//		break;
-//	case GEOMETRY:
-//		if(0 != strcmp(&sFullFilePath[sFullFilePath.size() - 5], ".geom"))
-//			sFullFilePath += ".geom";
-//		break;
-//	case TESS_CONTROL:
-//	case TESS_EVALUATION:
-//		if(0 != strcmp(&sFullFilePath[sFullFilePath.size() - 5], ".tess"))
-//			sFullFilePath += ".tess";
-//		break;
-//	default:
-//		m_sLogStr = "Unknown shader type";
-//		return false;
-//	}
-//
-//	/** Get Vertex And Fragment Shader Sources **/
-//
-//
-//	//  read the shader source code from constructed file path
-//	if(!HyFileIO::FileExists(sFullFilePath))
-//	{
-//		m_sLogStr = "File not found.";
-//		return false;
-//	}
-//	m_sCurSrcCode = HyFileIO::ReadTextFile(sFullFilePath.c_str());
-//	if(m_sCurSrcCode.empty())
-//	{
-//		m_sLogStr = "CreateShaderProgram - Vertex shader was not read correctly";
-//		return false;
-//	}
-//
-//	// Create main program handle if one hasn't been created yet (first shader compile)
-//	if(m_hProgHandle <= 0)
-//	{
-//		m_hProgHandle = glCreateProgram();
-//		if(m_hProgHandle == 0)
-//		{
-//			m_sLogStr = "Unable to create shader program.";
-//			return false;
-//		}
-//	}
-//
-//	return CompileFromString(m_sCurSrcCode.c_str(), eType);
-//}
-
-void HyOpenGLShader::CompileFromString(const char *szSource, eGLSLShaderType type)
+void HyOpenGLShader::CompileFromString(HyShaderType eType)
 {
 	// Create main program handle if one hasn't been created yet (first shader compile)
 	if(m_hProgHandle <= 0)
@@ -101,19 +33,20 @@ void HyOpenGLShader::CompileFromString(const char *szSource, eGLSLShaderType typ
 
 	GLuint iShaderHandle = 0;
 
-	switch(type)
+	switch(eType)
 	{
-	case VERTEX:			iShaderHandle = glCreateShader(GL_VERTEX_SHADER);				break;
-	case FRAGMENT:			iShaderHandle = glCreateShader(GL_FRAGMENT_SHADER);				break;
-	case GEOMETRY:			iShaderHandle = glCreateShader(GL_GEOMETRY_SHADER);				break;
-	case TESS_CONTROL:		iShaderHandle = glCreateShader(GL_TESS_CONTROL_SHADER);			break;
-	case TESS_EVALUATION:	iShaderHandle = glCreateShader(GL_TESS_EVALUATION_SHADER);		break;
+	case HYSHADER_Vertex:			iShaderHandle = glCreateShader(GL_VERTEX_SHADER);				break;
+	case HYSHADER_Fragment:			iShaderHandle = glCreateShader(GL_FRAGMENT_SHADER);				break;
+	case HYSHADER_Geometry:			iShaderHandle = glCreateShader(GL_GEOMETRY_SHADER);				break;
+	case HYSHADER_TessControl:		iShaderHandle = glCreateShader(GL_TESS_CONTROL_SHADER);			break;
+	case HYSHADER_TessEvaluation:	iShaderHandle = glCreateShader(GL_TESS_EVALUATION_SHADER);		break;
 	default:
 		HyError("Unknown shader type");
 	}
 
 	// Compile the shader from the passed in source code
-	glShaderSource(iShaderHandle, 1, &szSource, NULL);
+	const char *szSrc = m_sSourceCode[eType].c_str();
+	glShaderSource(iShaderHandle, 1, &szSrc, NULL);
 	glCompileShader(iShaderHandle);
 
 #ifdef HY_DEBUG

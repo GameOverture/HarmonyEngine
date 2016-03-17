@@ -19,11 +19,12 @@ class IHyApplication
 {
 	friend class HyEngine;
 
-	static HarmonyInit			sm_Init;
-	static HyMemoryHeap			sm_Mem;
+	static HarmonyInit				sm_Init;
+	static HyMemoryHeap				sm_Mem;
 
-	vector<HyWindow>			m_vWindows;
-	vector<IHyInputMap *>		m_vInputMaps;
+	vector<HyWindow>				m_vWindows;
+	vector<IHyInputMap *>			m_vInputMaps;
+	std::map<uint32, IHyShader *>	m_mapCustomShaders;
 
 	virtual bool Initialize() = 0;
 	virtual bool Update() = 0;
@@ -40,9 +41,10 @@ public:
 
 	HyWindow &Window(uint32 uiIndex = 0);
 	HyInputMapInterop &Input(uint32 uiIndex = 0);
+	IHyShader &CustomShader(uint32 uiId);
 
-	void *operator new(size_t size);
-	void operator delete (void *ptr);
+	void *operator new(size_t uiSize);
+	void operator delete (void *pPtr);
 };
 
 #endif /* __IHyApplication_h__ */
