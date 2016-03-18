@@ -100,8 +100,11 @@ HyOpenGL::~HyOpenGL(void)
 		m_pShader2d[QUADBATCH].SetUniform("mtxCameraToClipMatrix", m_mtxProj);
 
 		size_t uiDataOffset = renderState.GetDataOffset();
-		GLuint mtx = m_pShader2d[QUADBATCH].GetAttribLocation("mtxLocalToWorld");
 
+#if 0 // TODO: if OpenGL 4.3 is available
+		glBindVertexBuffer(QUADBATCH, m_hVBO2d, uiDataOffset, 132);
+#else
+		GLuint mtx = m_pShader2d[QUADBATCH].GetAttribLocation("mtxLocalToWorld");
 		glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("size"),			2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset));
 		glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("offset"),		2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (2*sizeof(GLfloat))));
 		glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("tint"),			4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (4*sizeof(GLfloat))));
@@ -114,6 +117,7 @@ HyOpenGL::~HyOpenGL(void)
 		glVertexAttribPointer(mtx + 1,													4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (21*sizeof(GLfloat))));
 		glVertexAttribPointer(mtx + 2,													4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (25*sizeof(GLfloat))));
 		glVertexAttribPointer(mtx + 3,													4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (29*sizeof(GLfloat))));
+#endif
 
 		glBindTexture(GL_TEXTURE_2D_ARRAY, renderState.GetTextureHandle());
 
@@ -158,7 +162,7 @@ HyOpenGL::~HyOpenGL(void)
 	{
 		size_t uiDataOffset = renderState.GetDataOffset();
 
-		GL_MAX_VERTEX_ATTRIBS - 1
+		//GL_MAX_VERTEX_ATTRIBS - 1
 
 	}
 }
@@ -303,19 +307,31 @@ bool HyOpenGL::Initialize()
 	glEnableVertexAttribArray(mtx + 3);
 
 	////////////////////////////////////////////////////////////////////////////
-	//// ALL HERE IS PROBABLY NOT NEEDED
-	//glVertexAttribPointer(size, 2, GL_FLOAT, GL_FALSE, 132, (void *)0);
-	//glVertexAttribPointer(offset, 2, GL_FLOAT, GL_FALSE, 132, (void *)(2 * sizeof(GLfloat)));
-	//glVertexAttribPointer(tint, 4, GL_FLOAT, GL_FALSE, 132, (void *)(4 * sizeof(GLfloat)));
-	//glVertexAttribPointer(textureIndex, 1, GL_UNSIGNED_INT, GL_FALSE, 132, (void *)(sizeof(GLuint)));
-	//glVertexAttribPointer(uv0, 2, GL_FLOAT, GL_FALSE, 132, (void *)(8 * sizeof(GLfloat)));
-	//glVertexAttribPointer(uv1, 2, GL_FLOAT, GL_FALSE, 132, (void *)(10 * sizeof(GLfloat)));
-	//glVertexAttribPointer(uv2, 2, GL_FLOAT, GL_FALSE, 132, (void *)(12 * sizeof(GLfloat)));
-	//glVertexAttribPointer(uv3, 2, GL_FLOAT, GL_FALSE, 132, (void *)(14 * sizeof(GLfloat)));
-	//glVertexAttribPointer(mtx + 0, 4, GL_FLOAT, GL_FALSE, 132, (void *)(16 * sizeof(GLfloat)));
-	//glVertexAttribPointer(mtx + 1, 4, GL_FLOAT, GL_FALSE, 132, (void *)(20 * sizeof(GLfloat)));
-	//glVertexAttribPointer(mtx + 2, 4, GL_FLOAT, GL_FALSE, 132, (void *)(24 * sizeof(GLfloat)));
-	//glVertexAttribPointer(mtx + 3, 4, GL_FLOAT, GL_FALSE, 132, (void *)(28 * sizeof(GLfloat)));
+	//// TODO: These would be nicer to use if OpenGL 4.3 was supported
+	//glVertexAttribFormat(size,			2, GL_FLOAT, GL_FALSE, 0);
+	//glVertexAttribBinding(size, QUADBATCH);
+	//glVertexAttribFormat(offset,		2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat));
+	//glVertexAttribBinding(offset, QUADBATCH);
+	//glVertexAttribFormat(tint,			4, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat));
+	//glVertexAttribBinding(tint, QUADBATCH);
+	//glVertexAttribFormat(textureIndex,	1, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat));
+	//glVertexAttribBinding(textureIndex, QUADBATCH);
+	//glVertexAttribFormat(uv0,			2, GL_FLOAT, GL_FALSE, 9*sizeof(GLfloat));
+	//glVertexAttribBinding(uv0, QUADBATCH);
+	//glVertexAttribFormat(uv1,			2, GL_FLOAT, GL_FALSE, 11*sizeof(GLfloat));
+	//glVertexAttribBinding(uv1, QUADBATCH);
+	//glVertexAttribFormat(uv2,			2, GL_FLOAT, GL_FALSE, 13*sizeof(GLfloat));
+	//glVertexAttribBinding(uv2, QUADBATCH);
+	//glVertexAttribFormat(uv3,			2, GL_FLOAT, GL_FALSE, 15*sizeof(GLfloat));
+	//glVertexAttribBinding(uv3, QUADBATCH);
+	//glVertexAttribFormat(mtx+0,			4, GL_FLOAT, GL_FALSE, 17*sizeof(GLfloat));
+	//glVertexAttribBinding(mtx+0, QUADBATCH);
+	//glVertexAttribFormat(mtx+1,			4, GL_FLOAT, GL_FALSE, 21*sizeof(GLfloat));
+	//glVertexAttribBinding(mtx+1, QUADBATCH);
+	//glVertexAttribFormat(mtx+2,			4, GL_FLOAT, GL_FALSE, 25*sizeof(GLfloat));
+	//glVertexAttribBinding(mtx+2, QUADBATCH);
+	//glVertexAttribFormat(mtx+3,			4, GL_FLOAT, GL_FALSE, 29*sizeof(GLfloat));
+	//glVertexAttribBinding(mtx+3, QUADBATCH);
 	////////////////////////////////////////////////////////////////////////////
 
 	glVertexAttribDivisor(size, 1);
