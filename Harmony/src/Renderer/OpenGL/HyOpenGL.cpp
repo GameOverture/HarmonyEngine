@@ -154,6 +154,13 @@ HyOpenGL::~HyOpenGL(void)
 			uiDataOffset += (sizeof(GLfloat) * 4) * iNumVerts;
 		}
 	}
+	else if(renderState.IsEnabled(HyRenderState::SHADER_CUSTOM))
+	{
+		size_t uiDataOffset = renderState.GetDataOffset();
+
+		GL_MAX_VERTEX_ATTRIBS - 1
+
+	}
 }
 
 /*virtual*/ void HyOpenGL::End_2d()
