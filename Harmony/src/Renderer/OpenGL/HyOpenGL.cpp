@@ -91,80 +91,69 @@ HyOpenGL::~HyOpenGL(void)
 	else
 		SetCameraMatrices_2d(MTX_CAMVIEW);
 
-	if(renderState.IsEnabled(HyRenderState::SHADER_QUADBATCH))
-	{
-		glBindVertexArray(m_pVAO2d[QUADBATCH]);
-		m_pShader2d[QUADBATCH].Use();
+	uint32 uiShaderIndex = renderState.GetShaderIndex();
+	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_vShaders[uiShaderIndex]);
 
-		m_pShader2d[QUADBATCH].SetUniform("mtxWorldToCameraMatrix", m_mtxView);
-		m_pShader2d[QUADBATCH].SetUniform("mtxCameraToClipMatrix", m_mtxProj);
+	pShader->Use(renderState.GetDataOffset());
+	pShader->SetUniform("mtxWorldToCamera", m_mtxView);
+	pShader->SetUniform("mtxCameraToClip", m_mtxProj);
 
-		size_t uiDataOffset = renderState.GetDataOffset();
-
-#if 0 // TODO: if OpenGL 4.3 is available
-		glBindVertexBuffer(QUADBATCH, m_hVBO2d, uiDataOffset, 132);
-#else
-		GLuint mtx = m_pShader2d[QUADBATCH].GetAttribLocation("mtxLocalToWorld");
-		glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("size"),			2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset));
-		glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("offset"),		2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (2*sizeof(GLfloat))));
-		glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("tint"),			4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (4*sizeof(GLfloat))));
-		glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("textureIndex"),	1, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (8*sizeof(GLfloat))));
-		glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord0"),		2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (9*sizeof(GLfloat))));
-		glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord1"),		2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (11*sizeof(GLfloat))));
-		glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord2"),		2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (13*sizeof(GLfloat))));
-		glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord3"),		2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (15*sizeof(GLfloat))));
-		glVertexAttribPointer(mtx + 0,													4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (17*sizeof(GLfloat))));
-		glVertexAttribPointer(mtx + 1,													4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (21*sizeof(GLfloat))));
-		glVertexAttribPointer(mtx + 2,													4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (25*sizeof(GLfloat))));
-		glVertexAttribPointer(mtx + 3,													4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (29*sizeof(GLfloat))));
-#endif
-
+	if(renderState.GetTextureHandle() != 0)
 		glBindTexture(GL_TEXTURE_2D_ARRAY, renderState.GetTextureHandle());
 
+	if(renderState.IsEnabled(HyRenderState::DRAWINSTANCED))
+	{
 		int iNumInsts = renderState.GetNumInstances();
 		glDrawArraysInstanced(m_eDrawMode, 0, 4, iNumInsts);
 	}
-	else if(renderState.IsEnabled(HyRenderState::SHADER_PRIMITIVEDRAW))
+	else
 	{
-		glBindVertexArray(m_pVAO2d[PRIMITIVE]);
-		m_pShader2d[PRIMITIVE].Use();
-
-		m_pShader2d[PRIMITIVE].SetUniform("worldToCameraMatrix", m_mtxView);
-		m_pShader2d[PRIMITIVE].SetUniform("cameraToClipMatrix", m_mtxProj);
-
-		char *pDrawData = GetVertexData2d();
-		
-		size_t uiDataOffset = renderState.GetDataOffset();
-		pDrawData += uiDataOffset;
-
-		for(uint32 i = 0; i < renderState.GetNumInstances(); ++i)
-		{
-			m_pShader2d[PRIMITIVE].SetUniform("primitiveColor", *reinterpret_cast<vec4 *>(pDrawData));
-			pDrawData += sizeof(vec4);
-			uiDataOffset += sizeof(vec4);
-			
-			m_pShader2d[PRIMITIVE].SetUniform("transformMtx", *reinterpret_cast<mat4 *>(pDrawData));
-			pDrawData += sizeof(mat4);
-			uiDataOffset += sizeof(mat4);
-
-			uint32 iNumVerts = *reinterpret_cast<uint32 *>(pDrawData);
-			pDrawData += sizeof(uint32);
-			uiDataOffset += sizeof(uint32);
-			
-			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)uiDataOffset);
-			glDrawArrays(m_eDrawMode, 0, iNumVerts);
-
-			pDrawData += (sizeof(GLfloat) * 4) * iNumVerts;
-			uiDataOffset += (sizeof(GLfloat) * 4) * iNumVerts;
-		}
 	}
-	else if(renderState.IsEnabled(HyRenderState::SHADER_CUSTOM))
-	{
-		size_t uiDataOffset = renderState.GetDataOffset();
 
-		//GL_MAX_VERTEX_ATTRIBS - 1
+	//if(renderState.IsEnabled(HyRenderState::SHADER_QUADBATCH))
+	//{
+	//	glBindVertexArray(m_hDefaultVAO2d[QUADBATCH]);
+	//	m_pShader2d[QUADBATCH].Use();
 
-	}
+	//	m_pShader2d[QUADBATCH].SetUniform("mtxWorldToCameraMatrix", m_mtxView);
+	//	m_pShader2d[QUADBATCH].SetUniform("mtxCameraToClipMatrix", m_mtxProj);
+
+	//	size_t uiDataOffset = renderState.GetDataOffset();
+	//}
+	//else if(renderState.IsEnabled(HyRenderState::SHADER_PRIMITIVEDRAW))
+	//{
+	//	glBindVertexArray(m_hDefaultVAO2d[PRIMITIVE]);
+	//	m_pShader2d[PRIMITIVE].Use();
+
+	//	m_pShader2d[PRIMITIVE].SetUniform("worldToCameraMatrix", m_mtxView);
+	//	m_pShader2d[PRIMITIVE].SetUniform("cameraToClipMatrix", m_mtxProj);
+
+	//	char *pDrawData = GetVertexData2d();
+	//	
+	//	size_t uiDataOffset = renderState.GetDataOffset();
+	//	pDrawData += uiDataOffset;
+
+	//	for(uint32 i = 0; i < renderState.GetNumInstances(); ++i)
+	//	{
+	//		m_pShader2d[PRIMITIVE].SetUniform("primitiveColor", *reinterpret_cast<vec4 *>(pDrawData));
+	//		pDrawData += sizeof(vec4);
+	//		uiDataOffset += sizeof(vec4);
+	//		
+	//		m_pShader2d[PRIMITIVE].SetUniform("transformMtx", *reinterpret_cast<mat4 *>(pDrawData));
+	//		pDrawData += sizeof(mat4);
+	//		uiDataOffset += sizeof(mat4);
+
+	//		uint32 iNumVerts = *reinterpret_cast<uint32 *>(pDrawData);
+	//		pDrawData += sizeof(uint32);
+	//		uiDataOffset += sizeof(uint32);
+	//		
+	//		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)uiDataOffset);
+	//		glDrawArrays(m_eDrawMode, 0, iNumVerts);
+
+	//		pDrawData += (sizeof(GLfloat) * 4) * iNumVerts;
+	//		uiDataOffset += (sizeof(GLfloat) * 4) * iNumVerts;
+	//	}
+	//}
 }
 
 /*virtual*/ void HyOpenGL::End_2d()
@@ -256,10 +245,6 @@ bool HyOpenGL::Initialize()
 	//printf ("Version: %s\n", glGetString (GL_VERSION));
 	//printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
 
-	GLint iMaxVertexAttribs;
-	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &iMaxVertexAttribs);
-	HyAssert(iMaxVertexAttribs >= 12, "GL_MAX_VERTEX_ATTRIBS is < 12");
-
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
 
@@ -267,100 +252,40 @@ bool HyOpenGL::Initialize()
 	// 2D setup
 	//////////////////////////////////////////////////////////////////////////
 
-	glGenVertexArrays(NUM_VAOTYPES, m_pVAO2d);
-
 	glGenBuffers(1, &m_hVBO2d);
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 
 	// Quad batch //////////////////////////////////////////////////////////////////////////
-	m_pShader2d[QUADBATCH].SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
-	m_pShader2d[QUADBATCH].CompileFromString(HYSHADER_Vertex);
+	HyOpenGLShader *pShaderQuadBatch = new HyOpenGLShader(IHyShader::SHADER_QuadBatch);
+	sm_vShaders.push_back(pShaderQuadBatch);
 
-	m_pShader2d[QUADBATCH].SetSourceCode(szHYQUADBATCH_FRAGMENTSHADER, HYSHADER_Fragment);
-	m_pShader2d[QUADBATCH].CompileFromString(HYSHADER_Fragment);
+	pShaderQuadBatch->SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
+	pShaderQuadBatch->SetVertexAttribute("size", HYSHADERVAR_vec2, 1);
+	pShaderQuadBatch->SetVertexAttribute("offset", HYSHADERVAR_vec2, 1);
+	pShaderQuadBatch->SetVertexAttribute("tint", HYSHADERVAR_vec4, 1);
+	pShaderQuadBatch->SetVertexAttribute("textureIndex", HYSHADERVAR_float, 1);
+	pShaderQuadBatch->SetVertexAttribute("UVcoord0", HYSHADERVAR_vec2, 1);
+	pShaderQuadBatch->SetVertexAttribute("UVcoord1", HYSHADERVAR_vec2, 1);
+	pShaderQuadBatch->SetVertexAttribute("UVcoord2", HYSHADERVAR_vec2, 1);
+	pShaderQuadBatch->SetVertexAttribute("UVcoord3", HYSHADERVAR_vec2, 1);
+	pShaderQuadBatch->SetVertexAttribute("mtxLocalToWorld", HYSHADERVAR_mat4, 1);
 
-	m_pShader2d[QUADBATCH].Link();
+	pShaderQuadBatch->SetSourceCode(szHYQUADBATCH_FRAGMENTSHADER, HYSHADER_Fragment);
 
-	glBindVertexArray(m_pVAO2d[QUADBATCH]);
-
-	GLuint size = m_pShader2d[QUADBATCH].GetAttribLocation("size");
-	GLuint offset = m_pShader2d[QUADBATCH].GetAttribLocation("offset");
-	GLuint tint = m_pShader2d[QUADBATCH].GetAttribLocation("tint");
-	GLuint textureIndex = m_pShader2d[QUADBATCH].GetAttribLocation("textureIndex");
-	GLuint uv0 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord0");
-	GLuint uv1 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord1");
-	GLuint uv2 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord2");
-	GLuint uv3 = m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord3");
-	GLuint mtx = m_pShader2d[QUADBATCH].GetAttribLocation("mtxLocalToWorld");
-
-	glEnableVertexAttribArray(size);
-	glEnableVertexAttribArray(offset);
-	glEnableVertexAttribArray(tint);
-	glEnableVertexAttribArray(textureIndex);
-	glEnableVertexAttribArray(uv0);
-	glEnableVertexAttribArray(uv1);
-	glEnableVertexAttribArray(uv2);
-	glEnableVertexAttribArray(uv3);
-	glEnableVertexAttribArray(mtx + 0);
-	glEnableVertexAttribArray(mtx + 1);
-	glEnableVertexAttribArray(mtx + 2);
-	glEnableVertexAttribArray(mtx + 3);
-
-	////////////////////////////////////////////////////////////////////////////
-	//// TODO: These would be nicer to use if OpenGL 4.3 was supported
-	//glVertexAttribFormat(size,			2, GL_FLOAT, GL_FALSE, 0);
-	//glVertexAttribBinding(size, QUADBATCH);
-	//glVertexAttribFormat(offset,		2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat));
-	//glVertexAttribBinding(offset, QUADBATCH);
-	//glVertexAttribFormat(tint,			4, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat));
-	//glVertexAttribBinding(tint, QUADBATCH);
-	//glVertexAttribFormat(textureIndex,	1, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat));
-	//glVertexAttribBinding(textureIndex, QUADBATCH);
-	//glVertexAttribFormat(uv0,			2, GL_FLOAT, GL_FALSE, 9*sizeof(GLfloat));
-	//glVertexAttribBinding(uv0, QUADBATCH);
-	//glVertexAttribFormat(uv1,			2, GL_FLOAT, GL_FALSE, 11*sizeof(GLfloat));
-	//glVertexAttribBinding(uv1, QUADBATCH);
-	//glVertexAttribFormat(uv2,			2, GL_FLOAT, GL_FALSE, 13*sizeof(GLfloat));
-	//glVertexAttribBinding(uv2, QUADBATCH);
-	//glVertexAttribFormat(uv3,			2, GL_FLOAT, GL_FALSE, 15*sizeof(GLfloat));
-	//glVertexAttribBinding(uv3, QUADBATCH);
-	//glVertexAttribFormat(mtx+0,			4, GL_FLOAT, GL_FALSE, 17*sizeof(GLfloat));
-	//glVertexAttribBinding(mtx+0, QUADBATCH);
-	//glVertexAttribFormat(mtx+1,			4, GL_FLOAT, GL_FALSE, 21*sizeof(GLfloat));
-	//glVertexAttribBinding(mtx+1, QUADBATCH);
-	//glVertexAttribFormat(mtx+2,			4, GL_FLOAT, GL_FALSE, 25*sizeof(GLfloat));
-	//glVertexAttribBinding(mtx+2, QUADBATCH);
-	//glVertexAttribFormat(mtx+3,			4, GL_FLOAT, GL_FALSE, 29*sizeof(GLfloat));
-	//glVertexAttribBinding(mtx+3, QUADBATCH);
-	////////////////////////////////////////////////////////////////////////////
-
-	glVertexAttribDivisor(size, 1);
-	glVertexAttribDivisor(offset, 1);
-	glVertexAttribDivisor(tint, 1);
-	glVertexAttribDivisor(textureIndex, 1);
-	glVertexAttribDivisor(uv0, 1);
-	glVertexAttribDivisor(uv1, 1);
-	glVertexAttribDivisor(uv2, 1);
-	glVertexAttribDivisor(uv3, 1);
-	glVertexAttribDivisor(mtx + 0, 1);
-	glVertexAttribDivisor(mtx + 1, 1);
-	glVertexAttribDivisor(mtx + 2, 1);
-	glVertexAttribDivisor(mtx + 3, 1);
+	pShaderQuadBatch->Lock();
+	pShaderQuadBatch->OnRenderThread(*this);
 
 	// Primitive //////////////////////////////////////////////////////////////////////////
-	m_pShader2d[PRIMITIVE].SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);
-	m_pShader2d[PRIMITIVE].CompileFromString(HYSHADER_Vertex);
+	HyOpenGLShader *pShaderPrimitive = new HyOpenGLShader(IHyShader::SHADER_Primitive);
+	sm_vShaders.push_back(pShaderPrimitive);
 
-	m_pShader2d[PRIMITIVE].SetSourceCode(szHYPRIMATIVE_FRAGMENTSHADER, HYSHADER_Fragment);
-	m_pShader2d[PRIMITIVE].CompileFromString(HYSHADER_Fragment);
+	pShaderPrimitive->SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);
+	pShaderPrimitive->SetVertexAttribute("position", HYSHADERVAR_vec4);
 
-	m_pShader2d[PRIMITIVE].Link();
+	pShaderPrimitive->SetSourceCode(szHYPRIMATIVE_FRAGMENTSHADER, HYSHADER_Fragment);
 
-	glBindVertexArray(m_pVAO2d[PRIMITIVE]);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
+	pShaderPrimitive->Lock();
+	pShaderPrimitive->OnRenderThread(*this);
 
 	//const float fUnitQuadVertPos[16] = {
 	//	0.0f, 0.0f, 0.0f, 1.0f,

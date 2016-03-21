@@ -15,6 +15,7 @@
 #include "Renderer/HyGfxComms.h"
 #include "Renderer/HyRenderState.h"
 
+class IHyShader;
 class HyWindow;
 struct HyMonitorDeviceInfo;
 
@@ -27,6 +28,9 @@ protected:
 	queue<IHyData2d *> *		m_pMsgQueuePtr;		// The pointer to the currently active render message queue
 	queue<IHyData2d *> *		m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
 	char *						m_pDrawBufferPtr;	// The pointer to the currently active draw buffer
+
+	static vector<IHyShader *>	sm_vShaders;
+	static bool					sm_bShadersDirty;
 
 	HyGfxComms::tDrawHeader *	m_pDrawBufferHeader;
 	HyRenderState *				m_pCurRenderState;
@@ -93,6 +97,8 @@ public:
 	void Update();
 	void Draw2d();
 	void SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
+
+	static IHyShader &NewCustomShader();
 };
 
 #endif /* __IHyRenderer_h__ */

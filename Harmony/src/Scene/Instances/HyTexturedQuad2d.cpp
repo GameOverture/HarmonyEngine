@@ -15,7 +15,8 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGroupId) :	IHyInst2d(HYINST_Tex
 															m_uiTextureIndex(0),
 															m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
 {
-	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::SHADER_QUADBATCH);
+	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
+	m_RenderState.SetShaderIndex(IHyShader::SHADER_QuadBatch);
 	m_RenderState.SetNumInstances(1);
 }
 

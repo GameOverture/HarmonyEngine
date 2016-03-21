@@ -11,6 +11,9 @@
 
 #include "Renderer/Viewport/HyWindow.h"
 
+vector<IHyShader *>	IHyRenderer::sm_vShaders;
+bool				IHyRenderer::sm_bShadersDirty = false;
+
 IHyRenderer::RenderSurface::RenderSurface(eRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight) :	m_eType(eType),
 																																			m_iID(iID),
 																																			m_iRenderSurfaceWidth(iRenderSurfaceWidth),
@@ -142,4 +145,16 @@ void IHyRenderer::Draw2d()
 void IHyRenderer::SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info)
 {
 	HyWindow::SetMonitorDeviceInfo(info);
+}
+
+/*static*/ IHyShader &IHyRenderer::NewCustomShader()
+{
+	HyAssert(sm_vShaders.size() >= IHyShader::SHADER_CustomStartIndex, "IHyRenderer::NewCustomShader() was invoked before renderer initialized default shaders");
+
+	IHyShader *pNewShader = new HyShaderInterop(IHyShader::SHADER_CustomStartIndex + sm_vShaders.size());
+	sm_vShaders.push_back(pNewShader);
+
+	sm_bShadersDirty = true;
+
+	return *pNewShader;
 }

@@ -24,7 +24,6 @@ class IHyApplication
 
 	vector<HyWindow>				m_vWindows;
 	vector<IHyInputMap *>			m_vInputMaps;
-	std::map<uint32, IHyShader *>	m_mapCustomShaders;
 
 	virtual bool Initialize() = 0;
 	virtual bool Update() = 0;
@@ -41,7 +40,7 @@ public:
 
 	HyWindow &Window(uint32 uiIndex = 0);
 	HyInputMapInterop &Input(uint32 uiIndex = 0);
-	IHyShader &CustomShader(uint32 uiId);
+	IHyShader &NewCustomShader();
 
 	void *operator new(size_t uiSize);
 	void operator delete (void *pPtr);

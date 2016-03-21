@@ -39,7 +39,6 @@ IHyApplication::~IHyApplication()
 {
 	m_vWindows.clear();
 	m_vInputMaps.clear();
-	m_mapCustomShaders.clear();
 }
 
 HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)
@@ -52,14 +51,6 @@ HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(uiIndex < sm_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
 	return *static_cast<HyInputMapInterop *>(m_vInputMaps[uiIndex]);
-}
-
-IHyShader &IHyApplication::CustomShader(uint32 uiId)
-{
-	if(m_mapCustomShaders.find(uiId) == m_mapCustomShaders.end())
-		m_mapCustomShaders[uiId] = new HyShaderInterop();
-
-	return *m_mapCustomShaders[uiId];
 }
 
 void *IHyApplication::operator new(size_t uiSize)

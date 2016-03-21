@@ -29,8 +29,8 @@ smooth out vec4 interpColor;												\n\
 smooth out vec2 interpUV;													\n\
 flat out float texIndex;													\n\
 																			\n\
-uniform mat4 mtxCameraToClipMatrix;											\n\
-uniform mat4 mtxWorldToCameraMatrix;										\n\
+uniform mat4 mtxCameraToClip;												\n\
+uniform mat4 mtxWorldToCamera;												\n\
 																			\n\
 const vec2 position[] = vec2[4](											\n\
 	vec2(1.0f, 1.0f),														\n\
@@ -69,8 +69,8 @@ void main()																	\n\
 					0.0, 1.0);												\n\
 																			\n\
 	pos = mtxLocalToWorld * pos;											\n\
-	pos = mtxWorldToCameraMatrix * pos;										\n\
-	gl_Position = mtxCameraToClipMatrix * pos;								\n\
+	pos = mtxWorldToCamera * pos;											\n\
+	gl_Position = mtxCameraToClip * pos;									\n\
 }";
 
 const char *szHYQUADBATCH_FRAGMENTSHADER = "								\n\

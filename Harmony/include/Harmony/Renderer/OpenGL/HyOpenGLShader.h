@@ -20,19 +20,21 @@
 
 class HyOpenGLShader : public IHyShader
 {
+	GLuint								m_hVAO;
+
+	GLsizei								m_uiStride;
+
 	// Shader creation
 	GLuint								m_hProgHandle;
 	bool								m_bLinked;
-	std::string							m_sCurSrcCode;
 
 public:
-
-	HyOpenGLShader();
+	HyOpenGLShader(uint32 uiId);
 	virtual HyOpenGLShader::~HyOpenGLShader();
 
 	void CompileFromString(HyShaderType eType);
 	void Link();
-	void Use();
+	void Use(uint32 uiDataOffset);
 
 	int GetHandle();
 	bool IsLinked();
@@ -54,6 +56,8 @@ public:
 
 	void PrintActiveUniforms();
 	void PrintActiveAttribs();
+
+	virtual void OnRenderThread(IHyRenderer &rendererRef);
 };
 
 #endif /* __HyOpenGLShader_h__ */

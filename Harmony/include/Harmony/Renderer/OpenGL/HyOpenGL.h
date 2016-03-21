@@ -31,16 +31,6 @@ protected:
 	};
 
 	///////// 2D MEMBERS ////////////////////
-	enum eVAOTypes
-	{
-		QUADBATCH,
-		PRIMITIVE,
-
-		NUM_VAOTYPES
-	};
-	GLuint					m_pVAO2d[NUM_VAOTYPES];
-	HyOpenGLShader			m_pShader2d[NUM_VAOTYPES];
-	
 	GLuint					m_hVBO2d;
 	GLenum					m_eDrawMode;
 

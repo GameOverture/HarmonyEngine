@@ -20,7 +20,8 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName) :	IHyInst2d(HYINST_
 																m_pVertexBuffer(NULL),
 																m_uiCurFontIndex(0)
 {
-	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::SHADER_QUADBATCH);
+	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
+	m_RenderState.SetShaderIndex(IHyShader::SHADER_QuadBatch);
 }
 
 HyText2d::~HyText2d(void)

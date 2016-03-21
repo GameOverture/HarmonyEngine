@@ -71,6 +71,16 @@ uint32 HyRenderState::GetAttributeBitFlags() const
 	return m_uiAttributeFlags;
 }
 
+uint32 HyRenderState::GetShaderIndex()
+{
+	return m_uiShaderIndex;
+}
+
+void HyRenderState::SetShaderIndex(uint32 uiIndex)
+{
+	m_uiShaderIndex = uiIndex;
+}
+
 uint32 HyRenderState::GetTextureHandle()
 {
 	return m_uiTextureBindHandle;

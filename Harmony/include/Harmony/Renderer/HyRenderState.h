@@ -23,23 +23,20 @@ public:
 		SCISSORTEST				= 1 << 0,
 		USINGSCREENCOORDS		= 1 << 1,	// If disabled, then using world coordinates
 
-		SHADER_PRIMITIVEDRAW	= 1 << 2,
-		SHADER_QUADBATCH		= 1 << 3,
-		SHADER_CUSTOM			= 1 << 4,
-		SHADERMASK				= SHADER_PRIMITIVEDRAW | SHADER_QUADBATCH | SHADER_CUSTOM,
+		DRAWINSTANCED			= 1 << 2,
 
-		DRAWMODE_TRIANGLESTRIP	= 1 << 5,
-		DRAWMODE_TRIANGLEFAN	= 1 << 6,
-		DRAWMODE_LINELOOP		= 1 << 7,
-		DRAWMODE_LINESTRIP		= 1 << 8,
+		DRAWMODE_TRIANGLESTRIP	= 1 << 3,
+		DRAWMODE_TRIANGLEFAN	= 1 << 4,
+		DRAWMODE_LINELOOP		= 1 << 5,
+		DRAWMODE_LINESTRIP		= 1 << 6,
 		DRAWMODEMASK			= DRAWMODE_TRIANGLESTRIP | DRAWMODE_TRIANGLEFAN | DRAWMODE_LINELOOP | DRAWMODE_LINESTRIP,
-
-		//RS_CUSTOMSHADER_ID			= // Bits 9-14, store index to custom shader vector. Valid entries [0-63]
 	};
 
 private:
 	uint32			m_uiAttributeFlags;
 	uint32			m_uiTextureBindHandle;
+
+	uint32			m_uiShaderIndex;
 	
 	uint32			m_uiNumInstances;
 	size_t			m_uiDataOffset;
@@ -60,6 +57,9 @@ public:
 	bool CompareAttribute(const HyRenderState &rs, uint32 uiMask);
 	bool IsEnabled(eAttributes eAttrib);
 	uint32 GetAttributeBitFlags() const;
+
+	uint32 GetShaderIndex();
+	void SetShaderIndex(uint32 uiIndex);
 
 	uint32 GetTextureHandle();
 	void SetTextureHandle(uint32 uiHandleId);

@@ -19,6 +19,7 @@ HyPrimitive2d::HyPrimitive2d() :	IHyInst2d(HYINST_Primitive2d, NULL, NULL),
 									m_pVertices(NULL),
 									m_uiNumVerts(0)
 {
+	m_RenderState.SetShaderIndex(IHyShader::SHADER_Primitive);
 	m_RenderState.SetNumInstances(1);
 }
 
@@ -50,9 +51,9 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, vec2
 	ClearData();
 
 	if(bWireframe)
-		m_RenderState.Enable(HyRenderState::DRAWMODE_LINELOOP | HyRenderState::SHADER_PRIMITIVEDRAW);
+		m_RenderState.Enable(HyRenderState::DRAWMODE_LINELOOP);
 	else
-		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::SHADER_PRIMITIVEDRAW);
+		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP);
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
 		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
@@ -99,9 +100,9 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	ClearData();
 
 	if(bWireframe)
-		m_RenderState.Enable(HyRenderState::DRAWMODE_LINELOOP | HyRenderState::SHADER_PRIMITIVEDRAW);
+		m_RenderState.Enable(HyRenderState::DRAWMODE_LINELOOP);
 	else
-		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLEFAN | HyRenderState::SHADER_PRIMITIVEDRAW);
+		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLEFAN);
 
 	m_uiNumVerts = iNumSegments;
 	m_pVertices = new vec4[m_uiNumVerts];
@@ -129,9 +130,9 @@ void HyPrimitive2d::SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, boo
 	ClearData();
 
 	if(bChainLoop)
-		m_RenderState.Enable(HyRenderState::DRAWMODE_LINELOOP | HyRenderState::SHADER_PRIMITIVEDRAW);
+		m_RenderState.Enable(HyRenderState::DRAWMODE_LINELOOP);
 	else
-		m_RenderState.Enable(HyRenderState::DRAWMODE_LINESTRIP | HyRenderState::SHADER_PRIMITIVEDRAW);
+		m_RenderState.Enable(HyRenderState::DRAWMODE_LINESTRIP);
 
 	m_uiNumVerts = uiNumVerts;
 	m_pVertices = new vec4[m_uiNumVerts];
@@ -179,7 +180,7 @@ void HyPrimitive2d::ClearData()
 	m_pVertices = NULL;
 	m_uiNumVerts = 0;
 
-	m_RenderState.Disable(HyRenderState::DRAWMODEMASK | HyRenderState::SHADERMASK);
+	m_RenderState.Disable(HyRenderState::DRAWMODEMASK);
 }
 
 /*virtual*/ void HyPrimitive2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)
