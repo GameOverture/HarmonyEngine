@@ -18,8 +18,8 @@
 class HyOpenGL : public IHyRenderer
 {
 protected:
-	mat4					m_mtxView;
-	mat4					m_mtxProj;
+	glm::mat4				m_mtxView;
+	glm::mat4				m_mtxProj;
 
 	int32					m_iCurCamIndex;
 	

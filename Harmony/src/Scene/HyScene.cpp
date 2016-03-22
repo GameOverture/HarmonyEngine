@@ -130,7 +130,7 @@ void HyScene::WriteDrawBuffers()
 	pDrawHeader->uiReturnFlags = 0;
 	m_pCurWritePos += sizeof(HyGfxComms::tDrawHeader);
 
-	mat4 mtxView;
+	glm::mat4 mtxView;
 	uint32 uiNumWindows = static_cast<uint32>(m_vWindowRef.size());
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 3d CAMERA(S) BUFFER
@@ -154,8 +154,8 @@ void HyScene::WriteDrawBuffers()
 			
 				HyError("GetLocalTransform_SRT should be 3d");
 				m_vWindowRef[i].m_vCams3d[j]->GetLocalTransform_SRT(mtxView);
-				*(reinterpret_cast<mat4 *>(m_pCurWritePos)) = mtxView;
-				m_pCurWritePos += sizeof(mat4);
+				*(reinterpret_cast<glm::mat4 *>(m_pCurWritePos)) = mtxView;
+				m_pCurWritePos += sizeof(glm::mat4);
 
 				iCount++;
 			}
@@ -189,8 +189,8 @@ void HyScene::WriteDrawBuffers()
 				mtxView[3].x *= -1;
 				mtxView[3].y *= -1;
 
-				*(reinterpret_cast<mat4 *>(m_pCurWritePos)) = mtxView;
-				m_pCurWritePos += sizeof(mat4);
+				*(reinterpret_cast<glm::mat4 *>(m_pCurWritePos)) = mtxView;
+				m_pCurWritePos += sizeof(glm::mat4);
 
 				iCount++;
 			}
@@ -242,12 +242,14 @@ void HyScene::WriteDrawBuffers()
 		m_vLoadedInst2d[i]->Update();
 
 		// If previously written instance has equal render state by "operator ==" then it's to be assumed the instance data can be batched and doesn't need to write another render state
-		if(pCurRenderState2d == NULL || false == (m_vLoadedInst2d[i]->GetRenderState() == *pCurRenderState2d))
+		if(pCurRenderState2d == NULL || m_vLoadedInst2d[i]->GetRenderState() != *pCurRenderState2d)
 		{
 			// Start a new draw. Write render state to buffer to be sent to render thread
 			memcpy(m_pCurWritePos, &m_vLoadedInst2d[i]->GetRenderState(), sizeof(HyRenderState));
 			pCurRenderState2d = reinterpret_cast<HyRenderState *>(m_pCurWritePos);
 			pCurRenderState2d->SetDataOffset(uiVertexDataOffset);
+
+			need to write uniform buffer here
 
 			m_pCurWritePos += sizeof(HyRenderState);
 			iCount++;

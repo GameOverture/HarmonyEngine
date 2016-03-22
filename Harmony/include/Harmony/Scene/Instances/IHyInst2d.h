@@ -43,7 +43,7 @@ protected:
 	// Scene graph hierarchy 
 	IHyInst2d *						m_pParent;
 	bool							m_bDirty;
-	mat4							m_mtxCached;
+	glm::mat4						m_mtxCached;
 	vector<IHyInst2d *>				m_vChildList;
 
 	// Attributes
@@ -83,7 +83,7 @@ public:
 
 	void Load();
 	void Unload();
-	void GetWorldTransform(mat4 &outMtx);
+	void GetWorldTransform(glm::mat4 &outMtx);
 	void GetRenderState(HyRenderState &renderStateOut) const;
 
 	void AddChild(IHyInst2d &childInst);

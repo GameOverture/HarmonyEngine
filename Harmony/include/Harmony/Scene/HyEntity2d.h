@@ -35,7 +35,7 @@ class HyEntity2d : public ITransform<HyAnimVec2>
 	HyEntity2d * const				m_kpParent;
 
 	bool							m_bDirty;
-	mat4							m_mtxCached;
+	glm::mat4						m_mtxCached;
 
 	vector<IHyInst2d *>			m_vInstList;
 	vector<HyEntity2d *>			m_vChildNodes;
@@ -69,7 +69,7 @@ public:
 
 
 	void SetInstOrderingDirty();
-	void GetWorldTransform(mat4 &outMtx);
+	void GetWorldTransform(glm::mat4 &outMtx);
 
 private:
 	virtual void Update();

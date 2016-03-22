@@ -46,21 +46,21 @@ class HyPhysEntity2d : public HyEntity2d
 	};
 	vector<tFixture>	m_Fixtures;
 
-	vec2				m_ptPrevPos;
+	glm::vec2			m_ptPrevPos;
 	float				m_fPrevRotation;
 
 public:
 	HyPhysEntity2d(b2BodyType eBodyType);
 	virtual ~HyPhysEntity2d(void);
 
-	void GetVelocity(vec2 &vVelOut)									{ memcpy(&vVelOut, &m_b2Body->GetLinearVelocity(), sizeof(vec2)); }
+	void GetVelocity(glm::vec2 &vVelOut)							{ memcpy(&vVelOut, &m_b2Body->GetLinearVelocity(), sizeof(glm::vec2)); }
 	float GetVelocityX()											{ return m_b2Body->GetLinearVelocity().x; }
 	float GetVelocityY()											{ return m_b2Body->GetLinearVelocity().y; }
 	size_t GetNumFixtures()											{ return m_Fixtures.size(); }
 
-	void SetLinearVelocity(vec2 vVel)								{ b2Vec2 vb2Vel(vVel.x, vVel.y); m_b2Body->SetLinearVelocity(vb2Vel); }
+	void SetLinearVelocity(glm::vec2 vVel)							{ b2Vec2 vb2Vel(vVel.x, vVel.y); m_b2Body->SetLinearVelocity(vb2Vel); }
 	void SetLinearVelocity(float fX, float fY)						{ b2Vec2 vb2Vel(fX, fY); m_b2Body->SetLinearVelocity(vb2Vel); }
-	void ApplyLinearImpulse(vec2 vLinearImpulse)					{ m_b2Body->ApplyLinearImpulse(b2Vec2(vLinearImpulse.x, vLinearImpulse.y), b2Vec2(pos.Get().x, pos.Get().y), true); }
+	void ApplyLinearImpulse(glm::vec2 vLinearImpulse)				{ m_b2Body->ApplyLinearImpulse(b2Vec2(vLinearImpulse.x, vLinearImpulse.y), b2Vec2(pos.Get().x, pos.Get().y), true); }
 	void SetFixedRotation(bool bEnable)								{ m_b2Body->SetFixedRotation(bEnable); }
 
 	bool IsGrounded(int32 iFixtureIndex)							{ return (m_Fixtures[iFixtureIndex].m_uiFlags & tFixture::FIXTUREFLAG_IsGrounded) != 0; }
@@ -69,11 +69,11 @@ public:
 	void SetDensity(int32 iFixtureIndex, float fDensityAmt)			{ m_Fixtures[iFixtureIndex].pFixture->SetDensity(fDensityAmt); m_b2Body->ResetMassData(); }
 	void SetDensity(float fDensityAmt)								{ for(uint32 i = 0; i < m_Fixtures.size(); ++i) m_Fixtures[i].pFixture->SetDensity(fDensityAmt); m_b2Body->ResetMassData(); }
 
-	int32 AddBoxFixture(float fHalfWidth, float fHalfHeight, float fDensity, vec2 vOffset = vec2(0.0f), float fAngleOffset = 0.0f);
+	int32 AddBoxFixture(float fHalfWidth, float fHalfHeight, float fDensity, glm::vec2 vOffset = glm::vec2(0.0f), float fAngleOffset = 0.0f);
 
-	int32 AddCircleFixture(float fRadius, float fDensity, vec2 vOffset = vec2(0.0f));
+	int32 AddCircleFixture(float fRadius, float fDensity, glm::vec2 vOffset = glm::vec2(0.0f));
 
-	int32 AddEdgeChainFixture(vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, vec2 vOffset = vec2(0.0f), float fAngleOffset = 0.0f);
+	int32 AddEdgeChainFixture(glm::vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, glm::vec2 vOffset = glm::vec2(0.0f), float fAngleOffset = 0.0f);
 
 	//virtual void SetCoordinateType(eCoordinateType eCoordType, bool bDoConversion);
 

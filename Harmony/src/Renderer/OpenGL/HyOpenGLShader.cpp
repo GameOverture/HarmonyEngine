@@ -134,23 +134,23 @@ void HyOpenGLShader::Use(uint32 uiStartOffset)
 		{
 		case HYSHADERVAR_bool:
 			glVertexAttribPointer(uiLocation, 1, GL_BYTE, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
-			uiOffset += sizeof(bool);
+			uiOffset += sizeof(GLboolean);
 			break;
 		case HYSHADERVAR_int:
 			glVertexAttribPointer(uiLocation, 1, GL_INT, m_vVertexAttributes[i].bNormalized, m_uiStride, (void *)(uiStartOffset + uiOffset));
-			uiOffset += sizeof(int32);
+			uiOffset += sizeof(GLint);
 			break;
 		case HYSHADERVAR_uint:
 			glVertexAttribPointer(uiLocation, 1, GL_UNSIGNED_INT, m_vVertexAttributes[i].bNormalized, m_uiStride, (void *)(uiStartOffset + uiOffset));
-			uiOffset += sizeof(uint32);
+			uiOffset += sizeof(GLuint);
 			break;
 		case HYSHADERVAR_float:
 			glVertexAttribPointer(uiLocation, 1, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
-			uiOffset += sizeof(float);
+			uiOffset += sizeof(GLfloat);
 			break;
 		case HYSHADERVAR_double:
 			glVertexAttribLPointer(uiLocation, 1, GL_DOUBLE, m_uiStride, (void *)(uiStartOffset + uiOffset));
-			uiOffset += sizeof(bool);
+			uiOffset += sizeof(GLdouble);
 			break;
 		case HYSHADERVAR_bvec2:
 			glVertexAttribPointer(uiLocation, 2, GL_BYTE, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
@@ -186,7 +186,7 @@ void HyOpenGLShader::Use(uint32 uiStartOffset)
 			break;
 		case HYSHADERVAR_vec4:
 			glVertexAttribPointer(uiLocation, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
-			uiOffset += sizeof(glm::vec2);
+			uiOffset += sizeof(glm::vec4);
 			break;
 		case HYSHADERVAR_dvec2:
 			glVertexAttribLPointer(uiLocation, 2, GL_DOUBLE, m_uiStride, (void *)(uiStartOffset + uiOffset));
@@ -200,11 +200,23 @@ void HyOpenGLShader::Use(uint32 uiStartOffset)
 			glVertexAttribLPointer(uiLocation, 4, GL_DOUBLE, m_uiStride, (void *)(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::dvec4);
 			break;
+		case HYSHADERVAR_mat3:
+			glVertexAttribPointer(uiLocation,     3, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec3);
+			glVertexAttribPointer(uiLocation + 1, 3, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec3);
+			glVertexAttribPointer(uiLocation + 2, 3, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec3);
+			break;
 		case HYSHADERVAR_mat4:
+			glVertexAttribPointer(uiLocation,     4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec4); 
 			glVertexAttribPointer(uiLocation + 1, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec4); 
 			glVertexAttribPointer(uiLocation + 2, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec4); 
 			glVertexAttribPointer(uiLocation + 3, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
-			uiOffset += sizeof(glm::mat4);
+			uiOffset += sizeof(glm::vec4);
 			break;
 		}
 	}
@@ -250,61 +262,61 @@ void HyOpenGLShader::BindFragDataLocation(GLuint location, const char *szName)
 	glBindFragDataLocation(m_hProgHandle, location, szName);
 }
 
-void HyOpenGLShader::SetUniform(const char *szName, float x, float y, float z)
+void HyOpenGLShader::SetUniformGLSL(const char *szName, float x, float y, float z)
 {
 	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniform3f(loc,x,y,z);
 }
 
-void HyOpenGLShader::SetUniform(const char *szName, const vec3 &v)
+void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::vec3 &v)
 {
-	this->SetUniform(szName, v.x, v.y, v.z);
+	this->SetUniformGLSL(szName, v.x, v.y, v.z);
 }
 
-void HyOpenGLShader::SetUniform(const char *szName, const vec4 &v)
+void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::vec4 &v)
 {
 	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if( loc >= 0 )
 		glUniform4f(loc, v.x, v.y, v.z, v.w);
 }
 
-void HyOpenGLShader::SetUniform(const char *szName, const mat4 &m)
+void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::mat4 &m)
 {
 	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &m[0][0]);
 }
 
-void HyOpenGLShader::SetUniform(const char *szName, const mat3 &m)
+void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::mat3 &m)
 {
 	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniformMatrix3fv(loc, 1, GL_FALSE, &m[0][0]);
 }
 
-void HyOpenGLShader::SetUniform(const char *szName, float val )
+void HyOpenGLShader::SetUniformGLSL(const char *szName, float val)
 {
 	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniform1f(loc, val);
 }
 
-void HyOpenGLShader::SetUniform(const char *szName, int32 val)
+void HyOpenGLShader::SetUniformGLSL(const char *szName, int32 val)
 {
 	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniform1i(loc, val);
 }
 
-void HyOpenGLShader::SetUniform(const char *szName, uint32 val)
+void HyOpenGLShader::SetUniformGLSL(const char *szName, uint32 val)
 {
 	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
 		glUniform1ui(loc, val);
 }
 
-void HyOpenGLShader::SetUniform(const char *szName, bool val)
+void HyOpenGLShader::SetUniformGLSL(const char *szName, bool val)
 {
 	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
@@ -361,6 +373,8 @@ void HyOpenGLShader::PrintActiveAttribs()
 
 /*virtual*/ void HyOpenGLShader::OnRenderThread(IHyRenderer &rendererRef)
 {
+	HyAssert(m_eLoadState == HYLOADSTATE_Queued, "HyOpenGLShader::OnRenderThread() invoked on a non-queued shader");
+
 	HyOpenGL &gl = static_cast<HyOpenGL &>(rendererRef);
 
 	glGenVertexArrays(1, &m_hVAO);
@@ -374,6 +388,8 @@ void HyOpenGLShader::PrintActiveAttribs()
 	{
 		if(m_vVertexAttributes[i].eVarType == HYSHADERVAR_dvec2 || m_vVertexAttributes[i].eVarType == HYSHADERVAR_dvec3 || m_vVertexAttributes[i].eVarType == HYSHADERVAR_dvec4)
 			iTotalVertexAttribs += 2;
+		else if(m_vVertexAttributes[i].eVarType == HYSHADERVAR_mat3)
+			iTotalVertexAttribs += 3;
 		else if(m_vVertexAttributes[i].eVarType == HYSHADERVAR_mat4)
 			iTotalVertexAttribs += 4;
 		else
@@ -403,6 +419,16 @@ void HyOpenGLShader::PrintActiveAttribs()
 
 			glVertexAttribDivisor(uiLocation + 0, m_vVertexAttributes[i].uiInstanceDivisor);
 			glVertexAttribDivisor(uiLocation + 1, m_vVertexAttributes[i].uiInstanceDivisor);
+		}
+		else if(m_vVertexAttributes[i].eVarType == HYSHADERVAR_mat3)
+		{
+			glEnableVertexAttribArray(uiLocation + 0);
+			glEnableVertexAttribArray(uiLocation + 1);
+			glEnableVertexAttribArray(uiLocation + 2);
+
+			glVertexAttribDivisor(uiLocation + 0, m_vVertexAttributes[i].uiInstanceDivisor);
+			glVertexAttribDivisor(uiLocation + 1, m_vVertexAttributes[i].uiInstanceDivisor);
+			glVertexAttribDivisor(uiLocation + 2, m_vVertexAttributes[i].uiInstanceDivisor);
 		}
 		else if(m_vVertexAttributes[i].eVarType == HYSHADERVAR_mat4)
 		{
@@ -441,6 +467,7 @@ void HyOpenGLShader::PrintActiveAttribs()
 		case HYSHADERVAR_dvec2:		m_uiStride += sizeof(glm::dvec2);	break;
 		case HYSHADERVAR_dvec3:		m_uiStride += sizeof(glm::dvec3);	break;
 		case HYSHADERVAR_dvec4:		m_uiStride += sizeof(glm::dvec4);	break;
+		case HYSHADERVAR_mat3:		m_uiStride += sizeof(glm::mat3);	break;
 		case HYSHADERVAR_mat4:		m_uiStride += sizeof(glm::mat4);	break;
 		}
 	}

@@ -21,9 +21,9 @@ class HyMesh3dData : public IHyData
 {
 	friend class HyFactory<HyMesh3dData>;
 
-	vec3					m_vAmbientReflectivity;
-	vec3					m_vDiffuseReflectivity;
-	vec3					m_vSpecularReflectivity;
+	glm::vec3				m_vAmbientReflectivity;
+	glm::vec3				m_vDiffuseReflectivity;
+	glm::vec3				m_vSpecularReflectivity;
 	float					m_fSpecularShininess;
 
 	// Only allow HyFactory instantiate

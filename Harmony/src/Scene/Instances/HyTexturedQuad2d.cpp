@@ -126,42 +126,42 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 {
 	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);
 
-	vec2 vSize(m_SrcRect.Width() * pData->GetAtlasGroup()->GetWidth(), m_SrcRect.Height() * pData->GetAtlasGroup()->GetHeight());
-	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vSize;
-	pRefDataWritePos += sizeof(vec2);
+	glm::vec2 vSize(m_SrcRect.Width() * pData->GetAtlasGroup()->GetWidth(), m_SrcRect.Height() * pData->GetAtlasGroup()->GetHeight());
+	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vSize;
+	pRefDataWritePos += sizeof(glm::vec2);
 
-	vec2 vOffset(0.0f, 0.0f);
-	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vOffset;
-	pRefDataWritePos += sizeof(vec2);
+	glm::vec2 vOffset(0.0f, 0.0f);
+	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vOffset;
+	pRefDataWritePos += sizeof(glm::vec2);
 
-	*reinterpret_cast<vec4 *>(pRefDataWritePos) = color.Get();
-	pRefDataWritePos += sizeof(vec4);
+	*reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = color.Get();
+	pRefDataWritePos += sizeof(glm::vec4);
 
 	*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(m_uiTextureIndex);
 	pRefDataWritePos += sizeof(float);
 
-	vec2 vUV;
+	glm::vec2 vUV;
 
 	vUV.x = m_SrcRect.right;//1.0f;
 	vUV.y = m_SrcRect.top;//0.0f;
-	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(vec2);
+	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+	pRefDataWritePos += sizeof(glm::vec2);
 
 	vUV.x = m_SrcRect.left;//0.0f;
 	vUV.y = m_SrcRect.top;//0.0f;
-	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(vec2);
+	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+	pRefDataWritePos += sizeof(glm::vec2);
 
 	vUV.x = m_SrcRect.right;//1.0f;
 	vUV.y = m_SrcRect.bottom;//1.0f;
-	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(vec2);
+	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+	pRefDataWritePos += sizeof(glm::vec2);
 
 	vUV.x = m_SrcRect.left;//0.0f;
 	vUV.y = m_SrcRect.bottom;//1.0f;
-	*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(vec2);
+	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+	pRefDataWritePos += sizeof(glm::vec2);
 
-	GetWorldTransform(*reinterpret_cast<mat4 *>(pRefDataWritePos));
-	pRefDataWritePos += sizeof(mat4);
+	GetWorldTransform(*reinterpret_cast<glm::mat4 *>(pRefDataWritePos));
+	pRefDataWritePos += sizeof(glm::mat4);
 }

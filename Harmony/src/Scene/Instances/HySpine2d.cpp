@@ -153,7 +153,7 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 	//m_pSpineSkeleton->x = m_ptPosition.Get().x * fCoordModifier;
 	//m_pSpineSkeleton->y = m_ptPosition.Get().y * fCoordModifier;
 	
-	const vec4 &rawColor = color.Get();
+	const glm::vec4 &rawColor = color.Get();
 	m_pSpineSkeleton->r = rawColor.r;
 	m_pSpineSkeleton->g = rawColor.g;
 	m_pSpineSkeleton->b = rawColor.b;
@@ -216,45 +216,45 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 #define vertU(index) regionAttachment->uvs[index*2]
 #define vertV(index) regionAttachment->uvs[index*2+1]
 
-		vec2 vSize(abs(vertX(0) - vertX(3)), abs(vertY(2) - vertY(3)));
-		vec2 vOffset(vertX(0), vertY(0));
+		glm::vec2 vSize(abs(vertX(0) - vertX(3)), abs(vertY(2) - vertY(3)));
+		glm::vec2 vOffset(vertX(0), vertY(0));
 
-		*reinterpret_cast<vec2 *>(pRefDataWritePos) = vSize;
-		pRefDataWritePos += sizeof(vec2);
-		*reinterpret_cast<vec2 *>(pRefDataWritePos) = vOffset;
-		pRefDataWritePos += sizeof(vec2);
+		*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vSize;
+		pRefDataWritePos += sizeof(glm::vec2);
+		*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vOffset;
+		pRefDataWritePos += sizeof(glm::vec2);
 
-		vec4 vVertColorRGBA;
+		glm::vec4 vVertColorRGBA;
 		vVertColorRGBA.r = m_pSpineSkeleton->r * pCurSlot->r;
 		vVertColorRGBA.g = m_pSpineSkeleton->g * pCurSlot->g;
 		vVertColorRGBA.b = m_pSpineSkeleton->b * pCurSlot->b;
 		vVertColorRGBA.a = m_pSpineSkeleton->a * pCurSlot->a;
-		*reinterpret_cast<vec4 *>(pRefDataWritePos) = vVertColorRGBA;
-		pRefDataWritePos += sizeof(vec4);
+		*reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = vVertColorRGBA;
+		pRefDataWritePos += sizeof(glm::vec4);
 
-		vec2 vUV;
+		glm::vec2 vUV;
 
 		vUV.x = vertU(0);
 		vUV.y = vertV(0);
-		*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
-		pRefDataWritePos += sizeof(vec2);
+		*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+		pRefDataWritePos += sizeof(glm::vec2);
 
 		vUV.x = vertU(1);
 		vUV.y = vertV(1);
-		*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
-		pRefDataWritePos += sizeof(vec2);
+		*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+		pRefDataWritePos += sizeof(glm::vec2);
 
 		vUV.x = vertU(3);
 		vUV.y = vertV(3);
-		*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
-		pRefDataWritePos += sizeof(vec2);
+		*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+		pRefDataWritePos += sizeof(glm::vec2);
 
 		vUV.x = vertU(2);
 		vUV.y = vertV(2);
-		*reinterpret_cast<vec2 *>(pRefDataWritePos) = vUV;
-		pRefDataWritePos += sizeof(vec2);
+		*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+		pRefDataWritePos += sizeof(glm::vec2);
 		
-		GetWorldTransform(*reinterpret_cast<mat4 *>(pRefDataWritePos));
-		pRefDataWritePos += sizeof(mat4);
+		GetWorldTransform(*reinterpret_cast<glm::mat4 *>(pRefDataWritePos));
+		pRefDataWritePos += sizeof(glm::mat4);
 	}
 }

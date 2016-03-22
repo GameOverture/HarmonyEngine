@@ -65,7 +65,7 @@ void IHyInst2d::Unload()
 	m_eLoadState = HYLOADSTATE_Inactive;
 }
 
-void IHyInst2d::GetWorldTransform(mat4 &outMtx)
+void IHyInst2d::GetWorldTransform(glm::mat4 &outMtx)
 {
 	if(m_bDirty)
 	{
@@ -112,6 +112,7 @@ void IHyInst2d::Detach()
 
 void IHyInst2d::SetCustomShader(IHyShader *pShader, HyWriteDrawBufferDataOverride fpWriteDrawBufferOverride /*= NULL*/)
 {
+	m_RenderState.SetShaderIndex(pShader->GetIndex());
 	m_fpWriteDrawBufferOverride = fpWriteDrawBufferOverride;
 }
 

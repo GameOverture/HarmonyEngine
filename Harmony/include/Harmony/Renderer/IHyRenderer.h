@@ -83,9 +83,9 @@ public:
 	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags) = 0;
 
 	int32 GetNumCameras2d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d)); }
-	uint32 GetCameraWindowIndex2d(int iCameraIndex)			{ return *(reinterpret_cast<uint32 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32)			+ (iCameraIndex		* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(mat4))))); }
-	HyRectangle<float> *GetCameraViewportRect2d(int iIndex)	{ return reinterpret_cast<HyRectangle<float> *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iIndex			* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(mat4))) + sizeof(uint32)); }
-	mat4 *GetCameraView2d(int iIndex)						{ return reinterpret_cast<mat4 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32)				+ (iIndex			* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(mat4))) + sizeof(uint32) + sizeof(HyRectangle<float>)); }
+	uint32 GetCameraWindowIndex2d(int iCameraIndex)			{ return *(reinterpret_cast<uint32 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iCameraIndex		* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))))); }
+	HyRectangle<float> *GetCameraViewportRect2d(int iIndex)	{ return reinterpret_cast<HyRectangle<float> *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iIndex	* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) + sizeof(uint32)); }
+	glm::mat4 *GetCameraView2d(int iIndex)					{ return reinterpret_cast<glm::mat4 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iIndex			* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) + sizeof(uint32) + sizeof(HyRectangle<float>)); }
 
 	int32 GetNumInsts3d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras3d)); }
 	int32 GetNumCameras3d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras3d)); }
@@ -98,7 +98,7 @@ public:
 	void Draw2d();
 	void SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
 
-	static IHyShader &NewCustomShader();
+	static IHyShader *NewCustomShader();
 };
 
 #endif /* __IHyRenderer_h__ */

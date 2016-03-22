@@ -18,7 +18,7 @@ class HyAtlasGroupData;
 
 class HyPrimitive2d : public IHyInst2d
 {
-	vec4 *			m_pVertices;
+	glm::vec4 *		m_pVertices;
 	uint32			m_uiNumVerts;
 
 public:
@@ -27,16 +27,16 @@ public:
 
 	const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p);
 
-	uint32 GetNumVerts()		{ return m_uiNumVerts; }
-	vec4 *GetVertexDataPtr()	{ return m_pVertices; }
+	uint32 GetNumVerts()			{ return m_uiNumVerts; }
+	glm::vec4 *GetVertexDataPtr()	{ return m_pVertices; }
 
-	void SetAsQuad(float fWidth, float fHeight, bool bWireframe, vec2 &vOffset = vec2(0.0f));
+	void SetAsQuad(float fWidth, float fHeight, bool bWireframe, glm::vec2 &vOffset = glm::vec2(0.0f));
 
-	void SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, vec2 &vOffset = vec2(0.0f));
+	void SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, glm::vec2 &vOffset = glm::vec2(0.0f));
 
-	void SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, vec2 &vOffset = vec2(0.0f));
+	void SetAsEdgeChain(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, glm::vec2 &vOffset = glm::vec2(0.0f));
 
-	void OffsetVerts(vec2 vOffset, float fAngleOffset);
+	void OffsetVerts(glm::vec2 vOffset, float fAngleOffset);
 
 private:
 

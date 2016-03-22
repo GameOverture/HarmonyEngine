@@ -39,14 +39,14 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 	ClearData();
 	if(m_uiNumVerts != 0)
 	{
-		m_pVertices = new vec4[m_uiNumVerts];
-		memcpy(m_pVertices, p.m_pVertices, m_uiNumVerts * sizeof(vec4));
+		m_pVertices = new glm::vec4[m_uiNumVerts];
+		memcpy(m_pVertices, p.m_pVertices, m_uiNumVerts * sizeof(glm::vec4));
 	}
 	
 	return *this;
 }
 
-void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, vec2 &vOffset /*= vec2(0.0f)*/)
+void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, glm::vec2 &vOffset /*= vec2(0.0f)*/)
 {
 	ClearData();
 
@@ -63,7 +63,7 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, vec2
 	vOffset *= fCoordMod;
 
 	m_uiNumVerts = 4;
-	m_pVertices = new vec4[m_uiNumVerts];
+	m_pVertices = new glm::vec4[m_uiNumVerts];
 
 	m_pVertices[0].x = vOffset.x;
 	m_pVertices[0].y = vOffset.y;
@@ -95,7 +95,7 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, vec2
 	m_pVertices[3].w = 1.0f;
 }
 
-void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, vec2 &vOffset /*= vec2(0.0f)*/)
+void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, glm::vec2 &vOffset /*= vec2(0.0f)*/)
 {
 	ClearData();
 
@@ -105,7 +105,7 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLEFAN);
 
 	m_uiNumVerts = iNumSegments;
-	m_pVertices = new vec4[m_uiNumVerts];
+	m_pVertices = new glm::vec4[m_uiNumVerts];
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
 		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
@@ -125,7 +125,7 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	}
 }
 
-void HyPrimitive2d::SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, vec2 &vOffset /*= vec2(0.0f)*/)
+void HyPrimitive2d::SetAsEdgeChain(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, glm::vec2 &vOffset /*= vec2(0.0f)*/)
 {
 	ClearData();
 
@@ -135,7 +135,7 @@ void HyPrimitive2d::SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, boo
 		m_RenderState.Enable(HyRenderState::DRAWMODE_LINESTRIP);
 
 	m_uiNumVerts = uiNumVerts;
-	m_pVertices = new vec4[m_uiNumVerts];
+	m_pVertices = new glm::vec4[m_uiNumVerts];
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
 		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
@@ -150,7 +150,7 @@ void HyPrimitive2d::SetAsEdgeChain(const vec2 *pVertices, uint32 uiNumVerts, boo
 	}
 }
 
-void HyPrimitive2d::OffsetVerts(vec2 vOffset, float fAngleOffset)
+void HyPrimitive2d::OffsetVerts(glm::vec2 vOffset, float fAngleOffset)
 {
 	HyAssert(m_pVertices, "HyPrimitive2d::OffsetVerts() was invoked with an unset instance.");
 
@@ -185,17 +185,17 @@ void HyPrimitive2d::ClearData()
 
 /*virtual*/ void HyPrimitive2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)
 {
-	memcpy(pRefDataWritePos, &color.Get(), sizeof(vec4));
-	pRefDataWritePos += sizeof(vec4);
+	memcpy(pRefDataWritePos, &color.Get(), sizeof(glm::vec4));
+	pRefDataWritePos += sizeof(glm::vec4);
 
-	mat4 mtx;
+	glm::mat4 mtx;
 	GetWorldTransform(mtx);
-	memcpy(pRefDataWritePos, &mtx, sizeof(mat4));
-	pRefDataWritePos += sizeof(mat4);
+	memcpy(pRefDataWritePos, &mtx, sizeof(glm::mat4));
+	pRefDataWritePos += sizeof(glm::mat4);
 
 	memcpy(pRefDataWritePos, &m_uiNumVerts, sizeof(uint32));
 	pRefDataWritePos += sizeof(uint32);
 
-	memcpy(pRefDataWritePos, m_pVertices, m_uiNumVerts * sizeof(vec4));
-	pRefDataWritePos += m_uiNumVerts * sizeof(vec4);
+	memcpy(pRefDataWritePos, m_pVertices, m_uiNumVerts * sizeof(glm::vec4));
+	pRefDataWritePos += m_uiNumVerts * sizeof(glm::vec4);
 }

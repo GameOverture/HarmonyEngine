@@ -40,7 +40,6 @@ public:
 
 	HyWindow &Window(uint32 uiIndex = 0);
 	HyInputMapInterop &Input(uint32 uiIndex = 0);
-	IHyShader &NewCustomShader();
 
 	void *operator new(size_t uiSize);
 	void operator delete (void *pPtr);

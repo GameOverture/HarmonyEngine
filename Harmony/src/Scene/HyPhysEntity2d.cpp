@@ -31,7 +31,7 @@ HyPhysEntity2d::~HyPhysEntity2d(void)
 }
 
 
-int32 HyPhysEntity2d::AddBoxFixture(float fHalfWidth, float fHalfHeight, float fDensity, vec2 vOffset /*= vec2(0.0f)*/, float fAngleOffset /*= 0.0f*/)
+int32 HyPhysEntity2d::AddBoxFixture(float fHalfWidth, float fHalfHeight, float fDensity, glm::vec2 vOffset /*= vec2(0.0f)*/, float fAngleOffset /*= 0.0f*/)
 {
 	HyAssert(m_b2Body, "HyPhysEntity2d::AddBoxFixture() was invoked with an uninitialized instance");
 
@@ -53,7 +53,7 @@ int32 HyPhysEntity2d::AddBoxFixture(float fHalfWidth, float fHalfHeight, float f
 	return static_cast<int32>(m_Fixtures.size()-1);
 }	
 
-int32 HyPhysEntity2d::AddCircleFixture(float fRadius, float fDensity, vec2 vOffset /*= vec2(0.0f)*/)
+int32 HyPhysEntity2d::AddCircleFixture(float fRadius, float fDensity, glm::vec2 vOffset /*= vec2(0.0f)*/)
 {
 	HyAssert(m_b2Body, "HyPhysEntity2d::SetAsBox() was invoked with an uninitialized instance");
 
@@ -77,7 +77,7 @@ int32 HyPhysEntity2d::AddCircleFixture(float fRadius, float fDensity, vec2 vOffs
 	return static_cast<int32>(m_Fixtures.size() - 1);
 }
 
-int32 HyPhysEntity2d::AddEdgeChainFixture(vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, vec2 vOffset /*= vec2(0.0f)*/, float fAngleOffset /*= 0.0f*/)
+int32 HyPhysEntity2d::AddEdgeChainFixture(glm::vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, glm::vec2 vOffset /*= vec2(0.0f)*/, float fAngleOffset /*= 0.0f*/)
 {
 	HyAssert(m_b2Body, "HyPhysEntity2d::SetAsBox() was invoked with an uninitialized instance");
 

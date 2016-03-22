@@ -19,7 +19,7 @@ using std::vector;
 
 class HyAnimVec4
 {
-	vec4		m_vValue;
+	glm::vec4			m_vValue;
 	enum {
 		NumDimensions = 4
 	};
@@ -35,7 +35,7 @@ public:
 	~HyAnimVec4()
 	{ }
 
-	inline const vec4 &Get() const											{ return m_vValue; }
+	inline const glm::vec4 &Get() const										{ return m_vValue; }
 
 	inline float X() const													{ return m_vAnimFloats[0].Get(); }
 	inline void X(float fValue)												{ m_vAnimFloats[0] = fValue; }
@@ -59,11 +59,11 @@ public:
 
 	inline void Set(float fAll)												{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].Set(fAll); }
 	inline void Set(float fXorR, float fYorG, float fZorB, float fWorA)		{ m_vAnimFloats[0] = fXorR; m_vAnimFloats[1] = fYorG; m_vAnimFloats[2] = fZorB; m_vAnimFloats[3] = fWorA; }
-	inline void Set(const vec4 &srcVec)										{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].Set(srcVec[i]); }
+	inline void Set(const glm::vec4 &srcVec)								{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].Set(srcVec[i]); }
 	inline void Set(const HyAnimVec4 &srcVec)								{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].Set(srcVec[i]); }
 
 	inline void Offset(float fXorR, float fYorG, float fZorB, float fWorA)	{ m_vAnimFloats[0] += fXorR; m_vAnimFloats[1] += fYorG; m_vAnimFloats[2] += fZorB; m_vAnimFloats[3] += fWorA; }
-	inline void Offset(const vec4 &srcVec)									{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].Offset(srcVec[i]); }
+	inline void Offset(const glm::vec4 &srcVec)								{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].Offset(srcVec[i]); }
 	inline void Offset(const HyAnimVec4 &srcVec)							{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].Offset(srcVec[i]); }
 
 	inline HyAnimFloat &AnimX()												{ return m_vAnimFloats[0]; }
@@ -86,10 +86,10 @@ public:
 	HyAnimVec4 &operator*=(const HyAnimVec4 &rhs)							{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i] *= rhs[i]; return *this; }
 	HyAnimVec4 &operator/=(const HyAnimVec4 &rhs)							{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i] /= rhs[i]; return *this; }
 
-	HyAnimVec4 &operator+=(const vec4 &rhs)									{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i] += rhs[i]; return *this; }
-	HyAnimVec4 &operator-=(const vec4 &rhs)									{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i] -= rhs[i]; return *this; }
-	HyAnimVec4 &operator*=(const vec4 &rhs)									{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i] *= rhs[i]; return *this; }
-	HyAnimVec4 &operator/=(const vec4 &rhs)									{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i] /= rhs[i]; return *this; }
+	HyAnimVec4 &operator+=(const glm::vec4 &rhs)							{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i] += rhs[i]; return *this; }
+	HyAnimVec4 &operator-=(const glm::vec4 &rhs)							{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i] -= rhs[i]; return *this; }
+	HyAnimVec4 &operator*=(const glm::vec4 &rhs)							{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i] *= rhs[i]; return *this; }
+	HyAnimVec4 &operator/=(const glm::vec4 &rhs)							{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i] /= rhs[i]; return *this; }
 
 	float operator [](int i) const											{ return m_vValue[i]; }
 };

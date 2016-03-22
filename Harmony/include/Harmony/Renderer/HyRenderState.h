@@ -17,6 +17,8 @@ class IHyInst2d;
 
 class HyRenderState
 {
+	// WARNING: This class should not dynamically allocate any memory or use any object that does so
+
 public:
 	enum eAttributes
 	{
@@ -36,7 +38,7 @@ private:
 	uint32			m_uiAttributeFlags;
 	uint32			m_uiTextureBindHandle;
 
-	uint32			m_uiShaderIndex;
+	uint32			m_uiShaderIndex; Need to compare uniforms in operator=
 	
 	uint32			m_uiNumInstances;
 	size_t			m_uiDataOffset;

@@ -44,15 +44,15 @@ public:
 
 	void BindFragDataLocation(GLuint location, const char *szName);
 
-	void SetUniform(const char *szName, float x, float y, float z);
-	void SetUniform(const char *szName, const vec3 &v);
-	void SetUniform(const char *szName, const vec4 &v);
-	void SetUniform(const char *szName, const mat4 &m);
-	void SetUniform(const char *szName, const mat3 &m);
-	void SetUniform(const char *szName, float val);
-	void SetUniform(const char *szName, int32 val);
-	void SetUniform(const char *szName, uint32 val);
-	void SetUniform(const char *szName, bool val);
+	void SetUniformGLSL(const char *szName, float x, float y, float z);
+	void SetUniformGLSL(const char *szName, const glm::vec3 &v);
+	void SetUniformGLSL(const char *szName, const glm::vec4 &v);
+	void SetUniformGLSL(const char *szName, const glm::mat4 &m);
+	void SetUniformGLSL(const char *szName, const glm::mat3 &m);
+	void SetUniformGLSL(const char *szName, float val);
+	void SetUniformGLSL(const char *szName, int32 val);
+	void SetUniformGLSL(const char *szName, uint32 val);
+	void SetUniformGLSL(const char *szName, bool val);
 
 	void PrintActiveUniforms();
 	void PrintActiveAttribs();

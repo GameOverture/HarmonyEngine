@@ -59,7 +59,7 @@ namespace glm
 	// Float definition
 
 #if(defined(GLM_PRECISION_HIGHP_FLOAT))
-	typedef highp_vec2          vec2;
+	typedef highp_vec2          glm::vec2;
 	typedef highp_vec3          vec3;
 	typedef highp_vec4          vec4;
 	typedef highp_mat2x2		mat2x2;

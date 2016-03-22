@@ -93,7 +93,7 @@ void HyRenderState::SetTextureHandle(uint32 uiHandleId)
 
 bool HyRenderState::operator==(const HyRenderState &right) const
 {
-	return (this->m_uiAttributeFlags == right.m_uiAttributeFlags) && (m_uiTextureBindHandle == right.m_uiTextureBindHandle);
+	return (this->m_uiAttributeFlags == right.m_uiAttributeFlags) && (m_uiTextureBindHandle == right.m_uiTextureBindHandle) && (m_uiShaderIndex == right.m_uiShaderIndex);
 }
 
 bool HyRenderState::operator!=(const HyRenderState &right) const
@@ -104,7 +104,12 @@ bool HyRenderState::operator!=(const HyRenderState &right) const
 bool HyRenderState::operator< (const HyRenderState &right) const
 {
 	if(m_uiAttributeFlags == right.m_uiAttributeFlags)
-		return (this->m_uiTextureBindHandle < right.m_uiTextureBindHandle);
+	{
+		if(this->m_uiTextureBindHandle == right.m_uiTextureBindHandle)
+			return this->m_uiShaderIndex < right.m_uiShaderIndex;
+		else
+			return (this->m_uiTextureBindHandle < right.m_uiTextureBindHandle);
+	}
 
 	return m_uiAttributeFlags < right.m_uiAttributeFlags;
 }

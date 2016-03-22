@@ -25,12 +25,6 @@
 #include "GL/glext.h"
 
 // Data types
-using glm::vec2;
-using glm::vec3;
-using glm::vec4;
-using glm::mat3;
-using glm::mat4;
-
 typedef signed char			char8;
 typedef unsigned char		uchar8;
 typedef signed char			int8;

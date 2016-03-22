@@ -46,8 +46,8 @@ public:
 	inline void	SetEnabled(bool bEnabled)						{ m_bEnabled = bEnabled; }
 	
 	// Returns the converted pixel position to the specified HyCoordinateType
-	void GetLocalTransform(mat4 &outMtx) const;
-	void GetLocalTransform_SRT(mat4 &outMtx) const;
+	void GetLocalTransform(glm::mat4 &outMtx) const;
+	void GetLocalTransform_SRT(glm::mat4 &outMtx) const;
 
 	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam = NULL);
 };
@@ -89,21 +89,21 @@ void ITransform<tVec>::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoCo
 }
 
 template<typename tVec>
-void ITransform<tVec>::GetLocalTransform(mat4 &outMtx) const
+void ITransform<tVec>::GetLocalTransform(glm::mat4 &outMtx) const
 {
 	outMtx = glm::mat4(1.0f);
 
 	// TODO: Make this support 3d by exposing 'NumDimensions' in AnimVec and loop, assign tVec's using bracket overload
 
-	vec3 ptPos(0.0f);
+	glm::vec3 ptPos(0.0f);
 	ptPos.x = pos.X();
 	ptPos.y = pos.Y();
 
-	vec3 vScale(1.0f);
+	glm::vec3 vScale(1.0f);
 	vScale.x = scale.X();
 	vScale.y = scale.Y();
 
-	vec3 ptRotPivot(0.0f);
+	glm::vec3 ptRotPivot(0.0f);
 	ptRotPivot.x = rot_pivot.X();
 	ptRotPivot.y = rot_pivot.Y();
 
@@ -113,33 +113,33 @@ void ITransform<tVec>::GetLocalTransform(mat4 &outMtx) const
 		outMtx = glm::translate(outMtx, ptPos);
 
 	outMtx = glm::translate(outMtx, ptRotPivot);
-	outMtx = glm::rotate(outMtx, rot.Get().x, vec3(1, 0, 0));
-	outMtx = glm::rotate(outMtx, rot.Get().y, vec3(0, 1, 0));
-	outMtx = glm::rotate(outMtx, rot.Get().z, vec3(0, 0, 1));
+	outMtx = glm::rotate(outMtx, rot.Get().x, glm::vec3(1, 0, 0));
+	outMtx = glm::rotate(outMtx, rot.Get().y, glm::vec3(0, 1, 0));
+	outMtx = glm::rotate(outMtx, rot.Get().z, glm::vec3(0, 0, 1));
 	outMtx = glm::translate(outMtx, ptRotPivot * -1.0f);
 
 	outMtx = glm::scale(outMtx, vScale);
 }
 
 template<typename tVec>
-void ITransform<tVec>::GetLocalTransform_SRT(mat4 &outMtx) const
+void ITransform<tVec>::GetLocalTransform_SRT(glm::mat4 &outMtx) const
 {
 	outMtx = glm::mat4(1.0f);
 
 	// TODO: Make this support 3d by exposing 'NumDimensions' in AnimVec and loop, assign tVec's using bracket overload
 	
-	vec3 ptPos(0.0f);
+	glm::vec3 ptPos(0.0f);
 	ptPos.x = pos.X();
 	ptPos.y = pos.Y();
 
-	vec3 vScale(1.0f);
+	glm::vec3 vScale(1.0f);
 	vScale.x = scale.X();
 	vScale.y = scale.Y();
 
 	outMtx = glm::scale(outMtx, vScale);
-	outMtx = glm::rotate(outMtx, rot.Get().x, vec3(1, 0, 0));
-	outMtx = glm::rotate(outMtx, rot.Get().y, vec3(0, 1, 0));
-	outMtx = glm::rotate(outMtx, rot.Get().z, vec3(0, 0, 1));
+	outMtx = glm::rotate(outMtx, rot.Get().x, glm::vec3(1, 0, 0));
+	outMtx = glm::rotate(outMtx, rot.Get().y, glm::vec3(0, 1, 0));
+	outMtx = glm::rotate(outMtx, rot.Get().z, glm::vec3(0, 0, 1));
 	
 	if(m_eCoordUnit == HYCOORDUNIT_Meters)
 		outMtx = glm::translate(outMtx, ptPos * IHyApplication::PixelsPerMeter());

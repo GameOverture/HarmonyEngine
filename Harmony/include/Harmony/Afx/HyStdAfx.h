@@ -78,6 +78,7 @@ enum HyShaderVariable
 	HYSHADERVAR_dvec3,
 	HYSHADERVAR_dvec4,
 	HYSHADERVAR_mat4,
+	HYSHADERVAR_mat3,
 
 	HYNUMSHADERVARS
 };

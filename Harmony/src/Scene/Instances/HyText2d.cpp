@@ -54,12 +54,12 @@ void HyText2d::CalcVertexBuffer()
 	if(m_pVertexBuffer)
 		delete [] m_pVertexBuffer;
 
-	vec4 ptVerts[4];
-	vec2 vUVs[4];
-	vec2 ptPenPos(0.0f);
+	glm::vec4 ptVerts[4];
+	glm::vec2 vUVs[4];
+	glm::vec2 ptPenPos(0.0f);
 
 	size_t uiNumCharacters = m_sString.size();
-	m_uiBufferSizeBytes = uiNumCharacters * (4 * (sizeof(vec4) + sizeof(vec2)));
+	m_uiBufferSizeBytes = uiNumCharacters * (4 * (sizeof(glm::vec4) + sizeof(glm::vec2)));
 	m_pVertexBuffer = new unsigned char[m_uiBufferSizeBytes];
 
 	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pData);
@@ -97,10 +97,10 @@ void HyText2d::CalcVertexBuffer()
 
 			for(int j = 0; j < 4; ++j)
 			{
-				memcpy(pCurVertexWritePos, &ptVerts[j], sizeof(vec4));
-				pCurVertexWritePos += sizeof(vec4);
-				memcpy(pCurVertexWritePos, &vUVs[j], sizeof(vec2));
-				pCurVertexWritePos += sizeof(vec2);
+				memcpy(pCurVertexWritePos, &ptVerts[j], sizeof(glm::vec4));
+				pCurVertexWritePos += sizeof(glm::vec4);
+				memcpy(pCurVertexWritePos, &vUVs[j], sizeof(glm::vec2));
+				pCurVertexWritePos += sizeof(glm::vec2);
 			}
 
 			ptPenPos.x += glyph->advance_x;
