@@ -25,7 +25,7 @@ public:
 		SCISSORTEST				= 1 << 0,
 		USINGSCREENCOORDS		= 1 << 1,	// If disabled, then using world coordinates
 
-		DRAWINSTANCED			= 1 << 2,
+		DRAWINSTANCED			= 1 << 2,	// If enabled, will attempt to batch render multiple instances if they have matching HyRenderStates
 
 		DRAWMODE_TRIANGLESTRIP	= 1 << 3,
 		DRAWMODE_TRIANGLEFAN	= 1 << 4,
