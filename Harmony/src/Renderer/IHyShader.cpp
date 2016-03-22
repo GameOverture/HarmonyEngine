@@ -231,3 +231,16 @@ void IHyShader::SetUniform(const char *szName, bool val)
 
 	m_csUniforms.Unlock();
 }
+
+bool IHyShader::operator==(const IHyShader &right) const
+{
+	if(m_uiINDEX != right.m_uiINDEX)
+		return false;
+	m_uiShaderIndex
+		return (this->m_uiAttributeFlags == right.m_uiAttributeFlags) && (m_uiTextureBindHandle == right.m_uiTextureBindHandle) && (m_uiShaderIndex == right.m_uiShaderIndex);
+}
+
+bool IHyShader::operator!=(const IHyShader &right) const
+{
+	return !(*this == right);
+}

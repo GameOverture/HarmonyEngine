@@ -239,6 +239,7 @@ void HyScene::WriteDrawBuffers()
 		if(m_vLoadedInst2d[i]->IsEnabled() == false)
 			continue;
 
+		// This update should *also* update any shader Uniforms that it wants in its HyRenderState
 		m_vLoadedInst2d[i]->Update();
 
 		// If previously written instance has equal render state by "operator ==" then it's to be assumed the instance data can be batched and doesn't need to write another render state

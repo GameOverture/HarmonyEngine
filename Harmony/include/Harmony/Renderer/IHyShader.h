@@ -75,6 +75,9 @@ public:
 	void SetUniform(const char *szName, uint32 val);
 	void SetUniform(const char *szName, bool val);
 
+	bool operator==(const IHyShader &right) const;
+	bool operator!=(const IHyShader &right) const;
+
 	virtual void OnRenderThread(IHyRenderer &rendererRef) = 0;
 };
 

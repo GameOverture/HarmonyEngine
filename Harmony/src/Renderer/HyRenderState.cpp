@@ -93,6 +93,7 @@ void HyRenderState::SetTextureHandle(uint32 uiHandleId)
 
 bool HyRenderState::operator==(const HyRenderState &right) const
 {
+	IHyRenderer::GetCustomShader(m_uiShaderIndex)
 	return (this->m_uiAttributeFlags == right.m_uiAttributeFlags) && (m_uiTextureBindHandle == right.m_uiTextureBindHandle) && (m_uiShaderIndex == right.m_uiShaderIndex);
 }
 
