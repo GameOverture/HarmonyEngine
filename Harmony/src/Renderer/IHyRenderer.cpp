@@ -159,10 +159,10 @@ void IHyRenderer::SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info)
 	return pNewShader;
 }
 
-/*static*/ IHyShader *IHyRenderer::GetShader(uint32 uiIndex)
+/*static*/ IHyShader *IHyRenderer::GetShader(int32 iIndex)
 {
-	if(uiIndex < sm_vShaders.size())
-		return sm_vShaders[uiIndex];
+	if(iIndex < static_cast<int32>(sm_vShaders.size()) && iIndex >= 0)
+		return sm_vShaders[iIndex];
 	else
 		return NULL;
 }

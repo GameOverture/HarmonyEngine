@@ -45,7 +45,13 @@ public:
 
 	void BindFragDataLocation(GLuint location, const char *szName);
 
-	void SetUniformGLSL(const char *szName, float x, float y, float z);
+	void SetUniformGLSL(const char *szName, const glm::bvec2 &v);
+	void SetUniformGLSL(const char *szName, const glm::bvec3 &v);
+	void SetUniformGLSL(const char *szName, const glm::bvec4 &v);
+	void SetUniformGLSL(const char *szName, const glm::ivec2 &v);
+	void SetUniformGLSL(const char *szName, const glm::ivec3 &v);
+	void SetUniformGLSL(const char *szName, const glm::ivec4 &v);
+	void SetUniformGLSL(const char *szName, const glm::vec2 &v);
 	void SetUniformGLSL(const char *szName, const glm::vec3 &v);
 	void SetUniformGLSL(const char *szName, const glm::vec4 &v);
 	void SetUniformGLSL(const char *szName, const glm::mat4 &m);

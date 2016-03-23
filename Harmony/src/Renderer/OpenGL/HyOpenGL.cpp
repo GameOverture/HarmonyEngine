@@ -86,31 +86,157 @@ HyOpenGL::~HyOpenGL(void)
 		}
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	if(renderState.IsEnabled(HyRenderState::USINGSCREENCOORDS))
 		SetCameraMatrices_2d(MTX_SCREENVIEW);
 	else
 		SetCameraMatrices_2d(MTX_CAMVIEW);
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	uint32 uiShaderIndex = renderState.GetShaderIndex();
 	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_vShaders[uiShaderIndex]);
 
 	pShader->Use();
 
-	// Always attempt to assign these uniforms if the shader chooses to use them
-	pShader->SetUniformGLSL("mtxWorldToCamera", m_mtxView);
-	pShader->SetUniformGLSL("mtxCameraToClip", m_mtxProj);
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	if(renderState.GetTextureHandle() != 0)
 		glBindTexture(GL_TEXTURE_2D_ARRAY, renderState.GetTextureHandle());
 
-	pShader->SetVertexAttributePtrs(renderState.GetDataOffset());
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//GLenum err = GL_NO_ERROR;
-	//while((err = glGetError()) != GL_NO_ERROR)
-	//{
-	//	//Process/log the error.
-	//	err = err;
-	//}
+	// Always attempt to assign these uniforms if the shader chooses to use them
+	pShader->SetUniformGLSL("mtxWorldToCamera", m_mtxView);
+	pShader->SetUniformGLSL("mtxCameraToClip", m_mtxProj);
+
+	char *pDrawBuffer = GetVertexData2d();
+	size_t uiDataOffset = renderState.GetDataOffset();
+	pDrawBuffer += uiDataOffset;
+
+	uint32 uiNumUniforms = *reinterpret_cast<uint32 *>(pDrawBuffer);
+	pDrawBuffer += sizeof(uint32);
+	uiDataOffset += sizeof(uint32);
+
+	for(uint32 i = 0; i < uiNumUniforms; ++i)
+	{
+		const char *szUniformName = pDrawBuffer;
+		size_t uiStrLen = strlen(szUniformName) + 1;	// +1 for NULL terminator
+		pDrawBuffer += uiStrLen;
+		uiDataOffset += uiStrLen;
+
+		HyShaderVariable eVarType = static_cast<HyShaderVariable>(*reinterpret_cast<uint32 *>(pDrawBuffer));
+		pDrawBuffer += sizeof(uint32);
+		uiDataOffset += sizeof(uint32);
+
+		switch(eVarType)
+		{
+		case HYSHADERVAR_bool:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<bool *>(pDrawBuffer));
+			pDrawBuffer += sizeof(bool);
+			uiDataOffset += sizeof(bool);
+			break;
+		case HYSHADERVAR_int:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<int32 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(int32);
+			uiDataOffset += sizeof(int32);
+			break;
+		case HYSHADERVAR_uint:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<uint32 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(uint32);
+			uiDataOffset += sizeof(uint32);
+			break;
+		case HYSHADERVAR_float:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<float *>(pDrawBuffer));
+			pDrawBuffer += sizeof(float);
+			uiDataOffset += sizeof(float);
+			break;
+		case HYSHADERVAR_double:
+			HyError("GLSL Shader uniform does not support type double yet!");
+			//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<double *>(pDrawBuffer));
+			//pDrawBuffer += sizeof(double);
+			//uiDataOffset += sizeof(double);
+			break;
+		case HYSHADERVAR_bvec2:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::bvec2 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(glm::bvec2);
+			uiDataOffset += sizeof(glm::bvec2);
+			break;
+		case HYSHADERVAR_bvec3:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::bvec3 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(glm::bvec3);
+			uiDataOffset += sizeof(glm::bvec3);
+			break;
+		case HYSHADERVAR_bvec4:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::bvec4 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(glm::bvec4);
+			uiDataOffset += sizeof(glm::bvec4);
+			break;
+		case HYSHADERVAR_ivec2:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::ivec2 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(glm::ivec2);
+			uiDataOffset += sizeof(glm::ivec2);
+			break;
+		case HYSHADERVAR_ivec3:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::ivec3 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(glm::ivec3);
+			uiDataOffset += sizeof(glm::ivec3);
+			break;
+		case HYSHADERVAR_ivec4:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::ivec4 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(glm::ivec4);
+			uiDataOffset += sizeof(glm::ivec4);
+			break;
+		case HYSHADERVAR_vec2:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::vec2 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(glm::vec2);
+			uiDataOffset += sizeof(glm::vec2);
+			break;
+		case HYSHADERVAR_vec3:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::vec3 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(glm::vec3);
+			uiDataOffset += sizeof(glm::vec3);
+			break;
+		case HYSHADERVAR_vec4:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::vec4 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(glm::vec4);
+			uiDataOffset += sizeof(glm::vec4);
+			break;
+		case HYSHADERVAR_dvec2:
+			HyError("GLSL Shader uniform does not support type double yet!");
+			//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::dvec2 *>(pDrawBuffer));
+			//pDrawBuffer += sizeof(glm::dvec2);
+			//uiDataOffset += sizeof(glm::dvec2);
+			break;
+		case HYSHADERVAR_dvec3:
+			HyError("GLSL Shader uniform does not support type double yet!");
+			//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::dvec3 *>(pDrawBuffer));
+			//pDrawBuffer += sizeof(glm::dvec3);
+			//uiDataOffset += sizeof(glm::dvec3);
+			break;
+		case HYSHADERVAR_dvec4:
+			HyError("GLSL Shader uniform does not support type double yet!");
+			//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::dvec4 *>(pDrawBuffer));
+			//pDrawBuffer += sizeof(glm::dvec4);
+			//uiDataOffset += sizeof(glm::dvec4);
+			break;
+		case HYSHADERVAR_mat3:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::mat3 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(glm::mat3);
+			uiDataOffset += sizeof(glm::mat3);
+			break;
+		case HYSHADERVAR_mat4:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::mat4 *>(pDrawBuffer));
+			pDrawBuffer += sizeof(glm::mat4);
+			uiDataOffset += sizeof(glm::mat4);
+			break;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	pShader->SetVertexAttributePtrs(uiDataOffset);
 
 	if(renderState.IsEnabled(HyRenderState::DRAWINSTANCED))
 	{

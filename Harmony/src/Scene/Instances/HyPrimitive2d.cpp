@@ -193,6 +193,12 @@ void HyPrimitive2d::ClearData()
 
 /*virtual*/ void HyPrimitive2d::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
 {
+	glm::mat4 mtx;
+	GetWorldTransform(mtx);
+
+	pShaderUniformsRef->Set("transformMtx", mtx);
+
+	FeelsBadMan - The number of verts needs to be stored in the RenderState
 }
 
 /*virtual*/ void HyPrimitive2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)

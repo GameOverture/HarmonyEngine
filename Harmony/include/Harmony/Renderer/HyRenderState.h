@@ -52,7 +52,8 @@ public:
 	void SetDataOffset(size_t uiVertexDataOffset);
 	size_t GetDataOffset() const;
 
-	void WriteUniformsBufferData(char *&pRefDataWritePos);
+	// This function is responsible for incrementing the passed in reference pointer the size of the data written
+	void WriteRenderStateInfoBufferData(char *&pRefDataWritePos);
 	
 	void AppendInstances(uint32 uiNumInstsToAppend);
 	uint32 GetNumInstances() const;

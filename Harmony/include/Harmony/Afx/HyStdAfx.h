@@ -77,10 +77,8 @@ enum HyShaderVariable
 	HYSHADERVAR_dvec2,
 	HYSHADERVAR_dvec3,
 	HYSHADERVAR_dvec4,
-	HYSHADERVAR_mat4,
 	HYSHADERVAR_mat3,
-
-	HYNUMSHADERVARS
+	HYSHADERVAR_mat4
 };
 
 enum HyCoordinateType

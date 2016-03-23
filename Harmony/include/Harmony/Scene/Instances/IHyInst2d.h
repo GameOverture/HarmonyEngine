@@ -74,7 +74,7 @@ public:
 	int32 GetDisplayOrder() const								{ return m_iDisplayOrder; }
 	void SetDisplayOrder(int32 iOrderValue);
 
-	const HyRenderState &GetRenderState() const					{ return m_RenderState; }	
+	const HyRenderState &GetRenderState() const					{ return m_RenderState; }
 
 	HyAnimVec4													color;
 
@@ -84,7 +84,6 @@ public:
 	void Load();
 	void Unload();
 	void GetWorldTransform(glm::mat4 &outMtx);
-	void GetRenderState(HyRenderState &renderStateOut) const;
 
 	void AddChild(IHyInst2d &childInst);
 	void Detach();

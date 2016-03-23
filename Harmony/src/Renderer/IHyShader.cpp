@@ -15,9 +15,7 @@ HyShaderUniforms::HyShaderUniforms() : m_bDirty(false)
 HyShaderUniforms::~HyShaderUniforms()
 {
 	for(std::map<std::string, Uniform>::iterator iter = m_mapUniforms.begin(); iter != m_mapUniforms.end(); ++iter)
-	{
 		delete iter->second.pData;
-	}
 }
 
 bool HyShaderUniforms::IsDirty()
@@ -209,6 +207,47 @@ void HyShaderUniforms::Set(const char *szName, bool bVal)
 // This function is responsible for incrementing the passed in reference pointer the size of the data written
 void HyShaderUniforms::WriteUniformsBufferData(char *&pRefDataWritePos)
 {
+	*reinterpret_cast<uint32 *>(pRefDataWritePos) = static_cast<uint32>(m_mapUniforms.size());
+	pRefDataWritePos += sizeof(uint32);
+
+	for(std::map<std::string, Uniform>::iterator iter = m_mapUniforms.begin(); iter != m_mapUniforms.end(); ++iter)
+	{
+		// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
+
+		size_t uiStrLen = iter->first.length() + 1;	// +1 for NULL terminator
+		strncpy_s(pRefDataWritePos, uiStrLen, iter->first.c_str(), uiStrLen);
+		pRefDataWritePos += uiStrLen;
+
+		*reinterpret_cast<int32 *>(pRefDataWritePos) = static_cast<int32>(iter->second.eVarType);
+		pRefDataWritePos += sizeof(int32);
+
+		uint32 uiDataSize = 0;
+		switch(iter->second.eVarType)
+		{
+		case HYSHADERVAR_bool:		uiDataSize = sizeof(bool);			break;
+		case HYSHADERVAR_int:		uiDataSize = sizeof(int32);			break;
+		case HYSHADERVAR_uint:		uiDataSize = sizeof(uint32);		break;
+		case HYSHADERVAR_float:		uiDataSize = sizeof(float);			break;
+		case HYSHADERVAR_double:	uiDataSize = sizeof(double);		break;
+		case HYSHADERVAR_bvec2:		uiDataSize = sizeof(glm::bvec2);	break;
+		case HYSHADERVAR_bvec3:		uiDataSize = sizeof(glm::bvec3);	break;
+		case HYSHADERVAR_bvec4:		uiDataSize = sizeof(glm::bvec4);	break;
+		case HYSHADERVAR_ivec2:		uiDataSize = sizeof(glm::ivec2);	break;
+		case HYSHADERVAR_ivec3:		uiDataSize = sizeof(glm::ivec3);	break;
+		case HYSHADERVAR_ivec4:		uiDataSize = sizeof(glm::ivec4);	break;
+		case HYSHADERVAR_vec2:		uiDataSize = sizeof(glm::vec2);		break;
+		case HYSHADERVAR_vec3:		uiDataSize = sizeof(glm::vec3);		break;
+		case HYSHADERVAR_vec4:		uiDataSize = sizeof(glm::vec4);		break;
+		case HYSHADERVAR_dvec2:		uiDataSize = sizeof(glm::dvec2);	break;
+		case HYSHADERVAR_dvec3:		uiDataSize = sizeof(glm::dvec3);	break;
+		case HYSHADERVAR_dvec4:		uiDataSize = sizeof(glm::dvec4);	break;
+		case HYSHADERVAR_mat3:		uiDataSize = sizeof(glm::mat3);		break;
+		case HYSHADERVAR_mat4:		uiDataSize = sizeof(glm::mat4);		break;
+		}
+		memcpy(pRefDataWritePos, iter->second.pData, uiDataSize);
+		pRefDataWritePos += uiDataSize;
+	}
+
 	m_bDirty = false;
 }
 

@@ -54,7 +54,7 @@ TestBed::~TestBed(void)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	//m_primBox.Load();
+	m_primBox.Load();
 	m_primBox.color.Set(0.0f, 0.0f, 1.0f, 1.0f);
 	m_primBox.SetAsQuad(180.0f, 160.0f, false);
 	m_primBox.SetDisplayOrder(0);
@@ -83,8 +83,8 @@ TestBed::~TestBed(void)
 	m_VertLine.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
 	m_HorzLine.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
 
-	//m_VertLine.Load();
-	//m_HorzLine.Load();
+	m_VertLine.Load();
+	m_HorzLine.Load();
 	
 
 	return true;

@@ -251,16 +251,60 @@ void HyOpenGLShader::BindFragDataLocation(GLuint location, const char *szName)
 	glBindFragDataLocation(m_hProgHandle, location, szName);
 }
 
-void HyOpenGLShader::SetUniformGLSL(const char *szName, float x, float y, float z)
+void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::bvec2 &v)
 {
 	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
 	if(loc >= 0)
-		glUniform3f(loc,x,y,z);
+		glUniform2i(loc, v.x, v.y);
+}
+
+void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::bvec3 &v)
+{
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
+	if(loc >= 0)
+		glUniform3i(loc, v.x, v.y, v.z);
+}
+
+void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::bvec4 &v)
+{
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
+	if(loc >= 0)
+		glUniform4i(loc, v.x, v.y, v.z, v.w);
+}
+
+void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::ivec2 &v)
+{
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
+	if(loc >= 0)
+		glUniform2i(loc, v.x, v.y);
+}
+
+void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::ivec3 &v)
+{
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
+	if(loc >= 0)
+		glUniform3i(loc, v.x, v.y, v.z);
+}
+
+void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::ivec4 &v)
+{
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
+	if(loc >= 0)
+		glUniform4i(loc, v.x, v.y, v.z, v.w);
+}
+
+void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::vec2 &v)
+{
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
+	if(loc >= 0)
+		glUniform2f(loc, v.x, v.y);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::vec3 &v)
 {
-	this->SetUniformGLSL(szName, v.x, v.y, v.z);
+	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
+	if(loc >= 0)
+		glUniform3f(loc, v.x, v.y, v.z);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::vec4 &v)

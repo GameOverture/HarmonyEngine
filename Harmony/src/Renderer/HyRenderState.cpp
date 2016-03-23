@@ -35,10 +35,10 @@ size_t HyRenderState::GetDataOffset() const
 	return m_uiDataOffset;
 }
 
-void HyRenderState::WriteUniformsBufferData(char *&pRefDataWritePos)
+// This function is responsible for incrementing the passed in reference pointer the size of the data written
+void HyRenderState::WriteRenderStateInfoBufferData(char *&pRefDataWritePos)
 {
-	if(m_pShaderUniformsRef == NULL)
-		m_pShaderUniformsRef = IHyRenderer::GetShader(m_iShaderIndex)->GetUniforms();
+	// TODO: Write texture bind ID's here, then append below
 
 	m_pShaderUniformsRef->WriteUniformsBufferData(pRefDataWritePos);
 }
@@ -91,12 +91,16 @@ int32 HyRenderState::GetShaderIndex()
 void HyRenderState::SetShaderIndex(uint32 uiIndex)
 {
 	m_iShaderIndex = static_cast<int32>(uiIndex);
+	PrimeShaderUniforms();
 }
 
 HyShaderUniforms *HyRenderState::PrimeShaderUniforms()
 {
-	if(m_pShaderUniformsRef == NULL)
-		m_pShaderUniformsRef = IHyRenderer::GetShader(m_iShaderIndex)->GetUniforms();
+	IHyShader *pShader = IHyRenderer::GetShader(m_iShaderIndex);
+	if(pShader)
+		m_pShaderUniformsRef = pShader->GetUniforms();
+	else
+		m_pShaderUniformsRef = NULL;
 
 	return m_pShaderUniformsRef;
 }
