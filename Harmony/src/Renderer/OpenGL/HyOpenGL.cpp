@@ -94,13 +94,16 @@ HyOpenGL::~HyOpenGL(void)
 	uint32 uiShaderIndex = renderState.GetShaderIndex();
 	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_vShaders[uiShaderIndex]);
 
-	pShader->Use(renderState.GetDataOffset());
+	pShader->Use();
+
+	// Always attempt to assign these uniforms if the shader chooses to use them
 	pShader->SetUniformGLSL("mtxWorldToCamera", m_mtxView);
 	pShader->SetUniformGLSL("mtxCameraToClip", m_mtxProj);
 
 	if(renderState.GetTextureHandle() != 0)
 		glBindTexture(GL_TEXTURE_2D_ARRAY, renderState.GetTextureHandle());
 
+	pShader->SetVertexAttributePtrs(renderState.GetDataOffset());
 
 	//GLenum err = GL_NO_ERROR;
 	//while((err = glGetError()) != GL_NO_ERROR)

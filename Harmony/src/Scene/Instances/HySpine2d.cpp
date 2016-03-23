@@ -132,8 +132,37 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 	spAnimationStateData_setMix(m_pAnimStateData, m_ppSpineAnims[uiAnimIdFrom], m_ppSpineAnims[uiAnimIdTo], fInterpDur);
 }
 
+
+/*virtual*/ void HySpine2d::OnDataLoaded()
+{
+	HySpine2dData *pSpineData = reinterpret_cast<HySpine2dData *>(m_pData);
+
+	m_pSpineSkeleton = spSkeleton_create(pSpineData->GetSkeletonData());
+
+	m_spSkeletonBounds = spSkeletonBounds_create();
+
+	m_uiNumAnims = pSpineData->GetSkeletonData()->animationCount;
+	m_ppSpineAnims = pSpineData->GetSkeletonData()->animations;
+	m_pAnimStateData = spAnimationStateData_create(pSpineData->GetSkeletonData());
+
+	m_RenderState.SetNumInstances(0);
+	for(int i = 0; i < m_pSpineSkeleton->slotCount; ++i)
+	{
+		spAttachment* attachment = m_pSpineSkeleton->drawOrder[i]->attachment;
+		if(attachment == NULL || attachment->type != SP_ATTACHMENT_REGION)
+			continue;
+
+		spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
+
+		m_RenderState.SetTextureHandle(0);//, reinterpret_cast<HyAtlasGroupData *>(reinterpret_cast<spAtlasRegion *>(regionAttachment->rendererObject)->page->rendererObject)->GetId());
+		m_RenderState.AppendInstances(1);
+	}
+
+	//AnimSetState(m_uiNumAnims, m_bLooping);
+}
+
 // Will only be called after it has been initialized by the Factory
-/*virtual*/ void HySpine2d::Update()
+/*virtual*/ void HySpine2d::OnUpdate()
 {
 	// Update the time field used for attachments and such
 	spSkeleton_update(m_pSpineSkeleton, IHyTime::GetUpdateStepSeconds());
@@ -168,32 +197,8 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 	spSkeleton_updateWorldTransform(m_pSpineSkeleton);
 }
 
-/*virtual*/ void HySpine2d::OnDataLoaded()
+/*virtual*/ void HySpine2d::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
 {
-	HySpine2dData *pSpineData = reinterpret_cast<HySpine2dData *>(m_pData);
-
-	m_pSpineSkeleton	= spSkeleton_create(pSpineData->GetSkeletonData());
-
-	m_spSkeletonBounds	= spSkeletonBounds_create();
-
-	m_uiNumAnims		= pSpineData->GetSkeletonData()->animationCount;
-	m_ppSpineAnims		= pSpineData->GetSkeletonData()->animations;
-	m_pAnimStateData	= spAnimationStateData_create(pSpineData->GetSkeletonData());
-
-	m_RenderState.SetNumInstances(0);
-	for (int i = 0; i < m_pSpineSkeleton->slotCount; ++i)
-	{
-		spAttachment* attachment = m_pSpineSkeleton->drawOrder[i]->attachment;
-		if(attachment == NULL || attachment->type != SP_ATTACHMENT_REGION)
-			continue;
-
-		spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
-
-		m_RenderState.SetTextureHandle(0);//, reinterpret_cast<HyAtlasGroupData *>(reinterpret_cast<spAtlasRegion *>(regionAttachment->rendererObject)->page->rendererObject)->GetId());
-		m_RenderState.AppendInstances(1);
-	}
-
-	//AnimSetState(m_uiNumAnims, m_bLooping);
 }
 
 /*virtual*/ void HySpine2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)

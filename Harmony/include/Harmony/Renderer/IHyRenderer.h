@@ -99,7 +99,7 @@ public:
 	void SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
 
 	static IHyShader *NewCustomShader();
-	static IHyShader *GetCustomShader(uint32 uiIndex);
+	static IHyShader *GetShader(uint32 uiIndex);
 };
 
 #endif /* __IHyRenderer_h__ */

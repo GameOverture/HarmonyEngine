@@ -112,14 +112,17 @@ void HyOpenGLShader::Link()
 	m_bLinked = true;
 }
 
-void HyOpenGLShader::Use(uint32 uiStartOffset)
+void HyOpenGLShader::Use()
 {
 	if(m_hProgHandle <= 0 || (! m_bLinked))
 		return;
 
 	glBindVertexArray(m_hVAO);
-
 	glUseProgram(m_hProgHandle);
+}
+
+void HyOpenGLShader::SetVertexAttributePtrs(uint32 uiStartOffset)
+{
 
 #if 0 // TODO: if OpenGL 4.3 is available
 	glBindVertexBuffer(QUADBATCH, m_hVBO2d, uiDataOffset, 132);
@@ -201,7 +204,7 @@ void HyOpenGLShader::Use(uint32 uiStartOffset)
 			uiOffset += sizeof(glm::dvec4);
 			break;
 		case HYSHADERVAR_mat3:
-			glVertexAttribPointer(uiLocation,     3, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 3, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec3);
 			glVertexAttribPointer(uiLocation + 1, 3, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec3);
@@ -209,31 +212,17 @@ void HyOpenGLShader::Use(uint32 uiStartOffset)
 			uiOffset += sizeof(glm::vec3);
 			break;
 		case HYSHADERVAR_mat4:
-			glVertexAttribPointer(uiLocation,     4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
-			uiOffset += sizeof(glm::vec4); 
+			glVertexAttribPointer(uiLocation, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec4);
 			glVertexAttribPointer(uiLocation + 1, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
-			uiOffset += sizeof(glm::vec4); 
+			uiOffset += sizeof(glm::vec4);
 			glVertexAttribPointer(uiLocation + 2, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
-			uiOffset += sizeof(glm::vec4); 
+			uiOffset += sizeof(glm::vec4);
 			glVertexAttribPointer(uiLocation + 3, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec4);
 			break;
 		}
 	}
-
-	//GLuint mtx = m_pShader2d[QUADBATCH].GetAttribLocation("mtxLocalToWorld");
-	//glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("size"), 2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset));
-	//glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("offset"), 2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (2 * sizeof(GLfloat))));
-	//glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("tint"), 4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (4 * sizeof(GLfloat))));
-	//glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("textureIndex"), 1, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (8 * sizeof(GLfloat))));
-	//glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord0"), 2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (9 * sizeof(GLfloat))));
-	//glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord1"), 2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (11 * sizeof(GLfloat))));
-	//glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord2"), 2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (13 * sizeof(GLfloat))));
-	//glVertexAttribPointer(m_pShader2d[QUADBATCH].GetAttribLocation("UVcoord3"), 2, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (15 * sizeof(GLfloat))));
-	//glVertexAttribPointer(mtx + 0, 4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (17 * sizeof(GLfloat))));
-	//glVertexAttribPointer(mtx + 1, 4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (21 * sizeof(GLfloat))));
-	//glVertexAttribPointer(mtx + 2, 4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (25 * sizeof(GLfloat))));
-	//glVertexAttribPointer(mtx + 3, 4, GL_FLOAT, GL_FALSE, 132, (void *)(uiDataOffset + (29 * sizeof(GLfloat))));
 #endif
 }
 

@@ -108,17 +108,21 @@ void HyText2d::CalcVertexBuffer()
 	}
 }
 
-/*virtual*/ void HyText2d::Update()
-{
-
-}
-
 /*virtual*/ void HyText2d::OnDataLoaded()
 {
 	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pData);
 	//m_uiCurFontSize = pTextData->GetMinFontSize();
 
 	CalcVertexBuffer();
+}
+
+/*virtual*/ void HyText2d::OnUpdate()
+{
+
+}
+
+/*virtual*/ void HyText2d::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
+{
 }
 
 /*virtual*/ void HyText2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)

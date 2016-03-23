@@ -118,7 +118,11 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	}
 }
 
-/*virtual*/ void HyTexturedQuad2d::Update()
+/*virtual*/ void HyTexturedQuad2d::OnUpdate()
+{
+}
+
+/*virtual*/ void HyTexturedQuad2d::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
 {
 }
 

@@ -12,12 +12,41 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Threading/BasicSync.h"
-
 #include <vector>
 #include <map>
 
 class IHyRenderer;
+
+class HyShaderUniforms
+{
+	bool							m_bDirty;
+
+	struct Uniform
+	{
+		HyShaderVariable	eVarType;
+		void *				pData;
+	};
+	std::map<std::string, Uniform>	m_mapUniforms;
+
+public:
+	HyShaderUniforms();
+	~HyShaderUniforms();
+
+	bool IsDirty();
+
+	void Set(const char *szName, float x, float y, float z);
+	void Set(const char *szName, const glm::vec3 &v);
+	void Set(const char *szName, const glm::vec4 &v);
+	void Set(const char *szName, const glm::mat4 &m);
+	void Set(const char *szName, const glm::mat3 &m);
+	void Set(const char *szName, float val);
+	void Set(const char *szName, int32 val);
+	void Set(const char *szName, uint32 val);
+	void Set(const char *szName, bool val);
+
+	// This function is responsible for incrementing the passed in reference pointer the size of the data written
+	void WriteUniformsBufferData(char *&pRefDataWritePos);
+};
 
 class IHyShader
 {
@@ -39,44 +68,25 @@ protected:
 		uint32				uiInstanceDivisor;
 	};
 
-	struct Uniform
-	{
-		HyShaderVariable	eVarType;
-		void *				pData;
-	};
-
 	const uint32												m_uiINDEX;
 
 	HyLoadState													m_eLoadState;
 	std::string													m_sSourceCode[HYNUMSHADERTYPES];
 	std::vector<VertexAttribute>								m_vVertexAttributes;
 
-	BasicSection												m_csUniforms;
-	std::map<std::string, Uniform>								m_mapUniforms;
+	HyShaderUniforms											m_Uniforms;
 
 	IHyShader(uint32 iIndex);
 public:
 	virtual ~IHyShader();
 
 	uint32 GetIndex();
+	HyShaderUniforms *GetUniforms();
 
 	void SetSourceCode(const char *szSource, HyShaderType eType);
 	void SetVertexAttribute(const char *szName, HyShaderVariable eVarType, bool bNormalize = false, uint32 uiInstanceDivisor = 0);
 
 	void Finalize();
-
-	void SetUniform(const char *szName, float x, float y, float z);
-	void SetUniform(const char *szName, const glm::vec3 &v);
-	void SetUniform(const char *szName, const glm::vec4 &v);
-	void SetUniform(const char *szName, const glm::mat4 &m);
-	void SetUniform(const char *szName, const glm::mat3 &m);
-	void SetUniform(const char *szName, float val);
-	void SetUniform(const char *szName, int32 val);
-	void SetUniform(const char *szName, uint32 val);
-	void SetUniform(const char *szName, bool val);
-
-	bool operator==(const IHyShader &right) const;
-	bool operator!=(const IHyShader &right) const;
 
 	virtual void OnRenderThread(IHyRenderer &rendererRef) = 0;
 };

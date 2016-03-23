@@ -24,7 +24,11 @@ HySprite2d::~HySprite2d(void)
 {
 }
 
-/*virtual*/ void HySprite2d::Update()
+/*virtual*/ void HySprite2d::OnUpdate()
+{
+}
+
+/*virtual*/ void HySprite2d::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
 {
 }
 

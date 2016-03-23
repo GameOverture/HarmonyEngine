@@ -34,7 +34,8 @@ public:
 
 	void CompileFromString(HyShaderType eType);
 	void Link();
-	void Use(uint32 uiDataOffset);
+	void Use();
+	void SetVertexAttributePtrs(uint32 uiStartOffset);
 
 	int GetHandle();
 	bool IsLinked();

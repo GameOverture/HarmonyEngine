@@ -10,10 +10,14 @@
 #include "Renderer/HyRenderState.h"
 #include "Scene/Instances/IHyInst2d.h"
 
+#include "Renderer/IHyShader.h"
+
 HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
 									m_uiNumInstances(0),
 									m_uiDataOffset(0),
-									m_uiTextureBindHandle(0)
+									m_uiTextureBindHandle(0),
+									m_iShaderIndex(-1),
+									m_pShaderUniformsRef(NULL)
 {
 }
 
@@ -29,6 +33,14 @@ void HyRenderState::SetDataOffset(size_t uiVertexDataOffset)
 size_t HyRenderState::GetDataOffset() const
 {
 	return m_uiDataOffset;
+}
+
+void HyRenderState::WriteUniformsBufferData(char *&pRefDataWritePos)
+{
+	if(m_pShaderUniformsRef == NULL)
+		m_pShaderUniformsRef = IHyRenderer::GetShader(m_iShaderIndex)->GetUniforms();
+
+	m_pShaderUniformsRef->WriteUniformsBufferData(pRefDataWritePos);
 }
 
 void HyRenderState::AppendInstances(uint32 uiNumInstsToAppend)
@@ -71,14 +83,22 @@ uint32 HyRenderState::GetAttributeBitFlags() const
 	return m_uiAttributeFlags;
 }
 
-uint32 HyRenderState::GetShaderIndex()
+int32 HyRenderState::GetShaderIndex()
 {
-	return m_uiShaderIndex;
+	return m_iShaderIndex;
 }
 
 void HyRenderState::SetShaderIndex(uint32 uiIndex)
 {
-	m_uiShaderIndex = uiIndex;
+	m_iShaderIndex = static_cast<int32>(uiIndex);
+}
+
+HyShaderUniforms *HyRenderState::PrimeShaderUniforms()
+{
+	if(m_pShaderUniformsRef == NULL)
+		m_pShaderUniformsRef = IHyRenderer::GetShader(m_iShaderIndex)->GetUniforms();
+
+	return m_pShaderUniformsRef;
 }
 
 uint32 HyRenderState::GetTextureHandle()
@@ -93,8 +113,14 @@ void HyRenderState::SetTextureHandle(uint32 uiHandleId)
 
 bool HyRenderState::operator==(const HyRenderState &right) const
 {
-	IHyRenderer::GetCustomShader(m_uiShaderIndex)
-	return (this->m_uiAttributeFlags == right.m_uiAttributeFlags) && (m_uiTextureBindHandle == right.m_uiTextureBindHandle) && (m_uiShaderIndex == right.m_uiShaderIndex);
+	if((this->m_uiAttributeFlags == right.m_uiAttributeFlags) && (m_uiTextureBindHandle == right.m_uiTextureBindHandle) && (m_iShaderIndex == right.m_iShaderIndex))
+	{
+		if(m_pShaderUniformsRef->IsDirty())
+			return false;
+		else
+			return true;
+	}
+	return false;
 }
 
 bool HyRenderState::operator!=(const HyRenderState &right) const
@@ -107,7 +133,7 @@ bool HyRenderState::operator< (const HyRenderState &right) const
 	if(m_uiAttributeFlags == right.m_uiAttributeFlags)
 	{
 		if(this->m_uiTextureBindHandle == right.m_uiTextureBindHandle)
-			return this->m_uiShaderIndex < right.m_uiShaderIndex;
+			return this->m_iShaderIndex < right.m_iShaderIndex;
 		else
 			return (this->m_uiTextureBindHandle < right.m_uiTextureBindHandle);
 	}

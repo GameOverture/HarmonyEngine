@@ -14,6 +14,7 @@
 
 // Forward declaration
 class IHyInst2d;
+class HyShaderUniforms;
 
 class HyRenderState
 {
@@ -35,13 +36,14 @@ public:
 	};
 
 private:
-	uint32			m_uiAttributeFlags;
-	uint32			m_uiTextureBindHandle;
+	uint32				m_uiAttributeFlags;
+	uint32				m_uiTextureBindHandle;
 
-	uint32			m_uiShaderIndex; Need to compare uniforms in operator=
-	
-	uint32			m_uiNumInstances;
-	size_t			m_uiDataOffset;
+	int32				m_iShaderIndex;
+	HyShaderUniforms *	m_pShaderUniformsRef;
+
+	uint32				m_uiNumInstances;
+	size_t				m_uiDataOffset;
 
 public:
 	HyRenderState();
@@ -49,6 +51,8 @@ public:
 
 	void SetDataOffset(size_t uiVertexDataOffset);
 	size_t GetDataOffset() const;
+
+	void WriteUniformsBufferData(char *&pRefDataWritePos);
 	
 	void AppendInstances(uint32 uiNumInstsToAppend);
 	uint32 GetNumInstances() const;
@@ -60,8 +64,9 @@ public:
 	bool IsEnabled(eAttributes eAttrib);
 	uint32 GetAttributeBitFlags() const;
 
-	uint32 GetShaderIndex();
+	int32 GetShaderIndex();
 	void SetShaderIndex(uint32 uiIndex);
+	HyShaderUniforms *PrimeShaderUniforms();
 
 	uint32 GetTextureHandle();
 	void SetTextureHandle(uint32 uiHandleId);

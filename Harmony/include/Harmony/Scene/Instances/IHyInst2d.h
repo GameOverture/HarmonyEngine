@@ -93,7 +93,10 @@ public:
 
 protected:
 	virtual void OnDataLoaded() = 0;
-	virtual void Update() = 0;
+	
+	void Update();
+	virtual void OnUpdate() = 0;
+	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef) = 0;
 
 	// This function is responsible for incrementing the passed in reference pointer the size of the data written
 	virtual void DefaultWriteDrawBufferData(char *&pRefDataWritePos) = 0;

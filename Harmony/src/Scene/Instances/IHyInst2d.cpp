@@ -116,6 +116,12 @@ void IHyInst2d::SetCustomShader(IHyShader *pShader, HyWriteDrawBufferDataOverrid
 	m_fpWriteDrawBufferOverride = fpWriteDrawBufferOverride;
 }
 
+void IHyInst2d::Update()
+{
+	OnUpdate();
+	OnUpdateUniforms(m_RenderState.PrimeShaderUniforms());
+}
+
 void IHyInst2d::SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom)
 {
 	if(eCoordType == HYCOORDTYPE_Default)

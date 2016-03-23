@@ -183,6 +183,18 @@ void HyPrimitive2d::ClearData()
 	m_RenderState.Disable(HyRenderState::DRAWMODEMASK);
 }
 
+/*virtual*/ void HyPrimitive2d::OnDataLoaded()
+{
+}
+
+/*virtual*/ void HyPrimitive2d::OnUpdate()
+{
+}
+
+/*virtual*/ void HyPrimitive2d::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
+{
+}
+
 /*virtual*/ void HyPrimitive2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)
 {
 	memcpy(pRefDataWritePos, &color.Get(), sizeof(glm::vec4));
