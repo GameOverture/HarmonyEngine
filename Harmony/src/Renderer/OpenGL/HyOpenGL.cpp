@@ -235,35 +235,15 @@ HyOpenGL::~HyOpenGL(void)
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	pShader->SetVertexAttributePtrs(uiDataOffset);
 
 	if(renderState.IsEnabled(HyRenderState::DRAWINSTANCED))
-	{
 		glDrawArraysInstanced(m_eDrawMode, 0, renderState.GetNumVertices(), renderState.GetNumInstances());
-	}
 	else
 	{
-		//char *pDrawData = GetVertexData2d();
-
-		//size_t uiDataOffset = renderState.GetDataOffset();
-		//pDrawData += uiDataOffset;
-
 		uint32 uiStartVertex = 0;
 		for(uint32 i = 0; i < renderState.GetNumInstances(); ++i)
 		{
-			//m_pShader2d[PRIMITIVE].SetUniformGLSL("primitiveColor", *reinterpret_cast<glm::vec4 *>(pDrawData));
-			//pDrawData += sizeof(glm::vec4);
-			//uiDataOffset += sizeof(glm::vec4);
-
-			//m_pShader2d[PRIMITIVE].SetUniformGLSL("transformMtx", *reinterpret_cast<glm::mat4 *>(pDrawData));
-			//pDrawData += sizeof(glm::mat4);
-			//uiDataOffset += sizeof(glm::mat4);
-
-			//uint32 iNumVerts = *reinterpret_cast<uint32 *>(pDrawData);
-			//pDrawData += sizeof(uint32);
-			//uiDataOffset += sizeof(uint32);
-
 			glDrawArrays(m_eDrawMode, uiStartVertex, renderState.GetNumVertices());
 			uiStartVertex += renderState.GetNumVertices();
 		}

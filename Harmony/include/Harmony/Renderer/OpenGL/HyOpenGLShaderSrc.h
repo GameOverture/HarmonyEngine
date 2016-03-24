@@ -100,8 +100,8 @@ layout(location = 0) in vec4 position;										\n\
 out vec4 Color;																\n\
 																			\n\
 uniform mat4 transformMtx;													\n\
-uniform mat4 cameraToClipMatrix;											\n\
-uniform mat4 worldToCameraMatrix;											\n\
+uniform mat4 mtxCameraToClip;												\n\
+uniform mat4 mtxWorldToCamera;												\n\
 uniform vec4 primitiveColor;												\n\
 																			\n\
 void main()																	\n\
@@ -109,8 +109,8 @@ void main()																	\n\
 	Color = primitiveColor;													\n\
 																			\n\
 	vec4 temp = transformMtx * position;									\n\
-	temp = worldToCameraMatrix * temp;										\n\
-	gl_Position = cameraToClipMatrix * temp;								\n\
+	temp = mtxWorldToCamera * temp;											\n\
+	gl_Position = mtxCameraToClip * temp;									\n\
 }";
 
 const char *szHYPRIMATIVE_FRAGMENTSHADER = "								\n\
