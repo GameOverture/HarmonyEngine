@@ -13,11 +13,12 @@
 #include "Renderer/IHyShader.h"
 
 HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
-									m_uiNumInstances(0),
-									m_uiDataOffset(0),
 									m_uiTextureBindHandle(0),
 									m_iShaderIndex(-1),
-									m_pShaderUniformsRef(NULL)
+									m_pShaderUniformsRef(NULL),
+									m_uiNumInstances(0),
+									m_uiNumVertices(0),
+									m_uiDataOffset(0)
 {
 }
 
@@ -56,6 +57,16 @@ uint32 HyRenderState::GetNumInstances() const
 void HyRenderState::SetNumInstances(uint32 uiNumInsts)
 {
 	m_uiNumInstances = uiNumInsts;
+}
+
+uint32 HyRenderState::GetNumVertices()
+{
+	return m_uiNumVertices;
+}
+
+void HyRenderState::SetNumVertices(uint32 uiNumVerts)
+{
+	m_uiNumVertices = uiNumVerts;
 }
 
 void HyRenderState::Enable(uint32 uiAttributes)

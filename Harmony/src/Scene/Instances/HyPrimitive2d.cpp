@@ -16,11 +16,11 @@
 #include "Box2D/Box2D.h"
 
 HyPrimitive2d::HyPrimitive2d() :	IHyInst2d(HYINST_Primitive2d, NULL, NULL),
-									m_pVertices(NULL),
-									m_uiNumVerts(0)
+									m_pVertices(NULL)
 {
 	m_RenderState.SetShaderIndex(IHyShader::SHADER_Primitive);
 	m_RenderState.SetNumInstances(1);
+	m_RenderState.SetNumVertices(0);
 }
 
 
@@ -32,15 +32,13 @@ HyPrimitive2d::~HyPrimitive2d(void)
 const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 {
 	m_RenderState = p.m_RenderState;
-	m_uiNumVerts = p.m_uiNumVerts;
-
 	m_eCoordUnit = p.m_eCoordUnit;
 
 	ClearData();
-	if(m_uiNumVerts != 0)
+	if(m_RenderState.GetNumVertices() != 0)
 	{
-		m_pVertices = new glm::vec4[m_uiNumVerts];
-		memcpy(m_pVertices, p.m_pVertices, m_uiNumVerts * sizeof(glm::vec4));
+		m_pVertices = new glm::vec4[m_RenderState.GetNumVertices()];
+		memcpy(m_pVertices, p.m_pVertices, m_RenderState.GetNumVertices() * sizeof(glm::vec4));
 	}
 	
 	return *this;
@@ -62,8 +60,8 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, glm:
 	fHeight *= fCoordMod;
 	vOffset *= fCoordMod;
 
-	m_uiNumVerts = 4;
-	m_pVertices = new glm::vec4[m_uiNumVerts];
+	m_RenderState.SetNumVertices(4);
+	m_pVertices = new glm::vec4[4];
 
 	m_pVertices[0].x = vOffset.x;
 	m_pVertices[0].y = vOffset.y;
@@ -104,8 +102,8 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	else
 		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLEFAN);
 
-	m_uiNumVerts = iNumSegments;
-	m_pVertices = new glm::vec4[m_uiNumVerts];
+	m_RenderState.SetNumVertices(iNumSegments);
+	m_pVertices = new glm::vec4[iNumSegments];
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
 		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
@@ -114,9 +112,9 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	vOffset *= fCoordMod;
 
 	float t = 0.0f;
-	for(uint32 n = 0; n <= m_uiNumVerts; ++n)
+	for(uint32 n = 0; n <= m_RenderState.GetNumVertices(); ++n)
 	{
-		t = 2.0f * HY_PI * static_cast<float>(n) / static_cast<float>(m_uiNumVerts);
+		t = 2.0f * HY_PI * static_cast<float>(n) / static_cast<float>(m_RenderState.GetNumVertices());
 
 		m_pVertices[n].x = (sin(t) * fRadius) + vOffset.x;
 		m_pVertices[n].y = (cos(t) * fRadius) + vOffset.y;
@@ -134,14 +132,14 @@ void HyPrimitive2d::SetAsEdgeChain(const glm::vec2 *pVertices, uint32 uiNumVerts
 	else
 		m_RenderState.Enable(HyRenderState::DRAWMODE_LINESTRIP);
 
-	m_uiNumVerts = uiNumVerts;
-	m_pVertices = new glm::vec4[m_uiNumVerts];
+	m_RenderState.SetNumVertices(uiNumVerts);
+	m_pVertices = new glm::vec4[uiNumVerts];
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
 		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
 	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? IHyApplication::PixelsPerMeter() : 1.0f;
 	
-	for(uint32 i = 0; i < m_uiNumVerts; ++i)
+	for(uint32 i = 0; i < m_RenderState.GetNumVertices(); ++i)
 	{
 		m_pVertices[i].x = (pVertices[i].x + vOffset.x) * fCoordMod;
 		m_pVertices[i].y = (pVertices[i].y + vOffset.y) * fCoordMod;
@@ -166,7 +164,7 @@ void HyPrimitive2d::OffsetVerts(glm::vec2 vOffset, float fAngleOffset)
 
 	b2Vec2 tmp;
 	// Transform vertices and normals.
-	for(uint32 i = 0; i < m_uiNumVerts; ++i)
+	for(uint32 i = 0; i < m_RenderState.GetNumVertices(); ++i)
 	{
 		tmp = b2Mul(xf, b2Vec2(m_pVertices[i].x, m_pVertices[i].y));
 		m_pVertices[i].x = tmp.x;
@@ -178,7 +176,7 @@ void HyPrimitive2d::ClearData()
 {
 	delete [] m_pVertices;
 	m_pVertices = NULL;
-	m_uiNumVerts = 0;
+	m_RenderState.SetNumVertices(0);
 
 	m_RenderState.Disable(HyRenderState::DRAWMODEMASK);
 }
@@ -196,24 +194,23 @@ void HyPrimitive2d::ClearData()
 	glm::mat4 mtx;
 	GetWorldTransform(mtx);
 
+	pShaderUniformsRef->Set("primitiveColor", color.Get());
 	pShaderUniformsRef->Set("transformMtx", mtx);
-
-	FeelsBadMan - The number of verts needs to be stored in the RenderState
 }
 
 /*virtual*/ void HyPrimitive2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)
 {
-	memcpy(pRefDataWritePos, &color.Get(), sizeof(glm::vec4));
-	pRefDataWritePos += sizeof(glm::vec4);
+	//memcpy(pRefDataWritePos, &color.Get(), sizeof(glm::vec4));
+	//pRefDataWritePos += sizeof(glm::vec4);
 
-	glm::mat4 mtx;
-	GetWorldTransform(mtx);
-	memcpy(pRefDataWritePos, &mtx, sizeof(glm::mat4));
-	pRefDataWritePos += sizeof(glm::mat4);
+	//glm::mat4 mtx;
+	//GetWorldTransform(mtx);
+	//memcpy(pRefDataWritePos, &mtx, sizeof(glm::mat4));
+	//pRefDataWritePos += sizeof(glm::mat4);
 
-	memcpy(pRefDataWritePos, &m_uiNumVerts, sizeof(uint32));
-	pRefDataWritePos += sizeof(uint32);
+	//memcpy(pRefDataWritePos, &m_uiNumVerts, sizeof(uint32));
+	//pRefDataWritePos += sizeof(uint32);
 
-	memcpy(pRefDataWritePos, m_pVertices, m_uiNumVerts * sizeof(glm::vec4));
-	pRefDataWritePos += m_uiNumVerts * sizeof(glm::vec4);
+	memcpy(pRefDataWritePos, m_pVertices, m_RenderState.GetNumVertices() * sizeof(glm::vec4));
+	pRefDataWritePos += m_RenderState.GetNumVertices() * sizeof(glm::vec4);
 }

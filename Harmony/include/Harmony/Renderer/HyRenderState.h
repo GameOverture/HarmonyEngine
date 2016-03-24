@@ -43,6 +43,7 @@ private:
 	HyShaderUniforms *	m_pShaderUniformsRef;
 
 	uint32				m_uiNumInstances;
+	uint32				m_uiNumVertices;
 	size_t				m_uiDataOffset;
 
 public:
@@ -58,6 +59,9 @@ public:
 	void AppendInstances(uint32 uiNumInstsToAppend);
 	uint32 GetNumInstances() const;
 	void SetNumInstances(uint32 uiNumInsts);
+
+	uint32 GetNumVertices();
+	void SetNumVertices(uint32 uiNumVerts);
 
 	void Enable(uint32 uiAttributes);
 	void Disable(uint32 uiAttributes);

@@ -25,6 +25,7 @@ HySpine2d::HySpine2d(const char *szPrefix, const char *szName) :	IHyInst2d(HYINS
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderIndex(IHyShader::SHADER_QuadBatch);
+	m_RenderState.SetNumVertices(4);
 }
 
 HySpine2d::~HySpine2d(void)

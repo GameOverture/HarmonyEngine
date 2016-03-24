@@ -240,8 +240,7 @@ HyOpenGL::~HyOpenGL(void)
 
 	if(renderState.IsEnabled(HyRenderState::DRAWINSTANCED))
 	{
-		int iNumInsts = renderState.GetNumInstances();
-		glDrawArraysInstanced(m_eDrawMode, 0, 4, iNumInsts);
+		glDrawArraysInstanced(m_eDrawMode, 0, renderState.GetNumVertices(), renderState.GetNumInstances());
 	}
 	else
 	{
@@ -250,26 +249,24 @@ HyOpenGL::~HyOpenGL(void)
 		//size_t uiDataOffset = renderState.GetDataOffset();
 		//pDrawData += uiDataOffset;
 
-		//for(uint32 i = 0; i < renderState.GetNumInstances(); ++i)
-		//{
-		//	m_pShader2d[PRIMITIVE].SetUniformGLSL("primitiveColor", *reinterpret_cast<glm::vec4 *>(pDrawData));
-		//	pDrawData += sizeof(glm::vec4);
-		//	uiDataOffset += sizeof(glm::vec4);
+		uint32 uiStartVertex = 0;
+		for(uint32 i = 0; i < renderState.GetNumInstances(); ++i)
+		{
+			//m_pShader2d[PRIMITIVE].SetUniformGLSL("primitiveColor", *reinterpret_cast<glm::vec4 *>(pDrawData));
+			//pDrawData += sizeof(glm::vec4);
+			//uiDataOffset += sizeof(glm::vec4);
 
-		//	m_pShader2d[PRIMITIVE].SetUniformGLSL("transformMtx", *reinterpret_cast<glm::mat4 *>(pDrawData));
-		//	pDrawData += sizeof(glm::mat4);
-		//	uiDataOffset += sizeof(glm::mat4);
+			//m_pShader2d[PRIMITIVE].SetUniformGLSL("transformMtx", *reinterpret_cast<glm::mat4 *>(pDrawData));
+			//pDrawData += sizeof(glm::mat4);
+			//uiDataOffset += sizeof(glm::mat4);
 
-		//	uint32 iNumVerts = *reinterpret_cast<uint32 *>(pDrawData);
-		//	pDrawData += sizeof(uint32);
-		//	uiDataOffset += sizeof(uint32);
+			//uint32 iNumVerts = *reinterpret_cast<uint32 *>(pDrawData);
+			//pDrawData += sizeof(uint32);
+			//uiDataOffset += sizeof(uint32);
 
-		//	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)uiDataOffset);
-		//	glDrawArrays(m_eDrawMode, 0, iNumVerts);
-
-		//	pDrawData += (sizeof(GLfloat) * 4) * iNumVerts;
-		//	uiDataOffset += (sizeof(GLfloat) * 4) * iNumVerts;
-		//}
+			glDrawArrays(m_eDrawMode, uiStartVertex, renderState.GetNumVertices());
+			uiStartVertex += renderState.GetNumVertices();
+		}
 	}
 }
 

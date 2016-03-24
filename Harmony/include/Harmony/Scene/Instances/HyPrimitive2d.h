@@ -19,7 +19,6 @@ class HyAtlasGroupData;
 class HyPrimitive2d : public IHyInst2d
 {
 	glm::vec4 *		m_pVertices;
-	uint32			m_uiNumVerts;
 
 public:
 	HyPrimitive2d();
@@ -27,7 +26,7 @@ public:
 
 	const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p);
 
-	uint32 GetNumVerts()			{ return m_uiNumVerts; }
+	uint32 GetNumVerts()			{ return m_RenderState.GetNumVertices(); }
 	glm::vec4 *GetVertexDataPtr()	{ return m_pVertices; }
 
 	void SetAsQuad(float fWidth, float fHeight, bool bWireframe, glm::vec2 &vOffset = glm::vec2(0.0f));
