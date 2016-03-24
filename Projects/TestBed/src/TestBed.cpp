@@ -60,7 +60,7 @@ TestBed::~TestBed(void)
 	m_primBox.SetDisplayOrder(0);
 	m_primBox.pos.Set(-45.0f, 0.0f);
 
-	m_testSprite.Load();
+	//m_testSprite.Load();
 	m_testSprite.SetTextureSource(8, 0, 0, 180, 162);
 	m_testSprite.SetDisplayOrder(1);
 	m_testSprite.pos.Set(0.0f, 0.0f);
@@ -83,8 +83,8 @@ TestBed::~TestBed(void)
 	m_VertLine.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
 	m_HorzLine.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
 
-	m_VertLine.Load();
-	m_HorzLine.Load();
+	//m_VertLine.Load();
+	//m_HorzLine.Load();
 	
 
 	return true;
