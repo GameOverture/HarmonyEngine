@@ -112,7 +112,7 @@ HyOpenGL::~HyOpenGL(void)
 	pShader->SetUniformGLSL("mtxCameraToClip", m_mtxProj);
 
 	char *pDrawBuffer = GetVertexData2d();
-	size_t uiDataOffset = renderState.GetDataOffset();
+	uint32 uiDataOffset = static_cast<uint32>(renderState.GetDataOffset());
 	pDrawBuffer += uiDataOffset;
 
 	uint32 uiNumUniforms = *reinterpret_cast<uint32 *>(pDrawBuffer);
@@ -124,7 +124,7 @@ HyOpenGL::~HyOpenGL(void)
 		const char *szUniformName = pDrawBuffer;
 		size_t uiStrLen = strlen(szUniformName) + 1;	// +1 for NULL terminator
 		pDrawBuffer += uiStrLen;
-		uiDataOffset += uiStrLen;
+		uiDataOffset += static_cast<uint32>(uiStrLen);
 
 		HyShaderVariable eVarType = static_cast<HyShaderVariable>(*reinterpret_cast<uint32 *>(pDrawBuffer));
 		pDrawBuffer += sizeof(uint32);

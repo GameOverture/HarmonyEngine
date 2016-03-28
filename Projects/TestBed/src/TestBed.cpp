@@ -85,6 +85,10 @@ TestBed::~TestBed(void)
 
 	m_VertLine.Load();
 	m_HorzLine.Load();
+
+	//////////////////////////////////////////////////////////////////////////
+	IHyShader *pShader_Checkerboard = IHyRenderer::NewCustomShader();
+	pShader_Checkerboard->
 	
 
 	return true;

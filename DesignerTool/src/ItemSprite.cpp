@@ -20,7 +20,7 @@ ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
 //    m_pUndoView->show();
 //    m_pUndoView->setAttribute(Qt::WA_QuitOnClose, false);
 
-    vec2 vLinePts[2];
+    glm::vec2 vLinePts[2];
     
     vLinePts[0].x = -2048.0f;
     vLinePts[0].y = 0.0f;
