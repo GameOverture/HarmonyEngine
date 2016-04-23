@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <fstream>
 
-char *HyReadTextFile(const char *szFilePath, int *iLength);
+char *HyReadTextFile(const char *szFilePath, int *pLengthOut);
 
 std::string HyReadTextFile(const char *szFilePath);
 

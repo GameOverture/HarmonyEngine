@@ -29,6 +29,7 @@
     <None Include="Data\Shaders\HyQuadBatch.frag">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="testFrag.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\stdafx.h" />

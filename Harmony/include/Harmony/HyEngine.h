@@ -33,6 +33,7 @@
 #include "Assets/HyAssetManager.h"
 
 #include "Utilities/HyMath.h"
+#include "Utilities/HyFileIO.h"
 
 class HyEngine
 {

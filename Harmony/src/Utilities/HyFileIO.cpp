@@ -9,20 +9,25 @@
 *************************************************************************/
 #include "Utilities/HyFileIO.h"
 
-char *HyReadTextFile(const char *szFilePath, int *iLength)
+char *HyReadTextFile(const char *szFilePath, int *pLengthOut)
 {
 	char *pData;
-	FILE *pFile = fopen(szFilePath, "rb");
+	FILE *pFile = fopen(szFilePath, "r");
 	if(!pFile)
 		return 0;
 
+	int iLength = 0;
+
 	fseek(pFile, 0, SEEK_END);
-	*iLength = ftell(pFile);
+	iLength = ftell(pFile);
 	fseek(pFile, 0, SEEK_SET);
 
-	pData = new char[*iLength];
-	fread(pData, 1, *iLength, pFile);
+	pData = new char[iLength];
+	fread(pData, 1, iLength, pFile);
 	fclose(pFile);
+
+	if(pLengthOut)
+		*pLengthOut = iLength;
 
 	return pData;
 }
