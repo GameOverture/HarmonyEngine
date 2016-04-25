@@ -90,7 +90,7 @@ TestBed::~TestBed(void)
 	IHyShader *pShader_Checkerboard = IHyRenderer::NewCustomShader();
 	pShader_Checkerboard->SetSourceCode(HyReadTextFile("testFrag.glsl", NULL), HYSHADER_Fragment);
 
-	m_primBox.SetCustomShader(pShader_Checkerboard);
+	//m_primBox.SetCustomShader(pShader_Checkerboard);
 	
 
 	return true;

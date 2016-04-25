@@ -9,7 +9,8 @@
 *************************************************************************/
 #include "Renderer/IHyShader.h"
 
-HyShaderUniforms::HyShaderUniforms() : m_bDirty(false)
+HyShaderUniforms::HyShaderUniforms() :	m_bDirty(true),
+										m_uiCrc32(0)
 { }
 
 HyShaderUniforms::~HyShaderUniforms()
@@ -248,6 +249,7 @@ void HyShaderUniforms::WriteUniformsBufferData(char *&pRefDataWritePos)
 		pRefDataWritePos += uiDataSize;
 	}
 
+	m_uiCrc32 = crc32_fast(
 	m_bDirty = false;
 }
 

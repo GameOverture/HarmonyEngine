@@ -20,11 +20,83 @@ class IHyRenderer;
 class HyShaderUniforms
 {
 	bool							m_bDirty;
+	uint32							m_uiCrc32;
 
 	struct Uniform
 	{
 		HyShaderVariable	eVarType;
-		void *				pData;
+		
+		union Values {
+
+			char asChar;
+
+			unsigned char asUChar;
+
+			short asShort;
+
+			unsigned short asUShort;
+
+			int asInt;
+
+			unsigned int asUInt;
+
+			long asLong;
+
+			unsigned long asULong;
+
+			float asFloat;
+
+			double asDouble;
+
+			char* asStr;
+
+			Values() { asULong = 0; }
+
+			Values(char in) { asUChar = in; }
+
+			Values(unsigned char in) { asChar = in; }
+
+			Values(short in) { asShort = in; }
+
+			Values(unsigned short in) { asUShort = in; }
+
+			Values(int in) { asInt = in; }
+
+			Values(unsigned int in) { asUInt = in; }
+
+			Values(long in) { asLong = in; }
+
+			Values(unsigned long in) { asULong = in; }
+
+			Values(float in) { asFloat = in; }
+
+			Values(double in) { asDouble = in; }
+
+			Values(char* in) { asStr = in; }
+
+			
+			operator char() { return asChar; }
+
+			operator unsigned char() { return asUChar; }
+
+			operator short() { return asShort; }
+
+			operator unsigned short() { return asUShort; }
+
+			operator int() { return asInt; }
+
+			operator unsigned int() { return asUInt; }
+
+			operator long() { return asLong; }
+
+			operator unsigned long() { return asULong; }
+
+			operator float() { return asFloat; }
+
+			operator double() { return asDouble; }
+
+			operator char*() { return asStr; }
+		};
 	};
 	std::map<std::string, Uniform>	m_mapUniforms;
 

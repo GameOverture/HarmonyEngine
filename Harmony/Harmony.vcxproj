@@ -90,6 +90,7 @@
     <ClCompile Include="src\Time\Watches\IHyTimeInst.cpp" />
     <ClCompile Include="src\Utilities\Animation\HyAnimFloat.cpp" />
     <ClCompile Include="src\Utilities\Animation\HyTweenFuncs.cpp" />
+    <ClCompile Include="src\Utilities\Crc32.cpp" />
     <ClCompile Include="src\Utilities\HyBitManip.cpp" />
     <ClCompile Include="src\Utilities\HyDebugPhys2d.cpp" />
     <ClCompile Include="src\Utilities\HyFileIO.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="include\Harmony\Utilities\HyStrManip.h" />
     <ClInclude Include="include\Harmony\Utilities\jsonxx.h" />
     <ClInclude Include="include\Harmony\Utilities\stb_image.h" />
+    <ClInclude Include="src\Utilities\Crc32.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}</ProjectGuid>
