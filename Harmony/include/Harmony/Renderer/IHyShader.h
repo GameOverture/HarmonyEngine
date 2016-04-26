@@ -13,98 +13,41 @@
 #include "Afx/HyStdAfx.h"
 
 #include <vector>
-#include <map>
 
 class IHyRenderer;
+
+#define HY_SHADER_UNIFORM_NAME_LENGTH		32	// includes the NULL terminator
+#define HY_SHADER_UNIFORM_BUFFER_LENGTH		(sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH + sizeof(glm::mat4))
 
 class HyShaderUniforms
 {
 	bool							m_bDirty;
 	uint32							m_uiCrc32;
 
-	struct Uniform
+	struct UniformBuffer
 	{
-		HyShaderVariable	eVarType;
-		
-		union Values {
+		char m_pData[HY_SHADER_UNIFORM_BUFFER_LENGTH];
 
-			char asChar;
+		HyShaderVariable GetVariableType()				{ return *reinterpret_cast<HyShaderVariable *>(m_pData); }
+		char *GetName()									{ return m_pData + sizeof(uint32); }
+		char *GetData()									{ return m_pData + sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH; }
 
-			unsigned char asUChar;
-
-			short asShort;
-
-			unsigned short asUShort;
-
-			int asInt;
-
-			unsigned int asUInt;
-
-			long asLong;
-
-			unsigned long asULong;
-
-			float asFloat;
-
-			double asDouble;
-
-			char* asStr;
-
-			Values() { asULong = 0; }
-
-			Values(char in) { asUChar = in; }
-
-			Values(unsigned char in) { asChar = in; }
-
-			Values(short in) { asShort = in; }
-
-			Values(unsigned short in) { asUShort = in; }
-
-			Values(int in) { asInt = in; }
-
-			Values(unsigned int in) { asUInt = in; }
-
-			Values(long in) { asLong = in; }
-
-			Values(unsigned long in) { asULong = in; }
-
-			Values(float in) { asFloat = in; }
-
-			Values(double in) { asDouble = in; }
-
-			Values(char* in) { asStr = in; }
-
-			
-			operator char() { return asChar; }
-
-			operator unsigned char() { return asUChar; }
-
-			operator short() { return asShort; }
-
-			operator unsigned short() { return asUShort; }
-
-			operator int() { return asInt; }
-
-			operator unsigned int() { return asUInt; }
-
-			operator long() { return asLong; }
-
-			operator unsigned long() { return asULong; }
-
-			operator float() { return asFloat; }
-
-			operator double() { return asDouble; }
-
-			operator char*() { return asStr; }
-		};
+		void SetVariableType(HyShaderVariable eType)	{ *reinterpret_cast<HyShaderVariable *>(m_pData) = eType; }
+		void SetName(const char *szName)
+		{ 
+			HyAssert(strlen(szName) < HY_SHADER_UNIFORM_NAME_LENGTH, "UniformBuffer::SetName() took a name greater than 'HY_SHADER_UNIFORM_NAME_LENGTH'");
+			strcpy(GetName(), szName);
+		}
 	};
-	std::map<std::string, Uniform>	m_mapUniforms;
+	std::vector<UniformBuffer>	m_vUniforms;
 
 public:
 	HyShaderUniforms();
 	~HyShaderUniforms();
 
 	bool IsDirty();
+
+	int32 FindIndex(const char *szName);
 
 	void Set(const char *szName, float x, float y, float z);
 	void Set(const char *szName, const glm::vec3 &v);
