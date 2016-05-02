@@ -23,12 +23,12 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct)
 	
 	for(uint32 i = 0; i < sm_Init.uiNumWindows; ++i)
 	{
-		m_vWindows.push_back(HyWindow());
+		m_vWindows.push_back(new HyWindow());
 
-		m_vWindows[i].SetTitle(sm_Init.windowInfo[i].sName);
-		m_vWindows[i].SetResolution(sm_Init.windowInfo[i].vResolution);
-		m_vWindows[i].SetLocation(sm_Init.windowInfo[i].vLocation);
-		m_vWindows[i].SetType(sm_Init.windowInfo[i].eType);
+		m_vWindows[i]->SetTitle(sm_Init.windowInfo[i].sName);
+		m_vWindows[i]->SetResolution(sm_Init.windowInfo[i].vResolution);
+		m_vWindows[i]->SetLocation(sm_Init.windowInfo[i].vLocation);
+		m_vWindows[i]->SetType(sm_Init.windowInfo[i].eType);
 	}
 
 	for(uint32 i = 0; i < sm_Init.uiNumInputMappings; ++i)
@@ -44,7 +44,7 @@ IHyApplication::~IHyApplication()
 HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(uiIndex < sm_Init.uiNumWindows, "IApplication::Viewport() took an invalid index: " << uiIndex);
-	return m_vWindows[uiIndex];
+	return *m_vWindows[uiIndex];
 }
 
 HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
@@ -53,12 +53,12 @@ HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 	return *static_cast<HyInputMapInterop *>(m_vInputMaps[uiIndex]);
 }
 
-void *IHyApplication::operator new(size_t uiSize)
-{
-	return sm_Mem.Alloc(uiSize);
-}
-
-void IHyApplication::operator delete(void *pPtr)
-{
-	sm_Mem.Free(pPtr);
-}
+//void *IHyApplication::operator new(size_t uiSize)
+//{
+//	return sm_Mem.Alloc(uiSize);
+//}
+//
+//void IHyApplication::operator delete(void *pPtr)
+//{
+//	sm_Mem.Free(pPtr);
+//}

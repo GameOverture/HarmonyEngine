@@ -42,6 +42,8 @@ int main(int argc, char **argv)
 	TestBed test(initStruct);
 	HyEngine::RunGame(test);
 
+	_CrtDumpMemoryLeaks();
+
 	return 0;
 }
 

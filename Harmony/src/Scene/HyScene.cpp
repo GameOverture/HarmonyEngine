@@ -27,7 +27,7 @@
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
 
-HyScene::HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
+HyScene::HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow *> &vWindowRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
 																			m_iPhysVelocityIterations(8),
 																			m_iPhysPositionIterations(3),
 																			m_GfxCommsRef(gfxCommsRef),
@@ -114,7 +114,7 @@ void HyScene::PostUpdate()
 	}
 
 	for(uint32 i = 0; i < m_vWindowRef.size(); ++i)
-		m_vWindowRef[i].Update();
+		m_vWindowRef[i]->Update();
 
 	WriteDrawBuffers();
 }
@@ -145,19 +145,19 @@ void HyScene::WriteDrawBuffers()
 	int32 iCount = 0;
 	for(uint32 i = 0; i < uiNumWindows; ++i)
 	{
-		uint32 uiNumCameras3d = static_cast<uint32>(m_vWindowRef[i].m_vCams3d.size());
+		uint32 uiNumCameras3d = static_cast<uint32>(m_vWindowRef[i]->m_vCams3d.size());
 		for(uint32 j = 0; j < uiNumCameras3d; ++j)
 		{
-			if(m_vWindowRef[i].m_vCams3d[j]->IsEnabled())
+			if(m_vWindowRef[i]->m_vCams3d[j]->IsEnabled())
 			{
 				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = i;
 				m_pCurWritePos += sizeof(uint32);
 
-				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_vWindowRef[i].m_vCams3d[j]->GetViewport();
+				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_vWindowRef[i]->m_vCams3d[j]->GetViewport();
 				m_pCurWritePos += sizeof(HyRectangle<float>);
 			
 				HyError("GetLocalTransform_SRT should be 3d");
-				m_vWindowRef[i].m_vCams3d[j]->GetLocalTransform_SRT(mtxView);
+				m_vWindowRef[i]->m_vCams3d[j]->GetLocalTransform_SRT(mtxView);
 				*(reinterpret_cast<glm::mat4 *>(m_pCurWritePos)) = mtxView;
 				m_pCurWritePos += sizeof(glm::mat4);
 
@@ -176,18 +176,18 @@ void HyScene::WriteDrawBuffers()
 	iCount = 0;
 	for(uint32 i = 0; i < uiNumWindows; ++i)
 	{
-		uint32 uiNumCameras2d = static_cast<uint32>(m_vWindowRef[i].m_vCams2d.size());
+		uint32 uiNumCameras2d = static_cast<uint32>(m_vWindowRef[i]->m_vCams2d.size());
 		for(uint32 j = 0; j < uiNumCameras2d; ++j)
 		{
-			if(m_vWindowRef[i].m_vCams2d[j]->IsEnabled())
+			if(m_vWindowRef[i]->m_vCams2d[j]->IsEnabled())
 			{
 				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = i;
 				m_pCurWritePos += sizeof(uint32);
 
-				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_vWindowRef[i].m_vCams2d[j]->GetViewport();
+				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_vWindowRef[i]->m_vCams2d[j]->GetViewport();
 				m_pCurWritePos += sizeof(HyRectangle<float>);
 
-				m_vWindowRef[i].m_vCams2d[j]->GetLocalTransform_SRT(mtxView);
+				m_vWindowRef[i]->m_vCams2d[j]->GetLocalTransform_SRT(mtxView);
 
 				// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly in the shader)
 				mtxView[3].x *= -1;

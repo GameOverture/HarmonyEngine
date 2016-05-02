@@ -35,15 +35,15 @@ HyEngine::~HyEngine()
 {
 }
 
-void * HyEngine::operator new(size_t size)
-{
-	return sm_Mem.Alloc(size);
-}
-
-void HyEngine::operator delete(void *ptr)
-{
-	sm_Mem.Free(ptr);
-}
+//void * HyEngine::operator new(size_t size)
+//{
+//	return sm_Mem.Alloc(size);
+//}
+//
+//void HyEngine::operator delete(void *ptr)
+//{
+//	sm_Mem.Free(ptr);
+//}
 
 /*static*/ void HyEngine::RunGame(IHyApplication &gameRef)
 {
@@ -65,6 +65,7 @@ void HyEngine::operator delete(void *ptr)
 bool HyEngine::Update()
 {
 	bool bUpdateApp = true;
+	bool bContinueRunning = true;
 
 	switch(m_pAssetManager->IsReloading())
 	{
@@ -105,7 +106,7 @@ bool HyEngine::Update()
 		if(bUpdateApp)
 		{
 			if(m_AppRef.Update() == false)
-				return false;
+				bContinueRunning = false; //return false;
 		}
 
 		m_pAssetManager->Update();
@@ -115,7 +116,7 @@ bool HyEngine::Update()
 	}
 	m_Renderer.Update();
 
-	return true;
+	return bContinueRunning;
 }
 
 bool HyEngine::PollPlatformApi()

@@ -23,7 +23,7 @@ class IHyRenderer
 {
 protected:
 	HyGfxComms &				m_GfxCommsRef;
-	vector<HyWindow> &			m_vWindowRef;
+	vector<HyWindow *> &		m_vWindowRef;
 
 	queue<IHyData2d *> *		m_pMsgQueuePtr;		// The pointer to the currently active render message queue
 	queue<IHyData2d *> *		m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
@@ -59,7 +59,7 @@ protected:
 	vector<RenderSurface>::iterator	m_RenderSurfaceIter;
 
 public:
-	IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef);
+	IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow *> &vWindowRef);
 	virtual ~IHyRenderer(void);
 
 	virtual void StartRender() = 0;

@@ -34,12 +34,12 @@ void IHyRenderer::RenderSurface::Resize(int32 iWidth, int32 iHeight)
 	m_iRenderSurfaceHeight = iHeight;
 }
 
-IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef) :	m_GfxCommsRef(gfxCommsRef),
+IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow *> &vWindowRef) :	m_GfxCommsRef(gfxCommsRef),
 																					m_vWindowRef(vWindowRef)
 {
 	// TODO: Make the application's HyWindow (ref to 'm_vWindowRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_vWindowRef.size()); ++i)
-		m_RenderSurfaces.push_back(RenderSurface(RENDERSURFACE_Window, i, m_vWindowRef[i].GetResolution().x, m_vWindowRef[i].GetResolution().y));
+		m_RenderSurfaces.push_back(RenderSurface(RENDERSURFACE_Window, i, m_vWindowRef[i]->GetResolution().x, m_vWindowRef[i]->GetResolution().y));
 }
 
 IHyRenderer::~IHyRenderer(void)
@@ -52,7 +52,7 @@ void IHyRenderer::Update()
 	// TODO: Make the application's HyWindow (ref to 'm_vWindowRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_vWindowRef.size()); ++i)
 	{
-		HyWindowInfo &windowInfoRef = m_vWindowRef[i].Update_Render();
+		HyWindowInfo &windowInfoRef = m_vWindowRef[i]->Update_Render();
 		if(windowInfoRef.uiDirtyFlags)
 		{
 			RenderSurface *pRenderSurface = NULL;
@@ -68,7 +68,7 @@ void IHyRenderer::Update()
 
 			if(windowInfoRef.uiDirtyFlags & HyWindowInfo::FLAG_Resolution)
 			{
-				glm::ivec2 vResolution = m_vWindowRef[i].GetResolution();
+				glm::ivec2 vResolution = m_vWindowRef[i]->GetResolution();
 				pRenderSurface->Resize(vResolution.x, vResolution.y);
 			}
 

@@ -22,7 +22,7 @@ class IHyApplication
 	static HarmonyInit				sm_Init;
 	static HyMemoryHeap				sm_Mem;
 
-	vector<HyWindow>				m_vWindows;
+	vector<HyWindow *>				m_vWindows;
 	vector<IHyInputMap *>			m_vInputMaps;
 
 	virtual bool Initialize() = 0;
@@ -41,8 +41,8 @@ public:
 	HyWindow &Window(uint32 uiIndex = 0);
 	HyInputMapInterop &Input(uint32 uiIndex = 0);
 
-	void *operator new(size_t uiSize);
-	void operator delete (void *pPtr);
+	//void *operator new(size_t uiSize);
+	//void operator delete (void *pPtr);
 };
 
 #endif /* __IHyApplication_h__ */

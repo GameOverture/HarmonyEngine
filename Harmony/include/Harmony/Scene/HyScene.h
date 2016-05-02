@@ -50,7 +50,7 @@ class HyScene
 	HyBox2dRuntime										m_Phys2dContactListener;
 
 	HyGfxComms &										m_GfxCommsRef;
-	vector<HyWindow> &									m_vWindowRef;
+	vector<HyWindow *> &								m_vWindowRef;
 
 	vector<IHyInst2d *>									m_vLoadedInst2d;
 	vector<IHyInst2d *>									m_vLoadedInst3d;
@@ -61,7 +61,7 @@ class HyScene
 	char *												m_pCurWritePos;
 
 public:
-	HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow> &vWindowRef);
+	HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow *> &vWindowRef);
 	~HyScene(void);
 
 	static void SetInstOrderingDirty()				{ sm_bInst2dOrderingDirty = true; }

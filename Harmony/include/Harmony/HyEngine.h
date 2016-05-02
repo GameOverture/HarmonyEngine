@@ -65,8 +65,8 @@ public:
 public:
 	~HyEngine();
 
-	void *operator new(size_t size);
-	void operator delete (void *ptr);
+	//void *operator new(size_t size);
+	//void operator delete (void *ptr);
 
 	static void RunGame(IHyApplication &gameRef);
 

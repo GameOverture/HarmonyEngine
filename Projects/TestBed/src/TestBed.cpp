@@ -90,16 +90,16 @@ TestBed::~TestBed(void)
 	IHyShader *pShader_Checkerboard = IHyRenderer::NewCustomShader();
 	pShader_Checkerboard->SetSourceCode(HyReadTextFile("testFrag.glsl", NULL), HYSHADER_Fragment);
 
-<<<<<<< HEAD
-	pShader_Checkerboard->
-
-	pShaderUniformsRef->Set("primitiveColor", color.Get());
-	pShaderUniformsRef->Set("transformMtx", mtx);
-
-	m_primBox.SetCustomShader(pShader_Checkerboard);
-=======
-	//m_primBox.SetCustomShader(pShader_Checkerboard);
->>>>>>> 69a4a7012978a9f8d4e55702add785735390ca19
+//<<<<<<< HEAD
+//	pShader_Checkerboard->
+//
+//	pShaderUniformsRef->Set("primitiveColor", color.Get());
+//	pShaderUniformsRef->Set("transformMtx", mtx);
+//
+//	m_primBox.SetCustomShader(pShader_Checkerboard);
+//=======
+//	//m_primBox.SetCustomShader(pShader_Checkerboard);
+//>>>>>>> 69a4a7012978a9f8d4e55702add785735390ca19
 	
 
 	return true;
@@ -150,7 +150,10 @@ TestBed::~TestBed(void)
 
 	if(Input().IsBtnDownBuffered(SEND_LOG))
 	{
-		HyEngine::ReloadDataDir(std::string("D:\\soft\\GitHub\\HarmonyEngine\\Projects\\NewGame\\data"));
+		// Exit application
+		return false;
+
+		//HyEngine::ReloadDataDir(std::string("D:\\soft\\GitHub\\HarmonyEngine\\Projects\\NewGame\\data"));
 		//HyLog("Testing message! Mo'fucka");
 	}
 

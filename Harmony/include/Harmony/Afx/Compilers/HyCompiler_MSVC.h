@@ -11,9 +11,9 @@
 #define __HyCompiler_msvc_h__
 
 #ifdef _DEBUG
-  #define HY_DEBUG
+	#define HY_DEBUG
 #else
-  #define HY_RELEASE
+	#define HY_RELEASE
 #endif
 
 #define HY_PACKDATA_BEGIN(align)	__declspec(align(align)) 
@@ -21,7 +21,7 @@
 
 #define HY_INLINE					__inline
 #define HY_FORCE_INLINE				__forceinline
-    
+
 //
 // Switch off the most annoying warnings
 //
@@ -33,5 +33,18 @@
 
 // This undefines the macros MIN and MAX which are specified in the windows headers. Use the stl versions instead.
 #define NOMINMAX
+
+#ifdef HY_DEBUG
+	#define _CRTDBG_MAP_ALLOC
+	//#include <stdlib.h>
+	#include <crtdbg.h>
+
+
+	//#define HY_DEBUG_NEW   new( _NORMAL_BLOCK, __FILE__, __LINE__)	// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the allocations to be of _CLIENT_BLOCK type
+	//#define new HY_DEBUG_NEW
+
+	#define  SET_CRT_DEBUG_FIELD(a)		_CrtSetDbgFlag((a) | _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG))
+	#define  CLEAR_CRT_DEBUG_FIELD(a)	_CrtSetDbgFlag(~(a) & _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG))
+#endif
 
 #endif /* __HyCompiler_msvc_h__ */
