@@ -90,6 +90,11 @@ TestBed::~TestBed(void)
 	IHyShader *pShader_Checkerboard = IHyRenderer::NewCustomShader();
 	pShader_Checkerboard->SetSourceCode(HyReadTextFile("testFrag.glsl", NULL), HYSHADER_Fragment);
 
+	pShader_Checkerboard->
+
+	pShaderUniformsRef->Set("primitiveColor", color.Get());
+	pShaderUniformsRef->Set("transformMtx", mtx);
+
 	m_primBox.SetCustomShader(pShader_Checkerboard);
 	
 
