@@ -189,6 +189,12 @@
     <ClCompile Include="src\Renderer\IHyShader.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utilities\Crc32.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\HyVariant.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -536,6 +542,12 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Renderer\IHyShader.h">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\HyVariant.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\Crc32.h">
+      <Filter>Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

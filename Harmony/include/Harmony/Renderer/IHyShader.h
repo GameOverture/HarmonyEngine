@@ -13,26 +13,41 @@
 #include "Afx/HyStdAfx.h"
 
 #include <vector>
-#include <map>
 
 class IHyRenderer;
+
+#define HY_SHADER_UNIFORM_NAME_LENGTH		32	// includes the NULL terminator
+#define HY_SHADER_UNIFORM_BUFFER_LENGTH		(sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH + sizeof(glm::mat4))
 
 class HyShaderUniforms
 {
 	bool							m_bDirty;
+	uint32							m_uiCrc32;
 
-	struct Uniform
+	struct UniformBuffer
 	{
-		HyShaderVariable	eVarType;
-		void *				pData;
+		char m_pData[HY_SHADER_UNIFORM_BUFFER_LENGTH];
+
+		HyShaderVariable GetVariableType()				{ return *reinterpret_cast<HyShaderVariable *>(m_pData); }
+		char *GetName()									{ return m_pData + sizeof(uint32); }
+		char *GetData()									{ return m_pData + sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH; }
+
+		void SetVariableType(HyShaderVariable eType)	{ *reinterpret_cast<HyShaderVariable *>(m_pData) = eType; }
+		void SetName(const char *szName)
+		{ 
+			HyAssert(strlen(szName) < HY_SHADER_UNIFORM_NAME_LENGTH, "UniformBuffer::SetName() took a name greater than 'HY_SHADER_UNIFORM_NAME_LENGTH'");
+			strcpy(GetName(), szName);
+		}
 	};
-	std::map<std::string, Uniform>	m_mapUniforms;
+	std::vector<UniformBuffer>	m_vUniforms;
 
 public:
 	HyShaderUniforms();
 	~HyShaderUniforms();
 
 	bool IsDirty();
+
+	int32 FindIndex(const char *szName);
 
 	void Set(const char *szName, float x, float y, float z);
 	void Set(const char *szName, const glm::vec3 &v);

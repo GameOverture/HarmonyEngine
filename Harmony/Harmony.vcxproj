@@ -90,6 +90,7 @@
     <ClCompile Include="src\Time\Watches\IHyTimeInst.cpp" />
     <ClCompile Include="src\Utilities\Animation\HyAnimFloat.cpp" />
     <ClCompile Include="src\Utilities\Animation\HyTweenFuncs.cpp" />
+    <ClCompile Include="src\Utilities\Crc32.cpp" />
     <ClCompile Include="src\Utilities\HyBitManip.cpp" />
     <ClCompile Include="src\Utilities\HyDebugPhys2d.cpp" />
     <ClCompile Include="src\Utilities\HyFileIO.cpp" />
@@ -97,6 +98,7 @@
     <ClCompile Include="src\Utilities\HyMath.cpp" />
     <ClCompile Include="src\Utilities\HyBox2dRuntime.cpp" />
     <ClCompile Include="src\Utilities\HyStrManip.cpp" />
+    <ClCompile Include="src\Utilities\HyVariant.cpp" />
     <ClCompile Include="src\Utilities\jasonxx.cc" />
     <ClCompile Include="src\Utilities\stb_image.c" />
   </ItemGroup>
@@ -183,6 +185,7 @@
     <ClInclude Include="include\Harmony\Utilities\Animation\HyTweenFuncs.h" />
     <ClInclude Include="include\Harmony\Utilities\Animation\ITransform.h" />
     <ClInclude Include="include\Harmony\Utilities\Containers\HyStaticArray.h" />
+    <ClInclude Include="include\Harmony\Utilities\Crc32.h" />
     <ClInclude Include="include\Harmony\Utilities\HyBitManip.h" />
     <ClInclude Include="include\Harmony\Utilities\HyDebugPhys2d.h" />
     <ClInclude Include="include\Harmony\Utilities\HyFileIO.h" />
@@ -190,6 +193,7 @@
     <ClInclude Include="include\Harmony\Utilities\HyMath.h" />
     <ClInclude Include="include\Harmony\Utilities\HyBox2dRuntime.h" />
     <ClInclude Include="include\Harmony\Utilities\HyStrManip.h" />
+    <ClInclude Include="include\Harmony\Utilities\HyVariant.h" />
     <ClInclude Include="include\Harmony\Utilities\jsonxx.h" />
     <ClInclude Include="include\Harmony\Utilities\stb_image.h" />
   </ItemGroup>
