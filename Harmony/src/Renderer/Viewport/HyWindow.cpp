@@ -76,7 +76,7 @@ void HyWindow::SetType(HyWindowType eType)
 
 HyCamera2d *HyWindow::CreateCamera2d()
 {
-	HyCamera2d *pNewCam = new HyCamera2d(this);
+	HyCamera2d *pNewCam = HY_NEW HyCamera2d(this);
 	m_vCams2d.push_back(pNewCam);
 
 	return pNewCam;
@@ -84,7 +84,7 @@ HyCamera2d *HyWindow::CreateCamera2d()
 
 HyCamera3d *HyWindow::CreateCamera3d()
 {
-	HyCamera3d *pNewCam = new HyCamera3d(this);
+	HyCamera3d *pNewCam = HY_NEW HyCamera3d(this);
 	m_vCams3d.push_back(pNewCam);
 
 	return pNewCam;

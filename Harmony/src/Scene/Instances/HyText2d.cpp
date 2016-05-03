@@ -61,7 +61,7 @@ void HyText2d::CalcVertexBuffer()
 
 	size_t uiNumCharacters = m_sString.size();
 	m_uiBufferSizeBytes = uiNumCharacters * (4 * (sizeof(glm::vec4) + sizeof(glm::vec2)));
-	m_pVertexBuffer = new unsigned char[m_uiBufferSizeBytes];
+	m_pVertexBuffer = HY_NEW unsigned char[m_uiBufferSizeBytes];
 
 	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pData);
 

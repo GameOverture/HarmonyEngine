@@ -20,7 +20,7 @@ HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::MemoryHeap();
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows),
-												m_pAssetManager(new HyAssetManager(m_AppRef.sm_Init.szDataDir, m_GfxBuffer, m_Scene)),
+												m_pAssetManager(HY_NEW HyAssetManager(m_AppRef.sm_Init.szDataDir, m_GfxBuffer, m_Scene)),
 												m_GuiComms(m_AppRef.sm_Init.uiDebugPort, *m_pAssetManager),
 												m_Input(m_AppRef.m_vInputMaps),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_vWindows)
@@ -47,7 +47,7 @@ HyEngine::~HyEngine()
 
 /*static*/ void HyEngine::RunGame(IHyApplication &gameRef)
 {
-	sm_pInstance = new HyEngine(gameRef);
+	sm_pInstance = HY_NEW HyEngine(gameRef);
 	
 	while(sm_pInstance->Update())
 	{ }
@@ -55,6 +55,11 @@ HyEngine::~HyEngine()
 	gameRef.Shutdown();
 	
 	delete sm_pInstance;
+
+	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler)
+#if defined(HY_DEBUG) && defined(_MSC_VER)
+	HY_SET_CRT_DEBUG_FIELD(_CRTDBG_LEAK_CHECK_DF);
+#endif
 }
 
 /*static*/ void HyEngine::ReloadDataDir(std::string sNewDataDir)
@@ -65,7 +70,6 @@ HyEngine::~HyEngine()
 bool HyEngine::Update()
 {
 	bool bUpdateApp = true;
-	bool bContinueRunning = true;
 
 	switch(m_pAssetManager->IsReloading())
 	{
@@ -87,7 +91,7 @@ bool HyEngine::Update()
 		std::string sNewDataDir = m_pAssetManager->GetNewDataDirPath();
 		delete m_pAssetManager;
 
-		m_pAssetManager = new HyAssetManager(sNewDataDir.c_str(), m_GfxBuffer, m_Scene);
+		m_pAssetManager = HY_NEW HyAssetManager(sNewDataDir.c_str(), m_GfxBuffer, m_Scene);
 	}
 	// Above should fall through to reset delta
 	case HYRELOADCODE_Finished:
@@ -106,7 +110,7 @@ bool HyEngine::Update()
 		if(bUpdateApp)
 		{
 			if(m_AppRef.Update() == false)
-				bContinueRunning = false; //return false;
+				return false;
 		}
 
 		m_pAssetManager->Update();
@@ -116,7 +120,7 @@ bool HyEngine::Update()
 	}
 	m_Renderer.Update();
 
-	return bContinueRunning;
+	return true;
 }
 
 bool HyEngine::PollPlatformApi()

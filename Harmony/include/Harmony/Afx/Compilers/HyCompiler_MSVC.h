@@ -36,15 +36,14 @@
 
 #ifdef HY_DEBUG
 	#define _CRTDBG_MAP_ALLOC
-	//#include <stdlib.h>
 	#include <crtdbg.h>
 
+	#define HY_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)	// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the allocations to be of _CLIENT_BLOCK type
 
-	//#define HY_DEBUG_NEW   new( _NORMAL_BLOCK, __FILE__, __LINE__)	// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the allocations to be of _CLIENT_BLOCK type
-	//#define new HY_DEBUG_NEW
-
-	#define  SET_CRT_DEBUG_FIELD(a)		_CrtSetDbgFlag((a) | _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG))
-	#define  CLEAR_CRT_DEBUG_FIELD(a)	_CrtSetDbgFlag(~(a) & _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG))
+	#define  HY_SET_CRT_DEBUG_FIELD(a)		_CrtSetDbgFlag((a) | _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG))
+	#define  HY_CLEAR_CRT_DEBUG_FIELD(a)	_CrtSetDbgFlag(~(a) & _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG))
+#else
+	#define HY_NEW new
 #endif
 
 #endif /* __HyCompiler_msvc_h__ */

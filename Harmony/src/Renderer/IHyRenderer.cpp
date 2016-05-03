@@ -151,7 +151,7 @@ void IHyRenderer::SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info)
 {
 	HyAssert(sm_vShaders.size() >= IHyShader::SHADER_CustomStartIndex, "IHyRenderer::NewCustomShader() was invoked before renderer initialized default shaders");
 
-	IHyShader *pNewShader = new HyShaderInterop(IHyShader::SHADER_CustomStartIndex + static_cast<uint32>(sm_vShaders.size()));
+	IHyShader *pNewShader = HY_NEW HyShaderInterop(IHyShader::SHADER_CustomStartIndex + static_cast<uint32>(sm_vShaders.size()));
 	sm_vShaders.push_back(pNewShader);
 
 	sm_bShadersDirty = true;

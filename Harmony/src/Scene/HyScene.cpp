@@ -45,6 +45,7 @@ HyScene::HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow *> &vWindowRef) :	m_b2
 
 HyScene::~HyScene(void)
 {
+	IHyInst2d::sm_pAssetManager = NULL;
 }
 
 void HyScene::AddInstance(IHyInst2d *pInst)

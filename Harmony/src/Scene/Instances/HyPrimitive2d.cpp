@@ -37,7 +37,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 	ClearData();
 	if(m_RenderState.GetNumVertices() != 0)
 	{
-		m_pVertices = new glm::vec4[m_RenderState.GetNumVertices()];
+		m_pVertices = HY_NEW glm::vec4[m_RenderState.GetNumVertices()];
 		memcpy(m_pVertices, p.m_pVertices, m_RenderState.GetNumVertices() * sizeof(glm::vec4));
 	}
 	
@@ -61,7 +61,7 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, glm:
 	vOffset *= fCoordMod;
 
 	m_RenderState.SetNumVertices(4);
-	m_pVertices = new glm::vec4[4];
+	m_pVertices = HY_NEW glm::vec4[4];
 
 	m_pVertices[0].x = vOffset.x;
 	m_pVertices[0].y = vOffset.y;
@@ -103,7 +103,7 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLEFAN);
 
 	m_RenderState.SetNumVertices(iNumSegments);
-	m_pVertices = new glm::vec4[iNumSegments];
+	m_pVertices = HY_NEW glm::vec4[iNumSegments];
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
 		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
@@ -133,7 +133,7 @@ void HyPrimitive2d::SetAsEdgeChain(const glm::vec2 *pVertices, uint32 uiNumVerts
 		m_RenderState.Enable(HyRenderState::DRAWMODE_LINESTRIP);
 
 	m_RenderState.SetNumVertices(uiNumVerts);
-	m_pVertices = new glm::vec4[uiNumVerts];
+	m_pVertices = HY_NEW glm::vec4[uiNumVerts];
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
 		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();

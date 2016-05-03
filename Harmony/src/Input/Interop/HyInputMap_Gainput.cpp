@@ -82,6 +82,6 @@ HyInputMap_Gainput::~HyInputMap_Gainput()
 
 /*virtual*/ void HyInputMap_Gainput::Initialize()
 {
-	m_pInputMap = new gainput::InputMap(HY_GAINPUT_MANAGER.GetGainputManager());
+	m_pInputMap = HY_NEW gainput::InputMap(HY_GAINPUT_MANAGER.GetGainputManager());
 }
 

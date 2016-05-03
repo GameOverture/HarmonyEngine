@@ -10,7 +10,7 @@
 #ifndef __HyFileIO_h__
 #define __HyFileIO_h__
 
-#include <stdio.h>
+#include "Afx/HyStdAfx.h"
 #include <fstream>
 
 char *HyReadTextFile(const char *szFilePath, int *pLengthOut);

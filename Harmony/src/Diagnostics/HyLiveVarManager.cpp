@@ -22,7 +22,7 @@ HyLiveVarManager::~HyLiveVarManager(void)
 HyLiveVarManager *HyLiveVarManager::GetInstance()
 {
 	if(sm_pInstance == NULL)
-		sm_pInstance = new HyLiveVarManager();
+		sm_pInstance = HY_NEW HyLiveVarManager();
 
 	return sm_pInstance;
 }

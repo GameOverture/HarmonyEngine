@@ -350,7 +350,7 @@ bool HyOpenGL::Initialize()
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 
 	// Quad batch //////////////////////////////////////////////////////////////////////////
-	HyOpenGLShader *pShaderQuadBatch = new HyOpenGLShader(IHyShader::SHADER_QuadBatch);
+	HyOpenGLShader *pShaderQuadBatch = HY_NEW HyOpenGLShader(IHyShader::SHADER_QuadBatch);
 	sm_vShaders.push_back(pShaderQuadBatch);
 
 	pShaderQuadBatch->SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
@@ -370,7 +370,7 @@ bool HyOpenGL::Initialize()
 	pShaderQuadBatch->OnRenderThread(*this);
 
 	// Primitive //////////////////////////////////////////////////////////////////////////
-	HyOpenGLShader *pShaderPrimitive = new HyOpenGLShader(IHyShader::SHADER_Primitive);
+	HyOpenGLShader *pShaderPrimitive = HY_NEW HyOpenGLShader(IHyShader::SHADER_Primitive);
 	sm_vShaders.push_back(pShaderPrimitive);
 
 	pShaderPrimitive->SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);

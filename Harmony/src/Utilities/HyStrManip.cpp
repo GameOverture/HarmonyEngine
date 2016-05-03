@@ -17,7 +17,7 @@ void DynamicStringCopy(char *&dst, const char *src)
 {
 	dst = NULL;
 	size_t iStrSize = strlen(src) + 1; // +1 for NULL terminator
-	dst = new char[iStrSize];
+	dst = HY_NEW char[iStrSize];
 	strcpy(dst, src);
 }
 

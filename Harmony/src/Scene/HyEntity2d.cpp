@@ -56,9 +56,9 @@ IHyInst2d *HyEntity2d::Set(HyInstanceType eType, const char *szPrefix, const cha
 	IHyInst2d *pNewInst = NULL;
 	switch(eType)
 	{
-	case HYINST_Sprite2d:	pNewInst = new HySprite2d(szPrefix, szName);	break;
-	case HYINST_Spine2d:	pNewInst = new HySpine2d(szPrefix, szName);		break;
-	case HYINST_Text2d:		pNewInst = new HyText2d(szPrefix, szName);		break;
+	case HYINST_Sprite2d:	pNewInst = HY_NEW HySprite2d(szPrefix, szName);	break;
+	case HYINST_Spine2d:	pNewInst = HY_NEW HySpine2d(szPrefix, szName);		break;
+	case HYINST_Text2d:		pNewInst = HY_NEW HyText2d(szPrefix, szName);		break;
 	default:
 		break;
 	}
@@ -73,7 +73,7 @@ IHyInst2d *HyEntity2d::Set(HyInstanceType eType, const char *szPrefix, const cha
 
 HySprite2d *HyEntity2d::SetSprite(const char *szPrefix, const char *szName)
 {
-	HySprite2d *pNewInst = new HySprite2d(szPrefix, szName);
+	HySprite2d *pNewInst = HY_NEW HySprite2d(szPrefix, szName);
 	LinkInst(pNewInst);
 
 	return pNewInst;
@@ -81,7 +81,7 @@ HySprite2d *HyEntity2d::SetSprite(const char *szPrefix, const char *szName)
 
 HySpine2d *HyEntity2d::SetSpine(const char *szPrefix, const char *szName)
 {
-	HySpine2d *pNewInst = new HySpine2d(szPrefix, szName);
+	HySpine2d *pNewInst = HY_NEW HySpine2d(szPrefix, szName);
 	LinkInst(pNewInst);
 
 	return pNewInst;
@@ -89,7 +89,7 @@ HySpine2d *HyEntity2d::SetSpine(const char *szPrefix, const char *szName)
 
 HyText2d *HyEntity2d::SetText(const char *szPrefix, const char *szName)
 {
-	HyText2d *pNewInst = new HyText2d(szPrefix, szName);
+	HyText2d *pNewInst = HY_NEW HyText2d(szPrefix, szName);
 	LinkInst(pNewInst);
 
 	return pNewInst;
@@ -97,7 +97,7 @@ HyText2d *HyEntity2d::SetText(const char *szPrefix, const char *szName)
 
 HyPrimitive2d *HyEntity2d::SetPrimitive()
 {
-	HyPrimitive2d *pNewInst = new HyPrimitive2d();
+	HyPrimitive2d *pNewInst = HY_NEW HyPrimitive2d();
 	LinkInst(pNewInst);
 
 	return pNewInst;
@@ -184,7 +184,7 @@ void HyEntity2d::Clear(bool bClearChildren)
 
 HyEntity2d *HyEntity2d::AddChild()
 {
-	HyEntity2d *pEnt2d = new HyEntity2d(this);
+	HyEntity2d *pEnt2d = HY_NEW HyEntity2d(this);
 	m_vChildNodes.push_back(pEnt2d);
 
 	pEnt2d->SetDirty();

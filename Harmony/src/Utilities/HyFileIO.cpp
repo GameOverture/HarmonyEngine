@@ -22,7 +22,7 @@ char *HyReadTextFile(const char *szFilePath, int *pLengthOut)
 	iLength = ftell(pFile);
 	fseek(pFile, 0, SEEK_SET);
 
-	pData = new char[iLength];
+	pData = HY_NEW char[iLength];
 	fread(pData, 1, iLength, pFile);
 	fclose(pFile);
 

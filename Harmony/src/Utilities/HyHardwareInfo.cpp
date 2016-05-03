@@ -53,7 +53,7 @@ HyHardwareInfo::HyHardwareInfo()
 HyHardwareInfo *HyHardwareInfo::Get()
 {
 	if(sm_pInstance == NULL)
-		sm_pInstance = new HyHardwareInfo();
+		sm_pInstance = HY_NEW HyHardwareInfo();
 
 	return sm_pInstance;
 }

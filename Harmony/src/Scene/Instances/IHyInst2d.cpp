@@ -60,7 +60,9 @@ void IHyInst2d::Load()
 
 void IHyInst2d::Unload()
 {
-	sm_pAssetManager->RemoveInst(this);
+	if(sm_pAssetManager)
+		sm_pAssetManager->RemoveInst(this);
+
 	m_pData = NULL;
 	m_eLoadState = HYLOADSTATE_Inactive;
 }

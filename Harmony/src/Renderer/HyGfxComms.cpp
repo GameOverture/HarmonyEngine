@@ -14,22 +14,22 @@ HyGfxComms::HyGfxComms()
 	m_pBuffer_Update = m_pBuffer_Shared = m_pBuffer_Render = NULL;
 	m_pAtlasSendQueue_Update = m_pAtlasSendQueue_Shared = m_pAtlasSendQueue_Render = NULL;
 
-	m_pBuffer_Update = new char[HY_GFX_BUFFER_SIZE];
+	m_pBuffer_Update = HY_NEW char[HY_GFX_BUFFER_SIZE];
 	memset(m_pBuffer_Update, 0, HY_GFX_BUFFER_SIZE);
 
-	m_pBuffer_Shared = new char[HY_GFX_BUFFER_SIZE];
+	m_pBuffer_Shared = HY_NEW char[HY_GFX_BUFFER_SIZE];
 	memset(m_pBuffer_Shared, 0, HY_GFX_BUFFER_SIZE);
 
-	m_pBuffer_Render = new char[HY_GFX_BUFFER_SIZE];
+	m_pBuffer_Render = HY_NEW char[HY_GFX_BUFFER_SIZE];
 	memset(m_pBuffer_Render, 0, HY_GFX_BUFFER_SIZE);
 
-	m_pAtlasSendQueue_Update = new queue<IHyData2d *>();
-	m_pAtlasSendQueue_Shared = new queue<IHyData2d *>();
-	m_pAtlasSendQueue_Render = new queue<IHyData2d *>();
+	m_pAtlasSendQueue_Update = HY_NEW queue<IHyData2d *>();
+	m_pAtlasSendQueue_Shared = HY_NEW queue<IHyData2d *>();
+	m_pAtlasSendQueue_Render = HY_NEW queue<IHyData2d *>();
 
-	m_pAtlasReceiveQueue_Update = new queue<IHyData2d *>();
-	m_pAtlasReceiveQueue_Shared = new queue<IHyData2d *>();
-	m_pAtlasReceiveQueue_Render = new queue<IHyData2d *>();
+	m_pAtlasReceiveQueue_Update = HY_NEW queue<IHyData2d *>();
+	m_pAtlasReceiveQueue_Shared = HY_NEW queue<IHyData2d *>();
+	m_pAtlasReceiveQueue_Render = HY_NEW queue<IHyData2d *>();
 }
 
 HyGfxComms::~HyGfxComms()

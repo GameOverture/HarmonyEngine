@@ -28,7 +28,7 @@ HySprite2dData::~HySprite2dData(void)
 	jsonxx::Array animStatesArray = spriteObj.get<jsonxx::Array>("animStates");
 
 	m_uiNumStates = static_cast<uint32>(animStatesArray.size());
-	m_pAnimStates = reinterpret_cast<AnimState *>(new unsigned char[sizeof(AnimState) * m_uiNumStates]);
+	m_pAnimStates = reinterpret_cast<AnimState *>(HY_NEW unsigned char[sizeof(AnimState) * m_uiNumStates]);
 	AnimState *pAnimStateWriteLocation = m_pAnimStates;
 
 	for(uint32 i = 0; i < m_uiNumStates; ++i)
@@ -50,7 +50,7 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 																																						bBOUNCE(bBounce),
 																																						uiNUMFRAMES(static_cast<uint32>(frameArray.size()))
 {
-	pFrames = reinterpret_cast<Frame *>(new unsigned char[sizeof(Frame) * uiNUMFRAMES]);
+	pFrames = reinterpret_cast<Frame *>(HY_NEW unsigned char[sizeof(Frame) * uiNUMFRAMES]);
 	Frame *pFrameWriteLocation = pFrames;
 
 	for(uint32 i = 0; i < uiNUMFRAMES; ++i)

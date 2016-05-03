@@ -64,7 +64,7 @@ void HyOpenGLShader::CompileFromString(HyShaderType eType)
 		glGetShaderiv(iShaderHandle, GL_INFO_LOG_LENGTH, &iLength);
 		if(iLength > 0)
 		{
-			char *szlog = new char[iLength];
+			char *szlog = HY_NEW char[iLength];
 			GLint written = 0;
 			glGetShaderInfoLog(iShaderHandle, iLength, &written, szlog);
 			
@@ -98,7 +98,7 @@ void HyOpenGLShader::Link()
 
 		if( length > 0)
 		{
-			char *szlog = new char[length];
+			char *szlog = HY_NEW char[length];
 			GLint written = 0;
 			glGetProgramInfoLog(m_hProgHandle, length, &written, szlog);
 

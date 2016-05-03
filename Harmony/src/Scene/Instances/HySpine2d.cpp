@@ -55,8 +55,8 @@ void HySpine2d::AnimInitState(uint32 uiNumStates)
 	HyAssert(uiNumStates != 0, "HySpine2d::AnimInitState must take uiNumState > 0");
 
 	m_uiNumAnimStates = uiNumStates;
-	m_ppAnimStates = new spAnimationState *[m_uiNumAnimStates];
-	m_pIsAnimStateEnabled = new bool[m_uiNumAnimStates];
+	m_ppAnimStates = HY_NEW spAnimationState *[m_uiNumAnimStates];
+	m_pIsAnimStateEnabled = HY_NEW bool[m_uiNumAnimStates];
 
 	for(uint32 i = 0; i < m_uiNumAnimStates; ++i)
 	{

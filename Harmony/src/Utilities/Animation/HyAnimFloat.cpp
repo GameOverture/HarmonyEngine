@@ -17,7 +17,7 @@
 
 /*static*/ HyScene *HyAnimFloat::sm_pScene = NULL;
 
-HyAnimFloat::HyAnimFloat() :	m_fValueRef(*(new float)),
+HyAnimFloat::HyAnimFloat() :	m_fValueRef(*(HY_NEW float)),
 								m_fStart(0.0f),
 								m_fTarget(0.0f),
 								m_fDuration(0.0f),

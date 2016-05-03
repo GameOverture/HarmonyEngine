@@ -55,7 +55,7 @@ public:
 				return m_vData[i];
 		}
 		
-		tData *pOutData = new tData(sPath);
+		tData *pOutData = HY_NEW tData(sPath);
 		m_vData.push_back(pOutData);
 
 		return pOutData;
