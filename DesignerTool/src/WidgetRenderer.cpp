@@ -34,18 +34,20 @@ HyGuiRenderer *WidgetRenderer::GetRenderer()
     return ui->openGLWidget;
 }
 
+// IHyApplication override
 /*virtual*/ bool WidgetRenderer::Initialize()
 {
     return true;
 }
 
+// IHyApplication override
 /*virtual*/ bool WidgetRenderer::Update()
 {
     while(m_ActionQueue.empty() == false)
     {
-        std::pair<Item *, eQueuedItem> action = m_ActionQueue.dequeue();
+        std::pair<Item *, eQueuedAction> action = m_ActionQueue.dequeue();
         Item *pItem = action.first;
-        eQueuedItem eActionToTake = action.second;
+        eQueuedAction eActionToTake = action.second;
         
         if(eActionToTake == QUEUEDITEM_Open)
         {
@@ -111,6 +113,7 @@ HyGuiRenderer *WidgetRenderer::GetRenderer()
     return true;
 }
 
+// IHyApplication override
 /*virtual*/ bool WidgetRenderer::Shutdown()
 {
     return true;
@@ -124,7 +127,7 @@ void WidgetRenderer::OpenItem(Item *pItem)
         return;
     }
     
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedItem>(pItem, QUEUEDITEM_Open));
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(pItem, QUEUEDITEM_Open));
 }
 
 void WidgetRenderer::CloseItem(Item *pItem)
@@ -135,7 +138,7 @@ void WidgetRenderer::CloseItem(Item *pItem)
         return;
     }
     
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedItem>(pItem, QUEUEDITEM_Close));
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(pItem, QUEUEDITEM_Close));
 }
 
 QStringList WidgetRenderer::GetOpenItemPaths()
@@ -187,5 +190,5 @@ void WidgetRenderer::on_tabWidget_currentChanged(int iIndex)
     if(m_bInitialized == false)
         return;
     
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedItem>(GetItem(iIndex), QUEUEDITEM_Show));
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(GetItem(iIndex), QUEUEDITEM_Show));
 }

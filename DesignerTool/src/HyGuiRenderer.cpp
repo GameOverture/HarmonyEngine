@@ -46,7 +46,7 @@ HyGuiRenderer::~HyGuiRenderer()
     if(m_bIsUpdating == false)
     {
         m_bIsUpdating = true;
-        if(m_pHyEngine->Update() == false)
+        if(m_pHyEngine->Update() == false)  // This will call WidgetRenderer::Update()
             HyGuiLog("Harmony Gfx requested exit program.", LOGTYPE_Info);
 
         m_bIsUpdating = false;

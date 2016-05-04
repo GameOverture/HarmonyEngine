@@ -48,13 +48,13 @@ class WidgetRenderer : public QWidget, public IHyApplication
     
     ItemProject *       m_pActiveItemProj;  // Overrides any Item in the current open TabPage
     
-    enum eQueuedItem
+    enum eQueuedAction
     {
         QUEUEDITEM_Open = 0,
         QUEUEDITEM_Show,
         QUEUEDITEM_Close
     };
-    QQueue<std::pair<Item *, eQueuedItem> > m_ActionQueue;
+    QQueue<std::pair<Item *, eQueuedAction> > m_ActionQueue;
 
 public:
     explicit WidgetRenderer(QWidget *parent = 0);
