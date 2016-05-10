@@ -16,7 +16,7 @@ HyMemoryHeap IHyApplication::sm_Mem;
 
 IHyApplication::IHyApplication(HarmonyInit &initStruct)
 {
-	_crtBreakAlloc = 5609;
+	//_crtBreakAlloc = 5609;
 
 	sm_Init = initStruct;
 	HyAssert(sm_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HarmonyInit's actual 'eDefaultCoordinateType' cannot be 'HYCOORDTYPE_Default'");
