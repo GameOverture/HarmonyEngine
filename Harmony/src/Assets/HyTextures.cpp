@@ -50,7 +50,7 @@ HyTextures::~HyTextures()
 		return;
 
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
-		m_pAtlasGroups->~HyAtlasGroup();
+		m_pAtlasGroups[i].~HyAtlasGroup();
 
 	unsigned char *pAtlasGrps = reinterpret_cast<unsigned char *>(m_pAtlasGroups);
 	delete[] pAtlasGrps;
@@ -111,7 +111,7 @@ HyAtlasGroup::HyAtlasGroup(HyTextures &managerRef, uint32 uiLoadGroupId, uint32 
 HyAtlasGroup::~HyAtlasGroup()
 {
 	for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
-		m_pAtlases->~HyAtlas();
+		m_pAtlases[i].~HyAtlas();
 
 	unsigned char *pAtlas = reinterpret_cast<unsigned char *>(m_pAtlases);
 	delete[] pAtlas;

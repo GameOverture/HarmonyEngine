@@ -10,7 +10,7 @@
 #ifndef __RenderTest_h__
 #define __RenderTest_h__
 
-#include "stdafx.h"
+#include "Harmony/HyEngine.h"
 
 class TestBed : public IHyApplication
 {

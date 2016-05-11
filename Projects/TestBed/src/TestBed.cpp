@@ -88,7 +88,9 @@ TestBed::~TestBed(void)
 
 	//////////////////////////////////////////////////////////////////////////
 	IHyShader *pShader_Checkerboard = IHyRenderer::NewCustomShader();
-	pShader_Checkerboard->SetSourceCode(HyReadTextFile("testFrag.glsl", NULL), HYSHADER_Fragment);
+	char *pShaderSrc = HyReadTextFile("testFrag.glsl", NULL);
+	pShader_Checkerboard->SetSourceCode(pShaderSrc, HYSHADER_Fragment);
+	delete[] pShaderSrc;
 
 //<<<<<<< HEAD
 //	pShader_Checkerboard->

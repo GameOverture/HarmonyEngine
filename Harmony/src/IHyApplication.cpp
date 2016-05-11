@@ -16,8 +16,6 @@ HyMemoryHeap IHyApplication::sm_Mem;
 
 IHyApplication::IHyApplication(HarmonyInit &initStruct)
 {
-	//_crtBreakAlloc = 5609;
-
 	sm_Init = initStruct;
 	HyAssert(sm_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HarmonyInit's actual 'eDefaultCoordinateType' cannot be 'HYCOORDTYPE_Default'");
 	HyAssert(sm_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HarmonyInit's actual 'eDefaultCoordinateUnit' cannot be 'HYCOORDUNIT_Default'");
@@ -39,8 +37,11 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct)
 
 IHyApplication::~IHyApplication()
 {
-	m_vWindows.clear();
-	m_vInputMaps.clear();
+	for(uint32 i = 0; i < static_cast<uint32>(m_vWindows.size()); ++i)
+		delete m_vWindows[i];
+
+	for(uint32 i = 0; i < static_cast<uint32>(m_vInputMaps.size()); ++i)
+		delete m_vInputMaps[i];
 }
 
 HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)

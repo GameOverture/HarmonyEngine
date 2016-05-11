@@ -20,8 +20,8 @@ HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::MemoryHeap();
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows),
-												m_pAssetManager(HY_NEW HyAssetManager(m_AppRef.sm_Init.szDataDir, m_GfxBuffer, m_Scene)),
-												m_GuiComms(m_AppRef.sm_Init.uiDebugPort, *m_pAssetManager),
+												m_AssetManager(m_AppRef.sm_Init.szDataDir, m_GfxBuffer, m_Scene),
+												m_GuiComms(m_AppRef.sm_Init.uiDebugPort, m_AssetManager),
 												m_Input(m_AppRef.m_vInputMaps),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_vWindows)
 {
@@ -35,16 +35,6 @@ HyEngine::~HyEngine()
 {
 }
 
-//void * HyEngine::operator new(size_t size)
-//{
-//	return sm_Mem.Alloc(size);
-//}
-//
-//void HyEngine::operator delete(void *ptr)
-//{
-//	sm_Mem.Free(ptr);
-//}
-
 /*static*/ void HyEngine::RunGame(IHyApplication &gameRef)
 {
 	sm_pInstance = HY_NEW HyEngine(gameRef);
@@ -53,6 +43,15 @@ HyEngine::~HyEngine()
 	{ }
 
 	gameRef.Shutdown();
+
+	// Unload any load-pending assets
+	sm_pInstance->m_AssetManager.Shutdown();
+	while(sm_pInstance->m_AssetManager.DoesAnyDataExist())
+	{
+		sm_pInstance->m_AssetManager.Update();
+		sm_pInstance->m_Scene.PostUpdate();
+		sm_pInstance->m_Renderer.Update();
+	}
 	
 	delete sm_pInstance;
 
@@ -62,43 +61,8 @@ HyEngine::~HyEngine()
 #endif
 }
 
-/*static*/ void HyEngine::ReloadDataDir(std::string sNewDataDir)
-{
-	sm_pInstance->m_pAssetManager->Reload(sNewDataDir);
-}
-
 bool HyEngine::Update()
 {
-	bool bUpdateApp = true;
-
-	switch(m_pAssetManager->IsReloading())
-	{
-	case HYRELOADCODE_Inactive:
-		break;
-			
-	case HYRELOADCODE_InProgress:
-
-		bUpdateApp = false;
-		//m_GfxBuffer.Update_SetSharedPtrs();
-		//m_Renderer.Update(); // NOTE: Renderer isn't multi-threaded anymore... so update it here
-							// TODO: Add code to support if renderer is multithreaded
-		break;
-		//return true;
-
-	case HYRELOADCODE_ReInit:
-	{
-		// Re-instantiate the HyAssetManager with new data directory (which will re-parse atlas data)
-		std::string sNewDataDir = m_pAssetManager->GetNewDataDirPath();
-		delete m_pAssetManager;
-
-		m_pAssetManager = HY_NEW HyAssetManager(sNewDataDir.c_str(), m_GfxBuffer, m_Scene);
-	}
-	// Above should fall through to reset delta
-	case HYRELOADCODE_Finished:
-		m_Time.ResetDelta();
-		break;
-	}
-
 	while(m_Time.ThrottleTime())
 	{
 		m_Input.Update();
@@ -107,13 +71,11 @@ bool HyEngine::Update()
 			return false;
 		
 		m_Scene.PreUpdate();
-		if(bUpdateApp)
-		{
-			if(m_AppRef.Update() == false)
-				return false;
-		}
 
-		m_pAssetManager->Update();
+		if(m_AppRef.Update() == false)
+			return false;
+
+		m_AssetManager.Update();
 		m_Scene.PostUpdate();
 
 		m_GuiComms.Update();

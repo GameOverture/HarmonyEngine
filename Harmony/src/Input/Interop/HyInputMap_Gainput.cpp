@@ -17,6 +17,7 @@ HyInputMap_Gainput::HyInputMap_Gainput() : m_pInputMap(NULL)
 
 HyInputMap_Gainput::~HyInputMap_Gainput()
 {
+	delete m_pInputMap;
 }
 
 /*virtual*/ bool HyInputMap_Gainput::MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn)

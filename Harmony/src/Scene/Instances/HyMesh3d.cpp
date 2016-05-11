@@ -17,3 +17,16 @@ HyMesh3d::HyMesh3d(const char *szPrefix, const char *szName) : IHyInst2d(HYINST_
 HyMesh3d::~HyMesh3d(void)
 {
 }
+
+/*virtual*/ void HyMesh3d::OnUpdate()
+{
+}
+
+/*virtual*/ void HyMesh3d::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
+{
+}
+
+// This function is responsible for incrementing the passed in reference pointer the size of the data written
+/*virtual*/ void HyMesh3d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)
+{
+}

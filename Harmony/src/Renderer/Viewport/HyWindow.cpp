@@ -19,10 +19,10 @@ HyWindow::HyWindow()
 HyWindow::~HyWindow(void)
 {
 	while(m_vCams2d.empty() == false)
-		RemoveCamera(m_vCams2d[0]);
+		RemoveCamera(m_vCams2d.back());
 
 	while(m_vCams3d.empty() == false)
-		RemoveCamera(m_vCams3d[0]);
+		RemoveCamera(m_vCams3d.back());
 }
 
 const HyWindowInfo &HyWindow::GetWindowInfo()
@@ -96,8 +96,9 @@ void HyWindow::RemoveCamera(HyCamera2d *&pCam)
 	{
 		if((*iter) == pCam)
 		{
+			delete pCam;
 			m_vCams2d.erase(iter);
-			pCam = NULL;
+
 			return;
 		}
 	}
@@ -109,8 +110,9 @@ void HyWindow::RemoveCamera(HyCamera3d *&pCam)
 	{
 		if((*iter) == pCam)
 		{
+			delete pCam;
 			m_vCams3d.erase(iter);
-			pCam = NULL;
+
 			return;
 		}
 	}

@@ -29,6 +29,11 @@ public:
 	HyFactory(HyInstanceType eType, std::string sDataDir) : m_eTYPE(eType),
 															m_sDATADIR(sDataDir)
 	{ }
+	~HyFactory()
+	{
+		for(uint32 i = 0; i < static_cast<uint32>(m_vData.size()); ++i)
+			delete m_vData[i];
+	}
 
 	HyInstanceType GetType()						{ return m_eType; }
 

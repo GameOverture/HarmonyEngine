@@ -237,9 +237,9 @@ void HyShaderUniforms::WriteUniformsBufferData(char *&pRefDataWritePos)
 	*reinterpret_cast<uint32 *>(pRefDataWritePos) = static_cast<uint32>(m_vUniforms.size());
 	pRefDataWritePos += sizeof(uint32);
 
-	for(uint32 i = 0; i < m_vUniforms.size(); ++i)
+	for(uint32 i = 0; i < static_cast<uint32>(m_vUniforms.size()); ++i)
 	{
-		uint32 uiStrLen = strlen(m_vUniforms[i].GetName()) + 1;
+		uint32 uiStrLen = static_cast<uint32>(strlen(m_vUniforms[i].GetName()) + 1);
 		strncpy_s(pRefDataWritePos, uiStrLen, m_vUniforms[i].GetName(), HY_SHADER_UNIFORM_NAME_LENGTH);
 		pRefDataWritePos += uiStrLen;
 

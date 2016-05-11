@@ -34,14 +34,6 @@ class HyText2dData;
 class HyTexturedQuad2dData;
 class HyMesh3dData;
 
-enum eHyReloadCode
-{
-	HYRELOADCODE_Inactive = 0,
-	HYRELOADCODE_InProgress,
-	HYRELOADCODE_Finished,
-	HYRELOADCODE_ReInit
-};
-
 class HyAssetManager
 {
 	const std::string									m_sDATADIR;
@@ -71,13 +63,16 @@ class HyAssetManager
 		queue<IHyData *> &	m_LoadQueueRef_Shared;
 		queue<IHyData *> &	m_LoadQueueRef_Retrieval;
 
-		WaitEvent		m_WaitEvent_HasNewData;
-		BasicSection	m_csSharedQueue;
-		BasicSection	m_csRetrievalQueue;
+		WaitEvent			m_WaitEvent_HasNewData;
+		BasicSection		m_csSharedQueue;
+		BasicSection		m_csRetrievalQueue;
+
+		bool				m_bShouldExit;
 
 		LoadThreadCtrl(queue<IHyData *> &LoadQueueRef_Shared, queue<IHyData *> &LoadQueueRef_Retrieval) :	m_LoadQueueRef_Shared(LoadQueueRef_Shared),
 																											m_LoadQueueRef_Retrieval(LoadQueueRef_Retrieval),
-																											m_WaitEvent_HasNewData(L"Thread Idler", true)
+																											m_WaitEvent_HasNewData(L"Thread Idler", true),
+																											m_bShouldExit(false)
 		{}
 	};
 	LoadThreadCtrl										m_LoadingCtrl;
@@ -103,10 +98,6 @@ class HyAssetManager
 	// Loading thread info pointer
 	ThreadInfoPtr										m_pLoadingThread;
 
-	static bool											sm_bIsReloading;
-	static vector<IHyInst2d *>							sm_vReloadInsts;
-	std::string											m_sNewDataDirPath;
-
 public:
 	HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
 	virtual ~HyAssetManager();
@@ -116,13 +107,7 @@ public:
 	void LoadInst2d(IHyInst2d *pInst);
 	void RemoveInst(IHyInst2d *pInst);
 
-	bool Reload(bool bRefreshAssets);										// Reload every instance
-	bool Reload(std::vector<std::string> &vPathsRef, bool bRefreshAssets);	// Reload only the specified instances
-	bool Reload(std::string sNewDataDirPath);								// Unload everything, and reinitialize to a new data directory. Doesn't load up anything when done.
-	eHyReloadCode IsReloading();
-
-	std::string GetNewDataDirPath();
-
+	void Shutdown();
 	bool DoesAnyDataExist();
 
 private:

@@ -44,6 +44,10 @@ IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow *> &vWindowRef
 
 IHyRenderer::~IHyRenderer(void)
 {
+	for(uint32 i = 0; i < static_cast<uint32>(sm_vShaders.size()); ++i)
+		delete sm_vShaders[i];
+
+	sm_vShaders.clear();
 }
 
 void IHyRenderer::Update()

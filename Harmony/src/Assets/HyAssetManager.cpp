@@ -16,14 +16,12 @@
 #include "Assets/Data/HySprite2dData.h"
 #include "Assets/Data/HyText2dData.h"
 #include "Assets/Data/HyTexturedQuad2dData.h"
+#include "Assets/Data/HyMesh3dData.h"
 
 #include "Utilities/HyStrManip.h"
 #include "Utilities/jsonxx.h"
 
 const std::string	HyAssetManager::sm_sSUBDIRNAMES[NUM_SUBDIRS] = { "Atlases/", "Audio/", "Particles/", "Fonts/", "Spine/", "Sprites/", "Shaders/", "Entities/", "Meshes/" };
-
-bool				HyAssetManager::sm_bIsReloading = false;
-vector<IHyInst2d *>	HyAssetManager::sm_vReloadInsts;
 
 HyAssetManager::HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) : m_sDATADIR(MakeStringProperPath(szDataDirPath, "/")),
 																										m_GfxCommsRef(gfxCommsRef),
@@ -35,8 +33,7 @@ HyAssetManager::HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRe
 																										m_Txt2d(HYINST_Text2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Fonts]),
 																										m_Mesh3d(HYINST_Mesh3d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Meshes]),
 																										m_Quad2d(HYINST_TexturedQuad2d, ""),
-																										m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval),
-																										m_sNewDataDirPath("")
+																										m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval)
 {
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
@@ -48,6 +45,9 @@ HyAssetManager::HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRe
 
 HyAssetManager::~HyAssetManager()
 {
+	m_LoadingCtrl.m_bShouldExit = true;
+	m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
+
 	HyAssert(DoesAnyDataExist() == false, "Tried to destruct the HyAssetManager while data still exists");
 }
 
@@ -186,108 +186,17 @@ void HyAssetManager::RemoveInst(IHyInst2d *pInst)
 	}
 }
 
-// Reload every instance
-bool HyAssetManager::Reload(bool bRefreshAssets)
+// Unload everything
+void HyAssetManager::Shutdown()
 {
-	if(sm_bIsReloading)
-		return false;
-
-	// 'm_sNewDataDirPath' is the indicator within HyEngine whether to refresh the Assets
-	if(bRefreshAssets)
-		m_sNewDataDirPath = m_sDATADIR;
-	else
-		m_sNewDataDirPath.clear();
-
-	m_SceneRef.CopyAllInsts(sm_vReloadInsts);
+	vector<IHyInst2d *> vReloadInsts;
+	m_SceneRef.CopyAllInsts(vReloadInsts);
 
 	for(uint32 i = 0; i < m_vQueuedInst2d.size(); ++i)
-		sm_vReloadInsts.push_back(m_vQueuedInst2d[i]);
+		vReloadInsts.push_back(m_vQueuedInst2d[i]);
 
-	for(uint32 i = 0; i < sm_vReloadInsts.size(); ++i)
-		sm_vReloadInsts[i]->Unload();
-
-	sm_bIsReloading = true;
-
-	return true;
-}
-
-// Reload only the specified instances
-bool HyAssetManager::Reload(std::vector<std::string> &vPathsRef, bool bRefreshAssets)
-{
-	// TODO: Deep copy 'vPathsRef' vector of strings to 'm_vReloadInsts' so we only reload the specified contents. vPathsRef can be deleted after this function
-	if(sm_bIsReloading)
-		return false;
-
-	// 'm_sNewDataDirPath' is the indicator within HyEngine whether to refresh the Assets
-	if(bRefreshAssets)
-		m_sNewDataDirPath = m_sDATADIR;
-	else
-		m_sNewDataDirPath.clear();
-
-	m_SceneRef.CopyAllInsts(sm_vReloadInsts);
-	
-	for(uint32 i = 0; i < m_vQueuedInst2d.size(); ++i)
-		sm_vReloadInsts.push_back(m_vQueuedInst2d[i]);
-
-	for(uint32 i = 0; i < sm_vReloadInsts.size(); ++i)
-		sm_vReloadInsts[i]->Unload();
-
-	sm_bIsReloading = true;
-	
-	return true;
-}
-
-// Unload everything, and reinitialize to a new data directory. Doesn't load up anything when done.
-bool HyAssetManager::Reload(std::string sNewDataDirPath)
-{
-	sNewDataDirPath = MakeStringProperPath(sNewDataDirPath.c_str(), "/");
-
-	if(sm_bIsReloading || m_sDATADIR == sNewDataDirPath)
-		return false;
-
-	m_sNewDataDirPath = sNewDataDirPath;
-
-	m_SceneRef.CopyAllInsts(sm_vReloadInsts);
-
-	for(uint32 i = 0; i < m_vQueuedInst2d.size(); ++i)
-		sm_vReloadInsts.push_back(m_vQueuedInst2d[i]);
-
-	for(uint32 i = 0; i < sm_vReloadInsts.size(); ++i)
-		sm_vReloadInsts[i]->Unload();
-
-	// Clear 'sm_vReloadInsts' since we don't want to load anything back up
-	sm_vReloadInsts.clear();
-
-	sm_bIsReloading = true;
-
-	return true;
-}
-
-eHyReloadCode HyAssetManager::IsReloading()
-{
-	if(sm_bIsReloading == false)
-		return HYRELOADCODE_Inactive;
-
-	Update();
-
-	if(DoesAnyDataExist())
-		return HYRELOADCODE_InProgress;
-
-	if(m_sNewDataDirPath.empty() == false)
-		return HYRELOADCODE_ReInit;
-
-	for(uint32 i = 0; i < sm_vReloadInsts.size(); ++i)
-		sm_vReloadInsts[i]->Load();
-
-	sm_vReloadInsts.clear();
-	sm_bIsReloading = false;
-
-	return HYRELOADCODE_Finished;
-}
-
-std::string HyAssetManager::GetNewDataDirPath()
-{
-	return m_sNewDataDirPath;
+	for(uint32 i = 0; i < vReloadInsts.size(); ++i)
+		vReloadInsts[i]->Unload();
 }
 
 bool HyAssetManager::DoesAnyDataExist()
@@ -359,7 +268,7 @@ void HyAssetManager::DiscardData(IHyData *pData)
 	LoadThreadCtrl *pLoadingCtrl = reinterpret_cast<LoadThreadCtrl *>(pParam);
 	vector<IHyData *>	vCurLoadData;
 
-	while(true)
+	while(pLoadingCtrl->m_bShouldExit == false)
 	{
 		// Wait idle indefinitely until there is new data to be grabbed
 		pLoadingCtrl->m_WaitEvent_HasNewData.Wait();

@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "stdafx.h"
+#include "Harmony/HyEngine.h"
 #include "TestBed.h"
 
 //--------------------------------------------------------------------------------------
@@ -21,6 +21,8 @@
 //--------------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
+	//_crtBreakAlloc = 5429;
+
 	HarmonyInit initStruct;
 	initStruct.szGameName = "Test Game";
 	initStruct.szDataDir = "./data";

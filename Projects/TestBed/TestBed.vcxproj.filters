@@ -32,7 +32,6 @@
     <None Include="testFrag.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\TestBed.h" />
   </ItemGroup>
 </Project>

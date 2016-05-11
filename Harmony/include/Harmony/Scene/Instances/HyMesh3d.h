@@ -20,6 +20,12 @@ class HyMesh3d : public IHyInst2d
 public:
 	HyMesh3d(const char *szPrefix, const char *szName);
 	virtual ~HyMesh3d(void);
+
+	virtual void OnUpdate();
+	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef);
+
+	// This function is responsible for incrementing the passed in reference pointer the size of the data written
+	virtual void DefaultWriteDrawBufferData(char *&pRefDataWritePos);
 };
 
 #endif /* __HyMesh3d_h__ */
