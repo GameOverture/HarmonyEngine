@@ -16,6 +16,8 @@
 
 #include "Harmony/HyEngine.h"
 
+class ItemProject;
+
 class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
 {
     Q_OBJECT
@@ -32,9 +34,7 @@ public:
     virtual void paintGL();
     virtual void resizeGL(int w, int h);
     
-    void Reload(bool bRefreshAssets);
-    void Reload(QStringList &sReloadPaths, bool bRefreshAssets);
-    void Reload(QString &sNewDataDir);
+    void Reload(ItemProject *pProj);
 
 private:
     IHyApplication *GetHyApp();
