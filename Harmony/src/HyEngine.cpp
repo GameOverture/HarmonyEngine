@@ -43,15 +43,7 @@ HyEngine::~HyEngine()
 	{ }
 
 	gameRef.Shutdown();
-
-	// Unload any load-pending assets
-	sm_pInstance->m_AssetManager.Shutdown();
-	while(sm_pInstance->m_AssetManager.DoesAnyDataExist())
-	{
-		sm_pInstance->m_AssetManager.Update();
-		sm_pInstance->m_Scene.PostUpdate();
-		sm_pInstance->m_Renderer.Update();
-	}
+	sm_pInstance->Shutdown();
 	
 	delete sm_pInstance;
 
@@ -105,5 +97,17 @@ bool HyEngine::PollPlatformApi()
 #endif
 
 	return true;
+}
+
+void HyEngine::Shutdown()
+{
+	// Unload any load-pending assets
+	m_AssetManager.Shutdown();
+	while(m_AssetManager.DoesAnyDataExist())
+	{
+		m_AssetManager.Update();
+		m_Scene.PostUpdate();
+		m_Renderer.Update();
+	}
 }
 

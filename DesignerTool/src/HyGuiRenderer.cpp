@@ -60,7 +60,11 @@ HyGuiRenderer::~HyGuiRenderer()
 
 void HyGuiRenderer::Reload(ItemProject *pProj)
 {
-    m_pHyEngine->m_pAssetManager->Reload(sNewDataDir.toStdString());
+    m_pHyEngine->Shutdown();
+    delete m_pHyEngine;
+
+    GetHyApp()
+    m_pHyEngine = new HyEngine(*GetHyApp());
 }
 
 IHyApplication *HyGuiRenderer::GetHyApp()

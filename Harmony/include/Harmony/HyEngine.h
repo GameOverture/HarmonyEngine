@@ -73,6 +73,8 @@ private:
 	bool Update();
 
 	bool PollPlatformApi();
+
+	void Shutdown();
 };
 
 #endif /* __HyEngine_h__ */

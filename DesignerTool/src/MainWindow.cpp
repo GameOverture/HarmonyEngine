@@ -221,10 +221,9 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
-/*static*/ void MainWindow::ReloadItems(QStringList &sPaths, bool bRefreshAssets)
+/*static*/ void MainWindow::ReloadItems(ItemProject *pProject)
 {
-    sm_pInstance->ui->renderer->GetRenderer()->Reload(sPaths, bRefreshAssets);
-    sm_pInstance->m_pDebugConnection->WriteReloadPacket(sPaths);
+    sm_pInstance->ui->renderer->GetRenderer()->Reload(pProject);
 }
 
 void MainWindow::on_actionNewProject_triggered()
