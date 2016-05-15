@@ -12,7 +12,6 @@
 #include "Renderer/Viewport/HyWindow.h"
 
 HarmonyInit IHyApplication::sm_Init;
-HyMemoryHeap IHyApplication::sm_Mem;
 
 IHyApplication::IHyApplication(HarmonyInit &initStruct)
 {
@@ -44,6 +43,11 @@ IHyApplication::~IHyApplication()
 		delete m_vInputMaps[i];
 }
 
+void IHyApplication::ResetInit(HarmonyInit &initStruct)
+{
+	sm_Init = initStruct;
+}
+
 HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(uiIndex < sm_Init.uiNumWindows, "IApplication::Viewport() took an invalid index: " << uiIndex);
@@ -55,13 +59,3 @@ HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 	HyAssert(uiIndex < sm_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
 	return *static_cast<HyInputMapInterop *>(m_vInputMaps[uiIndex]);
 }
-
-//void *IHyApplication::operator new(size_t uiSize)
-//{
-//	return sm_Mem.Alloc(uiSize);
-//}
-//
-//void IHyApplication::operator delete(void *pPtr)
-//{
-//	sm_Mem.Free(pPtr);
-//}

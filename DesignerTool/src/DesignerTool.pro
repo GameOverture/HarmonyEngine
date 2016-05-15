@@ -40,7 +40,9 @@ SOURCES += main.cpp \
     HyGuiDebugger.cpp \
     IHyGuiDrawItem.cpp \
     DlgSetEngineLocation.cpp \
-    ItemSpriteCmds.cpp
+    ItemSpriteCmds.cpp \
+    HyGuiApp.cpp \
+    WidgetTabsManager.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -69,7 +71,9 @@ HEADERS  += \
     HyGuiDebugger.h \
     IHyGuiDrawItem.h \
     DlgSetEngineLocation.h \
-    ItemSpriteCmds.h
+    ItemSpriteCmds.h \
+    HyGuiApp.h \
+    WidgetTabsManager.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -87,7 +91,8 @@ FORMS    += \
     DlgAtlasGroupSettings.ui \
     WidgetAtlasManager.ui \
     WidgetAtlasGroup.ui \
-    DlgSetEngineLocation.ui
+    DlgSetEngineLocation.ui \
+    WidgetTabsManager.ui
 
 Release:DESTDIR = ../bin/release
 Release:OBJECTS_DIR = ../bin/release/.obj

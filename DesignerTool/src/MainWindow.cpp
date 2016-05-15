@@ -221,7 +221,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
-/*static*/ void MainWindow::ReloadItems(ItemProject *pProject)
+/*static*/ void MainWindow::ReloadHarmony(ItemProject *pProject)
 {
     sm_pInstance->ui->renderer->GetRenderer()->Reload(pProject);
 }

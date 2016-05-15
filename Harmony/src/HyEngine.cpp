@@ -14,9 +14,6 @@
 
 HyEngine *		HyEngine::sm_pInstance = NULL;
 
-
-HyMemoryHeap &	HyEngine::sm_Mem = IHyApplication::MemoryHeap();
-
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows),

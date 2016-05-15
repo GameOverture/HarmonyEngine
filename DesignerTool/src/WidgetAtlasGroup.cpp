@@ -691,7 +691,9 @@ void WidgetAtlasGroup::Refresh()
             sReloadPaths.append(sLink);
     }
 
-    MainWindow::ReloadItems(sReloadPaths, true);
+    pAtlasManager->
+
+    MainWindow::ReloadHarmony(sReloadPaths, true);
 
     ui->atlasList->expandAll();
     ui->atlasList->sortItems(0, Qt::AscendingOrder);
