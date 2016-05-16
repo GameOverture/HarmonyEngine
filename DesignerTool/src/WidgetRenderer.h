@@ -17,6 +17,7 @@
 
 #include "Item.h"
 #include "ItemProject.h"
+#include "WidgetTabsManager.h"
 
 namespace Ui {
 class WidgetRenderer;
@@ -27,19 +28,18 @@ class WidgetRenderer;
 class WidgetRenderer : public QWidget
 {
     Q_OBJECT
+    
+    WidgetTabsManager *            m_pBlankTabs;
 
 public:
     explicit WidgetRenderer(QWidget *parent = 0);
     ~WidgetRenderer();
     
-    HyGuiRenderer *GetRenderer();
+    void LoadItemProject(ItemProject *pProj);
 
     void OpenItem(Item *pItem);
     void CloseItem(Item *pItem);
     
-    QStringList GetOpenItemPaths();
-
-
 private:
     Ui::WidgetRenderer *ui;
 };

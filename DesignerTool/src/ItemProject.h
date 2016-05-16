@@ -15,6 +15,7 @@
 
 // Forward declaration
 class WidgetAtlasManager;
+class WidgetTabsManager;
 
 class ItemProject : public Item
 {
@@ -24,6 +25,7 @@ class ItemProject : public Item
     QString                     m_sRelativeMetaDataLocation;
     QString                     m_sRelativeSourceLocation;
     
+    WidgetTabsManager *         m_pTabsManager;
     WidgetAtlasManager *        m_pAtlasManager;
     
     enum eDrawState
@@ -40,6 +42,7 @@ class ItemProject : public Item
 public:
     ~ItemProject();
 
+    IHyApplication *GetHyApp()                          { return reinterpret_cast<IHyApplication *>(m_pTabsManager); }
     bool HasError() const                               { return m_bHasError; }
 
     QString GetDirPath() const;
@@ -51,6 +54,7 @@ public:
     QString GetSourceAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation) + '/'; }
     QString GetSourceRelPath() const                    { return QDir::cleanPath(m_sRelativeSourceLocation) + '/'; }
 
+    WidgetTabsManager *GetTabsManager()                 { return m_pTabsManager; }
     WidgetAtlasManager *GetAtlasManager()               { return m_pAtlasManager; }
 
     virtual void OnDraw_Open(IHyApplication &hyApp);

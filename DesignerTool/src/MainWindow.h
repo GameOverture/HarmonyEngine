@@ -50,8 +50,7 @@ public:
     static void SetCurrentItem(Item *pItem);
     
     static void SetSelectedProj(ItemProject *pProj);
-    
-    static void ReloadHarmony(ItemProject *pProject);
+    static void ReloadHarmony();
 
 private slots:
     void on_actionNewProject_triggered();

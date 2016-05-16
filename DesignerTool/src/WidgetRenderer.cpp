@@ -10,13 +10,12 @@
 #include "WidgetRenderer.h"
 #include "ui_WidgetRenderer.h"
 
-#include "MainWindow.h"
-
 WidgetRenderer::WidgetRenderer(QWidget *parent) :   QWidget(parent),
-                                                    IHyApplication(HarmonyInit()),
                                                     ui(new Ui::WidgetRenderer)
 {
     ui->setupUi(this);
+    
+    m_pBlankTabs = ui->tabManager;
 }
 
 WidgetRenderer::~WidgetRenderer()
@@ -24,39 +23,50 @@ WidgetRenderer::~WidgetRenderer()
     delete ui;
 }
 
-HyGuiRenderer *WidgetRenderer::GetRenderer()
+void WidgetRenderer::LoadItemProject(ItemProject *pProj)
 {
-    return ui->openGLWidget;
+    ui->tabManager->hide();
+    
+    if(pProj == NULL)
+        ui->tabManager = m_pBlankTabs;
+    else
+        ui->tabManager = pProj->GetTabsManager();
+    
+    ui->tabManager->show();
+    
+    ui->openGLWidget->LoadItemProject(pProj);
 }
 
 void WidgetRenderer::OpenItem(Item *pItem)
 {
     if(pItem == NULL)
     {
-        HyGuiLog("WidgetRenderer::RenderItem tried to render NULL item", LOGTYPE_Warning);
+        HyGuiLog("WidgetRenderer::OpenItem tried to render NULL item", LOGTYPE_Warning);
         return;
     }
     
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(pItem, QUEUEDITEM_Open));
+    if(ui->tabManager == m_pBlankTabs)
+    {
+        HyGuiLog("WidgetRenderer::OpenItem tried to open an item with a 'm_pBlankTabs'", LOGTYPE_Warning);
+        return;
+    }
+    
+    ui->tabManager->OpenItem(pItem);
 }
 
 void WidgetRenderer::CloseItem(Item *pItem)
 {
     if(pItem == NULL)
     {
-        HyGuiLog("WidgetRenderer::HideItem tried to hide NULL item", LOGTYPE_Warning);
+        HyGuiLog("WidgetRenderer::CloseItem tried to hide NULL item", LOGTYPE_Warning);
         return;
     }
     
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(pItem, QUEUEDITEM_Close));
-}
-
-QStringList WidgetRenderer::GetOpenItemPaths()
-{
-    QStringList sOpenItemList;
+    if(ui->tabManager == m_pBlankTabs)
+    {
+        HyGuiLog("WidgetRenderer::CloseItem tried to close an item with a 'm_pBlankTabs'", LOGTYPE_Warning);
+        return;
+    }
     
-    for(int i = 0; i < ui->tabWidget->count(); ++i)
-        sOpenItemList.append(reinterpret_cast<TabPage *>(ui->tabWidget->widget(i))->GetItem()->GetPath());
-    
-    return sOpenItemList;
+    ui->tabManager->CloseItem(pItem);
 }

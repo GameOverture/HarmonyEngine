@@ -123,15 +123,14 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
             ui->explorer->AddItemProject(sProjPath);
         }
         
-        QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
-        sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
-        
-        foreach(QString sItemPath, sListOpenItems)
-        {
-            Item *pItem = ui->explorer->GetItemByPath(sItemPath);
-            if(pItem)
-                OpenItem(pItem);
-        }
+        //QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
+        //sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
+        //foreach(QString sItemPath, sListOpenItems)
+        //{
+        //    Item *pItem = ui->explorer->GetItemByPath(sItemPath);
+        //    if(pItem)
+        //        OpenItem(pItem);
+        //}
     }
     m_Settings.endGroup();
 
@@ -206,14 +205,14 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 {
     if(sm_pInstance->m_pCurSelectedProj == pProj)
         return;
-        
+    
     sm_pInstance->m_pCurSelectedProj = pProj;
+    sm_pInstance->ui->renderer->LoadItemProject(sm_pInstance->m_pCurSelectedProj);
+
     if(sm_pInstance->m_pCurSelectedProj)
     {
-        sm_pInstance->ui->renderer->GetRenderer()->Reload(sm_pInstance->m_pCurSelectedProj);
-        
         sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasManager());
-        sm_pInstance->m_pCurSelectedProj->GetAtlasManager()->show();
+        sm_pInstance->ui->dockWidgetAtlas->widget()->show();
     }
     else
     {
@@ -221,9 +220,12 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
-/*static*/ void MainWindow::ReloadHarmony(ItemProject *pProject)
+/*static*/ void MainWindow::ReloadHarmony()
 {
-    sm_pInstance->ui->renderer->GetRenderer()->Reload(pProject);
+    ItemProject *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
+    sm_pInstance->m_pCurSelectedProj = NULL;    // Set m_pCurSelectedProj to 'NULL' so SetSelectedProj() doesn't imediately return
+    
+    SetSelectedProj(pCurItemProj);
 }
 
 void MainWindow::on_actionNewProject_triggered()
@@ -309,7 +311,7 @@ void MainWindow::SaveSettings()
     {
         m_Settings.setValue("openProjs", QVariant(ui->explorer->GetOpenProjectPaths()));
         
-        m_Settings.setValue("openItems", QVariant(ui->renderer->GetOpenItemPaths()));
+        //m_Settings.setValue("openItems", QVariant(ui->renderer->GetOpenItemPaths()));
     }
     m_Settings.endGroup();
 }

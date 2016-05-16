@@ -18,6 +18,7 @@
 #include "ItemProject.h"
 
 HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent),
+                                                m_pHyApp(NULL),
                                                 m_pHyEngine(NULL),
                                                 m_bIsUpdating(false)
 {
@@ -38,12 +39,12 @@ HyGuiRenderer::~HyGuiRenderer()
     //    format.setSampleBuffers(true);
     //    setFormat(format);
 
-    m_pHyEngine = new HyEngine(*GetHyApp());
+    //m_pHyEngine = new HyEngine(*GetHyApp());
 }
 
 /*virtual*/ void HyGuiRenderer::paintGL()
 {
-    if(m_bIsUpdating == false)
+    if(m_pHyEngine && m_bIsUpdating == false)
     {
         m_bIsUpdating = true;
         if(m_pHyEngine->Update() == false)  // This will call WidgetRenderer::Update()
@@ -55,20 +56,18 @@ HyGuiRenderer::~HyGuiRenderer()
 
 /*virtual*/ void HyGuiRenderer::resizeGL(int w, int h)
 {
-    GetHyApp()->Window().SetResolution(glm::ivec2(w, h));
+    if(m_pHyApp)
+        m_pHyApp->Window().SetResolution(glm::ivec2(w, h));
 }
 
-void HyGuiRenderer::Reload(ItemProject *pProj)
+void HyGuiRenderer::LoadItemProject(ItemProject *pProj)
 {
-    m_pHyEngine->Shutdown();
+    if(m_pHyEngine)
+        m_pHyEngine->Shutdown();
+    
     delete m_pHyEngine;
-
-    GetHyApp()
-    m_pHyEngine = new HyEngine(*GetHyApp());
-}
-
-IHyApplication *HyGuiRenderer::GetHyApp()
-{
-    WidgetRenderer *pGameApp = reinterpret_cast<WidgetRenderer *>(parent());
-    return static_cast<IHyApplication *>(pGameApp);
+    m_pHyEngine = NULL;
+    
+    if(pProj)
+        m_pHyEngine = new HyEngine(*pProj->GetHyApp());
 }

@@ -22,7 +22,9 @@ class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
 {
     Q_OBJECT
 
+    IHyApplication *    m_pHyApp;
     HyEngine *          m_pHyEngine;
+    
     bool                m_bIsUpdating;
 
 public:
@@ -34,10 +36,7 @@ public:
     virtual void paintGL();
     virtual void resizeGL(int w, int h);
     
-    void Reload(ItemProject *pProj);
-
-private:
-    IHyApplication *GetHyApp();
+    void LoadItemProject(ItemProject *pProj);
 };
 
 #endif // HYGUIRENDERER_H

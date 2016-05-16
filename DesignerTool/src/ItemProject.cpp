@@ -8,8 +8,9 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "ItemProject.h"
-#include "WidgetAtlasManager.h"
 
+#include "WidgetAtlasManager.h"
+#include "WidgetTabsManager.h"
 #include "WidgetRenderer.h"
 
 #include <QFile>
@@ -48,6 +49,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) : Item(ITEM_Project,
     m_sRelativeMetaDataLocation = projPathsObj["MetaDataPath"].toString();
     m_sRelativeSourceLocation = projPathsObj["SourcePath"].toString();
 
+    m_pTabsManager = new WidgetTabsManager(this);
     m_pAtlasManager = new WidgetAtlasManager(this);
 }
 

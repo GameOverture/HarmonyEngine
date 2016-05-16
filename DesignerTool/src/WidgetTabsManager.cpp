@@ -10,9 +10,25 @@
 #include "WidgetTabsManager.h"
 #include "ui_WidgetTabsManager.h"
 
+#include "MainWindow.h"
+
 WidgetTabsManager::WidgetTabsManager(QWidget *parent) : QWidget(parent),
                                                         ui(new Ui::WidgetTabsManager),
-                                                        m_pActiveItemProj(NULL)
+                                                        IHyApplication(HarmonyInit()),
+                                                        m_pProjOwner(NULL),
+                                                        m_bOverrideDrawWithProj(false)
+{
+    ui->setupUi(this);
+    
+    // NOTE: THIS CONSTRUCTOR IS INVALID TO USE. IT EXISTS FOR QT TO ALLOW Q_OBJECT TO WORK
+    //HyGuiLog("WidgetTabsManager::WidgetTabsManager() invalid constructor used", LOGTYPE_Error);
+}
+
+WidgetTabsManager::WidgetTabsManager(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :    QWidget(parent),
+                                                                                            ui(new Ui::WidgetTabsManager),
+                                                                                            IHyApplication(HarmonyInit()),
+                                                                                            m_pProjOwner(pProjOwner),
+                                                                                            m_bOverrideDrawWithProj(false)
 {
     ui->setupUi(this);
     ui->tabWidget->clear();
@@ -23,6 +39,15 @@ WidgetTabsManager::~WidgetTabsManager()
     delete ui;
 }
 
+void WidgetTabsManager::OpenItem(Item *pItem)
+{
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(pItem, QUEUEDITEM_Open));
+}
+
+void WidgetTabsManager::CloseItem(Item *pItem)
+{
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(pItem, QUEUEDITEM_Close));
+}
 
 // IHyApplication override
 /*virtual*/ bool WidgetTabsManager::Initialize()
@@ -75,10 +100,11 @@ WidgetTabsManager::~WidgetTabsManager()
         }
         else if(eActionToTake == QUEUEDITEM_Close)
         {
-            if(m_pActiveItemProj == pItem)
+            if(m_pProjOwner == pItem)
             {
-                m_pActiveItemProj->DrawHide(*this);
-                m_pActiveItemProj = NULL;
+                m_pProjOwner->DrawHide(*this);
+                m_bOverrideDrawWithProj = false;
+
                 ShowItem(GetItem());
             }
             else
@@ -115,14 +141,19 @@ void WidgetTabsManager::ShowItem(Item *pItem)
     if(pItem == NULL)
         return;
 
-    if(m_pActiveItemProj)
-        m_pActiveItemProj->DrawHide(*this);
+    if(m_bOverrideDrawWithProj)
+        m_pProjOwner->DrawHide(*this);
 
     for(int i = 0; i < ui->tabWidget->count(); ++i)
         GetItem(i)->DrawHide(*this);
 
     if(pItem->GetType() == ITEM_Project)
-        m_pActiveItemProj = static_cast<ItemProject *>(pItem);
+    {
+        if(pItem != m_pProjOwner)
+            HyGuiLog("WidgetTabsManager::ShowItem() passed an ItemProj, but of a different project", LOGTYPE_Error);
+        
+        m_bOverrideDrawWithProj = true;
+    }
 
     MainWindow::SetCurrentItem(pItem);
 
@@ -131,11 +162,11 @@ void WidgetTabsManager::ShowItem(Item *pItem)
 
 Item *WidgetTabsManager::GetItem(int iIndex /*= -1*/)
 {
-    if(m_pActiveItemProj)   // Overrides any Item in the current open TabPage
-        return m_pActiveItemProj;
+    if(m_bOverrideDrawWithProj)   // Overrides any Item in the current open TabPage
+        return m_pProjOwner;
 
     if(ui->tabWidget->currentWidget() == NULL)
-        return NULL;~
+        return NULL;
 
     if(iIndex < 0)
         return static_cast<TabPage *>(ui->tabWidget->currentWidget())->GetItem();
@@ -145,5 +176,5 @@ Item *WidgetTabsManager::GetItem(int iIndex /*= -1*/)
 
 void WidgetTabsManager::on_tabWidget_currentChanged(int index)
 {
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(GetItem(iIndex), QUEUEDITEM_Show));
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(GetItem(index), QUEUEDITEM_Show));
 }

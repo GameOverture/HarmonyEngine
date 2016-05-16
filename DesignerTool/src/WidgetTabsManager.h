@@ -39,7 +39,8 @@ class WidgetTabsManager : public QWidget, public IHyApplication
 {
     Q_OBJECT
 
-    ItemProject *       m_pActiveItemProj;  // Overrides any Item in the current open TabPage
+    ItemProject *       m_pProjOwner;
+    bool                m_bOverrideDrawWithProj;
 
     enum eQueuedAction
     {
@@ -51,20 +52,24 @@ class WidgetTabsManager : public QWidget, public IHyApplication
     
 public:
     explicit WidgetTabsManager(QWidget *parent = 0);
+    explicit WidgetTabsManager(ItemProject *pProjOwner, QWidget *parent = 0);
     ~WidgetTabsManager();
+    
+    void OpenItem(Item *pItem);
+    void CloseItem(Item *pItem);
 
     // IHyApplication overrides
     virtual bool Initialize();
     virtual bool Update();
     virtual bool Shutdown();
 
-    // Do not invoke this function outside of Update()
-    void ShowItem(Item *pItem);
-
 private:
     Ui::WidgetTabsManager *ui;
 
     Item *GetItem(int iIndex = -1);
+    
+    // Do not invoke this function outside of Update()
+    void ShowItem(Item *pItem);
 
 private slots:
     void on_tabWidget_currentChanged(int index);

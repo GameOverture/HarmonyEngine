@@ -43,11 +43,6 @@ IHyApplication::~IHyApplication()
 		delete m_vInputMaps[i];
 }
 
-void IHyApplication::ResetInit(HarmonyInit &initStruct)
-{
-	sm_Init = initStruct;
-}
-
 HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(uiIndex < sm_Init.uiNumWindows, "IApplication::Viewport() took an invalid index: " << uiIndex);

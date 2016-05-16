@@ -41,7 +41,6 @@ SOURCES += main.cpp \
     IHyGuiDrawItem.cpp \
     DlgSetEngineLocation.cpp \
     ItemSpriteCmds.cpp \
-    HyGuiApp.cpp \
     WidgetTabsManager.cpp
 
 HEADERS  += \
@@ -72,7 +71,6 @@ HEADERS  += \
     IHyGuiDrawItem.h \
     DlgSetEngineLocation.h \
     ItemSpriteCmds.h \
-    HyGuiApp.h \
     WidgetTabsManager.h
 
 FORMS    += \
