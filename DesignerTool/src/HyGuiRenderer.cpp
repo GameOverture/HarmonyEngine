@@ -69,5 +69,5 @@ void HyGuiRenderer::LoadItemProject(ItemProject *pProj)
     m_pHyEngine = NULL;
     
     if(pProj)
-        m_pHyEngine = new HyEngine(*pProj->GetHyApp());
+        m_pHyEngine = new HyEngine(*pProj->GetTabsManager());   // WidgetTabsManager is a IHyApplication
 }

@@ -32,6 +32,8 @@ WidgetTabsManager::WidgetTabsManager(ItemProject *pProjOwner, QWidget *parent /*
 {
     ui->setupUi(this);
     ui->tabWidget->clear();
+
+    m_ActionQueue.clear();
 }
 
 WidgetTabsManager::~WidgetTabsManager()

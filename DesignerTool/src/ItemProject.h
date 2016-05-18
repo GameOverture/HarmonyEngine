@@ -42,7 +42,6 @@ class ItemProject : public Item
 public:
     ~ItemProject();
 
-    IHyApplication *GetHyApp()                          { return reinterpret_cast<IHyApplication *>(m_pTabsManager); }
     bool HasError() const                               { return m_bHasError; }
 
     QString GetDirPath() const;
