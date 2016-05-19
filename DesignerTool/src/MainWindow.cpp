@@ -207,6 +207,13 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         return;
     
     sm_pInstance->m_pCurSelectedProj = pProj;
+
+    if(sm_pInstance->m_pCurSelectedProj)
+    {
+        if(QDir::setCurrent(sm_pInstance->m_pCurSelectedProj->GetDirPath()) == false)
+            HyGuiLog("QDir::setCurrent() failed to set project at (" % sm_pInstance->m_pCurSelectedProj->GetDirPath() % ")", LOGTYPE_Normal);
+    }
+
     sm_pInstance->ui->renderer->LoadItemProject(sm_pInstance->m_pCurSelectedProj);
 
     if(sm_pInstance->m_pCurSelectedProj)

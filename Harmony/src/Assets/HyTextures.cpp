@@ -24,8 +24,7 @@ HyTextures::HyTextures(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasData
 	sAtlasInfoFilePath += "atlasInfo.json";
 	atlasGroupArray.parse(HyReadTextFile(sAtlasInfoFilePath.c_str()));
 
-	if(atlasGroupArray.size() == 0)
-		return;
+	HyAssert(atlasGroupArray.size() != 0, "Could not read (or find) atlasInfo.json at: " << sAtlasInfoFilePath.c_str());
 
 	m_uiNumAtlasGroups = static_cast<uint32>(atlasGroupArray.size());
 	m_pAtlasGroups = reinterpret_cast<HyAtlasGroup *>(HY_NEW unsigned char[sizeof(HyAtlasGroup) * m_uiNumAtlasGroups]);
