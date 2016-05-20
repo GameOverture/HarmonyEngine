@@ -17,7 +17,7 @@ HyEngine *		HyEngine::sm_pInstance = NULL;
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows),
-												m_AssetManager(m_AppRef.sm_Init.szDataDir, m_GfxBuffer, m_Scene),
+												m_AssetManager(m_AppRef.sm_Init.sDataDir, m_GfxBuffer, m_Scene),
 												m_GuiComms(m_AppRef.sm_Init.uiDebugPort, m_AssetManager),
 												m_Input(m_AppRef.m_vInputMaps),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_vWindows)

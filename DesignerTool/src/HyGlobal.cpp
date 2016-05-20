@@ -27,3 +27,10 @@ QAction *FindAction(QList<QAction *> list, QString sName)
     
     return NULL;
 }
+
+char *QStringToCharPtr(QString sString)
+{
+    QByteArray ba;
+    ba.append(sString);
+    return ba.data();
+}

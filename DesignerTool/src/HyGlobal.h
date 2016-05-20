@@ -67,6 +67,8 @@ QAction *FindAction(QList<QAction *> list, QString sName);
 
 #define JSONOBJ_TOINT(obj, key) obj.value(key).toVariant().toLongLong()
 
+char *QStringToCharPtr(QString sString);
+
 class HyGlobal
 {
     static QString                  sm_sItemNames[NUMITEM];

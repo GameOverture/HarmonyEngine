@@ -127,25 +127,24 @@ struct HyWindowInfo
 // Client supplies these initialization parameters to the engine
 struct HarmonyInit
 {
-	const char *			szGameName;
-	const char *			szDataDir;
+	std::string				sGameName;
+	std::string				sDataDir;
 	uint32					uiNumWindows;
 	HyWindowInfo			windowInfo[HY_MAXWINDOWS];
 	HyCoordinateType		eDefaultCoordinateType;
 	HyCoordinateUnit		eDefaultCoordinateUnit;
 	float					fPixelsPerMeter;
 	uint32					uiNumInputMappings;
-	const char *			szDefaultFont;
 	uint16					uiDebugPort;
 
-	HarmonyInit(const char *szGameName, const char *szDataDir) :	szGameName(szGameName),
-																	szDataDir(szDataDir)
+	HarmonyInit(std::string sGameNameStr, std::string sDataDirStr) :	sGameName(sGameName),
+																		sDataDir(sDataDir)
 	{
 		CtorInit();
 	}
 
-	HarmonyInit() :	szGameName("Untitled Game"),
-					szDataDir("/data")
+	HarmonyInit() :	sGameName("Untitled Game"),
+					sDataDir("/data")
 	{
 		CtorInit();
 	}
@@ -158,7 +157,6 @@ private:
 		eDefaultCoordinateUnit = HYCOORDUNIT_Pixels;
 		fPixelsPerMeter = 80.0f;
 		uiNumInputMappings = 1;
-		szDefaultFont = "Vera.ttf";
 		uiDebugPort = 1313;
 
 		for(int i = 0; i < HY_MAXWINDOWS; ++i)

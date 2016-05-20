@@ -26,7 +26,7 @@ WidgetTabsManager::WidgetTabsManager(QWidget *parent) : QWidget(parent),
 
 WidgetTabsManager::WidgetTabsManager(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :    QWidget(parent),
                                                                                             ui(new Ui::WidgetTabsManager),
-                                                                                            IHyApplication(HarmonyInit()),
+                                                                                            IHyApplication(HarmonyInit(pProjOwner->GetName().toStdString(), pProjOwner->GetAssetsAbsPath().toStdString())),
                                                                                             m_pProjOwner(pProjOwner),
                                                                                             m_bOverrideDrawWithProj(false)
 {

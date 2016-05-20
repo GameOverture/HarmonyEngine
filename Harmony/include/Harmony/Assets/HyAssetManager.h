@@ -99,7 +99,7 @@ class HyAssetManager
 	ThreadInfoPtr										m_pLoadingThread;
 
 public:
-	HyAssetManager(const char *szDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
+	HyAssetManager(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
 	virtual ~HyAssetManager();
 
 	void Update();
