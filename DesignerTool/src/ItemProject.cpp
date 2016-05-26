@@ -48,7 +48,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) : Item(ITEM_Project,
     m_sRelativeAssetsLocation = projPathsObj["AssetsPath"].toString();
     m_sRelativeMetaDataLocation = projPathsObj["MetaDataPath"].toString();
     m_sRelativeSourceLocation = projPathsObj["SourcePath"].toString();
-    
+
     m_pTabsManager = new WidgetTabsManager(this);
     m_pAtlasManager = new WidgetAtlasManager(this);
 }

@@ -28,8 +28,6 @@ class WidgetRenderer;
 class WidgetRenderer : public QWidget
 {
     Q_OBJECT
-    
-    WidgetTabsManager *            m_pBlankTabs;
 
 public:
     explicit WidgetRenderer(QWidget *parent = 0);

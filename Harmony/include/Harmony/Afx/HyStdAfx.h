@@ -137,8 +137,8 @@ struct HarmonyInit
 	uint32					uiNumInputMappings;
 	uint16					uiDebugPort;
 
-	HarmonyInit(std::string sGameNameStr, std::string sDataDirStr) :	sGameName(sGameName),
-																		sDataDir(sDataDir)
+	HarmonyInit(std::string sGameNameStr, std::string sDataDirStr) :	sGameName(sGameNameStr),
+																		sDataDir(sDataDirStr)
 	{
 		CtorInit();
 	}

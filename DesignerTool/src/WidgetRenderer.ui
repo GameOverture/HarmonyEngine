@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="WidgetTabsManager" name="tabManager" native="true">
+    <widget class="QStackedWidget" name="tabManagers">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -46,6 +46,8 @@
        <height>22</height>
       </size>
      </property>
+     <widget class="QWidget" name="page"/>
+     <widget class="QWidget" name="page_2"/>
     </widget>
    </item>
    <item>
@@ -58,12 +60,6 @@
    <class>HyGuiRenderer</class>
    <extends>QOpenGLWidget</extends>
    <header>HyGuiRenderer.h</header>
-  </customwidget>
-  <customwidget>
-   <class>WidgetTabsManager</class>
-   <extends>QWidget</extends>
-   <header>WidgetTabsManager.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

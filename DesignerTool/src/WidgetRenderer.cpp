@@ -15,7 +15,8 @@ WidgetRenderer::WidgetRenderer(QWidget *parent) :   QWidget(parent),
 {
     ui->setupUi(this);
     
-    m_pBlankTabs = ui->tabManager;
+    while(ui->tabManagers->count())
+        ui->tabManagers->removeWidget(ui->tabManagers->currentWidget());
 }
 
 WidgetRenderer::~WidgetRenderer()
@@ -25,14 +26,24 @@ WidgetRenderer::~WidgetRenderer()
 
 void WidgetRenderer::LoadItemProject(ItemProject *pProj)
 {
-    ui->tabManager->hide();
-    
-    if(pProj == NULL)
-        ui->tabManager = m_pBlankTabs;
-    else
-        ui->tabManager = pProj->GetTabsManager();
-    
-    ui->tabManager->show();
+    if(pProj)
+    {
+        bool bTabsFound = false;
+        for(int i = 0; i < ui->tabManagers->count(); ++i)
+        {
+            if(ui->tabManagers->widget(i) == pProj->GetTabsManager())
+            {
+                ui->tabManagers->setCurrentIndex(i);
+                bTabsFound = true;
+            }
+        }
+
+        if(bTabsFound == false)
+        {
+            ui->tabManagers->addWidget(pProj->GetTabsManager());
+            ui->tabManagers->setCurrentWidget(pProj->GetTabsManager());
+        }
+    }
     
     ui->openGLWidget->LoadItemProject(pProj);
 }
@@ -45,13 +56,14 @@ void WidgetRenderer::OpenItem(Item *pItem)
         return;
     }
     
-    if(ui->tabManager == m_pBlankTabs)
+    WidgetTabsManager *pTabsManager = static_cast<WidgetTabsManager *>(ui->tabManagers->currentWidget());
+    if(pTabsManager == NULL)
     {
         HyGuiLog("WidgetRenderer::OpenItem tried to open an item with a 'm_pBlankTabs'", LOGTYPE_Warning);
         return;
     }
     
-    ui->tabManager->OpenItem(pItem);
+    pTabsManager->OpenItem(pItem);
 }
 
 void WidgetRenderer::CloseItem(Item *pItem)
@@ -62,11 +74,12 @@ void WidgetRenderer::CloseItem(Item *pItem)
         return;
     }
     
-    if(ui->tabManager == m_pBlankTabs)
+    WidgetTabsManager *pTabsManager = static_cast<WidgetTabsManager *>(ui->tabManagers->currentWidget());
+    if(pTabsManager == NULL)
     {
         HyGuiLog("WidgetRenderer::CloseItem tried to close an item with a 'm_pBlankTabs'", LOGTYPE_Warning);
         return;
     }
     
-    ui->tabManager->CloseItem(pItem);
+    pTabsManager->CloseItem(pItem);
 }
