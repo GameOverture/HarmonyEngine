@@ -22,21 +22,20 @@ class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
 {
     Q_OBJECT
 
-    IHyApplication *    m_pHyApp;
+    ItemProject *       m_pProjOwner;
     HyEngine *          m_pHyEngine;
     
     bool                m_bIsUpdating;
 
 public:
     HyGuiRenderer(QWidget *parent = 0);
+    HyGuiRenderer(ItemProject *pProj, QWidget *parent = 0);
     ~HyGuiRenderer();
 
     // QOpenGLWidget overrides
     virtual void initializeGL();
     virtual void paintGL();
     virtual void resizeGL(int w, int h);
-    
-    void LoadItemProject(ItemProject *pProj);
 };
 
 #endif // HYGUIRENDERER_H

@@ -50,18 +50,8 @@
      <widget class="QWidget" name="page_2"/>
     </widget>
    </item>
-   <item>
-    <widget class="HyGuiRenderer" name="openGLWidget"/>
-   </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>HyGuiRenderer</class>
-   <extends>QOpenGLWidget</extends>
-   <header>HyGuiRenderer.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

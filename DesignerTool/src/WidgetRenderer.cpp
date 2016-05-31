@@ -17,6 +17,10 @@ WidgetRenderer::WidgetRenderer(QWidget *parent) :   QWidget(parent),
     
     while(ui->tabManagers->count())
         ui->tabManagers->removeWidget(ui->tabManagers->currentWidget());
+
+
+    m_pCurrentRenderer = new HyGuiRenderer(NULL, this);
+    ui->verticalLayout->addWidget(m_pCurrentRenderer);
 }
 
 WidgetRenderer::~WidgetRenderer()
@@ -44,8 +48,11 @@ void WidgetRenderer::LoadItemProject(ItemProject *pProj)
             ui->tabManagers->setCurrentWidget(pProj->GetTabsManager());
         }
     }
-    
-    ui->openGLWidget->LoadItemProject(pProj);
+
+    HyGuiRenderer *pNewRenderer = new HyGuiRenderer(pProj, this);
+    ui->verticalLayout->replaceWidget(m_pCurrentRenderer, pNewRenderer);
+    delete m_pCurrentRenderer;
+    m_pCurrentRenderer = pNewRenderer;
 }
 
 void WidgetRenderer::OpenItem(Item *pItem)

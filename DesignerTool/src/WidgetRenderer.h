@@ -29,6 +29,8 @@ class WidgetRenderer : public QWidget
 {
     Q_OBJECT
 
+    HyGuiRenderer * m_pCurrentRenderer;
+
 public:
     explicit WidgetRenderer(QWidget *parent = 0);
     ~WidgetRenderer();

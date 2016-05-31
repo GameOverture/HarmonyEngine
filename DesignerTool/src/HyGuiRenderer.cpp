@@ -18,9 +18,16 @@
 #include "ItemProject.h"
 
 HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent),
-                                                m_pHyApp(NULL),
-                                                m_pHyEngine(NULL),
-                                                m_bIsUpdating(false)
+                                                m_pProjOwner(NULL),
+                                                m_pHyEngine(NULL)
+{
+    HyGuiLog("Wrong ctor HyGuiRenderer()", LOGTYPE_Error);
+}
+
+HyGuiRenderer::HyGuiRenderer(ItemProject *pProj, QWidget *parent /*= 0*/) : QOpenGLWidget(parent),
+                                                                            m_pProjOwner(pProj),
+                                                                            m_pHyEngine(NULL),
+                                                                            m_bIsUpdating(false)
 {
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -29,6 +36,9 @@ HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent),
 
 HyGuiRenderer::~HyGuiRenderer()
 {
+    if(m_pHyEngine)
+        m_pHyEngine->Shutdown();
+    delete m_pHyEngine;
 }
 
 /*virtual*/ void HyGuiRenderer::initializeGL()
@@ -39,7 +49,8 @@ HyGuiRenderer::~HyGuiRenderer()
     //    format.setSampleBuffers(true);
     //    setFormat(format);
 
-    //m_pHyEngine = new HyEngine(*GetHyApp());
+    if(m_pProjOwner)
+        m_pHyEngine = new HyEngine(*m_pProjOwner->GetTabsManager());
 }
 
 /*virtual*/ void HyGuiRenderer::paintGL()
@@ -56,18 +67,6 @@ HyGuiRenderer::~HyGuiRenderer()
 
 /*virtual*/ void HyGuiRenderer::resizeGL(int w, int h)
 {
-    if(m_pHyApp)
-        m_pHyApp->Window().SetResolution(glm::ivec2(w, h));
-}
-
-void HyGuiRenderer::LoadItemProject(ItemProject *pProj)
-{
-    if(m_pHyEngine)
-        m_pHyEngine->Shutdown();
-    
-    delete m_pHyEngine;
-    m_pHyEngine = NULL;
-    
-    if(pProj)
-        m_pHyEngine = new HyEngine(*pProj->GetTabsManager());   // WidgetTabsManager is a IHyApplication
+    if(m_pProjOwner)
+        m_pProjOwner->GetTabsManager()->Window().SetResolution(glm::ivec2(w, h));
 }
