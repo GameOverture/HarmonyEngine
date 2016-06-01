@@ -100,7 +100,7 @@ void HyEngine::Shutdown()
 {
 	// Unload any load-pending assets
 	m_AssetManager.Shutdown();
-	while(m_AssetManager.DoesAnyDataExist())
+	while(m_AssetManager.IsShutdown())
 	{
 		m_AssetManager.Update();
 		m_Scene.PostUpdate();

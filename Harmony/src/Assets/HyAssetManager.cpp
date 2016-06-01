@@ -48,7 +48,7 @@ HyAssetManager::~HyAssetManager()
 	m_LoadingCtrl.m_bShouldExit = true;
 	m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
 
-	HyAssert(DoesAnyDataExist() == false, "Tried to destruct the HyAssetManager while data still exists");
+	HyAssert(IsShutdown() == false, "Tried to destruct the HyAssetManager while data still exists");
 }
 
 void HyAssetManager::Update()
@@ -197,11 +197,20 @@ void HyAssetManager::Shutdown()
 
 	for(uint32 i = 0; i < vReloadInsts.size(); ++i)
 		vReloadInsts[i]->Unload();
+
+	m_LoadingCtrl.m_bShouldExit = true;
+	m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
 }
 
-bool HyAssetManager::DoesAnyDataExist()
+bool HyAssetManager::IsShutdown()
 {
-	return (m_Sfx.IsEmpty() == false || m_Sprite2d.IsEmpty() == false || m_Spine2d.IsEmpty() == false || m_Mesh3d.IsEmpty() == false || m_Txt2d.IsEmpty() == false || m_Quad2d.IsEmpty() == false);
+	return m_pLoadingThread->IsAlive() == false &&
+		   m_Sfx.IsEmpty() &&
+		   m_Sprite2d.IsEmpty() &&
+		   m_Spine2d.IsEmpty() &&
+		   m_Mesh3d.IsEmpty() &&
+		   m_Txt2d.IsEmpty() &&
+		   m_Quad2d.IsEmpty();
 }
 
 void HyAssetManager::FinalizeData(IHyData *pData)

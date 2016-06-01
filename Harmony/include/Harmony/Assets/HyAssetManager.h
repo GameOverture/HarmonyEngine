@@ -108,7 +108,7 @@ public:
 	void RemoveInst(IHyInst2d *pInst);
 
 	void Shutdown();
-	bool DoesAnyDataExist();
+	bool IsShutdown();
 
 private:
 	void FinalizeData(IHyData *pData);
