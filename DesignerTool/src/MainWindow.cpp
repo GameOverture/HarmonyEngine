@@ -134,6 +134,15 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     }
     m_Settings.endGroup();
 
+    m_Settings.beginGroup("Misc");
+    {
+        m_sDefaultProjectLocation = m_Settings.value("defaultProjectLocation").toString();
+        QDir defaultProjDir(m_sDefaultProjectLocation);
+        if(m_sDefaultProjectLocation.isEmpty() || defaultProjDir.exists() == false)
+            m_sDefaultProjectLocation = QDir::current().path();
+    }
+    m_Settings.endGroup();
+
     // Restore opened items/tabs
 
     // Append version to window title
@@ -237,9 +246,16 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 void MainWindow::on_actionNewProject_triggered()
 {
-    DlgNewProject *pDlg = new DlgNewProject(QDir::current().path(), this);
-    if(pDlg->exec())
+    DlgNewProject *pDlg = new DlgNewProject(m_sDefaultProjectLocation, this);
+    if(pDlg->exec() == QDialog::Accepted)
     {
+        if(pDlg->IsCreatingGameDir())
+        {
+            QDir defaultProjDir(pDlg->GetProjDirPath());
+            defaultProjDir.cdUp();
+            m_sDefaultProjectLocation = defaultProjDir.absolutePath();
+        }
+
         ui->explorer->AddItemProject(pDlg->GetProjFilePath());
     }
     delete pDlg;
@@ -319,6 +335,12 @@ void MainWindow::SaveSettings()
         m_Settings.setValue("openProjs", QVariant(ui->explorer->GetOpenProjectPaths()));
         
         //m_Settings.setValue("openItems", QVariant(ui->renderer->GetOpenItemPaths()));
+    }
+    m_Settings.endGroup();
+
+    m_Settings.beginGroup("Misc");
+    {
+        m_Settings.setValue("defaultProjectLocation", QVariant(m_sDefaultProjectLocation));
     }
     m_Settings.endGroup();
 }

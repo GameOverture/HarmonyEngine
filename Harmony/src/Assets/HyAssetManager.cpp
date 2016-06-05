@@ -45,10 +45,7 @@ HyAssetManager::HyAssetManager(std::string sDataDirPath, HyGfxComms &gfxCommsRef
 
 HyAssetManager::~HyAssetManager()
 {
-	m_LoadingCtrl.m_bShouldExit = true;
-	m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
-
-	HyAssert(IsShutdown() == false, "Tried to destruct the HyAssetManager while data still exists");
+	HyAssert(IsShutdown(), "Tried to destruct the HyAssetManager while data still exists");
 }
 
 void HyAssetManager::Update()
@@ -198,13 +195,16 @@ void HyAssetManager::Shutdown()
 	for(uint32 i = 0; i < vReloadInsts.size(); ++i)
 		vReloadInsts[i]->Unload();
 
-	m_LoadingCtrl.m_bShouldExit = true;
+	m_LoadingCtrl.m_eState = LoadThreadCtrl::STATE_ShouldExit;
 	m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
 }
 
 bool HyAssetManager::IsShutdown()
 {
-	return m_pLoadingThread->IsAlive() == false &&
+	bool bTest = m_pLoadingThread->IsAlive();
+
+	return m_LoadingCtrl.m_eState == LoadThreadCtrl::STATE_HasExited &&
+		   m_pLoadingThread->IsAlive() == false &&
 		   m_Sfx.IsEmpty() &&
 		   m_Sprite2d.IsEmpty() &&
 		   m_Spine2d.IsEmpty() &&
@@ -277,7 +277,7 @@ void HyAssetManager::DiscardData(IHyData *pData)
 	LoadThreadCtrl *pLoadingCtrl = reinterpret_cast<LoadThreadCtrl *>(pParam);
 	vector<IHyData *>	vCurLoadData;
 
-	while(pLoadingCtrl->m_bShouldExit == false)
+	while(pLoadingCtrl->m_eState == LoadThreadCtrl::STATE_Run)
 	{
 		// Wait idle indefinitely until there is new data to be grabbed
 		pLoadingCtrl->m_WaitEvent_HasNewData.Wait();
@@ -310,4 +310,6 @@ void HyAssetManager::DiscardData(IHyData *pData)
 
 		vCurLoadData.clear();
 	}
+
+	pLoadingCtrl->m_eState = LoadThreadCtrl::STATE_HasExited;
 }

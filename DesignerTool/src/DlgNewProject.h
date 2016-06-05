@@ -20,9 +20,9 @@ class DlgNewProject : public QDialog
 {
     Q_OBJECT
     
-    QString               m_sAbsoluteAssetsLocation;
-    QString               m_sAbsoluteMetaDataLocation;
-    QString               m_sAbsoluteSourceLocation;
+    QString               m_sRelativeAssetsLocation;
+    QString               m_sRelativeMetaDataLocation;
+    QString               m_sRelativeSourceLocation;
 
 public:
     explicit DlgNewProject(QString &sDefaultLocation, QWidget *parent = 0);
@@ -30,6 +30,8 @@ public:
 
     QString GetProjFilePath();
     QString GetProjDirPath();
+
+    bool IsCreatingGameDir();
 
 private slots:
 

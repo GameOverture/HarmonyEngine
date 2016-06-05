@@ -30,6 +30,8 @@ class MainWindow : public QMainWindow
     QSettings           m_Settings;
 
     bool                m_bIsInitialized;
+
+    QString             m_sDefaultProjectLocation;
     
     ItemProject *       m_pCurSelectedProj;
     QMenu *             m_pCurEditMenu;
