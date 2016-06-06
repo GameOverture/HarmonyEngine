@@ -51,12 +51,6 @@ private slots:
     
     void on_btnBrowseSource_clicked();
     
-    void on_txtAssetsLocation_textChanged(const QString &arg1);
-    
-    void on_txtMetaDataLocation_textChanged(const QString &arg1);
-    
-    void on_txtSourceLocation_textChanged(const QString &arg1);
-    
     void on_txtAssetsDirName_textChanged(const QString &arg1);
 
     void on_txtMetaDataDirName_textChanged(const QString &arg1);
@@ -64,6 +58,12 @@ private slots:
     void on_txtSourceDirName_textChanged(const QString &arg1);
 
     void on_chkCreateGameDir_clicked();
+
+    void on_txtAssetsLocation_textEdited(const QString &arg1);
+
+    void on_txtMetaDataLocation_textEdited(const QString &arg1);
+
+    void on_txtSourceLocation_textEdited(const QString &arg1);
 
 private:
     Ui::DlgNewProject *ui;

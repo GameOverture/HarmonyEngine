@@ -28,12 +28,12 @@ class MainWindow : public QMainWindow
     static MainWindow * sm_pInstance;
 
     QSettings           m_Settings;
+    QString             m_sDefaultProjectLocation;
 
     bool                m_bIsInitialized;
 
-    QString             m_sDefaultProjectLocation;
-    
     ItemProject *       m_pCurSelectedProj;
+    HyGuiRenderer *     m_pCurRenderer;
     QMenu *             m_pCurEditMenu;
     
     HyGuiDebugger *     m_pDebugConnection;

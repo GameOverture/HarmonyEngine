@@ -41,6 +41,12 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
 {
     ui->setupUi(this);
     sm_pInstance = this;
+
+    while(ui->stackedTabWidgets->count())
+        ui->stackedTabWidgets->removeWidget(ui->stackedTabWidgets->currentWidget());
+
+    m_pCurRenderer = new HyGuiRenderer(NULL, this);
+    ui->centralVerticalLayout->addWidget(m_pCurRenderer);
     
     SetSelectedProj(NULL);
 
@@ -175,7 +181,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 // This only requests to the WidgetRenderer to open the item. It will eventually do so, after re-loading any resources it needs to
 /*static*/ void MainWindow::OpenItem(Item *pItem)
 {
-    sm_pInstance->ui->renderer->OpenItem(pItem);
+    sm_pInstance->ui->explorer->GetCurProjSelected()->GetTabsManager()->OpenItem(pItem);
     
     if(pItem->GetType() != ITEM_Project)
         sm_pInstance->ui->explorer->SelectItem(pItem);
@@ -184,7 +190,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 /*static*/ void MainWindow::CloseItem(Item *pItem)
 {
     // TODO: Ask to save file if changes have been made
-    sm_pInstance->ui->renderer->CloseItem(pItem);
+    sm_pInstance->ui->explorer->GetCurProjSelected()->GetTabsManager()->CloseItem(pItem);
 }
 
 // This should only be invoked by the WidgetRenderer
@@ -221,9 +227,32 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     {
         if(QDir::setCurrent(sm_pInstance->m_pCurSelectedProj->GetDirPath()) == false)
             HyGuiLog("QDir::setCurrent() failed to set project at (" % sm_pInstance->m_pCurSelectedProj->GetDirPath() % ")", LOGTYPE_Normal);
+
+        bool bTabsFound = false;
+        for(int i = 0; i < sm_pInstance->ui->stackedTabWidgets->count(); ++i)
+        {
+            if(sm_pInstance->ui->stackedTabWidgets->widget(i) == pProj->GetTabsManager())
+            {
+                sm_pInstance->ui->stackedTabWidgets->setCurrentIndex(i);
+                bTabsFound = true;
+            }
+        }
+
+        if(bTabsFound == false)
+        {
+            sm_pInstance->ui->stackedTabWidgets->addWidget(pProj->GetTabsManager());
+            sm_pInstance->ui->stackedTabWidgets->setCurrentWidget(pProj->GetTabsManager());
+        }
     }
 
-    sm_pInstance->ui->renderer->LoadItemProject(sm_pInstance->m_pCurSelectedProj);
+    // Swap the harmony engine renderers
+    sm_pInstance->m_pCurRenderer->Shutdown();
+    HyGuiRenderer *pNewRenderer = new HyGuiRenderer(pProj, sm_pInstance);
+    sm_pInstance->ui->centralVerticalLayout->replaceWidget(sm_pInstance->m_pCurRenderer, pNewRenderer);
+    delete sm_pInstance->m_pCurRenderer;
+    sm_pInstance->m_pCurRenderer = pNewRenderer;
+
+    //sm_pInstance->ui->renderer->LoadItemProject(sm_pInstance->m_pCurSelectedProj);
 
     if(sm_pInstance->m_pCurSelectedProj)
     {
