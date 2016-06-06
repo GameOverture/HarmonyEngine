@@ -48,7 +48,6 @@ public:
     static void OpenItem(Item *pItem);
     static void CloseItem(Item *pItem);
     
-    // This should only be invoked by the WidgetRenderer
     static void SetCurrentItem(Item *pItem);
     
     static void SetSelectedProj(ItemProject *pProj);

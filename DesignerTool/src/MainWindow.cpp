@@ -17,6 +17,7 @@
 
 #include "WidgetExplorer.h"
 #include "WidgetAtlasManager.h"
+#include "WidgetTabsManager.h"
 
 #include "ItemSprite.h"
 
@@ -37,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
                                             ui(new Ui::MainWindow),
                                             m_Settings("Overture Games", "Harmony Designer Tool"),
                                             m_bIsInitialized(false),
+                                            m_pCurSelectedProj(NULL),
+                                            m_pCurRenderer(NULL),
                                             m_pCurEditMenu(NULL)
 {
     ui->setupUi(this);
@@ -181,19 +184,22 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 // This only requests to the WidgetRenderer to open the item. It will eventually do so, after re-loading any resources it needs to
 /*static*/ void MainWindow::OpenItem(Item *pItem)
 {
+    if(pItem == NULL || pItem->GetType() == ITEM_Project)
+        return;
+
     sm_pInstance->ui->explorer->GetCurProjSelected()->GetTabsManager()->OpenItem(pItem);
-    
-    if(pItem->GetType() != ITEM_Project)
-        sm_pInstance->ui->explorer->SelectItem(pItem);
+    sm_pInstance->ui->explorer->SelectItem(pItem);
 }
 
 /*static*/ void MainWindow::CloseItem(Item *pItem)
 {
+    if(pItem == NULL || pItem->GetType() == ITEM_Project)
+        return;
+
     // TODO: Ask to save file if changes have been made
     sm_pInstance->ui->explorer->GetCurProjSelected()->GetTabsManager()->CloseItem(pItem);
 }
 
-// This should only be invoked by the WidgetRenderer
 /*static*/ void MainWindow::SetCurrentItem(Item *pItem)
 {
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
@@ -221,6 +227,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     if(sm_pInstance->m_pCurSelectedProj == pProj)
         return;
     
+    CloseItem(sm_pInstance->m_pCurSelectedProj);
     sm_pInstance->m_pCurSelectedProj = pProj;
 
     if(sm_pInstance->m_pCurSelectedProj)
@@ -267,6 +274,8 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 /*static*/ void MainWindow::ReloadHarmony()
 {
+    CloseItem(sm_pInstance->m_pCurSelectedProj);
+
     ItemProject *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
     sm_pInstance->m_pCurSelectedProj = NULL;    // Set m_pCurSelectedProj to 'NULL' so SetSelectedProj() doesn't imediately return
     

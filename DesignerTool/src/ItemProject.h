@@ -28,14 +28,9 @@ class ItemProject : public Item
     WidgetTabsManager *         m_pTabsManager;
     WidgetAtlasManager *        m_pAtlasManager;
     
-    enum eDrawState
-    {
-        DRAWSTATE_Nothing,
-        DRAWSTATE_AtlasManager,
-    };
-    eDrawState          m_eState;
+    eProjDrawState              m_eDrawState;
 
-    bool                m_bHasError;
+    bool                        m_bHasError;
     
     ItemProject(const QString sNewProjectFilePath);
     
@@ -62,7 +57,8 @@ public:
     virtual void OnDraw_Hide(IHyApplication &hyApp);
     virtual void OnDraw_Update(IHyApplication &hyApp);
     
-    void SetAtlasGroupDrawState(int iAtlasGrpId);
+    void SetOverrideDrawState(eProjDrawState eDrawState);
+    bool IsOverrideDraw();
 };
 
 #endif // ITEMPROJECT_H

@@ -27,8 +27,7 @@ WidgetTabsManager::WidgetTabsManager(QWidget *parent) : QWidget(parent),
 WidgetTabsManager::WidgetTabsManager(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :    QWidget(parent),
                                                                                             ui(new Ui::WidgetTabsManager),
                                                                                             IHyApplication(HarmonyInit(pProjOwner->GetName().toStdString(), pProjOwner->GetAssetsAbsPath().toStdString())),
-                                                                                            m_pProjOwner(pProjOwner),
-                                                                                            m_bOverrideDrawWithProj(false)
+                                                                                            m_pProjOwner(pProjOwner)
 {
     ui->setupUi(this);
     ui->tabWidget->clear();
@@ -66,12 +65,16 @@ void WidgetTabsManager::CloseItem(Item *pItem)
         Item *pItem = action.first;
         eQueuedAction eActionToTake = action.second;
 
-        if(eActionToTake == QUEUEDITEM_Open)
+        Item *pNewItemToShow = NULL;
+
+        switch(eActionToTake)
         {
+        case QUEUEDITEM_Open:
             if(pItem->GetType() == ITEM_Project)
             {
                 pItem->DrawOpen(*this);
-                ShowItem(pItem);
+                pNewItemToShow = pItem;
+                //ShowItem(pItem);
             }
             else
             {
@@ -95,19 +98,20 @@ void WidgetTabsManager::CloseItem(Item *pItem)
                     ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName()));
                 }
             }
-        }
-        else if(eActionToTake == QUEUEDITEM_Show)
-        {
-            ShowItem(pItem);
-        }
-        else if(eActionToTake == QUEUEDITEM_Close)
-        {
+            break;
+
+        case QUEUEDITEM_Show:
+            pNewItemToShow = pItem;
+            //ShowItem(pItem);
+            break;
+
+        case QUEUEDITEM_Close:
             if(m_pProjOwner == pItem)
             {
                 m_pProjOwner->DrawHide(*this);
-                m_bOverrideDrawWithProj = false;
 
-                ShowItem(GetItem());
+                pNewItemToShow = GetItem();
+                //ShowItem(GetItem());
             }
             else
             {
@@ -122,6 +126,33 @@ void WidgetTabsManager::CloseItem(Item *pItem)
                     }
                 }
             }
+            break;
+
+        case QUEUEDITEM_ProjClose:
+            break;
+        }
+
+        if(pNewItemToShow)
+        {
+            // Hide everything
+            if(m_pProjOwner->IsOverrideDraw())
+                m_pProjOwner->DrawHide(*this);
+
+            for(int i = 0; i < ui->tabWidget->count(); ++i)
+                GetItem(i)->DrawHide(*this);
+
+            // Then show
+            if(pNewItemToShow->GetType() == ITEM_Project)
+            {
+                if(pItem != m_pProjOwner)
+                    HyGuiLog("WidgetTabsManager::ShowItem() passed an ItemProj, but of a different project", LOGTYPE_Error);
+
+                m_bOverrideDrawWithProj = true;
+            }
+
+            MainWindow::SetCurrentItem(pNewItemToShow);
+
+            pNewItemToShow->DrawShow(*this);
         }
     }
 
@@ -137,34 +168,9 @@ void WidgetTabsManager::CloseItem(Item *pItem)
     return true;
 }
 
-// Do not invoke this function outside of Update()
-void WidgetTabsManager::ShowItem(Item *pItem)
-{
-    if(pItem == NULL)
-        return;
-
-    if(m_bOverrideDrawWithProj)
-        m_pProjOwner->DrawHide(*this);
-
-    for(int i = 0; i < ui->tabWidget->count(); ++i)
-        GetItem(i)->DrawHide(*this);
-
-    if(pItem->GetType() == ITEM_Project)
-    {
-        if(pItem != m_pProjOwner)
-            HyGuiLog("WidgetTabsManager::ShowItem() passed an ItemProj, but of a different project", LOGTYPE_Error);
-        
-        m_bOverrideDrawWithProj = true;
-    }
-
-    MainWindow::SetCurrentItem(pItem);
-
-    pItem->DrawShow(*this);
-}
-
 Item *WidgetTabsManager::GetItem(int iIndex /*= -1*/)
 {
-    if(m_bOverrideDrawWithProj)   // Overrides any Item in the current open TabPage
+    if(m_pProjOwner->IsOverrideDraw())   // Overrides any Item in the current open TabPage
         return m_pProjOwner;
 
     if(ui->tabWidget->currentWidget() == NULL)

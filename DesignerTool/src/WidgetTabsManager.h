@@ -40,13 +40,13 @@ class WidgetTabsManager : public QWidget, public IHyApplication
     Q_OBJECT
 
     ItemProject *       m_pProjOwner;
-    bool                m_bOverrideDrawWithProj;
 
     enum eQueuedAction
     {
         QUEUEDITEM_Open = 0,
         QUEUEDITEM_Show,
-        QUEUEDITEM_Close
+        QUEUEDITEM_Close,
+        QUEUEDITEM_ProjClose
     };
     QQueue<std::pair<Item *, eQueuedAction> > m_ActionQueue;
     
@@ -67,9 +67,6 @@ private:
     Ui::WidgetTabsManager *ui;
 
     Item *GetItem(int iIndex = -1);
-    
-    // Do not invoke this function outside of Update()
-    void ShowItem(Item *pItem);
 
 private slots:
     void on_tabWidget_currentChanged(int index);

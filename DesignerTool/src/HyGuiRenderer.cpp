@@ -8,13 +8,13 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "HyGuiRenderer.h"
+#include "WidgetTabsManager.h"
 
 #include <QTimer>
 //#include <QGLFormat>
 #include <QDir>
 
 #include "HyGlobal.h"
-#include "WidgetRenderer.h"
 #include "ItemProject.h"
 
 HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent),

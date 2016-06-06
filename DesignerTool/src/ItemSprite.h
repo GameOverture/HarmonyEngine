@@ -11,7 +11,6 @@
 #define ITEMSPRITE_H
 
 #include "Item.h"
-#include "WidgetRenderer.h"
 #include "WidgetSprite.h"
 
 class ItemSprite : public Item

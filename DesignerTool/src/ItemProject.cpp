@@ -11,7 +11,6 @@
 
 #include "WidgetAtlasManager.h"
 #include "WidgetTabsManager.h"
-#include "WidgetRenderer.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -19,7 +18,7 @@
 #include <QJsonObject>
 
 ItemProject::ItemProject(const QString sNewProjectFilePath) : Item(ITEM_Project, sNewProjectFilePath),
-                                                              m_eState(DRAWSTATE_Nothing),
+                                                              m_eDrawState(PROJDRAWSTATE_Nothing),
                                                               m_bHasError(false)
 {
     QFile projFile(sNewProjectFilePath);
@@ -66,35 +65,44 @@ QString ItemProject::GetDirPath() const
 
 /*virtual*/ void ItemProject::OnDraw_Open(IHyApplication &hyApp)
 {
-    if(m_eState == DRAWSTATE_AtlasManager)
+    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
         AtlasManager_DrawOpen(hyApp, *m_pAtlasManager);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Close(IHyApplication &hyApp)
 {
-    if(m_eState == DRAWSTATE_AtlasManager)
+    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
         AtlasManager_DrawClose(hyApp, *m_pAtlasManager);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Show(IHyApplication &hyApp)
 {
-    if(m_eState == DRAWSTATE_AtlasManager)
+    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
         AtlasManager_DrawShow(hyApp, *m_pAtlasManager);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Hide(IHyApplication &hyApp)
 {
-    if(m_eState == DRAWSTATE_AtlasManager)
+    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
         AtlasManager_DrawHide(hyApp, *m_pAtlasManager);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Update(IHyApplication &hyApp)
 {
-    if(m_eState == DRAWSTATE_AtlasManager)
+    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
         AtlasManager_DrawUpdate(hyApp, *m_pAtlasManager);
 }
 
-void ItemProject::SetAtlasGroupDrawState(int iAtlasGrpId)
+void ItemProject::SetOverrideDrawState(eProjDrawState eDrawState)
 {
-    m_eState = DRAWSTATE_AtlasManager;
+    m_eDrawState = eDrawState;
+    if(IsOverrideDraw())
+        GetTabsManager()->OpenItem(this);
+    else
+        GetTabsManager()->CloseItem(this);
+}
+
+bool ItemProject::IsOverrideDraw()
+{
+    return (m_eDrawState != PROJDRAWSTATE_Nothing);
 }
