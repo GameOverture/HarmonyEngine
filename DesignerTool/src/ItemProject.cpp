@@ -19,6 +19,7 @@
 
 ItemProject::ItemProject(const QString sNewProjectFilePath) : Item(ITEM_Project, sNewProjectFilePath),
                                                               m_eDrawState(PROJDRAWSTATE_Nothing),
+                                                              m_ePrevDrawState(PROJDRAWSTATE_Nothing),
                                                               m_bHasError(false)
 {
     QFile projFile(sNewProjectFilePath);
@@ -95,11 +96,11 @@ QString ItemProject::GetDirPath() const
 
 void ItemProject::SetOverrideDrawState(eProjDrawState eDrawState)
 {
+    m_ePrevDrawState = m_eDrawState;
     m_eDrawState = eDrawState;
-    if(IsOverrideDraw())
+
+    if(m_eDrawState != PROJDRAWSTATE_Nothing)
         GetTabsManager()->OpenItem(this);
-    else
-        GetTabsManager()->CloseItem(this);
 }
 
 bool ItemProject::IsOverrideDraw()

@@ -45,8 +45,7 @@ class WidgetTabsManager : public QWidget, public IHyApplication
     {
         QUEUEDITEM_Open = 0,
         QUEUEDITEM_Show,
-        QUEUEDITEM_Close,
-        QUEUEDITEM_ProjClose
+        QUEUEDITEM_Close
     };
     QQueue<std::pair<Item *, eQueuedAction> > m_ActionQueue;
     

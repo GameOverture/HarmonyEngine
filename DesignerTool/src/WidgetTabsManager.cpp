@@ -74,7 +74,6 @@ void WidgetTabsManager::CloseItem(Item *pItem)
             {
                 pItem->DrawOpen(*this);
                 pNewItemToShow = pItem;
-                //ShowItem(pItem);
             }
             else
             {
@@ -102,13 +101,12 @@ void WidgetTabsManager::CloseItem(Item *pItem)
 
         case QUEUEDITEM_Show:
             pNewItemToShow = pItem;
-            //ShowItem(pItem);
             break;
 
         case QUEUEDITEM_Close:
             if(m_pProjOwner == pItem)
             {
-                m_pProjOwner->DrawHide(*this);
+                m_pProjOwner->DrawClose(*this);
 
                 pNewItemToShow = GetItem();
                 //ShowItem(GetItem());
@@ -126,9 +124,6 @@ void WidgetTabsManager::CloseItem(Item *pItem)
                     }
                 }
             }
-            break;
-
-        case QUEUEDITEM_ProjClose:
             break;
         }
 

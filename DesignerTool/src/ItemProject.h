@@ -28,6 +28,7 @@ class ItemProject : public Item
     WidgetTabsManager *         m_pTabsManager;
     WidgetAtlasManager *        m_pAtlasManager;
     
+    eProjDrawState              m_ePrevDrawState;
     eProjDrawState              m_eDrawState;
 
     bool                        m_bHasError;
