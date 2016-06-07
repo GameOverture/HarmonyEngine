@@ -61,6 +61,8 @@ enum eProjDrawState
 {
     PROJDRAWSTATE_Nothing,
     PROJDRAWSTATE_AtlasManager,
+    
+    NUMPROJDRAWSTATE
 };
 
 #define HYGUIPATH_DataAtlasFileName         "atlasInfo.json"

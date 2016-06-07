@@ -22,6 +22,9 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) : Item(ITEM_Project,
                                                               m_ePrevDrawState(PROJDRAWSTATE_Nothing),
                                                               m_bHasError(false)
 {
+    for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
+        m_bDrawStateLoaded[i] = false;
+    
     QFile projFile(sNewProjectFilePath);
     if(projFile.exists())
     {
@@ -84,26 +87,54 @@ QString ItemProject::GetDirPath() const
 
 /*virtual*/ void ItemProject::OnDraw_Hide(IHyApplication &hyApp)
 {
-    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
+    if(m_ePrevDrawState == PROJDRAWSTATE_AtlasManager)
         AtlasManager_DrawHide(hyApp, *m_pAtlasManager);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Update(IHyApplication &hyApp)
 {
+    while(m_DrawStateQueue.empty() == false)
+    {
+        m_ePrevDrawState = m_eDrawState;
+        m_eDrawState = m_DrawStateQueue.dequeue();
+        
+        // This shouldn't happen, but if it did it would break logic below it
+        if(m_eDrawState == PROJDRAWSTATE_Nothing && m_ePrevDrawState == PROJDRAWSTATE_Nothing)
+        {
+            HyGuiLog("ItemProject::OnDraw_Update() has both m_eDrawState and m_ePrevDrawState as 'PROJDRAWSTATE_Nothing'", LOGTYPE_Warning);
+            break;
+        }
+        
+        // If our current state is 'nothing', then Hide() what was previous if it was loaded
+        if(m_eDrawState == PROJDRAWSTATE_Nothing)
+        {
+            if(m_bDrawStateLoaded[m_ePrevDrawState])
+                DrawHide(hyApp);
+            
+            m_ePrevDrawState = PROJDRAWSTATE_Nothing;
+        }
+        else
+        {
+            if(m_bDrawStateLoaded[m_eDrawState] == false)
+            {
+                DrawOpen(hyApp);
+                m_bDrawStateLoaded[m_eDrawState] = true;
+            }
+            else
+                DrawShow(hyApp);
+        }
+    }
+    
     if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
         AtlasManager_DrawUpdate(hyApp, *m_pAtlasManager);
 }
 
 void ItemProject::SetOverrideDrawState(eProjDrawState eDrawState)
 {
-    m_ePrevDrawState = m_eDrawState;
-    m_eDrawState = eDrawState;
-
-    if(m_eDrawState != PROJDRAWSTATE_Nothing)
-        GetTabsManager()->OpenItem(this);
+    m_DrawStateQueue.append(eDrawState);
 }
 
 bool ItemProject::IsOverrideDraw()
 {
-    return (m_eDrawState != PROJDRAWSTATE_Nothing || m_ePrevDrawState != PROJDRAWSTATE_Nothing);
+    return (m_eDrawState != PROJDRAWSTATE_Nothing || m_ePrevDrawState != PROJDRAWSTATE_Nothing || m_DrawStateQueue.empty() == false);
 }

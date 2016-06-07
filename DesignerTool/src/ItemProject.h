@@ -13,6 +13,8 @@
 #include "Item.h"
 #include "HyGuiRenderer.h"
 
+#include <QQueue>
+
 // Forward declaration
 class WidgetAtlasManager;
 class WidgetTabsManager;
@@ -28,8 +30,10 @@ class ItemProject : public Item
     WidgetTabsManager *         m_pTabsManager;
     WidgetAtlasManager *        m_pAtlasManager;
     
+    QQueue<eProjDrawState>      m_DrawStateQueue;
     eProjDrawState              m_ePrevDrawState;
     eProjDrawState              m_eDrawState;
+    bool                        m_bDrawStateLoaded[NUMPROJDRAWSTATE];
 
     bool                        m_bHasError;
     

@@ -56,8 +56,5 @@ void IHyGuiDrawItem::DrawHide(IHyApplication &hyApp)
 
 void IHyGuiDrawItem::DrawUpdate(IHyApplication &hyApp)
 {
-    if(m_bLoaded == false)
-        return;
-
     OnDraw_Update(hyApp);
 }

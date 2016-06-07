@@ -15,6 +15,7 @@
 class IHyGuiDrawItem
 {
     friend class WidgetTabsManager;
+    friend class ItemProject;
 
     bool                m_bLoaded;
 
