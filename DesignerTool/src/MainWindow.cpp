@@ -227,7 +227,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     if(sm_pInstance->m_pCurSelectedProj == pProj)
         return;
     
-    CloseItem(sm_pInstance->m_pCurSelectedProj);
     sm_pInstance->m_pCurSelectedProj = pProj;
 
     if(sm_pInstance->m_pCurSelectedProj)
@@ -274,8 +273,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 /*static*/ void MainWindow::ReloadHarmony()
 {
-    CloseItem(sm_pInstance->m_pCurSelectedProj);
-
     ItemProject *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
     sm_pInstance->m_pCurSelectedProj = NULL;    // Set m_pCurSelectedProj to 'NULL' so SetSelectedProj() doesn't imediately return
     

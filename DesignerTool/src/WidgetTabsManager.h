@@ -65,8 +65,6 @@ public:
 private:
     Ui::WidgetTabsManager *ui;
 
-    Item *GetItem(int iIndex = -1);
-
 private slots:
     void on_tabWidget_currentChanged(int index);
 };

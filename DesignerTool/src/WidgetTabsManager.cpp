@@ -64,92 +64,66 @@ void WidgetTabsManager::CloseItem(Item *pItem)
         Item *pItem = action.first;
         eQueuedAction eActionToTake = action.second;
 
-        Item *pNewItemToShow = NULL;
-
         switch(eActionToTake)
         {
         case QUEUEDITEM_Open:
-            if(pItem->GetType() == ITEM_Project)
+            for(int i = 0; i < ui->tabWidget->count(); ++i)
             {
-                pItem->DrawOpen(*this);
-                pNewItemToShow = pItem;
+                // Determine if already opened
+                if(static_cast<TabPage *>(ui->tabWidget->widget(i))->GetItem() == pItem)
+                {
+                    ui->tabWidget->setCurrentIndex(i);
+                    pItem = NULL;   // Signifies below to not create a new tab as this item is already open
+                    break;
+                }
             }
-            else
-            {
-                bool bIsAlreadyOpen = false;
-                for(int i = 0; i < ui->tabWidget->count(); ++i)
-                {
-                    // Determine if already opened
-                    if(reinterpret_cast<TabPage *>(ui->tabWidget->widget(i))->GetItem() == pItem)
-                    {
-                        ui->tabWidget->setCurrentIndex(i);
-                        bIsAlreadyOpen = true;
-                        break;
-                    }
-                }
 
-                if(bIsAlreadyOpen == false)
-                {
-                    // Below should invoke callback 'on_tabWidget_currentChanged' which will enqueue a QUEUEDITEM_Show action
-                    TabPage *pNewTab = new TabPage(pItem, this);
-                    pItem->DrawOpen(*this);
-                    ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName()));
-                }
+            if(pItem)
+            {
+                // Below should invoke callback 'on_tabWidget_currentChanged' which will enqueue a QUEUEDITEM_Show action
+                TabPage *pNewTab = new TabPage(pItem, this);
+                pItem->DrawOpen(*this);
+                ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName()));
             }
             break;
 
         case QUEUEDITEM_Show:
-            pNewItemToShow = pItem;
+            // Hide everything
+            if(m_pProjOwner->IsOverrideDraw())
+            {
+                m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_Nothing);
+                
+                while(m_pProjOwner->IsOverrideDraw())
+                    m_pProjOwner->DrawUpdate(*this);
+            }
+
+            for(int i = 0; i < ui->tabWidget->count(); ++i)
+                static_cast<TabPage *>(ui->tabWidget->widget(i))->GetItem()->DrawHide(*this);
+
+            // Then show
+            MainWindow::SetCurrentItem(pItem);
+            pItem->DrawShow(*this);
             break;
 
         case QUEUEDITEM_Close:
-            if(m_pProjOwner == pItem)
+            for(int i = 0; i < ui->tabWidget->count(); ++i)
             {
-                m_pProjOwner->DrawClose(*this);
-
-                pNewItemToShow = GetItem();
-                //ShowItem(GetItem());
-            }
-            else
-            {
-                for(int i = 0; i < ui->tabWidget->count(); ++i)
+                TabPage *pTabPage = static_cast<TabPage *>(ui->tabWidget->widget(i));
+                if(pTabPage->GetItem() == pItem)
                 {
-                    TabPage *pTabPage = reinterpret_cast<TabPage *>(ui->tabWidget->widget(i));
-                    if(pTabPage->GetItem() == pItem)
-                    {
-                        pItem->DrawClose(*this);
-                        ui->tabWidget->removeTab(i);
-                        break;
-                    }
+                    pItem->DrawClose(*this);
+                    ui->tabWidget->removeTab(i);
+                    break;
                 }
             }
             break;
         }
-
-        if(pNewItemToShow)
-        {
-            // Hide everything
-            if(m_pProjOwner->IsOverrideDraw())
-                m_pProjOwner->DrawHide(*this);
-
-            for(int i = 0; i < ui->tabWidget->count(); ++i)
-                GetItem(i)->DrawHide(*this);
-
-            // Then show
-            if(pNewItemToShow->GetType() == ITEM_Project)
-            {
-                if(pItem != m_pProjOwner)
-                    HyGuiLog("WidgetTabsManager::ShowItem() passed an ItemProj, but of a different project", LOGTYPE_Error);
-            }
-
-            MainWindow::SetCurrentItem(pNewItemToShow);
-
-            pNewItemToShow->DrawShow(*this);
-        }
     }
 
-    if(GetItem())
-        GetItem()->DrawUpdate(*this);
+    if(m_pProjOwner->IsOverrideDraw())
+        m_pProjOwner->DrawUpdate(*this);
+    else if(ui->tabWidget->currentWidget())
+        static_cast<TabPage *>(ui->tabWidget->currentWidget())->GetItem()->DrawUpdate(*this);
 
     return true;
 }
@@ -160,21 +134,10 @@ void WidgetTabsManager::CloseItem(Item *pItem)
     return true;
 }
 
-Item *WidgetTabsManager::GetItem(int iIndex /*= -1*/)
-{
-    if(m_pProjOwner->IsOverrideDraw())   // Overrides any Item in the current open TabPage
-        return m_pProjOwner;
-
-    if(ui->tabWidget->currentWidget() == NULL)
-        return NULL;
-
-    if(iIndex < 0)
-        return static_cast<TabPage *>(ui->tabWidget->currentWidget())->GetItem();
-    else
-        return static_cast<TabPage *>(ui->tabWidget->widget(iIndex))->GetItem();
-}
-
 void WidgetTabsManager::on_tabWidget_currentChanged(int index)
 {
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(GetItem(index), QUEUEDITEM_Show));
+    if(index < 0)
+        return;
+    
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(static_cast<TabPage *>(ui->tabWidget->widget(index))->GetItem(), QUEUEDITEM_Show));
 }
