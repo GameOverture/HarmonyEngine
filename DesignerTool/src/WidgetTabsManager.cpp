@@ -15,8 +15,7 @@
 WidgetTabsManager::WidgetTabsManager(QWidget *parent) : QWidget(parent),
                                                         ui(new Ui::WidgetTabsManager),
                                                         IHyApplication(HarmonyInit()),
-                                                        m_pProjOwner(NULL),
-                                                        m_bOverrideDrawWithProj(false)
+                                                        m_pProjOwner(NULL)
 {
     ui->setupUi(this);
     
@@ -141,8 +140,6 @@ void WidgetTabsManager::CloseItem(Item *pItem)
             {
                 if(pItem != m_pProjOwner)
                     HyGuiLog("WidgetTabsManager::ShowItem() passed an ItemProj, but of a different project", LOGTYPE_Error);
-
-                m_bOverrideDrawWithProj = true;
             }
 
             MainWindow::SetCurrentItem(pNewItemToShow);
@@ -150,8 +147,6 @@ void WidgetTabsManager::CloseItem(Item *pItem)
             pNewItemToShow->DrawShow(*this);
         }
     }
-
-    if(m_pProjOwner->
 
     if(GetItem())
         GetItem()->DrawUpdate(*this);

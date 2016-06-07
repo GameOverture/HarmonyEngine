@@ -105,5 +105,5 @@ void ItemProject::SetOverrideDrawState(eProjDrawState eDrawState)
 
 bool ItemProject::IsOverrideDraw()
 {
-    return (m_eDrawState != PROJDRAWSTATE_Nothing);
+    return (m_eDrawState != PROJDRAWSTATE_Nothing || m_ePrevDrawState != PROJDRAWSTATE_Nothing);
 }

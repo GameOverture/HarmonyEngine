@@ -125,6 +125,9 @@ void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObj)
     
     for(int i = 0; i < m_FrameList.size(); ++i)
     {
+        if(m_FrameList[i]->GetTextureIndex() < 0)
+            continue;
+        
         while(frameArrayList.empty() || frameArrayList.size() <= m_FrameList[i]->GetTextureIndex())
             frameArrayList.append(QJsonArray());
         

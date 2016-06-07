@@ -36,6 +36,7 @@ HyGuiRenderer::HyGuiRenderer(ItemProject *pProj, QWidget *parent /*= 0*/) : QOpe
 
 HyGuiRenderer::~HyGuiRenderer()
 {
+    makeCurrent();
     Shutdown();
 }
 
