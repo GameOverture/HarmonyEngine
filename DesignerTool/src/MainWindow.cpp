@@ -228,12 +228,8 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         return;
     
     sm_pInstance->m_pCurSelectedProj = pProj;
-
     if(sm_pInstance->m_pCurSelectedProj)
     {
-        if(QDir::setCurrent(sm_pInstance->m_pCurSelectedProj->GetDirPath()) == false)
-            HyGuiLog("QDir::setCurrent() failed to set project at (" % sm_pInstance->m_pCurSelectedProj->GetDirPath() % ")", LOGTYPE_Normal);
-
         bool bTabsFound = false;
         for(int i = 0; i < sm_pInstance->ui->stackedTabWidgets->count(); ++i)
         {
@@ -252,13 +248,9 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 
     // Swap the harmony engine renderers
-    sm_pInstance->m_pCurRenderer->Shutdown();
-    HyGuiRenderer *pNewRenderer = new HyGuiRenderer(pProj, sm_pInstance);
-    sm_pInstance->ui->centralVerticalLayout->replaceWidget(sm_pInstance->m_pCurRenderer, pNewRenderer);
     delete sm_pInstance->m_pCurRenderer;
-    sm_pInstance->m_pCurRenderer = pNewRenderer;
-
-    //sm_pInstance->ui->renderer->LoadItemProject(sm_pInstance->m_pCurSelectedProj);
+    sm_pInstance->m_pCurRenderer = new HyGuiRenderer(pProj, sm_pInstance);
+    sm_pInstance->ui->centralVerticalLayout->addWidget(sm_pInstance->m_pCurRenderer);
 
     if(sm_pInstance->m_pCurSelectedProj)
     {

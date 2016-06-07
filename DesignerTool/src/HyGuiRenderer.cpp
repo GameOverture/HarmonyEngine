@@ -37,7 +37,16 @@ HyGuiRenderer::HyGuiRenderer(ItemProject *pProj, QWidget *parent /*= 0*/) : QOpe
 HyGuiRenderer::~HyGuiRenderer()
 {
     makeCurrent();
-    Shutdown();
+    m_bIsUpdating = true;
+    
+    if(m_pHyEngine)
+        m_pHyEngine->Shutdown();
+    
+    delete m_pHyEngine;
+    m_pHyEngine = NULL;
+    m_bIsUpdating = false;
+    
+    doneCurrent();
 }
 
 /*virtual*/ void HyGuiRenderer::initializeGL()
@@ -68,17 +77,4 @@ HyGuiRenderer::~HyGuiRenderer()
 {
     if(m_pProjOwner)
         m_pProjOwner->GetTabsManager()->Window().SetResolution(glm::ivec2(w, h));
-}
-
-void HyGuiRenderer::Shutdown()
-{
-    if(m_pHyEngine)
-    {
-        m_bIsUpdating = true;
-        m_pHyEngine->Shutdown();
-    }
-    
-    delete m_pHyEngine;
-    m_pHyEngine = NULL;
-    m_bIsUpdating = false;
 }
