@@ -57,6 +57,12 @@ enum eAtlasNodeType
     NUMATLAS
 };
 
+enum eProjDrawState
+{
+    PROJDRAWSTATE_Nothing,
+    PROJDRAWSTATE_AtlasManager,
+};
+
 #define HYGUIPATH_DataAtlasFileName         "atlasInfo.json"
 #define HYGUIPATH_MetaDataAtlasFileName     "settings.hygui"
 

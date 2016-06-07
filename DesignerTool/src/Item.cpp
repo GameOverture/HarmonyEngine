@@ -10,8 +10,6 @@
 #include "Item.h"
 
 #include "MainWindow.h"
-#include "WidgetRenderer.h"
-
 #include "WidgetSprite.h"
 
 #include <QFileInfo>

@@ -36,6 +36,8 @@ public:
     virtual void initializeGL();
     virtual void paintGL();
     virtual void resizeGL(int w, int h);
+
+    void Shutdown();
 };
 
 #endif // HYGUIRENDERER_H

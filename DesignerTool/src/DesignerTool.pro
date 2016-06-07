@@ -15,7 +15,6 @@ SOURCES += main.cpp \
     DlgNewProject.cpp \
     WidgetExplorer.cpp \
     WidgetOutputLog.cpp \
-    WidgetRenderer.cpp \
     MainWindow.cpp \
     HyGlobal.cpp \
     Item.cpp \
@@ -47,7 +46,6 @@ HEADERS  += \
     DlgNewProject.h \
     WidgetExplorer.h \
     WidgetOutputLog.h \
-    WidgetRenderer.h \
     MainWindow.h \
     HyGlobal.h \
     Item.h \
@@ -77,7 +75,6 @@ FORMS    += \
     DlgNewProject.ui \
     WidgetExplorer.ui \
     WidgetOutputLog.ui \
-    WidgetRenderer.ui \
     MainWindow.ui \
     WidgetGlyphCreator.ui \
     WidgetFontMap.ui \

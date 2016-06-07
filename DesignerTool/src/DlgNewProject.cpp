@@ -34,9 +34,9 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
     ui->txtMetaDataDirName->setValidator(HyGlobal::FileNameValidator());
     ui->txtSourceDirName->setValidator(HyGlobal::FileNameValidator());
     
-    m_sAbsoluteAssetsLocation = sDefaultLocation;
-    m_sAbsoluteMetaDataLocation = sDefaultLocation;
-    m_sAbsoluteSourceLocation = sDefaultLocation;
+    m_sRelativeAssetsLocation.clear();
+    m_sRelativeMetaDataLocation.clear();
+    m_sRelativeSourceLocation.clear();
     
     SetRelativePaths();
 
@@ -62,6 +62,11 @@ QString DlgNewProject::GetProjDirPath()
         return QDir::cleanPath(ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + '/');
     else
         return QDir::cleanPath(ui->txtGameLocation->text() + '/');
+}
+
+bool DlgNewProject::IsCreatingGameDir()
+{
+    return ui->chkCreateGameDir->isChecked();
 }
 
 void DlgNewProject::on_buttonBox_accepted()
@@ -143,29 +148,71 @@ void DlgNewProject::on_txtGameLocation_textChanged(const QString &arg1)
 
 void DlgNewProject::SetRelativePaths()
 {
-    QDir rootLocation(GetProjDirPath());
-    
-    ui->txtAssetsLocation->setText(rootLocation.relativeFilePath(m_sAbsoluteAssetsLocation));
+    QDir assetsDir(m_sRelativeAssetsLocation);
+    if(assetsDir.isAbsolute())
+    {
+        QDir rootLocation(GetProjDirPath());
+        m_sRelativeAssetsLocation = rootLocation.relativeFilePath(m_sRelativeAssetsLocation);
+    }
+    ui->txtAssetsLocation->setText(m_sRelativeAssetsLocation);
     if(ui->txtAssetsLocation->text().isEmpty())
     {
         ui->txtAssetsLocation->setText("./");
-        m_sAbsoluteAssetsLocation = "";
+        m_sRelativeAssetsLocation.clear();
     }
     
-    ui->txtMetaDataLocation->setText(rootLocation.relativeFilePath(m_sAbsoluteMetaDataLocation));
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    QDir metaDir(m_sRelativeMetaDataLocation);
+    if(metaDir.isAbsolute())
+    {
+        QDir rootLocation(GetProjDirPath());
+        m_sRelativeMetaDataLocation = rootLocation.relativeFilePath(m_sRelativeMetaDataLocation);
+    }
+    ui->txtMetaDataLocation->setText(m_sRelativeMetaDataLocation);
     if(ui->txtMetaDataLocation->text().isEmpty())
     {
         ui->txtMetaDataLocation->setText("./");
-        m_sAbsoluteMetaDataLocation = "";
+        m_sRelativeMetaDataLocation = "";
     }
     
-    ui->txtSourceLocation->setText(rootLocation.relativeFilePath(m_sAbsoluteSourceLocation));
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    QDir sourceDir(m_sRelativeSourceLocation);
+    if(sourceDir.isAbsolute())
+    {
+        QDir rootLocation(GetProjDirPath());
+        m_sRelativeSourceLocation = rootLocation.relativeFilePath(m_sRelativeSourceLocation);
+    }
+    ui->txtSourceLocation->setText(m_sRelativeSourceLocation);
     if(ui->txtSourceLocation->text().isEmpty())
     {
         ui->txtSourceLocation->setText("./");
-        m_sAbsoluteSourceLocation = "";
+        m_sRelativeSourceLocation = "";
     }
     
+    ErrorCheck();
+}
+
+void DlgNewProject::on_txtAssetsLocation_textEdited(const QString &arg1)
+{
+    m_sRelativeAssetsLocation = ui->txtAssetsLocation->text();
+
+    SetRelativePaths();
+    ErrorCheck();
+}
+
+void DlgNewProject::on_txtMetaDataLocation_textEdited(const QString &arg1)
+{
+    m_sRelativeMetaDataLocation = ui->txtMetaDataLocation->text();
+
+    SetRelativePaths();
+    ErrorCheck();
+}
+
+void DlgNewProject::on_txtSourceLocation_textEdited(const QString &arg1)
+{
+    m_sRelativeSourceLocation = ui->txtSourceLocation->text();
+
+    SetRelativePaths();
     ErrorCheck();
 }
 
@@ -288,7 +335,7 @@ void DlgNewProject::on_btnBrowseAssets_clicked()
 
     if(pDlg->exec() == QDialog::Accepted)
     {
-        m_sAbsoluteAssetsLocation = pDlg->selectedFiles()[0];
+        m_sRelativeAssetsLocation = pDlg->selectedFiles()[0];
         SetRelativePaths();
     }
 }
@@ -305,7 +352,7 @@ void DlgNewProject::on_btnBrowseMetaData_clicked()
 
     if(pDlg->exec() == QDialog::Accepted)
     {
-        m_sAbsoluteMetaDataLocation = pDlg->selectedFiles()[0];
+        m_sRelativeMetaDataLocation = pDlg->selectedFiles()[0];
         SetRelativePaths();
     }
 }
@@ -322,48 +369,9 @@ void DlgNewProject::on_btnBrowseSource_clicked()
 
     if(pDlg->exec() == QDialog::Accepted)
     {
-        m_sAbsoluteSourceLocation = pDlg->selectedFiles()[0];
+        m_sRelativeSourceLocation = pDlg->selectedFiles()[0];
         SetRelativePaths();
     }
-}
-
-void DlgNewProject::on_txtAssetsLocation_textChanged(const QString &arg1)
-{
-    QDir assetsDir(ui->txtAssetsLocation->text());
-    
-    if(assetsDir.isAbsolute())
-    {
-        m_sAbsoluteAssetsLocation = ui->txtAssetsLocation->text();
-        SetRelativePaths();
-    }
-    
-    ErrorCheck();
-}
-
-void DlgNewProject::on_txtMetaDataLocation_textChanged(const QString &arg1)
-{
-    QDir metaDataDir(ui->txtMetaDataLocation->text());
-    
-    if(metaDataDir.isAbsolute())
-    {
-        m_sAbsoluteMetaDataLocation = ui->txtMetaDataLocation->text();
-        SetRelativePaths();
-    }
-    
-    ErrorCheck();
-}
-
-void DlgNewProject::on_txtSourceLocation_textChanged(const QString &arg1)
-{
-    QDir sourceDir(ui->txtSourceLocation->text());
-    
-    if(sourceDir.isAbsolute())
-    {
-        m_sAbsoluteSourceLocation = ui->txtSourceLocation->text();
-        SetRelativePaths();
-    }
-    
-    ErrorCheck();
 }
 
 void DlgNewProject::on_txtAssetsDirName_textChanged(const QString &arg1)

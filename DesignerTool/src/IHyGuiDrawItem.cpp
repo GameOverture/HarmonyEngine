@@ -16,8 +16,8 @@ IHyGuiDrawItem::IHyGuiDrawItem() :  m_bLoaded(false),
 
 void IHyGuiDrawItem::DrawOpen(IHyApplication &hyApp)
 {
-    if(m_bLoaded)
-        return;
+    //if(m_bLoaded)
+    //    return;
             
     if(m_pCamera == NULL)
         m_pCamera = hyApp.Window().CreateCamera2d();

@@ -14,7 +14,7 @@
    <string>Harmony Designer Tool</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="centralVerticalLayout">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -28,7 +28,39 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="WidgetRenderer" name="renderer" native="true"/>
+     <widget class="QStackedWidget" name="stackedTabWidgets">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>40</height>
+       </size>
+      </property>
+      <widget class="QWidget" name="page">
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QTabWidget" name="tabWidget">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <widget class="QWidget" name="tab">
+           <attribute name="title">
+            <string>Tab 1</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_2">
+           <attribute name="title">
+            <string>Tab 2</string>
+           </attribute>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_2"/>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -547,12 +579,6 @@
    <class>WidgetOutputLog</class>
    <extends>QWidget</extends>
    <header>WidgetOutputLog.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>WidgetRenderer</class>
-   <extends>QWidget</extends>
-   <header>WidgetRenderer.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

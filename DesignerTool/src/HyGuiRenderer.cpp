@@ -8,13 +8,13 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "HyGuiRenderer.h"
+#include "WidgetTabsManager.h"
 
 #include <QTimer>
 //#include <QGLFormat>
 #include <QDir>
 
 #include "HyGlobal.h"
-#include "WidgetRenderer.h"
 #include "ItemProject.h"
 
 HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent),
@@ -36,15 +36,7 @@ HyGuiRenderer::HyGuiRenderer(ItemProject *pProj, QWidget *parent /*= 0*/) : QOpe
 
 HyGuiRenderer::~HyGuiRenderer()
 {
-    if(m_pHyEngine)
-    {
-        m_bIsUpdating = true;
-        m_pHyEngine->Shutdown();
-    }
-    
-    delete m_pHyEngine;
-    m_pHyEngine = NULL;
-    m_bIsUpdating = false;
+    Shutdown();
 }
 
 /*virtual*/ void HyGuiRenderer::initializeGL()
@@ -75,4 +67,17 @@ HyGuiRenderer::~HyGuiRenderer()
 {
     if(m_pProjOwner)
         m_pProjOwner->GetTabsManager()->Window().SetResolution(glm::ivec2(w, h));
+}
+
+void HyGuiRenderer::Shutdown()
+{
+    if(m_pHyEngine)
+    {
+        m_bIsUpdating = true;
+        m_pHyEngine->Shutdown();
+    }
+    
+    delete m_pHyEngine;
+    m_pHyEngine = NULL;
+    m_bIsUpdating = false;
 }

@@ -28,10 +28,12 @@ class MainWindow : public QMainWindow
     static MainWindow * sm_pInstance;
 
     QSettings           m_Settings;
+    QString             m_sDefaultProjectLocation;
 
     bool                m_bIsInitialized;
-    
+
     ItemProject *       m_pCurSelectedProj;
+    HyGuiRenderer *     m_pCurRenderer;
     QMenu *             m_pCurEditMenu;
     
     HyGuiDebugger *     m_pDebugConnection;
@@ -46,7 +48,6 @@ public:
     static void OpenItem(Item *pItem);
     static void CloseItem(Item *pItem);
     
-    // This should only be invoked by the WidgetRenderer
     static void SetCurrentItem(Item *pItem);
     
     static void SetSelectedProj(ItemProject *pProj);

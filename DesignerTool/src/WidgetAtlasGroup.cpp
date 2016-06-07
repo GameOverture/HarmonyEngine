@@ -23,7 +23,6 @@
 
 #include "MainWindow.h"
 #include "WidgetAtlasManager.h"
-#include "WidgetRenderer.h"
 
 void ResetFrame(HyGuiFrame *pFrame);
 
@@ -695,8 +694,6 @@ void WidgetAtlasGroup::Refresh()
 
     ui->atlasList->expandAll();
     ui->atlasList->sortItems(0, Qt::AscendingOrder);
-    
-    pAtlasManager->PreviewAtlasGroup();
 }
 
 QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType)

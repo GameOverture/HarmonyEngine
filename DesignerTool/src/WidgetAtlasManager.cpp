@@ -16,7 +16,6 @@
 #include <QJsonObject>
 
 #include "MainWindow.h"
-#include "WidgetRenderer.h"
 
 WidgetAtlasManager::WidgetAtlasManager(QWidget *parent) :   QWidget(parent),
                                                             ui(new Ui::WidgetAtlasManager)
@@ -129,13 +128,12 @@ void WidgetAtlasManager::SaveData()
 
 void WidgetAtlasManager::PreviewAtlasGroup()
 {
-    m_pProjOwner->SetAtlasGroupDrawState(ui->atlasGroups->currentIndex());
-    MainWindow::OpenItem(m_pProjOwner);
+    m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_AtlasManager);
 }
 
 void WidgetAtlasManager::HideAtlasGroup()
 {
-    MainWindow::CloseItem(m_pProjOwner);
+    m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_Nothing);
 }
 
 /*friend*/ void AtlasManager_DrawOpen(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)

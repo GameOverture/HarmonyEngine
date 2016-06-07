@@ -67,12 +67,18 @@ class HyAssetManager
 		BasicSection		m_csSharedQueue;
 		BasicSection		m_csRetrievalQueue;
 
-		bool				m_bShouldExit;
+		enum eState
+		{
+			STATE_Run = 0,
+			STATE_ShouldExit,
+			STATE_HasExited
+		};
+		eState				m_eState;
 
 		LoadThreadCtrl(queue<IHyData *> &LoadQueueRef_Shared, queue<IHyData *> &LoadQueueRef_Retrieval) :	m_LoadQueueRef_Shared(LoadQueueRef_Shared),
 																											m_LoadQueueRef_Retrieval(LoadQueueRef_Retrieval),
 																											m_WaitEvent_HasNewData(L"Thread Idler", true),
-																											m_bShouldExit(false)
+																											m_eState(STATE_Run)
 		{}
 	};
 	LoadThreadCtrl										m_LoadingCtrl;

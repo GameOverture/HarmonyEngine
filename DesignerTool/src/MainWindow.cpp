@@ -17,6 +17,7 @@
 
 #include "WidgetExplorer.h"
 #include "WidgetAtlasManager.h"
+#include "WidgetTabsManager.h"
 
 #include "ItemSprite.h"
 
@@ -37,10 +38,18 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
                                             ui(new Ui::MainWindow),
                                             m_Settings("Overture Games", "Harmony Designer Tool"),
                                             m_bIsInitialized(false),
+                                            m_pCurSelectedProj(NULL),
+                                            m_pCurRenderer(NULL),
                                             m_pCurEditMenu(NULL)
 {
     ui->setupUi(this);
     sm_pInstance = this;
+
+    while(ui->stackedTabWidgets->count())
+        ui->stackedTabWidgets->removeWidget(ui->stackedTabWidgets->currentWidget());
+
+    m_pCurRenderer = new HyGuiRenderer(NULL, this);
+    ui->centralVerticalLayout->addWidget(m_pCurRenderer);
     
     SetSelectedProj(NULL);
 
@@ -134,6 +143,15 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     }
     m_Settings.endGroup();
 
+    m_Settings.beginGroup("Misc");
+    {
+        m_sDefaultProjectLocation = m_Settings.value("defaultProjectLocation").toString();
+        QDir defaultProjDir(m_sDefaultProjectLocation);
+        if(m_sDefaultProjectLocation.isEmpty() || defaultProjDir.exists() == false)
+            m_sDefaultProjectLocation = QDir::current().path();
+    }
+    m_Settings.endGroup();
+
     // Restore opened items/tabs
 
     // Append version to window title
@@ -166,19 +184,22 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 // This only requests to the WidgetRenderer to open the item. It will eventually do so, after re-loading any resources it needs to
 /*static*/ void MainWindow::OpenItem(Item *pItem)
 {
-    sm_pInstance->ui->renderer->OpenItem(pItem);
-    
-    if(pItem->GetType() != ITEM_Project)
-        sm_pInstance->ui->explorer->SelectItem(pItem);
+    if(pItem == NULL || pItem->GetType() == ITEM_Project)
+        return;
+
+    sm_pInstance->ui->explorer->GetCurProjSelected()->GetTabsManager()->OpenItem(pItem);
+    sm_pInstance->ui->explorer->SelectItem(pItem);
 }
 
 /*static*/ void MainWindow::CloseItem(Item *pItem)
 {
+    if(pItem == NULL || pItem->GetType() == ITEM_Project)
+        return;
+
     // TODO: Ask to save file if changes have been made
-    sm_pInstance->ui->renderer->CloseItem(pItem);
+    sm_pInstance->ui->explorer->GetCurProjSelected()->GetTabsManager()->CloseItem(pItem);
 }
 
-// This should only be invoked by the WidgetRenderer
 /*static*/ void MainWindow::SetCurrentItem(Item *pItem)
 {
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
@@ -206,15 +227,39 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     if(sm_pInstance->m_pCurSelectedProj == pProj)
         return;
     
+    CloseItem(sm_pInstance->m_pCurSelectedProj);
     sm_pInstance->m_pCurSelectedProj = pProj;
 
     if(sm_pInstance->m_pCurSelectedProj)
     {
         if(QDir::setCurrent(sm_pInstance->m_pCurSelectedProj->GetDirPath()) == false)
             HyGuiLog("QDir::setCurrent() failed to set project at (" % sm_pInstance->m_pCurSelectedProj->GetDirPath() % ")", LOGTYPE_Normal);
+
+        bool bTabsFound = false;
+        for(int i = 0; i < sm_pInstance->ui->stackedTabWidgets->count(); ++i)
+        {
+            if(sm_pInstance->ui->stackedTabWidgets->widget(i) == pProj->GetTabsManager())
+            {
+                sm_pInstance->ui->stackedTabWidgets->setCurrentIndex(i);
+                bTabsFound = true;
+            }
+        }
+
+        if(bTabsFound == false)
+        {
+            sm_pInstance->ui->stackedTabWidgets->addWidget(pProj->GetTabsManager());
+            sm_pInstance->ui->stackedTabWidgets->setCurrentWidget(pProj->GetTabsManager());
+        }
     }
 
-    sm_pInstance->ui->renderer->LoadItemProject(sm_pInstance->m_pCurSelectedProj);
+    // Swap the harmony engine renderers
+    sm_pInstance->m_pCurRenderer->Shutdown();
+    HyGuiRenderer *pNewRenderer = new HyGuiRenderer(pProj, sm_pInstance);
+    sm_pInstance->ui->centralVerticalLayout->replaceWidget(sm_pInstance->m_pCurRenderer, pNewRenderer);
+    delete sm_pInstance->m_pCurRenderer;
+    sm_pInstance->m_pCurRenderer = pNewRenderer;
+
+    //sm_pInstance->ui->renderer->LoadItemProject(sm_pInstance->m_pCurSelectedProj);
 
     if(sm_pInstance->m_pCurSelectedProj)
     {
@@ -229,6 +274,8 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 /*static*/ void MainWindow::ReloadHarmony()
 {
+    CloseItem(sm_pInstance->m_pCurSelectedProj);
+
     ItemProject *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
     sm_pInstance->m_pCurSelectedProj = NULL;    // Set m_pCurSelectedProj to 'NULL' so SetSelectedProj() doesn't imediately return
     
@@ -237,9 +284,16 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 void MainWindow::on_actionNewProject_triggered()
 {
-    DlgNewProject *pDlg = new DlgNewProject(QDir::current().path(), this);
-    if(pDlg->exec())
+    DlgNewProject *pDlg = new DlgNewProject(m_sDefaultProjectLocation, this);
+    if(pDlg->exec() == QDialog::Accepted)
     {
+        if(pDlg->IsCreatingGameDir())
+        {
+            QDir defaultProjDir(pDlg->GetProjDirPath());
+            defaultProjDir.cdUp();
+            m_sDefaultProjectLocation = defaultProjDir.absolutePath();
+        }
+
         ui->explorer->AddItemProject(pDlg->GetProjFilePath());
     }
     delete pDlg;
@@ -319,6 +373,12 @@ void MainWindow::SaveSettings()
         m_Settings.setValue("openProjs", QVariant(ui->explorer->GetOpenProjectPaths()));
         
         //m_Settings.setValue("openItems", QVariant(ui->renderer->GetOpenItemPaths()));
+    }
+    m_Settings.endGroup();
+
+    m_Settings.beginGroup("Misc");
+    {
+        m_Settings.setValue("defaultProjectLocation", QVariant(m_sDefaultProjectLocation));
     }
     m_Settings.endGroup();
 }

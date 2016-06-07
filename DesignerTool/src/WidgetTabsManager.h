@@ -40,7 +40,6 @@ class WidgetTabsManager : public QWidget, public IHyApplication
     Q_OBJECT
 
     ItemProject *       m_pProjOwner;
-    bool                m_bOverrideDrawWithProj;
 
     enum eQueuedAction
     {
@@ -67,9 +66,6 @@ private:
     Ui::WidgetTabsManager *ui;
 
     Item *GetItem(int iIndex = -1);
-    
-    // Do not invoke this function outside of Update()
-    void ShowItem(Item *pItem);
 
 private slots:
     void on_tabWidget_currentChanged(int index);
