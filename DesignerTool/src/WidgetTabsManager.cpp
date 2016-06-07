@@ -39,16 +39,6 @@ WidgetTabsManager::~WidgetTabsManager()
     delete ui;
 }
 
-void WidgetTabsManager::OpenItem(Item *pItem)
-{
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(pItem, QUEUEDITEM_Open));
-}
-
-void WidgetTabsManager::CloseItem(Item *pItem)
-{
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(pItem, QUEUEDITEM_Close));
-}
-
 // IHyApplication override
 /*virtual*/ bool WidgetTabsManager::Initialize()
 {
@@ -132,6 +122,16 @@ void WidgetTabsManager::CloseItem(Item *pItem)
 /*virtual*/ bool WidgetTabsManager::Shutdown()
 {
     return true;
+}
+
+void WidgetTabsManager::OpenItem(Item *pItem)
+{
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(pItem, QUEUEDITEM_Open));
+}
+
+void WidgetTabsManager::CloseItem(Item *pItem)
+{
+    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(pItem, QUEUEDITEM_Close));
 }
 
 void WidgetTabsManager::on_tabWidget_currentChanged(int index)

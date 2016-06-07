@@ -53,14 +53,14 @@ public:
     explicit WidgetTabsManager(QWidget *parent = 0);
     explicit WidgetTabsManager(ItemProject *pProjOwner, QWidget *parent = 0);
     ~WidgetTabsManager();
-    
-    void OpenItem(Item *pItem);
-    void CloseItem(Item *pItem);
 
     // IHyApplication overrides
     virtual bool Initialize();
     virtual bool Update();
     virtual bool Shutdown();
+    
+    void OpenItem(Item *pItem);
+    void CloseItem(Item *pItem);
 
 private:
     Ui::WidgetTabsManager *ui;
