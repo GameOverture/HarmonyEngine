@@ -120,8 +120,8 @@ QString ItemProject::GetDirPath() const
                 DrawOpen(hyApp);
                 m_bDrawStateLoaded[m_eDrawState] = true;
             }
-            else
-                DrawShow(hyApp);
+
+            DrawShow(hyApp);
         }
     }
     
