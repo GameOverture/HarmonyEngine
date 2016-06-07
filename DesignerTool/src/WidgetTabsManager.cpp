@@ -151,6 +151,8 @@ void WidgetTabsManager::CloseItem(Item *pItem)
         }
     }
 
+    if(m_pProjOwner->
+
     if(GetItem())
         GetItem()->DrawUpdate(*this);
 

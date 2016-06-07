@@ -107,3 +107,5 @@ bool ItemProject::IsOverrideDraw()
 {
     return (m_eDrawState != PROJDRAWSTATE_Nothing);
 }
+
+bool ItemProject::WasOverrideDraw
