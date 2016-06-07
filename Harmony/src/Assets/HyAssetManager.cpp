@@ -48,7 +48,7 @@ HyAssetManager::~HyAssetManager()
 	m_LoadingCtrl.m_bShouldExit = true;
 	m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
 
-	HyAssert(IsShutdown() == false, "Tried to destruct the HyAssetManager while data still exists");
+	HyAssert(IsShutdown(), "Tried to destruct the HyAssetManager while data still exists");
 }
 
 void HyAssetManager::Update()

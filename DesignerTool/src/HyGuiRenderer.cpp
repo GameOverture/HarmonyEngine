@@ -37,8 +37,14 @@ HyGuiRenderer::HyGuiRenderer(ItemProject *pProj, QWidget *parent /*= 0*/) : QOpe
 HyGuiRenderer::~HyGuiRenderer()
 {
     if(m_pHyEngine)
+    {
+        m_bIsUpdating = true;
         m_pHyEngine->Shutdown();
+    }
+    
     delete m_pHyEngine;
+    m_pHyEngine = NULL;
+    m_bIsUpdating = false;
 }
 
 /*virtual*/ void HyGuiRenderer::initializeGL()
