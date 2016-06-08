@@ -144,6 +144,8 @@ public:
     explicit WidgetAtlasGroup(QWidget *parent = 0);
     explicit WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent = 0);
     ~WidgetAtlasGroup();
+    
+    bool IsMatching(QDir metaDir, QDir dataDir);
 
     void GetAtlasInfo(QJsonObject &atlasObj);
     
@@ -156,6 +158,8 @@ public:
     friend void AtlasGroup_DrawUpdate(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp);
 
     void ResizeAtlasListColumns();
+    
+    void Reload();
 
 private slots:
     void on_btnAddImages_clicked();

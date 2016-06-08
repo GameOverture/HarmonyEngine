@@ -46,75 +46,21 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
 
     ui->atlasList->setSelectionMode(QAbstractItemView::MultiSelection);
     ui->atlasList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    QFile metaAtlasFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaDataAtlasFileName));
-    if(metaAtlasFile.exists())
-    {
-        if(!metaAtlasFile.open(QIODevice::ReadOnly))
-        {
-            QString sErrorMsg("WidgetAtlasGroup::WidgetAtlasGroup() could not open ");
-            sErrorMsg += HYGUIPATH_MetaDataAtlasFileName;
-            HyGuiLog(sErrorMsg, LOGTYPE_Error);
-        }
-
-        //QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
-        QJsonDocument settingsDoc = QJsonDocument::fromJson(metaAtlasFile.readAll());
-        metaAtlasFile.close();
-
-        QJsonObject settingsObj = settingsDoc.object();
-        m_dlgSettings.LoadSettings(settingsObj);
-
-        QJsonArray frameArray = settingsObj["frames"].toArray();
-        for(int i = 0; i < frameArray.size(); ++i)
-        {
-            QJsonObject frameObj = frameArray[i].toObject();
-
-            QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-            HyGuiFrame *pNewFrame = new HyGuiFrame(frameObj["hash"].toInt(),
-                                                   frameObj["name"].toString(),
-                                                   rAlphaCrop,
-                                                   GetId(),
-                                                   frameObj["width"].toInt(),
-                                                   frameObj["height"].toInt(),
-                                                   frameObj["textureIndex"].toInt(),
-                                                   frameObj["rotate"].toBool(),
-                                                   frameObj["x"].toInt(),
-                                                   frameObj["y"].toInt());
-
-            QJsonArray frameLinksArray = frameObj["links"].toArray();
-            for(int k = 0; k < frameLinksArray.size(); ++k)
-                pNewFrame->SetLink(frameLinksArray[k].toString());
-
-            eAtlasNodeType eIconType = ATLAS_Frame_Warning;
-            int iTexIndex = frameObj["textureIndex"].toInt();
-            if(iTexIndex >= 0)
-            {
-                //while(m_TextureList.empty() || m_TextureList.size() <= frameObj["textureIndex"].toInt())
-                //    m_TextureList.append(CreateTreeItem(NULL, "Texture: " % QString::number(m_TextureList.size()), ATLAS_Texture));
-
-                //pTextureTreeItem = m_TextureList[];
-                eIconType = ATLAS_Frame;
-            }
-
-            pNewFrame->SetTreeWidgetItem(CreateTreeItem(NULL, frameObj["name"].toString(), iTexIndex, eIconType));
-            
-            m_FrameList.append(pNewFrame);
-        }
-
-        ui->groupBox->setTitle(m_dlgSettings.GetName());
-
-        ui->atlasList->sortItems(0, Qt::AscendingOrder);
-        ui->atlasList->expandAll();
-    }
+    
+    Reload();
 }
 
 WidgetAtlasGroup::~WidgetAtlasGroup()
 {
     delete ui;
 
-	// TODO: This crashes, but does it leak when I don't?
-    //for(int i = 0; i < m_FrameList.size(); ++i)
-    //    delete m_FrameList[i];
+    for(int i = 0; i < m_FrameList.size(); ++i)
+        delete m_FrameList[i];
+}
+
+bool WidgetAtlasGroup::IsMatching(QDir metaDir, QDir dataDir)
+{
+    return (m_MetaDir == metaDir && m_DataDir == dataDir);
 }
 
 void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObj)
@@ -367,6 +313,72 @@ void WidgetAtlasGroup::ResizeAtlasListColumns()
     ui->atlasList->setColumnWidth(0, iTotalWidth - 60);
 }
 
+void WidgetAtlasGroup::Reload()
+{
+    for(int i = 0; i < m_FrameList.size(); ++i)
+        delete m_FrameList[i];
+    
+    m_FrameList.clear();
+    ui->atlasList->clear();
+	m_pMouseHoverItem = NULL;
+
+    QFile metaAtlasFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaDataAtlasFileName));
+    if(metaAtlasFile.exists())
+    {
+        if(!metaAtlasFile.open(QIODevice::ReadOnly))
+            HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaDataAtlasFileName, LOGTYPE_Error);
+
+        //QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
+        QJsonDocument settingsDoc = QJsonDocument::fromJson(metaAtlasFile.readAll());
+        metaAtlasFile.close();
+
+        QJsonObject settingsObj = settingsDoc.object();
+        m_dlgSettings.LoadSettings(settingsObj);
+
+        QJsonArray frameArray = settingsObj["frames"].toArray();
+        for(int i = 0; i < frameArray.size(); ++i)
+        {
+            QJsonObject frameObj = frameArray[i].toObject();
+
+            QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
+            HyGuiFrame *pNewFrame = new HyGuiFrame(frameObj["hash"].toInt(),
+                                                   frameObj["name"].toString(),
+                                                   rAlphaCrop,
+                                                   GetId(),
+                                                   frameObj["width"].toInt(),
+                                                   frameObj["height"].toInt(),
+                                                   frameObj["textureIndex"].toInt(),
+                                                   frameObj["rotate"].toBool(),
+                                                   frameObj["x"].toInt(),
+                                                   frameObj["y"].toInt());
+
+            QJsonArray frameLinksArray = frameObj["links"].toArray();
+            for(int k = 0; k < frameLinksArray.size(); ++k)
+                pNewFrame->SetLink(frameLinksArray[k].toString());
+
+            eAtlasNodeType eIconType = ATLAS_Frame_Warning;
+            int iTexIndex = frameObj["textureIndex"].toInt();
+            if(iTexIndex >= 0)
+            {
+                //while(m_TextureList.empty() || m_TextureList.size() <= frameObj["textureIndex"].toInt())
+                //    m_TextureList.append(CreateTreeItem(NULL, "Texture: " % QString::number(m_TextureList.size()), ATLAS_Texture));
+
+                //pTextureTreeItem = m_TextureList[];
+                eIconType = ATLAS_Frame;
+            }
+
+            pNewFrame->SetTreeWidgetItem(CreateTreeItem(NULL, frameObj["name"].toString(), iTexIndex, eIconType));
+            
+            m_FrameList.append(pNewFrame);
+        }
+
+        ui->groupBox->setTitle(m_dlgSettings.GetName());
+
+        ui->atlasList->sortItems(0, Qt::AscendingOrder);
+        ui->atlasList->expandAll();
+    }
+}
+
 void WidgetAtlasGroup::on_btnAddImages_clicked()
 {
     QFileDialog dlg(this);
@@ -531,7 +543,7 @@ void WidgetAtlasGroup::Refresh()
         if(imgInfoRef.duplicateId != NULL && m_Packer.merge)
             continue;
 
-        if(imgInfoRef.pos.x() == 999999)    // This is scriptum image packer's indication of an invalid image...
+        if(imgInfoRef.pos.x() == 999999)    // This is scriptum image packer's (dumb) indication of an invalid image...
             bValid = false;
 
         HyGuiFrame *pFrame = reinterpret_cast<HyGuiFrame *>(imgInfoRef.id);

@@ -34,6 +34,15 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
 {
     ui->setupUi(this);
     
+    while(ui->atlasGroups->currentWidget())
+        delete ui->atlasGroups->currentWidget();
+    
+    if(m_MetaDir.exists() == false)
+        HyGuiLog("Meta atlas directory is missing!", LOGTYPE_Error);
+
+    if(m_DataDir.exists() == false)
+        HyGuiLog("Data atlas directory is missing!", LOGTYPE_Error);
+    
     Reload();
 }
 
@@ -110,20 +119,6 @@ void WidgetAtlasManager::HideAtlasGroup()
 
 void WidgetAtlasManager::Reload()
 {
-    while(ui->atlasGroups->currentWidget())
-        delete ui->atlasGroups->currentWidget();//ui->atlasGroups->removeWidget(ui->atlasGroups->currentWidget());
-
-    if(m_MetaDir.exists() == false)
-    {
-        HyGuiLog("Meta atlas directory is missing!", LOGTYPE_Error);
-        return;
-    }
-    if(m_DataDir.exists() == false)
-    {
-        HyGuiLog("Data atlas directory is missing!", LOGTYPE_Error);
-        return;
-    }
-
     QFileInfoList metaAtlasDirs = m_MetaDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     if(metaAtlasDirs.empty())
     {
@@ -172,13 +167,36 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
     }
     
     QDir newMetaAtlasDir(m_MetaDir);
-    newMetaAtlasDir.cd(HyGlobal::MakeFileNameFromCounter(iId));
+    if(newMetaAtlasDir.cd(HyGlobal::MakeFileNameFromCounter(iId)) == false)
+    {
+        HyGuiLog("Failed to 'cd' into meta-atlas group directory: " + iId, LOGTYPE_Error);
+        return;
+    }
 
     QDir newDataAtlasDir(m_DataDir);
-    newDataAtlasDir.cd(HyGlobal::MakeFileNameFromCounter(iId));
-
-    WidgetAtlasGroup *pNewAtlas = new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this);
-    ui->atlasGroups->setCurrentIndex(ui->atlasGroups->addWidget(pNewAtlas));
+    if(newDataAtlasDir.cd(HyGlobal::MakeFileNameFromCounter(iId)) == false)
+    {
+        HyGuiLog("Failed to 'cd' into data-atlas group directory: " + iId, LOGTYPE_Error);
+        return;
+    }
+    
+    bool bGroupAlreadyExists = false;
+    for(int i = 0; i < ui->atlasGroups->count(); ++i)
+    {
+        if(static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->IsMatching(newMetaAtlasDir, newDataAtlasDir))
+        {
+            static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->Reload();
+            
+            bGroupAlreadyExists = true;
+            break;
+        }
+    }
+    
+    if(bGroupAlreadyExists == false)
+    {
+        WidgetAtlasGroup *pNewAtlas = new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this);
+        ui->atlasGroups->setCurrentIndex(ui->atlasGroups->addWidget(pNewAtlas));
+    }
 }
 
 void WidgetAtlasManager::on_atlasGroups_currentChanged(int iIndex)
