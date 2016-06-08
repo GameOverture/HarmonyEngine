@@ -46,6 +46,8 @@ public:
     friend void AtlasManager_DrawHide(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
 
+    void Reload();
+
 private slots:
     void on_atlasGroups_currentChanged(int iIndex);
 

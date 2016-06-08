@@ -111,6 +111,10 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
 WidgetAtlasGroup::~WidgetAtlasGroup()
 {
     delete ui;
+
+	// TODO: This crashes, but does it leak when I don't?
+    //for(int i = 0; i < m_FrameList.size(); ++i)
+    //    delete m_FrameList[i];
 }
 
 void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObj)
@@ -648,7 +652,11 @@ void WidgetAtlasGroup::Refresh()
     {
         QImage *pTexture = static_cast<QImage *>(ppPainters[i]->device());
         pTexture->save(m_DataDir.absolutePath() % "/" % HyGlobal::MakeFileNameFromCounter(i) % ".png");
+
+        delete ppPainters[i];
+        delete pTexture;
     }
+    delete [] ppPainters;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // WRITE SETTINGS FILE TO ATLAS META DIR

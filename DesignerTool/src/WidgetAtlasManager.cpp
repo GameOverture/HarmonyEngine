@@ -34,61 +34,7 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
 {
     ui->setupUi(this);
     
-    while(ui->atlasGroups->currentWidget())
-        ui->atlasGroups->removeWidget(ui->atlasGroups->currentWidget());
-
-    if(m_MetaDir.exists() == false)
-    {
-        HyGuiLog("Meta atlas directory is missing!", LOGTYPE_Error);
-        return;
-    }
-    if(m_DataDir.exists() == false)
-    {
-        HyGuiLog("Data atlas directory is missing!", LOGTYPE_Error);
-        return;
-    }
-
-    QFileInfoList metaAtlasDirs = m_MetaDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
-    if(metaAtlasDirs.empty())
-    {
-        HyGuiLog("Empty atlas directory, creating new empty group", LOGTYPE_Info);
-        AddAtlasGroup();
-    }
-    else
-    {
-        foreach(QFileInfo dir, metaAtlasDirs)
-        {
-            if(dir.isDir())
-            {
-                bool bWorked = false;
-                int iId = dir.baseName().toInt(&bWorked);
-
-                if(bWorked && iId >= 0)
-                    AddAtlasGroup(iId);
-            }
-        }
-    }
-
-
-
-//    // Find atlasInfo.json file
-//    for(unsigned int i = 0; i < atlasDirs.size(); ++i)
-//    {
-//        if(atlasFiles[i].isFile())
-//        {
-//            if(atlasFiles[i].fileName().toLower() == QString(HYGUIPATH_DataAtlasFileName).toLower())
-//            {
-//                QFile dataFile(atlasGrpSettings.absoluteFilePath());
-//                QJsonDocument atlasInfoDoc = QJsonDocument::fromJson(dataFile.readAll());
-
-//                QJsonArray atlasGrpArray = atlasInfoDoc.array();
-//                foreach(const QJsonValue atlasGrp, atlasGrpArray)
-//                {
-//                    atlasGrp.toObject();
-//                }
-//            }
-//        }
-//    }
+    Reload();
 }
 
 WidgetAtlasManager::~WidgetAtlasManager()
@@ -160,6 +106,44 @@ void WidgetAtlasManager::HideAtlasGroup()
 /*friend*/ void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
 {
     AtlasGroup_DrawUpdate(atlasMan.m_pProjOwner, hyApp, *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget()));
+}
+
+void WidgetAtlasManager::Reload()
+{
+    while(ui->atlasGroups->currentWidget())
+        delete ui->atlasGroups->currentWidget();//ui->atlasGroups->removeWidget(ui->atlasGroups->currentWidget());
+
+    if(m_MetaDir.exists() == false)
+    {
+        HyGuiLog("Meta atlas directory is missing!", LOGTYPE_Error);
+        return;
+    }
+    if(m_DataDir.exists() == false)
+    {
+        HyGuiLog("Data atlas directory is missing!", LOGTYPE_Error);
+        return;
+    }
+
+    QFileInfoList metaAtlasDirs = m_MetaDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    if(metaAtlasDirs.empty())
+    {
+        HyGuiLog("Empty atlas directory, creating new empty group", LOGTYPE_Info);
+        AddAtlasGroup();
+    }
+    else
+    {
+        foreach(QFileInfo dir, metaAtlasDirs)
+        {
+            if(dir.isDir())
+            {
+                bool bWorked = false;
+                int iId = dir.baseName().toInt(&bWorked);
+
+                if(bWorked && iId >= 0)
+                    AddAtlasGroup(iId);
+            }
+        }
+    }
 }
 
 void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
