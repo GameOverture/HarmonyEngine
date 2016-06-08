@@ -64,6 +64,8 @@ public:
     
     void SetOverrideDrawState(eProjDrawState eDrawState);
     bool IsOverrideDraw();
+
+    void Reset();
 };
 
 #endif // ITEMPROJECT_H

@@ -138,3 +138,9 @@ bool ItemProject::IsOverrideDraw()
 {
     return (m_eDrawState != PROJDRAWSTATE_Nothing || m_ePrevDrawState != PROJDRAWSTATE_Nothing || m_DrawStateQueue.empty() == false);
 }
+
+void ItemProject::Reset()
+{
+    for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
+        m_bDrawStateLoaded[i] = false;
+}
