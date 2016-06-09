@@ -15,7 +15,7 @@
 #include <QMouseEvent>
 
 #include "ItemProject.h"
-#include "WidgetAtlasGroup.h"\
+#include "WidgetAtlasGroup.h"
 
 namespace Ui {
 class WidgetAtlasManager;
@@ -29,6 +29,8 @@ class WidgetAtlasManager : public QWidget
 
     QDir                            m_MetaDir;
     QDir                            m_DataDir;
+    
+    QTreeWidgetItem *               m_pMouseHoverItem;
 
 public:
     explicit WidgetAtlasManager(QWidget *parent = 0);

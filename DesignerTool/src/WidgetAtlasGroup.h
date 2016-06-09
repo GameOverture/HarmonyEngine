@@ -121,6 +121,14 @@ public:
         
         return sMetaImgName;
     }
+    
+    void Reset()
+    {
+        SetEnabled(false);
+        SetDisplayOrder(0);
+        color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+        SetCoordinateType(HYCOORDTYPE_Screen, NULL);
+    }
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)
 
@@ -137,25 +145,19 @@ class WidgetAtlasGroup : public QWidget
     QList<HyGuiFrame *>         m_FrameList;
     ImagePacker                 m_Packer;
 
-    bool                        m_bRefreshDrawUpdate;
-    QTreeWidgetItem *           m_pMouseHoverItem;
-
 public:
     explicit WidgetAtlasGroup(QWidget *parent = 0);
     explicit WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent = 0);
     ~WidgetAtlasGroup();
     
     bool IsMatching(QDir metaDir, QDir dataDir);
+    
+    QList<HyGuiFrame *> &GetFrameList();
+    QTreeWidget *GetTreeWidget();
 
     void GetAtlasInfo(QJsonObject &atlasObj);
     
     int GetId();
-
-    friend void AtlasGroup_DrawOpen(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp);
-    friend void AtlasGroup_DrawClose(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp);
-    friend void AtlasGroup_DrawShow(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp);
-    friend void AtlasGroup_DrawHide(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp);
-    friend void AtlasGroup_DrawUpdate(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp);
 
     void ResizeAtlasListColumns();
     

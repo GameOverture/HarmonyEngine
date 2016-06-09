@@ -16,6 +16,7 @@
 #include <QAction>
 #include <QStringBuilder>
 #include <QDir>
+#include <QTreeWidgetItem>
 
 #include "WidgetOutputLog.h"
 
@@ -264,6 +265,14 @@ public:
         sNewString.sprintf("%05d", iCount);
 
         return sNewString;
+    }
+};
+
+struct SortTreeWidgetsPredicate
+{
+    bool operator()(const QTreeWidgetItem *pA, const QTreeWidgetItem *pB) const
+    {
+        return QString::compare(pA->text(0), pB->text(0)) < 0;
     }
 };
 

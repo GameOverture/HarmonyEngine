@@ -17,6 +17,33 @@
 
 #include "MainWindow.h"
 
+const float fTRANS_DUR = 0.5f;
+const int iPADDING = 2;
+
+struct PreviewRow
+{
+    QList<HyGuiFrame *> m_Frames;
+    int                 m_iLargestHeight;
+
+    void Clear()
+    {
+        m_Frames.clear();
+        m_iLargestHeight = 0;
+    }
+
+    void TweenPosY(int iStartPosY)
+    {
+        float fMidRow = (m_iLargestHeight * 0.5f);
+        float fPosY = 0.0f;
+        foreach(HyGuiFrame *pFrame, m_Frames)
+        {
+            fPosY = iStartPosY - (pFrame->GetHeight() * 0.5f) - fMidRow;
+            if(pFrame->pos.AnimY().IsTransforming() == false && pFrame->pos.Y() != fPosY)
+                pFrame->pos.AnimY().Tween(fPosY, fTRANS_DUR, HyTween::QuadInOut);
+        }
+    }
+};
+
 WidgetAtlasManager::WidgetAtlasManager(QWidget *parent) :   QWidget(parent),
                                                             ui(new Ui::WidgetAtlasManager)
 {
@@ -30,7 +57,8 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
                                                                                              ui(new Ui::WidgetAtlasManager),
                                                                                              m_pProjOwner(pProjOwner),
                                                                                              m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
-                                                                                             m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases))
+                                                                                             m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
+                                                                                             m_pMouseHoverItem(NULL)
 {
     ui->setupUi(this);
     
@@ -93,32 +121,171 @@ void WidgetAtlasManager::HideAtlasGroup()
 
 /*friend*/ void AtlasManager_DrawOpen(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
 {
-    AtlasGroup_DrawOpen(atlasMan.m_pProjOwner, hyApp, *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget()));
+    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget());
+    
+    foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
+    {
+        pFrame->Load();
+        pFrame->Reset();
+    }
+
+    atlasGrp.ResizeAtlasListColumns();
 }
 
 /*friend*/ void AtlasManager_DrawClose(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
 {
-    AtlasGroup_DrawClose(atlasMan.m_pProjOwner, hyApp, *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget()));
+    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget());
+    
+    foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
+         pFrame->Unload();
 }
 
 /*friend*/ void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
 {
-    AtlasGroup_DrawShow(atlasMan.m_pProjOwner, hyApp, *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget()));
 }
 
 /*friend*/ void AtlasManager_DrawHide(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
 {
     for(int i = 0; i < atlasMan.ui->atlasGroups->count(); ++i)
-        AtlasGroup_DrawHide(atlasMan.m_pProjOwner, hyApp, *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->widget(i)));
+    {
+        WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->widget(i));
+        
+        foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
+            pFrame->SetEnabled(false);
+    }
 }
 
 /*friend*/ void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
 {
-    AtlasGroup_DrawUpdate(atlasMan.m_pProjOwner, hyApp, *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget()));
+    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget());
+    
+    static int DEBUGCNT = 0;
+    DEBUGCNT++;
+    bool bDebugPrint = false;
+    if((DEBUGCNT % 100) == 0)
+    {
+        bDebugPrint = true;
+        DEBUGCNT = 0;
+    }
+
+    const uint32 uiRENDERWIDTH = hyApp.Window().GetResolution().x;
+    const uint32 uiRENDERHEIGHT = hyApp.Window().GetResolution().y;
+    
+    if(atlasMan.m_pMouseHoverItem && atlasMan.m_pMouseHoverItem->isSelected())
+        atlasMan.m_pMouseHoverItem = NULL;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Preview hover selection
+    QTreeWidgetItem *pHoveredItem = atlasGrp.GetTreeWidget()->itemAt(atlasGrp.GetTreeWidget()->mapFromGlobal(QCursor::pos()));
+    if(pHoveredItem && atlasMan.m_pMouseHoverItem != pHoveredItem && pHoveredItem->isSelected() == false)
+    {
+        if(atlasMan.m_pMouseHoverItem && atlasMan.m_pMouseHoverItem->isSelected() == false)
+        {
+            QVariant v = atlasMan.m_pMouseHoverItem->data(0, QTreeWidgetItem::UserType);
+            HyGuiFrame *pHoverFrame = v.value<HyGuiFrame *>();
+            if(pHoverFrame)
+                pHoverFrame->Reset();
+        }
+
+        atlasMan.m_pMouseHoverItem = pHoveredItem;
+
+        QVariant v = atlasMan.m_pMouseHoverItem->data(0, QTreeWidgetItem::UserType);
+        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
+
+        pFrame->SetEnabled(true);
+        pFrame->SetDisplayOrder(100);
+        pFrame->pos.Set((uiRENDERWIDTH * 0.5f) + (pFrame->GetWidth() * -0.5f),
+                        (uiRENDERHEIGHT * 0.5f) + (pFrame->GetHeight() * -0.5f));
+        pFrame->color.A(0.5f);
+    }
+    else if(atlasMan.m_pMouseHoverItem != pHoveredItem)
+        atlasMan.m_pMouseHoverItem = NULL;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Reset all frames (except hover) incase any frames got unselected. They will be enabled if selected below
+    HyGuiFrame *pHoveredFrame = NULL;
+
+    if(atlasMan.m_pMouseHoverItem)
+    {
+        QVariant v = atlasMan.m_pMouseHoverItem->data(0, QTreeWidgetItem::UserType);
+        pHoveredFrame = v.value<HyGuiFrame *>();
+    }
+
+    foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
+    {
+        if(pHoveredFrame != pFrame && pFrame)
+            pFrame->Reset();
+    }
+    
+    if(bDebugPrint)
+        HyGuiLog(QString::number(reinterpret_cast<qulonglong>(atlasMan.m_pMouseHoverItem)), LOGTYPE_Normal);
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Display all selected
+
+    QPoint ptDrawPos(0, 0);
+    PreviewRow curRow;
+    curRow.Clear();
+
+    QList<QTreeWidgetItem *> selectedItems = atlasGrp.GetTreeWidget()->selectedItems();
+    qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
+    
+    for(int i = 0; i < selectedItems.size(); ++i)
+    {
+        QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
+        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
+
+        if(pFrame == NULL)
+            continue;
+
+        pFrame->SetEnabled(true);
+        pFrame->color.A(1.0f);
+        pFrame->SetDisplayOrder(-0x0FFFFFFF + i);
+
+        float fFrameWidth = pFrame->IsRotated() ? pFrame->GetHeight() : pFrame->GetWidth();
+        float fFrameHeight = pFrame->IsRotated() ? pFrame->GetWidth() : pFrame->GetHeight();
+
+        // Will it fit in this row
+        if(ptDrawPos.x() + fFrameWidth > uiRENDERWIDTH)
+        {
+            curRow.TweenPosY(uiRENDERHEIGHT - ptDrawPos.y());
+            
+            ptDrawPos.setX(0);
+            ptDrawPos.setY(ptDrawPos.y() + curRow.m_iLargestHeight + iPADDING);
+            
+            curRow.Clear();
+        }
+        
+        float fPosX = ptDrawPos.x() + (pFrame->IsRotated() ? ((fFrameWidth * 0.5f) - (fFrameHeight * 0.5f)) : 0);
+        
+        if(pFrame->pos.AnimX().IsTransforming() == false && pFrame->pos.X() != ptDrawPos.x())
+            pFrame->pos.AnimX().Tween(fPosX, fTRANS_DUR, HyTween::QuadInOut);
+
+        ptDrawPos.setX(ptDrawPos.x() + fFrameWidth + iPADDING);
+
+        if(curRow.m_iLargestHeight < fFrameHeight)
+            curRow.m_iLargestHeight = fFrameHeight;
+
+        curRow.m_Frames.append(pFrame);
+    }
+    
+    curRow.TweenPosY(uiRENDERHEIGHT - ptDrawPos.y());
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //QPointF ptCamPos(uiCurWidth * 0.5f, uiCurHeight * 0.5f);
+
+    // Pan camera over previewed
+    //HyGuiLog("Hover: " % QString::number(atlasGrp.m_pMouseHoverFrame->pos.X()) % ", " % QString::number(atlasGrp.m_pMouseHoverFrame->pos.Y()), LOGTYPE_Normal);
+    //HyGuiLog("Cam  : " % QString::number(pProj->m_pCamera->pos.X()) % ", " % QString::number(pProj->m_pCamera->pos.Y()), LOGTYPE_Normal);
+    //if(pProj->m_pCamera && pProj->m_pCamera->pos.IsTweening() == false)
+        //pProj->m_pCamera->pos.Animate(iFrameCount * 12, iFrameCount * 12, 1.0f, HyEase::quadInOut);
 }
 
 void WidgetAtlasManager::Reload()
 {
+    m_pMouseHoverItem = NULL;
+    
     QFileInfoList metaAtlasDirs = m_MetaDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     if(metaAtlasDirs.empty())
     {

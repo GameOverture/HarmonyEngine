@@ -38,8 +38,6 @@ WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
 WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) :   QWidget(parent),
                                                                                     m_MetaDir(metaDir),
                                                                                     m_DataDir(dataDir),
-                                                                                    m_bRefreshDrawUpdate(false),
-                                                                                    m_pMouseHoverItem(NULL),
                                                                                     ui(new Ui::WidgetAtlasGroup)
 {    
     ui->setupUi(this);
@@ -61,6 +59,16 @@ WidgetAtlasGroup::~WidgetAtlasGroup()
 bool WidgetAtlasGroup::IsMatching(QDir metaDir, QDir dataDir)
 {
     return (m_MetaDir == metaDir && m_DataDir == dataDir);
+}
+
+QList<HyGuiFrame *> &WidgetAtlasGroup::GetFrameList()
+{
+    return m_FrameList;
+}
+
+QTreeWidget *WidgetAtlasGroup::GetTreeWidget()
+{
+    return ui->atlasList;
 }
 
 void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObj)
@@ -102,208 +110,6 @@ int WidgetAtlasGroup::GetId()
     return m_MetaDir.dirName().toInt();
 }
 
-/*friend*/ void AtlasGroup_DrawOpen(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
-{
-    foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
-    {
-        pFrame->Load();
-        ResetFrame(pFrame);
-    }
-
-    atlasGrp.ResizeAtlasListColumns();
-}
-
-/*friend*/ void AtlasGroup_DrawClose(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
-{
-    foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
-         pFrame->Unload();
-}
-
-/*friend*/ void AtlasGroup_DrawShow(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
-{
-    atlasGrp.m_bRefreshDrawUpdate = true;
-}
-
-/*friend*/ void AtlasGroup_DrawHide(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
-{
-    foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
-        pFrame->SetEnabled(false);
-}
-
-void ResetFrame(HyGuiFrame *pFrame)
-{
-    if(pFrame == NULL)
-        return;
-
-    pFrame->SetEnabled(false);
-    pFrame->SetDisplayOrder(0);
-    pFrame->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
-    pFrame->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
-}
-
-const float fTRANS_DUR = 0.5f;
-const int iPADDING = 2;
-
-struct PreviewRow
-{
-    QList<HyGuiFrame *> m_Frames;
-    int                 m_iLargestHeight;
-
-    void Clear()
-    {
-        m_Frames.clear();
-        m_iLargestHeight = 0;
-    }
-
-    void TweenPosY(int iStartPosY)
-    {
-        float fMidRow = (m_iLargestHeight * 0.5f);
-        float fPosY = 0.0f;
-        foreach(HyGuiFrame *pFrame, m_Frames)
-        {
-            fPosY = iStartPosY - (pFrame->GetHeight() * 0.5f) - fMidRow;
-            if(pFrame->pos.AnimY().IsTransforming() == false && pFrame->pos.Y() != fPosY)
-                pFrame->pos.AnimY().Tween(fPosY, fTRANS_DUR, HyTween::QuadInOut);
-        }
-    }
-};
-
-struct SortSelectedFramesPredicate
-{
-    bool operator()(const QTreeWidgetItem *pA, const QTreeWidgetItem *pB) const
-    {
-        return QString::compare(pA->text(0), pB->text(0)) < 0;
-    }
-};
-
-/*friend*/ void AtlasGroup_DrawUpdate(ItemProject *pProj, IHyApplication &hyApp, WidgetAtlasGroup &atlasGrp)
-{
-    static int DEBUGCNT = 0;
-    DEBUGCNT++;
-    bool bDebugPrint = false;
-    if((DEBUGCNT % 100) == 0)
-    {
-        bDebugPrint = true;
-        DEBUGCNT = 0;
-    }
-
-    const uint32 uiRENDERWIDTH = hyApp.Window().GetResolution().x;
-    const uint32 uiRENDERHEIGHT = hyApp.Window().GetResolution().y;
-    
-    if(atlasGrp.m_pMouseHoverItem && atlasGrp.m_pMouseHoverItem->isSelected())
-        atlasGrp.m_pMouseHoverItem = NULL;
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Preview hover selection
-    QTreeWidgetItem *pHoveredItem = atlasGrp.ui->atlasList->itemAt(atlasGrp.ui->atlasList->mapFromGlobal(QCursor::pos()));
-    if(pHoveredItem && atlasGrp.m_pMouseHoverItem != pHoveredItem && pHoveredItem->isSelected() == false)
-    {
-        if(atlasGrp.m_pMouseHoverItem && atlasGrp.m_pMouseHoverItem->isSelected() == false)
-        {
-            QVariant v = atlasGrp.m_pMouseHoverItem->data(0, QTreeWidgetItem::UserType);
-            ResetFrame(v.value<HyGuiFrame *>());
-        }
-
-        atlasGrp.m_pMouseHoverItem = pHoveredItem;
-
-        QVariant v = atlasGrp.m_pMouseHoverItem->data(0, QTreeWidgetItem::UserType);
-        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
-
-        pFrame->SetEnabled(true);
-        pFrame->SetDisplayOrder(100);
-        pFrame->pos.Set((uiRENDERWIDTH * 0.5f) + (pFrame->GetWidth() * -0.5f),
-                        (uiRENDERHEIGHT * 0.5f) + (pFrame->GetHeight() * -0.5f));
-        pFrame->color.A(0.5f);
-    }
-    else if(atlasGrp.m_pMouseHoverItem != pHoveredItem)
-        atlasGrp.m_pMouseHoverItem = NULL;
-
-    //if(atlasGrp.m_bRefreshDrawUpdate == false)
-    //    return;
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Reset all frames (except hover) incase any frames got unselected. They will be enabled if selected below
-    HyGuiFrame *pHoveredFrame = NULL;
-
-    if(atlasGrp.m_pMouseHoverItem)
-    {
-        QVariant v = atlasGrp.m_pMouseHoverItem->data(0, QTreeWidgetItem::UserType);
-        pHoveredFrame = v.value<HyGuiFrame *>();
-    }
-
-    foreach(HyGuiFrame *pFrame, atlasGrp.m_FrameList)
-    {
-        if(pHoveredFrame != pFrame)
-            ResetFrame(pFrame);
-    }
-    
-    if(bDebugPrint)
-        HyGuiLog(QString::number(reinterpret_cast<qulonglong>(atlasGrp.m_pMouseHoverItem)), LOGTYPE_Normal);
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Display all selected
-
-    QPoint ptDrawPos(0, 0);
-    PreviewRow curRow;
-    curRow.Clear();
-
-    QList<QTreeWidgetItem *> selectedItems = atlasGrp.ui->atlasList->selectedItems();
-    qSort(selectedItems.begin(), selectedItems.end(), SortSelectedFramesPredicate());
-    
-    for(int i = 0; i < selectedItems.size(); ++i)
-    {
-        QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
-        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
-
-        if(pFrame == NULL)
-            continue;
-
-        pFrame->SetEnabled(true);
-        pFrame->color.A(1.0f);
-        pFrame->SetDisplayOrder(-0x0FFFFFFF + i);
-
-        float fFrameWidth = pFrame->IsRotated() ? pFrame->GetHeight() : pFrame->GetWidth();
-        float fFrameHeight = pFrame->IsRotated() ? pFrame->GetWidth() : pFrame->GetHeight();
-
-        // Will it fit in this row
-        if(ptDrawPos.x() + fFrameWidth > uiRENDERWIDTH)
-        {
-            curRow.TweenPosY(uiRENDERHEIGHT - ptDrawPos.y());
-            
-            ptDrawPos.setX(0);
-            ptDrawPos.setY(ptDrawPos.y() + curRow.m_iLargestHeight + iPADDING);
-            
-            curRow.Clear();
-        }
-        
-        float fPosX = ptDrawPos.x() + (pFrame->IsRotated() ? ((fFrameWidth * 0.5f) - (fFrameHeight * 0.5f)) : 0);
-        
-        if(pFrame->pos.AnimX().IsTransforming() == false && pFrame->pos.X() != ptDrawPos.x())
-            pFrame->pos.AnimX().Tween(fPosX, fTRANS_DUR, HyTween::QuadInOut);
-
-        ptDrawPos.setX(ptDrawPos.x() + fFrameWidth + iPADDING);
-
-        if(curRow.m_iLargestHeight < fFrameHeight)
-            curRow.m_iLargestHeight = fFrameHeight;
-
-        curRow.m_Frames.append(pFrame);
-    }
-    
-    curRow.TweenPosY(uiRENDERHEIGHT - ptDrawPos.y());
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //QPointF ptCamPos(uiCurWidth * 0.5f, uiCurHeight * 0.5f);
-
-    // Pan camera over previewed
-    //HyGuiLog("Hover: " % QString::number(atlasGrp.m_pMouseHoverFrame->pos.X()) % ", " % QString::number(atlasGrp.m_pMouseHoverFrame->pos.Y()), LOGTYPE_Normal);
-    //HyGuiLog("Cam  : " % QString::number(pProj->m_pCamera->pos.X()) % ", " % QString::number(pProj->m_pCamera->pos.Y()), LOGTYPE_Normal);
-    //if(pProj->m_pCamera && pProj->m_pCamera->pos.IsTweening() == false)
-        //pProj->m_pCamera->pos.Animate(iFrameCount * 12, iFrameCount * 12, 1.0f, HyEase::quadInOut);
-
-    atlasGrp.m_bRefreshDrawUpdate = false;
-}
-
 void WidgetAtlasGroup::ResizeAtlasListColumns()
 {
     if(ui->atlasList == NULL)
@@ -320,7 +126,6 @@ void WidgetAtlasGroup::Reload()
     
     m_FrameList.clear();
     ui->atlasList->clear();
-	m_pMouseHoverItem = NULL;
 
     QFile metaAtlasFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaDataAtlasFileName));
     if(metaAtlasFile.exists())
@@ -758,5 +563,5 @@ void WidgetAtlasGroup::on_btnSettings_clicked()
 
 void WidgetAtlasGroup::on_atlasList_itemSelectionChanged()
 {
-    m_bRefreshDrawUpdate = true;
+    //m_bRefreshDrawUpdate = true;
 }
