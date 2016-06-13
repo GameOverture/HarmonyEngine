@@ -100,10 +100,7 @@ QString ItemProject::GetDirPath() const
         
         // This shouldn't happen, but if it did it would break logic below it
         if(m_eDrawState == PROJDRAWSTATE_Nothing && m_ePrevDrawState == PROJDRAWSTATE_Nothing)
-        {
-            HyGuiLog("ItemProject::OnDraw_Update() has both m_eDrawState and m_ePrevDrawState as 'PROJDRAWSTATE_Nothing'", LOGTYPE_Warning);
-            break;
-        }
+            continue;
         
         // If our current state is 'nothing', then Hide() what was previous if it was loaded
         if(m_eDrawState == PROJDRAWSTATE_Nothing)
