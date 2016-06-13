@@ -33,6 +33,8 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :  QWidget(
     pEditMenu->addAction(pActionUndo);
     pEditMenu->addAction(pActionRedo);
     pEditMenu->addSeparator();
+    
+    ui->txtPrefixAndName->setText(m_pItemSprite->GetName(true));
 }
 
 WidgetSprite::~WidgetSprite()

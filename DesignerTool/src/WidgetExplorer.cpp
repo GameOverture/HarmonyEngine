@@ -223,7 +223,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     
     if(bSucceeded == false)
     {
-        HyGuiLog("Did not add item: " % pItem->GetName() % " successfully", LOGTYPE_Error);
+        HyGuiLog("Did not add item: " % pItem->GetName(true) % " successfully", LOGTYPE_Error);
         return;
     }
     else if(bOpenAfterAdd)
@@ -281,7 +281,7 @@ QTreeWidgetItem *WidgetExplorer::CreateTreeItem(QTreeWidgetItem *pParent, Item *
     else
         pNewTreeItem = new QTreeWidgetItem();
     
-    pNewTreeItem->setText(0, pItem->GetName());
+    pNewTreeItem->setText(0, pItem->GetName(false));
     pNewTreeItem->setIcon(0, pItem->GetIcon());
 //    pNewTreeItem->setFlags(pNewItem->flags() | Qt::ItemIsEditable);
     

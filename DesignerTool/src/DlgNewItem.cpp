@@ -10,6 +10,8 @@
 #include "DlgNewItem.h"
 #include "ui_DlgNewItem.h"
 
+#include "HyGlobal.h"
+
 #include <QDirIterator>
 #include <QStringBuilder>
 #include <QPushButton>
@@ -116,19 +118,32 @@ void DlgNewItem::on_cmbPrefixList_currentIndexChanged(const QString &arg1)
 
 void DlgNewItem::ErrorCheck()
 {
-    QString newItemPath = m_sSubDirPath;
+    QString sPrefix;
     
     if(ui->chkNewPrefix->isChecked())
-        newItemPath = newItemPath % '/' % ui->txtPrefix->text();
+        sPrefix = ui->txtPrefix->text();
     else if(ui->cmbPrefixList->currentIndex() != 0)
-        newItemPath = newItemPath % '/' % ui->cmbPrefixList->currentText();
-    
-    newItemPath = newItemPath % '/' % ui->txtName->text() % m_sItemExt;
-    QDir newItemDir(newItemPath);
+        sPrefix = ui->cmbPrefixList->currentText();
     
     bool bIsError = false;
     do
     {
+        QStringList sPrefixDirList = sPrefix.split('/');
+        for(int i = 0; i < sPrefixDirList.size() && bIsError == false; ++i)
+        {
+            QStringList sSubDirList = HyGlobal::SubDirNameList();
+            for(int j = 0; j < sSubDirList.size() && bIsError == false; ++j)
+            {
+                if(sPrefixDirList[i].compare(sSubDirList[j], Qt::CaseInsensitive) == 0 &&
+                   ui->txtName->text().compare(sSubDirList[j], Qt::CaseInsensitive) == 0)
+                {
+                    ui->lblError->setText("Error: The prefix and/or name is using a reserved name.");
+                    bIsError = true;
+                    break;
+                }
+            }
+        }
+        
         if(ui->txtName->text().isEmpty())
         {
             ui->lblError->setText("Error: An item's name cannot be blank");
@@ -136,6 +151,8 @@ void DlgNewItem::ErrorCheck()
             break;
         }
         
+        QString sNewItemPath = m_sSubDirPath % '/' % sPrefix % '/' % ui->txtName->text() % m_sItemExt;
+        QDir newItemDir(sNewItemPath);
         if(newItemDir.exists())
         {
             ui->lblError->setText("Error: An item with this name at this location already exists.");

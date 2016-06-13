@@ -25,7 +25,7 @@ WidgetTabsManager::WidgetTabsManager(QWidget *parent) : QWidget(parent),
 
 WidgetTabsManager::WidgetTabsManager(ItemProject *pProjOwner, QWidget *parent /*= 0*/) :    QWidget(parent),
                                                                                             ui(new Ui::WidgetTabsManager),
-                                                                                            IHyApplication(HarmonyInit(pProjOwner->GetName().toStdString(), pProjOwner->GetAssetsAbsPath().toStdString())),
+                                                                                            IHyApplication(HarmonyInit(pProjOwner->GetName(false).toStdString(), pProjOwner->GetAssetsAbsPath().toStdString())),
                                                                                             m_pProjOwner(pProjOwner)
 {
     ui->setupUi(this);
@@ -73,7 +73,7 @@ WidgetTabsManager::~WidgetTabsManager()
                 // Below should invoke callback 'on_tabWidget_currentChanged' which will enqueue a QUEUEDITEM_Show action
                 TabPage *pNewTab = new TabPage(pItem, this);
                 pItem->DrawOpen(*this);
-                ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName()));
+                ui->tabWidget->setCurrentIndex(ui->tabWidget->addTab(pNewTab, pItem->GetIcon(), pItem->GetName(false)));
             }
             break;
 

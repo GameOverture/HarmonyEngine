@@ -54,44 +54,89 @@ Item::~Item()
     delete m_pTreeItemPtr;
 }
 
-QString Item::GetName() const
+QString Item::GetName(bool bWithPrefix) const
 {
+    // Check to see if this item can have a valid prefix, otherwise force 'bWithPrefix' to false
+    if(bWithPrefix)
+    {
+        if(m_eTYPE == ITEM_Project)
+            bWithPrefix = false;
+        
+        QList<eItemType> subDirItemList = HyGlobal::SubDirList();
+        for(int i = 0; i < subDirItemList.size() && bWithPrefix; ++i)
+        {
+            if(m_eTYPE == subDirItemList[i])
+                bWithPrefix = false;
+        }
+    }
+    
+    QString sPrefix; sPrefix.clear();
+    if(bWithPrefix)
+    {
+        QStringList sPathSplitList = m_sPATH.split('/', QString::SkipEmptyParts);
+        QStringList sSubDirList = HyGlobal::SubDirNameList();
+        
+        int iSplitIndex = sPathSplitList.size() - 1;
+        bool bSubDirFound = false;
+        for(; iSplitIndex >= 0; --iSplitIndex)
+        {
+            for(int i = 0; i < sSubDirList.size(); ++i)
+            {
+                if(sSubDirList[i].compare(sPathSplitList[iSplitIndex], Qt::CaseInsensitive) == 0)
+                {
+                    bSubDirFound = true;
+                    break;
+                }
+            }
+            
+            if(bSubDirFound)
+                break;
+        }
+        
+        if(bSubDirFound)
+        {
+            for(int i = iSplitIndex + 1; i < sPathSplitList.size() - 1; ++i)    // The '+ 1' so we don't include the sub directory, and the '- 1' is so we don't include the name
+                sPrefix += sPathSplitList[i] % "/";
+        }
+    }
+    
     // NOTE: We must remove the extension because dir items use "/", which doesn't work with QFileInfo::baseName()
     QString sPathWithoutExt = m_sPATH;
     sPathWithoutExt.truncate(m_sPATH.size() - HyGlobal::ItemExt(m_eTYPE).size());
     
     QFileInfo itemInfo;
     itemInfo.setFile(sPathWithoutExt);
+    QString sName = sPrefix % itemInfo.baseName();
     
-    return itemInfo.baseName();
+    return sName;
 }
 
 /*virtual*/ void Item::OnDraw_Open(IHyApplication &hyApp)
 {
-    HyGuiLog("Tried to OnDraw_Open() a non-derived item: " % GetName(), LOGTYPE_Error);
+    HyGuiLog("Tried to OnDraw_Open() a non-derived item: " % GetName(true), LOGTYPE_Error);
 }
 
 /*virtual*/ void Item::OnDraw_Close(IHyApplication &hyApp)
 {
-    HyGuiLog("Tried to OnDraw_Close() a non-derived item: " % GetName(), LOGTYPE_Error);
+    HyGuiLog("Tried to OnDraw_Close() a non-derived item: " % GetName(true), LOGTYPE_Error);
 }
 
 /*virtual*/ void Item::OnDraw_Show(IHyApplication &hyApp)
 {
-    HyGuiLog("Tried to OnDraw_Show() a non-derived item: " % GetName(), LOGTYPE_Error);
+    HyGuiLog("Tried to OnDraw_Show() a non-derived item: " % GetName(true), LOGTYPE_Error);
 }
 
 /*virtual*/ void Item::OnDraw_Hide(IHyApplication &hyApp)
 {
-    HyGuiLog("Tried to OnDraw_Hide() a non-derived item: " % GetName(), LOGTYPE_Error);
+    HyGuiLog("Tried to OnDraw_Hide() a non-derived item: " % GetName(true), LOGTYPE_Error);
 }
 
 /*virtual*/ void Item::OnDraw_Update(IHyApplication &hyApp)
 {
-    HyGuiLog("Tried to OnDraw_Update() a non-derived item: " % GetName(), LOGTYPE_Error);
+    HyGuiLog("Tried to OnDraw_Update() a non-derived item: " % GetName(true), LOGTYPE_Error);
 }
 
 /*virtual*/ void Item::Save()
 {
-    HyGuiLog("Tried to save a non-derived item: " % GetName(), LOGTYPE_Error);
+    HyGuiLog("Tried to save a non-derived item: " % GetName(true), LOGTYPE_Error);
 }

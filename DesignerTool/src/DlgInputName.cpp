@@ -34,7 +34,7 @@ DlgInputName::DlgInputName(const QString sDlgTitle, Item *pItem, QWidget *parent
     setWindowIcon(m_pItem->GetIcon());
     
     ui->txtName->setValidator(HyGlobal::FileNameValidator());
-    ui->txtName->setText(m_pItem->GetName());
+    ui->txtName->setText(m_pItem->GetName(false));
     ui->txtName->selectAll();
     
     ui->lblName->setText(HyGlobal::ItemName(m_pItem->GetType()) % " Name:");

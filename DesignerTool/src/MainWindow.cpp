@@ -205,7 +205,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
     
-    QString sWindowTitle = pItem->GetName() % " Properties";
+    QString sWindowTitle = pItem->GetName(false) % " Properties";
     
     sm_pInstance->ui->actionViewProperties->setVisible(true);
     sm_pInstance->ui->actionViewProperties->setText(sWindowTitle);

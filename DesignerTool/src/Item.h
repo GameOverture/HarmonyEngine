@@ -39,7 +39,7 @@ public:
     QWidget *GetWidget() const                      { return m_pWidget; }
     QMenu *GetEditMenu() const                      { return m_pEditMenu; }
     
-    QString GetName() const;
+    QString GetName(bool bWithPrefix) const;
     QString GetPath() const                         { return m_sPATH; }
     QIcon GetIcon() const                           { return HyGlobal::ItemIcon(m_eTYPE); }
     
