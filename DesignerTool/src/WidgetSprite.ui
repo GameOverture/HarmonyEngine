@@ -265,42 +265,16 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QPushButton" name="btnAddFrames">
-          <property name="maximumSize">
-           <size>
-            <width>23</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Import frames from Atlas Manager</string>
-          </property>
+         <widget class="QToolButton" name="btnAddFrames">
           <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="res/DesignerTool.qrc">
-            <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+           <string>...</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btnRemoveFrame">
-          <property name="maximumSize">
-           <size>
-            <width>23</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Remove selected frames</string>
-          </property>
+         <widget class="QToolButton" name="btnRemoveFrame">
           <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="res/DesignerTool.qrc">
-            <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+           <string>...</string>
           </property>
          </widget>
         </item>
@@ -318,42 +292,16 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="btnOrderFrameUp">
-          <property name="maximumSize">
-           <size>
-            <width>23</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Order frame upward</string>
-          </property>
+         <widget class="QToolButton" name="btnOrderFrameUp">
           <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="res/DesignerTool.qrc">
-            <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
+           <string>...</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btnOrderFrameDown">
-          <property name="maximumSize">
-           <size>
-            <width>23</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Order frame downward</string>
-          </property>
+         <widget class="QToolButton" name="btnOrderFrameDown">
           <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="res/DesignerTool.qrc">
-            <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
+           <string>...</string>
           </property>
          </widget>
         </item>
@@ -417,10 +365,58 @@
      <normaloff>:/icons16x16/generic-right.png</normaloff>:/icons16x16/generic-right.png</iconset>
    </property>
    <property name="text">
-    <string>Order State &amp;Forwards</string>
+    <string>Order State For&amp;wards</string>
    </property>
    <property name="toolTip">
     <string>Shift the index of the current state forward by 1</string>
+   </property>
+  </action>
+  <action name="actionAddFrames">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add &amp;Frames</string>
+   </property>
+   <property name="toolTip">
+    <string>Import selected frames from the Atlas Manager</string>
+   </property>
+  </action>
+  <action name="actionRemoveFrame">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rem&amp;ove Frame</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes the selected frame from this state</string>
+   </property>
+  </action>
+  <action name="actionOrderFrameUpwards">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Frame &amp;Upwards</string>
+   </property>
+   <property name="toolTip">
+    <string>Shift the selected frame to be played earlier in the sequence</string>
+   </property>
+  </action>
+  <action name="actionOrderFrameDownwards">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Frame &amp;Downwards</string>
+   </property>
+   <property name="toolTip">
+    <string>Shift the selected frame to be played later in the sequence</string>
    </property>
   </action>
  </widget>
@@ -435,10 +431,6 @@
   <tabstop>checkBox_3</tabstop>
   <tabstop>checkBox_2</tabstop>
   <tabstop>frames</tabstop>
-  <tabstop>btnAddFrames</tabstop>
-  <tabstop>btnRemoveFrame</tabstop>
-  <tabstop>btnOrderFrameUp</tabstop>
-  <tabstop>btnOrderFrameDown</tabstop>
   <tabstop>txtPrefixAndName</tabstop>
  </tabstops>
  <resources>

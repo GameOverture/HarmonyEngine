@@ -25,11 +25,15 @@ class ItemSprite;
 
 class SpriteState
 {
-    int                         m_iIndex;
     QString                     m_sName;
-    QUndoStack *                m_pUndoStack;
-
     QList<QTableWidgetItem *>   m_FrameList;
+    
+public:
+    SpriteState();
+    ~SpriteState();
+    
+    QString GetName();
+    void SetName(QString sNewName);
 };
 Q_DECLARE_METATYPE(SpriteState *)
 
@@ -38,14 +42,32 @@ class WidgetSprite : public QWidget
     Q_OBJECT
     
     ItemSprite *            m_pItemSprite;
-    QUndoGroup *            m_pUndoGroup;void on_actionAddState_triggered();
+    QUndoStack *            m_pUndoStack;
 
-
-    QList<SpriteState *>    m_States;
+    QList<QUndoCommand *>   m_CmdsNotInUndoStack;
 
 public:
     explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
+    
+private slots:
+    void on_actionAddState_triggered();
+    
+    void on_actionRemoveState_triggered();
+    
+    void on_actionRenameState_triggered();
+    
+    void on_actionOrderStateBackwards_triggered();
+    
+    void on_actionOrderStateForwards_triggered();
+    
+    void on_actionAddFrames_triggered();
+    
+    void on_actionRemoveFrame_triggered();
+    
+    void on_actionOrderFrameUpwards_triggered();
+    
+    void on_actionOrderFrameDownwards_triggered();
     
 private:
     Ui::WidgetSprite *ui;

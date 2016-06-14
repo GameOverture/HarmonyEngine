@@ -11,57 +11,99 @@
 #define ITEMSPRITECMDS_H
 
 #include <QUndoCommand>
+#include <QComboBox>
+#include <QCheckBox>
 
+class SpriteState;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_AddState : public QUndoCommand
 {
+    QComboBox *         m_pComboBox;
+    SpriteState *       m_pSpriteState;
+    
 public:
-    ItemSpriteCmd_AddState(QUndoCommand *pParent = 0);
+    ItemSpriteCmd_AddState(QComboBox *pCmb, QUndoCommand *pParent = 0);
     ~ItemSpriteCmd_AddState();
 
-    void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_RemoveState : public QUndoCommand
 {
+    QComboBox *         m_pComboBox;
+    SpriteState *       m_pSpriteState;
+    int                 m_iIndex;
+    
 public:
-    ItemSpriteCmd_RemoveState(QUndoCommand *pParent = 0);
+    ItemSpriteCmd_RemoveState(QComboBox *pCmb, QUndoCommand *pParent = 0);
     ~ItemSpriteCmd_RemoveState();
 
-    void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_RenameState : public QUndoCommand
 {
+    QComboBox *         m_pComboBox;
+    SpriteState *       m_pSpriteState;
+    QString             m_sNewName;
+    QString             m_sOldName;
+    
 public:
-    ItemSpriteCmd_RenameState(QUndoCommand *pParent = 0);
+    ItemSpriteCmd_RenameState(QComboBox *pCmb, QString sNewName, QUndoCommand *pParent = 0);
     ~ItemSpriteCmd_RenameState();
 
-    void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
 };
 
-class ItemSpriteCmd_MoveStateUp : public QUndoCommand
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemSpriteCmd_MoveStateBack : public QUndoCommand
 {
+    QComboBox *         m_pComboBox;
+    SpriteState *       m_pSpriteState;
+    
 public:
-    ItemSpriteCmd_MoveStateUp(QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_MoveStateUp();
+    ItemSpriteCmd_MoveStateBack(QComboBox *pCmb, QUndoCommand *pParent = 0);
+    ~ItemSpriteCmd_MoveStateBack();
 
-    void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
 };
 
-class ItemSpriteCmd_MoveStateDown : public QUndoCommand
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemSpriteCmd_MoveStateForward : public QUndoCommand
 {
+    QComboBox *         m_pComboBox;
+    SpriteState *       m_pSpriteState;
+    
 public:
-    ItemSpriteCmd_MoveStateDown(QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_MoveStateDown();
+    ItemSpriteCmd_MoveStateForward(QComboBox *pCmb, QUndoCommand *pParent = 0);
+    ~ItemSpriteCmd_MoveStateForward();
 
-    void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemSpriteCmd_ToggleStateReverse : public QUndoCommand
+{
+    QCheckBox *         m_pCheckBox; <-- probably want to have each SpriteState hold its own controls.
+    SpriteState *       m_pSpriteState;
+    
+public:
+    ItemSpriteCmd_ToggleStateReverse(QCheckBox *pCmb, QUndoCommand *pParent = 0);
+    ~ItemSpriteCmd_ToggleStateReverse();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_AddFrames : public QUndoCommand
 {
 public:
@@ -72,6 +114,7 @@ public:
     void redo() Q_DECL_OVERRIDE;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_DeleteFrame : public QUndoCommand
 {
 public:
@@ -82,6 +125,7 @@ public:
     void redo() Q_DECL_OVERRIDE;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_MoveFrameUp : public QUndoCommand
 {
 public:
@@ -92,6 +136,7 @@ public:
     void redo() Q_DECL_OVERRIDE;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_MoveFrameDown : public QUndoCommand
 {
 public:
