@@ -9,34 +9,34 @@
  *************************************************************************/
 #include "ItemSpriteCmds.h"
 
-ItemSpriteCmd_NewState::ItemSpriteCmd_NewState(QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
+ItemSpriteCmd_AddState::ItemSpriteCmd_AddState(QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
 {
     setText("Add a new state");
 }
 
-ItemSpriteCmd_NewState::~ItemSpriteCmd_NewState()
+ItemSpriteCmd_AddState::~ItemSpriteCmd_AddState()
 {
 }
 
-void ItemSpriteCmd_NewState::undo()
+void ItemSpriteCmd_AddState::undo()
 {
 }
 
-void ItemSpriteCmd_NewState::redo()
+void ItemSpriteCmd_AddState::redo()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemSpriteCmd_DeleteState::ItemSpriteCmd_DeleteState(QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
+ItemSpriteCmd_RemoveState::ItemSpriteCmd_RemoveState(QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
 {
 }
-ItemSpriteCmd_DeleteState::~ItemSpriteCmd_DeleteState()
+ItemSpriteCmd_RemoveState::~ItemSpriteCmd_RemoveState()
 {
 }
-void ItemSpriteCmd_DeleteState::undo()
+void ItemSpriteCmd_RemoveState::undo()
 {
 }
-void ItemSpriteCmd_DeleteState::redo()
+void ItemSpriteCmd_RemoveState::redo()
 {
 }
 
@@ -83,16 +83,16 @@ void ItemSpriteCmd_MoveStateDown::redo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemSpriteCmd_Import::ItemSpriteCmd_Import(QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
+ItemSpriteCmd_AddFrames::ItemSpriteCmd_AddFrames(QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
 {
 }
-ItemSpriteCmd_Import::~ItemSpriteCmd_Import()
+ItemSpriteCmd_AddFrames::~ItemSpriteCmd_AddFrames()
 {
 }
-void ItemSpriteCmd_Import::undo()
+void ItemSpriteCmd_AddFrames::undo()
 {
 }
-void ItemSpriteCmd_Import::redo()
+void ItemSpriteCmd_AddFrames::redo()
 {
 }
 

@@ -12,21 +12,21 @@
 
 #include <QUndoCommand>
 
-class ItemSpriteCmd_NewState : public QUndoCommand
+class ItemSpriteCmd_AddState : public QUndoCommand
 {
 public:
-    ItemSpriteCmd_NewState(QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_NewState();
+    ItemSpriteCmd_AddState(QUndoCommand *pParent = 0);
+    ~ItemSpriteCmd_AddState();
 
     void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;
 };
 
-class ItemSpriteCmd_DeleteState : public QUndoCommand
+class ItemSpriteCmd_RemoveState : public QUndoCommand
 {
 public:
-    ItemSpriteCmd_DeleteState(QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_DeleteState();
+    ItemSpriteCmd_RemoveState(QUndoCommand *pParent = 0);
+    ~ItemSpriteCmd_RemoveState();
 
     void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;
@@ -62,11 +62,11 @@ public:
     void redo() Q_DECL_OVERRIDE;
 };
 
-class ItemSpriteCmd_Import : public QUndoCommand
+class ItemSpriteCmd_AddFrames : public QUndoCommand
 {
 public:
-    ItemSpriteCmd_Import(QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_Import();
+    ItemSpriteCmd_AddFrames(QUndoCommand *pParent = 0);
+    ~ItemSpriteCmd_AddFrames();
 
     void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;

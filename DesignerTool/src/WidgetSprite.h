@@ -12,8 +12,10 @@
 
 #include <QWidget>
 #include <QMenu>
+#include <QUndoGroup>
 #include <QUndoStack>
 #include <QComboBox>
+#include <QTableWidgetItem>
 
 namespace Ui {
 class WidgetSprite;
@@ -21,26 +23,30 @@ class WidgetSprite;
 
 class ItemSprite;
 
+class SpriteState
+{
+    int                         m_iIndex;
+    QString                     m_sName;
+    QUndoStack *                m_pUndoStack;
+
+    QList<QTableWidgetItem *>   m_FrameList;
+};
+Q_DECLARE_METATYPE(SpriteState *)
+
 class WidgetSprite : public QWidget
 {
     Q_OBJECT
     
-    ItemSprite *        m_pItemSprite;
+    ItemSprite *            m_pItemSprite;
+    QUndoGroup *            m_pUndoGroup;void on_actionAddState_triggered();
 
-    QUndoStack *        m_pUndoStack;
 
-    struct State
-    {
-        QComboBox       m_p;
-    };
+    QList<SpriteState *>    m_States;
 
 public:
     explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
     
-private slots:
-    void on_btnAddState_clicked();
-
 private:
     Ui::WidgetSprite *ui;
 };

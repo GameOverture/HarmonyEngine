@@ -46,5 +46,7 @@
         <file>icons16x16/generic-rename.png</file>
         <file>icons16x16/generic-down.png</file>
         <file>icons16x16/generic-up.png</file>
+        <file>icons16x16/generic-left.png</file>
+        <file>icons16x16/generic-right.png</file>
     </qresource>
 </RCC>
