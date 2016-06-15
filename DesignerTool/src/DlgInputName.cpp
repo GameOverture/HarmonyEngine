@@ -13,52 +13,44 @@
 #include <QPushButton>
 #include <QStringBuilder>
 
-DlgInputName::DlgInputName(const QString sDlgTitle, Item *pItem, QWidget *parent /*= 0*/) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-                                                                                            ui(new Ui::DlgInputName),
-                                                                                            m_pItem(pItem)
+void DlgInputName::CtorInit(QString sDlgTitle, QString sCurName)
 {
-    if(m_pItem == NULL)
-    {
-        HyGuiLog("DlgInHyGuiLogme recieved a NULL Item pointer", LOGTYPE_Error);
-        return;
-    }
-    
     ui->setupUi(this);
-    
-    QFileInfo itemInfo;
-    itemInfo.setFile(m_pItem->GetPath());
-    m_sPathMinusName = itemInfo.path();
-    m_sFileExt = HyGlobal::ItemExt(m_pItem->GetType());
-    
+
     setWindowTitle(sDlgTitle);
-    setWindowIcon(m_pItem->GetIcon());
-    
+    setWindowIcon(QIcon(":/icons16x16/generic-rename.png"));
+
     ui->txtName->setValidator(HyGlobal::FileNameValidator());
-    ui->txtName->setText(m_pItem->GetName(false));
+    ui->txtName->setText(sCurName);
     ui->txtName->selectAll();
-    
-    ui->lblName->setText(HyGlobal::ItemName(m_pItem->GetType()) % " Name:");
-    
-    ErrorCheck();
+
+    ui->lblName->setText("Name:");
 }
 
-DlgInputName::DlgInputName(const QString sDlgTitle, eItemType eType, const QString sPathMinusName, QWidget *parent /*= 0*/) :   QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-                                                                                                                                ui(new Ui::DlgInputName),
-                                                                                                                                m_pItem(NULL)
+DlgInputName::DlgInputName(const QString sDlgTitle, QString sCurName, QWidget *pParent /*= 0*/) :   QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+                                                                                                    ui(new Ui::DlgInputName)
 {
-    ui->setupUi(this);
+    CtorInit(sDlgTitle, sCurName);
+}
+
+DlgInputName::DlgInputName(const QString sDlgTitle, Item *pItem, QWidget *parent /*= 0*/) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+                                                                                            ui(new Ui::DlgInputName)
+{
+    CtorInit(sDlgTitle, pItem->GetName(false));
+
+    if(pItem == NULL)
+    {
+        HyGuiLog("DlgInputName recieved a NULL Item pointer", LOGTYPE_Error);
+        return;
+    }
+
+    QFileInfo itemInfo;
+    itemInfo.setFile(pItem->GetPath());
+    m_sPathMinusName = itemInfo.path();
+    m_sFileExt = HyGlobal::ItemExt(pItem->GetType());
     
-    m_sPathMinusName = sPathMinusName;
-    m_sFileExt = HyGlobal::ItemExt(eType);
-    
-    setWindowTitle(sDlgTitle);
-    setWindowIcon(HyGlobal::ItemIcon(eType));
-    
-    ui->txtName->setValidator(HyGlobal::FileNameValidator());
-    ui->txtName->setText("New" % HyGlobal::ItemName(eType) % "Name");
-    ui->txtName->selectAll();
-    
-    ui->lblName->setText(HyGlobal::ItemName(eType) % " Name:");
+    setWindowIcon(pItem->GetIcon());
+    ui->lblName->setText(HyGlobal::ItemName(pItem->GetType()) % " Name:");
     
     ErrorCheck();
 }
@@ -71,6 +63,11 @@ DlgInputName::~DlgInputName()
 void DlgInputName::on_txtName_textChanged(const QString &arg1)
 {
     ErrorCheck();
+}
+
+QString DlgInputName::GetName()
+{
+    return ui->txtName->text();
 }
 
 QString DlgInputName::GetFullPathNameMinusExt()
@@ -90,12 +87,15 @@ void DlgInputName::ErrorCheck()
             break;
         }
         
-        QDir itemDir(GetFullPathNameMinusExt() % m_sFileExt);
-        if(itemDir.exists())
+        if(m_sPathMinusName.isEmpty() == false)
         {
-            ui->lblError->setText("Error: An item with this name at this location already exists.");
-            bIsError = true;
-            break;
+            QDir itemDir(GetFullPathNameMinusExt() % m_sFileExt);
+            if(itemDir.exists())
+            {
+                ui->lblError->setText("Error: An item with this name at this location already exists.");
+                bIsError = true;
+                break;
+            }
         }
     }while(false);
 

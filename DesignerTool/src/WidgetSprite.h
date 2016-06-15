@@ -10,32 +10,19 @@
 #ifndef WIDGETSPRITE_H
 #define WIDGETSPRITE_H
 
+#include "WidgetSpriteState.h"
+
 #include <QWidget>
 #include <QMenu>
 #include <QUndoGroup>
 #include <QUndoStack>
 #include <QComboBox>
-#include <QTableWidgetItem>
 
 namespace Ui {
 class WidgetSprite;
 }
 
 class ItemSprite;
-
-class SpriteState
-{
-    QString                     m_sName;
-    QList<QTableWidgetItem *>   m_FrameList;
-    
-public:
-    SpriteState();
-    ~SpriteState();
-    
-    QString GetName();
-    void SetName(QString sNewName);
-};
-Q_DECLARE_METATYPE(SpriteState *)
 
 class WidgetSprite : public QWidget
 {
@@ -44,11 +31,14 @@ class WidgetSprite : public QWidget
     ItemSprite *            m_pItemSprite;
     QUndoStack *            m_pUndoStack;
 
-    QList<QUndoCommand *>   m_CmdsNotInUndoStack;
+    QList<QAction *>        m_StateActionsList;
+    WidgetSpriteState *     m_pCurSpriteState;
 
 public:
     explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
+
+    void UpdateActions();
     
 private slots:
     void on_actionAddState_triggered();
@@ -69,6 +59,8 @@ private slots:
     
     void on_actionOrderFrameDownwards_triggered();
     
+    void on_cmbStates_currentIndexChanged(int index);
+
 private:
     Ui::WidgetSprite *ui;
 };

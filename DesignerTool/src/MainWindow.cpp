@@ -181,6 +181,11 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
+/*static*/ MainWindow *MainWindow::GetInstance()
+{
+    return sm_pInstance;
+}
+
 // This only requests to the WidgetRenderer to open the item. It will eventually do so, after re-loading any resources it needs to
 /*static*/ void MainWindow::OpenItem(Item *pItem)
 {

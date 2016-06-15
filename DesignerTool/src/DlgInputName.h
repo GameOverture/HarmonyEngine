@@ -23,13 +23,15 @@ class DlgInputName : public QDialog
     
     QString         m_sPathMinusName;
     QString         m_sFileExt;
-    Item *          m_pItem;
     
+    void CtorInit(QString sDlgTitle, QString sCurName);
+
 public:
+    explicit DlgInputName(const QString sDlgTitle, QString sCurName, QWidget *pParent = 0);
     explicit DlgInputName(const QString sDlgTitle, Item *pItem, QWidget *parent = 0);
-    explicit DlgInputName(const QString sDlgTitle, eItemType eType, const QString sPathMinusName, QWidget *parent = 0);
     ~DlgInputName();
     
+    QString GetName();
     QString GetFullPathNameMinusExt();
     
 private slots:
@@ -37,6 +39,7 @@ private slots:
     
 private:
     Ui::DlgInputName *ui;
+
     
     void ErrorCheck();
 };

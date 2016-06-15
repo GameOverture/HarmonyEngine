@@ -42,7 +42,7 @@ Item::Item(eItemType eType, const QString sPath) :  m_eTYPE(eType),
     case ITEM_Shader:
     case ITEM_Entity:
     case ITEM_Sprite:
-        m_pEditMenu = new QMenu("Edit");
+        m_pEditMenu = new QMenu("Edit", MainWindow::GetInstance());
         break;
     }
 }

@@ -13,32 +13,18 @@
 #include "ItemSprite.h"
 #include "ItemSpriteCmds.h"
 
+#include "DlgInputName.h"
+
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-
-SpriteState::SpriteState() : m_sName("Unnamed")
-{
-}
-
-SpriteState::~SpriteState()
-{
-}
-
-QString SpriteState::GetName()
-{
-    return m_sName;
-}
-
-void SpriteState::SetName(QString sNewName)
-{
-    m_sName = sNewName;
-}
+#include <QAction>
 
 WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :  QWidget(parent),
                                                                         m_pItemSprite(pItemSprite),
-                                                                        ui(new Ui::WidgetSprite)
+                                                                        ui(new Ui::WidgetSprite),
+                                                                        m_pCurSpriteState(NULL)
 {
     ui->setupUi(this);
 
@@ -50,10 +36,12 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :  QWidget(
     QAction *pActionUndo = m_pUndoStack->createUndoAction(pEditMenu, "&Undo");
     pActionUndo->setIcon(QIcon(":/icons16x16/generic-undo.png"));
     pActionUndo->setShortcuts(QKeySequence::Undo);
+    pActionUndo->setShortcutContext(Qt::ApplicationShortcut);
 
     QAction *pActionRedo = m_pUndoStack->createRedoAction(pEditMenu, "&Redo");
     pActionRedo->setIcon(QIcon(":/icons16x16/generic-redo.png"));
     pActionRedo->setShortcuts(QKeySequence::Redo);
+    pActionRedo->setShortcutContext(Qt::ApplicationShortcut);
 
     pEditMenu->addAction(pActionUndo);
     pEditMenu->addAction(pActionRedo);
@@ -74,11 +62,11 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :  QWidget(
     ui->btnRenameState->setDefaultAction(ui->actionRenameState);
     ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
     ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
-    
-    ui->btnAddFrames->setDefaultAction(ui->actionAddFrames);
-    ui->btnRemoveFrame->setDefaultAction(ui->actionRemoveFrame);
-    ui->btnOrderFrameUp->setDefaultAction(ui->actionOrderFrameUpwards);
-    ui->btnOrderFrameDown->setDefaultAction(ui->actionOrderFrameDownwards);
+
+    m_StateActionsList.push_back(ui->actionAddFrames);
+    m_StateActionsList.push_back(ui->actionRemoveFrame);
+    m_StateActionsList.push_back(ui->actionOrderFrameUpwards);
+    m_StateActionsList.push_back(ui->actionOrderFrameDownwards);
     
     ui->cmbStates->clear();
 
@@ -133,46 +121,68 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :  QWidget(
     }
     else
     {
-        // Use this QUndoCommand to perform adding a anim state, but don't add to UndoStack because we don't want it to be undone.
-        QUndoCommand *addCommand = new ItemSpriteCmd_AddState(ui->cmbStates);
-        addCommand->redo();
-        m_CmdsNotInUndoStack.push_back(addCommand);
+        on_actionAddState_triggered();
     }
+
+    // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
+    // I don't believe any on_actionAddState_triggered() calls will leak their dynamically allocated 'm_pSpriteState', since they should become children of 'ui->grpStateLayout'
+    m_pUndoStack->clear();
+
+    UpdateActions();
 }
 
 WidgetSprite::~WidgetSprite()
 {
     delete ui;
-    
-    for(int i = 0; i < m_CmdsNotInUndoStack.count(); ++i)
-        delete m_CmdsNotInUndoStack[i];
 }
 
+void WidgetSprite::UpdateActions()
+{
+    ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
+    ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
+    ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
+}
 
 void WidgetSprite::on_actionAddState_triggered()
 {
-    QUndoCommand *addCommand = new ItemSpriteCmd_AddState(ui->cmbStates);
-    m_pUndoStack->push(addCommand);
+    QUndoCommand *pCmd = new ItemSpriteCmd_AddState(m_StateActionsList, ui->cmbStates);
+    m_pUndoStack->push(pCmd);
+
+    UpdateActions();
 }
 
 void WidgetSprite::on_actionRemoveState_triggered()
 {
-    
+    QUndoCommand *pCmd = new ItemSpriteCmd_RemoveState(ui->cmbStates);
+    m_pUndoStack->push(pCmd);
+
+    UpdateActions();
 }
 
 void WidgetSprite::on_actionRenameState_triggered()
 {
-    
+    DlgInputName *pDlg = new DlgInputName("Rename Sprite State", ui->cmbStates->currentData().value<WidgetSpriteState *>()->GetName());
+    if(pDlg->exec() == QDialog::Accepted)
+    {
+        QUndoCommand *pCmd = new ItemSpriteCmd_RenameState(ui->cmbStates, pDlg->GetName());
+        m_pUndoStack->push(pCmd);
+    }
 }
 
 void WidgetSprite::on_actionOrderStateBackwards_triggered()
 {
-    
+    QUndoCommand *pCmd = new ItemSpriteCmd_MoveStateBack(ui->cmbStates);
+    m_pUndoStack->push(pCmd);
+
+    UpdateActions();
 }
 
 void WidgetSprite::on_actionOrderStateForwards_triggered()
 {
-    
+    QUndoCommand *pCmd = new ItemSpriteCmd_MoveStateForward(ui->cmbStates);
+    m_pUndoStack->push(pCmd);
+
+    UpdateActions();
 }
 
 void WidgetSprite::on_actionAddFrames_triggered()
@@ -193,4 +203,25 @@ void WidgetSprite::on_actionOrderFrameUpwards_triggered()
 void WidgetSprite::on_actionOrderFrameDownwards_triggered()
 {
     
+}
+
+void WidgetSprite::on_cmbStates_currentIndexChanged(int index)
+{
+    WidgetSpriteState *pSpriteState = ui->cmbStates->itemData(index).value<WidgetSpriteState *>();
+    if(m_pCurSpriteState == pSpriteState)
+        return;
+
+    if(m_pCurSpriteState)
+        m_pCurSpriteState->hide();
+
+    ui->grpStateLayout->addWidget(pSpriteState);
+
+#if _DEBUG
+    int iDebugTest = ui->grpStateLayout->count();
+#endif
+
+    m_pCurSpriteState = pSpriteState;
+    m_pCurSpriteState->show();
+
+    UpdateActions();
 }

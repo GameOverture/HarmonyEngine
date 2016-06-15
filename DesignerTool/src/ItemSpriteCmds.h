@@ -13,17 +13,20 @@
 #include <QUndoCommand>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QAction>
 
-class SpriteState;
+class WidgetSpriteState;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_AddState : public QUndoCommand
 {
+    QList<QAction *>    m_StateActionList;
+
     QComboBox *         m_pComboBox;
-    SpriteState *       m_pSpriteState;
+    WidgetSpriteState * m_pSpriteState;
     
 public:
-    ItemSpriteCmd_AddState(QComboBox *pCmb, QUndoCommand *pParent = 0);
+    ItemSpriteCmd_AddState(QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent = 0);
     ~ItemSpriteCmd_AddState();
 
     void redo() Q_DECL_OVERRIDE;
@@ -34,7 +37,7 @@ public:
 class ItemSpriteCmd_RemoveState : public QUndoCommand
 {
     QComboBox *         m_pComboBox;
-    SpriteState *       m_pSpriteState;
+    WidgetSpriteState * m_pSpriteState;
     int                 m_iIndex;
     
 public:
@@ -49,7 +52,7 @@ public:
 class ItemSpriteCmd_RenameState : public QUndoCommand
 {
     QComboBox *         m_pComboBox;
-    SpriteState *       m_pSpriteState;
+    WidgetSpriteState * m_pSpriteState;
     QString             m_sNewName;
     QString             m_sOldName;
     
@@ -65,7 +68,7 @@ public:
 class ItemSpriteCmd_MoveStateBack : public QUndoCommand
 {
     QComboBox *         m_pComboBox;
-    SpriteState *       m_pSpriteState;
+    WidgetSpriteState * m_pSpriteState;
     
 public:
     ItemSpriteCmd_MoveStateBack(QComboBox *pCmb, QUndoCommand *pParent = 0);
@@ -79,7 +82,7 @@ public:
 class ItemSpriteCmd_MoveStateForward : public QUndoCommand
 {
     QComboBox *         m_pComboBox;
-    SpriteState *       m_pSpriteState;
+    WidgetSpriteState * m_pSpriteState;
     
 public:
     ItemSpriteCmd_MoveStateForward(QComboBox *pCmb, QUndoCommand *pParent = 0);
@@ -92,8 +95,8 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_ToggleStateReverse : public QUndoCommand
 {
-    QCheckBox *         m_pCheckBox; <-- probably want to have each SpriteState hold its own controls.
-    SpriteState *       m_pSpriteState;
+    QCheckBox *         m_pCheckBox;// <-- probably want to have each SpriteState hold its own controls.
+    WidgetSpriteState * m_pSpriteState;
     
 public:
     ItemSpriteCmd_ToggleStateReverse(QCheckBox *pCmb, QUndoCommand *pParent = 0);
