@@ -90,7 +90,7 @@ public:
     }
     void SetLink(eItemType eType, QString sPrefix, QString sName)
     {
-        QString sLink(HyGlobal::ItemName(eType) % "/");
+        QString sLink(HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/");
         sLink += sPrefix;
         sLink += sName;
         

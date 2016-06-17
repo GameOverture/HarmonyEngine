@@ -11,7 +11,8 @@
 #include <QAction>
 #include <QUndoView>
 
-ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
+ItemSprite::ItemSprite(WidgetAtlasManager *pAtlasMan, const QString sPath) : Item(ITEM_Sprite, sPath),
+                                                                             m_pAtlasMan(pAtlasMan)
 {
     m_pWidget = new WidgetSprite(this);
 
@@ -71,3 +72,7 @@ ItemSprite::ItemSprite(const QString sPath) : Item(ITEM_Sprite, sPath)
     
 }
 
+WidgetAtlasManager *ItemSprite::GetAtlasMan()
+{
+    return m_pAtlasMan;
+}

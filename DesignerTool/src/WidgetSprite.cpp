@@ -141,6 +141,8 @@ void WidgetSprite::UpdateActions()
     ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
     ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
+    
+    m_pItemSprite->GetAtlasMan()->RequestFrames();
 }
 
 void WidgetSprite::on_actionAddState_triggered()

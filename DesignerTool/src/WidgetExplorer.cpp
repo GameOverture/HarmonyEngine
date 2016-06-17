@@ -99,7 +99,7 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
                 
                 switch(eType)
                 {
-                case ITEM_Sprite:   pPrefixItem = new ItemSprite(sCurPath); break;
+                case ITEM_Sprite:   pPrefixItem = new ItemSprite(pItem->GetAtlasManager(), sCurPath); break;
                 }
                 
                 CreateTreeItem(pCurParentTreeItem, pPrefixItem);
@@ -118,6 +118,28 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         return;
     }
     
+    // NOTE: Cannot use GetCurProjSelected() because this function may be called without anything selected in explorer widget. AKA opening an existing project and adding all its contents
+    //
+    // Find the proper project tree item
+    ItemProject *pCurProj = NULL;
+    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
+    {
+        QVariant v = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole);
+        Item *pTopLevelItem = v.value<Item *>();
+        
+        if(pTopLevelItem->GetType() != ITEM_Project && sNewItemPath.contains(static_cast<ItemProject *>(pTopLevelItem)->GetDirPath(), Qt::CaseInsensitive))
+            continue;
+        
+        pCurProj = static_cast<ItemProject *>(pTopLevelItem);
+        break;
+    }
+    
+    if(pCurProj == NULL)
+    {
+        HyGuiLog("Could not find associated project for item: " % sNewItemPath, LOGTYPE_Error);
+        return;
+    }
+    
     Item *pItem;
     switch(eNewItemType)
     {
@@ -133,35 +155,13 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         pItem = new Item(eNewItemType, sNewItemPath);
         break;
     case ITEM_Sprite:
-        pItem = new ItemSprite(sNewItemPath);
+        pItem = new ItemSprite(pCurProj->GetAtlasManager(), sNewItemPath);
         break;
     case ITEM_Font:
         pItem = new ItemFont(sNewItemPath);
         break;
     default:
         HyGuiLog("Item: " % sNewItemPath % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
-        return;
-    }
-    
-    // NOTE: Cannot use GetCurProjSelected() because this function may be called without anything selected in explorer widget. AKA opening an existing project and adding all its contents
-    //
-    // Find the proper project tree item
-    ItemProject *pCurProj = NULL;
-    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
-    {
-        QVariant v = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole);
-        Item *pTopLevelItem = v.value<Item *>();
-        
-        if(pTopLevelItem->GetType() != ITEM_Project && pItem->GetPath().contains(static_cast<ItemProject *>(pTopLevelItem)->GetDirPath(), Qt::CaseInsensitive))
-            continue;
-        
-        pCurProj = static_cast<ItemProject *>(pTopLevelItem);
-        break;
-    }
-    
-    if(pCurProj == NULL)
-    {
-        HyGuiLog("Could not find associated project for item: " % pItem->GetPath(), LOGTYPE_Error);
         return;
     }
     
