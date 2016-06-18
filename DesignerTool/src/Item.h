@@ -16,6 +16,7 @@
 #include "IHyGuiDrawItem.h"
 #include "Harmony/HyEngine.h"
 
+class HyGuiDependencies;
 class WidgetRenderer;
 
 class Item : public IHyGuiDrawItem
@@ -29,8 +30,10 @@ protected:
     QTreeWidgetItem *   m_pTreeItemPtr;
     QWidget *           m_pWidget;
     QMenu *             m_pEditMenu;
+
+    HyGuiDependencies * m_pDependencies;
     
-    Item(eItemType eType, const QString sPath);
+    Item(eItemType eType, const QString sPath, HyGuiDependencies *pDependencies);
     ~Item();
     
 public:
@@ -42,6 +45,8 @@ public:
     QString GetName(bool bWithPrefix) const;
     QString GetPath() const                         { return m_sPATH; }
     QIcon GetIcon() const                           { return HyGlobal::ItemIcon(m_eTYPE); }
+
+    HyGuiDependencies *GetDependencies()            { return m_pDependencies; }
     
     void SetTreeItem(QTreeWidgetItem *pTreeItem)    { m_pTreeItemPtr = pTreeItem; }
     

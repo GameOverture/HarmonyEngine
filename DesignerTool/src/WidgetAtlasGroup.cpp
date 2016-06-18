@@ -133,8 +133,11 @@ void WidgetAtlasGroup::Reload()
         if(!metaAtlasFile.open(QIODevice::ReadOnly))
             HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaDataAtlasFileName, LOGTYPE_Error);
 
-        //QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
+#ifdef HYGUI_UseBinaryMetaFiles
+        QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
+#else
         QJsonDocument settingsDoc = QJsonDocument::fromJson(metaAtlasFile.readAll());
+#endif
         metaAtlasFile.close();
 
         QJsonObject settingsObj = settingsDoc.object();

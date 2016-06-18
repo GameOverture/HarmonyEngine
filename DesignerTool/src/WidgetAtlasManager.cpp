@@ -308,6 +308,33 @@ void WidgetAtlasManager::Reload()
     }
 }
 
+bool WidgetAtlasManager::IsSelectedFrames()
+{
+    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
+    return atlasGrp.GetTreeWidget()->selectedItems().count() != 0;
+}
+
+void WidgetAtlasManager::GetSelectedFrames(QList<QPair<int, int> > &frameListOut, uint uiAtlasGroupIdOut)
+{
+    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
+
+    uiAtlasGroupIdOut = atlasGrp.GetId();
+
+    QList<QTreeWidgetItem *> selectedItems = atlasGrp.GetTreeWidget()->selectedItems();
+    qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
+
+    for(int i = 0; i < selectedItems.size(); ++i)
+    {
+        QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
+        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
+
+        if(pFrame == NULL)
+            continue;
+
+        //frameListOut.append(QPair<int, int>(pFrame->GetTextureIndex(), pFrame->Get
+    }
+}
+
 void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
 {
     if(iId == -1)

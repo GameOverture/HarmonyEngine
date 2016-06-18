@@ -12,8 +12,8 @@
 
 #include "ItemSprite.h"
 #include "ItemSpriteCmds.h"
-
 #include "DlgInputName.h"
+#include "HyGuiDependencies.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -142,7 +142,7 @@ void WidgetSprite::UpdateActions()
     ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
     
-    m_pItemSprite->GetAtlasMan()->RequestFrames();
+    ui->actionAddFrames->setEnabled(m_pItemSprite->GetDependencies()->IsAtlasFramesAvailable());
 }
 
 void WidgetSprite::on_actionAddState_triggered()
@@ -189,7 +189,10 @@ void WidgetSprite::on_actionOrderStateForwards_triggered()
 
 void WidgetSprite::on_actionAddFrames_triggered()
 {
-    
+    QUndoCommand *pCmd = new ItemSpriteCmd_AddFrames(m_pItemSprite->GetDependencies());
+    m_pUndoStack->push(pCmd);
+
+    UpdateActions();
 }
 
 void WidgetSprite::on_actionRemoveFrame_triggered()

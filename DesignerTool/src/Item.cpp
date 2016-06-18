@@ -11,16 +11,18 @@
 
 #include "MainWindow.h"
 #include "WidgetSprite.h"
+#include "HyGuiDependencies.h"
 
 #include <QFileInfo>
 
 #include "Harmony/Utilities/HyStrManip.h"
 
-Item::Item(eItemType eType, const QString sPath) :  m_eTYPE(eType),
-                                                    m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str()).c_str()),
-                                                    m_pTreeItemPtr(NULL),
-                                                    m_pWidget(NULL),
-                                                    m_pEditMenu(NULL)
+Item::Item(eItemType eType, const QString sPath, HyGuiDependencies *pDependencies) :    m_eTYPE(eType),
+                                                                                        m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str()).c_str()),
+                                                                                        m_pTreeItemPtr(NULL),
+                                                                                        m_pWidget(NULL),
+                                                                                        m_pEditMenu(NULL),
+                                                                                        m_pDependencies(pDependencies)
 {
     switch(m_eTYPE)
     {

@@ -50,7 +50,8 @@ public:
 
     void Reload();
     
-    void RequestFrames(QString sRequester, QList<QPair<int, int> > &frameListOut, uint uiAtlasGroupIdOut);
+    bool IsSelectedFrames();
+    void GetSelectedFrames(QList<QPair<int, int> > &frameListOut, uint uiAtlasGroupIdOut);
 
 private slots:
     void on_atlasGroups_currentChanged(int iIndex);

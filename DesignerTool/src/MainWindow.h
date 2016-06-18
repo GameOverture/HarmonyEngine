@@ -44,7 +44,7 @@ public:
 
     void showEvent(QShowEvent *pEvent);
 
-    static MainWindow *GetInstance();
+    static MainWindow *GetInstance();   // Should only be used to set QWidget parents
     
     // This only requests to the WidgetRenderer to open/close the item. It will eventually do so, after re-loading any resources if need be
     static void OpenItem(Item *pItem);

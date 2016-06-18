@@ -12,18 +12,15 @@
 
 #include "Item.h"
 #include "WidgetSprite.h"
-#include "WidgetAtlasManager.h"
 
 class ItemSprite : public Item
 {
     friend class WidgetExplorer;
     
-    WidgetAtlasManager *m_pAtlasMan;
-    
     HyPrimitive2d       m_primOriginHorz;
     HyPrimitive2d       m_primOriginVert;
     
-    ItemSprite(WidgetAtlasManager *pAtlasMan, const QString sPath);
+    ItemSprite(const QString sPath, HyGuiDependencies *pDependencies);
     
 protected:
     
@@ -35,9 +32,6 @@ protected:
     virtual void OnDraw_Update(IHyApplication &hyApp);
     
     virtual void Save();
-    
-public:
-    WidgetAtlasManager *GetAtlasMan();
 };
 
 #endif // ITEMSPRITE_H

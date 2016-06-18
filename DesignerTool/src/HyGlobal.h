@@ -22,6 +22,8 @@
 
 #define HyDesignerToolName "Harmony Designer Tool"
 
+//#define HYGUI_UseBinaryMetaFiles
+
 enum eItemType
 {
     ITEM_Unknown = -1,
@@ -66,8 +68,9 @@ enum eProjDrawState
     NUMPROJDRAWSTATE
 };
 
-#define HYGUIPATH_DataAtlasFileName         "atlasInfo.json"
-#define HYGUIPATH_MetaDataAtlasFileName     "settings.hygui"
+#define HYGUIPATH_DataAtlasFileName             "atlasInfo.json"
+#define HYGUIPATH_MetaDataAtlasFileName         "settings.hygui"
+#define HYGUIPATH_MetaDataDependenciesFileName  "dependencies.hygui"
 
 QAction *FindAction(QList<QAction *> list, QString sName);
 #define FINDACTION(str) FindAction(this->actions(), str)

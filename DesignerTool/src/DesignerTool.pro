@@ -41,7 +41,8 @@ SOURCES += main.cpp \
     DlgSetEngineLocation.cpp \
     ItemSpriteCmds.cpp \
     WidgetTabsManager.cpp \
-    WidgetSpriteState.cpp
+    WidgetSpriteState.cpp \
+    HyGuiDependencies.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -71,7 +72,8 @@ HEADERS  += \
     DlgSetEngineLocation.h \
     ItemSpriteCmds.h \
     WidgetTabsManager.h \
-    WidgetSpriteState.h
+    WidgetSpriteState.h \
+    HyGuiDependencies.h
 
 FORMS    += \
     DlgNewProject.ui \

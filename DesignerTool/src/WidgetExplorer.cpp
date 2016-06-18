@@ -38,16 +38,16 @@ WidgetExplorer::~WidgetExplorer()
 
 void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
 {
-    ItemProject *pItem = new ItemProject(sNewProjectFilePath);
-    if(pItem->HasError())
+    ItemProject *pItemProject = new ItemProject(sNewProjectFilePath);
+    if(pItemProject->HasError())
     {
-        HyGuiLog("Abort opening project: " % pItem->GetPath(), LOGTYPE_Error);
+        HyGuiLog("Abort opening project: " % pItemProject->GetPath(), LOGTYPE_Error);
         return;
     }
     else
-        HyGuiLog("Opening project: " % pItem->GetPath(), LOGTYPE_Info);
+        HyGuiLog("Opening project: " % pItemProject->GetPath(), LOGTYPE_Info);
     
-    QTreeWidgetItem *pProjTreeItem = CreateTreeItem(NULL, pItem);
+    QTreeWidgetItem *pProjTreeItem = CreateTreeItem(NULL, pItemProject);
     
     QList<eItemType> subDirList = HyGlobal::SubDirList();
     foreach(eItemType eType, subDirList)
@@ -55,8 +55,8 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
         if(eType == ITEM_DirAtlases)
             continue;
 
-        QString sSubDirPath = pItem->GetAssetsAbsPath() % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
-        Item *pSubDirItem = new Item(eType, sSubDirPath);
+        QString sSubDirPath = pItemProject->GetAssetsAbsPath() % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
+        Item *pSubDirItem = new Item(eType, sSubDirPath, pItemProject->GetDependencies());
         
         QTreeWidgetItem *pSubDirTreeItem = CreateTreeItem(pProjTreeItem, pSubDirItem);
         QTreeWidgetItem *pCurParentTreeItem = pSubDirTreeItem;
@@ -82,7 +82,7 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
             Item *pPrefixItem;
             if(dirIter.fileInfo().isDir())
             {
-                pPrefixItem = new Item(ITEM_Prefix, sCurPath);
+                pPrefixItem = new Item(ITEM_Prefix, sCurPath, pItemProject->GetDependencies());
                 pCurParentTreeItem = CreateTreeItem(pCurParentTreeItem, pPrefixItem);
             }
             else if(dirIter.fileInfo().isFile())
@@ -99,7 +99,7 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
                 
                 switch(eType)
                 {
-                case ITEM_Sprite:   pPrefixItem = new ItemSprite(pItem->GetAtlasManager(), sCurPath); break;
+                case ITEM_Sprite:   pPrefixItem = new ItemSprite(sCurPath, pItemProject->GetDependencies()); break;
                 }
                 
                 CreateTreeItem(pCurParentTreeItem, pPrefixItem);
@@ -152,13 +152,13 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     case ITEM_DirSpine:
     case ITEM_DirSprites:
     case ITEM_Prefix:
-        pItem = new Item(eNewItemType, sNewItemPath);
+        pItem = new Item(eNewItemType, sNewItemPath, pCurProj->GetDependencies());
         break;
     case ITEM_Sprite:
-        pItem = new ItemSprite(pCurProj->GetAtlasManager(), sNewItemPath);
+        pItem = new ItemSprite(sNewItemPath, pCurProj->GetDependencies());
         break;
     case ITEM_Font:
-        pItem = new ItemFont(sNewItemPath);
+        pItem = new ItemFont(sNewItemPath, pCurProj->GetDependencies());
         break;
     default:
         HyGuiLog("Item: " % sNewItemPath % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
@@ -206,7 +206,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
                 //
                 QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetPath() % sPathSplitList[i];
                 
-                Item *pPrefixItem = new Item(ITEM_Prefix, sPath);
+                Item *pPrefixItem = new Item(ITEM_Prefix, sPath, pCurProj->GetDependencies());
                 
                 pParentTreeItem = CreateTreeItem(pParentTreeItem, pPrefixItem);
             }

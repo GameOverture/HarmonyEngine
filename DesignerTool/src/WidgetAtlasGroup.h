@@ -38,7 +38,7 @@ class HyGuiFrame : public HyTexturedQuad2d
     const QRect         m_rALPHA_CROP;
 
     int                 m_iTextureIndex;
-    bool                m_bRotation;void on_atlasList_itemEntered(QTreeWidgetItem *item, int column);
+    bool                m_bRotation;
 
     int                 m_iPosX;
     int                 m_iPosY;
@@ -47,7 +47,7 @@ class HyGuiFrame : public HyTexturedQuad2d
     QStringList         m_sLinks;
 
 public:
-    HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupIndex, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) : HyTexturedQuad2d(uiAtlasGroupIndex),
+    HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) : HyTexturedQuad2d(uiAtlasGroupId),
                                                                                                                                                 m_uiHASH(uiCRC),
                                                                                                                                                 m_sNAME(sN),
                                                                                                                                                 m_iWIDTH(iW),

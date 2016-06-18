@@ -15,6 +15,7 @@
 #include <QCheckBox>
 #include <QAction>
 
+class HyGuiDependencies;
 class WidgetSpriteState;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,7 +111,7 @@ public:
 class ItemSpriteCmd_AddFrames : public QUndoCommand
 {
 public:
-    ItemSpriteCmd_AddFrames(QUndoCommand *pParent = 0);
+    ItemSpriteCmd_AddFrames(HyGuiDependencies *pDependencies, QUndoCommand *pParent = 0);
     ~ItemSpriteCmd_AddFrames();
 
     void undo() Q_DECL_OVERRIDE;
