@@ -61,6 +61,14 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
                                                                                              m_pMouseHoverItem(NULL)
 {
     ui->setupUi(this);
+
+    m_pFrameImportActionGroup = new QActionGroup(this);
+    m_pFrameImportActionGroup->setExclusive(false);
+    m_pFrameImportActionGroup->setEnabled(false);
+
+    m_pFrameRelinquishActionGroup = new QActionGroup(this);
+    m_pFrameRelinquishActionGroup->setExclusive(false);
+    m_pFrameRelinquishActionGroup->setEnabled(true);
     
     while(ui->atlasGroups->currentWidget())
         delete ui->atlasGroups->currentWidget();
@@ -70,7 +78,7 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
 
     if(m_DataDir.exists() == false)
         HyGuiLog("Data atlas directory is missing!", LOGTYPE_Error);
-    
+
     Reload();
 }
 
@@ -308,31 +316,66 @@ void WidgetAtlasManager::Reload()
     }
 }
 
-bool WidgetAtlasManager::IsSelectedFrames()
+QAction *WidgetAtlasManager::CreateImportFrameAction(Item *pRequester)
 {
-    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
-    return atlasGrp.GetTreeWidget()->selectedItems().count() != 0;
+    QObject *pParent = NULL;
+    switch(pRequester->GetType())
+    {
+    case ITEM_Sprite:
+        pParent = pRequester->GetWidget();
+        break;
+
+    default:
+        HyGuiLog("Unsupported item type in WidgetAtlasManager::CreateImportFrameAction", LOGTYPE_Error);
+        return NULL;
+    }
+
+    QAction *pNewAction = new QAction(pParent);
+    pNewAction->setIcon(QIcon(":/icons16x16/generic-add.png"));
+    pNewAction->setData(QVariant(pRequester->GetType()));
+    //pNewAction->setShortcuts(QKeySequence::Undo);
+    //pNewAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(pNewAction, SIGNAL(triggered()), this, SLOT(on_actionImportFrames_triggered()));
+    pNewAction->setActionGroup(m_pFrameImportActionGroup);
+
+    return pNewAction;
 }
 
-void WidgetAtlasManager::GetSelectedFrames(QList<QPair<int, int> > &frameListOut, uint uiAtlasGroupIdOut)
+QAction *WidgetAtlasManager::CreateRelinquishFrameAction(Item *pRequester)
 {
-    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
-
-    uiAtlasGroupIdOut = atlasGrp.GetId();
-
-    QList<QTreeWidgetItem *> selectedItems = atlasGrp.GetTreeWidget()->selectedItems();
-    qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
-
-    for(int i = 0; i < selectedItems.size(); ++i)
+    QObject *pParent = NULL;
+    switch(pRequester->GetType())
     {
-        QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
-        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
+    case ITEM_Sprite:
+        pParent = pRequester->GetWidget();
+        break;
 
-        if(pFrame == NULL)
-            continue;
-
-        //frameListOut.append(QPair<int, int>(pFrame->GetTextureIndex(), pFrame->Get
+    default:
+        HyGuiLog("Unsupported item type in WidgetAtlasManager::CreateRelinquishFrameAction", LOGTYPE_Error);
+        return NULL;
     }
+
+    QAction *pNewAction = new QAction(pParent);
+    pNewAction->setIcon(QIcon(":/icons16x16/edit-delete.png"));
+    pNewAction->setData(QVariant(pRequester->GetName(true)));
+    //pNewAction->setShortcuts(QKeySequence::Undo);
+    //pNewAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(pNewAction, SIGNAL(triggered()), this, SLOT(on_actionRelinqishFrames_triggered()));
+    pNewAction->setActionGroup(m_pFrameRelinquishActionGroup);
+
+    return pNewAction;
+}
+
+void WidgetAtlasManager::SetFramesAvailableForImport()
+{
+    WidgetAtlasGroup *pAtlasGrp = static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
+    if(pAtlasGrp)
+    {
+        QList<QTreeWidgetItem *> selectedItems = pAtlasGrp->GetTreeWidget()->selectedItems();
+        m_pFrameImportActionGroup->setEnabled(selectedItems.count() != 0);
+    }
+    else
+        m_pFrameImportActionGroup->setEnabled(false);
 }
 
 void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
@@ -395,14 +438,52 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
 
 void WidgetAtlasManager::on_atlasGroups_currentChanged(int iIndex)
 {
-//    if(ui->atlasGroups->currentWidget())
-//    {
-//        ui->atlasGroups->currentWidget()->metaObject()
-//        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget())->ResizeAtlasListColumns();
-//    }
+    SetFramesAvailableForImport();
 }
 
 void WidgetAtlasManager::on_btnAddGroup_clicked()
 {
 
+}
+
+void WidgetAtlasManager::on_actionImportFrames_triggered()
+{
+    QAction* pAction = qobject_cast<QAction*>(sender());
+    Q_ASSERT(pAction);
+
+    switch(pAction->data().toInt())
+    {
+    case ITEM_Sprite:
+        pAction->parentWidget()
+        pParent = pRequester->GetWidget();
+        break;
+
+    default:
+        HyGuiLog("Unsupported item type in WidgetAtlasManager::CreateImportFrameAction", LOGTYPE_Error);
+        return NULL;
+    }
+
+    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
+    QList<QTreeWidgetItem *> selectedItems = atlasGrp.GetTreeWidget()->selectedItems();
+    qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
+
+    for(int i = 0; i < selectedItems.size(); ++i)
+    {
+        QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
+        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
+
+        if(pFrame == NULL)
+            continue;
+
+        //frameListOut.append(QPair<int, int>(pFrame->GetTextureIndex(), pFrame->Get
+    }
+}
+
+void WidgetAtlasManager::on_actionRelinqishFrames_triggered()
+{
+    QAction* pAction = qobject_cast<QAction*>(sender());
+    Q_ASSERT(pAction);
+
+    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
+    //atlasGrp.GetTreeWidget()->selectedItems().count() != 0;
 }

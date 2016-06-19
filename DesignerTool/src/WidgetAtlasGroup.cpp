@@ -566,5 +566,6 @@ void WidgetAtlasGroup::on_btnSettings_clicked()
 
 void WidgetAtlasGroup::on_atlasList_itemSelectionChanged()
 {
-    //m_bRefreshDrawUpdate = true;
+    WidgetAtlasManager *pAtlasManager = reinterpret_cast<WidgetAtlasManager *>(this->parent()->parent());
+    pAtlasManager->SetFramesAvailableForImport();
 }

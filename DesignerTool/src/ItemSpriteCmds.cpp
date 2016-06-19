@@ -197,7 +197,7 @@ void ItemSpriteCmd_MoveStateForward::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemSpriteCmd_AddFrames::ItemSpriteCmd_AddFrames(HyGuiDependencies *pDependencies, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
+ItemSpriteCmd_AddFrames::ItemSpriteCmd_AddFrames(QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
 {
 }
 ItemSpriteCmd_AddFrames::~ItemSpriteCmd_AddFrames()

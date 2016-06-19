@@ -32,6 +32,13 @@ class WidgetAtlasManager : public QWidget
     
     QTreeWidgetItem *               m_pMouseHoverItem;
 
+    // Dependency maps. Both maps hold the same info, each provide access from either frame or item
+    QMap<quint32, QStringList>      m_FramesToItemMap;
+    QMap<QString, QList<quint32> >  m_ItemToFramesMap;
+
+    QActionGroup *                  m_pFrameImportActionGroup;
+    QActionGroup *                  m_pFrameRelinquishActionGroup;
+
 public:
     explicit WidgetAtlasManager(QWidget *parent = 0);
     explicit WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent = 0);
@@ -50,13 +57,19 @@ public:
 
     void Reload();
     
-    bool IsSelectedFrames();
-    void GetSelectedFrames(QList<QPair<int, int> > &frameListOut, uint uiAtlasGroupIdOut);
+    QAction *CreateImportFrameAction(Item *pRequester);
+    QAction *CreateRelinquishFrameAction(Item *pRequester);
+
+    void SetFramesAvailableForImport();
 
 private slots:
     void on_atlasGroups_currentChanged(int iIndex);
 
     void on_btnAddGroup_clicked();
+
+    void on_actionImportFrames_triggered();
+
+    void on_actionRelinqishFrames_triggered();
 
 private:
     Ui::WidgetAtlasManager *ui;

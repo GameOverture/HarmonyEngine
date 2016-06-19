@@ -17,30 +17,31 @@
 HyGuiDependencies::HyGuiDependencies(QString sMetaDataPath, WidgetAtlasManager *pAtlasMan) :    m_MetaDir(sMetaDataPath),
                                                                                                 m_pAtlasMan(pAtlasMan)
 {
-    QFile metaDependFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaDataDependenciesFileName));
-    if(metaDependFile.exists())
-    {
-        if(!metaDependFile.open(QIODevice::ReadOnly))
-            HyGuiLog(QString("HyGuiDependencies::HyGuiDependencies() could not open ") % HYGUIPATH_MetaDataDependenciesFileName, LOGTYPE_Error);
 
-#ifdef HYGUI_UseBinaryMetaFiles
-        QJsonDocument dependenciesDoc = QJsonDocument::fromBinaryData(metaDependFile.readAll());
-#else
-        QJsonDocument dependenciesDoc = QJsonDocument::fromJson(metaDependFile.readAll());
-#endif
-        metaDependFile.close();
+//    QFile metaDependFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaDataDependenciesFileName));
+//    if(metaDependFile.exists())
+//    {
+//        if(!metaDependFile.open(QIODevice::ReadOnly))
+//            HyGuiLog(QString("HyGuiDependencies::HyGuiDependencies() could not open ") % HYGUIPATH_MetaDataDependenciesFileName, LOGTYPE_Error);
 
-        QJsonObject dependenciesObj = dependenciesDoc.object();
-        QJsonArray frameArray = dependenciesObj["frames"].toArray();
-        for(int i = 0; i < frameArray.size(); ++i)
-        {
-            QJsonObject frameObj = frameArray[i].toObject();
+//#ifdef HYGUI_UseBinaryMetaFiles
+//        QJsonDocument dependenciesDoc = QJsonDocument::fromBinaryData(metaDependFile.readAll());
+//#else
+//        QJsonDocument dependenciesDoc = QJsonDocument::fromJson(metaDependFile.readAll());
+//#endif
+//        metaDependFile.close();
 
-            QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
+//        QJsonObject dependenciesObj = dependenciesDoc.object();
+//        QJsonArray frameArray = dependenciesObj["frames"].toArray();
+//        for(int i = 0; i < frameArray.size(); ++i)
+//        {
+//            QJsonObject frameObj = frameArray[i].toObject();
 
-            QJsonArray frameLinksArray = frameObj["links"].toArray();
-        }
-    }
+//            QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
+
+//            QJsonArray frameLinksArray = frameObj["links"].toArray();
+//        }
+//    }
 }
 
 HyGuiDependencies::~HyGuiDependencies()
@@ -51,7 +52,9 @@ HyGuiDependencies::~HyGuiDependencies()
 
 bool HyGuiDependencies::IsAtlasFramesAvailable()
 {
-    return m_pAtlasMan->IsSelectedFrames();
+//    m_ActionGroup.set
+//    return m_pAtlasMan->IsSelectedFrames();
+    return false;
 }
 
 void HyGuiDependencies::GetAtlasFrames(Item *pRequester, QList<const HyGuiFrame *> frameListOut)
@@ -60,6 +63,4 @@ void HyGuiDependencies::GetAtlasFrames(Item *pRequester, QList<const HyGuiFrame 
 
 void HyGuiDependencies::Save(Item *pItem)
 {
-
-    pItem->GetName
 }

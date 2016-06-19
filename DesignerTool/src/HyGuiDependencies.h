@@ -13,6 +13,7 @@
 #include "WidgetAtlasManager.h"
 
 #include <QDir>
+#include <QMap>
 
 class HyGuiDependencies
 {
@@ -24,8 +25,6 @@ class HyGuiDependencies
         TYPE_Frame = 0,
         TYPE_Item,
     };
-
-    QString
 
 public:
     HyGuiDependencies(QString sMetaDataPath, WidgetAtlasManager *pAtlasMan);
