@@ -35,7 +35,7 @@ class WidgetSprite : public QWidget
     WidgetSpriteState *     m_pCurSpriteState;
 
 public:
-    explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
+    explicit WidgetSprite(QAction *pImportFramesAction, QAction *pRelinquishFramesAction, ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
 
     void UpdateActions();

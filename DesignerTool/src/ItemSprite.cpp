@@ -11,9 +11,9 @@
 #include <QAction>
 #include <QUndoView>
 
-ItemSprite::ItemSprite(const QString sPath, HyGuiDependencies *pDependencies) : Item(ITEM_Sprite, sPath, pDependencies)
+ItemSprite::ItemSprite(QAction *pImportFramesAction, QAction *pRelinquishFramesAction, const QString sPath) : Item(ITEM_Sprite, sPath)
 {
-    m_pWidget = new WidgetSprite(this);
+    m_pWidget = new WidgetSprite(pImportFramesAction, pRelinquishFramesAction, this);
 
 //    m_pUndoView = new QUndoView(undoStack);
 //    m_pUndoView->setWindowTitle(tr("Command List"));

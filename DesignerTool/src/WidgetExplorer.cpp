@@ -14,6 +14,7 @@
 #include "ItemSprite.h"
 #include "ItemFont.h"
 #include "ItemProject.h"
+#include "WidgetAtlasManager.h"
 
 #include <QDirIterator>
 
@@ -56,7 +57,7 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
             continue;
 
         QString sSubDirPath = pItemProject->GetAssetsAbsPath() % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
-        Item *pSubDirItem = new Item(eType, sSubDirPath, pItemProject->GetDependencies());
+        Item *pSubDirItem = new Item(eType, sSubDirPath);
         
         QTreeWidgetItem *pSubDirTreeItem = CreateTreeItem(pProjTreeItem, pSubDirItem);
         QTreeWidgetItem *pCurParentTreeItem = pSubDirTreeItem;
@@ -82,7 +83,7 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
             Item *pPrefixItem;
             if(dirIter.fileInfo().isDir())
             {
-                pPrefixItem = new Item(ITEM_Prefix, sCurPath, pItemProject->GetDependencies());
+                pPrefixItem = new Item(ITEM_Prefix, sCurPath);
                 pCurParentTreeItem = CreateTreeItem(pCurParentTreeItem, pPrefixItem);
             }
             else if(dirIter.fileInfo().isFile())
@@ -99,7 +100,7 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
                 
                 switch(eType)
                 {
-                case ITEM_Sprite:   pPrefixItem = new ItemSprite(sCurPath, pItemProject->GetDependencies()); break;
+                case ITEM_Sprite:   pPrefixItem = new ItemSprite(pItemProject->GetAtlasManager()->CreateImportFrameAction(), pItemProject->GetAtlasManager()->CreateRelinquishFrameAction(), sCurPath); break;
                 }
                 
                 CreateTreeItem(pCurParentTreeItem, pPrefixItem);

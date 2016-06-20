@@ -9,7 +9,6 @@
  *************************************************************************/
 #include "ItemSpriteCmds.h"
 #include "WidgetSprite.h"
-#include "HyGuiDependencies.h"
 
 void EnsureProperNamingInComboBox(QComboBox *pCmb)
 {

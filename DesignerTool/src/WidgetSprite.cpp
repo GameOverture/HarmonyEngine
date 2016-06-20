@@ -13,7 +13,6 @@
 #include "ItemSprite.h"
 #include "ItemSpriteCmds.h"
 #include "DlgInputName.h"
-#include "HyGuiDependencies.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -21,10 +20,10 @@
 #include <QJsonArray>
 #include <QAction>
 
-WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :  QWidget(parent),
-                                                                        m_pItemSprite(pItemSprite),
-                                                                        ui(new Ui::WidgetSprite),
-                                                                        m_pCurSpriteState(NULL)
+WidgetSprite::WidgetSprite(QAction *pImportFramesAction, QAction *pRelinquishFramesAction, ItemSprite *pItemSprite, QWidget *parent) :  QWidget(parent),
+                                                                                                                                        m_pItemSprite(pItemSprite),
+                                                                                                                                        ui(new Ui::WidgetSprite),
+                                                                                                                                        m_pCurSpriteState(NULL)
 {
     ui->setupUi(this);
 

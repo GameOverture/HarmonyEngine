@@ -20,7 +20,7 @@ class ItemSprite : public Item
     HyPrimitive2d       m_primOriginHorz;
     HyPrimitive2d       m_primOriginVert;
     
-    ItemSprite(const QString sPath, HyGuiDependencies *pDependencies);
+    ItemSprite(QAction *pImportFramesAction, QAction *pRelinquishFramesAction, const QString sPath);
     
 protected:
     
