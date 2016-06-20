@@ -10,10 +10,11 @@
 #include "ItemSprite.h"
 #include <QAction>
 #include <QUndoView>
+#include "WidgetAtlasManager.h"
 
-ItemSprite::ItemSprite(QAction *pImportFramesAction, QAction *pRelinquishFramesAction, const QString sPath) : Item(ITEM_Sprite, sPath)
+ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager *pAtlasMan) : Item(ITEM_Sprite, sPath)
 {
-    m_pWidget = new WidgetSprite(pImportFramesAction, pRelinquishFramesAction, this);
+    m_pWidget = new WidgetSprite(this, pAtlasMan);
 
 //    m_pUndoView = new QUndoView(undoStack);
 //    m_pUndoView->setWindowTitle(tr("Command List"));

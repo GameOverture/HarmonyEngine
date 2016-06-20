@@ -13,6 +13,8 @@
 #include "Item.h"
 #include "WidgetSprite.h"
 
+class WidgetAtlasManager;
+
 class ItemSprite : public Item
 {
     friend class WidgetExplorer;
@@ -20,7 +22,7 @@ class ItemSprite : public Item
     HyPrimitive2d       m_primOriginHorz;
     HyPrimitive2d       m_primOriginVert;
     
-    ItemSprite(QAction *pImportFramesAction, QAction *pRelinquishFramesAction, const QString sPath);
+    ItemSprite(const QString sPath, WidgetAtlasManager *pAtlasMan);
     
 protected:
     

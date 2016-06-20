@@ -20,8 +20,6 @@ class WidgetSpriteState;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_AddState : public QUndoCommand
 {
-    QList<QAction *>    m_StateActionList;
-
     QComboBox *         m_pComboBox;
     WidgetSpriteState * m_pSpriteState;
     

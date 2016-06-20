@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "ItemFont.h"
 
-ItemFont::ItemFont(const QString sPath, HyGuiDependencies *pDependencies) : Item(ITEM_Font, sPath, pDependencies)
+ItemFont::ItemFont(const QString sPath) : Item(ITEM_Font, sPath)
 {
 }
 

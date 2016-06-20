@@ -237,30 +237,6 @@
     <string>Shift the index of the current state forward by 1</string>
    </property>
   </action>
-  <action name="actionAddFrames">
-   <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
-   </property>
-   <property name="text">
-    <string>Add &amp;Frames</string>
-   </property>
-   <property name="toolTip">
-    <string>Import selected frames from the Atlas Manager</string>
-   </property>
-  </action>
-  <action name="actionRemoveFrame">
-   <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
-   </property>
-   <property name="text">
-    <string>Rem&amp;ove Frame</string>
-   </property>
-   <property name="toolTip">
-    <string>Removes the selected frame from this state</string>
-   </property>
-  </action>
   <action name="actionOrderFrameUpwards">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">

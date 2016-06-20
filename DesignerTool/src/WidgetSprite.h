@@ -23,6 +23,7 @@ class WidgetSprite;
 }
 
 class ItemSprite;
+class WidgetAtlasManager;
 
 class WidgetSprite : public QWidget
 {
@@ -33,12 +34,18 @@ class WidgetSprite : public QWidget
 
     QList<QAction *>        m_StateActionsList;
     WidgetSpriteState *     m_pCurSpriteState;
+    
+    QAction *               m_pRequestFramesAction;
+    QAction *               m_pRelinquishFramesAction;
 
 public:
-    explicit WidgetSprite(QAction *pImportFramesAction, QAction *pRelinquishFramesAction, ItemSprite *pItemSprite, QWidget *parent = 0);
+    explicit WidgetSprite(ItemSprite *pItemSprite, WidgetAtlasManager *pAtlasMan, QWidget *parent = 0);
     ~WidgetSprite();
 
     void UpdateActions();
+    
+    void OnRequestFrames();
+    void OnRelinquishFrames();
     
 private slots:
     void on_actionAddState_triggered();
@@ -50,10 +57,6 @@ private slots:
     void on_actionOrderStateBackwards_triggered();
     
     void on_actionOrderStateForwards_triggered();
-    
-    void on_actionAddFrames_triggered();
-    
-    void on_actionRemoveFrame_triggered();
     
     void on_actionOrderFrameUpwards_triggered();
     

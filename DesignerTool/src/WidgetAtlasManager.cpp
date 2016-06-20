@@ -10,6 +10,7 @@
 #include "WidgetAtlasManager.h"
 #include "ui_WidgetAtlasManager.h"
 #include "HyGlobal.h"
+#include "WidgetSprite.h"
 
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -316,7 +317,7 @@ void WidgetAtlasManager::Reload()
     }
 }
 
-QAction *WidgetAtlasManager::CreateImportFrameAction(Item *pRequester)
+QAction *WidgetAtlasManager::CreateRequestFramesAction(Item *pRequester)
 {
     QObject *pParent = NULL;
     switch(pRequester->GetType())
@@ -333,6 +334,7 @@ QAction *WidgetAtlasManager::CreateImportFrameAction(Item *pRequester)
     QAction *pNewAction = new QAction(pParent);
     pNewAction->setIcon(QIcon(":/icons16x16/generic-add.png"));
     pNewAction->setData(QVariant(pRequester->GetType()));
+    pNewAction->setObjectName("actionAddFrames");
     //pNewAction->setShortcuts(QKeySequence::Undo);
     //pNewAction->setShortcutContext(Qt::ApplicationShortcut);
     connect(pNewAction, SIGNAL(triggered()), this, SLOT(on_actionImportFrames_triggered()));
@@ -341,7 +343,7 @@ QAction *WidgetAtlasManager::CreateImportFrameAction(Item *pRequester)
     return pNewAction;
 }
 
-QAction *WidgetAtlasManager::CreateRelinquishFrameAction(Item *pRequester)
+QAction *WidgetAtlasManager::CreateRelinquishFramesAction(Item *pRequester)
 {
     QObject *pParent = NULL;
     switch(pRequester->GetType())
@@ -358,6 +360,7 @@ QAction *WidgetAtlasManager::CreateRelinquishFrameAction(Item *pRequester)
     QAction *pNewAction = new QAction(pParent);
     pNewAction->setIcon(QIcon(":/icons16x16/edit-delete.png"));
     pNewAction->setData(QVariant(pRequester->GetName(true)));
+    pNewAction->setObjectName("actionRemoveFrame");
     //pNewAction->setShortcuts(QKeySequence::Undo);
     //pNewAction->setShortcutContext(Qt::ApplicationShortcut);
     connect(pNewAction, SIGNAL(triggered()), this, SLOT(on_actionRelinqishFrames_triggered()));
@@ -450,16 +453,18 @@ void WidgetAtlasManager::on_actionImportFrames_triggered()
 {
     QAction* pAction = qobject_cast<QAction*>(sender());
     Q_ASSERT(pAction);
+    
+    pAction->property(
 
     switch(pAction->data().toInt())
     {
     case ITEM_Sprite:
-        pAction->parentWidget()
+        static_cast<WidgetSprite *>(pAction->parentWidget())->OnRequestFrames(
         pParent = pRequester->GetWidget();
         break;
 
     default:
-        HyGuiLog("Unsupported item type in WidgetAtlasManager::CreateImportFrameAction", LOGTYPE_Error);
+        HyGuiLog("Unsupported item type in WidgetAtlasManager::on_actionImportFrames_triggered", LOGTYPE_Error);
         return NULL;
     }
 

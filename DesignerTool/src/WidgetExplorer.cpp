@@ -100,7 +100,7 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
                 
                 switch(eType)
                 {
-                case ITEM_Sprite:   pPrefixItem = new ItemSprite(pItemProject->GetAtlasManager()->CreateImportFrameAction(), pItemProject->GetAtlasManager()->CreateRelinquishFrameAction(), sCurPath); break;
+                case ITEM_Sprite:   pPrefixItem = new ItemSprite(sCurPath, pItemProject->GetAtlasManager()); break;
                 }
                 
                 CreateTreeItem(pCurParentTreeItem, pPrefixItem);
@@ -153,13 +153,13 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     case ITEM_DirSpine:
     case ITEM_DirSprites:
     case ITEM_Prefix:
-        pItem = new Item(eNewItemType, sNewItemPath, pCurProj->GetDependencies());
+        pItem = new Item(eNewItemType, sNewItemPath);
         break;
     case ITEM_Sprite:
-        pItem = new ItemSprite(sNewItemPath, pCurProj->GetDependencies());
+        pItem = new ItemSprite(sNewItemPath, pCurProj->GetAtlasManager());
         break;
     case ITEM_Font:
-        pItem = new ItemFont(sNewItemPath, pCurProj->GetDependencies());
+        pItem = new ItemFont(sNewItemPath);
         break;
     default:
         HyGuiLog("Item: " % sNewItemPath % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
@@ -207,7 +207,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
                 //
                 QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetPath() % sPathSplitList[i];
                 
-                Item *pPrefixItem = new Item(ITEM_Prefix, sPath, pCurProj->GetDependencies());
+                Item *pPrefixItem = new Item(ITEM_Prefix, sPath);
                 
                 pParentTreeItem = CreateTreeItem(pParentTreeItem, pPrefixItem);
             }

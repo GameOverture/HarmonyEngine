@@ -45,7 +45,7 @@ class ItemFont : public Item
         QList<tGlyphSet>    glyphSets;
     };
     
-    ItemFont(const QString sPath, HyGuiDependencies *pDependencies);
+    ItemFont(const QString sPath);
     
 public:
     virtual void Draw(WidgetRenderer &renderer);

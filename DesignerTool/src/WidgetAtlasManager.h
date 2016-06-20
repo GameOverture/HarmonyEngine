@@ -57,8 +57,8 @@ public:
 
     void Reload();
     
-    QAction *CreateImportFrameAction(Item *pRequester);
-    QAction *CreateRelinquishFrameAction(Item *pRequester);
+    QAction *CreateRequestFramesAction(Item *pRequester);
+    QAction *CreateRelinquishFramesAction(Item *pRequester);
 
     void SetFramesAvailableForImport();
 

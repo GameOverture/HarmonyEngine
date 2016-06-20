@@ -20,8 +20,7 @@ Item::Item(eItemType eType, const QString sPath) :  m_eTYPE(eType),
                                                     m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str()).c_str()),
                                                     m_pTreeItemPtr(NULL),
                                                     m_pWidget(NULL),
-                                                    m_pEditMenu(NULL),
-                                                    m_pDependencies(pDependencies)
+                                                    m_pEditMenu(NULL)
 {
     switch(m_eTYPE)
     {

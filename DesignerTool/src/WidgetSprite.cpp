@@ -13,6 +13,7 @@
 #include "ItemSprite.h"
 #include "ItemSpriteCmds.h"
 #include "DlgInputName.h"
+#include "WidgetAtlasManager.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -20,12 +21,15 @@
 #include <QJsonArray>
 #include <QAction>
 
-WidgetSprite::WidgetSprite(QAction *pImportFramesAction, QAction *pRelinquishFramesAction, ItemSprite *pItemSprite, QWidget *parent) :  QWidget(parent),
-                                                                                                                                        m_pItemSprite(pItemSprite),
-                                                                                                                                        ui(new Ui::WidgetSprite),
-                                                                                                                                        m_pCurSpriteState(NULL)
+WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, WidgetAtlasManager *pAtlasMan, QWidget *parent) :   QWidget(parent),
+                                                                                                        m_pItemSprite(pItemSprite),
+                                                                                                        ui(new Ui::WidgetSprite),
+                                                                                                        m_pCurSpriteState(NULL)
 {
     ui->setupUi(this);
+    
+    m_pRequestFramesAction = pAtlasMan->CreateRequestFramesAction(pItemSprite);
+    m_pRelinquishFramesAction = pAtlasMan->CreateRequestFramesAction(pItemSprite);
 
     ui->txtPrefixAndName->setText(m_pItemSprite->GetName(true));
     
@@ -51,8 +55,8 @@ WidgetSprite::WidgetSprite(QAction *pImportFramesAction, QAction *pRelinquishFra
     pEditMenu->addAction(ui->actionOrderStateBackwards);
     pEditMenu->addAction(ui->actionOrderStateForwards);
     pEditMenu->addSeparator();
-    pEditMenu->addAction(ui->actionAddFrames);
-    pEditMenu->addAction(ui->actionRemoveFrame);
+    pEditMenu->addAction(m_pRequestFramesAction);
+    pEditMenu->addAction(m_pRelinquishFramesAction);
     pEditMenu->addAction(ui->actionOrderFrameUpwards);
     pEditMenu->addAction(ui->actionOrderFrameDownwards);
 
@@ -62,8 +66,8 @@ WidgetSprite::WidgetSprite(QAction *pImportFramesAction, QAction *pRelinquishFra
     ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
     ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
 
-    m_StateActionsList.push_back(ui->actionAddFrames);
-    m_StateActionsList.push_back(ui->actionRemoveFrame);
+    m_StateActionsList.push_back(m_pRequestFramesAction);
+    m_StateActionsList.push_back(m_pRelinquishFramesAction);
     m_StateActionsList.push_back(ui->actionOrderFrameUpwards);
     m_StateActionsList.push_back(ui->actionOrderFrameDownwards);
     
@@ -140,8 +144,18 @@ void WidgetSprite::UpdateActions()
     ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
     ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
-    
-    ui->actionAddFrames->setEnabled(m_pItemSprite->GetDependencies()->IsAtlasFramesAvailable());
+}
+
+void WidgetSprite::OnRequestFrames()
+{
+    QUndoCommand *pCmd = new ItemSpriteCmd_AddFrames();
+    m_pUndoStack->push(pCmd);
+
+    UpdateActions();
+}
+
+void WidgetSprite::OnRelinquishFrames()
+{
 }
 
 void WidgetSprite::on_actionAddState_triggered()
@@ -184,19 +198,6 @@ void WidgetSprite::on_actionOrderStateForwards_triggered()
     m_pUndoStack->push(pCmd);
 
     UpdateActions();
-}
-
-void WidgetSprite::on_actionAddFrames_triggered()
-{
-    QUndoCommand *pCmd = new ItemSpriteCmd_AddFrames(m_pItemSprite->GetDependencies());
-    m_pUndoStack->push(pCmd);
-
-    UpdateActions();
-}
-
-void WidgetSprite::on_actionRemoveFrame_triggered()
-{
-    
 }
 
 void WidgetSprite::on_actionOrderFrameUpwards_triggered()

@@ -11,14 +11,13 @@
 
 #include "WidgetAtlasManager.h"
 #include "WidgetTabsManager.h"
-#include "HyGuiDependencies.h"
 
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
 
-ItemProject::ItemProject(const QString sNewProjectFilePath) : Item(ITEM_Project, sNewProjectFilePath, NULL),
+ItemProject::ItemProject(const QString sNewProjectFilePath) : Item(ITEM_Project, sNewProjectFilePath),
                                                               m_eDrawState(PROJDRAWSTATE_Nothing),
                                                               m_ePrevDrawState(PROJDRAWSTATE_Nothing),
                                                               m_bHasError(false)
@@ -55,7 +54,6 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) : Item(ITEM_Project,
 
     m_pTabsManager = new WidgetTabsManager(this);
     m_pAtlasManager = new WidgetAtlasManager(this);
-    m_pDependencies = new HyGuiDependencies(GetMetaDataAbsPath(), m_pAtlasManager);
 }
 
 ItemProject::~ItemProject()
