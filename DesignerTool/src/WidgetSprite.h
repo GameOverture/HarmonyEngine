@@ -24,6 +24,7 @@ class WidgetSprite;
 
 class ItemSprite;
 class WidgetAtlasManager;
+class HyGuiFrameActionInfo;
 
 class WidgetSprite : public QWidget
 {
@@ -35,6 +36,7 @@ class WidgetSprite : public QWidget
     QList<QAction *>        m_StateActionsList;
     WidgetSpriteState *     m_pCurSpriteState;
     
+    HyGuiFrameActionInfo *  m_pFrameActionInfo;
     QAction *               m_pRequestFramesAction;
     QAction *               m_pRelinquishFramesAction;
 

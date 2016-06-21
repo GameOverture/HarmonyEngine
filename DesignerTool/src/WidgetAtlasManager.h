@@ -21,6 +21,25 @@ namespace Ui {
 class WidgetAtlasManager;
 }
 
+class HyGuiFrameActionInfo
+{
+    Item *                          m_pAssociatedItem;
+    QList<quint32>                  m_RequestFrameList;         // Holds 32bit hashes
+    
+    // Below is filled out by WidgetAtlasManager
+    QList<QPair<quint32, bool> >    m_ReturnedFrameList;        // Holds 32bit hashes
+    
+public:
+    HyGuiFrameActionInfo(Item *pItem) : m_pAssociatedItem(pItem)
+    { }
+    ~HyGuiFrameActionInfo()
+    { }
+    
+    QList<quint32> &RequestedFrames()                       { return m_RequestFrameList; }
+    QList<QPair<quint32, bool> > &ReturnedFrames()          { return m_ReturnedFrameList; }
+};
+Q_DECLARE_METATYPE(HyGuiFrameActionInfo)
+
 class WidgetAtlasManager : public QWidget
 {
     Q_OBJECT
@@ -36,7 +55,7 @@ class WidgetAtlasManager : public QWidget
     QMap<quint32, QStringList>      m_FramesToItemMap;
     QMap<QString, QList<quint32> >  m_ItemToFramesMap;
 
-    QActionGroup *                  m_pFrameImportActionGroup;
+    QActionGroup *                  m_pFrameRequestActionGroup;
     QActionGroup *                  m_pFrameRelinquishActionGroup;
 
 public:
@@ -67,7 +86,7 @@ private slots:
 
     void on_btnAddGroup_clicked();
 
-    void on_actionImportFrames_triggered();
+    void on_actionRequestFrames_triggered();
 
     void on_actionRelinqishFrames_triggered();
 

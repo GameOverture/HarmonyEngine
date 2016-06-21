@@ -18,8 +18,8 @@ WidgetSpriteState::WidgetSpriteState(QList<QAction *> stateActionList, QWidget *
 {
     ui->setupUi(this);
 
-    ui->btnAddFrames->setDefaultAction(FindAction(stateActionList, "actionAddFrames"));
-    ui->btnRemoveFrame->setDefaultAction(FindAction(stateActionList, "actionRemoveFrame"));
+    ui->btnAddFrames->setDefaultAction(FindAction(stateActionList, "actionRequestFrames"));
+    ui->btnRemoveFrame->setDefaultAction(FindAction(stateActionList, "actionRelinquishFrames"));
     ui->btnOrderFrameUp->setDefaultAction(FindAction(stateActionList, "actionOrderFrameUpwards"));
     ui->btnOrderFrameDown->setDefaultAction(FindAction(stateActionList, "actionOrderFrameDownwards"));
 }
