@@ -1,4 +1,3 @@
-void on_atlasList_itemSelectionChanged();
 /**************************************************************************
  *	WidgetAtlasGroup.h
  *
@@ -19,118 +18,14 @@ void on_atlasList_itemSelectionChanged();
 #include "HyGlobal.h"
 #include "DlgAtlasGroupSettings.h"
 #include "IHyGuiDrawItem.h"
-
+#include "HyGuiFrame.h"
 #include "ItemProject.h"
 
 #include "scriptum/imagepacker.h"
-#include "Harmony/HyEngine.h"
 
 namespace Ui {
 class WidgetAtlasGroup;
 }
-
-class HyGuiFrame : public HyTexturedQuad2d
-{
-    const quint32       m_uiHASH;
-    const QString       m_sNAME;
-    const int           m_iWIDTH;
-    const int           m_iHEIGHT;
-    const QRect         m_rALPHA_CROP;
-
-    int                 m_iTextureIndex;
-    bool                m_bRotation;
-
-    int                 m_iPosX;
-    int                 m_iPosY;
-    
-    QTreeWidgetItem *   m_pTreeItem;
-    QStringList         m_sLinks;
-
-public:
-    HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) : HyTexturedQuad2d(uiAtlasGroupId),
-                                                                                                                                                m_uiHASH(uiCRC),
-                                                                                                                                                m_sNAME(sN),
-                                                                                                                                                m_iWIDTH(iW),
-                                                                                                                                                m_iHEIGHT(iH),
-                                                                                                                                                m_rALPHA_CROP(rAlphaCrop),
-                                                                                                                                                m_iTextureIndex(iTexIndex),
-                                                                                                                                                m_bRotation(bRot),
-                                                                                                                                                m_iPosX(iX),
-                                                                                                                                                m_iPosY(iY),
-                                                                                                                                                m_pTreeItem(NULL)
-    {
-        if(m_bRotation == false)
-            SetTextureSource(iTexIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
-        else
-        {
-            SetTextureSource(iTexIndex, GetX(), GetY(), m_rALPHA_CROP.height(), m_rALPHA_CROP.width());
-            rot_pivot.Set(m_rALPHA_CROP.height() * 0.5f, m_rALPHA_CROP.width() * 0.5f);
-            rot.Z(90);
-        }
-
-        SetDisplayOrder(1);
-        SetEnabled(false);
-    }
-    
-    quint32 GetHash()       { return m_uiHASH; }
-    QString GetName()       { return m_sNAME; }
-    QSize GetSize()         { return QSize(m_iWIDTH, m_iHEIGHT); }
-    QRect GetCrop()         { return m_rALPHA_CROP; }
-    QPoint GetPosition()    { return QPoint(m_iPosX, m_iPosY); }
-    QStringList GetLinks()  { return m_sLinks; }
-
-    bool IsRotated()        { return m_bRotation; }
-    int GetX()              { return m_iPosX; }
-    int GetY()              { return m_iPosY; }
-    int GetTextureIndex()   { return m_iTextureIndex; }
-    
-    void SetLink(QString sFullPath)
-    {
-        m_sLinks.append(sFullPath);
-    }
-    void SetLink(eItemType eType, QString sPrefix, QString sName)
-    {
-        QString sLink(HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/");
-        sLink += sPrefix;
-        sLink += sName;
-        
-        m_sLinks.append(sLink);
-    }
-    void SetTreeWidgetItem(QTreeWidgetItem *pItem)
-    {
-        m_pTreeItem = pItem;
-        
-        QVariant v; v.setValue(this);
-        m_pTreeItem->setData(0, QTreeWidgetItem::UserType, v);
-    }
-    void SetInfoFromPacker(int iTextureIndex, bool bRotation, int iX, int iY)
-    {
-        m_iTextureIndex = iTextureIndex;
-        m_bRotation = bRotation;
-        m_iPosX = iX;
-        m_iPosY = iY;
-
-        SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
-    }
-    
-    QString ConstructImageFileName()
-    {
-        QString sMetaImgName;
-        sMetaImgName = sMetaImgName.sprintf("%010u-%s", m_uiHASH, m_sNAME.toStdString().c_str());
-        sMetaImgName += ".png";
-        
-        return sMetaImgName;
-    }
-    
-    void Reset()
-    {
-        SetEnabled(false);
-        SetDisplayOrder(0);
-        color.Set(1.0f, 1.0f, 1.0f, 1.0f);
-        SetCoordinateType(HYCOORDTYPE_Screen, NULL);
-    }
-};
-Q_DECLARE_METATYPE(HyGuiFrame *)
 
 class WidgetAtlasGroup : public QWidget
 {
@@ -143,6 +38,7 @@ class WidgetAtlasGroup : public QWidget
     DlgAtlasGroupSettings       m_dlgSettings;
     
     QList<HyGuiFrame *>         m_FrameList;
+    QList<HyTexturedQuad2d *>   m_HyQuadList;
     ImagePacker                 m_Packer;
 
 public:
@@ -181,7 +77,7 @@ private:
     void ImportImages(QStringList sImportImgList);
     void Refresh();
 
-    QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType);
+    void CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType, HyGuiFrame *pFrame);
 };
 
 #endif // WIDGETATLASGROUP_H

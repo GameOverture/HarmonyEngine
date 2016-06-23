@@ -85,6 +85,9 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
 
 WidgetAtlasManager::~WidgetAtlasManager()
 {
+    while(ui->atlasGroups->currentWidget())
+        delete ui->atlasGroups->currentWidget();
+
     delete ui;
 }
 
@@ -223,7 +226,19 @@ void WidgetAtlasManager::HideAtlasGroup()
     foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
     {
         if(pHoveredFrame != pFrame && pFrame)
+        {
+//            void Reset()
+//            {
+//                SetEnabled(false);
+//                SetDisplayOrder(0);
+//                color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+//                SetCoordinateType(HYCOORDTYPE_Screen, NULL);
+//            }
+
+
+
             pFrame->Reset();
+        }
     }
     
     if(bDebugPrint)
@@ -320,7 +335,7 @@ void WidgetAtlasManager::Reload()
 QAction *WidgetAtlasManager::CreateRequestFramesAction(Item *pRequester)
 {
     QVariant v;
-    v.setValue(HyGuiFrameActionInfo(pRequester));
+    //v.setValue(HyGuiFrameActionInfo(pRequester));
     
     QAction *pNewAction = new QAction(pRequester->GetWidget());
     pNewAction->setIcon(QIcon(":/icons16x16/generic-add.png"));
@@ -348,7 +363,7 @@ QAction *WidgetAtlasManager::CreateRelinquishFramesAction(Item *pRequester)
     }
     
     QVariant v;
-    v.setValue(HyGuiFrameActionInfo(pRequester));
+    //v.setValue(HyGuiFrameActionInfo(pRequester));
 
     QAction *pNewAction = new QAction(pParent);
     pNewAction->setIcon(QIcon(":/icons16x16/edit-delete.png"));
@@ -364,7 +379,7 @@ QAction *WidgetAtlasManager::CreateRelinquishFramesAction(Item *pRequester)
 void WidgetAtlasManager::SetFramesAvailableForImport()
 {
     WidgetAtlasGroup *pAtlasGrp = static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
-    if(pAtlasGrp)
+    if(pAtlasGrp && pAtlasGrp->GetTreeWidget())
     {
         QList<QTreeWidgetItem *> selectedItems = pAtlasGrp->GetTreeWidget()->selectedItems();
         m_pFrameRequestActionGroup->setEnabled(selectedItems.count() != 0);
@@ -446,10 +461,10 @@ void WidgetAtlasManager::on_actionRequestFrames_triggered()
     QAction* pAction = qobject_cast<QAction*>(sender());
     Q_ASSERT(pAction);
     
-    HyGuiFrameActionInfo frameActionInfo = pAction->data().value<HyGuiFrameActionInfo>();
-    frameActionInfo.ReturnedFrames().clear();
+//    HyGuiFrameActionInfo frameActionInfo = pAction->data().value<HyGuiFrameActionInfo>();
+//    frameActionInfo.ReturnedFrames().clear();
     
-    if(pAction->data().value<HyGuiFrameActionInfo>().RequestedFrames().count() == 0)
+    //if(pAction->data().value<HyGuiFrameActionInfo>().RequestedFrames().count() == 0)
     {
         WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
         QList<QTreeWidgetItem *> selectedItems = atlasGrp.GetTreeWidget()->selectedItems();

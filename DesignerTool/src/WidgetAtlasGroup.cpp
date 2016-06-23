@@ -24,8 +24,6 @@
 #include "MainWindow.h"
 #include "WidgetAtlasManager.h"
 
-void ResetFrame(HyGuiFrame *pFrame);
-
 WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
                                                         ui(new Ui::WidgetAtlasGroup)
 {
@@ -68,7 +66,10 @@ QList<HyGuiFrame *> &WidgetAtlasGroup::GetFrameList()
 
 QTreeWidget *WidgetAtlasGroup::GetTreeWidget()
 {
-    return ui->atlasList;
+    if(ui)
+        return ui->atlasList;
+    else
+        return NULL;
 }
 
 void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObj)
@@ -175,7 +176,7 @@ void WidgetAtlasGroup::Reload()
                 eIconType = ATLAS_Frame;
             }
 
-            pNewFrame->SetTreeWidgetItem(CreateTreeItem(NULL, frameObj["name"].toString(), iTexIndex, eIconType));
+            CreateTreeItem(NULL, frameObj["name"].toString(), iTexIndex, eIconType, pNewFrame);
             
             m_FrameList.append(pNewFrame);
         }
@@ -527,7 +528,7 @@ void WidgetAtlasGroup::Refresh()
     ui->atlasList->sortItems(0, Qt::AscendingOrder);
 }
 
-QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType)
+void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType, HyGuiFrame *pFrame)
 {
     QTreeWidgetItem *pNewTreeItem;
     if(pParent == NULL)
@@ -547,12 +548,12 @@ QTreeWidgetItem *WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QStr
 //    v.in
 //    pNewTreeItem->setData(0, Qt::UserRole, v);
 
+    pFrame
+
     if(pParent)
         pParent->addChild(pNewTreeItem);
 
     ResizeAtlasListColumns();
-
-    return pNewTreeItem;
 }
 
 void WidgetAtlasGroup::on_btnSettings_clicked()
