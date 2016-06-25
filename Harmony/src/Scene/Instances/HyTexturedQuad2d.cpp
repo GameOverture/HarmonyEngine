@@ -48,8 +48,8 @@ void HyTexturedQuad2d::SetTextureSource(uint32 uiTextureIndex, int iX, int iY, i
 
 		m_SrcRect.left = fX / fTexWidth;
 		m_SrcRect.top = fY / fTexHeight;
-		m_SrcRect.right = fX + (fWidth / fTexWidth);
-		m_SrcRect.bottom = fY + (fHeight / fTexHeight);
+		m_SrcRect.right = (fX + fWidth) / fTexWidth;
+		m_SrcRect.bottom = (fY + fHeight) / fTexHeight;
 	}
 	else
 	{
