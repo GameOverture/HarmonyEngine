@@ -41,7 +41,8 @@ public:
     QMenu *GetEditMenu() const                      { return m_pEditMenu; }
     
     QString GetName(bool bWithPrefix) const;
-    QString GetPath() const                         { return m_sPATH; }
+    QString GetRelPath() const;
+    QString GetAbsPath() const                      { return m_sPATH; }
     QIcon GetIcon() const                           { return HyGlobal::ItemIcon(m_eTYPE); }
     
     void SetTreeItem(QTreeWidgetItem *pTreeItem)    { m_pTreeItemPtr = pTreeItem; }

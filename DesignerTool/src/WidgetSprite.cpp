@@ -27,9 +27,6 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, WidgetAtlasManager *pAtlasMa
                                                                                                         m_pCurSpriteState(NULL)
 {
     ui->setupUi(this);
-    
-    m_pRequestFramesAction = pAtlasMan->CreateRequestFramesAction(pItemSprite);
-    m_pRelinquishFramesAction = pAtlasMan->CreateRequestFramesAction(pItemSprite);
 
     ui->txtPrefixAndName->setText(m_pItemSprite->GetName(true));
     
@@ -55,8 +52,8 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, WidgetAtlasManager *pAtlasMa
     pEditMenu->addAction(ui->actionOrderStateBackwards);
     pEditMenu->addAction(ui->actionOrderStateForwards);
     pEditMenu->addSeparator();
-    pEditMenu->addAction(m_pRequestFramesAction);
-    pEditMenu->addAction(m_pRelinquishFramesAction);
+    pEditMenu->addAction(ui->actionImportFrames);
+    pEditMenu->addAction(ui->actionRemoveFrames);
     pEditMenu->addAction(ui->actionOrderFrameUpwards);
     pEditMenu->addAction(ui->actionOrderFrameDownwards);
 
@@ -66,19 +63,19 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, WidgetAtlasManager *pAtlasMa
     ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
     ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
 
-    m_StateActionsList.push_back(m_pRequestFramesAction);
-    m_StateActionsList.push_back(m_pRelinquishFramesAction);
+    m_StateActionsList.push_back(ui->actionImportFrames);
+    m_StateActionsList.push_back(ui->actionRemoveFrames);
     m_StateActionsList.push_back(ui->actionOrderFrameUpwards);
     m_StateActionsList.push_back(ui->actionOrderFrameDownwards);
     
     ui->cmbStates->clear();
 
     // If a .hyspr file exists, parse and initalize with it, otherwise make default empty sprite
-    QFile spriteFile(m_pItemSprite->GetPath());
+    QFile spriteFile(m_pItemSprite->GetAbsPath());
     if(spriteFile.exists())
     {
         if(!spriteFile.open(QIODevice::ReadOnly))
-            HyGuiLog(QString("WidgetSprite::WidgetSprite() could not open ") % m_pItemSprite->GetPath(), LOGTYPE_Error);
+            HyGuiLog(QString("WidgetSprite::WidgetSprite() could not open ") % m_pItemSprite->GetAbsPath(), LOGTYPE_Error);
 
         QJsonDocument spriteJsonDoc = QJsonDocument::fromJson(spriteFile.readAll());
         spriteFile.close();
@@ -200,6 +197,19 @@ void WidgetSprite::on_actionOrderStateForwards_triggered()
     UpdateActions();
 }
 
+void WidgetSprite::on_actionImportFrames_triggered()
+{
+    QUndoCommand *pCmd = new ItemSpriteCmd_AddFrames();
+    m_pUndoStack->push(pCmd);
+
+    UpdateActions();
+}
+
+void WidgetSprite::on_actionRemoveFrames_triggered()
+{
+
+}
+
 void WidgetSprite::on_actionOrderFrameUpwards_triggered()
 {
     
@@ -230,3 +240,4 @@ void WidgetSprite::on_cmbStates_currentIndexChanged(int index)
 
     UpdateActions();
 }
+

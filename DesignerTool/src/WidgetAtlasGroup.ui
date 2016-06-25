@@ -183,7 +183,21 @@
     </widget>
    </item>
   </layout>
+  <action name="actionDeleteImage">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete Image</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes the selected image(s) from the atlas group. The entire group will then be regenerated.</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="res/DesignerTool.qrc"/>
+ </resources>
  <connections/>
 </ui>

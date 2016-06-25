@@ -38,7 +38,6 @@ class WidgetAtlasGroup : public QWidget
     DlgAtlasGroupSettings       m_dlgSettings;
     
     QList<HyGuiFrame *>         m_FrameList;
-    QList<HyTexturedQuad2d *>   m_HyQuadList;
     ImagePacker                 m_Packer;
 
 public:
@@ -56,8 +55,6 @@ public:
     int GetId();
 
     void ResizeAtlasListColumns();
-    
-    void Reload();
 
 private slots:
     void on_btnAddImages_clicked();
@@ -67,12 +64,16 @@ private slots:
 
     void on_atlasList_itemSelectionChanged();
     
+    void on_actionDeleteImage_triggered();
+
 protected:
     virtual void enterEvent(QEvent *pEvent);
     virtual void leaveEvent(QEvent *pEvent);
 
 private:
     Ui::WidgetAtlasGroup *ui;
+
+    WidgetAtlasManager *GetManager();
     
     void ImportImages(QStringList sImportImgList);
     void Refresh();

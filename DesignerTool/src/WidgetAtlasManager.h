@@ -48,11 +48,13 @@ class WidgetAtlasManager : public QWidget
 
     QDir                            m_MetaDir;
     QDir                            m_DataDir;
+
+    QFile                           m_DependenciesFile;
     
     QTreeWidgetItem *               m_pMouseHoverItem;
 
     // Dependency maps. Both maps hold the same info, each provide access from either frame or item
-    QMap<quint32, QStringList>      m_FramesToItemMap;
+    QMap<quint32, QStringList>      m_FrameToItemsMap;
     QMap<QString, QList<quint32> >  m_ItemToFramesMap;
 
     QActionGroup *                  m_pFrameRequestActionGroup;
@@ -73,13 +75,13 @@ public:
     friend void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawHide(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
-
-    void Reload();
     
     QAction *CreateRequestFramesAction(Item *pRequester);
     QAction *CreateRelinquishFramesAction(Item *pRequester);
 
-    void SetFramesAvailableForImport();
+    void LinkSet(quint32 uiHash, Item *pItem);
+
+    QList<HyGuiFrame *> GetSelectedFrames();
 
 private slots:
     void on_atlasGroups_currentChanged(int iIndex);

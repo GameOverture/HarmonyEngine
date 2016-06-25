@@ -68,8 +68,9 @@ enum eProjDrawState
     NUMPROJDRAWSTATE
 };
 
-#define HYGUIPATH_DataAtlasFileName             "atlasInfo.json"
-#define HYGUIPATH_MetaDataAtlasFileName         "settings.hygui"
+#define HYGUIPATH_DataAtlases                   "atlasInfo.json"
+#define HYGUIPATH_MetaAtlasSettings             "settings.hygui"
+#define HYGUIPATH_MetaAtlasDependencies         "dependencies.hygui"
 
 QAction *FindAction(QList<QAction *> list, QString sName);
 #define FINDACTION(str) FindAction(this->actions(), str)

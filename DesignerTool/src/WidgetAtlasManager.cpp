@@ -38,9 +38,9 @@ struct PreviewRow
         float fPosY = 0.0f;
         foreach(HyGuiFrame *pFrame, m_Frames)
         {
-            fPosY = iStartPosY - (pFrame->GetHeight() * 0.5f) - fMidRow;
-            if(pFrame->pos.AnimY().IsTransforming() == false && pFrame->pos.Y() != fPosY)
-                pFrame->pos.AnimY().Tween(fPosY, fTRANS_DUR, HyTween::QuadInOut);
+            fPosY = iStartPosY - (pFrame->DrawInst()->GetHeight() * 0.5f) - fMidRow;
+            if(pFrame->DrawInst()->pos.AnimY().IsTransforming() == false && pFrame->DrawInst()->pos.Y() != fPosY)
+                pFrame->DrawInst()->pos.AnimY().Tween(fPosY, fTRANS_DUR, HyTween::QuadInOut);
         }
     }
 };
@@ -59,6 +59,7 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
                                                                                              m_pProjOwner(pProjOwner),
                                                                                              m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
                                                                                              m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
+                                                                                             m_DependenciesFile(m_MetaDir.absolutePath() % "/" % HYGUIPATH_MetaAtlasDependencies),
                                                                                              m_pMouseHoverItem(NULL)
 {
     ui->setupUi(this);
@@ -80,7 +81,26 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
     if(m_DataDir.exists() == false)
         HyGuiLog("Data atlas directory is missing!", LOGTYPE_Error);
 
-    Reload();
+    QFileInfoList metaAtlasDirs = m_MetaDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    if(metaAtlasDirs.empty())
+    {
+        HyGuiLog("Empty atlas directory, creating new empty group", LOGTYPE_Info);
+        AddAtlasGroup();
+    }
+    else
+    {
+        foreach(QFileInfo dir, metaAtlasDirs)
+        {
+            if(dir.isDir())
+            {
+                bool bWorked = false;
+                int iId = dir.baseName().toInt(&bWorked);
+
+                if(bWorked && iId >= 0)
+                    AddAtlasGroup(iId);
+            }
+        }
+    }
 }
 
 WidgetAtlasManager::~WidgetAtlasManager()
@@ -104,7 +124,7 @@ void WidgetAtlasManager::SaveData()
     QJsonDocument atlasInfoDoc;
     atlasInfoDoc.setArray(atlasGroupArray);
 
-    QFile atlasInfoFile(m_DataDir.absolutePath() % "/" % HYGUIPATH_DataAtlasFileName);
+    QFile atlasInfoFile(m_DataDir.absolutePath() % "/" % HYGUIPATH_DataAtlases);
     if(atlasInfoFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
     {
        HyGuiLog("Couldn't open atlas data info file for writing", LOGTYPE_Error);
@@ -137,8 +157,11 @@ void WidgetAtlasManager::HideAtlasGroup()
     
     foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
     {
-        pFrame->Load();
-        pFrame->Reset();
+        pFrame->DrawInst()->Load();
+        pFrame->DrawInst()->SetEnabled(false);
+        pFrame->DrawInst()->SetDisplayOrder(0);
+        pFrame->DrawInst()->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+        pFrame->DrawInst()->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
     }
 
     atlasGrp.ResizeAtlasListColumns();
@@ -149,7 +172,7 @@ void WidgetAtlasManager::HideAtlasGroup()
     WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget());
     
     foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
-         pFrame->Unload();
+         pFrame->DrawInst()->Unload();
 }
 
 /*friend*/ void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
@@ -163,7 +186,7 @@ void WidgetAtlasManager::HideAtlasGroup()
         WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->widget(i));
         
         foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
-            pFrame->SetEnabled(false);
+            pFrame->DrawInst()->SetEnabled(false);
     }
 }
 
@@ -193,22 +216,30 @@ void WidgetAtlasManager::HideAtlasGroup()
     {
         if(atlasMan.m_pMouseHoverItem && atlasMan.m_pMouseHoverItem->isSelected() == false)
         {
-            QVariant v = atlasMan.m_pMouseHoverItem->data(0, QTreeWidgetItem::UserType);
+            QVariant v = atlasMan.m_pMouseHoverItem->data(0, Qt::UserRole);
             HyGuiFrame *pHoverFrame = v.value<HyGuiFrame *>();
             if(pHoverFrame)
-                pHoverFrame->Reset();
+            {
+                pHoverFrame->DrawInst()->SetEnabled(false);
+                pHoverFrame->DrawInst()->SetDisplayOrder(0);
+                pHoverFrame->DrawInst()->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+                pHoverFrame->DrawInst()->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
+            }
         }
 
         atlasMan.m_pMouseHoverItem = pHoveredItem;
 
-        QVariant v = atlasMan.m_pMouseHoverItem->data(0, QTreeWidgetItem::UserType);
+        QVariant v = atlasMan.m_pMouseHoverItem->data(0, Qt::UserRole);
         HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
 
-        pFrame->SetEnabled(true);
-        pFrame->SetDisplayOrder(100);
-        pFrame->pos.Set((uiRENDERWIDTH * 0.5f) + (pFrame->GetWidth() * -0.5f),
-                        (uiRENDERHEIGHT * 0.5f) + (pFrame->GetHeight() * -0.5f));
-        pFrame->color.A(0.5f);
+        if(pFrame)
+        {
+            pFrame->DrawInst()->SetEnabled(true);
+            pFrame->DrawInst()->SetDisplayOrder(100);
+            pFrame->DrawInst()->pos.Set((uiRENDERWIDTH * 0.5f) + (pFrame->DrawInst()->GetWidth() * -0.5f),
+                            (uiRENDERHEIGHT * 0.5f) + (pFrame->DrawInst()->GetHeight() * -0.5f));
+            pFrame->DrawInst()->color.A(0.5f);
+        }
     }
     else if(atlasMan.m_pMouseHoverItem != pHoveredItem)
         atlasMan.m_pMouseHoverItem = NULL;
@@ -219,7 +250,7 @@ void WidgetAtlasManager::HideAtlasGroup()
 
     if(atlasMan.m_pMouseHoverItem)
     {
-        QVariant v = atlasMan.m_pMouseHoverItem->data(0, QTreeWidgetItem::UserType);
+        QVariant v = atlasMan.m_pMouseHoverItem->data(0, Qt::UserRole);
         pHoveredFrame = v.value<HyGuiFrame *>();
     }
 
@@ -234,10 +265,10 @@ void WidgetAtlasManager::HideAtlasGroup()
 //                color.Set(1.0f, 1.0f, 1.0f, 1.0f);
 //                SetCoordinateType(HYCOORDTYPE_Screen, NULL);
 //            }
-
-
-
-            pFrame->Reset();
+            pFrame->DrawInst()->SetEnabled(false);
+            pFrame->DrawInst()->SetDisplayOrder(0);
+            pFrame->DrawInst()->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+            pFrame->DrawInst()->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
         }
     }
     
@@ -257,18 +288,18 @@ void WidgetAtlasManager::HideAtlasGroup()
     
     for(int i = 0; i < selectedItems.size(); ++i)
     {
-        QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
+        QVariant v = selectedItems[i]->data(0, Qt::UserRole);
         HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
 
         if(pFrame == NULL)
             continue;
 
-        pFrame->SetEnabled(true);
-        pFrame->color.A(1.0f);
-        pFrame->SetDisplayOrder(-0x0FFFFFFF + i);
+        pFrame->DrawInst()->SetEnabled(true);
+        pFrame->DrawInst()->color.A(1.0f);
+        pFrame->DrawInst()->SetDisplayOrder(-0x0FFFFFFF + i);
 
-        float fFrameWidth = pFrame->IsRotated() ? pFrame->GetHeight() : pFrame->GetWidth();
-        float fFrameHeight = pFrame->IsRotated() ? pFrame->GetWidth() : pFrame->GetHeight();
+        float fFrameWidth = pFrame->IsRotated() ? pFrame->DrawInst()->GetHeight() : pFrame->DrawInst()->GetWidth();
+        float fFrameHeight = pFrame->IsRotated() ? pFrame->DrawInst()->GetWidth() : pFrame->DrawInst()->GetHeight();
 
         // Will it fit in this row
         if(ptDrawPos.x() + fFrameWidth > uiRENDERWIDTH)
@@ -283,8 +314,8 @@ void WidgetAtlasManager::HideAtlasGroup()
         
         float fPosX = ptDrawPos.x() + (pFrame->IsRotated() ? ((fFrameWidth * 0.5f) - (fFrameHeight * 0.5f)) : 0);
         
-        if(pFrame->pos.AnimX().IsTransforming() == false && pFrame->pos.X() != ptDrawPos.x())
-            pFrame->pos.AnimX().Tween(fPosX, fTRANS_DUR, HyTween::QuadInOut);
+        if(pFrame->DrawInst()->pos.AnimX().IsTransforming() == false && pFrame->DrawInst()->pos.X() != ptDrawPos.x())
+            pFrame->DrawInst()->pos.AnimX().Tween(fPosX, fTRANS_DUR, HyTween::QuadInOut);
 
         ptDrawPos.setX(ptDrawPos.x() + fFrameWidth + iPADDING);
 
@@ -304,32 +335,6 @@ void WidgetAtlasManager::HideAtlasGroup()
     //HyGuiLog("Cam  : " % QString::number(pProj->m_pCamera->pos.X()) % ", " % QString::number(pProj->m_pCamera->pos.Y()), LOGTYPE_Normal);
     //if(pProj->m_pCamera && pProj->m_pCamera->pos.IsTweening() == false)
         //pProj->m_pCamera->pos.Animate(iFrameCount * 12, iFrameCount * 12, 1.0f, HyEase::quadInOut);
-}
-
-void WidgetAtlasManager::Reload()
-{
-    m_pMouseHoverItem = NULL;
-    
-    QFileInfoList metaAtlasDirs = m_MetaDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
-    if(metaAtlasDirs.empty())
-    {
-        HyGuiLog("Empty atlas directory, creating new empty group", LOGTYPE_Info);
-        AddAtlasGroup();
-    }
-    else
-    {
-        foreach(QFileInfo dir, metaAtlasDirs)
-        {
-            if(dir.isDir())
-            {
-                bool bWorked = false;
-                int iId = dir.baseName().toInt(&bWorked);
-
-                if(bWorked && iId >= 0)
-                    AddAtlasGroup(iId);
-            }
-        }
-    }
 }
 
 QAction *WidgetAtlasManager::CreateRequestFramesAction(Item *pRequester)
@@ -376,17 +381,15 @@ QAction *WidgetAtlasManager::CreateRelinquishFramesAction(Item *pRequester)
     return pNewAction;
 }
 
-void WidgetAtlasManager::SetFramesAvailableForImport()
+void WidgetAtlasManager::LinkSet(quint32 uiHash, Item *pItem)
 {
-    WidgetAtlasGroup *pAtlasGrp = static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
-    if(pAtlasGrp && pAtlasGrp->GetTreeWidget())
-    {
-        QList<QTreeWidgetItem *> selectedItems = pAtlasGrp->GetTreeWidget()->selectedItems();
-        m_pFrameRequestActionGroup->setEnabled(selectedItems.count() != 0);
-    }
-    else
-        m_pFrameRequestActionGroup->setEnabled(false);
+    if(m_FrameToItemsMap.contains(uiHash) == false)
+        m_FrameToItemsMap[uiHash].append(pItem->GetRelPath());
+
+    m_ItemToFramesMap[pItem->GetRelPath()].contains(uiHash);
+    //m_FrameToItemsMap[uiHash].contains(pItem->GetRelPath()
 }
+
 
 void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
 {
@@ -432,7 +435,7 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
     {
         if(static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->IsMatching(newMetaAtlasDir, newDataAtlasDir))
         {
-            static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->Reload();
+            //static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->Reload();
             
             bGroupAlreadyExists = true;
             break;
@@ -448,7 +451,7 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
 
 void WidgetAtlasManager::on_atlasGroups_currentChanged(int iIndex)
 {
-    SetFramesAvailableForImport();
+    //SetFramesAvailableForImport();
 }
 
 void WidgetAtlasManager::on_btnAddGroup_clicked()
@@ -471,7 +474,7 @@ void WidgetAtlasManager::on_actionRequestFrames_triggered()
         qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
         for(int i = 0; i < selectedItems.size(); ++i)
         {
-            QVariant v = selectedItems[i]->data(0, QTreeWidgetItem::UserType);
+            QVariant v = selectedItems[i]->data(0, Qt::UserRole);
             HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
     
             if(pFrame == NULL)

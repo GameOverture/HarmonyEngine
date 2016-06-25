@@ -42,11 +42,11 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
     ItemProject *pItemProject = new ItemProject(sNewProjectFilePath);
     if(pItemProject->HasError())
     {
-        HyGuiLog("Abort opening project: " % pItemProject->GetPath(), LOGTYPE_Error);
+        HyGuiLog("Abort opening project: " % pItemProject->GetAbsPath(), LOGTYPE_Error);
         return;
     }
     else
-        HyGuiLog("Opening project: " % pItemProject->GetPath(), LOGTYPE_Info);
+        HyGuiLog("Opening project: " % pItemProject->GetAbsPath(), LOGTYPE_Info);
     
     QTreeWidgetItem *pProjTreeItem = CreateTreeItem(NULL, pItemProject);
     
@@ -168,7 +168,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     
     // Get the relative path from [ProjectDir->ItemPath] e.g. "data/Sprites/SpritePrefix/MySprite.hyspi"
     QDir assetDir(pCurProj->GetAssetsAbsPath());
-    QString sRelativePath = assetDir.relativeFilePath(pItem->GetPath());
+    QString sRelativePath = assetDir.relativeFilePath(pItem->GetAbsPath());
     
     QStringList sPathSplitList = sRelativePath.split(QChar('/'));
 //    if(QString::compare(sPathSplitList[0], "data", Qt::CaseInsensitive) != 0)
@@ -205,7 +205,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
             {
                 // Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
                 //
-                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetPath() % sPathSplitList[i];
+                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetAbsPath() % sPathSplitList[i];
                 
                 Item *pPrefixItem = new Item(ITEM_Prefix, sPath);
                 
@@ -314,7 +314,7 @@ QStringList WidgetExplorer::GetOpenProjectPaths()
     for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
     {
         Item *pItemVariant = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<Item *>();
-        sListOpenProjs.append(pItemVariant->GetPath());
+        sListOpenProjs.append(pItemVariant->GetAbsPath());
     }
     
     return sListOpenProjs;
@@ -376,7 +376,7 @@ Item *WidgetExplorer::GetItemByPath(QString sItemPathAbsolute)
     {
         Item *pItem = (*it)->data(0, Qt::UserRole).value<Item *>();
         
-        if(0 == QString::compare(pItem->GetPath(), sItemPathAbsolute, Qt::CaseInsensitive))
+        if(0 == QString::compare(pItem->GetAbsPath(), sItemPathAbsolute, Qt::CaseInsensitive))
             return pItem;
         
         ++it;

@@ -261,6 +261,27 @@
     <string>Shift the selected frame to be played later in the sequence</string>
    </property>
   </action>
+  <action name="actionImportFrames">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import &amp;Frames</string>
+   </property>
+  </action>
+  <action name="actionRemoveFrames">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Frames</string>
+   </property>
+   <property name="shortcut">
+    <string>Del, Backspace</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>btnRenameSprite</tabstop>

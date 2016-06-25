@@ -111,6 +111,39 @@ QString Item::GetName(bool bWithPrefix) const
     return sName;
 }
 
+QString Item::GetRelPath() const
+{
+    QString sRelPath;
+
+    QStringList sPathSplitList = m_sPATH.split('/', QString::SkipEmptyParts);
+    QStringList sSubDirList = HyGlobal::SubDirNameList();
+
+    int iSplitIndex = sPathSplitList.size() - 1;
+    bool bSubDirFound = false;
+    for(; iSplitIndex >= 0; --iSplitIndex)
+    {
+        for(int i = 0; i < sSubDirList.size(); ++i)
+        {
+            if(sSubDirList[i].compare(sPathSplitList[iSplitIndex], Qt::CaseInsensitive) == 0)
+            {
+                bSubDirFound = true;
+                break;
+            }
+        }
+
+        if(bSubDirFound)
+            break;
+    }
+
+    if(bSubDirFound)
+    {
+        for(int i = iSplitIndex; i < sPathSplitList.size(); ++i)
+            sRelPath += sPathSplitList[i] % "/";
+    }
+
+    return sRelPath;
+}
+
 /*virtual*/ void Item::OnDraw_Open(IHyApplication &hyApp)
 {
     HyGuiLog("Tried to OnDraw_Open() a non-derived item: " % GetName(true), LOGTYPE_Error);

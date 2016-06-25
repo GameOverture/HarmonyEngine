@@ -140,6 +140,4 @@ void ItemProject::Reset()
 {
     for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
         m_bDrawStateLoaded[i] = false;
-
-    m_pAtlasManager->Reload();
 }

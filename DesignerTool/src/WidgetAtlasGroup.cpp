@@ -43,7 +43,70 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
     ui->atlasList->setSelectionMode(QAbstractItemView::MultiSelection);
     ui->atlasList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     
-    Reload();
+    for(int i = 0; i < m_FrameList.size(); ++i)
+        delete m_FrameList[i];
+
+    m_FrameList.clear();
+    ui->atlasList->clear();
+
+    QFile metaAtlasFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaAtlasSettings));
+    if(metaAtlasFile.exists())
+    {
+        if(!metaAtlasFile.open(QIODevice::ReadOnly))
+            HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaAtlasSettings, LOGTYPE_Error);
+
+#ifdef HYGUI_UseBinaryMetaFiles
+        QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
+#else
+        QJsonDocument settingsDoc = QJsonDocument::fromJson(metaAtlasFile.readAll());
+#endif
+        metaAtlasFile.close();
+
+        QJsonObject settingsObj = settingsDoc.object();
+        m_dlgSettings.LoadSettings(settingsObj);
+
+        QJsonArray frameArray = settingsObj["frames"].toArray();
+        for(int i = 0; i < frameArray.size(); ++i)
+        {
+            QJsonObject frameObj = frameArray[i].toObject();
+
+            QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
+            HyGuiFrame *pNewFrame = new HyGuiFrame(frameObj["hash"].toInt(),
+                                                   frameObj["name"].toString(),
+                                                   rAlphaCrop,
+                                                   GetId(),
+                                                   frameObj["width"].toInt(),
+                                                   frameObj["height"].toInt(),
+                                                   frameObj["textureIndex"].toInt(),
+                                                   frameObj["rotate"].toBool(),
+                                                   frameObj["x"].toInt(),
+                                                   frameObj["y"].toInt());
+
+            QJsonArray frameLinksArray = frameObj["links"].toArray();
+            for(int k = 0; k < frameLinksArray.size(); ++k)
+                pNewFrame->SetLink(frameLinksArray[k].toString());
+
+            eAtlasNodeType eIconType = ATLAS_Frame_Warning;
+            int iTexIndex = frameObj["textureIndex"].toInt();
+            if(iTexIndex >= 0)
+            {
+                //while(m_TextureList.empty() || m_TextureList.size() <= frameObj["textureIndex"].toInt())
+                //    m_TextureList.append(CreateTreeItem(NULL, "Texture: " % QString::number(m_TextureList.size()), ATLAS_Texture));
+
+                //pTextureTreeItem = m_TextureList[];
+                eIconType = ATLAS_Frame;
+            }
+
+            CreateTreeItem(NULL, frameObj["name"].toString(), iTexIndex, eIconType, pNewFrame);
+
+            m_FrameList.append(pNewFrame);
+        }
+
+        ui->groupBox->setTitle(m_dlgSettings.GetName());
+
+        ui->atlasList->sortItems(0, Qt::AscendingOrder);
+        ui->atlasList->expandAll();
+    }
 }
 
 WidgetAtlasGroup::~WidgetAtlasGroup()
@@ -118,74 +181,6 @@ void WidgetAtlasGroup::ResizeAtlasListColumns()
 
     int iTotalWidth = ui->atlasList->size().width();
     ui->atlasList->setColumnWidth(0, iTotalWidth - 60);
-}
-
-void WidgetAtlasGroup::Reload()
-{
-    for(int i = 0; i < m_FrameList.size(); ++i)
-        delete m_FrameList[i];
-    
-    m_FrameList.clear();
-    ui->atlasList->clear();
-
-    QFile metaAtlasFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaDataAtlasFileName));
-    if(metaAtlasFile.exists())
-    {
-        if(!metaAtlasFile.open(QIODevice::ReadOnly))
-            HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaDataAtlasFileName, LOGTYPE_Error);
-
-#ifdef HYGUI_UseBinaryMetaFiles
-        QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
-#else
-        QJsonDocument settingsDoc = QJsonDocument::fromJson(metaAtlasFile.readAll());
-#endif
-        metaAtlasFile.close();
-
-        QJsonObject settingsObj = settingsDoc.object();
-        m_dlgSettings.LoadSettings(settingsObj);
-
-        QJsonArray frameArray = settingsObj["frames"].toArray();
-        for(int i = 0; i < frameArray.size(); ++i)
-        {
-            QJsonObject frameObj = frameArray[i].toObject();
-
-            QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-            HyGuiFrame *pNewFrame = new HyGuiFrame(frameObj["hash"].toInt(),
-                                                   frameObj["name"].toString(),
-                                                   rAlphaCrop,
-                                                   GetId(),
-                                                   frameObj["width"].toInt(),
-                                                   frameObj["height"].toInt(),
-                                                   frameObj["textureIndex"].toInt(),
-                                                   frameObj["rotate"].toBool(),
-                                                   frameObj["x"].toInt(),
-                                                   frameObj["y"].toInt());
-
-            QJsonArray frameLinksArray = frameObj["links"].toArray();
-            for(int k = 0; k < frameLinksArray.size(); ++k)
-                pNewFrame->SetLink(frameLinksArray[k].toString());
-
-            eAtlasNodeType eIconType = ATLAS_Frame_Warning;
-            int iTexIndex = frameObj["textureIndex"].toInt();
-            if(iTexIndex >= 0)
-            {
-                //while(m_TextureList.empty() || m_TextureList.size() <= frameObj["textureIndex"].toInt())
-                //    m_TextureList.append(CreateTreeItem(NULL, "Texture: " % QString::number(m_TextureList.size()), ATLAS_Texture));
-
-                //pTextureTreeItem = m_TextureList[];
-                eIconType = ATLAS_Frame;
-            }
-
-            CreateTreeItem(NULL, frameObj["name"].toString(), iTexIndex, eIconType, pNewFrame);
-            
-            m_FrameList.append(pNewFrame);
-        }
-
-        ui->groupBox->setTitle(m_dlgSettings.GetName());
-
-        ui->atlasList->sortItems(0, Qt::AscendingOrder);
-        ui->atlasList->expandAll();
-    }
 }
 
 void WidgetAtlasGroup::on_btnAddImages_clicked()
@@ -270,6 +265,11 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
     
     pAtlasMan->HideAtlasGroup();
     QWidget::leaveEvent(pEvent);
+}
+
+WidgetAtlasManager *WidgetAtlasGroup::GetManager()
+{
+    return reinterpret_cast<WidgetAtlasManager *>(this->parent()->parent());
 }
 
 void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
@@ -386,11 +386,11 @@ void WidgetAtlasGroup::Refresh()
 
         if(bValid == false)
         {
-            pFrame->SetTreeWidgetItem(CreateTreeItem(NULL, pFrame->GetName(), -1, ATLAS_Frame_Warning));
+            CreateTreeItem(NULL, pFrame->GetName(), -1, ATLAS_Frame_Warning, pFrame);
             continue;
         }
         else
-            pFrame->SetTreeWidgetItem(CreateTreeItem(NULL, pFrame->GetName(), pFrame->GetTextureIndex(), ATLAS_Frame));
+            CreateTreeItem(NULL, pFrame->GetName(), pFrame->GetTextureIndex(), ATLAS_Frame, pFrame);
 
         QImage imgFrame(imgInfoRef.path);
 
@@ -484,7 +484,7 @@ void WidgetAtlasGroup::Refresh()
     QJsonObject settingsObj = m_dlgSettings.GetSettings();
     settingsObj.insert("frames", frameArray);
 
-    QFile settingsFile(m_MetaDir.absolutePath() % "/" % HYGUIPATH_MetaDataAtlasFileName);
+    QFile settingsFile(m_MetaDir.absolutePath() % "/" % HYGUIPATH_MetaAtlasSettings);
     if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
        HyGuiLog("Couldn't open atlas settings file for writing", LOGTYPE_Error);
@@ -511,16 +511,16 @@ void WidgetAtlasGroup::Refresh()
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)
-    WidgetAtlasManager *pAtlasManager = reinterpret_cast<WidgetAtlasManager *>(this->parent()->parent());
+    WidgetAtlasManager *pAtlasManager = GetManager();
     pAtlasManager->SaveData();
     
-    QStringList sReloadPaths;
-    for(int i = 0; i < m_FrameList.size(); ++i)
-    {
-        QStringList sLinks = m_FrameList[i]->GetLinks();
-        foreach(QString sLink, sLinks)
-            sReloadPaths.append(sLink);
-    }
+//    QStringList sReloadPaths;
+//    for(int i = 0; i < m_FrameList.size(); ++i)
+//    {
+//        QStringList sLinks = m_FrameList[i]->GetLinks();
+//        foreach(QString sLink, sLinks)
+//            sReloadPaths.append(sLink);
+//    }
 
     MainWindow::ReloadHarmony();
 
@@ -544,11 +544,8 @@ void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, i
     else
         pNewTreeItem->setText(1, "Invalid");
 
-//    QVariant v; v.setValue(pItem);
-//    v.in
-//    pNewTreeItem->setData(0, Qt::UserRole, v);
-
-    pFrame
+    QVariant v; v.setValue(pFrame);
+    pNewTreeItem->setData(0, Qt::UserRole, v);
 
     if(pParent)
         pParent->addChild(pNewTreeItem);
@@ -567,6 +564,17 @@ void WidgetAtlasGroup::on_btnSettings_clicked()
 
 void WidgetAtlasGroup::on_atlasList_itemSelectionChanged()
 {
-    WidgetAtlasManager *pAtlasManager = reinterpret_cast<WidgetAtlasManager *>(this->parent()->parent());
-    pAtlasManager->SetFramesAvailableForImport();
+    //WidgetAtlasManager *pAtlasManager = reinterpret_cast<WidgetAtlasManager *>(this->parent()->parent());
+    ui->actionDeleteImage->setEnabled(ui->atlasList->selectedItems().count() != 0);
+}
+
+void WidgetAtlasGroup::on_actionDeleteImage_triggered()
+{
+    QList<QTreeWidgetItem *> selectedItems = ui->atlasList->selectedItems();
+
+    for(int i = 0; i < selectedItems.count(); ++i)
+    {
+        HyGuiFrame *pFrame = selectedItems[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
+        pFrame->GetLinks();
+    }
 }

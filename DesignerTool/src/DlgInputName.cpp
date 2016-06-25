@@ -45,7 +45,7 @@ DlgInputName::DlgInputName(const QString sDlgTitle, Item *pItem, QWidget *parent
     }
 
     QFileInfo itemInfo;
-    itemInfo.setFile(pItem->GetPath());
+    itemInfo.setFile(pItem->GetAbsPath());
     m_sPathMinusName = itemInfo.path();
     m_sFileExt = HyGlobal::ItemExt(pItem->GetType());
     
