@@ -42,9 +42,6 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
 
     ui->atlasList->setSelectionMode(QAbstractItemView::MultiSelection);
     ui->atlasList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    
-    for(int i = 0; i < m_FrameList.size(); ++i)
-        delete m_FrameList[i];
 
     m_FrameList.clear();
     ui->atlasList->clear();
@@ -71,20 +68,20 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
             QJsonObject frameObj = frameArray[i].toObject();
 
             QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-            HyGuiFrame *pNewFrame = new HyGuiFrame(frameObj["hash"].toInt(),
-                                                   frameObj["name"].toString(),
-                                                   rAlphaCrop,
-                                                   GetId(),
-                                                   frameObj["width"].toInt(),
-                                                   frameObj["height"].toInt(),
-                                                   frameObj["textureIndex"].toInt(),
-                                                   frameObj["rotate"].toBool(),
-                                                   frameObj["x"].toInt(),
-                                                   frameObj["y"].toInt());
+            HyGuiFrame *pNewFrame = GetManager()->CreateFrame(frameObj["hash"].toInt(),
+                                                              frameObj["name"].toString(),
+                                                              rAlphaCrop,
+                                                              GetId(),
+                                                              frameObj["width"].toInt(),
+                                                              frameObj["height"].toInt(),
+                                                              frameObj["textureIndex"].toInt(),
+                                                              frameObj["rotate"].toBool(),
+                                                              frameObj["x"].toInt(),
+                                                              frameObj["y"].toInt());
 
-            QJsonArray frameLinksArray = frameObj["links"].toArray();
-            for(int k = 0; k < frameLinksArray.size(); ++k)
-                pNewFrame->SetLink(frameLinksArray[k].toString());
+//            QJsonArray frameLinksArray = frameObj["links"].toArray();
+//            for(int k = 0; k < frameLinksArray.size(); ++k)
+//                pNewFrame->SetLink(frameLinksArray[k].toString());
 
             eAtlasNodeType eIconType = ATLAS_Frame_Warning;
             int iTexIndex = frameObj["textureIndex"].toInt();
@@ -114,7 +111,7 @@ WidgetAtlasGroup::~WidgetAtlasGroup()
     delete ui;
 
     for(int i = 0; i < m_FrameList.size(); ++i)
-        delete m_FrameList[i];
+        GetManager()->RemoveFrame(m_FrameList[i]);
 }
 
 bool WidgetAtlasGroup::IsMatching(QDir metaDir, QDir dataDir)
@@ -282,7 +279,7 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
         quint32 uiHash = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
         QRect rAlphaCrop = m_Packer.crop(newImage);
 
-        HyGuiFrame *pNewFrame = new HyGuiFrame(uiHash, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
+        HyGuiFrame *pNewFrame = GetManager()->CreateFrame(uiHash, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
         
         newImage.save(m_MetaDir.path() % "/" % pNewFrame->ConstructImageFileName());
         
@@ -376,11 +373,11 @@ void WidgetAtlasGroup::Refresh()
         frameObj.insert("cropRight", QJsonValue(pFrame->GetCrop().right()));
         frameObj.insert("cropBottom", QJsonValue(pFrame->GetCrop().bottom()));
 
-        QJsonArray frameLinksArray;
-        QStringList sLinks = pFrame->GetLinks();
-        for(int i = 0; i < sLinks.size(); ++i)
-            frameLinksArray.append(QJsonValue(sLinks[i]));
-        frameObj.insert("links", QJsonValue(frameLinksArray));
+//        QJsonArray frameLinksArray;
+//        QStringList sLinks = pFrame->GetLinks();
+//        for(int i = 0; i < sLinks.size(); ++i)
+//            frameLinksArray.append(QJsonValue(sLinks[i]));
+//        frameObj.insert("links", QJsonValue(frameLinksArray));
 
         frameArray.append(QJsonValue(frameObj));
 
@@ -575,6 +572,16 @@ void WidgetAtlasGroup::on_actionDeleteImage_triggered()
     for(int i = 0; i < selectedItems.count(); ++i)
     {
         HyGuiFrame *pFrame = selectedItems[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
-        pFrame->GetLinks();
+        QStringList sLinks = pFrame->GetLinks();
+        for(int i = 0; i < sLinks.count(); ++i)
+        {
+            sLinks[i];
+        }
+
+        m_FrameList.removeOne(pFrame);
+        GetManager()->RemoveFrame(pFrame);
+        delete selectedItems[i];
     }
+
+    Refresh();
 }

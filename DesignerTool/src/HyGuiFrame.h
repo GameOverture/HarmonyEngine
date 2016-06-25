@@ -16,7 +16,7 @@
 
 class HyGuiFrame
 {
-    friend class WidgetAtlasGroup;
+    friend class WidgetAtlasManager;
 
     const quint32       m_uiHASH;
     const QString       m_sNAME;
@@ -30,13 +30,14 @@ class HyGuiFrame
     int                 m_iPosX;
     int                 m_iPosY;
 
+    Item *
     QStringList         m_sLinks;
 
     HyTexturedQuad2d *  m_pDrawInst;
 
     HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
-public:
     ~HyGuiFrame();
+public:
 
     quint32 GetHash()       { return m_uiHASH; }
     QString GetName()       { return m_sNAME; }
@@ -54,6 +55,7 @@ public:
 
     void SetLink(QString sFullPath)
     {
+
         m_sLinks.append(sFullPath);
     }
 //    void SetLink(eItemType eType, QString sPrefix, QString sName)

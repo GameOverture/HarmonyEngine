@@ -63,14 +63,6 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
                                                                                              m_pMouseHoverItem(NULL)
 {
     ui->setupUi(this);
-
-    m_pFrameRequestActionGroup = new QActionGroup(this);
-    m_pFrameRequestActionGroup->setExclusive(false);
-    m_pFrameRequestActionGroup->setEnabled(false);
-
-    m_pFrameRelinquishActionGroup = new QActionGroup(this);
-    m_pFrameRelinquishActionGroup->setExclusive(false);
-    m_pFrameRelinquishActionGroup->setEnabled(true);
     
     while(ui->atlasGroups->currentWidget())
         delete ui->atlasGroups->currentWidget();
@@ -80,6 +72,10 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
 
     if(m_DataDir.exists() == false)
         HyGuiLog("Data atlas directory is missing!", LOGTYPE_Error);
+
+    if(m_DependenciesFile.exists())
+    {
+    }
 
     QFileInfoList metaAtlasDirs = m_MetaDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     if(metaAtlasDirs.empty())
@@ -111,6 +107,26 @@ WidgetAtlasManager::~WidgetAtlasManager()
     delete ui;
 }
 
+HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY)
+{
+    HyGuiFrame *pNewFrame = new HyGuiFrame(uiCRC, sN, rAlphaCrop, uiAtlasGroupId, iW, iH, iTexIndex, bRot, iX, iY);
+
+    if(m_DependencyMap.contains(uiCRC))
+    {
+        HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this hash", LOGTYPE_Error);
+    }
+    else
+        m_DependencyMap[uiCRC] = pNewFrame;
+
+    return pNewFrame;
+}
+
+void WidgetAtlasManager::RemoveFrame(HyGuiFrame *pFrame)
+{
+    m_DependencyMap.remove(pFrame->GetHash());
+    delete pFrame;
+}
+
 void WidgetAtlasManager::SaveData()
 {
     QJsonArray atlasGroupArray;
@@ -138,6 +154,48 @@ void WidgetAtlasManager::SaveData()
         }
 
         atlasInfoFile.close();
+    }
+}
+
+void WidgetAtlasManager::SaveDependencies()
+{
+    if(!m_DependenciesFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+       HyGuiLog("Couldn't open atlas dependencies file for writing", LOGTYPE_Error);
+    }
+    else
+    {
+        QJsonArray dependArray;
+
+        QMap<quint32, HyGuiFrame *>::iterator iter;
+        for(iter = m_DependencyMap.begin(); iter != m_DependencyMap.end(); ++iter)
+        {
+            QJsonArray frameLinksArray;
+            QStringList sLinks = iter.value()->GetLinks();
+            for(int i = 0; i < sLinks.size(); ++i)
+                frameLinksArray.append(QJsonValue(sLinks[i]));
+
+            QJsonObject linkObj;
+            linkObj.insert("hash", QJsonValue(static_cast<qint64>(iter.key())));
+            linkObj.insert("links", QJsonValue(frameLinksArray));
+
+            dependArray.append(QJsonValue(linkObj));
+        }
+
+        QJsonDocument settingsDoc(dependArray);
+
+#ifdef HYGUI_UseBinaryMetaFiles
+        qint64 iBytesWritten = m_DependenciesFile.write(settingsDoc.toBinaryData());
+#else
+        qint64 iBytesWritten = m_DependenciesFile.write(settingsDoc.toJson());
+#endif
+
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+        {
+            HyGuiLog("Could not write to atlas settings file: " % m_DependenciesFile.errorString(), LOGTYPE_Error);
+        }
+
+        m_DependenciesFile.close();
     }
 }
 
@@ -336,60 +394,6 @@ void WidgetAtlasManager::HideAtlasGroup()
     //if(pProj->m_pCamera && pProj->m_pCamera->pos.IsTweening() == false)
         //pProj->m_pCamera->pos.Animate(iFrameCount * 12, iFrameCount * 12, 1.0f, HyEase::quadInOut);
 }
-
-QAction *WidgetAtlasManager::CreateRequestFramesAction(Item *pRequester)
-{
-    QVariant v;
-    //v.setValue(HyGuiFrameActionInfo(pRequester));
-    
-    QAction *pNewAction = new QAction(pRequester->GetWidget());
-    pNewAction->setIcon(QIcon(":/icons16x16/generic-add.png"));
-    pNewAction->setData(v);
-    pNewAction->setObjectName("actionRequestFrames");
-    
-    connect(pNewAction, SIGNAL(triggered()), this, SLOT(on_actionRequestFrames_triggered()));
-    pNewAction->setActionGroup(m_pFrameRequestActionGroup);
-
-    return pNewAction;
-}
-
-QAction *WidgetAtlasManager::CreateRelinquishFramesAction(Item *pRequester)
-{
-    QObject *pParent = NULL;
-    switch(pRequester->GetType())
-    {
-    case ITEM_Sprite:
-        pParent = pRequester->GetWidget();
-        break;
-
-    default:
-        HyGuiLog("Unsupported item type in WidgetAtlasManager::CreateRelinquishFrameAction", LOGTYPE_Error);
-        return NULL;
-    }
-    
-    QVariant v;
-    //v.setValue(HyGuiFrameActionInfo(pRequester));
-
-    QAction *pNewAction = new QAction(pParent);
-    pNewAction->setIcon(QIcon(":/icons16x16/edit-delete.png"));
-    pNewAction->setData(v);
-    pNewAction->setObjectName("actionRelinquishFrames");
-    
-    connect(pNewAction, SIGNAL(triggered()), this, SLOT(on_actionRelinqishFrames_triggered()));
-    pNewAction->setActionGroup(m_pFrameRelinquishActionGroup);
-
-    return pNewAction;
-}
-
-void WidgetAtlasManager::LinkSet(quint32 uiHash, Item *pItem)
-{
-    if(m_FrameToItemsMap.contains(uiHash) == false)
-        m_FrameToItemsMap[uiHash].append(pItem->GetRelPath());
-
-    m_ItemToFramesMap[pItem->GetRelPath()].contains(uiHash);
-    //m_FrameToItemsMap[uiHash].contains(pItem->GetRelPath()
-}
-
 
 void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
 {

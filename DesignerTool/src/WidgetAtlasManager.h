@@ -21,25 +21,6 @@ namespace Ui {
 class WidgetAtlasManager;
 }
 
-//class HyGuiFrameActionInfo
-//{
-//    Item *                          m_pAssociatedItem;
-//    QList<quint32>                  m_RequestFrameList;         // Holds 32bit hashes
-    
-//    // Below is filled out by WidgetAtlasManager
-//    QList<QPair<quint32, bool> >    m_ReturnedFrameList;        // Holds 32bit hashes
-    
-//public:
-//    HyGuiFrameActionInfo(Item *pItem) : m_pAssociatedItem(pItem)
-//    { }
-//    ~HyGuiFrameActionInfo()
-//    { }
-    
-//    QList<quint32> &RequestedFrames()                       { return m_RequestFrameList; }
-//    QList<QPair<quint32, bool> > &ReturnedFrames()          { return m_ReturnedFrameList; }
-//};
-//Q_DECLARE_METATYPE(HyGuiFrameActionInfo)
-
 class WidgetAtlasManager : public QWidget
 {
     Q_OBJECT
@@ -50,22 +31,20 @@ class WidgetAtlasManager : public QWidget
     QDir                            m_DataDir;
 
     QFile                           m_DependenciesFile;
+    QMap<quint32, HyGuiFrame *>     m_DependencyMap;
     
     QTreeWidgetItem *               m_pMouseHoverItem;
-
-    // Dependency maps. Both maps hold the same info, each provide access from either frame or item
-    QMap<quint32, QStringList>      m_FrameToItemsMap;
-    QMap<QString, QList<quint32> >  m_ItemToFramesMap;
-
-    QActionGroup *                  m_pFrameRequestActionGroup;
-    QActionGroup *                  m_pFrameRelinquishActionGroup;
 
 public:
     explicit WidgetAtlasManager(QWidget *parent = 0);
     explicit WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent = 0);
     ~WidgetAtlasManager();
 
+    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
+    void RemoveFrame(HyGuiFrame *pFrame);
+
     void SaveData();
+    void SaveDependencies();
 
     void PreviewAtlasGroup();
     void HideAtlasGroup();
@@ -75,13 +54,8 @@ public:
     friend void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawHide(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
-    
-    QAction *CreateRequestFramesAction(Item *pRequester);
-    QAction *CreateRelinquishFramesAction(Item *pRequester);
 
-    void LinkSet(quint32 uiHash, Item *pItem);
-
-    QList<HyGuiFrame *> GetSelectedFrames();
+    QList<HyGuiFrame *> RequestFrames(QList<quint32> frameList);
 
 private slots:
     void on_atlasGroups_currentChanged(int iIndex);
