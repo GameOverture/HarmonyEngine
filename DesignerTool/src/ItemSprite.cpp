@@ -71,3 +71,14 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager *pAtlasMan) : Ite
 {
     
 }
+
+/*virtual*/ void ItemSprite::Link(HyGuiFrame *pFrame)
+{
+    static_cast<WidgetSprite *>(m_pWidget)->InsertFrame(pFrame);
+    Item::Link(pFrame);
+}
+
+/*virtual*/ void ItemSprite::UnLink(HyGuiFrame *pFrame)
+{
+    Item::UnLink(pFrame);
+}

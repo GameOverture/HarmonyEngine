@@ -11,8 +11,10 @@
 #define HYGUIFRAME_H
 
 #include "Harmony/HyEngine.h"
+#include "Item.h"
 
 #include <QWidget>
+#include <QSet>
 
 class HyGuiFrame
 {
@@ -30,8 +32,7 @@ class HyGuiFrame
     int                 m_iPosX;
     int                 m_iPosY;
 
-    Item *
-    QStringList         m_sLinks;
+    QSet<Item *>        m_Links;
 
     HyTexturedQuad2d *  m_pDrawInst;
 
@@ -44,7 +45,7 @@ public:
     QSize GetSize()         { return QSize(m_iWIDTH, m_iHEIGHT); }
     QRect GetCrop()         { return m_rALPHA_CROP; }
     QPoint GetPosition()    { return QPoint(m_iPosX, m_iPosY); }
-    QStringList GetLinks()  { return m_sLinks; }
+    QSet<Item *> GetLinks() { return m_Links; }
 
     bool IsRotated()        { return m_bRotation; }
     int GetX()              { return m_iPosX; }
@@ -52,20 +53,6 @@ public:
     int GetTextureIndex()   { return m_iTextureIndex; }
 
     HyTexturedQuad2d *DrawInst()    { return m_pDrawInst; }
-
-    void SetLink(QString sFullPath)
-    {
-
-        m_sLinks.append(sFullPath);
-    }
-//    void SetLink(eItemType eType, QString sPrefix, QString sName)
-//    {
-//        QString sLink(HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/");
-//        sLink += sPrefix;
-//        sLink += sName;
-
-//        m_sLinks.append(sLink);
-//    }
 
     void SetInfoFromPacker(int iTextureIndex, bool bRotation, int iX, int iY)
     {

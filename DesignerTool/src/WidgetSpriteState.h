@@ -30,6 +30,9 @@ public:
 
     QString GetName();
     void SetName(QString sNewName);
+
+    void InsertFrame(HyGuiFrame *pFrame);
+    void RemoveFrame(HyGuiFrame *pFrame);
     
 private:
     Ui::WidgetSpriteState *ui;

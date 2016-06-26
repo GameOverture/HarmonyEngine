@@ -41,8 +41,8 @@ public:
 
     void UpdateActions();
     
-    void OnRequestFrames();
-    void OnRelinquishFrames();
+    void InsertFrame(HyGuiFrame *pFrame);
+    void RemoveFrame(HyGuiFrame *pFrame);
     
 private slots:
     void on_actionAddState_triggered();

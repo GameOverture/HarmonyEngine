@@ -38,3 +38,13 @@ void WidgetSpriteState::SetName(QString sNewName)
 {
     m_sName = sNewName;
 }
+
+void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
+{
+    QTableWidgetItem *pNewItem = new QTableWidgetItem(pFrame
+    ui->frames->it
+}
+
+void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
+{
+}

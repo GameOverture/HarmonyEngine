@@ -107,6 +107,8 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
             }
         }
     }
+
+    pItemProject->GetAtlasManager()->LoadDependencies();
     
     ui->treeWidget->expandItem(pProjTreeItem);
 }
@@ -120,6 +122,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     }
     
     // NOTE: Cannot use GetCurProjSelected() because this function may be called without anything selected in explorer widget. AKA opening an existing project and adding all its contents
+    // Update 6/26: I could probably call GetCurProjSelected() now...
     //
     // Find the proper project tree item
     ItemProject *pCurProj = NULL;

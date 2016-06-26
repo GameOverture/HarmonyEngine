@@ -18,10 +18,12 @@
 
 class HyGuiDependencies;
 class WidgetRenderer;
+class HyGuiFrame;
 
 class Item : public IHyGuiDrawItem
 {
     friend class WidgetExplorer;
+    friend class WidgetAtlasManager;
     
 protected:
     const eItemType     m_eTYPE;
@@ -30,6 +32,8 @@ protected:
     QTreeWidgetItem *   m_pTreeItemPtr;
     QWidget *           m_pWidget;
     QMenu *             m_pEditMenu;
+
+    QSet<HyGuiFrame *>  m_Links;
     
     Item(eItemType eType, const QString sPath);
     ~Item();
@@ -56,10 +60,9 @@ public:
     
     virtual void Save();
     
-signals:
-    
-public slots:
-    
+protected:
+    virtual void Link(HyGuiFrame *pFrame);
+    virtual void UnLink(HyGuiFrame *pFrame);
 };
 Q_DECLARE_METATYPE(Item *)
 

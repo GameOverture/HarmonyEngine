@@ -34,6 +34,10 @@ protected:
     virtual void OnDraw_Update(IHyApplication &hyApp);
     
     virtual void Save();
+
+protected:
+    virtual void Link(HyGuiFrame *pFrame);
+    virtual void UnLink(HyGuiFrame *pFrame);
 };
 
 #endif // ITEMSPRITE_H

@@ -11,6 +11,7 @@
 #include "ui_WidgetAtlasManager.h"
 #include "HyGlobal.h"
 #include "WidgetSprite.h"
+#include "Item.h"
 
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -72,10 +73,6 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
 
     if(m_DataDir.exists() == false)
         HyGuiLog("Data atlas directory is missing!", LOGTYPE_Error);
-
-    if(m_DependenciesFile.exists())
-    {
-    }
 
     QFileInfoList metaAtlasDirs = m_MetaDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     if(metaAtlasDirs.empty())
@@ -171,9 +168,9 @@ void WidgetAtlasManager::SaveDependencies()
         for(iter = m_DependencyMap.begin(); iter != m_DependencyMap.end(); ++iter)
         {
             QJsonArray frameLinksArray;
-            QStringList sLinks = iter.value()->GetLinks();
-            for(int i = 0; i < sLinks.size(); ++i)
-                frameLinksArray.append(QJsonValue(sLinks[i]));
+            QSet<Item *> sLinks = iter.value()->GetLinks();
+            for(QSet<Item *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+                frameLinksArray.append(QJsonValue((*LinksIter)->GetRelPath()));
 
             QJsonObject linkObj;
             linkObj.insert("hash", QJsonValue(static_cast<qint64>(iter.key())));
@@ -197,6 +194,54 @@ void WidgetAtlasManager::SaveDependencies()
 
         m_DependenciesFile.close();
     }
+}
+
+void WidgetAtlasManager::LoadDependencies()
+{
+
+}
+
+void WidgetAtlasManager::SetDependency(HyGuiFrame *pFrame, Item *pItem)
+{
+    pFrame->m_Links.insert(pItem);
+    pItem->Link(pFrame);
+}
+
+void WidgetAtlasManager::RemoveDependency(HyGuiFrame *pFrame, Item *pItem)
+{
+    pFrame->m_Links.remove(pItem);
+    pItem->UnLink(pFrame);
+}
+
+void WidgetAtlasManager::RequestFrames(Item *pItem, QList<HyGuiFrame *>optionalRequestList /*= QList<HyGuiFrame *>()*/)
+{
+    if(optionalRequestList.empty())
+    {
+        WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
+        QList<QTreeWidgetItem *> selectedItems = atlasGrp.GetTreeWidget()->selectedItems();
+
+        for(int i = 0; i < selectedItems.size(); ++i)
+        {
+            QVariant v = selectedItems[i]->data(0, Qt::UserRole);
+            HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
+
+            if(pFrame == NULL)
+                continue;
+
+            SetDependency(pFrame, pItem);
+        }
+    }
+    else
+    {
+        for(int i = 0; i < optionalRequestList.size(); ++i)
+            SetDependency(optionalRequestList[i], pItem);
+    }
+}
+
+void WidgetAtlasManager::RelinquishFrames(Item *pItem, QList<HyGuiFrame *> relinquishList)
+{
+    for(int i = 0; i < relinquishList.size(); ++i)
+        RemoveDependency(relinquishList[i], pItem);
 }
 
 void WidgetAtlasManager::PreviewAtlasGroup()
@@ -461,39 +506,4 @@ void WidgetAtlasManager::on_atlasGroups_currentChanged(int iIndex)
 void WidgetAtlasManager::on_btnAddGroup_clicked()
 {
 
-}
-
-void WidgetAtlasManager::on_actionRequestFrames_triggered()
-{
-    QAction* pAction = qobject_cast<QAction*>(sender());
-    Q_ASSERT(pAction);
-    
-//    HyGuiFrameActionInfo frameActionInfo = pAction->data().value<HyGuiFrameActionInfo>();
-//    frameActionInfo.ReturnedFrames().clear();
-    
-    //if(pAction->data().value<HyGuiFrameActionInfo>().RequestedFrames().count() == 0)
-    {
-        WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
-        QList<QTreeWidgetItem *> selectedItems = atlasGrp.GetTreeWidget()->selectedItems();
-        qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
-        for(int i = 0; i < selectedItems.size(); ++i)
-        {
-            QVariant v = selectedItems[i]->data(0, Qt::UserRole);
-            HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
-    
-            if(pFrame == NULL)
-                continue;
-    
-            //frameListOut.append(QPair<int, int>(pFrame->GetTextureIndex(), pFrame->Get
-        }
-    }
-}
-
-void WidgetAtlasManager::on_actionRelinqishFrames_triggered()
-{
-    QAction* pAction = qobject_cast<QAction*>(sender());
-    Q_ASSERT(pAction);
-
-    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
-    //atlasGrp.GetTreeWidget()->selectedItems().count() != 0;
 }

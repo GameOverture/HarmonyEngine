@@ -44,7 +44,14 @@ public:
     void RemoveFrame(HyGuiFrame *pFrame);
 
     void SaveData();
+
     void SaveDependencies();
+    void LoadDependencies();
+    void SetDependency(HyGuiFrame *pFrame, Item *pItem);
+    void RemoveDependency(HyGuiFrame *pFrame, Item *pItem);
+
+    void RequestFrames(Item *pItem, QList<HyGuiFrame *> optionalRequestList = QList<HyGuiFrame *>());
+    void RelinquishFrames(Item *pItem, QList<HyGuiFrame *> relinquishList);
 
     void PreviewAtlasGroup();
     void HideAtlasGroup();
@@ -55,16 +62,10 @@ public:
     friend void AtlasManager_DrawHide(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
 
-    QList<HyGuiFrame *> RequestFrames(QList<quint32> frameList);
-
 private slots:
     void on_atlasGroups_currentChanged(int iIndex);
 
     void on_btnAddGroup_clicked();
-
-    void on_actionRequestFrames_triggered();
-
-    void on_actionRelinqishFrames_triggered();
 
 private:
     Ui::WidgetAtlasManager *ui;

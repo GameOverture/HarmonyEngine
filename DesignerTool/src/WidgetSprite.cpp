@@ -143,6 +143,15 @@ void WidgetSprite::UpdateActions()
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
 }
 
+void WidgetSprite::InsertFrame(HyGuiFrame *pFrame)
+{
+    ui->cmbStates->currentData().value<WidgetSpriteState *>()->InsertFrame(pFrame);
+}
+
+void WidgetSprite::RemoveFrame(HyGuiFrame *pFrame)
+{
+}
+
 void WidgetSprite::OnRequestFrames()
 {
     QUndoCommand *pCmd = new ItemSpriteCmd_AddFrames();
