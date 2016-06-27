@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "ItemSpriteCmds.h"
 #include "WidgetSprite.h"
+#include "WidgetAtlasManager.h"
 
 void EnsureProperNamingInComboBox(QComboBox *pCmb)
 {
@@ -195,17 +196,26 @@ void ItemSpriteCmd_MoveStateForward::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemSpriteCmd_AddFrames::ItemSpriteCmd_AddFrames(QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
+ItemSpriteCmd_AddFrames::ItemSpriteCmd_AddFrames(Item *pItem, WidgetAtlasManager *pAtlasMan, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                m_pItem(pItem),
+                                                                                                                                m_pAtlasMan(pAtlasMan)
 {
+    setText("Import Frames");
+    m_Frames.clear();
 }
+
 ItemSpriteCmd_AddFrames::~ItemSpriteCmd_AddFrames()
 {
 }
-void ItemSpriteCmd_AddFrames::undo()
-{
-}
+
 void ItemSpriteCmd_AddFrames::redo()
 {
+    m_Frames = m_pAtlasMan->RequestFrames(m_pItem, m_Frames);
+}
+
+void ItemSpriteCmd_AddFrames::undo()
+{
+    m_pAtlasMan->RelinquishFrames(m_pItem, m_Frames);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

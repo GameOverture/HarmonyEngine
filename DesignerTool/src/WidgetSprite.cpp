@@ -23,6 +23,7 @@
 
 WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, WidgetAtlasManager *pAtlasMan, QWidget *parent) :   QWidget(parent),
                                                                                                         m_pItemSprite(pItemSprite),
+                                                                                                        m_pAtlasManager(pAtlasMan),
                                                                                                         ui(new Ui::WidgetSprite),
                                                                                                         m_pCurSpriteState(NULL)
 {
@@ -152,18 +153,6 @@ void WidgetSprite::RemoveFrame(HyGuiFrame *pFrame)
 {
 }
 
-void WidgetSprite::OnRequestFrames()
-{
-    QUndoCommand *pCmd = new ItemSpriteCmd_AddFrames();
-    m_pUndoStack->push(pCmd);
-
-    UpdateActions();
-}
-
-void WidgetSprite::OnRelinquishFrames()
-{
-}
-
 void WidgetSprite::on_actionAddState_triggered()
 {
     QUndoCommand *pCmd = new ItemSpriteCmd_AddState(m_StateActionsList, ui->cmbStates);
@@ -208,7 +197,7 @@ void WidgetSprite::on_actionOrderStateForwards_triggered()
 
 void WidgetSprite::on_actionImportFrames_triggered()
 {
-    QUndoCommand *pCmd = new ItemSpriteCmd_AddFrames();
+    QUndoCommand *pCmd = new ItemSpriteCmd_AddFrames(m_pItemSprite, m_pAtlasManager);
     m_pUndoStack->push(pCmd);
 
     UpdateActions();

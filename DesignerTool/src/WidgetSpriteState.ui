@@ -115,6 +115,9 @@
    </item>
    <item>
     <widget class="QTableWidget" name="frames">
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
      <property name="horizontalScrollMode">
       <enum>QAbstractItemView::ScrollPerPixel</enum>
      </property>
@@ -132,17 +135,20 @@
      </attribute>
      <column>
       <property name="text">
-       <string>#</string>
+       <string>Frame</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Local Origin</string>
+       <string>Offset</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Rotation</string>
+       <string>Rot</string>
+      </property>
+      <property name="toolTip">
+       <string extracomment="Rotation"/>
       </property>
      </column>
      <column>
@@ -152,7 +158,10 @@
      </column>
      <column>
       <property name="text">
-       <string>Duration</string>
+       <string>Dur</string>
+      </property>
+      <property name="toolTip">
+       <string extracomment="Duration"/>
       </property>
      </column>
     </widget>

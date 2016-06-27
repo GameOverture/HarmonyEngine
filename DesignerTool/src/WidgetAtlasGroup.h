@@ -30,6 +30,8 @@ class WidgetAtlasGroup;
 class WidgetAtlasGroup : public QWidget
 {
     Q_OBJECT
+    
+    WidgetAtlasManager *        m_pManager;
 
     // NOTE: Order of these member variables matter here for the member initializer list
     QDir                        m_MetaDir;
@@ -42,7 +44,7 @@ class WidgetAtlasGroup : public QWidget
 
 public:
     explicit WidgetAtlasGroup(QWidget *parent = 0);
-    explicit WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent = 0);
+    explicit WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManager *pManager, QWidget *parent = 0);
     ~WidgetAtlasGroup();
     
     bool IsMatching(QDir metaDir, QDir dataDir);
@@ -72,8 +74,6 @@ protected:
 
 private:
     Ui::WidgetAtlasGroup *ui;
-
-    WidgetAtlasManager *GetManager();
     
     void ImportImages(QStringList sImportImgList);
     void Refresh();

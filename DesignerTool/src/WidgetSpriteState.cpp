@@ -18,10 +18,17 @@ WidgetSpriteState::WidgetSpriteState(QList<QAction *> stateActionList, QWidget *
 {
     ui->setupUi(this);
 
-    ui->btnAddFrames->setDefaultAction(FindAction(stateActionList, "actionRequestFrames"));
-    ui->btnRemoveFrame->setDefaultAction(FindAction(stateActionList, "actionRelinquishFrames"));
+    ui->btnAddFrames->setDefaultAction(FindAction(stateActionList, "actionImportFrames"));
+    ui->btnRemoveFrame->setDefaultAction(FindAction(stateActionList, "actionRemoveFrames"));
     ui->btnOrderFrameUp->setDefaultAction(FindAction(stateActionList, "actionOrderFrameUpwards"));
     ui->btnOrderFrameDown->setDefaultAction(FindAction(stateActionList, "actionOrderFrameDownwards"));
+    
+    ui->frames->setColumnWidth(COLUMN_Frame, 100);
+    ui->frames->setColumnWidth(COLUMN_Offset, 64);
+    ui->frames->setColumnWidth(COLUMN_Rotation, 32);
+    ui->frames->setColumnWidth(COLUMN_Scale, 64);
+    ui->frames->setColumnWidth(COLUMN_Duration, 32);
+    ui->frames->setMinimumWidth(100+64+32+64+32);
 }
 
 WidgetSpriteState::~WidgetSpriteState()
@@ -41,8 +48,15 @@ void WidgetSpriteState::SetName(QString sNewName)
 
 void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
 {
-    QTableWidgetItem *pNewItem = new QTableWidgetItem(pFrame
-    ui->frames->it
+    Frame *pNewItem = new Frame(pFrame);
+    int iRow = ui->frames->rowCount();
+    
+    ui->frames->insertRow(iRow);
+    ui->frames->setItem(iRow, COLUMN_Frame, pNewItem->m_pTableItems[COLUMN_Frame]);
+    ui->frames->setItem(iRow, COLUMN_Offset, pNewItem->m_pTableItems[COLUMN_Offset]);
+    ui->frames->setItem(iRow, COLUMN_Rotation, pNewItem->m_pTableItems[COLUMN_Rotation]);
+    ui->frames->setItem(iRow, COLUMN_Scale, pNewItem->m_pTableItems[COLUMN_Scale]);
+    ui->frames->setItem(iRow, COLUMN_Duration, pNewItem->m_pTableItems[COLUMN_Duration]);
 }
 
 void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)

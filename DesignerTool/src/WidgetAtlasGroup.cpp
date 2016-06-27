@@ -33,10 +33,11 @@ WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
     HyGuiLog("WidgetAtlasGroup::WidgetAtlasGroup() invalid constructor used", LOGTYPE_Error);
 }
 
-WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) :   QWidget(parent),
-                                                                                    m_MetaDir(metaDir),
-                                                                                    m_DataDir(dataDir),
-                                                                                    ui(new Ui::WidgetAtlasGroup)
+WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManager *pManager, QWidget *parent) : QWidget(parent),
+                                                                                                                m_pManager(pManager),
+                                                                                                                m_MetaDir(metaDir),
+                                                                                                                m_DataDir(dataDir),
+                                                                                                                ui(new Ui::WidgetAtlasGroup)
 {    
     ui->setupUi(this);
 
@@ -68,7 +69,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, QWidget *parent) 
             QJsonObject frameObj = frameArray[i].toObject();
 
             QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-            HyGuiFrame *pNewFrame = GetManager()->CreateFrame(frameObj["hash"].toInt(),
+            HyGuiFrame *pNewFrame = m_pManager->CreateFrame(frameObj["hash"].toInt(),
                                                               frameObj["name"].toString(),
                                                               rAlphaCrop,
                                                               GetId(),
@@ -111,7 +112,7 @@ WidgetAtlasGroup::~WidgetAtlasGroup()
     delete ui;
 
     for(int i = 0; i < m_FrameList.size(); ++i)
-        GetManager()->RemoveFrame(m_FrameList[i]);
+        m_pManager->RemoveFrame(m_FrameList[i]);
 }
 
 bool WidgetAtlasGroup::IsMatching(QDir metaDir, QDir dataDir)
@@ -264,11 +265,6 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
     QWidget::leaveEvent(pEvent);
 }
 
-WidgetAtlasManager *WidgetAtlasGroup::GetManager()
-{
-    return reinterpret_cast<WidgetAtlasManager *>(this->parent()->parent());
-}
-
 void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
 {
     for(int i = 0; i < sImportImgList.size(); ++i)
@@ -279,7 +275,7 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
         quint32 uiHash = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
         QRect rAlphaCrop = m_Packer.crop(newImage);
 
-        HyGuiFrame *pNewFrame = GetManager()->CreateFrame(uiHash, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
+        HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiHash, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
         
         newImage.save(m_MetaDir.path() % "/" % pNewFrame->ConstructImageFileName());
         
@@ -508,8 +504,7 @@ void WidgetAtlasGroup::Refresh()
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)
-    WidgetAtlasManager *pAtlasManager = GetManager();
-    pAtlasManager->SaveData();
+    m_pManager->SaveData();
     
 //    QStringList sReloadPaths;
 //    for(int i = 0; i < m_FrameList.size(); ++i)
@@ -575,11 +570,11 @@ void WidgetAtlasGroup::on_actionDeleteImage_triggered()
         QSet<Item *> sLinks = pFrame->GetLinks();
         for(QSet<Item *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
         {
-            GetManager()->RemoveDependency(pFrame, *LinksIter);
+            m_pManager->RemoveDependency(pFrame, *LinksIter);
         }
 
         m_FrameList.removeOne(pFrame);
-        GetManager()->RemoveFrame(pFrame);
+        m_pManager->RemoveFrame(pFrame);
         delete selectedItems[i];
     }
 

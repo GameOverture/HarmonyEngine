@@ -50,7 +50,7 @@ public:
     void SetDependency(HyGuiFrame *pFrame, Item *pItem);
     void RemoveDependency(HyGuiFrame *pFrame, Item *pItem);
 
-    void RequestFrames(Item *pItem, QList<HyGuiFrame *> optionalRequestList = QList<HyGuiFrame *>());
+    QList<HyGuiFrame *> RequestFrames(Item *pItem, QList<HyGuiFrame *> optionalRequestList = QList<HyGuiFrame *>());
     void RelinquishFrames(Item *pItem, QList<HyGuiFrame *> relinquishList);
 
     void PreviewAtlasGroup();

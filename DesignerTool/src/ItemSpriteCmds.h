@@ -16,6 +16,9 @@
 #include <QAction>
 
 class WidgetSpriteState;
+class Item;
+class WidgetAtlasManager;
+class HyGuiFrame;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_AddState : public QUndoCommand
@@ -107,12 +110,16 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_AddFrames : public QUndoCommand
 {
+    Item *                  m_pItem;
+    WidgetAtlasManager *    m_pAtlasMan;
+    QList<HyGuiFrame *>     m_Frames;
+    
 public:
-    ItemSpriteCmd_AddFrames(QUndoCommand *pParent = 0);
+    ItemSpriteCmd_AddFrames(Item *pItem, WidgetAtlasManager *pAtlasMan, QUndoCommand *pParent = 0);
     ~ItemSpriteCmd_AddFrames();
 
-    void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

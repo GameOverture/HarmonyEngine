@@ -11,6 +11,7 @@
 #define WIDGETSPRITE_H
 
 #include "WidgetSpriteState.h"
+#include "HyGuiFrame.h"
 
 #include <QWidget>
 #include <QMenu>
@@ -30,6 +31,7 @@ class WidgetSprite : public QWidget
     Q_OBJECT
     
     ItemSprite *            m_pItemSprite;
+    WidgetAtlasManager *    m_pAtlasManager;
     QUndoStack *            m_pUndoStack;
 
     QList<QAction *>        m_StateActionsList;

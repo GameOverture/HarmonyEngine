@@ -10,6 +10,8 @@
 #ifndef WIDGETSPRITESTATE_H
 #define WIDGETSPRITESTATE_H
 
+#include "HyGuiFrame.h"
+
 #include <QWidget>
 #include <QTableWidgetItem>
 
@@ -20,9 +22,49 @@ class WidgetSpriteState;
 class WidgetSpriteState : public QWidget
 {
     Q_OBJECT
+    
+    enum eColumn
+    {
+        COLUMN_Frame = 0,
+        COLUMN_Offset,
+        COLUMN_Rotation,
+        COLUMN_Scale,
+        COLUMN_Duration,
+        
+        NUMCOLUMNS
+    };
+    
+    struct Frame
+    {
+        HyGuiFrame *            m_pFrame;
+        QTableWidgetItem *      m_pTableItems[NUMCOLUMNS];
+        
+        QPointF                 m_ptOffset;
+        float                   m_fRotation;
+        QPointF                 m_ptScale;
+        float                   m_fDuration;
+        
+        Frame(HyGuiFrame *pFrame) : m_pFrame(pFrame),
+                                    m_ptOffset(0.0f, 0.0f),
+                                    m_fRotation(0.0f),
+                                    m_ptScale(1.0f, 1.0f),
+                                    m_fDuration(0.016f)
+        {
+            m_pTableItems[COLUMN_Frame] = new QTableWidgetItem(m_pFrame->GetName());
+            m_pTableItems[COLUMN_Offset] = new QTableWidgetItem(PointToString(m_ptOffset));
+            m_pTableItems[COLUMN_Rotation] = new QTableWidgetItem(QString::number(m_fRotation, 'g', 2));
+            m_pTableItems[COLUMN_Scale] = new QTableWidgetItem(PointToString(m_ptScale));
+            m_pTableItems[COLUMN_Duration] = new QTableWidgetItem(QString::number(m_fDuration, 'g', 2));
+        }
+        
+        QString PointToString(QPointF ptPoint)
+        {
+            return QString::number(ptPoint.x(), 'g', 2) % ", " % QString::number(ptPoint.y(), 'g', 2);
+        }
+    };
 
     QString                     m_sName;
-    QList<QTableWidgetItem *>   m_FrameList;
+    QList<Frame *>              m_pFrameList;
 
 public:
     explicit WidgetSpriteState(QList<QAction *> stateActionList, QWidget *parent = 0);

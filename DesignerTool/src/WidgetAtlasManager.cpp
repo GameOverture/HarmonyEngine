@@ -213,8 +213,10 @@ void WidgetAtlasManager::RemoveDependency(HyGuiFrame *pFrame, Item *pItem)
     pItem->UnLink(pFrame);
 }
 
-void WidgetAtlasManager::RequestFrames(Item *pItem, QList<HyGuiFrame *>optionalRequestList /*= QList<HyGuiFrame *>()*/)
+QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(Item *pItem, QList<HyGuiFrame *>optionalRequestList /*= QList<HyGuiFrame *>()*/)
 {
+    QList<HyGuiFrame *> returnList;
+            
     if(optionalRequestList.empty())
     {
         WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
@@ -229,13 +231,19 @@ void WidgetAtlasManager::RequestFrames(Item *pItem, QList<HyGuiFrame *>optionalR
                 continue;
 
             SetDependency(pFrame, pItem);
+            returnList.append(pFrame);
         }
     }
     else
     {
         for(int i = 0; i < optionalRequestList.size(); ++i)
+        {
             SetDependency(optionalRequestList[i], pItem);
+            returnList.append(optionalRequestList[i]);
+        }
     }
+    
+    return returnList;
 }
 
 void WidgetAtlasManager::RelinquishFrames(Item *pItem, QList<HyGuiFrame *> relinquishList)
@@ -493,7 +501,7 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
     
     if(bGroupAlreadyExists == false)
     {
-        WidgetAtlasGroup *pNewAtlas = new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this);
+        WidgetAtlasGroup *pNewAtlas = new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this, this);
         ui->atlasGroups->setCurrentIndex(ui->atlasGroups->addWidget(pNewAtlas));
     }
 }
