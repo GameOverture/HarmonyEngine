@@ -174,7 +174,7 @@ QString Item::GetRelPath() const
     HyGuiLog("Tried to save a non-derived item: " % GetName(true), LOGTYPE_Error);
 }
 
-/*virtual*/ void Item::Link(HyGuiFrame *pFrame)
+/*virtual*/ void Item::Link(HyGuiFrame *pFrame, QVariant param)
 {
     m_Links.insert(pFrame);
 }

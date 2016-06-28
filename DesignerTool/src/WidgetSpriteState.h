@@ -77,10 +77,11 @@ public:
     QString GetName();
     void SetName(QString sNewName);
 
-    void InsertFrame(HyGuiFrame *pFrame);
+    void InsertFrame(HyGuiFrame *pFrame, QVariant param);
     void RemoveFrame(HyGuiFrame *pFrame);
 
     HyGuiFrame *SelectedFrame();
+    int SelectedIndex();
     
 private:
     Ui::WidgetSpriteState *ui;

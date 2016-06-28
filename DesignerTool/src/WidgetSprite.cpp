@@ -144,9 +144,9 @@ void WidgetSprite::UpdateActions()
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
 }
 
-void WidgetSprite::InsertFrame(HyGuiFrame *pFrame)
+void WidgetSprite::InsertFrame(HyGuiFrame *pFrame, QVariant param)
 {
-    ui->cmbStates->currentData().value<WidgetSpriteState *>()->InsertFrame(pFrame);
+    ui->cmbStates->currentData().value<WidgetSpriteState *>()->InsertFrame(pFrame, param);
 }
 
 void WidgetSprite::RemoveFrame(HyGuiFrame *pFrame)
@@ -206,9 +206,10 @@ void WidgetSprite::on_actionImportFrames_triggered()
 
 void WidgetSprite::on_actionRemoveFrames_triggered()
 {
-    HyGuiFrame *pSelectredFrame = ui->cmbStates->itemData(ui->cmbStates->currentIndex()).value<WidgetSpriteState *>()->SelectedFrame();
+    WidgetSpriteState *pSpriteState = ui->cmbStates->itemData(ui->cmbStates->currentIndex()).value<WidgetSpriteState *>();
+    HyGuiFrame *pSelectredFrame = pSpriteState->SelectedFrame();
 
-    QUndoCommand *pCmd = new ItemSpriteCmd_DeleteFrame(m_pItemSprite, m_pAtlasManager, pSelectredFrame);
+    QUndoCommand *pCmd = new ItemSpriteCmd_DeleteFrame(m_pItemSprite, m_pAtlasManager, pSelectredFrame, pSpriteState->SelectedIndex());
     m_pUndoStack->push(pCmd);
 
     UpdateActions();

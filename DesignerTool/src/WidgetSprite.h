@@ -43,7 +43,7 @@ public:
 
     void UpdateActions();
     
-    void InsertFrame(HyGuiFrame *pFrame);
+    void InsertFrame(HyGuiFrame *pFrame, QVariant param);
     void RemoveFrame(HyGuiFrame *pFrame);
     
 private slots:

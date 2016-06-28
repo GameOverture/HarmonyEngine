@@ -61,7 +61,7 @@ public:
     virtual void Save();
     
 protected:
-    virtual void Link(HyGuiFrame *pFrame);
+    virtual void Link(HyGuiFrame *pFrame, QVariant param);
     virtual void UnLink(HyGuiFrame *pFrame);
 };
 Q_DECLARE_METATYPE(Item *)

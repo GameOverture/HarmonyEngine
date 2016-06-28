@@ -33,6 +33,12 @@ WidgetSpriteState::WidgetSpriteState(QList<QAction *> stateActionList, QWidget *
 
 WidgetSpriteState::~WidgetSpriteState()
 {
+    while(m_pFrameList.empty() == false)
+    {
+        delete m_pFrameList[m_pFrameList.count() - 1];
+        m_pFrameList.removeLast();
+    }
+
     delete ui;
 }
 
@@ -46,17 +52,25 @@ void WidgetSpriteState::SetName(QString sNewName)
     m_sName = sNewName;
 }
 
-void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
+void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame, QVariant param)
 {
+    bool bValidParam = false;
+    int iParamRow = param.toInt(&bValidParam);
+    if(bValidParam == false)
+        iParamRow = -1;
+
+    if(iParamRow == -1)
+        iParamRow = ui->frames->rowCount();
+
     Frame *pNewItem = new Frame(pFrame);
-    int iRow = ui->frames->rowCount();
-    
-    ui->frames->insertRow(iRow);
-    ui->frames->setItem(iRow, COLUMN_Frame, pNewItem->m_pTableItems[COLUMN_Frame]);
-    ui->frames->setItem(iRow, COLUMN_Offset, pNewItem->m_pTableItems[COLUMN_Offset]);
-    ui->frames->setItem(iRow, COLUMN_Rotation, pNewItem->m_pTableItems[COLUMN_Rotation]);
-    ui->frames->setItem(iRow, COLUMN_Scale, pNewItem->m_pTableItems[COLUMN_Scale]);
-    ui->frames->setItem(iRow, COLUMN_Duration, pNewItem->m_pTableItems[COLUMN_Duration]);
+    ui->frames->insertRow(iParamRow);
+    ui->frames->setItem(iParamRow, COLUMN_Frame, pNewItem->m_pTableItems[COLUMN_Frame]);
+    ui->frames->setItem(iParamRow, COLUMN_Offset, pNewItem->m_pTableItems[COLUMN_Offset]);
+    ui->frames->setItem(iParamRow, COLUMN_Rotation, pNewItem->m_pTableItems[COLUMN_Rotation]);
+    ui->frames->setItem(iParamRow, COLUMN_Scale, pNewItem->m_pTableItems[COLUMN_Scale]);
+    ui->frames->setItem(iParamRow, COLUMN_Duration, pNewItem->m_pTableItems[COLUMN_Duration]);
+
+    m_pFrameList.insert(iParamRow, pNewItem);
 }
 
 void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
@@ -66,6 +80,9 @@ void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
         if(ui->frames->item(i, COLUMN_Frame)->data(Qt::UserRole).value<HyGuiFrame *>() == pFrame)
         {
             ui->frames->removeRow(i);
+
+            delete m_pFrameList[i];
+            m_pFrameList.removeAt(i);
             break;
         }
     }
@@ -74,4 +91,9 @@ void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
 HyGuiFrame *WidgetSpriteState::SelectedFrame()
 {
     return ui->frames->item(ui->frames->currentRow(), COLUMN_Frame)->data(Qt::UserRole).value<HyGuiFrame *>();
+}
+
+int WidgetSpriteState::SelectedIndex()
+{
+    return ui->frames->currentRow();
 }

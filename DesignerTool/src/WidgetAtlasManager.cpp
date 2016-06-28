@@ -201,10 +201,10 @@ void WidgetAtlasManager::LoadDependencies()
 
 }
 
-void WidgetAtlasManager::SetDependency(HyGuiFrame *pFrame, Item *pItem)
+void WidgetAtlasManager::SetDependency(HyGuiFrame *pFrame, Item *pItem, QVariant param)
 {
     pFrame->m_Links.insert(pItem);
-    pItem->Link(pFrame);
+    pItem->Link(pFrame, param);
 }
 
 void WidgetAtlasManager::RemoveDependency(HyGuiFrame *pFrame, Item *pItem)
@@ -213,14 +213,15 @@ void WidgetAtlasManager::RemoveDependency(HyGuiFrame *pFrame, Item *pItem)
     pItem->UnLink(pFrame);
 }
 
-QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(Item *pItem, QList<HyGuiFrame *>optionalRequestList /*= QList<HyGuiFrame *>()*/)
+QList<QPair<HyGuiFrame *, QVariant> > WidgetAtlasManager::RequestFrames(Item *pItem, QList<QPair<HyGuiFrame *, QVariant> >optionalRequestList /*= QList<QPair<HyGuiFrame *, QVariant> >()*/)
 {
-    QList<HyGuiFrame *> returnList;
+    QList<QPair<HyGuiFrame *, QVariant> >returnList;
             
     if(optionalRequestList.empty())
     {
         WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
         QList<QTreeWidgetItem *> selectedItems = atlasGrp.GetTreeWidget()->selectedItems();
+        qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
 
         for(int i = 0; i < selectedItems.size(); ++i)
         {
@@ -230,26 +231,28 @@ QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(Item *pItem, QList<HyGuiFr
             if(pFrame == NULL)
                 continue;
 
-            SetDependency(pFrame, pItem);
-            returnList.append(pFrame);
+            SetDependency(pFrame, pItem, QVariant());
+            returnList.append(QPair<HyGuiFrame *, QVariant>(pFrame, QVariant()));
         }
+
+        atlasGrp.GetTreeWidget()->clearSelection();
     }
     else
     {
         for(int i = 0; i < optionalRequestList.size(); ++i)
         {
-            SetDependency(optionalRequestList[i], pItem);
-            returnList.append(optionalRequestList[i]);
+            SetDependency(optionalRequestList[i].first, pItem, optionalRequestList[i].second);
+            returnList.append(QPair<HyGuiFrame *, QVariant>(optionalRequestList[i]));
         }
     }
     
     return returnList;
 }
 
-void WidgetAtlasManager::RelinquishFrames(Item *pItem, QList<HyGuiFrame *> relinquishList)
+void WidgetAtlasManager::RelinquishFrames(Item *pItem, QList<QPair<HyGuiFrame *, QVariant> > relinquishList)
 {
     for(int i = 0; i < relinquishList.size(); ++i)
-        RemoveDependency(relinquishList[i], pItem);
+        RemoveDependency(relinquishList[i].first, pItem);
 }
 
 void WidgetAtlasManager::PreviewAtlasGroup()
