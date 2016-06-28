@@ -61,4 +61,17 @@ void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
 
 void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
 {
+    for(int i = 0; i < ui->frames->rowCount(); ++i)
+    {
+        if(ui->frames->item(i, COLUMN_Frame)->data(Qt::UserRole).value<HyGuiFrame *>() == pFrame)
+        {
+            ui->frames->removeRow(i);
+            break;
+        }
+    }
+}
+
+HyGuiFrame *WidgetSpriteState::SelectedFrame()
+{
+    return ui->frames->item(ui->frames->currentRow(), COLUMN_Frame)->data(Qt::UserRole).value<HyGuiFrame *>();
 }

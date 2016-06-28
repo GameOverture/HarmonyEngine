@@ -69,7 +69,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
             QJsonObject frameObj = frameArray[i].toObject();
 
             QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-            HyGuiFrame *pNewFrame = m_pManager->CreateFrame(frameObj["hash"].toInt(),
+            HyGuiFrame *pNewFrame = m_pManager->CreateFrame(JSONOBJ_TOINT(frameObj, "hash"),
                                                               frameObj["name"].toString(),
                                                               rAlphaCrop,
                                                               GetId(),

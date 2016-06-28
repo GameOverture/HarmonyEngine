@@ -125,12 +125,16 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_DeleteFrame : public QUndoCommand
 {
+    Item *                  m_pItem;
+    WidgetAtlasManager *    m_pAtlasMan;
+    QList<HyGuiFrame *>     m_Frames;
+
 public:
-    ItemSpriteCmd_DeleteFrame(QUndoCommand *pParent = 0);
+    ItemSpriteCmd_DeleteFrame(Item *pItem, WidgetAtlasManager *pAtlasMan, HyGuiFrame *pFrame, QUndoCommand *pParent = 0);
     ~ItemSpriteCmd_DeleteFrame();
 
-    void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

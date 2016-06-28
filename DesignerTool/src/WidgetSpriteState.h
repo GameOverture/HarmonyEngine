@@ -55,6 +55,10 @@ class WidgetSpriteState : public QWidget
             m_pTableItems[COLUMN_Rotation] = new QTableWidgetItem(QString::number(m_fRotation, 'g', 2));
             m_pTableItems[COLUMN_Scale] = new QTableWidgetItem(PointToString(m_ptScale));
             m_pTableItems[COLUMN_Duration] = new QTableWidgetItem(QString::number(m_fDuration, 'g', 2));
+
+            QVariant v;
+            v.setValue(m_pFrame);
+            m_pTableItems[COLUMN_Frame]->setData(Qt::UserRole, v);
         }
         
         QString PointToString(QPointF ptPoint)
@@ -75,6 +79,8 @@ public:
 
     void InsertFrame(HyGuiFrame *pFrame);
     void RemoveFrame(HyGuiFrame *pFrame);
+
+    HyGuiFrame *SelectedFrame();
     
 private:
     Ui::WidgetSpriteState *ui;

@@ -80,5 +80,6 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager *pAtlasMan) : Ite
 
 /*virtual*/ void ItemSprite::UnLink(HyGuiFrame *pFrame)
 {
+    static_cast<WidgetSprite *>(m_pWidget)->RemoveFrame(pFrame);
     Item::UnLink(pFrame);
 }

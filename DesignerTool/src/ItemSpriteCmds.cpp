@@ -219,17 +219,26 @@ void ItemSpriteCmd_AddFrames::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemSpriteCmd_DeleteFrame::ItemSpriteCmd_DeleteFrame(QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
+ItemSpriteCmd_DeleteFrame::ItemSpriteCmd_DeleteFrame(Item *pItem, WidgetAtlasManager *pAtlasMan, HyGuiFrame *pFrame, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                                        m_pItem(pItem),
+                                                                                                                                                        m_pAtlasMan(pAtlasMan)
 {
+    setText("Remove Frame");
+    m_Frames.append(pFrame);
 }
+
 ItemSpriteCmd_DeleteFrame::~ItemSpriteCmd_DeleteFrame()
 {
 }
-void ItemSpriteCmd_DeleteFrame::undo()
-{
-}
+
 void ItemSpriteCmd_DeleteFrame::redo()
 {
+    m_pAtlasMan->RelinquishFrames(m_pItem, m_Frames);
+}
+
+void ItemSpriteCmd_DeleteFrame::undo()
+{
+    m_Frames = m_pAtlasMan->RequestFrames(m_pItem, m_Frames);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
