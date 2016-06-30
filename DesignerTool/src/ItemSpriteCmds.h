@@ -16,7 +16,7 @@
 #include <QAction>
 
 class WidgetSpriteState;
-class Item;
+class ItemWidget;
 class WidgetAtlasManager;
 class HyGuiFrame;
 
@@ -110,12 +110,12 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_AddFrames : public QUndoCommand
 {
-    Item *                                  m_pItem;
+    ItemWidget *                            m_pItem;
     WidgetAtlasManager *                    m_pAtlasMan;
     QList<QPair<HyGuiFrame *, QVariant> >   m_Frames;
     
 public:
-    ItemSpriteCmd_AddFrames(Item *pItem, WidgetAtlasManager *pAtlasMan, QUndoCommand *pParent = 0);
+    ItemSpriteCmd_AddFrames(ItemWidget *pItem, QUndoCommand *pParent = 0);
     ~ItemSpriteCmd_AddFrames();
 
     void redo() Q_DECL_OVERRIDE;
@@ -125,12 +125,11 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_DeleteFrame : public QUndoCommand
 {
-    Item *                                  m_pItem;
-    WidgetAtlasManager *                    m_pAtlasMan;
+    ItemWidget *                            m_pItem;
     QList<QPair<HyGuiFrame *, QVariant> >   m_Frames;
 
 public:
-    ItemSpriteCmd_DeleteFrame(Item *pItem, WidgetAtlasManager *pAtlasMan, HyGuiFrame *pFrame, int iRowParam, QUndoCommand *pParent = 0);
+    ItemSpriteCmd_DeleteFrame(ItemWidget *pItem, HyGuiFrame *pFrame, int iRowParam, QUndoCommand *pParent = 0);
     ~ItemSpriteCmd_DeleteFrame();
 
     void redo() Q_DECL_OVERRIDE;

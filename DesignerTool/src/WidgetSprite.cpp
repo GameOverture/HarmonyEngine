@@ -21,11 +21,10 @@
 #include <QJsonArray>
 #include <QAction>
 
-WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, WidgetAtlasManager *pAtlasMan, QWidget *parent) :   QWidget(parent),
-                                                                                                        m_pItemSprite(pItemSprite),
-                                                                                                        m_pAtlasManager(pAtlasMan),
-                                                                                                        ui(new Ui::WidgetSprite),
-                                                                                                        m_pCurSpriteState(NULL)
+WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget(parent),
+                                                                         m_pItemSprite(pItemSprite),
+                                                                         ui(new Ui::WidgetSprite),
+                                                                         m_pCurSpriteState(NULL)
 {
     ui->setupUi(this);
 
@@ -198,7 +197,7 @@ void WidgetSprite::on_actionOrderStateForwards_triggered()
 
 void WidgetSprite::on_actionImportFrames_triggered()
 {
-    QUndoCommand *pCmd = new ItemSpriteCmd_AddFrames(m_pItemSprite, m_pAtlasManager);
+    QUndoCommand *pCmd = new ItemSpriteCmd_AddFrames(m_pItemSprite);
     m_pUndoStack->push(pCmd);
 
     UpdateActions();
@@ -209,7 +208,7 @@ void WidgetSprite::on_actionRemoveFrames_triggered()
     WidgetSpriteState *pSpriteState = ui->cmbStates->itemData(ui->cmbStates->currentIndex()).value<WidgetSpriteState *>();
     HyGuiFrame *pSelectredFrame = pSpriteState->SelectedFrame();
 
-    QUndoCommand *pCmd = new ItemSpriteCmd_DeleteFrame(m_pItemSprite, m_pAtlasManager, pSelectredFrame, pSpriteState->SelectedIndex());
+    QUndoCommand *pCmd = new ItemSpriteCmd_DeleteFrame(m_pItemSprite, pSelectredFrame, pSpriteState->SelectedIndex());
     m_pUndoStack->push(pCmd);
 
     UpdateActions();

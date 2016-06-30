@@ -47,10 +47,10 @@ public:
     static MainWindow *GetInstance();   // Should only be used to set QWidget parents
     
     // This only requests to the WidgetRenderer to open/close the item. It will eventually do so, after re-loading any resources if need be
-    static void OpenItem(Item *pItem);
-    static void CloseItem(Item *pItem);
+    static void OpenItem(ItemWidget *pItem);
+    static void CloseItem(ItemWidget *pItem);
     
-    static void SetCurrentItem(Item *pItem);
+    static void SetCurrentItem(ItemWidget *pItem);
     
     static void SetSelectedProj(ItemProject *pProj);
     static void ReloadHarmony();

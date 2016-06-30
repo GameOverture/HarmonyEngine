@@ -11,7 +11,7 @@
 #define HYGUIFRAME_H
 
 #include "Harmony/HyEngine.h"
-#include "Item.h"
+#include "ItemWidget.h"
 
 #include <QWidget>
 #include <QSet>
@@ -32,7 +32,7 @@ class HyGuiFrame
     int                 m_iPosX;
     int                 m_iPosY;
 
-    QSet<Item *>        m_Links;
+    QSet<ItemWidget *>  m_Links;
 
     HyTexturedQuad2d *  m_pDrawInst;
 
@@ -40,17 +40,17 @@ class HyGuiFrame
     ~HyGuiFrame();
 public:
 
-    quint32 GetHash()       { return m_uiHASH; }
-    QString GetName()       { return m_sNAME; }
-    QSize GetSize()         { return QSize(m_iWIDTH, m_iHEIGHT); }
-    QRect GetCrop()         { return m_rALPHA_CROP; }
-    QPoint GetPosition()    { return QPoint(m_iPosX, m_iPosY); }
-    QSet<Item *> GetLinks() { return m_Links; }
+    quint32 GetHash()               { return m_uiHASH; }
+    QString GetName()               { return m_sNAME; }
+    QSize GetSize()                 { return QSize(m_iWIDTH, m_iHEIGHT); }
+    QRect GetCrop()                 { return m_rALPHA_CROP; }
+    QPoint GetPosition()            { return QPoint(m_iPosX, m_iPosY); }
+    QSet<ItemWidget *> GetLinks()   { return m_Links; }
 
-    bool IsRotated()        { return m_bRotation; }
-    int GetX()              { return m_iPosX; }
-    int GetY()              { return m_iPosY; }
-    int GetTextureIndex()   { return m_iTextureIndex; }
+    bool IsRotated()                { return m_bRotation; }
+    int GetX()                      { return m_iPosX; }
+    int GetY()                      { return m_iPosY; }
+    int GetTextureIndex()           { return m_iTextureIndex; }
 
     HyTexturedQuad2d *DrawInst()    { return m_pDrawInst; }
 

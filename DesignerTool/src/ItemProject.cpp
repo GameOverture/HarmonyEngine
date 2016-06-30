@@ -17,7 +17,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-ItemProject::ItemProject(const QString sNewProjectFilePath) : Item(ITEM_Project, sNewProjectFilePath),
+ItemProject::ItemProject(const QString sNewProjectFilePath) : ItemWidget(ITEM_Project, sNewProjectFilePath, NULL),
                                                               m_eDrawState(PROJDRAWSTATE_Nothing),
                                                               m_ePrevDrawState(PROJDRAWSTATE_Nothing),
                                                               m_bHasError(false)
@@ -52,13 +52,13 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) : Item(ITEM_Project,
     m_sRelativeMetaDataLocation = projPathsObj["MetaDataPath"].toString();
     m_sRelativeSourceLocation = projPathsObj["SourcePath"].toString();
 
+    m_pAtlasMan = new WidgetAtlasManager(this);
     m_pTabsManager = new WidgetTabsManager(this);
-    m_pAtlasManager = new WidgetAtlasManager(this);
 }
 
 ItemProject::~ItemProject()
 {
-    delete m_pAtlasManager;
+    delete m_pAtlasMan;
 }
 
 QString ItemProject::GetDirPath() const
@@ -70,25 +70,25 @@ QString ItemProject::GetDirPath() const
 /*virtual*/ void ItemProject::OnDraw_Open(IHyApplication &hyApp)
 {
     if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-        AtlasManager_DrawOpen(hyApp, *m_pAtlasManager);
+        AtlasManager_DrawOpen(hyApp, *m_pAtlasMan);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Close(IHyApplication &hyApp)
 {
     if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-        AtlasManager_DrawClose(hyApp, *m_pAtlasManager);
+        AtlasManager_DrawClose(hyApp, *m_pAtlasMan);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Show(IHyApplication &hyApp)
 {
     if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-        AtlasManager_DrawShow(hyApp, *m_pAtlasManager);
+        AtlasManager_DrawShow(hyApp, *m_pAtlasMan);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Hide(IHyApplication &hyApp)
 {
     if(m_ePrevDrawState == PROJDRAWSTATE_AtlasManager)
-        AtlasManager_DrawHide(hyApp, *m_pAtlasManager);
+        AtlasManager_DrawHide(hyApp, *m_pAtlasMan);
 }
 
 /*virtual*/ void ItemProject::OnDraw_Update(IHyApplication &hyApp)
@@ -123,7 +123,7 @@ QString ItemProject::GetDirPath() const
     }
     
     if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-        AtlasManager_DrawUpdate(hyApp, *m_pAtlasManager);
+        AtlasManager_DrawUpdate(hyApp, *m_pAtlasMan);
 }
 
 void ItemProject::SetOverrideDrawState(eProjDrawState eDrawState)

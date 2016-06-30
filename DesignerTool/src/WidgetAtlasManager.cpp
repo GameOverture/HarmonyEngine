@@ -168,8 +168,8 @@ void WidgetAtlasManager::SaveDependencies()
         for(iter = m_DependencyMap.begin(); iter != m_DependencyMap.end(); ++iter)
         {
             QJsonArray frameLinksArray;
-            QSet<Item *> sLinks = iter.value()->GetLinks();
-            for(QSet<Item *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+            QSet<ItemWidget *> sLinks = iter.value()->GetLinks();
+            for(QSet<ItemWidget *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
                 frameLinksArray.append(QJsonValue((*LinksIter)->GetRelPath()));
 
             QJsonObject linkObj;
@@ -201,19 +201,19 @@ void WidgetAtlasManager::LoadDependencies()
 
 }
 
-void WidgetAtlasManager::SetDependency(HyGuiFrame *pFrame, Item *pItem, QVariant param)
+void WidgetAtlasManager::SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem, QVariant param)
 {
     pFrame->m_Links.insert(pItem);
     pItem->Link(pFrame, param);
 }
 
-void WidgetAtlasManager::RemoveDependency(HyGuiFrame *pFrame, Item *pItem)
+void WidgetAtlasManager::RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem)
 {
     pFrame->m_Links.remove(pItem);
     pItem->UnLink(pFrame);
 }
 
-QList<QPair<HyGuiFrame *, QVariant> > WidgetAtlasManager::RequestFrames(Item *pItem, QList<QPair<HyGuiFrame *, QVariant> >optionalRequestList /*= QList<QPair<HyGuiFrame *, QVariant> >()*/)
+QList<QPair<HyGuiFrame *, QVariant> > WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<QPair<HyGuiFrame *, QVariant> >optionalRequestList /*= QList<QPair<HyGuiFrame *, QVariant> >()*/)
 {
     QList<QPair<HyGuiFrame *, QVariant> >returnList;
             
@@ -249,7 +249,7 @@ QList<QPair<HyGuiFrame *, QVariant> > WidgetAtlasManager::RequestFrames(Item *pI
     return returnList;
 }
 
-void WidgetAtlasManager::RelinquishFrames(Item *pItem, QList<QPair<HyGuiFrame *, QVariant> > relinquishList)
+void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<QPair<HyGuiFrame *, QVariant> > relinquishList)
 {
     for(int i = 0; i < relinquishList.size(); ++i)
         RemoveDependency(relinquishList[i].first, pItem);

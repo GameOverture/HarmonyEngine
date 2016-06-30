@@ -187,7 +187,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 }
 
 // This only requests to the WidgetRenderer to open the item. It will eventually do so, after re-loading any resources it needs to
-/*static*/ void MainWindow::OpenItem(Item *pItem)
+/*static*/ void MainWindow::OpenItem(ItemWidget *pItem)
 {
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
@@ -196,7 +196,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->ui->explorer->SelectItem(pItem);
 }
 
-/*static*/ void MainWindow::CloseItem(Item *pItem)
+/*static*/ void MainWindow::CloseItem(ItemWidget *pItem)
 {
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
@@ -205,7 +205,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->ui->explorer->GetCurProjSelected()->GetTabsManager()->CloseItem(pItem);
 }
 
-/*static*/ void MainWindow::SetCurrentItem(Item *pItem)
+/*static*/ void MainWindow::SetCurrentItem(ItemWidget *pItem)
 {
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
@@ -261,7 +261,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
     if(sm_pInstance->m_pCurSelectedProj)
     {
-        sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasManager());
+        sm_pInstance->ui->dockWidgetAtlas->setWidget(&sm_pInstance->m_pCurSelectedProj->GetAtlasManager());
         sm_pInstance->ui->dockWidgetAtlas->widget()->show();
     }
     else

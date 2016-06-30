@@ -10,7 +10,7 @@
 #ifndef ITEMPROJECT_H
 #define ITEMPROJECT_H
 
-#include "Item.h"
+#include "ItemWidget.h"
 #include "HyGuiRenderer.h"
 
 #include <QQueue>
@@ -19,7 +19,7 @@
 class WidgetAtlasManager;
 class WidgetTabsManager;
 
-class ItemProject : public Item
+class ItemProject : public ItemWidget
 {
     friend class WidgetExplorer;
     
@@ -28,7 +28,6 @@ class ItemProject : public Item
     QString                     m_sRelativeSourceLocation;
     
     WidgetTabsManager *         m_pTabsManager;
-    WidgetAtlasManager *        m_pAtlasManager;
     
     QQueue<eProjDrawState>      m_DrawStateQueue;
     eProjDrawState              m_ePrevDrawState;
@@ -54,7 +53,6 @@ public:
     QString GetSourceRelPath() const                    { return QDir::cleanPath(m_sRelativeSourceLocation) + '/'; }
 
     WidgetTabsManager *GetTabsManager()                 { return m_pTabsManager; }
-    WidgetAtlasManager *GetAtlasManager()               { return m_pAtlasManager; }
 
     virtual void OnDraw_Open(IHyApplication &hyApp);
     virtual void OnDraw_Close(IHyApplication &hyApp);

@@ -31,14 +31,13 @@ class WidgetSprite : public QWidget
     Q_OBJECT
     
     ItemSprite *            m_pItemSprite;
-    WidgetAtlasManager *    m_pAtlasManager;
     QUndoStack *            m_pUndoStack;
 
     QList<QAction *>        m_StateActionsList;
     WidgetSpriteState *     m_pCurSpriteState;
 
 public:
-    explicit WidgetSprite(ItemSprite *pItemSprite, WidgetAtlasManager *pAtlasMan, QWidget *parent = 0);
+    explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
 
     void UpdateActions();

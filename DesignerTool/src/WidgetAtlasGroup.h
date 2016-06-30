@@ -17,7 +17,6 @@
 
 #include "HyGlobal.h"
 #include "DlgAtlasGroupSettings.h"
-#include "IHyGuiDrawItem.h"
 #include "HyGuiFrame.h"
 #include "ItemProject.h"
 

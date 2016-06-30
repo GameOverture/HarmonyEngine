@@ -50,8 +50,8 @@ WidgetTabsManager::~WidgetTabsManager()
 {
     while(m_ActionQueue.empty() == false)
     {
-        std::pair<Item *, eQueuedAction> action = m_ActionQueue.dequeue();
-        Item *pItem = action.first;
+        std::pair<ItemWidget *, eQueuedAction> action = m_ActionQueue.dequeue();
+        ItemWidget *pItem = action.first;
         eQueuedAction eActionToTake = action.second;
 
         switch(eActionToTake)
@@ -124,14 +124,14 @@ WidgetTabsManager::~WidgetTabsManager()
     return true;
 }
 
-void WidgetTabsManager::OpenItem(Item *pItem)
+void WidgetTabsManager::OpenItem(ItemWidget *pItem)
 {
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(pItem, QUEUEDITEM_Open));
+    m_ActionQueue.enqueue(std::pair<ItemWidget *, eQueuedAction>(pItem, QUEUEDITEM_Open));
 }
 
-void WidgetTabsManager::CloseItem(Item *pItem)
+void WidgetTabsManager::CloseItem(ItemWidget *pItem)
 {
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(pItem, QUEUEDITEM_Close));
+    m_ActionQueue.enqueue(std::pair<ItemWidget *, eQueuedAction>(pItem, QUEUEDITEM_Close));
 }
 
 void WidgetTabsManager::on_tabWidget_currentChanged(int index)
@@ -139,5 +139,5 @@ void WidgetTabsManager::on_tabWidget_currentChanged(int index)
     if(index < 0)
         return;
     
-    m_ActionQueue.enqueue(std::pair<Item *, eQueuedAction>(static_cast<TabPage *>(ui->tabWidget->widget(index))->GetItem(), QUEUEDITEM_Show));
+    m_ActionQueue.enqueue(std::pair<ItemWidget *, eQueuedAction>(static_cast<TabPage *>(ui->tabWidget->widget(index))->GetItem(), QUEUEDITEM_Show));
 }

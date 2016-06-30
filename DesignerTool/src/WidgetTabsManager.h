@@ -23,14 +23,14 @@ class TabPage : public QWidget
 {
     Q_OBJECT
 
-    Item *          m_pItem;
+    ItemWidget *          m_pItem;
 
 public:
-    TabPage(Item *pItem, QWidget *pParent) : m_pItem(pItem),
+    TabPage(ItemWidget *pItem, QWidget *pParent) : m_pItem(pItem),
                                              QWidget(pParent)
     { }
 
-    Item *GetItem() { return m_pItem; }
+    ItemWidget *GetItem() { return m_pItem; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ class WidgetTabsManager : public QWidget, public IHyApplication
         QUEUEDITEM_Show,
         QUEUEDITEM_Close
     };
-    QQueue<std::pair<Item *, eQueuedAction> > m_ActionQueue;
+    QQueue<std::pair<ItemWidget *, eQueuedAction> > m_ActionQueue;
     
 public:
     explicit WidgetTabsManager(QWidget *parent = 0);
@@ -59,8 +59,8 @@ public:
     virtual bool Update();
     virtual bool Shutdown();
     
-    void OpenItem(Item *pItem);
-    void CloseItem(Item *pItem);
+    void OpenItem(ItemWidget *pItem);
+    void CloseItem(ItemWidget *pItem);
 
 private:
     Ui::WidgetTabsManager *ui;

@@ -10,19 +10,19 @@
 #ifndef ITEMSPRITE_H
 #define ITEMSPRITE_H
 
-#include "Item.h"
+#include "ItemWidget.h"
 #include "WidgetSprite.h"
 
 class WidgetAtlasManager;
 
-class ItemSprite : public Item
+class ItemSprite : public ItemWidget
 {
     friend class WidgetExplorer;
     
     HyPrimitive2d       m_primOriginHorz;
     HyPrimitive2d       m_primOriginVert;
     
-    ItemSprite(const QString sPath, WidgetAtlasManager *pAtlasMan);
+    ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef);
     
 protected:
     

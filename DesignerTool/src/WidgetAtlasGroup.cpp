@@ -567,8 +567,8 @@ void WidgetAtlasGroup::on_actionDeleteImage_triggered()
     for(int i = 0; i < selectedItems.count(); ++i)
     {
         HyGuiFrame *pFrame = selectedItems[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
-        QSet<Item *> sLinks = pFrame->GetLinks();
-        for(QSet<Item *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+        QSet<ItemWidget *> sLinks = pFrame->GetLinks();
+        for(QSet<ItemWidget *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
         {
             m_pManager->RemoveDependency(pFrame, *LinksIter);
         }

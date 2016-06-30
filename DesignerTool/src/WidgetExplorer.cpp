@@ -48,7 +48,8 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
     else
         HyGuiLog("Opening project: " % pItemProject->GetAbsPath(), LOGTYPE_Info);
     
-    QTreeWidgetItem *pProjTreeItem = CreateTreeItem(NULL, pItemProject);
+    QTreeWidgetItem *pProjTreeItem = pItemProject->GetTreeItem();
+    ui->treeWidget->insertTopLevelItem(0, pProjTreeItem);
     
     QList<eItemType> subDirList = HyGlobal::SubDirList();
     foreach(eItemType eType, subDirList)
@@ -59,8 +60,8 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
         QString sSubDirPath = pItemProject->GetAssetsAbsPath() % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
         Item *pSubDirItem = new Item(eType, sSubDirPath);
         
-        QTreeWidgetItem *pSubDirTreeItem = CreateTreeItem(pProjTreeItem, pSubDirItem);
-        QTreeWidgetItem *pCurParentTreeItem = pSubDirTreeItem;
+        QTreeWidgetItem *pCurTreeItem = pSubDirItem->GetTreeItem();
+        pProjTreeItem->addChild(pCurTreeItem);
         
         QDirIterator dirIter(sSubDirPath, QDirIterator::Subdirectories);
         while(dirIter.hasNext())
@@ -73,18 +74,21 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
             // Ensure pCurParentTreeItem is correct. If not keep moving up the tree until found.
             QFileInfo curFileInfo(sCurPath);
             QString sCurFileParentBaseName = curFileInfo.dir().dirName();
-            QString sCurTreeItemName = pCurParentTreeItem->text(0);
+            QString sCurTreeItemName = pCurTreeItem->text(0);
             while(QString::compare(sCurFileParentBaseName, sCurTreeItemName, Qt::CaseInsensitive) != 0)
             {
-                pCurParentTreeItem = pCurParentTreeItem->parent();
-                sCurTreeItemName = pCurParentTreeItem->text(0);
+                pCurTreeItem = pCurTreeItem->parent();
+                sCurTreeItemName = pCurTreeItem->text(0);
             }
             
             Item *pPrefixItem;
             if(dirIter.fileInfo().isDir())
             {
                 pPrefixItem = new Item(ITEM_Prefix, sCurPath);
-                pCurParentTreeItem = CreateTreeItem(pCurParentTreeItem, pPrefixItem);
+                QTreeWidgetItem *pPrefixTreeWidget = pPrefixItem->GetTreeItem();
+
+                pCurTreeItem->addChild(pPrefixTreeWidget);
+                pCurTreeItem = pPrefixTreeWidget;
             }
             else if(dirIter.fileInfo().isFile())
             {
@@ -102,13 +106,13 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
                 {
                 case ITEM_Sprite:   pPrefixItem = new ItemSprite(sCurPath, pItemProject->GetAtlasManager()); break;
                 }
-                
-                CreateTreeItem(pCurParentTreeItem, pPrefixItem);
+
+                pCurTreeItem->addChild(pPrefixItem->GetTreeItem());
             }
         }
     }
 
-    pItemProject->GetAtlasManager()->LoadDependencies();
+    pItemProject->GetAtlasManager().LoadDependencies();
     
     ui->treeWidget->expandItem(pProjTreeItem);
 }
@@ -211,13 +215,15 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
                 QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetAbsPath() % sPathSplitList[i];
                 
                 Item *pPrefixItem = new Item(ITEM_Prefix, sPath);
-                
-                pParentTreeItem = CreateTreeItem(pParentTreeItem, pPrefixItem);
+                QTreeWidgetItem *pPrefixTreeItem = pPrefixItem->GetTreeItem();
+
+                pParentTreeItem->addChild(pPrefixTreeItem);
+                pParentTreeItem = pPrefixTreeItem;
             }
             else
             {
                 // At the final traversal, which is the item itself.
-                CreateTreeItem(pParentTreeItem, pItem);
+                pParentTreeItem->addChild(pItem->GetTreeItem());
                 
                 bSucceeded = true;
                 break;
@@ -239,7 +245,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
             pExpandItem = pExpandItem->parent();
         }
         
-        MainWindow::OpenItem(pItem);
+        MainWindow::OpenItem(static_cast<ItemWidget *>(pItem));
     }
 }
 
@@ -277,29 +283,6 @@ void WidgetExplorer::ProcessItem(Item *pItem)
 {
 }
 
-QTreeWidgetItem *WidgetExplorer::CreateTreeItem(QTreeWidgetItem *pParent, Item *pItem)
-{
-    QTreeWidgetItem *pNewTreeItem;
-    if(pParent == NULL)
-        pNewTreeItem = new QTreeWidgetItem(ui->treeWidget);
-    else
-        pNewTreeItem = new QTreeWidgetItem();
-    
-    pNewTreeItem->setText(0, pItem->GetName(false));
-    pNewTreeItem->setIcon(0, pItem->GetIcon());
-//    pNewTreeItem->setFlags(pNewItem->flags() | Qt::ItemIsEditable);
-    
-    QVariant v; v.setValue(pItem);
-    pNewTreeItem->setData(0, Qt::UserRole, v);
-    
-    if(pParent)
-        pParent->addChild(pNewTreeItem);
-    
-    pItem->SetTreeItem(pNewTreeItem);
-    
-    return pNewTreeItem;
-}
-
 QTreeWidgetItem *WidgetExplorer::GetSelectedTreeItem()
 {
     QTreeWidgetItem *pCurSelected = NULL;
@@ -333,7 +316,12 @@ ItemProject *WidgetExplorer::GetCurProjSelected()
         pCurProjItem = pCurProjItem->parent();
     
     QVariant v = pCurProjItem->data(0, Qt::UserRole);
-    return reinterpret_cast<ItemProject *>(v.value<Item *>());
+    Item *pItem = v.value<Item *>();
+
+    if(pItem->GetType() != ITEM_Project)
+        HyGuiLog("WidgetExplorer::GetCurProjSelected() returned a non project item", LOGTYPE_Error);
+
+    return reinterpret_cast<ItemProject *>(pItem);
 }
 
 Item *WidgetExplorer::GetCurItemSelected()
@@ -450,7 +438,7 @@ void WidgetExplorer::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int 
     case ITEM_Sprite:
     case ITEM_Shader:
     case ITEM_Entity:
-        MainWindow::OpenItem(pTreeVariantItem);
+        MainWindow::OpenItem(static_cast<ItemWidget *>(pTreeVariantItem));
         break;
     }
 }

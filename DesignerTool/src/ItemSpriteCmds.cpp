@@ -196,9 +196,8 @@ void ItemSpriteCmd_MoveStateForward::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemSpriteCmd_AddFrames::ItemSpriteCmd_AddFrames(Item *pItem, WidgetAtlasManager *pAtlasMan, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-                                                                                                                                m_pItem(pItem),
-                                                                                                                                m_pAtlasMan(pAtlasMan)
+ItemSpriteCmd_AddFrames::ItemSpriteCmd_AddFrames(ItemWidget *pItem, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                        m_pItem(pItem)
 {
     setText("Import Frames");
     m_Frames.clear();
@@ -210,18 +209,17 @@ ItemSpriteCmd_AddFrames::~ItemSpriteCmd_AddFrames()
 
 void ItemSpriteCmd_AddFrames::redo()
 {
-    m_Frames = m_pAtlasMan->RequestFrames(m_pItem, m_Frames);
+    m_Frames = m_pItem->GetAtlasManager().RequestFrames(m_pItem, m_Frames);
 }
 
 void ItemSpriteCmd_AddFrames::undo()
 {
-    m_pAtlasMan->RelinquishFrames(m_pItem, m_Frames);
+    m_pItem->GetAtlasManager().RelinquishFrames(m_pItem, m_Frames);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemSpriteCmd_DeleteFrame::ItemSpriteCmd_DeleteFrame(Item *pItem, WidgetAtlasManager *pAtlasMan, HyGuiFrame *pFrame, int iRowParam, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
-                                                                                                                                                                        m_pItem(pItem),
-                                                                                                                                                                        m_pAtlasMan(pAtlasMan)
+ItemSpriteCmd_DeleteFrame::ItemSpriteCmd_DeleteFrame(ItemWidget *pItem, HyGuiFrame *pFrame, int iRowParam, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                            m_pItem(pItem)
 {
     setText("Remove Frame");
     m_Frames.append(QPair<HyGuiFrame *, QVariant>(pFrame, QVariant(iRowParam)));
@@ -233,12 +231,12 @@ ItemSpriteCmd_DeleteFrame::~ItemSpriteCmd_DeleteFrame()
 
 void ItemSpriteCmd_DeleteFrame::redo()
 {
-    m_pAtlasMan->RelinquishFrames(m_pItem, m_Frames);
+    m_pItem->GetAtlasManager().RelinquishFrames(m_pItem, m_Frames);
 }
 
 void ItemSpriteCmd_DeleteFrame::undo()
 {
-    m_Frames = m_pAtlasMan->RequestFrames(m_pItem, m_Frames);
+    m_Frames = m_pItem->GetAtlasManager().RequestFrames(m_pItem, m_Frames);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

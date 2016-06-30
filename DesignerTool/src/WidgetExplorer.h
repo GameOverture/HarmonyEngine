@@ -51,8 +51,6 @@ private:
     
     void ProcessItem(Item *pItem);
     
-    QTreeWidgetItem *CreateTreeItem(QTreeWidgetItem *pParent, Item *pItem);
-    
     QTreeWidgetItem *GetSelectedTreeItem();
     
 private slots:

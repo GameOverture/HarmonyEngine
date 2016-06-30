@@ -12,9 +12,9 @@
 #include <QUndoView>
 #include "WidgetAtlasManager.h"
 
-ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager *pAtlasMan) : Item(ITEM_Sprite, sPath)
+ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : ItemWidget(ITEM_Sprite, sPath, &atlasManRef)
 {
-    m_pWidget = new WidgetSprite(this, pAtlasMan);
+    m_pWidget = new WidgetSprite(this);
 
 //    m_pUndoView = new QUndoView(undoStack);
 //    m_pUndoView->setWindowTitle(tr("Command List"));
@@ -75,11 +75,11 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager *pAtlasMan) : Ite
 /*virtual*/ void ItemSprite::Link(HyGuiFrame *pFrame, QVariant param)
 {
     static_cast<WidgetSprite *>(m_pWidget)->InsertFrame(pFrame, param);
-    Item::Link(pFrame, param);
+    ItemWidget::Link(pFrame, param);
 }
 
 /*virtual*/ void ItemSprite::UnLink(HyGuiFrame *pFrame)
 {
     static_cast<WidgetSprite *>(m_pWidget)->RemoveFrame(pFrame);
-    Item::UnLink(pFrame);
+    ItemWidget::UnLink(pFrame);
 }
