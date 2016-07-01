@@ -167,13 +167,17 @@ QString ItemProject::GetDirPath() const
 
             if(pItem)
             {
-                // Below should invoke callback 'on_tabWidget_currentChanged' which will enqueue a QUEUEDITEM_Show action
                 pItem->DrawOpen(*this);
-                pTabBar->setCurrentIndex(pTabBar->addTab(pItem->GetIcon(), pItem->GetName(false)));
 
+                pTabBar->blockSignals(true);
+                int iIndex = pTabBar->addTab(pItem->GetIcon(), pItem->GetName(false));
                 QVariant v;
                 v.setValue(pItem);
-                pTabBar->setTabData(pTabBar->currentIndex(), v);
+                pTabBar->setTabData(iIndex, v);
+                pTabBar->setCurrentIndex(iIndex);
+                pTabBar->blockSignals(false);
+
+                m_ActionQueue.enqueue(std::pair<ItemWidget *, eQueuedAction>(pItem, QUEUEDITEM_Show));
             }
             break;
 
@@ -256,5 +260,9 @@ void ItemProject::on_tabBar_currentChanged(int index)
         return;
 
     QTabBar *pTabBar = static_cast<QTabBar *>(m_pWidget);
-    m_ActionQueue.enqueue(std::pair<ItemWidget *, eQueuedAction>(pTabBar->tabData(pTabBar->currentIndex()).value<ItemWidget *>(), QUEUEDITEM_Show));
+
+    int iIndex = pTabBar->currentIndex();
+    QVariant v = pTabBar->tabData(iIndex);
+    ItemWidget *pItem = v.value<ItemWidget *>();
+    m_ActionQueue.enqueue(std::pair<ItemWidget *, eQueuedAction>(pItem, QUEUEDITEM_Show));
 }

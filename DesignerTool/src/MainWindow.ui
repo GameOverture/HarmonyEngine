@@ -32,32 +32,14 @@
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>40</height>
+        <height>20</height>
        </size>
       </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
       <widget class="QWidget" name="page">
-       <layout class="QVBoxLayout" name="verticalLayout_6">
-        <item>
-         <widget class="QTabWidget" name="tabWidget">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>40</height>
-           </size>
-          </property>
-          <widget class="QWidget" name="tab">
-           <attribute name="title">
-            <string>Tab 1</string>
-           </attribute>
-          </widget>
-          <widget class="QWidget" name="tab_2">
-           <attribute name="title">
-            <string>Tab 2</string>
-           </attribute>
-          </widget>
-         </widget>
-        </item>
-       </layout>
+       <layout class="QVBoxLayout" name="verticalLayout_6"/>
       </widget>
       <widget class="QWidget" name="page_2"/>
      </widget>
