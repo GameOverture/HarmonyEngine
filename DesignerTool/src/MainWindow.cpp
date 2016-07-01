@@ -17,7 +17,6 @@
 
 #include "WidgetExplorer.h"
 #include "WidgetAtlasManager.h"
-#include "WidgetTabsManager.h"
 
 #include "ItemSprite.h"
 
@@ -192,7 +191,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
 
-    sm_pInstance->ui->explorer->GetCurProjSelected()->GetTabsManager()->OpenItem(pItem);
+    sm_pInstance->ui->explorer->GetCurProjSelected()->OpenItem(pItem);
     sm_pInstance->ui->explorer->SelectItem(pItem);
 }
 
@@ -202,7 +201,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         return;
 
     // TODO: Ask to save file if changes have been made
-    sm_pInstance->ui->explorer->GetCurProjSelected()->GetTabsManager()->CloseItem(pItem);
+    sm_pInstance->ui->explorer->GetCurProjSelected()->CloseItem(pItem);
 }
 
 /*static*/ void MainWindow::SetCurrentItem(ItemWidget *pItem)
@@ -240,7 +239,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         bool bTabsFound = false;
         for(int i = 0; i < sm_pInstance->ui->stackedTabWidgets->count(); ++i)
         {
-            if(sm_pInstance->ui->stackedTabWidgets->widget(i) == pProj->GetTabsManager())
+            if(sm_pInstance->ui->stackedTabWidgets->widget(i) == pProj->GetWidget())
             {
                 sm_pInstance->ui->stackedTabWidgets->setCurrentIndex(i);
                 bTabsFound = true;
@@ -249,8 +248,8 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
         if(bTabsFound == false)
         {
-            sm_pInstance->ui->stackedTabWidgets->addWidget(pProj->GetTabsManager());
-            sm_pInstance->ui->stackedTabWidgets->setCurrentWidget(pProj->GetTabsManager());
+            sm_pInstance->ui->stackedTabWidgets->addWidget(pProj->GetWidget());
+            sm_pInstance->ui->stackedTabWidgets->setCurrentWidget(pProj->GetWidget());
         }
     }
 

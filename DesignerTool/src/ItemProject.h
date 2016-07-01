@@ -19,22 +19,30 @@
 class WidgetAtlasManager;
 class WidgetTabsManager;
 
-class ItemProject : public ItemWidget
+class ItemProject : public ItemWidget, public IHyApplication
 {
+    Q_OBJECT
+
     friend class WidgetExplorer;
     
-    QString                     m_sRelativeAssetsLocation;
-    QString                     m_sRelativeMetaDataLocation;
-    QString                     m_sRelativeSourceLocation;
-    
-    WidgetTabsManager *         m_pTabsManager;
-    
-    QQueue<eProjDrawState>      m_DrawStateQueue;
-    eProjDrawState              m_ePrevDrawState;
-    eProjDrawState              m_eDrawState;
-    bool                        m_bDrawStateLoaded[NUMPROJDRAWSTATE];
+    QString                                         m_sRelativeAssetsLocation;
+    QString                                         m_sRelativeMetaDataLocation;
+    QString                                         m_sRelativeSourceLocation;
 
-    bool                        m_bHasError;
+    QQueue<eProjDrawState>                          m_DrawStateQueue;
+    eProjDrawState                                  m_ePrevDrawState;
+    eProjDrawState                                  m_eDrawState;
+    bool                                            m_bDrawStateLoaded[NUMPROJDRAWSTATE];
+
+    enum eQueuedAction
+    {
+        QUEUEDITEM_Open = 0,
+        QUEUEDITEM_Show,
+        QUEUEDITEM_Close
+    };
+    QQueue<std::pair<ItemWidget *, eQueuedAction> > m_ActionQueue;
+
+    bool                                            m_bHasError;
     
     ItemProject(const QString sNewProjectFilePath);
     
@@ -52,18 +60,27 @@ public:
     QString GetSourceAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation) + '/'; }
     QString GetSourceRelPath() const                    { return QDir::cleanPath(m_sRelativeSourceLocation) + '/'; }
 
-    WidgetTabsManager *GetTabsManager()                 { return m_pTabsManager; }
-
+    // ItemWidget overrides
     virtual void OnDraw_Open(IHyApplication &hyApp);
     virtual void OnDraw_Close(IHyApplication &hyApp);
     virtual void OnDraw_Show(IHyApplication &hyApp);
     virtual void OnDraw_Hide(IHyApplication &hyApp);
     virtual void OnDraw_Update(IHyApplication &hyApp);
+
+    // IHyApplication overrides
+    virtual bool Initialize();
+    virtual bool Update();
+    virtual bool Shutdown();
     
     void SetOverrideDrawState(eProjDrawState eDrawState);
     bool IsOverrideDraw();
-
     void Reset();
+
+    void OpenItem(ItemWidget *pItem);
+    void CloseItem(ItemWidget *pItem);
+
+private slots:
+    void on_tabBar_currentChanged(int index);
 };
 
 #endif // ITEMPROJECT_H

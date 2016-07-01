@@ -39,7 +39,6 @@ SOURCES += main.cpp \
     HyGuiDebugger.cpp \
     DlgSetEngineLocation.cpp \
     ItemSpriteCmds.cpp \
-    WidgetTabsManager.cpp \
     WidgetSpriteState.cpp \
     HyGuiFrame.cpp \
     ItemWidget.cpp
@@ -70,7 +69,6 @@ HEADERS  += \
     HyGuiDebugger.h \
     DlgSetEngineLocation.h \
     ItemSpriteCmds.h \
-    WidgetTabsManager.h \
     WidgetSpriteState.h \
     HyGuiFrame.h \
     ItemWidget.h
@@ -91,7 +89,6 @@ FORMS    += \
     WidgetAtlasManager.ui \
     WidgetAtlasGroup.ui \
     DlgSetEngineLocation.ui \
-    WidgetTabsManager.ui \
     WidgetSpriteState.ui
 
 Release:DESTDIR = ../bin/release

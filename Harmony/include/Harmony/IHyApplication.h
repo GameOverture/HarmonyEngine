@@ -19,6 +19,9 @@ class IHyApplication
 {
 	friend class HyEngine;
 
+#ifdef HY_PLATFORM_GUI
+protected:
+#endif
 	static HarmonyInit				sm_Init;
 
 	vector<HyWindow *>				m_vWindows;

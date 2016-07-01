@@ -8,7 +8,6 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "HyGuiRenderer.h"
-#include "WidgetTabsManager.h"
 
 #include <QTimer>
 //#include <QGLFormat>
@@ -58,7 +57,7 @@ HyGuiRenderer::~HyGuiRenderer()
     //    setFormat(format);
 
     if(m_pProjOwner)
-        m_pHyEngine = new HyEngine(*m_pProjOwner->GetTabsManager());
+        m_pHyEngine = new HyEngine(*m_pProjOwner);
 }
 
 /*virtual*/ void HyGuiRenderer::paintGL()
@@ -76,5 +75,5 @@ HyGuiRenderer::~HyGuiRenderer()
 /*virtual*/ void HyGuiRenderer::resizeGL(int w, int h)
 {
     if(m_pProjOwner)
-        m_pProjOwner->GetTabsManager()->Window().SetResolution(glm::ivec2(w, h));
+        m_pProjOwner->Window().SetResolution(glm::ivec2(w, h));
 }

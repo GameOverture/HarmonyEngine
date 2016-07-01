@@ -17,6 +17,8 @@ class WidgetAtlasManager;
 
 class ItemSprite : public ItemWidget
 {
+    Q_OBJECT
+
     friend class WidgetExplorer;
     
     HyPrimitive2d       m_primOriginHorz;

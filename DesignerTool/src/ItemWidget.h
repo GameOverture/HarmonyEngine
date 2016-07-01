@@ -18,10 +18,12 @@ class WidgetAtlasManager;
 
 class ItemWidget : public Item
 {
+    Q_OBJECT
+
     friend class WidgetAtlasManager;
     friend class WidgetTabsManager;
 
-
+    // TODO: remove this friend and fix Draw*() functions
     friend class ItemProject;
 
     void DrawOpen(IHyApplication &hyApp);
@@ -61,5 +63,6 @@ protected:
     virtual void Link(HyGuiFrame *pFrame, QVariant param);
     virtual void UnLink(HyGuiFrame *pFrame);
 };
+Q_DECLARE_METATYPE(ItemWidget *)
 
 #endif // ITEMWIDGET_H

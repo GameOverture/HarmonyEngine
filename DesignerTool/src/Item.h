@@ -19,8 +19,10 @@ class HyGuiDependencies;
 class WidgetRenderer;
 class HyGuiFrame;
 
-class Item
+class Item : public QObject
 {
+    Q_OBJECT
+
     friend class WidgetExplorer;
     
 protected:

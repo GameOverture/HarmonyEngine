@@ -14,6 +14,8 @@
 
 class ItemFont : public Item
 {
+    Q_OBJECT
+
     friend class WidgetExplorer;
     
     struct tGlyphSet
