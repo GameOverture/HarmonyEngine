@@ -193,27 +193,12 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
     sm_pInstance->ui->explorer->GetCurProjSelected()->OpenItem(pItem);
     sm_pInstance->ui->explorer->SelectItem(pItem);
-}
 
-/*static*/ void MainWindow::CloseItem(ItemWidget *pItem)
-{
-    if(pItem == NULL || pItem->GetType() == ITEM_Project)
-        return;
-
-    // TODO: Ask to save file if changes have been made
-    sm_pInstance->ui->explorer->GetCurProjSelected()->CloseItem(pItem);
-}
-
-/*static*/ void MainWindow::SetCurrentItem(ItemWidget *pItem)
-{
-    if(pItem == NULL || pItem->GetType() == ITEM_Project)
-        return;
-    
     QString sWindowTitle = pItem->GetName(false) % " Properties";
-    
+
     sm_pInstance->ui->actionViewProperties->setVisible(true);
     sm_pInstance->ui->actionViewProperties->setText(sWindowTitle);
-    
+
     sm_pInstance->ui->dockWidgetCurrentItem->setVisible(true);
     sm_pInstance->ui->dockWidgetCurrentItem->setWindowTitle(sWindowTitle);
     sm_pInstance->ui->dockWidgetCurrentItem->setWidget(pItem->GetWidget());
@@ -224,6 +209,15 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurEditMenu = pItem->GetEditMenu();
     if(sm_pInstance->m_pCurEditMenu)
         sm_pInstance->ui->menuBar->insertMenu(sm_pInstance->ui->menu_View->menuAction(), sm_pInstance->m_pCurEditMenu);
+}
+
+/*static*/ void MainWindow::CloseItem(ItemWidget *pItem)
+{
+    if(pItem == NULL || pItem->GetType() == ITEM_Project)
+        return;
+
+    // TODO: Ask to save file if changes have been made
+    sm_pInstance->ui->explorer->GetCurProjSelected()->CloseItem(pItem);
 }
 
 /*static*/ void MainWindow::SetSelectedProj(ItemProject *pProj)
@@ -239,7 +233,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         bool bTabsFound = false;
         for(int i = 0; i < sm_pInstance->ui->stackedTabWidgets->count(); ++i)
         {
-            if(sm_pInstance->ui->stackedTabWidgets->widget(i) == pProj->GetWidget())
+            if(sm_pInstance->ui->stackedTabWidgets->widget(i) == pProj->GetTabBar())
             {
                 sm_pInstance->ui->stackedTabWidgets->setCurrentIndex(i);
                 bTabsFound = true;
@@ -248,8 +242,8 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
         if(bTabsFound == false)
         {
-            sm_pInstance->ui->stackedTabWidgets->addWidget(pProj->GetWidget());
-            sm_pInstance->ui->stackedTabWidgets->setCurrentWidget(pProj->GetWidget());
+            sm_pInstance->ui->stackedTabWidgets->addWidget(pProj->GetTabBar());
+            sm_pInstance->ui->stackedTabWidgets->setCurrentWidget(pProj->GetTabBar());
         }
     }
 

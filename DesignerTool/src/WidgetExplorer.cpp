@@ -462,9 +462,9 @@ void WidgetExplorer::on_treeWidget_itemSelectionChanged()
         
         Item *pItemDir = GetCurDirSelected(false);
         bValidItem = pItemDir->GetType() == ITEM_DirSprites || pItemDir->GetType() == ITEM_DirFonts;
+
+        MainWindow::SetSelectedProj(GetCurProjSelected());
     }
-    
-    MainWindow::SetSelectedProj(GetCurProjSelected());
 
     // QVariant v = current->data(0, Qt::UserRole);
     // Item *pItemVariant = v.value<Item *>();

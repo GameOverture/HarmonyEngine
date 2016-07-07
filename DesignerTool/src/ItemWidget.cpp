@@ -13,15 +13,12 @@
 
 #include <QMenu>
 
-ItemWidget::ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager *pAtlasMan) :   Item(eType, sPath),
-                                                                                                m_pAtlasMan(pAtlasMan),
+ItemWidget::ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager &AtlasManRef) : Item(eType, sPath),
+                                                                                                m_AtlasManRef(AtlasManRef),
                                                                                                 m_pWidget(NULL),
                                                                                                 m_pEditMenu(NULL),
                                                                                                 m_pCamera(NULL)
 {
-    if(m_pAtlasMan == NULL && m_eTYPE != ITEM_Project)
-        HyGuiLog("ItemWidget ctor of type [" % QString::number(m_eTYPE) % "] was passed a NULL WidgetAtlasManager", LOGTYPE_Error);
-
     switch(m_eTYPE)
     {
     case ITEM_Project:
@@ -52,22 +49,28 @@ ItemWidget::~ItemWidget()
     
 }
 
-void ItemWidget::DrawOpen(IHyApplication &hyApp)
+void ItemWidget::DrawLoad(IHyApplication &hyApp)
 {
-    if(m_pCamera == NULL)
-        m_pCamera = hyApp.Window().CreateCamera2d();
+    // A non NULL camera signifies that this has been loaded already
+    if(m_pCamera)
+        return;
 
+    m_pCamera = hyApp.Window().CreateCamera2d();
     m_pCamera->SetEnabled(false);
 
-    OnDraw_Open(hyApp);
+    OnDraw_Load(hyApp);
 }
 
-void ItemWidget::DrawClose(IHyApplication &hyApp)
+void ItemWidget::DrawUnload(IHyApplication &hyApp)
 {
-    if(m_pCamera)
-        hyApp.Window().RemoveCamera(m_pCamera);
+    // A NULL camera signifies that this has hasn't been loaded
+    if(m_pCamera == NULL)
+        return;
 
-    OnDraw_Close(hyApp);
+    hyApp.Window().RemoveCamera(m_pCamera);
+    m_pCamera = NULL;
+
+    OnDraw_Unload(hyApp);
 }
 
 void ItemWidget::DrawShow(IHyApplication &hyApp)
@@ -89,37 +92,14 @@ void ItemWidget::DrawUpdate(IHyApplication &hyApp)
     OnDraw_Update(hyApp);
 }
 
-///*virtual*/ void ItemWidget::OnDraw_Open(IHyApplication &hyApp)
-//{
-//    HyGuiLog("Tried to OnDraw_Open() a non-derived item: " % GetName(true), LOGTYPE_Error);
-//}
-
-///*virtual*/ void ItemWidget::OnDraw_Close(IHyApplication &hyApp)
-//{
-//    HyGuiLog("Tried to OnDraw_Close() a non-derived item: " % GetName(true), LOGTYPE_Error);
-//}
-
-///*virtual*/ void ItemWidget::OnDraw_Show(IHyApplication &hyApp)
-//{
-//    HyGuiLog("Tried to OnDraw_Show() a non-derived item: " % GetName(true), LOGTYPE_Error);
-//}
-
-///*virtual*/ void ItemWidget::OnDraw_Hide(IHyApplication &hyApp)
-//{
-//    HyGuiLog("Tried to OnDraw_Hide() a non-derived item: " % GetName(true), LOGTYPE_Error);
-//}
-
-///*virtual*/ void ItemWidget::OnDraw_Update(IHyApplication &hyApp)
-//{
-//    HyGuiLog("Tried to OnDraw_Update() a non-derived item: " % GetName(true), LOGTYPE_Error);
-//}
-
-/*virtual*/ void ItemWidget::Link(HyGuiFrame *pFrame, QVariant param)
+void ItemWidget::Link(HyGuiFrame *pFrame, QVariant param)
 {
+    OnLink(pFrame, param);
     m_Links.insert(pFrame);
 }
 
-/*virtual*/ void ItemWidget::UnLink(HyGuiFrame *pFrame)
+void ItemWidget::Unlink(HyGuiFrame *pFrame)
 {
+    OnUnlink(pFrame);
     m_Links.remove(pFrame);
 }

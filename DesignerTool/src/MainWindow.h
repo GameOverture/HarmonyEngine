@@ -50,8 +50,6 @@ public:
     static void OpenItem(ItemWidget *pItem);
     static void CloseItem(ItemWidget *pItem);
     
-    static void SetCurrentItem(ItemWidget *pItem);
-    
     static void SetSelectedProj(ItemProject *pProj);
     static void ReloadHarmony();
 

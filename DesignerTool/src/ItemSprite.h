@@ -28,8 +28,8 @@ class ItemSprite : public ItemWidget
     
 protected:
     
-    virtual void OnDraw_Open(IHyApplication &hyApp);
-    virtual void OnDraw_Close(IHyApplication &hyApp);
+    virtual void OnDraw_Load(IHyApplication &hyApp);
+    virtual void OnDraw_Unload(IHyApplication &hyApp);
 
     virtual void OnDraw_Show(IHyApplication &hyApp);
     virtual void OnDraw_Hide(IHyApplication &hyApp);
@@ -37,9 +37,8 @@ protected:
     
     virtual void Save();
 
-protected:
-    virtual void Link(HyGuiFrame *pFrame, QVariant param);
-    virtual void UnLink(HyGuiFrame *pFrame);
+    virtual void OnLink(HyGuiFrame *pFrame, QVariant param);
+    virtual void OnUnlink(HyGuiFrame *pFrame);
 };
 
 #endif // ITEMSPRITE_H

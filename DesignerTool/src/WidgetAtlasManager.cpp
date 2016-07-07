@@ -210,7 +210,7 @@ void WidgetAtlasManager::SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem, QV
 void WidgetAtlasManager::RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem)
 {
     pFrame->m_Links.remove(pItem);
-    pItem->UnLink(pFrame);
+    pItem->Unlink(pFrame);
 }
 
 QList<QPair<HyGuiFrame *, QVariant> > WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<QPair<HyGuiFrame *, QVariant> >optionalRequestList /*= QList<QPair<HyGuiFrame *, QVariant> >()*/)

@@ -33,7 +33,7 @@ protected:
 
 public:
 	IHyApplication(HarmonyInit &initStruct);
-	~IHyApplication();
+	virtual ~IHyApplication();
 
 	static HyCoordinateType DefaultCoordinateType()	{ HyAssert(sm_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HyScene::DefaultCoordinateType() invoked before engine initialized"); return sm_Init.eDefaultCoordinateType; }
 	static HyCoordinateUnit DefaultCoordinateUnit()	{ HyAssert(sm_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HyScene::DefaultCoordinateUnit() invoked before engine initialized"); return sm_Init.eDefaultCoordinateUnit; }

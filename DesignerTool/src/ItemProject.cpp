@@ -17,14 +17,15 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-ItemProject::ItemProject(const QString sNewProjectFilePath) :   ItemWidget(ITEM_Project, sNewProjectFilePath, NULL),
+ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Project, sNewProjectFilePath),
                                                                 IHyApplication(HarmonyInit()),
                                                                 m_eDrawState(PROJDRAWSTATE_Nothing),
                                                                 m_ePrevDrawState(PROJDRAWSTATE_Nothing),
                                                                 m_bHasError(false)
 {
-    m_pWidget = new QTabBar();
-    connect(m_pWidget, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
+    m_pTabBar = new QTabBar();
+    m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
+    connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
 
     for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
         m_bDrawStateLoaded[i] = false;
@@ -75,65 +76,6 @@ QString ItemProject::GetDirPath() const
     return file.dir().absolutePath() + '/';
 }
 
-/*virtual*/ void ItemProject::OnDraw_Open(IHyApplication &hyApp)
-{
-    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-        AtlasManager_DrawOpen(hyApp, *m_pAtlasMan);
-}
-
-/*virtual*/ void ItemProject::OnDraw_Close(IHyApplication &hyApp)
-{
-    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-        AtlasManager_DrawClose(hyApp, *m_pAtlasMan);
-}
-
-/*virtual*/ void ItemProject::OnDraw_Show(IHyApplication &hyApp)
-{
-    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-        AtlasManager_DrawShow(hyApp, *m_pAtlasMan);
-}
-
-/*virtual*/ void ItemProject::OnDraw_Hide(IHyApplication &hyApp)
-{
-    if(m_ePrevDrawState == PROJDRAWSTATE_AtlasManager)
-        AtlasManager_DrawHide(hyApp, *m_pAtlasMan);
-}
-
-/*virtual*/ void ItemProject::OnDraw_Update(IHyApplication &hyApp)
-{
-    while(m_DrawStateQueue.empty() == false)
-    {
-        m_ePrevDrawState = m_eDrawState;
-        m_eDrawState = m_DrawStateQueue.dequeue();
-        
-        // This shouldn't happen, but if it did it would break logic below it
-        if(m_eDrawState == PROJDRAWSTATE_Nothing && m_ePrevDrawState == PROJDRAWSTATE_Nothing)
-            continue;
-        
-        // If our current state is 'nothing', then Hide() what was previous if it was loaded
-        if(m_eDrawState == PROJDRAWSTATE_Nothing)
-        {
-            if(m_bDrawStateLoaded[m_ePrevDrawState])
-                DrawHide(hyApp);
-            
-            m_ePrevDrawState = PROJDRAWSTATE_Nothing;
-        }
-        else
-        {
-            if(m_bDrawStateLoaded[m_eDrawState] == false)
-            {
-                DrawOpen(hyApp);
-                m_bDrawStateLoaded[m_eDrawState] = true;
-            }
-
-            DrawShow(hyApp);
-        }
-    }
-    
-    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-        AtlasManager_DrawUpdate(hyApp, *m_pAtlasMan);
-}
-
 // IHyApplication override
 /*virtual*/ bool ItemProject::Initialize()
 {
@@ -143,81 +85,74 @@ QString ItemProject::GetDirPath() const
 // IHyApplication override
 /*virtual*/ bool ItemProject::Update()
 {
-    QTabBar *pTabBar = static_cast<QTabBar *>(m_pWidget);
-
-    while(m_ActionQueue.empty() == false)
+    while(m_ShowQueue.empty() == false)
     {
-        std::pair<ItemWidget *, eQueuedAction> action = m_ActionQueue.dequeue();
-        ItemWidget *pItem = action.first;
-        eQueuedAction eActionToTake = action.second;
+        ItemWidget *pItem = m_ShowQueue.dequeue();
+        if(pItem == NULL)
+            continue;
 
-        switch(eActionToTake)
+        if(pItem->IsDrawLoaded() == false)
         {
-        case QUEUEDITEM_Open:
-            for(int i = 0; i < pTabBar->count(); ++i)
+            pItem->DrawLoad(*this);
+
+            m_pTabBar->blockSignals(true);
+            int iIndex = m_pTabBar->addTab(pItem->GetIcon(), pItem->GetName(false));
+            QVariant v;
+            v.setValue(pItem);
+            m_pTabBar->setTabData(iIndex, v);
+            m_pTabBar->setCurrentIndex(iIndex);
+            m_pTabBar->blockSignals(false);
+        }
+        else
+        {
+            for(int i = 0; i < m_pTabBar->count(); ++i)
             {
-                // Determine if already opened
-                if(pTabBar->tabData(i).value<ItemWidget *>() == pItem)
+                if(m_pTabBar->tabData(i).value<ItemWidget *>() == pItem)
                 {
-                    pTabBar->setCurrentIndex(i);
-                    pItem = NULL;   // Signifies below to not create a new tab as this item is already open
+                    m_pTabBar->blockSignals(true);
+                    m_pTabBar->setCurrentIndex(i);
+                    m_pTabBar->blockSignals(false);
                     break;
                 }
             }
+        }
 
-            if(pItem)
+        // Hide everything
+        if(IsOverrideDraw())
+        {
+            SetOverrideDrawState(PROJDRAWSTATE_Nothing);
+
+            while(IsOverrideDraw())
+                OverrideDraw();
+        }
+        for(int i = 0; i < m_pTabBar->count(); ++i)
+            m_pTabBar->tabData(i).value<ItemWidget *>()->DrawHide(*this);
+
+        // Then show
+        pItem->DrawShow(*this);
+    }
+
+    while(m_KillQueue.empty() == false)
+    {
+        ItemWidget *pItem = m_KillQueue.dequeue();
+        if(pItem == NULL)
+            continue;
+
+        for(int i = 0; i < m_pTabBar->count(); ++i)
+        {
+            if(m_pTabBar->tabData(i).value<ItemWidget *>() == pItem)
             {
-                pItem->DrawOpen(*this);
-
-                pTabBar->blockSignals(true);
-                int iIndex = pTabBar->addTab(pItem->GetIcon(), pItem->GetName(false));
-                QVariant v;
-                v.setValue(pItem);
-                pTabBar->setTabData(iIndex, v);
-                pTabBar->setCurrentIndex(iIndex);
-                pTabBar->blockSignals(false);
-
-                m_ActionQueue.enqueue(std::pair<ItemWidget *, eQueuedAction>(pItem, QUEUEDITEM_Show));
+                pItem->DrawUnload(*this);
+                m_pTabBar->removeTab(i);
+                break;
             }
-            break;
-
-        case QUEUEDITEM_Show:
-            // Hide everything
-            if(IsOverrideDraw())
-            {
-                SetOverrideDrawState(PROJDRAWSTATE_Nothing);
-
-                while(IsOverrideDraw())
-                    DrawUpdate(*this);
-            }
-
-            for(int i = 0; i < pTabBar->count(); ++i)
-                pTabBar->tabData(i).value<ItemWidget *>()->DrawHide(*this);
-
-            // Then show
-            MainWindow::SetCurrentItem(pItem);
-            pItem->DrawShow(*this);
-            break;
-
-        case QUEUEDITEM_Close:
-            for(int i = 0; i < pTabBar->count(); ++i)
-            {
-                //TabPage *pTabPage = static_cast<TabPage *>(ui->tabWidget->widget(i));
-                if(pTabBar->tabData(i).value<ItemWidget *>() == pItem)
-                {
-                    pItem->DrawClose(*this);
-                    pTabBar->removeTab(i);
-                    break;
-                }
-            }
-            break;
         }
     }
 
     if(IsOverrideDraw())
-        DrawUpdate(*this);
-    else if(pTabBar->count() > 0)
-        pTabBar->tabData(pTabBar->currentIndex()).value<ItemWidget *>()->DrawUpdate(*this);
+        OverrideDraw();
+    else if(m_pTabBar->count() > 0)
+        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ItemWidget *>()->DrawUpdate(*this);
 
     return true;
 }
@@ -238,6 +173,59 @@ bool ItemProject::IsOverrideDraw()
     return (m_eDrawState != PROJDRAWSTATE_Nothing || m_ePrevDrawState != PROJDRAWSTATE_Nothing || m_DrawStateQueue.empty() == false);
 }
 
+void ItemProject::OverrideDraw()
+{
+    while(m_DrawStateQueue.empty() == false)
+    {
+        m_ePrevDrawState = m_eDrawState;
+        m_eDrawState = m_DrawStateQueue.dequeue();
+
+        // This shouldn't happen, but if it did it would break logic below it
+        if(m_eDrawState == PROJDRAWSTATE_Nothing && m_ePrevDrawState == PROJDRAWSTATE_Nothing)
+            continue;
+
+        // If our current state is 'nothing', then Hide() what was previous if it was loaded
+        if(m_eDrawState == PROJDRAWSTATE_Nothing)
+        {
+            if(m_bDrawStateLoaded[m_ePrevDrawState])
+            {
+                m_pCamera->SetEnabled(false);
+
+                if(m_ePrevDrawState == PROJDRAWSTATE_AtlasManager)
+                    AtlasManager_DrawHide(*this, *m_pAtlasMan);
+            }
+
+            m_ePrevDrawState = PROJDRAWSTATE_Nothing;
+        }
+        else
+        {
+            if(m_bDrawStateLoaded[m_eDrawState] == false)
+            {
+                // A non NULL camera signifies that this has been loaded already
+                if(m_pCamera != NULL)
+                {
+
+                    m_pCamera = Window().CreateCamera2d();
+                    m_pCamera->SetEnabled(false);
+
+                    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
+                        AtlasManager_DrawOpen(*this, *m_pAtlasMan);
+                }
+
+                m_bDrawStateLoaded[m_eDrawState] = true;
+            }
+
+            m_pCamera->SetEnabled(true);
+
+            if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
+                AtlasManager_DrawShow(*this, *m_pAtlasMan);
+        }
+    }
+
+    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
+        AtlasManager_DrawUpdate(*this, *m_pAtlasMan);
+}
+
 void ItemProject::Reset()
 {
     for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
@@ -246,12 +234,12 @@ void ItemProject::Reset()
 
 void ItemProject::OpenItem(ItemWidget *pItem)
 {
-    m_ActionQueue.enqueue(std::pair<ItemWidget *, eQueuedAction>(pItem, QUEUEDITEM_Open));
+    m_ShowQueue.enqueue(pItem);
 }
 
 void ItemProject::CloseItem(ItemWidget *pItem)
 {
-    m_ActionQueue.enqueue(std::pair<ItemWidget *, eQueuedAction>(pItem, QUEUEDITEM_Close));
+    m_KillQueue.enqueue(pItem);
 }
 
 void ItemProject::on_tabBar_currentChanged(int index)
@@ -259,10 +247,9 @@ void ItemProject::on_tabBar_currentChanged(int index)
     if(index < 0)
         return;
 
-    QTabBar *pTabBar = static_cast<QTabBar *>(m_pWidget);
-
-    int iIndex = pTabBar->currentIndex();
-    QVariant v = pTabBar->tabData(iIndex);
+    int iIndex = m_pTabBar->currentIndex();
+    QVariant v = m_pTabBar->tabData(iIndex);
     ItemWidget *pItem = v.value<ItemWidget *>();
-    m_ActionQueue.enqueue(std::pair<ItemWidget *, eQueuedAction>(pItem, QUEUEDITEM_Show));
+
+    MainWindow::OpenItem(pItem);
 }

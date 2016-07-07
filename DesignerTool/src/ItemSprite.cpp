@@ -12,14 +12,9 @@
 #include <QUndoView>
 #include "WidgetAtlasManager.h"
 
-ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : ItemWidget(ITEM_Sprite, sPath, &atlasManRef)
+ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : ItemWidget(ITEM_Sprite, sPath, atlasManRef)
 {
     m_pWidget = new WidgetSprite(this);
-
-//    m_pUndoView = new QUndoView(undoStack);
-//    m_pUndoView->setWindowTitle(tr("Command List"));
-//    m_pUndoView->show();
-//    m_pUndoView->setAttribute(Qt::WA_QuitOnClose, false);
 
     glm::vec2 vLinePts[2];
     
@@ -39,13 +34,13 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     m_primOriginVert.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
 }
 
-/*virtual*/ void ItemSprite::OnDraw_Open(IHyApplication &hyApp)
+/*virtual*/ void ItemSprite::OnDraw_Load(IHyApplication &hyApp)
 {
     m_primOriginHorz.Load();
     m_primOriginVert.Load();
 }
 
-/*virtual*/ void ItemSprite::OnDraw_Close(IHyApplication &hyApp)
+/*virtual*/ void ItemSprite::OnDraw_Unload(IHyApplication &hyApp)
 {
     m_primOriginHorz.Unload();
     m_primOriginVert.Unload();
@@ -72,14 +67,12 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     
 }
 
-/*virtual*/ void ItemSprite::Link(HyGuiFrame *pFrame, QVariant param)
+/*virtual*/ void ItemSprite::OnLink(HyGuiFrame *pFrame, QVariant param)
 {
     static_cast<WidgetSprite *>(m_pWidget)->InsertFrame(pFrame, param);
-    ItemWidget::Link(pFrame, param);
 }
 
-/*virtual*/ void ItemSprite::UnLink(HyGuiFrame *pFrame)
+/*virtual*/ void ItemSprite::OnUnlink(HyGuiFrame *pFrame)
 {
     static_cast<WidgetSprite *>(m_pWidget)->RemoveFrame(pFrame);
-    ItemWidget::UnLink(pFrame);
 }

@@ -152,8 +152,10 @@ TestBed::~TestBed(void)
 
 	if(Input().IsBtnDownBuffered(SEND_LOG))
 	{
+		m_pCam->SetEnabled(!m_pCam->IsEnabled());
+		
 		// Exit application
-		return false;
+		//return false;
 
 		//HyEngine::ReloadDataDir(std::string("D:\\soft\\GitHub\\HarmonyEngine\\Projects\\NewGame\\data"));
 		//HyLog("Testing message! Mo'fucka");
