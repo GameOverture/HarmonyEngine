@@ -50,7 +50,7 @@ protected:
 	HyCoordinateType				m_eCoordType;
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
 	HyRenderState					m_RenderState;
-	int32							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
+	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 
 	// Custom shader
 	HyWriteDrawBufferDataOverride	m_fpWriteDrawBufferOverride;
@@ -78,8 +78,8 @@ public:
 
 	HyAnimVec4													color;
 
-	inline int32 GetTag()										{ return m_iTag; }
-	inline void SetTag(int32 iTag)								{ m_iTag = iTag; }
+	inline int64 GetTag()										{ return m_iTag; }
+	inline void SetTag(int64 iTag)								{ m_iTag = iTag; }
 
 	void Load();
 	void Unload();
