@@ -47,7 +47,7 @@ class HyAtlasGroup
 {
 	friend class HyTextures;
 
-	HyTextures &			m_ManagerRef;
+	HyTextures &				m_ManagerRef;
 
 	const uint32				m_uiLOADGROUPID;
 	const uint32				m_uiWIDTH;
@@ -87,6 +87,8 @@ public:
 //////////////////////////////////////////////////////////////////////////
 class HyAtlas
 {
+	const uint32			m_uiNUM_FRAMES;
+
 	// The return value from the 'stb_image' loader is an 'unsigned char *' which points
 	// to the pixel data. The pixel data consists of *y scanlines of *x pixels,
 	// with each pixel consisting of N interleaved 8-bit components; the first
@@ -99,7 +101,6 @@ class HyAtlas
 	unsigned char *			m_pPixelData;
 
 	HyRectangle<int32> *	m_pFrames;
-	uint32					m_uiNumFrames;
 
 public:
 	HyAtlas(jsonxx::Array &srcFramesArrayRef);
