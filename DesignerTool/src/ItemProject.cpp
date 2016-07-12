@@ -204,13 +204,12 @@ void ItemProject::OverrideDraw()
                 // A non NULL camera signifies that this has been loaded already
                 if(m_pCamera != NULL)
                 {
-
                     m_pCamera = Window().CreateCamera2d();
                     m_pCamera->SetEnabled(false);
-
-                    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-                        AtlasManager_DrawOpen(*this, *m_pAtlasMan);
                 }
+
+                if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
+                    AtlasManager_DrawOpen(*this, *m_pAtlasMan);
 
                 m_bDrawStateLoaded[m_eDrawState] = true;
             }

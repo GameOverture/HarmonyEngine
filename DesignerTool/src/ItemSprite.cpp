@@ -76,3 +76,9 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
 {
     static_cast<WidgetSprite *>(m_pWidget)->RemoveFrame(pFrame);
 }
+
+/*virtual*/ void ItemSprite::OnUpdateLink(HyGuiFrame *pFrame)
+{
+
+    Save();
+}

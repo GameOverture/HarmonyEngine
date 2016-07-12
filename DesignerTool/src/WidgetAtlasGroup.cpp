@@ -350,10 +350,10 @@ void WidgetAtlasGroup::Refresh()
 
         HyGuiFrame *pFrame = reinterpret_cast<HyGuiFrame *>(imgInfoRef.id);
 
-        pFrame->SetInfoFromPacker(bValid ? imgInfoRef.textureId : -1,
-                                  imgInfoRef.rotated,
-                                  imgInfoRef.pos.x() + m_Packer.border.l,
-                                  imgInfoRef.pos.y() + m_Packer.border.t);
+        pFrame->UpdateInfoFromPacker(bValid ? imgInfoRef.textureId : -1,
+                                    imgInfoRef.rotated,
+                                    imgInfoRef.pos.x() + m_Packer.border.l,
+                                    imgInfoRef.pos.y() + m_Packer.border.t);
 
         QJsonObject frameObj;
         frameObj.insert("hash", QJsonValue(static_cast<qint64>(pFrame->GetHash())));

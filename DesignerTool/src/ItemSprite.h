@@ -39,6 +39,7 @@ protected:
 
     virtual void OnLink(HyGuiFrame *pFrame, QVariant param);
     virtual void OnUnlink(HyGuiFrame *pFrame);
+    virtual void OnUpdateLink(HyGuiFrame *pFrame);
 };
 
 #endif // ITEMSPRITE_H

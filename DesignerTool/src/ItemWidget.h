@@ -52,6 +52,7 @@ protected:
 
     virtual void OnLink(HyGuiFrame *pFrame, QVariant param) = 0;
     virtual void OnUnlink(HyGuiFrame *pFrame) = 0;
+    virtual void OnUpdateLink(HyGuiFrame *pFrame) = 0;
 
 public:
     ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager &AtlasManRef);

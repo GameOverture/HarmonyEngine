@@ -71,6 +71,8 @@ void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame, QVariant param)
     ui->frames->setItem(iParamRow, COLUMN_Duration, pNewItem->m_pTableItems[COLUMN_Duration]);
 
     m_pFrameList.insert(iParamRow, pNewItem);
+
+    ui->frames->selectRow(0);
 }
 
 void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
