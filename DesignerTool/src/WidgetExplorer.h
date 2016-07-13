@@ -15,7 +15,6 @@
 #include <QTreeWidget>
 #include <QMenu>
 
-#include "HyGlobal.h"
 #include "ItemProject.h"
 
 #include <vector>

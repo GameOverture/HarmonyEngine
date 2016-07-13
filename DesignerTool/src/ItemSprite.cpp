@@ -34,6 +34,10 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     m_primOriginVert.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
 }
 
+/*virtual*/ ItemSprite::~ItemSprite()
+{
+}
+
 /*virtual*/ void ItemSprite::OnDraw_Load(IHyApplication &hyApp)
 {
     m_primOriginHorz.Load();

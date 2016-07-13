@@ -15,8 +15,6 @@
 class ItemFont : public Item
 {
     Q_OBJECT
-
-    friend class WidgetExplorer;
     
     struct tGlyphSet
     {
@@ -47,9 +45,10 @@ class ItemFont : public Item
         QList<tGlyphSet>    glyphSets;
     };
     
-    ItemFont(const QString sPath);
     
 public:
+    ItemFont(const QString sPath);
+    virtual ~ItemFont();
     virtual void Draw(WidgetRenderer &renderer);
 };
 

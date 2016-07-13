@@ -11,11 +11,14 @@
 
 #include "WidgetAtlasManager.h"
 #include "MainWindow.h"
+#include "ItemSprite.h"
+#include "HyGlobal.h"
 
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QDirIterator>
 
 ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Project, sNewProjectFilePath),
                                                                 IHyApplication(HarmonyInit()),
@@ -23,13 +26,17 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
                                                                 m_ePrevDrawState(PROJDRAWSTATE_Nothing),
                                                                 m_bHasError(false)
 {
+    for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
+        m_bDrawStateLoaded[i] = false;
+
+
+    m_pAtlasMan = new WidgetAtlasManager(this);
+
     m_pTabBar = new QTabBar();
     m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
     connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
 
-    for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
-        m_bDrawStateLoaded[i] = false;
-    
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     QFile projFile(sNewProjectFilePath);
     if(projFile.exists())
     {
@@ -57,12 +64,73 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
     m_sRelativeMetaDataLocation = projPathsObj["MetaDataPath"].toString();
     m_sRelativeSourceLocation = projPathsObj["SourcePath"].toString();
 
-    m_pAtlasMan = new WidgetAtlasManager(this);
 
     sm_Init.sGameName = GetName(false).toStdString();
     sm_Init.sDataDir = GetAssetsAbsPath().toStdString();
 
-    //m_pTabsManager = new WidgetTabsManager(this);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    QList<eItemType> subDirList = HyGlobal::SubDirList();
+    foreach(eItemType eType, subDirList)
+    {
+        if(eType == ITEM_DirAtlases)
+            continue;
+
+        QString sSubDirPath = GetAssetsAbsPath() % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
+        Item *pSubDirItem = new Item(eType, sSubDirPath);
+
+        QTreeWidgetItem *pCurTreeItem = pSubDirItem->GetTreeItem();
+        m_pTreeItemPtr->addChild(pCurTreeItem);
+
+        QDirIterator dirIter(sSubDirPath, QDirIterator::Subdirectories);
+        while(dirIter.hasNext())
+        {
+            QString sCurPath = dirIter.next();
+
+            if(sCurPath.endsWith(QChar('.')))
+                continue;
+
+            // Ensure pCurParentTreeItem is correct. If not keep moving up the tree until found.
+            QFileInfo curFileInfo(sCurPath);
+            QString sCurFileParentBaseName = curFileInfo.dir().dirName();
+            QString sCurTreeItemName = pCurTreeItem->text(0);
+            while(QString::compare(sCurFileParentBaseName, sCurTreeItemName, Qt::CaseInsensitive) != 0)
+            {
+                pCurTreeItem = pCurTreeItem->parent();
+                sCurTreeItemName = pCurTreeItem->text(0);
+            }
+
+            Item *pPrefixItem;
+            if(dirIter.fileInfo().isDir())
+            {
+                pPrefixItem = new Item(ITEM_Prefix, sCurPath);
+                QTreeWidgetItem *pPrefixTreeWidget = pPrefixItem->GetTreeItem();
+
+                pCurTreeItem->addChild(pPrefixTreeWidget);
+                pCurTreeItem = pPrefixTreeWidget;
+            }
+            else if(dirIter.fileInfo().isFile())
+            {
+                eItemType eType;
+                for(int i = 0; i < NUMITEM; ++i)
+                {
+                    if(sCurPath.endsWith(HyGlobal::ItemExt(i)))
+                    {
+                        eType = static_cast<eItemType>(i);
+                        break;
+                    }
+                }
+
+                switch(eType)
+                {
+                case ITEM_Sprite:   pPrefixItem = new ItemSprite(sCurPath, *m_pAtlasMan); break;
+                }
+
+                pCurTreeItem->addChild(pPrefixItem->GetTreeItem());
+            }
+        }
+    }
+
+    m_pAtlasMan->LoadDependencies();
 }
 
 ItemProject::~ItemProject()

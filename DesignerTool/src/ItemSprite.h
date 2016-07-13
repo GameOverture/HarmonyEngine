@@ -24,9 +24,10 @@ class ItemSprite : public ItemWidget
     HyPrimitive2d       m_primOriginHorz;
     HyPrimitive2d       m_primOriginVert;
     
-    ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef);
     
 protected:
+    ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef);
+    virtual ~ItemSprite();
     
     virtual void OnDraw_Load(IHyApplication &hyApp);
     virtual void OnDraw_Unload(IHyApplication &hyApp);

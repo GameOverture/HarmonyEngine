@@ -16,8 +16,6 @@
 #include "ItemProject.h"
 #include "WidgetAtlasManager.h"
 
-#include <QDirIterator>
-
 WidgetExplorer::WidgetExplorer(QWidget *parent) :   QWidget(parent),
                                                     ui(new Ui::WidgetExplorer)
 {
@@ -51,68 +49,7 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
     QTreeWidgetItem *pProjTreeItem = pItemProject->GetTreeItem();
     ui->treeWidget->insertTopLevelItem(0, pProjTreeItem);
     
-    QList<eItemType> subDirList = HyGlobal::SubDirList();
-    foreach(eItemType eType, subDirList)
-    {
-        if(eType == ITEM_DirAtlases)
-            continue;
 
-        QString sSubDirPath = pItemProject->GetAssetsAbsPath() % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
-        Item *pSubDirItem = new Item(eType, sSubDirPath);
-        
-        QTreeWidgetItem *pCurTreeItem = pSubDirItem->GetTreeItem();
-        pProjTreeItem->addChild(pCurTreeItem);
-        
-        QDirIterator dirIter(sSubDirPath, QDirIterator::Subdirectories);
-        while(dirIter.hasNext())
-        {
-            QString sCurPath = dirIter.next();
-            
-            if(sCurPath.endsWith(QChar('.')))
-                continue;
-            
-            // Ensure pCurParentTreeItem is correct. If not keep moving up the tree until found.
-            QFileInfo curFileInfo(sCurPath);
-            QString sCurFileParentBaseName = curFileInfo.dir().dirName();
-            QString sCurTreeItemName = pCurTreeItem->text(0);
-            while(QString::compare(sCurFileParentBaseName, sCurTreeItemName, Qt::CaseInsensitive) != 0)
-            {
-                pCurTreeItem = pCurTreeItem->parent();
-                sCurTreeItemName = pCurTreeItem->text(0);
-            }
-            
-            Item *pPrefixItem;
-            if(dirIter.fileInfo().isDir())
-            {
-                pPrefixItem = new Item(ITEM_Prefix, sCurPath);
-                QTreeWidgetItem *pPrefixTreeWidget = pPrefixItem->GetTreeItem();
-
-                pCurTreeItem->addChild(pPrefixTreeWidget);
-                pCurTreeItem = pPrefixTreeWidget;
-            }
-            else if(dirIter.fileInfo().isFile())
-            {
-                eItemType eType;
-                for(int i = 0; i < NUMITEM; ++i)
-                {
-                    if(sCurPath.endsWith(HyGlobal::ItemExt(i)))
-                    {
-                        eType = static_cast<eItemType>(i);
-                        break;
-                    }
-                }
-                
-                switch(eType)
-                {
-                case ITEM_Sprite:   pPrefixItem = new ItemSprite(sCurPath, pItemProject->GetAtlasManager()); break;
-                }
-
-                pCurTreeItem->addChild(pPrefixItem->GetTreeItem());
-            }
-        }
-    }
-
-    pItemProject->GetAtlasManager().LoadDependencies();
     
     ui->treeWidget->expandItem(pProjTreeItem);
 }

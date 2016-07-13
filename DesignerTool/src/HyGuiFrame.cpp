@@ -25,7 +25,8 @@ HyGuiFrame::HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlas
 
 HyGuiFrame::~HyGuiFrame()
 {
-    delete m_pDrawInst;
+    for(int i = 0; i < m_DrawInstList.count(); ++i)
+        delete m_DrawInstList[i];
 }
 
 HyTexturedQuad2d *HyGuiFrame::RequestDrawInst()
@@ -41,7 +42,7 @@ HyTexturedQuad2d *HyGuiFrame::RequestDrawInst()
     }
 
     pDrawInst->SetEnabled(false);
-    pDrawInst->SetTag(*reinterpret_cast<int32>(this));
+    pDrawInst->SetTag(reinterpret_cast<int64>(this));
 
     m_DrawInstList.append(pDrawInst);
 
@@ -72,7 +73,8 @@ void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX,
 
     for(int i = 0; i < m_Links.count(); ++i)
     {
-        m_Links[i]
+        // TODO:
+        //m_Links[i]
     }
 }
 

@@ -13,6 +13,10 @@ ItemFont::ItemFont(const QString sPath) : Item(ITEM_Font, sPath)
 {
 }
 
+/*virtual*/ ItemFont::~ItemFont()
+{
+}
+
 /*virtual*/ void ItemFont::Draw(WidgetRenderer &renderer)
 {
     

@@ -24,8 +24,8 @@ const int iPADDING = 2;
 
 struct PreviewRow
 {
-    QList<HyGuiFrame *> m_Frames;
-    int                 m_iLargestHeight;
+    QList<HyTexturedQuad2d *>   m_Frames;
+    int                         m_iLargestHeight;
 
     void Clear()
     {
@@ -37,11 +37,11 @@ struct PreviewRow
     {
         float fMidRow = (m_iLargestHeight * 0.5f);
         float fPosY = 0.0f;
-        foreach(HyGuiFrame *pFrame, m_Frames)
+        foreach(HyTexturedQuad2d *pFrame, m_Frames)
         {
-            fPosY = iStartPosY - (pFrame->DrawInst()->GetHeight() * 0.5f) - fMidRow;
-            if(pFrame->DrawInst()->pos.AnimY().IsTransforming() == false && pFrame->DrawInst()->pos.Y() != fPosY)
-                pFrame->DrawInst()->pos.AnimY().Tween(fPosY, fTRANS_DUR, HyTween::QuadInOut);
+            fPosY = iStartPosY - (pFrame->GetHeight() * 0.5f) - fMidRow;
+            if(pFrame->pos.AnimY().IsTransforming() == false && pFrame->pos.Y() != fPosY)
+                pFrame->pos.AnimY().Tween(fPosY, fTRANS_DUR, HyTween::QuadInOut);
         }
     }
 };
@@ -64,13 +64,11 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
                                                                                              m_pMouseHoverItem(NULL)
 {
     ui->setupUi(this);
-    
     while(ui->atlasGroups->currentWidget())
         delete ui->atlasGroups->currentWidget();
     
     if(m_MetaDir.exists() == false)
         HyGuiLog("Meta atlas directory is missing!", LOGTYPE_Error);
-
     if(m_DataDir.exists() == false)
         HyGuiLog("Data atlas directory is missing!", LOGTYPE_Error);
 
@@ -106,7 +104,6 @@ WidgetAtlasManager::~WidgetAtlasManager()
 
 HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY)
 {
-    HyGuiFrame *pNewFrame = new HyGuiFrame(uiCRC, sN, rAlphaCrop, uiAtlasGroupId, iW, iH, iTexIndex, bRot, iX, iY);
 
     if(m_DependencyMap.contains(uiCRC))
     {
@@ -114,6 +111,8 @@ HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiCRC, QString sN, QRect rAl
     }
     else
         m_DependencyMap[uiCRC] = pNewFrame;
+
+    HyGuiFrame *pNewFrame = new HyGuiFrame(uiCRC, sN, rAlphaCrop, uiAtlasGroupId, iW, iH, iTexIndex, bRot, iX, iY);
 
     return pNewFrame;
 }

@@ -22,8 +22,6 @@ class HyGuiFrame;
 class Item : public QObject
 {
     Q_OBJECT
-
-    friend class WidgetExplorer;
     
 protected:
     const eItemType     m_eTYPE;
@@ -31,10 +29,10 @@ protected:
     
     QTreeWidgetItem *   m_pTreeItemPtr;
     
+public:
     Item(eItemType eType, const QString sPath);
     virtual ~Item();
-    
-public:
+
     eItemType GetType() const                       { return m_eTYPE; }
     QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
     
