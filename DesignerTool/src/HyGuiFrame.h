@@ -39,7 +39,9 @@ class HyGuiFrame
 
     HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
     ~HyGuiFrame();
+    
 public:
+    HyTexturedQuad2d *DrawInst()    { return m_DrawInstList[0]; }
 
     quint32 GetHash()               { return m_uiHASH; }
     QString GetName()               { return m_sNAME; }

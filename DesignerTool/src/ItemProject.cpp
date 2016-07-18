@@ -29,13 +29,6 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
     for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
         m_bDrawStateLoaded[i] = false;
 
-
-    m_pAtlasMan = new WidgetAtlasManager(this);
-
-    m_pTabBar = new QTabBar();
-    m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
-    connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     QFile projFile(sNewProjectFilePath);
     if(projFile.exists())
@@ -69,6 +62,15 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
     sm_Init.sDataDir = GetAssetsAbsPath().toStdString();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    m_pAtlasMan = new WidgetAtlasManager(this);
+
+    m_pTabBar = new QTabBar();
+    m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
+    connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
+    
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     QList<eItemType> subDirList = HyGlobal::SubDirList();
     foreach(eItemType eType, subDirList)
     {

@@ -18,17 +18,15 @@ class WidgetAtlasManager;
 class ItemSprite : public ItemWidget
 {
     Q_OBJECT
-
-    friend class WidgetExplorer;
     
     HyPrimitive2d       m_primOriginHorz;
     HyPrimitive2d       m_primOriginVert;
     
-    
-protected:
+public:
     ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef);
     virtual ~ItemSprite();
     
+protected:
     virtual void OnDraw_Load(IHyApplication &hyApp);
     virtual void OnDraw_Unload(IHyApplication &hyApp);
 

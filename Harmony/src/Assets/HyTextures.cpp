@@ -222,7 +222,7 @@ void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef)
 }
 
 //////////////////////////////////////////////////////////////////////////
-HyAtlas::HyAtlas(jsonxx::Array &srcFramesArrayRef) :	m_uiNUM_FRAMES(srcFramesArrayRef.size()),
+HyAtlas::HyAtlas(jsonxx::Array &srcFramesArrayRef) :	m_uiNUM_FRAMES(static_cast<uint32>(srcFramesArrayRef.size())),
 														m_pPixelData(NULL)
 {
 	m_pFrames = HY_NEW HyRectangle<int32>[m_uiNUM_FRAMES];

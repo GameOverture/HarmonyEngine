@@ -104,15 +104,17 @@ WidgetAtlasManager::~WidgetAtlasManager()
 
 HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY)
 {
-
+    HyGuiFrame *pNewFrame = NULL;
+    
     if(m_DependencyMap.contains(uiCRC))
     {
-        HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this hash", LOGTYPE_Error);
+        HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this hash: " % QString::number(uiCRC), LOGTYPE_Error);
     }
     else
+    {
+        pNewFrame = new HyGuiFrame(uiCRC, sN, rAlphaCrop, uiAtlasGroupId, iW, iH, iTexIndex, bRot, iX, iY);
         m_DependencyMap[uiCRC] = pNewFrame;
-
-    HyGuiFrame *pNewFrame = new HyGuiFrame(uiCRC, sN, rAlphaCrop, uiAtlasGroupId, iW, iH, iTexIndex, bRot, iX, iY);
+    }
 
     return pNewFrame;
 }
@@ -435,7 +437,7 @@ void WidgetAtlasManager::HideAtlasGroup()
         if(curRow.m_iLargestHeight < fFrameHeight)
             curRow.m_iLargestHeight = fFrameHeight;
 
-        curRow.m_Frames.append(pFrame);
+        curRow.m_Frames.append(pFrame->DrawInst());
     }
     
     curRow.TweenPosY(uiRENDERHEIGHT - ptDrawPos.y());

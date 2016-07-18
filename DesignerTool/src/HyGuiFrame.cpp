@@ -20,7 +20,8 @@ HyGuiFrame::HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlas
                                                                                                                                                         m_iPosX(iX),
                                                                                                                                                         m_iPosY(iY)
 {
-
+    // This draw instance is reserved for AtlasManager and accessed by DrawInst() function
+    RequestDrawInst();
 }
 
 HyGuiFrame::~HyGuiFrame()
