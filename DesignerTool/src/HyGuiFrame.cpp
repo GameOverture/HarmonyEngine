@@ -20,18 +20,25 @@ HyGuiFrame::HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlas
                                                                                                                                                         m_iPosX(iX),
                                                                                                                                                         m_iPosY(iY)
 {
-    // This draw instance is reserved for AtlasManager and accessed by DrawInst() function
-    RequestDrawInst();
 }
 
 HyGuiFrame::~HyGuiFrame()
 {
-    for(int i = 0; i < m_DrawInstList.count(); ++i)
-        delete m_DrawInstList[i];
+    QMapIterator<void *, HyTexturedQuad2d *> iter(m_DrawInstMap);
+    while(iter.hasNext())
+    {
+        iter.next();
+        delete iter.value();
+    }
 }
 
-HyTexturedQuad2d *HyGuiFrame::RequestDrawInst()
+HyTexturedQuad2d *HyGuiFrame::DrawInst(void *pKey)
 {
+    QMap<void *, HyTexturedQuad2d *>::iterator iter = m_DrawInstMap.find(pKey);
+    if(iter != m_DrawInstMap.end())
+        return iter.value();
+    
+    // Not found, create a new HyTexturedQuad2d based on key
     HyTexturedQuad2d *pDrawInst = new HyTexturedQuad2d(m_uiATLAS_GROUP_ID);
     if(m_bRotation == false)
         pDrawInst->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
@@ -45,7 +52,7 @@ HyTexturedQuad2d *HyGuiFrame::RequestDrawInst()
     pDrawInst->SetEnabled(false);
     pDrawInst->SetTag(reinterpret_cast<int64>(this));
 
-    m_DrawInstList.append(pDrawInst);
+    m_DrawInstMap.insert(pKey, pDrawInst);
 
     return pDrawInst;
 }
@@ -59,15 +66,18 @@ void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX,
 
     if(m_iTextureIndex != -1)
     {
-        for(int i = 0; i < m_DrawInstList.count(); ++i)
+        QMapIterator<void *, HyTexturedQuad2d *> iter(m_DrawInstMap);
+        while(iter.hasNext())
         {
+            iter.next();
+            
             if(m_bRotation == false)
-                m_DrawInstList[i]->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
+                iter.value()->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
             else
             {
-                m_DrawInstList[i]->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.height(), m_rALPHA_CROP.width());
-                m_DrawInstList[i]->rot_pivot.Set(m_rALPHA_CROP.height() * 0.5f, m_rALPHA_CROP.width() * 0.5f);
-                m_DrawInstList[i]->rot.Z(90);
+                iter.value()->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.height(), m_rALPHA_CROP.width());
+                iter.value()->rot_pivot.Set(m_rALPHA_CROP.height() * 0.5f, m_rALPHA_CROP.width() * 0.5f);
+                iter.value()->rot.Z(90);
             }
         }
     }

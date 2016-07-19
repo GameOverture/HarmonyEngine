@@ -272,11 +272,11 @@ void WidgetAtlasManager::HideAtlasGroup()
     
     foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
     {
-        pFrame->DrawInst()->Load();
-        pFrame->DrawInst()->SetEnabled(false);
-        pFrame->DrawInst()->SetDisplayOrder(0);
-        pFrame->DrawInst()->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
-        pFrame->DrawInst()->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
+        pFrame->DrawInst(&atlasMan)->Load();
+        pFrame->DrawInst(&atlasMan)->SetEnabled(false);
+        pFrame->DrawInst(&atlasMan)->SetDisplayOrder(0);
+        pFrame->DrawInst(&atlasMan)->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+        pFrame->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
     }
 
     atlasGrp.ResizeAtlasListColumns();
@@ -287,7 +287,7 @@ void WidgetAtlasManager::HideAtlasGroup()
     WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget());
     
     foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
-         pFrame->DrawInst()->Unload();
+         pFrame->DrawInst(&atlasMan)->Unload();
 }
 
 /*friend*/ void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
@@ -301,7 +301,7 @@ void WidgetAtlasManager::HideAtlasGroup()
         WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->widget(i));
         
         foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
-            pFrame->DrawInst()->SetEnabled(false);
+            pFrame->DrawInst(&atlasMan)->SetEnabled(false);
     }
 }
 
@@ -335,10 +335,10 @@ void WidgetAtlasManager::HideAtlasGroup()
             HyGuiFrame *pHoverFrame = v.value<HyGuiFrame *>();
             if(pHoverFrame)
             {
-                pHoverFrame->DrawInst()->SetEnabled(false);
-                pHoverFrame->DrawInst()->SetDisplayOrder(0);
-                pHoverFrame->DrawInst()->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
-                pHoverFrame->DrawInst()->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
+                pHoverFrame->DrawInst(&atlasMan)->SetEnabled(false);
+                pHoverFrame->DrawInst(&atlasMan)->SetDisplayOrder(0);
+                pHoverFrame->DrawInst(&atlasMan)->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+                pHoverFrame->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
             }
         }
 
@@ -349,11 +349,11 @@ void WidgetAtlasManager::HideAtlasGroup()
 
         if(pFrame)
         {
-            pFrame->DrawInst()->SetEnabled(true);
-            pFrame->DrawInst()->SetDisplayOrder(100);
-            pFrame->DrawInst()->pos.Set((uiRENDERWIDTH * 0.5f) + (pFrame->DrawInst()->GetWidth() * -0.5f),
-                            (uiRENDERHEIGHT * 0.5f) + (pFrame->DrawInst()->GetHeight() * -0.5f));
-            pFrame->DrawInst()->color.A(0.5f);
+            pFrame->DrawInst(&atlasMan)->SetEnabled(true);
+            pFrame->DrawInst(&atlasMan)->SetDisplayOrder(100);
+            pFrame->DrawInst(&atlasMan)->pos.Set((uiRENDERWIDTH * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetWidth() * -0.5f),
+                            (uiRENDERHEIGHT * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetHeight() * -0.5f));
+            pFrame->DrawInst(&atlasMan)->color.A(0.5f);
         }
     }
     else if(atlasMan.m_pMouseHoverItem != pHoveredItem)
@@ -380,10 +380,10 @@ void WidgetAtlasManager::HideAtlasGroup()
 //                color.Set(1.0f, 1.0f, 1.0f, 1.0f);
 //                SetCoordinateType(HYCOORDTYPE_Screen, NULL);
 //            }
-            pFrame->DrawInst()->SetEnabled(false);
-            pFrame->DrawInst()->SetDisplayOrder(0);
-            pFrame->DrawInst()->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
-            pFrame->DrawInst()->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
+            pFrame->DrawInst(&atlasMan)->SetEnabled(false);
+            pFrame->DrawInst(&atlasMan)->SetDisplayOrder(0);
+            pFrame->DrawInst(&atlasMan)->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+            pFrame->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
         }
     }
     
@@ -409,12 +409,12 @@ void WidgetAtlasManager::HideAtlasGroup()
         if(pFrame == NULL)
             continue;
 
-        pFrame->DrawInst()->SetEnabled(true);
-        pFrame->DrawInst()->color.A(1.0f);
-        pFrame->DrawInst()->SetDisplayOrder(-0x0FFFFFFF + i);
+        pFrame->DrawInst(&atlasMan)->SetEnabled(true);
+        pFrame->DrawInst(&atlasMan)->color.A(1.0f);
+        pFrame->DrawInst(&atlasMan)->SetDisplayOrder(-0x0FFFFFFF + i);
 
-        float fFrameWidth = pFrame->IsRotated() ? pFrame->DrawInst()->GetHeight() : pFrame->DrawInst()->GetWidth();
-        float fFrameHeight = pFrame->IsRotated() ? pFrame->DrawInst()->GetWidth() : pFrame->DrawInst()->GetHeight();
+        float fFrameWidth = pFrame->IsRotated() ? pFrame->DrawInst(&atlasMan)->GetHeight() : pFrame->DrawInst(&atlasMan)->GetWidth();
+        float fFrameHeight = pFrame->IsRotated() ? pFrame->DrawInst(&atlasMan)->GetWidth() : pFrame->DrawInst(&atlasMan)->GetHeight();
 
         // Will it fit in this row
         if(ptDrawPos.x() + fFrameWidth > uiRENDERWIDTH)
@@ -429,15 +429,15 @@ void WidgetAtlasManager::HideAtlasGroup()
         
         float fPosX = ptDrawPos.x() + (pFrame->IsRotated() ? ((fFrameWidth * 0.5f) - (fFrameHeight * 0.5f)) : 0);
         
-        if(pFrame->DrawInst()->pos.AnimX().IsTransforming() == false && pFrame->DrawInst()->pos.X() != ptDrawPos.x())
-            pFrame->DrawInst()->pos.AnimX().Tween(fPosX, fTRANS_DUR, HyTween::QuadInOut);
+        if(pFrame->DrawInst(&atlasMan)->pos.AnimX().IsTransforming() == false && pFrame->DrawInst(&atlasMan)->pos.X() != ptDrawPos.x())
+            pFrame->DrawInst(&atlasMan)->pos.AnimX().Tween(fPosX, fTRANS_DUR, HyTween::QuadInOut);
 
         ptDrawPos.setX(ptDrawPos.x() + fFrameWidth + iPADDING);
 
         if(curRow.m_iLargestHeight < fFrameHeight)
             curRow.m_iLargestHeight = fFrameHeight;
 
-        curRow.m_Frames.append(pFrame->DrawInst());
+        curRow.m_Frames.append(pFrame->DrawInst(&atlasMan));
     }
     
     curRow.TweenPosY(uiRENDERHEIGHT - ptDrawPos.y());
