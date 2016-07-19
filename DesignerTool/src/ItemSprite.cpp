@@ -64,6 +64,9 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
 
 /*virtual*/ void ItemSprite::OnDraw_Update(IHyApplication &hyApp)
 {
+    WidgetSprite *pWidgetSprite = static_cast<WidgetSprite *>(m_pWidget);
+    
+    pWidgetSprite->
 }
 
 /*virtual*/ void ItemSprite::Save()

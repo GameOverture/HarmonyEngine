@@ -45,6 +45,8 @@ public:
     void InsertFrame(HyGuiFrame *pFrame, QVariant param);
     void RemoveFrame(HyGuiFrame *pFrame);
     
+    HyTexturedQuad2d *GetSelected
+    
 private slots:
     void on_actionAddState_triggered();
     
