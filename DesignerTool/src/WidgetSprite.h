@@ -40,12 +40,8 @@ public:
     explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
 
-    void UpdateActions();
     
-    void InsertFrame(HyGuiFrame *pFrame, QVariant param);
-    void RemoveFrame(HyGuiFrame *pFrame);
-    
-    HyTexturedQuad2d *GetSelected
+    WidgetSpriteState *GetCurSpriteState();
     
 private slots:
     void on_actionAddState_triggered();
@@ -69,6 +65,8 @@ private slots:
     void on_cmbStates_currentIndexChanged(int index);
 
 private:
+    void UpdateActions();
+    
     Ui::WidgetSprite *ui;
 };
 

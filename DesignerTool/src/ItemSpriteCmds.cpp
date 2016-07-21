@@ -8,6 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "ItemSpriteCmds.h"
+#include "ItemSprite.h"
 #include "WidgetSprite.h"
 #include "WidgetAtlasManager.h"
 
@@ -21,9 +22,9 @@ void EnsureProperNamingInComboBox(QComboBox *pCmb)
     }
 }
 
-ItemSpriteCmd_AddState::ItemSpriteCmd_AddState(QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
-                                                                                                                                    m_pComboBox(pCmb),
-                                                                                                                                    m_pSpriteState(new WidgetSpriteState(stateActionList))
+ItemSpriteCmd_AddState::ItemSpriteCmd_AddState(ItemSprite *pItemSprite, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                            m_pComboBox(pCmb),
+                                                                                                                                                            m_pSpriteState(new WidgetSpriteState(pItemSprite, stateActionList))
 {
     setText("Add Sprite State");
 }

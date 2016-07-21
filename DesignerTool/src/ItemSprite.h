@@ -19,8 +19,8 @@ class ItemSprite : public ItemWidget
 {
     Q_OBJECT
     
-    HyPrimitive2d       m_primOriginHorz;
-    HyPrimitive2d       m_primOriginVert;
+    HyPrimitive2d               m_primOriginHorz;
+    HyPrimitive2d               m_primOriginVert;
     
 public:
     ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef);

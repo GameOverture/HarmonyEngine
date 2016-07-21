@@ -15,6 +15,8 @@
 #include <QWidget>
 #include <QTableWidgetItem>
 
+class ItemSprite;
+
 namespace Ui {
 class WidgetSpriteState;
 }
@@ -22,6 +24,8 @@ class WidgetSpriteState;
 class WidgetSpriteState : public QWidget
 {
     Q_OBJECT
+    
+    ItemSprite *                m_pSpriteOwner;
     
     enum eColumn
     {
@@ -71,7 +75,7 @@ class WidgetSpriteState : public QWidget
     QList<Frame *>              m_pFrameList;
 
 public:
-    explicit WidgetSpriteState(QList<QAction *> stateActionList, QWidget *parent = 0);
+    explicit WidgetSpriteState(ItemSprite *pItemSprite, QList<QAction *> stateActionList, QWidget *parent = 0);
     ~WidgetSpriteState();
 
     QString GetName();

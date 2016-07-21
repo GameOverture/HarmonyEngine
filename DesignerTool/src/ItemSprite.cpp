@@ -65,8 +65,6 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
 /*virtual*/ void ItemSprite::OnDraw_Update(IHyApplication &hyApp)
 {
     WidgetSprite *pWidgetSprite = static_cast<WidgetSprite *>(m_pWidget);
-    
-    pWidgetSprite->
 }
 
 /*virtual*/ void ItemSprite::Save()
@@ -76,12 +74,14 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
 
 /*virtual*/ void ItemSprite::OnLink(HyGuiFrame *pFrame, QVariant param)
 {
-    static_cast<WidgetSprite *>(m_pWidget)->InsertFrame(pFrame, param);
+    WidgetSpriteState *pCurSpriteState = static_cast<WidgetSprite *>(m_pWidget)->GetCurSpriteState();
+    pCurSpriteState->InsertFrame(pFrame, param);
 }
 
 /*virtual*/ void ItemSprite::OnUnlink(HyGuiFrame *pFrame)
 {
-    static_cast<WidgetSprite *>(m_pWidget)->RemoveFrame(pFrame);
+    WidgetSpriteState *pCurSpriteState = static_cast<WidgetSprite *>(m_pWidget)->GetCurSpriteState();
+    pCurSpriteState->RemoveFrame(pFrame);
 }
 
 /*virtual*/ void ItemSprite::OnUpdateLink(HyGuiFrame *pFrame)

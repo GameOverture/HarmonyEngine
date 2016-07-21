@@ -19,6 +19,7 @@ class WidgetSpriteState;
 class ItemWidget;
 class WidgetAtlasManager;
 class HyGuiFrame;
+class ItemSprite;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_AddState : public QUndoCommand
@@ -27,7 +28,7 @@ class ItemSpriteCmd_AddState : public QUndoCommand
     WidgetSpriteState * m_pSpriteState;
     
 public:
-    ItemSpriteCmd_AddState(QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent = 0);
+    ItemSpriteCmd_AddState(ItemSprite *pItemSprite, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent = 0);
     ~ItemSpriteCmd_AddState();
 
     void redo() Q_DECL_OVERRIDE;

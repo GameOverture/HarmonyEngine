@@ -11,10 +11,12 @@
 #include "ui_WidgetSpriteState.h"
 
 #include "HyGlobal.h"
+#include "ItemSprite.h"
 
-WidgetSpriteState::WidgetSpriteState(QList<QAction *> stateActionList, QWidget *parent) :   QWidget(parent),
-                                                                                            ui(new Ui::WidgetSpriteState),
-                                                                                            m_sName("Unnamed")
+WidgetSpriteState::WidgetSpriteState(ItemSprite *pItemSprite, QList<QAction *> stateActionList, QWidget *parent) :  QWidget(parent),
+                                                                                                                    m_pSpriteOwner(pItemSprite),
+                                                                                                                    ui(new Ui::WidgetSpriteState),
+                                                                                                                    m_sName("Unnamed")
 {
     ui->setupUi(this);
 
@@ -57,9 +59,6 @@ void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame, QVariant param)
     bool bValidParam = false;
     int iParamRow = param.toInt(&bValidParam);
     if(bValidParam == false)
-        iParamRow = -1;
-
-    if(iParamRow == -1)
         iParamRow = ui->frames->rowCount();
 
     Frame *pNewItem = new Frame(pFrame);

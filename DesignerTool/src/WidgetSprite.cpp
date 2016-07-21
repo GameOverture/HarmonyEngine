@@ -136,26 +136,14 @@ WidgetSprite::~WidgetSprite()
     delete ui;
 }
 
-void WidgetSprite::UpdateActions()
+WidgetSpriteState *WidgetSprite::GetCurSpriteState()
 {
-    ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
-    ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
-    ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
-}
-
-void WidgetSprite::InsertFrame(HyGuiFrame *pFrame, QVariant param)
-{
-    ui->cmbStates->currentData().value<WidgetSpriteState *>()->InsertFrame(pFrame, param);
-}
-
-void WidgetSprite::RemoveFrame(HyGuiFrame *pFrame)
-{
-    ui->cmbStates->currentData().value<WidgetSpriteState *>()->RemoveFrame(pFrame);
+    return ui->cmbStates->currentData().value<WidgetSpriteState *>();
 }
 
 void WidgetSprite::on_actionAddState_triggered()
 {
-    QUndoCommand *pCmd = new ItemSpriteCmd_AddState(m_StateActionsList, ui->cmbStates);
+    QUndoCommand *pCmd = new ItemSpriteCmd_AddState(m_pItemSprite, m_StateActionsList, ui->cmbStates);
     m_pUndoStack->push(pCmd);
 
     UpdateActions();
@@ -245,3 +233,9 @@ void WidgetSprite::on_cmbStates_currentIndexChanged(int index)
     UpdateActions();
 }
 
+void WidgetSprite::UpdateActions()
+{
+    ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
+    ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
+    ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
+}
