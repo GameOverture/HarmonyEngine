@@ -72,7 +72,25 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
 
     // If a .hyspr file exists, parse and initalize with it, otherwise make default empty sprite
     QFile spriteFile(m_pItemSprite->GetAbsPath());
-    if(spriteFile.exists())
+    if(spriteFile.exists() == false)
+    {
+        if(!spriteFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        {
+           HyGuiLog("Couldn't open item file for writing: " % m_pItemSprite->GetAbsPath(), LOGTYPE_Error);
+        }
+        else
+        {
+            QJsonDocument settingsDoc(settingsObj);
+            qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());//toBinaryData());
+            if(0 == iBytesWritten || -1 == iBytesWritten)
+            {
+                HyGuiLog("Could not write to atlas settings file: " % settingsFile.errorString(), LOGTYPE_Error);
+            }
+
+            settingsFile.close();
+        }
+    }
+    else
     {
         if(!spriteFile.open(QIODevice::ReadOnly))
             HyGuiLog(QString("WidgetSprite::WidgetSprite() could not open ") % m_pItemSprite->GetAbsPath(), LOGTYPE_Error);
