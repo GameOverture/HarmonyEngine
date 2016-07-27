@@ -72,25 +72,7 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
 
     // If a .hyspr file exists, parse and initalize with it, otherwise make default empty sprite
     QFile spriteFile(m_pItemSprite->GetAbsPath());
-    if(spriteFile.exists() == false)
-    {
-        if(!spriteFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-        {
-           HyGuiLog("Couldn't open item file for writing: " % m_pItemSprite->GetAbsPath(), LOGTYPE_Error);
-        }
-        else
-        {
-            QJsonDocument settingsDoc(settingsObj);
-            qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());//toBinaryData());
-            if(0 == iBytesWritten || -1 == iBytesWritten)
-            {
-                HyGuiLog("Could not write to atlas settings file: " % settingsFile.errorString(), LOGTYPE_Error);
-            }
-
-            settingsFile.close();
-        }
-    }
-    else
+    if(spriteFile.exists())
     {
         if(!spriteFile.open(QIODevice::ReadOnly))
             HyGuiLog(QString("WidgetSprite::WidgetSprite() could not open ") % m_pItemSprite->GetAbsPath(), LOGTYPE_Error);
@@ -139,6 +121,8 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
     }
     else
     {
+        Save();
+        
         on_actionAddState_triggered();
     }
 
@@ -152,6 +136,41 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
 WidgetSprite::~WidgetSprite()
 {
     delete ui;
+}
+
+void WidgetSprite::Save()
+{
+    QFile spriteFile(m_pItemSprite->GetAbsPath());
+    if(!spriteFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        HyGuiLog("Couldn't open item file " % m_pItemSprite->GetAbsPath() % ": " % spriteFile.errorString(), LOGTYPE_Error);
+        return;
+    }
+
+    QJsonArray spriteStateArray;
+    
+    for(int i = 0; i < ui->cmbStates->count(); ++i)
+    {
+        QJsonObject spriteObj;
+        
+        ui->cmbStates->currentIndex
+        spriteObj.insert("hash", QJsonValue(static_cast<qint64>(pFrame->GetHash())));
+        spriteObj.insert("name", QJsonValue(pFrame->GetName()));
+        spriteObj.insert("width", QJsonValue(pFrame->GetSize().width()));
+        
+        spriteStateArray.append(
+    }
+    
+    
+    QJsonDocument settingsDoc(spriteObj);
+    qint64 iBytesWritten = spriteFile.write(settingsDoc.toJson());
+    if(0 == iBytesWritten || -1 == iBytesWritten)
+    {
+        HyGuiLog("Could not write to atlas settings file: " % spriteFile.errorString(), LOGTYPE_Error);
+        return;
+    }
+
+    spriteFile.close();
 }
 
 WidgetSpriteState *WidgetSprite::GetCurSpriteState()

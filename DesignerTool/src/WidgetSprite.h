@@ -40,6 +40,7 @@ public:
     explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
 
+    void Save();
     
     WidgetSpriteState *GetCurSpriteState();
     
