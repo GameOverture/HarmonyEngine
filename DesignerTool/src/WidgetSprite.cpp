@@ -140,35 +140,26 @@ WidgetSprite::~WidgetSprite()
 
 void WidgetSprite::Save()
 {
-    QFile spriteFile(m_pItemSprite->GetAbsPath());
-    if(!spriteFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        HyGuiLog("Couldn't open item file " % m_pItemSprite->GetAbsPath() % ": " % spriteFile.errorString(), LOGTYPE_Error);
-        return;
-    }
-
     QJsonArray spriteStateArray;
-    
     for(int i = 0; i < ui->cmbStates->count(); ++i)
     {
-        QJsonObject spriteObj;
+        QJsonArray spriteFrameArray;
+        ui->cmbStates->itemData(i).value<WidgetSpriteState *>()->GetStateInfo(spriteFrameArray);
         
-        ui->cmbStates->currentIndex
-        spriteObj.insert("hash", QJsonValue(static_cast<qint64>(pFrame->GetHash())));
-        spriteObj.insert("name", QJsonValue(pFrame->GetName()));
-        spriteObj.insert("width", QJsonValue(pFrame->GetSize().width()));
-        
-        spriteStateArray.append(
+        spriteStateArray.append(spriteFrameArray);
     }
-    
-    
-    QJsonDocument settingsDoc(spriteObj);
-    qint64 iBytesWritten = spriteFile.write(settingsDoc.toJson());
-    if(0 == iBytesWritten || -1 == iBytesWritten)
+
+    QJsonDocument settingsDoc(spriteStateArray);
+
+    QFile spriteFile(m_pItemSprite->GetAbsPath());
+    if(spriteFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
-        HyGuiLog("Could not write to atlas settings file: " % spriteFile.errorString(), LOGTYPE_Error);
-        return;
+        qint64 iBytesWritten = spriteFile.write(settingsDoc.toJson());
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+            HyGuiLog("Could not write to atlas settings file: " % spriteFile.errorString(), LOGTYPE_Error);
     }
+    else
+        HyGuiLog("Couldn't open item file " % m_pItemSprite->GetAbsPath() % ": " % spriteFile.errorString(), LOGTYPE_Error);
 
     spriteFile.close();
 }

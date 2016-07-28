@@ -133,12 +133,12 @@ QTreeWidget *WidgetAtlasGroup::GetTreeWidget()
         return NULL;
 }
 
-void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObj)
+void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObjOut)
 {
-    atlasObj.insert("id", m_DataDir.dirName().toInt());
-    atlasObj.insert("width", m_dlgSettings.TextureWidth());
-    atlasObj.insert("height", m_dlgSettings.TextureHeight());
-    atlasObj.insert("num8BitClrChannels", 4);   // TODO: Actually make this configurable?
+    atlasObjOut.insert("id", m_DataDir.dirName().toInt());
+    atlasObjOut.insert("width", m_dlgSettings.TextureWidth());
+    atlasObjOut.insert("height", m_dlgSettings.TextureHeight());
+    atlasObjOut.insert("num8BitClrChannels", 4);   // TODO: Actually make this configurable?
     
     QJsonArray textureArray;
     QList<QJsonArray> frameArrayList;
@@ -164,7 +164,7 @@ void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObj)
     foreach(QJsonArray frameArray, frameArrayList)
         textureArray.append(frameArray);
     
-    atlasObj.insert("textures", textureArray);
+    atlasObjOut.insert("textures", textureArray);
 }
 
 int WidgetAtlasGroup::GetId()

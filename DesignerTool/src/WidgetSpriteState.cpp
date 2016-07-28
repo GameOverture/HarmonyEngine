@@ -13,6 +13,10 @@
 #include "HyGlobal.h"
 #include "ItemSprite.h"
 
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+
 WidgetSpriteState::WidgetSpriteState(ItemSprite *pItemSprite, QList<QAction *> stateActionList, QWidget *parent) :  QWidget(parent),
                                                                                                                     m_pSpriteOwner(pItemSprite),
                                                                                                                     ui(new Ui::WidgetSpriteState),
@@ -97,4 +101,17 @@ HyGuiFrame *WidgetSpriteState::SelectedFrame()
 int WidgetSpriteState::SelectedIndex()
 {
     return ui->frames->currentRow();
+}
+
+void WidgetSpriteState::GetStateInfo(QJsonArray &stateArrayOut)
+{
+    for(int i = 0; i < m_pFrameList.count(); ++i)
+    {
+        QJsonObject frameObj;
+
+        frameObj.insert("duration", QJsonValue(m_pFrameList[i]->m_fDuration));
+        asdf <--- finish here!
+
+        stateArrayOut.append(frameObj);
+    }
 }

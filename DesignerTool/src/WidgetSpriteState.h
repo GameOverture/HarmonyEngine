@@ -86,6 +86,8 @@ public:
 
     HyGuiFrame *SelectedFrame();
     int SelectedIndex();
+
+    void GetStateInfo(QJsonArray &stateArrayOut);
     
 private:
     Ui::WidgetSpriteState *ui;

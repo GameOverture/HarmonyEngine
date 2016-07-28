@@ -51,7 +51,7 @@ public:
     QList<HyGuiFrame *> &GetFrameList();
     QTreeWidget *GetTreeWidget();
 
-    void GetAtlasInfo(QJsonObject &atlasObj);
+    void GetAtlasInfo(QJsonObject &atlasObjOut);
     
     int GetId();
 
