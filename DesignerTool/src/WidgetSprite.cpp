@@ -80,50 +80,28 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
         QJsonDocument spriteJsonDoc = QJsonDocument::fromJson(spriteFile.readAll());
         spriteFile.close();
 
-        QJsonObject spriteObj = spriteJsonDoc.object();
-
-//        QJsonArray frameArray = settingsObj["frames"].toArray();
-//        for(int i = 0; i < frameArray.size(); ++i)
-//        {
-//            QJsonObject frameObj = frameArray[i].toObject();
-
-//            QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-//            HyGuiFrame *pNewFrame = new HyGuiFrame(frameObj["hash"].toInt(),
-//                                                   frameObj["name"].toString(),
-//                                                   rAlphaCrop,
-//                                                   GetId(),
-//                                                   frameObj["width"].toInt(),
-//                                                   frameObj["height"].toInt(),
-//                                                   frameObj["textureIndex"].toInt(),
-//                                                   frameObj["rotate"].toBool(),
-//                                                   frameObj["x"].toInt(),
-//                                                   frameObj["y"].toInt());
-
-//            QJsonArray frameLinksArray = frameObj["links"].toArray();
-//            for(int k = 0; k < frameLinksArray.size(); ++k)
-//                pNewFrame->SetLink(frameLinksArray[k].toString());
-
-//            eAtlasNodeType eIconType = ATLAS_Frame_Warning;
-//            int iTexIndex = frameObj["textureIndex"].toInt();
-//            if(iTexIndex >= 0)
-//            {
-//                //while(m_TextureList.empty() || m_TextureList.size() <= frameObj["textureIndex"].toInt())
-//                //    m_TextureList.append(CreateTreeItem(NULL, "Texture: " % QString::number(m_TextureList.size()), ATLAS_Texture));
-
-//                //pTextureTreeItem = m_TextureList[];
-//                eIconType = ATLAS_Frame;
-//            }
-
-//            pNewFrame->SetTreeWidgetItem(CreateTreeItem(NULL, frameObj["name"].toString(), iTexIndex, eIconType));
+        QJsonArray spriteStateArray = spriteJsonDoc.array();
+        for(int i = 0; i < spriteStateArray.size(); ++i)
+        {
+            on_actionAddState_triggered();
             
-//            m_FrameList.append(pNewFrame);
-//        }
+            QJsonArray spriteFrameArray = spriteStateArray[i].toArray();
+            for(int j = 0; j < spriteFrameArray.size(); ++j)
+            {
+                QJsonObject spriteFrameObj = spriteFrameArray[j].toObject();
+                
+                QList<quint32> requestList;
+                requestList.append(JSONOBJ_TOINT(spriteFrameObj, "hash"));
+                m_pItemSprite->GetAtlasManager().RequestFrames(m_pItemSprite, requestList);
+                
+                // TODO: set things like offset, rotation, duration, etc for each frame
+            }
+        }
     }
     else
     {
-        Save();
-        
         on_actionAddState_triggered();
+        Save();
     }
 
     // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
@@ -144,7 +122,7 @@ void WidgetSprite::Save()
     for(int i = 0; i < ui->cmbStates->count(); ++i)
     {
         QJsonArray spriteFrameArray;
-        ui->cmbStates->itemData(i).value<WidgetSpriteState *>()->GetStateInfo(spriteFrameArray);
+        ui->cmbStates->itemData(i).value<WidgetSpriteState *>()->GetStateFrameInfo(spriteFrameArray);
         
         spriteStateArray.append(spriteFrameArray);
     }
@@ -224,7 +202,7 @@ void WidgetSprite::on_actionRemoveFrames_triggered()
     WidgetSpriteState *pSpriteState = ui->cmbStates->itemData(ui->cmbStates->currentIndex()).value<WidgetSpriteState *>();
     HyGuiFrame *pSelectredFrame = pSpriteState->SelectedFrame();
 
-    QUndoCommand *pCmd = new ItemSpriteCmd_DeleteFrame(m_pItemSprite, pSelectredFrame, pSpriteState->SelectedIndex());
+    QUndoCommand *pCmd = new ItemSpriteCmd_DeleteFrame(m_pItemSprite, pSelectredFrame);
     m_pUndoStack->push(pCmd);
 
     UpdateActions();

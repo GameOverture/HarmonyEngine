@@ -58,7 +58,7 @@ void WidgetSpriteState::SetName(QString sNewName)
     m_sName = sNewName;
 }
 
-void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame, QVariant param)
+void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
 {
     bool bValidParam = false;
     int iParamRow = param.toInt(&bValidParam);
@@ -103,14 +103,21 @@ int WidgetSpriteState::SelectedIndex()
     return ui->frames->currentRow();
 }
 
-void WidgetSpriteState::GetStateInfo(QJsonArray &stateArrayOut)
+void WidgetSpriteState::GetStateFrameInfo(QJsonArray &stateArrayOut)
 {
     for(int i = 0; i < m_pFrameList.count(); ++i)
     {
         QJsonObject frameObj;
 
         frameObj.insert("duration", QJsonValue(m_pFrameList[i]->m_fDuration));
-        asdf <--- finish here!
+        frameObj.insert("rotation", QJsonValue(m_pFrameList[i]->m_fRotation));
+        frameObj.insert("offsetX", QJsonValue(m_pFrameList[i]->m_ptOffset.x()));
+        frameObj.insert("offsetY", QJsonValue(m_pFrameList[i]->m_ptOffset.y()));
+        frameObj.insert("scaleX", QJsonValue(m_pFrameList[i]->m_ptScale.x()));
+        frameObj.insert("scaleY", QJsonValue(m_pFrameList[i]->m_ptScale.y()));
+        
+        frameObj.insert("hash", QJsonValue(static_cast<qint64>(m_pFrameList[i]->m_pFrame->GetHash())));
+        frameObj.insert("frameIndex", QJsonValue(m_pFrameList[i]->m_pFrame-> ));
 
         stateArrayOut.append(frameObj);
     }

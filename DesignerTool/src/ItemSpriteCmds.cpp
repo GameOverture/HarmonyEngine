@@ -219,11 +219,11 @@ void ItemSpriteCmd_AddFrames::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemSpriteCmd_DeleteFrame::ItemSpriteCmd_DeleteFrame(ItemWidget *pItem, HyGuiFrame *pFrame, int iRowParam, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                                                            m_pItem(pItem)
+ItemSpriteCmd_DeleteFrame::ItemSpriteCmd_DeleteFrame(ItemWidget *pItem, HyGuiFrame *pFrame, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                                m_pItem(pItem)
 {
     setText("Remove Frame");
-    m_Frames.append(QPair<HyGuiFrame *, QVariant>(pFrame, QVariant(iRowParam)));
+    m_Frames.append(pFrame);
 }
 
 ItemSpriteCmd_DeleteFrame::~ItemSpriteCmd_DeleteFrame()

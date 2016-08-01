@@ -31,7 +31,7 @@ class ItemWidget : public Item
 
     void DrawUpdate(IHyApplication &hyApp);
 
-    void Link(HyGuiFrame *pFrame, QVariant param);
+    void Link(HyGuiFrame *pFrame);
     void Unlink(HyGuiFrame *pFrame);
 
 protected:
@@ -50,7 +50,7 @@ protected:
     virtual void OnDraw_Hide(IHyApplication &hyApp) = 0;
     virtual void OnDraw_Update(IHyApplication &hyApp) = 0;
 
-    virtual void OnLink(HyGuiFrame *pFrame, QVariant param) = 0;
+    virtual void OnLink(HyGuiFrame *pFrame) = 0;
     virtual void OnUnlink(HyGuiFrame *pFrame) = 0;
     virtual void OnUpdateLink(HyGuiFrame *pFrame) = 0;
 

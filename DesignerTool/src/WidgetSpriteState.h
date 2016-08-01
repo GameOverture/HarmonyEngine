@@ -81,13 +81,13 @@ public:
     QString GetName();
     void SetName(QString sNewName);
 
-    void InsertFrame(HyGuiFrame *pFrame, QVariant param);
+    void InsertFrame(HyGuiFrame *pFrame);
     void RemoveFrame(HyGuiFrame *pFrame);
 
     HyGuiFrame *SelectedFrame();
     int SelectedIndex();
 
-    void GetStateInfo(QJsonArray &stateArrayOut);
+    void GetStateFrameInfo(QJsonArray &stateArrayOut);
     
 private:
     Ui::WidgetSpriteState *ui;

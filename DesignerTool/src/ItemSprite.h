@@ -36,7 +36,7 @@ protected:
     
     virtual void Save();
 
-    virtual void OnLink(HyGuiFrame *pFrame, QVariant param);
+    virtual void OnLink(HyGuiFrame *pFrame);
     virtual void OnUnlink(HyGuiFrame *pFrame);
     virtual void OnUpdateLink(HyGuiFrame *pFrame);
 };

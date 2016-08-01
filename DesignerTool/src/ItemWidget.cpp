@@ -92,9 +92,9 @@ void ItemWidget::DrawUpdate(IHyApplication &hyApp)
     OnDraw_Update(hyApp);
 }
 
-void ItemWidget::Link(HyGuiFrame *pFrame, QVariant param)
+void ItemWidget::Link(HyGuiFrame *pFrame)
 {
-    OnLink(pFrame, param);
+    OnLink(pFrame);
     m_Links.insert(pFrame);
 }
 

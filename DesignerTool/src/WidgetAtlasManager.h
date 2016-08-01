@@ -47,11 +47,13 @@ public:
 
     void SaveDependencies();
     void LoadDependencies();
-    void SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem, QVariant param);
+    void SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
     void RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
 
-    QList<QPair<HyGuiFrame *, QVariant> > RequestFrames(ItemWidget *pItem, QList<QPair<HyGuiFrame *, QVariant> > optionalRequestList = QList<QPair<HyGuiFrame *, QVariant> >());
-    void RelinquishFrames(ItemWidget *pItem, QList<QPair<HyGuiFrame *, QVariant> > relinquishList);
+    QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem);
+    QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem, QList<HyGuiFrame *> requestList);
+    QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem, QList<quint32> requestList);
+    void RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *> relinquishList);
 
     void PreviewAtlasGroup();
     void HideAtlasGroup();
