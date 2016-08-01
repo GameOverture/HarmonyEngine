@@ -87,7 +87,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 class HyAtlas
 {
-	const uint32			m_uiNUM_FRAMES;
+	const uint32							m_uiNUM_FRAMES;
 
 	// The return value from the 'stb_image' loader is an 'unsigned char *' which points
 	// to the pixel data. The pixel data consists of *y scanlines of *x pixels,
@@ -98,9 +98,10 @@ class HyAtlas
 	// If req_comp is non-zero, *comp has the number of components that _would_
 	// have been output otherwise. E.g. if you set req_comp to 4, you will always
 	// get RGBA output, but you can check *comp to easily see if it's opaque.
-	unsigned char *			m_pPixelData;
+	unsigned char *							m_pPixelData;
 
-	HyRectangle<int32> *	m_pFrames;
+	HyRectangle<int32> *					m_pFrames;
+	std::map<uint32, HyRectangle<int32> *>	m_HashMap;
 
 public:
 	HyAtlas(jsonxx::Array &srcFramesArrayRef);

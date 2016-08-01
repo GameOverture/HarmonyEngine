@@ -236,6 +236,8 @@ HyAtlas::HyAtlas(jsonxx::Array &srcFramesArrayRef) :	m_uiNUM_FRAMES(static_cast<
 		m_pFrames[k].left = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("left"));
 		m_pFrames[k].top = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("top"));
 		m_pFrames[k].iTag = srcFrameObj.get<jsonxx::Boolean>("rotate") ? 1 : 0;
+
+		m_HashMap[static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("hash"))] = &m_pFrames[k];
 	}
 }
 

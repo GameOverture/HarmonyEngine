@@ -60,20 +60,26 @@ void WidgetSpriteState::SetName(QString sNewName)
 
 void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
 {
-    bool bValidParam = false;
-    int iParamRow = param.toInt(&bValidParam);
-    if(bValidParam == false)
-        iParamRow = ui->frames->rowCount();
+    Frame *pFrameToInsert = NULL;
+    
+    // See if this frame has been recently removed, and readd if possible. Otherwise, create a new Frame
+    QMap<quint32, Frame *>::iterator iter = m_RemovedFrameMap.find(pFrame->GetHash());
+    if(iter == m_RemovedFrameMap.end())
+        pFrameToInsert = new Frame(pFrame, ui->frames->rowCount());
+    else
+    {
+        pFrameToInsert = iter.value();
+        m_RemovedFrameMap.remove(pFrame->GetHash());
+    }
 
-    Frame *pNewItem = new Frame(pFrame);
-    ui->frames->insertRow(iParamRow);
-    ui->frames->setItem(iParamRow, COLUMN_Frame, pNewItem->m_pTableItems[COLUMN_Frame]);
-    ui->frames->setItem(iParamRow, COLUMN_Offset, pNewItem->m_pTableItems[COLUMN_Offset]);
-    ui->frames->setItem(iParamRow, COLUMN_Rotation, pNewItem->m_pTableItems[COLUMN_Rotation]);
-    ui->frames->setItem(iParamRow, COLUMN_Scale, pNewItem->m_pTableItems[COLUMN_Scale]);
-    ui->frames->setItem(iParamRow, COLUMN_Duration, pNewItem->m_pTableItems[COLUMN_Duration]);
+    ui->frames->insertRow(pFrameToInsert->m_iRowIndex);
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, COLUMN_Frame, pFrameToInsert->m_pTableItems[COLUMN_Frame]);
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, COLUMN_Offset, pFrameToInsert->m_pTableItems[COLUMN_Offset]);
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, COLUMN_Rotation, pFrameToInsert->m_pTableItems[COLUMN_Rotation]);
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, COLUMN_Scale, pFrameToInsert->m_pTableItems[COLUMN_Scale]);
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, COLUMN_Duration, pFrameToInsert->m_pTableItems[COLUMN_Duration]);
 
-    m_pFrameList.insert(iParamRow, pNewItem);
+    m_pFrameList.insert(pFrameToInsert->m_iRowIndex, pFrameToInsert);
 
     ui->frames->selectRow(0);
 }
@@ -86,7 +92,7 @@ void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
         {
             ui->frames->removeRow(i);
 
-            delete m_pFrameList[i];
+            m_RemovedFrameMap[pFrame->GetHash()] = m_pFrameList[i];
             m_pFrameList.removeAt(i);
             break;
         }
@@ -117,7 +123,7 @@ void WidgetSpriteState::GetStateFrameInfo(QJsonArray &stateArrayOut)
         frameObj.insert("scaleY", QJsonValue(m_pFrameList[i]->m_ptScale.y()));
         
         frameObj.insert("hash", QJsonValue(static_cast<qint64>(m_pFrameList[i]->m_pFrame->GetHash())));
-        frameObj.insert("frameIndex", QJsonValue(m_pFrameList[i]->m_pFrame-> ));
+        frameObj.insert("atlasGroupId", QJsonValue(m_pFrameList[i]->m_pFrame->GetAtlasGroupdId()));
 
         stateArrayOut.append(frameObj);
     }

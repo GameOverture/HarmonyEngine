@@ -152,6 +152,7 @@ void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObjOut)
             frameArrayList.append(QJsonArray());
         
         QJsonObject frameObj;
+        frameObj.insert("hash", QJsonValue(static_cast<qint64>(m_FrameList[i]->GetHash())));
         frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().right()));
         frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().bottom()));
         frameObj.insert("rotate", QJsonValue(m_FrameList[i]->IsRotated()));

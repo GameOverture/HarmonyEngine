@@ -49,6 +49,7 @@ public:
     QRect GetCrop()                             { return m_rALPHA_CROP; }
     QPoint GetPosition()                        { return QPoint(m_iPosX, m_iPosY); }
     QSet<ItemWidget *> GetLinks()               { return m_Links; }
+    int GetAtlasGroupdId()                      { return static_cast<int>(m_uiATLAS_GROUP_ID); }
 
     bool IsRotated()                            { return m_bRotation; }
     int GetX()                                  { return m_iPosX; }
