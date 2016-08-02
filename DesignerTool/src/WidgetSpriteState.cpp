@@ -62,7 +62,7 @@ void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
 {
     Frame *pFrameToInsert = NULL;
     
-    // See if this frame has been recently removed, and readd if possible. Otherwise, create a new Frame
+    // See if this frame has been recently removed, and re-add if possible. Otherwise, create a new Frame
     QMap<quint32, Frame *>::iterator iter = m_RemovedFrameMap.find(pFrame->GetHash());
     if(iter == m_RemovedFrameMap.end())
         pFrameToInsert = new Frame(pFrame, ui->frames->rowCount());

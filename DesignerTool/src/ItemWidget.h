@@ -14,6 +14,8 @@
 
 #include "Harmony/HyEngine.h"
 
+#include <QUndoStack>
+
 class WidgetAtlasManager;
 
 class ItemWidget : public Item
@@ -39,6 +41,7 @@ protected:
 
     QWidget *           m_pWidget;
     QMenu *             m_pEditMenu;
+    QUndoStack *        m_pUndoStack;
 
     QSet<HyGuiFrame *>  m_Links;
 
@@ -62,6 +65,7 @@ public:
 
     QWidget *GetWidget() const                      { return m_pWidget; }
     QMenu *GetEditMenu() const                      { return m_pEditMenu; }
+    QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
 
     WidgetAtlasManager &GetAtlasManager()           { return m_AtlasManRef; }
 

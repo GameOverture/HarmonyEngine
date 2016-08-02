@@ -31,21 +31,6 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
     ui->txtPrefixAndName->setText(m_pItemSprite->GetName(true));
     
     QMenu *pEditMenu = m_pItemSprite->GetEditMenu();
-
-    m_pUndoStack = new QUndoStack(this);
-    QAction *pActionUndo = m_pUndoStack->createUndoAction(pEditMenu, "&Undo");
-    pActionUndo->setIcon(QIcon(":/icons16x16/generic-undo.png"));
-    pActionUndo->setShortcuts(QKeySequence::Undo);
-    pActionUndo->setShortcutContext(Qt::ApplicationShortcut);
-
-    QAction *pActionRedo = m_pUndoStack->createRedoAction(pEditMenu, "&Redo");
-    pActionRedo->setIcon(QIcon(":/icons16x16/generic-redo.png"));
-    pActionRedo->setShortcuts(QKeySequence::Redo);
-    pActionRedo->setShortcutContext(Qt::ApplicationShortcut);
-
-    pEditMenu->addAction(pActionUndo);
-    pEditMenu->addAction(pActionRedo);
-    pEditMenu->addSeparator();
     pEditMenu->addAction(ui->actionAddState);
     pEditMenu->addAction(ui->actionRemoveState);
     pEditMenu->addAction(ui->actionRenameState);
@@ -106,7 +91,7 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
 
     // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
     // I don't believe any on_actionAddState_triggered() calls will leak their dynamically allocated 'm_pSpriteState', since they should become children of 'ui->grpStateLayout'
-    m_pUndoStack->clear();
+    m_pItemSprite->GetUndoStack()->clear();
 
     UpdateActions();
 }
@@ -150,7 +135,7 @@ WidgetSpriteState *WidgetSprite::GetCurSpriteState()
 void WidgetSprite::on_actionAddState_triggered()
 {
     QUndoCommand *pCmd = new ItemSpriteCmd_AddState(m_pItemSprite, m_StateActionsList, ui->cmbStates);
-    m_pUndoStack->push(pCmd);
+    m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
 }
@@ -158,7 +143,7 @@ void WidgetSprite::on_actionAddState_triggered()
 void WidgetSprite::on_actionRemoveState_triggered()
 {
     QUndoCommand *pCmd = new ItemSpriteCmd_RemoveState(ui->cmbStates);
-    m_pUndoStack->push(pCmd);
+    m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
 }
@@ -169,14 +154,14 @@ void WidgetSprite::on_actionRenameState_triggered()
     if(pDlg->exec() == QDialog::Accepted)
     {
         QUndoCommand *pCmd = new ItemSpriteCmd_RenameState(ui->cmbStates, pDlg->GetName());
-        m_pUndoStack->push(pCmd);
+        m_pItemSprite->GetUndoStack()->push(pCmd);
     }
 }
 
 void WidgetSprite::on_actionOrderStateBackwards_triggered()
 {
     QUndoCommand *pCmd = new ItemSpriteCmd_MoveStateBack(ui->cmbStates);
-    m_pUndoStack->push(pCmd);
+    m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
 }
@@ -184,7 +169,7 @@ void WidgetSprite::on_actionOrderStateBackwards_triggered()
 void WidgetSprite::on_actionOrderStateForwards_triggered()
 {
     QUndoCommand *pCmd = new ItemSpriteCmd_MoveStateForward(ui->cmbStates);
-    m_pUndoStack->push(pCmd);
+    m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
 }
@@ -192,7 +177,7 @@ void WidgetSprite::on_actionOrderStateForwards_triggered()
 void WidgetSprite::on_actionImportFrames_triggered()
 {
     QUndoCommand *pCmd = new ItemSpriteCmd_AddFrames(m_pItemSprite);
-    m_pUndoStack->push(pCmd);
+    m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
 }
@@ -203,7 +188,7 @@ void WidgetSprite::on_actionRemoveFrames_triggered()
     HyGuiFrame *pSelectredFrame = pSpriteState->SelectedFrame();
 
     QUndoCommand *pCmd = new ItemSpriteCmd_DeleteFrame(m_pItemSprite, pSelectredFrame);
-    m_pUndoStack->push(pCmd);
+    m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
 }

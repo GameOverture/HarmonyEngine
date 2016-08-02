@@ -31,17 +31,26 @@ ItemWidget::ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager 
     case ITEM_DirEntities:
     case ITEM_DirAtlases:
     case ITEM_Prefix:
-        break;
-    case ITEM_Audio:
-    case ITEM_Particles:
-    case ITEM_Font:
-    case ITEM_Spine:
-    case ITEM_Shader:
-    case ITEM_Entity:
-    case ITEM_Sprite:
-        m_pEditMenu = new QMenu("Edit", MainWindow::GetInstance());
+        HyGuiLog("Improper ItemWidget type created: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
+    
+    m_pEditMenu = new QMenu("Edit", MainWindow::GetInstance());
+    
+    m_pUndoStack = new QUndoStack(this);
+    QAction *pActionUndo = m_pUndoStack->createUndoAction(m_pEditMenu, "&Undo");
+    pActionUndo->setIcon(QIcon(":/icons16x16/generic-undo.png"));
+    pActionUndo->setShortcuts(QKeySequence::Undo);
+    pActionUndo->setShortcutContext(Qt::ApplicationShortcut);
+
+    QAction *pActionRedo = m_pUndoStack->createRedoAction(m_pEditMenu, "&Redo");
+    pActionRedo->setIcon(QIcon(":/icons16x16/generic-redo.png"));
+    pActionRedo->setShortcuts(QKeySequence::Redo);
+    pActionRedo->setShortcutContext(Qt::ApplicationShortcut);
+
+    m_pEditMenu->addAction(pActionUndo);
+    m_pEditMenu->addAction(pActionRedo);
+    m_pEditMenu->addSeparator();
 }
 
 ItemWidget::~ItemWidget()

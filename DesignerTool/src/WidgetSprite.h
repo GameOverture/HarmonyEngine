@@ -15,8 +15,6 @@
 
 #include <QWidget>
 #include <QMenu>
-#include <QUndoGroup>
-#include <QUndoStack>
 #include <QComboBox>
 
 namespace Ui {
@@ -31,7 +29,6 @@ class WidgetSprite : public QWidget
     Q_OBJECT
     
     ItemSprite *            m_pItemSprite;
-    QUndoStack *            m_pUndoStack;
 
     QList<QAction *>        m_StateActionsList;
     WidgetSpriteState *     m_pCurSpriteState;
