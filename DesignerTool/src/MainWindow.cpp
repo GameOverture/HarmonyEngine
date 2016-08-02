@@ -60,6 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->actionNewFont->setEnabled(false);
     ui->actionNewParticle->setEnabled(false);
     ui->actionNewAudio->setEnabled(false);
+    ui->actionSave->setEnabled(false);
+    ui->actionSaveAll->setEnabled(false);
+    
+    //ui->menu_File->insertAction
     
     // Link the actions to their proper widgets
     ui->explorer->addAction(ui->actionCloseProject);
@@ -74,7 +78,6 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->explorer->addAction(ui->actionPaste);
     ui->explorer->addAction(ui->actionRemove);
     ui->explorer->addAction(ui->actionRename);
-    ui->explorer->addAction(ui->actionSave);
 
     m_pDebugConnection = new HyGuiDebugger(*ui->actionConnect, this);
     
@@ -209,6 +212,8 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurEditMenu = pItem->GetEditMenu();
     if(sm_pInstance->m_pCurEditMenu)
         sm_pInstance->ui->menuBar->insertMenu(sm_pInstance->ui->menu_View->menuAction(), sm_pInstance->m_pCurEditMenu);
+    
+    insert save actions here
 }
 
 /*static*/ void MainWindow::CloseItem(ItemWidget *pItem)
@@ -269,6 +274,12 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurSelectedProj = NULL;    // Set m_pCurSelectedProj to 'NULL' so SetSelectedProj() doesn't imediately return
     
     SetSelectedProj(pCurItemProj);
+}
+
+/*static*/ void MainWindow::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
+{
+    sm_pInstance->ui->actionSave->setEnabled(bSaveEnabled);
+    sm_pInstance->ui->actionSaveAll->setEnabled(bSaveAllEnabled);
 }
 
 void MainWindow::on_actionNewProject_triggered()
@@ -403,4 +414,14 @@ void MainWindow::on_actionConnect_triggered()
 void MainWindow::on_actionViewProperties_triggered()
 {
     ui->dockWidgetCurrentItem->setHidden(!ui->dockWidgetCurrentItem->isHidden());
+}
+
+void MainWindow::on_actionSave_triggered()
+{
+    
+}
+
+void MainWindow::on_actionSaveAll_triggered()
+{
+    
 }

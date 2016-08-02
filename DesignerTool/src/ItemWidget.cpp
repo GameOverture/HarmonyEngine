@@ -120,6 +120,9 @@ void ItemWidget::on_undoStack_cleanChanged(bool bClean)
     ItemProject *pItemProj = m_AtlasManRef.GetProjOwner();
     QTabBar *pTabBar = pItemProj->GetTabBar();
     
+    bool bCurItemDirty = false;
+    bool bAnyItemDirty = false;
+    
     for(int i = 0; i < pTabBar->count(); ++i)
     {
         if(pTabBar->tabData(i).value<ItemWidget *>() == this)
@@ -128,8 +131,16 @@ void ItemWidget::on_undoStack_cleanChanged(bool bClean)
                 pTabBar->setTabText(i, GetName(false));
             else
                 pTabBar->setTabText(i, GetName(false) + "*");
-            break;
+        }
+        
+        if(pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
+        {
+            bAnyItemDirty = true;
+            if(pTabBar->currentIndex() == i)
+                bCurItemDirty = true;
         }
     }
+    
+    MainWindow::SetSaveEnabled(bCurItemDirty, bAnyItemDirty);
 }
 

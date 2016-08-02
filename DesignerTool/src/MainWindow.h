@@ -52,6 +52,8 @@ public:
     
     static void SetSelectedProj(ItemProject *pProj);
     static void ReloadHarmony();
+    
+    static void SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled);
 
 private slots:
     void on_actionNewProject_triggered();
@@ -59,7 +61,6 @@ private slots:
     void on_actionCloseProject_triggered();
     void on_actionNewSprite_triggered();
     void on_actionNewFont_triggered();
-    
     
     void on_actionNewParticle_triggered();
     
@@ -74,6 +75,10 @@ private slots:
     void on_actionConnect_triggered();
 
     void on_actionViewProperties_triggered();
+    
+    void on_actionSave_triggered();
+    
+    void on_actionSaveAll_triggered();
     
 private:
     Ui::MainWindow *ui;
