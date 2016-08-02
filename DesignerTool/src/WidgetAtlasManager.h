@@ -39,6 +39,8 @@ public:
     explicit WidgetAtlasManager(QWidget *parent = 0);
     explicit WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent = 0);
     ~WidgetAtlasManager();
+    
+    ItemProject *GetProjOwner()     { return m_pProjOwner; }
 
     HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
     void RemoveFrame(HyGuiFrame *pFrame);

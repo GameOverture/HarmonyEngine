@@ -51,6 +51,8 @@ ItemWidget::ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager 
     m_pEditMenu->addAction(pActionUndo);
     m_pEditMenu->addAction(pActionRedo);
     m_pEditMenu->addSeparator();
+    
+    connect(m_pUndoStack, SIGNAL(cleanChanged(bool)), this, SLOT(on_undoStack_cleanChanged(bool)));
 }
 
 ItemWidget::~ItemWidget()
@@ -112,3 +114,22 @@ void ItemWidget::Unlink(HyGuiFrame *pFrame)
     OnUnlink(pFrame);
     m_Links.remove(pFrame);
 }
+
+void ItemWidget::on_undoStack_cleanChanged(bool bClean)
+{
+    ItemProject *pItemProj = m_AtlasManRef.GetProjOwner();
+    QTabBar *pTabBar = pItemProj->GetTabBar();
+    
+    for(int i = 0; i < pTabBar->count(); ++i)
+    {
+        if(pTabBar->tabData(i).value<ItemWidget *>() == this)
+        {
+            if(bClean)
+                pTabBar->setTabText(i, GetName(false));
+            else
+                pTabBar->setTabText(i, GetName(false) + "*");
+            break;
+        }
+    }
+}
+

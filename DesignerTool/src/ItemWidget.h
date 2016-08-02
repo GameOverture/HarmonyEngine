@@ -69,8 +69,9 @@ public:
 
     WidgetAtlasManager &GetAtlasManager()           { return m_AtlasManRef; }
 
-protected:
-
+private slots:
+    void on_undoStack_cleanChanged(bool bClean);
+    
 };
 Q_DECLARE_METATYPE(ItemWidget *)
 
