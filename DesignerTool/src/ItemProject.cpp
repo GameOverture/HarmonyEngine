@@ -265,6 +265,9 @@ void ItemProject::OverrideDraw()
                     AtlasManager_DrawHide(*this, *m_pAtlasMan);
             }
 
+            // Show the selected tab since we're done with override draw
+            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ItemWidget *>()->DrawShow(*this);
+            
             m_ePrevDrawState = PROJDRAWSTATE_Nothing;
         }
         else
@@ -283,6 +286,10 @@ void ItemProject::OverrideDraw()
 
                 m_bDrawStateLoaded[m_eDrawState] = true;
             }
+            
+            // Hide any currently shown items, since we're being draw override
+            for(int i = 0; i < m_pTabBar->count(); ++i)
+                m_pTabBar->tabData(i).value<ItemWidget *>()->DrawHide(*this);
 
             m_pCamera->SetEnabled(true);
 

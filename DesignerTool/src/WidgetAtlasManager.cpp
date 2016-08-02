@@ -242,7 +242,7 @@ QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem)
 QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<HyGuiFrame *> requestList)
 {
     if(requestList.empty())
-        HyGuiLog("WidgetAtlasManager::RequestFrames(HyGuiFrame) passed an empty requestList", LOGTYPE_Error);
+        return RequestFrames(pItem);
     
     QList<HyGuiFrame *> returnList;
     for(int i = 0; i < requestList.size(); ++i)
@@ -257,7 +257,7 @@ QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<H
 QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<quint32> requestList)
 {
     if(requestList.empty())
-        HyGuiLog("WidgetAtlasManager::RequestFrames(quint32) passed an empty requestList", LOGTYPE_Error);
+        return RequestFrames(pItem);
     
     QList<HyGuiFrame *> returnList;
     for(int i = 0; i < requestList.size(); ++i)
