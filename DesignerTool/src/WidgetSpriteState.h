@@ -16,6 +16,7 @@
 #include <QTableWidgetItem>
 
 class ItemSprite;
+struct SpriteFrame;
 
 namespace Ui {
 class WidgetSpriteState;
@@ -25,64 +26,18 @@ class WidgetSpriteState : public QWidget
 {
     Q_OBJECT
     
-    ItemSprite *                m_pSpriteOwner;
-    
-    enum eColumn
-    {
-        COLUMN_Frame = 0,
-        COLUMN_Offset,
-        COLUMN_Rotation,
-        COLUMN_Scale,
-        COLUMN_Duration,
-        
-        NUMCOLUMNS
-    };
-    
-    struct Frame
-    {
-        HyGuiFrame *            m_pFrame;
-        int                     m_iRowIndex;
-        
-        QTableWidgetItem *      m_pTableItems[NUMCOLUMNS];
-        
-        QPointF                 m_ptOffset;
-        float                   m_fRotation;
-        QPointF                 m_ptScale;
-        float                   m_fDuration;
-        
-        Frame(HyGuiFrame *pFrame, int iRowIndex) :  m_pFrame(pFrame),
-                                                    m_iRowIndex(iRowIndex),
-                                                    m_ptOffset(0.0f, 0.0f),
-                                                    m_fRotation(0.0f),
-                                                    m_ptScale(1.0f, 1.0f),
-                                                    m_fDuration(0.016f)
-        {
-            m_pTableItems[COLUMN_Frame] = new QTableWidgetItem(m_pFrame->GetName());
-            m_pTableItems[COLUMN_Offset] = new QTableWidgetItem(PointToString(m_ptOffset));
-            m_pTableItems[COLUMN_Rotation] = new QTableWidgetItem(QString::number(m_fRotation, 'g', 2));
-            m_pTableItems[COLUMN_Scale] = new QTableWidgetItem(PointToString(m_ptScale));
-            m_pTableItems[COLUMN_Duration] = new QTableWidgetItem(QString::number(m_fDuration, 'g', 2));
+    ItemSprite *                        m_pSpriteOwner;
 
-            QVariant v;
-            v.setValue(m_pFrame);
-            m_pTableItems[COLUMN_Frame]->setData(Qt::UserRole, v);
-        }
-        
-        QString PointToString(QPointF ptPoint)
-        {
-            return QString::number(ptPoint.x(), 'g', 2) % ", " % QString::number(ptPoint.y(), 'g', 2);
-        }
-    };
-
-    QString                     m_sName;
-    QList<Frame *>              m_pFrameList;
+    QString                             m_sName;
+    QList<SpriteFrame *>                m_pFrameList;
     
-    QMap<quint32, Frame *>      m_RemovedFrameMap;  // Used to reinsert frames (via undo/redo) while keeping their attributes
+    QMap<quint32, SpriteFrame *>        m_RemovedFrameMap;  // Used to reinsert frames (via undo/redo) while keeping their attributes
 
 public:
     explicit WidgetSpriteState(ItemSprite *pItemSprite, QList<QAction *> stateActionList, QWidget *parent = 0);
     ~WidgetSpriteState();
 
+    
     QString GetName();
     void SetName(QString sNewName);
 
@@ -91,7 +46,9 @@ public:
 
     HyGuiFrame *SelectedFrame();
     int SelectedIndex();
-
+    
+    void AppendFramesToList(QList<HyGuiFrame *> &drawInstListRef);
+    
     void GetStateFrameInfo(QJsonArray &stateArrayOut);
     
 private:

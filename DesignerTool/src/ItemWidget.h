@@ -55,7 +55,8 @@ protected:
 
     virtual void OnLink(HyGuiFrame *pFrame) = 0;
     virtual void OnUnlink(HyGuiFrame *pFrame) = 0;
-    virtual void OnUpdateLink(HyGuiFrame *pFrame) = 0;
+    
+    virtual void OnSave() = 0;
 
 public:
     ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager &AtlasManRef);
@@ -68,6 +69,8 @@ public:
     QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
 
     WidgetAtlasManager &GetAtlasManager()           { return m_AtlasManRef; }
+    
+    void Save();
 
 private slots:
     void on_undoStack_cleanChanged(bool bClean);

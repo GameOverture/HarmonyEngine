@@ -8,9 +8,13 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "ItemSprite.h"
+#include "WidgetAtlasManager.h"
+
 #include <QAction>
 #include <QUndoView>
-#include "WidgetAtlasManager.h"
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : ItemWidget(ITEM_Sprite, sPath, atlasManRef)
 {
@@ -42,6 +46,11 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
 {
     m_primOriginHorz.Load();
     m_primOriginVert.Load();
+    
+    QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
+    
+    for(int i = 0; i < frameList.count(); i++)
+        frameList[i]->DrawInst(this)->Load();
 }
 
 /*virtual*/ void ItemSprite::OnDraw_Unload(IHyApplication &hyApp)
@@ -67,11 +76,6 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     WidgetSprite *pWidgetSprite = static_cast<WidgetSprite *>(m_pWidget);
 }
 
-/*virtual*/ void ItemSprite::Save()
-{
-    
-}
-
 /*virtual*/ void ItemSprite::OnLink(HyGuiFrame *pFrame)
 {
     WidgetSpriteState *pCurSpriteState = static_cast<WidgetSprite *>(m_pWidget)->GetCurSpriteState();
@@ -84,8 +88,22 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     pCurSpriteState->RemoveFrame(pFrame);
 }
 
-/*virtual*/ void ItemSprite::OnUpdateLink(HyGuiFrame *pFrame)
+/*virtual*/ void ItemSprite::OnSave()
 {
+    QJsonArray spriteStateArray;
+    static_cast<WidgetSprite *>(m_pWidget)->GetSpriteStateInfo(spriteStateArray);
 
-    Save();
+    QJsonDocument settingsDoc(spriteStateArray);
+
+    QFile spriteFile(GetAbsPath());
+    if(spriteFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        qint64 iBytesWritten = spriteFile.write(settingsDoc.toJson());
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+            HyGuiLog("Could not write to atlas settings file: " % spriteFile.errorString(), LOGTYPE_Error);
+    }
+    else
+        HyGuiLog("Couldn't open item file " % GetAbsPath() % ": " % spriteFile.errorString(), LOGTYPE_Error);
+
+    spriteFile.close();
 }

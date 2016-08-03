@@ -77,6 +77,8 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
                 
                 QList<quint32> requestList;
                 requestList.append(JSONOBJ_TOINT(spriteFrameObj, "hash"));
+                
+                chickenAndEggProblemHere-ItemWidget::Link not initalized
                 m_pItemSprite->GetAtlasManager().RequestFrames(m_pItemSprite, requestList);
                 
                 // TODO: set things like offset, rotation, duration, etc for each frame
@@ -86,7 +88,7 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
     else
     {
         on_actionAddState_triggered();
-        Save();
+        m_pItemSprite->Save();
     }
 
     // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
@@ -101,35 +103,30 @@ WidgetSprite::~WidgetSprite()
     delete ui;
 }
 
-void WidgetSprite::Save()
+void WidgetSprite::GetSpriteStateInfo(QJsonArray &spriteStateArrayRef)
 {
-    QJsonArray spriteStateArray;
     for(int i = 0; i < ui->cmbStates->count(); ++i)
     {
         QJsonArray spriteFrameArray;
         ui->cmbStates->itemData(i).value<WidgetSpriteState *>()->GetStateFrameInfo(spriteFrameArray);
         
-        spriteStateArray.append(spriteFrameArray);
+        spriteStateArrayRef.append(spriteFrameArray);
     }
-
-    QJsonDocument settingsDoc(spriteStateArray);
-
-    QFile spriteFile(m_pItemSprite->GetAbsPath());
-    if(spriteFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        qint64 iBytesWritten = spriteFile.write(settingsDoc.toJson());
-        if(0 == iBytesWritten || -1 == iBytesWritten)
-            HyGuiLog("Could not write to atlas settings file: " % spriteFile.errorString(), LOGTYPE_Error);
-    }
-    else
-        HyGuiLog("Couldn't open item file " % m_pItemSprite->GetAbsPath() % ": " % spriteFile.errorString(), LOGTYPE_Error);
-
-    spriteFile.close();
 }
 
 WidgetSpriteState *WidgetSprite::GetCurSpriteState()
 {
     return ui->cmbStates->currentData().value<WidgetSpriteState *>();
+}
+
+QList<HyGuiFrame *> WidgetSprite::GetAllDrawInsts()
+{
+    QList<HyGuiFrame *> returnList;
+    
+    for(int i = 0; i < ui->cmbStates->count(); ++i)
+        ui->cmbStates->itemData(i).value<WidgetSpriteState *>()->AppendFramesToList(returnList);
+    
+    return returnList;
 }
 
 void WidgetSprite::on_actionAddState_triggered()

@@ -364,10 +364,26 @@ void ItemProject::on_tabBar_currentChanged(int index)
 
 void ItemProject::on_save_triggered()
 {
-    HyGuiLog("Test", LOGTYPE_Error);
+    int iIndex = m_pTabBar->currentIndex();
+    QVariant v = m_pTabBar->tabData(iIndex);
+    ItemWidget *pItem = v.value<ItemWidget *>();
+    pItem->Save();
+    
+    HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
 }
 
 void ItemProject::on_saveAll_triggered()
 {
-    HyGuiLog("TestAll", LOGTYPE_Error);
+    for(int i = 0; i < m_pTabBar->count(); ++i)
+    {
+        if(m_pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
+        {
+            ItemWidget *pItem = m_pTabBar->tabData(i).value<ItemWidget *>();
+            pItem->Save();
+            
+            HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
+        }
+        
+        
+    }
 }

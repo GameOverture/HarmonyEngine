@@ -37,9 +37,11 @@ public:
     explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
 
-    void Save();
+    void GetSpriteStateInfo(QJsonArray &spriteStateArrayRef);
     
     WidgetSpriteState *GetCurSpriteState();
+    
+    QList<HyGuiFrame *> GetAllDrawInsts();
     
 private slots:
     void on_actionAddState_triggered();

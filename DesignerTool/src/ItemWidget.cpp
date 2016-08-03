@@ -115,6 +115,12 @@ void ItemWidget::Unlink(HyGuiFrame *pFrame)
     m_Links.remove(pFrame);
 }
 
+void ItemWidget::Save()
+{
+    OnSave();
+    m_pUndoStack->setClean();
+}
+
 void ItemWidget::on_undoStack_cleanChanged(bool bClean)
 {
     ItemProject *pItemProj = m_AtlasManRef.GetProjOwner();

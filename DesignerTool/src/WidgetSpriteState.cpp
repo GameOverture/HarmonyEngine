@@ -29,11 +29,11 @@ WidgetSpriteState::WidgetSpriteState(ItemSprite *pItemSprite, QList<QAction *> s
     ui->btnOrderFrameUp->setDefaultAction(FindAction(stateActionList, "actionOrderFrameUpwards"));
     ui->btnOrderFrameDown->setDefaultAction(FindAction(stateActionList, "actionOrderFrameDownwards"));
     
-    ui->frames->setColumnWidth(COLUMN_Frame, 100);
-    ui->frames->setColumnWidth(COLUMN_Offset, 64);
-    ui->frames->setColumnWidth(COLUMN_Rotation, 32);
-    ui->frames->setColumnWidth(COLUMN_Scale, 64);
-    ui->frames->setColumnWidth(COLUMN_Duration, 32);
+    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Frame, 100);
+    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Offset, 64);
+    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Rotation, 32);
+    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Scale, 64);
+    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Duration, 32);
     ui->frames->setMinimumWidth(100+64+32+64+32);
 }
 
@@ -60,12 +60,12 @@ void WidgetSpriteState::SetName(QString sNewName)
 
 void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
 {
-    Frame *pFrameToInsert = NULL;
+    SpriteFrame *pFrameToInsert = NULL;
     
     // See if this frame has been recently removed, and re-add if possible. Otherwise, create a new Frame
-    QMap<quint32, Frame *>::iterator iter = m_RemovedFrameMap.find(pFrame->GetHash());
+    QMap<quint32, SpriteFrame *>::iterator iter = m_RemovedFrameMap.find(pFrame->GetHash());
     if(iter == m_RemovedFrameMap.end())
-        pFrameToInsert = new Frame(pFrame, ui->frames->rowCount());
+        pFrameToInsert = new SpriteFrame(pFrame, ui->frames->rowCount());
     else
     {
         pFrameToInsert = iter.value();
@@ -73,11 +73,11 @@ void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
     }
 
     ui->frames->insertRow(pFrameToInsert->m_iRowIndex);
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, COLUMN_Frame, pFrameToInsert->m_pTableItems[COLUMN_Frame]);
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, COLUMN_Offset, pFrameToInsert->m_pTableItems[COLUMN_Offset]);
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, COLUMN_Rotation, pFrameToInsert->m_pTableItems[COLUMN_Rotation]);
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, COLUMN_Scale, pFrameToInsert->m_pTableItems[COLUMN_Scale]);
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, COLUMN_Duration, pFrameToInsert->m_pTableItems[COLUMN_Duration]);
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Frame, pFrameToInsert->m_pTableItems[SpriteFrame::COLUMN_Frame]);
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Offset, pFrameToInsert->m_pTableItems[SpriteFrame::COLUMN_Offset]);
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Rotation, pFrameToInsert->m_pTableItems[SpriteFrame::COLUMN_Rotation]);
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Scale, pFrameToInsert->m_pTableItems[SpriteFrame::COLUMN_Scale]);
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Duration, pFrameToInsert->m_pTableItems[SpriteFrame::COLUMN_Duration]);
 
     m_pFrameList.insert(pFrameToInsert->m_iRowIndex, pFrameToInsert);
 
@@ -88,7 +88,7 @@ void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
 {
     for(int i = 0; i < ui->frames->rowCount(); ++i)
     {
-        if(ui->frames->item(i, COLUMN_Frame)->data(Qt::UserRole).value<HyGuiFrame *>() == pFrame)
+        if(ui->frames->item(i, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<HyGuiFrame *>() == pFrame)
         {
             ui->frames->removeRow(i);
 
@@ -101,12 +101,18 @@ void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
 
 HyGuiFrame *WidgetSpriteState::SelectedFrame()
 {
-    return ui->frames->item(ui->frames->currentRow(), COLUMN_Frame)->data(Qt::UserRole).value<HyGuiFrame *>();
+    return ui->frames->item(ui->frames->currentRow(), SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<HyGuiFrame *>();
 }
 
 int WidgetSpriteState::SelectedIndex()
 {
     return ui->frames->currentRow();
+}
+
+void WidgetSpriteState::AppendFramesToList(QList<HyGuiFrame *> &drawInstListRef)
+{
+    for(int i = 0; i < m_pFrameList.count(); ++i)
+        drawInstListRef.append(m_pFrameList[i]->m_pFrame);
 }
 
 void WidgetSpriteState::GetStateFrameInfo(QJsonArray &stateArrayOut)
