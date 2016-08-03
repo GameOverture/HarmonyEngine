@@ -24,6 +24,8 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
                                                                 IHyApplication(HarmonyInit()),
                                                                 m_eDrawState(PROJDRAWSTATE_Nothing),
                                                                 m_ePrevDrawState(PROJDRAWSTATE_Nothing),
+                                                                m_ActionSave(0),
+                                                                m_ActionSaveAll(0),
                                                                 m_bHasError(false)
 {
     for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
@@ -68,6 +70,16 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
     m_pTabBar = new QTabBar();
     m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
     connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
+
+    m_ActionSave.setIcon(QIcon(":/icons16x16/file-save.png"));
+    m_ActionSave.setShortcuts(QKeySequence::Save);
+    m_ActionSave.setShortcutContext(Qt::ApplicationShortcut);
+    connect(&m_ActionSave, SIGNAL(triggered(bool)), this, SLOT(on_save_triggered()));
+
+    m_ActionSaveAll.setIcon(QIcon(":/icons16x16/file-saveAll.png"));
+    m_ActionSaveAll.setShortcuts(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
+    m_ActionSaveAll.setShortcutContext(Qt::ApplicationShortcut);
+    connect(&m_ActionSave, SIGNAL(triggered(bool)), this, SLOT(on_saveAll_triggered()));
     
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -328,4 +340,13 @@ void ItemProject::on_tabBar_currentChanged(int index)
     ItemWidget *pItem = v.value<ItemWidget *>();
 
     MainWindow::OpenItem(pItem);
+}
+
+void ItemProject::on_save_triggered()
+{
+
+}
+
+void ItemProject::on_saveAll_triggered()
+{
 }

@@ -40,6 +40,9 @@ class ItemProject : public Item, public IHyApplication
     QQueue<ItemWidget *>                            m_ShowQueue;
     QQueue<ItemWidget *>                            m_KillQueue;
 
+    QAction                                         m_ActionSave;
+    QAction                                         m_ActionSaveAll;
+
     bool                                            m_bHasError;
     
     ItemProject(const QString sNewProjectFilePath);
@@ -76,6 +79,10 @@ public:
 
 private slots:
     void on_tabBar_currentChanged(int index);
+
+    void on_save_triggered();
+
+    void on_saveAll_triggered();
 };
 
 #endif // ITEMPROJECT_H
