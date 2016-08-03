@@ -71,15 +71,19 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
     m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
     connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
 
+    m_ActionSave.setText("&Save");
     m_ActionSave.setIcon(QIcon(":/icons16x16/file-save.png"));
     m_ActionSave.setShortcuts(QKeySequence::Save);
     m_ActionSave.setShortcutContext(Qt::ApplicationShortcut);
+    m_ActionSave.setEnabled(false);
     connect(&m_ActionSave, SIGNAL(triggered(bool)), this, SLOT(on_save_triggered()));
 
+    m_ActionSaveAll.setText("Save &All");
     m_ActionSaveAll.setIcon(QIcon(":/icons16x16/file-saveAll.png"));
-    m_ActionSaveAll.setShortcuts(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
+    m_ActionSaveAll.setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
     m_ActionSaveAll.setShortcutContext(Qt::ApplicationShortcut);
-    connect(&m_ActionSave, SIGNAL(triggered(bool)), this, SLOT(on_saveAll_triggered()));
+    m_ActionSaveAll.setEnabled(false);
+    connect(&m_ActionSaveAll, SIGNAL(triggered(bool)), this, SLOT(on_saveAll_triggered()));
     
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -156,6 +160,21 @@ QString ItemProject::GetDirPath() const
 {
     QFileInfo file(m_sPATH);
     return file.dir().absolutePath() + '/';
+}
+
+QList<QAction *> ItemProject::GetSaveActions()
+{
+    QList<QAction *> actionList;
+    actionList.append(&m_ActionSave);
+    actionList.append(&m_ActionSaveAll);
+    
+    return actionList;
+}
+
+void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
+{
+    m_ActionSave.setEnabled(bSaveEnabled);
+    m_ActionSaveAll.setEnabled(bSaveAllEnabled);
 }
 
 // IHyApplication override
@@ -278,7 +297,8 @@ void ItemProject::OverrideDraw()
             }
 
             // Show the selected tab since we're done with override draw
-            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ItemWidget *>()->DrawShow(*this);
+            if(m_pTabBar->currentIndex() != -1)
+                m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ItemWidget *>()->DrawShow(*this);
             
             m_ePrevDrawState = PROJDRAWSTATE_Nothing;
         }
@@ -344,9 +364,10 @@ void ItemProject::on_tabBar_currentChanged(int index)
 
 void ItemProject::on_save_triggered()
 {
-
+    HyGuiLog("Test", LOGTYPE_Error);
 }
 
 void ItemProject::on_saveAll_triggered()
 {
+    HyGuiLog("TestAll", LOGTYPE_Error);
 }

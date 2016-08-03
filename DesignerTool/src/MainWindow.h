@@ -36,6 +36,9 @@ class MainWindow : public QMainWindow
     HyGuiRenderer *     m_pCurRenderer;
     QMenu *             m_pCurEditMenu;
     
+    QAction *           m_pCurSaveAction;
+    QAction *           m_pCurSaveAllAction;
+    
     HyGuiDebugger *     m_pDebugConnection;
 
 public:
@@ -52,8 +55,6 @@ public:
     
     static void SetSelectedProj(ItemProject *pProj);
     static void ReloadHarmony();
-    
-    static void SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled);
 
 private slots:
     void on_actionNewProject_triggered();

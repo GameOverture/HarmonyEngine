@@ -63,6 +63,9 @@ public:
 
     WidgetAtlasManager &GetAtlasManager()               { return *m_pAtlasMan; }
     QTabBar *GetTabBar()                                { return m_pTabBar; }
+    
+    QList<QAction *> GetSaveActions();
+    void SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled);
 
     // IHyApplication overrides
     virtual bool Initialize();

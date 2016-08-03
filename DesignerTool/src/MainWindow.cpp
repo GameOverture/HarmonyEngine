@@ -63,7 +63,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->actionSave->setEnabled(false);
     ui->actionSaveAll->setEnabled(false);
     
-    //ui->menu_File->insertAction
+    m_pCurSaveAction = ui->actionSave;
+    m_pCurSaveAllAction = ui->actionSaveAll;
     
     // Link the actions to their proper widgets
     ui->explorer->addAction(ui->actionCloseProject);
@@ -212,8 +213,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurEditMenu = pItem->GetEditMenu();
     if(sm_pInstance->m_pCurEditMenu)
         sm_pInstance->ui->menuBar->insertMenu(sm_pInstance->ui->menu_View->menuAction(), sm_pInstance->m_pCurEditMenu);
-    
-    insert save actions here
 }
 
 /*static*/ void MainWindow::CloseItem(ItemWidget *pItem)
@@ -235,6 +234,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     {
         sm_pInstance->m_pCurSelectedProj->Reset();
 
+        // Insert the project's TabBar
         bool bTabsFound = false;
         for(int i = 0; i < sm_pInstance->ui->stackedTabWidgets->count(); ++i)
         {
@@ -244,12 +244,19 @@ void MainWindow::showEvent(QShowEvent *pEvent)
                 bTabsFound = true;
             }
         }
-
         if(bTabsFound == false)
         {
             sm_pInstance->ui->stackedTabWidgets->addWidget(pProj->GetTabBar());
             sm_pInstance->ui->stackedTabWidgets->setCurrentWidget(pProj->GetTabBar());
         }
+        
+        // Replace the save actions in the 'File' menu
+        QList<QAction *> projSaveActionList = sm_pInstance->m_pCurSelectedProj->GetSaveActions();
+        sm_pInstance->ui->menu_File->insertActions(sm_pInstance->m_pCurSaveAction, projSaveActionList);
+        sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAction);
+        sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAllAction);
+        sm_pInstance->m_pCurSaveAction = projSaveActionList[0];
+        sm_pInstance->m_pCurSaveAllAction = projSaveActionList[1];
     }
 
     // Swap the harmony engine renderers
@@ -274,12 +281,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurSelectedProj = NULL;    // Set m_pCurSelectedProj to 'NULL' so SetSelectedProj() doesn't imediately return
     
     SetSelectedProj(pCurItemProj);
-}
-
-/*static*/ void MainWindow::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
-{
-    sm_pInstance->ui->actionSave->setEnabled(bSaveEnabled);
-    sm_pInstance->ui->actionSaveAll->setEnabled(bSaveAllEnabled);
 }
 
 void MainWindow::on_actionNewProject_triggered()

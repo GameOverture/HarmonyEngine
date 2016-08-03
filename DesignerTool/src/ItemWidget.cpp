@@ -141,6 +141,6 @@ void ItemWidget::on_undoStack_cleanChanged(bool bClean)
         }
     }
     
-    MainWindow::SetSaveEnabled(bCurItemDirty, bAnyItemDirty);
+    pItemProj->SetSaveEnabled(bCurItemDirty, bAnyItemDirty);
 }
 
