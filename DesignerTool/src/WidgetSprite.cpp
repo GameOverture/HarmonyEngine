@@ -54,7 +54,15 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
     m_StateActionsList.push_back(ui->actionOrderFrameDownwards);
     
     ui->cmbStates->clear();
+}
 
+WidgetSprite::~WidgetSprite()
+{
+    delete ui;
+}
+
+void WidgetSprite::LoadAndInit()
+{
     // If a .hyspr file exists, parse and initalize with it, otherwise make default empty sprite
     QFile spriteFile(m_pItemSprite->GetAbsPath());
     if(spriteFile.exists())
@@ -78,7 +86,6 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
                 QList<quint32> requestList;
                 requestList.append(JSONOBJ_TOINT(spriteFrameObj, "hash"));
                 
-                chickenAndEggProblemHere-ItemWidget::Link not initalized
                 m_pItemSprite->GetAtlasManager().RequestFrames(m_pItemSprite, requestList);
                 
                 // TODO: set things like offset, rotation, duration, etc for each frame
@@ -96,11 +103,6 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
     m_pItemSprite->GetUndoStack()->clear();
 
     UpdateActions();
-}
-
-WidgetSprite::~WidgetSprite()
-{
-    delete ui;
 }
 
 void WidgetSprite::GetSpriteStateInfo(QJsonArray &spriteStateArrayRef)
@@ -124,14 +126,14 @@ QList<HyGuiFrame *> WidgetSprite::GetAllDrawInsts()
     QList<HyGuiFrame *> returnList;
     
     for(int i = 0; i < ui->cmbStates->count(); ++i)
-        ui->cmbStates->itemData(i).value<WidgetSpriteState *>()->AppendFramesToList(returnList);
+        ui->cmbStates->itemData(i).value<WidgetSpriteState *>()->AppendFramesToListRef(returnList);
     
     return returnList;
 }
 
 void WidgetSprite::on_actionAddState_triggered()
 {
-    QUndoCommand *pCmd = new ItemSpriteCmd_AddState(m_pItemSprite, m_StateActionsList, ui->cmbStates);
+    QUndoCommand *pCmd = new ItemSpriteCmd_AddState(m_StateActionsList, ui->cmbStates);
     m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
@@ -182,9 +184,9 @@ void WidgetSprite::on_actionImportFrames_triggered()
 void WidgetSprite::on_actionRemoveFrames_triggered()
 {
     WidgetSpriteState *pSpriteState = ui->cmbStates->itemData(ui->cmbStates->currentIndex()).value<WidgetSpriteState *>();
-    HyGuiFrame *pSelectredFrame = pSpriteState->SelectedFrame();
+    SpriteFrame *pSpriteFrame = pSpriteState->SelectedFrame();
 
-    QUndoCommand *pCmd = new ItemSpriteCmd_DeleteFrame(m_pItemSprite, pSelectredFrame);
+    QUndoCommand *pCmd = new ItemSpriteCmd_DeleteFrame(m_pItemSprite, pSpriteFrame->m_pFrame);
     m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();

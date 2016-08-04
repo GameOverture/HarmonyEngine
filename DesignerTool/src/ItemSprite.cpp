@@ -19,6 +19,7 @@
 ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : ItemWidget(ITEM_Sprite, sPath, atlasManRef)
 {
     m_pWidget = new WidgetSprite(this);
+    static_cast<WidgetSprite *>(m_pWidget)->LoadAndInit();
 
     glm::vec2 vLinePts[2];
     
@@ -46,17 +47,16 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
 {
     m_primOriginHorz.Load();
     m_primOriginVert.Load();
-    
-    QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
-    
-    for(int i = 0; i < frameList.count(); i++)
-        frameList[i]->DrawInst(this)->Load();
 }
 
 /*virtual*/ void ItemSprite::OnDraw_Unload(IHyApplication &hyApp)
 {
     m_primOriginHorz.Unload();
     m_primOriginVert.Unload();
+    
+    QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
+    for(int i = 0; i < frameList.count(); i++)
+        frameList[i]->DrawInst(this)->Unload();
 }
 
 /*virtual*/ void ItemSprite::OnDraw_Show(IHyApplication &hyApp)
@@ -69,11 +69,34 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
 {
     m_primOriginHorz.SetEnabled(false);
     m_primOriginVert.SetEnabled(false);
+    
+    QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
+    for(int i = 0; i < frameList.count(); i++)
+        frameList[i]->DrawInst(this)->SetEnabled(false);
 }
 
 /*virtual*/ void ItemSprite::OnDraw_Update(IHyApplication &hyApp)
 {
-    WidgetSprite *pWidgetSprite = static_cast<WidgetSprite *>(m_pWidget);
+    QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
+    for(int i = 0; i < frameList.count(); i++)
+        frameList[i]->DrawInst(this)->SetEnabled(false);
+    
+    WidgetSpriteState *pCurSpriteState = static_cast<WidgetSprite *>(m_pWidget)->GetCurSpriteState();
+    SpriteFrame *pSpriteFrame = pCurSpriteState->SelectedFrame();
+    
+    if(pSpriteFrame == NULL)
+        return;
+    
+    HyGuiFrame *pGuiFrame = pSpriteFrame->m_pFrame;
+    HyTexturedQuad2d *pDrawInst = pGuiFrame->DrawInst(this);
+    
+    pDrawInst->pos.X(pGuiFrame->GetCrop().x() + pSpriteFrame->m_ptOffset.x());
+    //pDrawInst->pos.Y(pGuiFrame->GetCrop().y() - pGuiFrame->GetCrop().bottom() + pSpriteFrame->m_ptOffset.y());
+    
+    if(pDrawInst->IsLoaded() == false)
+        pDrawInst->Load();
+    
+    pDrawInst->SetEnabled(true);
 }
 
 /*virtual*/ void ItemSprite::OnLink(HyGuiFrame *pFrame)

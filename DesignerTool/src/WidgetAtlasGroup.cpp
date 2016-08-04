@@ -278,9 +278,11 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
 
         HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiHash, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
         
-        newImage.save(m_MetaDir.path() % "/" % pNewFrame->ConstructImageFileName());
-        
-        m_FrameList.append(pNewFrame);
+        if(pNewFrame)
+        {
+            newImage.save(m_MetaDir.path() % "/" % pNewFrame->ConstructImageFileName());
+            m_FrameList.append(pNewFrame);
+        }
     }
 
     Refresh();

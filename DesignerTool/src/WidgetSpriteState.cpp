@@ -17,10 +17,9 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-WidgetSpriteState::WidgetSpriteState(ItemSprite *pItemSprite, QList<QAction *> stateActionList, QWidget *parent) :  QWidget(parent),
-                                                                                                                    m_pSpriteOwner(pItemSprite),
-                                                                                                                    ui(new Ui::WidgetSpriteState),
-                                                                                                                    m_sName("Unnamed")
+WidgetSpriteState::WidgetSpriteState(QList<QAction *> stateActionList, QWidget *parent) :   QWidget(parent),
+                                                                                            ui(new Ui::WidgetSpriteState),
+                                                                                            m_sName("Unnamed")
 {
     ui->setupUi(this);
 
@@ -39,10 +38,12 @@ WidgetSpriteState::WidgetSpriteState(ItemSprite *pItemSprite, QList<QAction *> s
 
 WidgetSpriteState::~WidgetSpriteState()
 {
-    while(m_pFrameList.empty() == false)
+    while(ui->frames->rowCount() != 0)
     {
-        delete m_pFrameList[m_pFrameList.count() - 1];
-        m_pFrameList.removeLast();
+        SpriteFrame *pSpriteFrame = ui->frames->item(ui->frames->rowCount() - 1, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>();
+        delete pSpriteFrame;
+        
+        ui->frames->removeRow(ui->frames->rowCount() - 1);
     }
 
     delete ui;
@@ -71,15 +72,18 @@ void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
         pFrameToInsert = iter.value();
         m_RemovedFrameMap.remove(pFrame->GetHash());
     }
-
+    
+    QTableWidgetItem *pColumnFrameTableWidgetItem = new QTableWidgetItem(pFrameToInsert->m_pFrame->GetName());
+    QVariant v;
+    v.setValue(pFrameToInsert);
+    pColumnFrameTableWidgetItem->setData(Qt::UserRole, v);
+    
     ui->frames->insertRow(pFrameToInsert->m_iRowIndex);
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Frame, pFrameToInsert->m_pTableItems[SpriteFrame::COLUMN_Frame]);
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Offset, pFrameToInsert->m_pTableItems[SpriteFrame::COLUMN_Offset]);
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Rotation, pFrameToInsert->m_pTableItems[SpriteFrame::COLUMN_Rotation]);
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Scale, pFrameToInsert->m_pTableItems[SpriteFrame::COLUMN_Scale]);
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Duration, pFrameToInsert->m_pTableItems[SpriteFrame::COLUMN_Duration]);
-
-    m_pFrameList.insert(pFrameToInsert->m_iRowIndex, pFrameToInsert);
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Frame, pColumnFrameTableWidgetItem);
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Offset, new QTableWidgetItem(PointToQString(pFrameToInsert->m_ptOffset)));
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Rotation, new QTableWidgetItem(QString::number(pFrameToInsert->m_fRotation, 'g', 2)));
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Scale, new QTableWidgetItem(PointToQString(pFrameToInsert->m_ptScale)));
+    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Duration, new QTableWidgetItem(QString::number(pFrameToInsert->m_fDuration, 'g', 2)));
 
     ui->frames->selectRow(0);
 }
@@ -88,20 +92,24 @@ void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
 {
     for(int i = 0; i < ui->frames->rowCount(); ++i)
     {
-        if(ui->frames->item(i, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<HyGuiFrame *>() == pFrame)
+        SpriteFrame *pSpriteFrame = ui->frames->item(i, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>();
+        
+        if(pSpriteFrame->m_pFrame == pFrame)
         {
+            m_RemovedFrameMap[pFrame->GetHash()] = pSpriteFrame;
             ui->frames->removeRow(i);
-
-            m_RemovedFrameMap[pFrame->GetHash()] = m_pFrameList[i];
-            m_pFrameList.removeAt(i);
             break;
         }
     }
 }
 
-HyGuiFrame *WidgetSpriteState::SelectedFrame()
+SpriteFrame *WidgetSpriteState::SelectedFrame()
 {
-    return ui->frames->item(ui->frames->currentRow(), SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<HyGuiFrame *>();
+    if(ui->frames->rowCount() == 0)
+        return NULL;
+    
+    SpriteFrame *pSpriteFrame = ui->frames->item(ui->frames->currentRow(), SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>();
+    return pSpriteFrame;
 }
 
 int WidgetSpriteState::SelectedIndex()
@@ -109,27 +117,28 @@ int WidgetSpriteState::SelectedIndex()
     return ui->frames->currentRow();
 }
 
-void WidgetSpriteState::AppendFramesToList(QList<HyGuiFrame *> &drawInstListRef)
+void WidgetSpriteState::AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef)
 {
-    for(int i = 0; i < m_pFrameList.count(); ++i)
-        drawInstListRef.append(m_pFrameList[i]->m_pFrame);
+    for(int i = 0; i < ui->frames->rowCount(); ++i)
+        drawInstListRef.append(ui->frames->item(i, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>()->m_pFrame);
 }
 
 void WidgetSpriteState::GetStateFrameInfo(QJsonArray &stateArrayOut)
 {
-    for(int i = 0; i < m_pFrameList.count(); ++i)
+    for(int i = 0; i < ui->frames->rowCount(); ++i)
     {
+        SpriteFrame *pSpriteFrame = ui->frames->item(i, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>();
         QJsonObject frameObj;
 
-        frameObj.insert("duration", QJsonValue(m_pFrameList[i]->m_fDuration));
-        frameObj.insert("rotation", QJsonValue(m_pFrameList[i]->m_fRotation));
-        frameObj.insert("offsetX", QJsonValue(m_pFrameList[i]->m_ptOffset.x()));
-        frameObj.insert("offsetY", QJsonValue(m_pFrameList[i]->m_ptOffset.y()));
-        frameObj.insert("scaleX", QJsonValue(m_pFrameList[i]->m_ptScale.x()));
-        frameObj.insert("scaleY", QJsonValue(m_pFrameList[i]->m_ptScale.y()));
+        frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));
+        frameObj.insert("rotation", QJsonValue(pSpriteFrame->m_fRotation));
+        frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_ptOffset.x()));
+        frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_ptOffset.y()));
+        frameObj.insert("scaleX", QJsonValue(pSpriteFrame->m_ptScale.x()));
+        frameObj.insert("scaleY", QJsonValue(pSpriteFrame->m_ptScale.y()));
         
-        frameObj.insert("hash", QJsonValue(static_cast<qint64>(m_pFrameList[i]->m_pFrame->GetHash())));
-        frameObj.insert("atlasGroupId", QJsonValue(m_pFrameList[i]->m_pFrame->GetAtlasGroupdId()));
+        frameObj.insert("hash", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetHash())));
+        frameObj.insert("atlasGroupId", QJsonValue(pSpriteFrame->m_pFrame->GetAtlasGroupdId()));
 
         stateArrayOut.append(frameObj);
     }

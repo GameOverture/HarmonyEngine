@@ -34,3 +34,8 @@ char *QStringToCharPtr(QString sString)
     ba.append(sString);
     return ba.data();
 }
+
+QString PointToQString(QPointF ptPoint)
+{
+    return QString::number(ptPoint.x(), 'g', 2) % ", " % QString::number(ptPoint.y(), 'g', 2);
+}

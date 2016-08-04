@@ -22,9 +22,9 @@ void EnsureProperNamingInComboBox(QComboBox *pCmb)
     }
 }
 
-ItemSpriteCmd_AddState::ItemSpriteCmd_AddState(ItemSprite *pItemSprite, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                                                                            m_pComboBox(pCmb),
-                                                                                                                                                            m_pSpriteState(new WidgetSpriteState(pItemSprite, stateActionList))
+ItemSpriteCmd_AddState::ItemSpriteCmd_AddState(QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+                                                                                                                                    m_pComboBox(pCmb),
+                                                                                                                                    m_pSpriteState(new WidgetSpriteState(stateActionList))
 {
     setText("Add Sprite State");
 }

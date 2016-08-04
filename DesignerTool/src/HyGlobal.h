@@ -81,6 +81,8 @@ QAction *FindAction(QList<QAction *> list, QString sName);
 
 char *QStringToCharPtr(QString sString);
 
+QString PointToQString(QPointF ptPoint);
+
 class HyGlobal
 {
     static QString                  sm_sItemNames[NUMITEM];

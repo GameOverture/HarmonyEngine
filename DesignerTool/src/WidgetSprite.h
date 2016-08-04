@@ -36,6 +36,8 @@ class WidgetSprite : public QWidget
 public:
     explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
+    
+    void LoadAndInit();
 
     void GetSpriteStateInfo(QJsonArray &spriteStateArrayRef);
     
