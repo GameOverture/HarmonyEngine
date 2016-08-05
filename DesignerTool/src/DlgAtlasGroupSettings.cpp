@@ -12,12 +12,13 @@
 
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMessageBox>
 
 #include "HyGlobal.h"
 
-DlgAtlasGroupSettings::DlgAtlasGroupSettings(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::DlgAtlasGroupSettings)
+DlgAtlasGroupSettings::DlgAtlasGroupSettings(QWidget *parent) : QDialog(parent),
+                                                                ui(new Ui::DlgAtlasGroupSettings),
+                                                                m_bSettingsDirty(false)
 {
     ui->setupUi(this);
     DataFromWidgets();
@@ -67,6 +68,8 @@ void DlgAtlasGroupSettings::DataToWidgets()
     ui->sbTextureWidth->setValue(m_iTextureWidth);
     ui->sbTextureHeight->setValue(m_iTextureHeight);
     ui->cmbHeuristic->setCurrentIndex(m_iHeuristicIndex);
+    
+    m_bSettingsDirty = false;
 }
 
 QString DlgAtlasGroupSettings::GetName()
@@ -81,17 +84,17 @@ void DlgAtlasGroupSettings::SetName(QString sName)
 
 int DlgAtlasGroupSettings::TextureWidth()
 {
-    return m_iTextureWidth;//ui->sbTextureWidth->value();
+    return m_iTextureWidth;
 }
 
 int DlgAtlasGroupSettings::TextureHeight()
 {
-    return m_iTextureHeight;//ui->sbTextureHeight->value();
+    return m_iTextureHeight;
 }
 
 int DlgAtlasGroupSettings::GetHeuristic()
 {
-    return m_iHeuristicIndex;//ui->cmbHeuristic->currentIndex();
+    return m_iHeuristicIndex;
 }
 
 void DlgAtlasGroupSettings::SetPackerSettings(ImagePacker *pPacker)
@@ -156,109 +159,57 @@ void DlgAtlasGroupSettings::LoadSettings(QJsonObject settings)
     m_iHeuristicIndex = JSONOBJ_TOINT(settings, "cmbHeuristic");
 }
 
-void DlgAtlasGroupSettings::on_cmbSortOrder_currentIndexChanged(int index)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_cmbRotationStrategy_currentIndexChanged(int index)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_cmbHeuristic_currentIndexChanged(int index)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_alphaThreshold_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_extrude_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_minFillRate_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_chkMerge_stateChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_chkAutosize_stateChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_chkSquare_stateChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_sbFrameMarginTop_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_sbFrameMarginLeft_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_sbFrameMarginRight_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_sbFrameMarginBottom_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_sbTextureWidth_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_sbTextureHeight_valueChanged(int arg1)
-{
-    m_bSettingsDirty = true;
-}
-
-void DlgAtlasGroupSettings::on_btnMatchTextureWidthHeight_clicked()
-{
-    m_bSettingsDirty = true;
-}
-
 void DlgAtlasGroupSettings::on_btnTexSize256_clicked()
 {
-    m_bSettingsDirty = true;
+    ui->sbTextureWidth->setValue(256);
+    ui->sbTextureHeight->setValue(256);
 }
 
 void DlgAtlasGroupSettings::on_btnTexSize512_clicked()
 {
-    m_bSettingsDirty = true;
+    ui->sbTextureWidth->setValue(512);
+    ui->sbTextureHeight->setValue(512);
 }
 
 void DlgAtlasGroupSettings::on_btnTexSize1024_clicked()
 {
-    m_bSettingsDirty = true;
+    ui->sbTextureWidth->setValue(1024);
+    ui->sbTextureHeight->setValue(1024);
 }
 
 void DlgAtlasGroupSettings::on_btnTexSize2048_clicked()
 {
-    m_bSettingsDirty = true;
+    ui->sbTextureWidth->setValue(2048);
+    ui->sbTextureHeight->setValue(2048);
 }
 
 void DlgAtlasGroupSettings::on_buttonBox_accepted()
 {
-    DataFromWidgets();
+    m_bSettingsDirty = false;
+    
+    if(m_iTextureWidth != ui->sbTextureWidth->value() ||
+       m_iTextureHeight != ui->sbTextureHeight->value() ||
+       m_iHeuristicIndex != ui->cmbHeuristic->currentIndex() ||
+       m_iSortOrderIndex != ui->cmbSortOrder->currentIndex() ||
+       m_iFrameMarginTop != ui->sbFrameMarginTop->value() ||
+       m_iFrameMarginLeft != ui->sbFrameMarginLeft->value() ||
+       m_iFrameMarginRight != ui->sbFrameMarginRight->value() ||
+       m_iFrameMarginBottom != ui->sbFrameMarginBottom->value() ||
+       m_iExtrude != ui->extrude->value() ||
+       m_bMerge != ui->chkMerge->isChecked() ||
+       m_bAutoSize != ui->chkAutosize->isChecked() ||
+       m_bSquare != ui->chkSquare->isChecked() ||
+       m_iFillRate != ui->minFillRate->value() ||
+       m_iRotationStrategyIndex != ui->cmbRotationStrategy->currentIndex())
+    {
+        if(QMessageBox::Ok == QMessageBox::warning(NULL, QString("Save Atlas Group Settings?"), QString("By modifying the Atlas Group settings, it is required to regenerate the entire Atlas Group."), QMessageBox::Ok, QMessageBox::Cancel))
+        {
+            DataFromWidgets();
+            m_bSettingsDirty = true;
+        }
+        else
+            DataToWidgets();
+    }
 }
 
 void DlgAtlasGroupSettings::on_buttonBox_rejected()

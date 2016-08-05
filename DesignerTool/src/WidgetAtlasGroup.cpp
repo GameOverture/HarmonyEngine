@@ -554,7 +554,10 @@ void WidgetAtlasGroup::on_btnSettings_clicked()
         m_dlgSettings.SetName("Atlas Group " % QString::number(GetId()));
 
     m_dlgSettings.DataToWidgets();
-    m_dlgSettings.exec();
+    if(QDialog::Accepted == m_dlgSettings.exec() && m_dlgSettings.IsSettingsDirty())
+    {
+        Refresh();
+    }
 }
 
 void WidgetAtlasGroup::on_atlasList_itemSelectionChanged()

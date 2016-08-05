@@ -52,12 +52,20 @@
        <property name="text">
         <string>&lt;</string>
        </property>
+       <property name="icon">
+        <iconset resource="res/DesignerTool.qrc">
+         <normaloff>:/icons16x16/generic-left.png</normaloff>:/icons16x16/generic-left.png</iconset>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QToolButton" name="btnAddGroup">
        <property name="text">
         <string>+</string>
+       </property>
+       <property name="icon">
+        <iconset resource="res/DesignerTool.qrc">
+         <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
        </property>
       </widget>
      </item>
@@ -66,12 +74,20 @@
        <property name="text">
         <string>-</string>
        </property>
+       <property name="icon">
+        <iconset resource="res/DesignerTool.qrc">
+         <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QToolButton" name="btnNextGroup">
        <property name="text">
         <string>&gt;</string>
+       </property>
+       <property name="icon">
+        <iconset resource="res/DesignerTool.qrc">
+         <normaloff>:/icons16x16/generic-right.png</normaloff>:/icons16x16/generic-right.png</iconset>
        </property>
       </widget>
      </item>
@@ -92,6 +108,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="res/DesignerTool.qrc"/>
+ </resources>
  <connections/>
 </ui>
