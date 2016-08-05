@@ -46,6 +46,8 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
 
     m_FrameList.clear();
     ui->atlasList->clear();
+    
+    int iNumTextures = 0;
 
     QFile metaAtlasFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaAtlasSettings));
     if(metaAtlasFile.exists())
@@ -88,6 +90,9 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
             int iTexIndex = frameObj["textureIndex"].toInt();
             if(iTexIndex >= 0)
             {
+                if(iNumTextures < iTexIndex+1)
+                    iNumTextures = iTexIndex+1;
+                
                 //while(m_TextureList.empty() || m_TextureList.size() <= frameObj["textureIndex"].toInt())
                 //    m_TextureList.append(CreateTreeItem(NULL, "Texture: " % QString::number(m_TextureList.size()), ATLAS_Texture));
 
@@ -105,6 +110,10 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
         ui->atlasList->sortItems(0, Qt::AscendingOrder);
         ui->atlasList->expandAll();
     }
+    
+    ui->lcdNumTextures->display(iNumTextures);
+    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
+    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
 }
 
 WidgetAtlasGroup::~WidgetAtlasGroup()
@@ -250,7 +259,6 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
 
 /*virtual*/ void WidgetAtlasGroup::enterEvent(QEvent *pEvent)
 {
-    HyGuiLog("AtlasGroup mouseMoveEvent(): Enter", LOGTYPE_Normal);
     WidgetAtlasManager *pAtlasMan = static_cast<WidgetAtlasManager *>(parent()->parent());
 
     pAtlasMan->PreviewAtlasGroup();
@@ -259,7 +267,6 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
 
 /*virtual*/ void WidgetAtlasGroup::leaveEvent(QEvent *pEvent)
 {
-    HyGuiLog("AtlasGroup mouseMoveEvent(): Leave", LOGTYPE_Normal);
     WidgetAtlasManager *pAtlasMan = static_cast<WidgetAtlasManager *>(parent()->parent());
     
     pAtlasMan->HideAtlasGroup();
@@ -521,6 +528,10 @@ void WidgetAtlasGroup::Refresh()
 
     ui->atlasList->expandAll();
     ui->atlasList->sortItems(0, Qt::AscendingOrder);
+    
+    ui->lcdNumTextures->display(m_Packer.bins.size());
+    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
+    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
 }
 
 void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType, HyGuiFrame *pFrame)

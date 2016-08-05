@@ -401,22 +401,12 @@ void WidgetAtlasManager::HideAtlasGroup()
     {
         if(pHoveredFrame != pFrame && pFrame)
         {
-//            void Reset()
-//            {
-//                SetEnabled(false);
-//                SetDisplayOrder(0);
-//                color.Set(1.0f, 1.0f, 1.0f, 1.0f);
-//                SetCoordinateType(HYCOORDTYPE_Screen, NULL);
-//            }
             pFrame->DrawInst(&atlasMan)->SetEnabled(false);
             pFrame->DrawInst(&atlasMan)->SetDisplayOrder(0);
             pFrame->DrawInst(&atlasMan)->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
             pFrame->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
         }
     }
-    
-    if(bDebugPrint)
-        HyGuiLog(QString::number(reinterpret_cast<qulonglong>(atlasMan.m_pMouseHoverItem)), LOGTYPE_Normal);
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
