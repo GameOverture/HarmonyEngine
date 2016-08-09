@@ -114,6 +114,8 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
     ui->lcdNumTextures->display(iNumTextures);
     ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
     ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
+
+    ResizeAtlasListColumns();
 }
 
 WidgetAtlasGroup::~WidgetAtlasGroup()
@@ -271,6 +273,18 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
     
     pAtlasMan->HideAtlasGroup();
     QWidget::leaveEvent(pEvent);
+}
+
+/*virtual*/ void WidgetAtlasGroup::resizeEvent(QResizeEvent * event)
+{
+    ResizeAtlasListColumns();
+    QWidget::resizeEvent(event);
+}
+
+/*virtual*/ void WidgetAtlasGroup::showEvent(QShowEvent * event)
+{
+    ResizeAtlasListColumns();
+    QWidget::showEvent(event);
 }
 
 void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)

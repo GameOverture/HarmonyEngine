@@ -71,6 +71,9 @@ protected:
     virtual void enterEvent(QEvent *pEvent);
     virtual void leaveEvent(QEvent *pEvent);
 
+    virtual void showEvent(QShowEvent * event);
+    virtual void resizeEvent(QResizeEvent * event);
+
 private:
     Ui::WidgetAtlasGroup *ui;
     
