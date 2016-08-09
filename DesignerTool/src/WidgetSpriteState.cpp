@@ -12,14 +12,16 @@
 
 #include "HyGlobal.h"
 #include "ItemSprite.h"
+#include "WidgetSprite.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 
-WidgetSpriteState::WidgetSpriteState(QList<QAction *> stateActionList, QWidget *parent) :   QWidget(parent),
-                                                                                            ui(new Ui::WidgetSpriteState),
-                                                                                            m_sName("Unnamed")
+WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stateActionList, QWidget *parent) : QWidget(parent),
+                                                                                                                m_pOwner(pOwner),
+                                                                                                                ui(new Ui::WidgetSpriteState),
+                                                                                                                m_sName("Unnamed")
 {
     ui->setupUi(this);
 
@@ -103,7 +105,7 @@ void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
     }
 }
 
-SpriteFrame *WidgetSpriteState::SelectedFrame()
+SpriteFrame *WidgetSpriteState::GetSelectedFrame()
 {
     if(ui->frames->rowCount() == 0)
         return NULL;
@@ -112,9 +114,24 @@ SpriteFrame *WidgetSpriteState::SelectedFrame()
     return pSpriteFrame;
 }
 
-int WidgetSpriteState::SelectedIndex()
+int WidgetSpriteState::GetSelectedIndex()
 {
     return ui->frames->currentRow();
+}
+
+void WidgetSpriteState::SelectIndex(int iIndex)
+{
+    ui->frames->selectRow(iIndex);
+}
+
+int WidgetSpriteState::GetNumFrames()
+{
+    return ui->frames->rowCount();
+}
+
+QTableWidget *WidgetSpriteState::GetFrameList()
+{
+    return ui->frames;
 }
 
 void WidgetSpriteState::AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef)
@@ -142,4 +159,9 @@ void WidgetSpriteState::GetStateFrameInfo(QJsonArray &stateArrayOut)
 
         stateArrayOut.append(frameObj);
     }
+}
+
+void WidgetSpriteState::on_frames_itemSelectionChanged()
+{
+    m_pOwner->UpdateActions();
 }

@@ -22,14 +22,14 @@ void EnsureProperNamingInComboBox(QComboBox *pCmb)
     }
 }
 
-ItemSpriteCmd_AddState::ItemSpriteCmd_AddState(QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
-                                                                                                                                    m_pComboBox(pCmb),
-                                                                                                                                    m_pSpriteState(new WidgetSpriteState(stateActionList))
+ItemSpriteCmd_AddState::ItemSpriteCmd_AddState(WidgetSprite *pOwner, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                                                            m_pComboBox(pCmb),
+                                                                                                                                                            m_pSpriteState(new WidgetSpriteState(pOwner, stateActionList))
 {
     setText("Add Sprite State");
 }
 
-ItemSpriteCmd_AddState::~ItemSpriteCmd_AddState()
+/*virtual*/ ItemSpriteCmd_AddState::~ItemSpriteCmd_AddState()
 {
 }
 
@@ -64,7 +64,7 @@ ItemSpriteCmd_RemoveState::ItemSpriteCmd_RemoveState(QComboBox *pCmb, QUndoComma
     setText("Remove Sprite State");
 }
 
-ItemSpriteCmd_RemoveState::~ItemSpriteCmd_RemoveState()
+/*virtual*/ ItemSpriteCmd_RemoveState::~ItemSpriteCmd_RemoveState()
 {
 }
 
@@ -96,7 +96,7 @@ ItemSpriteCmd_RenameState::ItemSpriteCmd_RenameState(QComboBox *pCmb, QString sN
     setText("Rename Sprite State");
 }
 
-ItemSpriteCmd_RenameState::~ItemSpriteCmd_RenameState()
+/*virtual*/ ItemSpriteCmd_RenameState::~ItemSpriteCmd_RenameState()
 {
 }
 
@@ -120,7 +120,7 @@ ItemSpriteCmd_MoveStateBack::ItemSpriteCmd_MoveStateBack(QComboBox *pCmb, QUndoC
     setText("Shift State Index <-");
 }
 
-ItemSpriteCmd_MoveStateBack::~ItemSpriteCmd_MoveStateBack()
+/*virtual*/ ItemSpriteCmd_MoveStateBack::~ItemSpriteCmd_MoveStateBack()
 {
 }
 
@@ -162,7 +162,7 @@ ItemSpriteCmd_MoveStateForward::ItemSpriteCmd_MoveStateForward(QComboBox *pCmb, 
     setText("Shift State Index ->");
 }
 
-ItemSpriteCmd_MoveStateForward::~ItemSpriteCmd_MoveStateForward()
+/*virtual*/ ItemSpriteCmd_MoveStateForward::~ItemSpriteCmd_MoveStateForward()
 {
 }
 
@@ -204,7 +204,7 @@ ItemSpriteCmd_AddFrames::ItemSpriteCmd_AddFrames(ItemWidget *pItem, QUndoCommand
     m_Frames.clear();
 }
 
-ItemSpriteCmd_AddFrames::~ItemSpriteCmd_AddFrames()
+/*virtual*/ ItemSpriteCmd_AddFrames::~ItemSpriteCmd_AddFrames()
 {
 }
 
@@ -226,7 +226,7 @@ ItemSpriteCmd_DeleteFrame::ItemSpriteCmd_DeleteFrame(ItemWidget *pItem, HyGuiFra
     m_Frames.append(pFrame);
 }
 
-ItemSpriteCmd_DeleteFrame::~ItemSpriteCmd_DeleteFrame()
+/*virtual*/ ItemSpriteCmd_DeleteFrame::~ItemSpriteCmd_DeleteFrame()
 {
 }
 
@@ -241,24 +241,72 @@ void ItemSpriteCmd_DeleteFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemSpriteCmd_MoveFrameUp::ItemSpriteCmd_MoveFrameUp(QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
+ItemSpriteCmd_OrderFrame::ItemSpriteCmd_OrderFrame(WidgetSpriteState *pSpriteState, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                                                    m_pSpriteState(pSpriteState),
+                                                                                                                                                                    m_iFrameIndex(iFrameIndex),
+                                                                                                                                                                    m_iFrameIndexDest(iFrameIndexDestination)
+{
+    if(m_iFrameIndex > m_iFrameIndexDest)
+        setText("Order Frame Upwards");
+    else
+        setText("Order Frame Downwards");
+}
+
+/*virtual*/ ItemSpriteCmd_OrderFrame::~ItemSpriteCmd_OrderFrame()
 {
 }
-ItemSpriteCmd_MoveFrameUp::~ItemSpriteCmd_MoveFrameUp()
+
+void ItemSpriteCmd_OrderFrame::redo()
 {
+    QTableWidget *pFrameList = m_pSpriteState->GetFrameList();
+    
+    // Take the items
+    QList<QTableWidgetItem*> srcRowList;
+    for(int i = 0; i < pFrameList->columnCount(); ++i)
+        srcRowList.append(pFrameList->takeItem(m_iFrameIndex, i));
+    
+    QList<QTableWidgetItem*> destRowList;
+    for(int i = 0; i < pFrameList->columnCount(); ++i)
+        destRowList.append(pFrameList->takeItem(m_iFrameIndexDest, i));
+    
+    // Set the items back in reverse order
+    for(int i = 0; i < pFrameList->columnCount(); ++i)
+        pFrameList->setItem(m_iFrameIndex, i, destRowList[i]);
+    
+    for(int i = 0; i < pFrameList->columnCount(); ++i)
+        pFrameList->setItem(m_iFrameIndexDest, i, srcRowList[i]);
+    
+    m_pSpriteState->SelectIndex(m_iFrameIndexDest);
 }
-void ItemSpriteCmd_MoveFrameUp::undo()
+
+void ItemSpriteCmd_OrderFrame::undo()
 {
-}
-void ItemSpriteCmd_MoveFrameUp::redo()
-{
+    QTableWidget *pFrameList = m_pSpriteState->GetFrameList();
+    
+    // Take the items
+    QList<QTableWidgetItem*> srcRowList;
+    for(int i = 0; i < pFrameList->columnCount(); ++i)
+        srcRowList.append(pFrameList->takeItem(m_iFrameIndexDest, i));
+    
+    QList<QTableWidgetItem*> destRowList;
+    for(int i = 0; i < pFrameList->columnCount(); ++i)
+        destRowList.append(pFrameList->takeItem(m_iFrameIndex, i));
+    
+    // Set the items back in reverse order
+    for(int i = 0; i < pFrameList->columnCount(); ++i)
+        pFrameList->setItem(m_iFrameIndexDest, i, destRowList[i]);
+    
+    for(int i = 0; i < pFrameList->columnCount(); ++i)
+        pFrameList->setItem(m_iFrameIndex, i, srcRowList[i]);
+    
+    m_pSpriteState->SelectIndex(m_iFrameIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ItemSpriteCmd_MoveFrameDown::ItemSpriteCmd_MoveFrameDown(QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
 {
 }
-ItemSpriteCmd_MoveFrameDown::~ItemSpriteCmd_MoveFrameDown()
+/*virtual*/ ItemSpriteCmd_MoveFrameDown::~ItemSpriteCmd_MoveFrameDown()
 {
 }
 void ItemSpriteCmd_MoveFrameDown::undo()

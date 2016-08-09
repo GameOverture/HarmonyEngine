@@ -14,7 +14,9 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QAction>
+#include <QTableWidget>
 
+class WidgetSprite;
 class WidgetSpriteState;
 class ItemWidget;
 class WidgetAtlasManager;
@@ -28,8 +30,8 @@ class ItemSpriteCmd_AddState : public QUndoCommand
     WidgetSpriteState * m_pSpriteState;
     
 public:
-    ItemSpriteCmd_AddState(QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_AddState();
+    ItemSpriteCmd_AddState(WidgetSprite *pOwner, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent = 0);
+    virtual ~ItemSpriteCmd_AddState();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
@@ -44,7 +46,7 @@ class ItemSpriteCmd_RemoveState : public QUndoCommand
     
 public:
     ItemSpriteCmd_RemoveState(QComboBox *pCmb, QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_RemoveState();
+    virtual ~ItemSpriteCmd_RemoveState();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
@@ -60,7 +62,7 @@ class ItemSpriteCmd_RenameState : public QUndoCommand
     
 public:
     ItemSpriteCmd_RenameState(QComboBox *pCmb, QString sNewName, QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_RenameState();
+    virtual ~ItemSpriteCmd_RenameState();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
@@ -74,7 +76,7 @@ class ItemSpriteCmd_MoveStateBack : public QUndoCommand
     
 public:
     ItemSpriteCmd_MoveStateBack(QComboBox *pCmb, QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_MoveStateBack();
+    virtual ~ItemSpriteCmd_MoveStateBack();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
@@ -88,7 +90,7 @@ class ItemSpriteCmd_MoveStateForward : public QUndoCommand
     
 public:
     ItemSpriteCmd_MoveStateForward(QComboBox *pCmb, QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_MoveStateForward();
+    virtual ~ItemSpriteCmd_MoveStateForward();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
@@ -102,7 +104,7 @@ class ItemSpriteCmd_ToggleStateReverse : public QUndoCommand
     
 public:
     ItemSpriteCmd_ToggleStateReverse(QCheckBox *pCmb, QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_ToggleStateReverse();
+    virtual ~ItemSpriteCmd_ToggleStateReverse();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
@@ -117,7 +119,7 @@ class ItemSpriteCmd_AddFrames : public QUndoCommand
     
 public:
     ItemSpriteCmd_AddFrames(ItemWidget *pItem, QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_AddFrames();
+    virtual ~ItemSpriteCmd_AddFrames();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
@@ -131,21 +133,25 @@ class ItemSpriteCmd_DeleteFrame : public QUndoCommand
 
 public:
     ItemSpriteCmd_DeleteFrame(ItemWidget *pItem, HyGuiFrame *pFrame, QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_DeleteFrame();
+    virtual ~ItemSpriteCmd_DeleteFrame();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ItemSpriteCmd_MoveFrameUp : public QUndoCommand
+class ItemSpriteCmd_OrderFrame : public QUndoCommand
 {
+    WidgetSpriteState *                     m_pSpriteState;
+    int                                     m_iFrameIndex;
+    int                                     m_iFrameIndexDest;
+    
 public:
-    ItemSpriteCmd_MoveFrameUp(QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_MoveFrameUp();
+    ItemSpriteCmd_OrderFrame(WidgetSpriteState *pSpriteState, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent = 0);
+    virtual ~ItemSpriteCmd_OrderFrame();
 
-    void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -153,7 +159,7 @@ class ItemSpriteCmd_MoveFrameDown : public QUndoCommand
 {
 public:
     ItemSpriteCmd_MoveFrameDown(QUndoCommand *pParent = 0);
-    ~ItemSpriteCmd_MoveFrameDown();
+    virtual ~ItemSpriteCmd_MoveFrameDown();
 
     void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;

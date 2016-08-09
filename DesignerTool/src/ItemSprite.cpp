@@ -43,6 +43,19 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
 {
 }
 
+/*virtual*/ QList<QAction *> ItemSprite::GetActionsForToolBar()
+{
+    QList<QAction *> returnList;
+    
+    returnList.append(FindAction(m_pEditMenu->actions(), "Undo"));
+    returnList.append(FindAction(m_pEditMenu->actions(), "Redo"));
+    returnList.append(FindAction(m_pEditMenu->actions(), "UndoSeparator"));
+    
+    static_cast<WidgetSprite *>(m_pWidget)->AppendActionsForToolBar(returnList);
+    
+    return returnList;
+}
+
 /*virtual*/ void ItemSprite::OnDraw_Load(IHyApplication &hyApp)
 {
     m_primOriginHorz.Load();
@@ -82,7 +95,7 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
         frameList[i]->DrawInst(this)->SetEnabled(false);
     
     WidgetSpriteState *pCurSpriteState = static_cast<WidgetSprite *>(m_pWidget)->GetCurSpriteState();
-    SpriteFrame *pSpriteFrame = pCurSpriteState->SelectedFrame();
+    SpriteFrame *pSpriteFrame = pCurSpriteState->GetSelectedFrame();
     
     if(pSpriteFrame == NULL)
         return;

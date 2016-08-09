@@ -39,6 +39,8 @@ class MainWindow : public QMainWindow
     QAction *           m_pCurSaveAction;
     QAction *           m_pCurSaveAllAction;
     
+    QList<QAction *>    m_ToolBarItemActionsList;   // Used to append/remove the current item's actions to the main tool bar
+    
     HyGuiDebugger *     m_pDebugConnection;
 
 public:
@@ -49,7 +51,6 @@ public:
 
     static MainWindow *GetInstance();   // Should only be used to set QWidget parents
     
-    // This only requests to the WidgetRenderer to open/close the item. It will eventually do so, after re-loading any resources if need be
     static void OpenItem(ItemWidget *pItem);
     static void CloseItem(ItemWidget *pItem);
     

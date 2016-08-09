@@ -41,6 +41,7 @@ protected:
 
     QWidget *           m_pWidget;
     QMenu *             m_pEditMenu;
+    QMenu *             m_pItemMenu;
     QUndoStack *        m_pUndoStack;
 
     QSet<HyGuiFrame *>  m_Links;
@@ -69,6 +70,8 @@ public:
     QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
 
     WidgetAtlasManager &GetAtlasManager()           { return m_AtlasManRef; }
+    
+    virtual QList<QAction *> GetActionsForToolBar() = 0;
     
     void Save();
 

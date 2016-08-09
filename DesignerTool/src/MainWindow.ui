@@ -111,6 +111,7 @@
    <addaction name="actionCloseProject"/>
    <addaction name="separator"/>
    <addaction name="actionConnect"/>
+   <addaction name="separator"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidgetExplorer">

@@ -282,6 +282,105 @@
     <string>Del, Backspace</string>
    </property>
   </action>
+  <action name="actionAlignLeft">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/sprite-alignLeft.png</normaloff>:/icons16x16/sprite-alignLeft.png</iconset>
+   </property>
+   <property name="text">
+    <string>Align Left</string>
+   </property>
+   <property name="toolTip">
+    <string>Aligns the sprite's left side to its origin</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Left</string>
+   </property>
+  </action>
+  <action name="actionAlignRight">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/sprite-alignRight.png</normaloff>:/icons16x16/sprite-alignRight.png</iconset>
+   </property>
+   <property name="text">
+    <string>Align Right</string>
+   </property>
+   <property name="toolTip">
+    <string>Aligns the sprite's right side to its origin</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Right</string>
+   </property>
+  </action>
+  <action name="actionAlignUp">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/sprite-alignUp.png</normaloff>:/icons16x16/sprite-alignUp.png</iconset>
+   </property>
+   <property name="text">
+    <string>Align Up</string>
+   </property>
+   <property name="toolTip">
+    <string>Aligns the sprite's top side to its origin</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Up</string>
+   </property>
+  </action>
+  <action name="actionAlignDown">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/sprite-alignBottom.Image.png</normaloff>:/icons16x16/sprite-alignBottom.Image.png</iconset>
+   </property>
+   <property name="text">
+    <string>Align Down</string>
+   </property>
+   <property name="toolTip">
+    <string>Aligns the sprite's bottom side to its origin</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Down</string>
+   </property>
+  </action>
+  <action name="actionAlignCenterVertical">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/sprite-alignVertCenter.png</normaloff>:/icons16x16/sprite-alignVertCenter.png</iconset>
+   </property>
+   <property name="text">
+    <string>Align Center Vertical</string>
+   </property>
+   <property name="toolTip">
+    <string>Centers the sprite vertically to its origin</string>
+   </property>
+  </action>
+  <action name="actionAlignCenterHorizontal">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/sprite-alignHorzCenter.png</normaloff>:/icons16x16/sprite-alignHorzCenter.png</iconset>
+   </property>
+   <property name="text">
+    <string>Align Center Horizontal</string>
+   </property>
+   <property name="toolTip">
+    <string>Centers the sprite horizontally to its origin</string>
+   </property>
+  </action>
+  <action name="actionApplyToAll">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/sprite-applyToAll.png</normaloff>:/icons16x16/sprite-applyToAll.png</iconset>
+   </property>
+   <property name="text">
+    <string>Apply to all</string>
+   </property>
+   <property name="toolTip">
+    <string>Applys alignment to all frames in sprite state</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>btnRenameSprite</tabstop>

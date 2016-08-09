@@ -22,15 +22,19 @@ namespace Ui {
 class WidgetSpriteState;
 }
 
+class WidgetSprite;
+
 class WidgetSpriteState : public QWidget
 {
     Q_OBJECT
 
+    WidgetSprite *                      m_pOwner;
+    
     QString                             m_sName;
     QMap<quint32, SpriteFrame *>        m_RemovedFrameMap;  // Used to reinsert frames (via undo/redo) while keeping their attributes
 
 public:
-    explicit WidgetSpriteState(QList<QAction *> stateActionList, QWidget *parent = 0);
+    explicit WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stateActionList, QWidget *parent = 0);
     ~WidgetSpriteState();
     
     QString GetName();
@@ -39,12 +43,18 @@ public:
     void InsertFrame(HyGuiFrame *pFrame);
     void RemoveFrame(HyGuiFrame *pFrame);
 
-    SpriteFrame *SelectedFrame();
-    int SelectedIndex();
+    SpriteFrame *GetSelectedFrame();
+    int GetSelectedIndex();
+    void SelectIndex(int iIndex);
+    int GetNumFrames();
+    QTableWidget *GetFrameList();
     
     void AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef);
     
     void GetStateFrameInfo(QJsonArray &stateArrayOut);
+    
+private slots:
+    void on_frames_itemSelectionChanged();
     
 private:
     Ui::WidgetSpriteState *ui;

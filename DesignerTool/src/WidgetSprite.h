@@ -38,12 +38,16 @@ public:
     ~WidgetSprite();
     
     void LoadAndInit();
+    
+    void AppendActionsForToolBar(QList<QAction *> &actionList);
 
     void GetSpriteStateInfo(QJsonArray &spriteStateArrayRef);
     
     WidgetSpriteState *GetCurSpriteState();
     
     QList<HyGuiFrame *> GetAllDrawInsts();
+    
+    void UpdateActions();
     
 private slots:
     void on_actionAddState_triggered();
@@ -66,9 +70,19 @@ private slots:
     
     void on_cmbStates_currentIndexChanged(int index);
 
-private:
-    void UpdateActions();
+    void on_actionAlignLeft_triggered();
     
+    void on_actionAlignRight_triggered();
+    
+    void on_actionAlignUp_triggered();
+    
+    void on_actionAlignDown_triggered();
+    
+    void on_actionAlignCenterVertical_triggered();
+    
+    void on_actionAlignCenterHorizontal_triggered();
+    
+private:
     Ui::WidgetSprite *ui;
 };
 

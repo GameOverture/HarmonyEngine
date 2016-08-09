@@ -39,18 +39,23 @@ ItemWidget::ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager 
     
     m_pUndoStack = new QUndoStack(this);
     QAction *pActionUndo = m_pUndoStack->createUndoAction(m_pEditMenu, "&Undo");
-    pActionUndo->setIcon(QIcon(":/icons16x16/generic-undo.png"));
+    pActionUndo->setIcon(QIcon(":/icons16x16/edit-undo.png"));
     pActionUndo->setShortcuts(QKeySequence::Undo);
     pActionUndo->setShortcutContext(Qt::ApplicationShortcut);
+    pActionUndo->setObjectName("Undo");
 
     QAction *pActionRedo = m_pUndoStack->createRedoAction(m_pEditMenu, "&Redo");
-    pActionRedo->setIcon(QIcon(":/icons16x16/generic-redo.png"));
+    pActionRedo->setIcon(QIcon(":/icons16x16/edit-redo.png"));
     pActionRedo->setShortcuts(QKeySequence::Redo);
     pActionRedo->setShortcutContext(Qt::ApplicationShortcut);
+    pActionRedo->setObjectName("Redo");
 
     m_pEditMenu->addAction(pActionUndo);
     m_pEditMenu->addAction(pActionRedo);
-    m_pEditMenu->addSeparator();
+    QAction *pUndoSeparatorAction = new QAction(m_pEditMenu);
+    pUndoSeparatorAction->setObjectName("UndoSeparator");
+    pUndoSeparatorAction->setSeparator(true);
+    m_pEditMenu->addAction(pUndoSeparatorAction);
     
     connect(m_pUndoStack, SIGNAL(cleanChanged(bool)), this, SLOT(on_undoStack_cleanChanged(bool)));
 }

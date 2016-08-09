@@ -48,5 +48,6 @@
         <file>icons16x16/generic-up.png</file>
         <file>icons16x16/generic-left.png</file>
         <file>icons16x16/generic-right.png</file>
+        <file>icons16x16/sprite-applyToAll.png</file>
     </qresource>
 </RCC>

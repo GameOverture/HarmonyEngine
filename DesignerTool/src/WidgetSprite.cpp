@@ -105,6 +105,17 @@ void WidgetSprite::LoadAndInit()
     UpdateActions();
 }
 
+void WidgetSprite::AppendActionsForToolBar(QList<QAction *> &actionList)
+{
+    actionList.append(ui->actionAlignUp);
+    actionList.append(ui->actionAlignLeft);
+    actionList.append(ui->actionAlignDown);
+    actionList.append(ui->actionAlignRight);
+    actionList.append(ui->actionAlignCenterHorizontal);
+    actionList.append(ui->actionAlignCenterVertical);
+    actionList.append(ui->actionApplyToAll);
+}
+
 void WidgetSprite::GetSpriteStateInfo(QJsonArray &spriteStateArrayRef)
 {
     for(int i = 0; i < ui->cmbStates->count(); ++i)
@@ -131,9 +142,29 @@ QList<HyGuiFrame *> WidgetSprite::GetAllDrawInsts()
     return returnList;
 }
 
+void WidgetSprite::UpdateActions()
+{
+    ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
+    ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
+    ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
+    
+    WidgetSpriteState *pCurState = GetCurSpriteState();
+    bool bFrameIsSelected = pCurState->GetNumFrames() > 0 && pCurState->GetSelectedIndex() >= 0;
+    
+    ui->actionOrderFrameUpwards->setEnabled(pCurState->GetSelectedIndex() != 0 && pCurState->GetNumFrames() > 1);
+    ui->actionOrderFrameDownwards->setEnabled(pCurState->GetSelectedIndex() != pCurState->GetNumFrames() - 1 && pCurState->GetNumFrames() > 1);
+    ui->actionRemoveFrames->setEnabled(bFrameIsSelected);
+    ui->actionAlignCenterHorizontal->setEnabled(bFrameIsSelected);
+    ui->actionAlignCenterVertical->setEnabled(bFrameIsSelected);
+    ui->actionAlignUp->setEnabled(bFrameIsSelected);
+    ui->actionAlignDown->setEnabled(bFrameIsSelected);
+    ui->actionAlignLeft->setEnabled(bFrameIsSelected);
+    ui->actionAlignRight->setEnabled(bFrameIsSelected);
+}
+
 void WidgetSprite::on_actionAddState_triggered()
 {
-    QUndoCommand *pCmd = new ItemSpriteCmd_AddState(m_StateActionsList, ui->cmbStates);
+    QUndoCommand *pCmd = new ItemSpriteCmd_AddState(this, m_StateActionsList, ui->cmbStates);
     m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
@@ -184,7 +215,7 @@ void WidgetSprite::on_actionImportFrames_triggered()
 void WidgetSprite::on_actionRemoveFrames_triggered()
 {
     WidgetSpriteState *pSpriteState = ui->cmbStates->itemData(ui->cmbStates->currentIndex()).value<WidgetSpriteState *>();
-    SpriteFrame *pSpriteFrame = pSpriteState->SelectedFrame();
+    SpriteFrame *pSpriteFrame = pSpriteState->GetSelectedFrame();
 
     QUndoCommand *pCmd = new ItemSpriteCmd_DeleteFrame(m_pItemSprite, pSpriteFrame->m_pFrame);
     m_pItemSprite->GetUndoStack()->push(pCmd);
@@ -194,12 +225,22 @@ void WidgetSprite::on_actionRemoveFrames_triggered()
 
 void WidgetSprite::on_actionOrderFrameUpwards_triggered()
 {
+    int iSelectedIndex = GetCurSpriteState()->GetSelectedIndex();
     
+    QUndoCommand *pCmd = new ItemSpriteCmd_OrderFrame(GetCurSpriteState(), iSelectedIndex, iSelectedIndex - 1);
+    m_pItemSprite->GetUndoStack()->push(pCmd);
+    
+    UpdateActions();
 }
 
 void WidgetSprite::on_actionOrderFrameDownwards_triggered()
 {
+    int iSelectedIndex = GetCurSpriteState()->GetSelectedIndex();
     
+    QUndoCommand *pCmd = new ItemSpriteCmd_OrderFrame(GetCurSpriteState(), iSelectedIndex, iSelectedIndex + 1);
+    m_pItemSprite->GetUndoStack()->push(pCmd);
+    
+    UpdateActions();
 }
 
 void WidgetSprite::on_cmbStates_currentIndexChanged(int index)
@@ -223,9 +264,32 @@ void WidgetSprite::on_cmbStates_currentIndexChanged(int index)
     UpdateActions();
 }
 
-void WidgetSprite::UpdateActions()
+void WidgetSprite::on_actionAlignLeft_triggered()
 {
-    ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
-    ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
-    ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
+    
+}
+
+void WidgetSprite::on_actionAlignRight_triggered()
+{
+    
+}
+
+void WidgetSprite::on_actionAlignUp_triggered()
+{
+    
+}
+
+void WidgetSprite::on_actionAlignDown_triggered()
+{
+    
+}
+
+void WidgetSprite::on_actionAlignCenterVertical_triggered()
+{
+    
+}
+
+void WidgetSprite::on_actionAlignCenterHorizontal_triggered()
+{
+    
 }

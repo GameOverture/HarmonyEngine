@@ -189,17 +189,18 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     return sm_pInstance;
 }
 
-// This only requests to the WidgetRenderer to open the item. It will eventually do so, after re-loading any resources it needs to
 /*static*/ void MainWindow::OpenItem(ItemWidget *pItem)
 {
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
 
+    // Request to the WidgetRenderer to open the item. It will eventually do so, after re-loading any resources it needs to
     sm_pInstance->ui->explorer->GetCurProjSelected()->OpenItem(pItem);
     sm_pInstance->ui->explorer->SelectItem(pItem);
 
+    // Setup the item properties docking window to be the current item
     QString sWindowTitle = pItem->GetName(false) % " Properties";
-
+    
     sm_pInstance->ui->actionViewProperties->setVisible(true);
     sm_pInstance->ui->actionViewProperties->setText(sWindowTitle);
 
@@ -207,12 +208,22 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->ui->dockWidgetCurrentItem->setWindowTitle(sWindowTitle);
     sm_pInstance->ui->dockWidgetCurrentItem->setWidget(pItem->GetWidget());
 
+    // Remove any "Edit" menu, and replace it with the current item's "Edit" menu
     if(sm_pInstance->m_pCurEditMenu)
         sm_pInstance->ui->menuBar->removeAction(sm_pInstance->m_pCurEditMenu->menuAction());
 
     sm_pInstance->m_pCurEditMenu = pItem->GetEditMenu();
     if(sm_pInstance->m_pCurEditMenu)
         sm_pInstance->ui->menuBar->insertMenu(sm_pInstance->ui->menu_View->menuAction(), sm_pInstance->m_pCurEditMenu);
+    
+    // Remove any item specific actions in the main toolbar, and add the current item's desired actions to be shown to the main toolbar
+    for(int i = 0; i < sm_pInstance->m_ToolBarItemActionsList.count(); ++i)
+        sm_pInstance->ui->mainToolBar->removeAction(sm_pInstance->m_ToolBarItemActionsList[i]);
+    
+    sm_pInstance->m_ToolBarItemActionsList.clear();
+    sm_pInstance->m_ToolBarItemActionsList = pItem->GetActionsForToolBar();
+    
+    sm_pInstance->ui->mainToolBar->addActions(sm_pInstance->m_ToolBarItemActionsList);
 }
 
 /*static*/ void MainWindow::CloseItem(ItemWidget *pItem)
