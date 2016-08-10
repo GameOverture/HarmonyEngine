@@ -24,8 +24,8 @@ class HyStopwatch;
 
 class IHyTime
 {
-	static const uint32			sm_kuiUpdateStep;
-	static const double			sm_kdUpdateStep;
+	static const uint32			sm_uiUPDATESTEP_HERTZ;
+	static const double			sm_dUPDATESTEP_SECONDS;
 
 	vector<IHyTimeInst *>		m_vTimeInsts;
 
@@ -46,8 +46,8 @@ public:
 	IHyTime();
 	~IHyTime(void);
 
-	static uint32 GetUpdateMilliseconds()	{ return sm_kuiUpdateStep; }
-	static float GetUpdateStepSeconds()		{ return static_cast<float>(sm_kdUpdateStep); }
+	static uint32 GetUpdateHertz()			{ return sm_uiUPDATESTEP_HERTZ; }
+	static float GetUpdateStepSeconds()		{ return static_cast<float>(sm_dUPDATESTEP_SECONDS); }
 
 	// Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
 	// Delta time is in seconds.

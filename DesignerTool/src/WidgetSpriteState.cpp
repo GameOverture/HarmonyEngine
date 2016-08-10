@@ -40,6 +40,7 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
 
 WidgetSpriteState::~WidgetSpriteState()
 {
+    ui->frames->blockSignals(true);
     while(ui->frames->rowCount() != 0)
     {
         SpriteFrame *pSpriteFrame = ui->frames->item(ui->frames->rowCount() - 1, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>();
@@ -140,25 +141,28 @@ void WidgetSpriteState::AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListR
         drawInstListRef.append(ui->frames->item(i, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>()->m_pFrame);
 }
 
-void WidgetSpriteState::GetStateFrameInfo(QJsonArray &stateArrayOut)
+void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
 {
+    QJsonArray frameArray;
     for(int i = 0; i < ui->frames->rowCount(); ++i)
     {
         SpriteFrame *pSpriteFrame = ui->frames->item(i, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>();
-        QJsonObject frameObj;
 
+        QJsonObject frameObj;
         frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));
         frameObj.insert("rotation", QJsonValue(pSpriteFrame->m_fRotation));
         frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_ptOffset.x()));
         frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_ptOffset.y()));
         frameObj.insert("scaleX", QJsonValue(pSpriteFrame->m_ptScale.x()));
         frameObj.insert("scaleY", QJsonValue(pSpriteFrame->m_ptScale.y()));
-        
         frameObj.insert("hash", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetHash())));
         frameObj.insert("atlasGroupId", QJsonValue(pSpriteFrame->m_pFrame->GetAtlasGroupdId()));
 
-        stateArrayOut.append(frameObj);
+        frameArray.append(frameObj);
     }
+
+    stateObjOut.insert("name", QJsonValue(m_sName));
+    stateObjOut.insert("frames", QJsonValue(frameArray));
 }
 
 void WidgetSpriteState::on_frames_itemSelectionChanged()

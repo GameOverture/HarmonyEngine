@@ -22,6 +22,7 @@ class ItemWidget;
 class WidgetAtlasManager;
 class HyGuiFrame;
 class ItemSprite;
+struct SpriteFrame;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_AddState : public QUndoCommand
@@ -155,14 +156,14 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ItemSpriteCmd_MoveFrameDown : public QUndoCommand
+class ItemSpriteCmd_TransformFrame : public QUndoCommand
 {
 public:
-    ItemSpriteCmd_MoveFrameDown(QUndoCommand *pParent = 0);
-    virtual ~ItemSpriteCmd_MoveFrameDown();
+    ItemSpriteCmd_TransformFrame(SpriteFrame *pFrame, QPointF vOffset, float fRot, QPointF vScale, float fDuration, QUndoCommand *pParent = 0);
+    virtual ~ItemSpriteCmd_TransformFrame();
 
-    void undo() Q_DECL_OVERRIDE;
     void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
 };
 
 #endif // ITEMSPRITECMDS_H

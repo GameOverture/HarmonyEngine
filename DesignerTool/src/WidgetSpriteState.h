@@ -51,7 +51,7 @@ public:
     
     void AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef);
     
-    void GetStateFrameInfo(QJsonArray &stateArrayOut);
+    void GetStateFrameInfo(QJsonObject &stateObjOut);
     
 private slots:
     void on_frames_itemSelectionChanged();

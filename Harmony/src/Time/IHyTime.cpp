@@ -9,8 +9,8 @@
  *************************************************************************/
 #include "Time/IHyTime.h"
 
-/*static*/ const uint32			IHyTime::sm_kuiUpdateStep = 16;
-/*static*/ const double			IHyTime::sm_kdUpdateStep = IHyTime::sm_kuiUpdateStep / 1000.0;
+/*static*/ const uint32			IHyTime::sm_uiUPDATESTEP_HERTZ = 100;
+/*static*/ const double			IHyTime::sm_dUPDATESTEP_SECONDS = 1.0 / IHyTime::sm_uiUPDATESTEP_HERTZ;
 
 IHyTime::IHyTime() :	m_dTimeManipulation(1.0f),
 						m_dCurDeltaTime(0.0),
@@ -30,7 +30,6 @@ bool IHyTime::ThrottleTime()
 	// m_dCurDeltaTime will be set within SetCurDeltaTime()
 	SetCurDeltaTime();
 	m_dTotalElapsedTime += m_dCurDeltaTime;
-
 	m_dThrottledTime += m_dCurDeltaTime * m_dTimeManipulation;
 
 	// Update all timers
@@ -41,9 +40,9 @@ bool IHyTime::ThrottleTime()
 			m_vTimeInsts[i]->Update(m_dCurDeltaTime);
 	}
 
-	if(m_dThrottledTime >= sm_kdUpdateStep)
+	if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS)
 	{
-		m_dThrottledTime -= sm_kdUpdateStep;
+		m_dThrottledTime -= sm_dUPDATESTEP_SECONDS;
 		return true;
 	}
 

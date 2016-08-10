@@ -73,22 +73,25 @@ void WidgetSprite::LoadAndInit()
         QJsonDocument spriteJsonDoc = QJsonDocument::fromJson(spriteFile.readAll());
         spriteFile.close();
 
-        QJsonArray spriteStateArray = spriteJsonDoc.array();
-        for(int i = 0; i < spriteStateArray.size(); ++i)
+        QJsonArray stateArray = spriteJsonDoc.array();
+        for(int i = 0; i < stateArray.size(); ++i)
         {
-            on_actionAddState_triggered();
+            QJsonObject stateObj = stateArray[i].toObject();
+
+            m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_AddState(this, m_StateActionsList, ui->cmbStates));
+            m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_RenameState(ui->cmbStates, stateObj["name"].toString()));
             
-            QJsonArray spriteFrameArray = spriteStateArray[i].toArray();
+            QJsonArray spriteFrameArray = stateObj["frames"].toArray();
             for(int j = 0; j < spriteFrameArray.size(); ++j)
             {
                 QJsonObject spriteFrameObj = spriteFrameArray[j].toObject();
                 
                 QList<quint32> requestList;
                 requestList.append(JSONOBJ_TOINT(spriteFrameObj, "hash"));
-                
                 m_pItemSprite->GetAtlasManager().RequestFrames(m_pItemSprite, requestList);
-                
+
                 // TODO: set things like offset, rotation, duration, etc for each frame
+                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_TransformFrame(GetSelectedFrame()));
             }
         }
     }
@@ -99,7 +102,7 @@ void WidgetSprite::LoadAndInit()
     }
 
     // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
-    // I don't believe any on_actionAddState_triggered() calls will leak their dynamically allocated 'm_pSpriteState', since they should become children of 'ui->grpStateLayout'
+    // I don't believe any 'ItemSpriteCmd_AddState' will leak their dynamically allocated 'm_pSpriteState', since they should become children of 'ui->grpStateLayout'
     m_pItemSprite->GetUndoStack()->clear();
 
     UpdateActions();
@@ -120,10 +123,10 @@ void WidgetSprite::GetSpriteStateInfo(QJsonArray &spriteStateArrayRef)
 {
     for(int i = 0; i < ui->cmbStates->count(); ++i)
     {
-        QJsonArray spriteFrameArray;
-        ui->cmbStates->itemData(i).value<WidgetSpriteState *>()->GetStateFrameInfo(spriteFrameArray);
+        QJsonObject spriteState;
+        ui->cmbStates->itemData(i).value<WidgetSpriteState *>()->GetStateFrameInfo(spriteState);
         
-        spriteStateArrayRef.append(spriteFrameArray);
+        spriteStateArrayRef.append(spriteState);
     }
 }
 
@@ -149,10 +152,10 @@ void WidgetSprite::UpdateActions()
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
     
     WidgetSpriteState *pCurState = GetCurSpriteState();
-    bool bFrameIsSelected = pCurState->GetNumFrames() > 0 && pCurState->GetSelectedIndex() >= 0;
+    bool bFrameIsSelected = pCurState && pCurState->GetNumFrames() > 0 && pCurState->GetSelectedIndex() >= 0;
     
-    ui->actionOrderFrameUpwards->setEnabled(pCurState->GetSelectedIndex() != 0 && pCurState->GetNumFrames() > 1);
-    ui->actionOrderFrameDownwards->setEnabled(pCurState->GetSelectedIndex() != pCurState->GetNumFrames() - 1 && pCurState->GetNumFrames() > 1);
+    ui->actionOrderFrameUpwards->setEnabled(pCurState && pCurState->GetSelectedIndex() != 0 && pCurState->GetNumFrames() > 1);
+    ui->actionOrderFrameDownwards->setEnabled(pCurState && pCurState->GetSelectedIndex() != pCurState->GetNumFrames() - 1 && pCurState->GetNumFrames() > 1);
     ui->actionRemoveFrames->setEnabled(bFrameIsSelected);
     ui->actionAlignCenterHorizontal->setEnabled(bFrameIsSelected);
     ui->actionAlignCenterVertical->setEnabled(bFrameIsSelected);

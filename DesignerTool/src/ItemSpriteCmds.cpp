@@ -303,15 +303,18 @@ void ItemSpriteCmd_OrderFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemSpriteCmd_MoveFrameDown::ItemSpriteCmd_MoveFrameDown(QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
+ItemSpriteCmd_TransformFrame::ItemSpriteCmd_TransformFrame(SpriteFrame *pFrame, QPointF vOffset, float fRot, QPointF vScale, float fDuration, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
 {
 }
-/*virtual*/ ItemSpriteCmd_MoveFrameDown::~ItemSpriteCmd_MoveFrameDown()
+
+/*virtual*/ ItemSpriteCmd_TransformFrame::~ItemSpriteCmd_TransformFrame()
 {
 }
-void ItemSpriteCmd_MoveFrameDown::undo()
+
+void ItemSpriteCmd_TransformFrame::redo()
 {
 }
-void ItemSpriteCmd_MoveFrameDown::redo()
+
+void ItemSpriteCmd_TransformFrame::undo()
 {
 }
