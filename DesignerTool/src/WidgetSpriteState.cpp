@@ -18,6 +18,104 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+
+SpriteFramesModel::SpriteFramesModel(QObject *parent) : QAbstractTableModel(parent)
+{
+}
+
+/*virtual*/ int SpriteFramesModel::rowCount(const QModelIndex & /*parent*/) const
+{
+   return m_FramesList.count();
+}
+
+/*virtual*/ int SpriteFramesModel::columnCount(const QModelIndex & /*parent*/) const
+{
+    return NUMCOLUMNS;
+}
+
+/*virtual*/ QVariant SpriteFramesModel::data(const QModelIndex &index, int role) const
+{
+    SpriteFrame *pFrame = m_FramesList[index.row()];
+    
+    if(role == Qt::DisplayRole)
+    {
+        switch(index.column())
+        {
+        case COLUMN_Frame:
+            return pFrame->m_pFrame->GetName();
+        case COLUMN_Offset:
+            return PointToQString(pFrame->m_ptOffset);
+        case COLUMN_Rotation:
+            return QString::number(pFrame->m_fRotation);
+        case COLUMN_Scale:
+            return PointToQString(pFrame->m_ptScale);
+        case COLUMN_Duration:
+            return QString::number(pFrame->m_fDuration);
+        }
+    }
+    
+    return QVariant();
+}
+
+/*virtual*/ QVariant SpriteFramesModel::headerData(int section, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
+{
+    if (role == Qt::DisplayRole)
+    {
+        if (orientation == Qt::Horizontal)
+        {
+            switch(section)
+            {
+            case COLUMN_Frame:
+                return QString("Frame");
+            case COLUMN_Offset:
+                return QString("Offset");
+            case COLUMN_Rotation:
+                return QString("Rot");
+            case COLUMN_Scale:
+                return QString("Scale");
+            case COLUMN_Duration:
+                return QString("Duration");
+            }
+        }
+    }
+    
+    return QVariant();
+}
+
+/*virtual*/ bool SpriteFramesModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
+{
+    SpriteFrame *pFrame = m_FramesList[index.row()];
+    
+    if(role == Qt::EditRole)
+    {
+//        switch(index.column())
+//        {
+//        case COLUMN_Offset:
+//            return PointToQString(pFrame->m_ptOffset);
+//        case COLUMN_Rotation:
+//            return QString::number(pFrame->m_fRotation);
+//        case COLUMN_Scale:
+//            return PointToQString(pFrame->m_ptScale);
+//        case COLUMN_Duration:
+//            return QString::number(pFrame->m_fDuration);
+//        }
+
+        //emit editCompleted( result );
+    }
+
+    return true;
+}
+
+/*virtual*/ Qt::ItemFlags SpriteFramesModel::flags(const QModelIndex &index) const
+{
+    if(index.column() == COLUMN_Frame)
+        return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    else
+        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stateActionList, QWidget *parent) : QWidget(parent),
                                                                                                                 m_pOwner(pOwner),
                                                                                                                 ui(new Ui::WidgetSpriteState),
@@ -36,6 +134,9 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
     ui->frames->setColumnWidth(SpriteFrame::COLUMN_Scale, 64);
     ui->frames->setColumnWidth(SpriteFrame::COLUMN_Duration, 32);
     ui->frames->setMinimumWidth(100+64+32+64+32);
+    
+    m_pSpriteFramesModel = new SpriteFramesModel(this);
+    ui->framesView->setModel(m_pSpriteFramesModel);
 }
 
 WidgetSpriteState::~WidgetSpriteState()

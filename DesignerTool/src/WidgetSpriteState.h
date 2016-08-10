@@ -24,11 +24,44 @@ class WidgetSpriteState;
 
 class WidgetSprite;
 
+class SpriteFramesModel : public QAbstractTableModel
+{
+    Q_OBJECT
+    
+    QList<SpriteFrame *>        m_FramesList;
+    
+    enum eColumn
+    {
+        COLUMN_Frame = 0,
+        COLUMN_Offset,
+        COLUMN_Rotation,
+        COLUMN_Scale,
+        COLUMN_Duration,
+        
+        NUMCOLUMNS
+    };
+    
+public:
+    SpriteFramesModel(QObject *pParent);
+    
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+    
+signals:
+    void editCompleted(const QString &);
+};
+
+
 class WidgetSpriteState : public QWidget
 {
     Q_OBJECT
 
     WidgetSprite *                      m_pOwner;
+    SpriteFramesModel *                 m_pSpriteFramesModel;
     
     QString                             m_sName;
     QMap<quint32, SpriteFrame *>        m_RemovedFrameMap;  // Used to reinsert frames (via undo/redo) while keeping their attributes

@@ -91,7 +91,7 @@ void WidgetSprite::LoadAndInit()
                 m_pItemSprite->GetAtlasManager().RequestFrames(m_pItemSprite, requestList);
 
                 // TODO: set things like offset, rotation, duration, etc for each frame
-                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_TransformFrame(GetSelectedFrame()));
+                //m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_TransformFrame(GetSelectedFrame()));
             }
         }
     }

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>307</width>
+    <width>339</width>
     <height>476</height>
    </rect>
   </property>
@@ -170,6 +170,19 @@
        <string extracomment="Duration"/>
       </property>
      </column>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableView" name="framesView">
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
     </widget>
    </item>
    <item>

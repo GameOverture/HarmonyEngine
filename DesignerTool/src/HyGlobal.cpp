@@ -16,6 +16,7 @@
 
 /*static*/ QRegExpValidator *HyGlobal::sm_pFileNameValidator = NULL;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFilePathValidator = NULL;
+/*static*/ QRegExpValidator *HyGlobal::sm_pNumericCommaValidator = NULL;
 
 QAction *FindAction(QList<QAction *> list, QString sName)
 {

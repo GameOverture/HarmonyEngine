@@ -93,6 +93,7 @@ class HyGlobal
 
     static QRegExpValidator *       sm_pFileNameValidator;
     static QRegExpValidator *       sm_pFilePathValidator;
+    static QRegExpValidator *       sm_pNumericCommaValidator;
 
 public:
     static void Initialize()
@@ -153,6 +154,7 @@ public:
 
         sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_-]*"));
         sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_-]*"));
+        sm_pNumericCommaValidator = new QRegExpValidator(QRegExp("[0-9,]*"));
     }
 
     static eItemType GetCorrespondingDirItem(eItemType eItem)
@@ -210,6 +212,7 @@ public:
 
     static const QRegExpValidator *FileNameValidator()      { return sm_pFileNameValidator; }
     static const QRegExpValidator *FilePathValidator()      { return sm_pFilePathValidator; }
+    static const QRegExpValidator *NumericCommaValidator()  { return sm_pNumericCommaValidator; }
     
     static bool IsEngineDirValid(const QDir &engineDir)
     {
