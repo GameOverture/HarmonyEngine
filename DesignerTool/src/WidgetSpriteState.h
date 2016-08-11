@@ -28,7 +28,8 @@ class SpriteFramesModel : public QAbstractTableModel
 {
     Q_OBJECT
     
-    QList<SpriteFrame *>        m_FramesList;
+    QList<SpriteFrame *>            m_FramesList;
+    QMap<quint32, SpriteFrame *>    m_RemovedFrameMap;  // Used to reinsert frames (via undo/redo) while keeping their attributes
     
     enum eColumn
     {
@@ -43,6 +44,9 @@ class SpriteFramesModel : public QAbstractTableModel
     
 public:
     SpriteFramesModel(QObject *pParent);
+    
+    void Add(HyGuiFrame *pFrame);
+    void Remove(HyGuiFrame *pFrame);
     
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -64,7 +68,6 @@ class WidgetSpriteState : public QWidget
     SpriteFramesModel *                 m_pSpriteFramesModel;
     
     QString                             m_sName;
-    QMap<quint32, SpriteFrame *>        m_RemovedFrameMap;  // Used to reinsert frames (via undo/redo) while keeping their attributes
 
 public:
     explicit WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stateActionList, QWidget *parent = 0);

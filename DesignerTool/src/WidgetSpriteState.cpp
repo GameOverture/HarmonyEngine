@@ -23,6 +23,41 @@ SpriteFramesModel::SpriteFramesModel(QObject *parent) : QAbstractTableModel(pare
 {
 }
 
+void SpriteFramesModel::Add(HyGuiFrame *pFrame)
+{
+    SpriteFrame *pFrameToInsert = NULL;
+    
+    // See if this frame has been recently removed, and re-add if possible. Otherwise, create a new Frame
+    QMap<quint32, SpriteFrame *>::iterator iter = m_RemovedFrameMap.find(pFrame->GetHash());
+    if(iter == m_RemovedFrameMap.end())
+        pFrameToInsert = new SpriteFrame(pFrame, m_FramesList.count());
+    else
+    {
+        pFrameToInsert = iter.value();
+        m_RemovedFrameMap.remove(pFrame->GetHash());
+    }
+    
+    beginInsertRows(QModelIndex(), pFrameToInsert->m_iRowIndex, pFrameToInsert->m_iRowIndex);
+    m_FramesList.insert(pFrameToInsert->m_iRowIndex, pFrameToInsert);
+    endInsertRows();
+}
+
+void SpriteFramesModel::Remove(HyGuiFrame *pFrame)
+{
+    for(int i = 0; i < m_FramesList.count(); ++i)
+    {
+        if(m_FramesList[i]->m_pFrame == pFrame)
+        {
+            m_RemovedFrameMap[pFrame->GetHash()] = m_FramesList[i];
+            
+            beginRemoveRows(QModelIndex(), i, i);
+            m_FramesList.removeAt(i);
+            endRemoveRows();
+            break;
+        }
+    }
+}
+
 /*virtual*/ int SpriteFramesModel::rowCount(const QModelIndex & /*parent*/) const
 {
    return m_FramesList.count();
@@ -165,46 +200,13 @@ void WidgetSpriteState::SetName(QString sNewName)
 
 void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
 {
-    SpriteFrame *pFrameToInsert = NULL;
-    
-    // See if this frame has been recently removed, and re-add if possible. Otherwise, create a new Frame
-    QMap<quint32, SpriteFrame *>::iterator iter = m_RemovedFrameMap.find(pFrame->GetHash());
-    if(iter == m_RemovedFrameMap.end())
-        pFrameToInsert = new SpriteFrame(pFrame, ui->frames->rowCount());
-    else
-    {
-        pFrameToInsert = iter.value();
-        m_RemovedFrameMap.remove(pFrame->GetHash());
-    }
-    
-    QTableWidgetItem *pColumnFrameTableWidgetItem = new QTableWidgetItem(pFrameToInsert->m_pFrame->GetName());
-    QVariant v;
-    v.setValue(pFrameToInsert);
-    pColumnFrameTableWidgetItem->setData(Qt::UserRole, v);
-    
-    ui->frames->insertRow(pFrameToInsert->m_iRowIndex);
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Frame, pColumnFrameTableWidgetItem);
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Offset, new QTableWidgetItem(PointToQString(pFrameToInsert->m_ptOffset)));
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Rotation, new QTableWidgetItem(QString::number(pFrameToInsert->m_fRotation, 'g', 2)));
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Scale, new QTableWidgetItem(PointToQString(pFrameToInsert->m_ptScale)));
-    ui->frames->setItem(pFrameToInsert->m_iRowIndex, SpriteFrame::COLUMN_Duration, new QTableWidgetItem(QString::number(pFrameToInsert->m_fDuration, 'g', 2)));
-
-    ui->frames->selectRow(0);
+    m_pSpriteFramesModel->Add(pFrame);
+    ui->framesView->selectRow(0);
 }
 
 void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
 {
-    for(int i = 0; i < ui->frames->rowCount(); ++i)
-    {
-        SpriteFrame *pSpriteFrame = ui->frames->item(i, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>();
-        
-        if(pSpriteFrame->m_pFrame == pFrame)
-        {
-            m_RemovedFrameMap[pFrame->GetHash()] = pSpriteFrame;
-            ui->frames->removeRow(i);
-            break;
-        }
-    }
+    m_pSpriteFramesModel->Remove(pFrame);
 }
 
 SpriteFrame *WidgetSpriteState::GetSelectedFrame()
