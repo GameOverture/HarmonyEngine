@@ -258,47 +258,13 @@ ItemSpriteCmd_OrderFrame::ItemSpriteCmd_OrderFrame(WidgetSpriteState *pSpriteSta
 
 void ItemSpriteCmd_OrderFrame::redo()
 {
-    QTableWidget *pFrameList = m_pSpriteState->GetFrameList();
-    
-    // Take the items
-    QList<QTableWidgetItem*> srcRowList;
-    for(int i = 0; i < pFrameList->columnCount(); ++i)
-        srcRowList.append(pFrameList->takeItem(m_iFrameIndex, i));
-    
-    QList<QTableWidgetItem*> destRowList;
-    for(int i = 0; i < pFrameList->columnCount(); ++i)
-        destRowList.append(pFrameList->takeItem(m_iFrameIndexDest, i));
-    
-    // Set the items back in reverse order
-    for(int i = 0; i < pFrameList->columnCount(); ++i)
-        pFrameList->setItem(m_iFrameIndex, i, destRowList[i]);
-    
-    for(int i = 0; i < pFrameList->columnCount(); ++i)
-        pFrameList->setItem(m_iFrameIndexDest, i, srcRowList[i]);
-    
+    m_pSpriteState->OrderFrame(m_iFrameIndex, m_iFrameIndexDest - m_iFrameIndex);
     m_pSpriteState->SelectIndex(m_iFrameIndexDest);
 }
 
 void ItemSpriteCmd_OrderFrame::undo()
 {
-    QTableWidget *pFrameList = m_pSpriteState->GetFrameList();
-    
-    // Take the items
-    QList<QTableWidgetItem*> srcRowList;
-    for(int i = 0; i < pFrameList->columnCount(); ++i)
-        srcRowList.append(pFrameList->takeItem(m_iFrameIndexDest, i));
-    
-    QList<QTableWidgetItem*> destRowList;
-    for(int i = 0; i < pFrameList->columnCount(); ++i)
-        destRowList.append(pFrameList->takeItem(m_iFrameIndex, i));
-    
-    // Set the items back in reverse order
-    for(int i = 0; i < pFrameList->columnCount(); ++i)
-        pFrameList->setItem(m_iFrameIndexDest, i, destRowList[i]);
-    
-    for(int i = 0; i < pFrameList->columnCount(); ++i)
-        pFrameList->setItem(m_iFrameIndex, i, srcRowList[i]);
-    
+    m_pSpriteState->OrderFrame(m_iFrameIndex, m_iFrameIndex - m_iFrameIndexDest);
     m_pSpriteState->SelectIndex(m_iFrameIndex);
 }
 

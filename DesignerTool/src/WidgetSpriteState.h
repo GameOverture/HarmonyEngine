@@ -47,6 +47,9 @@ public:
     
     void Add(HyGuiFrame *pFrame);
     void Remove(HyGuiFrame *pFrame);
+    void Offset(int iIndex, int iOffset);
+    
+    SpriteFrame *GetFrameAt(int iIndex);
     
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -83,7 +86,7 @@ public:
     int GetSelectedIndex();
     void SelectIndex(int iIndex);
     int GetNumFrames();
-    QTableWidget *GetFrameList();
+    void OrderFrame(int iIndex, int iOffset);
     
     void AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef);
     

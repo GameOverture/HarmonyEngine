@@ -58,6 +58,18 @@ void SpriteFramesModel::Remove(HyGuiFrame *pFrame)
     }
 }
 
+void SpriteFramesModel::Offset(int iIndex, int iOffset)
+{
+    beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + iOffset);
+    m_FramesList.swap(iIndex, iIndex + iOffset);
+    endMoveRows();
+}
+
+SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
+{
+    return m_FramesList[iIndex];
+}
+
 /*virtual*/ int SpriteFramesModel::rowCount(const QModelIndex & /*parent*/) const
 {
    return m_FramesList.count();
@@ -94,6 +106,13 @@ void SpriteFramesModel::Remove(HyGuiFrame *pFrame)
 
 /*virtual*/ QVariant SpriteFramesModel::headerData(int section, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
 {
+//    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Frame, 100);
+//    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Offset, 64);
+//    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Rotation, 32);
+//    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Scale, 64);
+//    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Duration, 32);
+//    ui->frames->setMinimumWidth(100+64+32+64+32);
+    
     if (role == Qt::DisplayRole)
     {
         if (orientation == Qt::Horizontal)
@@ -163,28 +182,13 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
     ui->btnOrderFrameUp->setDefaultAction(FindAction(stateActionList, "actionOrderFrameUpwards"));
     ui->btnOrderFrameDown->setDefaultAction(FindAction(stateActionList, "actionOrderFrameDownwards"));
     
-    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Frame, 100);
-    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Offset, 64);
-    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Rotation, 32);
-    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Scale, 64);
-    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Duration, 32);
-    ui->frames->setMinimumWidth(100+64+32+64+32);
-    
     m_pSpriteFramesModel = new SpriteFramesModel(this);
     ui->framesView->setModel(m_pSpriteFramesModel);
 }
 
 WidgetSpriteState::~WidgetSpriteState()
 {
-    ui->frames->blockSignals(true);
-    while(ui->frames->rowCount() != 0)
-    {
-        SpriteFrame *pSpriteFrame = ui->frames->item(ui->frames->rowCount() - 1, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>();
-        delete pSpriteFrame;
-        
-        ui->frames->removeRow(ui->frames->rowCount() - 1);
-    }
-
+    ui->framesView->blockSignals(true);
     delete ui;
 }
 
@@ -211,45 +215,45 @@ void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
 
 SpriteFrame *WidgetSpriteState::GetSelectedFrame()
 {
-    if(ui->frames->rowCount() == 0)
+    if(m_pSpriteFramesModel->rowCount() == 0)
         return NULL;
     
-    SpriteFrame *pSpriteFrame = ui->frames->item(ui->frames->currentRow(), SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>();
+    SpriteFrame *pSpriteFrame = m_pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row());
     return pSpriteFrame;
 }
 
 int WidgetSpriteState::GetSelectedIndex()
 {
-    return ui->frames->currentRow();
+    return ui->framesView->currentIndex().row();
 }
 
 void WidgetSpriteState::SelectIndex(int iIndex)
 {
-    ui->frames->selectRow(iIndex);
+    ui->framesView->selectRow(iIndex);
 }
 
 int WidgetSpriteState::GetNumFrames()
 {
-    return ui->frames->rowCount();
+    return m_pSpriteFramesModel->rowCount();
 }
 
-QTableWidget *WidgetSpriteState::GetFrameList()
+void WidgetSpriteState::OrderFrame(int iIndex, int iOffset)
 {
-    return ui->frames;
+    m_pSpriteFramesModel->Offset(iIndex, iOffset);
 }
 
 void WidgetSpriteState::AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef)
 {
-    for(int i = 0; i < ui->frames->rowCount(); ++i)
-        drawInstListRef.append(ui->frames->item(i, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>()->m_pFrame);
+    for(int i = 0; i < GetNumFrames(); ++i)
+        drawInstListRef.append(m_pSpriteFramesModel->GetFrameAt(i)->m_pFrame);
 }
 
 void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
 {
     QJsonArray frameArray;
-    for(int i = 0; i < ui->frames->rowCount(); ++i)
+    for(int i = 0; i < GetNumFrames(); ++i)
     {
-        SpriteFrame *pSpriteFrame = ui->frames->item(i, SpriteFrame::COLUMN_Frame)->data(Qt::UserRole).value<SpriteFrame *>();
+        SpriteFrame *pSpriteFrame = m_pSpriteFramesModel->GetFrameAt(i);
 
         QJsonObject frameObj;
         frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));

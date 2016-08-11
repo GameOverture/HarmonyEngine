@@ -114,65 +114,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QTableWidget" name="frames">
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="horizontalScrollMode">
-      <enum>QAbstractItemView::ScrollPerPixel</enum>
-     </property>
-     <property name="columnCount">
-      <number>5</number>
-     </property>
-     <attribute name="horizontalHeaderCascadingSectionResizes">
-      <bool>false</bool>
-     </attribute>
-     <attribute name="horizontalHeaderDefaultSectionSize">
-      <number>100</number>
-     </attribute>
-     <attribute name="horizontalHeaderStretchLastSection">
-      <bool>false</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Frame</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Offset</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Rot</string>
-      </property>
-      <property name="toolTip">
-       <string extracomment="Rotation"/>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Scale</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Dur</string>
-      </property>
-      <property name="toolTip">
-       <string extracomment="Duration"/>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item>
     <widget class="QTableView" name="framesView">
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
