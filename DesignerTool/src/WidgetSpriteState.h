@@ -91,9 +91,9 @@ public:
     void AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef);
     
     void GetStateFrameInfo(QJsonObject &stateObjOut);
-    
+
 private slots:
-    void on_frames_itemSelectionChanged();
+    void on_framesView_itemSelectionChanged(QModelIndex current, QModelIndex previous);
     
 private:
     Ui::WidgetSpriteState *ui;

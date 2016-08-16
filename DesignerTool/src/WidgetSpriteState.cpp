@@ -184,6 +184,9 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
     
     m_pSpriteFramesModel = new SpriteFramesModel(this);
     ui->framesView->setModel(m_pSpriteFramesModel);
+
+    QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
+    connect(pSelModel, SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(on_framesView_itemSelectionChanged(QModelIndex,QModelIndex)));
 }
 
 WidgetSpriteState::~WidgetSpriteState()
@@ -272,7 +275,7 @@ void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
     stateObjOut.insert("frames", QJsonValue(frameArray));
 }
 
-void WidgetSpriteState::on_frames_itemSelectionChanged()
+void WidgetSpriteState::on_framesView_itemSelectionChanged(QModelIndex current, QModelIndex previous)
 {
     m_pOwner->UpdateActions();
 }
