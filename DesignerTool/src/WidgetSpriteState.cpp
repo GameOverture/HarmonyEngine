@@ -19,7 +19,7 @@
 #include <QJsonArray>
 
 
-SpriteFramesModel::SpriteFramesModel(QObject *parent) : QAbstractTableModel(parent)
+SpriteFramesModel::SpriteFramesModel(QObject *parent) : QStandardItemModel(parent)
 {
 }
 
@@ -67,6 +67,9 @@ void SpriteFramesModel::Offset(int iIndex, int iOffset)
 
 SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 {
+    if(iIndex < 0)
+        return NULL;
+
     return m_FramesList[iIndex];
 }
 
@@ -242,6 +245,25 @@ int WidgetSpriteState::GetNumFrames()
 
 void WidgetSpriteState::OrderFrame(int iIndex, int iOffset)
 {
+    QItemSelectionModel *pSelectionModel = ui->framesView->selectionModel();
+
+    int iNumLeft = ui->framesView->model()->rowCount();
+
+    QList<QStandardItem *> srcRowList;
+    srcRowList.append(static_cast<QStandardItemModel *>(ui->framesView->model())->takeRow(iIndex));
+
+    iNumLeft = ui->framesView->model()->rowCount();
+
+    QList<QStandardItem *> destRowList;
+    destRowList.append(static_cast<QStandardItemModel *>(ui->framesView->model())->takeRow(iIndex + iOffset));
+
+    iNumLeft = ui->framesView->model()->rowCount();
+
+    //static_cast<QStandardItem *>(ui->framesView->model())->insertRow(iIndex, );
+    //static_cast<QStandardItem *>(ui->framesView->model())->insertRow(iIndex + iOffset);
+
+
+
     m_pSpriteFramesModel->Offset(iIndex, iOffset);
 }
 

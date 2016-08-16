@@ -14,6 +14,7 @@
 
 #include <QWidget>
 #include <QTableWidgetItem>
+#include <QStandardItemModel>
 
 class ItemSprite;
 struct SpriteFrame;
@@ -24,7 +25,8 @@ class WidgetSpriteState;
 
 class WidgetSprite;
 
-class SpriteFramesModel : public QAbstractTableModel
+todo: make qstandarditemmodel work
+class SpriteFramesModel : public QStandardItemModel
 {
     Q_OBJECT
     

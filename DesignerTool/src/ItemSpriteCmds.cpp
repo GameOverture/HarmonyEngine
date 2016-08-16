@@ -264,8 +264,8 @@ void ItemSpriteCmd_OrderFrame::redo()
 
 void ItemSpriteCmd_OrderFrame::undo()
 {
-    m_pSpriteState->OrderFrame(m_iFrameIndex, m_iFrameIndex - m_iFrameIndexDest);
-    m_pSpriteState->SelectIndex(m_iFrameIndex);
+    m_pSpriteState->OrderFrame(m_iFrameIndexDest, m_iFrameIndex - m_iFrameIndexDest);
+    m_pSpriteState->SelectIndex(m_iFrameIndexDest);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
