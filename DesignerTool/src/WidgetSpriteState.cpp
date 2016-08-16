@@ -76,21 +76,6 @@ void SpriteFramesModel::MoveRowDown(int iIndex)
     endMoveRows();
 }
 
-//void SpriteFramesModel::Offset(int iIndex, int iOffset)
-//{
-//    int iDestinationRow = iIndex + iOffset;
-//    if(iOffset > 0)
-//        iDestinationRow += 1;
-    
-//    HyGuiLog("MOVE: " % QString::number(iIndex) % "--> " % QString::number(iIndex + iOffset), LOGTYPE_Normal);
-    
-//    if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iDestinationRow) == false)
-//        return;
-    
-//    m_FramesList.swap(iIndex, iIndex + iOffset);
-//    endMoveRows();
-//}
-
 SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 {
     if(iIndex < 0)
@@ -133,7 +118,7 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
     return QVariant();
 }
 
-/*virtual*/ QVariant SpriteFramesModel::headerData(int section, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant SpriteFramesModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
 {
 //    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Frame, 100);
 //    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Offset, 64);
@@ -146,7 +131,7 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
     {
         if (orientation == Qt::Horizontal)
         {
-            switch(section)
+            switch(iIndex)
             {
             case COLUMN_Frame:
                 return QString("Frame");
@@ -160,6 +145,8 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
                 return QString("Duration");
             }
         }
+        else
+            return QString::number(iIndex);
     }
     
     return QVariant();
