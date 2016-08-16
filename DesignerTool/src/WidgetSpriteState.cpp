@@ -19,7 +19,7 @@
 #include <QJsonArray>
 
 
-SpriteFramesModel::SpriteFramesModel(QObject *parent) : QStandardItemModel(parent)
+SpriteFramesModel::SpriteFramesModel(QObject *parent) : QAbstractTableModel(parent)
 {
 }
 
@@ -58,12 +58,38 @@ void SpriteFramesModel::Remove(HyGuiFrame *pFrame)
     }
 }
 
-void SpriteFramesModel::Offset(int iIndex, int iOffset)
+void SpriteFramesModel::MoveRowUp(int iIndex)
 {
-    beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + iOffset);
-    m_FramesList.swap(iIndex, iIndex + iOffset);
+    if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
+        return;
+    
+    m_FramesList.swap(iIndex, iIndex - 1);
     endMoveRows();
 }
+
+void SpriteFramesModel::MoveRowDown(int iIndex)
+{
+    if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt is retarded
+        return;
+    
+    m_FramesList.swap(iIndex, iIndex + 1);
+    endMoveRows();
+}
+
+//void SpriteFramesModel::Offset(int iIndex, int iOffset)
+//{
+//    int iDestinationRow = iIndex + iOffset;
+//    if(iOffset > 0)
+//        iDestinationRow += 1;
+    
+//    HyGuiLog("MOVE: " % QString::number(iIndex) % "--> " % QString::number(iIndex + iOffset), LOGTYPE_Normal);
+    
+//    if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iDestinationRow) == false)
+//        return;
+    
+//    m_FramesList.swap(iIndex, iIndex + iOffset);
+//    endMoveRows();
+//}
 
 SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 {
@@ -245,26 +271,17 @@ int WidgetSpriteState::GetNumFrames()
 
 void WidgetSpriteState::OrderFrame(int iIndex, int iOffset)
 {
-    QItemSelectionModel *pSelectionModel = ui->framesView->selectionModel();
-
-    int iNumLeft = ui->framesView->model()->rowCount();
-
-    QList<QStandardItem *> srcRowList;
-    srcRowList.append(static_cast<QStandardItemModel *>(ui->framesView->model())->takeRow(iIndex));
-
-    iNumLeft = ui->framesView->model()->rowCount();
-
-    QList<QStandardItem *> destRowList;
-    destRowList.append(static_cast<QStandardItemModel *>(ui->framesView->model())->takeRow(iIndex + iOffset));
-
-    iNumLeft = ui->framesView->model()->rowCount();
-
-    //static_cast<QStandardItem *>(ui->framesView->model())->insertRow(iIndex, );
-    //static_cast<QStandardItem *>(ui->framesView->model())->insertRow(iIndex + iOffset);
-
-
-
-    m_pSpriteFramesModel->Offset(iIndex, iOffset);
+    while(iOffset > 0)
+    {
+        m_pSpriteFramesModel->MoveRowDown(iIndex);
+        iOffset--;
+    }
+    
+    while(iOffset < 0)
+    {
+        m_pSpriteFramesModel->MoveRowUp(iIndex);
+        iOffset++;
+    }
 }
 
 void WidgetSpriteState::AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef)

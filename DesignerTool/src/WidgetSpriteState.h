@@ -13,8 +13,6 @@
 #include "HyGuiFrame.h"
 
 #include <QWidget>
-#include <QTableWidgetItem>
-#include <QStandardItemModel>
 
 class ItemSprite;
 struct SpriteFrame;
@@ -25,8 +23,7 @@ class WidgetSpriteState;
 
 class WidgetSprite;
 
-todo: make qstandarditemmodel work
-class SpriteFramesModel : public QStandardItemModel
+class SpriteFramesModel : public QAbstractTableModel
 {
     Q_OBJECT
     
@@ -49,7 +46,8 @@ public:
     
     void Add(HyGuiFrame *pFrame);
     void Remove(HyGuiFrame *pFrame);
-    void Offset(int iIndex, int iOffset);
+    void MoveRowUp(int iIndex);
+    void MoveRowDown(int iIndex);
     
     SpriteFrame *GetFrameAt(int iIndex);
     

@@ -17,17 +17,6 @@ class WidgetAtlasManager;
 
 struct SpriteFrame
 {
-    enum eColumn
-    {
-        COLUMN_Frame = 0,
-        COLUMN_Offset,
-        COLUMN_Rotation,
-        COLUMN_Scale,
-        COLUMN_Duration,
-        
-        NUMCOLUMNS
-    };
-    
     HyGuiFrame *            m_pFrame;
     int                     m_iRowIndex;
     
@@ -44,7 +33,7 @@ struct SpriteFrame
                                                         m_fDuration(0.016f)
     { }
 };
-Q_DECLARE_METATYPE(SpriteFrame *)
+//Q_DECLARE_METATYPE(SpriteFrame *)
 
 class ItemSprite : public ItemWidget
 {
