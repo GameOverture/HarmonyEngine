@@ -13,6 +13,7 @@
 #include "HyGuiFrame.h"
 
 #include <QWidget>
+#include <QResizeEvent>
 
 class ItemSprite;
 struct SpriteFrame;
@@ -30,6 +31,8 @@ class SpriteFramesModel : public QAbstractTableModel
     QList<SpriteFrame *>            m_FramesList;
     QMap<quint32, SpriteFrame *>    m_RemovedFrameMap;  // Used to reinsert frames (via undo/redo) while keeping their attributes
     
+    
+public:
     enum eColumn
     {
         COLUMN_Frame = 0,
@@ -37,11 +40,10 @@ class SpriteFramesModel : public QAbstractTableModel
         COLUMN_Rotation,
         COLUMN_Scale,
         COLUMN_Duration,
-        
+
         NUMCOLUMNS
     };
-    
-public:
+
     SpriteFramesModel(QObject *pParent);
     
     void Add(HyGuiFrame *pFrame);
@@ -94,6 +96,7 @@ public:
 
 private slots:
     void on_framesView_itemSelectionChanged(QModelIndex current, QModelIndex previous);
+    void on_framesView_resizeEvent(QResizeEvent *pResizeEvent);
     
 private:
     Ui::WidgetSpriteState *ui;

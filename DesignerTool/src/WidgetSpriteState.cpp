@@ -18,7 +18,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-
 SpriteFramesModel::SpriteFramesModel(QObject *parent) : QAbstractTableModel(parent)
 {
 }
@@ -120,13 +119,6 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 
 /*virtual*/ QVariant SpriteFramesModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
 {
-//    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Frame, 100);
-//    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Offset, 64);
-//    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Rotation, 32);
-//    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Scale, 64);
-//    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Duration, 32);
-//    ui->frames->setMinimumWidth(100+64+32+64+32);
-    
     if (role == Qt::DisplayRole)
     {
         if (orientation == Qt::Horizontal)
@@ -142,7 +134,7 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
             case COLUMN_Scale:
                 return QString("Scale");
             case COLUMN_Duration:
-                return QString("Duration");
+                return QString("Dur");
             }
         }
         else
@@ -198,11 +190,24 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
     ui->btnOrderFrameUp->setDefaultAction(FindAction(stateActionList, "actionOrderFrameUpwards"));
     ui->btnOrderFrameDown->setDefaultAction(FindAction(stateActionList, "actionOrderFrameDownwards"));
     
+    //    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Frame, 100);
+    //    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Offset, 64);
+    //    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Rotation, 32);
+    //    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Scale, 64);
+    //    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Duration, 32);
+    //    ui->frames->setMinimumWidth(100+64+32+64+32);
+
     m_pSpriteFramesModel = new SpriteFramesModel(this);
     ui->framesView->setModel(m_pSpriteFramesModel);
+//    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Frame, 100);
+//    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Offset, 64);
+//    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Rotation, 32);
+//    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Scale, 64);
+//    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Duration, 48);
 
     QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
     connect(pSelModel, SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(on_framesView_itemSelectionChanged(QModelIndex,QModelIndex)));
+    connect(ui->framesView, SIGNAL(resizeEvent(QResizeEvent *pEvent)), this, SLOT(on_framesView_resizeEvent(QResizeEvent *)));
 }
 
 WidgetSpriteState::~WidgetSpriteState()
@@ -305,3 +310,16 @@ void WidgetSpriteState::on_framesView_itemSelectionChanged(QModelIndex current, 
 {
     m_pOwner->UpdateActions();
 }
+
+void WidgetSpriteState::on_framesView_resizeEvent(QResizeEvent *pResizeEvent)
+{
+    int iWidth = pResizeEvent->size().width();
+
+    iWidth -= 64 + 32 + 64 + 48;
+    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Frame, iWidth);
+    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Offset, 64);
+    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Rotation, 32);
+    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Scale, 64);
+    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Duration, 48);
+}
+
