@@ -18,6 +18,24 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+WidgetSpriteStateTableView::WidgetSpriteStateTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
+{
+}
+
+/*virtual*/ void WidgetSpriteStateTableView::resizeEvent(QResizeEvent *pResizeEvent)
+{
+    int iWidth = pResizeEvent->size().width();
+
+    iWidth -= 64 + 32 + 64 + 48;
+    setColumnWidth(SpriteFramesModel::COLUMN_Frame, iWidth);
+    setColumnWidth(SpriteFramesModel::COLUMN_Offset, 64);
+    setColumnWidth(SpriteFramesModel::COLUMN_Rotation, 32);
+    setColumnWidth(SpriteFramesModel::COLUMN_Scale, 64);
+    setColumnWidth(SpriteFramesModel::COLUMN_Duration, 48);
+    
+    QTableView::resizeEvent(pResizeEvent);
+}
+
 SpriteFramesModel::SpriteFramesModel(QObject *parent) : QAbstractTableModel(parent)
 {
 }
@@ -207,7 +225,7 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
 
     QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
     connect(pSelModel, SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(on_framesView_itemSelectionChanged(QModelIndex,QModelIndex)));
-    connect(ui->framesView, SIGNAL(resizeEvent(QResizeEvent *pEvent)), this, SLOT(on_framesView_resizeEvent(QResizeEvent *)));
+    connect(ui->framesView, SIGNAL(resizeEvent(QResizeEvent *)), this, SLOT(on_framesView_resizeEvent(QResizeEvent *)));
 }
 
 WidgetSpriteState::~WidgetSpriteState()
@@ -309,17 +327,5 @@ void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
 void WidgetSpriteState::on_framesView_itemSelectionChanged(QModelIndex current, QModelIndex previous)
 {
     m_pOwner->UpdateActions();
-}
-
-void WidgetSpriteState::on_framesView_resizeEvent(QResizeEvent *pResizeEvent)
-{
-    int iWidth = pResizeEvent->size().width();
-
-    iWidth -= 64 + 32 + 64 + 48;
-    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Frame, iWidth);
-    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Offset, 64);
-    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Rotation, 32);
-    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Scale, 64);
-    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Duration, 48);
 }
 

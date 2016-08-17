@@ -14,6 +14,7 @@
 
 #include <QWidget>
 #include <QResizeEvent>
+#include <QTableView>
 
 class ItemSprite;
 struct SpriteFrame;
@@ -23,6 +24,17 @@ class WidgetSpriteState;
 }
 
 class WidgetSprite;
+
+class WidgetSpriteStateTableView : public QTableView
+{
+    Q_OBJECT
+    
+public:
+    WidgetSpriteStateTableView(QWidget *pParent = 0);
+    
+protected:
+    virtual void resizeEvent(QResizeEvent *pResizeEvent);
+};
 
 class SpriteFramesModel : public QAbstractTableModel
 {
@@ -96,7 +108,6 @@ public:
 
 private slots:
     void on_framesView_itemSelectionChanged(QModelIndex current, QModelIndex previous);
-    void on_framesView_resizeEvent(QResizeEvent *pResizeEvent);
     
 private:
     Ui::WidgetSpriteState *ui;
