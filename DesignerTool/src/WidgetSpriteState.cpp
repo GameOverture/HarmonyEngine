@@ -18,6 +18,8 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 WidgetSpriteStateTableView::WidgetSpriteStateTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
 {
 }
@@ -35,6 +37,8 @@ WidgetSpriteStateTableView::WidgetSpriteStateTableView(QWidget *pParent /*= 0*/)
     
     QTableView::resizeEvent(pResizeEvent);
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 SpriteFramesModel::SpriteFramesModel(QObject *parent) : QAbstractTableModel(parent)
 {
@@ -207,21 +211,13 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
     ui->btnRemoveFrame->setDefaultAction(FindAction(stateActionList, "actionRemoveFrames"));
     ui->btnOrderFrameUp->setDefaultAction(FindAction(stateActionList, "actionOrderFrameUpwards"));
     ui->btnOrderFrameDown->setDefaultAction(FindAction(stateActionList, "actionOrderFrameDownwards"));
-    
-    //    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Frame, 100);
-    //    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Offset, 64);
-    //    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Rotation, 32);
-    //    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Scale, 64);
-    //    ui->frames->setColumnWidth(SpriteFrame::COLUMN_Duration, 32);
-    //    ui->frames->setMinimumWidth(100+64+32+64+32);
 
     m_pSpriteFramesModel = new SpriteFramesModel(this);
     ui->framesView->setModel(m_pSpriteFramesModel);
-//    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Frame, 100);
-//    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Offset, 64);
-//    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Rotation, 32);
-//    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Scale, 64);
-//    ui->framesView->setColumnWidth(SpriteFramesModel::COLUMN_Duration, 48);
+    
+    ui->btnPlay->setDefaultAction(ui->actionPlay);
+    ui->btnFirstFrame->setDefaultAction(ui->actionFirstFrame);
+    ui->btnLastFrame->setDefaultAction(ui->actionLastFrame);
 
     QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
     connect(pSelModel, SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(on_framesView_itemSelectionChanged(QModelIndex,QModelIndex)));
@@ -329,3 +325,8 @@ void WidgetSpriteState::on_framesView_itemSelectionChanged(QModelIndex current, 
     m_pOwner->UpdateActions();
 }
 
+
+void WidgetSpriteState::on_actionPlay_triggered()
+{
+    
+}

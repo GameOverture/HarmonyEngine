@@ -26,54 +26,41 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QPushButton" name="btnPrevState">
-         <property name="maximumSize">
-          <size>
-           <width>23</width>
-           <height>16777215</height>
-          </size>
-         </property>
+        <widget class="QToolButton" name="btnFirstFrame">
          <property name="text">
-          <string/>
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="res/DesignerTool.qrc">
+           <normaloff>:/icons16x16/media-rewind.png</normaloff>:/icons16x16/media-rewind.png</iconset>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btnRewindState">
-         <property name="maximumSize">
-          <size>
-           <width>23</width>
-           <height>16777215</height>
-          </size>
+        <widget class="QToolButton" name="btnPlay">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <property name="text">
-          <string/>
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="res/DesignerTool.qrc">
+           <normaloff>:/icons16x16/media-play.png</normaloff>:/icons16x16/media-play.png</iconset>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btnPlayState">
-         <property name="maximumSize">
-          <size>
-           <width>75</width>
-           <height>16777215</height>
-          </size>
-         </property>
+        <widget class="QToolButton" name="btnLastFrame">
          <property name="text">
-          <string/>
+          <string>...</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnNextState">
-         <property name="maximumSize">
-          <size>
-           <width>23</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
+         <property name="icon">
+          <iconset resource="res/DesignerTool.qrc">
+           <normaloff>:/icons16x16/media-forward.png</normaloff>:/icons16x16/media-forward.png</iconset>
          </property>
         </widget>
        </item>
@@ -184,6 +171,42 @@
     </layout>
    </item>
   </layout>
+  <action name="actionPlay">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/media-play.png</normaloff>:/icons16x16/media-play.png</iconset>
+   </property>
+   <property name="text">
+    <string>Play</string>
+   </property>
+   <property name="toolTip">
+    <string>Preview the sprite's animation</string>
+   </property>
+  </action>
+  <action name="actionFirstFrame">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/media-rewind.png</normaloff>:/icons16x16/media-rewind.png</iconset>
+   </property>
+   <property name="text">
+    <string>First Frame</string>
+   </property>
+   <property name="toolTip">
+    <string>Selects the first frame of this sprite's animation</string>
+   </property>
+  </action>
+  <action name="actionLastFrame">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/media-forward.png</normaloff>:/icons16x16/media-forward.png</iconset>
+   </property>
+   <property name="text">
+    <string>Last Frame</string>
+   </property>
+   <property name="toolTip">
+    <string>Selects the last frame of this sprite's animation</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -192,6 +215,8 @@
    <header>WidgetSpriteState.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="res/DesignerTool.qrc"/>
+ </resources>
  <connections/>
 </ui>

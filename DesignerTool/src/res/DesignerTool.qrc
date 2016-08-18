@@ -49,5 +49,11 @@
         <file>icons16x16/generic-left.png</file>
         <file>icons16x16/generic-right.png</file>
         <file>icons16x16/sprite-applyToAll.png</file>
+        <file>icons16x16/media-forward.png</file>
+        <file>icons16x16/media-pause.png</file>
+        <file>icons16x16/media-pauseRecord.png</file>
+        <file>icons16x16/media-play.png</file>
+        <file>icons16x16/media-rewind.png</file>
+        <file>icons16x16/media-stop.png</file>
     </qresource>
 </RCC>

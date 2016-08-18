@@ -30,7 +30,7 @@ HyGuiRenderer::HyGuiRenderer(ItemProject *pProj, QWidget *parent /*= 0*/) : QOpe
 {
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(20);
+    timer->start(10);
 }
 
 HyGuiRenderer::~HyGuiRenderer()
@@ -65,7 +65,7 @@ HyGuiRenderer::~HyGuiRenderer()
     if(m_pHyEngine && m_bIsUpdating == false)
     {
         m_bIsUpdating = true;
-        if(m_pHyEngine->Update() == false)  // This will call WidgetRenderer::Update()
+        if(m_pHyEngine->Update() == false)
             HyGuiLog("Harmony Gfx requested exit program.", LOGTYPE_Info);
 
         m_bIsUpdating = false;

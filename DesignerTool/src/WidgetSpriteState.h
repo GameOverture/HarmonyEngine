@@ -109,6 +109,8 @@ public:
 private slots:
     void on_framesView_itemSelectionChanged(QModelIndex current, QModelIndex previous);
     
+    void on_actionPlay_triggered();
+    
 private:
     Ui::WidgetSpriteState *ui;
 };
