@@ -9,8 +9,8 @@
  *************************************************************************/
 #include "Time/IHyTime.h"
 
-/*static*/ const uint32			IHyTime::sm_uiUPDATESTEP_HERTZ = 100;
-/*static*/ const double			IHyTime::sm_dUPDATESTEP_SECONDS = 1.0 / IHyTime::sm_uiUPDATESTEP_HERTZ;
+/*static*/ const uint32			IHyTime::sm_uiUPDATESTEP_MILLISECONDS = 10;
+/*static*/ const double			IHyTime::sm_dUPDATESTEP_SECONDS = sm_uiUPDATESTEP_MILLISECONDS / 1000.0;
 
 IHyTime::IHyTime() :	m_dTimeManipulation(1.0f),
 						m_dCurDeltaTime(0.0),
