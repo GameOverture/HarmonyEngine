@@ -15,6 +15,7 @@
 #include <QWidget>
 #include <QResizeEvent>
 #include <QTableView>
+#include <QStyledItemDelegate>
 
 class ItemSprite;
 struct SpriteFrame;
@@ -25,6 +26,7 @@ class WidgetSpriteState;
 
 class WidgetSprite;
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class WidgetSpriteStateTableView : public QTableView
 {
     Q_OBJECT
@@ -35,7 +37,20 @@ public:
 protected:
     virtual void resizeEvent(QResizeEvent *pResizeEvent);
 };
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class WidgetSpriteStateDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+    
+public:
+    WidgetSpriteStateDelegate(QObject *pParent = 0);
+    
+    virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const;
+    virtual void setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const;
+    virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class SpriteFramesModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -76,8 +91,7 @@ public:
 signals:
     void editCompleted(const QString &);
 };
-
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class WidgetSpriteState : public QWidget
 {
     Q_OBJECT

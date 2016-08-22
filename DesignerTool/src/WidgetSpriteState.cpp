@@ -18,6 +18,9 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+#include <QLineEdit>
+#include <QDoubleSpinBox>
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 WidgetSpriteStateTableView::WidgetSpriteStateTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
@@ -28,14 +31,86 @@ WidgetSpriteStateTableView::WidgetSpriteStateTableView(QWidget *pParent /*= 0*/)
 {
     int iWidth = pResizeEvent->size().width();
 
-    iWidth -= 64 + 32 + 64 + 48;
+    iWidth -= 64 + 32 + 64 + 50;
     setColumnWidth(SpriteFramesModel::COLUMN_Frame, iWidth);
     setColumnWidth(SpriteFramesModel::COLUMN_Offset, 64);
     setColumnWidth(SpriteFramesModel::COLUMN_Rotation, 32);
     setColumnWidth(SpriteFramesModel::COLUMN_Scale, 64);
-    setColumnWidth(SpriteFramesModel::COLUMN_Duration, 48);
+    setColumnWidth(SpriteFramesModel::COLUMN_Duration, 50);
     
     QTableView::resizeEvent(pResizeEvent);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+WidgetSpriteStateDelegate::WidgetSpriteStateDelegate(QObject *pParent /*= 0*/) : QStyledItemDelegate(pParent)
+{
+}
+
+/*virtual*/ QWidget *WidgetSpriteStateDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QWidget *pReturnWidget = NULL;
+    
+    switch(index.column())
+    {
+    case SpriteFramesModel::COLUMN_Offset:
+    case SpriteFramesModel::COLUMN_Scale:
+        pReturnWidget = new QLineEdit(pParent);
+        static_cast<QLineEdit *>(pReturnWidget)->setValidator(HyGlobal::Vector2dValidator());
+        break;
+        
+    case SpriteFramesModel::COLUMN_Rotation:
+        pReturnWidget = new QDoubleSpinBox(pParent);
+        static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(0.0, 360.0);
+        static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix("°");
+        break;
+        
+    case SpriteFramesModel::COLUMN_Duration:
+        pReturnWidget = new QDoubleSpinBox(pParent);
+        static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix("ms");
+        break;
+    }
+    
+    return pReturnWidget;
+}
+
+/*virtual*/ void WidgetSpriteStateDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const
+{
+    QString sCurValue = index.model()->data(index, Qt::EditRole).toString();
+    
+    switch(index.column())
+    {
+    case SpriteFramesModel::COLUMN_Offset:
+    case SpriteFramesModel::COLUMN_Scale:
+        static_cast<QLineEdit *>(pEditor)->setText(sCurValue);
+        break;
+    
+    case SpriteFramesModel::COLUMN_Rotation:
+    case SpriteFramesModel::COLUMN_Duration:
+        static_cast<QDoubleSpinBox *>(pEditor)->setValue(sCurValue.toDouble());
+        break;
+    }
+}
+
+/*virtual*/ void WidgetSpriteStateDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
+{
+    switch(index.column())
+    {
+    case SpriteFramesModel::COLUMN_Offset:
+    case SpriteFramesModel::COLUMN_Scale:
+        pModel->setData(index, static_cast<QLineEdit *>(pEditor)->text());
+        break;
+    
+    case SpriteFramesModel::COLUMN_Rotation:
+    case SpriteFramesModel::COLUMN_Duration:
+        pModel->setData(index, QString::number(static_cast<QDoubleSpinBox *>(pEditor)->value()));
+        break;
+    }
+}
+
+/*virtual*/ void WidgetSpriteStateDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    pEditor->setGeometry(option.rect);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +206,7 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 {
     SpriteFrame *pFrame = m_FramesList[index.row()];
     
-    if(role == Qt::DisplayRole)
+    if(role == Qt::DisplayRole || role == Qt::EditRole)
     {
         switch(index.column())
         {
@@ -140,11 +215,11 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
         case COLUMN_Offset:
             return PointToQString(pFrame->m_ptOffset);
         case COLUMN_Rotation:
-            return QString::number(pFrame->m_fRotation);
+            return QString::number(pFrame->m_fRotation) % ((role == Qt::DisplayRole) ? "°" : "");
         case COLUMN_Scale:
             return PointToQString(pFrame->m_ptScale);
         case COLUMN_Duration:
-            return QString::number(pFrame->m_fDuration);
+            return QString::number(pFrame->m_fDuration, 'g', 4) % ((role == Qt::DisplayRole) ? "ms" : "");
         }
     }
     
@@ -184,17 +259,21 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
     
     if(role == Qt::EditRole)
     {
-//        switch(index.column())
-//        {
-//        case COLUMN_Offset:
-//            return PointToQString(pFrame->m_ptOffset);
-//        case COLUMN_Rotation:
-//            return QString::number(pFrame->m_fRotation);
-//        case COLUMN_Scale:
-//            return PointToQString(pFrame->m_ptScale);
-//        case COLUMN_Duration:
-//            return QString::number(pFrame->m_fDuration);
-//        }
+        switch(index.column())
+        {
+        case COLUMN_Offset:
+            pFrame->m_ptOffset = StringToPoint(value.toString());
+            break;
+        case COLUMN_Rotation:
+            pFrame->m_fRotation = value.toString().toFloat();
+            break;
+        case COLUMN_Scale:
+            pFrame->m_ptScale = StringToPoint(value.toString());
+            break;
+        case COLUMN_Duration:
+            pFrame->m_fDuration = value.toString().toFloat();
+            break;
+        }
     }
     
     QVector<int> vRolesChanged;
@@ -231,6 +310,7 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
 
     m_pSpriteFramesModel = new SpriteFramesModel(this);
     ui->framesView->setModel(m_pSpriteFramesModel);
+    ui->framesView->setItemDelegate(new WidgetSpriteStateDelegate(this));
     
     ui->btnPlay->setDefaultAction(ui->actionPlay);
     ui->btnFirstFrame->setDefaultAction(ui->actionFirstFrame);
@@ -238,7 +318,7 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
 
     QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
     connect(pSelModel, SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(on_framesView_itemSelectionChanged(QModelIndex,QModelIndex)));
-    connect(ui->framesView, SIGNAL(resizeEvent(QResizeEvent *)), this, SLOT(on_framesView_resizeEvent(QResizeEvent *)));
+    ui->framesView->resize(ui->framesView->size());
 }
 
 WidgetSpriteState::~WidgetSpriteState()

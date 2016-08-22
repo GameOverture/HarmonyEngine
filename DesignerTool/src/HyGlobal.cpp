@@ -16,7 +16,7 @@
 
 /*static*/ QRegExpValidator *HyGlobal::sm_pFileNameValidator = NULL;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFilePathValidator = NULL;
-/*static*/ QRegExpValidator *HyGlobal::sm_pNumericCommaValidator = NULL;
+/*static*/ QRegExpValidator *HyGlobal::sm_pVector2dValidator = NULL;
 
 QAction *FindAction(QList<QAction *> list, QString sName)
 {
@@ -38,5 +38,17 @@ char *QStringToCharPtr(QString sString)
 
 QString PointToQString(QPointF ptPoint)
 {
-    return QString::number(ptPoint.x(), 'g', 2) % ", " % QString::number(ptPoint.y(), 'g', 2);
+    return "(" % QString::number(ptPoint.x(), 'g', 4) % "," % QString::number(ptPoint.y(), 'g', 4) % ")";
+}
+
+QPointF StringToPoint(QString sPoint)
+{
+    sPoint.replace(QString("("), QString(""));
+    sPoint.replace(QString(")"), QString(""));
+    QStringList sComponentList = sPoint.split(',');
+    
+    if(sComponentList.size() < 2)
+        return QPointF(0.0f, 0.0f);
+    else
+        return QPointF(sComponentList[0].toFloat(), sComponentList[1].toFloat());
 }
