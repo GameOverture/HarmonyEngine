@@ -62,6 +62,7 @@ public:
     void Remove(HyGuiFrame *pFrame);
     void MoveRowUp(int iIndex);
     void MoveRowDown(int iIndex);
+    void SetUpdateFreq(uint uiHertz);
     
     SpriteFrame *GetFrameAt(int iIndex);
     
@@ -85,6 +86,10 @@ class WidgetSpriteState : public QWidget
     SpriteFramesModel *                 m_pSpriteFramesModel;
     
     QString                             m_sName;
+    
+    bool                                m_bPlayActive;
+    double                              m_dElapsedTime;
+    bool                                m_bIsBounced;
 
 public:
     explicit WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stateActionList, QWidget *parent = 0);
@@ -105,11 +110,25 @@ public:
     void AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef);
     
     void GetStateFrameInfo(QJsonObject &stateObjOut);
+    
+    void UpdateTimeStep(double dDelta);
 
 private slots:
     void on_framesView_itemSelectionChanged(QModelIndex current, QModelIndex previous);
     
     void on_actionPlay_triggered();
+    
+    void on_btnHz10_clicked();
+    
+    void on_btnHz20_clicked();
+    
+    void on_btnHz30_clicked();
+    
+    void on_btnHz40_clicked();
+    
+    void on_btnHz50_clicked();
+    
+    void on_btnHz60_clicked();
     
 private:
     Ui::WidgetSpriteState *ui;

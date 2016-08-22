@@ -97,6 +97,18 @@ void SpriteFramesModel::MoveRowDown(int iIndex)
     endMoveRows();
 }
 
+void SpriteFramesModel::SetUpdateFreq(uint uiHertz)
+{
+    float fDur = 1000.0f / static_cast<float>(uiHertz);
+    
+    for(int i = 0; i < m_FramesList.count(); ++i)
+        m_FramesList[i]->m_fDuration = fDur;
+    
+    QModelIndex startIndex = createIndex(0, COLUMN_Duration);
+    QModelIndex endIndex = createIndex(m_FramesList.count() - 1, COLUMN_Duration);
+    dataChanged(startIndex, endIndex);
+}
+
 SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 {
     if(iIndex < 0)
@@ -183,9 +195,11 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 //        case COLUMN_Duration:
 //            return QString::number(pFrame->m_fDuration);
 //        }
-
-        //emit editCompleted( result );
     }
+    
+    QVector<int> vRolesChanged;
+    vRolesChanged.append(role);
+    dataChanged(index, index, vRolesChanged);
 
     return true;
 }
@@ -203,7 +217,10 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stateActionList, QWidget *parent) : QWidget(parent),
                                                                                                                 m_pOwner(pOwner),
                                                                                                                 ui(new Ui::WidgetSpriteState),
-                                                                                                                m_sName("Unnamed")
+                                                                                                                m_sName("Unnamed"),
+                                                                                                                m_bPlayActive(false),
+                                                                                                                m_dElapsedTime(0.0),
+                                                                                                                m_bIsBounced(false)
 {
     ui->setupUi(this);
 
@@ -320,13 +337,85 @@ void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
     stateObjOut.insert("frames", QJsonValue(frameArray));
 }
 
+void WidgetSpriteState::UpdateTimeStep(double dDelta)
+{
+    if(m_bPlayActive == false)
+        return;
+    
+    SpriteFrame *pFrame = GetSelectedFrame();
+    if(pFrame)
+    {
+        m_dElapsedTime += dDelta;
+        while(m_dElapsedTime >= pFrame->m_fDuration)
+        {
+            int iCurRow = ui->framesView->currentIndex().row();
+            int iNextRow;
+            
+            if(ui->chkReverse->isChecked())
+            {
+                if(iCurRow == 0)
+                {
+                }
+                
+                if(ui->chkBounce->isChecked() && m_bIsBounced)
+                    iNextRow = iCurRow + 1;
+                else
+                    iNextRow = iCurRow - 1;
+            }
+            
+            ui->framesView->selectRow(iNextRow);
+            SpriteFrame *pFrame = GetSelectedFrame();
+            
+            m_dElapsedTime -= pFrame->m_fDuration;
+        }
+    }
+}
+
 void WidgetSpriteState::on_framesView_itemSelectionChanged(QModelIndex current, QModelIndex previous)
 {
     m_pOwner->UpdateActions();
 }
 
-
 void WidgetSpriteState::on_actionPlay_triggered()
 {
+    m_bPlayActive = !m_bPlayActive;
     
+    if(m_bPlayActive)
+    {
+        ui->btnPlay->setIcon(QIcon(":/icons16x16/media-pause.png"));
+        m_bIsBounced = false;
+    }
+    else
+        ui->btnPlay->setIcon(QIcon(":/icons16x16/media-play.png"));
 }
+
+void WidgetSpriteState::on_btnHz10_clicked()
+{
+    m_pSpriteFramesModel->SetUpdateFreq(10);
+}
+
+void WidgetSpriteState::on_btnHz20_clicked()
+{
+    m_pSpriteFramesModel->SetUpdateFreq(20);
+}
+
+void WidgetSpriteState::on_btnHz30_clicked()
+{
+    m_pSpriteFramesModel->SetUpdateFreq(30);
+}
+
+void WidgetSpriteState::on_btnHz40_clicked()
+{
+    m_pSpriteFramesModel->SetUpdateFreq(40);
+}
+
+void WidgetSpriteState::on_btnHz50_clicked()
+{
+    m_pSpriteFramesModel->SetUpdateFreq(50);
+}
+
+void WidgetSpriteState::on_btnHz60_clicked()
+{
+    m_pSpriteFramesModel->SetUpdateFreq(60);
+}
+
