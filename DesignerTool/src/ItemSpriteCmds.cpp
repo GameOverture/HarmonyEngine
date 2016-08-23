@@ -241,10 +241,10 @@ void ItemSpriteCmd_DeleteFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemSpriteCmd_OrderFrame::ItemSpriteCmd_OrderFrame(WidgetSpriteState *pSpriteState, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-                                                                                                                                                                    m_pSpriteState(pSpriteState),
-                                                                                                                                                                    m_iFrameIndex(iFrameIndex),
-                                                                                                                                                                    m_iFrameIndexDest(iFrameIndexDestination)
+ItemSpriteCmd_OrderFrame::ItemSpriteCmd_OrderFrame(WidgetSpriteStateTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+                                                                                                                                                                                m_pSpriteTableView(pSpriteTableView),
+                                                                                                                                                                                m_iFrameIndex(iFrameIndex),
+                                                                                                                                                                                m_iFrameIndexDest(iFrameIndexDestination)
 {
     if(m_iFrameIndex > m_iFrameIndexDest)
         setText("Order Frame Upwards");
@@ -258,29 +258,153 @@ ItemSpriteCmd_OrderFrame::ItemSpriteCmd_OrderFrame(WidgetSpriteState *pSpriteSta
 
 void ItemSpriteCmd_OrderFrame::redo()
 {
-    m_pSpriteState->OrderFrame(m_iFrameIndex, m_iFrameIndexDest - m_iFrameIndex);
-    m_pSpriteState->SelectIndex(m_iFrameIndexDest);
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    
+    int iOffset = m_iFrameIndexDest - m_iFrameIndex;
+    while(iOffset > 0)
+    {
+        pSpriteFramesModel->MoveRowDown(m_iFrameIndex);
+        iOffset--;
+    }
+    
+    while(iOffset < 0)
+    {
+        pSpriteFramesModel->MoveRowUp(m_iFrameIndex);
+        iOffset++;
+    }
+    
+    m_pSpriteTableView->selectRow(m_iFrameIndexDest);
 }
 
 void ItemSpriteCmd_OrderFrame::undo()
 {
-    m_pSpriteState->OrderFrame(m_iFrameIndexDest, m_iFrameIndex - m_iFrameIndexDest);
-    m_pSpriteState->SelectIndex(m_iFrameIndex);
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    
+    int iOffset = m_iFrameIndex - m_iFrameIndexDest;
+    while(iOffset > 0)
+    {
+        pSpriteFramesModel->MoveRowDown(m_iFrameIndexDest);
+        iOffset--;
+    }
+    
+    while(iOffset < 0)
+    {
+        pSpriteFramesModel->MoveRowUp(m_iFrameIndexDest);
+        iOffset++;
+    }
+    
+    m_pSpriteTableView->selectRow(m_iFrameIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemSpriteCmd_TransformFrame::ItemSpriteCmd_TransformFrame(SpriteFrame *pFrame, QPointF vOffset, float fRot, QPointF vScale, float fDuration, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent)
+ItemSpriteCmd_TranslateFrame::ItemSpriteCmd_TranslateFrame(WidgetSpriteStateTableView *pSpriteTableView, int iIndex, QPointF vOffset, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+                                                                                                                                                                        m_pSpriteTableView(pSpriteTableView),
+                                                                                                                                                                        m_iFrameIndex(iIndex),
+                                                                                                                                                                        m_vNewOffset(vOffset)
+{
+    setText("Translate Frame Offset");
+    
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    m_vOriginalOffset = pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_ptOffset;
+}
+
+/*virtual*/ ItemSpriteCmd_TranslateFrame::~ItemSpriteCmd_TranslateFrame()
 {
 }
 
-/*virtual*/ ItemSpriteCmd_TransformFrame::~ItemSpriteCmd_TransformFrame()
+void ItemSpriteCmd_TranslateFrame::redo()
+{
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    pSpriteFramesModel->TranslateFrame(m_iFrameIndex, m_vNewOffset);
+}
+
+void ItemSpriteCmd_TranslateFrame::undo()
+{
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    pSpriteFramesModel->TranslateFrame(m_iFrameIndex, m_vOriginalOffset);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ItemSpriteCmd_RotateFrame::ItemSpriteCmd_RotateFrame(WidgetSpriteStateTableView *pSpriteTableView, int iIndex, float fRot, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                            m_pSpriteTableView(pSpriteTableView),
+                                                                                                                                                            m_iFrameIndex(iIndex),
+                                                                                                                                                            m_fNewRotation(fRot)
+{
+    setText("Rotate Frame");
+    
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    m_fOriginalRotation = pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_fRotation;
+}
+
+/*virtual*/ ItemSpriteCmd_RotateFrame::~ItemSpriteCmd_RotateFrame()
 {
 }
 
-void ItemSpriteCmd_TransformFrame::redo()
+void ItemSpriteCmd_RotateFrame::redo()
+{
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    pSpriteFramesModel->RotateFrame(m_iFrameIndex, m_fNewRotation);
+}
+
+void ItemSpriteCmd_RotateFrame::undo()
+{
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    pSpriteFramesModel->RotateFrame(m_iFrameIndex, m_fOriginalRotation);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ItemSpriteCmd_ScaleFrame::ItemSpriteCmd_ScaleFrame(WidgetSpriteStateTableView *pSpriteTableView, int iIndex, QPointF vScale, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                                                m_pSpriteTableView(pSpriteTableView),
+                                                                                                                                                                m_iFrameIndex(iIndex),
+                                                                                                                                                                m_vNewScale(vScale)
+{
+    setText("Scale Frame");
+    
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    m_vOriginalScale = pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_ptScale;
+}
+
+/*virtual*/ ItemSpriteCmd_ScaleFrame::~ItemSpriteCmd_ScaleFrame()
 {
 }
 
-void ItemSpriteCmd_TransformFrame::undo()
+void ItemSpriteCmd_ScaleFrame::redo()
 {
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    pSpriteFramesModel->ScaleFrame(m_iFrameIndex, m_vNewScale);
+}
+
+void ItemSpriteCmd_ScaleFrame::undo()
+{
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    pSpriteFramesModel->ScaleFrame(m_iFrameIndex, m_vOriginalScale);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ItemSpriteCmd_DurationFrame::ItemSpriteCmd_DurationFrame(WidgetSpriteStateTableView *pSpriteTableView, int iIndex, float fDuration, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                                                                        m_pSpriteTableView(pSpriteTableView),
+                                                                                                                                                                        m_iFrameIndex(iIndex),
+                                                                                                                                                                        m_fNewDuration(fDuration)
+{
+    setText("Modify Frame Duration");
+    
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    m_fOriginalDuration = pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_fDuration;
+}
+
+/*virtual*/ ItemSpriteCmd_DurationFrame::~ItemSpriteCmd_DurationFrame()
+{
+}
+
+void ItemSpriteCmd_DurationFrame::redo()
+{
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    pSpriteFramesModel->DurationFrame(m_iFrameIndex, m_fNewDuration);
+}
+
+void ItemSpriteCmd_DurationFrame::undo()
+{
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
+    pSpriteFramesModel->DurationFrame(m_iFrameIndex, m_fOriginalDuration);
 }

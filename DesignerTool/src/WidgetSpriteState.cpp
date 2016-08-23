@@ -13,6 +13,7 @@
 #include "HyGlobal.h"
 #include "ItemSprite.h"
 #include "WidgetSprite.h"
+#include "ItemSpriteCmds.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -172,16 +173,72 @@ void SpriteFramesModel::MoveRowDown(int iIndex)
     endMoveRows();
 }
 
-void SpriteFramesModel::SetUpdateFreq(uint uiHertz)
+// iIndex of -1 will apply to all
+void SpriteFramesModel::TranslateFrame(int iIndex, QPointF ptPos)
 {
-    float fDur = 1000.0f / static_cast<float>(uiHertz);
-    
-    for(int i = 0; i < m_FramesList.count(); ++i)
-        m_FramesList[i]->m_fDuration = fDur;
-    
-    QModelIndex startIndex = createIndex(0, COLUMN_Duration);
-    QModelIndex endIndex = createIndex(m_FramesList.count() - 1, COLUMN_Duration);
-    dataChanged(startIndex, endIndex);
+    if(iIndex == -1)
+    {
+        for(int i = 0; i < m_FramesList.count(); ++i)
+            m_FramesList[i]->m_ptOffset = ptPos;
+        
+        dataChanged(createIndex(0, COLUMN_Offset), createIndex(m_FramesList.count() - 1, COLUMN_Offset));
+    }
+    else
+    {
+        m_FramesList[iIndex]->m_ptOffset = ptPos;
+        dataChanged(createIndex(iIndex, COLUMN_Offset), createIndex(iIndex, COLUMN_Offset));
+    }
+}
+
+// iIndex of -1 will apply to all
+void SpriteFramesModel::RotateFrame(int iIndex, float fRot)
+{
+    if(iIndex == -1)
+    {
+        for(int i = 0; i < m_FramesList.count(); ++i)
+            m_FramesList[i]->m_fRotation = fRot;
+        
+        dataChanged(createIndex(0, COLUMN_Rotation), createIndex(m_FramesList.count() - 1, COLUMN_Rotation));
+    }
+    else
+    {
+        m_FramesList[iIndex]->m_fRotation = fRot;
+        dataChanged(createIndex(iIndex, COLUMN_Rotation), createIndex(iIndex, COLUMN_Rotation));
+    }
+}
+
+// iIndex of -1 will apply to all
+void SpriteFramesModel::ScaleFrame(int iIndex, QPointF vScale)
+{
+    if(iIndex == -1)
+    {
+        for(int i = 0; i < m_FramesList.count(); ++i)
+            m_FramesList[i]->m_ptScale = vScale;
+        
+        dataChanged(createIndex(0, COLUMN_Scale), createIndex(m_FramesList.count() - 1, COLUMN_Scale));
+    }
+    else
+    {
+        m_FramesList[iIndex]->m_ptScale = vScale;
+        dataChanged(createIndex(iIndex, COLUMN_Scale), createIndex(iIndex, COLUMN_Scale));
+    }
+}
+
+// iIndex of -1 will apply to all
+void SpriteFramesModel::DurationFrame(int iIndex, float fDuration)
+{
+    if(iIndex == -1)
+    {
+        for(int i = 0; i < m_FramesList.count(); ++i)
+            m_FramesList[i]->m_fDuration = fDuration;
+        
+        dataChanged(createIndex(0, COLUMN_Duration), createIndex(m_FramesList.count() - 1, COLUMN_Duration));
+    }
+    else
+    {
+        m_FramesList[iIndex]->m_fDuration = fDuration;
+        dataChanged(createIndex(iIndex, COLUMN_Duration), createIndex(iIndex, COLUMN_Duration));
+    }
 }
 
 SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
@@ -255,6 +312,8 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 
 /*virtual*/ bool SpriteFramesModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
 {
+    HyGuiLog("SpriteFramesModel::setData was invoked", LOGTYPE_Error);
+    
     SpriteFrame *pFrame = m_FramesList[index.row()];
     
     if(role == Qt::EditRole)
@@ -362,29 +421,9 @@ int WidgetSpriteState::GetSelectedIndex()
     return ui->framesView->currentIndex().row();
 }
 
-void WidgetSpriteState::SelectIndex(int iIndex)
-{
-    ui->framesView->selectRow(iIndex);
-}
-
 int WidgetSpriteState::GetNumFrames()
 {
     return m_pSpriteFramesModel->rowCount();
-}
-
-void WidgetSpriteState::OrderFrame(int iIndex, int iOffset)
-{
-    while(iOffset > 0)
-    {
-        m_pSpriteFramesModel->MoveRowDown(iIndex);
-        iOffset--;
-    }
-    
-    while(iOffset < 0)
-    {
-        m_pSpriteFramesModel->MoveRowUp(iIndex);
-        iOffset++;
-    }
 }
 
 void WidgetSpriteState::AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef)
@@ -471,31 +510,71 @@ void WidgetSpriteState::on_actionPlay_triggered()
 
 void WidgetSpriteState::on_btnHz10_clicked()
 {
-    m_pSpriteFramesModel->SetUpdateFreq(10);
+    ItemSprite *pItemSprite = m_pOwner->Owner();
+    
+    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 10.0f);
+    pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void WidgetSpriteState::on_btnHz20_clicked()
 {
-    m_pSpriteFramesModel->SetUpdateFreq(20);
+    ItemSprite *pItemSprite = m_pOwner->Owner();
+    
+    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 20.0f);
+    pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void WidgetSpriteState::on_btnHz30_clicked()
 {
-    m_pSpriteFramesModel->SetUpdateFreq(30);
+    ItemSprite *pItemSprite = m_pOwner->Owner();
+    
+    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 30.0f);
+    pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void WidgetSpriteState::on_btnHz40_clicked()
 {
-    m_pSpriteFramesModel->SetUpdateFreq(40);
+    ItemSprite *pItemSprite = m_pOwner->Owner();
+    
+    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 40.0f);
+    pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void WidgetSpriteState::on_btnHz50_clicked()
 {
-    m_pSpriteFramesModel->SetUpdateFreq(50);
+    ItemSprite *pItemSprite = m_pOwner->Owner();
+    
+    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 50.0f);
+    pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void WidgetSpriteState::on_btnHz60_clicked()
 {
-    m_pSpriteFramesModel->SetUpdateFreq(60);
+    ItemSprite *pItemSprite = m_pOwner->Owner();
+    
+    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 60.0f);
+    pItemSprite->GetUndoStack()->push(pCmd);
 }
 
+
+void WidgetSpriteState::on_actionOrderFrameUpwards_triggered()
+{
+    ItemSprite *pItemSprite = m_pOwner->Owner();
+    int iSelectedIndex = GetSelectedIndex();
+    
+    QUndoCommand *pCmd = new ItemSpriteCmd_OrderFrame(ui->framesView, iSelectedIndex, iSelectedIndex - 1);
+    pItemSprite->GetUndoStack()->push(pCmd);
+    
+    m_pOwner->UpdateActions();
+}
+
+void WidgetSpriteState::on_actionOrderFrameDownwards_triggered()
+{
+    ItemSprite *pItemSprite = m_pOwner->Owner();
+    int iSelectedIndex = GetSelectedIndex();
+    
+    QUndoCommand *pCmd = new ItemSpriteCmd_OrderFrame(ui->framesView, iSelectedIndex, iSelectedIndex + 1);
+    pItemSprite->GetUndoStack()->push(pCmd);
+    
+    m_pOwner->UpdateActions();
+}

@@ -61,6 +61,11 @@ WidgetSprite::~WidgetSprite()
     delete ui;
 }
 
+ItemSprite *WidgetSprite::Owner()
+{
+    return m_pItemSprite;
+}
+
 void WidgetSprite::LoadAndInit()
 {
     // If a .hyspr file exists, parse and initalize with it, otherwise make default empty sprite
@@ -223,26 +228,6 @@ void WidgetSprite::on_actionRemoveFrames_triggered()
     QUndoCommand *pCmd = new ItemSpriteCmd_DeleteFrame(m_pItemSprite, pSpriteFrame->m_pFrame);
     m_pItemSprite->GetUndoStack()->push(pCmd);
 
-    UpdateActions();
-}
-
-void WidgetSprite::on_actionOrderFrameUpwards_triggered()
-{
-    int iSelectedIndex = GetCurSpriteState()->GetSelectedIndex();
-    
-    QUndoCommand *pCmd = new ItemSpriteCmd_OrderFrame(GetCurSpriteState(), iSelectedIndex, iSelectedIndex - 1);
-    m_pItemSprite->GetUndoStack()->push(pCmd);
-    
-    UpdateActions();
-}
-
-void WidgetSprite::on_actionOrderFrameDownwards_triggered()
-{
-    int iSelectedIndex = GetCurSpriteState()->GetSelectedIndex();
-    
-    QUndoCommand *pCmd = new ItemSpriteCmd_OrderFrame(GetCurSpriteState(), iSelectedIndex, iSelectedIndex + 1);
-    m_pItemSprite->GetUndoStack()->push(pCmd);
-    
     UpdateActions();
 }
 

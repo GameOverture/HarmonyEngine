@@ -18,6 +18,7 @@
 
 class WidgetSprite;
 class WidgetSpriteState;
+class WidgetSpriteStateTableView;
 class ItemWidget;
 class WidgetAtlasManager;
 class HyGuiFrame;
@@ -143,12 +144,12 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_OrderFrame : public QUndoCommand
 {
-    WidgetSpriteState *                     m_pSpriteState;
+    WidgetSpriteStateTableView *            m_pSpriteTableView;
     int                                     m_iFrameIndex;
     int                                     m_iFrameIndexDest;
     
 public:
-    ItemSpriteCmd_OrderFrame(WidgetSpriteState *pSpriteState, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent = 0);
+    ItemSpriteCmd_OrderFrame(WidgetSpriteStateTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent = 0);
     virtual ~ItemSpriteCmd_OrderFrame();
 
     void redo() Q_DECL_OVERRIDE;
@@ -156,11 +157,64 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ItemSpriteCmd_TransformFrame : public QUndoCommand
+class ItemSpriteCmd_TranslateFrame : public QUndoCommand
 {
+    WidgetSpriteStateTableView *    m_pSpriteTableView;
+    int                             m_iFrameIndex;
+    QPointF                         m_vOriginalOffset;
+    QPointF                         m_vNewOffset;
+    
 public:
-    ItemSpriteCmd_TransformFrame(SpriteFrame *pFrame, QPointF vOffset, float fRot, QPointF vScale, float fDuration, QUndoCommand *pParent = 0);
-    virtual ~ItemSpriteCmd_TransformFrame();
+    ItemSpriteCmd_TranslateFrame(WidgetSpriteStateTableView *pSpriteTableView, int iIndex, QPointF vOffset, QUndoCommand *pParent = 0);
+    virtual ~ItemSpriteCmd_TranslateFrame();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemSpriteCmd_RotateFrame : public QUndoCommand
+{
+    WidgetSpriteStateTableView *    m_pSpriteTableView;
+    int                             m_iFrameIndex;
+    float                           m_fOriginalRotation;
+    float                           m_fNewRotation;
+    
+public:
+    ItemSpriteCmd_RotateFrame(WidgetSpriteStateTableView *pSpriteTableView, int iIndex, float fRot, QUndoCommand *pParent = 0);
+    virtual ~ItemSpriteCmd_RotateFrame();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemSpriteCmd_ScaleFrame : public QUndoCommand
+{
+    WidgetSpriteStateTableView *    m_pSpriteTableView;
+    int                             m_iFrameIndex;
+    QPointF                         m_vOriginalScale;
+    QPointF                         m_vNewScale;
+    
+public:
+    ItemSpriteCmd_ScaleFrame(WidgetSpriteStateTableView *pSpriteTableView, int iIndex, QPointF vScale, QUndoCommand *pParent = 0);
+    virtual ~ItemSpriteCmd_ScaleFrame();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemSpriteCmd_DurationFrame : public QUndoCommand
+{
+    WidgetSpriteStateTableView *    m_pSpriteTableView;
+    int                             m_iFrameIndex;
+    float                           m_fOriginalDuration;
+    float                           m_fNewDuration;
+    
+public:
+    ItemSpriteCmd_DurationFrame(WidgetSpriteStateTableView *pSpriteTableView, int iIndex, float fDuration, QUndoCommand *pParent = 0);
+    virtual ~ItemSpriteCmd_DurationFrame();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;

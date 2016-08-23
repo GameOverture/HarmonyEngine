@@ -77,7 +77,10 @@ public:
     void Remove(HyGuiFrame *pFrame);
     void MoveRowUp(int iIndex);
     void MoveRowDown(int iIndex);
-    void SetUpdateFreq(uint uiHertz);
+    void TranslateFrame(int iIndex, QPointF ptPos); // iIndex of -1 will apply to all
+    void RotateFrame(int iIndex, float fRot);       // iIndex of -1 will apply to all
+    void ScaleFrame(int iIndex, QPointF vScale);    // iIndex of -1 will apply to all
+    void DurationFrame(int iIndex, float fDuration);// iIndex of -1 will apply to all
     
     SpriteFrame *GetFrameAt(int iIndex);
     
@@ -117,9 +120,7 @@ public:
 
     SpriteFrame *GetSelectedFrame();
     int GetSelectedIndex();
-    void SelectIndex(int iIndex);
     int GetNumFrames();
-    void OrderFrame(int iIndex, int iOffset);
     
     void AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef);
     
@@ -143,6 +144,10 @@ private slots:
     void on_btnHz50_clicked();
     
     void on_btnHz60_clicked();
+    
+    void on_actionOrderFrameUpwards_triggered();
+    
+    void on_actionOrderFrameDownwards_triggered();
     
 private:
     Ui::WidgetSpriteState *ui;

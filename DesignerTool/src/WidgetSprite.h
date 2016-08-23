@@ -37,6 +37,8 @@ public:
     explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
     
+    ItemSprite *Owner();
+    
     void LoadAndInit();
     
     void AppendActionsForToolBar(QList<QAction *> &actionList);
@@ -63,10 +65,6 @@ private slots:
     void on_actionImportFrames_triggered();
 
     void on_actionRemoveFrames_triggered();
-    
-    void on_actionOrderFrameUpwards_triggered();
-    
-    void on_actionOrderFrameDownwards_triggered();
     
     void on_cmbStates_currentIndexChanged(int index);
 
