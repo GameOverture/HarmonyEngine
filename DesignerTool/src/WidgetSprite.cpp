@@ -97,14 +97,8 @@ void WidgetSprite::LoadAndInit()
 
                 WidgetSpriteState *pSpriteState = GetCurSpriteState();
 
-                QPointF vOffset(spriteFrameObj["offsetX"].toDouble(), spriteFrameObj["offsetY"].toDouble());
-                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_TranslateFrame(pSpriteState->GetFrameView(), j, vOffset));
-
-                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_RotateFrame(pSpriteState->GetFrameView(), j, spriteFrameObj["rotation"].toDouble()));
-
-                QPointF vScale(spriteFrameObj["scaleX"].toDouble(), spriteFrameObj["scaleY"].toDouble());
-                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_ScaleFrame(pSpriteState->GetFrameView(), j, vScale));
-
+                QPoint vOffset(spriteFrameObj["offsetX"].toInt(), spriteFrameObj["offsetY"].toInt());
+                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetFrame(pSpriteState->GetFrameView(), j, vOffset));
                 m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_DurationFrame(pSpriteState->GetFrameView(), j, spriteFrameObj["duration"].toDouble()));
             }
         }

@@ -26,12 +26,11 @@ WidgetSpriteTableView::WidgetSpriteTableView(QWidget *pParent /*= 0*/) : QTableV
 {
     int iWidth = pResizeEvent->size().width();
 
-    iWidth -= 64 + 32 + 64 + 50;
+    iWidth -= 64 + 64 + 64;
     setColumnWidth(WidgetSpriteModel::COLUMN_Frame, iWidth);
-    setColumnWidth(WidgetSpriteModel::COLUMN_Offset, 64);
-    setColumnWidth(WidgetSpriteModel::COLUMN_Rotation, 32);
-    setColumnWidth(WidgetSpriteModel::COLUMN_Scale, 64);
-    setColumnWidth(WidgetSpriteModel::COLUMN_Duration, 50);
+    setColumnWidth(WidgetSpriteModel::COLUMN_OffsetX, 64);
+    setColumnWidth(WidgetSpriteModel::COLUMN_OffsetY, 64);
+    setColumnWidth(WidgetSpriteModel::COLUMN_Duration, 64);
 
     QTableView::resizeEvent(pResizeEvent);
 }
@@ -50,21 +49,22 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSprite
 
     switch(index.column())
     {
-    case WidgetSpriteModel::COLUMN_Offset:
-    case WidgetSpriteModel::COLUMN_Scale:
-        pReturnWidget = new QLineEdit(pParent);
-        static_cast<QLineEdit *>(pReturnWidget)->setValidator(HyGlobal::Vector2dValidator());
+    case WidgetSpriteModel::COLUMN_OffsetX:
+        pReturnWidget = new QSpinBox(pParent);
+        static_cast<QSpinBox *>(pReturnWidget)->setPrefix("X:");
+        static_cast<QSpinBox *>(pReturnWidget)->setRange(-4096, 4096);
         break;
-
-    case WidgetSpriteModel::COLUMN_Rotation:
-        pReturnWidget = new QDoubleSpinBox(pParent);
-        static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(0.0, 360.0);
-        static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix("°");
+        
+    case WidgetSpriteModel::COLUMN_OffsetY:
+        pReturnWidget = new QSpinBox(pParent);
+        static_cast<QSpinBox *>(pReturnWidget)->setPrefix("Y:");
+        static_cast<QSpinBox *>(pReturnWidget)->setRange(-4096, 4096);
         break;
 
     case WidgetSpriteModel::COLUMN_Duration:
         pReturnWidget = new QDoubleSpinBox(pParent);
-        static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix("ms");
+        static_cast<QDoubleSpinBox *>(pReturnWidget)->setSingleStep(0.001);
+        static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix("sec");
         break;
     }
 
@@ -77,12 +77,14 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSprite
 
     switch(index.column())
     {
-    case WidgetSpriteModel::COLUMN_Offset:
-    case WidgetSpriteModel::COLUMN_Scale:
-        static_cast<QLineEdit *>(pEditor)->setText(sCurValue);
+    case WidgetSpriteModel::COLUMN_OffsetX:
+        static_cast<QSpinBox *>(pEditor)->setValue(sCurValue.toInt());
+        break;
+        
+    case WidgetSpriteModel::COLUMN_OffsetY:
+        static_cast<QSpinBox *>(pEditor)->setValue(sCurValue.toInt());
         break;
 
-    case WidgetSpriteModel::COLUMN_Rotation:
     case WidgetSpriteModel::COLUMN_Duration:
         static_cast<QDoubleSpinBox *>(pEditor)->setValue(sCurValue.toDouble());
         break;
@@ -93,30 +95,29 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSprite
 {
     switch(index.column())
     {
-    case WidgetSpriteModel::COLUMN_Offset:
+    case WidgetSpriteModel::COLUMN_OffsetX:
     {
-        QUndoCommand *pCmd = new ItemSpriteCmd_TranslateFrame(m_pTableView, index.row(), StringToPoint(static_cast<QLineEdit *>(pEditor)->text()));
-        m_pItemSprite->GetUndoStack()->push(pCmd);
+        WidgetSpriteModel *pSpriteModel = static_cast<WidgetSpriteModel *>(pModel);
+        QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
+        vOffset.setX(static_cast<QSpinBox *>(pEditor)->value());
+
+        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
         break;
     }
 
-    case WidgetSpriteModel::COLUMN_Scale:
+    case WidgetSpriteModel::COLUMN_OffsetY:
     {
-        QUndoCommand *pCmd = new ItemSpriteCmd_ScaleFrame(m_pTableView, index.row(), StringToPoint(static_cast<QLineEdit *>(pEditor)->text()));
-        m_pItemSprite->GetUndoStack()->push(pCmd);
-        break;
-    }
+        WidgetSpriteModel *pSpriteModel = static_cast<WidgetSpriteModel *>(pModel);
+        QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
+        vOffset.setY(static_cast<QSpinBox *>(pEditor)->value());
 
-    case WidgetSpriteModel::COLUMN_Rotation:
-    {
-        QUndoCommand *pCmd = new ItemSpriteCmd_RotateFrame(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value());
-        m_pItemSprite->GetUndoStack()->push(pCmd);
+        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
         break;
     }
+    
 
     case WidgetSpriteModel::COLUMN_Duration:
-        QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value());
-        m_pItemSprite->GetUndoStack()->push(pCmd);
+        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_DurationFrame(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value()));
         break;
     }
 }
@@ -186,53 +187,19 @@ void WidgetSpriteModel::MoveRowDown(int iIndex)
 }
 
 // iIndex of -1 will apply to all
-void WidgetSpriteModel::TranslateFrame(int iIndex, QPointF ptPos)
+void WidgetSpriteModel::OffsetFrame(int iIndex, QPoint vOffset)
 {
     if(iIndex == -1)
     {
         for(int i = 0; i < m_FramesList.count(); ++i)
-            m_FramesList[i]->m_vOffset = ptPos;
+            m_FramesList[i]->m_vOffset = vOffset;
 
-        dataChanged(createIndex(0, COLUMN_Offset), createIndex(m_FramesList.count() - 1, COLUMN_Offset));
+        dataChanged(createIndex(0, COLUMN_OffsetX), createIndex(m_FramesList.count() - 1, COLUMN_OffsetY));
     }
     else
     {
-        m_FramesList[iIndex]->m_vOffset = ptPos;
-        dataChanged(createIndex(iIndex, COLUMN_Offset), createIndex(iIndex, COLUMN_Offset));
-    }
-}
-
-// iIndex of -1 will apply to all
-void WidgetSpriteModel::RotateFrame(int iIndex, float fRot)
-{
-    if(iIndex == -1)
-    {
-        for(int i = 0; i < m_FramesList.count(); ++i)
-            m_FramesList[i]->m_fRotation = fRot;
-
-        dataChanged(createIndex(0, COLUMN_Rotation), createIndex(m_FramesList.count() - 1, COLUMN_Rotation));
-    }
-    else
-    {
-        m_FramesList[iIndex]->m_fRotation = fRot;
-        dataChanged(createIndex(iIndex, COLUMN_Rotation), createIndex(iIndex, COLUMN_Rotation));
-    }
-}
-
-// iIndex of -1 will apply to all
-void WidgetSpriteModel::ScaleFrame(int iIndex, QPointF vScale)
-{
-    if(iIndex == -1)
-    {
-        for(int i = 0; i < m_FramesList.count(); ++i)
-            m_FramesList[i]->m_vScale = vScale;
-
-        dataChanged(createIndex(0, COLUMN_Scale), createIndex(m_FramesList.count() - 1, COLUMN_Scale));
-    }
-    else
-    {
-        m_FramesList[iIndex]->m_vScale = vScale;
-        dataChanged(createIndex(iIndex, COLUMN_Scale), createIndex(iIndex, COLUMN_Scale));
+        m_FramesList[iIndex]->m_vOffset = vOffset;
+        dataChanged(createIndex(iIndex, COLUMN_OffsetX), createIndex(iIndex, COLUMN_OffsetY));
     }
 }
 
@@ -281,14 +248,12 @@ SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
         {
         case COLUMN_Frame:
             return pFrame->m_pFrame->GetName();
-        case COLUMN_Offset:
-            return PointToQString(pFrame->m_vOffset);
-        case COLUMN_Rotation:
-            return QString::number(pFrame->m_fRotation) % ((role == Qt::DisplayRole) ? "°" : "");
-        case COLUMN_Scale:
-            return PointToQString(pFrame->m_vScale);
+        case COLUMN_OffsetX:
+            return QString::number(pFrame->m_vOffset.x());
+        case COLUMN_OffsetY:
+            return QString::number(pFrame->m_vOffset.y());
         case COLUMN_Duration:
-            return QString::number(pFrame->m_fDuration, 'g', 4) % ((role == Qt::DisplayRole) ? "ms" : "");
+            return QString::number(pFrame->m_fDuration, 'g', 5) % ((role == Qt::DisplayRole) ? "sec" : "");
         }
     }
 
@@ -305,14 +270,12 @@ SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
             {
             case COLUMN_Frame:
                 return QString("Frame");
-            case COLUMN_Offset:
-                return QString("Offset");
-            case COLUMN_Rotation:
-                return QString("Rot");
-            case COLUMN_Scale:
-                return QString("Scale");
+            case COLUMN_OffsetX:
+                return QString("X Offset");
+            case COLUMN_OffsetY:
+                return QString("Y Offset");
             case COLUMN_Duration:
-                return QString("Dur");
+                return QString("Duration");
             }
         }
         else
@@ -332,17 +295,14 @@ SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
     {
         switch(index.column())
         {
-        case COLUMN_Offset:
-            pFrame->m_vOffset = StringToPoint(value.toString());
+        case COLUMN_OffsetX:
+            pFrame->m_vOffset.setX(value.toInt());
             break;
-        case COLUMN_Rotation:
-            pFrame->m_fRotation = value.toString().toFloat();
-            break;
-        case COLUMN_Scale:
-            pFrame->m_vScale = StringToPoint(value.toString());
+        case COLUMN_OffsetY:
+            pFrame->m_vOffset.setY(value.toInt());
             break;
         case COLUMN_Duration:
-            pFrame->m_fDuration = value.toString().toFloat();
+            pFrame->m_fDuration = value.toFloat();
             break;
         }
     }

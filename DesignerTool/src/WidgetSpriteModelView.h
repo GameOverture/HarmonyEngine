@@ -61,9 +61,8 @@ public:
     enum eColumn
     {
         COLUMN_Frame = 0,
-        COLUMN_Offset,
-        COLUMN_Rotation,
-        COLUMN_Scale,
+        COLUMN_OffsetX,
+        COLUMN_OffsetY,
         COLUMN_Duration,
 
         NUMCOLUMNS
@@ -75,10 +74,8 @@ public:
     void Remove(HyGuiFrame *pFrame);
     void MoveRowUp(int iIndex);
     void MoveRowDown(int iIndex);
-    void TranslateFrame(int iIndex, QPointF ptPos); // iIndex of -1 will apply to all
-    void RotateFrame(int iIndex, float fRot);       // iIndex of -1 will apply to all
-    void ScaleFrame(int iIndex, QPointF vScale);    // iIndex of -1 will apply to all
-    void DurationFrame(int iIndex, float fDuration);// iIndex of -1 will apply to all
+    void OffsetFrame(int iIndex, QPoint vOffset);       // iIndex of -1 will apply to all
+    void DurationFrame(int iIndex, float fDuration);    // iIndex of -1 will apply to all
 
     SpriteFrame *GetFrameAt(int iIndex);
 
