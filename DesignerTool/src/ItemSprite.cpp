@@ -103,8 +103,8 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     HyGuiFrame *pGuiFrame = pSpriteFrame->m_pFrame;
     HyTexturedQuad2d *pDrawInst = pGuiFrame->DrawInst(this);
     
-    pDrawInst->pos.X(pGuiFrame->GetCrop().x() + pSpriteFrame->m_ptOffset.x());
-    pDrawInst->pos.Y(pGuiFrame->GetSize().height() - pGuiFrame->GetCrop().bottom() + pSpriteFrame->m_ptOffset.y());
+    pDrawInst->pos.X(pGuiFrame->GetCrop().x() + pSpriteFrame->m_vOffset.x());
+    pDrawInst->pos.Y(pGuiFrame->GetSize().height() - pGuiFrame->GetCrop().bottom() + pSpriteFrame->m_vOffset.y());
     
     if(pDrawInst->IsLoaded() == false)
         pDrawInst->Load();

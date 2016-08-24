@@ -191,13 +191,13 @@ void WidgetSpriteModel::TranslateFrame(int iIndex, QPointF ptPos)
     if(iIndex == -1)
     {
         for(int i = 0; i < m_FramesList.count(); ++i)
-            m_FramesList[i]->m_ptOffset = ptPos;
+            m_FramesList[i]->m_vOffset = ptPos;
 
         dataChanged(createIndex(0, COLUMN_Offset), createIndex(m_FramesList.count() - 1, COLUMN_Offset));
     }
     else
     {
-        m_FramesList[iIndex]->m_ptOffset = ptPos;
+        m_FramesList[iIndex]->m_vOffset = ptPos;
         dataChanged(createIndex(iIndex, COLUMN_Offset), createIndex(iIndex, COLUMN_Offset));
     }
 }
@@ -225,13 +225,13 @@ void WidgetSpriteModel::ScaleFrame(int iIndex, QPointF vScale)
     if(iIndex == -1)
     {
         for(int i = 0; i < m_FramesList.count(); ++i)
-            m_FramesList[i]->m_ptScale = vScale;
+            m_FramesList[i]->m_vScale = vScale;
 
         dataChanged(createIndex(0, COLUMN_Scale), createIndex(m_FramesList.count() - 1, COLUMN_Scale));
     }
     else
     {
-        m_FramesList[iIndex]->m_ptScale = vScale;
+        m_FramesList[iIndex]->m_vScale = vScale;
         dataChanged(createIndex(iIndex, COLUMN_Scale), createIndex(iIndex, COLUMN_Scale));
     }
 }
@@ -282,11 +282,11 @@ SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
         case COLUMN_Frame:
             return pFrame->m_pFrame->GetName();
         case COLUMN_Offset:
-            return PointToQString(pFrame->m_ptOffset);
+            return PointToQString(pFrame->m_vOffset);
         case COLUMN_Rotation:
             return QString::number(pFrame->m_fRotation) % ((role == Qt::DisplayRole) ? "°" : "");
         case COLUMN_Scale:
-            return PointToQString(pFrame->m_ptScale);
+            return PointToQString(pFrame->m_vScale);
         case COLUMN_Duration:
             return QString::number(pFrame->m_fDuration, 'g', 4) % ((role == Qt::DisplayRole) ? "ms" : "");
         }
@@ -333,13 +333,13 @@ SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
         switch(index.column())
         {
         case COLUMN_Offset:
-            pFrame->m_ptOffset = StringToPoint(value.toString());
+            pFrame->m_vOffset = StringToPoint(value.toString());
             break;
         case COLUMN_Rotation:
             pFrame->m_fRotation = value.toString().toFloat();
             break;
         case COLUMN_Scale:
-            pFrame->m_ptScale = StringToPoint(value.toString());
+            pFrame->m_vScale = StringToPoint(value.toString());
             break;
         case COLUMN_Duration:
             pFrame->m_fDuration = value.toString().toFloat();

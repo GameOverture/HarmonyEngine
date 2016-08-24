@@ -305,7 +305,7 @@ ItemSpriteCmd_TranslateFrame::ItemSpriteCmd_TranslateFrame(WidgetSpriteTableView
     setText("Translate Frame Offset");
     
     WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
-    m_vOriginalOffset = pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_ptOffset;
+    m_vOriginalOffset = pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_vOffset;
 }
 
 /*virtual*/ ItemSpriteCmd_TranslateFrame::~ItemSpriteCmd_TranslateFrame()
@@ -362,7 +362,7 @@ ItemSpriteCmd_ScaleFrame::ItemSpriteCmd_ScaleFrame(WidgetSpriteTableView *pSprit
     setText("Scale Frame");
     
     WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
-    m_vOriginalScale = pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_ptScale;
+    m_vOriginalScale = pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_vScale;
 }
 
 /*virtual*/ ItemSpriteCmd_ScaleFrame::~ItemSpriteCmd_ScaleFrame()

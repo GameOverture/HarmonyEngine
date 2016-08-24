@@ -20,16 +20,16 @@ struct SpriteFrame
     HyGuiFrame *            m_pFrame;
     int                     m_iRowIndex;
     
-    QPointF                 m_ptOffset;
+    QPointF                 m_vOffset;
     float                   m_fRotation;
-    QPointF                 m_ptScale;
+    QPointF                 m_vScale;
     float                   m_fDuration;
     
     SpriteFrame(HyGuiFrame *pFrame, int iRowIndex) :    m_pFrame(pFrame),
                                                         m_iRowIndex(iRowIndex),
-                                                        m_ptOffset(0.0f, 0.0f),
+                                                        m_vOffset(0.0f, 0.0f),
                                                         m_fRotation(0.0f),
-                                                        m_ptScale(1.0f, 1.0f),
+                                                        m_vScale(1.0f, 1.0f),
                                                         m_fDuration(0.016f)
     { }
 };

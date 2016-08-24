@@ -103,7 +103,7 @@ void WidgetSprite::LoadAndInit()
                 m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_RotateFrame(pSpriteState->GetFrameView(), j, spriteFrameObj["rotation"].toDouble()));
 
                 QPointF vScale(spriteFrameObj["scaleX"].toDouble(), spriteFrameObj["scaleY"].toDouble());
-                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_TranslateFrame(pSpriteState->GetFrameView(), j, vScale));
+                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_ScaleFrame(pSpriteState->GetFrameView(), j, vScale));
 
                 m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_DurationFrame(pSpriteState->GetFrameView(), j, spriteFrameObj["duration"].toDouble()));
             }
