@@ -80,6 +80,10 @@ private slots:
     
     void on_actionAlignCenterHorizontal_triggered();
     
+    void on_actionOrderFrameUpwards_triggered();
+
+    void on_actionOrderFrameDownwards_triggered();
+
 private:
     Ui::WidgetSprite *ui;
 };

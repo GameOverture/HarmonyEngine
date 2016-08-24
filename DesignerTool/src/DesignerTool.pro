@@ -41,7 +41,8 @@ SOURCES += main.cpp \
     ItemSpriteCmds.cpp \
     WidgetSpriteState.cpp \
     HyGuiFrame.cpp \
-    ItemWidget.cpp
+    ItemWidget.cpp \
+    WidgetSpriteModelView.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -71,7 +72,8 @@ HEADERS  += \
     ItemSpriteCmds.h \
     WidgetSpriteState.h \
     HyGuiFrame.h \
-    ItemWidget.h
+    ItemWidget.h \
+    WidgetSpriteModelView.h
 
 FORMS    += \
     DlgNewProject.ui \

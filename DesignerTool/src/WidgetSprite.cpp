@@ -95,8 +95,17 @@ void WidgetSprite::LoadAndInit()
                 requestList.append(JSONOBJ_TOINT(spriteFrameObj, "hash"));
                 m_pItemSprite->GetAtlasManager().RequestFrames(m_pItemSprite, requestList);
 
-                // TODO: set things like offset, rotation, duration, etc for each frame
-                //m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_TransformFrame(GetSelectedFrame()));
+                WidgetSpriteState *pSpriteState = GetCurSpriteState();
+
+                QPointF vOffset(spriteFrameObj["offsetX"].toDouble(), spriteFrameObj["offsetY"].toDouble());
+                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_TranslateFrame(pSpriteState->GetFrameView(), j, vOffset));
+
+                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_RotateFrame(pSpriteState->GetFrameView(), j, spriteFrameObj["rotation"].toDouble()));
+
+                QPointF vScale(spriteFrameObj["scaleX"].toDouble(), spriteFrameObj["scaleY"].toDouble());
+                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_TranslateFrame(pSpriteState->GetFrameView(), j, vScale));
+
+                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_DurationFrame(pSpriteState->GetFrameView(), j, spriteFrameObj["duration"].toDouble()));
             }
         }
     }
@@ -280,4 +289,24 @@ void WidgetSprite::on_actionAlignCenterVertical_triggered()
 void WidgetSprite::on_actionAlignCenterHorizontal_triggered()
 {
     
+}
+
+void WidgetSprite::on_actionOrderFrameUpwards_triggered()
+{
+    int iSelectedIndex = GetCurSpriteState()->GetSelectedIndex();
+
+    QUndoCommand *pCmd = new ItemSpriteCmd_OrderFrame(GetCurSpriteState()->GetFrameView(), iSelectedIndex, iSelectedIndex - 1);
+    m_pItemSprite->GetUndoStack()->push(pCmd);
+
+    UpdateActions();
+}
+
+void WidgetSprite::on_actionOrderFrameDownwards_triggered()
+{
+    int iSelectedIndex = GetCurSpriteState()->GetSelectedIndex();
+
+    QUndoCommand *pCmd = new ItemSpriteCmd_OrderFrame(GetCurSpriteState()->GetFrameView(), iSelectedIndex, iSelectedIndex + 1);
+    m_pItemSprite->GetUndoStack()->push(pCmd);
+
+    UpdateActions();
 }

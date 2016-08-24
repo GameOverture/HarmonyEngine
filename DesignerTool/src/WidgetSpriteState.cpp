@@ -10,7 +10,6 @@
 #include "WidgetSpriteState.h"
 #include "ui_WidgetSpriteState.h"
 
-#include "HyGlobal.h"
 #include "ItemSprite.h"
 #include "WidgetSprite.h"
 #include "ItemSpriteCmds.h"
@@ -18,339 +17,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-WidgetSpriteStateTableView::WidgetSpriteStateTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
-{
-}
-
-/*virtual*/ void WidgetSpriteStateTableView::resizeEvent(QResizeEvent *pResizeEvent)
-{
-    int iWidth = pResizeEvent->size().width();
-
-    iWidth -= 64 + 32 + 64 + 50;
-    setColumnWidth(SpriteFramesModel::COLUMN_Frame, iWidth);
-    setColumnWidth(SpriteFramesModel::COLUMN_Offset, 64);
-    setColumnWidth(SpriteFramesModel::COLUMN_Rotation, 32);
-    setColumnWidth(SpriteFramesModel::COLUMN_Scale, 64);
-    setColumnWidth(SpriteFramesModel::COLUMN_Duration, 50);
-    
-    QTableView::resizeEvent(pResizeEvent);
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-WidgetSpriteStateDelegate::WidgetSpriteStateDelegate(QObject *pParent /*= 0*/) : QStyledItemDelegate(pParent)
-{
-}
-
-/*virtual*/ QWidget *WidgetSpriteStateDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-    QWidget *pReturnWidget = NULL;
-    
-    switch(index.column())
-    {
-    case SpriteFramesModel::COLUMN_Offset:
-    case SpriteFramesModel::COLUMN_Scale:
-        pReturnWidget = new QLineEdit(pParent);
-        static_cast<QLineEdit *>(pReturnWidget)->setValidator(HyGlobal::Vector2dValidator());
-        break;
-        
-    case SpriteFramesModel::COLUMN_Rotation:
-        pReturnWidget = new QDoubleSpinBox(pParent);
-        static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(0.0, 360.0);
-        static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix("°");
-        break;
-        
-    case SpriteFramesModel::COLUMN_Duration:
-        pReturnWidget = new QDoubleSpinBox(pParent);
-        static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix("ms");
-        break;
-    }
-    
-    return pReturnWidget;
-}
-
-/*virtual*/ void WidgetSpriteStateDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const
-{
-    QString sCurValue = index.model()->data(index, Qt::EditRole).toString();
-    
-    switch(index.column())
-    {
-    case SpriteFramesModel::COLUMN_Offset:
-    case SpriteFramesModel::COLUMN_Scale:
-        static_cast<QLineEdit *>(pEditor)->setText(sCurValue);
-        break;
-    
-    case SpriteFramesModel::COLUMN_Rotation:
-    case SpriteFramesModel::COLUMN_Duration:
-        static_cast<QDoubleSpinBox *>(pEditor)->setValue(sCurValue.toDouble());
-        break;
-    }
-}
-
-/*virtual*/ void WidgetSpriteStateDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
-{
-    switch(index.column())
-    {
-    case SpriteFramesModel::COLUMN_Offset:
-    case SpriteFramesModel::COLUMN_Scale:
-        pModel->setData(index, static_cast<QLineEdit *>(pEditor)->text());
-        break;
-    
-    case SpriteFramesModel::COLUMN_Rotation:
-    case SpriteFramesModel::COLUMN_Duration:
-        pModel->setData(index, QString::number(static_cast<QDoubleSpinBox *>(pEditor)->value()));
-        break;
-    }
-}
-
-/*virtual*/ void WidgetSpriteStateDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-    pEditor->setGeometry(option.rect);
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-SpriteFramesModel::SpriteFramesModel(QObject *parent) : QAbstractTableModel(parent)
-{
-}
-
-void SpriteFramesModel::Add(HyGuiFrame *pFrame)
-{
-    SpriteFrame *pFrameToInsert = NULL;
-    
-    // See if this frame has been recently removed, and re-add if possible. Otherwise, create a new Frame
-    QMap<quint32, SpriteFrame *>::iterator iter = m_RemovedFrameMap.find(pFrame->GetHash());
-    if(iter == m_RemovedFrameMap.end())
-        pFrameToInsert = new SpriteFrame(pFrame, m_FramesList.count());
-    else
-    {
-        pFrameToInsert = iter.value();
-        m_RemovedFrameMap.remove(pFrame->GetHash());
-    }
-    
-    beginInsertRows(QModelIndex(), pFrameToInsert->m_iRowIndex, pFrameToInsert->m_iRowIndex);
-    m_FramesList.insert(pFrameToInsert->m_iRowIndex, pFrameToInsert);
-    endInsertRows();
-}
-
-void SpriteFramesModel::Remove(HyGuiFrame *pFrame)
-{
-    for(int i = 0; i < m_FramesList.count(); ++i)
-    {
-        if(m_FramesList[i]->m_pFrame == pFrame)
-        {
-            m_RemovedFrameMap[pFrame->GetHash()] = m_FramesList[i];
-            
-            beginRemoveRows(QModelIndex(), i, i);
-            m_FramesList.removeAt(i);
-            endRemoveRows();
-            break;
-        }
-    }
-}
-
-void SpriteFramesModel::MoveRowUp(int iIndex)
-{
-    if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
-        return;
-    
-    m_FramesList.swap(iIndex, iIndex - 1);
-    endMoveRows();
-}
-
-void SpriteFramesModel::MoveRowDown(int iIndex)
-{
-    if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt is retarded
-        return;
-    
-    m_FramesList.swap(iIndex, iIndex + 1);
-    endMoveRows();
-}
-
-// iIndex of -1 will apply to all
-void SpriteFramesModel::TranslateFrame(int iIndex, QPointF ptPos)
-{
-    if(iIndex == -1)
-    {
-        for(int i = 0; i < m_FramesList.count(); ++i)
-            m_FramesList[i]->m_ptOffset = ptPos;
-        
-        dataChanged(createIndex(0, COLUMN_Offset), createIndex(m_FramesList.count() - 1, COLUMN_Offset));
-    }
-    else
-    {
-        m_FramesList[iIndex]->m_ptOffset = ptPos;
-        dataChanged(createIndex(iIndex, COLUMN_Offset), createIndex(iIndex, COLUMN_Offset));
-    }
-}
-
-// iIndex of -1 will apply to all
-void SpriteFramesModel::RotateFrame(int iIndex, float fRot)
-{
-    if(iIndex == -1)
-    {
-        for(int i = 0; i < m_FramesList.count(); ++i)
-            m_FramesList[i]->m_fRotation = fRot;
-        
-        dataChanged(createIndex(0, COLUMN_Rotation), createIndex(m_FramesList.count() - 1, COLUMN_Rotation));
-    }
-    else
-    {
-        m_FramesList[iIndex]->m_fRotation = fRot;
-        dataChanged(createIndex(iIndex, COLUMN_Rotation), createIndex(iIndex, COLUMN_Rotation));
-    }
-}
-
-// iIndex of -1 will apply to all
-void SpriteFramesModel::ScaleFrame(int iIndex, QPointF vScale)
-{
-    if(iIndex == -1)
-    {
-        for(int i = 0; i < m_FramesList.count(); ++i)
-            m_FramesList[i]->m_ptScale = vScale;
-        
-        dataChanged(createIndex(0, COLUMN_Scale), createIndex(m_FramesList.count() - 1, COLUMN_Scale));
-    }
-    else
-    {
-        m_FramesList[iIndex]->m_ptScale = vScale;
-        dataChanged(createIndex(iIndex, COLUMN_Scale), createIndex(iIndex, COLUMN_Scale));
-    }
-}
-
-// iIndex of -1 will apply to all
-void SpriteFramesModel::DurationFrame(int iIndex, float fDuration)
-{
-    if(iIndex == -1)
-    {
-        for(int i = 0; i < m_FramesList.count(); ++i)
-            m_FramesList[i]->m_fDuration = fDuration;
-        
-        dataChanged(createIndex(0, COLUMN_Duration), createIndex(m_FramesList.count() - 1, COLUMN_Duration));
-    }
-    else
-    {
-        m_FramesList[iIndex]->m_fDuration = fDuration;
-        dataChanged(createIndex(iIndex, COLUMN_Duration), createIndex(iIndex, COLUMN_Duration));
-    }
-}
-
-SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
-{
-    if(iIndex < 0)
-        return NULL;
-
-    return m_FramesList[iIndex];
-}
-
-/*virtual*/ int SpriteFramesModel::rowCount(const QModelIndex & /*parent*/) const
-{
-   return m_FramesList.count();
-}
-
-/*virtual*/ int SpriteFramesModel::columnCount(const QModelIndex & /*parent*/) const
-{
-    return NUMCOLUMNS;
-}
-
-/*virtual*/ QVariant SpriteFramesModel::data(const QModelIndex &index, int role) const
-{
-    SpriteFrame *pFrame = m_FramesList[index.row()];
-    
-    if(role == Qt::DisplayRole || role == Qt::EditRole)
-    {
-        switch(index.column())
-        {
-        case COLUMN_Frame:
-            return pFrame->m_pFrame->GetName();
-        case COLUMN_Offset:
-            return PointToQString(pFrame->m_ptOffset);
-        case COLUMN_Rotation:
-            return QString::number(pFrame->m_fRotation) % ((role == Qt::DisplayRole) ? "°" : "");
-        case COLUMN_Scale:
-            return PointToQString(pFrame->m_ptScale);
-        case COLUMN_Duration:
-            return QString::number(pFrame->m_fDuration, 'g', 4) % ((role == Qt::DisplayRole) ? "ms" : "");
-        }
-    }
-    
-    return QVariant();
-}
-
-/*virtual*/ QVariant SpriteFramesModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
-{
-    if (role == Qt::DisplayRole)
-    {
-        if (orientation == Qt::Horizontal)
-        {
-            switch(iIndex)
-            {
-            case COLUMN_Frame:
-                return QString("Frame");
-            case COLUMN_Offset:
-                return QString("Offset");
-            case COLUMN_Rotation:
-                return QString("Rot");
-            case COLUMN_Scale:
-                return QString("Scale");
-            case COLUMN_Duration:
-                return QString("Dur");
-            }
-        }
-        else
-            return QString::number(iIndex);
-    }
-    
-    return QVariant();
-}
-
-/*virtual*/ bool SpriteFramesModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
-{
-    HyGuiLog("SpriteFramesModel::setData was invoked", LOGTYPE_Error);
-    
-    SpriteFrame *pFrame = m_FramesList[index.row()];
-    
-    if(role == Qt::EditRole)
-    {
-        switch(index.column())
-        {
-        case COLUMN_Offset:
-            pFrame->m_ptOffset = StringToPoint(value.toString());
-            break;
-        case COLUMN_Rotation:
-            pFrame->m_fRotation = value.toString().toFloat();
-            break;
-        case COLUMN_Scale:
-            pFrame->m_ptScale = StringToPoint(value.toString());
-            break;
-        case COLUMN_Duration:
-            pFrame->m_fDuration = value.toString().toFloat();
-            break;
-        }
-    }
-    
-    QVector<int> vRolesChanged;
-    vRolesChanged.append(role);
-    dataChanged(index, index, vRolesChanged);
-
-    return true;
-}
-
-/*virtual*/ Qt::ItemFlags SpriteFramesModel::flags(const QModelIndex &index) const
-{
-    if(index.column() == COLUMN_Frame)
-        return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-    else
-        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stateActionList, QWidget *parent) : QWidget(parent),
                                                                                                                 m_pOwner(pOwner),
@@ -367,17 +33,17 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
     ui->btnOrderFrameUp->setDefaultAction(FindAction(stateActionList, "actionOrderFrameUpwards"));
     ui->btnOrderFrameDown->setDefaultAction(FindAction(stateActionList, "actionOrderFrameDownwards"));
 
-    m_pSpriteFramesModel = new SpriteFramesModel(this);
+    m_pSpriteFramesModel = new WidgetSpriteModel(this);
+
+    QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
+    connect(pSelModel, SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(on_framesView_itemSelectionChanged(QModelIndex,QModelIndex)));
     ui->framesView->setModel(m_pSpriteFramesModel);
-    ui->framesView->setItemDelegate(new WidgetSpriteStateDelegate(this));
+    ui->framesView->resize(ui->framesView->size());
+    ui->framesView->setItemDelegate(new WidgetSpriteDelegate(m_pOwner->Owner(), ui->framesView, this));
     
     ui->btnPlay->setDefaultAction(ui->actionPlay);
     ui->btnFirstFrame->setDefaultAction(ui->actionFirstFrame);
     ui->btnLastFrame->setDefaultAction(ui->actionLastFrame);
-
-    QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
-    connect(pSelModel, SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(on_framesView_itemSelectionChanged(QModelIndex,QModelIndex)));
-    ui->framesView->resize(ui->framesView->size());
 }
 
 WidgetSpriteState::~WidgetSpriteState()
@@ -405,6 +71,11 @@ void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
 void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
 {
     m_pSpriteFramesModel->Remove(pFrame);
+}
+
+WidgetSpriteTableView *WidgetSpriteState::GetFrameView()
+{
+    return static_cast<WidgetSpriteTableView *>(ui->framesView);
 }
 
 SpriteFrame *WidgetSpriteState::GetSelectedFrame()
@@ -554,27 +225,4 @@ void WidgetSpriteState::on_btnHz60_clicked()
     
     QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 60.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
-}
-
-
-void WidgetSpriteState::on_actionOrderFrameUpwards_triggered()
-{
-    ItemSprite *pItemSprite = m_pOwner->Owner();
-    int iSelectedIndex = GetSelectedIndex();
-    
-    QUndoCommand *pCmd = new ItemSpriteCmd_OrderFrame(ui->framesView, iSelectedIndex, iSelectedIndex - 1);
-    pItemSprite->GetUndoStack()->push(pCmd);
-    
-    m_pOwner->UpdateActions();
-}
-
-void WidgetSpriteState::on_actionOrderFrameDownwards_triggered()
-{
-    ItemSprite *pItemSprite = m_pOwner->Owner();
-    int iSelectedIndex = GetSelectedIndex();
-    
-    QUndoCommand *pCmd = new ItemSpriteCmd_OrderFrame(ui->framesView, iSelectedIndex, iSelectedIndex + 1);
-    pItemSprite->GetUndoStack()->push(pCmd);
-    
-    m_pOwner->UpdateActions();
 }

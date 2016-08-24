@@ -15,8 +15,8 @@
                 "atlasGroupId": 1,
                 "duration": 0.016000000759959221,
                 "hash": 3407498625,
-                "offsetX": 0,
-                "offsetY": 0,
+                "offsetX": 10,
+                "offsetY": 30,
                 "rotation": 0,
                 "scaleX": 1,
                 "scaleY": 1
@@ -25,16 +25,6 @@
                 "atlasGroupId": 1,
                 "duration": 0.016000000759959221,
                 "hash": 109405639,
-                "offsetX": 0,
-                "offsetY": 0,
-                "rotation": 0,
-                "scaleX": 1,
-                "scaleY": 1
-            },
-            {
-                "atlasGroupId": 1,
-                "duration": 0.016000000759959221,
-                "hash": 3549603169,
                 "offsetX": 0,
                 "offsetY": 0,
                 "rotation": 0,

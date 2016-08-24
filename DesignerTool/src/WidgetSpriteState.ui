@@ -167,7 +167,7 @@
     </widget>
    </item>
    <item>
-    <widget class="WidgetSpriteStateTableView" name="framesView">
+    <widget class="WidgetSpriteTableView" name="framesView">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -273,36 +273,12 @@
     <string>Selects the last frame of this sprite's animation</string>
    </property>
   </action>
-  <action name="actionOrderFrameUpwards">
-   <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
-   </property>
-   <property name="text">
-    <string>Order Frame &amp;Upwards</string>
-   </property>
-   <property name="toolTip">
-    <string>Shift the selected frame to be played earlier in the sequence</string>
-   </property>
-  </action>
-  <action name="actionOrderFrameDownwards">
-   <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
-   </property>
-   <property name="text">
-    <string>Order Frame &amp;Downwards</string>
-   </property>
-   <property name="toolTip">
-    <string>Shift the selected frame to be played later in the sequence</string>
-   </property>
-  </action>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>WidgetSpriteStateTableView</class>
+   <class>WidgetSpriteTableView</class>
    <extends>QTableView</extends>
-   <header>WidgetSpriteState.h</header>
+   <header>WidgetSpriteModelView.h</header>
   </customwidget>
  </customwidgets>
  <resources>
