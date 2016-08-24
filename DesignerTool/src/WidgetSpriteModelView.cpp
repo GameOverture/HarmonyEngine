@@ -26,7 +26,7 @@ WidgetSpriteTableView::WidgetSpriteTableView(QWidget *pParent /*= 0*/) : QTableV
 {
     int iWidth = pResizeEvent->size().width();
 
-    iWidth -= 64 + 64 + 64;
+    iWidth -= 64 + 64 + 64 + 15;
     setColumnWidth(WidgetSpriteModel::COLUMN_Frame, iWidth);
     setColumnWidth(WidgetSpriteModel::COLUMN_OffsetX, 64);
     setColumnWidth(WidgetSpriteModel::COLUMN_OffsetY, 64);
@@ -64,6 +64,7 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSprite
     case WidgetSpriteModel::COLUMN_Duration:
         pReturnWidget = new QDoubleSpinBox(pParent);
         static_cast<QDoubleSpinBox *>(pReturnWidget)->setSingleStep(0.001);
+        static_cast<QDoubleSpinBox *>(pReturnWidget)->setDecimals(3);
         static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix("sec");
         break;
     }
