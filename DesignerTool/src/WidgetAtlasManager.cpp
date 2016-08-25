@@ -102,7 +102,7 @@ WidgetAtlasManager::~WidgetAtlasManager()
     delete ui;
 }
 
-HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY)
+HyGuiFrame *WidgetAtlasManager::CreateImage(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY)
 {
     HyGuiFrame *pNewFrame = NULL;
     
@@ -119,7 +119,7 @@ HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiCRC, QString sN, QRect rAl
     return pNewFrame;
 }
 
-void WidgetAtlasManager::RemoveFrame(HyGuiFrame *pFrame)
+void WidgetAtlasManager::RemoveImage(HyGuiFrame *pFrame)
 {
     m_DependencyMap.remove(pFrame->GetHash());
     delete pFrame;
@@ -247,8 +247,18 @@ QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<H
     QList<HyGuiFrame *> returnList;
     for(int i = 0; i < requestList.size(); ++i)
     {
-        SetDependency(requestList[i], pItem);
-        returnList.append(requestList[i]);
+        QMap<quint32, HyGuiFrame *>::iterator iter = m_DependencyMap.find(requestList[i]->GetHash());
+        
+        if(iter == m_DependencyMap.end())
+        {
+            // TODO: Support a "Yes to all" dialog functionality here
+            HyGuiLog("Cannot find image: " % requestList[i]->GetName() % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
+        }
+        else
+        {
+            SetDependency(iter.value(), pItem);
+            returnList.append(iter.value());
+        }
     }
     
     return returnList;
@@ -266,7 +276,8 @@ QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<q
         
         if(iter == m_DependencyMap.end())
         {
-            HyGuiLog("Cannot find HyGuiFrame with hash: " % QString::number(requestList[i]), LOGTYPE_Error);
+            // TODO: Support a "Yes to all" dialog functionality here
+            HyGuiLog("Cannot find image with hash: " % QString::number(requestList[i]) % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
         }
         else
         {

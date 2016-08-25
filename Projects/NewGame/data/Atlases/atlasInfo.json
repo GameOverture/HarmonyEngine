@@ -6,42 +6,10 @@
         "textures": [
             [
                 {
-                    "bottom": 92,
-                    "hash": 66331704,
-                    "left": 640,
-                    "right": 750,
-                    "rotate": false,
-                    "top": 7
-                },
-                {
-                    "bottom": 72,
-                    "hash": 109405639,
-                    "left": 851,
-                    "right": 896,
-                    "rotate": false,
-                    "top": 2
-                },
-                {
-                    "bottom": 39,
-                    "hash": 3407498625,
-                    "left": 510,
-                    "right": 629,
-                    "rotate": false,
-                    "top": 5
-                },
-                {
-                    "bottom": 64,
-                    "hash": 3549603169,
-                    "left": 898,
-                    "right": 942,
-                    "rotate": false,
-                    "top": 0
-                },
-                {
-                    "bottom": 87,
-                    "hash": 587736848,
-                    "left": 201,
-                    "right": 363,
+                    "bottom": 192,
+                    "hash": 2071674322,
+                    "left": 10,
+                    "right": 144,
                     "rotate": false,
                     "top": 2
                 },
@@ -54,26 +22,10 @@
                     "top": 5
                 },
                 {
-                    "bottom": 78,
-                    "hash": 3129390335,
-                    "left": 747,
-                    "right": 845,
-                    "rotate": false,
-                    "top": 0
-                },
-                {
-                    "bottom": 29,
-                    "hash": 682561893,
-                    "left": 946,
-                    "right": 975,
-                    "rotate": false,
-                    "top": 0
-                },
-                {
-                    "bottom": 192,
-                    "hash": 2071674322,
-                    "left": 10,
-                    "right": 144,
+                    "bottom": 87,
+                    "hash": 587736848,
+                    "left": 201,
+                    "right": 363,
                     "rotate": false,
                     "top": 2
                 },
@@ -82,6 +34,38 @@
                     "hash": 1079542514,
                     "left": 357,
                     "right": 506,
+                    "rotate": false,
+                    "top": 0
+                },
+                {
+                    "bottom": 78,
+                    "hash": 3129390335,
+                    "left": 510,
+                    "right": 608,
+                    "rotate": false,
+                    "top": 0
+                },
+                {
+                    "bottom": 72,
+                    "hash": 109405639,
+                    "left": 614,
+                    "right": 659,
+                    "rotate": false,
+                    "top": 2
+                },
+                {
+                    "bottom": 64,
+                    "hash": 3549603169,
+                    "left": 661,
+                    "right": 705,
+                    "rotate": false,
+                    "top": 0
+                },
+                {
+                    "bottom": 29,
+                    "hash": 682561893,
+                    "left": 709,
+                    "right": 738,
                     "rotate": false,
                     "top": 0
                 }

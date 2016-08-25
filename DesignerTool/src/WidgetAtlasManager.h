@@ -42,8 +42,8 @@ public:
     
     ItemProject *GetProjOwner()     { return m_pProjOwner; }
 
-    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
-    void RemoveFrame(HyGuiFrame *pFrame);
+    HyGuiFrame *CreateImage(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
+    void RemoveImage(HyGuiFrame *pFrame);
 
     void SaveData();
 

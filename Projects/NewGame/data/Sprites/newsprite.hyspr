@@ -3,20 +3,6 @@
         "frames": [
             {
                 "atlasGroupId": 1,
-                "duration": 0.01666666753590107,
-                "hash": 66331704,
-                "offsetX": 1,
-                "offsetY": 33
-            },
-            {
-                "atlasGroupId": 1,
-                "duration": 0.02199999988079071,
-                "hash": 3407498625,
-                "offsetX": 4089,
-                "offsetY": 55
-            },
-            {
-                "atlasGroupId": 1,
                 "duration": 0.017000000923871994,
                 "hash": 109405639,
                 "offsetX": -23,

@@ -64,9 +64,9 @@ private slots:
     void on_btnSettings_clicked();
 
     void on_atlasList_itemSelectionChanged();
-    
-    void on_actionDeleteImage_triggered();
 
+    void on_actionDeleteImages_triggered();
+    
 protected:
     virtual void enterEvent(QEvent *pEvent);
     virtual void leaveEvent(QEvent *pEvent);

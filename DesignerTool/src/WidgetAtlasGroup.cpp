@@ -40,6 +40,12 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
                                                                                                                 ui(new Ui::WidgetAtlasGroup)
 {    
     ui->setupUi(this);
+    
+    ui->btnDeleteImages->setDefaultAction(ui->actionDeleteImages);
+    ui->btnDeleteImages->setEnabled(false);
+    
+    ui->btnReplaceImages->setDefaultAction(ui->actionReplaceImages);
+    ui->btnReplaceImages->setEnabled(false);
 
     ui->atlasList->setSelectionMode(QAbstractItemView::MultiSelection);
     ui->atlasList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -71,7 +77,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
             QJsonObject frameObj = frameArray[i].toObject();
 
             QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-            HyGuiFrame *pNewFrame = m_pManager->CreateFrame(JSONOBJ_TOINT(frameObj, "hash"),
+            HyGuiFrame *pNewFrame = m_pManager->CreateImage(JSONOBJ_TOINT(frameObj, "hash"),
                                                               frameObj["name"].toString(),
                                                               rAlphaCrop,
                                                               GetId(),
@@ -105,7 +111,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
             m_FrameList.append(pNewFrame);
         }
 
-        ui->groupBox->setTitle(m_dlgSettings.GetName());
+        ui->lblAtlasGroupName->setText(m_dlgSettings.GetName());
 
         ui->atlasList->sortItems(0, Qt::AscendingOrder);
         ui->atlasList->expandAll();
@@ -123,7 +129,7 @@ WidgetAtlasGroup::~WidgetAtlasGroup()
     delete ui;
 
     for(int i = 0; i < m_FrameList.size(); ++i)
-        m_pManager->RemoveFrame(m_FrameList[i]);
+        m_pManager->RemoveImage(m_FrameList[i]);
 }
 
 bool WidgetAtlasGroup::IsMatching(QDir metaDir, QDir dataDir)
@@ -297,7 +303,7 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
         quint32 uiHash = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
         QRect rAlphaCrop = m_Packer.crop(newImage);
 
-        HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiHash, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
+        HyGuiFrame *pNewFrame = m_pManager->CreateImage(uiHash, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
         
         if(pNewFrame)
         {
@@ -588,10 +594,11 @@ void WidgetAtlasGroup::on_btnSettings_clicked()
 void WidgetAtlasGroup::on_atlasList_itemSelectionChanged()
 {
     //WidgetAtlasManager *pAtlasManager = reinterpret_cast<WidgetAtlasManager *>(this->parent()->parent());
-    ui->actionDeleteImage->setEnabled(ui->atlasList->selectedItems().count() != 0);
+    ui->actionDeleteImages->setEnabled(ui->atlasList->selectedItems().count() != 0);
+    ui->actionReplaceImages->setEnabled(ui->atlasList->selectedItems().count() != 0);
 }
 
-void WidgetAtlasGroup::on_actionDeleteImage_triggered()
+void WidgetAtlasGroup::on_actionDeleteImages_triggered()
 {
     QList<QTreeWidgetItem *> selectedItems = ui->atlasList->selectedItems();
 
@@ -601,11 +608,15 @@ void WidgetAtlasGroup::on_actionDeleteImage_triggered()
         QSet<ItemWidget *> sLinks = pFrame->GetLinks();
         for(QSet<ItemWidget *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
         {
+            // TODO: Support a "Yes to all" dialog functionality here
+            HyGuiLog("Removing " % pFrame->GetName() % " from " % (*LinksIter)->GetName(true), LOGTYPE_Warning);
+            
             m_pManager->RemoveDependency(pFrame, *LinksIter);
+            (*LinksIter)->Save();
         }
 
         m_FrameList.removeOne(pFrame);
-        m_pManager->RemoveFrame(pFrame);
+        m_pManager->RemoveImage(pFrame);
         delete selectedItems[i];
     }
 

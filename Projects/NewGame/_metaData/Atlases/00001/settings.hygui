@@ -64,34 +64,6 @@
             "y": 0
         },
         {
-            "cropBottom": 39,
-            "cropLeft": 0,
-            "cropRight": 119,
-            "cropTop": 5,
-            "hash": 3407498625,
-            "height": 40,
-            "name": "Frame-2",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 130,
-            "x": 510,
-            "y": 0
-        },
-        {
-            "cropBottom": 92,
-            "cropLeft": 7,
-            "cropRight": 117,
-            "cropTop": 7,
-            "hash": 66331704,
-            "height": 100,
-            "name": "Frame-0",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 125,
-            "x": 633,
-            "y": 0
-        },
-        {
             "cropBottom": 78,
             "cropLeft": 0,
             "cropRight": 98,
@@ -102,7 +74,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 100,
-            "x": 747,
+            "x": 510,
             "y": 0
         },
         {
@@ -116,7 +88,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 50,
-            "x": 849,
+            "x": 612,
             "y": 0
         },
         {
@@ -130,7 +102,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 45,
-            "x": 898,
+            "x": 661,
             "y": 0
         },
         {
@@ -144,7 +116,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 30,
-            "x": 946,
+            "x": 709,
             "y": 0
         }
     ],
@@ -155,5 +127,5 @@
     "sbFrameMarginTop": 0,
     "sbTextureHeight": 2048,
     "sbTextureWidth": 2048,
-    "txtName": ""
+    "txtName": "Test Atlas 1"
 }
