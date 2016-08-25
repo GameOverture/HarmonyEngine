@@ -593,9 +593,10 @@ void WidgetAtlasGroup::on_btnSettings_clicked()
 
 void WidgetAtlasGroup::on_atlasList_itemSelectionChanged()
 {
-    //WidgetAtlasManager *pAtlasManager = reinterpret_cast<WidgetAtlasManager *>(this->parent()->parent());
-    ui->actionDeleteImages->setEnabled(ui->atlasList->selectedItems().count() != 0);
-    ui->actionReplaceImages->setEnabled(ui->atlasList->selectedItems().count() != 0);
+    int iNumSelected = ui->atlasList->selectedItems().count();
+    
+    ui->actionDeleteImages->setEnabled(iNumSelected != 0);
+    ui->actionReplaceImages->setEnabled(iNumSelected != 0);
 }
 
 void WidgetAtlasGroup::on_actionDeleteImages_triggered()
