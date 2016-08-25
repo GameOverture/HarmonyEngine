@@ -110,8 +110,6 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
         pDrawInst->Load();
     
     pDrawInst->SetEnabled(true);
-    
-    
 }
 
 /*virtual*/ void ItemSprite::OnLink(HyGuiFrame *pFrame)

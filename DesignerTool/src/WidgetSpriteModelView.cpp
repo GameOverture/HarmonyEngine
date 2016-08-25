@@ -26,7 +26,7 @@ WidgetSpriteTableView::WidgetSpriteTableView(QWidget *pParent /*= 0*/) : QTableV
 {
     int iWidth = pResizeEvent->size().width();
 
-    iWidth -= 64 + 64 + 64 + 15;
+    iWidth -= 64 + 64 + 64;
     setColumnWidth(WidgetSpriteModel::COLUMN_Frame, iWidth);
     setColumnWidth(WidgetSpriteModel::COLUMN_OffsetX, 64);
     setColumnWidth(WidgetSpriteModel::COLUMN_OffsetY, 64);
@@ -65,7 +65,7 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSprite
         pReturnWidget = new QDoubleSpinBox(pParent);
         static_cast<QDoubleSpinBox *>(pReturnWidget)->setSingleStep(0.001);
         static_cast<QDoubleSpinBox *>(pReturnWidget)->setDecimals(3);
-        static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix("sec");
+        //static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix("sec");
         break;
     }
 
@@ -254,7 +254,7 @@ SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
         case COLUMN_OffsetY:
             return QString::number(pFrame->m_vOffset.y());
         case COLUMN_Duration:
-            return QString::number(pFrame->m_fDuration, 'g', 5) % ((role == Qt::DisplayRole) ? "sec" : "");
+            return QString::number(pFrame->m_fDuration, 'g', 3) % ((role == Qt::DisplayRole) ? "sec" : "");
         }
     }
 

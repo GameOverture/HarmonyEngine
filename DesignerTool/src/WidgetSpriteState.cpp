@@ -180,7 +180,7 @@ void WidgetSpriteState::on_btnHz10_clicked()
 {
     ItemSprite *pItemSprite = m_pOwner->Owner();
     
-    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 10.0f);
+    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 10.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
@@ -188,7 +188,7 @@ void WidgetSpriteState::on_btnHz20_clicked()
 {
     ItemSprite *pItemSprite = m_pOwner->Owner();
     
-    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 20.0f);
+    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 20.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
@@ -196,7 +196,7 @@ void WidgetSpriteState::on_btnHz30_clicked()
 {
     ItemSprite *pItemSprite = m_pOwner->Owner();
     
-    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 30.0f);
+    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 30.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
@@ -204,7 +204,7 @@ void WidgetSpriteState::on_btnHz40_clicked()
 {
     ItemSprite *pItemSprite = m_pOwner->Owner();
     
-    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 40.0f);
+    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 40.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
@@ -212,7 +212,7 @@ void WidgetSpriteState::on_btnHz50_clicked()
 {
     ItemSprite *pItemSprite = m_pOwner->Owner();
     
-    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 50.0f);
+    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 50.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
@@ -220,6 +220,6 @@ void WidgetSpriteState::on_btnHz60_clicked()
 {
     ItemSprite *pItemSprite = m_pOwner->Owner();
     
-    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1000.0f / 60.0f);
+    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 60.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }

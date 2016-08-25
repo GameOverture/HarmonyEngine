@@ -161,7 +161,7 @@ class ItemSpriteCmd_OffsetFrame : public QUndoCommand
 {
     WidgetSpriteTableView *     m_pSpriteTableView;
     int                         m_iFrameIndex;
-    QPoint                      m_vOriginalOffset;
+    QList<QPoint>               m_OriginalOffsetList;
     QPoint                      m_vNewOffset;
     
 public:
@@ -176,9 +176,9 @@ public:
 class ItemSpriteCmd_DurationFrame : public QUndoCommand
 {
     WidgetSpriteTableView *    m_pSpriteTableView;
-    int                             m_iFrameIndex;
-    float                           m_fOriginalDuration;
-    float                           m_fNewDuration;
+    int                        m_iFrameIndex;
+    QList<float>               m_OriginalDurationList;
+    float                      m_fNewDuration;
     
 public:
     ItemSpriteCmd_DurationFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, float fDuration, QUndoCommand *pParent = 0);

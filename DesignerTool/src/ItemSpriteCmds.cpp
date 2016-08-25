@@ -305,7 +305,14 @@ ItemSpriteCmd_OffsetFrame::ItemSpriteCmd_OffsetFrame(WidgetSpriteTableView *pSpr
     setText("Translate Frame Offset");
     
     WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
-    m_vOriginalOffset = pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_vOffset;
+
+    if(m_iFrameIndex == -1)
+    {
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            m_OriginalOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_vOffset);
+    }
+    else
+        m_OriginalOffsetList.append(pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_vOffset);
 }
 
 /*virtual*/ ItemSpriteCmd_OffsetFrame::~ItemSpriteCmd_OffsetFrame()
@@ -315,17 +322,33 @@ ItemSpriteCmd_OffsetFrame::ItemSpriteCmd_OffsetFrame(WidgetSpriteTableView *pSpr
 void ItemSpriteCmd_OffsetFrame::redo()
 {
     WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
-    pSpriteFramesModel->OffsetFrame(m_iFrameIndex, m_vNewOffset);
-    
-    m_pSpriteTableView->selectRow(m_iFrameIndex);
+
+    if(m_iFrameIndex == -1)
+    {
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            pSpriteFramesModel->OffsetFrame(i, m_vNewOffset);
+    }
+    else
+    {
+        pSpriteFramesModel->OffsetFrame(m_iFrameIndex, m_vNewOffset);
+        m_pSpriteTableView->selectRow(m_iFrameIndex);
+    }
 }
 
 void ItemSpriteCmd_OffsetFrame::undo()
 {
     WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
-    pSpriteFramesModel->OffsetFrame(m_iFrameIndex, m_vOriginalOffset);
-    
-    m_pSpriteTableView->selectRow(m_iFrameIndex);
+
+    if(m_iFrameIndex == -1)
+    {
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            pSpriteFramesModel->OffsetFrame(i, m_OriginalOffsetList[i]);
+    }
+    else
+    {
+        pSpriteFramesModel->OffsetFrame(m_iFrameIndex, m_OriginalOffsetList[0]);
+        m_pSpriteTableView->selectRow(m_iFrameIndex);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -337,7 +360,14 @@ ItemSpriteCmd_DurationFrame::ItemSpriteCmd_DurationFrame(WidgetSpriteTableView *
     setText("Modify Frame Duration");
     
     WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
-    m_fOriginalDuration = pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_fDuration;
+
+    if(m_iFrameIndex == -1)
+    {
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            m_OriginalDurationList.append(pSpriteFramesModel->GetFrameAt(i)->m_fDuration);
+    }
+    else
+        m_OriginalDurationList.append(pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_fDuration);
 }
 
 /*virtual*/ ItemSpriteCmd_DurationFrame::~ItemSpriteCmd_DurationFrame()
@@ -347,15 +377,31 @@ ItemSpriteCmd_DurationFrame::ItemSpriteCmd_DurationFrame(WidgetSpriteTableView *
 void ItemSpriteCmd_DurationFrame::redo()
 {
     WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
-    pSpriteFramesModel->DurationFrame(m_iFrameIndex, m_fNewDuration);
-    
-    m_pSpriteTableView->selectRow(m_iFrameIndex);
+
+    if(m_iFrameIndex == -1)
+    {
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            pSpriteFramesModel->DurationFrame(i, m_fNewDuration);
+    }
+    else
+    {
+        pSpriteFramesModel->DurationFrame(m_iFrameIndex, m_fNewDuration);
+        m_pSpriteTableView->selectRow(m_iFrameIndex);
+    }
 }
 
 void ItemSpriteCmd_DurationFrame::undo()
 {
     WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
-    pSpriteFramesModel->DurationFrame(m_iFrameIndex, m_fOriginalDuration);
-    
-    m_pSpriteTableView->selectRow(m_iFrameIndex);
+
+    if(m_iFrameIndex == -1)
+    {
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            pSpriteFramesModel->DurationFrame(i, m_OriginalDurationList[i]);
+    }
+    else
+    {
+        pSpriteFramesModel->DurationFrame(m_iFrameIndex, m_OriginalDurationList[0]);
+        m_pSpriteTableView->selectRow(m_iFrameIndex);
+    }
 }
