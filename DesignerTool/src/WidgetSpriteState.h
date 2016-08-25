@@ -34,7 +34,7 @@ class WidgetSpriteState : public QWidget
     QString                             m_sName;
     
     bool                                m_bPlayActive;
-    double                              m_dElapsedTime;
+    float                               m_fElapsedTime;
     bool                                m_bIsBounced;
 
 public:
@@ -56,7 +56,7 @@ public:
     
     void GetStateFrameInfo(QJsonObject &stateObjOut);
     
-    void UpdateTimeStep(double dDelta);
+    void UpdateTimeStep();
 
 private slots:
     void on_framesView_itemSelectionChanged(QModelIndex current, QModelIndex previous);
@@ -74,6 +74,10 @@ private slots:
     void on_btnHz50_clicked();
     
     void on_btnHz60_clicked();
+    
+    void on_actionFirstFrame_triggered();
+    
+    void on_actionLastFrame_triggered();
     
 private:
     Ui::WidgetSpriteState *ui;

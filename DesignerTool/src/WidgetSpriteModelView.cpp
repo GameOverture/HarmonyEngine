@@ -243,6 +243,11 @@ SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
 {
     SpriteFrame *pFrame = m_FramesList[index.row()];
 
+    if (role == Qt::TextAlignmentRole && index.column() != COLUMN_Frame)
+    {
+        return Qt::AlignCenter;
+    }
+    
     if(role == Qt::DisplayRole || role == Qt::EditRole)
     {
         switch(index.column())

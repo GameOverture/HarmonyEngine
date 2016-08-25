@@ -23,7 +23,7 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
                                                                                                                 ui(new Ui::WidgetSpriteState),
                                                                                                                 m_sName("Unnamed"),
                                                                                                                 m_bPlayActive(false),
-                                                                                                                m_dElapsedTime(0.0),
+                                                                                                                m_fElapsedTime(0.0),
                                                                                                                 m_bIsBounced(false)
 {
     ui->setupUi(this);
@@ -124,37 +124,83 @@ void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
     stateObjOut.insert("frames", QJsonValue(frameArray));
 }
 
-void WidgetSpriteState::UpdateTimeStep(double dDelta)
+void WidgetSpriteState::UpdateTimeStep()
 {
-    if(m_bPlayActive == false)
-        return;
-    
     SpriteFrame *pFrame = GetSelectedFrame();
-    if(pFrame)
+    
+    if(m_bPlayActive == false && pFrame != NULL)
+        return;
+
+    m_fElapsedTime += IHyTime::GetUpdateStepSeconds();
+    while(m_fElapsedTime >= pFrame->m_fDuration)
     {
-        m_dElapsedTime += dDelta;
-        while(m_dElapsedTime >= pFrame->m_fDuration)
+        bool bBounce = ui->chkBounce->isChecked();
+        bool bReverse = ui->chkReverse->isChecked();
+        bool bLoop = ui->chkLoop->isChecked();
+        int iNumFrames = GetNumFrames();
+        
+        int iNextRow = ui->framesView->currentIndex().row();
+        
+        if(bReverse == false)
         {
-            int iCurRow = ui->framesView->currentIndex().row();
-            int iNextRow;
+            m_bIsBounced ? iNextRow-- : iNextRow++;
             
-            if(ui->chkReverse->isChecked())
+            if(iNextRow < 0)
             {
-                if(iCurRow == 0)
-                {
-                }
+                m_bIsBounced = false;
                 
-                if(ui->chkBounce->isChecked() && m_bIsBounced)
-                    iNextRow = iCurRow + 1;
+                if(bLoop)
+                    iNextRow = 1;
                 else
-                    iNextRow = iCurRow - 1;
+                    on_actionPlay_triggered();  // Stop playback
             }
-            
-            ui->framesView->selectRow(iNextRow);
-            SpriteFrame *pFrame = GetSelectedFrame();
-            
-            m_dElapsedTime -= pFrame->m_fDuration;
+            else if(iNextRow >= iNumFrames)
+            {
+                if(bBounce)
+                {
+                    iNextRow = iNumFrames - 2;
+                    m_bIsBounced = true;
+                }
+                else if(bLoop)
+                    iNextRow = 0;
+                else
+                    on_actionPlay_triggered();  // Stop playback
+            }
         }
+        else
+        {
+            m_bIsBounced ? iNextRow++ : iNextRow--;
+            
+            if(iNextRow < 0)
+            {
+                if(bBounce)
+                {
+                    iNextRow = 1;
+                    m_bIsBounced = true;
+                }
+                else if(bLoop)
+                    iNextRow = iNumFrames - 1;
+                else
+                    on_actionPlay_triggered();  // Stop playback
+            }
+            else if(iNextRow >= iNumFrames)
+            {
+                m_bIsBounced = false;
+                
+                if(bLoop)
+                    iNextRow = iNumFrames - 2;
+                else
+                    on_actionPlay_triggered();  // Stop playback
+            }
+        }
+        
+        if(m_bPlayActive)
+        {
+            ui->framesView->selectRow(iNextRow);
+            m_fElapsedTime -= pFrame->m_fDuration;
+        }
+        else
+            break;
     }
 }
 
@@ -171,6 +217,7 @@ void WidgetSpriteState::on_actionPlay_triggered()
     {
         ui->btnPlay->setIcon(QIcon(":/icons16x16/media-pause.png"));
         m_bIsBounced = false;
+        m_fElapsedTime = 0.0f;
     }
     else
         ui->btnPlay->setIcon(QIcon(":/icons16x16/media-play.png"));
@@ -222,4 +269,14 @@ void WidgetSpriteState::on_btnHz60_clicked()
     
     QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 60.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
+}
+
+void WidgetSpriteState::on_actionFirstFrame_triggered()
+{
+    ui->framesView->selectRow(0);
+}
+
+void WidgetSpriteState::on_actionLastFrame_triggered()
+{
+    ui->framesView->selectRow(GetNumFrames() - 1);
 }
