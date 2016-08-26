@@ -139,13 +139,13 @@ void WidgetSpriteModel::Add(HyGuiFrame *pFrame)
     SpriteFrame *pFrameToInsert = NULL;
 
     // See if this frame has been recently removed, and re-add if possible. Otherwise, create a new Frame
-    QMap<quint32, SpriteFrame *>::iterator iter = m_RemovedFrameMap.find(pFrame->GetHash());
+    QMap<quint32, SpriteFrame *>::iterator iter = m_RemovedFrameMap.find(pFrame->GetChecksum());
     if(iter == m_RemovedFrameMap.end())
         pFrameToInsert = new SpriteFrame(pFrame, m_FramesList.count());
     else
     {
         pFrameToInsert = iter.value();
-        m_RemovedFrameMap.remove(pFrame->GetHash());
+        m_RemovedFrameMap.remove(pFrame->GetChecksum());
     }
 
     beginInsertRows(QModelIndex(), pFrameToInsert->m_iRowIndex, pFrameToInsert->m_iRowIndex);
@@ -159,7 +159,7 @@ void WidgetSpriteModel::Remove(HyGuiFrame *pFrame)
     {
         if(m_FramesList[i]->m_pFrame == pFrame)
         {
-            m_RemovedFrameMap[pFrame->GetHash()] = m_FramesList[i];
+            m_RemovedFrameMap[pFrame->GetChecksum()] = m_FramesList[i];
 
             beginRemoveRows(QModelIndex(), i, i);
             m_FramesList.removeAt(i);
@@ -185,6 +185,22 @@ void WidgetSpriteModel::MoveRowDown(int iIndex)
 
     m_FramesList.swap(iIndex, iIndex + 1);
     endMoveRows();
+}
+
+void WidgetSpriteModel::RefreshFrame(HyGuiFrame *pFrame)
+{
+    bool bFound = false;
+    for(int i = 0; i < m_FramesList.count(); ++i)
+    {
+        if(m_FramesList[i]->m_pFrame == pFrame)
+        {
+            bFound = true;
+            break;
+        }
+    }
+
+    if(bFound)
+        dataChanged(createIndex(0, 0), createIndex(m_FramesList.count() - 1, NUMCOLUMNS - 1));
 }
 
 // iIndex of -1 will apply to all

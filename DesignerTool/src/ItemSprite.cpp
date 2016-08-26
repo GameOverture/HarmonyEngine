@@ -120,6 +120,14 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     pCurSpriteState->InsertFrame(pFrame);
 }
 
+/*virtual*/ void ItemSprite::OnReLink(HyGuiFrame *pFrame)
+{
+    WidgetSprite *pWidgetSprite = static_cast<WidgetSprite *>(m_pWidget);
+    pWidgetSprite->RefreshFrame(pFrame);
+
+
+}
+
 /*virtual*/ void ItemSprite::OnUnlink(HyGuiFrame *pFrame)
 {
     WidgetSpriteState *pCurSpriteState = static_cast<WidgetSprite *>(m_pWidget)->GetCurSpriteState();

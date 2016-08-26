@@ -77,7 +77,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
             QJsonObject frameObj = frameArray[i].toObject();
 
             QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-            HyGuiFrame *pNewFrame = m_pManager->CreateImage(JSONOBJ_TOINT(frameObj, "hash"),
+            HyGuiFrame *pNewFrame = m_pManager->CreateImage(JSONOBJ_TOINT(frameObj, "checksum"),
                                                               frameObj["name"].toString(),
                                                               rAlphaCrop,
                                                               GetId(),
@@ -169,7 +169,7 @@ void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObjOut)
             frameArrayList.append(QJsonArray());
         
         QJsonObject frameObj;
-        frameObj.insert("hash", QJsonValue(static_cast<qint64>(m_FrameList[i]->GetHash())));
+        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FrameList[i]->GetChecksum())));
         frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().right()));
         frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().bottom()));
         frameObj.insert("rotate", QJsonValue(m_FrameList[i]->IsRotated()));
@@ -300,10 +300,10 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
         QFileInfo fileInfo(sImportImgList[i]);
 
         QImage newImage(fileInfo.absoluteFilePath());
-        quint32 uiHash = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
+        quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
         QRect rAlphaCrop = m_Packer.crop(newImage);
 
-        HyGuiFrame *pNewFrame = m_pManager->CreateImage(uiHash, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
+        HyGuiFrame *pNewFrame = m_pManager->CreateImage(uiChecksum, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
         
         if(pNewFrame)
         {
@@ -335,7 +335,7 @@ void WidgetAtlasGroup::Refresh()
     {
         m_Packer.addItem(m_FrameList[i]->GetSize(),
                          m_FrameList[i]->GetCrop(),
-                         m_FrameList[i]->GetHash(),
+                         m_FrameList[i]->GetChecksum(),
                          m_FrameList[i],
                          m_MetaDir.absoluteFilePath(m_FrameList[i]->ConstructImageFileName()));
     }
@@ -386,7 +386,7 @@ void WidgetAtlasGroup::Refresh()
                                     imgInfoRef.pos.y() + m_Packer.border.t);
 
         QJsonObject frameObj;
-        frameObj.insert("hash", QJsonValue(static_cast<qint64>(pFrame->GetHash())));
+        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pFrame->GetChecksum())));
         frameObj.insert("name", QJsonValue(pFrame->GetName()));
         frameObj.insert("width", QJsonValue(pFrame->GetSize().width()));
         frameObj.insert("height", QJsonValue(pFrame->GetSize().height()));
@@ -601,16 +601,16 @@ void WidgetAtlasGroup::on_atlasList_itemSelectionChanged()
 
 void WidgetAtlasGroup::on_actionDeleteImages_triggered()
 {
-    QList<QTreeWidgetItem *> selectedItems = ui->atlasList->selectedItems();
+    QList<QTreeWidgetItem *> selectedImageList = ui->atlasList->selectedItems();
 
-    for(int i = 0; i < selectedItems.count(); ++i)
+    for(int i = 0; i < selectedImageList.count(); ++i)
     {
-        HyGuiFrame *pFrame = selectedItems[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
+        HyGuiFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
         QSet<ItemWidget *> sLinks = pFrame->GetLinks();
         for(QSet<ItemWidget *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
         {
             // TODO: Support a "Yes to all" dialog functionality here
-            HyGuiLog("Removing " % pFrame->GetName() % " from " % (*LinksIter)->GetName(true), LOGTYPE_Warning);
+            HyGuiLog(pFrame->GetName() % " was in use by " % (*LinksIter)->GetName(true) % "\nRemoving image from " % (*LinksIter)->GetName(false), LOGTYPE_Warning);
             
             m_pManager->RemoveDependency(pFrame, *LinksIter);
             (*LinksIter)->Save();
@@ -618,8 +618,54 @@ void WidgetAtlasGroup::on_actionDeleteImages_triggered()
 
         m_FrameList.removeOne(pFrame);
         m_pManager->RemoveImage(pFrame);
-        delete selectedItems[i];
+        delete selectedImageList[i];
     }
 
     Refresh();
+}
+
+void WidgetAtlasGroup::on_actionReplaceImages_triggered()
+{
+    QList<QTreeWidgetItem *> selectedImageList = ui->atlasList->selectedItems();
+
+    QFileDialog dlg(this);
+    dlg.setFileMode(QFileDialog::Directory);
+    dlg.setWindowModality(Qt::ApplicationModal);
+    dlg.setModal(true);
+    //dlg.setCaption("Select " % QString::number(selectedItems.count()) % " image(s) to be replaced");
+    QStringList sFilterList;
+    sFilterList << "*.*" << "*.png";
+    dlg.setNameFilters(sFilterList);
+
+    QStringList sImportImgList;
+    do
+    {
+        if(dlg.exec() == QDialog::Rejected)
+            return;
+
+        sImportImgList = dlg.selectedFiles();
+
+        if(sImportImgList.count() != selectedImageList.count())
+            HyGuiLog("You must select " % QString::number(selectedImageList.count()) % " images", LOGTYPE_Warning);
+    }
+    while(sImportImgList.count() != selectedImageList.count());
+
+    for(int i = 0; i < selectedImageList.count(); ++i)
+    {
+        HyGuiFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
+
+        HyGuiLog("Replacing: " % pFrame->GetName() % " -> " % sImportImgList[i], LOGTYPE_Info);
+        pFrame->ReplaceImage(sImportImgList[i], m_MetaDir);
+    }
+
+    Refresh();
+
+    for(int i = 0; i < selectedImageList.count(); ++i)
+    {
+        HyGuiFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
+
+        QSet<ItemWidget *> sLinks = pFrame->GetLinks();
+        for(QSet<ItemWidget *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+            (*LinksIter)->Relink(pFrame);
+    }
 }

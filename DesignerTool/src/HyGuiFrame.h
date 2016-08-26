@@ -20,12 +20,13 @@ class HyGuiFrame
 {
     friend class WidgetAtlasManager;
 
-    const quint32                       m_uiHASH;
-    const QString                       m_sNAME;
-    const int                           m_iWIDTH;
-    const int                           m_iHEIGHT;
-    const QRect                         m_rALPHA_CROP;
     const uint                          m_uiATLAS_GROUP_ID;
+
+    quint32                             m_uiChecksum;
+    QString                             m_sName;
+    int                                 m_iWidth;
+    int                                 m_iHeight;
+    QRect                               m_rAlphaCrop;
 
     int                                 m_iTextureIndex;
     bool                                m_bRotation;
@@ -37,16 +38,18 @@ class HyGuiFrame
 
     QMap<void *, HyTexturedQuad2d *>    m_DrawInstMap;
 
-    HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
+    HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
     ~HyGuiFrame();
     
 public:
+    void ReplaceImage(QString sImgPath, QDir metaDir);
+
     HyTexturedQuad2d *DrawInst(void *pKey);
 
-    quint32 GetHash()                           { return m_uiHASH; }
-    QString GetName()                           { return m_sNAME; }
-    QSize GetSize()                             { return QSize(m_iWIDTH, m_iHEIGHT); }
-    QRect GetCrop()                             { return m_rALPHA_CROP; }
+    quint32 GetChecksum()                       { return m_uiChecksum; }
+    QString GetName()                           { return m_sName; }
+    QSize GetSize()                             { return QSize(m_iWidth, m_iHeight); }
+    QRect GetCrop()                             { return m_rAlphaCrop; }
     QPoint GetPosition()                        { return QPoint(m_iPosX, m_iPosY); }
     QSet<ItemWidget *> GetLinks()               { return m_Links; }
     int GetAtlasGroupdId()                      { return static_cast<int>(m_uiATLAS_GROUP_ID); }

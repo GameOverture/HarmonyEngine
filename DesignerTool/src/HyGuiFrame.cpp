@@ -8,17 +8,18 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "HyGuiFrame.h"
+#include "scriptum/imagepacker.h"
 
-HyGuiFrame::HyGuiFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) :    m_uiHASH(uiCRC),
-                                                                                                                                                        m_sNAME(sN),
-                                                                                                                                                        m_iWIDTH(iW),
-                                                                                                                                                        m_iHEIGHT(iH),
-                                                                                                                                                        m_rALPHA_CROP(rAlphaCrop),
-                                                                                                                                                        m_uiATLAS_GROUP_ID(uiAtlasGroupId),
-                                                                                                                                                        m_iTextureIndex(iTexIndex),
-                                                                                                                                                        m_bRotation(bRot),
-                                                                                                                                                        m_iPosX(iX),
-                                                                                                                                                        m_iPosY(iY)
+HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) :   m_uiATLAS_GROUP_ID(uiAtlasGroupId),
+                                                                                                                                                            m_uiChecksum(uiChecksum),
+                                                                                                                                                            m_sName(sN),
+                                                                                                                                                            m_iWidth(iW),
+                                                                                                                                                            m_iHeight(iH),
+                                                                                                                                                            m_rAlphaCrop(rAlphaCrop),
+                                                                                                                                                            m_iTextureIndex(iTexIndex),
+                                                                                                                                                            m_bRotation(bRot),
+                                                                                                                                                            m_iPosX(iX),
+                                                                                                                                                            m_iPosY(iY)
 {
 }
 
@@ -32,6 +33,28 @@ HyGuiFrame::~HyGuiFrame()
     }
 }
 
+void HyGuiFrame::ReplaceImage(QString sImgPath, QDir metaDir)
+{
+    QFileInfo fileInfo(sImgPath);
+
+    QFile oldImageFile(metaDir.path() % "/" % ConstructImageFileName());
+    if(oldImageFile.remove() == false)
+        HyGuiLog("Could not remove old meta image file when replacing " % fileInfo.baseName(), LOGTYPE_Error);
+
+    QImage newImage(fileInfo.absoluteFilePath());
+    m_uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
+    m_sName = fileInfo.baseName();
+    m_iWidth = newImage.width();
+    m_iHeight = newImage.height();
+    m_rAlphaCrop = ImagePacker::crop(newImage);
+    m_iTextureIndex = -1;
+    m_bRotation = false;
+    m_iPosX = -1;
+    m_iPosY = -1;
+
+    newImage.save(metaDir.path() % "/" % ConstructImageFileName());
+}
+
 HyTexturedQuad2d *HyGuiFrame::DrawInst(void *pKey)
 {
     QMap<void *, HyTexturedQuad2d *>::iterator iter = m_DrawInstMap.find(pKey);
@@ -41,11 +64,11 @@ HyTexturedQuad2d *HyGuiFrame::DrawInst(void *pKey)
     // Not found, create a new HyTexturedQuad2d based on key
     HyTexturedQuad2d *pDrawInst = new HyTexturedQuad2d(m_uiATLAS_GROUP_ID);
     if(m_bRotation == false)
-        pDrawInst->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
+        pDrawInst->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.width(), m_rAlphaCrop.height());
     else
     {
-        pDrawInst->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.height(), m_rALPHA_CROP.width());
-        pDrawInst->rot_pivot.Set(m_rALPHA_CROP.height() * 0.5f, m_rALPHA_CROP.width() * 0.5f);
+        pDrawInst->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.height(), m_rAlphaCrop.width());
+        pDrawInst->rot_pivot.Set(m_rAlphaCrop.height() * 0.5f, m_rAlphaCrop.width() * 0.5f);
         pDrawInst->rot.Z(90);
     }
 
@@ -72,11 +95,11 @@ void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX,
             iter.next();
             
             if(m_bRotation == false)
-                iter.value()->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.width(), m_rALPHA_CROP.height());
+                iter.value()->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.width(), m_rAlphaCrop.height());
             else
             {
-                iter.value()->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rALPHA_CROP.height(), m_rALPHA_CROP.width());
-                iter.value()->rot_pivot.Set(m_rALPHA_CROP.height() * 0.5f, m_rALPHA_CROP.width() * 0.5f);
+                iter.value()->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.height(), m_rAlphaCrop.width());
+                iter.value()->rot_pivot.Set(m_rAlphaCrop.height() * 0.5f, m_rAlphaCrop.width() * 0.5f);
                 iter.value()->rot.Z(90);
             }
         }
@@ -92,7 +115,7 @@ void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX,
 QString HyGuiFrame::ConstructImageFileName()
 {
     QString sMetaImgName;
-    sMetaImgName = sMetaImgName.sprintf("%010u-%s", m_uiHASH, m_sNAME.toStdString().c_str());
+    sMetaImgName = sMetaImgName.sprintf("%010u-%s", m_uiChecksum, m_sName.toStdString().c_str());
     sMetaImgName += ".png";
 
     return sMetaImgName;

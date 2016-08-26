@@ -45,6 +45,7 @@ public:
     void SetName(QString sNewName);
 
     void InsertFrame(HyGuiFrame *pFrame);
+    void RefreshFrame(HyGuiFrame *pFrame);
     void RemoveFrame(HyGuiFrame *pFrame);
 
     WidgetSpriteTableView *GetFrameView();

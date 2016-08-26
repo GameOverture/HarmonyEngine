@@ -46,6 +46,8 @@ public:
     void GetSpriteStateInfo(QJsonArray &spriteStateArrayRef);
     
     WidgetSpriteState *GetCurSpriteState();
+
+    void RefreshFrame(HyGuiFrame *pFrame);
     
     QList<HyGuiFrame *> GetAllDrawInsts();
     

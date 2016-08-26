@@ -74,6 +74,7 @@ public:
     void Remove(HyGuiFrame *pFrame);
     void MoveRowUp(int iIndex);
     void MoveRowDown(int iIndex);
+    void RefreshFrame(HyGuiFrame *pFrame);
     void OffsetFrame(int iIndex, QPoint vOffset);       // iIndex of -1 will apply to all
     void DurationFrame(int iIndex, float fDuration);    // iIndex of -1 will apply to all
 

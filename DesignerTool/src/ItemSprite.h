@@ -58,6 +58,7 @@ protected:
     virtual void OnDraw_Update(IHyApplication &hyApp);
 
     virtual void OnLink(HyGuiFrame *pFrame);
+    virtual void OnReLink(HyGuiFrame *pFrame);
     virtual void OnUnlink(HyGuiFrame *pFrame);
     
     virtual void OnSave();

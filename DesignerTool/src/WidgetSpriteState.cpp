@@ -68,6 +68,11 @@ void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
     ui->framesView->selectRow(0);
 }
 
+void WidgetSpriteState::RefreshFrame(HyGuiFrame *pFrame)
+{
+    m_pSpriteFramesModel->RefreshFrame(pFrame);
+}
+
 void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
 {
     m_pSpriteFramesModel->Remove(pFrame);
@@ -114,7 +119,7 @@ void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
         frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));
         frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x()));
         frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y()));
-        frameObj.insert("hash", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetHash())));
+        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetChecksum())));
         frameObj.insert("atlasGroupId", QJsonValue(pSpriteFrame->m_pFrame->GetAtlasGroupdId()));
 
         frameArray.append(frameObj);

@@ -102,18 +102,18 @@ WidgetAtlasManager::~WidgetAtlasManager()
     delete ui;
 }
 
-HyGuiFrame *WidgetAtlasManager::CreateImage(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY)
+HyGuiFrame *WidgetAtlasManager::CreateImage(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY)
 {
     HyGuiFrame *pNewFrame = NULL;
     
-    if(m_DependencyMap.contains(uiCRC))
+    if(m_DependencyMap.contains(uiChecksum))
     {
-        HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this hash: " % QString::number(uiCRC), LOGTYPE_Error);
+        HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
     }
     else
     {
-        pNewFrame = new HyGuiFrame(uiCRC, sN, rAlphaCrop, uiAtlasGroupId, iW, iH, iTexIndex, bRot, iX, iY);
-        m_DependencyMap[uiCRC] = pNewFrame;
+        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, iW, iH, iTexIndex, bRot, iX, iY);
+        m_DependencyMap[uiChecksum] = pNewFrame;
     }
 
     return pNewFrame;
@@ -121,7 +121,7 @@ HyGuiFrame *WidgetAtlasManager::CreateImage(quint32 uiCRC, QString sN, QRect rAl
 
 void WidgetAtlasManager::RemoveImage(HyGuiFrame *pFrame)
 {
-    m_DependencyMap.remove(pFrame->GetHash());
+    m_DependencyMap.remove(pFrame->GetChecksum());
     delete pFrame;
 }
 
@@ -174,7 +174,7 @@ void WidgetAtlasManager::SaveDependencies()
                 frameLinksArray.append(QJsonValue((*LinksIter)->GetRelPath()));
 
             QJsonObject linkObj;
-            linkObj.insert("hash", QJsonValue(static_cast<qint64>(iter.key())));
+            linkObj.insert("checksum", QJsonValue(static_cast<qint64>(iter.key())));
             linkObj.insert("links", QJsonValue(frameLinksArray));
 
             dependArray.append(QJsonValue(linkObj));
@@ -247,7 +247,7 @@ QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<H
     QList<HyGuiFrame *> returnList;
     for(int i = 0; i < requestList.size(); ++i)
     {
-        QMap<quint32, HyGuiFrame *>::iterator iter = m_DependencyMap.find(requestList[i]->GetHash());
+        QMap<quint32, HyGuiFrame *>::iterator iter = m_DependencyMap.find(requestList[i]->GetChecksum());
         
         if(iter == m_DependencyMap.end())
         {
@@ -277,7 +277,7 @@ QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<q
         if(iter == m_DependencyMap.end())
         {
             // TODO: Support a "Yes to all" dialog functionality here
-            HyGuiLog("Cannot find image with hash: " % QString::number(requestList[i]) % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
+            HyGuiLog("Cannot find image with checksum: " % QString::number(requestList[i]) % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
         }
         else
         {

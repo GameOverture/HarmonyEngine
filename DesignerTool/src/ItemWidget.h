@@ -34,6 +34,7 @@ class ItemWidget : public Item
     void DrawUpdate(IHyApplication &hyApp);
 
     void Link(HyGuiFrame *pFrame);
+    void Relink(HyGuiFrame *pFrame);
     void Unlink(HyGuiFrame *pFrame);
 
 protected:
@@ -55,6 +56,7 @@ protected:
     virtual void OnDraw_Update(IHyApplication &hyApp) = 0;
 
     virtual void OnLink(HyGuiFrame *pFrame) = 0;
+    virtual void OnReLink(HyGuiFrame *pFrame) = 0;
     virtual void OnUnlink(HyGuiFrame *pFrame) = 0;
     
     virtual void OnSave() = 0;

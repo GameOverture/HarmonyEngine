@@ -67,6 +67,8 @@ private slots:
 
     void on_actionDeleteImages_triggered();
     
+    void on_actionReplaceImages_triggered();
+
 protected:
     virtual void enterEvent(QEvent *pEvent);
     virtual void leaveEvent(QEvent *pEvent);

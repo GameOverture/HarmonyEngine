@@ -5,6 +5,8 @@
 #define CMPF2(x,y) img.pixel(x,y) != pix
 #define CMP2(x,y) if(CMPF2(x,y)) {t = false; break;} if(!t) break;
 
+#define CROP_THRESHOLD 10   // Code change by JJK
+
 //auto-cropping algorithm
 QRect ImagePacker::crop(const QImage &img)
 {
@@ -64,25 +66,25 @@ QRect ImagePacker::crop(const QImage &img)
     for(y = 0; y < img.height(); y++)
     {
         for(j = 0; j < img.width(); j++)
-            CMP(j, y, cropThreshold)
+            CMP(j, y, CROP_THRESHOLD)
         }
     t = true;
     for(x = 0; x < img.width(); x++)
     {
         for(j = y; j < img.height(); j++)
-            CMP(x, j, cropThreshold)
+            CMP(x, j, CROP_THRESHOLD)
         }
     t = true;
     for(w = img.width(); w > 0; w--)
     {
         for(j = y; j < img.height(); j++)
-            CMP(w - 1, j, cropThreshold)
+            CMP(w - 1, j, CROP_THRESHOLD)
         }
     t = true;
     for(h = img.height(); h > 0; h--)
     {
         for(j = x; j < w; j++)
-            CMP(j, h - 1, cropThreshold)
+            CMP(j, h - 1, CROP_THRESHOLD)
         }
 found_by_color:
     w = w - x;

@@ -92,7 +92,7 @@ void WidgetSprite::LoadAndInit()
                 QJsonObject spriteFrameObj = spriteFrameArray[j].toObject();
                 
                 QList<quint32> requestList;
-                requestList.append(JSONOBJ_TOINT(spriteFrameObj, "hash"));
+                requestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
                 m_pItemSprite->GetAtlasManager().RequestFrames(m_pItemSprite, requestList);
 
                 WidgetSpriteState *pSpriteState = GetCurSpriteState();
@@ -141,6 +141,15 @@ void WidgetSprite::GetSpriteStateInfo(QJsonArray &spriteStateArrayRef)
 WidgetSpriteState *WidgetSprite::GetCurSpriteState()
 {
     return ui->cmbStates->currentData().value<WidgetSpriteState *>();
+}
+
+void WidgetSprite::RefreshFrame(HyGuiFrame *pFrame)
+{
+    for(int i = 0; i < ui->cmbStates->count(); ++i)
+    {
+        WidgetSpriteState *pSpriteState = ui->cmbStates->itemData(i).value<WidgetSpriteState *>();
+        pSpriteState->RefreshFrame(pFrame);
+    }
 }
 
 QList<HyGuiFrame *> WidgetSprite::GetAllDrawInsts()

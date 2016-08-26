@@ -63,7 +63,7 @@ class ImagePacker : public QObject
 
         int FillBin(int heur, int w, int h, int binIndex);
 
-        QRect crop(const QImage &img);
+        static QRect crop(const QImage &img);   // Made static by JJK
         void sort();
         void addItem(QSize imageSize, QRect alphaCrop, quint32 uiHash, void *data, QString path);
         //void addItem(QString path, quint32 uiHash, void *data);

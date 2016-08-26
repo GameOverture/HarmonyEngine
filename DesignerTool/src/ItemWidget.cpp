@@ -114,6 +114,12 @@ void ItemWidget::Link(HyGuiFrame *pFrame)
     m_Links.insert(pFrame);
 }
 
+void ItemWidget::Relink(HyGuiFrame *pFrame)
+{
+    OnReLink(pFrame);
+    Save();
+}
+
 void ItemWidget::Unlink(HyGuiFrame *pFrame)
 {
     OnUnlink(pFrame);
