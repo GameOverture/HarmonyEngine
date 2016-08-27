@@ -45,6 +45,7 @@ public:
     void ReplaceImage(QString sImgPath, QDir metaDir);
 
     HyTexturedQuad2d *DrawInst(void *pKey);
+    void DeleteDrawInst(void *pKey);
 
     quint32 GetChecksum()                       { return m_uiChecksum; }
     QString GetName()                           { return m_sName; }

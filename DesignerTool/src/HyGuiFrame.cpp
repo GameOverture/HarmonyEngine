@@ -80,6 +80,16 @@ HyTexturedQuad2d *HyGuiFrame::DrawInst(void *pKey)
     return pDrawInst;
 }
 
+void HyGuiFrame::DeleteDrawInst(void *pKey)
+{
+    QMap<void *, HyTexturedQuad2d *>::iterator iter = m_DrawInstMap.find(pKey);
+    if(iter != m_DrawInstMap.end())
+    {
+        iter.value()->Unload();
+        m_DrawInstMap.remove(pKey);
+    }
+}
+
 void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX, int iY)
 {
     m_iTextureIndex = iTextureIndex;

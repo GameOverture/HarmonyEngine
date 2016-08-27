@@ -129,6 +129,8 @@ void ItemWidget::Relink(HyGuiFrame *pFrame)
 
 void ItemWidget::Unlink(HyGuiFrame *pFrame)
 {
+    pFrame->DeleteDrawInst(this);
+
     OnUnlink(pFrame);
     m_Links.remove(pFrame);
 }
