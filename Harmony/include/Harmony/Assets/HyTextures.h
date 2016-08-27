@@ -101,7 +101,7 @@ class HyAtlas
 	unsigned char *							m_pPixelData;
 
 	HyRectangle<int32> *					m_pFrames;
-	std::map<uint32, HyRectangle<int32> *>	m_HashMap;
+	std::map<uint32, HyRectangle<int32> *>	m_ChecksumMap;
 
 public:
 	HyAtlas(jsonxx::Array &srcFramesArrayRef);

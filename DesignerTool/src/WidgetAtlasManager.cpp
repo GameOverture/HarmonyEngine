@@ -60,7 +60,6 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
                                                                                              m_pProjOwner(pProjOwner),
                                                                                              m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
                                                                                              m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
-                                                                                             m_DependenciesFile(m_MetaDir.absolutePath() % "/" % HYGUIPATH_MetaAtlasDependencies),
                                                                                              m_pMouseHoverItem(NULL)
 {
     ui->setupUi(this);
@@ -153,53 +152,6 @@ void WidgetAtlasManager::SaveData()
 
         atlasInfoFile.close();
     }
-}
-
-void WidgetAtlasManager::SaveDependencies()
-{
-    if(!m_DependenciesFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-       HyGuiLog("Couldn't open atlas dependencies file for writing", LOGTYPE_Error);
-    }
-    else
-    {
-        QJsonArray dependArray;
-
-        QMap<quint32, HyGuiFrame *>::iterator iter;
-        for(iter = m_DependencyMap.begin(); iter != m_DependencyMap.end(); ++iter)
-        {
-            QJsonArray frameLinksArray;
-            QSet<ItemWidget *> sLinks = iter.value()->GetLinks();
-            for(QSet<ItemWidget *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
-                frameLinksArray.append(QJsonValue((*LinksIter)->GetRelPath()));
-
-            QJsonObject linkObj;
-            linkObj.insert("checksum", QJsonValue(static_cast<qint64>(iter.key())));
-            linkObj.insert("links", QJsonValue(frameLinksArray));
-
-            dependArray.append(QJsonValue(linkObj));
-        }
-
-        QJsonDocument settingsDoc(dependArray);
-
-#ifdef HYGUI_UseBinaryMetaFiles
-        qint64 iBytesWritten = m_DependenciesFile.write(settingsDoc.toBinaryData());
-#else
-        qint64 iBytesWritten = m_DependenciesFile.write(settingsDoc.toJson());
-#endif
-
-        if(0 == iBytesWritten || -1 == iBytesWritten)
-        {
-            HyGuiLog("Could not write to atlas settings file: " % m_DependenciesFile.errorString(), LOGTYPE_Error);
-        }
-
-        m_DependenciesFile.close();
-    }
-}
-
-void WidgetAtlasManager::LoadDependencies()
-{
-
 }
 
 void WidgetAtlasManager::SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem)

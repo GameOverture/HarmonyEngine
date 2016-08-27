@@ -147,8 +147,6 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
             }
         }
     }
-
-    m_pAtlasMan->LoadDependencies();
 }
 
 ItemProject::~ItemProject()

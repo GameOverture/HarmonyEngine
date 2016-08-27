@@ -23,6 +23,7 @@ class ItemWidget : public Item
     Q_OBJECT
 
     friend class WidgetAtlasManager;
+    friend class WidgetAtlasGroup;
     friend class ItemProject;
 
     void DrawLoad(IHyApplication &hyApp);
@@ -48,6 +49,7 @@ protected:
     QSet<HyGuiFrame *>  m_Links;
 
     HyCamera2d *        m_pCamera;
+    bool                m_bReloadDraw;
 
     virtual void OnDraw_Load(IHyApplication &hyApp) = 0;
     virtual void OnDraw_Unload(IHyApplication &hyApp) = 0;
@@ -74,7 +76,7 @@ public:
     WidgetAtlasManager &GetAtlasManager()           { return m_AtlasManRef; }
     
     virtual QList<QAction *> GetActionsForToolBar() = 0;
-    
+
     void Save();
 
 private slots:

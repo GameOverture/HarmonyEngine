@@ -8,11 +8,11 @@
     "extrude": 1,
     "frames": [
         {
+            "checksum": 2071674322,
             "cropBottom": 192,
             "cropLeft": 10,
             "cropRight": 144,
             "cropTop": 2,
-            "hash": 2071674322,
             "height": 200,
             "name": "Frame-8",
             "rotate": false,
@@ -22,11 +22,11 @@
             "y": 0
         },
         {
+            "checksum": 429067692,
             "cropBottom": 194,
             "cropLeft": 5,
             "cropRight": 54,
             "cropTop": 5,
-            "hash": 429067692,
             "height": 200,
             "name": "Frame-5",
             "rotate": false,
@@ -36,11 +36,11 @@
             "y": 0
         },
         {
+            "checksum": 587736848,
             "cropBottom": 87,
             "cropLeft": 10,
             "cropRight": 172,
             "cropTop": 2,
-            "hash": 587736848,
             "height": 90,
             "name": "Frame-4",
             "rotate": false,
@@ -50,11 +50,11 @@
             "y": 0
         },
         {
+            "checksum": 1079542514,
             "cropBottom": 19,
             "cropLeft": 0,
             "cropRight": 149,
             "cropTop": 0,
-            "hash": 1079542514,
             "height": 20,
             "name": "Frame-9",
             "rotate": false,
@@ -64,59 +64,87 @@
             "y": 0
         },
         {
+            "checksum": 3407498625,
+            "cropBottom": 39,
+            "cropLeft": 0,
+            "cropRight": 119,
+            "cropTop": 5,
+            "height": 40,
+            "name": "Frame-2",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 130,
+            "x": 510,
+            "y": 0
+        },
+        {
+            "checksum": 66331704,
+            "cropBottom": 92,
+            "cropLeft": 7,
+            "cropRight": 117,
+            "cropTop": 7,
+            "height": 100,
+            "name": "Frame-0",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 125,
+            "x": 633,
+            "y": 0
+        },
+        {
+            "checksum": 3129390335,
             "cropBottom": 78,
             "cropLeft": 0,
             "cropRight": 98,
             "cropTop": 0,
-            "hash": 3129390335,
             "height": 85,
             "name": "Frame-6",
             "rotate": false,
             "textureIndex": 0,
             "width": 100,
-            "x": 510,
+            "x": 747,
             "y": 0
         },
         {
+            "checksum": 109405639,
             "cropBottom": 72,
             "cropLeft": 2,
             "cropRight": 47,
             "cropTop": 2,
-            "hash": 109405639,
             "height": 75,
             "name": "Frame-1",
             "rotate": false,
             "textureIndex": 0,
             "width": 50,
-            "x": 612,
+            "x": 849,
             "y": 0
         },
         {
+            "checksum": 3549603169,
             "cropBottom": 64,
             "cropLeft": 0,
             "cropRight": 44,
             "cropTop": 0,
-            "hash": 3549603169,
             "height": 65,
             "name": "Frame-3",
             "rotate": false,
             "textureIndex": 0,
             "width": 45,
-            "x": 661,
+            "x": 898,
             "y": 0
         },
         {
+            "checksum": 682561893,
             "cropBottom": 29,
             "cropLeft": 0,
             "cropRight": 29,
             "cropTop": 0,
-            "hash": 682561893,
             "height": 30,
             "name": "Frame-7",
             "rotate": false,
             "textureIndex": 0,
             "width": 30,
-            "x": 709,
+            "x": 946,
             "y": 0
         }
     ],
@@ -127,5 +155,5 @@
     "sbFrameMarginTop": 0,
     "sbTextureHeight": 2048,
     "sbTextureWidth": 2048,
-    "txtName": "Test Atlas 1"
+    "txtName": ""
 }

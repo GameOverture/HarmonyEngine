@@ -88,10 +88,6 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
                                                               frameObj["x"].toInt(),
                                                               frameObj["y"].toInt());
 
-//            QJsonArray frameLinksArray = frameObj["links"].toArray();
-//            for(int k = 0; k < frameLinksArray.size(); ++k)
-//                pNewFrame->SetLink(frameLinksArray[k].toString());
-
             eAtlasNodeType eIconType = ATLAS_Frame_Warning;
             int iTexIndex = frameObj["textureIndex"].toInt();
             if(iTexIndex >= 0)

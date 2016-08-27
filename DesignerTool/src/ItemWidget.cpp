@@ -17,7 +17,8 @@ ItemWidget::ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager 
                                                                                                 m_AtlasManRef(AtlasManRef),
                                                                                                 m_pWidget(NULL),
                                                                                                 m_pEditMenu(NULL),
-                                                                                                m_pCamera(NULL)
+                                                                                                m_pCamera(NULL),
+                                                                                                m_bReloadDraw(false)
 {
     switch(m_eTYPE)
     {
@@ -105,6 +106,9 @@ void ItemWidget::DrawHide(IHyApplication &hyApp)
 
 void ItemWidget::DrawUpdate(IHyApplication &hyApp)
 {
+    if(m_bReloadDraw)
+        OnDraw_Load(hyApp);
+
     OnDraw_Update(hyApp);
 }
 
@@ -116,6 +120,9 @@ void ItemWidget::Link(HyGuiFrame *pFrame)
 
 void ItemWidget::Relink(HyGuiFrame *pFrame)
 {
+    if(IsDrawLoaded())
+        m_bReloadDraw = true;
+
     OnReLink(pFrame);
     Save();
 }

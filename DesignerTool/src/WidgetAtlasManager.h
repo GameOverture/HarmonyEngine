@@ -30,7 +30,6 @@ class WidgetAtlasManager : public QWidget
     QDir                            m_MetaDir;
     QDir                            m_DataDir;
 
-    QFile                           m_DependenciesFile;
     QMap<quint32, HyGuiFrame *>     m_DependencyMap;
     
     QTreeWidgetItem *               m_pMouseHoverItem;
@@ -47,8 +46,6 @@ public:
 
     void SaveData();
 
-    void SaveDependencies();
-    void LoadDependencies();
     void SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
     void RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
 
