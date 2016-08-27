@@ -70,7 +70,7 @@ public:
 
     WidgetSpriteModel(QObject *pParent);
 
-    void Add(HyGuiFrame *pFrame);
+    int Add(HyGuiFrame *pFrame);
     void Remove(HyGuiFrame *pFrame);
     void MoveRowUp(int iIndex);
     void MoveRowDown(int iIndex);

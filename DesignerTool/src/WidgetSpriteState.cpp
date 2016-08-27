@@ -64,8 +64,8 @@ void WidgetSpriteState::SetName(QString sNewName)
 
 void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
 {
-    m_pSpriteFramesModel->Add(pFrame);
-    ui->framesView->selectRow(0);
+    int iRowIndex = m_pSpriteFramesModel->Add(pFrame);
+    ui->framesView->selectRow(iRowIndex);
 }
 
 void WidgetSpriteState::RefreshFrame(HyGuiFrame *pFrame)

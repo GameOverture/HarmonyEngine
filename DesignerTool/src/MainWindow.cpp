@@ -263,11 +263,14 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         
         // Replace the save actions in the 'File' menu
         QList<QAction *> projSaveActionList = sm_pInstance->m_pCurSelectedProj->GetSaveActions();
-        sm_pInstance->ui->menu_File->insertActions(sm_pInstance->m_pCurSaveAction, projSaveActionList);
-        sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAction);
-        sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAllAction);
-        sm_pInstance->m_pCurSaveAction = projSaveActionList[0];
-        sm_pInstance->m_pCurSaveAllAction = projSaveActionList[1];
+        if(sm_pInstance->m_pCurSaveAction != projSaveActionList[0])
+        {
+            sm_pInstance->ui->menu_File->insertActions(sm_pInstance->m_pCurSaveAction, projSaveActionList);
+            sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAction);
+            sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAllAction);
+            sm_pInstance->m_pCurSaveAction = projSaveActionList[0];
+            sm_pInstance->m_pCurSaveAllAction = projSaveActionList[1];
+        }
     }
 
     // Swap the harmony engine renderers

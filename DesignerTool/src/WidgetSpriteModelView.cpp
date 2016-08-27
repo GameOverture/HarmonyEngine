@@ -134,7 +134,7 @@ WidgetSpriteModel::WidgetSpriteModel(QObject *parent) : QAbstractTableModel(pare
 {
 }
 
-void WidgetSpriteModel::Add(HyGuiFrame *pFrame)
+int WidgetSpriteModel::Add(HyGuiFrame *pFrame)
 {
     SpriteFrame *pFrameToInsert = NULL;
 
@@ -151,6 +151,8 @@ void WidgetSpriteModel::Add(HyGuiFrame *pFrame)
     beginInsertRows(QModelIndex(), pFrameToInsert->m_iRowIndex, pFrameToInsert->m_iRowIndex);
     m_FramesList.insert(pFrameToInsert->m_iRowIndex, pFrameToInsert);
     endInsertRows();
+
+    return pFrameToInsert->m_iRowIndex;
 }
 
 void WidgetSpriteModel::Remove(HyGuiFrame *pFrame)

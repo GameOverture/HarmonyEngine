@@ -41,11 +41,11 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
 {    
     ui->setupUi(this);
     
+    ui->actionDeleteImages->setEnabled(false);
     ui->btnDeleteImages->setDefaultAction(ui->actionDeleteImages);
-    ui->btnDeleteImages->setEnabled(false);
     
+    ui->actionReplaceImages->setEnabled(false);
     ui->btnReplaceImages->setDefaultAction(ui->actionReplaceImages);
-    ui->btnReplaceImages->setEnabled(false);
 
     ui->atlasList->setSelectionMode(QAbstractItemView::MultiSelection);
     ui->atlasList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -395,12 +395,6 @@ void WidgetAtlasGroup::Refresh()
         frameObj.insert("cropRight", QJsonValue(pFrame->GetCrop().right()));
         frameObj.insert("cropBottom", QJsonValue(pFrame->GetCrop().bottom()));
 
-//        QJsonArray frameLinksArray;
-//        QStringList sLinks = pFrame->GetLinks();
-//        for(int i = 0; i < sLinks.size(); ++i)
-//            frameLinksArray.append(QJsonValue(sLinks[i]));
-//        frameObj.insert("links", QJsonValue(frameLinksArray));
-
         frameArray.append(QJsonValue(frameObj));
 
         if(bValid == false)
@@ -622,15 +616,29 @@ void WidgetAtlasGroup::on_actionDeleteImages_triggered()
 
 void WidgetAtlasGroup::on_actionReplaceImages_triggered()
 {
-    QList<QTreeWidgetItem *> selectedImageList = ui->atlasList->selectedItems();
+    QList<QTreeWidgetItem *> atlasSelectedImageList = ui->atlasList->selectedItems();
+
+    // Store a list of the frames, since 'atlasSelectedImageList' will become invalid within Refresh()
+    QList<HyGuiFrame *> selectedImageList;
+    for(int i = 0; i < atlasSelectedImageList.count(); ++i)
+        selectedImageList.append(atlasSelectedImageList[i]->data(0, Qt::UserRole).value<HyGuiFrame *>());
 
     QFileDialog dlg(this);
-    dlg.setFileMode(QFileDialog::Directory);
+
+    if(selectedImageList.count() == 1)
+    {
+        dlg.setFileMode(QFileDialog::ExistingFile);
+        dlg.setWindowTitle("Select an image as the replacement");
+    }
+    else
+    {
+        dlg.setFileMode(QFileDialog::ExistingFiles);
+        dlg.setWindowTitle("Select " % QString::number(selectedImageList.count()) % " images as replacements");
+    }
     dlg.setWindowModality(Qt::ApplicationModal);
     dlg.setModal(true);
-    //dlg.setCaption("Select " % QString::number(selectedItems.count()) % " image(s) to be replaced");
     QStringList sFilterList;
-    sFilterList << "*.*" << "*.png";
+    sFilterList << "*.png" << "*.*";
     dlg.setNameFilters(sFilterList);
 
     QStringList sImportImgList;
@@ -648,20 +656,16 @@ void WidgetAtlasGroup::on_actionReplaceImages_triggered()
 
     for(int i = 0; i < selectedImageList.count(); ++i)
     {
-        HyGuiFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
-
-        HyGuiLog("Replacing: " % pFrame->GetName() % " -> " % sImportImgList[i], LOGTYPE_Info);
-        pFrame->ReplaceImage(sImportImgList[i], m_MetaDir);
+        HyGuiLog("Replacing: " % selectedImageList[i]->GetName() % " -> " % sImportImgList[i], LOGTYPE_Info);
+        selectedImageList[i]->ReplaceImage(sImportImgList[i], m_MetaDir);
     }
 
     Refresh();
 
     for(int i = 0; i < selectedImageList.count(); ++i)
     {
-        HyGuiFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
-
-        QSet<ItemWidget *> sLinks = pFrame->GetLinks();
+        QSet<ItemWidget *> sLinks = selectedImageList[i]->GetLinks();
         for(QSet<ItemWidget *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
-            (*LinksIter)->Relink(pFrame);
+            (*LinksIter)->Relink(selectedImageList[i]);
     }
 }
