@@ -8,6 +8,20 @@
     "extrude": 1,
     "frames": [
         {
+            "checksum": 2704008054,
+            "cropBottom": 37,
+            "cropLeft": 0,
+            "cropRight": 463,
+            "cropTop": 0,
+            "height": 38,
+            "name": "Kubiak",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 464,
+            "x": 0,
+            "y": 0
+        },
+        {
             "checksum": 2071674322,
             "cropBottom": 192,
             "cropLeft": 10,
@@ -18,7 +32,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 150,
-            "x": 0,
+            "x": 467,
             "y": 0
         },
         {
@@ -32,7 +46,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 60,
-            "x": 138,
+            "x": 605,
             "y": 0
         },
         {
@@ -46,7 +60,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 150,
-            "x": 191,
+            "x": 658,
             "y": 0
         },
         {
@@ -60,7 +74,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 125,
-            "x": 344,
+            "x": 811,
             "y": 0
         },
         {
@@ -74,7 +88,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 100,
-            "x": 458,
+            "x": 925,
             "y": 0
         },
         {
@@ -88,21 +102,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 50,
-            "x": 560,
-            "y": 0
-        },
-        {
-            "checksum": 2749353875,
-            "cropBottom": 33,
-            "cropLeft": 0,
-            "cropRight": 49,
-            "cropTop": 0,
-            "height": 34,
-            "name": "bonus_trigger_anim_initial01",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 50,
-            "x": 613,
+            "x": 1027,
             "y": 0
         },
         {
@@ -116,7 +116,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 50,
-            "x": 666,
+            "x": 1080,
             "y": 0
         },
         {
@@ -130,7 +130,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 50,
-            "x": 703,
+            "x": 1117,
             "y": 0
         },
         {
@@ -144,7 +144,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 30,
-            "x": 735,
+            "x": 1149,
             "y": 0
         }
     ],
@@ -155,5 +155,5 @@
     "sbFrameMarginTop": 0,
     "sbTextureHeight": 2048,
     "sbTextureWidth": 2048,
-    "txtName": ""
+    "txtName": "Test AtlasGroup 1"
 }

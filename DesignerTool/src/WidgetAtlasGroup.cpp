@@ -107,8 +107,6 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
             m_FrameList.append(pNewFrame);
         }
 
-        ui->lblAtlasGroupName->setText(m_dlgSettings.GetName());
-
         ui->atlasList->sortItems(0, Qt::AscendingOrder);
         ui->atlasList->expandAll();
     }
@@ -179,6 +177,11 @@ void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObjOut)
         textureArray.append(frameArray);
     
     atlasObjOut.insert("textures", textureArray);
+}
+
+QString WidgetAtlasGroup::GetName()
+{
+    return m_dlgSettings.GetName();
 }
 
 int WidgetAtlasGroup::GetId()

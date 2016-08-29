@@ -53,6 +53,7 @@ public:
 
     void GetAtlasInfo(QJsonObject &atlasObjOut);
     
+    QString GetName();
     int GetId();
 
     void ResizeAtlasListColumns();

@@ -14,9 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>4</number>
-   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -30,49 +27,9 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QStackedWidget" name="atlasGroups">
-     <widget class="QWidget" name="page"/>
-     <widget class="QWidget" name="page_2"/>
-    </widget>
-   </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="lineWidth">
-      <number>5</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnPrevGroup">
-       <property name="text">
-        <string>&lt;</string>
-       </property>
-       <property name="icon">
-        <iconset resource="res/DesignerTool.qrc">
-         <normaloff>:/icons16x16/generic-left.png</normaloff>:/icons16x16/generic-left.png</iconset>
-       </property>
-      </widget>
+      <widget class="QComboBox" name="cmbAtlasGroups"/>
      </item>
      <item>
       <widget class="QToolButton" name="btnAddGroup">
@@ -96,31 +53,26 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QToolButton" name="btnNextGroup">
-       <property name="text">
-        <string>&gt;</string>
-       </property>
-       <property name="icon">
-        <iconset resource="res/DesignerTool.qrc">
-         <normaloff>:/icons16x16/generic-right.png</normaloff>:/icons16x16/generic-right.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
     </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>5</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="atlasGroups">
+     <widget class="QWidget" name="page"/>
+     <widget class="QWidget" name="page_2"/>
+    </widget>
    </item>
   </layout>
  </widget>
