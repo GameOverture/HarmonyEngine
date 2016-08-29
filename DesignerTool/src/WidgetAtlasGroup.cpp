@@ -505,7 +505,12 @@ void WidgetAtlasGroup::Refresh()
     else
     {
         QJsonDocument settingsDoc(settingsObj);
-        qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());//toBinaryData());
+        
+#ifdef HYGUI_UseBinaryMetaFiles
+        qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
+#else
+        qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
+#endif
         if(0 == iBytesWritten || -1 == iBytesWritten)
         {
             HyGuiLog("Could not write to atlas settings file: " % settingsFile.errorString(), LOGTYPE_Error);
@@ -526,14 +531,6 @@ void WidgetAtlasGroup::Refresh()
     // REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)
     m_pManager->SaveData();
     
-//    QStringList sReloadPaths;
-//    for(int i = 0; i < m_FrameList.size(); ++i)
-//    {
-//        QStringList sLinks = m_FrameList[i]->GetLinks();
-//        foreach(QString sLink, sLinks)
-//            sReloadPaths.append(sLink);
-//    }
-
     MainWindow::ReloadHarmony();
 
     ui->atlasList->expandAll();
