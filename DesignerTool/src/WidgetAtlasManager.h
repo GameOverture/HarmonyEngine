@@ -58,7 +58,6 @@ public:
     void HideAtlasGroup();
 
     friend void AtlasManager_DrawOpen(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
-    friend void AtlasManager_DrawClose(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawHide(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
@@ -68,6 +67,10 @@ private slots:
 
     void on_btnAddGroup_clicked();
 
+    void on_cmbAtlasGroups_currentIndexChanged(int index);
+    
+    void on_actionDeleteAtlasGroup_triggered();
+    
 private:
     Ui::WidgetAtlasManager *ui;
 

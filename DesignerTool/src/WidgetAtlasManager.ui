@@ -75,6 +75,18 @@
     </widget>
    </item>
   </layout>
+  <action name="actionDeleteAtlasGroup">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete Atlas Group</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete the currently selected Atlas Group. This action cannot be undone.</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="res/DesignerTool.qrc"/>

@@ -41,6 +41,9 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
 {    
     ui->setupUi(this);
     
+    // Set the default name, which will get overwritten if LoadSettings() is called
+    m_dlgSettings.SetName("Atlas Group id " % QString::number(GetId()));
+    
     ui->actionDeleteImages->setEnabled(false);
     ui->btnDeleteImages->setDefaultAction(ui->actionDeleteImages);
     

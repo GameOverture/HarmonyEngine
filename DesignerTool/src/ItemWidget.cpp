@@ -106,8 +106,11 @@ void ItemWidget::DrawHide(IHyApplication &hyApp)
 
 void ItemWidget::DrawUpdate(IHyApplication &hyApp)
 {
-    if(m_bReloadDraw)
+    if(m_bReloadDraw || IsDrawLoaded() == false)
+    {
+        m_bReloadDraw = false;
         OnDraw_Load(hyApp);
+    }
 
     OnDraw_Update(hyApp);
 }

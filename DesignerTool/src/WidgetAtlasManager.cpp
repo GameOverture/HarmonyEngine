@@ -66,6 +66,9 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
     while(ui->atlasGroups->currentWidget())
         delete ui->atlasGroups->currentWidget();
     
+    ui->actionDeleteAtlasGroup->setEnabled(false);
+    ui->btnDeleteGroup->setDefaultAction(ui->actionDeleteAtlasGroup);
+    
     if(m_MetaDir.exists() == false)
         HyGuiLog("Meta atlas directory is missing!", LOGTYPE_Error);
     if(m_DataDir.exists() == false)
@@ -271,14 +274,6 @@ void WidgetAtlasManager::HideAtlasGroup()
     }
 
     atlasGrp.ResizeAtlasListColumns();
-}
-
-/*friend*/ void AtlasManager_DrawClose(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
-{
-    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget());
-    
-    foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
-         pFrame->DrawInst(&atlasMan)->Unload();
 }
 
 /*friend*/ void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
@@ -495,10 +490,34 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
 
 void WidgetAtlasManager::on_atlasGroups_currentChanged(int iIndex)
 {
-    //SetFramesAvailableForImport();
+    ui->actionDeleteAtlasGroup->setEnabled(ui->atlasGroups->currentWidget() != NULL);
 }
 
 void WidgetAtlasManager::on_btnAddGroup_clicked()
 {
+    AddAtlasGroup();
+}
 
+void WidgetAtlasManager::on_cmbAtlasGroups_currentIndexChanged(int index)
+{
+    for(int i = 0; i < ui->atlasGroups->count(); ++i)
+    {
+        if(static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->GetId() == ui->cmbAtlasGroups->currentData().toInt())
+        {
+            // Unload the old atlas group draw instances
+            WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
+            foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
+                 pFrame->DrawInst(this)->Unload();
+            
+            m_pProjOwner->Reset();
+            
+            // Then set the new atlas group
+            ui->atlasGroups->setCurrentIndex(i);
+        }
+    }
+}
+
+void WidgetAtlasManager::on_actionDeleteAtlasGroup_triggered()
+{
+    
 }
