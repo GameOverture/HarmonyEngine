@@ -144,6 +144,16 @@ void ItemWidget::Save()
     m_pUndoStack->setClean();
 }
 
+bool ItemWidget::IsSaveClean()
+{
+    return m_pUndoStack->isClean();
+}
+
+void ItemWidget::DiscardChanges()
+{
+    m_pUndoStack->clear();
+}
+
 void ItemWidget::on_undoStack_cleanChanged(bool bClean)
 {
     ItemProject *pItemProj = m_AtlasManRef.GetProjOwner();

@@ -6,6 +6,14 @@
         "textures": [
             [
                 {
+                    "bottom": 37,
+                    "checksum": 2704008054,
+                    "left": 0,
+                    "right": 463,
+                    "rotate": false,
+                    "top": 0
+                },
+                {
                     "bottom": 192,
                     "checksum": 2071674322,
                     "left": 477,
@@ -54,14 +62,6 @@
                     "top": 0
                 },
                 {
-                    "bottom": 37,
-                    "checksum": 2704008054,
-                    "left": 0,
-                    "right": 463,
-                    "rotate": false,
-                    "top": 0
-                },
-                {
                     "bottom": 31,
                     "checksum": 453112826,
                     "left": 1088,
@@ -82,6 +82,48 @@
                     "checksum": 682561893,
                     "left": 1149,
                     "right": 1178,
+                    "rotate": false,
+                    "top": 0
+                }
+            ]
+        ],
+        "width": 2048
+    },
+    {
+        "height": 2048,
+        "id": 2,
+        "num8BitClrChannels": 4,
+        "textures": [
+            [
+                {
+                    "bottom": 149,
+                    "checksum": 4237379956,
+                    "left": 506,
+                    "right": 613,
+                    "rotate": false,
+                    "top": 12
+                },
+                {
+                    "bottom": 145,
+                    "checksum": 2428687249,
+                    "left": 202,
+                    "right": 343,
+                    "rotate": false,
+                    "top": 19
+                },
+                {
+                    "bottom": 148,
+                    "checksum": 2310971706,
+                    "left": 343,
+                    "right": 481,
+                    "rotate": false,
+                    "top": 12
+                },
+                {
+                    "bottom": 161,
+                    "checksum": 2844852915,
+                    "left": 0,
+                    "right": 179,
                     "rotate": false,
                     "top": 0
                 }

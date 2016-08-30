@@ -78,6 +78,8 @@ public:
     virtual QList<QAction *> GetActionsForToolBar() = 0;
 
     void Save();
+    bool IsSaveClean();
+    void DiscardChanges();
 
 private slots:
     void on_undoStack_cleanChanged(bool bClean);

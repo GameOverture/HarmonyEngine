@@ -77,8 +77,11 @@ public:
     void OverrideDraw();
     void Reset();
 
-    void OpenItem(ItemWidget *pItem);
-    void CloseItem(ItemWidget *pItem);
+    // Use MainWindow::OpenItem(), not this directly
+    void _openItem(ItemWidget *pItem);
+
+    // Use MainWindow::CloseItem(), not this directly
+    void _closeItem(ItemWidget *pItem);
 
 private slots:
     void on_tabBar_currentChanged(int index);
@@ -86,6 +89,8 @@ private slots:
     void on_save_triggered();
 
     void on_saveAll_triggered();
+
+    void on_tabBar_closeRequested(int iIndex);
 };
 
 #endif // ITEMPROJECT_H

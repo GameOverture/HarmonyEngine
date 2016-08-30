@@ -4,35 +4,56 @@
             {
                 "atlasGroupId": 1,
                 "checksum": 66331704,
-                "duration": 0.016000000759959221,
+                "duration": 0.033333335071802139,
                 "offsetX": 0,
                 "offsetY": 0
             },
             {
                 "atlasGroupId": 1,
                 "checksum": 674863355,
-                "duration": 0.016000000759959221,
+                "duration": 0.033333335071802139,
                 "offsetX": 0,
                 "offsetY": 0
             },
             {
                 "atlasGroupId": 1,
                 "checksum": 2704008054,
-                "duration": 0.016000000759959221,
+                "duration": 0.033333335071802139,
                 "offsetX": 0,
                 "offsetY": 0
             },
             {
                 "atlasGroupId": 1,
                 "checksum": 453112826,
-                "duration": 0.016000000759959221,
+                "duration": 0.033333335071802139,
                 "offsetX": 0,
                 "offsetY": 0
             },
             {
                 "atlasGroupId": 1,
                 "checksum": 509933683,
-                "duration": 0.016000000759959221,
+                "duration": 0.033333335071802139,
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "atlasGroupId": 2,
+                "checksum": 2428687249,
+                "duration": 0.033333335071802139,
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "atlasGroupId": 2,
+                "checksum": 4237379956,
+                "duration": 0.033333335071802139,
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "atlasGroupId": 2,
+                "checksum": 2310971706,
+                "duration": 0.033333335071802139,
                 "offsetX": 0,
                 "offsetY": 0
             }

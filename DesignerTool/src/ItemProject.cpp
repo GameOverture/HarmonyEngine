@@ -68,8 +68,10 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
     m_pAtlasMan = new WidgetAtlasManager(this);
 
     m_pTabBar = new QTabBar();
+    m_pTabBar->setTabsClosable(true);
     m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
     connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
+    connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
 
     m_ActionSave.setText("&Save");
     m_ActionSave.setIcon(QIcon(":/icons16x16/file-save.png"));
@@ -338,12 +340,14 @@ void ItemProject::Reset()
         m_bDrawStateLoaded[i] = false;
 }
 
-void ItemProject::OpenItem(ItemWidget *pItem)
+// Use MainWindow::OpenItem(), not this directly
+void ItemProject::_openItem(ItemWidget *pItem)
 {
     m_ShowQueue.enqueue(pItem);
 }
 
-void ItemProject::CloseItem(ItemWidget *pItem)
+// Use MainWindow::CloseItem(), not this directly
+void ItemProject::_closeItem(ItemWidget *pItem)
 {
     m_KillQueue.enqueue(pItem);
 }
@@ -374,6 +378,7 @@ void ItemProject::on_saveAll_triggered()
 {
     for(int i = 0; i < m_pTabBar->count(); ++i)
     {
+        // TODO: instead look for dirty?
         if(m_pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
         {
             ItemWidget *pItem = m_pTabBar->tabData(i).value<ItemWidget *>();
@@ -384,4 +389,10 @@ void ItemProject::on_saveAll_triggered()
         
         
     }
+}
+
+void ItemProject::on_tabBar_closeRequested(int iIndex)
+{
+    ItemWidget *pItem = m_pTabBar->tabData(iIndex).value<ItemWidget *>();
+    MainWindow::CloseItem(pItem);
 }

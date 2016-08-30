@@ -485,6 +485,7 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
         ui->atlasGroups->setCurrentIndex(ui->atlasGroups->addWidget(pNewAtlas));
         
         ui->cmbAtlasGroups->addItem(pNewAtlas->GetName(), QVariant(pNewAtlas->GetId()));
+        ui->cmbAtlasGroups->setCurrentIndex(ui->atlasGroups->currentIndex());
     }
 }
 

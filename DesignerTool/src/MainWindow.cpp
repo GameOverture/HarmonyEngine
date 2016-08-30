@@ -195,11 +195,11 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         return;
 
     // Request to the WidgetRenderer to open the item. It will eventually do so, after re-loading any resources it needs to
-    sm_pInstance->ui->explorer->GetCurProjSelected()->OpenItem(pItem);
+    sm_pInstance->ui->explorer->GetCurProjSelected()->_openItem(pItem);
     sm_pInstance->ui->explorer->SelectItem(pItem);
 
     // Setup the item properties docking window to be the current item
-    QString sWindowTitle = pItem->GetName(false) % " Properties";
+    QString sWindowTitle = HyGlobal::ItemName(pItem->GetType()) % " Properties";
     
     sm_pInstance->ui->actionViewProperties->setVisible(true);
     sm_pInstance->ui->actionViewProperties->setText(sWindowTitle);
@@ -231,8 +231,21 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
 
-    // TODO: Ask to save file if changes have been made
-    sm_pInstance->ui->explorer->GetCurProjSelected()->CloseItem(pItem);
+    if(pItem->IsSaveClean() == false)
+    {
+        int iDlgReturn = QMessageBox::question(sm_pInstance, "Save Changes", pItem->GetName(true) % " has unsaved changes. Do you want to save before closing?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+
+        if(iDlgReturn == QMessageBox::Cancel)
+        {
+            pItem->DiscardChanges();
+            return;
+        }
+        else if(iDlgReturn == QMessageBox::Save)
+            pItem->Save();
+    }
+
+    sm_pInstance->ui->dockWidgetCurrentItem->hide();
+    sm_pInstance->ui->explorer->GetCurProjSelected()->_closeItem(pItem);
 }
 
 /*static*/ void MainWindow::SetSelectedProj(ItemProject *pProj)
