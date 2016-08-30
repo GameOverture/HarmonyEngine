@@ -22,12 +22,13 @@ class ItemWidget : public Item
 {
     Q_OBJECT
 
+    friend class MainWindow;
     friend class WidgetAtlasManager;
     friend class WidgetAtlasGroup;
     friend class ItemProject;
 
-    void DrawLoad(IHyApplication &hyApp);
-    void DrawUnload(IHyApplication &hyApp);
+    void Load(IHyApplication &hyApp);
+    void Unload(IHyApplication &hyApp);
 
     void DrawShow(IHyApplication &hyApp);
     void DrawHide(IHyApplication &hyApp);
@@ -51,8 +52,8 @@ protected:
     HyCamera2d *        m_pCamera;
     bool                m_bReloadDraw;
 
-    virtual void OnDraw_Load(IHyApplication &hyApp) = 0;
-    virtual void OnDraw_Unload(IHyApplication &hyApp) = 0;
+    virtual void OnLoad(IHyApplication &hyApp) = 0;
+    virtual void OnUnload(IHyApplication &hyApp) = 0;
     virtual void OnDraw_Show(IHyApplication &hyApp) = 0;
     virtual void OnDraw_Hide(IHyApplication &hyApp) = 0;
     virtual void OnDraw_Update(IHyApplication &hyApp) = 0;
@@ -67,7 +68,7 @@ public:
     ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager &AtlasManRef);
     virtual ~ItemWidget();
 
-    bool IsDrawLoaded() const                       { return (m_pCamera != NULL); }
+    bool IsLoaded() const                           { return (m_pCamera != NULL); }
 
     QWidget *GetWidget() const                      { return m_pWidget; }
     QMenu *GetEditMenu() const                      { return m_pEditMenu; }

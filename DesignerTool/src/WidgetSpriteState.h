@@ -60,7 +60,7 @@ public:
     void UpdateTimeStep();
 
 private slots:
-    void on_framesView_itemSelectionChanged(QModelIndex current, QModelIndex previous);
+    void on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection);
     
     void on_actionPlay_triggered();
     

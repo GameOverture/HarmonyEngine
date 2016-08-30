@@ -61,12 +61,8 @@ WidgetSprite::~WidgetSprite()
     delete ui;
 }
 
-ItemSprite *WidgetSprite::Owner()
-{
-    return m_pItemSprite;
-}
-
-void WidgetSprite::LoadAndInit()
+// This Load() code can't be put into the ctor because of GetAtlasManager().RequestFrames()
+void WidgetSprite::Load()
 {
     // If a .hyspr file exists, parse and initalize with it, otherwise make default empty sprite
     QFile spriteFile(m_pItemSprite->GetAbsPath());
@@ -114,6 +110,11 @@ void WidgetSprite::LoadAndInit()
     m_pItemSprite->GetUndoStack()->clear();
 
     UpdateActions();
+}
+
+ItemSprite *WidgetSprite::Owner()
+{
+    return m_pItemSprite;
 }
 
 void WidgetSprite::AppendActionsForToolBar(QList<QAction *> &actionList)

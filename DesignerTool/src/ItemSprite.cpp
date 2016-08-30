@@ -18,9 +18,6 @@
 
 ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : ItemWidget(ITEM_Sprite, sPath, atlasManRef)
 {
-    m_pWidget = new WidgetSprite(this);
-    static_cast<WidgetSprite *>(m_pWidget)->LoadAndInit();
-
     glm::vec2 vLinePts[2];
     
     vLinePts[0].x = -2048.0f;
@@ -56,13 +53,16 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     return returnList;
 }
 
-/*virtual*/ void ItemSprite::OnDraw_Load(IHyApplication &hyApp)
+/*virtual*/ void ItemSprite::OnLoad(IHyApplication &hyApp)
 {
+    m_pWidget = new WidgetSprite(this);
+    static_cast<WidgetSprite *>(m_pWidget)->Load();
+    
     m_primOriginHorz.Load();
     m_primOriginVert.Load();
 }
 
-/*virtual*/ void ItemSprite::OnDraw_Unload(IHyApplication &hyApp)
+/*virtual*/ void ItemSprite::OnUnload(IHyApplication &hyApp)
 {
     m_primOriginHorz.Unload();
     m_primOriginVert.Unload();
@@ -70,6 +70,8 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
     for(int i = 0; i < frameList.count(); i++)
         frameList[i]->DrawInst(this)->Unload();
+    
+    delete m_pWidget;
 }
 
 /*virtual*/ void ItemSprite::OnDraw_Show(IHyApplication &hyApp)

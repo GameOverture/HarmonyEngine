@@ -50,8 +50,8 @@ public:
     virtual QList<QAction *> GetActionsForToolBar();
     
 protected:
-    virtual void OnDraw_Load(IHyApplication &hyApp);
-    virtual void OnDraw_Unload(IHyApplication &hyApp);
+    virtual void OnLoad(IHyApplication &hyApp);
+    virtual void OnUnload(IHyApplication &hyApp);
 
     virtual void OnDraw_Show(IHyApplication &hyApp);
     virtual void OnDraw_Hide(IHyApplication &hyApp);

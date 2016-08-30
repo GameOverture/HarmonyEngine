@@ -186,70 +186,6 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 // IHyApplication override
 /*virtual*/ bool ItemProject::Update()
 {
-    while(m_ShowQueue.empty() == false)
-    {
-        ItemWidget *pItem = m_ShowQueue.dequeue();
-        if(pItem == NULL)
-            continue;
-
-        if(pItem->IsDrawLoaded() == false)
-        {
-            pItem->DrawLoad(*this);
-
-            m_pTabBar->blockSignals(true);
-            int iIndex = m_pTabBar->addTab(pItem->GetIcon(), pItem->GetName(false));
-            QVariant v;
-            v.setValue(pItem);
-            m_pTabBar->setTabData(iIndex, v);
-            m_pTabBar->setCurrentIndex(iIndex);
-            m_pTabBar->blockSignals(false);
-        }
-        else
-        {
-            for(int i = 0; i < m_pTabBar->count(); ++i)
-            {
-                if(m_pTabBar->tabData(i).value<ItemWidget *>() == pItem)
-                {
-                    m_pTabBar->blockSignals(true);
-                    m_pTabBar->setCurrentIndex(i);
-                    m_pTabBar->blockSignals(false);
-                    break;
-                }
-            }
-        }
-
-        // Hide everything
-        if(IsOverrideDraw())
-        {
-            SetOverrideDrawState(PROJDRAWSTATE_Nothing);
-
-            while(IsOverrideDraw())
-                OverrideDraw();
-        }
-        for(int i = 0; i < m_pTabBar->count(); ++i)
-            m_pTabBar->tabData(i).value<ItemWidget *>()->DrawHide(*this);
-
-        // Then show
-        pItem->DrawShow(*this);
-    }
-
-    while(m_KillQueue.empty() == false)
-    {
-        ItemWidget *pItem = m_KillQueue.dequeue();
-        if(pItem == NULL)
-            continue;
-
-        for(int i = 0; i < m_pTabBar->count(); ++i)
-        {
-            if(m_pTabBar->tabData(i).value<ItemWidget *>() == pItem)
-            {
-                pItem->DrawUnload(*this);
-                m_pTabBar->removeTab(i);
-                break;
-            }
-        }
-    }
-
     if(IsOverrideDraw())
         OverrideDraw();
     else if(m_pTabBar->count() > 0)
@@ -340,18 +276,6 @@ void ItemProject::Reset()
         m_bDrawStateLoaded[i] = false;
 }
 
-// Use MainWindow::OpenItem(), not this directly
-void ItemProject::_openItem(ItemWidget *pItem)
-{
-    m_ShowQueue.enqueue(pItem);
-}
-
-// Use MainWindow::CloseItem(), not this directly
-void ItemProject::_closeItem(ItemWidget *pItem)
-{
-    m_KillQueue.enqueue(pItem);
-}
-
 void ItemProject::on_tabBar_currentChanged(int index)
 {
     if(index < 0)
@@ -386,8 +310,6 @@ void ItemProject::on_saveAll_triggered()
             
             HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
         }
-        
-        
     }
 }
 

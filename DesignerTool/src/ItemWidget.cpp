@@ -66,7 +66,7 @@ ItemWidget::~ItemWidget()
     
 }
 
-void ItemWidget::DrawLoad(IHyApplication &hyApp)
+void ItemWidget::Load(IHyApplication &hyApp)
 {
     // A non NULL camera signifies that this has been loaded already
     if(m_pCamera)
@@ -75,10 +75,10 @@ void ItemWidget::DrawLoad(IHyApplication &hyApp)
     m_pCamera = hyApp.Window().CreateCamera2d();
     m_pCamera->SetEnabled(false);
 
-    OnDraw_Load(hyApp);
+    OnLoad(hyApp);
 }
 
-void ItemWidget::DrawUnload(IHyApplication &hyApp)
+void ItemWidget::Unload(IHyApplication &hyApp)
 {
     // A NULL camera signifies that this has hasn't been loaded
     if(m_pCamera == NULL)
@@ -87,7 +87,7 @@ void ItemWidget::DrawUnload(IHyApplication &hyApp)
     hyApp.Window().RemoveCamera(m_pCamera);
     m_pCamera = NULL;
 
-    OnDraw_Unload(hyApp);
+    OnUnload(hyApp);
 }
 
 void ItemWidget::DrawShow(IHyApplication &hyApp)
@@ -106,10 +106,10 @@ void ItemWidget::DrawHide(IHyApplication &hyApp)
 
 void ItemWidget::DrawUpdate(IHyApplication &hyApp)
 {
-    if(m_bReloadDraw || IsDrawLoaded() == false)
+    if(m_bReloadDraw || IsLoaded() == false)
     {
         m_bReloadDraw = false;
-        OnDraw_Load(hyApp);
+        OnLoad(hyApp);
     }
 
     OnDraw_Update(hyApp);
@@ -123,7 +123,7 @@ void ItemWidget::Link(HyGuiFrame *pFrame)
 
 void ItemWidget::Relink(HyGuiFrame *pFrame)
 {
-    if(IsDrawLoaded())
+    if(IsLoaded())
         m_bReloadDraw = true;
 
     OnReLink(pFrame);

@@ -37,9 +37,6 @@ class ItemProject : public Item, public IHyApplication
     bool                                            m_bDrawStateLoaded[NUMPROJDRAWSTATE];
     HyCamera2d *                                    m_pCamera;
 
-    QQueue<ItemWidget *>                            m_ShowQueue;
-    QQueue<ItemWidget *>                            m_KillQueue;
-
     QAction                                         m_ActionSave;
     QAction                                         m_ActionSaveAll;
 
@@ -76,12 +73,6 @@ public:
     bool IsOverrideDraw();
     void OverrideDraw();
     void Reset();
-
-    // Use MainWindow::OpenItem(), not this directly
-    void _openItem(ItemWidget *pItem);
-
-    // Use MainWindow::CloseItem(), not this directly
-    void _closeItem(ItemWidget *pItem);
 
 private slots:
     void on_tabBar_currentChanged(int index);

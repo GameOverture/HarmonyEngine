@@ -193,9 +193,43 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 {
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
+    
+    ItemProject *pItemProj = sm_pInstance->ui->explorer->GetCurProjSelected();
+    QTabBar *pTabBar = pItemProj->GetTabBar();
 
-    // Request to the WidgetRenderer to open the item. It will eventually do so, after re-loading any resources it needs to
-    sm_pInstance->ui->explorer->GetCurProjSelected()->_openItem(pItem);
+    if(pItem->IsLoaded() == false)
+    {
+        pItem->Load(*pItemProj);
+
+        pTabBar->blockSignals(true);
+        int iIndex = pTabBar->addTab(pItem->GetIcon(), pItem->GetName(false));
+        QVariant v;
+        v.setValue(pItem);
+        pTabBar->setTabData(iIndex, v);
+        pTabBar->setCurrentIndex(iIndex);
+        pTabBar->blockSignals(false);
+    }
+    else
+    {
+        for(int i = 0; i < pTabBar->count(); ++i)
+        {
+            if(pTabBar->tabData(i).value<ItemWidget *>() == pItem)
+            {
+                pTabBar->blockSignals(true);
+                pTabBar->setCurrentIndex(i);
+                pTabBar->blockSignals(false);
+                break;
+            }
+        }
+    }
+    
+    // Hide everything
+    for(int i = 0; i < pTabBar->count(); ++i)
+        pTabBar->tabData(i).value<ItemWidget *>()->DrawHide(*pItemProj);
+
+    // Then show
+    pItem->DrawShow(*pItemProj);
+    
     sm_pInstance->ui->explorer->SelectItem(pItem);
 
     // Setup the item properties docking window to be the current item
@@ -235,17 +269,40 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     {
         int iDlgReturn = QMessageBox::question(sm_pInstance, "Save Changes", pItem->GetName(true) % " has unsaved changes. Do you want to save before closing?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
-        if(iDlgReturn == QMessageBox::Cancel)
-        {
-            pItem->DiscardChanges();
-            return;
-        }
-        else if(iDlgReturn == QMessageBox::Save)
+        if(iDlgReturn == QMessageBox::Save)
             pItem->Save();
+        else if(iDlgReturn == QMessageBox::Discard)
+            pItem->DiscardChanges();
+        else if(iDlgReturn == QMessageBox::Cancel)
+            return;
     }
 
-    sm_pInstance->ui->dockWidgetCurrentItem->hide();
-    sm_pInstance->ui->explorer->GetCurProjSelected()->_closeItem(pItem);
+    // If this is the item that is currently being shown, unhook all its actions and widget
+    if(sm_pInstance->ui->dockWidgetCurrentItem->widget() == pItem->GetWidget())
+    {
+        sm_pInstance->ui->menuBar->removeAction(sm_pInstance->m_pCurEditMenu->menuAction());
+        sm_pInstance->m_pCurEditMenu = NULL;
+        
+        sm_pInstance->ui->dockWidgetCurrentItem->hide();
+        
+        for(int i = 0; i < sm_pInstance->m_ToolBarItemActionsList.count(); ++i)
+            sm_pInstance->ui->mainToolBar->removeAction(sm_pInstance->m_ToolBarItemActionsList[i]);
+        
+        sm_pInstance->m_ToolBarItemActionsList.clear();
+    }
+    
+    ItemProject *pItemProj = sm_pInstance->ui->explorer->GetCurProjSelected();
+    QTabBar *pTabBar = pItemProj->GetTabBar();
+    for(int i = 0; i < pTabBar->count(); ++i)
+    {
+        if(pTabBar->tabData(i).value<ItemWidget *>() == pItem)
+        {
+            pTabBar->removeTab(i);
+            break;
+        }
+    }
+    
+    pItem->Unload(*pItemProj);
 }
 
 /*static*/ void MainWindow::SetSelectedProj(ItemProject *pProj)

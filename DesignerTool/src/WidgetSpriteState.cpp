@@ -35,11 +35,11 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
 
     m_pSpriteFramesModel = new WidgetSpriteModel(this);
 
-    QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
-    connect(pSelModel, SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(on_framesView_itemSelectionChanged(QModelIndex,QModelIndex)));
     ui->framesView->setModel(m_pSpriteFramesModel);
     ui->framesView->resize(ui->framesView->size());
     ui->framesView->setItemDelegate(new WidgetSpriteDelegate(m_pOwner->Owner(), ui->framesView, this));
+    QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
+    connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
     
     ui->btnPlay->setDefaultAction(ui->actionPlay);
     ui->btnFirstFrame->setDefaultAction(ui->actionFirstFrame);
@@ -209,7 +209,7 @@ void WidgetSpriteState::UpdateTimeStep()
     }
 }
 
-void WidgetSpriteState::on_framesView_itemSelectionChanged(QModelIndex current, QModelIndex previous)
+void WidgetSpriteState::on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
 {
     m_pOwner->UpdateActions();
 }

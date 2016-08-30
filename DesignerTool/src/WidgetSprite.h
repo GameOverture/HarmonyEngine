@@ -37,9 +37,10 @@ public:
     explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
     
-    ItemSprite *Owner();
+    // This Load() code can't be put into the ctor because of GetAtlasManager().RequestFrames()
+    void Load();
     
-    void LoadAndInit();
+    ItemSprite *Owner();
     
     void AppendActionsForToolBar(QList<QAction *> &actionList);
 
