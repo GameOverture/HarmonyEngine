@@ -11,12 +11,14 @@
 #include "ui_DlgNewProject.h"
 
 #include "HyGlobal.h"
+#include "MainWindow.h"
 
 #include <QDir>
 #include <QFileDialog>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QTextCodec>
 
 DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
     QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
@@ -101,20 +103,77 @@ void DlgNewProject::on_buttonBox_accepted()
     }
     
     // Create workspace file tree
+    //
+    // DATA
     projDir.mkdir(sRelAssetsPath);
     projDir.cd(sRelAssetsPath);
     QStringList dirList = HyGlobal::SubDirNameList();
     foreach(QString sDir, dirList)
         projDir.mkdir(sDir);
 
+    // META-DATA
     projDir.setPath(GetProjDirPath());
     projDir.mkdir(sRelMetaDataPath);
     projDir.cd(sRelMetaDataPath);
     projDir.mkdir(HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases));
 
+    // SOURCE
     projDir.setPath(GetProjDirPath());
     projDir.mkdir(sRelSourcePath);
-    // TODO: Create code projects
+    projDir.cd(sRelSourcePath);
+    QDir templateDir(MainWindow::EngineLocation() % "templates");
+    if(ui->radVs2013->isChecked())
+        templateDir.cd("vs2013");
+    QFileInfoList templateContentsList = templateDir.entryInfoList();
+    foreach(QFileInfo info, templateContentsList)
+        QFile::copy(info.absoluteFilePath(), projDir.absoluteFilePath(info.fileName()));
+    
+    QDir dataDir(GetProjDirPath());
+    dataDir.cd(sRelAssetsPath);
+    QString sAbsPathToData = dataDir.absolutePath();
+    
+    // Convert the template to use the desired game name
+    //
+    // Rename the files themselves
+    QFileInfoList srcFileList = projDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+    foreach(QFileInfo srcFile, srcFileList)
+    {
+        if(srcFile.fileName().contains("HyTemplate"))
+        {
+            QFile file(srcFile.absoluteFilePath());
+            QString sNewFileName = srcFile.fileName().replace("HyTemplate", ui->txtGameTitle->text());
+            file.rename(srcFile.absoluteDir().absolutePath() % "/" % sNewFileName);
+            file.close();
+        }
+    }
+    // Then replace the contents
+    srcFileList = projDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+    QTextCodec *pCodec = QTextCodec::codecForLocale();
+    foreach(QFileInfo srcFile, srcFileList)
+    {
+        QFile file(srcFile.absoluteFilePath());
+        if(!file.open(QFile::ReadOnly))
+        {
+            HyGuiLog("Error reading " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
+            return;
+        }
+
+        QString sContents = pCodec->toUnicode(file.readAll());
+        file.close();
+        
+        sContents.replace("HyTemplate", ui->txtGameTitle->text());
+        sContents.replace("..\\..\\Harmony.vcxproj", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "Harmony.vcxproj"));
+        sContents.replace("HyHarmonyInclude", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "include"));
+        sContents.replace("HyDataRelPath", srcFile.dir().relativeFilePath(sAbsPathToData));
+    
+        if(!file.open(QFile::WriteOnly))
+        {
+            HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
+            return;
+        }
+        file.write(pCodec->fromUnicode(sContents));
+        file.close();
+    }
 }
 
 void DlgNewProject::on_btnBrowse_clicked()

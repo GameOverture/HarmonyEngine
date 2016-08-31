@@ -221,7 +221,7 @@ public:
         if(!dir.exists())
             return false;
         
-        if(!dir.exists("include/") || !dir.exists("lib/") || !dir.exists("src/") || !dir.exists("Harmony.sln") || !dir.exists("Harmony.vcxproj"))
+        if(!dir.exists("include/") || !dir.exists("lib/") || !dir.exists("src/") || !dir.exists("templates/") || !dir.exists("Harmony.sln") || !dir.exists("Harmony.vcxproj"))
             return false;
         
         return true;

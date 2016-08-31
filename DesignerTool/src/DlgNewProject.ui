@@ -285,28 +285,14 @@
      <property name="title">
       <string>Development Environment:</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QRadioButton" name="radWindows">
+       <widget class="QRadioButton" name="radVs2013">
         <property name="text">
-         <string>Windows</string>
+         <string>Visual Studio 2013</string>
         </property>
         <property name="checked">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radMac">
-        <property name="text">
-         <string>Mac OSX</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radLinux">
-        <property name="text">
-         <string>Linux</string>
         </property>
        </widget>
       </item>
@@ -352,9 +338,7 @@
   <tabstop>txtSourceDirName</tabstop>
   <tabstop>txtSourceLocation</tabstop>
   <tabstop>btnBrowseSource</tabstop>
-  <tabstop>radWindows</tabstop>
-  <tabstop>radMac</tabstop>
-  <tabstop>radLinux</tabstop>
+  <tabstop>radVs2013</tabstop>
  </tabstops>
  <resources/>
  <connections>

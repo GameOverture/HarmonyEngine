@@ -107,6 +107,9 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
             }
             delete pDlg;
         }
+        
+        m_sEngineLocation = engineDir.absolutePath();
+        m_sEngineLocation += "/";
     }
     m_Settings.endGroup();
     
@@ -187,6 +190,11 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 /*static*/ MainWindow *MainWindow::GetInstance()
 {
     return sm_pInstance;
+}
+
+/*static*/ QString MainWindow::EngineLocation()
+{
+    return sm_pInstance->m_sEngineLocation;
 }
 
 /*static*/ void MainWindow::OpenItem(ItemWidget *pItem)

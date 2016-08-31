@@ -28,6 +28,7 @@ class MainWindow : public QMainWindow
     static MainWindow * sm_pInstance;
 
     QSettings           m_Settings;
+    QString             m_sEngineLocation;
     QString             m_sDefaultProjectLocation;
 
     bool                m_bIsInitialized;
@@ -50,6 +51,8 @@ public:
     void showEvent(QShowEvent *pEvent);
 
     static MainWindow *GetInstance();   // Should only be used to set QWidget parents
+    
+    static QString EngineLocation();
     
     static void OpenItem(ItemWidget *pItem);
     static void CloseItem(ItemWidget *pItem);

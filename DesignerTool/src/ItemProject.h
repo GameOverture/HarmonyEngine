@@ -67,7 +67,7 @@ public:
     // IHyApplication overrides
     virtual bool Initialize();
     virtual bool Update();
-    virtual bool Shutdown();
+    virtual void Shutdown();
     
     void SetOverrideDrawState(eProjDrawState eDrawState);
     bool IsOverrideDraw();

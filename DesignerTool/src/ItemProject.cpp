@@ -195,9 +195,8 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 }
 
 // IHyApplication override
-/*virtual*/ bool ItemProject::Shutdown()
+/*virtual*/ void ItemProject::Shutdown()
 {
-    return true;
 }
 
 void ItemProject::SetOverrideDrawState(eProjDrawState eDrawState)
