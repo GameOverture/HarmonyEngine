@@ -21,7 +21,7 @@ void DynamicStringCopy(char *&dst, const char *src)
 	strcpy(dst, src);
 }
 
-std::string MakeStringProperPath(const char *szPath, const char *szExtension)
+std::string MakeStringProperPath(const char *szPath, const char *szExtension, bool bMakeLowercase)
 {
 	std::string sPath(szPath ? szPath : "");
 
@@ -43,7 +43,8 @@ std::string MakeStringProperPath(const char *szPath, const char *szExtension)
 		uiIndex += 1;
 	}
 	
-	transform(sPath.begin(), sPath.end(), sPath.begin(), ::tolower);
+	if(bMakeLowercase)
+		transform(sPath.begin(), sPath.end(), sPath.begin(), ::tolower);
 
 	return sPath;
 }

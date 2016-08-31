@@ -23,7 +23,7 @@
 
 const std::string	HyAssetManager::sm_sSUBDIRNAMES[NUM_SUBDIRS] = { "Atlases/", "Audio/", "Particles/", "Fonts/", "Spine/", "Sprites/", "Shaders/", "Entities/", "Meshes/" };
 
-HyAssetManager::HyAssetManager(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/")),
+HyAssetManager::HyAssetManager(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
 																										m_GfxCommsRef(gfxCommsRef),
 																										m_SceneRef(sceneRef),
 																										m_AtlasManager(m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Atlases]),

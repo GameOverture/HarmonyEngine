@@ -49,8 +49,6 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
     QTreeWidgetItem *pProjTreeItem = pItemProject->GetTreeItem();
     ui->treeWidget->insertTopLevelItem(0, pProjTreeItem);
     
-
-    
     ui->treeWidget->expandItem(pProjTreeItem);
 }
 

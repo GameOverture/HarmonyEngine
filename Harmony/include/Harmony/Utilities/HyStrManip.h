@@ -17,7 +17,7 @@
 // Takes the dst char ptr and dynamically allocates the size of src and copies its contents.
 void DynamicStringCopy(char *&dst, const char *src);
 
-std::string MakeStringProperPath(const char *szPath, const char *szExtension);
+std::string MakeStringProperPath(const char *szPath, const char *szExtension, bool bMakeLowercase);
 
 // converts a string into a wstring
 std::wstring StringToWString(const std::string& p_Str);

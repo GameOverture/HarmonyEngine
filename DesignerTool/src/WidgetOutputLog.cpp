@@ -49,7 +49,8 @@ WidgetOutputLog::~WidgetOutputLog()
     switch(eType)
     {
     case LOGTYPE_Normal:
-        sLogMsg = sm_ksNormalHtml % sLogMsg; break;
+        sLogMsg = sm_ksNormalHtml % sLogMsg;
+        break;
     case LOGTYPE_Warning:
         QMessageBox::warning(sm_pInstance->parentWidget(), HyDesignerToolName, sLogMsg);
         sLogMsg = sm_ksWarningHtml % sLogMsg; 
@@ -59,9 +60,11 @@ WidgetOutputLog::~WidgetOutputLog()
         sLogMsg = sm_ksErrorHtml % sLogMsg;
         break;
     case LOGTYPE_Info:
-        sLogMsg = sm_ksInfoHtml % sLogMsg; break;
+        sLogMsg = sm_ksInfoHtml % sLogMsg;
+        break;
     case LOGTYPE_Title:
-        sLogMsg = "<br>" % sm_ksTitleHtml % "<b>----- " % sLogMsg % " -----</b><br>"; break;
+        sLogMsg = "<br>" % sm_ksTitleHtml % "<b>----- " % sLogMsg % " -----</b><br>";
+        break;
     }
 
     sLogMsg = sLogMsg % sm_ksEndHtml;
