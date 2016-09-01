@@ -31,18 +31,27 @@ class HySprite2dData : public IHyData2d
 
 		struct Frame
 		{
-			HyAtlasGroup *		pAtlasGroup;
-			const uint32		uiRECTINDEX;
-			const uint32		uiTEXTUREINDEX;
+			HyAtlasGroup *				pAtlasGroup;
+			const HyRectangle<float>	rSRC_RECT;
+			const uint32				uiTEXTUREINDEX;
 
 			const glm::vec2		vOFFSET;
 			const float			fDURATION;
 
-			Frame(HyAtlasGroup *pAtlasGrp, uint32 uiTextureIndex, uint32 uiRectIndex, glm::vec2 vOffset, float fRotation, glm::vec2 vScale, float fDuration) :	pAtlasGroup(pAtlasGrp),
-																																								uiTEXTUREINDEX(uiTextureIndex),
-																																								uiRECTINDEX(uiRectIndex),
-																																								vOFFSET(vOffset),
-																																								fDURATION(fDuration)
+			Frame(HyAtlasGroup *pAtlasGrp,
+				  uint32 uiTextureIndex,
+				  float fSrcLeft,
+				  float fSrcTop,
+				  float fSrcRight,
+				  float fSrcBot,
+				  glm::vec2 vOffset,
+				  float fRotation,
+				  glm::vec2 vScale,
+				  float fDuration) :	pAtlasGroup(pAtlasGrp),
+										uiTEXTUREINDEX(uiTextureIndex),
+										rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot),
+										vOFFSET(vOffset),
+										fDURATION(fDuration)
 			{ }
 		};
 		Frame *			pFrames;

@@ -48,25 +48,25 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 																																						bBOUNCE(bBounce),
 																																						uiNUMFRAMES(static_cast<uint32>(frameArray.size()))
 {
-	pFrames = reinterpret_cast<Frame *>(HY_NEW unsigned char[sizeof(Frame) * uiNUMFRAMES]);
-	Frame *pFrameWriteLocation = pFrames;
+	//pFrames = reinterpret_cast<Frame *>(HY_NEW unsigned char[sizeof(Frame) * uiNUMFRAMES]);
+	//Frame *pFrameWriteLocation = pFrames;
 
-	for(uint32 i = 0; i < uiNUMFRAMES; ++i)
-	{
-		jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
+	//for(uint32 i = 0; i < uiNUMFRAMES; ++i)
+	//{
+	//	jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
 
-		HyAtlasGroup *pAtlasGroup = dataRef.RequestTexture(static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasId")));
-		uint32 uiTextureIndex = static_cast<uint32>(frameObj.get<jsonxx::Number>("textureId"));
+	//	HyAtlasGroup *pAtlasGroup = dataRef.RequestTexture(static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasId")));
+	//	uint32 uiTextureIndex = static_cast<uint32>(frameObj.get<jsonxx::Number>("textureId"));
 
-		if(pAtlasGroup->ContainsTexture(uiTextureIndex) == false)
-			HyError("HyTextures::RequestTexture() Atlas group (" << static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasId")) << ") does not contain texture index: " << uiTextureIndex);
+	//	if(pAtlasGroup->ContainsTexture(uiTextureIndex) == false)
+	//		HyError("HyTextures::RequestTexture() Atlas group (" << static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasId")) << ") does not contain texture index: " << uiTextureIndex);
 
-		new (pFrameWriteLocation)Frame(pAtlasGroup, 
-									   uiTextureIndex,
-									   static_cast<uint32>(frameObj.get<jsonxx::Number>("rectIndex")),
-									   glm::vec2(static_cast<float>(frameObj.get<jsonxx::Number>("xOffset")), static_cast<float>(frameObj.get<jsonxx::Number>("yOffset"))),
-									   static_cast<float>(frameObj.get<jsonxx::Number>("rotation")),
-									   glm::vec2(static_cast<float>(frameObj.get<jsonxx::Number>("xScale")), static_cast<float>(frameObj.get<jsonxx::Number>("yScale"))),
-									   static_cast<float>(frameObj.get<jsonxx::Number>("duration")));
-	}
+	//	new (pFrameWriteLocation)Frame(pAtlasGroup, 
+	//								   uiTextureIndex,
+	//								   static_cast<uint32>(frameObj.get<jsonxx::Number>("rectIndex")),
+	//								   glm::vec2(static_cast<float>(frameObj.get<jsonxx::Number>("xOffset")), static_cast<float>(frameObj.get<jsonxx::Number>("yOffset"))),
+	//								   static_cast<float>(frameObj.get<jsonxx::Number>("rotation")),
+	//								   glm::vec2(static_cast<float>(frameObj.get<jsonxx::Number>("xScale")), static_cast<float>(frameObj.get<jsonxx::Number>("yScale"))),
+	//								   static_cast<float>(frameObj.get<jsonxx::Number>("duration")));
+	//}
 }

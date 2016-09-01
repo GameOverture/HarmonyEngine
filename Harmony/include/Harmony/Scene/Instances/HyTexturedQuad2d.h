@@ -19,6 +19,7 @@ class HyTexturedQuad2d : public IHyInst2d
 {
 	uint32					m_uiTextureIndex;
 	HyRectangle<float>		m_SrcRect;
+
 public:
 	HyTexturedQuad2d(uint32 uiAtlasGroupId);
 	virtual ~HyTexturedQuad2d();
