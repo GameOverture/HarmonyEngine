@@ -187,5 +187,18 @@ public:
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemSpriteCmd_Checkbox : public QUndoCommand
+{
+    QCheckBox *                 m_pCheckBox;
+    bool                        m_bInitialValue;
+    
+public:
+    ItemSpriteCmd_Checkbox(QCheckBox *pCheckBox, QUndoCommand *pParent = 0);
+    virtual ~ItemSpriteCmd_Checkbox();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
 
 #endif // ITEMSPRITECMDS_H

@@ -405,3 +405,24 @@ void ItemSpriteCmd_DurationFrame::undo()
         m_pSpriteTableView->selectRow(m_iFrameIndex);
     }
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ItemSpriteCmd_Checkbox::ItemSpriteCmd_Checkbox(QCheckBox *pCheckBox, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                        m_pCheckBox(pCheckBox)
+{
+    m_bInitialValue = m_pCheckBox->isChecked();
+    setText((m_bInitialValue ? "Checked " : "Unchecked ") % m_pCheckBox->text());
+}
+
+/*virtual*/ ItemSpriteCmd_Checkbox::~ItemSpriteCmd_Checkbox()
+{
+}
+
+void ItemSpriteCmd_Checkbox::redo()
+{
+    m_pCheckBox->setChecked(m_bInitialValue);
+}
+
+void ItemSpriteCmd_Checkbox::undo()
+{
+   m_pCheckBox->setChecked(!m_bInitialValue);
+}

@@ -80,6 +80,12 @@ private slots:
     
     void on_actionLastFrame_triggered();
     
+    void on_chkReverse_stateChanged(int arg1);
+    
+    void on_chkLoop_stateChanged(int arg1);
+    
+    void on_chkBounce_stateChanged(int arg1);
+    
 private:
     Ui::WidgetSpriteState *ui;
 };

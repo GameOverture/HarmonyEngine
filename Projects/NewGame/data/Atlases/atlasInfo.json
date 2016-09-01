@@ -1,0 +1,252 @@
+[
+    {
+        "height": 2048,
+        "id": 1,
+        "num8BitClrChannels": 4,
+        "textures": [
+            [
+                {
+                    "bottom": 455,
+                    "checksum": 1706590145,
+                    "left": 102,
+                    "right": 281,
+                    "rotate": false,
+                    "top": 293
+                },
+                {
+                    "bottom": 606,
+                    "checksum": 811719801,
+                    "left": 1104,
+                    "right": 1281,
+                    "rotate": false,
+                    "top": 433
+                },
+                {
+                    "bottom": 604,
+                    "checksum": 2379523202,
+                    "left": 1296,
+                    "right": 1445,
+                    "rotate": false,
+                    "top": 446
+                },
+                {
+                    "bottom": 193,
+                    "checksum": 3974661146,
+                    "left": 1989,
+                    "right": 2109,
+                    "rotate": false,
+                    "top": 54
+                },
+                {
+                    "bottom": 381,
+                    "checksum": 3727752853,
+                    "left": 1780,
+                    "right": 1881,
+                    "rotate": false,
+                    "top": 257
+                },
+                {
+                    "bottom": 597,
+                    "checksum": 1496399219,
+                    "left": 102,
+                    "right": 185,
+                    "rotate": false,
+                    "top": 483
+                },
+                {
+                    "bottom": 595,
+                    "checksum": 2394397811,
+                    "left": 1995,
+                    "right": 2064,
+                    "rotate": false,
+                    "top": 487
+                },
+                {
+                    "bottom": 596,
+                    "checksum": 3522029400,
+                    "left": 2071,
+                    "right": 2144,
+                    "rotate": false,
+                    "top": 486
+                },
+                {
+                    "bottom": 585,
+                    "checksum": 1744615786,
+                    "left": 1478,
+                    "right": 1573,
+                    "rotate": false,
+                    "top": 469
+                },
+                {
+                    "bottom": 508,
+                    "checksum": 2141714927,
+                    "left": 1779,
+                    "right": 1896,
+                    "rotate": false,
+                    "top": 385
+                },
+                {
+                    "bottom": 606,
+                    "checksum": 1008737017,
+                    "left": 173,
+                    "right": 310,
+                    "rotate": false,
+                    "top": 472
+                },
+                {
+                    "bottom": 600,
+                    "checksum": 3224597060,
+                    "left": 304,
+                    "right": 458,
+                    "rotate": false,
+                    "top": 457
+                },
+                {
+                    "bottom": 445,
+                    "checksum": 2877555781,
+                    "left": 281,
+                    "right": 462,
+                    "rotate": false,
+                    "top": 288
+                },
+                {
+                    "bottom": 420,
+                    "checksum": 1695897600,
+                    "left": 1073,
+                    "right": 1287,
+                    "rotate": false,
+                    "top": 229
+                },
+                {
+                    "bottom": 451,
+                    "checksum": 1814633419,
+                    "left": 846,
+                    "right": 1057,
+                    "rotate": false,
+                    "top": 251
+                },
+                {
+                    "bottom": 452,
+                    "checksum": 1125740907,
+                    "left": 1499,
+                    "right": 1703,
+                    "rotate": false,
+                    "top": 239
+                },
+                {
+                    "bottom": 231,
+                    "checksum": 1547725342,
+                    "left": 1532,
+                    "right": 1712,
+                    "rotate": false,
+                    "top": 10
+                },
+                {
+                    "bottom": 239,
+                    "checksum": 1094531032,
+                    "left": 730,
+                    "right": 879,
+                    "rotate": false,
+                    "top": 8
+                },
+                {
+                    "bottom": 246,
+                    "checksum": 2429452628,
+                    "left": 230,
+                    "right": 366,
+                    "rotate": false,
+                    "top": 5
+                },
+                {
+                    "bottom": 248,
+                    "checksum": 3332196241,
+                    "left": 68,
+                    "right": 222,
+                    "rotate": false,
+                    "top": 2
+                },
+                {
+                    "bottom": 245,
+                    "checksum": 1664514922,
+                    "left": 349,
+                    "right": 527,
+                    "rotate": false,
+                    "top": 5
+                },
+                {
+                    "bottom": 241,
+                    "checksum": 1165699557,
+                    "left": 517,
+                    "right": 715,
+                    "rotate": false,
+                    "top": 8
+                },
+                {
+                    "bottom": 238,
+                    "checksum": 1066706560,
+                    "left": 861,
+                    "right": 1075,
+                    "rotate": false,
+                    "top": 12
+                },
+                {
+                    "bottom": 429,
+                    "checksum": 1947406781,
+                    "left": 1845,
+                    "right": 2064,
+                    "rotate": false,
+                    "top": 211
+                },
+                {
+                    "bottom": 229,
+                    "checksum": 2316351079,
+                    "left": 1299,
+                    "right": 1520,
+                    "rotate": false,
+                    "top": 21
+                },
+                {
+                    "bottom": 225,
+                    "checksum": 2272940162,
+                    "left": 1073,
+                    "right": 1296,
+                    "rotate": false,
+                    "top": 26
+                },
+                {
+                    "bottom": 221,
+                    "checksum": 2395841508,
+                    "left": 1713,
+                    "right": 1933,
+                    "rotate": false,
+                    "top": 30
+                },
+                {
+                    "bottom": 431,
+                    "checksum": 1423522163,
+                    "left": 1299,
+                    "right": 1513,
+                    "rotate": false,
+                    "top": 244
+                },
+                {
+                    "bottom": 454,
+                    "checksum": 2876503751,
+                    "left": 662,
+                    "right": 867,
+                    "rotate": false,
+                    "top": 272
+                },
+                {
+                    "bottom": 458,
+                    "checksum": 1348795426,
+                    "left": 460,
+                    "right": 660,
+                    "rotate": false,
+                    "top": 281
+                }
+            ]
+        ],
+        "width": 2048
+    }
+]

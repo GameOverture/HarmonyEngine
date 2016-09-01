@@ -1,10 +1,10 @@
 #include "NewGame.h"
 
 
-NewGame::NewGame(HarmonyInit &initStruct) : IHyApplication(initStruct)
+NewGame::NewGame(HarmonyInit &initStruct) :	IHyApplication(initStruct),
+											m_Tv("Feature", "Tv")
 {
 }
-
 
 NewGame::~NewGame()
 {
@@ -12,6 +12,8 @@ NewGame::~NewGame()
 
 /*virtual*/ bool NewGame::Initialize()
 {
+	m_Tv.Load();
+
 	return true;
 }
 
