@@ -14,6 +14,7 @@
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUMITEM];
 /*static*/ QIcon HyGlobal::sm_AtlasIcons[NUMATLAS];
 
+/*static*/ QRegExpValidator *HyGlobal::sm_pCodeNameValidator = NULL;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFileNameValidator = NULL;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFilePathValidator = NULL;
 /*static*/ QRegExpValidator *HyGlobal::sm_pVector2dValidator = NULL;

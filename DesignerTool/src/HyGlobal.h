@@ -92,6 +92,7 @@ class HyGlobal
     
     static QIcon                    sm_AtlasIcons[NUMATLAS];
 
+    static QRegExpValidator *       sm_pCodeNameValidator;
     static QRegExpValidator *       sm_pFileNameValidator;
     static QRegExpValidator *       sm_pFilePathValidator;
     static QRegExpValidator *       sm_pVector2dValidator;
@@ -153,6 +154,7 @@ public:
         sm_AtlasIcons[ATLAS_Spine].addFile(QString(":/icons16x16/spine-document.png"));
         sm_AtlasIcons[ATLAS_Font].addFile(QString(":/icons16x16/font-document.png"));
 
+        sm_pCodeNameValidator = new QRegExpValidator(QRegExp("[A-Za-z_]+[A-Za-z0-9_]*"));
         sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_-]*"));
         sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_-]*"));
         sm_pVector2dValidator = new QRegExpValidator(QRegExp("\\([0-9]*\\.?[0-9]*,[0-9]*\\.?[0-9]*\\)"));
@@ -211,6 +213,7 @@ public:
     
     static const QIcon &AtlasIcon(eAtlasNodeType eNode)     { return sm_AtlasIcons[eNode]; }
 
+    static const QRegExpValidator *CodeNameValidator()      { return sm_pCodeNameValidator; }
     static const QRegExpValidator *FileNameValidator()      { return sm_pFileNameValidator; }
     static const QRegExpValidator *FilePathValidator()      { return sm_pFilePathValidator; }
     static const QRegExpValidator *Vector2dValidator()      { return sm_pVector2dValidator; }

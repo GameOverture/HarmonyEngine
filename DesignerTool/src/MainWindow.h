@@ -85,6 +85,8 @@ private slots:
     
     void on_actionSaveAll_triggered();
     
+    void on_actionLaunchIDE_triggered();
+    
 private:
     Ui::MainWindow *ui;
 

@@ -28,7 +28,7 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
     ui->txtGameTitle->setText("NewGame");
     ui->txtGameTitle->setFocus();
     ui->txtGameTitle->selectAll();
-    ui->txtGameTitle->setValidator(HyGlobal::FileNameValidator());// new QRegExpValidator(QRegExp("[A-Za-z0-9_]*"), this));
+    ui->txtGameTitle->setValidator(HyGlobal::CodeNameValidator());
 
     ui->txtGameLocation->setText(sDefaultLocation);
     

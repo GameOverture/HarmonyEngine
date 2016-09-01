@@ -89,15 +89,16 @@
     <addaction name="separator"/>
     <addaction name="actionViewProperties"/>
    </widget>
-   <widget class="QMenu" name="menuDebug">
+   <widget class="QMenu" name="menu_Tools">
     <property name="title">
-     <string>Debug</string>
+     <string>Tools</string>
     </property>
+    <addaction name="actionLaunchIDE"/>
     <addaction name="actionConnect"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_View"/>
-   <addaction name="menuDebug"/>
+   <addaction name="menu_Tools"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -110,6 +111,7 @@
    <addaction name="actionOpenProject"/>
    <addaction name="actionCloseProject"/>
    <addaction name="separator"/>
+   <addaction name="actionLaunchIDE"/>
    <addaction name="actionConnect"/>
    <addaction name="separator"/>
   </widget>
@@ -520,6 +522,18 @@
    </property>
    <property name="shortcut">
     <string>F5</string>
+   </property>
+  </action>
+  <action name="actionLaunchIDE">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/code.png</normaloff>:/icons16x16/code.png</iconset>
+   </property>
+   <property name="text">
+    <string>Launch IDE</string>
+   </property>
+   <property name="toolTip">
+    <string>Launch the code project in your IDE</string>
    </property>
   </action>
  </widget>

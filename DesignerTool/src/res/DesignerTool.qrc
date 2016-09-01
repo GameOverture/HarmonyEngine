@@ -57,5 +57,6 @@
         <file>icons16x16/media-stop.png</file>
         <file>icons16x16/atlas-replaceFrame.png</file>
         <file>icons16x16/generic-settings.png</file>
+        <file>icons16x16/code.png</file>
     </qresource>
 </RCC>

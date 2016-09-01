@@ -28,6 +28,7 @@
 #include <QVBoxLayout>
 #include <QTcpSocket>
 #include <QMessageBox>
+#include <QDesktopServices>
 
 #define HYGUIVERSION_STRING "v0.0.1"
 
@@ -62,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->actionNewAudio->setEnabled(false);
     ui->actionSave->setEnabled(false);
     ui->actionSaveAll->setEnabled(false);
+    ui->actionLaunchIDE->setEnabled(false);
     
     m_pCurSaveAction = ui->actionSave;
     m_pCurSaveAllAction = ui->actionSaveAll;
@@ -79,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->explorer->addAction(ui->actionPaste);
     ui->explorer->addAction(ui->actionRemove);
     ui->explorer->addAction(ui->actionRename);
+    ui->explorer->addAction(ui->actionLaunchIDE);
 
     m_pDebugConnection = new HyGuiDebugger(*ui->actionConnect, this);
     
@@ -517,4 +520,21 @@ void MainWindow::on_actionSave_triggered()
 void MainWindow::on_actionSaveAll_triggered()
 {
     
+}
+
+void MainWindow::on_actionLaunchIDE_triggered()
+{
+    QStringList sFilterList;
+    sFilterList << "*.sln";
+    
+    QDir srcDir(ui->explorer->GetCurProjSelected()->GetSourceAbsPath());
+    srcDir.setNameFilters(sFilterList);
+    QFileInfoList ideFileInfoList = srcDir.entryInfoList();
+    
+    if(ideFileInfoList.empty())
+    {
+        HyGuiLog("Could not find appropriate IDE file to launch", LOGTYPE_Error);
+        return;
+    }
+    QDesktopServices::openUrl(QUrl(ideFileInfoList[0].absoluteFilePath()));
 }
