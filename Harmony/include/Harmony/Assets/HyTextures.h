@@ -75,7 +75,9 @@ public:
 	uint32 GetHeight() const;
 	uint32 GetNumTextures() const;
 
+	void GetFrame(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const;
 	bool ContainsTexture(uint32 uiTextureIndex) const;
+
 	void Load();
 
 	void Assign(IHyData *pData);
@@ -106,6 +108,8 @@ class HyAtlas
 public:
 	HyAtlas(jsonxx::Array &srcFramesArrayRef);
 	~HyAtlas();
+
+	const HyRectangle<int32> *GetFrame(uint32 uiChecksum) const;
 
 	void Load(const char *szFilePath);
 

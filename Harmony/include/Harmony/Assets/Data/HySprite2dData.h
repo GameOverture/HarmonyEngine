@@ -22,21 +22,21 @@ class HySprite2dData : public IHyData2d
 {
 	friend class HyFactory<HySprite2dData>;
 
-	struct AnimState
+	class AnimState
 	{
-		const std::string	sNAME;
-		const bool			bLOOP;
-		const bool			bREVERSE;
-		const bool			bBOUNCE;
+		const std::string	m_sNAME;
+		const bool			m_bLOOP;
+		const bool			m_bREVERSE;
+		const bool			m_bBOUNCE;
 
-		struct Frame
+		class Frame
 		{
-			HyAtlasGroup *				pAtlasGroup;
-			const HyRectangle<float>	rSRC_RECT;
-			const uint32				uiTEXTUREINDEX;
+			HyAtlasGroup *				m_pAtlasGroup;
+			const HyRectangle<float>	m_rSRC_RECT;
+			const uint32				m_uiTEXTUREINDEX;
 
-			const glm::vec2		vOFFSET;
-			const float			fDURATION;
+			const glm::vec2				m_vOFFSET;
+			const float					m_fDURATION;
 
 			Frame(HyAtlasGroup *pAtlasGrp,
 				  uint32 uiTextureIndex,
@@ -47,17 +47,19 @@ class HySprite2dData : public IHyData2d
 				  glm::vec2 vOffset,
 				  float fRotation,
 				  glm::vec2 vScale,
-				  float fDuration) :	pAtlasGroup(pAtlasGrp),
-										uiTEXTUREINDEX(uiTextureIndex),
-										rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot),
-										vOFFSET(vOffset),
-										fDURATION(fDuration)
+				  float fDuration) :	m_pAtlasGroup(pAtlasGrp),
+										m_uiTEXTUREINDEX(uiTextureIndex),
+										m_rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot),
+										m_vOFFSET(vOffset),
+										m_fDURATION(fDuration)
 			{ }
 		};
-		Frame *			pFrames;
-		const uint32	uiNUMFRAMES;
+		Frame *			m_pFrames;
+		const uint32	m_uiNUMFRAMES;
 
+	public:
 		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HySprite2dData &dataRef);
+		~AnimState();
 	};
 	AnimState *			m_pAnimStates;
 	uint32				m_uiNumStates;

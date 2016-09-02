@@ -15,8 +15,9 @@
 
 class WidgetAtlasManager;
 
-struct SpriteFrame
+class SpriteFrame
 {
+public:
     HyGuiFrame *            m_pFrame;
     int                     m_iRowIndex;
     
@@ -28,6 +29,15 @@ struct SpriteFrame
                                                         m_vOffset(0, 0),
                                                         m_fDuration(0.016f)
     { }
+
+    QPoint GetRenderOffset()
+    {
+        QPoint ptRenderOffset;
+        ptRenderOffset.setX(m_pFrame->GetCrop().x() + m_vOffset.x());
+        ptRenderOffset.setY(m_pFrame->GetSize().height() - m_pFrame->GetCrop().bottom() + m_vOffset.y());
+
+        return ptRenderOffset;
+    }
 };
 //Q_DECLARE_METATYPE(SpriteFrame *)
 

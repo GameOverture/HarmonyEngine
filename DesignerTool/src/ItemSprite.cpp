@@ -105,8 +105,9 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     HyGuiFrame *pGuiFrame = pSpriteFrame->m_pFrame;
     HyTexturedQuad2d *pDrawInst = pGuiFrame->DrawInst(this);
     
-    pDrawInst->pos.X(pGuiFrame->GetCrop().x() + pSpriteFrame->m_vOffset.x());
-    pDrawInst->pos.Y(pGuiFrame->GetSize().height() - pGuiFrame->GetCrop().bottom() + pSpriteFrame->m_vOffset.y());
+    QPoint ptRenderOffset = pSpriteFrame->GetRenderOffset();
+    pDrawInst->pos.X(ptRenderOffset.x());
+    pDrawInst->pos.Y(ptRenderOffset.y());
     
     if(pDrawInst->IsLoaded() == false)
         pDrawInst->Load();

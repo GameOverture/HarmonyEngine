@@ -23,6 +23,9 @@ HySprite2d::~HySprite2d(void)
 
 /*virtual*/ void HySprite2d::OnDataLoaded()
 {
+	HySprite2dData *pData = static_cast<HySprite2dData *>(m_pData);
+	//m_RenderState.SetTextureHandle(pData->GetAtlasGroup()->GetGfxApiHandle());
+
 }
 
 /*virtual*/ void HySprite2d::OnUpdate()

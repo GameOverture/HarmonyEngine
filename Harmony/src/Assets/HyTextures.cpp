@@ -150,6 +150,24 @@ uint32 HyAtlasGroup::GetNumTextures() const
 	return m_uiNUM_ATLASES;
 }
 
+void HyAtlasGroup::GetFrame(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
+{
+	float fTexWidth = static_cast<float>(m_uiWIDTH);
+	float fTexHeight = static_cast<float>(m_uiHEIGHT);
+
+	for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
+	{
+		const HyRectangle<int32> *pSrcRect = m_pAtlases[i].GetFrame(uiChecksum);
+
+		UVRectOut.left = static_cast<float>(pSrcRect->left) / fTexWidth;
+		UVRectOut.top = static_cast<float>(pSrcRect->top) / fTexHeight;
+		UVRectOut.right = static_cast<float>(pSrcRect->right) / fTexWidth;
+		UVRectOut.bottom = static_cast<float>(pSrcRect->bottom) / fTexHeight;
+
+		UVRectOut.iTag = pSrcRect->iTag;	// Whether it's rotated (0 or 1)
+	}
+}
+
 bool HyAtlasGroup::ContainsTexture(uint32 uiTextureIndex) const
 {
 	return (uiTextureIndex < m_uiNUM_ATLASES);
@@ -245,6 +263,11 @@ HyAtlas::~HyAtlas()
 {
 	delete [] m_pFrames;
 	DeletePixelData();
+}
+
+const HyRectangle<int32> *HyAtlas::GetFrame(uint32 uiChecksum) const
+{
+	return m_ChecksumMap.find(uiChecksum)->second;
 }
 
 void HyAtlas::Load(const char *szFilePath)
