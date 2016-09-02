@@ -289,26 +289,26 @@ void WidgetSpriteState::on_actionLastFrame_triggered()
     ui->framesView->selectRow(GetNumFrames() - 1);
 }
 
-void WidgetSpriteState::on_chkReverse_stateChanged(int arg1)
+void WidgetSpriteState::on_chkReverse_clicked()
 {
     ItemSprite *pItemSprite = m_pOwner->Owner();
-    
+
     QUndoCommand *pCmd = new ItemSpriteCmd_Checkbox(ui->chkReverse);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
-void WidgetSpriteState::on_chkLoop_stateChanged(int arg1)
+void WidgetSpriteState::on_chkLoop_clicked()
 {
     ItemSprite *pItemSprite = m_pOwner->Owner();
-    
+
     QUndoCommand *pCmd = new ItemSpriteCmd_Checkbox(ui->chkLoop);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
-void WidgetSpriteState::on_chkBounce_stateChanged(int arg1)
+void WidgetSpriteState::on_chkBounce_clicked()
 {
     ItemSprite *pItemSprite = m_pOwner->Owner();
-    
+
     QUndoCommand *pCmd = new ItemSpriteCmd_Checkbox(ui->chkBounce);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
