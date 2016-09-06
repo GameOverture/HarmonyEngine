@@ -64,12 +64,14 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 		if(pAtlasGroup->ContainsTexture(uiTextureIndex) == false)
 			HyError("HyTextures::RequestTexture() Atlas group (" << static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasId")) << ") does not contain texture index: " << uiTextureIndex);
 
+		HyRectangle<float> rUVRect;
+		pAtlasGroup->GetFrame(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), rUVRect);
+
 		new (pFrameWriteLocation)Frame(pAtlasGroup,
 									   uiTextureIndex,
-									   static_cast<uint32>(frameObj.get<jsonxx::Number>("rectIndex")),
+									   rUVRect.left, rUVRect.top, rUVRect.right, rUVRect.bottom,
 									   glm::vec2(static_cast<float>(frameObj.get<jsonxx::Number>("xOffset")), static_cast<float>(frameObj.get<jsonxx::Number>("yOffset"))),
-									   static_cast<float>(frameObj.get<jsonxx::Number>("rotation")),
-									   glm::vec2(static_cast<float>(frameObj.get<jsonxx::Number>("xScale")), static_cast<float>(frameObj.get<jsonxx::Number>("yScale"))),
+									   rUVRect.iTag == 0 ? false : true,
 									   static_cast<float>(frameObj.get<jsonxx::Number>("duration")));
 	}
 }

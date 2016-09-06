@@ -32,12 +32,13 @@ class HySprite2dData : public IHyData2d
 		class Frame
 		{
 			HyAtlasGroup *				m_pAtlasGroup;
-			const HyRectangle<float>	m_rSRC_RECT;
 			const uint32				m_uiTEXTUREINDEX;
-
+			const HyRectangle<float>	m_rSRC_RECT;
+			const bool					m_bROTATED;
 			const glm::vec2				m_vOFFSET;
 			const float					m_fDURATION;
 
+		public:
 			Frame(HyAtlasGroup *pAtlasGrp,
 				  uint32 uiTextureIndex,
 				  float fSrcLeft,
@@ -45,11 +46,11 @@ class HySprite2dData : public IHyData2d
 				  float fSrcRight,
 				  float fSrcBot,
 				  glm::vec2 vOffset,
-				  float fRotation,
-				  glm::vec2 vScale,
+				  bool bRotated,
 				  float fDuration) :	m_pAtlasGroup(pAtlasGrp),
 										m_uiTEXTUREINDEX(uiTextureIndex),
 										m_rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot),
+										m_bROTATED(bRotated),
 										m_vOFFSET(vOffset),
 										m_fDURATION(fDuration)
 			{ }
