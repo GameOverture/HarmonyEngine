@@ -1,0 +1,21 @@
+{
+    "DataPath": "data",
+    "DebugPort": 1313,
+    "DefaultCoordinateType": 1,
+    "DefaultCoordinateUnit": 1,
+    "GameName": "NewGame",
+    "MetaDataPath": "_metaData",
+    "NumInputMappings": 1,
+    "PixelsPerMeter": 80,
+    "SourcePath": "src",
+    "WindowInfoArray": [
+        {
+            "LocationX": 0,
+            "LocationY": 0,
+            "Name": "Window 1",
+            "ResolutionX": 1280,
+            "ResolutionY": 720,
+            "Type": 0
+        }
+    ]
+}

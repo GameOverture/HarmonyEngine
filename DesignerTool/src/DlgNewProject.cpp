@@ -56,17 +56,17 @@ DlgNewProject::~DlgNewProject()
 QString DlgNewProject::GetProjFilePath()
 {
     if(ui->chkCreateGameDir->isChecked())
-        return QDir::cleanPath(ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + '/' + ui->txtGameTitle->text() + HyGlobal::ItemExt(ITEM_Project));
+        return ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + '/' + ui->txtGameTitle->text() + HyGlobal::ItemExt(ITEM_Project);
     else
-        return QDir::cleanPath(ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + HyGlobal::ItemExt(ITEM_Project));
+        return ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + HyGlobal::ItemExt(ITEM_Project);
 }
 
 QString DlgNewProject::GetProjDirPath()
 {
     if(ui->chkCreateGameDir->isChecked())
-        return QDir::cleanPath(ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + '/');
+        return ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + '/';
     else
-        return QDir::cleanPath(ui->txtGameLocation->text() + '/');
+        return ui->txtGameLocation->text() + '/';
 }
 
 bool DlgNewProject::IsCreatingGameDir()
@@ -180,12 +180,12 @@ void DlgNewProject::on_buttonBox_accepted()
         QString sContents = pCodec->toUnicode(file.readAll());
         file.close();
         
-        QDir exeDir(GetProjDirPath());
+        QDir exeDir(GetProjDirPath() % "bin/");
         
         sContents.replace("HyTemplate", ui->txtGameTitle->text());
         sContents.replace("HyProjGUID", projGUID.toString());
         sContents.replace("HyHarmonyProjLocation", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "Harmony.vcxproj"));
-        sContents.replace("HyExeLocation", srcFile.dir().relativeFilePath(exeDir.absolutePath()));
+        sContents.replace("HyExeLocation", MakeStringProperPath(srcFile.dir().relativeFilePath(exeDir.absolutePath()).toStdString().c_str(), "/", false).c_str());
         sContents.replace("HyHarmonyInclude", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "include"));
         sContents.replace("HyProjRelPath", MakeStringProperPath(exeDir.relativeFilePath(GetProjFilePath()).toStdString().c_str(), "", false).c_str());
     
