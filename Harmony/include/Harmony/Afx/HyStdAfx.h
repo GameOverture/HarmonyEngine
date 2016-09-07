@@ -14,6 +14,9 @@
 #include "Compilers/HyCompiler.h"
 #include "Platforms/HyPlatform.h"
 
+#include "Utilities/jsonxx.h"
+#include "Utilities/HyFileIO.h"
+
 #define HY_TEMP_TEXTBUFFER_SIZE 1024
 
 enum HyInstanceType
@@ -122,8 +125,6 @@ struct HyWindowInfo
 	uint32			uiDirtyFlags;
 };
 
-#define HY_MAXWINDOWS 6
-
 // Client supplies these initialization parameters to the engine
 struct HarmonyInit
 {
@@ -137,14 +138,34 @@ struct HarmonyInit
 	uint32					uiNumInputMappings;
 	uint16					uiDebugPort;
 
-	HarmonyInit(std::string sGameNameStr, std::string sDataDirStr) :	sGameName(sGameNameStr),
-																		sDataDir(sDataDirStr)
+	HarmonyInit(std::string sHyProjFilePath)
 	{
 		CtorInit();
+
+		jsonxx::Object projObject;
+		projObject.parse(HyReadTextFile(sHyProjFilePath.c_str()));
+
+		sGameName = projObject.get<jsonxx::String>("GameName");
+		sDataDir = projObject.get<jsonxx::String>("AssetsPath");
+		
+		jsonxx::Array windowInfoArray = projObject.get<jsonxx::Array("WindowInfoArray");
+		uiNumWindows = windowInfoArray.size();
+		for(int i = 0; i < uiNumWindows; ++i)
+		{
+			jsonxx::Object windowInfoObj = windowInfoArray.get<jsonxx::Object>(i);
+
+			windowInfo[i].sName = windowInfoObj.get<jsonxx::String>("name");
+			windowInfo[i].eType = HYWINDOW_WindowedFixed;
+			windowInfo[i].vResolution.x = 512;
+			windowInfo[i].vResolution.x = 256;
+			windowInfo[i].vLocation.x = i * windowInfo[i].vResolution.x;
+			windowInfo[i].vLocation.y = 0;
+
+			windowInfo[i].uiDirtyFlags = 0;
+		}
 	}
 
-	HarmonyInit() :	sGameName("Untitled Game"),
-					sDataDir("/data")
+	HarmonyInit()
 	{
 		CtorInit();
 	}
@@ -152,6 +173,8 @@ struct HarmonyInit
 private:
 	void CtorInit()
 	{
+		sGameName = "Untitled Game";
+		sDataDir = "/data";
 		uiNumWindows = 1;
 		eDefaultCoordinateType = HYCOORDTYPE_Camera;
 		eDefaultCoordinateUnit = HYCOORDUNIT_Pixels;

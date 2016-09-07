@@ -15,7 +15,6 @@
 #include "Threading/Threading.h"
 
 #include "Utilities/HyMath.h"
-#include "Utilities/jsonxx.h"
 
 #include <set>
 using std::set;

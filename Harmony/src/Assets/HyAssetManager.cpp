@@ -18,8 +18,8 @@
 #include "Assets/Data/HyTexturedQuad2dData.h"
 #include "Assets/Data/HyMesh3dData.h"
 
+#include "Utilities/HyMath.h"
 #include "Utilities/HyStrManip.h"
-#include "Utilities/jsonxx.h"
 
 const std::string	HyAssetManager::sm_sSUBDIRNAMES[NUM_SUBDIRS] = { "Atlases/", "Audio/", "Particles/", "Fonts/", "Spine/", "Sprites/", "Shaders/", "Entities/", "Meshes/" };
 

@@ -13,6 +13,8 @@
 #include "HyGlobal.h"
 #include "MainWindow.h"
 
+#include "Harmony/Utilities/HyStrManip.h"
+
 #include <QDir>
 #include <QFileDialog>
 #include <QJsonDocument>
@@ -81,9 +83,16 @@ void DlgNewProject::on_buttonBox_accepted()
     QString sRelSourcePath = QDir::cleanPath(ui->txtSourceLocation->text() % "/" % ui->txtSourceDirName->text() % "/");
 
     QJsonObject jsonObj;
+    jsonObj.insert("GameName", ui->txtGameTitle->text());
     jsonObj.insert("AssetsPath", sRelAssetsPath);
     jsonObj.insert("MetaDataPath", sRelMetaDataPath);
     jsonObj.insert("SourcePath", sRelSourcePath);
+
+    QJsonArray windowInfoArray;
+    QJsonObject windowInfoObj;
+    windowInfoObj.insert("name", "Window " %
+    windowInfoArray.append();
+    windowInfoArray.insert("WindowInfoArray", windowInfoArray);
 
     QFile newProjectFile(GetProjFilePath());
     if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
@@ -128,10 +137,6 @@ void DlgNewProject::on_buttonBox_accepted()
     foreach(QFileInfo info, templateContentsList)
         QFile::copy(info.absoluteFilePath(), projDir.absoluteFilePath(info.fileName()));
     
-    QDir dataDir(GetProjDirPath());
-    dataDir.cd(sRelAssetsPath);
-    QString sAbsPathToData = dataDir.absolutePath();
-    
     // Convert the template to use the desired game name
     //
     // Rename the files themselves
@@ -164,7 +169,7 @@ void DlgNewProject::on_buttonBox_accepted()
         sContents.replace("HyTemplate", ui->txtGameTitle->text());
         sContents.replace("..\\..\\Harmony.vcxproj", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "Harmony.vcxproj"));
         sContents.replace("HyHarmonyInclude", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "include"));
-        sContents.replace("HyDataRelPath", srcFile.dir().relativeFilePath(sAbsPathToData));
+        sContents.replace("HyProjRelPath",  MakeStringProperPath(srcFile.dir().relativeFilePath(GetProjDirPath()));
     
         if(!file.open(QFile::WriteOnly))
         {

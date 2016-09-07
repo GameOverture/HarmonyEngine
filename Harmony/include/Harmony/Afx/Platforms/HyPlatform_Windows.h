@@ -36,6 +36,8 @@ typedef unsigned int		uint32;
 typedef __int64				int64;
 typedef unsigned __int64	uint64;
 
+#define HY_MAXWINDOWS 6
+
 // Support for the endian issues
 #define HY_ENDIAN_LITTLE	1
 #define HY_ENDIAN_BIG		0

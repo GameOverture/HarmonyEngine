@@ -16,8 +16,6 @@
 #include "Assets/HyFactory.h"
 #include "Assets/HyTextures.h"
 
-#include "Utilities/jsonxx.h"
-
 class HySprite2dData : public IHyData2d
 {
 	friend class HyFactory<HySprite2dData>;

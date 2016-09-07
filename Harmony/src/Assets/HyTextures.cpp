@@ -11,7 +11,6 @@
 
 #include "Renderer/IHyRenderer.h"
 
-#include "Utilities/HyFileIO.h"
 #include "Utilities/stb_image.h"
 
 HyTextures::HyTextures(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasDataDir),
