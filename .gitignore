@@ -10,6 +10,7 @@ build-DesignerTool-*/
 *.sdf
 *.opensdf
 *.suo
-*.user
 *.pdb
 *.lib
+*.user
+!HyTemplate.vcxproj.user
