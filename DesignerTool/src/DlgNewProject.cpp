@@ -21,6 +21,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QTextCodec>
+#include <QUuid>
 
 DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
     QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
@@ -78,21 +79,33 @@ void DlgNewProject::on_buttonBox_accepted()
     QDir projDir(GetProjDirPath());
     projDir.mkpath(".");
 
-    QString sRelAssetsPath = QDir::cleanPath(ui->txtAssetsLocation->text() % "/" % ui->txtAssetsDirName->text() % "/");
+    QString sRelDataPath = QDir::cleanPath(ui->txtAssetsLocation->text() % "/" % ui->txtAssetsDirName->text() % "/");
     QString sRelMetaDataPath = QDir::cleanPath(ui->txtMetaDataLocation->text() % "/" % ui->txtMetaDataDirName->text() % "/");
     QString sRelSourcePath = QDir::cleanPath(ui->txtSourceLocation->text() % "/" % ui->txtSourceDirName->text() % "/");
 
     QJsonObject jsonObj;
     jsonObj.insert("GameName", ui->txtGameTitle->text());
-    jsonObj.insert("AssetsPath", sRelAssetsPath);
+    jsonObj.insert("DataPath", sRelDataPath);
     jsonObj.insert("MetaDataPath", sRelMetaDataPath);
     jsonObj.insert("SourcePath", sRelSourcePath);
+    
+    jsonObj.insert("DefaultCoordinateType", QJsonValue(1));
+    jsonObj.insert("DefaultCoordinateUnit", QJsonValue(1));
+    jsonObj.insert("PixelsPerMeter", QJsonValue(80.0f));
+	jsonObj.insert("NumInputMappings", QJsonValue(1));
+	jsonObj.insert("DebugPort", QJsonValue(1313));
 
     QJsonArray windowInfoArray;
     QJsonObject windowInfoObj;
-    windowInfoObj.insert("name", "Window " %
-    windowInfoArray.append();
-    windowInfoArray.insert("WindowInfoArray", windowInfoArray);
+    windowInfoObj.insert("Name", "Window 1");
+    windowInfoObj.insert("Type", QJsonValue(0));
+    windowInfoObj.insert("ResolutionX", QJsonValue(1280));
+    windowInfoObj.insert("ResolutionY", QJsonValue(720));
+    windowInfoObj.insert("LocationX", QJsonValue(0));
+    windowInfoObj.insert("LocationY", QJsonValue(0));
+    windowInfoArray.append(windowInfoObj);
+    
+    jsonObj.insert("WindowInfoArray", windowInfoArray);
 
     QFile newProjectFile(GetProjFilePath());
     if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
@@ -114,8 +127,8 @@ void DlgNewProject::on_buttonBox_accepted()
     // Create workspace file tree
     //
     // DATA
-    projDir.mkdir(sRelAssetsPath);
-    projDir.cd(sRelAssetsPath);
+    projDir.mkdir(sRelDataPath);
+    projDir.cd(sRelDataPath);
     QStringList dirList = HyGlobal::SubDirNameList();
     foreach(QString sDir, dirList)
         projDir.mkdir(sDir);
@@ -152,6 +165,7 @@ void DlgNewProject::on_buttonBox_accepted()
         }
     }
     // Then replace the contents
+    QUuid projGUID = QUuid::createUuid();
     srcFileList = projDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
     QTextCodec *pCodec = QTextCodec::codecForLocale();
     foreach(QFileInfo srcFile, srcFileList)
@@ -166,10 +180,14 @@ void DlgNewProject::on_buttonBox_accepted()
         QString sContents = pCodec->toUnicode(file.readAll());
         file.close();
         
+        QDir exeDir(GetProjDirPath());
+        
         sContents.replace("HyTemplate", ui->txtGameTitle->text());
-        sContents.replace("..\\..\\Harmony.vcxproj", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "Harmony.vcxproj"));
+        sContents.replace("HyProjGUID", projGUID.toString());
+        sContents.replace("HyHarmonyProjLocation", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "Harmony.vcxproj"));
+        sContents.replace("HyExeLocation", srcFile.dir().relativeFilePath(exeDir.absolutePath()));
         sContents.replace("HyHarmonyInclude", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "include"));
-        sContents.replace("HyProjRelPath",  MakeStringProperPath(srcFile.dir().relativeFilePath(GetProjDirPath()));
+        sContents.replace("HyProjRelPath", MakeStringProperPath(exeDir.relativeFilePath(GetProjFilePath()).toStdString().c_str(), "", false).c_str());
     
         if(!file.open(QFile::WriteOnly))
         {

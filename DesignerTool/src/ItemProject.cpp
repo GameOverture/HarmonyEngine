@@ -55,7 +55,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
 
     QJsonObject projPathsObj = settingsDoc.object();
 
-    m_sRelativeAssetsLocation = projPathsObj["AssetsPath"].toString();
+    m_sRelativeAssetsLocation = projPathsObj["DataPath"].toString();
     m_sRelativeMetaDataLocation = projPathsObj["MetaDataPath"].toString();
     m_sRelativeSourceLocation = projPathsObj["SourcePath"].toString();
 
