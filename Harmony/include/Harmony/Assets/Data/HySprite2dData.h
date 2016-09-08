@@ -33,7 +33,7 @@ class HySprite2dData : public IHyData2d
 			const uint32				m_uiTEXTUREINDEX;
 			const HyRectangle<float>	m_rSRC_RECT;
 			const bool					m_bROTATED;
-			const glm::vec2				m_vOFFSET;
+			const glm::ivec2			m_vOFFSET;
 			const float					m_fDURATION;
 
 		public:
@@ -43,7 +43,7 @@ class HySprite2dData : public IHyData2d
 				  float fSrcTop,
 				  float fSrcRight,
 				  float fSrcBot,
-				  glm::vec2 vOffset,
+				  glm::ivec2 vOffset,
 				  bool bRotated,
 				  float fDuration) :	m_pAtlasGroup(pAtlasGrp),
 										m_uiTEXTUREINDEX(uiTextureIndex),

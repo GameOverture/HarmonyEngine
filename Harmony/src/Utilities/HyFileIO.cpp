@@ -40,6 +40,9 @@ std::string HyReadTextFile(const char *szFilePath)
 		return std::string();
 	}
 
+	char szCurDir[128];
+	GetCurrentDirectoryA(128, szCurDir);
+
 	std::ifstream infile(szFilePath, std::ios::binary);
 	if(!infile)
 	{

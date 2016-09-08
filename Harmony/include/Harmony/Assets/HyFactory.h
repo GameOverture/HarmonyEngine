@@ -41,15 +41,16 @@ public:
 	{
 		std::string sPath = m_sDATADIR;
 		sPath += MakeStringProperPath(sPrefix.c_str(), "/", true);
+		sPath += sName;
 
 		switch(m_eTYPE)
 		{
-		case HYINST_Sound2d:		sPath += MakeStringProperPath(sPath.c_str(), ".hyaud", true);	break;
-		case HYINST_Particles2d:	sPath += MakeStringProperPath(sPath.c_str(), ".hypfx", true);	break;
-		case HYINST_Text2d:			sPath += MakeStringProperPath(sPath.c_str(), ".hyfnt", true);	break;
-		case HYINST_Spine2d:		sPath += MakeStringProperPath(sPath.c_str(), ".hyspi", true);	break;
-		case HYINST_Sprite2d:		sPath += MakeStringProperPath(sPath.c_str(), ".hyspr", true);	break;
-		case HYINST_TexturedQuad2d:	sPath = sName.c_str();											break;
+		case HYINST_Sound2d:		sPath = MakeStringProperPath(sPath.c_str(), ".hyaud", true);	break;
+		case HYINST_Particles2d:	sPath = MakeStringProperPath(sPath.c_str(), ".hypfx", true);	break;
+		case HYINST_Text2d:			sPath = MakeStringProperPath(sPath.c_str(), ".hyfnt", true);	break;
+		case HYINST_Spine2d:		sPath = MakeStringProperPath(sPath.c_str(), ".hyspi", true);	break;
+		case HYINST_Sprite2d:		sPath = MakeStringProperPath(sPath.c_str(), ".hyspr", true);	break;
+		case HYINST_TexturedQuad2d:	sPath = sName;													break;
 		}
 
 		// Check to determine this data with these parameters doesn't already exist, if it does return the 'tData' associated with it.
