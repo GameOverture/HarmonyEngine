@@ -34,8 +34,8 @@ class HySprite2d : public IHyInst2d
 	HyAnimFloat				m_PlayRate;
 	
 	float					m_fElapsedFrameTime;
-	uint32					m_iCurAnimState;
-	uint32					m_iCurFrame;
+	uint32					m_uiCurAnimState;
+	uint32					m_uiCurFrame;
 
 	// Optional callback invoked upon anim completion/loop
 	typedef void(*fpHySprite2dCallback)(HySprite2d &selfRef, void *pParam);

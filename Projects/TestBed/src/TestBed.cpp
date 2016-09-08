@@ -12,8 +12,8 @@
 TestBed::TestBed(HarmonyInit &initStruct) : IHyApplication(initStruct),
 											m_spineBoy(NULL, "SpineBoy"),
 											m_primBox(),
-											m_txtName(NULL, NULL)//,
-											//m_testSprite(0)
+											m_txtName(NULL, NULL),
+											m_testSprite(1)
 {
 }
 
@@ -60,10 +60,10 @@ TestBed::~TestBed(void)
 	m_primBox.SetDisplayOrder(0);
 	m_primBox.pos.Set(-45.0f, 0.0f);
 
-	//m_testSprite.Load();
-	//m_testSprite.SetTextureSource(8, 0, 0, 180, 162);
-	//m_testSprite.SetDisplayOrder(1);
-	//m_testSprite.pos.Set(0.0f, 0.0f);
+	m_testSprite.Load();
+	m_testSprite.SetTextureSource(8, 0, 0, 180, 162);
+	m_testSprite.SetDisplayOrder(1);
+	m_testSprite.pos.Set(0.0f, 0.0f);
 
 
 	glm::vec2 vLinePts[2];
@@ -109,46 +109,46 @@ TestBed::~TestBed(void)
 
 /*virtual*/ bool TestBed::Update()
 {
-	//if(Input().IsBtnDownBuffered(ACTION_1))
-	//{
-	//	m_testSprite.SetCoordinateType(HYCOORDTYPE_Screen, NULL);//m_pCam_Viewport2);
-	//	//m_pCam_Viewport2->pos.Tween(40.0f, 40.0f, 5.0f, HyTween::Linear);
-	//}
-	//if(Input().IsBtnDownBuffered(ACTION_2))
-	//{
-	//	m_testSprite.SetCoordinateType(HYCOORDTYPE_Camera, NULL);//m_pCam_Viewport2);
-	//	//m_pCam_Viewport2->pos.Tween(40.0f, 40.0f, 5.0f, HyTween::Linear);
-	//}
-	//if(Input().IsBtnDownBuffered(ACTION_3))
-	//{
-	//	m_testSprite.rot.Tween(180.0f, 0.0f, 0.0f, 10.0f, HyTween::BounceInOut);
-	//}
+	if(Input().IsBtnDownBuffered(ACTION_1))
+	{
+		m_testSprite.SetCoordinateType(HYCOORDTYPE_Screen, NULL);//m_pCam_Viewport2);
+		//m_pCam_Viewport2->pos.Tween(40.0f, 40.0f, 5.0f, HyTween::Linear);
+	}
+	if(Input().IsBtnDownBuffered(ACTION_2))
+	{
+		m_testSprite.SetCoordinateType(HYCOORDTYPE_Camera, NULL);//m_pCam_Viewport2);
+		//m_pCam_Viewport2->pos.Tween(40.0f, 40.0f, 5.0f, HyTween::Linear);
+	}
+	if(Input().IsBtnDownBuffered(ACTION_3))
+	{
+		m_testSprite.rot.Tween(180.0f, 0.0f, 0.0f, 10.0f, HyTween::BounceInOut);
+	}
 
-	//const float fMOVEMENTSPEED = 2.0f;
+	const float fMOVEMENTSPEED = 2.0f;
 
-	//if(Input().IsBtnDown(CAM_LEFT))
-	//{
-	//	m_testSprite.pos.Offset(-fMOVEMENTSPEED, 0.0f);
-	//	m_pCam->pos.Offset(-fMOVEMENTSPEED, 0.0f);
-	//}
+	if(Input().IsBtnDown(CAM_LEFT))
+	{
+		m_testSprite.pos.Offset(-fMOVEMENTSPEED, 0.0f);
+		m_pCam->pos.Offset(-fMOVEMENTSPEED, 0.0f);
+	}
 
-	//if(Input().IsBtnDown(CAM_RIGHT))
-	//{
-	//	m_testSprite.pos.Offset(fMOVEMENTSPEED, 0.0f);
-	//	m_pCam->pos.Offset(fMOVEMENTSPEED, 0.0f);
-	//}
+	if(Input().IsBtnDown(CAM_RIGHT))
+	{
+		m_testSprite.pos.Offset(fMOVEMENTSPEED, 0.0f);
+		m_pCam->pos.Offset(fMOVEMENTSPEED, 0.0f);
+	}
 
-	//if(Input().IsBtnDown(CAM_UP))
-	//{
-	//	m_testSprite.pos.Offset(0.0f, fMOVEMENTSPEED);
-	//	m_pCam->pos.Offset(0.0f, fMOVEMENTSPEED);
-	//}
+	if(Input().IsBtnDown(CAM_UP))
+	{
+		m_testSprite.pos.Offset(0.0f, fMOVEMENTSPEED);
+		m_pCam->pos.Offset(0.0f, fMOVEMENTSPEED);
+	}
 
-	//if(Input().IsBtnDown(CAM_DOWN))
-	//{
-	//	m_testSprite.pos.Offset(0.0f, -fMOVEMENTSPEED);
-	//	m_pCam->pos.Offset(0.0f, -fMOVEMENTSPEED);
-	//}
+	if(Input().IsBtnDown(CAM_DOWN))
+	{
+		m_testSprite.pos.Offset(0.0f, -fMOVEMENTSPEED);
+		m_pCam->pos.Offset(0.0f, -fMOVEMENTSPEED);
+	}
 
 	if(Input().IsBtnDownBuffered(SEND_LOG))
 	{

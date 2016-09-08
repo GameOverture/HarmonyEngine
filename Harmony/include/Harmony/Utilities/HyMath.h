@@ -67,7 +67,7 @@ struct HyRectangle
 	HyRectangle(T tX, T tY, T tWidth, T tHeight) : left(tX), top(tY), right(tX + tWidth), bottom(tY + tHeight), iTag(0)
 	{ }
 
-	std::string ToString()
+	std::string ToString() const
 	{
 		std::ostringstream s;
 		s << "(" << left << "," << top << "," << right << "," << bottom << ")";
@@ -82,11 +82,11 @@ struct HyRectangle
 		bottom = tY + tHeight;
 	}
 
-	T Width()
+	T Width() const
 	{
 		return right - left;
 	}
-	T Height()
+	T Height() const
 	{
 		return bottom - top;
 	}

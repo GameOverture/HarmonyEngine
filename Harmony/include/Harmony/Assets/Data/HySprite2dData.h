@@ -16,49 +16,51 @@
 #include "Assets/HyFactory.h"
 #include "Assets/HyTextures.h"
 
+struct HySprite2dFrame
+{
+	HyAtlasGroup *				pAtlasGroup;
+	const uint32				uiTEXTUREINDEX;
+	const HyRectangle<float>	rSRC_RECT;
+	const bool					bROTATED;
+	const glm::ivec2			vOFFSET;
+	const float					fDURATION;
+
+	HySprite2dFrame(HyAtlasGroup *pAtlasGrp,
+					uint32 uiTextureIndex,
+					float fSrcLeft,
+					float fSrcTop,
+					float fSrcRight,
+					float fSrcBot,
+					glm::ivec2 vOffset,
+					bool bRotated,
+					float fDuration) :	pAtlasGroup(pAtlasGrp),
+										uiTEXTUREINDEX(uiTextureIndex),
+										rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot),
+										bROTATED(bRotated),
+										vOFFSET(vOffset),
+										fDURATION(fDuration)
+	{ }
+};
+
 class HySprite2dData : public IHyData2d
 {
 	friend class HyFactory<HySprite2dData>;
 
 	class AnimState
 	{
+	public:
 		const std::string	m_sNAME;
 		const bool			m_bLOOP;
 		const bool			m_bREVERSE;
 		const bool			m_bBOUNCE;
 
-		class Frame
-		{
-			HyAtlasGroup *				m_pAtlasGroup;
-			const uint32				m_uiTEXTUREINDEX;
-			const HyRectangle<float>	m_rSRC_RECT;
-			const bool					m_bROTATED;
-			const glm::ivec2			m_vOFFSET;
-			const float					m_fDURATION;
+		HySprite2dFrame *	m_pFrames;
+		const uint32		m_uiNUMFRAMES;
 
-		public:
-			Frame(HyAtlasGroup *pAtlasGrp,
-				  uint32 uiTextureIndex,
-				  float fSrcLeft,
-				  float fSrcTop,
-				  float fSrcRight,
-				  float fSrcBot,
-				  glm::ivec2 vOffset,
-				  bool bRotated,
-				  float fDuration) :	m_pAtlasGroup(pAtlasGrp),
-										m_uiTEXTUREINDEX(uiTextureIndex),
-										m_rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot),
-										m_bROTATED(bRotated),
-										m_vOFFSET(vOffset),
-										m_fDURATION(fDuration)
-			{ }
-		};
-		Frame *			m_pFrames;
-		const uint32	m_uiNUMFRAMES;
-
-	public:
 		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HySprite2dData &dataRef);
 		~AnimState();
+
+		const HySprite2dFrame &GetFrame(uint32 uiFrameIndex);
 	};
 	AnimState *			m_pAnimStates;
 	uint32				m_uiNumStates;
@@ -68,6 +70,8 @@ class HySprite2dData : public IHyData2d
 
 public:
 	virtual ~HySprite2dData(void);
+
+	const HySprite2dFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex);
 
 	virtual void DoFileLoad();
 };

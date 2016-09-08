@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Diagnostics/HyGuiComms.h"
 
-#ifndef HY_PLATFORM_GUI
+#if 0//#ifndef HY_PLATFORM_GUI
 
 HyGuiComms *HyGuiComms::sm_pInstance = NULL;
 

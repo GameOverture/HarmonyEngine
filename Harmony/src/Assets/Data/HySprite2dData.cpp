@@ -23,6 +23,11 @@ HySprite2dData::HySprite2dData(const std::string &sPath) :	IHyData2d(HYINST_Spin
 	delete[] m_pAnimStates;
 }
 
+const HySprite2dFrame &HySprite2dData::GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex)
+{
+	return m_pAnimStates[uiAnimStateIndex].GetFrame(uiFrameIndex);
+}
+
 /*virtual*/ void HySprite2dData::DoFileLoad()
 {
 	jsonxx::Array spriteStateArray;
@@ -45,14 +50,14 @@ HySprite2dData::HySprite2dData(const std::string &sPath) :	IHyData2d(HYINST_Spin
 	}
 }
 
-HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HySprite2dData &dataRef) :	m_sNAME(sName),
+HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HySprite2dData &dataRef) : m_sNAME(sName),
 																																						m_bLOOP(bLoop),
 																																						m_bREVERSE(bReverse),
 																																						m_bBOUNCE(bBounce),
 																																						m_uiNUMFRAMES(static_cast<uint32>(frameArray.size()))
 {
-	m_pFrames = reinterpret_cast<Frame *>(HY_NEW unsigned char[sizeof(Frame) * m_uiNUMFRAMES]);
-	Frame *pFrameWriteLocation = m_pFrames;
+	m_pFrames = reinterpret_cast<HySprite2dFrame *>(HY_NEW unsigned char[sizeof(HySprite2dFrame) * m_uiNUMFRAMES]);
+	HySprite2dFrame *pFrameWriteLocation = m_pFrames;
 
 	for(uint32 i = 0; i < m_uiNUMFRAMES; ++i, ++pFrameWriteLocation)
 	{
@@ -65,18 +70,23 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 			HyError("HyTextures::RequestTexture() Atlas group (" << static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasId")) << ") does not contain texture index: " << uiTextureIndex);
 
 		HyRectangle<float> rUVRect;
-		pAtlasGroup->GetFrame(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), rUVRect);
+		pAtlasGroup->GetUvRect(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), rUVRect);
 
-		new (pFrameWriteLocation)Frame(pAtlasGroup,
-									   uiTextureIndex,
-									   rUVRect.left, rUVRect.top, rUVRect.right, rUVRect.bottom,
-									   glm::ivec2(static_cast<int32>(frameObj.get<jsonxx::Number>("offsetX")), static_cast<int32>(frameObj.get<jsonxx::Number>("offsetY"))),
-									   rUVRect.iTag == 0 ? false : true,
-									   static_cast<float>(frameObj.get<jsonxx::Number>("duration")));
+		new (pFrameWriteLocation)HySprite2dFrame(pAtlasGroup,
+												 uiTextureIndex,
+												 rUVRect.left, rUVRect.top, rUVRect.right, rUVRect.bottom,
+												 glm::ivec2(static_cast<int32>(frameObj.get<jsonxx::Number>("offsetX")), static_cast<int32>(frameObj.get<jsonxx::Number>("offsetY"))),
+												 rUVRect.iTag == 0 ? false : true,
+												 static_cast<float>(frameObj.get<jsonxx::Number>("duration")));
 	}
 }
 
 HySprite2dData::AnimState::~AnimState()
 {
 	delete [] m_pFrames;
+}
+
+const HySprite2dFrame &HySprite2dData::AnimState::GetFrame(uint32 uiFrameIndex)
+{
+	return m_pFrames[uiFrameIndex];
 }

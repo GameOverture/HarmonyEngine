@@ -149,21 +149,25 @@ uint32 HyAtlasGroup::GetNumTextures() const
 	return m_uiNUM_ATLASES;
 }
 
-void HyAtlasGroup::GetFrame(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
+void HyAtlasGroup::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
 {
 	float fTexWidth = static_cast<float>(m_uiWIDTH);
 	float fTexHeight = static_cast<float>(m_uiHEIGHT);
 
+	const HyRectangle<int32> *pSrcRect = NULL;
 	for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
 	{
-		const HyRectangle<int32> *pSrcRect = m_pAtlases[i].GetFrame(uiChecksum);
+		pSrcRect = m_pAtlases[i].GetSrcRect(uiChecksum);
+		if(pSrcRect)
+		{
+			UVRectOut.left = static_cast<float>(pSrcRect->left) / fTexWidth;
+			UVRectOut.top = static_cast<float>(pSrcRect->top) / fTexHeight;
+			UVRectOut.right = static_cast<float>(pSrcRect->right) / fTexWidth;
+			UVRectOut.bottom = static_cast<float>(pSrcRect->bottom) / fTexHeight;
 
-		UVRectOut.left = static_cast<float>(pSrcRect->left) / fTexWidth;
-		UVRectOut.top = static_cast<float>(pSrcRect->top) / fTexHeight;
-		UVRectOut.right = static_cast<float>(pSrcRect->right) / fTexWidth;
-		UVRectOut.bottom = static_cast<float>(pSrcRect->bottom) / fTexHeight;
-
-		UVRectOut.iTag = pSrcRect->iTag;	// Whether it's rotated (0 or 1)
+			UVRectOut.iTag = pSrcRect->iTag;	// Whether it's rotated (0 or 1)
+			break;
+		}
 	}
 }
 
@@ -264,9 +268,13 @@ HyAtlas::~HyAtlas()
 	DeletePixelData();
 }
 
-const HyRectangle<int32> *HyAtlas::GetFrame(uint32 uiChecksum) const
+const HyRectangle<int32> *HyAtlas::GetSrcRect(uint32 uiChecksum) const
 {
-	return m_ChecksumMap.find(uiChecksum)->second;
+	std::map<uint32, HyRectangle<int32> *>::const_iterator iter = m_ChecksumMap.find(uiChecksum);
+	if(iter == m_ChecksumMap.end())
+		return NULL;
+	else
+		return iter->second;
 }
 
 void HyAtlas::Load(const char *szFilePath)

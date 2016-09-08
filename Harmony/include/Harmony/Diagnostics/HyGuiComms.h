@@ -15,7 +15,7 @@
 #include "Assets/HyAssetManager.h"
 #include "Diagnostics/HyGuiMessage.h"
 
-#ifndef HY_PLATFORM_GUI
+#if 0//#ifndef HY_PLATFORM_GUI
 
 // TODO: These below defines might only be necessary for MSVC 2013 (or is it to disable boost?)
 #define ASIO_STANDALONE 
