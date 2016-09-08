@@ -12,7 +12,7 @@
 //--------------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
-	HarmonyInit initStruct("../NewGame.hyproj");
+	HarmonyInit initStruct("NewGame.hyproj");
 
 	NewGame game(initStruct);
 	HyEngine::RunGame(game);

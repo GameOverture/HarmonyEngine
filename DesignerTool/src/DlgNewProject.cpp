@@ -181,14 +181,13 @@ void DlgNewProject::on_buttonBox_accepted()
         file.close();
         
         QDir exeDir(GetProjDirPath() % "bin/");
-        
+
         sContents.replace("HyTemplate", ui->txtGameTitle->text());
         sContents.replace("HyProjGUID", projGUID.toString());
         sContents.replace("HyHarmonyProjLocation", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "Harmony.vcxproj"));
-        sContents.replace("HyExeLocation", MakeStringProperPath(srcFile.dir().relativeFilePath(exeDir.absolutePath()).toStdString().c_str(), "/", false).c_str());
         sContents.replace("HyHarmonyInclude", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "include"));
-        sContents.replace("HyProjRelPath", MakeStringProperPath(exeDir.relativeFilePath(GetProjFilePath()).toStdString().c_str(), "", false).c_str());
-    
+        sContents.replace("HyWorkingDirectory", GetProjDirPath());
+
         if(!file.open(QFile::WriteOnly))
         {
             HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);

@@ -195,6 +195,9 @@
     <ClCompile Include="src\Utilities\HyVariant.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="src\Assets\Data\IHyData.cpp">
+      <Filter>Assets\Data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">

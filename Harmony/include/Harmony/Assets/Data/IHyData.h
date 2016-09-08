@@ -30,26 +30,19 @@ class IHyData
 	HyLoadState						m_eLoadState;
 
 public:
-	IHyData(HyDataType eDataType, HyInstanceType eInstType, const std::string &sPath) : m_eDATATYPE(eDataType),
-																						m_eINSTTYPE(eInstType),
-																						m_sFILEPATH(sPath),
-																						m_eLoadState(HYLOADSTATE_Inactive),
-																						m_iRefCount(0)
-	{ }
+	IHyData(HyDataType eDataType, HyInstanceType eInstType, const std::string &sPath);
+	virtual ~IHyData(void);
+	
+	HyDataType GetDataType();
+	HyInstanceType GetInstType();
+	const std::string &GetPath();
 
-	virtual ~IHyData(void)
-	{ }
+	virtual void SetLoadState(HyLoadState eState);
+	HyLoadState GetLoadState();
 
-	HyDataType GetDataType()										{ return m_eDATATYPE; }
-	HyInstanceType GetInstType()									{ return m_eINSTTYPE; }
-	const std::string &GetPath()									{ return m_sFILEPATH; }
-
-	virtual void SetLoadState(HyLoadState eState)					{ m_eLoadState = eState; }
-	HyLoadState GetLoadState()										{ return m_eLoadState; }
-
-	void IncRef()													{ m_iRefCount++; }
-	bool DecRef()													{ m_iRefCount--; return m_iRefCount <= 0; }
-	int32 GetRefCount()												{ return m_iRefCount; }
+	void IncRef();
+	bool DecRef();
+	int32 GetRefCount();
 	
 	// Only invoked on the Load thread
 	virtual void DoFileLoad() = 0;

@@ -49,6 +49,7 @@
     <ClCompile Include="src\Assets\Data\HySprite2dData.cpp" />
     <ClCompile Include="src\Assets\Data\HyText2dData.cpp" />
     <ClCompile Include="src\Assets\Data\HyTexturedQuad2dData.cpp" />
+    <ClCompile Include="src\Assets\Data\IHyData.cpp" />
     <ClCompile Include="src\Assets\Data\IHyData2d.cpp" />
     <ClCompile Include="src\Assets\HyAssetManager.cpp" />
     <ClCompile Include="src\Assets\HyTextures.cpp" />
