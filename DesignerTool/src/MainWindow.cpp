@@ -372,6 +372,9 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 /*static*/ void MainWindow::ReloadHarmony()
 {
+    delete sm_pInstance->m_pCurRenderer;
+    sm_pInstance->m_pCurRenderer = NULL;
+    
     ItemProject *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
     sm_pInstance->m_pCurSelectedProj = NULL;    // Set m_pCurSelectedProj to 'NULL' so SetSelectedProj() doesn't imediately return
     
