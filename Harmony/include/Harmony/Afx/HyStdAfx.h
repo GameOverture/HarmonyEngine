@@ -34,6 +34,18 @@ enum HyInstanceType
 	HYINST_Shader
 };
 
+enum HyAnimCtrl
+{
+	HYANIMCTRL_Play = 0,
+	HYANIMCTRL_Pause,
+	HYANIMCTRL_ReversePlay,
+	HYANIMCTRL_Reset,
+	HYANIMCTRL_Loop,
+	HYANIMCTRL_DontLoop,
+	HYANIMCTRL_Bounce,
+	HYANIMCTRL_DontBounce
+};
+
 enum HyDataType
 {
 	HYDATA_Regular = 0,

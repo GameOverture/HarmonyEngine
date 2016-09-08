@@ -25,30 +25,58 @@ class HySprite2d : public IHyInst2d
 		STATEATTRIB_Loop = 1 << 0,
 		STATEATTRIB_Reverse = 1 << 1,
 		STATEATTRIB_Bounce = 1 << 2,
+		STATEATTRIB_IsBouncing = 1 << 4,	// True if anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
+		STATEATTRIB_Paused = 1 << 3,
 		// Do not exceed '8' attributes, or else increase uint8
 	};
-	uint8 *		m_pAnimStateAttribs;
-	float		m_fPlayRate;
-	bool		m_bIsPaused;
-	float		m_fTime;			// Used to determine when to advance a frame in current animation
-	int32		m_iCurAnimState;
-	int32		m_iCurFrame;
-	bool		m_bIsBouncing;		// True if anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
+	uint8 *					m_pAnimStateAttribs;
+
+	HyAnimFloat				m_PlayRate;
+	
+	float					m_fElapsedFrameTime;
+	uint32					m_iCurAnimState;
+	uint32					m_iCurFrame;
+
+	// Optional callback invoked upon anim completion/loop
+	typedef void(*fpHySprite2dCallback)(HySprite2d &selfRef, void *pParam);
+	fpHySprite2dCallback *	m_fppAnimCallback;
+	void **					m_ppAnimCallbackParam;
 
 public:
 	HySprite2d(const char *szPrefix, const char *szName);
 	virtual ~HySprite2d(void);
-	
-	inline int32 GetNumStates()				;//{ return reinterpret_cast<HySprite2dData *>(m_pDataPtr)->m_iNumStates; }
-	inline int32 GetState()					;//{ return m_iCurAnimState; }
-	inline int32 GetState(int32 iIndex)		;//{ return ; }
-	inline int32 GetNumFrames()				;//{ return GetCurAnimState().m_iNumFrames; }
-	inline int32 GetFrame()					;//{ return m_iCurFrame; }
 
 	//--------------------------------------------------------------------------------------
+	// Specify an effect on the current state/animation of the entity. The same effects can
+	// be achieved by using AnimSetRate(), however this may be a cleaner, and more explict 
+	// interface.
 	// 
+	// Note: The play rate value is preserved when using this function. Its +/- sign may be
+	//       switched however if told to reverse from playing forward and vice versa.	
 	//--------------------------------------------------------------------------------------
-	inline float AnimGetPlayRate() { return m_fPlayRate; }
+	void AnimCtrl(HyAnimCtrl eAnimCtrl);
+	
+	uint32 AnimGetNumStates();
+	uint32 AnimGetCurState();
+	uint32 AnimGetNumFrames();
+	uint32 AnimGetFrame();
+	void AnimSetFrame(uint32 uiFrameIndex);
+
+	//--------------------------------------------------------------------------------------
+	// Returns the modifier (defaulted to 1.0f) that's applied the animation frame duration 
+	// set by the Designer Tool
+	//--------------------------------------------------------------------------------------
+	float AnimGetPlayRate();
+
+	//--------------------------------------------------------------------------------------
+	// Modifies how fast the entity's animation will play. Supplying a negative number 
+	// will set the reverse animation attribute. Supplying '0.0f' will just set the PAUSE
+	// flag and will preserve the current play rate. (1.0f = default speed)
+	//
+	// Note: This method will not unpause an entity. It will just set its play rate for
+	//       when it is told to resume.
+	//--------------------------------------------------------------------------------------
+	void AnimSetPlayRate(float fPlayRate);
 
 	//--------------------------------------------------------------------------------------
 	// Change the state of the entity, in other words, essentially swaps the animation and
@@ -66,7 +94,7 @@ public:
 	//--------------------------------------------------------------------------------------
 	bool AnimIsFinished();
 
-	bool AnimIsPaused() { return m_bIsPaused; }
+	bool AnimIsPaused();
 	
 	//--------------------------------------------------------------------------------------
 	// Client may specify whether to invoke a callback function when animation completes. The
@@ -85,33 +113,13 @@ public:
 	//--------------------------------------------------------------------------------------
 	void AnimSetFrame(int iFrameIndex);
 
-	//--------------------------------------------------------------------------------------
-	// Specify an effect on the current state/animation of the entity. The same effects can
-	// be achieved by using AnimSetRate(), however this may be a cleaner, and more explict 
-	// interface.
-	// 
-	// Note: The play rate value is preserved when using this function. Its +/- sign may be
-	//       switched however if told to reverse from playing forward and vice versa.	
-	//--------------------------------------------------------------------------------------
-	void AnimCtrl(/*eAnimControl eAnimCtrl*/);
-
-	//--------------------------------------------------------------------------------------
-	// Modifies how fast the entity's animation will play. Supplying a negative number 
-	// will set the reverse animation attribute. Supplying '0.0f' will just set the PAUSE
-	// flag and will preserve the current play rate. (1.0f = default speed)
-	//
-	// Note: This method will not unpause an entity. It will just set its play rate for
-	//       when it is told to resume.
-	//--------------------------------------------------------------------------------------
-	void AnimSetPlayRate(float fPlayRate);
-
 	// Returns a const RECT pointer to the internal drawing texture source rectangle. This method
 	// can sometimes be useful to determine the dimensions of an entity in its current state 
 	// and frame. 
 	// 
 	// NOTE: This rectangle may be misleading in the case where the source rectangle includes
 	//       alpha'ed out pixels around the source art.
-	const RECT *GetCurRect();
+	const HyRectangle<uint32> GetCurRect(bool bCropAlpha = false);
 
 	int GetCurFrameWidth(bool bCalcProceduralScale = false);
 	int GetCurFrameHeight(bool bCalcProceduralScale = false);

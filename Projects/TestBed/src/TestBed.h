@@ -41,7 +41,7 @@ class TestBed : public IHyApplication
 	HyPrimitive2d		m_HorzLine;
 	HyPrimitive2d		m_VertLine;
 
-	HyTexturedQuad2d	m_testSprite;
+	//HyTexturedQuad2d	m_testSprite;
 
 
 public:
@@ -50,7 +50,7 @@ public:
 
 	virtual bool Initialize();
 	virtual bool Update();
-	virtual bool Shutdown();
+	virtual void Shutdown();
 };
 
 #endif /* __RenderTest_h__ */

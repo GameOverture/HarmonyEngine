@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 
 	HarmonyInit initStruct;
 	initStruct.sGameName = "Test Game";
-	initStruct.sDataDir = "./data";
+	initStruct.sDataDir = "../data";
 	initStruct.uiNumWindows = 2;
 	
 	initStruct.windowInfo[0].sName = "Test Window";
