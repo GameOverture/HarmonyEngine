@@ -64,7 +64,7 @@ struct HyRectangle
 	HyRectangle() : left(0), top(0), right(0), bottom(0), iTag(0)
 	{ }
 
-	HyRectangle(T tX, T tY, T tWidth, T tHeight) : left(tX), top(tY), right(tX + tWidth), bottom(tY + tHeight), iTag(0)
+	HyRectangle(T tLeft, T tTop, T tRight, T tBottom) : left(tLeft), top(tTop), right(tRight), bottom(tBottom), iTag(0)
 	{ }
 
 	std::string ToString() const
