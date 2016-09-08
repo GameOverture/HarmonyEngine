@@ -411,6 +411,9 @@ void MainWindow::on_actionOpenProject_triggered()
 
 void MainWindow::on_actionCloseProject_triggered()
 {
+    delete m_pCurRenderer;
+    m_pCurRenderer = 0;
+
     ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
 }
 

@@ -70,9 +70,15 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
     ui->btnDeleteGroup->setDefaultAction(ui->actionDeleteAtlasGroup);
     
     if(m_MetaDir.exists() == false)
-        HyGuiLog("Meta atlas directory is missing!", LOGTYPE_Error);
+    {
+        HyGuiLog("Meta atlas directory is missing, recreating", LOGTYPE_Info);
+        m_MetaDir.mkpath(m_MetaDir.absolutePath());
+    }
     if(m_DataDir.exists() == false)
-        HyGuiLog("Data atlas directory is missing!", LOGTYPE_Error);
+    {
+        HyGuiLog("Data atlas directory is missing, recreating", LOGTYPE_Info);
+        m_DataDir.mkpath(m_DataDir.absolutePath());
+    }
 
     QFileInfoList metaAtlasDirs = m_MetaDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     if(metaAtlasDirs.empty())

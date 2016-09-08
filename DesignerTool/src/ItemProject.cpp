@@ -55,9 +55,12 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
 
     QJsonObject projPathsObj = settingsDoc.object();
 
-    m_sRelativeAssetsLocation = projPathsObj["DataPath"].toString();
+    m_sGameName                 = projPathsObj["GameName"].toString();
+    m_pTreeItemPtr->setText(0, m_sGameName);
+
+    m_sRelativeAssetsLocation   = projPathsObj["DataPath"].toString();
     m_sRelativeMetaDataLocation = projPathsObj["MetaDataPath"].toString();
-    m_sRelativeSourceLocation = projPathsObj["SourcePath"].toString();
+    m_sRelativeSourceLocation   = projPathsObj["SourcePath"].toString();
 
 
     sm_Init.sGameName = GetName(false).toStdString();

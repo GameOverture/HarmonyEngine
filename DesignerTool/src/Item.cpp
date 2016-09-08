@@ -11,7 +11,10 @@
 #include "WidgetSprite.h"
 
 #include <QFileInfo>
+#include <QJsonDocument>
+#include <QJsonObject>
 
+#include "ItemProject.h"
 #include "Harmony/Utilities/HyStrManip.h"
 
 Item::Item(eItemType eType, const QString sPath) :  m_eTYPE(eType),
@@ -38,7 +41,7 @@ QString Item::GetName(bool bWithPrefix) const
     {
         if(m_eTYPE == ITEM_Project)
             bWithPrefix = false;
-        
+
         QList<eItemType> subDirItemList = HyGlobal::SubDirList();
         for(int i = 0; i < subDirItemList.size() && bWithPrefix; ++i)
         {

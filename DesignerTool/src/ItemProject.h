@@ -27,6 +27,8 @@ class ItemProject : public Item, public IHyApplication
     QTabBar *                                       m_pTabBar;
     WidgetAtlasManager *                            m_pAtlasMan;
     
+    QString                                         m_sGameName;
+
     QString                                         m_sRelativeAssetsLocation;
     QString                                         m_sRelativeMetaDataLocation;
     QString                                         m_sRelativeSourceLocation;
@@ -50,6 +52,7 @@ public:
     bool HasError() const                               { return m_bHasError; }
 
     QString GetDirPath() const;
+    QString GetGameName() const                         { return m_sGameName; }
     
     QString GetAssetsAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeAssetsLocation) + '/'; }
     QString GetAssetsRelPath() const                    { return QDir::cleanPath(m_sRelativeAssetsLocation) + '/'; }
