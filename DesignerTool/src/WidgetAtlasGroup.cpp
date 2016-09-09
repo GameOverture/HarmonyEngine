@@ -171,13 +171,8 @@ void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObjOut)
 
         frameObj.insert("left", QJsonValue(m_FrameList[i]->GetX()));
         frameObj.insert("top", QJsonValue(m_FrameList[i]->GetY()));
-        frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetSize().width()));
-        frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetSize().height()));
-        
-//        frameObj.insert("left", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().left()));
-//        frameObj.insert("top", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().top()));
-//        frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().right()));
-//        frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().bottom()));
+        frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().width()));
+        frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().height()));
         
         frameArrayList[m_FrameList[i]->GetTextureIndex()].append(frameObj);
     }

@@ -118,8 +118,8 @@ void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
         QJsonObject frameObj;
         frameObj.insert("textureId", QJsonValue(pSpriteFrame->m_pFrame->GetTextureIndex()));
         frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));
-        frameObj.insert("offsetX", QJsonValue(pSpriteFrame->GetRenderOffset().x()));
-        frameObj.insert("offsetY", QJsonValue(pSpriteFrame->GetRenderOffset().y()));
+        frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x() + pSpriteFrame->m_pFrame->GetCrop().left()));
+        frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + (pSpriteFrame->m_pFrame->GetSize().height() - pSpriteFrame->m_pFrame->GetCrop().left())));
         frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetChecksum())));
         frameObj.insert("atlasGroupId", QJsonValue(pSpriteFrame->m_pFrame->GetAtlasGroupdId()));
 

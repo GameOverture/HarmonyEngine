@@ -40,7 +40,10 @@ public:
 	tData *GetOrCreateData(const std::string &sPrefix, const std::string &sName)
 	{
 		std::string sPath = m_sDATADIR;
-		sPath += MakeStringProperPath(sPrefix.c_str(), "/", true);
+
+		if(sPrefix.empty() == false)
+			sPath += MakeStringProperPath(sPrefix.c_str(), "/", true);
+
 		sPath += sName;
 
 		switch(m_eTYPE)
