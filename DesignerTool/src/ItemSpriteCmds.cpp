@@ -302,17 +302,22 @@ ItemSpriteCmd_OffsetFrame::ItemSpriteCmd_OffsetFrame(WidgetSpriteTableView *pSpr
                                                                                                                                                             m_iFrameIndex(iIndex),
                                                                                                                                                             m_vNewOffset(vOffset)
 {
-    setText("Translate Frame Offset");
+
     
     WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
+        setText("Translate Every Frame Offset");
+
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
             m_OriginalOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_vOffset);
     }
     else
+    {
+        setText("Translate Frame Offset");
         m_OriginalOffsetList.append(pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_vOffset);
+    }
 }
 
 /*virtual*/ ItemSpriteCmd_OffsetFrame::~ItemSpriteCmd_OffsetFrame()
@@ -336,6 +341,130 @@ void ItemSpriteCmd_OffsetFrame::redo()
 }
 
 void ItemSpriteCmd_OffsetFrame::undo()
+{
+    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+
+    if(m_iFrameIndex == -1)
+    {
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            pSpriteFramesModel->OffsetFrame(i, m_OriginalOffsetList[i]);
+    }
+    else
+    {
+        pSpriteFramesModel->OffsetFrame(m_iFrameIndex, m_OriginalOffsetList[0]);
+        m_pSpriteTableView->selectRow(m_iFrameIndex);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ItemSpriteCmd_OffsetXFrame::ItemSpriteCmd_OffsetXFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                        m_pSpriteTableView(pSpriteTableView),
+                                                                                                                                                                        m_iFrameIndex(iIndex),
+                                                                                                                                                                        m_NewOffsetList(newOffsetList)
+{
+    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+
+    if(m_iFrameIndex == -1)
+    {
+        setText("Translate Every Frame X Offset");
+
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            m_OriginalOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_vOffset);
+    }
+    else
+    {
+        setText("Translate Frame X Offset");
+        m_OriginalOffsetList.append(pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_vOffset);
+    }
+}
+
+/*virtual*/ ItemSpriteCmd_OffsetXFrame::~ItemSpriteCmd_OffsetXFrame()
+{
+}
+
+void ItemSpriteCmd_OffsetXFrame::redo()
+{
+    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+
+    if(m_iFrameIndex == -1)
+    {
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+        {
+            QPoint vOffset(m_NewOffsetList[i], m_OriginalOffsetList[i].y());
+            pSpriteFramesModel->OffsetFrame(i, vOffset);
+        }
+    }
+    else
+    {
+        QPoint vOffset(m_NewOffsetList[0], m_OriginalOffsetList[0].y());
+        pSpriteFramesModel->OffsetFrame(m_iFrameIndex, vOffset);
+        m_pSpriteTableView->selectRow(m_iFrameIndex);
+    }
+}
+
+void ItemSpriteCmd_OffsetXFrame::undo()
+{
+    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+
+    if(m_iFrameIndex == -1)
+    {
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            pSpriteFramesModel->OffsetFrame(i, m_OriginalOffsetList[i]);
+    }
+    else
+    {
+        pSpriteFramesModel->OffsetFrame(m_iFrameIndex, m_OriginalOffsetList[0]);
+        m_pSpriteTableView->selectRow(m_iFrameIndex);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ItemSpriteCmd_OffsetYFrame::ItemSpriteCmd_OffsetYFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                        m_pSpriteTableView(pSpriteTableView),
+                                                                                                                                                                        m_iFrameIndex(iIndex),
+                                                                                                                                                                        m_NewOffsetList(newOffsetList)
+{
+    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+
+    if(m_iFrameIndex == -1)
+    {
+        setText("Translate Every Frame Y Offset");
+
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            m_OriginalOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_vOffset);
+    }
+    else
+    {
+        setText("Translate Frame Y Offset");
+        m_OriginalOffsetList.append(pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_vOffset);
+    }
+}
+
+/*virtual*/ ItemSpriteCmd_OffsetYFrame::~ItemSpriteCmd_OffsetYFrame()
+{
+}
+
+void ItemSpriteCmd_OffsetYFrame::redo()
+{
+    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+
+    if(m_iFrameIndex == -1)
+    {
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+        {
+            QPoint vOffset(m_OriginalOffsetList[i].x(), m_NewOffsetList[i]);
+            pSpriteFramesModel->OffsetFrame(i, vOffset);
+        }
+    }
+    else
+    {
+        QPoint vOffset(m_OriginalOffsetList[0].x(), m_NewOffsetList[0]);
+        pSpriteFramesModel->OffsetFrame(m_iFrameIndex, vOffset);
+        m_pSpriteTableView->selectRow(m_iFrameIndex);
+    }
+}
+
+void ItemSpriteCmd_OffsetYFrame::undo()
 {
     WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
 

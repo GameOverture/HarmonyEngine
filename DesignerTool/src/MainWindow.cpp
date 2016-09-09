@@ -166,6 +166,9 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     // Append version to window title
     setWindowTitle(windowTitle() % " " % HYGUIVERSION_STRING);
 
+
+    //setStyleSheet("background-color:black;");
+
     HyGuiLog("Ready to go!", LOGTYPE_Normal);
 }
 

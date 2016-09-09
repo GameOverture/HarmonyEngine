@@ -344,7 +344,7 @@ void WidgetAtlasManager::HideAtlasGroup()
             pFrame->DrawInst(&atlasMan)->SetEnabled(true);
             pFrame->DrawInst(&atlasMan)->SetDisplayOrder(100);
             pFrame->DrawInst(&atlasMan)->pos.Set((uiRENDERWIDTH * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetWidth() * -0.5f),
-                            (uiRENDERHEIGHT * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetHeight() * -0.5f));
+                                                 (uiRENDERHEIGHT * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetHeight() * -0.5f));
             pFrame->DrawInst(&atlasMan)->color.A(0.5f);
         }
     }

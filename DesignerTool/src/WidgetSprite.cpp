@@ -267,32 +267,140 @@ void WidgetSprite::on_cmbStates_currentIndexChanged(int index)
 
 void WidgetSprite::on_actionAlignLeft_triggered()
 {
-    
+    WidgetSpriteTableView *pSpriteTableView = m_pCurSpriteState->GetFrameView();
+    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(pSpriteTableView->model());
+
+    if(pSpriteFramesModel->rowCount() == 0)
+        return;
+
+    if(ui->actionApplyToAll->isChecked())
+    {
+        QList<int> newOffsetList;
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            newOffsetList.append(0.0f);
+
+        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetXFrame(pSpriteTableView, -1, newOffsetList));
+        return;
+    }
+
+    QList<int> newOffsetList;
+    newOffsetList.append(0.0f);
+    m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetXFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
 }
 
 void WidgetSprite::on_actionAlignRight_triggered()
 {
-    
+    WidgetSpriteTableView *pSpriteTableView = m_pCurSpriteState->GetFrameView();
+    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(pSpriteTableView->model());
+
+    if(pSpriteFramesModel->rowCount() == 0)
+        return;
+
+    if(ui->actionApplyToAll->isChecked())
+    {
+        QList<int> newOffsetList;
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            newOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().width() * -1);
+
+        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetXFrame(pSpriteTableView, -1, newOffsetList));
+        return;
+    }
+
+    QList<int> newOffsetList;
+    newOffsetList.append(pSpriteFramesModel->GetFrameAt(pSpriteTableView->currentIndex().row())->m_pFrame->GetSize().width() * -1);
+    m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetXFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
 }
 
 void WidgetSprite::on_actionAlignUp_triggered()
 {
-    
+    WidgetSpriteTableView *pSpriteTableView = m_pCurSpriteState->GetFrameView();
+    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(pSpriteTableView->model());
+
+    if(pSpriteFramesModel->rowCount() == 0)
+        return;
+
+    if(ui->actionApplyToAll->isChecked())
+    {
+        QList<int> newOffsetList;
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            newOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().height() * -1);
+
+        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetYFrame(pSpriteTableView, -1, newOffsetList));
+        return;
+    }
+
+    QList<int> newOffsetList;
+    newOffsetList.append(pSpriteFramesModel->GetFrameAt(pSpriteTableView->currentIndex().row())->m_pFrame->GetSize().height() * -1);
+    m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetYFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
 }
 
 void WidgetSprite::on_actionAlignDown_triggered()
 {
-    
+    WidgetSpriteTableView *pSpriteTableView = m_pCurSpriteState->GetFrameView();
+    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(pSpriteTableView->model());
+
+    if(pSpriteFramesModel->rowCount() == 0)
+        return;
+
+    if(ui->actionApplyToAll->isChecked())
+    {
+        QList<int> newOffsetList;
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            newOffsetList.append(0.0f);
+
+        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetYFrame(pSpriteTableView, -1, newOffsetList));
+        return;
+    }
+
+    QList<int> newOffsetList;
+    newOffsetList.append(0.0f);
+    m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetYFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
 }
 
 void WidgetSprite::on_actionAlignCenterVertical_triggered()
 {
-    
+    WidgetSpriteTableView *pSpriteTableView = m_pCurSpriteState->GetFrameView();
+    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(pSpriteTableView->model());
+
+    if(pSpriteFramesModel->rowCount() == 0)
+        return;
+
+    if(ui->actionApplyToAll->isChecked())
+    {
+        QList<int> newOffsetList;
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            newOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().height() * -0.5f);
+
+        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetYFrame(pSpriteTableView, -1, newOffsetList));
+        return;
+    }
+
+    QList<int> newOffsetList;
+    newOffsetList.append(pSpriteFramesModel->GetFrameAt(pSpriteTableView->currentIndex().row())->m_pFrame->GetSize().height() * -0.5f);
+    m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetYFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
 }
 
 void WidgetSprite::on_actionAlignCenterHorizontal_triggered()
 {
-    
+    WidgetSpriteTableView *pSpriteTableView = m_pCurSpriteState->GetFrameView();
+    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(pSpriteTableView->model());
+
+    if(pSpriteFramesModel->rowCount() == 0)
+        return;
+
+    if(ui->actionApplyToAll->isChecked())
+    {
+        QList<int> newOffsetList;
+        for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+            newOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().width() * -0.5f);
+
+        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetXFrame(pSpriteTableView, -1, newOffsetList));
+        return;
+    }
+
+    QList<int> newOffsetList;
+    newOffsetList.append(pSpriteFramesModel->GetFrameAt(pSpriteTableView->currentIndex().row())->m_pFrame->GetSize().width() * -0.5f);
+    m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetXFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
 }
 
 void WidgetSprite::on_actionOrderFrameUpwards_triggered()

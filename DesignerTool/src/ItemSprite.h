@@ -33,8 +33,8 @@ public:
     QPoint GetRenderOffset()
     {
         QPoint ptRenderOffset;
-        ptRenderOffset.setX(m_pFrame->GetCrop().x() + m_vOffset.x());
-        ptRenderOffset.setY(m_pFrame->GetSize().height() - m_pFrame->GetCrop().bottom() + m_vOffset.y());
+        ptRenderOffset.setX(m_vOffset.x() + m_pFrame->GetCrop().left());
+        ptRenderOffset.setY(m_vOffset.y() + (m_pFrame->GetSize().height() - m_pFrame->GetCrop().bottom()));
 
         return ptRenderOffset;
     }

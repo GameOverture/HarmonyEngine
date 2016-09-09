@@ -173,6 +173,38 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemSpriteCmd_OffsetXFrame : public QUndoCommand
+{
+    WidgetSpriteTableView *     m_pSpriteTableView;
+    int                         m_iFrameIndex;
+    QList<QPoint>               m_OriginalOffsetList;
+    QList<int>                  m_NewOffsetList;
+
+public:
+    ItemSpriteCmd_OffsetXFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent = 0);
+    virtual ~ItemSpriteCmd_OffsetXFrame();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemSpriteCmd_OffsetYFrame : public QUndoCommand
+{
+    WidgetSpriteTableView *     m_pSpriteTableView;
+    int                         m_iFrameIndex;
+    QList<QPoint>               m_OriginalOffsetList;
+    QList<int>                  m_NewOffsetList;
+
+public:
+    ItemSpriteCmd_OffsetYFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent = 0);
+    virtual ~ItemSpriteCmd_OffsetYFrame();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemSpriteCmd_DurationFrame : public QUndoCommand
 {
     WidgetSpriteTableView *    m_pSpriteTableView;
