@@ -50,7 +50,7 @@ HySprite2d::~HySprite2d(void)
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vSize;
 	pRefDataWritePos += sizeof(glm::vec2);
 
-	glm::vec2 vOffset(0.0f, 0.0f);
+	glm::vec2 vOffset(frameRef.vOFFSET.x, frameRef.vOFFSET.y);
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vOffset;
 	pRefDataWritePos += sizeof(glm::vec2);
 

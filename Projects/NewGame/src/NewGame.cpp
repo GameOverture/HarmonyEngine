@@ -2,7 +2,7 @@
 
 
 NewGame::NewGame(HarmonyInit &initStruct) : IHyApplication(initStruct),
-											//m_TestSprite("", "NewSprite"),
+											m_TestSprite("", "NewSprite"),
 											m_TestQuad(1)
 {
 }
@@ -16,8 +16,8 @@ NewGame::~NewGame()
 {
 	m_pCam = Window().CreateCamera2d();
 
-	//m_TestSprite.Load();
-	//m_TestSprite.SetEnabled(true);
+	m_TestSprite.Load();
+	m_TestSprite.SetEnabled(true);
 
 	m_TestQuad.Load();
 	m_TestQuad.SetTextureSource(0, 100, 100, 500, 500);

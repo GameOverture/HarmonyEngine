@@ -225,14 +225,17 @@ void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef)
 	m_csTextures.Lock();
 	if(bUpload)
 	{
-		vector<unsigned char *> vTextureArrayData;
-		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
-			vTextureArrayData.push_back(m_pAtlases[i].GetPixelData());
+		if(m_uiGfxApiHandle == 0)
+		{
+			vector<unsigned char *> vTextureArrayData;
+			for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
+				vTextureArrayData.push_back(m_pAtlases[i].GetPixelData());
 
-		m_uiGfxApiHandle = rendererRef.AddTextureArray(m_uiNUM_8BIT_CHANNELS, m_uiWIDTH, m_uiHEIGHT, vTextureArrayData);
+			m_uiGfxApiHandle = rendererRef.AddTextureArray(m_uiNUM_8BIT_CHANNELS, m_uiWIDTH, m_uiHEIGHT, vTextureArrayData);
 
-		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
-			m_pAtlases[i].DeletePixelData();
+			for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
+				m_pAtlases[i].DeletePixelData();
+		}
 	}
 	else
 	{
