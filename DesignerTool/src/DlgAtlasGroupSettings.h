@@ -40,14 +40,16 @@ class DlgAtlasGroupSettings : public QDialog
     int         m_iRotationStrategyIndex;
 
     bool        m_bSettingsDirty;
+    bool        m_bNameChanged;
 
 public:
     explicit DlgAtlasGroupSettings(QWidget *parent = 0);
     ~DlgAtlasGroupSettings();
     
     bool IsSettingsDirty()      { return m_bSettingsDirty; }
+    bool IsNameChanged()        { return m_bNameChanged; }
 
-    void DataFromWidgets();
+    void WidgetsToData();
     void DataToWidgets();
 
     QString GetName();

@@ -58,18 +58,18 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
     
     int iNumTextures = 0;
 
-    QFile metaAtlasFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaAtlasSettings));
-    if(metaAtlasFile.exists())
+    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaAtlasSettings));
+    if(settingsFile.exists())
     {
-        if(!metaAtlasFile.open(QIODevice::ReadOnly))
+        if(!settingsFile.open(QIODevice::ReadOnly))
             HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaAtlasSettings, LOGTYPE_Error);
 
 #ifdef HYGUI_UseBinaryMetaFiles
-        QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
+        QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
 #else
-        QJsonDocument settingsDoc = QJsonDocument::fromJson(metaAtlasFile.readAll());
+        QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
 #endif
-        metaAtlasFile.close();
+        settingsFile.close();
 
         QJsonObject settingsObj = settingsDoc.object();
         m_dlgSettings.LoadSettings(settingsObj);
@@ -303,6 +303,7 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
         QFileInfo fileInfo(sImportImgList[i]);
 
         QImage newImage(fileInfo.absoluteFilePath());
+
         quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
         QRect rAlphaCrop = m_Packer.crop(newImage);
 
@@ -310,7 +311,7 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
         
         if(pNewFrame)
         {
-            newImage.save(m_MetaDir.path() % "/" % pNewFrame->ConstructImageFileName());
+            newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
             m_FrameList.append(pNewFrame);
         }
     }
@@ -492,7 +493,7 @@ void WidgetAtlasGroup::Refresh()
     for(int i = 0; i < m_Packer.bins.size(); ++i)
     {
         QImage *pTexture = static_cast<QImage *>(ppPainters[i]->device());
-        pTexture->save(m_DataDir.absolutePath() % "/" % HyGlobal::MakeFileNameFromCounter(i) % ".png");
+        pTexture->save(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(i) % ".png"));
 
         delete ppPainters[i];
         delete pTexture;
@@ -504,7 +505,7 @@ void WidgetAtlasGroup::Refresh()
     QJsonObject settingsObj = m_dlgSettings.GetSettings();
     settingsObj.insert("frames", frameArray);
 
-    QFile settingsFile(m_MetaDir.absolutePath() % "/" % HYGUIPATH_MetaAtlasSettings);
+    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaAtlasSettings));
     if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
        HyGuiLog("Couldn't open atlas settings file for writing", LOGTYPE_Error);
@@ -512,7 +513,7 @@ void WidgetAtlasGroup::Refresh()
     else
     {
         QJsonDocument settingsDoc(settingsObj);
-        
+
 #ifdef HYGUI_UseBinaryMetaFiles
         qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
 #else
@@ -579,9 +580,44 @@ void WidgetAtlasGroup::on_btnSettings_clicked()
         m_dlgSettings.SetName("Atlas Group " % QString::number(GetId()));
 
     m_dlgSettings.DataToWidgets();
-    if(QDialog::Accepted == m_dlgSettings.exec() && m_dlgSettings.IsSettingsDirty())
+    if(QDialog::Accepted == m_dlgSettings.exec())
     {
-        Refresh();
+        if(m_dlgSettings.IsSettingsDirty())
+            Refresh();
+        else if(m_dlgSettings.IsNameChanged())
+        {
+            m_dlgSettings.GetName();
+            QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaAtlasSettings));
+            if(!settingsFile.open(QIODevice::ReadWrite))
+            {
+                HyGuiLog("Couldn't open atlas settings file to save name", LOGTYPE_Error);
+            }
+            else
+            {
+#ifdef HYGUI_UseBinaryMetaFiles
+                QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
+#else
+                QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
+#endif
+                QJsonObject settingsObj = settingsDoc.object();
+                settingsObj.insert("txtName", m_dlgSettings.GetName());
+
+                settingsDoc.setObject(settingsObj);
+
+#ifdef HYGUI_UseBinaryMetaFiles
+                qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
+#else
+                qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
+#endif
+                if(0 == iBytesWritten || -1 == iBytesWritten)
+                {
+                    HyGuiLog("Could not write to atlas settings file to save name: " % settingsFile.errorString(), LOGTYPE_Error);
+                }
+
+                settingsFile.close();
+                TODO fix this mess
+            }
+        }
     }
 }
 

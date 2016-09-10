@@ -83,6 +83,8 @@ private:
     void ImportImages(QStringList sImportImgList);
     void Refresh();
 
+    void WriteMetaSettings(QJsonArray frameArray);
+
     void CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType, HyGuiFrame *pFrame);
 };
 

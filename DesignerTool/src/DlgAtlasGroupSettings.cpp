@@ -18,10 +18,11 @@
 
 DlgAtlasGroupSettings::DlgAtlasGroupSettings(QWidget *parent) : QDialog(parent),
                                                                 ui(new Ui::DlgAtlasGroupSettings),
-                                                                m_bSettingsDirty(false)
+                                                                m_bSettingsDirty(false),
+                                                                m_bNameChanged(false)
 {
     ui->setupUi(this);
-    DataFromWidgets();
+    WidgetsToData();
 }
 
 DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
@@ -29,7 +30,7 @@ DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
     delete ui;
 }
 
-void DlgAtlasGroupSettings::DataFromWidgets()
+void DlgAtlasGroupSettings::WidgetsToData()
 {
     m_sName = ui->txtName->text();
 
@@ -69,7 +70,7 @@ void DlgAtlasGroupSettings::DataToWidgets()
     ui->sbTextureHeight->setValue(m_iTextureHeight);
     ui->cmbHeuristic->setCurrentIndex(m_iHeuristicIndex);
     
-    m_bSettingsDirty = false;
+    m_bSettingsDirty = m_bNameChanged = false;
 }
 
 QString DlgAtlasGroupSettings::GetName()
@@ -186,6 +187,9 @@ void DlgAtlasGroupSettings::on_btnTexSize2048_clicked()
 void DlgAtlasGroupSettings::on_buttonBox_accepted()
 {
     m_bSettingsDirty = false;
+
+    if(m_sName != ui->txtName->text())
+        m_bNameChanged = true;
     
     if(m_iTextureWidth != ui->sbTextureWidth->value() ||
        m_iTextureHeight != ui->sbTextureHeight->value() ||
@@ -204,7 +208,7 @@ void DlgAtlasGroupSettings::on_buttonBox_accepted()
     {
         if(QMessageBox::Ok == QMessageBox::warning(NULL, QString("Save Atlas Group Settings?"), QString("By modifying the Atlas Group settings, it is required to regenerate the entire Atlas Group."), QMessageBox::Ok, QMessageBox::Cancel))
         {
-            DataFromWidgets();
+            WidgetsToData();
             m_bSettingsDirty = true;
         }
         else
