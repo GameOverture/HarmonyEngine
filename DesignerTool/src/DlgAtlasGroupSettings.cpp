@@ -186,7 +186,7 @@ void DlgAtlasGroupSettings::on_btnTexSize2048_clicked()
 
 void DlgAtlasGroupSettings::on_buttonBox_accepted()
 {
-    m_bSettingsDirty = false;
+    m_bSettingsDirty = m_bNameChanged = false;
 
     if(m_sName != ui->txtName->text())
         m_bNameChanged = true;
@@ -207,12 +207,7 @@ void DlgAtlasGroupSettings::on_buttonBox_accepted()
        m_iRotationStrategyIndex != ui->cmbRotationStrategy->currentIndex())
     {
         if(QMessageBox::Ok == QMessageBox::warning(NULL, QString("Save Atlas Group Settings?"), QString("By modifying the Atlas Group settings, it is required to regenerate the entire Atlas Group."), QMessageBox::Ok, QMessageBox::Cancel))
-        {
-            WidgetsToData();
             m_bSettingsDirty = true;
-        }
-        else
-            DataToWidgets();
     }
 }
 

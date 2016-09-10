@@ -362,6 +362,8 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurRenderer = new HyGuiRenderer(pProj, sm_pInstance);
     sm_pInstance->ui->centralVerticalLayout->addWidget(sm_pInstance->m_pCurRenderer);
 
+    ItemProject *pTest = sm_pInstance->m_pCurSelectedProj;
+
     if(sm_pInstance->m_pCurSelectedProj)
     {
         sm_pInstance->ui->dockWidgetAtlas->setWidget(&sm_pInstance->m_pCurSelectedProj->GetAtlasManager());

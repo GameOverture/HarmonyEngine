@@ -13,6 +13,8 @@
 #include <QWidget>
 #include <QDir>
 #include <QMouseEvent>
+#include <QStringListModel>
+#include <QStackedWidget>
 
 #include "ItemProject.h"
 #include "WidgetAtlasGroup.h"
@@ -20,6 +22,17 @@
 namespace Ui {
 class WidgetAtlasManager;
 }
+
+class WidgetAtlasModelView : public QStringListModel
+{
+    QStackedWidget &        m_AtlasGroupsRef;
+
+public:
+    WidgetAtlasModelView(QStackedWidget &atlasGroupsRef, QObject *pParent);
+
+    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+    virtual int	rowCount(const QModelIndex & parent = QModelIndex()) const;
+};
 
 class WidgetAtlasManager : public QWidget
 {
@@ -33,6 +46,8 @@ class WidgetAtlasManager : public QWidget
     QMap<quint32, HyGuiFrame *>     m_DependencyMap;
     
     QTreeWidgetItem *               m_pMouseHoverItem;
+
+    WidgetAtlasModelView *          m_pCmbModel;
 
 public:
     explicit WidgetAtlasManager(QWidget *parent = 0);

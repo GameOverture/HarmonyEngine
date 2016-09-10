@@ -582,43 +582,53 @@ void WidgetAtlasGroup::on_btnSettings_clicked()
     m_dlgSettings.DataToWidgets();
     if(QDialog::Accepted == m_dlgSettings.exec())
     {
+        m_dlgSettings.WidgetsToData();  // Save the changes
+
         if(m_dlgSettings.IsSettingsDirty())
             Refresh();
         else if(m_dlgSettings.IsNameChanged())
         {
             m_dlgSettings.GetName();
             QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaAtlasSettings));
-            if(!settingsFile.open(QIODevice::ReadWrite))
+            if(!settingsFile.open(QIODevice::ReadOnly))
             {
-                HyGuiLog("Couldn't open atlas settings file to save name", LOGTYPE_Error);
-            }
-            else
-            {
-#ifdef HYGUI_UseBinaryMetaFiles
-                QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
-#else
-                QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
-#endif
-                QJsonObject settingsObj = settingsDoc.object();
-                settingsObj.insert("txtName", m_dlgSettings.GetName());
-
-                settingsDoc.setObject(settingsObj);
-
-#ifdef HYGUI_UseBinaryMetaFiles
-                qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
-#else
-                qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
-#endif
-                if(0 == iBytesWritten || -1 == iBytesWritten)
-                {
-                    HyGuiLog("Could not write to atlas settings file to save name: " % settingsFile.errorString(), LOGTYPE_Error);
-                }
-
                 settingsFile.close();
-                TODO fix this mess
+                HyGuiLog("Couldn't open atlas settings file for reading", LOGTYPE_Error);
+                return;
             }
+
+#ifdef HYGUI_UseBinaryMetaFiles
+            QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
+#else
+            QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
+#endif
+            settingsFile.close();
+
+            QJsonObject settingsObj = settingsDoc.object();
+            settingsObj.insert("txtName", m_dlgSettings.GetName());
+            settingsDoc.setObject(settingsObj);
+
+            if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+            {
+                settingsFile.close();
+                HyGuiLog("Couldn't open atlas settings file for writing", LOGTYPE_Error);
+                return;
+            }
+
+#ifdef HYGUI_UseBinaryMetaFiles
+            qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
+#else
+            qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
+#endif
+            if(0 == iBytesWritten || -1 == iBytesWritten)
+            {
+                HyGuiLog("Could not write to atlas settings file to save name: " % settingsFile.errorString(), LOGTYPE_Error);
+            }
+            settingsFile.close();
         }
     }
+    else
+        m_dlgSettings.DataToWidgets();  // Reverts changes made
 }
 
 void WidgetAtlasGroup::on_atlasList_itemSelectionChanged()

@@ -100,6 +100,9 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
             }
         }
     }
+
+    m_pCmbModel = new WidgetAtlasModelView(*ui->atlasGroups, this);
+    ui->cmbAtlasGroups->setModel(m_pCmbModel);
 }
 
 WidgetAtlasManager::~WidgetAtlasManager()
@@ -490,7 +493,7 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
         WidgetAtlasGroup *pNewAtlas = new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this, this);
         ui->atlasGroups->setCurrentIndex(ui->atlasGroups->addWidget(pNewAtlas));
         
-        ui->cmbAtlasGroups->addItem(pNewAtlas->GetName(), QVariant(pNewAtlas->GetId()));
+//        ui->cmbAtlasGroups->addItem(pNewAtlas->GetName(), QVariant(pNewAtlas->GetId()));
         ui->cmbAtlasGroups->setCurrentIndex(ui->atlasGroups->currentIndex());
     }
 }
@@ -507,24 +510,60 @@ void WidgetAtlasManager::on_btnAddGroup_clicked()
 
 void WidgetAtlasManager::on_cmbAtlasGroups_currentIndexChanged(int index)
 {
-    for(int i = 0; i < ui->atlasGroups->count(); ++i)
-    {
-        if(static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->GetId() == ui->cmbAtlasGroups->currentData().toInt())
-        {
-            // Unload the old atlas group draw instances
-            WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
-            foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
-                 pFrame->DrawInst(this)->Unload();
+//    for(int i = 0; i < ui->atlasGroups->count(); ++i)
+//    {
+//        if(static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->GetId() == ui->cmbAtlasGroups->currentData().toInt())
+//        {
+//            // Unload the old atlas group draw instances
+//            WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
+//            foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
+//                 pFrame->DrawInst(this)->Unload();
             
-            m_pProjOwner->Reset();
+//            m_pProjOwner->Reset();
             
-            // Then set the new atlas group
-            ui->atlasGroups->setCurrentIndex(i);
-        }
-    }
+//            // Then set the new atlas group
+//            ui->atlasGroups->setCurrentIndex(i);
+//        }
+//    }
+
+    if(ui->atlasGroups->count() == 0)
+        return;
+
+    // Unload the old atlas group draw instances
+    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
+    foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
+         pFrame->DrawInst(this)->Unload();
+
+    m_pProjOwner->Reset();
+
+    // Then set the new atlas group
+    ui->atlasGroups->setCurrentIndex(index);
 }
 
 void WidgetAtlasManager::on_actionDeleteAtlasGroup_triggered()
 {
     
 }
+
+WidgetAtlasModelView::WidgetAtlasModelView(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
+                                                                                                m_AtlasGroupsRef(atlasGroupsRef)
+{ }
+
+/*virtual*/ QVariant WidgetAtlasModelView::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
+{
+    if(role == Qt::DisplayRole)
+    {
+        if(m_AtlasGroupsRef.count() == 0)
+            return "";
+        else
+            return static_cast<WidgetAtlasGroup *>(m_AtlasGroupsRef.widget(index.row()))->GetName();
+    }
+    else
+        return QStringListModel::data(index, role);
+}
+
+/*virtual*/ int	WidgetAtlasModelView::rowCount(const QModelIndex & parent /*= QModelIndex()*/) const
+{
+    return m_AtlasGroupsRef.count();
+}
+
