@@ -32,12 +32,14 @@ char *HyReadTextFile(const char *szFilePath, int *pLengthOut)
 	return pData;
 }
 
-std::string HyReadTextFile(const char *szFilePath)
+void HyReadTextFile(const char *szFilePath, std::string &sContentsOut)
 {
+	sContentsOut.clear();
+
 	if(szFilePath == NULL)
 	{
 		//sm_sLogStr = "ReadTextFile - filename is NULL\n";
-		return std::string();
+		return;
 	}
 
 	char szCurDir[128];
@@ -47,16 +49,13 @@ std::string HyReadTextFile(const char *szFilePath)
 	if(!infile)
 	{
 		//sm_sLogStr = "ReadTextFile() - invalid filename\n";
-		return std::string();
+		return;
 	}
 
 	// TODO: Make this a lot more safer!
 	std::istreambuf_iterator<char> begin(infile), end;
-
-	std::string sReadOutput;
-	sReadOutput.append(begin, end);
-
-	return sReadOutput;
+	sContentsOut.append(begin, end);
+	infile.close();
 }
 
 void WriteTextFile(const char *szFilePath, const char *szContentBuffer)

@@ -30,8 +30,11 @@ const HySprite2dFrame &HySprite2dData::GetFrame(uint32 uiAnimStateIndex, uint32 
 
 /*virtual*/ void HySprite2dData::DoFileLoad()
 {
+	std::string sSpriteFileContents;
+	HyReadTextFile(GetPath().c_str(), sSpriteFileContents);
+
 	jsonxx::Array spriteStateArray;
-	spriteStateArray.parse(HyReadTextFile(GetPath().c_str()));
+	spriteStateArray.parse(sSpriteFileContents);
 
 	m_uiNumStates = static_cast<uint32>(spriteStateArray.size());
 	m_pAnimStates = reinterpret_cast<AnimState *>(HY_NEW unsigned char[sizeof(AnimState) * m_uiNumStates]);

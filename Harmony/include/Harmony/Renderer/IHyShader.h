@@ -83,13 +83,13 @@ protected:
 		uint32				uiInstanceDivisor;
 	};
 
-	const uint32												m_uiINDEX;
+	const uint32					m_uiINDEX;
 
-	HyLoadState													m_eLoadState;
-	std::string													m_sSourceCode[HYNUMSHADERTYPES];
-	std::vector<VertexAttribute>								m_vVertexAttributes;
+	HyLoadState						m_eLoadState;
+	std::string						m_sSourceCode[HYNUMSHADERTYPES];
+	std::vector<VertexAttribute>	m_vVertexAttributes;
 
-	HyShaderUniforms											m_Uniforms;
+	HyShaderUniforms				m_Uniforms;
 
 	IHyShader(uint32 iIndex);
 public:

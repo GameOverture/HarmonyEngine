@@ -21,7 +21,10 @@ HyTextures::HyTextures(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasData
 
 	std::string sAtlasInfoFilePath(m_sATLAS_DIR_PATH);
 	sAtlasInfoFilePath += "atlasInfo.json";
-	if(atlasGroupArray.parse(HyReadTextFile(sAtlasInfoFilePath.c_str())) == false || atlasGroupArray.size() == 0)
+	std::string sAtlasInfoFileContents;
+	HyReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
+
+	if(atlasGroupArray.parse(sAtlasInfoFileContents) == false || atlasGroupArray.size() == 0)
 	{
 		m_uiNumAtlasGroups = 0;
 		m_pAtlasGroups = NULL;

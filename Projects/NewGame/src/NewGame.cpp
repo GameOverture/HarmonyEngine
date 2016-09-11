@@ -46,6 +46,14 @@ NewGame::~NewGame()
 	m_VertLine.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
 	m_VertLine.Load();
 
+
+	IHyShader *pShader_Checkerboard = IHyRenderer::NewCustomShader();
+	char *pShaderSrc = HyReadTextFile("testFrag.glsl", NULL);
+	pShader_Checkerboard->SetSourceCode(pShaderSrc, HYSHADER_Fragment);
+	delete[] pShaderSrc;
+
+	m_primBox.SetCustomShader(pShader_Checkerboard);
+
 	return true;
 }
 

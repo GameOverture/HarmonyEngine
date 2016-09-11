@@ -52,6 +52,7 @@ IHyRenderer::~IHyRenderer(void)
 
 void IHyRenderer::Update()
 {
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Iterate through 'm_vWindowRef' to find any dirty RenderSurface's that need processing
 	// TODO: Make the application's HyWindow (ref to 'm_vWindowRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_vWindowRef.size()); ++i)
@@ -82,14 +83,16 @@ void IHyRenderer::Update()
 		}
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Swap to newest draw buffers (is only thread-safe on Render thread)
 	if(!m_GfxCommsRef.Render_GetSharedPtrs(m_pMsgQueuePtr, m_pSendMsgQueuePtr, m_pDrawBufferPtr))
 	{
-		InteropSleep(10);
+		//InteropSleep(10);
 		return;
 	}
 	m_pDrawBufferHeader = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBufferPtr);
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
 	while(!m_pMsgQueuePtr->empty())
 	{
@@ -104,6 +107,7 @@ void IHyRenderer::Update()
 		m_pSendMsgQueuePtr->push(pData);
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Render all surfaces
 	m_RenderSurfaceIter = m_RenderSurfaces.begin();
 	while(m_RenderSurfaceIter != m_RenderSurfaces.end())

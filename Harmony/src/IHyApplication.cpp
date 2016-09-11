@@ -39,8 +39,11 @@ HarmonyInit::HarmonyInit()
 
 HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
 {
+	std::string sProjFileContents;
+	HyReadTextFile(sHyProjFilePath.c_str(), sProjFileContents);
+	
 	jsonxx::Object projObject;
-	projObject.parse(HyReadTextFile(sHyProjFilePath.c_str()));
+	projObject.parse(sProjFileContents);
 
 	sGameName				= projObject.get<jsonxx::String>("GameName");
 	sDataDir				= projObject.get<jsonxx::String>("DataPath");

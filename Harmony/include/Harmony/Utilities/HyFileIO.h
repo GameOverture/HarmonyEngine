@@ -15,7 +15,7 @@
 
 char *HyReadTextFile(const char *szFilePath, int *pLengthOut);
 
-std::string HyReadTextFile(const char *szFilePath);
+void HyReadTextFile(const char *szFilePath, std::string &sContentsOut);
 
 void WriteTextFile(const char *szFilePath, const char *szContentBuffer);
 
