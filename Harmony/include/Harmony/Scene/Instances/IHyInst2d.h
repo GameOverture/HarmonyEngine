@@ -22,6 +22,7 @@
 #include "Renderer/Viewport/HyCamera.h"
 
 typedef void (*HyWriteDrawBufferDataOverride)(char *&);
+typedef void(*HyUpdateUniformOverride)(HyShaderUniforms *);
 
 class IHyInst2d : public ITransform<HyAnimVec2>
 {
@@ -51,9 +52,6 @@ protected:
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
 	HyRenderState					m_RenderState;
 	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
-
-	// Custom shader
-	HyWriteDrawBufferDataOverride	m_fpWriteDrawBufferOverride;
 
 public:
 	IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName);
@@ -88,22 +86,20 @@ public:
 	void AddChild(IHyInst2d &childInst);
 	void Detach();
 
-	void SetCustomShader(IHyShader *pShader, HyWriteDrawBufferDataOverride fpWriteDrawBufferOverride = NULL);
-
 protected:
 	virtual void OnDataLoaded() = 0;
 	
 	void Update();
 	virtual void OnUpdate() = 0;
+
+	// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef) = 0;
 
 	// This function is responsible for incrementing the passed in reference pointer the size of the data written
-	virtual void DefaultWriteDrawBufferData(char *&pRefDataWritePos) = 0;
+	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) = 0;
 
 private:
 	HyLoadState GetLoadState()									{ return m_eLoadState; }
-
-	void WriteDrawBufferData(char *&pRefDataWritePos);
 
 	void SetData(IHyData *pData);
 	void SetLoaded();

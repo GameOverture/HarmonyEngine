@@ -44,9 +44,9 @@ private:
 	virtual void OnDataLoaded();
 
 	virtual void OnUpdate();
+	
 	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef);
-
-	virtual void DefaultWriteDrawBufferData(char *&pRefDataWritePos);
+	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
 };
 
 #endif /* __HyPrimitive2d_h__ */

@@ -128,9 +128,9 @@ private:
 	virtual void OnDataLoaded();
 
 	virtual void OnUpdate();
-	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef);
 
-	virtual void DefaultWriteDrawBufferData(char *&pRefDataWritePos);
+	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef);
+	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
 };
 
 #endif /* __HySprite2d_h__ */

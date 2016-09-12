@@ -40,7 +40,7 @@ HySprite2d::~HySprite2d(void)
 {
 }
 
-/*virtual*/ void HySprite2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)
+/*virtual*/ void HySprite2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
 	HySprite2dData *pData = static_cast<HySprite2dData *>(m_pData);
 

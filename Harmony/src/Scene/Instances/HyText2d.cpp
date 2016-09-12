@@ -126,7 +126,7 @@ void HyText2d::CalcVertexBuffer()
 {
 }
 
-/*virtual*/ void HyText2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)
+/*virtual*/ void HyText2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
 
 }

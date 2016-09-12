@@ -198,7 +198,7 @@ void HyPrimitive2d::ClearData()
 	pShaderUniformsRef->Set("transformMtx", mtx);
 }
 
-/*virtual*/ void HyPrimitive2d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)
+/*virtual*/ void HyPrimitive2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
 	//memcpy(pRefDataWritePos, &color.Get(), sizeof(glm::vec4));
 	//pRefDataWritePos += sizeof(glm::vec4);

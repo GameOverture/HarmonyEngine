@@ -267,8 +267,8 @@ void HyScene::WriteDrawBuffers()
 			pCurRenderState2d->AppendInstances(m_vLoadedInst2d[i]->GetRenderState().GetNumInstances());
 		}
 		
-		// WriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
-		m_vLoadedInst2d[i]->WriteDrawBufferData(pCurVertexWritePos);
+		// OnWriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
+		m_vLoadedInst2d[i]->OnWriteDrawBufferData(pCurVertexWritePos);
 		uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
 	}
 

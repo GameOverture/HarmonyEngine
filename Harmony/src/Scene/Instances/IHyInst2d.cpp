@@ -27,8 +27,7 @@ IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char 
 																							m_pParent(NULL),
 																							m_bDirty(true),
 																							m_iDisplayOrder(0),
-																							m_iTag(0),
-																							m_fpWriteDrawBufferOverride(NULL)
+																							m_iTag(0)
 {
 	color.Set(1.0f);
 	SetOnDirtyCallback(OnDirty, this);
@@ -112,12 +111,6 @@ void IHyInst2d::Detach()
 	HyError("IObjInst2d::Detach() could not find itself in parent's child list");
 }
 
-void IHyInst2d::SetCustomShader(IHyShader *pShader, HyWriteDrawBufferDataOverride fpWriteDrawBufferOverride /*= NULL*/)
-{
-	m_RenderState.SetShaderIndex(pShader->GetIndex());
-	m_fpWriteDrawBufferOverride = fpWriteDrawBufferOverride;
-}
-
 void IHyInst2d::Update()
 {
 	OnUpdate();
@@ -162,14 +155,6 @@ void IHyInst2d::SetDisplayOrder(int32 iOrderValue)
 {
 	m_iDisplayOrder = iOrderValue;
 	HyScene::SetInstOrderingDirty();
-}
-
-void IHyInst2d::WriteDrawBufferData(char *&pRefDataWritePos)
-{
-	if(m_fpWriteDrawBufferOverride)
-		m_fpWriteDrawBufferOverride(pRefDataWritePos);
-	else
-		DefaultWriteDrawBufferData(pRefDataWritePos);
 }
 
 void IHyInst2d::SetData(IHyData *pData)
