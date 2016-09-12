@@ -72,8 +72,6 @@ public:
 	int32 GetDisplayOrder() const								{ return m_iDisplayOrder; }
 	void SetDisplayOrder(int32 iOrderValue);
 
-	const HyRenderState &GetRenderState() const					{ return m_RenderState; }
-
 	HyAnimVec4													color;
 
 	inline int64 GetTag()										{ return m_iTag; }
@@ -100,6 +98,7 @@ protected:
 
 private:
 	HyLoadState GetLoadState()									{ return m_eLoadState; }
+	const HyRenderState &GetRenderState() const					{ return m_RenderState; }
 
 	void SetData(IHyData *pData);
 	void SetLoaded();

@@ -52,7 +52,7 @@ NewGame::~NewGame()
 	pShader_Checkerboard->SetSourceCode(pShaderSrc, HYSHADER_Fragment);
 	delete[] pShaderSrc;
 
-	m_primBox.SetCustomShader(pShader_Checkerboard);
+	//m_primBox.SetCustomShader(pShader_Checkerboard);
 
 	return true;
 }
