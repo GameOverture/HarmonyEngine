@@ -46,39 +46,40 @@ public:
 		size_t		uiOffsetToCameras2d;
 	};
 
+	// Note: All member variables and functions are named in reference of calling from 'Update' thread.
 private:
-	char *						m_pBuffer_Update;
-	char *						m_pBuffer_Shared;
-	char *						m_pBuffer_Render;
+	char *						m_pDrawBuffer_Update;
+	char *						m_pDrawBuffer_Shared;
+	char *						m_pDrawBuffer_Render;
 
-	queue<IHy2dData *> *		m_pAtlasSendQueue_Update;
-	queue<IHy2dData *> *		m_pAtlasSendQueue_Shared;
-	queue<IHy2dData *> *		m_pAtlasSendQueue_Render;
+	queue<IHy2dData *> *		m_pTxDataQueue_Update;
+	queue<IHy2dData *> *		m_pTxDataQueue_Shared;
+	queue<IHy2dData *> *		m_pTxDataQueue_Render;
 
-	queue<IHy2dData *> *		m_pAtlasReceiveQueue_Update;
-	queue<IHy2dData *> *		m_pAtlasReceiveQueue_Shared;
-	queue<IHy2dData *> *		m_pAtlasReceiveQueue_Render;
+	queue<IHy2dData *> *		m_pRxDataQueue_Update;
+	queue<IHy2dData *> *		m_pRxDataQueue_Shared;
+	queue<IHy2dData *> *		m_pRxDataQueue_Render;
 
-	BasicSection				m_csBuffers;
+	BasicSection				m_csPointers;
 
 public:
 	HyGfxComms();
 	~HyGfxComms();
 	
 	// This should only be invoked from the Update/Game thread
-	inline char *GetWriteBufferPtr()		{ return m_pBuffer_Update; }
+	char *GetDrawBuffer();
 
 	// This should only be invoked from the Update/Game thread
-	void SendAtlasGroup(IHy2dData *pAtlasGrp)	{ m_pAtlasSendQueue_Update->push(pAtlasGrp); }
+	void SetSharedPointers();
 
 	// This should only be invoked from the Update/Game thread
-	queue<IHy2dData *> *RetrieveAtlasGroups()	{ return m_pAtlasReceiveQueue_Update; }
+	void TxData(IHy2dData *pAtlasGrp);
 
 	// This should only be invoked from the Update/Game thread
-	void Update_SetSharedPtrs();
+	queue<IHy2dData *> *RxData();
 
 	// This should only be invoked from the Render thread
-	bool Render_GetSharedPtrs(queue<IHy2dData *> *&pMsgQueuePtr, queue<IHy2dData *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr);
+	bool Render_TakeSharedPointers(queue<IHy2dData *> *&pMsgQueuePtr, queue<IHy2dData *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr);
 };
 
 #endif /* __HyGfxBuffers_h__ */

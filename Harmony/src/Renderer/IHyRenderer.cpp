@@ -84,7 +84,7 @@ void IHyRenderer::Update()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Swap to newest draw buffers (is only thread-safe on Render thread)
-	if(!m_GfxCommsRef.Render_GetSharedPtrs(m_pMsgQueuePtr, m_pSendMsgQueuePtr, m_pDrawBufferPtr))
+	if(!m_GfxCommsRef.Render_TakeSharedPointers(m_pMsgQueuePtr, m_pSendMsgQueuePtr, m_pDrawBufferPtr))
 	{
 		//InteropSleep(10);
 		return;

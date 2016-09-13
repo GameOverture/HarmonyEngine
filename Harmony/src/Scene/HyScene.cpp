@@ -117,10 +117,10 @@ void HyScene::PostUpdate()
 	for(uint32 i = 0; i < m_vWindowRef.size(); ++i)
 		m_vWindowRef[i]->Update();
 
-	WriteDrawBuffers();
+	WriteDrawBuffer();
 }
 
-void HyScene::WriteDrawBuffers()
+void HyScene::WriteDrawBuffer()
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// BUFFER HEADER (contains offsets from here)-| Num 3d Cams (4bytes)-|-Cam3d-|-Cam3d-|...|-Num 2d Cams (4bytes)-|-Cam2d-|-Cam2d-|...|-Num 3d Insts (4bytes)-|-Inst3d-|-Inst3d-|-Inst3d...-|-Num 2d Insts (4bytes)-|-Inst2d-|-Inst2d-|-Inst2d...-|-<possible blank/empty data since we skip non-enabled instances>-|-RenderState info (Texture Binds, Uniform Data)-|-Vertex Data-|-RenderState info (Texture Binds, Uniform Data)-|-Vertex Data...
@@ -129,7 +129,7 @@ void HyScene::WriteDrawBuffers()
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
 
 	// GET BUFFER HEADER (and write to its members as data offsets become known below)
-	m_pCurWritePos = m_GfxCommsRef.GetWriteBufferPtr();
+	m_pCurWritePos = m_GfxCommsRef.GetDrawBuffer();
 	
 	HyGfxComms::tDrawHeader *pDrawHeader = new (m_pCurWritePos) HyGfxComms::tDrawHeader;
 	pDrawHeader->uiReturnFlags = 0;
@@ -139,7 +139,7 @@ void HyScene::WriteDrawBuffers()
 	uint32 uiNumWindows = static_cast<uint32>(m_vWindowRef.size());
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 3d CAMERA(S) BUFFER
-	pDrawHeader->uiOffsetToCameras3d = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
+	pDrawHeader->uiOffsetToCameras3d = m_pCurWritePos - m_GfxCommsRef.GetDrawBuffer();
 	char *pWriteNum3dCamsHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 	
@@ -170,7 +170,7 @@ void HyScene::WriteDrawBuffers()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 2d CAMERA(S) BUFFER
-	pDrawHeader->uiOffsetToCameras2d = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
+	pDrawHeader->uiOffsetToCameras2d = m_pCurWritePos - m_GfxCommsRef.GetDrawBuffer();
 	char *pWriteNum2dCamsHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 
@@ -205,7 +205,7 @@ void HyScene::WriteDrawBuffers()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 3d DRAW BUFFER
-	pDrawHeader->uiOffsetToInst3d = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
+	pDrawHeader->uiOffsetToInst3d = m_pCurWritePos - m_GfxCommsRef.GetDrawBuffer();
 	char *pWriteNum3dInstsHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 
@@ -225,7 +225,7 @@ void HyScene::WriteDrawBuffers()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 2d DRAW BUFFER
-	pDrawHeader->uiOffsetToInst2d = m_pCurWritePos - m_GfxCommsRef.GetWriteBufferPtr();
+	pDrawHeader->uiOffsetToInst2d = m_pCurWritePos - m_GfxCommsRef.GetDrawBuffer();
 	char *pWriteNum2dInstsHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 
@@ -233,7 +233,7 @@ void HyScene::WriteDrawBuffers()
 	uiTotalNumInsts = static_cast<uint32>(m_vLoadedInst2d.size());
 
 	char *pStartVertexWritePos = m_pCurWritePos + (uiTotalNumInsts * sizeof(HyRenderState));
-	pDrawHeader->uiOffsetToVertexData2d = pStartVertexWritePos - m_GfxCommsRef.GetWriteBufferPtr();
+	pDrawHeader->uiOffsetToVertexData2d = pStartVertexWritePos - m_GfxCommsRef.GetDrawBuffer();
 	char *pCurVertexWritePos = pStartVertexWritePos;
 
 	size_t	uiVertexDataOffset = 0;
@@ -294,7 +294,7 @@ void HyScene::WriteDrawBuffers()
 	// Do final check to see if we wrote passed our bounds
 	HyAssert(pDrawHeader->uiVertexBufferSize2d < HY_GFX_BUFFER_SIZE, "HyGfxComms::WriteUpdateBuffer() has written passed its bounds! Embiggen 'HY_GFX_BUFFER_SIZE'");
 
-	m_GfxCommsRef.Update_SetSharedPtrs();
+	m_GfxCommsRef.SetSharedPointers();
 }
 
 /*static*/ bool HyScene::Inst2dSortPredicate(const IHyInst2d *pInst1, const IHyInst2d *pInst2)

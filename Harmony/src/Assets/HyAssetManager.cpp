@@ -80,7 +80,7 @@ void HyAssetManager::Update()
 			if(pData->GetDataType() == HYDATA_2d)
 			{
 				pData->SetLoadState(HYLOADSTATE_Queued);
-				m_GfxCommsRef.SendAtlasGroup(static_cast<IHy2dData *>(pData));
+				m_GfxCommsRef.TxData(static_cast<IHy2dData *>(pData));
 			}
 			else
 				FinalizeData(pData);
@@ -91,7 +91,7 @@ void HyAssetManager::Update()
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	// Grab and process any returning IHy2dData's from the Render thread
-	m_pGfxQueue_Retrieval = m_GfxCommsRef.RetrieveAtlasGroups();
+	m_pGfxQueue_Retrieval = m_GfxCommsRef.RxData();
 	while(!m_pGfxQueue_Retrieval->empty())
 	{
 		IHy2dData *pData = m_pGfxQueue_Retrieval->front();
@@ -100,7 +100,7 @@ void HyAssetManager::Update()
 		if(pData->GetLoadState() == HYLOADSTATE_ReloadGfx)
 		{
 			pData->SetLoadState(HYLOADSTATE_Queued);
-			m_GfxCommsRef.SendAtlasGroup(pData);
+			m_GfxCommsRef.TxData(pData);
 		}
 		else
 			FinalizeData(pData);
@@ -272,7 +272,7 @@ void HyAssetManager::DiscardData(IHyData *pData)
 	pData->SetLoadState(HYLOADSTATE_Discarded);
 
 	if(pData->GetDataType() == HYDATA_2d)
-		m_GfxCommsRef.SendAtlasGroup(static_cast<IHy2dData *>(pData));
+		m_GfxCommsRef.TxData(static_cast<IHy2dData *>(pData));
 	else
 		FinalizeData(pData);
 }

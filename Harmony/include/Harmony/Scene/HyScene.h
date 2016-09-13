@@ -79,7 +79,7 @@ private:
 	void PreUpdate();
 	void PostUpdate();
 	
-	void WriteDrawBuffers();
+	void WriteDrawBuffer();
 	
 	static bool Inst2dSortPredicate(const IHyInst2d *pInst1, const IHyInst2d *pInst2);
 };

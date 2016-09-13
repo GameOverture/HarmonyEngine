@@ -11,93 +11,111 @@
 
 HyGfxComms::HyGfxComms()
 {
-	m_pBuffer_Update = m_pBuffer_Shared = m_pBuffer_Render = NULL;
-	m_pAtlasSendQueue_Update = m_pAtlasSendQueue_Shared = m_pAtlasSendQueue_Render = NULL;
+	m_pDrawBuffer_Update = m_pDrawBuffer_Shared = m_pDrawBuffer_Render = NULL;
+	m_pTxDataQueue_Update = m_pTxDataQueue_Shared = m_pTxDataQueue_Render = NULL;
 
-	m_pBuffer_Update = HY_NEW char[HY_GFX_BUFFER_SIZE];
-	memset(m_pBuffer_Update, 0, HY_GFX_BUFFER_SIZE);
+	m_pDrawBuffer_Update = HY_NEW char[HY_GFX_BUFFER_SIZE];
+	memset(m_pDrawBuffer_Update, 0, HY_GFX_BUFFER_SIZE);
 
-	m_pBuffer_Shared = HY_NEW char[HY_GFX_BUFFER_SIZE];
-	memset(m_pBuffer_Shared, 0, HY_GFX_BUFFER_SIZE);
+	m_pDrawBuffer_Shared = HY_NEW char[HY_GFX_BUFFER_SIZE];
+	memset(m_pDrawBuffer_Shared, 0, HY_GFX_BUFFER_SIZE);
 
-	m_pBuffer_Render = HY_NEW char[HY_GFX_BUFFER_SIZE];
-	memset(m_pBuffer_Render, 0, HY_GFX_BUFFER_SIZE);
+	m_pDrawBuffer_Render = HY_NEW char[HY_GFX_BUFFER_SIZE];
+	memset(m_pDrawBuffer_Render, 0, HY_GFX_BUFFER_SIZE);
 
-	m_pAtlasSendQueue_Update = HY_NEW queue<IHy2dData *>();
-	m_pAtlasSendQueue_Shared = HY_NEW queue<IHy2dData *>();
-	m_pAtlasSendQueue_Render = HY_NEW queue<IHy2dData *>();
+	m_pTxDataQueue_Update = HY_NEW queue<IHy2dData *>();
+	m_pTxDataQueue_Shared = HY_NEW queue<IHy2dData *>();
+	m_pTxDataQueue_Render = HY_NEW queue<IHy2dData *>();
 
-	m_pAtlasReceiveQueue_Update = HY_NEW queue<IHy2dData *>();
-	m_pAtlasReceiveQueue_Shared = HY_NEW queue<IHy2dData *>();
-	m_pAtlasReceiveQueue_Render = HY_NEW queue<IHy2dData *>();
+	m_pRxDataQueue_Update = HY_NEW queue<IHy2dData *>();
+	m_pRxDataQueue_Shared = HY_NEW queue<IHy2dData *>();
+	m_pRxDataQueue_Render = HY_NEW queue<IHy2dData *>();
 }
 
 HyGfxComms::~HyGfxComms()
 {
-	delete [] m_pBuffer_Update;
-	delete [] m_pBuffer_Shared;
-	delete [] m_pBuffer_Render;
+	delete [] m_pDrawBuffer_Update;
+	delete [] m_pDrawBuffer_Shared;
+	delete [] m_pDrawBuffer_Render;
 
-	delete m_pAtlasSendQueue_Update;
-	delete m_pAtlasSendQueue_Shared;
-	delete m_pAtlasSendQueue_Render;
+	delete m_pTxDataQueue_Update;
+	delete m_pTxDataQueue_Shared;
+	delete m_pTxDataQueue_Render;
 
-	delete m_pAtlasReceiveQueue_Update;
-	delete m_pAtlasReceiveQueue_Shared;
-	delete m_pAtlasReceiveQueue_Render;
+	delete m_pRxDataQueue_Update;
+	delete m_pRxDataQueue_Shared;
+	delete m_pRxDataQueue_Render;
 }
 
 // This should only be invoked from the Update/Game thread
-void HyGfxComms::Update_SetSharedPtrs()
+char *HyGfxComms::GetDrawBuffer()
 {
-	m_csBuffers.Lock();
+	return m_pDrawBuffer_Update;
+}
 
-	queue<IHy2dData *> *pTmpQueue = m_pAtlasSendQueue_Shared;
-	m_pAtlasSendQueue_Shared = m_pAtlasSendQueue_Update;
-	m_pAtlasSendQueue_Update = pTmpQueue;
+// This should only be invoked from the Update/Game thread
+void HyGfxComms::SetSharedPointers()
+{
+	m_csPointers.Lock();
 
-	pTmpQueue = m_pAtlasReceiveQueue_Shared;
-	m_pAtlasReceiveQueue_Shared = m_pAtlasReceiveQueue_Update;
-	m_pAtlasReceiveQueue_Update = pTmpQueue;
+	queue<IHy2dData *> *pTmpQueue = m_pTxDataQueue_Shared;
+	m_pTxDataQueue_Shared = m_pTxDataQueue_Update;
+	m_pTxDataQueue_Update = pTmpQueue;
 
-	char *pTmp = m_pBuffer_Shared;
-	m_pBuffer_Shared = m_pBuffer_Update;
-	m_pBuffer_Update = pTmp;
+	pTmpQueue = m_pRxDataQueue_Shared;
+	m_pRxDataQueue_Shared = m_pRxDataQueue_Update;
+	m_pRxDataQueue_Update = pTmpQueue;
 
-	m_csBuffers.Unlock();
+	char *pTmp = m_pDrawBuffer_Shared;
+	m_pDrawBuffer_Shared = m_pDrawBuffer_Update;
+	m_pDrawBuffer_Update = pTmp;
+
+	m_csPointers.Unlock();
+}
+
+// This should only be invoked from the Update/Game thread
+void HyGfxComms::TxData(IHy2dData *pAtlasGrp)
+{
+	m_pTxDataQueue_Update->push(pAtlasGrp);
+}
+
+// This should only be invoked from the Update/Game thread
+queue<IHy2dData *> *HyGfxComms::RxData()
+{
+	return m_pRxDataQueue_Update;
 }
 
 // This should only be invoked from the Render thread
-bool HyGfxComms::Render_GetSharedPtrs(queue<IHy2dData *> *&pMsgQueuePtr, queue<IHy2dData *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr)
+bool HyGfxComms::Render_TakeSharedPointers(queue<IHy2dData *> *&pMsgQueuePtr, queue<IHy2dData *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr)
 {
-	m_csBuffers.Lock();
+	m_csPointers.Lock();
 
 	// Check to see if these buffers have already been rendered, if so return false to try next update.
-	HyGfxComms::tDrawHeader *pTest = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pBuffer_Shared);
-	if(reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pBuffer_Shared)->uiReturnFlags != 0)
+	HyGfxComms::tDrawHeader *pTest = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBuffer_Shared);
+	if(reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBuffer_Shared)->uiReturnFlags != 0)
 	{
-		m_csBuffers.Unlock();
+		m_csPointers.Unlock();
 		return false;
 	}
 
-	// Message queues
-	queue<IHy2dData *> *pTmpQueue = m_pAtlasSendQueue_Render;
-	m_pAtlasSendQueue_Render = m_pAtlasSendQueue_Shared;
-	m_pAtlasSendQueue_Shared = pTmpQueue;
-	pMsgQueuePtr =  m_pAtlasSendQueue_Render;
+	// Data queues
+	queue<IHy2dData *> *pTmpQueue = m_pTxDataQueue_Render;
+	m_pTxDataQueue_Render = m_pTxDataQueue_Shared;
+	m_pTxDataQueue_Shared = pTmpQueue;
+	pMsgQueuePtr =  m_pTxDataQueue_Render;
 
-	pTmpQueue = m_pAtlasReceiveQueue_Render;
-	m_pAtlasReceiveQueue_Render = m_pAtlasReceiveQueue_Shared;
-	m_pAtlasReceiveQueue_Shared = pTmpQueue;
-	pSendMsgQueuePtr = m_pAtlasReceiveQueue_Render;
+	pTmpQueue = m_pRxDataQueue_Render;
+	m_pRxDataQueue_Render = m_pRxDataQueue_Shared;
+	m_pRxDataQueue_Shared = pTmpQueue;
+	pSendMsgQueuePtr = m_pRxDataQueue_Render;
 
 	// Buffers
-	char *pTmp = m_pBuffer_Render;
-	m_pBuffer_Render = m_pBuffer_Shared;
-	m_pBuffer_Shared = pTmp;
-	pDrawBufferPtr = m_pBuffer_Render;
+	char *pTmp = m_pDrawBuffer_Render;
+	m_pDrawBuffer_Render = m_pDrawBuffer_Shared;
+	m_pDrawBuffer_Shared = pTmp;
+	pDrawBufferPtr = m_pDrawBuffer_Render;
 
-	m_csBuffers.Unlock();
+	m_csPointers.Unlock();
 
 	return true;
 }
