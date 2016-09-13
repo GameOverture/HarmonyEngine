@@ -77,6 +77,8 @@ public:
 	inline int64 GetTag()										{ return m_iTag; }
 	inline void SetTag(int64 iTag)								{ m_iTag = iTag; }
 
+	void SetCustomShader(IHyShader *pShader);
+
 	void Load();
 	void Unload();
 	void GetWorldTransform(glm::mat4 &outMtx);

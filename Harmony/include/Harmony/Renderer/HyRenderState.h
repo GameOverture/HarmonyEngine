@@ -15,6 +15,7 @@
 // Forward declaration
 class IHyInst2d;
 class HyShaderUniforms;
+class IHyShader;
 
 class HyRenderState
 {
@@ -39,7 +40,8 @@ private:
 	uint32				m_uiAttributeFlags;
 	uint32				m_uiTextureBindHandle;
 
-	int32				m_iShaderIndex;
+	int32				m_iShaderId;
+	IHyShader *			m_pShader;
 	HyShaderUniforms *	m_pShaderUniformsRef;
 
 	uint32				m_uiNumInstances;
@@ -69,8 +71,9 @@ public:
 	bool IsEnabled(eAttributes eAttrib);
 	uint32 GetAttributeBitFlags() const;
 
-	int32 GetShaderIndex();
-	void SetShaderIndex(uint32 uiIndex);
+	IHyShader *GetShader();
+	void SetShader(IHyShader *pShader);
+	void SetShaderId(int32 iId);
 	HyShaderUniforms *PrimeShaderUniforms();
 
 	uint32 GetTextureHandle();

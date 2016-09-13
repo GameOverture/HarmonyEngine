@@ -95,9 +95,7 @@ HyOpenGL::~HyOpenGL(void)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	uint32 uiShaderIndex = renderState.GetShaderIndex();
-	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_vShaders[uiShaderIndex]);
-
+	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(renderState.GetShader());
 	pShader->Use();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -351,7 +349,7 @@ bool HyOpenGL::Initialize()
 
 	// Quad batch //////////////////////////////////////////////////////////////////////////
 	HyOpenGLShader *pShaderQuadBatch = HY_NEW HyOpenGLShader(IHyShader::SHADER_QuadBatch);
-	sm_vShaders.push_back(pShaderQuadBatch);
+	sm_ShaderMap[IHyShader::SHADER_QuadBatch] = pShaderQuadBatch;
 
 	pShaderQuadBatch->SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
 	pShaderQuadBatch->SetVertexAttribute("size", HYSHADERVAR_vec2, false, 1);
@@ -371,7 +369,7 @@ bool HyOpenGL::Initialize()
 
 	// Primitive //////////////////////////////////////////////////////////////////////////
 	HyOpenGLShader *pShaderPrimitive = HY_NEW HyOpenGLShader(IHyShader::SHADER_Primitive);
-	sm_vShaders.push_back(pShaderPrimitive);
+	sm_ShaderMap[IHyShader::SHADER_Primitive] = pShaderPrimitive;
 
 	pShaderPrimitive->SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);
 	pShaderPrimitive->SetVertexAttribute("position", HYSHADERVAR_vec4);

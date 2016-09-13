@@ -14,13 +14,15 @@
 
 HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
 									m_uiTextureBindHandle(0),
-									m_iShaderIndex(-1),
+									m_iShaderId(-1),
+									m_pShader(NULL),
 									m_pShaderUniformsRef(NULL),
 									m_uiNumInstances(0),
 									m_uiNumVertices(0),
 									m_uiDataOffset(0)
 {
 }
+
 
 HyRenderState::~HyRenderState(void)
 {
@@ -94,25 +96,28 @@ uint32 HyRenderState::GetAttributeBitFlags() const
 	return m_uiAttributeFlags;
 }
 
-int32 HyRenderState::GetShaderIndex()
+IHyShader *HyRenderState::GetShader()
 {
-	return m_iShaderIndex;
+	return m_pShader;
 }
 
-void HyRenderState::SetShaderIndex(uint32 uiIndex)
+void HyRenderState::SetShader(IHyShader *pShader)
 {
-	m_iShaderIndex = static_cast<int32>(uiIndex);
-	PrimeShaderUniforms();
+	m_pShader = pShader;
+}
+
+void HyRenderState::SetShaderId(int32 iId)
+{
+	m_iShaderId = iId;
 }
 
 HyShaderUniforms *HyRenderState::PrimeShaderUniforms()
 {
-	IHyShader *pShader = IHyRenderer::GetShader(m_iShaderIndex);
-	if(pShader)
-		m_pShaderUniformsRef = pShader->GetUniforms();
-	else
-		m_pShaderUniformsRef = NULL;
+	if(m_pShader == NULL)
+		m_pShader = IHyRenderer::GetShader(m_iShaderId);
 
+	m_pShaderUniformsRef = m_pShader->GetUniforms();
+	
 	return m_pShaderUniformsRef;
 }
 
@@ -128,7 +133,7 @@ void HyRenderState::SetTextureHandle(uint32 uiHandleId)
 
 bool HyRenderState::operator==(const HyRenderState &right) const
 {
-	if((this->m_uiAttributeFlags == right.m_uiAttributeFlags) && (m_uiTextureBindHandle == right.m_uiTextureBindHandle) && (m_iShaderIndex == right.m_iShaderIndex))
+	if((this->m_uiAttributeFlags == right.m_uiAttributeFlags) && (m_uiTextureBindHandle == right.m_uiTextureBindHandle) && (m_pShader == right.m_pShader))
 	{
 		if(m_pShaderUniformsRef->IsDirty())
 			return false;
@@ -148,7 +153,7 @@ bool HyRenderState::operator< (const HyRenderState &right) const
 	if(m_uiAttributeFlags == right.m_uiAttributeFlags)
 	{
 		if(this->m_uiTextureBindHandle == right.m_uiTextureBindHandle)
-			return this->m_iShaderIndex < right.m_iShaderIndex;
+			return this->m_pShader < right.m_pShader;
 		else
 			return (this->m_uiTextureBindHandle < right.m_uiTextureBindHandle);
 	}

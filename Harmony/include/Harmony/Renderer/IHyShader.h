@@ -83,7 +83,7 @@ protected:
 		uint32				uiInstanceDivisor;
 	};
 
-	const uint32					m_uiINDEX;
+	const int32						m_iID;
 
 	HyLoadState						m_eLoadState;
 	std::string						m_sSourceCode[HYNUMSHADERTYPES];
@@ -91,14 +91,15 @@ protected:
 
 	HyShaderUniforms				m_Uniforms;
 
-	IHyShader(uint32 iIndex);
+	IHyShader(int32 iId);
 public:
 	virtual ~IHyShader();
 
-	uint32 GetIndex();
+	int32 GetId();
+	bool IsFinalized();
 	HyShaderUniforms *GetUniforms();
 
-	void SetSourceCode(const char *szSource, HyShaderType eType);
+	void SetSourceCode(std::string sSource, HyShaderType eType);
 	void SetVertexAttribute(const char *szName, HyShaderVariable eVarType, bool bNormalize = false, uint32 uiInstanceDivisor = 0);
 
 	void Finalize();

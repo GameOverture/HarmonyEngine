@@ -12,6 +12,17 @@ NewGame::~NewGame()
 {
 }
 
+const char *szCUSTOM_FRAGMENTSHADER = "								\n\
+#version 400																\n\
+																			\n\
+in vec4 Color;																\n\
+out vec4 FragColor;															\n\
+																			\n\
+void main()																	\n\
+{																			\n\
+	FragColor = Color;														\n\
+}";
+
 /*virtual*/ bool NewGame::Initialize()
 {
 	m_pCam = Window().CreateCamera2d();
@@ -22,7 +33,6 @@ NewGame::~NewGame()
 	m_TestQuad.Load();
 	m_TestQuad.SetTextureSource(0, 100, 100, 500, 500);
 	
-	m_primBox.Load();
 	m_primBox.color.Set(0.0f, 0.0f, 1.0f, 1.0f);
 	m_primBox.SetAsQuad(180.0f, 160.0f, false);
 	m_primBox.SetDisplayOrder(0);
@@ -47,12 +57,13 @@ NewGame::~NewGame()
 	m_VertLine.Load();
 
 
-	IHyShader *pShader_Checkerboard = IHyRenderer::NewCustomShader();
-	char *pShaderSrc = HyReadTextFile("testFrag.glsl", NULL);
-	pShader_Checkerboard->SetSourceCode(pShaderSrc, HYSHADER_Fragment);
-	delete[] pShaderSrc;
+	IHyShader *pShader_Checkerboard = IHyRenderer::GetShader(10);
+	pShader_Checkerboard->SetSourceCode(szCUSTOM_FRAGMENTSHADER, HYSHADER_Fragment);
+	pShader_Checkerboard->SetVertexAttribute("position", HYSHADERVAR_vec4);
+	pShader_Checkerboard->Finalize();
 
-	//m_primBox.SetCustomShader(pShader_Checkerboard);
+	m_primBox.SetCustomShader(pShader_Checkerboard);
+	m_primBox.Load();
 
 	return true;
 }

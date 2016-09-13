@@ -29,7 +29,7 @@ class HyOpenGLShader : public IHyShader
 	bool								m_bLinked;
 
 public:
-	HyOpenGLShader(uint32 uiId);
+	HyOpenGLShader(int32 uiId);
 	virtual HyOpenGLShader::~HyOpenGLShader();
 
 	void CompileFromString(HyShaderType eType);

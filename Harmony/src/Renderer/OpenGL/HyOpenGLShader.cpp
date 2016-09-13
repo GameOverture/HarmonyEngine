@@ -10,7 +10,7 @@
 #include "Renderer/OpenGL/HyOpenGLShader.h"
 #include "Renderer/OpenGL/HyOpenGL.h"
 
-HyOpenGLShader::HyOpenGLShader(uint32 uiId) :	IHyShader(uiId),
+HyOpenGLShader::HyOpenGLShader(int32 uiId) :	IHyShader(uiId),
 												m_hProgHandle(0),
 												m_bLinked(false),
 												m_uiStride(0)

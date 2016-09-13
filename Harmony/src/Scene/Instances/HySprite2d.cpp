@@ -15,7 +15,7 @@ HySprite2d::HySprite2d(const char *szPrefix, const char *szName) :	IHyInst2d(HYI
 																	m_uiCurFrame(0)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
-	m_RenderState.SetShaderIndex(IHyShader::SHADER_QuadBatch);
+	m_RenderState.SetShaderId(IHyShader::SHADER_QuadBatch);
 	m_RenderState.SetNumInstances(1);
 	m_RenderState.SetNumVertices(4);
 }

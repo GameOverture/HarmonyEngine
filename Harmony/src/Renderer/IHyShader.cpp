@@ -283,8 +283,8 @@ void HyShaderUniforms::WriteUniformsBufferData(char *&pRefDataWritePos)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-IHyShader::IHyShader(uint32 iIndex) :	m_uiINDEX(iIndex),
-										m_eLoadState(HYLOADSTATE_Inactive)
+IHyShader::IHyShader(int32 iId) :	m_iID(iId),
+									m_eLoadState(HYLOADSTATE_Inactive)
 {
 }
 
@@ -292,9 +292,14 @@ IHyShader::~IHyShader()
 {
 }
 
-uint32 IHyShader::GetIndex()
+int32 IHyShader::GetId()
 {
-	return m_uiINDEX;
+	return m_iID;
+}
+
+bool IHyShader::IsFinalized()
+{
+	return m_eLoadState != HYLOADSTATE_Inactive;
 }
 
 HyShaderUniforms *IHyShader::GetUniforms()
@@ -302,13 +307,13 @@ HyShaderUniforms *IHyShader::GetUniforms()
 	return &m_Uniforms;
 }
 
-void IHyShader::SetSourceCode(const char *szSource, HyShaderType eType)
+void IHyShader::SetSourceCode(std::string sSource, HyShaderType eType)
 {
-	if(szSource == NULL)
+	if(sSource.empty())
 		return;
 
 	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "HyShader::SetSourceCode() was invoked on a locked shader");
-	m_sSourceCode[eType] = szSource;
+	m_sSourceCode[eType] = sSource;
 }
 
 void IHyShader::SetVertexAttribute(const char *szName, HyShaderVariable eVarType, bool bNormalize /*= false*/, uint32 uiInstanceDivisor /*= 0*/)

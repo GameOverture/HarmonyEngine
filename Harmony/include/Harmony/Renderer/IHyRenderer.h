@@ -22,19 +22,18 @@ struct HyMonitorDeviceInfo;
 class IHyRenderer
 {
 protected:
-	HyGfxComms &				m_GfxCommsRef;
-	vector<HyWindow *> &		m_vWindowRef;
+	HyGfxComms &						m_GfxCommsRef;
+	vector<HyWindow *> &				m_vWindowRef;
 
-	queue<IHyData2d *> *		m_pMsgQueuePtr;		// The pointer to the currently active render message queue
-	queue<IHyData2d *> *		m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
-	char *						m_pDrawBufferPtr;	// The pointer to the currently active draw buffer
+	queue<IHyData2d *> *				m_pMsgQueuePtr;		// The pointer to the currently active render message queue
+	queue<IHyData2d *> *				m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
+	char *								m_pDrawBufferPtr;	// The pointer to the currently active draw buffer
 
-	static vector<IHyShader *>	sm_vShaders;
-	static bool					sm_bShadersDirty;
+	static std::map<int32, IHyShader *>	sm_ShaderMap;
 
-	HyGfxComms::tDrawHeader *	m_pDrawBufferHeader;
-	HyRenderState *				m_pCurRenderState;
-	HyRenderState				m_PrevRenderState;
+	HyGfxComms::tDrawHeader *			m_pDrawBufferHeader;
+	HyRenderState *						m_pCurRenderState;
+	HyRenderState						m_PrevRenderState;
 
 	enum eRenderSurfaceType
 	{
@@ -98,8 +97,8 @@ public:
 	void Draw2d();
 	void SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
 
-	static IHyShader *NewCustomShader();
-	static IHyShader *GetShader(int32 iIndex);
+	static IHyShader *GetShader(int32 iId);
+	static IHyShader *GetShader(const char *szPrefix, const char *szName);
 };
 
 #endif /* __IHyRenderer_h__ */

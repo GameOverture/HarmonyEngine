@@ -11,8 +11,7 @@
 
 #include "Renderer/Viewport/HyWindow.h"
 
-vector<IHyShader *>	IHyRenderer::sm_vShaders;
-bool				IHyRenderer::sm_bShadersDirty = false;
+std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
 
 IHyRenderer::RenderSurface::RenderSurface(eRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight) :	m_eType(eType),
 																																			m_iID(iID),
@@ -44,10 +43,9 @@ IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow *> &vWindowRef
 
 IHyRenderer::~IHyRenderer(void)
 {
-	for(uint32 i = 0; i < static_cast<uint32>(sm_vShaders.size()); ++i)
-		delete sm_vShaders[i];
-
-	sm_vShaders.clear();
+	std::map<int32, IHyShader *>::iterator iter;
+	for(iter = sm_ShaderMap.begin(); iter != sm_ShaderMap.end(); ++iter)
+		delete iter->second;
 }
 
 void IHyRenderer::Update()
@@ -155,22 +153,22 @@ void IHyRenderer::SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info)
 	HyWindow::SetMonitorDeviceInfo(info);
 }
 
-/*static*/ IHyShader *IHyRenderer::NewCustomShader()
+
+/*static*/ IHyShader *IHyRenderer::GetShader(int32 iId)
 {
-	HyAssert(sm_vShaders.size() >= IHyShader::SHADER_CustomStartIndex, "IHyRenderer::NewCustomShader() was invoked before renderer initialized default shaders");
+	HyAssert(sm_ShaderMap.size() >= IHyShader::SHADER_CustomStartIndex, "IHyRenderer::GetShader() was invoked before renderer initialized default shaders");
 
-	IHyShader *pNewShader = HY_NEW HyShaderInterop(IHyShader::SHADER_CustomStartIndex + static_cast<uint32>(sm_vShaders.size()));
-	sm_vShaders.push_back(pNewShader);
+	if(sm_ShaderMap.find(iId) != sm_ShaderMap.end())
+		return sm_ShaderMap[iId];
 
-	sm_bShadersDirty = true;
+	IHyShader *pNewShader = HY_NEW HyShaderInterop(iId);
+	sm_ShaderMap[iId] = pNewShader;
 
 	return pNewShader;
 }
 
-/*static*/ IHyShader *IHyRenderer::GetShader(int32 iIndex)
+/*static*/ IHyShader *IHyRenderer::GetShader(const char *szPrefix, const char *szName)
 {
-	if(iIndex < static_cast<int32>(sm_vShaders.size()) && iIndex >= 0)
-		return sm_vShaders[iIndex];
-	else
-		return NULL;
+	return NULL;
 }
+
