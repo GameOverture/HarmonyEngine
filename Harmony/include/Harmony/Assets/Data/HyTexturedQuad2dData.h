@@ -23,7 +23,7 @@ class HyTexturedQuad2dData : public IHyData2d
 	HyAtlasGroup *		m_pAtlas;
 
 	// Only allow HyFactory instantiate
-	HyTexturedQuad2dData(const std::string &sPath);
+	HyTexturedQuad2dData(const std::string &sPath, int32 iShaderId);
 
 public:
 	virtual ~HyTexturedQuad2dData();

@@ -37,7 +37,7 @@ public:
 
 	HyInstanceType GetType()						{ return m_eType; }
 
-	tData *GetOrCreateData(const std::string &sPrefix, const std::string &sName)
+	tData *GetOrCreateData(const std::string &sPrefix, const std::string &sName, int32 iShaderId)
 	{
 		std::string sPath = m_sDATADIR;
 
@@ -64,7 +64,7 @@ public:
 				return m_vData[i];
 		}
 		
-		tData *pOutData = HY_NEW tData(sPath);
+		tData *pOutData = HY_NEW tData(sPath, iShaderId);
 		m_vData.push_back(pOutData);
 
 		return pOutData;

@@ -12,9 +12,9 @@
 #include "Renderer/IHyRenderer.h"
 #include "Utilities/HyFileIO.h"
 
-HySprite2dData::HySprite2dData(const std::string &sPath) :	IHyData2d(HYINST_Spine2d, sPath),
-															m_pAnimStates(NULL),
-															m_uiNumStates(0)
+HySprite2dData::HySprite2dData(const std::string &sPath, int32 iShaderId) : IHyData2d(HYINST_Spine2d, sPath, iShaderId),
+																			m_pAnimStates(NULL),
+																			m_uiNumStates(0)
 {
 }
 

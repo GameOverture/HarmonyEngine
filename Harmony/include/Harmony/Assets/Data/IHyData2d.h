@@ -19,11 +19,13 @@ class IHyData2d : public IHyData
 {
 	friend class HyAssetManager;
 
+	const int32						m_iSHADER_ID;
+
 	static HyTextures *				sm_pTextures;
 	std::set<HyAtlasGroup *>		m_AssociatedAtlases;
 
 public:
-	IHyData2d(HyInstanceType eInstType, const std::string &sPath);
+	IHyData2d(HyInstanceType eInstType, const std::string &sPath, int32 iShaderId);
 	virtual ~IHyData2d();
 
 	virtual void SetLoadState(HyLoadState eState);

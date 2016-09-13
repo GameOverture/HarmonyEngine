@@ -30,10 +30,10 @@ class HyText2dData : public IHyData2d
 	vector<_texture_font_t *>	m_vFonts;
 
 	// Only allow HyFactory instantiate
-	HyText2dData(const std::string &sPath);
+	HyText2dData(const std::string &sPath, int32 iShaderId);
 
 public:
-	virtual ~HyText2dData(void);
+	virtual ~HyText2dData();
 
 
 	_texture_glyph_t *GetGlyph(uint32 uiFontIndex, wchar_t charcode);

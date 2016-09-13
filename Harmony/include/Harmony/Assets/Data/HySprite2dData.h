@@ -66,10 +66,10 @@ class HySprite2dData : public IHyData2d
 	uint32				m_uiNumStates;
 
 	// Only allow HyFactory instantiate
-	HySprite2dData(const std::string &sPath);
+	HySprite2dData(const std::string &sPath, int32 iShaderId);
 
 public:
-	virtual ~HySprite2dData(void);
+	virtual ~HySprite2dData();
 
 	const HySprite2dFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex);
 
