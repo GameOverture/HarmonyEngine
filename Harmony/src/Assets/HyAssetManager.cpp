@@ -16,6 +16,7 @@
 #include "Assets/Data/HySprite2dData.h"
 #include "Assets/Data/HyText2dData.h"
 #include "Assets/Data/HyTexturedQuad2dData.h"
+#include "Assets/Data/HyPrimitive2dData.h"
 #include "Assets/Data/HyMesh3dData.h"
 
 #include "Utilities/HyMath.h"
@@ -33,12 +34,13 @@ HyAssetManager::HyAssetManager(std::string sDataDirPath, HyGfxComms &gfxCommsRef
 																										m_Txt2d(HYINST_Text2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Fonts]),
 																										m_Mesh3d(HYINST_Mesh3d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Meshes]),
 																										m_Quad2d(HYINST_TexturedQuad2d, ""),
+																										m_Primitive2d(HYINST_Primitive2d, ""),
 																										m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval)
 {
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
 
-	IHyData2d::sm_pTextures = &m_AtlasManager;
+	IHy2dData::sm_pTextures = &m_AtlasManager;
 	IHyInst2d::sm_pAssetManager = this;
 }
 
@@ -78,7 +80,7 @@ void HyAssetManager::Update()
 			if(pData->GetDataType() == HYDATA_2d)
 			{
 				pData->SetLoadState(HYLOADSTATE_Queued);
-				m_GfxCommsRef.SendAtlasGroup(static_cast<IHyData2d *>(pData));
+				m_GfxCommsRef.SendAtlasGroup(static_cast<IHy2dData *>(pData));
 			}
 			else
 				FinalizeData(pData);
@@ -88,11 +90,11 @@ void HyAssetManager::Update()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	// Grab and process any returning IHyData2d's from the Render thread
+	// Grab and process any returning IHy2dData's from the Render thread
 	m_pGfxQueue_Retrieval = m_GfxCommsRef.RetrieveAtlasGroups();
 	while(!m_pGfxQueue_Retrieval->empty())
 	{
-		IHyData2d *pData = m_pGfxQueue_Retrieval->front();
+		IHy2dData *pData = m_pGfxQueue_Retrieval->front();
 		m_pGfxQueue_Retrieval->pop();
 
 		if(pData->GetLoadState() == HYLOADSTATE_ReloadGfx)
@@ -121,6 +123,9 @@ void HyAssetManager::LoadInst2d(IHyInst2d *pInst)
 		break;
 	case HYINST_TexturedQuad2d:
 		pLoadData = m_Quad2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
+		break;
+	case HYINST_Primitive2d:
+		pLoadData = m_Primitive2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
 		break;
 	}
 
@@ -267,7 +272,7 @@ void HyAssetManager::DiscardData(IHyData *pData)
 	pData->SetLoadState(HYLOADSTATE_Discarded);
 
 	if(pData->GetDataType() == HYDATA_2d)
-		m_GfxCommsRef.SendAtlasGroup(static_cast<IHyData2d *>(pData));
+		m_GfxCommsRef.SendAtlasGroup(static_cast<IHy2dData *>(pData));
 	else
 		FinalizeData(pData);
 }

@@ -13,7 +13,7 @@
 #include "Diagnostics/HyGuiComms.h"
 #include "Utilities/HyFileIO.h"
 
-HySpine2dData::HySpine2dData(const std::string &sPath, int32 iShaderId) : IHyData2d(HYINST_Spine2d, sPath, iShaderId)
+HySpine2dData::HySpine2dData(const std::string &sPath, int32 iShaderId) : IHy2dData(HYINST_Spine2d, sPath, iShaderId)
 {
 	
 }

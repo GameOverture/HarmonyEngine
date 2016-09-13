@@ -25,8 +25,8 @@ protected:
 	HyGfxComms &						m_GfxCommsRef;
 	vector<HyWindow *> &				m_vWindowRef;
 
-	queue<IHyData2d *> *				m_pMsgQueuePtr;		// The pointer to the currently active render message queue
-	queue<IHyData2d *> *				m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
+	queue<IHy2dData *> *				m_pMsgQueuePtr;		// The pointer to the currently active render message queue
+	queue<IHy2dData *> *				m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
 	char *								m_pDrawBufferPtr;	// The pointer to the currently active draw buffer
 
 	static int32						sm_iShaderIdCount;

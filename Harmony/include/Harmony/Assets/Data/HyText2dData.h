@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/Data/IHyData2d.h"
+#include "Assets/Data/IHy2dData.h"
 #include "Assets/HyFactory.h"
 
 #include <map>
@@ -23,7 +23,7 @@ struct _texture_glyph_t;
 
 class HyText2d;
 
-class HyText2dData : public IHyData2d
+class HyText2dData : public IHy2dData
 {
 	friend class HyFactory<HyText2dData>;
 

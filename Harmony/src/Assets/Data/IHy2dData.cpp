@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyData2d.cpp
+*	IHy2dData.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2015 Jason Knobler
@@ -7,28 +7,28 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Assets/Data/IHyData2d.h"
+#include "Assets/Data/IHy2dData.h"
 
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/IHyShader.h"
 
-HyTextures *IHyData2d::sm_pTextures = NULL;
+HyTextures *IHy2dData::sm_pTextures = NULL;
 
-IHyData2d::IHyData2d(HyInstanceType eInstType, const std::string &sPath, int32 iShaderId) : IHyData(HYDATA_2d, eInstType, sPath),
+IHy2dData::IHy2dData(HyInstanceType eInstType, const std::string &sPath, int32 iShaderId) : IHyData(HYDATA_2d, eInstType, sPath),
 																							m_iSHADER_ID(iShaderId)
 {
 }
 
-IHyData2d::~IHyData2d()
+IHy2dData::~IHy2dData()
 {
 }
 
-int32 IHyData2d::GetShaderId()
+int32 IHy2dData::GetShaderId()
 {
 	return m_iSHADER_ID;
 }
 
-/*virtual*/ void IHyData2d::SetLoadState(HyLoadState eState)
+/*virtual*/ void IHy2dData::SetLoadState(HyLoadState eState)
 {
 	IHyData::SetLoadState(eState);
 
@@ -44,7 +44,7 @@ int32 IHyData2d::GetShaderId()
 	}
 }
 
-HyAtlasGroup *IHyData2d::RequestTexture(uint32 uiAtlasGroupId)
+HyAtlasGroup *IHy2dData::RequestTexture(uint32 uiAtlasGroupId)
 {
 	HyAtlasGroup *pAtlasGrp = sm_pTextures->RequestTexture(uiAtlasGroupId);
 	m_AssociatedAtlases.insert(pAtlasGrp);
@@ -52,18 +52,18 @@ HyAtlasGroup *IHyData2d::RequestTexture(uint32 uiAtlasGroupId)
 	return pAtlasGrp;
 }
 
-const std::set<HyAtlasGroup *> &IHyData2d::GetAssociatedAtlases()
+const std::set<HyAtlasGroup *> &IHy2dData::GetAssociatedAtlases()
 {
 	return m_AssociatedAtlases;
 }
 
-/*virtual*/ void IHyData2d::OnLoadThread()
+/*virtual*/ void IHy2dData::OnLoadThread()
 {
 	IHyShader *pShader = IHyRenderer::FindShader(m_iSHADER_ID);
-	HyAssert(pShader, "IHyData2d::OnLoadThread could not find a valid shader");
+	HyAssert(pShader, "IHy2dData::OnLoadThread could not find a valid shader");
 
 	pShader->OnLoadThread();
-	HyAssert(pShader->IsFinalized(), "IHyData2d::OnLoadThread processed an non-finalized shader");
+	HyAssert(pShader->IsFinalized(), "IHy2dData::OnLoadThread processed an non-finalized shader");
 
 	IHyData::OnLoadThread();
 }

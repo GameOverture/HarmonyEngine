@@ -11,7 +11,7 @@
 #define __HyEnt2dData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Data/IHyData2d.h"
+#include "Assets/Data/IHy2dData.h"
 #include "Assets/HyFactory.h"
 
 #include "spine/spine.h"
@@ -20,7 +20,7 @@
 class HyAtlasGroupData;
 class IGfxApi;
 
-class HySpine2dData : public IHyData2d
+class HySpine2dData : public IHy2dData
 {
 	friend class HyFactory<HySpine2dData>;
 

@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyData2d.h
+*	IHy2dData.h
 *
 *	Harmony Engine
 *	Copyright (c) 2013 Jason Knobler
@@ -15,7 +15,7 @@
 #include "Assets/Data/IHyData.h"
 #include "Assets/HyTextures.h"
 
-class IHyData2d : public IHyData
+class IHy2dData : public IHyData
 {
 	friend class HyAssetManager;
 
@@ -25,8 +25,8 @@ class IHyData2d : public IHyData
 	std::set<HyAtlasGroup *>		m_AssociatedAtlases;
 
 public:
-	IHyData2d(HyInstanceType eInstType, const std::string &sPath, int32 iShaderId);
-	virtual ~IHyData2d();
+	IHy2dData(HyInstanceType eInstType, const std::string &sPath, int32 iShaderId);
+	virtual ~IHy2dData();
 
 	int32 GetShaderId();
 
@@ -35,9 +35,8 @@ public:
 	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId);
 	const std::set<HyAtlasGroup *> &GetAssociatedAtlases();
 
-	virtual void OnLoadThread();
-
 	// Only invoked on the Load thread
+	virtual void OnLoadThread();
 	virtual void DoFileLoad() = 0;
 };
 

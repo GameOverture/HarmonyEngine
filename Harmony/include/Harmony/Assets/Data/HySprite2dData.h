@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/Data/IHyData2d.h"
+#include "Assets/Data/IHy2dData.h"
 #include "Assets/HyFactory.h"
 #include "Assets/HyTextures.h"
 
@@ -42,7 +42,7 @@ struct HySprite2dFrame
 	{ }
 };
 
-class HySprite2dData : public IHyData2d
+class HySprite2dData : public IHy2dData
 {
 	friend class HyFactory<HySprite2dData>;
 

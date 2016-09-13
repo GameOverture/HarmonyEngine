@@ -12,7 +12,7 @@
 #include "Renderer/IHyRenderer.h"
 #include "freetype-gl/freetype-gl.h"
 
-HyText2dData::HyText2dData(const std::string &sPath, int32 iShaderId) : IHyData2d(HYINST_Text2d, sPath, iShaderId)
+HyText2dData::HyText2dData(const std::string &sPath, int32 iShaderId) : IHy2dData(HYINST_Text2d, sPath, iShaderId)
 {
 }
 

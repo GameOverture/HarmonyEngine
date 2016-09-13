@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/Data/IHyData2d.h"
+#include "Assets/Data/IHy2dData.h"
 #include "Threading/BasicSync.h"
 
 #include <vector>
@@ -51,13 +51,13 @@ private:
 	char *						m_pBuffer_Shared;
 	char *						m_pBuffer_Render;
 
-	queue<IHyData2d *> *		m_pAtlasSendQueue_Update;
-	queue<IHyData2d *> *		m_pAtlasSendQueue_Shared;
-	queue<IHyData2d *> *		m_pAtlasSendQueue_Render;
+	queue<IHy2dData *> *		m_pAtlasSendQueue_Update;
+	queue<IHy2dData *> *		m_pAtlasSendQueue_Shared;
+	queue<IHy2dData *> *		m_pAtlasSendQueue_Render;
 
-	queue<IHyData2d *> *		m_pAtlasReceiveQueue_Update;
-	queue<IHyData2d *> *		m_pAtlasReceiveQueue_Shared;
-	queue<IHyData2d *> *		m_pAtlasReceiveQueue_Render;
+	queue<IHy2dData *> *		m_pAtlasReceiveQueue_Update;
+	queue<IHy2dData *> *		m_pAtlasReceiveQueue_Shared;
+	queue<IHy2dData *> *		m_pAtlasReceiveQueue_Render;
 
 	BasicSection				m_csBuffers;
 
@@ -69,16 +69,16 @@ public:
 	inline char *GetWriteBufferPtr()		{ return m_pBuffer_Update; }
 
 	// This should only be invoked from the Update/Game thread
-	void SendAtlasGroup(IHyData2d *pAtlasGrp)	{ m_pAtlasSendQueue_Update->push(pAtlasGrp); }
+	void SendAtlasGroup(IHy2dData *pAtlasGrp)	{ m_pAtlasSendQueue_Update->push(pAtlasGrp); }
 
 	// This should only be invoked from the Update/Game thread
-	queue<IHyData2d *> *RetrieveAtlasGroups()	{ return m_pAtlasReceiveQueue_Update; }
+	queue<IHy2dData *> *RetrieveAtlasGroups()	{ return m_pAtlasReceiveQueue_Update; }
 
 	// This should only be invoked from the Update/Game thread
 	void Update_SetSharedPtrs();
 
 	// This should only be invoked from the Render thread
-	bool Render_GetSharedPtrs(queue<IHyData2d *> *&pMsgQueuePtr, queue<IHyData2d *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr);
+	bool Render_GetSharedPtrs(queue<IHy2dData *> *&pMsgQueuePtr, queue<IHy2dData *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr);
 };
 
 #endif /* __HyGfxBuffers_h__ */

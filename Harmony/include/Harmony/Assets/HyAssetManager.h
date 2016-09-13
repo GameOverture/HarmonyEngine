@@ -26,12 +26,13 @@ using std::queue;
 class IHyInst2d;
 
 class IHyData;
-class IHyData2d;
+class IHy2dData;
 class HySfxData;
 class HySprite2dData;
 class HySpine2dData;
 class HyText2dData;
 class HyTexturedQuad2dData;
+class HyPrimitive2dData;
 class HyMesh3dData;
 
 class HyAssetManager
@@ -91,6 +92,7 @@ class HyAssetManager
 	HyFactory<HyMesh3dData>								m_Mesh3d;
 	HyFactory<HyText2dData>								m_Txt2d;
 	HyFactory<HyTexturedQuad2dData>						m_Quad2d;
+	HyFactory<HyPrimitive2dData>						m_Primitive2d;
 
 	HyTextures											m_AtlasManager;
 
@@ -99,7 +101,7 @@ class HyAssetManager
 	queue<IHyData *>									m_LoadQueue_Shared;
 	queue<IHyData *>									m_LoadQueue_Retrieval;
 
-	queue<IHyData2d *> *								m_pGfxQueue_Retrieval;
+	queue<IHy2dData *> *								m_pGfxQueue_Retrieval;
 
 	// Loading thread info pointer
 	ThreadInfoPtr										m_pLoadingThread;
