@@ -8,7 +8,6 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGL.h"
-#include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
 
 HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyWindow *> &viewportsRef) :	IHyRenderer(gfxCommsRef, viewportsRef),
 																				m_mtxView(1.0f)
@@ -95,7 +94,7 @@ HyOpenGL::~HyOpenGL(void)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(renderState.GetShader());
+	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_ShaderMap[renderState.GetShaderId()]);
 	pShader->Use();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -348,35 +347,15 @@ bool HyOpenGL::Initialize()
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 
 	// Quad batch //////////////////////////////////////////////////////////////////////////
-	HyOpenGLShader *pShaderQuadBatch = HY_NEW HyOpenGLShader(IHyShader::SHADER_QuadBatch);
-	sm_ShaderMap[IHyShader::SHADER_QuadBatch] = pShaderQuadBatch;
-
-	pShaderQuadBatch->SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
-	pShaderQuadBatch->SetVertexAttribute("size", HYSHADERVAR_vec2, false, 1);
-	pShaderQuadBatch->SetVertexAttribute("offset", HYSHADERVAR_vec2, false, 1);
-	pShaderQuadBatch->SetVertexAttribute("tint", HYSHADERVAR_vec4, false, 1);
-	pShaderQuadBatch->SetVertexAttribute("textureIndex", HYSHADERVAR_float, false, 1);
-	pShaderQuadBatch->SetVertexAttribute("UVcoord0", HYSHADERVAR_vec2, false, 1);
-	pShaderQuadBatch->SetVertexAttribute("UVcoord1", HYSHADERVAR_vec2, false, 1);
-	pShaderQuadBatch->SetVertexAttribute("UVcoord2", HYSHADERVAR_vec2, false, 1);
-	pShaderQuadBatch->SetVertexAttribute("UVcoord3", HYSHADERVAR_vec2, false, 1);
-	pShaderQuadBatch->SetVertexAttribute("mtxLocalToWorld", HYSHADERVAR_mat4, false, 1);
-
-	pShaderQuadBatch->SetSourceCode(szHYQUADBATCH_FRAGMENTSHADER, HYSHADER_Fragment);
-
-	pShaderQuadBatch->Finalize();
+	HyOpenGLShader *pShaderQuadBatch = HY_NEW HyOpenGLShader(HYSHADERPROG_QuadBatch);
+	sm_ShaderMap[HYSHADERPROG_QuadBatch] = pShaderQuadBatch;
+	pShaderQuadBatch->Finalize(HYSHADERPROG_QuadBatch);
 	pShaderQuadBatch->OnRenderThread(*this);
 
 	// Primitive //////////////////////////////////////////////////////////////////////////
-	HyOpenGLShader *pShaderPrimitive = HY_NEW HyOpenGLShader(IHyShader::SHADER_Primitive);
-	sm_ShaderMap[IHyShader::SHADER_Primitive] = pShaderPrimitive;
-
-	pShaderPrimitive->SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);
-	pShaderPrimitive->SetVertexAttribute("position", HYSHADERVAR_vec4);
-
-	pShaderPrimitive->SetSourceCode(szHYPRIMATIVE_FRAGMENTSHADER, HYSHADER_Fragment);
-
-	pShaderPrimitive->Finalize();
+	HyOpenGLShader *pShaderPrimitive = HY_NEW HyOpenGLShader(HYSHADERPROG_Primitive);
+	sm_ShaderMap[HYSHADERPROG_Primitive] = pShaderPrimitive;
+	pShaderPrimitive->Finalize(HYSHADERPROG_Primitive);
 	pShaderPrimitive->OnRenderThread(*this);
 
 	//const float fUnitQuadVertPos[16] = {

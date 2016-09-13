@@ -111,16 +111,16 @@ void HyAssetManager::LoadInst2d(IHyInst2d *pInst)
 	switch(pInst->GetInstType())
 	{
 	case HYINST_Sprite2d:
-		pLoadData = m_Sprite2d.GetOrCreateData(pInst->GetPrefix(), pInst->GetName());
+		pLoadData = m_Sprite2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
 		break;
 	case HYINST_Spine2d:
-		pLoadData = m_Spine2d.GetOrCreateData(pInst->GetPrefix(), pInst->GetName());
+		pLoadData = m_Spine2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
 		break;
 	case HYINST_Text2d:
-		pLoadData = m_Txt2d.GetOrCreateData(pInst->GetPrefix(), pInst->GetName());
+		pLoadData = m_Txt2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
 		break;
 	case HYINST_TexturedQuad2d:
-		pLoadData = m_Quad2d.GetOrCreateData(pInst->GetPrefix(), pInst->GetName());
+		pLoadData = m_Quad2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
 		break;
 	}
 
@@ -298,7 +298,7 @@ void HyAssetManager::DiscardData(IHyData *pData)
 
 		// Load everything that is enqueued (outside of any critical section)
 		for(uint32 i = 0; i < vCurLoadData.size(); ++i)
-			vCurLoadData[i]->DoFileLoad();
+			vCurLoadData[i]->OnLoadThread();
 
 		// Copy all the (loaded) IData ptrs to the retrieval vector
 		pLoadingCtrl->m_csRetrievalQueue.Lock();

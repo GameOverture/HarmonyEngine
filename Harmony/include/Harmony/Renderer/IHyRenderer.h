@@ -29,6 +29,7 @@ protected:
 	queue<IHyData2d *> *				m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
 	char *								m_pDrawBufferPtr;	// The pointer to the currently active draw buffer
 
+	static int32						sm_iShaderIdCount;
 	static std::map<int32, IHyShader *>	sm_ShaderMap;
 
 	HyGfxComms::tDrawHeader *			m_pDrawBufferHeader;
@@ -97,8 +98,9 @@ public:
 	void Draw2d();
 	void SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
 
-	static IHyShader *GetShader(int32 iId);
-	static IHyShader *GetShader(const char *szPrefix, const char *szName);
+	static IHyShader *FindShader(int32 iId);
+	static IHyShader *MakeCustomShader();
+	static IHyShader *MakeCustomShader(const char *szPrefix, const char *szName);
 };
 
 #endif /* __IHyRenderer_h__ */

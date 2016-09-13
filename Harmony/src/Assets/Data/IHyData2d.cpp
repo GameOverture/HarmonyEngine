@@ -9,6 +9,9 @@
 *************************************************************************/
 #include "Assets/Data/IHyData2d.h"
 
+#include "Renderer/IHyRenderer.h"
+#include "Renderer/IHyShader.h"
+
 HyTextures *IHyData2d::sm_pTextures = NULL;
 
 IHyData2d::IHyData2d(HyInstanceType eInstType, const std::string &sPath, int32 iShaderId) : IHyData(HYDATA_2d, eInstType, sPath),
@@ -18,6 +21,11 @@ IHyData2d::IHyData2d(HyInstanceType eInstType, const std::string &sPath, int32 i
 
 IHyData2d::~IHyData2d()
 {
+}
+
+int32 IHyData2d::GetShaderId()
+{
+	return m_iSHADER_ID;
 }
 
 /*virtual*/ void IHyData2d::SetLoadState(HyLoadState eState)
@@ -47,4 +55,15 @@ HyAtlasGroup *IHyData2d::RequestTexture(uint32 uiAtlasGroupId)
 const std::set<HyAtlasGroup *> &IHyData2d::GetAssociatedAtlases()
 {
 	return m_AssociatedAtlases;
+}
+
+/*virtual*/ void IHyData2d::OnLoadThread()
+{
+	IHyShader *pShader = IHyRenderer::FindShader(m_iSHADER_ID);
+	HyAssert(pShader, "IHyData2d::OnLoadThread could not find a valid shader");
+
+	pShader->OnLoadThread();
+	HyAssert(pShader->IsFinalized(), "IHyData2d::OnLoadThread processed an non-finalized shader");
+
+	IHyData::OnLoadThread();
 }

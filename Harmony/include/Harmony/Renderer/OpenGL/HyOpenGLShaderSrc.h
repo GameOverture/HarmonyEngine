@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-const char *szHYQUADBATCH_VERTEXSHADER = "									\n\
+const char * const szHYQUADBATCH_VERTEXSHADER = "							\n\
 #version 420																\n\
 																			\n\
 layout(location = 0) in vec2 size;											\n\
@@ -73,7 +73,7 @@ void main()																	\n\
 	gl_Position = mtxCameraToClip * pos;									\n\
 }";
 
-const char *szHYQUADBATCH_FRAGMENTSHADER = "								\n\
+const char * const szHYQUADBATCH_FRAGMENTSHADER = "							\n\
 #version 420																\n\
 																			\n\
 smooth in vec4 interpColor;													\n\
@@ -92,7 +92,7 @@ void main()																	\n\
 	outputColor = interpColor * texelClr;									\n\
 }";
 
-const char *szHYPRIMATIVE_VERTEXSHADER = "									\n\
+const char * const szHYPRIMATIVE_VERTEXSHADER = "							\n\
 #version 400																\n\
 																			\n\
 layout(location = 0) in vec4 position;										\n\
@@ -113,7 +113,7 @@ void main()																	\n\
 	gl_Position = mtxCameraToClip * temp;									\n\
 }";
 
-const char *szHYPRIMATIVE_FRAGMENTSHADER = "								\n\
+const char * const szHYPRIMATIVE_FRAGMENTSHADER = "							\n\
 #version 400																\n\
 																			\n\
 in vec4 Color;																\n\

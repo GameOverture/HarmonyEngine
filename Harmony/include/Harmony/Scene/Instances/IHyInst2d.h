@@ -77,6 +77,7 @@ public:
 	inline int64 GetTag()										{ return m_iTag; }
 	inline void SetTag(int64 iTag)								{ m_iTag = iTag; }
 
+	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);
 
 	void Load();

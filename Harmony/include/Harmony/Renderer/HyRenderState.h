@@ -41,7 +41,6 @@ private:
 	uint32				m_uiTextureBindHandle;
 
 	int32				m_iShaderId;
-	IHyShader *			m_pShader;
 	HyShaderUniforms *	m_pShaderUniformsRef;
 
 	uint32				m_uiNumInstances;
@@ -71,8 +70,7 @@ public:
 	bool IsEnabled(eAttributes eAttrib);
 	uint32 GetAttributeBitFlags() const;
 
-	IHyShader *GetShader();
-	void SetShader(IHyShader *pShader);
+	int32 GetShaderId();
 	void SetShaderId(int32 iId);
 	HyShaderUniforms *PrimeShaderUniforms();
 

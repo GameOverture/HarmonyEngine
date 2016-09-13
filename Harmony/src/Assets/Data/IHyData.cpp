@@ -60,3 +60,8 @@ int32 IHyData::GetRefCount()
 {
 	return m_iRefCount;
 }
+
+/*virtual*/ void IHyData::OnLoadThread()
+{
+	DoFileLoad();
+}

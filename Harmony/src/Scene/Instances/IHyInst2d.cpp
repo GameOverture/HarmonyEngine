@@ -38,12 +38,18 @@ IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char 
 	Unload();
 }
 
+int32 IHyInst2d::GetShaderId()
+{
+	return m_RenderState.GetShaderId();
+}
+
 void IHyInst2d::SetCustomShader(IHyShader *pShader)
 {
 	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyInst2d::SetCustomShader was used on an already loaded instance");
 	HyAssert(pShader->IsFinalized(), "IHyInst2d::SetCustomShader tried to set a non-finalized shader");
 
-	m_RenderState.SetShader(pShader);}
+	m_RenderState.SetShaderId(pShader->GetId());
+}
 
 void IHyInst2d::Load()
 {

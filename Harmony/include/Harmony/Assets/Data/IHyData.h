@@ -43,6 +43,8 @@ public:
 	void IncRef();
 	bool DecRef();
 	int32 GetRefCount();
+
+	virtual void OnLoadThread();
 	
 	// Only invoked on the Load thread
 	virtual void DoFileLoad() = 0;

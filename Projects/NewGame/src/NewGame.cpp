@@ -12,6 +12,28 @@ NewGame::~NewGame()
 {
 }
 
+const char *szCUSTOM_VERTEXSHADER = "									\n\
+#version 400																\n\
+																			\n\
+layout(location = 0) in vec4 position;										\n\
+																			\n\
+out vec4 Color;																\n\
+																			\n\
+uniform mat4 transformMtx;													\n\
+uniform mat4 mtxCameraToClip;												\n\
+uniform mat4 mtxWorldToCamera;												\n\
+uniform vec4 primitiveColor;												\n\
+																			\n\
+void main()																	\n\
+{																			\n\
+	Color = primitiveColor;													\n\
+																			\n\
+	vec4 temp = transformMtx * position;									\n\
+	temp = mtxWorldToCamera * temp;											\n\
+	gl_Position = mtxCameraToClip * temp;									\n\
+}";
+
+
 const char *szCUSTOM_FRAGMENTSHADER = "								\n\
 #version 400																\n\
 																			\n\
@@ -57,10 +79,13 @@ void main()																	\n\
 	m_VertLine.Load();
 
 
-	IHyShader *pShader_Checkerboard = IHyRenderer::GetShader(10);
+	IHyShader *pShader_Checkerboard = IHyRenderer::MakeCustomShader();
+	//pShader_Checkerboard->SetSourceCode(szCUSTOM_VERTEXSHADER, HYSHADER_Vertex);
+	//pShader_Checkerboard->SetVertexAttribute("position", HYSHADERVAR_vec4);
 	pShader_Checkerboard->SetSourceCode(szCUSTOM_FRAGMENTSHADER, HYSHADER_Fragment);
-	pShader_Checkerboard->SetVertexAttribute("position", HYSHADERVAR_vec4);
-	pShader_Checkerboard->Finalize();
+	pShader_Checkerboard->Finalize(HYSHADERPROG_Primitive);
+	
+	//pShader_Checkerboard->OnRenderThread(
 
 	m_primBox.SetCustomShader(pShader_Checkerboard);
 	m_primBox.Load();

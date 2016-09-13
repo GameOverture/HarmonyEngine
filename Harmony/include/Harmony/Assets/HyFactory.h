@@ -37,7 +37,7 @@ public:
 
 	HyInstanceType GetType()						{ return m_eType; }
 
-	tData *GetOrCreateData(const std::string &sPrefix, const std::string &sName, int32 iShaderId)
+	tData *GetOrCreateData2d(const std::string &sPrefix, const std::string &sName, int32 iShaderId)
 	{
 		std::string sPath = m_sDATADIR;
 
@@ -60,7 +60,7 @@ public:
 		size_t uiNumDatas = m_vData.size();
 		for(size_t i = 0; i < uiNumDatas; ++i)
 		{
-			if(m_vData[i]->GetPath() == sPath)
+			if(m_vData[i]->GetPath() == sPath && m_vData[i]->GetShaderId() == iShaderId)
 				return m_vData[i];
 		}
 		

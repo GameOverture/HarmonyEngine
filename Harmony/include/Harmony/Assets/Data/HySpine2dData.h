@@ -28,7 +28,7 @@ class HySpine2dData : public IHyData2d
 	spSkeletonData *		m_SpineSkeletonData;
 
 	// Only allow HyFactory instantiate
-	HySpine2dData(const std::string &sPath);
+	HySpine2dData(const std::string &sPath, int32 iShaderId);
 
 public:
 	virtual ~HySpine2dData();

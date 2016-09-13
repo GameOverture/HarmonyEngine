@@ -9,10 +9,14 @@
 *************************************************************************/
 #include "Renderer/IHyShader.h"
 #include "Utilities/Crc32.h"
+#include "Utilities/HyStrManip.h"
+
+#include "Afx/HyInteropAfx.h"
 
 HyShaderUniforms::HyShaderUniforms() :	m_bDirty(true),
 										m_uiCrc32(0)
-{ }
+{
+}
 
 HyShaderUniforms::~HyShaderUniforms()
 {
@@ -284,8 +288,18 @@ void HyShaderUniforms::WriteUniformsBufferData(char *&pRefDataWritePos)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 IHyShader::IHyShader(int32 iId) :	m_iID(iId),
+									m_sOPTIONAL_LOAD_PATH(""),
 									m_eLoadState(HYLOADSTATE_Inactive)
 {
+	for(int i = 0; i < HYNUMSHADERTYPES; ++i)
+		m_sSourceCode[i].clear();
+}
+IHyShader::IHyShader(int32 iId, std::string sPrefix, std::string sName) :	m_iID(iId),
+																			m_sOPTIONAL_LOAD_PATH(MakeStringProperPath(std::string(sPrefix + "/" + sName).c_str(), ".hyglsl", false)),
+																			m_eLoadState(HYLOADSTATE_Inactive)
+{
+	for(int i = 0; i < HYNUMSHADERTYPES; ++i)
+		m_sSourceCode[i].clear();
 }
 
 IHyShader::~IHyShader()
@@ -332,7 +346,57 @@ void IHyShader::SetVertexAttribute(const char *szName, HyShaderVariable eVarType
 	m_vVertexAttributes.push_back(vertAttrib);
 }
 
-void IHyShader::Finalize()
+void IHyShader::Finalize(HyShaderProgram eDefaultsFrom)
 {
+	// If unassigned vertex shader, fill in defaults
+	if(m_sSourceCode[HYSHADER_Vertex].empty())
+	{
+		m_vVertexAttributes.clear();
+
+		switch(eDefaultsFrom)
+		{
+		case HYSHADERPROG_QuadBatch:
+			SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
+			SetVertexAttribute("size", HYSHADERVAR_vec2, false, 1);
+			SetVertexAttribute("offset", HYSHADERVAR_vec2, false, 1);
+			SetVertexAttribute("tint", HYSHADERVAR_vec4, false, 1);
+			SetVertexAttribute("textureIndex", HYSHADERVAR_float, false, 1);
+			SetVertexAttribute("UVcoord0", HYSHADERVAR_vec2, false, 1);
+			SetVertexAttribute("UVcoord1", HYSHADERVAR_vec2, false, 1);
+			SetVertexAttribute("UVcoord2", HYSHADERVAR_vec2, false, 1);
+			SetVertexAttribute("UVcoord3", HYSHADERVAR_vec2, false, 1);
+			SetVertexAttribute("mtxLocalToWorld", HYSHADERVAR_mat4, false, 1);
+			break;
+
+		case HYSHADERPROG_Primitive:
+			SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);
+			SetVertexAttribute("position", HYSHADERVAR_vec4);
+			break;
+		}
+	}
+
+	// If unassigned fragment shader, fill in defaults
+	if(m_sSourceCode[HYSHADER_Fragment].empty())
+	{
+		switch(eDefaultsFrom)
+		{
+		case HYSHADERPROG_QuadBatch:
+			SetSourceCode(szHYQUADBATCH_FRAGMENTSHADER, HYSHADER_Fragment);
+			break;
+
+		case HYSHADERPROG_Primitive:
+			SetSourceCode(szHYPRIMATIVE_FRAGMENTSHADER, HYSHADER_Fragment);
+			break;
+		}
+	}
+
 	m_eLoadState = HYLOADSTATE_Queued;
+}
+
+void IHyShader::OnLoadThread()
+{
+	if(m_sOPTIONAL_LOAD_PATH.empty())
+		return;
+
+	HyError("IHyShader::OnLoadThread not implemented. Need to parse hy shader file and get setup shader source and vertex attribs");
 }

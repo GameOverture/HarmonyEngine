@@ -12,6 +12,7 @@
 #include "Renderer/Viewport/HyWindow.h"
 
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
+int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 
 IHyRenderer::RenderSurface::RenderSurface(eRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight) :	m_eType(eType),
 																																			m_iID(iID),
@@ -153,22 +154,28 @@ void IHyRenderer::SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info)
 	HyWindow::SetMonitorDeviceInfo(info);
 }
 
-
-/*static*/ IHyShader *IHyRenderer::GetShader(int32 iId)
+/*static*/ IHyShader *IHyRenderer::FindShader(int32 iId)
 {
-	HyAssert(sm_ShaderMap.size() >= IHyShader::SHADER_CustomStartIndex, "IHyRenderer::GetShader() was invoked before renderer initialized default shaders");
-
 	if(sm_ShaderMap.find(iId) != sm_ShaderMap.end())
 		return sm_ShaderMap[iId];
+	else
+		return NULL;
+}
 
-	IHyShader *pNewShader = HY_NEW HyShaderInterop(iId);
-	sm_ShaderMap[iId] = pNewShader;
+/*static*/ IHyShader *IHyRenderer::MakeCustomShader()
+{
+	IHyShader *pNewShader = HY_NEW HyShaderInterop(sm_iShaderIdCount);
+	sm_ShaderMap[sm_iShaderIdCount] = pNewShader;
 
+	sm_iShaderIdCount++;
 	return pNewShader;
 }
 
-/*static*/ IHyShader *IHyRenderer::GetShader(const char *szPrefix, const char *szName)
+/*static*/ IHyShader *IHyRenderer::MakeCustomShader(const char *szPrefix, const char *szName)
 {
-	return NULL;
-}
+	IHyShader *pNewShader = HY_NEW HyShaderInterop(sm_iShaderIdCount, szPrefix, szName);
+	sm_ShaderMap[sm_iShaderIdCount] = pNewShader;
 
+	sm_iShaderIdCount++;
+	return pNewShader;
+}

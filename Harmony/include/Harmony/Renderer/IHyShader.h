@@ -65,15 +65,9 @@ public:
 
 class IHyShader
 {
-public:
-	enum eShaderProgram
-	{
-		SHADER_QuadBatch = 0,
-		SHADER_Primitive,
-
-		SHADER_CustomStartIndex
-	};
 protected:
+	const int32						m_iID;
+	const std::string				m_sOPTIONAL_LOAD_PATH;
 
 	struct VertexAttribute
 	{
@@ -83,8 +77,6 @@ protected:
 		uint32				uiInstanceDivisor;
 	};
 
-	const int32						m_iID;
-
 	HyLoadState						m_eLoadState;
 	std::string						m_sSourceCode[HYNUMSHADERTYPES];
 	std::vector<VertexAttribute>	m_vVertexAttributes;
@@ -92,6 +84,7 @@ protected:
 	HyShaderUniforms				m_Uniforms;
 
 	IHyShader(int32 iId);
+	IHyShader(int32 iId, std::string sPrefix, std::string sName);
 public:
 	virtual ~IHyShader();
 
@@ -102,8 +95,9 @@ public:
 	void SetSourceCode(std::string sSource, HyShaderType eType);
 	void SetVertexAttribute(const char *szName, HyShaderVariable eVarType, bool bNormalize = false, uint32 uiInstanceDivisor = 0);
 
-	void Finalize();
+	void Finalize(HyShaderProgram eDefaultsFrom);
 
+	void OnLoadThread();
 	virtual void OnRenderThread(IHyRenderer &rendererRef) = 0;
 };
 

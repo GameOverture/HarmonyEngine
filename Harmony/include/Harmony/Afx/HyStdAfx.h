@@ -29,9 +29,7 @@ enum HyInstanceType
 	HYINST_TexturedQuad2d,
 	HYINST_Primitive2d,
 	HYINST_Text2d,
-	HYINST_Mesh3d,
-
-	HYINST_Shader
+	HYINST_Mesh3d
 };
 
 enum HyAnimCtrl
@@ -60,6 +58,14 @@ enum HyLoadState
 	HYLOADSTATE_Loaded,
 	HYLOADSTATE_Discarded,
 	HYLOADSTATE_ReloadGfx
+};
+
+enum HyShaderProgram
+{
+	HYSHADERPROG_QuadBatch = 0,
+	HYSHADERPROG_Primitive,
+
+	HYSHADERPROG_CustomStartIndex
 };
 
 enum HyShaderType

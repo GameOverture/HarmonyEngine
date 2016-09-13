@@ -15,7 +15,6 @@
 HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
 									m_uiTextureBindHandle(0),
 									m_iShaderId(-1),
-									m_pShader(NULL),
 									m_pShaderUniformsRef(NULL),
 									m_uiNumInstances(0),
 									m_uiNumVertices(0),
@@ -96,14 +95,9 @@ uint32 HyRenderState::GetAttributeBitFlags() const
 	return m_uiAttributeFlags;
 }
 
-IHyShader *HyRenderState::GetShader()
+int32 HyRenderState::GetShaderId()
 {
-	return m_pShader;
-}
-
-void HyRenderState::SetShader(IHyShader *pShader)
-{
-	m_pShader = pShader;
+	return m_iShaderId;
 }
 
 void HyRenderState::SetShaderId(int32 iId)
@@ -113,10 +107,10 @@ void HyRenderState::SetShaderId(int32 iId)
 
 HyShaderUniforms *HyRenderState::PrimeShaderUniforms()
 {
-	if(m_pShader == NULL)
-		m_pShader = IHyRenderer::GetShader(m_iShaderId);
+	IHyShader *pShader = IHyRenderer::FindShader(m_iShaderId);
+	HyAssert(pShader, "HyRenderState::PrimeShaderUniforms could not find a valid shader");
 
-	m_pShaderUniformsRef = m_pShader->GetUniforms();
+	m_pShaderUniformsRef = pShader->GetUniforms();
 	
 	return m_pShaderUniformsRef;
 }
@@ -133,7 +127,7 @@ void HyRenderState::SetTextureHandle(uint32 uiHandleId)
 
 bool HyRenderState::operator==(const HyRenderState &right) const
 {
-	if((this->m_uiAttributeFlags == right.m_uiAttributeFlags) && (m_uiTextureBindHandle == right.m_uiTextureBindHandle) && (m_pShader == right.m_pShader))
+	if((this->m_uiAttributeFlags == right.m_uiAttributeFlags) && (m_uiTextureBindHandle == right.m_uiTextureBindHandle) && (m_iShaderId == right.m_iShaderId))
 	{
 		if(m_pShaderUniformsRef->IsDirty())
 			return false;
@@ -153,7 +147,7 @@ bool HyRenderState::operator< (const HyRenderState &right) const
 	if(m_uiAttributeFlags == right.m_uiAttributeFlags)
 	{
 		if(this->m_uiTextureBindHandle == right.m_uiTextureBindHandle)
-			return this->m_pShader < right.m_pShader;
+			return this->m_iShaderId < right.m_iShaderId;
 		else
 			return (this->m_uiTextureBindHandle < right.m_uiTextureBindHandle);
 	}

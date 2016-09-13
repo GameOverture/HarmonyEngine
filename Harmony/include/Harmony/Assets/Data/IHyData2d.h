@@ -28,10 +28,14 @@ public:
 	IHyData2d(HyInstanceType eInstType, const std::string &sPath, int32 iShaderId);
 	virtual ~IHyData2d();
 
+	int32 GetShaderId();
+
 	virtual void SetLoadState(HyLoadState eState);
 
 	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId);
 	const std::set<HyAtlasGroup *> &GetAssociatedAtlases();
+
+	virtual void OnLoadThread();
 
 	// Only invoked on the Load thread
 	virtual void DoFileLoad() = 0;
