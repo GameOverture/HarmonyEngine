@@ -18,6 +18,7 @@
 
 class HySpine2d : public IHyInst2d
 {
+protected:
 	spSkeleton*				m_pSpineSkeleton;
 	spAnimation **			m_ppSpineAnims;
 	uint32					m_uiNumAnims;

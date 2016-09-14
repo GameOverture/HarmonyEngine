@@ -18,6 +18,7 @@ class HyAtlasGroupData;
 
 class HyPrimitive2d : public IHyInst2d
 {
+protected:
 	glm::vec4 *		m_pVertices;
 
 public:

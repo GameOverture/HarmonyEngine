@@ -19,6 +19,7 @@
 
 class HySprite2d : public IHyInst2d
 {
+protected:
 	// Array of BYTE's where each BYTE describes how each animation state is supposed to play
 	enum eStateAttribs
 	{

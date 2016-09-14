@@ -17,6 +17,7 @@
 
 class HyTexturedQuad2d : public IHyInst2d
 {
+protected:
 	uint32					m_uiTextureIndex;
 	HyRectangle<float>		m_SrcRect;
 

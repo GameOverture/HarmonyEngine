@@ -20,8 +20,8 @@ layout(location = 0) in vec4 position;										\n\
 out vec4 Color;																\n\
 																			\n\
 uniform mat4 transformMtx;													\n\
-uniform mat4 mtxCameraToClip;												\n\
 uniform mat4 mtxWorldToCamera;												\n\
+uniform mat4 mtxCameraToClip;												\n\
 uniform vec4 primitiveColor;												\n\
 																			\n\
 void main()																	\n\
@@ -37,7 +37,7 @@ void main()																	\n\
 const char *szCUSTOM_FRAGMENTSHADER = "								\n\
 #version 400																\n\
 																			\n\
-in vec4 Color;																\n\
+smooth in vec3 ex_UV;														\n\
 out vec4 FragColor;															\n\
 																			\n\
 void main()																	\n\
@@ -59,6 +59,7 @@ void main()																	\n\
 	m_primBox.SetAsQuad(180.0f, 160.0f, false);
 	m_primBox.SetDisplayOrder(0);
 	m_primBox.pos.Set(-405.0f, 0.0f);
+	m_primBox.Load();
 
 	glm::vec2 vLinePts[2];
 
@@ -80,15 +81,15 @@ void main()																	\n\
 
 
 	IHyShader *pShader_Checkerboard = IHyRenderer::MakeCustomShader();
-	//pShader_Checkerboard->SetSourceCode(szCUSTOM_VERTEXSHADER, HYSHADER_Vertex);
-	//pShader_Checkerboard->SetVertexAttribute("position", HYSHADERVAR_vec4);
+	pShader_Checkerboard->SetSourceCode(szCUSTOM_VERTEXSHADER, HYSHADER_Vertex);
+	pShader_Checkerboard->SetVertexAttribute("position", HYSHADERVAR_vec4);
 	pShader_Checkerboard->SetSourceCode(szCUSTOM_FRAGMENTSHADER, HYSHADER_Fragment);
 	pShader_Checkerboard->Finalize(HYSHADERPROG_Primitive);
 	
-	//pShader_Checkerboard->OnRenderThread(
+	m_TestGrid.pos.Set(-256.0, -256.0f);
+	m_TestGrid.SetCustomShader(pShader_Checkerboard);
+	m_TestGrid.Load();
 
-	m_primBox.SetCustomShader(pShader_Checkerboard);
-	m_primBox.Load();
 
 	return true;
 }

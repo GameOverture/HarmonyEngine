@@ -17,9 +17,15 @@
     <ClCompile Include="NewGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TestGrid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NewGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestGrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

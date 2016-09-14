@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Harmony/HyEngine.h"
+#include "TestGrid.h"
 
 class NewGame : public IHyApplication
 {
@@ -11,6 +12,8 @@ class NewGame : public IHyApplication
 	HyPrimitive2d		m_primBox;
 	HyPrimitive2d		m_HorzLine;
 	HyPrimitive2d		m_VertLine;
+
+	TestGrid			m_TestGrid;
 
 public:
 	NewGame(HarmonyInit &initStruct);

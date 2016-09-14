@@ -16,6 +16,7 @@
 
 class HyText2d : public IHyInst2d
 {
+protected:
 	static HyChar		sm_pTempTextBuffer[HY_TEMP_TEXTBUFFER_SIZE];
 
 	HyString			m_sString;
