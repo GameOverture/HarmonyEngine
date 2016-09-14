@@ -26,11 +26,6 @@ HyOpenGLShader::HyOpenGLShader(int32 iId, std::string sPrefix, std::string sName
 
 HyOpenGLShader::~HyOpenGLShader()
 {
-	// Delete shader objects, shader program, and uniforms allocated in the constructor
-
-	// ... Delete shader objects, etc 
-	if(m_hProgHandle > 0)
-		glDeleteProgram(m_hProgHandle);
 }
 
 void HyOpenGLShader::CompileFromString(HyShaderType eType)
@@ -411,7 +406,7 @@ void HyOpenGLShader::PrintActiveAttribs()
 	free(name);
 }
 
-/*virtual*/ void HyOpenGLShader::OnRenderThread(IHyRenderer &rendererRef)
+/*virtual*/ void HyOpenGLShader::OnUpload(IHyRenderer &rendererRef)
 {
 	HyAssert(m_eLoadState == HYLOADSTATE_Queued, "HyOpenGLShader::OnRenderThread() invoked on a non-queued shader");
 
@@ -511,7 +506,7 @@ void HyOpenGLShader::PrintActiveAttribs()
 		case HYSHADERVAR_mat4:		m_uiStride += sizeof(glm::mat4);	break;
 		}
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////
 	//// TODO: These would be nicer to use if OpenGL 4.3 was supported
 	//glVertexAttribFormat(size,			2, GL_FLOAT, GL_FALSE, 0);
@@ -543,4 +538,15 @@ void HyOpenGLShader::PrintActiveAttribs()
 	glBindVertexArray(0);
 
 	m_eLoadState = HYLOADSTATE_Loaded;
+}
+
+/*virtual*/ void HyOpenGLShader::OnDelete(IHyRenderer &rendererRef)
+{
+	// Delete shader objects, shader program, and uniforms allocated in the constructor
+
+	// ... Delete shader objects, etc 
+	if(m_hProgHandle > 0)
+		glDeleteProgram(m_hProgHandle);
+
+	m_eLoadState = HYLOADSTATE_Discarded;
 }

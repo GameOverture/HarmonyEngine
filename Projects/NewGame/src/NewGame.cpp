@@ -42,7 +42,7 @@ out vec4 FragColor;															\n\
 																			\n\
 void main()																	\n\
 {																			\n\
-	FragColor = Color;														\n\
+	FragColor = vec4(1.0f, 1.0f, 1.0f, 0.5f);								\n\
 }";
 
 /*virtual*/ bool NewGame::Initialize()

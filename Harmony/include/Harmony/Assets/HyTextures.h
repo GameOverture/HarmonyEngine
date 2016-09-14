@@ -22,7 +22,7 @@ using std::set;
 class HyAtlasGroup;
 class HyAtlas;
 
-class IHyData;
+class IHy2dData;
 class IHyRenderer;
 
 //////////////////////////////////////////////////////////////////////////
@@ -59,8 +59,8 @@ class HyAtlasGroup
 
 	uint32						m_uiGfxApiHandle;
 
-	set<IHyData *>				m_AssociatedDataSet;
-	BasicSection				m_csDataRefs;
+	uint32						m_uiRefCount;
+
 	BasicSection				m_csTextures;
 
 public:
@@ -79,10 +79,7 @@ public:
 
 	void Load();
 
-	void Assign(IHyData *pData);
-	void Relinquish(IHyData *pData);
-
-	void OnRenderThread(IHyRenderer &rendererRef);
+	void OnRenderThread(IHyRenderer &rendererRef, IHy2dData *pData);
 };
 
 //////////////////////////////////////////////////////////////////////////

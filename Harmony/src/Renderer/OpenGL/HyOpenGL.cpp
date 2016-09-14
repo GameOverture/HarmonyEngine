@@ -350,13 +350,13 @@ bool HyOpenGL::Initialize()
 	HyOpenGLShader *pShaderQuadBatch = HY_NEW HyOpenGLShader(HYSHADERPROG_QuadBatch);
 	sm_ShaderMap[HYSHADERPROG_QuadBatch] = pShaderQuadBatch;
 	pShaderQuadBatch->Finalize(HYSHADERPROG_QuadBatch);
-	pShaderQuadBatch->OnRenderThread(*this);
+	pShaderQuadBatch->OnRenderThread(*this, NULL);
 
 	// Primitive //////////////////////////////////////////////////////////////////////////
 	HyOpenGLShader *pShaderPrimitive = HY_NEW HyOpenGLShader(HYSHADERPROG_Primitive);
 	sm_ShaderMap[HYSHADERPROG_Primitive] = pShaderPrimitive;
 	pShaderPrimitive->Finalize(HYSHADERPROG_Primitive);
-	pShaderPrimitive->OnRenderThread(*this);
+	pShaderPrimitive->OnRenderThread(*this, NULL);
 
 	//const float fUnitQuadVertPos[16] = {
 	//	0.0f, 0.0f, 0.0f, 1.0f,

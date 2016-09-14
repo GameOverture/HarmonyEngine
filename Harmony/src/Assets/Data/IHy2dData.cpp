@@ -15,7 +15,8 @@
 HyTextures *IHy2dData::sm_pTextures = NULL;
 
 IHy2dData::IHy2dData(HyInstanceType eInstType, const std::string &sPath, int32 iShaderId) : IHyData(HYDATA_2d, eInstType, sPath),
-																							m_iSHADER_ID(iShaderId)
+																							m_iSHADER_ID(iShaderId),
+																							m_bIncRenderRef(false)
 {
 }
 
@@ -28,20 +29,19 @@ int32 IHy2dData::GetShaderId()
 	return m_iSHADER_ID;
 }
 
+bool IHy2dData::IsIncrementRenderRefs()
+{
+	return m_bIncRenderRef;
+}
+
 /*virtual*/ void IHy2dData::SetLoadState(HyLoadState eState)
 {
 	IHyData::SetLoadState(eState);
 
 	if(GetLoadState() == HYLOADSTATE_Queued)
-	{
-		for(std::set<HyAtlasGroup *>::iterator iter = m_AssociatedAtlases.begin(); iter != m_AssociatedAtlases.end(); ++iter)
-			(*iter)->Assign(this);
-	}
+		m_bIncRenderRef = true;
 	if(GetLoadState() == HYLOADSTATE_Discarded)
-	{
-		for(std::set<HyAtlasGroup *>::iterator iter = m_AssociatedAtlases.begin(); iter != m_AssociatedAtlases.end(); ++iter)
-			(*iter)->Relinquish(this); fix this
-	}
+		m_bIncRenderRef = false;
 }
 
 HyAtlasGroup *IHy2dData::RequestTexture(uint32 uiAtlasGroupId)

@@ -268,7 +268,7 @@ void HyAssetManager::DiscardData(IHyData *pData)
 {
 	HyAssert(pData->GetRefCount() <= 0, "HyAssetManager::DiscardData() tried to remove an IData with active references");
 
-	// TODO: Log about erasing data
+	//HyLog("Deleting data: " << pData->GetPath());
 	pData->SetLoadState(HYLOADSTATE_Discarded);
 
 	if(pData->GetDataType() == HYDATA_2d)

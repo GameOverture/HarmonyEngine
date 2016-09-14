@@ -21,6 +21,7 @@ class IHy2dData : public IHyData
 	friend class HyAssetManager;
 
 	const int32						m_iSHADER_ID;
+	bool							m_bIncRenderRef;
 
 	static HyTextures *				sm_pTextures;
 	std::set<HyAtlasGroup *>		m_AssociatedAtlases;
@@ -32,6 +33,7 @@ public:
 	virtual ~IHy2dData();
 
 	int32 GetShaderId();
+	bool IsIncrementRenderRefs();
 
 	virtual void SetLoadState(HyLoadState eState);
 

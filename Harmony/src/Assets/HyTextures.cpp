@@ -94,12 +94,13 @@ std::string HyTextures::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIn
 
 //////////////////////////////////////////////////////////////////////////
 HyAtlasGroup::HyAtlasGroup(HyTextures &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef) :	m_ManagerRef(managerRef),
-																																											m_uiLOADGROUPID(uiLoadGroupId),
-																																											m_uiWIDTH(uiWidth),
-																																											m_uiHEIGHT(uiHeight),
-																																											m_uiNUM_8BIT_CHANNELS(uiNumClrChannels),
-																																											m_uiNUM_ATLASES(static_cast<uint32>(texturesArrayRef.size())),
-																																											m_uiGfxApiHandle(0)
+																																										m_uiLOADGROUPID(uiLoadGroupId),
+																																										m_uiWIDTH(uiWidth),
+																																										m_uiHEIGHT(uiHeight),
+																																										m_uiNUM_8BIT_CHANNELS(uiNumClrChannels),
+																																										m_uiNUM_ATLASES(static_cast<uint32>(texturesArrayRef.size())),
+																																										m_uiGfxApiHandle(0),
+																																										m_uiRefCount(0)
 {
 	m_pAtlases = reinterpret_cast<HyAtlas *>(HY_NEW unsigned char[sizeof(HyAtlas) * m_uiNUM_ATLASES]);
 	HyAtlas *pAtlasWriteLocation = m_pAtlases;
@@ -192,38 +193,17 @@ void HyAtlasGroup::Load()
 	m_csTextures.Unlock();
 }
 
-// Returns 'true' if texture was just loaded
-void HyAtlasGroup::Assign(IHyData *pData)
+void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef, IHy2dData *pData)
 {
-	m_csDataRefs.Lock();
-	m_AssociatedDataSet.insert(pData);
-	m_csDataRefs.Unlock();
-}
+	bool bUpload = m_uiRefCount == 0;
 
-void HyAtlasGroup::Relinquish(IHyData *pData)
-{
-	m_csDataRefs.Lock();
-
-	for(set<IHyData *>::iterator iter = m_AssociatedDataSet.begin(); iter != m_AssociatedDataSet.end(); ++iter)
+	if(pData->IsIncrementRenderRefs())
+		m_uiRefCount++;
+	else
 	{
-		if((*iter) == pData)
-		{
-			m_AssociatedDataSet.erase(iter);
-			break;
-		}
+		HyAssert(m_uiRefCount == 0, "HyAtlasGroup::OnRenderThread Tried to decrement an empty ref");
+		m_uiRefCount--;
 	}
-
-	m_csDataRefs.Unlock();
-}
-
-void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef)
-{
-	bool bUpload;
-	
-	m_csDataRefs.Lock();
-	bUpload = m_AssociatedDataSet.empty() == false;
-	m_csDataRefs.Unlock();
-	
 
 	m_csTextures.Lock();
 	if(bUpload)
@@ -240,7 +220,7 @@ void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef)
 				m_pAtlases[i].DeletePixelData();
 		}
 	}
-	else
+	else if(m_uiRefCount == 0)
 	{
 		rendererRef.DeleteTextureArray(m_uiGfxApiHandle);
 		m_uiGfxApiHandle = 0;

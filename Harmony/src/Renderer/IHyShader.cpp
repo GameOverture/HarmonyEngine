@@ -289,7 +289,8 @@ void HyShaderUniforms::WriteUniformsBufferData(char *&pRefDataWritePos)
 
 IHyShader::IHyShader(int32 iId) :	m_iID(iId),
 									m_sOPTIONAL_LOAD_PATH(""),
-									m_eLoadState(HYLOADSTATE_Inactive)
+									m_eLoadState(HYLOADSTATE_Inactive),
+									m_uiRefCount(0)
 {
 	for(int i = 0; i < HYNUMSHADERTYPES; ++i)
 		m_sSourceCode[i].clear();
@@ -399,4 +400,29 @@ void IHyShader::OnLoadThread()
 		return;
 
 	HyError("IHyShader::OnLoadThread not implemented. Need to parse hy shader file and get setup shader source and vertex attribs");
+}
+
+void IHyShader::OnRenderThread(IHyRenderer &rendererRef, IHy2dData *pData)
+{
+	// Data can be NULL if it's a default shader being loaded by the Renderer
+	if(pData == NULL)
+	{
+		OnUpload(rendererRef);
+		return;
+	}
+
+	bool bUpload = m_uiRefCount == 0;
+
+	if(pData->IsIncrementRenderRefs())
+		m_uiRefCount++;
+	else
+	{
+		HyAssert(m_uiRefCount == 0, "HyAtlasGroup::OnRenderThread Tried to decrement an empty ref");
+		m_uiRefCount--;
+	}
+
+	if(bUpload)
+		OnUpload(rendererRef);
+	else if(m_uiRefCount == 0)
+		OnDelete(rendererRef);
 }
