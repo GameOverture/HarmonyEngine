@@ -40,7 +40,7 @@ int32 IHy2dData::GetShaderId()
 	if(GetLoadState() == HYLOADSTATE_Discarded)
 	{
 		for(std::set<HyAtlasGroup *>::iterator iter = m_AssociatedAtlases.begin(); iter != m_AssociatedAtlases.end(); ++iter)
-			(*iter)->Relinquish(this);
+			(*iter)->Relinquish(this); fix this
 	}
 }
 
@@ -57,6 +57,12 @@ const std::set<HyAtlasGroup *> &IHy2dData::GetAssociatedAtlases()
 	return m_AssociatedAtlases;
 }
 
+const std::set<IHyShader *> &IHy2dData::GetAssociatedShaders()
+{
+	return m_AssociatedShaders;
+}
+
+
 /*virtual*/ void IHy2dData::OnLoadThread()
 {
 	IHyShader *pShader = IHyRenderer::FindShader(m_iSHADER_ID);
@@ -64,6 +70,9 @@ const std::set<HyAtlasGroup *> &IHy2dData::GetAssociatedAtlases()
 
 	pShader->OnLoadThread();
 	HyAssert(pShader->IsFinalized(), "IHy2dData::OnLoadThread processed an non-finalized shader");
+
+	if(m_iSHADER_ID < 0 || m_iSHADER_ID >= HYSHADERPROG_CustomStartIndex)
+		m_AssociatedShaders.insert(pShader);
 
 	IHyData::OnLoadThread();
 }

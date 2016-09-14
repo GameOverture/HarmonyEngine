@@ -14,6 +14,7 @@
 
 #include "Assets/Data/IHyData.h"
 #include "Assets/HyTextures.h"
+#include "Renderer/IHyShader.h"
 
 class IHy2dData : public IHyData
 {
@@ -23,6 +24,8 @@ class IHy2dData : public IHyData
 
 	static HyTextures *				sm_pTextures;
 	std::set<HyAtlasGroup *>		m_AssociatedAtlases;
+
+	std::set<IHyShader *>			m_AssociatedShaders;
 
 public:
 	IHy2dData(HyInstanceType eInstType, const std::string &sPath, int32 iShaderId);
@@ -34,6 +37,8 @@ public:
 
 	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId);
 	const std::set<HyAtlasGroup *> &GetAssociatedAtlases();
+
+	const std::set<IHyShader *> &GetAssociatedShaders();
 
 	// Only invoked on the Load thread
 	virtual void OnLoadThread();

@@ -99,8 +99,11 @@ void IHyRenderer::Update()
 		m_pRxDataQueue->pop();
 
 		const std::set<HyAtlasGroup *> &associatedAtlasesSetRef = pData->GetAssociatedAtlases();
-
 		for(std::set<HyAtlasGroup *>::const_iterator iter = associatedAtlasesSetRef.begin(); iter != associatedAtlasesSetRef.end(); ++iter)
+			(*iter)->OnRenderThread(*this);
+
+		const std::set<IHyShader *> &associatedShadersSetRef = pData->GetAssociatedShaders();
+		for(std::set<IHyShader *>::const_iterator iter = associatedShadersSetRef.begin(); iter != associatedShadersSetRef.end(); ++iter)
 			(*iter)->OnRenderThread(*this);
 
 		m_pTxDataQueue->push(pData);
