@@ -86,7 +86,7 @@ queue<IHy2dData *> *HyGfxComms::RxData()
 }
 
 // This should only be invoked from the Render thread
-bool HyGfxComms::Render_TakeSharedPointers(queue<IHy2dData *> *&pMsgQueuePtr, queue<IHy2dData *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr)
+bool HyGfxComms::Render_TakeSharedPointers(queue<IHy2dData *> *&pRxDataQueue, queue<IHy2dData *> *&pTxDataQueue, char *&pDrawBuffer)
 {
 	m_csPointers.Lock();
 
@@ -102,18 +102,18 @@ bool HyGfxComms::Render_TakeSharedPointers(queue<IHy2dData *> *&pMsgQueuePtr, qu
 	queue<IHy2dData *> *pTmpQueue = m_pTxDataQueue_Render;
 	m_pTxDataQueue_Render = m_pTxDataQueue_Shared;
 	m_pTxDataQueue_Shared = pTmpQueue;
-	pMsgQueuePtr =  m_pTxDataQueue_Render;
+	pRxDataQueue =  m_pTxDataQueue_Render;
 
 	pTmpQueue = m_pRxDataQueue_Render;
 	m_pRxDataQueue_Render = m_pRxDataQueue_Shared;
 	m_pRxDataQueue_Shared = pTmpQueue;
-	pSendMsgQueuePtr = m_pRxDataQueue_Render;
+	pTxDataQueue = m_pRxDataQueue_Render;
 
 	// Buffers
 	char *pTmp = m_pDrawBuffer_Render;
 	m_pDrawBuffer_Render = m_pDrawBuffer_Shared;
 	m_pDrawBuffer_Shared = pTmp;
-	pDrawBufferPtr = m_pDrawBuffer_Render;
+	pDrawBuffer = m_pDrawBuffer_Render;
 
 	m_csPointers.Unlock();
 

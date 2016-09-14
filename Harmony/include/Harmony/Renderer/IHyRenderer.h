@@ -25,9 +25,9 @@ protected:
 	HyGfxComms &						m_GfxCommsRef;
 	vector<HyWindow *> &				m_vWindowRef;
 
-	queue<IHy2dData *> *				m_pMsgQueuePtr;		// The pointer to the currently active render message queue
-	queue<IHy2dData *> *				m_pSendMsgQueuePtr;	// The pointer to the currently active render message queue
-	char *								m_pDrawBufferPtr;	// The pointer to the currently active draw buffer
+	queue<IHy2dData *> *				m_pRxDataQueue;		// The pointer to the currently active render message queue
+	queue<IHy2dData *> *				m_pTxDataQueue;	// The pointer to the currently active render message queue
+	char *								m_pDrawBuffer;	// The pointer to the currently active draw buffer
 
 	static int32						sm_iShaderIdCount;
 	static std::map<int32, IHyShader *>	sm_ShaderMap;
@@ -82,17 +82,17 @@ public:
 
 	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags) = 0;
 
-	int32 GetNumCameras2d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d)); }
-	uint32 GetCameraWindowIndex2d(int iCameraIndex)			{ return *(reinterpret_cast<uint32 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iCameraIndex		* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))))); }
-	HyRectangle<float> *GetCameraViewportRect2d(int iIndex)	{ return reinterpret_cast<HyRectangle<float> *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iIndex	* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) + sizeof(uint32)); }
-	glm::mat4 *GetCameraView2d(int iIndex)					{ return reinterpret_cast<glm::mat4 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iIndex			* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) + sizeof(uint32) + sizeof(HyRectangle<float>)); }
+	int32 GetNumCameras2d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToCameras2d)); }
+	uint32 GetCameraWindowIndex2d(int iCameraIndex)			{ return *(reinterpret_cast<uint32 *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iCameraIndex		* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))))); }
+	HyRectangle<float> *GetCameraViewportRect2d(int iIndex)	{ return reinterpret_cast<HyRectangle<float> *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iIndex	* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) + sizeof(uint32)); }
+	glm::mat4 *GetCameraView2d(int iIndex)					{ return reinterpret_cast<glm::mat4 *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iIndex			* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) + sizeof(uint32) + sizeof(HyRectangle<float>)); }
 
-	int32 GetNumInsts3d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras3d)); }
-	int32 GetNumCameras3d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToCameras3d)); }
+	int32 GetNumInsts3d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToCameras3d)); }
+	int32 GetNumCameras3d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToCameras3d)); }
 
-	int32 GetNumRenderStates2d()							{ return *(reinterpret_cast<int32 *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToInst2d)); }
-	HyRenderState *GetRenderStatesPtr2d()					{ return reinterpret_cast<HyRenderState *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToInst2d + sizeof(int32)); } // Last sizeof(int32) is skipping number of 2dInsts
-	char *GetVertexData2d()									{ return reinterpret_cast<char *>(m_pDrawBufferPtr + m_pDrawBufferHeader->uiOffsetToVertexData2d); }
+	int32 GetNumRenderStates2d()							{ return *(reinterpret_cast<int32 *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToInst2d)); }
+	HyRenderState *GetRenderStatesPtr2d()					{ return reinterpret_cast<HyRenderState *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToInst2d + sizeof(int32)); } // Last sizeof(int32) is skipping number of 2dInsts
+	char *GetVertexData2d()									{ return reinterpret_cast<char *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToVertexData2d); }
 
 	void Update();
 	void Draw2d();

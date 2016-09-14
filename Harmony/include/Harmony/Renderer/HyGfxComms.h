@@ -46,7 +46,7 @@ public:
 		size_t		uiOffsetToCameras2d;
 	};
 
-	// Note: All member variables and functions are named in reference of calling from 'Update' thread.
+	// Note: All member variables and functions are named in reference of calling from the calling thread.
 private:
 	char *						m_pDrawBuffer_Update;
 	char *						m_pDrawBuffer_Shared;
@@ -79,7 +79,7 @@ public:
 	queue<IHy2dData *> *RxData();
 
 	// This should only be invoked from the Render thread
-	bool Render_TakeSharedPointers(queue<IHy2dData *> *&pMsgQueuePtr, queue<IHy2dData *> *&pSendMsgQueuePtr, char *&pDrawBufferPtr);
+	bool Render_TakeSharedPointers(queue<IHy2dData *> *&pRxDataQueue, queue<IHy2dData *> *&pTxDataQueue, char *&pDrawBuffer);
 };
 
 #endif /* __HyGfxBuffers_h__ */
