@@ -38,6 +38,30 @@ int32 HyShaderUniforms::FindIndex(const char *szName)
 	return -1;
 }
 
+void HyShaderUniforms::Set(const char *szName, const glm::vec2 &v)
+{
+	int32 iIndex = FindIndex(szName);
+	if(iIndex == -1)
+	{
+		UniformBuffer newUniform;
+		newUniform.SetVariableType(HYSHADERVAR_vec2);
+		newUniform.SetName(szName);
+		new (newUniform.GetData()) glm::vec2(v);
+
+		m_vUniforms.push_back(newUniform);
+	}
+	else
+	{
+		HyAssert(m_vUniforms[iIndex].GetVariableType() == HYSHADERVAR_vec2, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
+
+		if(*reinterpret_cast<glm::vec2 *>(m_vUniforms[iIndex].GetData()) != v)
+		{
+			*reinterpret_cast<glm::vec2 *>(m_vUniforms[iIndex].GetData()) = v;
+			m_bDirty = true;
+		}
+	}
+}
+
 void HyShaderUniforms::Set(const char *szName, float x, float y, float z)
 {
 	Set(szName, glm::vec3(x, y, z));

@@ -45,7 +45,7 @@ int32 IHyInst2d::GetShaderId()
 
 void IHyInst2d::SetCustomShader(IHyShader *pShader)
 {
-	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyInst2d::SetCustomShader was used on an already loaded instance");
+	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyInst2d::SetCustomShader was used on an already loaded instance - I can make this work I just haven't yet");
 	HyAssert(pShader->IsFinalized(), "IHyInst2d::SetCustomShader tried to set a non-finalized shader");
 
 	m_RenderState.SetShaderId(pShader->GetId());

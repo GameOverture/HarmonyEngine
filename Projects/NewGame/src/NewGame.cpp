@@ -17,16 +17,16 @@ const char *szCUSTOM_VERTEXSHADER = "									\n\
 																			\n\
 layout(location = 0) in vec4 position;										\n\
 																			\n\
-out vec4 Color;																\n\
+out vec2 coordinate;															\n\
 																			\n\
 uniform mat4 transformMtx;													\n\
 uniform mat4 mtxWorldToCamera;												\n\
 uniform mat4 mtxCameraToClip;												\n\
-uniform vec4 primitiveColor;												\n\
 																			\n\
 void main()																	\n\
 {																			\n\
-	Color = primitiveColor;													\n\
+	coordinate.x = position.x;												\n\
+	coordinate.y = position.y;												\n\
 																			\n\
 	vec4 temp = transformMtx * position;									\n\
 	temp = mtxWorldToCamera * temp;											\n\
@@ -35,14 +35,20 @@ void main()																	\n\
 
 
 const char *szCUSTOM_FRAGMENTSHADER = "								\n\
-#version 400																\n\
-																			\n\
-smooth in vec3 ex_UV;														\n\
-out vec4 FragColor;															\n\
-																			\n\
-void main()																	\n\
-{																			\n\
-	FragColor = vec4(1.0f, 1.0f, 1.0f, 0.5f);								\n\
+#version 400																		\n\
+																					\n\
+in vec2 coordinate;																	\n\
+out vec4 FragColor;																	\n\
+																					\n\
+uniform float uGridSize;															\n\
+uniform vec2 uResolution;															\n\
+uniform vec4 gridColor1;															\n\
+uniform vec4 gridColor2;															\n\
+																					\n\
+void main()																			\n\
+{																					\n\
+	vec2 screenCoords = (gl_FragCoord.xy - (uResolution * 0.5f)) / uGridSize;		\n\
+	FragColor = mix(gridColor1, gridColor2, step((float(int(floor(screenCoords.x) + floor(screenCoords.y)) & 1)), 0.9));		\n\
 }";
 
 /*virtual*/ bool NewGame::Initialize()
@@ -56,9 +62,9 @@ void main()																	\n\
 	m_TestQuad.SetTextureSource(0, 100, 100, 500, 500);
 	
 	m_primBox.color.Set(0.0f, 0.0f, 1.0f, 1.0f);
-	m_primBox.SetAsQuad(180.0f, 160.0f, false);
+	m_primBox.SetAsQuad(25.0f, 25.0f, false);
 	m_primBox.SetDisplayOrder(0);
-	m_primBox.pos.Set(-405.0f, 0.0f);
+	m_primBox.pos.Set(0.0f, -25.0f);
 	m_primBox.Load();
 
 	glm::vec2 vLinePts[2];
@@ -86,7 +92,9 @@ void main()																	\n\
 	pShader_Checkerboard->SetSourceCode(szCUSTOM_FRAGMENTSHADER, HYSHADER_Fragment);
 	pShader_Checkerboard->Finalize(HYSHADERPROG_Primitive);
 	
-	m_TestGrid.pos.Set(-256.0, -256.0f);
+	m_TestGrid.SetResolution(Window().GetResolution().x, Window().GetResolution().y);
+	m_TestGrid.SetDisplayOrder(-100);
+	m_TestGrid.pos.Set(Window().GetResolution().x * -0.5f, Window().GetResolution().y * -0.5f);
 	m_TestGrid.SetCustomShader(pShader_Checkerboard);
 	m_TestGrid.Load();
 

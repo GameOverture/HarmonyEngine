@@ -3,11 +3,17 @@
 
 TestGrid::TestGrid()
 {
-	SetAsQuad(500.0f, 500.0f, false);
 }
 
 TestGrid::~TestGrid()
 {
+}
+
+void TestGrid::SetResolution(int iWidth, int iHeight)
+{
+	m_Resolution.x = iWidth;
+	m_Resolution.y = iHeight;
+	SetAsQuad(m_Resolution.x, m_Resolution.y, false);
 }
 
 /*virtual*/ void TestGrid::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
@@ -15,8 +21,11 @@ TestGrid::~TestGrid()
 	glm::mat4 mtx;
 	GetWorldTransform(mtx);
 
-	pShaderUniformsRef->Set("primitiveColor", color.Get());
 	pShaderUniformsRef->Set("transformMtx", mtx);
+	pShaderUniformsRef->Set("uGridSize", 25.0f);
+	pShaderUniformsRef->Set("uResolution", m_Resolution);
+	pShaderUniformsRef->Set("gridColor1", glm::vec4(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f, 1.0f));
+	pShaderUniformsRef->Set("gridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
 }
 
 /*virtual*/ void TestGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)

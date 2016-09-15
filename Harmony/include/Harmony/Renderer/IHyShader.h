@@ -50,6 +50,7 @@ public:
 
 	int32 FindIndex(const char *szName);
 
+	void Set(const char *szName, const glm::vec2 &v);
 	void Set(const char *szName, float x, float y, float z);
 	void Set(const char *szName, const glm::vec3 &v);
 	void Set(const char *szName, const glm::vec4 &v);
