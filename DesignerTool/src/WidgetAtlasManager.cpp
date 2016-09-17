@@ -396,7 +396,7 @@ void WidgetAtlasManager::HideAtlasGroup()
 
         pFrame->DrawInst(&atlasMan)->SetEnabled(true);
         pFrame->DrawInst(&atlasMan)->color.A(1.0f);
-        pFrame->DrawInst(&atlasMan)->SetDisplayOrder(-0x0FFFFFFF + i);
+        //pFrame->DrawInst(&atlasMan)->SetDisplayOrder(-0x0FFFFFFF + i);
 
         float fFrameWidth = pFrame->IsRotated() ? pFrame->DrawInst(&atlasMan)->GetHeight() : pFrame->DrawInst(&atlasMan)->GetWidth();
         float fFrameHeight = pFrame->IsRotated() ? pFrame->DrawInst(&atlasMan)->GetWidth() : pFrame->DrawInst(&atlasMan)->GetHeight();

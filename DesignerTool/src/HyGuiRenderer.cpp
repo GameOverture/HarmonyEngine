@@ -75,5 +75,5 @@ HyGuiRenderer::~HyGuiRenderer()
 /*virtual*/ void HyGuiRenderer::resizeGL(int w, int h)
 {
     if(m_pProjOwner)
-        m_pProjOwner->Window().SetResolution(glm::ivec2(w, h));
+        m_pProjOwner->SetRenderSize(w, h);
 }

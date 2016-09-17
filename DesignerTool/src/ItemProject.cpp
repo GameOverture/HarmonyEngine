@@ -20,6 +20,79 @@
 #include <QJsonObject>
 #include <QDirIterator>
 
+const char *szCHECKERGRID_VERTEXSHADER = "									\n\
+#version 400																\n\
+                                                                            \n\
+layout(location = 0) in vec4 position;										\n\
+                                                                            \n\
+out vec2 coordinate;															\n\
+                                                                            \n\
+uniform mat4 transformMtx;													\n\
+uniform mat4 mtxWorldToCamera;												\n\
+uniform mat4 mtxCameraToClip;												\n\
+                                                                            \n\
+void main()																	\n\
+{																			\n\
+    coordinate.x = position.x;												\n\
+    coordinate.y = position.y;												\n\
+                                                                            \n\
+    vec4 temp = transformMtx * position;									\n\
+    temp = mtxWorldToCamera * temp;											\n\
+    gl_Position = mtxCameraToClip * temp;									\n\
+}";
+
+
+const char *szCHECKERGRID_FRAGMENTSHADER = "        								\n\
+#version 400																		\n\
+                                                                                    \n\
+in vec2 coordinate;																	\n\
+out vec4 FragColor;																	\n\
+                                                                                    \n\
+uniform float uGridSize;															\n\
+uniform vec2 uResolution;															\n\
+uniform vec4 gridColor1;															\n\
+uniform vec4 gridColor2;															\n\
+                                                                                    \n\
+void main()																			\n\
+{																					\n\
+    vec2 screenCoords = (gl_FragCoord.xy - (uResolution * 0.5f)) / uGridSize;		\n\
+    FragColor = mix(gridColor1, gridColor2, step((float(int(floor(screenCoords.x) + floor(screenCoords.y)) & 1)), 0.9));		\n\
+}";
+
+CheckerGrid::CheckerGrid()
+{
+}
+
+CheckerGrid::~CheckerGrid()
+{
+}
+
+void CheckerGrid::SetResolution(int iWidth, int iHeight)
+{
+    m_Resolution.x = iWidth;
+    m_Resolution.y = iHeight;
+    SetAsQuad(m_Resolution.x, m_Resolution.y, false);
+    pos.Set(iWidth * -0.5f, iHeight * -0.5f);
+}
+
+/*virtual*/ void CheckerGrid::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
+{
+    glm::mat4 mtx;
+    GetWorldTransform(mtx);
+
+    pShaderUniformsRef->Set("transformMtx", mtx);
+    pShaderUniformsRef->Set("uGridSize", 25.0f);
+    pShaderUniformsRef->Set("uResolution", m_Resolution);
+    pShaderUniformsRef->Set("gridColor1", glm::vec4(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f, 1.0f));
+    pShaderUniformsRef->Set("gridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
+}
+
+/*virtual*/ void CheckerGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)
+{
+    memcpy(pRefDataWritePos, m_pVertices, m_RenderState.GetNumVertices() * sizeof(glm::vec4));
+    pRefDataWritePos += m_RenderState.GetNumVertices() * sizeof(glm::vec4);
+}
+
 ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Project, sNewProjectFilePath),
                                                                 IHyApplication(HarmonyInit()),
                                                                 m_eDrawState(PROJDRAWSTATE_Nothing),
@@ -183,6 +256,17 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 // IHyApplication override
 /*virtual*/ bool ItemProject::Initialize()
 {
+    IHyShader *pShader_CheckerGrid = IHyRenderer::MakeCustomShader();
+    pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
+    pShader_CheckerGrid->SetVertexAttribute("position", HYSHADERVAR_vec4);
+    pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
+    pShader_CheckerGrid->Finalize(HYSHADERPROG_Primitive);
+
+    m_CheckerGridBG.SetCustomShader(pShader_CheckerGrid);
+    m_CheckerGridBG.SetDisplayOrder(-1000);
+    m_CheckerGridBG.SetResolution(Window().GetResolution().x, Window().GetResolution().y);
+    m_CheckerGridBG.Load();
+
     return true;
 }
 
@@ -200,6 +284,12 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 // IHyApplication override
 /*virtual*/ void ItemProject::Shutdown()
 {
+}
+
+void ItemProject::SetRenderSize(int iWidth, int iHeight)
+{
+    Window().SetResolution(glm::ivec2(iWidth, iHeight));
+    m_CheckerGridBG.SetResolution(iWidth, iHeight);
 }
 
 void ItemProject::SetOverrideDrawState(eProjDrawState eDrawState)

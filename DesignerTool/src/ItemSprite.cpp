@@ -108,6 +108,7 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     QPoint ptRenderOffset = pSpriteFrame->GetRenderOffset();
     pDrawInst->pos.X(ptRenderOffset.x());
     pDrawInst->pos.Y(ptRenderOffset.y());
+    pDrawInst->SetDisplayOrder(100);
     
     if(pDrawInst->IsLoaded() == false)
         pDrawInst->Load();

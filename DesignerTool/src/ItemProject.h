@@ -18,6 +18,19 @@
 // Forward declaration
 class WidgetAtlasManager;
 
+class CheckerGrid : public HyPrimitive2d
+{
+    glm::vec2		m_Resolution;
+public:
+    CheckerGrid();
+    virtual ~CheckerGrid();
+
+    void SetResolution(int iWidth, int iHeight);
+
+    virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef);
+    virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
+};
+
 class ItemProject : public Item, public IHyApplication
 {
     Q_OBJECT
@@ -38,6 +51,7 @@ class ItemProject : public Item, public IHyApplication
     eProjDrawState                                  m_eDrawState;
     bool                                            m_bDrawStateLoaded[NUMPROJDRAWSTATE];
     HyCamera2d *                                    m_pCamera;
+    CheckerGrid                                     m_CheckerGridBG;
 
     QAction                                         m_ActionSave;
     QAction                                         m_ActionSaveAll;
@@ -71,6 +85,8 @@ public:
     virtual bool Initialize();
     virtual bool Update();
     virtual void Shutdown();
+
+    void SetRenderSize(int iWidth, int iHeight);
     
     void SetOverrideDrawState(eProjDrawState eDrawState);
     bool IsOverrideDraw();
