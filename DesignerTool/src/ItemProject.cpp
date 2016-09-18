@@ -24,8 +24,9 @@ const char *szCHECKERGRID_VERTEXSHADER = "									\n\
 #version 400																\n\
                                                                             \n\
 layout(location = 0) in vec4 position;										\n\
+layout(location = 1) in vec2 UVcoord;										\n\
                                                                             \n\
-out vec2 coordinate;															\n\
+smooth out vec2 interpUV;													\n\
                                                                             \n\
 uniform mat4 transformMtx;													\n\
 uniform mat4 mtxWorldToCamera;												\n\
@@ -33,8 +34,8 @@ uniform mat4 mtxCameraToClip;												\n\
                                                                             \n\
 void main()																	\n\
 {																			\n\
-    coordinate.x = position.x;												\n\
-    coordinate.y = position.y;												\n\
+    interpUV.x = UVcoord.x;                                                 \n\
+    interpUV.y = UVcoord.y;                                                 \n\
                                                                             \n\
     vec4 temp = transformMtx * position;									\n\
     temp = mtxWorldToCamera * temp;											\n\
@@ -45,7 +46,7 @@ void main()																	\n\
 const char *szCHECKERGRID_FRAGMENTSHADER = "        								\n\
 #version 400																		\n\
                                                                                     \n\
-in vec2 coordinate;																	\n\
+in vec2 interpUV;																	\n\
 out vec4 FragColor;																	\n\
                                                                                     \n\
 uniform float uGridSize;															\n\
@@ -55,7 +56,7 @@ uniform vec4 gridColor2;															\n\
                                                                                     \n\
 void main()																			\n\
 {																					\n\
-    vec2 screenCoords = (gl_FragCoord.xy - (uResolution * 0.5f)) / uGridSize;		\n\
+    vec2 screenCoords = (interpUV.xy * (uResolution /** 0.5f*/)) / uGridSize;		\n\
     FragColor = mix(gridColor1, gridColor2, step((float(int(floor(screenCoords.x) + floor(screenCoords.y)) & 1)), 0.9));		\n\
 }";
 
@@ -89,14 +90,47 @@ void CheckerGrid::SetResolution(int iWidth, int iHeight)
 
 /*virtual*/ void CheckerGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-    memcpy(pRefDataWritePos, m_pVertices, m_RenderState.GetNumVertices() * sizeof(glm::vec4));
-    pRefDataWritePos += m_RenderState.GetNumVertices() * sizeof(glm::vec4);
+    HyAssert(m_RenderState.GetNumVertices() == 4, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
+
+    for(int i = 0; i < 4; ++i)
+    {
+        *reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = m_pVertices[i];
+        pRefDataWritePos += sizeof(glm::vec4);
+
+        glm::vec2 vUV;
+        switch(i)
+        {
+        case 0:
+            vUV.x = 1.0f;
+            vUV.y = 0.0f;
+            break;
+
+        case 1:
+            vUV.x = 0.0f;
+            vUV.y = 0.0f;
+            break;
+
+        case 2:
+            vUV.x = 1.0f;
+            vUV.y = 1.0f;
+            break;
+
+        case 3:
+            vUV.x = 0.0f;
+            vUV.y = 1.0f;
+            break;
+        }
+
+        *reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+        pRefDataWritePos += sizeof(glm::vec2);
+    }
 }
 
 ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Project, sNewProjectFilePath),
                                                                 IHyApplication(HarmonyInit()),
                                                                 m_eDrawState(PROJDRAWSTATE_Nothing),
                                                                 m_ePrevDrawState(PROJDRAWSTATE_Nothing),
+                                                                m_pCamera(NULL),
                                                                 m_ActionSave(0),
                                                                 m_ActionSaveAll(0),
                                                                 m_bHasError(false)
@@ -259,13 +293,17 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
     IHyShader *pShader_CheckerGrid = IHyRenderer::MakeCustomShader();
     pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
     pShader_CheckerGrid->SetVertexAttribute("position", HYSHADERVAR_vec4);
+    pShader_CheckerGrid->SetVertexAttribute("UVcoord", HYSHADERVAR_vec2);
     pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
     pShader_CheckerGrid->Finalize(HYSHADERPROG_Primitive);
 
     m_CheckerGridBG.SetCustomShader(pShader_CheckerGrid);
     m_CheckerGridBG.SetDisplayOrder(-1000);
-    m_CheckerGridBG.SetResolution(Window().GetResolution().x, Window().GetResolution().y);
+    m_CheckerGridBG.SetResolution(8200, 8200); //Window().GetResolution().x, Window().GetResolution().y);
     m_CheckerGridBG.Load();
+
+    m_pCamera = Window().CreateCamera2d();
+    m_pCamera->SetEnabled(true);
 
     return true;
 }
@@ -276,7 +314,10 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
     if(IsOverrideDraw())
         OverrideDraw();
     else if(m_pTabBar->count() > 0)
+    {
+        m_pCamera->SetEnabled(false);
         m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ItemWidget *>()->DrawUpdate(*this);
+    }
 
     return true;
 }
@@ -289,7 +330,6 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 void ItemProject::SetRenderSize(int iWidth, int iHeight)
 {
     Window().SetResolution(glm::ivec2(iWidth, iHeight));
-    m_CheckerGridBG.SetResolution(iWidth, iHeight);
 }
 
 void ItemProject::SetOverrideDrawState(eProjDrawState eDrawState)
@@ -304,6 +344,8 @@ bool ItemProject::IsOverrideDraw()
 
 void ItemProject::OverrideDraw()
 {
+    m_pCamera->SetEnabled(true);
+
     while(m_DrawStateQueue.empty() == false)
     {
         m_ePrevDrawState = m_eDrawState;
@@ -318,8 +360,6 @@ void ItemProject::OverrideDraw()
         {
             if(m_bDrawStateLoaded[m_ePrevDrawState])
             {
-                m_pCamera->SetEnabled(false);
-
                 if(m_ePrevDrawState == PROJDRAWSTATE_AtlasManager)
                     AtlasManager_DrawHide(*this, *m_pAtlasMan);
             }
@@ -334,13 +374,6 @@ void ItemProject::OverrideDraw()
         {
             if(m_bDrawStateLoaded[m_eDrawState] == false)
             {
-                // A non NULL camera signifies that this has been loaded already
-                if(m_pCamera != NULL)
-                {
-                    m_pCamera = Window().CreateCamera2d();
-                    m_pCamera->SetEnabled(false);
-                }
-
                 if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
                     AtlasManager_DrawOpen(*this, *m_pAtlasMan);
 
@@ -350,8 +383,6 @@ void ItemProject::OverrideDraw()
             // Hide any currently shown items, since we're being draw override
             for(int i = 0; i < m_pTabBar->count(); ++i)
                 m_pTabBar->tabData(i).value<ItemWidget *>()->DrawHide(*this);
-
-            m_pCamera->SetEnabled(true);
 
             if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
                 AtlasManager_DrawShow(*this, *m_pAtlasMan);
