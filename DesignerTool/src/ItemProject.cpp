@@ -68,7 +68,7 @@ CheckerGrid::~CheckerGrid()
 {
 }
 
-void CheckerGrid::SetResolution(int iWidth, int iHeight)
+void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 {
     m_Resolution.x = iWidth;
     m_Resolution.y = iHeight;
@@ -299,7 +299,7 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 
     m_CheckerGridBG.SetCustomShader(pShader_CheckerGrid);
     m_CheckerGridBG.SetDisplayOrder(-1000);
-    m_CheckerGridBG.SetResolution(8200, 8200); //Window().GetResolution().x, Window().GetResolution().y);
+    m_CheckerGridBG.SetSurfaceSize(8200, 8200);  // Use a large size that is a multiple of grid size (25)
     m_CheckerGridBG.Load();
 
     m_pCamera = Window().CreateCamera2d();
@@ -318,6 +318,8 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
         m_pCamera->SetEnabled(false);
         m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ItemWidget *>()->DrawUpdate(*this);
     }
+    else
+        m_pCamera->SetEnabled(true);
 
     return true;
 }

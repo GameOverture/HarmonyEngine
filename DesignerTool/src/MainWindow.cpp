@@ -549,3 +549,8 @@ void MainWindow::on_actionLaunchIDE_triggered()
     }
     QDesktopServices::openUrl(QUrl(ideFileInfoList[0].absoluteFilePath()));
 }
+
+void MainWindow::on_actionAbout_triggered()
+{
+    QMessageBox::about(this, HyDesignerToolName, "Harmony Engine and Designer Tool\nCopyright (c) 2016 Jason Knobler");
+}

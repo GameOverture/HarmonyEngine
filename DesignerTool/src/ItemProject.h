@@ -25,7 +25,7 @@ public:
     CheckerGrid();
     virtual ~CheckerGrid();
 
-    void SetResolution(int iWidth, int iHeight);
+    void SetSurfaceSize(int iWidth, int iHeight);
 
     virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef);
     virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
