@@ -23,6 +23,11 @@ HySprite2dData::HySprite2dData(const std::string &sPath, int32 iShaderId) : IHy2
 	delete[] m_pAnimStates;
 }
 
+const HySprite2dData::AnimState &HySprite2dData::GetState(uint32 uiAnimStateIndex)
+{
+	return m_pAnimStates[uiAnimStateIndex];
+}
+
 const HySprite2dFrame &HySprite2dData::GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex)
 {
 	return m_pAnimStates[uiAnimStateIndex].GetFrame(uiFrameIndex);

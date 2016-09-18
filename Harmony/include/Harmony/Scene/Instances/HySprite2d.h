@@ -33,6 +33,7 @@ protected:
 	uint8 *					m_pAnimStateAttribs;
 
 	HyAnimFloat				m_PlayRate;
+	bool					m_bIsBounced;
 	
 	float					m_fElapsedFrameTime;
 	uint32					m_uiCurAnimState;

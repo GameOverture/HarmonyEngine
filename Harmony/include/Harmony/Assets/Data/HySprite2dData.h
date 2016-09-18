@@ -46,6 +46,10 @@ class HySprite2dData : public IHy2dData
 {
 	friend class HyFactory<HySprite2dData>;
 
+	// Only allow HyFactory instantiate
+	HySprite2dData(const std::string &sPath, int32 iShaderId);
+
+public:
 	class AnimState
 	{
 	public:
@@ -65,12 +69,9 @@ class HySprite2dData : public IHy2dData
 	AnimState *			m_pAnimStates;
 	uint32				m_uiNumStates;
 
-	// Only allow HyFactory instantiate
-	HySprite2dData(const std::string &sPath, int32 iShaderId);
-
-public:
 	virtual ~HySprite2dData();
 
+	const HySprite2dData::AnimState &GetState(uint32 uiAnimStateIndex);
 	const HySprite2dFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex);
 
 	virtual void DoFileLoad();
