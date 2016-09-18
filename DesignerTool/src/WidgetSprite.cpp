@@ -89,11 +89,12 @@ void WidgetSprite::Load()
                 
                 QList<quint32> requestList;
                 requestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
-                m_pItemSprite->GetAtlasManager().RequestFrames(m_pItemSprite, requestList);
+                QList<HyGuiFrame *> pRequestedList = m_pItemSprite->GetAtlasManager().RequestFrames(m_pItemSprite, requestList);
 
                 WidgetSpriteState *pSpriteState = GetCurSpriteState();
 
-                QPoint vOffset(spriteFrameObj["offsetX"].toInt(), spriteFrameObj["offsetY"].toInt());
+                QPoint vOffset(spriteFrameObj["offsetX"].toInt() - pRequestedList[0]->GetCrop().left(),
+                               spriteFrameObj["offsetY"].toInt() - (pRequestedList[0]->GetSize().height() - pRequestedList[0]->GetCrop().bottom()));
                 m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetFrame(pSpriteState->GetFrameView(), j, vOffset));
                 m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_DurationFrame(pSpriteState->GetFrameView(), j, spriteFrameObj["duration"].toDouble()));
             }
