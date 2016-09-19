@@ -82,7 +82,7 @@ public:
 	//       to pause prior to AnimSetState(), it will switch to inital frame and continue 
 	//       to pause.
 	//--------------------------------------------------------------------------------------
-	void AnimSetState(int iStateIndex);
+	void AnimSetState(uint32 uiStateIndex);
 	void AnimSetState(std::string sStateName);
 
 	//--------------------------------------------------------------------------------------

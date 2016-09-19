@@ -107,27 +107,27 @@ void HySprite2d::AnimSetPlayRate(float fPlayRate)
 	m_fAnimPlayRate = fPlayRate;
 }
 
-void HySprite2d::AnimSetState(int iStateIndex)
+void HySprite2d::AnimSetState(uint32 uiStateIndex)
 {
-	HyAssert(iStateIndex >= 0 && iStateIndex < static_cast<HySprite2dData *>(m_pData)->GetNumStates(), "HySprite2d::AnimSetState was passed an invalid state index (" << iStateIndex << ")");
+	HyAssert(uiStateIndex < static_cast<HySprite2dData *>(m_pData)->GetNumStates(), "HySprite2d::AnimSetState was passed an invalid state index (" << uiStateIndex << ")");
 	
-	m_uiCurAnimState = iStateIndex;
+	m_uiCurAnimState = uiStateIndex;
 }
 
-void HySprite2d::AnimSetState(std::string sStateName)
-{
-	uint32 uiNumStates = static_cast<HySprite2dData *>(m_pData)->GetNumStates();
-	std::transform(sStateName.begin(), sStateName.end() ::tolower());
-
-	for(int i = 0; i < uiNumStates; ++i)
-	{
-		if( == std::transform(static_cast<HySprite2dData *>(m_pData)->GetState(i)->m_sNAME.begin(), static_cast<HySprite2dData *>(m_pData)->GetState(i)->m_sNAME.end(), ::tolower())
-		{
-			m_uiCurAnimState = i;
-			break;
-		}
-	}
-}
+//void HySprite2d::AnimSetState(std::string sStateName)
+//{
+//	uint32 uiNumStates = static_cast<HySprite2dData *>(m_pData)->GetNumStates();
+//	std::transform(sStateName.begin(), sStateName.end() ::tolower());
+//
+//	for(int i = 0; i < uiNumStates; ++i)
+//	{
+//		if( == std::transform(static_cast<HySprite2dData *>(m_pData)->GetState(i)->m_sNAME.begin(), static_cast<HySprite2dData *>(m_pData)->GetState(i)->m_sNAME.end(), ::tolower())
+//		{
+//			AnimSetState(i);
+//			break;
+//		}
+//	}
+//}
 
 bool HySprite2d::AnimIsFinished()
 {
