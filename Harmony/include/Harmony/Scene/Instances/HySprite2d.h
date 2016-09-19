@@ -21,21 +21,20 @@ class HySprite2d : public IHyInst2d
 {
 protected:
 	// Array of BYTE's where each BYTE describes how each animation state is supposed to play
-	enum eStateAttribs
+	enum eAnimCtrlAttribs
 	{
-		STATEATTRIB_Loop = 1 << 0,
-		STATEATTRIB_Reverse = 1 << 1,
-		STATEATTRIB_Bounce = 1 << 2,
-		STATEATTRIB_IsBouncing = 1 << 4,	// True if anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
-		STATEATTRIB_Paused = 1 << 3,
-		// Do not exceed '8' attributes, or else increase uint8
+		ANIMCTRLATTRIB_Loop			= 1 << 0,
+		ANIMCTRLATTRIB_Reverse		= 1 << 1,
+		ANIMCTRLATTRIB_Bounce		= 1 << 2,
+		ANIMCTRLATTRIB_IsBouncing	= 1 << 3,	// True if anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
+		ANIMCTRLATTRIB_Paused		= 1 << 4,
+		// Do not exceed '8' attributes, or else increase uint8s
 	};
-	uint8 *					m_pAnimStateAttribs;
+	uint8 *					m_pAnimCtrlAttribs;
 
-	HyAnimFloat				m_PlayRate;
-	bool					m_bIsBounced;
-	
+	float					m_fAnimPlayRate;
 	float					m_fElapsedFrameTime;
+
 	uint32					m_uiCurAnimState;
 	uint32					m_uiCurFrame;
 
@@ -49,14 +48,10 @@ public:
 	virtual ~HySprite2d(void);
 
 	//--------------------------------------------------------------------------------------
-	// Specify an effect on the current state/animation of the entity. The same effects can
-	// be achieved by using AnimSetRate(), however this may be a cleaner, and more explict 
-	// interface.
-	// 
-	// Note: The play rate value is preserved when using this function. Its +/- sign may be
-	//       switched however if told to reverse from playing forward and vice versa.	
+	// Set how to playback the animation on the current (or specified) state/animation.
 	//--------------------------------------------------------------------------------------
 	void AnimCtrl(HyAnimCtrl eAnimCtrl);
+	void AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState);
 	
 	uint32 AnimGetNumStates();
 	uint32 AnimGetCurState();
@@ -65,15 +60,15 @@ public:
 	void AnimSetFrame(uint32 uiFrameIndex);
 
 	//--------------------------------------------------------------------------------------
-	// Returns the modifier (defaulted to 1.0f) that's applied the animation frame duration 
-	// set by the Designer Tool
+	// Returns the time modifier (defaulted to 1.0f) that's applied the animation frame duration 
+	// set by the Designer Tool.
 	//--------------------------------------------------------------------------------------
 	float AnimGetPlayRate();
 
 	//--------------------------------------------------------------------------------------
-	// Modifies how fast the entity's animation will play. Supplying a negative number 
-	// will set the reverse animation attribute. Supplying '0.0f' will just set the PAUSE
-	// flag and will preserve the current play rate. (1.0f = default speed)
+	// Modifies the time modifier that's applied the animation frame duration 
+	// set by the Designer Tool. Negative fPlayRate is invalid. Supplying '0.0f' will 
+	// just set the PAUSE flag and will preserve the current play rate. (1.0f = default speed)
 	//
 	// Note: This method will not unpause an entity. It will just set its play rate for
 	//       when it is told to resume.

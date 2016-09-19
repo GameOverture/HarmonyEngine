@@ -1,6 +1,6 @@
 [
     {
-        "bounce": false,
+        "bounce": true,
         "frames": [
             {
                 "atlasGroupId": 1,

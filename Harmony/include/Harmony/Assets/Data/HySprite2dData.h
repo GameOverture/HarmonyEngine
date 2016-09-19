@@ -71,7 +71,8 @@ public:
 
 	virtual ~HySprite2dData();
 
-	const HySprite2dData::AnimState &GetState(uint32 uiAnimStateIndex);
+	uint32 GetNumStates();
+	const AnimState &GetState(uint32 uiAnimStateIndex);
 	const HySprite2dFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex);
 
 	virtual void DoFileLoad();
