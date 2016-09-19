@@ -95,6 +95,87 @@ void HySprite2d::AnimSetFrame(uint32 uiFrameIndex)
 	m_uiCurFrame = uiFrameIndex;
 }
 
+float HySprite2d::AnimGetPlayRate()
+{
+	return m_fAnimPlayRate;
+}
+
+void HySprite2d::AnimSetPlayRate(float fPlayRate)
+{
+	HyAssert(fPlayRate >= 0.0f, "HySprite2d::AnimSetPlayRate passed a value that was below zero");
+
+	m_fAnimPlayRate = fPlayRate;
+}
+
+void HySprite2d::AnimSetState(int iStateIndex)
+{
+	HyAssert(iStateIndex >= 0 && iStateIndex < static_cast<HySprite2dData *>(m_pData)->GetNumStates(), "HySprite2d::AnimSetState was passed an invalid state index (" << iStateIndex << ")");
+	
+	m_uiCurAnimState = iStateIndex;
+}
+
+void HySprite2d::AnimSetState(std::string sStateName)
+{
+	uint32 uiNumStates = static_cast<HySprite2dData *>(m_pData)->GetNumStates();
+	std::transform(sStateName.begin(), sStateName.end() ::tolower());
+
+	for(int i = 0; i < uiNumStates; ++i)
+	{
+		if( == std::transform(static_cast<HySprite2dData *>(m_pData)->GetState(i)->m_sNAME.begin(), static_cast<HySprite2dData *>(m_pData)->GetState(i)->m_sNAME.end(), ::tolower())
+		{
+			m_uiCurAnimState = i;
+			break;
+		}
+	}
+}
+
+bool HySprite2d::AnimIsFinished()
+{
+	uint8 uiCtrlAttribs = m_pAnimCtrlAttribs[m_uiCurAnimState];
+	if(uiCtrlAttribs & ANIMCTRLATTRIB_Loop)
+		return false;
+
+	if((uiCtrlAttribs & ANIMCTRLATTRIB_Reverse) == 0)
+	{
+		if(uiCtrlAttribs & ANIMCTRLATTRIB_IsBouncing)
+			return m_uiCurFrame == 0;
+		else
+			return m_uiCurFrame == (AnimGetNumFrames() - 1);
+	}
+	else
+	{
+		if(uiCtrlAttribs & ANIMCTRLATTRIB_IsBouncing)
+			return m_uiCurFrame == (AnimGetNumFrames() - 1);
+		else
+			return m_uiCurFrame == 0;
+	}
+}
+
+bool HySprite2d::AnimIsPaused()
+{
+	return m_pAnimCtrlAttribs[m_uiCurAnimState] & ANIMCTRLATTRIB_Paused;
+}
+
+void HySprite2d::AnimSetCallback(int iStateID, void(*fpCallback)(HySprite2d *, void *), void *pParam = NULL)
+{
+}
+
+void HySprite2d::AnimSetFrame(int iFrameIndex)
+{
+}
+
+const HyRectangle<uint32> HySprite2d::GetCurRect(bool bCropAlpha /*= false*/)
+{
+}
+
+int HySprite2d::GetCurFrameWidth(bool bCalcProceduralScale /*= false*/)
+{
+}
+
+int HySprite2d::GetCurFrameHeight(bool bCalcProceduralScale /*= false*/)
+{
+}
+
 /*virtual*/ void HySprite2d::OnDataLoaded()
 {
 	HySprite2dData *pData = static_cast<HySprite2dData *>(m_pData);

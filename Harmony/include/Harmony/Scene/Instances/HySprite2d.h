@@ -67,23 +67,23 @@ public:
 
 	//--------------------------------------------------------------------------------------
 	// Modifies the time modifier that's applied the animation frame duration 
-	// set by the Designer Tool. Negative fPlayRate is invalid. Supplying '0.0f' will 
-	// just set the PAUSE flag and will preserve the current play rate. (1.0f = default speed)
+	// set by the Designer Tool. Negative fPlayRate is invalid. 
 	//
-	// Note: This method will not unpause an entity. It will just set its play rate for
+	// Note: This method will not unpause an sprite. It will just set its play rate for
 	//       when it is told to resume.
 	//--------------------------------------------------------------------------------------
 	void AnimSetPlayRate(float fPlayRate);
 
 	//--------------------------------------------------------------------------------------
-	// Change the state of the entity, in other words, essentially swaps the animation and
-	// goes to frame [0] or frame [last] if playing in reverse.
+	// Change the animation state of the sprite. The new state sets the current frame index
+	// to frame [0] or frame [last] if the animation ctrls specify to play in reverse.
 	//
 	// Note: This does not automatically begin playing the animation. If entity was instructed
 	//       to pause prior to AnimSetState(), it will switch to inital frame and continue 
 	//       to pause.
 	//--------------------------------------------------------------------------------------
-	void AnimSetState(int iStateID);
+	void AnimSetState(int iStateIndex);
+	void AnimSetState(std::string sStateName);
 
 	//--------------------------------------------------------------------------------------
 	// Returns a boolean value that represents whether this animation has finished playing.
