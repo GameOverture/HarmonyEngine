@@ -44,7 +44,7 @@ void HyEntity2d::CtorInit()
 
 }
 
-void HyEntity2d::Update()
+void HyEntity2d::OnUpdate()
 {
 	
 }

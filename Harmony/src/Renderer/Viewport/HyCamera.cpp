@@ -37,7 +37,15 @@ HyCamera2d::HyCamera2d(HyWindow *pWindow) : IHyCamera(pWindow)
 HyCamera2d::~HyCamera2d()
 { }
 
+/*virtual*/ void HyCamera2d::OnUpdate()
+{
+}
+
 HyCamera3d::HyCamera3d(HyWindow *pWindow) : IHyCamera(pWindow)
 { }
 HyCamera3d::~HyCamera3d()
 { }
+
+/*virtual*/ void HyCamera3d::OnUpdate()
+{
+}

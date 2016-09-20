@@ -72,7 +72,7 @@ public:
 	void GetWorldTransform(glm::mat4 &outMtx);
 
 private:
-	virtual void Update();
+	virtual void OnUpdate();
 
 	void LinkInst(IHyInst2d *pInst);
 

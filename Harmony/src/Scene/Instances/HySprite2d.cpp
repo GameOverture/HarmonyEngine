@@ -165,22 +165,25 @@ void HySprite2d::AnimSetFrame(int iFrameIndex)
 {
 }
 
-const HyRectangle<uint32> HySprite2d::GetCurRect(bool bCropAlpha /*= false*/)
+float HySprite2d::GetCurFrameWidth(bool bIncludeScaling /*= true*/)
 {
+	HySprite2dData *pData = static_cast<HySprite2dData *>(m_pData);
+	const HySprite2dFrame &frameRef = pData->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+
+	return frameRef.rSRC_RECT.Width() * frameRef.pAtlasGroup->GetWidth() * (bIncludeScaling ? scale.X() : 1.0f);
 }
 
-int HySprite2d::GetCurFrameWidth(bool bCalcProceduralScale /*= false*/)
+float HySprite2d::GetCurFrameHeight(bool bIncludeScaling /*= true*/)
 {
-}
+	HySprite2dData *pData = static_cast<HySprite2dData *>(m_pData);
+	const HySprite2dFrame &frameRef = pData->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 
-int HySprite2d::GetCurFrameHeight(bool bCalcProceduralScale /*= false*/)
-{
+	return frameRef.rSRC_RECT.Height() * frameRef.pAtlasGroup->GetHeight() * (bIncludeScaling ? scale.Y() : 1.0f);
 }
 
 /*virtual*/ void HySprite2d::OnDataLoaded()
 {
 	HySprite2dData *pData = static_cast<HySprite2dData *>(m_pData);
-	//m_RenderState.SetTextureHandle(pData->GetAtlasGroup()->GetGfxApiHandle());
 
 	uint32 uiNumStates = pData->GetNumStates();
 
@@ -204,6 +207,8 @@ int HySprite2d::GetCurFrameHeight(bool bCalcProceduralScale /*= false*/)
 /*virtual*/ void HySprite2d::OnInstUpdate()
 {
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+
+	m_RenderState.SetTextureHandle(frameRef.pAtlasGroup->GetGfxApiHandle());
 
 	uint8 &uiAnimCtrlRef = m_pAnimCtrlAttribs[m_uiCurAnimState];
 

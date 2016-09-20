@@ -110,16 +110,8 @@ public:
 	//--------------------------------------------------------------------------------------
 	void AnimSetFrame(int iFrameIndex);
 
-	// Returns a const RECT pointer to the internal drawing texture source rectangle. This method
-	// can sometimes be useful to determine the dimensions of an entity in its current state 
-	// and frame. 
-	// 
-	// NOTE: This rectangle may be misleading in the case where the source rectangle includes
-	//       alpha'ed out pixels around the source art.
-	const HyRectangle<uint32> GetCurRect(bool bCropAlpha = false);
-
-	int GetCurFrameWidth(bool bCalcProceduralScale = false);
-	int GetCurFrameHeight(bool bCalcProceduralScale = false);
+	float GetCurFrameWidth(bool bIncludeScaling = true);
+	float GetCurFrameHeight(bool bIncludScaling = true);
 
 private:
 	virtual void OnDataLoaded();
