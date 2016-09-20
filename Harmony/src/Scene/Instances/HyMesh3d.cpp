@@ -18,7 +18,7 @@ HyMesh3d::~HyMesh3d(void)
 {
 }
 
-/*virtual*/ void HyMesh3d::OnUpdate()
+/*virtual*/ void HyMesh3d::OnInstUpdate()
 {
 }
 

@@ -117,6 +117,7 @@ void IHyInst2d::Detach()
 		if(*iter == this)
 		{
 			m_pParent->m_vChildList.erase(iter);
+			m_pParent = NULL;
 			return;
 		}
 	}
@@ -124,9 +125,9 @@ void IHyInst2d::Detach()
 	HyError("IObjInst2d::Detach() could not find itself in parent's child list");
 }
 
-void IHyInst2d::Update()
+/*virtual*/ void IHyInst2d::OnUpdate()
 {
-	OnUpdate();
+	OnInstUpdate();
 	OnUpdateUniforms(m_RenderState.PrimeShaderUniforms());
 }
 

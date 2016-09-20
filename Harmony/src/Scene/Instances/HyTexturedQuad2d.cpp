@@ -119,7 +119,7 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	}
 }
 
-/*virtual*/ void HyTexturedQuad2d::OnUpdate()
+/*virtual*/ void HyTexturedQuad2d::OnInstUpdate()
 {
 }
 

@@ -153,11 +153,12 @@ bool HySprite2d::AnimIsFinished()
 
 bool HySprite2d::AnimIsPaused()
 {
-	return m_pAnimCtrlAttribs[m_uiCurAnimState] & ANIMCTRLATTRIB_Paused;
+	return (m_pAnimCtrlAttribs[m_uiCurAnimState] & ANIMCTRLATTRIB_Paused) != 0;
 }
 
-void HySprite2d::AnimSetCallback(int iStateID, void(*fpCallback)(HySprite2d *, void *), void *pParam = NULL)
+void HySprite2d::AnimSetCallback(int iStateID, void(*fpCallback)(HySprite2d *, void *), void *pParam /*= NULL*/)
 {
+
 }
 
 void HySprite2d::AnimSetFrame(int iFrameIndex)
@@ -200,7 +201,7 @@ int HySprite2d::GetCurFrameHeight(bool bCalcProceduralScale /*= false*/)
 
 }
 
-/*virtual*/ void HySprite2d::OnUpdate()
+/*virtual*/ void HySprite2d::OnInstUpdate()
 {
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 

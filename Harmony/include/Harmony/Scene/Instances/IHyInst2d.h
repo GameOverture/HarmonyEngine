@@ -90,8 +90,8 @@ public:
 protected:
 	virtual void OnDataLoaded() = 0;
 	
-	void Update();
-	virtual void OnUpdate() = 0;
+	virtual void OnUpdate();
+	virtual void OnInstUpdate() = 0;
 
 	// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef) = 0;

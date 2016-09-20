@@ -42,14 +42,17 @@ public:
 	HyCoordinateUnit GetCoordinateUnit()						{ return m_eCoordUnit; }
 	void SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion);
 
-	inline bool	IsEnabled()										{ return m_bEnabled; }
-	inline void	SetEnabled(bool bEnabled)						{ m_bEnabled = bEnabled; }
+	bool IsEnabled()											{ return m_bEnabled; }
+	void SetEnabled(bool bEnabled)								{ m_bEnabled = bEnabled; }
 	
 	// Returns the converted pixel position to the specified HyCoordinateType
 	void GetLocalTransform(glm::mat4 &outMtx) const;
 	void GetLocalTransform_SRT(glm::mat4 &outMtx) const;
 
 	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam = NULL);
+
+	void Update();
+	virtual void OnUpdate() = 0;
 };
 
 template<typename tVec>
@@ -156,6 +159,14 @@ void ITransform<tVec>::SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pPara
 	pos.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
 	rot.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
 	scale.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
+}
+
+template<typename tVec>
+void ITransform<tVec>::Update()
+{
+	OnUpdate();
+
+	// TODO: process the procedural action queue
 }
 
 #endif /* __ITransform_h__ */

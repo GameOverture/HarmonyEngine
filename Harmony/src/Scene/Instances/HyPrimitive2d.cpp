@@ -185,7 +185,7 @@ void HyPrimitive2d::ClearData()
 {
 }
 
-/*virtual*/ void HyPrimitive2d::OnUpdate()
+/*virtual*/ void HyPrimitive2d::OnInstUpdate()
 {
 }
 

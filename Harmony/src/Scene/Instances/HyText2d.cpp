@@ -117,7 +117,7 @@ void HyText2d::CalcVertexBuffer()
 	CalcVertexBuffer();
 }
 
-/*virtual*/ void HyText2d::OnUpdate()
+/*virtual*/ void HyText2d::OnInstUpdate()
 {
 
 }

@@ -41,7 +41,7 @@ public:
 private:
 	virtual void OnDataLoaded();
 
-	virtual void OnUpdate();
+	virtual void OnInstUpdate();
 
 	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef);
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
