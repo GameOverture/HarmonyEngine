@@ -29,6 +29,8 @@ protected:
 
 	bool				m_bEnabled;
 
+	HyActionQueue		m_ActionQueue;
+
 public:
 	ITransform();
 	virtual ~ITransform(void);
@@ -50,6 +52,11 @@ public:
 	void GetLocalTransform_SRT(glm::mat4 &outMtx) const;
 
 	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam = NULL);
+
+	void QueuePos(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer = 0.0f);
+	void QueueRot(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer = 0.0f);
+	void QueueScale(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer = 0.0f);
+	void QueueCallback(void(*fpCallback)(IHyInst2d *, void *), void *pParam = NULL, float fDefer = 0.0f);
 
 	void Update();
 	virtual void OnUpdate() = 0;
@@ -159,6 +166,29 @@ void ITransform<tVec>::SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pPara
 	pos.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
 	rot.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
 	scale.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
+}
+
+template<typename tVec>
+void ITransform<tVec>::QueuePos(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer /*= 0.0f*/)
+{
+	m_ActionQueue.AppendAction(fTweenDuration, fDefer, [&]	{
+		this->pos.Tween(fX, fY, fTweenDuration, fpEase);
+	});
+}
+
+template<typename tVec>
+void ITransform<tVec>::QueueRot(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer /*= 0.0f*/)
+{
+}
+
+template<typename tVec>
+void ITransform<tVec>::QueueScale(tVec vScaleAmt, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer /*= 0.0f*/)
+{
+}
+
+template<typename tVec>
+void ITransform<tVec>::QueueCallback(void(*fpCallback)(void *, void *), void *pParam /*= NULL*/, float fDefer /*= 0.0f*/)
+{
 }
 
 template<typename tVec>

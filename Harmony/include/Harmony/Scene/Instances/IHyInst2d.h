@@ -24,6 +24,37 @@
 typedef void (*HyWriteDrawBufferDataOverride)(char *&);
 typedef void(*HyUpdateUniformOverride)(HyShaderUniforms *);
 
+
+#include <functional>
+class HyActionQueue
+{
+	float								m_fDuration;
+	std::queue<std::function<void()> >	m_Queue;
+
+public:
+	HyActionQueue() : m_fDuration(0.0f)
+	{ }
+
+	void Update()
+	{
+		m_fDuration = HyClamp(m_fDuration - IHyTime::GetUpdateStepSeconds(), 0.0f, m_fDuration);
+
+		if(m_fDuration == 0.0f)
+		{
+			if(m_Queue.empty() == false)
+			{
+				m_Queue.front()();
+				m_Queue.pop();
+			}
+		}
+	}
+
+	void AppendAction(float fDuration, float fDeferAmt, std::function<void()> task)
+	{
+		m_Queue.push_back(task);
+	}
+};
+
 class IHyInst2d : public ITransform<HyAnimVec2>
 {
 	friend class HyScene;
