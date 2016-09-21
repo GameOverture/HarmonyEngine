@@ -12,8 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Utilities/Animation/ITransform.h"
-#include "Utilities/Animation/HyAnimVec2.h"
+#include "Utilities/Animation/IHyTransform2d.h"
 
 #include "Utilities/HyMath.h"
 
@@ -27,7 +26,7 @@ class HySpine2d;
 class HyText2d;
 class HyPrimitive2d;
 
-class HyEntity2d : public ITransform<HyAnimVec2>
+class HyEntity2d : public IHyTransform2d
 {
 	friend class HyScene;
 

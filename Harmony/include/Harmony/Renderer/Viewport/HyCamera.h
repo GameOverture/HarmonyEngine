@@ -13,7 +13,8 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Utilities/HyMath.h"
-#include "Utilities/Animation/ITransform.h"
+#include "Utilities/Animation/IHyTransform2d.h"
+#include "Utilities/Animation/IHyTransform3d.h"
 #include "Utilities/Animation/HyAnimVec2.h"
 
 class HyWindow;
@@ -38,7 +39,7 @@ public:
 	virtual float GetZoom() const = 0;
 };
 
-class HyCamera2d : public ITransform<HyAnimVec2>, public IHyCamera
+class HyCamera2d : public IHyTransform2d, public IHyCamera
 {
 	friend class HyWindow;
 
@@ -52,7 +53,7 @@ public:
 	virtual float GetZoom() const				{ return scale.Get().x; }
 };
 
-class HyCamera3d : public ITransform<HyAnimVec3>, public IHyCamera
+class HyCamera3d : public IHyTransform3d, public IHyCamera
 {
 	friend class HyWindow;
 

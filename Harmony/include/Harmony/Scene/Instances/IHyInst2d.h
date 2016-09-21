@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Utilities/Animation/ITransform.h"
+#include "Utilities/Animation/IHyTransform2d.h"
 #include "Utilities/Animation/HyAnimVec2.h"
 
 #include "Assets/Data/IHyData.h"
@@ -24,38 +24,7 @@
 typedef void (*HyWriteDrawBufferDataOverride)(char *&);
 typedef void(*HyUpdateUniformOverride)(HyShaderUniforms *);
 
-
-#include <functional>
-class HyActionQueue
-{
-	float								m_fDuration;
-	std::queue<std::function<void()> >	m_Queue;
-
-public:
-	HyActionQueue() : m_fDuration(0.0f)
-	{ }
-
-	void Update()
-	{
-		m_fDuration = HyClamp(m_fDuration - IHyTime::GetUpdateStepSeconds(), 0.0f, m_fDuration);
-
-		if(m_fDuration == 0.0f)
-		{
-			if(m_Queue.empty() == false)
-			{
-				m_Queue.front()();
-				m_Queue.pop();
-			}
-		}
-	}
-
-	void AppendAction(float fDuration, float fDeferAmt, std::function<void()> task)
-	{
-		m_Queue.push_back(task);
-	}
-};
-
-class IHyInst2d : public ITransform<HyAnimVec2>
+class IHyInst2d : public IHyTransform2d
 {
 	friend class HyScene;
 	friend class HyAssetManager;

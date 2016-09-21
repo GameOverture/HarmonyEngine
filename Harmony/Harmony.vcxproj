@@ -92,6 +92,8 @@
     <ClCompile Include="src\Time\Watches\IHyTimeInst.cpp" />
     <ClCompile Include="src\Utilities\Animation\HyAnimFloat.cpp" />
     <ClCompile Include="src\Utilities\Animation\HyTweenFuncs.cpp" />
+    <ClCompile Include="src\Utilities\Animation\IHyTransform2d.cpp" />
+    <ClCompile Include="src\Utilities\Animation\IHyTransform3d.cpp" />
     <ClCompile Include="src\Utilities\Crc32.cpp" />
     <ClCompile Include="src\Utilities\HyBitManip.cpp" />
     <ClCompile Include="src\Utilities\HyDebugPhys2d.cpp" />
@@ -186,7 +188,9 @@
     <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec3.h" />
     <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec4.h" />
     <ClInclude Include="include\Harmony\Utilities\Animation\HyTweenFuncs.h" />
-    <ClInclude Include="include\Harmony\Utilities\Animation\ITransform.h" />
+    <ClInclude Include="include\Harmony\Utilities\Animation\IHyTransform2d.h" />
+    <ClInclude Include="include\Harmony\Utilities\Animation\IHyTransform.h" />
+    <ClInclude Include="include\Harmony\Utilities\Animation\IHyTransform3d.h" />
     <ClInclude Include="include\Harmony\Utilities\Containers\HyStaticArray.h" />
     <ClInclude Include="include\Harmony\Utilities\Crc32.h" />
     <ClInclude Include="include\Harmony\Utilities\HyBitManip.h" />

@@ -29,6 +29,7 @@ HyAnimFloat::HyAnimFloat() :	m_fValueRef(*(HY_NEW float)),
 								m_bAddedToSceneUpdate(false),
 								m_bSELF_ALLOCATED(true)
 {
+	m_fValueRef = 0.0f;
 }
 
 HyAnimFloat::HyAnimFloat(float &valueReference) :	m_fValueRef(valueReference), 

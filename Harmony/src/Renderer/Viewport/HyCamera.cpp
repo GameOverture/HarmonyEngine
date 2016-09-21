@@ -10,8 +10,6 @@
 #include "Renderer/Viewport/HyCamera.h"
 #include "Renderer/Viewport/HyWindow.h"
 
-#include "Utilities/Animation/ITransform.h"
-
 IHyCamera::IHyCamera(HyWindow *pWindow) : m_pWindowPtr(pWindow)
 {
 	m_ViewportRect.left = m_ViewportRect.top = 0.0f;
