@@ -14,12 +14,11 @@
 
 class IHyTransform3d : public IHyTransform<HyAnimVec3>
 {
-protected:
-	HyAnimVec3		rot;
-
 public:
 	IHyTransform3d();
 	virtual ~IHyTransform3d();
+	
+	HyAnimVec3		rot;
 
 	virtual void GetLocalTransform(glm::mat4 &outMtx) const;
 	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const;

@@ -69,7 +69,7 @@ HyTexturedQuad2d *HyGuiFrame::DrawInst(void *pKey)
     {
         pDrawInst->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.height(), m_rAlphaCrop.width());
         pDrawInst->rot_pivot.Set(m_rAlphaCrop.height() * 0.5f, m_rAlphaCrop.width() * 0.5f);
-        pDrawInst->rot.Z(90);
+        pDrawInst->rot.Set(90);
     }
 
     pDrawInst->SetEnabled(false);
@@ -110,7 +110,7 @@ void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX,
             {
                 iter.value()->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.height(), m_rAlphaCrop.width());
                 iter.value()->rot_pivot.Set(m_rAlphaCrop.height() * 0.5f, m_rAlphaCrop.width() * 0.5f);
-                iter.value()->rot.Z(90);
+                iter.value()->rot.Set(90);
             }
         }
     }

@@ -15,12 +15,11 @@
 
 class IHyTransform2d : public IHyTransform<HyAnimVec2>
 {
-protected:
-	HyAnimFloat		rot;
-
 public:
 	IHyTransform2d();
 	virtual ~IHyTransform2d();
+	
+	HyAnimFloat		rot;
 
 	void QueuePos(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer = 0.0f);
 	void QueueRot(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer = 0.0f);
