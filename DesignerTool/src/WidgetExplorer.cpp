@@ -101,7 +101,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         pItem = new ItemSprite(sNewItemPath, pCurProj->GetAtlasManager());
         break;
     case ITEM_Font:
-        pItem = new ItemFont(sNewItemPath);
+        pItem = new ItemFont(sNewItemPath, pCurProj->GetAtlasManager());
         break;
     default:
         HyGuiLog("Item: " % sNewItemPath % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);

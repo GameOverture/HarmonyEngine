@@ -48,11 +48,6 @@ class ItemSprite : public ItemWidget
     HyPrimitive2d               m_primOriginHorz;
     HyPrimitive2d               m_primOriginVert;
     
-    enum eCameraStates
-    {
-    };
-    QPointF                     m_ptCameraDestination;
-    
 public:
     ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef);
     virtual ~ItemSprite();
