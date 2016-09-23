@@ -14,7 +14,7 @@
 
 #include <iostream>
 
-/*static*/ HyChar HyText2d::sm_pTempTextBuffer[HY_TEMP_TEXTBUFFER_SIZE] = { 0 };
+/*static*/ char HyText2d::sm_pTempTextBuffer[HY_TEMP_TEXTBUFFER_SIZE] = { 0 };
 
 HyText2d::HyText2d(const char *szPrefix, const char *szName) :	IHyInst2d(HYINST_Text2d, szPrefix, szName),
 																m_pVertexBuffer(NULL),
@@ -29,15 +29,15 @@ HyText2d::~HyText2d(void)
 {
 }
 
-void HyText2d::SetString(const HyChar *szString, ...)
+void HyText2d::SetString(const char *szString, ...)
 {
 	va_list vl;
 	va_start(vl, szString);
-#ifdef HY_UNICODE
-	vswprintf(sm_pTempTextBuffer, HY_TEMP_TEXTBUFFER_SIZE, szString, vl);
-#else
+//#ifdef HY_UNICODE
+//	vswprintf(sm_pTempTextBuffer, HY_TEMP_TEXTBUFFER_SIZE, szString, vl);
+//#else
 	vsprintf(sm_pTempTextBuffer, szString, vl);
-#endif
+//#endif
 	va_end(vl);
 
 	if(m_sString == sm_pTempTextBuffer)
@@ -68,12 +68,12 @@ void HyText2d::CalcVertexBuffer()
 	unsigned char *pCurVertexWritePos = m_pVertexBuffer;
 	for(size_t i = 0; i < uiNumCharacters; ++i)
 	{
-		texture_glyph_t *glyph = pTextData->GetGlyph(m_uiCurFontIndex, m_sString[i]);
+		texture_glyph_t *glyph = pTextData->GetGlyph(m_uiCurFontIndex, &m_sString[i]);
 		if( glyph != NULL )
 		{
 			float fKerning = 0;
 			if( i > 0)
-				fKerning = texture_glyph_get_kerning(glyph, m_sString[i-1]);
+				fKerning = texture_glyph_get_kerning(glyph, &m_sString[i-1]);
 
 			ptPenPos.x += fKerning;
 

@@ -1,7 +1,7 @@
 /* ============================================================================
  * Freetype GL - A C OpenGL Freetype engine
  * Platform:    Any
- * WWW:         http://code.google.com/p/freetype-gl/
+ * WWW:         https://github.com/rougier/freetype-gl
  * ----------------------------------------------------------------------------
  * Copyright 2011,2012 Nicolas P. Rougier. All rights reserved.
  *
@@ -37,32 +37,30 @@
 #include <math.h>
 #include "mat4.h"
 
-#ifndef M_PI
-#    define M_PI 3.14159265358979323846
-#endif
+#define M_PI 3.141592f // Added by JJK
 
-mat4_ft *
+mat4 *
 mat4_new( void )
 {
-    mat4_ft *self = (mat4_ft *) malloc( sizeof(mat4_ft) );
+    mat4 *self = (mat4 *) malloc( sizeof(mat4) );
     return self;
 
 }
 
 void
-mat4_set_zero( mat4_ft *self )
+mat4_set_zero( mat4 *self )
 {
     assert( self );
 
-    memset( self, 0, sizeof( mat4_ft ));
+    memset( self, 0, sizeof( mat4 ));
 }
 
 void
-mat4_set_identity( mat4_ft *self )
+mat4_set_identity( mat4 *self )
 {
     assert( self );
 
-    memset( self, 0, sizeof( mat4_ft ));
+    memset( self, 0, sizeof( mat4 ));
     self->m00 = 1.0;
     self->m11 = 1.0;
     self->m22 = 1.0;
@@ -70,9 +68,9 @@ mat4_set_identity( mat4_ft *self )
 }
 
 void
-mat4_multiply( mat4_ft *self, mat4_ft *other )
+mat4_multiply( mat4 *self, mat4 *other )
 {
-    mat4_ft m;
+    mat4 m;
     size_t i;
 
     assert( self );
@@ -91,26 +89,26 @@ mat4_multiply( mat4_ft *self, mat4_ft *other )
             (self->data[i*4+1] * other->data[1*4+1]) +
             (self->data[i*4+2] * other->data[2*4+1]) +
             (self->data[i*4+3] * other->data[3*4+1]) ;
-        
+
         m.data[i*4+2] =
             (self->data[i*4+0] * other->data[0*4+2]) +
             (self->data[i*4+1] * other->data[1*4+2]) +
             (self->data[i*4+2] * other->data[2*4+2]) +
             (self->data[i*4+3] * other->data[3*4+2]) ;
-        
+
         m.data[i*4+3] =
             (self->data[i*4+0] * other->data[0*4+3]) +
             (self->data[i*4+1] * other->data[1*4+3]) +
             (self->data[i*4+2] * other->data[2*4+3]) +
             (self->data[i*4+3] * other->data[3*4+3]) ;
     }
-    memcpy( self, &m, sizeof( mat4_ft ) );
+    memcpy( self, &m, sizeof( mat4 ) );
 
 }
 
 
 void
-mat4_set_orthographic( mat4_ft *self,
+mat4_set_orthographic( mat4 *self,
                        float left,   float right,
                        float bottom, float top,
                        float znear,  float zfar )
@@ -122,38 +120,38 @@ mat4_set_orthographic( mat4_ft *self,
 
     mat4_set_zero( self );
 
-    self->m00 = +2.0/(right-left);
+    self->m00 = +2.0f/(right-left);
     self->m30 = -(right+left)/(right-left);
-    self->m11 = +2.0/(top-bottom);
+    self->m11 = +2.0f/(top-bottom);
     self->m31 = -(top+bottom)/(top-bottom);
-    self->m22 = -2.0/(zfar-znear);
+    self->m22 = -2.0f/(zfar-znear);
     self->m32 = -(zfar+znear)/(zfar-znear);
-    self->m33 = 1.0;
+    self->m33 = 1.0f;
 }
 
 void
-mat4_set_perspective( mat4_ft *self,
+mat4_set_perspective( mat4 *self,
                       float fovy,  float aspect,
                       float znear, float zfar)
 {
     float h, w;
-   
+
     assert( self );
     assert( znear != zfar );
 
-    h = tan(fovy / 360.0 * M_PI) * znear;
+    h = (float)tan(fovy / 360.0 * M_PI) * znear;
     w = h * aspect;
- 
+
     mat4_set_frustum( self, -w, w, -h, h, znear, zfar );
 }
 
 void
-mat4_set_frustum( mat4_ft *self,
+mat4_set_frustum( mat4 *self,
                   float left,   float right,
                   float bottom, float top,
                   float znear,  float zfar )
 {
-    
+
     assert( self );
     assert( right  != left );
     assert( bottom != top  );
@@ -161,30 +159,30 @@ mat4_set_frustum( mat4_ft *self,
 
     mat4_set_zero( self );
 
-    self->m00 = +2.0*znear/(right-left);
+    self->m00 = (2.0f*znear)/(right-left);
     self->m20 = (right+left)/(right-left);
 
-    self->m11 = +2.0*znear/(top-bottom);
-    self->m31 = (top+bottom)/(top-bottom);
+    self->m11 = (2.0f*znear)/(top-bottom);
+    self->m21 = (top+bottom)/(top-bottom);
 
     self->m22 = -(zfar+znear)/(zfar-znear);
-    self->m32 = -2.0*znear/(zfar-znear);
+    self->m32 = -(2.0f*zfar*znear)/(zfar-znear);
 
-    self->m23 = -1.0;
+    self->m23 = -1.0f;
 }
 
 void
-mat4_set_rotation( mat4_ft *self,
+mat4_set_rotation( mat4 *self,
                    float angle,
                    float x, float y, float z)
 {
     float c, s, norm;
-  
+
     assert( self );
 
-    c = cos( M_PI*angle/180.0 );
-    s = sin( M_PI*angle/180.0 );
-    norm = sqrt(x*x+y*y+z*z);
+    c = (float)cos( M_PI*angle/180.0 );
+    s = (float)sin( M_PI*angle/180.0 );
+    norm = (float)sqrt(x*x+y*y+z*z);
 
     x /= norm; y /= norm; z /= norm;
 
@@ -204,7 +202,7 @@ mat4_set_rotation( mat4_ft *self,
 }
 
 void
-mat4_set_translation( mat4_ft *self,
+mat4_set_translation( mat4 *self,
                       float x, float y, float z)
 {
     assert( self );
@@ -216,7 +214,7 @@ mat4_set_translation( mat4_ft *self,
 }
 
 void
-mat4_set_scaling( mat4_ft *self,
+mat4_set_scaling( mat4 *self,
                   float x, float y, float z)
 {
     assert( self );
@@ -228,12 +226,12 @@ mat4_set_scaling( mat4_ft *self,
 }
 
 void
-mat4_rotate( mat4_ft *self,
+mat4_rotate( mat4 *self,
              float angle,
              float x, float y, float z)
 {
-    mat4_ft m;
-    
+    mat4 m;
+
     assert( self );
 
     mat4_set_rotation( &m, angle, x, y, z);
@@ -241,10 +239,10 @@ mat4_rotate( mat4_ft *self,
 }
 
 void
-mat4_translate( mat4_ft *self,
+mat4_translate( mat4 *self,
                 float x, float y, float z)
 {
-    mat4_ft m;
+    mat4 m;
     assert( self );
 
     mat4_set_translation( &m, x, y, z);
@@ -252,10 +250,10 @@ mat4_translate( mat4_ft *self,
 }
 
 void
-mat4_scale( mat4_ft *self,
+mat4_scale( mat4 *self,
             float x, float y, float z)
 {
-    mat4_ft m;
+    mat4 m;
     assert( self );
 
     mat4_set_scaling( &m, x, y, z);

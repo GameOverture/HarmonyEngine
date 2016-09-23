@@ -1,7 +1,7 @@
 /* ============================================================================
  * Freetype GL - A C OpenGL Freetype engine
  * Platform:    Any
- * WWW:         http://code.google.com/p/freetype-gl/
+ * WWW:         https://github.com/rougier/freetype-gl
  * ----------------------------------------------------------------------------
  * Copyright 2011,2012 Nicolas P. Rougier. All rights reserved.
  *
@@ -53,6 +53,10 @@ extern "C" {
 #include "vector.h"
 #include "vec234.h"
 
+#ifdef __cplusplus
+namespace ftgl {
+#endif
+
 /**
  * @file   texture-atlas.h
  * @author Nicolas Rougier (Nicolas.Rougier@inria.fr)
@@ -79,7 +83,7 @@ extern "C" {
  * texture_atlas_t * atlas = texture_atlas_new( 512, 512, 1 );
  *
  * // Allocates a region of 20x20
- * ivec4_ft region = texture_atlas_get_region( atlas, 20, 20 );
+ * ivec4 region = texture_atlas_get_region( atlas, 20, 20 );
  *
  * // Fill region with some data
  * texture_atlas_set_region( atlas, region.x, region.y, region.width, region.height, data, stride )
@@ -95,7 +99,7 @@ extern "C" {
 /**
  * A texture atlas is used to pack several small regions into a single texture.
  */
-typedef struct
+typedef struct texture_atlas_t
 {
     /**
      * Allocated nodes
@@ -162,16 +166,6 @@ typedef struct
 
 
 /**
- *  Upload atlas to video memory.
- *
- *  @param self a texture atlas structure
- *
- */
-  void
-  texture_atlas_upload( texture_atlas_t * self );
-
-
-/**
  *  Allocate a new region in the atlas.
  *
  *  @param self   a texture atlas structure
@@ -180,7 +174,7 @@ typedef struct
  *  @return       Coordinates of the allocated region
  *
  */
-  ivec4_ft
+  ivec4
   texture_atlas_get_region( texture_atlas_t * self,
                             const size_t width,
                             const size_t height );
@@ -219,6 +213,7 @@ typedef struct
 /** @} */
 
 #ifdef __cplusplus
+}
 }
 #endif
 

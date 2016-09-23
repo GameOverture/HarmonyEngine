@@ -19,18 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\font-manager.c" />
-    <ClCompile Include="src\mat4.c" />
-    <ClCompile Include="src\platform.c" />
-    <ClCompile Include="src\shader.c" />
-    <ClCompile Include="src\text-buffer.c" />
-    <ClCompile Include="src\texture-atlas.c" />
-    <ClCompile Include="src\texture-font.c" />
-    <ClCompile Include="src\vector.c" />
-    <ClCompile Include="src\vertex-attribute.c" />
-    <ClCompile Include="src\vertex-buffer.c" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClInclude Include="..\..\..\include\freetype-gl\distance-field.h" />
+    <ClInclude Include="..\..\..\include\freetype-gl\edtaa3func.h" />
     <ClInclude Include="..\..\..\include\freetype-gl\font-manager.h" />
     <ClInclude Include="..\..\..\include\freetype-gl\freetype-gl.h" />
     <ClInclude Include="..\..\..\include\freetype-gl\markup.h" />
@@ -38,14 +28,30 @@
     <ClInclude Include="..\..\..\include\freetype-gl\opengl.h" />
     <ClInclude Include="..\..\..\include\freetype-gl\platform.h" />
     <ClInclude Include="..\..\..\include\freetype-gl\shader.h" />
-    <ClInclude Include="..\..\..\include\freetype-gl\stdint.h" />
     <ClInclude Include="..\..\..\include\freetype-gl\text-buffer.h" />
     <ClInclude Include="..\..\..\include\freetype-gl\texture-atlas.h" />
     <ClInclude Include="..\..\..\include\freetype-gl\texture-font.h" />
+    <ClInclude Include="..\..\..\include\freetype-gl\utf8-utils.h" />
     <ClInclude Include="..\..\..\include\freetype-gl\vec234.h" />
     <ClInclude Include="..\..\..\include\freetype-gl\vector.h" />
     <ClInclude Include="..\..\..\include\freetype-gl\vertex-attribute.h" />
     <ClInclude Include="..\..\..\include\freetype-gl\vertex-buffer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\distance-field.c" />
+    <ClCompile Include="src\edtaa3func.c" />
+    <ClCompile Include="src\font-manager.c" />
+    <ClCompile Include="src\makefont.c" />
+    <ClCompile Include="src\mat4.c" />
+    <ClCompile Include="src\platform.c" />
+    <ClCompile Include="src\shader.c" />
+    <ClCompile Include="src\text-buffer.c" />
+    <ClCompile Include="src\texture-atlas.c" />
+    <ClCompile Include="src\texture-font.c" />
+    <ClCompile Include="src\utf8-utils.c" />
+    <ClCompile Include="src\vector.c" />
+    <ClCompile Include="src\vertex-attribute.c" />
+    <ClCompile Include="src\vertex-buffer.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E0443D96-7D16-4ABD-B55E-3639B9E7BDC5}</ProjectGuid>

@@ -1,7 +1,7 @@
 /* =========================================================================
  * Freetype GL - A C OpenGL Freetype engine
  * Platform:    Any
- * WWW:         http://code.google.com/p/freetype-gl/
+ * WWW:         https://github.com/rougier/freetype-gl
  * -------------------------------------------------------------------------
  * Copyright 2011,2012 Nicolas P. Rougier. All rights reserved.
  *
@@ -40,6 +40,10 @@ extern "C" {
 #include "texture-font.h"
 #include "vec234.h"
 
+#ifdef __cplusplus
+namespace ftgl {
+#endif
+
 /**
  * @file   markup.h
  * @author Nicolas Rougier (Nicolas.Rougier@inria.fr)
@@ -54,9 +58,9 @@ extern "C" {
  *
  * ...
  *
- * vec4_ft black  = {{0.0, 0.0, 0.0, 1.0}};
- * vec4_ft white  = {{1.0, 1.0, 1.0, 1.0}};
- * vec4_ft none   = {{1.0, 1.0, 1.0, 0.0}};
+ * vec4 black  = {{0.0, 0.0, 0.0, 1.0}};
+ * vec4 white  = {{1.0, 1.0, 1.0, 1.0}};
+ * vec4 none   = {{1.0, 1.0, 1.0, 0.0}};
  *
  * markup_t normal = {
  *     .family  = "Droid Serif",
@@ -84,7 +88,7 @@ extern "C" {
 /**
  * Simple structure that describes text properties.
  */
-typedef struct
+typedef struct markup_t
 {
     /**
      * A font family name such as "normal", "sans", "serif" or "monospace".
@@ -124,12 +128,12 @@ typedef struct
     /**
      * Text color.
      */
-    vec4_ft foreground_color;
+    vec4 foreground_color;
 
     /**
      * Background color.
      */
-    vec4_ft background_color;
+    vec4 background_color;
 
     /**
      * Whether outline is active.
@@ -139,7 +143,7 @@ typedef struct
     /**
      * Outline color.
      */
-    vec4_ft outline_color;
+    vec4 outline_color;
 
     /**
      * Whether underline is active.
@@ -149,7 +153,7 @@ typedef struct
     /**
      * Underline color.
      */
-    vec4_ft underline_color;
+    vec4 underline_color;
 
     /**
      * Whether overline is active.
@@ -159,7 +163,7 @@ typedef struct
     /**
      * Overline color.
      */
-    vec4_ft overline_color;
+    vec4 overline_color;
 
     /**
      * Whether strikethrough is active.
@@ -169,7 +173,7 @@ typedef struct
     /**
      * Strikethrough color.
      */
-    vec4_ft strikethrough_color;
+    vec4 strikethrough_color;
 
     /**
      * Pointer on the corresponding font (family/size/bold/italic)
@@ -178,13 +182,16 @@ typedef struct
 
 } markup_t;
 
-
+/**
+  * Default markup
+  */
 extern markup_t default_markup;
 
 
 /** @} */
 
 #ifdef __cplusplus
+}
 }
 #endif
 

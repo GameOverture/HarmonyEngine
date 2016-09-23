@@ -17,9 +17,9 @@
 class HyText2d : public IHyInst2d
 {
 protected:
-	static HyChar		sm_pTempTextBuffer[HY_TEMP_TEXTBUFFER_SIZE];
+	static char			sm_pTempTextBuffer[HY_TEMP_TEXTBUFFER_SIZE];
 
-	HyString			m_sString;
+	std::string			m_sString;
 	unsigned char *		m_pVertexBuffer;
 	size_t				m_uiBufferSizeBytes;
 
@@ -34,7 +34,7 @@ public:
 	size_t GetBufferSizeBytes()			{ return m_uiBufferSizeBytes; }
 	unsigned char *GetBufferDataPtr()	{ return m_pVertexBuffer; }
 
-	void SetString(const HyChar *szString, ...);
+	void SetString(const char *szString, ...);
 	//HyString &GetString()				{ return m_sString; }
 	size_t GetStrLen()					{ return m_sString.length(); }
 

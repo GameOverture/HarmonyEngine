@@ -1,7 +1,7 @@
 /* ============================================================================
  * Freetype GL - A C OpenGL Freetype engine
  * Platform:    Any
- * WWW:         http://code.google.com/p/freetype-gl/
+ * WWW:         https://github.com/rougier/freetype-gl
  * ----------------------------------------------------------------------------
  * Copyright 2011,2012 Nicolas P. Rougier. All rights reserved.
  *
@@ -36,6 +36,7 @@
 
 #ifdef __cplusplus
 extern "C" {
+namespace ftgl {
 #endif
 
 
@@ -51,66 +52,67 @@ typedef union
         float m20, m21, m22, m23;
         float m30, m31, m32, m33;
     };
-} mat4_ft;
+} mat4;
 
 
-mat4_ft *
+mat4 *
 mat4_new( void );
 
 void
-mat4_set_identity( mat4_ft *self );
+mat4_set_identity( mat4 *self );
 
 void
-mat4_set_zero( mat4_ft *self );
+mat4_set_zero( mat4 *self );
 
 void
-mat4_multiply( mat4_ft *self, mat4_ft *other );
+mat4_multiply( mat4 *self, mat4 *other );
 
 void
-mat4_set_orthographic( mat4_ft *self,
+mat4_set_orthographic( mat4 *self,
                        float left,   float right,
                        float bottom, float top,
                        float znear,  float zfar );
 
 void
-mat4_set_perspective( mat4_ft *self,
+mat4_set_perspective( mat4 *self,
                       float fovy,  float aspect,
                       float zNear, float zFar);
 
 void
-mat4_set_frustum( mat4_ft *self,
+mat4_set_frustum( mat4 *self,
                   float left,   float right,
                   float bottom, float top,
                   float znear,  float zfar );
 
 void
-mat4_set_rotation( mat4_ft *self,
+mat4_set_rotation( mat4 *self,
                    float angle,
                    float x, float y, float z);
 
 void
-mat4_set_translation( mat4_ft *self,
+mat4_set_translation( mat4 *self,
                       float x, float y, float z);
 
 void
-mat4_set_scaling( mat4_ft *self,
+mat4_set_scaling( mat4 *self,
                   float x, float y, float z);
 
 void
-mat4_rotate( mat4_ft *self,
+mat4_rotate( mat4 *self,
              float angle,
              float x, float y, float z);
 
 void
-mat4_translate( mat4_ft *self,
+mat4_translate( mat4 *self,
                 float x, float y, float z);
 
 void
-mat4_scale( mat4_ft *self,
+mat4_scale( mat4 *self,
             float x, float y, float z);
 
 
 #ifdef __cplusplus
+}
 }
 #endif
 

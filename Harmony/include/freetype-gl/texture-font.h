@@ -1,7 +1,7 @@
 /* ============================================================================
  * Freetype GL - A C OpenGL Freetype engine
  * Platform:    Any
- * WWW:         http://code.google.com/p/freetype-gl/
+ * WWW:         https://github.com/rougier/freetype-gl
  * ----------------------------------------------------------------------------
  * Copyright 2011,2012 Nicolas P. Rougier. All rights reserved.
  *
@@ -35,6 +35,7 @@
 #define __TEXTURE_FONT_H__
 
 #include <stdlib.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,6 +43,10 @@ extern "C" {
 
 #include "vector.h"
 #include "texture-atlas.h"
+
+#ifdef __cplusplus
+namespace ftgl {
+#endif
 
 /**
  * @file   texture-font.h
@@ -65,20 +70,33 @@ extern "C" {
  */
 
 
+/**
+ * A list of possible ways to render a glyph.
+ */
+typedef enum rendermode_t
+{
+    RENDER_NORMAL,
+    RENDER_OUTLINE_EDGE,
+    RENDER_OUTLINE_POSITIVE,
+    RENDER_OUTLINE_NEGATIVE,
+    RENDER_SIGNED_DISTANCE_FIELD
+} rendermode_t;
+
 
 /**
- * A structure that hold a kerning value relatively to a charcode.
+ * A structure that hold a kerning value relatively to a Unicode
+ * codepoint.
  *
- * This structure cannot be used alone since the (necessary) right charcode is
- * implicitely held by the owner of this structure.
+ * This structure cannot be used alone since the (necessary) right
+ * Unicode codepoint is implicitely held by the owner of this structure.
  */
-typedef struct
+typedef struct kerning_t
 {
     /**
-     * Left character code in the kern pair.
+     * Left Unicode codepoint in the kern pair in UTF-32 LE encoding.
      */
-    wchar_t charcode;
-    
+    uint32_t codepoint;
+
     /**
      * Kerning value (in fractional pixels).
      */
@@ -96,26 +114,26 @@ typedef struct
  *                       xmin                     xmax
  *                        |                         |
  *                        |<-------- width -------->|
- *                        |                         |    
+ *                        |                         |
  *              |         +-------------------------+----------------- ymax
  *              |         |    ggggggggg   ggggg    |     ^        ^
- *              |         |   g:::::::::ggg::::g    |     |        | 
- *              |         |  g:::::::::::::::::g    |     |        | 
- *              |         | g::::::ggggg::::::gg    |     |        | 
- *              |         | g:::::g     g:::::g     |     |        | 
- *    offset_x -|-------->| g:::::g     g:::::g     |  offset_y    | 
- *              |         | g:::::g     g:::::g     |     |        | 
- *              |         | g::::::g    g:::::g     |     |        | 
- *              |         | g:::::::ggggg:::::g     |     |        |  
+ *              |         |   g:::::::::ggg::::g    |     |        |
+ *              |         |  g:::::::::::::::::g    |     |        |
+ *              |         | g::::::ggggg::::::gg    |     |        |
+ *              |         | g:::::g     g:::::g     |     |        |
+ *    offset_x -|-------->| g:::::g     g:::::g     |  offset_y    |
+ *              |         | g:::::g     g:::::g     |     |        |
+ *              |         | g::::::g    g:::::g     |     |        |
+ *              |         | g:::::::ggggg:::::g     |     |        |
  *              |         |  g::::::::::::::::g     |     |      height
- *              |         |   gg::::::::::::::g     |     |        | 
+ *              |         |   gg::::::::::::::g     |     |        |
  *  baseline ---*---------|---- gggggggg::::::g-----*--------      |
- *            / |         |             g:::::g     |              | 
- *     origin   |         | gggggg      g:::::g     |              | 
- *              |         | g:::::gg   gg:::::g     |              | 
- *              |         |  g::::::ggg:::::::g     |              | 
- *              |         |   gg:::::::::::::g      |              | 
- *              |         |     ggg::::::ggg        |              | 
+ *            / |         |             g:::::g     |              |
+ *     origin   |         | gggggg      g:::::g     |              |
+ *              |         | g:::::gg   gg:::::g     |              |
+ *              |         |  g::::::ggg:::::::g     |              |
+ *              |         |   gg:::::::::::::g      |              |
+ *              |         |     ggg::::::ggg        |              |
  *              |         |         gggggg          |              v
  *              |         +-------------------------+----------------- ymin
  *              |                                   |
@@ -125,17 +143,12 @@ typedef struct
 /**
  * A structure that describe a glyph.
  */
-typedef struct _texture_glyph_t
+typedef struct texture_glyph_t
 {
     /**
-     * Wide character this glyph represents
+     * Unicode codepoint this glyph represents in UTF-32 LE encoding.
      */
-    wchar_t charcode;
-
-    /**
-     * Glyph id (used for display lists)
-     */
-    unsigned int id;
+    uint32_t codepoint;
 
     /**
      * Glyph's width in pixels.
@@ -200,9 +213,9 @@ typedef struct _texture_glyph_t
     vector_t * kerning;
 
     /**
-     * Glyph outline type (0 = None, 1 = line, 2 = inner, 3 = outer)
+     * Mode this glyph was rendered
      */
-    int outline_type;
+    rendermode_t rendermode;
 
     /**
      * Glyph outline thickness
@@ -216,7 +229,7 @@ typedef struct _texture_glyph_t
 /**
  *  Texture font structure.
  */
-typedef struct _texture_font_t
+typedef struct texture_font_t
 {
     /**
      * Vector of glyphs contained in this font.
@@ -227,7 +240,7 @@ typedef struct _texture_font_t
      * Atlas structure to store glyphs data.
      */
     texture_atlas_t * atlas;
-    
+
     /**
      * font location
      */
@@ -255,36 +268,37 @@ typedef struct _texture_font_t
      * Font size
      */
     float size;
-    
+
     /**
      * Whether to use autohint when rendering font
      */
     int hinting;
 
     /**
-     * Outline type (0 = None, 1 = line, 2 = inner, 3 = outer)
+     * Mode the font is rendering its next glyph
      */
-    int outline_type;
+    rendermode_t rendermode;
 
     /**
      * Outline thickness
      */
     float outline_thickness;
 
-    /** 
+    /**
      * Whether to use our own lcd filter.
      */
     int filtering;
+
+    /**
+     * LCD filter weights
+     */
+    unsigned char lcd_weights[5];
 
     /**
      * Whether to use kerning if available
      */
     int kerning;
 
-    /**
-     * LCD filter weights
-     */
-    unsigned char lcd_weights[5];
 
     /**
      * This field is simply used to compute a default line spacing (i.e., the
@@ -392,10 +406,10 @@ typedef struct _texture_font_t
 
 /**
  * Request a new glyph from the font. If it has not been created yet, it will
- * be. 
+ * be.
  *
- * @param self     A valid texture font
- * @param charcode Character codepoint to be loaded.
+ * @param self      A valid texture font
+ * @param codepoint Character codepoint to be loaded in UTF-8 encoding.
  *
  * @return A pointer on the new glyph or 0 if the texture atlas is not big
  *         enough
@@ -403,33 +417,46 @@ typedef struct _texture_font_t
  */
   texture_glyph_t *
   texture_font_get_glyph( texture_font_t * self,
-                          wchar_t charcode );
+                          const char * codepoint );
 
+
+/**
+ * Request the loading of a given glyph.
+ *
+ * @param self       A valid texture font
+ * @param codepoints Character codepoint to be loaded in UTF-8 encoding.
+ *
+ * @return One if the glyph could be loaded, zero if not.
+ */
+  int
+  texture_font_load_glyph( texture_font_t * self,
+                           const char * codepoint );
 
 /**
  * Request the loading of several glyphs at once.
  *
- * @param self      a valid texture font
- * @param charcodes character codepoints to be loaded.
+ * @param self       A valid texture font
+ * @param codepoints Character codepoints to be loaded in UTF-8 encoding. May
+ *                   contain duplicates.
  *
  * @return Number of missed glyph if the texture is not big enough to hold
  *         every glyphs.
  */
   size_t
   texture_font_load_glyphs( texture_font_t * self,
-                            const wchar_t * charcodes );
+                            const char * codepoints );
 
 /**
  * Get the kerning between two horizontal glyphs.
  *
- * @param self      a valid texture glyph
- * @param charcode  codepoint of the peceding glyph
- * 
+ * @param self      A valid texture glyph
+ * @param codepoint Character codepoint of the peceding character in UTF-8 encoding.
+ *
  * @return x kerning value
  */
-float 
+float
 texture_glyph_get_kerning( const texture_glyph_t * self,
-                           const wchar_t charcode );
+                           const char * codepoint );
 
 
 /**
@@ -445,7 +472,7 @@ texture_glyph_new( void );
 
 #ifdef __cplusplus
 }
+}
 #endif
 
 #endif /* __TEXTURE_FONT_H__ */
-
