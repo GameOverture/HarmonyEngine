@@ -26,6 +26,9 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
 {
     ui->setupUi(this);
     
+    ui->btnAddSize->setDefaultAction(ui->actionAddFontSize);
+    ui->btnRemoveSize->setDefaultAction(ui->actionRemoveFontSize);
+    
     ui->cmbAtlasGroups->setModel(m_pItemFont->GetAtlasManager().AllocateAtlasModelView());
     
     // If a .hyfnt file exists, parse and initalize with it, otherwise make default empty font
@@ -84,7 +87,9 @@ void WidgetFont::GeneratePreview()
 {
     QSize atlasDimensions = m_pItemFont->GetAtlasManager().GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
     
-    texture_atlas_delete(m_pAtlas);
+    if(m_pAtlas)
+        texture_atlas_delete(m_pAtlas);
+    
     m_pAtlas = texture_atlas_new(atlasDimensions.width(), atlasDimensions.height(), 4);
     
     // Get path to the font file
@@ -130,6 +135,9 @@ void WidgetFont::GeneratePreview()
     QList<float> sizeList;
     for(int i = 0; i < ui->cmbSizes->count(); ++i)
         sizeList.append(ui->cmbSizes->itemText(i).toFloat());
+    
+    // TODO: REMOVE THIS TEMPORARY HACK
+    sizeList.append(12.0f);
     
     // Clear old texture fonts
     for(int i = 0; i < m_TextureFontList.count(); ++i)
@@ -180,7 +188,7 @@ void WidgetFont::on_cmbFonts_currentIndexChanged(int index)
 
 void WidgetFont::on_actionAddFontSize_triggered()
 {
-    
+    GeneratePreview();
 }
 
 void WidgetFont::on_actionRemoveFontSize_triggered()

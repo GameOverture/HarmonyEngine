@@ -60,7 +60,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
     texture_atlas_t *pAtlas = pWidget->GetAtlas();
     
-    if(pAtlas->id == 0)
+    if(pAtlas && pAtlas->id == 0)
     {
         if(m_pDrawPreview && m_pDrawPreview->GetGraphicsApiHandle() != 0)
             MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawPreview->GetGraphicsApiHandle());
@@ -72,6 +72,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
         delete m_pDrawPreview;
         m_pDrawPreview = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
         m_pDrawPreview->Load();
+        m_pDrawPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
         m_pDrawPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
     }
 
