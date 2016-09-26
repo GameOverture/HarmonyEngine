@@ -20,8 +20,6 @@ SOURCES += main.cpp \
     Item.cpp \
     ItemSprite.cpp \
     ItemFont.cpp \
-    WidgetGlyphCreator.cpp \
-    WidgetFontMap.cpp \
     DlgNewItem.cpp \
     scriptum/imagecrop.cpp \
     scriptum/imagepacker.cpp \
@@ -42,7 +40,9 @@ SOURCES += main.cpp \
     WidgetSpriteState.cpp \
     HyGuiFrame.cpp \
     ItemWidget.cpp \
-    WidgetSpriteModelView.cpp
+    WidgetSpriteModelView.cpp \
+    ItemFontCmds.cpp \
+    WidgetFont.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -53,8 +53,6 @@ HEADERS  += \
     Item.h \
     ItemSprite.h \
     ItemFont.h \
-    WidgetGlyphCreator.h \
-    WidgetFontMap.h \
     DlgNewItem.h \
     scriptum/imagepacker.h \
     scriptum/maxrects.h \
@@ -73,15 +71,15 @@ HEADERS  += \
     WidgetSpriteState.h \
     HyGuiFrame.h \
     ItemWidget.h \
-    WidgetSpriteModelView.h
+    WidgetSpriteModelView.h \
+    ItemFontCmds.h \
+    WidgetFont.h
 
 FORMS    += \
     DlgNewProject.ui \
     WidgetExplorer.ui \
     WidgetOutputLog.ui \
     MainWindow.ui \
-    WidgetGlyphCreator.ui \
-    WidgetFontMap.ui \
     DlgNewItem.ui \
     WidgetSprite.ui \
     DlgInputName.ui \
@@ -91,7 +89,8 @@ FORMS    += \
     WidgetAtlasManager.ui \
     WidgetAtlasGroup.ui \
     DlgSetEngineLocation.ui \
-    WidgetSpriteState.ui
+    WidgetSpriteState.ui \
+    WidgetFont.ui
 
 Release:DESTDIR = ../bin/release
 Release:OBJECTS_DIR = ../bin/release/.obj
@@ -119,6 +118,9 @@ else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/..
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64/HarmonyQtd.lib
 
 win32: LIBS += -lAdvAPI32
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/lib/x64/ -lfreetype-gl
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../Harmony/lib/x64/ -lfreetype-gld
 
 RESOURCES += \
     res/DesignerTool.qrc

@@ -147,6 +147,11 @@ QTreeWidget *WidgetAtlasGroup::GetTreeWidget()
         return NULL;
 }
 
+QSize WidgetAtlasGroup::GetAtlasDimensions()
+{
+    return QSize(m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight());
+}
+
 void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObjOut)
 {
     atlasObjOut.insert("id", m_DataDir.dirName().toInt());

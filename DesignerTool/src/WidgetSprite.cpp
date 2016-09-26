@@ -103,7 +103,8 @@ void WidgetSprite::Load()
     else
     {
         on_actionAddState_triggered();
-        m_pItemSprite->Save();
+        
+        //m_pItemSprite->Save();
     }
 
     // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.

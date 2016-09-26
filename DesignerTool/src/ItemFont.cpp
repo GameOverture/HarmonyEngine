@@ -13,6 +13,8 @@
 #include <QAction>
 #include <QUndoView>
 
+#include "WidgetFont.h"
+
 ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) : ItemWidget(ITEM_Font, sPath, atlasManRef)
 {
 }
@@ -34,6 +36,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) : ItemW
 
 /*virtual*/ void ItemFont::OnLoad(IHyApplication &hyApp)
 {
+    m_pWidget = new WidgetFont(this);
 }
 
 /*virtual*/ void ItemFont::OnUnload(IHyApplication &hyApp)

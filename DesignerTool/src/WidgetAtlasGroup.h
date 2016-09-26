@@ -51,6 +51,7 @@ public:
     QList<HyGuiFrame *> &GetFrameList();
     QTreeWidget *GetTreeWidget();
 
+    QSize GetAtlasDimensions();
     void GetAtlasInfo(QJsonObject &atlasObjOut);
     
     QString GetName();

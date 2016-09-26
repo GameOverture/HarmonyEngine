@@ -55,6 +55,10 @@ public:
     ~WidgetAtlasManager();
     
     ItemProject *GetProjOwner()     { return m_pProjOwner; }
+    
+    WidgetAtlasModelView *AllocateAtlasModelView();
+    int CurrentAtlasGroupIndex();
+    QSize GetAtlasDimensions(int iIndex);
 
     HyGuiFrame *CreateImage(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
     void RemoveImage(HyGuiFrame *pFrame);

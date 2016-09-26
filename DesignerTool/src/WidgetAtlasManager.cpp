@@ -101,7 +101,7 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
         }
     }
 
-    m_pCmbModel = new WidgetAtlasModelView(*ui->atlasGroups, this);
+    m_pCmbModel = AllocateAtlasModelView();
     ui->cmbAtlasGroups->setModel(m_pCmbModel);
 }
 
@@ -111,6 +111,21 @@ WidgetAtlasManager::~WidgetAtlasManager()
         delete ui->atlasGroups->currentWidget();
 
     delete ui;
+}
+
+WidgetAtlasModelView *WidgetAtlasManager::AllocateAtlasModelView()
+{
+    return new WidgetAtlasModelView(*ui->atlasGroups, this);
+}
+
+int WidgetAtlasManager::CurrentAtlasGroupIndex()
+{
+    return ui->cmbAtlasGroups->currentIndex();
+}
+
+QSize WidgetAtlasManager::GetAtlasDimensions(int iIndex)
+{
+    return static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(iIndex))->GetAtlasDimensions();
 }
 
 HyGuiFrame *WidgetAtlasManager::CreateImage(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY)
