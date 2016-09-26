@@ -13,10 +13,11 @@
 
 
 HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath, int32 iShaderId) : IHy2dData(HYINST_TexturedQuad2d, sPath, iShaderId),
-																						m_uiATLASGROUP_ID(atoi(sPath.c_str())),
+																						m_uiATLASGROUP_ID(sPath == "raw" ? 0xFFFFFFFF : atoi(sPath.c_str())),
 																						m_pAtlas(NULL)
 {
-	
+	if(m_uiATLASGROUP_ID == 0xFFFFFFFF)
+		SetLoadState(HYLOADSTATE_Loaded);
 }
 
 HyTexturedQuad2dData::~HyTexturedQuad2dData()
@@ -25,7 +26,8 @@ HyTexturedQuad2dData::~HyTexturedQuad2dData()
 
 /*virtual*/ void HyTexturedQuad2dData::DoFileLoad()
 {
-	m_pAtlas = RequestTexture(m_uiATLASGROUP_ID);
+	if(m_uiATLASGROUP_ID != 0xFFFFFFFF)
+		m_pAtlas = RequestTexture(m_uiATLASGROUP_ID);
 }
 
 HyAtlasGroup *HyTexturedQuad2dData::GetAtlasGroup()

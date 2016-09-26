@@ -48,6 +48,14 @@ HyGuiRenderer::~HyGuiRenderer()
     doneCurrent();
 }
 
+HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
+{
+    if(m_pHyEngine)
+        return &m_pHyEngine->GetRenderer();
+    else
+        return NULL;
+}
+
 /*virtual*/ void HyGuiRenderer::initializeGL()
 {
     //    QGLFormat format;

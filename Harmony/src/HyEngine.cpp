@@ -108,3 +108,8 @@ void HyEngine::Shutdown()
 	}
 }
 
+HyRendererInterop &HyEngine::GetRenderer()
+{
+	return m_Renderer;
+}
+

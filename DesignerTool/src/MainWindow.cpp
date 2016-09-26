@@ -386,6 +386,14 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     SetSelectedProj(pCurItemProj);
 }
 
+/*static*/ HyRendererInterop *MainWindow::GetCurrentRenderer()
+{
+    if(sm_pInstance->m_pCurRenderer)
+        sm_pInstance->m_pCurRenderer->GetHarmonyRenderer();
+    else
+        return NULL;
+}
+
 void MainWindow::on_actionNewProject_triggered()
 {
     DlgNewProject *pDlg = new DlgNewProject(m_sDefaultProjectLocation, this);

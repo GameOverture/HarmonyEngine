@@ -74,6 +74,8 @@ private:
 	bool PollPlatformApi();
 
 	void Shutdown();
+
+	HyRendererInterop &GetRenderer();
 };
 
 #endif /* __HyEngine_h__ */

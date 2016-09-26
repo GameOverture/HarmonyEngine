@@ -16,6 +16,8 @@ class ItemFont : public ItemWidget
 {
     Q_OBJECT
     
+    HyTexturedQuad2d *      m_pDrawPreview;
+    
     struct tGlyphSet
     {
         QString     sFontName;

@@ -34,6 +34,8 @@ public:
     ~WidgetFont();
     
     void GeneratePreview();
+    
+    texture_atlas_t *GetAtlas();
 
 private slots:
     void on_cmbAtlasGroups_currentIndexChanged(int index);

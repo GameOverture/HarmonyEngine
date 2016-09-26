@@ -115,7 +115,7 @@ HyShaderUniforms *HyRenderState::PrimeShaderUniforms()
 	return m_pShaderUniformsRef;
 }
 
-uint32 HyRenderState::GetTextureHandle()
+uint32 HyRenderState::GetTextureHandle() const
 {
 	return m_uiTextureBindHandle;
 }

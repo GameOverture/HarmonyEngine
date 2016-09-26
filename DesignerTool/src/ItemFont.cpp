@@ -13,9 +13,13 @@
 #include <QAction>
 #include <QUndoView>
 
+#include "MainWindow.h"
 #include "WidgetFont.h"
 
-ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) : ItemWidget(ITEM_Font, sPath, atlasManRef)
+#include "Harmony/HyEngine.h"
+
+ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  ItemWidget(ITEM_Font, sPath, atlasManRef),
+                                                                            m_pDrawPreview(NULL)
 {
 }
 
@@ -53,6 +57,24 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) : ItemW
 
 /*virtual*/ void ItemFont::OnDraw_Update(IHyApplication &hyApp)
 {
+    WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
+    texture_atlas_t *pAtlas = pWidget->GetAtlas();
+    
+    if(pAtlas->id == 0)
+    {
+        if(m_pDrawPreview && m_pDrawPreview->GetGraphicsApiHandle() != 0)
+            MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawPreview->GetGraphicsApiHandle());
+
+        vector<unsigned char *> vPixelData;
+        vPixelData.push_back(pAtlas->data);
+        pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(pAtlas->depth, pAtlas->width, pAtlas->height, vPixelData);
+        
+        delete m_pDrawPreview;
+        m_pDrawPreview = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
+        m_pDrawPreview->Load();
+        m_pDrawPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
+    }
+
 }
 
 /*virtual*/ void ItemFont::OnLink(HyGuiFrame *pFrame)

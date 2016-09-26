@@ -59,6 +59,8 @@ public:
     
     static void SetSelectedProj(ItemProject *pProj);
     static void ReloadHarmony();
+    
+    static HyRendererInterop *GetCurrentRenderer();
 
 private slots:
     void on_actionNewProject_triggered();

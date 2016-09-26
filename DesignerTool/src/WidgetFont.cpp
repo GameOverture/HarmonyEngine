@@ -155,6 +155,13 @@ void WidgetFont::GeneratePreview()
     HyGuiLog("Total number of glyphs     : " % QString::number(sGlyphs.size() * m_TextureFontList.count() - iNumMissedGlyphs) % "/" % QString::number(sGlyphs.size() * m_TextureFontList.count()), LOGTYPE_Normal);
     HyGuiLog("Texture size               : " % QString::number(m_pAtlas->width) % "x" % QString::number(m_pAtlas->height), LOGTYPE_Normal);
     HyGuiLog("Texture occupancy          : " % QString::number(100.0*m_pAtlas->used / (float)(m_pAtlas->width*m_pAtlas->height)), LOGTYPE_Normal);
+    
+    m_pAtlas->id = 0;
+}
+
+texture_atlas_t *WidgetFont::GetAtlas()
+{
+    return m_pAtlas;
 }
 
 void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)

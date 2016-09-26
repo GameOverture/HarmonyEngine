@@ -31,6 +31,8 @@ public:
     HyGuiRenderer(QWidget *parent = 0);
     HyGuiRenderer(ItemProject *pProj, QWidget *parent = 0);
     ~HyGuiRenderer();
+    
+    HyRendererInterop *GetHarmonyRenderer();
 
     // QOpenGLWidget overrides
     virtual void initializeGL();

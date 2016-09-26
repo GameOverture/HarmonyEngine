@@ -74,7 +74,7 @@ public:
 	void SetShaderId(int32 iId);
 	HyShaderUniforms *PrimeShaderUniforms();
 
-	uint32 GetTextureHandle();
+	uint32 GetTextureHandle() const;
 	void SetTextureHandle(uint32 uiHandleId);
 
 	bool operator==(const HyRenderState &right) const;
