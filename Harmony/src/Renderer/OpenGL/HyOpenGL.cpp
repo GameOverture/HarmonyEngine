@@ -274,7 +274,7 @@ HyOpenGL::~HyOpenGL(void)
 	uint32 uiNumTextures = static_cast<uint32>(vPixelData.size());
 
 	// Create (blank) storage for the texture array
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eFormat, uiWidth, uiHeight, uiNumTextures, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, uiNumTextures, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
 
 	for(uint32 i = 0; i != uiNumTextures; ++i)
 	{

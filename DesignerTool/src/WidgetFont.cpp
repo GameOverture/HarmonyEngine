@@ -90,7 +90,7 @@ void WidgetFont::GeneratePreview()
     if(m_pAtlas)
         texture_atlas_delete(m_pAtlas);
     
-    m_pAtlas = texture_atlas_new(atlasDimensions.width(), atlasDimensions.height(), 4);
+    m_pAtlas = texture_atlas_new(atlasDimensions.width(), atlasDimensions.height(), 1);
     
     // Get path to the font file
     QString sFontFamily = ui->cmbFonts->currentFont().family();
@@ -137,7 +137,7 @@ void WidgetFont::GeneratePreview()
         sizeList.append(ui->cmbSizes->itemText(i).toFloat());
     
     // TODO: REMOVE THIS TEMPORARY HACK
-    sizeList.append(12.0f);
+    sizeList.append(128.0f);
     
     // Clear old texture fonts
     for(int i = 0; i < m_TextureFontList.count(); ++i)

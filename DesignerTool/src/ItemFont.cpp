@@ -65,13 +65,23 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
         if(m_pDrawPreview && m_pDrawPreview->GetGraphicsApiHandle() != 0)
             MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawPreview->GetGraphicsApiHandle());
 
+        int iNumPixels = pAtlas->width * pAtlas->height;
+        unsigned char *pBuffer = new unsigned char[iNumPixels * 4];
+        memset(pBuffer, 0, iNumPixels * 4);
+
+        for(int i = 0; i < iNumPixels; ++i)
+            memset(&pBuffer[i*4], pAtlas->data[i], 4);
+            //memcpy(&pBuffer[i*4], &pAtlas->data[i*4 - i], 3);
+
+
         vector<unsigned char *> vPixelData;
-        vPixelData.push_back(pAtlas->data);
-        pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(pAtlas->depth, pAtlas->width, pAtlas->height, vPixelData);
+		vPixelData.push_back(pBuffer);//pAtlas->data);
+        pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(4/*pAtlas->depth*/, pAtlas->width, pAtlas->height, vPixelData);
         
         delete m_pDrawPreview;
         m_pDrawPreview = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
         m_pDrawPreview->Load();
+        m_pDrawPreview->pos.Set(0.0f, -2048.0f);
         m_pDrawPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
         m_pDrawPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
     }
