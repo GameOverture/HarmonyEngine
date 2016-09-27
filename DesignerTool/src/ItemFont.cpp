@@ -67,10 +67,11 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
 
         int iNumPixels = pAtlas->width * pAtlas->height;
         unsigned char *pBuffer = new unsigned char[iNumPixels * 4];
-        memset(pBuffer, 0, iNumPixels * 4);
+        memset(pBuffer, 0xFF, iNumPixels * 4);
 
         for(int i = 0; i < iNumPixels; ++i)
-            memset(&pBuffer[i*4], pAtlas->data[i], 4);
+            pBuffer[i*4+3] = pAtlas->data[i];
+            //memset(&pBuffer[i*4], pAtlas->data[i], 4);
             //memcpy(&pBuffer[i*4], &pAtlas->data[i*4 - i], 3);
 
 
