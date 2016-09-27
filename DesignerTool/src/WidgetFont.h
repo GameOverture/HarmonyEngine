@@ -11,6 +11,7 @@
 #define WIDGETFONT_H
 
 #include <QWidget>
+#include <QDir>
 
 #include "freetype-gl/freetype-gl.h"
 
@@ -28,6 +29,8 @@ class WidgetFont : public QWidget
     
     texture_atlas_t *           m_pAtlas;
     QList<texture_font_t *>     m_TextureFontList;
+    
+    QDir                        m_FontMetaDir;
     
 public:
     explicit WidgetFont(ItemFont *pOwner, QWidget *parent = 0);
@@ -55,6 +58,8 @@ private slots:
     void on_chk_symbols_stateChanged(int arg1);
     
     void on_txtAdditionalSymbols_editingFinished();
+    
+    void on_cmbFontList_currentIndexChanged(int index);
     
 private:
     Ui::WidgetFont *ui;

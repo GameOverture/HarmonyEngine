@@ -68,6 +68,7 @@ enum eProjDrawState
     NUMPROJDRAWSTATE
 };
 
+#define HYGUIPATH_TempDir                       "temp/"
 #define HYGUIPATH_DataAtlases                   "atlasInfo.json"
 #define HYGUIPATH_MetaAtlasSettings             "settings.hygui"
 #define HYGUIPATH_MetaAtlasDependencies         "dependencies.hygui"

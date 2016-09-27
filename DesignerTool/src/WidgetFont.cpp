@@ -18,10 +18,12 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QJsonDocument>
+#include <QFileDialog>
 
 WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
                                                             m_pItemFont(pOwner),
                                                             m_pAtlas(NULL),
+                                                            m_FontMetaDir(m_pItemFont->GetItemProject()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirFonts) % "/" % m_pItemFont->GetName(true)),
                                                             ui(new Ui::WidgetFont)
 {
     ui->setupUi(this);
@@ -30,6 +32,22 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     ui->btnRemoveSize->setDefaultAction(ui->actionRemoveFontSize);
     
     ui->cmbAtlasGroups->setModel(m_pItemFont->GetAtlasManager().AllocateAtlasModelView());
+    
+    // Populate the font list combo box
+    QStringList sFontPaths = QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
+    sFontPaths.append(m_FontMetaDir.absolutePath());
+    ui->cmbFontList->clear();
+    ui->cmbFontList->blockSignals(true);
+    for(int i = 0; i < sFontPaths.count(); ++i)
+    {
+        QDir fontDir(sFontPaths[i]);
+        QStringList sFilterList;
+        sFilterList << "*.ttf" << "*.otf";
+        QFileInfoList fontFileInfoList = fontDir.entryInfoList(sFilterList);
+        
+        for(int j = 0; j < fontFileInfoList.count(); ++j)
+            ui->cmbFontList->addItem(fontFileInfoList[j].fileName(), QVariant(fontFileInfoList[j].absoluteFilePath()));
+    }
     
     // If a .hyfnt file exists, parse and initalize with it, otherwise make default empty font
     QFile fontFile(m_pItemFont->GetAbsPath());
@@ -71,11 +89,17 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     {
         ui->cmbAtlasGroups->setCurrentIndex(m_pItemFont->GetAtlasManager().CurrentAtlasGroupIndex());
         
-        //on_actionAddState_triggered();
+        // Try to find Arial as default font
+        int iArialIndex = ui->cmbFontList->findText("Arial.ttf", Qt::MatchContains);
+        if(iArialIndex != -1)
+            ui->cmbFontList->setCurrentIndex(iArialIndex);
+        
+        on_actionAddFontSize_triggered();
     }
     
     // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
     m_pItemFont->GetUndoStack()->clear();
+    ui->cmbFontList->blockSignals(false);
 }
 
 WidgetFont::~WidgetFont()
@@ -91,33 +115,6 @@ void WidgetFont::GeneratePreview()
         texture_atlas_delete(m_pAtlas);
     
     m_pAtlas = texture_atlas_new(atlasDimensions.width(), atlasDimensions.height(), 1);
-    
-    // Get path to the font file
-    QString sFontFamily = ui->cmbFonts->currentFont().family();
-    QStringList sFontPaths = QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
-    bool bFound = false;
-    foreach(QString sPath, sFontPaths)
-    {
-        QDir fontDir(sPath);
-        if(fontDir.exists() == false)
-        {
-            HyGuiLog("WidgetFont::GeneratePreivew() font path '" % sPath % "' was not found", LOGTYPE_Error);
-            return;
-        }
-        
-        QFileInfoList fontFileInfoList = fontDir.entryInfoList();
-        foreach(QFileInfo fontFileInfo, fontFileInfoList)
-        {
-            if(QString::compare(sFontFamily, fontFileInfo.baseName(), Qt::CaseInsensitive) == 0)
-            {
-                sFontFamily = fontFileInfo.absoluteFilePath();
-                bFound = true;
-            }
-        }
-        
-        if(bFound)
-            break;
-    }
     
     // Assemble glyph set
     QString sGlyphs;
@@ -136,8 +133,8 @@ void WidgetFont::GeneratePreview()
     for(int i = 0; i < ui->cmbSizes->count(); ++i)
         sizeList.append(ui->cmbSizes->itemText(i).toFloat());
     
-    // TODO: REMOVE THIS TEMPORARY HACK
-    sizeList.append(128.0f);
+    // Get the file path to the font
+    QString sFontFilePath = ui->cmbFontList->currentData().toString();
     
     // Clear old texture fonts
     for(int i = 0; i < m_TextureFontList.count(); ++i)
@@ -147,7 +144,13 @@ void WidgetFont::GeneratePreview()
     size_t iNumMissedGlyphs = 0;
     for(int i = 0; i < sizeList.count(); ++i)
     {
-        texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, sizeList[i], sFontFamily.toStdString().c_str());
+        texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, sizeList[i], sFontFilePath.toStdString().c_str());
+        
+        if(pFont == NULL)
+        {
+            HyGuiLog("Could not create freetype font from: " % sFontFilePath, LOGTYPE_Error);
+            return;
+        }
         
         // TODO: implement all the outline stages
         iNumMissedGlyphs += texture_font_load_glyphs(pFont, sGlyphs.toStdString().c_str());
@@ -156,7 +159,7 @@ void WidgetFont::GeneratePreview()
     }
     
     HyGuiLog("Generating New Font Preview", LOGTYPE_Title);
-    HyGuiLog("Matched font               : " % sFontFamily, LOGTYPE_Normal);
+    HyGuiLog("Matched font               : " % sFontFilePath, LOGTYPE_Normal);
     HyGuiLog("Number of fonts            : " % QString::number(m_TextureFontList.count()), LOGTYPE_Normal);
     HyGuiLog("Number of glyphs per font  : " % QString::number(sGlyphs.size()), LOGTYPE_Normal);
     HyGuiLog("Number of missed glyphs    : " % QString::number(iNumMissedGlyphs), LOGTYPE_Normal);
@@ -188,6 +191,7 @@ void WidgetFont::on_cmbFonts_currentIndexChanged(int index)
 
 void WidgetFont::on_actionAddFontSize_triggered()
 {
+    ui->cmbSizes->addItem(QString::number(ui->sbSize->value(), 'g', 2));
     GeneratePreview();
 }
 
@@ -219,4 +223,34 @@ void WidgetFont::on_chk_symbols_stateChanged(int arg1)
 void WidgetFont::on_txtAdditionalSymbols_editingFinished()
 {
     
+}
+
+void WidgetFont::on_cmbFontList_currentIndexChanged(int index)
+{
+    QFileInfo originalFontFile(ui->cmbFontList->itemData(index).toString());
+    if(originalFontFile.exists() == false)
+    {
+        HyGuiLog("Font file (" % originalFontFile.absoluteFilePath() % ") doesn't exist", LOGTYPE_Error);
+        return;
+    }
+    
+    if(m_FontMetaDir.mkpath(m_FontMetaDir.absolutePath()) == false)
+    {
+        HyGuiLog("Failed making font meta directory path: " % m_FontMetaDir.absolutePath(), LOGTYPE_Error);
+        return;
+    }
+    
+    // TODO: support temp font files and keep the actual font file upon saving
+    foreach(QString dirFile, m_FontMetaDir.entryList())
+        m_FontMetaDir.remove(dirFile);
+    
+    QFileInfo newFontFile(m_FontMetaDir.absoluteFilePath(originalFontFile.fileName()));
+    if(newFontFile.exists() == false)
+    {
+        if(QFile::copy(originalFontFile.absoluteFilePath(), newFontFile.absoluteFilePath()) == false)
+        {
+            HyGuiLog("Failed copying font to meta directory: " % newFontFile.fileName(), LOGTYPE_Error);
+            return;
+        }
+    }
 }

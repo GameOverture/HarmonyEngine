@@ -138,6 +138,11 @@ void ItemWidget::Unlink(HyGuiFrame *pFrame)
     m_Links.remove(pFrame);
 }
 
+ItemProject *ItemWidget::GetItemProject()
+{
+    return m_AtlasManRef.GetProjOwner();
+}
+
 void ItemWidget::Save()
 {
     OnSave();

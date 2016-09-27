@@ -17,6 +17,7 @@
 #include <QUndoStack>
 
 class WidgetAtlasManager;
+class ItemProject;
 
 class ItemWidget : public Item
 {
@@ -75,6 +76,7 @@ public:
     QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
 
     WidgetAtlasManager &GetAtlasManager()           { return m_AtlasManRef; }
+    ItemProject *GetItemProject();
     
     virtual QList<QAction *> GetActionsForToolBar() = 0;
 
