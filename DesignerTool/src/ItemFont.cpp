@@ -18,6 +18,15 @@
 
 #include "Harmony/HyEngine.h"
 
+FontStage::FontStage(eType eRenderType, float fSize, float fOutlineThickness, QColor topColor, QColor botColor) :   m_eType(eRenderType),
+                                                                                                                    m_fSize(fSize),
+                                                                                                                    m_fOutlineThickness(fOutlineThickness),
+                                                                                                                    m_TopColor(topColor),
+                                                                                                                    m_BotColor(botColor),
+                                                                                                                    m_pTextureFont(NULL)
+{
+}
+
 ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  ItemWidget(ITEM_Font, sPath, atlasManRef),
                                                                             m_pDrawPreview(NULL)
 {

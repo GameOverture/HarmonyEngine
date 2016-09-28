@@ -28,8 +28,8 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
 {
     ui->setupUi(this);
     
-    ui->btnAddSize->setDefaultAction(ui->actionAddFontSize);
-    ui->btnRemoveSize->setDefaultAction(ui->actionRemoveFontSize);
+    ui->btnAddStage->setDefaultAction(ui->actionAddStage);
+    ui->btnRemoveStage->setDefaultAction(ui->actionRemoveStage);
     
     ui->cmbAtlasGroups->setModel(m_pItemFont->GetAtlasManager().AllocateAtlasModelView());
     
@@ -96,8 +96,8 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
         int iArialIndex = ui->cmbFontList->findText("Arial.ttf", Qt::MatchFixedString);
         if(iArialIndex != -1)
             ui->cmbFontList->setCurrentIndex(iArialIndex);
-        
-        on_actionAddFontSize_triggered();
+
+        on_actionAddStage_triggered();
     }
     
     // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
@@ -131,10 +131,6 @@ void WidgetFont::GeneratePreview()
         sGlyphs += "!\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@";
     sGlyphs += ui->txtAdditionalSymbols->text();    // May contain duplicates as stated in freetype-gl documentation
 
-    // Get all the type sizes for this font
-    QList<float> sizeList;
-    for(int i = 0; i < ui->cmbSizes->count(); ++i)
-        sizeList.append(ui->cmbSizes->itemText(i).toFloat());
 
     // Get the file path to the font
     QString sFontFilePath = ui->cmbFontList->currentData().toString();
@@ -142,6 +138,9 @@ void WidgetFont::GeneratePreview()
 
     // Try to find the perfect fit. Adjust atlas dimentions until we utilize efficient space on the smallest texture
     QSize maxAtlasDimensions = m_pItemFont->GetAtlasManager().GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
+    ui->lcdMaxTexWidth->display(maxAtlasDimensions.width());
+    ui->lcdMaxTexWidth->display(maxAtlasDimensions.height());
+
     float fModifier = 1.0f;
     bool bDoInitialShrink = true;
     size_t iNumMissedGlyphs = 0;
@@ -159,26 +158,28 @@ void WidgetFont::GeneratePreview()
             texture_atlas_delete(m_pAtlas);
         m_pAtlas = texture_atlas_new(static_cast<size_t>(maxAtlasDimensions.width() * fModifier), static_cast<size_t>(maxAtlasDimensions.height() * fModifier), 1);
 
-        // Clear old texture fonts
-        for(int i = 0; i < m_TextureFontList.count(); ++i)
-            texture_font_delete(m_TextureFontList[i]);
-        m_TextureFontList.clear();
+        // TODO: Get model from tableview and iterate each FontStage, assigning a new 'texture_font_t'
 
-        for(int i = 0; i < sizeList.count(); ++i)
-        {
-            texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, sizeList[i], sFontFilePath.toStdString().c_str());
+//        // Clear old texture fonts
+//        for(int i = 0; i < m_TextureFontList.count(); ++i)
+//            texture_font_delete(m_TextureFontList[i]);
+//        m_TextureFontList.clear();
 
-            if(pFont == NULL)
-            {
-                HyGuiLog("Could not create freetype font from: " % sFontFilePath, LOGTYPE_Error);
-                return;
-            }
+//        for(int i = 0; i < sizeList.count(); ++i)
+//        {
+//            texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, sizeList[i], sFontFilePath.toStdString().c_str());
 
-            // TODO: implement all the outline stages
-            iNumMissedGlyphs += texture_font_load_glyphs(pFont, sGlyphs.toStdString().c_str());
+//            if(pFont == NULL)
+//            {
+//                HyGuiLog("Could not create freetype font from: " % sFontFilePath, LOGTYPE_Error);
+//                return;
+//            }
 
-            m_TextureFontList.append(pFont);
-        }
+//            // TODO: implement all the outline stages
+//            iNumMissedGlyphs += texture_font_load_glyphs(pFont, sGlyphs.toStdString().c_str());
+
+//            m_TextureFontList.append(pFont);
+//        }
 
         if(iNumMissedGlyphs && fModifier == 1.0f)
             break; // Failure
@@ -202,9 +203,12 @@ void WidgetFont::GeneratePreview()
     else
     {
         HyGuiLog("Generated " % sFontFilePath % " Preview", LOGTYPE_Info);
-        HyGuiLog(QString::number(m_TextureFontList.count()) % " fonts with " % QString::number(sGlyphs.size()) % " glyphs each (totaling " % QString::number(sGlyphs.size() * m_TextureFontList.count()) % ").", LOGTYPE_Normal);
+        //HyGuiLog(QString::number(m_TextureFontList.count()) % " fonts with " % QString::number(sGlyphs.size()) % " glyphs each (totaling " % QString::number(sGlyphs.size() * m_TextureFontList.count()) % ").", LOGTYPE_Normal);
         HyGuiLog("Font Atlas size: " % QString::number(m_pAtlas->width) % "x" % QString::number(m_pAtlas->height) % " (Utilizing " % QString::number(100.0*m_pAtlas->used / (float)(m_pAtlas->width*m_pAtlas->height)) % "%) (Num Passes: " % QString::number(iNumPasses) % " - Dimensions Modifier: " % QString::number(fModifier) % ")", LOGTYPE_Normal);
     }
+
+    ui->lcdCurTexWidth->display(static_cast<int>(m_pAtlas->width));
+    ui->lcdCurTexHeight->display(static_cast<int>(m_pAtlas->height));
     
     // Signals ItemFont to upload and refresh the preview texture
     m_pAtlas->id = 0;
@@ -221,18 +225,6 @@ void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)
         return;
 
     QUndoCommand *pCmd = new ItemFontCmd_AtlasGroupChanged(*this, ui->cmbAtlasGroups, index);
-    m_pItemFont->GetUndoStack()->push(pCmd);
-}
-
-void WidgetFont::on_actionAddFontSize_triggered()
-{
-    QUndoCommand *pCmd = new ItemFontCmd_AddFontSize(*this, ui->cmbSizes, ui->sbSize->value());
-    m_pItemFont->GetUndoStack()->push(pCmd);
-}
-
-void WidgetFont::on_actionRemoveFontSize_triggered()
-{
-    QUndoCommand *pCmd = new ItemFontCmd_RemoveFontSize(*this, ui->cmbSizes, ui->cmbSizes->currentText().toDouble());
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
@@ -271,5 +263,17 @@ void WidgetFont::on_chk_AZ_clicked()
 void WidgetFont::on_chk_symbols_clicked()
 {
     QUndoCommand *pCmd = new ItemFontCmd_CheckBox(*this, ui->chk_symbols);
+    m_pItemFont->GetUndoStack()->push(pCmd);
+}
+
+void WidgetFont::on_actionAddStage_triggered()
+{
+    QUndoCommand *pCmd = new ItemFontCmd_AddStage(*this);
+    m_pItemFont->GetUndoStack()->push(pCmd);
+}
+
+void WidgetFont::on_actionRemoveStage_triggered()
+{
+    QUndoCommand *pCmd = new ItemFontCmd_RemoveStage(*this);
     m_pItemFont->GetUndoStack()->push(pCmd);
 }

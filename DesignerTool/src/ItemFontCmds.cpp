@@ -45,56 +45,46 @@ void ItemFontCmd_AtlasGroupChanged::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_AddFontSize::ItemFontCmd_AddFontSize(WidgetFont &widgetFont, QComboBox *pCmb, double dSize, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
-                                                                                                                                            m_WidgetFontRef(widgetFont),
-                                                                                                                                            m_pCmbSizes(pCmb),
-                                                                                                                                            m_dNewSize(dSize)
+ItemFontCmd_AddStage::ItemFontCmd_AddStage(WidgetFont &widgetFont, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                    m_WidgetFontRef(widgetFont)
 {
-    setText("Add Type Size");
+    setText("Add Font Stage");
 }
 
-/*virtual*/ ItemFontCmd_AddFontSize::~ItemFontCmd_AddFontSize()
+/*virtual*/ ItemFontCmd_AddStage::~ItemFontCmd_AddStage()
 {
 }
 
-void ItemFontCmd_AddFontSize::redo()
+void ItemFontCmd_AddStage::redo()
 {
-    m_pCmbSizes->addItem(QString::number(m_dNewSize, 'g', 2));
-    m_iIndexAdded = m_pCmbSizes->count() - 1;
-
     m_WidgetFontRef.GeneratePreview();
 }
 
-void ItemFontCmd_AddFontSize::undo()
+void ItemFontCmd_AddStage::undo()
 {
-    m_pCmbSizes->removeItem(m_iIndexAdded);
     m_WidgetFontRef.GeneratePreview();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_RemoveFontSize::ItemFontCmd_RemoveFontSize(WidgetFont &widgetFont, QComboBox *pCmb, int iIndexToRemove, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
-                                                                                                                                                        m_WidgetFontRef(widgetFont),
-                                                                                                                                                        m_pCmbSizes(pCmb),
-                                                                                                                                                        m_iIndexToRemove(iIndexToRemove)
+ItemFontCmd_RemoveStage::ItemFontCmd_RemoveStage(WidgetFont &widgetFont, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                            m_WidgetFontRef(widgetFont)
 {
     m_dOldSize = m_pCmbSizes->itemText(m_iIndexToRemove).toDouble();
-    setText("Remove Type Size");
+    setText("Remove Font Stage");
 }
 
-/*virtual*/ ItemFontCmd_RemoveFontSize::~ItemFontCmd_RemoveFontSize()
+/*virtual*/ ItemFontCmd_RemoveStage::~ItemFontCmd_RemoveStage()
 {
 }
 
-void ItemFontCmd_RemoveFontSize::redo()
+void ItemFontCmd_RemoveStage::redo()
 {
-    m_pCmbSizes->removeItem(m_iIndexToRemove);
     m_WidgetFontRef.GeneratePreview();
 }
 
-void ItemFontCmd_RemoveFontSize::undo()
+void ItemFontCmd_RemoveStage::undo()
 {
-    m_pCmbSizes->insertItem(m_iIndexToRemove, QString::number(m_dOldSize, 'g', 2));
     m_WidgetFontRef.GeneratePreview();
 }
 

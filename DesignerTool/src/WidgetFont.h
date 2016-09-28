@@ -28,7 +28,6 @@ class WidgetFont : public QWidget
     ItemFont *                  m_pItemFont;
     
     texture_atlas_t *           m_pAtlas;
-    QList<texture_font_t *>     m_TextureFontList;
     
     QDir                        m_FontMetaDir;
 
@@ -47,10 +46,6 @@ public:
 private slots:
     void on_cmbAtlasGroups_currentIndexChanged(int index);
     
-    void on_actionAddFontSize_triggered();
-    
-    void on_actionRemoveFontSize_triggered();
-    
     void on_txtAdditionalSymbols_editingFinished();
     
     void on_cmbFontList_currentIndexChanged(int index);
@@ -62,6 +57,10 @@ private slots:
     void on_chk_AZ_clicked();
 
     void on_chk_symbols_clicked();
+
+    void on_actionAddStage_triggered();
+
+    void on_actionRemoveStage_triggered();
 
 private:
     Ui::WidgetFont *ui;

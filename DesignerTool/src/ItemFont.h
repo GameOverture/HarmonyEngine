@@ -12,41 +12,39 @@
 
 #include "ItemWidget.h"
 
+#include "freetype-gl/freetype-gl.h"
+
+#include <QColor>
+
+class FontStage
+{
+public:
+    enum eType
+    {
+        TYPE_Normal = 0,
+        TYPE_OutlineEdge,
+        TYPE_OutlinePositive,
+        TYPE_OutlineNegative,
+        TYPE_DistanceField
+    };
+
+    eType               m_eType;
+    float               m_fSize;
+    float               m_fOutlineThickness;
+
+    QColor              m_TopColor;
+    QColor              m_BotColor;
+
+    texture_font_t *    m_pTextureFont;
+
+    FontStage(eType eRenderType, float fSize, float fOutlineThickness, QColor topColor, QColor botColor);
+};
+
 class ItemFont : public ItemWidget
 {
     Q_OBJECT
     
     HyTexturedQuad2d *      m_pDrawPreview;
-    
-    struct tGlyphSet
-    {
-        QString     sFontName;
-        int         iSize;
-        QString     sAvailChars;
-        
-        // Fill colors
-        QColor      clrTopLeft;
-        QColor      clrTopRight;
-        QColor      clrBotLeft;
-        QColor      clrBotRight;
-        
-        struct tDrawInfo
-        {
-            int     iType;  // 0 - Fill, 1 - Line, 2 - Inner, 3 - Outer
-            float   fThickness;
-        };
-        
-        QList<tDrawInfo>    drawOrder;
-    };
-    
-    struct tFontMap
-    {
-        int                 iAtlasWidth;
-        int                 iAtlasHeight;
-        
-        QList<tGlyphSet>    glyphSets;
-    };
-    
     
 public:
     ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef);

@@ -39,7 +39,6 @@ public:
         return ptRenderOffset;
     }
 };
-//Q_DECLARE_METATYPE(SpriteFrame *)
 
 class ItemSprite : public ItemWidget
 {

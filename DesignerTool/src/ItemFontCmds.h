@@ -36,23 +36,20 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ItemFontCmd_AddFontSize : public QUndoCommand
+class ItemFontCmd_AddStage : public QUndoCommand
 {
     WidgetFont &        m_WidgetFontRef;
-    QComboBox *         m_pCmbSizes;
-    double              m_dNewSize;
-    int                 m_iIndexAdded;
     
 public:
-    ItemFontCmd_AddFontSize(WidgetFont &widgetFont, QComboBox *pCmb, double dSize, QUndoCommand *pParent = 0);
-    virtual ~ItemFontCmd_AddFontSize();
+    ItemFontCmd_AddStage(WidgetFont &widgetFont, QUndoCommand *pParent = 0);
+    virtual ~ItemFontCmd_AddStage();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ItemFontCmd_RemoveFontSize : public QUndoCommand
+class ItemFontCmd_RemoveStage : public QUndoCommand
 {
     WidgetFont &        m_WidgetFontRef;
     QComboBox *         m_pCmbSizes;
@@ -60,8 +57,8 @@ class ItemFontCmd_RemoveFontSize : public QUndoCommand
     double              m_dOldSize;
 
 public:
-    ItemFontCmd_RemoveFontSize(WidgetFont &widgetFont, QComboBox *pCmb, int iIndexToRemove, QUndoCommand *pParent = 0);
-    virtual ~ItemFontCmd_RemoveFontSize();
+    ItemFontCmd_RemoveStage(WidgetFont &widgetFont, QUndoCommand *pParent = 0);
+    virtual ~ItemFontCmd_RemoveStage();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;

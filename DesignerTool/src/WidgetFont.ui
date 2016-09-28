@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>305</width>
-    <height>635</height>
+    <width>299</width>
+    <height>701</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,55 +51,6 @@
         <string>Font</string>
        </property>
       </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Size</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
-       <item>
-        <widget class="QDoubleSpinBox" name="sbSize">
-         <property name="minimum">
-          <double>4.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>4098.000000000000000</double>
-         </property>
-         <property name="value">
-          <double>24.000000000000000</double>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="btnAddSize">
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="icon">
-          <iconset resource="res/DesignerTool.qrc">
-           <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="cmbSizes"/>
-       </item>
-       <item>
-        <widget class="QToolButton" name="btnRemoveSize">
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="icon">
-          <iconset resource="res/DesignerTool.qrc">
-           <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </item>
      <item row="1" column="1">
       <widget class="QComboBox" name="cmbFontList"/>
@@ -178,37 +129,25 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Stage Order:</string>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>1</number>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTableView" name="tableView"/>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
      <item>
-      <widget class="QToolButton" name="toolButton_8">
+      <widget class="QLabel" name="label_7">
        <property name="text">
-        <string>...</string>
+        <string>Current Size:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton_2">
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="res/DesignerTool.qrc">
-         <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
+      <spacer name="horizontalSpacer_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -221,41 +160,27 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton">
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="res/DesignerTool.qrc">
-         <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
+      <widget class="QLCDNumber" name="lcdCurTexWidth">
+       <property name="digitCount">
+        <number>5</number>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton_3">
+      <widget class="QLabel" name="label_8">
        <property name="text">
-        <string>...</string>
+        <string>x</string>
        </property>
-       <property name="icon">
-        <iconset resource="res/DesignerTool.qrc">
-         <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLCDNumber" name="lcdCurTexHeight">
+       <property name="digitCount">
+        <number>5</number>
        </property>
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="lineWidth">
-      <number>5</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -312,25 +237,71 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="spacing">
-      <number>1</number>
+    <widget class="Line" name="line_3">
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
      </property>
-     <property name="leftMargin">
-      <number>0</number>
+     <property name="lineWidth">
+      <number>5</number>
      </property>
-     <property name="rightMargin">
-      <number>0</number>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Available Stages:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="WidgetFontTableView" name="tableView"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QLabel" name="label_7">
-       <property name="text">
-        <string>Current Size:</string>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>New Stage of Size</string>
        </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QDoubleSpinBox" name="sbSize">
+          <property name="minimum">
+           <double>4.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>4098.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>24.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnAddStage">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="res/DesignerTool.qrc">
+            <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_3">
+      <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -343,68 +314,231 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLCDNumber" name="lcdCurTexWidth">
-       <property name="digitCount">
-        <number>5</number>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Delete Stage</string>
        </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QToolButton" name="btnRemoveStage">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="res/DesignerTool.qrc">
+            <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>5</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
-      <widget class="QLabel" name="label_8">
+      <widget class="QLabel" name="label_9">
        <property name="text">
-        <string>x</string>
+        <string>States:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLCDNumber" name="lcdCurTexHeight">
-       <property name="digitCount">
-        <number>5</number>
+      <widget class="QComboBox" name="cmbStates">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="label_6">
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QToolButton" name="btnAddState">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="arrowType">
+        <enum>Qt::NoArrow</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnRemoveState">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnRenameState">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnOrderStateBack">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnOrderStateForward">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>TextLabel</string>
+      <string>Used Stages:</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton_10">
-     <property name="text">
-      <string>Create Font</string>
-     </property>
-    </widget>
+    <widget class="QTableView" name="tableView_2"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_10">
+     <item>
+      <widget class="QToolButton" name="toolButton_4">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton_5">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_6">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton_3">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="res/DesignerTool.qrc">
+         <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="res/DesignerTool.qrc">
+         <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
-  <action name="actionAddFontSize">
+  <action name="actionAddStage">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
-    <string>Add Font Size</string>
+    <string>Add New Font Stage</string>
    </property>
    <property name="toolTip">
-    <string>Include this size type in font package</string>
+    <string>Add a new font stage of the specified size to the texture atlas</string>
    </property>
   </action>
-  <action name="actionRemoveFontSize">
+  <action name="actionRemoveStage">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
-    <string>Remove Font Size</string>
+    <string>Remove Selected Font Stage</string>
    </property>
    <property name="toolTip">
-    <string>Remove the selected size type from font package</string>
+    <string>Remove the selected stage from the texture atlas</string>
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WidgetFontTableView</class>
+   <extends>QTableView</extends>
+   <header>WidgetFontModelView.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="res/DesignerTool.qrc"/>
  </resources>
