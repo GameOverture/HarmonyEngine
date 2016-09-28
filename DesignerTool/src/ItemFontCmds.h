@@ -14,6 +14,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QLineEdit>
+#include <QDir>
 
 class WidgetFont;
 
@@ -101,14 +102,18 @@ class ItemFontCmd_FontSelection : public QUndoCommand
 {
     WidgetFont &        m_WidgetFontRef;
     QComboBox *         m_pCmbFontList;
-    int                 m_iIndexSelected;
+    int                 m_iPrevIndex;
+    int                 m_iNewIndex;
+    QDir                m_FontMetaDir;
 
 public:
-    ItemFontCmd_FontSelection(WidgetFont &widgetFont, QComboBox *pCmbFontList, QUndoCommand *pParent = 0);
+    ItemFontCmd_FontSelection(WidgetFont &widgetFont, QComboBox *pCmbFontList, int iPrevIndex, int iNewIndex, QDir fontMetaDir, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_FontSelection();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
+
+    void MoveFontIntoTempDir(int iIndex);
 };
 
 #endif // ITEMFONTCMDS_H

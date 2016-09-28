@@ -23,7 +23,7 @@
 WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
                                                             m_pItemFont(pOwner),
                                                             m_pAtlas(NULL),
-                                                            m_FontMetaDir(m_pItemFont->GetItemProject()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirFonts) % "/" % m_pItemFont->GetName(true)),
+                                                            m_FontMetaDir(m_pItemFont->GetItemProject()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirFonts)),
                                                             ui(new Ui::WidgetFont)
 {
     ui->setupUi(this);
@@ -46,7 +46,10 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
         QFileInfoList fontFileInfoList = fontDir.entryInfoList(sFilterList);
         
         for(int j = 0; j < fontFileInfoList.count(); ++j)
+        {
+            ui->cmbFontList->findText(fontFileInfoList[j].fileName(), Qt::MatchFixedString);
             ui->cmbFontList->addItem(fontFileInfoList[j].fileName(), QVariant(fontFileInfoList[j].absoluteFilePath()));
+        }
     }
     
     // If a .hyfnt file exists, parse and initalize with it, otherwise make default empty font
@@ -90,7 +93,7 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
         ui->cmbAtlasGroups->setCurrentIndex(m_pItemFont->GetAtlasManager().CurrentAtlasGroupIndex());
         
         // Try to find Arial as default font
-        int iArialIndex = ui->cmbFontList->findText("Arial.ttf", Qt::MatchContains);
+        int iArialIndex = ui->cmbFontList->findText("Arial.ttf", Qt::MatchFixedString);
         if(iArialIndex != -1)
             ui->cmbFontList->setCurrentIndex(iArialIndex);
         
@@ -100,11 +103,18 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
     m_pItemFont->GetUndoStack()->clear();
     ui->cmbFontList->blockSignals(false);
+
+    m_iPrevFontIndex = ui->cmbFontList->currentIndex();
 }
 
 WidgetFont::~WidgetFont()
 {
     delete ui;
+}
+
+QString WidgetFont::GetFullItemName()
+{
+    return m_pItemFont->GetName(true);
 }
 
 void WidgetFont::GeneratePreview()
@@ -204,34 +214,10 @@ void WidgetFont::on_txtAdditionalSymbols_editingFinished()
 
 void WidgetFont::on_cmbFontList_currentIndexChanged(int index)
 {
-    QFileInfo originalFontFile(ui->cmbFontList->itemData(index).toString());
-    if(originalFontFile.exists() == false)
-    {
-        HyGuiLog("Font file (" % originalFontFile.absoluteFilePath() % ") doesn't exist", LOGTYPE_Error);
-        return;
-    }
-    
-    if(m_FontMetaDir.mkpath(m_FontMetaDir.absolutePath()) == false)
-    {
-        HyGuiLog("Failed making font meta directory path: " % m_FontMetaDir.absolutePath(), LOGTYPE_Error);
-        return;
-    }
-    
-    // TODO: support temp font files and keep the actual font file upon saving
-    foreach(QString dirFile, m_FontMetaDir.entryList())
-        m_FontMetaDir.remove(dirFile);
-    
-    QFileInfo newFontFile(m_FontMetaDir.absoluteFilePath(originalFontFile.fileName()));
-    if(newFontFile.exists() == false)
-    {
-        if(QFile::copy(originalFontFile.absoluteFilePath(), newFontFile.absoluteFilePath()) == false)
-        {
-            HyGuiLog("Failed copying font to meta directory: " % newFontFile.fileName(), LOGTYPE_Error);
-            return;
-        }
-    }
+    QUndoCommand *pCmd = new ItemFontCmd_FontSelection(*this, ui->cmbFontList, m_iPrevFontIndex, index, m_FontMetaDir);
+    m_pItemFont->GetUndoStack()->push(pCmd);
 
-    // TODO: Utilize the undo command for this
+    m_iPrevFontIndex = index;
 }
 
 void WidgetFont::on_chk_09_clicked()

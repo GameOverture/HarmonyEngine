@@ -10,6 +10,7 @@
 #include "ItemFontCmds.h"
 
 #include "WidgetFont.h"
+#include "HyGlobal.h"
 
 ItemFontCmd_AtlasGroupChanged::ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetFont, QComboBox *pCmb, int iIndex, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
                                                                                                                                                     m_WidgetFontRef(widgetFont),
@@ -154,9 +155,12 @@ void ItemFontCmd_LineEditSymbols::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_FontSelection::ItemFontCmd_FontSelection(WidgetFont &widgetFont, QComboBox *pCmbFontList, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
-                                                                                                                                        m_WidgetFontRef(widgetFont),
-                                                                                                                                        m_pCmbFontList(pCmbFontList)
+ItemFontCmd_FontSelection::ItemFontCmd_FontSelection(WidgetFont &widgetFont, QComboBox *pCmbFontList, int iPrevIndex, int iNewIndex, QDir fontMetaDir, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                                        m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                        m_pCmbFontList(pCmbFontList),
+                                                                                                                                                                                        m_iPrevIndex(iPrevIndex),
+                                                                                                                                                                                        m_iNewIndex(iNewIndex),
+                                                                                                                                                                                        m_FontMetaDir(fontMetaDir)
 {
     setText("Font Selection");
 }
@@ -167,8 +171,45 @@ ItemFontCmd_FontSelection::ItemFontCmd_FontSelection(WidgetFont &widgetFont, QCo
 
 void ItemFontCmd_FontSelection::redo()
 {
+    MoveFontIntoTempDir(m_iNewIndex);
+    m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_FontSelection::undo()
 {
+    MoveFontIntoTempDir(m_iPrevIndex);
+    m_WidgetFontRef.GeneratePreview();
+}
+
+void ItemFontCmd_FontSelection::MoveFontIntoTempDir(int iIndex)
+{
+    QFileInfo originalFontFile(m_pCmbFontList->itemData(iIndex).toString());
+    if(originalFontFile.exists() == false)
+    {
+        HyGuiLog("Font file (" % originalFontFile.absoluteFilePath() % ") doesn't exist", LOGTYPE_Error);
+        return;
+    }
+
+    QDir fontMetaTempDir(m_FontMetaDir.absolutePath() % "/" % HYGUIPATH_TempDir % m_WidgetFontRef.GetFullItemName());
+    if(fontMetaTempDir.removeRecursively() == false)
+    {
+        HyGuiLog("Could not clear temp font directory: " % fontMetaTempDir.absolutePath(), LOGTYPE_Error);
+        return;
+    }
+
+    if(fontMetaTempDir.mkpath(fontMetaTempDir.absolutePath()) == false)
+    {
+        HyGuiLog("Failed making font meta directory path: " % m_FontMetaDir.absolutePath(), LOGTYPE_Error);
+        return;
+    }
+
+    QFileInfo newFontFilePathDestination(fontMetaTempDir.absoluteFilePath(originalFontFile.fileName()));
+    if(newFontFilePathDestination.exists() == false)
+    {
+        if(QFile::copy(originalFontFile.absoluteFilePath(), newFontFilePathDestination.absoluteFilePath()) == false)
+        {
+            HyGuiLog("Failed copying font to meta directory: " % newFontFilePathDestination.absoluteFilePath(), LOGTYPE_Error);
+            return;
+        }
+    }
 }

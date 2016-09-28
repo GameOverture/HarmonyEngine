@@ -31,10 +31,14 @@ class WidgetFont : public QWidget
     QList<texture_font_t *>     m_TextureFontList;
     
     QDir                        m_FontMetaDir;
+
+    int                         m_iPrevFontIndex;
     
 public:
     explicit WidgetFont(ItemFont *pOwner, QWidget *parent = 0);
     ~WidgetFont();
+
+    QString GetFullItemName();
     
     void GeneratePreview();
     
