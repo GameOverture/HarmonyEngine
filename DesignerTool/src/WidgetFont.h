@@ -43,24 +43,22 @@ public:
 private slots:
     void on_cmbAtlasGroups_currentIndexChanged(int index);
     
-    void on_cmbFonts_currentIndexChanged(int index);
-    
     void on_actionAddFontSize_triggered();
     
     void on_actionRemoveFontSize_triggered();
-    
-    void on_chk_09_stateChanged(int arg1);
-    
-    void on_chk_az_stateChanged(int arg1);
-    
-    void on_chk_AZ_stateChanged(int arg1);
-    
-    void on_chk_symbols_stateChanged(int arg1);
     
     void on_txtAdditionalSymbols_editingFinished();
     
     void on_cmbFontList_currentIndexChanged(int index);
     
+    void on_chk_09_clicked();
+
+    void on_chk_az_clicked();
+
+    void on_chk_AZ_clicked();
+
+    void on_chk_symbols_clicked();
+
 private:
     Ui::WidgetFont *ui;
 };

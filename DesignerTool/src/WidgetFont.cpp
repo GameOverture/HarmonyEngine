@@ -180,49 +180,26 @@ void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)
     if(ui->cmbAtlasGroups->currentIndex() == index)
         return;
 
-    QUndoCommand *pCmd = new ItemFontCmd_AtlasGroupChanged(ui->cmbAtlasGroups, index);
+    QUndoCommand *pCmd = new ItemFontCmd_AtlasGroupChanged(*this, ui->cmbAtlasGroups, index);
     m_pItemFont->GetUndoStack()->push(pCmd);
-}
-
-void WidgetFont::on_cmbFonts_currentIndexChanged(int index)
-{
-    
 }
 
 void WidgetFont::on_actionAddFontSize_triggered()
 {
-    ui->cmbSizes->addItem(QString::number(ui->sbSize->value(), 'g', 2));
-    GeneratePreview();
+    QUndoCommand *pCmd = new ItemFontCmd_AddFontSize(*this, ui->cmbSizes, ui->sbSize->value());
+    m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFont::on_actionRemoveFontSize_triggered()
 {
-    
-}
-
-void WidgetFont::on_chk_09_stateChanged(int arg1)
-{
-    
-}
-
-void WidgetFont::on_chk_az_stateChanged(int arg1)
-{
-    
-}
-
-void WidgetFont::on_chk_AZ_stateChanged(int arg1)
-{
-    
-}
-
-void WidgetFont::on_chk_symbols_stateChanged(int arg1)
-{
-    
+    QUndoCommand *pCmd = new ItemFontCmd_RemoveFontSize(*this, ui->cmbSizes, ui->cmbSizes->currentText().toDouble());
+    m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFont::on_txtAdditionalSymbols_editingFinished()
 {
-    
+    QUndoCommand *pCmd = new ItemFontCmd_LineEditSymbols(*this, ui->txtAdditionalSymbols);
+    m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFont::on_cmbFontList_currentIndexChanged(int index)
@@ -253,4 +230,30 @@ void WidgetFont::on_cmbFontList_currentIndexChanged(int index)
             return;
         }
     }
+
+    // TODO: Utilize the undo command for this
+}
+
+void WidgetFont::on_chk_09_clicked()
+{
+    QUndoCommand *pCmd = new ItemFontCmd_CheckBox(*this, ui->chk_09);
+    m_pItemFont->GetUndoStack()->push(pCmd);
+}
+
+void WidgetFont::on_chk_az_clicked()
+{
+    QUndoCommand *pCmd = new ItemFontCmd_CheckBox(*this, ui->chk_az);
+    m_pItemFont->GetUndoStack()->push(pCmd);
+}
+
+void WidgetFont::on_chk_AZ_clicked()
+{
+    QUndoCommand *pCmd = new ItemFontCmd_CheckBox(*this, ui->chk_AZ);
+    m_pItemFont->GetUndoStack()->push(pCmd);
+}
+
+void WidgetFont::on_chk_symbols_clicked()
+{
+    QUndoCommand *pCmd = new ItemFontCmd_CheckBox(*this, ui->chk_symbols);
+    m_pItemFont->GetUndoStack()->push(pCmd);
 }

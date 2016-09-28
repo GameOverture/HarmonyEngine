@@ -553,5 +553,5 @@ void ItemSpriteCmd_Checkbox::redo()
 
 void ItemSpriteCmd_Checkbox::undo()
 {
-   m_pCheckBox->setChecked(!m_bInitialValue);
+    m_pCheckBox->setChecked(!m_bInitialValue);
 }
