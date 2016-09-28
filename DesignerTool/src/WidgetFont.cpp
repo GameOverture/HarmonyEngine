@@ -119,13 +119,6 @@ QString WidgetFont::GetFullItemName()
 
 void WidgetFont::GeneratePreview()
 {
-    QSize atlasDimensions = m_pItemFont->GetAtlasManager().GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
-    
-    if(m_pAtlas)
-        texture_atlas_delete(m_pAtlas);
-    
-    m_pAtlas = texture_atlas_new(atlasDimensions.width(), atlasDimensions.height(), 1);
-    
     // Assemble glyph set
     QString sGlyphs;
     if(ui->chk_09->isChecked())
@@ -137,46 +130,83 @@ void WidgetFont::GeneratePreview()
     if(ui->chk_symbols->isChecked())
         sGlyphs += "!\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@";
     sGlyphs += ui->txtAdditionalSymbols->text();    // May contain duplicates as stated in freetype-gl documentation
-    
+
     // Get all the type sizes for this font
     QList<float> sizeList;
     for(int i = 0; i < ui->cmbSizes->count(); ++i)
         sizeList.append(ui->cmbSizes->itemText(i).toFloat());
-    
+
     // Get the file path to the font
     QString sFontFilePath = ui->cmbFontList->currentData().toString();
-    
-    // Clear old texture fonts
-    for(int i = 0; i < m_TextureFontList.count(); ++i)
-        texture_font_delete(m_TextureFontList[i]);
-    m_TextureFontList.clear();
-    
+
+
+    // Try to find the perfect fit. Adjust atlas dimentions until we utilize efficient space on the smallest texture
+    QSize maxAtlasDimensions = m_pItemFont->GetAtlasManager().GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
+    float fModifier = 1.0f;
+    bool bDoInitialShrink = true;
     size_t iNumMissedGlyphs = 0;
-    for(int i = 0; i < sizeList.count(); ++i)
+    int iNumPasses = 0;
+    do
     {
-        texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, sizeList[i], sFontFilePath.toStdString().c_str());
-        
-        if(pFont == NULL)
+        iNumPasses++;
+
+        if(bDoInitialShrink && fModifier != 1.0f)
+            bDoInitialShrink = false;
+
+        iNumMissedGlyphs = 0;
+
+        if(m_pAtlas)
+            texture_atlas_delete(m_pAtlas);
+        m_pAtlas = texture_atlas_new(static_cast<size_t>(maxAtlasDimensions.width() * fModifier), static_cast<size_t>(maxAtlasDimensions.height() * fModifier), 1);
+
+        // Clear old texture fonts
+        for(int i = 0; i < m_TextureFontList.count(); ++i)
+            texture_font_delete(m_TextureFontList[i]);
+        m_TextureFontList.clear();
+
+        for(int i = 0; i < sizeList.count(); ++i)
         {
-            HyGuiLog("Could not create freetype font from: " % sFontFilePath, LOGTYPE_Error);
-            return;
+            texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, sizeList[i], sFontFilePath.toStdString().c_str());
+
+            if(pFont == NULL)
+            {
+                HyGuiLog("Could not create freetype font from: " % sFontFilePath, LOGTYPE_Error);
+                return;
+            }
+
+            // TODO: implement all the outline stages
+            iNumMissedGlyphs += texture_font_load_glyphs(pFont, sGlyphs.toStdString().c_str());
+
+            m_TextureFontList.append(pFont);
         }
-        
-        // TODO: implement all the outline stages
-        iNumMissedGlyphs += texture_font_load_glyphs(pFont, sGlyphs.toStdString().c_str());
-        
-        m_TextureFontList.append(pFont);
+
+        if(iNumMissedGlyphs && fModifier == 1.0f)
+            break; // Failure
+
+        if(iNumMissedGlyphs)
+        {
+            fModifier = HyClamp(fModifier + 0.05f, 0.0f, 1.0f);
+        }
+        else if(bDoInitialShrink)
+        {
+            fModifier = static_cast<float>(m_pAtlas->used) / static_cast<float>(m_pAtlas->width * m_pAtlas->height);
+            //fModifier += 0.025f; // Give some additional space initially, in case packing next time isn't 100% efficient
+        }
+    }
+    while(iNumMissedGlyphs != 0 || bDoInitialShrink);
+
+    if(iNumMissedGlyphs)
+    {
+        HyGuiLog("Failed to generate font preview. Number of missed glyphs: " % QString::number(iNumMissedGlyphs), LOGTYPE_Info);
+    }
+    else
+    {
+        HyGuiLog("Generated " % sFontFilePath % " Preview", LOGTYPE_Info);
+        HyGuiLog(QString::number(m_TextureFontList.count()) % " fonts with " % QString::number(sGlyphs.size()) % " glyphs each (totaling " % QString::number(sGlyphs.size() * m_TextureFontList.count()) % ").", LOGTYPE_Normal);
+        HyGuiLog("Font Atlas size: " % QString::number(m_pAtlas->width) % "x" % QString::number(m_pAtlas->height) % " (Utilizing " % QString::number(100.0*m_pAtlas->used / (float)(m_pAtlas->width*m_pAtlas->height)) % "%) (Num Passes: " % QString::number(iNumPasses) % " - Dimensions Modifier: " % QString::number(fModifier) % ")", LOGTYPE_Normal);
     }
     
-    HyGuiLog("Generating New Font Preview", LOGTYPE_Title);
-    HyGuiLog("Matched font               : " % sFontFilePath, LOGTYPE_Normal);
-    HyGuiLog("Number of fonts            : " % QString::number(m_TextureFontList.count()), LOGTYPE_Normal);
-    HyGuiLog("Number of glyphs per font  : " % QString::number(sGlyphs.size()), LOGTYPE_Normal);
-    HyGuiLog("Number of missed glyphs    : " % QString::number(iNumMissedGlyphs), LOGTYPE_Normal);
-    HyGuiLog("Total number of glyphs     : " % QString::number(sGlyphs.size() * m_TextureFontList.count() - iNumMissedGlyphs) % "/" % QString::number(sGlyphs.size() * m_TextureFontList.count()), LOGTYPE_Normal);
-    HyGuiLog("Texture size               : " % QString::number(m_pAtlas->width) % "x" % QString::number(m_pAtlas->height), LOGTYPE_Normal);
-    HyGuiLog("Texture occupancy          : " % QString::number(100.0*m_pAtlas->used / (float)(m_pAtlas->width*m_pAtlas->height)), LOGTYPE_Normal);
-    
+    // Signals ItemFont to upload and refresh the preview texture
     m_pAtlas->id = 0;
 }
 

@@ -60,32 +60,38 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
     texture_atlas_t *pAtlas = pWidget->GetAtlas();
     
-    if(pAtlas && pAtlas->id == 0)
+    if(pAtlas)
     {
-        if(m_pDrawPreview && m_pDrawPreview->GetGraphicsApiHandle() != 0)
-            MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawPreview->GetGraphicsApiHandle());
+        if(pAtlas->id == 0)
+        {
+            if(m_pDrawPreview && m_pDrawPreview->GetGraphicsApiHandle() != 0)
+                MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawPreview->GetGraphicsApiHandle());
 
-        int iNumPixels = pAtlas->width * pAtlas->height;
-        unsigned char *pBuffer = new unsigned char[iNumPixels * 4];
-        memset(pBuffer, 0xFF, iNumPixels * 4);
+            // Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
+            int iNumPixels = pAtlas->width * pAtlas->height;
+            unsigned char *pBuffer = new unsigned char[iNumPixels * 4];
+            memset(pBuffer, 0xFF, iNumPixels * 4);
 
-        for(int i = 0; i < iNumPixels; ++i)
-            pBuffer[i*4+3] = pAtlas->data[i];
-            //memset(&pBuffer[i*4], pAtlas->data[i], 4);
-            //memcpy(&pBuffer[i*4], &pAtlas->data[i*4 - i], 3);
+            // Overwriting alpha channel
+            for(int i = 0; i < iNumPixels; ++i)
+                pBuffer[i*4+3] = pAtlas->data[i];
 
+            // Upload texture to gfx api
+            vector<unsigned char *> vPixelData;
+            vPixelData.push_back(pBuffer);
+            pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(4/*pAtlas->depth*/, pAtlas->width, pAtlas->height, vPixelData);
 
-        vector<unsigned char *> vPixelData;
-		vPixelData.push_back(pBuffer);//pAtlas->data);
-        pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(4/*pAtlas->depth*/, pAtlas->width, pAtlas->height, vPixelData);
-        
-        delete m_pDrawPreview;
-        m_pDrawPreview = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
-        m_pDrawPreview->Load();
-        m_pDrawPreview->pos.Set(0.0f, -2048.0f);
-        m_pDrawPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
-        m_pDrawPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
+            // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
+            delete m_pDrawPreview;
+            m_pDrawPreview = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
+            m_pDrawPreview->Load();
+            m_pDrawPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
+            m_pDrawPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
+        }
+
+        m_pDrawPreview->pos.Set(hyApp.Window().GetResolution().y * -0.5f, -static_cast<float>(pAtlas->height) + (hyApp.Window().GetResolution().y * 0.5f));
     }
+
 
 }
 
