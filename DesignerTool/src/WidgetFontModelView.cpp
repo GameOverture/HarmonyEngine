@@ -34,6 +34,12 @@ WidgetFontTableView::WidgetFontTableView(QWidget *pParent /*= 0*/) : QTableView(
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, WidgetFontTableView *pTableView, QObject *pParent /*= 0*/) :    QStyledItemDelegate(pParent),
+                                                                                                                            m_pItemFont(pItemFont),
+                                                                                                                            m_pTableView(pTableView)
+{
+}
+
 /*virtual*/ QWidget* WidgetFontDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QWidget *pReturnWidget = NULL;
@@ -80,6 +86,10 @@ WidgetFontTableView::WidgetFontTableView(QWidget *pParent /*= 0*/) : QTableView(
 
 WidgetFontModel::WidgetFontModel(QObject *parent) : QAbstractTableModel(parent)
 {
+}
+
+/*virtual*/ WidgetFontModel::~WidgetFontModel()
+{
     for(int i = 0; i < m_StageList.count(); ++i)
         delete m_StageList[i];
 
@@ -87,34 +97,48 @@ WidgetFontModel::WidgetFontModel(QObject *parent) : QAbstractTableModel(parent)
         delete m_RemovedStageList[i];
 }
 
-void WidgetFontModel::AddStage(FontStage::eType eRenderType, float fSize, float fOutlineThickness, QColor topColor, QColor botColor)
+FontStage *WidgetFontModel::AddStage(FontStage::eType eRenderType, float fSize, float fOutlineThickness, QColor topColor, QColor botColor)
 {
     int iRowIndex = m_StageList.count();
 
     beginInsertRows(QModelIndex(), iRowIndex, iRowIndex);
-    m_StageList.append(new FontStage(eRenderType, fSize, fOutlineThickness, topColor, botColor));
+    FontStage *pNewFontStage = new FontStage(eRenderType, fSize, fOutlineThickness, topColor, botColor);
+    m_StageList.append(pNewFontStage);
     endInsertRows();
+
+    return pNewFontStage;
 }
 
 void WidgetFontModel::AddStage(FontStage *pExistingStage, int iRowIndex)
 {
     beginInsertRows(QModelIndex(), iRowIndex, iRowIndex);
+    m_RemovedStageList.removeOne(pExistingStage);
     m_StageList.insert(iRowIndex, pExistingStage);
     endInsertRows();
 }
 
-void WidgetFontModel::RemoveStage(FontStage *pStage)
+int WidgetFontModel::RemoveStage(FontStage *pStage)
 {
     for(int i = 0; i < m_StageList.count(); ++i)
     {
         if(m_StageList[i] == pStage)
         {
-            delete m_StageList[i];
+            m_RemovedStageList.append(m_StageList[i]);
             m_StageList.removeAt(i);
 
-            break;
+            return i;
         }
     }
+
+    return -1;
+}
+
+FontStage *WidgetFontModel::GetStageAt(int iIndex)
+{
+    if(iIndex < 0)
+        return NULL;
+
+    return m_StageList[iIndex];
 }
 
 /*virtual*/ int WidgetFontModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
@@ -141,9 +165,9 @@ void WidgetFontModel::RemoveStage(FontStage *pStage)
         switch(index.column())
         {
         case COLUMN_Type:
-            return  pStage->m_eType;
+            return pStage->GetTypeString();
         case COLUMN_Thickness:
-            return pStage->m_fOutlineThickness;
+            return pStage->GetThickness();
         case COLUMN_DefaultColor:
             return QVariant();//pStage->m_fOutlineThickness;
         }

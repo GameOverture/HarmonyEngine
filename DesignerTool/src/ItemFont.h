@@ -28,6 +28,7 @@ public:
         TYPE_DistanceField
     };
 
+private:
     eType               m_eType;
     float               m_fSize;
     float               m_fOutlineThickness;
@@ -37,7 +38,16 @@ public:
 
     texture_font_t *    m_pTextureFont;
 
+public:
     FontStage(eType eRenderType, float fSize, float fOutlineThickness, QColor topColor, QColor botColor);
+
+    QString GetTypeString();
+
+    float GetThickness();
+
+    float GetSize();
+
+    void SetNewTextureFont(texture_font_t *pNewFont);
 };
 
 class ItemFont : public ItemWidget

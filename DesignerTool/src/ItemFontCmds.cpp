@@ -45,8 +45,12 @@ void ItemFontCmd_AtlasGroupChanged::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_AddStage::ItemFontCmd_AddStage(WidgetFont &widgetFont, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                    m_WidgetFontRef(widgetFont)
+ItemFontCmd_AddStage::ItemFontCmd_AddStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, float fSize, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                                m_WidgetFontRef(widgetFont),
+                                                                                                                                                m_pTable(pTable),
+                                                                                                                                                m_fSize(fSize),
+                                                                                                                                                m_pFontStage(NULL),
+                                                                                                                                                m_iRowIndex(-1)
 {
     setText("Add Font Stage");
 }
@@ -57,20 +61,27 @@ ItemFontCmd_AddStage::ItemFontCmd_AddStage(WidgetFont &widgetFont, QUndoCommand 
 
 void ItemFontCmd_AddStage::redo()
 {
+    if(m_pFontStage)
+        static_cast<WidgetFontModel *>(m_pTable->model())->AddStage(m_pFontStage, m_iRowIndex);
+    else
+        m_pFontStage = static_cast<WidgetFontModel *>(m_pTable->model())->AddStage(FontStage::eType::TYPE_Normal, m_fSize, 0.0f, QColor(0, 0, 0), QColor(0, 0, 0));
+
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_AddStage::undo()
 {
+    m_iRowIndex = static_cast<WidgetFontModel *>(m_pTable->model())->RemoveStage(m_pFontStage);
     m_WidgetFontRef.GeneratePreview();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_RemoveStage::ItemFontCmd_RemoveStage(WidgetFont &widgetFont, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-                                                                                                            m_WidgetFontRef(widgetFont)
+ItemFontCmd_RemoveStage::ItemFontCmd_RemoveStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, FontStage *pFontStage, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                                                m_WidgetFontRef(widgetFont),
+                                                                                                                                                                m_pTable(pTable),
+                                                                                                                                                                m_pFontStage(pFontStage)
 {
-    m_dOldSize = m_pCmbSizes->itemText(m_iIndexToRemove).toDouble();
     setText("Remove Font Stage");
 }
 
@@ -80,11 +91,13 @@ ItemFontCmd_RemoveStage::ItemFontCmd_RemoveStage(WidgetFont &widgetFont, QUndoCo
 
 void ItemFontCmd_RemoveStage::redo()
 {
+    m_iRowIndex = static_cast<WidgetFontModel *>(m_pTable->model())->RemoveStage(m_pFontStage);
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_RemoveStage::undo()
 {
+    static_cast<WidgetFontModel *>(m_pTable->model())->AddStage(m_pFontStage, m_iRowIndex);
     m_WidgetFontRef.GeneratePreview();
 }
 

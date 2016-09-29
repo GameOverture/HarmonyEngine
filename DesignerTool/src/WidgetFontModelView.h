@@ -64,10 +64,13 @@ public:
     };
     
     WidgetFontModel(QObject *parent);
+    virtual ~WidgetFontModel();
 
-    void AddStage(FontStage::eType eRenderType, float fSize, float fOutlineThickness, QColor topColor, QColor botColor);
+    FontStage *AddStage(FontStage::eType eRenderType, float fSize, float fOutlineThickness, QColor topColor, QColor botColor);
     void AddStage(FontStage *pExistingStage, int iRowIndex);
-    void RemoveStage(FontStage *pStage);
+    int RemoveStage(FontStage *pStage);
+
+    FontStage *GetStageAt(int iIndex);
     
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;

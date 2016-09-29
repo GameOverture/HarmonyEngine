@@ -10,6 +10,8 @@
 #ifndef ITEMFONTCMDS_H
 #define ITEMFONTCMDS_H
 
+#include "WidgetFontModelView.h"
+
 #include <QUndoCommand>
 #include <QComboBox>
 #include <QCheckBox>
@@ -38,10 +40,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemFontCmd_AddStage : public QUndoCommand
 {
-    WidgetFont &        m_WidgetFontRef;
+    WidgetFont &            m_WidgetFontRef;
+    WidgetFontTableView *   m_pTable;
+    float                   m_fSize;
+    FontStage *             m_pFontStage;
+    int                     m_iRowIndex;
     
 public:
-    ItemFontCmd_AddStage(WidgetFont &widgetFont, QUndoCommand *pParent = 0);
+    ItemFontCmd_AddStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, float fSize, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_AddStage();
 
     void redo() Q_DECL_OVERRIDE;
@@ -51,13 +57,13 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemFontCmd_RemoveStage : public QUndoCommand
 {
-    WidgetFont &        m_WidgetFontRef;
-    QComboBox *         m_pCmbSizes;
-    int                 m_iIndexToRemove;
-    double              m_dOldSize;
+    WidgetFont &            m_WidgetFontRef;
+    WidgetFontTableView *   m_pTable;
+    FontStage *             m_pFontStage;
+    int                     m_iRowIndex;
 
 public:
-    ItemFontCmd_RemoveStage(WidgetFont &widgetFont, QUndoCommand *pParent = 0);
+    ItemFontCmd_RemoveStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, FontStage *pFontStage, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_RemoveStage();
 
     void redo() Q_DECL_OVERRIDE;

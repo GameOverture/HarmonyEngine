@@ -27,6 +27,43 @@ FontStage::FontStage(eType eRenderType, float fSize, float fOutlineThickness, QC
 {
 }
 
+QString FontStage::GetTypeString()
+{
+    switch(m_eType)
+    {
+    case TYPE_Normal:
+        return "Normal";
+    case TYPE_OutlineEdge:
+        return "Outline Edge";
+    case TYPE_OutlinePositive:
+        return "Outline Positive";
+    case TYPE_OutlineNegative:
+        return "Outline Negative";
+    case TYPE_DistanceField:
+        return "Distance Field";
+    }
+
+    return QString();
+}
+
+float FontStage::GetThickness()
+{
+    return m_fOutlineThickness;
+}
+
+float FontStage::GetSize()
+{
+    return m_fSize;
+}
+
+void FontStage::SetNewTextureFont(texture_font_t *pNewFont)
+{
+    if(m_pTextureFont)
+        texture_font_delete(m_pTextureFont);
+
+    m_pTextureFont = pNewFont;
+}
+
 ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  ItemWidget(ITEM_Font, sPath, atlasManRef),
                                                                             m_pDrawPreview(NULL)
 {

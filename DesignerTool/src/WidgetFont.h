@@ -20,6 +20,7 @@ class WidgetFont;
 }
 
 class ItemFont;
+class WidgetFontModel;
 
 class WidgetFont : public QWidget
 {
@@ -28,10 +29,9 @@ class WidgetFont : public QWidget
     ItemFont *                  m_pItemFont;
     
     texture_atlas_t *           m_pAtlas;
-    
     QDir                        m_FontMetaDir;
-
     int                         m_iPrevFontIndex;
+    WidgetFontModel *           m_pFontStageModel;
     
 public:
     explicit WidgetFont(ItemFont *pOwner, QWidget *parent = 0);
