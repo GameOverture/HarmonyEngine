@@ -257,7 +257,14 @@
     </widget>
    </item>
    <item>
-    <widget class="WidgetFontTableView" name="stagesView"/>
+    <widget class="WidgetFontTableView" name="stagesView">
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">

@@ -49,8 +49,7 @@ ItemFontCmd_AddStage::ItemFontCmd_AddStage(WidgetFont &widgetFont, WidgetFontTab
                                                                                                                                                 m_WidgetFontRef(widgetFont),
                                                                                                                                                 m_pTable(pTable),
                                                                                                                                                 m_fSize(fSize),
-                                                                                                                                                m_pFontStage(NULL),
-                                                                                                                                                m_iRowIndex(-1)
+                                                                                                                                                m_iId(-1)
 {
     setText("Add Font Stage");
 }
@@ -61,27 +60,27 @@ ItemFontCmd_AddStage::ItemFontCmd_AddStage(WidgetFont &widgetFont, WidgetFontTab
 
 void ItemFontCmd_AddStage::redo()
 {
-    if(m_pFontStage)
-        static_cast<WidgetFontModel *>(m_pTable->model())->AddStage(m_pFontStage, m_iRowIndex);
+    if(m_iId == -1)
+        m_iId = static_cast<WidgetFontModel *>(m_pTable->model())->AddNewStage(RENDER_NORMAL, m_fSize, 0.0f, QColor(0, 0, 0), QColor(0, 0, 0));
     else
-        m_pFontStage = static_cast<WidgetFontModel *>(m_pTable->model())->AddStage(FontStage::eType::TYPE_Normal, m_fSize, 0.0f, QColor(0, 0, 0), QColor(0, 0, 0));
+        static_cast<WidgetFontModel *>(m_pTable->model())->AddExistingStage(m_iId);
 
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_AddStage::undo()
 {
-    m_iRowIndex = static_cast<WidgetFontModel *>(m_pTable->model())->RemoveStage(m_pFontStage);
+    static_cast<WidgetFontModel *>(m_pTable->model())->RemoveStage(m_iId);
     m_WidgetFontRef.GeneratePreview();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_RemoveStage::ItemFontCmd_RemoveStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, FontStage *pFontStage, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-                                                                                                                                                                m_WidgetFontRef(widgetFont),
-                                                                                                                                                                m_pTable(pTable),
-                                                                                                                                                                m_pFontStage(pFontStage)
+ItemFontCmd_RemoveStage::ItemFontCmd_RemoveStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, int iRowIndex, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                                        m_WidgetFontRef(widgetFont),
+                                                                                                                                                        m_pTable(pTable)
 {
+    m_iId = static_cast<WidgetFontModel *>(m_pTable->model())->GetStageId(iRowIndex);
     setText("Remove Font Stage");
 }
 
@@ -91,13 +90,13 @@ ItemFontCmd_RemoveStage::ItemFontCmd_RemoveStage(WidgetFont &widgetFont, WidgetF
 
 void ItemFontCmd_RemoveStage::redo()
 {
-    m_iRowIndex = static_cast<WidgetFontModel *>(m_pTable->model())->RemoveStage(m_pFontStage);
+    static_cast<WidgetFontModel *>(m_pTable->model())->RemoveStage(m_iId);
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_RemoveStage::undo()
 {
-    static_cast<WidgetFontModel *>(m_pTable->model())->AddStage(m_pFontStage, m_iRowIndex);
+    static_cast<WidgetFontModel *>(m_pTable->model())->AddExistingStage(m_iId);
     m_WidgetFontRef.GeneratePreview();
 }
 
@@ -215,4 +214,88 @@ void ItemFontCmd_FontSelection::MoveFontIntoTempDir(int iIndex)
             return;
         }
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemFontCmd_StageRenderMode::ItemFontCmd_StageRenderMode(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iRowIndex, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                                                                                                                m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                                                m_pFontModel(pFontModel),
+                                                                                                                                                                                                                m_iRowIndex(iRowIndex),
+                                                                                                                                                                                                                m_ePrevRenderMode(ePrevMode),
+                                                                                                                                                                                                                m_eNewRenderMode(eNewMode)
+{
+    setText("Stage Render Mode");
+}
+
+/*virtual*/ ItemFontCmd_StageRenderMode::~ItemFontCmd_StageRenderMode()
+{
+}
+
+void ItemFontCmd_StageRenderMode::redo()
+{
+    m_pFontModel->SetStageRenderMode(m_iRowIndex, m_eNewRenderMode);
+    m_WidgetFontRef.GeneratePreview();
+}
+
+void ItemFontCmd_StageRenderMode::undo()
+{
+    m_pFontModel->SetStageRenderMode(m_iRowIndex, m_ePrevRenderMode);
+    m_WidgetFontRef.GeneratePreview();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemFontCmd_StageSize::ItemFontCmd_StageSize(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iRowIndex, float fPrevSize, float fNewSize, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+                                                                                                                                                                                    m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                    m_pFontModel(pFontModel),
+                                                                                                                                                                                    m_iRowIndex(iRowIndex),
+                                                                                                                                                                                    m_fPrevSize(fPrevSize),
+                                                                                                                                                                                    m_fNewSize(fNewSize)
+{
+}
+
+/*virtual*/ ItemFontCmd_StageSize::~ItemFontCmd_StageSize()
+{
+    setText("Stage Size");
+}
+
+void ItemFontCmd_StageSize::redo()
+{
+    m_pFontModel->SetStageSize(m_iRowIndex, m_fNewSize);
+    m_WidgetFontRef.GeneratePreview();
+}
+
+void ItemFontCmd_StageSize::undo()
+{
+    m_pFontModel->SetStageSize(m_iRowIndex, m_fPrevSize);
+    m_WidgetFontRef.GeneratePreview();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemFontCmd_StageOutlineThickness::ItemFontCmd_StageOutlineThickness(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iRowIndex, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                                                                                                                        m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                                                        m_pFontModel(pFontModel),
+                                                                                                                                                                                                                        m_iRowIndex(iRowIndex),
+                                                                                                                                                                                                                        m_fPrevThickness(fPrevThickness),
+                                                                                                                                                                                                                        m_fNewThickness(fNewThickness)
+{
+    setText("Stage Outline Thickness");
+}
+
+/*virtual*/ ItemFontCmd_StageOutlineThickness::~ItemFontCmd_StageOutlineThickness()
+{
+}
+
+void ItemFontCmd_StageOutlineThickness::redo()
+{
+    m_pFontModel->SetStageOutlineThickness(m_iRowIndex, m_fNewThickness);
+    m_WidgetFontRef.GeneratePreview();
+}
+
+void ItemFontCmd_StageOutlineThickness::undo()
+{
+    m_pFontModel->SetStageOutlineThickness(m_iRowIndex, m_fPrevThickness);
+    m_WidgetFontRef.GeneratePreview();
 }

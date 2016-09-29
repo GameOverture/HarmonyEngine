@@ -12,44 +12,6 @@
 
 #include "ItemWidget.h"
 
-#include "freetype-gl/freetype-gl.h"
-
-#include <QColor>
-
-class FontStage
-{
-public:
-    enum eType
-    {
-        TYPE_Normal = 0,
-        TYPE_OutlineEdge,
-        TYPE_OutlinePositive,
-        TYPE_OutlineNegative,
-        TYPE_DistanceField
-    };
-
-private:
-    eType               m_eType;
-    float               m_fSize;
-    float               m_fOutlineThickness;
-
-    QColor              m_TopColor;
-    QColor              m_BotColor;
-
-    texture_font_t *    m_pTextureFont;
-
-public:
-    FontStage(eType eRenderType, float fSize, float fOutlineThickness, QColor topColor, QColor botColor);
-
-    QString GetTypeString();
-
-    float GetThickness();
-
-    float GetSize();
-
-    void SetNewTextureFont(texture_font_t *pNewFont);
-};
-
 class ItemFont : public ItemWidget
 {
     Q_OBJECT

@@ -36,7 +36,7 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
 
     ui->stagesView->setModel(m_pFontStageModel);
     ui->stagesView->resize(ui->stagesView->size());
-    ui->stagesView->setItemDelegate(new WidgetFontDelegate(m_pItemFont, ui->stagesView, this));
+    ui->stagesView->setItemDelegate(new WidgetFontDelegate(m_pItemFont, this));
     //QItemSelectionModel *pSelModel = ui->stagesView->selectionModel();
     //connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
 
@@ -170,14 +170,14 @@ void WidgetFont::GeneratePreview()
         WidgetFontModel *pModel = static_cast<WidgetFontModel *>(ui->stagesView->model());
         for(int i = 0; i < pModel->rowCount(); i++)
         {
-            texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, pModel->GetStageAt(i)->GetSize(), sFontFilePath.toStdString().c_str());
+            texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, pModel->GetStageSize(i), sFontFilePath.toStdString().c_str());
             if(pFont == NULL)
             {
                 HyGuiLog("Could not create freetype font from: " % sFontFilePath, LOGTYPE_Error);
                 return;
             }
 
-            pModel->GetStageAt(i)->SetNewTextureFont(pFont);
+            pModel->SetTextureFont(i, pFont);
             iNumMissedGlyphs += texture_font_load_glyphs(pFont, sGlyphs.toStdString().c_str());
         }
 
@@ -217,6 +217,11 @@ void WidgetFont::GeneratePreview()
 texture_atlas_t *WidgetFont::GetAtlas()
 {
     return m_pAtlas;
+}
+
+WidgetFontModel *WidgetFont::GetFontModel()
+{
+    return m_pFontStageModel;
 }
 
 void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)
@@ -274,8 +279,6 @@ void WidgetFont::on_actionAddStage_triggered()
 
 void WidgetFont::on_actionRemoveStage_triggered()
 {
-    FontStage *pFontStage = static_cast<WidgetFontModel *>(ui->stagesView->model())->GetStageAt(ui->stagesView->currentIndex().row());
-
-    QUndoCommand *pCmd = new ItemFontCmd_RemoveStage(*this, ui->stagesView, pFontStage);
+    QUndoCommand *pCmd = new ItemFontCmd_RemoveStage(*this, ui->stagesView, ui->stagesView->currentIndex().row());
     m_pItemFont->GetUndoStack()->push(pCmd);
 }

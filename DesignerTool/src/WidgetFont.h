@@ -42,6 +42,7 @@ public:
     void GeneratePreview();
     
     texture_atlas_t *GetAtlas();
+    WidgetFontModel *GetFontModel();
 
 private slots:
     void on_cmbAtlasGroups_currentIndexChanged(int index);

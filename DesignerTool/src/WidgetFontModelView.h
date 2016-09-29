@@ -10,12 +10,14 @@
 #ifndef WIDGETFONTMODELVIEW_H
 #define WIDGETFONTMODELVIEW_H
 
+#include "ItemFont.h"
+#include "freetype-gl/freetype-gl.h"
+
 #include <QWidget>
 #include <QTableView>
 #include <QResizeEvent>
 #include <QStyledItemDelegate>
-
-#include "ItemFont.h"
+#include <QColor>
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class WidgetFontTableView : public QTableView
@@ -34,10 +36,9 @@ class WidgetFontDelegate : public QStyledItemDelegate
     Q_OBJECT
 
     ItemFont *              m_pItemFont;
-    WidgetFontTableView *   m_pTableView;
 
 public:
-    WidgetFontDelegate(ItemFont *pItemFont, WidgetFontTableView *pTableView, QObject *pParent = 0);
+    WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent = 0);
 
     virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const;
@@ -48,9 +49,35 @@ public:
 class WidgetFontModel : public QAbstractTableModel
 {
     Q_OBJECT
-    
-    QList<FontStage *>      m_StageList;
-    QList<FontStage *>      m_RemovedStageList;
+
+    int                             m_iUniqueIdCounter;
+
+    struct FontStage
+    {
+        const int           iUNIQUE_ID;
+
+        rendermode_t        eMode;
+        float               fSize;
+        float               fOutlineThickness;
+
+        QColor              topColor;
+        QColor              botColor;
+
+        texture_font_t *    pTextureFont;
+
+        FontStage(int uiId, rendermode_t eRenderMode, float fSize, float fOutlineThickness, QColor topColor, QColor botColor) : iUNIQUE_ID(uiId),
+                                                                                                                                eMode(eRenderMode),
+                                                                                                                                fSize(fSize),
+                                                                                                                                fOutlineThickness(fOutlineThickness),
+                                                                                                                                topColor(topColor),
+                                                                                                                                botColor(botColor),
+                                                                                                                                pTextureFont(NULL)
+        { }
+    };
+    QList<FontStage *>              m_StageList;
+    QList<QPair<FontStage *, int> > m_RemovedStageList;
+
+    QString                         m_sRenderModeStrings[5];
     
 public:
     enum eColumn
@@ -66,11 +93,24 @@ public:
     WidgetFontModel(QObject *parent);
     virtual ~WidgetFontModel();
 
-    FontStage *AddStage(FontStage::eType eRenderType, float fSize, float fOutlineThickness, QColor topColor, QColor botColor);
-    void AddStage(FontStage *pExistingStage, int iRowIndex);
-    int RemoveStage(FontStage *pStage);
+    QString GetRenderModeString(rendermode_t eMode) const;
 
-    FontStage *GetStageAt(int iIndex);
+    int AddNewStage(rendermode_t eRenderMode, float fSize, float fOutlineThickness, QColor topColor, QColor botColor);
+    void AddExistingStage(int iId);
+    void RemoveStage(int iId);
+
+    int GetStageId(int iRowIndex) const;
+
+    rendermode_t GetStageRenderMode(int iRowIndex) const;
+    void SetStageRenderMode(int iRowIndex, rendermode_t eRenderMode);
+
+    float GetStageSize(int iRowIndex) const;
+    void SetStageSize(int iRowIndex, float fSize);
+
+    float GetStageOutlineThickness(int iRowIndex) const;
+    void SetStageOutlineThickness(int iRowIndex, float fThickness);
+
+    void SetTextureFont(int iRowIndex, texture_font_t *pTextureFont);
     
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
