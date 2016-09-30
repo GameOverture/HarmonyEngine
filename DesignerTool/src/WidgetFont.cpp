@@ -147,7 +147,7 @@ void WidgetFont::GeneratePreview()
     // Try to find the perfect fit. Adjust atlas dimentions until we utilize efficient space on the smallest texture
     QSize maxAtlasDimensions = m_pItemFont->GetAtlasManager().GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
     ui->lcdMaxTexWidth->display(maxAtlasDimensions.width());
-    ui->lcdMaxTexWidth->display(maxAtlasDimensions.height());
+    ui->lcdMaxTexHeight->display(maxAtlasDimensions.height());
 
     float fModifier = 1.0f;
     bool bDoInitialShrink = true;
