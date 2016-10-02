@@ -16,7 +16,6 @@
 #include "WidgetAtlasManager.h"
 #include "WidgetFontModelView.h"
 
-#include <QStandardPaths>
 #include <QDir>
 #include <QJsonDocument>
 #include <QFileDialog>
@@ -50,40 +49,13 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
     ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
 
-    ui->btnAddLayer->setDefaultAction(ui->actionAddLayer);
-    ui->btnRemoveLayer->setDefaultAction(ui->actionRemoveLayer);
-    ui->btnOrderLayerUp->setDefaultAction(ui->actionOrderLayerUpwards);
-    ui->btnOrderLayerDown->setDefaultAction(ui->actionOrderLayerDownwards);
+    m_StateActionsList.push_back(ui->actionAddLayer);
+    m_StateActionsList.push_back(ui->actionRemoveLayer);
+    m_StateActionsList.push_back(ui->actionOrderLayerUpwards);
+    m_StateActionsList.push_back(ui->actionOrderLayerDownwards);
 
-    m_pFontStageModel = new WidgetFontModel(this);
-
-    ui->stagesView->setModel(m_pFontStageModel);
-    ui->stagesView->resize(ui->stagesView->size());
-    ui->stagesView->setItemDelegate(new WidgetFontDelegate(m_pItemFont, this));
-    //QItemSelectionModel *pSelModel = ui->stagesView->selectionModel();
-    //connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
-
-    
     ui->cmbAtlasGroups->setModel(m_pItemFont->GetAtlasManager().AllocateAtlasModelView());
     
-    // Populate the font list combo box
-    QStringList sFontPaths = QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
-    sFontPaths.append(m_FontMetaDir.absolutePath());
-    ui->cmbFontList->clear();
-    ui->cmbFontList->blockSignals(true);
-    for(int i = 0; i < sFontPaths.count(); ++i)
-    {
-        QDir fontDir(sFontPaths[i]);
-        QStringList sFilterList;
-        sFilterList << "*.ttf" << "*.otf";
-        QFileInfoList fontFileInfoList = fontDir.entryInfoList(sFilterList);
-        
-        for(int j = 0; j < fontFileInfoList.count(); ++j)
-        {
-            ui->cmbFontList->findText(fontFileInfoList[j].fileName(), Qt::MatchFixedString);
-            ui->cmbFontList->addItem(fontFileInfoList[j].fileName(), QVariant(fontFileInfoList[j].absoluteFilePath()));
-        }
-    }
     
     // If a .hyfnt file exists, parse and initalize with it, otherwise make default empty font
     QFile fontFile(m_pItemFont->GetAbsPath());
@@ -124,11 +96,6 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     else
     {
         ui->cmbAtlasGroups->setCurrentIndex(m_pItemFont->GetAtlasManager().CurrentAtlasGroupIndex());
-        
-        // Try to find Arial as default font
-        int iArialIndex = ui->cmbFontList->findText("Arial.ttf", Qt::MatchFixedString);
-        if(iArialIndex != -1)
-            ui->cmbFontList->setCurrentIndex(iArialIndex);
 
         on_actionAddStage_triggered();
     }
@@ -137,7 +104,7 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     m_pItemFont->GetUndoStack()->clear();
     ui->cmbFontList->blockSignals(false);
 
-    m_iPrevFontIndex = ui->cmbFontList->currentIndex();
+    m_iPrevAtlasCmbIndex = ui->cmbAtlasGroups->currentIndex();
 }
 
 WidgetFont::~WidgetFont()
@@ -150,7 +117,7 @@ QString WidgetFont::GetFullItemName()
     return m_pItemFont->GetName(true);
 }
 
-void WidgetFont::GeneratePreview()
+void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
 {
     // Assemble glyph set
     QString sGlyphs;
@@ -167,12 +134,9 @@ void WidgetFont::GeneratePreview()
     // Get the file path to the font
     QString sFontFilePath = ui->cmbFontList->currentData().toString();
 
-    // Try to find the perfect fit. Adjust atlas dimentions until we utilize efficient space on the smallest texture
-    m_CurrentAtlasDimensions = m_pItemFont->GetAtlasManager().GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
-    ui->lcdMaxTexWidth->display(m_CurrentAtlasDimensions.width());
-    ui->lcdMaxTexHeight->display(m_CurrentAtlasDimensions.height());
-
-    float fModifier = 1.0f;
+    // if 'bFindBestFit' == true, adjust atlas dimentions until we utilize efficient space on the smallest texture
+    QSize atlasSize = GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
+    float fAtlasSizeModifier = 1.0f;
     bool bDoInitialShrink = true;
     size_t iNumMissedGlyphs = 0;
     int iNumPasses = 0;
@@ -180,14 +144,14 @@ void WidgetFont::GeneratePreview()
     {
         iNumPasses++;
 
-        if(bDoInitialShrink && fModifier != 1.0f)
+        if(bDoInitialShrink && fAtlasSizeModifier != 1.0f)
             bDoInitialShrink = false;
 
         iNumMissedGlyphs = 0;
 
         if(m_pAtlas)
             texture_atlas_delete(m_pAtlas);
-        m_pAtlas = texture_atlas_new(static_cast<size_t>(maxAtlasDimensions.width() * fModifier), static_cast<size_t>(maxAtlasDimensions.height() * fModifier), 1);
+        m_pAtlas = texture_atlas_new(static_cast<size_t>(atlasSize.width() * fAtlasSizeModifier), static_cast<size_t>(atlasSize.height() * fAtlasSizeModifier), 1);
 
         // Get model from tableview and iterate each FontStage, assigning a new 'texture_font_t'
         WidgetFontModel *pModel = static_cast<WidgetFontModel *>(ui->stagesView->model());
@@ -204,30 +168,25 @@ void WidgetFont::GeneratePreview()
             iNumMissedGlyphs += texture_font_load_glyphs(pFont, sGlyphs.toStdString().c_str());
         }
 
-        if(iNumMissedGlyphs && fModifier == 1.0f)
+        if(iNumMissedGlyphs && fAtlasSizeModifier == 1.0f)
             break; // Failure
 
         if(iNumMissedGlyphs)
-        {
-            fModifier = HyClamp(fModifier + 0.05f, 0.0f, 1.0f);
-        }
+            fAtlasSizeModifier = HyClamp(fAtlasSizeModifier + 0.05f, 0.0f, 1.0f);
         else if(bDoInitialShrink)
-        {
-            fModifier = static_cast<float>(m_pAtlas->used) / static_cast<float>(m_pAtlas->width * m_pAtlas->height);
-            //fModifier += 0.025f; // Give some additional space initially, in case packing next time isn't 100% efficient
-        }
+            fAtlasSizeModifier = static_cast<float>(m_pAtlas->used) / static_cast<float>(m_pAtlas->width * m_pAtlas->height);
     }
-    while(iNumMissedGlyphs != 0 || bDoInitialShrink);
+    while(bFindBestFit && iNumMissedGlyphs != 0 || bDoInitialShrink);
 
     if(iNumMissedGlyphs)
     {
         HyGuiLog("Failed to generate font preview. Number of missed glyphs: " % QString::number(iNumMissedGlyphs), LOGTYPE_Info);
     }
-    else
+    else if(bFindBestFit)
     {
         HyGuiLog("Generated " % sFontFilePath % " Preview", LOGTYPE_Info);
-        //HyGuiLog(QString::number(m_TextureFontList.count()) % " fonts with " % QString::number(sGlyphs.size()) % " glyphs each (totaling " % QString::number(sGlyphs.size() * m_TextureFontList.count()) % ").", LOGTYPE_Normal);
-        HyGuiLog("Font Atlas size: " % QString::number(m_pAtlas->width) % "x" % QString::number(m_pAtlas->height) % " (Utilizing " % QString::number(100.0*m_pAtlas->used / (float)(m_pAtlas->width*m_pAtlas->height)) % "%) (Num Passes: " % QString::number(iNumPasses) % " - Dimensions Modifier: " % QString::number(fModifier) % ")", LOGTYPE_Normal);
+        HyGuiLog(QString::number(m_TextureFontList.count()) % " fonts with " % QString::number(sGlyphs.size()) % " glyphs each (totaling " % QString::number(sGlyphs.size() * m_TextureFontList.count()) % ").", LOGTYPE_Normal);
+        HyGuiLog("Font Atlas size: " % QString::number(m_pAtlas->width) % "x" % QString::number(m_pAtlas->height) % " (Utilizing " % QString::number(100.0*m_pAtlas->used / (float)(m_pAtlas->width*m_pAtlas->height)) % "%) (Num Passes: " % QString::number(iNumPasses) % " - Dimensions Modifier: " % QString::number(fAtlasSizeModifier) % ")", LOGTYPE_Normal);
     }
 
     ui->lcdCurTexWidth->display(static_cast<int>(m_pAtlas->width));
@@ -244,7 +203,12 @@ texture_atlas_t *WidgetFont::GetAtlas()
 
 WidgetFontModel *WidgetFont::GetFontModel()
 {
-    return m_pFontStageModel;
+    return m_pFontModel;
+}
+
+QSize WidgetFont::GetAtlasDimensions(int iAtlasGrpIndex)
+{
+    return m_pItemFont->GetAtlasManager().GetAtlasDimensions(iAtlasGrpIndex);
 }
 
 void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)
@@ -252,22 +216,11 @@ void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)
     if(ui->cmbAtlasGroups->currentIndex() == index)
         return;
 
-    QUndoCommand *pCmd = new ItemFontCmd_AtlasGroupChanged(*this, m_CurrentAtlasDimensions, ui->cmbAtlasGroups, index);
-    m_pItemFont->GetUndoStack()->push(pCmd);
-}
-
-void WidgetFont::on_txtAdditionalSymbols_editingFinished()
-{
-    QUndoCommand *pCmd = new ItemFontCmd_LineEditSymbols(*this, ui->txtAdditionalSymbols);
-    m_pItemFont->GetUndoStack()->push(pCmd);
-}
-
-void WidgetFont::on_cmbFontList_currentIndexChanged(int index)
-{
-    QUndoCommand *pCmd = new ItemFontCmd_FontSelection(*this, ui->cmbFontList, m_iPrevFontIndex, index, m_FontMetaDir);
+    // TODO: This will break when an atlas group is removed from the Atlas Manager and is apart of the UndoStack
+    QUndoCommand *pCmd = new ItemFontCmd_AtlasGroupChanged(*this, ui->cmbAtlasGroups, m_iPrevAtlasCmbIndex, index);
     m_pItemFont->GetUndoStack()->push(pCmd);
 
-    m_iPrevFontIndex = index;
+    m_iPrevAtlasCmbIndex = index;
 }
 
 void WidgetFont::on_chk_09_clicked()
@@ -291,6 +244,12 @@ void WidgetFont::on_chk_AZ_clicked()
 void WidgetFont::on_chk_symbols_clicked()
 {
     QUndoCommand *pCmd = new ItemFontCmd_CheckBox(*this, ui->chk_symbols);
+    m_pItemFont->GetUndoStack()->push(pCmd);
+}
+
+void WidgetFont::on_txtAdditionalSymbols_editingFinished()
+{
+    QUndoCommand *pCmd = new ItemFontCmd_LineEditSymbols(*this, ui->txtAdditionalSymbols);
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 

@@ -22,12 +22,12 @@ void EnsureProperNamingInComboBox(QComboBox *pCmb)
     }
 }
 
-ItemFontCmd_AtlasGroupChanged::ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetFont, QSize &atlasDimensionsRef, QComboBox *pCmb, int iIndex, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
-                                                                                                                                                    m_WidgetFontRef(widgetFont),
-                                                                                                                                                    m_iNewIndex(iIndex),
-                                                                                                                                                    m_pCmbAtlasGroups(pCmb)
+ItemFontCmd_AtlasGroupChanged::ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetFont, QComboBox *pCmb, int iPrevIndex, int iNewIndex, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                                                        m_WidgetFontRef(widgetFont),
+                                                                                                                                                                        m_iPrevIndex(iPrevIndex),
+                                                                                                                                                                        m_iNewIndex(iNewIndex),
+                                                                                                                                                                        m_pCmbAtlasGroups(pCmb)
 {
-    m_iOriginalIndex = m_pCmbAtlasGroups->currentIndex();
     setText("Atlas Group Changed");
 }
 
@@ -35,24 +35,86 @@ ItemFontCmd_AtlasGroupChanged::ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetF
 {
 }
 
-todo only generate preview if atlas is smaller
-
 void ItemFontCmd_AtlasGroupChanged::redo()
 {
-    if(m_pCmbAtlasGroups->currentIndex() != m_iNewIndex)
-    {
-        m_pCmbAtlasGroups->setCurrentIndex(m_iNewIndex);
+    m_pCmbAtlasGroups->blockSignals(true);
+    m_pCmbAtlasGroups->setCurrentIndex(m_iNewIndex);
+    m_pCmbAtlasGroups->blockSignals(false);
+
+    QSize prevSize = m_WidgetFontRef.GetAtlasDimensions(m_iPrevIndex);
+    QSize curSize = m_WidgetFontRef.GetAtlasDimensions(m_iNewIndex);
+
+    if(prevSize.width() < curSize.width() || prevSize.height() < curSize.height())
         m_WidgetFontRef.GeneratePreview();
-    }
 }
 
 void ItemFontCmd_AtlasGroupChanged::undo()
 {
-    if(m_pCmbAtlasGroups->currentIndex() != m_iOriginalIndex)
-    {
-        m_pCmbAtlasGroups->setCurrentIndex(m_iOriginalIndex);
+    m_pCmbAtlasGroups->blockSignals(true);
+    m_pCmbAtlasGroups->setCurrentIndex(m_iPrevIndex);
+    m_pCmbAtlasGroups->blockSignals(false);
+
+    QSize prevSize = m_WidgetFontRef.GetAtlasDimensions(m_iNewIndex);
+    QSize curSize = m_WidgetFontRef.GetAtlasDimensions(m_iPrevIndex);
+
+    if(prevSize.width() < curSize.width() || prevSize.height() < curSize.height())
         m_WidgetFontRef.GeneratePreview();
-    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemFontCmd_CheckBox::ItemFontCmd_CheckBox(WidgetFont &widgetFont, QCheckBox *pCheckBox, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                            m_WidgetFontRef(widgetFont),
+                                                                                                                            m_pCheckBox(pCheckBox)
+{
+    m_bInitialValue = m_pCheckBox->isChecked();
+    setText((m_bInitialValue ? "Checked " : "Unchecked ") % m_pCheckBox->text());
+}
+
+/*virtual*/ ItemFontCmd_CheckBox::~ItemFontCmd_CheckBox()
+{
+}
+
+void ItemFontCmd_CheckBox::redo()
+{
+    m_pCheckBox->setChecked(m_bInitialValue);
+    m_WidgetFontRef.GeneratePreview();
+}
+
+void ItemFontCmd_CheckBox::undo()
+{
+    m_pCheckBox->setChecked(!m_bInitialValue);
+    m_WidgetFontRef.GeneratePreview();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemFontCmd_LineEditSymbols::ItemFontCmd_LineEditSymbols(WidgetFont &widgetFont, QLineEdit *pTxtAdditionalSymbols, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                    m_WidgetFontRef(widgetFont),
+                                                                                                                                                    m_pTxtAdditionalSymbols(pTxtAdditionalSymbols),
+                                                                                                                                                    m_bFirstTimeSkipRedo(true)
+{
+    setText("Additional Symbols");
+}
+
+/*virtual*/ ItemFontCmd_LineEditSymbols::~ItemFontCmd_LineEditSymbols()
+{
+}
+
+void ItemFontCmd_LineEditSymbols::redo()
+{
+    if(m_bFirstTimeSkipRedo)
+        m_bFirstTimeSkipRedo = false;
+    else
+        m_pTxtAdditionalSymbols->redo();
+
+    m_WidgetFontRef.GeneratePreview();
+}
+
+void ItemFontCmd_LineEditSymbols::undo()
+{
+    m_pTxtAdditionalSymbols->undo();
+    m_WidgetFontRef.GeneratePreview();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,61 +171,6 @@ void ItemFontCmd_RemoveStage::redo()
 void ItemFontCmd_RemoveStage::undo()
 {
     static_cast<WidgetFontModel *>(m_pTable->model())->AddExistingStage(m_iId);
-    m_WidgetFontRef.GeneratePreview();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ItemFontCmd_CheckBox::ItemFontCmd_CheckBox(WidgetFont &widgetFont, QCheckBox *pCheckBox, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-                                                                                                                            m_WidgetFontRef(widgetFont),
-                                                                                                                            m_pCheckBox(pCheckBox)
-{
-    m_bInitialValue = m_pCheckBox->isChecked();
-    setText((m_bInitialValue ? "Checked " : "Unchecked ") % m_pCheckBox->text());
-}
-
-/*virtual*/ ItemFontCmd_CheckBox::~ItemFontCmd_CheckBox()
-{
-}
-
-void ItemFontCmd_CheckBox::redo()
-{
-    m_pCheckBox->setChecked(m_bInitialValue);
-    m_WidgetFontRef.GeneratePreview();
-}
-
-void ItemFontCmd_CheckBox::undo()
-{
-    m_pCheckBox->setChecked(!m_bInitialValue);
-    m_WidgetFontRef.GeneratePreview();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-ItemFontCmd_LineEditSymbols::ItemFontCmd_LineEditSymbols(WidgetFont &widgetFont, QLineEdit *pTxtAdditionalSymbols, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                                                                    m_WidgetFontRef(widgetFont),
-                                                                                                                                                    m_pTxtAdditionalSymbols(pTxtAdditionalSymbols),
-                                                                                                                                                    m_bFirstTimeSkipRedo(true)
-{
-    setText("Additional Symbols");
-}
-
-/*virtual*/ ItemFontCmd_LineEditSymbols::~ItemFontCmd_LineEditSymbols()
-{
-}
-
-void ItemFontCmd_LineEditSymbols::redo()
-{
-    if(m_bFirstTimeSkipRedo)
-        m_bFirstTimeSkipRedo = false;
-    else
-        m_pTxtAdditionalSymbols->redo();
-
-    m_WidgetFontRef.GeneratePreview();
-}
-
-void ItemFontCmd_LineEditSymbols::undo()
-{
-    m_pTxtAdditionalSymbols->undo();
     m_WidgetFontRef.GeneratePreview();
 }
 

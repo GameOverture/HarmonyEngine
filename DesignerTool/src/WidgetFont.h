@@ -27,12 +27,12 @@ class WidgetFont : public QWidget
     Q_OBJECT
 
     ItemFont *                  m_pItemFont;
+
+    QList<QAction *>            m_StateActionsList;
     
-    QSize                       m_CurrentAtlasDimensions;
     texture_atlas_t *           m_pAtlas;
     QDir                        m_FontMetaDir;
-    int                         m_iPrevFontIndex;
-    WidgetFontModel *           m_pFontStageModel;
+    int                         m_iPrevAtlasCmbIndex;
     
 public:
     explicit WidgetFont(ItemFont *pOwner, QWidget *parent = 0);
@@ -40,17 +40,15 @@ public:
 
     QString GetFullItemName();
     
-    void GeneratePreview();
+    void GeneratePreview(bool bFindBestFit = false);
     
     texture_atlas_t *GetAtlas();
     WidgetFontModel *GetFontModel();
 
+    QSize GetAtlasDimensions(int iAtlasGrpIndex);
+
 private slots:
     void on_cmbAtlasGroups_currentIndexChanged(int index);
-    
-    void on_txtAdditionalSymbols_editingFinished();
-    
-    void on_cmbFontList_currentIndexChanged(int index);
     
     void on_chk_09_clicked();
 
@@ -59,6 +57,8 @@ private slots:
     void on_chk_AZ_clicked();
 
     void on_chk_symbols_clicked();
+
+    void on_txtAdditionalSymbols_editingFinished();
 
     void on_actionAddStage_triggered();
 

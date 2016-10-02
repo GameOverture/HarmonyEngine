@@ -28,48 +28,16 @@ class ItemFontCmd_AtlasGroupChanged : public QUndoCommand
 
     QSize               m_CurrentAtlasDimensions;
     QComboBox *         m_pCmbAtlasGroups;
+    int                 m_iPrevIndex;
     int                 m_iNewIndex;
-    int                 m_iOriginalIndex;
     
 public:
-    ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetFont, QSize &atlasDimensionsRef, QComboBox *pCmb, int iIndex, QUndoCommand *pParent = 0);
+    ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetFont, QComboBox *pCmb, int iPrevIndex, int iNewIndex, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_AtlasGroupChanged();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ItemFontCmd_AddStage : public QUndoCommand
-{
-    WidgetFont &            m_WidgetFontRef;
-    WidgetFontTableView *   m_pTable;
-    float                   m_fSize;
-    int                     m_iId;
-    
-public:
-    ItemFontCmd_AddStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, float fSize, QUndoCommand *pParent = 0);
-    virtual ~ItemFontCmd_AddStage();
-
-    void redo() Q_DECL_OVERRIDE;
-    void undo() Q_DECL_OVERRIDE;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ItemFontCmd_RemoveStage : public QUndoCommand
-{
-    WidgetFont &            m_WidgetFontRef;
-    WidgetFontTableView *   m_pTable;
-    int                     m_iId;
-
-public:
-    ItemFontCmd_RemoveStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, int iRowIndex, QUndoCommand *pParent = 0);
-    virtual ~ItemFontCmd_RemoveStage();
-
-    void redo() Q_DECL_OVERRIDE;
-    void undo() Q_DECL_OVERRIDE;
-};
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemFontCmd_CheckBox : public QUndoCommand
 {
@@ -99,7 +67,35 @@ public:
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemFontCmd_AddStage : public QUndoCommand
+{
+    WidgetFont &            m_WidgetFontRef;
+    WidgetFontTableView *   m_pTable;
+    float                   m_fSize;
+    int                     m_iId;
+    
+public:
+    ItemFontCmd_AddStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, float fSize, QUndoCommand *pParent = 0);
+    virtual ~ItemFontCmd_AddStage();
 
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemFontCmd_RemoveStage : public QUndoCommand
+{
+    WidgetFont &            m_WidgetFontRef;
+    WidgetFontTableView *   m_pTable;
+    int                     m_iId;
+
+public:
+    ItemFontCmd_RemoveStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, int iRowIndex, QUndoCommand *pParent = 0);
+    virtual ~ItemFontCmd_RemoveStage();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemFontCmd_FontSelection : public QUndoCommand
 {
