@@ -20,6 +20,7 @@
 #include <QDir>
 #include <QJsonDocument>
 #include <QFileDialog>
+#include <QMenu>
 
 WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
                                                             m_pItemFont(pOwner),
@@ -28,9 +29,31 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
                                                             ui(new Ui::WidgetFont)
 {
     ui->setupUi(this);
+
+    ui->txtPrefixAndName->setText(m_pItemFont->GetName(true));
+
+    QMenu *pEditMenu = m_pItemFont->GetEditMenu();
+    pEditMenu->addAction(ui->actionAddState);
+    pEditMenu->addAction(ui->actionRemoveState);
+    pEditMenu->addAction(ui->actionRenameState);
+    pEditMenu->addAction(ui->actionOrderStateBackwards);
+    pEditMenu->addAction(ui->actionOrderStateForwards);
+    pEditMenu->addSeparator();
+    pEditMenu->addAction(ui->actionAddLayer);
+    pEditMenu->addAction(ui->actionRemoveLayer);
+    pEditMenu->addAction(ui->actionOrderLayerUpwards);
+    pEditMenu->addAction(ui->actionOrderLayerDownwards);
     
-    ui->btnAddStage->setDefaultAction(ui->actionAddStage);
-    ui->btnRemoveStage->setDefaultAction(ui->actionRemoveStage);
+    ui->btnAddState->setDefaultAction(ui->actionAddState);
+    ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
+    ui->btnRenameState->setDefaultAction(ui->actionRenameState);
+    ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
+    ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
+
+    ui->btnAddLayer->setDefaultAction(ui->actionAddLayer);
+    ui->btnRemoveLayer->setDefaultAction(ui->actionRemoveLayer);
+    ui->btnOrderLayerUp->setDefaultAction(ui->actionOrderLayerUpwards);
+    ui->btnOrderLayerDown->setDefaultAction(ui->actionOrderLayerDownwards);
 
     m_pFontStageModel = new WidgetFontModel(this);
 
@@ -145,9 +168,9 @@ void WidgetFont::GeneratePreview()
     QString sFontFilePath = ui->cmbFontList->currentData().toString();
 
     // Try to find the perfect fit. Adjust atlas dimentions until we utilize efficient space on the smallest texture
-    QSize maxAtlasDimensions = m_pItemFont->GetAtlasManager().GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
-    ui->lcdMaxTexWidth->display(maxAtlasDimensions.width());
-    ui->lcdMaxTexHeight->display(maxAtlasDimensions.height());
+    m_CurrentAtlasDimensions = m_pItemFont->GetAtlasManager().GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
+    ui->lcdMaxTexWidth->display(m_CurrentAtlasDimensions.width());
+    ui->lcdMaxTexHeight->display(m_CurrentAtlasDimensions.height());
 
     float fModifier = 1.0f;
     bool bDoInitialShrink = true;
@@ -229,7 +252,7 @@ void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)
     if(ui->cmbAtlasGroups->currentIndex() == index)
         return;
 
-    QUndoCommand *pCmd = new ItemFontCmd_AtlasGroupChanged(*this, ui->cmbAtlasGroups, index);
+    QUndoCommand *pCmd = new ItemFontCmd_AtlasGroupChanged(*this, m_CurrentAtlasDimensions, ui->cmbAtlasGroups, index);
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
@@ -281,4 +304,9 @@ void WidgetFont::on_actionRemoveStage_triggered()
 {
     QUndoCommand *pCmd = new ItemFontCmd_RemoveStage(*this, ui->stagesView, ui->stagesView->currentIndex().row());
     m_pItemFont->GetUndoStack()->push(pCmd);
+}
+
+void WidgetFont::on_actionAddState_triggered()
+{
+
 }

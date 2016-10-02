@@ -14,6 +14,52 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <item>
+      <widget class="QLineEdit" name="txtPrefixAndName">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnRenameFont">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line_4">
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>5</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QLabel" name="label">
      <property name="font">
@@ -200,13 +246,9 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
-      <widget class="QToolButton" name="btnAddStage">
+      <widget class="QToolButton" name="btnAddState">
        <property name="text">
         <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="res/DesignerTool.qrc">
-         <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
        </property>
       </widget>
      </item>
@@ -330,13 +372,9 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QToolButton" name="btnRemoveStage">
+         <widget class="QToolButton" name="btnRemoveLayer">
           <property name="text">
            <string>...</string>
-          </property>
-          <property name="icon">
-           <iconset resource="res/DesignerTool.qrc">
-            <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
           </property>
          </widget>
         </item>
@@ -354,14 +392,14 @@
          </spacer>
         </item>
         <item>
-         <widget class="QToolButton" name="toolButton_3">
+         <widget class="QToolButton" name="btnOrderLayerUp">
           <property name="text">
            <string>...</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="toolButton_2">
+         <widget class="QToolButton" name="btnOrderLayerDown">
           <property name="text">
            <string>...</string>
           </property>
@@ -494,28 +532,112 @@
     </layout>
    </item>
   </layout>
-  <action name="actionAddStage">
+  <action name="actionAddState">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
-    <string>Add New Font Stage</string>
+    <string>Add New Font State</string>
    </property>
    <property name="toolTip">
-    <string>Add a new font stage of the specified size to the texture atlas</string>
+    <string>Add a new state to this font</string>
    </property>
   </action>
-  <action name="actionRemoveStage">
+  <action name="actionRemoveState">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
-    <string>Remove Selected Font Stage</string>
+    <string>Remove Font State</string>
    </property>
    <property name="toolTip">
-    <string>Remove the selected stage from the texture atlas</string>
+    <string>Remove the currently selected stage from the font</string>
+   </property>
+  </action>
+  <action name="actionRenameState">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename State</string>
+   </property>
+   <property name="toolTip">
+    <string>Rename the currently selected font state</string>
+   </property>
+  </action>
+  <action name="actionOrderStateBackwards">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-left.png</normaloff>:/icons16x16/generic-left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order State &amp;Backwards</string>
+   </property>
+   <property name="toolTip">
+    <string>Shift the index of the current state back by 1</string>
+   </property>
+  </action>
+  <action name="actionOrderStateForwards">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-right.png</normaloff>:/icons16x16/generic-right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order State For&amp;wards</string>
+   </property>
+   <property name="toolTip">
+    <string>Shift the index of the current state forward by 1</string>
+   </property>
+  </action>
+  <action name="actionAddLayer">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+   </property>
+   <property name="text">
+    <string>AddLayer</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new layer to this font state</string>
+   </property>
+  </action>
+  <action name="actionRemoveLayer">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>RemoveLayer</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove the currently selected layer from the font state</string>
+   </property>
+  </action>
+  <action name="actionOrderLayerDownwards">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Layer &amp;Downwards</string>
+   </property>
+   <property name="toolTip">
+    <string>Sort the selected layer back one</string>
+   </property>
+  </action>
+  <action name="actionOrderLayerUpwards">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Layer &amp;Upwards</string>
+   </property>
+   <property name="toolTip">
+    <string>Sort the selected layer up one</string>
    </property>
   </action>
  </widget>

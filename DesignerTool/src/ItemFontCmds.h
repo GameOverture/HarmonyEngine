@@ -17,6 +17,7 @@
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QDir>
+#include <QSize>
 
 class WidgetFont;
 
@@ -25,12 +26,13 @@ class ItemFontCmd_AtlasGroupChanged : public QUndoCommand
 {
     WidgetFont &        m_WidgetFontRef;
 
+    QSize               m_CurrentAtlasDimensions;
     QComboBox *         m_pCmbAtlasGroups;
     int                 m_iNewIndex;
     int                 m_iOriginalIndex;
     
 public:
-    ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetFont, QComboBox *pCmb, int iIndex, QUndoCommand *pParent = 0);
+    ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetFont, QSize &atlasDimensionsRef, QComboBox *pCmb, int iIndex, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_AtlasGroupChanged();
 
     void redo() Q_DECL_OVERRIDE;

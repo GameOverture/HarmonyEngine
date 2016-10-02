@@ -28,6 +28,7 @@ class WidgetFont : public QWidget
 
     ItemFont *                  m_pItemFont;
     
+    QSize                       m_CurrentAtlasDimensions;
     texture_atlas_t *           m_pAtlas;
     QDir                        m_FontMetaDir;
     int                         m_iPrevFontIndex;
@@ -62,6 +63,8 @@ private slots:
     void on_actionAddStage_triggered();
 
     void on_actionRemoveStage_triggered();
+
+    void on_actionAddState_triggered();
 
 private:
     Ui::WidgetFont *ui;

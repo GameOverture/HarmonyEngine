@@ -12,7 +12,17 @@
 #include "WidgetFont.h"
 #include "HyGlobal.h"
 
-ItemFontCmd_AtlasGroupChanged::ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetFont, QComboBox *pCmb, int iIndex, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+void EnsureProperNamingInComboBox(QComboBox *pCmb)
+{
+    // Ensure that all the entry names in the combobox match their index
+    for(int i = 0; i < pCmb->count(); ++i)
+    {
+        QString sName(QString::number(i) % " - " % pCmb->itemData(i).value<WidgetFontModel *>()->GetName());
+        pCmb->setItemText(i, sName);
+    }
+}
+
+ItemFontCmd_AtlasGroupChanged::ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetFont, QSize &atlasDimensionsRef, QComboBox *pCmb, int iIndex, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
                                                                                                                                                     m_WidgetFontRef(widgetFont),
                                                                                                                                                     m_iNewIndex(iIndex),
                                                                                                                                                     m_pCmbAtlasGroups(pCmb)
@@ -24,6 +34,8 @@ ItemFontCmd_AtlasGroupChanged::ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetF
 /*virtual*/ ItemFontCmd_AtlasGroupChanged::~ItemFontCmd_AtlasGroupChanged()
 {
 }
+
+todo only generate preview if atlas is smaller
 
 void ItemFontCmd_AtlasGroupChanged::redo()
 {
