@@ -119,20 +119,21 @@ void ItemFontCmd_LineEditSymbols::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_AddStage::ItemFontCmd_AddStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, float fSize, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-                                                                                                                                                m_WidgetFontRef(widgetFont),
-                                                                                                                                                m_pTable(pTable),
-                                                                                                                                                m_fSize(fSize),
-                                                                                                                                                m_iId(-1)
+ItemFontCmd_AddState::ItemFontCmd_AddState(WidgetFont &widgetFont, QList<QAction *> stateActionList, WidgetFontTableView *pTable, float fSize, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                                m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                m_pFontState(new WidgetFontState(&m_WidgetFontRef, stateActionList)),
+                                                                                                                                                                                m_pTable(pTable),
+                                                                                                                                                                                m_fSize(fSize),
+                                                                                                                                                                                m_iId(-1)
 {
-    setText("Add Font Stage");
+    setText("Add Font State");
 }
 
-/*virtual*/ ItemFontCmd_AddStage::~ItemFontCmd_AddStage()
+/*virtual*/ ItemFontCmd_AddState::~ItemFontCmd_AddStage()
 {
 }
 
-void ItemFontCmd_AddStage::redo()
+void ItemFontCmd_AddState::redo()
 {
     if(m_iId == -1)
         m_iId = static_cast<WidgetFontModel *>(m_pTable->model())->AddNewStage(RENDER_NORMAL, m_fSize, 0.0f, QColor(0, 0, 0), QColor(0, 0, 0));
@@ -142,7 +143,7 @@ void ItemFontCmd_AddStage::redo()
     m_WidgetFontRef.GeneratePreview();
 }
 
-void ItemFontCmd_AddStage::undo()
+void ItemFontCmd_AddState::undo()
 {
     static_cast<WidgetFontModel *>(m_pTable->model())->RemoveStage(m_iId);
     m_WidgetFontRef.GeneratePreview();

@@ -68,16 +68,17 @@ public:
     void undo() Q_DECL_OVERRIDE;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ItemFontCmd_AddStage : public QUndoCommand
+class ItemFontCmd_AddState : public QUndoCommand
 {
     WidgetFont &            m_WidgetFontRef;
+    WidgetFontState *       m_pFontState;
     WidgetFontTableView *   m_pTable;
     float                   m_fSize;
     int                     m_iId;
     
 public:
-    ItemFontCmd_AddStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, float fSize, QUndoCommand *pParent = 0);
-    virtual ~ItemFontCmd_AddStage();
+    ItemFontCmd_AddState(WidgetFont &widgetFont, QList<QAction *> stateActionList, WidgetFontTableView *pTable, float fSize, QUndoCommand *pParent = 0);
+    virtual ~ItemFontCmd_AddState();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
