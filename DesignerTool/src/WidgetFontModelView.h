@@ -50,7 +50,7 @@ class WidgetFontModel : public QAbstractTableModel
 {
     Q_OBJECT
 
-    int                             m_iUniqueIdCounter;
+    static int                      sm_iUniqueIdCounter;
 
     struct FontStage
     {
@@ -83,7 +83,6 @@ public:
     enum eColumn
     {
         COLUMN_Type = 0,
-        COLUMN_Size,
         COLUMN_Thickness,
         COLUMN_DefaultColor,
 

@@ -15,13 +15,11 @@
 
 #include <QWidget>
 
-class ItemSprite;
-struct SpriteFrame;
-
 namespace Ui {
 class WidgetSpriteState;
 }
 
+struct SpriteFrame;
 class WidgetSprite;
 
 class WidgetSpriteState : public QWidget

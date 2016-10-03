@@ -114,7 +114,7 @@ void WidgetSprite::Load()
     UpdateActions();
 }
 
-ItemSprite *WidgetSprite::Owner()
+ItemSprite *WidgetSprite::GetItemSprite()
 {
     return m_pItemSprite;
 }
@@ -256,10 +256,6 @@ void WidgetSprite::on_cmbStates_currentIndexChanged(int index)
         m_pCurSpriteState->hide();
 
     ui->grpStateLayout->addWidget(pSpriteState);
-
-#if _DEBUG
-    int iDebugTest = ui->grpStateLayout->count();
-#endif
 
     m_pCurSpriteState = pSpriteState;
     m_pCurSpriteState->show();

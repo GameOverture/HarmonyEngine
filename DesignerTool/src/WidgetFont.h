@@ -10,6 +10,8 @@
 #ifndef WIDGETFONT_H
 #define WIDGETFONT_H
 
+#include "WidgetFontState.h"
+
 #include <QWidget>
 #include <QDir>
 
@@ -29,6 +31,7 @@ class WidgetFont : public QWidget
     ItemFont *                  m_pItemFont;
 
     QList<QAction *>            m_StateActionsList;
+    WidgetFontState *           m_pCurFontState;
     
     texture_atlas_t *           m_pAtlas;
     QDir                        m_FontMetaDir;
@@ -37,19 +40,22 @@ class WidgetFont : public QWidget
 public:
     explicit WidgetFont(ItemFont *pOwner, QWidget *parent = 0);
     ~WidgetFont();
+    
+    ItemFont *GetItemFont();
 
     QString GetFullItemName();
     
     void GeneratePreview(bool bFindBestFit = false);
     
     texture_atlas_t *GetAtlas();
-    WidgetFontModel *GetFontModel();
+    
+    QDir GetFontMetaDir();
 
     QSize GetAtlasDimensions(int iAtlasGrpIndex);
 
 private slots:
     void on_cmbAtlasGroups_currentIndexChanged(int index);
-    
+
     void on_chk_09_clicked();
 
     void on_chk_az_clicked();
@@ -60,12 +66,18 @@ private slots:
 
     void on_txtAdditionalSymbols_editingFinished();
 
-    void on_actionAddStage_triggered();
-
-    void on_actionRemoveStage_triggered();
+    void on_cmbStates_currentIndexChanged(int index);
 
     void on_actionAddState_triggered();
 
+    void on_actionRemoveState_triggered();
+    
+    void on_actionRenameState_triggered();
+    
+    void on_actionOrderStateBackwards_triggered();
+    
+    void on_actionOrderStateForwards_triggered();
+    
 private:
     Ui::WidgetFont *ui;
 };

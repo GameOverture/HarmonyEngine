@@ -15,6 +15,8 @@
 #include <QSpinBox>
 #include <QPushButton>
 
+int WidgetFontModel::sm_iUniqueIdCounter = 0;
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 WidgetFontTableView::WidgetFontTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
@@ -25,11 +27,10 @@ WidgetFontTableView::WidgetFontTableView(QWidget *pParent /*= 0*/) : QTableView(
 {
     int iWidth = pResizeEvent->size().width();
 
-    iWidth -= 64 + 64 + 64;
-    setColumnWidth(WidgetFontModel::COLUMN_Type, iWidth);
-    setColumnWidth(WidgetFontModel::COLUMN_Size, 64);
+    iWidth -= 64;
+    setColumnWidth(WidgetFontModel::COLUMN_Type, iWidth / 2);
     setColumnWidth(WidgetFontModel::COLUMN_Thickness, 64);
-    setColumnWidth(WidgetFontModel::COLUMN_DefaultColor, 64);
+    setColumnWidth(WidgetFontModel::COLUMN_DefaultColor, iWidth / 2);
 
     QTableView::resizeEvent(pResizeEvent);
 }
@@ -58,12 +59,6 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent /*=
         static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_SIGNED_DISTANCE_FIELD));
         break;
 
-    case WidgetFontModel::COLUMN_Size:
-        pReturnWidget = new QDoubleSpinBox(pParent);
-        static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(0.0, 4096.0);
-        static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix("pt");
-        break;
-
     case WidgetFontModel::COLUMN_Thickness:
         pReturnWidget = new QDoubleSpinBox(pParent);
         static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(0.0, 4096.0);
@@ -86,10 +81,6 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent /*=
     {
     case WidgetFontModel::COLUMN_Type:
         static_cast<QComboBox *>(pEditor)->setCurrentIndex(pFontModel->GetStageRenderMode(index.row()));
-        break;
-
-    case WidgetFontModel::COLUMN_Size:
-        static_cast<QDoubleSpinBox *>(pEditor)->setValue(pFontModel->GetStageSize(index.row()));
         break;
 
     case WidgetFontModel::COLUMN_Thickness:
@@ -115,14 +106,6 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent /*=
                                                                           static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
         break;
 
-    case WidgetFontModel::COLUMN_Size:
-        m_pItemFont->GetUndoStack()->push(new ItemFontCmd_StageSize(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
-                                                                    pFontModel,
-                                                                    index.row(),
-                                                                    pFontModel->GetStageSize(index.row()),
-                                                                    static_cast<QDoubleSpinBox *>(pEditor)->value()));
-        break;
-
     case WidgetFontModel::COLUMN_Thickness:
         m_pItemFont->GetUndoStack()->push(new ItemFontCmd_StageOutlineThickness(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
                                                                                 pFontModel,
@@ -144,8 +127,7 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent /*=
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetFontModel::WidgetFontModel(QObject *parent) : QAbstractTableModel(parent),
-                                                    m_iUniqueIdCounter(0)
+WidgetFontModel::WidgetFontModel(QObject *parent) : QAbstractTableModel(parent)
 {
     m_sRenderModeStrings[RENDER_NORMAL] = "Normal";
     m_sRenderModeStrings[RENDER_OUTLINE_EDGE] = "Outline Edge";
@@ -170,11 +152,11 @@ QString WidgetFontModel::GetRenderModeString(rendermode_t eMode) const
 
 int WidgetFontModel::AddNewStage(rendermode_t eRenderMode, float fSize, float fOutlineThickness, QColor topColor, QColor botColor)
 {
-    m_iUniqueIdCounter++;
+    sm_iUniqueIdCounter++;
     int iRowIndex = m_StageList.count();
 
     beginInsertRows(QModelIndex(), iRowIndex, iRowIndex);
-    FontStage *pNewFontStage = new FontStage(m_iUniqueIdCounter, eRenderMode, fSize, fOutlineThickness, topColor, botColor);
+    FontStage *pNewFontStage = new FontStage(sm_iUniqueIdCounter, eRenderMode, fSize, fOutlineThickness, topColor, botColor);
     m_StageList.append(pNewFontStage);
     endInsertRows();
 
@@ -281,8 +263,6 @@ void WidgetFontModel::SetTextureFont(int iRowIndex, texture_font_t *pTextureFont
         {
         case COLUMN_Type:
             return GetRenderModeString(pStage->eMode);
-        case COLUMN_Size:
-            return QString::number(GetStageSize(index.row()), 'g', 2);
         case COLUMN_Thickness:
             return QString::number(GetStageOutlineThickness(index.row()), 'g', 2);
         case COLUMN_DefaultColor:
@@ -303,10 +283,8 @@ void WidgetFontModel::SetTextureFont(int iRowIndex, texture_font_t *pTextureFont
             {
             case COLUMN_Type:
                 return QString("Type");
-            case COLUMN_Size:
-                return QString("Size");
             case COLUMN_Thickness:
-                return QString("Stroke");
+                return QString("Thickness");
             case COLUMN_DefaultColor:
                 return QString("Default Color");
             }

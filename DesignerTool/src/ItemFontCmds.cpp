@@ -12,12 +12,12 @@
 #include "WidgetFont.h"
 #include "HyGlobal.h"
 
-void EnsureProperNamingInComboBox(QComboBox *pCmb)
+void EnsureProperNamingInCmbFontState(QComboBox *pCmb)
 {
     // Ensure that all the entry names in the combobox match their index
     for(int i = 0; i < pCmb->count(); ++i)
     {
-        QString sName(QString::number(i) % " - " % pCmb->itemData(i).value<WidgetFontModel *>()->GetName());
+        QString sName(QString::number(i) % " - " % pCmb->itemData(i).value<WidgetFontState *>()->GetName());
         pCmb->setItemText(i, sName);
     }
 }

@@ -277,7 +277,7 @@
      <property name="title">
       <string>Font:</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QVBoxLayout" name="grpFontStateLayout">
       <property name="leftMargin">
        <number>4</number>
       </property>
