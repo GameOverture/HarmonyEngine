@@ -50,36 +50,11 @@ class WidgetFontModel : public QAbstractTableModel
 {
     Q_OBJECT
 
-    QString                         m_sFontFilePath;
-    float                           m_fSize;
-
     static int                      sm_iUniqueIdCounter;
-    struct FontStage
-    {
-        const int           iUNIQUE_ID;
-
-        rendermode_t        eMode;
-        float               fSize;
-        float               fOutlineThickness;
-
-        QColor              topColor;
-        QColor              botColor;
-
-        texture_font_t *    pTextureFont;
-
-        FontStage(int uiId, rendermode_t eRenderMode, float fSize, float fOutlineThickness, QColor topColor, QColor botColor) : iUNIQUE_ID(uiId),
-                                                                                                                                eMode(eRenderMode),
-                                                                                                                                fSize(fSize),
-                                                                                                                                fOutlineThickness(fOutlineThickness),
-                                                                                                                                topColor(topColor),
-                                                                                                                                botColor(botColor),
-                                                                                                                                pTextureFont(NULL)
-        { }
-    };
+    static QList<FontStage *>       sm_MasterStageList;
+    static QMap<int, FontStage *>   sm_RemovedStageMap;
+    
     QList<FontStage *>              m_StageList;
-    QList<QPair<FontStage *, int> > m_RemovedStageList;
-
-    QString                         m_sRenderModeStrings[5];
     
 public:
     enum eColumn
@@ -94,16 +69,8 @@ public:
     WidgetFontModel(QObject *parent);
     virtual ~WidgetFontModel();
 
-    QString GetFontPath() const;
-    void SetFontPath(QString sPath);
-
-    float GetSize() const;
-    void SetSize(float fSize);
-
-    QString GetRenderModeString(rendermode_t eMode) const;
-
-    int AddNewStage(rendermode_t eRenderMode, float fSize, float fOutlineThickness, QColor topColor, QColor botColor);
-    void AddExistingStage(int iId);
+    int RequestStage(QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
+    void RequestStage(int iId);
     void RemoveStage(int iId);
 
     int GetStageId(int iRowIndex) const;

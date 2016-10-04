@@ -11,6 +11,24 @@
 #define ITEMFONT_H
 
 #include "ItemWidget.h"
+#include "freetype-gl/freetype-gl.h"
+
+struct FontStage
+{
+    const int           iUNIQUE_ID;
+
+    texture_font_t *    pTextureFont;
+    rendermode_t        eMode;
+    float               fSize;
+    float               fOutlineThickness;
+
+    FontStage(int uiId, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :   iUNIQUE_ID(uiId),
+                                                                                            pTextureFont(NULL),
+                                                                                            eMode(eRenderMode),
+                                                                                            fSize(fSize),
+                                                                                            fOutlineThickness(fOutlineThickness)
+    { }
+};
 
 class ItemFont : public ItemWidget
 {

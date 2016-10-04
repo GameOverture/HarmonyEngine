@@ -19,17 +19,20 @@ class WidgetFontState;
 }
 
 class WidgetFont;
+struct FontStage;
 
 class WidgetFontState : public QWidget
 {
     Q_OBJECT
     
-    WidgetFont *                m_pOwner;
-    WidgetFontModel *           m_pFontModel;
+    WidgetFont *                    m_pOwner;
+    WidgetFontModel *               m_pFontModel;
     
-    QString                     m_sName;
+    QString                         m_sName;
 
-    int                         m_iPrevFontCmbIndex;
+    int                             m_iPrevFontCmbIndex;
+    
+    QList<FontStage *>              m_StageList;
 
 public:
     explicit WidgetFontState(WidgetFont *pOwner, QList<QAction *> stateActionList, QWidget *parent = 0);
@@ -41,6 +44,12 @@ public:
     WidgetFontModel *GetFontModel();
     
     QString GetFontFilePath();
+    
+    rendermode_t GetCurSelectedRenderMode();
+    
+    float GetSize();
+    
+    float GetThickness();
     
 private slots:
     void on_cmbFontList_currentIndexChanged(int index);

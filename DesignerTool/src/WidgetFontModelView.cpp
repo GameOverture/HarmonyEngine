@@ -52,11 +52,11 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent /*=
     {
     case WidgetFontModel::COLUMN_Type:
         pReturnWidget = new QComboBox(pParent);
-        static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_NORMAL));
-        static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_OUTLINE_EDGE));
-        static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_OUTLINE_POSITIVE));
-        static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_OUTLINE_NEGATIVE));
-        static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_SIGNED_DISTANCE_FIELD));
+        static_cast<QComboBox *>(pReturnWidget)->addItem("Normal");
+        static_cast<QComboBox *>(pReturnWidget)->addItem("Outline Edge");
+        static_cast<QComboBox *>(pReturnWidget)->addItem("Outline Added");
+        static_cast<QComboBox *>(pReturnWidget)->addItem("Outline Removed");
+        static_cast<QComboBox *>(pReturnWidget)->addItem("Distance Field");
         break;
 
     case WidgetFontModel::COLUMN_Thickness:
@@ -129,69 +129,56 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent /*=
 
 WidgetFontModel::WidgetFontModel(QObject *parent) : QAbstractTableModel(parent)
 {
-    m_sRenderModeStrings[RENDER_NORMAL] = "Normal";
-    m_sRenderModeStrings[RENDER_OUTLINE_EDGE] = "Outline Edge";
-    m_sRenderModeStrings[RENDER_OUTLINE_POSITIVE] = "Outline Added";
-    m_sRenderModeStrings[RENDER_OUTLINE_NEGATIVE] = "Outline Removed";
-    m_sRenderModeStrings[RENDER_SIGNED_DISTANCE_FIELD] = "Distance Field";
 }
 
 /*virtual*/ WidgetFontModel::~WidgetFontModel()
 {
-    for(int i = 0; i < m_StageList.count(); ++i)
-        delete m_StageList[i];
-
-    for(int i = 0; i < m_RemovedStageList.count(); ++i)
-        delete m_RemovedStageList[i].first;
+    for(int i = 0; i < m_MasterStageList.count(); ++i)
+        delete m_MasterStageList[i];
+    
+    QMap<int, FontStage *>::iterator iter;
+    for(iter = m_RemovedStageMap.begin(); iter != m_RemovedStageMap.end(); ++iter)
+        delete iter.value();
 }
 
-QString WidgetFontModel::GetFontPath() const
+int WidgetFontModel::RequestStage(QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fOutlineThickness)
 {
-    return m_sFontFilePath;
-}
-
-void WidgetFontModel::SetFontPath(QString sPath)
-{
-    m_sFontFilePath = sPath;
-}
-
-float WidgetFontModel::GetSize() const
-{
-    return m_fSize;
-}
-
-void WidgetFontModel::SetSize(float fSize)
-{
-    m_fSize = fSize;
-}
-
-
-QString WidgetFontModel::GetRenderModeString(rendermode_t eMode) const
-{
-    return m_sRenderModeStrings[eMode];
-}
-
-int WidgetFontModel::AddNewStage(rendermode_t eRenderMode, float fSize, float fOutlineThickness, QColor topColor, QColor botColor)
-{
+    // Look for an existing stage that matches the request first
+    for(int i = 0; i < sm_MasterStageList.count(); ++i)
+    {
+        FontStage *pStage = sm_MasterStageList[i];
+        
+        QFileInfo stageFontPath(pStage->pTextureFont->filename);
+        QFileInfo requestFontPath(sFullFontPath);
+        
+        if(QString::compare(stageFontPath.fileName(), requestFontPath.fileName(), Qt::CaseInsensitive) == 0 &&
+           pStage->eMode == eRenderMode &&
+           pStage->fSize == fSize &&
+           pStage->fOutlineThickness == fOutlineThickness)
+        {
+            return pStage->iUNIQUE_ID;
+        }
+    }
+    
     sm_iUniqueIdCounter++;
     int iRowIndex = m_StageList.count();
 
     beginInsertRows(QModelIndex(), iRowIndex, iRowIndex);
-    FontStage *pNewFontStage = new FontStage(sm_iUniqueIdCounter, eRenderMode, fSize, fOutlineThickness, topColor, botColor);
+    FontStage *pNewFontStage = new FontStage(sm_iUniqueIdCounter, eRenderMode, fSize, fOutlineThickness);
     m_StageList.append(pNewFontStage);
     endInsertRows();
 
     return pNewFontStage->iUNIQUE_ID;
 }
 
-void WidgetFontModel::AddExistingStage(int iId)
+void WidgetFontModel::RequestStage(int iId)
 {
     for(int i = 0; i < m_RemovedStageList.count(); ++i)
     {
         if(m_RemovedStageList[i].first->iUNIQUE_ID == iId)
         {
             beginInsertRows(QModelIndex(), m_RemovedStageList[i].second, m_RemovedStageList[i].second);
-            m_StageList.insert(m_RemovedStageList[i].second, m_RemovedStageList[i].first);
+            m_MasterStageList.insert(m_RemovedStageList[i].second, m_RemovedStageList[i].first);
             m_RemovedStageList.removeAt(i);
             endInsertRows();
 
@@ -202,12 +189,12 @@ void WidgetFontModel::AddExistingStage(int iId)
 
 void WidgetFontModel::RemoveStage(int iId)
 {
-    for(int i = 0; i < m_StageList.count(); ++i)
+    for(int i = 0; i < m_MasterStageList.count(); ++i)
     {
-        if(m_StageList[i]->iUNIQUE_ID == iId)
+        if(m_MasterStageList[i]->iUNIQUE_ID == iId)
         {
-            m_RemovedStageList.append(QPair<FontStage *, int>(m_StageList[i], i));
-            m_StageList.removeAt(i);
+            m_RemovedStageList.append(QPair<FontStage *, int>(m_MasterStageList[i], i));
+            m_MasterStageList.removeAt(i);
 
             return;
         }
@@ -216,42 +203,42 @@ void WidgetFontModel::RemoveStage(int iId)
 
 int WidgetFontModel::GetStageId(int iRowIndex) const
 {
-    return m_StageList[iRowIndex]->iUNIQUE_ID;
+    return m_MasterStageList[iRowIndex]->iUNIQUE_ID;
 }
 
 rendermode_t WidgetFontModel::GetStageRenderMode(int iRowIndex) const
 {
-    return m_StageList[iRowIndex]->eMode;
+    return m_MasterStageList[iRowIndex]->eMode;
 }
 
 void WidgetFontModel::SetStageRenderMode(int iRowIndex, rendermode_t eRenderMode)
 {
-    m_StageList[iRowIndex]->eMode = eRenderMode;
+    m_MasterStageList[iRowIndex]->eMode = eRenderMode;
 }
 
 float WidgetFontModel::GetStageOutlineThickness(int iRowIndex) const
 {
-    return m_StageList[iRowIndex]->fOutlineThickness;
+    return m_MasterStageList[iRowIndex]->fOutlineThickness;
 }
 
 void WidgetFontModel::SetStageOutlineThickness(int iRowIndex, float fThickness)
 {
-    m_StageList[iRowIndex]->fOutlineThickness = fThickness;
+    m_MasterStageList[iRowIndex]->fOutlineThickness = fThickness;
 }
 
 void WidgetFontModel::SetTextureFont(int iRowIndex, texture_font_t *pTextureFont)
 {
-    if(m_StageList[iRowIndex]->pTextureFont)
-        texture_font_delete(m_StageList[iRowIndex]->pTextureFont);
+    if(m_MasterStageList[iRowIndex]->pTextureFont)
+        texture_font_delete(m_MasterStageList[iRowIndex]->pTextureFont);
 
-    m_StageList[iRowIndex]->pTextureFont = pTextureFont;
-    m_StageList[iRowIndex]->pTextureFont->rendermode = m_StageList[iRowIndex]->eMode;
-    m_StageList[iRowIndex]->pTextureFont->outline_thickness = m_StageList[iRowIndex]->fOutlineThickness;
+    m_MasterStageList[iRowIndex]->pTextureFont = pTextureFont;
+    m_MasterStageList[iRowIndex]->pTextureFont->rendermode = m_MasterStageList[iRowIndex]->eMode;
+    m_MasterStageList[iRowIndex]->pTextureFont->outline_thickness = m_MasterStageList[iRowIndex]->fOutlineThickness;
 }
 
 /*virtual*/ int WidgetFontModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
-    return m_StageList.count();
+    return m_MasterStageList.count();
 }
 
 /*virtual*/ int WidgetFontModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
@@ -261,7 +248,7 @@ void WidgetFontModel::SetTextureFont(int iRowIndex, texture_font_t *pTextureFont
 
 /*virtual*/ QVariant WidgetFontModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
 {
-    FontStage *pStage = m_StageList[index.row()];
+    FontStage *pStage = m_MasterStageList[index.row()];
 
     if (role == Qt::TextAlignmentRole && index.column() != COLUMN_Type)
     {

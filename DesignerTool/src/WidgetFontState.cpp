@@ -22,13 +22,19 @@ WidgetFontState::WidgetFontState(WidgetFont *pOwner, QList<QAction *> stateActio
                                                                                                                     ui(new Ui::WidgetFontState)
 {
     ui->setupUi(this);
+    
+    m_pFontModel = new WidgetFontModel(this);
+    
+    ui->cmbRenderMode->addItem("Normal", QVariant(static_cast<int>(RENDER_NORMAL)));
+    ui->cmbRenderMode->addItem("Outline Edge", QVariant(static_cast<int>(RENDER_OUTLINE_EDGE)));
+    ui->cmbRenderMode->addItem("Outline Positive", QVariant(static_cast<int>(RENDER_OUTLINE_POSITIVE)));
+    ui->cmbRenderMode->addItem("Outline Negative", QVariant(static_cast<int>(RENDER_OUTLINE_NEGATIVE)));
+    ui->cmbRenderMode->addItem("Signed Distance Field", QVariant(static_cast<int>(RENDER_SIGNED_DISTANCE_FIELD)));
 
     ui->btnAddLayer->setDefaultAction(FindAction(stateActionList, "actionAddLayer"));
     ui->btnRemoveLayer->setDefaultAction(FindAction(stateActionList, "actionRemoveLayer"));
     ui->btnOrderLayerUp->setDefaultAction(FindAction(stateActionList, "actionOrderLayerUpwards"));
     ui->btnOrderLayerDown->setDefaultAction(FindAction(stateActionList, "actionOrderLayerDownwards"));
-
-    m_pFontModel = new WidgetFontModel(this);
 
     ui->stagesView->setModel(m_pFontModel);
     ui->stagesView->resize(ui->stagesView->size());
@@ -107,6 +113,21 @@ WidgetFontModel *WidgetFontState::GetFontModel()
 QString WidgetFontState::GetFontFilePath()
 {
     return ui->cmbFontList->currentData().toString();
+}
+
+rendermode_t WidgetFontState::GetCurSelectedRenderMode()
+{
+    return static_cast<rendermode_t>(ui->cmbRenderMode->currentData().toInt());
+}
+
+float WidgetFontState::GetSize()
+{
+    return static_cast<float>(ui->sbSize->value());
+}
+
+float WidgetFontState::GetThickness()
+{
+    return static_cast<float>(ui->sbThickness->value());
 }
 
 void WidgetFontState::on_cmbFontList_currentIndexChanged(int index)

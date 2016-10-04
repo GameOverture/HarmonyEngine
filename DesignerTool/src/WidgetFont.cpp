@@ -58,6 +58,9 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     ui->cmbAtlasGroups->setModel(m_pItemFont->GetAtlasManager().AllocateAtlasModelView());
     
     
+    m_pFontModel = new WidgetFontModel(ui->cmbStates, this);
+    
+    
     // If a .hyfnt file exists, parse and initalize with it, otherwise make default empty font
     QFile fontFile(m_pItemFont->GetAbsPath());
     if(fontFile.exists())
@@ -318,4 +321,12 @@ void WidgetFont::on_actionOrderStateBackwards_triggered()
 void WidgetFont::on_actionOrderStateForwards_triggered()
 {
     
+}
+
+void WidgetFont::on_actionAddLayer_triggered()
+{
+    WidgetFontState *pFontState = ui->cmbStates->currentData().value<WidgetFontState *>();
+    
+    QUndoCommand *pCmd = new ItemFontCmd_AddLayer(*this, m_pFontModel, pFontState->GetFontFilePath(), pFontState->GetCurSelectedRenderMode(), pFontState->GetSize(), pFontState->GetThickness());
+    m_pItemFont->GetUndoStack()->push(pCmd);
 }

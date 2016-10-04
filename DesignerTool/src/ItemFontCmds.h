@@ -143,11 +143,15 @@ public:
 class ItemFontCmd_AddLayer : public QUndoCommand
 {
     WidgetFont &            m_WidgetFontRef;
-    WidgetFontTableView *   m_pTable;
+    WidgetFontModel *       m_pModel;
+    QString                 m_sFullFontPath;
+    rendermode_t            m_eRenderMode;
+    float                   m_fSize;
+    float                   m_fThickness;
     int                     m_iId;
 
 public:
-    ItemFontCmd_AddLayer(WidgetFont &widgetFont, WidgetFontTableView *pTable, QUndoCommand *pParent = 0);
+    ItemFontCmd_AddLayer(WidgetFont &widgetFont, WidgetFontModel *pModel, QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_AddLayer();
 
     void redo() Q_DECL_OVERRIDE;
@@ -157,11 +161,13 @@ public:
 class ItemFontCmd_RemoveStage : public QUndoCommand
 {
     WidgetFont &            m_WidgetFontRef;
-    WidgetFontTableView *   m_pTable;
-    int                     m_iId;
+    QString                 m_sFullFontPath;
+    rendermode_t            m_eRenderMode;
+    float                   m_fSize;
+    float                   m_fThickness;
 
 public:
-    ItemFontCmd_RemoveStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, int iRowIndex, QUndoCommand *pParent = 0);
+    ItemFontCmd_RemoveStage(WidgetFont &widgetFont, QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_RemoveStage();
 
     void redo() Q_DECL_OVERRIDE;
@@ -174,10 +180,9 @@ class ItemFontCmd_FontSelection : public QUndoCommand
     QComboBox *         m_pCmbFontList;
     int                 m_iPrevIndex;
     int                 m_iNewIndex;
-    QDir                m_FontMetaDir;
 
 public:
-    ItemFontCmd_FontSelection(WidgetFont &widgetFont, QComboBox *pCmbFontList, int iPrevIndex, int iNewIndex, QDir fontMetaDir, QUndoCommand *pParent = 0);
+    ItemFontCmd_FontSelection(WidgetFont &widgetFont, QComboBox *pCmbFontList, int iPrevIndex, int iNewIndex, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_FontSelection();
 
     void redo() Q_DECL_OVERRIDE;

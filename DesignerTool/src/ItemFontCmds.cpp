@@ -288,10 +288,16 @@ void ItemFontCmd_MoveStateForward::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_AddLayer::ItemFontCmd_AddLayer(WidgetFont &widgetFont, WidgetFontTableView *pTable, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
-                                                                                                                                    m_WidgetFontRef(widgetFont),
-                                                                                                                                    m_pTable(pTable)
+ItemFontCmd_AddLayer::ItemFontCmd_AddLayer(WidgetFont &widgetFont, WidgetFontModel *pModel, QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                                                                                                                m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                                                m_pModel(pModel),
+                                                                                                                                                                                                                m_sFullFontPath(sFullFontPath),
+                                                                                                                                                                                                                m_eRenderMode(eRenderMode),
+                                                                                                                                                                                                                m_fSize(fSize),
+                                                                                                                                                                                                                m_fThickness(fThickness),
+                                                                                                                                                                                                                m_iId(-1)
 {
+    setText("Add Font Layer");
 }
 
 /*virtual*/ ItemFontCmd_AddLayer::~ItemFontCmd_AddLayer()
@@ -300,19 +306,17 @@ ItemFontCmd_AddLayer::ItemFontCmd_AddLayer(WidgetFont &widgetFont, WidgetFontTab
 
 void ItemFontCmd_AddLayer::redo()
 {
-    WidgetFontModel *pModel = static_cast<WidgetFontModel *>(m_pTable->model());
-
     if(m_iId == -1)
-        m_iId = pModel->AddNewStage(RENDER_NORMAL, pModel->GetSize(), 0.0f, QColor(0, 0, 0), QColor(0, 0, 0));
+        m_iId = m_pModel->RequestStage(m_sFullFontPath, m_eRenderMode, m_fSize, m_fThickness);
     else
-        pModel->AddExistingStage(m_iId);
+        m_pModel->RequestStage(m_iId);
 
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_AddLayer::undo()
 {
-    static_cast<WidgetFontModel *>(m_pTable->model())->RemoveStage(m_iId);
+    m_pModel->RemoveStage(m_iId);
     m_WidgetFontRef.GeneratePreview();
 }
 
@@ -344,12 +348,11 @@ void ItemFontCmd_RemoveStage::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_FontSelection::ItemFontCmd_FontSelection(WidgetFont &widgetFont, QComboBox *pCmbFontList, int iPrevIndex, int iNewIndex, QDir fontMetaDir, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                                                                                                        m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                        m_pCmbFontList(pCmbFontList),
-                                                                                                                                                                                        m_iPrevIndex(iPrevIndex),
-                                                                                                                                                                                        m_iNewIndex(iNewIndex),
-                                                                                                                                                                                        m_FontMetaDir(fontMetaDir)
+ItemFontCmd_FontSelection::ItemFontCmd_FontSelection(WidgetFont &widgetFont, QComboBox *pCmbFontList, int iPrevIndex, int iNewIndex, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                                                        m_WidgetFontRef(widgetFont),
+                                                                                                                                                                        m_pCmbFontList(pCmbFontList),
+                                                                                                                                                                        m_iPrevIndex(iPrevIndex),
+                                                                                                                                                                        m_iNewIndex(iNewIndex)
 {
     setText("Font Selection");
 }
@@ -368,39 +371,6 @@ void ItemFontCmd_FontSelection::undo()
 {
     MoveFontIntoTempDir(m_iPrevIndex);
     m_WidgetFontRef.GeneratePreview();
-}
-
-void ItemFontCmd_FontSelection::MoveFontIntoTempDir(int iIndex)
-{
-    QFileInfo originalFontFile(m_pCmbFontList->itemData(iIndex).toString());
-    if(originalFontFile.exists() == false)
-    {
-        HyGuiLog("Font file (" % originalFontFile.absoluteFilePath() % ") doesn't exist", LOGTYPE_Error);
-        return;
-    }
-
-    QDir fontMetaTempDir(m_FontMetaDir.absolutePath() % "/" % HYGUIPATH_TempDir % m_WidgetFontRef.GetFullItemName());
-    if(fontMetaTempDir.removeRecursively() == false)
-    {
-        HyGuiLog("Could not clear temp font directory: " % fontMetaTempDir.absolutePath(), LOGTYPE_Error);
-        return;
-    }
-
-    if(fontMetaTempDir.mkpath(fontMetaTempDir.absolutePath()) == false)
-    {
-        HyGuiLog("Failed making font meta directory path: " % m_FontMetaDir.absolutePath(), LOGTYPE_Error);
-        return;
-    }
-
-    QFileInfo newFontFilePathDestination(fontMetaTempDir.absoluteFilePath(originalFontFile.fileName()));
-    if(newFontFilePathDestination.exists() == false)
-    {
-        if(QFile::copy(originalFontFile.absoluteFilePath(), newFontFilePathDestination.absoluteFilePath()) == false)
-        {
-            HyGuiLog("Failed copying font to meta directory: " % newFontFilePathDestination.absoluteFilePath(), LOGTYPE_Error);
-            return;
-        }
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

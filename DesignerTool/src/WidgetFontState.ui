@@ -77,7 +77,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
-         <widget class="QComboBox" name="cmbAddLayer">
+         <widget class="QComboBox" name="cmbRenderMode">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -96,7 +96,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="sbAddLayer"/>
+         <widget class="QDoubleSpinBox" name="sbThickness"/>
         </item>
         <item>
          <widget class="QToolButton" name="btnAddLayer">

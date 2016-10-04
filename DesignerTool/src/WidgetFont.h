@@ -80,6 +80,8 @@ private slots:
     
     void on_actionOrderStateForwards_triggered();
     
+    void on_actionAddLayer_triggered();
+    
 private:
     Ui::WidgetFont *ui;
 };
