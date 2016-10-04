@@ -12,16 +12,6 @@
 #include "WidgetFont.h"
 #include "HyGlobal.h"
 
-void EnsureProperNamingInCmbFontState(QComboBox *pCmb)
-{
-    // Ensure that all the entry names in the combobox match their index
-    for(int i = 0; i < pCmb->count(); ++i)
-    {
-        QString sName(QString::number(i) % " - " % pCmb->itemData(i).value<WidgetFontState *>()->GetName());
-        pCmb->setItemText(i, sName);
-    }
-}
-
 ItemFontCmd_AtlasGroupChanged::ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetFont, QComboBox *pCmb, int iPrevIndex, int iNewIndex, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
                                                                                                                                                                         m_WidgetFontRef(widgetFont),
                                                                                                                                                                         m_iPrevIndex(iPrevIndex),
@@ -119,31 +109,208 @@ void ItemFontCmd_LineEditSymbols::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_AddState::ItemFontCmd_AddState(WidgetFont &widgetFont, QList<QAction *> stateActionList, WidgetFontTableView *pTable, float fSize, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                                                                                                m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                m_pFontState(new WidgetFontState(&m_WidgetFontRef, stateActionList)),
-                                                                                                                                                                                m_pTable(pTable),
-                                                                                                                                                                                m_fSize(fSize),
-                                                                                                                                                                                m_iId(-1)
+ItemFontCmd_AddState::ItemFontCmd_AddState(WidgetFont &widgetFont, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+                                                                                                                                                        m_WidgetFontRef(widgetFont),
+                                                                                                                                                        m_pFontState(new WidgetFontState(&m_WidgetFontRef, stateActionList)),
+                                                                                                                                                        m_pComboBox(pCmb)
 {
     setText("Add Font State");
 }
 
-/*virtual*/ ItemFontCmd_AddState::~ItemFontCmd_AddStage()
+/*virtual*/ ItemFontCmd_AddState::~ItemFontCmd_AddState()
 {
 }
 
 void ItemFontCmd_AddState::redo()
 {
+    int iIndex = m_pComboBox->count();
+
+    QVariant v;
+    v.setValue(m_pFontState);
+
+    m_pComboBox->addItem(QString::number(iIndex) % " - " % m_pFontState->GetName(), v);
+    SetStateNamingConventionInComboBox<WidgetFontState>(m_pComboBox);
+
+    m_pComboBox->setCurrentIndex(iIndex);
+}
+
+void ItemFontCmd_AddState::undo()
+{
+    QVariant v;
+    v.setValue(m_pFontState);
+
+    int iIndex = m_pComboBox->findData(v);
+    m_pComboBox->removeItem(iIndex);
+
+    SetStateNamingConventionInComboBox<WidgetFontState>(m_pComboBox);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ItemFontCmd_RemoveState::ItemFontCmd_RemoveState(QComboBox *pCmb, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+                                                                                                    m_pComboBox(pCmb),
+                                                                                                    m_pFontState(m_pComboBox->currentData().value<WidgetFontState *>()),
+                                                                                                    m_iIndex(m_pComboBox->currentIndex())
+{
+    setText("Remove Font State");
+}
+
+/*virtual*/ ItemFontCmd_RemoveState::~ItemFontCmd_RemoveState()
+{
+}
+
+void ItemFontCmd_RemoveState::redo()
+{
+    m_pComboBox->removeItem(m_iIndex);
+
+    SetStateNamingConventionInComboBox<WidgetFontState>(m_pComboBox);
+}
+
+void ItemFontCmd_RemoveState::undo()
+{
+    QVariant v;
+    v.setValue(m_pFontState);
+
+    m_pComboBox->insertItem(m_iIndex, QString::number(m_iIndex) % " - " % m_pFontState->GetName(), v);
+    m_pComboBox->setCurrentIndex(m_iIndex);
+
+    SetStateNamingConventionInComboBox<WidgetFontState>(m_pComboBox);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ItemFontCmd_RenameState::ItemFontCmd_RenameState(QComboBox *pCmb, QString sNewName, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                        m_pComboBox(pCmb),
+                                                                                                                        m_pFontState(m_pComboBox->currentData().value<WidgetFontState *>()),
+                                                                                                                        m_sNewName(sNewName),
+                                                                                                                        m_sOldName(m_pFontState->GetName())
+{
+    setText("Rename Font State");
+}
+
+/*virtual*/ ItemFontCmd_RenameState::~ItemFontCmd_RenameState()
+{
+}
+
+void ItemFontCmd_RenameState::redo()
+{
+    m_pFontState->SetName(m_sNewName);
+    SetStateNamingConventionInComboBox<WidgetFontState>(m_pComboBox);
+}
+
+void ItemFontCmd_RenameState::undo()
+{
+    m_pFontState->SetName(m_sOldName);
+    SetStateNamingConventionInComboBox<WidgetFontState>(m_pComboBox);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ItemFontCmd_MoveStateBack::ItemFontCmd_MoveStateBack(QComboBox *pCmb, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+                                                                                                        m_pComboBox(pCmb),
+                                                                                                        m_pFontState(m_pComboBox->currentData().value<WidgetFontState *>())
+{
+    setText("Shift Font State Index <-");
+}
+
+/*virtual*/ ItemFontCmd_MoveStateBack::~ItemFontCmd_MoveStateBack()
+{
+}
+
+void ItemFontCmd_MoveStateBack::redo()
+{
+    QVariant v;
+    v.setValue(m_pFontState);
+
+    int iIndex = m_pComboBox->findData(v);
+
+    m_pComboBox->removeItem(iIndex);
+    iIndex -= 1;
+    m_pComboBox->insertItem(iIndex, QString::number(iIndex) % " - " % m_pFontState->GetName(), v);
+    m_pComboBox->setCurrentIndex(iIndex);
+
+    SetStateNamingConventionInComboBox<WidgetFontState>(m_pComboBox);
+}
+
+void ItemFontCmd_MoveStateBack::undo()
+{
+    QVariant v;
+    v.setValue(m_pFontState);
+
+    int iIndex = m_pComboBox->findData(v);
+
+    m_pComboBox->removeItem(iIndex);
+    iIndex += 1;
+    m_pComboBox->insertItem(iIndex, QString::number(iIndex) % " - " % m_pFontState->GetName(), v);
+    m_pComboBox->setCurrentIndex(iIndex);
+
+    SetStateNamingConventionInComboBox<WidgetFontState>(m_pComboBox);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ItemFontCmd_MoveStateForward::ItemFontCmd_MoveStateForward(QComboBox *pCmb, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                m_pComboBox(pCmb),
+                                                                                                                m_pFontState(m_pComboBox->currentData().value<WidgetFontState *>())
+{
+    setText("Shift Font State Index ->");
+}
+
+/*virtual*/ ItemFontCmd_MoveStateForward::~ItemFontCmd_MoveStateForward()
+{
+}
+
+void ItemFontCmd_MoveStateForward::redo()
+{
+    QVariant v;
+    v.setValue(m_pFontState);
+
+    int iIndex = m_pComboBox->findData(v);
+
+    m_pComboBox->removeItem(iIndex);
+    iIndex += 1;
+    m_pComboBox->insertItem(iIndex, QString::number(iIndex) % " - " % m_pFontState->GetName(), v);
+    m_pComboBox->setCurrentIndex(iIndex);
+
+    SetStateNamingConventionInComboBox<WidgetFontState>(m_pComboBox);
+}
+
+void ItemFontCmd_MoveStateForward::undo()
+{
+    QVariant v;
+    v.setValue(m_pFontState);
+
+    int iIndex = m_pComboBox->findData(v);
+
+    m_pComboBox->removeItem(iIndex);
+    iIndex -= 1;
+    m_pComboBox->insertItem(iIndex, QString::number(iIndex) % " - " % m_pFontState->GetName(), v);
+    m_pComboBox->setCurrentIndex(iIndex);
+
+    SetStateNamingConventionInComboBox<WidgetFontState>(m_pComboBox);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemFontCmd_AddLayer::ItemFontCmd_AddLayer(WidgetFont &widgetFont, WidgetFontTableView *pTable, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                                    m_WidgetFontRef(widgetFont),
+                                                                                                                                    m_pTable(pTable)
+{
+}
+
+/*virtual*/ ItemFontCmd_AddLayer::~ItemFontCmd_AddLayer()
+{
+}
+
+void ItemFontCmd_AddLayer::redo()
+{
+    WidgetFontModel *pModel = static_cast<WidgetFontModel *>(m_pTable->model());
+
     if(m_iId == -1)
-        m_iId = static_cast<WidgetFontModel *>(m_pTable->model())->AddNewStage(RENDER_NORMAL, m_fSize, 0.0f, QColor(0, 0, 0), QColor(0, 0, 0));
+        m_iId = pModel->AddNewStage(RENDER_NORMAL, pModel->GetSize(), 0.0f, QColor(0, 0, 0), QColor(0, 0, 0));
     else
-        static_cast<WidgetFontModel *>(m_pTable->model())->AddExistingStage(m_iId);
+        pModel->AddExistingStage(m_iId);
 
     m_WidgetFontRef.GeneratePreview();
 }
 
-void ItemFontCmd_AddState::undo()
+void ItemFontCmd_AddLayer::undo()
 {
     static_cast<WidgetFontModel *>(m_pTable->model())->RemoveStage(m_iId);
     m_WidgetFontRef.GeneratePreview();
@@ -266,12 +433,11 @@ void ItemFontCmd_StageRenderMode::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_StageSize::ItemFontCmd_StageSize(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iRowIndex, float fPrevSize, float fNewSize, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
-                                                                                                                                                                                    m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                    m_pFontModel(pFontModel),
-                                                                                                                                                                                    m_iRowIndex(iRowIndex),
-                                                                                                                                                                                    m_fPrevSize(fPrevSize),
-                                                                                                                                                                                    m_fNewSize(fNewSize)
+ItemFontCmd_StageSize::ItemFontCmd_StageSize(WidgetFont &widgetFont, WidgetFontModel *pFontModel, float fPrevSize, float fNewSize, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                    m_WidgetFontRef(widgetFont),
+                                                                                                                                                                    m_pFontModel(pFontModel),
+                                                                                                                                                                    m_fPrevSize(fPrevSize),
+                                                                                                                                                                    m_fNewSize(fNewSize)
 {
 }
 
@@ -282,13 +448,13 @@ ItemFontCmd_StageSize::ItemFontCmd_StageSize(WidgetFont &widgetFont, WidgetFontM
 
 void ItemFontCmd_StageSize::redo()
 {
-    m_pFontModel->SetStageSize(m_iRowIndex, m_fNewSize);
+    m_pFontModel->SetSize(m_fNewSize);
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_StageSize::undo()
 {
-    m_pFontModel->SetStageSize(m_iRowIndex, m_fPrevSize);
+    m_pFontModel->SetSize(m_fPrevSize);
     m_WidgetFontRef.GeneratePreview();
 }
 

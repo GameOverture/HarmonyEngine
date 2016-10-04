@@ -50,8 +50,10 @@ class WidgetFontModel : public QAbstractTableModel
 {
     Q_OBJECT
 
-    static int                      sm_iUniqueIdCounter;
+    QString                         m_sFontFilePath;
+    float                           m_fSize;
 
+    static int                      sm_iUniqueIdCounter;
     struct FontStage
     {
         const int           iUNIQUE_ID;
@@ -92,6 +94,12 @@ public:
     WidgetFontModel(QObject *parent);
     virtual ~WidgetFontModel();
 
+    QString GetFontPath() const;
+    void SetFontPath(QString sPath);
+
+    float GetSize() const;
+    void SetSize(float fSize);
+
     QString GetRenderModeString(rendermode_t eMode) const;
 
     int AddNewStage(rendermode_t eRenderMode, float fSize, float fOutlineThickness, QColor topColor, QColor botColor);
@@ -102,9 +110,6 @@ public:
 
     rendermode_t GetStageRenderMode(int iRowIndex) const;
     void SetStageRenderMode(int iRowIndex, rendermode_t eRenderMode);
-
-    float GetStageSize(int iRowIndex) const;
-    void SetStageSize(int iRowIndex, float fSize);
 
     float GetStageOutlineThickness(int iRowIndex) const;
     void SetStageOutlineThickness(int iRowIndex, float fThickness);

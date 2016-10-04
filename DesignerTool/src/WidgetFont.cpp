@@ -97,12 +97,15 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     else
     {
         ui->cmbAtlasGroups->setCurrentIndex(m_pItemFont->GetAtlasManager().CurrentAtlasGroupIndex());
+        on_actionAddState_triggered();
     }
     
     // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
     m_pItemFont->GetUndoStack()->clear();
 
     m_iPrevAtlasCmbIndex = ui->cmbAtlasGroups->currentIndex();
+
+    UpdateActions();
 }
 
 WidgetFont::~WidgetFont()
@@ -163,7 +166,7 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
             {
                 iNumFonts++;
                 
-                texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, pModel->GetStageSize(j), pFontState->GetFontFilePath().toStdString().c_str());
+                texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, pModel->GetSize(), pFontState->GetFontFilePath().toStdString().c_str());
                 if(pFont == NULL)
                 {
                     HyGuiLog("Could not create freetype font from: " % pFontState->GetFontFilePath(), LOGTYPE_Error);
@@ -216,6 +219,13 @@ QDir WidgetFont::GetFontMetaDir()
 QSize WidgetFont::GetAtlasDimensions(int iAtlasGrpIndex)
 {
     return m_pItemFont->GetAtlasManager().GetAtlasDimensions(iAtlasGrpIndex);
+}
+
+void WidgetFont::UpdateActions()
+{
+    ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
+    ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
+    ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
 }
 
 void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)
@@ -283,7 +293,10 @@ void WidgetFont::on_cmbStates_currentIndexChanged(int index)
 
 void WidgetFont::on_actionAddState_triggered()
 {
+    QUndoCommand *pCmd = new ItemFontCmd_AddState(*this, m_StateActionsList, ui->cmbStates);
+    m_pItemFont->GetUndoStack()->push(pCmd);
 
+    UpdateActions();
 }
 
 

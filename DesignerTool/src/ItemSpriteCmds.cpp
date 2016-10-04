@@ -11,16 +11,7 @@
 #include "ItemSprite.h"
 #include "WidgetSprite.h"
 #include "WidgetAtlasManager.h"
-
-void EnsureProperNamingInComboBox(QComboBox *pCmb)
-{
-    // Ensure that all the entry names in the combobox match their index
-    for(int i = 0; i < pCmb->count(); ++i)
-    {
-        QString sName(QString::number(i) % " - " % pCmb->itemData(i).value<WidgetSpriteState *>()->GetName());
-        pCmb->setItemText(i, sName);
-    }
-}
+#include "HyGlobal.h"
 
 ItemSpriteCmd_AddState::ItemSpriteCmd_AddState(WidgetSprite *pOwner, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
                                                                                                                                                             m_pComboBox(pCmb),
@@ -41,6 +32,8 @@ void ItemSpriteCmd_AddState::redo()
     v.setValue(m_pSpriteState);
     
     m_pComboBox->addItem(QString::number(iIndex) % " - " % m_pSpriteState->GetName(), v);
+    SetStateNamingConventionInComboBox<WidgetSpriteState>(m_pComboBox);
+
     m_pComboBox->setCurrentIndex(iIndex);
 }
 
@@ -52,7 +45,7 @@ void ItemSpriteCmd_AddState::undo()
     int iIndex = m_pComboBox->findData(v);
     m_pComboBox->removeItem(iIndex);
     
-    EnsureProperNamingInComboBox(m_pComboBox);
+    SetStateNamingConventionInComboBox<WidgetSpriteState>(m_pComboBox);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +65,7 @@ void ItemSpriteCmd_RemoveState::redo()
 {
     m_pComboBox->removeItem(m_iIndex);
     
-    EnsureProperNamingInComboBox(m_pComboBox);
+    SetStateNamingConventionInComboBox<WidgetSpriteState>(m_pComboBox);
 }
 
 void ItemSpriteCmd_RemoveState::undo()
@@ -83,7 +76,7 @@ void ItemSpriteCmd_RemoveState::undo()
     m_pComboBox->insertItem(m_iIndex, QString::number(m_iIndex) % " - " % m_pSpriteState->GetName(), v);
     m_pComboBox->setCurrentIndex(m_iIndex);
     
-    EnsureProperNamingInComboBox(m_pComboBox);
+    SetStateNamingConventionInComboBox<WidgetSpriteState>(m_pComboBox);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,13 +96,13 @@ ItemSpriteCmd_RenameState::ItemSpriteCmd_RenameState(QComboBox *pCmb, QString sN
 void ItemSpriteCmd_RenameState::redo()
 {
     m_pSpriteState->SetName(m_sNewName);
-    EnsureProperNamingInComboBox(m_pComboBox);
+    SetStateNamingConventionInComboBox<WidgetSpriteState>(m_pComboBox);
 }
 
 void ItemSpriteCmd_RenameState::undo()
 {
     m_pSpriteState->SetName(m_sOldName);
-    EnsureProperNamingInComboBox(m_pComboBox);
+    SetStateNamingConventionInComboBox<WidgetSpriteState>(m_pComboBox);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +110,7 @@ ItemSpriteCmd_MoveStateBack::ItemSpriteCmd_MoveStateBack(QComboBox *pCmb, QUndoC
                                                                                                             m_pComboBox(pCmb),
                                                                                                             m_pSpriteState(m_pComboBox->currentData().value<WidgetSpriteState *>())
 {
-    setText("Shift State Index <-");
+    setText("Shift Sprite State Index <-");
 }
 
 /*virtual*/ ItemSpriteCmd_MoveStateBack::~ItemSpriteCmd_MoveStateBack()
@@ -136,7 +129,7 @@ void ItemSpriteCmd_MoveStateBack::redo()
     m_pComboBox->insertItem(iIndex, QString::number(iIndex) % " - " % m_pSpriteState->GetName(), v);
     m_pComboBox->setCurrentIndex(iIndex);
     
-    EnsureProperNamingInComboBox(m_pComboBox);
+    SetStateNamingConventionInComboBox<WidgetSpriteState>(m_pComboBox);
 }
 
 void ItemSpriteCmd_MoveStateBack::undo()
@@ -151,7 +144,7 @@ void ItemSpriteCmd_MoveStateBack::undo()
     m_pComboBox->insertItem(iIndex, QString::number(iIndex) % " - " % m_pSpriteState->GetName(), v);
     m_pComboBox->setCurrentIndex(iIndex);
     
-    EnsureProperNamingInComboBox(m_pComboBox);
+    SetStateNamingConventionInComboBox<WidgetSpriteState>(m_pComboBox);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,7 +152,7 @@ ItemSpriteCmd_MoveStateForward::ItemSpriteCmd_MoveStateForward(QComboBox *pCmb, 
                                                                                                                     m_pComboBox(pCmb),
                                                                                                                     m_pSpriteState(m_pComboBox->currentData().value<WidgetSpriteState *>())
 {
-    setText("Shift State Index ->");
+    setText("Shift Sprite State Index ->");
 }
 
 /*virtual*/ ItemSpriteCmd_MoveStateForward::~ItemSpriteCmd_MoveStateForward()
@@ -178,7 +171,7 @@ void ItemSpriteCmd_MoveStateForward::redo()
     m_pComboBox->insertItem(iIndex, QString::number(iIndex) % " - " % m_pSpriteState->GetName(), v);
     m_pComboBox->setCurrentIndex(iIndex);
     
-    EnsureProperNamingInComboBox(m_pComboBox);
+    SetStateNamingConventionInComboBox<WidgetSpriteState>(m_pComboBox);
 }
 
 void ItemSpriteCmd_MoveStateForward::undo()
@@ -193,7 +186,7 @@ void ItemSpriteCmd_MoveStateForward::undo()
     m_pComboBox->insertItem(iIndex, QString::number(iIndex) % " - " % m_pSpriteState->GetName(), v);
     m_pComboBox->setCurrentIndex(iIndex);
     
-    EnsureProperNamingInComboBox(m_pComboBox);
+    SetStateNamingConventionInComboBox<WidgetSpriteState>(m_pComboBox);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

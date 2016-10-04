@@ -53,6 +53,8 @@ public:
 
     QSize GetAtlasDimensions(int iAtlasGrpIndex);
 
+    void UpdateActions();
+
 private slots:
     void on_cmbAtlasGroups_currentIndexChanged(int index);
 

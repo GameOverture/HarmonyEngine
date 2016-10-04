@@ -17,6 +17,7 @@
 #include <QStringBuilder>
 #include <QDir>
 #include <QTreeWidgetItem>
+#include <QComboBox>
 
 #include "WidgetOutputLog.h"
 
@@ -84,6 +85,17 @@ char *QStringToCharPtr(QString sString);
 
 QString PointToQString(QPointF ptPoint);
 QPointF StringToPoint(QString sPoint);
+
+template <typename T>
+void SetStateNamingConventionInComboBox(QComboBox *pCmb)
+{
+    // Ensure that all the entry names in the combobox match their index
+    for(int i = 0; i < pCmb->count(); ++i)
+    {
+        QString sName(QString::number(i) % " - " % pCmb->itemData(i).value<T *>()->GetName());
+        pCmb->setItemText(i, sName);
+    }
+}
 
 class HyGlobal
 {

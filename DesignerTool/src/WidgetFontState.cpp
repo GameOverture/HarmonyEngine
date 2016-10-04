@@ -111,9 +111,6 @@ QString WidgetFontState::GetFontFilePath()
 
 void WidgetFontState::on_cmbFontList_currentIndexChanged(int index)
 {
-    if(ui->cmbFontList->currentIndex() == index)
-        return;
-    
     ItemFont *pItemFont = m_pOwner->GetItemFont();
     
     QUndoCommand *pCmd = new ItemFontCmd_FontSelection(*m_pOwner, ui->cmbFontList, m_iPrevFontCmbIndex, index, m_pOwner->GetFontMetaDir());

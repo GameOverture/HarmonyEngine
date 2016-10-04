@@ -145,6 +145,27 @@ WidgetFontModel::WidgetFontModel(QObject *parent) : QAbstractTableModel(parent)
         delete m_RemovedStageList[i].first;
 }
 
+QString WidgetFontModel::GetFontPath() const
+{
+    return m_sFontFilePath;
+}
+
+void WidgetFontModel::SetFontPath(QString sPath)
+{
+    m_sFontFilePath = sPath;
+}
+
+float WidgetFontModel::GetSize() const
+{
+    return m_fSize;
+}
+
+void WidgetFontModel::SetSize(float fSize)
+{
+    m_fSize = fSize;
+}
+
+
 QString WidgetFontModel::GetRenderModeString(rendermode_t eMode) const
 {
     return m_sRenderModeStrings[eMode];
@@ -206,16 +227,6 @@ rendermode_t WidgetFontModel::GetStageRenderMode(int iRowIndex) const
 void WidgetFontModel::SetStageRenderMode(int iRowIndex, rendermode_t eRenderMode)
 {
     m_StageList[iRowIndex]->eMode = eRenderMode;
-}
-
-float WidgetFontModel::GetStageSize(int iRowIndex) const
-{
-    return m_StageList[iRowIndex]->fSize;
-}
-
-void WidgetFontModel::SetStageSize(int iRowIndex, float fSize)
-{
-    m_StageList[iRowIndex]->fSize = fSize;
 }
 
 float WidgetFontModel::GetStageOutlineThickness(int iRowIndex) const
