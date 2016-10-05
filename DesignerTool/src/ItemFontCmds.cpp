@@ -307,9 +307,11 @@ ItemFontCmd_AddLayer::ItemFontCmd_AddLayer(WidgetFont &widgetFont, WidgetFontMod
 void ItemFontCmd_AddLayer::redo()
 {
     if(m_iId == -1)
-        m_iId = m_pModel->RequestStage(m_sFullFontPath, m_eRenderMode, m_fSize, m_fThickness);
+    {
+        m_iId = m_WidgetFontRef.RequestStage(m_sFullFontPath, m_eRenderMode, m_fSize, m_fThickness);
+    }
     else
-        m_pModel->RequestStage(m_iId);
+        m_WidgetFontRef.RequestStage(m_iId);
 
     m_WidgetFontRef.GeneratePreview();
 }
@@ -322,7 +324,7 @@ void ItemFontCmd_AddLayer::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_RemoveStage::ItemFontCmd_RemoveStage(WidgetFont &widgetFont, WidgetFontTableView *pTable, int iRowIndex, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+ItemFontCmd_RemoveLayer::ItemFontCmd_RemoveLayer(WidgetFont &widgetFont, WidgetFontTableView *pTable, int iRowIndex, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
                                                                                                                                                         m_WidgetFontRef(widgetFont),
                                                                                                                                                         m_pTable(pTable)
 {
@@ -330,17 +332,17 @@ ItemFontCmd_RemoveStage::ItemFontCmd_RemoveStage(WidgetFont &widgetFont, WidgetF
     setText("Remove Font Stage");
 }
 
-/*virtual*/ ItemFontCmd_RemoveStage::~ItemFontCmd_RemoveStage()
+/*virtual*/ ItemFontCmd_RemoveLayer::~ItemFontCmd_RemoveLayer()
 {
 }
 
-void ItemFontCmd_RemoveStage::redo()
+void ItemFontCmd_RemoveLayer::redo()
 {
     static_cast<WidgetFontModel *>(m_pTable->model())->RemoveStage(m_iId);
     m_WidgetFontRef.GeneratePreview();
 }
 
-void ItemFontCmd_RemoveStage::undo()
+void ItemFontCmd_RemoveLayer::undo()
 {
     static_cast<WidgetFontModel *>(m_pTable->model())->AddExistingStage(m_iId);
     m_WidgetFontRef.GeneratePreview();

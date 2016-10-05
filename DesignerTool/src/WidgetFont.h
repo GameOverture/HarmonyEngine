@@ -30,6 +30,10 @@ class WidgetFont : public QWidget
 
     ItemFont *                  m_pItemFont;
 
+    static int                  sm_iUniqueIdCounter;
+    QList<FontStage *>          m_MasterStageList;
+    QMap<int, FontStage *>      m_RemovedStageMap;
+
     QList<QAction *>            m_StateActionsList;
     WidgetFontState *           m_pCurFontState;
     
@@ -44,6 +48,10 @@ public:
     ItemFont *GetItemFont();
 
     QString GetFullItemName();
+
+    int RequestStage(QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
+    void RequestStage(int iId);
+    void RemoveStage(int iId);
     
     void GeneratePreview(bool bFindBestFit = false);
     
@@ -82,6 +90,12 @@ private slots:
     
     void on_actionAddLayer_triggered();
     
+    void on_actionRemoveLayer_triggered();
+
+    void on_actionOrderLayerDownwards_triggered();
+
+    void on_actionOrderLayerUpwards_triggered();
+
 private:
     Ui::WidgetFont *ui;
 };

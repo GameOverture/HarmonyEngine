@@ -50,11 +50,8 @@ class WidgetFontModel : public QAbstractTableModel
 {
     Q_OBJECT
 
-    static int                      sm_iUniqueIdCounter;
-    static QList<FontStage *>       sm_MasterStageList;
-    static QMap<int, FontStage *>   sm_RemovedStageMap;
-    
     QList<FontStage *>              m_StageList;
+    QStringList                     m_sRenderModeStringList;
     
 public:
     enum eColumn
@@ -69,9 +66,9 @@ public:
     WidgetFontModel(QObject *parent);
     virtual ~WidgetFontModel();
 
-    int RequestStage(QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
-    void RequestStage(int iId);
-    void RemoveStage(int iId);
+    QString GetRenderModeString(rendermode_t eMode) const;
+
+    void AddStage(FontStage *pStageToAdd, int iRowIndex = -1);
 
     int GetStageId(int iRowIndex) const;
 
