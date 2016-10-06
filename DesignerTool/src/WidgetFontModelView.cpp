@@ -127,11 +127,11 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent /*=
 
 WidgetFontModel::WidgetFontModel(QObject *parent) : QAbstractTableModel(parent)
 {
-    m_sRenderModeStringList[RENDER_NORMAL] = "Normal";
-    m_sRenderModeStringList[RENDER_OUTLINE_EDGE] = "Outline Edge";
-    m_sRenderModeStringList[RENDER_OUTLINE_POSITIVE] = "Outline Added";
-    m_sRenderModeStringList[RENDER_OUTLINE_NEGATIVE] = "Outline Removed";
-    m_sRenderModeStringList[RENDER_SIGNED_DISTANCE_FIELD] = "Distance Field";
+    m_sRenderModeStringList.append("Normal");
+    m_sRenderModeStringList.append("Outline Edge");
+    m_sRenderModeStringList.append("Outline Added");
+    m_sRenderModeStringList.append("Outline Removed");
+    m_sRenderModeStringList.append("Distance Field");
 }
 
 /*virtual*/ WidgetFontModel::~WidgetFontModel()
@@ -144,17 +144,39 @@ QString WidgetFontModel::GetRenderModeString(rendermode_t eMode) const
     return m_sRenderModeStringList[eMode];
 }
 
-
-
-
-void WidgetFontModel::AddStage(FontStage *pStageToAdd, int iRowIndex /*= -1*/)
+void WidgetFontModel::AddStage(FontStage *pStageToAdd)
 {
+    int iRowIndex = -1;
+    for(int i = 0; i < m_RemovedStageList.count(); ++i)
+    {
+        if(m_RemovedStageList[i].second == pStageToAdd)
+            iRowIndex = m_RemovedStageList[i].first;
+    }
+    
     if(iRowIndex == -1)
         iRowIndex = m_StageList.count();
 
     beginInsertRows(QModelIndex(), iRowIndex, iRowIndex);
     m_StageList.append(pStageToAdd);
     endInsertRows();
+}
+
+void WidgetFontModel::RemoveStage(FontStage *pStageToRemove)
+{
+    int iRowIndex = -1;
+    for(int i = 0; i < m_StageList.count(); ++i)
+    {
+        if(m_StageList[i] == pStageToRemove)
+            iRowIndex = i;
+    }
+    
+    if(iRowIndex != -1)
+    {
+        beginRemoveRows(QModelIndex(), iRowIndex, iRowIndex);
+        m_RemovedStageList.append(QPair<int, FontStage *>(iRowIndex, m_StageList[iRowIndex]));
+        m_StageList.removeAt(iRowIndex);
+        endRemoveRows();
+    }
 }
 
 int WidgetFontModel::GetStageId(int iRowIndex) const

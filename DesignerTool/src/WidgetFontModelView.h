@@ -51,6 +51,8 @@ class WidgetFontModel : public QAbstractTableModel
     Q_OBJECT
 
     QList<FontStage *>              m_StageList;
+    QList<QPair<int, FontStage *> > m_RemovedStageList; // QPair = <rowIndex, fontPtr>
+    
     QStringList                     m_sRenderModeStringList;
     
 public:
@@ -68,7 +70,9 @@ public:
 
     QString GetRenderModeString(rendermode_t eMode) const;
 
-    void AddStage(FontStage *pStageToAdd, int iRowIndex = -1);
+    void AddStage(FontStage *pStageToAdd);
+    
+    void RemoveStage(FontStage *pStageToRemove);
 
     int GetStageId(int iRowIndex) const;
 

@@ -307,28 +307,25 @@ ItemFontCmd_AddLayer::ItemFontCmd_AddLayer(WidgetFont &widgetFont, WidgetFontMod
 void ItemFontCmd_AddLayer::redo()
 {
     if(m_iId == -1)
-    {
-        m_iId = m_WidgetFontRef.RequestStage(m_sFullFontPath, m_eRenderMode, m_fSize, m_fThickness);
-    }
+        m_iId = m_WidgetFontRef.AddNewStage(m_sFullFontPath, m_eRenderMode, m_fSize, m_fThickness);
     else
-        m_WidgetFontRef.RequestStage(m_iId);
+        m_WidgetFontRef.ReAddStage(m_iId);
 
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_AddLayer::undo()
 {
-    m_pModel->RemoveStage(m_iId);
+    m_WidgetFontRef.RemoveStage(m_iId);
     m_WidgetFontRef.GeneratePreview();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_RemoveLayer::ItemFontCmd_RemoveLayer(WidgetFont &widgetFont, WidgetFontTableView *pTable, int iRowIndex, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-                                                                                                                                                        m_WidgetFontRef(widgetFont),
-                                                                                                                                                        m_pTable(pTable)
+ItemFontCmd_RemoveLayer::ItemFontCmd_RemoveLayer(WidgetFont &widgetFont, int iId, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+                                                                                                                    m_WidgetFontRef(widgetFont),
+                                                                                                                    m_iId(iId)
 {
-    m_iId = static_cast<WidgetFontModel *>(m_pTable->model())->GetStageId(iRowIndex);
     setText("Remove Font Stage");
 }
 
@@ -338,13 +335,13 @@ ItemFontCmd_RemoveLayer::ItemFontCmd_RemoveLayer(WidgetFont &widgetFont, WidgetF
 
 void ItemFontCmd_RemoveLayer::redo()
 {
-    static_cast<WidgetFontModel *>(m_pTable->model())->RemoveStage(m_iId);
+    m_WidgetFontRef.RemoveStage(m_iId);
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_RemoveLayer::undo()
 {
-    static_cast<WidgetFontModel *>(m_pTable->model())->AddExistingStage(m_iId);
+    m_WidgetFontRef.ReAddStage(m_iId);
     m_WidgetFontRef.GeneratePreview();
 }
 
@@ -365,13 +362,11 @@ ItemFontCmd_FontSelection::ItemFontCmd_FontSelection(WidgetFont &widgetFont, QCo
 
 void ItemFontCmd_FontSelection::redo()
 {
-    MoveFontIntoTempDir(m_iNewIndex);
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_FontSelection::undo()
 {
-    MoveFontIntoTempDir(m_iPrevIndex);
     m_WidgetFontRef.GeneratePreview();
 }
 
@@ -420,13 +415,11 @@ ItemFontCmd_StageSize::ItemFontCmd_StageSize(WidgetFont &widgetFont, WidgetFontM
 
 void ItemFontCmd_StageSize::redo()
 {
-    m_pFontModel->SetSize(m_fNewSize);
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_StageSize::undo()
 {
-    m_pFontModel->SetSize(m_fPrevSize);
     m_WidgetFontRef.GeneratePreview();
 }
 

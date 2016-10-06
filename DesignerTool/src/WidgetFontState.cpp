@@ -130,11 +130,25 @@ float WidgetFontState::GetThickness()
     return static_cast<float>(ui->sbThickness->value());
 }
 
+int WidgetFontState::GetSelectedStageId()
+{
+    int iRowIndex = ui->stagesView->currentIndex().row();
+    
+    if(m_pFontModel->rowCount() == 0 ||
+       iRowIndex < 0 ||
+       iRowIndex >= m_pFontModel->rowCount())
+    {
+        return -1;
+    }
+    
+    return m_pFontModel->GetStageId(iRowIndex);
+}
+
 void WidgetFontState::on_cmbFontList_currentIndexChanged(int index)
 {
     ItemFont *pItemFont = m_pOwner->GetItemFont();
     
-    QUndoCommand *pCmd = new ItemFontCmd_FontSelection(*m_pOwner, ui->cmbFontList, m_iPrevFontCmbIndex, index, m_pOwner->GetFontMetaDir());
+    QUndoCommand *pCmd = new ItemFontCmd_FontSelection(*m_pOwner, ui->cmbFontList, m_iPrevFontCmbIndex, index);
     pItemFont->GetUndoStack()->push(pCmd);
 
     m_iPrevFontCmbIndex = index;

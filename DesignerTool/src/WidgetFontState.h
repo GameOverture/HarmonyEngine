@@ -51,6 +51,8 @@ public:
     
     float GetThickness();
     
+    int GetSelectedStageId();
+    
 private slots:
     void on_cmbFontList_currentIndexChanged(int index);
 

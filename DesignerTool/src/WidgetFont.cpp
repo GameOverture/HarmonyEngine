@@ -15,6 +15,7 @@
 #include "ItemFontCmds.h"
 #include "WidgetAtlasManager.h"
 #include "WidgetFontModelView.h"
+#include "DlgInputName.h"
 
 #include <QDir>
 #include <QJsonDocument>
@@ -114,9 +115,9 @@ WidgetFont::~WidgetFont()
     for(int i = 0; i < m_MasterStageList.count(); ++i)
         delete m_MasterStageList[i];
 
-    QMap<int, FontStage *>::iterator iter;
-    for(iter = m_RemovedStageMap.begin(); iter != m_RemovedStageMap.end(); ++iter)
-        delete iter.value();
+//    QMap<int, FontStage *>::iterator iter;
+//    for(iter = m_RemovedStageMap.begin(); iter != m_RemovedStageMap.end(); ++iter)
+//        delete iter.value();
 
     delete ui;
 }
@@ -131,7 +132,8 @@ QString WidgetFont::GetFullItemName()
     return m_pItemFont->GetName(true);
 }
 
-int WidgetFont::RequestStage(QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fOutlineThickness)
+// This changes the document state, and should only be invoked through 'ItemFontCmd_*'
+int WidgetFont::AddNewStage(QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fOutlineThickness)
 {
     // Look for an existing stage that matches the request first
     FontStage *pStage = NULL;
@@ -148,8 +150,6 @@ int WidgetFont::RequestStage(QString sFullFontPath, rendermode_t eRenderMode, fl
            pStage->fOutlineThickness == fOutlineThickness)
         {
             ui->cmbStates->currentData().value<WidgetFontState *>()->GetFontModel()->AddStage(pStage);
-            m_MasterStageList.append(pStage);
-
             return pStage->iUNIQUE_ID;
         }
     }
@@ -163,35 +163,32 @@ int WidgetFont::RequestStage(QString sFullFontPath, rendermode_t eRenderMode, fl
     return pStage->iUNIQUE_ID;
 }
 
-void WidgetFont::RequestStage(int iId)
-{
-    for(int i = 0; i < m_RemovedStageList.count(); ++i)
-    {
-        if(m_RemovedStageList[i].first->iUNIQUE_ID == iId)
-        {
-            beginInsertRows(QModelIndex(), m_RemovedStageList[i].second, m_RemovedStageList[i].second);
-            m_MasterStageList.insert(m_RemovedStageList[i].second, m_RemovedStageList[i].first);
-            m_RemovedStageList.removeAt(i);
-            endInsertRows();
-
-            break;
-        }
-    }
-}
-
+// This changes the document state, and should only be invoked through 'ItemFontCmd_*'
 void WidgetFont::RemoveStage(int iId)
 {
     for(int i = 0; i < m_MasterStageList.count(); ++i)
     {
         if(m_MasterStageList[i]->iUNIQUE_ID == iId)
         {
-            m_RemovedStageList.append(QPair<FontStage *, int>(m_MasterStageList[i], i));
-            m_MasterStageList.removeAt(i);
-
+            ui->cmbStates->currentData().value<WidgetFontState *>()->GetFontModel()->RemoveStage(m_MasterStageList[i]);
             return;
         }
     }
 }
+
+// This changes the document state, and should only be invoked through 'ItemFontCmd_*'
+void WidgetFont::ReAddStage(int iId)
+{
+    for(int i = 0; i < m_MasterStageList.count(); ++i)
+    {
+        if(m_MasterStageList[i]->iUNIQUE_ID == iId)
+        {
+            ui->cmbStates->currentData().value<WidgetFontState *>()->GetFontModel()->AddStage(m_MasterStageList[i]);
+            return;
+        }
+    }
+}
+
 
 void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
 {
@@ -236,7 +233,7 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
             {
                 iNumFonts++;
                 
-                texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, pModel->GetSize(), pFontState->GetFontFilePath().toStdString().c_str());
+                texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, pFontState->GetSize(), pFontState->GetFontFilePath().toStdString().c_str());
                 if(pFont == NULL)
                 {
                     HyGuiLog("Could not create freetype font from: " % pFontState->GetFontFilePath(), LOGTYPE_Error);
@@ -372,7 +369,7 @@ void WidgetFont::on_actionAddState_triggered()
 
 void WidgetFont::on_actionRemoveState_triggered()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_RemoveState(*this, m_StateActionsList, ui->cmbStates);
+    QUndoCommand *pCmd = new ItemFontCmd_RemoveState(ui->cmbStates);
     m_pItemFont->GetUndoStack()->push(pCmd);
 
     UpdateActions();
@@ -380,15 +377,17 @@ void WidgetFont::on_actionRemoveState_triggered()
 
 void WidgetFont::on_actionRenameState_triggered()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_RenameState(*this, m_StateActionsList, ui->cmbStates);
-    m_pItemFont->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
+    DlgInputName *pDlg = new DlgInputName("Rename Font State", ui->cmbStates->currentData().value<WidgetFontState *>()->GetName());
+    if(pDlg->exec() == QDialog::Accepted)
+    {
+        QUndoCommand *pCmd = new ItemFontCmd_RenameState(ui->cmbStates, pDlg->GetName());
+        m_pItemFont->GetUndoStack()->push(pCmd);
+    }
 }
 
 void WidgetFont::on_actionOrderStateBackwards_triggered()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_MoveStateBack(*this, m_StateActionsList, ui->cmbStates);
+    QUndoCommand *pCmd = new ItemFontCmd_MoveStateBack(ui->cmbStates);
     m_pItemFont->GetUndoStack()->push(pCmd);
 
     UpdateActions();
@@ -396,7 +395,7 @@ void WidgetFont::on_actionOrderStateBackwards_triggered()
 
 void WidgetFont::on_actionOrderStateForwards_triggered()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_MoveStateForward(*this, m_StateActionsList, ui->cmbStates);
+    QUndoCommand *pCmd = new ItemFontCmd_MoveStateForward(ui->cmbStates);
     m_pItemFont->GetUndoStack()->push(pCmd);
 
     UpdateActions();
@@ -406,16 +405,20 @@ void WidgetFont::on_actionAddLayer_triggered()
 {
     WidgetFontState *pFontState = ui->cmbStates->currentData().value<WidgetFontState *>();
     
-    QUndoCommand *pCmd = new ItemFontCmd_AddLayer(*this, m_pFontModel, pFontState->GetFontFilePath(), pFontState->GetCurSelectedRenderMode(), pFontState->GetSize(), pFontState->GetThickness());
+    QUndoCommand *pCmd = new ItemFontCmd_AddLayer(*this, pFontState->GetFontModel(), pFontState->GetFontFilePath(), pFontState->GetCurSelectedRenderMode(), pFontState->GetSize(), pFontState->GetThickness());
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFont::on_actionRemoveLayer_triggered()
 {
-//    WidgetFontState *pFontState = ui->cmbStates->currentData().value<WidgetFontState *>();
+    WidgetFontState *pFontState = ui->cmbStates->currentData().value<WidgetFontState *>();
+    
+    int iSelectedId = pFontState->GetSelectedStageId();
+    if(iSelectedId == -1)
+        return;
 
-//    QUndoCommand *pCmd = new ItemFontCmd_RemoveLayer(*this, m_pFontModel, pFontState->GetFontFilePath(), pFontState->GetCurSelectedRenderMode(), pFontState->GetSize(), pFontState->GetThickness());
-//    m_pItemFont->GetUndoStack()->push(pCmd);
+    QUndoCommand *pCmd = new ItemFontCmd_RemoveLayer(*this, iSelectedId);
+    m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFont::on_actionOrderLayerDownwards_triggered()

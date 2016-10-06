@@ -32,7 +32,6 @@ class WidgetFont : public QWidget
 
     static int                  sm_iUniqueIdCounter;
     QList<FontStage *>          m_MasterStageList;
-    QMap<int, FontStage *>      m_RemovedStageMap;
 
     QList<QAction *>            m_StateActionsList;
     WidgetFontState *           m_pCurFontState;
@@ -49,9 +48,14 @@ public:
 
     QString GetFullItemName();
 
-    int RequestStage(QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
-    void RequestStage(int iId);
+    // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
+    int AddNewStage(QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
+    
+    // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
     void RemoveStage(int iId);
+    
+    // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
+    void ReAddStage(int iId);
     
     void GeneratePreview(bool bFindBestFit = false);
     

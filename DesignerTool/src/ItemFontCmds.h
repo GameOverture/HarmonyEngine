@@ -161,13 +161,10 @@ public:
 class ItemFontCmd_RemoveLayer : public QUndoCommand
 {
     WidgetFont &            m_WidgetFontRef;
-    QString                 m_sFullFontPath;
-    rendermode_t            m_eRenderMode;
-    float                   m_fSize;
-    float                   m_fThickness;
+    int                     m_iId;
 
 public:
-    ItemFontCmd_RemoveLayer(WidgetFont &widgetFont, QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent = 0);
+    ItemFontCmd_RemoveLayer(WidgetFont &widgetFont, int iId, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_RemoveLayer();
 
     void redo() Q_DECL_OVERRIDE;
@@ -187,8 +184,6 @@ public:
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
-
-    void MoveFontIntoTempDir(int iIndex);
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ItemFontCmd_StageRenderMode : public QUndoCommand
