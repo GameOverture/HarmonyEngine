@@ -388,6 +388,7 @@ ItemFontCmd_StageRenderMode::ItemFontCmd_StageRenderMode(WidgetFont &widgetFont,
 
 void ItemFontCmd_StageRenderMode::redo()
 {
+    m_WidgetFontRef.SetStageRenderMode(m_iRowIndex, m_eNewRenderMode);
     m_pFontModel->SetStageRenderMode(m_iRowIndex, m_eNewRenderMode);
     m_WidgetFontRef.GeneratePreview();
 }

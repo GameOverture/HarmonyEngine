@@ -253,7 +253,7 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
         else if(bDoInitialShrink)
             fAtlasSizeModifier = static_cast<float>(m_pAtlas->used) / static_cast<float>(m_pAtlas->width * m_pAtlas->height);
     }
-    while(bFindBestFit && iNumMissedGlyphs != 0 || bDoInitialShrink);
+    while(bFindBestFit && (iNumMissedGlyphs != 0 || bDoInitialShrink));
 
     if(iNumMissedGlyphs)
     {

@@ -56,6 +56,8 @@ public:
     
     // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
     void ReAddStage(int iId);
+
+    void SetStageRenderMode(int iRowIndex, rendermode_t eRenderMode);
     
     void GeneratePreview(bool bFindBestFit = false);
     
