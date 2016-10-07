@@ -141,7 +141,7 @@ int WidgetFontState::GetSelectedStageId()
         return -1;
     }
     
-    return m_pFontModel->GetStageId(iRowIndex);
+    return m_pFontModel->GetLayerId(iRowIndex);
 }
 
 void WidgetFontState::on_cmbFontList_currentIndexChanged(int index)

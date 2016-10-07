@@ -144,14 +144,13 @@ class ItemFontCmd_AddLayer : public QUndoCommand
 {
     WidgetFont &            m_WidgetFontRef;
     WidgetFontModel *       m_pModel;
-    QString                 m_sFullFontPath;
     rendermode_t            m_eRenderMode;
     float                   m_fSize;
     float                   m_fThickness;
     int                     m_iId;
 
 public:
-    ItemFontCmd_AddLayer(WidgetFont &widgetFont, WidgetFontModel *pModel, QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent = 0);
+    ItemFontCmd_AddLayer(WidgetFont &widgetFont, WidgetFontModel *pModel, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_AddLayer();
 
     void redo() Q_DECL_OVERRIDE;
@@ -161,10 +160,11 @@ public:
 class ItemFontCmd_RemoveLayer : public QUndoCommand
 {
     WidgetFont &            m_WidgetFontRef;
+    WidgetFontModel *       m_pModel;
     int                     m_iId;
 
 public:
-    ItemFontCmd_RemoveLayer(WidgetFont &widgetFont, int iId, QUndoCommand *pParent = 0);
+    ItemFontCmd_RemoveLayer(WidgetFont &widgetFont, WidgetFontModel *pModel, int iId, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_RemoveLayer();
 
     void redo() Q_DECL_OVERRIDE;
@@ -190,12 +190,12 @@ class ItemFontCmd_StageRenderMode : public QUndoCommand
 {
     WidgetFont &        m_WidgetFontRef;
     WidgetFontModel *   m_pFontModel;
-    int                 m_iRowIndex;
+    int                 m_iStageId;
     rendermode_t        m_ePrevRenderMode;
     rendermode_t        m_eNewRenderMode;
 
 public:
-    ItemFontCmd_StageRenderMode(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iRowIndex, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = 0);
+    ItemFontCmd_StageRenderMode(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iStageId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_StageRenderMode();
 
     void redo() Q_DECL_OVERRIDE;
@@ -218,7 +218,7 @@ public:
     void undo() Q_DECL_OVERRIDE;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ItemFontCmd_StageOutlineThickness : public QUndoCommand
+class ItemFontCmd_LayerOutlineThickness : public QUndoCommand
 {
     WidgetFont &        m_WidgetFontRef;
     WidgetFontModel *   m_pFontModel;
@@ -227,8 +227,8 @@ class ItemFontCmd_StageOutlineThickness : public QUndoCommand
     float               m_fNewThickness;
 
 public:
-    ItemFontCmd_StageOutlineThickness(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iRowIndex, float fPrevThickness, float fNewThickness, QUndoCommand *pParent = 0);
-    virtual ~ItemFontCmd_StageOutlineThickness();
+    ItemFontCmd_LayerOutlineThickness(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iRowIndex, float fPrevThickness, float fNewThickness, QUndoCommand *pParent = 0);
+    virtual ~ItemFontCmd_LayerOutlineThickness();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;

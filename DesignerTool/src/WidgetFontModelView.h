@@ -50,8 +50,9 @@ class WidgetFontModel : public QAbstractTableModel
 {
     Q_OBJECT
 
-    QList<FontStage *>              m_StageList;
-    QList<QPair<int, FontStage *> > m_RemovedStageList; // QPair = <rowIndex, fontPtr>
+    static int                      sm_iUniqueIdCounter;
+    QList<FontLayer *>              m_LayerList;
+    QList<QPair<int, FontLayer *> > m_RemovedLayerList; // QPair = <rowIndex, fontPtr>
     
     QStringList                     m_sRenderModeStringList;
     
@@ -69,20 +70,17 @@ public:
     virtual ~WidgetFontModel();
 
     QString GetRenderModeString(rendermode_t eMode) const;
-
-    void AddStage(FontStage *pStageToAdd);
     
-    void RemoveStage(FontStage *pStageToRemove);
+    int AddNewLayer(rendermode_t eRenderMode, float fSize, float fOutlineThickness);
+    void RemoveLayer(int iId);
+    void ReAddLayer(int iId);
 
-    int GetStageId(int iRowIndex) const;
+    int GetLayerId(int iRowIndex) const;
+    rendermode_t GetLayerRenderMode(int iRowIndex) const;
+    float GetLayerSize(int iRowIndex) const;
+    float GetLayerOutlineThickness(int iRowIndex) const;
 
-    rendermode_t GetStageRenderMode(int iRowIndex) const;
-    void SetStageRenderMode(int iRowIndex, rendermode_t eRenderMode);
-
-    float GetStageOutlineThickness(int iRowIndex) const;
-    void SetStageOutlineThickness(int iRowIndex, float fThickness);
-
-    void SetTextureFont(int iRowIndex, texture_font_t *pTextureFont);
+    //void SetTextureFont(int iRowIndex, texture_font_t *pTextureFont);
     
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;

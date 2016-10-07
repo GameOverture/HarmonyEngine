@@ -30,8 +30,7 @@ class WidgetFont : public QWidget
 
     ItemFont *                  m_pItemFont;
 
-    static int                  sm_iUniqueIdCounter;
-    QList<FontStage *>          m_MasterStageList;
+    QList<FontStagePass>        m_MasterStageList;
 
     QList<QAction *>            m_StateActionsList;
     WidgetFontState *           m_pCurFontState;
@@ -48,16 +47,16 @@ public:
 
     QString GetFullItemName();
 
-    // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
-    int AddNewStage(QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
+//    // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
+//    int AddNewStage(QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
     
-    // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
-    void RemoveStage(int iId);
+//    // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
+//    void RemoveStage(int iId);
     
-    // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
-    void ReAddStage(int iId);
+//    // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
+//    void ReAddStage(int iId);
 
-    void SetStageRenderMode(int iRowIndex, rendermode_t eRenderMode);
+    //void SetStageRenderMode(WidgetFontState *pFontState, int iStageId, rendermode_t eRenderMode);
     
     void GeneratePreview(bool bFindBestFit = false);
     
