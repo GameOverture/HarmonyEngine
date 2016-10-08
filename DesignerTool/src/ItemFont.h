@@ -15,16 +15,38 @@
 
 struct FontStagePass
 {
+    int                 iReferenceCount;
+    int                 iTmpReferenceCount;
+
     texture_font_t *    pTextureFont;
     rendermode_t        eMode;
     float               fSize;
     float               fOutlineThickness;
 
-    FontStagePass(rendermode_t eRenderMode, float fSize, float fOutlineThickness) : pTextureFont(NULL),
+    FontStagePass(rendermode_t eRenderMode, float fSize, float fOutlineThickness) : iReferenceCount(0),
+                                                                                    iTmpReferenceCount(0),
+                                                                                    pTextureFont(NULL),
                                                                                     eMode(eRenderMode),
                                                                                     fSize(fSize),
                                                                                     fOutlineThickness(fOutlineThickness)
     { }
+
+    ~FontStagePass()
+    {
+        if(pTextureFont)
+            texture_font_delete(pTextureFont);
+    }
+
+    void SetFont(texture_font_t *pNewFont)
+    {
+        if(pTextureFont)
+            texture_font_delete(pTextureFont);
+
+        pTextureFont = pNewFont;
+        pTextureFont->size = fSize;
+        pTextureFont->rendermode = eMode;
+        pTextureFont->outline_thickness = fOutlineThickness;
+    }
 };
 
 struct FontLayer

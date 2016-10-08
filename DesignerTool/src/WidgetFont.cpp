@@ -24,6 +24,7 @@
 
 WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
                                                             m_pItemFont(pOwner),
+                                                            m_bGlyphsDirty(false),
                                                             m_pCurFontState(NULL),
                                                             m_pAtlas(NULL),
                                                             m_FontMetaDir(m_pItemFont->GetItemProject()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirFonts)),
@@ -211,8 +212,10 @@ QString WidgetFont::GetFullItemName()
 
 void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
 {
-    // Determine how many unique stage passes are needed, based on every font state's layer(s)
-    m_MasterStageList.clear();
+    for(int i = 0; i < m_MasterStageList.count(); ++i)
+        m_MasterStageList[i]->iTmpReferenceCount = 0;
+
+    bool bIsDirty = false;
     for(int i = 0; i < ui->cmbStates->count(); ++i)
     {
         WidgetFontState *pFontState = ui->cmbStates->itemData(i).value<WidgetFontState *>();
@@ -224,21 +227,53 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
             
             for(int k = 0; k < m_MasterStageList.count(); ++k)
             {
-                QFileInfo stageFontPath(m_MasterStageList[k].pTextureFont->filename);
+                QFileInfo stageFontPath(m_MasterStageList[k]->pTextureFont->filename);
                 QFileInfo stateFontPath(pFontState->GetFontFilePath());
         
                 if(QString::compare(stageFontPath.fileName(), stateFontPath.fileName(), Qt::CaseInsensitive) == 0 &&
-                   m_MasterStageList[k].eMode == pFontModel->GetLayerRenderMode(j) &&
-                   m_MasterStageList[k].fSize == pFontModel->GetLayerSize(j) &&
-                   m_MasterStageList[k].fOutlineThickness == pFontModel->GetLayerOutlineThickness(j))
+                   m_MasterStageList[k]->eMode == pFontModel->GetLayerRenderMode(j) &&
+                   m_MasterStageList[k]->fSize == pFontModel->GetLayerSize(j) &&
+                   m_MasterStageList[k]->fOutlineThickness == pFontModel->GetLayerOutlineThickness(j))
                 {
                     bMatched = true;
                 }
             }
             
             if(bMatched == false)
-                m_MasterStageList.append(FontStagePass(
+            {
+                m_MasterStageList.append(new FontStagePass(pFontModel->GetLayerRenderMode(j), pFontModel->GetLayerSize(j), pFontModel->GetLayerOutlineThickness(j)));
+                bIsDirty = true;
+            }
         }
+    }
+
+    for(int i = 0; i < m_MasterStageList.count(); ++i)
+    {
+        if(m_MasterStageList[i]->iTmpReferenceCount != m_MasterStageList[i]->iReferenceCount)
+            bIsDirty = true;
+
+        if(m_MasterStageList[i]->iTmpReferenceCount == 0)
+        {
+            delete m_MasterStageList[i];
+            m_MasterStageList.removeAt(i);
+
+            bIsDirty = true;
+        }
+    }
+
+    if(m_bGlyphsDirty)
+    {
+        bIsDirty = true;
+        m_bGlyphsDirty = false;
+    }
+
+    if(bIsDirty == false)
+        return;
+
+    // Is dirty so reset ref count and generate atlas
+    for(int i = 0; i < m_MasterStageList.count(); ++i)
+    {
+        m_MasterStageList[i]->iReferenceCount = m_MasterStageList[i]->iTmpReferenceCount;
     }
     
     // Assemble glyph set
@@ -259,7 +294,6 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
     bool bDoInitialShrink = true;
     size_t iNumMissedGlyphs = 0;
     int iNumPasses = 0;
-    int iNumFonts = 0;
     do
     {
         iNumPasses++;
@@ -273,25 +307,19 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
             texture_atlas_delete(m_pAtlas);
         m_pAtlas = texture_atlas_new(static_cast<size_t>(atlasSize.width() * fAtlasSizeModifier), static_cast<size_t>(atlasSize.height() * fAtlasSizeModifier), 1);
 
-        for(int i = 0; i < ui->cmbStates->count(); ++i)
+        for(int i = 0; i < m_MasterStageList.count(); ++i)
         {
             WidgetFontState *pFontState = ui->cmbStates->itemData(i).value<WidgetFontState *>();
-            
-            WidgetFontModel *pModel = static_cast<WidgetFontModel *>(pFontState->GetFontModel());
-            for(int j = 0; j < pModel->rowCount(); ++j)
+
+            texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, pFontState->GetSize(), pFontState->GetFontFilePath().toStdString().c_str());
+            if(pFont == NULL)
             {
-                iNumFonts++;
-                
-                texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, pFontState->GetSize(), pFontState->GetFontFilePath().toStdString().c_str());
-                if(pFont == NULL)
-                {
-                    HyGuiLog("Could not create freetype font from: " % pFontState->GetFontFilePath(), LOGTYPE_Error);
-                    return;
-                }
-    
-                pModel->SetTextureFont(j, pFont);
-                iNumMissedGlyphs += texture_font_load_glyphs(pFont, sGlyphs.toStdString().c_str());
+                HyGuiLog("Could not create freetype font from: " % pFontState->GetFontFilePath(), LOGTYPE_Error);
+                return;
             }
+
+            m_MasterStageList[i]->SetFont(pFont);
+            iNumMissedGlyphs += texture_font_load_glyphs(pFont, sGlyphs.toStdString().c_str());
         }
 
         if(iNumMissedGlyphs && fAtlasSizeModifier == 1.0f)
@@ -311,7 +339,7 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
     else if(bFindBestFit)
     {
         HyGuiLog("Generated " % m_pItemFont->GetName(true) % " Preview", LOGTYPE_Info);
-        HyGuiLog(QString::number(iNumFonts) % " fonts with " % QString::number(sGlyphs.size()) % " glyphs each (totaling " % QString::number(sGlyphs.size() * iNumFonts) % ").", LOGTYPE_Normal);
+        HyGuiLog(QString::number(m_MasterStageList.count()) % " fonts with " % QString::number(sGlyphs.size()) % " glyphs each (totaling " % QString::number(sGlyphs.size() * m_MasterStageList.count()) % ").", LOGTYPE_Normal);
         HyGuiLog("Font Atlas size: " % QString::number(m_pAtlas->width) % "x" % QString::number(m_pAtlas->height) % " (Utilizing " % QString::number(100.0*m_pAtlas->used / (float)(m_pAtlas->width*m_pAtlas->height)) % "%) (Num Passes: " % QString::number(iNumPasses) % " - Dimensions Modifier: " % QString::number(fAtlasSizeModifier) % ")", LOGTYPE_Normal);
     }
 

@@ -30,7 +30,8 @@ class WidgetFont : public QWidget
 
     ItemFont *                  m_pItemFont;
 
-    QList<FontStagePass>        m_MasterStageList;
+    QList<FontStagePass *>      m_MasterStageList;
+    bool                        m_bGlyphsDirty;
 
     QList<QAction *>            m_StateActionsList;
     WidgetFontState *           m_pCurFontState;
