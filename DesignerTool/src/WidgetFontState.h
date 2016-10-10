@@ -56,6 +56,8 @@ public:
 private slots:
     void on_cmbFontList_currentIndexChanged(int index);
 
+    void on_cmbRenderMode_currentIndexChanged(int index);
+    
 private:
     Ui::WidgetFontState *ui;
 };

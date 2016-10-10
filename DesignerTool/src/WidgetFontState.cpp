@@ -153,3 +153,24 @@ void WidgetFontState::on_cmbFontList_currentIndexChanged(int index)
 
     m_iPrevFontCmbIndex = index;
 }
+
+void WidgetFontState::on_cmbRenderMode_currentIndexChanged(int index)
+{
+    switch(index)
+    {
+    case RENDER_NORMAL:
+    case RENDER_SIGNED_DISTANCE_FIELD:
+        ui->sbThickness->setRange(0.0, 0.0);
+        ui->sbThickness->setValue(0.0);
+        ui->sbThickness->setEnabled(false);
+        break;
+        
+    case RENDER_OUTLINE_EDGE:
+    case RENDER_OUTLINE_POSITIVE:
+    case RENDER_OUTLINE_NEGATIVE:
+        ui->sbThickness->setRange(1.0, 1024.0);
+        ui->sbThickness->setValue(1.0);
+        ui->sbThickness->setEnabled(true);
+        break;
+    }
+}

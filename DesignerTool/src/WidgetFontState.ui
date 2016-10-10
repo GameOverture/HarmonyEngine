@@ -77,6 +77,13 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
+         <widget class="QToolButton" name="btnAddLayer">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QComboBox" name="cmbRenderMode">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -97,13 +104,6 @@
         </item>
         <item>
          <widget class="QDoubleSpinBox" name="sbThickness"/>
-        </item>
-        <item>
-         <widget class="QToolButton" name="btnAddLayer">
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </item>
