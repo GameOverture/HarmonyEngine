@@ -437,16 +437,16 @@ void ItemFontCmd_FontSelection::redo()
 {
     m_pCmbFontList->blockSignals(true);
     m_pCmbFontList->setCurrentIndex(m_iNewIndex);
-    m_pCmbFontList->blockSignals(false);
     
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
+//    for(int i = 0; i < m_pCmbStates->count(); ++i)
+//    {
+//        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+//        {
+//            m_pCmbStates->setCurrentIndex(i);
+//            break;
+//        }
+//    }
+    m_pCmbFontList->blockSignals(false);
     
     m_WidgetFontRef.GeneratePreview();
 }
@@ -455,16 +455,16 @@ void ItemFontCmd_FontSelection::undo()
 {
     m_pCmbFontList->blockSignals(true);
     m_pCmbFontList->setCurrentIndex(m_iPrevIndex);
-    m_pCmbFontList->blockSignals(false);
     
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
+//    for(int i = 0; i < m_pCmbStates->count(); ++i)
+//    {
+//        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+//        {
+//            m_pCmbStates->setCurrentIndex(i);
+//            break;
+//        }
+//    }
+    m_pCmbFontList->blockSignals(false);
     
     m_WidgetFontRef.GeneratePreview();
 }
