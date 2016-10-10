@@ -16,6 +16,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QLineEdit>
+#include <QDoubleSpinBox>
 #include <QDir>
 #include <QSize>
 
@@ -190,7 +191,25 @@ public:
     void undo() Q_DECL_OVERRIDE;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ItemFontCmd_StageRenderMode : public QUndoCommand
+class ItemFontCmd_FontSize : public QUndoCommand
+{
+    WidgetFont &        m_WidgetFontRef;
+    QComboBox *         m_pCmbStates;
+    QDoubleSpinBox *    m_pSbSize;
+    WidgetFontState *   m_pFontState;
+    int                 m_iRowIndex;
+    float               m_fPrevSize;
+    float               m_fNewSize;
+
+public:
+    ItemFontCmd_FontSize(WidgetFont &widgetFont, QComboBox *pCmbStates, QDoubleSpinBox *pSbSize, float fPrevSize, float fNewSize, QUndoCommand *pParent = 0);
+    virtual ~ItemFontCmd_FontSize();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemFontCmd_LayerRenderMode : public QUndoCommand
 {
     WidgetFont &        m_WidgetFontRef;
     QComboBox *         m_pCmbStates;
@@ -200,8 +219,8 @@ class ItemFontCmd_StageRenderMode : public QUndoCommand
     rendermode_t        m_eNewRenderMode;
 
 public:
-    ItemFontCmd_StageRenderMode(WidgetFont &widgetFont, QComboBox *pCmbStates, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = 0);
-    virtual ~ItemFontCmd_StageRenderMode();
+    ItemFontCmd_LayerRenderMode(WidgetFont &widgetFont, QComboBox *pCmbStates, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = 0);
+    virtual ~ItemFontCmd_LayerRenderMode();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
@@ -219,22 +238,6 @@ class ItemFontCmd_LayerOutlineThickness : public QUndoCommand
 public:
     ItemFontCmd_LayerOutlineThickness(WidgetFont &widgetFont, QComboBox *pCmbStates, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_LayerOutlineThickness();
-
-    void redo() Q_DECL_OVERRIDE;
-    void undo() Q_DECL_OVERRIDE;
-};
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ItemFontCmd_StageSize : public QUndoCommand
-{
-    WidgetFont &        m_WidgetFontRef;
-    WidgetFontModel *   m_pFontModel;
-    int                 m_iRowIndex;
-    float               m_fPrevSize;
-    float               m_fNewSize;
-
-public:
-    ItemFontCmd_StageSize(WidgetFont &widgetFont, WidgetFontModel *pFontModel, float fPrevSize, float fNewSize, QUndoCommand *pParent = 0);
-    virtual ~ItemFontCmd_StageSize();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;

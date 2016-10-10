@@ -467,7 +467,68 @@ void ItemFontCmd_FontSelection::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_StageRenderMode::ItemFontCmd_StageRenderMode(WidgetFont &widgetFont, QComboBox *pCmbStates, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+ItemFontCmd_FontSize::ItemFontCmd_FontSize(WidgetFont &widgetFont, QComboBox *pCmbStates, QDoubleSpinBox *pSbSize, float fPrevSize, float fNewSize, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                                                                                        m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                        m_pCmbStates(pCmbStates),
+                                                                                                                                                                                        m_pSbSize(pSbSize),
+                                                                                                                                                                                        m_pFontState(m_pCmbStates->currentData().value<WidgetFontState *>()),
+                                                                                                                                                                                        m_fPrevSize(fPrevSize),
+                                                                                                                                                                                        m_fNewSize(fNewSize)
+{
+    setText("Font Size");
+}
+
+/*virtual*/ ItemFontCmd_FontSize::~ItemFontCmd_FontSize()
+{
+}
+
+void ItemFontCmd_FontSize::redo()
+{
+    WidgetFontModel *pModel = m_pFontState->GetFontModel();
+    
+    pModel->SetFontSize(m_fNewSize);
+    
+    m_pSbSize->blockSignals(true);
+    m_pSbSize->setValue(m_fNewSize);
+    m_pSbSize->blockSignals(false);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
+    m_WidgetFontRef.GeneratePreview();
+}
+
+void ItemFontCmd_FontSize::undo()
+{
+    WidgetFontModel *pModel = m_pFontState->GetFontModel();
+    
+    pModel->SetFontSize(m_fPrevSize);
+    
+    m_pSbSize->blockSignals(true);
+    m_pSbSize->setValue(m_fPrevSize);
+    m_pSbSize->blockSignals(false);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
+    m_WidgetFontRef.GeneratePreview();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemFontCmd_LayerRenderMode::ItemFontCmd_LayerRenderMode(WidgetFont &widgetFont, QComboBox *pCmbStates, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
                                                                                                                                                                                                         m_WidgetFontRef(widgetFont),
                                                                                                                                                                                                         m_pCmbStates(pCmbStates),
                                                                                                                                                                                                         m_pFontState(m_pCmbStates->currentData().value<WidgetFontState *>()),
@@ -478,11 +539,11 @@ ItemFontCmd_StageRenderMode::ItemFontCmd_StageRenderMode(WidgetFont &widgetFont,
     setText("Stage Render Mode");
 }
 
-/*virtual*/ ItemFontCmd_StageRenderMode::~ItemFontCmd_StageRenderMode()
+/*virtual*/ ItemFontCmd_LayerRenderMode::~ItemFontCmd_LayerRenderMode()
 {
 }
 
-void ItemFontCmd_StageRenderMode::redo()
+void ItemFontCmd_LayerRenderMode::redo()
 {
     WidgetFontModel *pModel = m_pFontState->GetFontModel();
     
@@ -500,7 +561,7 @@ void ItemFontCmd_StageRenderMode::redo()
     m_WidgetFontRef.GeneratePreview();
 }
 
-void ItemFontCmd_StageRenderMode::undo()
+void ItemFontCmd_LayerRenderMode::undo()
 {
     WidgetFontModel *pModel = m_pFontState->GetFontModel();
     
@@ -571,27 +632,3 @@ void ItemFontCmd_LayerOutlineThickness::undo()
     m_WidgetFontRef.GeneratePreview();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-ItemFontCmd_StageSize::ItemFontCmd_StageSize(WidgetFont &widgetFont, WidgetFontModel *pFontModel, float fPrevSize, float fNewSize, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                                                                                    m_WidgetFontRef(widgetFont),
-                                                                                                                                                                    m_pFontModel(pFontModel),
-                                                                                                                                                                    m_fPrevSize(fPrevSize),
-                                                                                                                                                                    m_fNewSize(fNewSize)
-{
-}
-
-/*virtual*/ ItemFontCmd_StageSize::~ItemFontCmd_StageSize()
-{
-    setText("Stage Size");
-}
-
-void ItemFontCmd_StageSize::redo()
-{
-    m_WidgetFontRef.GeneratePreview();
-}
-
-void ItemFontCmd_StageSize::undo()
-{
-    m_WidgetFontRef.GeneratePreview();
-}

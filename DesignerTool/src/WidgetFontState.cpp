@@ -88,6 +88,7 @@ WidgetFontState::WidgetFontState(WidgetFont *pOwner, QList<QAction *> stateActio
         ui->cmbFontList->setCurrentIndex(iArialIndex);
 
     m_iPrevFontCmbIndex = ui->cmbFontList->currentIndex();
+    m_dPrevFontSize = ui->sbSize->value();
 }
 
 /*virtual*/ WidgetFontState::~WidgetFontState()
@@ -173,4 +174,17 @@ void WidgetFontState::on_cmbRenderMode_currentIndexChanged(int index)
         ui->sbThickness->setEnabled(true);
         break;
     }
+}
+
+void WidgetFontState::on_sbSize_editingFinished()
+{
+    if(m_dPrevFontSize == ui->sbSize->value())
+        return;
+    
+    ItemFont *pItemFont = m_pOwner->GetItemFont();
+    
+    QUndoCommand *pCmd = new ItemFontCmd_FontSize(*m_pOwner, m_pOwner->GetCmbStates(), ui->sbSize, m_dPrevFontSize, ui->sbSize->value());
+    pItemFont->GetUndoStack()->push(pCmd);
+    
+    m_dPrevFontSize = ui->sbSize->value();
 }

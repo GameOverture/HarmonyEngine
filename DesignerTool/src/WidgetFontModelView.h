@@ -84,9 +84,7 @@ public:
     float GetLayerOutlineThickness(int iRowIndex) const;
     void SetLayerOutlineThickness(int iId, float fThickness);
     
-    float GetLayerSize(int iRowIndex) const;
-
-    //void SetTextureFont(int iRowIndex, texture_font_t *pTextureFont);
+    void SetFontSize(float fSize);
     
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;

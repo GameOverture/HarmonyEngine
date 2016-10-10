@@ -31,6 +31,7 @@ class WidgetFontState : public QWidget
     QString                         m_sName;
 
     int                             m_iPrevFontCmbIndex;
+    double                          m_dPrevFontSize;
     
     QList<FontStage *>              m_StageList;
 
@@ -57,6 +58,8 @@ private slots:
     void on_cmbFontList_currentIndexChanged(int index);
 
     void on_cmbRenderMode_currentIndexChanged(int index);
+    
+    void on_sbSize_editingFinished();
     
 private:
     Ui::WidgetFontState *ui;

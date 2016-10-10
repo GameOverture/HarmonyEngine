@@ -98,7 +98,7 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbState
     switch(index.column())
     {
     case WidgetFontModel::COLUMN_Type:
-        m_pItemFont->GetUndoStack()->push(new ItemFontCmd_StageRenderMode(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
+        m_pItemFont->GetUndoStack()->push(new ItemFontCmd_LayerRenderMode(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
                                                                           m_pCmbStates,
                                                                           pFontModel->GetLayerId(index.row()),
                                                                           pFontModel->GetLayerRenderMode(index.row()),
@@ -228,9 +228,10 @@ void WidgetFontModel::SetLayerOutlineThickness(int iId, float fThickness)
     }
 }
 
-float WidgetFontModel::GetLayerSize(int iRowIndex) const
+void WidgetFontModel::SetFontSize(float fSize)
 {
-    return m_LayerList[iRowIndex]->fSize;
+    for(int i = 0; i < m_LayerList.count(); ++i)
+        m_LayerList[i]->fSize = fSize;
 }
 
 /*virtual*/ int WidgetFontModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const

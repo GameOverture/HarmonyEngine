@@ -159,7 +159,7 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
         
                 if(QString::compare(stageFontPath.fileName(), stateFontPath.fileName(), Qt::CaseInsensitive) == 0 &&
                    m_MasterStageList[k]->eMode == pFontModel->GetLayerRenderMode(j) &&
-                   m_MasterStageList[k]->fSize == pFontModel->GetLayerSize(j) &&
+                   m_MasterStageList[k]->fSize == pFontState->GetSize() &&
                    m_MasterStageList[k]->fOutlineThickness == pFontModel->GetLayerOutlineThickness(j))
                 {
                     m_MasterStageList[k]->iTmpReferenceCount++;
@@ -169,7 +169,7 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
             
             if(bMatched == false)
             {
-                m_MasterStageList.append(new FontStagePass(pFontState->GetFontFilePath(), pFontModel->GetLayerRenderMode(j), pFontModel->GetLayerSize(j), pFontModel->GetLayerOutlineThickness(j)));
+                m_MasterStageList.append(new FontStagePass(pFontState->GetFontFilePath(), pFontModel->GetLayerRenderMode(j), pFontState->GetSize(), pFontModel->GetLayerOutlineThickness(j)));
                 m_MasterStageList[m_MasterStageList.count() - 1]->iTmpReferenceCount = 1;
                 bIsDirty = true;
             }
