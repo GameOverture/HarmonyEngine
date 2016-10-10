@@ -129,6 +129,11 @@ QString WidgetFont::GetFullItemName()
     return m_pItemFont->GetName(true);
 }
 
+QComboBox *WidgetFont::GetCmbStates()
+{
+    return ui->cmbStates;
+}
+
 void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
 {
     for(int i = 0; i < m_MasterStageList.count(); ++i)
@@ -404,7 +409,7 @@ void WidgetFont::on_actionAddLayer_triggered()
 {
     WidgetFontState *pFontState = ui->cmbStates->currentData().value<WidgetFontState *>();
     
-    QUndoCommand *pCmd = new ItemFontCmd_AddLayer(*this, pFontState->GetFontModel(), pFontState->GetCurSelectedRenderMode(), pFontState->GetSize(), pFontState->GetThickness());
+    QUndoCommand *pCmd = new ItemFontCmd_AddLayer(*this, ui->cmbStates, pFontState->GetCurSelectedRenderMode(), pFontState->GetSize(), pFontState->GetThickness());
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
@@ -416,7 +421,7 @@ void WidgetFont::on_actionRemoveLayer_triggered()
     if(iSelectedId == -1)
         return;
 
-    QUndoCommand *pCmd = new ItemFontCmd_RemoveLayer(*this, pFontState->GetFontModel(), iSelectedId);
+    QUndoCommand *pCmd = new ItemFontCmd_RemoveLayer(*this, ui->cmbStates, iSelectedId);
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 

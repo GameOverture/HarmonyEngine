@@ -194,12 +194,30 @@ void ItemFontCmd_RenameState::redo()
 {
     m_pFontState->SetName(m_sNewName);
     SetStateNamingConventionInComboBox<WidgetFontState>(m_pComboBox);
+    
+    for(int i = 0; i < m_pComboBox->count(); ++i)
+    {
+        if(m_pComboBox->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pComboBox->setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 void ItemFontCmd_RenameState::undo()
 {
     m_pFontState->SetName(m_sOldName);
     SetStateNamingConventionInComboBox<WidgetFontState>(m_pComboBox);
+    
+    for(int i = 0; i < m_pComboBox->count(); ++i)
+    {
+        if(m_pComboBox->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pComboBox->setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -288,13 +306,14 @@ void ItemFontCmd_MoveStateForward::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_AddLayer::ItemFontCmd_AddLayer(WidgetFont &widgetFont, WidgetFontModel *pModel, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-                                                                                                                                                                                        m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                        m_pModel(pModel),
-                                                                                                                                                                                        m_eRenderMode(eRenderMode),
-                                                                                                                                                                                        m_fSize(fSize),
-                                                                                                                                                                                        m_fThickness(fThickness),
-                                                                                                                                                                                        m_iId(-1)
+ItemFontCmd_AddLayer::ItemFontCmd_AddLayer(WidgetFont &widgetFont, QComboBox *pCmbStates, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                                    m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                    m_pCmbStates(pCmbStates),
+                                                                                                                                                                                    m_pFontState(m_pCmbStates->currentData().value<WidgetFontState *>()),
+                                                                                                                                                                                    m_eRenderMode(eRenderMode),
+                                                                                                                                                                                    m_fSize(fSize),
+                                                                                                                                                                                    m_fThickness(fThickness),
+                                                                                                                                                                                    m_iId(-1)
 {
     setText("Add Font Layer");
 }
@@ -305,25 +324,49 @@ ItemFontCmd_AddLayer::ItemFontCmd_AddLayer(WidgetFont &widgetFont, WidgetFontMod
 
 void ItemFontCmd_AddLayer::redo()
 {
+    WidgetFontModel *pModel = m_pFontState->GetFontModel();
+    
     if(m_iId == -1)
-        m_iId = m_pModel->AddNewLayer(m_eRenderMode, m_fSize, m_fThickness);
+        m_iId = pModel->AddNewLayer(m_eRenderMode, m_fSize, m_fThickness);
     else
-        m_pModel->ReAddLayer(m_iId);
+        pModel->ReAddLayer(m_iId);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
 
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_AddLayer::undo()
 {
-    m_pModel->RemoveLayer(m_iId);
+    WidgetFontModel *pModel = m_pFontState->GetFontModel();
+    
+    pModel->RemoveLayer(m_iId);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
     m_WidgetFontRef.GeneratePreview();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_RemoveLayer::ItemFontCmd_RemoveLayer(WidgetFont &widgetFont, WidgetFontModel *pModel, int iId, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+ItemFontCmd_RemoveLayer::ItemFontCmd_RemoveLayer(WidgetFont &widgetFont, QComboBox *pCmbStates, int iId, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
                                                                                                                                             m_WidgetFontRef(widgetFont),
-                                                                                                                                            m_pModel(pModel),
+                                                                                                                                            m_pCmbStates(pCmbStates),
+                                                                                                                                            m_pFontState(m_pCmbStates->currentData().value<WidgetFontState *>()),
                                                                                                                                             m_iId(iId)
 {
     setText("Remove Font Layer");
@@ -335,23 +378,49 @@ ItemFontCmd_RemoveLayer::ItemFontCmd_RemoveLayer(WidgetFont &widgetFont, WidgetF
 
 void ItemFontCmd_RemoveLayer::redo()
 {
-    m_pModel->RemoveLayer(m_iId);
+    WidgetFontModel *pModel = m_pFontState->GetFontModel();
+    
+    pModel->RemoveLayer(m_iId);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_RemoveLayer::undo()
 {
-    m_pModel->ReAddLayer(m_iId);
+    WidgetFontModel *pModel = m_pFontState->GetFontModel();
+    
+    pModel->ReAddLayer(m_iId);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
     m_WidgetFontRef.GeneratePreview();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_FontSelection::ItemFontCmd_FontSelection(WidgetFont &widgetFont, QComboBox *pCmbFontList, int iPrevIndex, int iNewIndex, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-                                                                                                                                                                        m_WidgetFontRef(widgetFont),
-                                                                                                                                                                        m_pCmbFontList(pCmbFontList),
-                                                                                                                                                                        m_iPrevIndex(iPrevIndex),
-                                                                                                                                                                        m_iNewIndex(iNewIndex)
+ItemFontCmd_FontSelection::ItemFontCmd_FontSelection(WidgetFont &widgetFont, QComboBox *pCmbStates, QComboBox *pCmbFontList, int iPrevIndex, int iNewIndex, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                                                                                                m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                                m_pCmbStates(pCmbFontList),
+                                                                                                                                                                                                m_pCmbFontList(pCmbFontList),
+                                                                                                                                                                                                m_pFontState(m_pCmbStates->currentData().value<WidgetFontState *>()),
+                                                                                                                                                                                                m_iPrevIndex(iPrevIndex),
+                                                                                                                                                                                                m_iNewIndex(iNewIndex)
 {
     setText("Font Selection");
 }
@@ -366,6 +435,15 @@ void ItemFontCmd_FontSelection::redo()
     m_pCmbFontList->setCurrentIndex(m_iNewIndex);
     m_pCmbFontList->blockSignals(false);
     
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
     m_WidgetFontRef.GeneratePreview();
 }
 
@@ -375,17 +453,27 @@ void ItemFontCmd_FontSelection::undo()
     m_pCmbFontList->setCurrentIndex(m_iPrevIndex);
     m_pCmbFontList->blockSignals(false);
     
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
     m_WidgetFontRef.GeneratePreview();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_StageRenderMode::ItemFontCmd_StageRenderMode(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                                                                                                                            m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                                            m_pFontModel(pFontModel),
-                                                                                                                                                                                                            m_iLayerId(iLayerId),
-                                                                                                                                                                                                            m_ePrevRenderMode(ePrevMode),
-                                                                                                                                                                                                            m_eNewRenderMode(eNewMode)
+ItemFontCmd_StageRenderMode::ItemFontCmd_StageRenderMode(WidgetFont &widgetFont, QComboBox *pCmbStates, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                                                                                        m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                                        m_pCmbStates(pCmbStates),
+                                                                                                                                                                                                        m_pFontState(m_pCmbStates->currentData().value<WidgetFontState *>()),
+                                                                                                                                                                                                        m_iLayerId(iLayerId),
+                                                                                                                                                                                                        m_ePrevRenderMode(ePrevMode),
+                                                                                                                                                                                                        m_eNewRenderMode(eNewMode)
 {
     setText("Stage Render Mode");
 }
@@ -396,24 +484,49 @@ ItemFontCmd_StageRenderMode::ItemFontCmd_StageRenderMode(WidgetFont &widgetFont,
 
 void ItemFontCmd_StageRenderMode::redo()
 {
-    m_pFontModel->SetLayerRenderMode(m_iLayerId, m_eNewRenderMode);
+    WidgetFontModel *pModel = m_pFontState->GetFontModel();
+    
+    pModel->SetLayerRenderMode(m_iLayerId, m_eNewRenderMode);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_StageRenderMode::undo()
 {
-    m_pFontModel->SetLayerRenderMode(m_iLayerId, m_ePrevRenderMode);
+    WidgetFontModel *pModel = m_pFontState->GetFontModel();
+    
+    pModel->SetLayerRenderMode(m_iLayerId, m_ePrevRenderMode);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
     m_WidgetFontRef.GeneratePreview();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_LayerOutlineThickness::ItemFontCmd_LayerOutlineThickness(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                                                                                                                                    m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                                                    m_pFontModel(pFontModel),
-                                                                                                                                                                                                                    m_iLayerId(iLayerId),
-                                                                                                                                                                                                                    m_fPrevThickness(fPrevThickness),
-                                                                                                                                                                                                                    m_fNewThickness(fNewThickness)
+ItemFontCmd_LayerOutlineThickness::ItemFontCmd_LayerOutlineThickness(WidgetFont &widgetFont, QComboBox *pCmbStates, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                                                                                                m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                                                m_pCmbStates(pCmbStates),
+                                                                                                                                                                                                                m_pFontState(m_pCmbStates->currentData().value<WidgetFontState *>()),
+                                                                                                                                                                                                                m_iLayerId(iLayerId),
+                                                                                                                                                                                                                m_fPrevThickness(fPrevThickness),
+                                                                                                                                                                                                                m_fNewThickness(fNewThickness)
 {
     setText("Stage Outline Thickness");
 }
@@ -424,13 +537,37 @@ ItemFontCmd_LayerOutlineThickness::ItemFontCmd_LayerOutlineThickness(WidgetFont 
 
 void ItemFontCmd_LayerOutlineThickness::redo()
 {
-    m_pFontModel->SetLayerOutlineThickness(m_iLayerId, m_fNewThickness);
+    WidgetFontModel *pModel = m_pFontState->GetFontModel();
+    
+    pModel->SetLayerOutlineThickness(m_iLayerId, m_fNewThickness);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_LayerOutlineThickness::undo()
 {
-    m_pFontModel->SetLayerOutlineThickness(m_iLayerId, m_fPrevThickness);
+    WidgetFontModel *pModel = m_pFontState->GetFontModel();
+    
+    pModel->SetLayerOutlineThickness(m_iLayerId, m_fPrevThickness);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
     m_WidgetFontRef.GeneratePreview();
 }
 

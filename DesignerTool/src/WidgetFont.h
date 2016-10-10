@@ -48,16 +48,7 @@ public:
 
     QString GetFullItemName();
 
-//    // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
-//    int AddNewStage(QString sFullFontPath, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
-    
-//    // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
-//    void RemoveStage(int iId);
-    
-//    // This changes the document state, and should only be invoked through 'ItemFontCmd_*'
-//    void ReAddStage(int iId);
-
-    //void SetStageRenderMode(WidgetFontState *pFontState, int iStageId, rendermode_t eRenderMode);
+    QComboBox *GetCmbStates();
     
     void GeneratePreview(bool bFindBestFit = false);
     

@@ -35,8 +35,9 @@ WidgetFontTableView::WidgetFontTableView(QWidget *pParent /*= 0*/) : QTableView(
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent /*= 0*/) : QStyledItemDelegate(pParent),
-                                                                                        m_pItemFont(pItemFont)
+WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbStates, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
+                                                                                                                m_pItemFont(pItemFont),
+                                                                                                                m_pCmbStates(pCmbStates)
 {
 }
 
@@ -98,7 +99,7 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent /*=
     {
     case WidgetFontModel::COLUMN_Type:
         m_pItemFont->GetUndoStack()->push(new ItemFontCmd_StageRenderMode(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
-                                                                          pFontModel,
+                                                                          m_pCmbStates,
                                                                           pFontModel->GetLayerId(index.row()),
                                                                           pFontModel->GetLayerRenderMode(index.row()),
                                                                           static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
@@ -106,7 +107,7 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent /*=
 
     case WidgetFontModel::COLUMN_Thickness:
         m_pItemFont->GetUndoStack()->push(new ItemFontCmd_LayerOutlineThickness(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
-                                                                                pFontModel,
+                                                                                m_pCmbStates,
                                                                                 pFontModel->GetLayerId(index.row()),
                                                                                 pFontModel->GetLayerOutlineThickness(index.row()),
                                                                                 static_cast<QDoubleSpinBox *>(pEditor)->value()));

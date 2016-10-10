@@ -97,12 +97,30 @@ void ItemSpriteCmd_RenameState::redo()
 {
     m_pSpriteState->SetName(m_sNewName);
     SetStateNamingConventionInComboBox<WidgetSpriteState>(m_pComboBox);
+    
+    for(int i = 0; i < m_pComboBox->count(); ++i)
+    {
+        if(m_pComboBox->itemData(i).value<WidgetSpriteState *>() == m_pSpriteState)
+        {
+            m_pComboBox->setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 void ItemSpriteCmd_RenameState::undo()
 {
     m_pSpriteState->SetName(m_sOldName);
     SetStateNamingConventionInComboBox<WidgetSpriteState>(m_pComboBox);
+    
+    for(int i = 0; i < m_pComboBox->count(); ++i)
+    {
+        if(m_pComboBox->itemData(i).value<WidgetSpriteState *>() == m_pSpriteState)
+        {
+            m_pComboBox->setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

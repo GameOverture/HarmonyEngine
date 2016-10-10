@@ -36,9 +36,10 @@ class WidgetFontDelegate : public QStyledItemDelegate
     Q_OBJECT
 
     ItemFont *              m_pItemFont;
+    QComboBox *             m_pCmbStates;
 
 public:
-    WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent = 0);
+    WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbStates, QObject *pParent = 0);
 
     virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const;

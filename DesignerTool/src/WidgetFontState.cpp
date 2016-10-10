@@ -38,7 +38,7 @@ WidgetFontState::WidgetFontState(WidgetFont *pOwner, QList<QAction *> stateActio
 
     ui->stagesView->setModel(m_pFontModel);
     ui->stagesView->resize(ui->stagesView->size());
-    ui->stagesView->setItemDelegate(new WidgetFontDelegate(m_pOwner->GetItemFont(), this));
+    ui->stagesView->setItemDelegate(new WidgetFontDelegate(m_pOwner->GetItemFont(), m_pOwner->GetCmbStates(), this));
 
     // Populate the font list combo box
     ui->cmbFontList->blockSignals(true);
@@ -148,7 +148,7 @@ void WidgetFontState::on_cmbFontList_currentIndexChanged(int index)
 {
     ItemFont *pItemFont = m_pOwner->GetItemFont();
     
-    QUndoCommand *pCmd = new ItemFontCmd_FontSelection(*m_pOwner, ui->cmbFontList, m_iPrevFontCmbIndex, index);
+    QUndoCommand *pCmd = new ItemFontCmd_FontSelection(*m_pOwner, m_pOwner->GetCmbStates(), ui->cmbFontList, m_iPrevFontCmbIndex, index);
     pItemFont->GetUndoStack()->push(pCmd);
 
     m_iPrevFontCmbIndex = index;
