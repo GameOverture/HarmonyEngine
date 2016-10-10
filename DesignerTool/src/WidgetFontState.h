@@ -43,6 +43,7 @@ public:
     void SetName(QString sNewName);
     
     WidgetFontModel *GetFontModel();
+    WidgetFontTableView *GetFontLayerView();
     
     QString GetFontFilePath();
     
@@ -60,6 +61,8 @@ private slots:
     void on_cmbRenderMode_currentIndexChanged(int index);
     
     void on_sbSize_editingFinished();
+    
+    void on_layersView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection);
     
 private:
     Ui::WidgetFontState *ui;

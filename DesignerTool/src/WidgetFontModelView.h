@@ -84,6 +84,9 @@ public:
     float GetLayerOutlineThickness(int iRowIndex) const;
     void SetLayerOutlineThickness(int iId, float fThickness);
     
+    void MoveRowUp(int iIndex);
+    void MoveRowDown(int iIndex);
+    
     void SetFontSize(float fSize);
     
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;

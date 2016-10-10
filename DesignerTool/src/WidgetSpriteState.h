@@ -83,7 +83,7 @@ private slots:
     void on_chkLoop_clicked();
 
     void on_chkBounce_clicked();
-
+    
 private:
     Ui::WidgetSpriteState *ui;
 };

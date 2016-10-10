@@ -39,7 +39,9 @@ WidgetFontState::WidgetFontState(WidgetFont *pOwner, QList<QAction *> stateActio
     ui->stagesView->setModel(m_pFontModel);
     ui->stagesView->resize(ui->stagesView->size());
     ui->stagesView->setItemDelegate(new WidgetFontDelegate(m_pOwner->GetItemFont(), m_pOwner->GetCmbStates(), this));
-
+    QItemSelectionModel *pSelModel = ui->stagesView->selectionModel();
+    connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
+    
     // Populate the font list combo box
     ui->cmbFontList->blockSignals(true);
     ui->cmbFontList->clear();
@@ -109,6 +111,11 @@ void WidgetFontState::SetName(QString sNewName)
 WidgetFontModel *WidgetFontState::GetFontModel()
 {
     return m_pFontModel;
+}
+
+WidgetFontTableView *WidgetFontState::GetFontLayerView()
+{
+    return ui->stagesView;
 }
 
 QString WidgetFontState::GetFontFilePath()
@@ -187,4 +194,9 @@ void WidgetFontState::on_sbSize_editingFinished()
     pItemFont->GetUndoStack()->push(pCmd);
     
     m_dPrevFontSize = ui->sbSize->value();
+}
+
+void WidgetFontState::on_layersView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
+{
+    m_pOwner->UpdateActions();
 }

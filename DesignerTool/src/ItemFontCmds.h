@@ -242,5 +242,22 @@ public:
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemFontCmd_LayerOrder : public QUndoCommand
+{
+    WidgetFont &                m_WidgetFontRef;
+    QComboBox *                 m_pCmbStates;
+    WidgetFontState *           m_pFontState;
+    WidgetFontTableView *       m_pFontTableView;
+    int                         m_iPrevRowIndex;
+    int                         m_iNewRowIndex;
+
+public:
+    ItemFontCmd_LayerOrder(WidgetFont &widgetFont, QComboBox *pCmbStates, WidgetFontTableView *pFontTableView, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent = 0);
+    virtual ~ItemFontCmd_LayerOrder();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
 
 #endif // ITEMFONTCMDS_H

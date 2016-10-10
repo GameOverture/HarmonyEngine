@@ -299,6 +299,21 @@ void WidgetFont::UpdateActions()
     ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
     ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
+    
+    WidgetFontState *pFontState = ui->cmbStates->currentData().value<WidgetFontState *>();
+    if(pFontState)
+    {
+        WidgetFontTableView *pTableView = pFontState->GetFontLayerView();
+        bool bFrameIsSelected = pFontState->GetFontModel()->rowCount() > 0 && pTableView->currentIndex().row() >= 0;
+        
+        ui->actionOrderLayerUpwards->setEnabled(bFrameIsSelected && pTableView->currentIndex().row() != 0);
+        ui->actionOrderLayerDownwards->setEnabled(bFrameIsSelected && pTableView->currentIndex().row() != pFontState->GetFontModel()->rowCount() - 1);
+    }
+    else
+    {
+        ui->actionOrderLayerUpwards->setEnabled(false);
+        ui->actionOrderLayerDownwards->setEnabled(false);
+    }
 }
 
 void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)
@@ -361,7 +376,7 @@ void WidgetFont::on_cmbStates_currentIndexChanged(int index)
     m_pCurFontState = pFontState;
     m_pCurFontState->show();
 
-    //UpdateActions();
+    UpdateActions();
 }
 
 void WidgetFont::on_actionAddState_triggered()
@@ -395,16 +410,12 @@ void WidgetFont::on_actionOrderStateBackwards_triggered()
 {
     QUndoCommand *pCmd = new ItemFontCmd_MoveStateBack(ui->cmbStates);
     m_pItemFont->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetFont::on_actionOrderStateForwards_triggered()
 {
     QUndoCommand *pCmd = new ItemFontCmd_MoveStateForward(ui->cmbStates);
     m_pItemFont->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetFont::on_actionAddLayer_triggered()
@@ -429,10 +440,16 @@ void WidgetFont::on_actionRemoveLayer_triggered()
 
 void WidgetFont::on_actionOrderLayerDownwards_triggered()
 {
-
+    WidgetFontState *pFontState = ui->cmbStates->currentData().value<WidgetFontState *>();
+    
+    QUndoCommand *pCmd = new ItemFontCmd_LayerOrder(*this, ui->cmbStates, pFontState->GetFontLayerView(), pFontState->GetFontLayerView()->currentIndex().row(), pFontState->GetFontLayerView()->currentIndex().row() + 1);
+    m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFont::on_actionOrderLayerUpwards_triggered()
 {
-
+    WidgetFontState *pFontState = ui->cmbStates->currentData().value<WidgetFontState *>();
+    
+    QUndoCommand *pCmd = new ItemFontCmd_LayerOrder(*this, ui->cmbStates, pFontState->GetFontLayerView(), pFontState->GetFontLayerView()->currentIndex().row(), pFontState->GetFontLayerView()->currentIndex().row() - 1);
+    m_pItemFont->GetUndoStack()->push(pCmd);
 }

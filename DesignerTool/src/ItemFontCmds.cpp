@@ -341,6 +341,7 @@ void ItemFontCmd_AddLayer::redo()
     }
 
     m_WidgetFontRef.GeneratePreview();
+    m_WidgetFontRef.UpdateActions();
 }
 
 void ItemFontCmd_AddLayer::undo()
@@ -359,6 +360,7 @@ void ItemFontCmd_AddLayer::undo()
     }
     
     m_WidgetFontRef.GeneratePreview();
+    m_WidgetFontRef.UpdateActions();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -392,6 +394,7 @@ void ItemFontCmd_RemoveLayer::redo()
     }
     
     m_WidgetFontRef.GeneratePreview();
+    m_WidgetFontRef.UpdateActions();
 }
 
 void ItemFontCmd_RemoveLayer::undo()
@@ -410,6 +413,7 @@ void ItemFontCmd_RemoveLayer::undo()
     }
     
     m_WidgetFontRef.GeneratePreview();
+    m_WidgetFontRef.UpdateActions();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -630,5 +634,75 @@ void ItemFontCmd_LayerOutlineThickness::undo()
     }
     
     m_WidgetFontRef.GeneratePreview();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemFontCmd_LayerOrder::ItemFontCmd_LayerOrder(WidgetFont &widgetFont, QComboBox *pCmbStates, WidgetFontTableView *pFontTableView, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                                                                                                            m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                                            m_pCmbStates(pCmbStates),
+                                                                                                                                                                                                            m_pFontState(m_pCmbStates->currentData().value<WidgetFontState *>()),
+                                                                                                                                                                                                            m_pFontTableView(pFontTableView),
+                                                                                                                                                                                                            m_iPrevRowIndex(iPrevRowIndex),
+                                                                                                                                                                                                            m_iNewRowIndex(iNewRowIndex)
+{
+    if(m_iPrevRowIndex > m_iNewRowIndex)
+        setText("Order Layer Upwards");
+    else
+        setText("Order Layer Downwards");
+}
+
+/*virtual*/ ItemFontCmd_LayerOrder::~ItemFontCmd_LayerOrder()
+{
+}
+
+void ItemFontCmd_LayerOrder::redo()
+{
+    WidgetFontModel *pModel = static_cast<WidgetFontModel *>(m_pFontTableView->model());
+    
+    int iOffset = m_iNewRowIndex - m_iPrevRowIndex;
+    if(iOffset > 0)
+        pModel->MoveRowDown(m_iPrevRowIndex);
+    else
+        pModel->MoveRowUp(m_iPrevRowIndex);
+        
+    m_pFontTableView->selectRow(m_iNewRowIndex);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
+    m_WidgetFontRef.GeneratePreview();
+    m_WidgetFontRef.UpdateActions();
+}
+
+void ItemFontCmd_LayerOrder::undo()
+{
+    WidgetFontModel *pModel = static_cast<WidgetFontModel *>(m_pFontTableView->model());
+    
+    int iOffset = m_iPrevRowIndex - m_iNewRowIndex;
+    if(iOffset > 0)
+        pModel->MoveRowDown(m_iNewRowIndex);
+    else
+        pModel->MoveRowUp(m_iNewRowIndex);
+    
+    m_pFontTableView->selectRow(m_iPrevRowIndex);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetFontState *>() == m_pFontState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+    
+    m_WidgetFontRef.GeneratePreview();
+    m_WidgetFontRef.UpdateActions();
 }
 

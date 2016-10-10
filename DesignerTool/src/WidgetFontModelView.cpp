@@ -228,6 +228,24 @@ void WidgetFontModel::SetLayerOutlineThickness(int iId, float fThickness)
     }
 }
 
+void WidgetFontModel::MoveRowUp(int iIndex)
+{
+    if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
+        return;
+
+    m_LayerList.swap(iIndex, iIndex - 1);
+    endMoveRows();
+}
+
+void WidgetFontModel::MoveRowDown(int iIndex)
+{
+    if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt is retarded
+        return;
+
+    m_LayerList.swap(iIndex, iIndex + 1);
+    endMoveRows();
+}
+
 void WidgetFontModel::SetFontSize(float fSize)
 {
     for(int i = 0; i < m_LayerList.count(); ++i)
