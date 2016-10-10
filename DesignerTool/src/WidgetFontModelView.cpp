@@ -99,7 +99,7 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent /*=
     case WidgetFontModel::COLUMN_Type:
         m_pItemFont->GetUndoStack()->push(new ItemFontCmd_StageRenderMode(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
                                                                           pFontModel,
-                                                                          index.row(),
+                                                                          pFontModel->GetLayerId(index.row()),
                                                                           pFontModel->GetLayerRenderMode(index.row()),
                                                                           static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
         break;
@@ -107,7 +107,7 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QObject *pParent /*=
     case WidgetFontModel::COLUMN_Thickness:
         m_pItemFont->GetUndoStack()->push(new ItemFontCmd_LayerOutlineThickness(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
                                                                                 pFontModel,
-                                                                                index.row(),
+                                                                                pFontModel->GetLayerId(index.row()),
                                                                                 pFontModel->GetLayerOutlineThickness(index.row()),
                                                                                 static_cast<QDoubleSpinBox *>(pEditor)->value()));
         break;
@@ -198,14 +198,38 @@ rendermode_t WidgetFontModel::GetLayerRenderMode(int iRowIndex) const
     return m_LayerList[iRowIndex]->eMode;
 }
 
-float WidgetFontModel::GetLayerSize(int iRowIndex) const
+void WidgetFontModel::SetLayerRenderMode(int iId, rendermode_t eMode)
 {
-    return m_LayerList[iRowIndex]->fSize;
+    for(int i = 0; i < m_LayerList.count(); ++i)
+    {
+        if(m_LayerList[i]->iUNIQUE_ID == iId)
+        {
+            m_LayerList[i]->eMode = eMode;
+            dataChanged(createIndex(i, COLUMN_Type), createIndex(i, COLUMN_Type));
+        }
+    }
 }
 
 float WidgetFontModel::GetLayerOutlineThickness(int iRowIndex) const
 {
     return m_LayerList[iRowIndex]->fOutlineThickness;
+}
+
+void WidgetFontModel::SetLayerOutlineThickness(int iId, float fThickness)
+{
+    for(int i = 0; i < m_LayerList.count(); ++i)
+    {
+        if(m_LayerList[i]->iUNIQUE_ID == iId)
+        {
+            m_LayerList[i]->fOutlineThickness = fThickness;
+            dataChanged(createIndex(i, COLUMN_Thickness), createIndex(i, COLUMN_Thickness));
+        }
+    }
+}
+
+float WidgetFontModel::GetLayerSize(int iRowIndex) const
+{
+    return m_LayerList[iRowIndex]->fSize;
 }
 
 /*virtual*/ int WidgetFontModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const

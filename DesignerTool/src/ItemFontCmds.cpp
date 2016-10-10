@@ -372,12 +372,12 @@ void ItemFontCmd_FontSelection::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ItemFontCmd_StageRenderMode::ItemFontCmd_StageRenderMode(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iStageId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
-                                                                                                                                                                                                                m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                                                m_pFontModel(pFontModel),
-                                                                                                                                                                                                                m_iStageId(iStageId),
-                                                                                                                                                                                                                m_ePrevRenderMode(ePrevMode),
-                                                                                                                                                                                                                m_eNewRenderMode(eNewMode)
+ItemFontCmd_StageRenderMode::ItemFontCmd_StageRenderMode(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                                                            m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                                            m_pFontModel(pFontModel),
+                                                                                                                                                                                                            m_iLayerId(iLayerId),
+                                                                                                                                                                                                            m_ePrevRenderMode(ePrevMode),
+                                                                                                                                                                                                            m_eNewRenderMode(eNewMode)
 {
     setText("Stage Render Mode");
 }
@@ -388,14 +388,41 @@ ItemFontCmd_StageRenderMode::ItemFontCmd_StageRenderMode(WidgetFont &widgetFont,
 
 void ItemFontCmd_StageRenderMode::redo()
 {
-    //m_WidgetFontRef.SetStageRenderMode(m_pFontModel, m_iStageId, m_eNewRenderMode);
-    //m_pFontModel->SetStageRenderMode(m_iRowIndex, m_eNewRenderMode);
+    m_pFontModel->SetLayerRenderMode(m_iLayerId, m_eNewRenderMode);
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_StageRenderMode::undo()
 {
-    //m_pFontModel->SetStageRenderMode(m_iRowIndex, m_ePrevRenderMode);
+    m_pFontModel->SetLayerRenderMode(m_iLayerId, m_ePrevRenderMode);
+    m_WidgetFontRef.GeneratePreview();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemFontCmd_LayerOutlineThickness::ItemFontCmd_LayerOutlineThickness(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                                                                    m_WidgetFontRef(widgetFont),
+                                                                                                                                                                                                                    m_pFontModel(pFontModel),
+                                                                                                                                                                                                                    m_iLayerId(iLayerId),
+                                                                                                                                                                                                                    m_fPrevThickness(fPrevThickness),
+                                                                                                                                                                                                                    m_fNewThickness(fNewThickness)
+{
+    setText("Stage Outline Thickness");
+}
+
+/*virtual*/ ItemFontCmd_LayerOutlineThickness::~ItemFontCmd_LayerOutlineThickness()
+{
+}
+
+void ItemFontCmd_LayerOutlineThickness::redo()
+{
+    m_pFontModel->SetLayerOutlineThickness(m_iLayerId, m_fNewThickness);
+    m_WidgetFontRef.GeneratePreview();
+}
+
+void ItemFontCmd_LayerOutlineThickness::undo()
+{
+    m_pFontModel->SetLayerOutlineThickness(m_iLayerId, m_fPrevThickness);
     m_WidgetFontRef.GeneratePreview();
 }
 
@@ -421,33 +448,5 @@ void ItemFontCmd_StageSize::redo()
 
 void ItemFontCmd_StageSize::undo()
 {
-    m_WidgetFontRef.GeneratePreview();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-ItemFontCmd_LayerOutlineThickness::ItemFontCmd_LayerOutlineThickness(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iRowIndex, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
-                                                                                                                                                                                                                        m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                                                        m_pFontModel(pFontModel),
-                                                                                                                                                                                                                        m_iRowIndex(iRowIndex),
-                                                                                                                                                                                                                        m_fPrevThickness(fPrevThickness),
-                                                                                                                                                                                                                        m_fNewThickness(fNewThickness)
-{
-    setText("Stage Outline Thickness");
-}
-
-/*virtual*/ ItemFontCmd_LayerOutlineThickness::~ItemFontCmd_LayerOutlineThickness()
-{
-}
-
-void ItemFontCmd_LayerOutlineThickness::redo()
-{
-    //m_pFontModel->SetLayerOutlineThickness(m_iRowIndex, m_fNewThickness);
-    m_WidgetFontRef.GeneratePreview();
-}
-
-void ItemFontCmd_LayerOutlineThickness::undo()
-{
-    //m_pFontModel->SetLayerOutlineThickness(m_iRowIndex, m_fPrevThickness);
     m_WidgetFontRef.GeneratePreview();
 }

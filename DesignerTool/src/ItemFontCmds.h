@@ -190,13 +190,29 @@ class ItemFontCmd_StageRenderMode : public QUndoCommand
 {
     WidgetFont &        m_WidgetFontRef;
     WidgetFontModel *   m_pFontModel;
-    int                 m_iStageId;
+    int                 m_iLayerId;
     rendermode_t        m_ePrevRenderMode;
     rendermode_t        m_eNewRenderMode;
 
 public:
-    ItemFontCmd_StageRenderMode(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iStageId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = 0);
+    ItemFontCmd_StageRenderMode(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_StageRenderMode();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemFontCmd_LayerOutlineThickness : public QUndoCommand
+{
+    WidgetFont &        m_WidgetFontRef;
+    WidgetFontModel *   m_pFontModel;
+    int                 m_iLayerId;
+    float               m_fPrevThickness;
+    float               m_fNewThickness;
+
+public:
+    ItemFontCmd_LayerOutlineThickness(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent = 0);
+    virtual ~ItemFontCmd_LayerOutlineThickness();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
@@ -213,22 +229,6 @@ class ItemFontCmd_StageSize : public QUndoCommand
 public:
     ItemFontCmd_StageSize(WidgetFont &widgetFont, WidgetFontModel *pFontModel, float fPrevSize, float fNewSize, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_StageSize();
-
-    void redo() Q_DECL_OVERRIDE;
-    void undo() Q_DECL_OVERRIDE;
-};
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ItemFontCmd_LayerOutlineThickness : public QUndoCommand
-{
-    WidgetFont &        m_WidgetFontRef;
-    WidgetFontModel *   m_pFontModel;
-    int                 m_iRowIndex;
-    float               m_fPrevThickness;
-    float               m_fNewThickness;
-
-public:
-    ItemFontCmd_LayerOutlineThickness(WidgetFont &widgetFont, WidgetFontModel *pFontModel, int iRowIndex, float fPrevThickness, float fNewThickness, QUndoCommand *pParent = 0);
-    virtual ~ItemFontCmd_LayerOutlineThickness();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;

@@ -76,9 +76,14 @@ public:
     void ReAddLayer(int iId);
 
     int GetLayerId(int iRowIndex) const;
+    
     rendermode_t GetLayerRenderMode(int iRowIndex) const;
-    float GetLayerSize(int iRowIndex) const;
+    void SetLayerRenderMode(int iId, rendermode_t eMode);
+    
     float GetLayerOutlineThickness(int iRowIndex) const;
+    void SetLayerOutlineThickness(int iId, float fThickness);
+    
+    float GetLayerSize(int iRowIndex) const;
 
     //void SetTextureFont(int iRowIndex, texture_font_t *pTextureFont);
     
