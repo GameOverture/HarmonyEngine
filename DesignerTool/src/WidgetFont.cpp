@@ -273,6 +273,8 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
     ui->lcdCurTexWidth->display(static_cast<int>(m_pAtlas->width));
     ui->lcdCurTexHeight->display(static_cast<int>(m_pAtlas->height));
     
+    ui->lcdPercentageUsed->display(static_cast<double>(100.0 * m_pAtlas->used) / static_cast<double>(m_pAtlas->width * m_pAtlas->height));
+    
     // Signals ItemFont to upload and refresh the preview texture
     m_pAtlas->id = 0;
 }

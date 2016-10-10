@@ -374,7 +374,7 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Max Size:</string>
+        <string>Percentage Used:</string>
        </property>
       </widget>
      </item>
@@ -392,23 +392,19 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLCDNumber" name="lcdMaxTexWidth">
+      <widget class="QLCDNumber" name="lcdPercentageUsed">
        <property name="digitCount">
         <number>5</number>
+       </property>
+       <property name="value" stdset="0">
+        <double>0.000000000000000</double>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_5">
+      <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>x</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLCDNumber" name="lcdMaxTexHeight">
-       <property name="digitCount">
-        <number>5</number>
+        <string>%</string>
        </property>
       </widget>
      </item>
