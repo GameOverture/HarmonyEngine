@@ -68,12 +68,16 @@ ItemFontCmd_CheckBox::ItemFontCmd_CheckBox(WidgetFont &widgetFont, QCheckBox *pC
 void ItemFontCmd_CheckBox::redo()
 {
     m_pCheckBox->setChecked(m_bInitialValue);
+    
+    m_WidgetFontRef.SetGlyphsDirty();
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_CheckBox::undo()
 {
     m_pCheckBox->setChecked(!m_bInitialValue);
+    
+    m_WidgetFontRef.SetGlyphsDirty();
     m_WidgetFontRef.GeneratePreview();
 }
 
@@ -98,12 +102,15 @@ void ItemFontCmd_LineEditSymbols::redo()
     else
         m_pTxtAdditionalSymbols->redo();
 
+    m_WidgetFontRef.SetGlyphsDirty();
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_LineEditSymbols::undo()
 {
     m_pTxtAdditionalSymbols->undo();
+    
+    m_WidgetFontRef.SetGlyphsDirty();
     m_WidgetFontRef.GeneratePreview();
 }
 

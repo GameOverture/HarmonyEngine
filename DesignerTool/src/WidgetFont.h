@@ -50,6 +50,8 @@ public:
 
     QComboBox *GetCmbStates();
     
+    void SetGlyphsDirty();
+    
     void GeneratePreview(bool bFindBestFit = false);
     
     texture_atlas_t *GetAtlas();

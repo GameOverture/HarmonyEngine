@@ -134,6 +134,11 @@ QComboBox *WidgetFont::GetCmbStates()
     return ui->cmbStates;
 }
 
+void WidgetFont::SetGlyphsDirty()
+{
+    m_bGlyphsDirty = true;
+}
+
 void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
 {
     for(int i = 0; i < m_MasterStageList.count(); ++i)
@@ -332,6 +337,8 @@ void WidgetFont::on_chk_09_clicked()
 {
     QUndoCommand *pCmd = new ItemFontCmd_CheckBox(*this, ui->chk_09);
     m_pItemFont->GetUndoStack()->push(pCmd);
+    
+    m_bGlyphsDirty = true;
 }
 
 void WidgetFont::on_chk_az_clicked()
