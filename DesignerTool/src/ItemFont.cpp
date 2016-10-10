@@ -45,14 +45,22 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
 
 /*virtual*/ void ItemFont::OnUnload(IHyApplication &hyApp)
 {
+    if(m_pDrawPreview)
+        m_pDrawPreview->Unload();
+    
+    delete m_pWidget;
 }
 
 /*virtual*/ void ItemFont::OnDraw_Show(IHyApplication &hyApp)
 {
+    if(m_pDrawPreview)
+        m_pDrawPreview->SetEnabled(true);
 }
 
 /*virtual*/ void ItemFont::OnDraw_Hide(IHyApplication &hyApp)
 {
+    if(m_pDrawPreview)
+        m_pDrawPreview->SetEnabled(false);
 }
 
 /*virtual*/ void ItemFont::OnDraw_Update(IHyApplication &hyApp)

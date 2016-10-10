@@ -18,17 +18,19 @@ struct FontStagePass
     int                 iReferenceCount;
     int                 iTmpReferenceCount;
 
+    QString             sFontPath;
     texture_font_t *    pTextureFont;
     rendermode_t        eMode;
     float               fSize;
     float               fOutlineThickness;
 
-    FontStagePass(rendermode_t eRenderMode, float fSize, float fOutlineThickness) : iReferenceCount(0),
-                                                                                    iTmpReferenceCount(0),
-                                                                                    pTextureFont(NULL),
-                                                                                    eMode(eRenderMode),
-                                                                                    fSize(fSize),
-                                                                                    fOutlineThickness(fOutlineThickness)
+    FontStagePass(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iReferenceCount(0),
+                                                                                                            iTmpReferenceCount(0),
+                                                                                                            sFontPath(sFontFilePath),
+                                                                                                            pTextureFont(NULL),
+                                                                                                            eMode(eRenderMode),
+                                                                                                            fSize(fSize),
+                                                                                                            fOutlineThickness(fOutlineThickness)
     { }
 
     ~FontStagePass()

@@ -227,6 +227,9 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
             
             for(int k = 0; k < m_MasterStageList.count(); ++k)
             {
+                if(m_MasterStageList[k]->pTextureFont == NULL)
+                    continue;
+                
                 QFileInfo stageFontPath(m_MasterStageList[k]->pTextureFont->filename);
                 QFileInfo stateFontPath(pFontState->GetFontFilePath());
         
@@ -235,13 +238,15 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
                    m_MasterStageList[k]->fSize == pFontModel->GetLayerSize(j) &&
                    m_MasterStageList[k]->fOutlineThickness == pFontModel->GetLayerOutlineThickness(j))
                 {
+                    m_MasterStageList[k]->iTmpReferenceCount++;
                     bMatched = true;
                 }
             }
             
             if(bMatched == false)
             {
-                m_MasterStageList.append(new FontStagePass(pFontModel->GetLayerRenderMode(j), pFontModel->GetLayerSize(j), pFontModel->GetLayerOutlineThickness(j)));
+                m_MasterStageList.append(new FontStagePass(pFontState->GetFontFilePath(), pFontModel->GetLayerRenderMode(j), pFontModel->GetLayerSize(j), pFontModel->GetLayerOutlineThickness(j)));
+                m_MasterStageList[m_MasterStageList.count() - 1]->iTmpReferenceCount = 1;
                 bIsDirty = true;
             }
         }
@@ -309,12 +314,10 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
 
         for(int i = 0; i < m_MasterStageList.count(); ++i)
         {
-            WidgetFontState *pFontState = ui->cmbStates->itemData(i).value<WidgetFontState *>();
-
-            texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, pFontState->GetSize(), pFontState->GetFontFilePath().toStdString().c_str());
+            texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, m_MasterStageList[i]->fSize, m_MasterStageList[i]->sFontPath.toStdString().c_str());
             if(pFont == NULL)
             {
-                HyGuiLog("Could not create freetype font from: " % pFontState->GetFontFilePath(), LOGTYPE_Error);
+                HyGuiLog("Could not create freetype font from: " % m_MasterStageList[i]->sFontPath, LOGTYPE_Error);
                 return;
             }
 
