@@ -362,11 +362,19 @@ ItemFontCmd_FontSelection::ItemFontCmd_FontSelection(WidgetFont &widgetFont, QCo
 
 void ItemFontCmd_FontSelection::redo()
 {
+    m_pCmbFontList->blockSignals(true);
+    m_pCmbFontList->setCurrentIndex(m_iNewIndex);
+    m_pCmbFontList->blockSignals(false);
+    
     m_WidgetFontRef.GeneratePreview();
 }
 
 void ItemFontCmd_FontSelection::undo()
 {
+    m_pCmbFontList->blockSignals(true);
+    m_pCmbFontList->setCurrentIndex(m_iPrevIndex);
+    m_pCmbFontList->blockSignals(false);
+    
     m_WidgetFontRef.GeneratePreview();
 }
 
