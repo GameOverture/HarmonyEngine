@@ -435,9 +435,7 @@ void HyOpenGL::SetCameraMatrices_2d(eMatrixStack eMtxStack)
 	if(eMtxStack == MTX_CAMVIEW)
 		m_mtxView = *GetCameraView2d(m_iCurCamIndex);
 	else
-	{
 		m_mtxView = glm::mat4(1.0f);
-		m_mtxView = glm::translate(m_mtxView, fWidth * -0.5f, fHeight * -0.5f, 0.0f);
-	}
+
 	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f);
 }

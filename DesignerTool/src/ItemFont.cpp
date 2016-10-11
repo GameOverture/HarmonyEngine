@@ -46,14 +46,25 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     if(m_pFontCamera == NULL)
         m_pFontCamera = hyApp.Window().CreateCamera2d();
     
-    m_pCamera->SetViewport(0.0f, 0.51f, 1.0f, 0.49f);
-    m_pFontCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.49f);
+    m_pCamera->SetViewport(0.0f, 0.5f, 1.0f, 0.5f);
+    m_pCamera->pos.Set(0.0f, 2500.0f);
+    
+    m_pFontCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.5f);
+    m_pFontCamera->pos.Set(0.0f, -2500.0f);
+    
+    m_DividerLine.SetAsQuad(10000.0f, 10.0f, false);
+    m_DividerLine.pos.Set(-5000.0f, -5.0f);
+    m_DividerLine.color.Set(0.0f, 0.0f, 0.0f, 1.0f);
+    m_DividerLine.SetCoordinateType(HYCOORDTYPE_Screen, NULL);
+    m_DividerLine.Load();
 }
 
 /*virtual*/ void ItemFont::OnUnload(IHyApplication &hyApp)
 {
     if(m_pDrawPreview)
         m_pDrawPreview->Unload();
+    
+    m_DividerLine.Unload();
     
     delete m_pWidget;
 }
@@ -65,12 +76,19 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     
     if(m_pFontCamera)
         m_pFontCamera->SetEnabled(true);
+    
+    m_DividerLine.SetEnabled(true);
 }
 
 /*virtual*/ void ItemFont::OnDraw_Hide(IHyApplication &hyApp)
 {
     if(m_pDrawPreview)
         m_pDrawPreview->SetEnabled(false);
+    
+    if(m_pFontCamera)
+        m_pFontCamera->SetEnabled(false);
+    
+    m_DividerLine.SetEnabled(false);
 }
 
 /*virtual*/ void ItemFont::OnDraw_Update(IHyApplication &hyApp)
@@ -107,7 +125,8 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
             m_pDrawPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
         }
         
-        m_pDrawPreview->pos.Set(hyApp.Window().GetResolution().x * -0.5f, -static_cast<float>(pAtlas->height) + (hyApp.Window().GetResolution().y * (m_pCamera->GetViewport().Height() * 0.5f)));
+        HyRectangle<float> atlasViewBounds = m_pCamera->GetWorldViewBounds();
+        m_pDrawPreview->pos.Set(atlasViewBounds.left, atlasViewBounds.top - pAtlas->height); //hyApp.Window().GetResolution().x * -0.5f, -static_cast<float>(pAtlas->height) + (hyApp.Window().GetResolution().y * (m_pCamera->GetViewport().Height() * 0.5f)));
     }
 
 

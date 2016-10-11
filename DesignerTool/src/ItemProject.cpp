@@ -73,7 +73,7 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
     m_Resolution.x = iWidth;
     m_Resolution.y = iHeight;
     SetAsQuad(m_Resolution.x, m_Resolution.y, false);
-    pos.Set(iWidth * -0.5f, iHeight * -0.5f);
+    pos.Set(m_Resolution.x * -0.5f, m_Resolution.y * -0.5f);
 }
 
 /*virtual*/ void CheckerGrid::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)

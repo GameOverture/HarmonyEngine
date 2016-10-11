@@ -73,6 +73,8 @@ class ItemFont : public ItemWidget
     HyTexturedQuad2d *      m_pDrawPreview;
     HyCamera2d *            m_pFontCamera;
     
+    HyPrimitive2d           m_DividerLine;
+    
 public:
     ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef);
     virtual ~ItemFont();

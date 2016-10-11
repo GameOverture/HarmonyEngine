@@ -49,7 +49,7 @@ HyRectangle<float> HyCamera2d::GetWorldViewBounds()
 	returnRect.left = pos.X() - fHalfWidth;
 	returnRect.bottom = pos.Y() - fHalfHeight;
 	returnRect.right = pos.X() + fHalfWidth;
-	returnRect.top = pos.X() + fHalfHeight;
+	returnRect.top = pos.Y() + fHalfHeight;
 
 	return returnRect;
 }
