@@ -39,6 +39,21 @@ HyCamera2d::~HyCamera2d()
 {
 }
 
+HyRectangle<float> HyCamera2d::GetWorldViewBounds()
+{
+	HyRectangle<float> returnRect;
+
+	float fHalfWidth = ((m_pWindowPtr->GetResolution().x * m_ViewportRect.Width()) * 0.5f);
+	float fHalfHeight = ((m_pWindowPtr->GetResolution().y * m_ViewportRect.Height()) * 0.5f);
+
+	returnRect.left = pos.X() - fHalfWidth;
+	returnRect.bottom = pos.Y() - fHalfHeight;
+	returnRect.right = pos.X() + fHalfWidth;
+	returnRect.top = pos.X() + fHalfHeight;
+
+	return returnRect;
+}
+
 HyCamera3d::HyCamera3d(HyWindow *pWindow) : IHyCamera(pWindow)
 { }
 HyCamera3d::~HyCamera3d()

@@ -21,10 +21,10 @@ class HyWindow;
 
 class IHyCamera
 {
+protected:
 	HyWindow *			m_pWindowPtr;
 	HyRectangle<float>	m_ViewportRect;	// Values are [0.0-1.0] representing percentages
 
-protected:
 	IHyCamera(HyWindow *pWindow);
 public:
 	virtual ~IHyCamera();
@@ -52,7 +52,7 @@ public:
 	virtual void SetZoom(const float fZoom)		{ scale.Set(fZoom, fZoom); }
 	virtual float GetZoom() const				{ return scale.Get().x; }
 
-	HyRectangle<float> GetWorldCoordinates();
+	HyRectangle<float> GetWorldViewBounds();
 };
 
 class HyCamera3d : public IHyTransform3d, public IHyCamera
