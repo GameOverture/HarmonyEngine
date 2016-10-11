@@ -417,13 +417,18 @@ void HyOpenGL::SetCameraMatrices_2d(eMatrixStack eMtxStack)
 	if(eMtxStack == MTX_CAMVIEW)
 		viewportRect = *GetCameraViewportRect2d(m_iCurCamIndex);
 	else
-		viewportRect.Set(0.0f, 0.0f, 1.0f, 1.0f);
+	{
+		viewportRect.left = 0.0f;
+		viewportRect.bottom = 0.0f;
+		viewportRect.right = 1.0f;
+		viewportRect.top = 1.0f;
+	}
 
 	float fWidth = (viewportRect.Width() * m_RenderSurfaceIter->m_iRenderSurfaceWidth);
 	float fHeight = (viewportRect.Height() * m_RenderSurfaceIter->m_iRenderSurfaceHeight);
 
 	glViewport(static_cast<GLint>(viewportRect.left * m_RenderSurfaceIter->m_iRenderSurfaceWidth),
-			   static_cast<GLint>(viewportRect.top * m_RenderSurfaceIter->m_iRenderSurfaceHeight),
+			   static_cast<GLint>(viewportRect.bottom * m_RenderSurfaceIter->m_iRenderSurfaceHeight),
 			   static_cast<GLsizei>(fWidth),
 			   static_cast<GLsizei>(fHeight));
 

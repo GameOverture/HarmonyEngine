@@ -109,7 +109,12 @@ void ItemWidget::DrawUpdate(IHyApplication &hyApp)
     if(m_bReloadDraw || IsLoaded() == false)
     {
         m_bReloadDraw = false;
-        OnLoad(hyApp);
+        
+        if(IsLoaded())
+            Unload(hyApp);
+        
+        Load(hyApp);
+        DrawShow(hyApp);
     }
 
     OnDraw_Update(hyApp);

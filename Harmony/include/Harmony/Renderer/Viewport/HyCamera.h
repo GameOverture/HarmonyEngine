@@ -51,6 +51,8 @@ public:
 
 	virtual void SetZoom(const float fZoom)		{ scale.Set(fZoom, fZoom); }
 	virtual float GetZoom() const				{ return scale.Get().x; }
+
+	HyRectangle<float> GetWorldCoordinates();
 };
 
 class HyCamera3d : public IHyTransform3d, public IHyCamera

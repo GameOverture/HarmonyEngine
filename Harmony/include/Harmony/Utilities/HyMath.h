@@ -70,25 +70,18 @@ struct HyRectangle
 	std::string ToString() const
 	{
 		std::ostringstream s;
-		s << "(" << left << "," << top << "," << right << "," << bottom << ")";
+		s << "(L:" << left << ", T:" << top << ", R:" << right << ", B:" << bottom << ")";
 		return s.str();
-	}
-
-	void Set(T tX, T tY, T tWidth, T tHeight)
-	{
-		left = tX;
-		top = tY;
-		right = tX + tWidth;
-		bottom = tY + tHeight;
 	}
 
 	T Width() const
 	{
 		return right - left;
 	}
+
 	T Height() const
 	{
-		return bottom - top;
+		return abs(bottom - top);
 	}
 };
 

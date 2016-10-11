@@ -19,7 +19,8 @@
 #include "Harmony/HyEngine.h"
 
 ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  ItemWidget(ITEM_Font, sPath, atlasManRef),
-                                                                            m_pDrawPreview(NULL)
+                                                                            m_pDrawPreview(NULL),
+                                                                            m_pFontCamera(NULL)
 {
 }
 
@@ -41,6 +42,12 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
 /*virtual*/ void ItemFont::OnLoad(IHyApplication &hyApp)
 {
     m_pWidget = new WidgetFont(this);
+    
+    if(m_pFontCamera == NULL)
+        m_pFontCamera = hyApp.Window().CreateCamera2d();
+    
+    m_pCamera->SetViewport(0.0f, 0.51f, 1.0f, 0.49f);
+    m_pFontCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.49f);
 }
 
 /*virtual*/ void ItemFont::OnUnload(IHyApplication &hyApp)
@@ -55,6 +62,9 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
 {
     if(m_pDrawPreview)
         m_pDrawPreview->SetEnabled(true);
+    
+    if(m_pFontCamera)
+        m_pFontCamera->SetEnabled(true);
 }
 
 /*virtual*/ void ItemFont::OnDraw_Hide(IHyApplication &hyApp)
@@ -96,8 +106,8 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
             m_pDrawPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
             m_pDrawPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
         }
-
-        m_pDrawPreview->pos.Set(hyApp.Window().GetResolution().x * -0.5f, -static_cast<float>(pAtlas->height) + (hyApp.Window().GetResolution().y * 0.5f));
+        
+        m_pDrawPreview->pos.Set(hyApp.Window().GetResolution().x * -0.5f, -static_cast<float>(pAtlas->height) + (hyApp.Window().GetResolution().y * (m_pCamera->GetViewport().Height() * 0.5f)));
     }
 
 

@@ -299,7 +299,7 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 
     m_CheckerGridBG.SetCustomShader(pShader_CheckerGrid);
     m_CheckerGridBG.SetDisplayOrder(-1000);
-    m_CheckerGridBG.SetSurfaceSize(8200, 8200);  // Use a large size that is a multiple of grid size (25)
+    m_CheckerGridBG.SetSurfaceSize(10000, 10000);  // Use a large size that is a multiple of grid size (25)
     m_CheckerGridBG.Load();
 
     m_pCamera = Window().CreateCamera2d();
