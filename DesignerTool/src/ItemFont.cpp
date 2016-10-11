@@ -19,7 +19,7 @@
 #include "Harmony/HyEngine.h"
 
 ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  ItemWidget(ITEM_Font, sPath, atlasManRef),
-                                                                            m_pDrawPreview(NULL),
+                                                                            m_pDrawAtlasPreview(NULL),
                                                                             m_pFontCamera(NULL)
 {
 }
@@ -61,8 +61,8 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
 
 /*virtual*/ void ItemFont::OnUnload(IHyApplication &hyApp)
 {
-    if(m_pDrawPreview)
-        m_pDrawPreview->Unload();
+    if(m_pDrawAtlasPreview)
+        m_pDrawAtlasPreview->Unload();
     
     m_DividerLine.Unload();
     
@@ -71,8 +71,8 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
 
 /*virtual*/ void ItemFont::OnDraw_Show(IHyApplication &hyApp)
 {
-    if(m_pDrawPreview)
-        m_pDrawPreview->SetEnabled(true);
+    if(m_pDrawAtlasPreview)
+        m_pDrawAtlasPreview->SetEnabled(true);
     
     if(m_pFontCamera)
         m_pFontCamera->SetEnabled(true);
@@ -82,8 +82,8 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
 
 /*virtual*/ void ItemFont::OnDraw_Hide(IHyApplication &hyApp)
 {
-    if(m_pDrawPreview)
-        m_pDrawPreview->SetEnabled(false);
+    if(m_pDrawAtlasPreview)
+        m_pDrawAtlasPreview->SetEnabled(false);
     
     if(m_pFontCamera)
         m_pFontCamera->SetEnabled(false);
@@ -100,8 +100,8 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     {
         if(pAtlas->id == 0)
         {
-            if(m_pDrawPreview && m_pDrawPreview->GetGraphicsApiHandle() != 0)
-                MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawPreview->GetGraphicsApiHandle());
+            if(m_pDrawAtlasPreview && m_pDrawAtlasPreview->GetGraphicsApiHandle() != 0)
+                MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawAtlasPreview->GetGraphicsApiHandle());
 
             // Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
             int iNumPixels = pAtlas->width * pAtlas->height;
@@ -118,15 +118,18 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
             pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(4/*pAtlas->depth*/, pAtlas->width, pAtlas->height, vPixelData);
 
             // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
-            delete m_pDrawPreview;
-            m_pDrawPreview = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
-            m_pDrawPreview->Load();
-            m_pDrawPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
-            m_pDrawPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
+            delete m_pDrawAtlasPreview;
+            m_pDrawAtlasPreview = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
+            m_pDrawAtlasPreview->Load();
+            m_pDrawAtlasPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
+            m_pDrawAtlasPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
         }
         
         HyRectangle<float> atlasViewBounds = m_pCamera->GetWorldViewBounds();
-        m_pDrawPreview->pos.Set(atlasViewBounds.left, atlasViewBounds.top - pAtlas->height); //hyApp.Window().GetResolution().x * -0.5f, -static_cast<float>(pAtlas->height) + (hyApp.Window().GetResolution().y * (m_pCamera->GetViewport().Height() * 0.5f)));
+        m_pDrawAtlasPreview->pos.Set(atlasViewBounds.left, atlasViewBounds.top - pAtlas->height);
+        
+        // TODO: generate m_DrawFontPreviewList here if font preview is dirty
+        QString sFontPreviewString = "The quick brown fox jumps over the lazy dog. 1234567890";
     }
 
 

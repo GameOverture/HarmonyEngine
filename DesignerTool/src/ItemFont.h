@@ -70,10 +70,12 @@ class ItemFont : public ItemWidget
 {
     Q_OBJECT
     
-    HyTexturedQuad2d *      m_pDrawPreview;
-    HyCamera2d *            m_pFontCamera;
+    HyTexturedQuad2d *          m_pDrawAtlasPreview;
+    HyCamera2d *                m_pFontCamera;
     
-    HyPrimitive2d           m_DividerLine;
+    HyPrimitive2d               m_DividerLine;
+    QList<HyTexturedQuad2d *>   m_DrawFontPreviewList;
+    
     
 public:
     ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef);
