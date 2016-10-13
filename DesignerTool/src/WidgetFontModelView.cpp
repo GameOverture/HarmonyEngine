@@ -194,6 +194,11 @@ int WidgetFontModel::GetLayerId(int iRowIndex) const
     return m_LayerList[iRowIndex]->iUNIQUE_ID;
 }
 
+FontStagePass *WidgetFontModel::GetStageRef(int iRowIndex)
+{
+    return m_LayerList[iRowIndex]->pReference;
+}
+
 rendermode_t WidgetFontModel::GetLayerRenderMode(int iRowIndex) const
 {
     return m_LayerList[iRowIndex]->eMode;
@@ -250,6 +255,11 @@ void WidgetFontModel::SetFontSize(float fSize)
 {
     for(int i = 0; i < m_LayerList.count(); ++i)
         m_LayerList[i]->fSize = fSize;
+}
+
+void WidgetFontModel::SetFontStageReference(int iRowIndex, FontStagePass *pStageRef)
+{
+    m_LayerList[iRowIndex]->pReference = pStageRef;
 }
 
 /*virtual*/ int WidgetFontModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const

@@ -128,8 +128,64 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
         HyRectangle<float> atlasViewBounds = m_pCamera->GetWorldViewBounds();
         m_pDrawAtlasPreview->pos.Set(atlasViewBounds.left, atlasViewBounds.top - pAtlas->height);
         
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // TODO: generate m_DrawFontPreviewList here if font preview is dirty
-        QString sFontPreviewString = "The quick brown fox jumps over the lazy dog. 1234567890";
+        for(int i = 0; i < m_DrawFontPreviewList.count(); ++i)
+            delete m_DrawFontPreviewList[i];
+        
+        m_DrawFontPreviewList.clear();
+        
+        WidgetFontModel *pFontModel = pWidget->GetCurrentFontModel();
+        
+        QString sFontPreviewString = "Thequickbrownfoxjumpsoverthelazydog.1234567890";
+        
+        // Each font layer
+        for(int i = 0; i < pFontModel->rowCount(); ++i)
+        {
+            glm::vec2 ptGlyphPos = m_pFontCamera->pos.Get();
+            
+            for(int j = 0; j < sFontPreviewString.count(); ++j)
+            {
+                FontStagePass *pFontStage = pFontModel->GetStageRef(i);
+                if(pFontStage == NULL)
+                {
+                    HyGuiLog("pFontStage was NULL", LOGTYPE_Error);
+                    continue;
+                }
+                
+                if(pFontStage->pTextureFont == NULL)
+                {
+                    HyGuiLog("pFontStage->pTextureFont was NULL", LOGTYPE_Error);
+                    continue;
+                }
+                
+                char cCharacter = sFontPreviewString[j].toLatin1();
+                texture_glyph_t *pGlyph = texture_font_get_glyph(pFontStage->pTextureFont, &cCharacter);
+                float fKerning = 0.0f;
+                if(j != 0)
+                {
+                    char cPrevCharacter = sFontPreviewString[j - 1].toLatin1();
+                    fKerning = texture_glyph_get_kerning(pGlyph, &cPrevCharacter);
+                }
+                
+                ptGlyphPos.x += (fKerning + pGlyph->offset_x);
+                ptGlyphPos.y = m_pFontCamera->pos.Y() - (pGlyph->height - pGlyph->offset_y);
+                
+                int iX = static_cast<int>(pGlyph->s0 * static_cast<float>(pAtlas->width));
+                int iY = static_cast<int>(pGlyph->t0 * static_cast<float>(pAtlas->height)) - 1;
+                int iWidth = static_cast<int>(pGlyph->s1 * static_cast<float>(pAtlas->width)) - iX - 1;
+                int iHeight = static_cast<int>(pGlyph->t1 * static_cast<float>(pAtlas->height)) - iY;
+                
+                HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
+                pDrawGlyphQuad->Load();
+                pDrawGlyphQuad->SetTextureSource(0, iX, iY, iWidth, iHeight);
+                pDrawGlyphQuad->pos.Set(ptGlyphPos);
+                
+                m_DrawFontPreviewList.append(pDrawGlyphQuad);
+                
+                ptGlyphPos.x += pGlyph->advance_x;
+            }
+        }
     }
 
 

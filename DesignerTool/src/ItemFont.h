@@ -54,12 +54,14 @@ struct FontStagePass
 struct FontLayer
 {
     const int           iUNIQUE_ID;
+    FontStagePass *     pReference;
     
     rendermode_t        eMode;
     float               fSize;
     float               fOutlineThickness;
     
     FontLayer(int iUniqueId, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iUNIQUE_ID(iUniqueId),
+                                                                                                pReference(NULL),
                                                                                                 eMode(eRenderMode),
                                                                                                 fSize(fSize),
                                                                                                 fOutlineThickness(fOutlineThickness)

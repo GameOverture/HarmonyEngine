@@ -77,6 +77,7 @@ public:
     void ReAddLayer(int iId);
 
     int GetLayerId(int iRowIndex) const;
+    FontStagePass *GetStageRef(int iRowIndex);
     
     rendermode_t GetLayerRenderMode(int iRowIndex) const;
     void SetLayerRenderMode(int iId, rendermode_t eMode);
@@ -88,6 +89,8 @@ public:
     void MoveRowDown(int iIndex);
     
     void SetFontSize(float fSize);
+    
+    void SetFontStageReference(int iRowIndex, FontStagePass *pStageRef);
     
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;

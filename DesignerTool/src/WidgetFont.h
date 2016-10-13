@@ -50,6 +50,8 @@ public:
 
     QComboBox *GetCmbStates();
     
+    WidgetFontModel *GetCurrentFontModel();
+    
     void SetGlyphsDirty();
     
     void GeneratePreview(bool bFindBestFit = false);

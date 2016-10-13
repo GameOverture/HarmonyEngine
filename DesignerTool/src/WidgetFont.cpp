@@ -134,6 +134,11 @@ QComboBox *WidgetFont::GetCmbStates()
     return ui->cmbStates;
 }
 
+WidgetFontModel *WidgetFont::GetCurrentFontModel()
+{
+    return m_pCurFontState->GetFontModel();
+}
+
 void WidgetFont::SetGlyphsDirty()
 {
     m_bGlyphsDirty = true;
@@ -141,15 +146,19 @@ void WidgetFont::SetGlyphsDirty()
 
 void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
 {
+    // 'bIsDirty' will determine whether we actually need to regenerate this typeface atlas
+    bool bIsDirty = false;
+    
+    // Iterating through every layer of every font, match with an item in 'm_MasterStageList' and count everytime it's referenced in using 'iTmpReferenceCount'
     for(int i = 0; i < m_MasterStageList.count(); ++i)
         m_MasterStageList[i]->iTmpReferenceCount = 0;
 
-    bool bIsDirty = false;
-    for(int i = 0; i < ui->cmbStates->count(); ++i)
+    for(int i = 0; i < ui->cmbStates->count(); ++i) // Iterating each font
     {
         WidgetFontState *pFontState = ui->cmbStates->itemData(i).value<WidgetFontState *>();
         WidgetFontModel *pFontModel = pFontState->GetFontModel();
         
+        // Iterating each layer of this font
         for(int j = 0; j < pFontModel->rowCount(); ++j)
         {
             bool bMatched = false;
@@ -167,20 +176,30 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
                    m_MasterStageList[k]->fSize == pFontState->GetSize() &&
                    m_MasterStageList[k]->fOutlineThickness == pFontModel->GetLayerOutlineThickness(j))
                 {
+                    // Match found, incrementing reference
                     m_MasterStageList[k]->iTmpReferenceCount++;
+                    
+                    pFontModel->SetFontStageReference(j, m_MasterStageList[k]);
+                    
                     bMatched = true;
                 }
             }
             
+            // Could not find a match, so adding a new FontStagePass to 'm_MasterStageList'
             if(bMatched == false)
             {
                 m_MasterStageList.append(new FontStagePass(pFontState->GetFontFilePath(), pFontModel->GetLayerRenderMode(j), pFontState->GetSize(), pFontModel->GetLayerOutlineThickness(j)));
                 m_MasterStageList[m_MasterStageList.count() - 1]->iTmpReferenceCount = 1;
+                
+                pFontModel->SetFontStageReference(j, m_MasterStageList[m_MasterStageList.count() - 1]);
+                
                 bIsDirty = true;
             }
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     for(int i = 0; i < m_MasterStageList.count(); ++i)
     {
         if(m_MasterStageList[i]->iTmpReferenceCount != m_MasterStageList[i]->iReferenceCount)
@@ -204,11 +223,11 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
     if(bIsDirty == false)
         return;
 
-    // Is dirty so reset ref count and generate atlas
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    // 'bIsDirty' == true so reset ref count and generate atlas
     for(int i = 0; i < m_MasterStageList.count(); ++i)
-    {
         m_MasterStageList[i]->iReferenceCount = m_MasterStageList[i]->iTmpReferenceCount;
-    }
     
     // Assemble glyph set
     QString sGlyphs;
