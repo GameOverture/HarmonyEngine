@@ -137,7 +137,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
         
         WidgetFontModel *pFontModel = pWidget->GetCurrentFontModel();
         
-        QString sFontPreviewString = "Thequickbrownfoxjumpsoverthelazydog.1234567890";
+        QString sFontPreviewString = "The quick brown fox jumps over the lazy dog. 1234567890";
         
         // Each font layer
         for(int i = 0; i < pFontModel->rowCount(); ++i)
@@ -147,17 +147,6 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
             for(int j = 0; j < sFontPreviewString.count(); ++j)
             {
                 FontStagePass *pFontStage = pFontModel->GetStageRef(i);
-                if(pFontStage == NULL)
-                {
-                    HyGuiLog("pFontStage was NULL", LOGTYPE_Error);
-                    continue;
-                }
-                
-                if(pFontStage->pTextureFont == NULL)
-                {
-                    HyGuiLog("pFontStage->pTextureFont was NULL", LOGTYPE_Error);
-                    continue;
-                }
                 
                 char cCharacter = sFontPreviewString[j].toLatin1();
                 texture_glyph_t *pGlyph = texture_font_get_glyph(pFontStage->pTextureFont, &cCharacter);
@@ -168,7 +157,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
                     fKerning = texture_glyph_get_kerning(pGlyph, &cPrevCharacter);
                 }
                 
-                ptGlyphPos.x += (fKerning + pGlyph->offset_x);
+                ptGlyphPos.x += fKerning;
                 ptGlyphPos.y = m_pFontCamera->pos.Y() - (pGlyph->height - pGlyph->offset_y);
                 
                 int iX = static_cast<int>(pGlyph->s0 * static_cast<float>(pAtlas->width));
@@ -179,7 +168,16 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
                 HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
                 pDrawGlyphQuad->Load();
                 pDrawGlyphQuad->SetTextureSource(0, iX, iY, iWidth, iHeight);
-                pDrawGlyphQuad->pos.Set(ptGlyphPos);
+                pDrawGlyphQuad->pos.Set(ptGlyphPos.x + pGlyph->offset_x, ptGlyphPos.y);
+                
+                if(i == 0)
+                    pDrawGlyphQuad->color.Set(1.0f, 0.0f, 0.0f, 1.0f);
+                else if(i == 1)
+                    pDrawGlyphQuad->color.Set(0.0f, 0.0f, 1.0f, 1.0f);
+                else if(i == 3)
+                    pDrawGlyphQuad->color.Set(0.0f, 1.0f, 0.0f, 1.0f);
+                
+                pDrawGlyphQuad->SetDisplayOrder(i * -1);
                 
                 m_DrawFontPreviewList.append(pDrawGlyphQuad);
                 
