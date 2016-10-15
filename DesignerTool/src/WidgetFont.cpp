@@ -25,6 +25,7 @@
 WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
                                                             m_pItemFont(pOwner),
                                                             m_bGlyphsDirty(false),
+                                                            m_bFontPreviewDirty(false),
                                                             m_pCurFontState(NULL),
                                                             m_pAtlas(NULL),
                                                             m_FontMetaDir(m_pItemFont->GetItemProject()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirFonts)),
@@ -301,6 +302,7 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
     
     // Signals ItemFont to upload and refresh the preview texture
     m_pAtlas->id = 0;
+    m_bFontPreviewDirty = true;
 }
 
 texture_atlas_t *WidgetFont::GetAtlas()
@@ -338,6 +340,24 @@ void WidgetFont::UpdateActions()
         ui->actionOrderLayerUpwards->setEnabled(false);
         ui->actionOrderLayerDownwards->setEnabled(false);
     }
+
+    m_bFontPreviewDirty = true;
+}
+
+QString WidgetFont::GetPreviewString()
+{
+    return ui->txtPreviewString->text();
+}
+
+bool WidgetFont::ClearFontDirtyFlag()
+{
+    if(m_bFontPreviewDirty)
+    {
+        m_bFontPreviewDirty = false;
+        return true;
+    }
+
+    return false;
 }
 
 void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)
@@ -416,7 +436,7 @@ void WidgetFont::on_actionAddState_triggered()
 
 void WidgetFont::on_actionRemoveState_triggered()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_RemoveState(ui->cmbStates);
+    QUndoCommand *pCmd = new ItemFontCmd_RemoveState(*this, ui->cmbStates);
     m_pItemFont->GetUndoStack()->push(pCmd);
 
     UpdateActions();
@@ -434,14 +454,18 @@ void WidgetFont::on_actionRenameState_triggered()
 
 void WidgetFont::on_actionOrderStateBackwards_triggered()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_MoveStateBack(ui->cmbStates);
+    QUndoCommand *pCmd = new ItemFontCmd_MoveStateBack(*this, ui->cmbStates);
     m_pItemFont->GetUndoStack()->push(pCmd);
+
+    UpdateActions();
 }
 
 void WidgetFont::on_actionOrderStateForwards_triggered()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_MoveStateForward(ui->cmbStates);
+    QUndoCommand *pCmd = new ItemFontCmd_MoveStateForward(*this, ui->cmbStates);
     m_pItemFont->GetUndoStack()->push(pCmd);
+
+    UpdateActions();
 }
 
 void WidgetFont::on_actionAddLayer_triggered()
@@ -478,4 +502,10 @@ void WidgetFont::on_actionOrderLayerUpwards_triggered()
     
     QUndoCommand *pCmd = new ItemFontCmd_LayerOrder(*this, ui->cmbStates, pFontState->GetFontLayerView(), pFontState->GetFontLayerView()->currentIndex().row(), pFontState->GetFontLayerView()->currentIndex().row() - 1);
     m_pItemFont->GetUndoStack()->push(pCmd);
+}
+
+void WidgetFont::on_txtPreviewString_editingFinished()
+{
+    // TODO: Only allow typeface glyphs to be typed
+    m_bFontPreviewDirty = true;
 }

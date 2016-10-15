@@ -12,3 +12,13 @@ DlgColorPicker::~DlgColorPicker()
 {
     delete ui;
 }
+
+QColor DlgColorPicker::GetTopColor()
+{
+    return m_TopColor;
+}
+
+QColor DlgColorPicker::GetBotColor()
+{
+    return m_BotColor;
+}

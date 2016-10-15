@@ -17,7 +17,8 @@ const char * const szHYQUADBATCH_VERTEXSHADER = "							\n\
 																			\n\
 layout(location = 0) in vec2 size;											\n\
 layout(location = 1) in vec2 offset;										\n\
-layout(location = 2) in vec4 tint;											\n\
+layout(location = 2) in vec4 topTint;										\n\
+layout(location = 2) in vec4 botTint;										\n\
 layout(location = 3) in float textureIndex;									\n\
 layout(location = 4) in vec2 UVcoord0;										\n\
 layout(location = 5) in vec2 UVcoord1;										\n\
@@ -46,23 +47,30 @@ void main()																	\n\
 	case 0:																	\n\
 		interpUV.x = UVcoord0.x;											\n\
 		interpUV.y = UVcoord0.y;											\n\
+																			\n\
+		interpColor = topTint;												\n\
 		break;																\n\
 	case 1:																	\n\
 		interpUV.x = UVcoord1.x;											\n\
 		interpUV.y = UVcoord1.y;											\n\
+																			\n\
+		interpColor = topTint;												\n\
 		break;																\n\
 	case 2:																	\n\
 		interpUV.x = UVcoord2.x;											\n\
 		interpUV.y = UVcoord2.y;											\n\
+																			\n\
+		interpColor = topTint;												\n\
 		break;																\n\
 	case 3:																	\n\
 		interpUV.x = UVcoord3.x;											\n\
 		interpUV.y = UVcoord3.y;											\n\
+																			\n\
+		interpColor = topTint;												\n\
 		break;																\n\
 	}																		\n\
 	texIndex = textureIndex;												\n\
 																			\n\
-	interpColor = tint;														\n\
 																			\n\
 	vec4 pos = vec4((position[gl_VertexID].x * size.x) + offset.x,			\n\
 					(position[gl_VertexID].y * size.y) + offset.y, 			\n\
@@ -102,11 +110,12 @@ out vec4 Color;																\n\
 uniform mat4 transformMtx;													\n\
 uniform mat4 mtxCameraToClip;												\n\
 uniform mat4 mtxWorldToCamera;												\n\
-uniform vec4 primitiveColor;												\n\
+uniform vec4 primitiveTopColor;												\n\
+uniform vec4 primitiveBotColor;												\n\
 																			\n\
 void main()																	\n\
 {																			\n\
-	Color = primitiveColor;													\n\
+	Color = primitiveTopColor;												\n\
 																			\n\
 	vec4 temp = transformMtx * position;									\n\
 	temp = mtxWorldToCamera * temp;											\n\

@@ -384,7 +384,8 @@ void IHyShader::Finalize(HyShaderProgram eDefaultsFrom)
 			SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
 			SetVertexAttribute("size", HYSHADERVAR_vec2, false, 1);
 			SetVertexAttribute("offset", HYSHADERVAR_vec2, false, 1);
-			SetVertexAttribute("tint", HYSHADERVAR_vec4, false, 1);
+			SetVertexAttribute("topTint", HYSHADERVAR_vec4, false, 1);
+			SetVertexAttribute("botTint", HYSHADERVAR_vec4, false, 1);
 			SetVertexAttribute("textureIndex", HYSHADERVAR_float, false, 1);
 			SetVertexAttribute("UVcoord0", HYSHADERVAR_vec2, false, 1);
 			SetVertexAttribute("UVcoord1", HYSHADERVAR_vec2, false, 1);

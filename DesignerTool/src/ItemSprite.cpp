@@ -32,8 +32,8 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     vLinePts[1].y = 2048.0f;
     m_primOriginVert.SetAsEdgeChain(vLinePts, 2, false);
     
-    m_primOriginHorz.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
-    m_primOriginVert.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
+    m_primOriginHorz.SetTint(1.0f, 0.0f, 0.0f);
+    m_primOriginVert.SetTint(1.0f, 0.0f, 0.0f);
 }
 
 /*virtual*/ ItemSprite::~ItemSprite()
@@ -104,6 +104,8 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     
     HyGuiFrame *pGuiFrame = pSpriteFrame->m_pFrame;
     HyTexturedQuad2d *pDrawInst = pGuiFrame->DrawInst(this);
+
+    pDrawInst->SetTransparency(1.0f);
     
     QPoint ptRenderOffset = pSpriteFrame->GetRenderOffset();
     pDrawInst->pos.X(ptRenderOffset.x());

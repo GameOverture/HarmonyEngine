@@ -43,8 +43,8 @@ HyRectangle<float> HyCamera2d::GetWorldViewBounds()
 {
 	HyRectangle<float> returnRect;
 
-	float fHalfWidth = ((m_pWindowPtr->GetResolution().x * m_ViewportRect.Width()) * 0.5f);
-	float fHalfHeight = ((m_pWindowPtr->GetResolution().y * m_ViewportRect.Height()) * 0.5f);
+	float fHalfWidth = ((m_pWindowPtr->GetResolution().x * m_ViewportRect.Width()) * 0.5f) * (1.0f / scale.X());
+	float fHalfHeight = ((m_pWindowPtr->GetResolution().y * m_ViewportRect.Height()) * 0.5f) * (1.0f / scale.Y());
 
 	returnRect.left = pos.X() - fHalfWidth;
 	returnRect.bottom = pos.Y() - fHalfHeight;

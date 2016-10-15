@@ -62,6 +62,9 @@ class WidgetFontModel : public QAbstractTableModel
         float               fSize;
         float               fOutlineThickness;
 
+        glm::vec4           vTopColor;
+        glm::vec4           vBotColor;
+
         FontLayer(int iUniqueId, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iUNIQUE_ID(iUniqueId),
                                                                                                     pReference(NULL),
                                                                                                     eMode(eRenderMode),
@@ -103,6 +106,10 @@ public:
     
     float GetLayerOutlineThickness(int iRowIndex) const;
     void SetLayerOutlineThickness(int iId, float fThickness);
+
+    QColor GetLayerTopColor(int iRowIndex) const;
+    QColor GetLayerBotColor(int iRowIndex) const;
+    void SetLayerColors(int iId, QColor topColor, QColor botColor);
     
     void MoveRowUp(int iIndex);
     void MoveRowDown(int iIndex);

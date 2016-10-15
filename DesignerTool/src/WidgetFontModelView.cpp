@@ -10,6 +10,7 @@
 #include "WidgetFontModelView.h"
 #include "ItemFontCmds.h"
 #include "WidgetFont.h"
+#include "DlgColorPicker.h"
 
 #include <QComboBox>
 #include <QSpinBox>
@@ -64,8 +65,17 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbState
         break;
 
     case WidgetFontModel::COLUMN_DefaultColor:
-        pReturnWidget = new QPushButton(pParent);
-        //static_cast<QPushButton *>(pReturnWidget)->
+        DlgColorPicker *pDlg = new DlgColorPicker(pParent);
+        if(pDlg->exec() == QDialog::Accepted)
+        {
+            m_pItemFont->GetUndoStack()->push(new ItemFontCmd_LayerColors(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
+                                                                          m_pCmbStates,
+                                                                          pFontModel->GetLayerId(index.row()),
+                                                                          pFontModel->GetLayerTopColor(index.row()),
+                                                                          pFontModel->GetLayerBotColor(index.row()),
+                                                                          pDlg->GetTopColor(),
+                                                                          pDlg->GetBotColor()));
+        }
         break;
     }
 
@@ -233,6 +243,29 @@ void WidgetFontModel::SetLayerOutlineThickness(int iId, float fThickness)
     }
 }
 
+QColor WidgetFontModel::GetLayerTopColor(int iRowIndex) const
+{
+    return QColor(m_LayerList[iRowIndex]->vTopColor.x * 255.0f, m_LayerList[iRowIndex]->vTopColor.y * 255.0f, m_LayerList[iRowIndex]->vTopColor.z * 255.0f);
+}
+
+QColor WidgetFontModel::GetLayerBotColor(int iRowIndex) const
+{
+    return QColor(m_LayerList[iRowIndex]->vBotColor.x * 255.0f, m_LayerList[iRowIndex]->vBotColor.y * 255.0f, m_LayerList[iRowIndex]->vBotColor.z * 255.0f);
+}
+
+void WidgetFontModel::SetLayerColors(int iId, QColor topColor, QColor botColor)
+{
+    for(int i = 0; i < m_LayerList.count(); ++i)
+    {
+        if(m_LayerList[i]->iUNIQUE_ID == iId)
+        {
+            m_LayerList[i]->vTopColor = glm::vec4(topColor.redF(), topColor.greenF(), topColor.blueF(), 1.0f);
+            m_LayerList[i]->vBotColor = glm::vec4(botColor.redF(), botColor.greenF(), botColor.blueF(), 1.0f);
+            dataChanged(createIndex(i, COLUMN_DefaultColor), createIndex(i, COLUMN_DefaultColor));
+        }
+    }
+}
+
 void WidgetFontModel::MoveRowUp(int iIndex)
 {
     if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
@@ -280,6 +313,33 @@ void WidgetFontModel::SetFontStageReference(int iRowIndex, FontStagePass *pStage
     {
         return Qt::AlignCenter;
     }
+
+    if(role == Qt::BackgroundRole && index.column() == COLUMN_DefaultColor)
+    {
+        QLinearGradient linearGrad(QPointF(100, 100), QPointF(200, 200));
+        linearGrad.setColorAt(0, QColor(pLayer->vTopColor.x * 255.0f, pLayer->vTopColor.y * 255.0f, pLayer->vTopColor.z * 255.0f));
+        linearGrad.setColorAt(1, QColor(pLayer->vBotColor.x * 255.0f, pLayer->vBotColor.y * 255.0f, pLayer->vBotColor.z * 255.0f));
+
+        QBrush bgColorBrush(linearGrad);
+        return QVariant(bgColorBrush);
+    }
+
+    if(role == Qt::ForegroundRole && index.column() == COLUMN_DefaultColor)
+    {
+        // Counting the perceptive luminance - human eye favors green color
+        double a = 1 - ( 0.299 * pLayer->vTopColor.x + 0.587 * pLayer->vTopColor.y + 0.114 * pLayer->vTopColor.z)/255;
+
+        if (a < 0.5)
+        {
+            QBrush bgColorBrush(Qt::black);
+            return QVariant(bgColorBrush);
+        }
+        else
+        {
+            QBrush bgColorBrush(Qt::white);
+            return QVariant(bgColorBrush);
+        }
+    }
     
     if(role == Qt::DisplayRole || role == Qt::EditRole)
     {
@@ -290,7 +350,7 @@ void WidgetFontModel::SetFontStageReference(int iRowIndex, FontStagePass *pStage
         case COLUMN_Thickness:
             return QString::number(GetLayerOutlineThickness(index.row()), 'g', 2);
         case COLUMN_DefaultColor:
-            return QVariant();//pStage->m_fOutlineThickness;
+            return "R:" % QString::number(static_cast<int>(pLayer->vTopColor.x * 255.0f)) % " G:" % QString::number(static_cast<int>(pLayer->vTopColor.y * 255.0f)) % " B:" % QString::number(static_cast<int>(pLayer->vTopColor.z * 255.0f)) % " - R:" % QString::number(static_cast<int>(pLayer->vTopColor.x * 255.0f)) % " G:" % QString::number(static_cast<int>(pLayer->vTopColor.y * 255.0f)) % " B:" % QString::number(static_cast<int>(pLayer->vTopColor.z * 255.0f));
         }
     }
 

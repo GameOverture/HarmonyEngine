@@ -293,7 +293,8 @@ void WidgetAtlasManager::HideAtlasGroup()
         pFrame->DrawInst(&atlasMan)->Load();
         pFrame->DrawInst(&atlasMan)->SetEnabled(false);
         pFrame->DrawInst(&atlasMan)->SetDisplayOrder(0);
-        pFrame->DrawInst(&atlasMan)->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+        pFrame->DrawInst(&atlasMan)->SetTint(1.0f, 1.0f, 1.0f);
+        pFrame->DrawInst(&atlasMan)->SetTransparency(1.0f);
         pFrame->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
     }
 
@@ -347,7 +348,8 @@ void WidgetAtlasManager::HideAtlasGroup()
             {
                 pHoverFrame->DrawInst(&atlasMan)->SetEnabled(false);
                 pHoverFrame->DrawInst(&atlasMan)->SetDisplayOrder(0);
-                pHoverFrame->DrawInst(&atlasMan)->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+                pHoverFrame->DrawInst(&atlasMan)->SetTint(1.0f, 1.0f, 1.0f);
+                pHoverFrame->DrawInst(&atlasMan)->SetTransparency(1.0f);
                 pHoverFrame->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
             }
         }
@@ -363,7 +365,7 @@ void WidgetAtlasManager::HideAtlasGroup()
             pFrame->DrawInst(&atlasMan)->SetDisplayOrder(100);
             pFrame->DrawInst(&atlasMan)->pos.Set((uiRENDERWIDTH * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetWidth() * -0.5f),
                                                  (uiRENDERHEIGHT * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetHeight() * -0.5f));
-            pFrame->DrawInst(&atlasMan)->color.A(0.5f);
+            pFrame->DrawInst(&atlasMan)->SetTransparency(0.5f);
         }
     }
     else if(atlasMan.m_pMouseHoverItem != pHoveredItem)
@@ -385,7 +387,8 @@ void WidgetAtlasManager::HideAtlasGroup()
         {
             pFrame->DrawInst(&atlasMan)->SetEnabled(false);
             pFrame->DrawInst(&atlasMan)->SetDisplayOrder(0);
-            pFrame->DrawInst(&atlasMan)->color.Set(1.0f, 1.0f, 1.0f, 1.0f);
+            pFrame->DrawInst(&atlasMan)->SetTint(1.0f, 1.0f, 1.0f);
+            pFrame->DrawInst(&atlasMan)->SetTransparency(1.0f);
             pFrame->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
         }
     }
@@ -410,7 +413,7 @@ void WidgetAtlasManager::HideAtlasGroup()
             continue;
 
         pFrame->DrawInst(&atlasMan)->SetEnabled(true);
-        pFrame->DrawInst(&atlasMan)->color.A(1.0f);
+        pFrame->DrawInst(&atlasMan)->SetTransparency(1.0f);
         //pFrame->DrawInst(&atlasMan)->SetDisplayOrder(-0x0FFFFFFF + i);
 
         float fFrameWidth = pFrame->IsRotated() ? pFrame->DrawInst(&atlasMan)->GetHeight() : pFrame->DrawInst(&atlasMan)->GetWidth();

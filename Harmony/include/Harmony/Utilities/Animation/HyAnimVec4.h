@@ -59,6 +59,7 @@ public:
 
 	inline void Set(float fAll)												{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].Set(fAll); }
 	inline void Set(float fXorR, float fYorG, float fZorB, float fWorA)		{ m_vAnimFloats[0] = fXorR; m_vAnimFloats[1] = fYorG; m_vAnimFloats[2] = fZorB; m_vAnimFloats[3] = fWorA; }
+	inline void Set(float fXorR, float fYorG, float fZorB)					{ m_vAnimFloats[0] = fXorR; m_vAnimFloats[1] = fYorG; m_vAnimFloats[2] = fZorB; }
 	inline void Set(const glm::vec4 &srcVec)								{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].Set(srcVec[i]); }
 	inline void Set(const HyAnimVec4 &srcVec)								{ for(int i = 0; i < NumDimensions; ++i) m_vAnimFloats[i].Set(srcVec[i]); }
 

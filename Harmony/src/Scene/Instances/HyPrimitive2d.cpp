@@ -194,7 +194,8 @@ void HyPrimitive2d::ClearData()
 	glm::mat4 mtx;
 	GetWorldTransform(mtx);
 
-	pShaderUniformsRef->Set("primitiveColor", color.Get());
+	pShaderUniformsRef->Set("primitiveTopColor", topColor.Get());
+	pShaderUniformsRef->Set("primitiveBotColor", botColor.Get());
 	pShaderUniformsRef->Set("transformMtx", mtx);
 }
 

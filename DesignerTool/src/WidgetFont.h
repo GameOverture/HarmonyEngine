@@ -70,6 +70,7 @@ class WidgetFont : public QWidget
 
     QList<FontStagePass *>      m_MasterStageList;
     bool                        m_bGlyphsDirty;
+    bool                        m_bFontPreviewDirty;
 
     QList<QAction *>            m_StateActionsList;
     WidgetFontState *           m_pCurFontState;
@@ -101,6 +102,10 @@ public:
     QSize GetAtlasDimensions(int iAtlasGrpIndex);
 
     void UpdateActions();
+
+    QString GetPreviewString();
+
+    bool ClearFontDirtyFlag();
 
 private slots:
     void on_cmbAtlasGroups_currentIndexChanged(int index);
@@ -134,6 +139,8 @@ private slots:
     void on_actionOrderLayerDownwards_triggered();
 
     void on_actionOrderLayerUpwards_triggered();
+
+    void on_txtPreviewString_editingFinished();
 
 private:
     Ui::WidgetFont *ui;

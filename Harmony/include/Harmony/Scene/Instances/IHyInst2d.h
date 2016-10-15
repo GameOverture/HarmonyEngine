@@ -72,7 +72,12 @@ public:
 	int32 GetDisplayOrder() const								{ return m_iDisplayOrder; }
 	void SetDisplayOrder(int32 iOrderValue);
 
-	HyAnimVec4													color;
+	HyAnimVec4													topColor;
+	HyAnimVec4													botColor;
+
+	void SetTint(float fR, float fG, float fB)					{ topColor.Set(fR, fG, fB); botColor.Set(fR, fG, fB); }
+
+	void SetTransparency(float fTransparency)					{ topColor.A(fTransparency); botColor.A(fTransparency); }
 
 	inline int64 GetTag()										{ return m_iTag; }
 	inline void SetTag(int64 iTag)								{ m_iTag = iTag; }

@@ -57,11 +57,12 @@ void main()																			\n\
 
 	m_TestSprite.Load();
 	m_TestSprite.SetEnabled(true);
+	m_TestSprite.SetTransparency(1.0f);
 
 	m_TestQuad.Load();
 	m_TestQuad.SetTextureSource(0, 100, 100, 500, 500);
 	
-	m_primBox.color.Set(0.0f, 0.0f, 1.0f, 1.0f);
+	m_primBox.SetTint(0.0f, 0.0f, 1.0f);
 	m_primBox.SetAsQuad(25.0f, 25.0f, false);
 	m_primBox.SetDisplayOrder(0);
 	m_primBox.pos.Set(0.0f, -25.0f);
@@ -74,7 +75,7 @@ void main()																			\n\
 	vLinePts[1].x = 2048.0f;
 	vLinePts[1].y = 0.0f;
 	m_HorzLine.SetAsEdgeChain(vLinePts, 2, false);
-	m_HorzLine.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
+	m_HorzLine.SetTint(1.0f, 0.0f, 0.0f);
 	m_HorzLine.Load();
 
 	vLinePts[0].x = 0.0f;
@@ -82,7 +83,7 @@ void main()																			\n\
 	vLinePts[1].x = 0.0f;
 	vLinePts[1].y = 2048.0f;
 	m_VertLine.SetAsEdgeChain(vLinePts, 2, false);
-	m_VertLine.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
+	m_VertLine.SetTint(1.0f, 0.0f, 0.0f);
 	m_VertLine.Load();
 
 

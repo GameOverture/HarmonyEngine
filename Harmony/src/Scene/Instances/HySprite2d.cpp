@@ -298,7 +298,10 @@ float HySprite2d::GetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vOffset;
 	pRefDataWritePos += sizeof(glm::vec2);
 
-	*reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = color.Get();
+	*reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = topColor.Get();
+	pRefDataWritePos += sizeof(glm::vec4);
+
+	*reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = botColor.Get();
 	pRefDataWritePos += sizeof(glm::vec4);
 
 	*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(frameRef.uiTEXTUREINDEX);

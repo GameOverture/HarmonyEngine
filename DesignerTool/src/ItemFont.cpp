@@ -52,15 +52,14 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     m_pFontCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.5f);
     m_pFontCamera->pos.Set(0.0f, -2500.0f);
     
-    m_DrawAtlasOutline.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
+    m_DrawAtlasOutline.SetTint(1.0f, 0.0f, 0.0f);
     m_DrawAtlasOutline.Load();
 
     m_DividerLine.SetAsQuad(10000.0f, 10.0f, false);
     m_DividerLine.pos.Set(-5000.0f, -5.0f);
-    m_DividerLine.color.Set(0.0f, 0.0f, 0.0f, 1.0f);
+    m_DividerLine.SetTint(0.0f, 0.0f, 0.0f);
     m_DividerLine.SetCoordinateType(HYCOORDTYPE_Screen, NULL);
     m_DividerLine.Load();
-
 }
 
 /*virtual*/ void ItemFont::OnUnload(IHyApplication &hyApp)
@@ -106,51 +105,59 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
     texture_atlas_t *pAtlas = pWidget->GetAtlas();
     
-    if(pAtlas)
+    if(pAtlas == NULL)
+        return;
+
+    if(pAtlas->id == 0)
     {
-        if(pAtlas->id == 0)
-        {
-            if(m_pDrawAtlasPreview && m_pDrawAtlasPreview->GetGraphicsApiHandle() != 0)
-                MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawAtlasPreview->GetGraphicsApiHandle());
+        if(m_pDrawAtlasPreview && m_pDrawAtlasPreview->GetGraphicsApiHandle() != 0)
+            MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawAtlasPreview->GetGraphicsApiHandle());
 
-            // Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
-            int iNumPixels = pAtlas->width * pAtlas->height;
-            unsigned char *pBuffer = new unsigned char[iNumPixels * 4];
-            memset(pBuffer, 0xFF, iNumPixels * 4);
+        // Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
+        int iNumPixels = pAtlas->width * pAtlas->height;
+        unsigned char *pBuffer = new unsigned char[iNumPixels * 4];
+        memset(pBuffer, 0xFF, iNumPixels * 4);
 
-            // Overwriting alpha channel
-            for(int i = 0; i < iNumPixels; ++i)
-                pBuffer[i*4+3] = pAtlas->data[i];
+        // Overwriting alpha channel
+        for(int i = 0; i < iNumPixels; ++i)
+            pBuffer[i*4+3] = pAtlas->data[i];
 
-            // Upload texture to gfx api
-            vector<unsigned char *> vPixelData;
-            vPixelData.push_back(pBuffer);
-            pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(4/*pAtlas->depth*/, pAtlas->width, pAtlas->height, vPixelData);
+        // Upload texture to gfx api
+        vector<unsigned char *> vPixelData;
+        vPixelData.push_back(pBuffer);
+        pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(4/*pAtlas->depth*/, pAtlas->width, pAtlas->height, vPixelData);
 
-            // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
-            delete m_pDrawAtlasPreview;
-            m_pDrawAtlasPreview = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
-            m_pDrawAtlasPreview->Load();
-            m_pDrawAtlasPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
-            m_pDrawAtlasPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
+        // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
+        delete m_pDrawAtlasPreview;
+        m_pDrawAtlasPreview = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
+        m_pDrawAtlasPreview->Load();
+        m_pDrawAtlasPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
+        m_pDrawAtlasPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
 
-            m_DrawAtlasOutline.SetAsQuad(pAtlas->width, pAtlas->height, true);
-        }
-        
+        m_DrawAtlasOutline.SetAsQuad(pAtlas->width, pAtlas->height, true);
+
+        // Calculate the proper zoom amount to fit the whole atlas width (plus some extra margin) in preview window
+        float fExtraMargin = 25.0f;
+        float fZoomAmt = ((hyApp.Window().GetResolution().x * 100.0f) / (pAtlas->width + (fExtraMargin * 2.0f))) / 100.0f;
+        m_pCamera->SetZoom(fZoomAmt);
+
         HyRectangle<float> atlasViewBounds = m_pCamera->GetWorldViewBounds();
-        m_pDrawAtlasPreview->pos.Set(atlasViewBounds.left, atlasViewBounds.top - pAtlas->height);
-        m_DrawAtlasOutline.pos.Set(atlasViewBounds.left, atlasViewBounds.top - pAtlas->height);
-        
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // TODO: generate m_DrawFontPreviewList here if font preview is dirty
+        m_pDrawAtlasPreview->pos.Set(atlasViewBounds.left + fExtraMargin, atlasViewBounds.top - pAtlas->height - fExtraMargin);
+        m_DrawAtlasOutline.pos.Set(m_pDrawAtlasPreview->pos.Get());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Generate m_DrawFontPreviewList here if font preview is dirty
+    if(pWidget->ClearFontDirtyFlag())
+    {
         for(int i = 0; i < m_DrawFontPreviewList.count(); ++i)
             delete m_DrawFontPreviewList[i];
-        
+
         m_DrawFontPreviewList.clear();
-        
+
         WidgetFontModel *pFontModel = pWidget->GetCurrentFontModel();
-        
-        QString sFontPreviewString = "The quick brown fox jumps over the lazy dog. 1234567890";
+
+        QString sFontPreviewString = pWidget->GetPreviewString();
 
         m_pFontCamera->pos.Set(0.0f, -2500.0f);
         glm::vec2 ptGlyphPos = m_pFontCamera->pos.Get();
@@ -161,11 +168,11 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
         for(int i = 0; i < pFontModel->rowCount(); ++i)
         {
             ptGlyphPos.x = 0.0f;
-            
+
             for(int j = 0; j < sFontPreviewString.count(); ++j)
             {
                 FontStagePass *pFontStage = pFontModel->GetStageRef(i);
-                
+
                 char cCharacter = sFontPreviewString[j].toLatin1();
                 texture_glyph_t *pGlyph = texture_font_get_glyph(pFontStage->pTextureFont, &cCharacter);
 
@@ -180,31 +187,31 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
                     char cPrevCharacter = sFontPreviewString[j - 1].toLatin1();
                     fKerning = texture_glyph_get_kerning(pGlyph, &cPrevCharacter);
                 }
-                
+
                 ptGlyphPos.x += fKerning;
                 ptGlyphPos.y = m_pFontCamera->pos.Y() - (pGlyph->height - pGlyph->offset_y);
-                
+
                 int iX = static_cast<int>(pGlyph->s0 * static_cast<float>(pAtlas->width));
-                int iY = static_cast<int>(pGlyph->t0 * static_cast<float>(pAtlas->height)) - 1;
+                int iY = static_cast<int>(pGlyph->t0 * static_cast<float>(pAtlas->height));
                 int iWidth = static_cast<int>(pGlyph->s1 * static_cast<float>(pAtlas->width)) - iX - 1;
-                int iHeight = static_cast<int>(pGlyph->t1 * static_cast<float>(pAtlas->height)) - iY;
-                
+                int iHeight = static_cast<int>(pGlyph->t1 * static_cast<float>(pAtlas->height)) - iY - 1;
+
                 HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
                 pDrawGlyphQuad->Load();
                 pDrawGlyphQuad->SetTextureSource(0, iX, iY, iWidth, iHeight);
                 pDrawGlyphQuad->pos.Set(ptGlyphPos.x + pGlyph->offset_x, ptGlyphPos.y);
-                
-                if(i == 0)
-                    pDrawGlyphQuad->color.Set(1.0f, 0.0f, 0.0f, 1.0f);
-                else if(i == 1)
-                    pDrawGlyphQuad->color.Set(0.0f, 0.0f, 1.0f, 1.0f);
-                else if(i == 2)
-                    pDrawGlyphQuad->color.Set(0.0f, 1.0f, 0.0f, 1.0f);
-                
+
+//                if(i == 0)
+//                    pDrawGlyphQuad->color.Set(1.0f, 0.0f, 0.0f, 1.0f);
+//                else if(i == 1)
+//                    pDrawGlyphQuad->color.Set(0.0f, 0.0f, 1.0f, 1.0f);
+//                else if(i == 2)
+//                    pDrawGlyphQuad->color.Set(0.0f, 1.0f, 0.0f, 1.0f);
+
                 pDrawGlyphQuad->SetDisplayOrder(i * -1);
-                
+
                 m_DrawFontPreviewList.append(pDrawGlyphQuad);
-                
+
                 ptGlyphPos.x += pGlyph->advance_x;
             }
 
@@ -214,8 +221,6 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
 
         m_pFontCamera->pos.X(fTextPixelLength * 0.5f);
     }
-
-
 }
 
 /*virtual*/ void ItemFont::OnLink(HyGuiFrame *pFrame)
