@@ -52,17 +52,23 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     m_pFontCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.5f);
     m_pFontCamera->pos.Set(0.0f, -2500.0f);
     
+    m_DrawAtlasOutline.color.Set(1.0f, 0.0f, 0.0f, 1.0f);
+    m_DrawAtlasOutline.Load();
+
     m_DividerLine.SetAsQuad(10000.0f, 10.0f, false);
     m_DividerLine.pos.Set(-5000.0f, -5.0f);
     m_DividerLine.color.Set(0.0f, 0.0f, 0.0f, 1.0f);
     m_DividerLine.SetCoordinateType(HYCOORDTYPE_Screen, NULL);
     m_DividerLine.Load();
+
 }
 
 /*virtual*/ void ItemFont::OnUnload(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->Unload();
+
+    m_DrawAtlasOutline.Unload();
     
     m_DividerLine.Unload();
     
@@ -73,6 +79,8 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->SetEnabled(true);
+
+    m_DrawAtlasOutline.SetEnabled(true);
     
     if(m_pFontCamera)
         m_pFontCamera->SetEnabled(true);
@@ -84,6 +92,8 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->SetEnabled(false);
+
+    m_DrawAtlasOutline.SetEnabled(false);
     
     if(m_pFontCamera)
         m_pFontCamera->SetEnabled(false);
@@ -123,10 +133,13 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
             m_pDrawAtlasPreview->Load();
             m_pDrawAtlasPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
             m_pDrawAtlasPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
+
+            m_DrawAtlasOutline.SetAsQuad(pAtlas->width, pAtlas->height, true);
         }
         
         HyRectangle<float> atlasViewBounds = m_pCamera->GetWorldViewBounds();
         m_pDrawAtlasPreview->pos.Set(atlasViewBounds.left, atlasViewBounds.top - pAtlas->height);
+        m_DrawAtlasOutline.pos.Set(atlasViewBounds.left, atlasViewBounds.top - pAtlas->height);
         
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // TODO: generate m_DrawFontPreviewList here if font preview is dirty
@@ -185,7 +198,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
                     pDrawGlyphQuad->color.Set(1.0f, 0.0f, 0.0f, 1.0f);
                 else if(i == 1)
                     pDrawGlyphQuad->color.Set(0.0f, 0.0f, 1.0f, 1.0f);
-                else if(i == 3)
+                else if(i == 2)
                     pDrawGlyphQuad->color.Set(0.0f, 1.0f, 0.0f, 1.0f);
                 
                 pDrawGlyphQuad->SetDisplayOrder(i * -1);

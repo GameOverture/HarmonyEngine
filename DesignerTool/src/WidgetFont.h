@@ -24,6 +24,44 @@ class WidgetFont;
 class ItemFont;
 class WidgetFontModel;
 
+struct FontStagePass
+{
+    int                 iReferenceCount;
+    int                 iTmpReferenceCount;
+
+    QString             sFontPath;
+    texture_font_t *    pTextureFont;
+    rendermode_t        eMode;
+    float               fSize;
+    float               fOutlineThickness;
+
+    FontStagePass(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iReferenceCount(0),
+                                                                                                            iTmpReferenceCount(0),
+                                                                                                            sFontPath(sFontFilePath),
+                                                                                                            pTextureFont(NULL),
+                                                                                                            eMode(eRenderMode),
+                                                                                                            fSize(fSize),
+                                                                                                            fOutlineThickness(fOutlineThickness)
+    { }
+
+    ~FontStagePass()
+    {
+        if(pTextureFont)
+            texture_font_delete(pTextureFont);
+    }
+
+    void SetFont(texture_font_t *pNewFont)
+    {
+        if(pTextureFont)
+            texture_font_delete(pTextureFont);
+
+        pTextureFont = pNewFont;
+        pTextureFont->size = fSize;
+        pTextureFont->rendermode = eMode;
+        pTextureFont->outline_thickness = fOutlineThickness;
+    }
+};
+
 class WidgetFont : public QWidget
 {
     Q_OBJECT

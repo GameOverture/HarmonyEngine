@@ -19,6 +19,8 @@
 #include <QStyledItemDelegate>
 #include <QColor>
 
+struct FontStagePass;
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class WidgetFontTableView : public QTableView
 {
@@ -50,6 +52,23 @@ public:
 class WidgetFontModel : public QAbstractTableModel
 {
     Q_OBJECT
+
+    struct FontLayer
+    {
+        const int           iUNIQUE_ID;
+        FontStagePass *     pReference;
+
+        rendermode_t        eMode;
+        float               fSize;
+        float               fOutlineThickness;
+
+        FontLayer(int iUniqueId, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iUNIQUE_ID(iUniqueId),
+                                                                                                    pReference(NULL),
+                                                                                                    eMode(eRenderMode),
+                                                                                                    fSize(fSize),
+                                                                                                    fOutlineThickness(fOutlineThickness)
+        { }
+    };
 
     static int                      sm_iUniqueIdCounter;
     QList<FontLayer *>              m_LayerList;

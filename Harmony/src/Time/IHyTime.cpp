@@ -36,8 +36,8 @@ bool IHyTime::ThrottleTime()
 	// Update all timers
 	if(m_vTimeInsts.empty() == false)
 	{
-		size_t iNumTimers = m_vTimeInsts.size();
-		for(unsigned int i = 0; i < iNumTimers; i++)
+		uint32 uiNumTimers = static_cast<uint32>(m_vTimeInsts.size());
+		for(uint32 i = 0; i < uiNumTimers; i++)
 			m_vTimeInsts[i]->Update(m_dCurDeltaTime);
 	}
 

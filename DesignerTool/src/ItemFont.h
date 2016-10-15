@@ -13,66 +13,12 @@
 #include "ItemWidget.h"
 #include "freetype-gl/freetype-gl.h"
 
-struct FontStagePass
-{
-    int                 iReferenceCount;
-    int                 iTmpReferenceCount;
-
-    QString             sFontPath;
-    texture_font_t *    pTextureFont;
-    rendermode_t        eMode;
-    float               fSize;
-    float               fOutlineThickness;
-
-    FontStagePass(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iReferenceCount(0),
-                                                                                                            iTmpReferenceCount(0),
-                                                                                                            sFontPath(sFontFilePath),
-                                                                                                            pTextureFont(NULL),
-                                                                                                            eMode(eRenderMode),
-                                                                                                            fSize(fSize),
-                                                                                                            fOutlineThickness(fOutlineThickness)
-    { }
-
-    ~FontStagePass()
-    {
-        if(pTextureFont)
-            texture_font_delete(pTextureFont);
-    }
-
-    void SetFont(texture_font_t *pNewFont)
-    {
-        if(pTextureFont)
-            texture_font_delete(pTextureFont);
-
-        pTextureFont = pNewFont;
-        pTextureFont->size = fSize;
-        pTextureFont->rendermode = eMode;
-        pTextureFont->outline_thickness = fOutlineThickness;
-    }
-};
-
-struct FontLayer
-{
-    const int           iUNIQUE_ID;
-    FontStagePass *     pReference;
-    
-    rendermode_t        eMode;
-    float               fSize;
-    float               fOutlineThickness;
-    
-    FontLayer(int iUniqueId, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iUNIQUE_ID(iUniqueId),
-                                                                                                pReference(NULL),
-                                                                                                eMode(eRenderMode),
-                                                                                                fSize(fSize),
-                                                                                                fOutlineThickness(fOutlineThickness)
-    { }
-};
-
 class ItemFont : public ItemWidget
 {
     Q_OBJECT
     
     HyTexturedQuad2d *          m_pDrawAtlasPreview;
+    HyPrimitive2d               m_DrawAtlasOutline;
     HyCamera2d *                m_pFontCamera;
     
     HyPrimitive2d               m_DividerLine;
