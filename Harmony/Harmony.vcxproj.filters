@@ -570,5 +570,8 @@
     <ClInclude Include="include\Harmony\Utilities\Animation\IHyTransform3d.h">
       <Filter>Utilities\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="include\Harmony\Input\Interop\HyInput_NULL.h">
+      <Filter>Input\Interop</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -41,15 +41,15 @@ HyText2dData::~HyText2dData(void)
 		texture_font_delete(font);
 	}
 
-	printf("Matched font               : %s\n", filename);
-	printf("Number of fonts            : %ld\n", count);
-	printf("Number of glyphs per font  : %ld\n", strlen(cache));
-	printf("Number of missed glyphs    : %ld\n", missed);
-	printf("Total number of glyphs     : %ld/%ld\n",
-		strlen(cache)*count - missed, strlen(cache)*count);
-	printf("Texture size               : %ldx%ld\n", atlas->width, atlas->height);
-	printf("Texture occupancy          : %.2f%%\n",
-		100.0*atlas->used / (float)(atlas->width*atlas->height));
+	//printf("Matched font               : %s\n", filename);
+	//printf("Number of fonts            : %ld\n", count);
+	//printf("Number of glyphs per font  : %ld\n", strlen(cache));
+	//printf("Number of missed glyphs    : %ld\n", missed);
+	//printf("Total number of glyphs     : %ld/%ld\n",
+	//	strlen(cache)*count - missed, strlen(cache)*count);
+	//printf("Texture size               : %ldx%ld\n", atlas->width, atlas->height);
+	//printf("Texture occupancy          : %.2f%%\n",
+		//100.0*atlas->used / (float)(atlas->width*atlas->height));
 
 	glClearColor(1, 1, 1, 1);
 	glEnable(GL_BLEND);

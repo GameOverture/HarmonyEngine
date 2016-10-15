@@ -54,7 +54,8 @@
     // Link to Ws2_32.lib library
 
 
-	#define snprintf _snprintf
+	// COMMENTED THIS OUT: Does not compile on VS2015 -JJK
+	//#define snprintf _snprintf
 
 #else
 

@@ -123,104 +123,104 @@ void HyOpenGLShader::Use()
 	glUseProgram(m_hProgHandle);
 }
 
-void HyOpenGLShader::SetVertexAttributePtrs(uint32 uiStartOffset)
+void HyOpenGLShader::SetVertexAttributePtrs(size_t uiStartOffset)
 {
 
 #if 0 // TODO: if OpenGL 4.3 is available
 	glBindVertexBuffer(QUADBATCH, m_hVBO2d, uiDataOffset, 132);
 #else
 
-	uint32 uiOffset = 0;
-	for(uint32 i = 0; i < m_vVertexAttributes.size(); ++i)
+	size_t uiOffset = 0;
+	for(size_t i = 0; i < m_vVertexAttributes.size(); ++i)
 	{
 		GLuint uiLocation = GetAttribLocation(m_vVertexAttributes[i].sName.c_str());
 
 		switch(m_vVertexAttributes[i].eVarType)
 		{
 		case HYSHADERVAR_bool:
-			glVertexAttribPointer(uiLocation, 1, GL_BYTE, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 1, GL_BYTE, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLboolean);
 			break;
 		case HYSHADERVAR_int:
-			glVertexAttribPointer(uiLocation, 1, GL_INT, m_vVertexAttributes[i].bNormalized, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 1, GL_INT, m_vVertexAttributes[i].bNormalized, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLint);
 			break;
 		case HYSHADERVAR_uint:
-			glVertexAttribPointer(uiLocation, 1, GL_UNSIGNED_INT, m_vVertexAttributes[i].bNormalized, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 1, GL_UNSIGNED_INT, m_vVertexAttributes[i].bNormalized, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLuint);
 			break;
 		case HYSHADERVAR_float:
-			glVertexAttribPointer(uiLocation, 1, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 1, GL_FLOAT, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLfloat);
 			break;
 		case HYSHADERVAR_double:
-			glVertexAttribLPointer(uiLocation, 1, GL_DOUBLE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribLPointer(uiLocation, 1, GL_DOUBLE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLdouble);
 			break;
 		case HYSHADERVAR_bvec2:
-			glVertexAttribPointer(uiLocation, 2, GL_BYTE, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 2, GL_BYTE, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::bvec2);
 			break;
 		case HYSHADERVAR_bvec3:
-			glVertexAttribPointer(uiLocation, 3, GL_BYTE, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 3, GL_BYTE, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::bvec3);
 			break;
 		case HYSHADERVAR_bvec4:
-			glVertexAttribPointer(uiLocation, 4, GL_BYTE, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 4, GL_BYTE, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::bvec4);
 			break;
 		case HYSHADERVAR_ivec2:
-			glVertexAttribPointer(uiLocation, 2, GL_INT, m_vVertexAttributes[i].bNormalized ? GL_TRUE : GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 2, GL_INT, m_vVertexAttributes[i].bNormalized ? GL_TRUE : GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::ivec2);
 			break;
 		case HYSHADERVAR_ivec3:
-			glVertexAttribPointer(uiLocation, 3, GL_INT, m_vVertexAttributes[i].bNormalized ? GL_TRUE : GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 3, GL_INT, m_vVertexAttributes[i].bNormalized ? GL_TRUE : GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::ivec3);
 			break;
 		case HYSHADERVAR_ivec4:
-			glVertexAttribPointer(uiLocation, 4, GL_INT, m_vVertexAttributes[i].bNormalized ? GL_TRUE : GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 4, GL_INT, m_vVertexAttributes[i].bNormalized ? GL_TRUE : GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::ivec4);
 			break;
 		case HYSHADERVAR_vec2:
-			glVertexAttribPointer(uiLocation, 2, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 2, GL_FLOAT, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec2);
 			break;
 		case HYSHADERVAR_vec3:
-			glVertexAttribPointer(uiLocation, 3, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 3, GL_FLOAT, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec3);
 			break;
 		case HYSHADERVAR_vec4:
-			glVertexAttribPointer(uiLocation, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 4, GL_FLOAT, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec4);
 			break;
 		case HYSHADERVAR_dvec2:
-			glVertexAttribLPointer(uiLocation, 2, GL_DOUBLE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribLPointer(uiLocation, 2, GL_DOUBLE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::dvec2);
 			break;
 		case HYSHADERVAR_dvec3:
-			glVertexAttribLPointer(uiLocation, 3, GL_DOUBLE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribLPointer(uiLocation, 3, GL_DOUBLE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::dvec3);
 			break;
 		case HYSHADERVAR_dvec4:
-			glVertexAttribLPointer(uiLocation, 4, GL_DOUBLE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribLPointer(uiLocation, 4, GL_DOUBLE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::dvec4);
 			break;
 		case HYSHADERVAR_mat3:
-			glVertexAttribPointer(uiLocation, 3, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 3, GL_FLOAT, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec3);
-			glVertexAttribPointer(uiLocation + 1, 3, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation + 1, 3, GL_FLOAT, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec3);
-			glVertexAttribPointer(uiLocation + 2, 3, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation + 2, 3, GL_FLOAT, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec3);
 			break;
 		case HYSHADERVAR_mat4:
-			glVertexAttribPointer(uiLocation, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 4, GL_FLOAT, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec4);
-			glVertexAttribPointer(uiLocation + 1, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation + 1, 4, GL_FLOAT, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec4);
-			glVertexAttribPointer(uiLocation + 2, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation + 2, 4, GL_FLOAT, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec4);
-			glVertexAttribPointer(uiLocation + 3, 4, GL_FLOAT, GL_FALSE, m_uiStride, (void *)(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation + 3, 4, GL_FLOAT, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec4);
 			break;
 		}

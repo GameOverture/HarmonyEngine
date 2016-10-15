@@ -43,7 +43,7 @@ typedef unsigned __int64	uint64;
 #define HY_ENDIAN_BIG		0
 
 // Diagnostics assertion
-#if defined(HY_DEBUG)
+#if defined(HY_DEBUG) && !defined(HY_PLATFORM_GUI)
 	#define HyAssert(condition, message) \
 		do { \
 			if(!(condition)) \
@@ -63,7 +63,7 @@ typedef unsigned __int64	uint64;
 			MessageBoxA(NULL, ss.str().c_str(), "Harmony Engine Error!", MB_ICONERROR); \
 			std::exit(EXIT_FAILURE); \
 		} while (false)
-#elif defined(HY_RELEASE)
+#else
 	#define HyAssert(condition, message) do { } while (false)
 	#define HyError(message) do { } while (false)
 #endif

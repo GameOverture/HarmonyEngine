@@ -13,4 +13,6 @@ build-DesignerTool-*/
 *.pdb
 *.lib
 *.user
+*.db
+*.opendb
 !HyTemplate.vcxproj.user
