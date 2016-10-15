@@ -138,11 +138,16 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
         WidgetFontModel *pFontModel = pWidget->GetCurrentFontModel();
         
         QString sFontPreviewString = "The quick brown fox jumps over the lazy dog. 1234567890";
-        
+
+        m_pFontCamera->pos.Set(0.0f, -2500.0f);
+        glm::vec2 ptGlyphPos = m_pFontCamera->pos.Get();
+
+        float fTextPixelLength = 0.0f;
+
         // Each font layer
         for(int i = 0; i < pFontModel->rowCount(); ++i)
         {
-            glm::vec2 ptGlyphPos = m_pFontCamera->pos.Get();
+            ptGlyphPos.x = 0.0f;
             
             for(int j = 0; j < sFontPreviewString.count(); ++j)
             {
@@ -150,6 +155,12 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
                 
                 char cCharacter = sFontPreviewString[j].toLatin1();
                 texture_glyph_t *pGlyph = texture_font_get_glyph(pFontStage->pTextureFont, &cCharacter);
+
+                if(pGlyph == NULL)
+                {
+                    return;
+                }
+
                 float fKerning = 0.0f;
                 if(j != 0)
                 {
@@ -183,7 +194,12 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
                 
                 ptGlyphPos.x += pGlyph->advance_x;
             }
+
+            if(fTextPixelLength < ptGlyphPos.x)
+                fTextPixelLength = ptGlyphPos.x;
         }
+
+        m_pFontCamera->pos.X(fTextPixelLength * 0.5f);
     }
 
 
