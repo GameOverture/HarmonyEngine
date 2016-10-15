@@ -39,6 +39,8 @@ class IHyTime
 	double						m_dFPSLogCounter;
 	bool						m_bDumpFPSToConsole;
 
+	int							m_iThrottleSafetyCounter;
+
 protected:
 	double						m_dCurDeltaTime;
 

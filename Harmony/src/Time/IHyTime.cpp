@@ -15,7 +15,8 @@
 IHyTime::IHyTime() :	m_dTimeManipulation(1.0f),
 						m_dCurDeltaTime(0.0),
 						m_dTotalElapsedTime(0.0),
-						m_dThrottledTime(0.0)
+						m_dThrottledTime(0.0),
+						m_iThrottleSafetyCounter(0)
 {
 }
 
@@ -42,9 +43,16 @@ bool IHyTime::ThrottleTime()
 
 	if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS)
 	{
+		m_iThrottleSafetyCounter++;
 		m_dThrottledTime -= sm_dUPDATESTEP_SECONDS;
-		return true;
+
+		if(m_iThrottleSafetyCounter < 5)
+			return true;
+		else
+			m_dThrottledTime = 0.0;
 	}
+
+	m_iThrottleSafetyCounter = 0;
 
 	return false;
 }
