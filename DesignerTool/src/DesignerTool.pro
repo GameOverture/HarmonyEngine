@@ -45,7 +45,8 @@ SOURCES += main.cpp \
     WidgetFont.cpp \
     WidgetFontModelView.cpp \
     DlgColorPicker.cpp \
-    WidgetFontState.cpp
+    WidgetFontState.cpp \
+    WidgetColor.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -79,7 +80,8 @@ HEADERS  += \
     WidgetFont.h \
     WidgetFontModelView.h \
     DlgColorPicker.h \
-    WidgetFontState.h
+    WidgetFontState.h \
+    WidgetColor.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -98,7 +100,8 @@ FORMS    += \
     WidgetSpriteState.ui \
     WidgetFont.ui \
     DlgColorPicker.ui \
-    WidgetFontState.ui
+    WidgetFontState.ui \
+    WidgetColor.ui
 
 Release:DESTDIR = ../bin/release
 Release:OBJECTS_DIR = ../bin/release/.obj

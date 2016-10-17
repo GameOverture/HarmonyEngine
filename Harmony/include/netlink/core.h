@@ -53,9 +53,9 @@
     // Requires Win7 or Vista
     // Link to Ws2_32.lib library
 
-
-	// COMMENTED THIS OUT: Does not compile on VS2015 -JJK
-	//#define snprintf _snprintf
+#if (_MSC_VER <= 1800)	// Checking VS version since this does not compile on VS2015 -JJK
+	#define snprintf _snprintf
+#endif
 
 #else
 

@@ -65,16 +65,27 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbState
         break;
 
     case WidgetFontModel::COLUMN_DefaultColor:
-        DlgColorPicker *pDlg = new DlgColorPicker(pParent);
+        DlgColorPicker *pDlg = new DlgColorPicker("Choose Font Layer Color", pParent);
         if(pDlg->exec() == QDialog::Accepted)
         {
+            QColor topColor, botColor;
+            if(pDlg->IsSolidColor())
+            {
+                topColor = pDlg->GetSolidColor();
+                botColor = pDlg->GetSolidColor();
+            }
+            else
+            {
+                topColor = pDlg->GetVgTopColor();
+                botColor = pDlg->GetVgBotColor();
+            }
             m_pItemFont->GetUndoStack()->push(new ItemFontCmd_LayerColors(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
                                                                           m_pCmbStates,
                                                                           pFontModel->GetLayerId(index.row()),
                                                                           pFontModel->GetLayerTopColor(index.row()),
                                                                           pFontModel->GetLayerBotColor(index.row()),
-                                                                          pDlg->GetTopColor(),
-                                                                          pDlg->GetBotColor()));
+                                                                          topColor,
+                                                                          botColor));
         }
         break;
     }
@@ -350,7 +361,7 @@ void WidgetFontModel::SetFontStageReference(int iRowIndex, FontStagePass *pStage
         case COLUMN_Thickness:
             return QString::number(GetLayerOutlineThickness(index.row()), 'g', 2);
         case COLUMN_DefaultColor:
-            return "R:" % QString::number(static_cast<int>(pLayer->vTopColor.x * 255.0f)) % " G:" % QString::number(static_cast<int>(pLayer->vTopColor.y * 255.0f)) % " B:" % QString::number(static_cast<int>(pLayer->vTopColor.z * 255.0f)) % " - R:" % QString::number(static_cast<int>(pLayer->vTopColor.x * 255.0f)) % " G:" % QString::number(static_cast<int>(pLayer->vTopColor.y * 255.0f)) % " B:" % QString::number(static_cast<int>(pLayer->vTopColor.z * 255.0f));
+            return "R:" % QString::number(static_cast<int>(pLayer->vTopColor.x * 255.0f)) % " G:" % QString::number(static_cast<int>(pLayer->vTopColor.y * 255.0f)) % " B:" % QString::number(static_cast<int>(pLayer->vTopColor.z * 255.0f)) % " - R:" % QString::number(static_cast<int>(pLayer->vBotColor.x * 255.0f)) % " G:" % QString::number(static_cast<int>(pLayer->vBotColor.y * 255.0f)) % " B:" % QString::number(static_cast<int>(pLayer->vBotColor.z * 255.0f));
         }
     }
 

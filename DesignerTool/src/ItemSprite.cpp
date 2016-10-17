@@ -152,7 +152,7 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
     {
         qint64 iBytesWritten = spriteFile.write(settingsDoc.toJson());
         if(0 == iBytesWritten || -1 == iBytesWritten)
-            HyGuiLog("Could not write to atlas settings file: " % spriteFile.errorString(), LOGTYPE_Error);
+            HyGuiLog("Could not write to sprite item file: " % spriteFile.errorString(), LOGTYPE_Error);
     }
     else
         HyGuiLog("Couldn't open item file " % GetAbsPath() % ": " % spriteFile.errorString(), LOGTYPE_Error);

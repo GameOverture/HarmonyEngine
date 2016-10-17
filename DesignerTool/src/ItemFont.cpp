@@ -12,6 +12,8 @@
 #include <QMenu>
 #include <QAction>
 #include <QUndoView>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 #include "MainWindow.h"
 #include "WidgetFont.h"
@@ -200,13 +202,11 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
                 pDrawGlyphQuad->Load();
                 pDrawGlyphQuad->SetTextureSource(0, iX, iY, iWidth, iHeight);
                 pDrawGlyphQuad->pos.Set(ptGlyphPos.x + pGlyph->offset_x, ptGlyphPos.y);
-
-//                if(i == 0)
-//                    pDrawGlyphQuad->color.Set(1.0f, 0.0f, 0.0f, 1.0f);
-//                else if(i == 1)
-//                    pDrawGlyphQuad->color.Set(0.0f, 0.0f, 1.0f, 1.0f);
-//                else if(i == 2)
-//                    pDrawGlyphQuad->color.Set(0.0f, 1.0f, 0.0f, 1.0f);
+                
+                QColor topColor = pFontModel->GetLayerTopColor(i);
+                QColor botColor = pFontModel->GetLayerBotColor(i);
+                pDrawGlyphQuad->topColor.Set(topColor.redF(), topColor.greenF(), topColor.blueF());
+                pDrawGlyphQuad->botColor.Set(botColor.redF(), botColor.greenF(), botColor.blueF());
 
                 pDrawGlyphQuad->SetDisplayOrder(i * -1);
 
@@ -237,4 +237,30 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
 
 /*virtual*/ void ItemFont::OnSave()
 {
+    WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
+    pWidget->SaveFontFilesToMetaDir();
+    
+    QJsonObject fontObj;
+    
+    QJsonArray typefaceArray;
+    pWidget->GetTypefaceArray(typefaceArray);
+    fontObj.insert("typefaceArray", typefaceArray);
+    
+    QJsonArray fontArray;
+    pWidget->GetFontArray(fontArray);
+    fontObj.insert("fontArray", fontArray);
+
+    QJsonDocument settingsDoc(fontObj);
+
+    QFile fontFile(GetAbsPath());
+    if(fontFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        qint64 iBytesWritten = fontFile.write(settingsDoc.toJson());
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+            HyGuiLog("Could not write to font item file: " % fontFile.errorString(), LOGTYPE_Error);
+    }
+    else
+        HyGuiLog("Couldn't open item file " % GetAbsPath() % ": " % fontFile.errorString(), LOGTYPE_Error);
+
+    fontFile.close();
 }

@@ -1,3 +1,12 @@
+/**************************************************************************
+ *	DlgColorPicker.h
+ *
+ *	Harmony Engine - Designer Tool
+ *	Copyright (c) 2016 Jason Knobler
+ *
+ *	The zlib License (zlib)
+ *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *************************************************************************/
 #ifndef DLGCOLORPICKER_H
 #define DLGCOLORPICKER_H
 
@@ -10,16 +19,17 @@ class DlgColorPicker;
 class DlgColorPicker : public QDialog
 {
     Q_OBJECT
-
-    QColor m_TopColor;
-    QColor m_BotColor;
     
 public:
-    explicit DlgColorPicker(QWidget *parent = 0);
+    explicit DlgColorPicker(QString sTitle, QWidget *parent = 0);
     ~DlgColorPicker();
+    
+    bool IsSolidColor();
 
-    QColor GetTopColor();
-    QColor GetBotColor();
+    QColor GetSolidColor();
+    
+    QColor GetVgTopColor();
+    QColor GetVgBotColor();
     
 private:
     Ui::DlgColorPicker *ui;

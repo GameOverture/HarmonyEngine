@@ -19,6 +19,7 @@
 
 #include <QDir>
 #include <QJsonDocument>
+#include <QJsonObject>
 #include <QFileDialog>
 #include <QMenu>
 
@@ -109,6 +110,7 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
 
     m_iPrevAtlasCmbIndex = ui->cmbAtlasGroups->currentIndex();
 
+    SetGlyphsDirty();
     UpdateActions();
 }
 
@@ -142,6 +144,28 @@ WidgetFontModel *WidgetFont::GetCurrentFontModel()
 
 void WidgetFont::SetGlyphsDirty()
 {
+    m_sAvailableTypefaceGlyphs.clear();
+    
+    // Assemble glyph set
+    if(ui->chk_09->isChecked())
+        m_sAvailableTypefaceGlyphs += "0123456789";
+    if(ui->chk_az->isChecked())
+        m_sAvailableTypefaceGlyphs += "abcdefghijklmnopqrstuvwxyz";
+    if(ui->chk_AZ->isChecked())
+        m_sAvailableTypefaceGlyphs += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    if(ui->chk_symbols->isChecked())
+        m_sAvailableTypefaceGlyphs += "!\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@";
+    m_sAvailableTypefaceGlyphs += ui->txtAdditionalSymbols->text();    // May contain duplicates as stated in freetype-gl documentation
+    
+    QString sRegularExp = m_sAvailableTypefaceGlyphs;
+    sRegularExp.replace('\\', "\\\\");
+    sRegularExp.replace('^', "\\^");
+    sRegularExp.replace(']', "\\]");
+    sRegularExp.replace('-', "\\-");
+    
+    m_PreviewValidator.setRegExp(QRegExp("[" % sRegularExp % "]*"));
+    ui->txtPreviewString->setValidator(&m_PreviewValidator);
+    
     m_bGlyphsDirty = true;
 }
 
@@ -230,18 +254,6 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
     for(int i = 0; i < m_MasterStageList.count(); ++i)
         m_MasterStageList[i]->iReferenceCount = m_MasterStageList[i]->iTmpReferenceCount;
     
-    // Assemble glyph set
-    QString sGlyphs;
-    if(ui->chk_09->isChecked())
-        sGlyphs += "0123456789";
-    if(ui->chk_az->isChecked())
-        sGlyphs += "abcdefghijklmnopqrstuvwxyz";
-    if(ui->chk_AZ->isChecked())
-        sGlyphs += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    if(ui->chk_symbols->isChecked())
-        sGlyphs += "!\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@";
-    sGlyphs += ui->txtAdditionalSymbols->text();    // May contain duplicates as stated in freetype-gl documentation
-
     // if 'bFindBestFit' == true, adjust atlas dimentions until we utilize efficient space on the smallest texture
     QSize atlasSize = GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
     float fAtlasSizeModifier = 1.0f;
@@ -271,7 +283,7 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
             }
 
             m_MasterStageList[i]->SetFont(pFont);
-            iNumMissedGlyphs += texture_font_load_glyphs(pFont, sGlyphs.toStdString().c_str());
+            iNumMissedGlyphs += texture_font_load_glyphs(pFont, m_sAvailableTypefaceGlyphs.toStdString().c_str());
         }
 
         if(iNumMissedGlyphs && fAtlasSizeModifier == 1.0f)
@@ -291,7 +303,7 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
     else if(bFindBestFit)
     {
         HyGuiLog("Generated " % m_pItemFont->GetName(true) % " Preview", LOGTYPE_Info);
-        HyGuiLog(QString::number(m_MasterStageList.count()) % " fonts with " % QString::number(sGlyphs.size()) % " glyphs each (totaling " % QString::number(sGlyphs.size() * m_MasterStageList.count()) % ").", LOGTYPE_Normal);
+        HyGuiLog(QString::number(m_MasterStageList.count()) % " fonts with " % QString::number(m_sAvailableTypefaceGlyphs.size()) % " glyphs each (totaling " % QString::number(m_sAvailableTypefaceGlyphs.size() * m_MasterStageList.count()) % ").", LOGTYPE_Normal);
         HyGuiLog("Font Atlas size: " % QString::number(m_pAtlas->width) % "x" % QString::number(m_pAtlas->height) % " (Utilizing " % QString::number(100.0*m_pAtlas->used / (float)(m_pAtlas->width*m_pAtlas->height)) % "%) (Num Passes: " % QString::number(iNumPasses) % " - Dimensions Modifier: " % QString::number(fAtlasSizeModifier) % ")", LOGTYPE_Normal);
     }
 
@@ -360,6 +372,115 @@ bool WidgetFont::ClearFontDirtyFlag()
     return false;
 }
 
+bool WidgetFont::SaveFontFilesToMetaDir()
+{
+    if(m_FontMetaDir.mkpath(".") == false)
+    {
+        HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
+        return false;
+    }
+    
+    for(int i = 0; i < m_MasterStageList.count(); ++i)
+    {
+        QFileInfo tmpFontFile(m_MasterStageList[i]->pTextureFont->filename);
+        QFileInfo metaFontFile(m_FontMetaDir.absoluteFilePath(tmpFontFile.fileName()));
+        
+        if(metaFontFile.exists() == false)
+        {
+            if(QFile::copy(tmpFontFile.absoluteFilePath(), metaFontFile.absoluteFilePath()) == false)
+            {
+                HyGuiLog("Could not copy font file (" % tmpFontFile.filePath() % ") to the meta directory", LOGTYPE_Error);
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
+
+void WidgetFont::GetTypefaceArray(QJsonArray &typefaceArray)
+{
+    for(int i = 0; i < m_MasterStageList.count(); ++i)
+    {
+        QJsonObject stageObj;
+        QFileInfo fontFileInfo(m_MasterStageList[i]->pTextureFont->filename);
+        
+        stageObj.insert("font", fontFileInfo.fileName());
+        stageObj.insert("size", m_MasterStageList[i]->fSize);
+        stageObj.insert("mode", m_MasterStageList[i]->eMode);
+        stageObj.insert("outlineThickness", m_MasterStageList[i]->fOutlineThickness);
+        
+        QJsonArray glyphsArray;
+        for(int j = 0; j < m_sAvailableTypefaceGlyphs.count(); ++j)
+        {
+            char cCharacter = m_sAvailableTypefaceGlyphs[j].toLatin1();
+            texture_glyph_t *pGlyph = texture_font_get_glyph(m_MasterStageList[i]->pTextureFont, &cCharacter);
+            
+            QJsonObject glyphInfoObj;
+            glyphInfoObj.insert("code", static_cast<int>(pGlyph->codepoint));
+            glyphInfoObj.insert("advance_x", pGlyph->advance_x);
+            glyphInfoObj.insert("advance_y", pGlyph->advance_y);
+            glyphInfoObj.insert("width", static_cast<int>(pGlyph->width));
+            glyphInfoObj.insert("height", static_cast<int>(pGlyph->height));
+            glyphInfoObj.insert("offset_x", pGlyph->offset_x);
+            glyphInfoObj.insert("offset_y", pGlyph->offset_y);
+            glyphInfoObj.insert("s0", pGlyph->s0);
+            glyphInfoObj.insert("t0", pGlyph->t0);
+            glyphInfoObj.insert("s1", pGlyph->s1);
+            glyphInfoObj.insert("t1", pGlyph->t1);
+            
+            QJsonObject kerningInfoObj;
+            for(int k = 0; k < m_sAvailableTypefaceGlyphs.count(); ++k)
+            {
+                char cTmpChar = m_sAvailableTypefaceGlyphs[k].toLatin1();
+                float fKerningAmt = texture_glyph_get_kerning(pGlyph, &cTmpChar);
+                
+                if(fKerningAmt != 0.0f)
+                    kerningInfoObj.insert(QString(m_sAvailableTypefaceGlyphs[k]), fKerningAmt);
+            }
+            glyphInfoObj.insert("kerning", kerningInfoObj);
+            
+            glyphsArray.append(glyphInfoObj);
+        }
+        stageObj.insert("glyphs", glyphsArray);
+        
+        typefaceArray.append(QJsonValue(stageObj));
+    }
+}
+
+void WidgetFont::GetFontArray(QJsonArray &fontArray)
+{
+    for(int i = 0; i < ui->cmbStates->count(); ++i)
+    {
+        WidgetFontState *pState = ui->cmbStates->itemData(i).value<WidgetFontState *>();
+        WidgetFontModel *pFontModel = pState->GetFontModel();
+        
+        QJsonArray layersArray;
+        for(int j = 0; j < pFontModel->rowCount(); ++j)
+        {
+            QJsonObject layerObj;
+            
+            int iIndex = 0;
+            FontStagePass *pFontStage = pFontModel->GetStageRef(j);
+            for(; iIndex < m_MasterStageList.count(); ++iIndex)
+            {
+                if(m_MasterStageList[iIndex] == pFontStage)
+                    break;
+            }
+            layerObj.insert("index", iIndex);
+            layerObj.insert("topR", pFontModel->GetLayerTopColor(j).redF());
+            layerObj.insert("topG", pFontModel->GetLayerTopColor(j).greenF());
+            layerObj.insert("topB", pFontModel->GetLayerTopColor(j).blueF());
+            layerObj.insert("botR", pFontModel->GetLayerBotColor(j).redF());
+            layerObj.insert("botG", pFontModel->GetLayerBotColor(j).greenF());
+            layerObj.insert("botB", pFontModel->GetLayerBotColor(j).blueF());
+            
+            layersArray.append(layerObj);
+        }
+        fontArray.append(layersArray);
+    }
+}
+
 void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)
 {
     if(ui->cmbAtlasGroups->currentIndex() == index)
@@ -376,8 +497,6 @@ void WidgetFont::on_chk_09_clicked()
 {
     QUndoCommand *pCmd = new ItemFontCmd_CheckBox(*this, ui->chk_09);
     m_pItemFont->GetUndoStack()->push(pCmd);
-    
-    m_bGlyphsDirty = true;
 }
 
 void WidgetFont::on_chk_az_clicked()

@@ -48,13 +48,13 @@ void main()																	\n\
 		interpUV.x = UVcoord0.x;											\n\
 		interpUV.y = UVcoord0.y;											\n\
 																			\n\
-		interpColor = topTint;												\n\
+		interpColor = botTint;												\n\
 		break;																\n\
 	case 1:																	\n\
 		interpUV.x = UVcoord1.x;											\n\
 		interpUV.y = UVcoord1.y;											\n\
 																			\n\
-		interpColor = topTint;												\n\
+		interpColor = botTint;												\n\
 		break;																\n\
 	case 2:																	\n\
 		interpUV.x = UVcoord2.x;											\n\

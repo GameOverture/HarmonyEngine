@@ -12,6 +12,7 @@
 #include "WidgetAtlasManager.h"
 #include "MainWindow.h"
 #include "ItemSprite.h"
+#include "ItemFont.h"
 #include "HyGlobal.h"
 
 #include <QFile>
@@ -253,6 +254,9 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
                 switch(eType)
                 {
                 case ITEM_Sprite:   pPrefixItem = new ItemSprite(sCurPath, *m_pAtlasMan); break;
+                case ITEM_Font:     pPrefixItem = new ItemFont(sCurPath, *m_pAtlasMan); break;
+                default:
+                    { HyGuiLog("Unknown item type in ItemProject!", LOGTYPE_Error); }
                 }
 
                 pCurTreeItem->addChild(pPrefixItem->GetTreeItem());

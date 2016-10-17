@@ -14,6 +14,7 @@
 
 #include <QWidget>
 #include <QDir>
+#include <QJsonArray>
 
 #include "freetype-gl/freetype-gl.h"
 
@@ -67,6 +68,9 @@ class WidgetFont : public QWidget
     Q_OBJECT
 
     ItemFont *                  m_pItemFont;
+    
+    QString                     m_sAvailableTypefaceGlyphs;
+    QRegExpValidator            m_PreviewValidator;
 
     QList<FontStagePass *>      m_MasterStageList;
     bool                        m_bGlyphsDirty;
@@ -106,6 +110,12 @@ public:
     QString GetPreviewString();
 
     bool ClearFontDirtyFlag();
+    
+    bool SaveFontFilesToMetaDir();
+    
+    void GetTypefaceArray(QJsonArray &typefaceArray);
+    
+    void GetFontArray(QJsonArray &fontArray);
 
 private slots:
     void on_cmbAtlasGroups_currentIndexChanged(int index);
