@@ -80,6 +80,9 @@ class WidgetFont : public QWidget
     WidgetFontState *           m_pCurFontState;
     
     texture_atlas_t *           m_pAtlas;
+    int                         m_iAtlasGroupId;
+    unsigned int                m_uiAtlasChecksum;
+    
     QDir                        m_FontMetaDir;
     int                         m_iPrevAtlasCmbIndex;
     
@@ -113,9 +116,7 @@ public:
     
     bool SaveFontFilesToMetaDir();
     
-    void GetTypefaceArray(QJsonArray &typefaceArray);
-    
-    void GetFontArray(QJsonArray &fontArray);
+    void GetFontInfo(QJsonObject &fontObj);
 
 private slots:
     void on_cmbAtlasGroups_currentIndexChanged(int index);

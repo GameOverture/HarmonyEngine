@@ -245,7 +245,7 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
         m_bGlyphsDirty = false;
     }
 
-    if(bIsDirty == false)
+    if(bIsDirty == false && bFindBestFit == false)  // If 'bFindBestFit' is true, always try generating a preview
         return;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -398,8 +398,26 @@ bool WidgetFont::SaveFontFilesToMetaDir()
     return true;
 }
 
-void WidgetFont::GetTypefaceArray(QJsonArray &typefaceArray)
+void WidgetFont::GetFontInfo(QJsonObject &fontObj)
 {
+    QJsonObject availableGlyphsObj;
+    availableGlyphsObj.insert("0-9", ui->chk_09->isChecked());
+    availableGlyphsObj.insert("A-Z", ui->chk_AZ->isChecked());
+    availableGlyphsObj.insert("a-z", ui->chk_az->isChecked());
+    availableGlyphsObj.insert("symbols", ui->chk_symbols->isChecked());
+    availableGlyphsObj.insert("additional", ui->txtAdditionalSymbols->text());
+    
+    fontObj.insert("availableGlyphs", availableGlyphsObj);
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    QJsonObject atlasObj;
+    atlasObj.insert("groupId", m_iAtlasGroupId);
+    atlasObj.insert("checksum", QJsonValue(static_cast<qint64>(m_uiAtlasChecksum)));
+
+    fontObj.insert("atlasInfo", atlasObj);
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    QJsonArray typefaceArray;
     for(int i = 0; i < m_MasterStageList.count(); ++i)
     {
         QJsonObject stageObj;
@@ -446,10 +464,10 @@ void WidgetFont::GetTypefaceArray(QJsonArray &typefaceArray)
         
         typefaceArray.append(QJsonValue(stageObj));
     }
-}
-
-void WidgetFont::GetFontArray(QJsonArray &fontArray)
-{
+    fontObj.insert("typefaceArray", typefaceArray);
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    QJsonArray fontArray;
     for(int i = 0; i < ui->cmbStates->count(); ++i)
     {
         WidgetFontState *pState = ui->cmbStates->itemData(i).value<WidgetFontState *>();
@@ -479,6 +497,7 @@ void WidgetFont::GetFontArray(QJsonArray &fontArray)
         }
         fontArray.append(layersArray);
     }
+    fontObj.insert("fontArray", fontArray);
 }
 
 void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)

@@ -68,10 +68,15 @@ public:
     void SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
     void RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // TODO: Only make these functions public
     QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem);
     QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem, QList<HyGuiFrame *> requestList);
     QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem, QList<quint32> requestList);
     void RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *> relinquishList);
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     void PreviewAtlasGroup();
     void HideAtlasGroup();

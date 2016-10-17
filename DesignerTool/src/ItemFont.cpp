@@ -17,6 +17,7 @@
 
 #include "MainWindow.h"
 #include "WidgetFont.h"
+#include "WidgetAtlasManager.h"
 
 #include "Harmony/HyEngine.h"
 
@@ -240,15 +241,14 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
     pWidget->SaveFontFilesToMetaDir();
     
+    pWidget->GeneratePreview(true);
+    // TODO: save font (sub) atlas into the atlas manager.
+    //       This will need to check to see if this (sub) atlas already existed either in this atlas group (then replace), or another one (then delete, and add new)
+    //
+    //GetAtlasManager()
+    
     QJsonObject fontObj;
-    
-    QJsonArray typefaceArray;
-    pWidget->GetTypefaceArray(typefaceArray);
-    fontObj.insert("typefaceArray", typefaceArray);
-    
-    QJsonArray fontArray;
-    pWidget->GetFontArray(fontArray);
-    fontObj.insert("fontArray", fontArray);
+    pWidget->GetFontInfo(fontObj);
 
     QJsonDocument settingsDoc(fontObj);
 
