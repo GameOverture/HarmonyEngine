@@ -237,8 +237,15 @@ public:
         if(!dir.exists())
             return false;
         
-        if(!dir.exists("include/") || !dir.exists("lib/") || !dir.exists("src/") || !dir.exists("templates/") || !dir.exists("Harmony.sln") || !dir.exists("Harmony.vcxproj"))
+        if(!dir.exists("include/") ||
+           !dir.exists("lib/") ||
+           !dir.exists("src/") ||
+           !dir.exists("templates/") ||
+           (!dir.exists("Harmony_vs2013.sln") && !dir.exists("Harmony_vs2015.sln")) ||
+           (!dir.exists("Harmony_vs2013.vcxproj") && !dir.exists("Harmony_vs2015.vcxproj")))
+        {
             return false;
+        }
         
         return true;
     }

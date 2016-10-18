@@ -18,98 +18,38 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\include\gainput\gainput.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputAllocator.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputContainers.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputDebugRenderer.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputDevice.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputDeviceBuiltIn.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputDeviceKeyboard.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputDeviceMouse.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputDevicePad.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputDeviceTouch.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputListener.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputManager.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputMap.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputInputState.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputIos.h" />
-    <ClInclude Include="..\..\..\include\gainput\GainputMapFilters.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputButtonStickGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputDoubleClickGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputGestures.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputHoldGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputPinchGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputRotateGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputSimultaneouslyDownGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\gestures\GainputTapGesture.h" />
-    <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputPlayer.h" />
-    <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputRecorder.h" />
-    <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputRecording.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\builtin\GainputInputDeviceBuiltIn.cpp" />
-    <ClCompile Include="src\dev\GainputDev.cpp" />
-    <ClCompile Include="src\dev\GainputMemoryStream.cpp" />
-    <ClCompile Include="src\dev\GainputNetAddress.cpp" />
-    <ClCompile Include="src\dev\GainputNetConnection.cpp" />
-    <ClCompile Include="src\dev\GainputNetListener.cpp" />
-    <ClCompile Include="src\gainput.cpp" />
-    <ClCompile Include="src\GainputAllocator.cpp" />
-    <ClCompile Include="src\GainputInputDeltaState.cpp" />
-    <ClCompile Include="src\GainputInputDevice.cpp" />
-    <ClCompile Include="src\GainputInputManager.cpp" />
-    <ClCompile Include="src\GainputInputMap.cpp" />
-    <ClCompile Include="src\GainputInputState.cpp" />
-    <ClCompile Include="src\GainputMapFilters.cpp" />
-    <ClCompile Include="src\gestures\GainputButtonStickGesture.cpp" />
-    <ClCompile Include="src\gestures\GainputDoubleClickGesture.cpp" />
-    <ClCompile Include="src\gestures\GainputHoldGesture.cpp" />
-    <ClCompile Include="src\gestures\GainputPinchGesture.cpp" />
-    <ClCompile Include="src\gestures\GainputRotateGesture.cpp" />
-    <ClCompile Include="src\gestures\GainputSimultaneouslyDownGesture.cpp" />
-    <ClCompile Include="src\gestures\GainputTapGesture.cpp" />
-    <ClCompile Include="src\keyboard\GainputInputDeviceKeyboard.cpp" />
-    <ClCompile Include="src\keyboard\GainputInputDeviceKeyboardMac.cpp" />
-    <ClCompile Include="src\mouse\GainputInputDeviceMouse.cpp" />
-    <ClCompile Include="src\pad\GainputInputDevicePad.cpp" />
-    <ClCompile Include="src\pad\GainputInputDevicePadMac.cpp" />
-    <ClCompile Include="src\recorder\GainputInputPlayer.cpp" />
-    <ClCompile Include="src\recorder\GainputInputRecorder.cpp" />
-    <ClCompile Include="src\recorder\GainputInputRecording.cpp" />
-    <ClCompile Include="src\touch\GainputInputDeviceTouch.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{1D5D3417-254B-4727-98AA-3E4E315AA1B9}</ProjectGuid>
+    <ProjectGuid>{04D5C584-8373-44F2-A6DF-568325CDC043}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>gainput</RootNamespace>
+    <RootNamespace>spinec</RootNamespace>
+	<ProjectName>spine-c</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -129,17 +69,20 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>$(ProjectName)d</TargetName>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>$(ProjectName)d</TargetName>
+    <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
@@ -147,12 +90,11 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../../include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../../include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,12 +103,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../../include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../../include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -175,14 +116,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../../include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../../include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -193,14 +133,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../../include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../../include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -209,6 +148,59 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\spine\Animation.h" />
+    <ClInclude Include="..\..\..\include\spine\AnimationState.h" />
+    <ClInclude Include="..\..\..\include\spine\AnimationStateData.h" />
+    <ClInclude Include="..\..\..\include\spine\Atlas.h" />
+    <ClInclude Include="..\..\..\include\spine\AtlasAttachmentLoader.h" />
+    <ClInclude Include="..\..\..\include\spine\Attachment.h" />
+    <ClInclude Include="..\..\..\include\spine\AttachmentLoader.h" />
+    <ClInclude Include="..\..\..\include\spine\Bone.h" />
+    <ClInclude Include="..\..\..\include\spine\BoneData.h" />
+    <ClInclude Include="..\..\..\include\spine\BoundingBoxAttachment.h" />
+    <ClInclude Include="..\..\..\include\spine\Event.h" />
+    <ClInclude Include="..\..\..\include\spine\EventData.h" />
+    <ClInclude Include="..\..\..\include\spine\extension.h" />
+    <ClInclude Include="..\..\..\include\spine\MeshAttachment.h" />
+    <ClInclude Include="..\..\..\include\spine\RegionAttachment.h" />
+    <ClInclude Include="..\..\..\include\spine\Skeleton.h" />
+    <ClInclude Include="..\..\..\include\spine\SkeletonBounds.h" />
+    <ClInclude Include="..\..\..\include\spine\SkeletonData.h" />
+    <ClInclude Include="..\..\..\include\spine\SkeletonJson.h" />
+    <ClInclude Include="..\..\..\include\spine\Skin.h" />
+    <ClInclude Include="..\..\..\include\spine\SkinnedMeshAttachment.h" />
+    <ClInclude Include="..\..\..\include\spine\Slot.h" />
+    <ClInclude Include="..\..\..\include\spine\SlotData.h" />
+    <ClInclude Include="..\..\..\include\spine\spine.h" />
+    <ClInclude Include="src\Json.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Animation.c" />
+    <ClCompile Include="src\AnimationState.c" />
+    <ClCompile Include="src\AnimationStateData.c" />
+    <ClCompile Include="src\Atlas.c" />
+    <ClCompile Include="src\AtlasAttachmentLoader.c" />
+    <ClCompile Include="src\Attachment.c" />
+    <ClCompile Include="src\AttachmentLoader.c" />
+    <ClCompile Include="src\Bone.c" />
+    <ClCompile Include="src\BoneData.c" />
+    <ClCompile Include="src\BoundingBoxAttachment.c" />
+    <ClCompile Include="src\Event.c" />
+    <ClCompile Include="src\EventData.c" />
+    <ClCompile Include="src\extension.c" />
+    <ClCompile Include="src\Json.c" />
+    <ClCompile Include="src\MeshAttachment.c" />
+    <ClCompile Include="src\RegionAttachment.c" />
+    <ClCompile Include="src\Skeleton.c" />
+    <ClCompile Include="src\SkeletonBounds.c" />
+    <ClCompile Include="src\SkeletonData.c" />
+    <ClCompile Include="src\SkeletonJson.c" />
+    <ClCompile Include="src\Skin.c" />
+    <ClCompile Include="src\SkinnedMeshAttachment.c" />
+    <ClCompile Include="src\Slot.c" />
+    <ClCompile Include="src\SlotData.c" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

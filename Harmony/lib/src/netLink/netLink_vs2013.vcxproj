@@ -45,6 +45,7 @@
     <ProjectGuid>{05B7CCCA-285E-4C5B-90A9-55CD0E849056}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>netLink</RootNamespace>
+	<ProjectName>netLink</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
