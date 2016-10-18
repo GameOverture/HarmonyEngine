@@ -71,7 +71,8 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
         QJsonDocument fontJsonDoc = QJsonDocument::fromJson(fontFile.readAll());
         fontFile.close();
 
-//        QJsonArray stateArray = fontJsonDoc.array();
+        QJsonObject fontObj = fontJsonDoc.object();
+        //fontObj["fontArray"].
 //        for(int i = 0; i < stateArray.size(); ++i)
 //        {
 //            QJsonObject stateObj = stateArray[i].toObject();
@@ -99,6 +100,8 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     }
     else
     {
+        SetGlyphsDirty();
+        
         ui->cmbAtlasGroups->setCurrentIndex(m_pItemFont->GetAtlasManager().CurrentAtlasGroupIndex());
         
         on_actionAddState_triggered();
@@ -110,7 +113,6 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
 
     m_iPrevAtlasCmbIndex = ui->cmbAtlasGroups->currentIndex();
 
-    SetGlyphsDirty();
     UpdateActions();
 }
 
@@ -311,6 +313,8 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
     ui->lcdCurTexHeight->display(static_cast<int>(m_pAtlas->height));
     
     ui->lcdPercentageUsed->display(static_cast<double>(100.0 * m_pAtlas->used) / static_cast<double>(m_pAtlas->width * m_pAtlas->height));
+    
+    m_pItemFont->ConvertAtlasPixelData(m_pAtlas);
     
     // Signals ItemFont to upload and refresh the preview texture
     m_pAtlas->id = 0;

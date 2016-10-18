@@ -8,6 +8,20 @@
     "extrude": 1,
     "frames": [
         {
+            "checksum": 1243416368,
+            "cropBottom": 177,
+            "cropLeft": 1,
+            "cropRight": 326,
+            "cropTop": 1,
+            "height": 330,
+            "name": "HyFont: NewFont",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 330,
+            "x": 0,
+            "y": 0
+        },
+        {
             "checksum": 1378125246,
             "cropBottom": 258,
             "cropLeft": 0,
@@ -18,7 +32,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 131,
-            "x": 0,
+            "x": 329,
             "y": 0
         },
         {
@@ -32,7 +46,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 134,
+            "x": 463,
             "y": 0
         },
         {
@@ -46,7 +60,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 292,
+            "x": 621,
             "y": 0
         },
         {
@@ -60,7 +74,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 432,
+            "x": 761,
             "y": 0
         },
         {
@@ -74,7 +88,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 614,
+            "x": 943,
             "y": 0
         },
         {
@@ -88,7 +102,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 816,
+            "x": 1145,
             "y": 0
         },
         {
@@ -102,7 +116,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 969,
+            "x": 1298,
             "y": 0
         },
         {
@@ -116,7 +130,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1187,
+            "x": 1516,
             "y": 0
         },
         {
@@ -130,7 +144,7 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1414,
+            "x": 1743,
             "y": 0
         },
         {
@@ -144,8 +158,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1639,
-            "y": 0
+            "x": 0,
+            "y": 180
         },
         {
             "checksum": 2395841508,
@@ -158,8 +172,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1823,
-            "y": 0
+            "x": 1516,
+            "y": 203
         },
         {
             "checksum": 1947406781,
@@ -172,8 +186,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1825,
-            "y": 195
+            "x": 1740,
+            "y": 212
         },
         {
             "checksum": 1695897600,
@@ -186,8 +200,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1187,
-            "y": 203
+            "x": 1298,
+            "y": 230
         },
         {
             "checksum": 1423522163,
@@ -200,8 +214,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1405,
-            "y": 212
+            "x": 1080,
+            "y": 237
         },
         {
             "checksum": 1125740907,
@@ -214,8 +228,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 979,
-            "y": 230
+            "x": 872,
+            "y": 244
         },
         {
             "checksum": 1814633419,
@@ -228,8 +242,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 764,
-            "y": 237
+            "x": 657,
+            "y": 245
         },
         {
             "checksum": 2876503751,
@@ -242,176 +256,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 555,
-            "y": 244
-        },
-        {
-            "checksum": 3087090630,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation18",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 347,
-            "y": 245
-        },
-        {
-            "checksum": 3251885963,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation17",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 139,
-            "y": 250
-        },
-        {
-            "checksum": 1545659115,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation16",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 1187,
-            "y": 398
-        },
-        {
-            "checksum": 3411446781,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation06",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 1395,
-            "y": 403
-        },
-        {
-            "checksum": 1324693881,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation11",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 1603,
-            "y": 403
-        },
-        {
-            "checksum": 3952387665,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation10",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 1811,
-            "y": 417
-        },
-        {
-            "checksum": 3109004190,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation05",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 347,
-            "y": 428
-        },
-        {
-            "checksum": 2816186394,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation21",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 555,
-            "y": 430
-        },
-        {
-            "checksum": 558505186,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation09",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 139,
-            "y": 433
-        },
-        {
-            "checksum": 1658784510,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation08",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 763,
-            "y": 441
-        },
-        {
-            "checksum": 824532313,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation15",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 971,
-            "y": 447
-        },
-        {
-            "checksum": 2269252502,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation19",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 1187,
-            "y": 581
+            "x": 184,
+            "y": 262
         },
         {
             "checksum": 3766058221,
@@ -424,22 +270,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 205,
-            "x": 1395,
-            "y": 586
-        },
-        {
-            "checksum": 2161173694,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation13",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 1603,
-            "y": 586
+            "x": 393,
+            "y": 262
         },
         {
             "checksum": 3101502437,
@@ -452,8 +284,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 205,
-            "x": 1811,
-            "y": 600
+            "x": 1516,
+            "y": 398
         },
         {
             "checksum": 870689080,
@@ -466,92 +298,36 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 205,
-            "x": 347,
-            "y": 611
+            "x": 1308,
+            "y": 425
         },
         {
-            "checksum": 3051563251,
+            "checksum": 3087090630,
             "cropBottom": 179,
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
             "height": 180,
-            "name": "tv_trans_animation14",
+            "name": "tv_trans_animation18",
             "rotate": false,
             "textureIndex": 0,
             "width": 205,
-            "x": 555,
-            "y": 613
+            "x": 1100,
+            "y": 428
         },
         {
-            "checksum": 3805806088,
+            "checksum": 2161173694,
             "cropBottom": 179,
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
             "height": 180,
-            "name": "tv_trans_animation27",
+            "name": "tv_trans_animation13",
             "rotate": false,
             "textureIndex": 0,
             "width": 205,
-            "x": 139,
-            "y": 616
-        },
-        {
-            "checksum": 3362175387,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation26",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 763,
-            "y": 624
-        },
-        {
-            "checksum": 3346782580,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation24",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 971,
-            "y": 630
-        },
-        {
-            "checksum": 2977496895,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation25",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 1187,
-            "y": 764
-        },
-        {
-            "checksum": 3981254487,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation22",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 1395,
-            "y": 769
+            "x": 1724,
+            "y": 434
         },
         {
             "checksum": 266587829,
@@ -564,8 +340,246 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 205,
-            "x": 1603,
-            "y": 769
+            "x": 393,
+            "y": 445
+        },
+        {
+            "checksum": 3362175387,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation26",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 185,
+            "y": 448
+        },
+        {
+            "checksum": 3346782580,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation24",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 601,
+            "y": 449
+        },
+        {
+            "checksum": 3051563251,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation14",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 809,
+            "y": 461
+        },
+        {
+            "checksum": 3981254487,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation22",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 1516,
+            "y": 581
+        },
+        {
+            "checksum": 2977496895,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation25",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 1308,
+            "y": 608
+        },
+        {
+            "checksum": 1324693881,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation11",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 1100,
+            "y": 611
+        },
+        {
+            "checksum": 3109004190,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation05",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 1724,
+            "y": 617
+        },
+        {
+            "checksum": 1658784510,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation08",
+            "rotate": true,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 0,
+            "y": 405
+        },
+        {
+            "checksum": 3952387665,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation10",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 393,
+            "y": 628
+        },
+        {
+            "checksum": 1545659115,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation16",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 185,
+            "y": 631
+        },
+        {
+            "checksum": 3411446781,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation06",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 601,
+            "y": 632
+        },
+        {
+            "checksum": 3251885963,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation17",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 809,
+            "y": 644
+        },
+        {
+            "checksum": 2269252502,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation19",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 1516,
+            "y": 764
+        },
+        {
+            "checksum": 558505186,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation09",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 1308,
+            "y": 791
+        },
+        {
+            "checksum": 2816186394,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation21",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 1100,
+            "y": 794
+        },
+        {
+            "checksum": 824532313,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation15",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 1724,
+            "y": 800
+        },
+        {
+            "checksum": 3805806088,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation27",
+            "rotate": false,
+            "textureIndex": 0,
+            "width": 205,
+            "x": 393,
+            "y": 811
         },
         {
             "checksum": 2485357460,
@@ -578,8 +592,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 205,
-            "x": 1811,
-            "y": 783
+            "x": 185,
+            "y": 814
         },
         {
             "checksum": 3153877517,
@@ -589,11 +603,11 @@
             "cropTop": 1,
             "height": 180,
             "name": "tv_trans_animation03",
-            "rotate": false,
+            "rotate": true,
             "textureIndex": 0,
             "width": 205,
-            "x": 347,
-            "y": 794
+            "x": 3,
+            "y": 613
         },
         {
             "checksum": 2903927902,
@@ -606,8 +620,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 205,
-            "x": 554,
-            "y": 796
+            "x": 601,
+            "y": 815
         },
         {
             "checksum": 3373001832,
@@ -620,8 +634,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 205,
-            "x": 141,
-            "y": 799
+            "x": 808,
+            "y": 827
         },
         {
             "checksum": 2283642992,
@@ -634,8 +648,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 205,
-            "x": 761,
-            "y": 807
+            "x": 1516,
+            "y": 947
         },
         {
             "checksum": 1348795426,
@@ -648,8 +662,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 967,
-            "y": 813
+            "x": 1312,
+            "y": 974
         },
         {
             "checksum": 2877555781,
@@ -662,8 +676,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1623,
-            "y": 225
+            "x": 0,
+            "y": 820
         },
         {
             "checksum": 1706590145,
@@ -676,8 +690,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1187,
-            "y": 947
+            "x": 1129,
+            "y": 977
         },
         {
             "checksum": 4097892007,
@@ -690,8 +704,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 180,
-            "x": 1370,
-            "y": 952
+            "x": 1722,
+            "y": 983
         },
         {
             "checksum": 811719801,
@@ -704,8 +718,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1553,
-            "y": 952
+            "x": 0,
+            "y": 981
         },
         {
             "checksum": 2379523202,
@@ -718,8 +732,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1734,
-            "y": 965
+            "x": 181,
+            "y": 996
         },
         {
             "checksum": 3224597060,
@@ -732,8 +746,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1887,
-            "y": 965
+            "x": 334,
+            "y": 996
         },
         {
             "checksum": 1021435203,
@@ -746,8 +760,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 205,
-            "x": 347,
-            "y": 976
+            "x": 492,
+            "y": 997
         },
         {
             "checksum": 3974661146,
@@ -760,8 +774,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 15,
-            "y": 262
+            "x": 1905,
+            "y": 983
         },
         {
             "checksum": 1008737017,
@@ -771,11 +785,11 @@
             "cropTop": 56,
             "height": 250,
             "name": "tv_popout_anim11",
-            "rotate": true,
+            "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 1,
-            "y": 405
+            "x": 646,
+            "y": 997
         },
         {
             "checksum": 3727752853,
@@ -788,8 +802,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 34,
-            "y": 546
+            "x": 1932,
+            "y": 434
         },
         {
             "checksum": 2141714927,
@@ -802,8 +816,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 18,
-            "y": 674
+            "x": 787,
+            "y": 1008
         },
         {
             "checksum": 1744615786,
@@ -816,8 +830,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 42,
-            "y": 801
+            "x": 1932,
+            "y": 562
         },
         {
             "checksum": 1496399219,
@@ -830,8 +844,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 0,
-            "y": 921
+            "x": 1932,
+            "y": 682
         },
         {
             "checksum": 3522029400,
@@ -844,8 +858,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 501,
-            "y": 978
+            "x": 1968,
+            "y": 0
         },
         {
             "checksum": 2394397811,
@@ -858,8 +872,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 270,
-            "x": 578,
-            "y": 978
+            "x": 1975,
+            "y": 114
         },
         {
             "checksum": 3362920247,
@@ -872,8 +886,8 @@
             "rotate": false,
             "textureIndex": 0,
             "width": 205,
-            "x": 1405,
-            "y": 203
+            "x": 2045,
+            "y": 0
         }
     ],
     "minFillRate": 80,

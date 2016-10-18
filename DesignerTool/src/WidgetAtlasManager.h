@@ -66,6 +66,7 @@ public:
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     HyGuiFrame *GenerateFrame(ItemWidget *pItem, QString sFrameName, unsigned char *pData, int iWidth, int iHeight, int iAtlasGroupId);
+    void ReplaceFrame(HyGuiFrame *pFrame);
 
     QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem);
     QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem, QList<HyGuiFrame *> requestList);

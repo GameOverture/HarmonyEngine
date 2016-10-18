@@ -326,7 +326,7 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
 quint32 WidgetAtlasGroup::ImportImage(QString sName, unsigned char *pData, int iWidth, int iHeight)
 {
     QImage newImage(pData, iWidth, iHeight, QImage::Format_RGBA8888);
-
+    
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
     QRect rAlphaCrop = m_Packer.crop(newImage);
 

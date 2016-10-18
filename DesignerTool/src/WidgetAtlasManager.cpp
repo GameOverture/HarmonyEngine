@@ -154,6 +154,19 @@ HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, QString sFrameN
     return NULL;
 }
 
+void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, int iAtlasGroupId)
+{
+    for(int i = 0; i < ui->atlasGroups->count(); ++i)
+    {
+        WidgetAtlasGroup *pAtlasGroup = static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i));
+
+        if(pAtlasGroup->GetId() == iAtlasGroupId)
+        {
+            pFrame->ReplaceImage(sImportImgList[i], pAtlasGroup->m_MetaDir);
+        }
+    }
+}
+
 QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem)
 {
     QList<HyGuiFrame *> returnList;

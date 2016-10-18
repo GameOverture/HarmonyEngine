@@ -18,6 +18,7 @@ class ItemFont : public ItemWidget
     Q_OBJECT
     
     HyGuiFrame *                m_pTrueAtlasFrame;
+    unsigned char *             m_pAtlasPixelData;
 
     HyTexturedQuad2d *          m_pDrawAtlasPreview;
     HyPrimitive2d               m_DrawAtlasOutline;
@@ -32,6 +33,8 @@ public:
     virtual ~ItemFont();
     
     virtual QList<QAction *> GetActionsForToolBar();
+    
+    void ConvertAtlasPixelData(texture_atlas_t *pAtlas);
     
 protected:
     virtual void OnLoad(IHyApplication &hyApp);
