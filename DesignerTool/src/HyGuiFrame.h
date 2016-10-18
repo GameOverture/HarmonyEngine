@@ -38,6 +38,7 @@ class HyGuiFrame
 
     QMap<void *, HyTexturedQuad2d *>    m_DrawInstMap;
 
+    // Private ctor as WidgetAtlasManager should only construct these
     HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
     ~HyGuiFrame();
     

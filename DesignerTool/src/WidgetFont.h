@@ -106,6 +106,8 @@ public:
     
     QDir GetFontMetaDir();
 
+    int GetSelectedAtlasId();
+
     QSize GetAtlasDimensions(int iAtlasGrpIndex);
 
     void UpdateActions();

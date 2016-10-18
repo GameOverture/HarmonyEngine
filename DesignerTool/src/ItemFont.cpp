@@ -241,11 +241,17 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
     pWidget->SaveFontFilesToMetaDir();
     
+    if(m_pTrueAtlasFrame)
+    {
+        QList<HyGuiFrame *> atlasFrameList;
+        atlasFrameList.append(m_pTrueAtlasFrame);
+        GetAtlasManager().RelinquishFrames(this, atlasFrameList);
+        m_pTrueAtlasFrame = NULL;
+    }
+
     pWidget->GeneratePreview(true);
-    // TODO: save font (sub) atlas into the atlas manager.
-    //       This will need to check to see if this (sub) atlas already existed either in this atlas group (then replace), or another one (then delete, and add new)
-    //
-    //GetAtlasManager()
+
+    m_pTrueAtlasFrame = GetAtlasManager().GenerateFrame(this, "HyFont: " % GetName(false), pWidget->GetAtlas()->data, pWidget->GetAtlas()->width, pWidget->GetAtlas()->height, pWidget->GetSelectedAtlasId());
     
     QJsonObject fontObj;
     pWidget->GetFontInfo(fontObj);

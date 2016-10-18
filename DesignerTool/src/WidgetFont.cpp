@@ -327,6 +327,11 @@ QDir WidgetFont::GetFontMetaDir()
     return m_FontMetaDir;
 }
 
+int WidgetFont::GetSelectedAtlasId()
+{
+    return m_pItemFont->GetAtlasManager().GetAtlasIdFromIndex(ui->cmbAtlasGroups->currentIndex());
+}
+
 QSize WidgetFont::GetAtlasDimensions(int iAtlasGrpIndex)
 {
     return m_pItemFont->GetAtlasManager().GetAtlasDimensions(iAtlasGrpIndex);

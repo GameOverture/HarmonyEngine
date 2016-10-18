@@ -123,74 +123,35 @@ int WidgetAtlasManager::CurrentAtlasGroupIndex()
     return ui->cmbAtlasGroups->currentIndex();
 }
 
+int WidgetAtlasManager::GetAtlasIdFromIndex(int iIndex)
+{
+    return static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(iIndex))->GetId();
+}
+
 QSize WidgetAtlasManager::GetAtlasDimensions(int iIndex)
 {
     return static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(iIndex))->GetAtlasDimensions();
 }
 
-HyGuiFrame *WidgetAtlasManager::CreateImage(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY)
+HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, QString sFrameName, unsigned char *pData, int iWidth, int iHeight, int iAtlasGroupId)
 {
-    HyGuiFrame *pNewFrame = NULL;
-    
-    if(m_DependencyMap.contains(uiChecksum))
-    {
-        HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
-    }
-    else
-    {
-        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, iW, iH, iTexIndex, bRot, iX, iY);
-        m_DependencyMap[uiChecksum] = pNewFrame;
-    }
-
-    return pNewFrame;
-}
-
-void WidgetAtlasManager::RemoveImage(HyGuiFrame *pFrame)
-{
-    m_DependencyMap.remove(pFrame->GetChecksum());
-    delete pFrame;
-}
-
-void WidgetAtlasManager::SaveData()
-{
-    QJsonArray atlasGroupArray;
     for(int i = 0; i < ui->atlasGroups->count(); ++i)
     {
-        QJsonObject atlasGroupObj;
-        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->GetAtlasInfo(atlasGroupObj);
-        atlasGroupArray.append(atlasGroupObj);
-    }
+        WidgetAtlasGroup *pAtlasGroup = static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i));
 
-    QJsonDocument atlasInfoDoc;
-    atlasInfoDoc.setArray(atlasGroupArray);
-
-    QFile atlasInfoFile(m_DataDir.absolutePath() % "/" % HYGUIPATH_DataAtlases);
-    if(atlasInfoFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
-    {
-       HyGuiLog("Couldn't open atlas data info file for writing", LOGTYPE_Error);
-    }
-    else
-    {
-        qint64 iBytesWritten = atlasInfoFile.write(atlasInfoDoc.toJson());
-        if(0 == iBytesWritten || -1 == iBytesWritten)
+        if(pAtlasGroup->GetId() == iAtlasGroupId)
         {
-            HyGuiLog("Could not write to atlas settings file: " % atlasInfoFile.errorString(), LOGTYPE_Error);
+            quint32 uiChecksum = pAtlasGroup->ImportImage(sFrameName, pData, iWidth, iHeight);
+            QList<quint32> checksumList;
+            checksumList.append(uiChecksum);
+
+            QList<HyGuiFrame *> returnList = RequestFrames(pItem, checksumList);
+            if(returnList.empty() == false)
+                return returnList[0];
         }
-
-        atlasInfoFile.close();
     }
-}
 
-void WidgetAtlasManager::SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem)
-{
-    pFrame->m_Links.insert(pItem);
-    pItem->Link(pFrame);
-}
-
-void WidgetAtlasManager::RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem)
-{
-    pFrame->m_Links.remove(pItem);
-    pItem->Unlink(pFrame);
+    return NULL;
 }
 
 QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem)
@@ -272,16 +233,6 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
 {
     for(int i = 0; i < relinquishList.size(); ++i)
         RemoveDependency(relinquishList[i], pItem);
-}
-
-void WidgetAtlasManager::PreviewAtlasGroup()
-{
-    m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_AtlasManager);
-}
-
-void WidgetAtlasManager::HideAtlasGroup()
-{
-    m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_Nothing);
 }
 
 /*friend*/ void AtlasManager_DrawOpen(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
@@ -514,6 +465,81 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
 //        ui->cmbAtlasGroups->addItem(pNewAtlas->GetName(), QVariant(pNewAtlas->GetId()));
         ui->cmbAtlasGroups->setCurrentIndex(ui->atlasGroups->currentIndex());
     }
+}
+
+void WidgetAtlasManager::PreviewAtlasGroup()
+{
+    m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_AtlasManager);
+}
+
+void WidgetAtlasManager::HideAtlasGroup()
+{
+    m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_Nothing);
+}
+
+HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY)
+{
+    HyGuiFrame *pNewFrame = NULL;
+
+    if(m_DependencyMap.contains(uiChecksum))
+    {
+        HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
+    }
+    else
+    {
+        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, iW, iH, iTexIndex, bRot, iX, iY);
+        m_DependencyMap[uiChecksum] = pNewFrame;
+    }
+
+    return pNewFrame;
+}
+
+void WidgetAtlasManager::RemoveImage(HyGuiFrame *pFrame)
+{
+    m_DependencyMap.remove(pFrame->GetChecksum());
+    delete pFrame;
+}
+
+void WidgetAtlasManager::SaveData()
+{
+    QJsonArray atlasGroupArray;
+    for(int i = 0; i < ui->atlasGroups->count(); ++i)
+    {
+        QJsonObject atlasGroupObj;
+        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->GetAtlasInfo(atlasGroupObj);
+        atlasGroupArray.append(atlasGroupObj);
+    }
+
+    QJsonDocument atlasInfoDoc;
+    atlasInfoDoc.setArray(atlasGroupArray);
+
+    QFile atlasInfoFile(m_DataDir.absolutePath() % "/" % HYGUIPATH_DataAtlases);
+    if(atlasInfoFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+    {
+       HyGuiLog("Couldn't open atlas data info file for writing", LOGTYPE_Error);
+    }
+    else
+    {
+        qint64 iBytesWritten = atlasInfoFile.write(atlasInfoDoc.toJson());
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+        {
+            HyGuiLog("Could not write to atlas settings file: " % atlasInfoFile.errorString(), LOGTYPE_Error);
+        }
+
+        atlasInfoFile.close();
+    }
+}
+
+void WidgetAtlasManager::SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem)
+{
+    pFrame->m_Links.insert(pItem);
+    pItem->Link(pFrame);
+}
+
+void WidgetAtlasManager::RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem)
+{
+    pFrame->m_Links.remove(pItem);
+    pItem->Unlink(pFrame);
 }
 
 void WidgetAtlasManager::on_atlasGroups_currentChanged(int iIndex)

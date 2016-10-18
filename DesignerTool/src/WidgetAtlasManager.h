@@ -38,6 +38,8 @@ class WidgetAtlasManager : public QWidget
 {
     Q_OBJECT
 
+    friend class WidgetAtlasGroup;
+
     ItemProject *                   m_pProjOwner;
 
     QDir                            m_MetaDir;
@@ -58,28 +60,20 @@ public:
     
     WidgetAtlasModelView *AllocateAtlasModelView();
     int CurrentAtlasGroupIndex();
+    int GetAtlasIdFromIndex(int iIndex);
     QSize GetAtlasDimensions(int iIndex);
 
-    HyGuiFrame *CreateImage(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
-    void RemoveImage(HyGuiFrame *pFrame);
-
-    void SaveData();
-
-    void SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
-    void RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
-
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // TODO: Only make these functions public
+
+    HyGuiFrame *GenerateFrame(ItemWidget *pItem, QString sFrameName, unsigned char *pData, int iWidth, int iHeight, int iAtlasGroupId);
+
     QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem);
     QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem, QList<HyGuiFrame *> requestList);
     QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem, QList<quint32> requestList);
+
     void RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *> relinquishList);
     
-    
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    void PreviewAtlasGroup();
-    void HideAtlasGroup();
 
     friend void AtlasManager_DrawOpen(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
@@ -99,6 +93,17 @@ private:
     Ui::WidgetAtlasManager *ui;
 
     void AddAtlasGroup(int iId = -1);
+
+    void PreviewAtlasGroup();
+    void HideAtlasGroup();
+
+    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
+    void RemoveImage(HyGuiFrame *pFrame);
+
+    void SaveData();
+
+    void SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
+    void RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
 };
 
 #endif // WIDGETATLASMANAGER_H

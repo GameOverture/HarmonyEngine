@@ -1,0 +1,577 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\Memory\HyMemoryHeap.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Time\Watches\HyStopwatch.cpp">
+      <Filter>Time\Watches</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\HyBitManip.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\HyStrManip.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\HyHardwareInfo.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\HyMath.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\HyAudio.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HyEngine.cpp" />
+    <ClCompile Include="src\Utilities\Animation\HyAnimFloat.cpp">
+      <Filter>Utilities\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Harmony\Threading\BasicSync.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Harmony\Threading\InteropUnix.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Harmony\Threading\stdafx.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Harmony\Threading\Threading.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Harmony\Threading\TLSEntry.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Harmony\Threading\Utils.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Harmony\Threading\WaitObject.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Harmony\Threading\WaitObjectEx.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\HyDebugPhys2d.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\HyBox2dRuntime.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\HyGfxComms.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\HyRenderState.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\HyOpenGL.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\HyOpenGLShader.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\Interop\HyOpenGL_Win.cpp">
+      <Filter>Renderer\OpenGL\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IHyApplication.cpp" />
+    <ClCompile Include="src\Time\Watches\IHyTimeInst.cpp">
+      <Filter>Time\Watches</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Time\Watches\HyTimer.cpp">
+      <Filter>Time\Watches</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Time\Interop\HyTime_Win.cpp">
+      <Filter>Time\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Time\IHyTime.cpp">
+      <Filter>Time</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\IHyRenderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Interop\HyInput_Gainput.cpp">
+      <Filter>Input\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\IHyInput.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Interop\HyInputMap_Gainput.cpp">
+      <Filter>Input\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\IHyInputMap.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\HyEntity2d.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\HyPhysEntity2d.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\HyScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HyMesh3d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HyPrimitive2d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HySound.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HySpine2d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HySprite2d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HyText2d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HyTexturedQuad2d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\IHyInst2d.cpp">
+      <Filter>Scene\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\jasonxx.cc">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\stb_image.c">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Viewport\HyWindow.cpp">
+      <Filter>Renderer\Viewport</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Diagnostics\HyGuiComms.cpp">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Diagnostics\HyLiveVarManager.cpp">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Diagnostics\HyGuiMessage.cpp">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Data\HyMesh3dData.cpp">
+      <Filter>Assets\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Data\HySfxData.cpp">
+      <Filter>Assets\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Data\HySpine2dData.cpp">
+      <Filter>Assets\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Data\HySprite2dData.cpp">
+      <Filter>Assets\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Data\HyText2dData.cpp">
+      <Filter>Assets\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Data\HyTexturedQuad2dData.cpp">
+      <Filter>Assets\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\HyAssetManager.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\HyTextures.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\HyFileIO.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\Animation\HyTweenFuncs.cpp">
+      <Filter>Utilities\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Viewport\HyCamera.cpp">
+      <Filter>Renderer\Viewport</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\IHyShader.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\Crc32.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\HyVariant.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Data\IHyData.cpp">
+      <Filter>Assets\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Data\HyPrimitive2dData.cpp">
+      <Filter>Assets\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Data\IHy2dData.cpp">
+      <Filter>Assets\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\Animation\IHyTransform2d.cpp">
+      <Filter>Utilities\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\Animation\IHyTransform3d.cpp">
+      <Filter>Utilities\Animation</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Time">
+      <UniqueIdentifier>{d2e4112c-544e-4d2c-8d4f-68444c75f167}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{55797ac0-494c-4c6f-90c7-641884b21082}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{63ed057b-9193-4adc-869f-0681e8edf56b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Afx">
+      <UniqueIdentifier>{625b30bd-af25-4a04-a1f7-668ca1153071}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Afx\Compilers">
+      <UniqueIdentifier>{b8967bae-7366-4619-88a5-d501e2e4f1f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Afx\Platforms">
+      <UniqueIdentifier>{6cfd5e75-2b18-4340-a6e5-3f2f1530aa7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\PageTypes">
+      <UniqueIdentifier>{158d1934-0b29-46ec-b547-1d4f16b9fdfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\Interop">
+      <UniqueIdentifier>{a51d0c10-cbaf-4787-82f4-8bb760d8f392}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Time\Watches">
+      <UniqueIdentifier>{66025e53-50ae-4470-871b-48b025afe0b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading">
+      <UniqueIdentifier>{59688164-7112-4eaf-8c36-916756f2726a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{9adb3b5b-b561-45a5-844e-8419105d02f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Audio">
+      <UniqueIdentifier>{674f9d66-c4d9-4b21-84bf-e4591c4ac684}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Time\Interop">
+      <UniqueIdentifier>{b2ff0804-0605-43fa-bfbd-c41b8a6dfd92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{6b89711e-e657-4696-9011-e81702fda34f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities\Containers">
+      <UniqueIdentifier>{d42e95ee-7da4-4caa-96a2-1cc254022bae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities\Animation">
+      <UniqueIdentifier>{42349797-5c4d-4251-912a-03d57d552c86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\OpenGL">
+      <UniqueIdentifier>{266ff3c9-2890-44c9-90f1-b987c1598bc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\OpenGL\Interop">
+      <UniqueIdentifier>{167448ad-d1cc-45b8-a402-87e7ee0e363b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input\Interop">
+      <UniqueIdentifier>{da3e46b7-a390-4cf8-a227-8f59da37b6c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Viewport">
+      <UniqueIdentifier>{9e5718c7-63a2-4a87-a5a2-d424a6ebc4fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{30a426c0-032d-4dbc-a560-acaad120a43f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Instances">
+      <UniqueIdentifier>{80660438-416c-412c-a17e-9611b2f4d248}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Diagnostics">
+      <UniqueIdentifier>{f30ad593-855a-4f2f-9687-8e618b4ed676}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{e2b21351-8df2-464a-9b03-dde1640d06dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Data">
+      <UniqueIdentifier>{465290dc-5ddc-437f-a8e4-3cbca5a052aa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Harmony\HyEngine.h" />
+    <ClInclude Include="include\Harmony\Afx\HyStdAfx.h">
+      <Filter>Afx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler.h">
+      <Filter>Afx\Compilers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler_GNU.h">
+      <Filter>Afx\Compilers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler_MSVC.h">
+      <Filter>Afx\Compilers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler_MWerks.h">
+      <Filter>Afx\Compilers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform.h">
+      <Filter>Afx\Platforms</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_OSX.h">
+      <Filter>Afx\Platforms</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Unix.h">
+      <Filter>Afx\Platforms</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Windows.h">
+      <Filter>Afx\Platforms</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Audio\HyAudio.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Memory\HyMemoryHeap.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Memory\Interop\HyMemAPI_Windows.h">
+      <Filter>Memory\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Memory\PageTypes\HyMedHeapPage.h">
+      <Filter>Memory\PageTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Memory\PageTypes\HySmlHeapPage.h">
+      <Filter>Memory\PageTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Time\Watches\HyStopwatch.h">
+      <Filter>Time\Watches</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\HyBitManip.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\HyHardwareInfo.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\HyMath.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\HyStrManip.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimFloat.h">
+      <Filter>Utilities\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\Containers\HyStaticArray.h">
+      <Filter>Utilities\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\BaseMacro.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\BasicSync.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\Error.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\InteropUnix.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\InteropWin.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\PlatformInterop.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\PrimitiveTypeDefs.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\stdafx.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\Threading.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\TLSEntry.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\Utils.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\WaitObject.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Threading\WaitObjectEx.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\HyDebugPhys2d.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\HyBox2dRuntime.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec2.h">
+      <Filter>Utilities\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec3.h">
+      <Filter>Utilities\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec4.h">
+      <Filter>Utilities\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\HyGfxComms.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\HyRenderState.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Afx\HyInteropAfx.h">
+      <Filter>Afx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatAfx.h">
+      <Filter>Afx\Platforms</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGL.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGLShader.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Win.h">
+      <Filter>Renderer\OpenGL\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\IHyApplication.h" />
+    <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Time\Watches\IHyTimeInst.h">
+      <Filter>Time\Watches</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Time\Watches\HyTimer.h">
+      <Filter>Time\Watches</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Time\Interop\HyTime_Win.h">
+      <Filter>Time\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Time\IHyTime.h">
+      <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\IHyRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Input\Interop\HyInput_Gainput.h">
+      <Filter>Input\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Input\IHyInput.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Input\IHyInputMap.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Input\Interop\HyInputMap_Gainput.h">
+      <Filter>Input\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\HyEntity2d.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\HyPhysEntity2d.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\HyScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HyMesh3d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HyPrimitive2d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HySound.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HySpine2d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HySprite2d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HyText2d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HyTexturedQuad2d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\IHyInst2d.h">
+      <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\stb_image.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\jsonxx.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\Viewport\HyWindow.h">
+      <Filter>Renderer\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Diagnostics\HyGuiComms.h">
+      <Filter>Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Diagnostics\HyLiveVarManager.h">
+      <Filter>Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Diagnostics\HyGuiMessage.h">
+      <Filter>Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\Data\HyMesh3dData.h">
+      <Filter>Assets\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\Data\HySfxData.h">
+      <Filter>Assets\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\Data\HySpine2dData.h">
+      <Filter>Assets\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\Data\HySprite2dData.h">
+      <Filter>Assets\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\Data\HyText2dData.h">
+      <Filter>Assets\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\Data\HyTexturedQuad2dData.h">
+      <Filter>Assets\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\Data\IHyData.h">
+      <Filter>Assets\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\HyAssetManager.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\HyFactory.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\HyTextures.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\HyFileIO.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\Animation\HyTweenFuncs.h">
+      <Filter>Utilities\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\Viewport\HyCamera.h">
+      <Filter>Renderer\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Renderer\IHyShader.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\HyVariant.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\Crc32.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\Data\HyPrimitive2dData.h">
+      <Filter>Assets\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\Data\IHy2dData.h">
+      <Filter>Assets\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\Animation\IHyTransform2d.h">
+      <Filter>Utilities\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\Animation\IHyTransform.h">
+      <Filter>Utilities\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Utilities\Animation\IHyTransform3d.h">
+      <Filter>Utilities\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Input\Interop\HyInput_NULL.h">
+      <Filter>Input\Interop</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

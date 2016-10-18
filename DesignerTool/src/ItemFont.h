@@ -17,6 +17,8 @@ class ItemFont : public ItemWidget
 {
     Q_OBJECT
     
+    HyGuiFrame *                m_pTrueAtlasFrame;
+
     HyTexturedQuad2d *          m_pDrawAtlasPreview;
     HyPrimitive2d               m_DrawAtlasOutline;
     HyCamera2d *                m_pFontCamera;

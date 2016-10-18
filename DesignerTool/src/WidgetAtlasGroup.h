@@ -29,6 +29,8 @@ class WidgetAtlasGroup;
 class WidgetAtlasGroup : public QWidget
 {
     Q_OBJECT
+
+    friend class                WidgetAtlasManager;
     
     WidgetAtlasManager *        m_pManager;
 
@@ -82,6 +84,7 @@ private:
     Ui::WidgetAtlasGroup *ui;
     
     void ImportImages(QStringList sImportImgList);
+    quint32 ImportImage(QString sName, unsigned char *pData, int iWidth, int iHeight);
     void Refresh();
 
     void WriteMetaSettings(QJsonArray frameArray);

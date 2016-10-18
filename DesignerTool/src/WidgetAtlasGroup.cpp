@@ -80,7 +80,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
             QJsonObject frameObj = frameArray[i].toObject();
 
             QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-            HyGuiFrame *pNewFrame = m_pManager->CreateImage(JSONOBJ_TOINT(frameObj, "checksum"),
+            HyGuiFrame *pNewFrame = m_pManager->CreateFrame(JSONOBJ_TOINT(frameObj, "checksum"),
                                                               frameObj["name"].toString(),
                                                               rAlphaCrop,
                                                               GetId(),
@@ -312,8 +312,7 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
         quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
         QRect rAlphaCrop = m_Packer.crop(newImage);
 
-        HyGuiFrame *pNewFrame = m_pManager->CreateImage(uiChecksum, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
-        
+        HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
         if(pNewFrame)
         {
             newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
@@ -322,6 +321,25 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
     }
 
     Refresh();
+}
+
+quint32 WidgetAtlasGroup::ImportImage(QString sName, unsigned char *pData, int iWidth, int iHeight)
+{
+    QImage newImage(pData, iWidth, iHeight, QImage::Format_RGBA8888);
+
+    quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
+    QRect rAlphaCrop = m_Packer.crop(newImage);
+
+    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
+    if(pNewFrame)
+    {
+        newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
+        m_FrameList.append(pNewFrame);
+    }
+
+    Refresh();
+
+    return uiChecksum;
 }
 
 void WidgetAtlasGroup::Refresh()
