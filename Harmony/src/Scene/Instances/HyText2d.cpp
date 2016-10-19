@@ -46,12 +46,8 @@ void HyText2d::SetString(const char *szString, ...)
 	CalcVertexBuffer();
 }
 
-// TODO: Remove this - this is a test to see if freetype is being linked into harmony
-#include "freetype-gl/freetype-gl.h"
-
 void HyText2d::CalcVertexBuffer()
 {
-	//texture_atlas_new(12, 10, 3);
 }
 
 /*virtual*/ void HyText2d::OnDataLoaded()
