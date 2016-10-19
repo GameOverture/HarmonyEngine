@@ -15,8 +15,6 @@
 #include "Assets/Data/IHy2dData.h"
 #include "Assets/HyFactory.h"
 
-#include "freetype-gl/freetype-gl.h"
-
 #include <map>
 using std::map;
 
@@ -26,16 +24,11 @@ class HyText2dData : public IHy2dData
 {
 	friend class HyFactory<HyText2dData>;
 
-	vector<ftgl::texture_font_t *>	m_vFonts;
-
 	// Only allow HyFactory instantiate
 	HyText2dData(const std::string &sPath, int32 iShaderId);
 
 public:
 	virtual ~HyText2dData();
-
-
-	ftgl::texture_glyph_t *GetGlyph(uint32 uiFontIndex, const char *pCodePoint);
 
 	virtual void DoFileLoad();
 };

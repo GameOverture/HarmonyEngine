@@ -10,7 +10,6 @@
 #include "Scene/Instances/HyText2d.h"
 
 #include "Utilities/HyStrManip.h"
-#include "freetype-gl/freetype-gl.h"
 
 #include <iostream>
 
@@ -47,66 +46,12 @@ void HyText2d::SetString(const char *szString, ...)
 	CalcVertexBuffer();
 }
 
+// TODO: Remove this - this is a test to see if freetype is being linked into harmony
+#include "freetype-gl/freetype-gl.h"
+
 void HyText2d::CalcVertexBuffer()
 {
-	if(m_eLoadState != HYLOADSTATE_Loaded)
-		return;
-
-	if(m_pVertexBuffer)
-		delete [] m_pVertexBuffer;
-
-	glm::vec4 ptVerts[4];
-	glm::vec2 vUVs[4];
-	glm::vec2 ptPenPos(0.0f);
-
-	size_t uiNumCharacters = m_sString.size();
-	m_uiBufferSizeBytes = uiNumCharacters * (4 * (sizeof(glm::vec4) + sizeof(glm::vec2)));
-	m_pVertexBuffer = HY_NEW unsigned char[m_uiBufferSizeBytes];
-
-	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pData);
-
-	unsigned char *pCurVertexWritePos = m_pVertexBuffer;
-	for(size_t i = 0; i < uiNumCharacters; ++i)
-	{
-		texture_glyph_t *glyph = pTextData->GetGlyph(m_uiCurFontIndex, &m_sString[i]);
-		if( glyph != NULL )
-		{
-			float fKerning = 0;
-			if( i > 0)
-				fKerning = texture_glyph_get_kerning(glyph, &m_sString[i-1]);
-
-			ptPenPos.x += fKerning;
-
-			float x0  = ( ptPenPos.x + glyph->offset_x );
-			float y0  = ( ptPenPos.y + glyph->offset_y );
-			float x1  = ( x0 + glyph->width );
-			float y1  = ( y0 - glyph->height );
-			float s0 = glyph->s0;
-			float t0 = glyph->t0;
-			float s1 = glyph->s1;
-			float t1 = glyph->t1;
-
-			ptVerts[0].x = x0;	ptVerts[0].y = y1;		ptVerts[0].z = 0.0f;	ptVerts[0].w = 1.0f;
-			ptVerts[1].x = x0;	ptVerts[1].y = y0;		ptVerts[1].z = 0.0f;	ptVerts[1].w = 1.0f;
-			ptVerts[2].x = x1;	ptVerts[2].y = y1;		ptVerts[2].z = 0.0f;	ptVerts[2].w = 1.0f;
-			ptVerts[3].x = x1;	ptVerts[3].y = y0;		ptVerts[3].z = 0.0f;	ptVerts[3].w = 1.0f;
-
-			vUVs[0].x = s0;		vUVs[0].y = t1;
-			vUVs[1].x = s0;		vUVs[1].y = t0;
-			vUVs[2].x = s1;		vUVs[2].y = t1;
-			vUVs[3].x = s1;		vUVs[3].y = t0;
-
-			for(int j = 0; j < 4; ++j)
-			{
-				memcpy(pCurVertexWritePos, &ptVerts[j], sizeof(glm::vec4));
-				pCurVertexWritePos += sizeof(glm::vec4);
-				memcpy(pCurVertexWritePos, &vUVs[j], sizeof(glm::vec2));
-				pCurVertexWritePos += sizeof(glm::vec2);
-			}
-
-			ptPenPos.x += glyph->advance_x;
-		}
-	}
+	//texture_atlas_new(12, 10, 3);
 }
 
 /*virtual*/ void HyText2d::OnDataLoaded()
