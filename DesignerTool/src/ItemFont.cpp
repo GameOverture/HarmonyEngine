@@ -22,8 +22,6 @@
 #include "Harmony/HyEngine.h"
 
 ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  ItemWidget(ITEM_Font, sPath, atlasManRef),
-                                                                            m_pTrueAtlasFrame(NULL),
-                                                                            m_pAtlasPixelData(NULL),
                                                                             m_pDrawAtlasPreview(NULL),
                                                                             m_pFontCamera(NULL)
 {
@@ -42,20 +40,6 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     returnList.append(FindAction(m_pEditMenu->actions(), "UndoSeparator"));
     
     return returnList;
-}
-
-void ItemFont::ConvertAtlasPixelData(texture_atlas_t *pAtlas)
-{
-    delete [] m_pAtlasPixelData;
-    
-    // Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
-    int iNumPixels = pAtlas->width * pAtlas->height;
-    m_pAtlasPixelData = new unsigned char[iNumPixels * 4];
-    memset(m_pAtlasPixelData, 0xFF, iNumPixels * 4);
-
-    // Overwriting alpha channel
-    for(int i = 0; i < iNumPixels; ++i)
-        m_pAtlasPixelData[i*4+3] = pAtlas->data[i];
 }
 
 /*virtual*/ void ItemFont::OnLoad(IHyApplication &hyApp)
@@ -134,7 +118,7 @@ void ItemFont::ConvertAtlasPixelData(texture_atlas_t *pAtlas)
 
         // Upload texture to gfx api
         vector<unsigned char *> vPixelData;
-        vPixelData.push_back(m_pAtlasPixelData);
+        vPixelData.push_back(pWidget->GetAtlasPixelData());
         pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(4 /*converted texture depth*/, pAtlas->width, pAtlas->height, vPixelData);
 
         // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
@@ -249,24 +233,9 @@ void ItemFont::ConvertAtlasPixelData(texture_atlas_t *pAtlas)
     pWidget->SaveFontFilesToMetaDir();
     
     pWidget->GeneratePreview(true);
-    if(m_pAtlasPixelData == NULL)
-    {
-        HyGuiLog("ItemFont::OnSave() tried to save with a NULL atlas pixel data", LOGTYPE_Error);
-        return;
-    }
-
-    QImage fontAtlasImage(m_pAtlasPixelData, pWidget->GetAtlas()->width, pWidget->GetAtlas()->height, QImage::Format_RGBA8888);
-    QString sName = "HyFont: " % GetName(false);
-
-    if(m_pTrueAtlasFrame)
-        GetAtlasManager().ReplaceFrame(m_pTrueAtlasFrame, sName, fontAtlasImage, m_pTrueAtlasFrame->GetAtlasGroupdId());
-    else
-        m_pTrueAtlasFrame = GetAtlasManager().GenerateFrame(this, pWidget->GetSelectedAtlasId(), sName, fontAtlasImage);
     
     QJsonObject fontObj;
-    fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetChecksum())));
     pWidget->AppendFontInfo(fontObj);
-
     QJsonDocument settingsDoc(fontObj);
 
     QFile fontFile(GetAbsPath());

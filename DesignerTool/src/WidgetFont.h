@@ -80,6 +80,8 @@ class WidgetFont : public QWidget
     WidgetFontState *           m_pCurFontState;
     
     texture_atlas_t *           m_pAtlas;
+    unsigned char *             m_pTrueAtlasPixelData;
+    HyGuiFrame *                m_pTrueAtlasFrame;
     
     QDir                        m_FontMetaDir;
     int                         m_iPrevAtlasCmbIndex;
@@ -98,9 +100,11 @@ public:
     
     void SetGlyphsDirty();
     
-    void GeneratePreview(bool bFindBestFit = false);
+    void GeneratePreview(bool bStoreIntoAtlasManager = false);
     
     texture_atlas_t *GetAtlas();
+
+    unsigned char *GetAtlasPixelData();
     
     QDir GetFontMetaDir();
 

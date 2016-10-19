@@ -29,6 +29,7 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
                                                             m_bFontPreviewDirty(false),
                                                             m_pCurFontState(NULL),
                                                             m_pAtlas(NULL),
+                                                            m_pTrueAtlasFrame(NULL),
                                                             m_FontMetaDir(m_pItemFont->GetItemProject()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirFonts)),
                                                             ui(new Ui::WidgetFont)
 {
@@ -72,7 +73,31 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
         fontFile.close();
 
         QJsonObject fontObj = fontJsonDoc.object();
-        //fontObj["fontArray"].
+
+        QJsonObject availGlyphsObj = fontObj["availableGlyphs"].toObject();
+        ui->chk_09->setChecked(availGlyphsObj["0-9"].toBool());
+        ui->chk_AZ->setChecked(availGlyphsObj["A-Z"].toBool());
+        ui->chk_az->setChecked(availGlyphsObj["a-z"].toBool());
+        ui->chk_symbols->setChecked(availGlyphsObj["symbols"].toBool());
+        ui->txtAdditionalSymbols->setText(availGlyphsObj["additional"].toString());
+        SetGlyphsDirty();
+
+        QList<quint32> requestList;
+        requestList.append(JSONOBJ_TOINT(fontObj, "checksum"));
+        QList<HyGuiFrame *> pRequestedList = m_pItemFont->GetAtlasManager().RequestFrames(m_pItemFont, requestList);
+        m_pTrueAtlasFrame = pRequestedList[0];
+
+        QJsonArray fontArray = fontObj["fontArray"].toArray();
+        for(int i = 0; i < fontArray.size(); ++i)
+        {
+            on_actionAddState_triggered();
+
+            QJsonObject layerObj = fontArray.at(i).toObject();
+
+//                    TODO: finish this loading of .hyfnt file. Also ensure that GeneratePreview() doesn't actually generate if atlas isn't dirty.
+//                          Still will want to prevent any GeneratePreivew() calls until the end of ctor however.
+        }
+
 //        for(int i = 0; i < stateArray.size(); ++i)
 //        {
 //            QJsonObject stateObj = stateArray[i].toObject();
@@ -171,7 +196,7 @@ void WidgetFont::SetGlyphsDirty()
     m_bGlyphsDirty = true;
 }
 
-void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
+void WidgetFont::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
 {
     // 'bIsDirty' will determine whether we actually need to regenerate this typeface atlas
     bool bIsDirty = false;
@@ -247,7 +272,7 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
         m_bGlyphsDirty = false;
     }
 
-    if(bIsDirty == false && bFindBestFit == false)  // If 'bFindBestFit' is true, always try generating a preview
+    if(bIsDirty == false && bStoreIntoAtlasManager == false)  // If 'bStoreIntoAtlasManager' is true, always try generating the best fit atlas
         return;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -296,13 +321,13 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
         else if(bDoInitialShrink)
             fAtlasSizeModifier = static_cast<float>(m_pAtlas->used) / static_cast<float>(m_pAtlas->width * m_pAtlas->height);
     }
-    while(bFindBestFit && (iNumMissedGlyphs != 0 || bDoInitialShrink));
+    while(bStoreIntoAtlasManager && (iNumMissedGlyphs != 0 || bDoInitialShrink));
 
     if(iNumMissedGlyphs)
     {
         HyGuiLog("Failed to generate font preview. Number of missed glyphs: " % QString::number(iNumMissedGlyphs), LOGTYPE_Info);
     }
-    else if(bFindBestFit)
+    else if(bStoreIntoAtlasManager)
     {
         HyGuiLog("Generated " % m_pItemFont->GetName(true) % " Preview", LOGTYPE_Info);
         HyGuiLog(QString::number(m_MasterStageList.count()) % " fonts with " % QString::number(m_sAvailableTypefaceGlyphs.size()) % " glyphs each (totaling " % QString::number(m_sAvailableTypefaceGlyphs.size() * m_MasterStageList.count()) % ").", LOGTYPE_Normal);
@@ -311,10 +336,27 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
 
     ui->lcdCurTexWidth->display(static_cast<int>(m_pAtlas->width));
     ui->lcdCurTexHeight->display(static_cast<int>(m_pAtlas->height));
-    
     ui->lcdPercentageUsed->display(static_cast<double>(100.0 * m_pAtlas->used) / static_cast<double>(m_pAtlas->width * m_pAtlas->height));
     
-    m_pItemFont->ConvertAtlasPixelData(m_pAtlas);
+    // Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
+    delete [] m_pTrueAtlasPixelData;
+    int iNumPixels = m_pAtlas->width * m_pAtlas->height;
+    m_pTrueAtlasPixelData = new unsigned char[iNumPixels * 4];
+    memset(m_pTrueAtlasPixelData, 0xFF, iNumPixels * 4);
+    // Overwriting alpha channel
+    for(int i = 0; i < iNumPixels; ++i)
+        m_pTrueAtlasPixelData[i*4+3] = m_pAtlas->data[i];
+
+    if(bStoreIntoAtlasManager)
+    {
+        QImage fontAtlasImage(m_pTrueAtlasPixelData, m_pAtlas->width, m_pAtlas->height, QImage::Format_RGBA8888);
+        QString sName = "HyFont: " % m_pItemFont->GetName(false);
+
+        if(m_pTrueAtlasFrame)
+            m_pItemFont->GetAtlasManager().ReplaceFrame(m_pTrueAtlasFrame, sName, fontAtlasImage);
+        else
+            m_pTrueAtlasFrame = m_pItemFont->GetAtlasManager().GenerateFrame(m_pItemFont, GetSelectedAtlasId(), sName, fontAtlasImage);
+    }
     
     // Signals ItemFont to upload and refresh the preview texture
     m_pAtlas->id = 0;
@@ -324,6 +366,11 @@ void WidgetFont::GeneratePreview(bool bFindBestFit /*= false*/)
 texture_atlas_t *WidgetFont::GetAtlas()
 {
     return m_pAtlas;
+}
+
+unsigned char *WidgetFont::GetAtlasPixelData()
+{
+    return m_pTrueAtlasPixelData;
 }
 
 QDir WidgetFont::GetFontMetaDir()
@@ -409,6 +456,8 @@ bool WidgetFont::SaveFontFilesToMetaDir()
 
 void WidgetFont::AppendFontInfo(QJsonObject &fontObj)
 {
+    fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetChecksum())));
+
     QJsonObject availableGlyphsObj;
     availableGlyphsObj.insert("0-9", ui->chk_09->isChecked());
     availableGlyphsObj.insert("A-Z", ui->chk_AZ->isChecked());

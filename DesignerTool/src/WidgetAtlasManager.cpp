@@ -159,13 +159,13 @@ HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, int iAtlasGroup
     return NULL;
 }
 
-void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newImage, int iAtlasGroupId)
+void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newImage)
 {
     for(int i = 0; i < ui->atlasGroups->count(); ++i)
     {
         WidgetAtlasGroup *pAtlasGroup = static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i));
 
-        if(pAtlasGroup->GetId() == iAtlasGroupId)
+        if(pAtlasGroup->GetId() == pFrame->GetAtlasGroupdId())
         {
             pFrame->ReplaceImage(sName, newImage, pAtlasGroup->m_MetaDir);
             return;
