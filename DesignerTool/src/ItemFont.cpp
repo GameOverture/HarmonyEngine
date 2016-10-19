@@ -264,7 +264,8 @@ void ItemFont::ConvertAtlasPixelData(texture_atlas_t *pAtlas)
         m_pTrueAtlasFrame = GetAtlasManager().GenerateFrame(this, pWidget->GetSelectedAtlasId(), sName, fontAtlasImage);
     
     QJsonObject fontObj;
-    pWidget->GetFontInfo(fontObj);
+    fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetChecksum())));
+    pWidget->AppendFontInfo(fontObj);
 
     QJsonDocument settingsDoc(fontObj);
 

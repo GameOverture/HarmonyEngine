@@ -407,7 +407,7 @@ bool WidgetFont::SaveFontFilesToMetaDir()
     return true;
 }
 
-void WidgetFont::GetFontInfo(QJsonObject &fontObj)
+void WidgetFont::AppendFontInfo(QJsonObject &fontObj)
 {
     QJsonObject availableGlyphsObj;
     availableGlyphsObj.insert("0-9", ui->chk_09->isChecked());
@@ -417,13 +417,6 @@ void WidgetFont::GetFontInfo(QJsonObject &fontObj)
     availableGlyphsObj.insert("additional", ui->txtAdditionalSymbols->text());
     
     fontObj.insert("availableGlyphs", availableGlyphsObj);
-    
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    QJsonObject atlasObj;
-    atlasObj.insert("groupId", m_iAtlasGroupId);
-    atlasObj.insert("checksum", QJsonValue(static_cast<qint64>(m_uiAtlasChecksum)));
-
-    fontObj.insert("atlasInfo", atlasObj);
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     QJsonArray typefaceArray;

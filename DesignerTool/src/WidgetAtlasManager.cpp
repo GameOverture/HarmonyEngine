@@ -504,6 +504,9 @@ void WidgetAtlasManager::RemoveImage(HyGuiFrame *pFrame)
 {
     m_DependencyMap.remove(pFrame->GetChecksum());
     delete pFrame;
+
+    // In case the removed image happened to be the current 'm_pMouseHoverItem'
+    m_pMouseHoverItem = NULL;
 }
 
 void WidgetAtlasManager::SaveData()
