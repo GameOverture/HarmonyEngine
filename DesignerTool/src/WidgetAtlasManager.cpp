@@ -16,6 +16,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QImage>
 
 #include "MainWindow.h"
 
@@ -133,7 +134,7 @@ QSize WidgetAtlasManager::GetAtlasDimensions(int iIndex)
     return static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(iIndex))->GetAtlasDimensions();
 }
 
-HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, QString sFrameName, unsigned char *pData, int iWidth, int iHeight, int iAtlasGroupId)
+HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, int iAtlasGroupId, QString sName, QImage &newImage)
 {
     for(int i = 0; i < ui->atlasGroups->count(); ++i)
     {
@@ -141,11 +142,15 @@ HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, QString sFrameN
 
         if(pAtlasGroup->GetId() == iAtlasGroupId)
         {
-            quint32 uiChecksum = pAtlasGroup->ImportImage(sFrameName, pData, iWidth, iHeight);
-            QList<quint32> checksumList;
-            checksumList.append(uiChecksum);
+            // This allocates a new HyGuiFrame into the dependency map
+            HyGuiFrame *pFrame = pAtlasGroup->ImportImage(sName, newImage);
+            pAtlasGroup->Refresh();
 
+            // This retrieves the newly created HyGuiFrame from the dependency map
+            QList<quint32> checksumList;
+            checksumList.append(pFrame->GetChecksum());
             QList<HyGuiFrame *> returnList = RequestFrames(pItem, checksumList);
+
             if(returnList.empty() == false)
                 return returnList[0];
         }
@@ -154,7 +159,7 @@ HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, QString sFrameN
     return NULL;
 }
 
-void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, int iAtlasGroupId)
+void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newImage, int iAtlasGroupId)
 {
     for(int i = 0; i < ui->atlasGroups->count(); ++i)
     {
@@ -162,34 +167,34 @@ void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, int iAtlasGroupId)
 
         if(pAtlasGroup->GetId() == iAtlasGroupId)
         {
-            pFrame->ReplaceImage(sImportImgList[i], pAtlasGroup->m_MetaDir);
+            pFrame->ReplaceImage(sName, newImage, pAtlasGroup->m_MetaDir);
+            return;
         }
     }
 }
 
 QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem)
 {
-    QList<HyGuiFrame *> returnList;
-    
     WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
     QList<QTreeWidgetItem *> selectedItems = atlasGrp.GetTreeWidget()->selectedItems();
     qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
 
+    atlasGrp.GetTreeWidget()->clearSelection();
+
+    QList<quint32> checksumRequestList;
     for(int i = 0; i < selectedItems.size(); ++i)
     {
-        QVariant v = selectedItems[i]->data(0, Qt::UserRole);
-        HyGuiFrame *pFrame = v.value<HyGuiFrame *>();
-
+        HyGuiFrame *pFrame = selectedItems[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
         if(pFrame == NULL)
             continue;
 
-        SetDependency(pFrame, pItem);
-        returnList.append(pFrame);
+        checksumRequestList.append(pFrame->GetChecksum());
     }
 
-    atlasGrp.GetTreeWidget()->clearSelection();
-    
-    return returnList;
+    if(checksumRequestList.empty())
+        return QList<HyGuiFrame *>();
+
+    return RequestFrames(pItem, checksumRequestList);
 }
 
 QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<HyGuiFrame *> requestList)
@@ -197,24 +202,11 @@ QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<H
     if(requestList.empty())
         return RequestFrames(pItem);
     
-    QList<HyGuiFrame *> returnList;
+    QList<quint32> checksumRequestList;
     for(int i = 0; i < requestList.size(); ++i)
-    {
-        QMap<quint32, HyGuiFrame *>::iterator iter = m_DependencyMap.find(requestList[i]->GetChecksum());
-        
-        if(iter == m_DependencyMap.end())
-        {
-            // TODO: Support a "Yes to all" dialog functionality here
-            HyGuiLog("Cannot find image: " % requestList[i]->GetName() % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
-        }
-        else
-        {
-            SetDependency(iter.value(), pItem);
-            returnList.append(iter.value());
-        }
-    }
-    
-    return returnList;
+        checksumRequestList.append(requestList[i]->GetChecksum());
+
+    return RequestFrames(pItem, checksumRequestList);
 }
 
 QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<quint32> requestList)
@@ -497,6 +489,7 @@ HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRec
     if(m_DependencyMap.contains(uiChecksum))
     {
         HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
+        pNewFrame = m_DependencyMap[uiChecksum];
     }
     else
     {

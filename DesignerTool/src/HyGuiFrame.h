@@ -44,6 +44,7 @@ class HyGuiFrame
     
 public:
     void ReplaceImage(QString sImgPath, QDir metaDir);
+    void ReplaceImage(QString sName, QImage &newImage, QDir metaDir);
 
     HyTexturedQuad2d *DrawInst(void *pKey);
     void DeleteDrawInst(void *pKey);

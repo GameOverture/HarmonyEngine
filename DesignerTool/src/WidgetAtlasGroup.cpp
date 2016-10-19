@@ -223,7 +223,10 @@ void WidgetAtlasGroup::on_btnAddImages_clicked()
                                                                &sSelectedFilter);
 
     if(sImportImgList.empty() == false)
+    {
         ImportImages(sImportImgList);
+        Refresh();
+    }
 }
 
 void WidgetAtlasGroup::on_btnAddDir_clicked()
@@ -270,7 +273,11 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
         }
     }
 
-    ImportImages(sImportImgList);
+    if(sImportImgList.empty() == false)
+    {
+        ImportImages(sImportImgList);
+        Refresh();
+    }
 }
 
 /*virtual*/ void WidgetAtlasGroup::enterEvent(QEvent *pEvent)
@@ -309,26 +316,14 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
 
         QImage newImage(fileInfo.absoluteFilePath());
 
-        quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
-        QRect rAlphaCrop = m_Packer.crop(newImage);
-
-        HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, fileInfo.baseName(), rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
-        if(pNewFrame)
-        {
-            newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
-            m_FrameList.append(pNewFrame);
-        }
+        ImportImage(fileInfo.baseName(), newImage);
     }
-
-    Refresh();
 }
 
-quint32 WidgetAtlasGroup::ImportImage(QString sName, unsigned char *pData, int iWidth, int iHeight)
+HyGuiFrame *WidgetAtlasGroup::ImportImage(QString sName, QImage &newImage)
 {
-    QImage newImage(pData, iWidth, iHeight, QImage::Format_RGBA8888);
-    
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
-    QRect rAlphaCrop = m_Packer.crop(newImage);
+    QRect rAlphaCrop = ImagePacker::crop(newImage);
 
     HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
     if(pNewFrame)
@@ -337,9 +332,7 @@ quint32 WidgetAtlasGroup::ImportImage(QString sName, unsigned char *pData, int i
         m_FrameList.append(pNewFrame);
     }
 
-    Refresh();
-
-    return uiChecksum;
+    return pNewFrame;
 }
 
 void WidgetAtlasGroup::Refresh()

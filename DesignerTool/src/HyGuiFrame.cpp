@@ -36,14 +36,19 @@ HyGuiFrame::~HyGuiFrame()
 void HyGuiFrame::ReplaceImage(QString sImgPath, QDir metaDir)
 {
     QFileInfo fileInfo(sImgPath);
+    QImage newImage(fileInfo.absoluteFilePath());
 
+    ReplaceImage(fileInfo.baseName(), newImage, metaDir);
+}
+
+void HyGuiFrame::ReplaceImage(QString sName, QImage &newImage, QDir metaDir)
+{
     QFile oldImageFile(metaDir.path() % "/" % ConstructImageFileName());
     if(oldImageFile.remove() == false)
-        HyGuiLog("Could not remove old meta image file when replacing " % fileInfo.baseName(), LOGTYPE_Error);
+        HyGuiLog("Could not remove old meta image file when replacing " % sName, LOGTYPE_Error);
 
-    QImage newImage(fileInfo.absoluteFilePath());
     m_uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
-    m_sName = fileInfo.baseName();
+    m_sName = sName;
     m_iWidth = newImage.width();
     m_iHeight = newImage.height();
     m_rAlphaCrop = ImagePacker::crop(newImage);
@@ -52,7 +57,8 @@ void HyGuiFrame::ReplaceImage(QString sImgPath, QDir metaDir)
     m_iPosX = -1;
     m_iPosY = -1;
 
-    newImage.save(metaDir.path() % "/" % ConstructImageFileName());
+    if(newImage.save(metaDir.path() % "/" % ConstructImageFileName()) == false)
+        HyGuiLog("Could not save frame image to meta directory: " % m_sName, LOGTYPE_Error);
 }
 
 HyTexturedQuad2d *HyGuiFrame::DrawInst(void *pKey)

@@ -244,29 +244,24 @@ void ItemFont::ConvertAtlasPixelData(texture_atlas_t *pAtlas)
 }
 
 /*virtual*/ void ItemFont::OnSave()
-{
+{ 
+    WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
+    pWidget->SaveFontFilesToMetaDir();
+    
+    pWidget->GeneratePreview(true);
     if(m_pAtlasPixelData == NULL)
     {
         HyGuiLog("ItemFont::OnSave() tried to save with a NULL atlas pixel data", LOGTYPE_Error);
         return;
     }
-        
-    WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
-    pWidget->SaveFontFilesToMetaDir();
-    
+
+    QImage fontAtlasImage(m_pAtlasPixelData, pWidget->GetAtlas()->width, pWidget->GetAtlas()->height, QImage::Format_RGBA8888);
+    QString sName = "HyFont: " % GetName(false);
+
     if(m_pTrueAtlasFrame)
-    {
-        // TODO: HALP!
-        QList<HyGuiFrame *> atlasFrameList;
-        atlasFrameList.append(m_pTrueAtlasFrame);
-        GetAtlasManager().RelinquishFrames(this, atlasFrameList);
-        m_pTrueAtlasFrame = NULL;
-    }
+        GetAtlasManager().ReplaceFrame(m_pTrueAtlasFrame, sName, fontAtlasImage, m_pTrueAtlasFrame->GetAtlasGroupdId());
     else
-    {
-        pWidget->GeneratePreview(true);
-        m_pTrueAtlasFrame = GetAtlasManager().GenerateFrame(this, "HyFont: " % GetName(false), m_pAtlasPixelData, pWidget->GetAtlas()->width, pWidget->GetAtlas()->height, pWidget->GetSelectedAtlasId());
-    }
+        m_pTrueAtlasFrame = GetAtlasManager().GenerateFrame(this, pWidget->GetSelectedAtlasId(), sName, fontAtlasImage);
     
     QJsonObject fontObj;
     pWidget->GetFontInfo(fontObj);

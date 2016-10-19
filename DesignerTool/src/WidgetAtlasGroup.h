@@ -84,7 +84,8 @@ private:
     Ui::WidgetAtlasGroup *ui;
     
     void ImportImages(QStringList sImportImgList);
-    quint32 ImportImage(QString sName, unsigned char *pData, int iWidth, int iHeight);
+    HyGuiFrame *ImportImage(QString sName, QImage &newImage);
+
     void Refresh();
 
     void WriteMetaSettings(QJsonArray frameArray);
