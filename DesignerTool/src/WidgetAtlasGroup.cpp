@@ -81,31 +81,18 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
 
             QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
             HyGuiFrame *pNewFrame = m_pManager->CreateFrame(JSONOBJ_TOINT(frameObj, "checksum"),
-                                                              frameObj["name"].toString(),
-                                                              rAlphaCrop,
-                                                              GetId(),
-                                                              frameObj["width"].toInt(),
-                                                              frameObj["height"].toInt(),
-                                                              frameObj["textureIndex"].toInt(),
-                                                              frameObj["rotate"].toBool(),
-                                                              frameObj["x"].toInt(),
-                                                              frameObj["y"].toInt());
+                                                            frameObj["name"].toString(),
+                                                            rAlphaCrop,
+                                                            GetId(),
+                                                            static_cast<eAtlasNodeType>(frameObj["type"].toInt()),
+                                                            frameObj["width"].toInt(),
+                                                            frameObj["height"].toInt(),
+                                                            frameObj["textureIndex"].toInt(),
+                                                            frameObj["rotate"].toBool(),
+                                                            frameObj["x"].toInt(),
+                                                            frameObj["y"].toInt());
 
-            eAtlasNodeType eIconType = ATLAS_Frame_Warning;
-            int iTexIndex = frameObj["textureIndex"].toInt();
-            if(iTexIndex >= 0)
-            {
-                if(iNumTextures < iTexIndex+1)
-                    iNumTextures = iTexIndex+1;
-                
-                //while(m_TextureList.empty() || m_TextureList.size() <= frameObj["textureIndex"].toInt())
-                //    m_TextureList.append(CreateTreeItem(NULL, "Texture: " % QString::number(m_TextureList.size()), ATLAS_Texture));
-
-                //pTextureTreeItem = m_TextureList[];
-                eIconType = ATLAS_Frame;
-            }
-
-            CreateTreeItem(NULL, frameObj["name"].toString(), iTexIndex, eIconType, pNewFrame);
+            CreateTreeItem(NULL, pNewFrame);
 
             m_FrameList.append(pNewFrame);
         }
@@ -316,16 +303,16 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
 
         QImage newImage(fileInfo.absoluteFilePath());
 
-        ImportImage(fileInfo.baseName(), newImage);
+        ImportImage(fileInfo.baseName(), newImage, ATLAS_Frame);
     }
 }
 
-HyGuiFrame *WidgetAtlasGroup::ImportImage(QString sName, QImage &newImage)
+HyGuiFrame *WidgetAtlasGroup::ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType)
 {
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
     QRect rAlphaCrop = ImagePacker::crop(newImage);
 
-    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), newImage.width(), newImage.height(), -1, false, -1, -1);
+    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, false, -1, -1);
     if(pNewFrame)
     {
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
@@ -411,6 +398,7 @@ void WidgetAtlasGroup::Refresh()
         frameObj.insert("width", QJsonValue(pFrame->GetSize().width()));
         frameObj.insert("height", QJsonValue(pFrame->GetSize().height()));
         frameObj.insert("textureIndex", QJsonValue(pFrame->GetTextureIndex()));
+        frameObj.insert("type", QJsonValue(pFrame->GetType()));
         frameObj.insert("rotate", QJsonValue(pFrame->IsRotated()));
         frameObj.insert("x", QJsonValue(pFrame->GetX()));
         frameObj.insert("y", QJsonValue(pFrame->GetY()));
@@ -421,13 +409,10 @@ void WidgetAtlasGroup::Refresh()
 
         frameArray.append(QJsonValue(frameObj));
 
+        CreateTreeItem(NULL, pFrame);
+        
         if(bValid == false)
-        {
-            CreateTreeItem(NULL, pFrame->GetName(), -1, ATLAS_Frame_Warning, pFrame);
             continue;
-        }
-        else
-            CreateTreeItem(NULL, pFrame->GetName(), pFrame->GetTextureIndex(), ATLAS_Frame, pFrame);
 
         QImage imgFrame(imgInfoRef.path);
 
@@ -565,7 +550,7 @@ void WidgetAtlasGroup::Refresh()
     ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
 }
 
-void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType, HyGuiFrame *pFrame)
+void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFrame)
 {
     QTreeWidgetItem *pNewTreeItem;
     if(pParent == NULL)
@@ -573,13 +558,18 @@ void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, QString sName, i
     else
         pNewTreeItem = new QTreeWidgetItem();
 
-    pNewTreeItem->setText(0, sName);
-    pNewTreeItem->setIcon(0, HyGlobal::AtlasIcon(eType));
+    pNewTreeItem->setText(0, pFrame->GetName());
 
-    if(iTextureIndex >= 0)
-        pNewTreeItem->setText(1, "Tex:" % QString::number(iTextureIndex));
+    if(pFrame->GetTextureIndex() >= 0)
+    {
+        pNewTreeItem->setIcon(0, HyGlobal::AtlasIcon(pFrame->GetType()));
+        pNewTreeItem->setText(1, "Tex:" % QString::number(pFrame->GetTextureIndex()));
+    }
     else
+    {
+        pNewTreeItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
         pNewTreeItem->setText(1, "Invalid");
+    }
 
     QVariant v; v.setValue(pFrame);
     pNewTreeItem->setData(0, Qt::UserRole, v);

@@ -85,11 +85,8 @@ WidgetFontState::WidgetFontState(WidgetFont *pOwner, QList<QAction *> stateActio
     ui->cmbFontList->blockSignals(false);
 
     // Try to find Arial as default font
-    int iArialIndex = ui->cmbFontList->findText("Arial.ttf", Qt::MatchFixedString);
-    if(iArialIndex != -1)
-        ui->cmbFontList->setCurrentIndex(iArialIndex);
-
-    m_iPrevFontCmbIndex = ui->cmbFontList->currentIndex();
+    SetSelectedFont("Arial.ttf");
+    
     m_dPrevFontSize = ui->sbSize->value();
 }
 
@@ -106,6 +103,15 @@ QString WidgetFontState::GetName()
 void WidgetFontState::SetName(QString sNewName)
 {
     m_sName = sNewName;
+}
+
+void WidgetFontState::SetSelectedFont(QString sFontName)
+{
+    int iFontIndex = ui->cmbFontList->findText(sFontName, Qt::MatchFixedString);
+    if(iFontIndex != -1)
+        ui->cmbFontList->setCurrentIndex(iFontIndex);
+
+    m_iPrevFontCmbIndex = ui->cmbFontList->currentIndex();
 }
 
 WidgetFontModel *WidgetFontState::GetFontModel()
@@ -131,6 +137,12 @@ rendermode_t WidgetFontState::GetCurSelectedRenderMode()
 float WidgetFontState::GetSize()
 {
     return static_cast<float>(ui->sbSize->value());
+}
+
+void WidgetFontState::SetSize(double dSize)
+{
+    ui->sbSize->setValue(dSize);
+    on_sbSize_editingFinished();
 }
 
 float WidgetFontState::GetThickness()

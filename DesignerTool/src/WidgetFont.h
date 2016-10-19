@@ -86,6 +86,8 @@ class WidgetFont : public QWidget
     QDir                        m_FontMetaDir;
     int                         m_iPrevAtlasCmbIndex;
     
+    bool                        m_bBlockGeneratePreview;
+    
 public:
     explicit WidgetFont(ItemFont *pOwner, QWidget *parent = 0);
     ~WidgetFont();

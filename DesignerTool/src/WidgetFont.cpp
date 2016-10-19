@@ -22,6 +22,7 @@
 #include <QJsonObject>
 #include <QFileDialog>
 #include <QMenu>
+#include <QColor>
 
 WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
                                                             m_pItemFont(pOwner),
@@ -29,11 +30,15 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
                                                             m_bFontPreviewDirty(false),
                                                             m_pCurFontState(NULL),
                                                             m_pAtlas(NULL),
+                                                            m_pTrueAtlasPixelData(NULL),
                                                             m_pTrueAtlasFrame(NULL),
                                                             m_FontMetaDir(m_pItemFont->GetItemProject()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirFonts)),
+                                                            m_iPrevAtlasCmbIndex(0),
                                                             ui(new Ui::WidgetFont)
 {
     ui->setupUi(this);
+    
+    m_bBlockGeneratePreview = true; // Avoid generating the atlas preview multiple times during initialization
 
     ui->txtPrefixAndName->setText(m_pItemFont->GetName(true));
 
@@ -86,42 +91,57 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
         requestList.append(JSONOBJ_TOINT(fontObj, "checksum"));
         QList<HyGuiFrame *> pRequestedList = m_pItemFont->GetAtlasManager().RequestFrames(m_pItemFont, requestList);
         m_pTrueAtlasFrame = pRequestedList[0];
-
-        QJsonArray fontArray = fontObj["fontArray"].toArray();
-        for(int i = 0; i < fontArray.size(); ++i)
+        
+        for(int i = 0; i < ui->cmbAtlasGroups->count(); ++i)
         {
-            on_actionAddState_triggered();
-
-            QJsonObject layerObj = fontArray.at(i).toObject();
-
-//                    TODO: finish this loading of .hyfnt file. Also ensure that GeneratePreview() doesn't actually generate if atlas isn't dirty.
-//                          Still will want to prevent any GeneratePreivew() calls until the end of ctor however.
+            if(m_pItemFont->GetAtlasManager().GetAtlasIdFromIndex(ui->cmbAtlasGroups->currentIndex()) == m_pTrueAtlasFrame->GetAtlasGroupdId())
+            {
+                m_iPrevAtlasCmbIndex = i;
+                break;
+            }
         }
-
-//        for(int i = 0; i < stateArray.size(); ++i)
-//        {
-//            QJsonObject stateObj = stateArray[i].toObject();
-
-//            m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_AddState(this, m_StateActionsList, ui->cmbStates));
-//            m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_RenameState(ui->cmbStates, stateObj["name"].toString()));
+        
+        QJsonArray stateArray = fontObj["stateArray"].toArray();
+        QJsonArray typefaceArray = fontObj["typefaceArray"].toArray();
+        
+        for(int i = 0; i < stateArray.size(); ++i)
+        {
+            QJsonObject stateObj = stateArray.at(i).toObject();
             
-//            QJsonArray spriteFrameArray = stateObj["frames"].toArray();
-//            for(int j = 0; j < spriteFrameArray.size(); ++j)
-//            {
-//                QJsonObject spriteFrameObj = spriteFrameArray[j].toObject();
+            m_pItemFont->GetUndoStack()->push(new ItemFontCmd_AddState(*this, m_StateActionsList, ui->cmbStates));
+            m_pItemFont->GetUndoStack()->push(new ItemFontCmd_RenameState(ui->cmbStates, stateObj["name"].toString()));
+            
+            QJsonArray layerArray = stateObj["layers"].toArray();
+            for(int j = 0; j < layerArray.size(); ++j)
+            {
+                QJsonObject layerObj = layerArray.at(j).toObject();
+                QJsonObject typefaceObj = typefaceArray.at(layerObj["typefaceIndex"].toInt()).toObject();
+                WidgetFontModel *pCurFontModel = m_pCurFontState->GetFontModel();
                 
-//                QList<quint32> requestList;
-//                requestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
-//                QList<HyGuiFrame *> pRequestedList = m_pItemSprite->GetAtlasManager().RequestFrames(m_pItemSprite, requestList);
-
-//                WidgetSpriteState *pSpriteState = GetCurSpriteState();
-
-//                QPoint vOffset(spriteFrameObj["offsetX"].toInt() - pRequestedList[0]->GetCrop().left(),
-//                               spriteFrameObj["offsetY"].toInt() - (pRequestedList[0]->GetSize().height() - pRequestedList[0]->GetCrop().bottom()));
-//                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetFrame(pSpriteState->GetFrameView(), j, vOffset));
-//                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_DurationFrame(pSpriteState->GetFrameView(), j, spriteFrameObj["duration"].toDouble()));
-//            }
-//        }
+                if(j == 0) // Only need to set the state's font and size once
+                {
+                    m_pCurFontState->SetSelectedFont(typefaceObj["font"].toString());
+                    m_pCurFontState->SetSize(typefaceObj["size"].toDouble());
+                }
+                
+                m_pItemFont->GetUndoStack()->push(new ItemFontCmd_AddLayer(*this,
+                                                                           ui->cmbStates,
+                                                                           static_cast<rendermode_t>(typefaceObj["mode"].toInt()),
+                                                                           typefaceObj["size"].toDouble(),
+                                                                           typefaceObj["outlineThickness"].toDouble()));
+                
+                QColor topColor, botColor;
+                topColor.setRgbF(layerObj["topR"].toDouble(), layerObj["topG"].toDouble(), layerObj["topB"].toDouble());
+                botColor.setRgbF(layerObj["botR"].toDouble(), layerObj["botG"].toDouble(), layerObj["botB"].toDouble());
+                m_pItemFont->GetUndoStack()->push(new ItemFontCmd_LayerColors(*this,
+                                                                              ui->cmbStates,
+                                                                              pCurFontModel->GetLayerId(j),
+                                                                              pCurFontModel->GetLayerTopColor(j),
+                                                                              pCurFontModel->GetLayerBotColor(j),
+                                                                              topColor,
+                                                                              botColor));
+            }
+        }
     }
     else
     {
@@ -131,14 +151,17 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
         
         on_actionAddState_triggered();
         on_actionAddLayer_triggered();
+        
+        m_iPrevAtlasCmbIndex = ui->cmbAtlasGroups->currentIndex();
     }
     
     // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
     m_pItemFont->GetUndoStack()->clear();
 
-    m_iPrevAtlasCmbIndex = ui->cmbAtlasGroups->currentIndex();
-
     UpdateActions();
+    
+    m_bBlockGeneratePreview = false;
+    GeneratePreview();
 }
 
 WidgetFont::~WidgetFont()
@@ -198,6 +221,9 @@ void WidgetFont::SetGlyphsDirty()
 
 void WidgetFont::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
 {
+    if(m_bBlockGeneratePreview)
+        return;
+    
     // 'bIsDirty' will determine whether we actually need to regenerate this typeface atlas
     bool bIsDirty = false;
     
@@ -350,12 +376,11 @@ void WidgetFont::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
     if(bStoreIntoAtlasManager)
     {
         QImage fontAtlasImage(m_pTrueAtlasPixelData, m_pAtlas->width, m_pAtlas->height, QImage::Format_RGBA8888);
-        QString sName = "HyFont: " % m_pItemFont->GetName(false);
 
         if(m_pTrueAtlasFrame)
-            m_pItemFont->GetAtlasManager().ReplaceFrame(m_pTrueAtlasFrame, sName, fontAtlasImage);
+            m_pItemFont->GetAtlasManager().ReplaceFrame(m_pTrueAtlasFrame, m_pItemFont->GetName(false), fontAtlasImage);
         else
-            m_pTrueAtlasFrame = m_pItemFont->GetAtlasManager().GenerateFrame(m_pItemFont, GetSelectedAtlasId(), sName, fontAtlasImage);
+            m_pTrueAtlasFrame = m_pItemFont->GetAtlasManager().GenerateFrame(m_pItemFont, GetSelectedAtlasId(), m_pItemFont->GetName(false), fontAtlasImage, ATLAS_Font);
     }
     
     // Signals ItemFont to upload and refresh the preview texture
@@ -518,11 +543,14 @@ void WidgetFont::AppendFontInfo(QJsonObject &fontObj)
     fontObj.insert("typefaceArray", typefaceArray);
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    QJsonArray fontArray;
+    QJsonArray stateArray;
     for(int i = 0; i < ui->cmbStates->count(); ++i)
     {
         WidgetFontState *pState = ui->cmbStates->itemData(i).value<WidgetFontState *>();
         WidgetFontModel *pFontModel = pState->GetFontModel();
+        
+        QJsonObject stateObj;
+        stateObj.insert("name", pState->GetName());
         
         QJsonArray layersArray;
         for(int j = 0; j < pFontModel->rowCount(); ++j)
@@ -536,7 +564,7 @@ void WidgetFont::AppendFontInfo(QJsonObject &fontObj)
                 if(m_MasterStageList[iIndex] == pFontStage)
                     break;
             }
-            layerObj.insert("index", iIndex);
+            layerObj.insert("typefaceIndex", iIndex);
             layerObj.insert("topR", pFontModel->GetLayerTopColor(j).redF());
             layerObj.insert("topG", pFontModel->GetLayerTopColor(j).greenF());
             layerObj.insert("topB", pFontModel->GetLayerTopColor(j).blueF());
@@ -546,9 +574,11 @@ void WidgetFont::AppendFontInfo(QJsonObject &fontObj)
             
             layersArray.append(layerObj);
         }
-        fontArray.append(layersArray);
+        stateObj.insert("layers", layersArray);
+        
+        stateArray.append(stateObj);
     }
-    fontObj.insert("fontArray", fontArray);
+    fontObj.insert("stateArray", stateArray);
 }
 
 void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)

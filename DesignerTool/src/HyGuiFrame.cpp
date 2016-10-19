@@ -10,16 +10,17 @@
 #include "HyGuiFrame.h"
 #include "scriptum/imagepacker.h"
 
-HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) :   m_uiATLAS_GROUP_ID(uiAtlasGroupId),
-                                                                                                                                                            m_uiChecksum(uiChecksum),
-                                                                                                                                                            m_sName(sN),
-                                                                                                                                                            m_iWidth(iW),
-                                                                                                                                                            m_iHeight(iH),
-                                                                                                                                                            m_rAlphaCrop(rAlphaCrop),
-                                                                                                                                                            m_iTextureIndex(iTexIndex),
-                                                                                                                                                            m_bRotation(bRot),
-                                                                                                                                                            m_iPosX(iX),
-                                                                                                                                                            m_iPosY(iY)
+HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) : m_uiATLAS_GROUP_ID(uiAtlasGroupId),
+                                                                                                                                                                                m_eType(eType),
+                                                                                                                                                                                m_uiChecksum(uiChecksum),
+                                                                                                                                                                                m_sName(sN),
+                                                                                                                                                                                m_iWidth(iW),
+                                                                                                                                                                                m_iHeight(iH),
+                                                                                                                                                                                m_rAlphaCrop(rAlphaCrop),
+                                                                                                                                                                                m_iTextureIndex(iTexIndex),
+                                                                                                                                                                                m_bRotation(bRot),
+                                                                                                                                                                                m_iPosX(iX),
+                                                                                                                                                                                m_iPosY(iY)
 {
 }
 

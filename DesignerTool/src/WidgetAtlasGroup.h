@@ -84,13 +84,13 @@ private:
     Ui::WidgetAtlasGroup *ui;
     
     void ImportImages(QStringList sImportImgList);
-    HyGuiFrame *ImportImage(QString sName, QImage &newImage);
+    HyGuiFrame *ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType);
 
     void Refresh();
 
     void WriteMetaSettings(QJsonArray frameArray);
 
-    void CreateTreeItem(QTreeWidgetItem *pParent, QString sName, int iTextureIndex, eAtlasNodeType eType, HyGuiFrame *pFrame);
+    void CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFrame);
 };
 
 #endif // WIDGETATLASGROUP_H

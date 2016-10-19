@@ -134,7 +134,7 @@ QSize WidgetAtlasManager::GetAtlasDimensions(int iIndex)
     return static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(iIndex))->GetAtlasDimensions();
 }
 
-HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, int iAtlasGroupId, QString sName, QImage &newImage)
+HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, int iAtlasGroupId, QString sName, QImage &newImage, eAtlasNodeType eType)
 {
     for(int i = 0; i < ui->atlasGroups->count(); ++i)
     {
@@ -143,7 +143,7 @@ HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, int iAtlasGroup
         if(pAtlasGroup->GetId() == iAtlasGroupId)
         {
             // This allocates a new HyGuiFrame into the dependency map
-            HyGuiFrame *pFrame = pAtlasGroup->ImportImage(sName, newImage);
+            HyGuiFrame *pFrame = pAtlasGroup->ImportImage(sName, newImage, eType);
             pAtlasGroup->Refresh();
 
             // This retrieves the newly created HyGuiFrame from the dependency map
@@ -482,7 +482,7 @@ void WidgetAtlasManager::HideAtlasGroup()
     m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_Nothing);
 }
 
-HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY)
+HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY)
 {
     HyGuiFrame *pNewFrame = NULL;
 
@@ -493,7 +493,7 @@ HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRec
     }
     else
     {
-        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, iW, iH, iTexIndex, bRot, iX, iY);
+        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, bRot, iX, iY);
         m_DependencyMap[uiChecksum] = pNewFrame;
     }
 

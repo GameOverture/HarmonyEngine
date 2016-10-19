@@ -8,16 +8,17 @@
     "extrude": 1,
     "frames": [
         {
-            "checksum": 190015262,
+            "checksum": 3317722243,
             "cropBottom": 200,
             "cropLeft": 1,
-            "cropRight": 329,
+            "cropRight": 330,
             "cropTop": 1,
-            "height": 333,
-            "name": "HyFont: NewFont",
+            "height": 334,
+            "name": "NewFont",
             "rotate": false,
             "textureIndex": 0,
-            "width": 333,
+            "type": 4,
+            "width": 334,
             "x": 0,
             "y": 0
         },
@@ -31,8 +32,9 @@
             "name": "AboutLogo",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 131,
-            "x": 332,
+            "x": 333,
             "y": 0
         },
         {
@@ -45,8 +47,9 @@
             "name": "tv_popout_anim20",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 466,
+            "x": 467,
             "y": 0
         },
         {
@@ -59,8 +62,9 @@
             "name": "tv_popout_anim19",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 624,
+            "x": 625,
             "y": 0
         },
         {
@@ -73,8 +77,9 @@
             "name": "tv_popout_anim21",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 764,
+            "x": 765,
             "y": 0
         },
         {
@@ -87,8 +92,9 @@
             "name": "tv_popout_anim22",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 946,
+            "x": 947,
             "y": 0
         },
         {
@@ -101,8 +107,9 @@
             "name": "tv_popout_anim18",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1148,
+            "x": 1149,
             "y": 0
         },
         {
@@ -115,8 +122,9 @@
             "name": "tv_popout_anim23",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1301,
+            "x": 1302,
             "y": 0
         },
         {
@@ -129,8 +137,9 @@
             "name": "tv_popout_anim26",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1519,
+            "x": 1520,
             "y": 0
         },
         {
@@ -143,8 +152,9 @@
             "name": "tv_popout_anim25",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1746,
+            "x": 1747,
             "y": 0
         },
         {
@@ -157,6 +167,7 @@
             "name": "tv_popout_anim17",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
             "x": 0,
             "y": 203
@@ -171,8 +182,9 @@
             "name": "tv_popout_anim27",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1519,
+            "x": 1520,
             "y": 203
         },
         {
@@ -185,8 +197,9 @@
             "name": "tv_popout_anim24",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1743,
+            "x": 1744,
             "y": 212
         },
         {
@@ -199,8 +212,9 @@
             "name": "tv_popout_anim14",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1301,
+            "x": 1302,
             "y": 230
         },
         {
@@ -213,8 +227,9 @@
             "name": "tv_popout_anim28",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1083,
+            "x": 1084,
             "y": 237
         },
         {
@@ -227,8 +242,9 @@
             "name": "tv_popout_anim16",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 875,
+            "x": 876,
             "y": 244
         },
         {
@@ -241,8 +257,9 @@
             "name": "tv_popout_anim15",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 660,
+            "x": 661,
             "y": 245
         },
         {
@@ -255,51 +272,10 @@
             "name": "tv_popout_anim29",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
             "x": 184,
             "y": 262
-        },
-        {
-            "checksum": 3101502437,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation20",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 393,
-            "y": 262
-        },
-        {
-            "checksum": 3087090630,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation18",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 1519,
-            "y": 398
-        },
-        {
-            "checksum": 3766058221,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation12",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 1311,
-            "y": 425
         },
         {
             "checksum": 2161173694,
@@ -311,9 +287,10 @@
             "name": "tv_trans_animation13",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
-            "x": 1103,
-            "y": 428
+            "x": 393,
+            "y": 262
         },
         {
             "checksum": 870689080,
@@ -325,8 +302,54 @@
             "name": "tv_trans_animation23",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
-            "x": 1727,
+            "x": 1520,
+            "y": 398
+        },
+        {
+            "checksum": 3087090630,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation18",
+            "rotate": false,
+            "textureIndex": 0,
+            "type": 0,
+            "width": 205,
+            "x": 1312,
+            "y": 425
+        },
+        {
+            "checksum": 3766058221,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation12",
+            "rotate": false,
+            "textureIndex": 0,
+            "type": 0,
+            "width": 205,
+            "x": 1104,
+            "y": 428
+        },
+        {
+            "checksum": 3101502437,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation20",
+            "rotate": false,
+            "textureIndex": 0,
+            "type": 0,
+            "width": 205,
+            "x": 1728,
             "y": 434
         },
         {
@@ -339,6 +362,7 @@
             "name": "tv_trans_animation25",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
             "x": 393,
             "y": 445
@@ -353,23 +377,10 @@
             "name": "tv_trans_animation26",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
             "x": 185,
             "y": 448
-        },
-        {
-            "checksum": 3981254487,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation22",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 601,
-            "y": 449
         },
         {
             "checksum": 3346782580,
@@ -381,9 +392,10 @@
             "name": "tv_trans_animation24",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
-            "x": 809,
-            "y": 461
+            "x": 601,
+            "y": 449
         },
         {
             "checksum": 3051563251,
@@ -395,8 +407,24 @@
             "name": "tv_trans_animation14",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
-            "x": 1519,
+            "x": 809,
+            "y": 461
+        },
+        {
+            "checksum": 3981254487,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation22",
+            "rotate": false,
+            "textureIndex": 0,
+            "type": 0,
+            "width": 205,
+            "x": 1520,
             "y": 581
         },
         {
@@ -409,37 +437,10 @@
             "name": "tv_trans_animation07",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
-            "x": 1311,
+            "x": 1312,
             "y": 608
-        },
-        {
-            "checksum": 3411446781,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation06",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 1103,
-            "y": 611
-        },
-        {
-            "checksum": 3251885963,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation17",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 1727,
-            "y": 617
         },
         {
             "checksum": 2269252502,
@@ -451,9 +452,10 @@
             "name": "tv_trans_animation19",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
-            "x": 393,
-            "y": 628
+            "x": 1104,
+            "y": 611
         },
         {
             "checksum": 3109004190,
@@ -465,6 +467,37 @@
             "name": "tv_trans_animation05",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
+            "width": 205,
+            "x": 1728,
+            "y": 617
+        },
+        {
+            "checksum": 3805806088,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation27",
+            "rotate": false,
+            "textureIndex": 0,
+            "type": 0,
+            "width": 205,
+            "x": 393,
+            "y": 628
+        },
+        {
+            "checksum": 3952387665,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation10",
+            "rotate": false,
+            "textureIndex": 0,
+            "type": 0,
             "width": 205,
             "x": 185,
             "y": 631
@@ -479,37 +512,10 @@
             "name": "tv_trans_animation16",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
             "x": 601,
             "y": 632
-        },
-        {
-            "checksum": 1658784510,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation08",
-            "rotate": false,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 809,
-            "y": 644
-        },
-        {
-            "checksum": 3952387665,
-            "cropBottom": 179,
-            "cropLeft": 0,
-            "cropRight": 204,
-            "cropTop": 0,
-            "height": 180,
-            "name": "tv_trans_animation10",
-            "rotate": true,
-            "textureIndex": 0,
-            "width": 205,
-            "x": 0,
-            "y": 428
         },
         {
             "checksum": 2816186394,
@@ -521,8 +527,39 @@
             "name": "tv_trans_animation21",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
-            "x": 1519,
+            "x": 809,
+            "y": 644
+        },
+        {
+            "checksum": 3251885963,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation17",
+            "rotate": true,
+            "textureIndex": 0,
+            "type": 0,
+            "width": 205,
+            "x": 0,
+            "y": 428
+        },
+        {
+            "checksum": 1324693881,
+            "cropBottom": 179,
+            "cropLeft": 0,
+            "cropRight": 204,
+            "cropTop": 0,
+            "height": 180,
+            "name": "tv_trans_animation11",
+            "rotate": false,
+            "textureIndex": 0,
+            "type": 0,
+            "width": 205,
+            "x": 1520,
             "y": 764
         },
         {
@@ -535,22 +572,24 @@
             "name": "tv_trans_animation09",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
-            "x": 1311,
+            "x": 1312,
             "y": 791
         },
         {
-            "checksum": 3805806088,
+            "checksum": 3411446781,
             "cropBottom": 179,
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
             "height": 180,
-            "name": "tv_trans_animation27",
+            "name": "tv_trans_animation06",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
-            "x": 1103,
+            "x": 1104,
             "y": 794
         },
         {
@@ -563,20 +602,22 @@
             "name": "tv_trans_animation15",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
-            "x": 1727,
+            "x": 1728,
             "y": 800
         },
         {
-            "checksum": 1324693881,
+            "checksum": 1658784510,
             "cropBottom": 179,
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
             "height": 180,
-            "name": "tv_trans_animation11",
+            "name": "tv_trans_animation08",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
             "x": 393,
             "y": 811
@@ -591,6 +632,7 @@
             "name": "tv_trans_animation28",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
             "x": 185,
             "y": 814
@@ -605,6 +647,7 @@
             "name": "tv_trans_animation04",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
             "x": 601,
             "y": 815
@@ -619,6 +662,7 @@
             "name": "tv_trans_animation03",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
             "x": 808,
             "y": 827
@@ -633,6 +677,7 @@
             "name": "tv_trans_animation29",
             "rotate": true,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
             "x": 4,
             "y": 636
@@ -647,8 +692,9 @@
             "name": "tv_trans_animation02",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
-            "x": 1519,
+            "x": 1520,
             "y": 947
         },
         {
@@ -661,8 +707,9 @@
             "name": "tv_popout_anim30",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1315,
+            "x": 1316,
             "y": 974
         },
         {
@@ -675,6 +722,7 @@
             "name": "tv_popout_anim13",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
             "x": 0,
             "y": 842
@@ -689,8 +737,9 @@
             "name": "tv_popout_anim01",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1132,
+            "x": 1133,
             "y": 977
         },
         {
@@ -703,8 +752,9 @@
             "name": "hawk_man",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 180,
-            "x": 1725,
+            "x": 1726,
             "y": 983
         },
         {
@@ -717,6 +767,7 @@
             "name": "tv_popout_anim02",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
             "x": 393,
             "y": 994
@@ -731,6 +782,7 @@
             "name": "tv_popout_anim03",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
             "x": 240,
             "y": 996
@@ -745,6 +797,7 @@
             "name": "tv_popout_anim12",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
             "x": 574,
             "y": 997
@@ -759,6 +812,7 @@
             "name": "tv_trans_animation30",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
             "x": 86,
             "y": 1003
@@ -773,8 +827,9 @@
             "name": "tv_popout_anim04",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1908,
+            "x": 1909,
             "y": 983
         },
         {
@@ -787,6 +842,7 @@
             "name": "tv_popout_anim11",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
             "x": 732,
             "y": 1009
@@ -801,8 +857,9 @@
             "name": "tv_popout_anim05",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1935,
+            "x": 1936,
             "y": 434
         },
         {
@@ -815,6 +872,7 @@
             "name": "tv_popout_anim10",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
             "x": 873,
             "y": 1009
@@ -829,8 +887,9 @@
             "name": "tv_popout_anim09",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1935,
+            "x": 1936,
             "y": 562
         },
         {
@@ -843,9 +902,10 @@
             "name": "tv_popout_anim06",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1935,
-            "y": 682
+            "x": 1017,
+            "y": 461
         },
         {
             "checksum": 3522029400,
@@ -857,9 +917,10 @@
             "name": "tv_popout_anim08",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1971,
-            "y": 0
+            "x": 1967,
+            "y": 212
         },
         {
             "checksum": 2394397811,
@@ -871,9 +932,10 @@
             "name": "tv_popout_anim07",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 270,
-            "x": 1975,
-            "y": 114
+            "x": 1972,
+            "y": 0
         },
         {
             "checksum": 3362920247,
@@ -885,9 +947,10 @@
             "name": "tv_trans_animation01",
             "rotate": false,
             "textureIndex": 0,
+            "type": 0,
             "width": 205,
-            "x": 1972,
-            "y": 114
+            "x": 2045,
+            "y": 0
         }
     ],
     "minFillRate": 80,

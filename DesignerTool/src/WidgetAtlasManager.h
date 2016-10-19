@@ -65,7 +65,7 @@ public:
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    HyGuiFrame *GenerateFrame(ItemWidget *pItem, int iAtlasGroupId, QString sName, QImage &newImage);
+    HyGuiFrame *GenerateFrame(ItemWidget *pItem, int iAtlasGroupId, QString sName, QImage &newImage, eAtlasNodeType eType);
     void ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newImage);
 
     QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem);
@@ -98,7 +98,7 @@ private:
     void PreviewAtlasGroup();
     void HideAtlasGroup();
 
-    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
+    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
     void RemoveImage(HyGuiFrame *pFrame);
 
     void SaveData();

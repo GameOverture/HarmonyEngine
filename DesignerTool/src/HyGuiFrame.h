@@ -21,6 +21,8 @@ class HyGuiFrame
     friend class WidgetAtlasManager;
 
     const uint                          m_uiATLAS_GROUP_ID;
+    
+    eAtlasNodeType                      m_eType;
 
     quint32                             m_uiChecksum;
     QString                             m_sName;
@@ -39,7 +41,7 @@ class HyGuiFrame
     QMap<void *, HyTexturedQuad2d *>    m_DrawInstMap;
 
     // Private ctor as WidgetAtlasManager should only construct these
-    HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
+    HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
     ~HyGuiFrame();
     
 public:
@@ -56,6 +58,7 @@ public:
     QPoint GetPosition()                        { return QPoint(m_iPosX, m_iPosY); }
     QSet<ItemWidget *> GetLinks()               { return m_Links; }
     int GetAtlasGroupdId()                      { return static_cast<int>(m_uiATLAS_GROUP_ID); }
+    eAtlasNodeType GetType()                    { return m_eType; }
 
     bool IsRotated()                            { return m_bRotation; }
     int GetX()                                  { return m_iPosX; }
