@@ -518,10 +518,12 @@ void WidgetFont::AppendFontInfo(QJsonObject &fontObj)
             glyphInfoObj.insert("height", static_cast<int>(pGlyph->height));
             glyphInfoObj.insert("offset_x", pGlyph->offset_x);
             glyphInfoObj.insert("offset_y", pGlyph->offset_y);
-            glyphInfoObj.insert("s0", pGlyph->s0);
-            glyphInfoObj.insert("t0", pGlyph->t0);
-            glyphInfoObj.insert("s1", pGlyph->s1);
-            glyphInfoObj.insert("t1", pGlyph->t1);
+
+            QSize atlasSize = GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
+            glyphInfoObj.insert("left", static_cast<float>((m_pTrueAtlasFrame->GetX() + (static_cast<float>(m_pAtlas->width) * pGlyph->s0)) * atlasSize.width()));
+            glyphInfoObj.insert("top", static_cast<float>((m_pTrueAtlasFrame->GetY() + (static_cast<float>(m_pAtlas->height) * pGlyph->t0)) * atlasSize.height()));
+            glyphInfoObj.insert("right", static_cast<float>((m_pTrueAtlasFrame->GetX() + m_pTrueAtlasFrame->GetSize().width() + (static_cast<float>(m_pAtlas->width) * pGlyph->s1)) * atlasSize.width()));
+            glyphInfoObj.insert("bottom", static_cast<float>((m_pTrueAtlasFrame->GetY() + m_pTrueAtlasFrame->GetSize().height() + (static_cast<float>(m_pAtlas->height) * pGlyph->t1)) * atlasSize.height()));
             
             QJsonObject kerningInfoObj;
             for(int k = 0; k < m_sAvailableTypefaceGlyphs.count(); ++k)

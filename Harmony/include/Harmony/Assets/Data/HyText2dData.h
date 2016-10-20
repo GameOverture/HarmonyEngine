@@ -60,14 +60,14 @@ class HyText2dData : public IHy2dData
 			kerningMap;
 		}
 	};
-	typedef std::map<uint32, GlyphInfo> Typeface;
+	typedef std::map<uint32, GlyphInfo *> Typeface;
 
 	Typeface *						m_pTypefaces;
 	uint32							m_uiNumTypefaces;
 
 	struct FontState
 	{
-		const std::string	m_sNAME;
+		const std::string			m_sNAME;
 
 		struct Layer
 		{
@@ -77,6 +77,9 @@ class HyText2dData : public IHy2dData
 		};
 		Layer *						m_pLayers;
 		uint32						m_uiNumLayers;
+
+		FontState(std::string sName) : m_sNAME(sName)
+		{ }
 	};
 	FontState *						m_pFontStates;
 	uint32							m_uiNumStates;
