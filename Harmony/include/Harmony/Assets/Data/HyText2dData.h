@@ -67,19 +67,24 @@ class HyText2dData : public IHy2dData
 
 	struct FontState
 	{
-		const std::string			m_sNAME;
+		const std::string			sNAME;
+		const uint32				uiNUM_LAYERS;
 
 		struct Layer
 		{
-			const glm::vec4			m_vDEFAULT_TOP_COLOR;
-			const glm::vec4			m_vDEFAULT_BOT_COLOR;
-			const Typeface &		m_TYPEFACE_REF;
-		};
-		Layer *						m_pLayers;
-		uint32						m_uiNumLayers;
+			const glm::vec4			vDEFAULT_TOP_COLOR;
+			const glm::vec4			vDEFAULT_BOT_COLOR;
+			const Typeface &		TYPEFACE_REF;
 
-		FontState(std::string sName) : m_sNAME(sName)
-		{ }
+			Layer(float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB, Typeface &typefaceRef) :	vDEFAULT_TOP_COLOR(fTopR, fTopG, fTopB, 1.0f),
+																															vDEFAULT_BOT_COLOR(fBotR, fBotG, fBotB, 1.0f),
+																															TYPEFACE_REF(typefaceRef)
+			{ }
+		};
+		Layer *						pLayers;
+
+		FontState(std::string sName, Typeface *pTypefaces, jsonxx::Array layersArray);
+		~FontState();
 	};
 	FontState *						m_pFontStates;
 	uint32							m_uiNumStates;

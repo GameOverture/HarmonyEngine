@@ -44,6 +44,14 @@ enum HyAnimCtrl
 	HYANIMCTRL_DontBounce
 };
 
+enum HyAlign
+{
+	HYALIGN_Left = 0,
+	HYALIGN_Center,
+	HYALIGN_Right,
+	HYALIGH_Justify
+};
+
 enum HyDataType
 {
 	HYDATA_Regular = 0,

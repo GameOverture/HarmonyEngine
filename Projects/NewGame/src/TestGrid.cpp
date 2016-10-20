@@ -41,6 +41,6 @@ void TestGrid::SetResolution(int iWidth, int iHeight)
 	//memcpy(pRefDataWritePos, &m_uiNumVerts, sizeof(uint32));
 	//pRefDataWritePos += sizeof(uint32);
 
-	memcpy(pRefDataWritePos, m_pVertices, m_RenderState.GetNumVertices() * sizeof(glm::vec4));
-	pRefDataWritePos += m_RenderState.GetNumVertices() * sizeof(glm::vec4);
+	memcpy(pRefDataWritePos, m_pVertices, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec4));
+	pRefDataWritePos += m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec4);
 }

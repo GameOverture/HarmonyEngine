@@ -235,14 +235,14 @@ HyOpenGL::~HyOpenGL(void)
 	pShader->SetVertexAttributePtrs(uiDataOffset);
 
 	if(renderState.IsEnabled(HyRenderState::DRAWINSTANCED))
-		glDrawArraysInstanced(m_eDrawMode, 0, renderState.GetNumVertices(), renderState.GetNumInstances());
+		glDrawArraysInstanced(m_eDrawMode, 0, renderState.GetNumVerticesPerInstance(), renderState.GetNumInstances());
 	else
 	{
 		uint32 uiStartVertex = 0;
 		for(uint32 i = 0; i < renderState.GetNumInstances(); ++i)
 		{
-			glDrawArrays(m_eDrawMode, uiStartVertex, renderState.GetNumVertices());
-			uiStartVertex += renderState.GetNumVertices();
+			glDrawArrays(m_eDrawMode, uiStartVertex, renderState.GetNumVerticesPerInstance());
+			uiStartVertex += renderState.GetNumVerticesPerInstance();
 		}
 	}
 }

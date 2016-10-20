@@ -20,7 +20,7 @@ HyPrimitive2d::HyPrimitive2d() :	IHyInst2d(HYINST_Primitive2d, NULL, NULL),
 {
 	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
 	m_RenderState.SetNumInstances(1);
-	m_RenderState.SetNumVertices(0);
+	m_RenderState.SetNumVerticesPerInstance(0);
 }
 
 
@@ -35,10 +35,10 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 	m_eCoordUnit = p.m_eCoordUnit;
 
 	ClearData();
-	if(m_RenderState.GetNumVertices() != 0)
+	if(m_RenderState.GetNumVerticesPerInstance() != 0)
 	{
-		m_pVertices = HY_NEW glm::vec4[m_RenderState.GetNumVertices()];
-		memcpy(m_pVertices, p.m_pVertices, m_RenderState.GetNumVertices() * sizeof(glm::vec4));
+		m_pVertices = HY_NEW glm::vec4[m_RenderState.GetNumVerticesPerInstance()];
+		memcpy(m_pVertices, p.m_pVertices, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec4));
 	}
 	
 	return *this;
@@ -60,7 +60,7 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, glm:
 	fHeight *= fCoordMod;
 	vOffset *= fCoordMod;
 
-	m_RenderState.SetNumVertices(4);
+	m_RenderState.SetNumVerticesPerInstance(4);
 	m_pVertices = HY_NEW glm::vec4[4];
 
 	m_pVertices[0].x = vOffset.x;
@@ -102,7 +102,7 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	else
 		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLEFAN);
 
-	m_RenderState.SetNumVertices(iNumSegments);
+	m_RenderState.SetNumVerticesPerInstance(iNumSegments);
 	m_pVertices = HY_NEW glm::vec4[iNumSegments];
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
@@ -112,9 +112,9 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	vOffset *= fCoordMod;
 
 	float t = 0.0f;
-	for(uint32 n = 0; n <= m_RenderState.GetNumVertices(); ++n)
+	for(uint32 n = 0; n <= m_RenderState.GetNumVerticesPerInstance(); ++n)
 	{
-		t = 2.0f * HY_PI * static_cast<float>(n) / static_cast<float>(m_RenderState.GetNumVertices());
+		t = 2.0f * HY_PI * static_cast<float>(n) / static_cast<float>(m_RenderState.GetNumVerticesPerInstance());
 
 		m_pVertices[n].x = (sin(t) * fRadius) + vOffset.x;
 		m_pVertices[n].y = (cos(t) * fRadius) + vOffset.y;
@@ -132,14 +132,14 @@ void HyPrimitive2d::SetAsEdgeChain(const glm::vec2 *pVertices, uint32 uiNumVerts
 	else
 		m_RenderState.Enable(HyRenderState::DRAWMODE_LINESTRIP);
 
-	m_RenderState.SetNumVertices(uiNumVerts);
+	m_RenderState.SetNumVerticesPerInstance(uiNumVerts);
 	m_pVertices = HY_NEW glm::vec4[uiNumVerts];
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
 		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
 	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? IHyApplication::PixelsPerMeter() : 1.0f;
 	
-	for(uint32 i = 0; i < m_RenderState.GetNumVertices(); ++i)
+	for(uint32 i = 0; i < m_RenderState.GetNumVerticesPerInstance(); ++i)
 	{
 		m_pVertices[i].x = (pVertices[i].x + vOffset.x) * fCoordMod;
 		m_pVertices[i].y = (pVertices[i].y + vOffset.y) * fCoordMod;
@@ -164,7 +164,7 @@ void HyPrimitive2d::OffsetVerts(glm::vec2 vOffset, float fAngleOffset)
 
 	b2Vec2 tmp;
 	// Transform vertices and normals.
-	for(uint32 i = 0; i < m_RenderState.GetNumVertices(); ++i)
+	for(uint32 i = 0; i < m_RenderState.GetNumVerticesPerInstance(); ++i)
 	{
 		tmp = b2Mul(xf, b2Vec2(m_pVertices[i].x, m_pVertices[i].y));
 		m_pVertices[i].x = tmp.x;
@@ -176,7 +176,7 @@ void HyPrimitive2d::ClearData()
 {
 	delete [] m_pVertices;
 	m_pVertices = NULL;
-	m_RenderState.SetNumVertices(0);
+	m_RenderState.SetNumVerticesPerInstance(0);
 
 	m_RenderState.Disable(HyRenderState::DRAWMODEMASK);
 }
@@ -212,6 +212,6 @@ void HyPrimitive2d::ClearData()
 	//memcpy(pRefDataWritePos, &m_uiNumVerts, sizeof(uint32));
 	//pRefDataWritePos += sizeof(uint32);
 
-	memcpy(pRefDataWritePos, m_pVertices, m_RenderState.GetNumVertices() * sizeof(glm::vec4));
-	pRefDataWritePos += m_RenderState.GetNumVertices() * sizeof(glm::vec4);
+	memcpy(pRefDataWritePos, m_pVertices, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec4));
+	pRefDataWritePos += m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec4);
 }

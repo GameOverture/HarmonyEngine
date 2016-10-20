@@ -17,26 +17,47 @@
 class HyText2d : public IHyInst2d
 {
 protected:
-	static char			sm_pTempTextBuffer[HY_TEMP_TEXTBUFFER_SIZE];
-
+	bool				m_bIsDirty;
 	std::string			m_sString;
-	unsigned char *		m_pVertexBuffer;
-	size_t				m_uiBufferSizeBytes;
 
-	uint32				m_uiCurFontIndex;
+	uint32				m_uiCurFontState;
+
+	HyAlign				m_eAlignment;
+	HyRectangle<float>	m_rBox;
+
+	// Stored in HyRectangle's (m_rBox) tag field
+	enum eBoxAttributes
+	{
+		BOXATTRIB_IsUsed			= 1 << 0,
+		BOXATTRIB_CenterVertically	= 1 << 1,
+		BOXATTRIB_ScaleDown			= 1 << 2,
+		BOXATTRIB_ScaleUp			= 1 << 3
+	};
+
+	unsigned char *		m_pVertexBuffer;
+	uint32				m_uiBufferSizeBytes;
+
 
 public:
 	HyText2d(const char *szPrefix, const char *szName);
 	virtual ~HyText2d(void);
 
-	uint32 GetCurFontIndex()			{ return m_uiCurFontIndex; }
+	// Accepts newline characters "\n"
+	void TextSet(std::string sText);
+	void TextSet(const char *szString, ...);
+	std::string TextGet();
 
-	size_t GetBufferSizeBytes()			{ return m_uiBufferSizeBytes; }
-	unsigned char *GetBufferDataPtr()	{ return m_pVertexBuffer; }
+	uint32 TextGetLength();
 
-	void SetString(const char *szString, ...);
-	//HyString &GetString()				{ return m_sString; }
-	size_t GetStrLen()					{ return m_sString.length(); }
+	uint32 TextGetState();
+	void TextSetState(uint32 uiStateIndex);
+
+	HyAlign TextGetAlignment();
+	void TextSetAlignment(HyAlign eAlignment);
+
+	HyRectangle<float> TextGetBox();
+	void TextSetBox(HyRectangle<float> rBox, bool bCenterVertically = false, bool bScaleDownToFit = false, bool bScaleUpToFit = false);
+	void TextClearBox();
 
 private:
 	virtual void OnDataLoaded();
@@ -45,8 +66,6 @@ private:
 
 	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef);
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
-	
-	void CalcVertexBuffer();
 };
 
 #endif /* __HyText2d_h__ */

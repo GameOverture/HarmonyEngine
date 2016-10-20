@@ -17,7 +17,7 @@ HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
 									m_iShaderId(-1),
 									m_pShaderUniformsRef(NULL),
 									m_uiNumInstances(0),
-									m_uiNumVertices(0),
+									m_uiNumVerticesPerInstance(0),
 									m_uiDataOffset(0)
 {
 }
@@ -60,14 +60,14 @@ void HyRenderState::SetNumInstances(uint32 uiNumInsts)
 	m_uiNumInstances = uiNumInsts;
 }
 
-uint32 HyRenderState::GetNumVertices()
+uint32 HyRenderState::GetNumVerticesPerInstance()
 {
-	return m_uiNumVertices;
+	return m_uiNumVerticesPerInstance;
 }
 
-void HyRenderState::SetNumVertices(uint32 uiNumVerts)
+void HyRenderState::SetNumVerticesPerInstance(uint32 uiNumVerts)
 {
-	m_uiNumVertices = uiNumVerts;
+	m_uiNumVerticesPerInstance = uiNumVerts;
 }
 
 void HyRenderState::Enable(uint32 uiAttributes)

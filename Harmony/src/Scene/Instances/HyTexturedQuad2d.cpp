@@ -21,7 +21,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGroupId) :	IHyInst2d(HYINST_Tex
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
 	m_RenderState.SetNumInstances(1);
-	m_RenderState.SetNumVertices(4);
+	m_RenderState.SetNumVerticesPerInstance(4);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight) :	IHyInst2d(HYINST_TexturedQuad2d, NULL, "raw"),
@@ -34,7 +34,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth,
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
 	m_RenderState.SetNumInstances(1);
-	m_RenderState.SetNumVertices(4);
+	m_RenderState.SetNumVerticesPerInstance(4);
 	m_RenderState.SetTextureHandle(uiGfxApiHandle);
 }
 

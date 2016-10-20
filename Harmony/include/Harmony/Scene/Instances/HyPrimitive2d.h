@@ -27,7 +27,7 @@ public:
 
 	const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p);
 
-	uint32 GetNumVerts()			{ return m_RenderState.GetNumVertices(); }
+	uint32 GetNumVerts()			{ return m_RenderState.GetNumVerticesPerInstance(); }
 	glm::vec4 *GetVertexDataPtr()	{ return m_pVertices; }
 
 	void SetAsQuad(float fWidth, float fHeight, bool bWireframe, glm::vec2 &vOffset = glm::vec2(0.0f));
