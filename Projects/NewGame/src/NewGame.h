@@ -9,6 +9,8 @@ class NewGame : public IHyApplication
 	HySprite2d			m_TestSprite;
 	HyTexturedQuad2d	m_TestQuad;
 
+	HyText2d			m_TestText;
+
 	HyPrimitive2d		m_primBox;
 	HyPrimitive2d		m_HorzLine;
 	HyPrimitive2d		m_VertLine;

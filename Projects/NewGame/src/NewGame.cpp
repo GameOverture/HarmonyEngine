@@ -3,7 +3,8 @@
 
 NewGame::NewGame(HarmonyInit &initStruct) : IHyApplication(initStruct),
 											m_TestSprite("", "NewSprite"),
-											m_TestQuad(1)
+											m_TestQuad(1),
+											m_TestText("", "NewFont")
 {
 }
 
@@ -55,19 +56,23 @@ void main()																			\n\
 {
 	m_pCam = Window().CreateCamera2d();
 
-	m_TestSprite.Load();
+	//m_TestSprite.Load();
 	m_TestSprite.SetEnabled(true);
 	//m_TestSprite.SetTransparency(0.5f);
 	m_TestSprite.topColor.Set(0.0f, 1.0f, 0.0f, 1.0f);
 	m_TestSprite.botColor.Set(1.0f, 0.0f, 0.0f, 1.0f);
 
-	m_TestQuad.Load();
-	m_TestQuad.SetTextureSource(0, 100, 100, 500, 500);
+	m_TestText.Load();
+	m_TestText.TextSet("Testing this omg");
+	m_TestText.pos.Set(0.0f, -200.0f);
+
+	//m_TestQuad.Load();
+	//m_TestQuad.SetTextureSource(0, 100, 100, 500, 500);
 	
 	m_primBox.SetTint(0.0f, 0.0f, 1.0f);
 	m_primBox.SetAsQuad(25.0f, 25.0f, false);
 	m_primBox.SetDisplayOrder(0);
-	m_primBox.pos.Set(0.0f, -25.0f);
+	//m_primBox.pos.Set(0.0f, -25.0f);
 	m_primBox.Load();
 
 	glm::vec2 vLinePts[2];

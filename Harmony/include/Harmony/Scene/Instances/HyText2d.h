@@ -34,9 +34,7 @@ protected:
 		BOXATTRIB_ScaleUp			= 1 << 3
 	};
 
-	unsigned char *		m_pVertexBuffer;
-	uint32				m_uiBufferSizeBytes;
-
+	vector<glm::vec2>	m_GlyphOffsets;
 
 public:
 	HyText2d(const char *szPrefix, const char *szName);

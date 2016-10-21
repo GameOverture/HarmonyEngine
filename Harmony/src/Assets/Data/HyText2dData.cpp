@@ -54,6 +54,16 @@ HyText2dData::~HyText2dData(void)
 	delete[] m_pTypefaces;
 }
 
+uint32 HyText2dData::GetNumLayers(uint32 uiStateIndex)
+{
+	return m_pFontStates[uiStateIndex].uiNUM_LAYERS;
+}
+
+const HyText2dGlyphInfo &HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiCode)
+{
+	return *m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.at(uiCode);
+}
+
 /*virtual*/ void HyText2dData::DoFileLoad()
 {
 	std::string sFontFileContents;
@@ -78,17 +88,17 @@ HyText2dData::~HyText2dData(void)
 		{
 			jsonxx::Object glyphObj = glyphsArray.get<jsonxx::Object>(j);
 
-			curTypeface[static_cast<uint32>(glyphObj.get<jsonxx::Number>("code"))] = HY_NEW GlyphInfo(static_cast<uint32>(glyphObj.get<jsonxx::Number>("width")),
-																									  static_cast<uint32>(glyphObj.get<jsonxx::Number>("height")),
-																									  static_cast<uint32>(glyphObj.get<jsonxx::Number>("offset_x")),
-																									  static_cast<uint32>(glyphObj.get<jsonxx::Number>("offset_y")),
-																									  static_cast<float>(glyphObj.get<jsonxx::Number>("advance_x")),
-																									  static_cast<float>(glyphObj.get<jsonxx::Number>("advance_y")),
-																									  static_cast<float>(glyphObj.get<jsonxx::Number>("left")),
-																									  static_cast<float>(glyphObj.get<jsonxx::Number>("top")),
-																									  static_cast<float>(glyphObj.get<jsonxx::Number>("right")),
-																									  static_cast<float>(glyphObj.get<jsonxx::Number>("bottom")),
-																									  glyphObj.get<jsonxx::Object>("kerning"));
+			curTypeface[static_cast<uint32>(glyphObj.get<jsonxx::Number>("code"))] = HY_NEW HyText2dGlyphInfo(static_cast<uint32>(glyphObj.get<jsonxx::Number>("width")),
+																											  static_cast<uint32>(glyphObj.get<jsonxx::Number>("height")),
+																											  static_cast<uint32>(glyphObj.get<jsonxx::Number>("offset_x")),
+																											  static_cast<uint32>(glyphObj.get<jsonxx::Number>("offset_y")),
+																											  static_cast<float>(glyphObj.get<jsonxx::Number>("advance_x")),
+																											  static_cast<float>(glyphObj.get<jsonxx::Number>("advance_y")),
+																											  static_cast<float>(glyphObj.get<jsonxx::Number>("left")),
+																											  static_cast<float>(glyphObj.get<jsonxx::Number>("top")),
+																											  static_cast<float>(glyphObj.get<jsonxx::Number>("right")),
+																											  static_cast<float>(glyphObj.get<jsonxx::Number>("bottom")),
+																											  glyphObj.get<jsonxx::Object>("kerning"));
 		}
 	}
 

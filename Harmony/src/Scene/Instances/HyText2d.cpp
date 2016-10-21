@@ -18,9 +18,7 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName) :	IHyInst2d(HYINST_
 																m_sString("<not set>"),
 																m_uiCurFontState(0),
 																m_eAlignment(HYALIGN_Left),
-																m_rBox(0.0f, 0.0f, 0.0f, 0.0f),
-																m_pVertexBuffer(NULL),
-																m_uiBufferSizeBytes(0)
+																m_rBox(0.0f, 0.0f, 0.0f, 0.0f)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
@@ -76,6 +74,7 @@ uint32 HyText2d::TextGetState()
 void HyText2d::TextSetState(uint32 uiStateIndex)
 {
 	m_uiCurFontState = uiStateIndex;
+	m_bIsDirty = true;
 }
 
 HyAlign HyText2d::TextGetAlignment()
@@ -86,6 +85,7 @@ HyAlign HyText2d::TextGetAlignment()
 void HyText2d::TextSetAlignment(HyAlign eAlignment)
 {
 	m_eAlignment = eAlignment;
+	m_bIsDirty = true;
 }
 
 HyRectangle<float> HyText2d::TextGetBox()
@@ -104,11 +104,17 @@ void HyText2d::TextSetBox(HyRectangle<float> rBox, bool bCenterVertically /*= fa
 		m_rBox.iTag |= BOXATTRIB_ScaleDown;
 	if(bScaleUpToFit)
 		m_rBox.iTag |= BOXATTRIB_ScaleUp;
+
+	m_bIsDirty = true;
 }
 
 void HyText2d::TextClearBox()
 {
+	if(0 == (m_rBox.iTag & BOXATTRIB_IsUsed))
+		return;
+
 	m_rBox.iTag &= ~BOXATTRIB_IsUsed;
+	m_bIsDirty = true;
 }
 
 /*virtual*/ void HyText2d::OnDataLoaded()
@@ -121,7 +127,33 @@ void HyText2d::TextClearBox()
 	if(m_bIsDirty == false)
 		return;
 
+	HyText2dData *pData = static_cast<HyText2dData *>(m_pData);
 
+	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
+	uint32 uiStrSize = static_cast<uint32>(m_sString.size());
+	
+	m_RenderState.SetNumInstances(uiStrSize * uiNumLayers);
+	
+	m_GlyphOffsets.reserve(m_RenderState.GetNumInstances());
+	m_GlyphOffsets.clear();
+	
+	for(uint32 i = 0; i < uiNumLayers; ++i)
+	{
+		glm::vec2 ptWritePos(0.0f, 0.0f);
+		float fCurWordSize = 0.0f;
+		float fCurLineSize = 0.0f;
+		
+		for(uint32 j = 0; j < uiStrSize; ++j)
+		{
+			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, i, static_cast<uint32>(m_sString[i]));
+			float fKerning = 0.0f;
+
+			m_GlyphOffsets.push_back(glm::vec2(ptWritePos.x + fKerning + glyphRef.iOFFSET_X,
+											   ptWritePos.y - (glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y)));
+
+			ptWritePos.x += glyphRef.fADVANCE_X;
+		}
+	}
 
 	m_bIsDirty = false;
 }
@@ -132,5 +164,62 @@ void HyText2d::TextClearBox()
 
 /*virtual*/ void HyText2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
+	HyText2dData *pData = static_cast<HyText2dData *>(m_pData);
 
+	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
+	uint32 uiStrSize = static_cast<uint32>(m_sString.size());
+
+	glm::mat4 mtxTransform;
+	GetWorldTransform(mtxTransform);
+
+	uint32 iOffsetIndex = 0;
+	for(uint32 i = 0; i < uiNumLayers; ++i)
+	{
+		for(uint32 j = 0; j < uiStrSize; ++j, ++iOffsetIndex)
+		{
+			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, 0, 'a');
+
+			glm::vec2 vSize(glyphRef.uiWIDTH, glyphRef.uiHEIGHT);
+			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vSize;
+			pRefDataWritePos += sizeof(glm::vec2);
+
+			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_GlyphOffsets[iOffsetIndex];
+			pRefDataWritePos += sizeof(glm::vec2);
+
+			*reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = topColor.Get();
+			pRefDataWritePos += sizeof(glm::vec4);
+
+			*reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = botColor.Get();
+			pRefDataWritePos += sizeof(glm::vec4);
+
+			// TODO: GET ACTUAL TEXTURE INDEX
+			*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(0);
+			pRefDataWritePos += sizeof(float);
+
+			glm::vec2 vUV;
+
+			vUV.x = glyphRef.rSRC_RECT.right;//1.0f;
+			vUV.y = glyphRef.rSRC_RECT.top;//0.0f;
+			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+			pRefDataWritePos += sizeof(glm::vec2);
+
+			vUV.x = glyphRef.rSRC_RECT.left;//0.0f;
+			vUV.y = glyphRef.rSRC_RECT.top;//0.0f;
+			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+			pRefDataWritePos += sizeof(glm::vec2);
+
+			vUV.x = glyphRef.rSRC_RECT.right;//1.0f;
+			vUV.y = glyphRef.rSRC_RECT.bottom;//1.0f;
+			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+			pRefDataWritePos += sizeof(glm::vec2);
+
+			vUV.x = glyphRef.rSRC_RECT.left;//0.0f;
+			vUV.y = glyphRef.rSRC_RECT.bottom;//1.0f;
+			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+			pRefDataWritePos += sizeof(glm::vec2);
+
+			*reinterpret_cast<glm::mat4 *>(pRefDataWritePos) = mtxTransform;
+			pRefDataWritePos += sizeof(glm::mat4);
+		}
+	}
 }

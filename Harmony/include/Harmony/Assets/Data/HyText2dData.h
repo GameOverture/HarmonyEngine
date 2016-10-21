@@ -18,49 +18,80 @@
 #include <map>
 using std::map;
 
-class HyText2d;
+/*
+* Glyph metrics:
+* --------------
+*
+*                       xmin                     xmax
+*                        |                         |
+*                        |<-------- width -------->|
+*                        |                         |
+*              |         +-------------------------+----------------- ymax
+*              |         |    ggggggggg   ggggg    |     ^        ^
+*              |         |   g:::::::::ggg::::g    |     |        |
+*              |         |  g:::::::::::::::::g    |     |        |
+*              |         | g::::::ggggg::::::gg    |     |        |
+*              |         | g:::::g     g:::::g     |     |        |
+*    offset_x -|-------->| g:::::g     g:::::g     |  offset_y    |
+*              |         | g:::::g     g:::::g     |     |        |
+*              |         | g::::::g    g:::::g     |     |        |
+*              |         | g:::::::ggggg:::::g     |     |        |
+*              |         |  g::::::::::::::::g     |     |      height
+*              |         |   gg::::::::::::::g     |     |        |
+*  baseline ---*---------|---- gggggggg::::::g-----*--------      |
+*            / |         |             g:::::g     |              |
+*     origin   |         | gggggg      g:::::g     |              |
+*              |         | g:::::gg   gg:::::g     |              |
+*              |         |  g::::::ggg:::::::g     |              |
+*              |         |   gg:::::::::::::g      |              |
+*              |         |     ggg::::::ggg        |              |
+*              |         |         gggggg          |              v
+*              |         +-------------------------+----------------- ymin
+*              |                                   |
+*              |------------- advance_x ---------->|
+*/
+struct HyText2dGlyphInfo
+{
+	const uint32				uiWIDTH;
+	const uint32				uiHEIGHT;
+
+	const int					iOFFSET_X;
+	const int					iOFFSET_Y;
+
+	const float					fADVANCE_X;
+	const float					fADVANCE_Y;
+
+	const HyRectangle<float>	rSRC_RECT;
+
+	std::map<uint32, float>		kerningMap;
+
+	HyText2dGlyphInfo(uint32 uiWidth,
+					  uint32 uiHeight,
+					  int iOffsetX,
+					  int iOffsetY,
+					  float fAdvanceX,
+					  float fAdvanceY,
+					  float fSrcLeft,
+					  float fSrcTop,
+					  float fSrcRight,
+					  float fSrcBot,
+					  jsonxx::Object &kerningObj) :	uiWIDTH(uiWidth),
+													uiHEIGHT(uiHeight),
+													iOFFSET_X(iOffsetX),
+													iOFFSET_Y(iOffsetY),
+													fADVANCE_X(fAdvanceX),
+													fADVANCE_Y(fAdvanceY),
+													rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot)
+	{
+		kerningMap;
+	}
+};
 
 class HyText2dData : public IHy2dData
 {
 	friend class HyFactory<HyText2dData>;
 
-	struct GlyphInfo
-	{
-		const uint32				uiWIDTH;
-		const uint32				uiHEIGHT;
-
-		const int					iOFFSET_X;
-		const int					iOFFSET_Y;
-
-		const float					fADVANCE_X;
-		const float					fADVANCE_Y;
-
-		const HyRectangle<float>	rSRC_RECT;
-
-		std::map<uint32, float>		kerningMap;
-
-		GlyphInfo(uint32 uiWidth,
-				  uint32 uiHeight,
-				  int iOffsetX,
-				  int iOffsetY,
-				  float fAdvanceX,
-				  float fAdvanceY,
-				  float fSrcLeft,
-				  float fSrcTop,
-				  float fSrcRight,
-				  float fSrcBot,
-				  jsonxx::Object &kerningObj) :	uiWIDTH(uiWidth),
-												uiHEIGHT(uiHeight),
-												iOFFSET_X(iOffsetX),
-												iOFFSET_Y(iOffsetY),
-												fADVANCE_X(fAdvanceX),
-												fADVANCE_Y(fAdvanceY),
-												rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot)
-		{
-			kerningMap;
-		}
-	};
-	typedef std::map<uint32, GlyphInfo *> Typeface;
+	typedef std::map<uint32, HyText2dGlyphInfo *> Typeface;
 
 	Typeface *						m_pTypefaces;
 	uint32							m_uiNumTypefaces;
@@ -94,6 +125,9 @@ class HyText2dData : public IHy2dData
 
 public:
 	virtual ~HyText2dData();
+
+	uint32 GetNumLayers(uint32 uiStateIndex);
+	const HyText2dGlyphInfo &GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiCode);
 
 	virtual void DoFileLoad();
 };

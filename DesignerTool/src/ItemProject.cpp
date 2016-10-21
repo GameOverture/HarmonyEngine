@@ -91,7 +91,7 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 
 /*virtual*/ void CheckerGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-    assert(m_RenderState.GetNumVertices() == 4, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
+    assert(m_RenderState.GetNumVerticesPerInstance() == 4, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
 
     for(int i = 0; i < 4; ++i)
     {
