@@ -358,53 +358,6 @@ bool HyOpenGL::Initialize()
 	pShaderPrimitive->Finalize(HYSHADERPROG_Primitive);
 	pShaderPrimitive->OnRenderThread(*this, NULL);
 
-	//const float fUnitQuadVertPos[16] = {
-	//	0.0f, 0.0f, 0.0f, 1.0f,
-	//	1.0f, 0.0f, 0.0f, 1.0f,
-	//	0.0f, 1.0f, 0.0f, 1.0f,
-	//	1.0f, 1.0f, 0.0f, 1.0f
-	//};
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, fUnitQuadVertPos, GL_STATIC_DRAW);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexDataEmulate), vertexDataEmulate, GL_STATIC_DRAW);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(primitiveVertexDataEmulate), primitiveVertexDataEmulate, GL_STATIC_DRAW);
-	//-----------------------------------------------------------------------------------------------------------------
-
-	// Initialize 2d quad index bufferSet up index data
-	//const short g_i16UnitQuadVertIndices[6] = {
-	//	0, 1, 2, 2, 1, 3
-	//};
-	//glGenBuffers(1, &m_hIBO2d);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO2d);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(short)*6, g_i16UnitQuadVertIndices, GL_STATIC_DRAW);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
-	//m_pGenericIndexBuffer2d = new uint16[HY_INDEX_BUFFER_SIZE/sizeof(uint16)];
-	//uint16 *pCurWriteShort = m_pGenericIndexBuffer2d;
-	//uint16 uiIndexCount = 0;
-	//uint32 uiResetIndexCount = 0;
-	//for(int i = 0; i < (HY_INDEX_BUFFER_SIZE/2); ++i)
-	//{
-	//	uiResetIndexCount++;
-	//	if(uiResetIndexCount == 5)
-	//	{
-	//		*pCurWriteShort = HY_RESTART_INDEX;
-	//		uiResetIndexCount = 0;
-	//	}
-	//	else
-	//	{
-	//		*pCurWriteShort = uiIndexCount;
-	//		uiIndexCount++;
-	//	}
-
-	//	pCurWriteShort++;
-	//}
-	//glPrimitiveRestartIndex(HY_RESTART_INDEX);
-	//glEnable(GL_PRIMITIVE_RESTART);
-
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

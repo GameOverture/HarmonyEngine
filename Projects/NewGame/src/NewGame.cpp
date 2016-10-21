@@ -57,7 +57,9 @@ void main()																			\n\
 
 	m_TestSprite.Load();
 	m_TestSprite.SetEnabled(true);
-	m_TestSprite.SetTransparency(1.0f);
+	//m_TestSprite.SetTransparency(0.5f);
+	m_TestSprite.topColor.Set(0.0f, 1.0f, 0.0f, 1.0f);
+	m_TestSprite.botColor.Set(1.0f, 0.0f, 0.0f, 1.0f);
 
 	m_TestQuad.Load();
 	m_TestQuad.SetTextureSource(0, 100, 100, 500, 500);
