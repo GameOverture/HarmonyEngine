@@ -97,7 +97,7 @@ HyText2dData::~HyText2dData(void)
 
 	m_pFontStates = reinterpret_cast<FontState *>(HY_NEW unsigned char[sizeof(FontState) * m_uiNumStates]);
 	FontState *pStateWriteLocation = m_pFontStates;
-	for (int i = 0; i < stateArray.size(); ++i, ++pStateWriteLocation)
+	for (uint32 i = 0; i < stateArray.size(); ++i, ++pStateWriteLocation)
 	{
 		jsonxx::Object stateObj = stateArray.get<jsonxx::Object>(i);
 		new (pStateWriteLocation)FontState(stateObj.get<jsonxx::String>("name"), m_pTypefaces, stateObj.get<jsonxx::Array>("layers"));
