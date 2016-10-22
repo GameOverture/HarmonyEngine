@@ -24,6 +24,8 @@ class HyGuiFrame
     
     eAtlasNodeType                      m_eType;
 
+    QTreeWidgetItem *                   m_pTreeWidgetItem;
+
     quint32                             m_uiChecksum;
     QString                             m_sName;
     int                                 m_iWidth;
@@ -40,8 +42,10 @@ class HyGuiFrame
 
     QMap<void *, HyTexturedQuad2d *>    m_DrawInstMap;
 
+    uint                                m_uiErrors; // '0' when there is no error
+
     // Private ctor as WidgetAtlasManager should only construct these
-    HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY);
+    HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY, uint uiErrors);
     ~HyGuiFrame();
     
 public:
@@ -50,6 +54,8 @@ public:
 
     HyTexturedQuad2d *DrawInst(void *pKey);
     void DeleteDrawInst(void *pKey);
+
+    void SetTreeWidgetItem(QTreeWidgetItem *pTreeItem);
 
     quint32 GetChecksum()                       { return m_uiChecksum; }
     QString GetName()                           { return m_sName; }
@@ -68,6 +74,10 @@ public:
     void UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX, int iY);
 
     QString ConstructImageFileName();
+
+    void SetError(eGuiFrameError eError);
+    void ClearError(eGuiFrameError eError);
+    uint GetErrors();
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)
 

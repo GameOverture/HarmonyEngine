@@ -63,10 +63,19 @@ enum eAtlasNodeType
 
 enum eProjDrawState
 {
-    PROJDRAWSTATE_Nothing,
+    PROJDRAWSTATE_Nothing = 0,
     PROJDRAWSTATE_AtlasManager,
     
     NUMPROJDRAWSTATE
+};
+
+enum eGuiFrameError
+{
+    GUIFRAMEERROR_CannotFindMetaImg = 0,
+    GUIFRAMEERROR_CouldNotPack,
+    GUIFRAMEERROR_Duplicate,
+
+    NUMGUIFRAMEERROR
 };
 
 #define HYGUIPATH_TempDir                       "temp/"
@@ -109,6 +118,8 @@ class HyGlobal
     static QRegExpValidator *       sm_pFileNameValidator;
     static QRegExpValidator *       sm_pFilePathValidator;
     static QRegExpValidator *       sm_pVector2dValidator;
+
+    static QString                  sm_ErrorStrings[NUMGUIFRAMEERROR];
 
 public:
     static void Initialize()
@@ -171,6 +182,10 @@ public:
         sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_-]*"));
         sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_-]*"));
         sm_pVector2dValidator = new QRegExpValidator(QRegExp("\\([0-9]*\\.?[0-9]*,[0-9]*\\.?[0-9]*\\)"));
+
+        sm_ErrorStrings[GUIFRAMEERROR_CannotFindMetaImg] = "Cannot find source meta-image";
+        sm_ErrorStrings[GUIFRAMEERROR_CouldNotPack] = "Could not pack this frame in atlas";
+        sm_ErrorStrings[GUIFRAMEERROR_Duplicate] = "Duplicate frame exists";
     }
 
     static eItemType GetCorrespondingDirItem(eItemType eItem)
@@ -216,20 +231,39 @@ public:
         return list;
     }
     
-    static const QString &ItemName(eItemType eItm)          { return sm_sItemNames[eItm]; }
+    static const QString &ItemName(eItemType eItm)                  { return sm_sItemNames[eItm]; }
 
-    static const QString &ItemExt(int iIndex)               { Q_ASSERT(iIndex >= 0 && iIndex < NUMITEM); return sm_sItemExt[iIndex]; }
-    static const QString &ItemExt(eItemType eItm)           { return sm_sItemExt[eItm]; }
-    
-    static const QIcon &ItemIcon(int iIndex)                { Q_ASSERT(iIndex >= 0 && iIndex < NUMITEM); return sm_ItemIcons[iIndex]; }
-    static const QIcon &ItemIcon(eItemType eItm)            { return sm_ItemIcons[eItm]; }
-    
-    static const QIcon &AtlasIcon(eAtlasNodeType eNode)     { return sm_AtlasIcons[eNode]; }
+    static const QString &ItemExt(int iIndex)                       { Q_ASSERT(iIndex >= 0 && iIndex < NUMITEM); return sm_sItemExt[iIndex]; }
+    static const QString &ItemExt(eItemType eItm)                   { return sm_sItemExt[eItm]; }
 
-    static const QRegExpValidator *CodeNameValidator()      { return sm_pCodeNameValidator; }
-    static const QRegExpValidator *FileNameValidator()      { return sm_pFileNameValidator; }
-    static const QRegExpValidator *FilePathValidator()      { return sm_pFilePathValidator; }
-    static const QRegExpValidator *Vector2dValidator()      { return sm_pVector2dValidator; }
+    static const QIcon &ItemIcon(int iIndex)                        { Q_ASSERT(iIndex >= 0 && iIndex < NUMITEM); return sm_ItemIcons[iIndex]; }
+    static const QIcon &ItemIcon(eItemType eItm)                    { return sm_ItemIcons[eItm]; }
+
+    static const QIcon &AtlasIcon(eAtlasNodeType eNode)             { return sm_AtlasIcons[eNode]; }
+
+    static const QRegExpValidator *CodeNameValidator()              { return sm_pCodeNameValidator; }
+    static const QRegExpValidator *FileNameValidator()              { return sm_pFileNameValidator; }
+    static const QRegExpValidator *FilePathValidator()              { return sm_pFilePathValidator; }
+    static const QRegExpValidator *Vector2dValidator()              { return sm_pVector2dValidator; }
+
+    static const QString GetGuiFrameErrors(uint uiErrorFlags)
+    {
+        QString sErrorString;
+        sErrorString.clear();
+
+        for(int i = 0; i < NUMGUIFRAMEERROR; ++i)
+        {
+            if((uiErrorFlags & (1 << i)) != 0)
+            {
+                if(sErrorString.isEmpty())
+                    sErrorString += sm_ErrorStrings[i];
+                else
+                    sErrorString += "; \n" % sm_ErrorStrings[i];
+            }
+        }
+
+        return sErrorString;
+    }
     
     static bool IsEngineDirValid(const QDir &engineDir)
     {

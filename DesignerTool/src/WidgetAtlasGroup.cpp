@@ -90,7 +90,13 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
                                                             frameObj["textureIndex"].toInt(),
                                                             frameObj["rotate"].toBool(),
                                                             frameObj["x"].toInt(),
-                                                            frameObj["y"].toInt());
+                                                            frameObj["y"].toInt(),
+                                                            frameObj["errors"].toInt(0));
+
+            if(QFile::exists(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName())) == false)
+                pNewFrame->SetError(GUIFRAMEERROR_CannotFindMetaImg);
+            else
+                pNewFrame->ClearError(GUIFRAMEERROR_CannotFindMetaImg);
 
             CreateTreeItem(NULL, pNewFrame);
 
@@ -312,7 +318,7 @@ HyGuiFrame *WidgetAtlasGroup::ImportImage(QString sName, QImage &newImage, eAtla
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
     QRect rAlphaCrop = ImagePacker::crop(newImage);
 
-    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, false, -1, -1);
+    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, false, -1, -1, 0);
     if(pNewFrame)
     {
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
@@ -340,6 +346,8 @@ void WidgetAtlasGroup::Refresh()
     // REPOPULATING THE PACKER WITH 'm_FrameList'
     for(int i = 0; i < m_FrameList.size(); ++i)
     {
+        m_FrameList[i]->SetTreeWidgetItem(NULL);
+
         m_Packer.addItem(m_FrameList[i]->GetSize(),
                          m_FrameList[i]->GetCrop(),
                          m_FrameList[i]->GetChecksum(),
@@ -406,6 +414,7 @@ void WidgetAtlasGroup::Refresh()
         frameObj.insert("cropTop", QJsonValue(pFrame->GetCrop().top()));
         frameObj.insert("cropRight", QJsonValue(pFrame->GetCrop().right()));
         frameObj.insert("cropBottom", QJsonValue(pFrame->GetCrop().bottom()));
+        frameObj.insert("errors", QJsonValue(static_cast<int>(pFrame->GetErrors())));
 
         frameArray.append(QJsonValue(frameObj));
 
@@ -560,22 +569,26 @@ void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFra
 
     pNewTreeItem->setText(0, pFrame->GetName());
 
-    if(pFrame->GetTextureIndex() >= 0)
-    {
+    if(pFrame->GetErrors() == 0)
         pNewTreeItem->setIcon(0, HyGlobal::AtlasIcon(pFrame->GetType()));
-        pNewTreeItem->setText(1, "Tex:" % QString::number(pFrame->GetTextureIndex()));
-    }
     else
     {
         pNewTreeItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
-        pNewTreeItem->setText(1, "Invalid");
+        pNewTreeItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(pFrame->GetErrors()));
     }
+
+    if(pFrame->GetTextureIndex() >= 0)
+        pNewTreeItem->setText(1, "Tex:" % QString::number(pFrame->GetTextureIndex()));
+    else
+        pNewTreeItem->setText(1, "Invalid");
 
     QVariant v; v.setValue(pFrame);
     pNewTreeItem->setData(0, Qt::UserRole, v);
 
     if(pParent)
         pParent->addChild(pNewTreeItem);
+
+    pFrame->SetTreeWidgetItem(pNewTreeItem);
 
     ResizeAtlasListColumns();
 }

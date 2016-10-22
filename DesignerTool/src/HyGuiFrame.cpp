@@ -10,17 +10,19 @@
 #include "HyGuiFrame.h"
 #include "scriptum/imagepacker.h"
 
-HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY) : m_uiATLAS_GROUP_ID(uiAtlasGroupId),
-                                                                                                                                                                                m_eType(eType),
-                                                                                                                                                                                m_uiChecksum(uiChecksum),
-                                                                                                                                                                                m_sName(sN),
-                                                                                                                                                                                m_iWidth(iW),
-                                                                                                                                                                                m_iHeight(iH),
-                                                                                                                                                                                m_rAlphaCrop(rAlphaCrop),
-                                                                                                                                                                                m_iTextureIndex(iTexIndex),
-                                                                                                                                                                                m_bRotation(bRot),
-                                                                                                                                                                                m_iPosX(iX),
-                                                                                                                                                                                m_iPosY(iY)
+HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY, uint uiErrors) :  m_uiATLAS_GROUP_ID(uiAtlasGroupId),
+                                                                                                                                                                                                m_eType(eType),
+                                                                                                                                                                                                m_pTreeWidgetItem(NULL),
+                                                                                                                                                                                                m_uiChecksum(uiChecksum),
+                                                                                                                                                                                                m_sName(sN),
+                                                                                                                                                                                                m_iWidth(iW),
+                                                                                                                                                                                                m_iHeight(iH),
+                                                                                                                                                                                                m_rAlphaCrop(rAlphaCrop),
+                                                                                                                                                                                                m_iTextureIndex(iTexIndex),
+                                                                                                                                                                                                m_bRotation(bRot),
+                                                                                                                                                                                                m_iPosX(iX),
+                                                                                                                                                                                                m_iPosY(iY),
+                                                                                                                                                                                                m_uiErrors(uiErrors)
 {
 }
 
@@ -97,6 +99,11 @@ void HyGuiFrame::DeleteDrawInst(void *pKey)
     }
 }
 
+void HyGuiFrame::SetTreeWidgetItem(QTreeWidgetItem *pTreeItem)
+{
+    m_pTreeWidgetItem = pTreeItem;
+}
+
 void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX, int iY)
 {
     m_iTextureIndex = iTextureIndex;
@@ -121,12 +128,8 @@ void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX,
             }
         }
     }
-
-    for(int i = 0; i < m_Links.count(); ++i)
-    {
-        // TODO:
-        //m_Links[i]
-    }
+    else
+        SetError(GUIFRAMEERROR_CouldNotPack);
 }
 
 QString HyGuiFrame::ConstructImageFileName()
@@ -136,4 +139,36 @@ QString HyGuiFrame::ConstructImageFileName()
     sMetaImgName += ".png";
 
     return sMetaImgName;
+}
+
+void HyGuiFrame::SetError(eGuiFrameError eError)
+{
+    m_uiErrors |= (1 << eError);
+
+    if(m_pTreeWidgetItem)
+    {
+        m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
+        m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
+    }
+}
+
+void HyGuiFrame::ClearError(eGuiFrameError eError)
+{
+    m_uiErrors &= ~(1 << eError);
+
+    if(m_pTreeWidgetItem)
+    {
+        if(m_uiErrors == 0)
+            m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(m_eType));
+        else
+        {
+            m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
+            m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
+        }
+    }
+}
+
+uint HyGuiFrame::GetErrors()
+{
+    return m_uiErrors;
 }

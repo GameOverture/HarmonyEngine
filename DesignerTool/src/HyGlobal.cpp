@@ -19,6 +19,8 @@
 /*static*/ QRegExpValidator *HyGlobal::sm_pFilePathValidator = NULL;
 /*static*/ QRegExpValidator *HyGlobal::sm_pVector2dValidator = NULL;
 
+/*static*/ QString HyGlobal::sm_ErrorStrings[NUMGUIFRAMEERROR];
+
 QAction *FindAction(QList<QAction *> list, QString sName)
 {
     foreach(QAction *pAction, list)
