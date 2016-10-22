@@ -27,6 +27,7 @@ layout(location = 8) in vec2 UVcoord3;										\n\
 layout(location = 9) in mat4 mtxLocalToWorld;								\n\
 																			\n\
 smooth out vec2 interpUV;													\n\
+smooth out vec4 interpColor;												\n\
 flat out float texIndex;													\n\
 																			\n\
 uniform mat4 mtxCameraToClip;												\n\
@@ -47,25 +48,25 @@ void main()																	\n\
 		interpUV.x = UVcoord0.x;											\n\
 		interpUV.y = UVcoord0.y;											\n\
 																			\n\
-		gl_FrontColor = topTint;											\n\
+		interpColor = topTint;												\n\
 		break;																\n\
 	case 1:																	\n\
 		interpUV.x = UVcoord1.x;											\n\
 		interpUV.y = UVcoord1.y;											\n\
 																			\n\
-		gl_FrontColor = topTint;											\n\
+		interpColor = topTint;												\n\
 		break;																\n\
 	case 2:																	\n\
 		interpUV.x = UVcoord2.x;											\n\
 		interpUV.y = UVcoord2.y;											\n\
 																			\n\
-		gl_FrontColor = botTint;											\n\
+		interpColor = botTint;												\n\
 		break;																\n\
 	case 3:																	\n\
 		interpUV.x = UVcoord3.x;											\n\
 		interpUV.y = UVcoord3.y;											\n\
 																			\n\
-		gl_FrontColor = botTint;											\n\
+		interpColor = botTint;												\n\
 		break;																\n\
 	}																		\n\
 	texIndex = textureIndex;												\n\
@@ -84,6 +85,7 @@ const char * const szHYQUADBATCH_FRAGMENTSHADER = "							\n\
 #version 420																\n\
 																			\n\
 smooth in vec2 interpUV;													\n\
+smooth in vec4 interpColor;													\n\
 flat in float texIndex;														\n\
 																			\n\
 uniform sampler2DArray Tex;													\n\
@@ -95,11 +97,11 @@ void main()																	\n\
 	// Blend interpColor with whatever texel I get from interpUV			\n\
 	vec4 texelClr = texture(Tex, vec3(interpUV.x, interpUV.y, texIndex));	\n\
 																			\n\
-	outputColor = gl_Color * texelClr;										\n\
+	outputColor = interpColor * texelClr;									\n\
 }";
 
 const char * const szHYPRIMATIVE_VERTEXSHADER = "							\n\
-#version 400																\n\
+#version 420																\n\
 																			\n\
 layout(location = 0) in vec4 position;										\n\
 																			\n\
@@ -121,7 +123,7 @@ void main()																	\n\
 }";
 
 const char * const szHYPRIMATIVE_FRAGMENTSHADER = "							\n\
-#version 400																\n\
+#version 420																\n\
 																			\n\
 in vec4 Color;																\n\
 out vec4 FragColor;															\n\
