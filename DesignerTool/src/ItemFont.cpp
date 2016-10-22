@@ -235,7 +235,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     pWidget->GeneratePreview(true);
     
     QJsonObject fontObj;
-    pWidget->AppendFontInfo(fontObj);
+    pWidget->GetSaveInfo(fontObj);
     QJsonDocument settingsDoc(fontObj);
 
     QFile fontFile(GetAbsPath());

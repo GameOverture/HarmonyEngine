@@ -122,7 +122,7 @@ public:
     
     bool SaveFontFilesToMetaDir();
     
-    void AppendFontInfo(QJsonObject &fontObj);
+    void GetSaveInfo(QJsonObject &fontObj);
 
 private slots:
     void on_cmbAtlasGroups_currentIndexChanged(int index);

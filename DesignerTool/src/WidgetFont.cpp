@@ -479,7 +479,7 @@ bool WidgetFont::SaveFontFilesToMetaDir()
     return true;
 }
 
-void WidgetFont::AppendFontInfo(QJsonObject &fontObj)
+void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
 {
     fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetChecksum())));
 

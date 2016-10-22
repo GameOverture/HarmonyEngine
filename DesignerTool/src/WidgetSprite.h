@@ -44,7 +44,7 @@ public:
     
     void AppendActionsForToolBar(QList<QAction *> &actionList);
 
-    void GetSpriteStateInfo(QJsonArray &spriteStateArrayRef);
+    void GetSaveInfo(QJsonArray &spriteStateArrayRef);
     
     WidgetSpriteState *GetCurSpriteState();
 

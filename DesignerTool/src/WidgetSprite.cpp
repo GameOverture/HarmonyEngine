@@ -130,7 +130,7 @@ void WidgetSprite::AppendActionsForToolBar(QList<QAction *> &actionList)
     actionList.append(ui->actionApplyToAll);
 }
 
-void WidgetSprite::GetSpriteStateInfo(QJsonArray &spriteStateArrayRef)
+void WidgetSprite::GetSaveInfo(QJsonArray &spriteStateArrayRef)
 {
     for(int i = 0; i < ui->cmbStates->count(); ++i)
     {

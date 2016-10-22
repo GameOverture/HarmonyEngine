@@ -130,8 +130,6 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
 {
     WidgetSprite *pWidgetSprite = static_cast<WidgetSprite *>(m_pWidget);
     pWidgetSprite->RefreshFrame(pFrame);
-
-
 }
 
 /*virtual*/ void ItemSprite::OnUnlink(HyGuiFrame *pFrame)
@@ -143,7 +141,7 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : I
 /*virtual*/ void ItemSprite::OnSave()
 {
     QJsonArray spriteStateArray;
-    static_cast<WidgetSprite *>(m_pWidget)->GetSpriteStateInfo(spriteStateArray);
+    static_cast<WidgetSprite *>(m_pWidget)->GetSaveInfo(spriteStateArray);
 
     QJsonDocument settingsDoc(spriteStateArray);
 
