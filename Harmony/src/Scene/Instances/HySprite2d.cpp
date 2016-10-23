@@ -310,22 +310,22 @@ float HySprite2d::GetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	glm::vec2 vUV;
 
 	vUV.x = frameRef.rSRC_RECT.right;//1.0f;
-	vUV.y = frameRef.rSRC_RECT.top;//0.0f;
+	vUV.y = frameRef.rSRC_RECT.top;//1.0f;
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(glm::vec2);
 
 	vUV.x = frameRef.rSRC_RECT.left;//0.0f;
-	vUV.y = frameRef.rSRC_RECT.top;//0.0f;
+	vUV.y = frameRef.rSRC_RECT.top;//1.0f;
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(glm::vec2);
 
 	vUV.x = frameRef.rSRC_RECT.right;//1.0f;
-	vUV.y = frameRef.rSRC_RECT.bottom;//1.0f;
+	vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(glm::vec2);
 
 	vUV.x = frameRef.rSRC_RECT.left;//0.0f;
-	vUV.y = frameRef.rSRC_RECT.bottom;//1.0f;
+	vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(glm::vec2);
 

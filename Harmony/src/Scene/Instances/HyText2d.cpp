@@ -38,23 +38,23 @@ void HyText2d::TextSet(std::string sText)
 	m_bIsDirty = true;
 }
 
-void HyText2d::TextSet(const char *szString, ...)
-{
-	//va_list vl;
-	//va_start(vl, szString);
-	////#ifdef HY_UNICODE
-	////	vswprintf(sm_pTempTextBuffer, HY_TEMP_TEXTBUFFER_SIZE, szString, vl);
-	////#else
-	//vsprintf(sm_pTempTextBuffer, szString, vl);
-	////#endif
-	//va_end(vl);
-
-	//if(m_sString == sm_pTempTextBuffer)
-	//	return;
-	//m_sString = sm_pTempTextBuffer;
-
-	//CalcVertexBuffer();
-}
+//void HyText2d::TextSet(const char *szString, ...)
+//{
+//	//va_list vl;
+//	//va_start(vl, szString);
+//	////#ifdef HY_UNICODE
+//	////	vswprintf(sm_pTempTextBuffer, HY_TEMP_TEXTBUFFER_SIZE, szString, vl);
+//	////#else
+//	//vsprintf(sm_pTempTextBuffer, szString, vl);
+//	////#endif
+//	//va_end(vl);
+//
+//	//if(m_sString == sm_pTempTextBuffer)
+//	//	return;
+//	//m_sString = sm_pTempTextBuffer;
+//
+//	//CalcVertexBuffer();
+//}
 
 std::string HyText2d::TextGet()
 {
@@ -75,6 +75,50 @@ void HyText2d::TextSetState(uint32 uiStateIndex)
 {
 	m_uiCurFontState = uiStateIndex;
 	m_bIsDirty = true;
+}
+
+uint32 HyText2d::TextGetNumLayers()
+{
+	static_cast<HyText2dData *>(m_pData)->GetNumLayers(m_uiCurFontState);
+}
+
+uint32 HyText2d::TextGetNumLayers(uint32 uiStateIndex)
+{
+	static_cast<HyText2dData *>(m_pData)->GetNumLayers(uiStateIndex);
+}
+
+std::pair<HyAnimVec3 &, HyAnimVec3 &> HyText2d::TextGetLayerColor(uint32 uiLayerIndex)
+{
+	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[m_uiCurFontState].m_LayerColors[uiLayerIndex].topColor, m_StateColors[m_uiCurFontState].m_LayerColors[uiLayerIndex].botColor);
+}
+
+std::pair<HyAnimVec3 &, HyAnimVec3 &> HyText2d::TextGetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex)
+{
+	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[uiStateIndex].m_LayerColors[uiLayerIndex].topColor, m_StateColors[uiStateIndex].m_LayerColors[uiLayerIndex].botColor);
+}
+
+void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
+{
+	m_StateColors[m_uiCurFontState].m_LayerColors[uiLayerIndex].topColor.Set(fR, fG, fB);
+	m_StateColors[m_uiCurFontState].m_LayerColors[uiLayerIndex].botColor.Set(fR, fG, fB);
+}
+
+void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB)
+{
+	m_StateColors[uiStateIndex].m_LayerColors[uiLayerIndex].topColor.Set(fR, fG, fB);
+	m_StateColors[uiStateIndex].m_LayerColors[uiLayerIndex].botColor.Set(fR, fG, fB);
+}
+
+void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
+{
+	m_StateColors[m_uiCurFontState].m_LayerColors[uiLayerIndex].topColor.Set(fTopR, fTopG, fTopB);
+	m_StateColors[m_uiCurFontState].m_LayerColors[uiLayerIndex].botColor.Set(fBotR, fBotG, fBotB);
+}
+
+void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
+{
+	m_StateColors[uiStateIndex].m_LayerColors[uiLayerIndex].topColor.Set(fTopR, fTopG, fTopB);
+	m_StateColors[uiStateIndex].m_LayerColors[uiLayerIndex].botColor.Set(fBotR, fBotG, fBotB);
 }
 
 HyAlign HyText2d::TextGetAlignment()
@@ -120,6 +164,20 @@ void HyText2d::TextClearBox()
 /*virtual*/ void HyText2d::OnDataLoaded()
 {
 	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pData);
+
+	m_StateColors.clear();
+
+	for(uint32 i = 0; i < pTextData->GetNumStates(); ++i)
+	{
+		m_StateColors.push_back(StateColors());
+
+		for(uint32 j = 0; j < pTextData->GetNumLayers(i); ++j)
+		{
+			m_StateColors[i].m_LayerColors.push_back(StateColors::LayerColor());
+
+			m_StateColors[i].m_LayerColors[j].topColor.Set(fTopR, fTopG, fTopB);
+		}
+	}
 }
 
 /*virtual*/ void HyText2d::OnInstUpdate()
@@ -145,7 +203,7 @@ void HyText2d::TextClearBox()
 		
 		for(uint32 j = 0; j < uiStrSize; ++j)
 		{
-			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, i, static_cast<uint32>(m_sString[i]));
+			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, i, static_cast<uint32>(m_sString[j]));
 			float fKerning = 0.0f;
 
 			m_GlyphOffsets.push_back(glm::vec2(ptWritePos.x + fKerning + glyphRef.iOFFSET_X,
@@ -177,7 +235,7 @@ void HyText2d::TextClearBox()
 	{
 		for(uint32 j = 0; j < uiStrSize; ++j, ++iOffsetIndex)
 		{
-			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, 0, 'a');
+			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, i, static_cast<uint32>(m_sString[j]));
 
 			glm::vec2 vSize(glyphRef.uiWIDTH, glyphRef.uiHEIGHT);
 			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vSize;
@@ -199,22 +257,22 @@ void HyText2d::TextClearBox()
 			glm::vec2 vUV;
 
 			vUV.x = glyphRef.rSRC_RECT.right;//1.0f;
-			vUV.y = glyphRef.rSRC_RECT.top;//0.0f;
+			vUV.y = glyphRef.rSRC_RECT.top;//1.0f;
 			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 			pRefDataWritePos += sizeof(glm::vec2);
 
 			vUV.x = glyphRef.rSRC_RECT.left;//0.0f;
-			vUV.y = glyphRef.rSRC_RECT.top;//0.0f;
+			vUV.y = glyphRef.rSRC_RECT.top;//1.0f;
 			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 			pRefDataWritePos += sizeof(glm::vec2);
 
 			vUV.x = glyphRef.rSRC_RECT.right;//1.0f;
-			vUV.y = glyphRef.rSRC_RECT.bottom;//1.0f;
+			vUV.y = glyphRef.rSRC_RECT.bottom;//0.0f;
 			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 			pRefDataWritePos += sizeof(glm::vec2);
 
 			vUV.x = glyphRef.rSRC_RECT.left;//0.0f;
-			vUV.y = glyphRef.rSRC_RECT.bottom;//1.0f;
+			vUV.y = glyphRef.rSRC_RECT.bottom;//0.0f;
 			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 			pRefDataWritePos += sizeof(glm::vec2);
 

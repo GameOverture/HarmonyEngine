@@ -195,6 +195,7 @@ WidgetFontModel *WidgetFont::GetCurrentFontModel()
 void WidgetFont::SetGlyphsDirty()
 {
     m_sAvailableTypefaceGlyphs.clear();
+    m_sAvailableTypefaceGlyphs += ' ';
     
     // Assemble glyph set
     if(ui->chk_09->isChecked())
@@ -489,7 +490,7 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
     availableGlyphsObj.insert("a-z", ui->chk_az->isChecked());
     availableGlyphsObj.insert("symbols", ui->chk_symbols->isChecked());
     availableGlyphsObj.insert("additional", ui->txtAdditionalSymbols->text());
-    
+
     fontObj.insert("availableGlyphs", availableGlyphsObj);
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -509,6 +510,16 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
         {
             char cCharacter = m_sAvailableTypefaceGlyphs[j].toLatin1();
             texture_glyph_t *pGlyph = texture_font_get_glyph(m_MasterStageList[i]->pTextureFont, &cCharacter);
+
+            QSize atlasSize = GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
+            double dLeft = static_cast<double>(m_pTrueAtlasFrame->GetX() + (m_pAtlas->width * pGlyph->s0));
+            dLeft /= static_cast<double>(atlasSize.width());
+            double dTop = static_cast<double>(m_pTrueAtlasFrame->GetY() + (m_pAtlas->height * pGlyph->t0));
+            dTop /= static_cast<double>(atlasSize.height());
+            double dRight = static_cast<double>(m_pTrueAtlasFrame->GetX() + (m_pAtlas->width * pGlyph->s1));
+            dRight /= static_cast<double>(atlasSize.width());
+            double dBottom = static_cast<double>(m_pTrueAtlasFrame->GetY() + (m_pAtlas->height * pGlyph->t1));
+            dBottom /= static_cast<double>(atlasSize.height());
             
             QJsonObject glyphInfoObj;
             glyphInfoObj.insert("code", static_cast<int>(pGlyph->codepoint));
@@ -518,12 +529,10 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
             glyphInfoObj.insert("height", static_cast<int>(pGlyph->height));
             glyphInfoObj.insert("offset_x", pGlyph->offset_x);
             glyphInfoObj.insert("offset_y", pGlyph->offset_y);
-
-            QSize atlasSize = GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
-            glyphInfoObj.insert("left", static_cast<float>((m_pTrueAtlasFrame->GetX() + (static_cast<float>(m_pAtlas->width) * pGlyph->s0)) * atlasSize.width()));
-            glyphInfoObj.insert("top", static_cast<float>((m_pTrueAtlasFrame->GetY() + (static_cast<float>(m_pAtlas->height) * pGlyph->t0)) * atlasSize.height()));
-            glyphInfoObj.insert("right", static_cast<float>((m_pTrueAtlasFrame->GetX() + m_pTrueAtlasFrame->GetSize().width() + (static_cast<float>(m_pAtlas->width) * pGlyph->s1)) * atlasSize.width()));
-            glyphInfoObj.insert("bottom", static_cast<float>((m_pTrueAtlasFrame->GetY() + m_pTrueAtlasFrame->GetSize().height() + (static_cast<float>(m_pAtlas->height) * pGlyph->t1)) * atlasSize.height()));
+            glyphInfoObj.insert("left", dLeft);
+            glyphInfoObj.insert("top", dTop);
+            glyphInfoObj.insert("right", dRight);
+            glyphInfoObj.insert("bottom", dBottom);
             
             QJsonObject kerningInfoObj;
             for(int k = 0; k < m_sAvailableTypefaceGlyphs.count(); ++k)

@@ -188,22 +188,22 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	glm::vec2 vUV;
 
 	vUV.x = m_SrcRect.right;//1.0f;
-	vUV.y = m_SrcRect.top;//0.0f;
+	vUV.y = m_SrcRect.top;//1.0f;
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(glm::vec2);
 
 	vUV.x = m_SrcRect.left;//0.0f;
-	vUV.y = m_SrcRect.top;//0.0f;
+	vUV.y = m_SrcRect.top;//1.0f;
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(glm::vec2);
 
 	vUV.x = m_SrcRect.right;//1.0f;
-	vUV.y = m_SrcRect.bottom;//1.0f;
+	vUV.y = m_SrcRect.bottom;//0.0f;
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(glm::vec2);
 
 	vUV.x = m_SrcRect.left;//0.0f;
-	vUV.y = m_SrcRect.bottom;//1.0f;
+	vUV.y = m_SrcRect.bottom;//0.0f;
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 	pRefDataWritePos += sizeof(glm::vec2);
 

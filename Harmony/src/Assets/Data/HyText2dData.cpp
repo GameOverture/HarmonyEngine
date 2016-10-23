@@ -54,6 +54,11 @@ HyText2dData::~HyText2dData(void)
 	delete[] m_pTypefaces;
 }
 
+uint32 HyText2dData::GetNumStates()
+{
+	return m_uiNumStates;
+}
+
 uint32 HyText2dData::GetNumLayers(uint32 uiStateIndex)
 {
 	return m_pFontStates[uiStateIndex].uiNUM_LAYERS;

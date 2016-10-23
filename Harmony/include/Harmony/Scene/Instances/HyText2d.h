@@ -22,6 +22,17 @@ protected:
 
 	uint32				m_uiCurFontState;
 
+	struct StateColors
+	{
+		struct LayerColor
+		{
+			HyAnimVec3 		topColor;
+			HyAnimVec3 		botColor;
+		};
+		vector<LayerColor>	m_LayerColors;
+	};
+	vector<StateColors>	m_StateColors;
+
 	HyAlign				m_eAlignment;
 	HyRectangle<float>	m_rBox;
 
@@ -40,15 +51,24 @@ public:
 	HyText2d(const char *szPrefix, const char *szName);
 	virtual ~HyText2d(void);
 
-	// Accepts newline characters "\n"
+	// Accepts newline characters '\n'
 	void TextSet(std::string sText);
-	void TextSet(const char *szString, ...);
 	std::string TextGet();
 
 	uint32 TextGetLength();
 
 	uint32 TextGetState();
 	void TextSetState(uint32 uiStateIndex);
+
+	uint32 TextGetNumLayers();
+	uint32 TextGetNumLayers(uint32 uiStateIndex);
+
+	std::pair<HyAnimVec3 &, HyAnimVec3 &> TextGetLayerColor(uint32 uiLayerIndex);
+	std::pair<HyAnimVec3 &, HyAnimVec3 &> TextGetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex);
+	void TextSetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
+	void TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB);
+	void TextSetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);
+	void TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);
 
 	HyAlign TextGetAlignment();
 	void TextSetAlignment(HyAlign eAlignment);

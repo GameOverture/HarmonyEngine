@@ -168,6 +168,7 @@ void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage 
         if(pAtlasGroup->GetId() == pFrame->GetAtlasGroupdId())
         {
             pFrame->ReplaceImage(sName, newImage, pAtlasGroup->m_MetaDir);
+            pAtlasGroup->Refresh();
             return;
         }
     }

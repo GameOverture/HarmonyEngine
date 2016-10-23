@@ -126,6 +126,7 @@ class HyText2dData : public IHy2dData
 public:
 	virtual ~HyText2dData();
 
+	uint32 GetNumStates();
 	uint32 GetNumLayers(uint32 uiStateIndex);
 	const HyText2dGlyphInfo &GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiCode);
 
