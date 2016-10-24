@@ -89,36 +89,36 @@ uint32 HyText2d::TextGetNumLayers(uint32 uiStateIndex)
 
 std::pair<HyAnimVec3 &, HyAnimVec3 &> HyText2d::TextGetLayerColor(uint32 uiLayerIndex)
 {
-	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[m_uiCurFontState].m_LayerColors[uiLayerIndex].topColor, m_StateColors[m_uiCurFontState].m_LayerColors[uiLayerIndex].botColor);
+	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->topColor, m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->botColor);
 }
 
 std::pair<HyAnimVec3 &, HyAnimVec3 &> HyText2d::TextGetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex)
 {
-	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[uiStateIndex].m_LayerColors[uiLayerIndex].topColor, m_StateColors[uiStateIndex].m_LayerColors[uiLayerIndex].botColor);
+	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topColor, m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botColor);
 }
 
 void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
 {
-	m_StateColors[m_uiCurFontState].m_LayerColors[uiLayerIndex].topColor.Set(fR, fG, fB);
-	m_StateColors[m_uiCurFontState].m_LayerColors[uiLayerIndex].botColor.Set(fR, fG, fB);
+	m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->topColor.Set(fR, fG, fB);
+	m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->botColor.Set(fR, fG, fB);
 }
 
 void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB)
 {
-	m_StateColors[uiStateIndex].m_LayerColors[uiLayerIndex].topColor.Set(fR, fG, fB);
-	m_StateColors[uiStateIndex].m_LayerColors[uiLayerIndex].botColor.Set(fR, fG, fB);
+	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topColor.Set(fR, fG, fB);
+	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botColor.Set(fR, fG, fB);
 }
 
 void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
 {
-	m_StateColors[m_uiCurFontState].m_LayerColors[uiLayerIndex].topColor.Set(fTopR, fTopG, fTopB);
-	m_StateColors[m_uiCurFontState].m_LayerColors[uiLayerIndex].botColor.Set(fBotR, fBotG, fBotB);
+	m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->topColor.Set(fTopR, fTopG, fTopB);
+	m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->botColor.Set(fBotR, fBotG, fBotB);
 }
 
 void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
 {
-	m_StateColors[uiStateIndex].m_LayerColors[uiLayerIndex].topColor.Set(fTopR, fTopG, fTopB);
-	m_StateColors[uiStateIndex].m_LayerColors[uiLayerIndex].botColor.Set(fBotR, fBotG, fBotB);
+	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topColor.Set(fTopR, fTopG, fTopB);
+	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botColor.Set(fBotR, fBotG, fBotB);
 }
 
 HyAlign HyText2d::TextGetAlignment()
@@ -165,20 +165,32 @@ void HyText2d::TextClearBox()
 {
 	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pData);
 
+	for(uint32 i = 0; i < m_StateColors.size(); ++i)
+	{
+		for(uint32 j = 0; j < m_StateColors[i]->m_LayerColors.size(); ++j)
+			delete m_StateColors[i]->m_LayerColors[j];
+	
+		delete m_StateColors[i];
+	}
 	m_StateColors.clear();
 
 	for(uint32 i = 0; i < pTextData->GetNumStates(); ++i)
 	{
-		m_StateColors.push_back(StateColors());
+		m_StateColors.push_back(new StateColors());
 
 		for(uint32 j = 0; j < pTextData->GetNumLayers(i); ++j)
 		{
-			m_StateColors[i].m_LayerColors.push_back(StateColors::LayerColor());
+			m_StateColors[i]->m_LayerColors.push_back(new StateColors::LayerColor());
 
 			glm::vec3 testTop = pTextData->GetDefaultColor(i, j, true);
 			glm::vec3 testBot = pTextData->GetDefaultColor(i, j, true);
-			m_StateColors[i].m_LayerColors[j].topColor.Set(testTop.r, testTop.g, testTop.b);
-			m_StateColors[i].m_LayerColors[j].botColor.Set(testBot.r, testBot.g, testBot.b);
+			
+			const glm::vec3 &testtttTop = m_StateColors[i]->m_LayerColors[j]->topColor.Get();
+
+			m_StateColors[i]->m_LayerColors[j]->topColor.Set(testTop.r, testTop.g, testTop.b);
+
+			//testtttTop = m_StateColors[i].m_LayerColors[j].topColor.Get();
+			m_StateColors[i]->m_LayerColors[j]->botColor.Set(testBot.r, testBot.g, testBot.b);
 		}
 	}
 }
@@ -247,12 +259,12 @@ void HyText2d::TextClearBox()
 			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_GlyphOffsets[iOffsetIndex];
 			pRefDataWritePos += sizeof(glm::vec2);
 
-			*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = m_StateColors[m_uiCurFontState].m_LayerColors[i].topColor.Get();
+			*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->topColor.Get();
 			pRefDataWritePos += sizeof(glm::vec3);
 			*reinterpret_cast<float *>(pRefDataWritePos) = topColor.A();
 			pRefDataWritePos += sizeof(float);
 
-			*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = m_StateColors[m_uiCurFontState].m_LayerColors[i].botColor.Get();
+			*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->botColor.Get();
 			pRefDataWritePos += sizeof(glm::vec3);
 			*reinterpret_cast<float *>(pRefDataWritePos) = botColor.A();
 			pRefDataWritePos += sizeof(float);

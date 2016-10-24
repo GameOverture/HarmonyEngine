@@ -29,9 +29,9 @@ protected:
 			HyAnimVec3 		topColor;
 			HyAnimVec3 		botColor;
 		};
-		vector<LayerColor>	m_LayerColors;
+		vector<LayerColor *>	m_LayerColors;
 	};
-	vector<StateColors>	m_StateColors;
+	vector<StateColors *>	m_StateColors;
 
 	HyAlign				m_eAlignment;
 	HyRectangle<float>	m_rBox;
