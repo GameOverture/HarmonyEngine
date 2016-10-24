@@ -224,7 +224,14 @@ void HyText2d::TextClearBox()
 	glm::vec2 *pWritePos = new glm::vec2[uiNumLayers];
 	memset(pWritePos, 0, sizeof(glm::vec2) * uiNumLayers);
 
+	if(0 != (m_rBox.iTag & BOXATTRIB_IsUsed))
+	{
+		for(uint32 i = 0; i < uiNumLayers; ++i)
+			pWritePos[i].y -= pData->GetLineGap();
+	}
+
 	uint32 uiLastSpaceIndex = 0;
+	uint32 uiNewlineIndex = 0;
 
 	for(uint32 iStrIndex = 0; iStrIndex < m_sString.length(); ++iStrIndex)
 	{
@@ -246,7 +253,7 @@ void HyText2d::TextClearBox()
 
 			pWritePos[iLayerIndex].x += glyphRef.fADVANCE_X;
 
-			if(iStrIndex != uiLastSpaceIndex)
+			if(iStrIndex != uiLastSpaceIndex && uiNewlineIndex != uiLastSpaceIndex)
 			{
 				if(0 != (m_rBox.iTag & BOXATTRIB_IsUsed) && pWritePos[iLayerIndex].x > m_rBox.right)
 				{
@@ -266,6 +273,7 @@ void HyText2d::TextClearBox()
 
 			// Restart calculation of glyph offsets at the beginning of this this word (on a newline)
 			iStrIndex = uiLastSpaceIndex; // The for-loop will increment to the character after the space
+			uiNewlineIndex = iStrIndex;
 		}
 	}
 

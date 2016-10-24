@@ -68,7 +68,7 @@ glm::vec2 textBoxSize;
 	m_TestSprite.SetTransparency(0.5f);
 
 	m_TestText.Load();
-	m_TestText.TextSet("Testing this omg");
+	m_TestText.TextSet("Oh my goodness, oh my damn. Oh my goodness, they going ham.");
 	m_TestText.TextSetBox(textBoxSize.x, textBoxSize.y);
 	m_TestText.pos.Set(0.0f, -200.0f);
 	//m_TestText.rot.Set(45.0f);
