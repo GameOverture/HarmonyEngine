@@ -111,6 +111,10 @@ public:
     QColor GetLayerBotColor(int iRowIndex) const;
     void SetLayerColors(int iId, QColor topColor, QColor botColor);
     
+    float GetLineHeight();
+    float GetLineAscender();
+    float GetLineDescender();
+    
     void MoveRowUp(int iIndex);
     void MoveRowDown(int iIndex);
     

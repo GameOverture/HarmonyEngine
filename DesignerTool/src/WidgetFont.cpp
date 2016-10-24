@@ -483,6 +483,7 @@ bool WidgetFont::SaveFontFilesToMetaDir()
 void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
 {
     fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetChecksum())));
+    fontObj.insert("textureIndex", m_pTrueAtlasFrame->GetTextureIndex());
 
     QJsonObject availableGlyphsObj;
     availableGlyphsObj.insert("0-9", ui->chk_09->isChecked());
@@ -562,6 +563,9 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
         
         QJsonObject stateObj;
         stateObj.insert("name", pState->GetName());
+        stateObj.insert("lineHeight", pFontModel->GetLineHeight());
+        stateObj.insert("lineAscender", pFontModel->GetLineAscender());
+        stateObj.insert("lineDescender", pFontModel->GetLineDescender());
         
         QJsonArray layersArray;
         for(int j = 0; j < pFontModel->rowCount(); ++j)

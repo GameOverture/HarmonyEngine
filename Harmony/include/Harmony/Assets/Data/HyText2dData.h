@@ -93,6 +93,8 @@ class HyText2dData : public IHy2dData
 
 	typedef std::map<uint32, HyText2dGlyphInfo *> Typeface;
 
+	uint32							m_uiTextureIndex;
+
 	Typeface *						m_pTypefaces;
 	uint32							m_uiNumTypefaces;
 
@@ -100,6 +102,9 @@ class HyText2dData : public IHy2dData
 	{
 		const std::string			sNAME;
 		const uint32				uiNUM_LAYERS;
+		const float					fLINE_HEIGHT;
+		const float					fLINE_ASCENDER;
+		const float					fLINE_DESCENDER;
 
 		struct Layer
 		{
@@ -114,7 +119,7 @@ class HyText2dData : public IHy2dData
 		};
 		Layer *						pLayers;
 
-		FontState(std::string sName, Typeface *pTypefaces, jsonxx::Array layersArray);
+		FontState(std::string sName, Typeface *pTypefaces, float fLineGap, float fLineAcender, float fLineDescender, jsonxx::Array layersArray);
 		~FontState();
 	};
 	FontState *						m_pFontStates;
@@ -131,7 +136,9 @@ public:
 	const HyText2dGlyphInfo &GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiCode);
 	const glm::vec3 &GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop);
 	uint32 GetTextureIndex();
-	float GetLineGap();
+	float GetLineHeight(uint32 uiStateIndex);
+	float GetLineAscender(uint32 uiStateIndex);
+	float GetLineDescender(uint32 uiStateIndex);
 
 	virtual void DoFileLoad();
 };

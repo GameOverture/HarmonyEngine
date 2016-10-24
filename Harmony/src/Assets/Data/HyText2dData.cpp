@@ -11,8 +11,11 @@
 
 #include "Renderer/IHyRenderer.h"
 
-HyText2dData::FontState::FontState(std::string sName, Typeface *pTypefaces, jsonxx::Array layersArray) :	sNAME(sName),
-																											uiNUM_LAYERS(static_cast<uint32>(layersArray.size()))
+HyText2dData::FontState::FontState(std::string sName, Typeface *pTypefaces, float fLineHeight, float fLineAcender, float fLineDescender, jsonxx::Array layersArray) :	sNAME(sName),
+																																										fLINE_HEIGHT(fLineHeight),
+																																										fLINE_ASCENDER(fLineAcender),
+																																										fLINE_DESCENDER(fLineDescender),
+																																										uiNUM_LAYERS(static_cast<uint32>(layersArray.size()))
 {
 	pLayers = reinterpret_cast<Layer *>(HY_NEW unsigned char[sizeof(Layer) * uiNUM_LAYERS]);
 	Layer *pLayerWriteLocation = pLayers;
@@ -37,6 +40,7 @@ HyText2dData::FontState::~FontState()
 }
 
 HyText2dData::HyText2dData(const std::string &sPath, int32 iShaderId) : IHy2dData(HYINST_Text2d, sPath, iShaderId),
+																		m_uiTextureIndex(0),
 																		m_pTypefaces(NULL),
 																		m_uiNumTypefaces(0),
 																		m_pFontStates(NULL),
@@ -79,14 +83,22 @@ const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLay
 
 uint32 HyText2dData::GetTextureIndex()
 {
-	// TODO: GET ACTUAL TEXTURE INDEX
-	return 0;
+	return m_uiTextureIndex;
 }
 
-float HyText2dData::GetLineGap()
+float HyText2dData::GetLineHeight(uint32 uiStateIndex)
 {
-	// TODO: GET ACTUAL LINE GAP FROM texture_font_t
-	return 50.0f;
+	return m_pFontStates[uiStateIndex].fLINE_HEIGHT;
+}
+
+float HyText2dData::GetLineAscender(uint32 uiStateIndex)
+{
+	return m_pFontStates[uiStateIndex].fLINE_ASCENDER;
+}
+
+float HyText2dData::GetLineDescender(uint32 uiStateIndex)
+{
+	return m_pFontStates[uiStateIndex].fLINE_DESCENDER;
 }
 
 /*virtual*/ void HyText2dData::DoFileLoad()
@@ -96,6 +108,8 @@ float HyText2dData::GetLineGap()
 
 	jsonxx::Object textObject;
 	textObject.parse(sFontFileContents);
+
+	m_uiTextureIndex = static_cast<uint32>(textObject.get<jsonxx::Number>("textureIndex"));
 	
 	jsonxx::Array typefaceArray = textObject.get<jsonxx::Array>("typefaceArray");
 	m_uiNumTypefaces = static_cast<uint32>(typefaceArray.size());
@@ -135,6 +149,11 @@ float HyText2dData::GetLineGap()
 	for (uint32 i = 0; i < stateArray.size(); ++i, ++pStateWriteLocation)
 	{
 		jsonxx::Object stateObj = stateArray.get<jsonxx::Object>(i);
-		new (pStateWriteLocation)FontState(stateObj.get<jsonxx::String>("name"), m_pTypefaces, stateObj.get<jsonxx::Array>("layers"));
+		new (pStateWriteLocation)FontState(stateObj.get<jsonxx::String>("name"),
+										   m_pTypefaces,
+										   static_cast<float>(stateObj.get<jsonxx::Number>("lineHeight")),
+										   static_cast<float>(stateObj.get<jsonxx::Number>("lineAscender")),
+										   static_cast<float>(stateObj.get<jsonxx::Number>("lineDescender")),
+										   stateObj.get<jsonxx::Array>("layers"));
 	}
 }

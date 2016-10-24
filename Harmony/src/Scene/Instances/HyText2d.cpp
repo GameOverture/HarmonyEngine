@@ -227,7 +227,7 @@ void HyText2d::TextClearBox()
 	if(0 != (m_rBox.iTag & BOXATTRIB_IsUsed))
 	{
 		for(uint32 i = 0; i < uiNumLayers; ++i)
-			pWritePos[i].y -= pData->GetLineGap();
+			pWritePos[i].y -= pData->GetLineAscender(m_uiCurFontState);
 	}
 
 	uint32 uiLastSpaceIndex = 0;
@@ -268,7 +268,7 @@ void HyText2d::TextClearBox()
 			for(uint32 i = 0; i < uiNumLayers; ++i)
 			{
 				pWritePos[i].x = 0.0f;
-				pWritePos[i].y -= pData->GetLineGap();
+				pWritePos[i].y -= pData->GetLineHeight(m_uiCurFontState);
 			}
 
 			// Restart calculation of glyph offsets at the beginning of this this word (on a newline)

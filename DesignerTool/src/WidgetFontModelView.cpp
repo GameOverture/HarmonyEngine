@@ -277,6 +277,45 @@ void WidgetFontModel::SetLayerColors(int iId, QColor topColor, QColor botColor)
     }
 }
 
+float WidgetFontModel::GetLineHeight()
+{
+    float fHeight = 0.0f;
+    
+    for(int i = 0; i < m_LayerList.count(); ++i)
+    {
+        if(fHeight < m_LayerList[i]->pReference->pTextureFont->height)
+            fHeight = m_LayerList[i]->pReference->pTextureFont->height;
+    }
+    
+    return fHeight;
+}
+
+float WidgetFontModel::GetLineAscender()
+{
+    float fAscender = 0.0f;
+    
+    for(int i = 0; i < m_LayerList.count(); ++i)
+    {
+        if(fAscender < abs(m_LayerList[i]->pReference->pTextureFont->ascender))
+            fAscender = abs(m_LayerList[i]->pReference->pTextureFont->ascender);
+    }
+    
+    return fAscender;
+}
+
+float WidgetFontModel::GetLineDescender()
+{
+    float fDescender = 0.0f;
+    
+    for(int i = 0; i < m_LayerList.count(); ++i)
+    {
+        if(fDescender < abs(m_LayerList[i]->pReference->pTextureFont->descender))
+            fDescender = abs(m_LayerList[i]->pReference->pTextureFont->descender);
+    }
+    
+    return fDescender;
+}
+
 void WidgetFontModel::MoveRowUp(int iIndex)
 {
     if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
