@@ -130,6 +130,8 @@ public:
 	uint32 GetNumLayers(uint32 uiStateIndex);
 	const HyText2dGlyphInfo &GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiCode);
 	const glm::vec3 &GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop);
+	uint32 GetTextureIndex();
+	float GetLineGap();
 
 	virtual void DoFileLoad();
 };

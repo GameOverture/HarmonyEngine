@@ -77,6 +77,18 @@ const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLay
 		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].vDEFAULT_BOT_COLOR;
 }
 
+uint32 HyText2dData::GetTextureIndex()
+{
+	// TODO: GET ACTUAL TEXTURE INDEX
+	return 0;
+}
+
+float HyText2dData::GetLineGap()
+{
+	// TODO: GET ACTUAL LINE GAP FROM texture_font_t
+	return 50.0f;
+}
+
 /*virtual*/ void HyText2dData::DoFileLoad()
 {
 	std::string sFontFileContents;

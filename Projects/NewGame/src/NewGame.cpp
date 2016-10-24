@@ -52,9 +52,14 @@ void main()																			\n\
 	FragColor = mix(gridColor1, gridColor2, step((float(int(floor(screenCoords.x) + floor(screenCoords.y)) & 1)), 0.9));		\n\
 }";
 
+glm::vec2 textBoxSize;
+
 /*virtual*/ bool NewGame::Initialize()
 {
 	m_pCam = Window().CreateCamera2d();
+
+	textBoxSize.x = 100.0f;
+	textBoxSize.y = 500.0f;
 
 	m_TestSprite.Load();
 	m_TestSprite.SetEnabled(true);
@@ -64,16 +69,19 @@ void main()																			\n\
 
 	m_TestText.Load();
 	m_TestText.TextSet("Testing this omg");
+	m_TestText.TextSetBox(textBoxSize.x, textBoxSize.y);
 	m_TestText.pos.Set(0.0f, -200.0f);
+	//m_TestText.rot.Set(45.0f);
+	//m_TestText.scale.Set(0.5f, 2.0f);
+	
+	m_primBox.SetTint(0.0f, 0.0f, 1.0f);
+	m_primBox.SetAsQuad(textBoxSize.x, textBoxSize.y, true);
+	m_primBox.SetDisplayOrder(0);
+	m_primBox.pos.Set(m_TestText.pos.X(), m_TestText.pos.Y() - textBoxSize.y);
+	m_primBox.Load();
 
 	m_TestQuad.Load();
 	m_TestQuad.SetTextureSource(0, 100, 100, 500, 500);
-	
-	m_primBox.SetTint(0.0f, 0.0f, 1.0f);
-	m_primBox.SetAsQuad(25.0f, 25.0f, false);
-	m_primBox.SetDisplayOrder(0);
-	m_primBox.pos.Set(-200.0f, 0.0f);
-	m_primBox.Load();
 
 	glm::vec2 vLinePts[2];
 

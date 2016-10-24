@@ -45,7 +45,8 @@ protected:
 		BOXATTRIB_ScaleUp			= 1 << 3
 	};
 
-	vector<glm::vec2>	m_GlyphOffsets;
+	glm::vec2 *			m_pGlyphOffsets;
+	uint32				m_uiNumReservedGlyphOffsets;
 
 public:
 	HyText2d(const char *szPrefix, const char *szName);
@@ -74,7 +75,7 @@ public:
 	void TextSetAlignment(HyAlign eAlignment);
 
 	HyRectangle<float> TextGetBox();
-	void TextSetBox(HyRectangle<float> rBox, bool bCenterVertically = false, bool bScaleDownToFit = false, bool bScaleUpToFit = false);
+	void TextSetBox(float fWidth, float fHeight, bool bCenterVertically = false, bool bScaleDownToFit = false, bool bScaleUpToFit = false);
 	void TextClearBox();
 
 private:
