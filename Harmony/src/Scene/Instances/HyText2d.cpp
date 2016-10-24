@@ -253,7 +253,7 @@ void HyText2d::TextClearBox()
 
 			pWritePos[iLayerIndex].x += glyphRef.fADVANCE_X;
 
-			if(iStrIndex != uiLastSpaceIndex && uiNewlineIndex != uiLastSpaceIndex)
+			if(iStrIndex != uiLastSpaceIndex)
 			{
 				if(0 != (m_rBox.iTag & BOXATTRIB_IsUsed) && pWritePos[iLayerIndex].x > m_rBox.right)
 				{
@@ -272,8 +272,16 @@ void HyText2d::TextClearBox()
 			}
 
 			// Restart calculation of glyph offsets at the beginning of this this word (on a newline)
-			iStrIndex = uiLastSpaceIndex; // The for-loop will increment to the character after the space
-			uiNewlineIndex = iStrIndex;
+			if(uiNewlineIndex != uiLastSpaceIndex)
+			{
+				iStrIndex = uiLastSpaceIndex; // The for-loop will increment to the character after the space
+				uiNewlineIndex = uiLastSpaceIndex = iStrIndex + 1;
+			}
+			else
+			{
+				--iStrIndex;
+				uiNewlineIndex = uiLastSpaceIndex = iStrIndex;
+			}
 		}
 	}
 
