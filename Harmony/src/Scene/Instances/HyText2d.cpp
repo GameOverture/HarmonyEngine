@@ -79,12 +79,12 @@ void HyText2d::TextSetState(uint32 uiStateIndex)
 
 uint32 HyText2d::TextGetNumLayers()
 {
-	static_cast<HyText2dData *>(m_pData)->GetNumLayers(m_uiCurFontState);
+	return static_cast<HyText2dData *>(m_pData)->GetNumLayers(m_uiCurFontState);
 }
 
 uint32 HyText2d::TextGetNumLayers(uint32 uiStateIndex)
 {
-	static_cast<HyText2dData *>(m_pData)->GetNumLayers(uiStateIndex);
+	return static_cast<HyText2dData *>(m_pData)->GetNumLayers(uiStateIndex);
 }
 
 std::pair<HyAnimVec3 &, HyAnimVec3 &> HyText2d::TextGetLayerColor(uint32 uiLayerIndex)
@@ -175,7 +175,10 @@ void HyText2d::TextClearBox()
 		{
 			m_StateColors[i].m_LayerColors.push_back(StateColors::LayerColor());
 
-			m_StateColors[i].m_LayerColors[j].topColor.Set(fTopR, fTopG, fTopB);
+			glm::vec3 testTop = pTextData->GetDefaultColor(i, j, true);
+			glm::vec3 testBot = pTextData->GetDefaultColor(i, j, true);
+			m_StateColors[i].m_LayerColors[j].topColor.Set(testTop.r, testTop.g, testTop.b);
+			m_StateColors[i].m_LayerColors[j].botColor.Set(testBot.r, testBot.g, testBot.b);
 		}
 	}
 }
@@ -195,7 +198,7 @@ void HyText2d::TextClearBox()
 	m_GlyphOffsets.reserve(m_RenderState.GetNumInstances());
 	m_GlyphOffsets.clear();
 	
-	for(uint32 i = 0; i < uiNumLayers; ++i)
+	for(int32 i = uiNumLayers - 1; i >= 0; --i)
 	{
 		glm::vec2 ptWritePos(0.0f, 0.0f);
 		float fCurWordSize = 0.0f;
@@ -231,7 +234,7 @@ void HyText2d::TextClearBox()
 	GetWorldTransform(mtxTransform);
 
 	uint32 iOffsetIndex = 0;
-	for(uint32 i = 0; i < uiNumLayers; ++i)
+	for(int32 i = uiNumLayers - 1; i >= 0; --i)
 	{
 		for(uint32 j = 0; j < uiStrSize; ++j, ++iOffsetIndex)
 		{
@@ -244,11 +247,15 @@ void HyText2d::TextClearBox()
 			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_GlyphOffsets[iOffsetIndex];
 			pRefDataWritePos += sizeof(glm::vec2);
 
-			*reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = topColor.Get();
-			pRefDataWritePos += sizeof(glm::vec4);
+			*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = m_StateColors[m_uiCurFontState].m_LayerColors[i].topColor.Get();
+			pRefDataWritePos += sizeof(glm::vec3);
+			*reinterpret_cast<float *>(pRefDataWritePos) = topColor.A();
+			pRefDataWritePos += sizeof(float);
 
-			*reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = botColor.Get();
-			pRefDataWritePos += sizeof(glm::vec4);
+			*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = m_StateColors[m_uiCurFontState].m_LayerColors[i].botColor.Get();
+			pRefDataWritePos += sizeof(glm::vec3);
+			*reinterpret_cast<float *>(pRefDataWritePos) = botColor.A();
+			pRefDataWritePos += sizeof(float);
 
 			// TODO: GET ACTUAL TEXTURE INDEX
 			*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(0);

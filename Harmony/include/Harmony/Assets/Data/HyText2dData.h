@@ -103,12 +103,12 @@ class HyText2dData : public IHy2dData
 
 		struct Layer
 		{
-			const glm::vec4			vDEFAULT_TOP_COLOR;
-			const glm::vec4			vDEFAULT_BOT_COLOR;
+			const glm::vec3			vDEFAULT_TOP_COLOR;
+			const glm::vec3			vDEFAULT_BOT_COLOR;
 			const Typeface &		TYPEFACE_REF;
 
-			Layer(float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB, Typeface &typefaceRef) :	vDEFAULT_TOP_COLOR(fTopR, fTopG, fTopB, 1.0f),
-																															vDEFAULT_BOT_COLOR(fBotR, fBotG, fBotB, 1.0f),
+			Layer(float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB, Typeface &typefaceRef) :	vDEFAULT_TOP_COLOR(fTopR, fTopG, fTopB),
+																															vDEFAULT_BOT_COLOR(fBotR, fBotG, fBotB),
 																															TYPEFACE_REF(typefaceRef)
 			{ }
 		};
@@ -129,6 +129,7 @@ public:
 	uint32 GetNumStates();
 	uint32 GetNumLayers(uint32 uiStateIndex);
 	const HyText2dGlyphInfo &GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiCode);
+	const glm::vec3 &GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop);
 
 	virtual void DoFileLoad();
 };
