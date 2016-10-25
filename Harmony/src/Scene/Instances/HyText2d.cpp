@@ -33,6 +33,7 @@ HyText2d::~HyText2d(void)
 	delete[] m_pGlyphOffsets;
 }
 
+// Accepts newline characters '\n'
 void HyText2d::TextSet(std::string sText)
 {
 	if(sText == m_sString)
@@ -216,6 +217,7 @@ void HyText2d::SetAsScaleBox()
 
 	uint32 uiLastSpaceIndex = 0;
 	uint32 uiNewlineIndex = 0;
+	uint32 uiNumNewlineCharacters = 0;
 	bool bTerminatedEarly = false;
 
 	for(uint32 uiStrIndex = 0; uiStrIndex < uiStrSize; ++uiStrIndex)
@@ -225,35 +227,45 @@ void HyText2d::SetAsScaleBox()
 		if(m_sString[uiStrIndex] == ' ')
 			uiLastSpaceIndex = uiStrIndex;
 
-		// Handle every layer for this character
-		for(uint32 iLayerIndex = 0; iLayerIndex < uiNumLayers; ++iLayerIndex)
+		if(m_sString[uiStrIndex] == '\n')
 		{
-			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, static_cast<uint32>(m_sString[uiStrIndex]));
+			++uiNumNewlineCharacters;
 
-			// TODO: Apply kerning if it isn't the first character of a newline
-			float fKerning = 0.0f;
+			bDoNewline = true;
+			++uiStrIndex;
 
-			uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiStrSize * ((uiNumLayers - 1) - iLayerIndex)));
-
-			m_pGlyphOffsets[iGlyphOffsetIndex].x = pWritePos[iLayerIndex].x + fKerning + glyphRef.iOFFSET_X;
-			m_pGlyphOffsets[iGlyphOffsetIndex].y = pWritePos[iLayerIndex].y - (glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y);
-
-			pWritePos[iLayerIndex].x += glyphRef.fADVANCE_X;
-
-			// TODO: support newline '\n' characters in m_sString
-
-			// If drawing text within a box, and we advance past our width, determine if we should newline
-			if(0 != (m_uiBoxAttributes & BOXATTRIB_IsUsed) && pWritePos[iLayerIndex].x + pData->GetLeftSideNudgeAmt(m_uiCurFontState) > m_vBoxDimensions.x)
+			uiNewlineIndex = uiLastSpaceIndex = uiStrIndex;
+		}
+		else
+		{
+			// Handle every layer for this character
+			for(uint32 iLayerIndex = 0; iLayerIndex < uiNumLayers; ++iLayerIndex)
 			{
-				// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
-				if((m_uiBoxAttributes & BOXATTRIB_SplitWordsToFit) != 0 ||
-				   ((m_uiBoxAttributes & BOXATTRIB_SplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
+				const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, static_cast<uint32>(m_sString[uiStrIndex]));
+
+				// TODO: Apply kerning if it isn't the first character of a newline
+				float fKerning = 0.0f;
+
+				uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiStrSize * ((uiNumLayers - 1) - iLayerIndex)));
+
+				m_pGlyphOffsets[iGlyphOffsetIndex].x = pWritePos[iLayerIndex].x + fKerning + glyphRef.iOFFSET_X;
+				m_pGlyphOffsets[iGlyphOffsetIndex].y = pWritePos[iLayerIndex].y - (glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y);
+
+				pWritePos[iLayerIndex].x += glyphRef.fADVANCE_X;
+
+				// If drawing text within a box, and we advance past our width, determine if we should newline
+				if(0 != (m_uiBoxAttributes & BOXATTRIB_IsUsed) && pWritePos[iLayerIndex].x + pData->GetLeftSideNudgeAmt(m_uiCurFontState) > m_vBoxDimensions.x)
 				{
-					// Don't newline on ' ' characters
-					if(uiStrIndex != uiLastSpaceIndex)
+					// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
+					if((m_uiBoxAttributes & BOXATTRIB_SplitWordsToFit) != 0 ||
+					   ((m_uiBoxAttributes & BOXATTRIB_SplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
 					{
-						bDoNewline = true;
-						break;
+						// Don't newline on ' ' characters
+						if(uiStrIndex != uiLastSpaceIndex)
+						{
+							bDoNewline = true;
+							break;
+						}
 					}
 				}
 			}
@@ -261,7 +273,7 @@ void HyText2d::SetAsScaleBox()
 
 		if(bDoNewline)
 		{
-			if(uiStrIndex == 0) // Text box is too small to fit a single character
+			if(uiStrIndex == 0 && m_sString[uiStrIndex] != '\n') // Text box is too small to fit a single character
 			{
 				m_uiNumValidCharacters = 0;
 				bTerminatedEarly = true;
@@ -298,7 +310,7 @@ void HyText2d::SetAsScaleBox()
 	if(bTerminatedEarly == false)
 		m_uiNumValidCharacters = static_cast<uint32>(m_sString.size());
 
-	m_RenderState.SetNumInstances(m_uiNumValidCharacters * uiNumLayers);
+	m_RenderState.SetNumInstances((m_uiNumValidCharacters * uiNumLayers) - uiNumNewlineCharacters);
 
 	// Apply a left side nudge which is equal to the glyph with the most negative 'offset_x'
 	for(uint32 i = 0; i < m_uiNumReservedGlyphOffsets; ++i)
@@ -329,6 +341,9 @@ void HyText2d::SetAsScaleBox()
 	{
 		for(uint32 j = 0; j < m_uiNumValidCharacters; ++j, ++iOffsetIndex)
 		{
+			if(m_sString[j] == '\n')
+				continue;
+
 			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, i, static_cast<uint32>(m_sString[j]));
 
 			glm::vec2 vSize(glyphRef.uiWIDTH, glyphRef.uiHEIGHT);
