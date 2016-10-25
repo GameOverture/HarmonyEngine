@@ -359,30 +359,73 @@ void HyText2d::SetAsScaleBox()
 	for(uint32 i = 0; i < m_uiNumReservedGlyphOffsets; ++i)
 		m_pGlyphOffsets[i].x += pData->GetLeftSideNudgeAmt(m_uiCurFontState);
 
-	// Fix each line to match proper alignment
-	if(m_eAlignment != HYALIGN_Left && m_eAlignment != HYALIGN_Justify)
+	// Fix each text line to match proper alignment (HYALIGN_Left is already set at this point)
+	if(m_eAlignment != HYALIGN_Left)
 	{
-		// Handles HYALIGN_Right and HYALIGN_Center
 		for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
 		{
 			float fNudgeAmt = (m_vBoxDimensions.x - vNewlineInfo[i].fUSED_WIDTH) - pData->GetLeftSideNudgeAmt(m_uiCurFontState);
-			fNudgeAmt *= (m_eAlignment == HYALIGN_Right) ? 1.0f : 0.5f;
+			fNudgeAmt *= (m_eAlignment == HYALIGN_Center) ? 0.5f : 1.0f;
 
 			uint32 uiStrIndex = vNewlineInfo[i].uiSTART_CHARACTER_INDEX;
 			uint32 uiEndIndex = (i + 1) < vNewlineInfo.size() ? vNewlineInfo[i + 1].uiSTART_CHARACTER_INDEX : m_uiNumValidCharacters;
 
-			for(; uiStrIndex < uiEndIndex; ++uiStrIndex)
+			if(m_eAlignment != HYALIGN_Justify)
 			{
-				for(uint32 iLayerIndex = 0; iLayerIndex < uiNumLayers; ++iLayerIndex)
+				for(; uiStrIndex < uiEndIndex; ++uiStrIndex)
 				{
-					uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiStrSize * ((uiNumLayers - 1) - iLayerIndex)));
-					m_pGlyphOffsets[iGlyphOffsetIndex].x += fNudgeAmt;
+					for(uint32 iLayerIndex = 0; iLayerIndex < uiNumLayers; ++iLayerIndex)
+					{
+						uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiStrSize * ((uiNumLayers - 1) - iLayerIndex)));
+						m_pGlyphOffsets[iGlyphOffsetIndex].x += fNudgeAmt;
+					}
+				}
+			}
+			else
+			{
+				// Justify doesn't affect the last line
+				if(i == vNewlineInfo.size() - 1)
+					continue;
+
+				// Count number of words on this line. Combine any consecutive ' ' characters, and eat any trailing ' '
+				uint32 uiNumWords = 0;
+				bool bSpaceFound = false;
+				for(; uiStrIndex < uiEndIndex; ++uiStrIndex)
+				{
+					if(m_sString[uiStrIndex] == ' ')
+						bSpaceFound = true;
+
+					if(bSpaceFound && m_sString[uiStrIndex] != ' ')
+					{
+						++uiNumWords;
+						bSpaceFound = false;
+					}
+				}
+
+				fNudgeAmt /= uiNumWords;
+				
+				uiStrIndex = vNewlineInfo[i].uiSTART_CHARACTER_INDEX;
+				uint32 uiCurWord = 0;
+				bSpaceFound = false;
+				for(; uiStrIndex < uiEndIndex; ++uiStrIndex)
+				{
+					if(m_sString[uiStrIndex] == ' ')
+						bSpaceFound = true;
+
+					if(bSpaceFound && m_sString[uiStrIndex] != ' ')
+					{
+						++uiCurWord;
+						bSpaceFound = false;
+					}
+
+					for(uint32 iLayerIndex = 0; iLayerIndex < uiNumLayers; ++iLayerIndex)
+					{
+						uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiStrSize * ((uiNumLayers - 1) - iLayerIndex)));
+						m_pGlyphOffsets[iGlyphOffsetIndex].x += (fNudgeAmt * uiCurWord);
+					}
 				}
 			}
 		}
-	}
-	else if(m_eAlignment == HYALIGN_Justify)
-	{
 	}
 
 	delete[] pWritePos;
