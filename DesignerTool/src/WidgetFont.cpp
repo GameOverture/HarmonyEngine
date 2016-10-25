@@ -566,6 +566,7 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
         stateObj.insert("lineHeight", pFontModel->GetLineHeight());
         stateObj.insert("lineAscender", pFontModel->GetLineAscender());
         stateObj.insert("lineDescender", pFontModel->GetLineDescender());
+        stateObj.insert("leftSideNudgeAmt", pFontModel->GetLeftSideNudgeAmt(m_sAvailableTypefaceGlyphs));
         
         QJsonArray layersArray;
         for(int j = 0; j < pFontModel->rowCount(); ++j)

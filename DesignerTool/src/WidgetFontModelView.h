@@ -114,6 +114,7 @@ public:
     float GetLineHeight();
     float GetLineAscender();
     float GetLineDescender();
+    float GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs);
     
     void MoveRowUp(int iIndex);
     void MoveRowDown(int iIndex);

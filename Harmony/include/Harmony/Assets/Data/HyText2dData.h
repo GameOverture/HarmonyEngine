@@ -105,6 +105,7 @@ class HyText2dData : public IHy2dData
 		const float					fLINE_HEIGHT;
 		const float					fLINE_ASCENDER;
 		const float					fLINE_DESCENDER;
+		const float					fLEFT_SIDE_NUDGE_AMT;
 
 		struct Layer
 		{
@@ -119,7 +120,7 @@ class HyText2dData : public IHy2dData
 		};
 		Layer *						pLayers;
 
-		FontState(std::string sName, Typeface *pTypefaces, float fLineGap, float fLineAcender, float fLineDescender, jsonxx::Array layersArray);
+		FontState(std::string sName, Typeface *pTypefaces, float fLineGap, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, jsonxx::Array layersArray);
 		~FontState();
 	};
 	FontState *						m_pFontStates;
@@ -139,6 +140,7 @@ public:
 	float GetLineHeight(uint32 uiStateIndex);
 	float GetLineAscender(uint32 uiStateIndex);
 	float GetLineDescender(uint32 uiStateIndex);
+	float GetLeftSideNudgeAmt(uint32 uiStateIndex);
 
 	virtual void DoFileLoad();
 };

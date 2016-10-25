@@ -59,7 +59,7 @@ glm::vec2 textBoxSize;
 	m_pCam = Window().CreateCamera2d();
 
 	textBoxSize.x = 100.0f;
-	textBoxSize.y = 500.0f;
+	textBoxSize.y = 200.0f;
 
 	m_TestSprite.Load();
 	m_TestSprite.SetEnabled(true);
@@ -69,8 +69,8 @@ glm::vec2 textBoxSize;
 
 	m_TestText.Load();
 	m_TestText.TextSet("Oh my goodness, oh my damn. Oh my goodness, they going ham.");
-	m_TestText.TextSetBox(textBoxSize.x, textBoxSize.y);
-	m_TestText.pos.Set(0.0f, -200.0f);
+	m_TestText.SetAsBox(textBoxSize.x, textBoxSize.y, false, false, true);
+	m_TestText.pos.Set(0.0f, -100.0f);
 	//m_TestText.rot.Set(45.0f);
 	//m_TestText.scale.Set(0.5f, 2.0f);
 	

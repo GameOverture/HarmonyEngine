@@ -11,11 +11,12 @@
 
 #include "Renderer/IHyRenderer.h"
 
-HyText2dData::FontState::FontState(std::string sName, Typeface *pTypefaces, float fLineHeight, float fLineAcender, float fLineDescender, jsonxx::Array layersArray) :	sNAME(sName),
-																																										fLINE_HEIGHT(fLineHeight),
-																																										fLINE_ASCENDER(fLineAcender),
-																																										fLINE_DESCENDER(fLineDescender),
-																																										uiNUM_LAYERS(static_cast<uint32>(layersArray.size()))
+HyText2dData::FontState::FontState(std::string sName, Typeface *pTypefaces, float fLineHeight, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, jsonxx::Array layersArray) :	sNAME(sName),
+																																																fLINE_HEIGHT(fLineHeight),
+																																																fLINE_ASCENDER(fLineAcender),
+																																																fLINE_DESCENDER(fLineDescender),
+																																																fLEFT_SIDE_NUDGE_AMT(fLeftSideNudgeAmt),
+																																																uiNUM_LAYERS(static_cast<uint32>(layersArray.size()))
 {
 	pLayers = reinterpret_cast<Layer *>(HY_NEW unsigned char[sizeof(Layer) * uiNUM_LAYERS]);
 	Layer *pLayerWriteLocation = pLayers;
@@ -101,6 +102,11 @@ float HyText2dData::GetLineDescender(uint32 uiStateIndex)
 	return m_pFontStates[uiStateIndex].fLINE_DESCENDER;
 }
 
+float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
+{
+	return m_pFontStates[uiStateIndex].fLEFT_SIDE_NUDGE_AMT;
+}
+
 /*virtual*/ void HyText2dData::DoFileLoad()
 {
 	std::string sFontFileContents;
@@ -154,6 +160,7 @@ float HyText2dData::GetLineDescender(uint32 uiStateIndex)
 										   static_cast<float>(stateObj.get<jsonxx::Number>("lineHeight")),
 										   static_cast<float>(stateObj.get<jsonxx::Number>("lineAscender")),
 										   static_cast<float>(stateObj.get<jsonxx::Number>("lineDescender")),
+										   static_cast<float>(stateObj.get<jsonxx::Number>("leftSideNudgeAmt")),
 										   stateObj.get<jsonxx::Array>("layers"));
 	}
 }

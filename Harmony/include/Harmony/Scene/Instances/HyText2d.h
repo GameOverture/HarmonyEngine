@@ -33,20 +33,23 @@ protected:
 	};
 	vector<StateColors *>	m_StateColors;
 
-	HyAlign				m_eAlignment;
-	HyRectangle<float>	m_rBox;
-
-	// Stored in HyRectangle's (m_rBox) tag field
 	enum eBoxAttributes
 	{
 		BOXATTRIB_IsUsed			= 1 << 0,
 		BOXATTRIB_CenterVertically	= 1 << 1,
-		BOXATTRIB_ScaleDown			= 1 << 2,
-		BOXATTRIB_ScaleUp			= 1 << 3
+		BOXATTRIB_ExtendingBottom	= 1 << 2,
+		BOXATTRIB_SplitWordsToFit	= 1 << 3,
+		BOXATTRIB_SingleLineScale	= 1 << 4
 	};
+	uint32				m_uiBoxAttributes;
+	glm::vec2			m_vBoxDimensions;
+
+	HyAlign				m_eAlignment;
 
 	glm::vec2 *			m_pGlyphOffsets;
 	uint32				m_uiNumReservedGlyphOffsets;
+
+	uint32				m_uiNumValidCharacters;
 
 public:
 	HyText2d(const char *szPrefix, const char *szName);
@@ -74,9 +77,11 @@ public:
 	HyAlign TextGetAlignment();
 	void TextSetAlignment(HyAlign eAlignment);
 
-	HyRectangle<float> TextGetBox();
-	void TextSetBox(float fWidth, float fHeight, bool bCenterVertically = false, bool bScaleDownToFit = false, bool bScaleUpToFit = false);
-	void TextClearBox();
+	const glm::vec2 &TextGetBox();
+
+	void SetAsSingleLine();
+	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically = false, bool bExtendingBottom = false, bool bDontSplitWordsToFit = false);
+	void SetAsScaleBox();
 
 private:
 	virtual void OnDataLoaded();

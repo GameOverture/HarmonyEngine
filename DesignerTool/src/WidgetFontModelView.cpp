@@ -316,6 +316,25 @@ float WidgetFontModel::GetLineDescender()
     return fDescender;
 }
 
+float WidgetFontModel::GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs)
+{
+    float fLeftSideNudgeAmt = 0.0f;
+
+    for(int i = 0; i < m_LayerList.count(); ++i)
+    {
+        for(int j = 0; j < sAvailableTypefaceGlyphs.count(); ++j)
+        {
+            char cCharacter = sAvailableTypefaceGlyphs[j].toLatin1();
+            texture_glyph_t *pGlyph = texture_font_get_glyph(m_LayerList[i]->pReference->pTextureFont, &cCharacter);
+
+            if(fLeftSideNudgeAmt < pGlyph->offset_x)
+                fLeftSideNudgeAmt = pGlyph->offset_x;
+        }
+    }
+
+    return abs(fLeftSideNudgeAmt);
+}
+
 void WidgetFontModel::MoveRowUp(int iIndex)
 {
     if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)

@@ -15,10 +15,11 @@
 
 HyText2d::HyText2d(const char *szPrefix, const char *szName) :	IHyInst2d(HYINST_Text2d, szPrefix, szName),
 																m_bIsDirty(true),
-																m_sString("<not set>"),
+																m_sString("Not set"),
 																m_uiCurFontState(0),
+																m_vBoxDimensions(0.0f, 0.0f),
+																m_uiBoxAttributes(0),
 																m_eAlignment(HYALIGN_Left),
-																m_rBox(0.0f, 0.0f, 0.0f, 0.0f),
 																m_pGlyphOffsets(NULL),
 																m_uiNumReservedGlyphOffsets(0)
 {
@@ -40,24 +41,6 @@ void HyText2d::TextSet(std::string sText)
 	m_sString = sText;
 	m_bIsDirty = true;
 }
-
-//void HyText2d::TextSet(const char *szString, ...)
-//{
-//	//va_list vl;
-//	//va_start(vl, szString);
-//	////#ifdef HY_UNICODE
-//	////	vswprintf(sm_pTempTextBuffer, HY_TEMP_TEXTBUFFER_SIZE, szString, vl);
-//	////#else
-//	//vsprintf(sm_pTempTextBuffer, szString, vl);
-//	////#endif
-//	//va_end(vl);
-//
-//	//if(m_sString == sm_pTempTextBuffer)
-//	//	return;
-//	//m_sString = sm_pTempTextBuffer;
-//
-//	//CalcVertexBuffer();
-//}
 
 std::string HyText2d::TextGet()
 {
@@ -135,36 +118,44 @@ void HyText2d::TextSetAlignment(HyAlign eAlignment)
 	m_bIsDirty = true;
 }
 
-HyRectangle<float> HyText2d::TextGetBox()
+const glm::vec2 &HyText2d::TextGetBox()
 {
-	return m_rBox;
+	return m_vBoxDimensions;
 }
 
-void HyText2d::TextSetBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/, bool bScaleDownToFit /*= false*/, bool bScaleUpToFit /*= false*/)
+void HyText2d::SetAsSingleLine()
 {
-	m_rBox.left = 0.0f;
-	m_rBox.top = 0.0f;
-	m_rBox.right = fWidth;
-	m_rBox.bottom = fHeight;
-	
-	m_rBox.iTag = BOXATTRIB_IsUsed;
-	if(bCenterVertically)
-		m_rBox.iTag |= BOXATTRIB_CenterVertically;
-	if(bScaleDownToFit)
-		m_rBox.iTag |= BOXATTRIB_ScaleDown;
-	if(bScaleUpToFit)
-		m_rBox.iTag |= BOXATTRIB_ScaleUp;
-
-	m_bIsDirty = true;
-}
-
-void HyText2d::TextClearBox()
-{
-	if(0 == (m_rBox.iTag & BOXATTRIB_IsUsed))
+	if(0 == (m_uiBoxAttributes & BOXATTRIB_IsUsed))
 		return;
 
-	m_rBox.iTag &= ~BOXATTRIB_IsUsed;
+	m_uiBoxAttributes &= ~BOXATTRIB_IsUsed;
 	m_bIsDirty = true;
+}
+
+void HyText2d::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/, bool bExtendingBottom /*= false*/, bool bSplitWordsToFit /*= false*/)
+{
+	int32 iFlags = BOXATTRIB_IsUsed;
+	if(bCenterVertically)
+		iFlags |= BOXATTRIB_CenterVertically;
+	if(bExtendingBottom)
+		iFlags |= BOXATTRIB_ExtendingBottom;
+	if(bSplitWordsToFit)
+		iFlags |= BOXATTRIB_SplitWordsToFit;
+	
+	if(m_uiBoxAttributes == iFlags && m_vBoxDimensions.x == fWidth && m_vBoxDimensions.y == fHeight)
+		return;
+
+	m_vBoxDimensions.x = fWidth;
+	m_vBoxDimensions.y = fHeight;
+
+	m_uiBoxAttributes = iFlags;
+
+	m_bIsDirty = true;
+}
+
+void HyText2d::SetAsScaleBox()
+{
+
 }
 
 /*virtual*/ void HyText2d::OnDataLoaded()
@@ -188,15 +179,8 @@ void HyText2d::TextClearBox()
 		{
 			m_StateColors[i]->m_LayerColors.push_back(new StateColors::LayerColor());
 
-			glm::vec3 testTop = pTextData->GetDefaultColor(i, j, true);
-			glm::vec3 testBot = pTextData->GetDefaultColor(i, j, true);
-			
-			const glm::vec3 &testtttTop = m_StateColors[i]->m_LayerColors[j]->topColor.Get();
-
-			m_StateColors[i]->m_LayerColors[j]->topColor.Set(testTop.r, testTop.g, testTop.b);
-
-			//testtttTop = m_StateColors[i].m_LayerColors[j].topColor.Get();
-			m_StateColors[i]->m_LayerColors[j]->botColor.Set(testBot.r, testBot.g, testBot.b);
+			m_StateColors[i]->m_LayerColors[j]->topColor.Set(pTextData->GetDefaultColor(i, j, true));
+			m_StateColors[i]->m_LayerColors[j]->botColor.Set(pTextData->GetDefaultColor(i, j, false));
 		}
 	}
 }
@@ -206,17 +190,17 @@ void HyText2d::TextClearBox()
 	if(m_bIsDirty == false)
 		return;
 
+	m_uiNumValidCharacters = 0;
+
 	HyText2dData *pData = static_cast<HyText2dData *>(m_pData);
 
 	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
 	uint32 uiStrSize = static_cast<uint32>(m_sString.size());
 	
-	m_RenderState.SetNumInstances(uiStrSize * uiNumLayers);
-	
-	if(m_pGlyphOffsets == NULL || m_uiNumReservedGlyphOffsets < m_RenderState.GetNumInstances())
+	if(m_pGlyphOffsets == NULL || m_uiNumReservedGlyphOffsets < uiStrSize * uiNumLayers)
 	{
 		delete[] m_pGlyphOffsets;
-		m_uiNumReservedGlyphOffsets = m_RenderState.GetNumInstances();
+		m_uiNumReservedGlyphOffsets = uiStrSize * uiNumLayers;
 		m_pGlyphOffsets = new glm::vec2[m_uiNumReservedGlyphOffsets];
 	}	
 	memset(m_pGlyphOffsets, 0, sizeof(glm::vec2) * m_uiNumReservedGlyphOffsets);
@@ -224,7 +208,7 @@ void HyText2d::TextClearBox()
 	glm::vec2 *pWritePos = new glm::vec2[uiNumLayers];
 	memset(pWritePos, 0, sizeof(glm::vec2) * uiNumLayers);
 
-	if(0 != (m_rBox.iTag & BOXATTRIB_IsUsed))
+	if(0 != (m_uiBoxAttributes & BOXATTRIB_IsUsed))
 	{
 		for(uint32 i = 0; i < uiNumLayers; ++i)
 			pWritePos[i].y -= pData->GetLineAscender(m_uiCurFontState);
@@ -232,39 +216,59 @@ void HyText2d::TextClearBox()
 
 	uint32 uiLastSpaceIndex = 0;
 	uint32 uiNewlineIndex = 0;
+	bool bTerminatedEarly = false;
 
-	for(uint32 iStrIndex = 0; iStrIndex < m_sString.length(); ++iStrIndex)
+	for(uint32 uiStrIndex = 0; uiStrIndex < uiStrSize; ++uiStrIndex)
 	{
 		bool bDoNewline = false;
 
-		if(m_sString[iStrIndex] == ' ')
-			uiLastSpaceIndex = iStrIndex;
+		if(m_sString[uiStrIndex] == ' ')
+			uiLastSpaceIndex = uiStrIndex;
 
 		// Handle every layer for this character
 		for(uint32 iLayerIndex = 0; iLayerIndex < uiNumLayers; ++iLayerIndex)
 		{
-			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, static_cast<uint32>(m_sString[iStrIndex]));
+			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, static_cast<uint32>(m_sString[uiStrIndex]));
+
+			// TODO: Apply kerning if it isn't the first character of a newline
 			float fKerning = 0.0f;
 
-			uint32 iGlyphOffsetIndex = static_cast<uint32>(iStrIndex + (m_sString.length() * ((uiNumLayers - 1) - iLayerIndex)));
+			uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiStrSize * ((uiNumLayers - 1) - iLayerIndex)));
 
 			m_pGlyphOffsets[iGlyphOffsetIndex].x = pWritePos[iLayerIndex].x + fKerning + glyphRef.iOFFSET_X;
 			m_pGlyphOffsets[iGlyphOffsetIndex].y = pWritePos[iLayerIndex].y - (glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y);
 
 			pWritePos[iLayerIndex].x += glyphRef.fADVANCE_X;
 
-			if(iStrIndex != uiLastSpaceIndex)
+			// TODO: support newline '\n' characters in m_sString
+
+			// If drawing text within a box, and we advance past our width, determine if we should newline
+			if(0 != (m_uiBoxAttributes & BOXATTRIB_IsUsed) && pWritePos[iLayerIndex].x + pData->GetLeftSideNudgeAmt(m_uiCurFontState) > m_vBoxDimensions.x)
 			{
-				if(0 != (m_rBox.iTag & BOXATTRIB_IsUsed) && pWritePos[iLayerIndex].x > m_rBox.right)
+				// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
+				if((m_uiBoxAttributes & BOXATTRIB_SplitWordsToFit) != 0 ||
+				   ((m_uiBoxAttributes & BOXATTRIB_SplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
 				{
-					bDoNewline = true;
-					break;
+					// Don't newline on ' ' characters
+					if(uiStrIndex != uiLastSpaceIndex)
+					{
+						bDoNewline = true;
+						break;
+					}
 				}
 			}
 		}
 
 		if(bDoNewline)
 		{
+			if(uiStrIndex == 0) // Text box is too small to fit a single character
+			{
+				m_uiNumValidCharacters = 0;
+				bTerminatedEarly = true;
+				break;
+			}
+
+			// Reset the write position onto a newline
 			for(uint32 i = 0; i < uiNumLayers; ++i)
 			{
 				pWritePos[i].x = 0.0f;
@@ -273,17 +277,32 @@ void HyText2d::TextClearBox()
 
 			// Restart calculation of glyph offsets at the beginning of this this word (on a newline)
 			if(uiNewlineIndex != uiLastSpaceIndex)
+				uiStrIndex = uiLastSpaceIndex;
+			else // Splitting mid-word, go back one character to place on newline
+				--uiStrIndex;
+			
+			// The next for-loop iteration will increment uiStrIndex to the character after the ' '. Assign uiNewlineIndex and uiLastSpaceIndex a '+1' to compensate
+			uiNewlineIndex = uiLastSpaceIndex = uiStrIndex + 1;
+
+			// Determine if we've exhausted all available vertical space (if extending bottom attribute is off)
+			if(0 == (m_uiBoxAttributes & BOXATTRIB_ExtendingBottom) && (abs(pWritePos[0].y) + pData->GetLineDescender(m_uiCurFontState)) > m_vBoxDimensions.y)
 			{
-				iStrIndex = uiLastSpaceIndex; // The for-loop will increment to the character after the space
-				uiNewlineIndex = uiLastSpaceIndex = iStrIndex + 1;
-			}
-			else
-			{
-				--iStrIndex;
-				uiNewlineIndex = uiLastSpaceIndex = iStrIndex;
+				// uiStrIndex is at the first invalid character index, which is also the number of valid characters
+				m_uiNumValidCharacters = uiStrIndex;
+				bTerminatedEarly = true;
+				break;
 			}
 		}
 	}
+
+	if(bTerminatedEarly == false)
+		m_uiNumValidCharacters = static_cast<uint32>(m_sString.size());
+
+	m_RenderState.SetNumInstances(m_uiNumValidCharacters * uiNumLayers);
+
+	// Apply a left side nudge which is equal to the glyph with the most negative 'offset_x'
+	for(uint32 i = 0; i < m_uiNumReservedGlyphOffsets; ++i)
+		m_pGlyphOffsets[i].x += pData->GetLeftSideNudgeAmt(m_uiCurFontState);
 
 	// TODO: Fix each line to match proper alignment
 
@@ -301,7 +320,6 @@ void HyText2d::TextClearBox()
 	HyText2dData *pData = static_cast<HyText2dData *>(m_pData);
 
 	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
-	uint32 uiStrSize = static_cast<uint32>(m_sString.size());
 
 	glm::mat4 mtxTransform;
 	GetWorldTransform(mtxTransform);
@@ -309,7 +327,7 @@ void HyText2d::TextClearBox()
 	uint32 iOffsetIndex = 0;
 	for(int32 i = uiNumLayers - 1; i >= 0; --i)
 	{
-		for(uint32 j = 0; j < uiStrSize; ++j, ++iOffsetIndex)
+		for(uint32 j = 0; j < m_uiNumValidCharacters; ++j, ++iOffsetIndex)
 		{
 			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, i, static_cast<uint32>(m_sString[j]));
 
@@ -317,7 +335,8 @@ void HyText2d::TextClearBox()
 			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vSize;
 			pRefDataWritePos += sizeof(glm::vec2);
 
-			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pGlyphOffsets[iOffsetIndex];
+			uint32 iGlyphOffsetIndex = static_cast<uint32>(j + (m_sString.size() * ((uiNumLayers - 1) - i)));
+			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pGlyphOffsets[iGlyphOffsetIndex];
 			pRefDataWritePos += sizeof(glm::vec2);
 
 			*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->topColor.Get();
