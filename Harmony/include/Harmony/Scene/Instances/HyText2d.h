@@ -80,7 +80,7 @@ public:
 	const glm::vec2 &TextGetBox();
 
 	void SetAsLine();
-	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically = false, bool bExtendingBottom = false, bool bDontSplitWordsToFit = false);
+	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically = false, bool bExtendingBottom = false, bool bSplitWordsToFit = false);
 	void SetAsScaleBox();
 
 private:

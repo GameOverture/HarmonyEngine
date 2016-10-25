@@ -49,7 +49,7 @@ enum HyAlign
 	HYALIGN_Left = 0,
 	HYALIGN_Center,
 	HYALIGN_Right,
-	HYALIGH_Justify
+	HYALIGN_Justify
 };
 
 enum HyDataType

@@ -129,6 +129,9 @@ void HyText2d::SetAsLine()
 	if(0 == (m_uiBoxAttributes & BOXATTRIB_IsUsed))
 		return;
 
+	m_vBoxDimensions.x = 0.0f;
+	m_vBoxDimensions.y = 0.0f;
+
 	m_uiBoxAttributes &= ~BOXATTRIB_IsUsed;
 	m_bIsDirty = true;
 }
@@ -215,6 +218,20 @@ void HyText2d::SetAsScaleBox()
 			pWritePos[i].y -= pData->GetLineAscender(m_uiCurFontState);
 	}
 
+	// vNewlineInfo is used to set text alignment of center, right, or justified. (left alignment is already accomplished by default)
+	struct LineInfo
+	{
+		const float fUSED_WIDTH;
+		const uint32 uiSTART_CHARACTER_INDEX;
+
+		LineInfo(float fUsedWidth, uint32 uiStartCharIndex) : fUSED_WIDTH(fUsedWidth), uiSTART_CHARACTER_INDEX(uiStartCharIndex)
+		{ }
+	};
+	vector<LineInfo> vNewlineInfo;
+	float fLastSpaceWidth = 0.0f;
+	float fLastCharWidth = 0.0f;
+	float fCurLineWidth = 0.0f;
+
 	uint32 uiLastSpaceIndex = 0;
 	uint32 uiNewlineIndex = 0;
 	uint32 uiNumNewlineCharacters = 0;
@@ -225,16 +242,20 @@ void HyText2d::SetAsScaleBox()
 		bool bDoNewline = false;
 
 		if(m_sString[uiStrIndex] == ' ')
+		{
 			uiLastSpaceIndex = uiStrIndex;
+			fLastSpaceWidth = fCurLineWidth;
+		}
 
 		if(m_sString[uiStrIndex] == '\n')
 		{
 			++uiNumNewlineCharacters;
 
 			bDoNewline = true;
-			++uiStrIndex;
+			++uiStrIndex;	// increment past the '\n' since the algorithm assumes a regular character to be the uiNewlineIndex
 
-			uiNewlineIndex = uiLastSpaceIndex = uiStrIndex;
+			uiLastSpaceIndex = uiNewlineIndex;	// Assigning uiLastSpaceIndex to be equal to uiNewlineIndex will "trick" the algorithm below to NOT split the line at the last ' ' character
+			fLastCharWidth = fCurLineWidth;	// Since we aren't technically splitting to the previous character, this will assign the proper line width to vNewlineInfo
 		}
 		else
 		{
@@ -251,7 +272,13 @@ void HyText2d::SetAsScaleBox()
 				m_pGlyphOffsets[iGlyphOffsetIndex].x = pWritePos[iLayerIndex].x + fKerning + glyphRef.iOFFSET_X;
 				m_pGlyphOffsets[iGlyphOffsetIndex].y = pWritePos[iLayerIndex].y - (glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y);
 
+				if(fLastCharWidth < pWritePos[iLayerIndex].x)
+					fLastCharWidth = pWritePos[iLayerIndex].x;
+
 				pWritePos[iLayerIndex].x += glyphRef.fADVANCE_X;
+
+				if(fCurLineWidth < pWritePos[iLayerIndex].x)
+					fCurLineWidth = pWritePos[iLayerIndex].x;
 
 				// If drawing text within a box, and we advance past our width, determine if we should newline
 				if(0 != (m_uiBoxAttributes & BOXATTRIB_IsUsed) && pWritePos[iLayerIndex].x + pData->GetLeftSideNudgeAmt(m_uiCurFontState) > m_vBoxDimensions.x)
@@ -273,8 +300,9 @@ void HyText2d::SetAsScaleBox()
 
 		if(bDoNewline)
 		{
-			if(uiStrIndex == 0 && m_sString[uiStrIndex] != '\n') // Text box is too small to fit a single character
+			if(uiStrIndex == 0 && m_sString[uiStrIndex] != '\n')
 			{
+				// Text box is too small to fit a single character
 				m_uiNumValidCharacters = 0;
 				bTerminatedEarly = true;
 				break;
@@ -289,9 +317,21 @@ void HyText2d::SetAsScaleBox()
 
 			// Restart calculation of glyph offsets at the beginning of this this word (on a newline)
 			if(uiNewlineIndex != uiLastSpaceIndex)
+			{
 				uiStrIndex = uiLastSpaceIndex;
+				fCurLineWidth = fLastSpaceWidth;
+			}
 			else // Splitting mid-word, go back one character to place on newline
+			{
 				--uiStrIndex;
+				fCurLineWidth = fLastCharWidth;
+			}
+
+			// Push back this line of text's info, and initialize for the next
+			vNewlineInfo.push_back(LineInfo(fCurLineWidth, uiNewlineIndex));
+			fLastSpaceWidth = 0.0f;
+			fLastCharWidth = 0.0f;
+			fCurLineWidth = 0.0f;
 			
 			// The next for-loop iteration will increment uiStrIndex to the character after the ' '. Assign uiNewlineIndex and uiLastSpaceIndex a '+1' to compensate
 			uiNewlineIndex = uiLastSpaceIndex = uiStrIndex + 1;
@@ -308,7 +348,10 @@ void HyText2d::SetAsScaleBox()
 	}
 
 	if(bTerminatedEarly == false)
+	{
 		m_uiNumValidCharacters = static_cast<uint32>(m_sString.size());
+		vNewlineInfo.push_back(LineInfo(fCurLineWidth, uiNewlineIndex));	// Push the final line (row)
+	}
 
 	m_RenderState.SetNumInstances((m_uiNumValidCharacters * uiNumLayers) - uiNumNewlineCharacters);
 
@@ -316,7 +359,31 @@ void HyText2d::SetAsScaleBox()
 	for(uint32 i = 0; i < m_uiNumReservedGlyphOffsets; ++i)
 		m_pGlyphOffsets[i].x += pData->GetLeftSideNudgeAmt(m_uiCurFontState);
 
-	// TODO: Fix each line to match proper alignment
+	// Fix each line to match proper alignment
+	if(m_eAlignment != HYALIGN_Left && m_eAlignment != HYALIGN_Justify)
+	{
+		// Handles HYALIGN_Right and HYALIGN_Center
+		for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
+		{
+			float fNudgeAmt = (m_vBoxDimensions.x - vNewlineInfo[i].fUSED_WIDTH) - pData->GetLeftSideNudgeAmt(m_uiCurFontState);
+			fNudgeAmt *= (m_eAlignment == HYALIGN_Right) ? 1.0f : 0.5f;
+
+			uint32 uiStrIndex = vNewlineInfo[i].uiSTART_CHARACTER_INDEX;
+			uint32 uiEndIndex = (i + 1) < vNewlineInfo.size() ? vNewlineInfo[i + 1].uiSTART_CHARACTER_INDEX : m_uiNumValidCharacters;
+
+			for(; uiStrIndex < uiEndIndex; ++uiStrIndex)
+			{
+				for(uint32 iLayerIndex = 0; iLayerIndex < uiNumLayers; ++iLayerIndex)
+				{
+					uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiStrSize * ((uiNumLayers - 1) - iLayerIndex)));
+					m_pGlyphOffsets[iGlyphOffsetIndex].x += fNudgeAmt;
+				}
+			}
+		}
+	}
+	else if(m_eAlignment == HYALIGN_Justify)
+	{
+	}
 
 	delete[] pWritePos;
 
