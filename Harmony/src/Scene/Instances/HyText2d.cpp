@@ -124,7 +124,7 @@ const glm::vec2 &HyText2d::TextGetBox()
 	return m_vBoxDimensions;
 }
 
-void HyText2d::SetAsSingleLine()
+void HyText2d::SetAsLine()
 {
 	if(0 == (m_uiBoxAttributes & BOXATTRIB_IsUsed))
 		return;
@@ -297,7 +297,7 @@ void HyText2d::SetAsScaleBox()
 			uiNewlineIndex = uiLastSpaceIndex = uiStrIndex + 1;
 
 			// Determine if we've exhausted all available vertical space (if extending bottom attribute is off)
-			if(0 == (m_uiBoxAttributes & BOXATTRIB_ExtendingBottom) && (abs(pWritePos[0].y) + pData->GetLineDescender(m_uiCurFontState)) > m_vBoxDimensions.y)
+			if(0 != (m_uiBoxAttributes & BOXATTRIB_IsUsed) && 0 == (m_uiBoxAttributes & BOXATTRIB_ExtendingBottom) && (abs(pWritePos[0].y) + pData->GetLineDescender(m_uiCurFontState)) > m_vBoxDimensions.y)
 			{
 				// uiStrIndex is at the first invalid character index, which is also the number of valid characters
 				m_uiNumValidCharacters = uiStrIndex;
