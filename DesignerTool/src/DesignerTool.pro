@@ -46,7 +46,8 @@ SOURCES += main.cpp \
     WidgetFontModelView.cpp \
     DlgColorPicker.cpp \
     WidgetFontState.cpp \
-    WidgetColor.cpp
+    WidgetColor.cpp \
+    QtWaitingSpinner/waitingspinnerwidget.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -81,7 +82,8 @@ HEADERS  += \
     WidgetFontModelView.h \
     DlgColorPicker.h \
     WidgetFontState.h \
-    WidgetColor.h
+    WidgetColor.h \
+    QtWaitingSpinner/waitingspinnerwidget.h
 
 FORMS    += \
     DlgNewProject.ui \

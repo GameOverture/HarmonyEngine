@@ -25,6 +25,7 @@ public:
     ~WidgetColor();
     
     QColor GetColor();
+    void SetColor(QColor color);
     
 private slots:
     void on_sbR_valueChanged(int arg1);

@@ -368,13 +368,19 @@ void HyOpenGL::SetCameraMatrices_2d(eMatrixStack eMtxStack)
 {
 	HyRectangle<float> viewportRect;
 	if(eMtxStack == MTX_CAMVIEW)
+	{
 		viewportRect = *GetCameraViewportRect2d(m_iCurCamIndex);
+		m_mtxView = *GetCameraView2d(m_iCurCamIndex);
+	}
 	else
 	{
 		viewportRect.left = 0.0f;
 		viewportRect.bottom = 0.0f;
 		viewportRect.right = 1.0f;
 		viewportRect.top = 1.0f;
+
+		m_mtxView = glm::mat4(1.0f);
+		m_mtxView = glm::translate(m_mtxView, m_RenderSurfaceIter->m_iRenderSurfaceWidth * -0.5f, m_RenderSurfaceIter->m_iRenderSurfaceHeight * -0.5f, 0.0f);
 	}
 
 	float fWidth = (viewportRect.Width() * m_RenderSurfaceIter->m_iRenderSurfaceWidth);
@@ -384,11 +390,6 @@ void HyOpenGL::SetCameraMatrices_2d(eMatrixStack eMtxStack)
 			   static_cast<GLint>(viewportRect.bottom * m_RenderSurfaceIter->m_iRenderSurfaceHeight),
 			   static_cast<GLsizei>(fWidth),
 			   static_cast<GLsizei>(fHeight));
-
-	if(eMtxStack == MTX_CAMVIEW)
-		m_mtxView = *GetCameraView2d(m_iCurCamIndex);
-	else
-		m_mtxView = glm::mat4(1.0f);
 
 	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f);
 }

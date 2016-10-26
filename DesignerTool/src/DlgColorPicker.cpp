@@ -10,13 +10,16 @@
 #include "DlgColorPicker.h"
 #include "ui_DlgColorPicker.h"
 
-DlgColorPicker::DlgColorPicker(QString sTitle, QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::DlgColorPicker)
+DlgColorPicker::DlgColorPicker(QString sTitle, QColor initTopColor, QColor initBotColor, QWidget *parent) : QDialog(parent),
+                                                                                                            ui(new Ui::DlgColorPicker)
 {
     ui->setupUi(this);
     
     setWindowTitle(sTitle);
+
+    ui->solidColor->SetColor(initTopColor);
+    ui->vgTopColor->SetColor(initTopColor);
+    ui->vgBotColor->SetColor(initBotColor);
 }
 
 DlgColorPicker::~DlgColorPicker()

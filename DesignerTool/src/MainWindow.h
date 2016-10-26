@@ -17,6 +17,8 @@
 #include "ItemProject.h"
 #include "HyGuiDebugger.h"
 
+#include "QtWaitingSpinner/waitingspinnerwidget.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -27,22 +29,24 @@ class MainWindow : public QMainWindow
 
     static MainWindow * sm_pInstance;
 
-    QSettings           m_Settings;
-    QString             m_sEngineLocation;
-    QString             m_sDefaultProjectLocation;
+    QSettings               m_Settings;
+    QString                 m_sEngineLocation;
+    QString                 m_sDefaultProjectLocation;
 
-    bool                m_bIsInitialized;
+    bool                    m_bIsInitialized;
 
-    ItemProject *       m_pCurSelectedProj;
-    HyGuiRenderer *     m_pCurRenderer;
-    QMenu *             m_pCurEditMenu;
-    
-    QAction *           m_pCurSaveAction;
-    QAction *           m_pCurSaveAllAction;
-    
-    QList<QAction *>    m_ToolBarItemActionsList;   // Used to append/remove the current item's actions to the main tool bar
-    
-    HyGuiDebugger *     m_pDebugConnection;
+    ItemProject *           m_pCurSelectedProj;
+    HyGuiRenderer *         m_pCurRenderer;
+    QMenu *                 m_pCurEditMenu;
+
+    QAction *               m_pCurSaveAction;
+    QAction *               m_pCurSaveAllAction;
+
+    QList<QAction *>        m_ToolBarItemActionsList;   // Used to append/remove the current item's actions to the main tool bar
+
+    HyGuiDebugger *         m_pDebugConnection;
+
+    WaitingSpinnerWidget *  m_pLoadingSpinner;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -59,6 +63,8 @@ public:
     
     static void SetSelectedProj(ItemProject *pProj);
     static void ReloadHarmony();
+
+    static void LoadSpinner(bool bEnabled);
     
     static HyRendererInterop *GetCurrentRenderer();
 

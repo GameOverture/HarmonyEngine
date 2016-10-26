@@ -50,6 +50,17 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
 
     m_pCurRenderer = new HyGuiRenderer(NULL, this);
     ui->centralVerticalLayout->addWidget(m_pCurRenderer);
+
+    m_pLoadingSpinner = new WaitingSpinnerWidget(this);
+    m_pLoadingSpinner->setRoundness(50.0);
+    m_pLoadingSpinner->setMinimumTrailOpacity(15.0);
+    m_pLoadingSpinner->setTrailFadePercentage(70.0);
+    m_pLoadingSpinner->setNumberOfLines(20);
+    m_pLoadingSpinner->setLineLength(35);
+    m_pLoadingSpinner->setLineWidth(15);
+    m_pLoadingSpinner->setInnerRadius(65);
+    m_pLoadingSpinner->setRevolutionsPerSecond(3.0);
+    m_pLoadingSpinner->setColor(QColor(25, 255, 25));
     
     SetSelectedProj(NULL);
 
@@ -324,6 +335,13 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     if(sm_pInstance->m_pCurSelectedProj == pProj)
         return;
 
+    bool bSelfSpinner = false;
+    if(sm_pInstance->m_pLoadingSpinner->isSpinning() == false)
+    {
+        sm_pInstance->m_pLoadingSpinner->start();
+        bSelfSpinner = true;
+    }
+
     sm_pInstance->m_pCurSelectedProj = pProj;
     if(sm_pInstance->m_pCurSelectedProj)
     {
@@ -373,6 +391,9 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     {
         sm_pInstance->ui->dockWidgetAtlas->setWidget(NULL);
     }
+
+    if(bSelfSpinner)
+        sm_pInstance->m_pLoadingSpinner->stop();
 }
 
 /*static*/ void MainWindow::ReloadHarmony()
@@ -384,6 +405,14 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurSelectedProj = NULL;    // Set m_pCurSelectedProj to 'NULL' so SetSelectedProj() doesn't imediately return
     
     SetSelectedProj(pCurItemProj);
+}
+
+/*static*/ void MainWindow::LoadSpinner(bool bEnabled)
+{
+    if(bEnabled)
+        sm_pInstance->m_pLoadingSpinner->start();
+    else
+        sm_pInstance->m_pLoadingSpinner->stop();
 }
 
 /*static*/ HyRendererInterop *MainWindow::GetCurrentRenderer()

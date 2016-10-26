@@ -31,6 +31,13 @@ QColor WidgetColor::GetColor()
     return QColor(ui->sbR->value(), ui->sbG->value(), ui->sbB->value());
 }
 
+void WidgetColor::SetColor(QColor color)
+{
+    ui->sliderR->setValue(color.red());
+    ui->sliderG->setValue(color.green());
+    ui->sliderB->setValue(color.blue());
+}
+
 void WidgetColor::on_sbR_valueChanged(int arg1)
 {
     ui->sliderR->setValue(ui->sbR->value());

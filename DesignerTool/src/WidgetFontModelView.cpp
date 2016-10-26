@@ -26,10 +26,10 @@ WidgetFontTableView::WidgetFontTableView(QWidget *pParent /*= 0*/) : QTableView(
 {
     int iWidth = pResizeEvent->size().width();
 
-    iWidth -= 64;
-    setColumnWidth(WidgetFontModel::COLUMN_Type, iWidth / 2);
+    iWidth -= 144;
+    setColumnWidth(WidgetFontModel::COLUMN_Type, iWidth);
     setColumnWidth(WidgetFontModel::COLUMN_Thickness, 64);
-    setColumnWidth(WidgetFontModel::COLUMN_DefaultColor, iWidth / 2);
+    setColumnWidth(WidgetFontModel::COLUMN_DefaultColor, 80);
 
     QTableView::resizeEvent(pResizeEvent);
 }
@@ -65,7 +65,7 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbState
         break;
 
     case WidgetFontModel::COLUMN_DefaultColor:
-        DlgColorPicker *pDlg = new DlgColorPicker("Choose Font Layer Color", pParent);
+        DlgColorPicker *pDlg = new DlgColorPicker("Choose Font Layer Color", pFontModel->GetLayerTopColor(index.row()), pFontModel->GetLayerBotColor(index.row()), pParent);
         if(pDlg->exec() == QDialog::Accepted)
         {
             QColor topColor, botColor;
@@ -419,7 +419,7 @@ void WidgetFontModel::SetFontStageReference(int iRowIndex, FontStagePass *pStage
         case COLUMN_Thickness:
             return QString::number(GetLayerOutlineThickness(index.row()), 'g', 2);
         case COLUMN_DefaultColor:
-            return "R:" % QString::number(static_cast<int>(pLayer->vTopColor.x * 255.0f)) % " G:" % QString::number(static_cast<int>(pLayer->vTopColor.y * 255.0f)) % " B:" % QString::number(static_cast<int>(pLayer->vTopColor.z * 255.0f)) % " - R:" % QString::number(static_cast<int>(pLayer->vBotColor.x * 255.0f)) % " G:" % QString::number(static_cast<int>(pLayer->vBotColor.y * 255.0f)) % " B:" % QString::number(static_cast<int>(pLayer->vBotColor.z * 255.0f));
+            return "";
         }
     }
 

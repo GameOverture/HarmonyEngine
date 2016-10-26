@@ -21,7 +21,7 @@ class DlgColorPicker : public QDialog
     Q_OBJECT
     
 public:
-    explicit DlgColorPicker(QString sTitle, QWidget *parent = 0);
+    explicit DlgColorPicker(QString sTitle, QColor initTopColor, QColor initBotColor, QWidget *parent = 0);
     ~DlgColorPicker();
     
     bool IsSolidColor();
