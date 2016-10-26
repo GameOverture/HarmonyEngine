@@ -17,6 +17,8 @@ WidgetColor::WidgetColor(QWidget *parent) :
     ui(new Ui::WidgetColor)
 {
     ui->setupUi(this);
+
+    ApplyColorToSampleBtn();
 }
 
 WidgetColor::~WidgetColor()
@@ -27,24 +29,6 @@ WidgetColor::~WidgetColor()
 QColor WidgetColor::GetColor()
 {
     return QColor(ui->sbR->value(), ui->sbG->value(), ui->sbB->value());
-}
-
-void WidgetColor::on_sliderR_sliderMoved(int position)
-{
-    ui->sbR->setValue(ui->sliderR->value());
-    ApplyColorToSampleBtn();
-}
-
-void WidgetColor::on_sliderG_sliderMoved(int position)
-{
-    ui->sbG->setValue(ui->sliderG->value());
-    ApplyColorToSampleBtn();
-}
-
-void WidgetColor::on_sliderB_sliderMoved(int position)
-{
-    ui->sbB->setValue(ui->sliderB->value());
-    ApplyColorToSampleBtn();
 }
 
 void WidgetColor::on_sbR_valueChanged(int arg1)
@@ -83,9 +67,29 @@ void WidgetColor::ApplyColorToSampleBtn()
     QColor color = GetColor();
     if(color.isValid())
     {
-        QString sStyle = QString("background-color: %1").arg(color.name());
-        ui->btnSample->setStyleSheet(sStyle);
-        
-        ui->btnSample->repaint();
+        QPalette pal = ui->btnSample->palette();
+        pal.setColor(QPalette::Button, color);
+
+        ui->btnSample->setAutoFillBackground(true);
+        ui->btnSample->setPalette(pal);
+        ui->btnSample->update();
     }
+}
+
+void WidgetColor::on_sliderR_valueChanged(int value)
+{
+    ui->sbR->setValue(ui->sliderR->value());
+    ApplyColorToSampleBtn();
+}
+
+void WidgetColor::on_sliderG_valueChanged(int value)
+{
+    ui->sbG->setValue(ui->sliderG->value());
+    ApplyColorToSampleBtn();
+}
+
+void WidgetColor::on_sliderB_valueChanged(int value)
+{
+    ui->sbB->setValue(ui->sliderB->value());
+    ApplyColorToSampleBtn();
 }

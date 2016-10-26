@@ -27,12 +27,6 @@ public:
     QColor GetColor();
     
 private slots:
-    void on_sliderR_sliderMoved(int position);
-    
-    void on_sliderG_sliderMoved(int position);
-    
-    void on_sliderB_sliderMoved(int position);
-    
     void on_sbR_valueChanged(int arg1);
     
     void on_sbG_valueChanged(int arg1);
@@ -41,6 +35,12 @@ private slots:
     
     void on_btnSample_clicked();
     
+    void on_sliderR_valueChanged(int value);
+
+    void on_sliderG_valueChanged(int value);
+
+    void on_sliderB_valueChanged(int value);
+
 private:
     Ui::WidgetColor *ui;
     

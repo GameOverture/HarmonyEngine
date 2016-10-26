@@ -216,7 +216,7 @@ void WidgetFont::SetGlyphsDirty()
     
     m_PreviewValidator.setRegExp(QRegExp("[" % sRegularExp % "]*"));
     ui->txtPreviewString->setValidator(&m_PreviewValidator);
-    
+
     m_bGlyphsDirty = true;
 }
 

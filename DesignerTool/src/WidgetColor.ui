@@ -114,7 +114,7 @@
       </size>
      </property>
      <property name="text">
-      <string>...</string>
+      <string/>
      </property>
      <property name="flat">
       <bool>true</bool>
@@ -123,6 +123,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>sbR</tabstop>
+  <tabstop>sbG</tabstop>
+  <tabstop>sbB</tabstop>
+  <tabstop>sliderR</tabstop>
+  <tabstop>btnSample</tabstop>
+  <tabstop>sliderG</tabstop>
+  <tabstop>sliderB</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

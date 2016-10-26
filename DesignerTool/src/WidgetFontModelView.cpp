@@ -385,11 +385,11 @@ void WidgetFontModel::SetFontStageReference(int iRowIndex, FontStagePass *pStage
 
     if(role == Qt::BackgroundRole && index.column() == COLUMN_DefaultColor)
     {
-        QLinearGradient linearGrad(QPointF(100, 100), QPointF(200, 200));
-        linearGrad.setColorAt(0, QColor(pLayer->vTopColor.x * 255.0f, pLayer->vTopColor.y * 255.0f, pLayer->vTopColor.z * 255.0f));
-        linearGrad.setColorAt(1, QColor(pLayer->vBotColor.x * 255.0f, pLayer->vBotColor.y * 255.0f, pLayer->vBotColor.z * 255.0f));
+        QLinearGradient gradient(0, 0, 0, 25.0f);
+        gradient.setColorAt(0.0, QColor(pLayer->vTopColor.x * 255.0f, pLayer->vTopColor.y * 255.0f, pLayer->vTopColor.z * 255.0f));
+        gradient.setColorAt(1.0, QColor(pLayer->vBotColor.x * 255.0f, pLayer->vBotColor.y * 255.0f, pLayer->vBotColor.z * 255.0f));
 
-        QBrush bgColorBrush(linearGrad);
+        QBrush bgColorBrush(gradient);
         return QVariant(bgColorBrush);
     }
 

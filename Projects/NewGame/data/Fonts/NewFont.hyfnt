@@ -12,20 +12,20 @@
             "layers": [
                 {
                     "botB": 0,
+                    "botG": 0.3333333333333333,
+                    "botR": 1,
+                    "topB": 0,
+                    "topG": 1,
+                    "topR": 1,
+                    "typefaceIndex": 0
+                },
+                {
+                    "botB": 0,
                     "botG": 0,
                     "botR": 0,
                     "topB": 0,
                     "topG": 0,
                     "topR": 0,
-                    "typefaceIndex": 0
-                },
-                {
-                    "botB": 1,
-                    "botG": 1,
-                    "botR": 1,
-                    "topB": 1,
-                    "topG": 1,
-                    "topR": 1,
                     "typefaceIndex": 1
                 }
             ],
@@ -38,8 +38,8 @@
         {
             "layers": [
                 {
-                    "botB": 0,
-                    "botG": 0,
+                    "botB": 1,
+                    "botG": 0.3333333333333333,
                     "botR": 0,
                     "topB": 0,
                     "topG": 0,
