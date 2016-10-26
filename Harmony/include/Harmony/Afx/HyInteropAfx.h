@@ -34,6 +34,9 @@
 	#include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
 	typedef HyOpenGLShader HyShaderInterop;
 
+	#include "Audio/Interop/HyAudio_Win.h"
+	typedef HyAudio_Win HyAudioInterop;
+
 	#include "Time/Interop/HyTime_Win.h"
 	typedef HyTime_Win HyTimeInterop;
 

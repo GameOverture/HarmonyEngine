@@ -17,7 +17,7 @@
 
 #include "Memory/HyMemoryHeap.h"
 
-#include "Audio/HyAudio.h"
+#include "Audio/IHyAudio.h"
 #include "Diagnostics/HyGuiComms.h"
 
 #include "Renderer/Viewport/HyWindow.h"
@@ -49,10 +49,10 @@ class HyEngine
 	HyAssetManager 			m_AssetManager;
 	HyGuiComms				m_GuiComms;
 
-	HyAudio					m_Audio;
 	HyTimeInterop			m_Time;
 	HyInputInterop			m_Input;
 	HyRendererInterop		m_Renderer;
+	HyAudioInterop			m_Audio;
 
 // If HY_PLATFORM_GUI, make this ctor public as gui tool requires special usage.
 #ifdef HY_PLATFORM_GUI

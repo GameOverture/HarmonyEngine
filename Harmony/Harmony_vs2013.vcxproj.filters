@@ -19,9 +19,6 @@
     <ClCompile Include="src\Utilities\HyMath.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Audio\HyAudio.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
     <ClCompile Include="src\HyEngine.cpp" />
     <ClCompile Include="src\Utilities\Animation\HyAnimFloat.cpp">
       <Filter>Utilities\Animation</Filter>
@@ -207,6 +204,12 @@
     <ClCompile Include="src\Utilities\Animation\IHyTransform3d.cpp">
       <Filter>Utilities\Animation</Filter>
     </ClCompile>
+    <ClCompile Include="src\Audio\IHyAudio.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\Interop\HyAudio_Win.cpp">
+      <Filter>Audio\Interop</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -284,6 +287,9 @@
     <Filter Include="Assets\Data">
       <UniqueIdentifier>{465290dc-5ddc-437f-a8e4-3cbca5a052aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Audio\Interop">
+      <UniqueIdentifier>{2b2f1543-364e-43f7-a861-20cd1f8a1396}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Harmony\HyEngine.h" />
@@ -313,9 +319,6 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Windows.h">
       <Filter>Afx\Platforms</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Audio\HyAudio.h">
-      <Filter>Audio</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Memory\HyMemoryHeap.h">
       <Filter>Memory</Filter>
@@ -572,6 +575,12 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Input\Interop\HyInput_NULL.h">
       <Filter>Input\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Audio\IHyAudio.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Audio\Interop\HyAudio_Win.h">
+      <Filter>Audio\Interop</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

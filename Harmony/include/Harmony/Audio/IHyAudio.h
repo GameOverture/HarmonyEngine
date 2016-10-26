@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyAudio.cpp
+ *	IHyAudio.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
@@ -7,14 +7,17 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#ifndef __IHyAudio_h__
+#define __IHyAudio_h__
+
 #include "Afx/HyStdAfx.h"
 
-#include "Audio/HyAudio.h"
-
-HyAudio::HyAudio(void)
+class IHyAudio
 {
-}
 
-HyAudio::~HyAudio(void)
-{
-}
+public:
+	IHyAudio(HyRendererInterop &rendererRef);
+	~IHyAudio(void);
+};
+
+#endif /* __IHyAudio_h__ */
