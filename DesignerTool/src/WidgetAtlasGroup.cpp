@@ -330,6 +330,8 @@ HyGuiFrame *WidgetAtlasGroup::ImportImage(QString sName, QImage &newImage, eAtla
 
 void WidgetAtlasGroup::Refresh()
 {
+    MainWindow::LoadSpinner(true);
+
     clock_t timeStartRefresh = clock();
     QElapsedTimer timerStartRefresh;
     timerStartRefresh.start();
@@ -557,6 +559,8 @@ void WidgetAtlasGroup::Refresh()
     ui->lcdNumTextures->display(m_Packer.bins.size());
     ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
     ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
+
+    MainWindow::LoadSpinner(false);
 }
 
 void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFrame)

@@ -27,6 +27,8 @@ class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
     
     bool                m_bIsUpdating;
 
+    QTimer *            m_pTimer;
+
 public:
     HyGuiRenderer(QWidget *parent = 0);
     HyGuiRenderer(ItemProject *pProj, QWidget *parent = 0);

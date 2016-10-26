@@ -28,13 +28,15 @@ HyGuiRenderer::HyGuiRenderer(ItemProject *pProj, QWidget *parent /*= 0*/) : QOpe
                                                                             m_pHyEngine(NULL),
                                                                             m_bIsUpdating(false)
 {
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(10);
+    m_pTimer = new QTimer(this);
+    connect(m_pTimer, SIGNAL(timeout()), this, SLOT(update()));
+    m_pTimer->start(10);
 }
 
 HyGuiRenderer::~HyGuiRenderer()
 {
+    m_pTimer->stop();
+
     makeCurrent();
     m_bIsUpdating = true;
     
