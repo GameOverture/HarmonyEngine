@@ -41,12 +41,6 @@ protected:
 	HyLoadState						m_eLoadState;
 	bool							m_bInvalidLoad;
 
-	// Scene graph hierarchy 
-	IHyInst2d *						m_pParent;
-	bool							m_bDirty;
-	glm::mat4						m_mtxCached;
-	vector<IHyInst2d *>				m_vChildList;
-
 	// Attributes
 	HyCoordinateType				m_eCoordType;
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
@@ -87,10 +81,6 @@ public:
 
 	void Load();
 	void Unload();
-	void GetWorldTransform(glm::mat4 &outMtx);
-
-	void AddChild(IHyInst2d &childInst);
-	void Detach();
 
 protected:
 	virtual void OnDataLoaded() = 0;
@@ -111,9 +101,6 @@ private:
 	void SetData(IHyData *pData);
 	void SetLoaded();
 	IHyData *GetData()											{ return m_pData; }
-
-	void SetDirty();
-	static void OnDirty(void *);
 };
 
 #endif /* __IHyInst2d_h__ */

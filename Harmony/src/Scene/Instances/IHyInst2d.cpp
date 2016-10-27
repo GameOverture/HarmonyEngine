@@ -24,14 +24,11 @@ IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char 
 																							m_pData(NULL),
 																							m_eLoadState(HYLOADSTATE_Inactive),
 																							m_bInvalidLoad(false),
-																							m_pParent(NULL),
-																							m_bDirty(true),
 																							m_iDisplayOrder(0),
 																							m_iTag(0)
 {
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
-	SetOnDirtyCallback(OnDirty, this);
 }
 
 /*virtual*/ IHyInst2d::~IHyInst2d(void)
@@ -78,52 +75,6 @@ void IHyInst2d::Unload()
 
 	m_pData = NULL;
 	m_eLoadState = HYLOADSTATE_Inactive;
-}
-
-void IHyInst2d::GetWorldTransform(glm::mat4 &outMtx)
-{
-	if(m_bDirty)
-	{
-		if(m_pParent)
-		{
-			m_pParent->GetWorldTransform(m_mtxCached);
-			GetLocalTransform(outMtx);	// Just use 'outMtx' rather than pushing another mat4 on the stack
-
-			m_mtxCached *= outMtx;
-		}
-		else
-			GetLocalTransform(m_mtxCached);
-
-		m_bDirty = false;
-	}
-
-	outMtx = m_mtxCached;
-}
-
-void IHyInst2d::AddChild(IHyInst2d &childInst)
-{
-	childInst.Detach();
-
-	childInst.m_pParent = this;
-	m_vChildList.push_back(&childInst);
-}
-
-void IHyInst2d::Detach()
-{
-	if(m_pParent == NULL)
-		return;
-
-	for(vector<IHyInst2d *>::iterator iter = m_pParent->m_vChildList.begin(); iter != m_pParent->m_vChildList.end(); ++iter)
-	{
-		if(*iter == this)
-		{
-			m_pParent->m_vChildList.erase(iter);
-			m_pParent = NULL;
-			return;
-		}
-	}
-
-	HyError("IObjInst2d::Detach() could not find itself in parent's child list");
 }
 
 /*virtual*/ void IHyInst2d::OnUpdate()
@@ -186,18 +137,4 @@ void IHyInst2d::SetLoaded()
 {
 	m_eLoadState = HYLOADSTATE_Loaded;
 	OnDataLoaded();
-}
-
-void IHyInst2d::SetDirty()
-{
-	m_bDirty = true;
-
-	for(uint32 i = 0; i < m_vChildList.size(); ++i)
-		m_vChildList[i]->SetDirty();
-}
-
-/*static*/ void IHyInst2d::OnDirty(void *pParam)
-{
-	IHyInst2d *pThis = reinterpret_cast<IHyInst2d *>(pParam);
-	pThis->SetDirty();
 }

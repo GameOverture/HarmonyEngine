@@ -18,6 +18,8 @@
 #elif defined(HY_PLATFORM_64BIT) // 64 bit environment
 	typedef int64 intx;
 	typedef uint64 uintx;
+#else
+	#error Unspecified cpu architecture
 #endif
 
 //-----------------------------------------------------------------------------------------
@@ -34,12 +36,12 @@ HY_INLINE uint32 EndianSwap32(uint32 var)
 		((((var)>>16)&0xff)<<8) | ((((var)>>24)&0xff)) );
 }
 
-#if HY_ENDIAN_LITTLE == 1
+#if defined(HY_ENDIAN_LITTLE)
 	#define EndianToBig16(_v)          EndianSwap16(_v)
 	#define EndianToLittle16(_v)
 	#define EndianToBig32(_v)          EndianSwap32(_v)
 	#define EndianToLittle32(_v)
-#elif HY_ENDIAN_BIG == 1
+#elif defined(HY_ENDIAN_BIG)
 	#define EndianToBig16(_v)
 	#define EndianToLittle16(_v)       EndianSwap16(_v)
 	#define EndianToBig32(_v)

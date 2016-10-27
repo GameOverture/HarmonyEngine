@@ -13,11 +13,19 @@
 #include "Afx/HyStdAfx.h"
 #include "Audio/IHyAudio.h"
 
+struct IXAudio2;
+struct IXAudio2MasteringVoice;
+
 class HyAudio_Win : public IHyAudio
 {
+	IXAudio2 *				m_pXAudio2;
+	IXAudio2MasteringVoice *m_pMasterVoice;
+
 public:
 	HyAudio_Win(HyRendererInterop &rendererRef);
 	virtual ~HyAudio_Win();
+
+	//DWORD PlaySoundTest();
 };
 
 #endif /* __HyAudio_Win_h__ */

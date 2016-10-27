@@ -9,10 +9,11 @@
 *************************************************************************/
 #include "Utilities/Animation/IHyTransform2d.h"
 
-IHyTransform2d::IHyTransform2d()
+IHyTransform2d::IHyTransform2d() :	m_pParent(NULL),
+									m_bDirty(true)
 {
+	SetOnDirtyCallback(OnDirty, this);
 }
-
 
 IHyTransform2d::~IHyTransform2d()
 {
@@ -98,4 +99,64 @@ void IHyTransform2d::QueueCallback(void(*fpCallback)(IHyTransform2d *, void *), 
 	pos.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
 	rot.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
 	scale.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
+}
+
+void IHyTransform2d::GetWorldTransform(glm::mat4 &outMtx)
+{
+	if(m_bDirty)
+	{
+		if(m_pParent)
+		{
+			m_pParent->GetWorldTransform(m_mtxCached);
+			GetLocalTransform(outMtx);	// Just use 'outMtx' rather than pushing another mat4 on the stack
+
+			m_mtxCached *= outMtx;
+		}
+		else
+			GetLocalTransform(m_mtxCached);
+
+		m_bDirty = false;
+	}
+
+	outMtx = m_mtxCached;
+}
+
+void IHyTransform2d::AddChild(IHyTransform2d &childInst)
+{
+	childInst.Detach();
+
+	childInst.m_pParent = this;
+	m_vChildList.push_back(&childInst);
+}
+
+void IHyTransform2d::Detach()
+{
+	if(m_pParent == NULL)
+		return;
+
+	for(vector<IHyTransform2d *>::iterator iter = m_pParent->m_vChildList.begin(); iter != m_pParent->m_vChildList.end(); ++iter)
+	{
+		if(*iter == this)
+		{
+			m_pParent->m_vChildList.erase(iter);
+			m_pParent = NULL;
+			return;
+		}
+	}
+
+	HyError("IHyTransform2d::Detach() could not find itself in parent's child list");
+}
+
+void IHyTransform2d::SetDirty()
+{
+	m_bDirty = true;
+
+	for(uint32 i = 0; i < m_vChildList.size(); ++i)
+		m_vChildList[i]->SetDirty();
+}
+
+/*static*/ void IHyTransform2d::OnDirty(void *pParam)
+{
+	IHyTransform2d *pThis = reinterpret_cast<IHyTransform2d *>(pParam);
+	pThis->SetDirty();
 }

@@ -19,7 +19,13 @@ public:
 	IHyTransform2d();
 	virtual ~IHyTransform2d();
 	
-	HyAnimFloat		rot;
+	HyAnimFloat						rot;
+
+	// Transformation hierarchy
+	IHyTransform2d *				m_pParent;
+	bool							m_bDirty;
+	glm::mat4						m_mtxCached;
+	vector<IHyTransform2d *>		m_vChildList;
 
 	void QueuePos(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer = 0.0f);
 	void QueueRot(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer = 0.0f);
@@ -29,6 +35,14 @@ public:
 	virtual void GetLocalTransform(glm::mat4 &outMtx) const;
 	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const;
 	virtual void SetOnDirtyCallback(void(*fpOnDirty)(void *), void *pParam = NULL);
+
+	void GetWorldTransform(glm::mat4 &outMtx);
+
+	void AddChild(IHyTransform2d &childInst);
+	void Detach();
+
+	void SetDirty();
+	static void OnDirty(void *);
 
 	virtual void OnUpdate() = 0;
 };
