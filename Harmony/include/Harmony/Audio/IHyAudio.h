@@ -16,7 +16,7 @@ class IHyAudio
 {
 
 public:
-	IHyAudio(HyRendererInterop &rendererRef);
+	IHyAudio();
 	~IHyAudio(void);
 };
 

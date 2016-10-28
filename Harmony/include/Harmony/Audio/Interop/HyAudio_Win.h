@@ -22,7 +22,7 @@ class HyAudio_Win : public IHyAudio
 	IXAudio2MasteringVoice *m_pMasterVoice;
 
 public:
-	HyAudio_Win(HyRendererInterop &rendererRef);
+	HyAudio_Win();
 	virtual ~HyAudio_Win();
 
 	//DWORD PlaySoundTest();

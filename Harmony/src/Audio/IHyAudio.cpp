@@ -11,7 +11,7 @@
 
 #include "Audio/IHyAudio.h"
 
-IHyAudio::IHyAudio(HyRendererInterop &rendererRef)
+IHyAudio::IHyAudio()
 {
 }
 

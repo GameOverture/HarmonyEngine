@@ -42,9 +42,9 @@
 //const DWORD uiSecondaryBufferSize = uiSamplesPerSec * uiBytesPerSample;
 
 
-HyAudio_Win::HyAudio_Win(HyRendererInterop &rendererRef) :	IHyAudio(rendererRef),
-															m_pXAudio2(NULL),
-															m_pMasterVoice(NULL)
+HyAudio_Win::HyAudio_Win() :	IHyAudio(),
+								m_pXAudio2(NULL),
+								m_pMasterVoice(NULL)
 {
 	//CoInitializeEx(nullptr, 0);
 

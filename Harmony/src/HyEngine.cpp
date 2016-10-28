@@ -21,7 +21,7 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_GuiComms(m_AppRef.sm_Init.uiDebugPort, m_AssetManager),
 												m_Input(m_AppRef.m_vInputMaps),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_vWindows),
-												m_Audio(m_Renderer)
+												m_Audio()
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
