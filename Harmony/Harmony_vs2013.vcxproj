@@ -43,9 +43,9 @@
     <ClCompile Include="include\Harmony\Threading\Utils.cpp" />
     <ClCompile Include="include\Harmony\Threading\WaitObject.cpp" />
     <ClCompile Include="include\Harmony\Threading\WaitObjectEx.cpp" />
+    <ClCompile Include="src\Assets\Data\HyAudioData.cpp" />
     <ClCompile Include="src\Assets\Data\HyMesh3dData.cpp" />
     <ClCompile Include="src\Assets\Data\HyPrimitive2dData.cpp" />
-    <ClCompile Include="src\Assets\Data\HySfxData.cpp" />
     <ClCompile Include="src\Assets\Data\HySpine2dData.cpp" />
     <ClCompile Include="src\Assets\Data\HySprite2dData.cpp" />
     <ClCompile Include="src\Assets\Data\HyText2dData.cpp" />
@@ -78,9 +78,9 @@
     <ClCompile Include="src\Scene\HyEntity2d.cpp" />
     <ClCompile Include="src\Scene\HyPhysEntity2d.cpp" />
     <ClCompile Include="src\Scene\HyScene.cpp" />
+    <ClCompile Include="src\Scene\Instances\HyAudio2d.cpp" />
     <ClCompile Include="src\Scene\Instances\HyMesh3d.cpp" />
     <ClCompile Include="src\Scene\Instances\HyPrimitive2d.cpp" />
-    <ClCompile Include="src\Scene\Instances\HySound.cpp" />
     <ClCompile Include="src\Scene\Instances\HySpine2d.cpp" />
     <ClCompile Include="src\Scene\Instances\HySprite2d.cpp" />
     <ClCompile Include="src\Scene\Instances\HyText2d.cpp" />
@@ -119,9 +119,9 @@
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_OSX.h" />
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
+    <ClInclude Include="include\Harmony\Assets\Data\HyAudioData.h" />
     <ClInclude Include="include\Harmony\Assets\Data\HyMesh3dData.h" />
     <ClInclude Include="include\Harmony\Assets\Data\HyPrimitive2dData.h" />
-    <ClInclude Include="include\Harmony\Assets\Data\HySfxData.h" />
     <ClInclude Include="include\Harmony\Assets\Data\HySpine2dData.h" />
     <ClInclude Include="include\Harmony\Assets\Data\HySprite2dData.h" />
     <ClInclude Include="include\Harmony\Assets\Data\HyText2dData.h" />
@@ -160,9 +160,9 @@
     <ClInclude Include="include\Harmony\Scene\HyEntity2d.h" />
     <ClInclude Include="include\Harmony\Scene\HyPhysEntity2d.h" />
     <ClInclude Include="include\Harmony\Scene\HyScene.h" />
+    <ClInclude Include="include\Harmony\Scene\Instances\HyAudio2d.h" />
     <ClInclude Include="include\Harmony\Scene\Instances\HyMesh3d.h" />
     <ClInclude Include="include\Harmony\Scene\Instances\HyPrimitive2d.h" />
-    <ClInclude Include="include\Harmony\Scene\Instances\HySound.h" />
     <ClInclude Include="include\Harmony\Scene\Instances\HySpine2d.h" />
     <ClInclude Include="include\Harmony\Scene\Instances\HySprite2d.h" />
     <ClInclude Include="include\Harmony\Scene\Instances\HyText2d.h" />
@@ -338,7 +338,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
@@ -349,10 +349,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>Winmm.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;x3daudio.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
     <ProjectReference>
@@ -365,7 +365,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
@@ -376,10 +376,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>Winmm.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;x3daudio.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
     <ProjectReference>
@@ -392,7 +392,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
@@ -403,10 +403,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>Winmm.lib;AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;x3daudio.lib;AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -421,7 +421,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
@@ -432,10 +432,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>Winmm.lib;AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;x3daudio.lib;AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -452,7 +452,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
     </ClCompile>
@@ -463,10 +463,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>Winmm.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;x3daudio.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -477,7 +477,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
     </ClCompile>
@@ -488,10 +488,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>Winmm.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;x3daudio.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
@@ -502,7 +502,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
@@ -514,10 +514,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>Winmm.lib;AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;x3daudio.lib;AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
@@ -530,7 +530,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
@@ -542,10 +542,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>Winmm.lib;AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;x3daudio.lib;AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
