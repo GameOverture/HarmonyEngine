@@ -14,7 +14,6 @@
 #include "Renderer/Viewport/HyWindow.h"
 
 #include "Scene/Instances/IHyInst2d.h"
-#include "Scene/Instances/HySound.h"
 #include "Scene/Instances/HySprite2d.h"
 #include "Scene/Instances/HySpine2d.h"
 #include "Scene/Instances/HyPrimitive2d.h"

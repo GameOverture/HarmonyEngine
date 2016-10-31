@@ -111,9 +111,6 @@
     <ClCompile Include="src\Scene\Instances\HyPrimitive2d.cpp">
       <Filter>Scene\Instances</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Instances\HySound.cpp">
-      <Filter>Scene\Instances</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scene\Instances\HySpine2d.cpp">
       <Filter>Scene\Instances</Filter>
     </ClCompile>
@@ -148,9 +145,6 @@
       <Filter>Diagnostics</Filter>
     </ClCompile>
     <ClCompile Include="src\Assets\Data\HyMesh3dData.cpp">
-      <Filter>Assets\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Assets\Data\HySfxData.cpp">
       <Filter>Assets\Data</Filter>
     </ClCompile>
     <ClCompile Include="src\Assets\Data\HySpine2dData.cpp">
@@ -209,6 +203,12 @@
     </ClCompile>
     <ClCompile Include="src\Audio\Interop\HyAudio_Win.cpp">
       <Filter>Audio\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Data\HyAudioData.cpp">
+      <Filter>Assets\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Instances\HyAudio2d.cpp">
+      <Filter>Scene\Instances</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -474,9 +474,6 @@
     <ClInclude Include="include\Harmony\Scene\Instances\HyPrimitive2d.h">
       <Filter>Scene\Instances</Filter>
     </ClInclude>
-    <ClInclude Include="include\Harmony\Scene\Instances\HySound.h">
-      <Filter>Scene\Instances</Filter>
-    </ClInclude>
     <ClInclude Include="include\Harmony\Scene\Instances\HySpine2d.h">
       <Filter>Scene\Instances</Filter>
     </ClInclude>
@@ -511,9 +508,6 @@
       <Filter>Diagnostics</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Assets\Data\HyMesh3dData.h">
-      <Filter>Assets\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Harmony\Assets\Data\HySfxData.h">
       <Filter>Assets\Data</Filter>
     </ClInclude>
     <ClInclude Include="include\Harmony\Assets\Data\HySpine2dData.h">
@@ -581,6 +575,12 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Audio\Interop\HyAudio_Win.h">
       <Filter>Audio\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Assets\Data\HyAudioData.h">
+      <Filter>Assets\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Scene\Instances\HyAudio2d.h">
+      <Filter>Scene\Instances</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

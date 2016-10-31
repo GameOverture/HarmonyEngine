@@ -11,7 +11,7 @@
 
 #include "Scene/Instances/IHyInst2d.h"
 
-#include "Assets/Data/HySfxData.h"
+#include "Assets/Data/HyAudioData.h"
 #include "Assets/Data/HySpine2dData.h"
 #include "Assets/Data/HySprite2dData.h"
 #include "Assets/Data/HyText2dData.h"

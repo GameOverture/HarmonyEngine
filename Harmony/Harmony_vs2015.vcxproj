@@ -45,7 +45,7 @@
     <ClCompile Include="include\Harmony\Threading\WaitObjectEx.cpp" />
     <ClCompile Include="src\Assets\Data\HyMesh3dData.cpp" />
     <ClCompile Include="src\Assets\Data\HyPrimitive2dData.cpp" />
-    <ClCompile Include="src\Assets\Data\HySfxData.cpp" />
+    <ClCompile Include="src\Assets\Data\HyAudioData.cpp" />
     <ClCompile Include="src\Assets\Data\HySpine2dData.cpp" />
     <ClCompile Include="src\Assets\Data\HySprite2dData.cpp" />
     <ClCompile Include="src\Assets\Data\HyText2dData.cpp" />
@@ -80,7 +80,7 @@
     <ClCompile Include="src\Scene\HyScene.cpp" />
     <ClCompile Include="src\Scene\Instances\HyMesh3d.cpp" />
     <ClCompile Include="src\Scene\Instances\HyPrimitive2d.cpp" />
-    <ClCompile Include="src\Scene\Instances\HySound.cpp" />
+    <ClCompile Include="src\Scene\Instances\HyAudio2d.cpp" />
     <ClCompile Include="src\Scene\Instances\HySpine2d.cpp" />
     <ClCompile Include="src\Scene\Instances\HySprite2d.cpp" />
     <ClCompile Include="src\Scene\Instances\HyText2d.cpp" />
@@ -121,7 +121,7 @@
     <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
     <ClInclude Include="include\Harmony\Assets\Data\HyMesh3dData.h" />
     <ClInclude Include="include\Harmony\Assets\Data\HyPrimitive2dData.h" />
-    <ClInclude Include="include\Harmony\Assets\Data\HySfxData.h" />
+    <ClInclude Include="include\Harmony\Assets\Data\HyAudioData.h" />
     <ClInclude Include="include\Harmony\Assets\Data\HySpine2dData.h" />
     <ClInclude Include="include\Harmony\Assets\Data\HySprite2dData.h" />
     <ClInclude Include="include\Harmony\Assets\Data\HyText2dData.h" />
@@ -162,7 +162,7 @@
     <ClInclude Include="include\Harmony\Scene\HyScene.h" />
     <ClInclude Include="include\Harmony\Scene\Instances\HyMesh3d.h" />
     <ClInclude Include="include\Harmony\Scene\Instances\HyPrimitive2d.h" />
-    <ClInclude Include="include\Harmony\Scene\Instances\HySound.h" />
+    <ClInclude Include="include\Harmony\Scene\Instances\HyAudio2d.h" />
     <ClInclude Include="include\Harmony\Scene\Instances\HySpine2d.h" />
     <ClInclude Include="include\Harmony\Scene\Instances\HySprite2d.h" />
     <ClInclude Include="include\Harmony\Scene\Instances\HyText2d.h" />
@@ -353,7 +353,7 @@
       <AdditionalDependencies>ole32.lib;Winmm.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
     <ProjectReference>
@@ -377,10 +377,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>ole32.lib;Winmm.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
     <ProjectReference>
@@ -407,7 +407,7 @@
       <AdditionalDependencies>ole32.lib;Winmm.lib;AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -436,7 +436,7 @@
       <AdditionalDependencies>ole32.lib;Winmm.lib;AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -467,7 +467,7 @@
       <AdditionalDependencies>ole32.lib;Winmm.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -492,7 +492,7 @@
       <AdditionalDependencies>ole32.lib;Winmm.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
@@ -518,7 +518,7 @@
       <AdditionalDependencies>ole32.lib;Winmm.lib;AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
@@ -546,7 +546,7 @@
       <AdditionalDependencies>ole32.lib;Winmm.lib;AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
     </Lib>

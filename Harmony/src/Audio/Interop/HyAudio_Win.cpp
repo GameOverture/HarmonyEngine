@@ -12,9 +12,20 @@
 
 #include "Diagnostics/HyGuiComms.h"
 
-#include <xaudio2.h>
 #if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
+	#include <xaudio2.h>
+	#include <xaudio2fx.h>
+	#include <x3daudio.h>
 	#pragma comment(lib,"xaudio2.lib")
+#else
+	#include <C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\comdecl.h>
+	#include <C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\xaudio2.h>
+	#include <C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\xaudio2fx.h>
+	#pragma warning(push)
+	#pragma warning( disable : 4005 )
+	#include <C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\x3daudio.h>
+	#pragma warning(pop)
+	#pragma comment(lib,"x3daudio.lib")
 #endif
 
 #ifdef HY_ENDIAN_BIG
@@ -25,7 +36,6 @@
 	#define fourccXWMA 'XWMA'
 	#define fourccDPDS 'dpds'
 #endif
-
 #ifdef HY_ENDIAN_LITTLE
 	#define fourccRIFF 'FFIR'
 	#define fourccDATA 'atad'
@@ -84,71 +94,71 @@ HyAudio_Win::~HyAudio_Win()
 
 }
 
-//HRESULT FindChunk(HANDLE hFile, DWORD fourcc, DWORD & dwChunkSize, DWORD & dwChunkDataPosition)
-//{
-//    HRESULT hr = S_OK;
-//    if( INVALID_SET_FILE_POINTER == SetFilePointer( hFile, 0, NULL, FILE_BEGIN ) )
-//        return HRESULT_FROM_WIN32(GetLastError());
-//
-//    DWORD dwChunkType;
-//    DWORD dwChunkDataSize;
-//    DWORD dwRIFFDataSize = 0;
-//    DWORD dwFileType;
-//    DWORD bytesRead = 0;
-//    DWORD dwOffset = 0;
-//
-//    while (hr == S_OK)
-//    {
-//        DWORD dwRead;
-//        if( 0 == ReadFile( hFile, &dwChunkType, sizeof(DWORD), &dwRead, NULL ) )
-//            hr = HRESULT_FROM_WIN32( GetLastError() );
-//
-//        if( 0 == ReadFile( hFile, &dwChunkDataSize, sizeof(DWORD), &dwRead, NULL ) )
-//            hr = HRESULT_FROM_WIN32( GetLastError() );
-//
-//        switch (dwChunkType)
-//        {
-//        case fourccRIFF:
-//            dwRIFFDataSize = dwChunkDataSize;
-//            dwChunkDataSize = 4;
-//            if( 0 == ReadFile( hFile, &dwFileType, sizeof(DWORD), &dwRead, NULL ) )
-//                hr = HRESULT_FROM_WIN32( GetLastError() );
-//            break;
-//
-//        default:
-//            if( INVALID_SET_FILE_POINTER == SetFilePointer( hFile, dwChunkDataSize, NULL, FILE_CURRENT ) )
-//            return HRESULT_FROM_WIN32( GetLastError() );            
-//        }
-//
-//        dwOffset += sizeof(DWORD) * 2;
-//        
-//        if (dwChunkType == fourcc)
-//        {
-//            dwChunkSize = dwChunkDataSize;
-//            dwChunkDataPosition = dwOffset;
-//            return S_OK;
-//        }
-//
-//        dwOffset += dwChunkDataSize;
-//        
-//        if (bytesRead >= dwRIFFDataSize) return S_FALSE;
-//
-//    }
-//
-//    return S_OK;
-//}
-//
-//HRESULT ReadChunkData(HANDLE hFile, void * buffer, DWORD buffersize, DWORD bufferoffset)
-//{
-//    HRESULT hr = S_OK;
-//    if( INVALID_SET_FILE_POINTER == SetFilePointer( hFile, bufferoffset, NULL, FILE_BEGIN ) )
-//        return HRESULT_FROM_WIN32( GetLastError() );
-//    DWORD dwRead;
-//    if( 0 == ReadFile( hFile, buffer, buffersize, &dwRead, NULL ) )
-//        hr = HRESULT_FROM_WIN32( GetLastError() );
-//    return hr;
-//}
-//
+HRESULT FindChunk(HANDLE hFile, DWORD fourcc, DWORD & dwChunkSize, DWORD & dwChunkDataPosition)
+{
+	HRESULT hr = S_OK;
+	if( INVALID_SET_FILE_POINTER == SetFilePointer( hFile, 0, NULL, FILE_BEGIN ) )
+		return HRESULT_FROM_WIN32(GetLastError());
+
+	DWORD dwChunkType;
+	DWORD dwChunkDataSize;
+	DWORD dwRIFFDataSize = 0;
+	DWORD dwFileType;
+	DWORD bytesRead = 0;
+	DWORD dwOffset = 0;
+
+	while (hr == S_OK)
+	{
+		DWORD dwRead;
+		if( 0 == ReadFile( hFile, &dwChunkType, sizeof(DWORD), &dwRead, NULL ) )
+			hr = HRESULT_FROM_WIN32( GetLastError() );
+
+		if( 0 == ReadFile( hFile, &dwChunkDataSize, sizeof(DWORD), &dwRead, NULL ) )
+			hr = HRESULT_FROM_WIN32( GetLastError() );
+
+		switch (dwChunkType)
+		{
+		case fourccRIFF:
+			dwRIFFDataSize = dwChunkDataSize;
+			dwChunkDataSize = 4;
+			if( 0 == ReadFile( hFile, &dwFileType, sizeof(DWORD), &dwRead, NULL ) )
+				hr = HRESULT_FROM_WIN32( GetLastError() );
+			break;
+
+		default:
+			if( INVALID_SET_FILE_POINTER == SetFilePointer( hFile, dwChunkDataSize, NULL, FILE_CURRENT ) )
+			return HRESULT_FROM_WIN32( GetLastError() );            
+		}
+
+		dwOffset += sizeof(DWORD) * 2;
+		
+		if (dwChunkType == fourcc)
+		{
+			dwChunkSize = dwChunkDataSize;
+			dwChunkDataPosition = dwOffset;
+			return S_OK;
+		}
+
+		dwOffset += dwChunkDataSize;
+		
+		if (bytesRead >= dwRIFFDataSize) return S_FALSE;
+
+	}
+
+	return S_OK;
+}
+
+HRESULT ReadChunkData(HANDLE hFile, void * buffer, DWORD buffersize, DWORD bufferoffset)
+{
+	HRESULT hr = S_OK;
+	if( INVALID_SET_FILE_POINTER == SetFilePointer( hFile, bufferoffset, NULL, FILE_BEGIN ) )
+		return HRESULT_FROM_WIN32( GetLastError() );
+	DWORD dwRead;
+	if( 0 == ReadFile( hFile, buffer, buffersize, &dwRead, NULL ) )
+		hr = HRESULT_FROM_WIN32( GetLastError() );
+	return hr;
+}
+
 //DWORD HyAudio_Win::PlaySoundTest()
 //{
 //	TCHAR * strFileName = _TEXT("media\\MusicMono.wav");

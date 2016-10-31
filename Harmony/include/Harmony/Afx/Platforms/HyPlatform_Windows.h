@@ -10,7 +10,7 @@
 #ifndef __HyPlatform_Windows_h__
 #define __HyPlatform_Windows_h__
 
-// TODO: Figure out wtf Windows was thinking with forcing me to use Windows SDK 8.x
+// TODO: Windows SDK 8.x sets builds to be Windows 8 by default, make it Windows 7 instead
 #define _WIN32_WINNT 0x0601
 
 #define WIN32_LEAN_AND_MEAN 

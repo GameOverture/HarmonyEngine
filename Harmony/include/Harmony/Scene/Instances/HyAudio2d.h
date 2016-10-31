@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HySound.h
+ *	HyAudio2d.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
@@ -7,18 +7,18 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HySound_h__
-#define __HySound_h__
+#ifndef __HyAudio2d_h__
+#define __HyAudio2d_h__
 
 #include "IHyInst2d.h"
 
-#include "Assets/Data/HySfxData.h"
+#include "Assets/Data/HyAudioData.h"
 
 //#include "SFML/Audio/Sound.hpp"
 
 // Forward declarations
 
-//class HySound : public IObjInst
+//class HyAudio2d : public IObjInst
 //{
 //
 //	HySfxData *						m_pDataPtr;
@@ -40,4 +40,4 @@
 
 //};
 
-#endif /* __HySound_h__ */
+#endif /* __HyAudio2d_h__ */
