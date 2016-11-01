@@ -56,18 +56,34 @@ HyAudio_Win::HyAudio_Win() :	IHyAudio(),
 								m_pXAudio2(NULL),
 								m_pMasterVoice(NULL)
 {
-	//CoInitializeEx(nullptr, 0);
+	HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	if(FAILED(hr))
+	{
+		HyLogError("HyAudio_Win - CoInitializeEx failed");
+		return;
+	}
 
 	UINT32 flags = 0;
-#if (_WIN32_WINNT < 0x0602 /*_WIN32_WINNT_WIN8*/) && defined(_DEBUG)
-	flags |= XAUDIO2_DEBUG_ENGINE;
+#if ( _WIN32_WINNT < 0x0602 /*_WIN32_WINNT_WIN8*/)
+	
+	#ifdef _DEBUG
+		m_hXAudioDLL = LoadLibraryExW(L"XAudioD2_7.DLL", nullptr, 0x00000800 /* LOAD_LIBRARY_SEARCH_SYSTEM32 */);	// Workaround for XAudio 2.7 known issue
+		flags |= XAUDIO2_DEBUG_ENGINE;
+	#else
+		m_hXAudioDLL = LoadLibraryExW(L"XAudio2_7.DLL", nullptr, 0x00000800 /* LOAD_LIBRARY_SEARCH_SYSTEM32 */);	// Workaround for XAudio 2.7 known issue
+	#endif
+	if (!m_hXAudioDLL)
+	{
+		HyLogError("Could not load XAudio dll");
+		return HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
+	}
 #endif
  
 	// Initialize the XAudio2 object
-	HRESULT hr = XAudio2Create(&m_pXAudio2, flags);
+	hr = XAudio2Create(&m_pXAudio2, flags);
 	if(FAILED(hr))
 	{
-		HyLogError("XAudio2Create failed");
+		HyLogError("HyAudio_Win - XAudio2Create failed");
 		return;
 	}
 	
