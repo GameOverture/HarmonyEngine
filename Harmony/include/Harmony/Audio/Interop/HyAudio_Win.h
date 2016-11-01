@@ -29,11 +29,33 @@ class HyAudio_Win : public IHyAudio
 	IXAudio2 *				m_pXAudio2;
 	IXAudio2MasteringVoice *m_pMasterVoice;
 
+	DWORD					m_uiChannelMask;
+	DWORD					m_uiSamplesPerSecond;
+	uint32					m_uiNumChannels;
+
+	enum eEffectType
+	{
+		EFFECT_Reverb = 0,
+
+		NUMEFFECTS
+	};
+
+	struct Effect
+	{
+		IUnknown *				pEffect;
+		uint32					uiNumOutputChannels;
+
+		IXAudio2SubmixVoice *	pSubmixVoice;
+	};
+
+	Effect						m_Effects[NUMEFFECTS];
+
 public:
 	HyAudio_Win();
 	virtual ~HyAudio_Win();
 
-	//DWORD PlaySoundTest();
+private:
+	void CreateEffect();
 };
 
 #endif /* __HyAudio_Win_h__ */

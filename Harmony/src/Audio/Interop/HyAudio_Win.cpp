@@ -75,7 +75,7 @@ HyAudio_Win::HyAudio_Win() :	IHyAudio(),
 	if (!m_hXAudioDLL)
 	{
 		HyLogError("Could not load XAudio dll");
-		return HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
+		return;
 	}
 #endif
  
@@ -96,13 +96,109 @@ HyAudio_Win::HyAudio_Win() :	IHyAudio(),
 	XAUDIO2_DEBUG_CONFIGURATION debugCfg = {0};
 	debugCfg.TraceMask = XAUDIO2_LOG_ERRORS | XAUDIO2_LOG_WARNINGS;
 	m_pXAudio2->SetDebugConfiguration(&debugCfg, 0);
- #endif
+#endif
 
 	if(FAILED(hr = m_pXAudio2->CreateMasteringVoice(&m_pMasterVoice)))
 	{
 		HyLogError("XAudio2 - CreateMasteringVoice failed");
+		m_pXAudio2->Release();
+		m_pXAudio2 = NULL;
+
 		return;
 	}
+
+	// Get information about the audio output device
+	//
+#if(_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
+	XAUDIO2_VOICE_DETAILS voiceDetails;
+	m_pMasterVoice->GetVoiceDetails(&voiceDetails);
+
+	hr = m_pMasterVoice->GetChannelMask(&m_uiChannelMask);
+	if(FAILED(hr))
+	{
+		HyLogError("XAudio2 - GetChannelMask failed");
+		m_pXAudio2->Release();
+		m_pXAudio2 = NULL;
+		return;
+	}
+
+	m_uiSamplesPerSecond = voiceDetails.InputSampleRate;
+	m_uiNumChannels = voiceDetails.InputChannels;
+
+#else
+	XAUDIO2_DEVICE_DETAILS deviceDetails;
+	hr = m_pXAudio2->GetDeviceDetails(0, &deviceDetails);
+	if(FAILED(hr))
+	{
+		HyLogError("XAudio2 - GetDeviceDetails failed");
+		m_pXAudio2->Release();
+		m_pXAudio2 = NULL;
+		return;
+	}
+
+	m_uiSamplesPerSecond = deviceDetails.OutputFormat.Format.nSamplesPerSec;
+	m_uiChannelMask = deviceDetails.OutputFormat.dwChannelMask;
+	m_uiNumChannels = deviceDetails.OutputFormat.Format.nChannels;
+
+#endif
+
+	for(int i = 0; i < NUMEFFECTS; ++i)
+	{
+		switch(i)
+		{
+		case EFFECT_Reverb:
+			UINT32 rflags = 0;
+			#if (_WIN32_WINNT < 0x0602 /*_WIN32_WINNT_WIN8*/) && defined(_DEBUG)
+				rflags |= XAUDIO2FX_DEBUG;
+			#endif
+			if(FAILED(hr = XAudio2CreateReverb(&m_Effects[EFFECT_Reverb].pEffect, rflags)))
+			{
+				HyLogError("XAudio2 - XAudio2CreateReverb failed");
+				m_pXAudio2->Release();
+				m_pXAudio2 = NULL;
+			}
+
+			m_Effects[EFFECT_Reverb].uiNumOutputChannels = 1;
+			
+			break;
+		}
+
+		XAUDIO2_EFFECT_DESCRIPTOR effects[] = { { m_Effects[EFFECT_Reverb].pEffect, TRUE, m_Effects[EFFECT_Reverb].uiNumOutputChannels } };
+		XAUDIO2_EFFECT_CHAIN effectChain = { 1, effects };
+
+		hr = m_pXAudio2->CreateSubmixVoice(&m_Effects[EFFECT_Reverb].pSubmixVoice,
+										   1, // TODO: Number of input channels
+										   m_uiSamplesPerSecond,
+										   0, 0,
+										   nullptr,
+										   &effectChain);
+		if(FAILED(hr))
+		{
+			HyLogError("XAudio2 - CreateSubmixVoice failed");
+			m_pXAudio2->Release();
+			m_pXAudio2 = NULL;
+		}
+
+		// Set default FX params
+		XAUDIO2FX_REVERB_PARAMETERS native;
+		ReverbConvertI3DL2ToNative(&g_PRESET_PARAMS[0], &native);
+		m_Effects[EFFECT_Reverb].pSubmixVoice->SetEffectParameters(0, &native, sizeof(native));
+	}
+
+	//
+	// Create reverb effect
+	//
+
+
+	//
+	// Create a submix voice
+	//
+
+	// Performance tip: you need not run global FX with the sample number
+	// of channels as the final mix.  For example, this sample runs
+	// the reverb in mono mode, thus reducing CPU overhead.
+	
+
 }
 
 HyAudio_Win::~HyAudio_Win()
