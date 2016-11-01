@@ -146,7 +146,22 @@ HyAudio_Win::HyAudio_Win() :	IHyAudio(),
 	{
 		switch(i)
 		{
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case EFFECT_MasterVolume:
+			m_Effects[EFFECT_MasterVolume].uiNumOutputChannels = 1;
+			m_Effects[EFFECT_MasterVolume].pEffect = NULL;
+			hr = m_pXAudio2->CreateSubmixVoice(&m_Effects[EFFECT_MasterVolume].pSubmixVoice, 1, m_uiSamplesPerSecond, 0, 0, 0, 0);
+			if(FAILED(hr))
+			{
+				HyLogError("XAudio2 - CreateSubmixVoice (Master Volume) failed");
+				m_pXAudio2->Release();
+				m_pXAudio2 = NULL;
+			}
+			break;
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case EFFECT_Reverb:
+			m_Effects[EFFECT_Reverb].uiNumOutputChannels = 1;
 			UINT32 rflags = 0;
 			#if (_WIN32_WINNT < 0x0602 /*_WIN32_WINNT_WIN8*/) && defined(_DEBUG)
 				rflags |= XAUDIO2FX_DEBUG;
@@ -157,53 +172,37 @@ HyAudio_Win::HyAudio_Win() :	IHyAudio(),
 				m_pXAudio2->Release();
 				m_pXAudio2 = NULL;
 			}
+			else
+			{
+				XAUDIO2_EFFECT_DESCRIPTOR effects[] = { { m_Effects[EFFECT_Reverb].pEffect, TRUE, m_Effects[EFFECT_Reverb].uiNumOutputChannels } };
+				XAUDIO2_EFFECT_CHAIN effectChain = { 1, effects };
+				hr = m_pXAudio2->CreateSubmixVoice(&m_Effects[EFFECT_Reverb].pSubmixVoice, 1, m_uiSamplesPerSecond, 0, 0, nullptr, &effectChain);
+				if(FAILED(hr))
+				{
+					HyLogError("XAudio2 - CreateSubmixVoice (Reverb) failed");
+					m_pXAudio2->Release();
+					m_pXAudio2 = NULL;
+				}
+			}
 
-			m_Effects[EFFECT_Reverb].uiNumOutputChannels = 1;
+			// Set default FX params
+			//XAUDIO2FX_REVERB_PARAMETERS native;
+			//ReverbConvertI3DL2ToNative(&g_PRESET_PARAMS[0], &native);
+			//m_Effects[EFFECT_Reverb].pSubmixVoice->SetEffectParameters(0, &native, sizeof(native), XAUDIO2_COMMIT_NOW);
 			
 			break;
 		}
-
-		XAUDIO2_EFFECT_DESCRIPTOR effects[] = { { m_Effects[EFFECT_Reverb].pEffect, TRUE, m_Effects[EFFECT_Reverb].uiNumOutputChannels } };
-		XAUDIO2_EFFECT_CHAIN effectChain = { 1, effects };
-
-		hr = m_pXAudio2->CreateSubmixVoice(&m_Effects[EFFECT_Reverb].pSubmixVoice,
-										   1, // TODO: Number of input channels
-										   m_uiSamplesPerSecond,
-										   0, 0,
-										   nullptr,
-										   &effectChain);
-		if(FAILED(hr))
-		{
-			HyLogError("XAudio2 - CreateSubmixVoice failed");
-			m_pXAudio2->Release();
-			m_pXAudio2 = NULL;
-		}
-
-		// Set default FX params
-		XAUDIO2FX_REVERB_PARAMETERS native;
-		ReverbConvertI3DL2ToNative(&g_PRESET_PARAMS[0], &native);
-		m_Effects[EFFECT_Reverb].pSubmixVoice->SetEffectParameters(0, &native, sizeof(native));
 	}
-
-	//
-	// Create reverb effect
-	//
-
-
-	//
-	// Create a submix voice
-	//
-
-	// Performance tip: you need not run global FX with the sample number
-	// of channels as the final mix.  For example, this sample runs
-	// the reverb in mono mode, thus reducing CPU overhead.
-	
-
 }
 
 HyAudio_Win::~HyAudio_Win()
 {
+#if ( _WIN32_WINNT < 0x0602 /*_WIN32_WINNT_WIN8*/)
+	if(m_hXAudioDLL)
+		FreeLibrary(m_hXAudioDLL);
+#endif
 
+	CoUninitialize();
 }
 
 HRESULT FindChunk(HANDLE hFile, DWORD fourcc, DWORD & dwChunkSize, DWORD & dwChunkDataPosition)

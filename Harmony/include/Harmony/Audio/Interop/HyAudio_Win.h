@@ -35,7 +35,8 @@ class HyAudio_Win : public IHyAudio
 
 	enum eEffectType
 	{
-		EFFECT_Reverb = 0,
+		EFFECT_MasterVolume = 0,
+		EFFECT_Reverb,
 
 		NUMEFFECTS
 	};
