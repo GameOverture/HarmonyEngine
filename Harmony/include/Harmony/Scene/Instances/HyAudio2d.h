@@ -2,7 +2,7 @@
  *	HyAudio2d.h
  *	
  *	Harmony Engine
- *	Copyright (c) 2014 Jason Knobler
+ *	Copyright (c) 2016 Jason Knobler
  *
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
@@ -14,30 +14,23 @@
 
 #include "Assets/Data/HyAudioData.h"
 
-//#include "SFML/Audio/Sound.hpp"
+class HyAudio2d
+{
+	HySfxData *						m_pDataPtr;
 
-// Forward declarations
+	enum eCueType
+	{
+		SNDCUETYPE_Unknown = -1,
+		SNDCUETYPE_Single = 0,
+		SNDCUETYPE_WeightTable = 1,
+		SNDCUETYPE_Cycle = 2,
+	};
+	eCueType		m_eCueType;
 
-//class HyAudio2d : public IObjInst
-//{
-//
-//	HySfxData *						m_pDataPtr;
-//
-//	enum eCueType
-//	{
-//		SNDCUETYPE_Unknown = -1,
-//		SNDCUETYPE_Single = 0,
-//		SNDCUETYPE_WeightTable = 1,
-//		SNDCUETYPE_Cycle = 2,
-//	};
-//	eCueType		m_eCueType;
-//
-//	sf::Sound *		m_pSounds;
-//
-//public:
-//	HySound(void);
-//	virtual ~HySound(void);
+public:
+	HyAudio2d(void);
+	virtual ~HyAudio2d(void);
 
-//};
+};
 
 #endif /* __HyAudio2d_h__ */
