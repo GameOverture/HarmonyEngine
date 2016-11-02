@@ -36,6 +36,7 @@
 
 	#include "Audio/Interop/HyAudio_Win.h"
 	typedef HyAudio_Win HyAudioInterop;
+	typedef IHyAudioInst_Win IHyAudioInstInterop;
 
 	#include "Time/Interop/HyTime_Win.h"
 	typedef HyTime_Win HyTimeInterop;

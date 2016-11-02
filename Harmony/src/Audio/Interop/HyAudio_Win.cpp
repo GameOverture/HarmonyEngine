@@ -51,6 +51,7 @@
 //const DWORD uiBytesPerSample = sizeof(int16) * 2;
 //const DWORD uiSecondaryBufferSize = uiSamplesPerSec * uiBytesPerSample;
 
+X3DAUDIO_HANDLE g_x3DInstance;
 
 HyAudio_Win::HyAudio_Win() :	IHyAudio(),
 								m_pXAudio2(NULL),
@@ -192,7 +193,10 @@ HyAudio_Win::HyAudio_Win() :	IHyAudio(),
 			
 			break;
 		}
-	}
+	} // effects
+
+	//const float SPEEDOFSOUND = X3DAUDIO_SPEED_OF_SOUND;
+	//X3DAudioInitialize(dwChannelMask, SPEEDOFSOUND,  g_audioState.x3DInstance);
 }
 
 HyAudio_Win::~HyAudio_Win()

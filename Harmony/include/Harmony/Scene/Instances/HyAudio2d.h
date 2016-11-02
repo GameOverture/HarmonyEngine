@@ -14,7 +14,7 @@
 
 #include "Assets/Data/HyAudioData.h"
 
-class HyAudio2d
+class HyAudio2d : public IHyAudioInstInterop
 {
 	HySfxData *						m_pDataPtr;
 
@@ -30,7 +30,6 @@ class HyAudio2d
 public:
 	HyAudio2d(void);
 	virtual ~HyAudio2d(void);
-
 };
 
 #endif /* __HyAudio2d_h__ */

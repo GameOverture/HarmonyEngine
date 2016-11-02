@@ -55,7 +55,9 @@
     <ClCompile Include="src\Assets\HyAssetManager.cpp" />
     <ClCompile Include="src\Assets\HyTextures.cpp" />
     <ClCompile Include="src\Audio\IHyAudio.cpp" />
+    <ClCompile Include="src\Audio\IHyAudioInst.cpp" />
     <ClCompile Include="src\Audio\Interop\HyAudio_Win.cpp" />
+    <ClCompile Include="src\Audio\Interop\IHyAudioInst_Win.cpp" />
     <ClCompile Include="src\Diagnostics\HyGuiComms.cpp" />
     <ClCompile Include="src\Diagnostics\HyGuiMessage.cpp" />
     <ClCompile Include="src\Diagnostics\HyLiveVarManager.cpp" />
@@ -132,7 +134,9 @@
     <ClInclude Include="include\Harmony\Assets\HyTextures.h" />
     <ClInclude Include="include\Harmony\Assets\HyFactory.h" />
     <ClInclude Include="include\Harmony\Audio\IHyAudio.h" />
+    <ClInclude Include="include\Harmony\Audio\IHyAudioInst.h" />
     <ClInclude Include="include\Harmony\Audio\Interop\HyAudio_Win.h" />
+    <ClInclude Include="include\Harmony\Audio\Interop\IHyAudioInst_Win.h" />
     <ClInclude Include="include\Harmony\Diagnostics\HyGuiComms.h" />
     <ClInclude Include="include\Harmony\Diagnostics\HyGuiMessage.h" />
     <ClInclude Include="include\Harmony\Diagnostics\HyLiveVarManager.h" />
@@ -206,6 +210,7 @@
     <ClInclude Include="include\Harmony\Utilities\HyVariant.h" />
     <ClInclude Include="include\Harmony\Utilities\jsonxx.h" />
     <ClInclude Include="include\Harmony\Utilities\stb_image.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}</ProjectGuid>

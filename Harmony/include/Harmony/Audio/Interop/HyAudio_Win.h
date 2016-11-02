@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Audio/IHyAudio.h"
+#include "IHyAudioInst_Win.h"
 
 struct IXAudio2;
 struct IXAudio2MasteringVoice;
