@@ -196,6 +196,8 @@ HyAudio_Win::HyAudio_Win() :	IHyAudio(),
 	} // effects
 
 	X3DAudioInitialize(m_uiChannelMask, X3DAUDIO_SPEED_OF_SOUND, g_x3DInstance);
+
+	X3DAUDIO_CONE Listener_DirectionalCone = { X3DAUDIO_PI*5.0f/6.0f, X3DAUDIO_PI*11.0f/6.0f, 1.0f, 0.75f, 0.0f, 0.25f, 0.708f, 1.0f };
 }
 
 HyAudio_Win::~HyAudio_Win()
