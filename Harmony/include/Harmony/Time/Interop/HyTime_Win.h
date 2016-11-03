@@ -14,7 +14,7 @@
 
 class HyTime_Win : public IHyTime
 {
-	bool						m_bUsingPerformanceTimer;	// Timer Selection Flag
+	//bool						m_bUsingPerformanceTimer;	// Timer Selection Flag
 
 	double						m_dTimeFactor;				// Time Scaling Factor
 	int64						m_i64LastTime;				// Previous timer value

@@ -9,31 +9,35 @@
  *************************************************************************/
 #include "Time/Interop/HyTime_Win.h"
 
-#include <mmsystem.h>
+//#include <mmsystem.h>
 
 HyTime_Win::HyTime_Win() : IHyTime()
 {
 	int64 i64PerfCnt;
 	if (QueryPerformanceFrequency((LARGE_INTEGER *) &i64PerfCnt)) 
 	{
-		m_bUsingPerformanceTimer = true;
+		//m_bUsingPerformanceTimer = true;
 
 		// set timer scaling factor
 		m_dTimeFactor = 1.0 / i64PerfCnt;
 
 		// read initial time
 		QueryPerformanceCounter((LARGE_INTEGER *) &m_i64LastTime);
-	} 
-	else 
-	{
-		m_bUsingPerformanceTimer = false;
-
-		// no performance counter, read in using timeGetTime
-		m_i64LastTime = timeGetTime();
-
-		// set timer scaling factor
-		m_dTimeFactor = 0.001;
 	}
+	else
+	{
+		HyError("Windows - QueryPerformanceFrequency failed, Must run Windows XP or later.");
+	}
+	//else 
+	//{
+	//	m_bUsingPerformanceTimer = false;
+
+	//	// no performance counter, read in using timeGetTime
+	//	m_i64LastTime = timeGetTime();
+
+	//	// set timer scaling factor
+	//	m_dTimeFactor = 0.001;
+	//}
 }
 
 HyTime_Win::~HyTime_Win(void)
@@ -45,10 +49,10 @@ HyTime_Win::~HyTime_Win(void)
 /*virtual*/ void HyTime_Win::SetCurDeltaTime()
 {
 	// read appropriate counter
-	if (m_bUsingPerformanceTimer)
+	//if (m_bUsingPerformanceTimer)
 		QueryPerformanceCounter((LARGE_INTEGER *) &m_i64CurTime);
-	else
-		m_i64CurTime = timeGetTime();
+	//else
+	//	m_i64CurTime = timeGetTime();
 
 	// scale time value and save
 	m_dCurDeltaTime = (m_i64CurTime - m_i64LastTime) * m_dTimeFactor;

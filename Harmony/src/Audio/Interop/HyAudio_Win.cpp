@@ -21,11 +21,10 @@
 	#include <C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\comdecl.h>
 	#include <C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\xaudio2.h>
 	#include <C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\xaudio2fx.h>
-	#pragma warning(push)
-	#pragma warning( disable : 4005 )
+	//#pragma warning(push)
+	//#pragma warning(disable : 4005)
 	#include <C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\x3daudio.h>
-	#pragma warning(pop)
-	//#pragma comment(lib,"x3daudio.lib")
+	//#pragma warning(pop)
 #endif
 
 #ifdef HY_ENDIAN_BIG
@@ -163,11 +162,11 @@ HyAudio_Win::HyAudio_Win() :	IHyAudio(),
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case EFFECT_Reverb:
 			m_Effects[EFFECT_Reverb].uiNumOutputChannels = 1;
-			UINT32 rflags = 0;
+			UINT32 uiReverbFlags = 0;
 			#if (_WIN32_WINNT < 0x0602 /*_WIN32_WINNT_WIN8*/) && defined(_DEBUG)
-				rflags |= XAUDIO2FX_DEBUG;
+				uiReverbFlags |= XAUDIO2FX_DEBUG;
 			#endif
-			if(FAILED(hr = XAudio2CreateReverb(&m_Effects[EFFECT_Reverb].pEffect, rflags)))
+			if(FAILED(hr = XAudio2CreateReverb(&m_Effects[EFFECT_Reverb].pEffect, uiReverbFlags)))
 			{
 				HyLogError("XAudio2 - XAudio2CreateReverb failed");
 				m_pXAudio2->Release();
@@ -187,16 +186,16 @@ HyAudio_Win::HyAudio_Win() :	IHyAudio(),
 			}
 
 			// Set default FX params
-			//XAUDIO2FX_REVERB_PARAMETERS native;
-			//ReverbConvertI3DL2ToNative(&g_PRESET_PARAMS[0], &native);
-			//m_Effects[EFFECT_Reverb].pSubmixVoice->SetEffectParameters(0, &native, sizeof(native), XAUDIO2_COMMIT_NOW);
+			XAUDIO2FX_REVERB_I3DL2_PARAMETERS defaultReverbPreset = XAUDIO2FX_I3DL2_PRESET_DEFAULT;
+			XAUDIO2FX_REVERB_PARAMETERS native;
+			ReverbConvertI3DL2ToNative(&defaultReverbPreset, &native);
+			m_Effects[EFFECT_Reverb].pSubmixVoice->SetEffectParameters(0, &native, sizeof(native), XAUDIO2_COMMIT_NOW);
 			
 			break;
 		}
 	} // effects
 
-	//const float SPEEDOFSOUND = X3DAUDIO_SPEED_OF_SOUND;
-	//X3DAudioInitialize(dwChannelMask, SPEEDOFSOUND,  g_audioState.x3DInstance);
+	X3DAudioInitialize(m_uiChannelMask, X3DAUDIO_SPEED_OF_SOUND, g_x3DInstance);
 }
 
 HyAudio_Win::~HyAudio_Win()

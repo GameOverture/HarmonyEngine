@@ -210,6 +210,12 @@
     <ClCompile Include="src\Scene\Instances\HyAudio2d.cpp">
       <Filter>Scene\Instances</Filter>
     </ClCompile>
+    <ClCompile Include="src\Audio\Interop\IHyAudioInst_Win.cpp">
+      <Filter>Audio\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\IHyAudioInst.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -581,6 +587,12 @@
     </ClInclude>
     <ClInclude Include="include\Harmony\Scene\Instances\HyAudio2d.h">
       <Filter>Scene\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Audio\Interop\IHyAudioInst_Win.h">
+      <Filter>Audio\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Harmony\Audio\IHyAudioInst.h">
+      <Filter>Audio</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
