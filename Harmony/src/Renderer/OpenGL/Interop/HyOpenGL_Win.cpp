@@ -16,8 +16,8 @@
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow *> &viewportsRef) :	HyOpenGL(gfxCommsRef, viewportsRef),
-																						m_hGLContext(NULL)
+HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowListRef) :	HyOpenGL(gfxCommsRef, windowListRef),
+																							m_hGLContext(NULL)
 {
 	m_PixelFormatDescriptor.nSize = sizeof(PIXELFORMATDESCRIPTOR);
 	m_PixelFormatDescriptor.nVersion = 1;

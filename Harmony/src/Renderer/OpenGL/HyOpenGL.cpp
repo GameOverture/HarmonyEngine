@@ -9,8 +9,8 @@
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGL.h"
 
-HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyWindow *> &viewportsRef) :	IHyRenderer(gfxCommsRef, viewportsRef),
-																				m_mtxView(1.0f)
+HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowListRef) :	IHyRenderer(gfxCommsRef, windowListRef),
+																					m_mtxView(1.0f)
 {
 #ifdef HY_PLATFORM_GUI
 	Initialize();

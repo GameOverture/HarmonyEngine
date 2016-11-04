@@ -59,7 +59,7 @@ protected:
 	vector<RenderSurface>::iterator	m_RenderSurfaceIter;
 
 public:
-	IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow *> &vWindowRef);
+	IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
 	virtual void StartRender() = 0;

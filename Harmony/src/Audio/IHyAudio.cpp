@@ -7,11 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Afx/HyInteropAfx.h"
-
 #include "Audio/IHyAudio.h"
+#include "Renderer/Viewport/HyWindow.h"
 
-IHyAudio::IHyAudio()
+IHyAudio::IHyAudio(vector<HyWindow *> &windowListRef) : m_WindowListRef(windowListRef)
 {
 }
 

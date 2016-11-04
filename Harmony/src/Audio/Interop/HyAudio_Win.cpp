@@ -52,9 +52,9 @@
 
 X3DAUDIO_HANDLE g_x3DInstance;
 
-HyAudio_Win::HyAudio_Win() :	IHyAudio(),
-								m_pXAudio2(NULL),
-								m_pMasterVoice(NULL)
+HyAudio_Win::HyAudio_Win(vector<HyWindow *> &windowListRef) :	IHyAudio(windowListRef),
+																m_pXAudio2(NULL),
+																m_pMasterVoice(NULL)
 {
 	HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if(FAILED(hr))
@@ -275,46 +275,3 @@ HRESULT ReadChunkData(HANDLE hFile, void * buffer, DWORD buffersize, DWORD buffe
 	return hr;
 }
 
-//DWORD HyAudio_Win::PlaySoundTest()
-//{
-//	TCHAR * strFileName = _TEXT("media\\MusicMono.wav");
-//
-//	// Open the file
-//	HANDLE hFile = CreateFile(
-//		strFileName,
-//		GENERIC_READ,
-//		FILE_SHARE_READ,
-//		NULL,
-//		OPEN_EXISTING,
-//		0,
-//		NULL );
-//
-//	if( INVALID_HANDLE_VALUE == hFile )
-//		return HRESULT_FROM_WIN32( GetLastError() );
-//
-//	if( INVALID_SET_FILE_POINTER == SetFilePointer( hFile, 0, NULL, FILE_BEGIN ) )
-//		return HRESULT_FROM_WIN32( GetLastError() );
-//
-//	return S_OK
-//
-//	//DWORD dwChunkSize;
-//	//DWORD dwChunkPosition;
-//	////check the file type, should be fourccWAVE or 'XWMA'
-//	//FindChunk(hFile,fourccRIFF,dwChunkSize, dwChunkPosition );
-//	//DWORD filetype;
-//	//ReadChunkData(hFile,&filetype,sizeof(DWORD),dwChunkPosition);
-//	//if (filetype != fourccWAVE)
-//	//	return S_FALSE;
-//
-//	//FindChunk(hFile,fourccFMT, dwChunkSize, dwChunkPosition);
-//	//ReadChunkData(hFile, &wfx, dwChunkSize, dwChunkPosition);
-//
-//	////fill out the audio data buffer with the contents of the fourccDATA chunk
-//	//FindChunk(hFile,fourccDATA,dwChunkSize, dwChunkPosition );
-//	//BYTE * pDataBuffer = new BYTE[dwChunkSize];
-//	//ReadChunkData(hFile, pDataBuffer, dwChunkSize, dwChunkPosition);
-//
-//	//buffer.AudioBytes = dwChunkSize;  //buffer containing audio data
-//	//buffer.pAudioData = pDataBuffer;  //size of the audio buffer in bytes
-//	//buffer.Flags = XAUDIO2_END_OF_STREAM; // tell the source voice not to expect any data after this buffer
-//}

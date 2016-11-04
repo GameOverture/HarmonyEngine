@@ -21,7 +21,7 @@ class HyOpenGL_Win : public HyOpenGL
 	PIXELFORMATDESCRIPTOR	m_PixelFormatDescriptor;
 
 public:
-	HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow *> &viewportsRef);
+	HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowListRef);
 	~HyOpenGL_Win();
 
 	HWND ConstructWindow(const HyWindowInfo &wndInfo);

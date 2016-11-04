@@ -34,8 +34,8 @@ void IHyRenderer::RenderSurface::Resize(int32 iWidth, int32 iHeight)
 	m_iRenderSurfaceHeight = iHeight;
 }
 
-IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow *> &vWindowRef) :	m_GfxCommsRef(gfxCommsRef),
-																					m_vWindowRef(vWindowRef)
+IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowListRef) :	m_GfxCommsRef(gfxCommsRef),
+																						m_vWindowRef(windowListRef)
 {
 	// TODO: Make the application's HyWindow (ref to 'm_vWindowRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_vWindowRef.size()); ++i)
