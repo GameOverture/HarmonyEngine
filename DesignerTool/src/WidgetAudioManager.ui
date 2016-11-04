@@ -98,22 +98,14 @@
      <item>
       <widget class="QToolButton" name="btnAddAudioBank">
        <property name="text">
-        <string>+</string>
-       </property>
-       <property name="icon">
-        <iconset resource="res/DesignerTool.qrc">
-         <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+        <string/>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QToolButton" name="btnDeleteAudioBank">
        <property name="text">
-        <string>-</string>
-       </property>
-       <property name="icon">
-        <iconset resource="res/DesignerTool.qrc">
-         <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+        <string/>
        </property>
       </widget>
      </item>

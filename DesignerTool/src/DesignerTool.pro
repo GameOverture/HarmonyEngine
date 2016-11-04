@@ -49,7 +49,8 @@ SOURCES += main.cpp \
     WidgetColor.cpp \
     QtWaitingSpinner/waitingspinnerwidget.cpp \
     WidgetAudioManager.cpp \
-    WidgetAudioBank.cpp
+    WidgetAudioBank.cpp \
+    WidgetAudioModelView.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -87,7 +88,8 @@ HEADERS  += \
     WidgetColor.h \
     QtWaitingSpinner/waitingspinnerwidget.h \
     WidgetAudioManager.h \
-    WidgetAudioBank.h
+    WidgetAudioBank.h \
+    WidgetAudioModelView.h
 
 FORMS    += \
     DlgNewProject.ui \

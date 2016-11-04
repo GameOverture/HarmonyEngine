@@ -50,6 +50,16 @@ public:
 private slots:
     void on_cmbAudioBanks_currentIndexChanged(int index);
     
+    void on_actionAddCategory_triggered();
+    
+    void on_actionRenameCategory_triggered();
+    
+    void on_actionRemoveCategory_triggered();
+    
+    void on_actionAddAudioBank_triggered();
+    
+    void on_actionDeleteAudioBank_triggered();
+    
 private:
     Ui::WidgetAudioManager *ui;
     

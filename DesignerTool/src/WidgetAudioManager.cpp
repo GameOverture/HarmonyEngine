@@ -11,6 +11,11 @@
 #include "ui_WidgetAudioManager.h"
 
 #include "WidgetAudioBank.h"
+#include "DlgInputName.h"
+
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 WidgetAudioBankModelView::WidgetAudioBankModelView(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
                                                                                                         m_AudioBanksRef(atlasGroupsRef)
@@ -92,6 +97,45 @@ WidgetAudioManager::WidgetAudioManager(ItemProject *pProjOwner, QWidget *parent)
         }
     }
     
+    QFile audioInfoFile(m_DataDir.absoluteFilePath(HYGUIPATH_DataAudio));
+    if(audioInfoFile.exists())
+    {
+        if(!audioInfoFile.open(QIODevice::ReadOnly))
+            HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaAtlasSettings, LOGTYPE_Error);
+
+        QJsonDocument audioDoc = QJsonDocument::fromJson(audioInfoFile.readAll());
+        QJsonObject audioObj = audioDoc.object();
+        
+        // TODO: Read audio info file
+        audioObj["name"].toString();
+        
+        audioInfoFile.close();
+    }
+    else
+    {
+        
+    }
+//    else if(audioInfoFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+//    {
+//        QJsonDocument settingsDoc(settingsObj);
+
+//#ifdef HYGUI_UseBinaryMetaFiles
+//        qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
+//#else
+//        qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
+//#endif
+//        if(0 == iBytesWritten || -1 == iBytesWritten)
+//        {
+//            HyGuiLog("Could not write to atlas settings file: " % settingsFile.errorString(), LOGTYPE_Error);
+//        }
+
+//        settingsFile.close();
+    
+//    }
+//    else
+//        HyGuiLog("Couldn't open data audio info file for initial writing", LOGTYPE_Error);
+    
+    
     ui->cmbAudioBanks->setModel(new WidgetAudioBankModelView(*ui->audioBanks, this));
 }
 
@@ -121,11 +165,6 @@ void WidgetAudioManager::AddAudioBankGroup(int iId /*= -1*/)
             HyGuiLog("Failed to create new meta-audio bank directory", LOGTYPE_Error)
         else
             HyGuiLog("Created new meta-audio bank: " + iId, LOGTYPE_Info)
-
-        if(false == m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(iId)))
-            HyGuiLog("Failed to create new data-audio bank directory", LOGTYPE_Error)
-        else
-            HyGuiLog("Created new data-audio bank: " + iId, LOGTYPE_Info)
     }
     
     QDir newMetaAudioBankDir(m_MetaDir);
@@ -135,13 +174,6 @@ void WidgetAudioManager::AddAudioBankGroup(int iId /*= -1*/)
         return;
     }
 
-    QDir newDataAudioBankDir(m_DataDir);
-    if(newDataAudioBankDir.cd(HyGlobal::MakeFileNameFromCounter(iId)) == false)
-    {
-        HyGuiLog("Failed to 'cd' into data-audio bank directory: " + iId, LOGTYPE_Error);
-        return;
-    }
-    
     bool bAudioBankAlreadyExists = false;
 //    for(int i = 0; i < ui->waveBanks->count(); ++i)
 //    {
@@ -154,7 +186,7 @@ void WidgetAudioManager::AddAudioBankGroup(int iId /*= -1*/)
     
     if(bAudioBankAlreadyExists == false)
     {
-        WidgetAudioBank *pNewAudioBank = new WidgetAudioBank(newMetaAudioBankDir, newDataAudioBankDir, this, this);
+        WidgetAudioBank *pNewAudioBank = new WidgetAudioBank(newMetaAudioBankDir, m_DataDir, this, this);
         int iTest = ui->audioBanks->count();
         ui->audioBanks->setCurrentIndex(ui->audioBanks->addWidget(pNewAudioBank));
         
@@ -168,4 +200,36 @@ void WidgetAudioManager::on_cmbAudioBanks_currentIndexChanged(int index)
 {
     // Then set the new atlas group
     ui->audioBanks->setCurrentIndex(index);
+}
+
+void WidgetAudioManager::on_actionAddCategory_triggered()
+{
+    DlgInputName *pDlg = new DlgInputName("New Category Name", "Unnamed", this);
+    if(pDlg->exec() == QDialog::Accepted)
+    {
+        
+        QUndoCommand *pCmd = new ItemFontCmd_RenameState(ui->cmbStates, pDlg->GetName());
+        m_pItemFont->GetUndoStack()->push(pCmd);
+    }
+    delete pDlg;
+}
+
+void WidgetAudioManager::on_actionRenameCategory_triggered()
+{
+    
+}
+
+void WidgetAudioManager::on_actionRemoveCategory_triggered()
+{
+    
+}
+
+void WidgetAudioManager::on_actionAddAudioBank_triggered()
+{
+    
+}
+
+void WidgetAudioManager::on_actionDeleteAudioBank_triggered()
+{
+    
 }

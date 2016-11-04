@@ -685,6 +685,7 @@ void WidgetFont::on_actionRenameState_triggered()
         QUndoCommand *pCmd = new ItemFontCmd_RenameState(ui->cmbStates, pDlg->GetName());
         m_pItemFont->GetUndoStack()->push(pCmd);
     }
+    delete pDlg;
 }
 
 void WidgetFont::on_actionOrderStateBackwards_triggered()
