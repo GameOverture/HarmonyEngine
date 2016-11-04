@@ -47,7 +47,9 @@ SOURCES += main.cpp \
     DlgColorPicker.cpp \
     WidgetFontState.cpp \
     WidgetColor.cpp \
-    QtWaitingSpinner/waitingspinnerwidget.cpp
+    QtWaitingSpinner/waitingspinnerwidget.cpp \
+    WidgetAudioManager.cpp \
+    WidgetAudioBank.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -83,7 +85,9 @@ HEADERS  += \
     DlgColorPicker.h \
     WidgetFontState.h \
     WidgetColor.h \
-    QtWaitingSpinner/waitingspinnerwidget.h
+    QtWaitingSpinner/waitingspinnerwidget.h \
+    WidgetAudioManager.h \
+    WidgetAudioBank.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -103,7 +107,9 @@ FORMS    += \
     WidgetFont.ui \
     DlgColorPicker.ui \
     WidgetFontState.ui \
-    WidgetColor.ui
+    WidgetColor.ui \
+    WidgetAudioManager.ui \
+    WidgetAudioBank.ui
 
 Release:DESTDIR = ../bin/release
 Release:OBJECTS_DIR = ../bin/release/.obj
