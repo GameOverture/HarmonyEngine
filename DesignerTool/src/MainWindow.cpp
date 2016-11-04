@@ -17,6 +17,7 @@
 
 #include "WidgetExplorer.h"
 #include "WidgetAtlasManager.h"
+#include "WidgetAudioManager.h"
 
 #include "ItemSprite.h"
 
@@ -127,6 +128,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     }
     m_Settings.endGroup();
     
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Restore workspace
     HyGuiLog("Recovering previously opened session...", LOGTYPE_Normal);
     m_Settings.beginGroup("MainWindow");
@@ -136,13 +138,15 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     }
     m_Settings.endGroup();
     
-    // Start with no open items. "OpenData" below will make this docking window (and Action menu item) visible if any items are to be opened
-    ui->dockWidgetCurrentItem->hide();
-    ui->actionViewProperties->setVisible(false);
-
     ui->actionViewAtlasManager->setChecked(!ui->dockWidgetAtlas->isHidden());
     ui->actionViewExplorer->setChecked(!ui->dockWidgetExplorer->isHidden());
     ui->actionViewOutputLog->setChecked(!ui->dockWidgetOutputLog->isHidden());
+    ui->actionAudioManager->setChecked(!ui->dockWidgetAudio->isHidden());
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Start with no open items. "OpenData" below will make this docking window (and Action menu item) visible if any items are to be opened
+    ui->dockWidgetCurrentItem->hide();
+    ui->actionViewProperties->setVisible(false);
 
     m_Settings.beginGroup("OpenData");
     {
@@ -386,6 +390,9 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     {
         sm_pInstance->ui->dockWidgetAtlas->setWidget(&sm_pInstance->m_pCurSelectedProj->GetAtlasManager());
         sm_pInstance->ui->dockWidgetAtlas->widget()->show();
+        
+        sm_pInstance->ui->dockWidgetAudio->setWidget(&sm_pInstance->m_pCurSelectedProj->GetAudioManager());
+        sm_pInstance->ui->dockWidgetAudio->widget()->show();
     }
     else
     {
@@ -590,4 +597,9 @@ void MainWindow::on_actionLaunchIDE_triggered()
 void MainWindow::on_actionAbout_triggered()
 {
     QMessageBox::about(this, HyDesignerToolName, "Harmony Engine and Designer Tool\nCopyright (c) 2016 Jason Knobler");
+}
+
+void MainWindow::on_actionAudioManager_triggered()
+{
+    ui->dockWidgetAudio->setHidden(!ui->dockWidgetAudio->isHidden());
 }

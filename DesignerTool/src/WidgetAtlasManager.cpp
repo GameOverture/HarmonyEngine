@@ -452,16 +452,16 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
     }
     
     bool bGroupAlreadyExists = false;
-    for(int i = 0; i < ui->atlasGroups->count(); ++i)
-    {
-        if(static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->IsMatching(newMetaAtlasDir, newDataAtlasDir))
-        {
-            //static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->Reload();
+//    for(int i = 0; i < ui->atlasGroups->count(); ++i)
+//    {
+//        if(static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->IsMatching(newMetaAtlasDir, newDataAtlasDir))
+//        {
+//            //static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->Reload();
             
-            bGroupAlreadyExists = true;
-            break;
-        }
-    }
+//            bGroupAlreadyExists = true;
+//            break;
+//        }
+//    }
     
     if(bGroupAlreadyExists == false)
     {

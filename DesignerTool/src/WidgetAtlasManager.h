@@ -34,6 +34,8 @@ public:
     virtual int	rowCount(const QModelIndex & parent = QModelIndex()) const;
 };
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class WidgetAtlasManager : public QWidget
 {
     Q_OBJECT

@@ -86,6 +86,7 @@
     <addaction name="actionViewExplorer"/>
     <addaction name="actionViewOutputLog"/>
     <addaction name="actionViewAtlasManager"/>
+    <addaction name="actionAudioManager"/>
     <addaction name="separator"/>
     <addaction name="actionViewProperties"/>
    </widget>
@@ -236,6 +237,30 @@
      </property>
      <property name="bottomMargin">
       <number>2</number>
+     </property>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidgetAudio">
+   <property name="windowTitle">
+    <string>Audio Manager</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_9">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
      </property>
     </layout>
    </widget>
@@ -546,6 +571,18 @@
   <action name="actionAbout">
    <property name="text">
     <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="actionAudioManager">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/audio-document.png</normaloff>:/icons16x16/audio-document.png</iconset>
+   </property>
+   <property name="text">
+    <string>Audio Manager</string>
+   </property>
+   <property name="toolTip">
+    <string>Dockable tool panel that imports audio</string>
    </property>
   </action>
  </widget>

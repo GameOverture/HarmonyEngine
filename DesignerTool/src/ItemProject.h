@@ -17,6 +17,7 @@
 
 // Forward declaration
 class WidgetAtlasManager;
+class WidgetAudioManager;
 
 class CheckerGrid : public HyPrimitive2d
 {
@@ -37,8 +38,9 @@ class ItemProject : public Item, public IHyApplication
 
     friend class WidgetExplorer;
 
-    QTabBar *                                       m_pTabBar;
     WidgetAtlasManager *                            m_pAtlasMan;
+    WidgetAudioManager *                            m_pAudioMan;
+    QTabBar *                                       m_pTabBar;
     
     QString                                         m_sGameName;
 
@@ -76,6 +78,7 @@ public:
     QString GetSourceRelPath() const                    { return QDir::cleanPath(m_sRelativeSourceLocation) + '/'; }
 
     WidgetAtlasManager &GetAtlasManager()               { return *m_pAtlasMan; }
+    WidgetAudioManager &GetAudioManager()               { return *m_pAudioMan; }
     QTabBar *GetTabBar()                                { return m_pTabBar; }
     
     QList<QAction *> GetSaveActions();

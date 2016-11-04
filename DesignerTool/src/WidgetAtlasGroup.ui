@@ -145,7 +145,7 @@
      <item>
       <widget class="QPushButton" name="btnAddDir">
        <property name="text">
-        <string>Add Directory</string>
+        <string>Add Image Dir</string>
        </property>
       </widget>
      </item>

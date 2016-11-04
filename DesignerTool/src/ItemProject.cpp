@@ -10,6 +10,7 @@
 #include "ItemProject.h"
 
 #include "WidgetAtlasManager.h"
+#include "WidgetAudioManager.h"
 #include "MainWindow.h"
 #include "ItemSprite.h"
 #include "ItemFont.h"
@@ -177,6 +178,8 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     m_pAtlasMan = new WidgetAtlasManager(this);
+    
+    m_pAudioMan = new WidgetAudioManager(this);
 
     m_pTabBar = new QTabBar();
     m_pTabBar->setTabsClosable(true);
@@ -203,7 +206,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
     QList<eItemType> subDirList = HyGlobal::SubDirList();
     foreach(eItemType eType, subDirList)
     {
-        if(eType == ITEM_DirAtlases)
+        if(eType == ITEM_DirAtlases || eType == ITEM_DirAudioBanks)
             continue;
 
         QString sSubDirPath = GetAssetsAbsPath() % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);

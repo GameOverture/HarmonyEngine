@@ -18,7 +18,6 @@
 #include "HyGlobal.h"
 #include "DlgAtlasGroupSettings.h"
 #include "HyGuiFrame.h"
-#include "ItemProject.h"
 
 #include "scriptum/imagepacker.h"
 

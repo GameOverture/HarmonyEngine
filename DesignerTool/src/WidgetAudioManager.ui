@@ -39,13 +39,13 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>120</height>
+         <height>100</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>120</height>
+         <height>100</height>
         </size>
        </property>
       </widget>
@@ -93,10 +93,10 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QComboBox" name="cmbWaveBanks"/>
+      <widget class="QComboBox" name="cmbAudioBanks"/>
      </item>
      <item>
-      <widget class="QToolButton" name="btnAddWaveBank">
+      <widget class="QToolButton" name="btnAddAudioBank">
        <property name="text">
         <string>+</string>
        </property>
@@ -107,7 +107,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnDeleteWaveBank">
+      <widget class="QToolButton" name="btnDeleteAudioBank">
        <property name="text">
         <string>-</string>
        </property>
@@ -122,7 +122,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Wave Bank</string>
+      <string>Audio Bank</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="leftMargin">
@@ -138,7 +138,7 @@
        <number>2</number>
       </property>
       <item>
-       <widget class="QStackedWidget" name="waveBanks">
+       <widget class="QStackedWidget" name="audioBanks">
         <widget class="QWidget" name="page"/>
         <widget class="QWidget" name="page_2"/>
        </widget>
@@ -147,6 +147,66 @@
     </widget>
    </item>
   </layout>
+  <action name="actionAddCategory">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Category</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a new category to group sounds</string>
+   </property>
+  </action>
+  <action name="actionRenameCategory">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Category</string>
+   </property>
+   <property name="toolTip">
+    <string>Renames the selected category</string>
+   </property>
+  </action>
+  <action name="actionRemoveCategory">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Category</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes the selected category</string>
+   </property>
+  </action>
+  <action name="actionAddAudioBank">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add New Audio Bank</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new Audio Bank</string>
+   </property>
+  </action>
+  <action name="actionDeleteAudioBank">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete Selected Audio Bank</string>
+   </property>
+   <property name="toolTip">
+    <string>Deletes the selected Audio Bank</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="res/DesignerTool.qrc"/>

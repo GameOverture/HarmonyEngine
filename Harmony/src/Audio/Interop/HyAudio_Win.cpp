@@ -207,7 +207,8 @@ HyAudio_Win::~HyAudio_Win()
 		FreeLibrary(m_hXAudioDLL);
 #endif
 
-	CoUninitialize();
+	// TODO: Call this without it crashing the program (make CoInit and CoUninit into an outer scope?)
+	//CoUninitialize();
 }
 
 HRESULT FindChunk(HANDLE hFile, DWORD fourcc, DWORD & dwChunkSize, DWORD & dwChunkDataPosition)

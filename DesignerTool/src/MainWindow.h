@@ -97,6 +97,8 @@ private slots:
     
     void on_actionAbout_triggered();
 
+    void on_actionAudioManager_triggered();
+    
 private:
     Ui::MainWindow *ui;
 

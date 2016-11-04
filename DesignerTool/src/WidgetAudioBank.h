@@ -1,5 +1,16 @@
-#ifndef WIDGEAUDIOBANK_H
-#define WIDGEAUDIOBANK_H
+/**************************************************************************
+ *	WidgetAudioBank.h
+ *
+ *	Harmony Engine - Designer Tool
+ *	Copyright (c) 2016 Jason Knobler
+ *
+ *	The zlib License (zlib)
+ *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *************************************************************************/
+#ifndef WIDGETAUDIOBANK_H
+#define WIDGETAUDIOBANK_H
+
+#include "HyGlobal.h"
 
 #include <QWidget>
 
@@ -7,16 +18,29 @@ namespace Ui {
 class WidgetAudioBank;
 }
 
+class WidgetAudioManager;
+
 class WidgetAudioBank : public QWidget
 {
     Q_OBJECT
+    
+    // NOTE: Order of these member variables matter here for the member initializer list
+    WidgetAudioManager *        m_pManager;
+    
+    QDir                        m_MetaDir;
+    QDir                        m_DataDir;
+    
+    QString                     m_sName;
 
 public:
     explicit WidgetAudioBank(QWidget *parent = 0);
+    explicit WidgetAudioBank(QDir metaDir, QDir dataDir, WidgetAudioManager *pManager, QWidget *pParent = 0);
     ~WidgetAudioBank();
+    
+    QString GetName();
 
 private:
     Ui::WidgetAudioBank *ui;
 };
 
-#endif // WIDGEAUDIOBANK_H
+#endif // WIDGETAUDIOBANK_H

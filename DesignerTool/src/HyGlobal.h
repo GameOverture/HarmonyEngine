@@ -38,6 +38,7 @@ enum eItemType
     ITEM_DirShaders,
     ITEM_DirEntities,
     ITEM_DirAtlases,
+    ITEM_DirAudioBanks,
     ITEM_Prefix,        // Essentially a sub-directory
     ITEM_Audio,
     ITEM_Particles,
@@ -136,6 +137,7 @@ public:
         sm_sItemNames[ITEM_DirEntities] = "Entities";
         sm_sItemNames[ITEM_Entity] = "Entity";
         sm_sItemNames[ITEM_DirAtlases] = "Atlases";
+        sm_sItemNames[ITEM_DirAudioBanks] = "AudioBanks";
         
         sm_sItemExt[ITEM_Project] = ".hyproj";
         sm_sItemExt[ITEM_DirAudio] = "/";
@@ -146,6 +148,7 @@ public:
         sm_sItemExt[ITEM_DirSprites] = "/";
         sm_sItemExt[ITEM_DirEntities] = "/";
         sm_sItemExt[ITEM_DirAtlases] = "/";
+        sm_sItemExt[ITEM_DirAudioBanks] = "/";
         sm_sItemExt[ITEM_Prefix] = "/";
         sm_sItemExt[ITEM_Audio] = ".hyaud";
         sm_sItemExt[ITEM_Particles] = ".hypfx";
@@ -164,6 +167,7 @@ public:
         sm_ItemIcons[ITEM_DirShaders].addFile(QString(":/icons16x16/shader-folder.png"));
         sm_ItemIcons[ITEM_DirEntities].addFile(QString(":/icons16x16/entity-folder.png"));
         //sm_ItemIcons[ITEM_DirAtlases].addFile();
+        //sm_ItemIcons[ITEM_DirAudioBanks].addFile();
         sm_ItemIcons[ITEM_Prefix].addFile(QString(":/icons16x16/folder.png"));
         sm_ItemIcons[ITEM_Audio].addFile(QString(":/icons16x16/audio-document.png"));
         sm_ItemIcons[ITEM_Particles].addFile(QString(":/icons16x16/particle-document.png"));
@@ -216,6 +220,7 @@ public:
         list.append(ITEM_DirShaders);
         list.append(ITEM_DirEntities);
         list.append(ITEM_DirAtlases);
+        list.append(ITEM_DirAudioBanks);
         
         return list;
     }
