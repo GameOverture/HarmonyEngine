@@ -275,17 +275,13 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
 
 /*virtual*/ void WidgetAtlasGroup::enterEvent(QEvent *pEvent)
 {
-    WidgetAtlasManager *pAtlasMan = static_cast<WidgetAtlasManager *>(parent()->parent());
-
-    pAtlasMan->PreviewAtlasGroup();
+    m_pManager->PreviewAtlasGroup();
     QWidget::enterEvent(pEvent);
 }
 
 /*virtual*/ void WidgetAtlasGroup::leaveEvent(QEvent *pEvent)
 {
-    WidgetAtlasManager *pAtlasMan = static_cast<WidgetAtlasManager *>(parent()->parent());
-    
-    pAtlasMan->HideAtlasGroup();
+    m_pManager->HideAtlasGroup();
     QWidget::leaveEvent(pEvent);
 }
 
