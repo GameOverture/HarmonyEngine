@@ -114,9 +114,9 @@ WidgetAtlasManager::~WidgetAtlasManager()
     delete ui;
 }
 
-WidgetAtlasModelView *WidgetAtlasManager::AllocateAtlasModelView()
+WidgetAtlasGroupModel *WidgetAtlasManager::AllocateAtlasModelView()
 {
-    return new WidgetAtlasModelView(*ui->atlasGroups, this);
+    return new WidgetAtlasGroupModel(*ui->atlasGroups, this);
 }
 
 int WidgetAtlasManager::CurrentAtlasGroupIndex()
@@ -601,11 +601,11 @@ void WidgetAtlasManager::on_actionDeleteAtlasGroup_triggered()
     
 }
 
-WidgetAtlasModelView::WidgetAtlasModelView(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
+WidgetAtlasGroupModel::WidgetAtlasGroupModel(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
                                                                                                 m_AtlasGroupsRef(atlasGroupsRef)
 { }
 
-/*virtual*/ QVariant WidgetAtlasModelView::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant WidgetAtlasGroupModel::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
 {
     if(role == Qt::DisplayRole)
     {
@@ -618,7 +618,7 @@ WidgetAtlasModelView::WidgetAtlasModelView(QStackedWidget &atlasGroupsRef, QObje
         return QStringListModel::data(index, role);
 }
 
-/*virtual*/ int	WidgetAtlasModelView::rowCount(const QModelIndex & parent /*= QModelIndex()*/) const
+/*virtual*/ int	WidgetAtlasGroupModel::rowCount(const QModelIndex & parent /*= QModelIndex()*/) const
 {
     return m_AtlasGroupsRef.count();
 }

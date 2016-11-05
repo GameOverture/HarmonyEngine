@@ -17,11 +17,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-WidgetAudioBankModelView::WidgetAudioBankModelView(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
+WidgetAudioBankModel::WidgetAudioBankModel(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
                                                                                                         m_AudioBanksRef(atlasGroupsRef)
 { }
 
-/*virtual*/ QVariant WidgetAudioBankModelView::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant WidgetAudioBankModel::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
 {
     if(role == Qt::DisplayRole)
     {
@@ -34,7 +34,7 @@ WidgetAudioBankModelView::WidgetAudioBankModelView(QStackedWidget &atlasGroupsRe
         return QStringListModel::data(index, role);
 }
 
-/*virtual*/ int	WidgetAudioBankModelView::rowCount(const QModelIndex & parent /*= QModelIndex()*/) const
+/*virtual*/ int	WidgetAudioBankModel::rowCount(const QModelIndex & parent /*= QModelIndex()*/) const
 {
     return m_AudioBanksRef.count();
 }
@@ -136,7 +136,7 @@ WidgetAudioManager::WidgetAudioManager(ItemProject *pProjOwner, QWidget *parent)
 //        HyGuiLog("Couldn't open data audio info file for initial writing", LOGTYPE_Error);
     
     
-    ui->cmbAudioBanks->setModel(new WidgetAudioBankModelView(*ui->audioBanks, this));
+    ui->cmbAudioBanks->setModel(new WidgetAudioBankModel(*ui->audioBanks, this));
 }
 
 WidgetAudioManager::~WidgetAudioManager()
@@ -208,8 +208,8 @@ void WidgetAudioManager::on_actionAddCategory_triggered()
     if(pDlg->exec() == QDialog::Accepted)
     {
         
-        QUndoCommand *pCmd = new ItemFontCmd_RenameState(ui->cmbStates, pDlg->GetName());
-        m_pItemFont->GetUndoStack()->push(pCmd);
+//        QUndoCommand *pCmd = new ItemFontCmd_RenameState(ui->cmbStates, pDlg->GetName());
+//        m_pItemFont->GetUndoStack()->push(pCmd);
     }
     delete pDlg;
 }

@@ -20,12 +20,12 @@ namespace Ui {
 class WidgetAudioManager;
 }
 
-class WidgetAudioBankModelView : public QStringListModel
+class WidgetAudioBankModel : public QStringListModel
 {
     QStackedWidget &        m_AudioBanksRef;
 
 public:
-    WidgetAudioBankModelView(QStackedWidget &audioBanksRef, QObject *pParent);
+    WidgetAudioBankModel(QStackedWidget &audioBanksRef, QObject *pParent);
 
     virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     virtual int	rowCount(const QModelIndex & parent = QModelIndex()) const;
@@ -38,6 +38,8 @@ class WidgetAudioManager : public QWidget
     Q_OBJECT
     
     ItemProject *                   m_pProjOwner;
+
+    WidgetAudioBankModel *      m_pCategoryModel;
     
     QDir                            m_MetaDir;
     QDir                            m_DataDir;

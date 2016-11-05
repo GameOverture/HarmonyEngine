@@ -23,12 +23,12 @@ namespace Ui {
 class WidgetAtlasManager;
 }
 
-class WidgetAtlasModelView : public QStringListModel
+class WidgetAtlasGroupModel : public QStringListModel
 {
     QStackedWidget &        m_AtlasGroupsRef;
 
 public:
-    WidgetAtlasModelView(QStackedWidget &atlasGroupsRef, QObject *pParent);
+    WidgetAtlasGroupModel(QStackedWidget &atlasGroupsRef, QObject *pParent);
 
     virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     virtual int	rowCount(const QModelIndex & parent = QModelIndex()) const;
@@ -51,7 +51,7 @@ class WidgetAtlasManager : public QWidget
     
     QTreeWidgetItem *               m_pMouseHoverItem;
 
-    WidgetAtlasModelView *          m_pCmbModel;
+    WidgetAtlasGroupModel *         m_pCmbModel;
 
 public:
     explicit WidgetAtlasManager(QWidget *parent = 0);
@@ -60,7 +60,7 @@ public:
     
     ItemProject *GetProjOwner()     { return m_pProjOwner; }
     
-    WidgetAtlasModelView *AllocateAtlasModelView();
+    WidgetAtlasGroupModel *AllocateAtlasModelView();
     int CurrentAtlasGroupIndex();
     int GetAtlasIdFromIndex(int iIndex);
     QSize GetAtlasDimensions(int iIndex);
