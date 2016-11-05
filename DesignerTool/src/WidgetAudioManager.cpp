@@ -16,29 +16,8 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
-
-WidgetAudioBankModel::WidgetAudioBankModel(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
-                                                                                                        m_AudioBanksRef(atlasGroupsRef)
-{ }
-
-/*virtual*/ QVariant WidgetAudioBankModel::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
-{
-    if(role == Qt::DisplayRole)
-    {
-        if(m_AudioBanksRef.count() == 0)
-            return "";
-        else
-            return static_cast<WidgetAudioBank *>(m_AudioBanksRef.widget(index.row()))->GetName();
-    }
-    else
-        return QStringListModel::data(index, role);
-}
-
-/*virtual*/ int	WidgetAudioBankModel::rowCount(const QModelIndex & parent /*= QModelIndex()*/) const
-{
-    return m_AudioBanksRef.count();
-}
-
+#include <QJsonArray>
+#include <QLineEdit>
 
 WidgetAudioManager::WidgetAudioManager(QWidget *parent) :   QWidget(parent),
                                                             ui(new Ui::WidgetAudioManager)
@@ -60,8 +39,7 @@ WidgetAudioManager::WidgetAudioManager(ItemProject *pProjOwner, QWidget *parent)
         delete ui->audioBanks->currentWidget();
     
     ui->btnAddCategory->setDefaultAction(ui->actionAddCategory);
-    ui->btnRenameCategory->setDefaultAction(ui->actionRenameCategory);
-    
+
     ui->actionRemoveCategory->setEnabled(false);
     ui->btnRemoveCategory->setDefaultAction(ui->actionRemoveCategory);
     
@@ -96,46 +74,16 @@ WidgetAudioManager::WidgetAudioManager(ItemProject *pProjOwner, QWidget *parent)
             }
         }
     }
-    
-    QFile audioInfoFile(m_DataDir.absoluteFilePath(HYGUIPATH_DataAudio));
-    if(audioInfoFile.exists())
-    {
-        if(!audioInfoFile.open(QIODevice::ReadOnly))
-            HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaAtlasSettings, LOGTYPE_Error);
 
-        QJsonDocument audioDoc = QJsonDocument::fromJson(audioInfoFile.readAll());
-        QJsonObject audioObj = audioDoc.object();
-        
-        // TODO: Read audio info file
-        audioObj["name"].toString();
-        
-        audioInfoFile.close();
-    }
-    else
-    {
-        
-    }
-//    else if(audioInfoFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-//    {
-//        QJsonDocument settingsDoc(settingsObj);
+    m_pCategoryDelegate = new WidgetAudioCategoryDelegate(this);
+    ui->categoryList->setItemDelegate(m_pCategoryDelegate);
 
-//#ifdef HYGUI_UseBinaryMetaFiles
-//        qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
-//#else
-//        qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
-//#endif
-//        if(0 == iBytesWritten || -1 == iBytesWritten)
-//        {
-//            HyGuiLog("Could not write to atlas settings file: " % settingsFile.errorString(), LOGTYPE_Error);
-//        }
+    m_pCategoryModel = new WidgetAudioCategoryModel(m_DataDir, this);
+    ui->categoryList->setModel(m_pCategoryModel);
 
-//        settingsFile.close();
-    
-//    }
-//    else
-//        HyGuiLog("Couldn't open data audio info file for initial writing", LOGTYPE_Error);
-    
-    
+    QItemSelectionModel *pSelModel = ui->categoryList->selectionModel();
+    connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_categoryList_selectionChanged(const QItemSelection &, const QItemSelection &)));
+
     ui->cmbAudioBanks->setModel(new WidgetAudioBankModel(*ui->audioBanks, this));
 }
 
@@ -207,21 +155,18 @@ void WidgetAudioManager::on_actionAddCategory_triggered()
     DlgInputName *pDlg = new DlgInputName("New Category Name", "Unnamed", this);
     if(pDlg->exec() == QDialog::Accepted)
     {
-        
-//        QUndoCommand *pCmd = new ItemFontCmd_RenameState(ui->cmbStates, pDlg->GetName());
-//        m_pItemFont->GetUndoStack()->push(pCmd);
-    }
-    delete pDlg;
-}
+        QStringList sCategoryList = m_pCategoryModel->stringList();
+        sCategoryList.append(pDlg->GetName());
 
-void WidgetAudioManager::on_actionRenameCategory_triggered()
-{
-    
+        m_pCategoryModel->setStringList(sCategoryList);
+    }
+
+    delete pDlg;
 }
 
 void WidgetAudioManager::on_actionRemoveCategory_triggered()
 {
-    
+    m_pCategoryModel->removeRow(ui->categoryList->currentIndex().row());
 }
 
 void WidgetAudioManager::on_actionAddAudioBank_triggered()
@@ -232,4 +177,9 @@ void WidgetAudioManager::on_actionAddAudioBank_triggered()
 void WidgetAudioManager::on_actionDeleteAudioBank_triggered()
 {
     
+}
+
+void WidgetAudioManager::on_categoryList_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    ui->actionRemoveCategory->setEnabled(ui->categoryList->currentIndex().row() != 0);
 }

@@ -8,9 +8,201 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "WidgetAudioModelView.h"
+#include "WidgetAudioBank.h"
+#include "WidgetAudioManager.h"
 
-WidgetAudioModelView::WidgetAudioModelView()
+#include <QJsonDocument>
+#include <QLineEdit>
+#include <QJsonArray>
+
+WidgetAudioBankModel::WidgetAudioBankModel(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
+                                                                                                m_AudioBanksRef(atlasGroupsRef)
+{ }
+
+/*virtual*/ QVariant WidgetAudioBankModel::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
 {
-    
+    if(role == Qt::DisplayRole)
+    {
+        if(m_AudioBanksRef.count() == 0)
+            return "";
+        else
+            return static_cast<WidgetAudioBank *>(m_AudioBanksRef.widget(index.row()))->GetName();
+    }
+    else
+        return QStringListModel::data(index, role);
 }
+
+/*virtual*/ int	WidgetAudioBankModel::rowCount(const QModelIndex & parent /*= QModelIndex()*/) const
+{
+    return m_AudioBanksRef.count();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+WidgetAudioCategoryDelegate::WidgetAudioCategoryDelegate(QObject *pParent /*= 0*/) :   QStyledItemDelegate(pParent)
+{
+}
+
+/*virtual*/ QWidget* WidgetAudioCategoryDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    if(index.column() == 0)
+    {
+        QLineEdit *pLineEdit = new QLineEdit(pParent);
+        pLineEdit->setValidator(HyGlobal::FileNameValidator());
+
+        if(index.row() == 0)
+        {
+            HyGuiLog("You cannot edit the \"Default\" category", LOGTYPE_Warning);
+            return NULL;//pLineEdit->setReadOnly(true); // Don't allow changing of "Default"
+        }
+
+        return pLineEdit;
+    }
+
+    QStyledItemDelegate::createEditor(pParent, option, index);
+}
+
+/*virtual*/ void WidgetAudioCategoryDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const
+{
+    if(index.column() == 0)
+    {
+        static_cast<QLineEdit *>(pEditor)->setText(index.model()->data(index).toString());
+    }
+    else
+        QStyledItemDelegate::setEditorData(pEditor, index);
+}
+
+/*virtual*/ void WidgetAudioCategoryDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
+{
+    if(index.column() == 0)
+        pModel->setData(index, static_cast<QLineEdit *>(pEditor)->text());
+    else
+        QStyledItemDelegate::setModelData(pEditor, pModel, index);
+}
+
+/*virtual*/ void WidgetAudioCategoryDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+}
+
+/////////////////////////////////////////////////
+
+WidgetAudioCategoryModel::WidgetAudioCategoryModel(QDir audioBankDir, QObject *pParent) :   QStringListModel(pParent),
+                                                                                            m_AudioBankDir(audioBankDir)
+{
+    QJsonArray categoryArray;
+    bool bNoFileFound = true;
+
+    QFile audioCategoryFile(m_AudioBankDir.absoluteFilePath(HYGUIPATH_DataAudioCategories));
+    if(audioCategoryFile.exists())
+    {
+        if(!audioCategoryFile.open(QIODevice::ReadOnly))
+        {
+            HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaAtlasSettings, LOGTYPE_Error);
+        }
+        else
+        {
+            bNoFileFound = false;
+
+            QJsonDocument audioCategoryDoc = QJsonDocument::fromJson(audioCategoryFile.readAll());
+            audioCategoryFile.close();
+
+            categoryArray = audioCategoryDoc.array();
+        }
+    }
+    else
+    {
+        categoryArray.append("Default");
+        categoryArray.append("Music");
+    }
+
+
+    QStringList sCategoryList;
+    for(int i = 0; i < categoryArray.count(); ++i)
+        sCategoryList.append(categoryArray.at(i).toString());
+
+    setStringList(sCategoryList);
+
+    if(bNoFileFound)
+        SaveData();
+}
+
+/*virtual*/ QVariant WidgetAudioCategoryModel::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
+{
+    if(role == Qt::DisplayRole && index.column() == 1)
+    {
+        if(stringList().count() == 0)
+            return "";
+        else
+            return stringList().at(index.row());
+    }
+    else
+        return QStringListModel::data(index, role);
+}
+
+/*virtual*/ bool WidgetAudioCategoryModel::insertRows(int row, int count, const QModelIndex &parent /*= QModelIndex()*/)
+{
+    bool bReturnValue = QStringListModel::insertRows(row, count, parent);
+    SaveData();
+
+    return bReturnValue;
+}
+
+/*virtual*/ bool WidgetAudioCategoryModel::removeRows(int row, int count, const QModelIndex &parent /*= QModelIndex()*/)
+{
+    bool bReturnValue = false;
+    if(row == 0)
+    {
+        // Don't allow deleting of "Default"
+        if(count > 1)
+            bReturnValue = QStringListModel::removeRows(row+1, count-1, parent);
+        else
+            bReturnValue = false;
+    }
+    else
+        bReturnValue = QStringListModel::removeRows(row, count, parent);
+
+    SaveData();
+    return bReturnValue;
+}
+
+/*virtual*/ bool WidgetAudioCategoryModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
+{
+    if(index.row() == 0)
+        return false;   // Don't allow changing of "Default"
+
+    bool bReturnValue = QStringListModel::setData(index, value, role);
+    SaveData();
+
+    return bReturnValue;
+}
+
+void WidgetAudioCategoryModel::SaveData()
+{
+    QJsonDocument audioCategoryDoc;
+
+    QJsonArray categoryArray;
+    QStringList sCategoryList = stringList();
+    for(int i = 0; i < sCategoryList.size(); ++i)
+        categoryArray.append(sCategoryList[i]);
+
+    audioCategoryDoc.setArray(categoryArray);
+
+    QFile audioCategoryFile(m_AudioBankDir.absolutePath() % "/" % HYGUIPATH_DataAudioCategories);
+    if(audioCategoryFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+    {
+       HyGuiLog("Couldn't open audio category file for writing", LOGTYPE_Error);
+    }
+    else
+    {
+        qint64 iBytesWritten = audioCategoryFile.write(audioCategoryDoc.toJson());
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+        {
+            HyGuiLog("Could not write to audio category file: " % audioCategoryFile.errorString(), LOGTYPE_Error);
+        }
+
+        audioCategoryFile.close();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

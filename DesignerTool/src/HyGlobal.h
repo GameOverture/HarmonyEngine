@@ -82,7 +82,7 @@ enum eGuiFrameError
 #define HYGUIPATH_TempDir                       "temp/"
 #define HYGUIPATH_DataAtlases                   "atlasInfo.json"
 #define HYGUIPATH_MetaAtlasSettings             "settings.hygui"
-#define HYGUIPATH_DataAudio                     "audioInfo.json"
+#define HYGUIPATH_DataAudioCategories           "categories.json"
 
 QAction *FindAction(QList<QAction *> list, QString sName);
 #define FINDACTION(str) FindAction(this->actions(), str)

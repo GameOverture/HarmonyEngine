@@ -11,27 +11,13 @@
 #define WIDGETAUDIOMANAGER_H
 
 #include "ItemProject.h"
+#include "WidgetAudioModelView.h"
 
 #include <QWidget>
-#include <QStringListModel>
-#include <QStackedWidget>
 
 namespace Ui {
 class WidgetAudioManager;
 }
-
-class WidgetAudioBankModel : public QStringListModel
-{
-    QStackedWidget &        m_AudioBanksRef;
-
-public:
-    WidgetAudioBankModel(QStackedWidget &audioBanksRef, QObject *pParent);
-
-    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-    virtual int	rowCount(const QModelIndex & parent = QModelIndex()) const;
-};
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class WidgetAudioManager : public QWidget
 {
@@ -39,7 +25,9 @@ class WidgetAudioManager : public QWidget
     
     ItemProject *                   m_pProjOwner;
 
-    WidgetAudioBankModel *      m_pCategoryModel;
+    WidgetAudioBankModel *          m_pBankModel;
+    WidgetAudioCategoryModel *      m_pCategoryModel;
+    WidgetAudioCategoryDelegate *   m_pCategoryDelegate;
     
     QDir                            m_MetaDir;
     QDir                            m_DataDir;
@@ -54,13 +42,13 @@ private slots:
     
     void on_actionAddCategory_triggered();
     
-    void on_actionRenameCategory_triggered();
-    
     void on_actionRemoveCategory_triggered();
     
     void on_actionAddAudioBank_triggered();
     
     void on_actionDeleteAudioBank_triggered();
+
+    void on_categoryList_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     
 private:
     Ui::WidgetAudioManager *ui;
