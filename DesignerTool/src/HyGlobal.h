@@ -18,6 +18,7 @@
 #include <QDir>
 #include <QTreeWidgetItem>
 #include <QComboBox>
+#include <QStack>
 
 #include "WidgetOutputLog.h"
 
@@ -336,6 +337,36 @@ public:
         sNewString.sprintf("%05d", iCount);
 
         return sNewString;
+    }
+
+    static void RecursiveFindOfFileExt(QString sExt, QStringList &appendList, QDir dirEntry)
+    {
+        sExt = sExt.toLower();
+
+        QFileInfoList list = dirEntry.entryInfoList();
+        QStack<QFileInfoList> dirStack;
+        dirStack.push(list);
+
+        while(dirStack.isEmpty() == false)
+        {
+            list = dirStack.pop();
+            for(int i = 0; i < list.count(); i++)
+            {
+                QFileInfo info = list[i];
+
+                if(info.isDir() && info.fileName() != ".." && info.fileName() != ".")
+                {
+                    QDir subDir(info.filePath());
+                    QFileInfoList subList = subDir.entryInfoList();
+
+                    dirStack.push(subList);
+                }
+                else if(info.suffix().toLower() == sExt)
+                {
+                    appendList.push_back(info.filePath());
+                }
+            }
+        }
     }
 };
 

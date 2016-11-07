@@ -42,6 +42,9 @@ WidgetAudioManager::WidgetAudioManager(ItemProject *pProjOwner, QWidget *parent)
 
     ui->actionRemoveCategory->setEnabled(false);
     ui->btnRemoveCategory->setDefaultAction(ui->actionRemoveCategory);
+
+    ui->btnAddAudioBank->setDefaultAction(ui->actionAddAudioBank);
+    ui->btnDeleteAudioBank->setDefaultAction(ui->actionDeleteAudioBank);
     
     if(m_MetaDir.exists() == false)
     {

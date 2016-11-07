@@ -39,8 +39,17 @@ public:
     
     QString GetName();
 
+private slots:
+    void on_btnAddWaves_pressed();
+
+    void on_btnAddDir_pressed();
+
 private:
     Ui::WidgetAudioBank *ui;
+
+    void ImportWaves(QStringList sWaveFileList);
+
+    void Refresh();
 };
 
 #endif // WIDGETAUDIOBANK_H

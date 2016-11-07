@@ -239,31 +239,7 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
     for(int iDirIndex = 0; iDirIndex < sDirs.size(); ++iDirIndex)
     {
         QDir dirEntry(sDirs[iDirIndex]);
-
-        QFileInfoList list = dirEntry.entryInfoList();
-        QStack<QFileInfoList> dirStack;
-        dirStack.push(list);
-
-        while(dirStack.isEmpty() == false)
-        {
-            list = dirStack.pop();
-            for(int i = 0; i < list.count(); i++)
-            {
-                QFileInfo info = list[i];
-
-                if(info.isDir() && info.fileName() != ".." && info.fileName() != ".")
-                {
-                    QDir subDir(info.filePath());
-                    QFileInfoList subList = subDir.entryInfoList();
-
-                    dirStack.push(subList);
-                }
-                else if(info.suffix().toLower() == "png") // Only supporting PNG for now
-                {
-                    sImportImgList.push_back(info.filePath());
-                }
-            }
-        }
+        HyGlobal::RecursiveFindOfFileExt("png", sImportImgList, dirEntry);
     }
 
     if(sImportImgList.empty() == false)
