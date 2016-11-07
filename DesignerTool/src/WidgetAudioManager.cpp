@@ -98,6 +98,27 @@ WidgetAudioManager::~WidgetAudioManager()
     delete ui;
 }
 
+HyGuiWave *WidgetAudioManager::CreateWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint32 uiErrors)
+{
+    HyGuiFrame *pNewFrame = NULL;
+
+    if(m_DependencyMap.contains(uiChecksum))
+    {
+        HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
+
+        pNewFrame = new HyGuiWave(uiWaveBankId, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, uiErrors);
+        pNewFrame->SetError(GUIFRAMEERROR_Duplicate);
+    }
+    else
+    {
+        pNewFrame = new HyGuiFrame(uiWaveBankId, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, uiErrors);
+        m_DependencyMap[uiChecksum] = pNewFrame;
+    }
+
+    return pNewFrame;
+}
+
+
 void WidgetAudioManager::AddAudioBankGroup(int iId /*= -1*/)
 {
     if(iId == -1)

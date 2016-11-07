@@ -12,6 +12,8 @@
 
 #include "HyGlobal.h"
 
+#include "HyGuiWave.h"
+
 #include <QWidget>
 
 namespace Ui {
@@ -31,6 +33,8 @@ class WidgetAudioBank : public QWidget
     QDir                        m_DataDir;
     
     QString                     m_sName;
+    
+    QList<HyGuiWave *>          m_WaveList;
 
 public:
     explicit WidgetAudioBank(QWidget *parent = 0);
@@ -38,6 +42,7 @@ public:
     ~WidgetAudioBank();
     
     QString GetName();
+    int GetId();
 
 private slots:
     void on_btnAddWaves_pressed();

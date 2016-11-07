@@ -44,6 +44,11 @@ QString WidgetAudioBank::GetName()
     return m_sName;
 }
 
+int WidgetAudioBank::GetId()
+{
+    return m_MetaDir.dirName().toInt();
+}
+
 void WidgetAudioBank::on_btnAddWaves_pressed()
 {
     QFileDialog dlg(this);
@@ -95,17 +100,27 @@ void WidgetAudioBank::on_btnAddDir_pressed()
 
 void WidgetAudioBank::ImportWaves(QStringList sWaveFileList)
 {
-    quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
-    QRect rAlphaCrop = ImagePacker::crop(newImage);
-
-    HyGuiFrame *pNewFrame = m_pManager->CreateWave(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, false, -1, -1, 0);
-    if(pNewFrame)
+    for(int i = 0; i < sWaveFileList.size(); ++i)
     {
-        newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
-        m_FrameList.append(pNewFrame);
-    }
+        QFileInfo waveFileInfo(sWaveFileList[i]);
+        //waveFileInfo.absoluteFilePath()
+        
+        WaveFile wave;
+        wave.conv = index;
+        std::unique_ptr<uint8_t[]> waveData;
 
-    return pNewFrame;
+        HRESULT hr = DirectX::LoadWAVAudioFromFileEx(pConv->szSrc, waveData, wave.data);
+        
+        quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
+        QRect rAlphaCrop = ImagePacker::crop(newImage);
+    
+        HyGuiFrame *pNewWave = m_pManager->CreateWave(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, false, -1, -1, 0);
+        if(pNewWave)
+        {
+            newImage.save(m_MetaDir.absoluteFilePath(pNewWave->ConstructImageFileName()));
+            m_WaveList.append(pNewWave);
+        }
+    }
 }
 
 void WidgetAudioBank::Refresh()

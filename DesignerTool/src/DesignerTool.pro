@@ -50,7 +50,8 @@ SOURCES += main.cpp \
     QtWaitingSpinner/waitingspinnerwidget.cpp \
     WidgetAudioManager.cpp \
     WidgetAudioBank.cpp \
-    WidgetAudioModelView.cpp
+    WidgetAudioModelView.cpp \
+    HyGuiWave.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -89,7 +90,8 @@ HEADERS  += \
     QtWaitingSpinner/waitingspinnerwidget.h \
     WidgetAudioManager.h \
     WidgetAudioBank.h \
-    WidgetAudioModelView.h
+    WidgetAudioModelView.h \
+    HyGuiWave.h
 
 FORMS    += \
     DlgNewProject.ui \
