@@ -33,7 +33,37 @@ QString HyGuiWave::ConstructImageFileName()
     return sMetaImgName;
 }
 
+void HyGuiWave::SetError(eGuiFrameError eError)
+{
+    m_uiErrors |= (1 << eError);
 
+//    if(m_pTreeWidgetItem)
+//    {
+//        m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
+//        m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
+//    }
+}
+
+void HyGuiWave::ClearError(eGuiFrameError eError)
+{
+    m_uiErrors &= ~(1 << eError);
+
+//    if(m_pTreeWidgetItem)
+//    {
+//        if(m_uiErrors == 0)
+//            m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(m_eType));
+//        else
+//        {
+//            m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
+//            m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
+//        }
+//    }
+}
+
+uint HyGuiWave::GetErrors()
+{
+    return m_uiErrors;
+}
 
 
 #pragma pack(push,1)

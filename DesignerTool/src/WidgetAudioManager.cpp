@@ -100,22 +100,22 @@ WidgetAudioManager::~WidgetAudioManager()
 
 HyGuiWave *WidgetAudioManager::CreateWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint32 uiErrors)
 {
-    HyGuiFrame *pNewFrame = NULL;
+    HyGuiWave *pNewWave = NULL;
 
     if(m_DependencyMap.contains(uiChecksum))
     {
-        HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
+        HyGuiLog("WidgetAtlasManager::CreateWave() already contains wave with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
 
-        pNewFrame = new HyGuiWave(uiWaveBankId, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, uiErrors);
-        pNewFrame->SetError(GUIFRAMEERROR_Duplicate);
+        pNewWave = new HyGuiWave(uiWaveBankId, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, uiErrors);
+        pNewWave->SetError(GUIFRAMEERROR_Duplicate);
     }
     else
     {
-        pNewFrame = new HyGuiFrame(uiWaveBankId, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, uiErrors);
-        m_DependencyMap[uiChecksum] = pNewFrame;
+        pNewWave = new HyGuiWave(uiWaveBankId, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, uiErrors);
+        m_DependencyMap[uiChecksum] = pNewWave;
     }
 
-    return pNewFrame;
+    return pNewWave;
 }
 
 

@@ -38,6 +38,10 @@ public:
     QString ConstructImageFileName();
     
     static void ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksumOut, QString &sNameOut, uint16 &uiFormatTypeOut, uint16 &uiNumChannelsOut, uint16 &uiBitsPerSampleOut, uint32 &uiSamplesPerSecOut);
+
+    void SetError(eGuiFrameError eError);
+    void ClearError(eGuiFrameError eError);
+    uint GetErrors();
 };
 
 #endif // HYGUIWAVE_H

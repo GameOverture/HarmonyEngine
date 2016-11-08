@@ -104,17 +104,16 @@ void WidgetAudioBank::ImportWaves(QStringList sWaveFileList)
     {
         QFileInfo waveFileInfo(sWaveFileList[i]);
         //waveFileInfo.absoluteFilePath()
-        
-        WaveFile wave;
-        wave.conv = index;
-        std::unique_ptr<uint8_t[]> waveData;
 
-        HRESULT hr = DirectX::LoadWAVAudioFromFileEx(pConv->szSrc, waveData, wave.data);
-        
-        quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
-        QRect rAlphaCrop = ImagePacker::crop(newImage);
+        quint32 uiChecksum;
+        QString sName;
+        uint16 uiFormatType;
+        uint16 uiNumChannels;
+        uint16 uiBitsPerSample;
+        uint32 &uiSamplesPerSec;
+        HyGuiWave::ParseWaveFile(waveFileInfo, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec);
     
-        HyGuiFrame *pNewWave = m_pManager->CreateWave(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, false, -1, -1, 0);
+        HyGuiFrame *pNewWave = m_pManager->CreateWave(GetId(), uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, 0);
         if(pNewWave)
         {
             newImage.save(m_MetaDir.absoluteFilePath(pNewWave->ConstructImageFileName()));

@@ -15,6 +15,7 @@
 #include "WidgetAudioModelView.h"
 
 #include <QWidget>
+#include <QMap>
 
 namespace Ui {
 class WidgetAudioManager;
@@ -25,13 +26,15 @@ class WidgetAudioManager : public QWidget
     Q_OBJECT
     
     ItemProject *                   m_pProjOwner;
+    
+    QDir                            m_MetaDir;
+    QDir                            m_DataDir;
+
+    QMap<quint32, HyGuiWave *>      m_DependencyMap;
 
     WidgetAudioBankModel *          m_pBankModel;
     WidgetAudioCategoryModel *      m_pCategoryModel;
     WidgetAudioCategoryDelegate *   m_pCategoryDelegate;
-    
-    QDir                            m_MetaDir;
-    QDir                            m_DataDir;
 
 public:
     explicit WidgetAudioManager(QWidget *parent = 0);
