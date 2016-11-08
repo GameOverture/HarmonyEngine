@@ -110,13 +110,15 @@ void WidgetAudioBank::ImportWaves(QStringList sWaveFileList)
         uint16 uiNumChannels;
         uint16 uiBitsPerSample;
         uint32 uiSamplesPerSec;
-        HyGuiWave::ParseWaveFile(waveFileInfo, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec);
-    
-        HyGuiWave *pNewWave = m_pManager->CreateWave(GetId(), uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, 0);
-        if(pNewWave)
+        
+        if(HyGuiWave::ParseWaveFile(waveFileInfo, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec))
         {
-            m_MetaDir.absoluteFilePath(pNewWave->ConstructWaveFileName());
-            m_WaveList.append(pNewWave);
+            HyGuiWave *pNewWave = m_pManager->CreateWave(GetId(), uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, 0);
+            if(pNewWave)
+            {
+                m_MetaDir.absoluteFilePath(pNewWave->ConstructWaveFileName());
+                m_WaveList.append(pNewWave);
+            }
         }
     }
 }
