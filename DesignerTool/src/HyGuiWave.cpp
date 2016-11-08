@@ -24,7 +24,7 @@ HyGuiWave::~HyGuiWave()
 {
 }
 
-QString HyGuiWave::ConstructImageFileName()
+QString HyGuiWave::ConstructWaveFileName()
 {
     QString sMetaImgName;
     sMetaImgName = sMetaImgName.sprintf("%010u-%s", m_uiChecksum, m_sName.toStdString().c_str());
@@ -65,18 +65,68 @@ uint HyGuiWave::GetErrors()
     return m_uiErrors;
 }
 
-
+// Below structures fit in aligned memory of a file type, and should be tightly packed
 #pragma pack(push,1)
+
 struct RIFFChunk
 {
     uint32_t tag;
     uint32_t size;
 };
+
 struct RIFFChunkHeader
 {
     uint32_t tag;
     uint32_t size;
     uint32_t riff;
+};
+
+// OLD general waveform format structure (information common to all formats)
+struct HY_WAVEFORMAT
+{
+    uint16_t    uiFormatTag;        // format type
+    uint16_t    uiChannels;         // number of channels (i.e. mono, stereo, etc.)
+    uint32_t    uiSamplesPerSec;    // sample rate
+    uint32_t    uiAvgBytesPerSec;   // for buffer estimation
+    uint16_t    uiBlockAlign;       // block size of data
+};
+
+// Extended waveform format structure used for all non-PCM formats. This structure is common to all non-PCM formats.
+struct HY_WAVEFORMATEX
+{
+    uint16_t    uiFormatTag;        // format type
+    uint16_t    uiChannels;         // number of channels (i.e. mono, stereo...)
+    uint32_t    uiSamplesPerSec;    // sample rate
+    uint32_t    uiAvgBytesPerSec;   // for buffer estimation
+    uint16_t    uiBlockAlign;       // block size of data
+    uint16_t    uiBitsPerSample;    // number of bits per sample of mono data
+    uint16_t    uiSize;             // the count in bytes of the size of
+                                    // extra information (after cbSize)
+};
+
+// New wave format development should be based on the HY_WAVEFORMATEXTENSIBLE structure.
+// HY_WAVEFORMATEXTENSIBLE allows you to avoid having to register a new format tag with Microsoft.
+// Simply define a new HY_WAVEGUID value for the HY_WAVEFORMATEXTENSIBLE.SubFormat field and use WAVE_FORMAT_EXTENSIBLE in the WAVEFORMATEXTENSIBLE.Format.wFormatTag field.
+struct HY_WAVEGUID
+{
+    uint32_t            Data1;
+    uint16_t            Data2;
+    uint16_t            Data3;
+    uint8_t             Data4[8];
+};
+struct HY_WAVEFORMATEXTENSIBLE
+{
+    HY_WAVEFORMATEX     Format;
+    union
+    {
+        uint16_t    wValidBitsPerSample;    // bits of precision
+        uint16_t    wSamplesPerBlock;       // valid if wBitsPerSample==0
+        uint16_t    wReserved;              // If neither applies, set to zero.
+    } Samples;
+    
+    uint32_t            dwChannelMask;      // which channels are present in stream
+    
+    HY_WAVEGUID         SubFormat;
 };
 
 // TODO: Support big-endian as well?
@@ -95,13 +145,13 @@ const uint32_t FOURCC_XMA_SEEK      = 'kees';
 
 //--------------------------------------------------------------------------------------
 
-const RIFFChunk *FindChunk(const char *pData, uint32 uiDataSize, uint32_t uiTagToFind)
+const RIFFChunk *FindChunk(const uint8_t *pData, uint32 uiDataSize, uint32_t uiTagToFind)
 {
-    if(waveData.size() == 0)
+    if(uiDataSize == 0)
         return NULL;
 
-    const char *pCurrentPtr = pData;
-    const char *pEndOfData = pData + uiDataSize;
+    const uint8_t *pCurrentPtr = pData;
+    const uint8_t *pEndOfData = pData + uiDataSize;
 
     while(pEndOfData > (pCurrentPtr + sizeof(RIFFChunk)))
     {
@@ -118,7 +168,7 @@ const RIFFChunk *FindChunk(const char *pData, uint32 uiDataSize, uint32_t uiTagT
 
 //--------------------------------------------------------------------------------------
 
-static void HyGuiWave::ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksumOut, QString &sNameOut, uint16 &uiFormatTypeOut, uint16 &uiNumChannelsOut, uint16 &uiBitsPerSampleOut, uint32 &uiSamplesPerSecOut)
+/*static*/ bool HyGuiWave::ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksumOut, QString &sNameOut, uint16 &uiFormatTagOut, uint16 &uiNumChannelsOut, uint16 &uiBitsPerSampleOut, uint32 &uiSamplesPerSecOut)
 {
     if(waveFileInfo.exists() == false)
     {
@@ -128,6 +178,8 @@ static void HyGuiWave::ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksum
     
     sNameOut = waveFileInfo.baseName();
     
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Read the wave file into memory
     QFile waveFile(waveFileInfo.absoluteFilePath());
     if(!waveFile.open(QIODevice::ReadOnly))
     {
@@ -137,8 +189,6 @@ static void HyGuiWave::ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksum
     
     QByteArray waveData = waveFile.readAll();
     waveFile.close();
-    
-    uiChecksumOut = HyGlobal::CRCData(0, waveData.data(), waveData.size());
     
     if(waveData.size() == 0)
     {
@@ -151,9 +201,12 @@ static void HyGuiWave::ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksum
         return false;
     }
     
+    const uint8_t *pWavEnd = reinterpret_cast<uint8_t *>(waveData.data() + waveData.size());
+    uiChecksumOut = HyGlobal::CRCData(0, reinterpret_cast<uchar *>(waveData.data()), waveData.size());
     
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Locate RIFF 'WAVE'
-    const RIFFChunk *pRiffChunk = FindChunk(waveData.data(), waveData.size(), FOURCC_RIFF_TAG);
+    const RIFFChunk *pRiffChunk = FindChunk(reinterpret_cast<uint8_t *>(waveData.data()), waveData.size(), FOURCC_RIFF_TAG);
     if(!pRiffChunk || pRiffChunk->size < 4)
     {
         HyGuiLog("HyGuiWave::ParseWaveFile FindChunk could not locate FOURCC_RIFF_TAG: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
@@ -167,10 +220,9 @@ static void HyGuiWave::ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksum
         return false;
     }
     
-    const char *pWavEnd = waveData.data() + waveData.size();
-    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Locate 'fmt '
-    const char *ptr = reinterpret_cast<const char *>(pRiffHeader) + sizeof(RIFFChunkHeader);
+    const uint8_t *ptr = reinterpret_cast<const uint8_t *>(pRiffHeader) + sizeof(RIFFChunkHeader);
     if((ptr + sizeof(RIFFChunk)) > pWavEnd)
     {
         HyGuiLog("HyGuiWave::ParseWaveFile parsing next chunk reached EOF: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
@@ -184,36 +236,170 @@ static void HyGuiWave::ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksum
         return false;
     }
     
-    ptr = reinterpret_cast<const char *>(pFmtChunk) + sizeof(RIFFChunk);
+    ptr = reinterpret_cast<const uint8_t *>(pFmtChunk) + sizeof(RIFFChunk);
     if(ptr + pFmtChunk->size > pWavEnd)
     {
         HyGuiLog("HyGuiWave::ParseWaveFile parsing chunk reached EOF: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
         return false;
     }
     
-    auto wf = reinterpret_cast<const WAVEFORMAT*>( ptr );
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Validate WAVEFORMAT (focused on chunk size and format tag, not other data that XAUDIO2 will validate)
+    const HY_WAVEFORMAT *pWaveFormat = reinterpret_cast<const HY_WAVEFORMAT *>(ptr);
     
+    bool bIsDPDS = false;
+    bool bIsSeek = false;
     
+    // Can be a PCMWAVEFORMAT (8 bytes) or WAVEFORMATEX (10 bytes)
+    if(pWaveFormat->uiFormatTag != 1 /*WAVE_FORMAT_PCM*/ && pWaveFormat->uiFormatTag != 3 /*WAVE_FORMAT_IEEE_FLOAT*/)
+    {
+        // We validated chunk as at least sizeof(PCMWAVEFORMAT) above
+        if(pFmtChunk->size < sizeof(HY_WAVEFORMATEX))
+        {
+            HyGuiLog("HyGuiWave::ParseWaveFile non-PCMWAVEFORMAT format chunk is not large enough to hold WAVEFORMATEX: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+            return false;
+        }
 
-//    bool dpds, seek;
-//    hr = WaveFindFormatAndData( wavData.get(), bytesRead, &result.wfx, &result.startAudio, &result.audioBytes, dpds, seek );
-//    if ( FAILED(hr) )
-//        return hr;
+        const HY_WAVEFORMATEX *pWaveFormatEx = reinterpret_cast<const HY_WAVEFORMATEX*>(ptr);
+
+        if(pFmtChunk->size < (sizeof(HY_WAVEFORMATEX) + pWaveFormatEx->uiSize))
+        {
+            HyGuiLog("HyGuiWave::ParseWaveFile non-PCMWAVEFORMAT format chunk is not large enough to hold WAVEFORMATEX and its appended extra format information: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+            return false;
+        }
+
+        switch(pWaveFormatEx->uiFormatTag)
+        {
+        case 0x161: // WAVE_FORMAT_WMAUDIO2
+        case 0x162: // WAVE_FORMAT_WMAUDIO3
+            bIsDPDS = true;
+            break;
+
+        case 0x166: // WAVE_FORMAT_XMA2 - XMA2 is supported by Xbox One
+            if((pFmtChunk->size < 52 /*sizeof(XMA2WAVEFORMATEX)*/) || (pWaveFormatEx->uiSize < 34 /*(sizeof(XMA2WAVEFORMATEX) - sizeof(WAVEFORMATEX))*/))
+            {
+                HyGuiLog("HyGuiWave::ParseWaveFile WAVE_FORMAT_XMA2 format chunk is not large enough: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+                return false;
+            }
+            bIsSeek = true;
+            break;
+
+        case 0x2:   // WAVE_FORMAT_ADPCM
+            if((pFmtChunk->size < (sizeof(HY_WAVEFORMATEX) + 32)) || (pWaveFormatEx->uiSize < 32 /*MSADPCM_FORMAT_EXTRA_BYTES*/))
+            {
+                HyGuiLog("HyGuiWave::ParseWaveFile WAVE_FORMAT_ADPCM format chunk is not large enough: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+                return false;
+            }
+            break;
+
+        case 0xFFFE: // WAVE_FORMAT_EXTENSIBLE
+            if((pFmtChunk->size < sizeof(HY_WAVEFORMATEXTENSIBLE)) || ( pWaveFormatEx->uiSize < (sizeof(HY_WAVEFORMATEXTENSIBLE) - sizeof(HY_WAVEFORMATEX))))
+            {
+                HyGuiLog("HyGuiWave::ParseWaveFile WAVE_FORMAT_EXTENSIBLE format chunk is not large enough: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+                return false;
+            }
+            else
+            {
+                const HY_WAVEFORMATEXTENSIBLE *pWaveFormatExtensible = reinterpret_cast<const HY_WAVEFORMATEXTENSIBLE *>(ptr);
+                
+                // Check against standard KSDATAFORMAT_SUBTYPE_PCM GUID (ignore first 4-byte field)
+                const HY_WAVEGUID standardPCM_GUID = {0x00000000, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71};
+                if(memcmp(reinterpret_cast<const unsigned char *>(&pWaveFormatExtensible->SubFormat) + sizeof(uint32_t),
+                          reinterpret_cast<const unsigned char *>(&standardPCM_GUID) + sizeof(uint32_t),
+                          sizeof(HY_WAVEGUID) - sizeof(uint32_t)) != 0)
+                {
+                    HyGuiLog("HyGuiWave::ParseWaveFile HY_WAVEFORMATEXTENSIBLE is not using the KSDATAFORMAT_SUBTYPE_PCM GUID: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+                    return false;
+                }
+                
+                switch(pWaveFormatExtensible->SubFormat.Data1)
+                {
+                case 1: // WAVE_FORMAT_PCM
+                case 3: // WAVE_FORMAT_IEEE_FLOAT
+                    break;
+                
+                // MS-ADPCM and XMA2 are not supported as WAVEFORMATEXTENSIBLE
+                
+                case 0x161: // WAVE_FORMAT_WMAUDIO2
+                case 0x162: // WAVE_FORMAT_WMAUDIO3
+                    bIsDPDS = true;
+                    break;
+                
+                default:
+                    HyGuiLog("HyGuiWave::ParseWaveFile HY_WAVEFORMATEXTENSIBLE is using an unsupported GUID: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+                    return false;
+                }
+
+            }
+            break;
+
+        default:
+            HyGuiLog("HyGuiWave::ParseWaveFile HY_WAVEFORMATEX is using an unsupported format tag: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+            return false;
+        }
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // TODO: Move this code elsewhere for when we want the raw audio data
+    // Locate 'data'
+    ptr = reinterpret_cast<const uint8_t *>(pRiffHeader) + sizeof(RIFFChunkHeader);
+    if((ptr + sizeof(RIFFChunk)) > pWavEnd)
+    {
+        HyGuiLog("HyGuiWave::ParseWaveFile parsing riff chunk reached EOF: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+        return false;
+    }
+
+    const RIFFChunk *pDataChunk = FindChunk(ptr, pRiffChunk->size, FOURCC_DATA_TAG);
+    if(!pDataChunk || !pDataChunk->size)
+    {
+        HyGuiLog("HyGuiWave::ParseWaveFile FindChunk (FOURCC_DATA_TAG) returned invalid chunk: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+        return false;
+    }
+
+    ptr = reinterpret_cast<const uint8_t *>(pDataChunk) + sizeof(RIFFChunk);
+    if(ptr + pDataChunk->size > pWavEnd)
+    {
+        HyGuiLog("HyGuiWave::ParseWaveFile parsing data chunk reached EOF: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+        return false;
+    }
+
+    // TODO: Move this code elsewhere for when we want the raw audio data
+//    *pdata = ptr;
+//    *dataSize = pDataChunk->size;
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    const HY_WAVEFORMATEX *pWaveFormatEx = reinterpret_cast<const HY_WAVEFORMATEX*>(pWaveFormat);
+                
+    uiFormatTagOut = pWaveFormatEx->uiFormatTag;
+    uiNumChannelsOut = pWaveFormatEx->uiChannels;
+    uiBitsPerSampleOut = pWaveFormatEx->uiBitsPerSample;
+    uiSamplesPerSecOut = pWaveFormatEx->uiSamplesPerSec;
+
+
 
 //    hr = WaveFindLoopInfo( wavData.get(), bytesRead, &result.loopStart, &result.loopLength );
 //    if ( FAILED(hr) )
 //        return hr;
 
-//    if ( dpds )
-//    {
-//        hr = WaveFindTable( wavData.get(), bytesRead, FOURCC_XWMA_DPDS, &result.seek, &result.seekCount );
-//        if ( FAILED(hr) )
-//            return hr;
-//    }
-//    else if ( seek )
-//    {
-//        hr = WaveFindTable( wavData.get(), bytesRead, FOURCC_XMA_SEEK, &result.seek, &result.seekCount );
-//        if ( FAILED(hr) )
-//            return hr;
-//    }
+    if(bIsDPDS)
+    {
+        int asdf = 0;
+//        if(WaveFindTable(wavData.get(), bytesRead, FOURCC_XWMA_DPDS, &result.seek, &result.seekCount) == false)
+//        {
+//            HyGuiLog("HyGuiWave::ParseWaveFile WaveFindTable for FOURCC_XWMA_DPDS failed: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+//            return false;
+//        }
+    }
+    else if(bIsSeek)
+    {
+        int asdf = 0;
+//        if(WaveFindTable(wavData.get(), bytesRead, FOURCC_XMA_SEEK, &result.seek, &result.seekCount) == false)
+//        {
+//            HyGuiLog("HyGuiWave::ParseWaveFile WaveFindTable for FOURCC_XMA_SEEK failed: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+//            return false;
+//        }
+    }
+    
+    return true;
 }

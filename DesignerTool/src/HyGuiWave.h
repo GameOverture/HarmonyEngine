@@ -35,9 +35,9 @@ class HyGuiWave
     ~HyGuiWave();
     
 public:
-    QString ConstructImageFileName();
+    QString ConstructWaveFileName();
     
-    static void ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksumOut, QString &sNameOut, uint16 &uiFormatTypeOut, uint16 &uiNumChannelsOut, uint16 &uiBitsPerSampleOut, uint32 &uiSamplesPerSecOut);
+    static bool ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksumOut, QString &sNameOut, uint16 &uiFormatTagOut, uint16 &uiNumChannelsOut, uint16 &uiBitsPerSampleOut, uint32 &uiSamplesPerSecOut);
 
     void SetError(eGuiFrameError eError);
     void ClearError(eGuiFrameError eError);
