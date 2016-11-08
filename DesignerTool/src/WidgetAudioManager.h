@@ -32,7 +32,7 @@ class WidgetAudioManager : public QWidget
 
     QMap<quint32, HyGuiWave *>      m_DependencyMap;
 
-    WidgetAudioBankModel *          m_pBankModel;
+    WidgetAudioManagerModel *       m_pBankModel;
     WidgetAudioCategoryModel *      m_pCategoryModel;
     WidgetAudioCategoryDelegate *   m_pCategoryDelegate;
 

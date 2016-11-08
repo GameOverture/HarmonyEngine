@@ -15,11 +15,102 @@
 #include <QLineEdit>
 #include <QJsonArray>
 
-WidgetAudioBankModel::WidgetAudioBankModel(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
+WidgetAudioBankModel::WidgetAudioBankModel(QObject *pParent) : QAbstractTableModel(pParent)
+{
+}
+
+void WidgetAudioBankModel::AddWave(HyGuiWave *pNewWave)
+{
+    m_WaveList.append(pNewWave);
+}
+
+HyGuiWave *WidgetAudioBankModel::GetWaveAt(int iIndex)
+{
+    return m_WaveList[iIndex];
+}
+
+/*virtual*/ int WidgetAudioBankModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
+{
+    return m_WaveList.size();
+}
+
+/*virtual*/ int WidgetAudioBankModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
+{
+    return NUM_COLUMNS;
+}
+
+/*virtual*/ QVariant WidgetAudioBankModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
+{
+    HyGuiWave *pWave = m_WaveList[index.row()];
+
+//    if (role == Qt::TextAlignmentRole && index.column() != COLUMN_Frame)
+//    {
+//        return Qt::AlignCenter;
+//    }
+    
+//    if(role == Qt::DisplayRole || role == Qt::EditRole)
+//    {
+//        switch(index.column())
+//        {
+//        case COLUMN_Frame:
+//            return pWave->GetName();
+//        case COLUMN_OffsetX:
+//            return QString::number(pFrame->m_vOffset.x());
+//        case COLUMN_OffsetY:
+//            return QString::number(pFrame->m_vOffset.y());
+//        case COLUMN_Duration:
+//            return QString::number(pFrame->m_fDuration, 'g', 3) % ((role == Qt::DisplayRole) ? "sec" : "");
+//        }
+//    }
+
+    return QVariant();
+}
+
+/*virtual*/ QVariant WidgetAudioBankModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
+{
+    if (role == Qt::DisplayRole)
+    {
+        if (orientation == Qt::Horizontal)
+        {
+            switch(iIndex)
+            {
+            case COLUMN_Name:
+                return QString("Name");
+//            case COLUMN_OffsetX:
+//                return QString("X Offset");
+//            case COLUMN_OffsetY:
+//                return QString("Y Offset");
+//            case COLUMN_Duration:
+//                return QString("Duration");
+            }
+        }
+        else
+            return QString::number(iIndex);
+    }
+
+    return QVariant();
+}
+
+/*virtual*/ bool WidgetAudioBankModel::setData(const QModelIndex & index, const QVariant & value, int role /*= Qt::EditRole*/)
+{
+    return true;
+}
+
+/*virtual*/ Qt::ItemFlags WidgetAudioBankModel::flags(const QModelIndex & index) const
+{
+    if(index.column() == COLUMN_Name)
+        return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    else
+        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+WidgetAudioManagerModel::WidgetAudioManagerModel(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
                                                                                                 m_AudioBanksRef(atlasGroupsRef)
 { }
 
-/*virtual*/ QVariant WidgetAudioBankModel::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant WidgetAudioManagerModel::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
 {
     if(role == Qt::DisplayRole)
     {
@@ -32,7 +123,7 @@ WidgetAudioBankModel::WidgetAudioBankModel(QStackedWidget &atlasGroupsRef, QObje
         return QStringListModel::data(index, role);
 }
 
-/*virtual*/ int	WidgetAudioBankModel::rowCount(const QModelIndex & parent /*= QModelIndex()*/) const
+/*virtual*/ int	WidgetAudioManagerModel::rowCount(const QModelIndex & parent /*= QModelIndex()*/) const
 {
     return m_AudioBanksRef.count();
 }

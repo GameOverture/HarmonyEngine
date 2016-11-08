@@ -65,33 +65,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QTreeWidget" name="waveTree">
-     <property name="mouseTracking">
-      <bool>false</bool>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::ContiguousSelection</enum>
-     </property>
-     <property name="columnCount">
-      <number>2</number>
-     </property>
-     <attribute name="headerVisible">
-      <bool>false</bool>
-     </attribute>
-     <attribute name="headerCascadingSectionResizes">
-      <bool>true</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string notr="true">1</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string notr="true">2</string>
-      </property>
-     </column>
-    </widget>
+    <widget class="QListView" name="waveList"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">

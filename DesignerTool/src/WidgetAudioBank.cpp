@@ -32,6 +32,9 @@ WidgetAudioBank::WidgetAudioBank(QDir metaDir, QDir dataDir, WidgetAudioManager 
                                                                                                                         m_sName("Unnamed")
 {
     ui->setupUi(this);
+    
+    m_pModel = new WidgetAudioBankModel(this);
+    ui->waveList->setModel(m_pModel);
 }
 
 WidgetAudioBank::~WidgetAudioBank()
@@ -117,7 +120,7 @@ void WidgetAudioBank::ImportWaves(QStringList sWaveFileList)
             if(pNewWave)
             {
                 m_MetaDir.absoluteFilePath(pNewWave->ConstructWaveFileName());
-                m_WaveList.append(pNewWave);
+                m_pModel->AddWave(pNewWave);
             }
         }
     }

@@ -12,7 +12,7 @@
 
 #include "HyGlobal.h"
 
-#include "HyGuiWave.h"
+#include "WidgetAudioModelView.h"
 
 #include <QWidget>
 
@@ -34,7 +34,7 @@ class WidgetAudioBank : public QWidget
     
     QString                     m_sName;
     
-    QList<HyGuiWave *>          m_WaveList;
+    WidgetAudioBankModel *  m_pModel;
 
 public:
     explicit WidgetAudioBank(QWidget *parent = 0);

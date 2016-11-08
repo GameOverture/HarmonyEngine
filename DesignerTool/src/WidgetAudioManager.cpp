@@ -87,7 +87,7 @@ WidgetAudioManager::WidgetAudioManager(ItemProject *pProjOwner, QWidget *parent)
     QItemSelectionModel *pSelModel = ui->categoryList->selectionModel();
     connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_categoryList_selectionChanged(const QItemSelection &, const QItemSelection &)));
 
-    ui->cmbAudioBanks->setModel(new WidgetAudioBankModel(*ui->audioBanks, this));
+    ui->cmbAudioBanks->setModel(new WidgetAudioManagerModel(*ui->audioBanks, this));
 }
 
 WidgetAudioManager::~WidgetAudioManager()

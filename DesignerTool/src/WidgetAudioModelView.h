@@ -10,6 +10,8 @@
 #ifndef WIDGETAUDIOMODELVIEW_H
 #define WIDGETAUDIOMODELVIEW_H
 
+#include "HyGuiWave.h"
+
 #include <QStringListModel>
 #include <QStringList>
 #include <QStackedWidget>
@@ -59,13 +61,41 @@
 //    void editCompleted(const QString &);
 //};
 
+class WidgetAudioBankModel : public QAbstractTableModel
+{
+    Q_OBJECT
+    
+    QList<HyGuiWave *>          m_WaveList;
+    
+    enum eColumns
+    {
+        COLUMN_Name = 0,
+        
+        NUM_COLUMNS
+    };
+    
+public:
+    WidgetAudioBankModel(QObject *pParent);
+    
+    void AddWave(HyGuiWave *pNewWave);
+    HyGuiWave *GetWaveAt(int iIndex);
 
-class WidgetAudioBankModel : public QStringListModel
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class WidgetAudioManagerModel : public QStringListModel
 {
     QStackedWidget &        m_AudioBanksRef;
 
 public:
-    WidgetAudioBankModel(QStackedWidget &audioBanksRef, QObject *pParent);
+    WidgetAudioManagerModel(QStackedWidget &audioBanksRef, QObject *pParent);
 
     virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     virtual int	rowCount(const QModelIndex & parent = QModelIndex()) const;
