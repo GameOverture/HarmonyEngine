@@ -51,7 +51,9 @@ SOURCES += main.cpp \
     WidgetAudioManager.cpp \
     WidgetAudioBank.cpp \
     WidgetAudioModelView.cpp \
-    HyGuiWave.cpp
+    HyGuiWave.cpp \
+    WidgetAudio.cpp \
+    ItemAudio.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -91,7 +93,9 @@ HEADERS  += \
     WidgetAudioManager.h \
     WidgetAudioBank.h \
     WidgetAudioModelView.h \
-    HyGuiWave.h
+    HyGuiWave.h \
+    WidgetAudio.h \
+    ItemAudio.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -113,7 +117,8 @@ FORMS    += \
     WidgetFontState.ui \
     WidgetColor.ui \
     WidgetAudioManager.ui \
-    WidgetAudioBank.ui
+    WidgetAudioBank.ui \
+    WidgetAudio.ui
 
 Release:DESTDIR = ../bin/release
 Release:OBJECTS_DIR = ../bin/release/.obj

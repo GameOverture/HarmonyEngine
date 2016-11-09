@@ -21,7 +21,9 @@ WidgetAudioBankModel::WidgetAudioBankModel(QObject *pParent) : QAbstractTableMod
 
 void WidgetAudioBankModel::AddWave(HyGuiWave *pNewWave)
 {
+    beginInsertRows(QModelIndex(), m_WaveList.count(), m_WaveList.count());
     m_WaveList.append(pNewWave);
+    endInsertRows();
 }
 
 HyGuiWave *WidgetAudioBankModel::GetWaveAt(int iIndex)
@@ -43,25 +45,25 @@ HyGuiWave *WidgetAudioBankModel::GetWaveAt(int iIndex)
 {
     HyGuiWave *pWave = m_WaveList[index.row()];
 
-//    if (role == Qt::TextAlignmentRole && index.column() != COLUMN_Frame)
-//    {
-//        return Qt::AlignCenter;
-//    }
+    if (role == Qt::TextAlignmentRole && index.column() != COLUMN_Name)
+    {
+        return Qt::AlignCenter;
+    }
     
-//    if(role == Qt::DisplayRole || role == Qt::EditRole)
-//    {
-//        switch(index.column())
-//        {
-//        case COLUMN_Frame:
-//            return pWave->GetName();
+    if(role == Qt::DisplayRole || role == Qt::EditRole)
+    {
+        switch(index.column())
+        {
+        case COLUMN_Name:
+            return pWave->GetName();
 //        case COLUMN_OffsetX:
 //            return QString::number(pFrame->m_vOffset.x());
 //        case COLUMN_OffsetY:
 //            return QString::number(pFrame->m_vOffset.y());
 //        case COLUMN_Duration:
 //            return QString::number(pFrame->m_fDuration, 'g', 3) % ((role == Qt::DisplayRole) ? "sec" : "");
-//        }
-//    }
+        }
+    }
 
     return QVariant();
 }
@@ -76,7 +78,8 @@ HyGuiWave *WidgetAudioBankModel::GetWaveAt(int iIndex)
             {
             case COLUMN_Name:
                 return QString("Name");
-//            case COLUMN_OffsetX:
+            case COLUMN_References:
+                return "0";
 //                return QString("X Offset");
 //            case COLUMN_OffsetY:
 //                return QString("Y Offset");
@@ -91,18 +94,18 @@ HyGuiWave *WidgetAudioBankModel::GetWaveAt(int iIndex)
     return QVariant();
 }
 
-/*virtual*/ bool WidgetAudioBankModel::setData(const QModelIndex & index, const QVariant & value, int role /*= Qt::EditRole*/)
-{
-    return true;
-}
+///*virtual*/ bool WidgetAudioBankModel::setData(const QModelIndex & index, const QVariant & value, int role /*= Qt::EditRole*/)
+//{
+//    return true;
+//}
 
-/*virtual*/ Qt::ItemFlags WidgetAudioBankModel::flags(const QModelIndex & index) const
-{
-    if(index.column() == COLUMN_Name)
-        return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-    else
-        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
-}
+///*virtual*/ Qt::ItemFlags WidgetAudioBankModel::flags(const QModelIndex & index) const
+//{
+//    if(index.column() == COLUMN_Name)
+//        return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+//    else
+//        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+//}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -24,6 +24,11 @@ HyGuiWave::~HyGuiWave()
 {
 }
 
+QString HyGuiWave::GetName()
+{
+    return m_sName;
+}
+
 QString HyGuiWave::ConstructWaveFileName()
 {
     QString sMetaImgName;

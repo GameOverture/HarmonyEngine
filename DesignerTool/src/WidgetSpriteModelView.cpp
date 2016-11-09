@@ -257,7 +257,7 @@ SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
     return NUMCOLUMNS;
 }
 
-/*virtual*/ QVariant WidgetSpriteModel::data(const QModelIndex &index, int role) const
+/*virtual*/ QVariant WidgetSpriteModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
 {
     SpriteFrame *pFrame = m_FramesList[index.row()];
 

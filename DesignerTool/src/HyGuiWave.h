@@ -35,6 +35,8 @@ class HyGuiWave
     ~HyGuiWave();
     
 public:
+    QString GetName();
+    
     QString ConstructWaveFileName();
     
     static bool ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksumOut, QString &sNameOut, uint16 &uiFormatTagOut, uint16 &uiNumChannelsOut, uint16 &uiBitsPerSampleOut, uint32 &uiSamplesPerSecOut);

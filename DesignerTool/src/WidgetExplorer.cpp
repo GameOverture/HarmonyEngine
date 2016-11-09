@@ -11,6 +11,7 @@
 #include "ui_WidgetExplorer.h"
 
 #include "MainWindow.h"
+#include "ItemAudio.h"
 #include "ItemSprite.h"
 #include "ItemFont.h"
 #include "ItemProject.h"
@@ -96,6 +97,9 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     case ITEM_DirSprites:
     case ITEM_Prefix:
         pItem = new Item(eNewItemType, sNewItemPath);
+        break;
+    case ITEM_Audio:
+        pItem = new ItemAudio(sNewItemPath, pCurProj->GetAtlasManager());
         break;
     case ITEM_Sprite:
         pItem = new ItemSprite(sNewItemPath, pCurProj->GetAtlasManager());

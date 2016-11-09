@@ -70,6 +70,7 @@ class WidgetAudioBankModel : public QAbstractTableModel
     enum eColumns
     {
         COLUMN_Name = 0,
+        COLUMN_References,
         
         NUM_COLUMNS
     };
@@ -84,8 +85,8 @@ public:
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+    //virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+    //virtual Qt::ItemFlags flags(const QModelIndex & index) const;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
