@@ -65,7 +65,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QListView" name="waveList"/>
+    <widget class="QTableView" name="waveTable"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">

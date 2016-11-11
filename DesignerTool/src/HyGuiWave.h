@@ -28,6 +28,8 @@ class HyGuiWave
     uint16                              m_uiBitsPerSample; // 16-bit, etc.
     uint32                              m_uiSamplesPerSec;
     
+    uint32                              m_uiDataSize;
+    
     uint                                m_uiErrors; // '0' when there is no error
     
     // Private ctor as WidgetAudioManager should only construct these
@@ -38,6 +40,10 @@ public:
     QString GetName();
     
     QString ConstructWaveFileName();
+    
+    uint32 GetDataSize();
+    
+    QString GetDescription();
     
     static bool ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksumOut, QString &sNameOut, uint16 &uiFormatTagOut, uint16 &uiNumChannelsOut, uint16 &uiBitsPerSampleOut, uint32 &uiSamplesPerSecOut);
 

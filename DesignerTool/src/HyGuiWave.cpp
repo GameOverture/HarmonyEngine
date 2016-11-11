@@ -38,6 +38,39 @@ QString HyGuiWave::ConstructWaveFileName()
     return sMetaImgName;
 }
 
+uint32 HyGuiWave::GetDataSize()
+{
+    return m_uiDataSize;
+}
+
+QString HyGuiWave::GetDescription()
+{
+    QString sDesc;
+    sDesc = QString::number(m_uiBitsPerSample) % "-bit ";
+    
+    switch(m_uiFormatType)
+    {
+    case 1:     sDesc += "PCM ";        break;
+    case 3:     sDesc += "IEEE Float "; break;
+    case 0x161: sDesc += "WMAUDIO2 ";   break;
+    case 0x162: sDesc += "WMAUDIO3 ";   break;
+    case 0x166: sDesc += "XMA2 ";       break;  // XMA2 is supported by Xbox One
+    case 0x2:   sDesc += "ADPCM ";      break;
+    case 0xFFFE:sDesc += "EXTENSIBLE "; break;
+    }
+    
+    sDesc += QString::number(m_uiSamplesPerSec) % " Hz, ";
+    
+    switch(m_uiNumChannels)
+    {
+    case 1:     sDesc += "Mono ";       break;
+    case 2:     sDesc += "Stereo ";     break;
+    default:    sDesc += "Multi Channel";break;
+    }
+    
+    return sDesc;
+}
+
 void HyGuiWave::SetError(eGuiFrameError eError)
 {
     m_uiErrors |= (1 << eError);

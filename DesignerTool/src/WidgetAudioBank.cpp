@@ -34,7 +34,7 @@ WidgetAudioBank::WidgetAudioBank(QDir metaDir, QDir dataDir, WidgetAudioManager 
     ui->setupUi(this);
     
     m_pModel = new WidgetAudioBankModel(this);
-    ui->waveList->setModel(m_pModel);
+    ui->waveTable->setModel(m_pModel);
 }
 
 WidgetAudioBank::~WidgetAudioBank()

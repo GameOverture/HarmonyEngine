@@ -53,7 +53,8 @@ SOURCES += main.cpp \
     WidgetAudioModelView.cpp \
     HyGuiWave.cpp \
     WidgetAudio.cpp \
-    ItemAudio.cpp
+    ItemAudio.cpp \
+    ItemAudioCmds.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -95,7 +96,8 @@ HEADERS  += \
     WidgetAudioModelView.h \
     HyGuiWave.h \
     WidgetAudio.h \
-    ItemAudio.h
+    ItemAudio.h \
+    ItemAudioCmds.h
 
 FORMS    += \
     DlgNewProject.ui \

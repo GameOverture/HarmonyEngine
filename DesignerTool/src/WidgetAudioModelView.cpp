@@ -45,6 +45,10 @@ HyGuiWave *WidgetAudioBankModel::GetWaveAt(int iIndex)
 {
     HyGuiWave *pWave = m_WaveList[index.row()];
 
+    if(role == Qt::ToolTipRole)
+    {
+        return pWave->GetDescription();
+    }
     if (role == Qt::TextAlignmentRole && index.column() != COLUMN_Name)
     {
         return Qt::AlignCenter;
@@ -56,12 +60,10 @@ HyGuiWave *WidgetAudioBankModel::GetWaveAt(int iIndex)
         {
         case COLUMN_Name:
             return pWave->GetName();
-//        case COLUMN_OffsetX:
-//            return QString::number(pFrame->m_vOffset.x());
-//        case COLUMN_OffsetY:
-//            return QString::number(pFrame->m_vOffset.y());
-//        case COLUMN_Duration:
-//            return QString::number(pFrame->m_fDuration, 'g', 3) % ((role == Qt::DisplayRole) ? "sec" : "");
+        case COLUMN_Size:
+            return QString::number(pWave->GetDataSize());
+        case COLUMN_Info:
+            return pWave->GetDescription();
         }
     }
 
@@ -78,34 +80,29 @@ HyGuiWave *WidgetAudioBankModel::GetWaveAt(int iIndex)
             {
             case COLUMN_Name:
                 return QString("Name");
-            case COLUMN_References:
-                return "0";
-//                return QString("X Offset");
-//            case COLUMN_OffsetY:
-//                return QString("Y Offset");
-//            case COLUMN_Duration:
-//                return QString("Duration");
+            case COLUMN_Size:
+                return "Size";
+            case COLUMN_Info:
+                return "Info";
             }
         }
-        else
-            return QString::number(iIndex);
     }
 
     return QVariant();
 }
 
-///*virtual*/ bool WidgetAudioBankModel::setData(const QModelIndex & index, const QVariant & value, int role /*= Qt::EditRole*/)
-//{
-//    return true;
-//}
+/*virtual*/ bool WidgetAudioBankModel::setData(const QModelIndex & index, const QVariant & value, int role /*= Qt::EditRole*/)
+{
+    return true;
+}
 
-///*virtual*/ Qt::ItemFlags WidgetAudioBankModel::flags(const QModelIndex & index) const
-//{
-//    if(index.column() == COLUMN_Name)
-//        return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-//    else
-//        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
-//}
+/*virtual*/ Qt::ItemFlags WidgetAudioBankModel::flags(const QModelIndex & index) const
+{
+    if(index.column() == COLUMN_Name)
+        return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    else
+        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
