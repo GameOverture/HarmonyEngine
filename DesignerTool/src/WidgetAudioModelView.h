@@ -82,6 +82,8 @@ public:
     void AddWave(HyGuiWave *pNewWave);
     HyGuiWave *GetWaveAt(int iIndex);
 
+    void GetSettingsObj(QJsonObject &settingsObj);
+
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;

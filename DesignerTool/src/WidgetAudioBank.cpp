@@ -14,6 +14,8 @@
 #include "WidgetAudioManager.h"
 
 #include <QFileDialog>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 WidgetAudioBank::WidgetAudioBank(QWidget *parent) : QWidget(parent),
                                                     ui(new Ui::WidgetAudioBank)
@@ -119,8 +121,24 @@ void WidgetAudioBank::ImportWaves(QStringList sWaveFileList)
             HyGuiWave *pNewWave = m_pManager->CreateWave(GetId(), uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, 0);
             if(pNewWave)
             {
-                m_MetaDir.absoluteFilePath(pNewWave->ConstructWaveFileName());
-                m_pModel->AddWave(pNewWave);
+                if(QFile::copy(waveFileInfo.absoluteFilePath(), m_MetaDir.absoluteFilePath(pNewWave->ConstructWaveFileName())))
+                {
+                    m_pModel->AddWave(pNewWave);
+                }
+                else
+                {
+                    HyGuiLog("WidgetAudioBank::ImportWaves could not copy wave to meta dir meta: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+                }
+
+//                QFile waveFile(waveFileInfo.absoluteFilePath());
+//                if(!waveFile.open(QIODevice::ReadOnly))
+//                {
+//                    HyGuiLog("HyGuiWave::ParseWaveFile could not open the wave file: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+//                    return false;
+//                }
+
+//                QByteArray waveData = waveFile.readAll();
+//                waveFile.close();
             }
         }
     }
@@ -648,4 +666,31 @@ void WidgetAudioBank::Refresh()
 //            return 1;
 //        }
 //    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // WRITE SETTINGS FILE TO AUDIO META DIR
+    QJsonObject settingsObj;
+    m_pModel->GetSettingsObj(settingsObj);
+
+    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
+    if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+       HyGuiLog("Couldn't open audio settings file for writing", LOGTYPE_Error);
+    }
+    else
+    {
+        QJsonDocument settingsDoc(settingsObj);
+
+#ifdef HYGUI_UseBinaryMetaFiles
+        qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
+#else
+        qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
+#endif
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+        {
+            HyGuiLog("Could not write to audio settings file: " % settingsFile.errorString(), LOGTYPE_Error);
+        }
+
+        settingsFile.close();
+    }
 }

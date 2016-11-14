@@ -34,7 +34,7 @@ class WidgetAudioBank : public QWidget
     
     QString                     m_sName;
     
-    WidgetAudioBankModel *  m_pModel;
+    WidgetAudioBankModel *      m_pModel;
 
 public:
     explicit WidgetAudioBank(QWidget *parent = 0);

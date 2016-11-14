@@ -58,11 +58,11 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
     
     int iNumTextures = 0;
 
-    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaAtlasSettings));
+    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
     if(settingsFile.exists())
     {
         if(!settingsFile.open(QIODevice::ReadOnly))
-            HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaAtlasSettings, LOGTYPE_Error);
+            HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaSettings, LOGTYPE_Error);
 
 #ifdef HYGUI_UseBinaryMetaFiles
         QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
@@ -489,7 +489,7 @@ void WidgetAtlasGroup::Refresh()
     QJsonObject settingsObj = m_dlgSettings.GetSettings();
     settingsObj.insert("frames", frameArray);
 
-    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaAtlasSettings));
+    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
     if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
        HyGuiLog("Couldn't open atlas settings file for writing", LOGTYPE_Error);
@@ -584,7 +584,7 @@ void WidgetAtlasGroup::on_btnSettings_clicked()
         else if(m_dlgSettings.IsNameChanged())
         {
             m_dlgSettings.GetName();
-            QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaAtlasSettings));
+            QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
             if(!settingsFile.open(QIODevice::ReadOnly))
             {
                 settingsFile.close();

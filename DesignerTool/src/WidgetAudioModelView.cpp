@@ -31,6 +31,11 @@ HyGuiWave *WidgetAudioBankModel::GetWaveAt(int iIndex)
     return m_WaveList[iIndex];
 }
 
+void WidgetAudioBankModel::GetSettingsObj(QJsonObject &settingsObj)
+{
+todo
+}
+
 /*virtual*/ int WidgetAudioBankModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
     return m_WaveList.size();
@@ -188,7 +193,7 @@ WidgetAudioCategoryModel::WidgetAudioCategoryModel(QDir audioBankDir, QObject *p
     {
         if(!audioCategoryFile.open(QIODevice::ReadOnly))
         {
-            HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaAtlasSettings, LOGTYPE_Error);
+            HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaSettings, LOGTYPE_Error);
         }
         else
         {
