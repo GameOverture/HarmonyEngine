@@ -54,7 +54,9 @@ SOURCES += main.cpp \
     HyGuiWave.cpp \
     WidgetAudio.cpp \
     ItemAudio.cpp \
-    ItemAudioCmds.cpp
+    ItemAudioCmds.cpp \
+    WidgetAudioState.cpp \
+    WidgetRangedSlider.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -97,7 +99,9 @@ HEADERS  += \
     HyGuiWave.h \
     WidgetAudio.h \
     ItemAudio.h \
-    ItemAudioCmds.h
+    ItemAudioCmds.h \
+    WidgetAudioState.h \
+    WidgetRangedSlider.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -120,7 +124,9 @@ FORMS    += \
     WidgetColor.ui \
     WidgetAudioManager.ui \
     WidgetAudioBank.ui \
-    WidgetAudio.ui
+    WidgetAudio.ui \
+    WidgetAudioState.ui \
+    WidgetRangedSlider.ui
 
 Release:DESTDIR = ../bin/release
 Release:OBJECTS_DIR = ../bin/release/.obj

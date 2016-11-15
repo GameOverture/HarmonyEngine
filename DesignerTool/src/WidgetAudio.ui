@@ -61,26 +61,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QListView" name="listView">
-     <property name="gridSize">
-      <size>
-       <width>5</width>
-       <height>0</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QSlider" name="verticalSlider">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QDial" name="dial"/>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
      <item>
       <widget class="QLabel" name="label_4">
@@ -178,22 +158,8 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Animation State Info</string>
+      <string>Audio State Info</string>
      </property>
-     <layout class="QVBoxLayout" name="grpStateLayout">
-      <property name="leftMargin">
-       <number>9</number>
-      </property>
-      <property name="topMargin">
-       <number>9</number>
-      </property>
-      <property name="rightMargin">
-       <number>9</number>
-      </property>
-      <property name="bottomMargin">
-       <number>9</number>
-      </property>
-     </layout>
     </widget>
    </item>
   </layout>
