@@ -41,11 +41,14 @@ public:
     quint32 GetChecksum();
     QString GetName();
     
+    QIcon GetIcon();
+    
     QString ConstructWaveFileName();
     
     uint32 GetDataSize();
     
     QString GetDescription();
+    QString GetSizeDescription();
     
     static bool ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksumOut, QString &sNameOut, uint16 &uiFormatTagOut, uint16 &uiNumChannelsOut, uint16 &uiBitsPerSampleOut, uint32 &uiSamplesPerSecOut);
 

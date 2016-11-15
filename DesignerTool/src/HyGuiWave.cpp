@@ -34,6 +34,14 @@ QString HyGuiWave::GetName()
     return m_sName;
 }
 
+QIcon HyGuiWave::GetIcon()
+{
+    if(m_uiErrors == 0)
+        return HyGlobal::AudioIcon(AUDIO_Wave);
+    else
+        return HyGlobal::AudioIcon(AUDIO_Wave_Warning);
+}
+
 QString HyGuiWave::ConstructWaveFileName()
 {
     QString sMetaImgName;
@@ -74,6 +82,11 @@ QString HyGuiWave::GetDescription()
     }
     
     return sDesc;
+}
+
+QString HyGuiWave::GetSizeDescription()
+{
+    return m_sName % " - " % QString::number(m_uiDataSize) % "bytes";
 }
 
 void HyGuiWave::GetJsonObj(QJsonObject &waveObj)

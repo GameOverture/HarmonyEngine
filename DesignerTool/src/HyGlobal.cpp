@@ -13,6 +13,7 @@
 /*static*/ QString HyGlobal::sm_sItemExt[NUMITEM];
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUMITEM];
 /*static*/ QIcon HyGlobal::sm_AtlasIcons[NUMATLAS];
+/*static*/ QIcon HyGlobal::sm_AudioIcons[NUMAUDIO];
 
 /*static*/ QRegExpValidator *HyGlobal::sm_pCodeNameValidator = NULL;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFileNameValidator = NULL;

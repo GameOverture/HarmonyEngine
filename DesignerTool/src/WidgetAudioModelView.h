@@ -12,6 +12,8 @@
 
 #include "HyGuiWave.h"
 
+#include <QTableView>
+#include <QResizeEvent>
 #include <QStringListModel>
 #include <QStringList>
 #include <QStackedWidget>
@@ -61,6 +63,19 @@
 //    void editCompleted(const QString &);
 //};
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class WidgetAudioBankTableView : public QTableView
+{
+    Q_OBJECT
+
+public:
+    WidgetAudioBankTableView(QWidget *pParent = 0);
+
+protected:
+    virtual void resizeEvent(QResizeEvent *pResizeEvent);
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class WidgetAudioBankModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -69,16 +84,16 @@ class WidgetAudioBankModel : public QAbstractTableModel
 
     QList<HyGuiWave *>          m_WaveList;
     
+public:
+    
     enum eColumns
     {
         COLUMN_Name = 0,
-        COLUMN_Size,
         COLUMN_Info,
         
         NUM_COLUMNS
     };
     
-public:
     WidgetAudioBankModel(QObject *pParent);
 
     QString GetName();
@@ -89,12 +104,12 @@ public:
 
     void GetJsonObj(QJsonObject &audioBankObj);
 
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
     virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole) Q_DECL_OVERRIDE;
+    virtual Qt::ItemFlags flags(const QModelIndex & index) const Q_DECL_OVERRIDE;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

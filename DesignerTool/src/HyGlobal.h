@@ -63,6 +63,14 @@ enum eAtlasNodeType
     NUMATLAS
 };
 
+enum eAudioNodeType
+{
+    AUDIO_Wave = 0,
+    AUDIO_Wave_Warning,
+    
+    NUMAUDIO
+};
+
 enum eProjDrawState
 {
     PROJDRAWSTATE_Nothing = 0,
@@ -115,6 +123,7 @@ class HyGlobal
     static QIcon                    sm_ItemIcons[NUMITEM];
     
     static QIcon                    sm_AtlasIcons[NUMATLAS];
+    static QIcon                    sm_AudioIcons[NUMAUDIO];
 
     static QRegExpValidator *       sm_pCodeNameValidator;
     static QRegExpValidator *       sm_pFileNameValidator;
@@ -182,6 +191,9 @@ public:
         sm_AtlasIcons[ATLAS_Frame_Warning].addFile(QString(":/icons16x16/atlas-frameWarning.png"));
         sm_AtlasIcons[ATLAS_Spine].addFile(QString(":/icons16x16/spine-document.png"));
         sm_AtlasIcons[ATLAS_Font].addFile(QString(":/icons16x16/font-document.png"));
+        
+        sm_AudioIcons[AUDIO_Wave].addFile(QString(":/icons16x16/audio-document.png"));
+        sm_AudioIcons[AUDIO_Wave_Warning].addFile(QString(":/icons16x16/atlas-frameWarning.png"));
 
         sm_pCodeNameValidator = new QRegExpValidator(QRegExp("[A-Za-z_]+[A-Za-z0-9_]*"));
         sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_-]*"));
@@ -246,6 +258,7 @@ public:
     static const QIcon &ItemIcon(eItemType eItm)                    { return sm_ItemIcons[eItm]; }
 
     static const QIcon &AtlasIcon(eAtlasNodeType eNode)             { return sm_AtlasIcons[eNode]; }
+    static const QIcon &AudioIcon(eAudioNodeType eNode)             { return sm_AudioIcons[eNode]; }
 
     static const QRegExpValidator *CodeNameValidator()              { return sm_pCodeNameValidator; }
     static const QRegExpValidator *FileNameValidator()              { return sm_pFileNameValidator; }

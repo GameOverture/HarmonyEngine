@@ -16,6 +16,24 @@
 #include <QLineEdit>
 #include <QJsonArray>
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+WidgetAudioBankTableView::WidgetAudioBankTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
+{
+}
+
+/*virtual*/ void WidgetAudioBankTableView::resizeEvent(QResizeEvent *pResizeEvent)
+{
+    int iWidth = pResizeEvent->size().width();
+    
+    setColumnWidth(WidgetAudioBankModel::COLUMN_Name, iWidth / 2);
+    setColumnWidth(WidgetAudioBankModel::COLUMN_Info, iWidth / 2);
+
+    QTableView::resizeEvent(pResizeEvent);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 WidgetAudioBankModel::WidgetAudioBankModel(QObject *pParent) :  QAbstractTableModel(pParent),
                                                                 m_sName("Unnamed")
 {
@@ -70,10 +88,13 @@ void WidgetAudioBankModel::GetJsonObj(QJsonObject &audioBankObj)
 /*virtual*/ QVariant WidgetAudioBankModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
 {
     HyGuiWave *pWave = m_WaveList[index.row()];
+    
+    if(role == Qt::DecorationRole && index.column() == COLUMN_Name)
+        return pWave->GetIcon();
 
     if(role == Qt::ToolTipRole)
     {
-        return pWave->GetDescription();
+        return pWave->GetSizeDescription();
     }
     if (role == Qt::TextAlignmentRole && index.column() != COLUMN_Name)
     {
@@ -86,8 +107,6 @@ void WidgetAudioBankModel::GetJsonObj(QJsonObject &audioBankObj)
         {
         case COLUMN_Name:
             return pWave->GetName();
-        case COLUMN_Size:
-            return QString::number(pWave->GetDataSize());
         case COLUMN_Info:
             return pWave->GetDescription();
         }
@@ -106,8 +125,6 @@ void WidgetAudioBankModel::GetJsonObj(QJsonObject &audioBankObj)
             {
             case COLUMN_Name:
                 return QString("Name");
-            case COLUMN_Size:
-                return "Size";
             case COLUMN_Info:
                 return "Info";
             }

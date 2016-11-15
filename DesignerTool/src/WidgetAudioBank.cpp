@@ -15,6 +15,7 @@
 
 #include <QFileDialog>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QJsonDocument>
 
 WidgetAudioBank::WidgetAudioBank(QWidget *parent) : QWidget(parent),
@@ -36,7 +37,47 @@ WidgetAudioBank::WidgetAudioBank(QDir metaDir, QDir dataDir, WidgetAudioManager 
     
     m_pModel = new WidgetAudioBankModel(this);
     ui->waveTable->setModel(m_pModel);
+    ui->waveTable->setShowGrid(false);
 
+    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
+    if(settingsFile.exists())
+    {
+        if(!settingsFile.open(QIODevice::ReadOnly))
+            HyGuiLog(QString("WidgetAudioBank::WidgetAudioBank() could not open ") % HYGUIPATH_MetaSettings, LOGTYPE_Error);
+
+#ifdef HYGUI_UseBinaryMetaFiles
+        QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
+#else
+        QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
+#endif
+        settingsFile.close();
+
+        QJsonObject settingsObj = settingsDoc.object();
+        
+        SetName(settingsObj["name"].toString());
+
+        QJsonArray wavesArray = settingsObj["waves"].toArray();
+        for(int i = 0; i < wavesArray.size(); ++i)
+        {
+            QJsonObject waveObj = wavesArray[i].toObject();
+            
+            HyGuiWave *pNewWave = m_pManager->CreateWave(GetId(),
+                                                         JSONOBJ_TOINT(waveObj, "checksum"),
+                                                         waveObj["name"].toString(),
+                                                         waveObj["formatType"].toInt(),
+                                                         waveObj["numChannels"].toInt(),
+                                                         waveObj["bitsPerSample"].toInt(),
+                                                         waveObj["samplesPerSec"].toInt(),
+                                                         waveObj["errors"].toInt(0));
+
+            if(QFile::exists(m_MetaDir.absoluteFilePath(pNewWave->ConstructWaveFileName())) == false)
+                pNewWave->SetError(GUIFRAMEERROR_CannotFindMetaImg);
+            else
+                pNewWave->ClearError(GUIFRAMEERROR_CannotFindMetaImg);
+
+            m_pModel->AddWave(pNewWave);
+        }
+    }
 
 }
 
@@ -48,6 +89,11 @@ WidgetAudioBank::~WidgetAudioBank()
 QString WidgetAudioBank::GetName()
 {
     return m_pModel->GetName();
+}
+
+void WidgetAudioBank::SetName(QString sName)
+{
+    m_pModel->SetName(sName);
 }
 
 int WidgetAudioBank::GetId()

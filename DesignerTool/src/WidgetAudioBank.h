@@ -40,6 +40,8 @@ public:
     ~WidgetAudioBank();
     
     QString GetName();
+    void SetName(QString sName);
+    
     int GetId();
 
 private slots:
