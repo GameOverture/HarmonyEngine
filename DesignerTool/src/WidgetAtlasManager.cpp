@@ -451,26 +451,9 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
         return;
     }
     
-    bool bGroupAlreadyExists = false;
-//    for(int i = 0; i < ui->atlasGroups->count(); ++i)
-//    {
-//        if(static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->IsMatching(newMetaAtlasDir, newDataAtlasDir))
-//        {
-//            //static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->Reload();
-            
-//            bGroupAlreadyExists = true;
-//            break;
-//        }
-//    }
-    
-    if(bGroupAlreadyExists == false)
-    {
-        WidgetAtlasGroup *pNewAtlas = new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this, this);
-        ui->atlasGroups->setCurrentIndex(ui->atlasGroups->addWidget(pNewAtlas));
-        
-//        ui->cmbAtlasGroups->addItem(pNewAtlas->GetName(), QVariant(pNewAtlas->GetId()));
-        ui->cmbAtlasGroups->setCurrentIndex(ui->atlasGroups->currentIndex());
-    }
+    WidgetAtlasGroup *pNewAtlas = new WidgetAtlasGroup(newMetaAtlasDir, newDataAtlasDir, this, this);
+    ui->atlasGroups->setCurrentIndex(ui->atlasGroups->addWidget(pNewAtlas));
+    ui->cmbAtlasGroups->setCurrentIndex(ui->atlasGroups->currentIndex());
 }
 
 void WidgetAtlasManager::PreviewAtlasGroup()

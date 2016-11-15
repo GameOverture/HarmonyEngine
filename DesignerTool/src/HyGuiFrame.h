@@ -15,6 +15,7 @@
 
 #include <QWidget>
 #include <QSet>
+#include <QJsonObject>
 
 class HyGuiFrame
 {
@@ -74,6 +75,8 @@ public:
     void UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX, int iY);
 
     QString ConstructImageFileName();
+
+    void GetJsonObj(QJsonObject &frameObj);
 
     void SetError(eGuiFrameError eError);
     void ClearError(eGuiFrameError eError);

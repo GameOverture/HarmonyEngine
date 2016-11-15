@@ -1,0 +1,55 @@
+{
+    "name": "Unnamed",
+    "waves": [
+        {
+            "bitsPerSample": 16,
+            "checksum": 802475687,
+            "dataSize": -842150451,
+            "errors": 0,
+            "formatType": 1,
+            "name": "0802475687-Speech Sleep",
+            "numChannels": 2,
+            "samplesPerSec": 44100
+        },
+        {
+            "bitsPerSample": 16,
+            "checksum": 1018216554,
+            "dataSize": -842150451,
+            "errors": 0,
+            "formatType": 1,
+            "name": "1018216554-Speech Disambiguation",
+            "numChannels": 2,
+            "samplesPerSec": 44100
+        },
+        {
+            "bitsPerSample": 16,
+            "checksum": 1213779946,
+            "dataSize": -842150451,
+            "errors": 0,
+            "formatType": 1,
+            "name": "1213779946-Speech On",
+            "numChannels": 2,
+            "samplesPerSec": 44100
+        },
+        {
+            "bitsPerSample": 16,
+            "checksum": 2739490205,
+            "dataSize": -842150451,
+            "errors": 0,
+            "formatType": 1,
+            "name": "2739490205-Speech Off",
+            "numChannels": 2,
+            "samplesPerSec": 44100
+        },
+        {
+            "bitsPerSample": 16,
+            "checksum": 4120636942,
+            "dataSize": -842150451,
+            "errors": 0,
+            "formatType": 1,
+            "name": "4120636942-Speech Misrecognition",
+            "numChannels": 2,
+            "samplesPerSec": 44100
+        }
+    ]
+}

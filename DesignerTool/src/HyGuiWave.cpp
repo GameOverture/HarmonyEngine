@@ -24,6 +24,11 @@ HyGuiWave::~HyGuiWave()
 {
 }
 
+quint32 HyGuiWave::GetChecksum()
+{
+    return m_uiChecksum;
+}
+
 QString HyGuiWave::GetName()
 {
     return m_sName;
@@ -69,6 +74,18 @@ QString HyGuiWave::GetDescription()
     }
     
     return sDesc;
+}
+
+void HyGuiWave::GetJsonObj(QJsonObject &waveObj)
+{
+    waveObj.insert("checksum", QJsonValue(static_cast<qint64>(m_uiChecksum)));
+    waveObj.insert("name", m_sName);
+    waveObj.insert("formatType", m_uiFormatType);
+    waveObj.insert("numChannels", m_uiNumChannels);
+    waveObj.insert("bitsPerSample", m_uiBitsPerSample);
+    waveObj.insert("samplesPerSec", QJsonValue(static_cast<int>(m_uiSamplesPerSec)));
+    waveObj.insert("dataSize", QJsonValue(static_cast<int>(m_uiDataSize)));
+    waveObj.insert("errors", QJsonValue(static_cast<int>(m_uiErrors)));
 }
 
 void HyGuiWave::SetError(eGuiFrameError eError)

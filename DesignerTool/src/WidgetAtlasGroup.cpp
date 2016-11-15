@@ -375,21 +375,7 @@ void WidgetAtlasGroup::Refresh()
                                     imgInfoRef.pos.y() + m_Packer.border.t);
 
         QJsonObject frameObj;
-        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pFrame->GetChecksum())));
-        frameObj.insert("name", QJsonValue(pFrame->GetName()));
-        frameObj.insert("width", QJsonValue(pFrame->GetSize().width()));
-        frameObj.insert("height", QJsonValue(pFrame->GetSize().height()));
-        frameObj.insert("textureIndex", QJsonValue(pFrame->GetTextureIndex()));
-        frameObj.insert("type", QJsonValue(pFrame->GetType()));
-        frameObj.insert("rotate", QJsonValue(pFrame->IsRotated()));
-        frameObj.insert("x", QJsonValue(pFrame->GetX()));
-        frameObj.insert("y", QJsonValue(pFrame->GetY()));
-        frameObj.insert("cropLeft", QJsonValue(pFrame->GetCrop().left()));
-        frameObj.insert("cropTop", QJsonValue(pFrame->GetCrop().top()));
-        frameObj.insert("cropRight", QJsonValue(pFrame->GetCrop().right()));
-        frameObj.insert("cropBottom", QJsonValue(pFrame->GetCrop().bottom()));
-        frameObj.insert("errors", QJsonValue(static_cast<int>(pFrame->GetErrors())));
-
+        pFrame->GetJsonObj(frameObj);
         frameArray.append(QJsonValue(frameObj));
 
         CreateTreeItem(NULL, pFrame);

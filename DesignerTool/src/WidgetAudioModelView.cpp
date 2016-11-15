@@ -12,11 +12,23 @@
 #include "WidgetAudioManager.h"
 
 #include <QJsonDocument>
+#include <QJsonObject>
 #include <QLineEdit>
 #include <QJsonArray>
 
-WidgetAudioBankModel::WidgetAudioBankModel(QObject *pParent) : QAbstractTableModel(pParent)
+WidgetAudioBankModel::WidgetAudioBankModel(QObject *pParent) :  QAbstractTableModel(pParent),
+                                                                m_sName("Unnamed")
 {
+}
+
+QString WidgetAudioBankModel::GetName()
+{
+    return m_sName;
+}
+
+void WidgetAudioBankModel::SetName(QString sName)
+{
+    m_sName = sName;
 }
 
 void WidgetAudioBankModel::AddWave(HyGuiWave *pNewWave)
@@ -31,9 +43,18 @@ HyGuiWave *WidgetAudioBankModel::GetWaveAt(int iIndex)
     return m_WaveList[iIndex];
 }
 
-void WidgetAudioBankModel::GetSettingsObj(QJsonObject &settingsObj)
+void WidgetAudioBankModel::GetJsonObj(QJsonObject &audioBankObj)
 {
-todo
+    audioBankObj.insert("name", QJsonValue(m_sName));
+
+    QJsonArray waveArray;
+    for(int i = 0; i < m_WaveList.size(); ++i)
+    {
+        QJsonObject waveObj;
+        m_WaveList[i]->GetJsonObj(waveObj);
+        waveArray.append(waveObj);
+    }
+    audioBankObj.insert("waves", waveArray);
 }
 
 /*virtual*/ int WidgetAudioBankModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const

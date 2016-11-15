@@ -65,6 +65,8 @@ class WidgetAudioBankModel : public QAbstractTableModel
 {
     Q_OBJECT
     
+    QString                     m_sName;
+
     QList<HyGuiWave *>          m_WaveList;
     
     enum eColumns
@@ -78,11 +80,14 @@ class WidgetAudioBankModel : public QAbstractTableModel
     
 public:
     WidgetAudioBankModel(QObject *pParent);
+
+    QString GetName();
+    void SetName(QString sName);
     
     void AddWave(HyGuiWave *pNewWave);
     HyGuiWave *GetWaveAt(int iIndex);
 
-    void GetSettingsObj(QJsonObject &settingsObj);
+    void GetJsonObj(QJsonObject &audioBankObj);
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;

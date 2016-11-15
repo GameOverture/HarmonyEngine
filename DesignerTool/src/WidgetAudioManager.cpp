@@ -146,26 +146,9 @@ void WidgetAudioManager::AddAudioBankGroup(int iId /*= -1*/)
         return;
     }
 
-    bool bAudioBankAlreadyExists = false;
-//    for(int i = 0; i < ui->waveBanks->count(); ++i)
-//    {
-//        if(static_cast<WidgetAudioBank *>(ui->waveBanks->widget(i))->IsMatching(newMetaAudioBankDir, newDataAudioBankDir))
-//        {
-//            bAudioBankAlreadyExists = true;
-//            break;
-//        }
-//    }
-    
-    if(bAudioBankAlreadyExists == false)
-    {
-        WidgetAudioBank *pNewAudioBank = new WidgetAudioBank(newMetaAudioBankDir, m_DataDir, this, this);
-        int iTest = ui->audioBanks->count();
-        ui->audioBanks->setCurrentIndex(ui->audioBanks->addWidget(pNewAudioBank));
-        
-        iTest = ui->audioBanks->count();
-        
-        ui->cmbAudioBanks->setCurrentIndex(ui->audioBanks->currentIndex());
-    }
+    WidgetAudioBank *pNewAudioBank = new WidgetAudioBank(newMetaAudioBankDir, m_DataDir, this, this);
+    ui->audioBanks->setCurrentIndex(ui->audioBanks->addWidget(pNewAudioBank));
+    ui->cmbAudioBanks->setCurrentIndex(ui->audioBanks->currentIndex());
 }
 
 void WidgetAudioManager::on_cmbAudioBanks_currentIndexChanged(int index)

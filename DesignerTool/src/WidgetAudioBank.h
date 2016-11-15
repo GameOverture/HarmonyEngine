@@ -32,8 +32,6 @@ class WidgetAudioBank : public QWidget
     QDir                        m_MetaDir;
     QDir                        m_DataDir;
     
-    QString                     m_sName;
-    
     WidgetAudioBankModel *      m_pModel;
 
 public:

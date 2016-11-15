@@ -141,6 +141,24 @@ QString HyGuiFrame::ConstructImageFileName()
     return sMetaImgName;
 }
 
+void HyGuiFrame::GetJsonObj(QJsonObject &frameObj)
+{
+    frameObj.insert("checksum", QJsonValue(static_cast<qint64>(GetChecksum())));
+    frameObj.insert("name", QJsonValue(GetName()));
+    frameObj.insert("width", QJsonValue(GetSize().width()));
+    frameObj.insert("height", QJsonValue(GetSize().height()));
+    frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));
+    frameObj.insert("type", QJsonValue(GetType()));
+    frameObj.insert("rotate", QJsonValue(IsRotated()));
+    frameObj.insert("x", QJsonValue(GetX()));
+    frameObj.insert("y", QJsonValue(GetY()));
+    frameObj.insert("cropLeft", QJsonValue(GetCrop().left()));
+    frameObj.insert("cropTop", QJsonValue(GetCrop().top()));
+    frameObj.insert("cropRight", QJsonValue(GetCrop().right()));
+    frameObj.insert("cropBottom", QJsonValue(GetCrop().bottom()));
+    frameObj.insert("errors", QJsonValue(static_cast<int>(GetErrors())));
+}
+
 void HyGuiFrame::SetError(eGuiFrameError eError)
 {
     m_uiErrors |= (1 << eError);

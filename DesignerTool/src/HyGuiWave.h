@@ -13,6 +13,7 @@
 #include "ItemWidget.h"
 
 #include <QWidget>
+#include <QJsonObject>
 
 class HyGuiWave
 {
@@ -37,6 +38,7 @@ class HyGuiWave
     ~HyGuiWave();
     
 public:
+    quint32 GetChecksum();
     QString GetName();
     
     QString ConstructWaveFileName();
@@ -46,6 +48,8 @@ public:
     QString GetDescription();
     
     static bool ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksumOut, QString &sNameOut, uint16 &uiFormatTagOut, uint16 &uiNumChannelsOut, uint16 &uiBitsPerSampleOut, uint32 &uiSamplesPerSecOut);
+
+    void GetJsonObj(QJsonObject &waveObj);
 
     void SetError(eGuiFrameError eError);
     void ClearError(eGuiFrameError eError);

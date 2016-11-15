@@ -30,13 +30,14 @@ WidgetAudioBank::WidgetAudioBank(QDir metaDir, QDir dataDir, WidgetAudioManager 
                                                                                                                         ui(new Ui::WidgetAudioBank),
                                                                                                                         m_pManager(pManager),
                                                                                                                         m_MetaDir(metaDir),
-                                                                                                                        m_DataDir(dataDir),
-                                                                                                                        m_sName("Unnamed")
+                                                                                                                        m_DataDir(dataDir)
 {
     ui->setupUi(this);
     
     m_pModel = new WidgetAudioBankModel(this);
     ui->waveTable->setModel(m_pModel);
+
+
 }
 
 WidgetAudioBank::~WidgetAudioBank()
@@ -46,7 +47,7 @@ WidgetAudioBank::~WidgetAudioBank()
 
 QString WidgetAudioBank::GetName()
 {
-    return m_sName;
+    return m_pModel->GetName();
 }
 
 int WidgetAudioBank::GetId()
@@ -670,7 +671,7 @@ void WidgetAudioBank::Refresh()
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // WRITE SETTINGS FILE TO AUDIO META DIR
     QJsonObject settingsObj;
-    m_pModel->GetSettingsObj(settingsObj);
+    m_pModel->GetJsonObj(settingsObj);
 
     QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
     if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
