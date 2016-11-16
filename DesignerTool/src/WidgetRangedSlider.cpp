@@ -80,13 +80,16 @@ void WidgetRangedSlider::SetValue(int iMin, int iMax)
         SetValue(static_cast<double>(iMin), static_cast<double>(iMax));
         return;
     }
+
+    ui->minSlider->blockSignals(true);
+
 }
 
 void WidgetRangedSlider::SetValue(double dMin, double dMax)
 {
     if(ui->stackedSpinBoxes->currentIndex() == TYPE_INT)
     {
-        SetValue(static_cast<double>(iMin), static_cast<double>(iMax));
+        SetValue(static_cast<int>(dMin), static_cast<int>(dMax));
         return;
     }
 }
