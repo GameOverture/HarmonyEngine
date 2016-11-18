@@ -10,7 +10,7 @@
 #include "HyGuiRenderer.h"
 
 #include <QTimer>
-//#include <QGLFormat>
+#include <QSurfaceFormat>
 #include <QDir>
 
 #include "HyGlobal.h"
@@ -28,6 +28,13 @@ HyGuiRenderer::HyGuiRenderer(ItemProject *pProj, QWidget *parent /*= 0*/) : QOpe
                                                                             m_pHyEngine(NULL),
                                                                             m_bIsUpdating(false)
 {
+    QSurfaceFormat format;
+    format.setRenderableType(QSurfaceFormat::OpenGL);
+    format.setProfile(QSurfaceFormat::CoreProfile);// QSurfaceFormat::CompatibilityProfile);
+    format.setVersion(3,3);
+
+    setFormat(format);
+
     m_pTimer = new QTimer(this);
     connect(m_pTimer, SIGNAL(timeout()), this, SLOT(update()));
     m_pTimer->start(10);
@@ -46,8 +53,6 @@ HyGuiRenderer::~HyGuiRenderer()
     delete m_pHyEngine;
     m_pHyEngine = NULL;
     m_bIsUpdating = false;
-    
-    doneCurrent();
 }
 
 HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
@@ -60,11 +65,28 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
 
 /*virtual*/ void HyGuiRenderer::initializeGL()
 {
-    //    QGLFormat format;
-    //    format.setVersion(4, 2);
-    //    format.setProfile(QGLFormat::CoreProfile);
-    //    format.setSampleBuffers(true);
-    //    setFormat(format);
+    initializeOpenGLFunctions();
+
+    QString glType;
+      QString glVersion;
+      QString glProfile;
+
+      // Get Version Information
+      glType = (context()->isOpenGLES()) ? "OpenGL ES" : "OpenGL";
+      glVersion = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+
+      // Get Profile Information
+    #define CASE(c) case QSurfaceFormat::c: glProfile = #c; break
+      switch (format().profile())
+      {
+        CASE(NoProfile);
+        CASE(CoreProfile);
+        CASE(CompatibilityProfile);
+      }
+    #undef CASE
+
+      // qPrintable() will print our QString w/o quotes around it.
+      //qDebug() << qPrintable(glType) << qPrintable(glVersion) << "(" << qPrintable(glProfile) << ")";
 
     if(m_pProjOwner)
         m_pHyEngine = new HyEngine(*m_pProjOwner);

@@ -312,6 +312,7 @@ bool HyOpenGL::Initialize()
 	//////////////////////////////////////////////////////////////////////////
 	// Init GLEW
 	//////////////////////////////////////////////////////////////////////////
+#ifndef HY_PLATFORM_GUI
 	GLenum err = glewInit();
 
 	if(err != GLEW_OK)
@@ -321,20 +322,23 @@ bool HyOpenGL::Initialize()
 		//szErrorStr = gluErrorString(eError);
 		HyError("OpenGL Error: " << eError/* << std::endl << szErrorStr*/);
 	}
+#endif
 
 	//const GLubyte *pExtStr = glGetString(GL_EXTENSIONS);
 	//WriteTextFile("GLExtensions.txt", glGetString(GL_EXTENSIONS));
 
+	char szTempBuff[1024];
 	//if (glewIsSupported("GL_VERSION_3_3"))
 	//	printf("Ready for OpenGL 3.3\n");
 	//else {
 	//	printf("OpenGL 3.3 not supported\n");
 	//	exit(1);
 	//}
-	//printf ("Vendor: %s\n", glGetString (GL_VENDOR));
-	//printf ("Renderer: %s\n", glGetString (GL_RENDERER));
-	//printf ("Version: %s\n", glGetString (GL_VERSION));
-	//printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
+	sprintf(szTempBuff, "Vendor: %s\n", glGetString (GL_VENDOR));
+	sprintf(szTempBuff, "Renderer: %s\n", glGetString (GL_RENDERER));
+	sprintf(szTempBuff, "Version: %s\n", glGetString (GL_VERSION));
+
+	sprintf (szTempBuff, "GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
 
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

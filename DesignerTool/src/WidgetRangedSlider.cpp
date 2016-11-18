@@ -169,52 +169,44 @@ void WidgetRangedSlider::OnDataCorrect()
 
 void WidgetRangedSlider::on_sbMin_Double_editingFinished()
 {
-    QVariant oldMin, oldMax, newMin, newMax;
-    
-    oldMin = QVariant(m_dPrevMin);
-    oldMax = QVariant(m_dPrevMax);
+    QVariant oldMin(m_dPrevMin);
+    QVariant oldMax(m_dPrevMax);
     OnDataCorrect();
-    newMin = QVariant(ui->sbMin_Double->value());
-    newMax = QVariant(ui->sbMax_Double->value());
+    QVariant newMin(ui->sbMin_Double->value());
+    QVariant newMax(ui->sbMax_Double->value());
     
     emit userChangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_sbMax_Double_editingFinished()
-{
-    QVariant oldMin, oldMax, newMin, newMax;
-    
-    oldMin = QVariant(m_dPrevMin);
-    oldMax = QVariant(m_dPrevMax);
+{    
+    QVariant oldMin(m_dPrevMin);
+    QVariant oldMax(m_dPrevMax);
     OnDataCorrect();
-    newMin = QVariant(ui->sbMin_Double->value());
-    newMax = QVariant(ui->sbMax_Double->value());
+    QVariant newMin(ui->sbMin_Double->value());
+    QVariant newMax(ui->sbMax_Double->value());
     
     emit userChangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_sbMin_Int_editingFinished()
-{
-    QVariant oldMin, oldMax, newMin, newMax;
-    
-    oldMin = QVariant(m_iPrevMin);
-    oldMax = QVariant(m_iPrevMax);
+{    
+    QVariant oldMin(m_iPrevMin);
+    QVariant oldMax(m_iPrevMax);
     OnDataCorrect();
-    newMin = QVariant(ui->sbMin_Int->value());
-    newMax = QVariant(ui->sbMax_Int->value());
+    QVariant newMin(ui->sbMin_Int->value());
+    QVariant newMax(ui->sbMax_Int->value());
     
     emit userChangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_sbMax_Int_editingFinished()
 {
-    QVariant oldMin, oldMax, newMin, newMax;
-    
-    oldMin = QVariant(m_iPrevMin);
-    oldMax = QVariant(m_iPrevMax);
+    QVariant oldMin(m_iPrevMin);
+    QVariant oldMax(m_iPrevMax);
     OnDataCorrect();
-    newMin = QVariant(ui->sbMin_Int->value());
-    newMax = QVariant(ui->sbMax_Int->value());
+    QVariant newMin(ui->sbMin_Int->value());
+    QVariant newMax(ui->sbMax_Int->value());
     
     emit userChangedValue(oldMin, oldMax, newMin, newMax);
 }

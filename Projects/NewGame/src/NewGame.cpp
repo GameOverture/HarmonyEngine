@@ -14,9 +14,9 @@ NewGame::~NewGame()
 }
 
 const char *szCUSTOM_VERTEXSHADER = "									\n\
-#version 400																\n\
+#version 130																\n\
 																			\n\
-layout(location = 0) in vec4 position;										\n\
+/*layout(location = 0)*/ in vec4 position;										\n\
 																			\n\
 out vec2 coordinate;															\n\
 																			\n\
@@ -36,7 +36,7 @@ void main()																	\n\
 
 
 const char *szCUSTOM_FRAGMENTSHADER = "								\n\
-#version 400																		\n\
+#version 130																		\n\
 																					\n\
 in vec2 coordinate;																	\n\
 out vec4 FragColor;																	\n\

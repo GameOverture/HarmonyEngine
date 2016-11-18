@@ -13,27 +13,27 @@
 #include "Afx/HyStdAfx.h"
 
 const char * const szHYQUADBATCH_VERTEXSHADER = "							\n\
-#version 420																\n\
+#version 130																\n\
 																			\n\
-layout(location = 0) in vec2 size;											\n\
-layout(location = 1) in vec2 offset;										\n\
-layout(location = 2) in vec4 topTint;										\n\
-layout(location = 3) in vec4 botTint;										\n\
-layout(location = 4) in float textureIndex;									\n\
-layout(location = 5) in vec2 UVcoord0;										\n\
-layout(location = 6) in vec2 UVcoord1;										\n\
-layout(location = 7) in vec2 UVcoord2;										\n\
-layout(location = 8) in vec2 UVcoord3;										\n\
-layout(location = 9) in mat4 mtxLocalToWorld;								\n\
+/*layout(location = 0)*/ in vec2 size;											\n\
+/*layout(location = 1)*/ in vec2 offset;										\n\
+/*layout(location = 2)*/ in vec4 topTint;										\n\
+/*layout(location = 3)*/ in vec4 botTint;										\n\
+/*layout(location = 4)*/ in float textureIndex;									\n\
+/*layout(location = 5)*/ in vec2 UVcoord0;										\n\
+/*layout(location = 6)*/ in vec2 UVcoord1;										\n\
+/*layout(location = 7)*/ in vec2 UVcoord2;										\n\
+/*layout(location = 8)*/ in vec2 UVcoord3;										\n\
+/*layout(location = 9)*/ in mat4 mtxLocalToWorld;								\n\
 																			\n\
-smooth out vec2 interpUV;													\n\
-smooth out vec4 interpColor;												\n\
-flat out float texIndex;													\n\
+/*smooth*/ out vec2 interpUV;													\n\
+/*smooth*/ out vec4 interpColor;												\n\
+/*flat*/ out float texIndex;													\n\
 																			\n\
 uniform mat4 mtxCameraToClip;												\n\
 uniform mat4 mtxWorldToCamera;												\n\
 																			\n\
-const vec2 position[] = vec2[4](											\n\
+/*const*/ vec2 position[] = vec2[4](											\n\
 	vec2(1.0f, 1.0f),														\n\
 	vec2(0.0f, 1.0f),														\n\
 	vec2(1.0f, 0.0f),														\n\
@@ -82,11 +82,12 @@ void main()																	\n\
 }";
 
 const char * const szHYQUADBATCH_FRAGMENTSHADER = "							\n\
-#version 420																\n\
+#version 130																\n\
+#extension GL_EXT_texture_array : enable									\n\
 																			\n\
-smooth in vec2 interpUV;													\n\
-smooth in vec4 interpColor;													\n\
-flat in float texIndex;														\n\
+/*smooth*/ in vec2 interpUV;													\n\
+/*smooth*/ in vec4 interpColor;													\n\
+/*flat*/ in float texIndex;														\n\
 																			\n\
 uniform sampler2DArray Tex;													\n\
 																			\n\
@@ -101,9 +102,9 @@ void main()																	\n\
 }";
 
 const char * const szHYPRIMATIVE_VERTEXSHADER = "							\n\
-#version 420																\n\
+#version 130																\n\
 																			\n\
-layout(location = 0) in vec4 position;										\n\
+/*layout(location = 0)*/ in vec4 position;										\n\
 																			\n\
 out vec4 Color;																\n\
 																			\n\
@@ -123,7 +124,7 @@ void main()																	\n\
 }";
 
 const char * const szHYPRIMATIVE_FRAGMENTSHADER = "							\n\
-#version 420																\n\
+#version 130																\n\
 																			\n\
 in vec4 Color;																\n\
 out vec4 FragColor;															\n\

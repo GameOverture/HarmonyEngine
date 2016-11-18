@@ -50,7 +50,7 @@ public:
     QVariant GetMax();
     
 signals:
-    void userChangedValue(QVariant oldMin, QVariant oldMax, QVariant newMin, QVariant newMax);
+    void userChangedValue(QVariant &oldMin, QVariant &oldMax, QVariant &newMin, QVariant &newMax);
     
 private slots:
     void on_sbMin_Double_editingFinished();
