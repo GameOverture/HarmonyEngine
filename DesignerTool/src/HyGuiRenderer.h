@@ -18,7 +18,7 @@
 
 class ItemProject;
 
-class HyGuiRenderer : public QOpenGLWidget, protected QOpenGLFunctions
+class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
 {
     Q_OBJECT
 
