@@ -26,9 +26,19 @@ WidgetRangedSlider::~WidgetRangedSlider()
     delete ui;
 }
 
+void WidgetRangedSlider::SetAsRangedSlider(bool bEnable)
+{
+    ui->stackedWidget->setCurrentIndex(bEnable ? SLIDERTYPE_Ranged : SLIDERTYPE_Single);
+}
+
 bool WidgetRangedSlider::IsIntType()
 {
     return ui->stackedSpinBoxes->currentIndex() == TYPE_INT;
+}
+
+bool WidgetRangedSlider::IsRangedType()
+{
+    return ui->stackedWidget->currentIndex() == SLIDERTYPE_Ranged;
 }
 
 QString WidgetRangedSlider::GetTitle()
@@ -44,12 +54,16 @@ void WidgetRangedSlider::SetTitle(QString sTitle)
 void WidgetRangedSlider::SetRange(int iMin, int iMax)
 {
     ui->stackedSpinBoxes->setCurrentIndex(TYPE_INT);
+    ui->stackedSingleSpinBoxes->setCurrentIndex(TYPE_INT);
     
     ui->minSlider->setRange(iMin, iMax);
     ui->maxSlider->setRange(iMin, iMax);
     
     ui->sbMin_Int->setRange(iMin, iMax);
     ui->sbMax_Int->setRange(iMin, iMax);
+    
+    ui->singleSlider->setRange(iMin, iMax);
+    ui->sbSingle_Int->setRange(iMin, iMax);
     
     OnDataCorrect();
 }
@@ -63,11 +77,15 @@ void WidgetRangedSlider::SetRange(double dMin, double dMax, int iNumDecimalPreci
     }
     
     ui->stackedSpinBoxes->setCurrentIndex(TYPE_DOUBLE);
+    ui->stackedSingleSpinBoxes->setCurrentIndex(TYPE_DOUBLE);
     
     ui->sbMin_Double->setRange(dMin, dMax);
     ui->sbMin_Double->setDecimals(iNumDecimalPrecision);
     ui->sbMax_Double->setRange(dMin, dMax);
     ui->sbMax_Double->setDecimals(iNumDecimalPrecision);
+    
+    ui->sbSingle_Double->setRange(dMin, dMax);
+    ui->sbSingle_Double->setDecimals(iNumDecimalPrecision);
     
     // Convert double to int for sliders
     for(int i = 0; i < iNumDecimalPrecision; ++i)
@@ -81,6 +99,8 @@ void WidgetRangedSlider::SetRange(double dMin, double dMax, int iNumDecimalPreci
     
     ui->minSlider->setRange(iSliderMin, iSliderMax);
     ui->maxSlider->setRange(iSliderMin, iSliderMax);
+    
+    ui->singleSlider->setRange(iSliderMin, iSliderMax);
     
     OnDataCorrect();
 }
@@ -96,6 +116,8 @@ void WidgetRangedSlider::SetValue(int iMin, int iMax)
     ui->sbMin_Int->setValue(iMin);
     ui->sbMax_Int->setValue(iMax);
     
+    ui->sbSingle_Int->setValue(iMax);
+    
     OnDataCorrect();
 }
 
@@ -110,10 +132,12 @@ void WidgetRangedSlider::SetValue(double dMin, double dMax)
     ui->sbMin_Double->setValue(dMin);
     ui->sbMax_Double->setValue(dMax);
     
+    ui->sbSingle_Double->setValue(dMax);
+    
     OnDataCorrect();
 }
 
-QVariant WidgetRangedSlider::GetMin()
+QVariant WidgetRangedSlider::GetRangedValueMin()
 {
     if(ui->stackedSpinBoxes->currentIndex() == TYPE_INT)
         return QVariant(ui->sbMin_Int->value());
@@ -121,7 +145,7 @@ QVariant WidgetRangedSlider::GetMin()
         return QVariant(ui->sbMin_Double->value());
 }
 
-QVariant WidgetRangedSlider::GetMax()
+QVariant WidgetRangedSlider::GetRangedValueMax()
 {
     if(ui->stackedSpinBoxes->currentIndex() == TYPE_INT)
         return QVariant(ui->sbMax_Int->value());
@@ -129,9 +153,23 @@ QVariant WidgetRangedSlider::GetMax()
         return QVariant(ui->sbMax_Double->value());
 }
 
+QVariant WidgetRangedSlider::GetSingleValue()
+{
+    if(ui->stackedSingleSpinBoxes->currentIndex() == TYPE_INT)
+        return QVariant(ui->sbSingle_Int->value());
+    else
+        return QVariant(ui->sbSingle_Double->value());
+}
+
 void WidgetRangedSlider::OnDataCorrect()
 {
-    if(ui->stackedSpinBoxes->currentIndex() == TYPE_INT)
+    eType curType;
+    if(ui->stackedWidget->currentIndex() == SLIDERTYPE_Ranged)
+        curType = ui->stackedSpinBoxes->currentIndex();
+    else
+        curType = ui->stackedSingleSpinBoxes->currentIndex();
+    
+    if(curType == TYPE_INT)
     {
         if(ui->sbMin_Int->value() > ui->sbMax_Int->value())
             ui->sbMin_Int->setValue(ui->sbMax_Int->value());
@@ -141,8 +179,12 @@ void WidgetRangedSlider::OnDataCorrect()
         ui->minSlider->setValue(ui->sbMin_Int->value());
         ui->maxSlider->setValue(ui->sbMax_Int->value());
         
+        ui->singleSlider->setValue(ui->sbSingle_Int->value());
+        
         m_iPrevMin = ui->sbMin_Int->value();
         m_iPrevMax = ui->sbMax_Int->value();
+        
+        m_iPrevSingle = ui->sbSingle_Int->value();
     }
     else
     {
@@ -158,12 +200,20 @@ void WidgetRangedSlider::OnDataCorrect()
         double dMaxValue = ui->sbMax_Double->value();
         for(int i = 0; i < ui->sbMax_Double->decimals(); ++i)
             dMaxValue *= 10.0f;
+        
+        double dSingleValue = ui->sbSingle_Double->value();
+        for(int i = 0; i < ui->sbSingle_Double->decimals(); ++i)
+            dSingleValue *= 10.0f;
 
         ui->minSlider->setValue(static_cast<int>(dMinValue));
         ui->maxSlider->setValue(static_cast<int>(dMaxValue));
         
+        ui->singleSlider->setValue(static_cast<int>(dSingleValue));
+        
         m_dPrevMin = ui->sbMin_Double->value();
         m_dPrevMax = ui->sbMax_Double->value();
+        
+        m_dPrevSingle = ui->sbSingle_Double->value();
     }
 }
 
@@ -175,7 +225,7 @@ void WidgetRangedSlider::on_sbMin_Double_editingFinished()
     QVariant newMin(ui->sbMin_Double->value());
     QVariant newMax(ui->sbMax_Double->value());
     
-    emit userChangedValue(oldMin, oldMax, newMin, newMax);
+    emit userChangedRangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_sbMax_Double_editingFinished()
@@ -186,7 +236,7 @@ void WidgetRangedSlider::on_sbMax_Double_editingFinished()
     QVariant newMin(ui->sbMin_Double->value());
     QVariant newMax(ui->sbMax_Double->value());
     
-    emit userChangedValue(oldMin, oldMax, newMin, newMax);
+    emit userChangedRangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_sbMin_Int_editingFinished()
@@ -197,7 +247,7 @@ void WidgetRangedSlider::on_sbMin_Int_editingFinished()
     QVariant newMin(ui->sbMin_Int->value());
     QVariant newMax(ui->sbMax_Int->value());
     
-    emit userChangedValue(oldMin, oldMax, newMin, newMax);
+    emit userChangedRangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_sbMax_Int_editingFinished()
@@ -208,7 +258,7 @@ void WidgetRangedSlider::on_sbMax_Int_editingFinished()
     QVariant newMin(ui->sbMin_Int->value());
     QVariant newMax(ui->sbMax_Int->value());
     
-    emit userChangedValue(oldMin, oldMax, newMin, newMax);
+    emit userChangedRangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_maxSlider_sliderMoved(int position)
@@ -242,7 +292,7 @@ void WidgetRangedSlider::on_maxSlider_sliderMoved(int position)
         newMax = QVariant(ui->sbMax_Double->value());
     }
     
-    emit userChangedValue(oldMin, oldMax, newMin, newMax);
+    emit userChangedRangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_minSlider_sliderMoved(int position)
@@ -276,5 +326,52 @@ void WidgetRangedSlider::on_minSlider_sliderMoved(int position)
         newMax = QVariant(ui->sbMax_Double->value());
     }
     
-    emit userChangedValue(oldMin, oldMax, newMin, newMax);
+    emit userChangedRangedValue(oldMin, oldMax, newMin, newMax);
+}
+
+void WidgetRangedSlider::on_sbSingle_Int_editingFinished()
+{
+    QVariant oldValue(m_iPrevSingle);
+    OnDataCorrect();
+    QVariant newValue(ui->sbSingle_Int->value());
+    
+    emit userChangedSingleValue(oldValue, newValue);
+}
+
+void WidgetRangedSlider::on_sbSingle_Double_editingFinished()
+{
+    QVariant oldValue(m_dPrevSingle);
+    OnDataCorrect();
+    QVariant newValue(ui->sbSingle_Double->value());
+    
+    emit userChangedSingleValue(oldValue, newValue);
+}
+
+void WidgetRangedSlider::on_singleSlider_sliderMoved(int position)
+{
+    QVariant oldValue, newValue;
+    
+    if(ui->stackedSingleSpinBoxes->currentIndex() == TYPE_INT)
+    {
+        oldValue = QVariant(m_iPrevSingle);
+        
+        ui->sbMax_Int->setValue(ui->maxSlider->value());
+        OnDataCorrect();
+        newValue = QVariant(ui->sbSingle_Int->value());
+    }
+    else
+    {
+        oldValue = QVariant(m_dPrevSingle);
+        
+        double dValue = ui->singleSlider->value();
+        for(int i = 0; i < ui->sbSingle_Double->decimals(); ++i)
+            dValue /= 10.0f;
+        
+        ui->sbSingle_Double->setValue(dValue);
+        OnDataCorrect();
+        
+        newValue = QVariant(ui->sbSingle_Double->value());
+    }
+    
+    emit userChangedSingleValue(oldValue, newValue);
 }
