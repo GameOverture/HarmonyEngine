@@ -20,17 +20,17 @@ WidgetAudio::WidgetAudio(ItemAudio *pOwner, QWidget *parent) :  QWidget(parent),
                                                                 m_pItemAudio(pOwner)
 {
     ui->setupUi(this);
-    \
+    
     ui->btnAddState->setDefaultAction(ui->actionAddState);
     ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
     ui->btnRenameState->setDefaultAction(ui->actionRenameState);
     ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
     ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
 
-//    m_StateActionsList.push_back(ui->actionImportFrames);
-//    m_StateActionsList.push_back(ui->actionRemoveFrames);
-//    m_StateActionsList.push_back(ui->actionOrderFrameUpwards);
-//    m_StateActionsList.push_back(ui->actionOrderFrameDownwards);
+    m_StateActionsList.push_back(ui->actionImportWaves);
+    m_StateActionsList.push_back(ui->actionRemoveWave);
+    m_StateActionsList.push_back(ui->actionOrderWaveUpwards);
+    m_StateActionsList.push_back(ui->actionOrderWaveDownwards);
 
     ui->cmbStates->clear();
 }

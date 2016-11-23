@@ -247,6 +247,9 @@
    <property name="text">
     <string>Import &amp;Frames</string>
    </property>
+   <property name="toolTip">
+    <string>Import the selected frames from the Atlas Manager</string>
+   </property>
   </action>
   <action name="actionRemoveFrames">
    <property name="icon">
@@ -255,6 +258,9 @@
    </property>
    <property name="text">
     <string>Remove Frames</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes the selected frame</string>
    </property>
    <property name="shortcut">
     <string>Del, Backspace</string>

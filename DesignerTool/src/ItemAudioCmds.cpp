@@ -10,6 +10,8 @@
 #include "ItemAudioCmds.h"
 #include "HyGlobal.h"
 
+#include "WidgetAudioState.h"
+
 ItemAudioCmd_AddState::ItemAudioCmd_AddState(WidgetAudio *pOwner, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
                                                                                                                                                          m_pComboBox(pCmb),
                                                                                                                                                          m_pAudioState(new WidgetAudioState(pOwner, stateActionList))

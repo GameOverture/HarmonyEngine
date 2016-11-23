@@ -165,9 +165,9 @@ void WidgetRangedSlider::OnDataCorrect()
 {
     eType curType;
     if(ui->stackedWidget->currentIndex() == SLIDERTYPE_Ranged)
-        curType = ui->stackedSpinBoxes->currentIndex();
+        curType = static_cast<eType>(ui->stackedSpinBoxes->currentIndex());
     else
-        curType = ui->stackedSingleSpinBoxes->currentIndex();
+        curType = static_cast<eType>(ui->stackedSingleSpinBoxes->currentIndex());
     
     if(curType == TYPE_INT)
     {
