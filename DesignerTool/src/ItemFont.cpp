@@ -59,7 +59,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
     m_DrawAtlasOutline.Load();
 
     m_DividerLine.SetAsQuad(10000.0f, 10.0f, false);
-    m_DividerLine.pos.Set(-5000.0f, -5.0f);
+    m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetResolution().y / 2 - 5.0f);
     m_DividerLine.SetTint(0.0f, 0.0f, 0.0f);
     m_DividerLine.SetCoordinateType(HYCOORDTYPE_Screen, NULL);
     m_DividerLine.Load();
@@ -107,6 +107,8 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef) :  Item
 {
     WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
     texture_atlas_t *pAtlas = pWidget->GetAtlas();
+
+    m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetResolution().y / 2 - 5.0f);
     
     if(pAtlas == NULL)
         return;

@@ -22,14 +22,29 @@ class WidgetAudio : public QWidget
 {
     Q_OBJECT
     
-    ItemAudio *     m_pItemAudio;
+    ItemAudio *             m_pItemAudio;
+
+    QList<QAction *>        m_StateActionsList;
     
 public:
     explicit WidgetAudio(ItemAudio *pOwner, QWidget *parent = 0);
     ~WidgetAudio();
     
+private slots:
+    void on_actionAddState_triggered();
+
+    void on_actionRemoveState_triggered();
+
+    void on_actionRenameState_triggered();
+
+    void on_actionOrderStateBackwards_triggered();
+
+    void on_actionOrderStateForwards_triggered();
+
 private:
     Ui::WidgetAudio *ui;
+
+    void UpdateActions();
 };
 
 #endif // WIDGETAUDIO_H

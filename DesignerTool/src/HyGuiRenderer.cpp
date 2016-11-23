@@ -28,12 +28,12 @@ HyGuiRenderer::HyGuiRenderer(ItemProject *pProj, QWidget *parent /*= 0*/) : QOpe
                                                                             m_pHyEngine(NULL),
                                                                             m_bIsUpdating(false)
 {
-    QSurfaceFormat format;
-    format.setRenderableType(QSurfaceFormat::OpenGL);
-    format.setProfile(QSurfaceFormat::CoreProfile);// QSurfaceFormat::CompatibilityProfile);
-    format.setVersion(3,3);
+//    QSurfaceFormat format;
+//    format.setRenderableType(QSurfaceFormat::OpenGL);
+//    format.setProfile(QSurfaceFormat::CoreProfile);// QSurfaceFormat::CompatibilityProfile);
+//    format.setVersion(3,3);
 
-    setFormat(format);
+//    setFormat(format);
 
     m_pTimer = new QTimer(this);
     connect(m_pTimer, SIGNAL(timeout()), this, SLOT(update()));
