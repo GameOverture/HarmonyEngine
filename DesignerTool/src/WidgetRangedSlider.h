@@ -49,9 +49,6 @@ public:
     bool IsIntType();
     bool IsRangedType();
     
-    QString GetTitle();
-    void SetTitle(QString sTitle);
-    
     void SetRange(int iMin, int iMax);
     void SetRange(double dMin, double dMax, int iNumDecimalPrecision);
     

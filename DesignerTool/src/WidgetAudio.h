@@ -11,6 +11,7 @@
 #define WIDGETAUDIO_H
 
 #include "ItemAudio.h"
+#include "WidgetAudioState.h"
 
 #include <QWidget>
 
@@ -23,6 +24,7 @@ class WidgetAudio : public QWidget
     Q_OBJECT
     
     ItemAudio *             m_pItemAudio;
+    WidgetAudioState *      m_pCurAudioState;
 
     QList<QAction *>        m_StateActionsList;
     
@@ -40,6 +42,8 @@ private slots:
     void on_actionOrderStateBackwards_triggered();
 
     void on_actionOrderStateForwards_triggered();
+
+    void on_cmbStates_currentIndexChanged(int index);
 
 private:
     Ui::WidgetAudio *ui;

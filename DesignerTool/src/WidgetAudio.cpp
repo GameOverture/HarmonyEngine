@@ -17,7 +17,8 @@
 
 WidgetAudio::WidgetAudio(ItemAudio *pOwner, QWidget *parent) :  QWidget(parent),
                                                                 ui(new Ui::WidgetAudio),
-                                                                m_pItemAudio(pOwner)
+                                                                m_pItemAudio(pOwner),
+                                                                m_pCurAudioState(NULL)
 {
     ui->setupUi(this);
     
@@ -86,6 +87,23 @@ void WidgetAudio::on_actionOrderStateForwards_triggered()
 {
     QUndoCommand *pCmd = new ItemAudioCmd_MoveStateForward(ui->cmbStates);
     m_pItemAudio->GetUndoStack()->push(pCmd);
+
+    UpdateActions();
+}
+
+void WidgetAudio::on_cmbStates_currentIndexChanged(int index)
+{
+    WidgetAudioState *pAudioState = ui->cmbStates->itemData(index).value<WidgetAudioState *>();
+    if(m_pCurAudioState == pAudioState)
+        return;
+
+    if(m_pCurAudioState)
+        m_pCurAudioState->hide();
+
+    ui->grpStateLayout->addWidget(pAudioState);
+
+    m_pCurAudioState = pAudioState;
+    m_pCurAudioState->show();
 
     UpdateActions();
 }

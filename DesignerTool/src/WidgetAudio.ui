@@ -162,6 +162,7 @@
      <property name="title">
       <string>Audio State Info</string>
      </property>
+     <layout class="QVBoxLayout" name="grpStateLayout"/>
     </widget>
    </item>
   </layout>

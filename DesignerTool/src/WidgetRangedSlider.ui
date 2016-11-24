@@ -6,14 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>73</width>
-    <height>493</height>
+    <width>106</width>
+    <height>415</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -27,22 +30,12 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLabel" name="lblTitle">
-     <property name="text">
-      <string>Title</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
       <number>0</number>
      </property>
      <widget class="QWidget" name="page">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -70,7 +63,7 @@
           <number>0</number>
          </property>
          <widget class="QWidget" name="intPage">
-          <layout class="QVBoxLayout" name="verticalLayout">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
            <property name="spacing">
             <number>0</number>
            </property>
@@ -86,6 +79,22 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
+           <item>
+            <widget class="QSpinBox" name="sbMin_Int">
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="buttonSymbols">
+              <enum>QAbstractSpinBox::NoButtons</enum>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="prefix">
+              <string/>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QSpinBox" name="sbMax_Int">
              <property name="alignment">
@@ -105,23 +114,10 @@
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QSpinBox" name="sbMin_Int">
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-             <property name="buttonSymbols">
-              <enum>QAbstractSpinBox::NoButtons</enum>
-             </property>
-             <property name="suffix">
-              <string/>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
          <widget class="QWidget" name="doublePage">
-          <layout class="QVBoxLayout" name="verticalLayout_2">
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
            <property name="spacing">
             <number>0</number>
            </property>
@@ -138,6 +134,19 @@
             <number>0</number>
            </property>
            <item>
+            <widget class="QDoubleSpinBox" name="sbMin_Double">
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="buttonSymbols">
+              <enum>QAbstractSpinBox::NoButtons</enum>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QDoubleSpinBox" name="sbMax_Double">
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -147,19 +156,6 @@
              </property>
              <property name="prefix">
               <string/>
-             </property>
-             <property name="suffix">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QDoubleSpinBox" name="sbMin_Double">
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-             <property name="buttonSymbols">
-              <enum>QAbstractSpinBox::NoButtons</enum>
              </property>
              <property name="suffix">
               <string/>
@@ -189,16 +185,6 @@
           </spacer>
          </item>
          <item>
-          <widget class="QSlider" name="maxSlider">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="tickPosition">
-            <enum>QSlider::TicksBelow</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QSlider" name="minSlider">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -208,6 +194,16 @@
            </property>
            <property name="invertedControls">
             <bool>false</bool>
+           </property>
+           <property name="tickPosition">
+            <enum>QSlider::TicksBelow</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSlider" name="maxSlider">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
            </property>
            <property name="tickPosition">
             <enum>QSlider::TicksAbove</enum>
@@ -257,7 +253,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="intPage_Single">
           <layout class="QVBoxLayout" name="verticalLayout_5">

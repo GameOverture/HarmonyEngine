@@ -41,16 +41,6 @@ bool WidgetRangedSlider::IsRangedType()
     return ui->stackedWidget->currentIndex() == SLIDERTYPE_Ranged;
 }
 
-QString WidgetRangedSlider::GetTitle()
-{
-    return ui->lblTitle->text();
-}
-
-void WidgetRangedSlider::SetTitle(QString sTitle)
-{
-    ui->lblTitle->setText(sTitle);
-}
-
 void WidgetRangedSlider::SetRange(int iMin, int iMax)
 {
     ui->stackedSpinBoxes->setCurrentIndex(TYPE_INT);
