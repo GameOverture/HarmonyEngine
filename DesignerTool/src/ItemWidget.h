@@ -17,6 +17,7 @@
 #include <QUndoStack>
 
 class WidgetAtlasManager;
+class WidgetAudioManager;
 class ItemProject;
 
 class ItemWidget : public Item
@@ -42,6 +43,7 @@ class ItemWidget : public Item
 
 protected:
     WidgetAtlasManager &m_AtlasManRef;
+    WidgetAudioManager &m_AudioManRef;
 
     QWidget *           m_pWidget;
     QMenu *             m_pEditMenu;
@@ -66,7 +68,7 @@ protected:
     virtual void OnSave() = 0;
 
 public:
-    ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager &AtlasManRef);
+    ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager &AtlasManRef, WidgetAudioManager &AudioManRef);
     virtual ~ItemWidget();
 
     bool IsLoaded() const                           { return (m_pCamera != NULL); }
@@ -76,6 +78,7 @@ public:
     QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
 
     WidgetAtlasManager &GetAtlasManager()           { return m_AtlasManRef; }
+    WidgetAudioManager &GetAudioManager()           { return m_AudioManRef; }
     ItemProject *GetItemProject();
     
     virtual QList<QAction *> GetActionsForToolBar() = 0;

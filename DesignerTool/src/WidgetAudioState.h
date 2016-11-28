@@ -32,6 +32,8 @@ public:
     QString GetName();
     void SetName(QString sName);
     
+private slots:
+    
 private:
     Ui::WidgetAudioState *ui;
 };

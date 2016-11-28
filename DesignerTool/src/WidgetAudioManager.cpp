@@ -118,6 +118,10 @@ HyGuiWave *WidgetAudioManager::CreateWave(uint uiWaveBankId, quint32 uiChecksum,
     return pNewWave;
 }
 
+WidgetAudioCategoryModel *WidgetAudioManager::GetCategoryModel()
+{
+    return m_pCategoryModel;
+}
 
 void WidgetAudioManager::AddAudioBankGroup(int iId /*= -1*/)
 {

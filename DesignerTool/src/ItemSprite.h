@@ -48,7 +48,7 @@ class ItemSprite : public ItemWidget
     HyPrimitive2d               m_primOriginVert;
     
 public:
-    ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef);
+    ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef);
     virtual ~ItemSprite();
     
     virtual QList<QAction *> GetActionsForToolBar();

@@ -32,6 +32,8 @@ public:
     explicit WidgetAudio(ItemAudio *pOwner, QWidget *parent = 0);
     ~WidgetAudio();
     
+    ItemAudio *GetItemAudio();
+    
 private slots:
     void on_actionAddState_triggered();
 

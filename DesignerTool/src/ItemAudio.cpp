@@ -10,7 +10,7 @@
 #include "ItemAudio.h"
 #include "WidgetAudio.h"
 
-ItemAudio::ItemAudio(const QString sPath, WidgetAtlasManager &atlasManRef) : ItemWidget(ITEM_Audio, sPath, atlasManRef)
+ItemAudio::ItemAudio(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Audio, sPath, atlasManRef, audioManRef)
 {
     
 }

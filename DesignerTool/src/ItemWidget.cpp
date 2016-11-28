@@ -10,15 +10,17 @@
 #include "ItemWidget.h"
 #include "MainWindow.h"
 #include "WidgetAtlasManager.h"
+#include "WidgetAudioManager.h"
 
 #include <QMenu>
 
-ItemWidget::ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager &AtlasManRef) : Item(eType, sPath),
-                                                                                                m_AtlasManRef(AtlasManRef),
-                                                                                                m_pWidget(NULL),
-                                                                                                m_pEditMenu(NULL),
-                                                                                                m_pCamera(NULL),
-                                                                                                m_bReloadDraw(false)
+ItemWidget::ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager &AtlasManRef, WidgetAudioManager &AudioManRef) :    Item(eType, sPath),
+                                                                                                                                    m_AtlasManRef(AtlasManRef),
+                                                                                                                                    m_AudioManRef(AudioManRef),
+                                                                                                                                    m_pWidget(NULL),
+                                                                                                                                    m_pEditMenu(NULL),
+                                                                                                                                    m_pCamera(NULL),
+                                                                                                                                    m_bReloadDraw(false)
 {
     switch(m_eTYPE)
     {

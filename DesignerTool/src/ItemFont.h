@@ -26,7 +26,7 @@ class ItemFont : public ItemWidget
     
     
 public:
-    ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef);
+    ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef);
     virtual ~ItemFont();
     
     virtual QList<QAction *> GetActionsForToolBar();

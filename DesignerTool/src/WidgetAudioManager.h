@@ -42,6 +42,8 @@ public:
     ~WidgetAudioManager();
     
     HyGuiWave *CreateWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint32 uiErrors);
+    
+    WidgetAudioCategoryModel *GetCategoryModel();
 
 private slots:
     void on_cmbAudioBanks_currentIndexChanged(int index);

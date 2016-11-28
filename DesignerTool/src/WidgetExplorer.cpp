@@ -99,13 +99,13 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
         pItem = new Item(eNewItemType, sNewItemPath);
         break;
     case ITEM_Audio:
-        pItem = new ItemAudio(sNewItemPath, pCurProj->GetAtlasManager());
+        pItem = new ItemAudio(sNewItemPath, pCurProj->GetAtlasManager(), pCurProj->GetAudioManager());
         break;
     case ITEM_Sprite:
-        pItem = new ItemSprite(sNewItemPath, pCurProj->GetAtlasManager());
+        pItem = new ItemSprite(sNewItemPath, pCurProj->GetAtlasManager(), pCurProj->GetAudioManager());
         break;
     case ITEM_Font:
-        pItem = new ItemFont(sNewItemPath, pCurProj->GetAtlasManager());
+        pItem = new ItemFont(sNewItemPath, pCurProj->GetAtlasManager(), pCurProj->GetAudioManager());
         break;
     default:
         HyGuiLog("Item: " % sNewItemPath % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);

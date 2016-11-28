@@ -41,6 +41,11 @@ WidgetAudio::~WidgetAudio()
     delete ui;
 }
 
+ItemAudio *WidgetAudio::GetItemAudio()
+{
+    return m_pItemAudio;
+}
+
 void WidgetAudio::UpdateActions()
 {
     ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);

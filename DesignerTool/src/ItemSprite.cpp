@@ -16,7 +16,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef) : ItemWidget(ITEM_Sprite, sPath, atlasManRef)
+ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Sprite, sPath, atlasManRef, audioManRef)
 {
     glm::vec2 vLinePts[2];
     
