@@ -25,6 +25,9 @@ class WidgetAudioState : public QWidget
     WidgetAudio *                       m_pOwner;
     QString                             m_sName;
     
+    int                                 m_iPrevCategoryIndex;
+    int                                 m_iPrevPlayTypeIndex;
+    
 public:
     explicit WidgetAudioState(WidgetAudio *pOwner, QList<QAction *> stateActionList, QWidget *parent = 0);
     ~WidgetAudioState();
@@ -32,7 +35,17 @@ public:
     QString GetName();
     void SetName(QString sName);
     
+    void UpdateActions();
+    
 private slots:
+    
+    void on_cmbCategory_currentIndexChanged(int index);
+    
+    void on_chkLimitInst_clicked();
+    
+    void on_chkLooping_clicked();
+    
+    void on_cmbPlayType_currentIndexChanged(int index);
     
 private:
     Ui::WidgetAudioState *ui;

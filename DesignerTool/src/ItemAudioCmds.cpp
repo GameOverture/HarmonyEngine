@@ -208,3 +208,109 @@ void ItemAudioCmd_MoveStateForward::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+ItemAudioCmd_CategoryChanged::ItemAudioCmd_CategoryChanged(WidgetAudioState &widgetAudioState, QComboBox *pCmb, int iPrevIndex, int iNewIndex, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                                m_WidgetAudioStateRef(widgetAudioState),
+                                                                                                                                                                                m_pCmbCategory(pCmb),
+                                                                                                                                                                                m_iPrevIndex(iPrevIndex),
+                                                                                                                                                                                m_iNewIndex(iNewIndex)
+{
+    setText("Audio Category");
+    
+    m_sPrev = m_pCmbCategory->itemText(m_iPrevIndex);
+    m_sNew = m_pCmbCategory->itemText(m_iNewIndex);
+}
+
+/*virtual*/ ItemAudioCmd_CategoryChanged::~ItemAudioCmd_CategoryChanged()
+{
+}
+
+void ItemAudioCmd_CategoryChanged::redo()
+{
+    if(m_pCmbCategory->itemText(m_iNewIndex).compare(m_sNew, Qt::CaseInsensitive) != 0)
+    {
+        HyGuiLog(m_sNew % " no longer exists when Redo'ing audio category", LOGTYPE_Warning);
+        return;
+    }
+    
+    m_pCmbCategory->blockSignals(true);
+    m_pCmbCategory->setCurrentIndex(m_iNewIndex);
+    m_pCmbCategory->blockSignals(false);
+    
+    m_WidgetAudioStateRef.UpdateActions();
+}
+
+void ItemAudioCmd_CategoryChanged::undo()
+{
+    if(m_pCmbCategory->itemText(m_iPrevIndex).compare(m_sPrev, Qt::CaseInsensitive) != 0)
+    {
+        HyGuiLog(m_sPrev % " no longer exists when Undo'ing audio category", LOGTYPE_Warning);
+        return;
+    }
+    
+    m_pCmbCategory->blockSignals(true);
+    m_pCmbCategory->setCurrentIndex(m_iPrevIndex);
+    m_pCmbCategory->blockSignals(false);
+    
+    m_WidgetAudioStateRef.UpdateActions();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemAudioCmd_CheckBox::ItemAudioCmd_CheckBox(WidgetAudioState &widgetAudioState, QCheckBox *pCheckBox, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                        m_WidgetAudioStateRef(widgetAudioState),
+                                                                                                                                        m_pCheckBox(pCheckBox)
+{
+    m_bInitialValue = m_pCheckBox->isChecked();
+    setText((m_bInitialValue ? "Checked " : "Unchecked ") % m_pCheckBox->text());
+}
+
+/*virtual*/ ItemAudioCmd_CheckBox::~ItemAudioCmd_CheckBox()
+{
+}
+
+void ItemAudioCmd_CheckBox::redo()
+{
+    m_pCheckBox->setChecked(m_bInitialValue);
+    
+    m_WidgetAudioStateRef.UpdateActions();
+}
+
+void ItemAudioCmd_CheckBox::undo()
+{
+    m_pCheckBox->setChecked(!m_bInitialValue);
+    
+    m_WidgetAudioStateRef.UpdateActions();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemAudioCmd_PlayTypeChanged::ItemAudioCmd_PlayTypeChanged(WidgetAudioState &widgetAudioState, QComboBox *pCmb, int iPrevIndex, int iNewIndex, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                                m_WidgetAudioStateRef(widgetAudioState),
+                                                                                                                                                                                m_pCmbCategory(pCmb),
+                                                                                                                                                                                m_iPrevIndex(iPrevIndex),
+                                                                                                                                                                                m_iNewIndex(iNewIndex)
+{
+    setText("Play Type");
+}
+
+/*virtual*/ ItemAudioCmd_PlayTypeChanged::~ItemAudioCmd_PlayTypeChanged()
+{
+}
+
+void ItemAudioCmd_PlayTypeChanged::redo()
+{
+    m_pCmbCategory->blockSignals(true);
+    m_pCmbCategory->setCurrentIndex(m_iNewIndex);
+    m_pCmbCategory->blockSignals(false);
+    
+    m_WidgetAudioStateRef.UpdateActions();
+}
+
+void ItemAudioCmd_PlayTypeChanged::undo()
+{
+    m_pCmbCategory->blockSignals(true);
+    m_pCmbCategory->setCurrentIndex(m_iPrevIndex);
+    m_pCmbCategory->blockSignals(false);
+    
+    m_WidgetAudioStateRef.UpdateActions();
+}

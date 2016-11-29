@@ -15,6 +15,8 @@
 #include "WidgetAudio.h"
 #include "WidgetAudioManager.h"
 
+#include "ItemAudioCmds.h"
+
 WidgetAudioState::WidgetAudioState(WidgetAudio *pOwner, QList<QAction *> stateActionList, QWidget *parent) :    QWidget(parent),
                                                                                                                 ui(new Ui::WidgetAudioState),
                                                                                                                 m_pOwner(pOwner),
@@ -28,6 +30,9 @@ WidgetAudioState::WidgetAudioState(WidgetAudio *pOwner, QList<QAction *> stateAc
     ui->btnOrderWaveDown->setDefaultAction(FindAction(stateActionList, "actionOrderWaveDownwards"));
     
     ui->cmbCategory->setModel(m_pOwner->GetItemAudio()->GetAudioManager().GetCategoryModel());
+    
+    m_iPrevCategoryIndex = ui->cmbCategory->currentIndex();
+    m_iPrevPlayTypeIndex = ui->cmbPlayType->currentIndex();
 }
 
 WidgetAudioState::~WidgetAudioState()
@@ -43,4 +48,39 @@ QString WidgetAudioState::GetName()
 void WidgetAudioState::SetName(QString sName)
 {
     m_sName = sName;
+}
+
+void WidgetAudioState::UpdateActions()
+{
+    ui->sbInstMax->setEnabled(ui->chkLimitInst->isChecked());
+    ui->radInstFail->setEnabled(ui->chkLimitInst->isChecked());
+    ui->radInstQueue->setEnabled(ui->chkLimitInst->isChecked());
+}
+
+void WidgetAudioState::on_cmbCategory_currentIndexChanged(int index)
+{
+    ItemAudioCmd_CategoryChanged *pCmd = new ItemAudioCmd_CategoryChanged(*this, ui->cmbCategory, m_iPrevCategoryIndex, index);
+    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+    
+    m_iPrevCategoryIndex = index;
+}
+
+void WidgetAudioState::on_chkLimitInst_clicked()
+{
+    ItemAudioCmd_CheckBox *pCmd = new ItemAudioCmd_CheckBox(*this, ui->chkLimitInst);
+    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+}
+
+void WidgetAudioState::on_chkLooping_clicked()
+{
+    ItemAudioCmd_CheckBox *pCmd = new ItemAudioCmd_CheckBox(*this, ui->chkLooping);
+    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+}
+
+void WidgetAudioState::on_cmbPlayType_currentIndexChanged(int index)
+{
+    ItemAudioCmd_PlayTypeChanged *pCmd = new ItemAudioCmd_PlayTypeChanged(*this, ui->cmbPlayType, m_iPrevPlayTypeIndex, index);
+    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+    
+    m_iPrevPlayTypeIndex = index;
 }

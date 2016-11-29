@@ -38,6 +38,7 @@ ItemAudio::ItemAudio(const QString sPath, WidgetAtlasManager &atlasManRef, Widge
 
 /*virtual*/ void ItemAudio::OnUnload(IHyApplication &hyApp)
 {
+    delete m_pWidget;
 }
 
 /*virtual*/ void ItemAudio::OnDraw_Show(IHyApplication &hyApp)

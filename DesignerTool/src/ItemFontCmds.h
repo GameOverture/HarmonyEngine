@@ -33,6 +33,9 @@ class ItemFontCmd_AtlasGroupChanged : public QUndoCommand
     int                 m_iPrevIndex;
     int                 m_iNewIndex;
     
+    QString             m_sPrev;
+    QString             m_sNew;
+    
 public:
     ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetFont, QComboBox *pCmb, int iPrevIndex, int iNewIndex, QUndoCommand *pParent = 0);
     virtual ~ItemFontCmd_AtlasGroupChanged();

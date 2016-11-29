@@ -15,6 +15,9 @@
 
 #include "ItemAudioCmds.h"
 
+#include <QJsonDocument>
+#include <QJsonObject>
+
 WidgetAudio::WidgetAudio(ItemAudio *pOwner, QWidget *parent) :  QWidget(parent),
                                                                 ui(new Ui::WidgetAudio),
                                                                 m_pItemAudio(pOwner),
@@ -34,6 +37,30 @@ WidgetAudio::WidgetAudio(ItemAudio *pOwner, QWidget *parent) :  QWidget(parent),
     m_StateActionsList.push_back(ui->actionOrderWaveDownwards);
 
     ui->cmbStates->clear();
+    
+    
+    
+    // If a .hyaud file exists, parse and initalize with it, otherwise make default empty audio
+    QFile audioFile(m_pItemAudio->GetAbsPath());
+    if(audioFile.exists())
+    {
+        if(!audioFile.open(QIODevice::ReadOnly))
+            HyGuiLog(QString("WidgetAudio::WidgetAudio() could not open ") % m_pItemAudio->GetAbsPath(), LOGTYPE_Error);
+
+        QJsonDocument fontJsonDoc = QJsonDocument::fromJson(audioFile.readAll());
+        audioFile.close();
+
+        QJsonObject fontObj = fontJsonDoc.object();
+    }
+    else
+    {
+        on_actionAddState_triggered();
+    }
+    
+    // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
+    m_pItemAudio->GetUndoStack()->clear();
+
+    UpdateActions();
 }
 
 WidgetAudio::~WidgetAudio()
@@ -105,10 +132,13 @@ void WidgetAudio::on_cmbStates_currentIndexChanged(int index)
     if(m_pCurAudioState)
         m_pCurAudioState->hide();
 
-    ui->grpStateLayout->addWidget(pAudioState);
-
-    m_pCurAudioState = pAudioState;
-    m_pCurAudioState->show();
+    if(pAudioState)
+    {
+        ui->grpStateLayout->addWidget(pAudioState);
+    
+        m_pCurAudioState = pAudioState;
+        m_pCurAudioState->show();
+    }
 
     UpdateActions();
 }

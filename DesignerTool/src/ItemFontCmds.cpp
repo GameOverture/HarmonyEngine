@@ -19,6 +19,9 @@ ItemFontCmd_AtlasGroupChanged::ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetF
                                                                                                                                                                         m_pCmbAtlasGroups(pCmb)
 {
     setText("Atlas Group Changed");
+    
+    m_sPrev = m_pCmbAtlasGroups->itemText(m_iPrevIndex);
+    m_sNew = m_pCmbAtlasGroups->itemText(m_iNewIndex);
 }
 
 /*virtual*/ ItemFontCmd_AtlasGroupChanged::~ItemFontCmd_AtlasGroupChanged()
@@ -27,6 +30,12 @@ ItemFontCmd_AtlasGroupChanged::ItemFontCmd_AtlasGroupChanged(WidgetFont &widgetF
 
 void ItemFontCmd_AtlasGroupChanged::redo()
 {
+    if(m_pCmbAtlasGroups->itemText(m_iNewIndex).compare(m_sNew, Qt::CaseInsensitive) != 0)
+    {
+        HyGuiLog(m_sNew % " no longer exists when Redo'ing atlas group", LOGTYPE_Warning);
+        return;
+    }
+    
     m_pCmbAtlasGroups->blockSignals(true);
     m_pCmbAtlasGroups->setCurrentIndex(m_iNewIndex);
     m_pCmbAtlasGroups->blockSignals(false);
@@ -40,6 +49,12 @@ void ItemFontCmd_AtlasGroupChanged::redo()
 
 void ItemFontCmd_AtlasGroupChanged::undo()
 {
+    if(m_pCmbAtlasGroups->itemText(m_iPrevIndex).compare(m_sPrev, Qt::CaseInsensitive) != 0)
+    {
+        HyGuiLog(m_sPrev % " no longer exists when Undo'ing atlas group", LOGTYPE_Warning);
+        return;
+    }
+    
     m_pCmbAtlasGroups->blockSignals(true);
     m_pCmbAtlasGroups->setCurrentIndex(m_iPrevIndex);
     m_pCmbAtlasGroups->blockSignals(false);

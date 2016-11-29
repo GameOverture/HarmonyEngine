@@ -85,7 +85,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QSpinBox" name="sbMaxInst">
+       <widget class="QSpinBox" name="sbInstMax">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -163,13 +163,33 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox">
+      <widget class="QComboBox" name="cmbPlayType">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <item>
+        <property name="text">
+         <string>Ordered</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Shuffle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Random</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Random (no repeats)</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>

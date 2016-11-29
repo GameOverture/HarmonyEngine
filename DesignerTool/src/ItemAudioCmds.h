@@ -12,6 +12,7 @@
 
 #include <QUndoCommand>
 #include <QComboBox>
+#include <QCheckBox>
 
 class WidgetAudio;
 class WidgetAudioState;
@@ -88,5 +89,58 @@ public:
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemAudioCmd_CategoryChanged : public QUndoCommand
+{
+    WidgetAudioState &  m_WidgetAudioStateRef;
+
+    QComboBox *         m_pCmbCategory;
+    int                 m_iPrevIndex;
+    int                 m_iNewIndex;
+    
+    QString             m_sPrev;
+    QString             m_sNew;
+    
+public:
+    ItemAudioCmd_CategoryChanged(WidgetAudioState &widgetAudioState, QComboBox *pCmb, int iPrevIndex, int iNewIndex, QUndoCommand *pParent = 0);
+    virtual ~ItemAudioCmd_CategoryChanged();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemAudioCmd_CheckBox : public QUndoCommand
+{
+    WidgetAudioState &  m_WidgetAudioStateRef;
+    QCheckBox *         m_pCheckBox;
+    bool                m_bInitialValue;
+
+public:
+    ItemAudioCmd_CheckBox(WidgetAudioState &widgetFont, QCheckBox *pCheckBox, QUndoCommand *pParent = 0);
+    virtual ~ItemAudioCmd_CheckBox();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemAudioCmd_PlayTypeChanged : public QUndoCommand
+{
+    WidgetAudioState &  m_WidgetAudioStateRef;
+
+    QComboBox *         m_pCmbCategory;
+    int                 m_iPrevIndex;
+    int                 m_iNewIndex;
+    
+public:
+    ItemAudioCmd_PlayTypeChanged(WidgetAudioState &widgetAudioState, QComboBox *pCmb, int iPrevIndex, int iNewIndex, QUndoCommand *pParent = 0);
+    virtual ~ItemAudioCmd_PlayTypeChanged();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+
 
 #endif // ITEMAUDIOCMDS_H
