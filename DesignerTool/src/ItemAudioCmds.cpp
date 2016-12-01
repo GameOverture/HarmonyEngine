@@ -314,3 +314,108 @@ void ItemAudioCmd_PlayTypeChanged::undo()
     
     m_WidgetAudioStateRef.UpdateActions();
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemAudioCmd_NumInstChanged::ItemAudioCmd_NumInstChanged(QComboBox *pCmbStates, QSpinBox *pSbSize, int iPrevSize, int iNewSize, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                                                                    m_pCmbStates(pCmbStates),
+                                                                                                                                                                    m_pSbNumInst(pSbSize),
+                                                                                                                                                                    m_pAudioState(m_pCmbStates->currentData().value<WidgetAudioState *>()),
+                                                                                                                                                                    m_iPrevSize(iPrevSize),
+                                                                                                                                                                    m_iNewSize(iNewSize)
+{
+    setText("Number of Instances");
+}
+
+/*virtual*/ ItemAudioCmd_NumInstChanged::~ItemAudioCmd_NumInstChanged()
+{
+}
+
+void ItemAudioCmd_NumInstChanged::redo()
+{
+    m_pSbNumInst->blockSignals(true);
+    m_pSbNumInst->setValue(m_iNewSize);
+    m_pSbNumInst->blockSignals(false);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetAudioState *>() == m_pAudioState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+}
+
+void ItemAudioCmd_NumInstChanged::undo()
+{
+    m_pSbNumInst->blockSignals(true);
+    m_pSbNumInst->setValue(m_iPrevSize);
+    m_pSbNumInst->blockSignals(false);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetAudioState *>() == m_pAudioState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ItemAudioCmd_RadioToggle::ItemAudioCmd_RadioToggle(QComboBox *pCmbStates, QRadioButton *pNewRadBtnToggle, QRadioButton *pPrevRadBtnToggle, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                            m_pCmbStates(pCmbStates),
+                                                                                                                                                                            m_pAudioState(m_pCmbStates->currentData().value<WidgetAudioState *>()),
+                                                                                                                                                                            m_pNewRadBtnToggle(pNewRadBtnToggle),
+                                                                                                                                                                            m_pPrevRadBtnToggle(pPrevRadBtnToggle)
+{
+    setText("Instance Limit Behavior");
+}
+
+/*virtual*/ ItemAudioCmd_RadioToggle::~ItemAudioCmd_RadioToggle()
+{
+}
+
+void ItemAudioCmd_RadioToggle::redo()
+{
+    m_pNewRadBtnToggle->blockSignals(true);
+    m_pPrevRadBtnToggle->blockSignals(true);
+    
+    m_pNewRadBtnToggle->setChecked(true);
+    m_pPrevRadBtnToggle->setChecked(false);
+    
+    m_pNewRadBtnToggle->blockSignals(false);
+    m_pPrevRadBtnToggle->blockSignals(false);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetAudioState *>() == m_pAudioState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+}
+
+void ItemAudioCmd_RadioToggle::undo()
+{
+    m_pNewRadBtnToggle->blockSignals(true);
+    m_pPrevRadBtnToggle->blockSignals(true);
+    
+    m_pNewRadBtnToggle->setChecked(false);
+    m_pPrevRadBtnToggle->setChecked(true);
+    
+    m_pNewRadBtnToggle->blockSignals(false);
+    m_pPrevRadBtnToggle->blockSignals(false);
+    
+    for(int i = 0; i < m_pCmbStates->count(); ++i)
+    {
+        if(m_pCmbStates->itemData(i).value<WidgetAudioState *>() == m_pAudioState)
+        {
+            m_pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+}

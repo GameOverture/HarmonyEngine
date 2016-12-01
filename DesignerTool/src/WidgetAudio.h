@@ -34,6 +34,8 @@ public:
     
     ItemAudio *GetItemAudio();
     
+    QComboBox *GetCmbStates();
+    
 private slots:
     void on_actionAddState_triggered();
 

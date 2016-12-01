@@ -73,6 +73,11 @@ ItemAudio *WidgetAudio::GetItemAudio()
     return m_pItemAudio;
 }
 
+QComboBox *WidgetAudio::GetCmbStates()
+{
+    return ui->cmbStates;
+}
+
 void WidgetAudio::UpdateActions()
 {
     ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);

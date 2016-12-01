@@ -13,6 +13,8 @@
 #include <QUndoCommand>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QSpinBox>
+#include <QRadioButton>
 
 class WidgetAudio;
 class WidgetAudioState;
@@ -137,6 +139,39 @@ class ItemAudioCmd_PlayTypeChanged : public QUndoCommand
 public:
     ItemAudioCmd_PlayTypeChanged(WidgetAudioState &widgetAudioState, QComboBox *pCmb, int iPrevIndex, int iNewIndex, QUndoCommand *pParent = 0);
     virtual ~ItemAudioCmd_PlayTypeChanged();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemAudioCmd_NumInstChanged : public QUndoCommand
+{
+    QComboBox *         m_pCmbStates;
+    QSpinBox *          m_pSbNumInst;
+    WidgetAudioState *  m_pAudioState;
+    int                 m_iPrevSize;
+    int                 m_iNewSize;
+
+public:
+    ItemAudioCmd_NumInstChanged(QComboBox *pCmbStates, QSpinBox *pSbNumInst, int iPrevSize, int iNewSize, QUndoCommand *pParent = 0);
+    virtual ~ItemAudioCmd_NumInstChanged();
+
+    void redo() Q_DECL_OVERRIDE;
+    void undo() Q_DECL_OVERRIDE;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ItemAudioCmd_RadioToggle : public QUndoCommand
+{
+    QComboBox *         m_pCmbStates;
+    WidgetAudioState *  m_pAudioState;
+    QRadioButton *      m_pNewRadBtnToggle;
+    QRadioButton *      m_pPrevRadBtnToggle;
+    
+public:
+    ItemAudioCmd_RadioToggle(QComboBox *pCmbStates, QRadioButton *pNewRadBtnToggle, QRadioButton *pPrevRadBtnToggle, QUndoCommand *pParent = 0);
+    virtual ~ItemAudioCmd_RadioToggle();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;

@@ -33,6 +33,7 @@ WidgetAudioState::WidgetAudioState(WidgetAudio *pOwner, QList<QAction *> stateAc
     
     m_iPrevCategoryIndex = ui->cmbCategory->currentIndex();
     m_iPrevPlayTypeIndex = ui->cmbPlayType->currentIndex();
+    m_iPrevNumInst = ui->sbInstMax->value();
 }
 
 WidgetAudioState::~WidgetAudioState()
@@ -83,4 +84,27 @@ void WidgetAudioState::on_cmbPlayType_currentIndexChanged(int index)
     m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
     
     m_iPrevPlayTypeIndex = index;
+}
+
+void WidgetAudioState::on_sbInstMax_editingFinished()
+{
+    if(m_iPrevNumInst == ui->sbInstMax->value())
+        return;
+    
+    ItemAudioCmd_NumInstChanged *pCmd = new ItemAudioCmd_NumInstChanged(m_pOwner->GetCmbStates(), ui->sbInstMax, m_iPrevNumInst, ui->sbInstMax->value());
+    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+    
+    m_iPrevNumInst = ui->sbInstMax->value();
+}
+
+void WidgetAudioState::on_radInstFail_toggled(bool checked)
+{
+    ItemAudioCmd_RadioToggle *pCmd = new ItemAudioCmd_RadioToggle(m_pOwner->GetCmbStates(), ui->radInstFail, ui->radInstQueue);
+    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+}
+
+void WidgetAudioState::on_radInstQueue_toggled(bool checked)
+{
+    ItemAudioCmd_RadioToggle *pCmd = new ItemAudioCmd_RadioToggle(m_pOwner->GetCmbStates(), ui->radInstQueue, ui->radInstFail);
+    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
 }

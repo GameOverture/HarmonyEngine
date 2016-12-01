@@ -27,6 +27,7 @@ class WidgetAudioState : public QWidget
     
     int                                 m_iPrevCategoryIndex;
     int                                 m_iPrevPlayTypeIndex;
+    int                                 m_iPrevNumInst;
     
 public:
     explicit WidgetAudioState(WidgetAudio *pOwner, QList<QAction *> stateActionList, QWidget *parent = 0);
@@ -46,6 +47,12 @@ private slots:
     void on_chkLooping_clicked();
     
     void on_cmbPlayType_currentIndexChanged(int index);
+    
+    void on_sbInstMax_editingFinished();
+    
+    void on_radInstFail_toggled(bool checked);
+    
+    void on_radInstQueue_toggled(bool checked);
     
 private:
     Ui::WidgetAudioState *ui;
