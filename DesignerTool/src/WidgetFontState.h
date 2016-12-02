@@ -55,6 +55,8 @@ public:
     
     int GetSelectedStageId();
     
+    void UpdateActions();
+    
 private slots:
     void on_cmbFontList_currentIndexChanged(int index);
 

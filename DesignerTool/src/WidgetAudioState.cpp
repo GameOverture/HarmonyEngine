@@ -15,7 +15,7 @@
 #include "WidgetAudio.h"
 #include "WidgetAudioManager.h"
 
-#include "ItemAudioCmds.h"
+#include "WidgetUndoCmds.h"
 
 WidgetAudioState::WidgetAudioState(WidgetAudio *pOwner, QList<QAction *> stateActionList, QWidget *parent) :    QWidget(parent),
                                                                                                                 ui(new Ui::WidgetAudioState),
@@ -31,9 +31,7 @@ WidgetAudioState::WidgetAudioState(WidgetAudio *pOwner, QList<QAction *> stateAc
     
     ui->cmbCategory->setModel(m_pOwner->GetItemAudio()->GetAudioManager().GetCategoryModel());
     
-    m_iPrevCategoryIndex = ui->cmbCategory->currentIndex();
-    m_iPrevPlayTypeIndex = ui->cmbPlayType->currentIndex();
-    m_iPrevNumInst = ui->sbInstMax->value();
+    UpdateActions();
 }
 
 WidgetAudioState::~WidgetAudioState()
@@ -53,37 +51,47 @@ void WidgetAudioState::SetName(QString sName)
 
 void WidgetAudioState::UpdateActions()
 {
+    m_iPrevCategoryIndex = ui->cmbCategory->currentIndex();
+    m_iPrevPlayTypeIndex = ui->cmbPlayType->currentIndex();
+    m_iPrevNumInst = ui->sbInstMax->value();
+    
     ui->sbInstMax->setEnabled(ui->chkLimitInst->isChecked());
     ui->radInstFail->setEnabled(ui->chkLimitInst->isChecked());
     ui->radInstQueue->setEnabled(ui->chkLimitInst->isChecked());
+    
+    QComboBox *pCmbStates = m_pOwner->GetCmbStates();
+    for(int i = 0; i < pCmbStates->count(); ++i)
+    {
+        if(pCmbStates->itemData(i).value<WidgetAudioState *>() == this)
+        {
+            pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 void WidgetAudioState::on_cmbCategory_currentIndexChanged(int index)
 {
-    ItemAudioCmd_CategoryChanged *pCmd = new ItemAudioCmd_CategoryChanged(*this, ui->cmbCategory, m_iPrevCategoryIndex, index);
+    QUndoCommand *pCmd = new WidgetUndoCmd_ComboBox<WidgetAudioState>("Audio Category", this, ui->cmbCategory, m_iPrevCategoryIndex, index);
     m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
-    
-    m_iPrevCategoryIndex = index;
 }
 
 void WidgetAudioState::on_chkLimitInst_clicked()
 {
-    ItemAudioCmd_CheckBox *pCmd = new ItemAudioCmd_CheckBox(*this, ui->chkLimitInst);
+    QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetAudioState>(this, ui->chkLimitInst);
     m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
 }
 
 void WidgetAudioState::on_chkLooping_clicked()
 {
-    ItemAudioCmd_CheckBox *pCmd = new ItemAudioCmd_CheckBox(*this, ui->chkLooping);
+    QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetAudioState>(this, ui->chkLooping);
     m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
 }
 
 void WidgetAudioState::on_cmbPlayType_currentIndexChanged(int index)
 {
-    ItemAudioCmd_PlayTypeChanged *pCmd = new ItemAudioCmd_PlayTypeChanged(*this, ui->cmbPlayType, m_iPrevPlayTypeIndex, index);
+    QUndoCommand *pCmd = new WidgetUndoCmd_ComboBox<WidgetAudioState>("Play Type", this, ui->cmbPlayType, m_iPrevPlayTypeIndex, index);
     m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
-    
-    m_iPrevPlayTypeIndex = index;
 }
 
 void WidgetAudioState::on_sbInstMax_editingFinished()
@@ -91,20 +99,24 @@ void WidgetAudioState::on_sbInstMax_editingFinished()
     if(m_iPrevNumInst == ui->sbInstMax->value())
         return;
     
-    ItemAudioCmd_NumInstChanged *pCmd = new ItemAudioCmd_NumInstChanged(m_pOwner->GetCmbStates(), ui->sbInstMax, m_iPrevNumInst, ui->sbInstMax->value());
+    QUndoCommand *pCmd = new WidgetUndoCmd_SpinBox<WidgetAudioState>("Number of Instances", this, ui->sbInstMax, m_iPrevNumInst, ui->sbInstMax->value());
     m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
-    
-    m_iPrevNumInst = ui->sbInstMax->value();
 }
 
 void WidgetAudioState::on_radInstFail_toggled(bool checked)
 {
-    ItemAudioCmd_RadioToggle *pCmd = new ItemAudioCmd_RadioToggle(m_pOwner->GetCmbStates(), ui->radInstFail, ui->radInstQueue);
+    if(checked == false)
+        return;
+    
+    QUndoCommand *pCmd = new WidgetUndoCmd_RadioToggle<WidgetAudioState>("Instance Limit Behavior", this, ui->radInstFail, ui->radInstQueue);
     m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
 }
 
 void WidgetAudioState::on_radInstQueue_toggled(bool checked)
 {
-    ItemAudioCmd_RadioToggle *pCmd = new ItemAudioCmd_RadioToggle(m_pOwner->GetCmbStates(), ui->radInstQueue, ui->radInstFail);
+    if(checked == false)
+        return;
+    
+    QUndoCommand *pCmd = new WidgetUndoCmd_RadioToggle<WidgetAudioState>("Instance Limit Behavior", this, ui->radInstQueue, ui->radInstFail);
     m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
 }

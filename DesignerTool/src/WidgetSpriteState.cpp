@@ -12,7 +12,8 @@
 
 #include "ItemSprite.h"
 #include "WidgetSprite.h"
-#include "ItemSpriteCmds.h"
+#include "WidgetUndoCmds.h"
+#include "WidgetSpriteUndoCmds.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -37,7 +38,7 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
 
     ui->framesView->setModel(m_pSpriteFramesModel);
     ui->framesView->resize(ui->framesView->size());
-    ui->framesView->setItemDelegate(new WidgetSpriteDelegate(m_pOwner->GetItemSprite(), ui->framesView, this));
+    ui->framesView->setItemDelegate(new WidgetSpriteDelegate(m_pOwner->GetItemOwner(), ui->framesView, this));
     QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
     connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
     
@@ -213,6 +214,10 @@ void WidgetSpriteState::UpdateTimeStep()
     }
 }
 
+void WidgetSpriteState::UpdateActions()
+{
+}
+
 void WidgetSpriteState::on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
 {
     m_pOwner->UpdateActions();
@@ -234,49 +239,49 @@ void WidgetSpriteState::on_actionPlay_triggered()
 
 void WidgetSpriteState::on_btnHz10_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetItemSprite();
+    ItemSprite *pItemSprite = m_pOwner->GetItemOwner();
     
-    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 10.0f);
+    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 10.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void WidgetSpriteState::on_btnHz20_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetItemSprite();
+    ItemSprite *pItemSprite = m_pOwner->GetItemOwner();
     
-    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 20.0f);
+    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 20.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void WidgetSpriteState::on_btnHz30_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetItemSprite();
+    ItemSprite *pItemSprite = m_pOwner->GetItemOwner();
     
-    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 30.0f);
+    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 30.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void WidgetSpriteState::on_btnHz40_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetItemSprite();
+    ItemSprite *pItemSprite = m_pOwner->GetItemOwner();
     
-    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 40.0f);
+    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 40.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void WidgetSpriteState::on_btnHz50_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetItemSprite();
+    ItemSprite *pItemSprite = m_pOwner->GetItemOwner();
     
-    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 50.0f);
+    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 50.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void WidgetSpriteState::on_btnHz60_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetItemSprite();
+    ItemSprite *pItemSprite = m_pOwner->GetItemOwner();
     
-    QUndoCommand *pCmd = new ItemSpriteCmd_DurationFrame(ui->framesView, -1, 1.0f / 60.0f);
+    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 60.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
@@ -292,24 +297,24 @@ void WidgetSpriteState::on_actionLastFrame_triggered()
 
 void WidgetSpriteState::on_chkReverse_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetItemSprite();
+    ItemSprite *pItemSprite = m_pOwner->GetItemOwner();
 
-    QUndoCommand *pCmd = new ItemSpriteCmd_Checkbox(ui->chkReverse);
+    QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetSpriteState>(this, ui->chkReverse);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void WidgetSpriteState::on_chkLoop_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetItemSprite();
+    ItemSprite *pItemSprite = m_pOwner->GetItemOwner();
 
-    QUndoCommand *pCmd = new ItemSpriteCmd_Checkbox(ui->chkLoop);
+    QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetSpriteState>(this, ui->chkLoop);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void WidgetSpriteState::on_chkBounce_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetItemSprite();
+    ItemSprite *pItemSprite = m_pOwner->GetItemOwner();
 
-    QUndoCommand *pCmd = new ItemSpriteCmd_Checkbox(ui->chkBounce);
+    QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetSpriteState>(this, ui->chkBounce);
     pItemSprite->GetUndoStack()->push(pCmd);
 }

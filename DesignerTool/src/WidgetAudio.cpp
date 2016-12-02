@@ -13,7 +13,7 @@
 #include "DlgInputName.h"
 #include "WidgetAudioState.h"
 
-#include "ItemAudioCmds.h"
+#include "WidgetUndoCmds.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -85,21 +85,16 @@ void WidgetAudio::UpdateActions()
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
 }
 
-
 void WidgetAudio::on_actionAddState_triggered()
 {
-    QUndoCommand *pCmd = new ItemAudioCmd_AddState(this, m_StateActionsList, ui->cmbStates);
+    QUndoCommand *pCmd = new WidgetUndoCmd_AddState<WidgetAudio, WidgetAudioState>("Add Audio State", this, m_StateActionsList, ui->cmbStates);
     m_pItemAudio->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetAudio::on_actionRemoveState_triggered()
 {
-    QUndoCommand *pCmd = new ItemAudioCmd_RemoveState(ui->cmbStates);
+    QUndoCommand *pCmd = new WidgetUndoCmd_RemoveState<WidgetAudio, WidgetAudioState>("Remove Audio State", this, ui->cmbStates);
     m_pItemAudio->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetAudio::on_actionRenameState_triggered()
@@ -107,25 +102,22 @@ void WidgetAudio::on_actionRenameState_triggered()
     DlgInputName *pDlg = new DlgInputName("Rename Audio State", ui->cmbStates->currentData().value<WidgetAudioState *>()->GetName());
     if(pDlg->exec() == QDialog::Accepted)
     {
-        QUndoCommand *pCmd = new ItemAudioCmd_RenameState(ui->cmbStates, pDlg->GetName());
+        QUndoCommand *pCmd = new WidgetUndoCmd_RenameState<WidgetAudioState>("Rename Audio State", ui->cmbStates, pDlg->GetName());
         m_pItemAudio->GetUndoStack()->push(pCmd);
     }
+    delete pDlg;
 }
 
 void WidgetAudio::on_actionOrderStateBackwards_triggered()
 {
-    QUndoCommand *pCmd = new ItemAudioCmd_MoveStateBack(ui->cmbStates);
+    QUndoCommand *pCmd = new WidgetUndoCmd_MoveStateBack<WidgetAudio, WidgetAudioState>("Shift Audio State Index <-", this, ui->cmbStates);
     m_pItemAudio->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetAudio::on_actionOrderStateForwards_triggered()
 {
-    QUndoCommand *pCmd = new ItemAudioCmd_MoveStateForward(ui->cmbStates);
+    QUndoCommand *pCmd = new WidgetUndoCmd_MoveStateForward<WidgetAudio, WidgetAudioState>("Shift Audio State Index ->", this, ui->cmbStates);
     m_pItemAudio->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetAudio::on_cmbStates_currentIndexChanged(int index)

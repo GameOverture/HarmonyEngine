@@ -36,6 +36,8 @@ public:
     
     QComboBox *GetCmbStates();
     
+    void UpdateActions();
+    
 private slots:
     void on_actionAddState_triggered();
 
@@ -51,8 +53,6 @@ private slots:
 
 private:
     Ui::WidgetAudio *ui;
-
-    void UpdateActions();
 };
 
 #endif // WIDGETAUDIO_H

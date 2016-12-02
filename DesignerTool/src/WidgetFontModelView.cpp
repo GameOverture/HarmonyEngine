@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "WidgetFontModelView.h"
-#include "ItemFontCmds.h"
+#include "WidgetFontUndoCmds.h"
 #include "WidgetFont.h"
 #include "DlgColorPicker.h"
 
@@ -79,13 +79,13 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbState
                 topColor = pDlg->GetVgTopColor();
                 botColor = pDlg->GetVgBotColor();
             }
-            m_pItemFont->GetUndoStack()->push(new ItemFontCmd_LayerColors(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
-                                                                          m_pCmbStates,
-                                                                          pFontModel->GetLayerId(index.row()),
-                                                                          pFontModel->GetLayerTopColor(index.row()),
-                                                                          pFontModel->GetLayerBotColor(index.row()),
-                                                                          topColor,
-                                                                          botColor));
+            m_pItemFont->GetUndoStack()->push(new WidgetFontUndoCmd_LayerColors(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
+                                                                                m_pCmbStates,
+                                                                                pFontModel->GetLayerId(index.row()),
+                                                                                pFontModel->GetLayerTopColor(index.row()),
+                                                                                pFontModel->GetLayerBotColor(index.row()),
+                                                                                topColor,
+                                                                                botColor));
         }
         break;
     }
@@ -119,19 +119,19 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbState
     switch(index.column())
     {
     case WidgetFontModel::COLUMN_Type:
-        m_pItemFont->GetUndoStack()->push(new ItemFontCmd_LayerRenderMode(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
-                                                                          m_pCmbStates,
-                                                                          pFontModel->GetLayerId(index.row()),
-                                                                          pFontModel->GetLayerRenderMode(index.row()),
-                                                                          static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
+        m_pItemFont->GetUndoStack()->push(new WidgetFontUndoCmd_LayerRenderMode(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
+                                                                                m_pCmbStates,
+                                                                                pFontModel->GetLayerId(index.row()),
+                                                                                pFontModel->GetLayerRenderMode(index.row()),
+                                                                                static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
         break;
 
     case WidgetFontModel::COLUMN_Thickness:
-        m_pItemFont->GetUndoStack()->push(new ItemFontCmd_LayerOutlineThickness(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
-                                                                                m_pCmbStates,
-                                                                                pFontModel->GetLayerId(index.row()),
-                                                                                pFontModel->GetLayerOutlineThickness(index.row()),
-                                                                                static_cast<QDoubleSpinBox *>(pEditor)->value()));
+        m_pItemFont->GetUndoStack()->push(new WidgetFontUndoCmd_LayerOutlineThickness(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
+                                                                                      m_pCmbStates,
+                                                                                      pFontModel->GetLayerId(index.row()),
+                                                                                      pFontModel->GetLayerOutlineThickness(index.row()),
+                                                                                      static_cast<QDoubleSpinBox *>(pEditor)->value()));
         break;
 
     case WidgetFontModel::COLUMN_DefaultColor:

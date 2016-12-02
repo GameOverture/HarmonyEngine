@@ -40,7 +40,7 @@ public:
     // This Load() code can't be put into the ctor because of GetAtlasManager().RequestFrames()
     void Load();
     
-    ItemSprite *GetItemSprite();
+    ItemSprite *GetItemOwner();
     
     void AppendActionsForToolBar(QList<QAction *> &actionList);
 

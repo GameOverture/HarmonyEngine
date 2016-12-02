@@ -36,12 +36,10 @@ SOURCES += main.cpp \
     WidgetAtlasGroup.cpp \
     HyGuiDebugger.cpp \
     DlgSetEngineLocation.cpp \
-    ItemSpriteCmds.cpp \
     WidgetSpriteState.cpp \
     HyGuiFrame.cpp \
     ItemWidget.cpp \
     WidgetSpriteModelView.cpp \
-    ItemFontCmds.cpp \
     WidgetFont.cpp \
     WidgetFontModelView.cpp \
     DlgColorPicker.cpp \
@@ -54,9 +52,10 @@ SOURCES += main.cpp \
     HyGuiWave.cpp \
     WidgetAudio.cpp \
     ItemAudio.cpp \
-    ItemAudioCmds.cpp \
     WidgetAudioState.cpp \
-    WidgetRangedSlider.cpp
+    WidgetRangedSlider.cpp \
+    WidgetFontUndoCmds.cpp \
+    WidgetSpriteUndoCmds.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -81,12 +80,10 @@ HEADERS  += \
     WidgetAtlasGroup.h \
     HyGuiDebugger.h \
     DlgSetEngineLocation.h \
-    ItemSpriteCmds.h \
     WidgetSpriteState.h \
     HyGuiFrame.h \
     ItemWidget.h \
     WidgetSpriteModelView.h \
-    ItemFontCmds.h \
     WidgetFont.h \
     WidgetFontModelView.h \
     DlgColorPicker.h \
@@ -99,9 +96,11 @@ HEADERS  += \
     HyGuiWave.h \
     WidgetAudio.h \
     ItemAudio.h \
-    ItemAudioCmds.h \
     WidgetAudioState.h \
-    WidgetRangedSlider.h
+    WidgetRangedSlider.h \
+    WidgetUndoCmds.h \
+    WidgetFontUndoCmds.h \
+    WidgetSpriteUndoCmds.h
 
 FORMS    += \
     DlgNewProject.ui \

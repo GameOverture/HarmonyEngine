@@ -56,6 +56,8 @@ public:
     void GetStateFrameInfo(QJsonObject &stateObjOut);
     
     void UpdateTimeStep();
+    
+    void UpdateActions();
 
 private slots:
     void on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection);

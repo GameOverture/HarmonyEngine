@@ -11,7 +11,7 @@
 
 #include "HyGlobal.h"
 #include "ItemSprite.h"
-#include "ItemSpriteCmds.h"
+#include "WidgetSpriteUndoCmds.h"
 
 #include <QLineEdit>
 #include <QDoubleSpinBox>
@@ -102,7 +102,7 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSprite
         QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
         vOffset.setX(static_cast<QSpinBox *>(pEditor)->value());
 
-        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
+        m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
         break;
     }
 
@@ -112,13 +112,13 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSprite
         QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
         vOffset.setY(static_cast<QSpinBox *>(pEditor)->value());
 
-        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
+        m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
         break;
     }
     
 
     case WidgetSpriteModel::COLUMN_Duration:
-        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_DurationFrame(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value()));
+        m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_DurationFrame(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value()));
         break;
     }
 }

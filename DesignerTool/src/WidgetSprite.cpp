@@ -11,7 +11,8 @@
 #include "ui_WidgetSprite.h"
 
 #include "ItemSprite.h"
-#include "ItemSpriteCmds.h"
+#include "WidgetUndoCmds.h"
+#include "WidgetSpriteUndoCmds.h"
 #include "DlgInputName.h"
 #include "WidgetAtlasManager.h"
 
@@ -79,8 +80,8 @@ void WidgetSprite::Load()
         {
             QJsonObject stateObj = stateArray[i].toObject();
 
-            m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_AddState(this, m_StateActionsList, ui->cmbStates));
-            m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_RenameState(ui->cmbStates, stateObj["name"].toString()));
+            m_pItemSprite->GetUndoStack()->push(new WidgetUndoCmd_AddState<WidgetSprite, WidgetSpriteState>("Add Sprite State", this, m_StateActionsList, ui->cmbStates));
+            m_pItemSprite->GetUndoStack()->push(new WidgetUndoCmd_RenameState<WidgetSpriteState>("Rename Sprite State", ui->cmbStates, stateObj["name"].toString()));
             
             QJsonArray spriteFrameArray = stateObj["frames"].toArray();
             for(int j = 0; j < spriteFrameArray.size(); ++j)
@@ -95,8 +96,8 @@ void WidgetSprite::Load()
 
                 QPoint vOffset(spriteFrameObj["offsetX"].toInt() - pRequestedList[0]->GetCrop().left(),
                                spriteFrameObj["offsetY"].toInt() - (pRequestedList[0]->GetSize().height() - pRequestedList[0]->GetCrop().bottom()));
-                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetFrame(pSpriteState->GetFrameView(), j, vOffset));
-                m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_DurationFrame(pSpriteState->GetFrameView(), j, spriteFrameObj["duration"].toDouble()));
+                m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetFrame(pSpriteState->GetFrameView(), j, vOffset));
+                m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_DurationFrame(pSpriteState->GetFrameView(), j, spriteFrameObj["duration"].toDouble()));
             }
         }
     }
@@ -114,7 +115,7 @@ void WidgetSprite::Load()
     UpdateActions();
 }
 
-ItemSprite *WidgetSprite::GetItemSprite()
+ItemSprite *WidgetSprite::GetItemOwner()
 {
     return m_pItemSprite;
 }
@@ -187,7 +188,7 @@ void WidgetSprite::UpdateActions()
 
 void WidgetSprite::on_actionAddState_triggered()
 {
-    QUndoCommand *pCmd = new ItemSpriteCmd_AddState(this, m_StateActionsList, ui->cmbStates);
+    QUndoCommand *pCmd = new WidgetUndoCmd_AddState<WidgetSprite, WidgetSpriteState>("Add Sprite State", this, m_StateActionsList, ui->cmbStates);
     m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
@@ -195,7 +196,7 @@ void WidgetSprite::on_actionAddState_triggered()
 
 void WidgetSprite::on_actionRemoveState_triggered()
 {
-    QUndoCommand *pCmd = new ItemSpriteCmd_RemoveState(ui->cmbStates);
+    QUndoCommand *pCmd = new WidgetUndoCmd_RemoveState<WidgetSprite, WidgetSpriteState>("Remove Sprite State", this, ui->cmbStates);
     m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
@@ -206,33 +207,27 @@ void WidgetSprite::on_actionRenameState_triggered()
     DlgInputName *pDlg = new DlgInputName("Rename Sprite State", ui->cmbStates->currentData().value<WidgetSpriteState *>()->GetName());
     if(pDlg->exec() == QDialog::Accepted)
     {
-        QUndoCommand *pCmd = new ItemSpriteCmd_RenameState(ui->cmbStates, pDlg->GetName());
+        QUndoCommand *pCmd = new WidgetUndoCmd_RenameState<WidgetSpriteState>("Rename Sprite State", ui->cmbStates, pDlg->GetName());
         m_pItemSprite->GetUndoStack()->push(pCmd);
     }
 }
 
 void WidgetSprite::on_actionOrderStateBackwards_triggered()
 {
-    QUndoCommand *pCmd = new ItemSpriteCmd_MoveStateBack(ui->cmbStates);
+    QUndoCommand *pCmd = new WidgetUndoCmd_MoveStateBack<WidgetSprite, WidgetSpriteState>("Shift Sprite State Index <-", this, ui->cmbStates);
     m_pItemSprite->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetSprite::on_actionOrderStateForwards_triggered()
 {
-    QUndoCommand *pCmd = new ItemSpriteCmd_MoveStateForward(ui->cmbStates);
+    QUndoCommand *pCmd = new WidgetUndoCmd_MoveStateForward<WidgetSprite, WidgetSpriteState>("Shift Sprite State Index ->", this, ui->cmbStates);
     m_pItemSprite->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetSprite::on_actionImportFrames_triggered()
 {
-    QUndoCommand *pCmd = new ItemSpriteCmd_AddFrames(m_pItemSprite);
+    QUndoCommand *pCmd = new WidgetUndoCmd_AddFrames<WidgetSprite>("Add Frames", this);
     m_pItemSprite->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetSprite::on_actionRemoveFrames_triggered()
@@ -240,10 +235,8 @@ void WidgetSprite::on_actionRemoveFrames_triggered()
     WidgetSpriteState *pSpriteState = ui->cmbStates->itemData(ui->cmbStates->currentIndex()).value<WidgetSpriteState *>();
     SpriteFrame *pSpriteFrame = pSpriteState->GetSelectedFrame();
 
-    QUndoCommand *pCmd = new ItemSpriteCmd_DeleteFrame(m_pItemSprite, pSpriteFrame->m_pFrame);
+    QUndoCommand *pCmd = new WidgetUndoCmd_DeleteFrame<WidgetSprite>("Remove Frame", this, pSpriteFrame->m_pFrame);
     m_pItemSprite->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetSprite::on_cmbStates_currentIndexChanged(int index)
@@ -277,13 +270,13 @@ void WidgetSprite::on_actionAlignLeft_triggered()
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
             newOffsetList.append(0.0f);
 
-        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetXFrame(pSpriteTableView, -1, newOffsetList));
+        m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetXFrame(pSpriteTableView, -1, newOffsetList));
         return;
     }
 
     QList<int> newOffsetList;
     newOffsetList.append(0.0f);
-    m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetXFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
+    m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetXFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
 }
 
 void WidgetSprite::on_actionAlignRight_triggered()
@@ -300,13 +293,13 @@ void WidgetSprite::on_actionAlignRight_triggered()
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
             newOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().width() * -1);
 
-        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetXFrame(pSpriteTableView, -1, newOffsetList));
+        m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetXFrame(pSpriteTableView, -1, newOffsetList));
         return;
     }
 
     QList<int> newOffsetList;
     newOffsetList.append(pSpriteFramesModel->GetFrameAt(pSpriteTableView->currentIndex().row())->m_pFrame->GetSize().width() * -1);
-    m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetXFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
+    m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetXFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
 }
 
 void WidgetSprite::on_actionAlignUp_triggered()
@@ -323,13 +316,13 @@ void WidgetSprite::on_actionAlignUp_triggered()
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
             newOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().height() * -1);
 
-        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetYFrame(pSpriteTableView, -1, newOffsetList));
+        m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetYFrame(pSpriteTableView, -1, newOffsetList));
         return;
     }
 
     QList<int> newOffsetList;
     newOffsetList.append(pSpriteFramesModel->GetFrameAt(pSpriteTableView->currentIndex().row())->m_pFrame->GetSize().height() * -1);
-    m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetYFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
+    m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetYFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
 }
 
 void WidgetSprite::on_actionAlignDown_triggered()
@@ -346,13 +339,13 @@ void WidgetSprite::on_actionAlignDown_triggered()
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
             newOffsetList.append(0.0f);
 
-        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetYFrame(pSpriteTableView, -1, newOffsetList));
+        m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetYFrame(pSpriteTableView, -1, newOffsetList));
         return;
     }
 
     QList<int> newOffsetList;
     newOffsetList.append(0.0f);
-    m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetYFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
+    m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetYFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
 }
 
 void WidgetSprite::on_actionAlignCenterVertical_triggered()
@@ -369,13 +362,13 @@ void WidgetSprite::on_actionAlignCenterVertical_triggered()
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
             newOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().height() * -0.5f);
 
-        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetYFrame(pSpriteTableView, -1, newOffsetList));
+        m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetYFrame(pSpriteTableView, -1, newOffsetList));
         return;
     }
 
     QList<int> newOffsetList;
     newOffsetList.append(pSpriteFramesModel->GetFrameAt(pSpriteTableView->currentIndex().row())->m_pFrame->GetSize().height() * -0.5f);
-    m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetYFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
+    m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetYFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
 }
 
 void WidgetSprite::on_actionAlignCenterHorizontal_triggered()
@@ -392,20 +385,20 @@ void WidgetSprite::on_actionAlignCenterHorizontal_triggered()
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
             newOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().width() * -0.5f);
 
-        m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetXFrame(pSpriteTableView, -1, newOffsetList));
+        m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetXFrame(pSpriteTableView, -1, newOffsetList));
         return;
     }
 
     QList<int> newOffsetList;
     newOffsetList.append(pSpriteFramesModel->GetFrameAt(pSpriteTableView->currentIndex().row())->m_pFrame->GetSize().width() * -0.5f);
-    m_pItemSprite->GetUndoStack()->push(new ItemSpriteCmd_OffsetXFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
+    m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetXFrame(pSpriteTableView, pSpriteTableView->currentIndex().row(), newOffsetList));
 }
 
 void WidgetSprite::on_actionOrderFrameUpwards_triggered()
 {
     int iSelectedIndex = GetCurSpriteState()->GetSelectedIndex();
 
-    QUndoCommand *pCmd = new ItemSpriteCmd_OrderFrame(GetCurSpriteState()->GetFrameView(), iSelectedIndex, iSelectedIndex - 1);
+    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_OrderFrame(GetCurSpriteState()->GetFrameView(), iSelectedIndex, iSelectedIndex - 1);
     m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
@@ -415,7 +408,7 @@ void WidgetSprite::on_actionOrderFrameDownwards_triggered()
 {
     int iSelectedIndex = GetCurSpriteState()->GetSelectedIndex();
 
-    QUndoCommand *pCmd = new ItemSpriteCmd_OrderFrame(GetCurSpriteState()->GetFrameView(), iSelectedIndex, iSelectedIndex + 1);
+    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_OrderFrame(GetCurSpriteState()->GetFrameView(), iSelectedIndex, iSelectedIndex + 1);
     m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();

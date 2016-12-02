@@ -12,7 +12,8 @@
 
 #include "HyGlobal.h"
 #include "ItemFont.h"
-#include "ItemFontCmds.h"
+#include "WidgetFontUndoCmds.h"
+#include "WidgetUndoCmds.h"
 #include "WidgetAtlasManager.h"
 #include "WidgetFontModelView.h"
 #include "DlgInputName.h"
@@ -108,8 +109,8 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
         {
             QJsonObject stateObj = stateArray.at(i).toObject();
             
-            m_pItemFont->GetUndoStack()->push(new ItemFontCmd_AddState(*this, m_StateActionsList, ui->cmbStates));
-            m_pItemFont->GetUndoStack()->push(new ItemFontCmd_RenameState(ui->cmbStates, stateObj["name"].toString()));
+            m_pItemFont->GetUndoStack()->push(new WidgetUndoCmd_AddState<WidgetFont, WidgetFontState>("Add Font State", this, m_StateActionsList, ui->cmbStates));
+            m_pItemFont->GetUndoStack()->push(new WidgetUndoCmd_RenameState<WidgetFontState>("Rename Font State", ui->cmbStates, stateObj["name"].toString()));
             
             QJsonArray layerArray = stateObj["layers"].toArray();
             for(int j = 0; j < layerArray.size(); ++j)
@@ -124,22 +125,22 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
                     m_pCurFontState->SetSize(typefaceObj["size"].toDouble());
                 }
                 
-                m_pItemFont->GetUndoStack()->push(new ItemFontCmd_AddLayer(*this,
-                                                                           ui->cmbStates,
-                                                                           static_cast<rendermode_t>(typefaceObj["mode"].toInt()),
-                                                                           typefaceObj["size"].toDouble(),
-                                                                           typefaceObj["outlineThickness"].toDouble()));
+                m_pItemFont->GetUndoStack()->push(new WidgetFontUndoCmd_AddLayer(*this,
+                                                                                 ui->cmbStates,
+                                                                                 static_cast<rendermode_t>(typefaceObj["mode"].toInt()),
+                                                                                 typefaceObj["size"].toDouble(),
+                                                                                 typefaceObj["outlineThickness"].toDouble()));
                 
                 QColor topColor, botColor;
                 topColor.setRgbF(layerObj["topR"].toDouble(), layerObj["topG"].toDouble(), layerObj["topB"].toDouble());
                 botColor.setRgbF(layerObj["botR"].toDouble(), layerObj["botG"].toDouble(), layerObj["botB"].toDouble());
-                m_pItemFont->GetUndoStack()->push(new ItemFontCmd_LayerColors(*this,
-                                                                              ui->cmbStates,
-                                                                              pCurFontModel->GetLayerId(j),
-                                                                              pCurFontModel->GetLayerTopColor(j),
-                                                                              pCurFontModel->GetLayerBotColor(j),
-                                                                              topColor,
-                                                                              botColor));
+                m_pItemFont->GetUndoStack()->push(new WidgetFontUndoCmd_LayerColors(*this,
+                                                                                    ui->cmbStates,
+                                                                                    pCurFontModel->GetLayerId(j),
+                                                                                    pCurFontModel->GetLayerTopColor(j),
+                                                                                    pCurFontModel->GetLayerBotColor(j),
+                                                                                    topColor,
+                                                                                    botColor));
             }
         }
     }
@@ -151,8 +152,6 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
         
         on_actionAddState_triggered();
         on_actionAddLayer_triggered();
-        
-        m_iPrevAtlasCmbIndex = ui->cmbAtlasGroups->currentIndex();
     }
     
     // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
@@ -416,6 +415,20 @@ QSize WidgetFont::GetAtlasDimensions(int iAtlasGrpIndex)
 
 void WidgetFont::UpdateActions()
 {
+    bool bGeneratePreview = false;
+    
+    QSize prevSize = GetAtlasDimensions(m_iPrevAtlasCmbIndex);
+    m_iPrevAtlasCmbIndex = ui->cmbAtlasGroups->currentIndex();
+    QSize curSize = GetAtlasDimensions(m_iPrevAtlasCmbIndex);
+    
+    if(prevSize.width() < curSize.width() || prevSize.height() < curSize.height())
+        bGeneratePreview = true;
+    
+    QString sPrevSymbols = m_sAvailableTypefaceGlyphs;
+    SetGlyphsDirty();
+    if(sPrevSymbols != m_sAvailableTypefaceGlyphs)
+        bGeneratePreview = true;
+    
     ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
     ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
@@ -434,6 +447,9 @@ void WidgetFont::UpdateActions()
         ui->actionOrderLayerUpwards->setEnabled(false);
         ui->actionOrderLayerDownwards->setEnabled(false);
     }
+    
+    if(bGeneratePreview)
+        GeneratePreview();
 
     m_bFontPreviewDirty = true;
 }
@@ -599,43 +615,38 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
 
 void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)
 {
-    if(ui->cmbAtlasGroups->currentIndex() == index)
-        return;
-
     // TODO: This will break when an atlas group is removed from the Atlas Manager and is apart of the UndoStack
-    QUndoCommand *pCmd = new ItemFontCmd_AtlasGroupChanged(*this, ui->cmbAtlasGroups, m_iPrevAtlasCmbIndex, index);
+    QUndoCommand *pCmd = new WidgetUndoCmd_ComboBox<WidgetFont>("Atlas Group Changed", this, ui->cmbAtlasGroups, m_iPrevAtlasCmbIndex, index);
     m_pItemFont->GetUndoStack()->push(pCmd);
-
-    m_iPrevAtlasCmbIndex = index;
 }
 
 void WidgetFont::on_chk_09_clicked()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_CheckBox(*this, ui->chk_09);
+    QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetFont>(this, ui->chk_09);
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFont::on_chk_az_clicked()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_CheckBox(*this, ui->chk_az);
+    QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetFont>(this, ui->chk_az);
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFont::on_chk_AZ_clicked()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_CheckBox(*this, ui->chk_AZ);
+    QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetFont>(this, ui->chk_AZ);
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFont::on_chk_symbols_clicked()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_CheckBox(*this, ui->chk_symbols);
+    QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetFont>(this, ui->chk_symbols);
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFont::on_txtAdditionalSymbols_editingFinished()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_LineEditSymbols(*this, ui->txtAdditionalSymbols);
+    QUndoCommand *pCmd = new WidgetUndoCmd_LineEdit<WidgetFont>("Additional Symbols", this, ui->txtAdditionalSymbols);
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
@@ -662,19 +673,14 @@ void WidgetFont::on_cmbStates_currentIndexChanged(int index)
 
 void WidgetFont::on_actionAddState_triggered()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_AddState(*this, m_StateActionsList, ui->cmbStates);
+    QUndoCommand *pCmd = new WidgetUndoCmd_AddState<WidgetFont, WidgetFontState>("Add Font State", this, m_StateActionsList, ui->cmbStates);
     m_pItemFont->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
-
 
 void WidgetFont::on_actionRemoveState_triggered()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_RemoveState(*this, ui->cmbStates);
+    QUndoCommand *pCmd = new WidgetUndoCmd_RemoveState<WidgetFont, WidgetFontState>("Remove Font State", this, ui->cmbStates);
     m_pItemFont->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetFont::on_actionRenameState_triggered()
@@ -682,7 +688,7 @@ void WidgetFont::on_actionRenameState_triggered()
     DlgInputName *pDlg = new DlgInputName("Rename Font State", ui->cmbStates->currentData().value<WidgetFontState *>()->GetName());
     if(pDlg->exec() == QDialog::Accepted)
     {
-        QUndoCommand *pCmd = new ItemFontCmd_RenameState(ui->cmbStates, pDlg->GetName());
+        QUndoCommand *pCmd = new WidgetUndoCmd_RenameState<WidgetFontState>("Rename Font State", ui->cmbStates, pDlg->GetName());
         m_pItemFont->GetUndoStack()->push(pCmd);
     }
     delete pDlg;
@@ -690,25 +696,21 @@ void WidgetFont::on_actionRenameState_triggered()
 
 void WidgetFont::on_actionOrderStateBackwards_triggered()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_MoveStateBack(*this, ui->cmbStates);
+    QUndoCommand *pCmd = new WidgetUndoCmd_MoveStateBack<WidgetFont, WidgetFontState>("Shift Font State Index <-", this, ui->cmbStates);
     m_pItemFont->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetFont::on_actionOrderStateForwards_triggered()
 {
-    QUndoCommand *pCmd = new ItemFontCmd_MoveStateForward(*this, ui->cmbStates);
+    QUndoCommand *pCmd = new WidgetUndoCmd_MoveStateForward<WidgetFont, WidgetFontState>("Shift Font State Index ->", this, ui->cmbStates);
     m_pItemFont->GetUndoStack()->push(pCmd);
-
-    UpdateActions();
 }
 
 void WidgetFont::on_actionAddLayer_triggered()
 {
     WidgetFontState *pFontState = ui->cmbStates->currentData().value<WidgetFontState *>();
     
-    QUndoCommand *pCmd = new ItemFontCmd_AddLayer(*this, ui->cmbStates, pFontState->GetCurSelectedRenderMode(), pFontState->GetSize(), pFontState->GetThickness());
+    QUndoCommand *pCmd = new WidgetFontUndoCmd_AddLayer(*this, ui->cmbStates, pFontState->GetCurSelectedRenderMode(), pFontState->GetSize(), pFontState->GetThickness());
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
@@ -720,7 +722,7 @@ void WidgetFont::on_actionRemoveLayer_triggered()
     if(iSelectedId == -1)
         return;
 
-    QUndoCommand *pCmd = new ItemFontCmd_RemoveLayer(*this, ui->cmbStates, iSelectedId);
+    QUndoCommand *pCmd = new WidgetFontUndoCmd_RemoveLayer(*this, ui->cmbStates, iSelectedId);
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
@@ -728,7 +730,7 @@ void WidgetFont::on_actionOrderLayerDownwards_triggered()
 {
     WidgetFontState *pFontState = ui->cmbStates->currentData().value<WidgetFontState *>();
     
-    QUndoCommand *pCmd = new ItemFontCmd_LayerOrder(*this, ui->cmbStates, pFontState->GetFontLayerView(), pFontState->GetFontLayerView()->currentIndex().row(), pFontState->GetFontLayerView()->currentIndex().row() + 1);
+    QUndoCommand *pCmd = new WidgetFontUndoCmd_LayerOrder(*this, ui->cmbStates, pFontState->GetFontLayerView(), pFontState->GetFontLayerView()->currentIndex().row(), pFontState->GetFontLayerView()->currentIndex().row() + 1);
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
@@ -736,7 +738,7 @@ void WidgetFont::on_actionOrderLayerUpwards_triggered()
 {
     WidgetFontState *pFontState = ui->cmbStates->currentData().value<WidgetFontState *>();
     
-    QUndoCommand *pCmd = new ItemFontCmd_LayerOrder(*this, ui->cmbStates, pFontState->GetFontLayerView(), pFontState->GetFontLayerView()->currentIndex().row(), pFontState->GetFontLayerView()->currentIndex().row() - 1);
+    QUndoCommand *pCmd = new WidgetFontUndoCmd_LayerOrder(*this, ui->cmbStates, pFontState->GetFontLayerView(), pFontState->GetFontLayerView()->currentIndex().row(), pFontState->GetFontLayerView()->currentIndex().row() - 1);
     m_pItemFont->GetUndoStack()->push(pCmd);
 }
 

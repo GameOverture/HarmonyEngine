@@ -11,7 +11,7 @@
 #include "ui_WidgetFontState.h"
 
 #include "WidgetFont.h"
-#include "ItemFontCmds.h"
+#include "WidgetUndoCmds.h"
 
 #include <QStandardPaths>
 
@@ -87,7 +87,7 @@ WidgetFontState::WidgetFontState(WidgetFont *pOwner, QList<QAction *> stateActio
     // Try to find Arial as default font
     SetSelectedFont("Arial.ttf");
     
-    m_dPrevFontSize = ui->sbSize->value();
+    UpdateActions();
 }
 
 /*virtual*/ WidgetFontState::~WidgetFontState()
@@ -164,14 +164,29 @@ int WidgetFontState::GetSelectedStageId()
     return m_pFontModel->GetLayerId(iRowIndex);
 }
 
+void WidgetFontState::UpdateActions()
+{
+    if(m_iPrevFontCmbIndex != ui->cmbFontList->currentIndex())
+        m_pOwner->GeneratePreview();
+    
+    m_iPrevFontCmbIndex = ui->cmbFontList->currentIndex();
+    m_dPrevFontSize = ui->sbSize->value();
+    
+    QComboBox *pCmbStates = m_pOwner->GetCmbStates();
+    for(int i = 0; i < pCmbStates->count(); ++i)
+    {
+        if(pCmbStates->itemData(i).value<WidgetFontState *>() == this)
+        {
+            pCmbStates->setCurrentIndex(i);
+            break;
+        }
+    }
+}
+
 void WidgetFontState::on_cmbFontList_currentIndexChanged(int index)
 {
-    ItemFont *pItemFont = m_pOwner->GetItemFont();
-    
-    QUndoCommand *pCmd = new ItemFontCmd_FontSelection(*m_pOwner, m_pOwner->GetCmbStates(), ui->cmbFontList, m_iPrevFontCmbIndex, index);
-    pItemFont->GetUndoStack()->push(pCmd);
-
-    m_iPrevFontCmbIndex = index;
+    QUndoCommand *pCmd = new WidgetUndoCmd_ComboBox<WidgetFontState>("Font Selection", this, ui->cmbFontList, m_iPrevFontCmbIndex, index);
+    m_pOwner->GetItemFont()->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFontState::on_cmbRenderMode_currentIndexChanged(int index)
@@ -200,12 +215,8 @@ void WidgetFontState::on_sbSize_editingFinished()
     if(m_dPrevFontSize == ui->sbSize->value())
         return;
     
-    ItemFont *pItemFont = m_pOwner->GetItemFont();
-    
-    QUndoCommand *pCmd = new ItemFontCmd_FontSize(*m_pOwner, m_pOwner->GetCmbStates(), ui->sbSize, m_dPrevFontSize, ui->sbSize->value());
-    pItemFont->GetUndoStack()->push(pCmd);
-    
-    m_dPrevFontSize = ui->sbSize->value();
+    QUndoCommand *pCmd = new WidgetUndoCmd_DoubleSpinBox<WidgetFontState>("Font Size", this, ui->sbSize, m_dPrevFontSize, ui->sbSize->value());
+    m_pOwner->GetItemFont()->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFontState::on_layersView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
