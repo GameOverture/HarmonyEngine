@@ -129,18 +129,6 @@ FORMS    += \
     WidgetAudioState.ui \
     WidgetRangedSlider.ui
 
-Release:DESTDIR = ../bin/release
-Release:OBJECTS_DIR = ../bin/release/.obj
-Release:MOC_DIR = ../bin/release/.moc
-Release:RCC_DIR = ../bin/release/.rcc
-Release:UI_DIR = ../bin/release/.ui
-
-Debug:DESTDIR = ../bin/debug
-Debug:OBJECTS_DIR = ../bin/debug/.obj
-Debug:MOC_DIR = ../bin/debug/.moc
-Debug:RCC_DIR = ../bin/debug/.rcc
-Debug:UI_DIR = ../bin/debug/.ui
-
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/bin/x64/ -lHarmonyQt

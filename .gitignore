@@ -15,4 +15,4 @@ build-DesignerTool-*/
 *.user
 *.db
 *.opendb
-!HyTemplate.vcxproj.user
+!HyTitle.vcxproj.user

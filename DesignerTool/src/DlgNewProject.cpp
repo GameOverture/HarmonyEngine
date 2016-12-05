@@ -210,7 +210,7 @@ void DlgNewProject::on_buttonBox_accepted()
             HyGuiLog("Unknown solution type", LOGTYPE_Error);
         
         sContents.replace("HyHarmonyInclude", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "include"));
-        sContents.replace("HyWorkingDirectory", GetProjDirPath());
+        sContents.replace("HyWorkingDirectory", projDir.relativeFilePath(GetProjDirPath()));
 
         if(!file.open(QFile::WriteOnly))
         {
