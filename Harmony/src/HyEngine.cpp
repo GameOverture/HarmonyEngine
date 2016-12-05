@@ -87,8 +87,7 @@ bool HyEngine::PollPlatformApi()
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 			
-			// Only take input from the main window
-			if(i == 0)
+			if(m_AppRef.m_vWindows[i]->IsInputEnabled())
 				m_Input.HandleMsg(msg);
 		}
 	}
