@@ -32,7 +32,7 @@ public:
     explicit WidgetExplorer(QWidget *parent = 0);
     ~WidgetExplorer();
     
-    void AddItemProject(const QString sNewProjectFilePath);
+    void AddItemProject(const QString sNewProjectFilePath, bool bSelectAfterAdd);
     void AddItem(eItemType eNewItemType, const QString sNewItemPath, bool bOpenAfterAdd);
     void RemoveItem(Item *pItem);
     

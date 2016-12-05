@@ -153,7 +153,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
         QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
         foreach(QString sProjPath, sListOpenProjs)
         {
-            ui->explorer->AddItemProject(sProjPath);
+            ui->explorer->AddItemProject(sProjPath, false);
         }
         
         //QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
@@ -397,6 +397,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     else
     {
         sm_pInstance->ui->dockWidgetAtlas->setWidget(NULL);
+        sm_pInstance->ui->dockWidgetAudio->setWidget(NULL);
     }
 
     if(bSelfSpinner)
@@ -442,7 +443,7 @@ void MainWindow::on_actionNewProject_triggered()
             m_sDefaultProjectLocation = defaultProjDir.absolutePath();
         }
 
-        ui->explorer->AddItemProject(pDlg->GetProjFilePath());
+        ui->explorer->AddItemProject(pDlg->GetProjFilePath(), true);
     }
     delete pDlg;
 }
@@ -456,7 +457,7 @@ void MainWindow::on_actionOpenProject_triggered()
 
     if(pDlg->exec() == QDialog::Accepted)
     {
-        ui->explorer->AddItemProject(pDlg->selectedFiles()[0]);
+        ui->explorer->AddItemProject(pDlg->selectedFiles()[0], true);
     }
     delete pDlg;
 }

@@ -56,12 +56,15 @@ HyAudio_Win::HyAudio_Win(vector<HyWindow *> &windowListRef) :	IHyAudio(windowLis
 																m_pXAudio2(NULL),
 																m_pMasterVoice(NULL)
 {
-	HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	HRESULT hr;
+#ifndef HY_PLATFORM_GUI
+	hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if(FAILED(hr))
 	{
 		HyLogError("HyAudio_Win - CoInitializeEx failed");
 		return;
 	}
+#endif
 
 	UINT32 flags = 0;
 #if ( _WIN32_WINNT < 0x0602 /*_WIN32_WINNT_WIN8*/)
@@ -208,7 +211,7 @@ HyAudio_Win::~HyAudio_Win()
 #endif
 
 	// TODO: Call this without it crashing the program (make CoInit and CoUninit into an outer scope?)
-	//CoUninitialize();
+	CoUninitialize();
 }
 
 HRESULT FindChunk(HANDLE hFile, DWORD fourcc, DWORD & dwChunkSize, DWORD & dwChunkDataPosition)

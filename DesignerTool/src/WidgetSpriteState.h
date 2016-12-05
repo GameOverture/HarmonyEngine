@@ -14,6 +14,7 @@
 #include "WidgetSpriteModelView.h"
 
 #include <QWidget>
+#include <QCheckBox>
 
 namespace Ui {
 class WidgetSpriteState;
@@ -46,6 +47,9 @@ public:
     void RefreshFrame(HyGuiFrame *pFrame);
     void RemoveFrame(HyGuiFrame *pFrame);
 
+    QCheckBox *GetChkBox_Reverse();
+    QCheckBox *GetChkBox_Looping();
+    QCheckBox *GetChkBox_Bounce();
     WidgetSpriteTableView *GetFrameView();
     SpriteFrame *GetSelectedFrame();
     int GetSelectedIndex();

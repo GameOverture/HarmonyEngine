@@ -79,6 +79,21 @@ void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
     m_pSpriteFramesModel->Remove(pFrame);
 }
 
+QCheckBox *WidgetSpriteState::GetChkBox_Reverse()
+{
+    return ui->chkReverse;
+}
+
+QCheckBox *WidgetSpriteState::GetChkBox_Looping()
+{
+    return ui->chkLoop;
+}
+
+QCheckBox *WidgetSpriteState::GetChkBox_Bounce()
+{
+    return ui->chkBounce;
+}
+
 WidgetSpriteTableView *WidgetSpriteState::GetFrameView()
 {
     return static_cast<WidgetSpriteTableView *>(ui->framesView);

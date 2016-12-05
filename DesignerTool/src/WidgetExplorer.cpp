@@ -36,7 +36,7 @@ WidgetExplorer::~WidgetExplorer()
     delete ui;
 }
 
-void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
+void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath, bool bSelectAfterAdd)
 {
     ItemProject *pItemProject = new ItemProject(sNewProjectFilePath);
     if(pItemProject->HasError())
@@ -51,6 +51,9 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
     ui->treeWidget->insertTopLevelItem(0, pProjTreeItem);
     
     ui->treeWidget->expandItem(pProjTreeItem);
+    
+    if(bSelectAfterAdd)
+        SelectItem(pItemProject);
 }
 
 void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath, bool bOpenAfterAdd)

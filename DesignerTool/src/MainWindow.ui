@@ -409,7 +409,7 @@
     <string>&amp;Close Project</string>
    </property>
    <property name="toolTip">
-    <string>Closes the currently selected project (or item within)</string>
+    <string>Closes the currently active project</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+Q</string>
