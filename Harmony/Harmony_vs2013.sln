@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Harmony", "Harmony_vs2013.vcxproj", "{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Harmony", "src\Harmony_vs2013.vcxproj", "{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{1D5D3417-254B-4727-98AA-3E4E315AA1B9} = {1D5D3417-254B-4727-98AA-3E4E315AA1B9}
 		{079E3143-4D45-4B8D-9FBA-204B1313B3D9} = {079E3143-4D45-4B8D-9FBA-204B1313B3D9}

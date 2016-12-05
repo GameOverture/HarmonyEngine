@@ -147,9 +147,15 @@ void DlgNewProject::on_buttonBox_accepted()
     projDir.setPath(GetProjDirPath());
     projDir.mkdir(sRelSourcePath);
     projDir.cd(sRelSourcePath);
+    
     QDir templateDir(MainWindow::EngineLocation() % "templates");
     if(ui->radVs2013->isChecked())
         templateDir.cd("vs2013");
+    else if(ui->radVs2015->isChecked())
+        templateDir.cd("vs2015");
+    else
+        HyGuiLog("Unknown solution type", LOGTYPE_Error);
+    
     QFileInfoList templateContentsList = templateDir.entryInfoList();
     foreach(QFileInfo info, templateContentsList)
         QFile::copy(info.absoluteFilePath(), projDir.absoluteFilePath(info.fileName()));
@@ -160,10 +166,17 @@ void DlgNewProject::on_buttonBox_accepted()
     QFileInfoList srcFileList = projDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
     foreach(QFileInfo srcFile, srcFileList)
     {
+        if(srcFile.fileName().contains("HyTitle"))
+        {
+            QFile file(srcFile.absoluteFilePath());
+            QString sNewFileName = srcFile.fileName().replace("HyTitle", ui->txtTitleName->text());
+            file.rename(srcFile.absoluteDir().absolutePath() % "/" % sNewFileName);
+            file.close();
+        }
         if(srcFile.fileName().contains("HyTemplate"))
         {
             QFile file(srcFile.absoluteFilePath());
-            QString sNewFileName = srcFile.fileName().replace("HyTemplate", ui->txtTitleName->text());
+            QString sNewFileName = srcFile.fileName().replace("HyTemplate", ui->txtClassName->text());
             file.rename(srcFile.absoluteDir().absolutePath() % "/" % sNewFileName);
             file.close();
         }
@@ -186,9 +199,16 @@ void DlgNewProject::on_buttonBox_accepted()
         
         QDir exeDir(GetProjDirPath() % "bin/");
 
+        sContents.replace("HyTitle", ui->txtTitleName->text());
         sContents.replace("HyTemplate", ui->txtClassName->text());
         sContents.replace("HyProjGUID", projGUID.toString());
-        sContents.replace("HyHarmonyProjLocation", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "Harmony.vcxproj"));
+        if(ui->radVs2013->isChecked())
+            sContents.replace("HyHarmonyProjLocation", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "src/Harmony_vs2013.vcxproj"));
+        else if(ui->radVs2015->isChecked())
+            sContents.replace("HyHarmonyProjLocation", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "src/Harmony_vs2015.vcxproj"));
+        else
+            HyGuiLog("Unknown solution type", LOGTYPE_Error);
+        
         sContents.replace("HyHarmonyInclude", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "include"));
         sContents.replace("HyWorkingDirectory", GetProjDirPath());
 

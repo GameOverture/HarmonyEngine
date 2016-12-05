@@ -316,6 +316,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QRadioButton" name="radVs2015">
+        <property name="text">
+         <string>Visual Studio 2015</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

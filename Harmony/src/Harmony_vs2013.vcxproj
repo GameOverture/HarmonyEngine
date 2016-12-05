@@ -35,181 +35,181 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\Harmony\Threading\BasicSync.cpp" />
-    <ClCompile Include="include\Harmony\Threading\InteropUnix.cpp" />
-    <ClCompile Include="include\Harmony\Threading\stdafx.cpp" />
-    <ClCompile Include="include\Harmony\Threading\Threading.cpp" />
-    <ClCompile Include="include\Harmony\Threading\TLSEntry.cpp" />
-    <ClCompile Include="include\Harmony\Threading\Utils.cpp" />
-    <ClCompile Include="include\Harmony\Threading\WaitObject.cpp" />
-    <ClCompile Include="include\Harmony\Threading\WaitObjectEx.cpp" />
-    <ClCompile Include="src\Assets\Data\HyAudioData.cpp" />
-    <ClCompile Include="src\Assets\Data\HyMesh3dData.cpp" />
-    <ClCompile Include="src\Assets\Data\HyPrimitive2dData.cpp" />
-    <ClCompile Include="src\Assets\Data\HySpine2dData.cpp" />
-    <ClCompile Include="src\Assets\Data\HySprite2dData.cpp" />
-    <ClCompile Include="src\Assets\Data\HyText2dData.cpp" />
-    <ClCompile Include="src\Assets\Data\HyTexturedQuad2dData.cpp" />
-    <ClCompile Include="src\Assets\Data\IHyData.cpp" />
-    <ClCompile Include="src\Assets\Data\IHy2dData.cpp" />
-    <ClCompile Include="src\Assets\HyAssetManager.cpp" />
-    <ClCompile Include="src\Assets\HyTextures.cpp" />
-    <ClCompile Include="src\Audio\IHyAudio.cpp" />
-    <ClCompile Include="src\Audio\IHyAudioInst.cpp" />
-    <ClCompile Include="src\Audio\Interop\HyAudio_Win.cpp" />
-    <ClCompile Include="src\Audio\Interop\IHyAudioInst_Win.cpp" />
-    <ClCompile Include="src\Diagnostics\HyGuiComms.cpp" />
-    <ClCompile Include="src\Diagnostics\HyGuiMessage.cpp" />
-    <ClCompile Include="src\Diagnostics\HyLiveVarManager.cpp" />
-    <ClCompile Include="src\HyEngine.cpp" />
-    <ClCompile Include="src\IHyApplication.cpp" />
-    <ClCompile Include="src\Input\IHyInput.cpp" />
-    <ClCompile Include="src\Input\IHyInputMap.cpp" />
-    <ClCompile Include="src\Input\Interop\HyInputMap_Gainput.cpp" />
-    <ClCompile Include="src\Input\Interop\HyInput_Gainput.cpp" />
-    <ClCompile Include="src\Memory\HyMemoryHeap.cpp" />
-    <ClCompile Include="src\Renderer\HyGfxComms.cpp" />
-    <ClCompile Include="src\Renderer\IHyRenderer.cpp" />
-    <ClCompile Include="src\Renderer\HyRenderState.cpp" />
-    <ClCompile Include="src\Renderer\IHyShader.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\HyOpenGL.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\HyOpenGLShader.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\Interop\HyOpenGL_Win.cpp" />
-    <ClCompile Include="src\Renderer\Viewport\HyWindow.cpp" />
-    <ClCompile Include="src\Renderer\Viewport\HyCamera.cpp" />
-    <ClCompile Include="src\Scene\HyEntity2d.cpp" />
-    <ClCompile Include="src\Scene\HyPhysEntity2d.cpp" />
-    <ClCompile Include="src\Scene\HyScene.cpp" />
-    <ClCompile Include="src\Scene\Instances\HyAudio2d.cpp" />
-    <ClCompile Include="src\Scene\Instances\HyMesh3d.cpp" />
-    <ClCompile Include="src\Scene\Instances\HyPrimitive2d.cpp" />
-    <ClCompile Include="src\Scene\Instances\HySpine2d.cpp" />
-    <ClCompile Include="src\Scene\Instances\HySprite2d.cpp" />
-    <ClCompile Include="src\Scene\Instances\HyText2d.cpp" />
-    <ClCompile Include="src\Scene\Instances\HyTexturedQuad2d.cpp" />
-    <ClCompile Include="src\Scene\Instances\IHyInst2d.cpp" />
-    <ClCompile Include="src\Time\Interop\HyTime_Win.cpp" />
-    <ClCompile Include="src\Time\IHyTime.cpp" />
-    <ClCompile Include="src\Time\Watches\HyStopwatch.cpp" />
-    <ClCompile Include="src\Time\Watches\HyTimer.cpp" />
-    <ClCompile Include="src\Time\Watches\IHyTimeInst.cpp" />
-    <ClCompile Include="src\Utilities\Animation\HyAnimFloat.cpp" />
-    <ClCompile Include="src\Utilities\Animation\HyTweenFuncs.cpp" />
-    <ClCompile Include="src\Utilities\Animation\IHyTransform2d.cpp" />
-    <ClCompile Include="src\Utilities\Animation\IHyTransform3d.cpp" />
-    <ClCompile Include="src\Utilities\Crc32.cpp" />
-    <ClCompile Include="src\Utilities\HyBitManip.cpp" />
-    <ClCompile Include="src\Utilities\HyDebugPhys2d.cpp" />
-    <ClCompile Include="src\Utilities\HyFileIO.cpp" />
-    <ClCompile Include="src\Utilities\HyHardwareInfo.cpp" />
-    <ClCompile Include="src\Utilities\HyMath.cpp" />
-    <ClCompile Include="src\Utilities\HyBox2dRuntime.cpp" />
-    <ClCompile Include="src\Utilities\HyStrManip.cpp" />
-    <ClCompile Include="src\Utilities\HyVariant.cpp" />
-    <ClCompile Include="src\Utilities\jasonxx.cc" />
-    <ClCompile Include="src\Utilities\stb_image.c" />
+    <ClCompile Include="..\include\Harmony\Threading\BasicSync.cpp" />
+    <ClCompile Include="..\include\Harmony\Threading\InteropUnix.cpp" />
+    <ClCompile Include="..\include\Harmony\Threading\stdafx.cpp" />
+    <ClCompile Include="..\include\Harmony\Threading\Threading.cpp" />
+    <ClCompile Include="..\include\Harmony\Threading\TLSEntry.cpp" />
+    <ClCompile Include="..\include\Harmony\Threading\Utils.cpp" />
+    <ClCompile Include="..\include\Harmony\Threading\WaitObject.cpp" />
+    <ClCompile Include="..\include\Harmony\Threading\WaitObjectEx.cpp" />
+    <ClCompile Include="Assets\Data\HyAudioData.cpp" />
+    <ClCompile Include="Assets\Data\HyMesh3dData.cpp" />
+    <ClCompile Include="Assets\Data\HyPrimitive2dData.cpp" />
+    <ClCompile Include="Assets\Data\HySpine2dData.cpp" />
+    <ClCompile Include="Assets\Data\HySprite2dData.cpp" />
+    <ClCompile Include="Assets\Data\HyText2dData.cpp" />
+    <ClCompile Include="Assets\Data\HyTexturedQuad2dData.cpp" />
+    <ClCompile Include="Assets\Data\IHyData.cpp" />
+    <ClCompile Include="Assets\Data\IHy2dData.cpp" />
+    <ClCompile Include="Assets\HyAssetManager.cpp" />
+    <ClCompile Include="Assets\HyTextures.cpp" />
+    <ClCompile Include="Audio\IHyAudio.cpp" />
+    <ClCompile Include="Audio\IHyAudioInst.cpp" />
+    <ClCompile Include="Audio\Interop\HyAudio_Win.cpp" />
+    <ClCompile Include="Audio\Interop\IHyAudioInst_Win.cpp" />
+    <ClCompile Include="Diagnostics\HyGuiComms.cpp" />
+    <ClCompile Include="Diagnostics\HyGuiMessage.cpp" />
+    <ClCompile Include="Diagnostics\HyLiveVarManager.cpp" />
+    <ClCompile Include="HyEngine.cpp" />
+    <ClCompile Include="IHyApplication.cpp" />
+    <ClCompile Include="Input\IHyInput.cpp" />
+    <ClCompile Include="Input\IHyInputMap.cpp" />
+    <ClCompile Include="Input\Interop\HyInputMap_Gainput.cpp" />
+    <ClCompile Include="Input\Interop\HyInput_Gainput.cpp" />
+    <ClCompile Include="Memory\HyMemoryHeap.cpp" />
+    <ClCompile Include="Renderer\HyGfxComms.cpp" />
+    <ClCompile Include="Renderer\IHyRenderer.cpp" />
+    <ClCompile Include="Renderer\HyRenderState.cpp" />
+    <ClCompile Include="Renderer\IHyShader.cpp" />
+    <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp" />
+    <ClCompile Include="Renderer\OpenGL\HyOpenGLShader.cpp" />
+    <ClCompile Include="Renderer\OpenGL\Interop\HyOpenGL_Win.cpp" />
+    <ClCompile Include="Renderer\Viewport\HyWindow.cpp" />
+    <ClCompile Include="Renderer\Viewport\HyCamera.cpp" />
+    <ClCompile Include="Scene\HyEntity2d.cpp" />
+    <ClCompile Include="Scene\HyPhysEntity2d.cpp" />
+    <ClCompile Include="Scene\HyScene.cpp" />
+    <ClCompile Include="Scene\Instances\HyAudio2d.cpp" />
+    <ClCompile Include="Scene\Instances\HyMesh3d.cpp" />
+    <ClCompile Include="Scene\Instances\HyPrimitive2d.cpp" />
+    <ClCompile Include="Scene\Instances\HySpine2d.cpp" />
+    <ClCompile Include="Scene\Instances\HySprite2d.cpp" />
+    <ClCompile Include="Scene\Instances\HyText2d.cpp" />
+    <ClCompile Include="Scene\Instances\HyTexturedQuad2d.cpp" />
+    <ClCompile Include="Scene\Instances\IHyInst2d.cpp" />
+    <ClCompile Include="Time\Interop\HyTime_Win.cpp" />
+    <ClCompile Include="Time\IHyTime.cpp" />
+    <ClCompile Include="Time\Watches\HyStopwatch.cpp" />
+    <ClCompile Include="Time\Watches\HyTimer.cpp" />
+    <ClCompile Include="Time\Watches\IHyTimeInst.cpp" />
+    <ClCompile Include="Utilities\Animation\HyAnimFloat.cpp" />
+    <ClCompile Include="Utilities\Animation\HyTweenFuncs.cpp" />
+    <ClCompile Include="Utilities\Animation\IHyTransform2d.cpp" />
+    <ClCompile Include="Utilities\Animation\IHyTransform3d.cpp" />
+    <ClCompile Include="Utilities\Crc32.cpp" />
+    <ClCompile Include="Utilities\HyBitManip.cpp" />
+    <ClCompile Include="Utilities\HyDebugPhys2d.cpp" />
+    <ClCompile Include="Utilities\HyFileIO.cpp" />
+    <ClCompile Include="Utilities\HyHardwareInfo.cpp" />
+    <ClCompile Include="Utilities\HyMath.cpp" />
+    <ClCompile Include="Utilities\HyBox2dRuntime.cpp" />
+    <ClCompile Include="Utilities\HyStrManip.cpp" />
+    <ClCompile Include="Utilities\HyVariant.cpp" />
+    <ClCompile Include="Utilities\jasonxx.cc" />
+    <ClCompile Include="Utilities\stb_image.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler.h" />
-    <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler_GNU.h" />
-    <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler_MSVC.h" />
-    <ClInclude Include="include\Harmony\Afx\Compilers\HyCompiler_MWerks.h" />
-    <ClInclude Include="include\Harmony\Afx\HyInteropAfx.h" />
-    <ClInclude Include="include\Harmony\Afx\HyStdAfx.h" />
-    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatAfx.h" />
-    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform.h" />
-    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_OSX.h" />
-    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
-    <ClInclude Include="include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
-    <ClInclude Include="include\Harmony\Assets\Data\HyAudioData.h" />
-    <ClInclude Include="include\Harmony\Assets\Data\HyMesh3dData.h" />
-    <ClInclude Include="include\Harmony\Assets\Data\HyPrimitive2dData.h" />
-    <ClInclude Include="include\Harmony\Assets\Data\HySpine2dData.h" />
-    <ClInclude Include="include\Harmony\Assets\Data\HySprite2dData.h" />
-    <ClInclude Include="include\Harmony\Assets\Data\HyText2dData.h" />
-    <ClInclude Include="include\Harmony\Assets\Data\HyTexturedQuad2dData.h" />
-    <ClInclude Include="include\Harmony\Assets\Data\IHyData.h" />
-    <ClInclude Include="include\Harmony\Assets\Data\IHy2dData.h" />
-    <ClInclude Include="include\Harmony\Assets\HyAssetManager.h" />
-    <ClInclude Include="include\Harmony\Assets\HyTextures.h" />
-    <ClInclude Include="include\Harmony\Assets\HyFactory.h" />
-    <ClInclude Include="include\Harmony\Audio\IHyAudio.h" />
-    <ClInclude Include="include\Harmony\Audio\IHyAudioInst.h" />
-    <ClInclude Include="include\Harmony\Audio\Interop\HyAudio_Win.h" />
-    <ClInclude Include="include\Harmony\Audio\Interop\IHyAudioInst_Win.h" />
-    <ClInclude Include="include\Harmony\Diagnostics\HyGuiComms.h" />
-    <ClInclude Include="include\Harmony\Diagnostics\HyGuiMessage.h" />
-    <ClInclude Include="include\Harmony\Diagnostics\HyLiveVarManager.h" />
-    <ClInclude Include="include\Harmony\HyEngine.h" />
-    <ClInclude Include="include\Harmony\IHyApplication.h" />
-    <ClInclude Include="include\Harmony\Input\IHyInput.h" />
-    <ClInclude Include="include\Harmony\Input\IHyInputMap.h" />
-    <ClInclude Include="include\Harmony\Input\Interop\HyInputMap_Gainput.h" />
-    <ClInclude Include="include\Harmony\Input\Interop\HyInput_Gainput.h" />
-    <ClInclude Include="include\Harmony\Input\Interop\HyInput_NULL.h" />
-    <ClInclude Include="include\Harmony\Memory\HyMemoryHeap.h" />
-    <ClInclude Include="include\Harmony\Memory\Interop\HyMemAPI_Windows.h" />
-    <ClInclude Include="include\Harmony\Memory\PageTypes\HyMedHeapPage.h" />
-    <ClInclude Include="include\Harmony\Memory\PageTypes\HySmlHeapPage.h" />
-    <ClInclude Include="include\Harmony\Renderer\HyGfxComms.h" />
-    <ClInclude Include="include\Harmony\Renderer\IHyRenderer.h" />
-    <ClInclude Include="include\Harmony\Renderer\HyRenderState.h" />
-    <ClInclude Include="include\Harmony\Renderer\IHyShader.h" />
-    <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGL.h" />
-    <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGLShader.h" />
-    <ClInclude Include="include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h" />
-    <ClInclude Include="include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Win.h" />
-    <ClInclude Include="include\Harmony\Renderer\Viewport\HyWindow.h" />
-    <ClInclude Include="include\Harmony\Renderer\Viewport\HyCamera.h" />
-    <ClInclude Include="include\Harmony\Scene\HyEntity2d.h" />
-    <ClInclude Include="include\Harmony\Scene\HyPhysEntity2d.h" />
-    <ClInclude Include="include\Harmony\Scene\HyScene.h" />
-    <ClInclude Include="include\Harmony\Scene\Instances\HyAudio2d.h" />
-    <ClInclude Include="include\Harmony\Scene\Instances\HyMesh3d.h" />
-    <ClInclude Include="include\Harmony\Scene\Instances\HyPrimitive2d.h" />
-    <ClInclude Include="include\Harmony\Scene\Instances\HySpine2d.h" />
-    <ClInclude Include="include\Harmony\Scene\Instances\HySprite2d.h" />
-    <ClInclude Include="include\Harmony\Scene\Instances\HyText2d.h" />
-    <ClInclude Include="include\Harmony\Scene\Instances\HyTexturedQuad2d.h" />
-    <ClInclude Include="include\Harmony\Scene\Instances\IHyInst2d.h" />
-    <ClInclude Include="include\Harmony\Threading\BaseMacro.h" />
-    <ClInclude Include="include\Harmony\Threading\BasicSync.h" />
-    <ClInclude Include="include\Harmony\Threading\Error.h" />
-    <ClInclude Include="include\Harmony\Threading\InteropUnix.h" />
-    <ClInclude Include="include\Harmony\Threading\InteropWin.h" />
-    <ClInclude Include="include\Harmony\Threading\PlatformInterop.h" />
-    <ClInclude Include="include\Harmony\Threading\PrimitiveTypeDefs.h" />
-    <ClInclude Include="include\Harmony\Threading\stdafx.h" />
-    <ClInclude Include="include\Harmony\Threading\Threading.h" />
-    <ClInclude Include="include\Harmony\Threading\TLSEntry.h" />
-    <ClInclude Include="include\Harmony\Threading\Utils.h" />
-    <ClInclude Include="include\Harmony\Threading\WaitObject.h" />
-    <ClInclude Include="include\Harmony\Threading\WaitObjectEx.h" />
-    <ClInclude Include="include\Harmony\Time\Interop\HyTime_Win.h" />
-    <ClInclude Include="include\Harmony\Time\IHyTime.h" />
-    <ClInclude Include="include\Harmony\Time\Watches\HyStopwatch.h" />
-    <ClInclude Include="include\Harmony\Time\Watches\HyTimer.h" />
-    <ClInclude Include="include\Harmony\Time\Watches\IHyTimeInst.h" />
-    <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimFloat.h" />
-    <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec2.h" />
-    <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec3.h" />
-    <ClInclude Include="include\Harmony\Utilities\Animation\HyAnimVec4.h" />
-    <ClInclude Include="include\Harmony\Utilities\Animation\HyTweenFuncs.h" />
-    <ClInclude Include="include\Harmony\Utilities\Animation\IHyTransform2d.h" />
-    <ClInclude Include="include\Harmony\Utilities\Animation\IHyTransform.h" />
-    <ClInclude Include="include\Harmony\Utilities\Animation\IHyTransform3d.h" />
-    <ClInclude Include="include\Harmony\Utilities\Containers\HyStaticArray.h" />
-    <ClInclude Include="include\Harmony\Utilities\Crc32.h" />
-    <ClInclude Include="include\Harmony\Utilities\HyBitManip.h" />
-    <ClInclude Include="include\Harmony\Utilities\HyDebugPhys2d.h" />
-    <ClInclude Include="include\Harmony\Utilities\HyFileIO.h" />
-    <ClInclude Include="include\Harmony\Utilities\HyHardwareInfo.h" />
-    <ClInclude Include="include\Harmony\Utilities\HyMath.h" />
-    <ClInclude Include="include\Harmony\Utilities\HyBox2dRuntime.h" />
-    <ClInclude Include="include\Harmony\Utilities\HyStrManip.h" />
-    <ClInclude Include="include\Harmony\Utilities\HyVariant.h" />
-    <ClInclude Include="include\Harmony\Utilities\jsonxx.h" />
-    <ClInclude Include="include\Harmony\Utilities\stb_image.h" />
+    <ClInclude Include="..\include\Harmony\Afx\Compilers\HyCompiler.h" />
+    <ClInclude Include="..\include\Harmony\Afx\Compilers\HyCompiler_GNU.h" />
+    <ClInclude Include="..\include\Harmony\Afx\Compilers\HyCompiler_MSVC.h" />
+    <ClInclude Include="..\include\Harmony\Afx\Compilers\HyCompiler_MWerks.h" />
+    <ClInclude Include="..\include\Harmony\Afx\HyInteropAfx.h" />
+    <ClInclude Include="..\include\Harmony\Afx\HyStdAfx.h" />
+    <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatAfx.h" />
+    <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform.h" />
+    <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_OSX.h" />
+    <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
+    <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Data\HyAudioData.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Data\HyMesh3dData.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Data\HyPrimitive2dData.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Data\HySpine2dData.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Data\HySprite2dData.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Data\HyText2dData.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Data\HyTexturedQuad2dData.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Data\IHyData.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Data\IHy2dData.h" />
+    <ClInclude Include="..\include\Harmony\Assets\HyAssetManager.h" />
+    <ClInclude Include="..\include\Harmony\Assets\HyTextures.h" />
+    <ClInclude Include="..\include\Harmony\Assets\HyFactory.h" />
+    <ClInclude Include="..\include\Harmony\Audio\IHyAudio.h" />
+    <ClInclude Include="..\include\Harmony\Audio\IHyAudioInst.h" />
+    <ClInclude Include="..\include\Harmony\Audio\Interop\HyAudio_Win.h" />
+    <ClInclude Include="..\include\Harmony\Audio\Interop\IHyAudioInst_Win.h" />
+    <ClInclude Include="..\include\Harmony\Diagnostics\HyGuiComms.h" />
+    <ClInclude Include="..\include\Harmony\Diagnostics\HyGuiMessage.h" />
+    <ClInclude Include="..\include\Harmony\Diagnostics\HyLiveVarManager.h" />
+    <ClInclude Include="..\include\Harmony\HyEngine.h" />
+    <ClInclude Include="..\include\Harmony\IHyApplication.h" />
+    <ClInclude Include="..\include\Harmony\Input\IHyInput.h" />
+    <ClInclude Include="..\include\Harmony\Input\IHyInputMap.h" />
+    <ClInclude Include="..\include\Harmony\Input\Interop\HyInputMap_Gainput.h" />
+    <ClInclude Include="..\include\Harmony\Input\Interop\HyInput_Gainput.h" />
+    <ClInclude Include="..\include\Harmony\Input\Interop\HyInput_NULL.h" />
+    <ClInclude Include="..\include\Harmony\Memory\HyMemoryHeap.h" />
+    <ClInclude Include="..\include\Harmony\Memory\Interop\HyMemAPI_Windows.h" />
+    <ClInclude Include="..\include\Harmony\Memory\PageTypes\HyMedHeapPage.h" />
+    <ClInclude Include="..\include\Harmony\Memory\PageTypes\HySmlHeapPage.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\HyGfxComms.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\IHyRenderer.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\HyRenderState.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\IHyShader.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGL.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShader.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Win.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\Viewport\HyWindow.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\Viewport\HyCamera.h" />
+    <ClInclude Include="..\include\Harmony\Scene\HyEntity2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\HyPhysEntity2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\HyScene.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Instances\HyAudio2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Instances\HyMesh3d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Instances\HyPrimitive2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Instances\HySpine2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Instances\HySprite2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Instances\HyText2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Instances\HyTexturedQuad2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Instances\IHyInst2d.h" />
+    <ClInclude Include="..\include\Harmony\Threading\BaseMacro.h" />
+    <ClInclude Include="..\include\Harmony\Threading\BasicSync.h" />
+    <ClInclude Include="..\include\Harmony\Threading\Error.h" />
+    <ClInclude Include="..\include\Harmony\Threading\InteropUnix.h" />
+    <ClInclude Include="..\include\Harmony\Threading\InteropWin.h" />
+    <ClInclude Include="..\include\Harmony\Threading\PlatformInterop.h" />
+    <ClInclude Include="..\include\Harmony\Threading\PrimitiveTypeDefs.h" />
+    <ClInclude Include="..\include\Harmony\Threading\stdafx.h" />
+    <ClInclude Include="..\include\Harmony\Threading\Threading.h" />
+    <ClInclude Include="..\include\Harmony\Threading\TLSEntry.h" />
+    <ClInclude Include="..\include\Harmony\Threading\Utils.h" />
+    <ClInclude Include="..\include\Harmony\Threading\WaitObject.h" />
+    <ClInclude Include="..\include\Harmony\Threading\WaitObjectEx.h" />
+    <ClInclude Include="..\include\Harmony\Time\Interop\HyTime_Win.h" />
+    <ClInclude Include="..\include\Harmony\Time\IHyTime.h" />
+    <ClInclude Include="..\include\Harmony\Time\Watches\HyStopwatch.h" />
+    <ClInclude Include="..\include\Harmony\Time\Watches\HyTimer.h" />
+    <ClInclude Include="..\include\Harmony\Time\Watches\IHyTimeInst.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\Animation\HyAnimFloat.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\Animation\HyAnimVec2.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\Animation\HyAnimVec3.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\Animation\HyAnimVec4.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\Animation\HyTweenFuncs.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\Animation\IHyTransform2d.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\Animation\IHyTransform.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\Animation\IHyTransform3d.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\Containers\HyStaticArray.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\Crc32.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\HyBitManip.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\HyDebugPhys2d.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\HyFileIO.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\HyHardwareInfo.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\HyMath.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\HyBox2dRuntime.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\HyStrManip.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\HyVariant.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\jsonxx.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\stb_image.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -300,42 +300,42 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(ProjectDir)\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>$(ProjectName)d</TargetName>
-    <OutDir>$(ProjectDir)\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">
-    <OutDir>$(ProjectDir)\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)Qtd</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|x64'">
     <TargetName>$(ProjectName)Qtd</TargetName>
-    <OutDir>$(ProjectDir)\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(ProjectDir)\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(ProjectDir)\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
-    <OutDir>$(ProjectDir)\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)Qt</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|x64'">
     <TargetName>$(ProjectName)Qt</TargetName>
-    <OutDir>$(ProjectDir)\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -343,7 +343,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
@@ -357,7 +357,7 @@
       <AdditionalDependencies>x3daudio.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
     <ProjectReference>
@@ -370,7 +370,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
@@ -384,7 +384,7 @@
       <AdditionalDependencies>x3daudio.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
     <ProjectReference>
@@ -397,7 +397,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
@@ -411,7 +411,7 @@
       <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -426,7 +426,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
@@ -440,7 +440,7 @@
       <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -457,7 +457,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
     </ClCompile>
@@ -471,7 +471,7 @@
       <AdditionalDependencies>x3daudio.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -482,7 +482,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
     </ClCompile>
@@ -496,7 +496,7 @@
       <AdditionalDependencies>x3daudio.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
@@ -507,7 +507,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
@@ -522,7 +522,7 @@
       <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
@@ -535,7 +535,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
@@ -550,7 +550,7 @@
       <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
     </Lib>

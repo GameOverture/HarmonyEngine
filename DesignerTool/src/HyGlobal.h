@@ -294,8 +294,7 @@ public:
            !dir.exists("lib/") ||
            !dir.exists("src/") ||
            !dir.exists("templates/") ||
-           (!dir.exists("Harmony_vs2013.sln") && !dir.exists("Harmony_vs2015.sln")) ||
-           (!dir.exists("Harmony_vs2013.vcxproj") && !dir.exists("Harmony_vs2015.vcxproj")))
+           (!dir.exists("Harmony_vs2013.sln") && !dir.exists("Harmony_vs2015.sln")))
         {
             return false;
         }
