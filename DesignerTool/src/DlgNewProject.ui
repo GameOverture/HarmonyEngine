@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>568</width>
-    <height>415</height>
+    <height>438</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -353,6 +353,9 @@
  </widget>
  <tabstops>
   <tabstop>txtTitleName</tabstop>
+  <tabstop>txtClassName</tabstop>
+  <tabstop>txtGameLocation</tabstop>
+  <tabstop>btnBrowse</tabstop>
   <tabstop>chkCreateGameDir</tabstop>
   <tabstop>txtAssetsDirName</tabstop>
   <tabstop>txtAssetsLocation</tabstop>
@@ -364,6 +367,7 @@
   <tabstop>txtSourceLocation</tabstop>
   <tabstop>btnBrowseSource</tabstop>
   <tabstop>radVs2013</tabstop>
+  <tabstop>radVs2015</tabstop>
  </tabstops>
  <resources/>
  <connections>
