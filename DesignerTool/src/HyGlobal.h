@@ -196,8 +196,8 @@ public:
         sm_AudioIcons[AUDIO_Wave_Warning].addFile(QString(":/icons16x16/atlas-frameWarning.png"));
 
         sm_pCodeNameValidator = new QRegExpValidator(QRegExp("[A-Za-z_]+[A-Za-z0-9_]*"));
-        sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_-]*"));
-        sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_-]*"));
+        sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-]*"));
+        sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_\\-]*"));
         sm_pVector2dValidator = new QRegExpValidator(QRegExp("\\([0-9]*\\.?[0-9]*,[0-9]*\\.?[0-9]*\\)"));
 
         sm_ErrorStrings[GUIFRAMEERROR_CannotFindMetaImg] = "Cannot find source meta-image";

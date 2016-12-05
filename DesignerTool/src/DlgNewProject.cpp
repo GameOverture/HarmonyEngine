@@ -28,10 +28,13 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
     ui(new Ui::DlgNewProject)
 {
     ui->setupUi(this);
-    ui->txtGameTitle->setText("NewGame");
-    ui->txtGameTitle->setFocus();
-    ui->txtGameTitle->selectAll();
-    ui->txtGameTitle->setValidator(HyGlobal::CodeNameValidator());
+    ui->txtTitleName->setText("NewGame");
+    ui->txtTitleName->setFocus();
+    ui->txtTitleName->selectAll();
+    ui->txtTitleName->setValidator(HyGlobal::FileNameValidator());
+    
+    ui->txtClassName->setText("NewGame");
+    ui->txtClassName->setValidator(HyGlobal::CodeNameValidator());
 
     ui->txtGameLocation->setText(sDefaultLocation);
     
@@ -56,15 +59,15 @@ DlgNewProject::~DlgNewProject()
 QString DlgNewProject::GetProjFilePath()
 {
     if(ui->chkCreateGameDir->isChecked())
-        return ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + '/' + ui->txtGameTitle->text() + HyGlobal::ItemExt(ITEM_Project);
+        return ui->txtGameLocation->text() + '/' + ui->txtTitleName->text() + '/' + ui->txtTitleName->text() + HyGlobal::ItemExt(ITEM_Project);
     else
-        return ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + HyGlobal::ItemExt(ITEM_Project);
+        return ui->txtGameLocation->text() + '/' + ui->txtTitleName->text() + HyGlobal::ItemExt(ITEM_Project);
 }
 
 QString DlgNewProject::GetProjDirPath()
 {
     if(ui->chkCreateGameDir->isChecked())
-        return ui->txtGameLocation->text() + '/' + ui->txtGameTitle->text() + '/';
+        return ui->txtGameLocation->text() + '/' + ui->txtTitleName->text() + '/';
     else
         return ui->txtGameLocation->text() + '/';
 }
@@ -84,7 +87,8 @@ void DlgNewProject::on_buttonBox_accepted()
     QString sRelSourcePath = QDir::cleanPath(ui->txtSourceLocation->text() % "/" % ui->txtSourceDirName->text() % "/");
 
     QJsonObject jsonObj;
-    jsonObj.insert("GameName", ui->txtGameTitle->text());
+    jsonObj.insert("GameName", ui->txtTitleName->text());
+    jsonObj.insert("ClassName", ui->txtClassName->text());
     jsonObj.insert("DataPath", sRelDataPath);
     jsonObj.insert("MetaDataPath", sRelMetaDataPath);
     jsonObj.insert("SourcePath", sRelSourcePath);
@@ -159,7 +163,7 @@ void DlgNewProject::on_buttonBox_accepted()
         if(srcFile.fileName().contains("HyTemplate"))
         {
             QFile file(srcFile.absoluteFilePath());
-            QString sNewFileName = srcFile.fileName().replace("HyTemplate", ui->txtGameTitle->text());
+            QString sNewFileName = srcFile.fileName().replace("HyTemplate", ui->txtTitleName->text());
             file.rename(srcFile.absoluteDir().absolutePath() % "/" % sNewFileName);
             file.close();
         }
@@ -182,7 +186,7 @@ void DlgNewProject::on_buttonBox_accepted()
         
         QDir exeDir(GetProjDirPath() % "bin/");
 
-        sContents.replace("HyTemplate", ui->txtGameTitle->text());
+        sContents.replace("HyTemplate", ui->txtClassName->text());
         sContents.replace("HyProjGUID", projGUID.toString());
         sContents.replace("HyHarmonyProjLocation", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "Harmony.vcxproj"));
         sContents.replace("HyHarmonyInclude", srcFile.dir().relativeFilePath(MainWindow::EngineLocation() % "include"));
@@ -213,13 +217,6 @@ void DlgNewProject::on_btnBrowse_clicked()
         QString sDir = pDlg->selectedFiles()[0];
         ui->txtGameLocation->setText(sDir);
     }
-}
-
-void DlgNewProject::on_txtGameTitle_textChanged(const QString &arg1)
-{
-    ui->lblAppendHint->setText("Appends \"/" % ui->txtGameTitle->text() % "/\" to above");
-
-    ErrorCheck();
 }
 
 void DlgNewProject::on_txtGameLocation_textChanged(const QString &arg1)
@@ -310,9 +307,16 @@ void DlgNewProject::ErrorCheck()
             break;
         }
 
-        if(ui->txtGameTitle->text().isEmpty())
+        if(ui->txtTitleName->text().isEmpty())
         {
             ui->lblError->setText("Error: Game title cannot be blank.");
+            bIsError = true;
+            break;
+        }
+        
+        if(ui->txtClassName->text().isEmpty())
+        {
+            ui->lblError->setText("Error: Class name cannot be blank.");
             bIsError = true;
             break;
         }
@@ -473,5 +477,11 @@ void DlgNewProject::on_txtSourceDirName_textChanged(const QString &arg1)
 void DlgNewProject::on_chkCreateGameDir_clicked()
 {
     SetRelativePaths();
+    ErrorCheck();
+}
+
+void DlgNewProject::on_txtTitleName_textChanged(const QString &arg1)
+{
+    ui->lblAppendHint->setText("Appends \"/" % ui->txtTitleName->text() % "/\" to above");
     ErrorCheck();
 }

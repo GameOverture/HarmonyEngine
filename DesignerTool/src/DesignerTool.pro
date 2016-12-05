@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = DesignerTool
 TEMPLATE = app
 
+CONFIG += axcontainer
+
 SOURCES += main.cpp \
     DlgNewProject.cpp \
     WidgetExplorer.cpp \

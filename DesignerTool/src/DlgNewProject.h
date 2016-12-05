@@ -41,8 +41,6 @@ private slots:
 
     void on_btnBrowse_clicked();
 
-    void on_txtGameTitle_textChanged(const QString &arg1);
-
     void on_txtGameLocation_textChanged(const QString &arg1);
 
     void on_btnBrowseAssets_clicked();
@@ -65,6 +63,8 @@ private slots:
 
     void on_txtSourceLocation_textEdited(const QString &arg1);
 
+    void on_txtTitleName_textChanged(const QString &arg1);
+    
 private:
     Ui::DlgNewProject *ui;
     
