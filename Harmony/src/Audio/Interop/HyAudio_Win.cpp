@@ -7,6 +7,7 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
 #include "Audio/Interop/HyAudio_Win.h"
 
@@ -27,6 +28,7 @@
 	//#pragma warning(pop)
 #endif
 
+// TODO: Are multi-character literals compiler specific to work?
 #ifdef HY_ENDIAN_BIG
 	#define fourccRIFF 'RIFF'
 	#define fourccDATA 'data'
@@ -56,7 +58,7 @@ HyAudio_Win::HyAudio_Win(vector<HyWindow *> &windowListRef) :	IHyAudio(windowLis
 																m_pXAudio2(NULL),
 																m_pMasterVoice(NULL)
 {
-	HRESULT hr;
+	HRESULT hr = 0;
 #ifndef HY_PLATFORM_GUI
 	hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if(FAILED(hr))
