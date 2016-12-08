@@ -41,6 +41,8 @@ public:
 
 	void Load();
 	void Unload();
+
+	virtual void OnUpdate();
 };
 
 #endif /* __HyEntity2d_h__ */

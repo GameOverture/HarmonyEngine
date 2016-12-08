@@ -130,7 +130,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetA
         m_pDrawAtlasPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
         m_pDrawAtlasPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
 
-        m_DrawAtlasOutline.SetAsQuad(pAtlas->width, pAtlas->height, true);
+        m_DrawAtlasOutline.SetAsQuad(static_cast<int>(pAtlas->width), static_cast<int>(pAtlas->height), true);
 
         // Calculate the proper zoom amount to fit the whole atlas width (plus some extra margin) in preview window
         float fExtraMargin = 25.0f;

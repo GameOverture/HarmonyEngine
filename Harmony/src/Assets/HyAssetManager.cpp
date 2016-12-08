@@ -110,7 +110,7 @@ void HyAssetManager::Update()
 void HyAssetManager::LoadInst2d(IHyInst2d *pInst)
 {
 	IHyData *pLoadData = NULL;
-	switch(pInst->GetInstType())
+	switch(pInst->GetType())
 	{
 	case HYTYPE_Sprite2d:
 		pLoadData = m_Sprite2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());

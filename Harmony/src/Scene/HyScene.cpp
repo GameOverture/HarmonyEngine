@@ -26,11 +26,11 @@
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
 
-HyScene::HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow *> &vWindowRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
-																			m_iPhysVelocityIterations(8),
-																			m_iPhysPositionIterations(3),
-																			m_GfxCommsRef(gfxCommsRef),
-																			m_vWindowRef(vWindowRef)
+HyScene::HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
+																				m_iPhysVelocityIterations(8),
+																				m_iPhysPositionIterations(3),
+																				m_GfxCommsRef(gfxCommsRef),
+																				m_WindowListRef(WindowListRef)
 {
 	m_b2World.SetDebugDraw(&m_DrawPhys2d);
 	m_b2World.SetContactListener(&m_Phys2dContactListener);
@@ -51,18 +51,18 @@ void HyScene::AddInstance(IHyInst2d *pInst)
 {
 	pInst->m_RenderState.PrimeShaderUniforms();
 
-	m_vLoadedInst2d.push_back(pInst);
+	m_LoadedInst2dList.push_back(pInst);
 	sm_bInst2dOrderingDirty = true;
 }
 
 void HyScene::RemoveInst(IHyInst2d *pInst)
 {
-	for(vector<IHyInst2d *>::iterator it = m_vLoadedInst2d.begin(); it != m_vLoadedInst2d.end(); ++it)
+	for(vector<IHyInst2d *>::iterator it = m_LoadedInst2dList.begin(); it != m_LoadedInst2dList.end(); ++it)
 	{
 		if((*it) == pInst)
 		{
 			// TODO: Log about erasing instance
-			m_vLoadedInst2d.erase(it);
+			m_LoadedInst2dList.erase(it);
 			break;
 		}
 	}
@@ -70,7 +70,7 @@ void HyScene::RemoveInst(IHyInst2d *pInst)
 
 void HyScene::CopyAllInsts(vector<IHyInst2d *> &vInstsToCopy)
 {
-	vInstsToCopy = m_vLoadedInst2d;
+	vInstsToCopy = m_LoadedInst2dList;
 }
 
 void HyScene::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
@@ -78,7 +78,7 @@ void HyScene::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
 	if(pAnimFloat->m_bAddedToSceneUpdate == false)
 	{
 		pAnimFloat->m_bAddedToSceneUpdate = true;
-		m_vActiveAnimFloats.push_back(pAnimFloat);
+		m_ActiveAnimFloatsList.push_back(pAnimFloat);
 	}
 }
 
@@ -91,12 +91,12 @@ void HyScene::PreUpdate()
 	m_b2World.Step(IHyTime::GetUpdateStepSeconds(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 
 	// Update any currently active AnimFloat in the game, and remove any of them that are finished.
-	for (vector<HyAnimFloat *>::iterator iter = m_vActiveAnimFloats.begin(); iter != m_vActiveAnimFloats.end(); )
+	for (vector<HyAnimFloat *>::iterator iter = m_ActiveAnimFloatsList.begin(); iter != m_ActiveAnimFloatsList.end(); )
 	{
 		if(!(*iter)->UpdateFloat())
 		{
 			(*iter)->m_bAddedToSceneUpdate = false;
-			iter = m_vActiveAnimFloats.erase(iter);
+			iter = m_ActiveAnimFloatsList.erase(iter);
 		}
 		else
 			++iter;
@@ -109,12 +109,12 @@ void HyScene::PostUpdate()
 {
 	if(sm_bInst2dOrderingDirty)
 	{
-		std::sort(m_vLoadedInst2d.begin(), m_vLoadedInst2d.end(), &Inst2dSortPredicate);
+		std::sort(m_LoadedInst2dList.begin(), m_LoadedInst2dList.end(), &Inst2dSortPredicate);
 		sm_bInst2dOrderingDirty = false;
 	}
 
-	for(uint32 i = 0; i < m_vWindowRef.size(); ++i)
-		m_vWindowRef[i]->Update();
+	for(uint32 i = 0; i < m_WindowListRef.size(); ++i)
+		m_WindowListRef[i]->Update();
 
 	WriteDrawBuffer();
 }
@@ -135,7 +135,7 @@ void HyScene::WriteDrawBuffer()
 	m_pCurWritePos += sizeof(HyGfxComms::tDrawHeader);
 
 	glm::mat4 mtxView;
-	uint32 uiNumWindows = static_cast<uint32>(m_vWindowRef.size());
+	uint32 uiNumWindows = static_cast<uint32>(m_WindowListRef.size());
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 3d CAMERA(S) BUFFER
 	pDrawHeader->uiOffsetToCameras3d = m_pCurWritePos - m_GfxCommsRef.GetDrawBuffer();
@@ -145,19 +145,19 @@ void HyScene::WriteDrawBuffer()
 	int32 iCount = 0;
 	for(uint32 i = 0; i < uiNumWindows; ++i)
 	{
-		uint32 uiNumCameras3d = static_cast<uint32>(m_vWindowRef[i]->m_vCams3d.size());
+		uint32 uiNumCameras3d = static_cast<uint32>(m_WindowListRef[i]->m_vCams3d.size());
 		for(uint32 j = 0; j < uiNumCameras3d; ++j)
 		{
-			if(m_vWindowRef[i]->m_vCams3d[j]->IsEnabled())
+			if(m_WindowListRef[i]->m_vCams3d[j]->IsEnabled())
 			{
 				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = i;
 				m_pCurWritePos += sizeof(uint32);
 
-				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_vWindowRef[i]->m_vCams3d[j]->GetViewport();
+				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_WindowListRef[i]->m_vCams3d[j]->GetViewport();
 				m_pCurWritePos += sizeof(HyRectangle<float>);
 			
 				HyError("GetLocalTransform_SRT should be 3d");
-				m_vWindowRef[i]->m_vCams3d[j]->GetLocalTransform_SRT(mtxView);
+				m_WindowListRef[i]->m_vCams3d[j]->GetLocalTransform_SRT(mtxView);
 				*(reinterpret_cast<glm::mat4 *>(m_pCurWritePos)) = mtxView;
 				m_pCurWritePos += sizeof(glm::mat4);
 
@@ -176,18 +176,18 @@ void HyScene::WriteDrawBuffer()
 	iCount = 0;
 	for(uint32 i = 0; i < uiNumWindows; ++i)
 	{
-		uint32 uiNumCameras2d = static_cast<uint32>(m_vWindowRef[i]->m_vCams2d.size());
+		uint32 uiNumCameras2d = static_cast<uint32>(m_WindowListRef[i]->m_vCams2d.size());
 		for(uint32 j = 0; j < uiNumCameras2d; ++j)
 		{
-			if(m_vWindowRef[i]->m_vCams2d[j]->IsEnabled())
+			if(m_WindowListRef[i]->m_vCams2d[j]->IsEnabled())
 			{
 				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = i;
 				m_pCurWritePos += sizeof(uint32);
 
-				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_vWindowRef[i]->m_vCams2d[j]->GetViewport();
+				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_WindowListRef[i]->m_vCams2d[j]->GetViewport();
 				m_pCurWritePos += sizeof(HyRectangle<float>);
 
-				m_vWindowRef[i]->m_vCams2d[j]->GetLocalTransform_SRT(mtxView);
+				m_WindowListRef[i]->m_vCams2d[j]->GetLocalTransform_SRT(mtxView);
 
 				// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly in the shader)
 				mtxView[3].x *= -1;
@@ -209,13 +209,13 @@ void HyScene::WriteDrawBuffer()
 	m_pCurWritePos += sizeof(int32);
 
 	iCount = 0;
-	uint32 uiTotalNumInsts = static_cast<uint32>(m_vLoadedInst3d.size());
+	uint32 uiTotalNumInsts = static_cast<uint32>(m_LoadedInst3dList.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_vLoadedInst3d[i]->IsEnabled())
+		if(m_LoadedInst3dList[i]->IsEnabled())
 		{
 			// TODO: 
-			//new (m_pCurWritePos) HyDrawText2d(reinterpret_cast<HyText2d *>(m_vLoadedInst2d[i]), uiVertexDataOffset, pCurVertexWritePos);
+			//new (m_pCurWritePos) HyDrawText2d(reinterpret_cast<HyText2d *>(m_LoadedInst2dList[i]), uiVertexDataOffset, pCurVertexWritePos);
 			//m_pCurWritePos += sizeof(HyDrawText2d);
 			iCount++;
 		}
@@ -229,7 +229,7 @@ void HyScene::WriteDrawBuffer()
 	m_pCurWritePos += sizeof(int32);
 
 	iCount = 0;
-	uiTotalNumInsts = static_cast<uint32>(m_vLoadedInst2d.size());
+	uiTotalNumInsts = static_cast<uint32>(m_LoadedInst2dList.size());
 
 	char *pStartVertexWritePos = m_pCurWritePos + (uiTotalNumInsts * sizeof(HyRenderState));
 	pDrawHeader->uiOffsetToVertexData2d = pStartVertexWritePos - m_GfxCommsRef.GetDrawBuffer();
@@ -240,17 +240,17 @@ void HyScene::WriteDrawBuffer()
 
 	for(size_t i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_vLoadedInst2d[i]->IsEnabled() == false)
+		if(m_LoadedInst2dList[i]->IsEnabled() == false)
 			continue;
 
 		// Updates the instance as well as its shader uniforms
-		m_vLoadedInst2d[i]->Update();
+		m_LoadedInst2dList[i]->Update();
 
 		// If previously written instance has equal render state by "operator ==" then it's to be assumed the instance data can be batched and doesn't need to write another render state
-		if(pCurRenderState2d == NULL || m_vLoadedInst2d[i]->GetRenderState() != *pCurRenderState2d)
+		if(pCurRenderState2d == NULL || m_LoadedInst2dList[i]->GetRenderState() != *pCurRenderState2d)
 		{
 			// Start a new draw. Write render state to buffer to be sent to render thread
-			memcpy(m_pCurWritePos, &m_vLoadedInst2d[i]->GetRenderState(), sizeof(HyRenderState));
+			memcpy(m_pCurWritePos, &m_LoadedInst2dList[i]->GetRenderState(), sizeof(HyRenderState));
 			pCurRenderState2d = reinterpret_cast<HyRenderState *>(m_pCurWritePos);
 			pCurRenderState2d->SetDataOffset(uiVertexDataOffset);
 
@@ -263,11 +263,11 @@ void HyScene::WriteDrawBuffer()
 		else
 		{
 			// This instance will be batched with the current render state
-			pCurRenderState2d->AppendInstances(m_vLoadedInst2d[i]->GetRenderState().GetNumInstances());
+			pCurRenderState2d->AppendInstances(m_LoadedInst2dList[i]->GetRenderState().GetNumInstances());
 		}
 		
 		// OnWriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
-		m_vLoadedInst2d[i]->OnWriteDrawBufferData(pCurVertexWritePos);
+		m_LoadedInst2dList[i]->OnWriteDrawBufferData(pCurVertexWritePos);
 		uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
 	}
 

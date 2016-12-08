@@ -71,7 +71,7 @@ protected:
 public:
 	virtual ~IHyTransform(void);
 
-	HyType GetInstType()								{ return m_eTYPE; }
+	HyType GetType()											{ return m_eTYPE; }
 
 	// Exposing these HyAnimVec's for user API convenience
 	tVec				pos;

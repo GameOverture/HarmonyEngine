@@ -50,18 +50,20 @@ class HyScene
 	HyBox2dRuntime										m_Phys2dContactListener;
 
 	HyGfxComms &										m_GfxCommsRef;
-	vector<HyWindow *> &								m_vWindowRef;
+	vector<HyWindow *> &								m_WindowListRef;
 
-	vector<IHyInst2d *>									m_vLoadedInst2d;
-	vector<IHyInst2d *>									m_vLoadedInst3d;
+	vector<IHyInst2d *>									m_LoadedInst2dList;
+	vector<IHyInst2d *>									m_LoadedInst3dList;
 
-	vector<HyAnimFloat *>								m_vActiveAnimFloats;
+	vector<HyEntity2d *>								m_LoadedEntity2dList;
+
+	vector<HyAnimFloat *>								m_ActiveAnimFloatsList;
 
 	// Used when writing the graphics draw buffer
 	char *												m_pCurWritePos;
 
 public:
-	HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow *> &vWindowRef);
+	HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
 
 	static void SetInstOrderingDirty()				{ sm_bInst2dOrderingDirty = true; }
@@ -70,6 +72,9 @@ public:
 	void RemoveInst(IHyInst2d *pInst);
 
 	void CopyAllInsts(vector<IHyInst2d *> &vInstsToCopy);
+
+	void AddEntity(HyEntity2d *pEnt);
+	void RemoveEntity(HyEntity2d *pEnt);
 
 	void DebugDrawPhysics2d(bool bDraw)				{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
 
