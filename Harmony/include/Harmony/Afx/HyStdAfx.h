@@ -19,17 +19,21 @@
 
 #define HY_TEMP_TEXTBUFFER_SIZE 1024
 
-enum HyInstanceType
+enum HyType
 {
-	HYINST_Unknown = 0,
-	HYINST_Sound2d,
-	HYINST_Particles2d,
-	HYINST_Sprite2d,
-	HYINST_Spine2d,
-	HYINST_TexturedQuad2d,
-	HYINST_Primitive2d,
-	HYINST_Text2d,
-	HYINST_Mesh3d
+	HYTYPE_Unknown = 0,
+	HYTYPE_Sound2d,
+	HYTYPE_Particles2d,
+	HYTYPE_Sprite2d,
+	HYTYPE_Spine2d,
+	HYTYPE_TexturedQuad2d,
+	HYTYPE_Primitive2d,
+	HYTYPE_Text2d,
+	HYTYPE_Mesh3d,
+	HYTYPE_Entity2d,
+	HYTYPE_Entity3d,
+	HYTYPE_Camera2d,
+	HYTYPE_Camera3d
 };
 
 enum HyAnimCtrl

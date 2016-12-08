@@ -9,8 +9,9 @@
 *************************************************************************/
 #include "Utilities/Animation/IHyTransform2d.h"
 
-IHyTransform2d::IHyTransform2d() :	m_pParent(NULL),
-									m_bDirty(true)
+IHyTransform2d::IHyTransform2d(HyType eInstType) :	IHyTransform<HyAnimVec2>(eInstType),
+													m_pParent(NULL),
+													m_bDirty(true)
 {
 	SetOnDirtyCallback(OnDirty, this);
 }
@@ -126,7 +127,7 @@ void IHyTransform2d::AddChild(IHyTransform2d &childInst)
 	childInst.Detach();
 
 	childInst.m_pParent = this;
-	m_vChildList.push_back(&childInst);
+	m_ChildList.push_back(&childInst);
 }
 
 void IHyTransform2d::Detach()
@@ -134,11 +135,11 @@ void IHyTransform2d::Detach()
 	if(m_pParent == NULL)
 		return;
 
-	for(vector<IHyTransform2d *>::iterator iter = m_pParent->m_vChildList.begin(); iter != m_pParent->m_vChildList.end(); ++iter)
+	for(vector<IHyTransform2d *>::iterator iter = m_pParent->m_ChildList.begin(); iter != m_pParent->m_ChildList.end(); ++iter)
 	{
 		if(*iter == this)
 		{
-			m_pParent->m_vChildList.erase(iter);
+			m_pParent->m_ChildList.erase(iter);
 			m_pParent = NULL;
 			return;
 		}
@@ -151,8 +152,8 @@ void IHyTransform2d::SetDirty()
 {
 	m_bDirty = true;
 
-	for(uint32 i = 0; i < m_vChildList.size(); ++i)
-		m_vChildList[i]->SetDirty();
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->SetDirty();
 }
 
 /*static*/ void IHyTransform2d::OnDirty(void *pParam)

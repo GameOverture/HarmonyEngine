@@ -20,14 +20,14 @@ using std::vector;
 template<typename tData>
 class HyFactory
 {
-	const HyInstanceType					m_eTYPE;
-	const std::string						m_sDATADIR;
+	const HyType					m_eTYPE;
+	const std::string				m_sDATADIR;
 
-	vector<tData *>							m_vData;
+	vector<tData *>					m_vData;
 	
 public:
-	HyFactory(HyInstanceType eType, std::string sDataDir) : m_eTYPE(eType),
-															m_sDATADIR(sDataDir)
+	HyFactory(HyType eType, std::string sDataDir) :	m_eTYPE(eType),
+													m_sDATADIR(sDataDir)
 	{ }
 	~HyFactory()
 	{
@@ -35,7 +35,7 @@ public:
 			delete m_vData[i];
 	}
 
-	HyInstanceType GetType()						{ return m_eType; }
+	HyType GetType()				{ return m_eType; }
 
 	tData *GetOrCreateData2d(const std::string &sPrefix, const std::string &sName, int32 iShaderId)
 	{
@@ -48,13 +48,13 @@ public:
 
 		switch(m_eTYPE)
 		{
-		case HYINST_Sound2d:		sPath = MakeStringProperPath(sPath.c_str(), ".hyaud", true);	break;
-		case HYINST_Particles2d:	sPath = MakeStringProperPath(sPath.c_str(), ".hypfx", true);	break;
-		case HYINST_Text2d:			sPath = MakeStringProperPath(sPath.c_str(), ".hyfnt", true);	break;
-		case HYINST_Spine2d:		sPath = MakeStringProperPath(sPath.c_str(), ".hyspi", true);	break;
-		case HYINST_Sprite2d:		sPath = MakeStringProperPath(sPath.c_str(), ".hyspr", true);	break;
-		case HYINST_TexturedQuad2d:	sPath = sName;													break;
-		case HYINST_Primitive2d:	sPath = "";														break;
+		case HYTYPE_Sound2d:		sPath = MakeStringProperPath(sPath.c_str(), ".hyaud", true);	break;
+		case HYTYPE_Particles2d:	sPath = MakeStringProperPath(sPath.c_str(), ".hypfx", true);	break;
+		case HYTYPE_Text2d:			sPath = MakeStringProperPath(sPath.c_str(), ".hyfnt", true);	break;
+		case HYTYPE_Spine2d:		sPath = MakeStringProperPath(sPath.c_str(), ".hyspi", true);	break;
+		case HYTYPE_Sprite2d:		sPath = MakeStringProperPath(sPath.c_str(), ".hyspr", true);	break;
+		case HYTYPE_TexturedQuad2d:	sPath = sName;													break;
+		case HYTYPE_Primitive2d:	sPath = "";														break;
 		}
 
 		// Check to determine this data with these parameters doesn't already exist, if it does return the 'tData' associated with it.

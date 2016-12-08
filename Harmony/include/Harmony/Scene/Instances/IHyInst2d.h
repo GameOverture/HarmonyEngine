@@ -32,7 +32,6 @@ class IHyInst2d : public IHyTransform2d
 	static HyAssetManager *			sm_pAssetManager;
 
 protected:
-	const HyInstanceType			m_eTYPE;
 	const std::string				m_sNAME;
 	const std::string				m_sPREFIX;
 
@@ -48,17 +47,13 @@ protected:
 	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 
 public:
-	IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName);
+	IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName);
 	virtual ~IHyInst2d(void);
 
-	HyInstanceType GetInstType()								{ return m_eTYPE; }
 	const std::string &GetName()								{ return m_sNAME; }
 	const std::string &GetPrefix()								{ return m_sPREFIX; }
 
 	bool IsLoaded()												{ return m_eLoadState == HYLOADSTATE_Loaded; }
-
-	inline bool	IsEnabled()										{ return m_bEnabled; }
-	inline void	SetEnabled(bool bVis)							{ m_bEnabled = bVis; }
 
 	HyCoordinateType GetCoordinateType()						{ return m_eCoordType; }
 	void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);
@@ -70,11 +65,10 @@ public:
 	HyAnimVec4													botColor;
 
 	void SetTint(float fR, float fG, float fB)					{ topColor.Set(fR, fG, fB); botColor.Set(fR, fG, fB); }
-
 	void SetTransparency(float fTransparency)					{ topColor.A(fTransparency); botColor.A(fTransparency); }
 
-	inline int64 GetTag()										{ return m_iTag; }
-	inline void SetTag(int64 iTag)								{ m_iTag = iTag; }
+	int64 GetTag()												{ return m_iTag; }
+	void SetTag(int64 iTag)										{ m_iTag = iTag; }
 
 	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);

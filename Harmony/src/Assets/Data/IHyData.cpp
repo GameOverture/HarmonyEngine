@@ -10,11 +10,11 @@
 
 #include "Assets/Data/IHyData.h"
 
-IHyData::IHyData(HyDataType eDataType, HyInstanceType eInstType, const std::string &sPath) :	m_eDATATYPE(eDataType),
-																								m_eINSTTYPE(eInstType),
-																								m_sFILEPATH(sPath),
-																								m_eLoadState(HYLOADSTATE_Inactive),
-																								m_iRefCount(0)
+IHyData::IHyData(HyDataType eDataType, HyType eInstType, const std::string &sPath) :	m_eDATATYPE(eDataType),
+																						m_eINSTTYPE(eInstType),
+																						m_sFILEPATH(sPath),
+																						m_eLoadState(HYLOADSTATE_Inactive),
+																						m_iRefCount(0)
 { }
 
 /*virtual*/ IHyData::~IHyData(void)
@@ -25,7 +25,7 @@ HyDataType IHyData::GetDataType()
 	return m_eDATATYPE;
 }
 
-HyInstanceType IHyData::GetInstType()
+HyType IHyData::GetInstType()
 {
 	return m_eINSTTYPE;
 }

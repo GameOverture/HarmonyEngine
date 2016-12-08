@@ -52,23 +52,26 @@ class IHyTransform
 	friend class IHyTransform3d;
 
 	// This ctor is hidden since any class that wants to derive from IHyTransform should use either 'IHyTransform2d' or 'IHyTransform3d'
-	IHyTransform();
+	IHyTransform(HyType eInstType);
 
 protected:
-	HyCoordinateUnit	m_eCoordUnit;
+	const HyType			m_eTYPE;
+	HyCoordinateUnit		m_eCoordUnit;
 
-	tVec				m_ptRotationAnchor;
-	tVec				m_ptScaleAnchor;
+	tVec					m_ptRotationAnchor;
+	tVec					m_ptScaleAnchor;
 
 	void (*m_fpOnDirty)(void *);
-	void *				m_pOnDirtyParam;
+	void *					m_pOnDirtyParam;
 
-	bool				m_bEnabled;
+	bool					m_bEnabled;
 
-	HyActionQueue		m_ActionQueue;
+	HyActionQueue			m_ActionQueue;
 
 public:
 	virtual ~IHyTransform(void);
+
+	HyType GetInstType()								{ return m_eTYPE; }
 
 	// Exposing these HyAnimVec's for user API convenience
 	tVec				pos;
@@ -91,10 +94,11 @@ public:
 };
 
 template<typename tVec>
-IHyTransform<tVec>::IHyTransform() : m_eCoordUnit(HYCOORDUNIT_Default),
-									m_fpOnDirty(NULL),
-									m_pOnDirtyParam(NULL),
-									m_bEnabled(true)
+IHyTransform<tVec>::IHyTransform(HyType eInstType) :	m_eTYPE(eInstType),
+														m_eCoordUnit(HYCOORDUNIT_Default),
+														m_fpOnDirty(NULL),
+														m_pOnDirtyParam(NULL),
+														m_bEnabled(true)
 {
 	scale.Set(1.0f);
 }

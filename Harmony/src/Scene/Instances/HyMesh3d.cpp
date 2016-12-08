@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Scene/Instances/HyMesh3d.h"
 
-HyMesh3d::HyMesh3d(const char *szPrefix, const char *szName) : IHyInst2d(HYINST_Mesh3d, szPrefix, szName)
+HyMesh3d::HyMesh3d(const char *szPrefix, const char *szName) : IHyInst2d(HYTYPE_Mesh3d, szPrefix, szName)
 {
 
 }

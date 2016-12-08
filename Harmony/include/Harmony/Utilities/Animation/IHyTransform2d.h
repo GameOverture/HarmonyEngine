@@ -15,17 +15,18 @@
 
 class IHyTransform2d : public IHyTransform<HyAnimVec2>
 {
-public:
-	IHyTransform2d();
-	virtual ~IHyTransform2d();
-	
-	HyAnimFloat						rot;
-
+protected:
 	// Transformation hierarchy
 	IHyTransform2d *				m_pParent;
 	bool							m_bDirty;
 	glm::mat4						m_mtxCached;
-	vector<IHyTransform2d *>		m_vChildList;
+	vector<IHyTransform2d *>		m_ChildList;
+
+public:
+	IHyTransform2d(HyType eInstType);
+	virtual ~IHyTransform2d();
+	
+	HyAnimFloat						rot;
 
 	void QueuePos(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer = 0.0f);
 	void QueueRot(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer = 0.0f);

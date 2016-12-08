@@ -22,7 +22,7 @@ class HyTextures;
 class IHyData
 {
 	const HyDataType				m_eDATATYPE;
-	const HyInstanceType			m_eINSTTYPE;
+	const HyType					m_eINSTTYPE;
 	const std::string				m_sFILEPATH;
 
 	int32							m_iRefCount;
@@ -30,11 +30,11 @@ class IHyData
 	HyLoadState						m_eLoadState;
 
 public:
-	IHyData(HyDataType eDataType, HyInstanceType eInstType, const std::string &sPath);
+	IHyData(HyDataType eDataType, HyType eInstType, const std::string &sPath);
 	virtual ~IHyData(void);
 	
 	HyDataType GetDataType();
-	HyInstanceType GetInstType();
+	HyType GetInstType();
 	const std::string &GetPath();
 
 	virtual void SetLoadState(HyLoadState eState);

@@ -14,9 +14,9 @@
 
 HyTextures *IHy2dData::sm_pTextures = NULL;
 
-IHy2dData::IHy2dData(HyInstanceType eInstType, const std::string &sPath, int32 iShaderId) : IHyData(HYDATA_2d, eInstType, sPath),
-																							m_iSHADER_ID(iShaderId),
-																							m_bIncRenderRef(false)
+IHy2dData::IHy2dData(HyType eInstType, const std::string &sPath, int32 iShaderId) :	IHyData(HYDATA_2d, eInstType, sPath),
+																					m_iSHADER_ID(iShaderId),
+																					m_bIncRenderRef(false)
 {
 }
 

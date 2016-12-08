@@ -15,7 +15,7 @@
 // TODO: Use more appropriate math lib
 #include "Box2D/Box2D.h"
 
-HyPrimitive2d::HyPrimitive2d() :	IHyInst2d(HYINST_Primitive2d, NULL, NULL),
+HyPrimitive2d::HyPrimitive2d() :	IHyInst2d(HYTYPE_Primitive2d, NULL, NULL),
 									m_pVertices(NULL)
 {
 	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);

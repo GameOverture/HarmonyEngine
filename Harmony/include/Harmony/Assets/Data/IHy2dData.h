@@ -29,7 +29,7 @@ class IHy2dData : public IHyData
 	std::set<IHyShader *>			m_AssociatedShaders;
 
 public:
-	IHy2dData(HyInstanceType eInstType, const std::string &sPath, int32 iShaderId);
+	IHy2dData(HyType eInstType, const std::string &sPath, int32 iShaderId);
 	virtual ~IHy2dData();
 
 	int32 GetShaderId();

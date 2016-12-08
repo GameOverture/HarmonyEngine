@@ -28,13 +28,13 @@ HyAssetManager::HyAssetManager(std::string sDataDirPath, HyGfxComms &gfxCommsRef
 																										m_GfxCommsRef(gfxCommsRef),
 																										m_SceneRef(sceneRef),
 																										m_AtlasManager(m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Atlases]),
-																										m_Sfx(HYINST_Sound2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Audio]),
-																										m_Sprite2d(HYINST_Sprite2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Sprites]),
-																										m_Spine2d(HYINST_Spine2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Spine]),
-																										m_Txt2d(HYINST_Text2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Fonts]),
-																										m_Mesh3d(HYINST_Mesh3d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Meshes]),
-																										m_Quad2d(HYINST_TexturedQuad2d, ""),
-																										m_Primitive2d(HYINST_Primitive2d, ""),
+																										m_Sfx(HYTYPE_Sound2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Audio]),
+																										m_Sprite2d(HYTYPE_Sprite2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Sprites]),
+																										m_Spine2d(HYTYPE_Spine2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Spine]),
+																										m_Txt2d(HYTYPE_Text2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Fonts]),
+																										m_Mesh3d(HYTYPE_Mesh3d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Meshes]),
+																										m_Quad2d(HYTYPE_TexturedQuad2d, ""),
+																										m_Primitive2d(HYTYPE_Primitive2d, ""),
 																										m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval)
 {
 	// Start up Loading thread
@@ -112,19 +112,19 @@ void HyAssetManager::LoadInst2d(IHyInst2d *pInst)
 	IHyData *pLoadData = NULL;
 	switch(pInst->GetInstType())
 	{
-	case HYINST_Sprite2d:
+	case HYTYPE_Sprite2d:
 		pLoadData = m_Sprite2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
 		break;
-	case HYINST_Spine2d:
+	case HYTYPE_Spine2d:
 		pLoadData = m_Spine2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
 		break;
-	case HYINST_Text2d:
+	case HYTYPE_Text2d:
 		pLoadData = m_Txt2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
 		break;
-	case HYINST_TexturedQuad2d:
+	case HYTYPE_TexturedQuad2d:
 		pLoadData = m_Quad2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
 		break;
-	case HYINST_Primitive2d:
+	case HYTYPE_Primitive2d:
 		pLoadData = m_Primitive2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
 		break;
 	}
@@ -249,11 +249,11 @@ void HyAssetManager::FinalizeData(IHyData *pData)
 
 		switch(pData->GetInstType())
 		{
-		case HYINST_Sound2d:		m_Sfx.DeleteData(static_cast<HySfxData *>(pData));					break;
-		case HYINST_Sprite2d:		m_Sprite2d.DeleteData(static_cast<HySprite2dData *>(pData));		break;
-		case HYINST_Spine2d:		m_Spine2d.DeleteData(static_cast<HySpine2dData *>(pData));			break;
-		case HYINST_Text2d:			m_Txt2d.DeleteData(static_cast<HyText2dData *>(pData));				break;
-		case HYINST_TexturedQuad2d:	m_Quad2d.DeleteData(static_cast<HyTexturedQuad2dData *>(pData));	break;
+		case HYTYPE_Sound2d:		m_Sfx.DeleteData(static_cast<HySfxData *>(pData));					break;
+		case HYTYPE_Sprite2d:		m_Sprite2d.DeleteData(static_cast<HySprite2dData *>(pData));		break;
+		case HYTYPE_Spine2d:		m_Spine2d.DeleteData(static_cast<HySpine2dData *>(pData));			break;
+		case HYTYPE_Text2d:			m_Txt2d.DeleteData(static_cast<HyText2dData *>(pData));				break;
+		case HYTYPE_TexturedQuad2d:	m_Quad2d.DeleteData(static_cast<HyTexturedQuad2dData *>(pData));	break;
 		default:
 			HyError("HyAssetManager::Update() got a returned IHyData from gfx comms with an invalid type: " << pData->GetInstType());
 		}

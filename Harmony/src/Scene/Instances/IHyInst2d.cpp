@@ -18,14 +18,14 @@
 
 /*static*/ HyAssetManager *IHyInst2d::sm_pAssetManager = NULL;
 
-IHyInst2d::IHyInst2d(HyInstanceType eInstType, const char *szPrefix, const char *szName) :	m_eTYPE(eInstType),
-																							m_sPREFIX(szPrefix ? szPrefix : ""),
-																							m_sNAME(szName ? szName : ""),
-																							m_pData(NULL),
-																							m_eLoadState(HYLOADSTATE_Inactive),
-																							m_bInvalidLoad(false),
-																							m_iDisplayOrder(0),
-																							m_iTag(0)
+IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName) :	IHyTransform2d(eInstType),
+																					m_sPREFIX(szPrefix ? szPrefix : ""),
+																					m_sNAME(szName ? szName : ""),
+																					m_pData(NULL),
+																					m_eLoadState(HYLOADSTATE_Inactive),
+																					m_bInvalidLoad(false),
+																					m_iDisplayOrder(0),
+																					m_iTag(0)
 {
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);

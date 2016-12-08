@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Scene/Instances/HySprite2d.h"
 
-HySprite2d::HySprite2d(const char *szPrefix, const char *szName) :	IHyInst2d(HYINST_Sprite2d, szPrefix, szName),
+HySprite2d::HySprite2d(const char *szPrefix, const char *szName) :	IHyInst2d(HYTYPE_Sprite2d, szPrefix, szName),
 																	m_pAnimCtrlAttribs(NULL),
 																	m_fAnimPlayRate(1.0f),
 																	m_fElapsedFrameTime(0.0f),

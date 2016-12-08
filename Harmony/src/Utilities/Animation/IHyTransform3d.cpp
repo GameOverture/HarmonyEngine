@@ -9,10 +9,9 @@
 *************************************************************************/
 #include "Utilities/Animation/IHyTransform3d.h"
 
-IHyTransform3d::IHyTransform3d()
+IHyTransform3d::IHyTransform3d(HyType eInstType) :	IHyTransform<HyAnimVec3>(eInstType)
 {
 }
-
 
 IHyTransform3d::~IHyTransform3d()
 {

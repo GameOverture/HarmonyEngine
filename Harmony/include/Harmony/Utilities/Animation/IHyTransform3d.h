@@ -15,7 +15,7 @@
 class IHyTransform3d : public IHyTransform<HyAnimVec3>
 {
 public:
-	IHyTransform3d();
+	IHyTransform3d(HyType eInstType);
 	virtual ~IHyTransform3d();
 	
 	HyAnimVec3		rot;

@@ -11,7 +11,7 @@
 
 #include "Assets/Data/HyTexturedQuad2dData.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGroupId) :	IHyInst2d(HYINST_TexturedQuad2d, NULL, std::to_string(uiAtlasGroupId).c_str()),
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGroupId) :	IHyInst2d(HYTYPE_TexturedQuad2d, NULL, std::to_string(uiAtlasGroupId).c_str()),
 															m_bIS_RAW(false),
 															m_uiRAW_TEXTURE_WIDTH(0),
 															m_uiRAW_TEXTURE_HEIGHT(0),
@@ -24,7 +24,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGroupId) :	IHyInst2d(HYINST_Tex
 	m_RenderState.SetNumVerticesPerInstance(4);
 }
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight) :	IHyInst2d(HYINST_TexturedQuad2d, NULL, "raw"),
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight) :	IHyInst2d(HYTYPE_TexturedQuad2d, NULL, "raw"),
 																											m_bIS_RAW(true),
 																											m_uiRAW_TEXTURE_WIDTH(uiTextureWidth),
 																											m_uiRAW_TEXTURE_HEIGHT(uiTextureHeight),

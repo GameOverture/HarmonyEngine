@@ -12,72 +12,35 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Utilities/Animation/IHyTransform2d.h"
+#include "Scene/Instances/HyPrimitive2d.h"
+#include "Scene/Instances/HyText2d.h"
+#include "Scene/Instances/HySprite2d.h"
+#include "Scene/Instances/HySpine2d.h"
 
 #include "Utilities/HyMath.h"
 
-#include <vector>
-using std::vector;
-
-// Forward declarations
-class IHyInst2d;
-class HySprite2d;
-class HySpine2d;
-class HyText2d;
-class HyPrimitive2d;
-
 class HyEntity2d : public IHyTransform2d
 {
-	friend class HyScene;
+	const std::string				m_sNAME;
+	const std::string				m_sPREFIX;
 
-	static HyScene *				sm_pCtor;
-	HyEntity2d * const				m_kpParent;
-
-	bool							m_bDirty;
-	glm::mat4						m_mtxCached;
-
-	vector<IHyInst2d *>			m_vInstList;
-	vector<HyEntity2d *>			m_vChildNodes;
-
-	// Hidden ctor used within AddChild()
-	HyEntity2d(HyEntity2d *pParent);
+	HyLoadState						m_eLoadState;
 
 public:
-	HyEntity2d(void);
+	HyEntity2d();
+	HyEntity2d(const char *szPrefix, const char *szName);
 	virtual ~HyEntity2d(void);
 
-	void CtorInit();
+	inline void	SetEnabled(bool bEnabled);
+	void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);
 
-	IHyInst2d *Set(HyInstanceType eType, const char *szPrefix, const char *szName);
-	HySprite2d *SetSprite(const char *szPrefix, const char *szName);
-	HySpine2d *SetSpine(const char *szPrefix, const char *szName);
-	HyText2d *SetText(const char *szPrefix, const char *szName);
-	HyPrimitive2d *SetPrimitive();
+	void SetDisplayOrder(int32 iOrderValue);
 
-	HySprite2d *GetSprite();
-	HySpine2d *GetSpine();
-	HyText2d *GetText();
-	HyPrimitive2d *GetPrimitive();
+	void SetTint(float fR, float fG, float fB);
+	void SetTransparency(float fTransparency);
 
-	bool Remove(IHyInst2d *pInst);
-	void Clear(bool bClearChildren);
-
-	HyEntity2d *GetParent()						{ return m_kpParent; }
-	HyEntity2d *AddChild();
-	void RemoveChild(HyEntity2d *pEnt2d);
-
-
-	void SetInstOrderingDirty();
-	void GetWorldTransform(glm::mat4 &outMtx);
-
-private:
-	virtual void OnUpdate();
-
-	void LinkInst(IHyInst2d *pInst);
-
-	void Erase(vector<IHyInst2d *>::iterator &iterRef);
-	void SetDirty();
-	static void OnDirty(void *);
+	void Load();
+	void Unload();
 };
 
 #endif /* __HyEntity2d_h__ */
