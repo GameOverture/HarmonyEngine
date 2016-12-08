@@ -30,6 +30,7 @@ public:
 	uint32 GetNumVerts()			{ return m_RenderState.GetNumVerticesPerInstance(); }
 	glm::vec4 *GetVertexDataPtr()	{ return m_pVertices; }
 
+	void SetAsQuad(int iWidth, int iHeight, bool bWireframe, glm::vec2 &vOffset = glm::vec2(0.0f));
 	void SetAsQuad(float fWidth, float fHeight, bool bWireframe, glm::vec2 &vOffset = glm::vec2(0.0f));
 
 	void SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, glm::vec2 &vOffset = glm::vec2(0.0f));

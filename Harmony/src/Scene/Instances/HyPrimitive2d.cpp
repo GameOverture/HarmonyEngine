@@ -44,6 +44,11 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 	return *this;
 }
 
+void HyPrimitive2d::SetAsQuad(int iWidth, int iHeight, bool bWireframe, glm::vec2 &vOffset /*= glm::vec2(0.0f)*/)
+{
+	SetAsQuad(static_cast<float>(iWidth), static_cast<float>(iHeight), bWireframe, vOffset);
+}
+
 void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, glm::vec2 &vOffset /*= vec2(0.0f)*/)
 {
 	ClearData();

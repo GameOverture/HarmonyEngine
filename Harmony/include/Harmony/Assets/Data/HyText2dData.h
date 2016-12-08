@@ -94,6 +94,7 @@ class HyText2dData : public IHy2dData
 	typedef std::map<uint32, HyText2dGlyphInfo *> Typeface;
 
 	uint32							m_uiTextureIndex;
+	HyAtlasGroup *					m_pAtlasGroup;
 
 	Typeface *						m_pTypefaces;
 	uint32							m_uiNumTypefaces;
@@ -136,6 +137,7 @@ public:
 	uint32 GetNumLayers(uint32 uiStateIndex);
 	const HyText2dGlyphInfo &GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiCode);
 	const glm::vec3 &GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop);
+	HyAtlasGroup *GetAtlasGroup();
 	uint32 GetTextureIndex();
 	float GetLineHeight(uint32 uiStateIndex);
 	float GetLineAscender(uint32 uiStateIndex);

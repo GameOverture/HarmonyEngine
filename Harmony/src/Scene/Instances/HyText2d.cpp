@@ -197,6 +197,7 @@ void HyText2d::SetAsScaleBox()
 	m_uiNumValidCharacters = 0;
 
 	HyText2dData *pData = static_cast<HyText2dData *>(m_pData);
+	m_RenderState.SetTextureHandle(pData->GetAtlasGroup()->GetGfxApiHandle());
 
 	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
 	uint32 uiStrSize = static_cast<uint32>(m_sString.size());

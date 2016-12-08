@@ -82,6 +82,11 @@ const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLay
 		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].vDEFAULT_BOT_COLOR;
 }
 
+HyAtlasGroup *HyText2dData::GetAtlasGroup()
+{
+	return m_pAtlasGroup;
+}
+
 uint32 HyText2dData::GetTextureIndex()
 {
 	return m_uiTextureIndex;
@@ -116,6 +121,7 @@ float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
 	textObject.parse(sFontFileContents);
 
 	m_uiTextureIndex = static_cast<uint32>(textObject.get<jsonxx::Number>("textureIndex"));
+	m_pAtlasGroup = RequestTexture(static_cast<uint32>(textObject.get<jsonxx::Number>("atlasGroupId")));
 	
 	jsonxx::Array typefaceArray = textObject.get<jsonxx::Array>("typefaceArray");
 	m_uiNumTypefaces = static_cast<uint32>(typefaceArray.size());

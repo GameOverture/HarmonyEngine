@@ -71,3 +71,14 @@ std::string WStringToString(const std::wstring& p_Str)
 	CType.narrow(p_Str.data(), p_Str.data() + p_Str.length(), ' ', &narrowStringBuffer[0]);
 	return std::string(&narrowStringBuffer[0], narrowStringBuffer.size()); 
 }
+
+uint32 StringToHash(const unsigned char *szStr)
+{
+	uint32 uiHash = 5381;
+	int c;
+
+	while(c = *szStr++)
+		uiHash = ((uiHash << 5) + uiHash) + c; /* hash * 33 + c */
+
+	return uiHash;
+}

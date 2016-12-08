@@ -55,11 +55,14 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ bool HyOpenGL::BeginPass_2d()
 {
+	int32 iNumCameras2d = GetNumCameras2d();
+	int32 iNumRenderStates2d = GetNumRenderStates2d();
+
 	// Only draw cameras that are apart of this render surface
-	while(m_RenderSurfaceIter->m_iID != GetCameraWindowIndex2d(m_iCurCamIndex) && m_iCurCamIndex < GetNumCameras2d())
+	while(m_RenderSurfaceIter->m_iID != GetCameraWindowIndex2d(m_iCurCamIndex) && m_iCurCamIndex < iNumCameras2d)
 		m_iCurCamIndex++;
 
-	if(GetNumRenderStates2d() == 0 || m_iCurCamIndex >= GetNumCameras2d())
+	if(iNumRenderStates2d == 0 || m_iCurCamIndex >= iNumCameras2d)
 		return false;
 	
 	// Without disabling glDepthMask, sprites fragments that overlap will be discarded, and primitive draws don't work

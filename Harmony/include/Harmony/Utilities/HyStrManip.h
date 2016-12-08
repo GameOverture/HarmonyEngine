@@ -25,5 +25,7 @@ std::wstring StringToWString(const std::string& p_Str);
 // converts a wstring into a string
 std::string WStringToString(const std::wstring& p_Str);
 
+uint32 StringToHash(const unsigned char *szStr);
+
 #endif /* __HyStrManip_h__ */
 
