@@ -29,9 +29,9 @@ bool HyShaderUniforms::IsDirty()
 
 int32 HyShaderUniforms::FindIndex(const char *szName)
 {
-	for(uint32 i = 0; i < m_vUniforms.size(); ++i)
+	for(uint32 i = 0; i < m_UniformList.size(); ++i)
 	{
-		if(0 == strcmp(m_vUniforms[i].GetName(), szName))
+		if(0 == strcmp(m_UniformList[i].GetName(), szName))
 			return static_cast<int32>(i);
 	}
 
@@ -48,15 +48,15 @@ void HyShaderUniforms::Set(const char *szName, const glm::vec2 &v)
 		newUniform.SetName(szName);
 		new (newUniform.GetData()) glm::vec2(v);
 
-		m_vUniforms.push_back(newUniform);
+		m_UniformList.push_back(newUniform);
 	}
 	else
 	{
-		HyAssert(m_vUniforms[iIndex].GetVariableType() == HYSHADERVAR_vec2, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
+		HyAssert(m_UniformList[iIndex].GetVariableType() == HYSHADERVAR_vec2, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
 
-		if(*reinterpret_cast<glm::vec2 *>(m_vUniforms[iIndex].GetData()) != v)
+		if(*reinterpret_cast<glm::vec2 *>(m_UniformList[iIndex].GetData()) != v)
 		{
-			*reinterpret_cast<glm::vec2 *>(m_vUniforms[iIndex].GetData()) = v;
+			*reinterpret_cast<glm::vec2 *>(m_UniformList[iIndex].GetData()) = v;
 			m_bDirty = true;
 		}
 	}
@@ -77,15 +77,15 @@ void HyShaderUniforms::Set(const char *szName, const glm::vec3 &v)
 		newUniform.SetName(szName);
 		new (newUniform.GetData()) glm::vec3(v);
 
-		m_vUniforms.push_back(newUniform);
+		m_UniformList.push_back(newUniform);
 	}
 	else
 	{
-		HyAssert(m_vUniforms[iIndex].GetVariableType() == HYSHADERVAR_vec3, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
+		HyAssert(m_UniformList[iIndex].GetVariableType() == HYSHADERVAR_vec3, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
 
-		if(*reinterpret_cast<glm::vec3 *>(m_vUniforms[iIndex].GetData()) != v)
+		if(*reinterpret_cast<glm::vec3 *>(m_UniformList[iIndex].GetData()) != v)
 		{
-			*reinterpret_cast<glm::vec3 *>(m_vUniforms[iIndex].GetData()) = v;
+			*reinterpret_cast<glm::vec3 *>(m_UniformList[iIndex].GetData()) = v;
 			m_bDirty = true;
 		}
 	}
@@ -101,15 +101,15 @@ void HyShaderUniforms::Set(const char *szName, const glm::vec4 &v)
 		newUniform.SetName(szName);
 		new (newUniform.GetData()) glm::vec4(v);
 
-		m_vUniforms.push_back(newUniform);
+		m_UniformList.push_back(newUniform);
 	}
 	else
 	{
-		HyAssert(m_vUniforms[iIndex].GetVariableType() == HYSHADERVAR_vec4, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
+		HyAssert(m_UniformList[iIndex].GetVariableType() == HYSHADERVAR_vec4, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
 
-		if(*reinterpret_cast<glm::vec4 *>(m_vUniforms[iIndex].GetData()) != v)
+		if(*reinterpret_cast<glm::vec4 *>(m_UniformList[iIndex].GetData()) != v)
 		{
-			*reinterpret_cast<glm::vec4 *>(m_vUniforms[iIndex].GetData()) = v;
+			*reinterpret_cast<glm::vec4 *>(m_UniformList[iIndex].GetData()) = v;
 			m_bDirty = true;
 		}
 	}
@@ -125,15 +125,15 @@ void HyShaderUniforms::Set(const char *szName, const glm::mat4 &m)
 		newUniform.SetName(szName);
 		new (newUniform.GetData()) glm::mat4(m);
 
-		m_vUniforms.push_back(newUniform);
+		m_UniformList.push_back(newUniform);
 	}
 	else
 	{
-		HyAssert(m_vUniforms[iIndex].GetVariableType() == HYSHADERVAR_mat4, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
+		HyAssert(m_UniformList[iIndex].GetVariableType() == HYSHADERVAR_mat4, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
 
-		if(*reinterpret_cast<glm::mat4 *>(m_vUniforms[iIndex].GetData()) != m)
+		if(*reinterpret_cast<glm::mat4 *>(m_UniformList[iIndex].GetData()) != m)
 		{
-			*reinterpret_cast<glm::mat4 *>(m_vUniforms[iIndex].GetData()) = m;
+			*reinterpret_cast<glm::mat4 *>(m_UniformList[iIndex].GetData()) = m;
 			m_bDirty = true;
 		}
 	}
@@ -149,15 +149,15 @@ void HyShaderUniforms::Set(const char *szName, const glm::mat3 &m)
 		newUniform.SetName(szName);
 		new (newUniform.GetData()) glm::mat3(m);
 
-		m_vUniforms.push_back(newUniform);
+		m_UniformList.push_back(newUniform);
 	}
 	else
 	{
-		HyAssert(m_vUniforms[iIndex].GetVariableType() == HYSHADERVAR_mat3, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
+		HyAssert(m_UniformList[iIndex].GetVariableType() == HYSHADERVAR_mat3, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
 
-		if(*reinterpret_cast<glm::mat3 *>(m_vUniforms[iIndex].GetData()) != m)
+		if(*reinterpret_cast<glm::mat3 *>(m_UniformList[iIndex].GetData()) != m)
 		{
-			*reinterpret_cast<glm::mat3 *>(m_vUniforms[iIndex].GetData()) = m;
+			*reinterpret_cast<glm::mat3 *>(m_UniformList[iIndex].GetData()) = m;
 			m_bDirty = true;
 		}
 	}
@@ -173,15 +173,15 @@ void HyShaderUniforms::Set(const char *szName, float fVal)
 		newUniform.SetName(szName);
 		new (newUniform.GetData()) float(fVal);
 
-		m_vUniforms.push_back(newUniform);
+		m_UniformList.push_back(newUniform);
 	}
 	else
 	{
-		HyAssert(m_vUniforms[iIndex].GetVariableType() == HYSHADERVAR_float, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
+		HyAssert(m_UniformList[iIndex].GetVariableType() == HYSHADERVAR_float, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
 
-		if(*reinterpret_cast<float *>(m_vUniforms[iIndex].GetData()) != fVal)
+		if(*reinterpret_cast<float *>(m_UniformList[iIndex].GetData()) != fVal)
 		{
-			*reinterpret_cast<float *>(m_vUniforms[iIndex].GetData()) = fVal;
+			*reinterpret_cast<float *>(m_UniformList[iIndex].GetData()) = fVal;
 			m_bDirty = true;
 		}
 	}
@@ -197,15 +197,15 @@ void HyShaderUniforms::Set(const char *szName, int32 iVal)
 		newUniform.SetName(szName);
 		new (newUniform.GetData()) int32(iVal);
 
-		m_vUniforms.push_back(newUniform);
+		m_UniformList.push_back(newUniform);
 	}
 	else
 	{
-		HyAssert(m_vUniforms[iIndex].GetVariableType() == HYSHADERVAR_int, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
+		HyAssert(m_UniformList[iIndex].GetVariableType() == HYSHADERVAR_int, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
 
-		if(*reinterpret_cast<int32 *>(m_vUniforms[iIndex].GetData()) != iVal)
+		if(*reinterpret_cast<int32 *>(m_UniformList[iIndex].GetData()) != iVal)
 		{
-			*reinterpret_cast<int32 *>(m_vUniforms[iIndex].GetData()) = iVal;
+			*reinterpret_cast<int32 *>(m_UniformList[iIndex].GetData()) = iVal;
 			m_bDirty = true;
 		}
 	}
@@ -221,15 +221,15 @@ void HyShaderUniforms::Set(const char *szName, uint32 uiVal)
 		newUniform.SetName(szName);
 		new (newUniform.GetData()) uint32(uiVal);
 
-		m_vUniforms.push_back(newUniform);
+		m_UniformList.push_back(newUniform);
 	}
 	else
 	{
-		HyAssert(m_vUniforms[iIndex].GetVariableType() == HYSHADERVAR_uint, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
+		HyAssert(m_UniformList[iIndex].GetVariableType() == HYSHADERVAR_uint, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
 
-		if(*reinterpret_cast<uint32 *>(m_vUniforms[iIndex].GetData()) != uiVal)
+		if(*reinterpret_cast<uint32 *>(m_UniformList[iIndex].GetData()) != uiVal)
 		{
-			*reinterpret_cast<uint32 *>(m_vUniforms[iIndex].GetData()) = uiVal;
+			*reinterpret_cast<uint32 *>(m_UniformList[iIndex].GetData()) = uiVal;
 			m_bDirty = true;
 		}
 	}
@@ -245,15 +245,15 @@ void HyShaderUniforms::Set(const char *szName, bool bVal)
 		newUniform.SetName(szName);
 		new (newUniform.GetData()) bool(bVal);
 
-		m_vUniforms.push_back(newUniform);
+		m_UniformList.push_back(newUniform);
 	}
 	else
 	{
-		HyAssert(m_vUniforms[iIndex].GetVariableType() == HYSHADERVAR_bool, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
+		HyAssert(m_UniformList[iIndex].GetVariableType() == HYSHADERVAR_bool, "IHyShader::SetUniform() has changed the data type of '" << szName << "'");
 
-		if(*reinterpret_cast<bool *>(m_vUniforms[iIndex].GetData()) != bVal)
+		if(*reinterpret_cast<bool *>(m_UniformList[iIndex].GetData()) != bVal)
 		{
-			*reinterpret_cast<bool *>(m_vUniforms[iIndex].GetData()) = bVal;
+			*reinterpret_cast<bool *>(m_UniformList[iIndex].GetData()) = bVal;
 			m_bDirty = true;
 		}
 	}
@@ -262,20 +262,20 @@ void HyShaderUniforms::Set(const char *szName, bool bVal)
 // This function is responsible for incrementing the passed in reference pointer the size of the data written
 void HyShaderUniforms::WriteUniformsBufferData(char *&pRefDataWritePos)
 {
-	*reinterpret_cast<uint32 *>(pRefDataWritePos) = static_cast<uint32>(m_vUniforms.size());
+	*reinterpret_cast<uint32 *>(pRefDataWritePos) = static_cast<uint32>(m_UniformList.size());
 	pRefDataWritePos += sizeof(uint32);
 
-	for(uint32 i = 0; i < static_cast<uint32>(m_vUniforms.size()); ++i)
+	for(uint32 i = 0; i < static_cast<uint32>(m_UniformList.size()); ++i)
 	{
-		uint32 uiStrLen = static_cast<uint32>(strlen(m_vUniforms[i].GetName()) + 1);
-		strncpy_s(pRefDataWritePos, uiStrLen, m_vUniforms[i].GetName(), HY_SHADER_UNIFORM_NAME_LENGTH);
+		uint32 uiStrLen = static_cast<uint32>(strlen(m_UniformList[i].GetName()) + 1);
+		strncpy_s(pRefDataWritePos, uiStrLen, m_UniformList[i].GetName(), HY_SHADER_UNIFORM_NAME_LENGTH);
 		pRefDataWritePos += uiStrLen;
 
-		*reinterpret_cast<int32 *>(pRefDataWritePos) = static_cast<int32>(m_vUniforms[i].GetVariableType());
+		*reinterpret_cast<int32 *>(pRefDataWritePos) = static_cast<int32>(m_UniformList[i].GetVariableType());
 		pRefDataWritePos += sizeof(int32);
 
 		uint32 uiDataSize = 0;
-		switch(m_vUniforms[i].GetVariableType())
+		switch(m_UniformList[i].GetVariableType())
 		{
 		case HYSHADERVAR_bool:		uiDataSize = sizeof(bool);			break;
 		case HYSHADERVAR_int:		uiDataSize = sizeof(int32);			break;
@@ -297,14 +297,14 @@ void HyShaderUniforms::WriteUniformsBufferData(char *&pRefDataWritePos)
 		case HYSHADERVAR_mat3:		uiDataSize = sizeof(glm::mat3);		break;
 		case HYSHADERVAR_mat4:		uiDataSize = sizeof(glm::mat4);		break;
 		}
-		memcpy(pRefDataWritePos, m_vUniforms[i].GetData(), uiDataSize);
+		memcpy(pRefDataWritePos, m_UniformList[i].GetData(), uiDataSize);
 		pRefDataWritePos += uiDataSize;
 	}
 	
-	if(m_vUniforms.empty())
+	if(m_UniformList.empty())
 		m_uiCrc32 = 0;
 	else
-		m_uiCrc32 = crc32_fast(&m_vUniforms[0], m_vUniforms.size() * sizeof(UniformBuffer), m_uiCrc32);
+		m_uiCrc32 = crc32_fast(&m_UniformList[0], m_UniformList.size() * sizeof(UniformBuffer), m_uiCrc32);
 
 	m_bDirty = false;
 }
@@ -368,7 +368,7 @@ void IHyShader::SetVertexAttribute(const char *szName, HyShaderVariable eVarType
 	vertAttrib.bNormalized = bNormalize;
 	vertAttrib.uiInstanceDivisor = uiInstanceDivisor;
 
-	m_vVertexAttributes.push_back(vertAttrib);
+	m_VertexAttributeList.push_back(vertAttrib);
 }
 
 void IHyShader::Finalize(HyShaderProgram eDefaultsFrom)
@@ -376,7 +376,7 @@ void IHyShader::Finalize(HyShaderProgram eDefaultsFrom)
 	// If unassigned vertex shader, fill in defaults
 	if(m_sSourceCode[HYSHADER_Vertex].empty())
 	{
-		m_vVertexAttributes.clear();
+		m_VertexAttributeList.clear();
 
 		switch(eDefaultsFrom)
 		{

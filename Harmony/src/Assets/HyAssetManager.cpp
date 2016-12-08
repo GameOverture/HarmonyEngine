@@ -140,7 +140,7 @@ void HyAssetManager::LoadInst2d(IHyInst2d *pInst)
 	}
 	else
 	{
-		m_vQueuedInst2d.push_back(pInst);
+		m_QueuedInst2dList.push_back(pInst);
 
 		if(pLoadData->GetLoadState() == HYLOADSTATE_Inactive)
 		{
@@ -173,11 +173,11 @@ void HyAssetManager::RemoveInst(IHyInst2d *pInst)
 
 	case HYLOADSTATE_Queued:
 	case HYLOADSTATE_ReloadGfx:
-		for(vector<IHyInst2d *>::iterator it = m_vQueuedInst2d.begin(); it != m_vQueuedInst2d.end(); ++it)
+		for(vector<IHyInst2d *>::iterator it = m_QueuedInst2dList.begin(); it != m_QueuedInst2dList.end(); ++it)
 		{
 			if((*it) == pInst)
 			{
-				m_vQueuedInst2d.erase(it);
+				m_QueuedInst2dList.erase(it);
 				break;
 			}
 		}
@@ -194,8 +194,8 @@ void HyAssetManager::Shutdown()
 	vector<IHyInst2d *> vReloadInsts;
 	m_SceneRef.CopyAllInsts(vReloadInsts);
 
-	for(uint32 i = 0; i < m_vQueuedInst2d.size(); ++i)
-		vReloadInsts.push_back(m_vQueuedInst2d[i]);
+	for(uint32 i = 0; i < m_QueuedInst2dList.size(); ++i)
+		vReloadInsts.push_back(m_QueuedInst2dList[i]);
 
 	for(uint32 i = 0; i < vReloadInsts.size(); ++i)
 		vReloadInsts[i]->Unload();
@@ -223,7 +223,7 @@ void HyAssetManager::FinalizeData(IHyData *pData)
 	if(pData->GetLoadState() == HYLOADSTATE_Queued)
 	{
 		bool bDataIsUsed = false;
-		for(vector<IHyInst2d *>::iterator iter = m_vQueuedInst2d.begin(); iter != m_vQueuedInst2d.end();)
+		for(vector<IHyInst2d *>::iterator iter = m_QueuedInst2dList.begin(); iter != m_QueuedInst2dList.end();)
 		{
 			if((*iter)->GetData() == pData)
 			{
@@ -232,7 +232,7 @@ void HyAssetManager::FinalizeData(IHyData *pData)
 
 				bDataIsUsed = true;
 
-				iter = m_vQueuedInst2d.erase(iter);
+				iter = m_QueuedInst2dList.erase(iter);
 			}
 			else
 				++iter;

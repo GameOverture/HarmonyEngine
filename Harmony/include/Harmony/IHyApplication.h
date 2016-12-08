@@ -42,8 +42,8 @@ protected:
 #endif
 	static HarmonyInit				sm_Init;
 
-	vector<HyWindow *>				m_vWindows;
-	vector<IHyInputMap *>			m_vInputMaps;
+	vector<HyWindow *>				m_WindowList;
+	vector<IHyInputMap *>			m_InputMapList;
 
 	virtual bool Initialize() = 0;
 	virtual bool Update() = 0;

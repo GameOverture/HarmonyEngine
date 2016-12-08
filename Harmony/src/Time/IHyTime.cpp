@@ -22,8 +22,8 @@ IHyTime::IHyTime() :	m_dTimeManipulation(1.0f),
 
 IHyTime::~IHyTime(void)
 {
-	while(m_vTimeInsts.size() != 0)
-		RemoveTimeInst(m_vTimeInsts[0]);
+	while(m_TimeInstList.size() != 0)
+		RemoveTimeInst(m_TimeInstList[0]);
 }
 
 bool IHyTime::ThrottleTime()
@@ -34,11 +34,11 @@ bool IHyTime::ThrottleTime()
 	m_dThrottledTime += m_dCurDeltaTime * m_dTimeManipulation;
 
 	// Update all timers
-	if(m_vTimeInsts.empty() == false)
+	if(m_TimeInstList.empty() == false)
 	{
-		uint32 uiNumTimers = static_cast<uint32>(m_vTimeInsts.size());
+		uint32 uiNumTimers = static_cast<uint32>(m_TimeInstList.size());
 		for(uint32 i = 0; i < uiNumTimers; i++)
-			m_vTimeInsts[i]->Update(m_dCurDeltaTime);
+			m_TimeInstList[i]->Update(m_dCurDeltaTime);
 	}
 
 	if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS)
@@ -68,7 +68,7 @@ void IHyTime::AddTimeInst(IHyTimeInst *pTimeInst)
 	if(pTimeInst == NULL)
 		return;
 
-	m_vTimeInsts.push_back(pTimeInst);
+	m_TimeInstList.push_back(pTimeInst);
 }
 
 void IHyTime::RemoveTimeInst(IHyTimeInst *pTimeInst)
@@ -76,11 +76,11 @@ void IHyTime::RemoveTimeInst(IHyTimeInst *pTimeInst)
 	if(pTimeInst == NULL)
 		return;
 
-	for(vector<IHyTimeInst*>::iterator it = m_vTimeInsts.begin(); it != m_vTimeInsts.end(); ++it)
+	for(vector<IHyTimeInst*>::iterator it = m_TimeInstList.begin(); it != m_TimeInstList.end(); ++it)
 	{
 		if((*it) == pTimeInst)
 		{
-			it = m_vTimeInsts.erase(it);
+			it = m_TimeInstList.erase(it);
 			break;
 		}
 	}

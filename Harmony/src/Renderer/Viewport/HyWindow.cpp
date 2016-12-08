@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Renderer/Viewport/HyWindow.h"
 
-vector<HyMonitorDeviceInfo>	HyWindow::sm_vMonitorInfo;
+vector<HyMonitorDeviceInfo>	HyWindow::sm_MonitorInfoList;
 BasicSection				HyWindow::sm_csInfo;
 
 HyWindow::HyWindow() : m_bTakeInput(true)
@@ -18,11 +18,11 @@ HyWindow::HyWindow() : m_bTakeInput(true)
 
 HyWindow::~HyWindow(void)
 {
-	while(m_vCams2d.empty() == false)
-		RemoveCamera(m_vCams2d.back());
+	while(m_Cams2dList.empty() == false)
+		RemoveCamera(m_Cams2dList.back());
 
-	while(m_vCams3d.empty() == false)
-		RemoveCamera(m_vCams3d.back());
+	while(m_Cams3dList.empty() == false)
+		RemoveCamera(m_Cams3dList.back());
 }
 
 const HyWindowInfo &HyWindow::GetWindowInfo()
@@ -87,7 +87,7 @@ void HyWindow::SetType(HyWindowType eType)
 HyCamera2d *HyWindow::CreateCamera2d()
 {
 	HyCamera2d *pNewCam = HY_NEW HyCamera2d(this);
-	m_vCams2d.push_back(pNewCam);
+	m_Cams2dList.push_back(pNewCam);
 
 	return pNewCam;
 }
@@ -95,19 +95,19 @@ HyCamera2d *HyWindow::CreateCamera2d()
 HyCamera3d *HyWindow::CreateCamera3d()
 {
 	HyCamera3d *pNewCam = HY_NEW HyCamera3d(this);
-	m_vCams3d.push_back(pNewCam);
+	m_Cams3dList.push_back(pNewCam);
 
 	return pNewCam;
 }
 
 void HyWindow::RemoveCamera(HyCamera2d *&pCam)
 {
-	for(vector<HyCamera2d *>::iterator iter = m_vCams2d.begin(); iter != m_vCams2d.end(); ++iter)
+	for(vector<HyCamera2d *>::iterator iter = m_Cams2dList.begin(); iter != m_Cams2dList.end(); ++iter)
 	{
 		if((*iter) == pCam)
 		{
 			delete pCam;
-			m_vCams2d.erase(iter);
+			m_Cams2dList.erase(iter);
 
 			return;
 		}
@@ -116,12 +116,12 @@ void HyWindow::RemoveCamera(HyCamera2d *&pCam)
 
 void HyWindow::RemoveCamera(HyCamera3d *&pCam)
 {
-	for(vector<HyCamera3d *>::iterator iter = m_vCams3d.begin(); iter != m_vCams3d.end(); ++iter)
+	for(vector<HyCamera3d *>::iterator iter = m_Cams3dList.begin(); iter != m_Cams3dList.end(); ++iter)
 	{
 		if((*iter) == pCam)
 		{
 			delete pCam;
-			m_vCams3d.erase(iter);
+			m_Cams3dList.erase(iter);
 
 			return;
 		}
@@ -134,8 +134,8 @@ void HyWindow::RemoveCamera(HyCamera3d *&pCam)
 
 	sm_csInfo.Lock();
 
-	for(uint32 i = 0; i < static_cast<uint32>(sm_vMonitorInfo.size()); ++i)
-		vDeviceInfoOut.push_back(sm_vMonitorInfo[i]);
+	for(uint32 i = 0; i < static_cast<uint32>(sm_MonitorInfoList.size()); ++i)
+		vDeviceInfoOut.push_back(sm_MonitorInfoList[i]);
 
 	sm_csInfo.Unlock();
 }
@@ -143,8 +143,8 @@ void HyWindow::RemoveCamera(HyCamera3d *&pCam)
 /*static*/ void HyWindow::SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info)
 {
 	sm_csInfo.Lock();
-	sm_vMonitorInfo.clear();
-	sm_vMonitorInfo = info;
+	sm_MonitorInfoList.clear();
+	sm_MonitorInfoList = info;
 	sm_csInfo.Unlock();
 }
 

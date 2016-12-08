@@ -39,7 +39,7 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowLi
 	m_PixelFormatDescriptor.dwDamageMask = 0;
 
 	for(uint32 i = 0; i < m_RenderSurfaces.size(); ++i)
-		m_RenderSurfaces[i].m_pExData = ConstructWindow(m_vWindowRef[i]->GetWindowInfo());
+		m_RenderSurfaces[i].m_pExData = ConstructWindow(m_WindowListRef[i]->GetWindowInfo());
 
 	vector<HyMonitorDeviceInfo> vMonitorDeviceInfo;
 	if(EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&vMonitorDeviceInfo) == false)

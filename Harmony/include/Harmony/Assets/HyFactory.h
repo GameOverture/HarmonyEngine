@@ -23,7 +23,7 @@ class HyFactory
 	const HyType					m_eTYPE;
 	const std::string				m_sDATADIR;
 
-	vector<tData *>					m_vData;
+	vector<tData *>					m_DataList;
 	
 public:
 	HyFactory(HyType eType, std::string sDataDir) :	m_eTYPE(eType),
@@ -31,8 +31,8 @@ public:
 	{ }
 	~HyFactory()
 	{
-		for(uint32 i = 0; i < static_cast<uint32>(m_vData.size()); ++i)
-			delete m_vData[i];
+		for(uint32 i = 0; i < static_cast<uint32>(m_DataList.size()); ++i)
+			delete m_DataList[i];
 	}
 
 	HyType GetType()				{ return m_eType; }
@@ -58,26 +58,26 @@ public:
 		}
 
 		// Check to determine this data with these parameters doesn't already exist, if it does return the 'tData' associated with it.
-		size_t uiNumDatas = m_vData.size();
+		size_t uiNumDatas = m_DataList.size();
 		for(size_t i = 0; i < uiNumDatas; ++i)
 		{
-			if(m_vData[i]->GetPath() == sPath && m_vData[i]->GetShaderId() == iShaderId)
-				return m_vData[i];
+			if(m_DataList[i]->GetPath() == sPath && m_DataList[i]->GetShaderId() == iShaderId)
+				return m_DataList[i];
 		}
 		
 		tData *pOutData = HY_NEW tData(sPath, iShaderId);
-		m_vData.push_back(pOutData);
+		m_DataList.push_back(pOutData);
 
 		return pOutData;
 	}
 
 	void DeleteData(tData *pData)
 	{
-		for(vector<tData *>::iterator it = m_vData.begin(); it != m_vData.end(); ++it)
+		for(vector<tData *>::iterator it = m_DataList.begin(); it != m_DataList.end(); ++it)
 		{
 			if((*it) == pData)
 			{
-				m_vData.erase(it);
+				m_DataList.erase(it);
 				delete pData;
 
 				return;
@@ -87,7 +87,7 @@ public:
 
 	bool IsEmpty()
 	{
-		return m_vData.empty();
+		return m_DataList.empty();
 	}
 };
 

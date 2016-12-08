@@ -80,35 +80,35 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct)
 	
 	for(uint32 i = 0; i < sm_Init.uiNumWindows; ++i)
 	{
-		m_vWindows.push_back(HY_NEW HyWindow());
+		m_WindowList.push_back(HY_NEW HyWindow());
 
-		m_vWindows[i]->SetTitle(sm_Init.windowInfo[i].sName);
-		m_vWindows[i]->SetResolution(sm_Init.windowInfo[i].vResolution);
-		m_vWindows[i]->SetLocation(sm_Init.windowInfo[i].vLocation);
-		m_vWindows[i]->SetType(sm_Init.windowInfo[i].eType);
+		m_WindowList[i]->SetTitle(sm_Init.windowInfo[i].sName);
+		m_WindowList[i]->SetResolution(sm_Init.windowInfo[i].vResolution);
+		m_WindowList[i]->SetLocation(sm_Init.windowInfo[i].vLocation);
+		m_WindowList[i]->SetType(sm_Init.windowInfo[i].eType);
 	}
 
 	for(uint32 i = 0; i < sm_Init.uiNumInputMappings; ++i)
-		m_vInputMaps.push_back(HY_NEW HyInputMapInterop());
+		m_InputMapList.push_back(HY_NEW HyInputMapInterop());
 }
 
 IHyApplication::~IHyApplication()
 {
-	for(uint32 i = 0; i < static_cast<uint32>(m_vWindows.size()); ++i)
-		delete m_vWindows[i];
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowList.size()); ++i)
+		delete m_WindowList[i];
 
-	for(uint32 i = 0; i < static_cast<uint32>(m_vInputMaps.size()); ++i)
-		delete m_vInputMaps[i];
+	for(uint32 i = 0; i < static_cast<uint32>(m_InputMapList.size()); ++i)
+		delete m_InputMapList[i];
 }
 
 HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(uiIndex < sm_Init.uiNumWindows, "IApplication::Viewport() took an invalid index: " << uiIndex);
-	return *m_vWindows[uiIndex];
+	return *m_WindowList[uiIndex];
 }
 
 HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(uiIndex < sm_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
-	return *static_cast<HyInputMapInterop *>(m_vInputMaps[uiIndex]);
+	return *static_cast<HyInputMapInterop *>(m_InputMapList[uiIndex]);
 }

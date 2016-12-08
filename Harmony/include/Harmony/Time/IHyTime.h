@@ -27,7 +27,7 @@ class IHyTime
 	static const uint32			sm_uiUPDATESTEP_MILLISECONDS;
 	static const double			sm_dUPDATESTEP_SECONDS;
 
-	vector<IHyTimeInst *>		m_vTimeInsts;
+	vector<IHyTimeInst *>		m_TimeInstList;
 
 	double						m_dTotalElapsedTime;
 	double						m_dThrottledTime;

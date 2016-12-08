@@ -40,7 +40,7 @@ class HyShaderUniforms
 			strcpy_s(GetName(), HY_SHADER_UNIFORM_NAME_LENGTH, szName);
 		}
 	};
-	std::vector<UniformBuffer>	m_vUniforms;
+	std::vector<UniformBuffer>	m_UniformList;
 
 public:
 	HyShaderUniforms();
@@ -81,7 +81,7 @@ protected:
 
 	HyLoadState						m_eLoadState;
 	std::string						m_sSourceCode[HYNUMSHADERTYPES];
-	std::vector<VertexAttribute>	m_vVertexAttributes;
+	std::vector<VertexAttribute>	m_VertexAttributeList;
 
 	HyShaderUniforms				m_Uniforms;
 

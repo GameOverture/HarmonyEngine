@@ -131,22 +131,22 @@ void HyOpenGLShader::SetVertexAttributePtrs(size_t uiStartOffset)
 #else
 
 	size_t uiOffset = 0;
-	for(size_t i = 0; i < m_vVertexAttributes.size(); ++i)
+	for(size_t i = 0; i < m_VertexAttributeList.size(); ++i)
 	{
-		GLuint uiLocation = GetAttribLocation(m_vVertexAttributes[i].sName.c_str());
+		GLuint uiLocation = GetAttribLocation(m_VertexAttributeList[i].sName.c_str());
 
-		switch(m_vVertexAttributes[i].eVarType)
+		switch(m_VertexAttributeList[i].eVarType)
 		{
 		case HYSHADERVAR_bool:
 			glVertexAttribPointer(uiLocation, 1, GL_BYTE, GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLboolean);
 			break;
 		case HYSHADERVAR_int:
-			glVertexAttribPointer(uiLocation, 1, GL_INT, m_vVertexAttributes[i].bNormalized, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 1, GL_INT, m_VertexAttributeList[i].bNormalized, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLint);
 			break;
 		case HYSHADERVAR_uint:
-			glVertexAttribPointer(uiLocation, 1, GL_UNSIGNED_INT, m_vVertexAttributes[i].bNormalized, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 1, GL_UNSIGNED_INT, m_VertexAttributeList[i].bNormalized, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLuint);
 			break;
 		case HYSHADERVAR_float:
@@ -170,15 +170,15 @@ void HyOpenGLShader::SetVertexAttributePtrs(size_t uiStartOffset)
 			uiOffset += sizeof(glm::bvec4);
 			break;
 		case HYSHADERVAR_ivec2:
-			glVertexAttribPointer(uiLocation, 2, GL_INT, m_vVertexAttributes[i].bNormalized ? GL_TRUE : GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 2, GL_INT, m_VertexAttributeList[i].bNormalized ? GL_TRUE : GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::ivec2);
 			break;
 		case HYSHADERVAR_ivec3:
-			glVertexAttribPointer(uiLocation, 3, GL_INT, m_vVertexAttributes[i].bNormalized ? GL_TRUE : GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 3, GL_INT, m_VertexAttributeList[i].bNormalized ? GL_TRUE : GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::ivec3);
 			break;
 		case HYSHADERVAR_ivec4:
-			glVertexAttribPointer(uiLocation, 4, GL_INT, m_vVertexAttributes[i].bNormalized ? GL_TRUE : GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			glVertexAttribPointer(uiLocation, 4, GL_INT, m_VertexAttributeList[i].bNormalized ? GL_TRUE : GL_FALSE, m_uiStride, reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::ivec4);
 			break;
 		case HYSHADERVAR_vec2:
@@ -419,13 +419,13 @@ void HyOpenGLShader::PrintActiveAttribs()
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &iMaxVertexAttribs);
 
 	int32 iTotalVertexAttribs = 0;
-	for(uint32 i = 0; i < m_vVertexAttributes.size(); ++i)
+	for(uint32 i = 0; i < m_VertexAttributeList.size(); ++i)
 	{
-		if(m_vVertexAttributes[i].eVarType == HYSHADERVAR_dvec2 || m_vVertexAttributes[i].eVarType == HYSHADERVAR_dvec3 || m_vVertexAttributes[i].eVarType == HYSHADERVAR_dvec4)
+		if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec2 || m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec3 || m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec4)
 			iTotalVertexAttribs += 2;
-		else if(m_vVertexAttributes[i].eVarType == HYSHADERVAR_mat3)
+		else if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_mat3)
 			iTotalVertexAttribs += 3;
-		else if(m_vVertexAttributes[i].eVarType == HYSHADERVAR_mat4)
+		else if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_mat4)
 			iTotalVertexAttribs += 4;
 		else
 			iTotalVertexAttribs += 1;
@@ -443,47 +443,47 @@ void HyOpenGLShader::PrintActiveAttribs()
 
 	m_uiStride = 0;
 
-	for(uint32 i = 0; i < m_vVertexAttributes.size(); ++i)
+	for(uint32 i = 0; i < m_VertexAttributeList.size(); ++i)
 	{
-		GLuint uiLocation = GetAttribLocation(m_vVertexAttributes[i].sName.c_str());
+		GLuint uiLocation = GetAttribLocation(m_VertexAttributeList[i].sName.c_str());
 
-		if(m_vVertexAttributes[i].eVarType == HYSHADERVAR_dvec2 || m_vVertexAttributes[i].eVarType == HYSHADERVAR_dvec3 || m_vVertexAttributes[i].eVarType == HYSHADERVAR_dvec4)
+		if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec2 || m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec3 || m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec4)
 		{
 			glEnableVertexAttribArray(uiLocation + 0);
 			glEnableVertexAttribArray(uiLocation + 1);
 
-			glVertexAttribDivisor(uiLocation + 0, m_vVertexAttributes[i].uiInstanceDivisor);
-			glVertexAttribDivisor(uiLocation + 1, m_vVertexAttributes[i].uiInstanceDivisor);
+			glVertexAttribDivisor(uiLocation + 0, m_VertexAttributeList[i].uiInstanceDivisor);
+			glVertexAttribDivisor(uiLocation + 1, m_VertexAttributeList[i].uiInstanceDivisor);
 		}
-		else if(m_vVertexAttributes[i].eVarType == HYSHADERVAR_mat3)
+		else if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_mat3)
 		{
 			glEnableVertexAttribArray(uiLocation + 0);
 			glEnableVertexAttribArray(uiLocation + 1);
 			glEnableVertexAttribArray(uiLocation + 2);
 
-			glVertexAttribDivisor(uiLocation + 0, m_vVertexAttributes[i].uiInstanceDivisor);
-			glVertexAttribDivisor(uiLocation + 1, m_vVertexAttributes[i].uiInstanceDivisor);
-			glVertexAttribDivisor(uiLocation + 2, m_vVertexAttributes[i].uiInstanceDivisor);
+			glVertexAttribDivisor(uiLocation + 0, m_VertexAttributeList[i].uiInstanceDivisor);
+			glVertexAttribDivisor(uiLocation + 1, m_VertexAttributeList[i].uiInstanceDivisor);
+			glVertexAttribDivisor(uiLocation + 2, m_VertexAttributeList[i].uiInstanceDivisor);
 		}
-		else if(m_vVertexAttributes[i].eVarType == HYSHADERVAR_mat4)
+		else if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_mat4)
 		{
 			glEnableVertexAttribArray(uiLocation + 0);
 			glEnableVertexAttribArray(uiLocation + 1);
 			glEnableVertexAttribArray(uiLocation + 2);
 			glEnableVertexAttribArray(uiLocation + 3);
 
-			glVertexAttribDivisor(uiLocation + 0, m_vVertexAttributes[i].uiInstanceDivisor);
-			glVertexAttribDivisor(uiLocation + 1, m_vVertexAttributes[i].uiInstanceDivisor);
-			glVertexAttribDivisor(uiLocation + 2, m_vVertexAttributes[i].uiInstanceDivisor);
-			glVertexAttribDivisor(uiLocation + 3, m_vVertexAttributes[i].uiInstanceDivisor);
+			glVertexAttribDivisor(uiLocation + 0, m_VertexAttributeList[i].uiInstanceDivisor);
+			glVertexAttribDivisor(uiLocation + 1, m_VertexAttributeList[i].uiInstanceDivisor);
+			glVertexAttribDivisor(uiLocation + 2, m_VertexAttributeList[i].uiInstanceDivisor);
+			glVertexAttribDivisor(uiLocation + 3, m_VertexAttributeList[i].uiInstanceDivisor);
 		}
 		else
 		{
 			glEnableVertexAttribArray(uiLocation);
-			glVertexAttribDivisor(uiLocation, m_vVertexAttributes[i].uiInstanceDivisor);
+			glVertexAttribDivisor(uiLocation, m_VertexAttributeList[i].uiInstanceDivisor);
 		}
 
-		switch(m_vVertexAttributes[i].eVarType)
+		switch(m_VertexAttributeList[i].eVarType)
 		{
 		case HYSHADERVAR_bool:		m_uiStride += sizeof(bool);			break;
 		case HYSHADERVAR_int:		m_uiStride += sizeof(int32);		break;

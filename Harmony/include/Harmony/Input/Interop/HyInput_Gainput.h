@@ -20,7 +20,7 @@ class HyInput_Gainput : public IHyInput
 
 	gainput::DeviceId			m_uiKeyboardId;
 	gainput::DeviceId			m_uiMouseId;
-	vector<gainput::DeviceId>	m_vGamePadIds;
+	vector<gainput::DeviceId>	m_GamePadIdList;
 
 	enum eRecordState
 	{

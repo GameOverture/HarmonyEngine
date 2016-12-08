@@ -145,19 +145,19 @@ void HyScene::WriteDrawBuffer()
 	int32 iCount = 0;
 	for(uint32 i = 0; i < uiNumWindows; ++i)
 	{
-		uint32 uiNumCameras3d = static_cast<uint32>(m_WindowListRef[i]->m_vCams3d.size());
+		uint32 uiNumCameras3d = static_cast<uint32>(m_WindowListRef[i]->m_Cams3dList.size());
 		for(uint32 j = 0; j < uiNumCameras3d; ++j)
 		{
-			if(m_WindowListRef[i]->m_vCams3d[j]->IsEnabled())
+			if(m_WindowListRef[i]->m_Cams3dList[j]->IsEnabled())
 			{
 				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = i;
 				m_pCurWritePos += sizeof(uint32);
 
-				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_WindowListRef[i]->m_vCams3d[j]->GetViewport();
+				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_WindowListRef[i]->m_Cams3dList[j]->GetViewport();
 				m_pCurWritePos += sizeof(HyRectangle<float>);
 			
 				HyError("GetLocalTransform_SRT should be 3d");
-				m_WindowListRef[i]->m_vCams3d[j]->GetLocalTransform_SRT(mtxView);
+				m_WindowListRef[i]->m_Cams3dList[j]->GetLocalTransform_SRT(mtxView);
 				*(reinterpret_cast<glm::mat4 *>(m_pCurWritePos)) = mtxView;
 				m_pCurWritePos += sizeof(glm::mat4);
 
@@ -176,18 +176,18 @@ void HyScene::WriteDrawBuffer()
 	iCount = 0;
 	for(uint32 i = 0; i < uiNumWindows; ++i)
 	{
-		uint32 uiNumCameras2d = static_cast<uint32>(m_WindowListRef[i]->m_vCams2d.size());
+		uint32 uiNumCameras2d = static_cast<uint32>(m_WindowListRef[i]->m_Cams2dList.size());
 		for(uint32 j = 0; j < uiNumCameras2d; ++j)
 		{
-			if(m_WindowListRef[i]->m_vCams2d[j]->IsEnabled())
+			if(m_WindowListRef[i]->m_Cams2dList[j]->IsEnabled())
 			{
 				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = i;
 				m_pCurWritePos += sizeof(uint32);
 
-				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_WindowListRef[i]->m_vCams2d[j]->GetViewport();
+				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_WindowListRef[i]->m_Cams2dList[j]->GetViewport();
 				m_pCurWritePos += sizeof(HyRectangle<float>);
 
-				m_WindowListRef[i]->m_vCams2d[j]->GetLocalTransform_SRT(mtxView);
+				m_WindowListRef[i]->m_Cams2dList[j]->GetLocalTransform_SRT(mtxView);
 
 				// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly in the shader)
 				mtxView[3].x *= -1;

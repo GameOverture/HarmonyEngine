@@ -23,7 +23,7 @@ class IHyRenderer
 {
 protected:
 	HyGfxComms &						m_GfxCommsRef;
-	vector<HyWindow *> &				m_vWindowRef;
+	vector<HyWindow *> &				m_WindowListRef;
 
 	queue<IHy2dData *> *				m_pRxDataQueue;		// The pointer to the currently active render message queue
 	queue<IHy2dData *> *				m_pTxDataQueue;	// The pointer to the currently active render message queue

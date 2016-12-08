@@ -49,15 +49,15 @@ class HyWindow
 	friend class HyScene;
 	friend class IHyRenderer;
 
-	static vector<HyMonitorDeviceInfo>	sm_vMonitorInfo;
+	static vector<HyMonitorDeviceInfo>	sm_MonitorInfoList;
 	static BasicSection					sm_csInfo;
 
 	HyWindowInfo						m_Info_Update;	// On the application's update thread
 	HyWindowInfo						m_Info_Shared;
 	HyWindowInfo						m_Info_Render;	// Read-only contents for render thread
 	
-	vector<HyCamera2d *>				m_vCams2d;
-	vector<HyCamera3d *>				m_vCams3d;
+	vector<HyCamera2d *>				m_Cams2dList;
+	vector<HyCamera3d *>				m_Cams3dList;
 
 	bool								m_bTakeInput;
 

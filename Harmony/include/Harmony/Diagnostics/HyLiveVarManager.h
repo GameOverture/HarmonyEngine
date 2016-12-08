@@ -45,9 +45,9 @@ class HyLiveVar
 				return false;
 			}
 		};
-		vector<tVar>	m_vVariables;
+		vector<tVar>	m_VariableList;
 	};
-	vector<tGroup>	m_vGroups;
+	vector<tGroup>	m_GroupList;
 
 public:
 	HyLiveVar();
@@ -59,7 +59,7 @@ class HyLiveVarManager
 {
 	static HyLiveVarManager *		sm_pInstance;
 
-	vector<HyLiveVar>				m_vPages;
+	vector<HyLiveVar>				m_PageList;
 
 	HyLiveVarManager(void);
 

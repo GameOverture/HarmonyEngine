@@ -16,12 +16,12 @@ HyEngine *		HyEngine::sm_pInstance = NULL;
 
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
-												m_Scene(m_GfxBuffer, m_AppRef.m_vWindows),
+												m_Scene(m_GfxBuffer, m_AppRef.m_WindowList),
 												m_AssetManager(m_AppRef.sm_Init.sDataDir, m_GfxBuffer, m_Scene),
 												m_GuiComms(m_AppRef.sm_Init.uiDebugPort, m_AssetManager),
-												m_Input(m_AppRef.m_vInputMaps),
-												m_Renderer(m_GfxBuffer, m_AppRef.m_vWindows),
-												m_Audio(m_AppRef.m_vWindows)
+												m_Input(m_AppRef.m_InputMapList),
+												m_Renderer(m_GfxBuffer, m_AppRef.m_WindowList),
+												m_Audio(m_AppRef.m_WindowList)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
@@ -80,14 +80,14 @@ bool HyEngine::PollPlatformApi()
 #if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
 	// TODO: return false when windows close message comes in or something similar
 	MSG msg = { 0 };
-	for(uint32 i = 0; i < static_cast<uint32>(m_AppRef.m_vWindows.size()); ++i)
+	for(uint32 i = 0; i < static_cast<uint32>(m_AppRef.m_WindowList.size()); ++i)
 	{
 		while(PeekMessage(&msg, m_Renderer.GetHWND(i), 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 			
-			if(m_AppRef.m_vWindows[i]->IsInputEnabled())
+			if(m_AppRef.m_WindowList[i]->IsInputEnabled())
 				m_Input.HandleMsg(msg);
 		}
 	}

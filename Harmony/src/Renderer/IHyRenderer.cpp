@@ -35,11 +35,11 @@ void IHyRenderer::RenderSurface::Resize(int32 iWidth, int32 iHeight)
 }
 
 IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowListRef) :	m_GfxCommsRef(gfxCommsRef),
-																						m_vWindowRef(windowListRef)
+																						m_WindowListRef(windowListRef)
 {
-	// TODO: Make the application's HyWindow (ref to 'm_vWindowRef') threadsafe
-	for(uint32 i = 0; i < static_cast<uint32>(m_vWindowRef.size()); ++i)
-		m_RenderSurfaces.push_back(RenderSurface(RENDERSURFACE_Window, i, m_vWindowRef[i]->GetResolution().x, m_vWindowRef[i]->GetResolution().y));
+	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
+		m_RenderSurfaces.push_back(RenderSurface(RENDERSURFACE_Window, i, m_WindowListRef[i]->GetResolution().x, m_WindowListRef[i]->GetResolution().y));
 }
 
 IHyRenderer::~IHyRenderer(void)
@@ -52,11 +52,11 @@ IHyRenderer::~IHyRenderer(void)
 void IHyRenderer::Update()
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Iterate through 'm_vWindowRef' to find any dirty RenderSurface's that need processing
-	// TODO: Make the application's HyWindow (ref to 'm_vWindowRef') threadsafe
-	for(uint32 i = 0; i < static_cast<uint32>(m_vWindowRef.size()); ++i)
+	// Iterate through 'm_WindowListRef' to find any dirty RenderSurface's that need processing
+	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
-		HyWindowInfo &windowInfoRef = m_vWindowRef[i]->Update_Render();
+		HyWindowInfo &windowInfoRef = m_WindowListRef[i]->Update_Render();
 		if(windowInfoRef.uiDirtyFlags)
 		{
 			RenderSurface *pRenderSurface = NULL;
@@ -72,7 +72,7 @@ void IHyRenderer::Update()
 
 			if(windowInfoRef.uiDirtyFlags & HyWindowInfo::FLAG_Resolution)
 			{
-				glm::ivec2 vResolution = m_vWindowRef[i]->GetResolution();
+				glm::ivec2 vResolution = m_WindowListRef[i]->GetResolution();
 				pRenderSurface->Resize(vResolution.x, vResolution.y);
 			}
 
