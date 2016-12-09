@@ -47,12 +47,14 @@ class HyCamera2d : public IHyTransform2d, public IHyCamera
 public:
 	virtual ~HyCamera2d();
 
-	virtual void OnUpdate();
 
 	virtual void SetZoom(const float fZoom)		{ scale.Set(fZoom, fZoom); }
 	virtual float GetZoom() const				{ return scale.Get().x; }
 
 	HyRectangle<float> GetWorldViewBounds();
+	
+private:
+	virtual void OnUpdate();
 };
 
 class HyCamera3d : public IHyTransform3d, public IHyCamera
@@ -63,10 +65,12 @@ class HyCamera3d : public IHyTransform3d, public IHyCamera
 public:
 	virtual ~HyCamera3d();
 
-	virtual void OnUpdate();
 
 	virtual void SetZoom(const float fZoom)		{ scale.Set(1.0f, 1.0f, fZoom); }
 	virtual float GetZoom() const				{ return scale.Get().z; }
+	
+private:
+	virtual void OnUpdate();
 };
 
 #endif /* __HyCamera_h__ */

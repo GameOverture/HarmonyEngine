@@ -173,7 +173,7 @@ void HyAssetManager::RemoveInst(IHyInst2d *pInst)
 
 	case HYLOADSTATE_Queued:
 	case HYLOADSTATE_ReloadGfx:
-		for(vector<IHyInst2d *>::iterator it = m_QueuedInst2dList.begin(); it != m_QueuedInst2dList.end(); ++it)
+		for(std::vector<IHyInst2d *>::iterator it = m_QueuedInst2dList.begin(); it != m_QueuedInst2dList.end(); ++it)
 		{
 			if((*it) == pInst)
 			{
@@ -191,7 +191,7 @@ void HyAssetManager::RemoveInst(IHyInst2d *pInst)
 // Unload everything
 void HyAssetManager::Shutdown()
 {
-	vector<IHyInst2d *> vReloadInsts;
+	std::vector<IHyInst2d *> vReloadInsts;
 	m_SceneRef.CopyAllInsts(vReloadInsts);
 
 	for(uint32 i = 0; i < m_QueuedInst2dList.size(); ++i)
@@ -223,7 +223,7 @@ void HyAssetManager::FinalizeData(IHyData *pData)
 	if(pData->GetLoadState() == HYLOADSTATE_Queued)
 	{
 		bool bDataIsUsed = false;
-		for(vector<IHyInst2d *>::iterator iter = m_QueuedInst2dList.begin(); iter != m_QueuedInst2dList.end();)
+		for(std::vector<IHyInst2d *>::iterator iter = m_QueuedInst2dList.begin(); iter != m_QueuedInst2dList.end();)
 		{
 			if((*iter)->GetData() == pData)
 			{
@@ -280,7 +280,7 @@ void HyAssetManager::DiscardData(IHyData *pData)
 /*static*/ void HyAssetManager::LoadingThread(void *pParam)
 {
 	LoadThreadCtrl *pLoadingCtrl = reinterpret_cast<LoadThreadCtrl *>(pParam);
-	vector<IHyData *>	vCurLoadData;
+	std::vector<IHyData *>	vCurLoadData;
 
 	while(pLoadingCtrl->m_eState == LoadThreadCtrl::STATE_Run)
 	{

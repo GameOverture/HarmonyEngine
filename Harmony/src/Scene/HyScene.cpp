@@ -25,12 +25,13 @@
 #include "Time/IHyTime.h"
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
+std::vector<IHyTransformNode *> HyScene::sm_MasterList;
 
-HyScene::HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
-																				m_iPhysVelocityIterations(8),
-																				m_iPhysPositionIterations(3),
-																				m_GfxCommsRef(gfxCommsRef),
-																				m_WindowListRef(WindowListRef)
+HyScene::HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
+																					m_iPhysVelocityIterations(8),
+																					m_iPhysPositionIterations(3),
+																					m_GfxCommsRef(gfxCommsRef),
+																					m_WindowListRef(WindowListRef)
 {
 	m_b2World.SetDebugDraw(&m_DrawPhys2d);
 	m_b2World.SetContactListener(&m_Phys2dContactListener);
@@ -39,12 +40,29 @@ HyScene::HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow *> &WindowListRef) :	m
 
 	// Link HyScene to all classes that access it
 	HyPhysEntity2d::sm_b2WorldRef = &m_b2World;
-	HyAnimFloat::sm_pScene = this;
 }
 
 HyScene::~HyScene(void)
 {
 	IHyInst2d::sm_pAssetManager = NULL;
+}
+
+/*static*/ void HyScene::AddTransformNode(IHyTransformNode *pNode)
+{
+	sm_MasterList.push_back(pNode);
+}
+
+/*static*/ void HyScene::RemoveTransformNode(IHyTransformNode *pNode)
+{
+	for(std::vector<IHyTransformNode *>::iterator it = sm_MasterList.begin(); it != sm_MasterList.end(); ++it)
+	{
+		if((*it) == pNode)
+		{
+			// TODO: Log about erasing Node
+			sm_MasterList.erase(it);
+			break;
+		}
+	}
 }
 
 void HyScene::AddInstance(IHyInst2d *pInst)
@@ -57,7 +75,7 @@ void HyScene::AddInstance(IHyInst2d *pInst)
 
 void HyScene::RemoveInst(IHyInst2d *pInst)
 {
-	for(vector<IHyInst2d *>::iterator it = m_LoadedInst2dList.begin(); it != m_LoadedInst2dList.end(); ++it)
+	for(std::vector<IHyInst2d *>::iterator it = m_LoadedInst2dList.begin(); it != m_LoadedInst2dList.end(); ++it)
 	{
 		if((*it) == pInst)
 		{
@@ -68,21 +86,10 @@ void HyScene::RemoveInst(IHyInst2d *pInst)
 	}
 }
 
-void HyScene::CopyAllInsts(vector<IHyInst2d *> &vInstsToCopy)
+void HyScene::CopyAllInsts(std::vector<IHyInst2d *> &vInstsToCopy)
 {
 	vInstsToCopy = m_LoadedInst2dList;
 }
-
-void HyScene::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
-{
-	if(pAnimFloat->m_bAddedToSceneUpdate == false)
-	{
-		pAnimFloat->m_bAddedToSceneUpdate = true;
-		m_ActiveAnimFloatsList.push_back(pAnimFloat);
-	}
-}
-
-
 
 //PRIVATE//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -90,19 +97,8 @@ void HyScene::PreUpdate()
 {
 	m_b2World.Step(IHyTime::GetUpdateStepSeconds(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 
-	// Update any currently active AnimFloat in the game, and remove any of them that are finished.
-	for (vector<HyAnimFloat *>::iterator iter = m_ActiveAnimFloatsList.begin(); iter != m_ActiveAnimFloatsList.end(); )
-	{
-		if(!(*iter)->UpdateFloat())
-		{
-			(*iter)->m_bAddedToSceneUpdate = false;
-			iter = m_ActiveAnimFloatsList.erase(iter);
-		}
-		else
-			++iter;
-	}
-
-
+	for(uint32 i = 0; i < sm_MasterList.size(); ++i)
+		sm_MasterList[i]->Update();
 }
 
 void HyScene::PostUpdate()
@@ -242,9 +238,6 @@ void HyScene::WriteDrawBuffer()
 	{
 		if(m_LoadedInst2dList[i]->IsEnabled() == false)
 			continue;
-
-		// Updates the instance as well as its shader uniforms
-		m_LoadedInst2dList[i]->Update();
 
 		// If previously written instance has equal render state by "operator ==" then it's to be assumed the instance data can be batched and doesn't need to write another render state
 		if(pCurRenderState2d == NULL || m_LoadedInst2dList[i]->GetRenderState() != *pCurRenderState2d)

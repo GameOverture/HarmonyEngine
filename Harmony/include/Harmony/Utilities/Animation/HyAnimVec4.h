@@ -15,22 +15,21 @@
 #include "Utilities/Animation/HyAnimFloat.h"
 
 #include <vector>
-using std::vector;
 
 class HyAnimVec4
 {
-	glm::vec4			m_vValue;
+	glm::vec4					m_vValue;
 	enum {
 		NumDimensions = 4
 	};
 
-	vector<HyAnimFloat> m_AnimFloatList;
+	std::vector<HyAnimFloat>	m_AnimFloatList;
 
 public:
-	HyAnimVec4()
+	HyAnimVec4(IHyTransformNode &ownerRef)
 	{
 		for(int i = 0; i < NumDimensions; ++i)
-			m_AnimFloatList.push_back(HyAnimFloat(m_vValue[i]));
+			m_AnimFloatList.push_back(HyAnimFloat(m_vValue[i], ownerRef));
 	}
 	~HyAnimVec4()
 	{ }
@@ -74,8 +73,6 @@ public:
 
 	void Tween(float fX, float fY, float fZ, float fSeconds, HyTweenUpdateFunc fpEase);
 	void TweenOffset(float fOffsetX, float fOffsetY, float fOffsetZ, float fSeconds, HyTweenUpdateFunc fpEase);
-
-	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam)		{ for(int i = 0; i < NumDimensions; ++i) m_AnimFloatList[i].SetOnDirtyCallback(fpOnDirty, pParam); }
 
 	HyAnimVec4 &operator+=(float rhs)										{ for(int i = 0; i < NumDimensions; ++i) m_AnimFloatList[i] += rhs; return *this; }
 	HyAnimVec4 &operator-=(float rhs)										{ for(int i = 0; i < NumDimensions; ++i) m_AnimFloatList[i] -= rhs; return *this; }

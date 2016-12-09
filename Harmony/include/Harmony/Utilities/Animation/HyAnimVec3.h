@@ -26,10 +26,10 @@ class HyAnimVec3
 	std::vector<HyAnimFloat> m_AnimFloatList;
 
 public:
-	HyAnimVec3()
+	HyAnimVec3(IHyTransformNode &ownerRef)
 	{
 		for(int i = 0; i < NumDimensions; ++i)
-			m_AnimFloatList.push_back(HyAnimFloat(m_vValue[i]));
+			m_AnimFloatList.push_back(HyAnimFloat(m_vValue[i], ownerRef));
 	}
 	~HyAnimVec3()
 	{ }
@@ -65,8 +65,6 @@ public:
 		m_AnimFloatList[2].TweenOffset(fZ, fSeconds, fpEase);
 	}
 	void TweenOffset(float fOffsetX, float fOffsetY, float fOffsetZ, float fSeconds, HyTweenUpdateFunc fpEase);
-
-	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam) { for(int i = 0; i < NumDimensions; ++i) m_AnimFloatList[i].SetOnDirtyCallback(fpOnDirty, pParam); }
 
 	HyAnimVec3 &operator+=(float rhs)					{ for(int i = 0; i < NumDimensions; ++i) m_AnimFloatList[i] += rhs; return *this; }
 	HyAnimVec3 &operator-=(float rhs)					{ for(int i = 0; i < NumDimensions; ++i) m_AnimFloatList[i] -= rhs; return *this; }

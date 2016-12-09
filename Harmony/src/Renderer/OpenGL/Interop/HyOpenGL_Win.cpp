@@ -16,8 +16,8 @@
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowListRef) :	HyOpenGL(gfxCommsRef, windowListRef),
-																							m_hGLContext(NULL)
+HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef) :	HyOpenGL(gfxCommsRef, windowListRef),
+																								m_hGLContext(NULL)
 {
 	m_PixelFormatDescriptor.nSize = sizeof(PIXELFORMATDESCRIPTOR);
 	m_PixelFormatDescriptor.nVersion = 1;
@@ -41,7 +41,7 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowLi
 	for(uint32 i = 0; i < m_RenderSurfaces.size(); ++i)
 		m_RenderSurfaces[i].m_pExData = ConstructWindow(m_WindowListRef[i]->GetWindowInfo());
 
-	vector<HyMonitorDeviceInfo> vMonitorDeviceInfo;
+	std::vector<HyMonitorDeviceInfo> vMonitorDeviceInfo;
 	if(EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&vMonitorDeviceInfo) == false)
 		HyError("EnumDisplayMonitors failed");
 
@@ -53,7 +53,7 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowLi
 
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
 {
-	vector<HyMonitorDeviceInfo> &vMonitorDeviceInfo = *reinterpret_cast<vector<HyMonitorDeviceInfo> *>(dwData);
+	std::vector<HyMonitorDeviceInfo> &vMonitorDeviceInfo = *reinterpret_cast<std::vector<HyMonitorDeviceInfo> *>(dwData);
 
 	MONITORINFOEX monitorInfo;
 	memset(&monitorInfo, 0, sizeof(monitorInfo));

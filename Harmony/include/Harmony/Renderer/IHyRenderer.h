@@ -22,19 +22,19 @@ struct HyMonitorDeviceInfo;
 class IHyRenderer
 {
 protected:
-	HyGfxComms &						m_GfxCommsRef;
-	vector<HyWindow *> &				m_WindowListRef;
+	HyGfxComms &							m_GfxCommsRef;
+	std::vector<HyWindow *> &				m_WindowListRef;
 
-	queue<IHy2dData *> *				m_pRxDataQueue;		// The pointer to the currently active render message queue
-	queue<IHy2dData *> *				m_pTxDataQueue;	// The pointer to the currently active render message queue
-	char *								m_pDrawBuffer;	// The pointer to the currently active draw buffer
+	std::queue<IHy2dData *> *				m_pRxDataQueue;		// The pointer to the currently active render message queue
+	std::queue<IHy2dData *> *				m_pTxDataQueue;	// The pointer to the currently active render message queue
+	char *									m_pDrawBuffer;	// The pointer to the currently active draw buffer
 
-	static int32						sm_iShaderIdCount;
-	static std::map<int32, IHyShader *>	sm_ShaderMap;
+	static int32							sm_iShaderIdCount;
+	static std::map<int32, IHyShader *>		sm_ShaderMap;
 
-	HyGfxComms::tDrawHeader *			m_pDrawBufferHeader;
-	HyRenderState *						m_pCurRenderState;
-	HyRenderState						m_PrevRenderState;
+	HyGfxComms::tDrawHeader *				m_pDrawBufferHeader;
+	HyRenderState *							m_pCurRenderState;
+	HyRenderState							m_PrevRenderState;
 
 	enum eRenderSurfaceType
 	{
@@ -44,22 +44,22 @@ protected:
 	
 	struct RenderSurface
 	{
-		eRenderSurfaceType			m_eType;
-		int32						m_iID;
-		int32						m_iRenderSurfaceWidth;
-		int32						m_iRenderSurfaceHeight;
-		
-		void *						m_pExData;
+		eRenderSurfaceType					m_eType;
+		int32								m_iID;
+		int32								m_iRenderSurfaceWidth;
+		int32								m_iRenderSurfaceHeight;
+
+		void *								m_pExData;
 
 		RenderSurface(eRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight);
 
 		void Resize(int32 iWidth, int32 iHeight);
 	};
-	vector<RenderSurface>			m_RenderSurfaces;
-	vector<RenderSurface>::iterator	m_RenderSurfaceIter;
+	std::vector<RenderSurface>				m_RenderSurfaces;
+	std::vector<RenderSurface>::iterator	m_RenderSurfaceIter;
 
 public:
-	IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowListRef);
+	IHyRenderer(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
 	virtual void StartRender() = 0;
@@ -77,7 +77,7 @@ public:
 	virtual void FinishRender() = 0;
 
 	// Returns the texture ID used for API specific drawing.
-	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, vector<unsigned char *> &vPixelData) = 0;
+	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &vPixelData) = 0;
 	virtual void DeleteTextureArray(uint32 uiTextureHandle) = 0;
 
 	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags) = 0;
@@ -96,7 +96,7 @@ public:
 
 	void Update();
 	void Draw2d();
-	void SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
+	void SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info);
 
 	static IHyShader *FindShader(int32 iId);
 	static IHyShader *MakeCustomShader();

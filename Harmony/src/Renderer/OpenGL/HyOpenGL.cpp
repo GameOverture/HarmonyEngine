@@ -11,8 +11,8 @@
 
 #include "Diagnostics/HyGuiComms.h"
 
-HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowListRef) :	IHyRenderer(gfxCommsRef, windowListRef),
-																					m_mtxView(1.0f)
+HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(gfxCommsRef, windowListRef),
+																						m_mtxView(1.0f)
 {
 #ifdef HY_PLATFORM_GUI
 	Initialize();
@@ -267,7 +267,7 @@ HyOpenGL::~HyOpenGL(void)
 }
 
 // Returns the texture ID used for API specific drawing.
-/*virtual*/ uint32 HyOpenGL::AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, vector<unsigned char *> &vPixelData)
+/*virtual*/ uint32 HyOpenGL::AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &PixelDataList)
 {
 	GLenum eInternalFormat = uiNumColorChannels == 4 ? GL_RGBA8 : (uiNumColorChannels == 3 ? GL_RGB8 : GL_R8);
 	GLenum eFormat = uiNumColorChannels == 4 ? GL_RGBA : (uiNumColorChannels == 3 ? GL_RGB : GL_RED);
@@ -276,7 +276,7 @@ HyOpenGL::~HyOpenGL(void)
 	glGenTextures(1, &hGLTextureArray);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, hGLTextureArray);
 
-	uint32 uiNumTextures = static_cast<uint32>(vPixelData.size());
+	uint32 uiNumTextures = static_cast<uint32>(PixelDataList.size());
 
 	// Create (blank) storage for the texture array
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, uiNumTextures, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
@@ -290,7 +290,7 @@ HyOpenGL::~HyOpenGL(void)
 						uiWidth, uiHeight, 1,	// width, height, depth (of texture you're copying in)
 						eFormat,				// format
 						GL_UNSIGNED_BYTE,		// type
-						vPixelData[i]);			// pointer to pixel data
+						PixelDataList[i]);			// pointer to pixel data
 	}
 
 	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

@@ -76,18 +76,6 @@ public:
 	void Load();
 	void Unload();
 
-protected:
-	virtual void OnDataLoaded() = 0;
-	
-	virtual void OnUpdate();
-	virtual void OnInstUpdate() = 0;
-
-	// Upon updating, this function will set the shaders' uniforms when using the default shader
-	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef) = 0;
-
-	// This function is responsible for incrementing the passed in reference pointer the size of the data written
-	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) = 0;
-
 private:
 	HyLoadState GetLoadState()									{ return m_eLoadState; }
 	const HyRenderState &GetRenderState() const					{ return m_RenderState; }
@@ -95,6 +83,13 @@ private:
 	void SetData(IHyData *pData);
 	void SetLoaded();
 	IHyData *GetData()											{ return m_pData; }
+
+	virtual void OnUpdate();
+
+	virtual void OnInstUpdate() = 0;
+	virtual void OnDataLoaded() = 0;
+	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef) = 0;	// Upon updating, this function will set the shaders' uniforms when using the default shader
+	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) = 0;			// This function is responsible for incrementing the passed in reference pointer the size of the data written
 };
 
 #endif /* __IHyInst2d_h__ */

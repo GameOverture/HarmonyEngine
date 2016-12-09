@@ -15,7 +15,6 @@
 #include "Utilities/Animation/HyAnimFloat.h"
 
 #include <vector>
-using std::vector;
 
 class HyAnimVec2
 {
@@ -24,13 +23,13 @@ class HyAnimVec2
 		NumDimensions = 2
 	};
 
-	vector<HyAnimFloat> m_AnimFloatList;
+	std::vector<HyAnimFloat> m_AnimFloatList;
 
 public:
-	HyAnimVec2()
+	HyAnimVec2(IHyTransformNode &ownerRef)
 	{
 		for(int i = 0; i < NumDimensions; ++i)
-			m_AnimFloatList.push_back(HyAnimFloat(m_vValue[i]));
+			m_AnimFloatList.push_back(HyAnimFloat(m_vValue[i], ownerRef));
 	}
 	~HyAnimVec2()
 	{ }
@@ -72,8 +71,6 @@ public:
 	{
 		return (m_AnimFloatList[0].IsTransforming() || m_AnimFloatList[1].IsTransforming());
 	}
-
-	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam) { for(int i = 0; i < NumDimensions; ++i) m_AnimFloatList[i].SetOnDirtyCallback(fpOnDirty, pParam); }
 
 	HyAnimVec2 &operator+=(float rhs)					{ for(int i = 0; i < NumDimensions; ++i) m_AnimFloatList[i] += rhs; return *this; }
 	HyAnimVec2 &operator-=(float rhs)					{ for(int i = 0; i < NumDimensions; ++i) m_AnimFloatList[i] -= rhs; return *this; }

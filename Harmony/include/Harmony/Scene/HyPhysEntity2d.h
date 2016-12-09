@@ -20,12 +20,12 @@ class HyPhysEntity2d : public HyEntity2d
 {
 	friend class HyBox2dRuntime;
 	friend class HyScene;
-	static b2World *	sm_b2WorldRef;
+	static b2World *		sm_b2WorldRef;
 
-	bool				m_bEnabled;
+	bool					m_bEnabled;
 
-	const b2BodyType	m_keBodyType;
-	b2Body *			m_b2Body;
+	const b2BodyType		m_keBodyType;
+	b2Body *				m_b2Body;
 
 	struct tFixture
 	{
@@ -44,10 +44,10 @@ class HyPhysEntity2d : public HyEntity2d
 		void SetGrounded()		{ m_uiFlags |= FIXTUREFLAG_IsGrounded; }
 		void UnsetGrounded()	{ m_uiFlags &= ~FIXTUREFLAG_IsGrounded; }
 	};
-	vector<tFixture>	m_Fixtures;
+	std::vector<tFixture>	m_Fixtures;
 
-	glm::vec2			m_ptPrevPos;
-	float				m_fPrevRotation;
+	glm::vec2				m_ptPrevPos;
+	float					m_fPrevRotation;
 
 public:
 	HyPhysEntity2d(b2BodyType eBodyType);

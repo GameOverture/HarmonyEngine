@@ -76,7 +76,7 @@ void IHyTime::RemoveTimeInst(IHyTimeInst *pTimeInst)
 	if(pTimeInst == NULL)
 		return;
 
-	for(vector<IHyTimeInst*>::iterator it = m_TimeInstList.begin(); it != m_TimeInstList.end(); ++it)
+	for(std::vector<IHyTimeInst*>::iterator it = m_TimeInstList.begin(); it != m_TimeInstList.end(); ++it)
 	{
 		if((*it) == pTimeInst)
 		{

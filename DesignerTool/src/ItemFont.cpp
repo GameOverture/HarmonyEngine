@@ -119,7 +119,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetA
             MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawAtlasPreview->GetGraphicsApiHandle());
 
         // Upload texture to gfx api
-        vector<unsigned char *> vPixelData;
+        std::vector<unsigned char *> vPixelData;
         vPixelData.push_back(pWidget->GetAtlasPixelData());
         pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(4 /*converted texture depth*/, pAtlas->width, pAtlas->height, vPixelData);
 

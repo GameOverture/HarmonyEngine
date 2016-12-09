@@ -12,6 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
+#include "Scene/Transforms/IHyTransformNode.h"
+
 #include "IHyApplication.h"
 #include "Utilities/Animation/HyAnimVec3.h"
 
@@ -46,59 +48,41 @@ public:
 };
 
 template<typename tVec>
-class IHyTransform
+class IHyTransform : public IHyTransformNode
 {
-	friend class IHyTransform2d;
-	friend class IHyTransform3d;
-
-	// This ctor is hidden since any class that wants to derive from IHyTransform should use either 'IHyTransform2d' or 'IHyTransform3d'
-	IHyTransform(HyType eInstType);
-
 protected:
-	const HyType			m_eTYPE;
-	HyCoordinateUnit		m_eCoordUnit;
-
-	tVec					m_ptRotationAnchor;
-	tVec					m_ptScaleAnchor;
-
-	void (*m_fpOnDirty)(void *);
-	void *					m_pOnDirtyParam;
-
-	bool					m_bEnabled;
-
 	HyActionQueue			m_ActionQueue;
 
+	HyCoordinateUnit		m_eCoordUnit;
+
 public:
+	IHyTransform(HyType eInstType);
 	virtual ~IHyTransform(void);
 
-	HyType GetType()											{ return m_eTYPE; }
+	HyCoordinateUnit GetCoordinateUnit()						{ return m_eCoordUnit; }
+	void SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion);
 
 	// Exposing these HyAnimVec's for user API convenience
 	tVec				pos;
 	tVec				rot_pivot;
 	tVec				scale;
-
-	HyCoordinateUnit GetCoordinateUnit()						{ return m_eCoordUnit; }
-	void SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion);
-
-	bool IsEnabled()											{ return m_bEnabled; }
-	void SetEnabled(bool bEnabled)								{ m_bEnabled = bEnabled; }
 	
 	// Returns the converted pixel position to the specified HyCoordinateType
 	virtual void GetLocalTransform(glm::mat4 &outMtx) const = 0;
 	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const = 0;
-	virtual void SetOnDirtyCallback(void(*fpOnDirty)(void *), void *pParam = NULL) = 0;
 
-	void Update();
+	virtual void OnTransformUpdate();
+
+private:
 	virtual void OnUpdate() = 0;
 };
 
 template<typename tVec>
-IHyTransform<tVec>::IHyTransform(HyType eInstType) :	m_eTYPE(eInstType),
+IHyTransform<tVec>::IHyTransform(HyType eInstType) :	IHyTransformNode(eInstType),
 														m_eCoordUnit(HYCOORDUNIT_Default),
-														m_fpOnDirty(NULL),
-														m_pOnDirtyParam(NULL),
-														m_bEnabled(true)
+														pos(*this),
+														rot_pivot(*this),
+														scale(*this)
 {
 	scale.Set(1.0f);
 }
@@ -126,16 +110,16 @@ void IHyTransform<tVec>::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDo
 	}
 	m_eCoordUnit = eCoordUnit;
 
-	if(m_fpOnDirty)
-		m_fpOnDirty(m_pOnDirtyParam);
+	SetDirty();
 }
 
 template<typename tVec>
-void IHyTransform<tVec>::Update()
+void IHyTransform<tVec>::OnTransformUpdate()
 {
-	OnUpdate();
-
+	
 	// TODO: process the procedural action queue
+
+	OnUpdate();
 }
 
 #endif /* __ITransform_h__ */

@@ -13,14 +13,13 @@
 #include "Afx/HyStdAfx.h"
 
 #include <vector>
-using std::vector;
 
 class IHyInputMap;
 
 class IHyInput
 {
 public:
-	IHyInput(vector<IHyInputMap *> &vInputMapsRef);
+	IHyInput(std::vector<IHyInputMap *> &vInputMapsRef);
 	virtual ~IHyInput();
 
 	virtual void Update() = 0;

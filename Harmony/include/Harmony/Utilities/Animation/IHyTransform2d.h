@@ -16,11 +16,9 @@
 class IHyTransform2d : public IHyTransform<HyAnimVec2>
 {
 protected:
-	// Transformation hierarchy
-	IHyTransform2d *				m_pParent;
-	bool							m_bDirty;
 	glm::mat4						m_mtxCached;
-	vector<IHyTransform2d *>		m_ChildList;
+
+	float							m_fRotation;
 
 public:
 	IHyTransform2d(HyType eInstType);
@@ -35,16 +33,10 @@ public:
 
 	virtual void GetLocalTransform(glm::mat4 &outMtx) const;
 	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const;
-	virtual void SetOnDirtyCallback(void(*fpOnDirty)(void *), void *pParam = NULL);
 
 	void GetWorldTransform(glm::mat4 &outMtx);
 
-	void AddChild(IHyTransform2d &childInst);
-	void Detach();
-
-	void SetDirty();
-	static void OnDirty(void *);
-
+private:
 	virtual void OnUpdate() = 0;
 };
 

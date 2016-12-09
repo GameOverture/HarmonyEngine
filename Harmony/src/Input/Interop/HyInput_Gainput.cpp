@@ -10,11 +10,11 @@
 #include "Input/Interop/HyInput_Gainput.h"
 #include "Input/Interop/HyInputMap_Gainput.h"
 
-HyInput_Gainput::HyInput_Gainput(vector<IHyInputMap *> &vInputMapsRef) :	IHyInput(vInputMapsRef),
-																			m_uiKeyboardId(gainput::InvalidDeviceId),
-																			m_uiMouseId(gainput::InvalidDeviceId),
-																			m_eRecordState(RECORD_Off),
-																			m_uiRecordCount(0)
+HyInput_Gainput::HyInput_Gainput(std::vector<IHyInputMap *> &vInputMapsRef) :	IHyInput(vInputMapsRef),
+																				m_uiKeyboardId(gainput::InvalidDeviceId),
+																				m_uiMouseId(gainput::InvalidDeviceId),
+																				m_eRecordState(RECORD_Off),
+																				m_uiRecordCount(0)
 {
 }
 

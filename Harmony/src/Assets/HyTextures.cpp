@@ -210,7 +210,7 @@ void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef, IHy2dData *pData)
 	{
 		if(m_uiGfxApiHandle == 0)
 		{
-			vector<unsigned char *> vTextureArrayData;
+			std::vector<unsigned char *> vTextureArrayData;
 			for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
 				vTextureArrayData.push_back(m_pAtlases[i].GetPixelData());
 

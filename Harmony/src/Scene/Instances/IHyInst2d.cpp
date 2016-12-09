@@ -25,7 +25,9 @@ IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName)
 																					m_eLoadState(HYLOADSTATE_Inactive),
 																					m_bInvalidLoad(false),
 																					m_iDisplayOrder(0),
-																					m_iTag(0)
+																					m_iTag(0),
+																					topColor(*this),
+																					botColor(*this)
 {
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
@@ -75,12 +77,6 @@ void IHyInst2d::Unload()
 
 	m_pData = NULL;
 	m_eLoadState = HYLOADSTATE_Inactive;
-}
-
-/*virtual*/ void IHyInst2d::OnUpdate()
-{
-	OnInstUpdate();
-	OnUpdateUniforms(m_RenderState.PrimeShaderUniforms());
 }
 
 void IHyInst2d::SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom)
@@ -137,4 +133,10 @@ void IHyInst2d::SetLoaded()
 {
 	m_eLoadState = HYLOADSTATE_Loaded;
 	OnDataLoaded();
+}
+
+/*virtual*/ void IHyInst2d::OnUpdate()
+{
+	OnInstUpdate();
+	OnUpdateUniforms(m_RenderState.PrimeShaderUniforms());
 }

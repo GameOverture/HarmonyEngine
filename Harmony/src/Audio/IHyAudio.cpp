@@ -10,7 +10,7 @@
 #include "Audio/IHyAudio.h"
 #include "Renderer/Viewport/HyWindow.h"
 
-IHyAudio::IHyAudio(vector<HyWindow *> &windowListRef) : m_WindowListRef(windowListRef)
+IHyAudio::IHyAudio(std::vector<HyWindow *> &windowListRef) :	m_WindowListRef(windowListRef)
 {
 }
 

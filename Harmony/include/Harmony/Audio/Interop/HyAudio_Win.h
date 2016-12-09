@@ -53,7 +53,7 @@ class HyAudio_Win : public IHyAudio
 	Effect						m_Effects[NUMEFFECTS];
 
 public:
-	HyAudio_Win(vector<HyWindow *> &windowListRef);
+	HyAudio_Win(std::vector<HyWindow *> &windowListRef);
 	virtual ~HyAudio_Win();
 
 private:

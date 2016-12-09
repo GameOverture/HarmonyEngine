@@ -10,7 +10,7 @@
 #include "Input/IHyInput.h"
 #include "Input/IHyInputMap.h"
 
-IHyInput::IHyInput(vector<IHyInputMap *> &vInputMapsRef)
+IHyInput::IHyInput(std::vector<IHyInputMap *> &vInputMapsRef)
 {
 	IHyInputMap::SetManagerPtr(this);
 

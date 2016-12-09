@@ -16,7 +16,7 @@
 class HyInput_NULL : public IHyInput
 {
 public:
-	HyInput_NULL(vector<IHyInputMap *> &vInputMapsRef) : IHyInput(vInputMapsRef) { }
+	HyInput_NULL(std::vector<IHyInputMap *> &vInputMapsRef) : IHyInput(vInputMapsRef) { }
 
 	virtual void Update() { }
 

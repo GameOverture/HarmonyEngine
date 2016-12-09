@@ -88,6 +88,7 @@
     <ClCompile Include="Scene\Instances\HyText2d.cpp" />
     <ClCompile Include="Scene\Instances\HyTexturedQuad2d.cpp" />
     <ClCompile Include="Scene\Instances\IHyInst2d.cpp" />
+    <ClCompile Include="Scene\Transforms\IHyTransformNode.cpp" />
     <ClCompile Include="Time\Interop\HyTime_Win.cpp" />
     <ClCompile Include="Time\IHyTime.cpp" />
     <ClCompile Include="Time\Watches\HyStopwatch.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="..\include\Harmony\Scene\Instances\HyText2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Instances\HyTexturedQuad2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Instances\IHyInst2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Transforms\IHyTransformNode.h" />
     <ClInclude Include="..\include\Harmony\Threading\BaseMacro.h" />
     <ClInclude Include="..\include\Harmony\Threading\BasicSync.h" />
     <ClInclude Include="..\include\Harmony\Threading\Error.h" />

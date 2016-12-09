@@ -18,9 +18,9 @@
 
 struct HyMonitorDeviceInfo
 {
-	bool				bIsPrimaryMonitor;
-	std::wstring		sDeviceName;
-	std::wstring		sDeviceDescription;
+	bool					bIsPrimaryMonitor;
+	std::wstring			sDeviceName;
+	std::wstring			sDeviceDescription;
 
 	struct Resolution
 	{
@@ -40,7 +40,7 @@ struct HyMonitorDeviceInfo
 			return this->iWidth == right.iWidth && this->iHeight == right.iHeight;
 		}
 	};
-	vector<Resolution>	vResolutions;
+	std::vector<Resolution>	vResolutions;
 };
 
 // TODO: Make this class threadsafe between game app and renderer
@@ -49,19 +49,19 @@ class HyWindow
 	friend class HyScene;
 	friend class IHyRenderer;
 
-	static vector<HyMonitorDeviceInfo>	sm_MonitorInfoList;
-	static BasicSection					sm_csInfo;
+	static std::vector<HyMonitorDeviceInfo>	sm_MonitorInfoList;
+	static BasicSection						sm_csInfo;
 
-	HyWindowInfo						m_Info_Update;	// On the application's update thread
-	HyWindowInfo						m_Info_Shared;
-	HyWindowInfo						m_Info_Render;	// Read-only contents for render thread
+	HyWindowInfo							m_Info_Update;	// On the application's update thread
+	HyWindowInfo							m_Info_Shared;
+	HyWindowInfo							m_Info_Render;	// Read-only contents for render thread
 	
-	vector<HyCamera2d *>				m_Cams2dList;
-	vector<HyCamera3d *>				m_Cams3dList;
+	std::vector<HyCamera2d *>				m_Cams2dList;
+	std::vector<HyCamera3d *>				m_Cams3dList;
 
-	bool								m_bTakeInput;
+	bool									m_bTakeInput;
 
-	BasicSection						m_cs;
+	BasicSection							m_cs;
 
 public:
 	HyWindow();
@@ -93,10 +93,10 @@ public:
 	void				RemoveCamera(HyCamera2d *&pCam);
 	void				RemoveCamera(HyCamera3d *&pCam);
 
-	static void			MonitorDeviceInfo(vector<HyMonitorDeviceInfo> &vDeviceInfoOut);
+	static void			MonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &vDeviceInfoOut);
 
 private:
-	static void			SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info);
+	static void			SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info);
 
 	void				Update();
 

@@ -16,7 +16,6 @@
 #include "Watches/HyStopwatch.h"
 
 #include <vector>
-using std::vector;
 
 // Forward declarations
 class IHyTimeInst;
@@ -27,7 +26,7 @@ class IHyTime
 	static const uint32			sm_uiUPDATESTEP_MILLISECONDS;
 	static const double			sm_dUPDATESTEP_SECONDS;
 
-	vector<IHyTimeInst *>		m_TimeInstList;
+	std::vector<IHyTimeInst *>	m_TimeInstList;
 
 	double						m_dTotalElapsedTime;
 	double						m_dThrottledTime;

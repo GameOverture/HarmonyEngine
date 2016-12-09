@@ -22,7 +22,6 @@ public:
 
 	virtual void GetLocalTransform(glm::mat4 &outMtx) const;
 	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const;
-	virtual void SetOnDirtyCallback(void(*fpOnDirty)(void *), void *pParam = NULL);
 
 	virtual void OnUpdate() = 0;
 };

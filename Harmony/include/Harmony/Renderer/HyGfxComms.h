@@ -17,8 +17,6 @@
 
 #include <vector>
 #include <queue>
-using std::vector;
-using std::queue;
 
 #define HY_GFX_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
 
@@ -52,13 +50,13 @@ private:
 	char *						m_pDrawBuffer_Shared;
 	char *						m_pDrawBuffer_Render;
 
-	queue<IHy2dData *> *		m_pTxDataQueue_Update;
-	queue<IHy2dData *> *		m_pTxDataQueue_Shared;
-	queue<IHy2dData *> *		m_pTxDataQueue_Render;
-
-	queue<IHy2dData *> *		m_pRxDataQueue_Update;
-	queue<IHy2dData *> *		m_pRxDataQueue_Shared;
-	queue<IHy2dData *> *		m_pRxDataQueue_Render;
+	std::queue<IHy2dData *> *		m_pTxDataQueue_Update;
+	std::queue<IHy2dData *> *		m_pTxDataQueue_Shared;
+	std::queue<IHy2dData *> *		m_pTxDataQueue_Render;
+	
+	std::queue<IHy2dData *> *		m_pRxDataQueue_Update;
+	std::queue<IHy2dData *> *		m_pRxDataQueue_Shared;
+	std::queue<IHy2dData *> *		m_pRxDataQueue_Render;
 
 	BasicSection				m_csPointers;
 
@@ -76,10 +74,10 @@ public:
 	void TxData(IHy2dData *pAtlasGrp);
 
 	// This should only be invoked from the Update/Game thread
-	queue<IHy2dData *> *RxData();
+	std::queue<IHy2dData *> *RxData();
 
 	// This should only be invoked from the Render thread
-	bool Render_TakeSharedPointers(queue<IHy2dData *> *&pRxDataQueue, queue<IHy2dData *> *&pTxDataQueue, char *&pDrawBuffer);
+	bool Render_TakeSharedPointers(std::queue<IHy2dData *> *&pRxDataQueue, std::queue<IHy2dData *> *&pTxDataQueue, char *&pDrawBuffer);
 };
 
 #endif /* __HyGfxBuffers_h__ */

@@ -16,11 +16,11 @@
 
 class HyInput_Gainput : public IHyInput
 {
-	gainput::InputManager		m_Manager;
+	gainput::InputManager			m_Manager;
 
-	gainput::DeviceId			m_uiKeyboardId;
-	gainput::DeviceId			m_uiMouseId;
-	vector<gainput::DeviceId>	m_GamePadIdList;
+	gainput::DeviceId				m_uiKeyboardId;
+	gainput::DeviceId				m_uiMouseId;
+	std::vector<gainput::DeviceId>	m_GamePadIdList;
 
 	enum eRecordState
 	{
@@ -28,11 +28,11 @@ class HyInput_Gainput : public IHyInput
 		RECORD_Saving,
 		RECORD_Replaying
 	};
-	eRecordState				m_eRecordState;
-	uint64						m_uiRecordCount;
+	eRecordState					m_eRecordState;
+	uint64							m_uiRecordCount;
 
 public:
-	HyInput_Gainput(vector<IHyInputMap *> &vInputMapsRef);
+	HyInput_Gainput(std::vector<IHyInputMap *> &vInputMapsRef);
 	~HyInput_Gainput();
 
 	gainput::InputManager &GetGainputManager();

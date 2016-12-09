@@ -34,8 +34,8 @@ void IHyRenderer::RenderSurface::Resize(int32 iWidth, int32 iHeight)
 	m_iRenderSurfaceHeight = iHeight;
 }
 
-IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowListRef) :	m_GfxCommsRef(gfxCommsRef),
-																						m_WindowListRef(windowListRef)
+IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef) :	m_GfxCommsRef(gfxCommsRef),
+																							m_WindowListRef(windowListRef)
 {
 	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
@@ -152,7 +152,7 @@ void IHyRenderer::Draw2d()
 	}
 }
 
-void IHyRenderer::SetMonitorDeviceInfo(vector<HyMonitorDeviceInfo> &info)
+void IHyRenderer::SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info)
 {
 	HyWindow::SetMonitorDeviceInfo(info);
 }

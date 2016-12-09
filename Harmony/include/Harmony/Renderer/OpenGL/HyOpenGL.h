@@ -35,7 +35,7 @@ protected:
 	GLenum					m_eDrawMode;
 
 public:
-	HyOpenGL(HyGfxComms &gfxCommsRef, vector<HyWindow *> &windowListRef);
+	HyOpenGL(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~HyOpenGL(void);
 
 	virtual void StartRender();
@@ -53,7 +53,7 @@ public:
 	virtual void FinishRender();
 
 	// Returns the texture ID used for API specific drawing.
-	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, vector<unsigned char *> &vPixelData);
+	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &PixelDataList);
 	virtual void DeleteTextureArray(uint32 uiTextureHandle);
 
 	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags);

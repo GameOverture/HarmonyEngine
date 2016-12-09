@@ -216,6 +216,9 @@
     <ClCompile Include="Audio\Interop\IHyAudioInst_Win.cpp">
       <Filter>Audio\Interop</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Transforms\IHyTransformNode.cpp">
+      <Filter>Scene\Transforms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -295,6 +298,9 @@
     </Filter>
     <Filter Include="Audio\Interop">
       <UniqueIdentifier>{2b2f1543-364e-43f7-a861-20cd1f8a1396}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Transforms">
+      <UniqueIdentifier>{4185a7b1-9b33-41c5-9200-1aeed6f4bead}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -594,6 +600,9 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\include\Harmony\Audio\Interop\IHyAudioInst_Win.h">
       <Filter>Audio\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Transforms\IHyTransformNode.h">
+      <Filter>Scene\Transforms</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

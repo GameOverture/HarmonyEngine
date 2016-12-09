@@ -14,35 +14,27 @@
 
 #include "Utilities/Animation/HyTweenFuncs.h"
 
-// Forward declaration
-class HyScene;
+class IHyTransformNode;
 
-// NOTE: The constructor that takes a float reference will not invoke its 'dirty callback' if
-//		 manipulated outside of this class.
 class HyAnimFloat
 {
-	friend class HyScene;
-	static HyScene *		sm_pScene;
+	friend class IHyTransformNode;
 
 	float &					m_fValueRef;
+	IHyTransformNode &		m_OwnerRef;
+
 	float					m_fStart;
 	float					m_fTarget;
 	float					m_fDuration;
 	float					m_fElapsedTime;
-	bool					m_bAddedToSceneUpdate;
+	bool					m_bAddedToOwnerUpdate;
 
-	const bool				m_bSELF_ALLOCATED;
-
-	HyTweenUpdateFunc			m_fpEaseFunc;
-	//float (HyEase::*m_fpEaseFunc)(float);
+	HyTweenUpdateFunc		m_fpEaseFunc;
 
 	bool (HyAnimFloat::*m_fpBehaviorUpdate)();
-	void (*m_fpOnDirty)(void *pParam);
-	void *					m_pOnChangeParam;
 
 public:
-	HyAnimFloat();
-	HyAnimFloat(float &valueReference);
+	HyAnimFloat(float &valueReference, IHyTransformNode &ownerRef);
 	~HyAnimFloat(void);
 
 	inline float Get() const			{ return m_fValueRef; }
@@ -50,17 +42,12 @@ public:
 	void Offset(float fValue);
 
 	// Procedural transformation functions
-	bool IsTransforming()				{ return m_bAddedToSceneUpdate; }
+	bool IsTransforming()				{ return m_bAddedToOwnerUpdate; }
 	void Tween(float fFrom, float fTo, float fSeconds, HyTweenUpdateFunc fpEase);
 	void Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpEase);
 	void TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFunc fpEase);
 	//void Follow(float &fToFollow, float fOffsetAmt);
 	//void Sequence(...);
-
-	void SetOnDirtyCallback(void (*fpOnDirty)(void *), void *pParam = NULL);
-
-	// Returns true if updating is still continuing. False otherwise, to signal HyScene to remove this instance from the ActiveAnimFloat vector
-	bool UpdateFloat();
 
 	HyAnimFloat &operator=(const float &rhs);
 	HyAnimFloat &operator+=(const float &rhs);
@@ -74,6 +61,9 @@ public:
 	HyAnimFloat &operator/=(const HyAnimFloat &rhs);
 
 private:
+	// Returns true if updating is still continuing. False otherwise, to signal HyScene to remove this instance from the ActiveAnimFloat vector
+	bool UpdateFloat();
+
 	//////////////////////////////////////////////////////////////////////////
 	// Update Behaviors
 	//////////////////////////////////////////////////////////////////////////

@@ -13,7 +13,6 @@
 #include "Afx/HyStdAfx.h"
 
 #include <vector>
-using std::vector;
 
 class HyLiveVar
 {
@@ -45,9 +44,9 @@ class HyLiveVar
 				return false;
 			}
 		};
-		vector<tVar>	m_VariableList;
+		std::vector<tVar>	m_VariableList;
 	};
-	vector<tGroup>	m_GroupList;
+	std::vector<tGroup>	m_GroupList;
 
 public:
 	HyLiveVar();
@@ -59,7 +58,7 @@ class HyLiveVarManager
 {
 	static HyLiveVarManager *		sm_pInstance;
 
-	vector<HyLiveVar>				m_PageList;
+	std::vector<HyLiveVar>			m_PageList;
 
 	HyLiveVarManager(void);
 

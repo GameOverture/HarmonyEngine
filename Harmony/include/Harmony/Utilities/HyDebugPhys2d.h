@@ -15,7 +15,6 @@
 #include "Box2D/Box2D.h"
 
 #include <vector>
-using std::vector;
 
 // forward declaration
 class HyEntity2d;

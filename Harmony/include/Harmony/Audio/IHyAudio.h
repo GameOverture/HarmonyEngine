@@ -13,7 +13,6 @@
 #include "Afx/HyStdAfx.h"
 
 #include <vector>
-using std::vector;
 
 class HyWindow;
 
@@ -22,7 +21,7 @@ class IHyAudio
 	std::vector<HyWindow *> &	m_WindowListRef;
 
 public:
-	IHyAudio(vector<HyWindow *> &windowListRef);
+	IHyAudio(std::vector<HyWindow *> &windowListRef);
 	~IHyAudio(void);
 };
 

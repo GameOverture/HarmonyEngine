@@ -15,7 +15,6 @@
 #include "Utilities/HyStrManip.h"
 
 #include <vector>
-using std::vector;
 
 template<typename tData>
 class HyFactory
@@ -23,7 +22,7 @@ class HyFactory
 	const HyType					m_eTYPE;
 	const std::string				m_sDATADIR;
 
-	vector<tData *>					m_DataList;
+	std::vector<tData *>			m_DataList;
 	
 public:
 	HyFactory(HyType eType, std::string sDataDir) :	m_eTYPE(eType),
@@ -73,7 +72,7 @@ public:
 
 	void DeleteData(tData *pData)
 	{
-		for(vector<tData *>::iterator it = m_DataList.begin(); it != m_DataList.end(); ++it)
+		for(std::vector<tData *>::iterator it = m_DataList.begin(); it != m_DataList.end(); ++it)
 		{
 			if((*it) == pData)
 			{

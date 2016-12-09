@@ -14,13 +14,15 @@
 
 #include "Assets/Data/HyText2dData.h"
 
+#include <vector>
+
 class HyText2d : public IHyInst2d
 {
 protected:
-	bool				m_bIsDirty;
-	std::string			m_sString;
+	bool							m_bIsDirty;
+	std::string						m_sString;
 
-	uint32				m_uiCurFontState;
+	uint32							m_uiCurFontState;
 
 	struct StateColors
 	{
@@ -28,10 +30,14 @@ protected:
 		{
 			HyAnimVec3 		topColor;
 			HyAnimVec3 		botColor;
+
+			LayerColor(IHyTransformNode &colorOwner) :	topColor(colorOwner),
+														botColor(colorOwner)
+			{ }
 		};
-		vector<LayerColor *>	m_LayerColors;
+		std::vector<LayerColor *>	m_LayerColors;
 	};
-	vector<StateColors *>	m_StateColors;
+	std::vector<StateColors *>		m_StateColors;
 
 	enum eBoxAttributes
 	{

@@ -16,9 +16,9 @@
 #include "Utilities/HyBox2dRuntime.h"
 
 #include <vector>
-using std::vector;
 
 // Forward declarations
+class IHyTransformNode;
 class IHyInst2d;
 
 class HySound;
@@ -50,35 +50,34 @@ class HyScene
 	HyBox2dRuntime										m_Phys2dContactListener;
 
 	HyGfxComms &										m_GfxCommsRef;
-	vector<HyWindow *> &								m_WindowListRef;
+	std::vector<HyWindow *> &							m_WindowListRef;
 
-	vector<IHyInst2d *>									m_LoadedInst2dList;
-	vector<IHyInst2d *>									m_LoadedInst3dList;
+	static std::vector<IHyTransformNode *>				sm_MasterList;
 
-	vector<HyEntity2d *>								m_LoadedEntity2dList;
-
-	vector<HyAnimFloat *>								m_ActiveAnimFloatsList;
+	std::vector<IHyInst2d *>							m_LoadedInst2dList;
+	std::vector<IHyInst2d *>							m_LoadedInst3dList;
 
 	// Used when writing the graphics draw buffer
 	char *												m_pCurWritePos;
 
 public:
-	HyScene(HyGfxComms &gfxCommsRef, vector<HyWindow *> &WindowListRef);
+	HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
 
-	static void SetInstOrderingDirty()				{ sm_bInst2dOrderingDirty = true; }
+	static void SetInstOrderingDirty()						{ sm_bInst2dOrderingDirty = true; }
+	
+	static void AddTransformNode(IHyTransformNode *pNode);
+	static void RemoveTransformNode(IHyTransformNode *pNode);
 
 	void AddInstance(IHyInst2d *pInst);
 	void RemoveInst(IHyInst2d *pInst);
 
-	void CopyAllInsts(vector<IHyInst2d *> &vInstsToCopy);
+	void CopyAllInsts(std::vector<IHyInst2d *> &vInstsToCopy);
 
 	void AddEntity(HyEntity2d *pEnt);
 	void RemoveEntity(HyEntity2d *pEnt);
 
-	void DebugDrawPhysics2d(bool bDraw)				{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
-
-	void InsertActiveAnimFloat(HyAnimFloat *pAnimFloat);
+	void DebugDrawPhysics2d(bool bDraw)					{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
 
 private:
 	void PreUpdate();

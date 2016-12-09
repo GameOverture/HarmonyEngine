@@ -9,7 +9,8 @@
 *************************************************************************/
 #include "Utilities/Animation/IHyTransform3d.h"
 
-IHyTransform3d::IHyTransform3d(HyType eInstType) :	IHyTransform<HyAnimVec3>(eInstType)
+IHyTransform3d::IHyTransform3d(HyType eInstType) :	IHyTransform<HyAnimVec3>(eInstType),
+													rot(*this)
 {
 }
 
@@ -48,14 +49,4 @@ IHyTransform3d::~IHyTransform3d()
 		outMtx = glm::translate(outMtx, pos.Get() * IHyApplication::PixelsPerMeter());
 	else
 		outMtx = glm::translate(outMtx, pos.Get());
-}
-
-/*virtual*/ void IHyTransform3d::SetOnDirtyCallback(void(*fpOnDirty)(void *), void *pParam /*= NULL*/)
-{
-	m_fpOnDirty = fpOnDirty;
-	m_pOnDirtyParam = pParam;
-
-	pos.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
-	rot.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
-	scale.SetOnDirtyCallback(m_fpOnDirty, m_pOnDirtyParam);
 }

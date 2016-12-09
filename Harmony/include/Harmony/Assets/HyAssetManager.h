@@ -84,7 +84,7 @@ class HyAssetManager
 	};
 	LoadThreadCtrl										m_LoadingCtrl;
 
-	vector<IHyInst2d *>									m_QueuedInst2dList;
+	std::vector<IHyInst2d *>							m_QueuedInst2dList;
 
 	HyFactory<HySfxData>								m_Sfx;
 	HyFactory<HySprite2dData>							m_Sprite2d;

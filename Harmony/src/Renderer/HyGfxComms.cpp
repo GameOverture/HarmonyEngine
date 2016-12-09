@@ -23,13 +23,13 @@ HyGfxComms::HyGfxComms()
 	m_pDrawBuffer_Render = HY_NEW char[HY_GFX_BUFFER_SIZE];
 	memset(m_pDrawBuffer_Render, 0, HY_GFX_BUFFER_SIZE);
 
-	m_pTxDataQueue_Update = HY_NEW queue<IHy2dData *>();
-	m_pTxDataQueue_Shared = HY_NEW queue<IHy2dData *>();
-	m_pTxDataQueue_Render = HY_NEW queue<IHy2dData *>();
+	m_pTxDataQueue_Update = HY_NEW std::queue<IHy2dData *>();
+	m_pTxDataQueue_Shared = HY_NEW std::queue<IHy2dData *>();
+	m_pTxDataQueue_Render = HY_NEW std::queue<IHy2dData *>();
 
-	m_pRxDataQueue_Update = HY_NEW queue<IHy2dData *>();
-	m_pRxDataQueue_Shared = HY_NEW queue<IHy2dData *>();
-	m_pRxDataQueue_Render = HY_NEW queue<IHy2dData *>();
+	m_pRxDataQueue_Update = HY_NEW std::queue<IHy2dData *>();
+	m_pRxDataQueue_Shared = HY_NEW std::queue<IHy2dData *>();
+	m_pRxDataQueue_Render = HY_NEW std::queue<IHy2dData *>();
 }
 
 HyGfxComms::~HyGfxComms()
@@ -58,7 +58,7 @@ void HyGfxComms::SetSharedPointers()
 {
 	m_csPointers.Lock();
 
-	queue<IHy2dData *> *pTmpQueue = m_pTxDataQueue_Shared;
+	std::queue<IHy2dData *> *pTmpQueue = m_pTxDataQueue_Shared;
 	m_pTxDataQueue_Shared = m_pTxDataQueue_Update;
 	m_pTxDataQueue_Update = pTmpQueue;
 
@@ -80,13 +80,13 @@ void HyGfxComms::TxData(IHy2dData *pAtlasGrp)
 }
 
 // This should only be invoked from the Update/Game thread
-queue<IHy2dData *> *HyGfxComms::RxData()
+std::queue<IHy2dData *> *HyGfxComms::RxData()
 {
 	return m_pRxDataQueue_Update;
 }
 
 // This should only be invoked from the Render thread
-bool HyGfxComms::Render_TakeSharedPointers(queue<IHy2dData *> *&pRxDataQueue, queue<IHy2dData *> *&pTxDataQueue, char *&pDrawBuffer)
+bool HyGfxComms::Render_TakeSharedPointers(std::queue<IHy2dData *> *&pRxDataQueue, std::queue<IHy2dData *> *&pTxDataQueue, char *&pDrawBuffer)
 {
 	m_csPointers.Lock();
 
@@ -99,7 +99,7 @@ bool HyGfxComms::Render_TakeSharedPointers(queue<IHy2dData *> *&pRxDataQueue, qu
 	}
 
 	// Data queues
-	queue<IHy2dData *> *pTmpQueue = m_pTxDataQueue_Render;
+	std::queue<IHy2dData *> *pTmpQueue = m_pTxDataQueue_Render;
 	m_pTxDataQueue_Render = m_pTxDataQueue_Shared;
 	m_pTxDataQueue_Shared = pTmpQueue;
 	pRxDataQueue =  m_pTxDataQueue_Render;

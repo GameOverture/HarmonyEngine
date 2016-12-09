@@ -177,11 +177,11 @@ void HyText2d::SetAsScaleBox()
 
 	for(uint32 i = 0; i < pTextData->GetNumStates(); ++i)
 	{
-		m_StateColors.push_back(new StateColors());
+		m_StateColors.push_back(HY_NEW StateColors());
 
 		for(uint32 j = 0; j < pTextData->GetNumLayers(i); ++j)
 		{
-			m_StateColors[i]->m_LayerColors.push_back(new StateColors::LayerColor());
+			m_StateColors[i]->m_LayerColors.push_back(HY_NEW StateColors::LayerColor(*this));
 
 			m_StateColors[i]->m_LayerColors[j]->topColor.Set(pTextData->GetDefaultColor(i, j, true));
 			m_StateColors[i]->m_LayerColors[j]->botColor.Set(pTextData->GetDefaultColor(i, j, false));
@@ -228,7 +228,7 @@ void HyText2d::SetAsScaleBox()
 		LineInfo(float fUsedWidth, uint32 uiStartCharIndex) : fUSED_WIDTH(fUsedWidth), uiSTART_CHARACTER_INDEX(uiStartCharIndex)
 		{ }
 	};
-	vector<LineInfo> vNewlineInfo;
+	std::vector<LineInfo> vNewlineInfo;
 	float fLastSpaceWidth = 0.0f;
 	float fLastCharWidth = 0.0f;
 	float fCurLineWidth = 0.0f;
