@@ -10,6 +10,7 @@
 #include "Utilities/Animation/IHyTransform2d.h"
 
 IHyTransform2d::IHyTransform2d(HyType eInstType) :	IHyTransform<HyAnimVec2>(eInstType),
+													m_eCoordUnit(HYCOORDUNIT_Default),
 													m_fRotation(0.0f),
 													rot(m_fRotation, *this)
 {
@@ -19,23 +20,30 @@ IHyTransform2d::~IHyTransform2d()
 {
 }
 
-void IHyTransform2d::QueuePos(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer /*= 0.0f*/)
+HyCoordinateUnit IHyTransform2d::GetCoordinateUnit()
 {
-	m_ActionQueue.AppendAction(fTweenDuration, fDefer, [&]	{
-		this->pos.Tween(fX, fY, fTweenDuration, fpEase);
-	});
+	return m_eCoordUnit;
 }
 
-void IHyTransform2d::QueueRot(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer /*= 0.0f*/)
+void IHyTransform2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion)
 {
-}
+	if(eCoordUnit == HYCOORDUNIT_Default)
+		eCoordUnit = IHyApplication::DefaultCoordinateUnit();
 
-void IHyTransform2d::QueueScale(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer /*= 0.0f*/)
-{
-}
+	if(m_eCoordUnit == eCoordUnit)
+		return;
 
-void IHyTransform2d::QueueCallback(void(*fpCallback)(IHyTransform2d *, void *), void *pParam /*= NULL*/, float fDefer /*= 0.0f*/)
-{
+	if(bDoConversion)
+	{
+		switch(eCoordUnit)
+		{
+		case HYCOORDUNIT_Meters:	pos *= IHyApplication::PixelsPerMeter();	break;
+		case HYCOORDUNIT_Pixels:	pos /= IHyApplication::PixelsPerMeter();	break;
+		}
+	}
+	m_eCoordUnit = eCoordUnit;
+
+	SetDirty();
 }
 
 /*virtual*/ void IHyTransform2d::GetLocalTransform(glm::mat4 &outMtx) const

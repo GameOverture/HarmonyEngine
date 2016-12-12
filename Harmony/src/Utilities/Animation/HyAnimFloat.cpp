@@ -20,8 +20,9 @@ HyAnimFloat::HyAnimFloat(float &valueReference, IHyTransformNode &ownerRef) :	m_
 																				m_fTarget(0.0f),
 																				m_fDuration(0.0f),
 																				m_fElapsedTime(0.0f),
-																				m_fpEaseFunc(NULL),
+																				m_fpTweenFunc(NULL),
 																				m_fpBehaviorUpdate(NULL),
+																				m_fpTweenFinishedFunc(HyTween::_NullTweenCallback),
 																				m_bAddedToOwnerUpdate(false)
 {
 }
@@ -38,6 +39,7 @@ void HyAnimFloat::Set(float fValue)
 
 	m_fValueRef = fValue;
 	m_fpBehaviorUpdate = NULL;
+	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
 }
 
 void HyAnimFloat::Offset(float fValue)
@@ -47,9 +49,10 @@ void HyAnimFloat::Offset(float fValue)
 
 	m_fValueRef += fValue;
 	m_fpBehaviorUpdate = NULL;
+	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
 }
 
-void HyAnimFloat::Tween(float fFrom, float fTo, float fSeconds, HyTweenUpdateFunc fpEase)
+void HyAnimFloat::Tween(float fFrom, float fTo, float fSeconds, HyTweenUpdateFunc fpTweenFunc /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::_NullTweenCallback*/)
 {
 	if(m_fValueRef != fFrom)
 		m_OwnerRef.SetDirty();
@@ -57,41 +60,44 @@ void HyAnimFloat::Tween(float fFrom, float fTo, float fSeconds, HyTweenUpdateFun
 	m_fValueRef = m_fStart = fFrom;
 	m_fTarget = fTo;
 	m_fDuration = fSeconds;
-	m_fpEaseFunc = fpEase;
+	m_fpTweenFunc = fpTweenFunc;
 	m_fElapsedTime = 0.0f;
 	m_fpBehaviorUpdate = &HyAnimFloat::Tween;
+	m_fpTweenFinishedFunc = tweenFinishedCallback;
 
 	m_OwnerRef.InsertActiveAnimFloat(this);
 }
 
-void HyAnimFloat::Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpEase)
+void HyAnimFloat::Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpTweenFunc /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::_NullTweenCallback*/)
 {
 	m_fStart = m_fValueRef;
 	m_fTarget = fTo;
 	m_fDuration = fSeconds;
-	m_fpEaseFunc = fpEase;
+	m_fpTweenFunc = fpTweenFunc;
 	m_fElapsedTime = 0.0f;
 	m_fpBehaviorUpdate = &HyAnimFloat::Tween;
+	m_fpTweenFinishedFunc = tweenFinishedCallback;
 
 	m_OwnerRef.InsertActiveAnimFloat(this);
 }
 
-void HyAnimFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFunc fpEase)
+void HyAnimFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFunc fpTweenFunc /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::_NullTweenCallback*/)
 {
 	m_fStart = m_fValueRef;
 	m_fTarget = m_fValueRef + fOffsetAmt;
 	m_fDuration = fSeconds;
-	m_fpEaseFunc = fpEase;
+	m_fpTweenFunc = fpTweenFunc;
 	m_fElapsedTime = 0.0f;
 	m_fpBehaviorUpdate = &HyAnimFloat::Tween;
+	m_fpTweenFinishedFunc = tweenFinishedCallback;
 
 	m_OwnerRef.InsertActiveAnimFloat(this);
 }
 
-//void HyAnimFloat::Follow(float &fToFollow, float fOffsetAmt)
-//{
-//	m_pT
-//}
+void HyAnimFloat::ClearCallback()
+{
+	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
+}
 
 HyAnimFloat &HyAnimFloat::operator=(const float &rhs)
 {
@@ -100,6 +106,7 @@ HyAnimFloat &HyAnimFloat::operator=(const float &rhs)
 
 	m_fValueRef = rhs;
 	m_fpBehaviorUpdate = NULL;
+	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
 
 	return *this;
 }
@@ -111,6 +118,7 @@ HyAnimFloat &HyAnimFloat::operator+=(const float &rhs)
 
 	m_fValueRef += rhs;
 	m_fpBehaviorUpdate = NULL;
+	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
 
 	return *this;
 }
@@ -122,6 +130,7 @@ HyAnimFloat &HyAnimFloat::operator-=(const float &rhs)
 
 	m_fValueRef -= rhs;
 	m_fpBehaviorUpdate = NULL;
+	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
 
 	return *this;
 }
@@ -134,6 +143,7 @@ HyAnimFloat &HyAnimFloat::operator*=(const float &rhs)
 
 	m_fValueRef = fProduct;
 	m_fpBehaviorUpdate = NULL;
+	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
 
 	return *this;
 }
@@ -145,6 +155,7 @@ HyAnimFloat &HyAnimFloat::operator/=(const float &rhs)
 
 	m_fValueRef /= rhs;
 	m_fpBehaviorUpdate = NULL;
+	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
 
 	return *this;
 }
@@ -157,6 +168,7 @@ HyAnimFloat &HyAnimFloat::operator+=(const HyAnimFloat &rhs)
 
 	m_fValueRef += rhs.Get();
 	m_fpBehaviorUpdate = NULL;
+	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
 
 	return *this;
 }
@@ -168,6 +180,7 @@ HyAnimFloat &HyAnimFloat::operator-=(const HyAnimFloat &rhs)
 
 	m_fValueRef -= rhs.Get();
 	m_fpBehaviorUpdate = NULL;
+	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
 
 	return *this;
 }
@@ -180,6 +193,7 @@ HyAnimFloat &HyAnimFloat::operator*=(const HyAnimFloat &rhs)
 
 	m_fValueRef = fProduct;
 	m_fpBehaviorUpdate = NULL;
+	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
 
 	return *this;
 }
@@ -191,17 +205,24 @@ HyAnimFloat &HyAnimFloat::operator/=(const HyAnimFloat &rhs)
 
 	m_fValueRef /= rhs.Get();
 	m_fpBehaviorUpdate = NULL;
+	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
 
 	return *this;
 }
 
-// Returns true if updating is still continuing. False otherwise, to signal HyScene to remove this instance from the ActiveAnimFloat vector
+// Returns false if updating is still continuing. True when finished, which signals to IHyTransformNode to remove this instance from the ActiveAnimFloat vector
 bool HyAnimFloat::UpdateFloat()
 {
 	if(m_fpBehaviorUpdate == NULL)
-		return false;
+		return true;
 
-	return (this->*m_fpBehaviorUpdate)();
+	if((this->*m_fpBehaviorUpdate)())
+	{
+		m_fpTweenFinishedFunc(&m_OwnerRef);
+		return true;
+	}
+	else
+		return false;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -212,8 +233,8 @@ bool HyAnimFloat::Tween()
 	m_fElapsedTime = HyClamp(m_fElapsedTime + IHyTime::GetUpdateStepSeconds(), 0.0f, m_fDuration);
 	
 	float fFromVal = m_fValueRef;
-	m_fValueRef = m_fStart + (m_fTarget - m_fStart) * m_fpEaseFunc(m_fElapsedTime / m_fDuration);
+	m_fValueRef = m_fStart + (m_fTarget - m_fStart) * m_fpTweenFunc(m_fElapsedTime / m_fDuration);
 	m_OwnerRef.SetDirty();
 
-	return (m_fElapsedTime != m_fDuration);
+	return m_fElapsedTime == m_fDuration;
 }

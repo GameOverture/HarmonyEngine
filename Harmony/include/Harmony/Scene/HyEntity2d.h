@@ -19,30 +19,34 @@
 
 #include "Utilities/HyMath.h"
 
-class HyEntity2d : public IHyTransform2d
+class HyEntity2d : public IHyInst2d
 {
-	const std::string				m_sNAME;
-	const std::string				m_sPREFIX;
-
-	HyLoadState						m_eLoadState;
+	int32					m_iDisplayOrderMax;
 
 public:
 	HyEntity2d();
 	HyEntity2d(const char *szPrefix, const char *szName);
 	virtual ~HyEntity2d(void);
 
-	inline void	SetEnabled(bool bEnabled);
-	void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);
+	virtual void SetEnabled(bool bEnabled);
+	
+	virtual bool IsLoaded();
 
-	void SetDisplayOrder(int32 iOrderValue);
+	virtual void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);
 
-	void SetTint(float fR, float fG, float fB);
-	void SetTransparency(float fTransparency);
+	int32 GetDisplayOrderMax();
+	virtual void SetDisplayOrder(int32 iOrderValue);
 
-	void Load();
-	void Unload();
+	virtual void Load();
+	virtual void Unload();
 
-	virtual void OnUpdate();
+private:
+	// Unused virtual overrides
+	virtual void OnUpdate() { }
+	virtual void OnInstUpdate() { }
+	virtual void OnDataLoaded() { }
+	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef) { }
+	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) { }
 };
 
 #endif /* __HyEntity2d_h__ */

@@ -467,12 +467,12 @@ void HyText2d::SetAsScaleBox()
 
 			*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->topColor.Get();
 			pRefDataWritePos += sizeof(glm::vec3);
-			*reinterpret_cast<float *>(pRefDataWritePos) = topColor.A();
+			*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
 			pRefDataWritePos += sizeof(float);
 
 			*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->botColor.Get();
 			pRefDataWritePos += sizeof(glm::vec3);
-			*reinterpret_cast<float *>(pRefDataWritePos) = botColor.A();
+			*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
 			pRefDataWritePos += sizeof(float);
 
 			*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(pData->GetTextureIndex());

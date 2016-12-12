@@ -27,6 +27,8 @@ protected:
 
 	bool							m_bDirty;
 
+	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
+
 	std::vector<HyAnimFloat *>		m_ActiveAnimFloatsList;
 
 public:
@@ -36,7 +38,10 @@ public:
 	HyType GetType();
 
 	bool IsEnabled();
-	void SetEnabled(bool bEnabled);
+	virtual void SetEnabled(bool bEnabled);
+
+	int64 GetTag();
+	void SetTag(int64 iTag);
 
 	void AddChild(IHyTransformNode &childInst);
 	void Detach();
@@ -44,11 +49,10 @@ public:
 	void SetDirty();
 
 	void Update();
-	virtual void OnTransformUpdate() = 0;
+	virtual void OnUpdate() = 0;
 
 private:
 	void InsertActiveAnimFloat(HyAnimFloat *pAnimFloat);
-	void ProcessActiveFloats();
 };
 
 #endif /* __IHyTransformNode_h__ */

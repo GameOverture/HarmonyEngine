@@ -176,11 +176,15 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vOffset;
 	pRefDataWritePos += sizeof(glm::vec2);
 
-	*reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = topColor.Get();
-	pRefDataWritePos += sizeof(glm::vec4);
+	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = topColor.Get();
+	pRefDataWritePos += sizeof(glm::vec3);
+	*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
+	pRefDataWritePos += sizeof(float);
 
-	*reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = botColor.Get();
-	pRefDataWritePos += sizeof(glm::vec4);
+	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = botColor.Get();
+	pRefDataWritePos += sizeof(glm::vec3);
+	*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
+	pRefDataWritePos += sizeof(float);
 
 	*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(m_uiTextureIndex);
 	pRefDataWritePos += sizeof(float);

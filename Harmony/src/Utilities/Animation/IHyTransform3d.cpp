@@ -22,10 +22,7 @@ IHyTransform3d::~IHyTransform3d()
 {
 	outMtx = glm::mat4(1.0f);
 
-	if(m_eCoordUnit == HYCOORDUNIT_Meters)
-		outMtx = glm::translate(outMtx, pos.Get() * IHyApplication::PixelsPerMeter());
-	else
-		outMtx = glm::translate(outMtx, pos.Get());
+	outMtx = glm::translate(outMtx, pos.Get());
 
 	outMtx = glm::translate(outMtx, rot_pivot.Get());
 	outMtx = glm::rotate(outMtx, rot.Get().x, glm::vec3(1, 0, 0));
@@ -45,8 +42,5 @@ IHyTransform3d::~IHyTransform3d()
 	outMtx = glm::rotate(outMtx, rot.Get().y, glm::vec3(0, 1, 0));
 	outMtx = glm::rotate(outMtx, rot.Get().z, glm::vec3(0, 0, 1));
 
-	if(m_eCoordUnit == HYCOORDUNIT_Meters)
-		outMtx = glm::translate(outMtx, pos.Get() * IHyApplication::PixelsPerMeter());
-	else
-		outMtx = glm::translate(outMtx, pos.Get());
+	outMtx = glm::translate(outMtx, pos.Get());
 }

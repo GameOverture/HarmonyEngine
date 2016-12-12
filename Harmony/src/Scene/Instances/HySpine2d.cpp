@@ -184,11 +184,11 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 	//m_pSpineSkeleton->y = m_ptPosition.Get().y * fCoordModifier;
 	
 	// TODO: Use botColor as well
-	const glm::vec4 &rawColor = topColor.Get();
+	const glm::vec3 &rawColor = topColor.Get();
 	m_pSpineSkeleton->r = rawColor.r;
 	m_pSpineSkeleton->g = rawColor.g;
 	m_pSpineSkeleton->b = rawColor.b;
-	m_pSpineSkeleton->a = rawColor.a;
+	m_pSpineSkeleton->a = alpha.Get();
 
 	//m_pSpineSkeleton->root->rotation = m_vRotation.Get().z;
 

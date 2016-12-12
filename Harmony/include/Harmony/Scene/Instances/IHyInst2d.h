@@ -22,7 +22,7 @@
 #include "Renderer/Viewport/HyCamera.h"
 
 typedef void (*HyWriteDrawBufferDataOverride)(char *&);
-typedef void(*HyUpdateUniformOverride)(HyShaderUniforms *);
+typedef void (*HyUpdateUniformOverride)(HyShaderUniforms *);
 
 class IHyInst2d : public IHyTransform2d
 {
@@ -44,37 +44,35 @@ protected:
 	HyCoordinateType				m_eCoordType;
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
 	HyRenderState					m_RenderState;
-	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
+
+	float							m_fAlpha;
 
 public:
+	HyAnimVec3						topColor;
+	HyAnimVec3						botColor;
+	HyAnimFloat						alpha;
+
 	IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName);
 	virtual ~IHyInst2d(void);
 
-	const std::string &GetName()								{ return m_sNAME; }
-	const std::string &GetPrefix()								{ return m_sPREFIX; }
+	const std::string &GetName();
+	const std::string &GetPrefix();
 
-	bool IsLoaded()												{ return m_eLoadState == HYLOADSTATE_Loaded; }
+	virtual bool IsLoaded();
 
-	HyCoordinateType GetCoordinateType()						{ return m_eCoordType; }
+	HyCoordinateType GetCoordinateType();
 	void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);
 
-	int32 GetDisplayOrder() const								{ return m_iDisplayOrder; }
-	void SetDisplayOrder(int32 iOrderValue);
+	int32 GetDisplayOrder() const;
+	virtual void SetDisplayOrder(int32 iOrderValue);
 
-	HyAnimVec4													topColor;
-	HyAnimVec4													botColor;
-
-	void SetTint(float fR, float fG, float fB)					{ topColor.Set(fR, fG, fB); botColor.Set(fR, fG, fB); }
-	void SetTransparency(float fTransparency)					{ topColor.A(fTransparency); botColor.A(fTransparency); }
-
-	int64 GetTag()												{ return m_iTag; }
-	void SetTag(int64 iTag)										{ m_iTag = iTag; }
+	void SetTint(float fR, float fG, float fB);
 
 	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);
 
-	void Load();
-	void Unload();
+	virtual void Load();
+	virtual void Unload();
 
 private:
 	HyLoadState GetLoadState()									{ return m_eLoadState; }

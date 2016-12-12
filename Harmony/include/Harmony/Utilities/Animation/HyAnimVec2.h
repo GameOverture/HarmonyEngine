@@ -52,24 +52,21 @@ public:
 	inline void Offset(const glm::vec2 &srcVec)			{ for(int i = 0; i < NumDimensions; ++i) m_AnimFloatList[i].Offset(srcVec[i]); }
 	inline void Offset(const HyAnimVec2 &srcVec)		{ for(int i = 0; i < NumDimensions; ++i) m_AnimFloatList[i].Offset(srcVec[i]); }
 
-	inline HyAnimFloat &AnimX()							{ return m_AnimFloatList[0]; }
-	inline HyAnimFloat &AnimY()							{ return m_AnimFloatList[1]; }
-
-	void Tween(float fX, float fY, float fSeconds, HyTweenUpdateFunc fpEase)
+	void Tween(float fX, float fY, float fSeconds, HyTweenUpdateFunc fpEase = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback)
 	{
-		m_AnimFloatList[0].Tween(fX, fSeconds, fpEase);
+		m_AnimFloatList[0].Tween(fX, fSeconds, fpEase, tweenFinishedCallback);
 		m_AnimFloatList[1].Tween(fY, fSeconds, fpEase);
 	}
 
-	void TweenOffset(float fOffsetX, float fOffsetY, float fSeconds, HyTweenUpdateFunc fpEase)
+	void TweenOffset(float fOffsetX, float fOffsetY, float fSeconds, HyTweenUpdateFunc fpEase = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback)
 	{
-		m_AnimFloatList[0].TweenOffset(fOffsetX, fSeconds, fpEase);
+		m_AnimFloatList[0].TweenOffset(fOffsetX, fSeconds, fpEase, tweenFinishedCallback);
 		m_AnimFloatList[1].TweenOffset(fOffsetY, fSeconds, fpEase);
 	}
 
-	bool IsTransforming()
+	bool IsTweening()
 	{
-		return (m_AnimFloatList[0].IsTransforming() || m_AnimFloatList[1].IsTransforming());
+		return (m_AnimFloatList[0].IsTweening() || m_AnimFloatList[1].IsTweening());
 	}
 
 	HyAnimVec2 &operator+=(float rhs)					{ for(int i = 0; i < NumDimensions; ++i) m_AnimFloatList[i] += rhs; return *this; }

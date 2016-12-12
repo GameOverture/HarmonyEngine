@@ -14,6 +14,8 @@
 
 #include <math.h>
 
+class IHyTransformNode;
+
 typedef float (*HyTweenUpdateFunc)(float);
 
 class HyTween
@@ -29,103 +31,103 @@ class HyTween
 
 public:
 	// Linear, no easing
-	static float Linear (float fRatio)
+	static float Linear(float fRatio)
 	{
 		return fRatio;
 	}
 
 	// Quadratic in
-	static float QuadIn (float fRatio)
+	static float QuadIn(float fRatio)
 	{
 		return fRatio * fRatio;
 	}
 
 	// Quadratic out
-	static float QuadOut (float fRatio)
+	static float QuadOut(float fRatio)
 	{
 		return fRatio * (2 - fRatio);
 	}
 
 	// Quadratic in and out
-	static float QuadInOut (float fRatio)
+	static float QuadInOut(float fRatio)
 	{
 		return fRatio <= 0.5f ? fRatio * fRatio * 2.0f : 1.0f - (--fRatio) * fRatio * 2.0f;
 	}
 
 	// Cubic in
-	static float CubeIn (float fRatio)
+	static float CubeIn(float fRatio)
 	{
 		return fRatio * fRatio * fRatio;
 	}
 
 	// Cubic out
-	static float CubeOut (float fRatio)
+	static float CubeOut(float fRatio)
 	{
 		return 1.0f + (--fRatio) * fRatio * fRatio;
 	}
 
 	// Cubic in and out
-	static float CubeInOut (float fRatio)
+	static float CubeInOut(float fRatio)
 	{
 		return fRatio <= 0.5f ? fRatio * fRatio * fRatio * 4.0f : 1.0f + (--fRatio) * fRatio * fRatio * 4.0f;
 	}
 
 	// Quartic in
-	static float QuartIn (float fRatio)
+	static float QuartIn(float fRatio)
 	{
 		return fRatio * fRatio * fRatio * fRatio;
 	}
 
 	// Quartic out
-	static float QuartOut (float fRatio)
+	static float QuartOut(float fRatio)
 	{
 		return 1.0f - (--fRatio) * fRatio * fRatio * fRatio;
 	}
 
 	// Quartic in and out
-	static float QuartInOut (float fRatio)
+	static float QuartInOut(float fRatio)
 	{
 		return fRatio <= 0.5f ? fRatio * fRatio * fRatio * fRatio * 8.0f : (1.0f - (fRatio = fRatio * 2.0f - 2.0f) * fRatio * fRatio * fRatio) / 2.0f + 0.5f;
 	}
 
 	// Quintic in
-	static float QuintIn (float fRatio)
+	static float QuintIn(float fRatio)
 	{
 		return fRatio * fRatio * fRatio * fRatio * fRatio;
 	}
 
 	// Quintic out
-	static float QuintOut (float fRatio)
+	static float QuintOut(float fRatio)
 	{
 		return (fRatio = fRatio - 1.0f) * fRatio * fRatio * fRatio * fRatio + 1.0f;
 	}
 
 	// Quintic in and out
-	static float QuintInOut (float fRatio)
+	static float QuintInOut(float fRatio)
 	{
 		return ((fRatio *= 2.0f) < 1.0f) ? (fRatio * fRatio * fRatio * fRatio * fRatio) / 2.0f : ((fRatio -= 2.0f) * fRatio * fRatio * fRatio * fRatio + 2.0f) / 2.0f;
 	}
 
 	// Sine in
-	static float SineIn (float fRatio)
+	static float SineIn(float fRatio)
 	{
 		return 1.0f - cos(PI2 * fRatio);
 	}
 
 	// Sine out
-	static float SineOut (float fRatio)
+	static float SineOut(float fRatio)
 	{
 		return sin(PI2 * fRatio);
 	}
 
 	// Sine in and out
-	static float SineInOut (float fRatio)
+	static float SineInOut(float fRatio)
 	{
 		return 0.5f - cos(PI * fRatio) / 2.0f;
 	}
 
 	// Bounce in
-	static float BounceIn (float fRatio)
+	static float BounceIn(float fRatio)
 	{
 		fRatio = 1.0f - fRatio;
 		if (fRatio < B1) return 1.0f - 7.5625f * fRatio * fRatio;
@@ -135,7 +137,7 @@ public:
 	}
 
 	// Bounce out
-	static float BounceOut (float fRatio)
+	static float BounceOut(float fRatio)
 	{
 		if (fRatio < B1) return 7.5625f * fRatio * fRatio;
 		if (fRatio < B2) return 7.5625f * (fRatio - B3) * (fRatio - B3) + 0.75f;
@@ -144,7 +146,7 @@ public:
 	}
 
 	// Bounce in and out
-	static float BounceInOut (float fRatio)
+	static float BounceInOut(float fRatio)
 	{
 		if (fRatio < 0.5f) {
 			fRatio = 1.0f - fRatio * 2.0f;
@@ -161,61 +163,65 @@ public:
 	}
 
 	// Circle in
-	static float CircIn (float fRatio)
+	static float CircIn(float fRatio)
 	{
 		return 1.0f - sqrt(1.0f - fRatio * fRatio);
 	}
 
 	// Circle out
-	static float CircOut (float fRatio)
+	static float CircOut(float fRatio)
 	{
 		--fRatio;
 		return sqrt(1.0f - fRatio * fRatio);
 	}
 
 	// Circle in and out
-	static float CircInOut (float fRatio)
+	static float CircInOut(float fRatio)
 	{
 		return fRatio <= 0.5f ? (sqrt(1.0f - fRatio * fRatio * 4.0f) - 1.0f) / -2.0f : (sqrt(1.0f - (fRatio * 2.0f - 2.0f) * (fRatio * 2.0f - 2.0f)) + 1.0f) / 2.0f;
 	}
 
 	// Exponential in
-	static float ExpoIn (float fRatio)
+	static float ExpoIn(float fRatio)
 	{
 		return pow(2.0f, 10.0f * (fRatio - 1.0f));
 	}
 
 	// Exponential out
-	static float ExpoOut (float fRatio)
+	static float ExpoOut(float fRatio)
 	{
 		return -pow(2.0f, -10.0f * fRatio) + 1.0f;
 	}
 
 	// Exponential in and out
-	static float ExpoInOut (float fRatio)
+	static float ExpoInOut(float fRatio)
 	{
 		return fRatio < 0.5f ? pow(2.0f, 10.0f * (fRatio * 2.0f - 1.0f)) / 2.0f : (-pow(2.0f, -10.0f * (fRatio * 2.0f - 1.0f)) + 2.0f) / 2.0f;
 	}
 
 	// Back in
-	static float BackIn (float fRatio)
+	static float BackIn(float fRatio)
 	{
 		return fRatio * fRatio * (2.70158f * fRatio - 1.70158f);
 	}
 
 	// Back out
-	static float BackOut (float fRatio)
+	static float BackOut(float fRatio)
 	{
 		return 1.0f - (--fRatio) * (fRatio) * (-2.70158f * fRatio - 1.70158f);
 	}
 
 	// Back in and out
-	static float BackInOut (float fRatio)
+	static float BackInOut(float fRatio)
 	{
 		fRatio *= 2.0f;
 		if (fRatio < 1.0f) return fRatio * fRatio * (2.70158f * fRatio - 1.70158f) / 2.0f;
 		fRatio -= 2.0f;
 		return (1.0f - fRatio * fRatio * (-2.70158f * fRatio - 1.70158f)) / 2.0f + 0.5f;
 	}
+
+	// Default (do-nothing) callback when tween finishes
+	static void _NullTweenCallback(IHyTransformNode *)
+	{ }
 };
 #endif /* __HyTweenFuncs_h__ */

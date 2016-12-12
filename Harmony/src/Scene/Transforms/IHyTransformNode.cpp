@@ -14,7 +14,8 @@
 IHyTransformNode::IHyTransformNode(HyType eType) :	m_eTYPE(eType),
 													m_bEnabled(true),
 													m_pParent(NULL),
-													m_bDirty(false)
+													m_bDirty(false),
+													m_iTag(0)
 {
 	HyScene::AddTransformNode(this);
 }
@@ -34,9 +35,19 @@ bool IHyTransformNode::IsEnabled()
 	return m_bEnabled;
 }
 
-void IHyTransformNode::SetEnabled(bool bEnabled)
+/*virtual*/ void IHyTransformNode::SetEnabled(bool bEnabled)
 {
 	m_bEnabled = bEnabled;
+}
+
+int64 IHyTransformNode::GetTag()
+{
+	return m_iTag;
+}
+
+void IHyTransformNode::SetTag(int64 iTag)
+{
+	m_iTag = iTag;
 }
 
 void IHyTransformNode::AddChild(IHyTransformNode &childInst)
@@ -78,7 +89,7 @@ void IHyTransformNode::Update()
 	// Update any currently active AnimFloat in the game, and remove any of them that are finished.
 	for(std::vector<HyAnimFloat *>::iterator iter = m_ActiveAnimFloatsList.begin(); iter != m_ActiveAnimFloatsList.end();)
 	{
-		if(!(*iter)->UpdateFloat())
+		if((*iter)->UpdateFloat())
 		{
 			(*iter)->m_bAddedToOwnerUpdate = false;
 			iter = m_ActiveAnimFloatsList.erase(iter);
@@ -87,7 +98,9 @@ void IHyTransformNode::Update()
 			++iter;
 	}
 
-	OnTransformUpdate();
+	// TODO: Process the action queue
+
+	OnUpdate();
 }
 
 void IHyTransformNode::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)

@@ -15,10 +15,10 @@
 class IHyTransform3d : public IHyTransform<HyAnimVec3>
 {
 public:
+	HyAnimVec3						rot;
+
 	IHyTransform3d(HyType eInstType);
 	virtual ~IHyTransform3d();
-	
-	HyAnimVec3		rot;
 
 	virtual void GetLocalTransform(glm::mat4 &outMtx) const;
 	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const;

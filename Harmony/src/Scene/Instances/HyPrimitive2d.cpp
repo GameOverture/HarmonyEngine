@@ -206,17 +206,6 @@ void HyPrimitive2d::ClearData()
 
 /*virtual*/ void HyPrimitive2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-	//memcpy(pRefDataWritePos, &color.Get(), sizeof(glm::vec4));
-	//pRefDataWritePos += sizeof(glm::vec4);
-
-	//glm::mat4 mtx;
-	//GetWorldTransform(mtx);
-	//memcpy(pRefDataWritePos, &mtx, sizeof(glm::mat4));
-	//pRefDataWritePos += sizeof(glm::mat4);
-
-	//memcpy(pRefDataWritePos, &m_uiNumVerts, sizeof(uint32));
-	//pRefDataWritePos += sizeof(uint32);
-
 	memcpy(pRefDataWritePos, m_pVertices, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec4));
 	pRefDataWritePos += m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec4);
 }

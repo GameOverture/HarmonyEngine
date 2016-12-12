@@ -25,9 +25,9 @@ IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName)
 																					m_eLoadState(HYLOADSTATE_Inactive),
 																					m_bInvalidLoad(false),
 																					m_iDisplayOrder(0),
-																					m_iTag(0),
 																					topColor(*this),
-																					botColor(*this)
+																					botColor(*this),
+																					alpha(m_fAlpha, *this)
 {
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
@@ -38,45 +38,24 @@ IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName)
 	Unload();
 }
 
-int32 IHyInst2d::GetShaderId()
+const std::string &IHyInst2d::GetName()
 {
-	return m_RenderState.GetShaderId();
+	return m_sNAME;
 }
 
-void IHyInst2d::SetCustomShader(IHyShader *pShader)
+const std::string &IHyInst2d::GetPrefix()
 {
-	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyInst2d::SetCustomShader was used on an already loaded instance - I can make this work I just haven't yet");
-	HyAssert(pShader->IsFinalized(), "IHyInst2d::SetCustomShader tried to set a non-finalized shader");
-
-	m_RenderState.SetShaderId(pShader->GetId());
+	return m_sPREFIX;
 }
 
-void IHyInst2d::Load()
+/*virtual*/ bool IHyInst2d::IsLoaded()
 {
-	if(m_eLoadState != HYLOADSTATE_Inactive)
-		return;
-
-	if(GetCoordinateType() == HYCOORDTYPE_Default)
-		SetCoordinateType(IHyApplication::DefaultCoordinateType(), NULL);
-	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
-		SetCoordinateUnit(IHyApplication::DefaultCoordinateUnit(), false);
-
-	if(sm_pAssetManager)
-	{
-		sm_pAssetManager->LoadInst2d(this);
-		m_bInvalidLoad = false;
-	}
-	else
-		m_bInvalidLoad = true;
+	return m_eLoadState == HYLOADSTATE_Loaded;
 }
 
-void IHyInst2d::Unload()
+HyCoordinateType IHyInst2d::GetCoordinateType()
 {
-	if(sm_pAssetManager)
-		sm_pAssetManager->RemoveInst(this);
-
-	m_pData = NULL;
-	m_eLoadState = HYLOADSTATE_Inactive;
+	return m_eCoordType;
 }
 
 void IHyInst2d::SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom)
@@ -113,10 +92,62 @@ void IHyInst2d::SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCame
 		m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
 }
 
+int32 IHyInst2d::GetDisplayOrder() const
+{
+	return m_iDisplayOrder;
+}
+
 void IHyInst2d::SetDisplayOrder(int32 iOrderValue)
 {
 	m_iDisplayOrder = iOrderValue;
 	HyScene::SetInstOrderingDirty();
+}
+
+void IHyInst2d::SetTint(float fR, float fG, float fB)
+{
+	topColor.Set(fR, fG, fB);
+	botColor.Set(fR, fG, fB);
+}
+
+int32 IHyInst2d::GetShaderId()
+{
+	return m_RenderState.GetShaderId();
+}
+
+void IHyInst2d::SetCustomShader(IHyShader *pShader)
+{
+	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyInst2d::SetCustomShader was used on an already loaded instance - I can make this work I just haven't yet");
+	HyAssert(pShader->IsFinalized(), "IHyInst2d::SetCustomShader tried to set a non-finalized shader");
+
+	m_RenderState.SetShaderId(pShader->GetId());
+}
+
+/*virtual*/ void IHyInst2d::Load()
+{
+	if(m_eLoadState != HYLOADSTATE_Inactive)
+		return;
+
+	if(GetCoordinateType() == HYCOORDTYPE_Default)
+		SetCoordinateType(IHyApplication::DefaultCoordinateType(), NULL);
+	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
+		SetCoordinateUnit(IHyApplication::DefaultCoordinateUnit(), false);
+
+	if(sm_pAssetManager)
+	{
+		sm_pAssetManager->LoadInst2d(this);
+		m_bInvalidLoad = false;
+	}
+	else
+		m_bInvalidLoad = true;
+}
+
+/*virtual*/ void IHyInst2d::Unload()
+{
+	if(sm_pAssetManager)
+		sm_pAssetManager->RemoveInst(this);
+
+	m_pData = NULL;
+	m_eLoadState = HYLOADSTATE_Inactive;
 }
 
 void IHyInst2d::SetData(IHyData *pData)

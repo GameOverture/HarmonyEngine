@@ -17,19 +17,18 @@ class IHyTransform2d : public IHyTransform<HyAnimVec2>
 {
 protected:
 	glm::mat4						m_mtxCached;
+	HyCoordinateUnit				m_eCoordUnit;
 
 	float							m_fRotation;
 
 public:
-	IHyTransform2d(HyType eInstType);
-	virtual ~IHyTransform2d();
-	
 	HyAnimFloat						rot;
 
-	void QueuePos(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer = 0.0f);
-	void QueueRot(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer = 0.0f);
-	void QueueScale(float fX, float fY, float fTweenDuration, HyTweenUpdateFunc fpEase, float fDefer = 0.0f);
-	void QueueCallback(void(*fpCallback)(IHyTransform2d *, void *), void *pParam = NULL, float fDefer = 0.0f);
+	IHyTransform2d(HyType eInstType);
+	virtual ~IHyTransform2d();
+
+	HyCoordinateUnit GetCoordinateUnit();
+	void SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion);
 
 	virtual void GetLocalTransform(glm::mat4 &outMtx) const;
 	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const;
