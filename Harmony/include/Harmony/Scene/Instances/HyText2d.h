@@ -28,8 +28,8 @@ protected:
 	{
 		struct LayerColor
 		{
-			HyAnimVec3 		topColor;
-			HyAnimVec3 		botColor;
+			HyTweenVec3 		topColor;
+			HyTweenVec3 		botColor;
 
 			LayerColor(IHyTransformNode &colorOwner) :	topColor(colorOwner),
 														botColor(colorOwner)
@@ -73,8 +73,8 @@ public:
 	uint32 TextGetNumLayers();
 	uint32 TextGetNumLayers(uint32 uiStateIndex);
 
-	std::pair<HyAnimVec3 &, HyAnimVec3 &> TextGetLayerColor(uint32 uiLayerIndex);
-	std::pair<HyAnimVec3 &, HyAnimVec3 &> TextGetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex);
+	std::pair<HyTweenVec3 &, HyTweenVec3 &> TextGetLayerColor(uint32 uiLayerIndex);
+	std::pair<HyTweenVec3 &, HyTweenVec3 &> TextGetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex);
 	void TextSetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
 	void TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB);
 	void TextSetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);

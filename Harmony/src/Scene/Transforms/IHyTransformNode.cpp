@@ -8,8 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Transforms/IHyTransformNode.h"
-
-#include "Utilities/Animation/HyAnimFloat.h"
+#include "Scene/Transforms/Tweens/HyTweenFloat.h"
 
 IHyTransformNode::IHyTransformNode(HyType eType) :	m_eTYPE(eType),
 													m_bEnabled(true),
@@ -87,7 +86,7 @@ void IHyTransformNode::SetDirty()
 void IHyTransformNode::Update()
 {
 	// Update any currently active AnimFloat in the game, and remove any of them that are finished.
-	for(std::vector<HyAnimFloat *>::iterator iter = m_ActiveAnimFloatsList.begin(); iter != m_ActiveAnimFloatsList.end();)
+	for(std::vector<HyTweenFloat *>::iterator iter = m_ActiveAnimFloatsList.begin(); iter != m_ActiveAnimFloatsList.end();)
 	{
 		if((*iter)->UpdateFloat())
 		{
@@ -103,7 +102,7 @@ void IHyTransformNode::Update()
 	OnUpdate();
 }
 
-void IHyTransformNode::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
+void IHyTransformNode::InsertActiveAnimFloat(HyTweenFloat *pAnimFloat)
 {
 	if(pAnimFloat->m_bAddedToOwnerUpdate == false)
 	{

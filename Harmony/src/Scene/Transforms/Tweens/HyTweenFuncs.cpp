@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Utilities/Animation/HyTweenFuncs.h"
+#include "Scene/Transforms/Tweens/HyTweenFuncs.h"
 
 /*static*/ float HyTween::PI = atan(1.0f)*4.0f;
 /*static*/ float HyTween::PI2 = (atan(1.0f)*4.0f) / 2.0f;

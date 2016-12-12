@@ -7,9 +7,9 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Utilities/Animation/IHyTransform3d.h"
+#include "Scene/Transforms/IHyTransform3d.h"
 
-IHyTransform3d::IHyTransform3d(HyType eInstType) :	IHyTransform<HyAnimVec3>(eInstType),
+IHyTransform3d::IHyTransform3d(HyType eInstType) :	IHyTransform<HyTweenVec3>(eInstType),
 													rot(*this)
 {
 }

@@ -10,12 +10,12 @@
 #ifndef __IHyTransform3d_h__
 #define __IHyTransform3d_h__
 
-#include "Utilities\Animation\IHyTransform.h"
+#include "Scene/Transforms/IHyTransform.h"
 
-class IHyTransform3d : public IHyTransform<HyAnimVec3>
+class IHyTransform3d : public IHyTransform<HyTweenVec3>
 {
 public:
-	HyAnimVec3						rot;
+	HyTweenVec3						rot;
 
 	IHyTransform3d(HyType eInstType);
 	virtual ~IHyTransform3d();

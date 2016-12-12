@@ -29,12 +29,12 @@ class HyPrimitive2d;
 
 class HyGfxComms;
 class HyPhysics2d;
-class HyAnimVec2;
-class HyAnimVec3;
+class HyTweenVec2;
+class HyTweenVec3;
 
 class HyWindow;
 class HyEntity2d;
-class HyAnimFloat;
+class HyTweenFloat;
 
 //////////////////////////////////////////////////////////////////////////
 class HyScene

@@ -15,7 +15,7 @@
 
 class IHyTransformNode
 {
-	friend class HyAnimFloat;
+	friend class HyTweenFloat;
 
 protected:
 	const HyType					m_eTYPE;
@@ -29,7 +29,7 @@ protected:
 
 	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 
-	std::vector<HyAnimFloat *>		m_ActiveAnimFloatsList;
+	std::vector<HyTweenFloat *>		m_ActiveAnimFloatsList;
 
 public:
 	IHyTransformNode(HyType eInstType);
@@ -52,7 +52,7 @@ public:
 	virtual void OnUpdate() = 0;
 
 private:
-	void InsertActiveAnimFloat(HyAnimFloat *pAnimFloat);
+	void InsertActiveAnimFloat(HyTweenFloat *pAnimFloat);
 };
 
 #endif /* __IHyTransformNode_h__ */

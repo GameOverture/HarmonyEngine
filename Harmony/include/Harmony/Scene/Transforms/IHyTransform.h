@@ -15,7 +15,7 @@
 #include "Scene/Transforms/IHyTransformNode.h"
 
 #include "IHyApplication.h"
-#include "Utilities/Animation/HyAnimVec3.h"
+#include "Scene/Transforms/Tweens/HyTweenVec3.h"
 
 template<typename tVec>
 class IHyTransform : public IHyTransformNode

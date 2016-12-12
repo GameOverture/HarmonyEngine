@@ -41,8 +41,8 @@ struct PreviewRow
         foreach(HyTexturedQuad2d *pFrame, m_Frames)
         {
             fPosY = iStartPosY - (pFrame->GetHeight() * 0.5f) - fMidRow;
-            if(pFrame->pos.AnimY().IsTransforming() == false && pFrame->pos.Y() != fPosY)
-                pFrame->pos.AnimY().Tween(fPosY, fTRANS_DUR, HyTween::QuadInOut);
+            if(pFrame->pos.IsTweening() == false && pFrame->pos.Y() != fPosY)
+                pFrame->pos.Tween(pFrame->pos.X(), fPosY, fTRANS_DUR, HyTween::QuadInOut);
         }
     }
 };
@@ -251,7 +251,7 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
         pFrame->DrawInst(&atlasMan)->SetEnabled(false);
         pFrame->DrawInst(&atlasMan)->SetDisplayOrder(0);
         pFrame->DrawInst(&atlasMan)->SetTint(1.0f, 1.0f, 1.0f);
-        pFrame->DrawInst(&atlasMan)->SetTransparency(1.0f);
+        pFrame->DrawInst(&atlasMan)->alpha.Set(1.0f);
         pFrame->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
     }
 
@@ -306,7 +306,7 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
                 pHoverFrame->DrawInst(&atlasMan)->SetEnabled(false);
                 pHoverFrame->DrawInst(&atlasMan)->SetDisplayOrder(0);
                 pHoverFrame->DrawInst(&atlasMan)->SetTint(1.0f, 1.0f, 1.0f);
-                pHoverFrame->DrawInst(&atlasMan)->SetTransparency(1.0f);
+                pHoverFrame->DrawInst(&atlasMan)->alpha.Set(1.0f);
                 pHoverFrame->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
             }
         }
@@ -322,7 +322,7 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
             pFrame->DrawInst(&atlasMan)->SetDisplayOrder(100);
             pFrame->DrawInst(&atlasMan)->pos.Set((uiRENDERWIDTH * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetWidth() * -0.5f),
                                                  (uiRENDERHEIGHT * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetHeight() * -0.5f));
-            pFrame->DrawInst(&atlasMan)->SetTransparency(0.5f);
+            pFrame->DrawInst(&atlasMan)->alpha.Set(0.5f);
         }
     }
     else if(atlasMan.m_pMouseHoverItem != pHoveredItem)
@@ -345,7 +345,7 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
             pFrame->DrawInst(&atlasMan)->SetEnabled(false);
             pFrame->DrawInst(&atlasMan)->SetDisplayOrder(0);
             pFrame->DrawInst(&atlasMan)->SetTint(1.0f, 1.0f, 1.0f);
-            pFrame->DrawInst(&atlasMan)->SetTransparency(1.0f);
+            pFrame->DrawInst(&atlasMan)->alpha.Set(1.0f);
             pFrame->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
         }
     }
@@ -370,8 +370,7 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
             continue;
 
         pFrame->DrawInst(&atlasMan)->SetEnabled(true);
-        pFrame->DrawInst(&atlasMan)->SetTransparency(1.0f);
-        //pFrame->DrawInst(&atlasMan)->SetDisplayOrder(-0x0FFFFFFF + i);
+        pFrame->DrawInst(&atlasMan)->alpha.Set(1.0f);
 
         float fFrameWidth = pFrame->IsRotated() ? pFrame->DrawInst(&atlasMan)->GetHeight() : pFrame->DrawInst(&atlasMan)->GetWidth();
         float fFrameHeight = pFrame->IsRotated() ? pFrame->DrawInst(&atlasMan)->GetWidth() : pFrame->DrawInst(&atlasMan)->GetHeight();
@@ -389,8 +388,8 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
         
         float fPosX = ptDrawPos.x() + (pFrame->IsRotated() ? ((fFrameWidth * 0.5f) - (fFrameHeight * 0.5f)) : 0);
         
-        if(pFrame->DrawInst(&atlasMan)->pos.AnimX().IsTransforming() == false && pFrame->DrawInst(&atlasMan)->pos.X() != ptDrawPos.x())
-            pFrame->DrawInst(&atlasMan)->pos.AnimX().Tween(fPosX, fTRANS_DUR, HyTween::QuadInOut);
+        if(pFrame->DrawInst(&atlasMan)->pos.IsTweening() == false && pFrame->DrawInst(&atlasMan)->pos.X() != ptDrawPos.x())
+            pFrame->DrawInst(&atlasMan)->pos.Tween(fPosX, pFrame->DrawInst(&atlasMan)->pos.Y(), fTRANS_DUR, HyTween::QuadInOut);
 
         ptDrawPos.setX(ptDrawPos.x() + fFrameWidth + iPADDING);
 

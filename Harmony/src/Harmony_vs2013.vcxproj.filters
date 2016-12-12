@@ -20,9 +20,6 @@
       <Filter>Utilities</Filter>
     </ClCompile>
     <ClCompile Include="HyEngine.cpp" />
-    <ClCompile Include="Utilities\Animation\HyAnimFloat.cpp">
-      <Filter>Utilities\Animation</Filter>
-    </ClCompile>
     <ClCompile Include="..\include\Harmony\Threading\BasicSync.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
@@ -168,9 +165,6 @@
     <ClCompile Include="Utilities\HyFileIO.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\Animation\HyTweenFuncs.cpp">
-      <Filter>Utilities\Animation</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Viewport\HyCamera.cpp">
       <Filter>Renderer\Viewport</Filter>
     </ClCompile>
@@ -192,12 +186,6 @@
     <ClCompile Include="Assets\Data\IHy2dData.cpp">
       <Filter>Assets\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\Animation\IHyTransform2d.cpp">
-      <Filter>Utilities\Animation</Filter>
-    </ClCompile>
-    <ClCompile Include="Utilities\Animation\IHyTransform3d.cpp">
-      <Filter>Utilities\Animation</Filter>
-    </ClCompile>
     <ClCompile Include="Audio\IHyAudio.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
@@ -218,6 +206,24 @@
     </ClCompile>
     <ClCompile Include="Scene\Transforms\IHyTransformNode.cpp">
       <Filter>Scene\Transforms</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Transforms\IHyTransform2d.cpp">
+      <Filter>Scene\Transforms</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Transforms\IHyTransform3d.cpp">
+      <Filter>Scene\Transforms</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Transforms\Tweens\HyTweenFloat.cpp">
+      <Filter>Scene\Transforms\Tweens</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Transforms\Tweens\HyTweenFuncs.cpp">
+      <Filter>Scene\Transforms\Tweens</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Transforms\Tweens\HyTweenVec2.cpp">
+      <Filter>Scene\Transforms\Tweens</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Transforms\Tweens\HyTweenVec3.cpp">
+      <Filter>Scene\Transforms\Tweens</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -266,9 +272,6 @@
     <Filter Include="Utilities\Containers">
       <UniqueIdentifier>{d42e95ee-7da4-4caa-96a2-1cc254022bae}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Utilities\Animation">
-      <UniqueIdentifier>{42349797-5c4d-4251-912a-03d57d552c86}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Renderer\OpenGL">
       <UniqueIdentifier>{266ff3c9-2890-44c9-90f1-b987c1598bc6}</UniqueIdentifier>
     </Filter>
@@ -301,6 +304,9 @@
     </Filter>
     <Filter Include="Scene\Transforms">
       <UniqueIdentifier>{4185a7b1-9b33-41c5-9200-1aeed6f4bead}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Transforms\Tweens">
+      <UniqueIdentifier>{ff8e8338-cfb3-4ef8-9295-db79a02a4038}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -359,9 +365,6 @@
     <ClInclude Include="..\include\Harmony\Utilities\HyStrManip.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\Animation\HyAnimFloat.h">
-      <Filter>Utilities\Animation</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Utilities\Containers\HyStaticArray.h">
       <Filter>Utilities\Containers</Filter>
     </ClInclude>
@@ -409,15 +412,6 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Utilities\HyBox2dRuntime.h">
       <Filter>Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\Animation\HyAnimVec2.h">
-      <Filter>Utilities\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\Animation\HyAnimVec3.h">
-      <Filter>Utilities\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\Animation\HyAnimVec4.h">
-      <Filter>Utilities\Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\HyGfxComms.h">
       <Filter>Renderer</Filter>
@@ -549,9 +543,6 @@
     <ClInclude Include="..\include\Harmony\Utilities\HyFileIO.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\Animation\HyTweenFuncs.h">
-      <Filter>Utilities\Animation</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Viewport\HyCamera.h">
       <Filter>Renderer\Viewport</Filter>
     </ClInclude>
@@ -569,15 +560,6 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Assets\Data\IHy2dData.h">
       <Filter>Assets\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\Animation\IHyTransform2d.h">
-      <Filter>Utilities\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\Animation\IHyTransform.h">
-      <Filter>Utilities\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\Animation\IHyTransform3d.h">
-      <Filter>Utilities\Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Input\Interop\HyInput_NULL.h">
       <Filter>Input\Interop</Filter>
@@ -603,6 +585,27 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Transforms\IHyTransformNode.h">
       <Filter>Scene\Transforms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Transforms\IHyTransform.h">
+      <Filter>Scene\Transforms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Transforms\IHyTransform2d.h">
+      <Filter>Scene\Transforms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Transforms\IHyTransform3d.h">
+      <Filter>Scene\Transforms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Transforms\Tweens\HyTweenFloat.h">
+      <Filter>Scene\Transforms\Tweens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Transforms\Tweens\HyTweenFuncs.h">
+      <Filter>Scene\Transforms\Tweens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Transforms\Tweens\HyTweenVec2.h">
+      <Filter>Scene\Transforms\Tweens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Transforms\Tweens\HyTweenVec3.h">
+      <Filter>Scene\Transforms\Tweens</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -12,12 +12,10 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Utilities/Animation/IHyTransform2d.h"
-#include "Utilities/Animation/HyAnimVec2.h"
+#include "Scene/Transforms/IHyTransform2d.h"
 
 #include "Assets/Data/IHyData.h"
 
-#include "Utilities/Animation/HyAnimVec4.h"
 #include "Renderer/HyRenderState.h"
 #include "Renderer/Viewport/HyCamera.h"
 
@@ -48,9 +46,9 @@ protected:
 	float							m_fAlpha;
 
 public:
-	HyAnimVec3						topColor;
-	HyAnimVec3						botColor;
-	HyAnimFloat						alpha;
+	HyTweenVec3						topColor;
+	HyTweenVec3						botColor;
+	HyTweenFloat					alpha;
 
 	IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName);
 	virtual ~IHyInst2d(void);

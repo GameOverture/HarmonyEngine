@@ -10,10 +10,10 @@
 #ifndef __IHyTransform2d_h__
 #define __IHyTransform2d_h__
 
-#include "Utilities/Animation/HyAnimVec2.h"
-#include "Utilities/Animation/IHyTransform.h"
+#include "Scene/Transforms/Tweens/HyTweenVec2.h"
+#include "Scene/Transforms/IHyTransform.h"
 
-class IHyTransform2d : public IHyTransform<HyAnimVec2>
+class IHyTransform2d : public IHyTransform<HyTweenVec2>
 {
 protected:
 	glm::mat4						m_mtxCached;
@@ -22,7 +22,7 @@ protected:
 	float							m_fRotation;
 
 public:
-	HyAnimFloat						rot;
+	HyTweenFloat						rot;
 
 	IHyTransform2d(HyType eInstType);
 	virtual ~IHyTransform2d();

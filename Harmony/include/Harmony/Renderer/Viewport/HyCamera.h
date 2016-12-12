@@ -13,9 +13,8 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Utilities/HyMath.h"
-#include "Utilities/Animation/IHyTransform2d.h"
-#include "Utilities/Animation/IHyTransform3d.h"
-#include "Utilities/Animation/HyAnimVec2.h"
+#include "Scene/Transforms/IHyTransform2d.h"
+#include "Scene/Transforms/IHyTransform3d.h"
 
 class HyWindow;
 

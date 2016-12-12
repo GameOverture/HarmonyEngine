@@ -7,9 +7,9 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Utilities/Animation/IHyTransform2d.h"
+#include "Scene/Transforms/IHyTransform2d.h"
 
-IHyTransform2d::IHyTransform2d(HyType eInstType) :	IHyTransform<HyAnimVec2>(eInstType),
+IHyTransform2d::IHyTransform2d(HyType eInstType) :	IHyTransform<HyTweenVec2>(eInstType),
 													m_eCoordUnit(HYCOORDUNIT_Default),
 													m_fRotation(0.0f),
 													rot(m_fRotation, *this)

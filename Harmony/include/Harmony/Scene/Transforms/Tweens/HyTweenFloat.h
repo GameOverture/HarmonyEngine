@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyAnimFloat.h
+ *	HyTweenFloat.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
@@ -7,19 +7,19 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyAnimFloat_h__
-#define __HyAnimFloat_h__
+#ifndef __HyTweenFloat_h__
+#define __HyTweenFloat_h__
 
 #include "Afx/HyStdAfx.h"
 
-#include "Utilities/Animation/HyTweenFuncs.h"
+#include "Scene/Transforms/Tweens/HyTweenFuncs.h"
 
 #include <functional>
 
 class IHyTransformNode;
 typedef std::function<void(IHyTransformNode *)> HyTweenFinishedCallback;
 
-class HyAnimFloat
+class HyTweenFloat
 {
 	friend class IHyTransformNode;
 
@@ -35,11 +35,11 @@ class HyAnimFloat
 	HyTweenUpdateFunc		m_fpTweenFunc;
 	HyTweenFinishedCallback	m_fpTweenFinishedFunc;
 
-	bool (HyAnimFloat::*m_fpBehaviorUpdate)();
+	bool (HyTweenFloat::*m_fpBehaviorUpdate)();
 
 public:
-	HyAnimFloat(float &valueReference, IHyTransformNode &ownerRef);
-	~HyAnimFloat(void);
+	HyTweenFloat(float &valueReference, IHyTransformNode &ownerRef);
+	~HyTweenFloat(void);
 
 	inline float Get() const			{ return m_fValueRef; }
 	void Set(float fValue);
@@ -47,23 +47,22 @@ public:
 
 	// Procedural transformation functions
 	bool IsTweening()					{ return m_bAddedToOwnerUpdate; }
-	void Tween(float fFrom, float fTo, float fSeconds, HyTweenUpdateFunc fpTweenFunc = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback);
 	void Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpTweenFunc = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback);
 	void TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFunc fpTweenFunc = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback);
 	//void Follow(float &fToFollow, float fOffsetAmt, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback);
 
-	void ClearCallback();
+	void StopTween();
 
-	HyAnimFloat &operator=(const float &rhs);
-	HyAnimFloat &operator+=(const float &rhs);
-	HyAnimFloat &operator-=(const float &rhs);
-	HyAnimFloat &operator*=(const float &rhs);
-	HyAnimFloat &operator/=(const float &rhs);
+	HyTweenFloat &operator=(const float &rhs);
+	HyTweenFloat &operator+=(const float &rhs);
+	HyTweenFloat &operator-=(const float &rhs);
+	HyTweenFloat &operator*=(const float &rhs);
+	HyTweenFloat &operator/=(const float &rhs);
 
-	HyAnimFloat &operator+=(const HyAnimFloat &rhs);
-	HyAnimFloat &operator-=(const HyAnimFloat &rhs);
-	HyAnimFloat &operator*=(const HyAnimFloat &rhs);
-	HyAnimFloat &operator/=(const HyAnimFloat &rhs);
+	HyTweenFloat &operator+=(const HyTweenFloat &rhs);
+	HyTweenFloat &operator-=(const HyTweenFloat &rhs);
+	HyTweenFloat &operator*=(const HyTweenFloat &rhs);
+	HyTweenFloat &operator/=(const HyTweenFloat &rhs);
 
 private:
 	// Returns false if updating is still continuing. True when finished, which signals to IHyTransformNode to remove this instance from the ActiveAnimFloat vector
@@ -76,4 +75,4 @@ private:
 	bool Follow();
 };
 
-#endif /* __HyAnimFloat_h__ */
+#endif /* __HyTweenFloat_h__ */
