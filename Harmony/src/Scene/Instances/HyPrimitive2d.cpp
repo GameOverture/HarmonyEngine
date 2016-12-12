@@ -199,8 +199,20 @@ void HyPrimitive2d::ClearData()
 	glm::mat4 mtx;
 	GetWorldTransform(mtx);
 
-	pShaderUniformsRef->Set("primitiveTopColor", topColor.Get());
-	pShaderUniformsRef->Set("primitiveBotColor", botColor.Get());
+	glm::vec4 vTop;
+	vTop.x = topColor.X();
+	vTop.y = topColor.Y();
+	vTop.z = topColor.Z();
+	vTop.a = alpha.Get();
+	
+	glm::vec4 vBot;
+	vTop.x = botColor.X();
+	vTop.y = botColor.Y();
+	vTop.z = botColor.Z();
+	vBot.a = alpha.Get();
+
+	pShaderUniformsRef->Set("primitiveTopColor", vTop);
+	pShaderUniformsRef->Set("primitiveBotColor", vBot);
 	pShaderUniformsRef->Set("transformMtx", mtx);
 }
 

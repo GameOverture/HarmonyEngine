@@ -22,7 +22,7 @@ protected:
 	float							m_fRotation;
 
 public:
-	HyTweenFloat						rot;
+	HyTweenFloat					rot;
 
 	IHyTransform2d(HyType eInstType);
 	virtual ~IHyTransform2d();

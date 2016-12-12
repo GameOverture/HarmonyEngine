@@ -27,6 +27,7 @@ IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName)
 																					m_iDisplayOrder(0),
 																					topColor(*this),
 																					botColor(*this),
+																					m_fAlpha(1.0f),
 																					alpha(m_fAlpha, *this)
 {
 	topColor.Set(1.0f);
@@ -168,6 +169,9 @@ void IHyInst2d::SetLoaded()
 
 /*virtual*/ void IHyInst2d::OnUpdate()
 {
+	if(m_eLoadState != HYLOADSTATE_Loaded)
+		return;
+
 	OnInstUpdate();
 	OnUpdateUniforms(m_RenderState.PrimeShaderUniforms());
 }

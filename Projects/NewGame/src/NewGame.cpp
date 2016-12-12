@@ -63,9 +63,9 @@ glm::vec2 textBoxSize;
 
 	m_TestSprite.Load();
 	m_TestSprite.SetEnabled(true);
-	m_TestSprite.topColor.Set(0.0f, 1.0f, 0.0f, 1.0f);
-	m_TestSprite.botColor.Set(1.0f, 0.0f, 0.0f, 1.0f);
-	m_TestSprite.SetTransparency(0.5f);
+	m_TestSprite.topColor.Set(0.0f, 1.0f, 0.0f);
+	m_TestSprite.botColor.Set(1.0f, 0.0f, 0.0f);
+	m_TestSprite.alpha.Set(0.5f);
 
 	m_TestText.Load();
 	m_TestText.TextSetAlignment(HYALIGN_Right);

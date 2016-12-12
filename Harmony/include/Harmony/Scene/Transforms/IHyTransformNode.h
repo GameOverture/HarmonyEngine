@@ -15,6 +15,7 @@
 
 class IHyTransformNode
 {
+	friend class HyScene;
 	friend class HyTweenFloat;
 
 protected:
@@ -46,12 +47,11 @@ public:
 	void AddChild(IHyTransformNode &childInst);
 	void Detach();
 
-	void SetDirty();
-
+protected:
 	void Update();
 	virtual void OnUpdate() = 0;
 
-private:
+	void SetDirty();
 	void InsertActiveAnimFloat(HyTweenFloat *pAnimFloat);
 };
 

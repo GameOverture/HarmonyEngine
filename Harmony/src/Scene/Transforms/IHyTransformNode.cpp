@@ -75,14 +75,6 @@ void IHyTransformNode::Detach()
 	HyError("IHyTransformNode::Detach() could not find itself in parent's child list");
 }
 
-void IHyTransformNode::SetDirty()
-{
-	m_bDirty = true;
-
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->SetDirty();
-}
-
 void IHyTransformNode::Update()
 {
 	// Update any currently active AnimFloat in the game, and remove any of them that are finished.
@@ -100,6 +92,14 @@ void IHyTransformNode::Update()
 	// TODO: Process the action queue
 
 	OnUpdate();
+}
+
+void IHyTransformNode::SetDirty()
+{
+	m_bDirty = true;
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->SetDirty();
 }
 
 void IHyTransformNode::InsertActiveAnimFloat(HyTweenFloat *pAnimFloat)

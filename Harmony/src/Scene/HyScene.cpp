@@ -96,9 +96,6 @@ void HyScene::CopyAllInsts(std::vector<IHyInst2d *> &vInstsToCopy)
 void HyScene::PreUpdate()
 {
 	m_b2World.Step(IHyTime::GetUpdateStepSeconds(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
-
-	for(uint32 i = 0; i < sm_MasterList.size(); ++i)
-		sm_MasterList[i]->Update();
 }
 
 void HyScene::PostUpdate()
@@ -111,6 +108,9 @@ void HyScene::PostUpdate()
 
 	for(uint32 i = 0; i < m_WindowListRef.size(); ++i)
 		m_WindowListRef[i]->Update();
+
+	for(uint32 i = 0; i < sm_MasterList.size(); ++i)
+		sm_MasterList[i]->Update();
 
 	WriteDrawBuffer();
 }

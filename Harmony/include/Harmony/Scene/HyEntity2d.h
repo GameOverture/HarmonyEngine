@@ -42,7 +42,6 @@ public:
 
 private:
 	// Unused virtual overrides
-	virtual void OnUpdate() { }
 	virtual void OnInstUpdate() { }
 	virtual void OnDataLoaded() { }
 	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef) { }
