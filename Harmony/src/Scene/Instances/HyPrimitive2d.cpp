@@ -18,6 +18,7 @@
 HyPrimitive2d::HyPrimitive2d() :	IHyInst2d(HYTYPE_Primitive2d, NULL, NULL),
 									m_pVertices(NULL)
 {
+	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP);
 	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
 	m_RenderState.SetNumInstances(1);
 	m_RenderState.SetNumVerticesPerInstance(0);

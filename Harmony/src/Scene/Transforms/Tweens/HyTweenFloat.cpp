@@ -195,6 +195,7 @@ bool HyTweenFloat::UpdateFloat()
 	if((this->*m_fpBehaviorUpdate)())
 	{
 		m_fpTweenFinishedFunc(&m_OwnerRef);
+		m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
 		return true;
 	}
 	else

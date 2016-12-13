@@ -85,4 +85,25 @@ struct HyRectangle
 	}
 };
 
+template<typename T>
+struct HyPoint
+{
+	T x;
+	T y;
+	int32 iTag;
+
+	HyPoint() : x(0), y(0), iTag(0)
+	{ }
+
+	HyPoint(T xVal, T yVal) : x(xVal), y(yVal), iTag(0)
+	{ }
+
+	std::string ToString() const
+	{
+		std::ostringstream s;
+		s << "(X:" << x << ", Y:" << y << ")";
+		return s.str();
+	}
+};
+
 #endif /* __HyMath_h__ */

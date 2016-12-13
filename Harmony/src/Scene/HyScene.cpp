@@ -185,7 +185,7 @@ void HyScene::WriteDrawBuffer()
 
 				m_WindowListRef[i]->m_Cams2dList[j]->GetLocalTransform_SRT(mtxView);
 
-				// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly in the shader)
+				// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly above or in the shader)
 				mtxView[3].x *= -1;
 				mtxView[3].y *= -1;
 

@@ -86,8 +86,8 @@ public:
 	const glm::vec2 &TextGetBox();
 
 	void SetAsLine();
-	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically = false, bool bExtendingBottom = false, bool bSplitWordsToFit = false);
-	void SetAsScaleBox();
+	void SetAsColumn(float fWidth, bool bSplitWordsToFit = false);
+	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = false, bool bSplitWordsToFit = false);
 
 private:
 	virtual void OnDataLoaded();

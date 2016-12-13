@@ -136,16 +136,33 @@ void HyText2d::SetAsLine()
 	m_bIsDirty = true;
 }
 
-void HyText2d::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/, bool bExtendingBottom /*= false*/, bool bSplitWordsToFit /*= false*/)
+void HyText2d::SetAsColumn(float fWidth, bool bSplitWordsToFit /*= false*/)
 {
-	int32 iFlags = BOXATTRIB_IsUsed;
-	if(bCenterVertically)
-		iFlags |= BOXATTRIB_CenterVertically;
-	if(bExtendingBottom)
-		iFlags |= BOXATTRIB_ExtendingBottom;
+	int32 iFlags = BOXATTRIB_IsUsed | BOXATTRIB_ExtendingBottom;
+
 	if(bSplitWordsToFit)
 		iFlags |= BOXATTRIB_SplitWordsToFit;
 	
+	if(m_uiBoxAttributes == iFlags && m_vBoxDimensions.x == fWidth)
+		return;
+
+	m_vBoxDimensions.x = fWidth;
+	m_vBoxDimensions.y = 0.0f;
+
+	m_uiBoxAttributes = iFlags;
+
+	m_bIsDirty = true;
+}
+
+void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/, bool bSplitWordsToFit /*= false*/)
+{
+	int32 iFlags = BOXATTRIB_IsUsed;
+
+	if(bCenterVertically)
+		iFlags |= BOXATTRIB_CenterVertically;
+	if(bSplitWordsToFit)
+		iFlags |= BOXATTRIB_SplitWordsToFit;
+
 	if(m_uiBoxAttributes == iFlags && m_vBoxDimensions.x == fWidth && m_vBoxDimensions.y == fHeight)
 		return;
 
@@ -155,11 +172,6 @@ void HyText2d::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= 
 	m_uiBoxAttributes = iFlags;
 
 	m_bIsDirty = true;
-}
-
-void HyText2d::SetAsScaleBox()
-{
-
 }
 
 /*virtual*/ void HyText2d::OnDataLoaded()
