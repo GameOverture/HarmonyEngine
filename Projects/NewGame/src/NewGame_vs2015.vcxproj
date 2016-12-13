@@ -158,7 +158,7 @@
     <ClInclude Include="TestGrid.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Harmony\Harmony_vs2015.vcxproj">
+    <ProjectReference Include="..\..\..\Harmony\src\Harmony_vs2015.vcxproj">
       <Project>{b4471160-742a-4571-bcc5-3ef8163c10e1}</Project>
     </ProjectReference>
   </ItemGroup>
