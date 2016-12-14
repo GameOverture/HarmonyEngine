@@ -113,7 +113,7 @@ private:
 
 	virtual void OnInstUpdate();
 	
-	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef);
+	virtual void OnUpdateUniforms();
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
 };
 

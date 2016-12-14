@@ -84,8 +84,8 @@ private:
 
 	virtual void OnInstUpdate() = 0;
 	virtual void OnDataLoaded() = 0;
-	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef) = 0;	// Upon updating, this function will set the shaders' uniforms when using the default shader
-	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) = 0;			// This function is responsible for incrementing the passed in reference pointer the size of the data written
+	virtual void OnUpdateUniforms() = 0;								// Upon updating, this function will set the shaders' uniforms when using the default shader
+	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) = 0;	// This function is responsible for incrementing the passed in reference pointer the size of the data written
 };
 
 #endif /* __IHyInst2d_h__ */

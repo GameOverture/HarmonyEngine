@@ -132,6 +132,9 @@ int32 HyEntity2d::GetDisplayOrderMax()
 			break;
 		}
 	}
+
+	// Set load state to be "loaded" so base class IHyInst2d invokes its OnInstUpdate (and OnEntityUpdate)
+	m_eLoadState = HYLOADSTATE_Loaded;
 }
 
 /*virtual*/ void HyEntity2d::Unload()
@@ -154,4 +157,34 @@ int32 HyEntity2d::GetDisplayOrderMax()
 			break;
 		}
 	}
+	
+	// OnInstUpdate (and OnEntityUpdate) will no longer be invoked
+	m_eLoadState = HYLOADSTATE_Inactive;
+}
+
+/*virtual*/ void HyEntity2d::OnInstUpdate()
+{
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		switch(m_ChildList[i]->GetType())
+		{
+		case HYTYPE_Particles2d:
+		case HYTYPE_Sprite2d:
+		case HYTYPE_Spine2d:
+		case HYTYPE_TexturedQuad2d:
+		case HYTYPE_Primitive2d:
+		case HYTYPE_Text2d:
+			static_cast<IHyInst2d *>(m_ChildList[i])->alpha.Set(alpha.Get());
+			//static_cast<IHyInst2d *>(m_ChildList[i])->topColor.Set(topColor.Get());
+			//static_cast<IHyInst2d *>(m_ChildList[i])->botColor.Set(botColor.Get());
+			break;
+		case HYTYPE_Entity2d:
+			static_cast<HyEntity2d *>(m_ChildList[i])->alpha.Set(alpha.Get());
+			//static_cast<HyEntity2d *>(m_ChildList[i])->topColor.Set(topColor.Get());
+			//static_cast<HyEntity2d *>(m_ChildList[i])->botColor.Set(botColor.Get());
+			break;
+		}
+	}
+
+	OnEntityUpdate();
 }

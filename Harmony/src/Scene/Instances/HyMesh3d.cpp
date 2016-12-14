@@ -22,8 +22,9 @@ HyMesh3d::~HyMesh3d(void)
 {
 }
 
-/*virtual*/ void HyMesh3d::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
+/*virtual*/ void HyMesh3d::OnUpdateUniforms()
 {
+	HyShaderUniforms *pShaderUniformsRef = m_RenderState.PrimeShaderUniforms();
 }
 
 // This function is responsible for incrementing the passed in reference pointer the size of the data written

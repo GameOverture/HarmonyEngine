@@ -41,10 +41,12 @@ public:
 	virtual void Unload();
 
 private:
-	// Unused virtual overrides
-	virtual void OnInstUpdate() { }
+	virtual void OnInstUpdate();
+	virtual void OnEntityUpdate() = 0;
+
+	// Unused overrides
 	virtual void OnDataLoaded() { }
-	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef) { }
+	virtual void OnUpdateUniforms() { }
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) { }
 };
 

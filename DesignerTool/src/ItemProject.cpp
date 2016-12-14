@@ -79,8 +79,10 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
     pos.Set(m_Resolution.x * -0.5f, m_Resolution.y * -0.5f);
 }
 
-/*virtual*/ void CheckerGrid::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
+/*virtual*/ void CheckerGrid::OnUpdateUniforms()
 {
+    HyShaderUniforms *pShaderUniformsRef = m_RenderState.PrimeShaderUniforms();
+        
     glm::mat4 mtx;
     GetWorldTransform(mtx);
 

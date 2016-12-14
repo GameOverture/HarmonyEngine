@@ -280,8 +280,9 @@ float HySprite2d::GetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	}
 }
 
-/*virtual*/ void HySprite2d::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
+/*virtual*/ void HySprite2d::OnUpdateUniforms()
 {
+	//HyShaderUniforms *pShaderUniformsRef = m_RenderState.PrimeShaderUniforms();
 }
 
 /*virtual*/ void HySprite2d::OnWriteDrawBufferData(char *&pRefDataWritePos)

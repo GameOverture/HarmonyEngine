@@ -41,12 +41,12 @@ public:
 	HyTweenFloat(float &valueReference, IHyTransformNode &ownerRef);
 	~HyTweenFloat(void);
 
-	inline float Get() const			{ return m_fValueRef; }
+	float Get() const;
 	void Set(float fValue);
 	void Offset(float fValue);
 
 	// Procedural transformation functions
-	bool IsTweening()					{ return m_bAddedToOwnerUpdate; }
+	bool IsTweening();
 	void Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpTweenFunc = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback);
 	void TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFunc fpTweenFunc = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback);
 	//void Follow(float &fToFollow, float fOffsetAmt, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback);

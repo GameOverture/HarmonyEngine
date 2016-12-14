@@ -173,5 +173,5 @@ void IHyInst2d::SetLoaded()
 		return;
 
 	OnInstUpdate();
-	OnUpdateUniforms(m_RenderState.PrimeShaderUniforms());
+	OnUpdateUniforms();
 }

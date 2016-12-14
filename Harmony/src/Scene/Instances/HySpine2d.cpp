@@ -199,8 +199,9 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 	spSkeleton_updateWorldTransform(m_pSpineSkeleton);
 }
 
-/*virtual*/ void HySpine2d::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
+/*virtual*/ void HySpine2d::OnUpdateUniforms()
 {
+	//HyShaderUniforms *pShaderUniformsRef = m_RenderState.PrimeShaderUniforms();
 }
 
 /*virtual*/ void HySpine2d::OnWriteDrawBufferData(char *&pRefDataWritePos)

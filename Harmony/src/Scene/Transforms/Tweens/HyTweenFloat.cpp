@@ -31,6 +31,11 @@ HyTweenFloat::~HyTweenFloat(void)
 {
 }
 
+float HyTweenFloat::Get() const
+{
+	return m_fValueRef;
+}
+
 void HyTweenFloat::Set(float fValue)
 {
 	if(m_fValueRef != fValue)
@@ -47,6 +52,11 @@ void HyTweenFloat::Offset(float fValue)
 
 	m_fValueRef += fValue;
 	StopTween();
+}
+
+bool HyTweenFloat::IsTweening()
+{
+	return m_bAddedToOwnerUpdate;
 }
 
 void HyTweenFloat::Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpTweenFunc /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::_NullTweenCallback*/)

@@ -28,7 +28,7 @@ public:
 
     void SetSurfaceSize(int iWidth, int iHeight);
 
-    virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef);
+    virtual void OnUpdateUniforms();
     virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
 };
 

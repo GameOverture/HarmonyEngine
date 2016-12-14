@@ -446,8 +446,9 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	m_bIsDirty = false;
 }
 
-/*virtual*/ void HyText2d::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
+/*virtual*/ void HyText2d::OnUpdateUniforms()
 {
+	HyShaderUniforms *pShaderUniformsRef = m_RenderState.PrimeShaderUniforms();
 }
 
 /*virtual*/ void HyText2d::OnWriteDrawBufferData(char *&pRefDataWritePos)

@@ -195,7 +195,7 @@ void HyPrimitive2d::ClearData()
 {
 }
 
-/*virtual*/ void HyPrimitive2d::OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef)
+/*virtual*/ void HyPrimitive2d::OnUpdateUniforms()
 {
 	glm::mat4 mtx;
 	GetWorldTransform(mtx);
@@ -212,6 +212,7 @@ void HyPrimitive2d::ClearData()
 	vTop.z = botColor.Z();
 	vBot.a = alpha.Get();
 
+	HyShaderUniforms *pShaderUniformsRef = m_RenderState.PrimeShaderUniforms();
 	pShaderUniformsRef->Set("primitiveTopColor", vTop);
 	pShaderUniformsRef->Set("primitiveBotColor", vBot);
 	pShaderUniformsRef->Set("transformMtx", mtx);

@@ -47,6 +47,10 @@ IHyRenderer::~IHyRenderer(void)
 	std::map<int32, IHyShader *>::iterator iter;
 	for(iter = sm_ShaderMap.begin(); iter != sm_ShaderMap.end(); ++iter)
 		delete iter->second;
+
+	// Needed for GUI reloads
+	sm_ShaderMap.clear();
+	sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 }
 
 void IHyRenderer::Update()
