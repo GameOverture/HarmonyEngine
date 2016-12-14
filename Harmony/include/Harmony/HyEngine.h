@@ -23,6 +23,7 @@
 #include "Renderer/Viewport/HyWindow.h"
 
 #include "Scene/HyScene.h"
+#include "Scene/Instances/HyAudio2d.h"
 #include "Scene/Instances/HySprite2d.h"
 #include "Scene/Instances/HySpine2d.h"
 #include "Scene/Instances/HyPrimitive2d.h"

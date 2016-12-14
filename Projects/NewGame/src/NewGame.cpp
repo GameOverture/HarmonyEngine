@@ -71,7 +71,7 @@ glm::vec2 textBoxSize;
 	m_TestText.TextSetAlignment(HYALIGN_Right);
 	m_TestText.TextSetState(1);
 	m_TestText.TextSet("Oh my goodness, oh me damn. Oh my goodness, they going ham.");
-	m_TestText.SetAsBox(textBoxSize.x, textBoxSize.y, false, false, false);
+	m_TestText.SetAsColumn(textBoxSize.x);
 	m_TestText.pos.Set(0.0f, -100.0f);
 	//m_TestText.rot.Set(45.0f);
 	//m_TestText.scale.Set(0.5f, 2.0f);

@@ -15,6 +15,8 @@ class NewGame : public IHyApplication
 	HyPrimitive2d		m_HorzLine;
 	HyPrimitive2d		m_VertLine;
 
+	HyAudio2d			m_AudioTest;
+
 	TestGrid			m_TestGrid;
 
 public:

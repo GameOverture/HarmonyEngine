@@ -28,7 +28,7 @@ class HyAudio2d : public IHyAudioInstInterop
 	eCueType		m_eCueType;
 
 public:
-	HyAudio2d(std::vector<HyWindow *> &windowListRef);
+	HyAudio2d();
 	virtual ~HyAudio2d(void);
 };
 
