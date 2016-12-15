@@ -39,6 +39,7 @@ public:
 	void Set(float fAll);
 	void Set(float fX, float fY, float fZ);
 	void Set(const glm::vec3 &srcVec);
+	void Set(const glm::ivec3 &srcVec);
 	void Set(const HyTweenVec3 &srcVec);
 
 	void Offset(float fX, float fY, float fZ);

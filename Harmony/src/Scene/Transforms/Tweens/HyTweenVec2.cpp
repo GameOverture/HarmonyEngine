@@ -63,6 +63,12 @@ void HyTweenVec2::Set(const glm::vec2 &srcVec)
 	m_AnimFloatList[1].Set(srcVec[1]);
 }
 
+void HyTweenVec2::Set(const glm::ivec2 &srcVec)
+{
+	m_AnimFloatList[0].Set(static_cast<float>(srcVec[0]));
+	m_AnimFloatList[1].Set(static_cast<float>(srcVec[1]));
+}
+
 void HyTweenVec2::Set(const HyTweenVec2 &srcVec)
 {
 	m_AnimFloatList[0].Set(srcVec[0]);
