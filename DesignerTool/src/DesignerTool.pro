@@ -57,7 +57,56 @@ SOURCES += main.cpp \
     WidgetAudioState.cpp \
     WidgetRangedSlider.cpp \
     WidgetFontUndoCmds.cpp \
-    WidgetSpriteUndoCmds.cpp
+    WidgetSpriteUndoCmds.cpp \
+    WidgetGradientEditor.cpp \
+    Gradient Dialog/colordialog.cpp \
+    Gradient Dialog/colorselector.cpp \
+    Gradient Dialog/colorselectordetailsconnector.cpp \
+    Gradient Dialog/customgraphicsscene.cpp \
+    Gradient Dialog/customgraphicsscene_2.cpp \
+    Gradient Dialog/customgraphicsview.cpp \
+    Gradient Dialog/gradientdialog.cpp \
+    Gradient Dialog/graphicspixmapboard.cpp \
+    Gradient Dialog/graphicsrectboard.cpp \
+    Gradient Dialog/helpdialog.cpp \
+    Gradient Dialog/selector.cpp \
+    Gradient Dialog/sizeinputdialog.cpp \
+    Gradient Dialog/colordialog.cpp \
+    Gradient Dialog/colorselector.cpp \
+    Gradient Dialog/colorselectordetailsconnector.cpp \
+    Gradient Dialog/customgraphicsscene.cpp \
+    Gradient Dialog/customgraphicsscene_2.cpp \
+    Gradient Dialog/customgraphicsview.cpp \
+    Gradient Dialog/gradientdialog.cpp \
+    Gradient Dialog/graphicspixmapboard.cpp \
+    Gradient Dialog/graphicsrectboard.cpp \
+    Gradient Dialog/helpdialog.cpp \
+    Gradient Dialog/selector.cpp \
+    Gradient Dialog/sizeinputdialog.cpp \
+    Gradient Dialog/colordialog.cpp \
+    Gradient Dialog/colorselector.cpp \
+    Gradient Dialog/colorselectordetailsconnector.cpp \
+    Gradient Dialog/customgraphicsscene.cpp \
+    Gradient Dialog/customgraphicsscene_2.cpp \
+    Gradient Dialog/customgraphicsview.cpp \
+    Gradient Dialog/gradientdialog.cpp \
+    Gradient Dialog/graphicspixmapboard.cpp \
+    Gradient Dialog/graphicsrectboard.cpp \
+    Gradient Dialog/helpdialog.cpp \
+    Gradient Dialog/selector.cpp \
+    Gradient Dialog/sizeinputdialog.cpp \
+    Gradient Dialog/colordialog.cpp \
+    Gradient Dialog/colorselector.cpp \
+    Gradient Dialog/colorselectordetailsconnector.cpp \
+    Gradient Dialog/customgraphicsscene.cpp \
+    Gradient Dialog/customgraphicsscene_2.cpp \
+    Gradient Dialog/customgraphicsview.cpp \
+    Gradient Dialog/gradientdialog.cpp \
+    Gradient Dialog/graphicspixmapboard.cpp \
+    Gradient Dialog/graphicsrectboard.cpp \
+    Gradient Dialog/helpdialog.cpp \
+    Gradient Dialog/selector.cpp \
+    Gradient Dialog/sizeinputdialog.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -102,7 +151,56 @@ HEADERS  += \
     WidgetRangedSlider.h \
     WidgetUndoCmds.h \
     WidgetFontUndoCmds.h \
-    WidgetSpriteUndoCmds.h
+    WidgetSpriteUndoCmds.h \
+    WidgetGradientEditor.h \
+    Gradient Dialog/colordialog.h \
+    Gradient Dialog/colorselector.h \
+    Gradient Dialog/colorselectordetailsconnector.h \
+    Gradient Dialog/customgraphicsscene.h \
+    Gradient Dialog/customgraphicsscene_2.h \
+    Gradient Dialog/customgraphicsview.h \
+    Gradient Dialog/gradientdialog.h \
+    Gradient Dialog/graphicspixmapboard.h \
+    Gradient Dialog/graphicsrectboard.h \
+    Gradient Dialog/helpdialog.h \
+    Gradient Dialog/selector.h \
+    Gradient Dialog/sizeinputdialog.h \
+    Gradient Dialog/colordialog.h \
+    Gradient Dialog/colorselector.h \
+    Gradient Dialog/colorselectordetailsconnector.h \
+    Gradient Dialog/customgraphicsscene.h \
+    Gradient Dialog/customgraphicsscene_2.h \
+    Gradient Dialog/customgraphicsview.h \
+    Gradient Dialog/gradientdialog.h \
+    Gradient Dialog/graphicspixmapboard.h \
+    Gradient Dialog/graphicsrectboard.h \
+    Gradient Dialog/helpdialog.h \
+    Gradient Dialog/selector.h \
+    Gradient Dialog/sizeinputdialog.h \
+    Gradient Dialog/colordialog.h \
+    Gradient Dialog/colorselector.h \
+    Gradient Dialog/colorselectordetailsconnector.h \
+    Gradient Dialog/customgraphicsscene.h \
+    Gradient Dialog/customgraphicsscene_2.h \
+    Gradient Dialog/customgraphicsview.h \
+    Gradient Dialog/gradientdialog.h \
+    Gradient Dialog/graphicspixmapboard.h \
+    Gradient Dialog/graphicsrectboard.h \
+    Gradient Dialog/helpdialog.h \
+    Gradient Dialog/selector.h \
+    Gradient Dialog/sizeinputdialog.h \
+    Gradient Dialog/colordialog.h \
+    Gradient Dialog/colorselector.h \
+    Gradient Dialog/colorselectordetailsconnector.h \
+    Gradient Dialog/customgraphicsscene.h \
+    Gradient Dialog/customgraphicsscene_2.h \
+    Gradient Dialog/customgraphicsview.h \
+    Gradient Dialog/gradientdialog.h \
+    Gradient Dialog/graphicspixmapboard.h \
+    Gradient Dialog/graphicsrectboard.h \
+    Gradient Dialog/helpdialog.h \
+    Gradient Dialog/selector.h \
+    Gradient Dialog/sizeinputdialog.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -127,7 +225,16 @@ FORMS    += \
     WidgetAudioBank.ui \
     WidgetAudio.ui \
     WidgetAudioState.ui \
-    WidgetRangedSlider.ui
+    WidgetRangedSlider.ui \
+    WidgetGradientEditor.ui \
+    Gradient Dialog/colordialog.ui \
+    Gradient Dialog/gradientdialog.ui \
+    Gradient Dialog/helpdialog.ui \
+    Gradient Dialog/sizeinputdialog.ui \
+    Gradient Dialog/colordialog.ui \
+    Gradient Dialog/gradientdialog.ui \
+    Gradient Dialog/helpdialog.ui \
+    Gradient Dialog/sizeinputdialog.ui
 
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER HY_PLATFORM_GUI
 
