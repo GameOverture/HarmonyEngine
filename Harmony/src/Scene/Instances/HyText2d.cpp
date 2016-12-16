@@ -15,7 +15,7 @@
 
 HyText2d::HyText2d(const char *szPrefix, const char *szName) :	IHyInst2d(HYTYPE_Text2d, szPrefix, szName),
 																m_bIsDirty(true),
-																m_sString("Not set"),
+																m_sString(""),
 																m_uiCurFontState(0),
 																m_vBoxDimensions(0.0f, 0.0f),
 																m_uiBoxAttributes(0),
