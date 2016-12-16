@@ -26,6 +26,13 @@
 #define HYCOLOR_XYUV(y,u,v)   HYCOLOR_ARGB(0xff,y,u,v)
 #define HYCOLOR_AYUV(a,y,u,v) HYCOLOR_ARGB(a,y,u,v)
 
+void HySetVec(glm::vec2 &vecOut, float fX, float fY);
+void HySetVec(glm::vec3 &vecOut, float fX, float fY, float fZ);
+void HySetVec(glm::vec4 &vecOut, float fX, float fY, float fZ, float fW);
+void HySetVec(glm::ivec2 &vecOut, int32 iX, int32 iY);
+void HySetVec(glm::ivec3 &vecOut, int32 iX, int32 iY, int32 iZ);
+void HySetVec(glm::ivec4 &vecOut, int32 iX, int32 iY, int32 iZ, int32 iW);
+
 template <typename T> 
 T HyClamp(const T& value, const T& low, const T& high) 
 {
