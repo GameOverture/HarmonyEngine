@@ -31,7 +31,7 @@ HyEntity2d::~HyEntity2d(void)
 		m_ChildList[i]->SetEnabled(m_bEnabled);
 }
 
-/*virtual*/ bool HyEntity2d::IsLoaded()
+/*virtual*/ bool HyEntity2d::IsLoaded() const
 {
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{

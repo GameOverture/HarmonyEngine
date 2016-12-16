@@ -53,17 +53,17 @@ public:
 	void AnimCtrl(HyAnimCtrl eAnimCtrl);
 	void AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState);
 	
-	uint32 AnimGetNumStates();
-	uint32 AnimGetCurState();
-	uint32 AnimGetNumFrames();
-	uint32 AnimGetFrame();
+	uint32 AnimGetNumStates() const;
+	uint32 AnimGetCurState() const;
+	uint32 AnimGetNumFrames() const;
+	uint32 AnimGetFrame() const;
 	void AnimSetFrame(uint32 uiFrameIndex);
 
 	//--------------------------------------------------------------------------------------
 	// Returns the time modifier (defaulted to 1.0f) that's applied the animation frame duration 
 	// set by the Designer Tool.
 	//--------------------------------------------------------------------------------------
-	float AnimGetPlayRate();
+	float AnimGetPlayRate() const;
 
 	//--------------------------------------------------------------------------------------
 	// Modifies the time modifier that's applied the animation frame duration 
@@ -89,9 +89,9 @@ public:
 	// Returns a boolean value that represents whether this animation has finished playing.
 	// A looping animation never will return true.
 	//--------------------------------------------------------------------------------------
-	bool AnimIsFinished();
+	bool AnimIsFinished() const;
 
-	bool AnimIsPaused();
+	bool AnimIsPaused() const;
 	
 	//--------------------------------------------------------------------------------------
 	// Client may specify whether to invoke a callback function when animation completes. The
@@ -110,8 +110,8 @@ public:
 	//--------------------------------------------------------------------------------------
 	void AnimSetFrame(int iFrameIndex);
 
-	float GetCurFrameWidth(bool bIncludeScaling = true);
-	float GetCurFrameHeight(bool bIncludScaling = true);
+	float AnimGetCurFrameWidth(bool bIncludeScaling = true);
+	float AnimGetCurFrameHeight(bool bIncludScaling = true);
 
 private:
 	virtual void OnDataLoaded();

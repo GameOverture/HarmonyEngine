@@ -56,7 +56,7 @@ public:
 	const std::string &GetName();
 	const std::string &GetPrefix();
 
-	virtual bool IsLoaded();
+	virtual bool IsLoaded() const;
 
 	HyCoordinateType GetCoordinateType();
 	void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);

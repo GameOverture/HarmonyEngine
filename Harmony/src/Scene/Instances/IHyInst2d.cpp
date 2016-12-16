@@ -49,7 +49,7 @@ const std::string &IHyInst2d::GetPrefix()
 	return m_sPREFIX;
 }
 
-/*virtual*/ bool IHyInst2d::IsLoaded()
+/*virtual*/ bool IHyInst2d::IsLoaded() const
 {
 	return m_eLoadState == HYLOADSTATE_Loaded;
 }

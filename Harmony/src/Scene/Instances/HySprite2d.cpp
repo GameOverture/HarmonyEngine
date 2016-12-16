@@ -35,6 +35,8 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl)
 
 void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 {
+	HyAssert(IsLoaded(), "HySprite2d::AnimCtrl cannot be invoked until the instance IsLoaded() == true");
+
 	switch(eAnimCtrl)
 	{
 	case HYANIMCTRL_Play:
@@ -69,33 +71,37 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 	}
 }
 
-uint32 HySprite2d::AnimGetNumStates()
+uint32 HySprite2d::AnimGetNumStates() const
 {
+	HyAssert(IsLoaded(), "HySprite2d::AnimGetNumStates cannot be invoked until the instance IsLoaded() == true");
 	return static_cast<HySprite2dData *>(m_pData)->GetNumStates();
 }
 
-uint32 HySprite2d::AnimGetCurState()
+uint32 HySprite2d::AnimGetCurState() const
 {
 	return m_uiCurAnimState;
 }
 
-uint32 HySprite2d::AnimGetNumFrames()
+uint32 HySprite2d::AnimGetNumFrames() const
 {
+	HyAssert(IsLoaded(), "HySprite2d::AnimGetNumFrames cannot be invoked until the instance IsLoaded() == true");
 	return static_cast<int32>(static_cast<HySprite2dData *>(m_pData)->GetState(m_uiCurAnimState).m_uiNUMFRAMES);
 }
 
-uint32 HySprite2d::AnimGetFrame()
+uint32 HySprite2d::AnimGetFrame() const
 {
 	return m_uiCurFrame;
 }
 
 void HySprite2d::AnimSetFrame(uint32 uiFrameIndex)
 {
-	HyAssert(uiFrameIndex >= 0 && uiFrameIndex < AnimGetNumFrames(), "HySprite2d::AnimSetFrame - Invalid frame index specified (" << uiFrameIndex << ")");
+	HyAssert(IsLoaded(), "HySprite2d::AnimSetFrame cannot be invoked until the instance IsLoaded() == true");
+	HyAssert(uiFrameIndex < AnimGetNumFrames(), "HySprite2d::AnimSetFrame - Invalid frame index specified: " << uiFrameIndex << "(Max: " << AnimGetNumFrames() << ")");
+
 	m_uiCurFrame = uiFrameIndex;
 }
 
-float HySprite2d::AnimGetPlayRate()
+float HySprite2d::AnimGetPlayRate() const
 {
 	return m_fAnimPlayRate;
 }
@@ -109,28 +115,16 @@ void HySprite2d::AnimSetPlayRate(float fPlayRate)
 
 void HySprite2d::AnimSetState(uint32 uiStateIndex)
 {
+	HyAssert(IsLoaded(), "HySprite2d::AnimSetState cannot be invoked until the instance IsLoaded() == true");
 	HyAssert(uiStateIndex < static_cast<HySprite2dData *>(m_pData)->GetNumStates(), "HySprite2d::AnimSetState was passed an invalid state index (" << uiStateIndex << ")");
 	
 	m_uiCurAnimState = uiStateIndex;
 }
 
-//void HySprite2d::AnimSetState(std::string sStateName)
-//{
-//	uint32 uiNumStates = static_cast<HySprite2dData *>(m_pData)->GetNumStates();
-//	std::transform(sStateName.begin(), sStateName.end() ::tolower());
-//
-//	for(int i = 0; i < uiNumStates; ++i)
-//	{
-//		if( == std::transform(static_cast<HySprite2dData *>(m_pData)->GetState(i)->m_sNAME.begin(), static_cast<HySprite2dData *>(m_pData)->GetState(i)->m_sNAME.end(), ::tolower())
-//		{
-//			AnimSetState(i);
-//			break;
-//		}
-//	}
-//}
-
-bool HySprite2d::AnimIsFinished()
+bool HySprite2d::AnimIsFinished() const
 {
+	HyAssert(IsLoaded(), "HySprite2d::AnimIsFinished cannot be invoked until the instance IsLoaded() == true");
+
 	uint8 uiCtrlAttribs = m_pAnimCtrlAttribs[m_uiCurAnimState];
 	if(uiCtrlAttribs & ANIMCTRLATTRIB_Loop)
 		return false;
@@ -151,30 +145,33 @@ bool HySprite2d::AnimIsFinished()
 	}
 }
 
-bool HySprite2d::AnimIsPaused()
+bool HySprite2d::AnimIsPaused() const
 {
+	HyAssert(IsLoaded(), "HySprite2d::AnimIsPaused cannot be invoked until the instance IsLoaded() == true");
 	return (m_pAnimCtrlAttribs[m_uiCurAnimState] & ANIMCTRLATTRIB_Paused) != 0;
 }
 
 void HySprite2d::AnimSetCallback(int iStateID, void(*fpCallback)(HySprite2d *, void *), void *pParam /*= NULL*/)
 {
-
+	HyAssert(IsLoaded(), "HySprite2d::AnimSetCallback cannot be invoked until the instance IsLoaded() == true");
+	
+	HyError("HySprite2d::AnimSetCallback needs implementation");
 }
 
-void HySprite2d::AnimSetFrame(int iFrameIndex)
+float HySprite2d::AnimGetCurFrameWidth(bool bIncludeScaling /*= true*/)
 {
-}
+	HyAssert(IsLoaded(), "HySprite2d::AnimGetCurFrameWidth cannot be invoked until the instance IsLoaded() == true");
 
-float HySprite2d::GetCurFrameWidth(bool bIncludeScaling /*= true*/)
-{
 	HySprite2dData *pData = static_cast<HySprite2dData *>(m_pData);
 	const HySprite2dFrame &frameRef = pData->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 
 	return frameRef.rSRC_RECT.Width() * frameRef.pAtlasGroup->GetWidth() * (bIncludeScaling ? scale.X() : 1.0f);
 }
 
-float HySprite2d::GetCurFrameHeight(bool bIncludeScaling /*= true*/)
+float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 {
+	HyAssert(IsLoaded(), "HySprite2d::AnimGetCurFrameHeight cannot be invoked until the instance IsLoaded() == true");
+
 	HySprite2dData *pData = static_cast<HySprite2dData *>(m_pData);
 	const HySprite2dFrame &frameRef = pData->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 

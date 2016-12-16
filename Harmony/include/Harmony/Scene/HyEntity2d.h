@@ -30,7 +30,7 @@ public:
 
 	virtual void SetEnabled(bool bEnabled);
 	
-	virtual bool IsLoaded();
+	virtual bool IsLoaded() const;
 
 	virtual void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);
 
