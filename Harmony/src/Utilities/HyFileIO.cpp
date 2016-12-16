@@ -46,11 +46,7 @@ void HyReadTextFile(const char *szFilePath, std::string &sContentsOut)
 	GetCurrentDirectoryA(128, szCurDir);
 
 	std::ifstream infile(szFilePath, std::ios::binary);
-	if(!infile)
-	{
-		//sm_sLogStr = "ReadTextFile() - invalid filename\n";
-		return;
-	}
+	HyAssert(infile, "HyReadTextFile invalid file: " << szFilePath);
 
 	// TODO: Make this a lot more safer!
 	std::istreambuf_iterator<char> begin(infile), end;
