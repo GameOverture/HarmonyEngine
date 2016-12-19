@@ -41,7 +41,7 @@ private:
 	uint32				m_uiTextureBindHandle;
 
 	int32				m_iShaderId;
-	HyShaderUniforms *	m_pShaderUniformsRef;
+	uint32				m_uiUniformsCrc32;
 
 	uint32				m_uiNumInstances;
 	uint32				m_uiNumVerticesPerInstance;
@@ -53,9 +53,6 @@ public:
 
 	void SetDataOffset(size_t uiVertexDataOffset);
 	size_t GetDataOffset() const;
-
-	// This function is responsible for incrementing the passed in reference pointer the size of the data written
-	void WriteRenderStateInfoBufferData(char *&pRefDataWritePos);
 	
 	void AppendInstances(uint32 uiNumInstsToAppend);
 	uint32 GetNumInstances() const;
@@ -72,7 +69,7 @@ public:
 
 	int32 GetShaderId();
 	void SetShaderId(int32 iId);
-	HyShaderUniforms *PrimeShaderUniforms();
+	void SetUniformCrc32(uint32 uiCrc32);
 
 	uint32 GetTextureHandle() const;
 	void SetTextureHandle(uint32 uiHandleId);

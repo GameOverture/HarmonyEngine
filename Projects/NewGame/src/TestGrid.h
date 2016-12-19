@@ -11,7 +11,7 @@ public:
 
 	void SetResolution(int iWidth, int iHeight);
 
-	virtual void OnUpdateUniforms(HyShaderUniforms *pShaderUniformsRef);
+	virtual void OnUpdateUniforms();
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
 };
 

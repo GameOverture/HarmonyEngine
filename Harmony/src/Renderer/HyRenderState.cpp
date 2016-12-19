@@ -15,7 +15,7 @@
 HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
 									m_uiTextureBindHandle(0),
 									m_iShaderId(-1),
-									m_pShaderUniformsRef(NULL),
+									m_uiUniformsCrc32(0),
 									m_uiNumInstances(0),
 									m_uiNumVerticesPerInstance(0),
 									m_uiDataOffset(0)
@@ -35,14 +35,6 @@ void HyRenderState::SetDataOffset(size_t uiVertexDataOffset)
 size_t HyRenderState::GetDataOffset() const
 {
 	return m_uiDataOffset;
-}
-
-// This function is responsible for incrementing the passed in reference pointer the size of the data written
-void HyRenderState::WriteRenderStateInfoBufferData(char *&pRefDataWritePos)
-{
-	// TODO: Write texture bind ID's here, then append below
-
-	m_pShaderUniformsRef->WriteUniformsBufferData(pRefDataWritePos);
 }
 
 void HyRenderState::AppendInstances(uint32 uiNumInstsToAppend)
@@ -105,14 +97,9 @@ void HyRenderState::SetShaderId(int32 iId)
 	m_iShaderId = iId;
 }
 
-HyShaderUniforms *HyRenderState::PrimeShaderUniforms()
+void HyRenderState::SetUniformCrc32(uint32 uiCrc32)
 {
-	IHyShader *pShader = IHyRenderer::FindShader(m_iShaderId);
-	HyAssert(pShader, "HyRenderState::PrimeShaderUniforms could not find a valid shader");
-
-	m_pShaderUniformsRef = pShader->GetUniforms();
-	
-	return m_pShaderUniformsRef;
+	m_uiUniformsCrc32 = uiCrc32;
 }
 
 uint32 HyRenderState::GetTextureHandle() const
@@ -127,13 +114,14 @@ void HyRenderState::SetTextureHandle(uint32 uiHandleId)
 
 bool HyRenderState::operator==(const HyRenderState &right) const
 {
-	if((this->m_uiAttributeFlags == right.m_uiAttributeFlags) && (m_uiTextureBindHandle == right.m_uiTextureBindHandle) && (m_iShaderId == right.m_iShaderId))
+	if(m_uiAttributeFlags == right.m_uiAttributeFlags &&
+	   m_uiTextureBindHandle == right.m_uiTextureBindHandle &&
+	   m_iShaderId == right.m_iShaderId &&
+	   m_uiUniformsCrc32 == right.m_uiUniformsCrc32)
 	{
-		if(m_pShaderUniformsRef->IsDirty())
-			return false;
-		else
-			return true;
+		return true;
 	}
+
 	return false;
 }
 

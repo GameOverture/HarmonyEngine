@@ -109,12 +109,11 @@ out vec4 Color;																\n\
 uniform mat4 transformMtx;													\n\
 uniform mat4 mtxCameraToClip;												\n\
 uniform mat4 mtxWorldToCamera;												\n\
-uniform vec4 primitiveTopColor;												\n\
-uniform vec4 primitiveBotColor;												\n\
+uniform vec4 primitiveColor;												\n\
 																			\n\
 void main()																	\n\
 {																			\n\
-	Color = primitiveTopColor;												\n\
+	Color = primitiveColor;													\n\
 																			\n\
 	vec4 temp = transformMtx * position;									\n\
 	temp = mtxWorldToCamera * temp;											\n\

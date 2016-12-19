@@ -67,8 +67,6 @@ HyScene::~HyScene(void)
 
 void HyScene::AddInstance(IHyInst2d *pInst)
 {
-	pInst->m_RenderState.PrimeShaderUniforms();
-
 	m_LoadedInst2dList.push_back(pInst);
 	sm_bInst2dOrderingDirty = true;
 }
@@ -248,7 +246,7 @@ void HyScene::WriteDrawBuffer()
 			pCurRenderState2d->SetDataOffset(uiVertexDataOffset);
 
 			// This function is responsible for incrementing the draw pointer to after what's written
-			pCurRenderState2d->WriteRenderStateInfoBufferData(pCurVertexWritePos);	// Also clears Uniforms' dirty flag
+			m_LoadedInst2dList[i]->WriteShaderUniformBuffer(pCurVertexWritePos);
 
 			m_pCurWritePos += sizeof(HyRenderState);
 			iCount++;

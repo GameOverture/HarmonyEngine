@@ -161,7 +161,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	if(bCenterVertically)
 		iFlags |= BOXATTRIB_CenterVertically;
 	if(bSplitWordsToFit)
-		iFlags |= BOXATTRIB_SplitWordsToFit;
+		iFlags |= BOXATTRIB_SingleLineScale;
 
 	if(m_uiBoxAttributes == iFlags && m_vBoxDimensions.x == fWidth && m_vBoxDimensions.y == fHeight)
 		return;
@@ -448,7 +448,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::OnUpdateUniforms()
 {
-	HyShaderUniforms *pShaderUniformsRef = m_RenderState.PrimeShaderUniforms();
+	//m_ShaderUniforms.Set(...);
 }
 
 /*virtual*/ void HyText2d::OnWriteDrawBufferData(char *&pRefDataWritePos)

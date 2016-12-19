@@ -81,16 +81,14 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 
 /*virtual*/ void CheckerGrid::OnUpdateUniforms()
 {
-    HyShaderUniforms *pShaderUniformsRef = m_RenderState.PrimeShaderUniforms();
-        
     glm::mat4 mtx;
     GetWorldTransform(mtx);
 
-    pShaderUniformsRef->Set("transformMtx", mtx);
-    pShaderUniformsRef->Set("uGridSize", 25.0f);
-    pShaderUniformsRef->Set("uResolution", m_Resolution);
-    pShaderUniformsRef->Set("gridColor1", glm::vec4(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f, 1.0f));
-    pShaderUniformsRef->Set("gridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
+    m_ShaderUniforms.Set("transformMtx", mtx);
+    m_ShaderUniforms.Set("uGridSize", 25.0f);
+    m_ShaderUniforms.Set("uResolution", m_Resolution);
+    m_ShaderUniforms.Set("gridColor1", glm::vec4(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f, 1.0f));
+    m_ShaderUniforms.Set("gridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
 }
 
 /*virtual*/ void CheckerGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)

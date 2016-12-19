@@ -19,8 +19,8 @@
 #include "Renderer/HyRenderState.h"
 #include "Renderer/Viewport/HyCamera.h"
 
-typedef void (*HyWriteDrawBufferDataOverride)(char *&);
-typedef void (*HyUpdateUniformOverride)(HyShaderUniforms *);
+//typedef void (*HyWriteDrawBufferDataOverride)(char *&);
+//typedef void (*HyUpdateUniformOverride)(HyShaderUniforms *);
 
 class IHyInst2d : public IHyTransform2d
 {
@@ -44,6 +44,8 @@ protected:
 	HyRenderState					m_RenderState;
 
 	float							m_fAlpha;
+
+	HyShaderUniforms 				m_ShaderUniforms;
 
 public:
 	HyTweenVec3						topColor;
@@ -79,6 +81,8 @@ private:
 	void SetData(IHyData *pData);
 	void SetLoaded();
 	IHyData *GetData()											{ return m_pData; }
+
+	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
 	virtual void OnUpdate();
 

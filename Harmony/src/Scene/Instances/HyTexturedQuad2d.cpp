@@ -161,7 +161,7 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 
 /*virtual*/ void HyTexturedQuad2d::OnUpdateUniforms()
 {
-	//HyShaderUniforms *pShaderUniformsRef = m_RenderState.PrimeShaderUniforms();
+	//m_ShaderUniforms.Set(...);
 }
 
 /*virtual*/ void HyTexturedQuad2d::OnWriteDrawBufferData(char *&pRefDataWritePos)

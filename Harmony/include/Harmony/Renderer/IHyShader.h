@@ -46,7 +46,7 @@ public:
 	HyShaderUniforms();
 	~HyShaderUniforms();
 
-	bool IsDirty();
+	uint32 GetCrc32();
 
 	int32 FindIndex(const char *szName);
 
@@ -83,8 +83,6 @@ protected:
 	std::string						m_sSourceCode[HYNUMSHADERTYPES];
 	std::vector<VertexAttribute>	m_VertexAttributeList;
 
-	HyShaderUniforms				m_Uniforms;
-
 	uint32							m_uiRefCount;
 
 	IHyShader(int32 iId);
@@ -94,7 +92,6 @@ public:
 
 	int32 GetId();
 	bool IsFinalized();
-	HyShaderUniforms *GetUniforms();
 
 	void SetSourceCode(std::string sSource, HyShaderType eType);
 	void SetVertexAttribute(const char *szName, HyShaderVariable eVarType, bool bNormalize = false, uint32 uiInstanceDivisor = 0);

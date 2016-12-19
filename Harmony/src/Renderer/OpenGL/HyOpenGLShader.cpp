@@ -255,107 +255,122 @@ void HyOpenGLShader::BindFragDataLocation(GLuint location, const char *szName)
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::bvec2 &v)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniform2i(loc, v.x, v.y);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniform2i(loc, v.x, v.y);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::bvec3 &v)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniform3i(loc, v.x, v.y, v.z);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniform3i(loc, v.x, v.y, v.z);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::bvec4 &v)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniform4i(loc, v.x, v.y, v.z, v.w);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+	
+	glUniform4i(loc, v.x, v.y, v.z, v.w);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::ivec2 &v)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniform2i(loc, v.x, v.y);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniform2i(loc, v.x, v.y);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::ivec3 &v)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniform3i(loc, v.x, v.y, v.z);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniform3i(loc, v.x, v.y, v.z);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::ivec4 &v)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniform4i(loc, v.x, v.y, v.z, v.w);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniform4i(loc, v.x, v.y, v.z, v.w);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::vec2 &v)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniform2f(loc, v.x, v.y);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniform2f(loc, v.x, v.y);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::vec3 &v)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniform3f(loc, v.x, v.y, v.z);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniform3f(loc, v.x, v.y, v.z);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::vec4 &v)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if( loc >= 0 )
-		glUniform4f(loc, v.x, v.y, v.z, v.w);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniform4f(loc, v.x, v.y, v.z, v.w);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::mat4 &m)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniformMatrix4fv(loc, 1, GL_FALSE, &m[0][0]);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniformMatrix4fv(loc, 1, GL_FALSE, &m[0][0]);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::mat3 &m)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniformMatrix3fv(loc, 1, GL_FALSE, &m[0][0]);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniformMatrix3fv(loc, 1, GL_FALSE, &m[0][0]);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, float val)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniform1f(loc, val);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniform1f(loc, val);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, int32 val)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniform1i(loc, val);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniform1i(loc, val);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, uint32 val)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniform1ui(loc, val);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniform1ui(loc, val);
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, bool val)
 {
-	uint32 loc = glGetUniformLocation(m_hProgHandle, szName);
-	if(loc >= 0)
-		glUniform1i(loc, val);
+	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
+
+	glUniform1i(loc, val);
 }
 
 void HyOpenGLShader::PrintActiveUniforms()

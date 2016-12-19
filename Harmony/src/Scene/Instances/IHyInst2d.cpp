@@ -167,11 +167,18 @@ void IHyInst2d::SetLoaded()
 	OnDataLoaded();
 }
 
+void IHyInst2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
+{
+	m_ShaderUniforms.WriteUniformsBufferData(pRefDataWritePos);
+}
+
 /*virtual*/ void IHyInst2d::OnUpdate()
 {
 	if(m_eLoadState != HYLOADSTATE_Loaded)
 		return;
 
 	OnInstUpdate();
+
 	OnUpdateUniforms();
+	m_RenderState.SetUniformCrc32(m_ShaderUniforms.GetCrc32());
 }

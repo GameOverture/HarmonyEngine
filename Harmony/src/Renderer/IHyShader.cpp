@@ -22,9 +22,19 @@ HyShaderUniforms::~HyShaderUniforms()
 {
 }
 
-bool HyShaderUniforms::IsDirty()
+uint32 HyShaderUniforms::GetCrc32()
 {
-	return m_bDirty;
+	if(m_bDirty == false)
+		return m_uiCrc32;
+
+	if(m_UniformList.empty())
+		m_uiCrc32 = 0;
+	else
+		m_uiCrc32 = crc32_fast(&m_UniformList[0], m_UniformList.size() * sizeof(UniformBuffer), m_uiCrc32);
+
+	m_bDirty = false;
+
+	return m_uiCrc32;
 }
 
 int32 HyShaderUniforms::FindIndex(const char *szName)
@@ -300,13 +310,6 @@ void HyShaderUniforms::WriteUniformsBufferData(char *&pRefDataWritePos)
 		memcpy(pRefDataWritePos, m_UniformList[i].GetData(), uiDataSize);
 		pRefDataWritePos += uiDataSize;
 	}
-	
-	if(m_UniformList.empty())
-		m_uiCrc32 = 0;
-	else
-		m_uiCrc32 = crc32_fast(&m_UniformList[0], m_UniformList.size() * sizeof(UniformBuffer), m_uiCrc32);
-
-	m_bDirty = false;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -339,11 +342,6 @@ int32 IHyShader::GetId()
 bool IHyShader::IsFinalized()
 {
 	return m_eLoadState != HYLOADSTATE_Inactive;
-}
-
-HyShaderUniforms *IHyShader::GetUniforms()
-{
-	return &m_Uniforms;
 }
 
 void IHyShader::SetSourceCode(std::string sSource, HyShaderType eType)

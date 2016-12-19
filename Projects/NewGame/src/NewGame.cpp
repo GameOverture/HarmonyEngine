@@ -78,7 +78,7 @@ glm::vec2 textBoxSize;
 	
 	m_primBox.SetTint(0.0f, 0.0f, 1.0f);
 	m_primBox.SetAsQuad(textBoxSize.x, textBoxSize.y, true);
-	m_primBox.SetDisplayOrder(0);
+	m_primBox.SetDisplayOrder(10000);
 	m_primBox.pos.Set(m_TestText.pos.X(), m_TestText.pos.Y() - textBoxSize.y);
 	m_primBox.Load();
 
@@ -114,6 +114,11 @@ glm::vec2 textBoxSize;
 	m_TestGrid.pos.Set(Window().GetResolution().x * -0.5f, Window().GetResolution().y * -0.5f);
 	m_TestGrid.SetCustomShader(pShader_Checkerboard);
 	m_TestGrid.Load();
+
+
+	m_BoxTest.pos.Set(100.0f, 23.0f);
+	m_BoxTest.SetAsQuad(200.0f, 100.0f, false);
+	m_BoxTest.Load();
 
 
 	return true;

@@ -212,10 +212,8 @@ void HyPrimitive2d::ClearData()
 	vTop.z = botColor.Z();
 	vBot.a = alpha.Get();
 
-	HyShaderUniforms *pShaderUniformsRef = m_RenderState.PrimeShaderUniforms();
-	pShaderUniformsRef->Set("primitiveTopColor", vTop);
-	pShaderUniformsRef->Set("primitiveBotColor", vBot);
-	pShaderUniformsRef->Set("transformMtx", mtx);
+	m_ShaderUniforms.Set("transformMtx", mtx);
+	m_ShaderUniforms.Set("primitiveColor", vTop);
 }
 
 /*virtual*/ void HyPrimitive2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
