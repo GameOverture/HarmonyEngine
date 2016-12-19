@@ -45,10 +45,11 @@ protected:
 		BOXATTRIB_CenterVertically	= 1 << 1,
 		BOXATTRIB_ExtendingBottom	= 1 << 2,
 		BOXATTRIB_SplitWordsToFit	= 1 << 3,
-		BOXATTRIB_SingleLineScale	= 1 << 4
+		BOXATTRIB_ScaleBox			= 1 << 4
 	};
 	uint32				m_uiBoxAttributes;
 	glm::vec2			m_vBoxDimensions;
+	float				m_fScaleBoxModifier;
 
 	HyAlign				m_eAlignment;
 
@@ -87,7 +88,7 @@ public:
 
 	void SetAsLine();
 	void SetAsColumn(float fWidth, bool bSplitWordsToFit = false);
-	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = false, bool bSplitWordsToFit = false);
+	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 
 private:
 	virtual void OnDataLoaded();
