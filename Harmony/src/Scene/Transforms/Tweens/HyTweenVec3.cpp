@@ -109,6 +109,13 @@ void HyTweenVec3::Offset(const glm::vec3 &srcVec)
 	m_AnimFloatList[2].Offset(srcVec[2]);
 }
 
+void HyTweenVec3::Offset(const glm::ivec3 &srcVec)
+{
+	m_AnimFloatList[0].Offset(static_cast<float>(srcVec[0]));
+	m_AnimFloatList[1].Offset(static_cast<float>(srcVec[1]));
+	m_AnimFloatList[2].Offset(static_cast<float>(srcVec[2]));
+}
+
 void HyTweenVec3::Offset(const HyTweenVec3 &srcVec)
 {
 	m_AnimFloatList[0].Offset(srcVec[0]);

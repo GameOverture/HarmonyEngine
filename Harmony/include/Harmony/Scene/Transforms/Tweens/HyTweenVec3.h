@@ -44,6 +44,7 @@ public:
 
 	void Offset(float fX, float fY, float fZ);
 	void Offset(const glm::vec3 &srcVec);
+	void Offset(const glm::ivec3 &srcVec);
 	void Offset(const HyTweenVec3 &srcVec);
 
 	void Tween(float fX, float fY, float fZ, float fSeconds, HyTweenUpdateFunc fpEase = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback);

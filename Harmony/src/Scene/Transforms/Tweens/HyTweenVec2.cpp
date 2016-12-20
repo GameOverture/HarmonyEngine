@@ -87,6 +87,12 @@ void HyTweenVec2::Offset(const glm::vec2 &srcVec)
 	m_AnimFloatList[1].Offset(srcVec[1]);
 }
 
+void HyTweenVec2::Offset(const glm::ivec2 &srcVec)
+{
+	m_AnimFloatList[0].Offset(static_cast<float>(srcVec[0]));
+	m_AnimFloatList[1].Offset(static_cast<float>(srcVec[1]));
+}
+
 void HyTweenVec2::Offset(const HyTweenVec2 &srcVec)
 {
 	m_AnimFloatList[0].Offset(srcVec[0]);
