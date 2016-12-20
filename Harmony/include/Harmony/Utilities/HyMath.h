@@ -39,6 +39,18 @@ T HyClamp(const T& value, const T& low, const T& high)
 	return value < low ? low : (value > high ? high : value); 
 }
 
+template <class T>
+const T &HyMin(const T &a, const T &b)
+{
+	return (a < b) ? a : b;
+}
+
+template <class T>
+const T &HyMax(const T &a, const T &b)
+{
+	return (a > b) ? a : b;
+}
+
 float Ease_Linear(float a, float b, float t);
 
 //--------------------------------------------------------------------------------------

@@ -466,9 +466,12 @@ offsetCalculation:
 					fTotalWidth = vNewlineInfo[i].fUSED_WIDTH;
 			}
 
-			m_fScaleBoxModifier = m_vBoxDimensions.x / fTotalWidth;
-			bScaleBoxModiferIsSet = true;
+			float fScaleX = m_vBoxDimensions.x / fTotalWidth;
+			float fScaleY = m_vBoxDimensions.y / fTotalHeight;
 
+			m_fScaleBoxModifier = HyMin(fScaleX, fScaleY);
+
+			bScaleBoxModiferIsSet = true;
 			goto offsetCalculation;
 		}
 		else if(0 != (m_uiBoxAttributes & BOXATTRIB_CenterVertically))
