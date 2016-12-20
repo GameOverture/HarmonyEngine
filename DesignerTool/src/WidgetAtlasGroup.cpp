@@ -45,10 +45,11 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
     m_dlgSettings.SetName("Group ID: " % QString::number(GetId()));
     
     ui->actionDeleteImages->setEnabled(false);
-    ui->btnDeleteImages->setDefaultAction(ui->actionDeleteImages);
-    
     ui->actionReplaceImages->setEnabled(false);
+    
+    ui->btnDeleteImages->setDefaultAction(ui->actionDeleteImages);
     ui->btnReplaceImages->setDefaultAction(ui->actionReplaceImages);
+    ui->btnAddFilter->setDefaultAction(ui->actionAddFilter);
 
     ui->atlasList->setSelectionMode(QAbstractItemView::MultiSelection);
     ui->atlasList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -74,6 +75,30 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
         QJsonObject settingsObj = settingsDoc.object();
         m_dlgSettings.LoadSettings(settingsObj);
 
+        QJsonArray filtersArray = settingsObj["filters"].toArray();
+        for(int i = 0; i < filtersArray.size(); ++i)
+        {
+            QDir filterPath(filtersArray.at(i).toString());
+
+            QTreeWidgetItem *pNewTreeItem = new QTreeWidgetItem(ui->atlasList);
+
+            pNewTreeItem->setText(0, filterPath.dirName());
+            pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix));
+
+            QVariant v(QString("FILTER"));
+            pNewTreeItem->setData(0, Qt::UserRole, v);
+
+            QTreeWidgetItem *pParent = NULL;
+            if(filterPath.cdUp())
+            {
+                QList<QTreeWidgetItem *> foundList = ui->atlasList->findItems(filterPath.dirName(), Qt::MatchExactly);
+                if(foundList.empty() == false && foundList[0]->data(0, Qt::UserRole).toString() == "FILTER")
+                    pParent = foundList[0];
+            }
+            if(pParent)
+                pParent->addChild(pNewTreeItem);
+        }
+
         QJsonArray frameArray = settingsObj["frames"].toArray();
         for(int i = 0; i < frameArray.size(); ++i)
         {
@@ -91,6 +116,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
                                                             frameObj["rotate"].toBool(),
                                                             frameObj["x"].toInt(),
                                                             frameObj["y"].toInt(),
+                                                            frameObj["filter"].toString(),
                                                             frameObj["errors"].toInt(0));
 
             if(QFile::exists(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName())) == false)
@@ -290,7 +316,7 @@ HyGuiFrame *WidgetAtlasGroup::ImportImage(QString sName, QImage &newImage, eAtla
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
     QRect rAlphaCrop = ImagePacker::crop(newImage);
 
-    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, false, -1, -1, 0);
+    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, false, -1, -1, "", 0);
     if(pNewFrame)
     {
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
@@ -699,4 +725,9 @@ void WidgetAtlasGroup::on_actionReplaceImages_triggered()
         for(QSet<ItemWidget *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
             (*LinksIter)->Relink(selectedImageList[i]);
     }
+}
+
+void WidgetAtlasGroup::on_actionAddFilter_triggered()
+{
+
 }

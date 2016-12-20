@@ -39,6 +39,8 @@ class HyGuiFrame
     int                                 m_iPosX;
     int                                 m_iPosY;
 
+    QString                             m_sFilter;  // Folder filter for atlas group
+
     QSet<ItemWidget *>                  m_Links;
 
     QMap<void *, HyTexturedQuad2d *>    m_DrawInstMap;
@@ -46,7 +48,7 @@ class HyGuiFrame
     uint                                m_uiErrors; // '0' when there is no error
 
     // Private ctor as WidgetAtlasManager should only construct these
-    HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY, uint uiErrors);
+    HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY, QString sFilter, uint uiErrors);
     ~HyGuiFrame();
     
 public:
@@ -67,10 +69,12 @@ public:
     int GetAtlasGroupdId()                      { return static_cast<int>(m_uiATLAS_GROUP_ID); }
     eAtlasNodeType GetType()                    { return m_eType; }
 
+    int GetTextureIndex()                       { return m_iTextureIndex; }
     bool IsRotated()                            { return m_bRotation; }
     int GetX()                                  { return m_iPosX; }
     int GetY()                                  { return m_iPosY; }
-    int GetTextureIndex()                       { return m_iTextureIndex; }
+    QString GetFilter();
+    void SetFilter(QString sFilter);
 
     void UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX, int iY);
 

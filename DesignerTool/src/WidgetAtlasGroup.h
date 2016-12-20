@@ -72,6 +72,8 @@ private slots:
     
     void on_actionReplaceImages_triggered();
 
+    void on_actionAddFilter_triggered();
+
 protected:
     virtual void enterEvent(QEvent *pEvent);
     virtual void leaveEvent(QEvent *pEvent);

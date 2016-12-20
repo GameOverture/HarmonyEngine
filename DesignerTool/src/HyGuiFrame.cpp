@@ -10,19 +10,20 @@
 #include "HyGuiFrame.h"
 #include "scriptum/imagepacker.h"
 
-HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY, uint uiErrors) :  m_uiATLAS_GROUP_ID(uiAtlasGroupId),
-                                                                                                                                                                                                m_eType(eType),
-                                                                                                                                                                                                m_pTreeWidgetItem(NULL),
-                                                                                                                                                                                                m_uiChecksum(uiChecksum),
-                                                                                                                                                                                                m_sName(sN),
-                                                                                                                                                                                                m_iWidth(iW),
-                                                                                                                                                                                                m_iHeight(iH),
-                                                                                                                                                                                                m_rAlphaCrop(rAlphaCrop),
-                                                                                                                                                                                                m_iTextureIndex(iTexIndex),
-                                                                                                                                                                                                m_bRotation(bRot),
-                                                                                                                                                                                                m_iPosX(iX),
-                                                                                                                                                                                                m_iPosY(iY),
-                                                                                                                                                                                                m_uiErrors(uiErrors)
+HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY, QString sFilter, uint uiErrors) : m_uiATLAS_GROUP_ID(uiAtlasGroupId),
+                                                                                                                                                                                                                m_eType(eType),
+                                                                                                                                                                                                                m_pTreeWidgetItem(NULL),
+                                                                                                                                                                                                                m_uiChecksum(uiChecksum),
+                                                                                                                                                                                                                m_sName(sN),
+                                                                                                                                                                                                                m_iWidth(iW),
+                                                                                                                                                                                                                m_iHeight(iH),
+                                                                                                                                                                                                                m_rAlphaCrop(rAlphaCrop),
+                                                                                                                                                                                                                m_iTextureIndex(iTexIndex),
+                                                                                                                                                                                                                m_bRotation(bRot),
+                                                                                                                                                                                                                m_iPosX(iX),
+                                                                                                                                                                                                                m_iPosY(iY),
+                                                                                                                                                                                                                m_sFilter(sFilter),
+                                                                                                                                                                                                                m_uiErrors(uiErrors)
 {
 }
 
@@ -102,6 +103,16 @@ void HyGuiFrame::DeleteDrawInst(void *pKey)
 void HyGuiFrame::SetTreeWidgetItem(QTreeWidgetItem *pTreeItem)
 {
     m_pTreeWidgetItem = pTreeItem;
+}
+
+QString HyGuiFrame::GetFilter()
+{
+    return m_sFilter;
+}
+
+void HyGuiFrame::SetFilter(QString sFilter)
+{
+    m_sFilter = sFilter;
 }
 
 void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX, int iY)

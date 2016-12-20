@@ -465,7 +465,7 @@ void WidgetAtlasManager::HideAtlasGroup()
     m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_Nothing);
 }
 
-HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY, uint uiErrors)
+HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY, QString sFilter, uint uiErrors)
 {
     HyGuiFrame *pNewFrame = NULL;
 
@@ -473,12 +473,12 @@ HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRec
     {
         HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
 
-        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, bRot, iX, iY, uiErrors);
+        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, bRot, iX, iY, sFilter, uiErrors);
         pNewFrame->SetError(GUIFRAMEERROR_Duplicate);
     }
     else
     {
-        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, bRot, iX, iY, uiErrors);
+        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, bRot, iX, iY, sFilter, uiErrors);
         m_DependencyMap[uiChecksum] = pNewFrame;
     }
 
