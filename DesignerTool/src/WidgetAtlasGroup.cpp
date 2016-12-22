@@ -132,6 +132,11 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
         ui->atlasList->sortItems(0, Qt::AscendingOrder);
         ui->atlasList->expandAll();
     }
+    else
+    {
+        QJsonArray emptyFramesArray;
+        WriteMetaSettings(emptyFramesArray);
+    }
     
     ui->lcdNumTextures->display(iNumTextures);
     ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
@@ -498,6 +503,34 @@ void WidgetAtlasGroup::Refresh()
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // WRITE SETTINGS FILE TO ATLAS META DIR
+    WriteMetaSettings(frameArray);
+
+    qint64 i64TimeRefresh = timerStartRefresh.elapsed();
+    clock_t timeEndRefresh = clock();
+
+    HyGuiLog("Atlas Group Refresh done in: " % QString::number(static_cast<float>(i64TimeRefresh / 1000)), LOGTYPE_Normal);
+    HyGuiLog("Atlas Group Pack done in:    " % QString::number(static_cast<float>(i64TimePack / 1000)), LOGTYPE_Normal);
+    HyGuiLog("Atlas Group Refresh done in: " % QString::number(static_cast<float>((timeEndRefresh - timeStartRefresh) / CLOCKS_PER_SEC)), LOGTYPE_Info);
+    HyGuiLog("Atlas Group Pack done in:    " % QString::number(static_cast<float>((timeEndPack - timeStartPack) / CLOCKS_PER_SEC)), LOGTYPE_Info);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)
+    m_pManager->SaveData();
+    
+    MainWindow::ReloadHarmony();
+
+    ui->atlasList->expandAll();
+    ui->atlasList->sortItems(0, Qt::AscendingOrder);
+    
+    ui->lcdNumTextures->display(m_Packer.bins.size());
+    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
+    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
+
+    MainWindow::LoadSpinner(false);
+}
+
+void WidgetAtlasGroup::WriteMetaSettings(QJsonArray frameArray)
+{
     QJsonObject settingsObj = m_dlgSettings.GetSettings();
     settingsObj.insert("frames", frameArray);
 
@@ -522,29 +555,6 @@ void WidgetAtlasGroup::Refresh()
 
         settingsFile.close();
     }
-
-    qint64 i64TimeRefresh = timerStartRefresh.elapsed();
-    clock_t timeEndRefresh = clock();
-
-    HyGuiLog("Atlas Group Refresh done in: " % QString::number(static_cast<float>(i64TimeRefresh / 1000)), LOGTYPE_Normal);
-    HyGuiLog("Atlas Group Pack done in:    " % QString::number(static_cast<float>(i64TimePack / 1000)), LOGTYPE_Normal);
-    HyGuiLog("Atlas Group Refresh done in: " % QString::number(static_cast<float>((timeEndRefresh - timeStartRefresh) / CLOCKS_PER_SEC)), LOGTYPE_Info);
-    HyGuiLog("Atlas Group Pack done in:    " % QString::number(static_cast<float>((timeEndPack - timeStartPack) / CLOCKS_PER_SEC)), LOGTYPE_Info);
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)
-    m_pManager->SaveData();
-    
-    MainWindow::ReloadHarmony();
-
-    ui->atlasList->expandAll();
-    ui->atlasList->sortItems(0, Qt::AscendingOrder);
-    
-    ui->lcdNumTextures->display(m_Packer.bins.size());
-    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
-    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
-
-    MainWindow::LoadSpinner(false);
 }
 
 void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFrame)

@@ -95,8 +95,9 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
         
         for(int i = 0; i < ui->cmbAtlasGroups->count(); ++i)
         {
-            if(m_pItemFont->GetAtlasManager().GetAtlasIdFromIndex(ui->cmbAtlasGroups->currentIndex()) == m_pTrueAtlasFrame->GetAtlasGroupdId())
+            if(m_pItemFont->GetAtlasManager().GetAtlasIdFromIndex(i) == m_pTrueAtlasFrame->GetAtlasGroupdId())
             {
+                ui->cmbAtlasGroups->setCurrentIndex(i);
                 m_iPrevAtlasCmbIndex = i;
                 break;
             }
