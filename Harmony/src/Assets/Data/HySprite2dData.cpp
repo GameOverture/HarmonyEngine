@@ -77,13 +77,10 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 		jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
 
 		HyAtlasGroup *pAtlasGroup = dataRef.RequestTexture(static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasGroupId")));
-		uint32 uiTextureIndex = static_cast<uint32>(frameObj.get<jsonxx::Number>("textureId"));
 
-		if(pAtlasGroup->ContainsTexture(uiTextureIndex) == false)
-			HyError("HyTextures::RequestTexture() Atlas group (" << static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasId")) << ") does not contain texture index: " << uiTextureIndex);
-
+		uint32 uiTextureIndex;
 		HyRectangle<float> rUVRect;
-		pAtlasGroup->GetUvRect(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), rUVRect);
+		pAtlasGroup->GetUvRect(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), uiTextureIndex, rUVRect);
 
 		new (pFrameWriteLocation)HySprite2dFrame(pAtlasGroup,
 												 uiTextureIndex,

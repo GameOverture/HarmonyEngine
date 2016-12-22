@@ -121,8 +121,13 @@ float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
 	jsonxx::Object textObject;
 	textObject.parse(sFontFileContents);
 
-	m_uiTextureIndex = static_cast<uint32>(textObject.get<jsonxx::Number>("textureIndex"));
 	m_pAtlasGroup = RequestTexture(static_cast<uint32>(textObject.get<jsonxx::Number>("atlasGroupId")));
+
+	HyRectangle<float> rSubAtlasUVRect;
+	m_pAtlasGroup->GetUvRect(static_cast<uint32>(textObject.get<jsonxx::Number>("checksum")), m_uiTextureIndex, rSubAtlasUVRect);
+
+	float fSubAtlasWidth = m_pAtlasGroup->GetWidth() * (rSubAtlasUVRect.right - rSubAtlasUVRect.left);
+	float fSubAtlasHeight = m_pAtlasGroup->GetHeight() * (rSubAtlasUVRect.bottom - rSubAtlasUVRect.top);
 	
 	jsonxx::Array typefaceArray = textObject.get<jsonxx::Array>("typefaceArray");
 	m_uiNumTypefaces = static_cast<uint32>(typefaceArray.size());
@@ -140,16 +145,25 @@ float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
 		{
 			jsonxx::Object glyphObj = glyphsArray.get<jsonxx::Object>(j);
 
+			float fLeftUv = (m_pAtlasGroup->GetWidth() * rSubAtlasUVRect.left) + (fSubAtlasWidth * static_cast<float>(glyphObj.get<jsonxx::Number>("left")));
+			fLeftUv /= m_pAtlasGroup->GetWidth();
+			float fTopUv = (m_pAtlasGroup->GetHeight() * rSubAtlasUVRect.top) + (fSubAtlasHeight * static_cast<float>(glyphObj.get<jsonxx::Number>("top")));
+			fTopUv /= m_pAtlasGroup->GetHeight();
+			float fRightUv = (m_pAtlasGroup->GetWidth() * rSubAtlasUVRect.left) + (fSubAtlasWidth * static_cast<float>(glyphObj.get<jsonxx::Number>("right")));
+			fRightUv /= m_pAtlasGroup->GetWidth();
+			float fBottomUv = (m_pAtlasGroup->GetHeight() * rSubAtlasUVRect.top) + (fSubAtlasHeight * static_cast<float>(glyphObj.get<jsonxx::Number>("bottom")));
+			fBottomUv /= m_pAtlasGroup->GetHeight();
+
 			curTypeface[static_cast<uint32>(glyphObj.get<jsonxx::Number>("code"))] = HY_NEW HyText2dGlyphInfo(static_cast<uint32>(glyphObj.get<jsonxx::Number>("width")),
 																											  static_cast<uint32>(glyphObj.get<jsonxx::Number>("height")),
 																											  static_cast<uint32>(glyphObj.get<jsonxx::Number>("offset_x")),
 																											  static_cast<uint32>(glyphObj.get<jsonxx::Number>("offset_y")),
 																											  static_cast<float>(glyphObj.get<jsonxx::Number>("advance_x")),
 																											  static_cast<float>(glyphObj.get<jsonxx::Number>("advance_y")),
-																											  static_cast<float>(glyphObj.get<jsonxx::Number>("left")),
-																											  static_cast<float>(glyphObj.get<jsonxx::Number>("top")),
-																											  static_cast<float>(glyphObj.get<jsonxx::Number>("right")),
-																											  static_cast<float>(glyphObj.get<jsonxx::Number>("bottom")),
+																											  fLeftUv,
+																											  fTopUv,
+																											  fRightUv,
+																											  fBottomUv,
 																											  glyphObj.get<jsonxx::Object>("kerning"));
 		}
 	}

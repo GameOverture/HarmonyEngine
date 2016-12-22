@@ -74,8 +74,7 @@ public:
 	uint32 GetHeight() const;
 	uint32 GetNumTextures() const;
 
-	void GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const;
-	bool ContainsTexture(uint32 uiTextureIndex) const;
+	void GetUvRect(uint32 uiChecksum, uint32 &uiTextureIndexOut, HyRectangle<float> &UVRectOut) const;
 
 	void Load();
 

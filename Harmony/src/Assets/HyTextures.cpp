@@ -153,7 +153,7 @@ uint32 HyAtlasGroup::GetNumTextures() const
 	return m_uiNUM_ATLASES;
 }
 
-void HyAtlasGroup::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
+void HyAtlasGroup::GetUvRect(uint32 uiChecksum, uint32 &uiTextureIndexOut, HyRectangle<float> &UVRectOut) const
 {
 	float fTexWidth = static_cast<float>(m_uiWIDTH);
 	float fTexHeight = static_cast<float>(m_uiHEIGHT);
@@ -164,6 +164,8 @@ void HyAtlasGroup::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) c
 		pSrcRect = m_pAtlases[i].GetSrcRect(uiChecksum);
 		if(pSrcRect)
 		{
+			uiTextureIndexOut = i;
+
 			UVRectOut.left = static_cast<float>(pSrcRect->left) / fTexWidth;
 			UVRectOut.top = static_cast<float>(pSrcRect->top) / fTexHeight;
 			UVRectOut.right = static_cast<float>(pSrcRect->right) / fTexWidth;
@@ -173,11 +175,6 @@ void HyAtlasGroup::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) c
 			break;
 		}
 	}
-}
-
-bool HyAtlasGroup::ContainsTexture(uint32 uiTextureIndex) const
-{
-	return (uiTextureIndex < m_uiNUM_ATLASES);
 }
 
 void HyAtlasGroup::Load()

@@ -132,7 +132,6 @@ void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
         SpriteFrame *pSpriteFrame = m_pSpriteFramesModel->GetFrameAt(i);
 
         QJsonObject frameObj;
-        frameObj.insert("textureId", QJsonValue(pSpriteFrame->m_pFrame->GetTextureIndex()));
         frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));
         frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x() + pSpriteFrame->m_pFrame->GetCrop().left()));
         frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + (pSpriteFrame->m_pFrame->GetSize().height() - pSpriteFrame->m_pFrame->GetCrop().bottom())));

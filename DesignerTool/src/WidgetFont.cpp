@@ -499,7 +499,6 @@ bool WidgetFont::SaveFontFilesToMetaDir()
 void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
 {
     fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetChecksum())));
-    fontObj.insert("textureIndex", m_pTrueAtlasFrame->GetTextureIndex());
     fontObj.insert("atlasGroupId", m_pTrueAtlasFrame->GetAtlasGroupdId());
 
     QJsonObject availableGlyphsObj;
@@ -528,16 +527,6 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
         {
             char cCharacter = m_sAvailableTypefaceGlyphs[j].toLatin1();
             texture_glyph_t *pGlyph = texture_font_get_glyph(m_MasterStageList[i]->pTextureFont, &cCharacter);
-
-            QSize atlasSize = GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
-            double dLeft = static_cast<double>(m_pTrueAtlasFrame->GetX() + (m_pAtlas->width * pGlyph->s0));
-            dLeft /= static_cast<double>(atlasSize.width());
-            double dTop = static_cast<double>(m_pTrueAtlasFrame->GetY() + (m_pAtlas->height * pGlyph->t0));
-            dTop /= static_cast<double>(atlasSize.height());
-            double dRight = static_cast<double>(m_pTrueAtlasFrame->GetX() + (m_pAtlas->width * pGlyph->s1));
-            dRight /= static_cast<double>(atlasSize.width());
-            double dBottom = static_cast<double>(m_pTrueAtlasFrame->GetY() + (m_pAtlas->height * pGlyph->t1));
-            dBottom /= static_cast<double>(atlasSize.height());
             
             QJsonObject glyphInfoObj;
             glyphInfoObj.insert("code", static_cast<int>(pGlyph->codepoint));
@@ -547,10 +536,10 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
             glyphInfoObj.insert("height", static_cast<int>(pGlyph->height));
             glyphInfoObj.insert("offset_x", pGlyph->offset_x);
             glyphInfoObj.insert("offset_y", pGlyph->offset_y);
-            glyphInfoObj.insert("left", dLeft);
-            glyphInfoObj.insert("top", dTop);
-            glyphInfoObj.insert("right", dRight);
-            glyphInfoObj.insert("bottom", dBottom);
+            glyphInfoObj.insert("left", pGlyph->s0);
+            glyphInfoObj.insert("top", pGlyph->t0);
+            glyphInfoObj.insert("right", pGlyph->s1);
+            glyphInfoObj.insert("bottom", pGlyph->t1);
             
             QJsonObject kerningInfoObj;
             for(int k = 0; k < m_sAvailableTypefaceGlyphs.count(); ++k)
