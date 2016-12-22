@@ -100,6 +100,17 @@ void HyGuiFrame::DeleteDrawInst(void *pKey)
     }
 }
 
+void HyGuiFrame::DeleteAllDrawInst()
+{
+    QMap<void *, HyTexturedQuad2d *>::iterator iter = m_DrawInstMap.begin();
+    for(; iter != m_DrawInstMap.end(); ++iter)
+    {
+        delete iter.value();
+    }
+    
+    m_DrawInstMap.clear();
+}
+
 void HyGuiFrame::SetTreeWidgetItem(QTreeWidgetItem *pTreeItem)
 {
     m_pTreeWidgetItem = pTreeItem;

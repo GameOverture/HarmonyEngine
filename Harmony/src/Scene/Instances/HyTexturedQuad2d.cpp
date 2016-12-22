@@ -169,7 +169,7 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);
 
 	glm::vec2 vSize(m_SrcRect.Width() * (m_bIS_RAW ? m_uiRAW_TEXTURE_WIDTH : pData->GetAtlasGroup()->GetWidth()),
-					m_SrcRect.Height() * (m_bIS_RAW ? m_uiRAW_TEXTURE_WIDTH : pData->GetAtlasGroup()->GetHeight()));
+					m_SrcRect.Height() * (m_bIS_RAW ? m_uiRAW_TEXTURE_HEIGHT : pData->GetAtlasGroup()->GetHeight()));
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vSize;
 	pRefDataWritePos += sizeof(glm::vec2);
 

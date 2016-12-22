@@ -207,13 +207,15 @@ HyAudio_Win::HyAudio_Win(std::vector<HyWindow *> &windowListRef) :	IHyAudio(wind
 
 HyAudio_Win::~HyAudio_Win()
 {
-#if ( _WIN32_WINNT < 0x0602 /*_WIN32_WINNT_WIN8*/)
-	if(m_hXAudioDLL)
-		FreeLibrary(m_hXAudioDLL);
-#endif
+#ifndef HY_PLATFORM_GUI
+	#if ( _WIN32_WINNT < 0x0602 /*_WIN32_WINNT_WIN8*/)
+		if(m_hXAudioDLL)
+			FreeLibrary(m_hXAudioDLL);
+	#endif
 
-	// TODO: Call this without it crashing the program (make CoInit and CoUninit into an outer scope?)
-	CoUninitialize();
+		// TODO: Call this without it crashing the program (make CoInit and CoUninit into an outer scope?)
+		CoUninitialize();
+#endif
 }
 
 HRESULT FindChunk(HANDLE hFile, DWORD fourcc, DWORD & dwChunkSize, DWORD & dwChunkDataPosition)

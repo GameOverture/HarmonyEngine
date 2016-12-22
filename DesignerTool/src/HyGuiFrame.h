@@ -57,6 +57,7 @@ public:
 
     HyTexturedQuad2d *DrawInst(void *pKey);
     void DeleteDrawInst(void *pKey);
+    void DeleteAllDrawInst();
 
     void SetTreeWidgetItem(QTreeWidgetItem *pTreeItem);
 
