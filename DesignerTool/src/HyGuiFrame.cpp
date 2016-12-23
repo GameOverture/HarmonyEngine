@@ -55,7 +55,12 @@ void HyGuiFrame::ReplaceImage(QString sName, QImage &newImage, QDir metaDir)
     m_sName = sName;
     m_iWidth = newImage.width();
     m_iHeight = newImage.height();
-    m_rAlphaCrop = ImagePacker::crop(newImage);
+    
+    if(m_eType != ATLAS_Font && m_eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
+        m_rAlphaCrop = ImagePacker::crop(newImage);
+    else
+        m_rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
+
     m_iTextureIndex = -1;
     m_bRotation = false;
     m_iPosX = -1;

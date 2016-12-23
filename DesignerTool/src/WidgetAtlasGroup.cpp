@@ -319,7 +319,10 @@ void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
 HyGuiFrame *WidgetAtlasGroup::ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType)
 {
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
-    QRect rAlphaCrop = ImagePacker::crop(newImage);
+    
+    QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
+    if(eType != ATLAS_Font && eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
+        rAlphaCrop = ImagePacker::crop(newImage);
 
     HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, false, -1, -1, "", 0);
     if(pNewFrame)
