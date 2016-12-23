@@ -200,8 +200,17 @@ void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObjOut)
 
         frameObj.insert("left", QJsonValue(m_FrameList[i]->GetX()));
         frameObj.insert("top", QJsonValue(m_FrameList[i]->GetY()));
-        frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().width()));
-        frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().height()));
+        
+        if(m_FrameList[i]->IsRotated())
+        {
+            frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().height()));
+            frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().width()));
+        }
+        else
+        {
+            frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().width()));
+            frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().height()));
+        }
         
         frameArrayList[m_FrameList[i]->GetTextureIndex()].append(frameObj);
     }

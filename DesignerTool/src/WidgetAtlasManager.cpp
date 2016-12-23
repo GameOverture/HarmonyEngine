@@ -322,6 +322,12 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
             pFrame->DrawInst(&atlasMan)->SetDisplayOrder(100);
             pFrame->DrawInst(&atlasMan)->pos.Set((uiRENDERWIDTH * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetWidth() * -0.5f),
                                                  (uiRENDERHEIGHT * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetHeight() * -0.5f));
+            if(pFrame->IsRotated())
+            {
+                pFrame->DrawInst(&atlasMan)->rot_pivot.Set(pFrame->DrawInst(&atlasMan)->GetWidth() * 0.5f, pFrame->DrawInst(&atlasMan)->GetHeight() * 0.5f);
+                pFrame->DrawInst(&atlasMan)->rot.Set(90);
+            }
+            
             pFrame->DrawInst(&atlasMan)->alpha.Set(0.5f);
         }
     }

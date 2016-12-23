@@ -110,6 +110,13 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef, Wid
     QPoint ptRenderOffset = pSpriteFrame->GetRenderOffset();
     pDrawInst->pos.X(ptRenderOffset.x());
     pDrawInst->pos.Y(ptRenderOffset.y());
+    
+    if(pGuiFrame->IsRotated())
+    {
+        pDrawInst->rot.Set(90);
+        pDrawInst->pos.Offset(pGuiFrame->GetSize().width(), 0.0f);
+    }
+    
     pDrawInst->SetDisplayOrder(100);
     
     if(pDrawInst->IsLoaded() == false)
