@@ -68,8 +68,6 @@ void IHyTransform2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConv
 		outMtx = glm::translate(outMtx, ptPos);
 
 	outMtx = glm::translate(outMtx, ptRotPivot);
-	//outMtx = glm::rotate(outMtx, 0.0f/*rot.Get().x*/, glm::vec3(1, 0, 0));
-	//outMtx = glm::rotate(outMtx, 0.0f/*rot.Get().y*/, glm::vec3(0, 1, 0));
 	outMtx = glm::rotate(outMtx, rot.Get(), glm::vec3(0, 0, 1));
 	outMtx = glm::translate(outMtx, ptRotPivot * -1.0f);
 
@@ -89,8 +87,6 @@ void IHyTransform2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConv
 	vScale.y = scale.Y();
 
 	outMtx = glm::scale(outMtx, vScale);
-	//outMtx = glm::rotate(outMtx, 0.0f/*rot.Get().x*/, glm::vec3(1, 0, 0));
-	//outMtx = glm::rotate(outMtx, 0.0f/*rot.Get().y*/, glm::vec3(0, 1, 0));
 	outMtx = glm::rotate(outMtx, rot.Get(), glm::vec3(0, 0, 1));
 
 	if(m_eCoordUnit == HYCOORDUNIT_Meters)
