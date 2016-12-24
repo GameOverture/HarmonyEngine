@@ -13,6 +13,8 @@
 
 #include "Afx/HyInteropAfx.h"
 
+#include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
+
 HyShaderUniforms::HyShaderUniforms() :	m_bDirty(true),
 										m_uiCrc32(0)
 {

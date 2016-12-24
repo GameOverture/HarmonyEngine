@@ -31,7 +31,6 @@
 		typedef HyInputMap_Gainput HyInputMapInterop;
 	#endif
 
-	#include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
 	typedef HyOpenGLShader HyShaderInterop;
 
 	#include "Audio/Interop/HyAudio_Win.h"
