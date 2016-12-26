@@ -408,6 +408,9 @@ void ItemProject::Reset()
 {
     for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
         m_bDrawStateLoaded[i] = false;
+
+    sm_Init.sGameName = GetName(false).toStdString();
+    sm_Init.sDataDir = GetAssetsAbsPath().toStdString();
 }
 
 void ItemProject::on_tabBar_currentChanged(int index)

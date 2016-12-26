@@ -53,9 +53,9 @@ public:
 	IHyApplication(HarmonyInit &initStruct);
 	virtual ~IHyApplication();
 
-	static HyCoordinateType DefaultCoordinateType()	{ HyAssert(sm_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HyScene::DefaultCoordinateType() invoked before engine initialized"); return sm_Init.eDefaultCoordinateType; }
-	static HyCoordinateUnit DefaultCoordinateUnit()	{ HyAssert(sm_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HyScene::DefaultCoordinateUnit() invoked before engine initialized"); return sm_Init.eDefaultCoordinateUnit; }
-	static float PixelsPerMeter()					{ return sm_Init.fPixelsPerMeter; }
+	static HyCoordinateType DefaultCoordinateType();
+	static HyCoordinateUnit DefaultCoordinateUnit();
+	static float PixelsPerMeter();
 
 	HyWindow &Window(uint32 uiIndex = 0);
 	HyInputMapInterop &Input(uint32 uiIndex = 0);

@@ -101,6 +101,22 @@ IHyApplication::~IHyApplication()
 		delete m_InputMapList[i];
 }
 
+HyCoordinateType IHyApplication::DefaultCoordinateType()
+{
+	HyAssert(sm_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HyScene::DefaultCoordinateType() invoked before engine initialized");
+	return sm_Init.eDefaultCoordinateType;
+}
+HyCoordinateUnit IHyApplication::DefaultCoordinateUnit()
+{
+	HyAssert(sm_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HyScene::DefaultCoordinateUnit() invoked before engine initialized");
+	return sm_Init.eDefaultCoordinateUnit;
+}
+
+float IHyApplication::PixelsPerMeter()
+{
+	return sm_Init.fPixelsPerMeter;
+}
+
 HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(uiIndex < sm_Init.uiNumWindows, "IApplication::Viewport() took an invalid index: " << uiIndex);
