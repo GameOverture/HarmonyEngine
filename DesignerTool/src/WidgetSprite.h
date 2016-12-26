@@ -36,7 +36,7 @@ class WidgetSprite : public QWidget
 public:
     explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
-    
+
     // This Load() code can't be put into the ctor because of GetAtlasManager().RequestFrames()
     void Load();
     

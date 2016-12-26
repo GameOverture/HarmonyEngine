@@ -25,10 +25,12 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetA
                                                                                                             m_pDrawAtlasPreview(NULL),
                                                                                                             m_pFontCamera(NULL)
 {
+    m_pWidget = new WidgetFont(this);
 }
 
 /*virtual*/ ItemFont::~ItemFont()
 {
+    delete m_pWidget;
 }
 
 /*virtual*/ QList<QAction *> ItemFont::GetActionsForToolBar()
@@ -44,8 +46,6 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetA
 
 /*virtual*/ void ItemFont::OnLoad(IHyApplication &hyApp)
 {
-    m_pWidget = new WidgetFont(this);
-    
     if(m_pFontCamera == NULL)
         m_pFontCamera = hyApp.Window().CreateCamera2d();
     
@@ -73,8 +73,6 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetA
     m_DrawAtlasOutline.Unload();
     
     m_DividerLine.Unload();
-    
-    delete m_pWidget;
 }
 
 /*virtual*/ void ItemFont::OnDraw_Show(IHyApplication &hyApp)

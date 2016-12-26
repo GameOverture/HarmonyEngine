@@ -148,9 +148,6 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
 WidgetAtlasGroup::~WidgetAtlasGroup()
 {
     delete ui;
-
-    for(int i = 0; i < m_FrameList.size(); ++i)
-        m_pManager->RemoveImage(m_FrameList[i]);
 }
 
 bool WidgetAtlasGroup::IsMatching(QDir metaDir, QDir dataDir)
@@ -672,23 +669,26 @@ void WidgetAtlasGroup::on_atlasList_itemSelectionChanged()
 
 void WidgetAtlasGroup::on_actionDeleteImages_triggered()
 {
+    // TODO: Should save all open items - beware of the Undo/Redo stack per item that may refrence the deleted images
+
     QList<QTreeWidgetItem *> selectedImageList = ui->atlasList->selectedItems();
 
     for(int i = 0; i < selectedImageList.count(); ++i)
     {
         HyGuiFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
         QSet<ItemWidget *> sLinks = pFrame->GetLinks();
-        for(QSet<ItemWidget *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+        if(sLinks.empty() == false)
         {
-            // TODO: Support a "Yes to all" dialog functionality here
-            HyGuiLog(pFrame->GetName() % " was in use by " % (*LinksIter)->GetName(true) % "\nRemoving image from " % (*LinksIter)->GetName(false), LOGTYPE_Warning);
-            
-            m_pManager->RemoveDependency(pFrame, *LinksIter);
-            (*LinksIter)->Save();
+            QString sMessage = "'" % pFrame->GetName() % "' image cannot be deleted because it is in use by the following items: \n\n";
+            for(QSet<ItemWidget *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+                sMessage.append(HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem((*LinksIter)->GetType())) % "/" % (*LinksIter)->GetName(true) % "\n");
+
+            HyGuiLog(sMessage, LOGTYPE_Warning);
+            continue;
         }
 
         m_FrameList.removeOne(pFrame);
-        m_pManager->RemoveImage(pFrame);
+        m_pManager->RemoveImage(pFrame, m_MetaDir);
         delete selectedImageList[i];
     }
 

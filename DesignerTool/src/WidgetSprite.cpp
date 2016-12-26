@@ -82,18 +82,18 @@ void WidgetSprite::Load()
 
             m_pItemSprite->GetUndoStack()->push(new WidgetUndoCmd_AddState<WidgetSprite, WidgetSpriteState>("Add Sprite State", this, m_StateActionsList, ui->cmbStates));
             m_pItemSprite->GetUndoStack()->push(new WidgetUndoCmd_RenameState<WidgetSpriteState>("Rename Sprite State", ui->cmbStates, stateObj["name"].toString()));
-            
+
             WidgetSpriteState *pSpriteState = GetCurSpriteState();
-            
+
             pSpriteState->GetChkBox_Reverse()->setChecked(stateObj["reverse"].toBool());
             pSpriteState->GetChkBox_Looping()->setChecked(stateObj["loop"].toBool());
             pSpriteState->GetChkBox_Bounce()->setChecked(stateObj["bounce"].toBool());
-            
+
             QJsonArray spriteFrameArray = stateObj["frames"].toArray();
             for(int j = 0; j < spriteFrameArray.size(); ++j)
             {
                 QJsonObject spriteFrameObj = spriteFrameArray[j].toObject();
-                
+
                 QList<quint32> requestList;
                 requestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
                 QList<HyGuiFrame *> pRequestedList = m_pItemSprite->GetAtlasManager().RequestFrames(m_pItemSprite, requestList);
@@ -108,7 +108,7 @@ void WidgetSprite::Load()
     else
     {
         on_actionAddState_triggered();
-        
+
         //m_pItemSprite->Save();
     }
 

@@ -37,6 +37,15 @@ HyGuiFrame::~HyGuiFrame()
     }
 }
 
+bool HyGuiFrame::DeleteMetaImage(QDir metaDir)
+{
+    QFile imageFile(metaDir.path() % "/" % ConstructImageFileName());
+    if(imageFile.remove() == false)
+        return false;
+
+    return true;
+}
+
 void HyGuiFrame::ReplaceImage(QString sImgPath, QDir metaDir)
 {
     QFileInfo fileInfo(sImgPath);
@@ -47,8 +56,7 @@ void HyGuiFrame::ReplaceImage(QString sImgPath, QDir metaDir)
 
 void HyGuiFrame::ReplaceImage(QString sName, QImage &newImage, QDir metaDir)
 {
-    QFile oldImageFile(metaDir.path() % "/" % ConstructImageFileName());
-    if(oldImageFile.remove() == false)
+    if(DeleteMetaImage(metaDir) == false)
         HyGuiLog("Could not remove old meta image file when replacing " % sName, LOGTYPE_Error);
 
     m_uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());

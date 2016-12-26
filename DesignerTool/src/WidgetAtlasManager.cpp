@@ -491,9 +491,11 @@ HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRec
     return pNewFrame;
 }
 
-void WidgetAtlasManager::RemoveImage(HyGuiFrame *pFrame)
+void WidgetAtlasManager::RemoveImage(HyGuiFrame *pFrame, QDir metaDir)
 {
     m_DependencyMap.remove(pFrame->GetChecksum());
+    pFrame->DeleteMetaImage(metaDir);
+
     delete pFrame;
 
     // In case the removed image happened to be the current 'm_pMouseHoverItem'

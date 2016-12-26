@@ -34,10 +34,14 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef, Wid
     
     m_primOriginHorz.SetTint(1.0f, 0.0f, 0.0f);
     m_primOriginVert.SetTint(1.0f, 0.0f, 0.0f);
+
+    m_pWidget = new WidgetSprite(this);
+    static_cast<WidgetSprite *>(m_pWidget)->Load();
 }
 
 /*virtual*/ ItemSprite::~ItemSprite()
 {
+    delete m_pWidget;
 }
 
 /*virtual*/ QList<QAction *> ItemSprite::GetActionsForToolBar()
@@ -55,9 +59,6 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef, Wid
 
 /*virtual*/ void ItemSprite::OnLoad(IHyApplication &hyApp)
 {
-    m_pWidget = new WidgetSprite(this);
-    static_cast<WidgetSprite *>(m_pWidget)->Load();
-    
     m_primOriginHorz.Load();
     m_primOriginVert.Load();
 }
@@ -70,8 +71,6 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef, Wid
     QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
     for(int i = 0; i < frameList.count(); i++)
         frameList[i]->DrawInst(this)->Unload();
-    
-    delete m_pWidget;
 }
 
 /*virtual*/ void ItemSprite::OnDraw_Show(IHyApplication &hyApp)

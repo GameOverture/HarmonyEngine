@@ -12,12 +12,12 @@
 
 ItemAudio::ItemAudio(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Audio, sPath, atlasManRef, audioManRef)
 {
-    
+    m_pWidget = new WidgetAudio(this);
 }
 
 /*virtual*/ ItemAudio::~ItemAudio()
 {
-    
+    delete m_pWidget;
 }
 
 /*virtual*/ QList<QAction *> ItemAudio::GetActionsForToolBar()
@@ -33,12 +33,10 @@ ItemAudio::ItemAudio(const QString sPath, WidgetAtlasManager &atlasManRef, Widge
 
 /*virtual*/ void ItemAudio::OnLoad(IHyApplication &hyApp)
 {
-    m_pWidget = new WidgetAudio(this);
 }
 
 /*virtual*/ void ItemAudio::OnUnload(IHyApplication &hyApp)
 {
-    delete m_pWidget;
 }
 
 /*virtual*/ void ItemAudio::OnDraw_Show(IHyApplication &hyApp)

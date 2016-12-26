@@ -52,6 +52,8 @@ class HyGuiFrame
     ~HyGuiFrame();
     
 public:
+    bool DeleteMetaImage(QDir metaDir);
+
     void ReplaceImage(QString sImgPath, QDir metaDir);
     void ReplaceImage(QString sName, QImage &newImage, QDir metaDir);
 
