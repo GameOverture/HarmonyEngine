@@ -39,8 +39,7 @@ public:
 
 	void OffsetVerts(glm::vec2 vOffset, float fAngleOffset);
 
-private:
-
+protected:
 	void ClearData();
 
 	virtual void OnDataLoaded();

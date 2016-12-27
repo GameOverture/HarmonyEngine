@@ -113,7 +113,7 @@ public:
 	float AnimGetCurFrameWidth(bool bIncludeScaling = true);
 	float AnimGetCurFrameHeight(bool bIncludScaling = true);
 
-private:
+protected:
 	virtual void OnDataLoaded();
 
 	virtual void OnInstUpdate();

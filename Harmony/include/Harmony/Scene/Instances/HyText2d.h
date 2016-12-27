@@ -20,7 +20,8 @@ class HyText2d : public IHyInst2d
 {
 protected:
 	bool							m_bIsDirty;
-	std::string						m_sString;
+	std::string						m_sCurrentString;
+	std::string						m_sNewString;
 
 	uint32							m_uiCurFontState;
 
@@ -90,7 +91,7 @@ public:
 	void SetAsColumn(float fWidth, bool bSplitWordsToFit = false);
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 
-private:
+protected:
 	virtual void OnDataLoaded();
 
 	virtual void OnInstUpdate();

@@ -71,6 +71,11 @@ uint32 HyText2dData::GetNumLayers(uint32 uiStateIndex)
 
 const HyText2dGlyphInfo &HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiCode)
 {
+	if(uiCode == 0)
+	{
+		int test = 0;
+		test++;
+	}
 	HyAssert(m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(uiCode) != m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end(), "HyText2d tried to draw a glyph (Code: " << uiCode << ") that wasn't exported");
 	return *m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.at(uiCode);
 }
