@@ -106,7 +106,7 @@ void HySpine2d::AnimSetStateEnabled(bool bEnable, uint32 uiIndex)
 
 void HySpine2d::AnimSetListener(void (*fpCallback)(spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount), void *pParam /*= NULL*/, int uiIndex /*= 0*/)
 {
-	m_ppAnimStates[uiIndex]->listener = fpCallback;
+	//m_ppAnimStates[uiIndex]->listener = fpCallback;
 	//m_ppAnimStates[uiIndex]->context = pParam;
 }
 
@@ -142,12 +142,12 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 
 	m_spSkeletonBounds = spSkeletonBounds_create();
 
-	m_uiNumAnims = pSpineData->GetSkeletonData()->animationCount;
+	//m_uiNumAnims = pSpineData->GetSkeletonData()->animationCount;
 	m_ppSpineAnims = pSpineData->GetSkeletonData()->animations;
 	m_pAnimStateData = spAnimationStateData_create(pSpineData->GetSkeletonData());
 
 	m_RenderState.SetNumInstances(0);
-	for(int i = 0; i < m_pSpineSkeleton->slotCount; ++i)
+	for(int i = 0; i < m_pSpineSkeleton->slotsCount; ++i)
 	{
 		spAttachment* attachment = m_pSpineSkeleton->drawOrder[i]->attachment;
 		if(attachment == NULL || attachment->type != SP_ATTACHMENT_REGION)
@@ -207,7 +207,7 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 /*virtual*/ void HySpine2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
 	spSlot *pCurSlot;
-	for (int i = 0; i < m_pSpineSkeleton->slotCount; ++i)
+	for (int i = 0; i < m_pSpineSkeleton->slotsCount; ++i)
 	{
 		pCurSlot = m_pSpineSkeleton->drawOrder[i];
 
@@ -218,7 +218,7 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 		spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
 
 		float pPos[8];
-		spRegionAttachment_computeWorldVertices(regionAttachment, pCurSlot->skeleton->x, pCurSlot->skeleton->y, pCurSlot->bone, pPos);
+		//spRegionAttachment_computeWorldVertices(regionAttachment, pCurSlot->skeleton->x, pCurSlot->skeleton->y, pCurSlot->bone, pPos);
 #define vertX(index) pPos[index*2]
 #define vertY(index) pPos[index*2+1]
 #define vertU(index) regionAttachment->uvs[index*2]

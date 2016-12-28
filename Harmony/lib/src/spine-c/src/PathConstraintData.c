@@ -28,17 +28,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Event.h>
+#include <spine/PathConstraintData.h>
 #include <spine/extension.h>
 
-spEvent* spEvent_create (float time, spEventData* data) {
-	spEvent* self = NEW(spEvent);
-	CONST_CAST(spEventData*, self->data) = data;
-	CONST_CAST(float, self->time) = time;
+spPathConstraintData* spPathConstraintData_create (const char* name) {
+	spPathConstraintData* self = NEW(spPathConstraintData);
+	MALLOC_STR(self->name, name);
 	return self;
 }
 
-void spEvent_dispose (spEvent* self) {
-	FREE(self->stringValue);
+void spPathConstraintData_dispose (spPathConstraintData* self) {
+	FREE(self->name);
+	FREE(self->bones);
 	FREE(self);
 }

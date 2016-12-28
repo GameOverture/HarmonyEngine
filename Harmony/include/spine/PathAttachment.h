@@ -28,17 +28,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Event.h>
-#include <spine/extension.h>
+#ifndef SPINE_PATHATTACHMENT_H_
+#define SPINE_PATHATTACHMENT_H_
 
-spEvent* spEvent_create (float time, spEventData* data) {
-	spEvent* self = NEW(spEvent);
-	CONST_CAST(spEventData*, self->data) = data;
-	CONST_CAST(float, self->time) = time;
-	return self;
-}
+#include <spine/Attachment.h>
+#include <spine/VertexAttachment.h>
+#include <spine/Atlas.h>
+#include <spine/Slot.h>
 
-void spEvent_dispose (spEvent* self) {
-	FREE(self->stringValue);
-	FREE(self);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct spPathAttachment {
+	spVertexAttachment super;
+	int lengthsLength;
+	float* lengths;
+	int/*bool*/ closed, constantSpeed;
+} spPathAttachment;
+
+spPathAttachment* spPathAttachment_create (const char* name);
+void spPathAttachment_computeWorldVertices (spPathAttachment* self, spSlot* slot, float* worldVertices);
+void spPathAttachment_computeWorldVertices1 (spPathAttachment* self, spSlot* slot, int start, int count, float* worldVertices, int offset);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spPathAttachment PathAttachment;
+#define PathAttachment_create(...) spPathAttachment_create(__VA_ARGS__)
+#define PathAttachment_computeWorldVertices(...) spPathAttachment_computeWorldVertices(__VA_ARGS__)
+#endif
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* SPINE_PATHATTACHMENT_H_ */
