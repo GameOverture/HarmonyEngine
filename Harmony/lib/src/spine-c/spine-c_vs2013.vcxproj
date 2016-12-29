@@ -22,7 +22,7 @@
     <ProjectGuid>{04D5C584-8373-44F2-A6DF-568325CDC043}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>spinec</RootNamespace>
-	<ProjectName>spine-c</ProjectName>
+    <ProjectName>spine-c</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -169,7 +169,6 @@
     <ClInclude Include="..\..\..\include\spine\SkeletonData.h" />
     <ClInclude Include="..\..\..\include\spine\SkeletonJson.h" />
     <ClInclude Include="..\..\..\include\spine\Skin.h" />
-    <ClInclude Include="..\..\..\include\spine\SkinnedMeshAttachment.h" />
     <ClInclude Include="..\..\..\include\spine\Slot.h" />
     <ClInclude Include="..\..\..\include\spine\SlotData.h" />
     <ClInclude Include="..\..\..\include\spine\spine.h" />
@@ -197,7 +196,6 @@
     <ClCompile Include="src\SkeletonData.c" />
     <ClCompile Include="src\SkeletonJson.c" />
     <ClCompile Include="src\Skin.c" />
-    <ClCompile Include="src\SkinnedMeshAttachment.c" />
     <ClCompile Include="src\Slot.c" />
     <ClCompile Include="src\SlotData.c" />
   </ItemGroup>
