@@ -59,54 +59,8 @@ SOURCES += main.cpp \
     WidgetFontUndoCmds.cpp \
     WidgetSpriteUndoCmds.cpp \
     WidgetGradientEditor.cpp \
-    Gradient Dialog/colordialog.cpp \
-    Gradient Dialog/colorselector.cpp \
-    Gradient Dialog/colorselectordetailsconnector.cpp \
-    Gradient Dialog/customgraphicsscene.cpp \
-    Gradient Dialog/customgraphicsscene_2.cpp \
-    Gradient Dialog/customgraphicsview.cpp \
-    Gradient Dialog/gradientdialog.cpp \
-    Gradient Dialog/graphicspixmapboard.cpp \
-    Gradient Dialog/graphicsrectboard.cpp \
-    Gradient Dialog/helpdialog.cpp \
-    Gradient Dialog/selector.cpp \
-    Gradient Dialog/sizeinputdialog.cpp \
-    Gradient Dialog/colordialog.cpp \
-    Gradient Dialog/colorselector.cpp \
-    Gradient Dialog/colorselectordetailsconnector.cpp \
-    Gradient Dialog/customgraphicsscene.cpp \
-    Gradient Dialog/customgraphicsscene_2.cpp \
-    Gradient Dialog/customgraphicsview.cpp \
-    Gradient Dialog/gradientdialog.cpp \
-    Gradient Dialog/graphicspixmapboard.cpp \
-    Gradient Dialog/graphicsrectboard.cpp \
-    Gradient Dialog/helpdialog.cpp \
-    Gradient Dialog/selector.cpp \
-    Gradient Dialog/sizeinputdialog.cpp \
-    Gradient Dialog/colordialog.cpp \
-    Gradient Dialog/colorselector.cpp \
-    Gradient Dialog/colorselectordetailsconnector.cpp \
-    Gradient Dialog/customgraphicsscene.cpp \
-    Gradient Dialog/customgraphicsscene_2.cpp \
-    Gradient Dialog/customgraphicsview.cpp \
-    Gradient Dialog/gradientdialog.cpp \
-    Gradient Dialog/graphicspixmapboard.cpp \
-    Gradient Dialog/graphicsrectboard.cpp \
-    Gradient Dialog/helpdialog.cpp \
-    Gradient Dialog/selector.cpp \
-    Gradient Dialog/sizeinputdialog.cpp \
-    Gradient Dialog/colordialog.cpp \
-    Gradient Dialog/colorselector.cpp \
-    Gradient Dialog/colorselectordetailsconnector.cpp \
-    Gradient Dialog/customgraphicsscene.cpp \
-    Gradient Dialog/customgraphicsscene_2.cpp \
-    Gradient Dialog/customgraphicsview.cpp \
-    Gradient Dialog/gradientdialog.cpp \
-    Gradient Dialog/graphicspixmapboard.cpp \
-    Gradient Dialog/graphicsrectboard.cpp \
-    Gradient Dialog/helpdialog.cpp \
-    Gradient Dialog/selector.cpp \
-    Gradient Dialog/sizeinputdialog.cpp
+    ItemSpine.cpp \
+    WidgetSpine.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -153,54 +107,8 @@ HEADERS  += \
     WidgetFontUndoCmds.h \
     WidgetSpriteUndoCmds.h \
     WidgetGradientEditor.h \
-    Gradient Dialog/colordialog.h \
-    Gradient Dialog/colorselector.h \
-    Gradient Dialog/colorselectordetailsconnector.h \
-    Gradient Dialog/customgraphicsscene.h \
-    Gradient Dialog/customgraphicsscene_2.h \
-    Gradient Dialog/customgraphicsview.h \
-    Gradient Dialog/gradientdialog.h \
-    Gradient Dialog/graphicspixmapboard.h \
-    Gradient Dialog/graphicsrectboard.h \
-    Gradient Dialog/helpdialog.h \
-    Gradient Dialog/selector.h \
-    Gradient Dialog/sizeinputdialog.h \
-    Gradient Dialog/colordialog.h \
-    Gradient Dialog/colorselector.h \
-    Gradient Dialog/colorselectordetailsconnector.h \
-    Gradient Dialog/customgraphicsscene.h \
-    Gradient Dialog/customgraphicsscene_2.h \
-    Gradient Dialog/customgraphicsview.h \
-    Gradient Dialog/gradientdialog.h \
-    Gradient Dialog/graphicspixmapboard.h \
-    Gradient Dialog/graphicsrectboard.h \
-    Gradient Dialog/helpdialog.h \
-    Gradient Dialog/selector.h \
-    Gradient Dialog/sizeinputdialog.h \
-    Gradient Dialog/colordialog.h \
-    Gradient Dialog/colorselector.h \
-    Gradient Dialog/colorselectordetailsconnector.h \
-    Gradient Dialog/customgraphicsscene.h \
-    Gradient Dialog/customgraphicsscene_2.h \
-    Gradient Dialog/customgraphicsview.h \
-    Gradient Dialog/gradientdialog.h \
-    Gradient Dialog/graphicspixmapboard.h \
-    Gradient Dialog/graphicsrectboard.h \
-    Gradient Dialog/helpdialog.h \
-    Gradient Dialog/selector.h \
-    Gradient Dialog/sizeinputdialog.h \
-    Gradient Dialog/colordialog.h \
-    Gradient Dialog/colorselector.h \
-    Gradient Dialog/colorselectordetailsconnector.h \
-    Gradient Dialog/customgraphicsscene.h \
-    Gradient Dialog/customgraphicsscene_2.h \
-    Gradient Dialog/customgraphicsview.h \
-    Gradient Dialog/gradientdialog.h \
-    Gradient Dialog/graphicspixmapboard.h \
-    Gradient Dialog/graphicsrectboard.h \
-    Gradient Dialog/helpdialog.h \
-    Gradient Dialog/selector.h \
-    Gradient Dialog/sizeinputdialog.h
+    ItemSpine.h \
+    WidgetSpine.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -227,14 +135,7 @@ FORMS    += \
     WidgetAudioState.ui \
     WidgetRangedSlider.ui \
     WidgetGradientEditor.ui \
-    Gradient Dialog/colordialog.ui \
-    Gradient Dialog/gradientdialog.ui \
-    Gradient Dialog/helpdialog.ui \
-    Gradient Dialog/sizeinputdialog.ui \
-    Gradient Dialog/colordialog.ui \
-    Gradient Dialog/gradientdialog.ui \
-    Gradient Dialog/helpdialog.ui \
-    Gradient Dialog/sizeinputdialog.ui
+    WidgetSpine.ui
 
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER HY_PLATFORM_GUI
 
