@@ -65,7 +65,7 @@ public:
     QJsonObject GetSettings();
     void LoadSettings(QJsonObject settings);
 
-private slots:
+private Q_SLOTS:
     void on_btnTexSize256_clicked();
     void on_btnTexSize512_clicked();
     void on_btnTexSize1024_clicked();

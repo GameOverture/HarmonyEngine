@@ -60,7 +60,7 @@ public:
 
     void ResizeAtlasListColumns();
 
-private slots:
+private Q_SLOTS:
     void on_btnAddImages_clicked();
     void on_btnAddDir_clicked();
 

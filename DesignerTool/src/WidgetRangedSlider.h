@@ -60,11 +60,11 @@ public:
     
     QVariant GetSingleValue();
     
-signals:
+Q_SIGNALS:
     void userChangedRangedValue(QVariant &oldMin, QVariant &oldMax, QVariant &newMin, QVariant &newMax);
     void userChangedSingleValue(QVariant &oldValue, QVariant &newValue);
     
-private slots:
+private Q_SLOTS:
     void on_sbMin_Double_editingFinished();
     
     void on_sbMax_Double_editingFinished();

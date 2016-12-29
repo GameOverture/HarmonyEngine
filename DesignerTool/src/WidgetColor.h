@@ -27,7 +27,7 @@ public:
     QColor GetColor();
     void SetColor(QColor color);
     
-private slots:
+private Q_SLOTS:
     void on_sbR_valueChanged(int arg1);
     
     void on_sbG_valueChanged(int arg1);

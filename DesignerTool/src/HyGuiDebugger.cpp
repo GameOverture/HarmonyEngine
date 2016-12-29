@@ -65,12 +65,12 @@ void HyGuiDebugger::WriteReloadPacket(QStringList &sPaths)
     quint32 id = QTime::currentTime().msecsSinceStartOfDay();
     Write(HYPACKET_ReloadStart, sizeof(quint32), &id);
     
-    foreach(QString sPath, sPaths)
+    for(int i = 0; i < sPaths.size(); ++i)
     {
         QByteArray testBuffer;
         testBuffer.append(reinterpret_cast<const char *>(&id), sizeof(quint32));
-        testBuffer.append(sPath);
-        quint32 uiSize = sPath.length() + sizeof(quint32) + 1;  // +1 is for null terminator
+        testBuffer.append(sPaths[i]);
+        quint32 uiSize = sPaths[i].length() + sizeof(quint32) + 1;  // +1 is for null terminator
         
         Write(HYPACKET_ReloadItem, uiSize, testBuffer.data());
     }

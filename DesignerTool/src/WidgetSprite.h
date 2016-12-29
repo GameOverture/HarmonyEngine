@@ -54,7 +54,7 @@ public:
     
     void UpdateActions();
     
-private slots:
+private Q_SLOTS:
     void on_actionAddState_triggered();
     
     void on_actionRemoveState_triggered();

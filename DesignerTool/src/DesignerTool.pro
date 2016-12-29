@@ -12,6 +12,7 @@ TARGET = DesignerTool
 TEMPLATE = app
 
 CONFIG += axcontainer
+CONFIG += no_keywords
 
 SOURCES += main.cpp \
     DlgNewProject.cpp \

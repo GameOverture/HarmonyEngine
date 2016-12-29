@@ -18,6 +18,76 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Animation.c" />
+    <ClCompile Include="src\AnimationState.c" />
+    <ClCompile Include="src\AnimationStateData.c" />
+    <ClCompile Include="src\Atlas.c" />
+    <ClCompile Include="src\AtlasAttachmentLoader.c" />
+    <ClCompile Include="src\Attachment.c" />
+    <ClCompile Include="src\AttachmentLoader.c" />
+    <ClCompile Include="src\Bone.c" />
+    <ClCompile Include="src\BoneData.c" />
+    <ClCompile Include="src\BoundingBoxAttachment.c" />
+    <ClCompile Include="src\Event.c" />
+    <ClCompile Include="src\EventData.c" />
+    <ClCompile Include="src\extension.c" />
+    <ClCompile Include="src\IkConstraint.c" />
+    <ClCompile Include="src\IkConstraintData.c" />
+    <ClCompile Include="src\Json.c" />
+    <ClCompile Include="src\MeshAttachment.c" />
+    <ClCompile Include="src\PathAttachment.c" />
+    <ClCompile Include="src\PathConstraint.c" />
+    <ClCompile Include="src\PathConstraintData.c" />
+    <ClCompile Include="src\RegionAttachment.c" />
+    <ClCompile Include="src\Skeleton.c" />
+    <ClCompile Include="src\SkeletonBinary.c" />
+    <ClCompile Include="src\SkeletonBounds.c" />
+    <ClCompile Include="src\SkeletonData.c" />
+    <ClCompile Include="src\SkeletonJson.c" />
+    <ClCompile Include="src\Skin.c" />
+    <ClCompile Include="src\Slot.c" />
+    <ClCompile Include="src\SlotData.c" />
+    <ClCompile Include="src\TransformConstraint.c" />
+    <ClCompile Include="src\TransformConstraintData.c" />
+    <ClCompile Include="src\VertexAttachment.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\spine\Animation.h" />
+    <ClInclude Include="..\..\..\include\spine\AnimationState.h" />
+    <ClInclude Include="..\..\..\include\spine\AnimationStateData.h" />
+    <ClInclude Include="..\..\..\include\spine\Atlas.h" />
+    <ClInclude Include="..\..\..\include\spine\AtlasAttachmentLoader.h" />
+    <ClInclude Include="..\..\..\include\spine\Attachment.h" />
+    <ClInclude Include="..\..\..\include\spine\AttachmentLoader.h" />
+    <ClInclude Include="..\..\..\include\spine\Bone.h" />
+    <ClInclude Include="..\..\..\include\spine\BoneData.h" />
+    <ClInclude Include="..\..\..\include\spine\BoundingBoxAttachment.h" />
+    <ClInclude Include="..\..\..\include\spine\Event.h" />
+    <ClInclude Include="..\..\..\include\spine\EventData.h" />
+    <ClInclude Include="..\..\..\include\spine\extension.h" />
+    <ClInclude Include="..\..\..\include\spine\IkConstraint.h" />
+    <ClInclude Include="..\..\..\include\spine\IkConstraintData.h" />
+    <ClInclude Include="..\..\..\include\spine\MeshAttachment.h" />
+    <ClInclude Include="..\..\..\include\spine\PathAttachment.h" />
+    <ClInclude Include="..\..\..\include\spine\PathConstraint.h" />
+    <ClInclude Include="..\..\..\include\spine\PathConstraintData.h" />
+    <ClInclude Include="..\..\..\include\spine\RegionAttachment.h" />
+    <ClInclude Include="..\..\..\include\spine\Skeleton.h" />
+    <ClInclude Include="..\..\..\include\spine\SkeletonBinary.h" />
+    <ClInclude Include="..\..\..\include\spine\SkeletonBounds.h" />
+    <ClInclude Include="..\..\..\include\spine\SkeletonData.h" />
+    <ClInclude Include="..\..\..\include\spine\SkeletonJson.h" />
+    <ClInclude Include="..\..\..\include\spine\Skin.h" />
+    <ClInclude Include="..\..\..\include\spine\Slot.h" />
+    <ClInclude Include="..\..\..\include\spine\SlotData.h" />
+    <ClInclude Include="..\..\..\include\spine\spine.h" />
+    <ClInclude Include="..\..\..\include\spine\TransformConstraint.h" />
+    <ClInclude Include="..\..\..\include\spine\TransformConstraintData.h" />
+    <ClInclude Include="..\..\..\include\spine\VertexAttachment.h" />
+    <ClInclude Include="src\Json.h" />
+    <ClInclude Include="src\kvec.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{04D5C584-8373-44F2-A6DF-568325CDC043}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -148,57 +218,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\include\spine\Animation.h" />
-    <ClInclude Include="..\..\..\include\spine\AnimationState.h" />
-    <ClInclude Include="..\..\..\include\spine\AnimationStateData.h" />
-    <ClInclude Include="..\..\..\include\spine\Atlas.h" />
-    <ClInclude Include="..\..\..\include\spine\AtlasAttachmentLoader.h" />
-    <ClInclude Include="..\..\..\include\spine\Attachment.h" />
-    <ClInclude Include="..\..\..\include\spine\AttachmentLoader.h" />
-    <ClInclude Include="..\..\..\include\spine\Bone.h" />
-    <ClInclude Include="..\..\..\include\spine\BoneData.h" />
-    <ClInclude Include="..\..\..\include\spine\BoundingBoxAttachment.h" />
-    <ClInclude Include="..\..\..\include\spine\Event.h" />
-    <ClInclude Include="..\..\..\include\spine\EventData.h" />
-    <ClInclude Include="..\..\..\include\spine\extension.h" />
-    <ClInclude Include="..\..\..\include\spine\MeshAttachment.h" />
-    <ClInclude Include="..\..\..\include\spine\RegionAttachment.h" />
-    <ClInclude Include="..\..\..\include\spine\Skeleton.h" />
-    <ClInclude Include="..\..\..\include\spine\SkeletonBounds.h" />
-    <ClInclude Include="..\..\..\include\spine\SkeletonData.h" />
-    <ClInclude Include="..\..\..\include\spine\SkeletonJson.h" />
-    <ClInclude Include="..\..\..\include\spine\Skin.h" />
-    <ClInclude Include="..\..\..\include\spine\Slot.h" />
-    <ClInclude Include="..\..\..\include\spine\SlotData.h" />
-    <ClInclude Include="..\..\..\include\spine\spine.h" />
-    <ClInclude Include="src\Json.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\Animation.c" />
-    <ClCompile Include="src\AnimationState.c" />
-    <ClCompile Include="src\AnimationStateData.c" />
-    <ClCompile Include="src\Atlas.c" />
-    <ClCompile Include="src\AtlasAttachmentLoader.c" />
-    <ClCompile Include="src\Attachment.c" />
-    <ClCompile Include="src\AttachmentLoader.c" />
-    <ClCompile Include="src\Bone.c" />
-    <ClCompile Include="src\BoneData.c" />
-    <ClCompile Include="src\BoundingBoxAttachment.c" />
-    <ClCompile Include="src\Event.c" />
-    <ClCompile Include="src\EventData.c" />
-    <ClCompile Include="src\extension.c" />
-    <ClCompile Include="src\Json.c" />
-    <ClCompile Include="src\MeshAttachment.c" />
-    <ClCompile Include="src\RegionAttachment.c" />
-    <ClCompile Include="src\Skeleton.c" />
-    <ClCompile Include="src\SkeletonBounds.c" />
-    <ClCompile Include="src\SkeletonData.c" />
-    <ClCompile Include="src\SkeletonJson.c" />
-    <ClCompile Include="src\Skin.c" />
-    <ClCompile Include="src\Slot.c" />
-    <ClCompile Include="src\SlotData.c" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

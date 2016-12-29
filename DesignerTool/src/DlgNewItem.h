@@ -33,7 +33,7 @@ public:
     
     QString GetPrefix();
 
-private slots:
+private Q_SLOTS:
     void on_chkNewPrefix_stateChanged(int arg1);
 
     void on_txtPrefix_textChanged(const QString &arg1);

@@ -34,7 +34,7 @@ public:
     QString GetName();
     QString GetFullPathNameMinusExt();
     
-private slots:
+private Q_SLOTS:
     void on_txtName_textChanged(const QString &arg1);
     
 private:

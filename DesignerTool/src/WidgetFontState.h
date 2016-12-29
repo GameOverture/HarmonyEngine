@@ -57,7 +57,7 @@ public:
     
     void UpdateActions();
     
-private slots:
+private Q_SLOTS:
     void on_cmbFontList_currentIndexChanged(int index);
 
     void on_cmbRenderMode_currentIndexChanged(int index);

@@ -205,13 +205,13 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     QList<eItemType> subDirList = HyGlobal::SubDirList();
-    foreach(eItemType eType, subDirList)
+    for(int i = 0; i < subDirList.size(); ++i)
     {
-        if(eType == ITEM_DirAtlases || eType == ITEM_DirAudioBanks)
+        if(subDirList[i] == ITEM_DirAtlases || subDirList[i] == ITEM_DirAudioBanks)
             continue;
 
-        QString sSubDirPath = GetAssetsAbsPath() % HyGlobal::ItemName(eType) % HyGlobal::ItemExt(eType);
-        Item *pSubDirItem = new Item(eType, sSubDirPath);
+        QString sSubDirPath = GetAssetsAbsPath() % HyGlobal::ItemName(subDirList[i]) % HyGlobal::ItemExt(subDirList[i]);
+        Item *pSubDirItem = new Item(subDirList[i], sSubDirPath);
 
         QTreeWidgetItem *pCurTreeItem = pSubDirItem->GetTreeItem();
         m_pTreeItemPtr->addChild(pCurTreeItem);

@@ -38,11 +38,11 @@ struct PreviewRow
     {
         float fMidRow = (m_iLargestHeight * 0.5f);
         float fPosY = 0.0f;
-        foreach(HyTexturedQuad2d *pFrame, m_Frames)
+        for(int i = 0; i < m_Frames.size(); ++i)
         {
-            fPosY = iStartPosY - (pFrame->GetHeight() * 0.5f) - fMidRow;
-            if(pFrame->pos.IsTweening() == false && pFrame->pos.Y() != fPosY)
-                pFrame->pos.Tween(pFrame->pos.X(), fPosY, fTRANS_DUR, HyTween::QuadInOut);
+            fPosY = iStartPosY - (m_Frames[i]->GetHeight() * 0.5f) - fMidRow;
+            if(m_Frames[i]->pos.IsTweening() == false && m_Frames[i]->pos.Y() != fPosY)
+                m_Frames[i]->pos.Tween(m_Frames[i]->pos.X(), fPosY, fTRANS_DUR, HyTween::QuadInOut);
         }
     }
 };
@@ -89,12 +89,12 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
     }
     else
     {
-        foreach(QFileInfo dir, metaAtlasDirs)
+        for(int i = 0; i < metaAtlasDirs.size(); ++i)
         {
-            if(dir.isDir())
+            if(metaAtlasDirs[i].isDir())
             {
                 bool bWorked = false;
-                int iId = dir.baseName().toInt(&bWorked);
+                int iId = metaAtlasDirs[i].baseName().toInt(&bWorked);
 
                 if(bWorked && iId >= 0)
                     AddAtlasGroup(iId);
@@ -245,14 +245,15 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
 {
     WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget());
     
-    foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
+    QList<HyGuiFrame *> atlasFrameList = atlasGrp.GetFrameList();
+    for(int i = 0; i < atlasFrameList.size(); ++i)
     {
-        pFrame->DrawInst(&atlasMan)->Load();
-        pFrame->DrawInst(&atlasMan)->SetEnabled(false);
-        pFrame->DrawInst(&atlasMan)->SetDisplayOrder(0);
-        pFrame->DrawInst(&atlasMan)->SetTint(1.0f, 1.0f, 1.0f);
-        pFrame->DrawInst(&atlasMan)->alpha.Set(1.0f);
-        pFrame->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
+        atlasFrameList[i]->DrawInst(&atlasMan)->Load();
+        atlasFrameList[i]->DrawInst(&atlasMan)->SetEnabled(false);
+        atlasFrameList[i]->DrawInst(&atlasMan)->SetDisplayOrder(0);
+        atlasFrameList[i]->DrawInst(&atlasMan)->SetTint(1.0f, 1.0f, 1.0f);
+        atlasFrameList[i]->DrawInst(&atlasMan)->alpha.Set(1.0f);
+        atlasFrameList[i]->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
     }
 
     atlasGrp.ResizeAtlasListColumns();
@@ -268,8 +269,9 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
     {
         WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->widget(i));
         
-        foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
-            pFrame->DrawInst(&atlasMan)->SetEnabled(false);
+        QList<HyGuiFrame *> atlasGroupFrameList = atlasGrp.GetFrameList();
+        for(int j = 0; j < atlasGroupFrameList.size(); ++j)
+            atlasGroupFrameList[j]->DrawInst(&atlasMan)->SetEnabled(false);
     }
 }
 
@@ -344,15 +346,16 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
         pHoveredFrame = v.value<HyGuiFrame *>();
     }
 
-    foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
+    QList<HyGuiFrame *> atlasGrpFrameList = atlasGrp.GetFrameList();
+    for(int i = 0; i < atlasGrpFrameList.size(); ++i)
     {
-        if(pHoveredFrame != pFrame && pFrame)
+        if(pHoveredFrame != atlasGrpFrameList[i] && atlasGrpFrameList[i])
         {
-            pFrame->DrawInst(&atlasMan)->SetEnabled(false);
-            pFrame->DrawInst(&atlasMan)->SetDisplayOrder(0);
-            pFrame->DrawInst(&atlasMan)->SetTint(1.0f, 1.0f, 1.0f);
-            pFrame->DrawInst(&atlasMan)->alpha.Set(1.0f);
-            pFrame->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
+            atlasGrpFrameList[i]->DrawInst(&atlasMan)->SetEnabled(false);
+            atlasGrpFrameList[i]->DrawInst(&atlasMan)->SetDisplayOrder(0);
+            atlasGrpFrameList[i]->DrawInst(&atlasMan)->SetTint(1.0f, 1.0f, 1.0f);
+            atlasGrpFrameList[i]->DrawInst(&atlasMan)->alpha.Set(1.0f);
+            atlasGrpFrameList[i]->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
         }
     }
 
@@ -424,9 +427,9 @@ void WidgetAtlasManager::AddAtlasGroup(int iId /*= -1*/)
         // Find first available directory name
         iId = 0;
         QFileInfoList atlasDirs = m_MetaDir.entryInfoList(QDir::Dirs, QDir::Name);
-        foreach(QFileInfo info, atlasDirs)
+        for(int i = 0; i < atlasDirs.size(); ++i)
         {
-            if(info.isDir() && info.baseName().toInt() == iId)
+            if(atlasDirs[i].isDir() && atlasDirs[i].baseName().toInt() == iId)
                 iId++;
         }
         
@@ -577,8 +580,10 @@ void WidgetAtlasManager::on_cmbAtlasGroups_currentIndexChanged(int index)
 
     // Unload the old atlas group draw instances
     WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(ui->atlasGroups->currentWidget());
-    foreach(HyGuiFrame *pFrame, atlasGrp.GetFrameList())
-         pFrame->DrawInst(this)->Unload();
+    
+    QList<HyGuiFrame *> atlasGrpFrameList = atlasGrp.GetFrameList();
+    for(int i = 0; i < atlasGrpFrameList.size(); ++i)
+         atlasGrpFrameList[i]->DrawInst(this)->Unload();
 
     m_pProjOwner->Reset();
 

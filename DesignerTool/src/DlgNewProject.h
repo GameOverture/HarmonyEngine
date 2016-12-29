@@ -33,7 +33,7 @@ public:
 
     bool IsCreatingGameDir();
 
-private slots:
+private Q_SLOTS:
 
     void ErrorCheck();
 

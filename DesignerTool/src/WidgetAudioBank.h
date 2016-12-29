@@ -44,7 +44,7 @@ public:
     
     int GetId();
 
-private slots:
+private Q_SLOTS:
     void on_btnAddWaves_pressed();
 
     void on_btnAddDir_pressed();

@@ -83,7 +83,7 @@ public:
     friend void AtlasManager_DrawHide(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
 
-private slots:
+private Q_SLOTS:
     void on_atlasGroups_currentChanged(int iIndex);
 
     void on_btnAddGroup_clicked();

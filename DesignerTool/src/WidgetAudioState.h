@@ -38,7 +38,7 @@ public:
     
     void UpdateActions();
     
-private slots:
+private Q_SLOTS:
     
     void on_cmbCategory_currentIndexChanged(int index);
     

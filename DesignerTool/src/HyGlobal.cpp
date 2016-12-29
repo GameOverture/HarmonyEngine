@@ -24,10 +24,10 @@
 
 QAction *FindAction(QList<QAction *> list, QString sName)
 {
-    foreach(QAction *pAction, list)
+    for(int i = 0; i < list.size(); ++i)
     {
-        if(pAction->objectName() == sName)
-            return pAction;
+        if(list[i]->objectName() == sName)
+            return list[i];
     }
     
     return NULL;

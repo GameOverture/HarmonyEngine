@@ -52,7 +52,7 @@ private:
     
     QTreeWidgetItem *GetSelectedTreeItem();
     
-private slots:
+private Q_SLOTS:
     void OnContextMenu(const QPoint &pos);
     void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_treeWidget_itemSelectionChanged();

@@ -45,7 +45,7 @@ public:
                          bool centerOnParent = true,
                          bool disableParentWhenSpinning = true);
 
-public slots:
+public Q_SLOTS:
     void start();
     void stop();
 
@@ -73,7 +73,7 @@ public:
 
     bool isSpinning() const;
 
-private slots:
+private Q_SLOTS:
     void rotate();
 
 protected:

@@ -10,8 +10,11 @@
 #include "WidgetSpine.h"
 #include "ui_WidgetSpine.h"
 
-WidgetSpine::WidgetSpine(QWidget *parent) : QWidget(parent),
-                                            ui(new Ui::WidgetSpine)
+#include "ItemSpine.h"
+
+WidgetSpine::WidgetSpine(ItemSpine *pItemSpine, QWidget *parent) :  QWidget(parent),
+                                                                    ui(new Ui::WidgetSpine),
+                                                                    m_pItemSpine(pItemSpine)
 {
     ui->setupUi(this);
 }

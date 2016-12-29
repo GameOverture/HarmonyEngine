@@ -87,7 +87,7 @@ public:
     bool IsSaveClean();
     void DiscardChanges();
 
-private slots:
+private Q_SLOTS:
     void on_undoStack_cleanChanged(bool bClean);
     
 };

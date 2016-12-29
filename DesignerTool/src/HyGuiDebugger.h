@@ -42,12 +42,12 @@ public:
     
     void WriteReloadPacket(QStringList &sPaths);
     
-signals:
+Q_SIGNALS:
     
-public slots:
+public Q_SLOTS:
     void OnHostFound();
 
-private slots:
+private Q_SLOTS:
     void ReadData();
     void OnError(QAbstractSocket::SocketError socketError);
     

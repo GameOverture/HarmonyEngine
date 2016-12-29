@@ -124,7 +124,7 @@ public:
     
     void GetSaveInfo(QJsonObject &fontObj);
 
-private slots:
+private Q_SLOTS:
     void on_cmbAtlasGroups_currentIndexChanged(int index);
 
     void on_chk_09_clicked();

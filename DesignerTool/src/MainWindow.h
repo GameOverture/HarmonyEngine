@@ -68,7 +68,7 @@ public:
     
     static HyRendererInterop *GetCurrentRenderer();
 
-private slots:
+private Q_SLOTS:
     void on_actionNewProject_triggered();
     void on_actionOpenProject_triggered();
     void on_actionCloseProject_triggered();

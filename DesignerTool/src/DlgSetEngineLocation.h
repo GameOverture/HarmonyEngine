@@ -30,7 +30,7 @@ public:
     
     QString SelectedDir();
     
-private slots:
+private Q_SLOTS:
     void on_listView_doubleClicked(const QModelIndex &index);
     
     void on_txtCurDirectory_editingFinished();

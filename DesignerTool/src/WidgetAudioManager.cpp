@@ -65,12 +65,12 @@ WidgetAudioManager::WidgetAudioManager(ItemProject *pProjOwner, QWidget *parent)
     }
     else
     {
-        foreach(QFileInfo dir, metaAudioBankDirs)
+        for(int i = 0; i < metaAudioBankDirs.size(); ++i)
         {
-            if(dir.isDir())
+            if(metaAudioBankDirs[i].isDir())
             {
                 bool bWorked = false;
-                int iId = dir.baseName().toInt(&bWorked);
+                int iId = metaAudioBankDirs[i].baseName().toInt(&bWorked);
 
                 if(bWorked && iId >= 0)
                     AddAudioBankGroup(iId);
@@ -130,9 +130,9 @@ void WidgetAudioManager::AddAudioBankGroup(int iId /*= -1*/)
         // Find first available directory name
         iId = 0;
         QFileInfoList audioBankDirs = m_MetaDir.entryInfoList(QDir::Dirs, QDir::Name);
-        foreach(QFileInfo info, audioBankDirs)
+        for(int i = 0; i < audioBankDirs.size(); ++i)
         {
-            if(info.isDir() && info.baseName().toInt() == iId)
+            if(audioBankDirs[i].isDir() && audioBankDirs[i].baseName().toInt() == iId)
                 iId++;
         }
         

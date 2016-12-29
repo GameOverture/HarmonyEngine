@@ -96,7 +96,7 @@ public:
     void OverrideDraw();
     void Reset();
 
-private slots:
+private Q_SLOTS:
     void on_tabBar_currentChanged(int index);
 
     void on_save_triggered();

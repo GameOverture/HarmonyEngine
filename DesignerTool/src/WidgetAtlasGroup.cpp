@@ -212,8 +212,8 @@ void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObjOut)
         frameArrayList[m_FrameList[i]->GetTextureIndex()].append(frameObj);
     }
     
-    foreach(QJsonArray frameArray, frameArrayList)
-        textureArray.append(frameArray);
+    for(int i = 0; i < frameArrayList.size(); ++i)
+        textureArray.append(frameArrayList[i]);
     
     atlasObjOut.insert("textures", textureArray);
 }
@@ -353,8 +353,9 @@ void WidgetAtlasGroup::Refresh()
     ui->atlasList->clear();
     m_Packer.clear();
     QStringList sTextureNames = m_DataDir.entryList(QDir::NoDotAndDotDot);
-    foreach(QString sTexName, sTextureNames)
-        QFile::remove(sTexName);
+    
+    for(int i = 0; i < sTextureNames.size(); ++i)
+        QFile::remove(sTextureNames[i]);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // REPOPULATING THE PACKER WITH 'm_FrameList'

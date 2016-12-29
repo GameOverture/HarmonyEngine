@@ -63,7 +63,7 @@ public:
     
     void UpdateActions();
 
-private slots:
+private Q_SLOTS:
     void on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection);
     
     void on_actionPlay_triggered();

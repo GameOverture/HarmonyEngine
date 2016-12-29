@@ -16,12 +16,16 @@ namespace Ui {
 class WidgetSpine;
 }
 
+class ItemSpine;
+
 class WidgetSpine : public QWidget
 {
     Q_OBJECT
+    
+    ItemSpine *     m_pItemSpine;
 
 public:
-    explicit WidgetSpine(QWidget *parent = 0);
+    explicit WidgetSpine(ItemSpine *pItemSpine, QWidget *parent = 0);
     ~WidgetSpine();
 
 private:

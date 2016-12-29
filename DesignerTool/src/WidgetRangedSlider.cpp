@@ -215,7 +215,7 @@ void WidgetRangedSlider::on_sbMin_Double_editingFinished()
     QVariant newMin(ui->sbMin_Double->value());
     QVariant newMax(ui->sbMax_Double->value());
     
-    emit userChangedRangedValue(oldMin, oldMax, newMin, newMax);
+    Q_EMIT userChangedRangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_sbMax_Double_editingFinished()
@@ -226,7 +226,7 @@ void WidgetRangedSlider::on_sbMax_Double_editingFinished()
     QVariant newMin(ui->sbMin_Double->value());
     QVariant newMax(ui->sbMax_Double->value());
     
-    emit userChangedRangedValue(oldMin, oldMax, newMin, newMax);
+    Q_EMIT userChangedRangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_sbMin_Int_editingFinished()
@@ -237,7 +237,7 @@ void WidgetRangedSlider::on_sbMin_Int_editingFinished()
     QVariant newMin(ui->sbMin_Int->value());
     QVariant newMax(ui->sbMax_Int->value());
     
-    emit userChangedRangedValue(oldMin, oldMax, newMin, newMax);
+    Q_EMIT userChangedRangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_sbMax_Int_editingFinished()
@@ -248,7 +248,7 @@ void WidgetRangedSlider::on_sbMax_Int_editingFinished()
     QVariant newMin(ui->sbMin_Int->value());
     QVariant newMax(ui->sbMax_Int->value());
     
-    emit userChangedRangedValue(oldMin, oldMax, newMin, newMax);
+    Q_EMIT userChangedRangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_maxSlider_sliderMoved(int position)
@@ -282,7 +282,7 @@ void WidgetRangedSlider::on_maxSlider_sliderMoved(int position)
         newMax = QVariant(ui->sbMax_Double->value());
     }
     
-    emit userChangedRangedValue(oldMin, oldMax, newMin, newMax);
+    Q_EMIT userChangedRangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_minSlider_sliderMoved(int position)
@@ -316,7 +316,7 @@ void WidgetRangedSlider::on_minSlider_sliderMoved(int position)
         newMax = QVariant(ui->sbMax_Double->value());
     }
     
-    emit userChangedRangedValue(oldMin, oldMax, newMin, newMax);
+    Q_EMIT userChangedRangedValue(oldMin, oldMax, newMin, newMax);
 }
 
 void WidgetRangedSlider::on_sbSingle_Int_editingFinished()
@@ -325,7 +325,7 @@ void WidgetRangedSlider::on_sbSingle_Int_editingFinished()
     OnDataCorrect();
     QVariant newValue(ui->sbSingle_Int->value());
     
-    emit userChangedSingleValue(oldValue, newValue);
+    Q_EMIT userChangedSingleValue(oldValue, newValue);
 }
 
 void WidgetRangedSlider::on_sbSingle_Double_editingFinished()
@@ -334,7 +334,7 @@ void WidgetRangedSlider::on_sbSingle_Double_editingFinished()
     OnDataCorrect();
     QVariant newValue(ui->sbSingle_Double->value());
     
-    emit userChangedSingleValue(oldValue, newValue);
+    Q_EMIT userChangedSingleValue(oldValue, newValue);
 }
 
 void WidgetRangedSlider::on_singleSlider_sliderMoved(int position)
@@ -363,5 +363,5 @@ void WidgetRangedSlider::on_singleSlider_sliderMoved(int position)
         newValue = QVariant(ui->sbSingle_Double->value());
     }
     
-    emit userChangedSingleValue(oldValue, newValue);
+    Q_EMIT userChangedSingleValue(oldValue, newValue);
 }

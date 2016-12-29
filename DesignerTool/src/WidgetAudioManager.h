@@ -45,7 +45,7 @@ public:
     
     WidgetAudioCategoryModel *GetCategoryModel();
 
-private slots:
+private Q_SLOTS:
     void on_cmbAudioBanks_currentIndexChanged(int index);
     
     void on_actionAddCategory_triggered();

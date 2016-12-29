@@ -243,8 +243,8 @@ public:
         QList<eItemType> itemList = SubDirList();
         
         QStringList list;
-        foreach(eItemType eType, itemList)
-            list.append(sm_sItemNames[eType]);
+        for(int i = 0; i < itemList.size(); ++i)
+            list.append(sm_sItemNames[itemList[i]]);
         
         return list;
     }

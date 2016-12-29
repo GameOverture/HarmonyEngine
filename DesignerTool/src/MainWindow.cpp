@@ -151,10 +151,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     m_Settings.beginGroup("OpenData");
     {
         QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
-        foreach(QString sProjPath, sListOpenProjs)
-        {
-            ui->explorer->AddItemProject(sProjPath, false);
-        }
+        for(int i = 0; i < sListOpenProjs.size(); ++i)
+            ui->explorer->AddItemProject(sListOpenProjs[i], false);
         
         //QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
         //sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
