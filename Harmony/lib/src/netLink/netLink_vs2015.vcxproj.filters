@@ -28,46 +28,46 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\netlink\config.h">
+    <ClInclude Include="..\..\..\include\netlink\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\core.h">
+    <ClInclude Include="..\..\..\include\netlink\core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\exception.h">
+    <ClInclude Include="..\..\..\include\netlink\exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\netlink.h">
+    <ClInclude Include="..\..\..\include\netlink\netlink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\release_manager.h">
+    <ClInclude Include="..\..\..\include\netlink\release_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\release_manager.inline.h">
+    <ClInclude Include="..\..\..\include\netlink\release_manager.inline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\smart_buffer.h">
+    <ClInclude Include="..\..\..\include\netlink\smart_buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\smart_buffer.inline.h">
+    <ClInclude Include="..\..\..\include\netlink\smart_buffer.inline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\socket.h">
+    <ClInclude Include="..\..\..\include\netlink\socket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\socket.inline.h">
+    <ClInclude Include="..\..\..\include\netlink\socket.inline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\socket_group.h">
+    <ClInclude Include="..\..\..\include\netlink\socket_group.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\socket_group.inline.h">
+    <ClInclude Include="..\..\..\include\netlink\socket_group.inline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\util.h">
+    <ClInclude Include="..\..\..\include\netlink\util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\netlink\util.inline.h">
+    <ClInclude Include="..\..\..\include\netlink\util.inline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
