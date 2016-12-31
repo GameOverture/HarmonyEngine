@@ -102,6 +102,12 @@ struct HyRectangle
 	{
 		return abs(bottom - top);
 	}
+
+	// Does not compare tags
+	bool operator==(const HyRectangle<T> &rhs) const
+	{
+		return (0 == memcmp(this, &rhs, sizeof(T) * 4));
+	}
 };
 
 #endif /* __HyMath_h__ */

@@ -110,6 +110,16 @@ void IHyInst2d::SetTint(float fR, float fG, float fB)
 	botColor.Set(fR, fG, fB);
 }
 
+void IHyInst2d::SetScissor(uint32 uiX, uint32 uiY, uint32 uiWidth, uint32 uiHeight)
+{
+	m_RenderState.SetScissorRect(uiX, uiY, uiWidth, uiHeight);
+}
+
+void IHyInst2d::ClearScissor()
+{
+	m_RenderState.ClearScissorRect();
+}
+
 int32 IHyInst2d::GetShaderId()
 {
 	return m_RenderState.GetShaderId();

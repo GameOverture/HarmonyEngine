@@ -12,6 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
+#include "Utilities/HyMath.h"
+
 // Forward declaration
 class IHyInst2d;
 class HyShaderUniforms;
@@ -47,6 +49,8 @@ private:
 	uint32				m_uiNumVerticesPerInstance;
 	size_t				m_uiDataOffset;
 
+	HyRectangle<uint32>	m_ScissorRect;
+
 public:
 	HyRenderState();
 	~HyRenderState(void);
@@ -60,6 +64,11 @@ public:
 
 	uint32 GetNumVerticesPerInstance();
 	void SetNumVerticesPerInstance(uint32 uiNumVerts);
+
+	bool IsScissorRect();
+	const HyRectangle<uint32> &GetScissorRect();
+	void SetScissorRect(uint32 uiX, uint32 uiY, uint32 uiWidth, uint32 uiHeight);
+	void ClearScissorRect();
 
 	void Enable(uint32 uiAttributes);
 	void Disable(uint32 uiAttributes);

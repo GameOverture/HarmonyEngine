@@ -66,6 +66,7 @@ glm::vec2 textBoxSize;
 	m_TestSprite.topColor.Set(0.0f, 1.0f, 0.0f);
 	m_TestSprite.botColor.Set(1.0f, 0.0f, 0.0f);
 	m_TestSprite.alpha.Set(0.5f);
+	
 
 	m_TestText.Load();
 	m_TestText.TextSetAlignment(HYALIGN_Right);
@@ -116,9 +117,10 @@ glm::vec2 textBoxSize;
 	m_TestGrid.Load();
 
 
-	m_BoxTest.pos.Set(100.0f, 23.0f);
+	m_BoxTest.pos.Set(0, 0);
 	m_BoxTest.SetAsQuad(200.0f, 100.0f, false);
 	m_BoxTest.Load();
+	m_BoxTest.SetScissor(366, 359, 100, 100);
 
 
 	return true;

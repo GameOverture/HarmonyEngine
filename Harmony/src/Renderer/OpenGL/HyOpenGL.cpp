@@ -109,6 +109,17 @@ HyOpenGL::~HyOpenGL(void)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	if(renderState.IsScissorRect())
+	{
+		const HyRectangle<uint32> &scissorRectRef = renderState.GetScissorRect();
+		glScissor(scissorRectRef.left, scissorRectRef.bottom, scissorRectRef.right, scissorRectRef.top);
+		glEnable(GL_SCISSOR_TEST);
+	}
+	else
+		glDisable(GL_SCISSOR_TEST);
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	// Always attempt to assign these uniforms if the shader chooses to use them
 	pShader->SetUniformGLSL("mtxWorldToCamera", m_mtxView);
 	pShader->SetUniformGLSL("mtxCameraToClip", m_mtxProj);

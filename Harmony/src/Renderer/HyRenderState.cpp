@@ -18,7 +18,8 @@ HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
 									m_uiUniformsCrc32(0),
 									m_uiNumInstances(0),
 									m_uiNumVerticesPerInstance(0),
-									m_uiDataOffset(0)
+									m_uiDataOffset(0),
+									m_ScissorRect(0, 0, 0, 0)
 {
 }
 
@@ -60,6 +61,31 @@ uint32 HyRenderState::GetNumVerticesPerInstance()
 void HyRenderState::SetNumVerticesPerInstance(uint32 uiNumVerts)
 {
 	m_uiNumVerticesPerInstance = uiNumVerts;
+}
+
+bool HyRenderState::IsScissorRect()
+{
+	return m_ScissorRect.iTag != 0;
+}
+
+const HyRectangle<uint32> &HyRenderState::GetScissorRect()
+{
+	return m_ScissorRect;
+}
+
+void HyRenderState::SetScissorRect(uint32 uiX, uint32 uiY, uint32 uiWidth, uint32 uiHeight)
+{
+	m_ScissorRect.left = uiX;
+	m_ScissorRect.bottom = uiY;
+	m_ScissorRect.right = uiWidth;
+	m_ScissorRect.top = uiHeight;
+
+	m_ScissorRect.iTag = 1;
+}
+
+void HyRenderState::ClearScissorRect()
+{
+	memset(&m_ScissorRect, 0, sizeof(HyRectangle<uint32>));
 }
 
 void HyRenderState::Enable(uint32 uiAttributes)
@@ -117,7 +143,8 @@ bool HyRenderState::operator==(const HyRenderState &right) const
 	if(m_uiAttributeFlags == right.m_uiAttributeFlags &&
 	   m_uiTextureBindHandle == right.m_uiTextureBindHandle &&
 	   m_iShaderId == right.m_iShaderId &&
-	   m_uiUniformsCrc32 == right.m_uiUniformsCrc32)
+	   m_uiUniformsCrc32 == right.m_uiUniformsCrc32 &&
+	   m_ScissorRect == right.m_ScissorRect)
 	{
 		return true;
 	}
