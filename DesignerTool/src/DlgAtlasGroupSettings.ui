@@ -87,6 +87,9 @@
         </item>
         <item row="1" column="1">
          <widget class="QComboBox" name="cmbRotationStrategy">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="minimumSize">
            <size>
             <width>130</width>
@@ -97,7 +100,7 @@
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotation strategy. Packer may rotate images by following formulas:&lt;/p&gt;&lt;p&gt;- Only when necessary - rotate only when necessary&lt;/p&gt;&lt;p&gt;- Never - disable rotation&lt;/p&gt;&lt;p&gt;- Height / 2 &amp;lt; Width &amp;lt; Height&lt;/p&gt;&lt;p&gt;- Width &amp;gt; Height&lt;/p&gt;&lt;p&gt;- Width &amp;gt; 2 * Height&lt;/p&gt;&lt;p&gt;- Width / 2 &amp;lt; Height &amp;lt; Width&lt;/p&gt;&lt;p&gt;- Height &amp;gt; Width&lt;/p&gt;&lt;p&gt;- Height &amp;gt; 2 * Width&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <item>
            <property name="text">

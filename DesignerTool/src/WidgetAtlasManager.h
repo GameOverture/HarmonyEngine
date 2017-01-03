@@ -100,7 +100,7 @@ private:
     void PreviewAtlasGroup();
     void HideAtlasGroup();
 
-    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY, QString sFilter, uint uiErrors);
+    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, int iX, int iY, QString sFilter, uint uiErrors);
     void RemoveImage(HyGuiFrame *pFrame, QDir metaDir);
 
     void SaveData();

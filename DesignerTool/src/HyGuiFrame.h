@@ -34,7 +34,6 @@ class HyGuiFrame
     QRect                               m_rAlphaCrop;
 
     int                                 m_iTextureIndex;
-    bool                                m_bRotation;
 
     int                                 m_iPosX;
     int                                 m_iPosY;
@@ -48,7 +47,7 @@ class HyGuiFrame
     uint                                m_uiErrors; // '0' when there is no error
 
     // Private ctor as WidgetAtlasManager should only construct these
-    HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY, QString sFilter, uint uiErrors);
+    HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, int iX, int iY, QString sFilter, uint uiErrors);
     ~HyGuiFrame();
     
 public:
@@ -73,13 +72,12 @@ public:
     eAtlasNodeType GetType()                    { return m_eType; }
 
     int GetTextureIndex()                       { return m_iTextureIndex; }
-    bool IsRotated()                            { return m_bRotation; }
     int GetX()                                  { return m_iPosX; }
     int GetY()                                  { return m_iPosY; }
     QString GetFilter();
     void SetFilter(QString sFilter);
 
-    void UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX, int iY);
+    void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY);
 
     QString ConstructImageFileName();
 

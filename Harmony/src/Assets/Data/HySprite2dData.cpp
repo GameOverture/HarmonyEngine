@@ -86,7 +86,6 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 												 uiTextureIndex,
 												 rUVRect.left, rUVRect.top, rUVRect.right, rUVRect.bottom,
 												 glm::ivec2(static_cast<int32>(frameObj.get<jsonxx::Number>("offsetX")), static_cast<int32>(frameObj.get<jsonxx::Number>("offsetY"))),
-												 rUVRect.iTag == 0 ? false : true,
 												 static_cast<float>(frameObj.get<jsonxx::Number>("duration")));
 	}
 }

@@ -21,7 +21,6 @@ struct HySprite2dFrame
 	HyAtlasGroup *				pAtlasGroup;
 	const uint32				uiTEXTUREINDEX;
 	const HyRectangle<float>	rSRC_RECT;
-	const bool					bROTATED;
 	const glm::ivec2			vOFFSET;
 	const float					fDURATION;
 
@@ -32,11 +31,9 @@ struct HySprite2dFrame
 					float fSrcRight,
 					float fSrcBot,
 					glm::ivec2 vOffset,
-					bool bRotated,
 					float fDuration) :	pAtlasGroup(pAtlasGrp),
 										uiTEXTUREINDEX(uiTextureIndex),
 										rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot),
-										bROTATED(bRotated),
 										vOFFSET(vOffset),
 										fDURATION(fDuration)
 	{ }

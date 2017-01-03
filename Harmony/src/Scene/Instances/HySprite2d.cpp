@@ -293,12 +293,6 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	pRefDataWritePos += sizeof(glm::vec2);
 
 	glm::vec2 vOffset(frameRef.vOFFSET.x, frameRef.vOFFSET.y);
-	if(frameRef.bROTATED)
-	{
-		vOffset.x = static_cast<float>(frameRef.vOFFSET.y);
-		vOffset.y = static_cast<float>(frameRef.vOFFSET.x);
-	}
-
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vOffset;
 	pRefDataWritePos += sizeof(glm::vec2);
 
@@ -338,9 +332,6 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	pRefDataWritePos += sizeof(glm::vec2);
 
 	GetWorldTransform(*reinterpret_cast<glm::mat4 *>(pRefDataWritePos));
-
-	if(frameRef.bROTATED)
-		*reinterpret_cast<glm::mat4 *>(pRefDataWritePos) = glm::rotate(*reinterpret_cast<glm::mat4 *>(pRefDataWritePos), 90.0f, glm::vec3(0, 0, 1));
 
 	pRefDataWritePos += sizeof(glm::mat4);
 }

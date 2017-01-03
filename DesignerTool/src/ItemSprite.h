@@ -34,16 +34,8 @@ public:
     {
         QPoint ptRenderOffset;
         
-        if(m_pFrame->IsRotated())
-        {
-            ptRenderOffset.setX(m_vOffset.x() + m_pFrame->GetCrop().top());
-            ptRenderOffset.setY(m_vOffset.y() + (m_pFrame->GetSize().width() - m_pFrame->GetCrop().right()));
-        }
-        else
-        {
-            ptRenderOffset.setX(m_vOffset.x() + m_pFrame->GetCrop().left());
-            ptRenderOffset.setY(m_vOffset.y() + (m_pFrame->GetSize().height() - m_pFrame->GetCrop().bottom()));
-        }
+        ptRenderOffset.setX(m_vOffset.x() + m_pFrame->GetCrop().left());
+        ptRenderOffset.setY(m_vOffset.y() + (m_pFrame->GetSize().height() - m_pFrame->GetCrop().bottom()));
 
         return ptRenderOffset;
     }

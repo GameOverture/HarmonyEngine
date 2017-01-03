@@ -10,20 +10,19 @@
 #include "HyGuiFrame.h"
 #include "scriptum/imagepacker.h"
 
-HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY, QString sFilter, uint uiErrors) : m_uiATLAS_GROUP_ID(uiAtlasGroupId),
-                                                                                                                                                                                                                m_eType(eType),
-                                                                                                                                                                                                                m_pTreeWidgetItem(NULL),
-                                                                                                                                                                                                                m_uiChecksum(uiChecksum),
-                                                                                                                                                                                                                m_sName(sN),
-                                                                                                                                                                                                                m_iWidth(iW),
-                                                                                                                                                                                                                m_iHeight(iH),
-                                                                                                                                                                                                                m_rAlphaCrop(rAlphaCrop),
-                                                                                                                                                                                                                m_iTextureIndex(iTexIndex),
-                                                                                                                                                                                                                m_bRotation(bRot),
-                                                                                                                                                                                                                m_iPosX(iX),
-                                                                                                                                                                                                                m_iPosY(iY),
-                                                                                                                                                                                                                m_sFilter(sFilter),
-                                                                                                                                                                                                                m_uiErrors(uiErrors)
+HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, int iX, int iY, QString sFilter, uint uiErrors) : m_uiATLAS_GROUP_ID(uiAtlasGroupId),
+                                                                                                                                                                                                     m_eType(eType),
+                                                                                                                                                                                                     m_pTreeWidgetItem(NULL),
+                                                                                                                                                                                                     m_uiChecksum(uiChecksum),
+                                                                                                                                                                                                     m_sName(sN),
+                                                                                                                                                                                                     m_iWidth(iW),
+                                                                                                                                                                                                     m_iHeight(iH),
+                                                                                                                                                                                                     m_rAlphaCrop(rAlphaCrop),
+                                                                                                                                                                                                     m_iTextureIndex(iTexIndex),
+                                                                                                                                                                                                     m_iPosX(iX),
+                                                                                                                                                                                                     m_iPosY(iY),
+                                                                                                                                                                                                     m_sFilter(sFilter),
+                                                                                                                                                                                                     m_uiErrors(uiErrors)
 {
 }
 
@@ -70,7 +69,6 @@ void HyGuiFrame::ReplaceImage(QString sName, QImage &newImage, QDir metaDir)
         m_rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
 
     m_iTextureIndex = -1;
-    m_bRotation = false;
     m_iPosX = -1;
     m_iPosY = -1;
 
@@ -86,10 +84,7 @@ HyTexturedQuad2d *HyGuiFrame::DrawInst(void *pKey)
     
     // Not found, create a new HyTexturedQuad2d based on key
     HyTexturedQuad2d *pDrawInst = new HyTexturedQuad2d(m_uiATLAS_GROUP_ID);
-    if(m_bRotation == false)
-        pDrawInst->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.width(), m_rAlphaCrop.height());
-    else
-        pDrawInst->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.height(), m_rAlphaCrop.width());
+    pDrawInst->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.width(), m_rAlphaCrop.height());
 
     pDrawInst->SetEnabled(false);
     pDrawInst->SetTag(reinterpret_cast<int64>(this));
@@ -135,10 +130,9 @@ void HyGuiFrame::SetFilter(QString sFilter)
     m_sFilter = sFilter;
 }
 
-void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX, int iY)
+void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 {
     m_iTextureIndex = iTextureIndex;
-    m_bRotation = bRotation;
     m_iPosX = iX;
     m_iPosY = iY;
 
@@ -148,11 +142,7 @@ void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, bool bRotation, int iX,
         while(iter.hasNext())
         {
             iter.next();
-            
-            if(m_bRotation == false)
-                iter.value()->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.width(), m_rAlphaCrop.height());
-            else
-                iter.value()->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.height(), m_rAlphaCrop.width());
+            iter.value()->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.width(), m_rAlphaCrop.height());
         }
     }
     else
@@ -176,7 +166,6 @@ void HyGuiFrame::GetJsonObj(QJsonObject &frameObj)
     frameObj.insert("height", QJsonValue(GetSize().height()));
     frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));
     frameObj.insert("type", QJsonValue(GetType()));
-    frameObj.insert("rotate", QJsonValue(IsRotated()));
     frameObj.insert("x", QJsonValue(GetX()));
     frameObj.insert("y", QJsonValue(GetY()));
     frameObj.insert("cropLeft", QJsonValue(GetCrop().left()));

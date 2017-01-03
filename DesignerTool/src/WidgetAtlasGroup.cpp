@@ -113,7 +113,6 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
                                                             frameObj["width"].toInt(),
                                                             frameObj["height"].toInt(),
                                                             frameObj["textureIndex"].toInt(),
-                                                            frameObj["rotate"].toBool(),
                                                             frameObj["x"].toInt(),
                                                             frameObj["y"].toInt(),
                                                             frameObj["filter"].toString(),
@@ -193,21 +192,12 @@ void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObjOut)
         
         QJsonObject frameObj;
         frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FrameList[i]->GetChecksum())));
-        frameObj.insert("rotate", QJsonValue(m_FrameList[i]->IsRotated()));
 
         frameObj.insert("left", QJsonValue(m_FrameList[i]->GetX()));
         frameObj.insert("top", QJsonValue(m_FrameList[i]->GetY()));
         
-        if(m_FrameList[i]->IsRotated())
-        {
-            frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().height()));
-            frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().width()));
-        }
-        else
-        {
-            frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().width()));
-            frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().height()));
-        }
+        frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().width()));
+        frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().height()));
         
         frameArrayList[m_FrameList[i]->GetTextureIndex()].append(frameObj);
     }
@@ -330,7 +320,7 @@ HyGuiFrame *WidgetAtlasGroup::ImportImage(QString sName, QImage &newImage, eAtla
     if(eType != ATLAS_Font && eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
         rAlphaCrop = ImagePacker::crop(newImage);
 
-    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, false, -1, -1, "", 0);
+    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, -1, -1, "", 0);
     if(pNewFrame)
     {
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
@@ -413,7 +403,6 @@ void WidgetAtlasGroup::Refresh()
         HyGuiFrame *pFrame = reinterpret_cast<HyGuiFrame *>(imgInfoRef.id);
 
         pFrame->UpdateInfoFromPacker(bValid ? imgInfoRef.textureId : -1,
-                                    imgInfoRef.rotated,
                                     imgInfoRef.pos.x() + m_Packer.border.l,
                                     imgInfoRef.pos.y() + m_Packer.border.t);
 
@@ -441,16 +430,16 @@ void WidgetAtlasGroup::Refresh()
             crop = imgInfoRef.crop;
         }
 
-        if(imgInfoRef.rotated)
-        {
-            QTransform rotateTransform;
-            rotateTransform.rotate(90);
-            imgFrame = imgFrame.transformed(rotateTransform);
+//        if(imgInfoRef.rotated)
+//        {
+//            QTransform rotateTransform;
+//            rotateTransform.rotate(90);
+//            imgFrame = imgFrame.transformed(rotateTransform);
 
-            size.transpose();
-            crop = QRect(imgInfoRef.size.height() - crop.y() - crop.height(),
-                         crop.x(), crop.height(), crop.width());
-        }
+//            size.transpose();
+//            crop = QRect(imgInfoRef.size.height() - crop.y() - crop.height(),
+//                         crop.x(), crop.height(), crop.width());
+//        }
 
         QPainter &p = *ppPainters[pFrame->GetTextureIndex()];
         QPoint pos(pFrame->GetX(), pFrame->GetY());

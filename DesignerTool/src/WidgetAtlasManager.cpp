@@ -324,11 +324,6 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
             pFrame->DrawInst(&atlasMan)->SetDisplayOrder(100);
             pFrame->DrawInst(&atlasMan)->pos.Set((uiRENDERWIDTH * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetWidth() * -0.5f),
                                                  (uiRENDERHEIGHT * 0.5f) + (pFrame->DrawInst(&atlasMan)->GetHeight() * -0.5f));
-            if(pFrame->IsRotated())
-            {
-                pFrame->DrawInst(&atlasMan)->rot_pivot.Set(pFrame->DrawInst(&atlasMan)->GetWidth() * 0.5f, pFrame->DrawInst(&atlasMan)->GetHeight() * 0.5f);
-                pFrame->DrawInst(&atlasMan)->rot.Set(90);
-            }
             
             pFrame->DrawInst(&atlasMan)->alpha.Set(0.5f);
         }
@@ -381,8 +376,8 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
         pFrame->DrawInst(&atlasMan)->SetEnabled(true);
         pFrame->DrawInst(&atlasMan)->alpha.Set(1.0f);
 
-        float fFrameWidth = pFrame->IsRotated() ? pFrame->DrawInst(&atlasMan)->GetHeight() : pFrame->DrawInst(&atlasMan)->GetWidth();
-        float fFrameHeight = pFrame->IsRotated() ? pFrame->DrawInst(&atlasMan)->GetWidth() : pFrame->DrawInst(&atlasMan)->GetHeight();
+        float fFrameWidth = pFrame->DrawInst(&atlasMan)->GetWidth();
+        float fFrameHeight = pFrame->DrawInst(&atlasMan)->GetHeight();
 
         // Will it fit in this row
         if(ptDrawPos.x() + fFrameWidth > uiRENDERWIDTH)
@@ -395,7 +390,7 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
             curRow.Clear();
         }
         
-        float fPosX = ptDrawPos.x() + (pFrame->IsRotated() ? ((fFrameWidth * 0.5f) - (fFrameHeight * 0.5f)) : 0);
+        float fPosX = ptDrawPos.x();
         
         if(pFrame->DrawInst(&atlasMan)->pos.IsTweening() == false && pFrame->DrawInst(&atlasMan)->pos.X() != ptDrawPos.x())
             pFrame->DrawInst(&atlasMan)->pos.Tween(fPosX, pFrame->DrawInst(&atlasMan)->pos.Y(), fTRANS_DUR, HyTween::QuadInOut);
@@ -474,7 +469,7 @@ void WidgetAtlasManager::HideAtlasGroup()
     m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_Nothing);
 }
 
-HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, bool bRot, int iX, int iY, QString sFilter, uint uiErrors)
+HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, int iX, int iY, QString sFilter, uint uiErrors)
 {
     HyGuiFrame *pNewFrame = NULL;
 
@@ -482,12 +477,12 @@ HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRec
     {
         HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
 
-        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, bRot, iX, iY, sFilter, uiErrors);
+        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, iX, iY, sFilter, uiErrors);
         pNewFrame->SetError(GUIFRAMEERROR_Duplicate);
     }
     else
     {
-        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, bRot, iX, iY, sFilter, uiErrors);
+        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, iX, iY, sFilter, uiErrors);
         m_DependencyMap[uiChecksum] = pNewFrame;
     }
 

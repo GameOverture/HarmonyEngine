@@ -19,7 +19,8 @@
 DlgAtlasGroupSettings::DlgAtlasGroupSettings(QWidget *parent) : QDialog(parent),
                                                                 ui(new Ui::DlgAtlasGroupSettings),
                                                                 m_bSettingsDirty(false),
-                                                                m_bNameChanged(false)
+                                                                m_bNameChanged(false),
+                                                                m_iRotationStrategyIndex(ImagePacker::NEVER)
 {
     ui->setupUi(this);
     WidgetsToData();
@@ -47,7 +48,9 @@ void DlgAtlasGroupSettings::WidgetsToData()
     m_bAutoSize = ui->chkAutosize->isChecked();
     m_bSquare = ui->chkSquare->isChecked();
     m_iFillRate = ui->minFillRate->value();
-    m_iRotationStrategyIndex = ui->cmbRotationStrategy->currentIndex();
+    
+    // NOTE: Removing rotation from atlas packing
+    //m_iRotationStrategyIndex = ui->cmbRotationStrategy->currentIndex();
 }
 
 void DlgAtlasGroupSettings::DataToWidgets()
@@ -64,7 +67,9 @@ void DlgAtlasGroupSettings::DataToWidgets()
     ui->chkSquare->setChecked(m_bSquare);
     ui->chkAutosize->setChecked(m_bAutoSize);
     ui->minFillRate->setValue(m_iFillRate);
-    ui->cmbRotationStrategy->setCurrentIndex(m_iRotationStrategyIndex);
+    
+    // NOTE: Removing rotation from atlas packing
+    //ui->cmbRotationStrategy->setCurrentIndex(m_iRotationStrategyIndex);
 
     ui->sbTextureWidth->setValue(m_iTextureWidth);
     ui->sbTextureHeight->setValue(m_iTextureHeight);
@@ -130,7 +135,8 @@ QJsonObject DlgAtlasGroupSettings::GetSettings()
     settings.insert("chkSquare", QJsonValue(m_bSquare/*ui->chkSquare->isChecked()*/));
     settings.insert("chkAutosize", QJsonValue(m_bAutoSize/*ui->chkAutosize->isChecked()*/));
     settings.insert("minFillRate", QJsonValue(m_iFillRate/*ui->minFillRate->value()*/));
-    settings.insert("cmbRotationStrategy", QJsonValue(m_iRotationStrategyIndex/*ui->cmbRotationStrategy->currentIndex()*/));
+    
+    //settings.insert("cmbRotationStrategy", QJsonValue(m_iRotationStrategyIndex/*ui->cmbRotationStrategy->currentIndex()*/));
 
     settings.insert("sbTextureWidth", QJsonValue(m_iTextureWidth/*ui->sbTextureWidth->value()*/));
     settings.insert("sbTextureHeight", QJsonValue(m_iTextureHeight/*ui->sbTextureHeight->value()*/));
@@ -153,7 +159,8 @@ void DlgAtlasGroupSettings::LoadSettings(QJsonObject settings)
     m_bAutoSize = settings["chkAutosize"].toBool();
     m_bSquare = settings["chkSquare"].toBool();
     m_iFillRate = JSONOBJ_TOINT(settings, "minFillRate");
-    m_iRotationStrategyIndex = JSONOBJ_TOINT(settings, "cmbRotationStrategy");
+    
+    //m_iRotationStrategyIndex = JSONOBJ_TOINT(settings, "cmbRotationStrategy");
 
     m_iTextureWidth = JSONOBJ_TOINT(settings, "sbTextureWidth");
     m_iTextureHeight = JSONOBJ_TOINT(settings, "sbTextureHeight");
@@ -203,8 +210,8 @@ void DlgAtlasGroupSettings::on_buttonBox_accepted()
        m_bMerge != ui->chkMerge->isChecked() ||
        m_bAutoSize != ui->chkAutosize->isChecked() ||
        m_bSquare != ui->chkSquare->isChecked() ||
-       m_iFillRate != ui->minFillRate->value() ||
-       m_iRotationStrategyIndex != ui->cmbRotationStrategy->currentIndex())
+       m_iFillRate != ui->minFillRate->value()/* ||
+       m_iRotationStrategyIndex != ui->cmbRotationStrategy->currentIndex()*/)
     {
         if(QMessageBox::Ok == QMessageBox::warning(NULL, QString("Save Atlas Group Settings?"), QString("By modifying the Atlas Group settings, it is required to regenerate the entire Atlas Group."), QMessageBox::Ok, QMessageBox::Cancel))
             m_bSettingsDirty = true;
