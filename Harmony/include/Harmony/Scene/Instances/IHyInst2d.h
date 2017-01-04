@@ -68,8 +68,8 @@ public:
 
 	void SetTint(float fR, float fG, float fB);
 
-	void SetScissor(uint32 uiX, uint32 uiY, uint32 uiWidth, uint32 uiHeight);
-	void ClearScissor();
+	virtual void SetScissor(uint32 uiX, uint32 uiY, uint32 uiWidth, uint32 uiHeight);
+	virtual void ClearScissor();
 
 	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);

@@ -37,6 +37,9 @@ public:
 	int32 GetDisplayOrderMax();
 	virtual void SetDisplayOrder(int32 iOrderValue);
 
+	virtual void SetScissor(uint32 uiX, uint32 uiY, uint32 uiWidth, uint32 uiHeight);
+	virtual void ClearScissor();
+
 	virtual void Load();
 	virtual void Unload();
 
