@@ -23,14 +23,20 @@ protected:
 	// Array of BYTE's where each BYTE describes how each animation state is supposed to play
 	enum eAnimCtrlAttribs
 	{
-		ANIMCTRLATTRIB_Loop			= 1 << 0,
-		ANIMCTRLATTRIB_Reverse		= 1 << 1,
-		ANIMCTRLATTRIB_Bounce		= 1 << 2,
-		ANIMCTRLATTRIB_IsBouncing	= 1 << 3,	// True if anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
-		ANIMCTRLATTRIB_Paused		= 1 << 4,
+		ANIMCTRLATTRIB_Loop						= 1 << 0,
+		ANIMCTRLATTRIB_Reverse					= 1 << 1,
+		ANIMCTRLATTRIB_Bounce					= 1 << 2,
+		ANIMCTRLATTRIB_IsBouncing				= 1 << 3,	// True if anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
+		ANIMCTRLATTRIB_Paused					= 1 << 4,
+
+		// Below are only used when this instance isn't loaded yet. They are the "off" values to be applied once the instance actually is loaded
+		ANIMCTRLATTRIB_PRELOADAPPLY_DontLoop	= 1 << 5,
+		ANIMCTRLATTRIB_PRELOADAPPLY_DontBounce	= 1 << 6,
+		ANIMCTRLATTRIB_PRELOADAPPLY_DontReverse	= 1 << 7
+
 		// Do not exceed '8' attributes, or else increase uint8s
 	};
-	uint8 *					m_pAnimCtrlAttribs;
+	std::vector<uint8>		m_AnimCtrlAttribList;
 
 	float					m_fAnimPlayRate;
 	float					m_fElapsedFrameTime;
@@ -40,12 +46,13 @@ protected:
 
 	// Optional callback invoked upon anim completion/loop
 	typedef void(*fpHySprite2dCallback)(HySprite2d &selfRef, void *pParam);
-	fpHySprite2dCallback *	m_fppAnimCallback;
-	void **					m_ppAnimCallbackParam;
+	std::vector<std::pair<fpHySprite2dCallback, void *> >	m_AnimCallbackList;
 
 public:
 	HySprite2d(const char *szPrefix, const char *szName);
 	virtual ~HySprite2d(void);
+
+	virtual void Unload();
 
 	//--------------------------------------------------------------------------------------
 	// Set how to playback the animation on the current (or specified) state/animation.
@@ -91,7 +98,7 @@ public:
 	//--------------------------------------------------------------------------------------
 	bool AnimIsFinished() const;
 
-	bool AnimIsPaused() const;
+	bool AnimIsPaused();
 	
 	//--------------------------------------------------------------------------------------
 	// Client may specify whether to invoke a callback function when animation completes. The
@@ -102,7 +109,7 @@ public:
 	// Note: if the animation is set to loop and a callback is specified, the callback will
 	//       be invoked on every loop.
 	//--------------------------------------------------------------------------------------
-	void AnimSetCallback(int iStateID, void (*fpCallback)(HySprite2d *, void *), void *pParam = NULL);
+	void AnimSetCallback(uint32 uiStateID, void(*fpCallback)(HySprite2d &, void *), void *pParam = NULL);
 
 	//--------------------------------------------------------------------------------------
 	// Instantly sets the specified frame of the current animation. If supplied frame index
