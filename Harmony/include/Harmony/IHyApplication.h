@@ -58,6 +58,7 @@ public:
 	static float PixelsPerMeter();
 
 	HyWindow &Window(uint32 uiIndex = 0);
+	uint32 GetNumWindows();
 	HyInputMapInterop &Input(uint32 uiIndex = 0);
 };
 

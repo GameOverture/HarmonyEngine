@@ -123,6 +123,11 @@ HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)
 	return *m_WindowList[uiIndex];
 }
 
+uint32 IHyApplication::GetNumWindows()
+{
+	return sm_Init.uiNumWindows;
+}
+
 HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(uiIndex < sm_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
