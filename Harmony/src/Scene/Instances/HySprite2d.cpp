@@ -158,7 +158,18 @@ void HySprite2d::AnimSetState(uint32 uiStateIndex)
 		}
 	}
 
+	if(m_uiCurAnimState == uiStateIndex)
+		return;
+
 	m_uiCurAnimState = uiStateIndex;
+
+	while(m_uiCurAnimState >= m_AnimCtrlAttribList.size())
+		m_AnimCtrlAttribList.push_back(0);
+
+	if(0 == (m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Reverse))
+		m_uiCurFrame = 0;
+	else
+		m_uiCurFrame = AnimGetNumFrames() - 1;
 }
 
 bool HySprite2d::AnimIsFinished() const
