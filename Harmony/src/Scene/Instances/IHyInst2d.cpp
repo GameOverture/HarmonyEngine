@@ -30,6 +30,11 @@ IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName)
 																					m_fAlpha(1.0f),
 																					alpha(m_fAlpha, *this)
 {
+#ifdef HY_DEBUG
+	if(m_eTYPE != HYTYPE_Entity2d && m_eTYPE != HYTYPE_Primitive2d)
+		HyAssert(m_sPREFIX.empty() == false && m_sNAME.empty() == false, "IHyInst2d of type '" << m_eTYPE << "' was constructed with a blank prefix or name");
+#endif
+
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
 }
