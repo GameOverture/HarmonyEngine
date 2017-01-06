@@ -23,6 +23,8 @@ class HyEntity2d : public IHyInst2d
 {
 	int32					m_iDisplayOrderMax;
 
+	float					m_fPrevAlphaValue;
+
 public:
 	HyEntity2d();
 	HyEntity2d(const char *szPrefix, const char *szName);

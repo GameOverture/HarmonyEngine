@@ -10,12 +10,14 @@
 #include "Scene/HyEntity2d.h"
 
 HyEntity2d::HyEntity2d() :	IHyInst2d(HYTYPE_Entity2d, NULL, NULL),
-							m_iDisplayOrderMax(0)
+							m_iDisplayOrderMax(0),
+							m_fPrevAlphaValue(1.0f)
 {
 }
 
 HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName) :	IHyInst2d(HYTYPE_Entity2d, szPrefix, szName),
-																	m_iDisplayOrderMax(0)
+																	m_iDisplayOrderMax(0),
+																	m_fPrevAlphaValue(1.0f)
 {
 }
 
@@ -211,6 +213,13 @@ int32 HyEntity2d::GetDisplayOrderMax()
 
 /*virtual*/ void HyEntity2d::OnInstUpdate()
 {
+	OnEntityUpdate();
+
+	if(m_fPrevAlphaValue == alpha.Get())
+		return;
+
+	m_fPrevAlphaValue = alpha.Get();
+
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		switch(m_ChildList[i]->GetType())
@@ -232,6 +241,4 @@ int32 HyEntity2d::GetDisplayOrderMax()
 			break;
 		}
 	}
-
-	OnEntityUpdate();
 }
