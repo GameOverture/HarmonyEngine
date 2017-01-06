@@ -118,6 +118,9 @@ void HyGuiFrame::SetTreeWidgetItem(QTreeWidgetItem *pTreeItem)
 {
     m_pTreeWidgetItem = pTreeItem;
 
+    if(m_pTreeWidgetItem == NULL)
+        return;
+
     if(m_uiErrors == 0)
         m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(m_eType));
     else
