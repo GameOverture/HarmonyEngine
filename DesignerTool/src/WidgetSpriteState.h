@@ -20,7 +20,7 @@ namespace Ui {
 class WidgetSpriteState;
 }
 
-struct SpriteFrame;
+class SpriteFrame;
 class WidgetSprite;
 
 class WidgetSpriteState : public QWidget

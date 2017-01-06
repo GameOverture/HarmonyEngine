@@ -367,16 +367,16 @@ void WidgetFont::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
     
     // Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
     delete [] m_pTrueAtlasPixelData;
-    int iNumPixels = m_pAtlas->width * m_pAtlas->height;
-    m_pTrueAtlasPixelData = new unsigned char[iNumPixels * 4];
-    memset(m_pTrueAtlasPixelData, 0xFF, iNumPixels * 4);
+    uint uiNumPixels = static_cast<uint>(m_pAtlas->width * m_pAtlas->height);
+    m_pTrueAtlasPixelData = new unsigned char[uiNumPixels * 4];
+    memset(m_pTrueAtlasPixelData, 0xFF, uiNumPixels * 4);
     // Overwriting alpha channel
-    for(int i = 0; i < iNumPixels; ++i)
+    for(uint i = 0; i < uiNumPixels; ++i)
         m_pTrueAtlasPixelData[i*4+3] = m_pAtlas->data[i];
 
     if(bStoreIntoAtlasManager)
     {
-        QImage fontAtlasImage(m_pTrueAtlasPixelData, m_pAtlas->width, m_pAtlas->height, QImage::Format_RGBA8888);
+        QImage fontAtlasImage(m_pTrueAtlasPixelData, static_cast<int>(m_pAtlas->width), static_cast<int>(m_pAtlas->height), QImage::Format_RGBA8888);
 
         if(m_pTrueAtlasFrame)
             m_pItemFont->GetAtlasManager().ReplaceFrame(m_pTrueAtlasFrame, m_pItemFont->GetName(false), fontAtlasImage);
