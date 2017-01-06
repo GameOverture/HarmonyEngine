@@ -53,7 +53,7 @@ public:
     QTreeWidget *GetTreeWidget();
 
     QSize GetAtlasDimensions();
-    void GetAtlasInfo(QJsonObject &atlasObjOut);
+    void GetAtlasInfoForGameData(QJsonObject &atlasObjOut);
     
     QString GetName();
     int GetId();
@@ -89,6 +89,7 @@ private:
 
     void Refresh();
 
+    void WriteMetaSettings();
     void WriteMetaSettings(QJsonArray frameArray);
 
     void CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFrame);

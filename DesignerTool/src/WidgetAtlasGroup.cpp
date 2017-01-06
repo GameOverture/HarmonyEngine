@@ -75,28 +75,48 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
         QJsonObject settingsObj = settingsDoc.object();
         m_dlgSettings.LoadSettings(settingsObj);
 
+        // Create all the filter items first
         QJsonArray filtersArray = settingsObj["filters"].toArray();
         for(int i = 0; i < filtersArray.size(); ++i)
         {
-            QDir filterPath(filtersArray.at(i).toString());
+            QDir filterPathDir(filtersArray.at(i).toString());
 
             QTreeWidgetItem *pNewTreeItem = new QTreeWidgetItem(ui->atlasList);
 
-            pNewTreeItem->setText(0, filterPath.dirName());
+            pNewTreeItem->setText(0, filterPathDir.dirName());
             pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix));
 
-            QVariant v(QString("FILTER"));
+            QVariant v(QString(filterPathDir.absolutePath()));
             pNewTreeItem->setData(0, Qt::UserRole, v);
+        }
 
-            QTreeWidgetItem *pParent = NULL;
-            if(filterPath.cdUp())
+        // Then place the filters correctly as a parent heirarchy
+        for(int i = 0; i < ui->atlasList->topLevelItemCount(); ++i)
+        {
+            QTreeWidgetItem *pParentFilter = NULL;
+
+            QString sFilterPath = ui->atlasList->topLevelItem(i)->data(0, Qt::UserRole).toString();
+            sFilterPath.truncate(sFilterPath.lastIndexOf("/"));
+            if(sFilterPath != "")
             {
-                QList<QTreeWidgetItem *> foundList = ui->atlasList->findItems(filterPath.dirName(), Qt::MatchExactly);
-                if(foundList.empty() == false && foundList[0]->data(0, Qt::UserRole).toString() == "FILTER")
-                    pParent = foundList[0];
+                QTreeWidgetItemIterator iter2(ui->atlasList);
+                while(*iter2)
+                {
+                    if((*iter2)->data(0, Qt::UserRole).toString() == sFilterPath)
+                    {
+                        pParentFilter = (*iter2);
+                        break;
+                    }
+
+                    ++iter2;
+                }
             }
-            if(pParent)
-                pParent->addChild(pNewTreeItem);
+
+            if(pParentFilter)
+            {
+                pParentFilter->addChild(ui->atlasList->takeTopLevelItem(i));
+                i = -1;
+            }
         }
 
         QJsonArray frameArray = settingsObj["frames"].toArray();
@@ -115,15 +135,31 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
                                                             frameObj["textureIndex"].toInt(),
                                                             frameObj["x"].toInt(),
                                                             frameObj["y"].toInt(),
-                                                            frameObj["filter"].toString(),
                                                             frameObj["errors"].toInt(0));
+
+            QString sFilterPath = frameObj["filter"].toString();
+            QTreeWidgetItem *pFrameParent = NULL;
+            if(sFilterPath != "")
+            {
+                QTreeWidgetItemIterator it(ui->atlasList);
+                while(*it)
+                {
+                    if((*it)->data(0, Qt::UserRole).toString() == sFilterPath)
+                    {
+                        pFrameParent = (*it);
+                        break;
+                    }
+
+                    ++it;
+                }
+            }
 
             if(QFile::exists(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName())) == false)
                 pNewFrame->SetError(GUIFRAMEERROR_CannotFindMetaImg);
             else
                 pNewFrame->ClearError(GUIFRAMEERROR_CannotFindMetaImg);
 
-            CreateTreeItem(NULL, pNewFrame);
+            CreateTreeItem(pFrameParent, pNewFrame);
 
             m_FrameList.append(pNewFrame);
         }
@@ -133,8 +169,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
     }
     else
     {
-        QJsonArray emptyFramesArray;
-        WriteMetaSettings(emptyFramesArray);
+        WriteMetaSettings();
     }
     
     ui->lcdNumTextures->display(iNumTextures);
@@ -172,7 +207,7 @@ QSize WidgetAtlasGroup::GetAtlasDimensions()
     return QSize(m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight());
 }
 
-void WidgetAtlasGroup::GetAtlasInfo(QJsonObject &atlasObjOut)
+void WidgetAtlasGroup::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
 {
     atlasObjOut.insert("id", m_DataDir.dirName().toInt());
     atlasObjOut.insert("width", m_dlgSettings.TextureWidth());
@@ -320,10 +355,13 @@ HyGuiFrame *WidgetAtlasGroup::ImportImage(QString sName, QImage &newImage, eAtla
     if(eType != ATLAS_Font && eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
         rAlphaCrop = ImagePacker::crop(newImage);
 
-    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, -1, -1, "", 0);
+    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, -1, -1, 0);
     if(pNewFrame)
     {
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
+
+        CreateTreeItem(NULL, pNewFrame);
+
         m_FrameList.append(pNewFrame);
     }
 
@@ -340,7 +378,6 @@ void WidgetAtlasGroup::Refresh()
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // CLEARING EXISTING DATA
-    ui->atlasList->clear();
     m_Packer.clear();
     QStringList sTextureNames = m_DataDir.entryList(QDir::NoDotAndDotDot);
     
@@ -409,8 +446,6 @@ void WidgetAtlasGroup::Refresh()
         QJsonObject frameObj;
         pFrame->GetJsonObj(frameObj);
         frameArray.append(QJsonValue(frameObj));
-
-        CreateTreeItem(NULL, pFrame);
         
         if(bValid == false)
             continue;
@@ -530,10 +565,38 @@ void WidgetAtlasGroup::Refresh()
     MainWindow::LoadSpinner(false);
 }
 
+void WidgetAtlasGroup::WriteMetaSettings()
+{
+    QJsonArray frameArray;
+    for(int i = 0; i < m_FrameList.size(); ++i)
+    {
+        QJsonObject frameObj;
+        m_FrameList[i]->GetJsonObj(frameObj);
+        frameArray.append(QJsonValue(frameObj));
+    }
+
+    WriteMetaSettings(frameArray);
+}
+
 void WidgetAtlasGroup::WriteMetaSettings(QJsonArray frameArray)
 {
     QJsonObject settingsObj = m_dlgSettings.GetSettings();
     settingsObj.insert("frames", frameArray);
+
+    QJsonArray filtersArray;
+    QTreeWidgetItemIterator iter(ui->atlasList);
+    while(*iter)
+    {
+        if((*iter)->data(0, Qt::UserRole).toString() != "")
+        {
+            QString sFilterPath = (*iter)->data(0, Qt::UserRole).toString();
+            filtersArray.append(QJsonValue(sFilterPath));
+        }
+
+        ++iter;
+    }
+
+    settingsObj.insert("filters", filtersArray);
 
     QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
     if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
@@ -567,14 +630,6 @@ void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFra
         pNewTreeItem = new QTreeWidgetItem();
 
     pNewTreeItem->setText(0, pFrame->GetName());
-
-    if(pFrame->GetErrors() == 0)
-        pNewTreeItem->setIcon(0, HyGlobal::AtlasIcon(pFrame->GetType()));
-    else
-    {
-        pNewTreeItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
-        pNewTreeItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(pFrame->GetErrors()));
-    }
 
     if(pFrame->GetTextureIndex() >= 0)
         pNewTreeItem->setText(1, "Tex:" % QString::number(pFrame->GetTextureIndex()));
@@ -743,5 +798,13 @@ void WidgetAtlasGroup::on_actionReplaceImages_triggered()
 
 void WidgetAtlasGroup::on_actionAddFilter_triggered()
 {
+    QTreeWidgetItem *pNewTreeItem = new QTreeWidgetItem(ui->atlasList);
 
+    pNewTreeItem->setText(0, "New Filter");
+    pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix));
+
+    QVariant v(QString("/New Filter"));
+    pNewTreeItem->setData(0, Qt::UserRole, v);
+
+    WriteMetaSettings();
 }

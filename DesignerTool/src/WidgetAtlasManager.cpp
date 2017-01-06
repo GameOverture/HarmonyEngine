@@ -469,7 +469,7 @@ void WidgetAtlasManager::HideAtlasGroup()
     m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_Nothing);
 }
 
-HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, int iX, int iY, QString sFilter, uint uiErrors)
+HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, int iX, int iY, uint uiErrors)
 {
     HyGuiFrame *pNewFrame = NULL;
 
@@ -477,12 +477,12 @@ HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRec
     {
         HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
 
-        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, iX, iY, sFilter, uiErrors);
+        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, iX, iY, uiErrors);
         pNewFrame->SetError(GUIFRAMEERROR_Duplicate);
     }
     else
     {
-        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, iX, iY, sFilter, uiErrors);
+        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, iX, iY, uiErrors);
         m_DependencyMap[uiChecksum] = pNewFrame;
     }
 
@@ -506,7 +506,7 @@ void WidgetAtlasManager::SaveData()
     for(int i = 0; i < ui->atlasGroups->count(); ++i)
     {
         QJsonObject atlasGroupObj;
-        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->GetAtlasInfo(atlasGroupObj);
+        static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i))->GetAtlasInfoForGameData(atlasGroupObj);
         atlasGroupArray.append(atlasGroupObj);
     }
 

@@ -10,19 +10,18 @@
 #include "HyGuiFrame.h"
 #include "scriptum/imagepacker.h"
 
-HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, int iX, int iY, QString sFilter, uint uiErrors) : m_uiATLAS_GROUP_ID(uiAtlasGroupId),
-                                                                                                                                                                                                     m_eType(eType),
-                                                                                                                                                                                                     m_pTreeWidgetItem(NULL),
-                                                                                                                                                                                                     m_uiChecksum(uiChecksum),
-                                                                                                                                                                                                     m_sName(sN),
-                                                                                                                                                                                                     m_iWidth(iW),
-                                                                                                                                                                                                     m_iHeight(iH),
-                                                                                                                                                                                                     m_rAlphaCrop(rAlphaCrop),
-                                                                                                                                                                                                     m_iTextureIndex(iTexIndex),
-                                                                                                                                                                                                     m_iPosX(iX),
-                                                                                                                                                                                                     m_iPosY(iY),
-                                                                                                                                                                                                     m_sFilter(sFilter),
-                                                                                                                                                                                                     m_uiErrors(uiErrors)
+HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, int iX, int iY, uint uiErrors) : m_uiATLAS_GROUP_ID(uiAtlasGroupId),
+                                                                                                                                                                                    m_eType(eType),
+                                                                                                                                                                                    m_pTreeWidgetItem(NULL),
+                                                                                                                                                                                    m_uiChecksum(uiChecksum),
+                                                                                                                                                                                    m_sName(sN),
+                                                                                                                                                                                    m_iWidth(iW),
+                                                                                                                                                                                    m_iHeight(iH),
+                                                                                                                                                                                    m_rAlphaCrop(rAlphaCrop),
+                                                                                                                                                                                    m_iTextureIndex(iTexIndex),
+                                                                                                                                                                                    m_iPosX(iX),
+                                                                                                                                                                                    m_iPosY(iY),
+                                                                                                                                                                                    m_uiErrors(uiErrors)
 {
 }
 
@@ -118,16 +117,14 @@ void HyGuiFrame::DeleteAllDrawInst()
 void HyGuiFrame::SetTreeWidgetItem(QTreeWidgetItem *pTreeItem)
 {
     m_pTreeWidgetItem = pTreeItem;
-}
 
-QString HyGuiFrame::GetFilter()
-{
-    return m_sFilter;
-}
-
-void HyGuiFrame::SetFilter(QString sFilter)
-{
-    m_sFilter = sFilter;
+    if(m_uiErrors == 0)
+        m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(m_eType));
+    else
+    {
+        m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
+        m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
+    }
 }
 
 void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
@@ -173,6 +170,13 @@ void HyGuiFrame::GetJsonObj(QJsonObject &frameObj)
     frameObj.insert("cropRight", QJsonValue(GetCrop().right()));
     frameObj.insert("cropBottom", QJsonValue(GetCrop().bottom()));
     frameObj.insert("errors", QJsonValue(static_cast<int>(GetErrors())));
+
+    QTreeWidgetItem *pTreeParent = m_pTreeWidgetItem->parent();
+    QString sFilterPath = "";
+    if(pTreeParent)
+        sFilterPath = pTreeParent->data(0, Qt::UserRole).toString();
+
+    frameObj.insert("filter", QJsonValue(sFilterPath));
 }
 
 void HyGuiFrame::SetError(eGuiFrameError eError)
