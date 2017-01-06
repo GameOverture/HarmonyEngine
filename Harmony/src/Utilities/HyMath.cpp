@@ -39,7 +39,7 @@ void HySetVec(glm::ivec4 &vecOut, int32 iX, int32 iY, int32 iZ, int32 iW)
 	vecOut.x = iX; vecOut.y = iY; vecOut.z = iZ; vecOut.w = iW;
 }
 
-float Ease_Linear(float a, float b, float t)
+float HyEase_Linear(float a, float b, float t)
 {
 	return ((b-a)*t)+a;
 }
@@ -47,7 +47,7 @@ float Ease_Linear(float a, float b, float t)
 //--------------------------------------------------------------------------------------
 // Accelerating from zero velocity
 //--------------------------------------------------------------------------------------
-float Ease_QuadraticIn(float fTime, float fStart, float fDist, float fDur)
+float HyEase_QuadraticIn(float fTime, float fStart, float fDist, float fDur)
 {
 	fTime /= fDur;
 	return fDist * fTime * fTime + fStart;
@@ -56,7 +56,7 @@ float Ease_QuadraticIn(float fTime, float fStart, float fDist, float fDur)
 //--------------------------------------------------------------------------------------
 // Decelerating to zero velocity
 //--------------------------------------------------------------------------------------
-float Ease_QuadraticOut(float fTime, float fStart, float fDist, float fDur)
+float HyEase_QuadraticOut(float fTime, float fStart, float fDist, float fDur)
 {
 	fTime /= fDur;
 	return -fDist * fTime*(fTime-2) + fStart;
@@ -65,7 +65,7 @@ float Ease_QuadraticOut(float fTime, float fStart, float fDist, float fDur)
 //--------------------------------------------------------------------------------------
 // Acceleration until halfway, then deceleration
 //--------------------------------------------------------------------------------------
-float Ease_QuadraticInOut(float fTime, float fStart, float fDist, float fDur)
+float HyEase_QuadraticInOut(float fTime, float fStart, float fDist, float fDur)
 {
 	fTime /= fDur/2;
 
@@ -77,7 +77,7 @@ float Ease_QuadraticInOut(float fTime, float fStart, float fDist, float fDur)
 	return -fDist/2 * (fTime*(fTime-2) - 1) + fStart;
 }
 
-float Ease_AngleLinear(float angleA, float angleB, int32 spin, float t)
+float HyEase_AngleLinear(float angleA, float angleB, int32 spin, float t)
 {
 	if(spin==0)
 	{
@@ -98,6 +98,6 @@ float Ease_AngleLinear(float angleA, float angleB, int32 spin, float t)
 		}
 	}
 
-	return Ease_Linear(angleA,angleB,t);
+	return HyEase_Linear(angleA,angleB,t);
 }
 

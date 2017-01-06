@@ -51,24 +51,25 @@ const T &HyMax(const T &a, const T &b)
 	return (a > b) ? a : b;
 }
 
-float Ease_Linear(float a, float b, float t);
+float HyEase_Linear(float a, float b, float t);
 
 //--------------------------------------------------------------------------------------
 // Accelerating from zero velocity
 //--------------------------------------------------------------------------------------
-float Ease_QuadraticIn(float fTime, float fStart, float fDist, float fDur);
+float HyEase_QuadraticIn(float fTime, float fStart, float fDist, float fDur);
 
 //--------------------------------------------------------------------------------------
 // Decelerating to zero velocity
 //--------------------------------------------------------------------------------------
-float Ease_QuadraticOut(float fTime, float fStart, float fDist, float fDur);
+float HyEase_QuadraticOut(float fTime, float fStart, float fDist, float fDur);
 
 //--------------------------------------------------------------------------------------
 // Acceleration until halfway, then deceleration
 //--------------------------------------------------------------------------------------
-float Ease_QuadraticInOut(float fTime, float fStart, float fDist, float fDur);
+float HyEase_QuadraticInOut(float fTime, float fStart, float fDist, float fDur);
 
-float Ease_AngleLinear(float angleA, float angleB, int32 spin, float t);
+// 
+float HyEase_AngleLinear(float angleA, float angleB, int32 spin, float t);
 
 template<typename T>
 struct HyRectangle
