@@ -388,7 +388,6 @@ void WidgetAtlasGroup::Refresh()
     // REPOPULATING THE PACKER WITH 'm_FrameList'
     for(int i = 0; i < m_FrameList.size(); ++i)
     {
-        m_FrameList[i]->SetTreeWidgetItem(NULL);
         m_FrameList[i]->ClearError(GUIFRAMEERROR_CouldNotPack);
         m_FrameList[i]->DeleteAllDrawInst();
 
