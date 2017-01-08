@@ -25,6 +25,19 @@ namespace Ui {
 class WidgetAtlasGroup;
 }
 
+class WidgetAtlasGroupTreeWidget : public QTreeWidget
+{
+    WidgetAtlasGroup *      m_pOwner;
+
+public:
+    WidgetAtlasGroupTreeWidget(QWidget *parent = Q_NULLPTR);
+    void SetOwner(WidgetAtlasGroup *pOwner);
+    void SpecialSort();
+
+protected:
+    virtual void dropEvent(QDropEvent *e);
+};
+
 class WidgetAtlasGroup : public QWidget
 {
     Q_OBJECT
@@ -60,6 +73,9 @@ public:
 
     void ResizeAtlasListColumns();
 
+    void WriteMetaSettings();
+    void WriteMetaSettings(QJsonArray frameArray);
+
 private Q_SLOTS:
     void on_btnAddImages_clicked();
     void on_btnAddDir_clicked();
@@ -89,8 +105,6 @@ private:
 
     void Refresh();
 
-    void WriteMetaSettings();
-    void WriteMetaSettings(QJsonArray frameArray);
 
     void CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFrame);
 };

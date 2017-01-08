@@ -88,6 +88,8 @@ enum eGuiFrameError
     NUMGUIFRAMEERROR
 };
 
+#define HYTREEWIDGETITEM_IsFilter               "HyTreeFilter"
+
 #define HYGUIPATH_TempDir                       "temp/"
 #define HYGUIPATH_DataAtlases                   "atlasInfo.json"
 #define HYGUIPATH_MetaSettings                  "settings.hygui"
@@ -379,6 +381,18 @@ public:
                 }
             }
         }
+    }
+
+    static QString GetTreeWidgetItemPath(const QTreeWidgetItem *pItem)
+    {
+        QString sPath = "";
+        while(pItem)
+        {
+            sPath = "/" % pItem->text(0) % sPath;
+            pItem = pItem->parent();
+        }
+
+        return sPath;
     }
 };
 

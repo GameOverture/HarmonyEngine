@@ -174,10 +174,17 @@ void HyGuiFrame::GetJsonObj(QJsonObject &frameObj)
     frameObj.insert("cropBottom", QJsonValue(GetCrop().bottom()));
     frameObj.insert("errors", QJsonValue(static_cast<int>(GetErrors())));
 
-    QTreeWidgetItem *pTreeParent = m_pTreeWidgetItem->parent();
     QString sFilterPath = "";
+    QTreeWidgetItem *pTreeParent = m_pTreeWidgetItem->parent();
+    while(pTreeParent)
+    {
+        if(pTreeParent->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+            break;
+
+        pTreeParent = pTreeParent->parent();
+    }
     if(pTreeParent)
-        sFilterPath = pTreeParent->data(0, Qt::UserRole).toString();
+        sFilterPath = HyGlobal::GetTreeWidgetItemPath(pTreeParent);
 
     frameObj.insert("filter", QJsonValue(sFilterPath));
 }
@@ -212,4 +219,16 @@ void HyGuiFrame::ClearError(eGuiFrameError eError)
 uint HyGuiFrame::GetErrors()
 {
     return m_uiErrors;
+}
+
+QDataStream &operator<<(QDataStream &out, HyGuiFrame *const &rhs)
+{
+    out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, HyGuiFrame *rhs)
+{
+    in.readRawData(reinterpret_cast<char *>(rhs), sizeof(rhs));
+    return in;
 }

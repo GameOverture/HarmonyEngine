@@ -16,6 +16,7 @@
 #include <QWidget>
 #include <QSet>
 #include <QJsonObject>
+#include <QDataStream>
 
 class HyGuiFrame
 {
@@ -86,5 +87,8 @@ public:
     uint GetErrors();
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)
+
+QDataStream &operator<<(QDataStream &out, HyGuiFrame *const &rhs);
+QDataStream &operator>>(QDataStream &in, HyGuiFrame *rhs);
 
 #endif // HYGUIFRAME_H

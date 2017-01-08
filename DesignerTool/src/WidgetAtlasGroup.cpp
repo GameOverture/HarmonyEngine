@@ -23,6 +23,35 @@
 
 #include "MainWindow.h"
 #include "WidgetAtlasManager.h"
+#include "DlgInputName.h"
+
+WidgetAtlasGroupTreeWidget::WidgetAtlasGroupTreeWidget(QWidget *parent /*= Q_NULLPTR*/) : QTreeWidget(parent)
+{
+}
+
+void WidgetAtlasGroupTreeWidget::SetOwner(WidgetAtlasGroup *pOwner)
+{
+    m_pOwner = pOwner;
+}
+
+void WidgetAtlasGroupTreeWidget::SpecialSort()
+{
+    sortItems(0, Qt::AscendingOrder);
+}
+
+/*virtual*/ void WidgetAtlasGroupTreeWidget::dropEvent(QDropEvent *e)
+{
+//    foreach (const QUrl &url, e->mimeData()->urls())
+//    {
+//        QString fileName = url.toLocalFile();
+//        qDebug() << "Dropped file:" << fileName;
+//    }
+
+    QTreeWidget::dropEvent(e);
+
+    SpecialSort();
+    m_pOwner->WriteMetaSettings();
+}
 
 WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
                                                         ui(new Ui::WidgetAtlasGroup)
@@ -51,8 +80,13 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
     ui->btnReplaceImages->setDefaultAction(ui->actionReplaceImages);
     ui->btnAddFilter->setDefaultAction(ui->actionAddFilter);
 
-    ui->atlasList->setSelectionMode(QAbstractItemView::MultiSelection);
+    ui->atlasList->SetOwner(this);
+
     ui->atlasList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->atlasList->setDragEnabled(true);
+    //ui->atlasList->viewport()->setAcceptDrops(true);
+    ui->atlasList->setDropIndicatorShown(true);
+    ui->atlasList->setDragDropMode(QAbstractItemView::InternalMove);
 
     m_FrameList.clear();
     ui->atlasList->clear();
@@ -75,7 +109,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
         QJsonObject settingsObj = settingsDoc.object();
         m_dlgSettings.LoadSettings(settingsObj);
 
-        // Create all the filter items first
+        // Create all the filter items first, storing their actual path in their data (for now)
         QJsonArray filtersArray = settingsObj["filters"].toArray();
         for(int i = 0; i < filtersArray.size(); ++i)
         {
@@ -90,7 +124,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
             pNewTreeItem->setData(0, Qt::UserRole, v);
         }
 
-        // Then place the filters correctly as a parent heirarchy
+        // Then place the filters correctly as a parent heirarchy using the path string stored in their data
         for(int i = 0; i < ui->atlasList->topLevelItemCount(); ++i)
         {
             QTreeWidgetItem *pParentFilter = NULL;
@@ -119,6 +153,14 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
             }
         }
 
+        // Finally go through all the filters and set the data string to the 'HYTREEWIDGETITEM_IsFilter' value to identify this QTreeWidgetItem as a filter
+        QTreeWidgetItemIterator iter(ui->atlasList);
+        while(*iter)
+        {
+            (*iter)->setData(0, Qt::UserRole, QVariant(QString(HYTREEWIDGETITEM_IsFilter)));
+            ++iter;
+        }
+
         QJsonArray frameArray = settingsObj["frames"].toArray();
         for(int i = 0; i < frameArray.size(); ++i)
         {
@@ -144,7 +186,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
                 QTreeWidgetItemIterator it(ui->atlasList);
                 while(*it)
                 {
-                    if((*it)->data(0, Qt::UserRole).toString() == sFilterPath)
+                    if((*it)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter && HyGlobal::GetTreeWidgetItemPath(*it) == sFilterPath)
                     {
                         pFrameParent = (*it);
                         break;
@@ -260,6 +302,62 @@ void WidgetAtlasGroup::ResizeAtlasListColumns()
 
     int iTotalWidth = ui->atlasList->size().width();
     ui->atlasList->setColumnWidth(0, iTotalWidth - 60);
+}
+
+void WidgetAtlasGroup::WriteMetaSettings()
+{
+    QJsonArray frameArray;
+    for(int i = 0; i < m_FrameList.size(); ++i)
+    {
+        QJsonObject frameObj;
+        m_FrameList[i]->GetJsonObj(frameObj);
+        frameArray.append(QJsonValue(frameObj));
+    }
+
+    WriteMetaSettings(frameArray);
+}
+
+void WidgetAtlasGroup::WriteMetaSettings(QJsonArray frameArray)
+{
+    QJsonObject settingsObj = m_dlgSettings.GetSettings();
+    settingsObj.insert("frames", frameArray);
+
+    QJsonArray filtersArray;
+    QTreeWidgetItemIterator iter(ui->atlasList);
+    while(*iter)
+    {
+        if((*iter)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+        {
+            QString sFilterPath = HyGlobal::GetTreeWidgetItemPath(*iter);
+            filtersArray.append(QJsonValue(sFilterPath));
+        }
+
+        ++iter;
+    }
+
+    settingsObj.insert("filters", filtersArray);
+
+    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
+    if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+       HyGuiLog("Couldn't open atlas settings file for writing", LOGTYPE_Error);
+    }
+    else
+    {
+        QJsonDocument settingsDoc(settingsObj);
+
+#ifdef HYGUI_UseBinaryMetaFiles
+        qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
+#else
+        qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
+#endif
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+        {
+            HyGuiLog("Could not write to atlas settings file: " % settingsFile.errorString(), LOGTYPE_Error);
+        }
+
+        settingsFile.close();
+    }
 }
 
 void WidgetAtlasGroup::on_btnAddImages_clicked()
@@ -555,69 +653,13 @@ void WidgetAtlasGroup::Refresh()
     MainWindow::ReloadHarmony();
 
     ui->atlasList->expandAll();
-    ui->atlasList->sortItems(0, Qt::AscendingOrder);
+    ui->atlasList->SpecialSort();
     
     ui->lcdNumTextures->display(m_Packer.bins.size());
     ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
     ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
 
     MainWindow::LoadSpinner(false);
-}
-
-void WidgetAtlasGroup::WriteMetaSettings()
-{
-    QJsonArray frameArray;
-    for(int i = 0; i < m_FrameList.size(); ++i)
-    {
-        QJsonObject frameObj;
-        m_FrameList[i]->GetJsonObj(frameObj);
-        frameArray.append(QJsonValue(frameObj));
-    }
-
-    WriteMetaSettings(frameArray);
-}
-
-void WidgetAtlasGroup::WriteMetaSettings(QJsonArray frameArray)
-{
-    QJsonObject settingsObj = m_dlgSettings.GetSettings();
-    settingsObj.insert("frames", frameArray);
-
-    QJsonArray filtersArray;
-    QTreeWidgetItemIterator iter(ui->atlasList);
-    while(*iter)
-    {
-        if((*iter)->data(0, Qt::UserRole).toString() != "")
-        {
-            QString sFilterPath = (*iter)->data(0, Qt::UserRole).toString();
-            filtersArray.append(QJsonValue(sFilterPath));
-        }
-
-        ++iter;
-    }
-
-    settingsObj.insert("filters", filtersArray);
-
-    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
-    if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-       HyGuiLog("Couldn't open atlas settings file for writing", LOGTYPE_Error);
-    }
-    else
-    {
-        QJsonDocument settingsDoc(settingsObj);
-
-#ifdef HYGUI_UseBinaryMetaFiles
-        qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
-#else
-        qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
-#endif
-        if(0 == iBytesWritten || -1 == iBytesWritten)
-        {
-            HyGuiLog("Could not write to atlas settings file: " % settingsFile.errorString(), LOGTYPE_Error);
-        }
-
-        settingsFile.close();
-    }
 }
 
 void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFrame)
@@ -637,6 +679,8 @@ void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFra
 
     QVariant v; v.setValue(pFrame);
     pNewTreeItem->setData(0, Qt::UserRole, v);
+
+    pNewTreeItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
 
     if(pParent)
         pParent->addChild(pNewTreeItem);
@@ -659,45 +703,7 @@ void WidgetAtlasGroup::on_btnSettings_clicked()
         if(m_dlgSettings.IsSettingsDirty())
             Refresh();
         else if(m_dlgSettings.IsNameChanged())
-        {
-            m_dlgSettings.GetName();
-            QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
-            if(!settingsFile.open(QIODevice::ReadOnly))
-            {
-                settingsFile.close();
-                HyGuiLog("Couldn't open atlas settings file for reading", LOGTYPE_Error);
-                return;
-            }
-
-#ifdef HYGUI_UseBinaryMetaFiles
-            QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
-#else
-            QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
-#endif
-            settingsFile.close();
-
-            QJsonObject settingsObj = settingsDoc.object();
-            settingsObj.insert("txtName", m_dlgSettings.GetName());
-            settingsDoc.setObject(settingsObj);
-
-            if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-            {
-                settingsFile.close();
-                HyGuiLog("Couldn't open atlas settings file for writing", LOGTYPE_Error);
-                return;
-            }
-
-#ifdef HYGUI_UseBinaryMetaFiles
-            qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
-#else
-            qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
-#endif
-            if(0 == iBytesWritten || -1 == iBytesWritten)
-            {
-                HyGuiLog("Could not write to atlas settings file to save name: " % settingsFile.errorString(), LOGTYPE_Error);
-            }
-            settingsFile.close();
-        }
+            WriteMetaSettings();
     }
     else
         m_dlgSettings.DataToWidgets();  // Reverts changes made
@@ -799,11 +805,19 @@ void WidgetAtlasGroup::on_actionAddFilter_triggered()
 {
     QTreeWidgetItem *pNewTreeItem = new QTreeWidgetItem(ui->atlasList);
 
-    pNewTreeItem->setText(0, "New Filter");
-    pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix));
+    DlgInputName *pDlg = new DlgInputName("Enter Atlas Group Filter Name", "New Filter");
+    if(pDlg->exec() == QDialog::Accepted)
+        pNewTreeItem->setText(0, pDlg->GetName());
+    else
+    {
+        delete pDlg;
+        return;
+    }
 
-    QVariant v(QString("/New Filter"));
-    pNewTreeItem->setData(0, Qt::UserRole, v);
+    delete pDlg;
+
+    pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix));
+    pNewTreeItem->setData(0, Qt::UserRole, QVariant(QString(HYTREEWIDGETITEM_IsFilter)));
 
     WriteMetaSettings();
 }

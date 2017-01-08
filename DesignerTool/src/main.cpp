@@ -11,10 +11,13 @@
 #include <QApplication>
 
 #include "HyGlobal.h"
+#include "HyGuiFrame.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    qRegisterMetaTypeStreamOperators<HyGuiFrame *>("HyGuiFrame *");
 
     HyGlobal::Initialize();
 

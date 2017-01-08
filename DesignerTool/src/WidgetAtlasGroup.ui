@@ -152,12 +152,12 @@
     </layout>
    </item>
    <item>
-    <widget class="QTreeWidget" name="atlasList">
+    <widget class="WidgetAtlasGroupTreeWidget" name="atlasList">
      <property name="mouseTracking">
       <bool>false</bool>
      </property>
      <property name="selectionMode">
-      <enum>QAbstractItemView::ContiguousSelection</enum>
+      <enum>QAbstractItemView::ExtendedSelection</enum>
      </property>
      <property name="columnCount">
       <number>2</number>
@@ -256,6 +256,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WidgetAtlasGroupTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>WidgetAtlasGroup.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="res/DesignerTool.qrc"/>
  </resources>
