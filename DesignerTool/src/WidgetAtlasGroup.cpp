@@ -16,7 +16,6 @@
 #include <QJsonArray>
 #include <QStack>
 #include <QPainter>
-#include <QElapsedTimer>
 #include <QByteArray>
 
 #include <ctime>
@@ -470,10 +469,6 @@ void WidgetAtlasGroup::Refresh()
 {
     MainWindow::LoadSpinner(true);
 
-    clock_t timeStartRefresh = clock();
-    QElapsedTimer timerStartRefresh;
-    timerStartRefresh.start();
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // CLEARING EXISTING DATA
     m_Packer.clear();
@@ -496,15 +491,8 @@ void WidgetAtlasGroup::Refresh()
                          m_MetaDir.absoluteFilePath(m_FrameList[i]->ConstructImageFileName()));
     }
 
-    clock_t timeStartPack = clock();
-    QElapsedTimer timerStartPack;
-    timerStartRefresh.start();
-
     m_dlgSettings.SetPackerSettings(&m_Packer);
     m_Packer.pack(m_dlgSettings.GetHeuristic(), m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight());
-
-    qint64 i64TimePack = timerStartPack.elapsed();
-    clock_t timeEndPack = clock();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // CREATE EMPTY TEXTURES
@@ -638,14 +626,6 @@ void WidgetAtlasGroup::Refresh()
     // WRITE SETTINGS FILE TO ATLAS META DIR
     WriteMetaSettings(frameArray);
 
-    qint64 i64TimeRefresh = timerStartRefresh.elapsed();
-    clock_t timeEndRefresh = clock();
-
-    HyGuiLog("Atlas Group Refresh done in: " % QString::number(static_cast<float>(i64TimeRefresh / 1000)), LOGTYPE_Normal);
-    HyGuiLog("Atlas Group Pack done in:    " % QString::number(static_cast<float>(i64TimePack / 1000)), LOGTYPE_Normal);
-    HyGuiLog("Atlas Group Refresh done in: " % QString::number(static_cast<float>((timeEndRefresh - timeStartRefresh) / CLOCKS_PER_SEC)), LOGTYPE_Info);
-    HyGuiLog("Atlas Group Pack done in:    " % QString::number(static_cast<float>((timeEndPack - timeStartPack) / CLOCKS_PER_SEC)), LOGTYPE_Info);
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)
     m_pManager->SaveData();
@@ -659,6 +639,7 @@ void WidgetAtlasGroup::Refresh()
     ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
     ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
 
+    HyGuiLog("Atlas Group Refresh finished", LOGTYPE_Normal);
     MainWindow::LoadSpinner(false);
 }
 
