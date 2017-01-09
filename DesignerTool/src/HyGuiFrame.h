@@ -50,11 +50,6 @@ class HyGuiFrame
     ~HyGuiFrame();
     
 public:
-    bool DeleteMetaImage(QDir metaDir);
-
-    void ReplaceImage(QString sImgPath, QDir metaDir);
-    void ReplaceImage(QString sName, QImage &newImage, QDir metaDir);
-
     HyTexturedQuad2d *DrawInst(void *pKey);
     void DeleteDrawInst(void *pKey);
     void DeleteAllDrawInst();
@@ -85,6 +80,10 @@ public:
     void SetError(eGuiFrameError eError);
     void ClearError(eGuiFrameError eError);
     uint GetErrors();
+
+private:
+    bool DeleteMetaImage(QDir metaDir);
+    void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);
 };
 Q_DECLARE_METATYPE(HyGuiFrame *)
 

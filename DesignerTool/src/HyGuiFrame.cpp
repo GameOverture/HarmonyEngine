@@ -35,46 +35,6 @@ HyGuiFrame::~HyGuiFrame()
     }
 }
 
-bool HyGuiFrame::DeleteMetaImage(QDir metaDir)
-{
-    QFile imageFile(metaDir.path() % "/" % ConstructImageFileName());
-    if(imageFile.remove() == false)
-        return false;
-
-    return true;
-}
-
-void HyGuiFrame::ReplaceImage(QString sImgPath, QDir metaDir)
-{
-    QFileInfo fileInfo(sImgPath);
-    QImage newImage(fileInfo.absoluteFilePath());
-
-    ReplaceImage(fileInfo.baseName(), newImage, metaDir);
-}
-
-void HyGuiFrame::ReplaceImage(QString sName, QImage &newImage, QDir metaDir)
-{
-    if(DeleteMetaImage(metaDir) == false)
-        HyGuiLog("Could not remove old meta image file when replacing " % sName, LOGTYPE_Error);
-
-    m_uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
-    m_sName = sName;
-    m_iWidth = newImage.width();
-    m_iHeight = newImage.height();
-    
-    if(m_eType != ATLAS_Font && m_eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
-        m_rAlphaCrop = ImagePacker::crop(newImage);
-    else
-        m_rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
-
-    m_iTextureIndex = -1;
-    m_iPosX = -1;
-    m_iPosY = -1;
-
-    if(newImage.save(metaDir.path() % "/" % ConstructImageFileName()) == false)
-        HyGuiLog("Could not save frame image to meta directory: " % m_sName, LOGTYPE_Error);
-}
-
 HyTexturedQuad2d *HyGuiFrame::DrawInst(void *pKey)
 {
     QMap<void *, HyTexturedQuad2d *>::iterator iter = m_DrawInstMap.find(pKey);
@@ -144,9 +104,16 @@ void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
             iter.next();
             iter.value()->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.width(), m_rAlphaCrop.height());
         }
+
+        if(m_pTreeWidgetItem)
+            m_pTreeWidgetItem->setText(1, "Tex:" % QString::number(m_iTextureIndex));
     }
     else
+    {
         SetError(GUIFRAMEERROR_CouldNotPack);
+        if(m_pTreeWidgetItem)
+            m_pTreeWidgetItem->setText(1, "Invalid");
+    }
 }
 
 QString HyGuiFrame::ConstructImageFileName()
@@ -207,7 +174,10 @@ void HyGuiFrame::ClearError(eGuiFrameError eError)
     if(m_pTreeWidgetItem)
     {
         if(m_uiErrors == 0)
+        {
             m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(m_eType));
+            m_pTreeWidgetItem->setToolTip(0, "");
+        }
         else
         {
             m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
@@ -219,6 +189,42 @@ void HyGuiFrame::ClearError(eGuiFrameError eError)
 uint HyGuiFrame::GetErrors()
 {
     return m_uiErrors;
+}
+
+bool HyGuiFrame::DeleteMetaImage(QDir metaDir)
+{
+    if(0 != (m_uiErrors & GUIFRAMEERROR_Duplicate))
+        return true;
+
+    QFile imageFile(metaDir.path() % "/" % ConstructImageFileName());
+    if(imageFile.remove() == false)
+        return false;
+
+    return true;
+}
+
+void HyGuiFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir)
+{
+    DeleteMetaImage(metaDir);
+
+    m_sName = sName;
+    m_pTreeWidgetItem->setText(0, m_sName);
+
+    m_uiChecksum = uiChecksum;
+    m_iWidth = newImage.width();
+    m_iHeight = newImage.height();
+
+    if(m_eType != ATLAS_Font && m_eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
+        m_rAlphaCrop = ImagePacker::crop(newImage);
+    else
+        m_rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
+
+    m_iTextureIndex = -1;
+    m_iPosX = -1;
+    m_iPosY = -1;
+
+    if(newImage.save(metaDir.path() % "/" % ConstructImageFileName()) == false)
+        HyGuiLog("Could not save frame image to meta directory: " % m_sName, LOGTYPE_Error);
 }
 
 QDataStream &operator<<(QDataStream &out, HyGuiFrame *const &rhs)

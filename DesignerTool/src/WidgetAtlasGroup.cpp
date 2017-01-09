@@ -472,8 +472,8 @@ void WidgetAtlasGroup::Refresh()
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // CLEARING EXISTING DATA
     m_Packer.clear();
-    QStringList sTextureNames = m_DataDir.entryList(QDir::NoDotAndDotDot);
     
+    QStringList sTextureNames = m_DataDir.entryList(QDir::NoDotAndDotDot);
     for(int i = 0; i < sTextureNames.size(); ++i)
         QFile::remove(sTextureNames[i]);
 
@@ -491,6 +491,8 @@ void WidgetAtlasGroup::Refresh()
                          m_MetaDir.absoluteFilePath(m_FrameList[i]->ConstructImageFileName()));
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PACK THE BINS WITH ALL THE FRAMES
     m_dlgSettings.SetPackerSettings(&m_Packer);
     m_Packer.pack(m_dlgSettings.GetHeuristic(), m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight());
 
@@ -516,22 +518,27 @@ void WidgetAtlasGroup::Refresh()
         bool bValid = true;
         inputImage &imgInfoRef = m_Packer.images[i];
 
-        if(imgInfoRef.duplicateId != NULL && m_Packer.merge)
-            continue;
-
         if(imgInfoRef.pos.x() == 999999)    // This is scriptum image packer's (dumb) indication of an invalid image...
             bValid = false;
 
         HyGuiFrame *pFrame = reinterpret_cast<HyGuiFrame *>(imgInfoRef.id);
 
         pFrame->UpdateInfoFromPacker(bValid ? imgInfoRef.textureId : -1,
-                                    imgInfoRef.pos.x() + m_Packer.border.l,
-                                    imgInfoRef.pos.y() + m_Packer.border.t);
+                                     imgInfoRef.pos.x() + m_Packer.border.l,
+                                     imgInfoRef.pos.y() + m_Packer.border.t);
 
         QJsonObject frameObj;
         pFrame->GetJsonObj(frameObj);
         frameArray.append(QJsonValue(frameObj));
         
+        if(imgInfoRef.duplicateId != NULL && m_Packer.merge)
+        {
+            pFrame->SetError(GUIFRAMEERROR_Duplicate);
+            bValid = false;
+        }
+        else
+            pFrame->ClearError(GUIFRAMEERROR_Duplicate);
+
         if(bValid == false)
             continue;
 
@@ -654,9 +661,21 @@ void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFra
     pNewTreeItem->setText(0, pFrame->GetName());
 
     if(pFrame->GetTextureIndex() >= 0)
+    {
         pNewTreeItem->setText(1, "Tex:" % QString::number(pFrame->GetTextureIndex()));
+        pFrame->ClearError(GUIFRAMEERROR_CouldNotPack);
+    }
     else
+    {
         pNewTreeItem->setText(1, "Invalid");
+        pFrame->SetError(GUIFRAMEERROR_CouldNotPack);
+    }
+
+    if(pFrame->GetErrors() != 0)
+    {
+        pNewTreeItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
+        pNewTreeItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(pFrame->GetErrors()));
+    }
 
     QVariant v; v.setValue(pFrame);
     pNewTreeItem->setData(0, Qt::UserRole, v);
@@ -769,7 +788,11 @@ void WidgetAtlasGroup::on_actionReplaceImages_triggered()
     for(int i = 0; i < selectedImageList.count(); ++i)
     {
         HyGuiLog("Replacing: " % selectedImageList[i]->GetName() % " -> " % sImportImgList[i], LOGTYPE_Info);
-        selectedImageList[i]->ReplaceImage(sImportImgList[i], m_MetaDir);
+
+        QFileInfo fileInfo(sImportImgList[i]);
+        QImage newImage(fileInfo.absoluteFilePath());
+
+        m_pManager->ReplaceFrame(selectedImageList[i], fileInfo.fileName(), newImage);
     }
 
     Refresh();
