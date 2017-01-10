@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Time/IHyTime.h"
 
-/*static*/ const uint32			IHyTime::sm_uiUPDATESTEP_MILLISECONDS = 10;
+/*static*/ const uint32			IHyTime::sm_uiUPDATESTEP_MILLISECONDS = 16;
 /*static*/ const double			IHyTime::sm_dUPDATESTEP_SECONDS = sm_uiUPDATESTEP_MILLISECONDS / 1000.0;
 
 IHyTime::IHyTime() :	m_dTimeManipulation(1.0f),
@@ -43,13 +43,12 @@ bool IHyTime::ThrottleTime()
 
 	if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS)
 	{
-		m_iThrottleSafetyCounter++;
 		m_dThrottledTime -= sm_dUPDATESTEP_SECONDS;
 
-		if(m_iThrottleSafetyCounter < 5)
-			return true;
-		else
-			m_dThrottledTime = 0.0;
+		if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS)
+			m_iThrottleSafetyCounter = 0;
+
+		return true;
 	}
 
 	m_iThrottleSafetyCounter = 0;

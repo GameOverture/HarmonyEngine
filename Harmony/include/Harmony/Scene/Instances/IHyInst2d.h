@@ -42,6 +42,7 @@ protected:
 	HyCoordinateType				m_eCoordType;
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
 	HyRenderState					m_RenderState;
+	HyRectangle<int32>				m_LocalScissorRect;
 
 	float							m_fAlpha;
 
@@ -68,8 +69,8 @@ public:
 
 	void SetTint(float fR, float fG, float fB);
 
-	virtual void SetScissor(uint32 uiX, uint32 uiY, uint32 uiWidth, uint32 uiHeight);
-	virtual void ClearScissor();
+	void SetScissor(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight);
+	void ClearScissor();
 
 	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);

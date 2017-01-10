@@ -113,54 +113,6 @@ int32 HyEntity2d::GetDisplayOrderMax()
 	m_iDisplayOrderMax = iOrderValue;
 }
 
-/*virtual*/ void HyEntity2d::SetScissor(uint32 uiX, uint32 uiY, uint32 uiWidth, uint32 uiHeight)
-{
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		switch(m_ChildList[i]->GetType())
-		{
-		case HYTYPE_Sound2d:
-		case HYTYPE_Particles2d:
-		case HYTYPE_Sprite2d:
-		case HYTYPE_Spine2d:
-		case HYTYPE_TexturedQuad2d:
-		case HYTYPE_Primitive2d:
-		case HYTYPE_Text2d:
-			static_cast<IHyInst2d *>(m_ChildList[i])->SetScissor(uiX, uiY, uiWidth, uiHeight);
-			break;
-		case HYTYPE_Entity2d:
-			static_cast<HyEntity2d *>(m_ChildList[i])->SetScissor(uiX, uiY, uiWidth, uiHeight);
-			break;
-		}
-	}
-
-	IHyInst2d::SetScissor(uiX, uiY, uiWidth, uiHeight);
-}
-
-/*virtual*/ void HyEntity2d::ClearScissor()
-{
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		switch(m_ChildList[i]->GetType())
-		{
-		case HYTYPE_Sound2d:
-		case HYTYPE_Particles2d:
-		case HYTYPE_Sprite2d:
-		case HYTYPE_Spine2d:
-		case HYTYPE_TexturedQuad2d:
-		case HYTYPE_Primitive2d:
-		case HYTYPE_Text2d:
-			static_cast<IHyInst2d *>(m_ChildList[i])->ClearScissor();
-			break;
-		case HYTYPE_Entity2d:
-			static_cast<HyEntity2d *>(m_ChildList[i])->ClearScissor();
-			break;
-		}
-	}
-
-	IHyInst2d::ClearScissor();
-}
-
 /*virtual*/ void HyEntity2d::Load()
 {
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)

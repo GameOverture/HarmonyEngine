@@ -65,27 +65,28 @@ void HyRenderState::SetNumVerticesPerInstance(uint32 uiNumVerts)
 
 bool HyRenderState::IsScissorRect()
 {
-	return m_ScissorRect.iTag != 0;
+	return (m_uiAttributeFlags & SCISSORTEST) != 0;
 }
 
-const HyRectangle<uint32> &HyRenderState::GetScissorRect()
+const HyRectangle<int32> &HyRenderState::GetScissorRect()
 {
 	return m_ScissorRect;
 }
 
-void HyRenderState::SetScissorRect(uint32 uiX, uint32 uiY, uint32 uiWidth, uint32 uiHeight)
+void HyRenderState::SetScissorRect(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight)
 {
 	m_ScissorRect.left = uiX;
 	m_ScissorRect.bottom = uiY;
 	m_ScissorRect.right = uiWidth;
 	m_ScissorRect.top = uiHeight;
 
-	m_ScissorRect.iTag = 1;
+	m_uiAttributeFlags |= SCISSORTEST;
 }
 
 void HyRenderState::ClearScissorRect()
 {
 	memset(&m_ScissorRect, 0, sizeof(HyRectangle<uint32>));
+	m_uiAttributeFlags &= ~SCISSORTEST;
 }
 
 void HyRenderState::Enable(uint32 uiAttributes)

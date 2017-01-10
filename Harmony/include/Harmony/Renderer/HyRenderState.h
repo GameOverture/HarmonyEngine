@@ -49,7 +49,7 @@ private:
 	uint32				m_uiNumVerticesPerInstance;
 	size_t				m_uiDataOffset;
 
-	HyRectangle<uint32>	m_ScissorRect;
+	HyRectangle<int32>	m_ScissorRect;
 
 public:
 	HyRenderState();
@@ -66,8 +66,8 @@ public:
 	void SetNumVerticesPerInstance(uint32 uiNumVerts);
 
 	bool IsScissorRect();
-	const HyRectangle<uint32> &GetScissorRect();
-	void SetScissorRect(uint32 uiX, uint32 uiY, uint32 uiWidth, uint32 uiHeight);
+	const HyRectangle<int32> &GetScissorRect();
+	void SetScissorRect(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight);
 	void ClearScissorRect();
 
 	void Enable(uint32 uiAttributes);
