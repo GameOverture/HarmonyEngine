@@ -167,15 +167,13 @@ void IHyInst2d::SetCustomShader(IHyShader *pShader)
 {
 	HyAssert(sm_pAssetManager, "IHyInst2d::Load was invoked before engine has been initialized");
 
-	if(m_eLoadState != HYLOADSTATE_Inactive)
-		return;
-
 	if(GetCoordinateType() == HYCOORDTYPE_Default)
 		SetCoordinateType(IHyApplication::DefaultCoordinateType(), NULL);
 	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
 		SetCoordinateUnit(IHyApplication::DefaultCoordinateUnit(), false);
 
-	if (m_eTYPE != HYTYPE_Entity2d &&
+	if(m_eLoadState == HYLOADSTATE_Inactive && 
+		m_eTYPE != HYTYPE_Entity2d &&
 		m_eTYPE != HYTYPE_Entity3d &&
 		m_eTYPE != HYTYPE_Camera2d &&
 		m_eTYPE != HYTYPE_Camera3d)

@@ -17,8 +17,6 @@
 #include "Utilities/jsonxx.h"
 #include "Utilities/HyFileIO.h"
 
-#define HY_TEMP_TEXTBUFFER_SIZE 1024
-
 enum HyType
 {
 	HYTYPE_Unknown = 0,
