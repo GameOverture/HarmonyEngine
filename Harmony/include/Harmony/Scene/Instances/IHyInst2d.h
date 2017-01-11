@@ -36,7 +36,6 @@ protected:
 	// Data loading
 	IHyData *						m_pData;
 	HyLoadState						m_eLoadState;
-	bool							m_bInvalidLoad;
 
 	// Attributes
 	HyCoordinateType				m_eCoordType;

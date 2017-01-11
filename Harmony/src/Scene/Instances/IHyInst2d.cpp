@@ -25,7 +25,6 @@ IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName)
 																					m_sNAME(szName ? szName : ""),
 																					m_pData(NULL),
 																					m_eLoadState(HYLOADSTATE_Inactive),
-																					m_bInvalidLoad(false),
 																					m_iDisplayOrder(0),
 																					topColor(*this),
 																					botColor(*this),
@@ -166,6 +165,8 @@ void IHyInst2d::SetCustomShader(IHyShader *pShader)
 
 /*virtual*/ void IHyInst2d::Load()
 {
+	HyAssert(sm_pAssetManager, "IHyInst2d::Load was invoked before engine has been initialized");
+
 	if(m_eLoadState != HYLOADSTATE_Inactive)
 		return;
 
@@ -174,13 +175,16 @@ void IHyInst2d::SetCustomShader(IHyShader *pShader)
 	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
 		SetCoordinateUnit(IHyApplication::DefaultCoordinateUnit(), false);
 
-	if(sm_pAssetManager)
+	if (m_eTYPE != HYTYPE_Entity2d &&
+		m_eTYPE != HYTYPE_Entity3d &&
+		m_eTYPE != HYTYPE_Camera2d &&
+		m_eTYPE != HYTYPE_Camera3d)
 	{
 		sm_pAssetManager->LoadInst2d(this);
-		m_bInvalidLoad = false;
 	}
-	else
-		m_bInvalidLoad = true;
+
+	for (uint32 i = 0; i < m_ChildList.size(); ++i)
+		static_cast<IHyInst2d *>(m_ChildList[i])->Load();
 }
 
 /*virtual*/ void IHyInst2d::Unload()
