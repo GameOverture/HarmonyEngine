@@ -11,6 +11,7 @@
 #include "Diagnostics/HyGuiComms.h"
 
 HySprite2d::HySprite2d(const char *szPrefix, const char *szName) :	IHyInst2d(HYTYPE_Sprite2d, szPrefix, szName),
+																	m_bIsAnimPaused(false),
 																	m_fAnimPlayRate(1.0f),
 																	m_fElapsedFrameTime(0.0f),
 																	m_uiCurAnimState(0),
@@ -54,14 +55,12 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 	switch(eAnimCtrl)
 	{
 	case HYANIMCTRL_Play:
-		m_AnimCtrlAttribList[uiAnimState] &= ~(ANIMCTRLATTRIB_Paused | ANIMCTRLATTRIB_Reverse);
+		m_bIsAnimPaused = false;
+		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Reverse;
 		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_PRELOADAPPLY_DontReverse;
 		break;
-	case HYANIMCTRL_Pause:
-		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_Paused;
-		break;
 	case HYANIMCTRL_ReversePlay:
-		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Paused;
+		m_bIsAnimPaused = false;
 		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_Reverse;
 		break;
 	case HYANIMCTRL_Reset:
@@ -86,6 +85,11 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_PRELOADAPPLY_DontBounce;
 		break;
 	}
+}
+
+void HySprite2d::AnimSetPause(bool bPause)
+{
+	m_bIsAnimPaused = bPause;
 }
 
 uint32 HySprite2d::AnimGetNumStates() const
@@ -204,10 +208,7 @@ bool HySprite2d::AnimIsFinished() const
 
 bool HySprite2d::AnimIsPaused()
 {
-	while(m_uiCurAnimState >= m_AnimCtrlAttribList.size())
-		m_AnimCtrlAttribList.push_back(0);
-
-	return (m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Paused) != 0;
+	return m_bIsAnimPaused;
 }
 
 void HySprite2d::AnimSetCallback(uint32 uiStateID, void(*fpCallback)(HySprite2d &, void *), void *pParam /*= NULL*/)
@@ -283,7 +284,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiCurAnimState];
 
-	if((uiAnimCtrlRef & ANIMCTRLATTRIB_Paused) == 0)
+	if(m_bIsAnimPaused == false)
 		m_fElapsedFrameTime += IHyTime::GetUpdateStepSeconds() * m_fAnimPlayRate;
 
 	while(m_fElapsedFrameTime >= frameRef.fDURATION)

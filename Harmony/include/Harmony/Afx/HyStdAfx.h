@@ -39,7 +39,6 @@ enum HyType
 enum HyAnimCtrl
 {
 	HYANIMCTRL_Play = 0,
-	HYANIMCTRL_Pause,
 	HYANIMCTRL_ReversePlay,
 	HYANIMCTRL_Reset,
 	HYANIMCTRL_Loop,

@@ -27,16 +27,16 @@ protected:
 		ANIMCTRLATTRIB_Reverse					= 1 << 1,
 		ANIMCTRLATTRIB_Bounce					= 1 << 2,
 		ANIMCTRLATTRIB_IsBouncing				= 1 << 3,	// True if anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
-		ANIMCTRLATTRIB_Paused					= 1 << 4,
 
 		// Below are only used when this instance isn't loaded yet. They are the "off" values to be applied once the instance actually is loaded
-		ANIMCTRLATTRIB_PRELOADAPPLY_DontLoop	= 1 << 5,
-		ANIMCTRLATTRIB_PRELOADAPPLY_DontBounce	= 1 << 6,
-		ANIMCTRLATTRIB_PRELOADAPPLY_DontReverse	= 1 << 7
+		ANIMCTRLATTRIB_PRELOADAPPLY_DontLoop	= 1 << 4,
+		ANIMCTRLATTRIB_PRELOADAPPLY_DontBounce	= 1 << 5,
+		ANIMCTRLATTRIB_PRELOADAPPLY_DontReverse	= 1 << 6
 
 		// Do not exceed '8' attributes, or else increase uint8s
 	};
 	std::vector<uint8>		m_AnimCtrlAttribList;
+	bool					m_bIsAnimPaused;
 
 	float					m_fAnimPlayRate;
 	float					m_fElapsedFrameTime;
@@ -59,6 +59,8 @@ public:
 	//--------------------------------------------------------------------------------------
 	void AnimCtrl(HyAnimCtrl eAnimCtrl);
 	void AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState);
+
+	void AnimSetPause(bool bPause);
 	
 	uint32 AnimGetNumStates() const;
 	uint32 AnimGetCurState() const;
