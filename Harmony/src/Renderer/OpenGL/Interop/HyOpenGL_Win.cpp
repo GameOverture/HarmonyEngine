@@ -112,9 +112,18 @@ HWND HyOpenGL_Win::ConstructWindow(const HyWindowInfo &wndInfo)
 
 	DWORD dwStyle;
 	DWORD dwExStyle;
-	if(wndInfo.eType == HYWINDOW_FullScreen)
+	DEVMODE dmScreenSettings;
+	switch(wndInfo.eType)
 	{
-		DEVMODE dmScreenSettings;
+	case HYWINDOW_WindowedFixed:
+		dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;			// Window Extended Style
+		dwStyle = WS_OVERLAPPEDWINDOW;							// Windows Style
+		break;
+	case HYWINDOW_WindowedSizeable:
+		dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;			// Window Extended Style
+		dwStyle = WS_OVERLAPPEDWINDOW;							// Windows Style
+		break;
+	case HYWINDOW_FullScreen:
 		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
 		dmScreenSettings.dmSize = sizeof(dmScreenSettings);
 		dmScreenSettings.dmPelsWidth = wndInfo.vResolution.x;
@@ -130,11 +139,11 @@ HWND HyOpenGL_Win::ConstructWindow(const HyWindowInfo &wndInfo)
 		dwExStyle = WS_EX_APPWINDOW;							// Window Extended Style
 		dwStyle = WS_POPUP;										// Windows Style
 		ShowCursor(FALSE);
-	}
-	else
-	{
+		break;
+	case HYWINDOW_BorderlessWindow:
 		dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;			// Window Extended Style
-		dwStyle = WS_OVERLAPPEDWINDOW;							// Windows Style
+		dwStyle = WS_POPUP;							// Windows Style
+		break;
 	}
 
 	RECT rWndRect;
