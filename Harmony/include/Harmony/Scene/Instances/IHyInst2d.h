@@ -40,6 +40,7 @@ protected:
 	// Attributes
 	HyCoordinateType				m_eCoordType;
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
+	int32							m_iDisplayOrderMax;	// The highest display order in this hierarchy (children attached)
 	HyRenderState					m_RenderState;
 	HyRectangle<int32>				m_LocalScissorRect;
 
@@ -59,13 +60,12 @@ public:
 	const std::string &GetName();
 	const std::string &GetPrefix();
 
-	virtual bool IsLoaded() const;
-
 	HyCoordinateType GetCoordinateType();
 	void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);
 
 	int32 GetDisplayOrder() const;
-	virtual void SetDisplayOrder(int32 iOrderValue);
+	int32 GetDisplayOrderMax() const;
+	void SetDisplayOrder(int32 iOrderValue);
 
 	void SetTint(float fR, float fG, float fB);
 
@@ -74,6 +74,8 @@ public:
 
 	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);
+
+	bool IsLoaded() const;
 
 	void Load();
 	void Unload();

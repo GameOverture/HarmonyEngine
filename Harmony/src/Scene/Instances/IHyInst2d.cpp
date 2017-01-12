@@ -26,6 +26,7 @@ IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName)
 																					m_pData(NULL),
 																					m_eLoadState(HYLOADSTATE_Inactive),
 																					m_iDisplayOrder(0),
+																					m_iDisplayOrderMax(0),
 																					topColor(*this),
 																					botColor(*this),
 																					m_fAlpha(1.0f),
@@ -56,11 +57,6 @@ const std::string &IHyInst2d::GetName()
 const std::string &IHyInst2d::GetPrefix()
 {
 	return m_sPREFIX;
-}
-
-/*virtual*/ bool IHyInst2d::IsLoaded() const
-{
-	return m_eLoadState == HYLOADSTATE_Loaded;
 }
 
 HyCoordinateType IHyInst2d::GetCoordinateType()
@@ -113,9 +109,27 @@ int32 IHyInst2d::GetDisplayOrder() const
 	return m_iDisplayOrder;
 }
 
+int32 IHyInst2d::GetDisplayOrderMax() const
+{
+	return m_iDisplayOrderMax;
+}
+
 void IHyInst2d::SetDisplayOrder(int32 iOrderValue)
 {
 	m_iDisplayOrder = iOrderValue;
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(m_ChildList[i]->IsInst2d())
+		{
+			++iOrderValue;
+			static_cast<IHyInst2d *>(m_ChildList[i])->SetDisplayOrder(iOrderValue);
+			iOrderValue = static_cast<IHyInst2d *>(m_ChildList[i])->GetDisplayOrderMax();
+		}
+	}
+
+	m_iDisplayOrderMax = iOrderValue;
+
 	HyScene::SetInstOrderingDirty();
 }
 
@@ -170,6 +184,20 @@ void IHyInst2d::SetCustomShader(IHyShader *pShader)
 	HyAssert(pShader->IsFinalized(), "IHyInst2d::SetCustomShader tried to set a non-finalized shader");
 
 	m_RenderState.SetShaderId(pShader->GetId());
+}
+
+bool IHyInst2d::IsLoaded() const
+{
+	if(m_eTYPE != HYTYPE_Entity2d && m_eLoadState != HYLOADSTATE_Loaded)
+		return false;
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(m_ChildList[i]->IsInst2d() && static_cast<IHyInst2d *>(m_ChildList[i])->IsLoaded() == false)
+			return false;
+	}
+
+	return true;
 }
 
 void IHyInst2d::Load()

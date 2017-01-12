@@ -21,19 +21,10 @@
 
 class IHyEntity2d : public IHyInst2d
 {
-	int32					m_iDisplayOrderMax;
-
 public:
 	IHyEntity2d();
 	IHyEntity2d(const char *szPrefix, const char *szName);
 	virtual ~IHyEntity2d(void);
-
-	virtual void SetEnabled(bool bEnabled);
-	
-	virtual bool IsLoaded() const;
-
-	int32 GetDisplayOrderMax();
-	virtual void SetDisplayOrder(int32 iOrderValue);
 
 private:
 	virtual void OnUpdate() = 0;

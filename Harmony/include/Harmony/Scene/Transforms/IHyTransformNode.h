@@ -41,7 +41,7 @@ public:
 	bool IsInst2d();
 
 	bool IsEnabled();
-	virtual void SetEnabled(bool bEnabled);
+	void SetEnabled(bool bEnabled);
 
 	int64 GetTag();
 	void SetTag(int64 iTag);
