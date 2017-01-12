@@ -62,7 +62,7 @@ void HyTexturedQuad2d::SetTextureSource(uint32 uiTextureIndex)
 
 void HyTexturedQuad2d::SetTextureSource(uint32 uiTextureIndex, int iX, int iY, int iWidth, int iHeight)
 {
-	if(IsLoaded())
+	if(m_eLoadState != HYLOADSTATE_Loaded)
 	{
 		float fX = static_cast<float>(iX);
 		float fY = static_cast<float>(iY);
@@ -107,7 +107,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureWidth()
 	if(m_bIS_RAW)
 		return m_uiRAW_TEXTURE_WIDTH;
 
-	if(IsLoaded())
+	if(m_eLoadState != HYLOADSTATE_Loaded)
 		return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetWidth();
 	else
 		return 0;
@@ -118,7 +118,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	if(m_bIS_RAW)
 		return m_uiRAW_TEXTURE_HEIGHT;
 
-	if(IsLoaded())
+	if(m_eLoadState != HYLOADSTATE_Loaded)
 		return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetHeight();
 	else
 		return 0;
@@ -129,7 +129,7 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	if(m_bIS_RAW)
 		return 1;
 
-	if(IsLoaded())
+	if(m_eLoadState != HYLOADSTATE_Loaded)
 		return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetNumTextures();
 	else
 		return 0;

@@ -94,7 +94,7 @@ void HySprite2d::AnimSetPause(bool bPause)
 
 uint32 HySprite2d::AnimGetNumStates() const
 {
-	if(IsLoaded() == false)
+	if(m_eLoadState != HYLOADSTATE_Loaded)
 	{
 		HyLogWarning("HySprite2d::AnimGetNumStates invoked before sprite instance has loaded. Returning 0");
 		return 0;
@@ -110,7 +110,7 @@ uint32 HySprite2d::AnimGetCurState() const
 
 uint32 HySprite2d::AnimGetNumFrames() const
 {
-	if(IsLoaded() == false)
+	if(m_eLoadState != HYLOADSTATE_Loaded)
 	{
 		HyLogWarning("HySprite2d::AnimGetNumFrames invoked before sprite instance has loaded. Returning 0");
 		return 0;
@@ -126,7 +126,7 @@ uint32 HySprite2d::AnimGetFrame() const
 
 void HySprite2d::AnimSetFrame(uint32 uiFrameIndex)
 {
-	if(IsLoaded())
+	if(m_eLoadState != HYLOADSTATE_Loaded)
 	{
 		if(uiFrameIndex >= static_cast<HySprite2dData *>(m_pData)->GetState(m_uiCurAnimState).m_uiNUMFRAMES)
 		{
@@ -153,7 +153,7 @@ void HySprite2d::AnimSetPlayRate(float fPlayRate)
 
 void HySprite2d::AnimSetState(uint32 uiStateIndex)
 {
-	if(IsLoaded())
+	if(m_eLoadState == HYLOADSTATE_Loaded)
 	{
 		if(uiStateIndex >= static_cast<HySprite2dData *>(m_pData)->GetNumStates())
 		{
@@ -178,7 +178,7 @@ void HySprite2d::AnimSetState(uint32 uiStateIndex)
 
 bool HySprite2d::AnimIsFinished() const
 {
-	if(IsLoaded() == false)
+	if(m_eLoadState != HYLOADSTATE_Loaded)
 	{
 		HyLogWarning("HySprite2d::AnimIsFinished invoked before sprite instance has loaded. Returning false");
 		return false;
@@ -222,12 +222,12 @@ void HySprite2d::AnimSetCallback(uint32 uiStateID, void(*fpCallback)(HySprite2d 
 
 float HySprite2d::AnimGetCurFrameWidth(bool bIncludeScaling /*= true*/)
 {
-	if(IsLoaded() == false)
+	if(m_eLoadState != HYLOADSTATE_Loaded)
 	{
 		HyLogWarning("HySprite2d::AnimGetCurFrameWidth invoked before sprite instance has loaded. Returning 0.0f");
 		return 0.0f;
 	}
-
+	
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 
 	return frameRef.rSRC_RECT.Width() * frameRef.pAtlasGroup->GetWidth() * (bIncludeScaling ? scale.X() : 1.0f);
@@ -235,7 +235,7 @@ float HySprite2d::AnimGetCurFrameWidth(bool bIncludeScaling /*= true*/)
 
 float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 {
-	if(IsLoaded() == false)
+	if(m_eLoadState != HYLOADSTATE_Loaded)
 	{
 		HyLogWarning("HySprite2d::AnimGetCurFrameHeight invoked before sprite instance has loaded. Returning 0.0f");
 		return 0.0f;
@@ -278,7 +278,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 
 /*virtual*/ void HySprite2d::OnUpdate()
 {
-	if(IsLoaded() == false)
+	if(m_eLoadState != HYLOADSTATE_Loaded)
 		return;
 
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
