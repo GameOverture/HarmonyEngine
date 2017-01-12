@@ -18,6 +18,8 @@
 
 #include "Scene/IHyEntity2d.h"
 
+#include "Diagnostics/HyGuiComms.h"
+
 /*static*/ HyAssetManager *IHyInst2d::sm_pAssetManager = NULL;
 
 IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName) :	IHyTransform2d(eInstType),
@@ -46,6 +48,16 @@ IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName)
 
 /*virtual*/ IHyInst2d::~IHyInst2d(void)
 {
+	if(m_ChildList.empty() == false)
+	{
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		{
+			if(m_ChildList[i]->IsInst2d())
+				static_cast<IHyInst2d *>(m_ChildList[i])->Detach();
+		}
+		HyLogWarning("Deleting IHyInst2d (" << m_sPREFIX << "/" << m_sNAME << ") with '" << m_ChildList.size() << "' children attached. These children are now orphaned");
+	}
+
 	Unload();
 }
 
@@ -227,6 +239,12 @@ void IHyInst2d::Unload()
 
 	m_pData = NULL;
 	m_eLoadState = HYLOADSTATE_Inactive;
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(m_ChildList[i]->IsInst2d())
+			static_cast<IHyInst2d *>(m_ChildList[i])->Unload();
+	}
 }
 
 void IHyInst2d::SetData(IHyData *pData)
