@@ -93,9 +93,6 @@
     <ClCompile Include="Input\IHyInputMap.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\HyEntity2d.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\HyPhysEntity2d.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
@@ -224,6 +221,9 @@
     </ClCompile>
     <ClCompile Include="Scene\Transforms\Tweens\HyTweenVec3.cpp">
       <Filter>Scene\Transforms\Tweens</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\IHyEntity2d.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -465,9 +465,6 @@
     <ClInclude Include="..\include\Harmony\Input\Interop\HyInputMap_Gainput.h">
       <Filter>Input\Interop</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\HyEntity2d.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\HyPhysEntity2d.h">
       <Filter>Scene</Filter>
     </ClInclude>
@@ -606,6 +603,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Transforms\Tweens\HyTweenVec3.h">
       <Filter>Scene\Transforms\Tweens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\IHyEntity2d.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

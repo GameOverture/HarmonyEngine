@@ -77,9 +77,9 @@
     <ClCompile Include="Renderer\OpenGL\Interop\HyOpenGL_Win.cpp" />
     <ClCompile Include="Renderer\Viewport\HyWindow.cpp" />
     <ClCompile Include="Renderer\Viewport\HyCamera.cpp" />
-    <ClCompile Include="Scene\HyEntity2d.cpp" />
     <ClCompile Include="Scene\HyPhysEntity2d.cpp" />
     <ClCompile Include="Scene\HyScene.cpp" />
+    <ClCompile Include="Scene\IHyEntity2d.cpp" />
     <ClCompile Include="Scene\Instances\HyAudio2d.cpp" />
     <ClCompile Include="Scene\Instances\HyMesh3d.cpp" />
     <ClCompile Include="Scene\Instances\HyPrimitive2d.cpp" />
@@ -182,9 +182,9 @@
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Win.h" />
     <ClInclude Include="..\include\Harmony\Renderer\Viewport\HyWindow.h" />
     <ClInclude Include="..\include\Harmony\Renderer\Viewport\HyCamera.h" />
-    <ClInclude Include="..\include\Harmony\Scene\HyEntity2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\HyPhysEntity2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\HyScene.h" />
+    <ClInclude Include="..\include\Harmony\Scene\IHyEntity2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Instances\HyAudio2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Instances\HyMesh3d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Instances\HyPrimitive2d.h" />
