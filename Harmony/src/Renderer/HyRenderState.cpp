@@ -73,6 +73,13 @@ const HyRectangle<int32> &HyRenderState::GetScissorRect()
 	return m_ScissorRect;
 }
 
+void HyRenderState::SetScissorRect(const HyRectangle<int32> &rect)
+{
+	m_ScissorRect = rect;
+
+	m_uiAttributeFlags |= SCISSORTEST;
+}
+
 void HyRenderState::SetScissorRect(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight)
 {
 	m_ScissorRect.left = uiX;

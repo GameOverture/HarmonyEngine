@@ -16,7 +16,7 @@
 #include "Renderer/Viewport/HyCamera.h"
 #include "Renderer/Viewport/HyWindow.h"
 
-#include "Scene/HyEntity2d.h"
+#include "Scene/IHyEntity2d.h"
 
 /*static*/ HyAssetManager *IHyInst2d::sm_pAssetManager = NULL;
 
@@ -29,8 +29,11 @@ IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName)
 																					topColor(*this),
 																					botColor(*this),
 																					m_fAlpha(1.0f),
+																					m_fPrevAlphaValue(1.0f),
 																					alpha(m_fAlpha, *this)
 {
+	m_bIsInst2d = true;
+
 #ifdef HY_DEBUG
 	if(m_eTYPE != HYTYPE_Entity2d && m_eTYPE != HYTYPE_Primitive2d)
 		HyAssert(m_sPREFIX.empty() == false && m_sNAME.empty() == false, "IHyInst2d of type '" << m_eTYPE << "' was constructed with a blank prefix or name");
@@ -97,6 +100,12 @@ void IHyInst2d::SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCame
 		m_RenderState.Enable(HyRenderState::USINGSCREENCOORDS);
 	else
 		m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(m_ChildList[i]->IsInst2d())
+			static_cast<IHyInst2d *>(m_ChildList[i])->SetCoordinateType(eCoordType, pCameraToCovertFrom);
+	}
 }
 
 int32 IHyInst2d::GetDisplayOrder() const
@@ -144,7 +153,7 @@ void IHyInst2d::ClearScissor()
 			static_cast<IHyInst2d *>(m_ChildList[i])->m_RenderState.ClearScissorRect();
 			break;
 		case HYTYPE_Entity2d:
-			static_cast<HyEntity2d *>(m_ChildList[i])->m_RenderState.ClearScissorRect();
+			static_cast<IHyEntity2d *>(m_ChildList[i])->m_RenderState.ClearScissorRect();
 			break;
 		}
 	}
@@ -163,7 +172,7 @@ void IHyInst2d::SetCustomShader(IHyShader *pShader)
 	m_RenderState.SetShaderId(pShader->GetId());
 }
 
-/*virtual*/ void IHyInst2d::Load()
+void IHyInst2d::Load()
 {
 	HyAssert(sm_pAssetManager, "IHyInst2d::Load was invoked before engine has been initialized");
 
@@ -172,25 +181,23 @@ void IHyInst2d::SetCustomShader(IHyShader *pShader)
 	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
 		SetCoordinateUnit(IHyApplication::DefaultCoordinateUnit(), false);
 
-	if(m_eLoadState == HYLOADSTATE_Inactive && 
-		m_eTYPE != HYTYPE_Entity2d &&
-		m_eTYPE != HYTYPE_Entity3d &&
-		m_eTYPE != HYTYPE_Camera2d &&
-		m_eTYPE != HYTYPE_Camera3d)
-	{
+	if(m_eLoadState == HYLOADSTATE_Inactive)
 		sm_pAssetManager->LoadInst2d(this);
-	}
 
 	for (uint32 i = 0; i < m_ChildList.size(); ++i)
-		static_cast<IHyInst2d *>(m_ChildList[i])->Load();
+	{
+		if(m_ChildList[i]->IsInst2d())
+			static_cast<IHyInst2d *>(m_ChildList[i])->Load();
+	}
 }
 
-/*virtual*/ void IHyInst2d::Unload()
+void IHyInst2d::Unload()
 {
 	if(sm_pAssetManager)
 		sm_pAssetManager->RemoveInst(this);
 
 	m_pData = NULL;
+
 	m_eLoadState = HYLOADSTATE_Inactive;
 }
 
@@ -215,51 +222,41 @@ void IHyInst2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 	m_ShaderUniforms.WriteUniformsBufferData(pRefDataWritePos);
 }
 
-/*virtual*/ void IHyInst2d::OnUpdate()
+/*virtual*/ void IHyInst2d::InstUpdate()
 {
 	if(m_LocalScissorRect.iTag == 1)
 	{
 		glm::mat4 mtx;
 		GetWorldTransform(mtx);
 
-		// TODO: Apply scaling to the scissor rects below
-
 		m_RenderState.SetScissorRect(static_cast<int32>(mtx[3].x + m_LocalScissorRect.left),
 									 static_cast<int32>(mtx[3].y + m_LocalScissorRect.bottom),
-									 static_cast<uint32>(m_LocalScissorRect.right),
-									 static_cast<uint32>(m_LocalScissorRect.top));
+									 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.right),
+									 static_cast<uint32>(mtx[1].y * m_LocalScissorRect.top));
 
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
-			switch(m_ChildList[i]->GetType())
-			{
-			case HYTYPE_Particles2d:
-			case HYTYPE_Sprite2d:
-			case HYTYPE_Spine2d:
-			case HYTYPE_TexturedQuad2d:
-			case HYTYPE_Primitive2d:
-			case HYTYPE_Text2d:
-				static_cast<IHyInst2d *>(m_ChildList[i])->m_RenderState.SetScissorRect(static_cast<int32>(mtx[3].x + m_LocalScissorRect.left),
-																					   static_cast<int32>(mtx[3].y + m_LocalScissorRect.bottom),
-																					   static_cast<uint32>(m_LocalScissorRect.right),
-																					   static_cast<uint32>(m_LocalScissorRect.top));
-				break;
-			case HYTYPE_Entity2d:
-				static_cast<HyEntity2d *>(m_ChildList[i])->m_RenderState.SetScissorRect(static_cast<int32>(mtx[3].x + m_LocalScissorRect.left),
-																						static_cast<int32>(mtx[3].y + m_LocalScissorRect.bottom),
-																						static_cast<uint32>(m_LocalScissorRect.right),
-																						static_cast<uint32>(m_LocalScissorRect.top));
-				break;
-			}
+			if(m_ChildList[i]->IsInst2d())
+				static_cast<IHyInst2d *>(m_ChildList[i])->m_RenderState.SetScissorRect(m_RenderState.GetScissorRect());
 		}
 	}
 
+	if(m_fPrevAlphaValue != alpha.Get())
+	{
+		m_fPrevAlphaValue = alpha.Get();
 
-	if(m_eLoadState != HYLOADSTATE_Loaded)
-		return;
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		{
+			if(m_ChildList[i]->IsInst2d())
+				static_cast<IHyInst2d *>(m_ChildList[i])->alpha.Set(alpha.Get());
+		}
+	}
 
-	OnInstUpdate();
+	OnUpdate();
 
-	OnUpdateUniforms();
-	m_RenderState.SetUniformCrc32(m_ShaderUniforms.GetCrc32());
+	if(m_eLoadState == HYLOADSTATE_Loaded)
+	{
+		OnUpdateUniforms();
+		m_RenderState.SetUniformCrc32(m_ShaderUniforms.GetCrc32());
+	}
 }

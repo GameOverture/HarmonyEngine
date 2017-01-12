@@ -187,14 +187,6 @@ void HyPrimitive2d::ClearData()
 	m_RenderState.Disable(HyRenderState::DRAWMODEMASK);
 }
 
-/*virtual*/ void HyPrimitive2d::OnDataLoaded()
-{
-}
-
-/*virtual*/ void HyPrimitive2d::OnInstUpdate()
-{
-}
-
 /*virtual*/ void HyPrimitive2d::OnUpdateUniforms()
 {
 	glm::mat4 mtx;

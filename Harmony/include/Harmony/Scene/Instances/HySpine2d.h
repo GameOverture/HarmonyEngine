@@ -111,7 +111,7 @@ public:
 private:
 	virtual void OnDataLoaded();
 
-	virtual void OnInstUpdate();
+	virtual void OnUpdate();
 	
 	virtual void OnUpdateUniforms();
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);

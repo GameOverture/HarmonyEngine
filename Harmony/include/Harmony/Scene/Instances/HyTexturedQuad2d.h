@@ -45,9 +45,9 @@ public:
 	uint32 GetNumTextures();
 
 private:
-	virtual void OnDataLoaded();
+	virtual void OnUpdate() { }
 
-	virtual void OnInstUpdate();
+	virtual void OnDataLoaded();
 	
 	virtual void OnUpdateUniforms();
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);

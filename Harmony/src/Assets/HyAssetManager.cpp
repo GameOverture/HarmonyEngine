@@ -127,6 +127,9 @@ void HyAssetManager::LoadInst2d(IHyInst2d *pInst)
 	case HYTYPE_Primitive2d:
 		pLoadData = m_Primitive2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
 		break;
+
+	default:
+		return;
 	}
 
 	pInst->SetData(pLoadData);

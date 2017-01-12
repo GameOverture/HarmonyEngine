@@ -42,9 +42,8 @@ public:
 protected:
 	void ClearData();
 
-	virtual void OnDataLoaded();
-
-	virtual void OnInstUpdate();
+private:
+	virtual void OnUpdate() { }
 	
 	virtual void OnUpdateUniforms();
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);

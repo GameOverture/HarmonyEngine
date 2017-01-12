@@ -21,12 +21,13 @@ class IHyTransformNode
 protected:
 	const HyType					m_eTYPE;
 
+	bool							m_bDirty;
+	bool							m_bIsInst2d;
 	bool							m_bEnabled;
 
 	IHyTransformNode *				m_pParent;
 	std::vector<IHyTransformNode *>	m_ChildList;
 
-	bool							m_bDirty;
 
 	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 
@@ -37,6 +38,7 @@ public:
 	virtual ~IHyTransformNode();
 
 	HyType GetType();
+	bool IsInst2d();
 
 	bool IsEnabled();
 	virtual void SetEnabled(bool bEnabled);
@@ -49,7 +51,7 @@ public:
 
 protected:
 	void Update();
-	virtual void OnUpdate() = 0;
+	virtual void InstUpdate() { }
 
 	void SetDirty();
 	void InsertActiveAnimFloat(HyTweenFloat *pAnimFloat);

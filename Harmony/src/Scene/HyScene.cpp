@@ -19,7 +19,7 @@
 #include "Scene/Instances/HyPrimitive2d.h"
 #include "Scene/Instances/HyText2d.h"
 #include "Scene/Instances/HyTexturedQuad2d.h"
-#include "Scene/HyEntity2d.h"
+#include "Scene/IHyEntity2d.h"
 #include "Scene/HyPhysEntity2d.h"
 
 #include "Time/IHyTime.h"

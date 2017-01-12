@@ -34,9 +34,6 @@ public:
 	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const;
 
 	void GetWorldTransform(glm::mat4 &outMtx);
-
-private:
-	virtual void OnUpdate() = 0;
 };
 
 #endif /* __IHyTransform2d_h__ */

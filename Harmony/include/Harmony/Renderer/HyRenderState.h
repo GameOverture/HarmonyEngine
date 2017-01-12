@@ -67,6 +67,7 @@ public:
 
 	bool IsScissorRect();
 	const HyRectangle<int32> &GetScissorRect();
+	void SetScissorRect(const HyRectangle<int32> &rect);
 	void SetScissorRect(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight);
 	void ClearScissorRect();
 

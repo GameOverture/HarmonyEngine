@@ -201,9 +201,9 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	}
 }
 
-/*virtual*/ void HyText2d::OnInstUpdate()
+/*virtual*/ void HyText2d::OnUpdate()
 {
-	if(m_bIsDirty == false)
+	if(IsLoaded() == false || m_bIsDirty == false)
 		return;
 
 	m_sCurrentString = m_sNewString;

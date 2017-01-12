@@ -37,10 +37,6 @@ HyCamera2d::HyCamera2d(HyWindow *pWindow) :	IHyTransform2d(HYTYPE_Camera2d),
 HyCamera2d::~HyCamera2d()
 { }
 
-/*virtual*/ void HyCamera2d::OnUpdate()
-{
-}
-
 HyRectangle<float> HyCamera2d::GetWorldViewBounds()
 {
 	HyRectangle<float> returnRect;
@@ -62,7 +58,3 @@ HyCamera3d::HyCamera3d(HyWindow *pWindow) :	IHyTransform3d(HYTYPE_Camera3d),
 
 HyCamera3d::~HyCamera3d()
 { }
-
-/*virtual*/ void HyCamera3d::OnUpdate()
-{
-}

@@ -44,6 +44,7 @@ protected:
 	HyRectangle<int32>				m_LocalScissorRect;
 
 	float							m_fAlpha;
+	float							m_fPrevAlphaValue;
 
 	HyShaderUniforms 				m_ShaderUniforms;
 
@@ -74,8 +75,8 @@ public:
 	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);
 
-	virtual void Load();
-	virtual void Unload();
+	void Load();
+	void Unload();
 
 private:
 	HyLoadState GetLoadState()									{ return m_eLoadState; }
@@ -87,12 +88,13 @@ private:
 
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
-	virtual void OnUpdate();
+	virtual void InstUpdate();
 
-	virtual void OnInstUpdate() = 0;
-	virtual void OnDataLoaded() = 0;
-	virtual void OnUpdateUniforms() = 0;								// Upon updating, this function will set the shaders' uniforms when using the default shader
-	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) = 0;	// This function is responsible for incrementing the passed in reference pointer the size of the data written
+	virtual void OnUpdate() = 0;
+
+	virtual void OnDataLoaded() { }
+	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
+	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) { }		// This function is responsible for incrementing the passed in reference pointer the size of the data written
 };
 
 #endif /* __IHyInst2d_h__ */

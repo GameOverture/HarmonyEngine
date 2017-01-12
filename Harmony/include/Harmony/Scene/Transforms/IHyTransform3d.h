@@ -22,8 +22,6 @@ public:
 
 	virtual void GetLocalTransform(glm::mat4 &outMtx) const;
 	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const;
-
-	virtual void OnUpdate() = 0;
 };
 
 #endif /* __IHyTransform3d_h__ */

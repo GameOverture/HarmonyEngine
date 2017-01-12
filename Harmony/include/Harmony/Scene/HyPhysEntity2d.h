@@ -14,9 +14,9 @@
 #include "Box2D/Box2D.h"
 
 #include "Scene/Instances/HyPrimitive2d.h"
-#include "Scene/HyEntity2d.h"
+#include "Scene/IHyEntity2d.h"
 
-class HyPhysEntity2d : public HyEntity2d
+class HyPhysEntity2d : public IHyEntity2d
 {
 	friend class HyBox2dRuntime;
 	friend class HyScene;
@@ -74,8 +74,6 @@ public:
 	int32 AddCircleFixture(float fRadius, float fDensity, glm::vec2 vOffset = glm::vec2(0.0f));
 
 	int32 AddEdgeChainFixture(glm::vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, glm::vec2 vOffset = glm::vec2(0.0f), float fAngleOffset = 0.0f);
-
-	//virtual void SetCoordinateType(eCoordinateType eCoordType, bool bDoConversion);
 
 private:
 	virtual void Update();

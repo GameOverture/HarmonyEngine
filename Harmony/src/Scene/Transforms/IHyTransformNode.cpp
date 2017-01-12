@@ -11,9 +11,10 @@
 #include "Scene/Transforms/Tweens/HyTweenFloat.h"
 
 IHyTransformNode::IHyTransformNode(HyType eType) :	m_eTYPE(eType),
+													m_bDirty(false),
+													m_bIsInst2d(false),
 													m_bEnabled(true),
 													m_pParent(NULL),
-													m_bDirty(false),
 													m_iTag(0)
 {
 	HyScene::AddTransformNode(this);
@@ -27,6 +28,11 @@ IHyTransformNode::IHyTransformNode(HyType eType) :	m_eTYPE(eType),
 HyType IHyTransformNode::GetType()
 {
 	return m_eTYPE;
+}
+
+bool IHyTransformNode::IsInst2d()
+{
+	return m_bIsInst2d;
 }
 
 bool IHyTransformNode::IsEnabled()
@@ -91,7 +97,7 @@ void IHyTransformNode::Update()
 
 	// TODO: Process the action queue
 
-	OnUpdate();
+	InstUpdate();
 }
 
 void IHyTransformNode::SetDirty()
