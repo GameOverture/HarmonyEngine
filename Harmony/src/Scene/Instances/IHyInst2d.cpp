@@ -212,7 +212,7 @@ void IHyInst2d::Load()
 	if(m_eLoadState == HYLOADSTATE_Inactive)
 		sm_pAssetManager->LoadInst2d(this);
 
-	for (uint32 i = 0; i < m_ChildList.size(); ++i)
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(m_ChildList[i]->IsInst2d())
 			static_cast<IHyInst2d *>(m_ChildList[i])->Load();
@@ -221,11 +221,11 @@ void IHyInst2d::Load()
 
 void IHyInst2d::Unload()
 {
-	if(sm_pAssetManager)
-		sm_pAssetManager->RemoveInst(this);
+	HyAssert(sm_pAssetManager, "IHyInst2d::Unload was invoked before engine has been initialized");
+
+	sm_pAssetManager->RemoveInst(this);
 
 	m_pData = NULL;
-
 	m_eLoadState = HYLOADSTATE_Inactive;
 }
 
