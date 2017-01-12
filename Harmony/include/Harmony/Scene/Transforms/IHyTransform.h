@@ -24,6 +24,7 @@ public:
 	tVec					pos;
 	tVec					rot_pivot;
 	tVec					scale;
+	tVec					scale_pivot;
 
 	IHyTransform(HyType eInstType);
 	virtual ~IHyTransform(void);
@@ -37,7 +38,8 @@ template<typename tVec>
 IHyTransform<tVec>::IHyTransform(HyType eInstType) :	IHyTransformNode(eInstType),
 														pos(*this),
 														rot_pivot(*this),
-														scale(*this)
+														scale(*this),
+														scale_pivot(*this)
 {
 	scale.Set(1.0f);
 }
