@@ -126,7 +126,7 @@ uint32 HySprite2d::AnimGetFrame() const
 
 void HySprite2d::AnimSetFrame(uint32 uiFrameIndex)
 {
-	if(m_eLoadState != HYLOADSTATE_Loaded)
+	if(m_eLoadState == HYLOADSTATE_Loaded)
 	{
 		if(uiFrameIndex >= static_cast<HySprite2dData *>(m_pData)->GetState(m_uiCurAnimState).m_uiNUMFRAMES)
 		{
