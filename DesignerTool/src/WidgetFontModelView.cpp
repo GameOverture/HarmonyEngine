@@ -324,7 +324,7 @@ float WidgetFontModel::GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs)
     {
         for(int j = 0; j < sAvailableTypefaceGlyphs.count(); ++j)
         {
-            char cCharacter = sAvailableTypefaceGlyphs[j].toLatin1();
+            char cCharacter = sAvailableTypefaceGlyphs.toStdString().c_str()[j];
             texture_glyph_t *pGlyph = texture_font_get_glyph(m_LayerList[i]->pReference->pTextureFont, &cCharacter);
 
             if(fLeftSideNudgeAmt < pGlyph->offset_x)

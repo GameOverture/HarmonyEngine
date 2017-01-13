@@ -167,7 +167,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetA
             {
                 FontStagePass *pFontStage = pFontModel->GetStageRef(i);
 
-                char cCharacter = sFontPreviewString[j].toLatin1();
+                char cCharacter = sFontPreviewString.toStdString().c_str()[j];
                 texture_glyph_t *pGlyph = texture_font_get_glyph(pFontStage->pTextureFont, &cCharacter);
 
                 if(pGlyph == NULL)
@@ -178,7 +178,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetA
                 float fKerning = 0.0f;
                 if(j != 0)
                 {
-                    char cPrevCharacter = sFontPreviewString[j - 1].toLatin1();
+                    char cPrevCharacter = sFontPreviewString.toStdString().c_str()[j - 1];
                     fKerning = texture_glyph_get_kerning(pGlyph, &cPrevCharacter);
                 }
 

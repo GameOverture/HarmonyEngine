@@ -526,7 +526,7 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
         QJsonArray glyphsArray;
         for(int j = 0; j < m_sAvailableTypefaceGlyphs.count(); ++j)
         {
-            char cCharacter = m_sAvailableTypefaceGlyphs[j].toLatin1();
+            char cCharacter = m_sAvailableTypefaceGlyphs.toStdString().c_str()[j];
             texture_glyph_t *pGlyph = texture_font_get_glyph(m_MasterStageList[i]->pTextureFont, &cCharacter);
             
             QJsonObject glyphInfoObj;
@@ -545,7 +545,7 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
             QJsonObject kerningInfoObj;
             for(int k = 0; k < m_sAvailableTypefaceGlyphs.count(); ++k)
             {
-                char cTmpChar = m_sAvailableTypefaceGlyphs[k].toLatin1();
+                char cTmpChar = m_sAvailableTypefaceGlyphs.toStdString().c_str()[k];
                 float fKerningAmt = texture_glyph_get_kerning(pGlyph, &cTmpChar);
                 
                 if(fKerningAmt != 0.0f)
