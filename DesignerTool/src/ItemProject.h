@@ -96,6 +96,8 @@ public:
     void OverrideDraw();
     void Reset();
 
+    void SaveUserData();
+
 private Q_SLOTS:
     void on_tabBar_currentChanged(int index);
 

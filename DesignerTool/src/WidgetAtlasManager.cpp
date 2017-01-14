@@ -134,6 +134,20 @@ QSize WidgetAtlasManager::GetAtlasDimensions(int iIndex)
     return static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(iIndex))->GetAtlasDimensions();
 }
 
+QString WidgetAtlasManager::GetSelectedAtlasGroup()
+{
+    return ui->cmbAtlasGroups->currentText();
+}
+
+void WidgetAtlasManager::SetSelectedAtlasGroup(QString sName)
+{
+    for(int i = 0; i < ui->atlasGroups->count(); ++i)
+    {
+        if(ui->cmbAtlasGroups->itemText(i) == sName)
+            ui->cmbAtlasGroups->setCurrentIndex(i);
+    }
+}
+
 HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, int iAtlasGroupId, QString sName, QImage &newImage, eAtlasNodeType eType)
 {
     for(int i = 0; i < ui->atlasGroups->count(); ++i)

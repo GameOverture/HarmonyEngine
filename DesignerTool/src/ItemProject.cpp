@@ -147,7 +147,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
     {
         if(!projFile.open(QIODevice::ReadOnly))
         {
-            HyGuiLog("ItemProject::ItemProject() could not open the project file: " % sNewProjectFilePath, LOGTYPE_Error);
+            HyGuiLog("ItemProject::ItemProject() could not open " % sNewProjectFilePath % ": " % projFile.errorString(), LOGTYPE_Error);
             m_bHasError = true;
         }
     }
@@ -267,6 +267,25 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
                 pCurTreeItem->addChild(pPrefixItem->GetTreeItem());
             }
         }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Load user settings into meta data
+    QFile userFile(GetMetaDataAbsPath() % "Project.user");
+    if(userFile.exists())
+    {
+        if(!userFile.open(QIODevice::ReadOnly))
+        {
+            HyGuiLog("ItemProject::ItemProject() could not open " % sNewProjectFilePath % "'s Project.user file for project: " % userFile.errorString(), LOGTYPE_Error);
+        }
+
+        QJsonDocument userDoc = QJsonDocument::fromJson(userFile.readAll());
+        userFile.close();
+
+        QJsonObject userObj = userDoc.object();
+
+        m_pAtlasMan->SetSelectedAtlasGroup(userObj["DefaultAtlasGroup"].toString());
     }
 }
 
@@ -411,6 +430,30 @@ void ItemProject::Reset()
 
     sm_Init.sGameName = GetName(false).toStdString();
     sm_Init.sDataDir = GetAssetsAbsPath().toStdString();
+}
+
+void ItemProject::SaveUserData()
+{
+    QFile userFile(GetMetaDataAbsPath() % "Project.user");
+    if(userFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+    {
+       HyGuiLog("Couldn't open Project.user for writing: " % userFile.errorString(), LOGTYPE_Error);
+    }
+    else
+    {
+        QJsonObject userObj;
+        userObj.insert("DefaultAtlasGroup", m_pAtlasMan->GetSelectedAtlasGroup());
+
+        QJsonDocument userDoc;
+        userDoc.setObject(userObj);
+        qint64 iBytesWritten = userFile.write(userDoc.toJson());
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+        {
+            HyGuiLog("Could not write to Project.user file: " % userFile.errorString(), LOGTYPE_Error);
+        }
+
+        userFile.close();
+    }
 }
 
 void ItemProject::on_tabBar_currentChanged(int index)

@@ -65,6 +65,9 @@ public:
     int GetAtlasIdFromIndex(int iIndex);
     QSize GetAtlasDimensions(int iIndex);
 
+    QString GetSelectedAtlasGroup();
+    void SetSelectedAtlasGroup(QString sName);
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     HyGuiFrame *GenerateFrame(ItemWidget *pItem, int iAtlasGroupId, QString sName, QImage &newImage, eAtlasNodeType eType);

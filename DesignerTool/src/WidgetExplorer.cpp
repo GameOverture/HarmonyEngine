@@ -243,6 +243,8 @@ QStringList WidgetExplorer::GetOpenProjectPaths()
     {
         Item *pItemVariant = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<Item *>();
         sListOpenProjs.append(pItemVariant->GetAbsPath());
+
+        static_cast<ItemProject *>(pItemVariant)->SaveUserData();
     }
     
     return sListOpenProjs;

@@ -465,6 +465,7 @@ void MainWindow::on_actionCloseProject_triggered()
     delete m_pCurRenderer;
     m_pCurRenderer = 0;
 
+    ui->explorer->GetCurProjSelected()->SaveUserData();
     ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
 }
 
