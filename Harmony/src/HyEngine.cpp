@@ -69,6 +69,11 @@ bool HyEngine::Update()
 		m_Scene.PostUpdate();
 
 		m_GuiComms.Update();
+				
+		// GUI renderer paints on a timer which doesn't work well with fixed updates like this. Ensures only single updates per frame.
+#ifdef HY_PLATFORM_GUI
+		break;
+#endif
 	}
 	m_Renderer.Update();
 
