@@ -286,6 +286,17 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
         QJsonObject userObj = userDoc.object();
 
         m_pAtlasMan->SetSelectedAtlasGroup(userObj["DefaultAtlasGroup"].toString());
+
+        // TODO:
+
+        //QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
+        //sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
+        //foreach(QString sItemPath, sListOpenItems)
+        //{
+        //    Item *pItem = ui->explorer->GetItemByPath(sItemPath);
+        //    if(pItem)
+        //        OpenItem(pItem);
+        //}
     }
 }
 
@@ -443,6 +454,22 @@ void ItemProject::SaveUserData()
     {
         QJsonObject userObj;
         userObj.insert("DefaultAtlasGroup", m_pAtlasMan->GetSelectedAtlasGroup());
+
+
+        // TODO:
+
+        //QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
+        //sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
+        //foreach(QString sItemPath, sListOpenItems)
+        //{
+        //    Item *pItem = ui->explorer->GetItemByPath(sItemPath);
+        //    if(pItem)
+        //        OpenItem(pItem);
+        //}
+
+
+
+
 
         QJsonDocument userDoc;
         userDoc.setObject(userObj);

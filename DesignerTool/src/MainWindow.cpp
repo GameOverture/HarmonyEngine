@@ -153,15 +153,6 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
         QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
         for(int i = 0; i < sListOpenProjs.size(); ++i)
             ui->explorer->AddItemProject(sListOpenProjs[i], false);
-        
-        //QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
-        //sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
-        //foreach(QString sItemPath, sListOpenItems)
-        //{
-        //    Item *pItem = ui->explorer->GetItemByPath(sItemPath);
-        //    if(pItem)
-        //        OpenItem(pItem);
-        //}
     }
     m_Settings.endGroup();
 
@@ -522,8 +513,6 @@ void MainWindow::SaveSettings()
     m_Settings.beginGroup("OpenData");
     {
         m_Settings.setValue("openProjs", QVariant(ui->explorer->GetOpenProjectPaths()));
-        
-        //m_Settings.setValue("openItems", QVariant(ui->renderer->GetOpenItemPaths()));
     }
     m_Settings.endGroup();
 

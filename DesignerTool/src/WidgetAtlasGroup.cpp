@@ -17,6 +17,7 @@
 #include <QStack>
 #include <QPainter>
 #include <QByteArray>
+#include <QTreeWidgetItemIterator>
 
 #include <ctime>
 
@@ -33,11 +34,6 @@ void WidgetAtlasGroupTreeWidget::SetOwner(WidgetAtlasGroup *pOwner)
     m_pOwner = pOwner;
 }
 
-void WidgetAtlasGroupTreeWidget::SpecialSort()
-{
-    sortItems(0, Qt::AscendingOrder);
-}
-
 /*virtual*/ void WidgetAtlasGroupTreeWidget::dropEvent(QDropEvent *e)
 {
 //    foreach (const QUrl &url, e->mimeData()->urls())
@@ -48,8 +44,22 @@ void WidgetAtlasGroupTreeWidget::SpecialSort()
 
     QTreeWidget::dropEvent(e);
 
-    SpecialSort();
+    sortItems(0, Qt::AscendingOrder);
     m_pOwner->WriteMetaSettings();
+}
+
+
+bool WidgetAtlasGroupTreeWidgetItem::operator<(const QTreeWidgetItem &rhs) const
+{
+    bool bLeftIsFilter = this->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter;
+    bool bRightIsFilter = rhs.data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter;
+
+    if(bLeftIsFilter && bRightIsFilter == false)
+        return true;
+    if(bLeftIsFilter == false && bRightIsFilter)
+        return false;
+
+    return this->text(0) < rhs.text(0);
 }
 
 WidgetAtlasGroup::WidgetAtlasGroup(QWidget *parent) :   QWidget(parent),
@@ -114,7 +124,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
         {
             QDir filterPathDir(filtersArray.at(i).toString());
 
-            QTreeWidgetItem *pNewTreeItem = new QTreeWidgetItem(ui->atlasList);
+            WidgetAtlasGroupTreeWidgetItem *pNewTreeItem = new WidgetAtlasGroupTreeWidgetItem(ui->atlasList);
 
             pNewTreeItem->setText(0, filterPathDir.dirName());
             pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix));
@@ -126,7 +136,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
         // Then place the filters correctly as a parent heirarchy using the path string stored in their data
         for(int i = 0; i < ui->atlasList->topLevelItemCount(); ++i)
         {
-            QTreeWidgetItem *pParentFilter = NULL;
+            WidgetAtlasGroupTreeWidgetItem *pParentFilter = NULL;
 
             QString sFilterPath = ui->atlasList->topLevelItem(i)->data(0, Qt::UserRole).toString();
             sFilterPath.truncate(sFilterPath.lastIndexOf("/"));
@@ -137,7 +147,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
                 {
                     if((*iter2)->data(0, Qt::UserRole).toString() == sFilterPath)
                     {
-                        pParentFilter = (*iter2);
+                        pParentFilter = static_cast<WidgetAtlasGroupTreeWidgetItem *>(*iter2);
                         break;
                     }
 
@@ -179,7 +189,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
                                                             frameObj["errors"].toInt(0));
 
             QString sFilterPath = frameObj["filter"].toString();
-            QTreeWidgetItem *pFrameParent = NULL;
+            WidgetAtlasGroupTreeWidgetItem *pFrameParent = NULL;
             if(sFilterPath != "")
             {
                 QTreeWidgetItemIterator it(ui->atlasList);
@@ -187,7 +197,7 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
                 {
                     if((*it)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter && HyGlobal::GetTreeWidgetItemPath(*it) == sFilterPath)
                     {
-                        pFrameParent = (*it);
+                        pFrameParent = static_cast<WidgetAtlasGroupTreeWidgetItem *>(*it);
                         break;
                     }
 
@@ -640,7 +650,7 @@ void WidgetAtlasGroup::Refresh()
     MainWindow::ReloadHarmony();
 
     ui->atlasList->expandAll();
-    ui->atlasList->SpecialSort();
+    ui->atlasList->sortItems(0, Qt::AscendingOrder);
     
     ui->lcdNumTextures->display(m_Packer.bins.size());
     ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
@@ -650,13 +660,13 @@ void WidgetAtlasGroup::Refresh()
     MainWindow::LoadSpinner(false);
 }
 
-void WidgetAtlasGroup::CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFrame)
+void WidgetAtlasGroup::CreateTreeItem(WidgetAtlasGroupTreeWidgetItem *pParent, HyGuiFrame *pFrame)
 {
-    QTreeWidgetItem *pNewTreeItem;
+    WidgetAtlasGroupTreeWidgetItem *pNewTreeItem;
     if(pParent == NULL)
-        pNewTreeItem = new QTreeWidgetItem(ui->atlasList);
+        pNewTreeItem = new WidgetAtlasGroupTreeWidgetItem(ui->atlasList);
     else
-        pNewTreeItem = new QTreeWidgetItem();
+        pNewTreeItem = new WidgetAtlasGroupTreeWidgetItem();
 
     pNewTreeItem->setText(0, pFrame->GetName());
 
@@ -807,7 +817,7 @@ void WidgetAtlasGroup::on_actionReplaceImages_triggered()
 
 void WidgetAtlasGroup::on_actionAddFilter_triggered()
 {
-    QTreeWidgetItem *pNewTreeItem = new QTreeWidgetItem(ui->atlasList);
+    WidgetAtlasGroupTreeWidgetItem *pNewTreeItem = new WidgetAtlasGroupTreeWidgetItem(ui->atlasList);
 
     DlgInputName *pDlg = new DlgInputName("Enter Atlas Group Filter Name", "New Filter");
     if(pDlg->exec() == QDialog::Accepted)
@@ -823,5 +833,6 @@ void WidgetAtlasGroup::on_actionAddFilter_triggered()
     pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix));
     pNewTreeItem->setData(0, Qt::UserRole, QVariant(QString(HYTREEWIDGETITEM_IsFilter)));
 
+    ui->atlasList->sortItems(0, Qt::AscendingOrder);
     WriteMetaSettings();
 }

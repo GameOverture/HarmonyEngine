@@ -32,10 +32,24 @@ class WidgetAtlasGroupTreeWidget : public QTreeWidget
 public:
     WidgetAtlasGroupTreeWidget(QWidget *parent = Q_NULLPTR);
     void SetOwner(WidgetAtlasGroup *pOwner);
-    void SpecialSort();
 
 protected:
     virtual void dropEvent(QDropEvent *e);
+};
+
+class WidgetAtlasGroupTreeWidgetItem : public QTreeWidgetItem
+{
+public:
+    WidgetAtlasGroupTreeWidgetItem(int type = Type) : QTreeWidgetItem(type)
+    { }
+
+    WidgetAtlasGroupTreeWidgetItem(QTreeWidget *parent, int type = Type) : QTreeWidgetItem(parent, type)
+    { }
+
+    WidgetAtlasGroupTreeWidgetItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type)
+    { }
+
+    bool operator<(const QTreeWidgetItem& other) const;
 };
 
 class WidgetAtlasGroup : public QWidget
@@ -106,7 +120,7 @@ private:
     void Refresh();
 
 
-    void CreateTreeItem(QTreeWidgetItem *pParent, HyGuiFrame *pFrame);
+    void CreateTreeItem(WidgetAtlasGroupTreeWidgetItem *pParent, HyGuiFrame *pFrame);
 };
 
 #endif // WIDGETATLASGROUP_H
