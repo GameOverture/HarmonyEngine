@@ -379,7 +379,7 @@ void WidgetFont::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
         QImage fontAtlasImage(m_pTrueAtlasPixelData, static_cast<int>(m_pAtlas->width), static_cast<int>(m_pAtlas->height), QImage::Format_RGBA8888);
 
         if(m_pTrueAtlasFrame)
-            m_pItemFont->GetAtlasManager().ReplaceFrame(m_pTrueAtlasFrame, m_pItemFont->GetName(false), fontAtlasImage);
+            m_pItemFont->GetAtlasManager().ReplaceFrame(m_pTrueAtlasFrame, m_pItemFont->GetName(false), fontAtlasImage, true);
         else
             m_pTrueAtlasFrame = m_pItemFont->GetAtlasManager().GenerateFrame(m_pItemFont, GetSelectedAtlasId(), m_pItemFont->GetName(false), fontAtlasImage, ATLAS_Font);
     }

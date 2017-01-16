@@ -158,7 +158,10 @@ HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, int iAtlasGroup
         {
             // This allocates a new HyGuiFrame into the dependency map
             HyGuiFrame *pFrame = pAtlasGroup->ImportImage(sName, newImage, eType);
-            pAtlasGroup->Refresh();
+
+            QSet<HyGuiFrame *> newFrameSet;
+            newFrameSet.insert(pFrame);
+            pAtlasGroup->Repack(QSet<int>(), newFrameSet);
 
             // This retrieves the newly created HyGuiFrame from the dependency map
             QList<quint32> checksumList;
@@ -173,7 +176,7 @@ HyGuiFrame *WidgetAtlasManager::GenerateFrame(ItemWidget *pItem, int iAtlasGroup
     return NULL;
 }
 
-void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newImage)
+void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack)
 {
     for(int i = 0; i < ui->atlasGroups->count(); ++i)
     {
@@ -181,6 +184,9 @@ void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage 
 
         if(pAtlasGroup->GetId() == pFrame->GetAtlasGroupdId())
         {
+            QSet<int> textureIndexToReplaceSet;
+            textureIndexToReplaceSet.insert(pFrame->GetTextureIndex());
+
             if(0 == (pFrame->GetErrors() & GUIFRAMEERROR_Duplicate))
                 m_DependencyMap.remove(pFrame->GetChecksum());
 
@@ -198,7 +204,9 @@ void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage 
                 pFrame->ClearError(GUIFRAMEERROR_Duplicate);
             }
 
-            pAtlasGroup->Refresh();
+            if(bDoAtlasGroupRepack)
+                pAtlasGroup->Repack(textureIndexToReplaceSet, QSet<HyGuiFrame *>());
+
             return;
         }
     }

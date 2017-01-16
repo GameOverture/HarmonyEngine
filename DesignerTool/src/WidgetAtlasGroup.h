@@ -114,11 +114,13 @@ protected:
 private:
     Ui::WidgetAtlasGroup *ui;
     
-    void ImportImages(QStringList sImportImgList);
+    QSet<HyGuiFrame *> ImportImages(QStringList sImportImgList);
     HyGuiFrame *ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType);
 
+    void RepackAll();
+    void Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> newFramesSet);
+    void ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIndex);
     void Refresh();
-
 
     void CreateTreeItem(WidgetAtlasGroupTreeWidgetItem *pParent, HyGuiFrame *pFrame);
 };

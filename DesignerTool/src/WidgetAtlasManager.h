@@ -71,7 +71,7 @@ public:
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     HyGuiFrame *GenerateFrame(ItemWidget *pItem, int iAtlasGroupId, QString sName, QImage &newImage, eAtlasNodeType eType);
-    void ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newImage);
+    void ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
 
     QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem);
     QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem, QList<HyGuiFrame *> requestList);

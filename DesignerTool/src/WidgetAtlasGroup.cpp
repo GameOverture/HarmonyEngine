@@ -99,8 +99,6 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
 
     m_FrameList.clear();
     ui->atlasList->clear();
-    
-    int iNumTextures = 0;
 
     QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
     if(settingsFile.exists())
@@ -223,9 +221,11 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
         WriteMetaSettings();
     }
     
-    ui->lcdNumTextures->display(iNumTextures);
+    ui->lcdNumTextures->display(m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot).size());
     ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
     ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
+
+    ui->atlasList->collapseAll();
 
     ResizeAtlasListColumns();
 }
@@ -385,10 +385,7 @@ void WidgetAtlasGroup::on_btnAddImages_clicked()
                                                                &sSelectedFilter);
 
     if(sImportImgList.empty() == false)
-    {
-        ImportImages(sImportImgList);
-        Refresh();
-    }
+        Repack(QSet<int>(), ImportImages(sImportImgList));
 }
 
 void WidgetAtlasGroup::on_btnAddDir_clicked()
@@ -412,10 +409,7 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
     }
 
     if(sImportImgList.empty() == false)
-    {
-        ImportImages(sImportImgList);
-        Refresh();
-    }
+        Repack(QSet<int>(), ImportImages(sImportImgList));
 }
 
 /*virtual*/ void WidgetAtlasGroup::enterEvent(QEvent *pEvent)
@@ -442,16 +436,20 @@ void WidgetAtlasGroup::on_btnAddDir_clicked()
     QWidget::showEvent(event);
 }
 
-void WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
+QSet<HyGuiFrame *> WidgetAtlasGroup::ImportImages(QStringList sImportImgList)
 {
+    QSet<HyGuiFrame *> returnSet;
+
     for(int i = 0; i < sImportImgList.size(); ++i)
     {
         QFileInfo fileInfo(sImportImgList[i]);
 
         QImage newImage(fileInfo.absoluteFilePath());
 
-        ImportImage(fileInfo.baseName(), newImage, ATLAS_Frame);
+        returnSet.insert(ImportImage(fileInfo.baseName(), newImage, ATLAS_Frame));
     }
+
+    return returnSet;
 }
 
 HyGuiFrame *WidgetAtlasGroup::ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType)
@@ -475,82 +473,164 @@ HyGuiFrame *WidgetAtlasGroup::ImportImage(QString sName, QImage &newImage, eAtla
     return pNewFrame;
 }
 
-void WidgetAtlasGroup::Refresh()
+void WidgetAtlasGroup::RepackAll()
+{
+    int iNumTotalTextures = m_DataDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name).size();
+
+    QSet<int> textureIndexSet;
+    for(int i = 0; i < iNumTotalTextures; ++i)
+        textureIndexSet.insert(i);
+
+    Repack(textureIndexSet, QSet<HyGuiFrame *>());
+}
+
+void WidgetAtlasGroup::Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> newFramesSet)
 {
     MainWindow::LoadSpinner(true);
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // CLEARING EXISTING DATA
-    m_Packer.clear();
-    
-    QStringList sTextureNames = m_DataDir.entryList(QDir::NoDotAndDotDot);
-    for(int i = 0; i < sTextureNames.size(); ++i)
-        QFile::remove(sTextureNames[i]);
+    // Always repack the last texture to ensure it gets filled as much as it can
+    QFileInfoList existingTexturesInfoList = m_DataDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
+    for(int i = HyClamp(existingTexturesInfoList.size() - 1, 0, existingTexturesInfoList.size()); i < existingTexturesInfoList.size(); ++i)
+        repackTexIndicesSet.insert(i);
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // REPOPULATING THE PACKER WITH 'm_FrameList'
+    QList<int> textureIndexList = repackTexIndicesSet.toList();
+
+    // Get all the affected frames into a list
     for(int i = 0; i < m_FrameList.size(); ++i)
     {
-        m_FrameList[i]->ClearError(GUIFRAMEERROR_CouldNotPack);
-        m_FrameList[i]->DeleteAllDrawInst();
-
-        m_Packer.addItem(m_FrameList[i]->GetSize(),
-                         m_FrameList[i]->GetCrop(),
-                         m_FrameList[i]->GetChecksum(),
-                         m_FrameList[i],
-                         m_MetaDir.absoluteFilePath(m_FrameList[i]->ConstructImageFileName()));
+        for(int j = 0; j < textureIndexList.size(); ++j)
+        {
+            if(m_FrameList[i]->GetTextureIndex() == textureIndexList[j])
+                newFramesSet.insert(m_FrameList[i]);
+        }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PACK THE BINS WITH ALL THE FRAMES
+    QList<HyGuiFrame *>newFramesList = newFramesSet.toList();
+
+    // Repack the affected frames and determine how many textures this repack took
+    m_Packer.clear();
+    for(int i = 0; i < newFramesList.size(); ++i)
+    {
+        m_Packer.addItem(newFramesList[i]->GetSize(),
+                         newFramesList[i]->GetCrop(),
+                         newFramesList[i]->GetChecksum(),
+                         newFramesList[i],
+                         m_MetaDir.absoluteFilePath(newFramesList[i]->ConstructImageFileName()));
+    }
     m_dlgSettings.SetPackerSettings(&m_Packer);
     m_Packer.pack(m_dlgSettings.GetHeuristic(), m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight());
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // CREATE EMPTY TEXTURES
-    QPainter **ppPainters = new QPainter *[m_Packer.bins.size()];
-    for(int i = 0; i < m_Packer.bins.size(); ++i)
+    int iNumNewTextures = m_Packer.bins.size();
+
+    // Delete the old textures
+    for(int i = 0; i < textureIndexList.size(); ++i)
+        QFile::remove(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".png"));
+
+    // Using our stock of newly generated textures, fill in any gaps in the texture array. If there aren't enough new textures then shift textures (and their frames) to fill any remaining gaps in the indices.
+    int iTotalNumTextures = iNumNewTextures + existingTexturesInfoList.size();
+    ui->lcdNumTextures->display(iTotalNumTextures);
+
+    int iNumNewTexturesUsed = 0;
+    for(int iCurrentIndex = 0; iCurrentIndex < iTotalNumTextures; ++iCurrentIndex)
     {
-        if(m_dlgSettings.TextureWidth() != m_Packer.bins[i].width() || m_dlgSettings.TextureHeight() != m_Packer.bins[i].height())
-            HyGuiLog("WidgetAtlasGroup::Refresh() Mismatching texture dimentions", LOGTYPE_Error);
+        bool bFound = false;
+        for(int i = 0; i < existingTexturesInfoList.size(); ++i)
+        {
+            if(existingTexturesInfoList[i].baseName().toInt() == iCurrentIndex)
+            {
+                bFound = true;
+                break;
+            }
+        }
 
-        QImage *pTexture = new QImage(m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight(), QImage::Format_ARGB32);  // TODO: BitsPerPixel configurable here?
-        pTexture->fill(Qt::transparent);
+        if(bFound)
+            continue;
 
-        ppPainters[i] = new QPainter(pTexture);
+        if(iNumNewTexturesUsed < iNumNewTextures)
+        {
+            ConstructAtlasTexture(iNumNewTexturesUsed, iCurrentIndex);
+            iNumNewTexturesUsed++;
+        }
+        else
+        {
+            // There aren't enough new textures to fill all the gaps in indices. Find the next existing texture and assign it to iCurrentIndex
+            bool bHandled = false;
+            int iNextAvailableFoundIndex = iCurrentIndex;
+            do
+            {
+                ++iNextAvailableFoundIndex;
+                for(int i = 0; i < existingTexturesInfoList.size(); ++i)
+                {
+                    int iExistingTextureIndex = existingTexturesInfoList[i].baseName().toInt();
+
+                    if(iExistingTextureIndex == iNextAvailableFoundIndex)
+                    {
+                        // Texture found, start migrating its frames
+                        for(int i = 0; i < m_FrameList.size(); ++i)
+                        {
+                            if(m_FrameList[i]->GetTextureIndex() == iExistingTextureIndex)
+                                m_FrameList[i]->UpdateInfoFromPacker(iCurrentIndex, m_FrameList[i]->GetX(), m_FrameList[i]->GetY());
+                        }
+
+                        // Rename the texture file to be the new index
+                        QFile::rename(existingTexturesInfoList[i].absoluteFilePath(), m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iCurrentIndex) % ".png"));
+
+                        bHandled = true;
+                        break;
+                    }
+                }
+            }
+            while(bHandled == false);
+        }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // GO THROUGH PACKER'S IMAGES AND DRAW THEM TO TEXTURES, WHILE KEEPING JSON ARRAY (FOR META-FILE)
-    QJsonArray frameArray;
+    Refresh();
+
+    MainWindow::LoadSpinner(false);
+}
+
+void WidgetAtlasGroup::ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIndex)
+{
+    if(m_dlgSettings.TextureWidth() != m_Packer.bins[iPackerBinIndex].width() || m_dlgSettings.TextureHeight() != m_Packer.bins[iPackerBinIndex].height())
+        HyGuiLog("WidgetAtlasGroup::ConstructAtlasTexture() Mismatching texture dimentions", LOGTYPE_Error);
+
+    QImage newTexture(m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight(), QImage::Format_ARGB32);
+    newTexture.fill(Qt::transparent);
+
+    QPainter p(&newTexture);
+
+    // Iterate through the images that were packed, and update their corresponding HyGuiFrame. Then draw them to the blank textures
     for(int i = 0; i < m_Packer.images.size(); ++i)
     {
-        bool bValid = true;
         inputImage &imgInfoRef = m_Packer.images[i];
+        HyGuiFrame *pFrame = reinterpret_cast<HyGuiFrame *>(imgInfoRef.id);
+        bool bValidToDraw = true;
 
         if(imgInfoRef.pos.x() == 999999)    // This is scriptum image packer's (dumb) indication of an invalid image...
-            bValid = false;
+        {
+            pFrame->UpdateInfoFromPacker(-1, -1, -1);
+            bValidToDraw = false;
+        }
+        else
+            pFrame->ClearError(GUIFRAMEERROR_CouldNotPack);
 
-        HyGuiFrame *pFrame = reinterpret_cast<HyGuiFrame *>(imgInfoRef.id);
-
-        pFrame->UpdateInfoFromPacker(bValid ? imgInfoRef.textureId : -1,
-                                     imgInfoRef.pos.x() + m_Packer.border.l,
-                                     imgInfoRef.pos.y() + m_Packer.border.t);
-
-        QJsonObject frameObj;
-        pFrame->GetJsonObj(frameObj);
-        frameArray.append(QJsonValue(frameObj));
-        
         if(imgInfoRef.duplicateId != NULL && m_Packer.merge)
         {
             pFrame->SetError(GUIFRAMEERROR_Duplicate);
-            bValid = false;
+            bValidToDraw = false;
         }
         else
             pFrame->ClearError(GUIFRAMEERROR_Duplicate);
 
-        if(bValid == false)
+        if(imgInfoRef.textureId != iPackerBinIndex)
+            bValidToDraw = false;
+
+        if(bValidToDraw == false)
             continue;
+
+        pFrame->UpdateInfoFromPacker(iTextureArrayIndex,
+                                     imgInfoRef.pos.x() + m_Packer.border.l,
+                                     imgInfoRef.pos.y() + m_Packer.border.t);
 
         QImage imgFrame(imgInfoRef.path);
 
@@ -578,7 +658,6 @@ void WidgetAtlasGroup::Refresh()
 //                         crop.x(), crop.height(), crop.width());
 //        }
 
-        QPainter &p = *ppPainters[pFrame->GetTextureIndex()];
         QPoint pos(pFrame->GetX(), pFrame->GetY());
         if(m_Packer.extrude)
         {
@@ -627,20 +706,20 @@ void WidgetAtlasGroup::Refresh()
             p.drawImage(pos.x(), pos.y(), imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // SAVE ALL TEXTURES OUT TO ATLAS DATA DIR
-    for(int i = 0; i < m_Packer.bins.size(); ++i)
+    QImage *pTexture = static_cast<QImage *>(p.device());
+    pTexture->save(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iTextureArrayIndex) % ".png"));
+}
+
+void WidgetAtlasGroup::Refresh()
+{
+    QJsonArray frameArray;
+    for(int i = 0; i < m_FrameList.size(); ++i)
     {
-        QImage *pTexture = static_cast<QImage *>(ppPainters[i]->device());
-        pTexture->save(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(i) % ".png"));
-
-        delete ppPainters[i];
-        delete pTexture;
+        QJsonObject frameObj;
+        m_FrameList[i]->GetJsonObj(frameObj);
+        frameArray.append(QJsonValue(frameObj));
     }
-    delete [] ppPainters;
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // WRITE SETTINGS FILE TO ATLAS META DIR
     WriteMetaSettings(frameArray);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -652,12 +731,11 @@ void WidgetAtlasGroup::Refresh()
     ui->atlasList->expandAll();
     ui->atlasList->sortItems(0, Qt::AscendingOrder);
     
-    ui->lcdNumTextures->display(m_Packer.bins.size());
     ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
     ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
 
     HyGuiLog("Atlas Group Refresh finished", LOGTYPE_Normal);
-    MainWindow::LoadSpinner(false);
+
 }
 
 void WidgetAtlasGroup::CreateTreeItem(WidgetAtlasGroupTreeWidgetItem *pParent, HyGuiFrame *pFrame)
@@ -711,7 +789,7 @@ void WidgetAtlasGroup::on_btnSettings_clicked()
         m_dlgSettings.WidgetsToData();  // Save the changes
 
         if(m_dlgSettings.IsSettingsDirty())
-            Refresh();
+            RepackAll();
         else if(m_dlgSettings.IsNameChanged())
             WriteMetaSettings();
     }
@@ -729,10 +807,9 @@ void WidgetAtlasGroup::on_atlasList_itemSelectionChanged()
 
 void WidgetAtlasGroup::on_actionDeleteImages_triggered()
 {
-    // TODO: Should save all open items - beware of the Undo/Redo stack per item that may refrence the deleted images
+    QSet<int> affectedTextureIndexSet;
 
     QList<QTreeWidgetItem *> selectedImageList = ui->atlasList->selectedItems();
-
     for(int i = 0; i < selectedImageList.count(); ++i)
     {
         HyGuiFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
@@ -747,16 +824,20 @@ void WidgetAtlasGroup::on_actionDeleteImages_triggered()
             continue;
         }
 
+        affectedTextureIndexSet.insert(pFrame->GetTextureIndex());
+
         m_FrameList.removeOne(pFrame);
         m_pManager->RemoveImage(pFrame, m_MetaDir);
         delete selectedImageList[i];
     }
 
-    Refresh();
+    Repack(affectedTextureIndexSet, QSet<HyGuiFrame *>());
 }
 
 void WidgetAtlasGroup::on_actionReplaceImages_triggered()
 {
+    QSet<int> affectedTextureIndexSet;
+
     QList<QTreeWidgetItem *> atlasSelectedImageList = ui->atlasList->selectedItems();
 
     // Store a list of the frames, since 'atlasSelectedImageList' will become invalid within Refresh()
@@ -802,10 +883,12 @@ void WidgetAtlasGroup::on_actionReplaceImages_triggered()
         QFileInfo fileInfo(sImportImgList[i]);
         QImage newImage(fileInfo.absoluteFilePath());
 
-        m_pManager->ReplaceFrame(selectedImageList[i], fileInfo.fileName(), newImage);
+        affectedTextureIndexSet.insert(selectedImageList[i]->GetTextureIndex());
+
+        m_pManager->ReplaceFrame(selectedImageList[i], fileInfo.fileName(), newImage, false);
     }
 
-    Refresh();
+    Repack(affectedTextureIndexSet, QSet<HyGuiFrame *>());
 
     for(int i = 0; i < selectedImageList.count(); ++i)
     {

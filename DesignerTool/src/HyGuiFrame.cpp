@@ -92,12 +92,16 @@ void HyGuiFrame::SetTreeWidgetItem(QTreeWidgetItem *pTreeItem)
 
 void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 {
+    DeleteAllDrawInst();
+
     m_iTextureIndex = iTextureIndex;
     m_iPosX = iX;
     m_iPosY = iY;
 
     if(m_iTextureIndex != -1)
     {
+        ClearError(GUIFRAMEERROR_CouldNotPack);
+
         QMapIterator<void *, HyTexturedQuad2d *> iter(m_DrawInstMap);
         while(iter.hasNext())
         {
