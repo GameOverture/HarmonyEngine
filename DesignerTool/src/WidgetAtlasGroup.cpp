@@ -214,7 +214,6 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
         }
 
         ui->atlasList->sortItems(0, Qt::AscendingOrder);
-        ui->atlasList->expandAll();
     }
     else
     {
@@ -525,6 +524,9 @@ void WidgetAtlasGroup::Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> 
     // Delete the old textures
     for(int i = 0; i < textureIndexList.size(); ++i)
         QFile::remove(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".png"));
+    
+    // Regrab 'existingTexturesInfoList' after deleting obsolete textures
+    existingTexturesInfoList = m_DataDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
 
     // Using our stock of newly generated textures, fill in any gaps in the texture array. If there aren't enough new textures then shift textures (and their frames) to fill any remaining gaps in the indices.
     int iTotalNumTextures = iNumNewTextures + existingTexturesInfoList.size();
@@ -728,7 +730,6 @@ void WidgetAtlasGroup::Refresh()
     
     MainWindow::ReloadHarmony();
 
-    ui->atlasList->expandAll();
     ui->atlasList->sortItems(0, Qt::AscendingOrder);
     
     ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
