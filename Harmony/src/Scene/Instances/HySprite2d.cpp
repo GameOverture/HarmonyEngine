@@ -282,7 +282,8 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 		return;
 
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
-	m_RenderState.SetTextureHandle(frameRef.GetGfxApiHandle());
+	uint32 uiGfxTextureHandle = frameRef.GetGfxApiHandle();
+	m_RenderState.SetTextureHandle(uiGfxTextureHandle);
 
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiCurAnimState];
 
@@ -361,9 +362,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 
 /*virtual*/ void HySprite2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-	HySprite2dData *pData = static_cast<HySprite2dData *>(m_pData);
-
-	const HySprite2dFrame &frameRef = pData->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 
 	glm::vec2 vSize(frameRef.rSRC_RECT.Width() * frameRef.pAtlasGroup->GetWidth(), frameRef.rSRC_RECT.Height() * frameRef.pAtlasGroup->GetHeight());
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vSize;
@@ -382,7 +381,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	pRefDataWritePos += sizeof(glm::vec3);
 	*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
 	pRefDataWritePos += sizeof(float);
-
+	
 	*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(frameRef.GetActualTextureIndex());
 	pRefDataWritePos += sizeof(float);
 

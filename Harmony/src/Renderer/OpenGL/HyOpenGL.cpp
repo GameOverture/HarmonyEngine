@@ -99,13 +99,15 @@ HyOpenGL::~HyOpenGL(void)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_ShaderMap[renderState.GetShaderId()]);
 	pShader->Use();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if(renderState.GetTextureHandle() != 0)
-		glBindTexture(GL_TEXTURE_2D_ARRAY, renderState.GetTextureHandle());
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, renderState.GetTextureHandle());
+
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -124,6 +126,7 @@ HyOpenGL::~HyOpenGL(void)
 	// Always attempt to assign these uniforms if the shader chooses to use them
 	pShader->SetUniformGLSL("mtxWorldToCamera", m_mtxView);
 	pShader->SetUniformGLSL("mtxCameraToClip", m_mtxProj);
+	//pShader->SetUniformGLSL("Tex", 0);//renderState.GetTextureHandle());
 
 	char *pDrawBuffer = GetVertexData2d();
 	uint32 uiDataOffset = static_cast<uint32>(renderState.GetDataOffset());
@@ -262,6 +265,9 @@ HyOpenGL::~HyOpenGL(void)
 			uiStartVertex += renderState.GetNumVerticesPerInstance();
 		}
 	}
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }
 
 /*virtual*/ void HyOpenGL::End_2d()
@@ -269,6 +275,7 @@ HyOpenGL::~HyOpenGL(void)
 	m_iCurCamIndex++;
 	glDepthMask(true);
 
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
 }
@@ -286,6 +293,8 @@ HyOpenGL::~HyOpenGL(void)
 
 	GLuint hGLTextureArray;
 	glGenTextures(1, &hGLTextureArray);
+
+	//glActiveTexture(GL_TEXTURE0 + hGLTextureArray);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, hGLTextureArray);
 
 	// Create (blank) storage for the texture array
@@ -293,8 +302,8 @@ HyOpenGL::~HyOpenGL(void)
 	uiNumTexturesUploadedOut = static_cast<uint32>(pixelDataList.size());
 
 	// TODO: Don't upload huge texture arrays. Actually calculate required bytes, and then size array accordingly to hardware constraints. Hardcoding 12 for now
-	if(uiNumTexturesUploadedOut > 4)
-		uiNumTexturesUploadedOut = 4;
+	//if(uiNumTexturesUploadedOut > 4)
+	//	uiNumTexturesUploadedOut = 4;
 
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, uiNumTexturesUploadedOut, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
 	eError = glGetError();

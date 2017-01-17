@@ -12,6 +12,17 @@
 #include "Renderer/IHyRenderer.h"
 #include "Utilities/HyFileIO.h"
 
+
+uint32 HySprite2dFrame::GetGfxApiHandle() const
+{
+	return pAtlasGroup->GetGfxApiHandle(uiATLAS_GROUP_TEXTURE_INDEX);
+}
+
+uint32 HySprite2dFrame::GetActualTextureIndex() const
+{
+	return pAtlasGroup->GetActualGfxApiTextureIndex(uiATLAS_GROUP_TEXTURE_INDEX);
+}
+
 HySprite2dData::HySprite2dData(const std::string &sPath, int32 iShaderId) : IHy2dData(HYTYPE_Sprite2d, sPath, iShaderId),
 																			m_pAnimStates(NULL),
 																			m_uiNumStates(0)

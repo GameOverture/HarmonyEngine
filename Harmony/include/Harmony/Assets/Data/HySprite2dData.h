@@ -38,8 +38,8 @@ struct HySprite2dFrame
 										fDURATION(fDuration)
 	{ }
 
-	uint32 GetGfxApiHandle() const 			{ return pAtlasGroup->GetGfxApiHandle(uiATLAS_GROUP_TEXTURE_INDEX); }
-	uint32 GetActualTextureIndex() const	{ return pAtlasGroup->GetActualGfxApiTextureIndex(uiATLAS_GROUP_TEXTURE_INDEX); }
+	uint32 GetGfxApiHandle() const;
+	uint32 GetActualTextureIndex() const;
 };
 
 class HySprite2dData : public IHy2dData
