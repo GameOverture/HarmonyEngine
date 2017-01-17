@@ -57,8 +57,6 @@ class HyAtlasGroup
 	HyAtlas *					m_pAtlases;
 	const uint32				m_uiNUM_ATLASES;
 
-	uint32						m_uiGfxApiHandle;
-
 	uint32						m_uiRefCount;
 
 	BasicSection				m_csTextures;
@@ -67,8 +65,9 @@ public:
 	HyAtlasGroup(HyTextures &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
 	~HyAtlasGroup();
 
+	uint32 GetGfxApiHandle(uint32 uiTextureIndex);
+
 	uint32 GetId() const;
-	uint32 GetGfxApiHandle() const;
 	uint32 GetNumColorChannels() const;
 	uint32 GetWidth() const;
 	uint32 GetHeight() const;
@@ -84,6 +83,8 @@ public:
 //////////////////////////////////////////////////////////////////////////
 class HyAtlas
 {
+	uint32									m_uiGfxApiHandle;
+
 	const uint32							m_uiNUM_FRAMES;
 
 	// The return value from the 'stb_image' loader is an 'unsigned char *' which points
@@ -103,6 +104,9 @@ class HyAtlas
 public:
 	HyAtlas(jsonxx::Array &srcFramesArrayRef);
 	~HyAtlas();
+
+	uint32 GetGfxApiHandle() const;
+	void SetGfxApiHandle(uint32 uiGfxApiHandle);
 
 	const HyRectangle<int32> *GetSrcRect(uint32 uiChecksum) const;
 

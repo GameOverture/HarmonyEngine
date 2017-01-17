@@ -77,7 +77,7 @@ public:
 	virtual void FinishRender() = 0;
 
 	// Returns the texture ID used for API specific drawing.
-	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &vPixelData) = 0;
+	virtual void AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<std::pair<uint32, unsigned char *> > &PixelDataList) = 0;
 	virtual void DeleteTextureArray(uint32 uiTextureHandle) = 0;
 
 	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags) = 0;

@@ -279,7 +279,7 @@ HyOpenGL::~HyOpenGL(void)
 }
 
 // Returns the texture ID used for API specific drawing.
-/*virtual*/ uint32 HyOpenGL::AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &PixelDataList)
+/*virtual*/ void HyOpenGL::AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<std::pair<uint32, unsigned char *> > &PixelDataList)
 {
 	GLenum eInternalFormat = uiNumColorChannels == 4 ? GL_RGBA8 : (uiNumColorChannels == 3 ? GL_RGB8 : GL_R8);
 	GLenum eFormat = uiNumColorChannels == 4 ? GL_RGBA : (uiNumColorChannels == 3 ? GL_RGB : GL_RED);
@@ -288,10 +288,22 @@ HyOpenGL::~HyOpenGL(void)
 	glGenTextures(1, &hGLTextureArray);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, hGLTextureArray);
 
-	uint32 uiNumTextures = static_cast<uint32>(PixelDataList.size());
-
 	// Create (blank) storage for the texture array
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, uiNumTextures, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
+
+	GLenum eError = GL_NO_ERROR;
+	uint32 uiNumTextures = static_cast<uint32>(PixelDataList.size());
+	glTexImage3D(GL_PROXY_TEXTURE_2D_ARRAY/*GL_TEXTURE_2D_ARRAY*/, 0, eInternalFormat, uiWidth, uiHeight, uiNumTextures, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
+	eError = glGetError();
+
+	while (eError)
+	{
+		uiNumTextures /= 2;
+		if(uiNumTextures == 0)
+			HyError("Could not allocate texture array.");
+
+		glTexImage3D(GL_PROXY_TEXTURE_2D_ARRAY/*GL_TEXTURE_2D_ARRAY*/, 0, eInternalFormat, uiWidth, uiHeight, uiNumTextures, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
+		eError = glGetError();
+	}
 
 	for(uint32 i = 0; i != uiNumTextures; ++i)
 	{
@@ -302,7 +314,7 @@ HyOpenGL::~HyOpenGL(void)
 						uiWidth, uiHeight, 1,	// width, height, depth (of texture you're copying in)
 						eFormat,				// format
 						GL_UNSIGNED_BYTE,		// type
-						PixelDataList[i]);			// pointer to pixel data
+						PixelDataList[i].second);			// pointer to pixel data
 	}
 
 	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -312,7 +324,7 @@ HyOpenGL::~HyOpenGL(void)
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	return hGLTextureArray;
+	//return hGLTextureArray;
 }
 
 /*virtual*/ void HyOpenGL::DeleteTextureArray(uint32 uiTextureHandle)

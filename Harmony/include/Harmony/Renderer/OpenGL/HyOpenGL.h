@@ -52,8 +52,12 @@ public:
 
 	virtual void FinishRender();
 
-	// Returns the texture ID used for API specific drawing.
-	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &PixelDataList);
+	// AddTextureArray will attempt to create entire array. If out of memory it will continually slice array in halfs, and fail once beyond single texture per array
+	//
+	// vector pair:
+	// uint32 (out param)			= each texture's ID used for API specific drawing.
+	// unsigned char * (in param)	= pixel data for each texture
+	virtual void AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<std::pair<uint32, unsigned char *> > &PixelDataList);
 	virtual void DeleteTextureArray(uint32 uiTextureHandle);
 
 	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags);

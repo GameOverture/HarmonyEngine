@@ -140,7 +140,7 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);
 
 	if(m_bIS_RAW == false)
-		m_RenderState.SetTextureHandle(pData->GetAtlasGroup()->GetGfxApiHandle());
+		m_RenderState.SetTextureHandle(pData->GetAtlasGroup()->GetGfxApiHandle(m_uiTextureIndex));
 
 	// Correct 'm_SrcRect' if using pixel coords
 	if(m_SrcRect.left > 1.0f || m_SrcRect.top > 1.0f || m_SrcRect.right > 1.0f || m_SrcRect.bottom > 1.0f)

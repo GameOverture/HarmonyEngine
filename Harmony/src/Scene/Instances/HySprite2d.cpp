@@ -283,7 +283,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 
-	m_RenderState.SetTextureHandle(frameRef.pAtlasGroup->GetGfxApiHandle());
+	m_RenderState.SetTextureHandle(frameRef.pAtlasGroup->GetGfxApiHandle(frameRef.uiTEXTUREINDEX));
 
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiCurAnimState];
 

@@ -99,7 +99,6 @@ HyAtlasGroup::HyAtlasGroup(HyTextures &managerRef, uint32 uiLoadGroupId, uint32 
 																																										m_uiHEIGHT(uiHeight),
 																																										m_uiNUM_8BIT_CHANNELS(uiNumClrChannels),
 																																										m_uiNUM_ATLASES(static_cast<uint32>(texturesArrayRef.size())),
-																																										m_uiGfxApiHandle(0),
 																																										m_uiRefCount(0)
 {
 	m_pAtlases = reinterpret_cast<HyAtlas *>(HY_NEW unsigned char[sizeof(HyAtlas) * m_uiNUM_ATLASES]);
@@ -123,14 +122,14 @@ HyAtlasGroup::~HyAtlasGroup()
 	m_pAtlases = NULL;
 }
 
+uint32 HyAtlasGroup::GetGfxApiHandle(uint32 uiTextureIndex)
+{
+	return m_pAtlases[uiTextureIndex].GetGfxApiHandle();
+}
+
 uint32 HyAtlasGroup::GetId() const
 {
 	return m_uiLOADGROUPID;
-}
-
-uint32 HyAtlasGroup::GetGfxApiHandle() const
-{
-	return m_uiGfxApiHandle;
 }
 
 uint32 HyAtlasGroup::GetNumColorChannels() const
@@ -206,9 +205,9 @@ void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef, IHy2dData *pData)
 	{
 		if(m_uiGfxApiHandle == 0)
 		{
-			std::vector<unsigned char *> vTextureArrayData;
+			std::vector<std::pair<uint32, unsigned char *> > vTextureArrayData;
 			for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
-				vTextureArrayData.push_back(m_pAtlases[i].GetPixelData());
+				vTextureArrayData.push_back(std::pair<uint32, unsigned char *>(0, m_pAtlases[i].GetPixelData()));
 
 			m_uiGfxApiHandle = rendererRef.AddTextureArray(m_uiNUM_8BIT_CHANNELS, m_uiWIDTH, m_uiHEIGHT, vTextureArrayData);
 
@@ -225,7 +224,8 @@ void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef, IHy2dData *pData)
 }
 
 //////////////////////////////////////////////////////////////////////////
-HyAtlas::HyAtlas(jsonxx::Array &srcFramesArrayRef) :	m_uiNUM_FRAMES(static_cast<uint32>(srcFramesArrayRef.size())),
+HyAtlas::HyAtlas(jsonxx::Array &srcFramesArrayRef) :	m_uiGfxApiHandle(0),
+														m_uiNUM_FRAMES(static_cast<uint32>(srcFramesArrayRef.size())),
 														m_pPixelData(NULL)
 {
 	m_pFrames = HY_NEW HyRectangle<int32>[m_uiNUM_FRAMES];
@@ -247,6 +247,16 @@ HyAtlas::~HyAtlas()
 {
 	delete [] m_pFrames;
 	DeletePixelData();
+}
+
+uint32 HyAtlas::GetGfxApiHandle() const
+{
+	return m_uiGfxApiHandle;
+}
+
+void HyAtlas::SetGfxApiHandle(uint32 uiGfxApiHandle)
+{
+	m_uiGfxApiHandle = uiGfxApiHandle;
 }
 
 const HyRectangle<int32> *HyAtlas::GetSrcRect(uint32 uiChecksum) const
