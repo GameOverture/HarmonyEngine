@@ -278,8 +278,8 @@ HyOpenGL::~HyOpenGL(void)
 
 }
 
-// Returns the texture ID used for API specific drawing.
-/*virtual*/ void HyOpenGL::AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<std::pair<uint32, unsigned char *> > &PixelDataList)
+// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
+/*virtual*/ uint32 HyOpenGL::AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut)
 {
 	GLenum eInternalFormat = uiNumColorChannels == 4 ? GL_RGBA8 : (uiNumColorChannels == 3 ? GL_RGB8 : GL_R8);
 	GLenum eFormat = uiNumColorChannels == 4 ? GL_RGBA : (uiNumColorChannels == 3 ? GL_RGB : GL_RED);
@@ -289,23 +289,27 @@ HyOpenGL::~HyOpenGL(void)
 	glBindTexture(GL_TEXTURE_2D_ARRAY, hGLTextureArray);
 
 	// Create (blank) storage for the texture array
-
 	GLenum eError = GL_NO_ERROR;
-	uint32 uiNumTextures = static_cast<uint32>(PixelDataList.size());
-	glTexImage3D(GL_PROXY_TEXTURE_2D_ARRAY/*GL_TEXTURE_2D_ARRAY*/, 0, eInternalFormat, uiWidth, uiHeight, uiNumTextures, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
+	uiNumTexturesUploadedOut = static_cast<uint32>(pixelDataList.size());
+
+	// TODO: Don't upload huge texture arrays. Actually calculate required bytes, and then size array accordingly to hardware constraints. Hardcoding 12 for now
+	if(uiNumTexturesUploadedOut > 4)
+		uiNumTexturesUploadedOut = 4;
+
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, uiNumTexturesUploadedOut, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
 	eError = glGetError();
 
 	while (eError)
 	{
-		uiNumTextures /= 2;
-		if(uiNumTextures == 0)
+		uiNumTexturesUploadedOut /= 2;
+		if(uiNumTexturesUploadedOut == 0)
 			HyError("Could not allocate texture array.");
 
-		glTexImage3D(GL_PROXY_TEXTURE_2D_ARRAY/*GL_TEXTURE_2D_ARRAY*/, 0, eInternalFormat, uiWidth, uiHeight, uiNumTextures, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, uiNumTexturesUploadedOut, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
 		eError = glGetError();
 	}
 
-	for(uint32 i = 0; i != uiNumTextures; ++i)
+	for(uint32 i = 0; i != uiNumTexturesUploadedOut; ++i)
 	{
 		// Write each texture into storage
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
@@ -314,7 +318,7 @@ HyOpenGL::~HyOpenGL(void)
 						uiWidth, uiHeight, 1,	// width, height, depth (of texture you're copying in)
 						eFormat,				// format
 						GL_UNSIGNED_BYTE,		// type
-						PixelDataList[i].second);			// pointer to pixel data
+						pixelDataList[i]);		// pointer to pixel data
 	}
 
 	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -324,7 +328,7 @@ HyOpenGL::~HyOpenGL(void)
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	//return hGLTextureArray;
+	return hGLTextureArray;
 }
 
 /*virtual*/ void HyOpenGL::DeleteTextureArray(uint32 uiTextureHandle)

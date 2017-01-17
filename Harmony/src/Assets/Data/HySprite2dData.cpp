@@ -78,12 +78,12 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 
 		HyAtlasGroup *pAtlasGroup = dataRef.RequestTexture(static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasGroupId")));
 
-		uint32 uiTextureIndex;
+		uint32 uiAtlasGroupTextureIndex;
 		HyRectangle<float> rUVRect;
-		pAtlasGroup->GetUvRect(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), uiTextureIndex, rUVRect);
+		pAtlasGroup->GetUvRect(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), uiAtlasGroupTextureIndex, rUVRect);
 
 		new (pFrameWriteLocation)HySprite2dFrame(pAtlasGroup,
-												 uiTextureIndex,
+												 uiAtlasGroupTextureIndex,
 												 rUVRect.left, rUVRect.top, rUVRect.right, rUVRect.bottom,
 												 glm::ivec2(static_cast<int32>(frameObj.get<jsonxx::Number>("offsetX")), static_cast<int32>(frameObj.get<jsonxx::Number>("offsetY"))),
 												 static_cast<float>(frameObj.get<jsonxx::Number>("duration")));

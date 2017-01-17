@@ -19,24 +19,27 @@
 struct HySprite2dFrame
 {
 	HyAtlasGroup *				pAtlasGroup;
-	const uint32				uiTEXTUREINDEX;
+	const uint32				uiATLAS_GROUP_TEXTURE_INDEX;
 	const HyRectangle<float>	rSRC_RECT;
 	const glm::ivec2			vOFFSET;
 	const float					fDURATION;
 
 	HySprite2dFrame(HyAtlasGroup *pAtlasGrp,
-					uint32 uiTextureIndex,
+					uint32 uiAtlasGroupTextureIndex,
 					float fSrcLeft,
 					float fSrcTop,
 					float fSrcRight,
 					float fSrcBot,
 					glm::ivec2 vOffset,
 					float fDuration) :	pAtlasGroup(pAtlasGrp),
-										uiTEXTUREINDEX(uiTextureIndex),
+										uiATLAS_GROUP_TEXTURE_INDEX(uiAtlasGroupTextureIndex),
 										rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot),
 										vOFFSET(vOffset),
 										fDURATION(fDuration)
 	{ }
+
+	uint32 GetGfxApiHandle() const 			{ return pAtlasGroup->GetGfxApiHandle(uiATLAS_GROUP_TEXTURE_INDEX); }
+	uint32 GetActualTextureIndex() const	{ return pAtlasGroup->GetActualGfxApiTextureIndex(uiATLAS_GROUP_TEXTURE_INDEX); }
 };
 
 class HySprite2dData : public IHy2dData

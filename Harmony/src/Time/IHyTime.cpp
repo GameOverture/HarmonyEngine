@@ -45,8 +45,14 @@ bool IHyTime::ThrottleTime()
 	{
 		m_dThrottledTime -= sm_dUPDATESTEP_SECONDS;
 
-		if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS)
+		// TODO: Handle this better or input replays will not work
+		if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS * 5.0f)
+		{
+#ifndef HY_PLATFORM_GUI
+			m_dThrottledTime = 0.0f;
+#endif
 			m_iThrottleSafetyCounter = 0;
+		}
 
 		return true;
 	}

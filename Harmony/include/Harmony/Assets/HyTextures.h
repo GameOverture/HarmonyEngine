@@ -57,6 +57,7 @@ class HyAtlasGroup
 	HyAtlas *					m_pAtlases;
 	const uint32				m_uiNUM_ATLASES;
 
+	bool						m_bIsLoaded;
 	uint32						m_uiRefCount;
 
 	BasicSection				m_csTextures;
@@ -65,7 +66,8 @@ public:
 	HyAtlasGroup(HyTextures &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
 	~HyAtlasGroup();
 
-	uint32 GetGfxApiHandle(uint32 uiTextureIndex);
+	uint32 GetGfxApiHandle(uint32 uiAtlasGroupTextureIndex);
+	uint32 GetActualGfxApiTextureIndex(uint32 uiAtlasGroupTextureIndex);
 
 	uint32 GetId() const;
 	uint32 GetNumColorChannels() const;
@@ -84,6 +86,7 @@ public:
 class HyAtlas
 {
 	uint32									m_uiGfxApiHandle;
+	uint32									m_uiGfxApiTextureIndex;	// Because the texture array may get split due to HW constraints, this becomes the true index in its texture array
 
 	const uint32							m_uiNUM_FRAMES;
 
@@ -106,7 +109,9 @@ public:
 	~HyAtlas();
 
 	uint32 GetGfxApiHandle() const;
-	void SetGfxApiHandle(uint32 uiGfxApiHandle);
+	uint32 GetGfxApiTextureIndex() const;
+	void SetGfxApiHandle(uint32 uiGfxApiHandle, uint32 uiGfxApiTextureIndex);
+
 
 	const HyRectangle<int32> *GetSrcRect(uint32 uiChecksum) const;
 

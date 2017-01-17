@@ -122,9 +122,14 @@ HyAtlasGroup::~HyAtlasGroup()
 	m_pAtlases = NULL;
 }
 
-uint32 HyAtlasGroup::GetGfxApiHandle(uint32 uiTextureIndex)
+uint32 HyAtlasGroup::GetGfxApiHandle(uint32 uiAtlasGroupTextureIndex)
 {
-	return m_pAtlases[uiTextureIndex].GetGfxApiHandle();
+	return m_pAtlases[uiAtlasGroupTextureIndex].GetGfxApiHandle();
+}
+
+uint32 HyAtlasGroup::GetActualGfxApiTextureIndex(uint32 uiAtlasGroupTextureIndex)
+{
+	return m_pAtlases[uiAtlasGroupTextureIndex].GetGfxApiTextureIndex();
 }
 
 uint32 HyAtlasGroup::GetId() const
@@ -179,7 +184,7 @@ void HyAtlasGroup::Load()
 {
 	m_csTextures.Lock();
 
-	if(m_uiGfxApiHandle == 0)
+	if(m_uiRefCount == 0)
 	{
 		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
 			m_pAtlases[i].Load(m_ManagerRef.GetTexturePath(m_uiLOADGROUPID, i).c_str());
@@ -203,28 +208,44 @@ void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef, IHy2dData *pData)
 	m_csTextures.Lock();
 	if(bUpload)
 	{
-		if(m_uiGfxApiHandle == 0)
+		std::vector<unsigned char *> texturePixelDataList;
+		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
+			texturePixelDataList.push_back(m_pAtlases[i].GetPixelData());
+
+		uint32 uiNumTexturesUploaded = 0;
+		while(uiNumTexturesUploaded != m_uiNUM_ATLASES)
 		{
-			std::vector<std::pair<uint32, unsigned char *> > vTextureArrayData;
-			for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
-				vTextureArrayData.push_back(std::pair<uint32, unsigned char *>(0, m_pAtlases[i].GetPixelData()));
+			uint32 uiNumSuccess = 0;
+			uint32 uiGfxApiHandle = rendererRef.AddTextureArray(m_uiNUM_8BIT_CHANNELS, m_uiWIDTH, m_uiHEIGHT, texturePixelDataList, uiNumSuccess);
 
-			m_uiGfxApiHandle = rendererRef.AddTextureArray(m_uiNUM_8BIT_CHANNELS, m_uiWIDTH, m_uiHEIGHT, vTextureArrayData);
+			uint32 uiActualTextureIndex = 0;
+			for(uint32 i = uiNumTexturesUploaded; i < (uiNumTexturesUploaded + uiNumSuccess); ++i, ++uiActualTextureIndex)
+				m_pAtlases[i].SetGfxApiHandle(uiGfxApiHandle, uiActualTextureIndex);
 
-			for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
-				m_pAtlases[i].DeletePixelData();
+			std::vector<unsigned char *> split_hi(texturePixelDataList.begin() + uiNumSuccess, texturePixelDataList.end());
+			texturePixelDataList = split_hi;
+
+			uiNumTexturesUploaded += uiNumSuccess;
 		}
+
+		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
+			m_pAtlases[i].DeletePixelData();
 	}
 	else if(m_uiRefCount == 0)
 	{
-		rendererRef.DeleteTextureArray(m_uiGfxApiHandle);
-		m_uiGfxApiHandle = 0;
+		std::set<uint32> gfxApiHandleSet;
+		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
+			gfxApiHandleSet.insert(m_pAtlases[i].GetGfxApiHandle());
+
+		for(std::set<uint32>::iterator iter = gfxApiHandleSet.begin(); iter != gfxApiHandleSet.end(); ++iter)
+			rendererRef.DeleteTextureArray(*iter);
 	}
 	m_csTextures.Unlock();
 }
 
 //////////////////////////////////////////////////////////////////////////
 HyAtlas::HyAtlas(jsonxx::Array &srcFramesArrayRef) :	m_uiGfxApiHandle(0),
+														m_uiGfxApiTextureIndex(0),
 														m_uiNUM_FRAMES(static_cast<uint32>(srcFramesArrayRef.size())),
 														m_pPixelData(NULL)
 {
@@ -254,9 +275,15 @@ uint32 HyAtlas::GetGfxApiHandle() const
 	return m_uiGfxApiHandle;
 }
 
-void HyAtlas::SetGfxApiHandle(uint32 uiGfxApiHandle)
+uint32 HyAtlas::GetGfxApiTextureIndex() const
+{
+	return m_uiGfxApiTextureIndex;
+}
+
+void HyAtlas::SetGfxApiHandle(uint32 uiGfxApiHandle, uint32 uiGfxApiTextureIndex)
 {
 	m_uiGfxApiHandle = uiGfxApiHandle;
+	m_uiGfxApiTextureIndex = uiGfxApiTextureIndex;
 }
 
 const HyRectangle<int32> *HyAtlas::GetSrcRect(uint32 uiChecksum) const

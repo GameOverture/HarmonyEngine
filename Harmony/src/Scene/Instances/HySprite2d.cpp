@@ -282,8 +282,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 		return;
 
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
-
-	m_RenderState.SetTextureHandle(frameRef.pAtlasGroup->GetGfxApiHandle(frameRef.uiTEXTUREINDEX));
+	m_RenderState.SetTextureHandle(frameRef.GetGfxApiHandle());
 
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiCurAnimState];
 
@@ -384,7 +383,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
 	pRefDataWritePos += sizeof(float);
 
-	*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(frameRef.uiTEXTUREINDEX);
+	*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(frameRef.GetActualTextureIndex());
 	pRefDataWritePos += sizeof(float);
 
 	glm::vec2 vUV;

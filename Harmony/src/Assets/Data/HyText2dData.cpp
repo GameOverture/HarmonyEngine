@@ -41,7 +41,7 @@ HyText2dData::FontState::~FontState()
 }
 
 HyText2dData::HyText2dData(const std::string &sPath, int32 iShaderId) : IHy2dData(HYTYPE_Text2d, sPath, iShaderId),
-																		m_uiTextureIndex(0),
+																		m_uiAtlasGroupTextureIndex(0),
 																		m_pTypefaces(NULL),
 																		m_uiNumTypefaces(0),
 																		m_pFontStates(NULL),
@@ -88,9 +88,9 @@ HyAtlasGroup *HyText2dData::GetAtlasGroup()
 	return m_pAtlasGroup;
 }
 
-uint32 HyText2dData::GetTextureIndex()
+uint32 HyText2dData::GetAtlasGroupTextureIndex()
 {
-	return m_uiTextureIndex;
+	return m_uiAtlasGroupTextureIndex;
 }
 
 float HyText2dData::GetLineHeight(uint32 uiStateIndex)
@@ -124,7 +124,7 @@ float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
 	m_pAtlasGroup = RequestTexture(static_cast<uint32>(textObject.get<jsonxx::Number>("atlasGroupId")));
 
 	HyRectangle<float> rSubAtlasUVRect;
-	m_pAtlasGroup->GetUvRect(static_cast<uint32>(textObject.get<jsonxx::Number>("checksum")), m_uiTextureIndex, rSubAtlasUVRect);
+	m_pAtlasGroup->GetUvRect(static_cast<uint32>(textObject.get<jsonxx::Number>("checksum")), m_uiAtlasGroupTextureIndex, rSubAtlasUVRect);
 
 	float fSubAtlasWidth = m_pAtlasGroup->GetWidth() * (rSubAtlasUVRect.right - rSubAtlasUVRect.left);
 	float fSubAtlasHeight = m_pAtlasGroup->GetHeight() * (rSubAtlasUVRect.bottom - rSubAtlasUVRect.top);
