@@ -486,6 +486,9 @@ void WidgetAtlasGroup::RepackAll()
 void WidgetAtlasGroup::Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> newFramesSet)
 {
     MainWindow::LoadSpinner(true);
+    
+    for(uint32 i = 0; i < m_FrameList.size(); ++i)
+        m_FrameList[i]->DeleteAllDrawInst();
 
     // Always repack the last texture to ensure it gets filled as much as it can
     QFileInfoList existingTexturesInfoList = m_DataDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
@@ -568,14 +571,17 @@ void WidgetAtlasGroup::Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> 
                     if(iExistingTextureIndex == iNextAvailableFoundIndex)
                     {
                         // Texture found, start migrating its frames
-                        for(int i = 0; i < m_FrameList.size(); ++i)
+                        for(int j = 0; j < m_FrameList.size(); ++j)
                         {
-                            if(m_FrameList[i]->GetTextureIndex() == iExistingTextureIndex)
-                                m_FrameList[i]->UpdateInfoFromPacker(iCurrentIndex, m_FrameList[i]->GetX(), m_FrameList[i]->GetY());
+                            if(m_FrameList[j]->GetTextureIndex() == iExistingTextureIndex)
+                                m_FrameList[j]->UpdateInfoFromPacker(iCurrentIndex, m_FrameList[j]->GetX(), m_FrameList[j]->GetY());
                         }
 
                         // Rename the texture file to be the new index
                         QFile::rename(existingTexturesInfoList[i].absoluteFilePath(), m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iCurrentIndex) % ".png"));
+                        
+                        // Regrab 'existingTexturesInfoList' after renaming a texture
+                        existingTexturesInfoList = m_DataDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
 
                         bHandled = true;
                         break;
