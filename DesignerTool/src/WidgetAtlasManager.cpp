@@ -195,7 +195,7 @@ void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage 
 
             if(m_DependencyMap.contains(uiChecksum))
             {
-                HyGuiLog("WidgetAtlasManager::ReplaceFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
+                HyGuiLog("WidgetAtlasManager::ReplaceFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Info);
                 pFrame->SetError(GUIFRAMEERROR_Duplicate);
             }
             else
@@ -513,7 +513,7 @@ HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRec
 
     if(m_DependencyMap.contains(uiChecksum))
     {
-        HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
+        HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Info);
 
         m_DependencyMap.find(uiChecksum).value()->SetError(GUIFRAMEERROR_Duplicate);
 

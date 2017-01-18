@@ -618,6 +618,10 @@ void WidgetAtlasGroup::ConstructAtlasTexture(int iPackerBinIndex, int iTextureAr
 
         if(imgInfoRef.duplicateId != NULL && m_Packer.merge)
         {
+            pFrame->UpdateInfoFromPacker(iTextureArrayIndex,
+                                         imgInfoRef.pos.x() + m_Packer.border.l,
+                                         imgInfoRef.pos.y() + m_Packer.border.t);
+            
             pFrame->SetError(GUIFRAMEERROR_Duplicate);
             bValidToDraw = false;
         }
