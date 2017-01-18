@@ -183,7 +183,7 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
 	pRefDataWritePos += sizeof(float);
 
-	*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(pData->GetAtlasGroup()->GetActualGfxApiTextureIndex(m_uiTextureIndex));
+	*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(pData->GetAtlasGroup() ? pData->GetAtlasGroup()->GetActualGfxApiTextureIndex(m_uiTextureIndex) : m_uiTextureIndex);
 	pRefDataWritePos += sizeof(float);
 
 	glm::vec2 vUV;
