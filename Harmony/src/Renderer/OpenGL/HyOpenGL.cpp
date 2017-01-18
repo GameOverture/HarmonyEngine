@@ -301,9 +301,9 @@ HyOpenGL::~HyOpenGL(void)
 	GLenum eError = GL_NO_ERROR;
 	uiNumTexturesUploadedOut = static_cast<uint32>(pixelDataList.size());
 
-	// TODO: Don't upload huge texture arrays. Actually calculate required bytes, and then size array accordingly to hardware constraints. Hardcoding 12 for now
-	//if(uiNumTexturesUploadedOut > 4)
-	//	uiNumTexturesUploadedOut = 4;
+	// TODO: Don't upload huge texture arrays. Actually calculate required bytes, and then size array accordingly to hardware constraints
+	if(uiNumTexturesUploadedOut > 8)
+		uiNumTexturesUploadedOut = 8;
 
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, uiNumTexturesUploadedOut, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
 	eError = glGetError();

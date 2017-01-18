@@ -281,15 +281,11 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	if(m_eLoadState != HYLOADSTATE_Loaded)
 		return;
 
-	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
-	uint32 uiGfxTextureHandle = frameRef.GetGfxApiHandle();
-	m_RenderState.SetTextureHandle(uiGfxTextureHandle);
-
-	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiCurAnimState];
-
 	if(m_bIsAnimPaused == false)
 		m_fElapsedFrameTime += IHyTime::GetUpdateStepSeconds() * m_fAnimPlayRate;
 
+	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiCurAnimState];
 	while(m_fElapsedFrameTime >= frameRef.fDURATION)
 	{
 		int32 iNumFrames = AnimGetNumFrames();
@@ -353,6 +349,9 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 		m_uiCurFrame = iNextFrameIndex;
 		m_fElapsedFrameTime -= frameRef.fDURATION;
 	}
+
+	const HySprite2dFrame &UpdatedFrameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
 }
 
 /*virtual*/ void HySprite2d::OnUpdateUniforms()

@@ -119,7 +119,8 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetA
         // Upload texture to gfx api
         std::vector<unsigned char *> vPixelData;
         vPixelData.push_back(pWidget->GetAtlasPixelData());
-        pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(4 /*converted texture depth*/, pAtlas->width, pAtlas->height, vPixelData);
+        uint32 uiNumSucceeded = 0;
+        pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(4 /*converted texture depth*/, pAtlas->width, pAtlas->height, vPixelData, uiNumSucceeded);
 
         // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
         delete m_pDrawAtlasPreview;
