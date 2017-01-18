@@ -31,6 +31,8 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
+#include <QLabel>
+
 #define HYGUIVERSION_STRING "v0.0.1"
 
 /*static*/ MainWindow * MainWindow::sm_pInstance = NULL;
@@ -170,6 +172,18 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     // Append version to window title
     setWindowTitle(windowTitle() % " " % HYGUIVERSION_STRING);
 
+
+    QLabel *pStatusLbl = new QLabel;
+    statusBar()->showMessage("Ready");
+
+    QPixmap *pPixmap = new QPixmap(":/icons16x16/smiley-sad.gif");
+    QLabel *pSvnStatusIcon = new QLabel;
+    pSvnStatusIcon->setPixmap(*pPixmap);
+    statusBar()->addPermanentWidget(pSvnStatusIcon);
+
+    QLabel *pSvnLoginLabel = new QLabel;
+    pSvnLoginLabel->setText("SVN Not Detected");
+    statusBar()->addPermanentWidget(pSvnLoginLabel);
 
     //setStyleSheet("background-color:black;");
 

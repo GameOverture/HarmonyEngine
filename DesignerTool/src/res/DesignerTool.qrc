@@ -59,5 +59,6 @@
         <file>icons16x16/generic-settings.png</file>
         <file>icons16x16/code.png</file>
         <file>icons16x16/folder-new.png</file>
+        <file>icons16x16/smiley-sad.gif</file>
     </qresource>
 </RCC>
