@@ -105,11 +105,18 @@ void HyEngine::Shutdown()
 {
 	// Unload any load-pending assets
 	m_AssetManager.Shutdown();
+	int32 iSafetyExit = 0;
 	while(m_AssetManager.IsShutdown() == false)
 	{
 		m_AssetManager.Update();
 		m_Scene.PostUpdate();
 		m_Renderer.Update();
+		
+		if(++iSafetyExit > 1000)
+		{
+			HyLogError("Breaking out of Shutdown() with instances still alive");
+			break;
+		}
 	}
 }
 
