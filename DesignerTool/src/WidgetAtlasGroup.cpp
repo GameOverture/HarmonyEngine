@@ -522,7 +522,8 @@ void WidgetAtlasGroup::Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> 
     m_dlgSettings.SetPackerSettings(&m_Packer);
     m_Packer.pack(m_dlgSettings.GetHeuristic(), m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight());
 
-    int iNumNewTextures = m_Packer.bins.size();
+    // Subtract '1' from the number of new textures because we want to ensure the last generated (and likely least filled) texture is last
+    int iNumNewTextures = m_Packer.bins.size() - 1;
 
     // Delete the old textures
     for(int i = 0; i < textureIndexList.size(); ++i)
@@ -536,7 +537,8 @@ void WidgetAtlasGroup::Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> 
     ui->lcdNumTextures->display(iTotalNumTextures);
 
     int iNumNewTexturesUsed = 0;
-    for(int iCurrentIndex = 0; iCurrentIndex < iTotalNumTextures; ++iCurrentIndex)
+    int iCurrentIndex = 0;
+    for(; iCurrentIndex < iTotalNumTextures; ++iCurrentIndex)
     {
         bool bFound = false;
         for(int i = 0; i < existingTexturesInfoList.size(); ++i)
@@ -591,6 +593,9 @@ void WidgetAtlasGroup::Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> 
             while(bHandled == false);
         }
     }
+    
+    // Place the last generated texture at the end of the array
+    ConstructAtlasTexture(m_Packer.bins.size() - 1, iCurrentIndex);
 
     Refresh();
 
