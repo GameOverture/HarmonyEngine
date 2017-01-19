@@ -223,9 +223,7 @@ void HyGuiFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
     else
         m_rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
 
-    m_iTextureIndex = -1;
-    m_iPosX = -1;
-    m_iPosY = -1;
+    // DO NOT clear 'm_iTextureIndex' as it's needed in the WidgetAtlasGroup::Repack()
 
     if(newImage.save(metaDir.path() % "/" % ConstructImageFileName()) == false)
         HyGuiLog("Could not save frame image to meta directory: " % m_sName, LOGTYPE_Error);
