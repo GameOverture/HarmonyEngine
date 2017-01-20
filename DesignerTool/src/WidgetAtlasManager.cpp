@@ -220,32 +220,20 @@ QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem)
 
     atlasGrp.GetTreeWidget()->clearSelection();
 
-    QList<quint32> checksumRequestList;
+    QList<HyGuiFrame *> frameRequestList;
     for(int i = 0; i < selectedItems.size(); ++i)
     {
         HyGuiFrame *pFrame = selectedItems[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
         if(pFrame == NULL)
             continue;
 
-        checksumRequestList.append(pFrame->GetChecksum());
+        frameRequestList.append(pFrame);
     }
 
-    if(checksumRequestList.empty())
+    if(frameRequestList.empty())
         return QList<HyGuiFrame *>();
 
-    return RequestFrames(pItem, checksumRequestList);
-}
-
-QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<HyGuiFrame *> requestList)
-{
-    if(requestList.empty())
-        return RequestFrames(pItem);
-    
-    QList<quint32> checksumRequestList;
-    for(int i = 0; i < requestList.size(); ++i)
-        checksumRequestList.append(requestList[i]->GetChecksum());
-
-    return RequestFrames(pItem, checksumRequestList);
+    return RequestFrames(pItem, frameRequestList);
 }
 
 QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<quint32> requestList)
@@ -253,21 +241,32 @@ QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<q
     if(requestList.empty())
         return RequestFrames(pItem);
     
-    QList<HyGuiFrame *> returnList;
+    QList<HyGuiFrame *> frameRequestList;
     for(int i = 0; i < requestList.size(); ++i)
     {
         QMap<quint32, HyGuiFrame *>::iterator iter = m_DependencyMap.find(requestList[i]);
-        
         if(iter == m_DependencyMap.end())
         {
             // TODO: Support a "Yes to all" dialog functionality here
             HyGuiLog("Cannot find image with checksum: " % QString::number(requestList[i]) % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
         }
         else
-        {
-            SetDependency(iter.value(), pItem);
-            returnList.append(iter.value());
-        }
+            frameRequestList.append(iter.value());
+    }
+
+    return RequestFrames(pItem, frameRequestList);
+}
+
+QList<HyGuiFrame *> WidgetAtlasManager::RequestFrames(ItemWidget *pItem, QList<HyGuiFrame *> requestList)
+{
+    if(requestList.empty())
+        return RequestFrames(pItem);
+    
+    QList<HyGuiFrame *> returnList;
+    for(int i = 0; i < requestList.size(); ++i)
+    {
+        SetDependency(requestList[i], pItem);
+        returnList.append(requestList[i]);
     }
     
     return returnList;
