@@ -513,12 +513,13 @@ HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRec
 
     if(m_DependencyMap.contains(uiChecksum))
     {
-        HyGuiLog("WidgetAtlasManager::CreateFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Info);
-
-        m_DependencyMap.find(uiChecksum).value()->SetError(GUIFRAMEERROR_Duplicate);
+        HyGuiFrame *pExistingFrame = m_DependencyMap.find(uiChecksum).value();
+        HyGuiLog("'" % sN % "' is a duplicate of '" % pExistingFrame->GetName() % "' with the checksum: " % QString::number(uiChecksum), LOGTYPE_Info);
 
         pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, iX, iY, uiErrors);
+
         pNewFrame->SetError(GUIFRAMEERROR_Duplicate);
+        pExistingFrame->SetError(GUIFRAMEERROR_Duplicate);
     }
     else
     {

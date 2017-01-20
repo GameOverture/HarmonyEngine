@@ -43,6 +43,13 @@ HyTexturedQuad2d *HyGuiFrame::DrawInst(void *pKey)
     
     // Not found, create a new HyTexturedQuad2d based on key
     HyTexturedQuad2d *pDrawInst = new HyTexturedQuad2d(m_uiATLAS_GROUP_ID);
+
+    if(m_iTextureIndex == -1)
+    {
+        HyGuiLog(m_sName % " is trying to create a HyTextureQuad2d with a texture index of '-1'", LOGTYPE_Error);
+        return NULL;
+    }
+
     pDrawInst->SetTextureSource(m_iTextureIndex, GetX(), GetY(), m_rAlphaCrop.width(), m_rAlphaCrop.height());
 
     pDrawInst->SetEnabled(false);
@@ -123,7 +130,7 @@ void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 QString HyGuiFrame::ConstructImageFileName()
 {
     QString sMetaImgName;
-    sMetaImgName = sMetaImgName.sprintf("%010u-%s", m_uiChecksum, m_sName.toStdString().c_str());
+    sMetaImgName = sMetaImgName.sprintf("%010u", m_uiChecksum);
     sMetaImgName += ".png";
 
     return sMetaImgName;
