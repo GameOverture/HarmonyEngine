@@ -32,7 +32,7 @@ class HyInput_Gainput : public IHyInput
 	uint64							m_uiRecordCount;
 
 public:
-	HyInput_Gainput(std::vector<IHyInputMap *> &vInputMapsRef);
+	HyInput_Gainput(uint32 uiNumInputMappings);
 	~HyInput_Gainput();
 
 	gainput::InputManager &GetGainputManager();
@@ -47,7 +47,7 @@ public:
 	virtual void StopPlayback();
 
 #ifdef HY_PLATFORM_WINDOWS
-	void HandleMsg(const MSG& msg);
+	void HandleMsg(glm::ivec2 vResolution, const MSG& msg);
 #endif
 
 	gainput::DeviceId GetKeyboardDeviceId();

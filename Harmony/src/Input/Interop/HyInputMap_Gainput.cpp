@@ -9,42 +9,50 @@
 *************************************************************************/
 #include "Input/Interop/HyInputMap_Gainput.h"
 
-#define HY_GAINPUT_MANAGER (*static_cast<HyInput_Gainput *>(sm_pInputManager))
-
-HyInputMap_Gainput::HyInputMap_Gainput() : m_pInputMap(NULL)
+HyInputMap_Gainput::HyInputMap_Gainput(IHyInput *pInputManager) : IHyInputMap(pInputManager)
 {
+	m_pGainputMap = HY_NEW gainput::InputMap(static_cast<HyInput_Gainput *>(m_pInputManager)->GetGainputManager());
 }
 
 HyInputMap_Gainput::~HyInputMap_Gainput()
 {
-	delete m_pInputMap;
+	delete m_pGainputMap;
+}
+
+/*virtual*/ glm::ivec2 HyInputMap_Gainput::GetMousePos()
+{
+	glm::ivec2 ptMouse;
+	
+	m_pGainputMap->MapFloat(m_uiMouseX, static_cast<HyInput_Gainput *>(m_pInputManager)->GetMouseDeviceId(), HYMOUSE_AxisX);
+
+	return ptMouse;
 }
 
 /*virtual*/ bool HyInputMap_Gainput::MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn)
 {
-	HyAssert(m_pInputMap, "HyInputMap_Gainput::MapBtn_KB() used before manager initialized");
+	HyAssert(m_pGainputMap, "HyInputMap_Gainput::MapBtn_KB() used before manager initialized");
 
-	return m_pInputMap->MapBool(iUserId, HY_GAINPUT_MANAGER.GetKeyboardDeviceId(), eBtn);
+	return m_pGainputMap->MapBool(iUserId, static_cast<HyInput_Gainput *>(m_pInputManager)->GetKeyboardDeviceId(), eBtn);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn)
 {
-	return m_pInputMap->MapBool(iUserId, HY_GAINPUT_MANAGER.GetMouseDeviceId(), eBtn);
+	return m_pGainputMap->MapBool(iUserId, static_cast<HyInput_Gainput *>(m_pInputManager)->GetMouseDeviceId(), eBtn);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn, uint32 uiGamePadIndex)
 {
-	return m_pInputMap->MapBool(iUserId, HY_GAINPUT_MANAGER.GetGamePadDeviceId(uiGamePadIndex), eBtn);
+	return m_pGainputMap->MapBool(iUserId, static_cast<HyInput_Gainput *>(m_pInputManager)->GetGamePadDeviceId(uiGamePadIndex), eBtn);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::MapAxis_MO(uint32 iUserId, HyMouseBtn eAxis, float fMin /*= 0.0f*/, float fMax /*= 1.0f*/)
 {
-	return true;
+	return false;
 }
 
 /*virtual*/ bool HyInputMap_Gainput::MapAxis_GP(uint32 iUserId, HyGamePadBtn eAxis, float fMin /*= 0.0f*/, float fMax /*= 1.0f*/)
 {
-	return true;
+	return false;
 }
 
 /*virtual*/ void HyInputMap_Gainput::Unmap(uint32 iUserId)
@@ -53,17 +61,17 @@ HyInputMap_Gainput::~HyInputMap_Gainput()
 
 /*virtual*/ bool HyInputMap_Gainput::IsMapped(uint32 iUserId) const
 {
-	return true;
+	return m_pGainputMap->IsMapped(iUserId);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::IsBtnDown(uint32 iUserId) const
 {
-	return m_pInputMap->GetBool(iUserId);
+	return m_pGainputMap->GetBool(iUserId);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::IsBtnDownBuffered(uint32 iUserId) const
 {
-	return m_pInputMap->GetBoolIsNew(iUserId);
+	return m_pGainputMap->GetBoolIsNew(iUserId);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::IsBtnReleased(uint32 iUserId) const
@@ -80,9 +88,3 @@ HyInputMap_Gainput::~HyInputMap_Gainput()
 {
 	return 0.0f;
 }
-
-/*virtual*/ void HyInputMap_Gainput::Initialize()
-{
-	m_pInputMap = HY_NEW gainput::InputMap(HY_GAINPUT_MANAGER.GetGainputManager());
-}
-

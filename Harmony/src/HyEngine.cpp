@@ -19,7 +19,7 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxBuffer, m_AppRef.m_WindowList),
 												m_AssetManager(m_AppRef.sm_Init.sDataDir, m_GfxBuffer, m_Scene),
 												m_GuiComms(m_AppRef.sm_Init.uiDebugPort, m_AssetManager),
-												m_Input(m_AppRef.m_InputMapList),
+												m_Input(m_AppRef.sm_Init.uiNumInputMappings),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList)
 {
@@ -93,7 +93,7 @@ bool HyEngine::PollPlatformApi()
 			DispatchMessage(&msg);
 			
 			if(m_AppRef.m_WindowList[i]->IsInputEnabled())
-				m_Input.HandleMsg(msg);
+				m_Input.HandleMsg(m_AppRef.m_WindowList[i]->GetResolution(), msg);
 		}
 	}
 #endif

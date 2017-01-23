@@ -10,9 +10,7 @@
 #include "Input/IHyInputMap.h"
 #include "Input/IHyInput.h"
 
-/*static*/ IHyInput *IHyInputMap::sm_pInputManager = NULL;
-
-IHyInputMap::IHyInputMap()
+IHyInputMap::IHyInputMap(IHyInput *pInputManager) : m_pInputManager(pInputManager)
 {
 }
 
@@ -20,32 +18,27 @@ IHyInputMap::IHyInputMap()
 {
 }
 
-/*static*/ void IHyInputMap::SetManagerPtr(IHyInput *pInputManager)
-{
-	sm_pInputManager = pInputManager;
-}
-
 /*static*/ void IHyInputMap::StartRecording()
 {
-	sm_pInputManager->StartRecording();
+	m_pInputManager->StartRecording();
 }
 
 /*static*/ void IHyInputMap::StopRecording()
 {
-	sm_pInputManager->StopRecording();
+	m_pInputManager->StopRecording();
 }
 
 /*static*/ void IHyInputMap::SerializeRecording()
 {
-	sm_pInputManager->SerializeRecording();
+	m_pInputManager->SerializeRecording();
 }
 
 /*static*/ void IHyInputMap::StartPlayback()
 {
-	sm_pInputManager->StartPlayback();
+	m_pInputManager->StartPlayback();
 }
 
 /*static*/ void IHyInputMap::StopPlayback()
 {
-	sm_pInputManager->StartPlayback();
+	m_pInputManager->StartPlayback();
 }

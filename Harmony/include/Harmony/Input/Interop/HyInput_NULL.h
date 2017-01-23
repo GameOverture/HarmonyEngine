@@ -31,6 +31,8 @@ public:
 class HyInputMap_NULL : public IHyInputMap
 {
 public:
+	virtual glm::ivec2 GetMousePos() { return glm::ivec2(0); }
+
 	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn) { return false; }
 	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn) { return false; }
 	virtual bool MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn, uint32 uiGamePadIndex) { return false; }

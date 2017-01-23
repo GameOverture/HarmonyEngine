@@ -16,11 +16,14 @@
 #include "Renderer/Viewport/HyCamera.h"
 #include "Renderer/Viewport/HyWindow.h"
 
+#include "Input/IHyInput.h"
+
 #include "Scene/IHyEntity2d.h"
 
 #include "Diagnostics/HyGuiComms.h"
 
 /*static*/ HyAssetManager *IHyInst2d::sm_pAssetManager = NULL;
+/*static*/ IHyInput *IHyInst2d::sm_pInputManager = NULL;
 
 IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName) :	IHyTransform2d(eInstType),
 																					m_sPREFIX(szPrefix ? szPrefix : ""),
@@ -247,6 +250,12 @@ void IHyInst2d::Unload()
 	}
 }
 
+void IHyInst2d::SetInputEnabled(bool bEnabled)
+{
+	HyAssert(sm_pInputManager, "IHyInst2d::SetInputEnabled was invoked before engine has been initialized");
+	sm_pInputManager->SetInputListener(bEnabled, this);
+}
+
 void IHyInst2d::SetData(IHyData *pData)
 {
 	m_pData = pData;
@@ -266,6 +275,12 @@ void IHyInst2d::SetLoaded()
 void IHyInst2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 {
 	m_ShaderUniforms.WriteUniformsBufferData(pRefDataWritePos);
+}
+
+/*virtual*/ void IHyInst2d::InputUpdate(IHyInputMap &inputMapRef)
+{
+	//glm::ivec2 ptMousePos = inputMapRef.GetMousePos();
+	//ptMousePos
 }
 
 /*virtual*/ void IHyInst2d::InstUpdate()

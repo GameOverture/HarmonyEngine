@@ -12,14 +12,20 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include <vector>
+#include "Input/IHyInputMap.h"
 
-class IHyInputMap;
+class IHyInst2d;
 
 class IHyInput
 {
+protected:
+	const uint32				m_uiNUM_INPUT_MAPS;
+	IHyInputMap *				m_pInputMaps;
+
+	std::vector<IHyInst2d *>	m_InputListenerList;
+
 public:
-	IHyInput(std::vector<IHyInputMap *> &vInputMapsRef);
+	IHyInput(uint32 uiNumInputMappings);
 	virtual ~IHyInput();
 
 	virtual void Update() = 0;
@@ -30,6 +36,8 @@ public:
 
 	virtual void StartPlayback() = 0;
 	virtual void StopPlayback() = 0;
+
+	void SetInputListener(bool bEnable, IHyInst2d *pInst);
 };
 
 #endif /* __HyInput_h__ */

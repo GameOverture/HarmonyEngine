@@ -43,7 +43,8 @@ protected:
 	static HarmonyInit				sm_Init;
 
 	std::vector<HyWindow *>			m_WindowList;
-	std::vector<IHyInputMap *>		m_InputMapList;
+
+	IHyInputMap *					m_pInputMaps;
 
 	virtual bool Initialize() = 0;
 	virtual bool Update() = 0;
@@ -60,6 +61,9 @@ public:
 	HyWindow &Window(uint32 uiIndex = 0);
 	uint32 GetNumWindows();
 	HyInputMapInterop &Input(uint32 uiIndex = 0);
+
+private:
+	void SetInputMapPtr(IHyInputMap *pInputMaps);
 };
 
 #endif /* __IHyApplication_h__ */

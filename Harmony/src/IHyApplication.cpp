@@ -71,7 +71,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IHyApplication::IHyApplication(HarmonyInit &initStruct)
+IHyApplication::IHyApplication(HarmonyInit &initStruct) : m_pInputMaps(NULL)
 {
 	sm_Init = initStruct;
 	HyAssert(sm_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HarmonyInit's actual 'eDefaultCoordinateType' cannot be 'HYCOORDTYPE_Default'");
@@ -88,17 +88,14 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct)
 		m_WindowList[i]->SetType(sm_Init.windowInfo[i].eType);
 	}
 
-	for(uint32 i = 0; i < sm_Init.uiNumInputMappings; ++i)
-		m_InputMapList.push_back(HY_NEW HyInputMapInterop());
+	//for(uint32 i = 0; i < sm_Init.uiNumInputMappings; ++i)
+	//	m_InputMapList.push_back(HY_NEW HyInputMapInterop());
 }
 
 IHyApplication::~IHyApplication()
 {
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowList.size()); ++i)
 		delete m_WindowList[i];
-
-	for(uint32 i = 0; i < static_cast<uint32>(m_InputMapList.size()); ++i)
-		delete m_InputMapList[i];
 }
 
 HyCoordinateType IHyApplication::DefaultCoordinateType()
@@ -131,5 +128,10 @@ uint32 IHyApplication::GetNumWindows()
 HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(uiIndex < sm_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
-	return *static_cast<HyInputMapInterop *>(m_InputMapList[uiIndex]);
+	return static_cast<HyInputMapInterop &>(m_pInputMaps[uiIndex]);
+}
+
+void IHyApplication::SetInputMapPtr(IHyInputMap *pInputMaps)
+{
+	m_pInputMaps = pInputMaps;
 }

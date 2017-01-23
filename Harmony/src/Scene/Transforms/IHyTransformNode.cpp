@@ -86,7 +86,7 @@ void IHyTransformNode::Detach()
 
 void IHyTransformNode::Update()
 {
-	// Update any currently active AnimFloat in the game, and remove any of them that are finished.
+	// Update any currently active AnimFloat associated with this transform, and remove any of them that are finished.
 	for(std::vector<HyTweenFloat *>::iterator iter = m_ActiveAnimFloatsList.begin(); iter != m_ActiveAnimFloatsList.end();)
 	{
 		if((*iter)->UpdateFloat())

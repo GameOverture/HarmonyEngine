@@ -10,6 +10,7 @@
 #ifndef __HyInputMap_Gainput_h__
 #define __HyInputMap_Gainput_h__
 
+#include "Afx/HyStdAfx.h"
 #include "Input/IHyInputMap.h"
 #include "Input/Interop/HyInput_Gainput.h"
 
@@ -19,11 +20,16 @@ class HyInputMap_Gainput : public IHyInputMap
 {
 	friend class HyInput_Gainput;
 
-	gainput::InputMap *			m_pInputMap;
+	gainput::InputMap *			m_pGainputMap;
+
+	uint32						m_uiMouseX;
+	uint32						m_uiMouseY;
 
 public:
-	HyInputMap_Gainput();
+	HyInputMap_Gainput(IHyInput *pInputManager);
 	virtual ~HyInputMap_Gainput();
+
+	virtual glm::ivec2 GetMousePos();
 
 	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn);
 	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn);
@@ -41,9 +47,6 @@ public:
 
 	virtual float GetAxis(uint32 iUserId) const;
 	virtual float GetAxisDelta(uint32 iUserId) const;
-
-private:
-	virtual void Initialize();
 };
 
 #endif /* __HyInputMap_Gainput_h__ */

@@ -19,15 +19,14 @@
 #include "Renderer/HyRenderState.h"
 #include "Renderer/Viewport/HyCamera.h"
 
-//typedef void (*HyWriteDrawBufferDataOverride)(char *&);
-//typedef void (*HyUpdateUniformOverride)(HyShaderUniforms *);
-
 class IHyInst2d : public IHyTransform2d
 {
 	friend class HyScene;
 	friend class HyAssetManager;
+	friend class IHyInput;
 
 	static HyAssetManager *			sm_pAssetManager;
+	static IHyInput *				sm_pInputManager;
 
 protected:
 	const std::string				m_sNAME;
@@ -80,6 +79,8 @@ public:
 	void Load();
 	void Unload();
 
+	void SetInputEnabled(bool bEnabled);
+
 private:
 	HyLoadState GetLoadState()									{ return m_eLoadState; }
 	const HyRenderState &GetRenderState() const					{ return m_RenderState; }
@@ -90,13 +91,21 @@ private:
 
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
-	virtual void InstUpdate();
-
 	virtual void OnUpdate() = 0;
 
 	virtual void OnDataLoaded() { }
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) { }		// This function is responsible for incrementing the passed in reference pointer the size of the data written
+
+	void PointerHover(IHyInputMap &inputMapRef);
+	void PointerLeave(IHyInputMap &inputMapRef);
+	void PointerDown(IHyInputMap &inputMapRef);
+	void PointerUp(IHyInputMap &inputMapRef);
+	void PointerClicked(IHyInputMap &inputMapRef);
+
+	virtual void InputUpdate(IHyInputMap &inputMapRef);
+
+	virtual void InstUpdate();
 };
 
 #endif /* __IHyInst2d_h__ */
