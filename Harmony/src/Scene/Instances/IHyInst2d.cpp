@@ -277,10 +277,14 @@ void IHyInst2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 	m_ShaderUniforms.WriteUniformsBufferData(pRefDataWritePos);
 }
 
-/*virtual*/ void IHyInst2d::InputUpdate(IHyInputMap &inputMapRef)
+/*virtual*/ void IHyInst2d::InputUpdate(IHyInputMap *pInputMapArray)
 {
-	//glm::ivec2 ptMousePos = inputMapRef.GetMousePos();
-	//ptMousePos
+	glm::vec2 ptMousePos = pInputMapArray[0].GetWorldMousePos();
+
+	if(m_BoundingVolume.IsWorldPointCollide(ptMousePos))
+	{
+		
+	}
 }
 
 /*virtual*/ void IHyInst2d::InstUpdate()

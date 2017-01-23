@@ -128,6 +128,36 @@ void HyWindow::RemoveCamera(HyCamera3d *&pCam)
 	}
 }
 
+glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate)
+{
+	glm::vec2 ptWorldPos(0.0f);
+
+	// Find the first camera that encompasses this normalized point in the viewport, then using that camera's transformation calculate the world position
+	for(uint32 i = 0; i < m_Cams2dList.size(); ++i)
+	{
+		const HyRectangle<float> &viewportRect = m_Cams2dList[i]->GetViewport();
+
+		if(ptViewportCoordinate.x >= viewportRect.left   && ptViewportCoordinate.x <= viewportRect.right &&
+		   ptViewportCoordinate.y >= viewportRect.bottom && ptViewportCoordinate.y <= viewportRect.top)
+		{
+			glm::vec2 vOffsetInViewport;
+			vOffsetInViewport.x = (ptViewportCoordinate.x - viewportRect.left) / (viewportRect.right - viewportRect.left);
+			vOffsetInViewport.y = (ptViewportCoordinate.y - viewportRect.top) / (viewportRect.top - viewportRect.bottom);
+
+			HyRectangle<float> worldViewBoundRect = m_Cams2dList[i]->GetWorldViewBounds();
+			ptWorldPos.x = (worldViewBoundRect.right - worldViewBoundRect.left) * vOffsetInViewport.x;
+			ptWorldPos.x += worldViewBoundRect.left;
+
+			ptWorldPos.y = (worldViewBoundRect.top - worldViewBoundRect.bottom) * vOffsetInViewport.y;
+			ptWorldPos.y += worldViewBoundRect.bottom;
+
+			break;
+		}
+	}
+
+	return ptWorldPos;
+}
+
 /*static*/ void HyWindow::MonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &vDeviceInfoOut)
 {
 	vDeviceInfoOut.clear();

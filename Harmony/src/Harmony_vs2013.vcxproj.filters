@@ -225,6 +225,9 @@
     <ClCompile Include="Scene\IHyEntity2d.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Transforms\HyBoundingVolume2d.cpp">
+      <Filter>Scene\Transforms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -606,6 +609,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\IHyEntity2d.h">
       <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Transforms\HyBoundingVolume2d.h">
+      <Filter>Scene\Transforms</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

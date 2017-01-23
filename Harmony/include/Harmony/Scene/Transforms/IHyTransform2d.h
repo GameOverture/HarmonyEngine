@@ -12,6 +12,7 @@
 
 #include "Scene/Transforms/Tweens/HyTweenVec2.h"
 #include "Scene/Transforms/IHyTransform.h"
+#include "Scene/Transforms/HyBoundingVolume2d.h"
 
 class IHyTransform2d : public IHyTransform<HyTweenVec2>
 {
@@ -20,6 +21,8 @@ protected:
 	HyCoordinateUnit				m_eCoordUnit;
 
 	float							m_fRotation;
+
+	HyBoundingVolume2d				m_BoundingVolume;
 
 public:
 	HyTweenFloat					rot;

@@ -97,13 +97,13 @@ private:
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) { }		// This function is responsible for incrementing the passed in reference pointer the size of the data written
 
-	void PointerHover(IHyInputMap &inputMapRef);
-	void PointerLeave(IHyInputMap &inputMapRef);
-	void PointerDown(IHyInputMap &inputMapRef);
-	void PointerUp(IHyInputMap &inputMapRef);
-	void PointerClicked(IHyInputMap &inputMapRef);
+	virtual void OnMouseHover(IHyInputMap &inputMapRef) { }
+	virtual void OnMouseLeave(IHyInputMap &inputMapRef) { }
+	virtual void OnMouseDown(IHyInputMap &inputMapRef) { }
+	virtual void OnMouseUp(IHyInputMap &inputMapRef) { }
+	virtual void OnMouseClicked(IHyInputMap &inputMapRef) { }
 
-	virtual void InputUpdate(IHyInputMap &inputMapRef);
+	virtual void InputUpdate(IHyInputMap *pInputMapArray);
 
 	virtual void InstUpdate();
 };

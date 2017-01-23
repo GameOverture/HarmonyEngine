@@ -235,14 +235,15 @@ enum HyMouseBtn
 	HYMOUSE_Button19,
 	HYMOUSE_Button20,
 
-	HYMOUSE_ButtonMax = HYMOUSE_Button20,
 	HYMOUSE_ButtonCount,
+};
 
+enum HyMouseAxis
+{
 	HYMOUSE_AxisX = HYMOUSE_ButtonCount,
 	HYMOUSE_AxisY,
-	HYMOUSE_ButtonCount_,
 
-	HYMOUSE_AxisCount = HYMOUSE_ButtonCount_ - HYMOUSE_AxisX
+	HYMOUSE_AxisCount = 2
 };
 
 enum HyGamePadBtn
@@ -335,16 +336,18 @@ class IHyInputMap
 protected:
 	IHyInput *			m_pInputManager;
 
+	static glm::vec2	sm_ptWorldMousePos;
+
 public:
 	IHyInputMap(IHyInput *pInputManager);
 	virtual ~IHyInputMap(void);
 
-	virtual glm::ivec2 GetMousePos() = 0;
+	static glm::vec2 GetWorldMousePos();
 
 	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn) = 0;
 	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn) = 0;
 	virtual bool MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn, uint32 uiGamePadIndex) = 0;
-	virtual bool MapAxis_MO(uint32 iUserId, HyMouseBtn eAxis, float fMin = 0.0f, float fMax = 1.0f) = 0;
+	virtual bool MapAxis_MO(uint32 iUserId, HyMouseAxis eAxis, float fMin = 0.0f, float fMax = 1.0f) = 0;
 	virtual bool MapAxis_GP(uint32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f) = 0;
 
 	virtual void Unmap(uint32 iUserId) = 0;
@@ -356,12 +359,12 @@ public:
 	virtual float GetAxis(uint32 iUserId) const = 0;
 	virtual float GetAxisDelta(uint32 iUserId) const = 0;
 
-	static void StartRecording();
-	static void StopRecording();
-	static void SerializeRecording();
+	void StartRecording();
+	void StopRecording();
+	void SerializeRecording();
 
-	static void StartPlayback();
-	static void StopPlayback();
+	void StartPlayback();
+	void StopPlayback();
 };
 
 #endif /* __IHyInputMap_h__ */

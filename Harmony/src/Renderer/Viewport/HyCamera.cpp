@@ -37,6 +37,7 @@ HyCamera2d::HyCamera2d(HyWindow *pWindow) :	IHyTransform2d(HYTYPE_Camera2d),
 HyCamera2d::~HyCamera2d()
 { }
 
+// NOTE: Does not properly calculate camera twist - must be axis aligned
 HyRectangle<float> HyCamera2d::GetWorldViewBounds()
 {
 	HyRectangle<float> returnRect;
@@ -44,6 +45,7 @@ HyRectangle<float> HyCamera2d::GetWorldViewBounds()
 	float fHalfWidth = ((m_pWindowPtr->GetResolution().x * m_ViewportRect.Width()) * 0.5f) * (1.0f / scale.X());
 	float fHalfHeight = ((m_pWindowPtr->GetResolution().y * m_ViewportRect.Height()) * 0.5f) * (1.0f / scale.Y());
 
+	// TODO: 'pos' may not represent the world coordinates if it is attached to a parent transform hierarchy - GetWorldTransform() should be used first
 	returnRect.left = pos.X() - fHalfWidth;
 	returnRect.bottom = pos.Y() - fHalfHeight;
 	returnRect.right = pos.X() + fHalfWidth;

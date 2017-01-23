@@ -14,9 +14,17 @@
 
 #include "gainput/gainput.h"
 
+class HyWindow;
+
 class HyInput_Gainput : public IHyInput
 {
 	gainput::InputManager			m_Manager;
+
+	enum eMouseAxisId
+	{
+		MOUSEID_X = 0xFFFF,
+		MOUSEID_Y
+	};
 
 	gainput::DeviceId				m_uiKeyboardId;
 	gainput::DeviceId				m_uiMouseId;
@@ -31,13 +39,12 @@ class HyInput_Gainput : public IHyInput
 	eRecordState					m_eRecordState;
 	uint64							m_uiRecordCount;
 
+
 public:
 	HyInput_Gainput(uint32 uiNumInputMappings);
 	~HyInput_Gainput();
 
 	gainput::InputManager &GetGainputManager();
-
-	virtual void Update();
 
 	virtual void StartRecording();
 	virtual void StopRecording();
@@ -47,7 +54,7 @@ public:
 	virtual void StopPlayback();
 
 #ifdef HY_PLATFORM_WINDOWS
-	void HandleMsg(glm::ivec2 vResolution, const MSG& msg);
+	void HandleMsg(HyWindow *pCurrentWindow, const MSG& msg);
 #endif
 
 	gainput::DeviceId GetKeyboardDeviceId();
@@ -56,6 +63,7 @@ public:
 
 	gainput::DeviceId GetGamePadDeviceId(uint32 uiIndex);
 
+	virtual void OnUpdate();
 };
 
 #endif /* __HyInput_Gainput_h__ */

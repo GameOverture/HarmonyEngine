@@ -93,6 +93,8 @@ public:
 	void				RemoveCamera(HyCamera2d *&pCam);
 	void				RemoveCamera(HyCamera3d *&pCam);
 
+	glm::vec2			ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
+
 	static void			MonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &vDeviceInfoOut);
 
 private:

@@ -10,6 +10,10 @@
 #include "Input/IHyInputMap.h"
 #include "Input/IHyInput.h"
 
+#include "Afx/HyInteropAfx.h"
+
+/*static*/ glm::vec2 IHyInputMap::sm_ptWorldMousePos(0.0f);
+
 IHyInputMap::IHyInputMap(IHyInput *pInputManager) : m_pInputManager(pInputManager)
 {
 }
@@ -18,27 +22,32 @@ IHyInputMap::IHyInputMap(IHyInput *pInputManager) : m_pInputManager(pInputManage
 {
 }
 
-/*static*/ void IHyInputMap::StartRecording()
+/*static*/ glm::vec2 IHyInputMap::GetWorldMousePos()
+{
+	return sm_ptWorldMousePos;
+}
+
+void IHyInputMap::StartRecording()
 {
 	m_pInputManager->StartRecording();
 }
 
-/*static*/ void IHyInputMap::StopRecording()
+void IHyInputMap::StopRecording()
 {
 	m_pInputManager->StopRecording();
 }
 
-/*static*/ void IHyInputMap::SerializeRecording()
+void IHyInputMap::SerializeRecording()
 {
 	m_pInputManager->SerializeRecording();
 }
 
-/*static*/ void IHyInputMap::StartPlayback()
+void IHyInputMap::StartPlayback()
 {
 	m_pInputManager->StartPlayback();
 }
 
-/*static*/ void IHyInputMap::StopPlayback()
+void IHyInputMap::StopPlayback()
 {
 	m_pInputManager->StartPlayback();
 }

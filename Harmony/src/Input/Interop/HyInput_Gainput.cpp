@@ -10,16 +10,19 @@
 #include "Input/Interop/HyInput_Gainput.h"
 #include "Input/Interop/HyInputMap_Gainput.h"
 
+#include "Renderer/Viewport/HyWindow.h"
+
 HyInput_Gainput::HyInput_Gainput(uint32 uiNumInputMappings) :	IHyInput(uiNumInputMappings),
 																m_uiKeyboardId(gainput::InvalidDeviceId),
 																m_uiMouseId(gainput::InvalidDeviceId),
 																m_eRecordState(RECORD_Off),
 																m_uiRecordCount(0)
 {
-	static_cast<HyInputMap_Gainput *>(m_pInputMaps) = reinterpret_cast<HyInputMap_Gainput *>(HY_NEW unsigned char[sizeof(HyInputMap_Gainput) * m_uiNUM_INPUT_MAPS]);
-	HyInputMap_Gainput *pWriteLoc = static_cast<HyInputMap_Gainput *>(m_pInputMaps);
-	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i, ++pWriteLoc)
-		new (pWriteLoc) HyInputMap_Gainput(this);
+	if(uiNumInputMappings > 0)
+	{
+		static_cast<HyInputMap_Gainput *>(m_pInputMaps)[0].MapAxis_MO(MOUSEID_X, HYMOUSE_AxisX);
+		static_cast<HyInputMap_Gainput *>(m_pInputMaps)[0].MapAxis_MO(MOUSEID_Y, HYMOUSE_AxisY);
+	}
 }
 
 HyInput_Gainput::~HyInput_Gainput()
@@ -29,14 +32,6 @@ HyInput_Gainput::~HyInput_Gainput()
 gainput::InputManager &HyInput_Gainput::GetGainputManager()
 {
 	return m_Manager;
-}
-
-/*virtual*/ void HyInput_Gainput::Update()
-{
-	// TODO: pass in m_uiRecordCount and wrap logic around this call
-	m_Manager.Update();
-
-	//m_Manager.GetDeviceCountByType(
 }
 
 /*virtual*/ void HyInput_Gainput::StartRecording()
@@ -60,10 +55,18 @@ gainput::InputManager &HyInput_Gainput::GetGainputManager()
 }
 
 #ifdef HY_PLATFORM_WINDOWS
-void HyInput_Gainput::HandleMsg(glm::ivec2 vResolution, const MSG& msg)
+void HyInput_Gainput::HandleMsg(HyWindow *pCurrentWindow, const MSG& msg)
 {
-	m_Manager.SetDisplaySize(vResolution.x, vResolution.y);
+	m_Manager.SetDisplaySize(pCurrentWindow->GetResolution().x, pCurrentWindow->GetResolution().y);
 	m_Manager.HandleMessage(msg);
+
+	if(msg.message == WM_MOUSEMOVE)
+	{
+		glm::vec2 ptMouseAxisNormalized(m_pInputMaps[0].GetAxis(MOUSEID_X), m_pInputMaps[0].GetAxis(MOUSEID_Y));
+		ptMouseAxisNormalized.y *= -1.0f;
+
+		IHyInputMap::sm_ptWorldMousePos = pCurrentWindow->ConvertViewportCoordinateToWorldPos(ptMouseAxisNormalized);
+	}
 }
 #endif
 
@@ -86,4 +89,12 @@ gainput::DeviceId HyInput_Gainput::GetMouseDeviceId()
 gainput::DeviceId HyInput_Gainput::GetGamePadDeviceId(uint32 uiIndex)
 {
 	return -1;
+}
+
+/*virtual*/ void HyInput_Gainput::OnUpdate()
+{
+	// TODO: pass in m_uiRecordCount and wrap logic around this call
+	m_Manager.Update();
+
+	//m_Manager.GetDeviceCountByType(
 }

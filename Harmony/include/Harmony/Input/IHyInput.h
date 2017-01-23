@@ -28,7 +28,7 @@ public:
 	IHyInput(uint32 uiNumInputMappings);
 	virtual ~IHyInput();
 
-	virtual void Update() = 0;
+	IHyInputMap *GetInputMapArray();
 
 	virtual void StartRecording() = 0;
 	virtual void StopRecording() = 0;
@@ -38,6 +38,9 @@ public:
 	virtual void StopPlayback() = 0;
 
 	void SetInputListener(bool bEnable, IHyInst2d *pInst);
+
+	void Update();
+	virtual void OnUpdate() = 0;
 };
 
 #endif /* __HyInput_h__ */

@@ -46,10 +46,10 @@ class HyCamera2d : public IHyTransform2d, public IHyCamera
 public:
 	virtual ~HyCamera2d();
 
-
 	virtual void SetZoom(const float fZoom)		{ scale.Set(fZoom, fZoom); }
 	virtual float GetZoom() const				{ return scale.Get().x; }
 
+	// NOTE: Does not properly calculate camera twist - must be axis aligned
 	HyRectangle<float> GetWorldViewBounds();
 };
 

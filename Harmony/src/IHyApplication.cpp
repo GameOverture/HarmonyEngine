@@ -131,7 +131,7 @@ HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 	return static_cast<HyInputMapInterop &>(m_pInputMaps[uiIndex]);
 }
 
-void IHyApplication::SetInputMapPtr(IHyInputMap *pInputMaps)
+void IHyApplication::SetInputMapPtr(HyInputMapInterop *pInputMaps)
 {
 	m_pInputMaps = pInputMaps;
 }

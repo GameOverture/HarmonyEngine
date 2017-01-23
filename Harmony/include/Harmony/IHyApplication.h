@@ -44,7 +44,7 @@ protected:
 
 	std::vector<HyWindow *>			m_WindowList;
 
-	IHyInputMap *					m_pInputMaps;
+	HyInputMapInterop *				m_pInputMaps;
 
 	virtual bool Initialize() = 0;
 	virtual bool Update() = 0;
@@ -63,7 +63,7 @@ public:
 	HyInputMapInterop &Input(uint32 uiIndex = 0);
 
 private:
-	void SetInputMapPtr(IHyInputMap *pInputMaps);
+	void SetInputMapPtr(HyInputMapInterop *pInputMaps);
 };
 
 #endif /* __IHyApplication_h__ */

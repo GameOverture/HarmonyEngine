@@ -25,6 +25,7 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
+	m_AppRef.SetInputMapPtr(static_cast<HyInputMapInterop *>(m_Input.GetInputMapArray()));
 	if(m_AppRef.Initialize() == false)
 		HyError("IApplication Initialize() failed");
 }
@@ -93,7 +94,7 @@ bool HyEngine::PollPlatformApi()
 			DispatchMessage(&msg);
 			
 			if(m_AppRef.m_WindowList[i]->IsInputEnabled())
-				m_Input.HandleMsg(m_AppRef.m_WindowList[i]->GetResolution(), msg);
+				m_Input.HandleMsg(m_AppRef.m_WindowList[i], msg);
 		}
 	}
 #endif
