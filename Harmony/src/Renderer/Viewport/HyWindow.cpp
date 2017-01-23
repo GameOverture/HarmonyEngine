@@ -142,7 +142,7 @@ glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoor
 		{
 			glm::vec2 vOffsetInViewport;
 			vOffsetInViewport.x = (ptViewportCoordinate.x - viewportRect.left) / (viewportRect.right - viewportRect.left);
-			vOffsetInViewport.y = (ptViewportCoordinate.y - viewportRect.top) / (viewportRect.top - viewportRect.bottom);
+			vOffsetInViewport.y = (ptViewportCoordinate.y - viewportRect.bottom) / (viewportRect.top - viewportRect.bottom);
 
 			HyRectangle<float> worldViewBoundRect = m_Cams2dList[i]->GetWorldViewBounds();
 			ptWorldPos.x = (worldViewBoundRect.right - worldViewBoundRect.left) * vOffsetInViewport.x;

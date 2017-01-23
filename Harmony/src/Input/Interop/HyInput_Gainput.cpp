@@ -63,7 +63,7 @@ void HyInput_Gainput::HandleMsg(HyWindow *pCurrentWindow, const MSG& msg)
 	if(msg.message == WM_MOUSEMOVE)
 	{
 		glm::vec2 ptMouseAxisNormalized(m_pInputMaps[0].GetAxis(MOUSEID_X), m_pInputMaps[0].GetAxis(MOUSEID_Y));
-		ptMouseAxisNormalized.y *= -1.0f;
+		ptMouseAxisNormalized.y = 1.0f - ptMouseAxisNormalized.y; // Invert Y-coordinate
 
 		IHyInputMap::sm_ptWorldMousePos = pCurrentWindow->ConvertViewportCoordinateToWorldPos(ptMouseAxisNormalized);
 	}

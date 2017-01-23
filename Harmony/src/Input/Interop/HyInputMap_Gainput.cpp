@@ -72,7 +72,7 @@ HyInputMap_Gainput::~HyInputMap_Gainput()
 
 /*virtual*/ float HyInputMap_Gainput::GetAxis(uint32 iUserId) const
 {
-	return 0.0f;
+	return m_pGainputMap->GetFloat(iUserId);
 }
 
 /*virtual*/ float HyInputMap_Gainput::GetAxisDelta(uint32 iUserId) const
