@@ -37,12 +37,21 @@ protected:
 	enum eAttributes
 	{
 		ATTRIBFLAG_Scissor					= 1 << 0,
-		ATTRIBFLAG_Button					= 1 << 1,
+		ATTRIBFLAG_MouseInput				= 1 << 1,
 		ATTRIBFLAG_HasBoundingVolume		= 1 << 2,
 		ATTRIBFLAG_BoundingVolumeDirty		= 1 << 3,
 		ATTRIBFLAG_Physics					= 1 << 4
 	};
 	uint32							m_uiAttributes;
+
+	enum eMouseInputState
+	{
+		MOUSEINPUT_None = 0,
+		MOUSEINPUT_Hover,
+		MOUSEINPUT_Down
+	};
+	eMouseInputState				m_eMouseInputState;
+	void *							m_pMouseInputUserParam;
 
 	HyCoordinateType				m_eCoordType;
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
@@ -75,7 +84,7 @@ public:
 
 	void SetTint(float fR, float fG, float fB);
 
-	void EnableButton(bool bEnable);
+	void EnableMouseInput(bool bEnable, void *pUserParam = NULL);
 	void EnableCollider(bool bEnable);
 	void EnablePhysics(bool bEnable);
 
@@ -111,11 +120,11 @@ private:
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) { }		// This function is responsible for incrementing the passed in reference pointer the size of the data written
 
-	virtual void OnMouseHover(IHyInputMap &inputMapRef) { }
-	virtual void OnMouseLeave(IHyInputMap &inputMapRef) { }
-	virtual void OnMouseDown(IHyInputMap &inputMapRef) { }
-	virtual void OnMouseUp(IHyInputMap &inputMapRef) { }
-	virtual void OnMouseClicked(IHyInputMap &inputMapRef) { }
+	virtual void OnMouseEnter(void *pUserParam) { }
+	virtual void OnMouseLeave(void *pUserParam) { }
+	virtual void OnMouseDown(void *pUserParam) { }
+	virtual void OnMouseUp(void *pUserParam) { }
+	virtual void OnMouseClicked(void *pUserParam) { }
 
 	virtual void InstUpdate();
 };

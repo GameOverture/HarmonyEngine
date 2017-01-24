@@ -28,6 +28,8 @@ IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName)
 																					m_pData(NULL),
 																					m_eLoadState(HYLOADSTATE_Inactive),
 																					m_uiAttributes(0),
+																					m_eMouseInputState(MOUSEINPUT_None),
+																					m_pMouseInputUserParam(NULL),
 																					m_iDisplayOrder(0),
 																					m_iDisplayOrderMax(0),
 																					topColor(*this),
@@ -152,12 +154,14 @@ void IHyInst2d::SetTint(float fR, float fG, float fB)
 	botColor.Set(fR, fG, fB);
 }
 
-void IHyInst2d::EnableButton(bool bEnable)
+void IHyInst2d::EnableMouseInput(bool bEnable, void *pUserParam /*= NULL*/)
 {
 	if(bEnable)
-		m_uiAttributes |= (ATTRIBFLAG_Button | ATTRIBFLAG_BoundingVolumeDirty);
+		m_uiAttributes |= (ATTRIBFLAG_MouseInput | ATTRIBFLAG_BoundingVolumeDirty);
 	else
-		m_uiAttributes &= ~ATTRIBFLAG_Button;
+		m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
+
+	m_pMouseInputUserParam = pUserParam;
 }
 
 void IHyInst2d::EnableCollider(bool bEnable)
@@ -313,7 +317,7 @@ void IHyInst2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 		}
 	}
 
-	if((m_uiAttributes & (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_Button)) != 0)
+	if((m_uiAttributes & (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_MouseInput)) != 0)
 	{
 		if(m_uiAttributes & ATTRIBFLAG_BoundingVolumeDirty)
 		{
@@ -321,12 +325,44 @@ void IHyInst2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 			m_uiAttributes &= ~ATTRIBFLAG_BoundingVolumeDirty;
 		}
 
-		if((m_uiAttributes & ATTRIBFLAG_Button) != 0)
+		if((m_uiAttributes & ATTRIBFLAG_MouseInput) != 0)
 		{
-			glm::vec2 ptMousePos = IHyInputMap::GetWorldMousePos();
-			if(m_BoundingVolume.IsWorldPointCollide(ptMousePos))
+			bool bLeftClickDown = IHyInputMap::IsMouseLeftDown();
+			bool bMouseInBounds = m_BoundingVolume.IsWorldPointCollide(IHyInputMap::GetWorldMousePos());
+
+			switch(m_eMouseInputState)
 			{
-				//IHyInputMap::IsMouseLeftDown()
+			case MOUSEINPUT_None:
+				if(bLeftClickDown == false && bMouseInBounds)
+				{
+					m_eMouseInputState = MOUSEINPUT_Hover;
+					OnMouseEnter(m_pMouseInputUserParam);
+				}
+				break;
+
+			case MOUSEINPUT_Hover:
+				if(bMouseInBounds == false)
+				{
+					m_eMouseInputState = MOUSEINPUT_None;
+					OnMouseLeave(m_pMouseInputUserParam);
+				}
+				else if(bLeftClickDown)
+				{
+					m_eMouseInputState = MOUSEINPUT_Down;
+					OnMouseDown(m_pMouseInputUserParam);
+				}
+				break;
+
+			case MOUSEINPUT_Down:
+				if(bLeftClickDown == false)
+				{
+					m_eMouseInputState = MOUSEINPUT_None;
+					OnMouseUp(m_pMouseInputUserParam);
+
+					if(bMouseInBounds)
+						OnMouseClicked(m_pMouseInputUserParam);
+				}
+				break;
 			}
 		}
 	}
