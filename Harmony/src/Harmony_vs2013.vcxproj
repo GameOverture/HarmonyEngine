@@ -431,7 +431,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;gainputQtd.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
@@ -460,7 +460,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;gainputQtd.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
@@ -544,7 +544,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;gainputQt.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
@@ -572,7 +572,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;gainputQt.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>

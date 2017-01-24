@@ -10,6 +10,7 @@
 #ifndef __HyInteropAfx_h__
 #define __HyInteropAfx_h__
 
+#include "Afx/HyStdAfx.h"
 #include "Afx/Platforms/HyPlatAfx.h"
 
 #if defined(HY_PLATFORM_WINDOWS)
