@@ -112,12 +112,6 @@ public:
 	//--------------------------------------------------------------------------------------
 	void AnimSetCallback(uint32 uiStateID, void(*fpCallback)(HySprite2d &, void *), void *pParam = NULL);
 
-	//--------------------------------------------------------------------------------------
-	// Instantly sets the specified frame of the current animation. If supplied frame index
-	// exceeds the bounds of the current animation, it will be clamped.
-	//--------------------------------------------------------------------------------------
-	void AnimSetFrame(int iFrameIndex);
-
 	float AnimGetCurFrameWidth(bool bIncludeScaling = true);
 	float AnimGetCurFrameHeight(bool bIncludScaling = true);
 

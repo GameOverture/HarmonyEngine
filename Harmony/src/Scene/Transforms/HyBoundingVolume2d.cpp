@@ -46,6 +46,12 @@ bool HyBoundingVolume2d::IsWorldPointCollide(glm::vec2 &pt)
 	return false;
 }
 
+HyRectangle<float> HyBoundingVolume2d::GetWorldAABB()
+{
+	UpdateWorldAABB();
+	return HyRectangle<float>(m_WorldAABB.lowerBound.x, m_WorldAABB.upperBound.y, m_WorldAABB.upperBound.x, m_WorldAABB.lowerBound.y);
+}
+
 void HyBoundingVolume2d::UpdateWorldAABB()
 {
 	glm::mat4 mtx;

@@ -13,6 +13,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Box2D/Box2D.h"
 
+#include "Utilities/HyMath.h"
+
 class IHyTransform2d;
 
 class HyBoundingVolume2d
@@ -38,6 +40,8 @@ public:
 	void SetLocalAABB(glm::vec2 &ptLowerBound, glm::vec2 &ptUpperBound);
 
 	bool IsWorldPointCollide(glm::vec2 &pt);
+
+	HyRectangle<float> GetWorldAABB();
 
 private:
 	void UpdateWorldAABB();
