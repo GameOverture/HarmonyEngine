@@ -41,6 +41,8 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 		m_pVertices = HY_NEW glm::vec4[m_RenderState.GetNumVerticesPerInstance()];
 		memcpy(m_pVertices, p.m_pVertices, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec4));
 	}
+
+	MakeBoundingVolumeDirty();
 	
 	return *this;
 }
@@ -97,6 +99,8 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe, glm:
 	m_pVertices[2].w = 1.0f;
 	m_pVertices[3].z = 0.0f;
 	m_pVertices[3].w = 1.0f;
+
+	MakeBoundingVolumeDirty();
 }
 
 void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, glm::vec2 &vOffset /*= vec2(0.0f)*/)
@@ -127,6 +131,8 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 		m_pVertices[n].z = 0.0f;
 		m_pVertices[n].w = 1.0f;
 	}
+
+	MakeBoundingVolumeDirty();
 }
 
 void HyPrimitive2d::SetAsEdgeChain(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, glm::vec2 &vOffset /*= vec2(0.0f)*/)
@@ -152,6 +158,8 @@ void HyPrimitive2d::SetAsEdgeChain(const glm::vec2 *pVertices, uint32 uiNumVerts
 		m_pVertices[i].z = 0.0f;
 		m_pVertices[i].w = 1.0f;
 	}
+
+	MakeBoundingVolumeDirty();
 }
 
 void HyPrimitive2d::OffsetVerts(glm::vec2 vOffset, float fAngleOffset)
@@ -176,6 +184,8 @@ void HyPrimitive2d::OffsetVerts(glm::vec2 vOffset, float fAngleOffset)
 		m_pVertices[i].x = tmp.x;
 		m_pVertices[i].y = tmp.y;
 	}
+
+	MakeBoundingVolumeDirty();
 }
 
 void HyPrimitive2d::ClearData()
@@ -185,6 +195,36 @@ void HyPrimitive2d::ClearData()
 	m_RenderState.SetNumVerticesPerInstance(0);
 
 	m_RenderState.Disable(HyRenderState::DRAWMODEMASK);
+
+	MakeBoundingVolumeDirty();
+}
+
+/*virtual*/ void HyPrimitive2d::OnCalcBoundingVolume()
+{
+	uint32 uiNumVerts = m_RenderState.GetNumVerticesPerInstance();
+	glm::vec2 vLowerBounds(0.0f);
+	glm::vec2 vUpperBounds(0.0f);
+
+	if(uiNumVerts == 0)
+	{
+		m_BoundingVolume.SetLocalAABB(vLowerBounds, vUpperBounds);
+		return;
+	}
+
+	vLowerBounds.x = m_pVertices[0].x;
+	vLowerBounds.y = m_pVertices[0].y;
+	vUpperBounds.x = m_pVertices[0].x;
+	vUpperBounds.y = m_pVertices[0].y;
+
+	for(uint32 i = 1; i < uiNumVerts; ++i)
+	{
+		vLowerBounds.x = HyMin(m_pVertices[i].x, vLowerBounds.x);
+		vLowerBounds.y = HyMin(m_pVertices[i].y, vLowerBounds.y);
+		vUpperBounds.x = HyMax(m_pVertices[i].x, vUpperBounds.x);
+		vUpperBounds.y = HyMax(m_pVertices[i].y, vUpperBounds.y);
+	}
+
+	m_BoundingVolume.SetLocalAABB(vLowerBounds, vUpperBounds);
 }
 
 /*virtual*/ void HyPrimitive2d::OnUpdateUniforms()

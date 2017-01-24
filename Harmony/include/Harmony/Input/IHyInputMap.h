@@ -337,12 +337,16 @@ protected:
 	IHyInput *			m_pInputManager;
 
 	static glm::vec2	sm_ptWorldMousePos;
+	static bool			sm_bMouseLeftDown;
+	static bool			sm_bMouseRightDown;
 
 public:
 	IHyInputMap(IHyInput *pInputManager);
 	virtual ~IHyInputMap(void);
 
 	static glm::vec2 GetWorldMousePos();
+	static bool IsMouseLeftDown();
+	static bool IsMouseRightDown();
 
 	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn) = 0;
 	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn) = 0;

@@ -18,7 +18,7 @@ class HyInput_NULL : public IHyInput
 public:
 	HyInput_NULL(uint32 uiNumInputMappings) : IHyInput(uiNumInputMappings) { }
 
-	virtual void OnUpdate() { }
+	virtual void Update() { }
 
 	virtual void StartRecording() { }
 	virtual void StopRecording() { }

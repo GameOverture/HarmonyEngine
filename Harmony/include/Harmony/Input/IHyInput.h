@@ -22,8 +22,6 @@ protected:
 	const uint32				m_uiNUM_INPUT_MAPS;
 	IHyInputMap *				m_pInputMaps;
 
-	std::vector<IHyInst2d *>	m_InputListenerList;
-
 public:
 	IHyInput(uint32 uiNumInputMappings);
 	virtual ~IHyInput();
@@ -37,10 +35,7 @@ public:
 	virtual void StartPlayback() = 0;
 	virtual void StopPlayback() = 0;
 
-	void SetInputListener(bool bEnable, IHyInst2d *pInst);
-
-	void Update();
-	virtual void OnUpdate() = 0;
+	virtual void Update() = 0;
 };
 
 #endif /* __HyInput_h__ */

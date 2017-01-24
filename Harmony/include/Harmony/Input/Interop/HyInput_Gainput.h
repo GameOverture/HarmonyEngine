@@ -23,7 +23,9 @@ class HyInput_Gainput : public IHyInput
 	enum eMouseAxisId
 	{
 		MOUSEID_X = 0xFFFF,
-		MOUSEID_Y
+		MOUSEID_Y,
+		MOUSEID_Left,
+		MOUSEID_Right
 	};
 
 	gainput::DeviceId				m_uiKeyboardId;

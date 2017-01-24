@@ -16,20 +16,18 @@
 #include "Renderer/Viewport/HyCamera.h"
 #include "Renderer/Viewport/HyWindow.h"
 
-#include "Input/IHyInput.h"
-
 #include "Scene/IHyEntity2d.h"
 
 #include "Diagnostics/HyGuiComms.h"
 
 /*static*/ HyAssetManager *IHyInst2d::sm_pAssetManager = NULL;
-/*static*/ IHyInput *IHyInst2d::sm_pInputManager = NULL;
 
 IHyInst2d::IHyInst2d(HyType eInstType, const char *szPrefix, const char *szName) :	IHyTransform2d(eInstType),
 																					m_sPREFIX(szPrefix ? szPrefix : ""),
 																					m_sNAME(szName ? szName : ""),
 																					m_pData(NULL),
 																					m_eLoadState(HYLOADSTATE_Inactive),
+																					m_uiAttributes(0),
 																					m_iDisplayOrder(0),
 																					m_iDisplayOrderMax(0),
 																					topColor(*this),
@@ -154,6 +152,26 @@ void IHyInst2d::SetTint(float fR, float fG, float fB)
 	botColor.Set(fR, fG, fB);
 }
 
+void IHyInst2d::EnableButton(bool bEnable)
+{
+	if(bEnable)
+		m_uiAttributes |= (ATTRIBFLAG_Button | ATTRIBFLAG_BoundingVolumeDirty);
+	else
+		m_uiAttributes &= ~ATTRIBFLAG_Button;
+}
+
+void IHyInst2d::EnableCollider(bool bEnable)
+{
+	if(bEnable)
+		m_uiAttributes |= (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_BoundingVolumeDirty);
+	else
+		m_uiAttributes &= ~ATTRIBFLAG_HasBoundingVolume;
+}
+
+void IHyInst2d::EnablePhysics(bool bEnable)
+{
+}
+
 void IHyInst2d::SetScissor(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight)
 {
 	m_LocalScissorRect.left = uiX;
@@ -161,12 +179,12 @@ void IHyInst2d::SetScissor(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight
 	m_LocalScissorRect.right = uiWidth;
 	m_LocalScissorRect.top = uiHeight;
 
-	m_LocalScissorRect.iTag = 1;	// '1' indicates this scissor rect is in use
+	m_uiAttributes |= ATTRIBFLAG_Scissor;
 }
 
 void IHyInst2d::ClearScissor()
 {
-	m_LocalScissorRect.iTag = 0;	// '0' indicates this scissor rect is disabled
+	m_uiAttributes &= ~ATTRIBFLAG_Scissor;
 	m_RenderState.ClearScissorRect();
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
@@ -250,10 +268,9 @@ void IHyInst2d::Unload()
 	}
 }
 
-void IHyInst2d::SetInputEnabled(bool bEnabled)
+void IHyInst2d::MakeBoundingVolumeDirty()
 {
-	HyAssert(sm_pInputManager, "IHyInst2d::SetInputEnabled was invoked before engine has been initialized");
-	sm_pInputManager->SetInputListener(bEnabled, this);
+	m_uiAttributes |= ATTRIBFLAG_BoundingVolumeDirty;
 }
 
 void IHyInst2d::SetData(IHyData *pData)
@@ -277,19 +294,9 @@ void IHyInst2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 	m_ShaderUniforms.WriteUniformsBufferData(pRefDataWritePos);
 }
 
-/*virtual*/ void IHyInst2d::InputUpdate(IHyInputMap *pInputMapArray)
-{
-	glm::vec2 ptMousePos = pInputMapArray[0].GetWorldMousePos();
-
-	if(m_BoundingVolume.IsWorldPointCollide(ptMousePos))
-	{
-		
-	}
-}
-
 /*virtual*/ void IHyInst2d::InstUpdate()
 {
-	if(m_LocalScissorRect.iTag == 1)
+	if((m_uiAttributes & ATTRIBFLAG_Scissor) != 0)
 	{
 		glm::mat4 mtx;
 		GetWorldTransform(mtx);
@@ -303,6 +310,24 @@ void IHyInst2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 		{
 			if(m_ChildList[i]->IsInst2d())
 				static_cast<IHyInst2d *>(m_ChildList[i])->m_RenderState.SetScissorRect(m_RenderState.GetScissorRect());
+		}
+	}
+
+	if((m_uiAttributes & (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_Button)) != 0)
+	{
+		if(m_uiAttributes & ATTRIBFLAG_BoundingVolumeDirty)
+		{
+			OnCalcBoundingVolume();
+			m_uiAttributes &= ~ATTRIBFLAG_BoundingVolumeDirty;
+		}
+
+		if((m_uiAttributes & ATTRIBFLAG_Button) != 0)
+		{
+			glm::vec2 ptMousePos = IHyInputMap::GetWorldMousePos();
+			if(m_BoundingVolume.IsWorldPointCollide(ptMousePos))
+			{
+				//IHyInputMap::IsMouseLeftDown()
+			}
 		}
 	}
 

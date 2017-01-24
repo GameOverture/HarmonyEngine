@@ -127,6 +127,8 @@ protected:
 
 	virtual void OnUpdate();
 
+	virtual void OnCalcBoundingVolume();
+
 	virtual void OnUpdateUniforms();
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
 };

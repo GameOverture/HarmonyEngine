@@ -22,6 +22,9 @@ HyInput_Gainput::HyInput_Gainput(uint32 uiNumInputMappings) :	IHyInput(uiNumInpu
 	{
 		static_cast<HyInputMap_Gainput *>(m_pInputMaps)[0].MapAxis_MO(MOUSEID_X, HYMOUSE_AxisX);
 		static_cast<HyInputMap_Gainput *>(m_pInputMaps)[0].MapAxis_MO(MOUSEID_Y, HYMOUSE_AxisY);
+
+		static_cast<HyInputMap_Gainput *>(m_pInputMaps)[0].MapBtn_MO(MOUSEID_Left, HYMOUSE_ButtonLeft);
+		static_cast<HyInputMap_Gainput *>(m_pInputMaps)[0].MapBtn_MO(MOUSEID_Right, HYMOUSE_ButtonRight);
 	}
 }
 
@@ -67,6 +70,9 @@ void HyInput_Gainput::HandleMsg(HyWindow *pCurrentWindow, const MSG& msg)
 
 		IHyInputMap::sm_ptWorldMousePos = pCurrentWindow->ConvertViewportCoordinateToWorldPos(ptMouseAxisNormalized);
 	}
+
+	IHyInputMap::sm_bMouseLeftDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Left);
+	IHyInputMap::sm_bMouseRightDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Right);
 }
 #endif
 

@@ -23,10 +23,8 @@ class IHyInst2d : public IHyTransform2d
 {
 	friend class HyScene;
 	friend class HyAssetManager;
-	friend class IHyInput;
 
 	static HyAssetManager *			sm_pAssetManager;
-	static IHyInput *				sm_pInputManager;
 
 protected:
 	const std::string				m_sNAME;
@@ -36,7 +34,16 @@ protected:
 	IHyData *						m_pData;
 	HyLoadState						m_eLoadState;
 
-	// Attributes
+	enum eAttributes
+	{
+		ATTRIBFLAG_Scissor					= 1 << 0,
+		ATTRIBFLAG_Button					= 1 << 1,
+		ATTRIBFLAG_HasBoundingVolume		= 1 << 2,
+		ATTRIBFLAG_BoundingVolumeDirty		= 1 << 3,
+		ATTRIBFLAG_Physics					= 1 << 4
+	};
+	uint32							m_uiAttributes;
+
 	HyCoordinateType				m_eCoordType;
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
 	int32							m_iDisplayOrderMax;	// The highest display order in this hierarchy (children attached)
@@ -68,6 +75,10 @@ public:
 
 	void SetTint(float fR, float fG, float fB);
 
+	void EnableButton(bool bEnable);
+	void EnableCollider(bool bEnable);
+	void EnablePhysics(bool bEnable);
+
 	void SetScissor(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight);
 	void ClearScissor();
 
@@ -79,7 +90,8 @@ public:
 	void Load();
 	void Unload();
 
-	void SetInputEnabled(bool bEnabled);
+protected:
+	void MakeBoundingVolumeDirty();
 
 private:
 	HyLoadState GetLoadState()									{ return m_eLoadState; }
@@ -93,6 +105,8 @@ private:
 
 	virtual void OnUpdate() = 0;
 
+	virtual void OnCalcBoundingVolume() { }								// Should calculate the local bounding volume in 'm_BoundingVolume'
+
 	virtual void OnDataLoaded() { }
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) { }		// This function is responsible for incrementing the passed in reference pointer the size of the data written
@@ -102,8 +116,6 @@ private:
 	virtual void OnMouseDown(IHyInputMap &inputMapRef) { }
 	virtual void OnMouseUp(IHyInputMap &inputMapRef) { }
 	virtual void OnMouseClicked(IHyInputMap &inputMapRef) { }
-
-	virtual void InputUpdate(IHyInputMap *pInputMapArray);
 
 	virtual void InstUpdate();
 };

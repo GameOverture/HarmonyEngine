@@ -13,6 +13,8 @@
 #include "Afx/HyInteropAfx.h"
 
 /*static*/ glm::vec2 IHyInputMap::sm_ptWorldMousePos(0.0f);
+/*static*/ bool IHyInputMap::sm_bMouseLeftDown = false;
+/*static*/ bool IHyInputMap::sm_bMouseRightDown = false;
 
 IHyInputMap::IHyInputMap(IHyInput *pInputManager) : m_pInputManager(pInputManager)
 {
@@ -25,6 +27,16 @@ IHyInputMap::IHyInputMap(IHyInput *pInputManager) : m_pInputManager(pInputManage
 /*static*/ glm::vec2 IHyInputMap::GetWorldMousePos()
 {
 	return sm_ptWorldMousePos;
+}
+
+/*static*/ bool IHyInputMap::IsMouseLeftDown()
+{
+	return sm_bMouseLeftDown;
+}
+
+/*static*/ bool IHyInputMap::IsMouseRightDown()
+{
+	return sm_bMouseRightDown;
 }
 
 void IHyInputMap::StartRecording()

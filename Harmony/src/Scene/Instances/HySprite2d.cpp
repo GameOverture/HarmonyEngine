@@ -136,6 +136,8 @@ void HySprite2d::AnimSetFrame(uint32 uiFrameIndex)
 	}
 
 	m_uiCurFrame = uiFrameIndex;
+
+	MakeBoundingVolumeDirty();
 }
 
 float HySprite2d::AnimGetPlayRate() const
@@ -174,6 +176,8 @@ void HySprite2d::AnimSetState(uint32 uiStateIndex)
 		m_uiCurFrame = 0;
 	else
 		m_uiCurFrame = AnimGetNumFrames() - 1;
+
+	MakeBoundingVolumeDirty();
 }
 
 bool HySprite2d::AnimIsFinished() const
@@ -274,6 +278,8 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 
 	if(m_uiCurFrame >= AnimGetNumFrames())
 		m_uiCurFrame = AnimGetNumFrames() - 1;
+
+	MakeBoundingVolumeDirty();
 }
 
 /*virtual*/ void HySprite2d::OnUpdate()
@@ -348,10 +354,33 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 
 		m_uiCurFrame = iNextFrameIndex;
 		m_fElapsedFrameTime -= frameRef.fDURATION;
+
+		MakeBoundingVolumeDirty();
 	}
 
 	const HySprite2dFrame &UpdatedFrameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 	m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
+}
+
+/*virtual*/ void HySprite2d::OnCalcBoundingVolume()
+{
+	uint32 uiNumVerts = m_RenderState.GetNumVerticesPerInstance();
+	glm::vec2 vLowerBounds(0.0f);
+	glm::vec2 vUpperBounds(0.0f);
+
+	if(m_eLoadState != HYLOADSTATE_Loaded)
+	{
+		m_BoundingVolume.SetLocalAABB(vLowerBounds, vUpperBounds);
+		return;
+	}
+
+	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	vLowerBounds.x = static_cast<float>(frameRef.vOFFSET.x);
+	vLowerBounds.y = static_cast<float>(frameRef.vOFFSET.y);
+	vUpperBounds.x = vLowerBounds.x + AnimGetCurFrameWidth(true);
+	vUpperBounds.y = vLowerBounds.y + AnimGetCurFrameHeight(true);
+
+	m_BoundingVolume.SetLocalAABB(vLowerBounds, vUpperBounds);
 }
 
 /*virtual*/ void HySprite2d::OnUpdateUniforms()
