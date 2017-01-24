@@ -92,7 +92,6 @@ public:
 	//       to pause.
 	//--------------------------------------------------------------------------------------
 	void AnimSetState(uint32 uiStateIndex);
-	void AnimSetState(std::string sStateName);
 
 	//--------------------------------------------------------------------------------------
 	// Returns a boolean value that represents whether this animation has finished playing.
