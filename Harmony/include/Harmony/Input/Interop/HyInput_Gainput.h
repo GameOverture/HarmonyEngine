@@ -65,7 +65,7 @@ public:
 
 	gainput::DeviceId GetGamePadDeviceId(uint32 uiIndex);
 
-	virtual void OnUpdate();
+	virtual void Update();
 };
 
 #endif /* __HyInput_Gainput_h__ */

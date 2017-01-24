@@ -97,7 +97,7 @@ gainput::DeviceId HyInput_Gainput::GetGamePadDeviceId(uint32 uiIndex)
 	return -1;
 }
 
-/*virtual*/ void HyInput_Gainput::OnUpdate()
+/*virtual*/ void HyInput_Gainput::Update()
 {
 	// TODO: pass in m_uiRecordCount and wrap logic around this call
 	m_Manager.Update();
