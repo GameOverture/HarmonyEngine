@@ -41,17 +41,14 @@ public:
 	virtual bool MapAxis_GP(uint32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f) override { return false; }
 
 	virtual void Unmap(uint32 iUserId) { }
-	virtual bool IsMapped(uint32 iUserId) override const { return false; }
+	virtual bool IsMapped(uint32 iUserId) const override { return false; }
 
-	virtual bool IsBtnDown(uint32 iUserId) override const { return false; }
-	virtual bool IsBtnDownBuffered(uint32 iUserId) override const { return false; }
-	virtual bool IsBtnReleased(uint32 iUserId) override const { return false; }
+	virtual bool IsBtnDown(uint32 iUserId) const override { return false; }
+	virtual bool IsBtnDownBuffered(uint32 iUserId) const override { return false; }
+	virtual bool IsBtnReleased(uint32 iUserId) const override { return false; }
 
-	virtual float GetAxis(uint32 iUserId) override const { return 0.0f; }
-	virtual float GetAxisDelta(uint32 iUserId) override const { return 0.0f; }
-
-private:
-	virtual void Initialize() override { }
+	virtual float GetAxis(uint32 iUserId) const override { return 0.0f; }
+	virtual float GetAxisDelta(uint32 iUserId) const override { return 0.0f; }
 };
 
 #endif /* __HyInput_NULL_h__ */
