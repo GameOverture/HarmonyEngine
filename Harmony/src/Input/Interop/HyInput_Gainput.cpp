@@ -70,9 +70,6 @@ void HyInput_Gainput::HandleMsg(HyWindow *pCurrentWindow, const MSG& msg)
 
 		IHyInputMap::sm_ptWorldMousePos = pCurrentWindow->ConvertViewportCoordinateToWorldPos(ptMouseAxisNormalized);
 	}
-
-	IHyInputMap::sm_bMouseLeftDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Left);
-	IHyInputMap::sm_bMouseRightDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Right);
 }
 #endif
 
@@ -101,6 +98,9 @@ gainput::DeviceId HyInput_Gainput::GetGamePadDeviceId(uint32 uiIndex)
 {
 	// TODO: pass in m_uiRecordCount and wrap logic around this call
 	m_Manager.Update();
+
+	IHyInputMap::sm_bMouseLeftDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Left);
+	IHyInputMap::sm_bMouseRightDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Right);
 
 	//m_Manager.GetDeviceCountByType(
 }

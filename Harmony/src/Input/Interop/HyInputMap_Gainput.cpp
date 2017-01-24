@@ -67,7 +67,7 @@ HyInputMap_Gainput::~HyInputMap_Gainput()
 
 /*virtual*/ bool HyInputMap_Gainput::IsBtnReleased(uint32 iUserId) const
 {
-	return true;
+	return m_pGainputMap->GetBoolWasDown(iUserId);
 }
 
 /*virtual*/ float HyInputMap_Gainput::GetAxis(uint32 iUserId) const
