@@ -18,7 +18,7 @@ class HyInput_NULL : public IHyInput
 public:
 	HyInput_NULL(uint32 uiNumInputMappings) : IHyInput(uiNumInputMappings) { }
 
-	virtual void Update() { }
+	virtual void OnUpdate() { }
 
 	virtual void StartRecording() { }
 	virtual void StopRecording() { }
@@ -31,13 +31,13 @@ public:
 class HyInputMap_NULL : public IHyInputMap
 {
 public:
-	virtual glm::ivec2 GetMousePos() { return glm::ivec2(0); }
+	HyInputMap_NULL(IHyInput *pInputManager) : IHyInputMap(pInputManager) { }
 
 	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn) { return false; }
 	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn) { return false; }
 	virtual bool MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn, uint32 uiGamePadIndex) { return false; }
 
-	virtual bool MapAxis_MO(uint32 iUserId, HyMouseBtn eAxis, float fMin = 0.0f, float fMax = 1.0f) { return false; }
+	virtual bool MapAxis_MO(uint32 iUserId, HyMouseAxis eAxis, float fMin = 0.0f, float fMax = 1.0f) { return false; }
 	virtual bool MapAxis_GP(uint32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f) { return false; }
 
 	virtual void Unmap(uint32 iUserId) { }

@@ -88,6 +88,7 @@
     <ClCompile Include="Scene\Instances\HyText2d.cpp" />
     <ClCompile Include="Scene\Instances\HyTexturedQuad2d.cpp" />
     <ClCompile Include="Scene\Instances\IHyInst2d.cpp" />
+    <ClCompile Include="Scene\Transforms\HyBoundingVolume2d.cpp" />
     <ClCompile Include="Scene\Transforms\IHyTransform2d.cpp" />
     <ClCompile Include="Scene\Transforms\IHyTransform3d.cpp" />
     <ClCompile Include="Scene\Transforms\IHyTransformNode.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="..\include\Harmony\Scene\Instances\HyText2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Instances\HyTexturedQuad2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Instances\IHyInst2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Transforms\HyBoundingVolume2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Transforms\IHyTransform.h" />
     <ClInclude Include="..\include\Harmony\Scene\Transforms\IHyTransform2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Transforms\IHyTransform3d.h" />
