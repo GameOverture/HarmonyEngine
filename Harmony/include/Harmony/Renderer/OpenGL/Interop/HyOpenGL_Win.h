@@ -28,10 +28,10 @@ public:
 
 	HWND GetHWND(int32 iWindowIndex);
 
-	virtual void StartRender();
-	virtual void FinishRender();
+	virtual void StartRender() override;
+	virtual void FinishRender() override;
 
-	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags);
+	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags) override;
 };
 
 #endif /* __HyOpenGL_Win_h__ */

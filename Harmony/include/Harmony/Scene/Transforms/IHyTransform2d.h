@@ -33,8 +33,8 @@ public:
 	HyCoordinateUnit GetCoordinateUnit();
 	void SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion);
 
-	virtual void GetLocalTransform(glm::mat4 &outMtx) const;
-	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const;
+	virtual void GetLocalTransform(glm::mat4 &outMtx) const override;
+	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const override;
 
 	void GetWorldTransform(glm::mat4 &outMtx);
 };

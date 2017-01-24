@@ -92,12 +92,12 @@ public:
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 
 protected:
-	virtual void OnDataLoaded();
+	virtual void OnDataLoaded() override;
 
-	virtual void OnUpdate();
+	virtual void OnUpdate() override;
 
-	virtual void OnUpdateUniforms();
-	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
+	virtual void OnUpdateUniforms() override;
+	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 };
 
 #endif /* __HyText2d_h__ */

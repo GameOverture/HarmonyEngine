@@ -144,7 +144,7 @@ public:
 	float GetLineDescender(uint32 uiStateIndex);
 	float GetLeftSideNudgeAmt(uint32 uiStateIndex);
 
-	virtual void DoFileLoad();
+	virtual void DoFileLoad() override;
 };
 
 #endif /* __HyText2dData_h__ */

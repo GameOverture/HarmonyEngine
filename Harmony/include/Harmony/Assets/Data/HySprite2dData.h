@@ -75,7 +75,7 @@ public:
 	const AnimState &GetState(uint32 uiAnimStateIndex) const;
 	const HySprite2dFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const;
 
-	virtual void DoFileLoad();
+	virtual void DoFileLoad() override;
 };
 
 #endif /* __HySprite2dData_h__ */

@@ -43,12 +43,12 @@ protected:
 	void ClearData();
 
 private:
-	virtual void OnUpdate() { }
+	virtual void OnUpdate() override { }
 
-	virtual void OnCalcBoundingVolume();
+	virtual void OnCalcBoundingVolume() override;
 	
-	virtual void OnUpdateUniforms();
-	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
+	virtual void OnUpdateUniforms() override;
+	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 };
 
 #endif /* __HyPrimitive2d_h__ */

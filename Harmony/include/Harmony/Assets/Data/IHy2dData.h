@@ -43,7 +43,7 @@ public:
 	const std::set<IHyShader *> &GetAssociatedShaders();
 
 	// Only invoked on the Load thread
-	virtual void OnLoadThread();
+	virtual void OnLoadThread() override;
 	virtual void DoFileLoad() = 0;
 };
 

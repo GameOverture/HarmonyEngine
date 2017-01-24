@@ -52,7 +52,7 @@ public:
 	HySprite2d(const char *szPrefix, const char *szName);
 	virtual ~HySprite2d(void);
 
-	virtual void Unload();
+	virtual void Unload() override;
 
 	//--------------------------------------------------------------------------------------
 	// Set how to playback the animation on the current (or specified) state/animation.
@@ -122,14 +122,14 @@ public:
 	float AnimGetCurFrameHeight(bool bIncludScaling = true);
 
 protected:
-	virtual void OnDataLoaded();
+	virtual void OnDataLoaded() override;
 
-	virtual void OnUpdate();
+	virtual void OnUpdate() override;
 
-	virtual void OnCalcBoundingVolume();
+	virtual void OnCalcBoundingVolume() override;
 
-	virtual void OnUpdateUniforms();
-	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
+	virtual void OnUpdateUniforms() override;
+	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 };
 
 #endif /* __HySprite2d_h__ */

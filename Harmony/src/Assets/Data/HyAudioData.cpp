@@ -18,6 +18,6 @@ HySfxData::~HySfxData(void)
 {
 }
 
-/*virtual*/ void HySfxData::DoFileLoad(HyTextures &atlasManagerRef)
+/*virtual*/ void HySfxData::DoFileLoad()
 {
 }

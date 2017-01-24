@@ -28,6 +28,6 @@ HyMesh3d::~HyMesh3d(void)
 }
 
 // This function is responsible for incrementing the passed in reference pointer the size of the data written
-/*virtual*/ void HyMesh3d::DefaultWriteDrawBufferData(char *&pRefDataWritePos)
+/*virtual*/ void HyMesh3d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
 }

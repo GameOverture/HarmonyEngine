@@ -97,7 +97,7 @@ public:
 	bool IsLoaded() const;
 
 	void Load();
-	void Unload();
+	virtual void Unload();
 
 protected:
 	void MakeBoundingVolumeDirty();
@@ -126,7 +126,7 @@ private:
 	virtual void OnMouseUp(void *pUserParam) { }
 	virtual void OnMouseClicked(void *pUserParam) { }
 
-	virtual void InstUpdate();
+	virtual void InstUpdate() override;
 };
 
 #endif /* __IHyInst2d_h__ */

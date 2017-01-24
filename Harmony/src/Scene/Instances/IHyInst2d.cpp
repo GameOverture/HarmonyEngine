@@ -256,7 +256,7 @@ void IHyInst2d::Load()
 	}
 }
 
-void IHyInst2d::Unload()
+/*virtual*/ void IHyInst2d::Unload()
 {
 	HyAssert(sm_pAssetManager, "IHyInst2d::Unload was invoked before engine has been initialized");
 

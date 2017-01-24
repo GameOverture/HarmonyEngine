@@ -29,22 +29,22 @@ public:
 	HyInputMap_Gainput(IHyInput *pInputManager);
 	virtual ~HyInputMap_Gainput();
 
-	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn);
-	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn);
-	virtual bool MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn, uint32 uiGamePadIndex);
+	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn) override;
+	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn) override;
+	virtual bool MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn, uint32 uiGamePadIndex) override;
 
-	virtual bool MapAxis_MO(uint32 iUserId, HyMouseAxis eAxis, float fMin = 0.0f, float fMax = 1.0f);
-	virtual bool MapAxis_GP(uint32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f);
+	virtual bool MapAxis_MO(uint32 iUserId, HyMouseAxis eAxis, float fMin = 0.0f, float fMax = 1.0f) override;
+	virtual bool MapAxis_GP(uint32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f) override;
 
-	virtual void Unmap(uint32 iUserId);
-	virtual bool IsMapped(uint32 iUserId) const;
+	virtual void Unmap(uint32 iUserId) override;
+	virtual bool IsMapped(uint32 iUserId) const override;
 
-	virtual bool IsBtnDown(uint32 iUserId) const;
-	virtual bool IsBtnDownBuffered(uint32 iUserId) const;		// If the button was just pressed
-	virtual bool IsBtnReleased(uint32 iUserId) const;
+	virtual bool IsBtnDown(uint32 iUserId) const override;
+	virtual bool IsBtnDownBuffered(uint32 iUserId) const override;		// If the button was just pressed
+	virtual bool IsBtnReleased(uint32 iUserId) const override;
 
-	virtual float GetAxis(uint32 iUserId) const;
-	virtual float GetAxisDelta(uint32 iUserId) const;
+	virtual float GetAxis(uint32 iUserId) const override;
+	virtual float GetAxisDelta(uint32 iUserId) const override;
 };
 
 #endif /* __HyInputMap_Gainput_h__ */

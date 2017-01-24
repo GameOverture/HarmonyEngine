@@ -26,7 +26,7 @@ public:
 
 	// Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
 	// Delta time is in seconds.
-	virtual void SetCurDeltaTime();
+	virtual void SetCurDeltaTime() override;
 };
 
 #endif /* __HyTime_Win_h__ */

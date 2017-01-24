@@ -28,7 +28,7 @@ class HyTexturedQuad2dData : public IHy2dData
 public:
 	virtual ~HyTexturedQuad2dData();
 
-	virtual void DoFileLoad();
+	virtual void DoFileLoad() override;
 
 	HyAtlasGroup *GetAtlasGroup();
 };

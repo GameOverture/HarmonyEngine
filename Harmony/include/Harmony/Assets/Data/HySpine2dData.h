@@ -41,7 +41,7 @@ public:
 	void AnimInitBlend(const char *szAnimFrom, const char *szAnimTo, float fInterpDur);
 	void AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInterpDur);
 
-	virtual void DoFileLoad();
+	virtual void DoFileLoad() override;
 };
 
 #endif /* __HyEnt2dData_h__ */

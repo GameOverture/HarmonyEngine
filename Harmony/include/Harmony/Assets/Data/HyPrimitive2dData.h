@@ -25,7 +25,7 @@ class HyPrimitive2dData : public IHy2dData
 public:
 	virtual ~HyPrimitive2dData();
 
-	virtual void DoFileLoad();
+	virtual void DoFileLoad() override;
 };
 
 #endif /* __HyPrimitive2dData_h__ */

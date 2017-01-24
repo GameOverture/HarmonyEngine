@@ -45,12 +45,12 @@ public:
 	uint32 GetNumTextures();
 
 private:
-	virtual void OnUpdate() { }
+	virtual void OnUpdate() override { }
 
-	virtual void OnDataLoaded();
+	virtual void OnDataLoaded() override;
 	
-	virtual void OnUpdateUniforms();
-	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
+	virtual void OnUpdateUniforms() override;
+	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 };
 
 #endif /* __HyTexturedQuad2d_h__ */

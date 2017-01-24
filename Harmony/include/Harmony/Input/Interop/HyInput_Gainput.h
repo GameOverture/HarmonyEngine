@@ -48,12 +48,12 @@ public:
 
 	gainput::InputManager &GetGainputManager();
 
-	virtual void StartRecording();
-	virtual void StopRecording();
-	virtual void SerializeRecording();
+	virtual void StartRecording() override;
+	virtual void StopRecording() override;
+	virtual void SerializeRecording() override;
 
-	virtual void StartPlayback();
-	virtual void StopPlayback();
+	virtual void StartPlayback() override;
+	virtual void StopPlayback() override;
 
 #ifdef HY_PLATFORM_WINDOWS
 	void HandleMsg(HyWindow *pCurrentWindow, const MSG& msg);
@@ -65,7 +65,7 @@ public:
 
 	gainput::DeviceId GetGamePadDeviceId(uint32 uiIndex);
 
-	virtual void Update();
+	virtual void Update() override;
 };
 
 #endif /* __HyInput_Gainput_h__ */

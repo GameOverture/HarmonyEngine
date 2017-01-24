@@ -66,8 +66,8 @@ public:
 	void PrintActiveUniforms();
 	void PrintActiveAttribs();
 
-	virtual void OnUpload(IHyRenderer &rendererRef);
-	virtual void OnDelete(IHyRenderer &rendererRef);
+	virtual void OnUpload(IHyRenderer &rendererRef) override;
+	virtual void OnDelete(IHyRenderer &rendererRef) override;
 };
 
 #endif /* __HyOpenGLShader_h__ */

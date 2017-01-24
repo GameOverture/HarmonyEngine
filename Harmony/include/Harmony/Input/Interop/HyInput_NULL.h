@@ -18,14 +18,14 @@ class HyInput_NULL : public IHyInput
 public:
 	HyInput_NULL(uint32 uiNumInputMappings) : IHyInput(uiNumInputMappings) { }
 
-	virtual void Update() { }
+	virtual void Update() override { }
 
-	virtual void StartRecording() { }
-	virtual void StopRecording() { }
-	virtual void SerializeRecording() { }
+	virtual void StartRecording() override { }
+	virtual void StopRecording() override { }
+	virtual void SerializeRecording() override { }
 
-	virtual void StartPlayback() { }
-	virtual void StopPlayback() { }
+	virtual void StartPlayback() override { }
+	virtual void StopPlayback() override { }
 };
 
 class HyInputMap_NULL : public IHyInputMap
@@ -33,25 +33,25 @@ class HyInputMap_NULL : public IHyInputMap
 public:
 	HyInputMap_NULL(IHyInput *pInputManager) : IHyInputMap(pInputManager) { }
 
-	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn) { return false; }
-	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn) { return false; }
-	virtual bool MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn, uint32 uiGamePadIndex) { return false; }
+	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn) override { return false; }
+	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn) override { return false; }
+	virtual bool MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn, uint32 uiGamePadIndex) override { return false; }
 
-	virtual bool MapAxis_MO(uint32 iUserId, HyMouseAxis eAxis, float fMin = 0.0f, float fMax = 1.0f) { return false; }
-	virtual bool MapAxis_GP(uint32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f) { return false; }
+	virtual bool MapAxis_MO(uint32 iUserId, HyMouseAxis eAxis, float fMin = 0.0f, float fMax = 1.0f) override { return false; }
+	virtual bool MapAxis_GP(uint32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f) override { return false; }
 
 	virtual void Unmap(uint32 iUserId) { }
-	virtual bool IsMapped(uint32 iUserId) const { return false; }
+	virtual bool IsMapped(uint32 iUserId) override const { return false; }
 
-	virtual bool IsBtnDown(uint32 iUserId) const { return false; }
-	virtual bool IsBtnDownBuffered(uint32 iUserId) const { return false; }
-	virtual bool IsBtnReleased(uint32 iUserId) const { return false; }
+	virtual bool IsBtnDown(uint32 iUserId) override const { return false; }
+	virtual bool IsBtnDownBuffered(uint32 iUserId) override const { return false; }
+	virtual bool IsBtnReleased(uint32 iUserId) override const { return false; }
 
-	virtual float GetAxis(uint32 iUserId) const { return 0.0f; }
-	virtual float GetAxisDelta(uint32 iUserId) const { return 0.0f; }
+	virtual float GetAxis(uint32 iUserId) override const { return 0.0f; }
+	virtual float GetAxisDelta(uint32 iUserId) override const { return 0.0f; }
 
 private:
-	virtual void Initialize() { }
+	virtual void Initialize() override { }
 };
 
 #endif /* __HyInput_NULL_h__ */

@@ -31,7 +31,7 @@ class HySfxData : public IHyData
 public:
 	virtual ~HySfxData(void);
 
-	virtual void DoFileLoad(HyTextures &atlasManagerRef);
+	virtual void DoFileLoad() override;
 };
 
 #endif /* __HySfxData_h__ */
