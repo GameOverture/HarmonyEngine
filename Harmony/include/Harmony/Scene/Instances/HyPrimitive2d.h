@@ -43,8 +43,6 @@ protected:
 	void ClearData();
 
 private:
-	virtual void OnUpdate() override { }
-
 	virtual void OnCalcBoundingVolume() override;
 	
 	virtual void OnUpdateUniforms() override;

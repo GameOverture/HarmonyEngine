@@ -25,9 +25,6 @@ public:
 	IHyEntity2d();
 	IHyEntity2d(const char *szPrefix, const char *szName);
 	virtual ~IHyEntity2d(void);
-
-private:
-	virtual void OnUpdate() = 0;
 };
 
 #endif /* __HyEntity2d_h__ */

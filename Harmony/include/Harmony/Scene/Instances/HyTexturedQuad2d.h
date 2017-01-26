@@ -45,8 +45,6 @@ public:
 	uint32 GetNumTextures();
 
 private:
-	virtual void OnUpdate() override { }
-
 	virtual void OnDataLoaded() override;
 	
 	virtual void OnUpdateUniforms() override;

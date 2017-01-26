@@ -112,7 +112,7 @@ private:
 
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
-	virtual void OnUpdate() = 0;
+	virtual void OnUpdate() { };
 
 	virtual void OnCalcBoundingVolume() { }								// Should calculate the local bounding volume in 'm_BoundingVolume'
 
