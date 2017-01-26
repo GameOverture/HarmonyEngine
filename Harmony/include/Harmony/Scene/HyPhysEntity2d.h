@@ -14,9 +14,9 @@
 #include "Box2D/Box2D.h"
 
 #include "Scene/Instances/HyPrimitive2d.h"
-#include "Scene/IHyEntity2d.h"
+#include "Scene/HyEntity2d.h"
 
-class HyPhysEntity2d : public IHyEntity2d
+class HyPhysEntity2d : public HyEntity2d
 {
 	friend class HyBox2dRuntime;
 	friend class HyScene;

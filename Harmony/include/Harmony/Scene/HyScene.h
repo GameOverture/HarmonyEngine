@@ -33,7 +33,7 @@ class HyTweenVec2;
 class HyTweenVec3;
 
 class HyWindow;
-class IHyEntity2d;
+class HyEntity2d;
 class HyTweenFloat;
 
 //////////////////////////////////////////////////////////////////////////
@@ -74,8 +74,8 @@ public:
 
 	void CopyAllInsts(std::vector<IHyInst2d *> &vInstsToCopy);
 
-	void AddEntity(IHyEntity2d *pEnt);
-	void RemoveEntity(IHyEntity2d *pEnt);
+	void AddEntity(HyEntity2d *pEnt);
+	void RemoveEntity(HyEntity2d *pEnt);
 
 	void DebugDrawPhysics2d(bool bDraw)					{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
 

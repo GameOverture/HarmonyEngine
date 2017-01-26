@@ -16,7 +16,7 @@
 #include "Renderer/Viewport/HyCamera.h"
 #include "Renderer/Viewport/HyWindow.h"
 
-#include "Scene/IHyEntity2d.h"
+#include "Scene/HyEntity2d.h"
 
 #include "Diagnostics/HyGuiComms.h"
 
@@ -204,7 +204,7 @@ void IHyInst2d::ClearScissor()
 			static_cast<IHyInst2d *>(m_ChildList[i])->m_RenderState.ClearScissorRect();
 			break;
 		case HYTYPE_Entity2d:
-			static_cast<IHyEntity2d *>(m_ChildList[i])->m_RenderState.ClearScissorRect();
+			static_cast<HyEntity2d *>(m_ChildList[i])->m_RenderState.ClearScissorRect();
 			break;
 		}
 	}

@@ -1,5 +1,5 @@
 /**************************************************************************
- *	IHyEntity2d.h
+ *	HyEntity2d.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
@@ -19,12 +19,12 @@
 
 #include "Utilities/HyMath.h"
 
-class IHyEntity2d : public IHyInst2d
+class HyEntity2d : public IHyInst2d
 {
 public:
-	IHyEntity2d();
-	IHyEntity2d(const char *szPrefix, const char *szName);
-	virtual ~IHyEntity2d(void);
+	HyEntity2d();
+	HyEntity2d(const char *szPrefix, const char *szName);
+	virtual ~HyEntity2d(void);
 };
 
 #endif /* __HyEntity2d_h__ */
