@@ -33,7 +33,7 @@ protected:
 
 	std::vector<HyTweenFloat *>		m_ActiveAnimFloatsList;
 
-	// Destructor is protected as to prevent static and stack allocations. Heap memory can be freed using IHyNode::Destroy() function
+	// Destructor is protected as to prevent static and stack allocations. Heap memory should be freed using IHyNode::Destroy() function
 	virtual ~IHyNode();
 
 public:
