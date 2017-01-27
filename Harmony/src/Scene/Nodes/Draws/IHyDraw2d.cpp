@@ -14,7 +14,7 @@
 #include "Assets/Data/IHyData.h"
 #include "Assets/HyAssetManager.h"
 #include "Scene/Nodes/Misc/HyCamera.h"
-#include "Renderer/Viewport/HyWindow.h"
+#include "Renderer/Components/HyWindow.h"
 
 #include "Scene/Nodes/HyEntity2d.h"
 

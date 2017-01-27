@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Renderer/IHyRenderer.h"
 
-#include "Renderer/Viewport/HyWindow.h"
+#include "Renderer/Components/HyWindow.h"
 
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
 int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;

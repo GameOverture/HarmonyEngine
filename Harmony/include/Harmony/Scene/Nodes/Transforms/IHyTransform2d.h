@@ -12,7 +12,7 @@
 
 #include "Scene/Nodes/Transforms/Tweens/HyTweenVec2.h"
 #include "Scene/Nodes/Transforms/IHyTransform.h"
-#include "Scene/Nodes/Transforms/HyBoundingVolume2d.h"
+#include "Scene/Physics/HyBoundingVolume2d.h"
 
 class IHyTransform2d : public IHyTransform<HyTweenVec2>
 {

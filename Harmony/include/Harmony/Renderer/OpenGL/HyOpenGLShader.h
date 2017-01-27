@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Renderer/IHyShader.h"
+#include "Renderer/Components/IHyShader.h"
 
 #include <vector>
 #include <map>

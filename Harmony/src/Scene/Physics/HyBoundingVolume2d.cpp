@@ -7,9 +7,9 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Transforms/HyBoundingVolume2d.h"
+#include "Scene/Physics/HyBoundingVolume2d.h"
 
-#include "Scene/Transforms/IHyTransform2d.h"
+#include "Scene/Nodes/Transforms/IHyTransform2d.h"
 
 HyBoundingVolume2d::HyBoundingVolume2d(IHyTransform2d &ownerRef) :	m_OwnerRef(ownerRef),
 																	m_eType(TYPE_None)

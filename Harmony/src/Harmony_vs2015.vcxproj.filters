@@ -50,12 +50,6 @@
     <ClCompile Include="Utilities\HyBox2dRuntime.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\HyGfxComms.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer\HyRenderState.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
@@ -102,9 +96,6 @@
     <ClCompile Include="Utilities\stb_image.c">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Viewport\HyWindow.cpp">
-      <Filter>Renderer\Viewport</Filter>
-    </ClCompile>
     <ClCompile Include="Diagnostics\HyGuiComms.cpp">
       <Filter>Diagnostics</Filter>
     </ClCompile>
@@ -137,9 +128,6 @@
     </ClCompile>
     <ClCompile Include="Utilities\HyFileIO.cpp">
       <Filter>Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer\IHyShader.cpp">
-      <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Utilities\Crc32.cpp">
       <Filter>Utilities</Filter>
@@ -213,9 +201,6 @@
     <ClCompile Include="Scene\Nodes\HyEntity2d.cpp">
       <Filter>Scene\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\HyPhysEntity2d.cpp">
-      <Filter>Scene\Nodes</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Nodes\IHyNode.cpp">
       <Filter>Scene\Nodes</Filter>
     </ClCompile>
@@ -224,6 +209,24 @@
     </ClCompile>
     <ClCompile Include="Scene\Nodes\Misc\HyCamera.cpp">
       <Filter>Scene\Nodes\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Physics\HyBoundingVolume2d.cpp">
+      <Filter>Scene\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Physics\HyPhysEntity2d.cpp">
+      <Filter>Scene\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Components\HyGfxComms.cpp">
+      <Filter>Renderer\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Components\HyRenderState.cpp">
+      <Filter>Renderer\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Components\HyWindow.cpp">
+      <Filter>Renderer\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Components\IHyShader.cpp">
+      <Filter>Renderer\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -281,9 +284,6 @@
     <Filter Include="Input\Interop">
       <UniqueIdentifier>{da3e46b7-a390-4cf8-a227-8f59da37b6c8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer\Viewport">
-      <UniqueIdentifier>{9e5718c7-63a2-4a87-a5a2-d424a6ebc4fc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scene">
       <UniqueIdentifier>{30a426c0-032d-4dbc-a560-acaad120a43f}</UniqueIdentifier>
     </Filter>
@@ -313,6 +313,12 @@
     </Filter>
     <Filter Include="Scene\Nodes\Draws">
       <UniqueIdentifier>{3ba0eb89-06bf-4c46-9fa8-4793088033a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Physics">
+      <UniqueIdentifier>{11b96100-2b7b-4578-b9fb-8cad49b3bee3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Components">
+      <UniqueIdentifier>{b30e48d2-cc50-4a12-910b-56a411b88e32}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -419,12 +425,6 @@
     <ClInclude Include="..\include\Harmony\Utilities\HyBox2dRuntime.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Renderer\HyGfxComms.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Renderer\HyRenderState.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Afx\HyInteropAfx.h">
       <Filter>Afx</Filter>
     </ClInclude>
@@ -480,9 +480,6 @@
     <ClInclude Include="..\include\Harmony\Utilities\jsonxx.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Renderer\Viewport\HyWindow.h">
-      <Filter>Renderer\Viewport</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Diagnostics\HyGuiComms.h">
       <Filter>Diagnostics</Filter>
     </ClInclude>
@@ -522,9 +519,6 @@
     <ClInclude Include="..\include\Harmony\Utilities\HyFileIO.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Renderer\IHyShader.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Utilities\HyVariant.h">
       <Filter>Utilities</Filter>
     </ClInclude>
@@ -556,9 +550,6 @@
       <Filter>Audio</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\HyEntity2d.h">
-      <Filter>Scene\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\HyPhysEntity2d.h">
       <Filter>Scene\Nodes</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode.h">
@@ -611,6 +602,24 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyCamera.h">
       <Filter>Scene\Nodes\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Physics\HyBoundingVolume2d.h">
+      <Filter>Scene\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Physics\HyPhysEntity2d.h">
+      <Filter>Scene\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyGfxComms.h">
+      <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyRenderState.h">
+      <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyWindow.h">
+      <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Components\IHyShader.h">
+      <Filter>Renderer\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -15,7 +15,7 @@
 #include "Assets/HyFactory.h"
 #include "Assets/HyTextures.h"
 
-#include "Renderer/HyGfxComms.h"
+#include "Renderer/Components/HyGfxComms.h"
 #include "Scene/HyScene.h"
 
 #include "Threading/Threading.h"

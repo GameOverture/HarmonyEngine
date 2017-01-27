@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Renderer/OpenGL/Interop/HyOpenGL_Win.h"
 
-#include "Renderer/Viewport/HyWindow.h"
+#include "Renderer/Components/HyWindow.h"
 #include "Diagnostics/HyGuiComms.h"
 #include "Utilities/HyStrManip.h"
 

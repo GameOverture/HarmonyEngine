@@ -14,7 +14,7 @@
 
 #include "Assets/Data/IHyData.h"
 #include "Assets/HyTextures.h"
-#include "Renderer/IHyShader.h"
+#include "Renderer/Components/IHyShader.h"
 
 class IHy2dData : public IHyData
 {

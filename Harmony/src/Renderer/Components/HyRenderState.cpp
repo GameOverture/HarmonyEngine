@@ -7,10 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Renderer/HyRenderState.h"
+#include "Renderer/Components/HyRenderState.h"
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
 
-#include "Renderer/IHyShader.h"
+#include "Renderer/Components/IHyShader.h"
 
 HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
 									m_uiTextureBindHandle(0),

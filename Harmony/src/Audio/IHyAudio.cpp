@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Audio/IHyAudio.h"
-#include "Renderer/Viewport/HyWindow.h"
+#include "Renderer/Components/HyWindow.h"
 
 IHyAudio::IHyAudio(std::vector<HyWindow *> &windowListRef) :	m_WindowListRef(windowListRef)
 {

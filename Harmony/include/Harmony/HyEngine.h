@@ -20,7 +20,7 @@
 #include "Audio/IHyAudio.h"
 #include "Diagnostics/HyGuiComms.h"
 
-#include "Renderer/Viewport/HyWindow.h"
+#include "Renderer/Components/HyWindow.h"
 
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Misc/HyAudio2d.h"
@@ -29,7 +29,7 @@
 #include "Scene/Nodes/Draws/HyPrimitive2d.h"
 #include "Scene/Nodes/Draws/HyText2d.h"
 #include "Scene/Nodes/Draws/HyTexturedQuad2d.h"
-#include "Scene/Nodes/HyPhysEntity2d.h"
+#include "Scene/Physics/HyPhysEntity2d.h"
 
 #include "Assets/HyAssetManager.h"
 

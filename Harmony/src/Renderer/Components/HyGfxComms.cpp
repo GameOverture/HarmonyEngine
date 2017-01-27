@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Renderer/HyGfxComms.h"
+#include "Renderer/Components/HyGfxComms.h"
 
 HyGfxComms::HyGfxComms()
 {

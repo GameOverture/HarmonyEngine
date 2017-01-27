@@ -16,7 +16,7 @@
 
 #include "Assets/Data/IHyData.h"
 
-#include "Renderer/HyRenderState.h"
+#include "Renderer/Components/HyRenderState.h"
 #include "Scene/Nodes/Misc/HyCamera.h"
 
 class IHyDraw2d : public IHyTransform2d

@@ -10,8 +10,8 @@
 #include "Scene/HyScene.h"
 
 #include "Renderer/IHyRenderer.h"
-#include "Renderer/HyGfxComms.h"
-#include "Renderer/Viewport/HyWindow.h"
+#include "Renderer/Components/HyGfxComms.h"
+#include "Renderer/Components/HyWindow.h"
 
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
 #include "Scene/Nodes/Draws/HySprite2d.h"
@@ -20,7 +20,7 @@
 #include "Scene/Nodes/Draws/HyText2d.h"
 #include "Scene/Nodes/Draws/HyTexturedQuad2d.h"
 #include "Scene/Nodes/HyEntity2d.h"
-#include "Scene/Nodes/HyPhysEntity2d.h"
+#include "Scene/Physics/HyPhysEntity2d.h"
 
 #include "Time/IHyTime.h"
 

@@ -21,11 +21,11 @@ class HyPrimitive2d : public IHyDraw2d
 protected:
 	glm::vec4 *		m_pVertices;
 
-	// Destructor is protected as to prevent static and stack allocations. Heap memory can be freed using IHyTransformNode::Destroy() function
-	virtual ~HyPrimitive2d(void);
 
 public:
 	HyPrimitive2d();
+	// TODO: Destructor is protected as to prevent static and stack allocations. Heap memory can be freed using IHyTransformNode::Destroy() function
+	virtual ~HyPrimitive2d(void);
 
 	const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p);
 

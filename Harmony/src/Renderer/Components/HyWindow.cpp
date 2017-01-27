@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Renderer/Viewport/HyWindow.h"
+#include "Renderer/Components/HyWindow.h"
 
 std::vector<HyMonitorDeviceInfo>	HyWindow::sm_MonitorInfoList;
 BasicSection						HyWindow::sm_csInfo;

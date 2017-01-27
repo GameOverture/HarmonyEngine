@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "IHyApplication.h"
 
-#include "Renderer/Viewport/HyWindow.h"
+#include "Renderer/Components/HyWindow.h"
 
 HarmonyInit IHyApplication::sm_Init;
 

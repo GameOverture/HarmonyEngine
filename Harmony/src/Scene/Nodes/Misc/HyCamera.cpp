@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Nodes/Misc/HyCamera.h"
-#include "Renderer/Viewport/HyWindow.h"
+#include "Renderer/Components/HyWindow.h"
 
 IHyCamera::IHyCamera(HyWindow *pWindow) : m_pWindowPtr(pWindow)
 {

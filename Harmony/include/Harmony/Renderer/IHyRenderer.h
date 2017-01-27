@@ -12,8 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Renderer/HyGfxComms.h"
-#include "Renderer/HyRenderState.h"
+#include "Renderer/Components/HyGfxComms.h"
+#include "Renderer/Components/HyRenderState.h"
 
 class IHyShader;
 class HyWindow;

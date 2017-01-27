@@ -10,7 +10,7 @@
 #include "Input/Interop/HyInput_Gainput.h"
 #include "Input/Interop/HyInputMap_Gainput.h"
 
-#include "Renderer/Viewport/HyWindow.h"
+#include "Renderer/Components/HyWindow.h"
 
 HyInput_Gainput::HyInput_Gainput(uint32 uiNumInputMappings) :	IHyInput(uiNumInputMappings),
 																m_uiKeyboardId(gainput::InvalidDeviceId),

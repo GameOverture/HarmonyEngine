@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/HyPhysEntity2d.h"
+#include "Scene/Physics/HyPhysEntity2d.h"
 
 #include "IHyApplication.h"
 

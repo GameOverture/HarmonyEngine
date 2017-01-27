@@ -10,7 +10,7 @@
 #include "Assets/Data/IHy2dData.h"
 
 #include "Renderer/IHyRenderer.h"
-#include "Renderer/IHyShader.h"
+#include "Renderer/Components/IHyShader.h"
 
 HyTextures *IHy2dData::sm_pTextures = NULL;
 
