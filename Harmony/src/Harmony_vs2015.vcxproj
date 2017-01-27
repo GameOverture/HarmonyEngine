@@ -95,6 +95,8 @@
     <ClCompile Include="Scene\Nodes\Transforms\Tweens\HyTweenVec2.cpp" />
     <ClCompile Include="Scene\Nodes\Transforms\Tweens\HyTweenVec3.cpp" />
     <ClCompile Include="Scene\Physics\HyBoundingVolume2d.cpp" />
+    <ClCompile Include="Scene\Physics\HyBox2dRuntime.cpp" />
+    <ClCompile Include="Scene\Physics\HyDebugPhys2d.cpp" />
     <ClCompile Include="Scene\Physics\HyPhysEntity2d.cpp" />
     <ClCompile Include="Time\Interop\HyTime_Win.cpp" />
     <ClCompile Include="Time\IHyTime.cpp" />
@@ -103,11 +105,9 @@
     <ClCompile Include="Time\Watches\IHyTimeInst.cpp" />
     <ClCompile Include="Utilities\Crc32.cpp" />
     <ClCompile Include="Utilities\HyBitManip.cpp" />
-    <ClCompile Include="Utilities\HyDebugPhys2d.cpp" />
     <ClCompile Include="Utilities\HyFileIO.cpp" />
     <ClCompile Include="Utilities\HyHardwareInfo.cpp" />
     <ClCompile Include="Utilities\HyMath.cpp" />
-    <ClCompile Include="Utilities\HyBox2dRuntime.cpp" />
     <ClCompile Include="Utilities\HyStrManip.cpp" />
     <ClCompile Include="Utilities\HyVariant.cpp" />
     <ClCompile Include="Utilities\jasonxx.cc" />
@@ -205,6 +205,8 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\Tweens\HyTweenVec2.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\Tweens\HyTweenVec3.h" />
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyBoundingVolume2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Physics\HyBox2dRuntime.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Physics\HyDebugPhys2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyPhysEntity2d.h" />
     <ClInclude Include="..\include\Harmony\Threading\BaseMacro.h" />
     <ClInclude Include="..\include\Harmony\Threading\BasicSync.h" />
@@ -227,11 +229,9 @@
     <ClInclude Include="..\include\Harmony\Utilities\Containers\HyStaticArray.h" />
     <ClInclude Include="..\include\Harmony\Utilities\Crc32.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyBitManip.h" />
-    <ClInclude Include="..\include\Harmony\Utilities\HyDebugPhys2d.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyFileIO.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyHardwareInfo.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyMath.h" />
-    <ClInclude Include="..\include\Harmony\Utilities\HyBox2dRuntime.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyStrManip.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyVariant.h" />
     <ClInclude Include="..\include\Harmony\Utilities\jsonxx.h" />

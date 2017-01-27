@@ -44,12 +44,6 @@
     <ClCompile Include="..\include\Harmony\Threading\WaitObjectEx.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\HyDebugPhys2d.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="Utilities\HyBox2dRuntime.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
@@ -227,6 +221,12 @@
     </ClCompile>
     <ClCompile Include="Renderer\Components\IHyShader.cpp">
       <Filter>Renderer\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Physics\HyBox2dRuntime.cpp">
+      <Filter>Scene\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Physics\HyDebugPhys2d.cpp">
+      <Filter>Scene\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -418,12 +418,6 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Threading\WaitObjectEx.h">
       <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\HyDebugPhys2d.h">
-      <Filter>Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\HyBox2dRuntime.h">
-      <Filter>Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Afx\HyInteropAfx.h">
       <Filter>Afx</Filter>
@@ -620,6 +614,12 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Components\IHyShader.h">
       <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Physics\HyBox2dRuntime.h">
+      <Filter>Scene\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Physics\HyDebugPhys2d.h">
+      <Filter>Scene\Physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

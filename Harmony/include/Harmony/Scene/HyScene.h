@@ -12,8 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Utilities/HyDebugPhys2d.h"
-#include "Utilities/HyBox2dRuntime.h"
+#include "Scene/Physics/HyBox2dRuntime.h"
+#include "Scene/Physics/HyDebugPhys2d.h"
 
 #include <vector>
 

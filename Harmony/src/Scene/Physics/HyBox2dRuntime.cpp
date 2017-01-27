@@ -7,8 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Utilities/HyBox2dRuntime.h"
-
+#include "Scene/Physics/HyBox2dRuntime.h"
 #include "Scene/Physics/HyPhysEntity2d.h"
 
 HyBox2dRuntime::HyBox2dRuntime(void)
