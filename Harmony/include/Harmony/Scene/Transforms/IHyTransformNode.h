@@ -51,7 +51,7 @@ public:
 
 protected:
 	void Update();
-	virtual void InstUpdate() { }
+	virtual void InstUpdate() = 0;
 
 	void SetDirty();
 	void InsertActiveAnimFloat(HyTweenFloat *pAnimFloat);

@@ -46,11 +46,14 @@ class HyCamera2d : public IHyTransform2d, public IHyCamera
 public:
 	virtual ~HyCamera2d();
 
-	virtual void SetZoom(const float fZoom) override	{ scale.Set(fZoom, fZoom); }
-	virtual float GetZoom() const override				{ return scale.Get().x; }
+	virtual void SetZoom(const float fZoom) override;
+	virtual float GetZoom() const override;
 
 	// NOTE: Does not properly calculate camera twist - must be axis aligned
 	HyRectangle<float> GetWorldViewBounds();
+
+private:
+	virtual void InstUpdate() override;
 };
 
 class HyCamera3d : public IHyTransform3d, public IHyCamera
@@ -61,8 +64,11 @@ class HyCamera3d : public IHyTransform3d, public IHyCamera
 public:
 	virtual ~HyCamera3d();
 
-	virtual void SetZoom(const float fZoom) override 	{ scale.Set(1.0f, 1.0f, fZoom); }
-	virtual float GetZoom() const override				{ return scale.Get().z; }
+	virtual void SetZoom(const float fZoom) override;
+	virtual float GetZoom() const override;
+
+private:
+	virtual void InstUpdate() override;
 };
 
 #endif /* __HyCamera_h__ */

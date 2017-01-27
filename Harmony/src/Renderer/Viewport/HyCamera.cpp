@@ -37,6 +37,16 @@ HyCamera2d::HyCamera2d(HyWindow *pWindow) :	IHyTransform2d(HYTYPE_Camera2d),
 HyCamera2d::~HyCamera2d()
 { }
 
+/*virtual*/ void HyCamera2d::SetZoom(const float fZoom)
+{
+	scale.Set(fZoom, fZoom);
+}
+
+/*virtual*/ float HyCamera2d::GetZoom() const
+{
+	return scale.Get().x;
+}
+
 // NOTE: Does not properly calculate camera twist - must be axis aligned
 HyRectangle<float> HyCamera2d::GetWorldViewBounds()
 {
@@ -54,9 +64,27 @@ HyRectangle<float> HyCamera2d::GetWorldViewBounds()
 	return returnRect;
 }
 
+/*virtual*/ void HyCamera2d::InstUpdate()
+{
+}
+
 HyCamera3d::HyCamera3d(HyWindow *pWindow) :	IHyTransform3d(HYTYPE_Camera3d),
 											IHyCamera(pWindow)
 { }
 
 HyCamera3d::~HyCamera3d()
 { }
+
+/*virtual*/ void HyCamera3d::SetZoom(const float fZoom)
+{
+	scale.Set(1.0f, 1.0f, fZoom);
+}
+
+/*virtual*/ float HyCamera3d::GetZoom() const
+{
+	return scale.Get().z;
+}
+
+/*virtual*/ void HyCamera3d::InstUpdate()
+{
+}
