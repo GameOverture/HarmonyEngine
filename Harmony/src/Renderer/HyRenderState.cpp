@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/HyRenderState.h"
-#include "Scene/Instances/IHyInst2d.h"
+#include "Scene/Nodes/Draws/IHyDraw2d.h"
 
 #include "Renderer/IHyShader.h"
 

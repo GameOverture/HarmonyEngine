@@ -23,13 +23,13 @@
 #include "Renderer/Viewport/HyWindow.h"
 
 #include "Scene/HyScene.h"
-#include "Scene/Instances/HyAudio2d.h"
-#include "Scene/Instances/HySprite2d.h"
-#include "Scene/Instances/HySpine2d.h"
-#include "Scene/Instances/HyPrimitive2d.h"
-#include "Scene/Instances/HyText2d.h"
-#include "Scene/Instances/HyTexturedQuad2d.h"
-#include "Scene/HyPhysEntity2d.h"
+#include "Scene/Nodes/Misc/HyAudio2d.h"
+#include "Scene/Nodes/Draws/HySprite2d.h"
+#include "Scene/Nodes/Draws/HySpine2d.h"
+#include "Scene/Nodes/Draws/HyPrimitive2d.h"
+#include "Scene/Nodes/Draws/HyText2d.h"
+#include "Scene/Nodes/Draws/HyTexturedQuad2d.h"
+#include "Scene/Nodes/HyPhysEntity2d.h"
 
 #include "Assets/HyAssetManager.h"
 

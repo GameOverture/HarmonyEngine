@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Utilities/HyDebugPhys2d.h"
 
-#include "Scene/Instances/HyPrimitive2d.h"
+#include "Scene/Nodes/Draws/HyPrimitive2d.h"
 
 HyDebugPhys2d::HyDebugPhys2d(void) : m_bDrawEnabled(false)
 {

@@ -15,7 +15,7 @@
 #include "Utilities/HyMath.h"
 
 // Forward declaration
-class IHyInst2d;
+class IHyDraw2d;
 class HyShaderUniforms;
 class IHyShader;
 

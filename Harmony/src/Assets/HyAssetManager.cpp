@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Assets/HyAssetManager.h"
 
-#include "Scene/Instances/IHyInst2d.h"
+#include "Scene/Nodes/Draws/IHyDraw2d.h"
 
 #include "Assets/Data/HyAudioData.h"
 #include "Assets/Data/HySpine2dData.h"
@@ -41,7 +41,7 @@ HyAssetManager::HyAssetManager(std::string sDataDirPath, HyGfxComms &gfxCommsRef
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
 
 	IHy2dData::sm_pTextures = &m_AtlasManager;
-	IHyInst2d::sm_pAssetManager = this;
+	IHyDraw2d::sm_pAssetManager = this;
 }
 
 
@@ -107,7 +107,7 @@ void HyAssetManager::Update()
 	}
 }
 
-void HyAssetManager::LoadInst2d(IHyInst2d *pInst)
+void HyAssetManager::LoadInst2d(IHyDraw2d *pInst)
 {
 	IHyData *pLoadData = NULL;
 	switch(pInst->GetType())
@@ -157,7 +157,7 @@ void HyAssetManager::LoadInst2d(IHyInst2d *pInst)
 	}
 }
 
-void HyAssetManager::RemoveInst(IHyInst2d *pInst)
+void HyAssetManager::RemoveInst(IHyDraw2d *pInst)
 {
 	IHyData *pInstData = NULL;
 
@@ -176,7 +176,7 @@ void HyAssetManager::RemoveInst(IHyInst2d *pInst)
 
 	case HYLOADSTATE_Queued:
 	case HYLOADSTATE_ReloadGfx:
-		for(std::vector<IHyInst2d *>::iterator it = m_QueuedInst2dList.begin(); it != m_QueuedInst2dList.end(); ++it)
+		for(std::vector<IHyDraw2d *>::iterator it = m_QueuedInst2dList.begin(); it != m_QueuedInst2dList.end(); ++it)
 		{
 			if((*it) == pInst)
 			{
@@ -194,7 +194,7 @@ void HyAssetManager::RemoveInst(IHyInst2d *pInst)
 // Unload everything
 void HyAssetManager::Shutdown()
 {
-	std::vector<IHyInst2d *> vReloadInsts;
+	std::vector<IHyDraw2d *> vReloadInsts;
 	m_SceneRef.CopyAllInsts(vReloadInsts);
 
 	for(uint32 i = 0; i < m_QueuedInst2dList.size(); ++i)
@@ -226,7 +226,7 @@ void HyAssetManager::FinalizeData(IHyData *pData)
 	if(pData->GetLoadState() == HYLOADSTATE_Queued)
 	{
 		bool bDataIsUsed = false;
-		for(std::vector<IHyInst2d *>::iterator iter = m_QueuedInst2dList.begin(); iter != m_QueuedInst2dList.end();)
+		for(std::vector<IHyDraw2d *>::iterator iter = m_QueuedInst2dList.begin(); iter != m_QueuedInst2dList.end();)
 		{
 			if((*iter)->GetData() == pData)
 			{

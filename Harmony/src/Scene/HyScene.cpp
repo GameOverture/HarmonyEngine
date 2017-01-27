@@ -13,19 +13,19 @@
 #include "Renderer/HyGfxComms.h"
 #include "Renderer/Viewport/HyWindow.h"
 
-#include "Scene/Instances/IHyInst2d.h"
-#include "Scene/Instances/HySprite2d.h"
-#include "Scene/Instances/HySpine2d.h"
-#include "Scene/Instances/HyPrimitive2d.h"
-#include "Scene/Instances/HyText2d.h"
-#include "Scene/Instances/HyTexturedQuad2d.h"
-#include "Scene/HyEntity2d.h"
-#include "Scene/HyPhysEntity2d.h"
+#include "Scene/Nodes/Draws/IHyDraw2d.h"
+#include "Scene/Nodes/Draws/HySprite2d.h"
+#include "Scene/Nodes/Draws/HySpine2d.h"
+#include "Scene/Nodes/Draws/HyPrimitive2d.h"
+#include "Scene/Nodes/Draws/HyText2d.h"
+#include "Scene/Nodes/Draws/HyTexturedQuad2d.h"
+#include "Scene/Nodes/HyEntity2d.h"
+#include "Scene/Nodes/HyPhysEntity2d.h"
 
 #include "Time/IHyTime.h"
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
-std::vector<IHyTransformNode *> HyScene::sm_MasterList;
+std::vector<IHyNode *> HyScene::sm_MasterList;
 
 HyScene::HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
 																					m_iPhysVelocityIterations(8),
@@ -44,17 +44,17 @@ HyScene::HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef
 
 HyScene::~HyScene(void)
 {
-	IHyInst2d::sm_pAssetManager = NULL;
+	IHyDraw2d::sm_pAssetManager = NULL;
 }
 
-/*static*/ void HyScene::AddTransformNode(IHyTransformNode *pNode)
+/*static*/ void HyScene::AddTransformNode(IHyNode *pNode)
 {
 	sm_MasterList.push_back(pNode);
 }
 
-/*static*/ void HyScene::RemoveTransformNode(IHyTransformNode *pNode)
+/*static*/ void HyScene::RemoveTransformNode(IHyNode *pNode)
 {
-	for(std::vector<IHyTransformNode *>::iterator it = sm_MasterList.begin(); it != sm_MasterList.end(); ++it)
+	for(std::vector<IHyNode *>::iterator it = sm_MasterList.begin(); it != sm_MasterList.end(); ++it)
 	{
 		if((*it) == pNode)
 		{
@@ -65,15 +65,15 @@ HyScene::~HyScene(void)
 	}
 }
 
-void HyScene::AddInstance(IHyInst2d *pInst)
+void HyScene::AddInstance(IHyDraw2d *pInst)
 {
 	m_LoadedInst2dList.push_back(pInst);
 	sm_bInst2dOrderingDirty = true;
 }
 
-void HyScene::RemoveInst(IHyInst2d *pInst)
+void HyScene::RemoveInst(IHyDraw2d *pInst)
 {
-	for(std::vector<IHyInst2d *>::iterator it = m_LoadedInst2dList.begin(); it != m_LoadedInst2dList.end(); ++it)
+	for(std::vector<IHyDraw2d *>::iterator it = m_LoadedInst2dList.begin(); it != m_LoadedInst2dList.end(); ++it)
 	{
 		if((*it) == pInst)
 		{
@@ -84,7 +84,7 @@ void HyScene::RemoveInst(IHyInst2d *pInst)
 	}
 }
 
-void HyScene::CopyAllInsts(std::vector<IHyInst2d *> &vInstsToCopy)
+void HyScene::CopyAllInsts(std::vector<IHyDraw2d *> &vInstsToCopy)
 {
 	vInstsToCopy = m_LoadedInst2dList;
 }
@@ -287,7 +287,7 @@ void HyScene::WriteDrawBuffer()
 	m_GfxCommsRef.SetSharedPointers();
 }
 
-/*static*/ bool HyScene::Inst2dSortPredicate(const IHyInst2d *pInst1, const IHyInst2d *pInst2)
+/*static*/ bool HyScene::Inst2dSortPredicate(const IHyDraw2d *pInst1, const IHyDraw2d *pInst2)
 {
 	// TODO: Below is commented out because std::sort expects less-than operator to supply a transitive relationship, 
 	//		 i.e. when the sort sees A < B is true and B < C is true, it implies that A < C is true as well.

@@ -1,0 +1,25 @@
+/**************************************************************************
+ *	HyEntity2d.h
+ *	
+ *	Harmony Engine
+ *	Copyright (c) 2014 Jason Knobler
+ *
+ *	The zlib License (zlib)
+ *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *************************************************************************/
+#ifndef __HyEntity2d_h__
+#define __HyEntity2d_h__
+
+#include "Afx/HyStdAfx.h"
+
+#include "Scene/Nodes/Draws/IHyDraw2d.h"
+
+class HyEntity2d : public IHyDraw2d
+{
+public:
+	HyEntity2d();
+	HyEntity2d(const char *szPrefix, const char *szName);
+	virtual ~HyEntity2d(void);
+};
+
+#endif /* __HyEntity2d_h__ */

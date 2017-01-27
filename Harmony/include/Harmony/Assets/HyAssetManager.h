@@ -23,7 +23,7 @@
 #include <queue>
 using std::queue;
 
-class IHyInst2d;
+class IHyDraw2d;
 
 class IHyData;
 class IHy2dData;
@@ -84,7 +84,7 @@ class HyAssetManager
 	};
 	LoadThreadCtrl										m_LoadingCtrl;
 
-	std::vector<IHyInst2d *>							m_QueuedInst2dList;
+	std::vector<IHyDraw2d *>							m_QueuedInst2dList;
 
 	HyFactory<HySfxData>								m_Sfx;
 	HyFactory<HySprite2dData>							m_Sprite2d;
@@ -112,8 +112,8 @@ public:
 
 	void Update();
 
-	void LoadInst2d(IHyInst2d *pInst);
-	void RemoveInst(IHyInst2d *pInst);
+	void LoadInst2d(IHyDraw2d *pInst);
+	void RemoveInst(IHyDraw2d *pInst);
 
 	void Shutdown();
 	bool IsShutdown();

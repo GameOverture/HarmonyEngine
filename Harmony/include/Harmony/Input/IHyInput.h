@@ -14,7 +14,7 @@
 
 #include "Input/IHyInputMap.h"
 
-class IHyInst2d;
+class IHyDraw2d;
 
 class IHyInput
 {

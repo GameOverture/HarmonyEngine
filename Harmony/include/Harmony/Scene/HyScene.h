@@ -18,8 +18,8 @@
 #include <vector>
 
 // Forward declarations
-class IHyTransformNode;
-class IHyInst2d;
+class IHyNode;
+class IHyDraw2d;
 
 class HySound;
 class HySpine2d;
@@ -52,10 +52,10 @@ class HyScene
 	HyGfxComms &										m_GfxCommsRef;
 	std::vector<HyWindow *> &							m_WindowListRef;
 
-	static std::vector<IHyTransformNode *>				sm_MasterList;
+	static std::vector<IHyNode *>				sm_MasterList;
 
-	std::vector<IHyInst2d *>							m_LoadedInst2dList;
-	std::vector<IHyInst2d *>							m_LoadedInst3dList;
+	std::vector<IHyDraw2d *>							m_LoadedInst2dList;
+	std::vector<IHyDraw2d *>							m_LoadedInst3dList;
 
 	// Used when writing the graphics draw buffer
 	char *												m_pCurWritePos;
@@ -66,13 +66,13 @@ public:
 
 	static void SetInstOrderingDirty()						{ sm_bInst2dOrderingDirty = true; }
 	
-	static void AddTransformNode(IHyTransformNode *pNode);
-	static void RemoveTransformNode(IHyTransformNode *pNode);
+	static void AddTransformNode(IHyNode *pNode);
+	static void RemoveTransformNode(IHyNode *pNode);
 
-	void AddInstance(IHyInst2d *pInst);
-	void RemoveInst(IHyInst2d *pInst);
+	void AddInstance(IHyDraw2d *pInst);
+	void RemoveInst(IHyDraw2d *pInst);
 
-	void CopyAllInsts(std::vector<IHyInst2d *> &vInstsToCopy);
+	void CopyAllInsts(std::vector<IHyDraw2d *> &vInstsToCopy);
 
 	void AddEntity(HyEntity2d *pEnt);
 	void RemoveEntity(HyEntity2d *pEnt);
@@ -85,7 +85,7 @@ private:
 	
 	void WriteDrawBuffer();
 	
-	static bool Inst2dSortPredicate(const IHyInst2d *pInst1, const IHyInst2d *pInst2);
+	static bool Inst2dSortPredicate(const IHyDraw2d *pInst1, const IHyDraw2d *pInst2);
 };
 
 #endif /* __HyScene_h__ */
