@@ -10,19 +10,20 @@
 #include "Scene/Nodes/IHyNode.h"
 #include "Scene/Nodes/Transforms/Tweens/HyTweenFloat.h"
 
-IHyNode::IHyNode(HyType eType) :	m_eTYPE(eType),
-													m_bDirty(false),
-													m_bIsInst2d(false),
-													m_bEnabled(true),
-													m_pParent(NULL),
-													m_iTag(0)
-{
-	HyScene::AddTransformNode(this);
-}
-
+// Destructor is protected as to prevent static and stack allocations. Heap memory can be freed using IHyNode::Destroy() function
 /*virtual*/ IHyNode::~IHyNode()
 {
 	HyScene::RemoveTransformNode(this);
+}
+
+IHyNode::IHyNode(HyType eType) :	m_eTYPE(eType),
+									m_bDirty(false),
+									m_bIsDraw2d(false),
+									m_bEnabled(true),
+									m_pParent(NULL),
+									m_iTag(0)
+{
+	HyScene::AddTransformNode(this);
 }
 
 void IHyNode::Destroy()
@@ -35,9 +36,9 @@ HyType IHyNode::GetType()
 	return m_eTYPE;
 }
 
-bool IHyNode::IsInst2d()
+bool IHyNode::IsDraw2d()
 {
-	return m_bIsInst2d;
+	return m_bIsDraw2d;
 }
 
 bool IHyNode::IsEnabled()

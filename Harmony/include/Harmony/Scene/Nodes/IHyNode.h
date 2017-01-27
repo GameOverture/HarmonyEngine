@@ -22,11 +22,11 @@ protected:
 	const HyType					m_eTYPE;
 
 	bool							m_bDirty;
-	bool							m_bIsInst2d;
+	bool							m_bIsDraw2d;
 	bool							m_bEnabled;
 
-	IHyNode *				m_pParent;
-	std::vector<IHyNode *>	m_ChildList;
+	IHyNode *						m_pParent;
+	std::vector<IHyNode *>			m_ChildList;
 
 
 	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
@@ -41,7 +41,7 @@ public:
 	void Destroy();
 
 	HyType GetType();
-	bool IsInst2d();
+	bool IsDraw2d();
 
 	bool IsEnabled();
 	void SetEnabled(bool bEnabled);

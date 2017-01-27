@@ -38,7 +38,7 @@ IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName)
 																					m_fPrevAlphaValue(1.0f),
 																					alpha(m_fAlpha, *this)
 {
-	m_bIsInst2d = true;
+	m_bIsDraw2d = true;
 
 #ifdef HY_DEBUG
 	if(m_eTYPE != HYTYPE_Entity2d && m_eTYPE != HYTYPE_Primitive2d)
@@ -51,16 +51,6 @@ IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName)
 
 /*virtual*/ IHyDraw2d::~IHyDraw2d(void)
 {
-	if(m_ChildList.empty() == false)
-	{
-		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		{
-			if(m_ChildList[i]->IsInst2d())
-				static_cast<IHyDraw2d *>(m_ChildList[i])->Detach();
-		}
-		HyLogWarning("Deleting IHyDraw2d (" << m_sPREFIX << "/" << m_sNAME << ") with '" << m_ChildList.size() << "' children attached. These children are now orphaned");
-	}
-
 	Unload();
 }
 
@@ -114,7 +104,7 @@ void IHyDraw2d::SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCame
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(m_ChildList[i]->IsInst2d())
+		if(m_ChildList[i]->IsDraw2d())
 			static_cast<IHyDraw2d *>(m_ChildList[i])->SetCoordinateType(eCoordType, pCameraToCovertFrom);
 	}
 }
@@ -135,7 +125,7 @@ void IHyDraw2d::SetDisplayOrder(int32 iOrderValue)
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(m_ChildList[i]->IsInst2d())
+		if(m_ChildList[i]->IsDraw2d())
 		{
 			++iOrderValue;
 			static_cast<IHyDraw2d *>(m_ChildList[i])->SetDisplayOrder(iOrderValue);
@@ -193,20 +183,8 @@ void IHyDraw2d::ClearScissor()
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		switch(m_ChildList[i]->GetType())
-		{
-		case HYTYPE_Particles2d:
-		case HYTYPE_Sprite2d:
-		case HYTYPE_Spine2d:
-		case HYTYPE_TexturedQuad2d:
-		case HYTYPE_Primitive2d:
-		case HYTYPE_Text2d:
+		if(m_ChildList[i]->IsDraw2d())
 			static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.ClearScissorRect();
-			break;
-		case HYTYPE_Entity2d:
-			static_cast<HyEntity2d *>(m_ChildList[i])->m_RenderState.ClearScissorRect();
-			break;
-		}
 	}
 }
 
@@ -230,7 +208,7 @@ bool IHyDraw2d::IsLoaded() const
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(m_ChildList[i]->IsInst2d() && static_cast<IHyDraw2d *>(m_ChildList[i])->IsLoaded() == false)
+		if(m_ChildList[i]->IsDraw2d() && static_cast<IHyDraw2d *>(m_ChildList[i])->IsLoaded() == false)
 			return false;
 	}
 
@@ -251,7 +229,7 @@ void IHyDraw2d::Load()
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(m_ChildList[i]->IsInst2d())
+		if(m_ChildList[i]->IsDraw2d())
 			static_cast<IHyDraw2d *>(m_ChildList[i])->Load();
 	}
 }
@@ -260,16 +238,15 @@ void IHyDraw2d::Load()
 {
 	HyAssert(sm_pAssetManager, "IHyDraw2d::Unload was invoked before engine has been initialized");
 
-	sm_pAssetManager->RemoveInst(this);
-
-	m_pData = NULL;
-	m_eLoadState = HYLOADSTATE_Inactive;
-
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(m_ChildList[i]->IsInst2d())
+		if(m_ChildList[i]->IsDraw2d())
 			static_cast<IHyDraw2d *>(m_ChildList[i])->Unload();
 	}
+	
+	m_pData = NULL;
+	m_eLoadState = HYLOADSTATE_Inactive;
+	sm_pAssetManager->RemoveInst(this);
 }
 
 void IHyDraw2d::MakeBoundingVolumeDirty()
@@ -312,7 +289,7 @@ void IHyDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
-			if(m_ChildList[i]->IsInst2d())
+			if(m_ChildList[i]->IsDraw2d())
 				static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.SetScissorRect(m_RenderState.GetScissorRect());
 		}
 	}
@@ -373,7 +350,7 @@ void IHyDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
-			if(m_ChildList[i]->IsInst2d())
+			if(m_ChildList[i]->IsDraw2d())
 				static_cast<IHyDraw2d *>(m_ChildList[i])->alpha.Set(alpha.Get());
 		}
 	}
