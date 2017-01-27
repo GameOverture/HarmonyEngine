@@ -66,8 +66,8 @@ public:
 
 	static void SetInstOrderingDirty()						{ sm_bInst2dOrderingDirty = true; }
 	
-	static void AddTransformNode(IHyNode *pNode);
-	static void RemoveTransformNode(IHyNode *pNode);
+	static void AddNode(IHyNode *pNode);
+	static void RemoveNode(IHyNode *pNode);
 
 	void AddInstance(IHyDraw2d *pInst);
 	void RemoveInst(IHyDraw2d *pInst);

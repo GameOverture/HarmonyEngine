@@ -33,13 +33,10 @@ protected:
 
 	std::vector<HyTweenFloat *>		m_ActiveAnimFloatsList;
 
-	// Destructor is protected as to prevent static and stack allocations. Heap memory should be freed using IHyNode::Destroy() function
-	virtual ~IHyNode();
-
 public:
 	IHyNode(HyType eInstType);
-	void Destroy();
-
+	virtual ~IHyNode();
+	
 	HyType GetType();
 	bool IsDraw2d();
 

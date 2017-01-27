@@ -64,7 +64,6 @@ protected:
 
 	HyShaderUniforms 				m_ShaderUniforms;
 
-	virtual ~IHyDraw2d(void);
 
 public:
 	HyTweenVec3						topColor;
@@ -72,6 +71,7 @@ public:
 	HyTweenFloat					alpha;
 
 	IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName);
+	virtual ~IHyDraw2d(void);
 
 	const std::string &GetName();
 	const std::string &GetPrefix();

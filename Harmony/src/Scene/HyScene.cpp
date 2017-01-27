@@ -47,12 +47,12 @@ HyScene::~HyScene(void)
 	IHyDraw2d::sm_pAssetManager = NULL;
 }
 
-/*static*/ void HyScene::AddTransformNode(IHyNode *pNode)
+/*static*/ void HyScene::AddNode(IHyNode *pNode)
 {
 	sm_MasterList.push_back(pNode);
 }
 
-/*static*/ void HyScene::RemoveTransformNode(IHyNode *pNode)
+/*static*/ void HyScene::RemoveNode(IHyNode *pNode)
 {
 	for(std::vector<IHyNode *>::iterator it = sm_MasterList.begin(); it != sm_MasterList.end(); ++it)
 	{
