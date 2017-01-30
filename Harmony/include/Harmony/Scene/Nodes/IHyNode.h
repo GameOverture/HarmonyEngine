@@ -48,6 +48,7 @@ public:
 
 	void AddChild(IHyNode &childInst);
 	void Detach();
+	bool HasParent();
 
 protected:
 	void Update();

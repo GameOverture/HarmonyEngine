@@ -91,6 +91,11 @@ void IHyNode::Detach()
 	HyError("IHyNode::Detach() could not find itself in parent's child list");
 }
 
+bool IHyNode::HasParent()
+{
+	return m_pParent != NULL;
+}
+
 void IHyNode::Update()
 {
 	// Update any currently active AnimFloat associated with this transform, and remove any of them that are finished.
