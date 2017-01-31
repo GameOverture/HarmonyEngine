@@ -73,6 +73,25 @@ void IHyNode::AddChild(IHyNode &childInst)
 	m_ChildList.push_back(&childInst);
 }
 
+bool IHyNode::InsertChild(IHyNode &insertBefore, IHyNode &childInst)
+{
+	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
+	{
+		if((*iter) == &insertBefore)
+		{
+			m_ChildList.insert(iter, &childInst);
+			return true;
+		}
+		else if((*iter)->m_ChildList.empty() == false)
+		{
+			if((*iter)->InsertChild(insertBefore, childInst))
+				return true;
+		}
+	}
+
+	return false;
+}
+
 void IHyNode::Detach()
 {
 	if(m_pParent == NULL)

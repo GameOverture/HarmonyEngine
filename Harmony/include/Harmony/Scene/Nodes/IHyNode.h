@@ -47,6 +47,7 @@ public:
 	void SetTag(int64 iTag);
 
 	void AddChild(IHyNode &childInst);
+	bool InsertChild(IHyNode &insertBefore, IHyNode &childInst);
 	void Detach();
 	bool HasParent();
 
