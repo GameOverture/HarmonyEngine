@@ -1,14 +1,14 @@
 /**************************************************************************
- *	HyConole.h
+ *	HyConsole.h
  *	
  *	Harmony Engine
- *	Copyright (c) 2013 Jason Knobler
+ *	Copyright (c) 2017 Jason Knobler
  *
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyConole_h__
-#define __HyConole_h__
+#ifndef __HyConsole_h__
+#define __HyConsole_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -23,4 +23,4 @@ public:
 	~HyConsole();
 };
 
-#endif /*__HyConole_h__*/
+#endif /*__HyConsole_h__*/
