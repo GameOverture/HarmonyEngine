@@ -47,7 +47,7 @@ bool IHyNode::IsEnabled()
 	return m_bEnabled;
 }
 
-void IHyNode::SetEnabled(bool bEnabled)
+/*virtual*/ void IHyNode::SetEnabled(bool bEnabled)
 {
 	m_bEnabled = bEnabled;
 

@@ -41,7 +41,7 @@ public:
 	bool IsDraw2d();
 
 	bool IsEnabled();
-	void SetEnabled(bool bEnabled);
+	virtual void SetEnabled(bool bEnabled);
 
 	int64 GetTag();
 	void SetTag(int64 iTag);
