@@ -228,6 +228,9 @@
     <ClCompile Include="Renderer\Components\IHyShader.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Diagnostics\HyConsole.cpp">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -620,6 +623,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Components\IHyShader.h">
       <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\HyConsole.h">
+      <Filter>Diagnostics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
