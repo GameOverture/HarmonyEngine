@@ -228,6 +228,7 @@
     <ClCompile Include="Scene\Physics\HyDebugPhys2d.cpp">
       <Filter>Scene\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="HyConsole.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -621,5 +622,6 @@
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyDebugPhys2d.h">
       <Filter>Scene\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="HyConsole.h" />
   </ItemGroup>
 </Project>
