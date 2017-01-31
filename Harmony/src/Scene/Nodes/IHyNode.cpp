@@ -29,6 +29,7 @@ IHyNode::IHyNode(HyType eType) :	m_eTYPE(eType),
 			m_ChildList[i]->Detach();
 	}
 
+	Detach();
 	HyScene::RemoveNode(this);
 }
 
