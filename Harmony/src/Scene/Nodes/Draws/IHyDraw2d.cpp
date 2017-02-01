@@ -238,15 +238,19 @@ void IHyDraw2d::Load()
 {
 	HyAssert(sm_pAssetManager, "IHyDraw2d::Unload was invoked before engine has been initialized");
 
+	// Unload any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(m_ChildList[i]->IsDraw2d())
 			static_cast<IHyDraw2d *>(m_ChildList[i])->Unload();
 	}
 	
+	// Remove self from scene (and possibly clean up any unused gfx assets)
+	sm_pAssetManager->RemoveInst(this);
+	
+	// *THEN* clear/reset your load data members
 	m_pData = NULL;
 	m_eLoadState = HYLOADSTATE_Inactive;
-	sm_pAssetManager->RemoveInst(this);
 }
 
 void IHyDraw2d::MakeBoundingVolumeDirty()
