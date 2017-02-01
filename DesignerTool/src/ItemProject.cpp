@@ -21,6 +21,7 @@
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QDirIterator>
 
 const char *szCHECKERGRID_VERTEXSHADER = "									\n\
@@ -204,6 +205,25 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
     
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Load game data items
+    QFile dataFile(GetAssetsAbsPath() % HYGUIPATH_DataFile);
+    if(dataFile.exists())
+    {
+        if(!dataFile.open(QIODevice::ReadOnly))
+        {
+            HyGuiLog("ItemProject::ItemProject() could not open " % sNewProjectFilePath % "'s " % HYGUIPATH_DataFile % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
+            m_bHasError = true;
+            return;
+        }
+
+        QJsonDocument userDoc = QJsonDocument::fromJson(dataFile.readAll());
+        dataFile.close();
+
+        m_SaveDataObj = userDoc.object();
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     QList<eItemType> subDirList = HyGlobal::SubDirList();
     for(int i = 0; i < subDirList.size(); ++i)
     {
@@ -215,6 +235,29 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
 
         QTreeWidgetItem *pCurTreeItem = pSubDirItem->GetTreeItem();
         m_pTreeItemPtr->addChild(pCurTreeItem);
+
+        QString sSubDirName = HyGlobal::ItemName(subDirList[i]);
+        if(m_SaveDataObj.contains(sSubDirName) == false)
+            m_SaveDataObj.insert(sSubDirName, QJsonObject());
+
+        QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
+        QJsonObject::iterator iter = subDirObj.begin();
+        for(; iter != subDirObj.end(); ++iter)
+        {
+            QString sItemPath = iter.key();
+
+            QStringList sPrefixList = sItemPath.split("/");
+            bool bPrefixFound = false;
+            for(int iChildIndex = 0; iChildIndex < pCurTreeItem->childCount(); ++iChildIndex)
+            {
+                if(sPrefixList == pCurTreeItem->child(iChildIndex)->text(0))
+                {
+                    pCurTreeItem = pCurTreeItem->child(iChildIndex);
+                    asdf
+                }
+            }
+
+        }
 
         QDirIterator dirIter(sSubDirPath, QDirIterator::Subdirectories);
         while(dirIter.hasNext())
@@ -271,13 +314,13 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Load user settings into meta data
-    QFile userFile(GetMetaDataAbsPath() % "Project.user");
+    // Load user settings from meta data
+    QFile userFile(GetMetaDataAbsPath() % HYGUIPATH_MetaUserFile);
     if(userFile.exists())
     {
         if(!userFile.open(QIODevice::ReadOnly))
         {
-            HyGuiLog("ItemProject::ItemProject() could not open " % sNewProjectFilePath % "'s Project.user file for project: " % userFile.errorString(), LOGTYPE_Error);
+            HyGuiLog("ItemProject::ItemProject() could not open " % sNewProjectFilePath % "'s " % HYGUIPATH_MetaUserFile % " file for project: " % userFile.errorString(), LOGTYPE_Error);
         }
 
         QJsonDocument userDoc = QJsonDocument::fromJson(userFile.readAll());
@@ -443,12 +486,53 @@ void ItemProject::Reset()
     sm_Init.sDataDir = GetAssetsAbsPath().toStdString();
 }
 
-void ItemProject::SaveUserData()
+void ItemProject::SaveGameData(eItemType eType, QString sPath, QJsonObject itemObj)
 {
-    QFile userFile(GetMetaDataAbsPath() % "Project.user");
+    QFile userFile(GetAssetsAbsPath() % HYGUIPATH_DataFile);
     if(userFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
     {
-       HyGuiLog("Couldn't open Project.user for writing: " % userFile.errorString(), LOGTYPE_Error);
+       HyGuiLog("Couldn't open " % HYGUIPATH_DataFile % " for writing: " % userFile.errorString(), LOGTYPE_Error);
+    }
+    else
+    {
+
+        userObj.remove
+        userObj.insert("DefaultAtlasGroup", m_pAtlasMan->GetSelectedAtlasGroup());
+
+
+        // TODO:
+
+        //QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
+        //sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
+        //foreach(QString sItemPath, sListOpenItems)
+        //{
+        //    Item *pItem = ui->explorer->GetItemByPath(sItemPath);
+        //    if(pItem)
+        //        OpenItem(pItem);
+        //}
+
+
+
+
+
+        QJsonDocument userDoc;
+        userDoc.setObject(userObj);
+        qint64 iBytesWritten = userFile.write(userDoc.toJson());
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+        {
+            HyGuiLog("Could not write to " % HYGUIPATH_MetaUserFile % " file: " % userFile.errorString(), LOGTYPE_Error);
+        }
+
+        userFile.close();
+    }
+}
+
+void ItemProject::SaveUserData()
+{
+    QFile userFile(GetMetaDataAbsPath() % HYGUIPATH_MetaUserFile);
+    if(userFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+    {
+       HyGuiLog("Couldn't open " % HYGUIPATH_MetaUserFile % " for writing: " % userFile.errorString(), LOGTYPE_Error);
     }
     else
     {
@@ -476,7 +560,7 @@ void ItemProject::SaveUserData()
         qint64 iBytesWritten = userFile.write(userDoc.toJson());
         if(0 == iBytesWritten || -1 == iBytesWritten)
         {
-            HyGuiLog("Could not write to Project.user file: " % userFile.errorString(), LOGTYPE_Error);
+            HyGuiLog("Could not write to " % HYGUIPATH_MetaUserFile % " file: " % userFile.errorString(), LOGTYPE_Error);
         }
 
         userFile.close();

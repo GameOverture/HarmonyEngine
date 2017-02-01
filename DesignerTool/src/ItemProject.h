@@ -57,6 +57,7 @@ class ItemProject : public Item, public IHyApplication
 
     QAction                                         m_ActionSave;
     QAction                                         m_ActionSaveAll;
+    QJsonObject                                     m_SaveDataObj;
 
     bool                                            m_bHasError;
     
@@ -96,6 +97,7 @@ public:
     void OverrideDraw();
     void Reset();
 
+    void SaveGameData(eItemType eType, QString sPath, QJsonObject itemObj);
     void SaveUserData();
 
 private Q_SLOTS:

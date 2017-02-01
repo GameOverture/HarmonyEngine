@@ -228,7 +228,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetA
 {
 }
 
-/*virtual*/ void ItemFont::OnSave()
+/*virtual*/ QJsonObject ItemFont::OnSave()
 { 
     WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
     pWidget->SaveFontFilesToMetaDir();

@@ -88,8 +88,11 @@ enum eGuiFrameError
     NUMGUIFRAMEERROR
 };
 
+
 #define HYTREEWIDGETITEM_IsFilter               "HyTreeFilter"
 
+#define HYGUIPATH_MetaUserFile                  "Project.user"
+#define HYGUIPATH_DataFile                      "Data.json"
 #define HYGUIPATH_TempDir                       "temp/"
 #define HYGUIPATH_DataAtlases                   "atlasInfo.json"
 #define HYGUIPATH_MetaSettings                  "settings.hygui"

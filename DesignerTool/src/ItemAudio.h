@@ -34,7 +34,7 @@ protected:
     virtual void OnReLink(HyGuiFrame *pFrame);
     virtual void OnUnlink(HyGuiFrame *pFrame);
     
-    virtual void OnSave();
+    virtual QJsonObject OnSave();
 };
 
 #endif // ITEMAUDIO_H

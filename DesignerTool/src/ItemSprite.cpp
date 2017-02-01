@@ -138,7 +138,7 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef, Wid
     pCurSpriteState->RemoveFrame(pFrame);
 }
 
-/*virtual*/ void ItemSprite::OnSave()
+/*virtual*/ QJsonObject ItemSprite::OnSave()
 {
     QJsonArray spriteStateArray;
     static_cast<WidgetSprite *>(m_pWidget)->GetSaveInfo(spriteStateArray);

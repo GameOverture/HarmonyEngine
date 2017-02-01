@@ -152,7 +152,7 @@ ItemProject *ItemWidget::GetItemProject()
 
 void ItemWidget::Save()
 {
-    OnSave();
+    GetItemProject()->SaveGameData(OnSave());
     m_pUndoStack->setClean();
 }
 
