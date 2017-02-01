@@ -23,7 +23,6 @@ HySprite2d::HySprite2d(const char *szPrefix, const char *szName) :	IHyDraw2d(HYT
 	m_RenderState.SetNumVerticesPerInstance(4);
 }
 
-
 HySprite2d::~HySprite2d(void)
 {
 }
