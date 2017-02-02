@@ -41,6 +41,7 @@ public:
 private:
 	uint32				m_uiAttributeFlags;
 	uint32				m_uiTextureBindHandle;
+	float				m_fLineThickness;
 
 	int32				m_iShaderId;
 	uint32				m_uiUniformsCrc32;
@@ -83,6 +84,9 @@ public:
 
 	uint32 GetTextureHandle() const;
 	void SetTextureHandle(uint32 uiHandleId);
+
+	float GetLineThickness() const;
+	void SetLineThickness(float fParam);
 
 	bool operator==(const HyRenderState &right) const;
 	bool operator!=(const HyRenderState &right) const;

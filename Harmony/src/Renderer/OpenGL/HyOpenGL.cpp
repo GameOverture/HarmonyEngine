@@ -90,6 +90,8 @@ HyOpenGL::~HyOpenGL(void)
 		}
 	}
 
+	glLineWidth(renderState.GetLineThickness());
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	if(renderState.IsEnabled(HyRenderState::USINGSCREENCOORDS))
@@ -401,6 +403,9 @@ bool HyOpenGL::Initialize()
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Line anti-aliasing on always for now.
+	glEnable(GL_LINE_SMOOTH);
 
 	return true;
 }

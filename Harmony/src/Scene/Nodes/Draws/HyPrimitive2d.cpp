@@ -162,6 +162,16 @@ void HyPrimitive2d::SetAsEdgeChain(const glm::vec2 *pVertices, uint32 uiNumVerts
 	MakeBoundingVolumeDirty();
 }
 
+float HyPrimitive2d::GetLineThickness()
+{
+	return m_RenderState.GetLineThickness();
+}
+
+void HyPrimitive2d::SetLineThickness(float fThickness)
+{
+	m_RenderState.SetLineThickness(fThickness);
+}
+
 void HyPrimitive2d::OffsetVerts(glm::vec2 vOffset, float fAngleOffset)
 {
 	HyAssert(m_pVertices, "HyPrimitive2d::OffsetVerts() was invoked with an unset instance.");
