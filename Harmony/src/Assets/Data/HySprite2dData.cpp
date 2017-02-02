@@ -31,7 +31,12 @@ HySprite2dData::HySprite2dData(const std::string &sPath, int32 iShaderId) : IHy2
 
 /*virtual*/ HySprite2dData::~HySprite2dData(void)
 {
-	delete[] m_pAnimStates;
+	for(uint32 i = 0; i < m_uiNumStates; ++i)
+		m_pAnimStates[i].~AnimState();
+
+	unsigned char *pAnimStatesBuffer = reinterpret_cast<unsigned char *>(m_pAnimStates);
+	delete[] pAnimStatesBuffer;
+	pAnimStatesBuffer = NULL;
 }
 
 uint32 HySprite2dData::GetNumStates() const
@@ -103,7 +108,12 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 
 HySprite2dData::AnimState::~AnimState()
 {
-	delete [] m_pFrames;
+	for(uint32 i = 0; i < m_uiNUMFRAMES; ++i)
+		m_pFrames[i].~HySprite2dFrame();
+
+	unsigned char *pSpriteFramesBuffer = reinterpret_cast<unsigned char *>(m_pFrames);
+	delete[] pSpriteFramesBuffer;
+	pSpriteFramesBuffer = NULL;
 }
 
 const HySprite2dFrame &HySprite2dData::AnimState::GetFrame(uint32 uiFrameIndex)
