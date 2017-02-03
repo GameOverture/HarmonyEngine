@@ -37,6 +37,9 @@ public:
 
 	void SetAsEdgeChain(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, glm::vec2 &vOffset = glm::vec2(0.0f));
 
+	float GetLineThickness();
+	void SetLineThickness(float fThickness);
+
 	void OffsetVerts(glm::vec2 vOffset, float fAngleOffset);
 
 protected:

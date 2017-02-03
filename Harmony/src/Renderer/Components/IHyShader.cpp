@@ -442,7 +442,7 @@ void IHyShader::OnRenderThread(IHyRenderer &rendererRef, IHy2dData *pData)
 		m_uiRefCount++;
 	else
 	{
-		HyAssert(m_uiRefCount == 0, "HyAtlasGroup::OnRenderThread Tried to decrement an empty ref");
+		HyAssert(m_uiRefCount > 0, "HyAtlasGroup::OnRenderThread Tried to decrement an empty ref");
 		m_uiRefCount--;
 	}
 

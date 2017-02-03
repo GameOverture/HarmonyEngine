@@ -48,6 +48,7 @@ public:
 
 	void AddChild(IHyNode &childInst);
 	bool InsertChild(IHyNode &insertBefore, IHyNode &childInst);
+	bool HasChild(IHyNode &childInst);
 	void Detach();
 	bool HasParent();
 
