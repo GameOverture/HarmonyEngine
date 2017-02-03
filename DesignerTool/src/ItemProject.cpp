@@ -224,6 +224,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Initialize the project by processing each type of sub dir
     QList<eItemType> subDirList = HyGlobal::SubDirList();
     for(int i = 0; i < subDirList.size(); ++i)
     {
@@ -233,6 +234,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
         QString sSubDirPath = GetAssetsAbsPath() % HyGlobal::ItemName(subDirList[i]) % HyGlobal::ItemExt(subDirList[i]);
         Item *pSubDirItem = new Item(subDirList[i], sSubDirPath);
 
+        // Adding sub dir tree item
         QTreeWidgetItem *pCurTreeItem = pSubDirItem->GetTreeItem();
         m_pTreeItemPtr->addChild(pCurTreeItem);
 
@@ -240,20 +242,25 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
         if(m_SaveDataObj.contains(sSubDirName) == false)
             m_SaveDataObj.insert(sSubDirName, QJsonObject());
 
+        // Get the corresponding sub dir QJsonObject, and iterate through the objects (data items) within
         QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
-        QJsonObject::iterator iter = subDirObj.begin();
-        for(; iter != subDirObj.end(); ++iter)
+        QJsonObject::iterator objsInSubDirIter = subDirObj.begin();
+        for(; objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
         {
-            QString sItemPath = iter.key();
+            QString sItemPath = objsInSubDirIter.key();
 
-            QStringList sPrefixList = sItemPath.split("/");
-            bool bPrefixFound = false;
-            for(int iChildIndex = 0; iChildIndex < pCurTreeItem->childCount(); ++iChildIndex)
+            // Create prefix folder tree items if they don't exist, and finally adding the tree item for the data itself
+            QStringList sPathPartList = sItemPath.split("/");
+            for(int iPathPartIndex = 0; iPathPartIndex < sPathPartList.size(); ++iPathPartIndex)
             {
-                if(sPrefixList == pCurTreeItem->child(iChildIndex)->text(0))
+                bool bPrefixFound = false;
+                for(int iChildIndex = 0; iChildIndex < pCurTreeItem->childCount(); ++iChildIndex)
                 {
-                    pCurTreeItem = pCurTreeItem->child(iChildIndex);
-                    asdf
+                    if(sPathPartList == pCurTreeItem->child(iChildIndex)->text(0))
+                    {
+                        pCurTreeItem = pCurTreeItem->child(iChildIndex);
+                        asdf
+                    }
                 }
             }
 
