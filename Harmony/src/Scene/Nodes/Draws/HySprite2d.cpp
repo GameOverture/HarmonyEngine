@@ -89,6 +89,7 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 void HySprite2d::AnimSetPause(bool bPause)
 {
 	m_bIsAnimPaused = bPause;
+	m_fElapsedFrameTime = 0.0f;
 }
 
 uint32 HySprite2d::AnimGetNumStates() const
