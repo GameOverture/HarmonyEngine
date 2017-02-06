@@ -302,7 +302,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiCurAnimState];
-	while(m_fElapsedFrameTime >= frameRef.fDURATION)
+	while(m_fElapsedFrameTime >= frameRef.fDURATION && frameRef.fDURATION > 0.0f)
 	{
 		int32 iNumFrames = AnimGetNumFrames();
 		int32 iNextFrameIndex = static_cast<int32>(m_uiCurFrame);
