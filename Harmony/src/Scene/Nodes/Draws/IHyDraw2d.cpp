@@ -144,6 +144,13 @@ void IHyDraw2d::SetTint(float fR, float fG, float fB)
 	botColor.Set(fR, fG, fB);
 }
 
+void IHyDraw2d::SetTint(uint32 uiColor)
+{
+	SetTint(((uiColor >> 16) & 0xFF) / 255.0f,
+			((uiColor >> 8) & 0xFF) / 255.0f,
+			(uiColor & 0xFF) / 255.0f);
+}
+
 void IHyDraw2d::EnableMouseInput(bool bEnable, void *pUserParam /*= NULL*/)
 {
 	if(bEnable)
