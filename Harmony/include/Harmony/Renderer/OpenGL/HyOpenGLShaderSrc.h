@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const char * const szHYQUADBATCH_VERTEXSHADER = R"src(
 #version 130
 
@@ -30,8 +31,8 @@ const char * const szHYQUADBATCH_VERTEXSHADER = R"src(
 /*smooth*/ out vec4 interpColor;
 /*flat*/ out float texIndex;
 
-uniform mat4 mtxCameraToClip;
-uniform mat4 mtxWorldToCamera;
+uniform mat4 u_mtxCameraToClip;
+uniform mat4 u_mtxWorldToCamera;
 
 /*const*/ vec2 position[] = vec2[4](vec2(1.0f, 1.0f),
 									vec2(0.0f, 1.0f),
@@ -75,11 +76,11 @@ void main()
 					0.0, 1.0);
 
 	pos = mtxLocalToWorld * pos;
-	pos = mtxWorldToCamera * pos;
-	gl_Position = mtxCameraToClip * pos;
+	pos = u_mtxWorldToCamera * pos;
+	gl_Position = u_mtxCameraToClip * pos;
 }
 )src";
-
+//////////////////////////////////////////////////////////////////////////
 const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(
 #version 130
 #extension GL_EXT_texture_array : enable
@@ -101,37 +102,78 @@ void main()
 }
 )src";
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const char * const szHYPRIMATIVE_VERTEXSHADER = R"src(
 #version 130
 
-/*layout(location = 0)*/ in vec4 position;
+/*layout(location = 0)*/ in vec2 a_vPosition;
 
-out vec4 Color;
-
-uniform mat4 transformMtx;
-uniform mat4 mtxCameraToClip;
-uniform mat4 mtxWorldToCamera;
-uniform vec4 primitiveColor;
+uniform mat4 u_mtxTransform;
+uniform mat4 u_mtxWorldToCamera;
+uniform mat4 u_mtxCameraToClip;
+uniform vec4 u_vColor;
 
 void main()
 {
-	Color = primitiveColor;
-
-	vec4 temp = transformMtx * position;
-	temp = mtxWorldToCamera * temp;
-	gl_Position = mtxCameraToClip * temp;
+	vec4 temp = u_mtxTransform * vec4(a_vPosition, 0, 1);
+	temp = u_mtxWorldToCamera * temp;
+	gl_Position = u_mtxCameraToClip * temp;
 }
 )src";
-
+//////////////////////////////////////////////////////////////////////////
 const char * const szHYPRIMATIVE_FRAGMENTSHADER = R"src(
 #version 130
 
-in vec4 Color;
 out vec4 FragColor;
+
+uniform vec4 u_vColor;
 
 void main()
 {
-	FragColor = Color;
+	FragColor = u_vColor;
+}
+)src";
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const char * const szHYLINES2D_VERTEXSHADER = R"src(
+#version 130
+
+in vec2 a_vPosition;
+in vec2 a_vNormal;
+
+out vec2 o_vNormal;
+
+uniform float u_fLineWidth;
+uniform vec4 u_vColor;
+uniform mat4 u_mtxTransform;
+uniform mat4 u_mtxWorldToCamera;
+uniform mat4 u_mtxCameraToClip;
+
+void main()
+{
+	o_vNormal = a_vNormal;
+
+	vec4 vDelta = vec4(a_vNormal * u_fLineWidth, 0, 0);
+
+	vec4 vPos = u_mtxTransform * vec4(a_vPosition, 0, 1);
+	vPos = u_mtxWorldToCamera * vPos;
+
+	gl_Position = u_mtxCameraToClip * (vPos + vDelta);
+}
+)src";
+//////////////////////////////////////////////////////////////////////////
+const char * const szHYLINES2D_FRAGMENTSHADER = R"src(
+#version 130
+
+in vec2 a_vNormal;
+
+out vec4 o_FragColor;
+
+uniform vec4 u_vColor;
+
+void main()
+{
+	o_FragColor = u_vColor;
 }
 )src";
 
