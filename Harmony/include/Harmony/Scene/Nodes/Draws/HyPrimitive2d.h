@@ -19,16 +19,13 @@ class HyAtlasGroupData;
 class HyPrimitive2d : public IHyDraw2d
 {
 protected:
-	glm::vec2 *		m_pVertices;
+	glm::vec2 *		m_pDrawBuffer;
 
 public:
 	HyPrimitive2d();
 	virtual ~HyPrimitive2d(void);
 
 	const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p);
-
-	uint32 GetNumVerts()			{ return m_RenderState.GetNumVerticesPerInstance(); }
-	glm::vec2 *GetVertexDataPtr()	{ return m_pVertices; }
 
 	void SetAsQuad(int iWidth, int iHeight, bool bWireframe);
 	void SetAsQuad(float fWidth, float fHeight, bool bWireframe);

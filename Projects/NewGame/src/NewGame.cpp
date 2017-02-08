@@ -70,7 +70,7 @@ glm::vec2 textBoxSize;
 	//m_TestText.Load();
 	m_TestText.TextSetAlignment(HYALIGN_Right);
 	m_TestText.TextSetState(1);
-	m_TestText.TextSet("Oh my goodness, oh me damn. Oh my goodness, they going ham.");
+	m_TestText.TextSet("Oh my goodness, oh my damn. Oh my goodness, they going ham.");
 	m_TestText.SetAsColumn(textBoxSize.x);
 	m_TestText.pos.Set(0.0f, -100.0f);
 	//m_TestText.rot.Set(45.0f);
@@ -94,12 +94,12 @@ glm::vec2 textBoxSize;
 	m_HorzLine.Load();
 
 	vLinePts.clear();
-	vLinePts.push_back(glm::vec2(0.0f, -2048.0f));
-	vLinePts.push_back(glm::vec2(0.0, 2048.0f));
+	vLinePts.push_back(glm::vec2(200.0f, -2048.0f));
+	vLinePts.push_back(glm::vec2(200.0, 2048.0f));
 
 	m_VertLine.SetAsLineChain(vLinePts);
-	m_VertLine.SetTint(1.0f, 0.0f, 0.0f);
-	m_VertLine.Load();
+	m_VertLine.SetTint(1.0f, 1.0f, 0.0f);
+	//m_VertLine.Load();
 
 	IHyShader *pShader_Checkerboard = IHyRenderer::MakeCustomShader();
 	pShader_Checkerboard->SetSourceCode(szCUSTOM_VERTEXSHADER, HYSHADER_Vertex);

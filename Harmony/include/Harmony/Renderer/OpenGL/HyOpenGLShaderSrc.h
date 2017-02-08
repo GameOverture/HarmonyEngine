@@ -125,13 +125,13 @@ void main()
 const char * const szHYPRIMATIVE_FRAGMENTSHADER = R"src(
 #version 130
 
-out vec4 FragColor;
+out vec4 vFragColorOut;
 
 uniform vec4 u_vColor;
 
 void main()
 {
-	FragColor = u_vColor;
+	vFragColorOut = u_vColor;
 }
 )src";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ const char * const szHYLINES2D_VERTEXSHADER = R"src(
 in vec2 a_vPosition;
 in vec2 a_vNormal;
 
-out vec2 o_vNormal;
+out vec2 vNormalOut;
 
 uniform float u_fLineWidth;
 uniform vec4 u_vColor;
@@ -152,7 +152,7 @@ uniform mat4 u_mtxCameraToClip;
 
 void main()
 {
-	o_vNormal = a_vNormal;
+	vNormalOut = a_vNormal;
 
 	vec4 vDelta = vec4(a_vNormal * u_fLineWidth, 0, 0);
 
@@ -168,13 +168,13 @@ const char * const szHYLINES2D_FRAGMENTSHADER = R"src(
 
 in vec2 a_vNormal;
 
-out vec4 o_FragColor;
+out vec4 vFragColorOut;
 
 uniform vec4 u_vColor;
 
 void main()
 {
-	o_FragColor = u_vColor;
+	vFragColorOut = u_vColor;
 }
 )src";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

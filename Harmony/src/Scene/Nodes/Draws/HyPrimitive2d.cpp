@@ -13,7 +13,7 @@
 #include "Utilities/HyMath.h"
 
 HyPrimitive2d::HyPrimitive2d() :	IHyDraw2d(HYTYPE_Primitive2d, nullptr, nullptr),
-									m_pVertices(nullptr)
+									m_pDrawBuffer(nullptr)
 {
 	ClearData();
 }
@@ -32,8 +32,8 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 	ClearData();
 	if(m_RenderState.GetNumVerticesPerInstance() != 0)
 	{
-		m_pVertices = HY_NEW glm::vec2[m_RenderState.GetNumVerticesPerInstance()];
-		memcpy(m_pVertices, p.m_pVertices, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec2));
+		m_pDrawBuffer = HY_NEW glm::vec2[m_RenderState.GetNumVerticesPerInstance()];
+		memcpy(m_pDrawBuffer, p.m_pDrawBuffer, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec2));
 	}
 
 	MakeBoundingVolumeDirty();
@@ -64,26 +64,26 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe)
 	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
 	m_RenderState.SetNumVerticesPerInstance(4);
 
-	m_pVertices = HY_NEW glm::vec2[4];
+	m_pDrawBuffer = HY_NEW glm::vec2[4];
 
-	m_pVertices[0].x = 0.0f;
-	m_pVertices[0].y = 0.0f;
-	m_pVertices[1].x = fWidth;
-	m_pVertices[1].y = 0.0f;
+	m_pDrawBuffer[0].x = 0.0f;
+	m_pDrawBuffer[0].y = 0.0f;
+	m_pDrawBuffer[1].x = fWidth;
+	m_pDrawBuffer[1].y = 0.0f;
 
 	if(bWireframe)
 	{
-		m_pVertices[2].x = fWidth;
-		m_pVertices[2].y = fHeight;
-		m_pVertices[3].x = 0.0f;
-		m_pVertices[3].y = fHeight;
+		m_pDrawBuffer[2].x = fWidth;
+		m_pDrawBuffer[2].y = fHeight;
+		m_pDrawBuffer[3].x = 0.0f;
+		m_pDrawBuffer[3].y = fHeight;
 	}
 	else
 	{
-		m_pVertices[2].x = 0.0f;
-		m_pVertices[2].y = fHeight;
-		m_pVertices[3].x = fWidth;
-		m_pVertices[3].y = fHeight;
+		m_pDrawBuffer[2].x = 0.0f;
+		m_pDrawBuffer[2].y = fHeight;
+		m_pDrawBuffer[3].x = fWidth;
+		m_pDrawBuffer[3].y = fHeight;
 	}
 
 	MakeBoundingVolumeDirty();
@@ -100,7 +100,7 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 
 	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
 	m_RenderState.SetNumVerticesPerInstance(iNumSegments);
-	m_pVertices = HY_NEW glm::vec2[iNumSegments];
+	m_pDrawBuffer = HY_NEW glm::vec2[iNumSegments];
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
 		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
@@ -112,8 +112,8 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	{
 		t = 2.0f * HY_PI * static_cast<float>(n) / static_cast<float>(m_RenderState.GetNumVerticesPerInstance());
 
-		m_pVertices[n].x = (sin(t) * fRadius);
-		m_pVertices[n].y = (cos(t) * fRadius);
+		m_pDrawBuffer[n].x = (sin(t) * fRadius);
+		m_pDrawBuffer[n].y = (cos(t) * fRadius);
 	}
 
 	MakeBoundingVolumeDirty();
@@ -130,7 +130,7 @@ void HyPrimitive2d::SetAsLineChain(std::vector<glm::vec2> &vertexList)
 	m_RenderState.SetNumInstances(static_cast<uint32>(vertexList.size()) - 1);
 	m_RenderState.SetNumVerticesPerInstance(8);				// 8 vertices per instance because of '2' duplicate vertex positions and normals on each end of line segment
 	
-	m_pVertices = HY_NEW glm::vec2[vertexList.size() * 4];	// size*4 = Each vertex of segment has '2' duplicate vertex positions that are offset by '2' corresponding normals within vertex shader 
+	m_pDrawBuffer = HY_NEW glm::vec2[vertexList.size() * 4];	// size*4 = Each vertex of segment has '2' duplicate vertex positions that are offset by '2' corresponding normals within vertex shader 
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
 		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
@@ -141,15 +141,15 @@ void HyPrimitive2d::SetAsLineChain(std::vector<glm::vec2> &vertexList)
 	{
 		glm::vec2 vVecDirection = vertexList[i + 1] - vertexList[i + 0];
 
-		/*postion 1    */ m_pVertices[j + 0] = vertexList[i + 0] * fCoordMod;
-		/*Normal  1    */ m_pVertices[j + 1] = glm::normalize(glm::vec2(-vVecDirection.y, vVecDirection.x));
-		/*postion 1 dup*/ m_pVertices[j + 2] = m_pVertices[j + 0];
-		/*Normal  1 inv*/ m_pVertices[j + 3] = m_pVertices[j + 1] * -1.0f;
+		/*postion 1    */ m_pDrawBuffer[j + 0] = vertexList[i + 0] * fCoordMod;
+		/*Normal  1    */ m_pDrawBuffer[j + 1] = glm::normalize(glm::vec2(-vVecDirection.y, vVecDirection.x));
+		/*postion 1 dup*/ m_pDrawBuffer[j + 2] = m_pDrawBuffer[j + 0];
+		/*Normal  1 inv*/ m_pDrawBuffer[j + 3] = m_pDrawBuffer[j + 1] * -1.0f;
 
-		/*postion 2    */ m_pVertices[j + 4] = vertexList[i + 1] * fCoordMod;
-		/*Normal  2    */ m_pVertices[j + 5] = glm::normalize(glm::vec2(vVecDirection.y, -vVecDirection.x));
-		/*postion 2 dup*/ m_pVertices[j + 6] = m_pVertices[j + 4];
-		/*Normal  2 inv*/ m_pVertices[j + 7] = m_pVertices[j + 5] * -1.0f;
+		/*postion 2    */ m_pDrawBuffer[j + 4] = vertexList[i + 1] * fCoordMod;
+		/*Normal  2    */ m_pDrawBuffer[j + 5] = glm::normalize(glm::vec2(vVecDirection.y, -vVecDirection.x));
+		/*postion 2 dup*/ m_pDrawBuffer[j + 6] = m_pDrawBuffer[j + 4];
+		/*Normal  2 inv*/ m_pDrawBuffer[j + 7] = m_pDrawBuffer[j + 5] * -1.0f;
 	}
 
 	MakeBoundingVolumeDirty();
@@ -167,8 +167,8 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 
 void HyPrimitive2d::ClearData()
 {
-	delete [] m_pVertices;
-	m_pVertices = nullptr;
+	delete [] m_pDrawBuffer;
+	m_pDrawBuffer = nullptr;
 	m_RenderState.SetNumVerticesPerInstance(0);
 	m_RenderState.SetNumInstances(1);
 	m_RenderState.Disable(HyRenderState::DRAWMODEMASK);
@@ -188,17 +188,17 @@ void HyPrimitive2d::ClearData()
 		return;
 	}
 
-	vLowerBounds.x = m_pVertices[0].x;
-	vLowerBounds.y = m_pVertices[0].y;
-	vUpperBounds.x = m_pVertices[0].x;
-	vUpperBounds.y = m_pVertices[0].y;
+	vLowerBounds.x = m_pDrawBuffer[0].x;
+	vLowerBounds.y = m_pDrawBuffer[0].y;
+	vUpperBounds.x = m_pDrawBuffer[0].x;
+	vUpperBounds.y = m_pDrawBuffer[0].y;
 
 	for(uint32 i = 1; i < uiNumVerts; ++i)
 	{
-		vLowerBounds.x = HyMin(m_pVertices[i].x, vLowerBounds.x);
-		vLowerBounds.y = HyMin(m_pVertices[i].y, vLowerBounds.y);
-		vUpperBounds.x = HyMax(m_pVertices[i].x, vUpperBounds.x);
-		vUpperBounds.y = HyMax(m_pVertices[i].y, vUpperBounds.y);
+		vLowerBounds.x = HyMin(m_pDrawBuffer[i].x, vLowerBounds.x);
+		vLowerBounds.y = HyMin(m_pDrawBuffer[i].y, vLowerBounds.y);
+		vUpperBounds.x = HyMax(m_pDrawBuffer[i].x, vUpperBounds.x);
+		vUpperBounds.y = HyMax(m_pDrawBuffer[i].y, vUpperBounds.y);
 	}
 
 	m_BoundingVolume.SetLocalAABB(vLowerBounds, vUpperBounds);
@@ -209,6 +209,7 @@ void HyPrimitive2d::ClearData()
 	glm::mat4 mtx;
 	GetWorldTransform(mtx);
 
+	// TODO: Get rid of top/bot color
 	glm::vec4 vTop;
 	vTop.x = topColor.X();
 	vTop.y = topColor.Y();
@@ -227,6 +228,6 @@ void HyPrimitive2d::ClearData()
 
 /*virtual*/ void HyPrimitive2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-	memcpy(pRefDataWritePos, m_pVertices, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec2));
+	memcpy(pRefDataWritePos, m_pDrawBuffer, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec2));
 	pRefDataWritePos += m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec2);
 }
