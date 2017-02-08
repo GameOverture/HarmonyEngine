@@ -14,6 +14,7 @@
 #include "HyGuiRenderer.h"
 
 #include <QQueue>
+#include <QJsonObject>
 
 // Forward declaration
 class WidgetAtlasManager;

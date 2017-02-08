@@ -65,5 +65,6 @@ ItemAudio::ItemAudio(const QString sPath, WidgetAtlasManager &atlasManRef, Widge
 
 /*virtual*/ QJsonObject ItemAudio::OnSave()
 {
+    return QJsonObject();
 }
 
