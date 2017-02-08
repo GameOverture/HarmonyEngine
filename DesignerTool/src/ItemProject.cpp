@@ -26,8 +26,8 @@
 const char * const szCHECKERGRID_VERTEXSHADER = R"src(
 #version 400
 
-layout(location = 0) in vec4 position;
-layout(location = 1) in vec2 UVcoord;
+/*layout(location = 0)*/ in vec2 position;
+/*layout(location = 1)*/ in vec2 UVcoord;
 
 smooth out vec2 interpUV;
 
@@ -40,7 +40,7 @@ void main()
     interpUV.x = UVcoord.x;
     interpUV.y = UVcoord.y;
 
-    vec4 temp = transformMtx * position;
+    vec4 temp = transformMtx * vec4(position, 0, 1);
     temp = u_mtxWorldToCamera * temp;
     gl_Position = u_mtxCameraToClip * temp;
 }
@@ -333,14 +333,14 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 {
     IHyShader *pShader_CheckerGrid = IHyRenderer::MakeCustomShader();
     pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
-    pShader_CheckerGrid->SetVertexAttribute("position", HYSHADERVAR_vec4);
+    pShader_CheckerGrid->SetVertexAttribute("position", HYSHADERVAR_vec2);
     pShader_CheckerGrid->SetVertexAttribute("UVcoord", HYSHADERVAR_vec2);
     pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
     pShader_CheckerGrid->Finalize(HYSHADERPROG_Primitive);
 
-    m_CheckerGridBG.SetCustomShader(pShader_CheckerGrid);
     m_CheckerGridBG.SetDisplayOrder(-1000);
     m_CheckerGridBG.SetSurfaceSize(10000, 10000);  // Use a large size that is a multiple of grid size (25)
+    m_CheckerGridBG.SetCustomShader(pShader_CheckerGrid);
     m_CheckerGridBG.Load();
 
     m_pCamera = Window().CreateCamera2d();
