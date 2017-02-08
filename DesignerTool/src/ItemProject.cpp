@@ -23,45 +23,47 @@
 #include <QJsonObject>
 #include <QDirIterator>
 
-const char *szCHECKERGRID_VERTEXSHADER = "									\n\
-#version 400																\n\
-                                                                            \n\
-layout(location = 0) in vec4 position;										\n\
-layout(location = 1) in vec2 UVcoord;										\n\
-                                                                            \n\
-smooth out vec2 interpUV;													\n\
-                                                                            \n\
-uniform mat4 transformMtx;													\n\
-uniform mat4 mtxWorldToCamera;												\n\
-uniform mat4 mtxCameraToClip;												\n\
-                                                                            \n\
-void main()																	\n\
-{																			\n\
-    interpUV.x = UVcoord.x;                                                 \n\
-    interpUV.y = UVcoord.y;                                                 \n\
-                                                                            \n\
-    vec4 temp = transformMtx * position;									\n\
-    temp = mtxWorldToCamera * temp;											\n\
-    gl_Position = mtxCameraToClip * temp;									\n\
-}";
+const char * const szCHECKERGRID_VERTEXSHADER = R"src(
+#version 400
+
+layout(location = 0) in vec4 position;
+layout(location = 1) in vec2 UVcoord;
+
+smooth out vec2 interpUV;
+
+uniform mat4 transformMtx;
+uniform mat4 u_mtxWorldToCamera;
+uniform mat4 u_mtxCameraToClip;
+
+void main()
+{
+    interpUV.x = UVcoord.x;
+    interpUV.y = UVcoord.y;
+
+    vec4 temp = transformMtx * position;
+    temp = u_mtxWorldToCamera * temp;
+    gl_Position = u_mtxCameraToClip * temp;
+}
+)src";
 
 
-const char *szCHECKERGRID_FRAGMENTSHADER = "        								\n\
-#version 400																		\n\
-                                                                                    \n\
-in vec2 interpUV;																	\n\
-out vec4 FragColor;																	\n\
-                                                                                    \n\
-uniform float uGridSize;															\n\
-uniform vec2 uResolution;															\n\
-uniform vec4 gridColor1;															\n\
-uniform vec4 gridColor2;															\n\
-                                                                                    \n\
-void main()																			\n\
-{																					\n\
-    vec2 screenCoords = (interpUV.xy * (uResolution /** 0.5f*/)) / uGridSize;		\n\
-    FragColor = mix(gridColor1, gridColor2, step((float(int(floor(screenCoords.x) + floor(screenCoords.y)) & 1)), 0.9));		\n\
-}";
+const char *const szCHECKERGRID_FRAGMENTSHADER = R"src(
+#version 400
+
+in vec2 interpUV;
+out vec4 FragColor;
+
+uniform float uGridSize;
+uniform vec2 uResolution;
+uniform vec4 gridColor1;
+uniform vec4 gridColor2;
+
+void main()
+{
+    vec2 screenCoords = (interpUV.xy * (uResolution /** 0.5f*/)) / uGridSize;
+    FragColor = mix(gridColor1, gridColor2, step((float(int(floor(screenCoords.x) + floor(screenCoords.y)) & 1)), 0.9));
+}
+)src";
 
 CheckerGrid::CheckerGrid()
 {
@@ -97,8 +99,8 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 
     for(int i = 0; i < 4; ++i)
     {
-        *reinterpret_cast<glm::vec4 *>(pRefDataWritePos) = m_pVertices[i];
-        pRefDataWritePos += sizeof(glm::vec4);
+        *reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pDrawBuffer[i];
+        pRefDataWritePos += sizeof(glm::vec2);
 
         glm::vec2 vUV;
         switch(i)

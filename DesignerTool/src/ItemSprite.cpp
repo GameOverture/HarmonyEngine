@@ -18,19 +18,19 @@
 
 ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Sprite, sPath, atlasManRef, audioManRef)
 {
-    glm::vec2 vLinePts[2];
+    std::vector<glm::vec2> lineList(2, glm::vec2());
     
-    vLinePts[0].x = -2048.0f;
-    vLinePts[0].y = 0.0f;
-    vLinePts[1].x = 2048.0f;
-    vLinePts[1].y = 0.0f;
-    m_primOriginHorz.SetAsEdgeChain(vLinePts, 2, false);
+    lineList[0].x = -2048.0f;
+    lineList[0].y = 0.0f;
+    lineList[1].x = 2048.0f;
+    lineList[1].y = 0.0f;
+    m_primOriginHorz.SetAsLineChain(lineList);
     
-    vLinePts[0].x = 0.0f;
-    vLinePts[0].y = -2048.0f;
-    vLinePts[1].x = 0.0f;
-    vLinePts[1].y = 2048.0f;
-    m_primOriginVert.SetAsEdgeChain(vLinePts, 2, false);
+    lineList[0].x = 0.0f;
+    lineList[0].y = -2048.0f;
+    lineList[1].x = 0.0f;
+    lineList[1].y = 2048.0f;
+    m_primOriginVert.SetAsLineChain(lineList);
     
     m_primOriginHorz.SetTint(1.0f, 0.0f, 0.0f);
     m_primOriginVert.SetTint(1.0f, 0.0f, 0.0f);
