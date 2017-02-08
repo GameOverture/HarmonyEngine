@@ -338,9 +338,9 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
     pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
     pShader_CheckerGrid->Finalize(HYSHADERPROG_Primitive);
 
+    m_CheckerGridBG.SetCustomShader(pShader_CheckerGrid);
     m_CheckerGridBG.SetDisplayOrder(-1000);
     m_CheckerGridBG.SetSurfaceSize(10000, 10000);  // Use a large size that is a multiple of grid size (25)
-    m_CheckerGridBG.SetCustomShader(pShader_CheckerGrid);
     m_CheckerGridBG.Load();
 
     m_pCamera = Window().CreateCamera2d();

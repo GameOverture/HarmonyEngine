@@ -129,7 +129,9 @@ int32 HyRenderState::GetShaderId() const
 
 void HyRenderState::SetShaderId(int32 iId)
 {
-	m_iShaderId = iId;
+	// Don't overwrite the shader Id if a custom one is already set, and this new 'iId' is a built in shader
+	if(m_iShaderId < HYSHADERPROG_CustomStartIndex || iId >= HYSHADERPROG_CustomStartIndex)
+		m_iShaderId = iId;
 }
 
 void HyRenderState::SetUniformCrc32(uint32 uiCrc32)

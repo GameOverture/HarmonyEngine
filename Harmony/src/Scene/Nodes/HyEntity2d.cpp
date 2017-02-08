@@ -11,10 +11,14 @@
 
 HyEntity2d::HyEntity2d() :	IHyDraw2d(HYTYPE_Entity2d, NULL, NULL)
 {
+	// TODO: Check IsLoaded with multiple hyentity's in a hierarchy
+	m_eLoadState = HYLOADSTATE_Loaded;
 }
 
 HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName) :	IHyDraw2d(HYTYPE_Entity2d, szPrefix, szName)
 {
+	// TODO: Check IsLoaded with multiple hyentity's in a hierarchy
+	m_eLoadState = HYLOADSTATE_Loaded;
 }
 
 HyEntity2d::~HyEntity2d(void)
