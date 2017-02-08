@@ -20,6 +20,7 @@ class HyPrimitive2d : public IHyDraw2d
 {
 protected:
 	glm::vec2 *		m_pDrawBuffer;
+	uint32			m_uiBufferSize;
 
 public:
 	HyPrimitive2d();

@@ -61,6 +61,7 @@ void HyShaderUniforms::Set(const char *szName, const glm::vec2 &v)
 		new (newUniform.GetData()) glm::vec2(v);
 
 		m_UniformList.push_back(newUniform);
+		m_bDirty = true;
 	}
 	else
 	{
@@ -90,6 +91,7 @@ void HyShaderUniforms::Set(const char *szName, const glm::vec3 &v)
 		new (newUniform.GetData()) glm::vec3(v);
 
 		m_UniformList.push_back(newUniform);
+		m_bDirty = true;
 	}
 	else
 	{
@@ -114,6 +116,7 @@ void HyShaderUniforms::Set(const char *szName, const glm::vec4 &v)
 		new (newUniform.GetData()) glm::vec4(v);
 
 		m_UniformList.push_back(newUniform);
+		m_bDirty = true;
 	}
 	else
 	{
@@ -138,6 +141,7 @@ void HyShaderUniforms::Set(const char *szName, const glm::mat4 &m)
 		new (newUniform.GetData()) glm::mat4(m);
 
 		m_UniformList.push_back(newUniform);
+		m_bDirty = true;
 	}
 	else
 	{
@@ -162,6 +166,7 @@ void HyShaderUniforms::Set(const char *szName, const glm::mat3 &m)
 		new (newUniform.GetData()) glm::mat3(m);
 
 		m_UniformList.push_back(newUniform);
+		m_bDirty = true;
 	}
 	else
 	{
@@ -186,6 +191,7 @@ void HyShaderUniforms::Set(const char *szName, float fVal)
 		new (newUniform.GetData()) float(fVal);
 
 		m_UniformList.push_back(newUniform);
+		m_bDirty = true;
 	}
 	else
 	{
@@ -210,6 +216,7 @@ void HyShaderUniforms::Set(const char *szName, int32 iVal)
 		new (newUniform.GetData()) int32(iVal);
 
 		m_UniformList.push_back(newUniform);
+		m_bDirty = true;
 	}
 	else
 	{
@@ -234,6 +241,7 @@ void HyShaderUniforms::Set(const char *szName, uint32 uiVal)
 		new (newUniform.GetData()) uint32(uiVal);
 
 		m_UniformList.push_back(newUniform);
+		m_bDirty = true;
 	}
 	else
 	{
@@ -258,6 +266,7 @@ void HyShaderUniforms::Set(const char *szName, bool bVal)
 		new (newUniform.GetData()) bool(bVal);
 
 		m_UniformList.push_back(newUniform);
+		m_bDirty = true;
 	}
 	else
 	{
@@ -314,6 +323,12 @@ void HyShaderUniforms::WriteUniformsBufferData(char *&pRefDataWritePos)
 	}
 }
 
+void HyShaderUniforms::Clear()
+{
+	m_UniformList.clear();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 IHyShader::IHyShader(int32 iId) :	m_iID(iId),
