@@ -233,7 +233,10 @@ void HyPrimitive2d::ClearData()
 	m_ShaderUniforms.Set("u_vColor", vTop);
 
 	if(m_RenderState.GetShaderId() == HYSHADERPROG_Lines2d)
+	{
 		m_ShaderUniforms.Set("u_fHalfWidth", m_RenderState.GetLineThickness() * 0.5f);
+		m_ShaderUniforms.Set("u_fFeatherAmt", 2.0f);	// Feather amount is how much anti-aliasing to apply. Greater values will make line fuzzier
+	}
 }
 
 /*virtual*/ void HyPrimitive2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
