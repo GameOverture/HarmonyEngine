@@ -78,7 +78,7 @@ public:
 	bool IsEnabled(eAttributes eAttrib);
 	uint32 GetAttributeBitFlags() const;
 
-	int32 GetShaderId();
+	int32 GetShaderId() const;
 	void SetShaderId(int32 iId);
 	void SetUniformCrc32(uint32 uiCrc32);
 

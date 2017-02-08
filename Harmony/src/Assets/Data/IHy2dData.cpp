@@ -62,17 +62,19 @@ const std::set<IHyShader *> &IHy2dData::GetAssociatedShaders()
 	return m_AssociatedShaders;
 }
 
-
 /*virtual*/ void IHy2dData::OnLoadThread()
 {
-	IHyShader *pShader = IHyRenderer::FindShader(m_iSHADER_ID);
-	HyAssert(pShader, "IHy2dData::OnLoadThread could not find a valid shader");
+	if(m_iSHADER_ID != -1)
+	{
+		IHyShader *pShader = IHyRenderer::FindShader(m_iSHADER_ID);
+		HyAssert(pShader, "IHy2dData::OnLoadThread could not find a valid shader");
 
-	pShader->OnLoadThread();
-	HyAssert(pShader->IsFinalized(), "IHy2dData::OnLoadThread processed an non-finalized shader");
+		pShader->OnLoadThread();
+		HyAssert(pShader->IsFinalized(), "IHy2dData::OnLoadThread processed an non-finalized shader");
 
-	if(m_iSHADER_ID < 0 || m_iSHADER_ID >= HYSHADERPROG_CustomStartIndex)
-		m_AssociatedShaders.insert(pShader);
+		if(m_iSHADER_ID < 0 || m_iSHADER_ID >= HYSHADERPROG_CustomStartIndex)
+			m_AssociatedShaders.insert(pShader);
+	}
 
 	IHyData::OnLoadThread();
 }

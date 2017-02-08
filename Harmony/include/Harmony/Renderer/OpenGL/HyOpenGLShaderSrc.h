@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// QUADBATCH
 const char * const szHYQUADBATCH_VERTEXSHADER = R"src(
 #version 130
 
@@ -31,8 +32,8 @@ const char * const szHYQUADBATCH_VERTEXSHADER = R"src(
 /*smooth*/ out vec4 interpColor;
 /*flat*/ out float texIndex;
 
-uniform mat4 u_mtxCameraToClip;
 uniform mat4 u_mtxWorldToCamera;
+uniform mat4 u_mtxCameraToClip;
 
 /*const*/ vec2 position[] = vec2[4](vec2(1.0f, 1.0f),
 									vec2(0.0f, 1.0f),
@@ -80,7 +81,7 @@ void main()
 	gl_Position = u_mtxCameraToClip * pos;
 }
 )src";
-//////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(
 #version 130
 #extension GL_EXT_texture_array : enable
@@ -101,8 +102,8 @@ void main()
 	outputColor = interpColor * texelClr;
 }
 )src";
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// PRIMITIVE
 const char * const szHYPRIMATIVE_VERTEXSHADER = R"src(
 #version 130
 
@@ -120,7 +121,7 @@ void main()
 	gl_Position = u_mtxCameraToClip * temp;
 }
 )src";
-//////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYPRIMATIVE_FRAGMENTSHADER = R"src(
 #version 130
 
@@ -133,8 +134,8 @@ void main()
 	FragColor = u_vColor;
 }
 )src";
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// LINES2D
 const char * const szHYLINES2D_VERTEXSHADER = R"src(
 #version 130
 
@@ -161,7 +162,7 @@ void main()
 	gl_Position = u_mtxCameraToClip * (vPos + vDelta);
 }
 )src";
-//////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYLINES2D_FRAGMENTSHADER = R"src(
 #version 130
 
@@ -176,5 +177,6 @@ void main()
 	o_FragColor = u_vColor;
 }
 )src";
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif __HyOpenGLShaderSrc_h__

@@ -127,7 +127,7 @@ void HyPrimitive2d::SetAsLineChain(std::vector<glm::vec2> &vertexList)
 
 	m_RenderState.SetShaderId(HYSHADERPROG_Lines2d);
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP);
-	m_RenderState.SetNumInstances(vertexList.size() - 1);
+	m_RenderState.SetNumInstances(static_cast<uint32>(vertexList.size()) - 1);
 	m_RenderState.SetNumVerticesPerInstance(8);				// 8 vertices per instance because of '2' duplicate vertex positions and normals on each end of line segment
 	
 	m_pVertices = HY_NEW glm::vec2[vertexList.size() * 4];	// size*4 = Each vertex of segment has '2' duplicate vertex positions that are offset by '2' corresponding normals within vertex shader 
@@ -227,6 +227,6 @@ void HyPrimitive2d::ClearData()
 
 /*virtual*/ void HyPrimitive2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-	memcpy(pRefDataWritePos, m_pVertices, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec4));
-	pRefDataWritePos += m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec4);
+	memcpy(pRefDataWritePos, m_pVertices, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec2));
+	pRefDataWritePos += m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec2);
 }

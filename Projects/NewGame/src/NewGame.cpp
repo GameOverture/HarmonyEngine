@@ -16,22 +16,21 @@ NewGame::~NewGame()
 const char *szCUSTOM_VERTEXSHADER = "									\n\
 #version 130																\n\
 																			\n\
-/*layout(location = 0)*/ in vec4 position;										\n\
+/*layout(location = 0)*/ in vec2 position;										\n\
 																			\n\
 out vec2 coordinate;															\n\
 																			\n\
-uniform mat4 transformMtx;													\n\
-uniform mat4 mtxWorldToCamera;												\n\
-uniform mat4 mtxCameraToClip;												\n\
+uniform mat4 u_mtxTransform;													\n\
+uniform mat4 u_mtxWorldToCamera;												\n\
+uniform mat4 u_mtxCameraToClip;												\n\
 																			\n\
 void main()																	\n\
 {																			\n\
-	coordinate.x = position.x;												\n\
-	coordinate.y = position.y;												\n\
+	coordinate = position;												\n\
 																			\n\
-	vec4 temp = transformMtx * position;									\n\
-	temp = mtxWorldToCamera * temp;											\n\
-	gl_Position = mtxCameraToClip * temp;									\n\
+	vec4 temp = u_mtxTransform * vec4(position, 0, 1);									\n\
+	temp = u_mtxWorldToCamera * temp;											\n\
+	gl_Position = u_mtxCameraToClip * temp;									\n\
 }";
 
 
@@ -68,7 +67,7 @@ glm::vec2 textBoxSize;
 	m_TestSprite.alpha.Set(0.5f);
 	
 
-	m_TestText.Load();
+	//m_TestText.Load();
 	m_TestText.TextSetAlignment(HYALIGN_Right);
 	m_TestText.TextSetState(1);
 	m_TestText.TextSet("Oh my goodness, oh me damn. Oh my goodness, they going ham.");
@@ -81,26 +80,24 @@ glm::vec2 textBoxSize;
 	m_primBox.SetAsQuad(textBoxSize.x, textBoxSize.y, true);
 	m_primBox.SetDisplayOrder(10000);
 	m_primBox.pos.Set(m_TestText.pos.X(), m_TestText.pos.Y() - textBoxSize.y);
-	m_primBox.Load();
+	//m_primBox.Load();
 
-	m_TestQuad.Load();
+	//m_TestQuad.Load();
 	m_TestQuad.SetTextureSource(0, 100, 100, 500, 500);
 
-	glm::vec2 vLinePts[2];
+	std::vector<glm::vec2> vLinePts;
+	vLinePts.push_back(glm::vec2(-2048.0f, 0.0f));
+	vLinePts.push_back(glm::vec2(2048.0f, 0.0f));
 
-	vLinePts[0].x = -2048.0f;
-	vLinePts[0].y = 0.0f;
-	vLinePts[1].x = 2048.0f;
-	vLinePts[1].y = 0.0f;
-	m_HorzLine.SetAsEdgeChain(vLinePts, 2, false);
+	m_HorzLine.SetAsLineChain(vLinePts);
 	m_HorzLine.SetTint(1.0f, 0.0f, 0.0f);
 	m_HorzLine.Load();
 
-	vLinePts[0].x = 0.0f;
-	vLinePts[0].y = -2048.0f;
-	vLinePts[1].x = 0.0f;
-	vLinePts[1].y = 2048.0f;
-	m_VertLine.SetAsEdgeChain(vLinePts, 2, false);
+	vLinePts.clear();
+	vLinePts.push_back(glm::vec2(0.0f, -2048.0f));
+	vLinePts.push_back(glm::vec2(0.0, 2048.0f));
+
+	m_VertLine.SetAsLineChain(vLinePts);
 	m_VertLine.SetTint(1.0f, 0.0f, 0.0f);
 	m_VertLine.Load();
 
@@ -114,12 +111,12 @@ glm::vec2 textBoxSize;
 	m_TestGrid.SetDisplayOrder(-100);
 	m_TestGrid.pos.Set(Window().GetResolution().x * -0.5f, Window().GetResolution().y * -0.5f);
 	m_TestGrid.SetCustomShader(pShader_Checkerboard);
-	m_TestGrid.Load();
+	//m_TestGrid.Load();
 
 
 	m_BoxTest.pos.Set(0, 0);
 	m_BoxTest.SetAsQuad(200.0f, 100.0f, false);
-	m_BoxTest.Load();
+	//m_BoxTest.Load();
 	m_BoxTest.SetScissor(366, 359, 100, 100);
 
 
