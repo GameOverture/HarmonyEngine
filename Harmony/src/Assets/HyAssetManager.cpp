@@ -271,6 +271,12 @@ void HyAssetManager::DiscardData(IHyData *pData)
 {
 	HyAssert(pData->GetRefCount() <= 0, "HyAssetManager::DiscardData() tried to remove an IData with active references");
 
+
+	// TODO: Wot in tarnation
+	if(pData->GetInstType() == HYTYPE_Primitive2d && static_cast<IHy2dData *>(pData)->GetShaderId() < HYSHADERPROG_CustomStartIndex)
+		return;
+
+
 	//HyLog("Deleting data: " << pData->GetPath());
 	pData->SetLoadState(HYLOADSTATE_Discarded);
 
