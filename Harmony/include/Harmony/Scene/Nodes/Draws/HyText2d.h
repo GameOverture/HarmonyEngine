@@ -33,7 +33,7 @@ protected:
 			HyTweenVec3 		botColor;
 
 			LayerColor(IHyNode &colorOwner) :	topColor(colorOwner),
-														botColor(colorOwner)
+												botColor(colorOwner)
 			{ }
 		};
 		std::vector<LayerColor *>	m_LayerColors;
