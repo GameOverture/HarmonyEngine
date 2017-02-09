@@ -96,6 +96,8 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 {
 	ClearData();
 
+	iNumSegments += 1;
+
 	if(bWireframe)
 		m_RenderState.Enable(HyRenderState::DRAWMODE_LINELOOP);
 	else
@@ -112,12 +114,12 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	fRadius *= fCoordMod;
 
 	float t = 0.0f;
-	for(uint32 n = 0; n <= m_RenderState.GetNumVerticesPerInstance(); ++n)
+	for(int32 i = 0; i < iNumSegments; ++i)
 	{
-		t = 2.0f * HY_PI * static_cast<float>(n) / static_cast<float>(m_RenderState.GetNumVerticesPerInstance());
+		t = 2.0f * HY_PI * static_cast<float>(i) / static_cast<float>(m_RenderState.GetNumVerticesPerInstance());
 
-		m_pDrawBuffer[n].x = (sin(t) * fRadius);
-		m_pDrawBuffer[n].y = (cos(t) * fRadius);
+		m_pDrawBuffer[i].x = (sin(t) * fRadius);
+		m_pDrawBuffer[i].y = (cos(t) * fRadius);
 	}
 
 	MakeBoundingVolumeDirty();
