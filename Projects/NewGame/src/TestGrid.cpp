@@ -21,7 +21,7 @@ void TestGrid::SetResolution(int iWidth, int iHeight)
 	glm::mat4 mtx;
 	GetWorldTransform(mtx);
 
-	m_ShaderUniforms.Set("transformMtx", mtx);
+	m_ShaderUniforms.Set("u_mtxTransform", mtx);
 	m_ShaderUniforms.Set("uGridSize", 25.0f);
 	m_ShaderUniforms.Set("uResolution", m_Resolution);
 	m_ShaderUniforms.Set("gridColor1", glm::vec4(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f, 1.0f));
@@ -41,6 +41,6 @@ void TestGrid::SetResolution(int iWidth, int iHeight)
 	//memcpy(pRefDataWritePos, &m_uiNumVerts, sizeof(uint32));
 	//pRefDataWritePos += sizeof(uint32);
 
-	memcpy(pRefDataWritePos, m_pVertices, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec4));
-	pRefDataWritePos += m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec4);
+	memcpy(pRefDataWritePos, m_pDrawBuffer, m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec2));
+	pRefDataWritePos += m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec2);
 }

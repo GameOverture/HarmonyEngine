@@ -122,7 +122,7 @@ uint32 HyRenderState::GetAttributeBitFlags() const
 	return m_uiAttributeFlags;
 }
 
-int32 HyRenderState::GetShaderId()
+int32 HyRenderState::GetShaderId() const
 {
 	return m_iShaderId;
 }

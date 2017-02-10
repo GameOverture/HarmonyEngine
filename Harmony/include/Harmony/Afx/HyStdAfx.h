@@ -73,6 +73,7 @@ enum HyShaderProgram
 {
 	HYSHADERPROG_QuadBatch = 0,
 	HYSHADERPROG_Primitive,
+	HYSHADERPROG_Lines2d,
 
 	HYSHADERPROG_CustomStartIndex
 };

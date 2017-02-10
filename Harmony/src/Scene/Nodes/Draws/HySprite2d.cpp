@@ -64,7 +64,7 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 		break;
 	case HYANIMCTRL_Reset:
 		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_IsBouncing;
-		if(m_AnimCtrlAttribList[uiAnimState] & ANIMCTRLATTRIB_Reverse && m_pData)
+		if(m_AnimCtrlAttribList[uiAnimState] & ANIMCTRLATTRIB_Reverse && m_pData && static_cast<HySprite2dData *>(m_pData)->GetState(uiAnimState).m_uiNUMFRAMES > 0)
 			m_uiCurFrame = static_cast<HySprite2dData *>(m_pData)->GetState(uiAnimState).m_uiNUMFRAMES - 1;
 		else
 			m_uiCurFrame = 0;
@@ -89,6 +89,7 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 void HySprite2d::AnimSetPause(bool bPause)
 {
 	m_bIsAnimPaused = bPause;
+	m_fElapsedFrameTime = 0.0f;
 }
 
 uint32 HySprite2d::AnimGetNumStates() const
@@ -171,7 +172,7 @@ void HySprite2d::AnimSetState(uint32 uiStateIndex)
 	while(m_uiCurAnimState >= m_AnimCtrlAttribList.size())
 		m_AnimCtrlAttribList.push_back(0);
 
-	if(0 == (m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Reverse))
+	if(0 == (m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Reverse) || AnimGetNumFrames() == 0)
 		m_uiCurFrame = 0;
 	else
 		m_uiCurFrame = AnimGetNumFrames() - 1;
@@ -194,7 +195,7 @@ bool HySprite2d::AnimIsFinished() const
 	if((uiCtrlAttribs & ANIMCTRLATTRIB_Reverse) == 0)
 	{
 		// Playing forward
-		if(uiCtrlAttribs & ANIMCTRLATTRIB_IsBouncing)
+		if(uiCtrlAttribs & ANIMCTRLATTRIB_IsBouncing || AnimGetNumFrames() == 0)
 			return m_uiCurFrame == 0;
 		else
 			return m_uiCurFrame == (AnimGetNumFrames() - 1);
@@ -202,7 +203,7 @@ bool HySprite2d::AnimIsFinished() const
 	else
 	{
 		// Playing reverse
-		if(uiCtrlAttribs & ANIMCTRLATTRIB_IsBouncing)
+		if(uiCtrlAttribs & ANIMCTRLATTRIB_IsBouncing && AnimGetNumFrames() != 0)
 			return m_uiCurFrame == (AnimGetNumFrames() - 1);
 		else
 			return m_uiCurFrame == 0;
@@ -273,10 +274,21 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	}
 
 	if(m_uiCurAnimState >= uiNumStates)
-		m_uiCurAnimState = uiNumStates - 1;
+	{
+		if(uiNumStates == 0)
+			m_uiCurAnimState = 0;
+		else
+			m_uiCurAnimState = uiNumStates - 1;
+	}
 
-	if(m_uiCurFrame >= AnimGetNumFrames())
-		m_uiCurFrame = AnimGetNumFrames() - 1;
+	uint32 uiNumFrames = AnimGetNumFrames();
+	if(m_uiCurFrame >= uiNumFrames)
+	{
+		if(uiNumFrames == 0)
+			m_uiCurFrame = 0;
+		else
+			m_uiCurFrame = uiNumFrames - 1;
+	}
 
 	MakeBoundingVolumeDirty();
 }
@@ -291,7 +303,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiCurAnimState];
-	while(m_fElapsedFrameTime >= frameRef.fDURATION)
+	while(m_fElapsedFrameTime >= frameRef.fDURATION && frameRef.fDURATION > 0.0f)
 	{
 		int32 iNumFrames = AnimGetNumFrames();
 		int32 iNextFrameIndex = static_cast<int32>(m_uiCurFrame);
@@ -350,6 +362,9 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 					iNextFrameIndex = iNumFrames - 1;
 			}
 		}
+
+		if(iNextFrameIndex < 0)
+			iNextFrameIndex = 0;
 
 		m_uiCurFrame = iNextFrameIndex;
 		m_fElapsedFrameTime -= frameRef.fDURATION;

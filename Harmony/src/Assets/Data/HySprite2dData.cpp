@@ -15,12 +15,12 @@
 
 uint32 HySprite2dFrame::GetGfxApiHandle() const
 {
-	return pAtlasGroup->GetGfxApiHandle(uiATLAS_GROUP_TEXTURE_INDEX);
+	return pAtlasGroup ? pAtlasGroup->GetGfxApiHandle(uiATLAS_GROUP_TEXTURE_INDEX) : 0;
 }
 
 uint32 HySprite2dFrame::GetActualTextureIndex() const
 {
-	return pAtlasGroup->GetActualGfxApiTextureIndex(uiATLAS_GROUP_TEXTURE_INDEX);
+	return pAtlasGroup ? pAtlasGroup->GetActualGfxApiTextureIndex(uiATLAS_GROUP_TEXTURE_INDEX) : 0;
 }
 
 HySprite2dData::HySprite2dData(const std::string &sPath, int32 iShaderId) : IHy2dData(HYTYPE_Sprite2d, sPath, iShaderId),
@@ -79,30 +79,38 @@ const HySprite2dFrame &HySprite2dData::GetFrame(uint32 uiAnimStateIndex, uint32 
 	}
 }
 
-HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HySprite2dData &dataRef) : m_sNAME(sName),
+HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HySprite2dData &dataRef) :	m_sNAME(sName),
 																																						m_bLOOP(bLoop),
 																																						m_bREVERSE(bReverse),
 																																						m_bBOUNCE(bBounce),
-																																						m_uiNUMFRAMES(static_cast<uint32>(frameArray.size()))
+																																						m_uiNUMFRAMES(frameArray.empty() ? 1 : static_cast<uint32>(frameArray.size()))	// Cannot have '0' frames
 {
 	m_pFrames = reinterpret_cast<HySprite2dFrame *>(HY_NEW unsigned char[sizeof(HySprite2dFrame) * m_uiNUMFRAMES]);
 	HySprite2dFrame *pFrameWriteLocation = m_pFrames;
 
 	for(uint32 i = 0; i < m_uiNUMFRAMES; ++i, ++pFrameWriteLocation)
 	{
-		jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
+		HyAtlasGroup *pAtlasGroup = nullptr;
+		uint32 uiAtlasGroupTextureIndex = 0;
+		HyRectangle<float> rUVRect(0.0f, 0.0f, 0.0f, 0.0f);
+		glm::ivec2 vOffset(0);
+		float fDuration(0.0f);
 
-		HyAtlasGroup *pAtlasGroup = dataRef.RequestTexture(static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasGroupId")));
+		if(frameArray.empty() == false)
+		{
+			jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
 
-		uint32 uiAtlasGroupTextureIndex;
-		HyRectangle<float> rUVRect;
-		pAtlasGroup->GetUvRect(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), uiAtlasGroupTextureIndex, rUVRect);
+			pAtlasGroup = dataRef.RequestTexture(static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasGroupId")));
+			pAtlasGroup->GetUvRect(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), uiAtlasGroupTextureIndex, rUVRect);
+			HySetVec(vOffset, static_cast<int32>(frameObj.get<jsonxx::Number>("offsetX")), static_cast<int32>(frameObj.get<jsonxx::Number>("offsetY")));
+			fDuration = static_cast<float>(frameObj.get<jsonxx::Number>("duration"));
+		}
 
 		new (pFrameWriteLocation)HySprite2dFrame(pAtlasGroup,
 												 uiAtlasGroupTextureIndex,
 												 rUVRect.left, rUVRect.top, rUVRect.right, rUVRect.bottom,
-												 glm::ivec2(static_cast<int32>(frameObj.get<jsonxx::Number>("offsetX")), static_cast<int32>(frameObj.get<jsonxx::Number>("offsetY"))),
-												 static_cast<float>(frameObj.get<jsonxx::Number>("duration")));
+												 vOffset,
+												 fDuration);
 	}
 }
 

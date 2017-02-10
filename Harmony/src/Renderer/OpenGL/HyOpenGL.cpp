@@ -126,8 +126,8 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// Always attempt to assign these uniforms if the shader chooses to use them
-	pShader->SetUniformGLSL("mtxWorldToCamera", m_mtxView);
-	pShader->SetUniformGLSL("mtxCameraToClip", m_mtxProj);
+	pShader->SetUniformGLSL("u_mtxWorldToCamera", m_mtxView);
+	pShader->SetUniformGLSL("u_mtxCameraToClip", m_mtxProj);
 	//pShader->SetUniformGLSL("Tex", 0);//renderState.GetTextureHandle());
 
 	char *pDrawBuffer = GetVertexData2d();
@@ -393,13 +393,20 @@ bool HyOpenGL::Initialize()
 	HyOpenGLShader *pShaderQuadBatch = HY_NEW HyOpenGLShader(HYSHADERPROG_QuadBatch);
 	sm_ShaderMap[HYSHADERPROG_QuadBatch] = pShaderQuadBatch;
 	pShaderQuadBatch->Finalize(HYSHADERPROG_QuadBatch);
-	pShaderQuadBatch->OnRenderThread(*this, NULL);
+	pShaderQuadBatch->OnRenderThread(*this, nullptr);
 
 	// Primitive //////////////////////////////////////////////////////////////////////////
 	HyOpenGLShader *pShaderPrimitive = HY_NEW HyOpenGLShader(HYSHADERPROG_Primitive);
 	sm_ShaderMap[HYSHADERPROG_Primitive] = pShaderPrimitive;
 	pShaderPrimitive->Finalize(HYSHADERPROG_Primitive);
-	pShaderPrimitive->OnRenderThread(*this, NULL);
+	pShaderPrimitive->OnRenderThread(*this, nullptr);
+
+	// Line2D //////////////////////////////////////////////////////////////////////////
+	HyOpenGLShader *pShaderLine2d = HY_NEW HyOpenGLShader(HYSHADERPROG_Lines2d);
+	sm_ShaderMap[HYSHADERPROG_Lines2d] = pShaderLine2d;
+	pShaderLine2d->Finalize(HYSHADERPROG_Lines2d);
+	pShaderLine2d->OnRenderThread(*this, nullptr);
+
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

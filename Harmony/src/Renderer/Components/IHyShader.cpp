@@ -396,7 +396,13 @@ void IHyShader::Finalize(HyShaderProgram eDefaultsFrom)
 
 		case HYSHADERPROG_Primitive:
 			SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);
-			SetVertexAttribute("position", HYSHADERVAR_vec4);
+			SetVertexAttribute("a_vPosition", HYSHADERVAR_vec2);
+			break;
+
+		case HYSHADERPROG_Lines2d:
+			SetSourceCode(szHYLINES2D_VERTEXSHADER, HYSHADER_Vertex);
+			SetVertexAttribute("a_vPosition", HYSHADERVAR_vec2);
+			SetVertexAttribute("a_vNormal", HYSHADERVAR_vec2);
 			break;
 		}
 	}
@@ -412,6 +418,10 @@ void IHyShader::Finalize(HyShaderProgram eDefaultsFrom)
 
 		case HYSHADERPROG_Primitive:
 			SetSourceCode(szHYPRIMATIVE_FRAGMENTSHADER, HYSHADER_Fragment);
+			break;
+
+		case HYSHADERPROG_Lines2d:
+			SetSourceCode(szHYLINES2D_FRAGMENTSHADER, HYSHADER_Fragment);
 			break;
 		}
 	}

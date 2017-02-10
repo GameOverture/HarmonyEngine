@@ -19,7 +19,7 @@ class HyAtlasGroupData;
 class HyPrimitive2d : public IHyDraw2d
 {
 protected:
-	glm::vec4 *		m_pVertices;
+	glm::vec2 *		m_pDrawBuffer;
 
 public:
 	HyPrimitive2d();
@@ -27,20 +27,15 @@ public:
 
 	const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p);
 
-	uint32 GetNumVerts()			{ return m_RenderState.GetNumVerticesPerInstance(); }
-	glm::vec4 *GetVertexDataPtr()	{ return m_pVertices; }
+	void SetAsQuad(int iWidth, int iHeight, bool bWireframe);
+	void SetAsQuad(float fWidth, float fHeight, bool bWireframe);
 
-	void SetAsQuad(int iWidth, int iHeight, bool bWireframe, glm::vec2 &vOffset = glm::vec2(0.0f));
-	void SetAsQuad(float fWidth, float fHeight, bool bWireframe, glm::vec2 &vOffset = glm::vec2(0.0f));
+	void SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe);
 
-	void SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe, glm::vec2 &vOffset = glm::vec2(0.0f));
-
-	void SetAsEdgeChain(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, glm::vec2 &vOffset = glm::vec2(0.0f));
+	void SetAsLineChain(std::vector<glm::vec2> &vertexList);
 
 	float GetLineThickness();
 	void SetLineThickness(float fThickness);
-
-	void OffsetVerts(glm::vec2 vOffset, float fAngleOffset);
 
 protected:
 	void ClearData();

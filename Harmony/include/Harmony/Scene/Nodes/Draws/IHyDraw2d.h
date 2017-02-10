@@ -84,6 +84,7 @@ public:
 	void SetDisplayOrder(int32 iOrderValue);
 
 	void SetTint(float fR, float fG, float fB);
+	void SetTint(uint32 uiColor);
 
 	void EnableMouseInput(bool bEnable, void *pUserParam = NULL);
 	void EnableCollider(bool bEnable);
