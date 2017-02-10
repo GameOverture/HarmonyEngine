@@ -1,10 +1,10 @@
 #include "NewGame.h"
 
 
-NewGame::NewGame(HarmonyInit &initStruct) : IHyApplication(initStruct),
-											m_TestSprite("", "NewSprite"),
-											m_TestQuad(1),
-											m_TestText("", "NewFont")
+NewGame::NewGame(HarmonyInit &initStruct) : IHyApplication(initStruct)
+											//m_TestSprite("", "NewSprite"),
+											//m_TestQuad(1),
+											//m_TestText("", "NewFont")
 {
 }
 
@@ -57,67 +57,72 @@ glm::vec2 textBoxSize;
 {
 	m_pCam = Window().CreateCamera2d();
 
-	textBoxSize.x = 300.0f;
-	textBoxSize.y = 500.0f;
+	//textBoxSize.x = 300.0f;
+	//textBoxSize.y = 500.0f;
 
-	m_TestSprite.Load();
-	m_TestSprite.SetEnabled(true);
-	m_TestSprite.topColor.Set(0.0f, 1.0f, 0.0f);
-	m_TestSprite.botColor.Set(1.0f, 0.0f, 0.0f);
-	m_TestSprite.alpha.Set(0.5f);
+	//m_TestSprite.Load();
+	//m_TestSprite.SetEnabled(true);
+	//m_TestSprite.topColor.Set(0.0f, 1.0f, 0.0f);
+	//m_TestSprite.botColor.Set(1.0f, 0.0f, 0.0f);
+	//m_TestSprite.alpha.Set(0.5f);
 	
 
 	//m_TestText.Load();
-	m_TestText.TextSetAlignment(HYALIGN_Right);
-	m_TestText.TextSetState(1);
-	m_TestText.TextSet("Oh my goodness, oh my damn. Oh my goodness, they going ham.");
-	m_TestText.SetAsColumn(textBoxSize.x);
-	m_TestText.pos.Set(0.0f, -100.0f);
+	//m_TestText.TextSetAlignment(HYALIGN_Right);
+	//m_TestText.TextSetState(1);
+	//m_TestText.TextSet("Oh my goodness, oh my damn. Oh my goodness, they going ham.");
+	//m_TestText.SetAsColumn(textBoxSize.x);
+	//m_TestText.pos.Set(0.0f, -100.0f);
 	//m_TestText.rot.Set(45.0f);
 	//m_TestText.scale.Set(0.5f, 2.0f);
 	
-	m_primBox.SetTint(0.0f, 0.0f, 1.0f);
-	m_primBox.SetAsQuad(textBoxSize.x, textBoxSize.y, true);
-	m_primBox.SetDisplayOrder(10000);
-	m_primBox.pos.Set(m_TestText.pos.X(), m_TestText.pos.Y() - textBoxSize.y);
+	//m_primBox.SetTint(0.0f, 0.0f, 1.0f);
+	//m_primBox.SetAsQuad(textBoxSize.x, textBoxSize.y, true);
+	//m_primBox.SetDisplayOrder(10000);
+	//m_primBox.pos.Set(m_TestText.pos.X(), m_TestText.pos.Y() - textBoxSize.y);
 	//m_primBox.Load();
 
 	//m_TestQuad.Load();
-	m_TestQuad.SetTextureSource(0, 100, 100, 500, 500);
+	//m_TestQuad.SetTextureSource(0, 100, 100, 500, 500);
 
 	std::vector<glm::vec2> vLinePts;
-	vLinePts.push_back(glm::vec2(-2048.0f, 0.0f));
-	vLinePts.push_back(glm::vec2(2048.0f, 0.0f));
+	//vLinePts.push_back(glm::vec2(-2048.0f, 0.0f));
+	//vLinePts.push_back(glm::vec2(2048.0f, 0.0f));
 
-	m_HorzLine.SetAsLineChain(vLinePts);
-	m_HorzLine.SetTint(1.0f, 0.0f, 0.0f);
-	m_HorzLine.Load();
+	//m_HorzLine.SetAsLineChain(vLinePts);
+	//m_HorzLine.SetTint(1.0f, 0.0f, 0.0f);
+	//m_HorzLine.Load();
 
 	vLinePts.clear();
-	vLinePts.push_back(glm::vec2(200.0f, -2048.0f));
-	vLinePts.push_back(glm::vec2(200.0, 2048.0f));
+	vLinePts.push_back(glm::vec2(0.0, 0.0f));
+	vLinePts.push_back(glm::vec2(150.0f, 0.0f));
+	vLinePts.push_back(glm::vec2(150.0f, 100.0f));
+	vLinePts.push_back(glm::vec2(-150.0f, 50.0f));
 
 	m_VertLine.SetAsLineChain(vLinePts);
-	m_VertLine.SetTint(1.0f, 1.0f, 0.0f);
-	//m_VertLine.Load();
+	//m_VertLine.SetAsQuad(200.0f, 100.0f, false);
 
-	IHyShader *pShader_Checkerboard = IHyRenderer::MakeCustomShader();
-	pShader_Checkerboard->SetSourceCode(szCUSTOM_VERTEXSHADER, HYSHADER_Vertex);
-	pShader_Checkerboard->SetVertexAttribute("position", HYSHADERVAR_vec4);
-	pShader_Checkerboard->SetSourceCode(szCUSTOM_FRAGMENTSHADER, HYSHADER_Fragment);
-	pShader_Checkerboard->Finalize(HYSHADERPROG_Primitive);
-	
-	m_TestGrid.SetResolution(Window().GetResolution().x, Window().GetResolution().y);
-	m_TestGrid.SetDisplayOrder(-100);
-	m_TestGrid.pos.Set(Window().GetResolution().x * -0.5f, Window().GetResolution().y * -0.5f);
-	m_TestGrid.SetCustomShader(pShader_Checkerboard);
+	m_VertLine.SetTint(1.0f, 1.0f, 0.0f);
+	m_VertLine.SetLineThickness(1.0f);
+	m_VertLine.Load();
+
+	//IHyShader *pShader_Checkerboard = IHyRenderer::MakeCustomShader();
+	//pShader_Checkerboard->SetSourceCode(szCUSTOM_VERTEXSHADER, HYSHADER_Vertex);
+	//pShader_Checkerboard->SetVertexAttribute("position", HYSHADERVAR_vec4);
+	//pShader_Checkerboard->SetSourceCode(szCUSTOM_FRAGMENTSHADER, HYSHADER_Fragment);
+	//pShader_Checkerboard->Finalize(HYSHADERPROG_Primitive);
+	//
+	//m_TestGrid.SetResolution(Window().GetResolution().x, Window().GetResolution().y);
+	//m_TestGrid.SetDisplayOrder(-100);
+	//m_TestGrid.pos.Set(Window().GetResolution().x * -0.5f, Window().GetResolution().y * -0.5f);
+	//m_TestGrid.SetCustomShader(pShader_Checkerboard);
 	//m_TestGrid.Load();
 
 
-	m_BoxTest.pos.Set(0, 0);
-	m_BoxTest.SetAsQuad(200.0f, 100.0f, false);
+	//m_BoxTest.pos.Set(0, 0);
+	//m_BoxTest.SetAsQuad(200.0f, 100.0f, false);
 	//m_BoxTest.Load();
-	m_BoxTest.SetScissor(366, 359, 100, 100);
+	//m_BoxTest.SetScissor(366, 359, 100, 100);
 
 
 	return true;

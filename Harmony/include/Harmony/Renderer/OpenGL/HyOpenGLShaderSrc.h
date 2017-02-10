@@ -144,7 +144,8 @@ in vec2 a_vNormal;
 
 out vec2 vNormalOut;
 
-uniform float u_fLineWidth;
+uniform float u_fHalfWidth;
+uniform float u_fFeatherAmt;
 uniform vec4 u_vColor;
 uniform mat4 u_mtxTransform;
 uniform mat4 u_mtxWorldToCamera;
@@ -154,27 +155,27 @@ void main()
 {
 	vNormalOut = a_vNormal;
 
-	vec4 vDelta = vec4(a_vNormal * u_fLineWidth, 0, 0);
-
 	vec4 vPos = u_mtxTransform * vec4(a_vPosition, 0, 1);
 	vPos = u_mtxWorldToCamera * vPos;
-
-	gl_Position = u_mtxCameraToClip * (vPos + vDelta);
+	gl_Position = u_mtxCameraToClip * (vPos + vec4(a_vNormal * (u_fHalfWidth + (u_fFeatherAmt * 0.5f)), 0, 0));
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYLINES2D_FRAGMENTSHADER = R"src(
 #version 130
 
-in vec2 a_vNormal;
+in vec2 vNormalOut;
 
 out vec4 vFragColorOut;
 
+uniform float u_fHalfWidth;
+uniform float u_fFeatherAmt;
 uniform vec4 u_vColor;
 
 void main()
 {
 	vFragColorOut = u_vColor;
+	vFragColorOut.w = smoothstep(u_fHalfWidth, u_fHalfWidth - u_fFeatherAmt, length(vNormalOut) * u_fHalfWidth);
 }
 )src";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

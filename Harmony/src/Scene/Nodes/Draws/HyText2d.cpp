@@ -22,8 +22,9 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName) :	IHyDraw2d(HYTYPE_
 																m_fScaleBoxModifier(1.0f),
 																m_uiBoxAttributes(0),
 																m_eAlignment(HYALIGN_Left),
-																m_pGlyphOffsets(NULL),
-																m_uiNumReservedGlyphOffsets(0)
+																m_pGlyphOffsets(nullptr),
+																m_uiNumReservedGlyphOffsets(0),
+																m_uiNumValidCharacters(0)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
@@ -215,14 +216,14 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
 	const uint32 uiSTR_SIZE = static_cast<uint32>(m_sCurrentString.size());
 	
-	if(m_pGlyphOffsets == NULL || m_uiNumReservedGlyphOffsets < uiSTR_SIZE * uiNUM_LAYERS)
+	if(m_pGlyphOffsets == nullptr || m_uiNumReservedGlyphOffsets < uiSTR_SIZE * uiNUM_LAYERS)
 	{
 		delete[] m_pGlyphOffsets;
 		m_uiNumReservedGlyphOffsets = uiSTR_SIZE * uiNUM_LAYERS;
-		m_pGlyphOffsets = new glm::vec2[m_uiNumReservedGlyphOffsets];
+		m_pGlyphOffsets = HY_NEW glm::vec2[m_uiNumReservedGlyphOffsets];
 	}
 
-	glm::vec2 *pWritePos = new glm::vec2[uiNUM_LAYERS];
+	glm::vec2 *pWritePos = HY_NEW glm::vec2[uiNUM_LAYERS];
 	
 	bool bScaleBoxModiferIsSet = false;
 	m_fScaleBoxModifier = 1.0f;

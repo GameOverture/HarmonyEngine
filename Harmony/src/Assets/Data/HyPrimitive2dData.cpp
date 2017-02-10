@@ -12,7 +12,7 @@
 #include "Renderer/IHyRenderer.h"
 
 
-HyPrimitive2dData::HyPrimitive2dData(const std::string &sPath, int32 iShaderId) :	IHy2dData(HYTYPE_TexturedQuad2d, sPath, iShaderId)
+HyPrimitive2dData::HyPrimitive2dData(const std::string &sPath, int32 iShaderId) : IHy2dData(HYTYPE_Primitive2d, sPath, iShaderId)
 {
 	if(GetShaderId() < HYSHADERPROG_CustomStartIndex && GetShaderId() >= 0)
 		SetLoadState(HYLOADSTATE_Loaded);

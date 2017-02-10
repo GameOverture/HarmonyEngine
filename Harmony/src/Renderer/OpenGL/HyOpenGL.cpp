@@ -412,7 +412,7 @@ bool HyOpenGL::Initialize()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Line anti-aliasing on always for now.
-	glEnable(GL_LINE_SMOOTH);
+	//glEnable(GL_LINE_SMOOTH);
 
 	return true;
 }
