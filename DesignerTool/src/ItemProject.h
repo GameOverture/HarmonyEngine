@@ -98,7 +98,7 @@ public:
     void OverrideDraw();
     void Reset();
 
-    void SaveGameData(eItemType eType, QString sPath, QJsonObject itemObj);
+    void SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal);
     void SaveUserData();
 
 private Q_SLOTS:

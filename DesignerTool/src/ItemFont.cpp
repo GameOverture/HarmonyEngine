@@ -228,7 +228,7 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetA
 {
 }
 
-/*virtual*/ QJsonObject ItemFont::OnSave()
+/*virtual*/ QJsonValue ItemFont::OnSave()
 { 
     WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
     pWidget->SaveFontFilesToMetaDir();
@@ -237,17 +237,20 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetA
     
     QJsonObject fontObj;
     pWidget->GetSaveInfo(fontObj);
-    QJsonDocument settingsDoc(fontObj);
 
-    QFile fontFile(GetAbsPath());
-    if(fontFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        qint64 iBytesWritten = fontFile.write(settingsDoc.toJson());
-        if(0 == iBytesWritten || -1 == iBytesWritten)
-            HyGuiLog("Could not write to font item file: " % fontFile.errorString(), LOGTYPE_Error);
-    }
-    else
-        HyGuiLog("Couldn't open item file " % GetAbsPath() % ": " % fontFile.errorString(), LOGTYPE_Error);
+    return fontObj;
 
-    fontFile.close();
+//    QJsonDocument settingsDoc(fontObj);
+
+//    QFile fontFile(GetAbsPath());
+//    if(fontFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+//    {
+//        qint64 iBytesWritten = fontFile.write(settingsDoc.toJson());
+//        if(0 == iBytesWritten || -1 == iBytesWritten)
+//            HyGuiLog("Could not write to font item file: " % fontFile.errorString(), LOGTYPE_Error);
+//    }
+//    else
+//        HyGuiLog("Couldn't open item file " % GetAbsPath() % ": " % fontFile.errorString(), LOGTYPE_Error);
+
+//    fontFile.close();
 }

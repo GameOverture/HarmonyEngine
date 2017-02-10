@@ -482,12 +482,12 @@ void ItemProject::Reset()
     sm_Init.sDataDir = GetAssetsAbsPath().toStdString();
 }
 
-void ItemProject::SaveGameData(eItemType eType, QString sPath, QJsonObject itemObj)
+void ItemProject::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal)
 {
     QFile dataFile(GetAssetsAbsPath() % HYGUIPATH_DataFile);
     if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
     {
-       HyGuiLog("Couldn't open " % HYGUIPATH_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
+       HyGuiLog(QString("Couldn't open ") % HYGUIPATH_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
     }
     else
     {
@@ -498,44 +498,21 @@ void ItemProject::SaveGameData(eItemType eType, QString sPath, QJsonObject itemO
         {
             HyGuiLog("Could not find subdir: " % sSubDirName % " within ItemProject::SaveGameData", LOGTYPE_Error);
         }
-        else
-        {
-            QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
-            subDirObj.
 
+        QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
 
+        subDirObj.remove(sPath);
+        subDirObj.insert(sPath, itemVal);
 
-        // Search for the object within the subdir object to be replaced
-        for(
         m_SaveDataObj.remove(sSubDirName);
-        m_SaveDataObj.insert(sSubDirName, itemObj
-
-        QJsonDocument(
-        userObj.remove
-        userObj.insert("DefaultAtlasGroup", m_pAtlasMan->GetSelectedAtlasGroup());
-
-
-        // TODO:
-
-        //QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
-        //sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
-        //foreach(QString sItemPath, sListOpenItems)
-        //{
-        //    Item *pItem = ui->explorer->GetItemByPath(sItemPath);
-        //    if(pItem)
-        //        OpenItem(pItem);
-        //}
-
-
-
-
+        m_SaveDataObj.insert(sSubDirName, subDirObj);
 
         QJsonDocument userDoc;
-        userDoc.setObject(userObj);
+        userDoc.setObject(m_SaveDataObj);
         qint64 iBytesWritten = dataFile.write(userDoc.toJson());
         if(0 == iBytesWritten || -1 == iBytesWritten)
         {
-            HyGuiLog("Could not write to " % HYGUIPATH_MetaUserFile % " file: " % dataFile.errorString(), LOGTYPE_Error);
+            HyGuiLog(QString("Could not write to ") % HYGUIPATH_DataFile % " file: " % dataFile.errorString(), LOGTYPE_Error);
         }
 
         dataFile.close();
@@ -547,7 +524,7 @@ void ItemProject::SaveUserData()
     QFile userFile(GetMetaDataAbsPath() % HYGUIPATH_MetaUserFile);
     if(userFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
     {
-       HyGuiLog("Couldn't open " % HYGUIPATH_MetaUserFile % " for writing: " % userFile.errorString(), LOGTYPE_Error);
+       HyGuiLog(QString("Couldn't open ") % HYGUIPATH_MetaUserFile % " for writing: " % userFile.errorString(), LOGTYPE_Error);
     }
     else
     {
@@ -575,7 +552,7 @@ void ItemProject::SaveUserData()
         qint64 iBytesWritten = userFile.write(userDoc.toJson());
         if(0 == iBytesWritten || -1 == iBytesWritten)
         {
-            HyGuiLog("Could not write to " % HYGUIPATH_MetaUserFile % " file: " % userFile.errorString(), LOGTYPE_Error);
+            HyGuiLog(QString("Could not write to ") % HYGUIPATH_MetaUserFile % " file: " % userFile.errorString(), LOGTYPE_Error);
         }
 
         userFile.close();

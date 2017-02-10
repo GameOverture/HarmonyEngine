@@ -65,7 +65,7 @@ ItemSpine::ItemSpine(const QString sPath, WidgetAtlasManager &atlasManRef, Widge
 {
 }
 
-/*virtual*/ QJsonObject ItemSpine::OnSave()
+/*virtual*/ QJsonValue ItemSpine::OnSave()
 {
     return QJsonObject();
 }

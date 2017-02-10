@@ -66,7 +66,7 @@ protected:
     virtual void OnReLink(HyGuiFrame *pFrame);
     virtual void OnUnlink(HyGuiFrame *pFrame);
     
-    virtual QJsonObject OnSave();
+    virtual QJsonValue OnSave();
 };
 
 #endif // ITEMSPRITE_H

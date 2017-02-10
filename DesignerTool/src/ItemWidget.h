@@ -15,6 +15,7 @@
 #include "Harmony/HyEngine.h"
 
 #include <QUndoStack>
+#include <QJsonObject>
 
 class WidgetAtlasManager;
 class WidgetAudioManager;
@@ -65,7 +66,7 @@ protected:
     virtual void OnReLink(HyGuiFrame *pFrame) = 0;
     virtual void OnUnlink(HyGuiFrame *pFrame) = 0;
     
-    virtual QJsonObject OnSave() = 0;
+    virtual QJsonValue OnSave() = 0;
 
 public:
     ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager &AtlasManRef, WidgetAudioManager &AudioManRef);

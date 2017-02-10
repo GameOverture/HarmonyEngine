@@ -138,22 +138,24 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef, Wid
     pCurSpriteState->RemoveFrame(pFrame);
 }
 
-/*virtual*/ QJsonObject ItemSprite::OnSave()
+/*virtual*/ QJsonValue ItemSprite::OnSave()
 {
     QJsonArray spriteStateArray;
     static_cast<WidgetSprite *>(m_pWidget)->GetSaveInfo(spriteStateArray);
 
-    QJsonDocument settingsDoc(spriteStateArray);
+    return spriteStateArray;
 
-    QFile spriteFile(GetAbsPath());
-    if(spriteFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        qint64 iBytesWritten = spriteFile.write(settingsDoc.toJson());
-        if(0 == iBytesWritten || -1 == iBytesWritten)
-            HyGuiLog("Could not write to sprite item file: " % spriteFile.errorString(), LOGTYPE_Error);
-    }
-    else
-        HyGuiLog("Couldn't open item file " % GetAbsPath() % ": " % spriteFile.errorString(), LOGTYPE_Error);
+//    QJsonDocument settingsDoc(spriteStateArray);
 
-    spriteFile.close();
+//    QFile spriteFile(GetAbsPath());
+//    if(spriteFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+//    {
+//        qint64 iBytesWritten = spriteFile.write(settingsDoc.toJson());
+//        if(0 == iBytesWritten || -1 == iBytesWritten)
+//            HyGuiLog("Could not write to sprite item file: " % spriteFile.errorString(), LOGTYPE_Error);
+//    }
+//    else
+//        HyGuiLog("Couldn't open item file " % GetAbsPath() % ": " % spriteFile.errorString(), LOGTYPE_Error);
+
+//    spriteFile.close();
 }

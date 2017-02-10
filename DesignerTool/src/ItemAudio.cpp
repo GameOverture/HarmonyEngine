@@ -10,6 +10,7 @@
 #include "ItemAudio.h"
 #include "WidgetAudio.h"
 
+
 ItemAudio::ItemAudio(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Audio, sPath, atlasManRef, audioManRef)
 {
     m_pWidget = new WidgetAudio(this);
@@ -63,7 +64,7 @@ ItemAudio::ItemAudio(const QString sPath, WidgetAtlasManager &atlasManRef, Widge
 {
 }
 
-/*virtual*/ QJsonObject ItemAudio::OnSave()
+/*virtual*/ QJsonValue ItemAudio::OnSave()
 {
     return QJsonObject();
 }
