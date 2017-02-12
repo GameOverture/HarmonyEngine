@@ -20,6 +20,15 @@ public:
 	HyEntity2d();
 	HyEntity2d(const char *szPrefix, const char *szName);
 	virtual ~HyEntity2d(void);
+
+	// Optional user overrides below
+	virtual void OnUpdate() { };
+	virtual void OnCalcBoundingVolume() { }				// Should calculate the local bounding volume in 'm_BoundingVolume'
+	virtual void OnMouseEnter(void *pUserParam) { }
+	virtual void OnMouseLeave(void *pUserParam) { }
+	virtual void OnMouseDown(void *pUserParam) { }
+	virtual void OnMouseUp(void *pUserParam) { }
+	virtual void OnMouseClicked(void *pUserParam) { }
 };
 
 #endif /* __HyEntity2d_h__ */

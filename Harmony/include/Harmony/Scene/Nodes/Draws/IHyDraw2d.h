@@ -128,7 +128,7 @@ private:
 	virtual void OnMouseUp(void *pUserParam) { }
 	virtual void OnMouseClicked(void *pUserParam) { }
 
-	virtual void InstUpdate() override;
+	virtual void InstUpdate() override final;
 };
 
 #endif /* __IHyInst2d_h__ */

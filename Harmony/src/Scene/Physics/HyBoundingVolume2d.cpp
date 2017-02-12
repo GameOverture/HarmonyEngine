@@ -33,6 +33,15 @@ void HyBoundingVolume2d::SetLocalAABB(glm::vec2 &ptLowerBound, glm::vec2 &ptUppe
 	m_eType = TYPE_AABB;
 }
 
+void HyBoundingVolume2d::SetLocalAABB(HyBoundingVolume2d &otherBV)
+{
+	if(otherBV.m_eType != TYPE_AABB)
+		return;
+
+	m_LocalAABB = otherBV.m_LocalAABB;
+	m_eType = TYPE_AABB;
+}
+
 bool HyBoundingVolume2d::IsWorldPointCollide(glm::vec2 &pt)
 {
 	UpdateWorldAABB();

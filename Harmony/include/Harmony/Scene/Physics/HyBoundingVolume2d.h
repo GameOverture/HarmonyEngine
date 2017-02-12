@@ -38,10 +38,12 @@ public:
 	bool IsEnabled();
 
 	void SetLocalAABB(glm::vec2 &ptLowerBound, glm::vec2 &ptUpperBound);
+	void SetLocalAABB(HyBoundingVolume2d &otherBV);
 
 	bool IsWorldPointCollide(glm::vec2 &pt);
 
 	HyRectangle<float> GetWorldAABB();
+	
 
 private:
 	void UpdateWorldAABB();
