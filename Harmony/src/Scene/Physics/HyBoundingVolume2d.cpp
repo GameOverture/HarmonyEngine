@@ -25,20 +25,11 @@ bool HyBoundingVolume2d::IsEnabled()
 	return m_eType != TYPE_None;
 }
 
-void HyBoundingVolume2d::SetLocalAABB(glm::vec2 &ptLowerBound, glm::vec2 &ptUpperBound)
+void HyBoundingVolume2d::SetLocalAABB(const glm::vec2 &ptLowerBound, const glm::vec2 &ptUpperBound)
 {
 	m_LocalAABB.lowerBound.Set(ptLowerBound.x, ptLowerBound.y);
 	m_LocalAABB.upperBound.Set(ptUpperBound.x, ptUpperBound.y);
 
-	m_eType = TYPE_AABB;
-}
-
-void HyBoundingVolume2d::SetLocalAABB(HyBoundingVolume2d &otherBV)
-{
-	if(otherBV.m_eType != TYPE_AABB)
-		return;
-
-	m_LocalAABB = otherBV.m_LocalAABB;
 	m_eType = TYPE_AABB;
 }
 

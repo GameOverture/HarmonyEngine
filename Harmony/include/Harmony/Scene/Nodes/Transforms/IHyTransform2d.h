@@ -30,8 +30,6 @@ public:
 	IHyTransform2d(HyType eInstType);
 	virtual ~IHyTransform2d();
 
-	HyBoundingVolume2d &GetBoundingVolume();
-
 	HyCoordinateUnit GetCoordinateUnit();
 	void SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion);
 

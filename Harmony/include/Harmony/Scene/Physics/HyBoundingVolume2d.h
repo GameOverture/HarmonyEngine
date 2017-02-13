@@ -37,8 +37,7 @@ public:
 
 	bool IsEnabled();
 
-	void SetLocalAABB(glm::vec2 &ptLowerBound, glm::vec2 &ptUpperBound);
-	void SetLocalAABB(HyBoundingVolume2d &otherBV);
+	void SetLocalAABB(const glm::vec2 &ptLowerBound, const glm::vec2 &ptUpperBound);
 
 	bool IsWorldPointCollide(glm::vec2 &pt);
 

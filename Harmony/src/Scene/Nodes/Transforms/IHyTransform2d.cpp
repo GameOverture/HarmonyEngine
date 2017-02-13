@@ -21,11 +21,6 @@ IHyTransform2d::~IHyTransform2d()
 {
 }
 
-HyBoundingVolume2d &IHyTransform2d::GetBoundingVolume()
-{
-	return m_BoundingVolume;
-}
-
 HyCoordinateUnit IHyTransform2d::GetCoordinateUnit()
 {
 	return m_eCoordUnit;
