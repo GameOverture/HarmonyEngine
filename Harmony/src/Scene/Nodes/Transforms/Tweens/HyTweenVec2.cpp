@@ -99,6 +99,11 @@ void HyTweenVec2::Offset(const HyTweenVec2 &srcVec)
 	m_AnimFloatList[1].Offset(srcVec[1]);
 }
 
+void HyTweenVec2::Tween(int32 iX, int32 iY, float fSeconds, HyTweenUpdateFunc fpEase /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::_NullTweenCallback*/)
+{
+	Tween(static_cast<float>(iX), static_cast<float>(iY), fSeconds, fpEase, tweenFinishedCallback);
+}
+
 void HyTweenVec2::Tween(float fX, float fY, float fSeconds, HyTweenUpdateFunc fpEase /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::_NullTweenCallback*/)
 {
 	m_AnimFloatList[0].Tween(fX, fSeconds, fpEase, tweenFinishedCallback);
