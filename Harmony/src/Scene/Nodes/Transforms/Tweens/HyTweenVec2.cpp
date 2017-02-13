@@ -51,6 +51,12 @@ void HyTweenVec2::Set(float fAll)
 	m_AnimFloatList[1].Set(fAll);
 }
 
+void HyTweenVec2::Set(int32 iX, int32 iY)
+{
+	m_AnimFloatList[0] = static_cast<float>(iX);
+	m_AnimFloatList[1] = static_cast<float>(iY);
+}
+
 void HyTweenVec2::Set(float fX, float fY)
 {
 	m_AnimFloatList[0] = fX;

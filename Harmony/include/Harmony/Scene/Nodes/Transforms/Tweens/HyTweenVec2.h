@@ -34,6 +34,7 @@ public:
 	void Y(float fValue);
 
 	void Set(float fAll);
+	void Set(int32 iX, int32 iY);
 	void Set(float fX, float fY);
 	void Set(const glm::vec2 &srcVec);
 	void Set(const glm::ivec2 &srcVec);
