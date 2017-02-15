@@ -90,6 +90,7 @@ public:
 	void EnableCollider(bool bEnable);
 	void EnablePhysics(bool bEnable);
 
+	const HyRectangle<int32> &GetScissor();
 	void SetScissor(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight);
 	void ClearScissor();
 

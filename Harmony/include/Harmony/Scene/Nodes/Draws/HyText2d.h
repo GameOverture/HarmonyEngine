@@ -46,7 +46,8 @@ protected:
 		BOXATTRIB_CenterVertically	= 1 << 1,
 		BOXATTRIB_ExtendingBottom	= 1 << 2,
 		BOXATTRIB_SplitWordsToFit	= 1 << 3,
-		BOXATTRIB_ScaleBox			= 1 << 4
+		BOXATTRIB_TextBox			= 1 << 4,
+		//BOXATTRIB_DigitBox
 	};
 	uint32				m_uiBoxAttributes;
 	glm::vec2			m_vBoxDimensions;
@@ -59,15 +60,19 @@ protected:
 
 	uint32				m_uiNumValidCharacters;
 
+	float				m_fUsedPixelWidth;
+
 public:
 	HyText2d(const char *szPrefix, const char *szName);
 	virtual ~HyText2d(void);
 
 	// Accepts newline characters '\n'
 	void TextSet(std::string sText);
+	void TextSet(char cChar);
 	std::string TextGet();
 
-	uint32 TextGetLength();
+	uint32 TextGetStrLength();
+	float TextGetPixelWidth();
 
 	uint32 TextGetState();
 	void TextSetState(uint32 uiStateIndex);

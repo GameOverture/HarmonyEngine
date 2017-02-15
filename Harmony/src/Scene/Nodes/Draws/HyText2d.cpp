@@ -24,7 +24,8 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName) :	IHyDraw2d(HYTYPE_
 																m_eAlignment(HYALIGN_Left),
 																m_pGlyphOffsets(nullptr),
 																m_uiNumReservedGlyphOffsets(0),
-																m_uiNumValidCharacters(0)
+																m_uiNumValidCharacters(0),
+																m_fUsedPixelWidth(0.0f)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
@@ -46,14 +47,31 @@ void HyText2d::TextSet(std::string sText)
 	m_bIsDirty = true;
 }
 
+void HyText2d::TextSet(char cChar)
+{
+	if(m_sCurrentString.length() == 1 && m_sCurrentString[0] == cChar)
+		return;
+
+	m_sNewString = cChar;
+	m_bIsDirty = true;
+}
+
 std::string HyText2d::TextGet()
 {
 	return m_sCurrentString;
 }
 
-uint32 HyText2d::TextGetLength()
+uint32 HyText2d::TextGetStrLength()
 {
 	return static_cast<uint32>(m_sCurrentString.size());
+}
+
+float HyText2d::TextGetPixelWidth()
+{
+	if(m_bIsDirty)
+		OnUpdate();
+
+	return m_fUsedPixelWidth;
 }
 
 uint32 HyText2d::TextGetState()
@@ -159,7 +177,7 @@ void HyText2d::SetAsColumn(float fWidth, bool bSplitWordsToFit /*= false*/)
 
 void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
 {
-	int32 iFlags = BOXATTRIB_IsUsed | BOXATTRIB_ScaleBox;
+	int32 iFlags = BOXATTRIB_IsUsed | BOXATTRIB_TextBox;
 
 	if(bCenterVertically)
 		iFlags |= BOXATTRIB_CenterVertically;
@@ -234,7 +252,7 @@ offsetCalculation:
 	memset(pWritePos, 0, sizeof(glm::vec2) * uiNUM_LAYERS);
 
 	// Scale box will start writing text at the upper left corner of 'm_vBoxDimensions', (but within the bounds of the box, which GetLineAscender accounts for)
-	if(0 != (m_uiBoxAttributes & BOXATTRIB_ScaleBox))
+	if(0 != (m_uiBoxAttributes & BOXATTRIB_TextBox))
 	{
 		for(uint32 i = 0; i < uiNUM_LAYERS; ++i)
 		{
@@ -307,7 +325,7 @@ offsetCalculation:
 					fCurLineWidth = pWritePos[iLayerIndex].x + (pData->GetLeftSideNudgeAmt(m_uiCurFontState) * m_fScaleBoxModifier);
 
 				// If drawing text within a box, and we advance past our width, determine if we should newline
-				if((m_uiBoxAttributes & BOXATTRIB_ScaleBox) == 0 &&
+				if((m_uiBoxAttributes & BOXATTRIB_TextBox) == 0 &&
 				   (m_uiBoxAttributes & BOXATTRIB_IsUsed) != 0 &&
 				   pWritePos[iLayerIndex].x + (pData->GetLeftSideNudgeAmt(m_uiCurFontState) * m_fScaleBoxModifier) > m_vBoxDimensions.x)
 				{
@@ -456,20 +474,20 @@ offsetCalculation:
 		}
 	}
 
-	if(0 != (m_uiBoxAttributes & BOXATTRIB_ScaleBox))
+	m_fUsedPixelWidth = 0.0f;
+	for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
+	{
+		if(m_fUsedPixelWidth < vNewlineInfo[i].fUSED_WIDTH)
+			m_fUsedPixelWidth = vNewlineInfo[i].fUSED_WIDTH;
+	}
+
+	if(0 != (m_uiBoxAttributes & BOXATTRIB_TextBox))
 	{
 		float fTotalHeight = (pData->GetLineHeight(m_uiCurFontState) * m_fScaleBoxModifier) * vNewlineInfo.size();
 
 		if(bScaleBoxModiferIsSet == false)
 		{
-			float fTotalWidth = 0.0f;
-			for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
-			{
-				if(fTotalWidth < vNewlineInfo[i].fUSED_WIDTH)
-					fTotalWidth = vNewlineInfo[i].fUSED_WIDTH;
-			}
-
-			float fScaleX = m_vBoxDimensions.x / fTotalWidth;
+			float fScaleX = m_vBoxDimensions.x / m_fUsedPixelWidth;
 			float fScaleY = m_vBoxDimensions.y / fTotalHeight;
 
 			m_fScaleBoxModifier = HyMin(fScaleX, fScaleY);
