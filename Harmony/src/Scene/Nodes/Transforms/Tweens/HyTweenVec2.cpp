@@ -34,6 +34,12 @@ void HyTweenVec2::X(float fValue)
 	m_AnimFloatList[1].StopTween();
 }
 
+void HyTweenVec2::X(int32 iValue)
+{
+	m_AnimFloatList[0] = static_cast<float>(iValue);
+	m_AnimFloatList[1].StopTween();
+}
+
 float HyTweenVec2::Y() const
 {
 	return m_AnimFloatList[1].Get();
@@ -43,6 +49,12 @@ void HyTweenVec2::Y(float fValue)
 {
 	m_AnimFloatList[0].StopTween();
 	m_AnimFloatList[1] = fValue;
+}
+
+void HyTweenVec2::Y(int32 iValue)
+{
+	m_AnimFloatList[0].StopTween();
+	m_AnimFloatList[1] = static_cast<float>(iValue);
 }
 
 void HyTweenVec2::Set(float fAll)

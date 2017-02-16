@@ -29,9 +29,11 @@ public:
 
 	float X() const;
 	void X(float fValue);
+	void X(int32 iValue);
 
 	float Y() const;
 	void Y(float fValue);
+	void Y(int32 iValue);
 
 	void Set(float fAll);
 	void Set(int32 iX, int32 iY);

@@ -110,7 +110,10 @@ float HyText2dData::GetLineDescender(uint32 uiStateIndex)
 
 float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
 {
-	return m_pFontStates[uiStateIndex].fLEFT_SIDE_NUDGE_AMT;
+	if(m_pFontStates)
+		return m_pFontStates[uiStateIndex].fLEFT_SIDE_NUDGE_AMT;
+
+	return 0.0f;
 }
 
 /*virtual*/ void HyText2dData::DoFileLoad()

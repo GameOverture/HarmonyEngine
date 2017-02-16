@@ -71,7 +71,14 @@ float HyText2d::TextGetPixelWidth()
 	if(m_bIsDirty)
 		OnUpdate();
 
-	return m_fUsedPixelWidth;
+	float fProperNudgeAmt = 0.0f;
+	if(m_eLoadState == HYLOADSTATE_Loaded)
+	{
+		const HyText2dGlyphInfo &glyphRef = static_cast<HyText2dData *>(m_pData)->GetGlyph(m_uiCurFontState, 0, static_cast<uint32>(m_sCurrentString[0]));
+		fProperNudgeAmt = static_cast<HyText2dData *>(m_pData)->GetLeftSideNudgeAmt(m_uiCurFontState) - glyphRef.iOFFSET_X;
+	}
+
+	return m_fUsedPixelWidth - fProperNudgeAmt;
 }
 
 uint32 HyText2d::TextGetState()
