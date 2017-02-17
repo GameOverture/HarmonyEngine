@@ -173,6 +173,11 @@ void IHyDraw2d::EnablePhysics(bool bEnable)
 {
 }
 
+const HyRectangle<int32> &IHyDraw2d::GetScissor()
+{
+	return m_LocalScissorRect;
+}
+
 void IHyDraw2d::SetScissor(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight)
 {
 	m_LocalScissorRect.left = uiX;

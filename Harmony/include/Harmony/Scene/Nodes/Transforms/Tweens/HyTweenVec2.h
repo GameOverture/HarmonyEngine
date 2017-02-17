@@ -29,11 +29,14 @@ public:
 
 	float X() const;
 	void X(float fValue);
+	void X(int32 iValue);
 
 	float Y() const;
 	void Y(float fValue);
+	void Y(int32 iValue);
 
 	void Set(float fAll);
+	void Set(int32 iX, int32 iY);
 	void Set(float fX, float fY);
 	void Set(const glm::vec2 &srcVec);
 	void Set(const glm::ivec2 &srcVec);
@@ -44,6 +47,7 @@ public:
 	void Offset(const glm::ivec2 &srcVec);
 	void Offset(const HyTweenVec2 &srcVec);
 
+	void Tween(int32 iX, int32 iY, float fSeconds, HyTweenUpdateFunc fpEase = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback);
 	void Tween(float fX, float fY, float fSeconds, HyTweenUpdateFunc fpEase = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback);
 	void TweenOffset(float fOffsetX, float fOffsetY, float fSeconds, HyTweenUpdateFunc fpEase = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::_NullTweenCallback);
 	

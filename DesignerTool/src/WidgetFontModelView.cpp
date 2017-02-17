@@ -327,12 +327,12 @@ float WidgetFontModel::GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs)
             char cCharacter = sAvailableTypefaceGlyphs.toStdString().c_str()[j];
             texture_glyph_t *pGlyph = texture_font_get_glyph(m_LayerList[i]->pReference->pTextureFont, &cCharacter);
 
-            if(fLeftSideNudgeAmt < pGlyph->offset_x)
-                fLeftSideNudgeAmt = pGlyph->offset_x;
+            if(fLeftSideNudgeAmt < abs(pGlyph->offset_x))
+                fLeftSideNudgeAmt = abs(pGlyph->offset_x);
         }
     }
 
-    return abs(fLeftSideNudgeAmt);
+    return fLeftSideNudgeAmt;
 }
 
 void WidgetFontModel::MoveRowUp(int iIndex)

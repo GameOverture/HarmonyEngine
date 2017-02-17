@@ -34,6 +34,12 @@ void HyTweenVec2::X(float fValue)
 	m_AnimFloatList[1].StopTween();
 }
 
+void HyTweenVec2::X(int32 iValue)
+{
+	m_AnimFloatList[0] = static_cast<float>(iValue);
+	m_AnimFloatList[1].StopTween();
+}
+
 float HyTweenVec2::Y() const
 {
 	return m_AnimFloatList[1].Get();
@@ -45,10 +51,22 @@ void HyTweenVec2::Y(float fValue)
 	m_AnimFloatList[1] = fValue;
 }
 
+void HyTweenVec2::Y(int32 iValue)
+{
+	m_AnimFloatList[0].StopTween();
+	m_AnimFloatList[1] = static_cast<float>(iValue);
+}
+
 void HyTweenVec2::Set(float fAll)
 {
 	m_AnimFloatList[0].Set(fAll);
 	m_AnimFloatList[1].Set(fAll);
+}
+
+void HyTweenVec2::Set(int32 iX, int32 iY)
+{
+	m_AnimFloatList[0] = static_cast<float>(iX);
+	m_AnimFloatList[1] = static_cast<float>(iY);
 }
 
 void HyTweenVec2::Set(float fX, float fY)
@@ -97,6 +115,11 @@ void HyTweenVec2::Offset(const HyTweenVec2 &srcVec)
 {
 	m_AnimFloatList[0].Offset(srcVec[0]);
 	m_AnimFloatList[1].Offset(srcVec[1]);
+}
+
+void HyTweenVec2::Tween(int32 iX, int32 iY, float fSeconds, HyTweenUpdateFunc fpEase /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::_NullTweenCallback*/)
+{
+	Tween(static_cast<float>(iX), static_cast<float>(iY), fSeconds, fpEase, tweenFinishedCallback);
 }
 
 void HyTweenVec2::Tween(float fX, float fY, float fSeconds, HyTweenUpdateFunc fpEase /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::_NullTweenCallback*/)
