@@ -28,8 +28,13 @@ class IHy2dData : public IHyData
 
 	std::set<IHyShader *>			m_AssociatedShaders;
 
+
+
+	int32							m_iRefCount;
+	HyLoadState						m_eLoadState;
+
 public:
-	IHy2dData(HyType eInstType, const std::string &sPath, int32 iShaderId);
+	IHy2dData(HyType eInstType, const std::string &sPath, const jsonxx::Value &dataValueRef, int32 iShaderId);
 	virtual ~IHy2dData();
 
 	int32 GetShaderId();
@@ -41,6 +46,13 @@ public:
 	const std::set<HyAtlasGroup *> &GetAssociatedAtlases();
 
 	const std::set<IHyShader *> &GetAssociatedShaders();
+
+	virtual void SetLoadState(HyLoadState eState);
+	HyLoadState GetLoadState();
+
+	void IncRef();
+	bool DecRef();
+	int32 GetRefCount();
 
 	// Only invoked on the Load thread
 	virtual void OnLoadThread() override;

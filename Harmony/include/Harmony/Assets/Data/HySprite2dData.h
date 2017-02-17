@@ -42,12 +42,12 @@ struct HySprite2dFrame
 	uint32 GetActualTextureIndex() const;
 };
 
-class HySprite2dData : public IHy2dData
+class HySprite2dData : public IHyData
 {
 	friend class HyFactory<HySprite2dData>;
 
 	// Only allow HyFactory instantiate
-	HySprite2dData(const std::string &sPath, int32 iShaderId);
+	HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef);
 
 public:
 	class AnimState
@@ -74,8 +74,6 @@ public:
 	uint32 GetNumStates() const;
 	const AnimState &GetState(uint32 uiAnimStateIndex) const;
 	const HySprite2dFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const;
-
-	virtual void DoFileLoad() override;
 };
 
 #endif /* __HySprite2dData_h__ */

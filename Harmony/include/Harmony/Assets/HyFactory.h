@@ -20,73 +20,43 @@ template<typename tData>
 class HyFactory
 {
 	const HyType					m_eTYPE;
-	const std::string				m_sDATADIR;
 
-	std::vector<tData *>			m_DataList;
+	std::map<std::string, uint32>	m_LookupIndexMap;
+	std::vector<tData>				m_DataList;
 	
 public:
-	HyFactory(HyType eType, std::string sDataDir) :	m_eTYPE(eType),
-													m_sDATADIR(sDataDir)
+	HyFactory(HyType eType) :	m_eTYPE(eType)
 	{ }
+
 	~HyFactory()
+	{ }
+
+	void Init(jsonxx::Object &subDirObjRef)
 	{
-		for(uint32 i = 0; i < static_cast<uint32>(m_DataList.size()); ++i)
-			delete m_DataList[i];
+		uint32 i = 0;
+		for(auto iter = subDirObjRef.kv_map().begin(); iter != subDirObjRef.kv_map().end(); ++iter, ++i)
+		{
+			std::string sPath = MakeStringProperPath(iter->first.c_str(), nullptr, true);
+
+			m_LookupIndexMap.insert(std::make_pair(sPath, i));
+			m_DataList.emplace_back(iter->first, iter->second);
+		}
 	}
 
-	HyType GetType()				{ return m_eType; }
-
-	tData *GetOrCreateData2d(const std::string &sPrefix, const std::string &sName, int32 iShaderId)
+	tData *GetData(const std::string &sPrefix, const std::string &sName)
 	{
-		std::string sPath = m_sDATADIR;
+		std::string sPath;
 
 		if(sPrefix.empty() == false)
 			sPath += MakeStringProperPath(sPrefix.c_str(), "/", true);
 
 		sPath += sName;
+		sPath = MakeStringProperPath(sPath.c_str(), nullptr, true);
 
-		switch(m_eTYPE)
-		{
-		case HYTYPE_Sound2d:		sPath = MakeStringProperPath(sPath.c_str(), ".hyaud", true);	break;
-		case HYTYPE_Particles2d:	sPath = MakeStringProperPath(sPath.c_str(), ".hypfx", true);	break;
-		case HYTYPE_Text2d:			sPath = MakeStringProperPath(sPath.c_str(), ".hyfnt", true);	break;
-		case HYTYPE_Spine2d:		sPath = MakeStringProperPath(sPath.c_str(), ".hyspi", true);	break;
-		case HYTYPE_Sprite2d:		sPath = MakeStringProperPath(sPath.c_str(), ".hyspr", true);	break;
-		case HYTYPE_TexturedQuad2d:	sPath = sName;													break;
-		case HYTYPE_Primitive2d:	sPath = "";														break;
-		}
+		auto iter = m_LookupIndexMap.find(sPath);
+		HyAssert(iter != m_LookupIndexMap.end(), "Could not find data: " << sPath.c_str());
 
-		// Check to determine this data with these parameters doesn't already exist, if it does return the 'tData' associated with it.
-		size_t uiNumDatas = m_DataList.size();
-		for(size_t i = 0; i < uiNumDatas; ++i)
-		{
-			if(m_DataList[i]->GetPath() == sPath && m_DataList[i]->GetShaderId() == iShaderId)
-				return m_DataList[i];
-		}
-		
-		tData *pOutData = HY_NEW tData(sPath, iShaderId);
-		m_DataList.push_back(pOutData);
-
-		return pOutData;
-	}
-
-	void DeleteData(tData *pData)
-	{
-		for(std::vector<tData *>::iterator it = m_DataList.begin(); it != m_DataList.end(); ++it)
-		{
-			if((*it) == pData)
-			{
-				m_DataList.erase(it);
-				delete pData;
-
-				return;
-			}
-		}
-	}
-
-	bool IsEmpty()
-	{
-		return m_DataList.empty();
+		return m_DataList[*iter];
 	}
 };
 

@@ -14,9 +14,11 @@
 
 HyTextures *IHy2dData::sm_pTextures = NULL;
 
-IHy2dData::IHy2dData(HyType eInstType, const std::string &sPath, int32 iShaderId) :	IHyData(HYDATA_2d, eInstType, sPath),
-																					m_iSHADER_ID(iShaderId),
-																					m_bIncRenderRef(false)
+IHy2dData::IHy2dData(HyType eInstType, const std::string &sPath, const jsonxx::Value &dataValueRef, int32 iShaderId) :	IHyData(HYDATA_2d, eInstType, sPath, dataValueRef),
+																														m_iSHADER_ID(iShaderId),
+																														m_bIncRenderRef(false),
+																														m_eLoadState(HYLOADSTATE_Inactive),
+																														m_iRefCount(0)
 {
 }
 
@@ -77,4 +79,30 @@ const std::set<IHyShader *> &IHy2dData::GetAssociatedShaders()
 	}
 
 	IHyData::OnLoadThread();
+}
+
+/*virtual*/ void IHy2dData::SetLoadState(HyLoadState eState)
+{
+	m_eLoadState = eState;
+}
+
+HyLoadState IHy2dData::GetLoadState()
+{
+	return m_eLoadState;
+}
+
+void IHy2dData::IncRef()
+{
+	m_iRefCount++;
+}
+
+bool IHy2dData::DecRef()
+{
+	m_iRefCount--;
+	return m_iRefCount <= 0;
+}
+
+int32 IHy2dData::GetRefCount()
+{
+	return m_iRefCount;
 }

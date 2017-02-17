@@ -23,10 +23,27 @@ uint32 HySprite2dFrame::GetActualTextureIndex() const
 	return pAtlasGroup ? pAtlasGroup->GetActualGfxApiTextureIndex(uiATLAS_GROUP_TEXTURE_INDEX) : 0;
 }
 
-HySprite2dData::HySprite2dData(const std::string &sPath, int32 iShaderId) : IHy2dData(HYTYPE_Sprite2d, sPath, iShaderId),
-																			m_pAnimStates(NULL),
-																			m_uiNumStates(0)
+HySprite2dData::HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef) :	IHyData(HYTYPE_Sprite2d, sPath),
+																								m_pAnimStates(NULL),
+																								m_uiNumStates(0)
 {
+	jsonxx::Array spriteStateArray = dataValueRef.get<jsonxx::Array>();
+
+	m_uiNumStates = static_cast<uint32>(spriteStateArray.size());
+	m_pAnimStates = reinterpret_cast<AnimState *>(HY_NEW unsigned char[sizeof(AnimState) * m_uiNumStates]);
+	AnimState *pAnimStateWriteLocation = m_pAnimStates;
+
+	for(uint32 i = 0; i < m_uiNumStates; ++i, ++pAnimStateWriteLocation)
+	{
+		jsonxx::Object spriteStateObj = spriteStateArray.get<jsonxx::Object>(i);
+
+		new (pAnimStateWriteLocation)AnimState(spriteStateObj.get<jsonxx::String>("name"),
+			spriteStateObj.get<jsonxx::Boolean>("loop"),
+			spriteStateObj.get<jsonxx::Boolean>("reverse"),
+			spriteStateObj.get<jsonxx::Boolean>("bounce"),
+			spriteStateObj.get<jsonxx::Array>("frames"),
+			*this);
+	}
 }
 
 /*virtual*/ HySprite2dData::~HySprite2dData(void)
@@ -52,31 +69,6 @@ const HySprite2dData::AnimState &HySprite2dData::GetState(uint32 uiAnimStateInde
 const HySprite2dFrame &HySprite2dData::GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const
 {
 	return m_pAnimStates[uiAnimStateIndex].GetFrame(uiFrameIndex);
-}
-
-/*virtual*/ void HySprite2dData::DoFileLoad()
-{
-	std::string sSpriteFileContents;
-	HyReadTextFile(GetPath().c_str(), sSpriteFileContents);
-
-	jsonxx::Array spriteStateArray;
-	spriteStateArray.parse(sSpriteFileContents);
-
-	m_uiNumStates = static_cast<uint32>(spriteStateArray.size());
-	m_pAnimStates = reinterpret_cast<AnimState *>(HY_NEW unsigned char[sizeof(AnimState) * m_uiNumStates]);
-	AnimState *pAnimStateWriteLocation = m_pAnimStates;
-
-	for(uint32 i = 0; i < m_uiNumStates; ++i, ++pAnimStateWriteLocation)
-	{
-		jsonxx::Object spriteStateObj = spriteStateArray.get<jsonxx::Object>(i);
-
-		new (pAnimStateWriteLocation)AnimState(spriteStateObj.get<jsonxx::String>("name"),
-											   spriteStateObj.get<jsonxx::Boolean>("loop"),
-											   spriteStateObj.get<jsonxx::Boolean>("reverse"),
-											   spriteStateObj.get<jsonxx::Boolean>("bounce"),
-											   spriteStateObj.get<jsonxx::Array>("frames"),
-											   *this);
-	}
 }
 
 HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HySprite2dData &dataRef) :	m_sNAME(sName),

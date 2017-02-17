@@ -22,28 +22,44 @@
 #include "Utilities/HyMath.h"
 #include "Utilities/HyStrManip.h"
 
-const std::string	HyAssetManager::sm_sSUBDIRNAMES[NUM_SUBDIRS] = { "Atlases/", "Audio/", "Particles/", "Fonts/", "Spine/", "Sprites/", "Shaders/", "Entities/", "Meshes/" };
-
 HyAssetManager::HyAssetManager(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
 																										m_GfxCommsRef(gfxCommsRef),
 																										m_SceneRef(sceneRef),
-																										m_AtlasManager(m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Atlases]),
-																										m_Sfx(HYTYPE_Sound2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Audio]),
-																										m_Sprite2d(HYTYPE_Sprite2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Sprites]),
-																										m_Spine2d(HYTYPE_Spine2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Spine]),
-																										m_Txt2d(HYTYPE_Text2d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Fonts]),
-																										m_Mesh3d(HYTYPE_Mesh3d, m_sDATADIR + sm_sSUBDIRNAMES[SUBDIR_Meshes]),
-																										m_Quad2d(HYTYPE_TexturedQuad2d, ""),
-																										m_Primitive2d(HYTYPE_Primitive2d, ""),
+																										m_AtlasManager(m_sDATADIR + "Atlases/"),
+																										m_Sfx(HYTYPE_Sound2d),
+																										m_Sprite2d(HYTYPE_Sprite2d),
+																										m_Spine2d(HYTYPE_Spine2d),
+																										m_Txt2d(HYTYPE_Text2d),
+																										m_Mesh3d(HYTYPE_Mesh3d),
+																										m_Quad2d(HYTYPE_TexturedQuad2d),
+																										m_Primitive2d(HYTYPE_Primitive2d),
 																										m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval)
 {
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
 
+
+	std::string sGameDataFilePath(m_sDATADIR);
+	sGameDataFilePath += "Data.json";
+
+	std::string sGameDataFileContents;
+	HyReadTextFile(sGameDataFilePath.c_str(), sGameDataFileContents);
+	
+	jsonxx::Object gameDataObj;
+	bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
+	HyAssert(bGameDataParsed, "Could not parse game data");
+
+	m_Sfx.Init(gameDataObj.get<jsonxx::Object>("Audio"));
+	m_Txt2d.Init(gameDataObj.get<jsonxx::Object>("Fonts"));
+	m_Sprite2d.Init(gameDataObj.get<jsonxx::Object>("Sprites"));
+	//jsonxx::Object &entitiesDataObjRef = gameDataObj.get<jsonxx::Object>("Entities");
+	//jsonxx::Object &particlesDataObjRef = gameDataObj.get<jsonxx::Object>("Particles");
+	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");
+	//jsonxx::Object &spineDataObjRef = gameDataObj.get<jsonxx::Object>("Spine");
+
 	IHy2dData::sm_pTextures = &m_AtlasManager;
 	IHyDraw2d::sm_pAssetManager = this;
 }
-
 
 HyAssetManager::~HyAssetManager()
 {

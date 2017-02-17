@@ -39,25 +39,29 @@ class HyAssetManager
 {
 	const std::string									m_sDATADIR;
 
-	enum eSubDirs
-	{
-		SUBDIR_Atlases = 0,
-		SUBDIR_Audio,
-		SUBDIR_Particles,
-		SUBDIR_Fonts,
-		SUBDIR_Spine,
-		SUBDIR_Sprites,
-		SUBDIR_Shaders,
-		SUBDIR_Entities,
-		SUBDIR_Meshes,
-
-		NUM_SUBDIRS
-	};
-	static const std::string							sm_sSUBDIRNAMES[NUM_SUBDIRS];
-
 	HyGfxComms &										m_GfxCommsRef;
 	HyScene &											m_SceneRef;
 
+	HyTextures											m_AtlasManager;
+
+	HyFactory<HySfxData>								m_Sfx;
+	HyFactory<HySprite2dData>							m_Sprite2d;
+	HyFactory<HySpine2dData>							m_Spine2d;
+	HyFactory<HyMesh3dData>								m_Mesh3d;
+	HyFactory<HyText2dData>								m_Txt2d;
+	HyFactory<HyTexturedQuad2dData>						m_Quad2d;
+	HyFactory<HyPrimitive2dData>						m_Primitive2d;
+
+	std::vector<IHyDraw2d *>							m_QueuedInst2dList;
+
+	// Queues responsible for passing and retrieving factory data between the loading thread
+	queue<IHyData *>									m_LoadQueue_Prepare;
+	queue<IHyData *>									m_LoadQueue_Shared;
+	queue<IHyData *>									m_LoadQueue_Retrieval;
+
+	queue<IHy2dData *> *								m_pGfxQueue_Retrieval;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Thread control structure to help sync loading of factory data
 	struct LoadThreadCtrl
 	{
@@ -76,35 +80,15 @@ class HyAssetManager
 		};
 		eState				m_eState;
 
-		LoadThreadCtrl(queue<IHyData *> &LoadQueueRef_Shared, queue<IHyData *> &LoadQueueRef_Retrieval) :	m_LoadQueueRef_Shared(LoadQueueRef_Shared),
-																											m_LoadQueueRef_Retrieval(LoadQueueRef_Retrieval),
-																											m_WaitEvent_HasNewData(L"Thread Idler", true),
-																											m_eState(STATE_Run)
+		LoadThreadCtrl(queue<IHyData *> &LoadQueueRef_Shared, queue<IHyData *> &LoadQueueRef_Retrieval) : m_LoadQueueRef_Shared(LoadQueueRef_Shared),
+			m_LoadQueueRef_Retrieval(LoadQueueRef_Retrieval),
+			m_WaitEvent_HasNewData(L"Thread Idler", true),
+			m_eState(STATE_Run)
 		{}
 	};
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	LoadThreadCtrl										m_LoadingCtrl;
-
-	std::vector<IHyDraw2d *>							m_QueuedInst2dList;
-
-	HyFactory<HySfxData>								m_Sfx;
-	HyFactory<HySprite2dData>							m_Sprite2d;
-	HyFactory<HySpine2dData>							m_Spine2d;
-	HyFactory<HyMesh3dData>								m_Mesh3d;
-	HyFactory<HyText2dData>								m_Txt2d;
-	HyFactory<HyTexturedQuad2dData>						m_Quad2d;
-	HyFactory<HyPrimitive2dData>						m_Primitive2d;
-
-	HyTextures											m_AtlasManager;
-
-	// Queues responsible for passing and retrieving factory data between the loading thread
-	queue<IHyData *>									m_LoadQueue_Prepare;
-	queue<IHyData *>									m_LoadQueue_Shared;
-	queue<IHyData *>									m_LoadQueue_Retrieval;
-
-	queue<IHy2dData *> *								m_pGfxQueue_Retrieval;
-
-	// Loading thread info pointer
-	ThreadInfoPtr										m_pLoadingThread;
+	ThreadInfoPtr										m_pLoadingThread;	// Loading thread info pointer
 
 public:
 	HyAssetManager(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
