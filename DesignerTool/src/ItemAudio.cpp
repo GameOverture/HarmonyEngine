@@ -11,7 +11,7 @@
 #include "WidgetAudio.h"
 
 
-ItemAudio::ItemAudio(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Audio, sPath, atlasManRef, audioManRef)
+ItemAudio::ItemAudio(const QString sPath, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Audio, sPath, initVal, atlasManRef, audioManRef)
 {
     m_pWidget = new WidgetAudio(this);
 }

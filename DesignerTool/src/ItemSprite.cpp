@@ -16,7 +16,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Sprite, sPath, atlasManRef, audioManRef)
+ItemSprite::ItemSprite(const QString sPath, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Sprite, sPath, initVal, atlasManRef, audioManRef)
 {
     std::vector<glm::vec2> lineList(2, glm::vec2());
     
@@ -144,18 +144,4 @@ ItemSprite::ItemSprite(const QString sPath, WidgetAtlasManager &atlasManRef, Wid
     static_cast<WidgetSprite *>(m_pWidget)->GetSaveInfo(spriteStateArray);
 
     return spriteStateArray;
-
-//    QJsonDocument settingsDoc(spriteStateArray);
-
-//    QFile spriteFile(GetAbsPath());
-//    if(spriteFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-//    {
-//        qint64 iBytesWritten = spriteFile.write(settingsDoc.toJson());
-//        if(0 == iBytesWritten || -1 == iBytesWritten)
-//            HyGuiLog("Could not write to sprite item file: " % spriteFile.errorString(), LOGTYPE_Error);
-//    }
-//    else
-//        HyGuiLog("Couldn't open item file " % GetAbsPath() % ": " % spriteFile.errorString(), LOGTYPE_Error);
-
-//    spriteFile.close();
 }

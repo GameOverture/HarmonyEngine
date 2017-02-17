@@ -21,9 +21,9 @@
 
 #include "Harmony/HyEngine.h"
 
-ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Font, sPath, atlasManRef, audioManRef),
-                                                                                                            m_pDrawAtlasPreview(NULL),
-                                                                                                            m_pFontCamera(NULL)
+ItemFont::ItemFont(const QString sPath, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Font, sPath, initVal, atlasManRef, audioManRef),
+                                                                                                                                m_pDrawAtlasPreview(NULL),
+                                                                                                                                m_pFontCamera(NULL)
 {
     m_pWidget = new WidgetFont(this);
 }
@@ -239,18 +239,4 @@ ItemFont::ItemFont(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetA
     pWidget->GetSaveInfo(fontObj);
 
     return fontObj;
-
-//    QJsonDocument settingsDoc(fontObj);
-
-//    QFile fontFile(GetAbsPath());
-//    if(fontFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-//    {
-//        qint64 iBytesWritten = fontFile.write(settingsDoc.toJson());
-//        if(0 == iBytesWritten || -1 == iBytesWritten)
-//            HyGuiLog("Could not write to font item file: " % fontFile.errorString(), LOGTYPE_Error);
-//    }
-//    else
-//        HyGuiLog("Couldn't open item file " % GetAbsPath() % ": " % fontFile.errorString(), LOGTYPE_Error);
-
-//    fontFile.close();
 }

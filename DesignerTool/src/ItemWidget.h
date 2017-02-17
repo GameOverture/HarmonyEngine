@@ -43,6 +43,7 @@ class ItemWidget : public Item
     void Unlink(HyGuiFrame *pFrame);
 
 protected:
+    QJsonValue          m_InitValue;
     WidgetAtlasManager &m_AtlasManRef;
     WidgetAudioManager &m_AudioManRef;
 
@@ -69,8 +70,10 @@ protected:
     virtual QJsonValue OnSave() = 0;
 
 public:
-    ItemWidget(eItemType eType, const QString sPath, WidgetAtlasManager &AtlasManRef, WidgetAudioManager &AudioManRef);
+    ItemWidget(eItemType eType, const QString sPath, QJsonValue initVal, WidgetAtlasManager &AtlasManRef, WidgetAudioManager &AudioManRef);
     virtual ~ItemWidget();
+    
+    QJsonValue GetInitValue()                       { return m_InitValue; }
 
     bool IsLoaded() const                           { return (m_pCamera != NULL); }
 

@@ -68,17 +68,10 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
 
     ui->cmbAtlasGroups->setModel(m_pItemFont->GetAtlasManager().AllocateAtlasModelView());
     
-    // If a .hyfnt file exists, parse and initalize with it, otherwise make default empty font
-    QFile fontFile(m_pItemFont->GetAbsPath());
-    if(fontFile.exists())
+    // If item's init value is defined, parse and initalize with it, otherwise make default empty font
+    if(m_pItemFont->GetInitValue().isUndefined() == false)
     {
-        if(!fontFile.open(QIODevice::ReadOnly))
-            HyGuiLog(QString("WidgetFont::WidgetFont() could not open ") % m_pItemFont->GetAbsPath(), LOGTYPE_Error);
-
-        QJsonDocument fontJsonDoc = QJsonDocument::fromJson(fontFile.readAll());
-        fontFile.close();
-
-        QJsonObject fontObj = fontJsonDoc.object();
+        QJsonObject fontObj = m_pItemFont->GetInitValue().toObject();
 
         QJsonObject availGlyphsObj = fontObj["availableGlyphs"].toObject();
         ui->chk_09->setChecked(availGlyphsObj["0-9"].toBool());

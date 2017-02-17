@@ -40,19 +40,19 @@ WidgetAudio::WidgetAudio(ItemAudio *pOwner, QWidget *parent) :  QWidget(parent),
     
     
     
-    // If a .hyaud file exists, parse and initalize with it, otherwise make default empty audio
-    QFile audioFile(m_pItemAudio->GetAbsPath());
-    if(audioFile.exists())
-    {
-        if(!audioFile.open(QIODevice::ReadOnly))
-            HyGuiLog(QString("WidgetAudio::WidgetAudio() could not open ") % m_pItemAudio->GetAbsPath(), LOGTYPE_Error);
+//    // If a .hyaud file exists, parse and initalize with it, otherwise make default empty audio
+//    QFile audioFile(m_pItemAudio->GetAbsPath());
+//    if(audioFile.exists())
+//    {
+//        if(!audioFile.open(QIODevice::ReadOnly))
+//            HyGuiLog(QString("WidgetAudio::WidgetAudio() could not open ") % m_pItemAudio->GetAbsPath(), LOGTYPE_Error);
 
-        QJsonDocument fontJsonDoc = QJsonDocument::fromJson(audioFile.readAll());
-        audioFile.close();
+//        QJsonDocument fontJsonDoc = QJsonDocument::fromJson(audioFile.readAll());
+//        audioFile.close();
 
-        QJsonObject fontObj = fontJsonDoc.object();
-    }
-    else
+//        QJsonObject fontObj = fontJsonDoc.object();
+//    }
+//    else
     {
         on_actionAddState_triggered();
     }

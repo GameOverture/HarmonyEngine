@@ -165,13 +165,13 @@ public:
         sm_sItemExt[ITEM_DirAtlases] = "/";
         sm_sItemExt[ITEM_DirAudioBanks] = "/";
         sm_sItemExt[ITEM_Prefix] = "/";
-        sm_sItemExt[ITEM_Audio] = ".hyaud";
-        sm_sItemExt[ITEM_Particles] = ".hypfx";
-        sm_sItemExt[ITEM_Font] = ".hyfnt";
-        sm_sItemExt[ITEM_Spine] = ".hyspi";
-        sm_sItemExt[ITEM_Sprite] = ".hyspr";
+        sm_sItemExt[ITEM_Audio] = "";//".hyaud";
+        sm_sItemExt[ITEM_Particles] = "";//".hypfx";
+        sm_sItemExt[ITEM_Font] = "";//".hyfnt";
+        sm_sItemExt[ITEM_Spine] = "";//".hyspi";
+        sm_sItemExt[ITEM_Sprite] = "";//".hyspr";
         sm_sItemExt[ITEM_Shader] = "";
-        sm_sItemExt[ITEM_Entity] = ".hyent";
+        sm_sItemExt[ITEM_Entity] = "";//".hyent";
         
         sm_ItemIcons[ITEM_Project].addFile(QString(":/icons16x16/project.png"));
         sm_ItemIcons[ITEM_DirAudio].addFile(QString(":/icons16x16/audio-folder.png"));

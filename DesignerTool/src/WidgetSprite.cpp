@@ -65,17 +65,10 @@ WidgetSprite::~WidgetSprite()
 // This Load() code can't be put into the ctor because of GetAtlasManager().RequestFrames()
 void WidgetSprite::Load()
 {
-    // If a .hyspr file exists, parse and initalize with it, otherwise make default empty sprite
-    QFile spriteFile(m_pItemSprite->GetAbsPath());
-    if(spriteFile.exists())
+    // If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
+    if(m_pItemSprite->GetInitValue().isUndefined() == false)
     {
-        if(!spriteFile.open(QIODevice::ReadOnly))
-            HyGuiLog(QString("WidgetSprite::WidgetSprite() could not open ") % m_pItemSprite->GetAbsPath(), LOGTYPE_Error);
-
-        QJsonDocument spriteJsonDoc = QJsonDocument::fromJson(spriteFile.readAll());
-        spriteFile.close();
-
-        QJsonArray stateArray = spriteJsonDoc.array();
+        QJsonArray stateArray = m_pItemSprite->GetInitValue().toArray();
         for(int i = 0; i < stateArray.size(); ++i)
         {
             QJsonObject stateObj = stateArray[i].toObject();

@@ -20,7 +20,7 @@ class ItemSpine : public ItemWidget
     Q_OBJECT
 
 public:
-    ItemSpine(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef);
+    ItemSpine(const QString sPath, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef);
     virtual ~ItemSpine();
 
     virtual QList<QAction *> GetActionsForToolBar();

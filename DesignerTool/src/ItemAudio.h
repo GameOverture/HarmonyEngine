@@ -17,7 +17,7 @@ class ItemAudio : public ItemWidget
     Q_OBJECT
     
 public:
-    ItemAudio(const QString sPath, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef);
+    ItemAudio(const QString sPath, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef);
     virtual ~ItemAudio();
     
     virtual QList<QAction *> GetActionsForToolBar();
