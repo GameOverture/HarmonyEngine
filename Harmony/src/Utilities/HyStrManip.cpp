@@ -27,8 +27,11 @@ std::string MakeStringProperPath(const char *szPath, const char *szExtension, bo
 
 	std::replace(sPath.begin(), sPath.end(), '\\', '/');
 
-	if(sPath.empty() || 0 != strcmp(&sPath[sPath.length() - strlen(szExtension)], szExtension))
-		sPath.append(szExtension ? szExtension : "");
+	if(szExtension)
+	{
+		if(sPath.empty() || 0 != strcmp(&sPath[sPath.length() - strlen(szExtension)], szExtension))
+			sPath.append(szExtension);
+	}
 
 	size_t uiIndex = 0;
 	while(true)

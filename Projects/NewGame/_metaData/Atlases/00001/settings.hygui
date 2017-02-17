@@ -13,10 +13,10 @@
     "frames": [
         {
             "checksum": 1815730889,
-            "cropBottom": 313,
-            "cropLeft": 1,
-            "cropRight": 467,
-            "cropTop": 1,
+            "cropBottom": 469,
+            "cropLeft": 0,
+            "cropRight": 469,
+            "cropTop": 0,
             "errors": 0,
             "filter": "/HyTreeFilter",
             "height": 470,
@@ -33,14 +33,14 @@
             "cropLeft": 68,
             "cropRight": 222,
             "cropTop": 2,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim20",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 470,
+            "x": 473,
             "y": 0
         },
         {
@@ -49,14 +49,14 @@
             "cropLeft": 72,
             "cropRight": 208,
             "cropTop": 5,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim19",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 628,
+            "x": 631,
             "y": 0
         },
         {
@@ -65,14 +65,14 @@
             "cropLeft": 51,
             "cropRight": 229,
             "cropTop": 5,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim21",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 768,
+            "x": 771,
             "y": 0
         },
         {
@@ -81,14 +81,14 @@
             "cropLeft": 37,
             "cropRight": 235,
             "cropTop": 8,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim22",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 950,
+            "x": 953,
             "y": 0
         },
         {
@@ -97,14 +97,14 @@
             "cropLeft": 48,
             "cropRight": 197,
             "cropTop": 8,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim18",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1152,
+            "x": 1155,
             "y": 0
         },
         {
@@ -113,14 +113,14 @@
             "cropLeft": 26,
             "cropRight": 240,
             "cropTop": 12,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim23",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1305,
+            "x": 1308,
             "y": 0
         },
         {
@@ -129,14 +129,14 @@
             "cropLeft": 20,
             "cropRight": 243,
             "cropTop": 26,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim26",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1523,
+            "x": 1526,
             "y": 0
         },
         {
@@ -145,14 +145,14 @@
             "cropLeft": 19,
             "cropRight": 240,
             "cropTop": 21,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim25",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1750,
+            "x": 1753,
             "y": 0
         },
         {
@@ -161,14 +161,14 @@
             "cropLeft": 27,
             "cropRight": 207,
             "cropTop": 10,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim17",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1523,
+            "x": 1526,
             "y": 203
         },
         {
@@ -177,14 +177,14 @@
             "cropLeft": 24,
             "cropRight": 244,
             "cropTop": 30,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim27",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1707,
+            "x": 1710,
             "y": 212
         },
         {
@@ -193,14 +193,14 @@
             "cropLeft": 20,
             "cropRight": 239,
             "cropTop": 16,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim24",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1300,
+            "x": 1303,
             "y": 235
         },
         {
@@ -209,14 +209,14 @@
             "cropLeft": 20,
             "cropRight": 234,
             "cropTop": 26,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim14",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1082,
+            "x": 1085,
             "y": 237
         },
         {
@@ -225,14 +225,14 @@
             "cropLeft": 28,
             "cropRight": 242,
             "cropTop": 32,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim28",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 864,
+            "x": 867,
             "y": 244
         },
         {
@@ -241,15 +241,15 @@
             "cropLeft": 10,
             "cropRight": 214,
             "cropTop": 14,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim16",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 656,
-            "y": 245
+            "x": 1840,
+            "y": 407
         },
         {
             "checksum": 1814633419,
@@ -257,15 +257,15 @@
             "cropLeft": 8,
             "cropRight": 219,
             "cropTop": 21,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim15",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 441,
-            "y": 316
+            "x": 1625,
+            "y": 428
         },
         {
             "checksum": 2876503751,
@@ -273,15 +273,15 @@
             "cropLeft": 33,
             "cropRight": 238,
             "cropTop": 35,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim29",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 232,
-            "y": 316
+            "x": 1085,
+            "y": 432
         },
         {
             "checksum": 1545659115,
@@ -289,15 +289,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation16",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 24,
-            "y": 316
+            "x": 1085,
+            "y": 618
         },
         {
             "checksum": 3805806088,
@@ -305,15 +305,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation27",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1840,
-            "y": 407
+            "x": 877,
+            "y": 618
         },
         {
             "checksum": 2161173694,
@@ -321,15 +321,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation13",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1632,
-            "y": 428
+            "x": 461,
+            "y": 839
         },
         {
             "checksum": 3251885963,
@@ -337,15 +337,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation17",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1082,
-            "y": 432
+            "x": 1632,
+            "y": 815
         },
         {
             "checksum": 1324693881,
@@ -353,15 +353,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation11",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 874,
-            "y": 435
+            "x": 1840,
+            "y": 807
         },
         {
             "checksum": 1658784510,
@@ -369,15 +369,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation08",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1290,
-            "y": 457
+            "x": 1293,
+            "y": 823
         },
         {
             "checksum": 2269252502,
@@ -385,15 +385,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation19",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 666,
-            "y": 462
+            "x": 877,
+            "y": 435
         },
         {
             "checksum": 3362175387,
@@ -401,15 +401,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation26",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 0,
-            "y": 499
+            "x": 253,
+            "y": 473
         },
         {
             "checksum": 3109004190,
@@ -417,15 +417,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation05",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 208,
-            "y": 502
+            "x": 1840,
+            "y": 624
         },
         {
             "checksum": 3411446781,
@@ -433,15 +433,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation06",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 416,
-            "y": 520
+            "x": 669,
+            "y": 462
         },
         {
             "checksum": 3952387665,
@@ -449,15 +449,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation10",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1840,
-            "y": 590
+            "x": 461,
+            "y": 656
         },
         {
             "checksum": 3981254487,
@@ -465,15 +465,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation22",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1632,
-            "y": 611
+            "x": 45,
+            "y": 656
         },
         {
             "checksum": 3101502437,
@@ -481,15 +481,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation20",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1082,
-            "y": 615
+            "x": 1294,
+            "y": 457
         },
         {
             "checksum": 2816186394,
@@ -497,15 +497,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation21",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 874,
-            "y": 618
+            "x": 1293,
+            "y": 640
         },
         {
             "checksum": 824532313,
@@ -513,15 +513,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation15",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1290,
-            "y": 640
+            "x": 461,
+            "y": 473
         },
         {
             "checksum": 3766058221,
@@ -529,15 +529,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation12",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 666,
-            "y": 645
+            "x": 1632,
+            "y": 632
         },
         {
             "checksum": 870689080,
@@ -545,15 +545,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation23",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 0,
-            "y": 682
+            "x": 669,
+            "y": 645
         },
         {
             "checksum": 3087090630,
@@ -561,15 +561,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation18",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 208,
-            "y": 685
+            "x": 669,
+            "y": 828
         },
         {
             "checksum": 2977496895,
@@ -577,15 +577,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation25",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 416,
-            "y": 703
+            "x": 877,
+            "y": 801
         },
         {
             "checksum": 3051563251,
@@ -593,15 +593,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation14",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1840,
-            "y": 773
+            "x": 253,
+            "y": 656
         },
         {
             "checksum": 266587829,
@@ -609,15 +609,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation07",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1632,
-            "y": 794
+            "x": 253,
+            "y": 839
         },
         {
             "checksum": 3346782580,
@@ -625,15 +625,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation24",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1082,
-            "y": 798
+            "x": 1085,
+            "y": 801
         },
         {
             "checksum": 558505186,
@@ -641,15 +641,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 0,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation09",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 874,
-            "y": 801
+            "x": 45,
+            "y": 473
         },
         {
             "checksum": 2485357460,
@@ -657,15 +657,15 @@
             "cropLeft": 0,
             "cropRight": 204,
             "cropTop": 1,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation28",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1290,
-            "y": 823
+            "x": 45,
+            "y": 839
         },
         {
             "checksum": 3153877517,
@@ -673,15 +673,15 @@
             "cropLeft": 0,
             "cropRight": 203,
             "cropTop": 1,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation03",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 667,
-            "y": 828
+            "x": 878,
+            "y": 984
         },
         {
             "checksum": 2903927902,
@@ -689,15 +689,15 @@
             "cropLeft": 0,
             "cropRight": 203,
             "cropTop": 1,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation04",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 0,
-            "y": 865
+            "x": 1085,
+            "y": 984
         },
         {
             "checksum": 3373001832,
@@ -705,15 +705,15 @@
             "cropLeft": 1,
             "cropRight": 203,
             "cropTop": 2,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation29",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 207,
-            "y": 868
+            "x": 1842,
+            "y": 990
         },
         {
             "checksum": 2283642992,
@@ -721,15 +721,15 @@
             "cropLeft": 1,
             "cropRight": 203,
             "cropTop": 2,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation02",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 413,
-            "y": 886
+            "x": 1636,
+            "y": 998
         },
         {
             "checksum": 1348795426,
@@ -737,15 +737,15 @@
             "cropLeft": 35,
             "cropRight": 235,
             "cropTop": 37,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim30",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1844,
-            "y": 956
+            "x": 1292,
+            "y": 1006
         },
         {
             "checksum": 2877555781,
@@ -753,15 +753,15 @@
             "cropLeft": 41,
             "cropRight": 222,
             "cropTop": 43,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim13",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1659,
-            "y": 977
+            "x": 693,
+            "y": 1011
         },
         {
             "checksum": 1706590145,
@@ -769,15 +769,15 @@
             "cropLeft": 45,
             "cropRight": 224,
             "cropTop": 43,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim01",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1082,
-            "y": 981
+            "x": 510,
+            "y": 1022
         },
         {
             "checksum": 811719801,
@@ -785,15 +785,15 @@
             "cropLeft": 51,
             "cropRight": 228,
             "cropTop": 35,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim02",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 901,
-            "y": 984
+            "x": 329,
+            "y": 1022
         },
         {
             "checksum": 2379523202,
@@ -801,15 +801,15 @@
             "cropLeft": 62,
             "cropRight": 211,
             "cropTop": 43,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim03",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1506,
-            "y": 977
+            "x": 473,
+            "y": 250
         },
         {
             "checksum": 3224597060,
@@ -817,15 +817,15 @@
             "cropLeft": 64,
             "cropRight": 218,
             "cropTop": 51,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim12",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1265,
-            "y": 1005
+            "x": 171,
+            "y": 1022
         },
         {
             "checksum": 1021435203,
@@ -833,15 +833,15 @@
             "cropLeft": 27,
             "cropRight": 177,
             "cropTop": 16,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation30",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 747,
-            "y": 1010
+            "x": 17,
+            "y": 1021
         },
         {
             "checksum": 3974661146,
@@ -849,15 +849,15 @@
             "cropLeft": 76,
             "cropRight": 196,
             "cropTop": 54,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim04",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1498,
-            "y": 457
+            "x": 1501,
+            "y": 640
         },
         {
             "checksum": 1008737017,
@@ -865,15 +865,15 @@
             "cropLeft": 74,
             "cropRight": 211,
             "cropTop": 56,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim11",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 0,
-            "y": 1047
+            "x": 1085,
+            "y": 1166
         },
         {
             "checksum": 3727752853,
@@ -881,14 +881,14 @@
             "cropLeft": 83,
             "cropRight": 184,
             "cropTop": 62,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim05",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1931,
+            "x": 1934,
             "y": 212
         },
         {
@@ -897,15 +897,15 @@
             "cropLeft": 82,
             "cropRight": 199,
             "cropTop": 62,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim10",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1498,
-            "y": 600
+            "x": 1502,
+            "y": 457
         },
         {
             "checksum": 1744615786,
@@ -913,15 +913,15 @@
             "cropLeft": 91,
             "cropRight": 186,
             "cropTop": 66,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim09",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1498,
-            "y": 727
+            "x": 1501,
+            "y": 783
         },
         {
             "checksum": 1496399219,
@@ -929,15 +929,15 @@
             "cropLeft": 90,
             "cropRight": 173,
             "cropTop": 67,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim06",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1498,
-            "y": 847
+            "x": 1501,
+            "y": 903
         },
         {
             "checksum": 3522029400,
@@ -945,15 +945,15 @@
             "cropLeft": 100,
             "cropRight": 173,
             "cropTop": 69,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim08",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1423,
-            "y": 1005
+            "x": 1496,
+            "y": 1021
         },
         {
             "checksum": 2394397811,
@@ -961,15 +961,15 @@
             "cropLeft": 97,
             "cropRight": 166,
             "cropTop": 70,
-            "errors": 0,
+            "errors": 1,
             "filter": "/Test",
             "height": 250,
             "name": "tv_popout_anim07",
             "textureIndex": 0,
             "type": 0,
             "width": 270,
-            "x": 1975,
-            "y": 0
+            "x": 1496,
+            "y": 1135
         },
         {
             "checksum": 3362920247,
@@ -977,15 +977,31 @@
             "cropLeft": 205,
             "cropRight": 204,
             "cropTop": 180,
-            "errors": 0,
+            "errors": 1,
             "filter": "/HyTreeFilter/HyTreeFilter",
             "height": 180,
             "name": "tv_trans_animation01",
             "textureIndex": 0,
             "type": 0,
             "width": 205,
-            "x": 1975,
-            "y": 112
+            "x": 2039,
+            "y": 0
+        },
+        {
+            "checksum": 3065368916,
+            "cropBottom": 213,
+            "cropLeft": 0,
+            "cropRight": 213,
+            "cropTop": 0,
+            "errors": 0,
+            "filter": "",
+            "height": 214,
+            "name": "N",
+            "textureIndex": 0,
+            "type": 4,
+            "width": 214,
+            "x": 650,
+            "y": 245
         }
     ],
     "minFillRate": 80,

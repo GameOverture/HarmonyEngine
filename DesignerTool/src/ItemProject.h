@@ -99,6 +99,7 @@ public:
     void Reset();
 
     void SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal);
+    void SaveGameData();
     void SaveUserData();
 
 private Q_SLOTS:

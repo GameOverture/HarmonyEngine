@@ -152,7 +152,7 @@ ItemProject *ItemWidget::GetItemProject()
 
 void ItemWidget::Save()
 {
-    GetItemProject()->SaveGameData(m_eTYPE, GetRelPath(), OnSave());
+    GetItemProject()->SaveGameData(m_eTYPE, GetName(true), OnSave());
     m_pUndoStack->setClean();
 }
 

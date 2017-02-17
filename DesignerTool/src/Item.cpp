@@ -95,7 +95,11 @@ QString Item::GetRelPath() const
 {
     QString sRelPath;
 
-    QStringList sPathSplitList = m_sPATH.split('/', QString::SkipEmptyParts);
+    QString sFullPath = m_sPATH;
+    if(m_eTYPE == ITEM_Sprite || m_eTYPE == ITEM_Font)
+        sFullPath.remove(HyGlobal::ItemExt(m_eTYPE));
+
+    QStringList sPathSplitList = sFullPath.split('/', QString::SkipEmptyParts);
     QStringList sSubDirList = HyGlobal::SubDirNameList();
 
     int iSplitIndex = sPathSplitList.size() - 1;
@@ -118,7 +122,12 @@ QString Item::GetRelPath() const
     if(bSubDirFound)
     {
         for(int i = iSplitIndex; i < sPathSplitList.size(); ++i)
-            sRelPath += sPathSplitList[i] % "/";
+        {
+            if(i != iSplitIndex)
+                sRelPath += "/";
+
+            sRelPath += sPathSplitList[i];
+        }
     }
 
     return sRelPath;
