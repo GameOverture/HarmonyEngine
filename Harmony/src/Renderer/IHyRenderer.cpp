@@ -99,7 +99,7 @@ void IHyRenderer::Update()
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
 	while(!m_pRxDataQueue->empty())
 	{
-		IHy2dData *pData = m_pRxDataQueue->front();
+		HyDataDraw *pData = m_pRxDataQueue->front();
 		m_pRxDataQueue->pop();
 
 		const std::set<HyAtlasGroup *> &associatedAtlasesSetRef = pData->GetAssociatedAtlases();

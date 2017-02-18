@@ -40,7 +40,7 @@ HyText2dData::FontState::~FontState()
 	delete[] pLayerBuffer;
 }
 
-HyText2dData::HyText2dData(const std::string &sPath, int32 iShaderId) : IHy2dData(HYTYPE_Text2d, sPath, iShaderId),
+HyText2dData::HyText2dData(const std::string &sPath, int32 iShaderId) : HyDataDraw(HYTYPE_Text2d, sPath, iShaderId),
 																		m_uiAtlasGroupTextureIndex(0),
 																		m_pTypefaces(NULL),
 																		m_uiNumTypefaces(0),

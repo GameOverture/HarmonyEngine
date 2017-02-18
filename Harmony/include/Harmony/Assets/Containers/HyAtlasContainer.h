@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyTextures.h
+ *	HyAtlasContainer.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyTextures_h__
-#define __HyTextures_h__
+#ifndef __HyAtlasContainer_h__
+#define __HyAtlasContainer_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -22,11 +22,11 @@ using std::set;
 class HyAtlasGroup;
 class HyAtlas;
 
-class IHy2dData;
+class HyDataDraw;
 class IHyRenderer;
 
 //////////////////////////////////////////////////////////////////////////
-class HyTextures
+class HyAtlasContainer
 {
 	const std::string		m_sATLAS_DIR_PATH;
 
@@ -34,8 +34,8 @@ class HyTextures
 	uint32					m_uiNumAtlasGroups;
 
 public:
-	HyTextures(std::string sAtlasDataDir);
-	~HyTextures();
+	HyAtlasContainer(std::string sAtlasDataDir);
+	~HyAtlasContainer();
 
 	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId);
 	std::string GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
@@ -44,9 +44,9 @@ public:
 //////////////////////////////////////////////////////////////////////////
 class HyAtlasGroup
 {
-	friend class HyTextures;
+	friend class HyAtlasContainer;
 
-	HyTextures &				m_ManagerRef;
+	HyAtlasContainer &				m_ManagerRef;
 
 	const uint32				m_uiLOADGROUPID;
 	const uint32				m_uiWIDTH;
@@ -63,7 +63,7 @@ class HyAtlasGroup
 	BasicSection				m_csTextures;
 
 public:
-	HyAtlasGroup(HyTextures &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
+	HyAtlasGroup(HyAtlasContainer &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
 	~HyAtlasGroup();
 
 	uint32 GetGfxApiHandle(uint32 uiAtlasGroupTextureIndex);
@@ -79,7 +79,7 @@ public:
 
 	void Load();
 
-	void OnRenderThread(IHyRenderer &rendererRef, IHy2dData *pData);
+	void OnRenderThread(IHyRenderer &rendererRef, HyDataDraw *pData);
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -12,7 +12,7 @@
 #include "Renderer/IHyRenderer.h"
 
 
-HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath, int32 iShaderId) : IHy2dData(HYTYPE_TexturedQuad2d, sPath, iShaderId),
+HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath, int32 iShaderId) : HyDataDraw(HYTYPE_TexturedQuad2d, sPath, iShaderId),
 																						m_uiATLASGROUP_ID(sPath == "raw" ? 0xFFFFFFFF : atoi(sPath.c_str())),
 																						m_pAtlas(NULL)
 {

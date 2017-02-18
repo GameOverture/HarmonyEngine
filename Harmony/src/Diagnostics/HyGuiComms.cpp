@@ -13,7 +13,7 @@
 
 HyGuiComms *HyGuiComms::sm_pInstance = NULL;
 
-HyGuiComms::HyGuiComms(uint16 uiPort, HyAssetManager &assetManagerRef) :	m_Acceptor(m_IOService, tcp::endpoint(tcp::v4(), uiPort)),
+HyGuiComms::HyGuiComms(uint16 uiPort, HyAssets &assetManagerRef) :	m_Acceptor(m_IOService, tcp::endpoint(tcp::v4(), uiPort)),
 																			m_AssetManagerRef(assetManagerRef),
 																			m_Socket(m_IOService)
 {

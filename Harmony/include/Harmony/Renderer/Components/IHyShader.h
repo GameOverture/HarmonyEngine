@@ -15,7 +15,7 @@
 #include <vector>
 
 class IHyRenderer;
-class IHy2dData;
+class HyDataDraw;
 
 #define HY_SHADER_UNIFORM_NAME_LENGTH		32	// includes the NULL terminator
 #define HY_SHADER_UNIFORM_BUFFER_LENGTH		(sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH + sizeof(glm::mat4))
@@ -101,7 +101,7 @@ public:
 	void Finalize(HyShaderProgram eDefaultsFrom);
 
 	void OnLoadThread();
-	void OnRenderThread(IHyRenderer &rendererRef, IHy2dData *pData);
+	void OnRenderThread(IHyRenderer &rendererRef, HyDataDraw *pData);
 
 	virtual void OnUpload(IHyRenderer &rendererRef) = 0;
 	virtual void OnDelete(IHyRenderer &rendererRef) = 0;

@@ -452,7 +452,7 @@ void IHyShader::OnLoadThread()
 	HyError("IHyShader::OnLoadThread not implemented. Need to parse hy shader file and get setup shader source and vertex attribs");
 }
 
-void IHyShader::OnRenderThread(IHyRenderer &rendererRef, IHy2dData *pData)
+void IHyShader::OnRenderThread(IHyRenderer &rendererRef, HyDataDraw *pData)
 {
 	// Data can be NULL if it's a default shader being loaded by the Renderer
 	if(pData == NULL)

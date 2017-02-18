@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyAssetManager.h
+ *	HyAssets.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -7,13 +7,13 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __IHyAssetManager_h__
-#define __IHyAssetManager_h__
+#ifndef __IHyAssets_h__
+#define __IHyAssets_h__
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/HyFactory.h"
-#include "Assets/HyTextures.h"
+#include "Assets/Containers/HyNodeDataContainer.h"
+#include "Assets/Containers/HyAtlasContainer.h"
 
 #include "Renderer/Components/HyGfxComms.h"
 #include "Scene/HyScene.h"
@@ -26,7 +26,7 @@ using std::queue;
 class IHyDraw2d;
 
 class IHyData;
-class IHy2dData;
+class HyDataDraw;
 class HySfxData;
 class HySprite2dData;
 class HySpine2dData;
@@ -35,22 +35,22 @@ class HyTexturedQuad2dData;
 class HyPrimitive2dData;
 class HyMesh3dData;
 
-class HyAssetManager
+class HyAssets
 {
 	const std::string									m_sDATADIR;
 
 	HyGfxComms &										m_GfxCommsRef;
 	HyScene &											m_SceneRef;
 
-	HyTextures											m_AtlasManager;
+	HyAtlasContainer									m_AtlasManager;
 
-	HyFactory<HySfxData>								m_Sfx;
-	HyFactory<HySprite2dData>							m_Sprite2d;
-	HyFactory<HySpine2dData>							m_Spine2d;
-	HyFactory<HyMesh3dData>								m_Mesh3d;
-	HyFactory<HyText2dData>								m_Txt2d;
-	HyFactory<HyTexturedQuad2dData>						m_Quad2d;
-	HyFactory<HyPrimitive2dData>						m_Primitive2d;
+	HyNodeDataContainer<HySfxData>						m_Sfx;
+	HyNodeDataContainer<HySprite2dData>					m_Sprite2d;
+	HyNodeDataContainer<HySpine2dData>					m_Spine2d;
+	HyNodeDataContainer<HyMesh3dData>					m_Mesh3d;
+	HyNodeDataContainer<HyText2dData>					m_Txt2d;
+	HyNodeDataContainer<HyTexturedQuad2dData>			m_Quad2d;
+	HyNodeDataContainer<HyPrimitive2dData>				m_Primitive2d;
 
 	std::vector<IHyDraw2d *>							m_QueuedInst2dList;
 
@@ -59,7 +59,7 @@ class HyAssetManager
 	queue<IHyData *>									m_LoadQueue_Shared;
 	queue<IHyData *>									m_LoadQueue_Retrieval;
 
-	queue<IHy2dData *> *								m_pGfxQueue_Retrieval;
+	queue<HyDataDraw *> *								m_pGfxQueue_Retrieval;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Thread control structure to help sync loading of factory data
@@ -91,11 +91,12 @@ class HyAssetManager
 	ThreadInfoPtr										m_pLoadingThread;	// Loading thread info pointer
 
 public:
-	HyAssetManager(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
-	virtual ~HyAssetManager();
+	HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
+	virtual ~HyAssets();
 
 	void Update();
 
+	void GetNodeData(IHyDraw2d *pDrawNode, IHyData *pData);
 	void LoadInst2d(IHyDraw2d *pInst);
 	void RemoveInst(IHyDraw2d *pInst);
 
@@ -109,4 +110,4 @@ private:
 	static void LoadingThread(void *pParam);
 };
 
-#endif /* __IHyAssetManager_h__ */
+#endif /* __IHyAssets_h__ */

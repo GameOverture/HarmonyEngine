@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyAssetManager.cpp
+ *	HyAssets.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Assets/HyAssetManager.h"
+#include "Assets/HyAssets.h"
 
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
 
@@ -22,7 +22,7 @@
 #include "Utilities/HyMath.h"
 #include "Utilities/HyStrManip.h"
 
-HyAssetManager::HyAssetManager(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
+HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
 																										m_GfxCommsRef(gfxCommsRef),
 																										m_SceneRef(sceneRef),
 																										m_AtlasManager(m_sDATADIR + "Atlases/"),
@@ -57,16 +57,16 @@ HyAssetManager::HyAssetManager(std::string sDataDirPath, HyGfxComms &gfxCommsRef
 	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");
 	//jsonxx::Object &spineDataObjRef = gameDataObj.get<jsonxx::Object>("Spine");
 
-	IHy2dData::sm_pTextures = &m_AtlasManager;
-	IHyDraw2d::sm_pAssetManager = this;
+	HyDataDraw::sm_pTextures = &m_AtlasManager;
+	IHyDraw2d::sm_pHyAssets = this;
 }
 
-HyAssetManager::~HyAssetManager()
+HyAssets::~HyAssets()
 {
-	HyAssert(IsShutdown(), "Tried to destruct the HyAssetManager while data still exists");
+	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
 }
 
-void HyAssetManager::Update()
+void HyAssets::Update()
 {
 	// Check to see if we have any pending loads to make
 	if(m_LoadQueue_Prepare.empty() == false)
@@ -96,7 +96,7 @@ void HyAssetManager::Update()
 			if(pData->GetDataType() == HYDATA_2d)
 			{
 				pData->SetLoadState(HYLOADSTATE_Queued);
-				m_GfxCommsRef.TxData(static_cast<IHy2dData *>(pData));
+				m_GfxCommsRef.TxData(static_cast<HyDataDraw *>(pData));
 			}
 			else
 				FinalizeData(pData);
@@ -106,11 +106,11 @@ void HyAssetManager::Update()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	// Grab and process any returning IHy2dData's from the Render thread
+	// Grab and process any returning HyDataDraw's from the Render thread
 	m_pGfxQueue_Retrieval = m_GfxCommsRef.RxData();
 	while(!m_pGfxQueue_Retrieval->empty())
 	{
-		IHy2dData *pData = m_pGfxQueue_Retrieval->front();
+		HyDataDraw *pData = m_pGfxQueue_Retrieval->front();
 		m_pGfxQueue_Retrieval->pop();
 
 		if(pData->GetLoadState() == HYLOADSTATE_ReloadGfx)
@@ -123,7 +123,32 @@ void HyAssetManager::Update()
 	}
 }
 
-void HyAssetManager::LoadInst2d(IHyDraw2d *pInst)
+void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyData *pData)
+{
+	switch(pDrawNode->GetType())
+	{
+	case HYTYPE_Sprite2d:
+		pData = m_Sprite2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
+		break;
+	case HYTYPE_Spine2d:
+		pData = m_Spine2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
+		break;
+	case HYTYPE_Text2d:
+		pData = m_Txt2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
+		break;
+	case HYTYPE_TexturedQuad2d:
+		pData = m_Quad2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
+		break;
+	case HYTYPE_Primitive2d:
+		pData = m_Primitive2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
+		break;
+
+	default:
+		return;
+	}
+}
+
+void HyAssets::LoadInst2d(IHyDraw2d *pInst)
 {
 	IHyData *pLoadData = NULL;
 	switch(pInst->GetType())
@@ -173,7 +198,7 @@ void HyAssetManager::LoadInst2d(IHyDraw2d *pInst)
 	}
 }
 
-void HyAssetManager::RemoveInst(IHyDraw2d *pInst)
+void HyAssets::RemoveInst(IHyDraw2d *pInst)
 {
 	IHyData *pInstData = NULL;
 
@@ -203,12 +228,12 @@ void HyAssetManager::RemoveInst(IHyDraw2d *pInst)
 		break;
 
 	default:
-		HyError("HyAssetManager::RemoveInst() passed an invalid HyLoadState");
+		HyError("HyAssets::RemoveInst() passed an invalid HyLoadState");
 	}
 }
 
 // Unload everything
-void HyAssetManager::Shutdown()
+void HyAssets::Shutdown()
 {
 	std::vector<IHyDraw2d *> vReloadInsts;
 	m_SceneRef.CopyAllInsts(vReloadInsts);
@@ -223,7 +248,7 @@ void HyAssetManager::Shutdown()
 	m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
 }
 
-bool HyAssetManager::IsShutdown()
+bool HyAssets::IsShutdown()
 {
 	bool bTest = m_pLoadingThread->IsAlive();
 
@@ -237,7 +262,7 @@ bool HyAssetManager::IsShutdown()
 		   m_Quad2d.IsEmpty();
 }
 
-void HyAssetManager::FinalizeData(IHyData *pData)
+void HyAssets::FinalizeData(IHyData *pData)
 {
 	if(pData->GetLoadState() == HYLOADSTATE_Queued)
 	{
@@ -264,7 +289,7 @@ void HyAssetManager::FinalizeData(IHyData *pData)
 	}
 	else if(pData->GetLoadState() == HYLOADSTATE_Discarded)
 	{
-		HyAssert(pData->GetRefCount() <= 0, "HyAssetManager::Update() tried to delete an IData with active references. Num Refs: " << pData->GetRefCount());
+		HyAssert(pData->GetRefCount() <= 0, "HyAssets::Update() tried to delete an IData with active references. Num Refs: " << pData->GetRefCount());
 
 		switch(pData->GetInstType())
 		{
@@ -274,22 +299,22 @@ void HyAssetManager::FinalizeData(IHyData *pData)
 		case HYTYPE_Text2d:			m_Txt2d.DeleteData(static_cast<HyText2dData *>(pData));				break;
 		case HYTYPE_TexturedQuad2d:	m_Quad2d.DeleteData(static_cast<HyTexturedQuad2dData *>(pData));	break;
 		default:
-			HyError("HyAssetManager::Update() got a returned IHyData from gfx comms with an invalid type: " << pData->GetInstType());
+			HyError("HyAssets::Update() got a returned IHyData from gfx comms with an invalid type: " << pData->GetInstType());
 		}
 	}
 	else
 	{
-		HyError("HyAssetManager::Update() got a returned IHyData from gfx comms with an invalid state: " << pData->GetLoadState());
+		HyError("HyAssets::Update() got a returned IHyData from gfx comms with an invalid state: " << pData->GetLoadState());
 	}
 }
 
-void HyAssetManager::DiscardData(IHyData *pData)
+void HyAssets::DiscardData(IHyData *pData)
 {
-	HyAssert(pData->GetRefCount() <= 0, "HyAssetManager::DiscardData() tried to remove an IData with active references");
+	HyAssert(pData->GetRefCount() <= 0, "HyAssets::DiscardData() tried to remove an IData with active references");
 
 
 	// TODO: Wot in tarnation
-	if(pData->GetInstType() == HYTYPE_Primitive2d && static_cast<IHy2dData *>(pData)->GetShaderId() < HYSHADERPROG_CustomStartIndex)
+	if(pData->GetInstType() == HYTYPE_Primitive2d && static_cast<HyDataDraw *>(pData)->GetShaderId() < HYSHADERPROG_CustomStartIndex)
 		return;
 
 
@@ -297,12 +322,12 @@ void HyAssetManager::DiscardData(IHyData *pData)
 	pData->SetLoadState(HYLOADSTATE_Discarded);
 
 	if(pData->GetDataType() == HYDATA_2d)
-		m_GfxCommsRef.TxData(static_cast<IHy2dData *>(pData));
+		m_GfxCommsRef.TxData(static_cast<HyDataDraw *>(pData));
 	else
 		FinalizeData(pData);
 }
 
-/*static*/ void HyAssetManager::LoadingThread(void *pParam)
+/*static*/ void HyAssets::LoadingThread(void *pParam)
 {
 	LoadThreadCtrl *pLoadingCtrl = reinterpret_cast<LoadThreadCtrl *>(pParam);
 	std::vector<IHyData *>	vCurLoadData;

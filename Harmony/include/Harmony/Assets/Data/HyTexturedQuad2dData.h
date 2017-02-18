@@ -12,17 +12,17 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets\Data\IHy2dData.h"
-#include "Assets\HyFactory.h"
+#include "Assets\Data\HyDataDraw.h"
+#include "Assets\HyManager_Data.h"
 
-class HyTexturedQuad2dData : public IHy2dData
+class HyTexturedQuad2dData : public HyDataDraw
 {
-	friend class HyFactory<HyTexturedQuad2dData>;
+	friend class HyNodeDataContainer<HyTexturedQuad2dData>;
 
 	const uint32		m_uiATLASGROUP_ID;
 	HyAtlasGroup *		m_pAtlas;
 
-	// Only allow HyFactory instantiate
+	// Only allow HyNodeDataContainer instantiate
 	HyTexturedQuad2dData(const std::string &sPath, int32 iShaderId);
 
 public:

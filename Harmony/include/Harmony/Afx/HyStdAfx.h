@@ -53,13 +53,6 @@ enum HyAlign
 	HYALIGN_Justify
 };
 
-enum HyDataType
-{
-	HYDATA_Regular = 0,
-	HYDATA_2d,
-	HYDATA_3d
-};
-
 enum HyLoadState
 {
 	HYLOADSTATE_Inactive = 0,

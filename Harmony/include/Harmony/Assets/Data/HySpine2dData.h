@@ -11,8 +11,8 @@
 #define __HyEnt2dData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Data/IHy2dData.h"
-#include "Assets/HyFactory.h"
+#include "Assets/Data/HyDataDraw.h"
+#include "Assets/HyNodeDataContainer.h"
 
 #include "spine/spine.h"
 #include "spine/extension.h"
@@ -20,14 +20,14 @@
 class HyAtlasGroupData;
 class IGfxApi;
 
-class HySpine2dData : public IHy2dData
+class HySpine2dData : public HyDataDraw
 {
-	friend class HyFactory<HySpine2dData>;
+	friend class HyNodeDataContainer<HySpine2dData>;
 
 	spAtlas *				m_SpineAtlasData;
 	spSkeletonData *		m_SpineSkeletonData;
 
-	// Only allow HyFactory instantiate
+	// Only allow HyNodeDataContainer instantiate
 	HySpine2dData(const std::string &sPath, int32 iShaderId);
 
 public:

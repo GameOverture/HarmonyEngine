@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyFactory.h
+ *	HyNodeDataContainer.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyFactory_h__
-#define __HyFactory_h__
+#ifndef __HyNodeDataContainer_h__
+#define __HyNodeDataContainer_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -17,7 +17,7 @@
 #include <vector>
 
 template<typename tData>
-class HyFactory
+class HyNodeDataContainer
 {
 	const HyType					m_eTYPE;
 
@@ -25,10 +25,10 @@ class HyFactory
 	std::vector<tData>				m_DataList;
 	
 public:
-	HyFactory(HyType eType) :	m_eTYPE(eType)
+	HyNodeDataContainer(HyType eType) :	m_eTYPE(eType)
 	{ }
 
-	~HyFactory()
+	~HyNodeDataContainer()
 	{ }
 
 	void Init(jsonxx::Object &subDirObjRef)
@@ -60,4 +60,4 @@ public:
 	}
 };
 
-#endif /* __HyFactory_h__ */
+#endif /* __HyNodeDataContainer_h__ */

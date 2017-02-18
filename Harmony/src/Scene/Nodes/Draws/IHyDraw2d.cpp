@@ -12,7 +12,7 @@
 #include "IHyApplication.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/HyAssetManager.h"
+#include "Assets/HyAssets.h"
 #include "Scene/Nodes/Misc/HyCamera.h"
 #include "Renderer/Components/HyWindow.h"
 
@@ -20,7 +20,7 @@
 
 #include "Diagnostics/HyGuiComms.h"
 
-/*static*/ HyAssetManager *IHyDraw2d::sm_pAssetManager = NULL;
+/*static*/ HyAssets *IHyDraw2d::sm_pHyAssets = NULL;
 
 IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName) :	IHyTransform2d(eInstType),
 																					m_sPREFIX(szPrefix ? szPrefix : ""),
@@ -62,6 +62,14 @@ const std::string &IHyDraw2d::GetName()
 const std::string &IHyDraw2d::GetPrefix()
 {
 	return m_sPREFIX;
+}
+
+IHyData &IHyDraw2d::GetData()
+{
+	if(m_pData == nullptr)
+		sm_pHyAssets->GetNodeData(this, m_pData);
+
+	return *m_pData;
 }
 
 HyCoordinateType IHyDraw2d::GetCoordinateType()
@@ -229,15 +237,18 @@ bool IHyDraw2d::IsLoaded() const
 
 void IHyDraw2d::Load()
 {
-	HyAssert(sm_pAssetManager, "IHyDraw2d::Load was invoked before engine has been initialized");
+	HyAssert(sm_pHyAssets, "IHyDraw2d::Load was invoked before engine has been initialized");
 
 	if(GetCoordinateType() == HYCOORDTYPE_Default)
 		SetCoordinateType(IHyApplication::DefaultCoordinateType(), NULL);
 	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
 		SetCoordinateUnit(IHyApplication::DefaultCoordinateUnit(), false);
 
+	GetData();
+	
+
 	if(m_eLoadState == HYLOADSTATE_Inactive)
-		sm_pAssetManager->LoadInst2d(this);
+		sm_pHyAssets->LoadInst2d(this);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
@@ -248,7 +259,7 @@ void IHyDraw2d::Load()
 
 /*virtual*/ void IHyDraw2d::Unload()
 {
-	HyAssert(sm_pAssetManager, "IHyDraw2d::Unload was invoked before engine has been initialized");
+	HyAssert(sm_pHyAssets, "IHyDraw2d::Unload was invoked before engine has been initialized");
 
 	// Unload any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
@@ -258,7 +269,7 @@ void IHyDraw2d::Load()
 	}
 	
 	// Remove self from scene (and possibly clean up any unused gfx assets)
-	sm_pAssetManager->RemoveInst(this);
+	sm_pHyAssets->RemoveInst(this);
 	
 	// *THEN* clear/reset your load data members
 	m_pData = NULL;
@@ -280,7 +291,7 @@ void IHyDraw2d::SetData(IHyData *pData)
 		m_eLoadState = (m_pData->GetLoadState() == HYLOADSTATE_Loaded) ? HYLOADSTATE_Loaded : HYLOADSTATE_Queued;
 }
 
-void IHyDraw2d::SetLoaded()
+void IHyDraw2d::SetGfxLoaded()
 {
 	m_eLoadState = HYLOADSTATE_Loaded;
 	OnDataLoaded();

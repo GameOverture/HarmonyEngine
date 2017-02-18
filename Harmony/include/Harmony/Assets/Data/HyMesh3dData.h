@@ -13,20 +13,20 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/HyFactory.h"
+#include "Assets/HyNodeDataContainer.h"
 
 class HyMesh3d;
 
 class HyMesh3dData : public IHyData
 {
-	friend class HyFactory<HyMesh3dData>;
+	friend class HyNodeDataContainer<HyMesh3dData>;
 
 	glm::vec3				m_vAmbientReflectivity;
 	glm::vec3				m_vDiffuseReflectivity;
 	glm::vec3				m_vSpecularReflectivity;
 	float					m_fSpecularShininess;
 
-	// Only allow HyFactory instantiate
+	// Only allow HyNodeDataContainer instantiate
 	HyMesh3dData(const std::string &sPath);
 
 public:

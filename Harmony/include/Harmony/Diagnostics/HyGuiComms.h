@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/HyAssetManager.h"
+#include "Assets/HyAssets.h"
 #include "Diagnostics/HyGuiMessage.h"
 
 #if 0//#ifndef HY_PLATFORM_GUI
@@ -36,7 +36,7 @@ class HyGuiSession;
 class HyGuiComms
 {
 	static HyGuiComms *		sm_pInstance;
-	HyAssetManager &		m_AssetManagerRef;
+	HyAssets &		m_AssetManagerRef;
 
 	asio::io_service		m_IOService;
 	tcp::acceptor			m_Acceptor;
@@ -48,7 +48,7 @@ class HyGuiComms
 	std::map<uint32, std::vector<std::string> >	m_ReloadMap;
 
 public:
-	HyGuiComms(uint16 uiPort, HyAssetManager &assetManagerRef);
+	HyGuiComms(uint16 uiPort, HyAssets &assetManagerRef);
 	~HyGuiComms(void);
 
 	void AcceptGuiConnection();
@@ -172,7 +172,7 @@ private:
 class HyGuiComms
 {
 public:
-	HyGuiComms(uint16 uiPort, HyAssetManager &assetManagerRef)
+	HyGuiComms(uint16 uiPort, HyAssets &assetManagerRef)
 	{ }
 
 	void Update()

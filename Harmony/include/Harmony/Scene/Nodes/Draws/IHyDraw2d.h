@@ -22,9 +22,9 @@
 class IHyDraw2d : public IHyTransform2d
 {
 	friend class HyScene;
-	friend class HyAssetManager;
+	friend class HyAssets;
 
-	static HyAssetManager *			sm_pAssetManager;
+	static HyAssets *			sm_pHyAssets;
 
 protected:
 	const std::string				m_sNAME;
@@ -32,7 +32,7 @@ protected:
 
 	// Data loading
 	IHyData *						m_pData;
-	HyLoadState						m_eLoadState;
+	HyDataDraw						m_pGfxData;
 
 	enum eAttributes
 	{
@@ -76,6 +76,8 @@ public:
 	const std::string &GetName();
 	const std::string &GetPrefix();
 
+	IHyData &GetData();
+
 	HyCoordinateType GetCoordinateType();
 	void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);
 
@@ -110,8 +112,7 @@ private:
 	const HyRenderState &GetRenderState() const					{ return m_RenderState; }
 
 	void SetData(IHyData *pData);
-	void SetLoaded();
-	IHyData *GetData()											{ return m_pData; }
+	void SetGfxLoaded();
 
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 

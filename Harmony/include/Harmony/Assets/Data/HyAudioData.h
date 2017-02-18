@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/HyFactory.h"
+#include "Assets/HyNodeDataContainer.h"
 
 //#include "SFML/Audio.hpp"
 
@@ -21,11 +21,11 @@ class HySound;
 
 class HySfxData : public IHyData
 {
-	friend class HyFactory<HySfxData>;
+	friend class HyNodeDataContainer<HySfxData>;
 
 	//sf::SoundBuffer			m_SoundBuffer;
 
-	// Only allow HyFactory instantiate
+	// Only allow HyNodeDataContainer instantiate
 	HySfxData(const std::string &sPath);
 
 public:

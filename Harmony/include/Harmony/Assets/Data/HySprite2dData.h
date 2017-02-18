@@ -12,9 +12,9 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/Data/IHy2dData.h"
-#include "Assets/HyFactory.h"
-#include "Assets/HyTextures.h"
+#include "Assets/Data/HyDataDraw.h"
+#include "Assets/HyNodeDataContainer.h"
+#include "Assets/HyAtlasContainer.h"
 
 struct HySprite2dFrame
 {
@@ -42,11 +42,14 @@ struct HySprite2dFrame
 	uint32 GetActualTextureIndex() const;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class HySprite2dData : public IHyData
 {
-	friend class HyFactory<HySprite2dData>;
+	friend class HyNodeDataContainer<HySprite2dData>;
 
-	// Only allow HyFactory instantiate
+	// Only allow HyNodeDataContainer instantiate
 	HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef);
 
 public:

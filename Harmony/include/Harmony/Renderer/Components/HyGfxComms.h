@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/Data/IHy2dData.h"
+#include "Assets/Data/HyDataDraw.h"
 #include "Threading/BasicSync.h"
 
 #include <vector>
@@ -50,13 +50,13 @@ private:
 	char *						m_pDrawBuffer_Shared;
 	char *						m_pDrawBuffer_Render;
 
-	std::queue<IHy2dData *> *		m_pTxDataQueue_Update;
-	std::queue<IHy2dData *> *		m_pTxDataQueue_Shared;
-	std::queue<IHy2dData *> *		m_pTxDataQueue_Render;
+	std::queue<HyDataDraw *> *		m_pTxDataQueue_Update;
+	std::queue<HyDataDraw *> *		m_pTxDataQueue_Shared;
+	std::queue<HyDataDraw *> *		m_pTxDataQueue_Render;
 	
-	std::queue<IHy2dData *> *		m_pRxDataQueue_Update;
-	std::queue<IHy2dData *> *		m_pRxDataQueue_Shared;
-	std::queue<IHy2dData *> *		m_pRxDataQueue_Render;
+	std::queue<HyDataDraw *> *		m_pRxDataQueue_Update;
+	std::queue<HyDataDraw *> *		m_pRxDataQueue_Shared;
+	std::queue<HyDataDraw *> *		m_pRxDataQueue_Render;
 
 	BasicSection				m_csPointers;
 
@@ -71,13 +71,13 @@ public:
 	void SetSharedPointers();
 
 	// This should only be invoked from the Update/Game thread
-	void TxData(IHy2dData *pAtlasGrp);
+	void TxData(HyDataDraw *pAtlasGrp);
 
 	// This should only be invoked from the Update/Game thread
-	std::queue<IHy2dData *> *RxData();
+	std::queue<HyDataDraw *> *RxData();
 
 	// This should only be invoked from the Render thread
-	bool Render_TakeSharedPointers(std::queue<IHy2dData *> *&pRxDataQueue, std::queue<IHy2dData *> *&pTxDataQueue, char *&pDrawBuffer);
+	bool Render_TakeSharedPointers(std::queue<HyDataDraw *> *&pRxDataQueue, std::queue<HyDataDraw *> *&pTxDataQueue, char *&pDrawBuffer);
 };
 
 #endif /* __HyGfxBuffers_h__ */

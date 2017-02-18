@@ -31,7 +31,7 @@
 #include "Scene/Nodes/Draws/HyTexturedQuad2d.h"
 #include "Scene/Physics/HyPhysEntity2d.h"
 
-#include "Assets/HyAssetManager.h"
+#include "Assets/HyAssets.h"
 
 #include "Utilities/HyMath.h"
 #include "Utilities/HyFileIO.h"
@@ -47,7 +47,7 @@ class HyEngine
 	
 	HyGfxComms				m_GfxBuffer;
 	HyScene					m_Scene;
-	HyAssetManager 			m_AssetManager;
+	HyAssets 			m_AssetManager;
 	HyGuiComms				m_GuiComms;
 
 	HyTimeInterop			m_Time;

@@ -43,6 +43,7 @@
     <ClCompile Include="..\include\Harmony\Threading\Utils.cpp" />
     <ClCompile Include="..\include\Harmony\Threading\WaitObject.cpp" />
     <ClCompile Include="..\include\Harmony\Threading\WaitObjectEx.cpp" />
+    <ClCompile Include="Assets\Containers\HyAtlasContainer.cpp" />
     <ClCompile Include="Assets\Data\HyMesh3dData.cpp" />
     <ClCompile Include="Assets\Data\HyPrimitive2dData.cpp" />
     <ClCompile Include="Assets\Data\HyAudioData.cpp" />
@@ -51,9 +52,8 @@
     <ClCompile Include="Assets\Data\HyText2dData.cpp" />
     <ClCompile Include="Assets\Data\HyTexturedQuad2dData.cpp" />
     <ClCompile Include="Assets\Data\IHyData.cpp" />
-    <ClCompile Include="Assets\Data\IHy2dData.cpp" />
-    <ClCompile Include="Assets\HyAssetManager.cpp" />
-    <ClCompile Include="Assets\HyTextures.cpp" />
+    <ClCompile Include="Assets\Data\HyDataDraw.cpp" />
+    <ClCompile Include="Assets\HyAssets.cpp" />
     <ClCompile Include="Audio\IHyAudio.cpp" />
     <ClCompile Include="Audio\IHyAudioInst.cpp" />
     <ClCompile Include="Audio\Interop\HyAudio_Win.cpp" />
@@ -147,6 +147,8 @@
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_OSX.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Containers\HyAtlasContainer.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Containers\HyNodeDataContainer.h" />
     <ClInclude Include="..\include\Harmony\Assets\Data\HyMesh3dData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Data\HyPrimitive2dData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Data\HyAudioData.h" />
@@ -155,10 +157,8 @@
     <ClInclude Include="..\include\Harmony\Assets\Data\HyText2dData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Data\HyTexturedQuad2dData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Data\IHyData.h" />
-    <ClInclude Include="..\include\Harmony\Assets\Data\IHy2dData.h" />
-    <ClInclude Include="..\include\Harmony\Assets\HyAssetManager.h" />
-    <ClInclude Include="..\include\Harmony\Assets\HyTextures.h" />
-    <ClInclude Include="..\include\Harmony\Assets\HyFactory.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Data\HyDataDraw.h" />
+    <ClInclude Include="..\include\Harmony\Assets\HyAssets.h" />
     <ClInclude Include="..\include\Harmony\Audio\IHyAudio.h" />
     <ClInclude Include="..\include\Harmony\Audio\IHyAudioInst.h" />
     <ClInclude Include="..\include\Harmony\Audio\Interop\HyAudio_Win.h" />

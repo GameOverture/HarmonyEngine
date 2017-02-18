@@ -12,8 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/Data/IHy2dData.h"
-#include "Assets/HyFactory.h"
+#include "Assets/Data/HyDataDraw.h"
+#include "Assets/HyNodeDataContainer.h"
 
 #include <map>
 using std::map;
@@ -87,9 +87,9 @@ struct HyText2dGlyphInfo
 	}
 };
 
-class HyText2dData : public IHy2dData
+class HyText2dData : public HyDataDraw
 {
-	friend class HyFactory<HyText2dData>;
+	friend class HyNodeDataContainer<HyText2dData>;
 
 	typedef std::map<uint32, HyText2dGlyphInfo *> Typeface;
 
@@ -127,7 +127,7 @@ class HyText2dData : public IHy2dData
 	FontState *						m_pFontStates;
 	uint32							m_uiNumStates;
 
-	// Only allow HyFactory instantiate
+	// Only allow HyNodeDataContainer instantiate
 	HyText2dData(const std::string &sPath, int32 iShaderId);
 
 public:

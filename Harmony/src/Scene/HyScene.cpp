@@ -44,7 +44,7 @@ HyScene::HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef
 
 HyScene::~HyScene(void)
 {
-	IHyDraw2d::sm_pAssetManager = NULL;
+	IHyDraw2d::sm_pHyAssets = NULL;
 }
 
 /*static*/ void HyScene::AddNode(IHyNode *pNode)

@@ -12,14 +12,14 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets\Data\IHy2dData.h"
-#include "Assets\HyFactory.h"
+#include "Assets\Data\HyDataDraw.h"
+#include "Assets\HyManager_Data.h"
 
-class HyPrimitive2dData : public IHy2dData
+class HyPrimitive2dData : public HyDataDraw
 {
-	friend class HyFactory<HyPrimitive2dData>;
+	friend class HyNodeDataContainer<HyPrimitive2dData>;
 
-	// Only allow HyFactory instantiate
+	// Only allow HyNodeDataContainer instantiate
 	HyPrimitive2dData(const std::string &sPath, int32 iShaderId);
 
 public:

@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyTextures.cpp
+ *	HyAtlasContainer.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -7,13 +7,13 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Assets/HyTextures.h"
+#include "Assets/HyAtlasContainer.h"
 
 #include "Renderer/IHyRenderer.h"
 
 #include "Utilities/stb_image.h"
 
-HyTextures::HyTextures(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasDataDir),
+HyAtlasContainer::HyAtlasContainer(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasDataDir),
 													m_uiNumAtlasGroups(0),
 													m_pAtlasGroups(NULL)
 {
@@ -48,7 +48,7 @@ HyTextures::HyTextures(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasData
 	}
 }
 
-HyTextures::~HyTextures()
+HyAtlasContainer::~HyAtlasContainer()
 {
 	if(m_pAtlasGroups == NULL || m_uiNumAtlasGroups == 0)
 		return;
@@ -61,7 +61,7 @@ HyTextures::~HyTextures()
 	m_pAtlasGroups = NULL;
 }
 
-HyAtlasGroup *HyTextures::RequestTexture(uint32 uiAtlasGroupId)
+HyAtlasGroup *HyAtlasContainer::RequestTexture(uint32 uiAtlasGroupId)
 {
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 	{
@@ -72,11 +72,11 @@ HyAtlasGroup *HyTextures::RequestTexture(uint32 uiAtlasGroupId)
 		}
 	}
 	
-	HyError("HyTextures::RequestTexture() could not find the atlas group ID: " << uiAtlasGroupId);
+	HyError("HyAtlasContainer::RequestTexture() could not find the atlas group ID: " << uiAtlasGroupId);
 	return &m_pAtlasGroups[0];
 }
 
-std::string HyTextures::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
+std::string HyAtlasContainer::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
 {
 	std::string sTexturePath(m_sATLAS_DIR_PATH);
 
@@ -93,7 +93,7 @@ std::string HyTextures::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIn
 }
 
 //////////////////////////////////////////////////////////////////////////
-HyAtlasGroup::HyAtlasGroup(HyTextures &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef) :	m_ManagerRef(managerRef),
+HyAtlasGroup::HyAtlasGroup(HyAtlasContainer &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef) :	m_ManagerRef(managerRef),
 																																										m_uiLOADGROUPID(uiLoadGroupId),
 																																										m_uiWIDTH(uiWidth),
 																																										m_uiHEIGHT(uiHeight),
@@ -193,7 +193,7 @@ void HyAtlasGroup::Load()
 	m_csTextures.Unlock();
 }
 
-void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef, IHy2dData *pData)
+void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef, HyDataDraw *pData)
 {
 	bool bUpload = m_uiRefCount == 0;
 
