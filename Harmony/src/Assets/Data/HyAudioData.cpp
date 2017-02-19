@@ -10,7 +10,7 @@
 #include "Assets/Data/HyAudioData.h"
 
 
-HySfxData::HySfxData(const std::string &sPath) : IHyData(HYTYPE_Sound2d, sPath)
+HySfxData::HySfxData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef) : IHyData(HYTYPE_Sound2d, sPath)
 {
 }
 
@@ -18,6 +18,6 @@ HySfxData::~HySfxData(void)
 {
 }
 
-/*virtual*/ void HySfxData::SetRequiredAtlasIds(HyGfxData &gfxDataOut)
+/*virtual*/ void HySfxData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
 {
 }

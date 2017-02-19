@@ -333,7 +333,8 @@ void HyShaderUniforms::Clear()
 
 IHyShader::IHyShader(int32 iId) :	IHyLoadableData(HYGFXTYPE_CustomShader),
 									m_iID(iId),
-									m_sOPTIONAL_LOAD_PATH("")
+									m_sOPTIONAL_LOAD_PATH(""),
+									m_bIsFinalized(false)
 {
 	for(int i = 0; i < HYNUMSHADERTYPES; ++i)
 		m_sSourceCode[i].clear();
@@ -357,7 +358,7 @@ int32 IHyShader::GetId()
 
 bool IHyShader::IsFinalized()
 {
-	return m_eLoadState != HYLOADSTATE_Inactive;
+	return m_bIsFinalized;
 }
 
 void IHyShader::SetSourceCode(std::string sSource, HyShaderType eType)
@@ -440,12 +441,12 @@ void IHyShader::Finalize(HyShaderProgram eDefaultsFrom)
 		}
 	}
 
-	m_eLoadState = HYLOADSTATE_Queued;
+	m_bIsFinalized = true;
 }
 
 void IHyShader::OnLoadThread()
 {
-	HyAssert(IsFinalized(), "IHyShader::OnLoadThread processed an non-finalized shader");
+	HyAssert(m_bIsFinalized, "IHyShader::OnLoadThread processed an non-finalized shader");
 
 	if(m_sOPTIONAL_LOAD_PATH.empty())
 		return;
@@ -455,25 +456,15 @@ void IHyShader::OnLoadThread()
 
 void IHyShader::OnRenderThread(IHyRenderer &rendererRef)
 {
-	// Data can be NULL if it's a default shader being loaded by the Renderer
-	if(pData == NULL)
+	// Load state can be HYLOADSTATE_Inactive if it's a default shader being loaded by the Renderer
+	if(GetLoadState() == HYLOADSTATE_Inactive)
 	{
 		OnUpload(rendererRef);
 		return;
 	}
 
-	bool bUpload = m_uiRefCount == 0;
-
-	if(pData->IsIncrementRenderRefs())
-		m_uiRefCount++;
-	else
-	{
-		HyAssert(m_uiRefCount > 0, "HyAtlasGroup::OnRenderThread Tried to decrement an empty ref");
-		m_uiRefCount--;
-	}
-
-	if(bUpload)
+	if(GetLoadState() == HYLOADSTATE_Queued)
 		OnUpload(rendererRef);
-	else if(m_uiRefCount == 0)
+	else
 		OnDelete(rendererRef);
 }

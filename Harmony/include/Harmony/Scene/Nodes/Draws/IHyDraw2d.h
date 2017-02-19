@@ -18,19 +18,24 @@
 
 #include "Renderer/Components/HyRenderState.h"
 #include "Scene/Nodes/Misc/HyCamera.h"
+#include <set>
 
-class IHyDraw2d : public IHyTransform2d, public HyGfxData
+class IHyDraw2d : public IHyTransform2d
 {
 	friend class HyScene;
 	friend class HyAssets;
 
 	static HyAssets *				sm_pHyAssets;
 
+	HyLoadState						m_eLoadState;
+	std::set<uint32>				m_RequiredAtlasIds;
+	std::set<int32>					m_RequiredCustomShaders;
+
+	IHyData *						m_pData;
+
 protected:
 	const std::string				m_sNAME;
 	const std::string				m_sPREFIX;
-
-	IHyData *						m_pData;
 
 	enum eAttributes
 	{
@@ -74,7 +79,7 @@ public:
 	const std::string &GetName();
 	const std::string &GetPrefix();
 
-	IHyData &GetData();
+	IHyData *AcquireData();
 
 	HyCoordinateType GetCoordinateType();
 	void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);
@@ -103,24 +108,20 @@ public:
 	virtual void Unload();
 
 protected:
+	bool IsSelfLoaded();
+	IHyData *UncheckedGetData();
 	void MakeBoundingVolumeDirty();
 
 private:
 	const HyRenderState &GetRenderState() const;
 
-	void SetData(IHyData *pData);
-	void SetGfxLoaded();
-
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
 	virtual void OnUpdate() { };
-
+	virtual void OnDataAcquired() { }
 	virtual void OnCalcBoundingVolume() { }								// Should calculate the local bounding volume in 'm_BoundingVolume'
-
-	virtual void OnDataLoaded() { }
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) { }		// This function is responsible for incrementing the passed in reference pointer the size of the data written
-
 	virtual void OnMouseEnter(void *pUserParam) { }
 	virtual void OnMouseLeave(void *pUserParam) { }
 	virtual void OnMouseDown(void *pUserParam) { }

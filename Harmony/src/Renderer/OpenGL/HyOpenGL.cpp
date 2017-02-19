@@ -393,19 +393,19 @@ bool HyOpenGL::Initialize()
 	HyOpenGLShader *pShaderQuadBatch = HY_NEW HyOpenGLShader(HYSHADERPROG_QuadBatch);
 	sm_ShaderMap[HYSHADERPROG_QuadBatch] = pShaderQuadBatch;
 	pShaderQuadBatch->Finalize(HYSHADERPROG_QuadBatch);
-	pShaderQuadBatch->OnRenderThread(*this, nullptr);
+	pShaderQuadBatch->OnRenderThread(*this);
 
 	// Primitive //////////////////////////////////////////////////////////////////////////
 	HyOpenGLShader *pShaderPrimitive = HY_NEW HyOpenGLShader(HYSHADERPROG_Primitive);
 	sm_ShaderMap[HYSHADERPROG_Primitive] = pShaderPrimitive;
 	pShaderPrimitive->Finalize(HYSHADERPROG_Primitive);
-	pShaderPrimitive->OnRenderThread(*this, nullptr);
+	pShaderPrimitive->OnRenderThread(*this);
 
 	// Line2D //////////////////////////////////////////////////////////////////////////
 	HyOpenGLShader *pShaderLine2d = HY_NEW HyOpenGLShader(HYSHADERPROG_Lines2d);
 	sm_ShaderMap[HYSHADERPROG_Lines2d] = pShaderLine2d;
 	pShaderLine2d->Finalize(HYSHADERPROG_Lines2d);
-	pShaderLine2d->OnRenderThread(*this, nullptr);
+	pShaderLine2d->OnRenderThread(*this);
 
 
 	glEnable(GL_BLEND);

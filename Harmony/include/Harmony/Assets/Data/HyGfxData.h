@@ -11,31 +11,8 @@
 #define __HyGfxData_h__
 
 #include "Afx/HyStdAfx.h"
-#include <set>
 
 class IHyRenderer;
-
-class HyGfxData
-{
-	friend class HyAssets;
-
-	HyLoadState				m_eLoadState;
-
-	std::set<uint32>		m_RequiredAtlasIds;
-	std::set<int32>			m_RequiredCustomShaders;
-
-public:
-	HyGfxData();
-	virtual ~HyGfxData();
-
-	HyLoadState GetLoadState();
-
-	void Clear();
-	void SetRequiredAtlasId(uint32 uiAtlasId);
-	void SetRequiredCustomShaderId(int32 iShaderId);
-
-	virtual void OnLoaded() = 0;
-};
 
 class IHyLoadableData
 {
@@ -52,8 +29,10 @@ public:
 										m_uiRefCount(0)
 	{ }
 
+	HyLoadState GetLoadState() { return m_eLoadState; }
+
 	virtual void OnLoadThread() = 0;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) = 0;
-}
+};
 
 #endif /* __HyGfxData_h__ */

@@ -72,11 +72,9 @@ float HyText2d::TextGetPixelWidth()
 		OnUpdate();
 
 	float fProperNudgeAmt = 0.0f;
-	if(m_eLoadState == HYLOADSTATE_Loaded)
-	{
-		const HyText2dGlyphInfo &glyphRef = static_cast<HyText2dData *>(m_pData)->GetGlyph(m_uiCurFontState, 0, static_cast<uint32>(m_sCurrentString[0]));
-		fProperNudgeAmt = static_cast<HyText2dData *>(m_pData)->GetLeftSideNudgeAmt(m_uiCurFontState) - glyphRef.iOFFSET_X;
-	}
+
+	const HyText2dGlyphInfo &glyphRef = static_cast<HyText2dData *>(AcquireData())->GetGlyph(m_uiCurFontState, 0, static_cast<uint32>(m_sCurrentString[0]));
+	fProperNudgeAmt = static_cast<HyText2dData *>(AcquireData())->GetLeftSideNudgeAmt(m_uiCurFontState) - glyphRef.iOFFSET_X;
 
 	return m_fUsedPixelWidth - fProperNudgeAmt;
 }
@@ -94,12 +92,12 @@ void HyText2d::TextSetState(uint32 uiStateIndex)
 
 uint32 HyText2d::TextGetNumLayers()
 {
-	return static_cast<HyText2dData *>(m_pData)->GetNumLayers(m_uiCurFontState);
+	return static_cast<HyText2dData *>(AcquireData())->GetNumLayers(m_uiCurFontState);
 }
 
 uint32 HyText2d::TextGetNumLayers(uint32 uiStateIndex)
 {
-	return static_cast<HyText2dData *>(m_pData)->GetNumLayers(uiStateIndex);
+	return static_cast<HyText2dData *>(AcquireData())->GetNumLayers(uiStateIndex);
 }
 
 std::pair<HyTweenVec3 &, HyTweenVec3 &> HyText2d::TextGetLayerColor(uint32 uiLayerIndex)
@@ -200,9 +198,9 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	m_bIsDirty = true;
 }
 
-/*virtual*/ void HyText2d::OnDataLoaded()
+/*virtual*/ void HyText2d::OnDataAcquired()
 {
-	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(m_pData);
+	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(UncheckedGetData());
 
 	for(uint32 i = 0; i < m_StateColors.size(); ++i)
 	{
@@ -229,13 +227,13 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::OnUpdate()
 {
-	if(m_eLoadState != HYLOADSTATE_Loaded || m_bIsDirty == false)
+	if(IsSelfLoaded() == false || m_bIsDirty == false)
 		return;
 
 	m_sCurrentString = m_sNewString;
 	m_uiNumValidCharacters = 0;
 
-	HyText2dData *pData = static_cast<HyText2dData *>(m_pData);
+	HyText2dData *pData = static_cast<HyText2dData *>(UncheckedGetData());
 	m_RenderState.SetTextureHandle(pData->GetAtlasGroup()->GetGfxApiHandle(pData->GetAtlasGroupTextureIndex()));
 
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
@@ -522,7 +520,7 @@ offsetCalculation:
 
 /*virtual*/ void HyText2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-	HyText2dData *pData = static_cast<HyText2dData *>(m_pData);
+	HyText2dData *pData = static_cast<HyText2dData *>(UncheckedGetData());
 
 	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
 

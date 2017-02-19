@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/Containers/HyNodeDataContainer.h"
+#include "Assets/Containers/HyAtlasContainer.h"
 
 #include <map>
 using std::map;
@@ -92,8 +92,6 @@ struct HyText2dGlyphInfo
 
 class HyText2dData : public IHyData
 {
-	friend class HyNodeDataContainer<HyText2dData>;
-
 	typedef std::map<uint32, HyText2dGlyphInfo *> Typeface;
 
 	uint32							m_uiAtlasGroupTextureIndex;
@@ -130,10 +128,8 @@ class HyText2dData : public IHyData
 	FontState *						m_pFontStates;
 	uint32							m_uiNumStates;
 
-	// Only allow HyNodeDataContainer instantiate
-	HyText2dData(const std::string &sPath);
-
 public:
+	HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);
 	virtual ~HyText2dData();
 
 	uint32 GetNumStates();
@@ -147,7 +143,7 @@ public:
 	float GetLineDescender(uint32 uiStateIndex);
 	float GetLeftSideNudgeAmt(uint32 uiStateIndex);
 
-	virtual void SetRequiredAtlasIds(HyGfxData &gfxDataOut) override;
+	virtual void AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut) override;
 };
 
 #endif /* __HyText2dData_h__ */

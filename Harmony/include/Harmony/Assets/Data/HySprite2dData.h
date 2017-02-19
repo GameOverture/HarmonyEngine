@@ -13,8 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/HyNodeDataContainer.h"
-#include "Assets/HyAtlasContainer.h"
+#include "Assets/Containers/HyAtlasContainer.h"
 
 struct HySprite2dFrame
 {
@@ -47,12 +46,10 @@ struct HySprite2dFrame
 
 class HySprite2dData : public IHyData
 {
-	friend class HyNodeDataContainer<HySprite2dData>;
-
-	// Only allow HyNodeDataContainer instantiate
-	HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef);
-
 public:
+	HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);
+	virtual ~HySprite2dData();
+
 	class AnimState
 	{
 	public:
@@ -64,7 +61,7 @@ public:
 		HySprite2dFrame *	m_pFrames;
 		const uint32		m_uiNUMFRAMES;
 
-		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HySprite2dData &dataRef);
+		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HyAtlasContainer &atlasContainerRef);
 		~AnimState();
 
 		const HySprite2dFrame &GetFrame(uint32 uiFrameIndex);
@@ -72,13 +69,11 @@ public:
 	AnimState *			m_pAnimStates;
 	uint32				m_uiNumStates;
 
-	virtual ~HySprite2dData();
-
 	uint32 GetNumStates() const;
 	const AnimState &GetState(uint32 uiAnimStateIndex) const;
 	const HySprite2dFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const;
 
-	virtual void SetRequiredAtlasIds(HyGfxData &gfxDataOut) override;
+	virtual void AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut) override;
 };
 
 #endif /* __HySprite2dData_h__ */

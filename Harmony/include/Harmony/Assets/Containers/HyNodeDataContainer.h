@@ -13,25 +13,24 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Utilities/HyStrManip.h"
+#include "Assets/Containers/HyAtlasContainer.h"
 
 #include <vector>
 
 template<typename tData>
 class HyNodeDataContainer
 {
-	const HyType					m_eTYPE;
-
 	std::map<std::string, uint32>	m_LookupIndexMap;
 	std::vector<tData>				m_DataList;
 	
 public:
-	HyNodeDataContainer(HyType eType) :	m_eTYPE(eType)
+	HyNodeDataContainer()
 	{ }
 
 	~HyNodeDataContainer()
 	{ }
 
-	void Init(jsonxx::Object &subDirObjRef)
+	void Init(jsonxx::Object &subDirObjRef, HyAtlasContainer &atlasContainerRef)
 	{
 		uint32 i = 0;
 		for(auto iter = subDirObjRef.kv_map().begin(); iter != subDirObjRef.kv_map().end(); ++iter, ++i)
@@ -39,7 +38,7 @@ public:
 			std::string sPath = MakeStringProperPath(iter->first.c_str(), nullptr, true);
 
 			m_LookupIndexMap.insert(std::make_pair(sPath, i));
-			m_DataList.emplace_back(iter->first, iter->second);
+			m_DataList.emplace_back(iter->first, iter->second, atlasContainerRef);
 		}
 	}
 
@@ -56,7 +55,7 @@ public:
 		auto iter = m_LookupIndexMap.find(sPath);
 		HyAssert(iter != m_LookupIndexMap.end(), "Could not find data: " << sPath.c_str());
 
-		return m_DataList[*iter];
+		return &m_DataList[iter->second];
 	}
 };
 

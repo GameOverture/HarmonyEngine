@@ -28,11 +28,6 @@ protected:
 		ANIMCTRLATTRIB_Bounce					= 1 << 2,
 		ANIMCTRLATTRIB_IsBouncing				= 1 << 3,	// True if anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
 
-		// Below are only used when this instance isn't loaded yet. They are the "off" values to be applied once the instance actually is loaded
-		ANIMCTRLATTRIB_PRELOADAPPLY_DontLoop	= 1 << 4,
-		ANIMCTRLATTRIB_PRELOADAPPLY_DontBounce	= 1 << 5,
-		ANIMCTRLATTRIB_PRELOADAPPLY_DontReverse	= 1 << 6
-
 		// Do not exceed '8' attributes, or else increase uint8s
 	};
 	std::vector<uint8>		m_AnimCtrlAttribList;
@@ -62,9 +57,9 @@ public:
 
 	void AnimSetPause(bool bPause);
 	
-	uint32 AnimGetNumStates() const;
+	uint32 AnimGetNumStates();
 	uint32 AnimGetCurState() const;
-	uint32 AnimGetNumFrames() const;
+	uint32 AnimGetNumFrames();
 	uint32 AnimGetFrame() const;
 	void AnimSetFrame(uint32 uiFrameIndex);
 
@@ -97,7 +92,7 @@ public:
 	// Returns a boolean value that represents whether this animation has finished playing.
 	// A looping animation never will return true.
 	//--------------------------------------------------------------------------------------
-	bool AnimIsFinished() const;
+	bool AnimIsFinished();
 
 	bool AnimIsPaused();
 	
@@ -116,8 +111,6 @@ public:
 	float AnimGetCurFrameHeight(bool bIncludScaling = true);
 
 protected:
-	virtual void OnDataLoaded() override;
-
 	virtual void OnUpdate() override;
 
 	virtual void OnCalcBoundingVolume() override;

@@ -109,7 +109,7 @@ public:
 	//}
 
 private:
-	virtual void OnDataLoaded() override;
+	//virtual void OnDataLoaded() override;
 
 	virtual void OnUpdate() override;
 	

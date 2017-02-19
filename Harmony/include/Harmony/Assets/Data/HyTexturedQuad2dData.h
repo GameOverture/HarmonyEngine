@@ -12,27 +12,21 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets\Data\IHyData.h"
-#include "Assets\HyManager_Data.h"
+#include "Assets/Data/IHyData.h"
+#include "Assets/Containers/HyAtlasContainer.h"
 
 class HyTexturedQuad2dData : public IHyData
 {
-	friend class HyNodeDataContainer<HyTexturedQuad2dData>;
-
 	const uint32		m_uiATLASGROUP_ID;
 	HyAtlasGroup *		m_pAtlas;
 
-	// Only allow HyNodeDataContainer instantiate
-	HyTexturedQuad2dData(const std::string &sPath, int32 iShaderId);
-
 public:
+	HyTexturedQuad2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);
 	virtual ~HyTexturedQuad2dData();
-
-	virtual void DoFileLoad() override;
 
 	HyAtlasGroup *GetAtlasGroup();
 
-	virtual void SetRequiredAtlasIds(HyGfxData &gfxDataOut) override;
+	virtual void AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut) override;
 };
 
 #endif /* __HyTexturedQuad2dData_h__ */

@@ -50,10 +50,10 @@ class HyAssets
 	HyNodeDataContainer<HyMesh3dData>					m_Mesh3d;
 	HyNodeDataContainer<HyText2dData>					m_Txt2d;
 	HyNodeDataContainer<HyTexturedQuad2dData>			m_Quad2d;
-	HyNodeDataContainer<HyPrimitive2dData>				m_Primitive2d;
 
 	IHyLoadableData *									m_pLastQueuedData;
-	std::vector<HyGfxData *>							m_QueuedInst2dList;
+	IHyLoadableData *									m_pLastDiscardedData;
+	std::vector<IHyDraw2d *>							m_QueuedInst2dList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
 	std::queue<IHyLoadableData *>						m_Load_Prepare;
@@ -96,9 +96,9 @@ public:
 	HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
 	virtual ~HyAssets();
 
-	void GetNodeData(IHyDraw2d *pDrawNode, IHyData *pData);
-	void LoadGfxData(HyGfxData &drawDataRef);
-	void RemoveGfxData(HyGfxData &drawDataRef);
+	void GetNodeData(IHyDraw2d *pDrawNode, IHyData *&pDataOut);
+	void LoadGfxData(IHyDraw2d *pDraw2d);
+	void RemoveGfxData(IHyDraw2d *pDraw2d);
 
 	void Shutdown();
 	bool IsShutdown();

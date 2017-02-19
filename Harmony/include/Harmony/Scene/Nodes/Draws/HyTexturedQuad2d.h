@@ -30,7 +30,7 @@ public:
 	HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight);	// Note: The 'uiGfxApiHandle' must be a handle to a texture array
 	virtual ~HyTexturedQuad2d();
 
-	uint32 GetAtlasGroupId() const;
+	uint32 GetAtlasGroupId();
 	uint32 GetGraphicsApiHandle() const;
 
 	void SetTextureSource(uint32 uiTextureIndex);
@@ -45,8 +45,6 @@ public:
 	uint32 GetNumTextures();
 
 private:
-	virtual void OnDataLoaded() override;
-	
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 };

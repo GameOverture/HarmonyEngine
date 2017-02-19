@@ -25,18 +25,12 @@
 #include "Diagnostics/HyGuiComms.h"
 
 HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
-																										m_GfxCommsRef(gfxCommsRef),
-																										m_SceneRef(sceneRef),
-																										m_AtlasManager(m_sDATADIR + "Atlases/"),
-																										m_Sfx(HYTYPE_Sound2d),
-																										m_Sprite2d(HYTYPE_Sprite2d),
-																										m_Spine2d(HYTYPE_Spine2d),
-																										m_Txt2d(HYTYPE_Text2d),
-																										m_Mesh3d(HYTYPE_Mesh3d),
-																										m_Quad2d(HYTYPE_TexturedQuad2d),
-																										m_Primitive2d(HYTYPE_Primitive2d),
-																										m_pLastQueuedData(nullptr),
-																										m_LoadingCtrl(m_Load_Shared, m_Load_Retrieval)
+																							m_GfxCommsRef(gfxCommsRef),
+																							m_SceneRef(sceneRef),
+																							m_AtlasManager(m_sDATADIR + "Atlases/"),
+																							m_pLastQueuedData(nullptr),
+																							m_pLastDiscardedData(nullptr),
+																							m_LoadingCtrl(m_Load_Shared, m_Load_Retrieval)
 {
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
@@ -52,9 +46,9 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 	bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
 	HyAssert(bGameDataParsed, "Could not parse game data");
 
-	m_Sfx.Init(gameDataObj.get<jsonxx::Object>("Audio"));
-	m_Txt2d.Init(gameDataObj.get<jsonxx::Object>("Fonts"));
-	m_Sprite2d.Init(gameDataObj.get<jsonxx::Object>("Sprites"));
+	m_Sfx.Init(gameDataObj.get<jsonxx::Object>("Audio"), m_AtlasManager);
+	m_Txt2d.Init(gameDataObj.get<jsonxx::Object>("Fonts"), m_AtlasManager);
+	m_Sprite2d.Init(gameDataObj.get<jsonxx::Object>("Sprites"), m_AtlasManager);
 	//jsonxx::Object &entitiesDataObjRef = gameDataObj.get<jsonxx::Object>("Entities");
 	//jsonxx::Object &particlesDataObjRef = gameDataObj.get<jsonxx::Object>("Particles");
 	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");
@@ -68,39 +62,33 @@ HyAssets::~HyAssets()
 	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
 }
 
-void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyData *pData)
+void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyData *&pDataOut)
 {
 	switch(pDrawNode->GetType())
 	{
 	case HYTYPE_Sprite2d:
-		pData = m_Sprite2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
+		pDataOut = m_Sprite2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
 		break;
 	case HYTYPE_Spine2d:
-		pData = m_Spine2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
+		pDataOut = m_Spine2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
 		break;
 	case HYTYPE_Text2d:
-		pData = m_Txt2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
+		pDataOut = m_Txt2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
 		break;
 	case HYTYPE_TexturedQuad2d:
-		pData = m_Quad2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
+		pDataOut = m_Quad2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
 		break;
-	case HYTYPE_Primitive2d:
-		pData = m_Primitive2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
-		break;
-
-	default:
-		return;
 	}
 }
 
-void HyAssets::LoadGfxData(HyGfxData &drawDataRef)
+void HyAssets::LoadGfxData(IHyDraw2d *pDrawNode2d)
 {
 	HyAssert(drawDataRef.m_eLoadState == HYLOADSTATE_Inactive, "HyAssets::LoadGfxData was called on a gfxData that wasn't HYLOADSTATE_Inactive");
 
 	bool bFullyLoaded = true;
 
 	// Check whether all the required atlases are loaded
-	for(auto iter = drawDataRef.m_RequiredAtlasIds.begin(); iter != drawDataRef.m_RequiredAtlasIds.end(); ++iter)
+	for(auto iter = pDrawNode2d->m_RequiredAtlasIds.begin(); iter != pDrawNode2d->m_RequiredAtlasIds.end(); ++iter)
 	{
 		HyAtlasGroup *pAtlasGrp = m_AtlasManager.GetAtlasGroup(*iter);
 		if(QueueData(pAtlasGrp) == false)
@@ -108,7 +96,7 @@ void HyAssets::LoadGfxData(HyGfxData &drawDataRef)
 	}
 
 	// Check whether we need to load custom shaders
-	for(auto iter = drawDataRef.m_RequiredCustomShaders.begin(); iter != drawDataRef.m_RequiredCustomShaders.end(); ++iter)
+	for(auto iter = pDrawNode2d->m_RequiredCustomShaders.begin(); iter != pDrawNode2d->m_RequiredCustomShaders.end(); ++iter)
 	{
 		IHyShader *pShader = IHyRenderer::FindShader(*iter);
 		if(QueueData(pShader) == false)
@@ -118,37 +106,37 @@ void HyAssets::LoadGfxData(HyGfxData &drawDataRef)
 	// Set the instance
 	if(bFullyLoaded == false)
 	{
-		drawDataRef.m_eLoadState = HYLOADSTATE_Queued;
-		m_QueuedInst2dList.push_back(&drawDataRef);
+		pDrawNode2d->m_eLoadState = HYLOADSTATE_Queued;
+		m_QueuedInst2dList.push_back(pDrawNode2d);
 	}
 	else
 	{
-		m_SceneRef.AddInstance(
-		drawDataRef.m_eLoadState = HYLOADSTATE_Loaded;
+		m_SceneRef.AddInstance(pDrawNode2d);
+		pDrawNode2d->m_eLoadState = HYLOADSTATE_Loaded;
 	}
 }
 
-void HyAssets::RemoveGfxData(HyGfxData &drawDataRef)
+void HyAssets::RemoveGfxData(IHyDraw2d *pDrawNode2d)
 {
-	HyAssert(drawDataRef.m_eLoadState != HYLOADSTATE_Inactive, "HyAssets::RemoveGfxData was called on a gfxData that was HYLOADSTATE_Inactive");
+	HyAssert(pDrawNode2d->m_eLoadState != HYLOADSTATE_Inactive, "HyAssets::RemoveGfxData was called on a gfxData that was HYLOADSTATE_Inactive");
 
-	for(auto iter = drawDataRef.m_RequiredAtlasIds.begin(); iter != drawDataRef.m_RequiredAtlasIds.end(); ++iter)
+	for(auto iter = pDrawNode2d->m_RequiredAtlasIds.begin(); iter != pDrawNode2d->m_RequiredAtlasIds.end(); ++iter)
 	{
 		HyAtlasGroup *pAtlasGrp = m_AtlasManager.GetAtlasGroup(*iter);
 		DequeData(pAtlasGrp);
 	}
 
-	for(auto iter = drawDataRef.m_RequiredCustomShaders.begin(); iter != drawDataRef.m_RequiredCustomShaders.end(); ++iter)
+	for(auto iter = pDrawNode2d->m_RequiredCustomShaders.begin(); iter != pDrawNode2d->m_RequiredCustomShaders.end(); ++iter)
 	{
 		IHyShader *pShader = IHyRenderer::FindShader(*iter);
 		DequeData(pShader);
 	}
 
-	if(drawDataRef.m_eLoadState == HYLOADSTATE_Queued)
+	if(pDrawNode2d->m_eLoadState == HYLOADSTATE_Queued)
 	{
 		for(auto it = m_QueuedInst2dList.begin(); it != m_QueuedInst2dList.end(); ++it)
 		{
-			if((*it) == &drawDataRef)
+			if((*it) == pDrawNode2d)
 			{
 				m_QueuedInst2dList.erase(it);
 				break;
@@ -156,7 +144,7 @@ void HyAssets::RemoveGfxData(HyGfxData &drawDataRef)
 		}
 	}
 
-	drawDataRef.m_eLoadState = HYLOADSTATE_Inactive;
+	pDrawNode2d->m_eLoadState = HYLOADSTATE_Inactive;
 }
 
 // Unload everything
@@ -177,16 +165,7 @@ void HyAssets::Shutdown()
 
 bool HyAssets::IsShutdown()
 {
-	bool bTest = m_pLoadingThread->IsAlive();
-
-	return m_LoadingCtrl.m_eState == LoadThreadCtrl::STATE_HasExited &&
-		   m_pLoadingThread->IsAlive() == false &&
-		   m_Sfx.IsEmpty() &&
-		   m_Sprite2d.IsEmpty() &&
-		   m_Spine2d.IsEmpty() &&
-		   m_Mesh3d.IsEmpty() &&
-		   m_Txt2d.IsEmpty() &&
-		   m_Quad2d.IsEmpty();
+	return m_pLastDiscardedData == nullptr && m_LoadingCtrl.m_eState != LoadThreadCtrl::STATE_Run;
 }
 
 void HyAssets::Update()
@@ -267,6 +246,8 @@ void HyAssets::DequeData(IHyLoadableData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Discarded;
 			m_Load_Prepare.push(pData);
+
+			m_pLastDiscardedData = pData;
 		}
 	}
 }
@@ -282,6 +263,8 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Discarded;
 			m_Load_Prepare.push(pData);
+
+			m_pLastDiscardedData = pData;
 		}
 		else
 		{
@@ -291,7 +274,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 			{
 				for(auto iter = m_QueuedInst2dList.begin(); iter != m_QueuedInst2dList.end(); ++iter)
 				{
-					m_SceneRef.AddInstance
+					m_SceneRef.AddInstance(*iter);
 					(*iter)->m_eLoadState = HYLOADSTATE_Loaded;
 				}
 
@@ -304,6 +287,9 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 	{
 		pData->m_eLoadState = HYLOADSTATE_Inactive;
 		HyLog("Deleted loadable data");
+
+		if(pData == m_pLastDiscardedData)
+			m_pLastDiscardedData = nullptr;
 	}
 }
 

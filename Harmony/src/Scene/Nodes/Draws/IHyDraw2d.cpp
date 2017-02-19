@@ -23,6 +23,7 @@
 /*static*/ HyAssets *IHyDraw2d::sm_pHyAssets = nullptr;
 
 IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName) :	IHyTransform2d(eInstType),
+																					m_eLoadState(HYLOADSTATE_Inactive),
 																					m_sPREFIX(szPrefix ? szPrefix : ""),
 																					m_sNAME(szName ? szName : ""),
 																					m_pData(nullptr),
@@ -63,12 +64,16 @@ const std::string &IHyDraw2d::GetPrefix()
 	return m_sPREFIX;
 }
 
-IHyData &IHyDraw2d::GetData()
+IHyData *IHyDraw2d::AcquireData()
 {
 	if(m_pData == nullptr)
+	{
 		sm_pHyAssets->GetNodeData(this, m_pData);
+		MakeBoundingVolumeDirty();
+		OnDataAcquired();
+	}
 
-	return *m_pData;
+	return m_pData;
 }
 
 HyCoordinateType IHyDraw2d::GetCoordinateType()
@@ -216,7 +221,10 @@ void IHyDraw2d::SetCustomShader(IHyShader *pShader)
 {
 	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyDraw2d::SetCustomShader was used on an already loaded instance - I can make this work I just haven't yet");
 	HyAssert(pShader->IsFinalized(), "IHyDraw2d::SetCustomShader tried to set a non-finalized shader");
+	HyAssert(pShader->GetId() >= HYSHADERPROG_CustomStartIndex, "HyGfxData::SetRequiredCustomShaderId was passed an invalid custom shader Id");
 
+	m_RequiredCustomShaders.clear();
+	m_RequiredCustomShaders.insert(pShader->GetId());
 	m_RenderState.SetShaderId(pShader->GetId());
 }
 
@@ -243,11 +251,14 @@ void IHyDraw2d::Load()
 	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
 		SetCoordinateUnit(IHyApplication::DefaultCoordinateUnit(), false);
 
+	m_RequiredAtlasIds.clear();
+	AcquireData();
+	if(m_pData)
+		m_pData->AppendRequiredAtlasIds(m_RequiredAtlasIds);
 
-	GetData().SetRequiredAtlasIds(m_GfxData);
+	sm_pHyAssets->LoadGfxData(this);
 
-	sm_pHyAssets->LoadGfxData(m_GfxData);
-
+	// Load any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(m_ChildList[i]->IsDraw2d())
@@ -266,12 +277,17 @@ void IHyDraw2d::Load()
 			static_cast<IHyDraw2d *>(m_ChildList[i])->Unload();
 	}
 	
-	// Remove self from scene (and possibly clean up any unused gfx assets)
 	sm_pHyAssets->RemoveGfxData(this);
-	
-	// *THEN* clear/reset your load data members
-	m_pData = NULL;
-	m_eLoadState = HYLOADSTATE_Inactive;
+}
+
+bool IHyDraw2d::IsSelfLoaded()
+{
+	return m_eLoadState == HYLOADSTATE_Loaded;
+}
+
+IHyData *IHyDraw2d::UncheckedGetData()
+{
+	return m_pData;
 }
 
 void IHyDraw2d::MakeBoundingVolumeDirty()
@@ -282,22 +298,6 @@ void IHyDraw2d::MakeBoundingVolumeDirty()
 const HyRenderState &IHyDraw2d::GetRenderState() const
 {
 	return m_RenderState;
-}
-
-void IHyDraw2d::SetData(IHyData *pData)
-{
-	m_pData = pData;
-	
-	if(m_pData == NULL)
-		m_eLoadState = HYLOADSTATE_Loaded;
-	else
-		m_eLoadState = (m_pData->GetLoadState() == HYLOADSTATE_Loaded) ? HYLOADSTATE_Loaded : HYLOADSTATE_Queued;
-}
-
-void IHyDraw2d::SetGfxLoaded()
-{
-	m_eLoadState = HYLOADSTATE_Loaded;
-	OnDataLoaded();
 }
 
 void IHyDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)

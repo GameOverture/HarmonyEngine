@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Assets/Data/HyMesh3dData.h"
 
-HyMesh3dData::HyMesh3dData(const std::string &sPath) :	IHyData(HYTYPE_Mesh3d, sPath)
+HyMesh3dData::HyMesh3dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef) :	IHyData(HYTYPE_Mesh3d, sPath)
 {
 	m_vAmbientReflectivity.x = 0.1f; m_vAmbientReflectivity.y = 0.1f; m_vAmbientReflectivity.z = 0.1f;
 	m_vDiffuseReflectivity.x = 0.4f; m_vDiffuseReflectivity.y = 0.4f; m_vDiffuseReflectivity.z = 0.4f;
@@ -22,7 +22,7 @@ HyMesh3dData::~HyMesh3dData(void)
 {
 }
 
-/*virtual*/ void HyMesh3dData::SetRequiredAtlasIds(HyGfxData &gfxDataOut)
+/*virtual*/ void HyMesh3dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
 {
 	HyError("Not implemented");
 }

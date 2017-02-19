@@ -423,7 +423,7 @@ void HyOpenGLShader::PrintActiveAttribs()
 
 /*virtual*/ void HyOpenGLShader::OnUpload(IHyRenderer &rendererRef)
 {
-	HyAssert(m_eLoadState == HYLOADSTATE_Queued, "HyOpenGLShader::OnRenderThread() invoked on a non-queued shader");
+	HyAssert(GetLoadState() == HYLOADSTATE_Queued, "HyOpenGLShader::OnRenderThread() invoked on a non-queued shader");
 
 	HyOpenGL &gl = static_cast<HyOpenGL &>(rendererRef);
 
@@ -551,8 +551,6 @@ void HyOpenGLShader::PrintActiveAttribs()
 	////////////////////////////////////////////////////////////////////////////
 
 	glBindVertexArray(0);
-
-	m_eLoadState = HYLOADSTATE_Loaded;
 }
 
 /*virtual*/ void HyOpenGLShader::OnDelete(IHyRenderer &rendererRef)
@@ -562,6 +560,4 @@ void HyOpenGLShader::PrintActiveAttribs()
 	// ... Delete shader objects, etc 
 	if(m_hProgHandle > 0)
 		glDeleteProgram(m_hProgHandle);
-
-	m_eLoadState = HYLOADSTATE_Discarded;
 }

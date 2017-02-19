@@ -43,12 +43,12 @@ HyText2dData::FontState::~FontState()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyText2dData::HyText2dData(const std::string &sPath) :	IHyData(HYTYPE_Text2d, sPath),
-														m_uiAtlasGroupTextureIndex(0),
-														m_pTypefaces(NULL),
-														m_uiNumTypefaces(0),
-														m_pFontStates(NULL),
-														m_uiNumStates(0)
+HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef) :	IHyData(HYTYPE_Text2d, sPath),
+																																m_uiAtlasGroupTextureIndex(0),
+																																m_pTypefaces(NULL),
+																																m_uiNumTypefaces(0),
+																																m_pFontStates(NULL),
+																																m_uiNumStates(0)
 {
 	std::string sFontFileContents;
 	HyReadTextFile(GetPath().c_str(), sFontFileContents);
@@ -56,7 +56,7 @@ HyText2dData::HyText2dData(const std::string &sPath) :	IHyData(HYTYPE_Text2d, sP
 	jsonxx::Object textObject;
 	textObject.parse(sFontFileContents);
 
-	m_pAtlasGroup = RequestTexture(static_cast<uint32>(textObject.get<jsonxx::Number>("atlasGroupId")));
+	m_pAtlasGroup = atlasContainerRef.GetAtlasGroup(static_cast<uint32>(textObject.get<jsonxx::Number>("atlasGroupId")));
 
 	HyRectangle<float> rSubAtlasUVRect;
 	m_pAtlasGroup->GetUvRect(static_cast<uint32>(textObject.get<jsonxx::Number>("checksum")), m_uiAtlasGroupTextureIndex, rSubAtlasUVRect);
@@ -188,7 +188,7 @@ float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
 	return 0.0f;
 }
 
-/*virtual*/ void HyText2dData::SetRequiredAtlasIds(HyGfxData &gfxDataOut)
+/*virtual*/ void HyText2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
 {
 	HyError("Not implemented");
 }

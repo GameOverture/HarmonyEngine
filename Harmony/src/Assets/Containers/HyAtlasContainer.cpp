@@ -7,15 +7,15 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Assets/HyAtlasContainer.h"
+#include "Assets/Containers/HyAtlasContainer.h"
 
 #include "Renderer/IHyRenderer.h"
 
 #include "Utilities/stb_image.h"
 
 HyAtlasContainer::HyAtlasContainer(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasDataDir),
-													m_uiNumAtlasGroups(0),
-													m_pAtlasGroups(NULL)
+																m_uiNumAtlasGroups(0),
+																m_pAtlasGroups(NULL)
 {
 	jsonxx::Array atlasGroupArray;
 
@@ -91,13 +91,13 @@ std::string HyAtlasContainer::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTex
 }
 
 //////////////////////////////////////////////////////////////////////////
-HyAtlasGroup::HyAtlasGroup(HyAtlasContainer &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef) :	m_ManagerRef(managerRef),
-																																										m_uiLOADGROUPID(uiLoadGroupId),
-																																										m_uiWIDTH(uiWidth),
-																																										m_uiHEIGHT(uiHeight),
-																																										m_uiNUM_8BIT_CHANNELS(uiNumClrChannels),
-																																										m_uiNUM_ATLASES(static_cast<uint32>(texturesArrayRef.size())),
-																																										m_uiRefCount(0)
+HyAtlasGroup::HyAtlasGroup(HyAtlasContainer &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef) :	IHyLoadableData(HYGFXTYPE_AtlasGroup),
+																																											m_ManagerRef(managerRef),
+																																											m_uiLOADGROUPID(uiLoadGroupId),
+																																											m_uiWIDTH(uiWidth),
+																																											m_uiHEIGHT(uiHeight),
+																																											m_uiNUM_8BIT_CHANNELS(uiNumClrChannels),
+																																											m_uiNUM_ATLASES(static_cast<uint32>(texturesArrayRef.size()))
 {
 	m_pAtlases = reinterpret_cast<HyAtlas *>(HY_NEW unsigned char[sizeof(HyAtlas) * m_uiNUM_ATLASES]);
 	HyAtlas *pAtlasWriteLocation = m_pAtlases;
@@ -182,7 +182,7 @@ void HyAtlasGroup::OnLoadThread()
 {
 	m_csTextures.Lock();
 
-	if(isloading // m_uiRefCount == 0)
+	if(GetLoadState() == HYLOADSTATE_Queued)
 	{
 		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
 			m_pAtlases[i].Load(m_ManagerRef.GetTexturePath(m_uiLOADGROUPID, i).c_str());
@@ -193,18 +193,8 @@ void HyAtlasGroup::OnLoadThread()
 
 void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef)
 {
-	bool bUpload = m_uiRefCount == 0;
-
-	if(pData->IsIncrementRenderRefs())
-		m_uiRefCount++;
-	else
-	{
-		HyAssert(m_uiRefCount > 0, "HyAtlasGroup::OnRenderThread Tried to decrement an empty ref");
-		m_uiRefCount--;
-	}
-
 	m_csTextures.Lock();
-	if(bUpload)
+	if(GetLoadState() == HYLOADSTATE_Queued)
 	{
 		std::vector<unsigned char *> texturePixelDataList;
 		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
@@ -229,7 +219,7 @@ void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef)
 		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
 			m_pAtlases[i].DeletePixelData();
 	}
-	else if(m_uiRefCount == 0)
+	else // GetLoadState() == HYLOADSTATE_Discarded
 	{
 		std::set<uint32> gfxApiHandleSet;
 		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)

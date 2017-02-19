@@ -13,7 +13,7 @@
 #include "Diagnostics/HyGuiComms.h"
 #include "Utilities/HyFileIO.h"
 
-HySpine2dData::HySpine2dData(const std::string &sPath) : IHyData(HYTYPE_Spine2d, sPath)
+HySpine2dData::HySpine2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef) : IHyData(HYTYPE_Spine2d, sPath)
 {
 	std::string sAtlasPath(GetPath());
 	sAtlasPath += ".atlas";
@@ -43,7 +43,7 @@ HySpine2dData::~HySpine2dData()
 	spAtlas_dispose(m_SpineAtlasData);
 }
 
-/*virtual*/ void HySpine2dData::SetRequiredAtlasIds(HyGfxData &gfxDataOut)
+/*virtual*/ void HySpine2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
 {
 	HyError("Not implemented");
 }

@@ -12,7 +12,7 @@
 #include "Renderer/IHyRenderer.h"
 
 
-HyPrimitive2dData::HyPrimitive2dData(const std::string &sPath) : IHyData(HYTYPE_Primitive2d, sPath)
+HyPrimitive2dData::HyPrimitive2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef) : IHyData(HYTYPE_Primitive2d, sPath)
 {
 }
 
@@ -20,7 +20,6 @@ HyPrimitive2dData::~HyPrimitive2dData()
 {
 }
 
-/*virtual*/ void HyPrimitive2dData::SetRequiredAtlasIds(HyGfxData &gfxDataOut)
+/*virtual*/ void HyPrimitive2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
 {
-	HyError("Not implemented");
 }

@@ -12,25 +12,20 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/Data/HyGfxData.h"
-#include "Assets/Containers/HyNodeDataContainer.h"
+
+#include "Assets/Data/IHyData.h"
+#include "Assets/Containers/HyAtlasContainer.h"
 
 #include "spine/spine.h"
 #include "spine/extension.h"
 
-class HyAtlasGroupData;
-class IGfxApi;
-
 class HySpine2dData : public IHyData
 {
-	friend class HyNodeDataContainer<HySpine2dData>;
-
 	spAtlas *				m_SpineAtlasData;
 	spSkeletonData *		m_SpineSkeletonData;
 
-	// Only allow HyNodeDataContainer instantiate
-	HySpine2dData(const std::string &sPath);
-
 public:
+	HySpine2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);
 	virtual ~HySpine2dData();
 
 	spSkeletonData *GetSkeletonData()								{ return m_SpineSkeletonData; }
@@ -41,7 +36,7 @@ public:
 	void AnimInitBlend(const char *szAnimFrom, const char *szAnimTo, float fInterpDur);
 	void AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInterpDur);
 
-	virtual void SetRequiredAtlasIds(HyGfxData &gfxDataOut) override;
+	virtual void AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut) override;
 };
 
 #endif /* __HyEnt2dData_h__ */

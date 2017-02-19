@@ -52,7 +52,6 @@
     <ClCompile Include="Assets\Data\HyText2dData.cpp" />
     <ClCompile Include="Assets\Data\HyTexturedQuad2dData.cpp" />
     <ClCompile Include="Assets\Data\IHyData.cpp" />
-    <ClCompile Include="Assets\Data\HyGfxData.cpp" />
     <ClCompile Include="Assets\HyAssets.cpp" />
     <ClCompile Include="Audio\IHyAudio.cpp" />
     <ClCompile Include="Audio\IHyAudioInst.cpp" />

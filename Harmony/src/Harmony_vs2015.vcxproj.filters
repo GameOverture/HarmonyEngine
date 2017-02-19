@@ -228,9 +228,6 @@
     <ClCompile Include="Assets\Containers\HyAtlasContainer.cpp">
       <Filter>Assets\Containers</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\Data\HyGfxData.cpp">
-      <Filter>Assets\Data</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">

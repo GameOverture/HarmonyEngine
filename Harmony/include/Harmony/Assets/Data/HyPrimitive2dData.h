@@ -13,19 +13,15 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/Containers/HyNodeDataContainer.h"
+#include "Assets/Containers/HyAtlasContainer.h"
 
 class HyPrimitive2dData : public IHyData
 {
-	friend class HyNodeDataContainer<HyPrimitive2dData>;
-
-	// Only allow HyNodeDataContainer instantiate
-	HyPrimitive2dData(const std::string &sPath);
-
 public:
+	HyPrimitive2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);
 	virtual ~HyPrimitive2dData();
 
-	virtual void SetRequiredAtlasIds(HyGfxData &gfxDataOut) override;
+	virtual void AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut) override;
 };
 
 #endif /* __HyPrimitive2dData_h__ */

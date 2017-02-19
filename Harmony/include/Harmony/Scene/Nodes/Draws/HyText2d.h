@@ -97,9 +97,8 @@ public:
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 
 protected:
-	virtual void OnDataLoaded() override;
-
 	virtual void OnUpdate() override;
+	virtual void OnDataAcquired() override;
 
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;

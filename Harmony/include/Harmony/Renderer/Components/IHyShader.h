@@ -15,9 +15,6 @@
 
 #include <vector>
 
-class IHyRenderer;
-class HyGfxData;
-
 #define HY_SHADER_UNIFORM_NAME_LENGTH		32	// includes the NULL terminator
 #define HY_SHADER_UNIFORM_BUFFER_LENGTH		(sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH + sizeof(glm::mat4))
 
@@ -73,6 +70,8 @@ class IHyShader : public IHyLoadableData
 protected:
 	const int32						m_iID;
 	const std::string				m_sOPTIONAL_LOAD_PATH;
+
+	bool							m_bIsFinalized;
 
 	struct VertexAttribute
 	{

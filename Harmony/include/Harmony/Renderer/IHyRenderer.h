@@ -25,9 +25,9 @@ protected:
 	HyGfxComms &							m_GfxCommsRef;
 	std::vector<HyWindow *> &				m_WindowListRef;
 
-	std::queue<HyGfxData *> *				m_pRxDataQueue;		// The pointer to the currently active render message queue
-	std::queue<HyGfxData *> *				m_pTxDataQueue;	// The pointer to the currently active render message queue
-	char *									m_pDrawBuffer;	// The pointer to the currently active draw buffer
+	std::queue<IHyLoadableData *> *			m_pRxDataQueue;		// The pointer to the currently active render message queue
+	std::queue<IHyLoadableData *> *			m_pTxDataQueue;		// The pointer to the currently active render message queue
+	char *									m_pDrawBuffer;		// The pointer to the currently active draw buffer
 
 	static int32							sm_iShaderIdCount;
 	static std::map<int32, IHyShader *>		sm_ShaderMap;

@@ -42,12 +42,12 @@ HyTexturedQuad2d::~HyTexturedQuad2d()
 {
 }
 
-uint32 HyTexturedQuad2d::GetAtlasGroupId() const
+uint32 HyTexturedQuad2d::GetAtlasGroupId()
 {
 	if(m_bIS_RAW)
 		return 0xFFFFFFFF;
 
-	return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetId();
+	return static_cast<HyTexturedQuad2dData *>(AcquireData())->GetAtlasGroup()->GetId();
 }
 
 uint32 HyTexturedQuad2d::GetGraphicsApiHandle() const
@@ -62,27 +62,17 @@ void HyTexturedQuad2d::SetTextureSource(uint32 uiTextureIndex)
 
 void HyTexturedQuad2d::SetTextureSource(uint32 uiTextureIndex, int iX, int iY, int iWidth, int iHeight)
 {
-	if(m_eLoadState == HYLOADSTATE_Loaded)
-	{
-		float fX = static_cast<float>(iX);
-		float fY = static_cast<float>(iY);
-		float fWidth = static_cast<float>(iWidth);
-		float fHeight = static_cast<float>(iHeight);
-		float fTexWidth = m_bIS_RAW ? m_uiRAW_TEXTURE_WIDTH : static_cast<float>(static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetWidth());
-		float fTexHeight = m_bIS_RAW ? m_uiRAW_TEXTURE_HEIGHT : static_cast<float>(static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetHeight());
+	float fX = static_cast<float>(iX);
+	float fY = static_cast<float>(iY);
+	float fWidth = static_cast<float>(iWidth);
+	float fHeight = static_cast<float>(iHeight);
+	float fTexWidth = m_bIS_RAW ? m_uiRAW_TEXTURE_WIDTH : static_cast<float>(static_cast<HyTexturedQuad2dData *>(AcquireData())->GetAtlasGroup()->GetWidth());
+	float fTexHeight = m_bIS_RAW ? m_uiRAW_TEXTURE_HEIGHT : static_cast<float>(static_cast<HyTexturedQuad2dData *>(AcquireData())->GetAtlasGroup()->GetHeight());
 
-		m_SrcRect.left = fX / fTexWidth;
-		m_SrcRect.top = fY / fTexHeight;
-		m_SrcRect.right = (fX + fWidth) / fTexWidth;
-		m_SrcRect.bottom = (fY + fHeight) / fTexHeight;
-	}
-	else
-	{
-		m_SrcRect.left = static_cast<float>(iX);
-		m_SrcRect.top = static_cast<float>(iY);
-		m_SrcRect.right = m_SrcRect.left + static_cast<float>(iWidth);
-		m_SrcRect.bottom = m_SrcRect.top + static_cast<float>(iHeight);
-	}
+	m_SrcRect.left = fX / fTexWidth;
+	m_SrcRect.top = fY / fTexHeight;
+	m_SrcRect.right = (fX + fWidth) / fTexWidth;
+	m_SrcRect.bottom = (fY + fHeight) / fTexHeight;
 
 	m_uiTextureIndex = uiTextureIndex;
 }
@@ -107,10 +97,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureWidth()
 	if(m_bIS_RAW)
 		return m_uiRAW_TEXTURE_WIDTH;
 
-	if(m_eLoadState == HYLOADSTATE_Loaded)
-		return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetWidth();
-	else
-		return 0;
+	return static_cast<HyTexturedQuad2dData *>(AcquireData())->GetAtlasGroup()->GetWidth();
 }
 
 uint32 HyTexturedQuad2d::GetEntireTextureHeight()
@@ -118,10 +105,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	if(m_bIS_RAW)
 		return m_uiRAW_TEXTURE_HEIGHT;
 
-	if(m_eLoadState == HYLOADSTATE_Loaded)
-		return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetHeight();
-	else
-		return 0;
+	return static_cast<HyTexturedQuad2dData *>(AcquireData())->GetAtlasGroup()->GetHeight();
 }
 
 uint32 HyTexturedQuad2d::GetNumTextures()
@@ -129,30 +113,7 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	if(m_bIS_RAW)
 		return 1;
 
-	if(m_eLoadState == HYLOADSTATE_Loaded)
-		return static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetNumTextures();
-	else
-		return 0;
-}
-
-/*virtual*/ void HyTexturedQuad2d::OnDataLoaded()
-{
-	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);
-
-	if(m_bIS_RAW == false)
-		m_RenderState.SetTextureHandle(pData->GetAtlasGroup()->GetGfxApiHandle(m_uiTextureIndex));
-
-	// Correct 'm_SrcRect' if using pixel coords
-	if(m_SrcRect.left > 1.0f || m_SrcRect.top > 1.0f || m_SrcRect.right > 1.0f || m_SrcRect.bottom > 1.0f)
-	{
-		float fTexWidth = m_bIS_RAW ? m_uiRAW_TEXTURE_WIDTH : static_cast<float>(static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetWidth());
-		float fTexHeight = m_bIS_RAW ? m_uiRAW_TEXTURE_HEIGHT : static_cast<float>(static_cast<HyTexturedQuad2dData *>(m_pData)->GetAtlasGroup()->GetHeight());
-
-		m_SrcRect.left = m_SrcRect.left / fTexWidth;
-		m_SrcRect.top = m_SrcRect.top / fTexHeight;
-		m_SrcRect.right = m_SrcRect.right / fTexWidth;
-		m_SrcRect.bottom = m_SrcRect.bottom / fTexHeight;
-	}
+	return static_cast<HyTexturedQuad2dData *>(AcquireData())->GetAtlasGroup()->GetNumTextures();
 }
 
 /*virtual*/ void HyTexturedQuad2d::OnUpdateUniforms()
@@ -162,7 +123,7 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 
 /*virtual*/ void HyTexturedQuad2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(m_pData);
+	HyTexturedQuad2dData *pData = static_cast<HyTexturedQuad2dData *>(UncheckedGetData());
 
 	glm::vec2 vSize(m_SrcRect.Width() * (m_bIS_RAW ? m_uiRAW_TEXTURE_WIDTH : pData->GetAtlasGroup()->GetWidth()),
 					m_SrcRect.Height() * (m_bIS_RAW ? m_uiRAW_TEXTURE_HEIGHT : pData->GetAtlasGroup()->GetHeight()));

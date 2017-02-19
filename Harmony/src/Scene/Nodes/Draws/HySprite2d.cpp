@@ -56,7 +56,6 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 	case HYANIMCTRL_Play:
 		m_bIsAnimPaused = false;
 		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Reverse;
-		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_PRELOADAPPLY_DontReverse;
 		break;
 	case HYANIMCTRL_ReversePlay:
 		m_bIsAnimPaused = false;
@@ -64,8 +63,8 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 		break;
 	case HYANIMCTRL_Reset:
 		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_IsBouncing;
-		if(m_AnimCtrlAttribList[uiAnimState] & ANIMCTRLATTRIB_Reverse && m_pData && static_cast<HySprite2dData *>(m_pData)->GetState(uiAnimState).m_uiNUMFRAMES > 0)
-			m_uiCurFrame = static_cast<HySprite2dData *>(m_pData)->GetState(uiAnimState).m_uiNUMFRAMES - 1;
+		if(m_AnimCtrlAttribList[uiAnimState] & ANIMCTRLATTRIB_Reverse && static_cast<HySprite2dData *>(AcquireData())->GetState(uiAnimState).m_uiNUMFRAMES > 0)
+			m_uiCurFrame = static_cast<HySprite2dData *>(AcquireData())->GetState(uiAnimState).m_uiNUMFRAMES - 1;
 		else
 			m_uiCurFrame = 0;
 		break;
@@ -74,14 +73,12 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 		break;
 	case HYANIMCTRL_DontLoop:
 		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Loop;
-		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_PRELOADAPPLY_DontLoop;
 		break;
 	case HYANIMCTRL_Bounce:
 		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_Bounce;
 		break;
 	case HYANIMCTRL_DontBounce:
 		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Bounce;
-		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_PRELOADAPPLY_DontBounce;
 		break;
 	}
 }
@@ -92,15 +89,9 @@ void HySprite2d::AnimSetPause(bool bPause)
 	m_fElapsedFrameTime = 0.0f;
 }
 
-uint32 HySprite2d::AnimGetNumStates() const
+uint32 HySprite2d::AnimGetNumStates()
 {
-	if(m_eLoadState != HYLOADSTATE_Loaded)
-	{
-		HyLogWarning("HySprite2d::AnimGetNumStates invoked before sprite instance has loaded. Returning 0");
-		return 0;
-	}
-
-	return static_cast<HySprite2dData *>(m_pData)->GetNumStates();
+	return static_cast<HySprite2dData *>(AcquireData())->GetNumStates();
 }
 
 uint32 HySprite2d::AnimGetCurState() const
@@ -108,15 +99,9 @@ uint32 HySprite2d::AnimGetCurState() const
 	return m_uiCurAnimState;
 }
 
-uint32 HySprite2d::AnimGetNumFrames() const
+uint32 HySprite2d::AnimGetNumFrames()
 {
-	if(m_eLoadState != HYLOADSTATE_Loaded)
-	{
-		HyLogWarning("HySprite2d::AnimGetNumFrames invoked before sprite instance has loaded. Returning 0");
-		return 0;
-	}
-
-	return static_cast<HySprite2dData *>(m_pData)->GetState(m_uiCurAnimState).m_uiNUMFRAMES;
+	return static_cast<HySprite2dData *>(AcquireData())->GetState(m_uiCurAnimState).m_uiNUMFRAMES;
 }
 
 uint32 HySprite2d::AnimGetFrame() const
@@ -126,13 +111,10 @@ uint32 HySprite2d::AnimGetFrame() const
 
 void HySprite2d::AnimSetFrame(uint32 uiFrameIndex)
 {
-	if(m_eLoadState == HYLOADSTATE_Loaded)
+	if(uiFrameIndex >= static_cast<HySprite2dData *>(AcquireData())->GetState(m_uiCurAnimState).m_uiNUMFRAMES)
 	{
-		if(uiFrameIndex >= static_cast<HySprite2dData *>(m_pData)->GetState(m_uiCurAnimState).m_uiNUMFRAMES)
-		{
-			HyLogWarning("HySprite2d::AnimSetFrame wants to set frame index of '" << uiFrameIndex << "' when total number of frames is '" << static_cast<HySprite2dData *>(m_pData)->GetState(m_uiCurAnimState).m_uiNUMFRAMES << "'");
-			return;
-		}
+		HyLogWarning("HySprite2d::AnimSetFrame wants to set frame index of '" << uiFrameIndex << "' when total number of frames is '" << static_cast<HySprite2dData *>(AcquireData())->GetState(m_uiCurAnimState).m_uiNUMFRAMES << "'");
+		return;
 	}
 
 	m_uiCurFrame = uiFrameIndex;
@@ -155,13 +137,10 @@ void HySprite2d::AnimSetPlayRate(float fPlayRate)
 
 void HySprite2d::AnimSetState(uint32 uiStateIndex)
 {
-	if(m_eLoadState == HYLOADSTATE_Loaded)
+	if(uiStateIndex >= static_cast<HySprite2dData *>(AcquireData())->GetNumStates())
 	{
-		if(uiStateIndex >= static_cast<HySprite2dData *>(m_pData)->GetNumStates())
-		{
-			HyLogWarning("HySprite2d::AnimSetState wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<HySprite2dData *>(m_pData)->GetNumStates() << "'");
-			return;
-		}
+		HyLogWarning("HySprite2d::AnimSetState wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<HySprite2dData *>(AcquireData())->GetNumStates() << "'");
+		return;
 	}
 
 	if(m_uiCurAnimState == uiStateIndex)
@@ -180,14 +159,8 @@ void HySprite2d::AnimSetState(uint32 uiStateIndex)
 	MakeBoundingVolumeDirty();
 }
 
-bool HySprite2d::AnimIsFinished() const
+bool HySprite2d::AnimIsFinished()
 {
-	if(m_eLoadState != HYLOADSTATE_Loaded)
-	{
-		HyLogWarning("HySprite2d::AnimIsFinished invoked before sprite instance has loaded. Returning false");
-		return false;
-	}
-
 	uint8 uiCtrlAttribs = m_AnimCtrlAttribList[m_uiCurAnimState];
 	if(uiCtrlAttribs & ANIMCTRLATTRIB_Loop)
 		return false;
@@ -215,10 +188,10 @@ bool HySprite2d::AnimIsPaused()
 	return m_bIsAnimPaused;
 }
 
-void HySprite2d::AnimSetCallback(uint32 uiStateID, void(*fpCallback)(HySprite2d &, void *), void *pParam /*= NULL*/)
+void HySprite2d::AnimSetCallback(uint32 uiStateID, void(*fpCallback)(HySprite2d &, void *), void *pParam /*= nullptr*/)
 {
 	while(uiStateID >= m_AnimCallbackList.size())
-		m_AnimCallbackList.push_back(std::pair<fpHySprite2dCallback, void *>(NULL, NULL));
+		m_AnimCallbackList.push_back(std::pair<fpHySprite2dCallback, void *>(nullptr, nullptr));
 
 	m_AnimCallbackList[uiStateID].first = fpCallback;
 	m_AnimCallbackList[uiStateID].second = pParam;
@@ -226,82 +199,27 @@ void HySprite2d::AnimSetCallback(uint32 uiStateID, void(*fpCallback)(HySprite2d 
 
 float HySprite2d::AnimGetCurFrameWidth(bool bIncludeScaling /*= true*/)
 {
-	if(m_eLoadState != HYLOADSTATE_Loaded)
-	{
-		HyLogWarning("HySprite2d::AnimGetCurFrameWidth invoked before sprite instance has loaded. Returning 0.0f");
-		return 0.0f;
-	}
-	
-	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 
 	return frameRef.rSRC_RECT.Width() * frameRef.pAtlasGroup->GetWidth() * (bIncludeScaling ? scale.X() : 1.0f);
 }
 
 float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 {
-	if(m_eLoadState != HYLOADSTATE_Loaded)
-	{
-		HyLogWarning("HySprite2d::AnimGetCurFrameHeight invoked before sprite instance has loaded. Returning 0.0f");
-		return 0.0f;
-	}
-
-	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 
 	return frameRef.rSRC_RECT.Height() * frameRef.pAtlasGroup->GetHeight() * (bIncludeScaling ? scale.Y() : 1.0f);
 }
 
-/*virtual*/ void HySprite2d::OnDataLoaded()
-{
-	HySprite2dData *pData = static_cast<HySprite2dData *>(m_pData);
-	uint32 uiNumStates = pData->GetNumStates();
-
-	while(m_AnimCtrlAttribList.size() > uiNumStates)
-		m_AnimCtrlAttribList.pop_back();
-
-	while(m_AnimCtrlAttribList.size() < uiNumStates)
-		m_AnimCtrlAttribList.push_back(0);
-
-	for(uint32 i = 0; i < uiNumStates; ++i)
-	{
-		const HySprite2dData::AnimState &stateRef = pData->GetState(i);
-
-		if(stateRef.m_bLOOP && (m_AnimCtrlAttribList[i] & ANIMCTRLATTRIB_PRELOADAPPLY_DontLoop) == 0)
-			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Loop;
-		if(stateRef.m_bBOUNCE && (m_AnimCtrlAttribList[i] & ANIMCTRLATTRIB_PRELOADAPPLY_DontBounce) == 0)
-			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Bounce;
-		if(stateRef.m_bREVERSE && (m_AnimCtrlAttribList[i] & ANIMCTRLATTRIB_PRELOADAPPLY_DontReverse) == 0)
-			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Reverse;
-	}
-
-	if(m_uiCurAnimState >= uiNumStates)
-	{
-		if(uiNumStates == 0)
-			m_uiCurAnimState = 0;
-		else
-			m_uiCurAnimState = uiNumStates - 1;
-	}
-
-	uint32 uiNumFrames = AnimGetNumFrames();
-	if(m_uiCurFrame >= uiNumFrames)
-	{
-		if(uiNumFrames == 0)
-			m_uiCurFrame = 0;
-		else
-			m_uiCurFrame = uiNumFrames - 1;
-	}
-
-	MakeBoundingVolumeDirty();
-}
-
 /*virtual*/ void HySprite2d::OnUpdate()
 {
-	if(m_eLoadState != HYLOADSTATE_Loaded)
+	if(IsSelfLoaded() == false)
 		return;
 
 	if(m_bIsAnimPaused == false)
 		m_fElapsedFrameTime += IHyTime::GetUpdateStepSeconds() * m_fAnimPlayRate;
 
-	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiCurAnimState];
 	while(m_fElapsedFrameTime >= frameRef.fDURATION && frameRef.fDURATION > 0.0f)
 	{
@@ -372,7 +290,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 		MakeBoundingVolumeDirty();
 	}
 
-	const HySprite2dFrame &UpdatedFrameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &UpdatedFrameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 	m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
 }
 
@@ -382,13 +300,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	glm::vec2 vLowerBounds(0.0f);
 	glm::vec2 vUpperBounds(0.0f);
 
-	if(m_eLoadState != HYLOADSTATE_Loaded)
-	{
-		m_BoundingVolume.SetLocalAABB(vLowerBounds, vUpperBounds);
-		return;
-	}
-
-	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 	vLowerBounds.x = static_cast<float>(frameRef.vOFFSET.x);
 	vLowerBounds.y = static_cast<float>(frameRef.vOFFSET.y);
 	vUpperBounds.x = vLowerBounds.x + AnimGetCurFrameWidth(true);
@@ -404,7 +316,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 
 /*virtual*/ void HySprite2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(m_pData)->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 
 	glm::vec2 vSize(frameRef.rSRC_RECT.Width() * frameRef.pAtlasGroup->GetWidth(), frameRef.rSRC_RECT.Height() * frameRef.pAtlasGroup->GetHeight());
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vSize;
