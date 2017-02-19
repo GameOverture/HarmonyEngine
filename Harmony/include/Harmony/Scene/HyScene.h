@@ -74,9 +74,6 @@ public:
 
 	void CopyAllInsts(std::vector<IHyDraw2d *> &vInstsToCopy);
 
-	void AddEntity(HyEntity2d *pEnt);
-	void RemoveEntity(HyEntity2d *pEnt);
-
 	void DebugDrawPhysics2d(bool bDraw)					{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
 
 private:

@@ -20,16 +20,15 @@
 
 #include "Diagnostics/HyGuiComms.h"
 
-/*static*/ HyAssets *IHyDraw2d::sm_pHyAssets = NULL;
+/*static*/ HyAssets *IHyDraw2d::sm_pHyAssets = nullptr;
 
 IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName) :	IHyTransform2d(eInstType),
 																					m_sPREFIX(szPrefix ? szPrefix : ""),
 																					m_sNAME(szName ? szName : ""),
-																					m_pData(NULL),
-																					m_eLoadState(HYLOADSTATE_Inactive),
+																					m_pData(nullptr),
 																					m_uiAttributes(0),
 																					m_eMouseInputState(MOUSEINPUT_None),
-																					m_pMouseInputUserParam(NULL),
+																					m_pMouseInputUserParam(nullptr),
 																					m_iDisplayOrder(0),
 																					m_iDisplayOrderMax(0),
 																					topColor(*this),
@@ -268,7 +267,7 @@ void IHyDraw2d::Load()
 	}
 	
 	// Remove self from scene (and possibly clean up any unused gfx assets)
-	sm_pHyAssets->RemoveInst(this);
+	sm_pHyAssets->RemoveGfxData(this);
 	
 	// *THEN* clear/reset your load data members
 	m_pData = NULL;
@@ -278,6 +277,11 @@ void IHyDraw2d::Load()
 void IHyDraw2d::MakeBoundingVolumeDirty()
 {
 	m_uiAttributes |= ATTRIBFLAG_BoundingVolumeDirty;
+}
+
+const HyRenderState &IHyDraw2d::GetRenderState() const
+{
+	return m_RenderState;
 }
 
 void IHyDraw2d::SetData(IHyData *pData)

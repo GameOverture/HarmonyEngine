@@ -19,7 +19,7 @@
 #include "Renderer/Components/HyRenderState.h"
 #include "Scene/Nodes/Misc/HyCamera.h"
 
-class IHyDraw2d : public IHyTransform2d
+class IHyDraw2d : public IHyTransform2d, public HyGfxData
 {
 	friend class HyScene;
 	friend class HyAssets;
@@ -30,9 +30,7 @@ protected:
 	const std::string				m_sNAME;
 	const std::string				m_sPREFIX;
 
-	// Data loading
 	IHyData *						m_pData;
-	HyGfxData						m_GfxData;
 
 	enum eAttributes
 	{
@@ -108,8 +106,7 @@ protected:
 	void MakeBoundingVolumeDirty();
 
 private:
-	HyLoadState GetLoadState()									{ return m_eLoadState; }
-	const HyRenderState &GetRenderState() const					{ return m_RenderState; }
+	const HyRenderState &GetRenderState() const;
 
 	void SetData(IHyData *pData);
 	void SetGfxLoaded();

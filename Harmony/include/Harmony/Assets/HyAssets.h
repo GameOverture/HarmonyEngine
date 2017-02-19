@@ -52,6 +52,7 @@ class HyAssets
 	HyNodeDataContainer<HyTexturedQuad2dData>			m_Quad2d;
 	HyNodeDataContainer<HyPrimitive2dData>				m_Primitive2d;
 
+	IHyLoadableData *									m_pLastQueuedData;
 	std::vector<HyGfxData *>							m_QueuedInst2dList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
@@ -97,7 +98,7 @@ public:
 
 	void GetNodeData(IHyDraw2d *pDrawNode, IHyData *pData);
 	void LoadGfxData(HyGfxData &drawDataRef);
-	void RemoveInst(IHyDraw2d *pInst);
+	void RemoveGfxData(HyGfxData &drawDataRef);
 
 	void Shutdown();
 	bool IsShutdown();
@@ -105,8 +106,9 @@ public:
 	void Update();
 
 private:
+	bool QueueData(IHyLoadableData *pData);
+	void DequeData(IHyLoadableData *pData);
 	void FinalizeData(IHyLoadableData *pData);
-	void DiscardData(IHyData *pData);
 
 	static void LoadingThread(void *pParam);
 };

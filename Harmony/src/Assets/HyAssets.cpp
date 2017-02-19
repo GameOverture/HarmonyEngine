@@ -22,6 +22,8 @@
 #include "Utilities/HyMath.h"
 #include "Utilities/HyStrManip.h"
 
+#include "Diagnostics/HyGuiComms.h"
+
 HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
 																										m_GfxCommsRef(gfxCommsRef),
 																										m_SceneRef(sceneRef),
@@ -33,6 +35,7 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 																										m_Mesh3d(HYTYPE_Mesh3d),
 																										m_Quad2d(HYTYPE_TexturedQuad2d),
 																										m_Primitive2d(HYTYPE_Primitive2d),
+																										m_pLastQueuedData(nullptr),
 																										m_LoadingCtrl(m_Load_Shared, m_Load_Retrieval)
 {
 	// Start up Loading thread
@@ -92,78 +95,68 @@ void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyData *pData)
 
 void HyAssets::LoadGfxData(HyGfxData &drawDataRef)
 {
-	if(drawDataRef.m_eLoadState != HYLOADSTATE_Inactive)
-		return;
+	HyAssert(drawDataRef.m_eLoadState == HYLOADSTATE_Inactive, "HyAssets::LoadGfxData was called on a gfxData that wasn't HYLOADSTATE_Inactive");
 
 	bool bFullyLoaded = true;
 
-	// Check whether all the required IHyLoadableData are loaded
+	// Check whether all the required atlases are loaded
 	for(auto iter = drawDataRef.m_RequiredAtlasIds.begin(); iter != drawDataRef.m_RequiredAtlasIds.end(); ++iter)
 	{
 		HyAtlasGroup *pAtlasGrp = m_AtlasManager.GetAtlasGroup(*iter);
-		if(pAtlasGrp->GetRefCount() == 0)
-		{
-			m_Load_Prepare.push(pAtlasGrp);
+		if(QueueData(pAtlasGrp) == false)
 			bFullyLoaded = false;
-		}
-
-		pAtlasGrp->IncRef();
 	}
 
 	// Check whether we need to load custom shaders
 	for(auto iter = drawDataRef.m_RequiredCustomShaders.begin(); iter != drawDataRef.m_RequiredCustomShaders.end(); ++iter)
 	{
 		IHyShader *pShader = IHyRenderer::FindShader(*iter);
-		if(pShader->GetRefCount() == 0)
-		{
-			m_Load_Prepare.push(pShader);
+		if(QueueData(pShader) == false)
 			bFullyLoaded = false;
-		}
-
-		pShader->IncRef();
 	}
 
+	// Set the instance
 	if(bFullyLoaded == false)
 	{
 		drawDataRef.m_eLoadState = HYLOADSTATE_Queued;
 		m_QueuedInst2dList.push_back(&drawDataRef);
 	}
 	else
+	{
+		m_SceneRef.AddInstance(
 		drawDataRef.m_eLoadState = HYLOADSTATE_Loaded;
+	}
 }
 
-void HyAssets::RemoveInst(IHyDraw2d *pInst)
+void HyAssets::RemoveGfxData(HyGfxData &drawDataRef)
 {
-	IHyData *pInstData = NULL;
+	HyAssert(drawDataRef.m_eLoadState != HYLOADSTATE_Inactive, "HyAssets::RemoveGfxData was called on a gfxData that was HYLOADSTATE_Inactive");
 
-	switch(pInst->GetLoadState())
+	for(auto iter = drawDataRef.m_RequiredAtlasIds.begin(); iter != drawDataRef.m_RequiredAtlasIds.end(); ++iter)
 	{
-	case HYLOADSTATE_Inactive:
-		break;
+		HyAtlasGroup *pAtlasGrp = m_AtlasManager.GetAtlasGroup(*iter);
+		DequeData(pAtlasGrp);
+	}
 
-	case HYLOADSTATE_Loaded:
-		m_SceneRef.RemoveInst(pInst);
+	for(auto iter = drawDataRef.m_RequiredCustomShaders.begin(); iter != drawDataRef.m_RequiredCustomShaders.end(); ++iter)
+	{
+		IHyShader *pShader = IHyRenderer::FindShader(*iter);
+		DequeData(pShader);
+	}
 
-		pInstData = pInst->GetData();
-		if(pInstData && pInstData->DecRef())
-			DiscardData(pInstData);
-		break;
-
-	case HYLOADSTATE_Queued:
-	case HYLOADSTATE_ReloadGfx:
-		for(std::vector<IHyDraw2d *>::iterator it = m_QueuedInst2dList.begin(); it != m_QueuedInst2dList.end(); ++it)
+	if(drawDataRef.m_eLoadState == HYLOADSTATE_Queued)
+	{
+		for(auto it = m_QueuedInst2dList.begin(); it != m_QueuedInst2dList.end(); ++it)
 		{
-			if((*it) == pInst)
+			if((*it) == &drawDataRef)
 			{
 				m_QueuedInst2dList.erase(it);
 				break;
 			}
 		}
-		break;
-
-	default:
-		HyError("HyAssets::RemoveInst() passed an invalid HyLoadState");
 	}
+
+	drawDataRef.m_eLoadState = HYLOADSTATE_Inactive;
 }
 
 // Unload everything
@@ -237,79 +230,81 @@ void HyAssets::Update()
 		IHyLoadableData *pData = m_pGfxQueue_Retrieval->front();
 		m_pGfxQueue_Retrieval->pop();
 
-		if(pData->GetLoadState() == HYLOADSTATE_ReloadGfx)
+		FinalizeData(pData);
+	}
+}
+
+bool HyAssets::QueueData(IHyLoadableData *pData)
+{
+	bool bAlreadyLoaded = true;
+	if(pData->m_uiRefCount == 0)
+	{
+		if(pData->m_eLoadState == HYLOADSTATE_Inactive)
 		{
-			pData->SetLoadState(HYLOADSTATE_Queued);
-			m_GfxCommsRef.TxData(pAtlasGrp);
+			pData->m_eLoadState = HYLOADSTATE_Queued;
+			m_Load_Prepare.push(pData);
+
+			m_pLastQueuedData = pData;
 		}
-		else
-			FinalizeData(pAtlasGrp);
+
+		bAlreadyLoaded = false;
+	}
+
+	pData->m_uiRefCount++;
+
+	return bAlreadyLoaded;
+}
+
+void HyAssets::DequeData(IHyLoadableData *pData)
+{
+	HyAssert(pData->m_eLoadState != HYLOADSTATE_Inactive, "Trying to DequeData that is HYLOADSTATE_Inactive");
+	HyAssert(pData->m_uiRefCount > 0, "Tried to decrement a '0' reference");
+
+	pData->m_uiRefCount--;
+	if(pData->m_uiRefCount == 0)
+	{
+		if(pData->m_eLoadState == HYLOADSTATE_Loaded)
+		{
+			pData->m_eLoadState = HYLOADSTATE_Discarded;
+			m_Load_Prepare.push(pData);
+		}
 	}
 }
 
 void HyAssets::FinalizeData(IHyLoadableData *pData)
 {
-	if(pData->GetLoadState() == HYLOADSTATE_Queued)
+	HyAssert(pData->m_eLoadState != HYLOADSTATE_Inactive, "HyAssets::FinalizeData was passed data that was HYLOADSTATE_Inactive");
+	HyAssert(pData->m_eLoadState != HYLOADSTATE_Loaded, "HyAssets::FinalizeData was passed data that was HYLOADSTATE_Loaded");
+
+	if(pData->m_eLoadState == HYLOADSTATE_Queued)
 	{
-		bool bDataIsUsed = false;
-		for(std::vector<IHyDraw2d *>::iterator iter = m_QueuedInst2dList.begin(); iter != m_QueuedInst2dList.end();)
+		if(pData->m_uiRefCount == 0)
 		{
-			if((*iter)->GetData() == pData)
-			{
-				(*iter)->SetLoaded();
-				m_SceneRef.AddInstance(*iter);
-
-				bDataIsUsed = true;
-
-				iter = m_QueuedInst2dList.erase(iter);
-			}
-			else
-				++iter;
+			pData->m_eLoadState = HYLOADSTATE_Discarded;
+			m_Load_Prepare.push(pData);
 		}
-
-		if(bDataIsUsed)
-			pData->SetLoadState(HYLOADSTATE_Loaded);
 		else
-			DiscardData(pData);
-	}
-	else if(pData->GetLoadState() == HYLOADSTATE_Discarded)
-	{
-		HyAssert(pData->GetRefCount() <= 0, "HyAssets::Update() tried to delete an IData with active references. Num Refs: " << pData->GetRefCount());
-
-		switch(pData->GetInstType())
 		{
-		case HYTYPE_Sound2d:		m_Sfx.DeleteData(static_cast<HySfxData *>(pData));					break;
-		case HYTYPE_Sprite2d:		m_Sprite2d.DeleteData(static_cast<HySprite2dData *>(pData));		break;
-		case HYTYPE_Spine2d:		m_Spine2d.DeleteData(static_cast<HySpine2dData *>(pData));			break;
-		case HYTYPE_Text2d:			m_Txt2d.DeleteData(static_cast<HyText2dData *>(pData));				break;
-		case HYTYPE_TexturedQuad2d:	m_Quad2d.DeleteData(static_cast<HyTexturedQuad2dData *>(pData));	break;
-		default:
-			HyError("HyAssets::Update() got a returned IHyData from gfx comms with an invalid type: " << pData->GetInstType());
+			pData->m_eLoadState = HYLOADSTATE_Loaded;
+
+			if(pData == m_pLastQueuedData)
+			{
+				for(auto iter = m_QueuedInst2dList.begin(); iter != m_QueuedInst2dList.end(); ++iter)
+				{
+					m_SceneRef.AddInstance
+					(*iter)->m_eLoadState = HYLOADSTATE_Loaded;
+				}
+
+				m_QueuedInst2dList.clear();
+				m_pLastQueuedData = nullptr;
+			}
 		}
 	}
 	else
 	{
-		HyError("HyAssets::Update() got a returned IHyData from gfx comms with an invalid state: " << pData->GetLoadState());
+		pData->m_eLoadState = HYLOADSTATE_Inactive;
+		HyLog("Deleted loadable data");
 	}
-}
-
-void HyAssets::DiscardData(IHyData *pData)
-{
-	HyAssert(pData->GetRefCount() <= 0, "HyAssets::DiscardData() tried to remove an IData with active references");
-
-
-	// TODO: Wot in tarnation
-	if(pData->GetInstType() == HYTYPE_Primitive2d && static_cast<HyGfxData *>(pData)->GetShaderId() < HYSHADERPROG_CustomStartIndex)
-		return;
-
-
-	//HyLog("Deleting data: " << pData->GetPath());
-	pData->SetLoadState(HYLOADSTATE_Discarded);
-
-	if(pData->GetDataType() == HYDATA_2d)
-		m_GfxCommsRef.TxData(static_cast<HyGfxData *>(pData));
-	else
-		FinalizeData(pData);
 }
 
 /*static*/ void HyAssets::LoadingThread(void *pParam)

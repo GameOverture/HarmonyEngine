@@ -33,21 +33,24 @@ public:
 	void Clear();
 	void SetRequiredAtlasId(uint32 uiAtlasId);
 	void SetRequiredCustomShaderId(int32 iShaderId);
+
+	virtual void OnLoaded() = 0;
 };
 
 class IHyLoadableData
 {
+	friend class HyAssets;
+
 	const HyGfxType			m_eTYPE;
-	
+
+	HyLoadState				m_eLoadState;
 	uint32					m_uiRefCount;
 
 public:
 	IHyLoadableData(HyGfxType eType) :	m_eTYPE(eType),
+										m_eLoadState(HYLOADSTATE_Inactive),
 										m_uiRefCount(0)
 	{ }
-
-	uint32 GetRefCount()				{ return m_uiRefCount; }
-	void IncRef()						{ m_uiRefCount++; }
 
 	virtual void OnLoadThread() = 0;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) = 0;

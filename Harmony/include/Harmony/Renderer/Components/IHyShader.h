@@ -82,7 +82,6 @@ protected:
 		uint32				uiInstanceDivisor;
 	};
 
-	HyLoadState						m_eLoadState;
 	std::string						m_sSourceCode[HYNUMSHADERTYPES];
 	std::vector<VertexAttribute>	m_VertexAttributeList;
 

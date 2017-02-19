@@ -331,17 +331,16 @@ void HyShaderUniforms::Clear()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-IHyShader::IHyShader(int32 iId) :	m_iID(iId),
-									m_sOPTIONAL_LOAD_PATH(""),
-									m_eLoadState(HYLOADSTATE_Inactive),
-									m_uiRefCount(0)
+IHyShader::IHyShader(int32 iId) :	IHyLoadableData(HYGFXTYPE_CustomShader),
+									m_iID(iId),
+									m_sOPTIONAL_LOAD_PATH("")
 {
 	for(int i = 0; i < HYNUMSHADERTYPES; ++i)
 		m_sSourceCode[i].clear();
 }
-IHyShader::IHyShader(int32 iId, std::string sPrefix, std::string sName) :	m_iID(iId),
-																			m_sOPTIONAL_LOAD_PATH(MakeStringProperPath(std::string(sPrefix + "/" + sName).c_str(), ".hyglsl", false)),
-																			m_eLoadState(HYLOADSTATE_Inactive)
+IHyShader::IHyShader(int32 iId, std::string sPrefix, std::string sName) :	IHyLoadableData(HYGFXTYPE_CustomShader),
+																			m_iID(iId),
+																			m_sOPTIONAL_LOAD_PATH(MakeStringProperPath(std::string(sPrefix + "/" + sName).c_str(), ".hyglsl", false))
 {
 	for(int i = 0; i < HYNUMSHADERTYPES; ++i)
 		m_sSourceCode[i].clear();

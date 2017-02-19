@@ -63,9 +63,8 @@ enum HyLoadState
 {
 	HYLOADSTATE_Inactive = 0,
 	HYLOADSTATE_Queued,
-	HYLOADSTATE_Loaded,
 	HYLOADSTATE_Discarded,
-	HYLOADSTATE_ReloadGfx
+	HYLOADSTATE_Loaded
 };
 
 enum HyShaderProgram
