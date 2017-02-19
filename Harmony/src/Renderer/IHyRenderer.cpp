@@ -99,7 +99,7 @@ void IHyRenderer::Update()
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
 	while(!m_pRxDataQueue->empty())
 	{
-		HyDataDraw *pData = m_pRxDataQueue->front();
+		HyGfxData *pData = m_pRxDataQueue->front();
 		m_pRxDataQueue->pop();
 
 		const std::set<HyAtlasGroup *> &associatedAtlasesSetRef = pData->GetAssociatedAtlases();
@@ -165,8 +165,9 @@ void IHyRenderer::SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info)
 {
 	if(sm_ShaderMap.find(iId) != sm_ShaderMap.end())
 		return sm_ShaderMap[iId];
-	else
-		return NULL;
+	
+	HyError("IHyRenderer::FindShader could not find a valid shader");
+	return NULL;
 }
 
 /*static*/ IHyShader *IHyRenderer::MakeCustomShader()

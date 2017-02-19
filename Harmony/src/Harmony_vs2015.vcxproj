@@ -52,7 +52,7 @@
     <ClCompile Include="Assets\Data\HyText2dData.cpp" />
     <ClCompile Include="Assets\Data\HyTexturedQuad2dData.cpp" />
     <ClCompile Include="Assets\Data\IHyData.cpp" />
-    <ClCompile Include="Assets\Data\HyDataDraw.cpp" />
+    <ClCompile Include="Assets\Data\HyGfxData.cpp" />
     <ClCompile Include="Assets\HyAssets.cpp" />
     <ClCompile Include="Audio\IHyAudio.cpp" />
     <ClCompile Include="Audio\IHyAudioInst.cpp" />
@@ -157,7 +157,7 @@
     <ClInclude Include="..\include\Harmony\Assets\Data\HyText2dData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Data\HyTexturedQuad2dData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Data\IHyData.h" />
-    <ClInclude Include="..\include\Harmony\Assets\Data\HyDataDraw.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Data\HyGfxData.h" />
     <ClInclude Include="..\include\Harmony\Assets\HyAssets.h" />
     <ClInclude Include="..\include\Harmony\Audio\IHyAudio.h" />
     <ClInclude Include="..\include\Harmony\Audio\IHyAudioInst.h" />

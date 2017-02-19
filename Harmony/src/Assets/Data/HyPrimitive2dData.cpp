@@ -12,16 +12,15 @@
 #include "Renderer/IHyRenderer.h"
 
 
-HyPrimitive2dData::HyPrimitive2dData(const std::string &sPath, int32 iShaderId) : HyDataDraw(HYTYPE_Primitive2d, sPath, iShaderId)
+HyPrimitive2dData::HyPrimitive2dData(const std::string &sPath) : IHyData(HYTYPE_Primitive2d, sPath)
 {
-	if(GetShaderId() < HYSHADERPROG_CustomStartIndex && GetShaderId() >= 0)
-		SetLoadState(HYLOADSTATE_Loaded);
 }
 
 HyPrimitive2dData::~HyPrimitive2dData()
 {
 }
 
-/*virtual*/ void HyPrimitive2dData::DoFileLoad()
+/*virtual*/ void HyPrimitive2dData::SetRequiredAtlasIds(HyGfxData &gfxDataOut)
 {
+	HyError("Not implemented");
 }

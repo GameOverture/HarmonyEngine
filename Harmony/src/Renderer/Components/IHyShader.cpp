@@ -446,13 +446,15 @@ void IHyShader::Finalize(HyShaderProgram eDefaultsFrom)
 
 void IHyShader::OnLoadThread()
 {
+	HyAssert(IsFinalized(), "IHyShader::OnLoadThread processed an non-finalized shader");
+
 	if(m_sOPTIONAL_LOAD_PATH.empty())
 		return;
 
 	HyError("IHyShader::OnLoadThread not implemented. Need to parse hy shader file and get setup shader source and vertex attribs");
 }
 
-void IHyShader::OnRenderThread(IHyRenderer &rendererRef, HyDataDraw *pData)
+void IHyShader::OnRenderThread(IHyRenderer &rendererRef)
 {
 	// Data can be NULL if it's a default shader being loaded by the Renderer
 	if(pData == NULL)

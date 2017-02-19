@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/HyNodeDataContainer.h"
+#include "Assets/Containers/HyNodeDataContainer.h"
 
 //#include "SFML/Audio.hpp"
 
@@ -31,7 +31,7 @@ class HySfxData : public IHyData
 public:
 	virtual ~HySfxData(void);
 
-	virtual void DoFileLoad() override;
+	virtual void SetRequiredAtlasIds(HyGfxData &gfxDataOut) override;
 };
 
 #endif /* __HySfxData_h__ */

@@ -123,3 +123,8 @@ const HySprite2dFrame &HySprite2dData::AnimState::GetFrame(uint32 uiFrameIndex)
 {
 	return m_pFrames[uiFrameIndex];
 }
+
+/*virtual*/ void HySprite2dData::SetRequiredAtlasIds(HyGfxData &gfxDataOut)
+{
+	HyError("Not implemented");
+}

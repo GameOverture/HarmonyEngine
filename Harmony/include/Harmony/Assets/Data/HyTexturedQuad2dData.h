@@ -12,10 +12,10 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets\Data\HyDataDraw.h"
+#include "Assets\Data\IHyData.h"
 #include "Assets\HyManager_Data.h"
 
-class HyTexturedQuad2dData : public HyDataDraw
+class HyTexturedQuad2dData : public IHyData
 {
 	friend class HyNodeDataContainer<HyTexturedQuad2dData>;
 
@@ -31,6 +31,8 @@ public:
 	virtual void DoFileLoad() override;
 
 	HyAtlasGroup *GetAtlasGroup();
+
+	virtual void SetRequiredAtlasIds(HyGfxData &gfxDataOut) override;
 };
 
 #endif /* __HyTexturedQuad2dData_h__ */

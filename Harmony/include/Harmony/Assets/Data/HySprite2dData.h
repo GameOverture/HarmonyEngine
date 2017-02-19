@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/Data/HyDataDraw.h"
+#include "Assets/Data/IHyData.h"
 #include "Assets/HyNodeDataContainer.h"
 #include "Assets/HyAtlasContainer.h"
 
@@ -77,6 +77,8 @@ public:
 	uint32 GetNumStates() const;
 	const AnimState &GetState(uint32 uiAnimStateIndex) const;
 	const HySprite2dFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const;
+
+	virtual void SetRequiredAtlasIds(HyGfxData &gfxDataOut) override;
 };
 
 #endif /* __HySprite2dData_h__ */

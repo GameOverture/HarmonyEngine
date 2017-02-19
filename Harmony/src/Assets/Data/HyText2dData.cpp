@@ -40,83 +40,15 @@ HyText2dData::FontState::~FontState()
 	delete[] pLayerBuffer;
 }
 
-HyText2dData::HyText2dData(const std::string &sPath, int32 iShaderId) : HyDataDraw(HYTYPE_Text2d, sPath, iShaderId),
-																		m_uiAtlasGroupTextureIndex(0),
-																		m_pTypefaces(NULL),
-																		m_uiNumTypefaces(0),
-																		m_pFontStates(NULL),
-																		m_uiNumStates(0)
-{
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyText2dData::~HyText2dData(void)
-{
-	for(uint32 i = 0; i < m_uiNumStates; ++i)
-		m_pFontStates[i].~FontState();
-	unsigned char *pFontStatesBuffer = reinterpret_cast<unsigned char *>(m_pFontStates);
-	delete[] pFontStatesBuffer;
-
-	delete[] m_pTypefaces;
-}
-
-uint32 HyText2dData::GetNumStates()
-{
-	return m_uiNumStates;
-}
-
-uint32 HyText2dData::GetNumLayers(uint32 uiStateIndex)
-{
-	return m_pFontStates[uiStateIndex].uiNUM_LAYERS;
-}
-
-const HyText2dGlyphInfo &HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiCode)
-{
-	HyAssert(m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(uiCode) != m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end(), "HyText2d tried to draw a glyph (Code: " << uiCode << ") that wasn't exported");
-	return *m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.at(uiCode);
-}
-
-const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop)
-{
-	if(bTop)
-		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].vDEFAULT_TOP_COLOR;
-	else
-		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].vDEFAULT_BOT_COLOR;
-}
-
-HyAtlasGroup *HyText2dData::GetAtlasGroup()
-{
-	return m_pAtlasGroup;
-}
-
-uint32 HyText2dData::GetAtlasGroupTextureIndex()
-{
-	return m_uiAtlasGroupTextureIndex;
-}
-
-float HyText2dData::GetLineHeight(uint32 uiStateIndex)
-{
-	return m_pFontStates[uiStateIndex].fLINE_HEIGHT;
-}
-
-float HyText2dData::GetLineAscender(uint32 uiStateIndex)
-{
-	return m_pFontStates[uiStateIndex].fLINE_ASCENDER;
-}
-
-float HyText2dData::GetLineDescender(uint32 uiStateIndex)
-{
-	return m_pFontStates[uiStateIndex].fLINE_DESCENDER;
-}
-
-float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
-{
-	if(m_pFontStates)
-		return m_pFontStates[uiStateIndex].fLEFT_SIDE_NUDGE_AMT;
-
-	return 0.0f;
-}
-
-/*virtual*/ void HyText2dData::DoFileLoad()
+HyText2dData::HyText2dData(const std::string &sPath) :	IHyData(HYTYPE_Text2d, sPath),
+														m_uiAtlasGroupTextureIndex(0),
+														m_pTypefaces(NULL),
+														m_uiNumTypefaces(0),
+														m_pFontStates(NULL),
+														m_uiNumStates(0)
 {
 	std::string sFontFileContents;
 	HyReadTextFile(GetPath().c_str(), sFontFileContents);
@@ -187,4 +119,76 @@ float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
 										   static_cast<float>(stateObj.get<jsonxx::Number>("leftSideNudgeAmt")),
 										   stateObj.get<jsonxx::Array>("layers"));
 	}
+}
+
+HyText2dData::~HyText2dData(void)
+{
+	for(uint32 i = 0; i < m_uiNumStates; ++i)
+		m_pFontStates[i].~FontState();
+	unsigned char *pFontStatesBuffer = reinterpret_cast<unsigned char *>(m_pFontStates);
+	delete[] pFontStatesBuffer;
+
+	delete[] m_pTypefaces;
+}
+
+uint32 HyText2dData::GetNumStates()
+{
+	return m_uiNumStates;
+}
+
+uint32 HyText2dData::GetNumLayers(uint32 uiStateIndex)
+{
+	return m_pFontStates[uiStateIndex].uiNUM_LAYERS;
+}
+
+const HyText2dGlyphInfo &HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiCode)
+{
+	HyAssert(m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(uiCode) != m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end(), "HyText2d tried to draw a glyph (Code: " << uiCode << ") that wasn't exported");
+	return *m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.at(uiCode);
+}
+
+const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop)
+{
+	if(bTop)
+		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].vDEFAULT_TOP_COLOR;
+	else
+		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].vDEFAULT_BOT_COLOR;
+}
+
+HyAtlasGroup *HyText2dData::GetAtlasGroup()
+{
+	return m_pAtlasGroup;
+}
+
+uint32 HyText2dData::GetAtlasGroupTextureIndex()
+{
+	return m_uiAtlasGroupTextureIndex;
+}
+
+float HyText2dData::GetLineHeight(uint32 uiStateIndex)
+{
+	return m_pFontStates[uiStateIndex].fLINE_HEIGHT;
+}
+
+float HyText2dData::GetLineAscender(uint32 uiStateIndex)
+{
+	return m_pFontStates[uiStateIndex].fLINE_ASCENDER;
+}
+
+float HyText2dData::GetLineDescender(uint32 uiStateIndex)
+{
+	return m_pFontStates[uiStateIndex].fLINE_DESCENDER;
+}
+
+float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
+{
+	if(m_pFontStates)
+		return m_pFontStates[uiStateIndex].fLEFT_SIDE_NUDGE_AMT;
+
+	return 0.0f;
+}
+
+/*virtual*/ void HyText2dData::SetRequiredAtlasIds(HyGfxData &gfxDataOut)
+{
+	HyError("Not implemented");
 }

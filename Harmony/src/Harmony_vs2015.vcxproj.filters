@@ -228,7 +228,7 @@
     <ClCompile Include="Assets\Containers\HyAtlasContainer.cpp">
       <Filter>Assets\Containers</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\Data\HyDataDraw.cpp">
+    <ClCompile Include="Assets\Data\HyGfxData.cpp">
       <Filter>Assets\Data</Filter>
     </ClCompile>
   </ItemGroup>
@@ -630,7 +630,7 @@
     <ClInclude Include="..\include\Harmony\Assets\Containers\HyNodeDataContainer.h">
       <Filter>Assets\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\Data\HyDataDraw.h">
+    <ClInclude Include="..\include\Harmony\Assets\Data\HyGfxData.h">
       <Filter>Assets\Data</Filter>
     </ClInclude>
   </ItemGroup>

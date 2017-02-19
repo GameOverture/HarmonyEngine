@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
+#include "Assets/Data/HyGfxData.h"
 #include "Assets/Containers/HyNodeDataContainer.h"
 #include "Assets/Containers/HyAtlasContainer.h"
 
@@ -21,12 +22,11 @@
 #include "Threading/Threading.h"
 
 #include <queue>
-using std::queue;
 
 class IHyDraw2d;
 
 class IHyData;
-class HyDataDraw;
+class HyGfxData;
 class HySfxData;
 class HySprite2dData;
 class HySpine2dData;
@@ -52,25 +52,25 @@ class HyAssets
 	HyNodeDataContainer<HyTexturedQuad2dData>			m_Quad2d;
 	HyNodeDataContainer<HyPrimitive2dData>				m_Primitive2d;
 
-	std::vector<IHyDraw2d *>							m_QueuedInst2dList;
+	std::vector<HyGfxData *>							m_QueuedInst2dList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
-	queue<IHyData *>									m_LoadQueue_Prepare;
-	queue<IHyData *>									m_LoadQueue_Shared;
-	queue<IHyData *>									m_LoadQueue_Retrieval;
+	std::queue<IHyLoadableData *>						m_Load_Prepare;
+	std::queue<IHyLoadableData *>						m_Load_Shared;
+	std::queue<IHyLoadableData *>						m_Load_Retrieval;
 
-	queue<HyDataDraw *> *								m_pGfxQueue_Retrieval;
+	std::queue<IHyLoadableData *> *						m_pGfxQueue_Retrieval;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Thread control structure to help sync loading of factory data
 	struct LoadThreadCtrl
 	{
-		queue<IHyData *> &	m_LoadQueueRef_Shared;
-		queue<IHyData *> &	m_LoadQueueRef_Retrieval;
+		std::queue<IHyLoadableData *> &		m_Load_SharedRef;
+		std::queue<IHyLoadableData *> &		m_Load_RetrievalRef;
 
-		WaitEvent			m_WaitEvent_HasNewData;
-		BasicSection		m_csSharedQueue;
-		BasicSection		m_csRetrievalQueue;
+		WaitEvent							m_WaitEvent_HasNewData;
+		BasicSection						m_csSharedQueue;
+		BasicSection						m_csRetrievalQueue;
 
 		enum eState
 		{
@@ -80,11 +80,12 @@ class HyAssets
 		};
 		eState				m_eState;
 
-		LoadThreadCtrl(queue<IHyData *> &LoadQueueRef_Shared, queue<IHyData *> &LoadQueueRef_Retrieval) : m_LoadQueueRef_Shared(LoadQueueRef_Shared),
-			m_LoadQueueRef_Retrieval(LoadQueueRef_Retrieval),
-			m_WaitEvent_HasNewData(L"Thread Idler", true),
-			m_eState(STATE_Run)
-		{}
+		LoadThreadCtrl(std::queue<IHyLoadableData *> &load_SharedRef,
+					   std::queue<IHyLoadableData *> &Load_RetrievalRef) :	m_Load_SharedRef(load_SharedRef),
+																			m_Load_RetrievalRef(Load_RetrievalRef),
+																			m_WaitEvent_HasNewData(L"Thread Idler", true),
+																			m_eState(STATE_Run)
+		{ }
 	};
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	LoadThreadCtrl										m_LoadingCtrl;
@@ -94,17 +95,17 @@ public:
 	HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
 	virtual ~HyAssets();
 
-	void Update();
-
 	void GetNodeData(IHyDraw2d *pDrawNode, IHyData *pData);
-	void LoadInst2d(IHyDraw2d *pInst);
+	void LoadGfxData(HyGfxData &drawDataRef);
 	void RemoveInst(IHyDraw2d *pInst);
 
 	void Shutdown();
 	bool IsShutdown();
 
+	void Update();
+
 private:
-	void FinalizeData(IHyData *pData);
+	void FinalizeData(IHyLoadableData *pData);
 	void DiscardData(IHyData *pData);
 
 	static void LoadingThread(void *pParam);

@@ -61,18 +61,16 @@ HyAtlasContainer::~HyAtlasContainer()
 	m_pAtlasGroups = NULL;
 }
 
-HyAtlasGroup *HyAtlasContainer::RequestTexture(uint32 uiAtlasGroupId)
+
+HyAtlasGroup *HyAtlasContainer::GetAtlasGroup(uint32 uiAtlasGroupId)
 {
 	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
 	{
 		if(m_pAtlasGroups[i].GetId() == uiAtlasGroupId)
-		{
-			m_pAtlasGroups[i].Load();
 			return &m_pAtlasGroups[i];
-		}
 	}
 	
-	HyError("HyAtlasContainer::RequestTexture() could not find the atlas group ID: " << uiAtlasGroupId);
+	HyError("HyAtlasContainer::GetAtlasGroup() could not find the atlas group ID: " << uiAtlasGroupId);
 	return &m_pAtlasGroups[0];
 }
 
@@ -180,11 +178,11 @@ void HyAtlasGroup::GetUvRect(uint32 uiChecksum, uint32 &uiTextureIndexOut, HyRec
 	}
 }
 
-void HyAtlasGroup::Load()
+void HyAtlasGroup::OnLoadThread()
 {
 	m_csTextures.Lock();
 
-	if(m_uiRefCount == 0)
+	if(isloading // m_uiRefCount == 0)
 	{
 		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
 			m_pAtlases[i].Load(m_ManagerRef.GetTexturePath(m_uiLOADGROUPID, i).c_str());
@@ -193,7 +191,7 @@ void HyAtlasGroup::Load()
 	m_csTextures.Unlock();
 }
 
-void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef, HyDataDraw *pData)
+void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef)
 {
 	bool bUpload = m_uiRefCount == 0;
 

@@ -33,7 +33,7 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 																										m_Mesh3d(HYTYPE_Mesh3d),
 																										m_Quad2d(HYTYPE_TexturedQuad2d),
 																										m_Primitive2d(HYTYPE_Primitive2d),
-																										m_LoadingCtrl(m_LoadQueue_Shared, m_LoadQueue_Retrieval)
+																										m_LoadingCtrl(m_Load_Shared, m_Load_Retrieval)
 {
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
@@ -57,70 +57,12 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");
 	//jsonxx::Object &spineDataObjRef = gameDataObj.get<jsonxx::Object>("Spine");
 
-	HyDataDraw::sm_pTextures = &m_AtlasManager;
 	IHyDraw2d::sm_pHyAssets = this;
 }
 
 HyAssets::~HyAssets()
 {
 	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
-}
-
-void HyAssets::Update()
-{
-	// Check to see if we have any pending loads to make
-	if(m_LoadQueue_Prepare.empty() == false)
-	{
-		// Copy load queue data into shared data
-		m_LoadingCtrl.m_csSharedQueue.Lock();
-		{
-			while(m_LoadQueue_Prepare.empty() == false)
-			{
-				m_LoadQueue_Shared.push(m_LoadQueue_Prepare.front());
-				m_LoadQueue_Prepare.pop();
-			}
-		}
-		m_LoadingCtrl.m_csSharedQueue.Unlock();
-
-		m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
-	}
-
-	// Check to see if any loaded data (from the load thread) is ready to go
-	m_LoadingCtrl.m_csRetrievalQueue.Lock();
-	{
-		while(m_LoadQueue_Retrieval.empty() == false)
-		{
-			IHyData *pData = m_LoadQueue_Retrieval.front();
-			m_LoadQueue_Retrieval.pop();
-
-			if(pData->GetDataType() == HYDATA_2d)
-			{
-				pData->SetLoadState(HYLOADSTATE_Queued);
-				m_GfxCommsRef.TxData(static_cast<HyDataDraw *>(pData));
-			}
-			else
-				FinalizeData(pData);
-		}
-	}
-	m_LoadingCtrl.m_csRetrievalQueue.Unlock();
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	// Grab and process any returning HyDataDraw's from the Render thread
-	m_pGfxQueue_Retrieval = m_GfxCommsRef.RxData();
-	while(!m_pGfxQueue_Retrieval->empty())
-	{
-		HyDataDraw *pData = m_pGfxQueue_Retrieval->front();
-		m_pGfxQueue_Retrieval->pop();
-
-		if(pData->GetLoadState() == HYLOADSTATE_ReloadGfx)
-		{
-			pData->SetLoadState(HYLOADSTATE_Queued);
-			m_GfxCommsRef.TxData(pData);
-		}
-		else
-			FinalizeData(pData);
-	}
 }
 
 void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyData *pData)
@@ -148,54 +90,46 @@ void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyData *pData)
 	}
 }
 
-void HyAssets::LoadInst2d(IHyDraw2d *pInst)
+void HyAssets::LoadGfxData(HyGfxData &drawDataRef)
 {
-	IHyData *pLoadData = NULL;
-	switch(pInst->GetType())
-	{
-	case HYTYPE_Sprite2d:
-		pLoadData = m_Sprite2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
-		break;
-	case HYTYPE_Spine2d:
-		pLoadData = m_Spine2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
-		break;
-	case HYTYPE_Text2d:
-		pLoadData = m_Txt2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
-		break;
-	case HYTYPE_TexturedQuad2d:
-		pLoadData = m_Quad2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
-		break;
-	case HYTYPE_Primitive2d:
-		pLoadData = m_Primitive2d.GetOrCreateData2d(pInst->GetPrefix(), pInst->GetName(), pInst->GetShaderId());
-		break;
-
-	default:
+	if(drawDataRef.m_eLoadState != HYLOADSTATE_Inactive)
 		return;
+
+	bool bFullyLoaded = true;
+
+	// Check whether all the required IHyLoadableData are loaded
+	for(auto iter = drawDataRef.m_RequiredAtlasIds.begin(); iter != drawDataRef.m_RequiredAtlasIds.end(); ++iter)
+	{
+		HyAtlasGroup *pAtlasGrp = m_AtlasManager.GetAtlasGroup(*iter);
+		if(pAtlasGrp->GetRefCount() == 0)
+		{
+			m_Load_Prepare.push(pAtlasGrp);
+			bFullyLoaded = false;
+		}
+
+		pAtlasGrp->IncRef();
 	}
 
-	pInst->SetData(pLoadData);
-	if(pLoadData)
-		pLoadData->IncRef();
-
-	if(pLoadData == NULL || pLoadData->GetLoadState() == HYLOADSTATE_Loaded)
+	// Check whether we need to load custom shaders
+	for(auto iter = drawDataRef.m_RequiredCustomShaders.begin(); iter != drawDataRef.m_RequiredCustomShaders.end(); ++iter)
 	{
-		pInst->SetLoaded();
-		m_SceneRef.AddInstance(pInst);
+		IHyShader *pShader = IHyRenderer::FindShader(*iter);
+		if(pShader->GetRefCount() == 0)
+		{
+			m_Load_Prepare.push(pShader);
+			bFullyLoaded = false;
+		}
+
+		pShader->IncRef();
+	}
+
+	if(bFullyLoaded == false)
+	{
+		drawDataRef.m_eLoadState = HYLOADSTATE_Queued;
+		m_QueuedInst2dList.push_back(&drawDataRef);
 	}
 	else
-	{
-		m_QueuedInst2dList.push_back(pInst);
-
-		if(pLoadData->GetLoadState() == HYLOADSTATE_Inactive)
-		{
-			pLoadData->SetLoadState(HYLOADSTATE_Queued);
-			m_LoadQueue_Prepare.push(pLoadData);
-		}
-		else if(pLoadData->GetLoadState() == HYLOADSTATE_Discarded)
-		{
-			pLoadData->SetLoadState(HYLOADSTATE_ReloadGfx);
-		}
-	}
+		drawDataRef.m_eLoadState = HYLOADSTATE_Loaded;
 }
 
 void HyAssets::RemoveInst(IHyDraw2d *pInst)
@@ -262,7 +196,58 @@ bool HyAssets::IsShutdown()
 		   m_Quad2d.IsEmpty();
 }
 
-void HyAssets::FinalizeData(IHyData *pData)
+void HyAssets::Update()
+{
+	// Check to see if we have any pending loads to make
+	if(m_Load_Prepare.empty() == false)
+	{
+		// Copy load queue data into shared data
+		m_LoadingCtrl.m_csSharedQueue.Lock();
+		{
+			while(m_Load_Prepare.empty() == false)
+			{
+				m_Load_Shared.push(m_Load_Prepare.front());
+				m_Load_Prepare.pop();
+			}
+		}
+		m_LoadingCtrl.m_csSharedQueue.Unlock();
+
+		m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Check to see if any loaded data (from the load thread) is ready to go to the render thread
+	m_LoadingCtrl.m_csRetrievalQueue.Lock();
+	{
+		while(m_Load_Retrieval.empty() == false)
+		{
+			IHyLoadableData *pData = m_Load_Retrieval.front();
+			m_Load_Retrieval.pop();
+
+			m_GfxCommsRef.TxData(pData);
+		}
+	}
+	m_LoadingCtrl.m_csRetrievalQueue.Unlock();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Grab and process any returning data from the Render thread
+	m_pGfxQueue_Retrieval = m_GfxCommsRef.RxData();
+	while(!m_pGfxQueue_Retrieval->empty())
+	{
+		IHyLoadableData *pData = m_pGfxQueue_Retrieval->front();
+		m_pGfxQueue_Retrieval->pop();
+
+		if(pData->GetLoadState() == HYLOADSTATE_ReloadGfx)
+		{
+			pData->SetLoadState(HYLOADSTATE_Queued);
+			m_GfxCommsRef.TxData(pAtlasGrp);
+		}
+		else
+			FinalizeData(pAtlasGrp);
+	}
+}
+
+void HyAssets::FinalizeData(IHyLoadableData *pData)
 {
 	if(pData->GetLoadState() == HYLOADSTATE_Queued)
 	{
@@ -314,7 +299,7 @@ void HyAssets::DiscardData(IHyData *pData)
 
 
 	// TODO: Wot in tarnation
-	if(pData->GetInstType() == HYTYPE_Primitive2d && static_cast<HyDataDraw *>(pData)->GetShaderId() < HYSHADERPROG_CustomStartIndex)
+	if(pData->GetInstType() == HYTYPE_Primitive2d && static_cast<HyGfxData *>(pData)->GetShaderId() < HYSHADERPROG_CustomStartIndex)
 		return;
 
 
@@ -322,7 +307,7 @@ void HyAssets::DiscardData(IHyData *pData)
 	pData->SetLoadState(HYLOADSTATE_Discarded);
 
 	if(pData->GetDataType() == HYDATA_2d)
-		m_GfxCommsRef.TxData(static_cast<HyDataDraw *>(pData));
+		m_GfxCommsRef.TxData(static_cast<HyGfxData *>(pData));
 	else
 		FinalizeData(pData);
 }
@@ -330,7 +315,7 @@ void HyAssets::DiscardData(IHyData *pData)
 /*static*/ void HyAssets::LoadingThread(void *pParam)
 {
 	LoadThreadCtrl *pLoadingCtrl = reinterpret_cast<LoadThreadCtrl *>(pParam);
-	std::vector<IHyData *>	vCurLoadData;
+	std::vector<IHyLoadableData *>	dataList;
 
 	while(pLoadingCtrl->m_eState == LoadThreadCtrl::STATE_Run)
 	{
@@ -340,30 +325,33 @@ void HyAssets::DiscardData(IHyData *pData)
 		// Reset the event so we wait the next time we loop
 		pLoadingCtrl->m_WaitEvent_HasNewData.Reset();
 
-		// Copy all the IData ptrs into the 'vCurLoadData' to be processed, while emptying the shared queue
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Copy all the ptrs into their vectors to be processed, while emptying the shared queue
 		pLoadingCtrl->m_csSharedQueue.Lock();
 		{
-			while(pLoadingCtrl->m_LoadQueueRef_Shared.empty() == false)
+			while(pLoadingCtrl->m_Load_SharedRef.empty() == false)
 			{
-				vCurLoadData.push_back(pLoadingCtrl->m_LoadQueueRef_Shared.front());
-				pLoadingCtrl->m_LoadQueueRef_Shared.pop();
+				dataList.push_back(pLoadingCtrl->m_Load_SharedRef.front());
+				pLoadingCtrl->m_Load_SharedRef.pop();
 			}
 		}
 		pLoadingCtrl->m_csSharedQueue.Unlock();
 
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Load everything that is enqueued (outside of any critical section)
-		for(uint32 i = 0; i < vCurLoadData.size(); ++i)
-			vCurLoadData[i]->OnLoadThread();
+		for(uint32 i = 0; i < dataList.size(); ++i)
+			dataList[i]->OnLoadThread();
 
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Copy all the (loaded) IData ptrs to the retrieval vector
 		pLoadingCtrl->m_csRetrievalQueue.Lock();
 		{
-			for(uint32 i = 0; i < vCurLoadData.size(); ++i)
-				pLoadingCtrl->m_LoadQueueRef_Retrieval.push(vCurLoadData[i]);
+			for(uint32 i = 0; i < dataList.size(); ++i)
+				pLoadingCtrl->m_Load_RetrievalRef.push(dataList[i]);
 		}
 		pLoadingCtrl->m_csRetrievalQueue.Unlock();
 
-		vCurLoadData.clear();
+		dataList.clear();
 	}
 
 	pLoadingCtrl->m_eState = LoadThreadCtrl::STATE_HasExited;

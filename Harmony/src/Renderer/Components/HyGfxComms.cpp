@@ -11,9 +11,6 @@
 
 HyGfxComms::HyGfxComms()
 {
-	m_pDrawBuffer_Update = m_pDrawBuffer_Shared = m_pDrawBuffer_Render = NULL;
-	m_pTxDataQueue_Update = m_pTxDataQueue_Shared = m_pTxDataQueue_Render = NULL;
-
 	m_pDrawBuffer_Update = HY_NEW char[HY_GFX_BUFFER_SIZE];
 	memset(m_pDrawBuffer_Update, 0, HY_GFX_BUFFER_SIZE);
 
@@ -23,13 +20,13 @@ HyGfxComms::HyGfxComms()
 	m_pDrawBuffer_Render = HY_NEW char[HY_GFX_BUFFER_SIZE];
 	memset(m_pDrawBuffer_Render, 0, HY_GFX_BUFFER_SIZE);
 
-	m_pTxDataQueue_Update = HY_NEW std::queue<HyDataDraw *>();
-	m_pTxDataQueue_Shared = HY_NEW std::queue<HyDataDraw *>();
-	m_pTxDataQueue_Render = HY_NEW std::queue<HyDataDraw *>();
+	m_pTxQueue_Update = HY_NEW std::queue<IHyLoadableData *>();
+	m_pTxQueue_Shared = HY_NEW std::queue<IHyLoadableData *>();
+	m_pTxQueue_Render = HY_NEW std::queue<IHyLoadableData *>();
 
-	m_pRxDataQueue_Update = HY_NEW std::queue<HyDataDraw *>();
-	m_pRxDataQueue_Shared = HY_NEW std::queue<HyDataDraw *>();
-	m_pRxDataQueue_Render = HY_NEW std::queue<HyDataDraw *>();
+	m_pRxQueue_Update = HY_NEW std::queue<IHyLoadableData *>();
+	m_pRxQueue_Shared = HY_NEW std::queue<IHyLoadableData *>();
+	m_pRxQueue_Render = HY_NEW std::queue<IHyLoadableData *>();
 }
 
 HyGfxComms::~HyGfxComms()
@@ -38,13 +35,13 @@ HyGfxComms::~HyGfxComms()
 	delete [] m_pDrawBuffer_Shared;
 	delete [] m_pDrawBuffer_Render;
 
-	delete m_pTxDataQueue_Update;
-	delete m_pTxDataQueue_Shared;
-	delete m_pTxDataQueue_Render;
+	delete m_pTxQueue_Update;
+	delete m_pTxQueue_Shared;
+	delete m_pTxQueue_Render;
 
-	delete m_pRxDataQueue_Update;
-	delete m_pRxDataQueue_Shared;
-	delete m_pRxDataQueue_Render;
+	delete m_pRxQueue_Update;
+	delete m_pRxQueue_Shared;
+	delete m_pRxQueue_Render;
 }
 
 // This should only be invoked from the Update/Game thread
@@ -58,13 +55,13 @@ void HyGfxComms::SetSharedPointers()
 {
 	m_csPointers.Lock();
 
-	std::queue<HyDataDraw *> *pTmpQueue = m_pTxDataQueue_Shared;
-	m_pTxDataQueue_Shared = m_pTxDataQueue_Update;
-	m_pTxDataQueue_Update = pTmpQueue;
+	std::queue<IHyLoadableData *> *pTmpQueue = m_pTxQueue_Shared;
+	m_pTxQueue_Shared = m_pTxQueue_Update;
+	m_pTxQueue_Update = pTmpQueue;
 
-	pTmpQueue = m_pRxDataQueue_Shared;
-	m_pRxDataQueue_Shared = m_pRxDataQueue_Update;
-	m_pRxDataQueue_Update = pTmpQueue;
+	pTmpQueue = m_pRxQueue_Shared;
+	m_pRxQueue_Shared = m_pRxQueue_Update;
+	m_pRxQueue_Update = pTmpQueue;
 
 	char *pTmp = m_pDrawBuffer_Shared;
 	m_pDrawBuffer_Shared = m_pDrawBuffer_Update;
@@ -74,19 +71,19 @@ void HyGfxComms::SetSharedPointers()
 }
 
 // This should only be invoked from the Update/Game thread
-void HyGfxComms::TxData(HyDataDraw *pAtlasGrp)
+void HyGfxComms::TxData(IHyLoadableData *pData)
 {
-	m_pTxDataQueue_Update->push(pAtlasGrp);
+	m_pTxQueue_Update->push(pData);
 }
 
 // This should only be invoked from the Update/Game thread
-std::queue<HyDataDraw *> *HyGfxComms::RxData()
+std::queue<IHyLoadableData *> *HyGfxComms::RxData()
 {
-	return m_pRxDataQueue_Update;
+	return m_pRxQueue_Update;
 }
 
 // This should only be invoked from the Render thread
-bool HyGfxComms::Render_TakeSharedPointers(std::queue<HyDataDraw *> *&pRxDataQueue, std::queue<HyDataDraw *> *&pTxDataQueue, char *&pDrawBuffer)
+bool HyGfxComms::Render_TakeSharedPointers(std::queue<IHyLoadableData *> *&pRxDataQueue, std::queue<IHyLoadableData *> *&pTxDataQueue, char *&pDrawBuffer)
 {
 	m_csPointers.Lock();
 
@@ -99,15 +96,15 @@ bool HyGfxComms::Render_TakeSharedPointers(std::queue<HyDataDraw *> *&pRxDataQue
 	}
 
 	// Data queues
-	std::queue<HyDataDraw *> *pTmpQueue = m_pTxDataQueue_Render;
-	m_pTxDataQueue_Render = m_pTxDataQueue_Shared;
-	m_pTxDataQueue_Shared = pTmpQueue;
-	pRxDataQueue =  m_pTxDataQueue_Render;
+	std::queue<IHyLoadableData *> *pTmpQueue = m_pTxQueue_Render;
+	m_pTxQueue_Render = m_pTxQueue_Shared;
+	m_pTxQueue_Shared = pTmpQueue;
+	pRxDataQueue =  m_pTxQueue_Render;
 
-	pTmpQueue = m_pRxDataQueue_Render;
-	m_pRxDataQueue_Render = m_pRxDataQueue_Shared;
-	m_pRxDataQueue_Shared = pTmpQueue;
-	pTxDataQueue = m_pRxDataQueue_Render;
+	pTmpQueue = m_pRxQueue_Render;
+	m_pRxQueue_Render = m_pRxQueue_Shared;
+	m_pRxQueue_Shared = pTmpQueue;
+	pTxDataQueue = m_pRxQueue_Render;
 
 	// Buffers
 	char *pTmp = m_pDrawBuffer_Render;

@@ -13,18 +13,7 @@
 #include "Diagnostics/HyGuiComms.h"
 #include "Utilities/HyFileIO.h"
 
-HySpine2dData::HySpine2dData(const std::string &sPath, int32 iShaderId) : HyDataDraw(HYTYPE_Spine2d, sPath, iShaderId)
-{
-	
-}
-
-HySpine2dData::~HySpine2dData()
-{
-	spSkeletonData_dispose(m_SpineSkeletonData);
-	spAtlas_dispose(m_SpineAtlasData);
-}
-
-/*virtual*/ void HySpine2dData::DoFileLoad()
+HySpine2dData::HySpine2dData(const std::string &sPath) : IHyData(HYTYPE_Spine2d, sPath)
 {
 	std::string sAtlasPath(GetPath());
 	sAtlasPath += ".atlas";
@@ -46,6 +35,17 @@ HySpine2dData::~HySpine2dData()
 	spSkeletonJson_dispose(pSpineJsonData);
 
 	printf("Default skin name: %s\n", m_SpineSkeletonData->defaultSkin->name);
+}
+
+HySpine2dData::~HySpine2dData()
+{
+	spSkeletonData_dispose(m_SpineSkeletonData);
+	spAtlas_dispose(m_SpineAtlasData);
+}
+
+/*virtual*/ void HySpine2dData::SetRequiredAtlasIds(HyGfxData &gfxDataOut)
+{
+	HyError("Not implemented");
 }
 
 // Below functions are invoked within the Spine API and expect to be overloaded

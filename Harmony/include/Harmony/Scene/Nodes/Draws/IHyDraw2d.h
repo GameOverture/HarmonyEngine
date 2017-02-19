@@ -24,7 +24,7 @@ class IHyDraw2d : public IHyTransform2d
 	friend class HyScene;
 	friend class HyAssets;
 
-	static HyAssets *			sm_pHyAssets;
+	static HyAssets *				sm_pHyAssets;
 
 protected:
 	const std::string				m_sNAME;
@@ -32,7 +32,7 @@ protected:
 
 	// Data loading
 	IHyData *						m_pData;
-	HyDataDraw						m_pGfxData;
+	HyGfxData						m_GfxData;
 
 	enum eAttributes
 	{

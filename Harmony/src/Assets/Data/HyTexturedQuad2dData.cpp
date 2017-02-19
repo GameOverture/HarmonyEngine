@@ -12,7 +12,7 @@
 #include "Renderer/IHyRenderer.h"
 
 
-HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath, int32 iShaderId) : HyDataDraw(HYTYPE_TexturedQuad2d, sPath, iShaderId),
+HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath, int32 iShaderId) : HyGfxData(HYTYPE_TexturedQuad2d, sPath, iShaderId),
 																						m_uiATLASGROUP_ID(sPath == "raw" ? 0xFFFFFFFF : atoi(sPath.c_str())),
 																						m_pAtlas(NULL)
 {
@@ -33,4 +33,9 @@ HyTexturedQuad2dData::~HyTexturedQuad2dData()
 HyAtlasGroup *HyTexturedQuad2dData::GetAtlasGroup()
 {
 	return m_pAtlas;
+}
+
+/*virtual*/ void HyTexturedQuad2dData::SetRequiredAtlasIds(HyGfxData &gfxDataOut)
+{
+	HyError("Not implemented");
 }

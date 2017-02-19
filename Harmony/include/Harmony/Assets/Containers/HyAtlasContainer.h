@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
+#include "Assets/Data/HyGfxData.h"
 #include "Threading/Threading.h"
 
 #include "Utilities/HyMath.h"
@@ -22,7 +23,7 @@ using std::set;
 class HyAtlasGroup;
 class HyAtlas;
 
-class HyDataDraw;
+class HyGfxData;
 class IHyRenderer;
 
 //////////////////////////////////////////////////////////////////////////
@@ -37,16 +38,16 @@ public:
 	HyAtlasContainer(std::string sAtlasDataDir);
 	~HyAtlasContainer();
 
-	HyAtlasGroup *RequestTexture(uint32 uiAtlasGroupId);
+	HyAtlasGroup *GetAtlasGroup(uint32 uiAtlasGroupId);
 	std::string GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
 };
 
 //////////////////////////////////////////////////////////////////////////
-class HyAtlasGroup
+class HyAtlasGroup : public IHyLoadableData
 {
 	friend class HyAtlasContainer;
 
-	HyAtlasContainer &				m_ManagerRef;
+	HyAtlasContainer &			m_ManagerRef;
 
 	const uint32				m_uiLOADGROUPID;
 	const uint32				m_uiWIDTH;
@@ -56,9 +57,6 @@ class HyAtlasGroup
 
 	HyAtlas *					m_pAtlases;
 	const uint32				m_uiNUM_ATLASES;
-
-	bool						m_bIsLoaded;
-	uint32						m_uiRefCount;
 
 	BasicSection				m_csTextures;
 
@@ -77,9 +75,8 @@ public:
 
 	void GetUvRect(uint32 uiChecksum, uint32 &uiTextureIndexOut, HyRectangle<float> &UVRectOut) const;
 
-	void Load();
-
-	void OnRenderThread(IHyRenderer &rendererRef, HyDataDraw *pData);
+	virtual void OnLoadThread() override;
+	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 };
 
 //////////////////////////////////////////////////////////////////////////

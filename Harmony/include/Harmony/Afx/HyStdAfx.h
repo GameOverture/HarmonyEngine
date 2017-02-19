@@ -34,6 +34,12 @@ enum HyType
 	HYTYPE_Camera3d
 };
 
+enum HyGfxType
+{
+	HYGFXTYPE_AtlasGroup = 0,
+	HYGFXTYPE_CustomShader
+};
+
 enum HyAnimCtrl
 {
 	HYANIMCTRL_Play = 0,

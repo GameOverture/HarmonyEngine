@@ -11,11 +11,12 @@
 #define __IHyShader_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Assets/Data/HyGfxData.h"
 
 #include <vector>
 
 class IHyRenderer;
-class HyDataDraw;
+class HyGfxData;
 
 #define HY_SHADER_UNIFORM_NAME_LENGTH		32	// includes the NULL terminator
 #define HY_SHADER_UNIFORM_BUFFER_LENGTH		(sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH + sizeof(glm::mat4))
@@ -67,7 +68,7 @@ public:
 	void Clear();
 };
 
-class IHyShader
+class IHyShader : public IHyLoadableData
 {
 protected:
 	const int32						m_iID;
@@ -85,8 +86,6 @@ protected:
 	std::string						m_sSourceCode[HYNUMSHADERTYPES];
 	std::vector<VertexAttribute>	m_VertexAttributeList;
 
-	uint32							m_uiRefCount;
-
 	IHyShader(int32 iId);
 	IHyShader(int32 iId, std::string sPrefix, std::string sName);
 public:
@@ -100,8 +99,8 @@ public:
 
 	void Finalize(HyShaderProgram eDefaultsFrom);
 
-	void OnLoadThread();
-	void OnRenderThread(IHyRenderer &rendererRef, HyDataDraw *pData);
+	virtual void OnLoadThread() override;
+	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 
 	virtual void OnUpload(IHyRenderer &rendererRef) = 0;
 	virtual void OnDelete(IHyRenderer &rendererRef) = 0;

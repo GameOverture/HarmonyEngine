@@ -12,20 +12,20 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets\Data\HyDataDraw.h"
-#include "Assets\HyManager_Data.h"
+#include "Assets/Data/IHyData.h"
+#include "Assets/Containers/HyNodeDataContainer.h"
 
-class HyPrimitive2dData : public HyDataDraw
+class HyPrimitive2dData : public IHyData
 {
 	friend class HyNodeDataContainer<HyPrimitive2dData>;
 
 	// Only allow HyNodeDataContainer instantiate
-	HyPrimitive2dData(const std::string &sPath, int32 iShaderId);
+	HyPrimitive2dData(const std::string &sPath);
 
 public:
 	virtual ~HyPrimitive2dData();
 
-	virtual void DoFileLoad() override;
+	virtual void SetRequiredAtlasIds(HyGfxData &gfxDataOut) override;
 };
 
 #endif /* __HyPrimitive2dData_h__ */

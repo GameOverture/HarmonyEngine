@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/HyNodeDataContainer.h"
+#include "Assets/Containers/HyNodeDataContainer.h"
 
 class HyMesh3d;
 
@@ -32,7 +32,7 @@ class HyMesh3dData : public IHyData
 public:
 	virtual ~HyMesh3dData(void);
 
-	virtual void DoFileLoad() override;
+	virtual void SetRequiredAtlasIds(HyGfxData &gfxDataOut) override;
 };
 
 #endif /* __HyMesh3dData_h__ */

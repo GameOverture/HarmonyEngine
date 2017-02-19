@@ -11,6 +11,7 @@
 #define __IHyData_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Assets/Data/HyDataDraw.h"
 
 #include <set>
 using std::set;
@@ -30,6 +31,8 @@ public:
 	
 	HyType GetInstType();
 	const std::string &GetPath();
+
+	virtual void SetRequiredAtlasIds(HyGfxData &gfxDataOut) = 0;
 };
 
 #endif /* __IHyData_h__ */

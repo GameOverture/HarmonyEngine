@@ -244,11 +244,10 @@ void IHyDraw2d::Load()
 	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
 		SetCoordinateUnit(IHyApplication::DefaultCoordinateUnit(), false);
 
-	GetData();
-	
 
-	if(m_eLoadState == HYLOADSTATE_Inactive)
-		sm_pHyAssets->LoadInst2d(this);
+	GetData().SetRequiredAtlasIds(m_GfxData);
+
+	sm_pHyAssets->LoadGfxData(m_GfxData);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
