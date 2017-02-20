@@ -21,7 +21,7 @@ class HyText2d : public IHyDraw2d
 protected:
 	bool							m_bIsDirty;
 	std::string						m_sCurrentString;
-	std::string						m_sNewString;
+	//std::string						m_sNewString;
 
 	uint32							m_uiCurFontState;
 

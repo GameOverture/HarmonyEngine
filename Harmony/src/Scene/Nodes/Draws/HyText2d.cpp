@@ -16,7 +16,7 @@
 HyText2d::HyText2d(const char *szPrefix, const char *szName) :	IHyDraw2d(HYTYPE_Text2d, szPrefix, szName),
 																m_bIsDirty(true),
 																m_sCurrentString(""),
-																m_sNewString(""),
+																//m_sNewString(""),
 																m_uiCurFontState(0),
 																m_vBoxDimensions(0.0f, 0.0f),
 																m_fScaleBoxModifier(1.0f),
@@ -43,7 +43,8 @@ void HyText2d::TextSet(std::string sText)
 	if(sText == m_sCurrentString)
 		return;
 
-	m_sNewString = sText;
+	m_sCurrentString = sText;
+	//m_sNewString = sText;
 	m_bIsDirty = true;
 }
 
@@ -52,7 +53,8 @@ void HyText2d::TextSet(char cChar)
 	if(m_sCurrentString.length() == 1 && m_sCurrentString[0] == cChar)
 		return;
 
-	m_sNewString = cChar;
+	m_sCurrentString = cChar;
+	//m_sNewString = cChar;
 	m_bIsDirty = true;
 }
 
@@ -77,7 +79,7 @@ float HyText2d::TextGetPixelWidth()
 	float fProperNudgeAmt = 0.0f;
 
 	const HyText2dGlyphInfo &glyphRef = static_cast<HyText2dData *>(AcquireData())->GetGlyph(m_uiCurFontState, 0, static_cast<uint32>(m_sCurrentString[0]));
-	fProperNudgeAmt = static_cast<HyText2dData *>(AcquireData())->GetLeftSideNudgeAmt(m_uiCurFontState) - glyphRef.iOFFSET_X;
+	fProperNudgeAmt = static_cast<HyText2dData *>(UncheckedGetData())->GetLeftSideNudgeAmt(m_uiCurFontState) - glyphRef.iOFFSET_X;
 
 	return m_fUsedPixelWidth - fProperNudgeAmt;
 }
@@ -233,7 +235,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	if(IsSelfLoaded() == false || m_bIsDirty == false)
 		return;
 
-	m_sCurrentString = m_sNewString;
+	//m_sCurrentString = m_sNewString;
 	m_uiNumValidCharacters = 0;
 
 	HyText2dData *pData = static_cast<HyText2dData *>(UncheckedGetData());
