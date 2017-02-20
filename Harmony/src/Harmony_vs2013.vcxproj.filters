@@ -114,12 +114,6 @@
     <ClCompile Include="Assets\Data\HyTexturedQuad2dData.cpp">
       <Filter>Assets\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\HyAssetManager.cpp">
-      <Filter>Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="Assets\HyTextures.cpp">
-      <Filter>Assets</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\HyFileIO.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -133,9 +127,6 @@
       <Filter>Assets\Data</Filter>
     </ClCompile>
     <ClCompile Include="Assets\Data\HyPrimitive2dData.cpp">
-      <Filter>Assets\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="Assets\Data\IHy2dData.cpp">
       <Filter>Assets\Data</Filter>
     </ClCompile>
     <ClCompile Include="Audio\IHyAudio.cpp">
@@ -231,6 +222,12 @@
     <ClCompile Include="Diagnostics\HyConsole.cpp">
       <Filter>Diagnostics</Filter>
     </ClCompile>
+    <ClCompile Include="Assets\Containers\HyAtlasContainer.cpp">
+      <Filter>Assets\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\HyAssets.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -322,6 +319,9 @@
     </Filter>
     <Filter Include="Renderer\Components">
       <UniqueIdentifier>{f88cc56b-d7e8-4470-828b-8c4b27791e7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Containers">
+      <UniqueIdentifier>{2576f667-75f3-44c5-9e47-166f483c025a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -504,15 +504,6 @@
     <ClInclude Include="..\include\Harmony\Assets\Data\IHyData.h">
       <Filter>Assets\Data</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\HyAssetManager.h">
-      <Filter>Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\HyFactory.h">
-      <Filter>Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\HyTextures.h">
-      <Filter>Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Utilities\HyFileIO.h">
       <Filter>Utilities</Filter>
     </ClInclude>
@@ -523,9 +514,6 @@
       <Filter>Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Assets\Data\HyPrimitive2dData.h">
-      <Filter>Assets\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\Data\IHy2dData.h">
       <Filter>Assets\Data</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Input\Interop\HyInput_NULL.h">
@@ -626,6 +614,18 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Diagnostics\HyConsole.h">
       <Filter>Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Assets\Containers\HyAtlasContainer.h">
+      <Filter>Assets\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Assets\Containers\HyNodeDataContainer.h">
+      <Filter>Assets\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Assets\HyAssets.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Assets\Data\HyGfxData.h">
+      <Filter>Assets\Data</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
