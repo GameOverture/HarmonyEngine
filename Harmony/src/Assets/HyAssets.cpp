@@ -174,13 +174,13 @@ void HyAssets::Shutdown()
 	for(uint32 i = 0; i < vReloadInsts.size(); ++i)
 		vReloadInsts[i]->Unload();
 
-	m_LoadingCtrl.m_eState = LoadThreadCtrl::STATE_ShouldExit;
-	m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
+	//m_LoadingCtrl.m_eState = LoadThreadCtrl::STATE_ShouldExit;
+	//m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
 }
 
 bool HyAssets::IsShutdown()
 {
-	return m_pLastDiscardedData == nullptr && m_LoadingCtrl.m_eState != LoadThreadCtrl::STATE_Run;
+	return m_pLastDiscardedData == nullptr;// && m_LoadingCtrl.m_eState != LoadThreadCtrl::STATE_Run;
 }
 
 void HyAssets::Update()
