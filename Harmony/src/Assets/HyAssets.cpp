@@ -59,6 +59,9 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 
 HyAssets::~HyAssets()
 {
+	for(auto iter = m_Quad2d.begin(); iter != m_Quad2d.end(); ++iter)
+		delete iter->second;
+
 	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
 }
 
@@ -76,7 +79,12 @@ void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyData *&pDataOut)
 		pDataOut = m_Txt2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
 		break;
 	case HYTYPE_TexturedQuad2d:
-		pDataOut = m_Quad2d.GetData(pDrawNode->GetPrefix(), pDrawNode->GetName());
+		if(m_Quad2d.find(std::stoi(pDrawNode->GetName())) == m_Quad2d.end())
+		{
+			HyTexturedQuad2dData *pNewQuadData = HY_NEW HyTexturedQuad2dData(pDrawNode->GetName(), m_AtlasManager);
+			m_Quad2d[std::stoi(pDrawNode->GetName())] = pNewQuadData;
+		}
+		pDataOut = m_Quad2d[std::stoi(pDrawNode->GetName())];
 		break;
 	}
 }

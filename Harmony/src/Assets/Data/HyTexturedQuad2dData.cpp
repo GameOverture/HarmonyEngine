@@ -12,9 +12,9 @@
 #include "Renderer/IHyRenderer.h"
 
 
-HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef) :	IHyData(HYTYPE_TexturedQuad2d, sPath),
-																																				m_uiATLASGROUP_ID(sPath == "raw" ? 0xFFFFFFFF : atoi(sPath.c_str())),
-																																				m_pAtlas(nullptr)
+HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath, HyAtlasContainer &atlasContainerRef) :	IHyData(HYTYPE_TexturedQuad2d, sPath),
+																											m_uiATLASGROUP_ID(sPath == "raw" ? 0xFFFFFFFF : std::stoi(sPath)),
+																											m_pAtlas(nullptr)
 {
 	//if(m_uiATLASGROUP_ID == 0xFFFFFFFF)
 	//	SetLoadState(HYLOADSTATE_Loaded);

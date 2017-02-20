@@ -1,0 +1,68 @@
+[
+    {
+        "height": 2048,
+        "id": 1,
+        "num8BitClrChannels": 4,
+        "textures": [
+            [
+                {
+                    "bottom": 14,
+                    "checksum": 1182561361,
+                    "left": 110,
+                    "right": 124,
+                    "top": 0
+                },
+                {
+                    "bottom": 16,
+                    "checksum": 2229090601,
+                    "left": 38,
+                    "right": 54,
+                    "top": 0
+                },
+                {
+                    "bottom": 16,
+                    "checksum": 2539808593,
+                    "left": 57,
+                    "right": 73,
+                    "top": 0
+                },
+                {
+                    "bottom": 13,
+                    "checksum": 2366918356,
+                    "left": 127,
+                    "right": 140,
+                    "top": 0
+                },
+                {
+                    "bottom": 16,
+                    "checksum": 1852955377,
+                    "left": 0,
+                    "right": 16,
+                    "top": 0
+                },
+                {
+                    "bottom": 16,
+                    "checksum": 2935481515,
+                    "left": 93,
+                    "right": 107,
+                    "top": 0
+                },
+                {
+                    "bottom": 16,
+                    "checksum": 4180679666,
+                    "left": 76,
+                    "right": 90,
+                    "top": 0
+                },
+                {
+                    "bottom": 16,
+                    "checksum": 2317297425,
+                    "left": 19,
+                    "right": 35,
+                    "top": 0
+                }
+            ]
+        ],
+        "width": 2048
+    }
+]

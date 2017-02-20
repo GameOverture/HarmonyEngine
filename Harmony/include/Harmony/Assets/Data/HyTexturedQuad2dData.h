@@ -21,7 +21,7 @@ class HyTexturedQuad2dData : public IHyData
 	HyAtlasGroup *		m_pAtlas;
 
 public:
-	HyTexturedQuad2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);
+	HyTexturedQuad2dData(const std::string &sPath, HyAtlasContainer &atlasContainerRef);
 	virtual ~HyTexturedQuad2dData();
 
 	HyAtlasGroup *GetAtlasGroup();

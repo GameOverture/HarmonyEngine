@@ -49,7 +49,7 @@ class HyAssets
 	HyNodeDataContainer<HySpine2dData>					m_Spine2d;
 	HyNodeDataContainer<HyMesh3dData>					m_Mesh3d;
 	HyNodeDataContainer<HyText2dData>					m_Txt2d;
-	HyNodeDataContainer<HyTexturedQuad2dData>			m_Quad2d;
+	std::map<int32, HyTexturedQuad2dData *>				m_Quad2d;
 
 	IHyLoadableData *									m_pLastQueuedData;
 	IHyLoadableData *									m_pLastDiscardedData;

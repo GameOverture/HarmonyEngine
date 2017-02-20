@@ -103,7 +103,9 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
     }
 
     m_pCmbModel = AllocateAtlasModelView();
+    ui->cmbAtlasGroups->blockSignals(true);
     ui->cmbAtlasGroups->setModel(m_pCmbModel);
+    ui->cmbAtlasGroups->blockSignals(false);
 }
 
 WidgetAtlasManager::~WidgetAtlasManager()
