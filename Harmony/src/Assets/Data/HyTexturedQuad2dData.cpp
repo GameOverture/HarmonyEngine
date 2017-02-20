@@ -34,5 +34,5 @@ HyAtlasGroup *HyTexturedQuad2dData::GetAtlasGroup()
 
 /*virtual*/ void HyTexturedQuad2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
 {
-	HyError("Not implemented");
+	requiredAtlasIdsOut.insert(m_pAtlas->GetId());
 }

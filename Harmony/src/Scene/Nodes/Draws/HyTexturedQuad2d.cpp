@@ -116,6 +116,14 @@ uint32 HyTexturedQuad2d::GetNumTextures()
 	return static_cast<HyTexturedQuad2dData *>(AcquireData())->GetAtlasGroup()->GetNumTextures();
 }
 
+/*virtual*/ void HyTexturedQuad2d::OnUpdate()
+{
+	if(IsSelfLoaded() == false || m_bIS_RAW)
+		return;
+
+	m_RenderState.SetTextureHandle(static_cast<HyTexturedQuad2dData *>(UncheckedGetData())->GetAtlasGroup()->GetGfxApiHandle(m_uiTextureIndex));
+}
+
 /*virtual*/ void HyTexturedQuad2d::OnUpdateUniforms()
 {
 	//m_ShaderUniforms.Set(...);
