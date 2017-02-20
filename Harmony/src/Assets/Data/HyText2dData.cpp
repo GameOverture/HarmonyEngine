@@ -50,11 +50,7 @@ HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataVa
 																																m_pFontStates(NULL),
 																																m_uiNumStates(0)
 {
-	std::string sFontFileContents;
-	HyReadTextFile(GetPath().c_str(), sFontFileContents);
-
-	jsonxx::Object textObject;
-	textObject.parse(sFontFileContents);
+	jsonxx::Object textObject = dataValueRef.get<jsonxx::Object>();
 
 	m_pAtlasGroup = atlasContainerRef.GetAtlasGroup(static_cast<uint32>(textObject.get<jsonxx::Number>("atlasGroupId")));
 
@@ -190,5 +186,5 @@ float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
 
 /*virtual*/ void HyText2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
 {
-	HyError("Not implemented");
+	requiredAtlasIdsOut.insert(m_pAtlasGroup->GetId());
 }

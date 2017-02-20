@@ -112,6 +112,7 @@ public:
 
 protected:
 	virtual void OnUpdate() override;
+	virtual void OnDataAcquired() override;
 
 	virtual void OnCalcBoundingVolume() override;
 

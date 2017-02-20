@@ -84,9 +84,6 @@
     <ClCompile Include="Scene\HyScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\jasonxx.cc">
-      <Filter>Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\stb_image.c">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -227,6 +224,9 @@
     </ClCompile>
     <ClCompile Include="Assets\HyAssets.cpp">
       <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\jasonxx.cc">
+      <Filter>Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -474,9 +474,6 @@
     <ClInclude Include="..\include\Harmony\Utilities\stb_image.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\jsonxx.h">
-      <Filter>Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Diagnostics\HyGuiComms.h">
       <Filter>Diagnostics</Filter>
     </ClInclude>
@@ -626,6 +623,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Assets\Data\HyGfxData.h">
       <Filter>Assets\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Utilities\jsonxx.h">
+      <Filter>Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

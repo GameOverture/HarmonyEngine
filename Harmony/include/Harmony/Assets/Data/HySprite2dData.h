@@ -61,6 +61,8 @@ public:
 		HySprite2dFrame *	m_pFrames;
 		const uint32		m_uiNUMFRAMES;
 
+		std::set<uint32>	m_UsedAtlasIds;
+
 		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HyAtlasContainer &atlasContainerRef);
 		~AnimState();
 

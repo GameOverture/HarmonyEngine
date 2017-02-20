@@ -95,7 +95,9 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 		{
 			jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
 
-			pAtlasGroup = atlasContainerRef.GetAtlasGroup(static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasGroupId")));
+			uint32 uiAtlasGroupId = static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasGroupId"));
+			m_UsedAtlasIds.insert(uiAtlasGroupId);
+			pAtlasGroup = atlasContainerRef.GetAtlasGroup(uiAtlasGroupId);
 			pAtlasGroup->GetUvRect(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), uiAtlasGroupTextureIndex, rUVRect);
 			HySetVec(vOffset, static_cast<int32>(frameObj.get<jsonxx::Number>("offsetX")), static_cast<int32>(frameObj.get<jsonxx::Number>("offsetY")));
 			fDuration = static_cast<float>(frameObj.get<jsonxx::Number>("duration"));
@@ -126,5 +128,6 @@ const HySprite2dFrame &HySprite2dData::AnimState::GetFrame(uint32 uiFrameIndex)
 
 /*virtual*/ void HySprite2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
 {
-	HyError("Not implemented");
+	for(uint32 i = 0; i < m_uiNumStates; ++i)
+		requiredAtlasIdsOut.insert(m_pAnimStates[i].m_UsedAtlasIds.begin(), m_pAnimStates[i].m_UsedAtlasIds.end());
 }

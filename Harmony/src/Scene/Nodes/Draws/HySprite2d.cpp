@@ -294,6 +294,30 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
 }
 
+/*virtual*/ void HySprite2d::OnDataAcquired()
+{
+	HySprite2dData *pData = static_cast<HySprite2dData *>(UncheckedGetData());
+	uint32 uiNumStates = pData->GetNumStates();
+
+	while(m_AnimCtrlAttribList.size() > uiNumStates)
+		m_AnimCtrlAttribList.pop_back();
+
+	while(m_AnimCtrlAttribList.size() < uiNumStates)
+		m_AnimCtrlAttribList.push_back(0);
+
+	for(uint32 i = 0; i < uiNumStates; ++i)
+	{
+		const HySprite2dData::AnimState &stateRef = pData->GetState(i);
+
+		if(stateRef.m_bLOOP)
+			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Loop;
+		if(stateRef.m_bBOUNCE)
+			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Bounce;
+		if(stateRef.m_bREVERSE)
+			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Reverse;
+	}
+}
+
 /*virtual*/ void HySprite2d::OnCalcBoundingVolume()
 {
 	uint32 uiNumVerts = m_RenderState.GetNumVerticesPerInstance();

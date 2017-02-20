@@ -32,13 +32,15 @@ public:
 
 	void Init(jsonxx::Object &subDirObjRef, HyAtlasContainer &atlasContainerRef)
 	{
+		m_DataList.reserve(subDirObjRef.size());
+
 		uint32 i = 0;
 		for(auto iter = subDirObjRef.kv_map().begin(); iter != subDirObjRef.kv_map().end(); ++iter, ++i)
 		{
 			std::string sPath = MakeStringProperPath(iter->first.c_str(), nullptr, true);
-
 			m_LookupIndexMap.insert(std::make_pair(sPath, i));
-			m_DataList.emplace_back(iter->first, iter->second, atlasContainerRef);
+
+			m_DataList.emplace_back(iter->first, subDirObjRef.get<jsonxx::Value>(iter->first), atlasContainerRef);
 		}
 	}
 

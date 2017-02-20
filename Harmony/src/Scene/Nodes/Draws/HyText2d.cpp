@@ -68,6 +68,9 @@ uint32 HyText2d::TextGetStrLength()
 
 float HyText2d::TextGetPixelWidth()
 {
+	if(m_sCurrentString.empty())
+		return 0.0f;
+
 	if(m_bIsDirty)
 		OnUpdate();
 

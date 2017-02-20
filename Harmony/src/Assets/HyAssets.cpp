@@ -91,7 +91,8 @@ void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyData *&pDataOut)
 
 void HyAssets::LoadGfxData(IHyDraw2d *pDrawNode2d)
 {
-	HyAssert(pDrawNode2d->m_eLoadState == HYLOADSTATE_Inactive, "HyAssets::LoadGfxData was called on a gfxData that wasn't HYLOADSTATE_Inactive");
+	if(pDrawNode2d->m_eLoadState != HYLOADSTATE_Inactive)
+		return;
 
 	bool bFullyLoaded = true;
 
@@ -126,7 +127,8 @@ void HyAssets::LoadGfxData(IHyDraw2d *pDrawNode2d)
 
 void HyAssets::RemoveGfxData(IHyDraw2d *pDrawNode2d)
 {
-	HyAssert(pDrawNode2d->m_eLoadState != HYLOADSTATE_Inactive, "HyAssets::RemoveGfxData was called on a gfxData that was HYLOADSTATE_Inactive");
+	if(pDrawNode2d->m_eLoadState == HYLOADSTATE_Inactive)
+		return;
 
 	for(auto iter = pDrawNode2d->m_RequiredAtlasIds.begin(); iter != pDrawNode2d->m_RequiredAtlasIds.end(); ++iter)
 	{
