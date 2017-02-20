@@ -91,7 +91,7 @@ void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyData *&pDataOut)
 
 void HyAssets::LoadGfxData(IHyDraw2d *pDrawNode2d)
 {
-	HyAssert(drawDataRef.m_eLoadState == HYLOADSTATE_Inactive, "HyAssets::LoadGfxData was called on a gfxData that wasn't HYLOADSTATE_Inactive");
+	HyAssert(pDrawNode2d->m_eLoadState == HYLOADSTATE_Inactive, "HyAssets::LoadGfxData was called on a gfxData that wasn't HYLOADSTATE_Inactive");
 
 	bool bFullyLoaded = true;
 

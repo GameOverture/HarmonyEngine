@@ -366,7 +366,7 @@ void IHyShader::SetSourceCode(std::string sSource, HyShaderType eType)
 	if(sSource.empty())
 		return;
 
-	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "HyShader::SetSourceCode() was invoked on a locked shader");
+	HyAssert(m_bIsFinalized == false, "HyShader::SetSourceCode() was invoked on a locked shader");
 	m_sSourceCode[eType] = sSource;
 }
 
@@ -375,7 +375,7 @@ void IHyShader::SetVertexAttribute(const char *szName, HyShaderVariable eVarType
 	if(szName == NULL)
 		return;
 
-	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "HyShader::SetVertexAttribute() was invoked on a locked shader");
+	HyAssert(m_bIsFinalized == false, "HyShader::SetVertexAttribute() was invoked on a locked shader");
 
 	VertexAttribute vertAttrib;
 	vertAttrib.sName = szName;
