@@ -100,7 +100,9 @@ void HyAssets::LoadGfxData(IHyDraw2d *pDrawNode2d)
 	for(auto iter = pDrawNode2d->m_RequiredAtlasIds.begin(); iter != pDrawNode2d->m_RequiredAtlasIds.end(); ++iter)
 	{
 		HyAtlasGroup *pAtlasGrp = m_AtlasManager.GetAtlasGroup(*iter);
-		if(QueueData(pAtlasGrp) == false)
+		QueueData(pAtlasGrp);
+
+		if(pAtlasGrp->GetLoadState() != HYLOADSTATE_Loaded)
 			bFullyLoaded = false;
 	}
 
@@ -108,7 +110,9 @@ void HyAssets::LoadGfxData(IHyDraw2d *pDrawNode2d)
 	for(auto iter = pDrawNode2d->m_RequiredCustomShaders.begin(); iter != pDrawNode2d->m_RequiredCustomShaders.end(); ++iter)
 	{
 		IHyShader *pShader = IHyRenderer::FindShader(*iter);
-		if(QueueData(pShader) == false)
+		QueueData(pShader);
+
+		if(pShader->GetLoadState() != HYLOADSTATE_Loaded)
 			bFullyLoaded = false;
 	}
 
@@ -154,6 +158,7 @@ void HyAssets::RemoveGfxData(IHyDraw2d *pDrawNode2d)
 		}
 	}
 
+	m_SceneRef.RemoveInst(pDrawNode2d);
 	pDrawNode2d->m_eLoadState = HYLOADSTATE_Inactive;
 }
 
@@ -223,9 +228,8 @@ void HyAssets::Update()
 	}
 }
 
-bool HyAssets::QueueData(IHyLoadableData *pData)
+void HyAssets::QueueData(IHyLoadableData *pData)
 {
-	bool bAlreadyLoaded = true;
 	if(pData->m_uiRefCount == 0)
 	{
 		if(pData->m_eLoadState == HYLOADSTATE_Inactive)
@@ -235,13 +239,9 @@ bool HyAssets::QueueData(IHyLoadableData *pData)
 
 			m_pLastQueuedData = pData;
 		}
-
-		bAlreadyLoaded = false;
 	}
 
 	pData->m_uiRefCount++;
-
-	return bAlreadyLoaded;
 }
 
 void HyAssets::DequeData(IHyLoadableData *pData)

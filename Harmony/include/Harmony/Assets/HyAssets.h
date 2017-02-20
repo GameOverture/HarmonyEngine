@@ -106,7 +106,7 @@ public:
 	void Update();
 
 private:
-	bool QueueData(IHyLoadableData *pData);
+	void QueueData(IHyLoadableData *pData);
 	void DequeData(IHyLoadableData *pData);
 	void FinalizeData(IHyLoadableData *pData);
 

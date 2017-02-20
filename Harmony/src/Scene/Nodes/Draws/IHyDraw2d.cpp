@@ -251,12 +251,15 @@ void IHyDraw2d::Load()
 	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
 		SetCoordinateUnit(IHyApplication::DefaultCoordinateUnit(), false);
 
-	m_RequiredAtlasIds.clear();
-	AcquireData();
-	if(m_pData)
-		m_pData->AppendRequiredAtlasIds(m_RequiredAtlasIds);
+	if(m_eTYPE != HYTYPE_Entity2d)
+	{
+		m_RequiredAtlasIds.clear();
+		AcquireData();
+		if(m_pData)
+			m_pData->AppendRequiredAtlasIds(m_RequiredAtlasIds);
 
-	sm_pHyAssets->LoadGfxData(this);
+		sm_pHyAssets->LoadGfxData(this);
+	}
 
 	// Load any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
