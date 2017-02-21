@@ -78,6 +78,12 @@ QString Item::GetName(bool bWithPrefix) const
             for(int i = iSplitIndex + 1; i < sPathSplitList.size() - 1; ++i)    // The '+ 1' so we don't include the sub directory, and the '- 1' is so we don't include the name
                 sPrefix += sPathSplitList[i] % "/";
         }
+        else
+        {
+            QFileInfo itemInfo;
+            itemInfo.setFile(m_sPATH);
+            sPrefix = itemInfo.path() % "/";
+        }
     }
     
     // NOTE: We must remove the extension because dir items use "/", which doesn't work with QFileInfo::baseName()

@@ -598,7 +598,7 @@ void ItemProject::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVa
     m_SaveDataObj.remove(sSubDirName);
     m_SaveDataObj.insert(sSubDirName, subDirObj);
 
-    //SaveGameData();
+    SaveGameData();
 }
 
 void ItemProject::SaveGameData()
