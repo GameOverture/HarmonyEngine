@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/Containers/HyAtlasContainer.h"
+#include "Assets/Loadables/HyAtlasGroup.h"
 
 class HyPrimitive2dData : public IHyData
 {

@@ -24,17 +24,49 @@
 
 #include "Diagnostics/HyGuiComms.h"
 
+#define HYASSETS_AtlasDir "Atlases/"
+
 HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
 																							m_GfxCommsRef(gfxCommsRef),
 																							m_SceneRef(sceneRef),
-																							m_AtlasManager(m_sDATADIR + "Atlases/"),
+																							m_uiNumAtlasGroups(0),
+																							m_pAtlasGroups(nullptr),
 																							m_pLastQueuedData(nullptr),
 																							m_pLastDiscardedData(nullptr),
 																							m_LoadingCtrl(m_Load_Shared, m_Load_Retrieval)
 {
-	// Start up Loading thread
-	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
+	IHyDraw2d::sm_pHyAssets = this;
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	std::string sAtlasInfoFilePath(m_sDATADIR + HYASSETS_AtlasDir);
+	sAtlasInfoFilePath += "atlasInfo.json";
+	std::string sAtlasInfoFileContents;
+	HyReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
+
+	jsonxx::Array atlasGroupArray;
+	if(atlasGroupArray.parse(sAtlasInfoFileContents) == false || atlasGroupArray.size() == 0)
+	{
+		m_uiNumAtlasGroups = 0;
+		m_pAtlasGroups = NULL;
+		return;
+	}
+
+	m_uiNumAtlasGroups = static_cast<uint32>(atlasGroupArray.size());
+	m_pAtlasGroups = reinterpret_cast<HyAtlasGroup *>(HY_NEW unsigned char[sizeof(HyAtlasGroup) * m_uiNumAtlasGroups]);
+	HyAtlasGroup *pAtlasGroupWriteLocation = m_pAtlasGroups;
+
+	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i, ++pAtlasGroupWriteLocation)
+	{
+		jsonxx::Object atlasGroupObj = atlasGroupArray.get<jsonxx::Object>(i);
+
+		new (pAtlasGroupWriteLocation)HyAtlasGroup(*this,
+												   static_cast<uint32>(atlasGroupObj.get<jsonxx::Number>("id")),
+												   static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("width")),
+												   static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("height")),
+												   static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("num8BitClrChannels")),
+												   atlasGroupObj.get<jsonxx::Array>("textures"));
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	std::string sGameDataFilePath(m_sDATADIR);
 	sGameDataFilePath += "Data.json";
@@ -46,23 +78,63 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 	bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
 	HyAssert(bGameDataParsed, "Could not parse game data");
 
-	m_Sfx.Init(gameDataObj.get<jsonxx::Object>("Audio"), m_AtlasManager);
-	m_Txt2d.Init(gameDataObj.get<jsonxx::Object>("Fonts"), m_AtlasManager);
-	m_Sprite2d.Init(gameDataObj.get<jsonxx::Object>("Sprites"), m_AtlasManager);
+	m_Audio.Init(gameDataObj.get<jsonxx::Object>("Audio"), *this);
+	m_Txt2d.Init(gameDataObj.get<jsonxx::Object>("Fonts"), *this);
+	m_Sprite2d.Init(gameDataObj.get<jsonxx::Object>("Sprites"), *this);
 	//jsonxx::Object &entitiesDataObjRef = gameDataObj.get<jsonxx::Object>("Entities");
 	//jsonxx::Object &particlesDataObjRef = gameDataObj.get<jsonxx::Object>("Particles");
 	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");
 	//jsonxx::Object &spineDataObjRef = gameDataObj.get<jsonxx::Object>("Spine");
 
-	IHyDraw2d::sm_pHyAssets = this;
+	
+	// Start up Loading thread
+	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
 }
 
 HyAssets::~HyAssets()
 {
+	if(m_pAtlasGroups == NULL || m_uiNumAtlasGroups == 0)
+		return;
+
+	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
+		m_pAtlasGroups[i].~HyAtlasGroup();
+
+	unsigned char *pAtlasGrps = reinterpret_cast<unsigned char *>(m_pAtlasGroups);
+	delete[] pAtlasGrps;
+	m_pAtlasGroups = NULL;
+
 	for(auto iter = m_Quad2d.begin(); iter != m_Quad2d.end(); ++iter)
 		delete iter->second;
 
 	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
+}
+
+HyAtlasGroup *HyAssets::GetAtlasGroup(uint32 uiAtlasGroupId)
+{
+	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
+	{
+		if(m_pAtlasGroups[i].GetId() == uiAtlasGroupId)
+			return &m_pAtlasGroups[i];
+	}
+
+	HyError("HyAtlasContainer::GetAtlasGroup() could not find the atlas group ID: " << uiAtlasGroupId);
+	return &m_pAtlasGroups[0];
+}
+
+std::string HyAssets::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
+{
+	std::string sTexturePath(m_sDATADIR + HYASSETS_AtlasDir);
+
+	char szTmpBuffer[16];
+	std::sprintf(szTmpBuffer, "%05d/", uiAtlasGroupId);
+	sTexturePath += szTmpBuffer;
+
+	std::sprintf(szTmpBuffer, "%05d", uiTextureIndex);
+	sTexturePath += szTmpBuffer;
+
+	sTexturePath += ".png";
+
+	return sTexturePath;
 }
 
 void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyData *&pDataOut)
@@ -81,7 +153,7 @@ void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyData *&pDataOut)
 	case HYTYPE_TexturedQuad2d:
 		if(m_Quad2d.find(std::stoi(pDrawNode->GetName())) == m_Quad2d.end())
 		{
-			HyTexturedQuad2dData *pNewQuadData = HY_NEW HyTexturedQuad2dData(pDrawNode->GetName(), m_AtlasManager);
+			HyTexturedQuad2dData *pNewQuadData = HY_NEW HyTexturedQuad2dData(pDrawNode->GetName(), *this);
 			m_Quad2d[std::stoi(pDrawNode->GetName())] = pNewQuadData;
 		}
 		pDataOut = m_Quad2d[std::stoi(pDrawNode->GetName())];
@@ -99,7 +171,7 @@ void HyAssets::LoadGfxData(IHyDraw2d *pDrawNode2d)
 	// Check whether all the required atlases are loaded
 	for(auto iter = pDrawNode2d->m_RequiredAtlasIds.begin(); iter != pDrawNode2d->m_RequiredAtlasIds.end(); ++iter)
 	{
-		HyAtlasGroup *pAtlasGrp = m_AtlasManager.GetAtlasGroup(*iter);
+		HyAtlasGroup *pAtlasGrp = GetAtlasGroup(*iter);
 		QueueData(pAtlasGrp);
 
 		if(pAtlasGrp->GetLoadState() != HYLOADSTATE_Loaded)
@@ -136,7 +208,7 @@ void HyAssets::RemoveGfxData(IHyDraw2d *pDrawNode2d)
 
 	for(auto iter = pDrawNode2d->m_RequiredAtlasIds.begin(); iter != pDrawNode2d->m_RequiredAtlasIds.end(); ++iter)
 	{
-		HyAtlasGroup *pAtlasGrp = m_AtlasManager.GetAtlasGroup(*iter);
+		HyAtlasGroup *pAtlasGrp = GetAtlasGroup(*iter);
 		DequeData(pAtlasGrp);
 	}
 

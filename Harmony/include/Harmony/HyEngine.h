@@ -35,6 +35,7 @@
 
 #include "Utilities/HyMath.h"
 #include "Utilities/HyFileIO.h"
+#include "Utilities/HyStrManip.h"
 
 class HyEngine
 {
@@ -47,7 +48,7 @@ class HyEngine
 	
 	HyGfxComms				m_GfxBuffer;
 	HyScene					m_Scene;
-	HyAssets 			m_AssetManager;
+	HyAssets 				m_AssetManager;
 	HyGuiComms				m_GuiComms;
 
 	HyTimeInterop			m_Time;

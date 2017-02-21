@@ -11,10 +11,9 @@
 #define __HyEnt2dData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Data/HyGfxData.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/Containers/HyAtlasContainer.h"
+#include "Assets/HyAssets.h"
 
 #include "spine/spine.h"
 #include "spine/extension.h"
@@ -25,7 +24,7 @@ class HySpine2dData : public IHyData
 	spSkeletonData *		m_SpineSkeletonData;
 
 public:
-	HySpine2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);
+	HySpine2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
 	virtual ~HySpine2dData();
 
 	spSkeletonData *GetSkeletonData()								{ return m_SpineSkeletonData; }

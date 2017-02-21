@@ -10,7 +10,7 @@
 #include "Renderer/Components/HyRenderState.h"
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
 
-#include "Renderer/Components/IHyShader.h"
+#include "Renderer/Components/HyShaderUniforms.h"
 
 HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
 									m_uiTextureBindHandle(0),

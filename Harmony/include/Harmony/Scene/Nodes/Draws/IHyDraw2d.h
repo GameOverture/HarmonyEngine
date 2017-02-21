@@ -13,11 +13,14 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Scene/Nodes/Transforms/IHyTransform2d.h"
+#include "Scene/Nodes/Misc/HyCamera.h"
 
 #include "Assets/Data/IHyData.h"
+#include "Assets/Loadables/IHyShader.h"
 
 #include "Renderer/Components/HyRenderState.h"
-#include "Scene/Nodes/Misc/HyCamera.h"
+#include "Renderer/Components/HyShaderUniforms.h"
+
 #include <set>
 
 class IHyDraw2d : public IHyTransform2d
@@ -66,7 +69,6 @@ protected:
 	float							m_fPrevAlphaValue;
 
 	HyShaderUniforms 				m_ShaderUniforms;
-
 
 public:
 	HyTweenVec3						topColor;

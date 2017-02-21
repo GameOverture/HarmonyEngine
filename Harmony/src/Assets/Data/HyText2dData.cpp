@@ -43,16 +43,16 @@ HyText2dData::FontState::~FontState()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef) :	IHyData(HYTYPE_Text2d, sPath),
-																																m_uiAtlasGroupTextureIndex(0),
-																																m_pTypefaces(NULL),
-																																m_uiNumTypefaces(0),
-																																m_pFontStates(NULL),
-																																m_uiNumStates(0)
+HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyData(HYTYPE_Text2d, sPath),
+																												m_uiAtlasGroupTextureIndex(0),
+																												m_pTypefaces(NULL),
+																												m_uiNumTypefaces(0),
+																												m_pFontStates(NULL),
+																												m_uiNumStates(0)
 {
 	jsonxx::Object textObject = dataValueRef.get<jsonxx::Object>();
 
-	m_pAtlasGroup = atlasContainerRef.GetAtlasGroup(static_cast<uint32>(textObject.get<jsonxx::Number>("atlasGroupId")));
+	m_pAtlasGroup = assetsRef.GetAtlasGroup(static_cast<uint32>(textObject.get<jsonxx::Number>("atlasGroupId")));
 
 	HyRectangle<float> rSubAtlasUVRect;
 	m_pAtlasGroup->GetUvRect(static_cast<uint32>(textObject.get<jsonxx::Number>("checksum")), m_uiAtlasGroupTextureIndex, rSubAtlasUVRect);

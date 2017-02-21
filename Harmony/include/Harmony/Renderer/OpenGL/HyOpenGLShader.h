@@ -12,11 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Renderer/Components/IHyShader.h"
-
-#include <vector>
-#include <map>
-#include <algorithm>
+#include "Assets/Loadables/IHyShader.h"
 
 class HyOpenGLShader : public IHyShader
 {

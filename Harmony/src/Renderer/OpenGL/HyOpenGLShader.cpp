@@ -10,6 +10,10 @@
 #include "Renderer/OpenGL/HyOpenGLShader.h"
 #include "Renderer/OpenGL/HyOpenGL.h"
 
+#include <vector>
+#include <map>
+#include <algorithm>
+
 HyOpenGLShader::HyOpenGLShader(int32 iId) :	IHyShader(iId),
 											m_hProgHandle(0),
 											m_bLinked(false),

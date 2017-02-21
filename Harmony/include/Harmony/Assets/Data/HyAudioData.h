@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HySfxData.h
+ *	HyAudioData.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
@@ -7,25 +7,23 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HySfxData_h__
-#define __HySfxData_h__
+#ifndef __HyAudioData_h__
+#define __HyAudioData_h__
 
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/Containers/HyAtlasContainer.h"
-
-//#include "SFML/Audio.hpp"
+#include "Assets/HyAssets.h"
 
 class HySound;
 
-class HySfxData : public IHyData
+class HyAudioData : public IHyData
 {
 public:
-	HySfxData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);
-	virtual ~HySfxData(void);
+	HyAudioData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
+	virtual ~HyAudioData(void);
 
 	virtual void AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut) override;
 };
 
-#endif /* __HySfxData_h__ */
+#endif /* __HyAudioData_h__ */

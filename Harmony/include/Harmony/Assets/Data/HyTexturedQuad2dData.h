@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/Containers/HyAtlasContainer.h"
+#include "Assets/HyAssets.h"
 
 class HyTexturedQuad2dData : public IHyData
 {
@@ -21,7 +21,7 @@ class HyTexturedQuad2dData : public IHyData
 	HyAtlasGroup *		m_pAtlas;
 
 public:
-	HyTexturedQuad2dData(const std::string &sPath, HyAtlasContainer &atlasContainerRef);
+	HyTexturedQuad2dData(const std::string &sPath, HyAssets &assetsRef);
 	virtual ~HyTexturedQuad2dData();
 
 	HyAtlasGroup *GetAtlasGroup();

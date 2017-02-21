@@ -525,6 +525,9 @@ offsetCalculation:
 
 /*virtual*/ void HyText2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
+	// OnUpdate called here to ensure 'm_uiNumValidCharacters' is up to date with 'm_sCurrentString'
+	OnUpdate();
+
 	HyText2dData *pData = static_cast<HyText2dData *>(UncheckedGetData());
 
 	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);

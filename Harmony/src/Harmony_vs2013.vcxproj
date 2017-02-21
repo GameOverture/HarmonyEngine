@@ -43,7 +43,6 @@
     <ClCompile Include="..\include\Harmony\Threading\Utils.cpp" />
     <ClCompile Include="..\include\Harmony\Threading\WaitObject.cpp" />
     <ClCompile Include="..\include\Harmony\Threading\WaitObjectEx.cpp" />
-    <ClCompile Include="Assets\Containers\HyAtlasContainer.cpp" />
     <ClCompile Include="Assets\Data\HyAudioData.cpp" />
     <ClCompile Include="Assets\Data\HyMesh3dData.cpp" />
     <ClCompile Include="Assets\Data\HyPrimitive2dData.cpp" />
@@ -53,6 +52,8 @@
     <ClCompile Include="Assets\Data\HyTexturedQuad2dData.cpp" />
     <ClCompile Include="Assets\Data\IHyData.cpp" />
     <ClCompile Include="Assets\HyAssets.cpp" />
+    <ClCompile Include="Assets\Loadables\HyAtlasGroup.cpp" />
+    <ClCompile Include="Assets\Loadables\IHyShader.cpp" />
     <ClCompile Include="Audio\IHyAudio.cpp" />
     <ClCompile Include="Audio\IHyAudioInst.cpp" />
     <ClCompile Include="Audio\Interop\HyAudio_Win.cpp" />
@@ -71,7 +72,7 @@
     <ClCompile Include="Renderer\Components\HyGfxComms.cpp" />
     <ClCompile Include="Renderer\Components\HyRenderState.cpp" />
     <ClCompile Include="Renderer\Components\HyWindow.cpp" />
-    <ClCompile Include="Renderer\Components\IHyShader.cpp" />
+    <ClCompile Include="Renderer\Components\HyShaderUniforms.cpp" />
     <ClCompile Include="Renderer\IHyRenderer.cpp" />
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp" />
     <ClCompile Include="Renderer\OpenGL\HyOpenGLShader.cpp" />
@@ -143,10 +144,7 @@
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_OSX.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
-    <ClInclude Include="..\include\Harmony\Assets\Containers\HyAtlasContainer.h" />
-    <ClInclude Include="..\include\Harmony\Assets\Containers\HyNodeDataContainer.h" />
     <ClInclude Include="..\include\Harmony\Assets\Data\HyAudioData.h" />
-    <ClInclude Include="..\include\Harmony\Assets\Data\HyGfxData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Data\HyMesh3dData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Data\HyPrimitive2dData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Data\HySpine2dData.h" />
@@ -155,6 +153,9 @@
     <ClInclude Include="..\include\Harmony\Assets\Data\HyTexturedQuad2dData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Data\IHyData.h" />
     <ClInclude Include="..\include\Harmony\Assets\HyAssets.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlasGroup.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Loadables\IHyLoadableData.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Loadables\IHyShader.h" />
     <ClInclude Include="..\include\Harmony\Audio\IHyAudio.h" />
     <ClInclude Include="..\include\Harmony\Audio\IHyAudioInst.h" />
     <ClInclude Include="..\include\Harmony\Audio\Interop\HyAudio_Win.h" />
@@ -177,7 +178,7 @@
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyGfxComms.h" />
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyRenderState.h" />
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyWindow.h" />
-    <ClInclude Include="..\include\Harmony\Renderer\Components\IHyShader.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyShaderUniforms.h" />
     <ClInclude Include="..\include\Harmony\Renderer\IHyRenderer.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGL.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShader.h" />

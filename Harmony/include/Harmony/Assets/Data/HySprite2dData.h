@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/Containers/HyAtlasContainer.h"
+#include "Assets/HyAssets.h"
 
 struct HySprite2dFrame
 {
@@ -47,7 +47,7 @@ struct HySprite2dFrame
 class HySprite2dData : public IHyData
 {
 public:
-	HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);
+	HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
 	virtual ~HySprite2dData();
 
 	class AnimState
@@ -63,7 +63,7 @@ public:
 
 		std::set<uint32>	m_UsedAtlasIds;
 
-		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HyAtlasContainer &atlasContainerRef);
+		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HyAssets &assetsRef);
 		~AnimState();
 
 		const HySprite2dFrame &GetFrame(uint32 uiFrameIndex);

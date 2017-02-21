@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Data/IHyData.h"
-#include "Assets/Containers/HyAtlasContainer.h"
+#include "Assets/HyAssets.h"
 
 #include <map>
 using std::map;
@@ -129,7 +129,7 @@ class HyText2dData : public IHyData
 	uint32							m_uiNumStates;
 
 public:
-	HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);
+	HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
 	virtual ~HyText2dData();
 
 	uint32 GetNumStates();

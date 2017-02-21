@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyAtlasContainer.cpp
+ *	HyAtlasGroup.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -7,97 +7,22 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Assets/Containers/HyAtlasContainer.h"
+#include "Assets/Loadables/HyAtlasGroup.h"
 
+#include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
 
 #include "Utilities/stb_image.h"
 
-HyAtlasContainer::HyAtlasContainer(std::string sAtlasDataDir) : m_sATLAS_DIR_PATH(sAtlasDataDir),
-																m_uiNumAtlasGroups(0),
-																m_pAtlasGroups(NULL)
-{
-	jsonxx::Array atlasGroupArray;
+#include <set>
 
-	std::string sAtlasInfoFilePath(m_sATLAS_DIR_PATH);
-	sAtlasInfoFilePath += "atlasInfo.json";
-	std::string sAtlasInfoFileContents;
-	HyReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
-
-	if(atlasGroupArray.parse(sAtlasInfoFileContents) == false || atlasGroupArray.size() == 0)
-	{
-		m_uiNumAtlasGroups = 0;
-		m_pAtlasGroups = NULL;
-		return;
-	}
-
-	m_uiNumAtlasGroups = static_cast<uint32>(atlasGroupArray.size());
-	m_pAtlasGroups = reinterpret_cast<HyAtlasGroup *>(HY_NEW unsigned char[sizeof(HyAtlasGroup) * m_uiNumAtlasGroups]);
-	HyAtlasGroup *pAtlasGroupWriteLocation = m_pAtlasGroups;
-
-	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i, ++pAtlasGroupWriteLocation)
-	{
-		jsonxx::Object atlasGroupObj = atlasGroupArray.get<jsonxx::Object>(i);
-
-		new (pAtlasGroupWriteLocation)HyAtlasGroup(*this,
-			static_cast<uint32>(atlasGroupObj.get<jsonxx::Number>("id")),
-			static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("width")),
-			static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("height")),
-			static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("num8BitClrChannels")),
-			atlasGroupObj.get<jsonxx::Array>("textures"));
-	}
-}
-
-HyAtlasContainer::~HyAtlasContainer()
-{
-	if(m_pAtlasGroups == NULL || m_uiNumAtlasGroups == 0)
-		return;
-
-	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
-		m_pAtlasGroups[i].~HyAtlasGroup();
-
-	unsigned char *pAtlasGrps = reinterpret_cast<unsigned char *>(m_pAtlasGroups);
-	delete[] pAtlasGrps;
-	m_pAtlasGroups = NULL;
-}
-
-
-HyAtlasGroup *HyAtlasContainer::GetAtlasGroup(uint32 uiAtlasGroupId)
-{
-	for(uint32 i = 0; i < m_uiNumAtlasGroups; ++i)
-	{
-		if(m_pAtlasGroups[i].GetId() == uiAtlasGroupId)
-			return &m_pAtlasGroups[i];
-	}
-	
-	HyError("HyAtlasContainer::GetAtlasGroup() could not find the atlas group ID: " << uiAtlasGroupId);
-	return &m_pAtlasGroups[0];
-}
-
-std::string HyAtlasContainer::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex)
-{
-	std::string sTexturePath(m_sATLAS_DIR_PATH);
-
-	char szTmpBuffer[16];
-	sprintf(szTmpBuffer, "%05d/", uiAtlasGroupId);
-	sTexturePath += szTmpBuffer;
-
-	sprintf(szTmpBuffer, "%05d", uiTextureIndex);
-	sTexturePath += szTmpBuffer;
-
-	sTexturePath += ".png";
-
-	return sTexturePath;
-}
-
-//////////////////////////////////////////////////////////////////////////
-HyAtlasGroup::HyAtlasGroup(HyAtlasContainer &managerRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef) :	IHyLoadableData(HYGFXTYPE_AtlasGroup),
-																																											m_ManagerRef(managerRef),
-																																											m_uiLOADGROUPID(uiLoadGroupId),
-																																											m_uiWIDTH(uiWidth),
-																																											m_uiHEIGHT(uiHeight),
-																																											m_uiNUM_8BIT_CHANNELS(uiNumClrChannels),
-																																											m_uiNUM_ATLASES(static_cast<uint32>(texturesArrayRef.size()))
+HyAtlasGroup::HyAtlasGroup(HyAssets &assetsRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef) :	IHyLoadableData(HYGFXTYPE_AtlasGroup),
+																																									m_AssetsRef(assetsRef),
+																																									m_uiLOADGROUPID(uiLoadGroupId),
+																																									m_uiWIDTH(uiWidth),
+																																									m_uiHEIGHT(uiHeight),
+																																									m_uiNUM_8BIT_CHANNELS(uiNumClrChannels),
+																																									m_uiNUM_ATLASES(static_cast<uint32>(texturesArrayRef.size()))
 {
 	m_pAtlases = reinterpret_cast<HyAtlas *>(HY_NEW unsigned char[sizeof(HyAtlas) * m_uiNUM_ATLASES]);
 	HyAtlas *pAtlasWriteLocation = m_pAtlases;
@@ -185,7 +110,7 @@ void HyAtlasGroup::OnLoadThread()
 	if(GetLoadState() == HYLOADSTATE_Queued)
 	{
 		for(uint32 i = 0; i < m_uiNUM_ATLASES; ++i)
-			m_pAtlases[i].Load(m_ManagerRef.GetTexturePath(m_uiLOADGROUPID, i).c_str());
+			m_pAtlases[i].Load(m_AssetsRef.GetTexturePath(m_uiLOADGROUPID, i).c_str());
 	}
 
 	m_csTextures.Unlock();
@@ -232,7 +157,7 @@ void HyAtlasGroup::OnRenderThread(IHyRenderer &rendererRef)
 }
 
 //////////////////////////////////////////////////////////////////////////
-HyAtlas::HyAtlas(jsonxx::Array &srcFramesArrayRef) :	m_uiGfxApiHandle(0),
+HyAtlasGroup::HyAtlas::HyAtlas(jsonxx::Array &srcFramesArrayRef) : m_uiGfxApiHandle(0),
 														m_uiGfxApiTextureIndex(0),
 														m_uiNUM_FRAMES(static_cast<uint32>(srcFramesArrayRef.size())),
 														m_pPixelData(NULL)
@@ -252,29 +177,29 @@ HyAtlas::HyAtlas(jsonxx::Array &srcFramesArrayRef) :	m_uiGfxApiHandle(0),
 	}
 }
 
-HyAtlas::~HyAtlas()
+HyAtlasGroup::HyAtlas::~HyAtlas()
 {
 	delete [] m_pFrames;
 	DeletePixelData();
 }
 
-uint32 HyAtlas::GetGfxApiHandle() const
+uint32 HyAtlasGroup::HyAtlas::GetGfxApiHandle() const
 {
 	return m_uiGfxApiHandle;
 }
 
-uint32 HyAtlas::GetGfxApiTextureIndex() const
+uint32 HyAtlasGroup::HyAtlas::GetGfxApiTextureIndex() const
 {
 	return m_uiGfxApiTextureIndex;
 }
 
-void HyAtlas::SetGfxApiHandle(uint32 uiGfxApiHandle, uint32 uiGfxApiTextureIndex)
+void HyAtlasGroup::HyAtlas::SetGfxApiHandle(uint32 uiGfxApiHandle, uint32 uiGfxApiTextureIndex)
 {
 	m_uiGfxApiHandle = uiGfxApiHandle;
 	m_uiGfxApiTextureIndex = uiGfxApiTextureIndex;
 }
 
-const HyRectangle<int32> *HyAtlas::GetSrcRect(uint32 uiChecksum) const
+const HyRectangle<int32> *HyAtlasGroup::HyAtlas::GetSrcRect(uint32 uiChecksum) const
 {
 	std::map<uint32, HyRectangle<int32> *>::const_iterator iter = m_ChecksumMap.find(uiChecksum);
 	if(iter == m_ChecksumMap.end())
@@ -283,7 +208,7 @@ const HyRectangle<int32> *HyAtlas::GetSrcRect(uint32 uiChecksum) const
 		return iter->second;
 }
 
-void HyAtlas::Load(const char *szFilePath)
+void HyAtlasGroup::HyAtlas::Load(const char *szFilePath)
 {
 	if(m_pPixelData)
 		return;
@@ -294,12 +219,12 @@ void HyAtlas::Load(const char *szFilePath)
 	HyAssert(m_pPixelData != NULL, "HyAtlas failed to load image data");
 }
 
-unsigned char *HyAtlas::GetPixelData()
+unsigned char *HyAtlasGroup::HyAtlas::GetPixelData()
 {
 	return m_pPixelData;
 }
 
-void HyAtlas::DeletePixelData()
+void HyAtlasGroup::HyAtlas::DeletePixelData()
 {
 	stbi_image_free(m_pPixelData);
 	m_pPixelData = NULL;

@@ -213,20 +213,23 @@
     <ClCompile Include="Renderer\Components\HyWindow.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Components\IHyShader.cpp">
-      <Filter>Renderer\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Diagnostics\HyConsole.cpp">
       <Filter>Diagnostics</Filter>
-    </ClCompile>
-    <ClCompile Include="Assets\Containers\HyAtlasContainer.cpp">
-      <Filter>Assets\Containers</Filter>
     </ClCompile>
     <ClCompile Include="Assets\HyAssets.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
     <ClCompile Include="Utilities\jasonxx.cc">
       <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Loadables\HyAtlasGroup.cpp">
+      <Filter>Assets\Loadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Components\HyShaderUniforms.cpp">
+      <Filter>Renderer\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Loadables\IHyShader.cpp">
+      <Filter>Assets\Loadables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -320,8 +323,8 @@
     <Filter Include="Renderer\Components">
       <UniqueIdentifier>{f88cc56b-d7e8-4470-828b-8c4b27791e7a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Assets\Containers">
-      <UniqueIdentifier>{2576f667-75f3-44c5-9e47-166f483c025a}</UniqueIdentifier>
+    <Filter Include="Assets\Loadables">
+      <UniqueIdentifier>{62dc3c2c-b600-4cfd-96db-e8a46f4d1c25}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -606,26 +609,26 @@
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyWindow.h">
       <Filter>Renderer\Components</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Renderer\Components\IHyShader.h">
-      <Filter>Renderer\Components</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Diagnostics\HyConsole.h">
       <Filter>Diagnostics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\Containers\HyAtlasContainer.h">
-      <Filter>Assets\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\Containers\HyNodeDataContainer.h">
-      <Filter>Assets\Containers</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Assets\HyAssets.h">
       <Filter>Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\Data\HyGfxData.h">
-      <Filter>Assets\Data</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Utilities\jsonxx.h">
       <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Assets\Loadables\IHyLoadableData.h">
+      <Filter>Assets\Loadables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlasGroup.h">
+      <Filter>Assets\Loadables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyShaderUniforms.h">
+      <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Assets\Loadables\IHyShader.h">
+      <Filter>Assets\Loadables</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

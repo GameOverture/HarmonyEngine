@@ -15,7 +15,7 @@
 
 class HyAudio2d : public IHyAudioInstInterop
 {
-	HySfxData *						m_pDataPtr;
+	HyAudioData *						m_pDataPtr;
 
 	enum eCueType
 	{
