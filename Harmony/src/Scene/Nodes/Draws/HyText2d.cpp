@@ -16,7 +16,6 @@
 HyText2d::HyText2d(const char *szPrefix, const char *szName) :	IHyDraw2d(HYTYPE_Text2d, szPrefix, szName),
 																m_bIsDirty(true),
 																m_sCurrentString(""),
-																//m_sNewString(""),
 																m_uiCurFontState(0),
 																m_vBoxDimensions(0.0f, 0.0f),
 																m_fScaleBoxModifier(1.0f),
@@ -44,7 +43,6 @@ void HyText2d::TextSet(std::string sText)
 		return;
 
 	m_sCurrentString = sText;
-	//m_sNewString = sText;
 	m_bIsDirty = true;
 }
 
@@ -54,7 +52,6 @@ void HyText2d::TextSet(char cChar)
 		return;
 
 	m_sCurrentString = cChar;
-	//m_sNewString = cChar;
 	m_bIsDirty = true;
 }
 
@@ -68,20 +65,12 @@ uint32 HyText2d::TextGetStrLength()
 	return static_cast<uint32>(m_sCurrentString.size());
 }
 
-float HyText2d::TextGetPixelWidth()
+float HyText2d::TextGetScaleBoxModifer()
 {
-	if(m_sCurrentString.empty())
-		return 0.0f;
-
 	if(m_bIsDirty)
 		OnUpdate();
 
-	float fProperNudgeAmt = 0.0f;
-
-	const HyText2dGlyphInfo &glyphRef = static_cast<HyText2dData *>(AcquireData())->GetGlyph(m_uiCurFontState, 0, static_cast<uint32>(m_sCurrentString[0]));
-	fProperNudgeAmt = static_cast<HyText2dData *>(UncheckedGetData())->GetLeftSideNudgeAmt(m_uiCurFontState) - glyphRef.iOFFSET_X;
-
-	return m_fUsedPixelWidth - fProperNudgeAmt;
+	return m_fScaleBoxModifier;
 }
 
 uint32 HyText2d::TextGetState()
@@ -235,7 +224,6 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	if(IsSelfLoaded() == false || m_bIsDirty == false)
 		return;
 
-	//m_sCurrentString = m_sNewString;
 	m_uiNumValidCharacters = 0;
 
 	HyText2dData *pData = static_cast<HyText2dData *>(UncheckedGetData());
@@ -315,7 +303,7 @@ offsetCalculation:
 			// Handle every layer for this character
 			for(uint32 iLayerIndex = 0; iLayerIndex < uiNUM_LAYERS; ++iLayerIndex)
 			{
-				const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, static_cast<uint32>(m_sCurrentString[uiStrIndex]));
+				const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, HyUtf8_to_Utf32(&m_sCurrentString[uiStrIndex]));
 
 				// TODO: Apply kerning if it isn't the first character of a newline
 				float fKerning = 0.0f;
@@ -330,14 +318,13 @@ offsetCalculation:
 
 				pWritePos[iLayerIndex].x += (glyphRef.fADVANCE_X * m_fScaleBoxModifier);
 
-				// TODO: Using GetLeftSideNudgeAmt() is almost correct here, but should instead have calculated a the "right side" version of this nudge within the Designer Tool
-				if(fCurLineWidth < pWritePos[iLayerIndex].x + (pData->GetLeftSideNudgeAmt(m_uiCurFontState) * m_fScaleBoxModifier))
-					fCurLineWidth = pWritePos[iLayerIndex].x + (pData->GetLeftSideNudgeAmt(m_uiCurFontState) * m_fScaleBoxModifier);
+				if(fCurLineWidth < m_pGlyphOffsets[iGlyphOffsetIndex].x + ((glyphRef.uiWIDTH + pData->GetLeftSideNudgeAmt(m_uiCurFontState)) * m_fScaleBoxModifier))
+					fCurLineWidth = m_pGlyphOffsets[iGlyphOffsetIndex].x + ((glyphRef.uiWIDTH + pData->GetLeftSideNudgeAmt(m_uiCurFontState)) * m_fScaleBoxModifier);
 
 				// If drawing text within a box, and we advance past our width, determine if we should newline
 				if((m_uiBoxAttributes & BOXATTRIB_TextBox) == 0 &&
 				   (m_uiBoxAttributes & BOXATTRIB_IsUsed) != 0 &&
-				   pWritePos[iLayerIndex].x + (pData->GetLeftSideNudgeAmt(m_uiCurFontState) * m_fScaleBoxModifier) > m_vBoxDimensions.x)
+				   fCurLineWidth > m_vBoxDimensions.x)
 				{
 					// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
 					if((m_uiBoxAttributes & BOXATTRIB_SplitWordsToFit) != 0 ||
@@ -543,7 +530,7 @@ offsetCalculation:
 			if(m_sCurrentString[j] == '\n')
 				continue;
 
-			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, i, static_cast<uint32>(m_sCurrentString[j]));
+			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, i, HyUtf8_to_Utf32(&m_sCurrentString[j]));
 
 			glm::vec2 vSize(glyphRef.uiWIDTH, glyphRef.uiHEIGHT);
 			vSize *= m_fScaleBoxModifier;

@@ -134,7 +134,7 @@ public:
 
 	uint32 GetNumStates();
 	uint32 GetNumLayers(uint32 uiStateIndex);
-	const HyText2dGlyphInfo &GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiCode);
+	const HyText2dGlyphInfo &GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code);
 	const glm::vec3 &GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop);
 	HyAtlasGroup *GetAtlasGroup();
 	uint32 GetAtlasGroupTextureIndex();

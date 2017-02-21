@@ -69,8 +69,11 @@ IHyNodeData *IHyDraw2d::AcquireData()
 	if(m_pData == nullptr)
 	{
 		sm_pHyAssets->GetNodeData(this, m_pData);
-		MakeBoundingVolumeDirty();
-		OnDataAcquired();
+		if(m_pData)
+		{
+			MakeBoundingVolumeDirty();
+			OnDataAcquired();
+		}
 	}
 
 	return m_pData;

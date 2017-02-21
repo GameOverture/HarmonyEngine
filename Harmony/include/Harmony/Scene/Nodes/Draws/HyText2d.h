@@ -21,7 +21,6 @@ class HyText2d : public IHyDraw2d
 protected:
 	bool							m_bIsDirty;
 	std::string						m_sCurrentString;
-	//std::string						m_sNewString;
 
 	uint32							m_uiCurFontState;
 
@@ -72,7 +71,7 @@ public:
 	std::string TextGet();
 
 	uint32 TextGetStrLength();
-	float TextGetPixelWidth();
+	float TextGetScaleBoxModifer();
 
 	uint32 TextGetState();
 	void TextSetState(uint32 uiStateIndex);

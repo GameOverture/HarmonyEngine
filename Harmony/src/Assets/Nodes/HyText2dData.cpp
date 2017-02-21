@@ -137,10 +137,10 @@ uint32 HyText2dData::GetNumLayers(uint32 uiStateIndex)
 	return m_pFontStates[uiStateIndex].uiNUM_LAYERS;
 }
 
-const HyText2dGlyphInfo &HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiCode)
+const HyText2dGlyphInfo &HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code)
 {
-	HyAssert(m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(uiCode) != m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end(), "HyText2d tried to draw a glyph (Code: " << uiCode << ") that wasn't exported");
-	return *m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.at(uiCode);
+	HyAssert(m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(uiUtf32Code) != m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end(), "HyText2d tried to draw a glyph (UTF-32: " << uiUtf32Code << ") that wasn't exported");
+	return *m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.at(uiUtf32Code);
 }
 
 const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop)
