@@ -11,7 +11,7 @@
 
 #include "IHyApplication.h"
 
-#include "Assets/Data/IHyData.h"
+#include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
 #include "Scene/Nodes/Misc/HyCamera.h"
 #include "Renderer/Components/HyWindow.h"
@@ -64,7 +64,7 @@ const std::string &IHyDraw2d::GetPrefix()
 	return m_sPREFIX;
 }
 
-IHyData *IHyDraw2d::AcquireData()
+IHyNodeData *IHyDraw2d::AcquireData()
 {
 	if(m_pData == nullptr)
 	{
@@ -288,7 +288,7 @@ bool IHyDraw2d::IsSelfLoaded()
 	return m_eLoadState == HYLOADSTATE_Loaded;
 }
 
-IHyData *IHyDraw2d::UncheckedGetData()
+IHyNodeData *IHyDraw2d::UncheckedGetData()
 {
 	return m_pData;
 }

@@ -23,7 +23,7 @@
 
 class IHyDraw2d;
 
-class IHyData;
+class IHyNodeData;
 class HyAudioData;
 class HySprite2dData;
 class HySpine2dData;
@@ -43,53 +43,20 @@ class HyAssets
 	uint32												m_uiNumAtlasGroups;
 
 	template<typename tData>
-	class HyNodeDataContainer
+	class NodeData
 	{
-		std::map<std::string, uint32>	m_LookupIndexMap;
-		std::vector<tData>				m_DataList;
+		std::map<std::string, uint32>					m_LookupIndexMap;
+		std::vector<tData>								m_DataList;
 
 	public:
-		HyNodeDataContainer()
-		{ }
-
-		~HyNodeDataContainer()
-		{ }
-
-		void Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef)
-		{
-			m_DataList.reserve(subDirObjRef.size());
-
-			uint32 i = 0;
-			for(auto iter = subDirObjRef.kv_map().begin(); iter != subDirObjRef.kv_map().end(); ++iter, ++i)
-			{
-				std::string sPath = MakeStringProperPath(iter->first.c_str(), nullptr, true);
-				m_LookupIndexMap.insert(std::make_pair(sPath, i));
-
-				m_DataList.emplace_back(iter->first, subDirObjRef.get<jsonxx::Value>(iter->first), assetsRef);
-			}
-		}
-
-		tData *GetData(const std::string &sPrefix, const std::string &sName)
-		{
-			std::string sPath;
-
-			if(sPrefix.empty() == false)
-				sPath += MakeStringProperPath(sPrefix.c_str(), "/", true);
-
-			sPath += sName;
-			sPath = MakeStringProperPath(sPath.c_str(), nullptr, true);
-
-			auto iter = m_LookupIndexMap.find(sPath);
-			HyAssert(iter != m_LookupIndexMap.end(), "Could not find data: " << sPath.c_str());
-
-			return &m_DataList[iter->second];
-		}
+		void Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef);
+		tData *GetData(const std::string &sPrefix, const std::string &sName);
 	};
-	HyNodeDataContainer<HyAudioData>					m_Audio;
-	HyNodeDataContainer<HySprite2dData>					m_Sprite2d;
-	HyNodeDataContainer<HySpine2dData>					m_Spine2d;
-	HyNodeDataContainer<HyMesh3dData>					m_Mesh3d;
-	HyNodeDataContainer<HyText2dData>					m_Txt2d;
+	NodeData<HyAudioData>								m_Audio;
+	NodeData<HySprite2dData>							m_Sprite2d;
+	NodeData<HySpine2dData>								m_Spine2d;
+	NodeData<HyMesh3dData>								m_Mesh3d;
+	NodeData<HyText2dData>								m_Txt2d;
 	std::map<int32, HyTexturedQuad2dData *>				m_Quad2d;
 
 	IHyLoadableData *									m_pLastQueuedData;
@@ -140,7 +107,7 @@ public:
 	HyAtlasGroup *GetAtlasGroup(uint32 uiAtlasGroupId);
 	std::string GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
 
-	void GetNodeData(IHyDraw2d *pDrawNode, IHyData *&pDataOut);
+	void GetNodeData(IHyDraw2d *pDrawNode, IHyNodeData *&pDataOut);
 	void LoadGfxData(IHyDraw2d *pDraw2d);
 	void RemoveGfxData(IHyDraw2d *pDraw2d);
 

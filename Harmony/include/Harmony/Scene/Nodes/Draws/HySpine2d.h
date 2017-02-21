@@ -14,7 +14,7 @@
 
 #include "IHyDraw2d.h"
 
-#include "Assets/Data/HySpine2dData.h"
+#include "Assets/Nodes/HySpine2dData.h"
 
 class HySpine2d : public IHyDraw2d
 {

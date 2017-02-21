@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Assets/Data/HyText2dData.h"
+#include "Assets/Nodes/HyText2dData.h"
 
 #include "Renderer/IHyRenderer.h"
 
@@ -43,7 +43,7 @@ HyText2dData::FontState::~FontState()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyData(HYTYPE_Text2d, sPath),
+HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_Text2d, sPath),
 																												m_uiAtlasGroupTextureIndex(0),
 																												m_pTypefaces(NULL),
 																												m_uiNumTypefaces(0),

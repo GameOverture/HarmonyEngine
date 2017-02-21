@@ -11,7 +11,7 @@
 #define __HyAudio2d_h__
 
 #include "Afx/HyInteropAfx.h"
-#include "Assets/Data/HyAudioData.h"
+#include "Assets/Nodes/HyAudioData.h"
 
 class HyAudio2d : public IHyAudioInstInterop
 {

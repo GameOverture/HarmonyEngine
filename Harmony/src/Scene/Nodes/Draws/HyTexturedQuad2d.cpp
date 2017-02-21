@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Scene/Nodes/Draws/HyTexturedQuad2d.h"
 
-#include "Assets/Data/HyTexturedQuad2dData.h"
+#include "Assets/Nodes/HyTexturedQuad2dData.h"
 
 HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGroupId) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, std::to_string(uiAtlasGroupId).c_str()),
 															m_bIS_RAW(false),

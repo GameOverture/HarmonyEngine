@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyData.cpp
+*	IHyNodeData.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2013 Jason Knobler
@@ -8,21 +8,21 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 
-#include "Assets/Data/IHyData.h"
+#include "Assets/Nodes/IHyNodeData.h"
 
-IHyData::IHyData(HyType eType, const std::string &sPath) :	m_eTYPE(eType),
+IHyNodeData::IHyNodeData(HyType eType, const std::string &sPath) :	m_eTYPE(eType),
 															m_sPATH(sPath)
 { }
 
-/*virtual*/ IHyData::~IHyData(void)
+/*virtual*/ IHyNodeData::~IHyNodeData(void)
 { }
 
-HyType IHyData::GetInstType()
+HyType IHyNodeData::GetInstType()
 {
 	return m_eTYPE;
 }
 
-const std::string &IHyData::GetPath()
+const std::string &IHyNodeData::GetPath()
 { 
 	return m_sPATH;
 }

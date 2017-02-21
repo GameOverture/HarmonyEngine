@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Assets/Data/HySprite2dData.h"
+#include "Assets/Nodes/HySprite2dData.h"
 
 #include "Renderer/IHyRenderer.h"
 #include "Utilities/HyFileIO.h"
@@ -26,7 +26,7 @@ uint32 HySprite2dFrame::GetActualTextureIndex() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HySprite2dData::HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyData(HYTYPE_Sprite2d, sPath),
+HySprite2dData::HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_Sprite2d, sPath),
 																													m_pAnimStates(NULL),
 																													m_uiNumStates(0)
 {

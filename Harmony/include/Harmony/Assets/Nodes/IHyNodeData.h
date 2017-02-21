@@ -1,5 +1,5 @@
 /**************************************************************************
- *	IHyData.h
+ *	IHyNodeData.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -19,14 +19,14 @@ using std::set;
 class IHyRenderer;
 class HyAtlasContainer;
 
-class IHyData
+class IHyNodeData
 {
 	const HyType					m_eTYPE;
 	const std::string				m_sPATH;
 
 public:
-	IHyData(HyType eInstType, const std::string &sPath);
-	virtual ~IHyData(void);
+	IHyNodeData(HyType eInstType, const std::string &sPath);
+	virtual ~IHyNodeData(void);
 	
 	HyType GetInstType();
 	const std::string &GetPath();

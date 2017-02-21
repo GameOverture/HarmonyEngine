@@ -11,13 +11,13 @@
 
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
 
-#include "Assets/Data/HyAudioData.h"
-#include "Assets/Data/HySpine2dData.h"
-#include "Assets/Data/HySprite2dData.h"
-#include "Assets/Data/HyText2dData.h"
-#include "Assets/Data/HyTexturedQuad2dData.h"
-#include "Assets/Data/HyPrimitive2dData.h"
-#include "Assets/Data/HyMesh3dData.h"
+#include "Assets/Nodes/HyAudioData.h"
+#include "Assets/Nodes/HySpine2dData.h"
+#include "Assets/Nodes/HySprite2dData.h"
+#include "Assets/Nodes/HyText2dData.h"
+#include "Assets/Nodes/HyTexturedQuad2dData.h"
+#include "Assets/Nodes/HyPrimitive2dData.h"
+#include "Assets/Nodes/HyMesh3dData.h"
 
 #include "Utilities/HyMath.h"
 #include "Utilities/HyStrManip.h"
@@ -25,6 +25,38 @@
 #include "Diagnostics/HyGuiComms.h"
 
 #define HYASSETS_AtlasDir "Atlases/"
+
+template<typename tData>
+void HyAssets::NodeData<tData>::Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef)
+{
+	m_DataList.reserve(subDirObjRef.size());
+
+	uint32 i = 0;
+	for(auto iter = subDirObjRef.kv_map().begin(); iter != subDirObjRef.kv_map().end(); ++iter, ++i)
+	{
+		std::string sPath = MakeStringProperPath(iter->first.c_str(), nullptr, true);
+		m_LookupIndexMap.insert(std::make_pair(sPath, i));
+
+		m_DataList.emplace_back(iter->first, subDirObjRef.get<jsonxx::Value>(iter->first), assetsRef);
+	}
+}
+
+template<typename tData>
+tData *HyAssets::NodeData<tData>::GetData(const std::string &sPrefix, const std::string &sName)
+{
+	std::string sPath;
+
+	if(sPrefix.empty() == false)
+		sPath += MakeStringProperPath(sPrefix.c_str(), "/", true);
+
+	sPath += sName;
+	sPath = MakeStringProperPath(sPath.c_str(), nullptr, true);
+
+	auto iter = m_LookupIndexMap.find(sPath);
+	HyAssert(iter != m_LookupIndexMap.end(), "Could not find data: " << sPath.c_str());
+
+	return &m_DataList[iter->second];
+}
 
 HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
 																							m_GfxCommsRef(gfxCommsRef),
@@ -137,7 +169,7 @@ std::string HyAssets::GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureInde
 	return sTexturePath;
 }
 
-void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyData *&pDataOut)
+void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyNodeData *&pDataOut)
 {
 	switch(pDrawNode->GetType())
 	{

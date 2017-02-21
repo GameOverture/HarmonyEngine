@@ -7,13 +7,13 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Assets/Data/HySpine2dData.h"
+#include "Assets/Nodes/HySpine2dData.h"
 
 #include "Renderer/IHyRenderer.h"
 #include "Diagnostics/HyGuiComms.h"
 #include "Utilities/HyFileIO.h"
 
-HySpine2dData::HySpine2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyData(HYTYPE_Spine2d, sPath)
+HySpine2dData::HySpine2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_Spine2d, sPath)
 {
 	std::string sAtlasPath(GetPath());
 	sAtlasPath += ".atlas";

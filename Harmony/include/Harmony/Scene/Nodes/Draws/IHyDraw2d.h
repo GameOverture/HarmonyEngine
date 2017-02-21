@@ -15,7 +15,7 @@
 #include "Scene/Nodes/Transforms/IHyTransform2d.h"
 #include "Scene/Nodes/Misc/HyCamera.h"
 
-#include "Assets/Data/IHyData.h"
+#include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/Loadables/IHyShader.h"
 
 #include "Renderer/Components/HyRenderState.h"
@@ -34,7 +34,7 @@ class IHyDraw2d : public IHyTransform2d
 	std::set<uint32>				m_RequiredAtlasIds;
 	std::set<int32>					m_RequiredCustomShaders;
 
-	IHyData *						m_pData;
+	IHyNodeData *						m_pData;
 
 protected:
 	const std::string				m_sNAME;
@@ -81,7 +81,7 @@ public:
 	const std::string &GetName();
 	const std::string &GetPrefix();
 
-	IHyData *AcquireData();
+	IHyNodeData *AcquireData();
 
 	HyCoordinateType GetCoordinateType();
 	void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);
@@ -111,7 +111,7 @@ public:
 
 protected:
 	bool IsSelfLoaded();
-	IHyData *UncheckedGetData();
+	IHyNodeData *UncheckedGetData();
 	void MakeBoundingVolumeDirty();
 
 private:

@@ -12,12 +12,12 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/Data/IHyData.h"
+#include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
 
 class HySound;
 
-class HyAudioData : public IHyData
+class HyAudioData : public IHyNodeData
 {
 public:
 	HyAudioData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);

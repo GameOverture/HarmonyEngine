@@ -12,10 +12,10 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/Data/IHyData.h"
+#include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
 
-class HyTexturedQuad2dData : public IHyData
+class HyTexturedQuad2dData : public IHyNodeData
 {
 	const uint32		m_uiATLASGROUP_ID;
 	HyAtlasGroup *		m_pAtlas;

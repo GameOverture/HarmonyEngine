@@ -12,10 +12,10 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/Data/IHyData.h"
+#include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/Loadables/HyAtlasGroup.h"
 
-class HyPrimitive2dData : public IHyData
+class HyPrimitive2dData : public IHyNodeData
 {
 public:
 	HyPrimitive2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);

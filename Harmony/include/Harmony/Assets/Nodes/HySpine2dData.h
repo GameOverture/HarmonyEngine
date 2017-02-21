@@ -12,13 +12,13 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/Data/IHyData.h"
+#include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
 
 #include "spine/spine.h"
 #include "spine/extension.h"
 
-class HySpine2dData : public IHyData
+class HySpine2dData : public IHyNodeData
 {
 	spAtlas *				m_SpineAtlasData;
 	spSkeletonData *		m_SpineSkeletonData;

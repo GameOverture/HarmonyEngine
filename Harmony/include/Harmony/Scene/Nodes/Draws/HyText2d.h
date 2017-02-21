@@ -12,7 +12,7 @@
 
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
 
-#include "Assets/Data/HyText2dData.h"
+#include "Assets/Nodes/HyText2dData.h"
 
 #include <vector>
 

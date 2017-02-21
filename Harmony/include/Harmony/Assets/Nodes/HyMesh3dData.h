@@ -12,10 +12,10 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Assets/Data/IHyData.h"
+#include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/Loadables/HyAtlasGroup.h"
 
-class HyMesh3dData : public IHyData
+class HyMesh3dData : public IHyNodeData
 {
 	glm::vec3				m_vAmbientReflectivity;
 	glm::vec3				m_vDiffuseReflectivity;

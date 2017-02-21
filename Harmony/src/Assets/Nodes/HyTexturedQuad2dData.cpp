@@ -7,12 +7,12 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Assets/Data/HyTexturedQuad2dData.h"
+#include "Assets/Nodes/HyTexturedQuad2dData.h"
 
 #include "Renderer/IHyRenderer.h"
 
 
-HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath, HyAssets &assetsRef) :	IHyData(HYTYPE_TexturedQuad2d, sPath),
+HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_TexturedQuad2d, sPath),
 																							m_uiATLASGROUP_ID(sPath == "raw" ? 0xFFFFFFFF : std::stoi(sPath)),
 																							m_pAtlas(nullptr)
 {
