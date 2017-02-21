@@ -324,10 +324,12 @@ float WidgetFontModel::GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs)
     {
         for(int j = 0; j < sAvailableTypefaceGlyphs.count(); ++j)
         {
-            char cCharacter = sAvailableTypefaceGlyphs.toStdString().c_str()[j];
-            texture_glyph_t *pGlyph = texture_font_get_glyph(m_LayerList[i]->pReference->pTextureFont, &cCharacter);
+            // NOTE: Assumes LITTLE ENDIAN
+            QString sSingleChar = sAvailableTypefaceGlyphs[j];
+            texture_glyph_t *pGlyph = texture_font_get_glyph(m_LayerList[i]->pReference->pTextureFont, sSingleChar.toUtf8().data());
 
-            if(fLeftSideNudgeAmt < abs(pGlyph->offset_x))
+            // Only keep track of negative offset_x's
+            if(pGlyph->offset_x < 0 && fLeftSideNudgeAmt < abs(pGlyph->offset_x))
                 fLeftSideNudgeAmt = abs(pGlyph->offset_x);
         }
     }

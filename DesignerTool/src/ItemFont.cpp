@@ -168,8 +168,9 @@ ItemFont::ItemFont(const QString sPath, QJsonValue initVal, WidgetAtlasManager &
             {
                 FontStagePass *pFontStage = pFontModel->GetStageRef(i);
 
-                char cCharacter = sFontPreviewString.toStdString().c_str()[j];
-                texture_glyph_t *pGlyph = texture_font_get_glyph(pFontStage->pTextureFont, &cCharacter);
+                // NOTE: Assumes LITTLE ENDIAN
+                QString sSingleChar = sFontPreviewString[j];
+                texture_glyph_t *pGlyph = texture_font_get_glyph(pFontStage->pTextureFont, sSingleChar.toUtf8().data());
 
                 if(pGlyph == NULL)
                 {

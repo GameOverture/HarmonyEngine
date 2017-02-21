@@ -519,11 +519,12 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
         QJsonArray glyphsArray;
         for(int j = 0; j < m_sAvailableTypefaceGlyphs.count(); ++j)
         {
-            char cCharacter = m_sAvailableTypefaceGlyphs.toStdString().c_str()[j];
-            texture_glyph_t *pGlyph = texture_font_get_glyph(m_MasterStageList[i]->pTextureFont, &cCharacter);
+            // NOTE: Assumes LITTLE ENDIAN
+            QString sSingleChar = m_sAvailableTypefaceGlyphs[j];
+            texture_glyph_t *pGlyph = texture_font_get_glyph(m_MasterStageList[i]->pTextureFont, sSingleChar.toUtf8().data());
             
             QJsonObject glyphInfoObj;
-            glyphInfoObj.insert("code", static_cast<int>(pGlyph->codepoint));
+            glyphInfoObj.insert("code", QJsonValue(static_cast<qint64>(pGlyph->codepoint)));
             glyphInfoObj.insert("advance_x", pGlyph->advance_x);
             glyphInfoObj.insert("advance_y", pGlyph->advance_y);
             glyphInfoObj.insert("width", static_cast<int>(pGlyph->width));
