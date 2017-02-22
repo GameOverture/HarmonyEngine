@@ -1,0 +1,36 @@
+{
+    "chkAutosize": true,
+    "chkMerge": true,
+    "chkSquare": true,
+    "cmbHeuristic": 1,
+    "cmbSortOrder": 0,
+    "extrude": 1,
+    "filters": [
+    ],
+    "frames": [
+        {
+            "checksum": 462369872,
+            "cropBottom": 517,
+            "cropLeft": 0,
+            "cropRight": 517,
+            "cropTop": 0,
+            "errors": 0,
+            "filter": "",
+            "height": 518,
+            "name": "NewFont",
+            "textureIndex": 0,
+            "type": 4,
+            "width": 518,
+            "x": 0,
+            "y": 0
+        }
+    ],
+    "minFillRate": 80,
+    "sbFrameMarginBottom": 1,
+    "sbFrameMarginLeft": 0,
+    "sbFrameMarginRight": 1,
+    "sbFrameMarginTop": 0,
+    "sbTextureHeight": 2048,
+    "sbTextureWidth": 2048,
+    "txtName": "Group ID: 1"
+}

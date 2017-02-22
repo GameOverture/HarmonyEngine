@@ -69,7 +69,7 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     ui->cmbAtlasGroups->setModel(m_pItemFont->GetAtlasManager().AllocateAtlasModelView());
     
     // If item's init value is defined, parse and initalize with it, otherwise make default empty font
-    if(m_pItemFont->GetInitValue().isUndefined() == false)
+    if(m_pItemFont->GetInitValue().type() != QJsonValue::Null)
     {
         QJsonObject fontObj = m_pItemFont->GetInitValue().toObject();
 

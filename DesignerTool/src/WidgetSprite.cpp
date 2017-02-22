@@ -66,7 +66,7 @@ WidgetSprite::~WidgetSprite()
 void WidgetSprite::Load()
 {
     // If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
-    if(m_pItemSprite->GetInitValue().isUndefined() == false)
+    if(m_pItemSprite->GetInitValue().type() != QJsonValue::Null)
     {
         QJsonArray stateArray = m_pItemSprite->GetInitValue().toArray();
         for(int i = 0; i < stateArray.size(); ++i)
