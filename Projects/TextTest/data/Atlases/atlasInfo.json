@@ -6,10 +6,19 @@
         "textures": [
             [
                 {
-                    "bottom": 518,
-                    "checksum": 462369872,
+                    "bottom": 1556,
+                    "checksum": 2538730877,
                     "left": 0,
-                    "right": 518,
+                    "right": 1556,
+                    "top": 0
+                }
+            ],
+            [
+                {
+                    "bottom": 1331,
+                    "checksum": 3782867258,
+                    "left": 0,
+                    "right": 1331,
                     "top": 0
                 }
             ]

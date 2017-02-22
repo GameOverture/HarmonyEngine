@@ -281,6 +281,8 @@ offsetCalculation:
 	uint32 uiNewlineIndex = 0;
 	uint32 uiNumNewlineCharacters = 0;
 	bool bTerminatedEarly = false;
+	bool bFirstCharacterOnNewLine = true;
+	float fLeftSideNudgeAmt = 0.0f;
 
 	for(uint32 uiStrIndex = 0; uiStrIndex < uiSTR_SIZE; ++uiStrIndex)
 	{
@@ -311,9 +313,17 @@ offsetCalculation:
 
 				// TODO: Apply kerning if it isn't the first character of a newline
 				float fKerning = 0.0f;
+				if(bFirstCharacterOnNewLine)
+				{
+					if(glyphRef.iOFFSET_X < 0 && fLeftSideNudgeAmt < abs(glyphRef.iOFFSET_X))
+						fLeftSideNudgeAmt = static_cast<float>(abs(glyphRef.iOFFSET_X));
+				}
+				else
+				{
+					fKerning = 0.0f;
+				}
 
 				uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiSTR_SIZE * ((uiNUM_LAYERS - 1) - iLayerIndex)));
-
 				m_pGlyphOffsets[iGlyphOffsetIndex].x = pWritePos[iLayerIndex].x + ((fKerning + glyphRef.iOFFSET_X) * m_fScaleBoxModifier);
 				m_pGlyphOffsets[iGlyphOffsetIndex].y = pWritePos[iLayerIndex].y - ((glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y) * m_fScaleBoxModifier);
 
@@ -322,8 +332,8 @@ offsetCalculation:
 
 				pWritePos[iLayerIndex].x += (glyphRef.fADVANCE_X * m_fScaleBoxModifier);
 
-				if(fCurLineWidth < m_pGlyphOffsets[iGlyphOffsetIndex].x + ((glyphRef.uiWIDTH + pData->GetLeftSideNudgeAmt(m_uiCurFontState)) * m_fScaleBoxModifier))
-					fCurLineWidth = m_pGlyphOffsets[iGlyphOffsetIndex].x + ((glyphRef.uiWIDTH + pData->GetLeftSideNudgeAmt(m_uiCurFontState)) * m_fScaleBoxModifier);
+				if(fCurLineWidth < m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier))
+					fCurLineWidth = m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier);
 
 				// If drawing text within a box, and we advance past our width, determine if we should newline
 				if((m_uiBoxAttributes & BOXATTRIB_TextBox) == 0 &&
@@ -342,6 +352,24 @@ offsetCalculation:
 						}
 					}
 				}
+			}
+
+			if(bFirstCharacterOnNewLine)
+			{
+				// Handle every layer for this character
+				for(uint32 iLayerIndex = 0; iLayerIndex < uiNUM_LAYERS; ++iLayerIndex)
+				{
+					uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiSTR_SIZE * ((uiNUM_LAYERS - 1) - iLayerIndex)));
+					m_pGlyphOffsets[iGlyphOffsetIndex].x += (fLeftSideNudgeAmt * m_fScaleBoxModifier);
+					pWritePos[iLayerIndex].x += (fLeftSideNudgeAmt * m_fScaleBoxModifier);
+
+					const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, HyUtf8_to_Utf32(&m_sCurrentString[uiStrIndex]));
+					if(fCurLineWidth < m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier))
+						fCurLineWidth = m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier);
+				}
+
+				fLeftSideNudgeAmt = 0.0f;
+				bFirstCharacterOnNewLine = false;
 			}
 		}
 
@@ -383,6 +411,8 @@ offsetCalculation:
 			// The next for-loop iteration will increment uiStrIndex to the character after the ' '. Assign uiNewlineIndex and uiLastSpaceIndex a '+1' to compensate
 			uiNewlineIndex = uiLastSpaceIndex = uiStrIndex + 1;
 
+			bFirstCharacterOnNewLine = true;
+
 			//// Determine if we've exhausted all available vertical space (if extending bottom attribute is off)
 			//if(0 != (m_uiBoxAttributes & BOXATTRIB_IsUsed) && 0 == (m_uiBoxAttributes & BOXATTRIB_ExtendingBottom) && (abs(pWritePos[0].y) + pData->GetLineDescender(m_uiCurFontState)) > m_vBoxDimensions.y)
 			//{
@@ -403,8 +433,8 @@ offsetCalculation:
 	m_RenderState.SetNumInstances((m_uiNumValidCharacters * uiNUM_LAYERS) - uiNumNewlineCharacters);
 
 	// Apply a left side nudge which is equal to the glyph with the most negative 'offset_x'
-	for(uint32 i = 0; i < m_uiNumReservedGlyphOffsets; ++i)
-		m_pGlyphOffsets[i].x += (pData->GetLeftSideNudgeAmt(m_uiCurFontState) * m_fScaleBoxModifier);
+	//for(uint32 i = 0; i < m_uiNumReservedGlyphOffsets; ++i)
+	//	m_pGlyphOffsets[i].x += (pData->GetLeftSideNudgeAmt(m_uiCurFontState) * m_fScaleBoxModifier);
 
 	// Fix each text line to match proper alignment (HYALIGN_Left is already set at this point)
 	if(m_eAlignment != HYALIGN_Left)

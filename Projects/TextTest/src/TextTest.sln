@@ -3,12 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TextTest", "TextTest.vcxproj", "{458955a9-eca7-4f4b-a164-7ed5656640d1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TextTest", "TextTest.vcxproj", "{458955A9-ECA7-4F4B-A164-7ED5656640D1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A} = {FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Harmony_vs2013", "../../../Harmony/src/Harmony_vs2013.vcxproj", "{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Harmony", "..\..\..\Harmony\src\Harmony_vs2013.vcxproj", "{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,12 +18,14 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{458955a9-eca7-4f4b-a164-7ed5656640d1}.Debug|Win32.ActiveCfg = Debug|Win32
-		{458955a9-eca7-4f4b-a164-7ed5656640d1}.Debug|Win32.Build.0 = Debug|Win32
-		{458955a9-eca7-4f4b-a164-7ed5656640d1}.Debug|x64.ActiveCfg = Debug|Win32
-		{458955a9-eca7-4f4b-a164-7ed5656640d1}.Release|Win32.ActiveCfg = Release|Win32
-		{458955a9-eca7-4f4b-a164-7ed5656640d1}.Release|Win32.Build.0 = Release|Win32
-		{458955a9-eca7-4f4b-a164-7ed5656640d1}.Release|x64.ActiveCfg = Release|Win32
+		{458955A9-ECA7-4F4B-A164-7ED5656640D1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{458955A9-ECA7-4F4B-A164-7ED5656640D1}.Debug|Win32.Build.0 = Debug|Win32
+		{458955A9-ECA7-4F4B-A164-7ED5656640D1}.Debug|x64.ActiveCfg = Debug|x64
+		{458955A9-ECA7-4F4B-A164-7ED5656640D1}.Debug|x64.Build.0 = Debug|x64
+		{458955A9-ECA7-4F4B-A164-7ED5656640D1}.Release|Win32.ActiveCfg = Release|Win32
+		{458955A9-ECA7-4F4B-A164-7ED5656640D1}.Release|Win32.Build.0 = Release|Win32
+		{458955A9-ECA7-4F4B-A164-7ED5656640D1}.Release|x64.ActiveCfg = Release|x64
+		{458955A9-ECA7-4F4B-A164-7ED5656640D1}.Release|x64.Build.0 = Release|x64
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.Debug|Win32.ActiveCfg = Debug|Win32
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.Debug|Win32.Build.0 = Debug|Win32
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.Debug|x64.ActiveCfg = Debug|x64
