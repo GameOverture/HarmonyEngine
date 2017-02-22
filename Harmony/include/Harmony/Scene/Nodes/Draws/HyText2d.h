@@ -98,7 +98,7 @@ public:
 protected:
 	virtual void OnUpdate() override;
 	virtual void OnDataAcquired() override;
-
+	virtual void OnLoaded() override;
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 };

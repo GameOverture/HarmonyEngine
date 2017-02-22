@@ -219,16 +219,20 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	}
 }
 
+/*virtual*/ void HyText2d::OnLoaded()
+{
+	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(UncheckedGetData());
+	m_RenderState.SetTextureHandle(pTextData->GetAtlasGroup()->GetGfxApiHandle(pTextData->GetAtlasGroupTextureIndex()));
+}
+
 /*virtual*/ void HyText2d::OnUpdate()
 {
-	if(IsSelfLoaded() == false || m_bIsDirty == false)
+	if(m_bIsDirty == false)
 		return;
 
+	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
+
 	m_uiNumValidCharacters = 0;
-
-	HyText2dData *pData = static_cast<HyText2dData *>(UncheckedGetData());
-	m_RenderState.SetTextureHandle(pData->GetAtlasGroup()->GetGfxApiHandle(pData->GetAtlasGroupTextureIndex()));
-
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
 	const uint32 uiSTR_SIZE = static_cast<uint32>(m_sCurrentString.size());
 	

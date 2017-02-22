@@ -121,6 +121,8 @@ private:
 	void DequeData(IHyLoadableData *pData);
 	void FinalizeData(IHyLoadableData *pData);
 
+	void SetNodeAsLoaded(IHyDraw2d *pDrawNode2d);
+
 	static void LoadingThread(void *pParam);
 };
 

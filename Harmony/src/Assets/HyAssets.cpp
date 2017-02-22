@@ -231,8 +231,7 @@ void HyAssets::LoadGfxData(IHyDraw2d *pDrawNode2d)
 	}
 	else
 	{
-		m_SceneRef.AddInstance(pDrawNode2d);
-		pDrawNode2d->m_eLoadState = HYLOADSTATE_Loaded;
+		SetNodeAsLoaded(pDrawNode2d);
 	}
 }
 
@@ -390,10 +389,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 			if(pData == m_pLastQueuedData)
 			{
 				for(auto iter = m_QueuedInst2dList.begin(); iter != m_QueuedInst2dList.end(); ++iter)
-				{
-					m_SceneRef.AddInstance(*iter);
-					(*iter)->m_eLoadState = HYLOADSTATE_Loaded;
-				}
+					SetNodeAsLoaded(*iter);
 
 				m_QueuedInst2dList.clear();
 				m_pLastQueuedData = nullptr;
@@ -408,6 +404,13 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 		if(pData == m_pLastDiscardedData)
 			m_pLastDiscardedData = nullptr;
 	}
+}
+
+void HyAssets::SetNodeAsLoaded(IHyDraw2d *pDrawNode2d)
+{
+	m_SceneRef.AddInstance(pDrawNode2d);
+	pDrawNode2d->m_eLoadState = HYLOADSTATE_Loaded;
+	pDrawNode2d->OnLoaded();
 }
 
 /*static*/ void HyAssets::LoadingThread(void *pParam)

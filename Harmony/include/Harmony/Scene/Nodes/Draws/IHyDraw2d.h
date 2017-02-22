@@ -120,7 +120,8 @@ private:
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
 	virtual void OnUpdate() { };
-	virtual void OnDataAcquired() { }
+	virtual void OnDataAcquired() { }									// Invoked once on the first time this node's data is queried
+	virtual void OnLoaded() { }											// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
 	virtual void OnCalcBoundingVolume() { }								// Should calculate the local bounding volume in 'm_BoundingVolume'
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) { }		// This function is responsible for incrementing the passed in reference pointer the size of the data written
