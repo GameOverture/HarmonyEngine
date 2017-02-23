@@ -130,6 +130,14 @@ bool IHyNode::HasParent()
 	return m_pParent != NULL;
 }
 
+void IHyNode::ForEachChild(std::function<void(IHyNode *)> func)
+{
+	func(this);
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->ForEachChild(func);
+}
+
 void IHyNode::Update()
 {
 	// Update any currently active AnimFloat associated with this transform, and remove any of them that are finished.

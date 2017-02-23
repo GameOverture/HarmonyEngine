@@ -181,7 +181,7 @@ void HyScene::WriteDrawBuffer()
 				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_WindowListRef[i]->m_Cams2dList[j]->GetViewport();
 				m_pCurWritePos += sizeof(HyRectangle<float>);
 
-				m_WindowListRef[i]->m_Cams2dList[j]->GetLocalTransform_SRT(mtxView);
+				m_WindowListRef[i]->m_Cams2dList[j]->GetLocalTransform(mtxView);
 
 				// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly above or in the shader)
 				mtxView[3].x *= -1;

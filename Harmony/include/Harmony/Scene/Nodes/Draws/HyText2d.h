@@ -65,10 +65,9 @@ public:
 	HyText2d(const char *szPrefix, const char *szName);
 	virtual ~HyText2d(void);
 
-	// Accepts newline characters '\n'
-	void TextSet(std::string sText);
-	void TextSet(char cChar);
-	std::string TextGet();
+	// Assumes UTF-8 encoding. Accepts newline characters '\n'
+	void TextSet(const std::string &sTextRef);
+	const std::string &TextGet() const;
 
 	uint32 TextGetStrLength();
 	float TextGetScaleBoxModifer();

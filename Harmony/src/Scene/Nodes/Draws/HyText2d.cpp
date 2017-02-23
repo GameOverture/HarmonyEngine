@@ -36,26 +36,17 @@ HyText2d::~HyText2d(void)
 	delete[] m_pGlyphOffsets;
 }
 
-// Accepts newline characters '\n'
-void HyText2d::TextSet(std::string sText)
+// Assumes UTF-8 encoding. Accepts newline characters '\n'
+void HyText2d::TextSet(const std::string &sTextRef)
 {
-	if(sText == m_sCurrentString)
+	if(sTextRef == m_sCurrentString)
 		return;
 
-	m_sCurrentString = sText;
+	m_sCurrentString = sTextRef;
 	m_bIsDirty = true;
 }
 
-void HyText2d::TextSet(char cChar)
-{
-	if(m_sCurrentString.length() == 1 && m_sCurrentString[0] == cChar)
-		return;
-
-	m_sCurrentString = cChar;
-	m_bIsDirty = true;
-}
-
-std::string HyText2d::TextGet()
+const std::string &HyText2d::TextGet() const
 {
 	return m_sCurrentString;
 }
@@ -234,6 +225,10 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 	m_uiNumValidCharacters = 0;
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
+
+
+	// TODO: Convert 'm_sCurrentString' from UTF-8 to UTF-32LE
+
 	const uint32 uiSTR_SIZE = static_cast<uint32>(m_sCurrentString.size());
 	
 	if(m_pGlyphOffsets == nullptr || m_uiNumReservedGlyphOffsets < uiSTR_SIZE * uiNUM_LAYERS)

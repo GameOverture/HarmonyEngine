@@ -13,6 +13,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/HyScene.h"
 
+#include <functional>
+
 class IHyNode
 {
 	friend class HyScene;
@@ -51,6 +53,8 @@ public:
 	bool HasChild(IHyNode &childInst);
 	void Detach();
 	bool HasParent();
+
+	void ForEachChild(std::function<void(IHyNode *)> func);
 
 protected:
 	void Update();

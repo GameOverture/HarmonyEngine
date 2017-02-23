@@ -323,11 +323,17 @@ void IHyDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 									 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.right),
 									 static_cast<uint32>(mtx[1].y * m_LocalScissorRect.top));
 
-		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		{
-			if(m_ChildList[i]->IsDraw2d())
-				static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.SetScissorRect(m_RenderState.GetScissorRect());
-		}
+		ForEachChild([&](IHyNode *pThis)
+					{
+						if(pThis->IsDraw2d())
+							static_cast<IHyDraw2d *>(pThis)->m_RenderState.SetScissorRect(this->m_RenderState.GetScissorRect());
+					});
+		
+		//for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		//{
+		//	if(m_ChildList[i]->IsDraw2d())
+		//		static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.SetScissorRect(m_RenderState.GetScissorRect());
+		//}
 	}
 
 	if((m_uiAttributes & (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_MouseInput)) != 0)
