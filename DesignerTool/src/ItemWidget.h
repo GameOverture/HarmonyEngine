@@ -70,7 +70,7 @@ protected:
     virtual QJsonValue OnSave() = 0;
 
 public:
-    ItemWidget(eItemType eType, const QString sPath, QJsonValue initVal, WidgetAtlasManager &AtlasManRef, WidgetAudioManager &AudioManRef);
+    ItemWidget(eItemType eType, const QString sPrefix, const QString sName, QJsonValue initVal, WidgetAtlasManager &AtlasManRef, WidgetAudioManager &AudioManRef);
     virtual ~ItemWidget();
     
     QJsonValue GetInitValue()                       { return m_InitValue; }

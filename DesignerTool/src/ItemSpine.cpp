@@ -11,7 +11,7 @@
 
 #include <QMenu>
 
-ItemSpine::ItemSpine(const QString sPath, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) :   ItemWidget(ITEM_Spine, sPath, initVal, atlasManRef, audioManRef)
+ItemSpine::ItemSpine(const QString sPrefix, const QString sName, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) :   ItemWidget(ITEM_Spine, sPrefix, sName, initVal, atlasManRef, audioManRef)
 {
     m_pWidget = new WidgetSpine(this);
 }

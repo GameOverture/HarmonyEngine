@@ -72,6 +72,7 @@ public:
     QString GetDirPath() const;
     QString GetGameName() const                         { return m_sGameName; }
     
+    QString GetAbsPath() const                          { return m_sPATH; }
     QString GetAssetsAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeAssetsLocation) + '/'; }
     QString GetAssetsRelPath() const                    { return QDir::cleanPath(m_sRelativeAssetsLocation) + '/'; }
     QString GetMetaDataAbsPath() const                  { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeMetaDataLocation) + '/'; }
@@ -101,6 +102,8 @@ public:
     void SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal);
     void SaveGameData();
     void SaveUserData();
+
+    QJsonObject GetSubDirObj(eItemType eType);
 
 private Q_SLOTS:
     void on_tabBar_currentChanged(int index);

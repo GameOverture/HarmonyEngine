@@ -16,9 +16,10 @@
 #include <QStringBuilder>
 #include <QPushButton>
 
-DlgNewItem::DlgNewItem(const QString &sSubDirPath, eItemType eItem, QWidget *parent) :
-    QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-    ui(new Ui::DlgNewItem)
+DlgNewItem::DlgNewItem(ItemProject *pItemProject, eItemType eItem, QWidget *parent) :   QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+                                                                                        ui(new Ui::DlgNewItem),
+                                                                                        m_pItemProject(pItemProject),
+                                                                                        m_eItemType(eItem)
 {
     
     ui->setupUi(this);
@@ -26,37 +27,40 @@ DlgNewItem::DlgNewItem(const QString &sSubDirPath, eItemType eItem, QWidget *par
     setWindowTitle("Add a new " % HyGlobal::ItemName(eItem) % " item");
     setWindowIcon(HyGlobal::ItemIcon(eItem));
     
-    m_sSubDirPath = sSubDirPath;
-    m_sItemExt = HyGlobal::ItemExt(eItem);
-    
-    QDir subDir(m_sSubDirPath);
-    Q_ASSERT(0 == QString::compare(subDir.dirName(), HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eItem)), Qt::CaseInsensitive));
-
     ui->txtName->setValidator(HyGlobal::FileNameValidator());
     ui->txtPrefix->setValidator(HyGlobal::FilePathValidator());
     on_chkNewPrefix_stateChanged(ui->chkNewPrefix->isChecked() ? Qt::Checked : Qt::Unchecked);
 
-    QStringList sListOfDirPrefixs;
-    sListOfDirPrefixs.append(QString("<no prefix>"));
-    
-    QDirIterator dirIter(subDir, QDirIterator::Subdirectories);
-    while(dirIter.hasNext())
+    m_sListOfDirPrefixes.clear();
+    m_sListOfDirPrefixes.append(QString("<no prefix>"));
+
+    QJsonObject subDirObj = m_pItemProject->GetSubDirObj(HyGlobal::GetCorrespondingDirItem(eItem));
+
+    // ITEMS IN SUBDIR
+    for(auto objsInSubDirIter = subDirObj.begin(); objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
     {
-        QString sCurPrefixPath = dirIter.next();
-        
-        if(sCurPrefixPath.endsWith(QChar('.')) || dirIter.fileInfo().isDir() == false)
-            continue;
-        
-        QString sRelativePath = subDir.relativeFilePath(sCurPrefixPath);
-        sListOfDirPrefixs.append(sRelativePath);
+        QString sItemPath = objsInSubDirIter.key();
+        QStringList sPathPartList = sItemPath.split("/");
+        QString sCurPrefix = "";
+
+        // PATH PARTS
+        for(int iPathPartIndex = 0; iPathPartIndex < sPathPartList.size() - 1; ++iPathPartIndex)
+        {
+            if(iPathPartIndex != 0)
+                sCurPrefix += "/";
+
+            sCurPrefix += sPathPartList[iPathPartIndex];
+        }
+
+        m_sListOfDirPrefixes.append(sCurPrefix);
     }
+
     ui->cmbPrefixList->clear();
-    ui->cmbPrefixList->addItems(sListOfDirPrefixs);
+    ui->cmbPrefixList->addItems(m_sListOfDirPrefixes);
     
     
     ui->lblName->setText(HyGlobal::ItemName(eItem) % " Name:");
     ui->txtName->setText("New" % HyGlobal::ItemName(eItem));
-    
     
     ui->txtName->selectAll();
 }
@@ -74,7 +78,7 @@ QString DlgNewItem::GetName()
 QString DlgNewItem::GetPrefix()
 {
     if(ui->chkNewPrefix->isChecked())
-        return QDir::cleanPath(ui->txtPrefix->text());
+        return QString(MakeStringProperPath(ui->txtPrefix->text().toStdString().c_str(), nullptr, false).c_str());
     else
         return ui->cmbPrefixList->currentIndex() == 0 ? QString() : ui->cmbPrefixList->currentText();
 }
@@ -118,12 +122,7 @@ void DlgNewItem::on_cmbPrefixList_currentIndexChanged(const QString &arg1)
 
 void DlgNewItem::ErrorCheck()
 {
-    QString sPrefix;
-    
-    if(ui->chkNewPrefix->isChecked())
-        sPrefix = ui->txtPrefix->text();
-    else if(ui->cmbPrefixList->currentIndex() != 0)
-        sPrefix = ui->cmbPrefixList->currentText();
+    QString sPrefix = GetPrefix();
     
     bool bIsError = false;
     do
@@ -151,26 +150,43 @@ void DlgNewItem::ErrorCheck()
             break;
         }
         
-        QString sNewItemPath = m_sSubDirPath % '/' % sPrefix % '/' % ui->txtName->text() % m_sItemExt;
-        QDir newItemDir(sNewItemPath);
-        if(newItemDir.exists())
-        {
-            ui->lblError->setText("Error: An item with this name at this location already exists.");
-            bIsError = true;
-            break;
-        }
-
+        bool bFoundDup = false;
         if(ui->chkNewPrefix->isChecked())
         {
-            QString sPrefixPath = m_sSubDirPath % '/' % ui->txtPrefix->text();
-            QDir prefixDir(sPrefixPath);
-            if(prefixDir.exists())
+            for(uint i = 0; i < m_sListOfDirPrefixes.size(); ++i)
+            {
+                if(0 == sPrefix.compare(m_sListOfDirPrefixes[i], Qt::CaseInsensitive))
+                {
+                    bFoundDup = true;
+                    break;
+                }
+            }
+            if(bFoundDup)
             {
                 ui->lblError->setText("Error: This prefix already exists.");
                 bIsError = true;
                 break;
             }
         }
+
+        QString sNewItemPath = sPrefix % '/' % ui->txtName->text();
+        QJsonObject subDirObj = m_pItemProject->GetSubDirObj(HyGlobal::GetCorrespondingDirItem(m_eItemType));
+        for(auto objsInSubDirIter = subDirObj.begin(); objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
+        {
+            QString sItemPath = objsInSubDirIter.key();
+            if(0 == sNewItemPath.compare(sItemPath, Qt::CaseInsensitive))
+            {
+                bFoundDup = true;
+                break;
+            }
+        }
+        if(bFoundDup)
+        {
+            ui->lblError->setText("Error: An item with this name at this prefix already exists.");
+            bIsError = true;
+            break;
+        }
+
     }while(false);
 
     if(bIsError)
@@ -187,9 +203,4 @@ void DlgNewItem::ErrorCheck()
 
 void DlgNewItem::on_buttonBox_accepted()
 {
-    if(ui->chkNewPrefix->isChecked())
-    {
-        QDir itemDir(m_sSubDirPath);
-        itemDir.mkpath(ui->txtPrefix->text());
-    }
 }

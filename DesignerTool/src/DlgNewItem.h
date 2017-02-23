@@ -13,6 +13,7 @@
 #include <QDialog>
 
 #include "HyGlobal.h"
+#include "ItemProject.h"
 
 namespace Ui {
 class DlgNewItem;
@@ -22,11 +23,13 @@ class DlgNewItem : public QDialog
 {
     Q_OBJECT
 
-    QString         m_sSubDirPath;
-    QString         m_sItemExt;
+    ItemProject *   m_pItemProject;
+    eItemType       m_eItemType;
+    QStringList     m_sListOfDirPrefixes;
+    QStringList     m_sListOfDirFullPaths;
 
 public:
-    explicit DlgNewItem(const QString &sSubDirPath, eItemType eItem, QWidget *parent = 0);
+    explicit DlgNewItem(ItemProject *pItemProject, eItemType eItem, QWidget *parent = 0);
     ~DlgNewItem();
     
     QString GetName();

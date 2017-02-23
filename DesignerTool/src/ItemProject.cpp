@@ -341,7 +341,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
 
             // Create prefix folder tree items if they don't exist, and finally adding the tree item for the data itself
             QStringList sPathPartList = sItemPath.split("/");
-            QString sCurPath = "";
+            QString sCurPrefix = "";
             
             QTreeWidgetItem *pCurPrefixTreeItem = pSubDirTreeItem;
             ///////////////////////////////////////
@@ -349,13 +349,13 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
             for(int iPathPartIndex = 0; iPathPartIndex < sPathPartList.size(); ++iPathPartIndex)
             {
                 if(iPathPartIndex != 0)
-                    sCurPath += "/";
-                
-                sCurPath += sPathPartList[iPathPartIndex];
+                    sCurPrefix += "/";
 
                 // Not the last path part, must be a prefix
                 if(iPathPartIndex != sPathPartList.size() - 1)
                 {
+                    sCurPrefix += sPathPartList[iPathPartIndex];
+
                     bool bPrefixFound = false;
                     for(int iChildIndex = 0; iChildIndex < pCurPrefixTreeItem->childCount(); ++iChildIndex)
                     {
@@ -369,7 +369,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
                     
                     if(bPrefixFound == false)
                     {
-                        Item *pPrefixItem = new Item(ITEM_Prefix, sCurPath);
+                        Item *pPrefixItem = new Item(ITEM_Prefix, sCurPrefix);
                         QTreeWidgetItem *pNewPrefixTreeWidget = pPrefixItem->GetTreeItem();
 
                         pCurPrefixTreeItem->addChild(pNewPrefixTreeWidget);
@@ -382,13 +382,13 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
                     switch(subDirList[i])
                     {
                     case ITEM_DirAudio:
-                        pNewDataItem = new ItemAudio(sCurPath, objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
+                        pNewDataItem = new ItemAudio(sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
                         break;
                     case ITEM_DirFonts:
-                        pNewDataItem = new ItemFont(sCurPath, objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
+                        pNewDataItem = new ItemFont(sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
                         break;
                     case ITEM_DirSprites:
-                        pNewDataItem = new ItemSprite(sCurPath, objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
+                        pNewDataItem = new ItemSprite(sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
                         break;
                     case ITEM_DirParticles:
                     case ITEM_DirSpine:
@@ -660,6 +660,11 @@ void ItemProject::SaveUserData()
 
         userFile.close();
     }
+}
+
+QJsonObject ItemProject::GetSubDirObj(eItemType eType)
+{
+    return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType))].toObject();
 }
 
 void ItemProject::on_tabBar_currentChanged(int index)

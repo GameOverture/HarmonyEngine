@@ -21,9 +21,6 @@ class DlgInputName : public QDialog
 {
     Q_OBJECT
     
-    QString         m_sPathMinusName;
-    QString         m_sFileExt;
-    
     void CtorInit(QString sDlgTitle, QString sCurName);
 
 public:
@@ -32,7 +29,6 @@ public:
     ~DlgInputName();
     
     QString GetName();
-    QString GetFullPathNameMinusExt();
     
 private Q_SLOTS:
     void on_txtName_textChanged(const QString &arg1);

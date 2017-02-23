@@ -214,12 +214,24 @@ public:
     {
         switch(eItem)
         {
-        case ITEM_Audio:        return ITEM_DirAudio;
-        case ITEM_Particles:    return ITEM_DirParticles;
-        case ITEM_Font:         return ITEM_DirFonts;
-        case ITEM_Spine:        return ITEM_DirSpine;
-        case ITEM_Sprite:       return ITEM_DirSprites;
-        case ITEM_Shader:       return ITEM_DirShaders;
+        case ITEM_Audio:
+        case ITEM_DirAudio:
+            return ITEM_DirAudio;
+        case ITEM_Particles:
+        case ITEM_DirParticles:
+            return ITEM_DirParticles;
+        case ITEM_Font:
+        case ITEM_DirFonts:
+            return ITEM_DirFonts;
+        case ITEM_Spine:
+        case ITEM_DirSpine:
+            return ITEM_DirSpine;
+        case ITEM_Sprite:
+        case ITEM_DirSprites:
+            return ITEM_DirSprites;
+        case ITEM_Shader:
+        case ITEM_DirShaders:
+            return ITEM_DirShaders;
         default:
             HyGuiLog("HyGlobal::GetCorrespondingDirItem() could not find the proper directory item", LOGTYPE_Warning);
         }

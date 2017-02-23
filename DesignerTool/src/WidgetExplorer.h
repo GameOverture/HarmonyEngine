@@ -33,7 +33,7 @@ public:
     ~WidgetExplorer();
     
     void AddItemProject(const QString sNewProjectFilePath, bool bSelectAfterAdd);
-    void AddItem(eItemType eNewItemType, const QString sNewItemPath, bool bOpenAfterAdd);
+    void AddItem(eItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd);
     void RemoveItem(Item *pItem);
     
     void SelectItem(Item *pItem);
@@ -41,7 +41,7 @@ public:
     ItemProject *GetCurProjSelected();
     Item *GetCurItemSelected();
     Item *GetCurDirSelected(bool bIncludePrefixDirs);
-    Item *GetItemByPath(QString sItemPathAbsolute);
+    //Item *GetItemByPath(QString sItemPathAbsolute);
     
     QStringList GetOpenProjectPaths();
 

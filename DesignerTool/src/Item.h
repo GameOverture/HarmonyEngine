@@ -37,8 +37,8 @@ public:
     QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
     
     QString GetName(bool bWithPrefix) const;
-    QString GetRelPath() const;
-    QString GetAbsPath() const                      { return m_sPATH; }
+    QString GetPath() const                         { return m_sPATH; }
+    //QString GetRelPath() const;
     QIcon GetIcon() const                           { return HyGlobal::ItemIcon(m_eTYPE); }
 };
 Q_DECLARE_METATYPE(Item *)

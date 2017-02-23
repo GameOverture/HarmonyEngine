@@ -56,34 +56,13 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath, bool bSel
         SelectItem(pItemProject);
 }
 
-void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath, bool bOpenAfterAdd)
+void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd)
 {
-    if(eNewItemType == ITEM_Unknown)
-    {
-        HyGuiLog("Invalid item passed to WidgetExplorer::AddItem()", LOGTYPE_Error);
-        return;
-    }
-    
-    // NOTE: Cannot use GetCurProjSelected() because this function may be called without anything selected in explorer widget. AKA opening an existing project and adding all its contents
-    // Update 6/26: I could probably call GetCurProjSelected() now...
-    //
     // Find the proper project tree item
-    ItemProject *pCurProj = NULL;
-    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
+    ItemProject *pCurProj = GetCurProjSelected();
+    if(pCurProj == nullptr)
     {
-        QVariant v = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole);
-        Item *pTopLevelItem = v.value<Item *>();
-        
-        if(pTopLevelItem->GetType() != ITEM_Project && sNewItemPath.contains(static_cast<ItemProject *>(pTopLevelItem)->GetDirPath(), Qt::CaseInsensitive))
-            continue;
-        
-        pCurProj = static_cast<ItemProject *>(pTopLevelItem);
-        break;
-    }
-    
-    if(pCurProj == NULL)
-    {
-        HyGuiLog("Could not find associated project for item: " % sNewItemPath, LOGTYPE_Error);
+        HyGuiLog("Could not find associated project for item: " % sPrefix % "/" % sName, LOGTYPE_Error);
         return;
     }
     
@@ -99,32 +78,25 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
     case ITEM_DirSpine:
     case ITEM_DirSprites:
     case ITEM_Prefix:
-        pItem = new Item(eNewItemType, sNewItemPath);
-        break;
+        HyGuiLog("Do not use WidgetExplorer::AddItem for Sub dirs or prefixes", LOGTYPE_Error);
+        return;
     case ITEM_Audio:
-        pItem = new ItemAudio(sNewItemPath, QJsonValue(), pCurProj->GetAtlasManager(), pCurProj->GetAudioManager());
+        pItem = new ItemAudio(sPrefix, sName, QJsonValue(), pCurProj->GetAtlasManager(), pCurProj->GetAudioManager());
         break;
     case ITEM_Sprite:
-        pItem = new ItemSprite(sNewItemPath, QJsonValue(), pCurProj->GetAtlasManager(), pCurProj->GetAudioManager());
+        pItem = new ItemSprite(sPrefix, sName, QJsonValue(), pCurProj->GetAtlasManager(), pCurProj->GetAudioManager());
         break;
     case ITEM_Font:
-        pItem = new ItemFont(sNewItemPath, QJsonValue(), pCurProj->GetAtlasManager(), pCurProj->GetAudioManager());
+        pItem = new ItemFont(sPrefix, sName, QJsonValue(), pCurProj->GetAtlasManager(), pCurProj->GetAudioManager());
         break;
     default:
-        HyGuiLog("Item: " % sNewItemPath % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
+        HyGuiLog("Item: " % sPrefix % "/" % sName % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
         return;
     }
     
-    // Get the relative path from [ProjectDir->ItemPath] e.g. "data/Sprites/SpritePrefix/MySprite.hyspi"
-    QDir assetDir(pCurProj->GetAssetsAbsPath());
-    QString sRelativePath = assetDir.relativeFilePath(pItem->GetAbsPath());
-    
+    // Get the relative path from [ProjectDir->ItemPath] e.g. "Sprites/SpritePrefix/MySprite"
+    QString sRelativePath = pItem->GetPath();
     QStringList sPathSplitList = sRelativePath.split(QChar('/'));
-//    if(QString::compare(sPathSplitList[0], "data", Qt::CaseInsensitive) != 0)
-//    {
-//        HyGuiLog("Project path does not begin inside 'data' directory", LOGTYPE_Error);
-//        return;
-//    }
     
     // Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
     QTreeWidgetItem *pParentTreeItem = pCurProj->GetTreeItem();
@@ -154,7 +126,7 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sNewItemPath,
             {
                 // Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
                 //
-                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetAbsPath() % sPathSplitList[i];
+                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetName(true) % sPathSplitList[i];
                 
                 Item *pPrefixItem = new Item(ITEM_Prefix, sPath);
                 QTreeWidgetItem *pPrefixTreeItem = pPrefixItem->GetTreeItem();
@@ -241,10 +213,11 @@ QStringList WidgetExplorer::GetOpenProjectPaths()
     
     for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
     {
-        Item *pItemVariant = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<Item *>();
-        sListOpenProjs.append(pItemVariant->GetAbsPath());
+        Item *pItem = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<Item *>();
+        ItemProject *pItemProject = static_cast<ItemProject *>(pItem);
+        sListOpenProjs.append(pItemProject->GetAbsPath());
 
-        static_cast<ItemProject *>(pItemVariant)->SaveUserData();
+        pItemProject->SaveUserData();
     }
     
     return sListOpenProjs;
@@ -304,21 +277,21 @@ Item *WidgetExplorer::GetCurDirSelected(bool bIncludePrefixDirs)
     return pCurItem;
 }
 
-Item *WidgetExplorer::GetItemByPath(QString sItemPathAbsolute)
-{
-    QTreeWidgetItemIterator it(ui->treeWidget);
-    while(*it)
-    {
-        Item *pItem = (*it)->data(0, Qt::UserRole).value<Item *>();
+//Item *WidgetExplorer::GetItemByPath(QString sItemPathAbsolute)
+//{
+//    QTreeWidgetItemIterator it(ui->treeWidget);
+//    while(*it)
+//    {
+//        Item *pItem = (*it)->data(0, Qt::UserRole).value<Item *>();
         
-        if(0 == QString::compare(pItem->GetAbsPath(), sItemPathAbsolute, Qt::CaseInsensitive))
-            return pItem;
+//        if(0 == QString::compare(pItem->GetAbsPath(), sItemPathAbsolute, Qt::CaseInsensitive))
+//            return pItem;
         
-        ++it;
-    }
+//        ++it;
+//    }
     
-    return NULL;
-}
+//    return NULL;
+//}
 
 void WidgetExplorer::OnContextMenu(const QPoint &pos)
 {

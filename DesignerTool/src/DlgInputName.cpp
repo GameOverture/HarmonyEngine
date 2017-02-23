@@ -43,11 +43,6 @@ DlgInputName::DlgInputName(const QString sDlgTitle, Item *pItem, QWidget *parent
         HyGuiLog("DlgInputName recieved a NULL Item pointer", LOGTYPE_Error);
         return;
     }
-
-    QFileInfo itemInfo;
-    itemInfo.setFile(pItem->GetAbsPath());
-    m_sPathMinusName = itemInfo.path();
-    m_sFileExt = HyGlobal::ItemExt(pItem->GetType());
     
     setWindowIcon(pItem->GetIcon());
     ui->lblName->setText(HyGlobal::ItemName(pItem->GetType()) % " Name:");
@@ -70,11 +65,6 @@ QString DlgInputName::GetName()
     return ui->txtName->text();
 }
 
-QString DlgInputName::GetFullPathNameMinusExt()
-{
-    return QDir::cleanPath(m_sPathMinusName % "/" % ui->txtName->text());
-}
-
 void DlgInputName::ErrorCheck()
 {
     bool bIsError = false;
@@ -82,21 +72,11 @@ void DlgInputName::ErrorCheck()
     {
         if(ui->txtName->text().isEmpty())
         {
-            ui->lblError->setText("Error: An item's name cannot be blank");
+            ui->lblError->setText("Error: name cannot be blank");
             bIsError = true;
             break;
         }
         
-        if(m_sPathMinusName.isEmpty() == false)
-        {
-            QDir itemDir(GetFullPathNameMinusExt() % m_sFileExt);
-            if(itemDir.exists())
-            {
-                ui->lblError->setText("Error: An item with this name at this location already exists.");
-                bIsError = true;
-                break;
-            }
-        }
     }while(false);
 
     if(bIsError)

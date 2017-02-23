@@ -496,16 +496,10 @@ void MainWindow::on_actionNewFont_triggered()
 
 void MainWindow::NewItem(eItemType eItem)
 {
-    eItemType eItemDir = HyGlobal::GetCorrespondingDirItem(eItem);
-    
-    QString sNewItemPath = ui->explorer->GetCurProjSelected()->GetAssetsAbsPath() % HyGlobal::ItemName(eItemDir) % "/";
-            
-    DlgNewItem *pDlg = new DlgNewItem(sNewItemPath, eItem, this);
+    DlgNewItem *pDlg = new DlgNewItem(m_pCurSelectedProj, eItem, this);
     if(pDlg->exec())
-    {
-        QString sPath = QDir::cleanPath(sNewItemPath % pDlg->GetPrefix() % "/" % pDlg->GetName() % HyGlobal::ItemExt(eItem));
-        ui->explorer->AddItem(eItem, sPath, true);
-    }
+        ui->explorer->AddItem(eItem, pDlg->GetPrefix(), pDlg->GetName(), true);
+
     delete pDlg;
 }
 
