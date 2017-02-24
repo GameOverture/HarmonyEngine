@@ -188,17 +188,17 @@ void IHyDraw2d::EnablePhysics(bool bEnable)
 {
 }
 
-const HyRectangle<int32> &IHyDraw2d::GetScissor()
+const HyScreenRect<int32> &IHyDraw2d::GetScissor()
 {
 	return m_LocalScissorRect;
 }
 
 void IHyDraw2d::SetScissor(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight)
 {
-	m_LocalScissorRect.left = uiX;
-	m_LocalScissorRect.bottom = uiY;
-	m_LocalScissorRect.right = uiWidth;
-	m_LocalScissorRect.top = uiHeight;
+	m_LocalScissorRect.x = uiX;
+	m_LocalScissorRect.y = uiY;
+	m_LocalScissorRect.width = uiWidth;
+	m_LocalScissorRect.height = uiHeight;
 
 	m_uiAttributes |= ATTRIBFLAG_Scissor;
 }
@@ -318,10 +318,10 @@ void IHyDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 		glm::mat4 mtx;
 		GetWorldTransform(mtx);
 
-		m_RenderState.SetScissorRect(static_cast<int32>(mtx[3].x + m_LocalScissorRect.left),
-									 static_cast<int32>(mtx[3].y + m_LocalScissorRect.bottom),
-									 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.right),
-									 static_cast<uint32>(mtx[1].y * m_LocalScissorRect.top));
+		m_RenderState.SetScissorRect(static_cast<int32>(mtx[3].x + m_LocalScissorRect.x),
+									 static_cast<int32>(mtx[3].y + m_LocalScissorRect.y),
+									 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.width),
+									 static_cast<uint32>(mtx[1].y * m_LocalScissorRect.height));
 
 		ForEachChild([&](IHyNode *pThis)
 					{

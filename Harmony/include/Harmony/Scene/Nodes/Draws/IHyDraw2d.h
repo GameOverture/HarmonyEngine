@@ -63,7 +63,7 @@ protected:
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
 	int32							m_iDisplayOrderMax;	// The highest display order in this hierarchy (children attached)
 	HyRenderState					m_RenderState;
-	HyRectangle<int32>				m_LocalScissorRect;
+	HyScreenRect<int32>				m_LocalScissorRect;
 
 	float							m_fAlpha;
 	float							m_fPrevAlphaValue;
@@ -97,7 +97,7 @@ public:
 	void EnableCollider(bool bEnable);
 	void EnablePhysics(bool bEnable);
 
-	const HyRectangle<int32> &GetScissor();
+	const HyScreenRect<int32> &GetScissor();
 	void SetScissor(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight);
 	void ClearScissor();
 

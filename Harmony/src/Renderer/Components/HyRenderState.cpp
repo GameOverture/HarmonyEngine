@@ -69,12 +69,12 @@ bool HyRenderState::IsScissorRect()
 	return (m_uiAttributeFlags & SCISSORTEST) != 0;
 }
 
-const HyRectangle<int32> &HyRenderState::GetScissorRect()
+const HyScreenRect<int32> &HyRenderState::GetScissorRect()
 {
 	return m_ScissorRect;
 }
 
-void HyRenderState::SetScissorRect(const HyRectangle<int32> &rect)
+void HyRenderState::SetScissorRect(const HyScreenRect<int32> &rect)
 {
 	m_ScissorRect = rect;
 
@@ -83,17 +83,17 @@ void HyRenderState::SetScissorRect(const HyRectangle<int32> &rect)
 
 void HyRenderState::SetScissorRect(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight)
 {
-	m_ScissorRect.left = uiX;
-	m_ScissorRect.bottom = uiY;
-	m_ScissorRect.right = uiWidth;
-	m_ScissorRect.top = uiHeight;
+	m_ScissorRect.x = uiX;
+	m_ScissorRect.y = uiY;
+	m_ScissorRect.width = uiWidth;
+	m_ScissorRect.height = uiHeight;
 
 	m_uiAttributeFlags |= SCISSORTEST;
 }
 
 void HyRenderState::ClearScissorRect()
 {
-	memset(&m_ScissorRect, 0, sizeof(HyRectangle<uint32>));
+	memset(&m_ScissorRect, 0, sizeof(HyScreenRect<uint32>));
 	m_uiAttributeFlags &= ~SCISSORTEST;
 }
 

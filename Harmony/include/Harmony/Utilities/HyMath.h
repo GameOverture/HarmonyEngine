@@ -111,4 +111,34 @@ struct HyRectangle
 	}
 };
 
+template<typename T>
+struct HyScreenRect
+{
+	T x;
+	T y;
+	T width;
+	T height;
+
+	int32 iTag;
+
+	HyScreenRect() : x(0), y(0), width(0), height(0), iTag(0)
+	{ }
+
+	HyScreenRect(T tX, T tY, T tWidth, T tHeight) : x(tX), y(tY), width(tWidth), height(tHeight), iTag(0)
+	{ }
+
+	std::string ToString() const
+	{
+		std::ostringstream s;
+		s << "(X:" << x << ", Y:" << y << ", W:" << width << ", H:" << height << ")";
+		return s.str();
+	}
+
+	// Does not compare tags
+	bool operator==(const HyScreenRect<T> &rhs) const
+	{
+		return (0 == memcmp(this, &rhs, sizeof(T) * 4));
+	}
+};
+
 #endif /* __HyMath_h__ */

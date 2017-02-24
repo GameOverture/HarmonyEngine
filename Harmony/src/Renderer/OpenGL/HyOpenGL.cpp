@@ -115,15 +115,15 @@ HyOpenGL::~HyOpenGL(void)
 
 	if(renderState.IsScissorRect())
 	{
-		const HyRectangle<int32> &scissorRectRef = renderState.GetScissorRect();
+		const HyScreenRect<int32> &scissorRectRef = renderState.GetScissorRect();
 
 #if 0
-		glScissor(static_cast<GLint>((m_mtxView[3].x * -1.0f) + scissorRectRef.left),
-				  static_cast<GLint>((m_mtxView[3].y * -1.0f) + scissorRectRef.bottom),
-				  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.right),
-				  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.top));
+		glScissor(static_cast<GLint>((m_mtxView[3].x * -1.0f) + scissorRectRef.x),
+				  static_cast<GLint>((m_mtxView[3].y * -1.0f) + scissorRectRef.y),
+				  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
+				  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
 #else
-		glScissor(scissorRectRef.left, scissorRectRef.bottom, scissorRectRef.right, scissorRectRef.top);
+		glScissor(scissorRectRef.x, scissorRectRef.y, scissorRectRef.width, scissorRectRef.height);
 #endif
 		glEnable(GL_SCISSOR_TEST);
 	}
