@@ -323,17 +323,11 @@ void IHyDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 									 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.width),
 									 static_cast<uint32>(mtx[1].y * m_LocalScissorRect.height));
 
-		ForEachChild([&](IHyNode *pThis)
+		ForEachNode([&](IHyNode *pThis)
 					{
 						if(pThis->IsDraw2d())
 							static_cast<IHyDraw2d *>(pThis)->m_RenderState.SetScissorRect(this->m_RenderState.GetScissorRect());
 					});
-		
-		//for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		//{
-		//	if(m_ChildList[i]->IsDraw2d())
-		//		static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.SetScissorRect(m_RenderState.GetScissorRect());
-		//}
 	}
 
 	if((m_uiAttributes & (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_MouseInput)) != 0)
@@ -388,13 +382,14 @@ void IHyDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 
 	if(m_fPrevAlphaValue != alpha.Get())
 	{
-		m_fPrevAlphaValue = alpha.Get();
-
-		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		{
-			if(m_ChildList[i]->IsDraw2d())
-				static_cast<IHyDraw2d *>(m_ChildList[i])->alpha.Set(alpha.Get());
-		}
+		ForEachNode([&](IHyNode *pThis)
+					{
+						if(pThis->IsDraw2d())
+						{
+							static_cast<IHyDraw2d *>(pThis)->m_fPrevAlphaValue = this->alpha.Get();
+							static_cast<IHyDraw2d *>(pThis)->alpha.Set(this->alpha.Get());
+						}
+					});
 	}
 
 	OnUpdate();

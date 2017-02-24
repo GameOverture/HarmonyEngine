@@ -24,7 +24,8 @@ TextTest::~TextTest()
 	m_Text.pos.Set(100.0f, 100.0f);
 
 	m_Text.TextSetAlignment(HYALIGN_Left);
-	m_Text.SetScissor(0, 0, 333, 300);
+	m_Text.alpha.Set(0.5f);
+	//m_Text.SetScissor(0, 0, 333, 300);
 
 	m_TextBox.SetAsQuad(m_Text.TextGetBox().x, m_Text.TextGetBox().y, true);
 	m_TextBox.SetTint(1.0f, 0.0f, 0.0f);

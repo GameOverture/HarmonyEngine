@@ -54,7 +54,7 @@ public:
 	void Detach();
 	bool HasParent();
 
-	void ForEachChild(std::function<void(IHyNode *)> func);
+	void ForEachNode(std::function<void(IHyNode *)> func);
 
 protected:
 	void Update();

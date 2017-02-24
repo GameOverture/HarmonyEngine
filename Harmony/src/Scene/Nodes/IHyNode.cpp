@@ -130,12 +130,12 @@ bool IHyNode::HasParent()
 	return m_pParent != NULL;
 }
 
-void IHyNode::ForEachChild(std::function<void(IHyNode *)> func)
+void IHyNode::ForEachNode(std::function<void(IHyNode *)> func)
 {
 	func(this);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->ForEachChild(func);
+		m_ChildList[i]->ForEachNode(func);
 }
 
 void IHyNode::Update()
