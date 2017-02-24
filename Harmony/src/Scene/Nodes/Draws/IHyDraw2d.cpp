@@ -193,10 +193,10 @@ const HyScreenRect<int32> &IHyDraw2d::GetScissor()
 	return m_LocalScissorRect;
 }
 
-void IHyDraw2d::SetScissor(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight)
+void IHyDraw2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
 {
-	m_LocalScissorRect.x = uiX;
-	m_LocalScissorRect.y = uiY;
+	m_LocalScissorRect.x = uiLocalX;
+	m_LocalScissorRect.y = uiLocalY;
 	m_LocalScissorRect.width = uiWidth;
 	m_LocalScissorRect.height = uiHeight;
 

@@ -98,7 +98,7 @@ public:
 	void EnablePhysics(bool bEnable);
 
 	const HyScreenRect<int32> &GetScissor();
-	void SetScissor(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight);
+	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
 	void ClearScissor();
 
 	int32 GetShaderId();
