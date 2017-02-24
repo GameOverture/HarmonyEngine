@@ -14,9 +14,9 @@ TextTest::~TextTest()
 /*virtual*/ bool TextTest::Initialize()
 {
 	HyCamera2d *pCam = Window().CreateCamera2d();
-	pCam->pos.Set(Window().GetResolution().x * 0.5f, Window().GetResolution().y * 0.5f);
+	//pCam->pos.Set(Window().GetResolution().x * 0.5f, Window().GetResolution().y * 0.5f);
 
-	pCam->pos.Offset(-40, 30);
+	pCam->pos.Offset(40, 300);
 
 	m_Text.TextSet("One\nTwo\nThree");
 	m_Text.SetAsScaleBox(500.0f, 500.0f, false);

@@ -117,9 +117,9 @@ HyOpenGL::~HyOpenGL(void)
 	{
 		const HyScreenRect<int32> &scissorRectRef = renderState.GetScissorRect();
 
-#if 0
-		glScissor(static_cast<GLint>((m_mtxView[3].x * -1.0f) + scissorRectRef.x),
-				  static_cast<GLint>((m_mtxView[3].y * -1.0f) + scissorRectRef.y),
+#if 1
+		glScissor(scissorRectRef.x + (m_RenderSurfaceIter->m_iRenderSurfaceWidth / 2) + static_cast<GLint>(m_mtxView[3].x),
+				  scissorRectRef.y + (m_RenderSurfaceIter->m_iRenderSurfaceHeight / 2) + static_cast<GLint>(m_mtxView[3].y),
 				  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
 				  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
 #else
