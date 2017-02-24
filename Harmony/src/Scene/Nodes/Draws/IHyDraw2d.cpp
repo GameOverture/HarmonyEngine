@@ -382,14 +382,21 @@ void IHyDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 
 	if(m_fPrevAlphaValue != alpha.Get())
 	{
-		ForEachNode([&](IHyNode *pChildNode)
-					{
-						if(pChildNode->IsDraw2d())
-						{
-							static_cast<IHyDraw2d *>(pChildNode)->m_fPrevAlphaValue = this->alpha.Get();
-							static_cast<IHyDraw2d *>(pChildNode)->alpha.Set(this->alpha.Get());
-						}
-					});
+		m_fPrevAlphaValue = alpha.Get();
+
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		{
+			if(m_ChildList[i]->IsDraw2d())
+				static_cast<IHyDraw2d *>(m_ChildList[i])->alpha.Set(alpha.Get());
+		}
+
+		//ForEachNode([&](IHyNode *pChildNode)
+		//			{
+		//				if(pChildNode->IsDraw2d())
+		//				{
+		//					static_cast<IHyDraw2d *>(pChildNode)->alpha.Set(this->alpha.Get());
+		//				}
+		//			});
 	}
 
 	OnUpdate();
