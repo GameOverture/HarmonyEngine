@@ -16,11 +16,12 @@ TextTest::~TextTest()
 	HyCamera2d *pCam = Window().CreateCamera2d();
 	//pCam->pos.Set(Window().GetResolution().x * 0.5f, Window().GetResolution().y * 0.5f);
 
-	pCam->pos.Offset(40, 300);
+	pCam->pos.Offset(400, 300);
+	pCam->SetZoom(0.25f);
 
 	m_Text.TextSet("One\nTwo\nThree");
 	m_Text.SetAsScaleBox(500.0f, 500.0f, false);
-	m_Text.pos.Set(500.0f, 200.0f);
+	m_Text.pos.Set(100.0f, 100.0f);
 
 	m_Text.TextSetAlignment(HYALIGN_Left);
 	m_Text.SetScissor(0, 0, 333, 300);
