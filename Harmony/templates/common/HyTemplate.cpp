@@ -12,6 +12,8 @@ HyTemplate::~HyTemplate()
 
 /*virtual*/ bool HyTemplate::Initialize()
 {
+	m_pCamera = Window().CreateCamera2d();
+
 	return true;
 }
 

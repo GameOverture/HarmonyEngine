@@ -46,6 +46,7 @@ protected:
 		BOXATTRIB_ExtendingBottom	= 1 << 2,
 		BOXATTRIB_SplitWordsToFit	= 1 << 3,
 		BOXATTRIB_TextBox			= 1 << 4,
+		BOXATTRIB_FitWithinBounds	= 1 << 5,	// Whether any fancy glyph is allowed to hang outside the bounds
 		//BOXATTRIB_DigitBox
 	};
 	uint32				m_uiBoxAttributes;
@@ -91,7 +92,7 @@ public:
 	const glm::vec2 &TextGetBox();
 
 	void SetAsLine();
-	void SetAsColumn(float fWidth, bool bSplitWordsToFit = false);
+	void SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitWordsToFit = false);
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 
 protected:

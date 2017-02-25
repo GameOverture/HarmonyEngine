@@ -137,19 +137,19 @@ const glm::vec2 &HyText2d::TextGetBox()
 
 void HyText2d::SetAsLine()
 {
-	if(0 == (m_uiBoxAttributes & BOXATTRIB_IsUsed))
-		return;
-
+	m_uiBoxAttributes = 0;
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
-	m_uiBoxAttributes &= ~BOXATTRIB_IsUsed;
 	m_bIsDirty = true;
 }
 
-void HyText2d::SetAsColumn(float fWidth, bool bSplitWordsToFit /*= false*/)
+void HyText2d::SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitWordsToFit /*= false*/)
 {
 	int32 iFlags = BOXATTRIB_IsUsed | BOXATTRIB_ExtendingBottom;
+
+	if(bMustFitWithinColumn)
+		iFlags |= BOXATTRIB_FitWithinBounds;
 
 	if(bSplitWordsToFit)
 		iFlags |= BOXATTRIB_SplitWordsToFit;
@@ -167,7 +167,7 @@ void HyText2d::SetAsColumn(float fWidth, bool bSplitWordsToFit /*= false*/)
 
 void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
 {
-	int32 iFlags = BOXATTRIB_IsUsed | BOXATTRIB_TextBox;
+	int32 iFlags = BOXATTRIB_IsUsed | BOXATTRIB_TextBox | BOXATTRIB_FitWithinBounds;
 
 	if(bCenterVertically)
 		iFlags |= BOXATTRIB_CenterVertically;
@@ -351,16 +351,19 @@ offsetCalculation:
 
 			if(bFirstCharacterOnNewLine)
 			{
-				// Handle every layer for this character
-				for(uint32 iLayerIndex = 0; iLayerIndex < uiNUM_LAYERS; ++iLayerIndex)
+				if(0 != (m_uiBoxAttributes & BOXATTRIB_FitWithinBounds))
 				{
-					uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiSTR_SIZE * ((uiNUM_LAYERS - 1) - iLayerIndex)));
-					m_pGlyphOffsets[iGlyphOffsetIndex].x += (fLeftSideNudgeAmt * m_fScaleBoxModifier);
-					pWritePos[iLayerIndex].x += (fLeftSideNudgeAmt * m_fScaleBoxModifier);
+					// Handle every layer for this character
+					for(uint32 iLayerIndex = 0; iLayerIndex < uiNUM_LAYERS; ++iLayerIndex)
+					{
+						uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiSTR_SIZE * ((uiNUM_LAYERS - 1) - iLayerIndex)));
+						m_pGlyphOffsets[iGlyphOffsetIndex].x += (fLeftSideNudgeAmt * m_fScaleBoxModifier);
+						pWritePos[iLayerIndex].x += (fLeftSideNudgeAmt * m_fScaleBoxModifier);
 
-					const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, HyUtf8_to_Utf32(&m_sCurrentString[uiStrIndex]));
-					if(fCurLineWidth < m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier))
-						fCurLineWidth = m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier);
+						const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, HyUtf8_to_Utf32(&m_sCurrentString[uiStrIndex]));
+						if(fCurLineWidth < m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier))
+							fCurLineWidth = m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier);
+					}
 				}
 
 				fLeftSideNudgeAmt = 0.0f;

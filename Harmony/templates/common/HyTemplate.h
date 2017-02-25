@@ -4,6 +4,8 @@
 
 class HyTemplate : public IHyApplication
 {
+	HyCamera2d *	m_pCamera;
+
 public:
 	HyTemplate(HarmonyInit &initStruct);
 	virtual ~HyTemplate();
