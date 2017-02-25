@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>HyProjGUID</ProjectGuid>
+    <ProjectGuid>{63f11316-0e62-4cff-ac6e-5b613624df31}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>HyTemplate</RootNamespace>
-	<ProjectName>HyTemplate</ProjectName>
+    <RootNamespace>ScaledText</RootNamespace>
+	<ProjectName>ScaledText</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -70,22 +70,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)_$(Platform)_debug</TargetName>
-    <OutDir>HyWorkingDirectory</OutDir>
+    <OutDir>..//</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)_$(Platform)_debug</TargetName>
-    <OutDir>HyWorkingDirectory</OutDir>
+    <OutDir>..//</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)_$(Platform)</TargetName>
-    <OutDir>HyWorkingDirectory</OutDir>
+    <OutDir>..//</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)_$(Platform)</TargetName>
-    <OutDir>HyWorkingDirectory</OutDir>
+    <OutDir>..//</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -93,7 +93,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>HyHarmonyInclude</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Harmony/include</AdditionalIncludeDirectories>
 	  <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -109,7 +109,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>HyHarmonyInclude</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Harmony/include</AdditionalIncludeDirectories>
 	  <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -128,7 +128,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>HyHarmonyInclude</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Harmony/include</AdditionalIncludeDirectories>
 	  <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -149,7 +149,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>HyHarmonyInclude</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Harmony/include</AdditionalIncludeDirectories>
 	  <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -162,14 +162,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="HyTemplate.cpp" />
+    <ClCompile Include="ScaledText.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HyTemplate.h" />
+    <ClInclude Include="ScaledText.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="[HyHarmonyProjLocation]src/Harmony_vs2015.vcxproj">
+    <ProjectReference Include="../../../Harmony/src/Harmony_vs2015.vcxproj">
       <Project>{fccd89c1-bc25-41e0-8ee4-b77e0fc9273a}</Project>
     </ProjectReference>
   </ItemGroup>

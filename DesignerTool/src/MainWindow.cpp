@@ -577,7 +577,10 @@ void MainWindow::on_actionSaveAll_triggered()
 void MainWindow::on_actionLaunchIDE_triggered()
 {
     QStringList sFilterList;
+
+#if defined(Q_OS_WIN)
     sFilterList << "*.sln";
+#endif
     
     QDir srcDir(ui->explorer->GetCurProjSelected()->GetSourceAbsPath());
     srcDir.setNameFilters(sFilterList);
@@ -589,32 +592,58 @@ void MainWindow::on_actionLaunchIDE_triggered()
         return;
     }
 
-    QString sSolutionName = m_pCurSelectedProj->GetName(false);
-
 #if defined(Q_OS_WIN)
+    bool bUseVs2015 = false;
+    bool bUseVs2013 = false;
+
     QSettings windowsRegEntryVS2015("HKEY_CLASSES_ROOT\\VisualStudio.DTE.14.0", QSettings::NativeFormat);
     if(windowsRegEntryVS2015.childKeys().empty() == false)
-    {
-        for(int i = 0; i < ideFileInfoList.size(); ++i)
-        {
-            if(ideFileInfoList[i].fileName() == (sSolutionName % "_vs2015.sln"))
-            {
-                QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath()));
-                return;
-            }
-        }
-    }
+        bUseVs2015 = true;
 
     QSettings windowsRegEntryVS2013("HKEY_CLASSES_ROOT\\VisualStudio.DTE.12.0", QSettings::NativeFormat);
     if(windowsRegEntryVS2013.childKeys().empty() == false)
+        bUseVs2013 = true;
+
+    // Use the newer version
+    if(bUseVs2013 && bUseVs2015)
+        bUseVs2013 = false;
+
+    for(int i = 0; i < ideFileInfoList.size(); ++i)
     {
-        for(int i = 0; i < ideFileInfoList.size(); ++i)
+        QFile file(ideFileInfoList[i].absoluteFilePath());
+        if(file.open(QFile::ReadOnly))
         {
-            if(ideFileInfoList[i].fileName() == (sSolutionName % "_vs2013.sln"))
+            QTextStream in(&file);
+            QString line;
+            do
             {
-                QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath()));
-                return;
-            }
+                line = in.readLine();
+                if(line.contains("# Visual Studio 14", Qt::CaseSensitive))
+                {
+                    if(bUseVs2015)
+                    {
+                        file.close();
+                        QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath()));
+                        return;
+                    }
+                    else
+                        break;
+                }
+
+                if(line.contains("# Visual Studio 2013", Qt::CaseSensitive))
+                {
+                    if(bUseVs2013)
+                    {
+                        file.close();
+                        QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath()));
+                        return;
+                    }
+                    else
+                        break;
+                }
+            } while (!line.isNull());
+
+            file.close();
         }
     }
 #endif
