@@ -29,6 +29,7 @@ public:
     ~DlgNewProject();
 
     QString GetProjFilePath();
+    QString GetProjFileName();
     QString GetProjDirPath();
 
     bool IsCreatingGameDir();

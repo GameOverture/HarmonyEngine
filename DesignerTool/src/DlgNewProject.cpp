@@ -58,10 +58,12 @@ DlgNewProject::~DlgNewProject()
 
 QString DlgNewProject::GetProjFilePath()
 {
-    if(ui->chkCreateGameDir->isChecked())
-        return ui->txtGameLocation->text() + '/' + ui->txtTitleName->text() + '/' + ui->txtTitleName->text() + HyGlobal::ItemExt(ITEM_Project);
-    else
-        return ui->txtGameLocation->text() + '/' + ui->txtTitleName->text() + HyGlobal::ItemExt(ITEM_Project);
+    return GetProjDirPath() % GetProjFileName();
+}
+
+QString DlgNewProject::GetProjFileName()
+{
+    return ui->txtTitleName->text() % HyGlobal::ItemExt(ITEM_Project);
 }
 
 QString DlgNewProject::GetProjDirPath()
@@ -86,6 +88,26 @@ void DlgNewProject::on_buttonBox_accepted()
     QString sRelMetaDataPath = QDir::cleanPath(ui->txtMetaDataLocation->text() % "/" % ui->txtMetaDataDirName->text() % "/");
     QString sRelSourcePath = QDir::cleanPath(ui->txtSourceLocation->text() % "/" % ui->txtSourceDirName->text() % "/");
 
+    // Create workspace file tree
+    //
+    // DATA
+    projDir.mkdir(sRelDataPath);
+    projDir.cd(sRelDataPath);
+    projDir.mkdir(HyGlobal::ItemName(ITEM_DirAtlases));
+    projDir.mkdir(HyGlobal::ItemName(ITEM_DirAudioBanks));
+
+    // META-DATA
+    projDir.setPath(GetProjDirPath());
+    projDir.mkdir(sRelMetaDataPath);
+    projDir.cd(sRelMetaDataPath);
+    projDir.mkdir(HyGlobal::ItemName(ITEM_DirAtlases));
+
+    // SOURCE
+    projDir.setPath(GetProjDirPath());
+    projDir.mkdir(sRelSourcePath);
+    projDir.cd(sRelSourcePath);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     QJsonObject jsonObj;
     jsonObj.insert("GameName", ui->txtTitleName->text());
     jsonObj.insert("ClassName", ui->txtClassName->text());
@@ -111,6 +133,12 @@ void DlgNewProject::on_buttonBox_accepted()
     
     jsonObj.insert("WindowInfoArray", windowInfoArray);
 
+    QJsonObject jsonObjForSrc = jsonObj;
+    QDir srcDir(GetProjDirPath() % sRelSourcePath);
+    jsonObjForSrc.insert("DataPath", QJsonValue(srcDir.relativeFilePath(GetProjDirPath()) % sRelDataPath));
+    jsonObjForSrc.insert("MetaDataPath", QJsonValue(srcDir.relativeFilePath(GetProjDirPath()) % sRelMetaDataPath));
+    jsonObjForSrc.insert("SourcePath", QJsonValue(srcDir.relativeFilePath(GetProjDirPath()) % sRelSourcePath));
+
     QFile newProjectFile(GetProjFilePath());
     if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
     {
@@ -127,98 +155,112 @@ void DlgNewProject::on_buttonBox_accepted()
 
         newProjectFile.close();
     }
-    
-    // Create workspace file tree
-    //
-    // DATA
-    projDir.mkdir(sRelDataPath);
-    projDir.cd(sRelDataPath);
-    QStringList dirList = HyGlobal::SubDirNameList();
-    for(int i = 0; i < dirList.size(); ++i)
-        projDir.mkdir(dirList[i]);
 
-    // META-DATA
-    projDir.setPath(GetProjDirPath());
-    projDir.mkdir(sRelMetaDataPath);
-    projDir.cd(sRelMetaDataPath);
-    projDir.mkdir(HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases));
-
-    // SOURCE
-    projDir.setPath(GetProjDirPath());
-    projDir.mkdir(sRelSourcePath);
-    projDir.cd(sRelSourcePath);
-    
-    QDir templateDir(MainWindow::EngineLocation() % "templates");
-    if(ui->radVs2013->isChecked())
-        templateDir.cd("vs2013");
-    else if(ui->radVs2015->isChecked())
-        templateDir.cd("vs2015");
-    else
-        HyGuiLog("Unknown solution type", LOGTYPE_Error);
-    
-    QFileInfoList templateContentsList = templateDir.entryInfoList();
-    for(int i = 0; i < templateContentsList.size(); ++i)
-        QFile::copy(templateContentsList[i].absoluteFilePath(), projDir.absoluteFilePath(templateContentsList[i].fileName()));
-    
-    // Convert the template to use the desired game name
-    //
-    // Rename the files themselves
-    QFileInfoList srcFileList = projDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-    for(int i = 0; i < srcFileList.size(); ++i)
+    QFile newProjectFileForSrc(GetProjDirPath() % sRelSourcePath % "/" % GetProjFileName());
+    if(newProjectFileForSrc.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
     {
-        if(srcFileList[i].fileName().contains("HyTitle"))
-        {
-            QFile file(srcFileList[i].absoluteFilePath());
-            QString sNewFileName = srcFileList[i].fileName().replace("HyTitle", ui->txtTitleName->text());
-            file.rename(srcFileList[i].absoluteDir().absolutePath() % "/" % sNewFileName);
-            file.close();
-        }
-        if(srcFileList[i].fileName().contains("HyTemplate"))
-        {
-            QFile file(srcFileList[i].absoluteFilePath());
-            QString sNewFileName = srcFileList[i].fileName().replace("HyTemplate", ui->txtClassName->text());
-            file.rename(srcFileList[i].absoluteDir().absolutePath() % "/" % sNewFileName);
-            file.close();
-        }
+       HyGuiLog("Couldn't open new project file for writing", LOGTYPE_Error);
     }
-    // Then replace the contents
-    QUuid projGUID = QUuid::createUuid();
-    srcFileList = projDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-    QTextCodec *pCodec = QTextCodec::codecForLocale();
-    for(int i = 0; i < srcFileList.size(); ++i)
+    else
     {
-        QFile file(srcFileList[i].absoluteFilePath());
-        if(!file.open(QFile::ReadOnly))
+        QJsonDocument newProjectDoc(jsonObjForSrc);
+        qint64 iBytesWritten = newProjectFileForSrc.write(newProjectDoc.toJson());
+        if(0 == iBytesWritten || -1 == iBytesWritten)
         {
-            HyGuiLog("Error reading " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
-            return;
+            HyGuiLog("Could not write new project file: " % newProjectFileForSrc.errorString(), LOGTYPE_Error);
         }
 
-        QString sContents = pCodec->toUnicode(file.readAll());
-        file.close();
-        
-        //QDir exeDir(GetProjDirPath() % "bin/");
+        newProjectFileForSrc.close();
+    }
+    
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    QList<QDir> templateDirList;
+    if(ui->radVs2013->isChecked())
+    {
+        QDir templateDir(MainWindow::EngineLocation() % "templates");
+        templateDir.cd("vs2013");
 
-        sContents.replace("HyTitle", ui->txtTitleName->text());
-        sContents.replace("HyTemplate", ui->txtClassName->text());
-        sContents.replace("HyProjGUID", projGUID.toString());
-        if(ui->radVs2013->isChecked())
-            sContents.replace("HyHarmonyProjLocation", srcFileList[i].dir().relativeFilePath(MainWindow::EngineLocation() % "src/Harmony_vs2013.vcxproj"));
-        else if(ui->radVs2015->isChecked())
-            sContents.replace("HyHarmonyProjLocation", srcFileList[i].dir().relativeFilePath(MainWindow::EngineLocation() % "src/Harmony_vs2015.vcxproj"));
-        else
-            HyGuiLog("Unknown solution type", LOGTYPE_Error);
-        
-        sContents.replace("HyHarmonyInclude", srcFileList[i].dir().relativeFilePath(MainWindow::EngineLocation() % "include"));
-        sContents.replace("HyWorkingDirectory", projDir.relativeFilePath(GetProjDirPath()) % "/");
+        templateDirList.append(templateDir);
+    }
+    else if(ui->radVs2015->isChecked())
+    {
+        QDir templateDir(MainWindow::EngineLocation() % "templates");
+        templateDir.cd("vs2015");
 
-        if(!file.open(QFile::WriteOnly))
+        templateDirList.append(templateDir);
+    }
+
+    QDir templateDir(MainWindow::EngineLocation() % "templates");
+    templateDir.cd("common");
+    templateDirList.append(templateDir);
+    
+    for(int iTemplateIndex = 0; iTemplateIndex < templateDirList.size(); ++iTemplateIndex)
+    {
+        QFileInfoList templateContentsList = templateDirList[iTemplateIndex].entryInfoList();
+        for(int i = 0; i < templateContentsList.size(); ++i)
+            QFile::copy(templateContentsList[i].absoluteFilePath(), projDir.absoluteFilePath(templateContentsList[i].fileName()));
+
+        // Convert the template to use the desired game name
+        //
+        // Rename the files themselves
+        QFileInfoList srcFileList = projDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+        for(int i = 0; i < srcFileList.size(); ++i)
         {
-            HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
-            return;
+            if(srcFileList[i].fileName().contains("HyTitle"))
+            {
+                QFile file(srcFileList[i].absoluteFilePath());
+                QString sNewFileName = srcFileList[i].fileName().replace("HyTitle", ui->txtTitleName->text() % "_" % templateDirList[iTemplateIndex].dirName());
+                file.rename(srcFileList[i].absoluteDir().absolutePath() % "/" % sNewFileName);
+                file.close();
+            }
+
+            if(srcFileList[i].fileName().contains("HyTemplate"))
+            {
+                QFile file(srcFileList[i].absoluteFilePath());
+                QString sNewFileName = srcFileList[i].fileName().replace("HyTemplate", ui->txtClassName->text());
+                file.rename(srcFileList[i].absoluteDir().absolutePath() % "/" % sNewFileName);
+                file.close();
+            }
         }
-        file.write(pCodec->fromUnicode(sContents));
-        file.close();
+        // Then replace the contents
+        QUuid projGUID = QUuid::createUuid();
+        srcFileList = projDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+        QTextCodec *pCodec = QTextCodec::codecForLocale();
+        for(int i = 0; i < srcFileList.size(); ++i)
+        {
+            QFile file(srcFileList[i].absoluteFilePath());
+            if(!file.open(QFile::ReadOnly))
+            {
+                HyGuiLog("Error reading " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
+                return;
+            }
+
+            QString sContents = pCodec->toUnicode(file.readAll());
+            file.close();
+
+            //QDir exeDir(GetProjDirPath() % "bin/");
+
+            sContents.replace("HyTitle", ui->txtTitleName->text());
+            sContents.replace("HyTemplate", ui->txtClassName->text());
+            sContents.replace("HyProjGUID", projGUID.toString());
+            if(ui->radVs2013->isChecked())
+                sContents.replace("HyHarmonyProjLocation", srcFileList[i].dir().relativeFilePath(MainWindow::EngineLocation() % "src/Harmony_vs2013.vcxproj"));
+            else if(ui->radVs2015->isChecked())
+                sContents.replace("HyHarmonyProjLocation", srcFileList[i].dir().relativeFilePath(MainWindow::EngineLocation() % "src/Harmony_vs2015.vcxproj"));
+            else
+                HyGuiLog("Unknown solution type", LOGTYPE_Error);
+
+            sContents.replace("HyHarmonyInclude", srcFileList[i].dir().relativeFilePath(MainWindow::EngineLocation() % "include"));
+            sContents.replace("HyWorkingDirectory", projDir.relativeFilePath(GetProjDirPath()) % "/");
+
+            if(!file.open(QFile::WriteOnly))
+            {
+                HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
+                return;
+            }
+            file.write(pCodec->fromUnicode(sContents));
+            file.close();
+        }
     }
 }
 
@@ -320,12 +362,6 @@ void DlgNewProject::ErrorCheck()
     do
     {
         QDir rootDir(ui->txtGameLocation->text());
-        if(rootDir.exists() == false)
-        {
-            ui->lblError->setText("Error: Workspace location does not exist.");
-            bIsError = true;
-            break;
-        }
 
         if(ui->txtTitleName->text().isEmpty())
         {

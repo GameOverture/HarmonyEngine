@@ -303,11 +303,11 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Development Environment:</string>
+      <string>Development Environment(s):</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QRadioButton" name="radVs2013">
+       <widget class="QCheckBox" name="radVs2013">
         <property name="text">
          <string>Visual Studio 2013</string>
         </property>
@@ -317,9 +317,12 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radVs2015">
+       <widget class="QCheckBox" name="radVs2015">
         <property name="text">
          <string>Visual Studio 2015</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
