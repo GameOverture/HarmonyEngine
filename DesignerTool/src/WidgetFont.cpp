@@ -330,7 +330,7 @@ void WidgetFont::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
             }
 
             m_MasterStageList[i]->SetFont(pFont);
-            iNumMissedGlyphs += texture_font_load_glyphs(pFont, m_sAvailableTypefaceGlyphs.toStdString().c_str());
+            iNumMissedGlyphs += texture_font_load_glyphs(pFont, m_sAvailableTypefaceGlyphs.toUtf8().data());
         }
 
         if(iNumMissedGlyphs && fAtlasSizeModifier == 1.0f)
