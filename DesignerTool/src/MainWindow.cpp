@@ -588,6 +588,37 @@ void MainWindow::on_actionLaunchIDE_triggered()
         HyGuiLog("Could not find appropriate IDE file to launch", LOGTYPE_Error);
         return;
     }
+
+    QString sSolutionName = m_pCurSelectedProj->GetName(false);
+
+#if defined(Q_OS_WIN)
+    QSettings windowsRegEntryVS2015("HKEY_CLASSES_ROOT\\VisualStudio.DTE.14.0", QSettings::NativeFormat);
+    if(windowsRegEntryVS2015.childKeys().empty() == false)
+    {
+        for(int i = 0; i < ideFileInfoList.size(); ++i)
+        {
+            if(ideFileInfoList[i].fileName() == (sSolutionName % "_vs2015.sln"))
+            {
+                QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath()));
+                return;
+            }
+        }
+    }
+
+    QSettings windowsRegEntryVS2013("HKEY_CLASSES_ROOT\\VisualStudio.DTE.12.0", QSettings::NativeFormat);
+    if(windowsRegEntryVS2013.childKeys().empty() == false)
+    {
+        for(int i = 0; i < ideFileInfoList.size(); ++i)
+        {
+            if(ideFileInfoList[i].fileName() == (sSolutionName % "_vs2013.sln"))
+            {
+                QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath()));
+                return;
+            }
+        }
+    }
+#endif
+
     QDesktopServices::openUrl(QUrl(ideFileInfoList[0].absoluteFilePath()));
 }
 

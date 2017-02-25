@@ -168,7 +168,7 @@
     <ClInclude Include="HyTemplate.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="HyHarmonyProjLocation">
+    <ProjectReference Include="[HyHarmonyProjLocation]src/Harmony_vs2015.vcxproj">
       <Project>{fccd89c1-bc25-41e0-8ee4-b77e0fc9273a}</Project>
     </ProjectReference>
   </ItemGroup>

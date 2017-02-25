@@ -307,7 +307,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QCheckBox" name="radVs2013">
+       <widget class="QCheckBox" name="chkVs2013">
         <property name="text">
          <string>Visual Studio 2013</string>
         </property>
@@ -317,7 +317,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="radVs2015">
+       <widget class="QCheckBox" name="chkVs2015">
         <property name="text">
          <string>Visual Studio 2015</string>
         </property>
@@ -369,8 +369,8 @@
   <tabstop>txtSourceDirName</tabstop>
   <tabstop>txtSourceLocation</tabstop>
   <tabstop>btnBrowseSource</tabstop>
-  <tabstop>radVs2013</tabstop>
-  <tabstop>radVs2015</tabstop>
+  <tabstop>chkVs2013</tabstop>
+  <tabstop>chkVs2015</tabstop>
  </tabstops>
  <resources/>
  <connections>
