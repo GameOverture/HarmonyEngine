@@ -241,10 +241,10 @@ void DlgNewProject::on_buttonBox_accepted()
 
             //QDir exeDir(GetProjDirPath() % "bin/");
 
-            sContents.replace("HyTitle", ui->txtTitleName->text());
+            sContents.replace("[HyTitle]", ui->txtTitleName->text());
             sContents.replace("HyTemplate", ui->txtClassName->text());
             sContents.replace("HyProjGUID", projGUID.toString());
-            sContents.replace("[HyHarmonyProjLocation]", srcFileList[i].dir().relativeFilePath(MainWindow::EngineLocation()));
+            sContents.replace("[HyHarmonyProjLocation]", srcFileList[i].dir().relativeFilePath(MainWindow::EngineLocation()) % "/");
             sContents.replace("HyHarmonyInclude", srcFileList[i].dir().relativeFilePath(MainWindow::EngineLocation() % "include"));
             sContents.replace("HyWorkingDirectory", projDir.relativeFilePath(GetProjDirPath()) % "/");
 
