@@ -1,0 +1,19 @@
+[
+    {
+        "height": 2048,
+        "id": 1,
+        "num8BitClrChannels": 4,
+        "textures": [
+            [
+                {
+                    "bottom": 330,
+                    "checksum": 2409076785,
+                    "left": 0,
+                    "right": 330,
+                    "top": 0
+                }
+            ]
+        ],
+        "width": 2048
+    }
+]
