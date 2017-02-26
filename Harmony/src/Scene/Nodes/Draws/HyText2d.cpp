@@ -146,7 +146,7 @@ void HyText2d::SetAsLine()
 
 void HyText2d::SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitWordsToFit /*= false*/)
 {
-	int32 iFlags = BOXATTRIB_IsUsed | BOXATTRIB_ExtendingBottom;
+	int32 iFlags = BOXATTRIB_IsColumn | BOXATTRIB_ExtendingBottom;
 
 	if(bMustFitWithinColumn)
 		iFlags |= BOXATTRIB_FitWithinBounds;
@@ -167,7 +167,7 @@ void HyText2d::SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitW
 
 void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
 {
-	int32 iFlags = BOXATTRIB_IsUsed | BOXATTRIB_TextBox | BOXATTRIB_FitWithinBounds;
+	int32 iFlags = BOXATTRIB_IsScaleBox | BOXATTRIB_FitWithinBounds;
 
 	if(bCenterVertically)
 		iFlags |= BOXATTRIB_CenterVertically;
@@ -248,36 +248,30 @@ offsetCalculation:
 	memset(m_pGlyphOffsets, 0, sizeof(glm::vec2) * m_uiNumReservedGlyphOffsets);
 	memset(pWritePos, 0, sizeof(glm::vec2) * uiNUM_LAYERS);
 
-	// Scale box will start writing text at the upper left corner of 'm_vBoxDimensions', (but within the bounds of the box, which GetLineAscender accounts for)
-	if(0 != (m_uiBoxAttributes & BOXATTRIB_TextBox))
-	{
-		for(uint32 i = 0; i < uiNUM_LAYERS; ++i)
-		{
-			pWritePos[i].y = m_vBoxDimensions.y;
-			pWritePos[i].y -= (pData->GetLineAscender(m_uiCurFontState) * m_fScaleBoxModifier);
-		}
-	}
-
 	// vNewlineInfo is used to set text alignment of center, right, or justified. (left alignment is already accomplished by default)
 	struct LineInfo
 	{
 		const float fUSED_WIDTH;
+		const float fUSED_HEIGHT;
 		const uint32 uiSTART_CHARACTER_INDEX;
 
-		LineInfo(float fUsedWidth, uint32 uiStartCharIndex) : fUSED_WIDTH(fUsedWidth), uiSTART_CHARACTER_INDEX(uiStartCharIndex)
+		LineInfo(float fUsedWidth, float fUsedHeight, uint32 uiStartCharIndex) : fUSED_WIDTH(fUsedWidth), fUSED_HEIGHT(fUsedHeight), uiSTART_CHARACTER_INDEX(uiStartCharIndex)
 		{ }
 	};
 	std::vector<LineInfo> vNewlineInfo;
 	float fLastSpaceWidth = 0.0f;
 	float fLastCharWidth = 0.0f;
 	float fCurLineWidth = 0.0f;
+	float fCurLineHeight = 0.0f;
 
 	uint32 uiLastSpaceIndex = 0;
 	uint32 uiNewlineIndex = 0;
 	uint32 uiNumNewlineCharacters = 0;
 	bool bTerminatedEarly = false;
 	bool bFirstCharacterOnNewLine = true;
-	float fLeftSideNudgeAmt = 0.0f;
+	float fFirstCharacterNudgeRightAmt = 0.0f;
+	
+	bool bFirstLine = true;
 
 	for(uint32 uiStrIndex = 0; uiStrIndex < uiSTR_SIZE; ++uiStrIndex)
 	{
@@ -306,15 +300,15 @@ offsetCalculation:
 			{
 				const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, HyUtf8_to_Utf32(&m_sCurrentString[uiStrIndex]));
 
-				// TODO: Apply kerning if it isn't the first character of a newline
 				float fKerning = 0.0f;
 				if(bFirstCharacterOnNewLine)
 				{
-					if(glyphRef.iOFFSET_X < 0 && fLeftSideNudgeAmt < abs(glyphRef.iOFFSET_X))
-						fLeftSideNudgeAmt = static_cast<float>(abs(glyphRef.iOFFSET_X));
+					if(glyphRef.iOFFSET_X < 0 && fFirstCharacterNudgeRightAmt < abs(glyphRef.iOFFSET_X))
+						fFirstCharacterNudgeRightAmt = static_cast<float>(abs(glyphRef.iOFFSET_X));
 				}
 				else
 				{
+					// TODO: Apply kerning if it isn't the first character of a newline
 					fKerning = 0.0f;
 				}
 
@@ -329,10 +323,12 @@ offsetCalculation:
 
 				if(fCurLineWidth < m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier))
 					fCurLineWidth = m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier);
+				if(fCurLineHeight < (glyphRef.iOFFSET_Y * m_fScaleBoxModifier))
+					fCurLineHeight = (glyphRef.iOFFSET_Y * m_fScaleBoxModifier);
 
 				// If drawing text within a box, and we advance past our width, determine if we should newline
-				if((m_uiBoxAttributes & BOXATTRIB_TextBox) == 0 &&
-				   (m_uiBoxAttributes & BOXATTRIB_IsUsed) != 0 &&
+				if((m_uiBoxAttributes & BOXATTRIB_IsScaleBox) == 0 &&
+				   (m_uiBoxAttributes & BOXATTRIB_IsColumn) != 0 &&
 				   fCurLineWidth > m_vBoxDimensions.x)
 				{
 					// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
@@ -357,8 +353,8 @@ offsetCalculation:
 					for(uint32 iLayerIndex = 0; iLayerIndex < uiNUM_LAYERS; ++iLayerIndex)
 					{
 						uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiSTR_SIZE * ((uiNUM_LAYERS - 1) - iLayerIndex)));
-						m_pGlyphOffsets[iGlyphOffsetIndex].x += (fLeftSideNudgeAmt * m_fScaleBoxModifier);
-						pWritePos[iLayerIndex].x += (fLeftSideNudgeAmt * m_fScaleBoxModifier);
+						m_pGlyphOffsets[iGlyphOffsetIndex].x += (fFirstCharacterNudgeRightAmt * m_fScaleBoxModifier);
+						pWritePos[iLayerIndex].x += (fFirstCharacterNudgeRightAmt * m_fScaleBoxModifier);
 
 						const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, HyUtf8_to_Utf32(&m_sCurrentString[uiStrIndex]));
 						if(fCurLineWidth < m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier))
@@ -366,9 +362,34 @@ offsetCalculation:
 					}
 				}
 
-				fLeftSideNudgeAmt = 0.0f;
+				fFirstCharacterNudgeRightAmt = 0.0f;
 				bFirstCharacterOnNewLine = false;
 			}
+		}
+
+		// If this is the first line, and we're a BOXATTRIB_ScaleBox, then place text snug against the top of the bounds box
+		if(bFirstLine &&
+		   (bDoNewline || uiStrIndex == (uiSTR_SIZE - 1)))
+		{
+			if(0 != (m_uiBoxAttributes & BOXATTRIB_IsScaleBox))
+			{
+				for(int32 iFirstLineStrIndex = static_cast<int32>(uiStrIndex); iFirstLineStrIndex >= 0; --iFirstLineStrIndex)
+				{
+					// Handle every layer for this character
+					for(uint32 iLayerIndex = 0; iLayerIndex < uiNUM_LAYERS; ++iLayerIndex)
+					{
+						uint32 iGlyphOffsetIndex = static_cast<uint32>(iFirstLineStrIndex + (uiSTR_SIZE * ((uiNUM_LAYERS - 1) - iLayerIndex)));
+
+						pWritePos[iLayerIndex].y = m_vBoxDimensions.y;
+						pWritePos[iLayerIndex].y -= fCurLineHeight;
+
+						// Because this is the first line, we know that the previous value of 'm_pGlyphOffsets' is positioned from 0.0f (y-axis)
+						m_pGlyphOffsets[iGlyphOffsetIndex].y += pWritePos[iLayerIndex].y;
+					}
+				}
+			}
+
+			bFirstLine = false;
 		}
 
 		if(bDoNewline)
@@ -401,38 +422,26 @@ offsetCalculation:
 			}
 
 			// Push back this line of text's info, and initialize for the next
-			vNewlineInfo.push_back(LineInfo(fCurLineWidth, uiNewlineIndex));
+			vNewlineInfo.push_back(LineInfo(fCurLineWidth, fCurLineHeight, uiNewlineIndex));
 			fLastSpaceWidth = 0.0f;
 			fLastCharWidth = 0.0f;
 			fCurLineWidth = 0.0f;
+			fCurLineHeight = 0.0f;
 			
 			// The next for-loop iteration will increment uiStrIndex to the character after the ' '. Assign uiNewlineIndex and uiLastSpaceIndex a '+1' to compensate
 			uiNewlineIndex = uiLastSpaceIndex = uiStrIndex + 1;
 
 			bFirstCharacterOnNewLine = true;
-
-			//// Determine if we've exhausted all available vertical space (if extending bottom attribute is off)
-			//if(0 != (m_uiBoxAttributes & BOXATTRIB_IsUsed) && 0 == (m_uiBoxAttributes & BOXATTRIB_ExtendingBottom) && (abs(pWritePos[0].y) + pData->GetLineDescender(m_uiCurFontState)) > m_vBoxDimensions.y)
-			//{
-			//	// uiStrIndex is at the first invalid character index, which is also the number of valid characters
-			//	m_uiNumValidCharacters = uiStrIndex;
-			//	bTerminatedEarly = true;
-			//	break;
-			//}
 		}
 	}
 
 	if(bTerminatedEarly == false)
 	{
 		m_uiNumValidCharacters = static_cast<uint32>(m_sCurrentString.size());
-		vNewlineInfo.push_back(LineInfo(fCurLineWidth, uiNewlineIndex));	// Push the final line (row)
+		vNewlineInfo.push_back(LineInfo(fCurLineWidth, fCurLineHeight, uiNewlineIndex));	// Push the final line (row)
 	}
 
 	m_RenderState.SetNumInstances((m_uiNumValidCharacters * uiNUM_LAYERS) - uiNumNewlineCharacters);
-
-	// Apply a left side nudge which is equal to the glyph with the most negative 'offset_x'
-	//for(uint32 i = 0; i < m_uiNumReservedGlyphOffsets; ++i)
-	//	m_pGlyphOffsets[i].x += (pData->GetLeftSideNudgeAmt(m_uiCurFontState) * m_fScaleBoxModifier);
 
 	// Fix each text line to match proper alignment (HYALIGN_Left is already set at this point)
 	if(m_eAlignment != HYALIGN_Left)
@@ -510,7 +519,7 @@ offsetCalculation:
 			m_fUsedPixelWidth = vNewlineInfo[i].fUSED_WIDTH;
 	}
 
-	if(0 != (m_uiBoxAttributes & BOXATTRIB_TextBox))
+	if(0 != (m_uiBoxAttributes & BOXATTRIB_IsScaleBox))
 	{
 		float fTotalHeight = (pData->GetLineHeight(m_uiCurFontState) * m_fScaleBoxModifier) * vNewlineInfo.size();
 

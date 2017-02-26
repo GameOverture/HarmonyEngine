@@ -41,11 +41,11 @@ protected:
 
 	enum eBoxAttributes
 	{
-		BOXATTRIB_IsUsed			= 1 << 0,
+		BOXATTRIB_IsColumn			= 1 << 0,
 		BOXATTRIB_CenterVertically	= 1 << 1,
 		BOXATTRIB_ExtendingBottom	= 1 << 2,
 		BOXATTRIB_SplitWordsToFit	= 1 << 3,
-		BOXATTRIB_TextBox			= 1 << 4,
+		BOXATTRIB_IsScaleBox		= 1 << 4,
 		BOXATTRIB_FitWithinBounds	= 1 << 5,	// Whether any fancy glyph is allowed to hang outside the bounds
 		//BOXATTRIB_DigitBox
 	};
