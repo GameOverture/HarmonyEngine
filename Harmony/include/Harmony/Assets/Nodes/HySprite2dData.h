@@ -57,13 +57,14 @@ public:
 		const bool			m_bLOOP;
 		const bool			m_bREVERSE;
 		const bool			m_bBOUNCE;
+		const float			m_fDURATION;
 
 		HySprite2dFrame *	m_pFrames;
 		const uint32		m_uiNUMFRAMES;
 
 		std::set<uint32>	m_UsedAtlasIds;
 
-		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, jsonxx::Array &frameArray, HyAssets &assetsRef);
+		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, float fDuration, jsonxx::Array &frameArray, HyAssets &assetsRef);
 		~AnimState();
 
 		const HySprite2dFrame &GetFrame(uint32 uiFrameIndex);

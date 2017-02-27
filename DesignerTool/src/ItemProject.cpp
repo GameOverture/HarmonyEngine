@@ -24,6 +24,9 @@
 #include <QJsonArray>
 #include <QDirIterator>
 
+// Keep this commented out unless you want the entire project to save every item upon boot (used if 'Data.json' layout has changed and needs to propagate all its changes)
+//#define RESAVE_ENTIRE_PROJECT
+
 const char * const szCHECKERGRID_VERTEXSHADER = R"src(
 #version 400
 
@@ -400,10 +403,19 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
                     }
 
                     pCurPrefixTreeItem->addChild(pNewDataItem->GetTreeItem());
+                    
+#ifdef RESAVE_ENTIRE_PROJECT
+                    static_cast<ItemWidget *>(pNewDataItem)->Save();
+#endif
+                    
                 }
             }
         }
     }
+#endif
+    
+#ifdef RESAVE_ENTIRE_PROJECT
+    SaveGameData();
 #endif
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -598,7 +610,9 @@ void ItemProject::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVa
     m_SaveDataObj.remove(sSubDirName);
     m_SaveDataObj.insert(sSubDirName, subDirObj);
 
+#ifndef RESAVE_ENTIRE_PROJECT
     SaveGameData();
+#endif
 }
 
 void ItemProject::SaveGameData()

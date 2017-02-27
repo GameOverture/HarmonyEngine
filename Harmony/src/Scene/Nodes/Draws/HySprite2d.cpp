@@ -188,6 +188,11 @@ bool HySprite2d::AnimIsPaused()
 	return m_bIsAnimPaused;
 }
 
+float HySprite2d::AnimGetDuration()
+{
+	return static_cast<HySprite2dData *>(AcquireData())->GetState(m_uiCurAnimState).m_fDURATION;
+}
+
 void HySprite2d::AnimSetCallback(uint32 uiStateID, void(*fpCallback)(HySprite2d &, void *), void *pParam /*= nullptr*/)
 {
 	while(uiStateID >= m_AnimCallbackList.size())

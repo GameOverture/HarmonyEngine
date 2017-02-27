@@ -95,6 +95,8 @@ public:
 	bool AnimIsFinished();
 
 	bool AnimIsPaused();
+
+	float AnimGetDuration();
 	
 	//--------------------------------------------------------------------------------------
 	// Client may specify whether to invoke a callback function when animation completes. The

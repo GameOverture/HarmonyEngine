@@ -127,12 +127,14 @@ void WidgetSpriteState::AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListR
 void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
 {
     QJsonArray frameArray;
+    float fTotalDuration = 0.0f;
     for(int i = 0; i < GetNumFrames(); ++i)
     {
         SpriteFrame *pSpriteFrame = m_pSpriteFramesModel->GetFrameAt(i);
 
         QJsonObject frameObj;
         frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));
+        fTotalDuration += pSpriteFrame->m_fDuration;
         frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x() + pSpriteFrame->m_pFrame->GetCrop().left()));
         frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + (pSpriteFrame->m_pFrame->GetSize().height() - pSpriteFrame->m_pFrame->GetCrop().bottom())));
         frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetChecksum())));
@@ -145,6 +147,7 @@ void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
     stateObjOut.insert("loop", QJsonValue(ui->chkLoop->isChecked()));
     stateObjOut.insert("reverse", QJsonValue(ui->chkReverse->isChecked()));
     stateObjOut.insert("bounce", QJsonValue(ui->chkBounce->isChecked()));
+    stateObjOut.insert("duration", QJsonValue(fTotalDuration));
     stateObjOut.insert("frames", QJsonValue(frameArray));
 }
 
