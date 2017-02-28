@@ -165,12 +165,15 @@ void HyText2d::SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitW
 	m_bIsDirty = true;
 }
 
-void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
+void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/, bool bPreserveGlyphRatios /*= false*/)
 {
 	int32 iFlags = BOXATTRIB_IsScaleBox | BOXATTRIB_FitWithinBounds;
 
 	if(bCenterVertically)
 		iFlags |= BOXATTRIB_CenterVertically;
+
+	if(bPreserveGlyphRatios)
+		iFlags |= BOXATTRIB_PreserveGlyphRatios;
 
 	if(m_uiBoxAttributes == iFlags && m_vBoxDimensions.x == fWidth && m_vBoxDimensions.y == fHeight)
 		return;
@@ -262,7 +265,8 @@ offsetCalculation:
 	float fLastSpaceWidth = 0.0f;
 	float fLastCharWidth = 0.0f;
 	float fCurLineWidth = 0.0f;
-	float fCurLineHeight = 0.0f;
+	float fCurLineAscender = 0.0f;
+	float fCurLineDecender = 0.0f;	// Stored as positive value
 
 	uint32 uiLastSpaceIndex = 0;
 	uint32 uiNewlineIndex = 0;
@@ -323,8 +327,12 @@ offsetCalculation:
 
 				if(fCurLineWidth < m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier))
 					fCurLineWidth = m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier);
-				if(fCurLineHeight < (glyphRef.iOFFSET_Y * m_fScaleBoxModifier))
-					fCurLineHeight = (glyphRef.iOFFSET_Y * m_fScaleBoxModifier);
+
+				if(fCurLineAscender < (glyphRef.iOFFSET_Y * m_fScaleBoxModifier))
+					fCurLineAscender = (glyphRef.iOFFSET_Y * m_fScaleBoxModifier);
+
+				if(fCurLineDecender < ((glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y) * m_fScaleBoxModifier))
+					fCurLineDecender = ((glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y) * m_fScaleBoxModifier);
 
 				// If drawing text within a box, and we advance past our width, determine if we should newline
 				if((m_uiBoxAttributes & BOXATTRIB_IsScaleBox) == 0 &&
@@ -381,7 +389,7 @@ offsetCalculation:
 						uint32 iGlyphOffsetIndex = static_cast<uint32>(iFirstLineStrIndex + (uiSTR_SIZE * ((uiNUM_LAYERS - 1) - iLayerIndex)));
 
 						pWritePos[iLayerIndex].y = m_vBoxDimensions.y;
-						pWritePos[iLayerIndex].y -= fCurLineHeight;
+						pWritePos[iLayerIndex].y -= (0 == (m_uiBoxAttributes & BOXATTRIB_PreserveGlyphRatios)) ? fCurLineAscender : (pData->GetLineHeight(m_uiCurFontState) * m_fScaleBoxModifier);
 
 						// Because this is the first line, we know that the previous value of 'm_pGlyphOffsets' is positioned from 0.0f (y-axis)
 						m_pGlyphOffsets[iGlyphOffsetIndex].y += pWritePos[iLayerIndex].y;
@@ -422,11 +430,12 @@ offsetCalculation:
 			}
 
 			// Push back this line of text's info, and initialize for the next
-			vNewlineInfo.push_back(LineInfo(fCurLineWidth, fCurLineHeight, uiNewlineIndex));
+			vNewlineInfo.push_back(LineInfo(fCurLineWidth, (fCurLineAscender + fCurLineDecender), uiNewlineIndex));
 			fLastSpaceWidth = 0.0f;
 			fLastCharWidth = 0.0f;
 			fCurLineWidth = 0.0f;
-			fCurLineHeight = 0.0f;
+			fCurLineAscender = 0.0f;
+			fCurLineDecender = 0.0f;
 			
 			// The next for-loop iteration will increment uiStrIndex to the character after the ' '. Assign uiNewlineIndex and uiLastSpaceIndex a '+1' to compensate
 			uiNewlineIndex = uiLastSpaceIndex = uiStrIndex + 1;
@@ -438,7 +447,7 @@ offsetCalculation:
 	if(bTerminatedEarly == false)
 	{
 		m_uiNumValidCharacters = static_cast<uint32>(m_sCurrentString.size());
-		vNewlineInfo.push_back(LineInfo(fCurLineWidth, fCurLineHeight, uiNewlineIndex));	// Push the final line (row)
+		vNewlineInfo.push_back(LineInfo(fCurLineWidth, (fCurLineAscender + fCurLineDecender), uiNewlineIndex));	// Push the final line (row)
 	}
 
 	m_RenderState.SetNumInstances((m_uiNumValidCharacters * uiNUM_LAYERS) - uiNumNewlineCharacters);
@@ -521,7 +530,9 @@ offsetCalculation:
 
 	if(0 != (m_uiBoxAttributes & BOXATTRIB_IsScaleBox))
 	{
-		float fTotalHeight = (pData->GetLineHeight(m_uiCurFontState) * m_fScaleBoxModifier) * vNewlineInfo.size();
+		float fTotalHeight = 0.0f;
+		for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
+			fTotalHeight += (0 == (m_uiBoxAttributes & BOXATTRIB_PreserveGlyphRatios)) ? vNewlineInfo[i].fUSED_HEIGHT : (pData->GetLineHeight(m_uiCurFontState) * m_fScaleBoxModifier);
 
 		if(bScaleBoxModiferIsSet == false)
 		{
