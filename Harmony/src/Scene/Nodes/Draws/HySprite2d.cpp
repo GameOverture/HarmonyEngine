@@ -94,7 +94,7 @@ uint32 HySprite2d::AnimGetNumStates()
 	return static_cast<HySprite2dData *>(AcquireData())->GetNumStates();
 }
 
-uint32 HySprite2d::AnimGetCurState() const
+uint32 HySprite2d::AnimGetState() const
 {
 	return m_uiCurAnimState;
 }

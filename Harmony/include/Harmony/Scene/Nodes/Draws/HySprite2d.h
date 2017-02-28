@@ -58,7 +58,7 @@ public:
 	void AnimSetPause(bool bPause);
 	
 	uint32 AnimGetNumStates();
-	uint32 AnimGetCurState() const;
+	uint32 AnimGetState() const;
 	uint32 AnimGetNumFrames();
 	uint32 AnimGetFrame() const;
 	void AnimSetFrame(uint32 uiFrameIndex);
