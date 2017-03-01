@@ -11,7 +11,7 @@
 #define __HyPlatform_Windows_h__
 
 // TODO: Windows SDK 8.x sets builds to be Windows 8 by default, make it Windows 7 instead
-#define _WIN32_WINNT 0x0601
+//#define _WIN32_WINNT 0x0601
 
 #define WIN32_LEAN_AND_MEAN 
 #include <Windows.h>
