@@ -52,8 +52,12 @@ typedef unsigned __int64	uint64;
 			{	std::stringstream ss; \
 				ss << "Assertion (" #condition ") failed.\n\n" << __FILE__ \
 				<< "\nLine: " << __LINE__ << "\n\n" << message << std::endl; \
-				MessageBoxA(NULL, ss.str().c_str(), "Harmony Engine Assert!", MB_ICONERROR); \
-				std::exit(EXIT_FAILURE); \
+				int iRetVal = MessageBoxA(NULL, ss.str().c_str(), "Harmony Engine Assert!", MB_ICONERROR | MB_ABORTRETRYIGNORE | MB_DEFBUTTON2); \
+				switch(iRetVal) { \
+				case IDABORT: std::exit(EXIT_FAILURE); \
+				case IDRETRY: DebugBreak(); break; \
+				case IDIGNORE: break; \
+				} \
 			} \
 		} while (false)
 
