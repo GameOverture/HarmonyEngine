@@ -207,7 +207,10 @@ void HyAssets::LoadGfxData(IHyDraw2d *pDrawNode2d)
 	for(auto iter = pDrawNode2d->m_RequiredAtlasIds.begin(); iter != pDrawNode2d->m_RequiredAtlasIds.end(); ++iter)
 	{
 		HyAtlasGroup *pAtlasGrp = GetAtlasGroup(*iter);
-		QueueData(pAtlasGrp);
+		for(uint32 i = 0; i < pAtlasGrp->GetNumTextures(); ++i)
+		{
+			HyA
+			QueueData(pAtlasGrp);
 
 		if(pAtlasGrp->GetLoadState() != HYLOADSTATE_Loaded)
 			bFullyLoaded = false;
@@ -441,16 +444,18 @@ void HyAssets::SetNodeAsLoaded(IHyDraw2d *pDrawNode2d)
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Load everything that is enqueued (outside of any critical section)
 		for(uint32 i = 0; i < dataList.size(); ++i)
+		{
 			dataList[i]->OnLoadThread();
 
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Copy all the (loaded) IData ptrs to the retrieval vector
-		pLoadingCtrl->m_csRetrievalQueue.Lock();
-		{
-			for(uint32 i = 0; i < dataList.size(); ++i)
-				pLoadingCtrl->m_Load_RetrievalRef.push(dataList[i]);
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// Copy all the (loaded) IData ptrs to the retrieval vector
+			pLoadingCtrl->m_csRetrievalQueue.Lock();
+			{
+				//for(uint32 i = 0; i < dataList.size(); ++i)
+					pLoadingCtrl->m_Load_RetrievalRef.push(dataList[i]);
+			}
+			pLoadingCtrl->m_csRetrievalQueue.Unlock();
 		}
-		pLoadingCtrl->m_csRetrievalQueue.Unlock();
 
 		dataList.clear();
 	}

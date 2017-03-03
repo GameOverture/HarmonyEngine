@@ -34,7 +34,7 @@ class IHyDraw2d : public IHyTransform2d
 	std::set<uint32>				m_RequiredAtlasIds;
 	std::set<int32>					m_RequiredCustomShaders;
 
-	IHyNodeData *						m_pData;
+	IHyNodeData *					m_pData;
 
 protected:
 	const std::string				m_sNAME;
