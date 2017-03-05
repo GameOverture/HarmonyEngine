@@ -91,7 +91,7 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 	{
 		jsonxx::Object atlasGroupObj = atlasGroupArray.get<jsonxx::Object>(i);
 
-		new (pAtlasGroupWriteLocation)HyAtlasGroup(*this,
+		new (pAtlasGroupWriteLocation)HyAtlasGroup(m_sDATADIR + HYASSETS_AtlasDir,
 												   static_cast<uint32>(atlasGroupObj.get<jsonxx::Number>("id")),
 												   static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("width")),
 												   static_cast<int32>(atlasGroupObj.get<jsonxx::Number>("height")),

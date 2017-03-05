@@ -105,7 +105,6 @@ public:
 	virtual ~HyAssets();
 
 	HyAtlasGroup *GetAtlasGroup(uint32 uiAtlasGroupId);
-	std::string GetTexturePath(uint32 uiAtlasGroupId, uint32 uiTextureIndex);
 
 	void GetNodeData(IHyDraw2d *pDrawNode, IHyNodeData *&pDataOut);
 	void LoadGfxData(IHyDraw2d *pDraw2d);

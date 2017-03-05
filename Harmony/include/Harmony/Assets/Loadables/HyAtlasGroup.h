@@ -22,6 +22,8 @@ class HyAssets;
 class HyAtlas : public IHyLoadableData
 {
 	const std::string						m_sFILE_PATH;
+	const uint32							m_uiWIDTH;
+	const uint32							m_uiHEIGHT;
 
 	uint32									m_uiGfxApiHandle;
 	uint32									m_uiGfxApiTextureIndex;	// Because the texture array may get split due to HW constraints, this becomes the true index in its texture array
@@ -45,19 +47,12 @@ class HyAtlas : public IHyLoadableData
 	BasicSection							m_csTextures;
 
 public:
-	HyAtlas(std::string sFilePath, jsonxx::Array &srcFramesArrayRef);
+	HyAtlas(std::string sFilePath, uint32 uiWidth, uint32 uiHeight, jsonxx::Array &srcFramesArrayRef);
 	~HyAtlas();
 
 	uint32 GetGfxApiHandle() const;
-	uint32 GetGfxApiTextureIndex() const;
-	void SetGfxApiHandle(uint32 uiGfxApiHandle, uint32 uiGfxApiTextureIndex);
-
-
 	const HyRectangle<int32> *GetSrcRect(uint32 uiChecksum) const;
 
-	void Load(const char *szFilePath);
-
-	unsigned char *GetPixelData();
 	void DeletePixelData();
 
 	virtual void OnLoadThread() override;
@@ -68,8 +63,6 @@ class HyAtlasGroup
 {
 	friend class HyAtlasContainer;
 
-	HyAssets &					m_AssetsRef;
-
 	const uint32				m_uiLOADGROUPID;
 	const uint32				m_uiWIDTH;
 	const uint32				m_uiHEIGHT;
@@ -79,7 +72,7 @@ class HyAtlasGroup
 	const uint32				m_uiNUM_ATLASES;
 
 public:
-	HyAtlasGroup(HyAssets &assetsRef, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
+	HyAtlasGroup(std::string sTexturePath, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
 	~HyAtlasGroup();
 
 	uint32 GetGfxApiHandle(uint32 uiAtlasGroupTextureIndex);
