@@ -21,16 +21,14 @@ const char * const szHYQUADBATCH_VERTEXSHADER = R"src(
 /*layout(location = 1)*/ in vec2 offset;
 /*layout(location = 2)*/ in vec4 topTint;
 /*layout(location = 3)*/ in vec4 botTint;
-/*layout(location = 4)*/ in float textureIndex;
-/*layout(location = 5)*/ in vec2 UVcoord0;
-/*layout(location = 6)*/ in vec2 UVcoord1;
-/*layout(location = 7)*/ in vec2 UVcoord2;
-/*layout(location = 8)*/ in vec2 UVcoord3;
-/*layout(location = 9)*/ in mat4 mtxLocalToWorld;
+/*layout(location = 4)*/ in vec2 UVcoord0;
+/*layout(location = 5)*/ in vec2 UVcoord1;
+/*layout(location = 6)*/ in vec2 UVcoord2;
+/*layout(location = 7)*/ in vec2 UVcoord3;
+/*layout(location = 8)*/ in mat4 mtxLocalToWorld;
 
 /*smooth*/ out vec2 interpUV;
 /*smooth*/ out vec4 interpColor;
-/*flat*/ out float texIndex;
 
 uniform mat4 u_mtxWorldToCamera;
 uniform mat4 u_mtxCameraToClip;
@@ -69,8 +67,6 @@ void main()
 		interpColor = botTint;
 		break;
 	}
-	texIndex = textureIndex;
-
 
 	vec4 pos = vec4((position[gl_VertexID].x * size.x) + offset.x,
 					(position[gl_VertexID].y * size.y) + offset.y,
@@ -88,16 +84,15 @@ const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(
 
 /*smooth*/ in vec2 interpUV;
 /*smooth*/ in vec4 interpColor;
-/*flat*/ in float texIndex;
 
-uniform sampler2DArray Tex;
+uniform sampler2D Tex;
 
 out vec4 outputColor;
 
 void main()
 {
 	// Blend interpColor with whatever texel I get from interpUV
-	vec4 texelClr = texture(Tex, vec3(interpUV.x, interpUV.y, texIndex));
+	vec4 texelClr = texture(Tex, interpUV);
 
 	outputColor = interpColor * texelClr;
 }

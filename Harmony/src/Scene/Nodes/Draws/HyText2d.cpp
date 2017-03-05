@@ -216,7 +216,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 /*virtual*/ void HyText2d::OnLoaded()
 {
 	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(UncheckedGetData());
-	m_RenderState.SetTextureHandle(pTextData->GetAtlasGroup()->GetGfxApiHandle(pTextData->GetAtlasGroupTextureIndex()));
+	m_RenderState.SetTextureHandle(pTextData->GetAtlas()->GetGfxApiHandle());
 }
 
 /*virtual*/ void HyText2d::OnUpdate()
@@ -603,8 +603,8 @@ offsetCalculation:
 			*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
 			pRefDataWritePos += sizeof(float);
 
-			*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(pData->GetAtlasGroup()->GetActualGfxApiTextureIndex(pData->GetAtlasGroupTextureIndex()));
-			pRefDataWritePos += sizeof(float);
+			//*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(pData->GetAtlas()->GetActualGfxApiTextureIndex(pData->GetAtlasGroupTextureIndex()));
+			//pRefDataWritePos += sizeof(float);
 
 			glm::vec2 vUV;
 

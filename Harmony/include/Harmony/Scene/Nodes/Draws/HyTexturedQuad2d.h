@@ -19,30 +19,27 @@ class HyTexturedQuad2d : public IHyDraw2d
 {
 protected:
 	const bool				m_bIS_RAW;	// This is 'true' when using the raw ctor which by-passes the traditional loading and instead takes info directly from the gfx api
+	const uint32			m_uiATLAS_INDEX;
 	const uint32			m_uiRAW_TEXTURE_WIDTH;
 	const uint32			m_uiRAW_TEXTURE_HEIGHT;
 
-	uint32					m_uiTextureIndex;
 	HyRectangle<float>		m_SrcRect;
 
 public:
-	HyTexturedQuad2d(uint32 uiAtlasGroupId);
-	HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight);	// Note: The 'uiGfxApiHandle' must be a handle to a texture array
+	HyTexturedQuad2d(uint32 uiAtlasIndex);
+	HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight);
 	virtual ~HyTexturedQuad2d();
 
-	uint32 GetAtlasGroupId();
 	uint32 GetGraphicsApiHandle() const;
 
-	void SetTextureSource(uint32 uiTextureIndex);
-	void SetTextureSource(uint32 uiTextureIndex, int iX, int iY, int iWidth, int iHeight);
+	void SetTextureSource(int iX, int iY, int iWidth, int iHeight);
 
-	uint32 GetTextureIndex();
+	uint32 GetAtlasIndex();
 	uint32 GetWidth();
 	uint32 GetHeight();
 
 	uint32 GetEntireTextureWidth();
 	uint32 GetEntireTextureHeight();
-	uint32 GetNumTextures();
 
 private:
 	virtual void OnUpdate() override;

@@ -22,8 +22,10 @@ class HyAssets;
 class HyAtlas : public IHyLoadableData
 {
 	const std::string						m_sFILE_PATH;
+	const uint32							m_uiINDEX;
 	const uint32							m_uiWIDTH;
 	const uint32							m_uiHEIGHT;
+	const uint32							m_uiNUM_8BIT_CHANNELS;
 
 	uint32									m_uiGfxApiHandle;
 	uint32									m_uiGfxApiTextureIndex;	// Because the texture array may get split due to HW constraints, this becomes the true index in its texture array
@@ -44,14 +46,17 @@ class HyAtlas : public IHyLoadableData
 	HyRectangle<int32> *					m_pFrames;
 	std::map<uint32, HyRectangle<int32> *>	m_ChecksumMap;
 
-	BasicSection							m_csTextures;
+	BasicSection							m_csPixelData;
 
 public:
-	HyAtlas(std::string sFilePath, uint32 uiWidth, uint32 uiHeight, jsonxx::Array &srcFramesArrayRef);
+	HyAtlas(std::string sFilePath, uint32 uiIndex, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &srcFramesArrayRef);
 	~HyAtlas();
 
+	uint32 GetIndex() const;
+	uint32 GetWidth() const;
+	uint32 GetHeight() const;
 	uint32 GetGfxApiHandle() const;
-	const HyRectangle<int32> *GetSrcRect(uint32 uiChecksum) const;
+	void GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const;
 
 	void DeletePixelData();
 
@@ -59,32 +64,32 @@ public:
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 };
 
-class HyAtlasGroup
-{
-	friend class HyAtlasContainer;
-
-	const uint32				m_uiLOADGROUPID;
-	const uint32				m_uiWIDTH;
-	const uint32				m_uiHEIGHT;
-	const uint32				m_uiNUM_8BIT_CHANNELS;
-
-	HyAtlas *					m_pAtlases;
-	const uint32				m_uiNUM_ATLASES;
-
-public:
-	HyAtlasGroup(std::string sTexturePath, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
-	~HyAtlasGroup();
-
-	uint32 GetGfxApiHandle(uint32 uiAtlasGroupTextureIndex);
-	uint32 GetActualGfxApiTextureIndex(uint32 uiAtlasGroupTextureIndex);
-
-	uint32 GetId() const;
-	uint32 GetNumColorChannels() const;
-	uint32 GetWidth() const;
-	uint32 GetHeight() const;
-	uint32 GetNumTextures() const;
-
-	void GetUvRect(uint32 uiChecksum, uint32 &uiTextureIndexOut, HyRectangle<float> &UVRectOut) const;
-};
+//class HyAtlasGroup
+//{
+//	friend class HyAtlasContainer;
+//
+//	const uint32				m_uiLOADGROUPID;
+//	const uint32				m_uiWIDTH;
+//	const uint32				m_uiHEIGHT;
+//	
+//
+//	HyAtlas *					m_pAtlases;
+//	const uint32				m_uiNUM_ATLASES;
+//
+//public:
+//	HyAtlasGroup(std::string sTexturePath, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
+//	~HyAtlasGroup();
+//
+//	uint32 GetGfxApiHandle(uint32 uiAtlasGroupTextureIndex);
+//	uint32 GetActualGfxApiTextureIndex(uint32 uiAtlasGroupTextureIndex);
+//
+//	uint32 GetId() const;
+//	uint32 GetNumColorChannels() const;
+//	uint32 GetWidth() const;
+//	uint32 GetHeight() const;
+//	uint32 GetNumTextures() const;
+//
+//	void GetUvRect(uint32 uiChecksum, uint32 &uiTextureIndexOut, HyRectangle<float> &UVRectOut) const;
+//};
 
 #endif /* __HyAtlasGroup_h__ */

@@ -181,7 +181,6 @@ WidgetAtlasGroup::WidgetAtlasGroup(QDir metaDir, QDir dataDir, WidgetAtlasManage
                                                             static_cast<eAtlasNodeType>(frameObj["type"].toInt()),
                                                             frameObj["width"].toInt(),
                                                             frameObj["height"].toInt(),
-                                                            frameObj["textureIndex"].toInt(),
                                                             frameObj["x"].toInt(),
                                                             frameObj["y"].toInt(),
                                                             frameObj["errors"].toInt(0));
@@ -459,7 +458,7 @@ HyGuiFrame *WidgetAtlasGroup::ImportImage(QString sName, QImage &newImage, eAtla
     if(eType != ATLAS_Font && eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
         rAlphaCrop = ImagePacker::crop(newImage);
 
-    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, GetId(), eType, newImage.width(), newImage.height(), -1, -1, -1, 0);
+    HyGuiFrame *pNewFrame = m_pManager->CreateFrame(uiChecksum, sName, rAlphaCrop, uiAtlasIndex, eType, newImage.width(), newImage.height(), -1, -1, 0);
     if(pNewFrame)
     {
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));

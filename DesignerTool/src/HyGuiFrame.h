@@ -22,7 +22,7 @@ class HyGuiFrame
 {
     friend class WidgetAtlasManager;
 
-    const uint                          m_uiATLAS_GROUP_ID;
+    const uint                          m_uiATLAS_INDEX;
     
     eAtlasNodeType                      m_eType;
 
@@ -46,7 +46,7 @@ class HyGuiFrame
     uint                                m_uiErrors; // '0' when there is no error
 
     // Private ctor as WidgetAtlasManager should only construct these
-    HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, int iX, int iY, uint uiErrors);
+    HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasIndex, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiErrors);
     ~HyGuiFrame();
     
 public:
@@ -62,7 +62,7 @@ public:
     QRect GetCrop()                             { return m_rAlphaCrop; }
     QPoint GetPosition()                        { return QPoint(m_iPosX, m_iPosY); }
     QSet<ItemWidget *> GetLinks()               { return m_Links; }
-    int GetAtlasGroupdId()                      { return static_cast<int>(m_uiATLAS_GROUP_ID); }
+    int GetAtlasIndex()                         { return static_cast<int>(m_uiATLAS_INDEX); }
     eAtlasNodeType GetType()                    { return m_eType; }
 
     int GetTextureIndex()                       { return m_iTextureIndex; }

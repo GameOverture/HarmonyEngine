@@ -17,16 +17,16 @@
 
 class HyTexturedQuad2dData : public IHyNodeData
 {
-	const uint32		m_uiATLASGROUP_ID;
-	HyAtlasGroup *		m_pAtlas;
+	const uint32		m_uiATLAS_INDEX;
+	HyAtlas *			m_pAtlas;
 
 public:
 	HyTexturedQuad2dData(const std::string &sPath, HyAssets &assetsRef);
 	virtual ~HyTexturedQuad2dData();
 
-	HyAtlasGroup *GetAtlasGroup();
+	HyAtlas *GetAtlas();
 
-	virtual void AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut) override;
+	virtual void AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIndicesOut) override;
 };
 
 #endif /* __HyTexturedQuad2dData_h__ */

@@ -256,10 +256,10 @@ void IHyDraw2d::Load()
 
 	if(m_eTYPE != HYTYPE_Entity2d)
 	{
-		m_RequiredAtlasIds.clear();
+		m_RequiredAtlasIndices.clear();
 		AcquireData();
 		if(m_pData)
-			m_pData->AppendRequiredAtlasIds(m_RequiredAtlasIds);
+			m_pData->AppendRequiredAtlasIds(m_RequiredAtlasIndices);
 
 		sm_pHyAssets->LoadGfxData(this);
 	}

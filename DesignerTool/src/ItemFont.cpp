@@ -127,7 +127,7 @@ ItemFont::ItemFont(const QString sPrefix, const QString sName, QJsonValue initVa
         m_pDrawAtlasPreview = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
         m_pDrawAtlasPreview->Load();
         m_pDrawAtlasPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
-        m_pDrawAtlasPreview->SetTextureSource(0, 0, 0, pAtlas->width, pAtlas->height);
+        m_pDrawAtlasPreview->SetTextureSource(0, 0, pAtlas->width, pAtlas->height);
 
         m_DrawAtlasOutline.SetAsQuad(static_cast<int>(pAtlas->width), static_cast<int>(pAtlas->height), true);
 
@@ -194,7 +194,7 @@ ItemFont::ItemFont(const QString sPrefix, const QString sName, QJsonValue initVa
 
                 HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
                 pDrawGlyphQuad->Load();
-                pDrawGlyphQuad->SetTextureSource(0, iX, iY, iWidth, iHeight);
+                pDrawGlyphQuad->SetTextureSource(iX, iY, iWidth, iHeight);
                 pDrawGlyphQuad->pos.Set(ptGlyphPos.x + pGlyph->offset_x, ptGlyphPos.y);
                 
                 QColor topColor = pFontModel->GetLayerTopColor(i);

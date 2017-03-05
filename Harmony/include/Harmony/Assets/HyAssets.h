@@ -39,8 +39,8 @@ class HyAssets
 	HyGfxComms &										m_GfxCommsRef;
 	HyScene &											m_SceneRef;
 
-	HyAtlasGroup *										m_pAtlasGroups;
-	uint32												m_uiNumAtlasGroups;
+	HyAtlas *											m_pAtlases;
+	uint32												m_uiNumAtlases;
 
 	template<typename tData>
 	class NodeData
@@ -104,7 +104,7 @@ public:
 	HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
 	virtual ~HyAssets();
 
-	HyAtlasGroup *GetAtlasGroup(uint32 uiAtlasGroupId);
+	HyAtlas *GetAtlas(uint32 uiIndex);
 
 	void GetNodeData(IHyDraw2d *pDrawNode, IHyNodeData *&pDataOut);
 	void LoadGfxData(IHyDraw2d *pDraw2d);

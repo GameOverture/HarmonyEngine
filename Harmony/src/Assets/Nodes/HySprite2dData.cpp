@@ -15,12 +15,7 @@
 
 uint32 HySprite2dFrame::GetGfxApiHandle() const
 {
-	return pAtlasGroup ? pAtlasGroup->GetGfxApiHandle(uiATLAS_GROUP_TEXTURE_INDEX) : 0;
-}
-
-uint32 HySprite2dFrame::GetActualTextureIndex() const
-{
-	return pAtlasGroup ? pAtlasGroup->GetActualGfxApiTextureIndex(uiATLAS_GROUP_TEXTURE_INDEX) : 0;
+	return pAtlas ? pAtlas->GetGfxApiHandle() : 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,8 +82,7 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 
 	for(uint32 i = 0; i < m_uiNUMFRAMES; ++i, ++pFrameWriteLocation)
 	{
-		HyAtlasGroup *pAtlasGroup = nullptr;
-		uint32 uiAtlasGroupTextureIndex = 0;
+		HyAtlas *pAtlas = nullptr;
 		HyRectangle<float> rUVRect(0.0f, 0.0f, 0.0f, 0.0f);
 		glm::ivec2 vOffset(0);
 		float fDuration(0.0f);
@@ -97,16 +91,15 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 		{
 			jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
 
-			uint32 uiAtlasGroupId = static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasGroupId"));
-			m_UsedAtlasIds.insert(uiAtlasGroupId);
-			pAtlasGroup = assetsRef.GetAtlasGroup(uiAtlasGroupId);
-			pAtlasGroup->GetUvRect(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), uiAtlasGroupTextureIndex, rUVRect);
+			uint32 uiAtlasIndex = static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasIndex"));
+			m_UsedAtlasIds.insert(uiAtlasIndex);
+			pAtlas = assetsRef.GetAtlas(uiAtlasIndex);
+			pAtlas->GetUvRect(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), rUVRect);
 			HySetVec(vOffset, static_cast<int32>(frameObj.get<jsonxx::Number>("offsetX")), static_cast<int32>(frameObj.get<jsonxx::Number>("offsetY")));
 			fDuration = static_cast<float>(frameObj.get<jsonxx::Number>("duration"));
 		}
 
-		new (pFrameWriteLocation)HySprite2dFrame(pAtlasGroup,
-												 uiAtlasGroupTextureIndex,
+		new (pFrameWriteLocation)HySprite2dFrame(pAtlas,
 												 rUVRect.left, rUVRect.top, rUVRect.right, rUVRect.bottom,
 												 vOffset,
 												 fDuration);

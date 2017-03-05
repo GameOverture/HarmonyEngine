@@ -31,7 +31,7 @@ class IHyDraw2d : public IHyTransform2d
 	static HyAssets *				sm_pHyAssets;
 
 	HyLoadState						m_eLoadState;
-	std::set<uint32>				m_RequiredAtlasIds;
+	std::set<uint32>				m_RequiredAtlasIndices;
 	std::set<int32>					m_RequiredCustomShaders;
 
 	IHyNodeData *					m_pData;

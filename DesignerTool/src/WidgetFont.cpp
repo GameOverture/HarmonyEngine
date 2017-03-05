@@ -88,7 +88,7 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
         
         for(int i = 0; i < ui->cmbAtlasGroups->count(); ++i)
         {
-            if(m_pItemFont->GetAtlasManager().GetAtlasIdFromIndex(i) == m_pTrueAtlasFrame->GetAtlasGroupdId())
+            if(m_pItemFont->GetAtlasManager().GetAtlasIdFromIndex(i) == m_pTrueAtlasFrame->GetAtlasIndex())
             {
                 ui->cmbAtlasGroups->setCurrentIndex(i);
                 m_iPrevAtlasCmbIndex = i;
@@ -493,7 +493,8 @@ bool WidgetFont::SaveFontFilesToMetaDir()
 void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
 {
     fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetChecksum())));
-    fontObj.insert("atlasGroupId", m_pTrueAtlasFrame->GetAtlasGroupdId());
+
+    fontObj.insert("atlasIndex", m_pTrueAtlasFrame->GetAtlasIndex());
 
     QJsonObject availableGlyphsObj;
     availableGlyphsObj.insert("0-9", ui->chk_09->isChecked());

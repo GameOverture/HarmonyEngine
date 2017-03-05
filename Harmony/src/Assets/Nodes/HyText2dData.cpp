@@ -44,7 +44,6 @@ HyText2dData::FontState::~FontState()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_Text2d, sPath),
-																												m_uiAtlasGroupTextureIndex(0),
 																												m_pTypefaces(NULL),
 																												m_uiNumTypefaces(0),
 																												m_pFontStates(NULL),
@@ -52,13 +51,13 @@ HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataVa
 {
 	jsonxx::Object textObject = dataValueRef.get<jsonxx::Object>();
 
-	m_pAtlasGroup = assetsRef.GetAtlasGroup(static_cast<uint32>(textObject.get<jsonxx::Number>("atlasGroupId")));
+	m_pAtlas = assetsRef.GetAtlas(static_cast<uint32>(textObject.get<jsonxx::Number>("atlasIndex")));
 
 	HyRectangle<float> rSubAtlasUVRect;
-	m_pAtlasGroup->GetUvRect(static_cast<uint32>(textObject.get<jsonxx::Number>("checksum")), m_uiAtlasGroupTextureIndex, rSubAtlasUVRect);
+	m_pAtlas->GetUvRect(static_cast<uint32>(textObject.get<jsonxx::Number>("checksum")), rSubAtlasUVRect);
 
-	float fSubAtlasWidth = m_pAtlasGroup->GetWidth() * (rSubAtlasUVRect.right - rSubAtlasUVRect.left);
-	float fSubAtlasHeight = m_pAtlasGroup->GetHeight() * (rSubAtlasUVRect.bottom - rSubAtlasUVRect.top);
+	float fSubAtlasWidth = m_pAtlas->GetWidth() * (rSubAtlasUVRect.right - rSubAtlasUVRect.left);
+	float fSubAtlasHeight = m_pAtlas->GetHeight() * (rSubAtlasUVRect.bottom - rSubAtlasUVRect.top);
 	
 	jsonxx::Array typefaceArray = textObject.get<jsonxx::Array>("typefaceArray");
 	m_uiNumTypefaces = static_cast<uint32>(typefaceArray.size());
@@ -76,14 +75,14 @@ HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataVa
 		{
 			jsonxx::Object glyphObj = glyphsArray.get<jsonxx::Object>(j);
 
-			float fLeftUv = (m_pAtlasGroup->GetWidth() * rSubAtlasUVRect.left) + (fSubAtlasWidth * static_cast<float>(glyphObj.get<jsonxx::Number>("left")));
-			fLeftUv /= m_pAtlasGroup->GetWidth();
-			float fTopUv = (m_pAtlasGroup->GetHeight() * rSubAtlasUVRect.top) + (fSubAtlasHeight * static_cast<float>(glyphObj.get<jsonxx::Number>("top")));
-			fTopUv /= m_pAtlasGroup->GetHeight();
-			float fRightUv = (m_pAtlasGroup->GetWidth() * rSubAtlasUVRect.left) + (fSubAtlasWidth * static_cast<float>(glyphObj.get<jsonxx::Number>("right")));
-			fRightUv /= m_pAtlasGroup->GetWidth();
-			float fBottomUv = (m_pAtlasGroup->GetHeight() * rSubAtlasUVRect.top) + (fSubAtlasHeight * static_cast<float>(glyphObj.get<jsonxx::Number>("bottom")));
-			fBottomUv /= m_pAtlasGroup->GetHeight();
+			float fLeftUv = (m_pAtlas->GetWidth() * rSubAtlasUVRect.left) + (fSubAtlasWidth * static_cast<float>(glyphObj.get<jsonxx::Number>("left")));
+			fLeftUv /= m_pAtlas->GetWidth();
+			float fTopUv = (m_pAtlas->GetHeight() * rSubAtlasUVRect.top) + (fSubAtlasHeight * static_cast<float>(glyphObj.get<jsonxx::Number>("top")));
+			fTopUv /= m_pAtlas->GetHeight();
+			float fRightUv = (m_pAtlas->GetWidth() * rSubAtlasUVRect.left) + (fSubAtlasWidth * static_cast<float>(glyphObj.get<jsonxx::Number>("right")));
+			fRightUv /= m_pAtlas->GetWidth();
+			float fBottomUv = (m_pAtlas->GetHeight() * rSubAtlasUVRect.top) + (fSubAtlasHeight * static_cast<float>(glyphObj.get<jsonxx::Number>("bottom")));
+			fBottomUv /= m_pAtlas->GetHeight();
 
 			curTypeface[static_cast<uint32>(glyphObj.get<jsonxx::Number>("code"))] = HY_NEW HyText2dGlyphInfo(static_cast<uint32>(glyphObj.get<jsonxx::Number>("width")),
 																											  static_cast<uint32>(glyphObj.get<jsonxx::Number>("height")),
@@ -151,14 +150,9 @@ const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLay
 		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].vDEFAULT_BOT_COLOR;
 }
 
-HyAtlasGroup *HyText2dData::GetAtlasGroup()
+HyAtlas *HyText2dData::GetAtlas()
 {
-	return m_pAtlasGroup;
-}
-
-uint32 HyText2dData::GetAtlasGroupTextureIndex()
-{
-	return m_uiAtlasGroupTextureIndex;
+	return m_pAtlas;
 }
 
 float HyText2dData::GetLineHeight(uint32 uiStateIndex)
@@ -184,7 +178,7 @@ float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
 	return 0.0f;
 }
 
-/*virtual*/ void HyText2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
+/*virtual*/ void HyText2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIndicesOut)
 {
-	requiredAtlasIdsOut.insert(m_pAtlasGroup->GetId());
+	requiredAtlasIndicesOut.insert(m_pAtlas->GetIndex());
 }

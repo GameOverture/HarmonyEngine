@@ -13,26 +13,26 @@
 
 
 HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_TexturedQuad2d, sPath),
-																							m_uiATLASGROUP_ID(sPath == "raw" ? 0xFFFFFFFF : std::stoi(sPath)),
+																							m_uiATLAS_INDEX(sPath == "raw" ? 0xFFFFFFFF : std::stoi(sPath)),
 																							m_pAtlas(nullptr)
 {
 	//if(m_uiATLASGROUP_ID == 0xFFFFFFFF)
 	//	SetLoadState(HYLOADSTATE_Loaded);
 	
-	if(m_uiATLASGROUP_ID != 0xFFFFFFFF)
-		m_pAtlas = assetsRef.GetAtlasGroup(m_uiATLASGROUP_ID);
+	if(m_uiATLAS_INDEX != 0xFFFFFFFF)
+		m_pAtlas = assetsRef.GetAtlas(m_uiATLAS_INDEX);
 }
 
 HyTexturedQuad2dData::~HyTexturedQuad2dData()
 {
 }
 
-HyAtlasGroup *HyTexturedQuad2dData::GetAtlasGroup()
+HyAtlas *HyTexturedQuad2dData::GetAtlas()
 {
 	return m_pAtlas;
 }
 
-/*virtual*/ void HyTexturedQuad2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
+/*virtual*/ void HyTexturedQuad2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIndicesOut)
 {
-	requiredAtlasIdsOut.insert(m_pAtlas->GetId());
+	requiredAtlasIndicesOut.insert(m_uiATLAS_INDEX);
 }

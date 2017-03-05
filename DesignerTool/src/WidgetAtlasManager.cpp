@@ -184,7 +184,7 @@ void WidgetAtlasManager::ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage 
     {
         WidgetAtlasGroup *pAtlasGroup = static_cast<WidgetAtlasGroup *>(ui->atlasGroups->widget(i));
 
-        if(pAtlasGroup->GetId() == pFrame->GetAtlasGroupdId())
+        if(pAtlasGroup->GetId() == pFrame->GetAtlasIndex())
         {
             QSet<int> textureIndexToReplaceSet;
             textureIndexToReplaceSet.insert(pFrame->GetTextureIndex());
@@ -508,7 +508,7 @@ void WidgetAtlasManager::HideAtlasGroup()
     m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_Nothing);
 }
 
-HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasGroupId, eAtlasNodeType eType, int iW, int iH, int iTexIndex, int iX, int iY, uint uiErrors)
+HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasIndex, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiErrors)
 {
     HyGuiFrame *pNewFrame = NULL;
 
@@ -517,14 +517,14 @@ HyGuiFrame *WidgetAtlasManager::CreateFrame(quint32 uiChecksum, QString sN, QRec
         HyGuiFrame *pExistingFrame = m_DependencyMap.find(uiChecksum).value();
         HyGuiLog("'" % sN % "' is a duplicate of '" % pExistingFrame->GetName() % "' with the checksum: " % QString::number(uiChecksum), LOGTYPE_Info);
 
-        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, iX, iY, uiErrors);
+        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasIndex, eType, iW, iH, iX, iY, uiErrors);
 
         pNewFrame->SetError(GUIFRAMEERROR_Duplicate);
         pExistingFrame->SetError(GUIFRAMEERROR_Duplicate);
     }
     else
     {
-        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasGroupId, eType, iW, iH, iTexIndex, iX, iY, uiErrors);
+        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, uiAtlasIndex, eType, iW, iH, iX, iY, uiErrors);
         m_DependencyMap[uiChecksum] = pNewFrame;
     }
 
