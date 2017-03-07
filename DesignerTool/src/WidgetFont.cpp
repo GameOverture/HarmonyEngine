@@ -34,12 +34,14 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
                                                             m_pTrueAtlasPixelData(NULL),
                                                             m_pTrueAtlasFrame(NULL),
                                                             m_FontMetaDir(m_pItemFont->GetItemProject()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirFonts)),
-                                                            m_iPrevAtlasCmbIndex(0),
                                                             ui(new Ui::WidgetFont)
 {
     ui->setupUi(this);
     
     m_bBlockGeneratePreview = true; // Avoid generating the atlas preview multiple times during initialization
+
+    m_PrevAtlasSize.setWidth(0);
+    m_PrevAtlasSize.setHeight(0);
 
     ui->txtPrefixAndName->setText(m_pItemFont->GetName(true));
 
@@ -66,8 +68,6 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     m_StateActionsList.push_back(ui->actionOrderLayerUpwards);
     m_StateActionsList.push_back(ui->actionOrderLayerDownwards);
 
-    ui->cmbAtlasGroups->setModel(m_pItemFont->GetAtlasManager().AllocateAtlasModelView());
-    
     // If item's init value is defined, parse and initalize with it, otherwise make default empty font
     if(m_pItemFont->GetInitValue().type() != QJsonValue::Null)
     {
@@ -86,15 +86,15 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
         QList<HyGuiFrame *> pRequestedList = m_pItemFont->GetAtlasManager().RequestFrames(m_pItemFont, requestList);
         m_pTrueAtlasFrame = pRequestedList[0];
         
-        for(int i = 0; i < ui->cmbAtlasGroups->count(); ++i)
-        {
-            if(m_pItemFont->GetAtlasManager().GetAtlasIdFromIndex(i) == m_pTrueAtlasFrame->GetAtlasIndex())
-            {
-                ui->cmbAtlasGroups->setCurrentIndex(i);
-                m_iPrevAtlasCmbIndex = i;
-                break;
-            }
-        }
+//        for(int i = 0; i < ui->cmbAtlasGroups->count(); ++i)
+//        {
+//            if(m_pItemFont->GetAtlasManager().GetAtlasIdFromIndex(i) == m_pTrueAtlasFrame->GetAtlasIndex())
+//            {
+//                ui->cmbAtlasGroups->setCurrentIndex(i);
+//                m_iPrevAtlasCmbIndex = i;
+//                break;
+//            }
+//        }
         
         QJsonArray stateArray = fontObj["stateArray"].toArray();
         QJsonArray typefaceArray = fontObj["typefaceArray"].toArray();
@@ -141,8 +141,6 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     else
     {
         SetGlyphsDirty();
-        
-        ui->cmbAtlasGroups->setCurrentIndex(m_pItemFont->GetAtlasManager().CurrentAtlasGroupIndex());
         
         on_actionAddState_triggered();
         on_actionAddLayer_triggered();
@@ -302,7 +300,7 @@ void WidgetFont::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
         m_MasterStageList[i]->iReferenceCount = m_MasterStageList[i]->iTmpReferenceCount;
     
     // if 'bFindBestFit' == true, adjust atlas dimentions until we utilize efficient space on the smallest texture
-    QSize atlasSize = GetAtlasDimensions(ui->cmbAtlasGroups->currentIndex());
+    QSize atlasSize = m_pItemFont->GetAtlasManager().GetAtlasDimensions();
     float fAtlasSizeModifier = 1.0f;
     bool bDoInitialShrink = true;
     size_t iNumMissedGlyphs = 0;
@@ -374,7 +372,7 @@ void WidgetFont::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
         if(m_pTrueAtlasFrame)
             m_pItemFont->GetAtlasManager().ReplaceFrame(m_pTrueAtlasFrame, m_pItemFont->GetName(false), fontAtlasImage, true);
         else
-            m_pTrueAtlasFrame = m_pItemFont->GetAtlasManager().GenerateFrame(m_pItemFont, GetSelectedAtlasId(), m_pItemFont->GetName(false), fontAtlasImage, ATLAS_Font);
+            m_pTrueAtlasFrame = m_pItemFont->GetAtlasManager().GenerateFrame(m_pItemFont, m_pItemFont->GetName(false), fontAtlasImage, ATLAS_Font);
     }
     
     // Signals ItemFont to upload and refresh the preview texture
@@ -397,26 +395,15 @@ QDir WidgetFont::GetFontMetaDir()
     return m_FontMetaDir;
 }
 
-int WidgetFont::GetSelectedAtlasId()
-{
-    return m_pItemFont->GetAtlasManager().GetAtlasIdFromIndex(ui->cmbAtlasGroups->currentIndex());
-}
-
-QSize WidgetFont::GetAtlasDimensions(int iAtlasGrpIndex)
-{
-    return m_pItemFont->GetAtlasManager().GetAtlasDimensions(iAtlasGrpIndex);
-}
-
 void WidgetFont::UpdateActions()
 {
     bool bGeneratePreview = false;
     
-    QSize prevSize = GetAtlasDimensions(m_iPrevAtlasCmbIndex);
-    m_iPrevAtlasCmbIndex = ui->cmbAtlasGroups->currentIndex();
-    QSize curSize = GetAtlasDimensions(m_iPrevAtlasCmbIndex);
-    
-    if(prevSize.width() < curSize.width() || prevSize.height() < curSize.height())
+    QSize curSize = m_pItemFont->GetAtlasManager().GetAtlasDimensions();
+    if(m_PrevAtlasSize.width() < curSize.width() || m_PrevAtlasSize.height() < curSize.height())
         bGeneratePreview = true;
+
+    m_PrevAtlasSize = curSize;
     
     QString sPrevSymbols = m_sAvailableTypefaceGlyphs;
     SetGlyphsDirty();
@@ -494,7 +481,7 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
 {
     fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetChecksum())));
 
-    fontObj.insert("atlasIndex", m_pTrueAtlasFrame->GetAtlasIndex());
+    fontObj.insert("atlasIndex", m_pTrueAtlasFrame->GetTextureIndex());
 
     QJsonObject availableGlyphsObj;
     availableGlyphsObj.insert("0-9", ui->chk_09->isChecked());
@@ -606,13 +593,6 @@ void WidgetFont::GetSaveInfo(QJsonObject &fontObj)
         stateArray.append(stateObj);
     }
     fontObj.insert("stateArray", stateArray);
-}
-
-void WidgetFont::on_cmbAtlasGroups_currentIndexChanged(int index)
-{
-    // TODO: This will break when an atlas group is removed from the Atlas Manager and is apart of the UndoStack
-    QUndoCommand *pCmd = new WidgetUndoCmd_ComboBox<WidgetFont>("Atlas Group Changed", this, ui->cmbAtlasGroups, m_iPrevAtlasCmbIndex, index);
-    m_pItemFont->GetUndoStack()->push(pCmd);
 }
 
 void WidgetFont::on_chk_09_clicked()

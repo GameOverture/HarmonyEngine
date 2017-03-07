@@ -5,7 +5,7 @@
     },
     "Fonts": {
         "NewFont": {
-            "atlasGroupId": 1,
+            "atlasIndex": 0,
             "availableGlyphs": {
                 "0-9": true,
                 "A-Z": true,

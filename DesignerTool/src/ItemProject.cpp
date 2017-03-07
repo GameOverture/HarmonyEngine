@@ -646,7 +646,7 @@ void ItemProject::SaveUserData()
     else
     {
         QJsonObject userObj;
-        userObj.insert("DefaultAtlasGroup", m_pAtlasMan->GetSelectedAtlasGroup());
+        userObj.insert("DefaultAtlasGroup", "Not used anymore");
 
 
         // TODO:

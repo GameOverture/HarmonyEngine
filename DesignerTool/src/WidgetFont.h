@@ -84,9 +84,10 @@ class WidgetFont : public QWidget
     HyGuiFrame *                m_pTrueAtlasFrame;
     
     QDir                        m_FontMetaDir;
-    int                         m_iPrevAtlasCmbIndex;
     
     bool                        m_bBlockGeneratePreview;
+
+    QSize                       m_PrevAtlasSize;
     
 public:
     explicit WidgetFont(ItemFont *pOwner, QWidget *parent = 0);
@@ -110,10 +111,6 @@ public:
     
     QDir GetFontMetaDir();
 
-    int GetSelectedAtlasId();
-
-    QSize GetAtlasDimensions(int iAtlasGrpIndex);
-
     void UpdateActions();
 
     QString GetPreviewString();
@@ -125,8 +122,6 @@ public:
     void GetSaveInfo(QJsonObject &fontObj);
 
 private Q_SLOTS:
-    void on_cmbAtlasGroups_currentIndexChanged(int index);
-
     void on_chk_09_clicked();
 
     void on_chk_az_clicked();

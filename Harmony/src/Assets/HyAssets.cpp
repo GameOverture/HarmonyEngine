@@ -75,17 +75,17 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 	std::string sAtlasInfoFileContents;
 	HyReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
 
-	jsonxx::Array atlasArray;
-	if(atlasArray.parse(sAtlasInfoFileContents) && atlasArray.size() != 0)
+	jsonxx::Object atlasObject;
+	if(atlasObject.parse(sAtlasInfoFileContents))
 	{
-		m_uiNumAtlases = static_cast<uint32>(atlasArray.size());
+		jsonxx::Array texturesArray = atlasObject.get<jsonxx::Array>("textures");
+
+		m_uiNumAtlases = static_cast<uint32>(texturesArray.size());
 		m_pAtlases = reinterpret_cast<HyAtlas *>(HY_NEW unsigned char[sizeof(HyAtlas) * m_uiNumAtlases]);
 		HyAtlas *pAtlasWriteLocation = m_pAtlases;
 
 		for(uint32 i = 0; i < m_uiNumAtlases; ++i, ++pAtlasWriteLocation)
 		{
-			jsonxx::Object atlasObj = atlasArray.get<jsonxx::Object>(i);
-
 			std::string sAtlasFilePath = m_sDATADIR + HYASSETS_AtlasDir;
 			char szTmpBuffer[16];
 			std::sprintf(szTmpBuffer, "%05d", i);
@@ -94,10 +94,10 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 
 			new (pAtlasWriteLocation)HyAtlas(sAtlasFilePath,
 											 i,
-											 static_cast<int32>(atlasObj.get<jsonxx::Number>("width")),
-											 static_cast<int32>(atlasObj.get<jsonxx::Number>("height")),
-											 static_cast<int32>(atlasObj.get<jsonxx::Number>("num8BitClrChannels")),
-											 atlasObj.get<jsonxx::Array>("frames"));
+											 static_cast<int32>(atlasObject.get<jsonxx::Number>("width")),
+											 static_cast<int32>(atlasObject.get<jsonxx::Number>("height")),
+											 static_cast<int32>(atlasObject.get<jsonxx::Number>("num8BitClrChannels")),
+											 texturesArray.get<jsonxx::Array>(i));
 		}
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -23,18 +23,34 @@ namespace Ui {
 class WidgetAtlasManager;
 }
 
-class WidgetAtlasGroupModel : public QStringListModel
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class WidgetAtlasGroupTreeWidget : public QTreeWidget
 {
-    QStackedWidget &        m_AtlasGroupsRef;
+    WidgetAtlasManager *      m_pOwner;
 
 public:
-    WidgetAtlasGroupModel(QStackedWidget &atlasGroupsRef, QObject *pParent);
+    WidgetAtlasGroupTreeWidget(QWidget *parent = Q_NULLPTR);
+    void SetOwner(WidgetAtlasManager *pOwner);
 
-    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-    virtual int	rowCount(const QModelIndex & parent = QModelIndex()) const;
+protected:
+    virtual void dropEvent(QDropEvent *e);
 };
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class WidgetAtlasGroupTreeWidgetItem : public QTreeWidgetItem
+{
+public:
+    WidgetAtlasGroupTreeWidgetItem(int type = Type) : QTreeWidgetItem(type)
+    { }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    WidgetAtlasGroupTreeWidgetItem(QTreeWidget *parent, int type = Type) : QTreeWidgetItem(parent, type)
+    { }
+
+    WidgetAtlasGroupTreeWidgetItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type)
+    { }
+
+    bool operator<(const QTreeWidgetItem& other) const;
+};
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class WidgetAtlasManager : public QWidget
 {
@@ -51,7 +67,11 @@ class WidgetAtlasManager : public QWidget
     
     QTreeWidgetItem *               m_pMouseHoverItem;
 
-    WidgetAtlasGroupModel *         m_pCmbModel;
+
+    DlgAtlasGroupSettings       m_dlgSettings;
+
+    QList<HyGuiFrame *>         m_FrameList;
+    ImagePacker                 m_Packer;
 
 public:
     explicit WidgetAtlasManager(QWidget *parent = 0);
@@ -59,18 +79,14 @@ public:
     ~WidgetAtlasManager();
     
     ItemProject *GetProjOwner()     { return m_pProjOwner; }
-    
-    WidgetAtlasGroupModel *AllocateAtlasModelView();
-    int CurrentAtlasGroupIndex();
-    int GetAtlasIdFromIndex(int iIndex);
-    QSize GetAtlasDimensions(int iIndex);
 
-    QString GetSelectedAtlasGroup();
-    void SetSelectedAtlasGroup(QString sName);
+    QSize GetAtlasDimensions();
+    void WriteMetaSettings();
+    void WriteMetaSettings(QJsonArray frameArray);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    HyGuiFrame *GenerateFrame(ItemWidget *pItem, int iAtlasGroupId, QString sName, QImage &newImage, eAtlasNodeType eType);
+    HyGuiFrame *GenerateFrame(ItemWidget *pItem, QString sName, QImage &newImage, eAtlasNodeType eType);
     void ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
 
     QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem);
@@ -87,29 +103,47 @@ public:
     friend void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
 
 private Q_SLOTS:
-    void on_atlasGroups_currentChanged(int iIndex);
+    void on_btnAddImages_clicked();
 
-    void on_btnAddGroup_clicked();
+    void on_btnAddDir_clicked();
 
-    void on_cmbAtlasGroups_currentIndexChanged(int index);
-    
-    void on_actionDeleteAtlasGroup_triggered();
-    
+    void on_btnSettings_clicked();
+
+    void on_actionDeleteImages_triggered();
+
+    void on_actionReplaceImages_triggered();
+
+    void on_actionAddFilter_triggered();
+
+    void on_atlasList_itemSelectionChanged();
+
 private:
     Ui::WidgetAtlasManager *ui;
-
-    void AddAtlasGroup(int iId = -1);
 
     void PreviewAtlasGroup();
     void HideAtlasGroup();
 
-    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, uint uiAtlasIndex, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiErrors);
+    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors);
     void RemoveImage(HyGuiFrame *pFrame, QDir metaDir);
 
     void SaveData();
 
     void SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
     void RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
+
+    void CreateTreeItem(WidgetAtlasGroupTreeWidgetItem *pParent, HyGuiFrame *pFrame);
+
+    void ResizeAtlasListColumns();
+
+    void GetAtlasInfoForGameData(QJsonObject &atlasObjOut);
+
+    QSet<HyGuiFrame *> ImportImages(QStringList sImportImgList);
+    HyGuiFrame *ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType);
+
+    void RepackAll();
+    void Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> newFramesSet);
+    void ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIndex);
+    void Refresh();
 };
 
 #endif // WIDGETATLASMANAGER_H

@@ -10,8 +10,7 @@
 #include "HyGuiFrame.h"
 #include "scriptum/imagepacker.h"
 
-HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint uiAtlasIndex, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiErrors) :  m_uiATLAS_INDEX(uiAtlasIndex),
-                                                                                                                                                                    m_eType(eType),
+HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors) :  m_eType(eType),
                                                                                                                                                                     m_pTreeWidgetItem(NULL),
                                                                                                                                                                     m_uiChecksum(uiChecksum),
                                                                                                                                                                     m_sName(sN),
@@ -20,6 +19,7 @@ HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, uint ui
                                                                                                                                                                     m_rAlphaCrop(rAlphaCrop),
                                                                                                                                                                     m_iPosX(iX),
                                                                                                                                                                     m_iPosY(iY),
+                                                                                                                                                                    m_iTextureIndex(uiAtlasIndex),
                                                                                                                                                                     m_uiErrors(uiErrors)
 {
 }
@@ -39,9 +39,14 @@ HyTexturedQuad2d *HyGuiFrame::DrawInst(void *pKey)
     QMap<void *, HyTexturedQuad2d *>::iterator iter = m_DrawInstMap.find(pKey);
     if(iter != m_DrawInstMap.end())
         return iter.value();
+
+    if(m_iTextureIndex == -1) {
+        HyGuiLog("HyGuiFrame::DrawInst() has m_iTextureIndex as -1", LOGTYPE_Error);
+        return nullptr;
+    }
     
     // Not found, create a new HyTexturedQuad2d based on key
-    HyTexturedQuad2d *pDrawInst = new HyTexturedQuad2d(m_uiATLAS_INDEX);
+    HyTexturedQuad2d *pDrawInst = new HyTexturedQuad2d(m_iTextureIndex);
     pDrawInst->SetTextureSource(GetX(), GetY(), m_rAlphaCrop.width(), m_rAlphaCrop.height());
 
     pDrawInst->SetEnabled(false);
