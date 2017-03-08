@@ -23,7 +23,6 @@ HyAtlas::HyAtlas(std::string sFilePath, uint32 uiIndex, uint32 uiWidth, uint32 u
 																																						m_uiHEIGHT(uiHeight),
 																																						m_uiNUM_8BIT_CHANNELS(uiNumClrChannels),
 																																						m_uiGfxApiHandle(0),
-																																						m_uiGfxApiTextureIndex(0),
 																																						m_uiNUM_FRAMES(static_cast<uint32>(srcFramesArrayRef.size())),
 																																						m_pPixelData(NULL)
 {
@@ -68,7 +67,7 @@ uint32 HyAtlas::GetGfxApiHandle() const
 	return m_uiGfxApiHandle;
 }
 
-void HyAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
+bool HyAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
 {
 	float fTexWidth = static_cast<float>(m_uiWIDTH);
 	float fTexHeight = static_cast<float>(m_uiHEIGHT);
@@ -84,7 +83,11 @@ void HyAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
 		UVRectOut.top = static_cast<float>(pSrcRect->top) / fTexHeight;
 		UVRectOut.right = static_cast<float>(pSrcRect->right) / fTexWidth;
 		UVRectOut.bottom = static_cast<float>(pSrcRect->bottom) / fTexHeight;
+
+		return true;
 	}
+
+	return false;
 }
 
 void HyAtlas::DeletePixelData()

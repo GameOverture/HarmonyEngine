@@ -15,6 +15,8 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/OpenGL/HyOpenGLShader.h"
 
+#define HyErrorCheck_OpenGL(funcLoc, funcName) HyAssert(glGetError() == GL_NO_ERROR, "HyOpenGL error in " << funcLoc << " on function " << funcName << ": " << glGetError());
+
 class HyOpenGL : public IHyRenderer
 {
 protected:

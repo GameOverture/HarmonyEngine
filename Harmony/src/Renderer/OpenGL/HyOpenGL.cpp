@@ -303,11 +303,9 @@ HyOpenGL::~HyOpenGL(void)
 	glBindTexture(GL_TEXTURE_2D, hGLTexture);
 
 	// Create (blank) storage for the texture array
-	GLenum eError = GL_NO_ERROR;
 
-	glTexImage2D(GL_TEXTURE_2D, 0, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
-	eError = glGetError();
-	HyAssert(eError == GL_NO_ERROR, "HyOpenGL::AddTexture error on glTexImage2D(): " << eError);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, uiWidth, uiHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, pPixelData);
+	HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
 	
 	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -340,6 +338,7 @@ HyOpenGL::~HyOpenGL(void)
 		uiNumTexturesUploadedOut = 8;
 
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, uiNumTexturesUploadedOut, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
+	HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glTexImage3D");
 	eError = glGetError();
 
 	while (eError)
@@ -391,8 +390,7 @@ bool HyOpenGL::Initialize()
 	GLenum err = glewInit();
 	if(err != GLEW_OK)
 	{
-		GLenum eError = glGetError();
-		HyError("glewInit Error: " << eError);
+		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
 	}
 
 	//const GLubyte *pExtStr = glGetString(GL_EXTENSIONS);
@@ -439,9 +437,9 @@ bool HyOpenGL::Initialize()
 	pShaderLine2d->Finalize(HYSHADERPROG_Lines2d);
 	pShaderLine2d->OnRenderThread(*this);
 
-
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
 
 	// Line anti-aliasing on always for now.
 	//glEnable(GL_LINE_SMOOTH);

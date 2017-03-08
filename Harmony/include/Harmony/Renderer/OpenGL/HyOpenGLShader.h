@@ -62,6 +62,7 @@ public:
 	void PrintActiveUniforms();
 	void PrintActiveAttribs();
 
+	virtual void OnSetVertexAttribute(const char *szName, uint32 uiLocation) override;
 	virtual void OnUpload(IHyRenderer &rendererRef) override;
 	virtual void OnDelete(IHyRenderer &rendererRef) override;
 };

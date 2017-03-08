@@ -51,10 +51,8 @@ HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataVa
 {
 	jsonxx::Object textObject = dataValueRef.get<jsonxx::Object>();
 
-	m_pAtlas = assetsRef.GetAtlas(static_cast<uint32>(textObject.get<jsonxx::Number>("atlasIndex")));
-
 	HyRectangle<float> rSubAtlasUVRect;
-	m_pAtlas->GetUvRect(static_cast<uint32>(textObject.get<jsonxx::Number>("checksum")), rSubAtlasUVRect);
+	m_pAtlas = assetsRef.GetAtlas(static_cast<uint32>(textObject.get<jsonxx::Number>("checksum")), rSubAtlasUVRect);
 
 	float fSubAtlasWidth = m_pAtlas->GetWidth() * (rSubAtlasUVRect.right - rSubAtlasUVRect.left);
 	float fSubAtlasHeight = m_pAtlas->GetHeight() * (rSubAtlasUVRect.bottom - rSubAtlasUVRect.top);
@@ -178,7 +176,7 @@ float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
 	return 0.0f;
 }
 
-/*virtual*/ void HyText2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIndicesOut)
+/*virtual*/ void HyText2dData::AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIndicesOut)
 {
 	requiredAtlasIndicesOut.insert(m_pAtlas->GetIndex());
 }

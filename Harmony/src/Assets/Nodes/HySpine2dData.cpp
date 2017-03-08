@@ -43,7 +43,7 @@ HySpine2dData::~HySpine2dData()
 	spAtlas_dispose(m_SpineAtlasData);
 }
 
-/*virtual*/ void HySpine2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
+/*virtual*/ void HySpine2dData::AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut)
 {
 	HyError("Not implemented");
 }

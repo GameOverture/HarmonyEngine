@@ -31,7 +31,7 @@ public:
 	HyType GetInstType();
 	const std::string &GetPath();
 
-	virtual void AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut) = 0;
+	virtual void AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut) = 0;
 };
 
 #endif /* __IHyData_h__ */

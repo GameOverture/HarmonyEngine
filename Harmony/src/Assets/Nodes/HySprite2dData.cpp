@@ -91,10 +91,9 @@ HySprite2dData::AnimState::AnimState(std::string sName, bool bLoop, bool bRevers
 		{
 			jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
 
-			uint32 uiAtlasIndex = static_cast<uint32>(frameObj.get<jsonxx::Number>("atlasIndex"));
-			m_UsedAtlasIds.insert(uiAtlasIndex);
-			pAtlas = assetsRef.GetAtlas(uiAtlasIndex);
-			pAtlas->GetUvRect(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), rUVRect);
+			pAtlas = assetsRef.GetAtlas(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), rUVRect);
+			m_UsedAtlasIndices.insert(pAtlas->GetIndex());
+
 			HySetVec(vOffset, static_cast<int32>(frameObj.get<jsonxx::Number>("offsetX")), static_cast<int32>(frameObj.get<jsonxx::Number>("offsetY")));
 			fDuration = static_cast<float>(frameObj.get<jsonxx::Number>("duration"));
 		}
@@ -121,8 +120,8 @@ const HySprite2dFrame &HySprite2dData::AnimState::GetFrame(uint32 uiFrameIndex)
 	return m_pFrames[uiFrameIndex];
 }
 
-/*virtual*/ void HySprite2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
+/*virtual*/ void HySprite2dData::AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut)
 {
 	for(uint32 i = 0; i < m_uiNumStates; ++i)
-		requiredAtlasIdsOut.insert(m_pAnimStates[i].m_UsedAtlasIds.begin(), m_pAnimStates[i].m_UsedAtlasIds.end());
+		requiredAtlasIdsOut.insert(m_pAnimStates[i].m_UsedAtlasIndices.begin(), m_pAnimStates[i].m_UsedAtlasIndices.end());
 }

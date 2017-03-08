@@ -23,7 +23,7 @@ public:
 	HyAudioData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);
 
-	virtual void AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut) override;
+	virtual void AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut) override;
 };
 
 #endif /* __HyAudioData_h__ */

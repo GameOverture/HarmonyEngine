@@ -28,7 +28,6 @@ class HyAtlas : public IHyLoadableData
 	const uint32							m_uiNUM_8BIT_CHANNELS;
 
 	uint32									m_uiGfxApiHandle;
-	uint32									m_uiGfxApiTextureIndex;	// Because the texture array may get split due to HW constraints, this becomes the true index in its texture array
 
 	const uint32							m_uiNUM_FRAMES;
 
@@ -56,7 +55,7 @@ public:
 	uint32 GetWidth() const;
 	uint32 GetHeight() const;
 	uint32 GetGfxApiHandle() const;
-	void GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const;
+	bool GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const;
 
 	void DeletePixelData();
 

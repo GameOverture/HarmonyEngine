@@ -21,7 +21,7 @@ public:
 	HyPrimitive2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);
 	virtual ~HyPrimitive2dData();
 
-	virtual void AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut) override;
+	virtual void AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut) override;
 };
 
 #endif /* __HyPrimitive2dData_h__ */

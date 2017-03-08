@@ -51,7 +51,7 @@ void IHyShader::SetSourceCode(std::string sSource, HyShaderType eType)
 	m_sSourceCode[eType] = sSource;
 }
 
-void IHyShader::SetVertexAttribute(const char *szName, HyShaderVariable eVarType, bool bNormalize /*= false*/, uint32 uiInstanceDivisor /*= 0*/)
+/*virtual*/ void IHyShader::SetVertexAttribute(const char *szName, HyShaderVariable eVarType, bool bNormalize /*= false*/, uint32 uiInstanceDivisor /*= 0*/)
 {
 	if(szName == NULL)
 		return;
@@ -65,6 +65,9 @@ void IHyShader::SetVertexAttribute(const char *szName, HyShaderVariable eVarType
 	vertAttrib.uiInstanceDivisor = uiInstanceDivisor;
 
 	m_VertexAttributeList.push_back(vertAttrib);
+
+	// TODO: Handle vertex attribs that take multiple locations
+	//OnSetVertexAttribute(szName, m_VertexAttributeList.size() - 1);
 }
 
 void IHyShader::Finalize(HyShaderProgram eDefaultsFrom)
@@ -82,7 +85,6 @@ void IHyShader::Finalize(HyShaderProgram eDefaultsFrom)
 			SetVertexAttribute("offset", HYSHADERVAR_vec2, false, 1);
 			SetVertexAttribute("topTint", HYSHADERVAR_vec4, false, 1);
 			SetVertexAttribute("botTint", HYSHADERVAR_vec4, false, 1);
-			SetVertexAttribute("textureIndex", HYSHADERVAR_float, false, 1);
 			SetVertexAttribute("UVcoord0", HYSHADERVAR_vec2, false, 1);
 			SetVertexAttribute("UVcoord1", HYSHADERVAR_vec2, false, 1);
 			SetVertexAttribute("UVcoord2", HYSHADERVAR_vec2, false, 1);

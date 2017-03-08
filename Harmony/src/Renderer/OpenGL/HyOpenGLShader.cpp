@@ -82,6 +82,7 @@ void HyOpenGLShader::CompileFromString(HyShaderType eType)
 	
 	// Compile succeeded, attach shader
 	glAttachShader(m_hProgHandle, iShaderHandle);
+	HyErrorCheck_OpenGL("HyOpenGLShader::CompileFromString", "glAttachShader");
 }
 
 void HyOpenGLShader::Link()
@@ -92,10 +93,11 @@ void HyOpenGLShader::Link()
 	HyAssert(m_hProgHandle > 0, "Shader has not been created yet");
 
 	glLinkProgram(m_hProgHandle);
+	HyErrorCheck_OpenGL("HyOpenGLShader::Link", "glLinkProgram");
 
 #ifdef HY_DEBUG
 	GLint status = 0;
-	glGetProgramiv( m_hProgHandle, GL_LINK_STATUS, &status);
+	glGetProgramiv(m_hProgHandle, GL_LINK_STATUS, &status);
 	if(GL_FALSE == status)
 	{
 		GLint length = 0;
@@ -244,6 +246,7 @@ bool HyOpenGLShader::IsLinked()
 
 void HyOpenGLShader::BindAttribLocation(GLuint location, const char *szName)
 {
+	glEnableVertexAttribArray(location);
 	glBindAttribLocation(m_hProgHandle, location, szName);
 }
 
@@ -425,6 +428,11 @@ void HyOpenGLShader::PrintActiveAttribs()
 	free(name);
 }
 
+/*virtual*/ void HyOpenGLShader::OnSetVertexAttribute(const char *szName, uint32 uiLocation)
+{
+	BindAttribLocation(uiLocation, szName);
+}
+
 /*virtual*/ void HyOpenGLShader::OnUpload(IHyRenderer &rendererRef)
 {
 	HyAssert(GetLoadState() != HYLOADSTATE_Discarded, "HyOpenGLShader::OnRenderThread() invoked on a discarded shader");
@@ -432,6 +440,7 @@ void HyOpenGLShader::PrintActiveAttribs()
 	HyOpenGL &gl = static_cast<HyOpenGL &>(rendererRef);
 
 	glGenVertexArrays(1, &m_hVAO);
+	HyErrorCheck_OpenGL("HyOpenGLShader::OnUpload", "glGenVertexArrays");
 
 #ifdef HY_DEBUG
 	GLint iMaxVertexAttribs;
@@ -455,6 +464,10 @@ void HyOpenGLShader::PrintActiveAttribs()
 
 	CompileFromString(HYSHADER_Vertex);
 	CompileFromString(HYSHADER_Fragment);
+
+	// TODO: Explicitly bind 
+	//for(uint32 i = 0; i < m_VertexAttributeList.size(); ++i)
+	//	BindAttribLocation(i, m_VertexAttributeList[i].sName.c_str());
 
 	Link();
 
@@ -501,6 +514,8 @@ void HyOpenGLShader::PrintActiveAttribs()
 			glEnableVertexAttribArray(uiLocation);
 			glVertexAttribDivisor(uiLocation, m_VertexAttributeList[i].uiInstanceDivisor);
 		}
+
+		HyErrorCheck_OpenGL("HyOpenGLShader::OnUpload", "glEnableVertexAttribArray or glVertexAttribDivisor");
 
 		switch(m_VertexAttributeList[i].eVarType)
 		{

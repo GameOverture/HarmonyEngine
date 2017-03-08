@@ -32,7 +32,7 @@ HyAtlas *HyTexturedQuad2dData::GetAtlas()
 	return m_pAtlas;
 }
 
-/*virtual*/ void HyTexturedQuad2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIndicesOut)
+/*virtual*/ void HyTexturedQuad2dData::AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIndicesOut)
 {
 	requiredAtlasIndicesOut.insert(m_uiATLAS_INDEX);
 }

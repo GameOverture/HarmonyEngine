@@ -49,6 +49,7 @@ public:
 	virtual void OnLoadThread() override;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 
+	virtual void OnSetVertexAttribute(const char *szName, uint32 uiLocation) = 0;
 	virtual void OnUpload(IHyRenderer &rendererRef) = 0;
 	virtual void OnDelete(IHyRenderer &rendererRef) = 0;
 };

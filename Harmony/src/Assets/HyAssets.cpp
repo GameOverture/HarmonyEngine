@@ -146,6 +146,17 @@ HyAtlas *HyAssets::GetAtlas(uint32 uiIndex)
 	return &m_pAtlases[uiIndex];
 }
 
+HyAtlas *HyAssets::GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut)
+{
+	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+	{
+		if(m_pAtlases[i].GetUvRect(uiChecksum, UVRectOut))
+			return &m_pAtlases[i];
+	}
+
+	return nullptr;
+}
+
 void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyNodeData *&pDataOut)
 {
 	switch(pDrawNode->GetType())

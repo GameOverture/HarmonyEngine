@@ -259,7 +259,7 @@ void IHyDraw2d::Load()
 		m_RequiredAtlasIndices.clear();
 		AcquireData();
 		if(m_pData)
-			m_pData->AppendRequiredAtlasIds(m_RequiredAtlasIndices);
+			m_pData->AppendRequiredAtlasIndices(m_RequiredAtlasIndices);
 
 		sm_pHyAssets->LoadGfxData(this);
 	}

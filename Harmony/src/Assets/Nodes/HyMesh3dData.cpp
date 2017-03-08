@@ -22,7 +22,7 @@ HyMesh3dData::~HyMesh3dData(void)
 {
 }
 
-/*virtual*/ void HyMesh3dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
+/*virtual*/ void HyMesh3dData::AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut)
 {
 	HyError("Not implemented");
 }

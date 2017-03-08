@@ -105,6 +105,7 @@ public:
 	virtual ~HyAssets();
 
 	HyAtlas *GetAtlas(uint32 uiIndex);
+	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
 
 	void GetNodeData(IHyDraw2d *pDrawNode, IHyNodeData *&pDataOut);
 	void LoadGfxData(IHyDraw2d *pDraw2d);

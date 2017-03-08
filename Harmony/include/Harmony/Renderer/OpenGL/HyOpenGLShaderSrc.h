@@ -15,25 +15,25 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // QUADBATCH
 const char * const szHYQUADBATCH_VERTEXSHADER = R"src(
-#version 130
+#version 430
 
-/*layout(location = 0)*/ in vec2 size;
-/*layout(location = 1)*/ in vec2 offset;
-/*layout(location = 2)*/ in vec4 topTint;
-/*layout(location = 3)*/ in vec4 botTint;
-/*layout(location = 4)*/ in vec2 UVcoord0;
-/*layout(location = 5)*/ in vec2 UVcoord1;
-/*layout(location = 6)*/ in vec2 UVcoord2;
-/*layout(location = 7)*/ in vec2 UVcoord3;
-/*layout(location = 8)*/ in mat4 mtxLocalToWorld;
+layout(location = 0) in vec2 size;
+layout(location = 1) in vec2 offset;
+layout(location = 2) in vec4 topTint;
+layout(location = 3) in vec4 botTint;
+layout(location = 4) in vec2 UVcoord0;
+layout(location = 5) in vec2 UVcoord1;
+layout(location = 6) in vec2 UVcoord2;
+layout(location = 7) in vec2 UVcoord3;
+layout(location = 8) in mat4 mtxLocalToWorld;
 
-/*smooth*/ out vec2 interpUV;
-/*smooth*/ out vec4 interpColor;
+smooth out vec2 interpUV;
+smooth out vec4 interpColor;
 
 uniform mat4 u_mtxWorldToCamera;
 uniform mat4 u_mtxCameraToClip;
 
-/*const*/ vec2 position[] = vec2[4](vec2(1.0f, 1.0f),
+const vec2 position[] = vec2[4](vec2(1.0f, 1.0f),
 									vec2(0.0f, 1.0f),
 									vec2(1.0f, 0.0f),
 									vec2(0.0f, 0.0f));
@@ -79,11 +79,11 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(
-#version 130
-#extension GL_EXT_texture_array : enable
+#version 430
+//#extension GL_EXT_texture_array : enable
 
-/*smooth*/ in vec2 interpUV;
-/*smooth*/ in vec4 interpColor;
+smooth in vec2 interpUV;
+smooth in vec4 interpColor;
 
 uniform sampler2D Tex;
 

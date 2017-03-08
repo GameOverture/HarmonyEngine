@@ -18,6 +18,6 @@ HyAudioData::~HyAudioData(void)
 {
 }
 
-/*virtual*/ void HyAudioData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
+/*virtual*/ void HyAudioData::AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut)
 {
 }

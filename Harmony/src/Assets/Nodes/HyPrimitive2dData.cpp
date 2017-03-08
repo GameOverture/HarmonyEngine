@@ -20,6 +20,6 @@ HyPrimitive2dData::~HyPrimitive2dData()
 {
 }
 
-/*virtual*/ void HyPrimitive2dData::AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIdsOut)
+/*virtual*/ void HyPrimitive2dData::AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut)
 {
 }

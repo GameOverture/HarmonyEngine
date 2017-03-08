@@ -26,7 +26,7 @@ public:
 
 	HyAtlas *GetAtlas();
 
-	virtual void AppendRequiredAtlasIds(std::set<uint32> &requiredAtlasIndicesOut) override;
+	virtual void AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIndicesOut) override;
 };
 
 #endif /* __HyTexturedQuad2dData_h__ */
