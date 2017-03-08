@@ -13,6 +13,8 @@ class Text : public IHyApplication
 
 	HyPrimitive2d	m_Origin;
 
+	HyPrimitive2d	m_BG;
+
 public:
 	Text(HarmonyInit &initStruct);
 	virtual ~Text();

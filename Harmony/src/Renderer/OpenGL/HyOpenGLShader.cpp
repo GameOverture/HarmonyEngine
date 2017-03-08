@@ -466,8 +466,8 @@ void HyOpenGLShader::PrintActiveAttribs()
 	CompileFromString(HYSHADER_Fragment);
 
 	// TODO: Explicitly bind 
-	//for(uint32 i = 0; i < m_VertexAttributeList.size(); ++i)
-	//	BindAttribLocation(i, m_VertexAttributeList[i].sName.c_str());
+	for(uint32 i = 0; i < m_VertexAttributeList.size(); ++i)
+		BindAttribLocation(i, m_VertexAttributeList[i].sName.c_str());
 
 	Link();
 

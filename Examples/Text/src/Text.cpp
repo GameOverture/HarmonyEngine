@@ -39,10 +39,16 @@ Text::~Text()
 	m_Text2.AddChild(m_TextBox2);
 
 
+	m_BG.pos.Set(-Window().GetResolution().x, -Window().GetResolution().y);
+	m_BG.SetAsQuad(Window().GetResolution().x * 2.0f, Window().GetResolution().y * 2.0f, false);
+	m_BG.SetDisplayOrder(-100);
+	m_BG.SetTint(1.0f, 0.0f, 0.0f);
+
 
 	m_Origin.Load();
 	m_Text.Load();
 	m_Text2.Load();
+	m_BG.Load();
 
 	return true;
 }

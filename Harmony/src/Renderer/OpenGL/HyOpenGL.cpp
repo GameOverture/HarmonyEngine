@@ -108,8 +108,10 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, renderState.GetTextureHandle());
-
+	glBindTexture(GL_TEXTURE_2D, renderState.GetTextureHandle());
+	if(renderState.GetTextureHandle() != 0)
+		pShader->SetUniformGLSL("Tex", 0);
+	//glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture1"), 0);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -273,7 +275,7 @@ HyOpenGL::~HyOpenGL(void)
 	}
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 /*virtual*/ void HyOpenGL::End_2d()
@@ -281,7 +283,7 @@ HyOpenGL::~HyOpenGL(void)
 	m_iCurCamIndex++;
 	glDepthMask(true);
 
-	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
 }
@@ -298,21 +300,17 @@ HyOpenGL::~HyOpenGL(void)
 
 	GLuint hGLTexture;
 	glGenTextures(1, &hGLTexture);
-
-	//glActiveTexture(GL_TEXTURE0 + hGLTextureArray);
 	glBindTexture(GL_TEXTURE_2D, hGLTexture);
 
-	// Create (blank) storage for the texture array
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, uiWidth, uiHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, pPixelData);
-	HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
-	
-	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // GL_NEAREST
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // GL_NEAREST
+
+	glTexImage2D(GL_TEXTURE_2D, 0, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
+	HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return hGLTexture;
 }
