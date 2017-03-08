@@ -54,17 +54,17 @@ public:
 
     void SetTreeWidgetItem(QTreeWidgetItem *pTreeItem);
 
-    quint32 GetChecksum()                       { return m_uiChecksum; }
-    QString GetName()                           { return m_sName; }
-    QSize GetSize()                             { return QSize(m_iWidth, m_iHeight); }
-    QRect GetCrop()                             { return m_rAlphaCrop; }
-    QPoint GetPosition()                        { return QPoint(m_iPosX, m_iPosY); }
-    QSet<ItemWidget *> GetLinks()               { return m_Links; }
-    eAtlasNodeType GetType()                    { return m_eType; }
+    quint32 GetChecksum();
+    QString GetName();
+    QSize GetSize();
+    QRect GetCrop();
+    QPoint GetPosition();
+    QSet<ItemWidget *> GetLinks();
+    eAtlasNodeType GetType();
 
-    int GetTextureIndex()                       { return m_iTextureIndex; }
-    int GetX()                                  { return m_iPosX; }
-    int GetY()                                  { return m_iPosY; }
+    int GetTextureIndex();
+    int GetX();
+    int GetY();
     QString GetFilter();
     void SetFilter(QString sFilter);
 

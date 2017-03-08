@@ -94,6 +94,56 @@ void HyGuiFrame::SetTreeWidgetItem(QTreeWidgetItem *pTreeItem)
     }
 }
 
+quint32 HyGuiFrame::GetChecksum()
+{
+    return m_uiChecksum;
+}
+
+QString HyGuiFrame::GetName()
+{
+    return m_sName;
+}
+
+QSize HyGuiFrame::GetSize()
+{
+    return QSize(m_iWidth, m_iHeight);
+}
+
+QRect HyGuiFrame::GetCrop()
+{
+    return m_rAlphaCrop;
+}
+
+QPoint HyGuiFrame::GetPosition()
+{
+    return QPoint(m_iPosX, m_iPosY);
+}
+
+QSet<ItemWidget *> HyGuiFrame::GetLinks()
+{
+    return m_Links;
+}
+
+eAtlasNodeType HyGuiFrame::GetType()
+{
+    return m_eType;
+}
+
+int HyGuiFrame::GetTextureIndex()
+{
+    return m_iTextureIndex;
+}
+
+int HyGuiFrame::GetX()
+{
+    return m_iPosX;
+}
+
+int HyGuiFrame::GetY()
+{
+    return m_iPosY;
+}
+
 void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 {
     DeleteAllDrawInst();

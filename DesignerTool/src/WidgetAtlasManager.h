@@ -133,8 +133,6 @@ private:
 
     void CreateTreeItem(WidgetAtlasGroupTreeWidgetItem *pParent, HyGuiFrame *pFrame);
 
-    void ResizeAtlasListColumns();
-
     void GetAtlasInfoForGameData(QJsonObject &atlasObjOut);
 
     QSet<HyGuiFrame *> ImportImages(QStringList sImportImgList);
@@ -144,6 +142,9 @@ private:
     void Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> newFramesSet);
     void ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIndex);
     void Refresh();
+
+protected:
+    virtual void resizeEvent(QResizeEvent *event);
 };
 
 #endif // WIDGETATLASMANAGER_H

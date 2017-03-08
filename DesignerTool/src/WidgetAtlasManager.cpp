@@ -262,8 +262,6 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
     ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
 
     ui->atlasList->collapseAll();
-
-    ResizeAtlasListColumns();
 }
 
 WidgetAtlasManager::~WidgetAtlasManager()
@@ -455,8 +453,6 @@ void WidgetAtlasManager::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *>
         atlasMan.m_FrameList[i]->DrawInst(&atlasMan)->alpha.Set(1.0f);
         atlasMan.m_FrameList[i]->DrawInst(&atlasMan)->SetCoordinateType(HYCOORDTYPE_Screen, NULL);
     }
-
-    atlasMan.ResizeAtlasListColumns();
 }
 
 /*friend*/ void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
@@ -732,17 +728,6 @@ void WidgetAtlasManager::CreateTreeItem(WidgetAtlasGroupTreeWidgetItem *pParent,
         pParent->addChild(pNewTreeItem);
 
     pFrame->SetTreeWidgetItem(pNewTreeItem);
-
-    ResizeAtlasListColumns();
-}
-
-void WidgetAtlasManager::ResizeAtlasListColumns()
-{
-    if(ui->atlasList == NULL)
-        return;
-
-    int iTotalWidth = ui->atlasList->size().width();
-    ui->atlasList->setColumnWidth(0, iTotalWidth - 60);
 }
 
 void WidgetAtlasManager::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
@@ -1272,6 +1257,17 @@ void WidgetAtlasManager::on_actionAddFilter_triggered()
 
     ui->atlasList->sortItems(0, Qt::AscendingOrder);
     WriteMetaSettings();
+}
+
+/*virtual*/ void WidgetAtlasManager::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+
+    if(ui->atlasList == NULL)
+        return;
+
+    int iTotalWidth = ui->atlasList->size().width();
+    ui->atlasList->setColumnWidth(0, iTotalWidth - 60);
 }
 
 void WidgetAtlasManager::on_atlasList_itemSelectionChanged()
