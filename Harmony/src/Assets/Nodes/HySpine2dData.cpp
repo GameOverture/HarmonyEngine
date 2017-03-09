@@ -8,9 +8,8 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Assets/Nodes/HySpine2dData.h"
-
 #include "Renderer/IHyRenderer.h"
-#include "Diagnostics/HyGuiComms.h"
+#include "Diagnostics/HyConsole.h"
 #include "Utilities/HyFileIO.h"
 
 HySpine2dData::HySpine2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_Spine2d, sPath)

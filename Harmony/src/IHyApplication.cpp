@@ -35,6 +35,15 @@ HarmonyInit::HarmonyInit()
 
 		windowInfo[i].uiDirtyFlags = 0;
 	}
+
+	bUseConsole = false;
+	consoleInfo.sName = "Harmony Log Console";
+	consoleInfo.eType = HYWINDOW_WindowedSizeable;
+	consoleInfo.vResolution.x = 64;
+	consoleInfo.vResolution.y = 80;
+	consoleInfo.vLocation.x = 512;
+	consoleInfo.vLocation.y = 256;
+	consoleInfo.uiDirtyFlags = 0;
 }
 
 HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
@@ -68,6 +77,16 @@ HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
 
 		windowInfo[i].uiDirtyFlags	= 0;
 	}
+
+	// TODO: Parse this info
+	bUseConsole = false;
+	consoleInfo.sName = "Harmony Log Console";
+	consoleInfo.eType = HYWINDOW_WindowedSizeable;
+	consoleInfo.vResolution.x = 64;
+	consoleInfo.vResolution.y = 80;
+	consoleInfo.vLocation.x = 512;
+	consoleInfo.vLocation.y = 256;
+	consoleInfo.uiDirtyFlags = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

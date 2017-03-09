@@ -8,9 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Assets/HyAssets.h"
-
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
-
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Nodes/HySpine2dData.h"
 #include "Assets/Nodes/HySprite2dData.h"
@@ -18,11 +16,9 @@
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 #include "Assets/Nodes/HyPrimitive2dData.h"
 #include "Assets/Nodes/HyMesh3dData.h"
-
 #include "Utilities/HyMath.h"
 #include "Utilities/HyStrManip.h"
-
-#include "Diagnostics/HyGuiComms.h"
+#include "Diagnostics/HyConsole.h"
 
 #define HYASSETS_AtlasDir "Atlases/"
 

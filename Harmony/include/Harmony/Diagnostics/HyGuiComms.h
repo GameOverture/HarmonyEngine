@@ -146,28 +146,6 @@ private:
 	}
 };
 
-// TODO: Have an option to disable logs
-#define HyLog(msg) {\
-	std::stringstream ss; \
-	ss << msg << std::endl; \
-	HyGuiComms::Broadcast(HYPACKET_LogNormal, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
-#define HyLogWarning(msg) {\
-	std::stringstream ss; \
-	ss << msg << std::endl; \
-	HyGuiComms::Broadcast(HYPACKET_LogWarning, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
-#define HyLogError(msg) {\
-	std::stringstream ss; \
-	ss << msg << std::endl; \
-	HyGuiComms::Broadcast(HYPACKET_LogError, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
-#define HyLogInfo(msg) {\
-	std::stringstream ss; \
-	ss << msg << std::endl; \
-	HyGuiComms::Broadcast(HYPACKET_LogInfo, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
-#define HyLogTitle(msg) {\
-	std::stringstream ss; \
-	ss << msg << std::endl; \
-	HyGuiComms::Broadcast(HYPACKET_LogTitle, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
-
 #else
 class HyGuiComms
 {
@@ -178,12 +156,6 @@ public:
 	void Update()
 	{ }
 };
-
-#define HyLog(msg) do { } while (false)
-#define HyLogWarning(msg) do { } while (false)
-#define HyLogError(msg) do { } while (false)
-#define HyLogInfo(msg) do { } while (false)
-#define HyLogTitle(msg) do { } while (false)
 #endif
 
 #endif /* __HyGuiComms_h__ */

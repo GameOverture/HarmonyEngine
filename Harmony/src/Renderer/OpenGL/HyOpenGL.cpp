@@ -8,8 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGL.h"
-
-#include "Diagnostics/HyGuiComms.h"
+#include "Diagnostics/HyConsole.h"
 
 HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(gfxCommsRef, windowListRef),
 																						m_mtxView(1.0f)

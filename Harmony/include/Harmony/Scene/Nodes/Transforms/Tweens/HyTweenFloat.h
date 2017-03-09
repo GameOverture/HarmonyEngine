@@ -11,9 +11,7 @@
 #define __HyTweenFloat_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Scene/Nodes/Transforms/Tweens/HyTweenFuncs.h"
-
 #include <functional>
 
 class IHyNode;

@@ -27,6 +27,8 @@ struct HarmonyInit
 	float					fPixelsPerMeter;
 	uint32					uiNumInputMappings;
 	uint16					uiDebugPort;
+	bool					bUseConsole;
+	HyWindowInfo			consoleInfo;
 
 	HarmonyInit();
 	HarmonyInit(std::string sHyProjFilePath);

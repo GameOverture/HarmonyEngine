@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Nodes/Draws/HySprite2d.h"
-#include "Diagnostics/HyGuiComms.h"
+#include "Diagnostics/HyConsole.h"
 
 HySprite2d::HySprite2d(const char *szPrefix, const char *szName) :	IHyDraw2d(HYTYPE_Sprite2d, szPrefix, szName),
 																	m_bIsAnimPaused(false),
