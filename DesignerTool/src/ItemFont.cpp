@@ -117,10 +117,7 @@ ItemFont::ItemFont(const QString sPrefix, const QString sName, QJsonValue initVa
             MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawAtlasPreview->GetGraphicsApiHandle());
 
         // Upload texture to gfx api
-        std::vector<unsigned char *> vPixelData;
-        vPixelData.push_back(pWidget->GetAtlasPixelData());
-        uint32 uiNumSucceeded = 0;
-        pAtlas->id = MainWindow::GetCurrentRenderer()->AddTextureArray(4 /*converted texture depth*/, pAtlas->width, pAtlas->height, vPixelData, uiNumSucceeded);
+        pAtlas->id = MainWindow::GetCurrentRenderer()->AddTexture(4 /*converted texture depth*/, pAtlas->width, pAtlas->height, pWidget->GetAtlasPixelData());
 
         // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
         delete m_pDrawAtlasPreview;
