@@ -11,6 +11,7 @@
 #define __HyConsole_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Threading/BasicSync.h"
 
 #include <sstream>
 
@@ -25,6 +26,7 @@ public:
 	~HyConsole();
 
 	static std::stringstream	sm_ss;
+	static BasicSection			sm_csLog;
 
 	enum LogType
 	{
@@ -41,22 +43,34 @@ public:
 };
 
 #define HyLog(msg) {\
-	HyConsole::sm_ss.clear(); HyConsole::sm_ss << msg << std::endl; \
-	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Regular); }
+	HyConsole::sm_csLog.Lock(); \
+	HyConsole::sm_ss.str(std::string()); HyConsole::sm_ss << msg; \
+	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Regular); \
+	HyConsole::sm_csLog.Unlock(); }
 #define HyLogWarning(msg) {\
-	HyConsole::sm_ss.clear(); HyConsole::sm_ss << msg << std::endl; \
-	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Warning); }
+	HyConsole::sm_csLog.Lock(); \
+	HyConsole::sm_ss.str(std::string()); HyConsole::sm_ss << msg; \
+	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Warning); \
+	HyConsole::sm_csLog.Unlock(); }
 #define HyLogError(msg) {\
-	HyConsole::sm_ss.clear(); HyConsole::sm_ss << msg << std::endl; \
-	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Error); }
+	HyConsole::sm_csLog.Lock(); \
+	HyConsole::sm_ss.str(std::string()); HyConsole::sm_ss << msg; \
+	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Error); \
+	HyConsole::sm_csLog.Unlock(); }
 #define HyLogInfo(msg) {\
-	HyConsole::sm_ss.clear(); HyConsole::sm_ss << msg << std::endl; \
-	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Info); }
+	HyConsole::sm_csLog.Lock(); \
+	HyConsole::sm_ss.str(std::string()); HyConsole::sm_ss << msg; \
+	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Info); \
+	HyConsole::sm_csLog.Unlock(); }
 #define HyLogTitle(msg) {\
-	HyConsole::sm_ss.clear(); HyConsole::sm_ss << msg << std::endl; \
-	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Title); }
+	HyConsole::sm_csLog.Lock(); \
+	HyConsole::sm_ss.str(std::string()); HyConsole::sm_ss << msg; \
+	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Title); \
+	HyConsole::sm_csLog.Unlock(); }
 #define HyLogSection(msg) {\
-	HyConsole::sm_ss.clear(); HyConsole::sm_ss << msg << std::endl; \
-	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Section); }
+	HyConsole::sm_csLog.Lock(); \
+	HyConsole::sm_ss.str(std::string()); HyConsole::sm_ss << msg; \
+	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Section); \
+	HyConsole::sm_csLog.Unlock(); }
 
 #endif /*__HyConsole_h__*/

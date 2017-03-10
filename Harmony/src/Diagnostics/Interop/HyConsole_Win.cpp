@@ -95,20 +95,20 @@ HyConsole_Win::~HyConsole_Win()
 		CONSOLE_SCREEN_BUFFER_INFO coninfo;
 		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &coninfo);
 
-		os << "\n\n";
+		os << std::endl;
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_BLUE);
 		for(int i = 0; i < coninfo.dwSize.X; i++)
 			os << "~";
-		os << '\n';
+		os << std::endl;
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE);
-		os << '\t' << szMsg << '\n';
+		os << '\t' << szMsg << std::endl;
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_BLUE);
 		for(int i = 0; i < coninfo.dwSize.X; i++)
 			os << "~";
 		break; }
 
 	case LOG_Section: {
-		os << "\n\n";
+		os << std::endl;
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE);
 		os << "\t-==== " << szMsg << " ====-";
 		break; }
@@ -116,5 +116,5 @@ HyConsole_Win::~HyConsole_Win()
 
 	// Reset console color and start a newline for next Write()
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE);
-	os << "\n";
+	os << std::endl;
 }
