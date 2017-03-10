@@ -47,6 +47,7 @@ protected:
 	std::vector<HyWindow *>			m_WindowList;
 
 	HyInputMapInterop *				m_pInputMaps;
+	HyConsoleInterop				m_Console;
 
 	virtual bool Initialize() = 0;
 	virtual bool Update() = 0;

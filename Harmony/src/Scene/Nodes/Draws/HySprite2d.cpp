@@ -216,6 +216,12 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * (bIncludeScaling ? scale.Y() : 1.0f);
 }
 
+const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
+{
+	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	return frameRef.vOFFSET;
+}
+
 /*virtual*/ void HySprite2d::OnUpdate()
 {
 	if(IsSelfLoaded() == false)

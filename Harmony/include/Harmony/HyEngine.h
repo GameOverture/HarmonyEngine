@@ -19,7 +19,6 @@
 
 #include "Audio/IHyAudio.h"
 #include "Diagnostics/HyGuiComms.h"
-#include "Diagnostics/HyConsole.h"
 
 #include "Renderer/Components/HyWindow.h"
 
@@ -51,7 +50,6 @@ class HyEngine
 	HyScene					m_Scene;
 	HyAssets 				m_AssetManager;
 	HyGuiComms				m_GuiComms;
-	HyConsole				m_Console;
 
 	HyTimeInterop			m_Time;
 	HyInputInterop			m_Input;

@@ -112,6 +112,8 @@ public:
 	float AnimGetCurFrameWidth(bool bIncludeScaling = true);
 	float AnimGetCurFrameHeight(bool bIncludScaling = true);
 
+	const glm::ivec2 &AnimGetCurFrameOffset();
+
 protected:
 	virtual void OnUpdate() override;
 	virtual void OnDataAcquired() override;

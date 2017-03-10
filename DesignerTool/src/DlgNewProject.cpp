@@ -120,6 +120,16 @@ void DlgNewProject::on_buttonBox_accepted()
     jsonObj.insert("PixelsPerMeter", QJsonValue(80.0f));
 	jsonObj.insert("NumInputMappings", QJsonValue(1));
 	jsonObj.insert("DebugPort", QJsonValue(1313));
+    
+    jsonObj.insert("UseConsole", QJsonValue(true));
+    QJsonObject consoleInfoObj;
+    consoleInfoObj.insert("Name", "Harmony Log Console");
+    consoleInfoObj.insert("Type", QJsonValue(3));
+    consoleInfoObj.insert("ResolutionX", QJsonValue(64));
+    consoleInfoObj.insert("ResolutionY", QJsonValue(80));
+    consoleInfoObj.insert("LocationX", QJsonValue(0));
+    consoleInfoObj.insert("LocationY", QJsonValue(0));
+    jsonObj.insert("ConsoleInfo", consoleInfoObj);
 
     QJsonArray windowInfoArray;
     QJsonObject windowInfoObj;

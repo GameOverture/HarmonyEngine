@@ -11,45 +11,66 @@
 #define __HyConsole_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Threading/BasicSync.h"
+
+#include <sstream>
 
 class HyConsole
 {
+	static HyConsole *			sm_pInstance;
+
+protected:
+	HyConsole();
+
 public:
-	HyConsole(bool bCreateConsole, HyWindowInfo &consoleInfo);
 	~HyConsole();
+
+	static std::stringstream	sm_ss;
+	static BasicSection			sm_csLog;
+
+	enum LogType
+	{
+		LOG_Regular = 0,
+		LOG_Warning,
+		LOG_Error,
+		LOG_Info,
+		LOG_Title,
+		LOG_Section
+	};
+	static HyConsole *Get();
+
+	virtual void Log(std::ostream &os, const char *szMsg, LogType eType) = 0;
 };
 
-
 #define HyLog(msg) {\
-	std::stringstream ss; \
-	ss << msg << std::endl; \
-	printf(ss.str().c_str()); }
-	//HyGuiComms::Broadcast(HYPACKET_LogNormal, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
+	HyConsole::sm_csLog.Lock(); \
+	HyConsole::sm_ss.str(std::string()); HyConsole::sm_ss << msg; \
+	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Regular); \
+	HyConsole::sm_csLog.Unlock(); }
 #define HyLogWarning(msg) {\
-	std::stringstream ss; \
-	ss << msg << std::endl; \
-	std::cout << ss; }
-	//HyGuiComms::Broadcast(HYPACKET_LogWarning, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
+	HyConsole::sm_csLog.Lock(); \
+	HyConsole::sm_ss.str(std::string()); HyConsole::sm_ss << msg; \
+	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Warning); \
+	HyConsole::sm_csLog.Unlock(); }
 #define HyLogError(msg) {\
-	std::stringstream ss; \
-	ss << msg << std::endl; \
-	std::cout << ss; }
-	//HyGuiComms::Broadcast(HYPACKET_LogError, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
+	HyConsole::sm_csLog.Lock(); \
+	HyConsole::sm_ss.str(std::string()); HyConsole::sm_ss << msg; \
+	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Error); \
+	HyConsole::sm_csLog.Unlock(); }
 #define HyLogInfo(msg) {\
-	std::stringstream ss; \
-	ss << msg << std::endl; \
-	std::cout << ss; }
-	//HyGuiComms::Broadcast(HYPACKET_LogInfo, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
+	HyConsole::sm_csLog.Lock(); \
+	HyConsole::sm_ss.str(std::string()); HyConsole::sm_ss << msg; \
+	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Info); \
+	HyConsole::sm_csLog.Unlock(); }
 #define HyLogTitle(msg) {\
-	std::stringstream ss; \
-	ss << msg << std::endl; \
-	std::cout << ss; }
-	//HyGuiComms::Broadcast(HYPACKET_LogTitle, static_cast<uint32>(strlen(ss.str().c_str())), ss.str().c_str()); }
-
-//#define HyLog(msg) do { } while (false)
-//#define HyLogWarning(msg) do { } while (false)
-//#define HyLogError(msg) do { } while (false)
-//#define HyLogInfo(msg) do { } while (false)
-//#define HyLogTitle(msg) do { } while (false)
+	HyConsole::sm_csLog.Lock(); \
+	HyConsole::sm_ss.str(std::string()); HyConsole::sm_ss << msg; \
+	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Title); \
+	HyConsole::sm_csLog.Unlock(); }
+#define HyLogSection(msg) {\
+	HyConsole::sm_csLog.Lock(); \
+	HyConsole::sm_ss.str(std::string()); HyConsole::sm_ss << msg; \
+	HyConsole::Get()->Log(std::cout, HyConsole::sm_ss.str().c_str(), HyConsole::LOG_Section); \
+	HyConsole::sm_csLog.Unlock(); }
 
 #endif /*__HyConsole_h__*/

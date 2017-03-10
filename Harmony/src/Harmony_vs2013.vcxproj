@@ -62,6 +62,8 @@
     <ClCompile Include="Diagnostics\HyGuiComms.cpp" />
     <ClCompile Include="Diagnostics\HyGuiMessage.cpp" />
     <ClCompile Include="Diagnostics\HyLiveVarManager.cpp" />
+    <ClCompile Include="Diagnostics\Interop\HyConsole_Gui.cpp" />
+    <ClCompile Include="Diagnostics\Interop\HyConsole_Win.cpp" />
     <ClCompile Include="HyEngine.cpp" />
     <ClCompile Include="IHyApplication.cpp" />
     <ClCompile Include="Input\IHyInput.cpp" />
@@ -164,6 +166,8 @@
     <ClInclude Include="..\include\Harmony\Diagnostics\HyGuiComms.h" />
     <ClInclude Include="..\include\Harmony\Diagnostics\HyGuiMessage.h" />
     <ClInclude Include="..\include\Harmony\Diagnostics\HyLiveVarManager.h" />
+    <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Gui.h" />
+    <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Win.h" />
     <ClInclude Include="..\include\Harmony\HyEngine.h" />
     <ClInclude Include="..\include\Harmony\IHyApplication.h" />
     <ClInclude Include="..\include\Harmony\Input\IHyInput.h" />

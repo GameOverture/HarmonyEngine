@@ -231,6 +231,12 @@
     <ClCompile Include="Assets\Nodes\IHyNodeData.cpp">
       <Filter>Assets\Nodes</Filter>
     </ClCompile>
+    <ClCompile Include="Diagnostics\Interop\HyConsole_Win.cpp">
+      <Filter>Diagnostics\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\Interop\HyConsole_Gui.cpp">
+      <Filter>Diagnostics\Interop</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -325,6 +331,9 @@
     </Filter>
     <Filter Include="Assets\Nodes">
       <UniqueIdentifier>{465290dc-5ddc-437f-a8e4-3cbca5a052aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Diagnostics\Interop">
+      <UniqueIdentifier>{c3fdf12c-8b66-4143-935b-197586559ff3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -629,6 +638,12 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Assets\Nodes\IHyNodeData.h">
       <Filter>Assets\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Win.h">
+      <Filter>Diagnostics\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Gui.h">
+      <Filter>Diagnostics\Interop</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
