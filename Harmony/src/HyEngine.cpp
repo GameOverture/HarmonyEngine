@@ -19,7 +19,6 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxBuffer, m_AppRef.m_WindowList),
 												m_AssetManager(m_AppRef.sm_Init.sDataDir, m_GfxBuffer, m_Scene),
 												m_GuiComms(m_AppRef.sm_Init.uiDebugPort, m_AssetManager),
-												m_Console(m_AppRef.sm_Init.bUseConsole, m_AppRef.sm_Init.consoleInfo),
 												m_Input(m_AppRef.sm_Init.uiNumInputMappings),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList)

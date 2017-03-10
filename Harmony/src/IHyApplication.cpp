@@ -79,7 +79,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
 	}
 
 	// TODO: Parse this info
-	bUseConsole = false;
+	bUseConsole = true;
 	consoleInfo.sName = "Harmony Log Console";
 	consoleInfo.eType = HYWINDOW_WindowedSizeable;
 	consoleInfo.vResolution.x = 64;
@@ -90,7 +90,8 @@ HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IHyApplication::IHyApplication(HarmonyInit &initStruct) : m_pInputMaps(NULL)
+IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(NULL),
+															m_Console(initStruct.bUseConsole, initStruct.consoleInfo)
 {
 	sm_Init = initStruct;
 	HyAssert(sm_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HarmonyInit's actual 'eDefaultCoordinateType' cannot be 'HYCOORDTYPE_Default'");
