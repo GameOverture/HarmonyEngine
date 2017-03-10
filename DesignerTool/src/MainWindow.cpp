@@ -54,16 +54,27 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     m_pCurRenderer = new HyGuiRenderer(NULL, this);
     ui->centralVerticalLayout->addWidget(m_pCurRenderer);
 
-    m_pLoadingSpinner = new WaitingSpinnerWidget(this);
-    m_pLoadingSpinner->setRoundness(50.0);
-    m_pLoadingSpinner->setMinimumTrailOpacity(15.0);
-    m_pLoadingSpinner->setTrailFadePercentage(70.0);
-    m_pLoadingSpinner->setNumberOfLines(20);
-    m_pLoadingSpinner->setLineLength(35);
-    m_pLoadingSpinner->setLineWidth(15);
-    m_pLoadingSpinner->setInnerRadius(65);
-    m_pLoadingSpinner->setRevolutionsPerSecond(3.0);
-    m_pLoadingSpinner->setColor(QColor(25, 255, 25));
+    m_pLoadingSpinners[0 /*MDI_MainWindow*/] = new WaitingSpinnerWidget(this, true, true);
+    m_pLoadingSpinners[1 /*MDI_Explorer*/] = new WaitingSpinnerWidget(ui->dockWidgetExplorer, true, true);
+    m_pLoadingSpinners[2 /*MDI_AtlasManager*/] = new WaitingSpinnerWidget(ui->dockWidgetAtlas, true, true);
+    m_pLoadingSpinners[3 /*MDI_AudioManager*/] = new WaitingSpinnerWidget(ui->dockWidgetAudio, true, true);
+    m_pLoadingSpinners[4 /*MDI_ItemProperties*/] = new WaitingSpinnerWidget(ui->dockWidgetCurrentItem, true, true);
+    m_pLoadingSpinners[5 /*MDI_Output*/] = new WaitingSpinnerWidget(ui->dockWidgetOutputLog, true, true);
+
+    for(uint i = 0; i < NUM_MDI; ++i)
+    {
+        m_pLoadingSpinners[i]->setRoundness(50.0);
+        m_pLoadingSpinners[i]->setMinimumTrailOpacity(15.0);
+        m_pLoadingSpinners[i]->setTrailFadePercentage(70.0);
+        m_pLoadingSpinners[i]->setNumberOfLines(20);
+        m_pLoadingSpinners[i]->setLineLength(32);
+        m_pLoadingSpinners[i]->setLineWidth(8);
+        m_pLoadingSpinners[i]->setInnerRadius(20);
+        m_pLoadingSpinners[i]->setRevolutionsPerSecond(1.5);
+        m_pLoadingSpinners[i]->setColor(QColor(25, 255, 25));
+    }
+
+    StartLoading(MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties);
     
     SetSelectedProj(NULL);
 
@@ -342,13 +353,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     if(sm_pInstance->m_pCurSelectedProj == pProj)
         return;
 
-    bool bSelfSpinner = false;
-    if(sm_pInstance->m_pLoadingSpinner->isSpinning() == false)
-    {
-        sm_pInstance->m_pLoadingSpinner->start();
-        bSelfSpinner = true;
-    }
-
     sm_pInstance->m_pCurSelectedProj = pProj;
     if(sm_pInstance->m_pCurSelectedProj)
     {
@@ -402,9 +406,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         sm_pInstance->ui->dockWidgetAtlas->setWidget(NULL);
         sm_pInstance->ui->dockWidgetAudio->setWidget(NULL);
     }
-
-    if(bSelfSpinner)
-        sm_pInstance->m_pLoadingSpinner->stop();
 }
 
 /*static*/ void MainWindow::ReloadHarmony()
@@ -418,12 +419,22 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     SetSelectedProj(pCurItemProj);
 }
 
-/*static*/ void MainWindow::LoadSpinner(bool bEnabled)
+/*static*/ void MainWindow::StartLoading(uint uiAreaFlags)
 {
-    if(bEnabled)
-        sm_pInstance->m_pLoadingSpinner->start();
-    else
-        sm_pInstance->m_pLoadingSpinner->stop();
+    for(uint i = 0; i < NUM_MDI; ++i)
+    {
+        if((uiAreaFlags & (1 << i)) != 0)
+            sm_pInstance->m_pLoadingSpinners[i]->start();
+    }
+}
+
+/*static*/ void MainWindow::StopLoading(uint uiAreaFlags)
+{
+    for(uint i = 0; i < NUM_MDI; ++i)
+    {
+        if((uiAreaFlags & (1 << i)) != 0)
+            sm_pInstance->m_pLoadingSpinners[i]->stop();
+    }
 }
 
 /*static*/ HyRendererInterop *MainWindow::GetCurrentRenderer()

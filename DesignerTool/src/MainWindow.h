@@ -27,7 +27,21 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    static MainWindow * sm_pInstance;
+    static MainWindow *     sm_pInstance;
+
+    enum MdiArea
+    {
+        MDI_MainWindow      = 1 << 0,
+        MDI_Explorer        = 1 << 1,
+        MDI_AtlasManager    = 1 << 2,
+        MDI_AudioManager    = 1 << 3,
+        MDI_ItemProperties  = 1 << 4,
+        MDI_Output          = 1 << 5,
+
+        NUM_MDI             = 6,
+        MDI_All             = (MDI_MainWindow | MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties | MDI_Output)
+    };
+    WaitingSpinnerWidget *  m_pLoadingSpinners[NUM_MDI];
 
     QSettings               m_Settings;
     QString                 m_sEngineLocation;
@@ -46,8 +60,6 @@ class MainWindow : public QMainWindow
 
     HyGuiDebugger *         m_pDebugConnection;
 
-    WaitingSpinnerWidget *  m_pLoadingSpinner;
-
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -64,7 +76,8 @@ public:
     static void SetSelectedProj(ItemProject *pProj);
     static void ReloadHarmony();
 
-    static void LoadSpinner(bool bEnabled);
+    static void StartLoading(uint uiAreaFlags);
+    static void StopLoading(uint uiAreaFlags);
     
     static HyRendererInterop *GetCurrentRenderer();
 

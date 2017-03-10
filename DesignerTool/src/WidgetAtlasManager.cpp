@@ -813,8 +813,6 @@ void WidgetAtlasManager::RepackAll()
 
 void WidgetAtlasManager::Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> newFramesSet)
 {
-    MainWindow::LoadSpinner(true);
-
     for(uint32 i = 0; i < m_FrameList.size(); ++i)
         m_FrameList[i]->DeleteAllDrawInst();
 
@@ -928,8 +926,6 @@ void WidgetAtlasManager::Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *
     ConstructAtlasTexture(m_Packer.bins.size() - 1, iCurrentIndex);
 
     Refresh();
-
-    MainWindow::LoadSpinner(false);
 }
 
 void WidgetAtlasManager::ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIndex)

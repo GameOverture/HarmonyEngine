@@ -39,6 +39,8 @@ class ItemProject : public Item, public IHyApplication
 
     friend class WidgetExplorer;
 
+    HyEngine *                                      m_pHyEngine;
+
     WidgetAtlasManager *                            m_pAtlasMan;
     WidgetAudioManager *                            m_pAudioMan;
     QTabBar *                                       m_pTabBar;
