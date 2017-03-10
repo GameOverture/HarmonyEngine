@@ -78,14 +78,15 @@ HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
 		windowInfo[i].uiDirtyFlags	= 0;
 	}
 
-	// TODO: Parse this info
-	bUseConsole = true;
-	consoleInfo.sName = "Harmony Log Console";
-	consoleInfo.eType = HYWINDOW_WindowedSizeable;
-	consoleInfo.vResolution.x = 64;
-	consoleInfo.vResolution.y = 80;
-	consoleInfo.vLocation.x = 512;
-	consoleInfo.vLocation.y = 256;
+	// Log Console
+	bUseConsole = projObject.get<jsonxx::Boolean>("UseConsole");
+	jsonxx::Object consoleInfoObj = projObject.get<jsonxx::Object>("ConsoleInfo");
+	consoleInfo.sName = consoleInfoObj.get<jsonxx::String>("Name");
+	consoleInfo.eType = static_cast<HyWindowType>(static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("Type")));
+	consoleInfo.vResolution.x = static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("ResolutionX"));
+	consoleInfo.vResolution.y = static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("ResolutionY"));
+	consoleInfo.vLocation.x = static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("LocationX"));
+	consoleInfo.vLocation.y = static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("LocationY"));
 	consoleInfo.uiDirtyFlags = 0;
 }
 

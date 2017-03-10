@@ -234,6 +234,9 @@
     <ClCompile Include="Diagnostics\Interop\HyConsole_Win.cpp">
       <Filter>Diagnostics\Interop</Filter>
     </ClCompile>
+    <ClCompile Include="Diagnostics\Interop\HyConsole_Gui.cpp">
+      <Filter>Diagnostics\Interop</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -637,6 +640,9 @@
       <Filter>Assets\Nodes</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Win.h">
+      <Filter>Diagnostics\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Gui.h">
       <Filter>Diagnostics\Interop</Filter>
     </ClInclude>
   </ItemGroup>

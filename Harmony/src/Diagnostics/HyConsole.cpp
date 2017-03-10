@@ -23,6 +23,6 @@ HyConsole::~HyConsole()
 
 /*static*/ HyConsole *HyConsole::Get()
 {
-	HyAssert(sm_pInstance, "HyConsole::Get() was invoked before engine initialized it");
+	HyAssert(sm_pInstance, "HyConsole::Get() was invoked before IHyApplication was initialized");
 	return sm_pInstance;
 }

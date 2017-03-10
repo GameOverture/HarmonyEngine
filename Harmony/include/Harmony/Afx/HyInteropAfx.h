@@ -23,8 +23,8 @@
 		typedef HyInput_NULL HyInputInterop;
 		typedef HyInputMap_NULL HyInputMapInterop;
 
-		#include "Diagnostics/HyConsole.h"
-		typedef HyConsole HyConsoleInterop;
+		#include "Diagnostics/Interop/HyConsole_Gui.h"
+		typedef HyConsole_Gui HyConsoleInterop;
 	#else
 		#include "Renderer/OpenGL/Interop/HyOpenGL_Win.h"
 		typedef HyOpenGL_Win HyRendererInterop;
