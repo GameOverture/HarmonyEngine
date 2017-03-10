@@ -74,7 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
         m_pLoadingSpinners[i]->setColor(QColor(25, 255, 25));
     }
 
-    StartLoading(MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties);
+    //StartLoading(MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties);
     
     SetSelectedProj(NULL);
 
@@ -165,7 +165,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     {
         QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
         for(int i = 0; i < sListOpenProjs.size(); ++i)
-            ui->explorer->AddItemProject(sListOpenProjs[i], false);
+            ui->explorer->AddItemProject(sListOpenProjs[i]);
     }
     m_Settings.endGroup();
 
@@ -457,7 +457,7 @@ void MainWindow::on_actionNewProject_triggered()
             m_sDefaultProjectLocation = defaultProjDir.absolutePath();
         }
 
-        ui->explorer->AddItemProject(pDlg->GetProjFilePath(), true);
+        ui->explorer->AddItemProject(pDlg->GetProjFilePath());
     }
     delete pDlg;
 }
@@ -471,7 +471,7 @@ void MainWindow::on_actionOpenProject_triggered()
 
     if(pDlg->exec() == QDialog::Accepted)
     {
-        ui->explorer->AddItemProject(pDlg->selectedFiles()[0], true);
+        ui->explorer->AddItemProject(pDlg->selectedFiles()[0]);
     }
     delete pDlg;
 }

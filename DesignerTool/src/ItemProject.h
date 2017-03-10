@@ -37,8 +37,6 @@ class ItemProject : public Item, public IHyApplication
 {
     Q_OBJECT
 
-    friend class WidgetExplorer;
-
     HyEngine *                                      m_pHyEngine;
 
     WidgetAtlasManager *                            m_pAtlasMan;
@@ -64,9 +62,8 @@ class ItemProject : public Item, public IHyApplication
 
     bool                                            m_bHasError;
     
-    ItemProject(const QString sNewProjectFilePath);
-    
 public:
+    ItemProject(const QString sNewProjectFilePath);
     ~ItemProject();
 
     bool HasError() const                               { return m_bHasError; }
@@ -108,6 +105,8 @@ public:
     QJsonObject GetSubDirObj(eItemType eType);
 
 private Q_SLOTS:
+    void OnLoadThread();
+
     void on_tabBar_currentChanged(int index);
 
     void on_save_triggered();
@@ -115,6 +114,9 @@ private Q_SLOTS:
     void on_saveAll_triggered();
 
     void on_tabBar_closeRequested(int iIndex);
+
+Q_SIGNALS:
+    void LoadFinished(ItemProject *pSelf);
 };
 
 #endif // ITEMPROJECT_H

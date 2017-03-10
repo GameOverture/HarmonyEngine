@@ -16,6 +16,7 @@
 #include "ItemFont.h"
 #include "ItemProject.h"
 #include "WidgetAtlasManager.h"
+#include "HyGlobal.h"
 
 WidgetExplorer::WidgetExplorer(QWidget *parent) :   QWidget(parent),
                                                     ui(new Ui::WidgetExplorer)
@@ -36,24 +37,42 @@ WidgetExplorer::~WidgetExplorer()
     delete ui;
 }
 
-void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath, bool bSelectAfterAdd)
+void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
 {
-    ItemProject *pItemProject = new ItemProject(sNewProjectFilePath);
-    if(pItemProject->HasError())
-    {
-        HyGuiLog("Abort opening project: " % pItemProject->GetAbsPath(), LOGTYPE_Error);
-        return;
-    }
-    else
-        HyGuiLog("Opening project: " % pItemProject->GetAbsPath(), LOGTYPE_Info);
-    
-    QTreeWidgetItem *pProjTreeItem = pItemProject->GetTreeItem();
-    ui->treeWidget->insertTopLevelItem(0, pProjTreeItem);
-    
-    ui->treeWidget->expandItem(pProjTreeItem);
-    
-    if(bSelectAfterAdd)
-        SelectItem(pItemProject);
+    //m_LoadProjectThread
+    //QThread *pNewThread = new QThread();
+
+
+
+    //ItemProject *pItemProject = new ItemProject(sNewProjectFilePath);
+
+
+
+    //pItemProject->moveToThread(pNewThread);
+    //connect(this, &WidgetExplorer::LoadItemProject, pItemProject, &ItemProject::OnLoadThread);
+    //connect(pItemProject, &ItemProject::LoadFinished, this, &WidgetExplorer::OnProjectLoaded);
+    //connect(pNewThread, &QThread::finished, pNewThread, &QObject::deleteLater);
+
+
+
+    //OnProjectLoaded(pItemProject);
+
+
+
+    //Q_EMIT LoadItemProject();
+    //MainWindow::StartLoading(MDI_Explorer);
+    //pNewThread->start();
+
+
+
+
+
+
+
+    ItemProjectLoadThread *pNewLoadThread = new ItemProjectLoadThread(sNewProjectFilePath, this);
+    connect(pNewLoadThread, &ItemProjectLoadThread::LoadFinished, this, &WidgetExplorer::OnProjectLoaded);
+    connect(pNewLoadThread, &ItemProjectLoadThread::finished, pNewLoadThread, &QObject::deleteLater);
+    pNewLoadThread->start();
 }
 
 void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd)
@@ -292,6 +311,23 @@ Item *WidgetExplorer::GetCurDirSelected(bool bIncludePrefixDirs)
     
 //    return NULL;
 //}
+
+void WidgetExplorer::OnProjectLoaded(ItemProject *pLoadedProj)
+{
+    if(pLoadedProj->HasError())
+    {
+        HyGuiLog("Abort opening project: " % pLoadedProj->GetAbsPath(), LOGTYPE_Error);
+        return;
+    }
+    else
+        HyGuiLog("Opening project: " % pLoadedProj->GetAbsPath(), LOGTYPE_Info);
+
+    QTreeWidgetItem *pProjTreeItem = pLoadedProj->GetTreeItem();
+    ui->treeWidget->insertTopLevelItem(0, pProjTreeItem);
+    ui->treeWidget->expandItem(pProjTreeItem);
+
+    MainWindow::StopLoading(MDI_Explorer);
+}
 
 void WidgetExplorer::OnContextMenu(const QPoint &pos)
 {

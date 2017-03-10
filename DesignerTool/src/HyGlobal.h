@@ -88,6 +88,18 @@ enum eGuiFrameError
     NUMGUIFRAMEERROR
 };
 
+enum MdiArea
+{
+    MDI_MainWindow      = 1 << 0,
+    MDI_Explorer        = 1 << 1,
+    MDI_AtlasManager    = 1 << 2,
+    MDI_AudioManager    = 1 << 3,
+    MDI_ItemProperties  = 1 << 4,
+    MDI_Output          = 1 << 5,
+
+    NUM_MDI             = 6,
+    MDI_All             = (MDI_MainWindow | MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties | MDI_Output)
+};
 
 #define HYTREEWIDGETITEM_IsFilter               "HyTreeFilter"
 
