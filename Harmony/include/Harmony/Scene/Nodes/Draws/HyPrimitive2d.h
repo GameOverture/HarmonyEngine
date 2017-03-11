@@ -23,7 +23,7 @@ protected:
 	uint32			m_uiBufferSize;
 
 public:
-	HyPrimitive2d();
+	HyPrimitive2d(IHyNode *pParent = nullptr);
 	virtual ~HyPrimitive2d(void);
 
 	const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p);

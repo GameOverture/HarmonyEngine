@@ -9,11 +9,11 @@
  *************************************************************************/
 #include "Scene/Nodes/HyEntity2d.h"
 
-HyEntity2d::HyEntity2d() :	IHyDraw2d(HYTYPE_Entity2d, NULL, NULL)
+HyEntity2d::HyEntity2d(IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Entity2d, nullptr, nullptr, pParent)
 {
 }
 
-HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName) :	IHyDraw2d(HYTYPE_Entity2d, szPrefix, szName)
+HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Entity2d, szPrefix, szName, pParent)
 {
 }
 

@@ -142,7 +142,10 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
                                                                 m_pCamera(NULL),
                                                                 m_ActionSave(0),
                                                                 m_ActionSaveAll(0),
-                                                                m_bHasError(false)
+                                                                m_bHasError(false),
+                                                                m_pAtlasMan(nullptr),
+                                                                m_pAudioMan(nullptr),
+                                                                m_pTabBar(nullptr)
 {
     for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
         m_bDrawStateLoaded[i] = false;
@@ -183,16 +186,6 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
     sm_Init.sDataDir = GetAssetsAbsPath().toStdString();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    m_pAtlasMan = new WidgetAtlasManager(this);
-    
-    m_pAudioMan = new WidgetAudioManager(this);
-
-    m_pTabBar = new QTabBar();
-    m_pTabBar->setTabsClosable(true);
-    m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
-    connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
-    connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
 
     m_ActionSave.setText("&Save");
     m_ActionSave.setIcon(QIcon(":/icons16x16/file-save.png"));
@@ -244,7 +237,108 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    OnLoadThread();
+    // Initialize the project by processing each type of sub dir
+    QList<eItemType> subDirList = HyGlobal::SubDirList();
+    for(int i = 0; i < subDirList.size(); ++i)
+    {
+        if(subDirList[i] == ITEM_DirAtlases || subDirList[i] == ITEM_DirAudioBanks)
+            continue;
+
+        QString sSubDirPath = GetAssetsAbsPath() % HyGlobal::ItemName(subDirList[i]) % HyGlobal::ItemExt(subDirList[i]);
+        Item *pSubDirItem = new Item(subDirList[i], sSubDirPath);
+
+        // Adding sub dir tree item
+        QTreeWidgetItem *pSubDirTreeItem = pSubDirItem->GetTreeItem();
+        m_pTreeItemPtr->addChild(pSubDirTreeItem);
+
+        QString sSubDirName = HyGlobal::ItemName(subDirList[i]);
+        if(m_SaveDataObj.contains(sSubDirName) == false)
+            m_SaveDataObj.insert(sSubDirName, QJsonObject());
+
+        // Get the corresponding sub dir QJsonObject, and iterate through the objects (data items) within
+        QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
+        QJsonObject::iterator objsInSubDirIter = subDirObj.begin();
+
+        ///////////////////////////////////////
+        /// ITEMS IN SUBDIR
+        for(; objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
+        {
+            QString sItemPath = objsInSubDirIter.key();
+
+            // Create prefix folder tree items if they don't exist, and finally adding the tree item for the data itself
+            QStringList sPathPartList = sItemPath.split("/");
+            QString sCurPrefix = "";
+
+            QTreeWidgetItem *pCurPrefixTreeItem = pSubDirTreeItem;
+            ///////////////////////////////////////
+            /// PATH PARTS
+            for(int iPathPartIndex = 0; iPathPartIndex < sPathPartList.size(); ++iPathPartIndex)
+            {
+                if(iPathPartIndex != 0)
+                    sCurPrefix += "/";
+
+                // Not the last path part, must be a prefix
+                if(iPathPartIndex != sPathPartList.size() - 1)
+                {
+                    sCurPrefix += sPathPartList[iPathPartIndex];
+
+                    bool bPrefixFound = false;
+                    for(int iChildIndex = 0; iChildIndex < pCurPrefixTreeItem->childCount(); ++iChildIndex)
+                    {
+                        if(sPathPartList[iPathPartIndex] == pCurPrefixTreeItem->child(iChildIndex)->text(0))
+                        {
+                            pCurPrefixTreeItem = pCurPrefixTreeItem->child(iChildIndex);
+                            bPrefixFound = true;
+                            break;
+                        }
+                    }
+
+                    if(bPrefixFound == false)
+                    {
+                        Item *pPrefixItem = new Item(ITEM_Prefix, sCurPrefix);
+                        QTreeWidgetItem *pNewPrefixTreeWidget = pPrefixItem->GetTreeItem();
+
+                        pCurPrefixTreeItem->addChild(pNewPrefixTreeWidget);
+                        pCurPrefixTreeItem = pNewPrefixTreeWidget;
+                    }
+                }
+                else // Last path part, so must be the actual data item
+                {
+                    Item *pNewDataItem = nullptr;
+                    switch(subDirList[i])
+                    {
+                    case ITEM_DirAudio:
+                        pNewDataItem = new ItemAudio(sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
+                        break;
+                    case ITEM_DirFonts:
+                        pNewDataItem = new ItemFont(sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
+                        break;
+                    case ITEM_DirSprites:
+                        pNewDataItem = new ItemSprite(sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
+                        break;
+                    case ITEM_DirParticles:
+                    case ITEM_DirSpine:
+                    case ITEM_DirShaders:
+                    case ITEM_DirEntities:
+                    case ITEM_DirAtlases:
+                    default:
+                        { HyGuiLog("Unknown item type in ItemProject!", LOGTYPE_Error); }
+                    }
+
+                    pCurPrefixTreeItem->addChild(pNewDataItem->GetTreeItem());
+
+#ifdef RESAVE_ENTIRE_PROJECT
+                    static_cast<ItemWidget *>(pNewDataItem)->Save();
+#endif
+
+                }
+            }
+        }
+    }
+
+#ifdef RESAVE_ENTIRE_PROJECT
+    SaveGameData();
+#endif
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -275,11 +369,25 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
         //        OpenItem(pItem);
         //}
     }
+
+    Q_EMIT LoadFinished(this);
 }
 
 ItemProject::~ItemProject()
 {
     delete m_pAtlasMan;
+}
+
+void ItemProject::WidgetLoad()
+{
+    m_pAtlasMan = new WidgetAtlasManager(this, nullptr);
+    m_pAudioMan = new WidgetAudioManager(this, nullptr);
+
+    m_pTabBar = new QTabBar(nullptr);
+    m_pTabBar->setTabsClosable(true);
+    m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
+    connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
+    connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
 }
 
 QString ItemProject::GetDirPath() const
@@ -507,114 +615,6 @@ void ItemProject::SaveUserData()
 QJsonObject ItemProject::GetSubDirObj(eItemType eType)
 {
     return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType))].toObject();
-}
-
-void ItemProject::OnLoadThread()
-{
-    // Initialize the project by processing each type of sub dir
-    QList<eItemType> subDirList = HyGlobal::SubDirList();
-    for(int i = 0; i < subDirList.size(); ++i)
-    {
-        if(subDirList[i] == ITEM_DirAtlases || subDirList[i] == ITEM_DirAudioBanks)
-            continue;
-
-        QString sSubDirPath = GetAssetsAbsPath() % HyGlobal::ItemName(subDirList[i]) % HyGlobal::ItemExt(subDirList[i]);
-        Item *pSubDirItem = new Item(subDirList[i], sSubDirPath);
-
-        // Adding sub dir tree item
-        QTreeWidgetItem *pSubDirTreeItem = pSubDirItem->GetTreeItem();
-        m_pTreeItemPtr->addChild(pSubDirTreeItem);
-
-        QString sSubDirName = HyGlobal::ItemName(subDirList[i]);
-        if(m_SaveDataObj.contains(sSubDirName) == false)
-            m_SaveDataObj.insert(sSubDirName, QJsonObject());
-
-        // Get the corresponding sub dir QJsonObject, and iterate through the objects (data items) within
-        QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
-        QJsonObject::iterator objsInSubDirIter = subDirObj.begin();
-
-        ///////////////////////////////////////
-        /// ITEMS IN SUBDIR
-        for(; objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
-        {
-            QString sItemPath = objsInSubDirIter.key();
-
-            // Create prefix folder tree items if they don't exist, and finally adding the tree item for the data itself
-            QStringList sPathPartList = sItemPath.split("/");
-            QString sCurPrefix = "";
-
-            QTreeWidgetItem *pCurPrefixTreeItem = pSubDirTreeItem;
-            ///////////////////////////////////////
-            /// PATH PARTS
-            for(int iPathPartIndex = 0; iPathPartIndex < sPathPartList.size(); ++iPathPartIndex)
-            {
-                if(iPathPartIndex != 0)
-                    sCurPrefix += "/";
-
-                // Not the last path part, must be a prefix
-                if(iPathPartIndex != sPathPartList.size() - 1)
-                {
-                    sCurPrefix += sPathPartList[iPathPartIndex];
-
-                    bool bPrefixFound = false;
-                    for(int iChildIndex = 0; iChildIndex < pCurPrefixTreeItem->childCount(); ++iChildIndex)
-                    {
-                        if(sPathPartList[iPathPartIndex] == pCurPrefixTreeItem->child(iChildIndex)->text(0))
-                        {
-                            pCurPrefixTreeItem = pCurPrefixTreeItem->child(iChildIndex);
-                            bPrefixFound = true;
-                            break;
-                        }
-                    }
-
-                    if(bPrefixFound == false)
-                    {
-                        Item *pPrefixItem = new Item(ITEM_Prefix, sCurPrefix);
-                        QTreeWidgetItem *pNewPrefixTreeWidget = pPrefixItem->GetTreeItem();
-
-                        pCurPrefixTreeItem->addChild(pNewPrefixTreeWidget);
-                        pCurPrefixTreeItem = pNewPrefixTreeWidget;
-                    }
-                }
-                else // Last path part, so must be the actual data item
-                {
-                    Item *pNewDataItem = nullptr;
-                    switch(subDirList[i])
-                    {
-                    case ITEM_DirAudio:
-                        pNewDataItem = new ItemAudio(sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
-                        break;
-                    case ITEM_DirFonts:
-                        pNewDataItem = new ItemFont(sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
-                        break;
-                    case ITEM_DirSprites:
-                        pNewDataItem = new ItemSprite(sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
-                        break;
-                    case ITEM_DirParticles:
-                    case ITEM_DirSpine:
-                    case ITEM_DirShaders:
-                    case ITEM_DirEntities:
-                    case ITEM_DirAtlases:
-                    default:
-                        { HyGuiLog("Unknown item type in ItemProject!", LOGTYPE_Error); }
-                    }
-
-                    pCurPrefixTreeItem->addChild(pNewDataItem->GetTreeItem());
-
-#ifdef RESAVE_ENTIRE_PROJECT
-                    static_cast<ItemWidget *>(pNewDataItem)->Save();
-#endif
-
-                }
-            }
-        }
-    }
-
-#ifdef RESAVE_ENTIRE_PROJECT
-    SaveGameData();
-#endif
-
-    Q_EMIT LoadFinished(this);
 }
 
 void ItemProject::on_tabBar_currentChanged(int index)

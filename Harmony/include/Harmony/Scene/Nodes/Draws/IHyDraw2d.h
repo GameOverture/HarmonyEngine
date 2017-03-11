@@ -75,7 +75,7 @@ public:
 	HyTweenVec3						botColor;
 	HyTweenFloat					alpha;
 
-	IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName);
+	IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName, IHyNode *pParent = nullptr);
 	virtual ~IHyDraw2d(void);
 
 	const std::string &GetName();

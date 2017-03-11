@@ -18,7 +18,7 @@ class HyMesh3d : public IHyDraw2d
 {
 	
 public:
-	HyMesh3d(const char *szPrefix, const char *szName);
+	HyMesh3d(const char *szPrefix, const char *szName, IHyNode *pParent = nullptr);
 	virtual ~HyMesh3d(void);
 
 	virtual void OnUpdate() override;

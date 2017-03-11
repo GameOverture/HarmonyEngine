@@ -36,7 +36,7 @@ protected:
 	std::vector<HyTweenFloat *>		m_ActiveAnimFloatsList;
 
 public:
-	IHyNode(HyType eInstType);
+	IHyNode(HyType eInstType, IHyNode *pParent = nullptr);
 	virtual ~IHyNode();
 	
 	HyType GetType();

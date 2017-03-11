@@ -10,14 +10,17 @@
 #include "Scene/Nodes/IHyNode.h"
 #include "Scene/Nodes/Transforms/Tweens/HyTweenFloat.h"
 
-IHyNode::IHyNode(HyType eType) :	m_eTYPE(eType),
-									m_bDirty(false),
-									m_bIsDraw2d(false),
-									m_bEnabled(true),
-									m_pParent(NULL),
-									m_iTag(0)
+IHyNode::IHyNode(HyType eType, IHyNode *pParent /*= nullptr*/) :	m_eTYPE(eType),
+																	m_bDirty(false),
+																	m_bIsDraw2d(false),
+																	m_bEnabled(true),
+																	m_pParent(nullptr),
+																	m_iTag(0)
 {
 	HyScene::AddNode(this);
+	
+	if(pParent)
+		pParent->AddChild(*this);
 }
 
 /*virtual*/ IHyNode::~IHyNode()
@@ -109,7 +112,7 @@ bool IHyNode::HasChild(IHyNode &childInst)
 
 void IHyNode::Detach()
 {
-	if(m_pParent == NULL)
+	if(m_pParent == nullptr)
 		return;
 
 	for(std::vector<IHyNode *>::iterator iter = m_pParent->m_ChildList.begin(); iter != m_pParent->m_ChildList.end(); ++iter)
@@ -117,7 +120,7 @@ void IHyNode::Detach()
 		if(*iter == this)
 		{
 			m_pParent->m_ChildList.erase(iter);
-			m_pParent = NULL;
+			m_pParent = nullptr;
 			return;
 		}
 	}
@@ -127,7 +130,7 @@ void IHyNode::Detach()
 
 bool IHyNode::HasParent()
 {
-	return m_pParent != NULL;
+	return m_pParent != nullptr;
 }
 
 void IHyNode::ForEachNode(std::function<void(IHyNode *)> func)

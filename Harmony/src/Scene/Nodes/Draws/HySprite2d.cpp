@@ -10,12 +10,12 @@
 #include "Scene/Nodes/Draws/HySprite2d.h"
 #include "Diagnostics/HyConsole.h"
 
-HySprite2d::HySprite2d(const char *szPrefix, const char *szName) :	IHyDraw2d(HYTYPE_Sprite2d, szPrefix, szName),
-																	m_bIsAnimPaused(false),
-																	m_fAnimPlayRate(1.0f),
-																	m_fElapsedFrameTime(0.0f),
-																	m_uiCurAnimState(0),
-																	m_uiCurFrame(0)
+HySprite2d::HySprite2d(const char *szPrefix, const char *szName, IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
+																									m_bIsAnimPaused(false),
+																									m_fAnimPlayRate(1.0f),
+																									m_fElapsedFrameTime(0.0f),
+																									m_uiCurAnimState(0),
+																									m_uiCurFrame(0)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);

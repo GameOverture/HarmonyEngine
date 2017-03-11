@@ -11,12 +11,12 @@
 
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasIndex) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, std::to_string(uiAtlasIndex).c_str()),
-															m_bIS_RAW(false),
-															m_uiATLAS_INDEX(uiAtlasIndex),
-															m_uiRAW_TEXTURE_WIDTH(0),
-															m_uiRAW_TEXTURE_HEIGHT(0),
-															m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasIndex, IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, std::to_string(uiAtlasIndex).c_str(), pParent),
+																							m_bIS_RAW(false),
+																							m_uiATLAS_INDEX(uiAtlasIndex),
+																							m_uiRAW_TEXTURE_WIDTH(0),
+																							m_uiRAW_TEXTURE_HEIGHT(0),
+																							m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
@@ -24,12 +24,12 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasIndex) :	IHyDraw2d(HYTYPE_Textu
 	m_RenderState.SetNumVerticesPerInstance(4);
 }
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, "raw"),
-																											m_bIS_RAW(true),
-																											m_uiATLAS_INDEX(0),
-																											m_uiRAW_TEXTURE_WIDTH(uiTextureWidth),
-																											m_uiRAW_TEXTURE_HEIGHT(uiTextureHeight),
-																											m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, "raw", pParent),
+																																			m_bIS_RAW(true),
+																																			m_uiATLAS_INDEX(0),
+																																			m_uiRAW_TEXTURE_WIDTH(uiTextureWidth),
+																																			m_uiRAW_TEXTURE_HEIGHT(uiTextureHeight),
+																																			m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);

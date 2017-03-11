@@ -37,8 +37,6 @@ class ItemProject : public Item, public IHyApplication
 {
     Q_OBJECT
 
-    HyEngine *                                      m_pHyEngine;
-
     WidgetAtlasManager *                            m_pAtlasMan;
     WidgetAudioManager *                            m_pAudioMan;
     QTabBar *                                       m_pTabBar;
@@ -65,6 +63,8 @@ class ItemProject : public Item, public IHyApplication
 public:
     ItemProject(const QString sNewProjectFilePath);
     ~ItemProject();
+
+    void WidgetLoad();
 
     bool HasError() const                               { return m_bHasError; }
 
@@ -105,8 +105,6 @@ public:
     QJsonObject GetSubDirObj(eItemType eType);
 
 private Q_SLOTS:
-    void OnLoadThread();
-
     void on_tabBar_currentChanged(int index);
 
     void on_save_triggered();

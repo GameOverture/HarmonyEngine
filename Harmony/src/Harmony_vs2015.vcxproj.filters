@@ -231,6 +231,12 @@
     <ClCompile Include="Renderer\Components\HyShaderUniforms.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Diagnostics\Interop\HyConsole_Gui.cpp">
+      <Filter>Diagnostics\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\Interop\HyConsole_Win.cpp">
+      <Filter>Diagnostics\Interop</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -325,6 +331,9 @@
     </Filter>
     <Filter Include="Assets\Loadables">
       <UniqueIdentifier>{846e1724-4c9c-40c4-b6bb-3ca33bc2ff3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Diagnostics\Interop">
+      <UniqueIdentifier>{e72199ab-395c-4343-a244-cffc6669020a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -629,6 +638,12 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyShaderUniforms.h">
       <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Gui.h">
+      <Filter>Diagnostics\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Win.h">
+      <Filter>Diagnostics\Interop</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
