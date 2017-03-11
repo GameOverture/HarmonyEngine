@@ -32,7 +32,7 @@ public:
     explicit WidgetAudio(ItemAudio *pOwner, QWidget *parent = 0);
     ~WidgetAudio();
     
-    ItemAudio *GetItemAudio();
+    ItemAudio *GetData();
     
     QComboBox *GetCmbStates();
     

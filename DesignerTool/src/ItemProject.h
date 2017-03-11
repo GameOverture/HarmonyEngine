@@ -86,6 +86,7 @@ public:
     QString GetSourceAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation) + '/'; }
     QString GetSourceRelPath() const                    { return QDir::cleanPath(m_sRelativeSourceLocation) + '/'; }
 
+    ItemAtlases &GetAtlasesData()                       { return *m_pAtlasesData; }
     WidgetAtlasManager &GetAtlasManager()               { return *m_pAtlasMan; }
     WidgetAudioManager &GetAudioManager()               { return *m_pAudioMan; }
     QTabBar *GetTabBar()                                { return m_pTabBar; }

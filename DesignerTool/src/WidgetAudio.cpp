@@ -68,7 +68,7 @@ WidgetAudio::~WidgetAudio()
     delete ui;
 }
 
-ItemAudio *WidgetAudio::GetItemAudio()
+ItemAudio *WidgetAudio::GetData()
 {
     return m_pItemAudio;
 }

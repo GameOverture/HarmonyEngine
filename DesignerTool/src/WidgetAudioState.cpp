@@ -29,7 +29,7 @@ WidgetAudioState::WidgetAudioState(WidgetAudio *pOwner, QList<QAction *> stateAc
     ui->btnOrderWaveUp->setDefaultAction(FindAction(stateActionList, "actionOrderWaveUpwards"));
     ui->btnOrderWaveDown->setDefaultAction(FindAction(stateActionList, "actionOrderWaveDownwards"));
     
-    ui->cmbCategory->setModel(m_pOwner->GetItemAudio()->GetAudioManager().GetCategoryModel());
+    ui->cmbCategory->setModel(m_pOwner->GetData()->GetItemProject()->GetAudioManager().GetCategoryModel());
     
     UpdateActions();
 }
@@ -73,25 +73,25 @@ void WidgetAudioState::UpdateActions()
 void WidgetAudioState::on_cmbCategory_currentIndexChanged(int index)
 {
     QUndoCommand *pCmd = new WidgetUndoCmd_ComboBox<WidgetAudioState>("Audio Category", this, ui->cmbCategory, m_iPrevCategoryIndex, index);
-    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
 }
 
 void WidgetAudioState::on_chkLimitInst_clicked()
 {
     QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetAudioState>(this, ui->chkLimitInst);
-    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
 }
 
 void WidgetAudioState::on_chkLooping_clicked()
 {
     QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetAudioState>(this, ui->chkLooping);
-    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
 }
 
 void WidgetAudioState::on_cmbPlayType_currentIndexChanged(int index)
 {
     QUndoCommand *pCmd = new WidgetUndoCmd_ComboBox<WidgetAudioState>("Play Type", this, ui->cmbPlayType, m_iPrevPlayTypeIndex, index);
-    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
 }
 
 void WidgetAudioState::on_sbInstMax_editingFinished()
@@ -100,7 +100,7 @@ void WidgetAudioState::on_sbInstMax_editingFinished()
         return;
     
     QUndoCommand *pCmd = new WidgetUndoCmd_SpinBox<WidgetAudioState>("Number of Instances", this, ui->sbInstMax, m_iPrevNumInst, ui->sbInstMax->value());
-    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
 }
 
 void WidgetAudioState::on_radInstFail_toggled(bool checked)
@@ -109,7 +109,7 @@ void WidgetAudioState::on_radInstFail_toggled(bool checked)
         return;
     
     QUndoCommand *pCmd = new WidgetUndoCmd_RadioToggle<WidgetAudioState>("Instance Limit Behavior", this, ui->radInstFail, ui->radInstQueue);
-    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
 }
 
 void WidgetAudioState::on_radInstQueue_toggled(bool checked)
@@ -118,5 +118,5 @@ void WidgetAudioState::on_radInstQueue_toggled(bool checked)
         return;
     
     QUndoCommand *pCmd = new WidgetUndoCmd_RadioToggle<WidgetAudioState>("Instance Limit Behavior", this, ui->radInstQueue, ui->radInstFail);
-    m_pOwner->GetItemAudio()->GetUndoStack()->push(pCmd);
+    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
 }

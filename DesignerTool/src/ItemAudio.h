@@ -17,7 +17,7 @@ class ItemAudio : public ItemWidget
     Q_OBJECT
     
 public:
-    ItemAudio(const QString sPrefix, const QString sName, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef);
+    ItemAudio(ItemProject *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
     virtual ~ItemAudio();
     
 protected:

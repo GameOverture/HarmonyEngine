@@ -11,7 +11,7 @@
 #include "WidgetAudio.h"
 
 
-ItemAudio::ItemAudio(const QString sPrefix, const QString sName, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Audio, sPrefix, sName, initVal, atlasManRef, audioManRef)
+ItemAudio::ItemAudio(ItemProject *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) : ItemWidget(pItemProj, ITEM_Audio, sPrefix, sName, initVal)
 {
 }
 

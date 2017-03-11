@@ -81,6 +81,7 @@ bool AtlasTreeItem::operator<(const QTreeWidgetItem &rhs) const
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 WidgetAtlasManager::WidgetAtlasManager(QWidget *parent) :   QWidget(parent),
+                                                            m_DataRef(new ItemAtlases(nullptr)),
                                                             ui(new Ui::WidgetAtlasManager)
 {
     ui->setupUi(this);

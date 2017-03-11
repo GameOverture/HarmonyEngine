@@ -71,7 +71,7 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
 
         QList<quint32> requestList;
         requestList.append(JSONOBJ_TOINT(fontObj, "checksum"));
-        QList<HyGuiFrame *> pRequestedList = m_pItemFont->GetAtlasManager().RequestFrames(m_pItemFont, requestList);
+        QList<HyGuiFrame *> pRequestedList = m_pItemFont->GetItemProject()->GetAtlasesData().RequestFrames(m_pItemFont, requestList);
         m_pTrueAtlasFrame = pRequestedList[0];
         
 //        for(int i = 0; i < ui->cmbAtlasGroups->count(); ++i)
@@ -302,7 +302,7 @@ void WidgetFont::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
         m_MasterStageList[i]->iReferenceCount = m_MasterStageList[i]->iTmpReferenceCount;
     
     // if 'bFindBestFit' == true, adjust atlas dimentions until we utilize efficient space on the smallest texture
-    QSize atlasSize = m_pItemFont->GetAtlasManager().GetAtlasDimensions();
+    QSize atlasSize = m_pItemFont->GetItemProject()->GetAtlasesData().GetAtlasDimensions();
     float fAtlasSizeModifier = 1.0f;
     bool bDoInitialShrink = true;
     size_t iNumMissedGlyphs = 0;

@@ -100,13 +100,13 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sPrefix, cons
         HyGuiLog("Do not use WidgetExplorer::AddItem for Sub dirs or prefixes", LOGTYPE_Error);
         return;
     case ITEM_Audio:
-        pItem = new ItemAudio(sPrefix, sName, QJsonValue(), pCurProj->GetAtlasManager(), pCurProj->GetAudioManager());
+        pItem = new ItemAudio(pCurProj, sPrefix, sName, QJsonValue());
         break;
     case ITEM_Sprite:
-        pItem = new ItemSprite(sPrefix, sName, QJsonValue(), pCurProj->GetAtlasManager(), pCurProj->GetAudioManager());
+        pItem = new ItemSprite(pCurProj, sPrefix, sName, QJsonValue());
         break;
     case ITEM_Font:
-        pItem = new ItemFont(sPrefix, sName, QJsonValue(), pCurProj->GetAtlasManager(), pCurProj->GetAudioManager());
+        pItem = new ItemFont(pCurProj, sPrefix, sName, QJsonValue());
         break;
     default:
         HyGuiLog("Item: " % sPrefix % "/" % sName % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);

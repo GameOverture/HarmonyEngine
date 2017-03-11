@@ -309,13 +309,13 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
                     switch(subDirList[i])
                     {
                     case ITEM_DirAudio:
-                        pNewDataItem = new ItemAudio(sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
+                        pNewDataItem = new ItemAudio(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirFonts:
-                        pNewDataItem = new ItemFont(sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
+                        pNewDataItem = new ItemFont(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirSprites:
-                        pNewDataItem = new ItemSprite(sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), *m_pAtlasMan, *m_pAudioMan);
+                        pNewDataItem = new ItemSprite(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirParticles:
                     case ITEM_DirSpine:
@@ -381,7 +381,7 @@ ItemProject::~ItemProject()
 
 void ItemProject::LoadWidgets()
 {
-    m_pAtlasMan = new WidgetAtlasManager(m_Atlases, nullptr);
+    m_pAtlasMan = new WidgetAtlasManager(*m_pAtlasesData, nullptr);
     m_pAudioMan = new WidgetAudioManager(this, nullptr);
 
     m_pTabBar = new QTabBar(nullptr);

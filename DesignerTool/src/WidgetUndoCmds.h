@@ -13,8 +13,7 @@
 #include "HyGlobal.h"
 #include "ItemWidget.h"
 
-#include "WidgetAtlasManager.h"
-#include "WidgetAudioManager.h"
+#include "ItemProject.h"
 
 #include <QUndoCommand>
 #include <QComboBox>
@@ -540,13 +539,13 @@ public:
 
     void redo() Q_DECL_OVERRIDE
     {
-        m_Frames = m_pOwner->GetItemOwner()->GetAtlasManager().RequestFrames(m_pOwner->GetItemOwner(), m_Frames);
+        m_Frames = m_pOwner->GetData()->GetItemProject()->GetAtlasesData().RequestFrames(m_pOwner->GetData(), m_Frames);
         m_pOwner->UpdateActions();
     }
     
     void undo() Q_DECL_OVERRIDE
     {
-        m_pOwner->GetItemOwner()->GetAtlasManager().RelinquishFrames(m_pOwner->GetItemOwner(), m_Frames);
+        m_pOwner->GetData()->GetItemProject()->GetAtlasesData().RelinquishFrames(m_pOwner->GetData(), m_Frames);
         m_pOwner->UpdateActions();
     }
 };
@@ -571,13 +570,13 @@ public:
 
     void redo() Q_DECL_OVERRIDE
     {
-        m_pOwner->GetItemOwner()->GetAtlasManager().RelinquishFrames(m_pOwner->GetItemOwner(), m_Frames);
+        m_pOwner->GetData()->GetItemProject()->GetAtlasesData().RelinquishFrames(m_pOwner->GetData(), m_Frames);
         m_pOwner->UpdateActions();
     }
     
     void undo() Q_DECL_OVERRIDE
     {
-        m_Frames = m_pOwner->GetItemOwner()->GetAtlasManager().RequestFrames(m_pOwner->GetItemOwner(), m_Frames);
+        m_Frames = m_pOwner->GetData()->GetItemProject()->GetAtlasesData().RequestFrames(m_pOwner->GetData(), m_Frames);
         m_pOwner->UpdateActions();
     }
 };

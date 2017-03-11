@@ -37,7 +37,7 @@ public:
     explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
     ~WidgetSprite();
     
-    ItemSprite *GetItemOwner();
+    ItemSprite *GetData();
     
     void OnGiveMenuActions(QMenu *pMenu);
 

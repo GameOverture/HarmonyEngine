@@ -68,7 +68,7 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
 
                 QList<quint32> requestList;
                 requestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
-                QList<HyGuiFrame *> pRequestedList = m_pItemSprite->GetAtlasManager().RequestFrames(m_pItemSprite, requestList);
+                QList<HyGuiFrame *> pRequestedList = m_pItemSprite->GetItemProject()->GetAtlasesData().RequestFrames(m_pItemSprite, requestList);
 
                 QPoint vOffset(spriteFrameObj["offsetX"].toInt() - pRequestedList[0]->GetCrop().left(),
                                spriteFrameObj["offsetY"].toInt() - (pRequestedList[0]->GetSize().height() - pRequestedList[0]->GetCrop().bottom()));
@@ -96,7 +96,7 @@ WidgetSprite::~WidgetSprite()
     delete ui;
 }
 
-ItemSprite *WidgetSprite::GetItemOwner()
+ItemSprite *WidgetSprite::GetData()
 {
     return m_pItemSprite;
 }
