@@ -18,33 +18,11 @@
 #include <QThread>
 
 #include "ItemProject.h"
-#include "WidgetAtlasGroup.h"
+#include "DlgAtlasGroupSettings.h"
 
 namespace Ui {
 class WidgetAtlasManager;
 }
-
-class WidgetAtlasManagerLoadThread : public QThread
-{
-    Q_OBJECT
-
-    QString m_sSettingsPath;
-
-public:
-    WidgetAtlasManagerLoadThread(QString sPath, QObject *pParent) : QThread(pParent),
-                                                                    m_sSettingsPath(sPath)
-    { }
-
-    void run() Q_DECL_OVERRIDE
-    {
-        /* ... here is the expensive or blocking operation ... */
-        ItemProject *pNewItemProject = new ItemProject(m_sPath);
-        Q_EMIT LoadFinished(pNewItemProject);
-    }
-
-Q_SIGNALS:
-    void LoadFinished(ItemProject *pLoadedItemProject);
-};
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class WidgetAtlasGroupTreeWidget : public QTreeWidget
@@ -59,16 +37,10 @@ protected:
     virtual void dropEvent(QDropEvent *e);
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetAtlasGroupTreeWidgetItem : public QTreeWidgetItem
+class AtlasTreeItem : public QTreeWidgetItem
 {
 public:
-    WidgetAtlasGroupTreeWidgetItem(int type = Type) : QTreeWidgetItem(type)
-    { }
-
-    WidgetAtlasGroupTreeWidgetItem(QTreeWidget *parent, int type = Type) : QTreeWidgetItem(parent, type)
-    { }
-
-    WidgetAtlasGroupTreeWidgetItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type)
+    AtlasTreeItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type)
     { }
 
     bool operator<(const QTreeWidgetItem& other) const;
@@ -89,10 +61,10 @@ class WidgetAtlasManager : public QWidget
     QTreeWidgetItem *               m_pMouseHoverItem;
 
 
-    DlgAtlasGroupSettings       m_dlgSettings;
+    DlgAtlasGroupSettings           m_dlgSettings;
 
 
-    ImagePacker                 m_Packer;
+    ImagePacker                     m_Packer;
 
 public:
     explicit WidgetAtlasManager(QWidget *parent = 0);
@@ -148,8 +120,6 @@ private:
 
     void SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
     void RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
-
-    void CreateTreeItem(WidgetAtlasGroupTreeWidgetItem *pParent, HyGuiFrame *pFrame);
 
     void GetAtlasInfoForGameData(QJsonObject &atlasObjOut);
 

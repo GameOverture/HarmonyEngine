@@ -18,13 +18,15 @@
 #include <QJsonObject>
 #include <QDataStream>
 
+class AtlasTreeItem;
+
 class HyGuiFrame
 {
     friend class ItemProject;
     
     eAtlasNodeType                      m_eType;
 
-    QTreeWidgetItem *                   m_pTreeWidgetItem;
+    AtlasTreeItem *                     m_pTreeWidgetItem;
 
     quint32                             m_uiChecksum;
     QString                             m_sName;
@@ -52,7 +54,7 @@ public:
     void DeleteDrawInst(void *pKey);
     void DeleteAllDrawInst();
 
-    void SetTreeWidgetItem(QTreeWidgetItem *pTreeItem);
+    AtlasTreeItem *GetTreeItem();
 
     quint32 GetChecksum();
     QString GetName();

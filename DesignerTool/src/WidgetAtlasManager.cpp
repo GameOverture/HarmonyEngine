@@ -65,7 +65,7 @@ void WidgetAtlasGroupTreeWidget::SetOwner(WidgetAtlasManager *pOwner)
     m_pOwner->WriteMetaSettings();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool WidgetAtlasGroupTreeWidgetItem::operator<(const QTreeWidgetItem &rhs) const
+bool AtlasTreeItem::operator<(const QTreeWidgetItem &rhs) const
 {
     bool bLeftIsFilter = this->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter;
     bool bRightIsFilter = rhs.data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter;
@@ -129,13 +129,14 @@ WidgetAtlasManager::WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent 
     ui->atlasList->setDropIndicatorShown(true);
     ui->atlasList->setDragDropMode(QAbstractItemView::InternalMove);
 
-    m_FrameList.clear();
-    ui->atlasList->clear();
+    QList<AtlasTreeItem *> atlasTreeItemList = m_pProjOwner->GetAtlasTreeItemList();
+    for(int i = 0; i < atlasTreeItemList.size(); ++i)
+        ui->atlasList->addTopLevelItem(atlasTreeItemList[i]);
 
-    if(m_FrameList.empty()) asdf
-    {
+    if(atlasTreeItemList.empty())
         WriteMetaSettings();
-    }
+    else
+        ui->atlasList->sortItems(0, Qt::AscendingOrder);
 
     ui->lcdNumTextures->display(m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot).size());
     ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
@@ -538,44 +539,6 @@ void WidgetAtlasManager::RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem)
     pItem->Unlink(pFrame);
 }
 
-void WidgetAtlasManager::CreateTreeItem(WidgetAtlasGroupTreeWidgetItem *pParent, HyGuiFrame *pFrame)
-{
-    WidgetAtlasGroupTreeWidgetItem *pNewTreeItem;
-    if(pParent == NULL)
-        pNewTreeItem = new WidgetAtlasGroupTreeWidgetItem(ui->atlasList);
-    else
-        pNewTreeItem = new WidgetAtlasGroupTreeWidgetItem();
-
-    pNewTreeItem->setText(0, pFrame->GetName());
-
-    if(pFrame->GetTextureIndex() >= 0)
-    {
-        pNewTreeItem->setText(1, "Tex:" % QString::number(pFrame->GetTextureIndex()));
-        pFrame->ClearError(GUIFRAMEERROR_CouldNotPack);
-    }
-    else
-    {
-        pNewTreeItem->setText(1, "Invalid");
-        pFrame->SetError(GUIFRAMEERROR_CouldNotPack);
-    }
-
-    if(pFrame->GetErrors() != 0)
-    {
-        pNewTreeItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
-        pNewTreeItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(pFrame->GetErrors()));
-    }
-
-    QVariant v; v.setValue(pFrame);
-    pNewTreeItem->setData(0, Qt::UserRole, v);
-
-    pNewTreeItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-
-    if(pParent)
-        pParent->addChild(pNewTreeItem);
-
-    pFrame->SetTreeWidgetItem(pNewTreeItem);
-}
-
 void WidgetAtlasManager::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
 {
     atlasObjOut.insert("id", m_DataDir.dirName().toInt());
@@ -633,14 +596,11 @@ HyGuiFrame *WidgetAtlasManager::ImportImage(QString sName, QImage &newImage, eAt
     if(eType != ATLAS_Font && eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
         rAlphaCrop = ImagePacker::crop(newImage);
 
-    HyGuiFrame *pNewFrame = CreateFrame(uiChecksum, sName, rAlphaCrop, eType, newImage.width(), newImage.height(), -1, -1, -1, 0);
+    HyGuiFrame *pNewFrame = m_pProjOwner->CreateFrame(uiChecksum, sName, rAlphaCrop, eType, newImage.width(), newImage.height(), -1, -1, -1, 0);
     if(pNewFrame)
     {
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
-
-        CreateTreeItem(NULL, pNewFrame);
-
-        m_FrameList.append(pNewFrame);
+        ui->atlasList->addTopLevelItem(pNewFrame->GetTreeItem());
     }
 
     return pNewFrame;
@@ -1083,7 +1043,7 @@ void WidgetAtlasManager::on_actionReplaceImages_triggered()
 
 void WidgetAtlasManager::on_actionAddFilter_triggered()
 {
-    WidgetAtlasGroupTreeWidgetItem *pNewTreeItem = new WidgetAtlasGroupTreeWidgetItem(ui->atlasList);
+    AtlasTreeItem *pNewTreeItem = new AtlasTreeItem(ui->atlasList);
 
     DlgInputName *pDlg = new DlgInputName("Enter Atlas Group Filter Name", "New Filter");
     if(pDlg->exec() == QDialog::Accepted)

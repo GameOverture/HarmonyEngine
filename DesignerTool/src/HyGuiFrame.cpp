@@ -10,8 +10,10 @@
 #include "HyGuiFrame.h"
 #include "scriptum/imagepacker.h"
 
+#include "WidgetAtlasManager.h"
+
 HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors) :  m_eType(eType),
-                                                                                                                                                                    m_pTreeWidgetItem(NULL),
+                                                                                                                                                                    m_pTreeWidgetItem(nullptr),
                                                                                                                                                                     m_uiChecksum(uiChecksum),
                                                                                                                                                                     m_sName(sN),
                                                                                                                                                                     m_iWidth(iW),
@@ -78,12 +80,24 @@ void HyGuiFrame::DeleteAllDrawInst()
     m_DrawInstMap.clear();
 }
 
-void HyGuiFrame::SetTreeWidgetItem(QTreeWidgetItem *pTreeItem)
+AtlasTreeItem *HyGuiFrame::GetTreeItem()
 {
-    m_pTreeWidgetItem = pTreeItem;
+    if(m_pTreeWidgetItem)
+        return m_pTreeWidgetItem;
 
-    if(m_pTreeWidgetItem == NULL)
-        return;
+    m_pTreeWidgetItem = new AtlasTreeItem(nullptr, QTreeWidgetItem::Type);
+    m_pTreeWidgetItem->setText(0, GetName());
+
+    if(m_iTextureIndex >= 0)
+    {
+        m_pTreeWidgetItem->setText(1, "Tex:" % QString::number(GetTextureIndex()));
+        ClearError(GUIFRAMEERROR_CouldNotPack);
+    }
+    else
+    {
+        m_pTreeWidgetItem->setText(1, "Invalid");
+        SetError(GUIFRAMEERROR_CouldNotPack);
+    }
 
     if(m_uiErrors == 0)
         m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(m_eType));
@@ -92,6 +106,12 @@ void HyGuiFrame::SetTreeWidgetItem(QTreeWidgetItem *pTreeItem)
         m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
         m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
     }
+
+    QVariant v; v.setValue(this);
+    m_pTreeWidgetItem->setData(0, Qt::UserRole, v);
+    m_pTreeWidgetItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+
+    return m_pTreeWidgetItem;
 }
 
 quint32 HyGuiFrame::GetChecksum()

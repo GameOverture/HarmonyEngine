@@ -20,6 +20,8 @@
 class WidgetAtlasManager;
 class WidgetAudioManager;
 
+class AtlasTreeItem;
+
 class CheckerGrid : public HyPrimitive2d
 {
     glm::vec2		m_Resolution;
@@ -48,6 +50,7 @@ class ItemProject : public Item, public IHyApplication
     QString                                         m_sRelativeSourceLocation;
 
     QList<HyGuiFrame *>                             m_FrameList;
+    QList<AtlasTreeItem *>                          m_TopLevelAtlasTreeItemList;
     QMap<quint32, HyGuiFrame *>                     m_DependencyMap;
 
     QQueue<eProjDrawState>                          m_DrawStateQueue;
@@ -70,6 +73,8 @@ public:
     void LoadWidgets();
 
     bool HasError() const                               { return m_bHasError; }
+
+    QList<AtlasTreeItem *> GetAtlasTreeItemList()       { return m_TopLevelAtlasTreeItemList; }
 
     QString GetDirPath() const;
     QString GetGameName() const                         { return m_sGameName; }
