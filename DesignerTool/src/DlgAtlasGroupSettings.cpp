@@ -19,8 +19,7 @@
 DlgAtlasGroupSettings::DlgAtlasGroupSettings(QWidget *parent) : QDialog(parent),
                                                                 ui(new Ui::DlgAtlasGroupSettings),
                                                                 m_bSettingsDirty(false),
-                                                                m_bNameChanged(false),
-                                                                m_iRotationStrategyIndex(ImagePacker::NEVER)
+                                                                m_bNameChanged(false)
 {
     ui->setupUi(this);
     WidgetsToData();
@@ -101,22 +100,6 @@ int DlgAtlasGroupSettings::TextureHeight()
 int DlgAtlasGroupSettings::GetHeuristic()
 {
     return m_iHeuristicIndex;
-}
-
-void DlgAtlasGroupSettings::SetPackerSettings(ImagePacker *pPacker)
-{
-    pPacker->sortOrder = m_iSortOrderIndex;//ui->cmbSortOrder->currentIndex();
-    pPacker->border.t = m_iFrameMarginTop;//ui->sbFrameMarginTop->value();
-    pPacker->border.l = m_iFrameMarginLeft;//ui->sbFrameMarginLeft->value();
-    pPacker->border.r = m_iFrameMarginRight;//ui->sbFrameMarginRight->value();
-    pPacker->border.b = m_iFrameMarginBottom;//ui->sbFrameMarginBottom->value();
-    pPacker->extrude = m_iExtrude;//ui->extrude->value();
-    pPacker->merge = m_bMerge;//ui->chkMerge->isChecked();
-    pPacker->square = m_bSquare;//ui->chkSquare->isChecked();
-    pPacker->autosize = m_bAutoSize;//ui->chkAutosize->isChecked();
-    pPacker->minFillRate = m_iFillRate;//ui->minFillRate->value();
-    pPacker->mergeBF = false;
-    pPacker->rotate = m_iRotationStrategyIndex;//ui->cmbRotationStrategy->currentIndex();
 }
 
 QJsonObject DlgAtlasGroupSettings::GetSettings()

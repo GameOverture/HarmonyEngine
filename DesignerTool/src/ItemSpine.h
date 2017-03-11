@@ -20,7 +20,7 @@ class ItemSpine : public ItemWidget
     Q_OBJECT
 
 public:
-    ItemSpine(const QString sPrefix, const QString sName, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef);
+    ItemSpine(ItemProject *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
     virtual ~ItemSpine();
 
 protected:

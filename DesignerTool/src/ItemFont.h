@@ -26,7 +26,7 @@ class ItemFont : public ItemWidget
     
     
 public:
-    ItemFont(const QString sPrefix, const QString sName, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef);
+    ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
     virtual ~ItemFont();
     
 protected:

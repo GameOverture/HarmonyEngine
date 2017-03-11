@@ -12,8 +12,6 @@
 
 #include <QDialog>
 
-#include "scriptum/imagepacker.h"
-
 namespace Ui {
 class DlgAtlasGroupSettings;
 }
@@ -37,7 +35,6 @@ class DlgAtlasGroupSettings : public QDialog
     bool        m_bAutoSize;
     bool        m_bSquare;
     int         m_iFillRate;
-    int         m_iRotationStrategyIndex;
 
     bool        m_bSettingsDirty;
     bool        m_bNameChanged;
@@ -59,8 +56,6 @@ public:
     int TextureHeight();
 
     int GetHeuristic();
-
-    void SetPackerSettings(ImagePacker *pPacker);
 
     QJsonObject GetSettings();
     void LoadSettings(QJsonObject settings);

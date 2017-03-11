@@ -21,9 +21,9 @@
 
 #include "Harmony/HyEngine.h"
 
-ItemFont::ItemFont(const QString sPrefix, const QString sName, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) :  ItemWidget(ITEM_Font, sPrefix, sName, initVal, atlasManRef, audioManRef),
-                                                                                                                                                        m_pDrawAtlasPreview(NULL),
-                                                                                                                                                        m_pFontCamera(NULL)
+ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) :  ItemWidget(pItemProj, ITEM_Font, sPrefix, sName, initVal),
+                                                                                                              m_pDrawAtlasPreview(NULL),
+                                                                                                              m_pFontCamera(NULL)
 {
 }
 

@@ -60,7 +60,8 @@ SOURCES += main.cpp \
     WidgetSpriteUndoCmds.cpp \
     WidgetGradientEditor.cpp \
     ItemSpine.cpp \
-    WidgetSpine.cpp
+    WidgetSpine.cpp \
+    ItemAtlases.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -107,7 +108,8 @@ HEADERS  += \
     WidgetSpriteUndoCmds.h \
     WidgetGradientEditor.h \
     ItemSpine.h \
-    WidgetSpine.h
+    WidgetSpine.h \
+    ItemAtlases.h
 
 FORMS    += \
     DlgNewProject.ui \

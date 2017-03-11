@@ -137,15 +137,16 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 
 ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Project, sNewProjectFilePath),
                                                                 IHyApplication(HarmonyInit()),
+                                                                m_pAtlasesData(nullptr),
+                                                                m_pAtlasMan(nullptr),
+                                                                m_pAudioMan(nullptr),
+                                                                m_pTabBar(nullptr),
                                                                 m_eDrawState(PROJDRAWSTATE_Nothing),
                                                                 m_ePrevDrawState(PROJDRAWSTATE_Nothing),
                                                                 m_pCamera(NULL),
                                                                 m_ActionSave(0),
                                                                 m_ActionSaveAll(0),
-                                                                m_bHasError(false),
-                                                                m_pAtlasMan(nullptr),
-                                                                m_pAudioMan(nullptr),
-                                                                m_pTabBar(nullptr)
+                                                                m_bHasError(false)
 {
     for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
         m_bDrawStateLoaded[i] = false;
@@ -370,114 +371,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
         //}
     }
 
-
-
-    QDir metaAtlasDir(GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases));
-    QFile settingsFile(metaAtlasDir.absoluteFilePath(HYGUIPATH_MetaSettings));
-    if(settingsFile.exists())
-    {
-        if(!settingsFile.open(QIODevice::ReadOnly))
-            HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaSettings, LOGTYPE_Error);
-
-#ifdef HYGUI_UseBinaryMetaFiles
-        QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
-#else
-        QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
-#endif
-        settingsFile.close();
-
-        QJsonObject settingsObj = settingsDoc.object();
-
-        // Create all the filter items first, storing their actual path in their data (for now)
-        QJsonArray filtersArray = settingsObj["filters"].toArray();
-        for(int i = 0; i < filtersArray.size(); ++i)
-        {
-            QDir filterPathDir(filtersArray.at(i).toString());
-
-            AtlasTreeItem *pNewTreeItem = new AtlasTreeItem(nullptr, QTreeWidgetItem::Type);
-
-            pNewTreeItem->setText(0, filterPathDir.dirName());
-            pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix));
-
-            QVariant v(QString(filterPathDir.absolutePath()));
-            pNewTreeItem->setData(0, Qt::UserRole, v);
-
-            m_TopLevelAtlasTreeItemList.append(pNewTreeItem);
-        }
-
-        // Then place the filters correctly as a parent heirarchy using the path string stored in their data
-        QList<AtlasTreeItem *> atlasFiltersTreeItemList(m_TopLevelAtlasTreeItemList);
-        for(int i = 0; i < m_TopLevelAtlasTreeItemList.size(); ++i)
-        {
-            AtlasTreeItem *pParentFilter = NULL;
-
-            QString sFilterPath = m_TopLevelAtlasTreeItemList[i]->data(0, Qt::UserRole).toString();
-            sFilterPath.truncate(sFilterPath.lastIndexOf("/"));
-            if(sFilterPath != "")
-            {
-                for(int j = 0; j < atlasFiltersTreeItemList.size(); ++j)
-                {
-                    if(atlasFiltersTreeItemList[j]->data(0, Qt::UserRole).toString() == sFilterPath)
-                    {
-                        pParentFilter = atlasFiltersTreeItemList[j];
-                        break;
-                    }
-                }
-            }
-
-            if(pParentFilter)
-            {
-                pParentFilter->addChild(m_TopLevelAtlasTreeItemList.takeAt(i));
-                i = -1;
-            }
-        }
-
-        // Finally go through all the filters and set the data string to the 'HYTREEWIDGETITEM_IsFilter' value to identify this QTreeWidgetItem as a filter
-        for(int i = 0; i < atlasFiltersTreeItemList.size(); ++i)
-            atlasFiltersTreeItemList[i]->setData(0, Qt::UserRole, QVariant(QString(HYTREEWIDGETITEM_IsFilter)));
-
-        QJsonArray frameArray = settingsObj["frames"].toArray();
-        for(int i = 0; i < frameArray.size(); ++i)
-        {
-            QJsonObject frameObj = frameArray[i].toObject();
-
-            QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-            HyGuiFrame *pNewFrame = CreateFrame(JSONOBJ_TOINT(frameObj, "checksum"),
-                                                frameObj["name"].toString(),
-                                                rAlphaCrop,
-                                                static_cast<eAtlasNodeType>(frameObj["type"].toInt()),
-                                                frameObj["width"].toInt(),
-                                                frameObj["height"].toInt(),
-                                                frameObj["x"].toInt(),
-                                                frameObj["y"].toInt(),
-                                                frameObj["textureIndex"].toInt(),
-                                                frameObj["errors"].toInt(0));
-
-            QString sFilterPath = frameObj["filter"].toString();
-            AtlasTreeItem *pFrameParent = NULL;
-            if(sFilterPath != "")
-            {
-                for(int j = 0; j < atlasFiltersTreeItemList.size(); ++j)
-                {
-                    if(atlasFiltersTreeItemList[j]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter && HyGlobal::GetTreeWidgetItemPath(atlasFiltersTreeItemList[j]) == sFilterPath)
-                    {
-                        pFrameParent = atlasFiltersTreeItemList[j];
-                        break;
-                    }
-                }
-            }
-
-            if(QFile::exists(metaAtlasDir.absoluteFilePath(pNewFrame->ConstructImageFileName())) == false)
-                pNewFrame->SetError(GUIFRAMEERROR_CannotFindMetaImg);
-            else
-                pNewFrame->ClearError(GUIFRAMEERROR_CannotFindMetaImg);
-
-            if(pFrameParent)
-                pFrameParent->addChild(pNewFrame->GetTreeItem());
-            else
-                m_TopLevelAtlasTreeItemList.append(pNewFrame->GetTreeItem());
-        }
-    }
+    m_pAtlasesData = new ItemAtlases(this);
 }
 
 ItemProject::~ItemProject()
@@ -487,7 +381,7 @@ ItemProject::~ItemProject()
 
 void ItemProject::LoadWidgets()
 {
-    m_pAtlasMan = new WidgetAtlasManager(this, nullptr);
+    m_pAtlasMan = new WidgetAtlasManager(m_Atlases, nullptr);
     m_pAudioMan = new WidgetAudioManager(this, nullptr);
 
     m_pTabBar = new QTabBar(nullptr);
@@ -497,45 +391,20 @@ void ItemProject::LoadWidgets()
     connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
 }
 
+bool ItemProject::HasError() const
+{
+    return m_bHasError;
+}
+
+QList<AtlasTreeItem *> ItemProject::GetAtlasTreeItemList()
+{
+    return m_pAtlasesData->GetAtlasTreeItemList();
+}
+
 QString ItemProject::GetDirPath() const
 {
     QFileInfo file(m_sPATH);
     return file.dir().absolutePath() + '/';
-}
-
-HyGuiFrame *ItemProject::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors)
-{
-    HyGuiFrame *pNewFrame = NULL;
-
-    if(m_DependencyMap.contains(uiChecksum))
-    {
-        HyGuiFrame *pExistingFrame = m_DependencyMap.find(uiChecksum).value();
-        HyGuiLog("'" % sN % "' is a duplicate of '" % pExistingFrame->GetName() % "' with the checksum: " % QString::number(uiChecksum), LOGTYPE_Info);
-
-        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, eType, iW, iH, iX, iY, uiAtlasIndex, uiErrors);
-
-        pNewFrame->SetError(GUIFRAMEERROR_Duplicate);
-        pExistingFrame->SetError(GUIFRAMEERROR_Duplicate);
-    }
-    else
-    {
-        pNewFrame = new HyGuiFrame(uiChecksum, sN, rAlphaCrop, eType, iW, iH, iX, iY, uiAtlasIndex, uiErrors);
-        m_DependencyMap[uiChecksum] = pNewFrame;
-    }
-
-    m_FrameList.append(pNewFrame);
-    return pNewFrame;
-}
-
-void ItemProject::RemoveFrame(HyGuiFrame *pFrame, QDir metaDir)
-{
-    m_DependencyMap.remove(pFrame->GetChecksum());
-    pFrame->DeleteMetaImage(metaDir);
-
-    delete pFrame;
-
-    // In case the removed image happened to be the current 'm_pMouseHoverItem'
-    //m_pMouseHoverItem = NULL;
 }
 
 QList<QAction *> ItemProject::GetSaveActions()

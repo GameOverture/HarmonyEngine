@@ -49,7 +49,7 @@ class ItemSprite : public ItemWidget
     HyPrimitive2d               m_primOriginVert;
     
 public:
-    ItemSprite(const QString sPrefix, const QString sName, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef);
+    ItemSprite(ItemProject *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
     virtual ~ItemSprite();
     
 protected:

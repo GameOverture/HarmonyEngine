@@ -11,6 +11,7 @@
 #define ITEMPROJECT_H
 
 #include "ItemWidget.h"
+#include "ItemAtlases.h"
 #include "HyGuiRenderer.h"
 
 #include <QQueue>
@@ -39,7 +40,9 @@ class ItemProject : public Item, public IHyApplication
 {
     Q_OBJECT
 
+    ItemAtlases *                                   m_pAtlasesData;
     WidgetAtlasManager *                            m_pAtlasMan;
+
     WidgetAudioManager *                            m_pAudioMan;
     QTabBar *                                       m_pTabBar;
     
@@ -48,10 +51,6 @@ class ItemProject : public Item, public IHyApplication
     QString                                         m_sRelativeAssetsLocation;
     QString                                         m_sRelativeMetaDataLocation;
     QString                                         m_sRelativeSourceLocation;
-
-    QList<HyGuiFrame *>                             m_FrameList;
-    QList<AtlasTreeItem *>                          m_TopLevelAtlasTreeItemList;
-    QMap<quint32, HyGuiFrame *>                     m_DependencyMap;
 
     QQueue<eProjDrawState>                          m_DrawStateQueue;
     eProjDrawState                                  m_ePrevDrawState;
@@ -72,9 +71,9 @@ public:
 
     void LoadWidgets();
 
-    bool HasError() const                               { return m_bHasError; }
+    bool HasError() const;
 
-    QList<AtlasTreeItem *> GetAtlasTreeItemList()       { return m_TopLevelAtlasTreeItemList; }
+    QList<AtlasTreeItem *> GetAtlasTreeItemList();
 
     QString GetDirPath() const;
     QString GetGameName() const                         { return m_sGameName; }
@@ -86,9 +85,6 @@ public:
     QString GetMetaDataRelPath() const                  { return QDir::cleanPath(m_sRelativeMetaDataLocation) + '/'; }
     QString GetSourceAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation) + '/'; }
     QString GetSourceRelPath() const                    { return QDir::cleanPath(m_sRelativeSourceLocation) + '/'; }
-
-    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors);
-    void RemoveFrame(HyGuiFrame *pFrame, QDir metaDir);
 
     WidgetAtlasManager &GetAtlasManager()               { return *m_pAtlasMan; }
     WidgetAudioManager &GetAudioManager()               { return *m_pAudioMan; }

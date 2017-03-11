@@ -20,6 +20,7 @@
 class WidgetAtlasManager;
 class WidgetAudioManager;
 class ItemProject;
+class HyGuiFrame;
 
 class ItemWidget : public Item
 {
@@ -31,12 +32,10 @@ class ItemWidget : public Item
     friend class ItemProject;
 
 protected:
-    HyEntity2d          m_HyEntity;
-
+    ItemProject *       m_pItemProj;
     QJsonValue          m_InitValue;
-    WidgetAtlasManager &m_AtlasManRef;
-    WidgetAudioManager &m_AudioManRef;
 
+    HyEntity2d          m_HyEntity;
     QWidget *           m_pWidget;
 
     QUndoStack *        m_pUndoStack;
@@ -63,9 +62,11 @@ protected:
     virtual QJsonValue OnSave() = 0;
 
 public:
-    ItemWidget(eItemType eType, const QString sPrefix, const QString sName, QJsonValue initVal, WidgetAtlasManager &AtlasManRef, WidgetAudioManager &AudioManRef);
+    ItemWidget(ItemProject *pItemProj, eItemType eType, const QString sPrefix, const QString sName, QJsonValue initVal);
     virtual ~ItemWidget();
     
+    ItemProject *GetItemProject();
+
     QJsonValue GetInitValue()                       { return m_InitValue; }
 
     bool IsLoaded() const                           { return (m_pCamera != NULL); }
@@ -73,9 +74,6 @@ public:
     QWidget *GetWidget() const                      { return m_pWidget; }
     QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
 
-    WidgetAtlasManager &GetAtlasManager()           { return m_AtlasManRef; }
-    WidgetAudioManager &GetAudioManager()           { return m_AudioManRef; }
-    ItemProject *GetItemProject();
     
     void GiveMenuActions(QMenu *pMenu);
     void Save();

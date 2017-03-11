@@ -11,21 +11,20 @@
 #include "MainWindow.h"
 #include "WidgetAtlasManager.h"
 #include "WidgetAudioManager.h"
+#include "HyGuiFrame.h"
 
 #include <QMenu>
 
-ItemWidget::ItemWidget(eItemType eType,
+ItemWidget::ItemWidget(ItemProject *pItemProj,
+                       eItemType eType,
                        const QString sPrefix,
                        const QString sName,
-                       QJsonValue initVal,
-                       WidgetAtlasManager &AtlasManRef,
-                       WidgetAudioManager &AudioManRef) :   Item(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
-                                                            m_InitValue(initVal),
-                                                            m_AtlasManRef(AtlasManRef),
-                                                            m_AudioManRef(AudioManRef),
-                                                            m_pWidget(nullptr),
-                                                            m_pCamera(nullptr),
-                                                            m_bReloadDraw(false)
+                       QJsonValue initVal) :    Item(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
+                                                m_pItemProj(pItemProj),
+                                                m_InitValue(initVal),
+                                                m_pWidget(nullptr),
+                                                m_pCamera(nullptr),
+                                                m_bReloadDraw(false)
 {
     switch(m_eTYPE)
     {
@@ -66,7 +65,7 @@ ItemWidget::~ItemWidget()
 
 ItemProject *ItemWidget::GetItemProject()
 {
-    return m_AtlasManRef.GetProjOwner();
+    return m_pItemProj;
 }
 
 void ItemWidget::GiveMenuActions(QMenu *pMenu)
@@ -175,8 +174,7 @@ void ItemWidget::Unlink(HyGuiFrame *pFrame)
 
 void ItemWidget::on_undoStack_cleanChanged(bool bClean)
 {
-    ItemProject *pItemProj = m_AtlasManRef.GetProjOwner();
-    QTabBar *pTabBar = pItemProj->GetTabBar();
+    QTabBar *pTabBar = m_pItemProj->GetTabBar();
     
     bool bCurItemDirty = false;
     bool bAnyItemDirty = false;
@@ -199,6 +197,6 @@ void ItemWidget::on_undoStack_cleanChanged(bool bClean)
         }
     }
     
-    pItemProj->SetSaveEnabled(bCurItemDirty, bAnyItemDirty);
+    m_pItemProj->SetSaveEnabled(bCurItemDirty, bAnyItemDirty);
 }
 

@@ -17,8 +17,7 @@
 #include <QStackedWidget>
 #include <QThread>
 
-#include "ItemProject.h"
-#include "DlgAtlasGroupSettings.h"
+#include "ItemAtlases.h"
 
 namespace Ui {
 class WidgetAtlasManager;
@@ -53,42 +52,17 @@ class WidgetAtlasManager : public QWidget
 
     friend class WidgetAtlasGroup;
 
-    ItemProject *                   m_pProjOwner;
+    ItemAtlases &                   m_DataRef;
 
     QDir                            m_MetaDir;
     QDir                            m_DataDir;
     
     QTreeWidgetItem *               m_pMouseHoverItem;
 
-
-    DlgAtlasGroupSettings           m_dlgSettings;
-
-
-    ImagePacker                     m_Packer;
-
 public:
     explicit WidgetAtlasManager(QWidget *parent = 0);
-    explicit WidgetAtlasManager(ItemProject *pProjOwner, QWidget *parent = 0);
+    explicit WidgetAtlasManager(ItemAtlases &itemDataRef, QWidget *parent = 0);
     ~WidgetAtlasManager();
-    
-    ItemProject *GetProjOwner()     { return m_pProjOwner; }
-
-    QSize GetAtlasDimensions();
-    void WriteMetaSettings();
-    void WriteMetaSettings(QJsonArray frameArray);
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    HyGuiFrame *GenerateFrame(ItemWidget *pItem, QString sName, QImage &newImage, eAtlasNodeType eType);
-    void ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
-
-    QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem);
-    QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem, QList<HyGuiFrame *> requestList);
-    QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem, QList<quint32> requestList);
-
-    void RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *> relinquishList);
-    
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     friend void AtlasManager_DrawOpen(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
@@ -115,21 +89,6 @@ private:
 
     void PreviewAtlasGroup();
     void HideAtlasGroup();
-
-    void SaveData();
-
-    void SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
-    void RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
-
-    void GetAtlasInfoForGameData(QJsonObject &atlasObjOut);
-
-    QSet<HyGuiFrame *> ImportImages(QStringList sImportImgList);
-    HyGuiFrame *ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType);
-
-    void RepackAll();
-    void Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> newFramesSet);
-    void ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIndex);
-    void Refresh();
 
 protected:
     virtual void resizeEvent(QResizeEvent *event);
