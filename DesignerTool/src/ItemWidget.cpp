@@ -23,9 +23,8 @@ ItemWidget::ItemWidget(eItemType eType,
                                                             m_InitValue(initVal),
                                                             m_AtlasManRef(AtlasManRef),
                                                             m_AudioManRef(AudioManRef),
-                                                            m_pWidget(NULL),
-                                                            m_pEditMenu(NULL),
-                                                            m_pCamera(NULL),
+                                                            m_pWidget(nullptr),
+                                                            m_pCamera(nullptr),
                                                             m_bReloadDraw(false)
 {
     switch(m_eTYPE)
@@ -44,34 +43,55 @@ ItemWidget::ItemWidget(eItemType eType,
         break;
     }
     
-    m_pEditMenu = new QMenu("Edit", MainWindow::GetInstance());
-    
     m_pUndoStack = new QUndoStack(this);
-    QAction *pActionUndo = m_pUndoStack->createUndoAction(m_pEditMenu, "&Undo");
-    pActionUndo->setIcon(QIcon(":/icons16x16/edit-undo.png"));
-    pActionUndo->setShortcuts(QKeySequence::Undo);
-    pActionUndo->setShortcutContext(Qt::ApplicationShortcut);
-    pActionUndo->setObjectName("Undo");
+    m_pActionUndo = m_pUndoStack->createUndoAction(nullptr, "&Undo");
+    m_pActionUndo->setIcon(QIcon(":/icons16x16/edit-undo.png"));
+    m_pActionUndo->setShortcuts(QKeySequence::Undo);
+    m_pActionUndo->setShortcutContext(Qt::ApplicationShortcut);
+    m_pActionUndo->setObjectName("Undo");
 
-    QAction *pActionRedo = m_pUndoStack->createRedoAction(m_pEditMenu, "&Redo");
-    pActionRedo->setIcon(QIcon(":/icons16x16/edit-redo.png"));
-    pActionRedo->setShortcuts(QKeySequence::Redo);
-    pActionRedo->setShortcutContext(Qt::ApplicationShortcut);
-    pActionRedo->setObjectName("Redo");
+    m_pActionRedo = m_pUndoStack->createRedoAction(nullptr, "&Redo");
+    m_pActionRedo->setIcon(QIcon(":/icons16x16/edit-redo.png"));
+    m_pActionRedo->setShortcuts(QKeySequence::Redo);
+    m_pActionRedo->setShortcutContext(Qt::ApplicationShortcut);
+    m_pActionRedo->setObjectName("Redo");
 
-    m_pEditMenu->addAction(pActionUndo);
-    m_pEditMenu->addAction(pActionRedo);
-    QAction *pUndoSeparatorAction = new QAction(m_pEditMenu);
-    pUndoSeparatorAction->setObjectName("UndoSeparator");
-    pUndoSeparatorAction->setSeparator(true);
-    m_pEditMenu->addAction(pUndoSeparatorAction);
-    
     connect(m_pUndoStack, SIGNAL(cleanChanged(bool)), this, SLOT(on_undoStack_cleanChanged(bool)));
 }
 
 ItemWidget::~ItemWidget()
 {
     
+}
+
+ItemProject *ItemWidget::GetItemProject()
+{
+    return m_AtlasManRef.GetProjOwner();
+}
+
+void ItemWidget::GiveMenuActions(QMenu *pMenu)
+{
+    pMenu->addAction(m_pActionUndo);
+    pMenu->addAction(m_pActionRedo);
+    pMenu->addSeparator();
+
+    OnGiveMenuActions(pMenu);
+}
+
+void ItemWidget::Save()
+{
+    GetItemProject()->SaveGameData(m_eTYPE, GetName(true), OnSave());
+    m_pUndoStack->setClean();
+}
+
+bool ItemWidget::IsSaveClean()
+{
+    return m_pUndoStack->isClean();
+}
+
+void ItemWidget::DiscardChanges()
+{
+    m_pUndoStack->clear();
 }
 
 void ItemWidget::Load(IHyApplication &hyApp)
@@ -84,6 +104,7 @@ void ItemWidget::Load(IHyApplication &hyApp)
     m_pCamera->SetEnabled(false);
 
     OnLoad(hyApp);
+    m_HyEntity.Load();
 }
 
 void ItemWidget::Unload(IHyApplication &hyApp)
@@ -96,6 +117,7 @@ void ItemWidget::Unload(IHyApplication &hyApp)
     m_pCamera = NULL;
 
     OnUnload(hyApp);
+    m_HyEntity.Load();
 }
 
 void ItemWidget::DrawShow(IHyApplication &hyApp)
@@ -117,10 +139,10 @@ void ItemWidget::DrawUpdate(IHyApplication &hyApp)
     if(m_bReloadDraw || IsLoaded() == false)
     {
         m_bReloadDraw = false;
-        
+
         if(IsLoaded())
             Unload(hyApp);
-        
+
         Load(hyApp);
         DrawShow(hyApp);
     }
@@ -149,27 +171,6 @@ void ItemWidget::Unlink(HyGuiFrame *pFrame)
 
     OnUnlink(pFrame);
     m_Links.remove(pFrame);
-}
-
-ItemProject *ItemWidget::GetItemProject()
-{
-    return m_AtlasManRef.GetProjOwner();
-}
-
-void ItemWidget::Save()
-{
-    GetItemProject()->SaveGameData(m_eTYPE, GetName(true), OnSave());
-    m_pUndoStack->setClean();
-}
-
-bool ItemWidget::IsSaveClean()
-{
-    return m_pUndoStack->isClean();
-}
-
-void ItemWidget::DiscardChanges()
-{
-    m_pUndoStack->clear();
 }
 
 void ItemWidget::on_undoStack_cleanChanged(bool bClean)

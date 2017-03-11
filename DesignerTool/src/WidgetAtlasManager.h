@@ -15,6 +15,7 @@
 #include <QMouseEvent>
 #include <QStringListModel>
 #include <QStackedWidget>
+#include <QThread>
 
 #include "ItemProject.h"
 #include "WidgetAtlasGroup.h"
@@ -22,6 +23,28 @@
 namespace Ui {
 class WidgetAtlasManager;
 }
+
+class WidgetAtlasManagerLoadThread : public QThread
+{
+    Q_OBJECT
+
+    QString m_sSettingsPath;
+
+public:
+    WidgetAtlasManagerLoadThread(QString sPath, QObject *pParent) : QThread(pParent),
+                                                                    m_sSettingsPath(sPath)
+    { }
+
+    void run() Q_DECL_OVERRIDE
+    {
+        /* ... here is the expensive or blocking operation ... */
+        ItemProject *pNewItemProject = new ItemProject(m_sPath);
+        Q_EMIT LoadFinished(pNewItemProject);
+    }
+
+Q_SIGNALS:
+    void LoadFinished(ItemProject *pLoadedItemProject);
+};
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class WidgetAtlasGroupTreeWidget : public QTreeWidget
@@ -62,15 +85,13 @@ class WidgetAtlasManager : public QWidget
 
     QDir                            m_MetaDir;
     QDir                            m_DataDir;
-
-    QMap<quint32, HyGuiFrame *>     m_DependencyMap;
     
     QTreeWidgetItem *               m_pMouseHoverItem;
 
 
     DlgAtlasGroupSettings       m_dlgSettings;
 
-    QList<HyGuiFrame *>         m_FrameList;
+
     ImagePacker                 m_Packer;
 
 public:
@@ -122,9 +143,6 @@ private:
 
     void PreviewAtlasGroup();
     void HideAtlasGroup();
-
-    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors);
-    void RemoveImage(HyGuiFrame *pFrame, QDir metaDir);
 
     void SaveData();
 

@@ -20,7 +20,7 @@
 
 class HyGuiFrame
 {
-    friend class WidgetAtlasManager;
+    friend class ItemProject;
     
     eAtlasNodeType                      m_eType;
 

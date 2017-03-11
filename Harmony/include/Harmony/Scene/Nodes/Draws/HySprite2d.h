@@ -47,8 +47,6 @@ public:
 	HySprite2d(const char *szPrefix, const char *szName, IHyNode *pParent = nullptr);
 	virtual ~HySprite2d(void);
 
-	virtual void Unload() override;
-
 	//--------------------------------------------------------------------------------------
 	// Set how to playback the animation on the current (or specified) state/animation.
 	//--------------------------------------------------------------------------------------

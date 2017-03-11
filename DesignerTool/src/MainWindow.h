@@ -30,6 +30,7 @@ class MainWindow : public QMainWindow
     static MainWindow *     sm_pInstance;
 
     WaitingSpinnerWidget *  m_pLoadingSpinners[NUM_MDI];
+    uint                    m_uiLoadingSpinnerRefCounts[NUM_MDI];
 
     QSettings               m_Settings;
     QString                 m_sEngineLocation;
@@ -39,12 +40,9 @@ class MainWindow : public QMainWindow
 
     ItemProject *           m_pCurSelectedProj;
     HyGuiRenderer *         m_pCurRenderer;
-    QMenu *                 m_pCurEditMenu;
 
     QAction *               m_pCurSaveAction;
     QAction *               m_pCurSaveAllAction;
-
-    QList<QAction *>        m_ToolBarItemActionsList;   // Used to append/remove the current item's actions to the main tool bar
 
     HyGuiDebugger *         m_pDebugConnection;
 

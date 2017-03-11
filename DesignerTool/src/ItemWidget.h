@@ -30,32 +30,25 @@ class ItemWidget : public Item
     friend class WidgetAtlasGroup;
     friend class ItemProject;
 
-    void Load(IHyApplication &hyApp);
-    void Unload(IHyApplication &hyApp);
-
-    void DrawShow(IHyApplication &hyApp);
-    void DrawHide(IHyApplication &hyApp);
-
-    void DrawUpdate(IHyApplication &hyApp);
-
-    void Link(HyGuiFrame *pFrame);
-    void Relink(HyGuiFrame *pFrame);
-    void Unlink(HyGuiFrame *pFrame);
-
 protected:
+    HyEntity2d          m_HyEntity;
+
     QJsonValue          m_InitValue;
     WidgetAtlasManager &m_AtlasManRef;
     WidgetAudioManager &m_AudioManRef;
 
     QWidget *           m_pWidget;
-    QMenu *             m_pEditMenu;
-    QMenu *             m_pItemMenu;
+
     QUndoStack *        m_pUndoStack;
+    QAction *           m_pActionUndo;
+    QAction *           m_pActionRedo;
 
     QSet<HyGuiFrame *>  m_Links;
 
     HyCamera2d *        m_pCamera;
     bool                m_bReloadDraw;
+
+    virtual void OnGiveMenuActions(QMenu *pMenu) = 0;
 
     virtual void OnLoad(IHyApplication &hyApp) = 0;
     virtual void OnUnload(IHyApplication &hyApp) = 0;
@@ -78,18 +71,29 @@ public:
     bool IsLoaded() const                           { return (m_pCamera != NULL); }
 
     QWidget *GetWidget() const                      { return m_pWidget; }
-    QMenu *GetEditMenu() const                      { return m_pEditMenu; }
     QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
 
     WidgetAtlasManager &GetAtlasManager()           { return m_AtlasManRef; }
     WidgetAudioManager &GetAudioManager()           { return m_AudioManRef; }
     ItemProject *GetItemProject();
     
-    virtual QList<QAction *> GetActionsForToolBar() = 0;
-
+    void GiveMenuActions(QMenu *pMenu);
     void Save();
     bool IsSaveClean();
     void DiscardChanges();
+
+private:
+    void Load(IHyApplication &hyApp);
+    void Unload(IHyApplication &hyApp);
+
+    void DrawShow(IHyApplication &hyApp);
+    void DrawHide(IHyApplication &hyApp);
+
+    void DrawUpdate(IHyApplication &hyApp);
+
+    void Link(HyGuiFrame *pFrame);
+    void Relink(HyGuiFrame *pFrame);
+    void Unlink(HyGuiFrame *pFrame);
 
 private Q_SLOTS:
     void on_undoStack_cleanChanged(bool bClean);

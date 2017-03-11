@@ -25,7 +25,6 @@ ItemFont::ItemFont(const QString sPrefix, const QString sName, QJsonValue initVa
                                                                                                                                                         m_pDrawAtlasPreview(NULL),
                                                                                                                                                         m_pFontCamera(NULL)
 {
-    m_pWidget = new WidgetFont(this);
 }
 
 /*virtual*/ ItemFont::~ItemFont()
@@ -33,19 +32,15 @@ ItemFont::ItemFont(const QString sPrefix, const QString sName, QJsonValue initVa
     delete m_pWidget;
 }
 
-/*virtual*/ QList<QAction *> ItemFont::GetActionsForToolBar()
+/*virtual*/ void ItemFont::OnGiveMenuActions(QMenu *pMenu)
 {
-    QList<QAction *> returnList;
-    
-    returnList.append(FindAction(m_pEditMenu->actions(), "Undo"));
-    returnList.append(FindAction(m_pEditMenu->actions(), "Redo"));
-    returnList.append(FindAction(m_pEditMenu->actions(), "UndoSeparator"));
-    
-    return returnList;
+    static_cast<WidgetFont *>(m_pWidget)->OnGiveMenuActions(pMenu);
 }
 
 /*virtual*/ void ItemFont::OnLoad(IHyApplication &hyApp)
 {
+    m_pWidget = new WidgetFont(this);
+
     if(m_pFontCamera == NULL)
         m_pFontCamera = hyApp.Window().CreateCamera2d();
     
@@ -73,6 +68,8 @@ ItemFont::ItemFont(const QString sPrefix, const QString sName, QJsonValue initVa
     m_DrawAtlasOutline.Unload();
     
     m_DividerLine.Unload();
+
+    delete m_pWidget;
 }
 
 /*virtual*/ void ItemFont::OnDraw_Show(IHyApplication &hyApp)

@@ -69,9 +69,9 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
 
 
     MainWindow::StartLoading(MDI_Explorer);
-    ItemProjectLoadThread *pNewLoadThread = new ItemProjectLoadThread(sNewProjectFilePath, this);
-    connect(pNewLoadThread, &ItemProjectLoadThread::LoadFinished, this, &WidgetExplorer::OnProjectLoaded);
-    connect(pNewLoadThread, &ItemProjectLoadThread::finished, pNewLoadThread, &QObject::deleteLater);
+    WidgetExplorerLoadThread *pNewLoadThread = new WidgetExplorerLoadThread(sNewProjectFilePath, this);
+    connect(pNewLoadThread, &WidgetExplorerLoadThread::LoadFinished, this, &WidgetExplorer::OnProjectLoaded);
+    connect(pNewLoadThread, &WidgetExplorerLoadThread::finished, pNewLoadThread, &QObject::deleteLater);
     pNewLoadThread->start();
 }
 
@@ -314,6 +314,8 @@ Item *WidgetExplorer::GetCurDirSelected(bool bIncludePrefixDirs)
 
 void WidgetExplorer::OnProjectLoaded(ItemProject *pLoadedProj)
 {
+    pLoadedProj->LoadWidgets();
+
     if(pLoadedProj->HasError())
     {
         HyGuiLog("Abort opening project: " % pLoadedProj->GetAbsPath(), LOGTYPE_Error);

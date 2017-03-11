@@ -44,18 +44,6 @@ WidgetFont::WidgetFont(ItemFont *pOwner, QWidget *parent) : QWidget(parent),
     m_PrevAtlasSize.setHeight(0);
 
     ui->txtPrefixAndName->setText(m_pItemFont->GetName(true));
-
-    QMenu *pEditMenu = m_pItemFont->GetEditMenu();
-    pEditMenu->addAction(ui->actionAddState);
-    pEditMenu->addAction(ui->actionRemoveState);
-    pEditMenu->addAction(ui->actionRenameState);
-    pEditMenu->addAction(ui->actionOrderStateBackwards);
-    pEditMenu->addAction(ui->actionOrderStateForwards);
-    pEditMenu->addSeparator();
-    pEditMenu->addAction(ui->actionAddLayer);
-    pEditMenu->addAction(ui->actionRemoveLayer);
-    pEditMenu->addAction(ui->actionOrderLayerUpwards);
-    pEditMenu->addAction(ui->actionOrderLayerDownwards);
     
     ui->btnAddState->setDefaultAction(ui->actionAddState);
     ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
@@ -161,6 +149,20 @@ WidgetFont::~WidgetFont()
         delete m_MasterStageList[i];
 
     delete ui;
+}
+
+void WidgetFont::OnGiveMenuActions(QMenu *pMenu)
+{
+    pMenu->addAction(ui->actionAddState);
+    pMenu->addAction(ui->actionRemoveState);
+    pMenu->addAction(ui->actionRenameState);
+    pMenu->addAction(ui->actionOrderStateBackwards);
+    pMenu->addAction(ui->actionOrderStateForwards);
+    pMenu->addSeparator();
+    pMenu->addAction(ui->actionAddLayer);
+    pMenu->addAction(ui->actionRemoveLayer);
+    pMenu->addAction(ui->actionOrderLayerUpwards);
+    pMenu->addAction(ui->actionOrderLayerDownwards);
 }
 
 ItemFont *WidgetFont::GetItemFont()

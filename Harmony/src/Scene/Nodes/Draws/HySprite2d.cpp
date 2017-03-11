@@ -27,20 +27,6 @@ HySprite2d::~HySprite2d(void)
 {
 }
 
-/*virtual*/ void HySprite2d::Unload()
-{
-	m_AnimCtrlAttribList.clear();
-	m_AnimCallbackList.clear();
-
-	m_fAnimPlayRate = 1.0f;
-	m_fElapsedFrameTime = 0.0f;
-	m_uiCurAnimState = m_uiCurFrame = 0;
-
-	m_RenderState.SetTextureHandle(0);
-
-	IHyDraw2d::Unload();
-}
-
 void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl)
 {
 	AnimCtrl(eAnimCtrl, m_uiCurAnimState);

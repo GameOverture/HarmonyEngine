@@ -47,6 +47,9 @@ class ItemProject : public Item, public IHyApplication
     QString                                         m_sRelativeMetaDataLocation;
     QString                                         m_sRelativeSourceLocation;
 
+    QList<HyGuiFrame *>                             m_FrameList;
+    QMap<quint32, HyGuiFrame *>                     m_DependencyMap;
+
     QQueue<eProjDrawState>                          m_DrawStateQueue;
     eProjDrawState                                  m_ePrevDrawState;
     eProjDrawState                                  m_eDrawState;
@@ -64,7 +67,7 @@ public:
     ItemProject(const QString sNewProjectFilePath);
     ~ItemProject();
 
-    void WidgetLoad();
+    void LoadWidgets();
 
     bool HasError() const                               { return m_bHasError; }
 
@@ -78,6 +81,9 @@ public:
     QString GetMetaDataRelPath() const                  { return QDir::cleanPath(m_sRelativeMetaDataLocation) + '/'; }
     QString GetSourceAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation) + '/'; }
     QString GetSourceRelPath() const                    { return QDir::cleanPath(m_sRelativeSourceLocation) + '/'; }
+
+    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors);
+    void RemoveFrame(HyGuiFrame *pFrame, QDir metaDir);
 
     WidgetAtlasManager &GetAtlasManager()               { return *m_pAtlasMan; }
     WidgetAudioManager &GetAudioManager()               { return *m_pAudioMan; }
@@ -112,9 +118,6 @@ private Q_SLOTS:
     void on_saveAll_triggered();
 
     void on_tabBar_closeRequested(int iIndex);
-
-Q_SIGNALS:
-    void LoadFinished(ItemProject *pSelf);
 };
 
 #endif // ITEMPROJECT_H

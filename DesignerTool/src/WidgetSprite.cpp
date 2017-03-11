@@ -31,18 +31,6 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
 
     ui->txtPrefixAndName->setText(m_pItemSprite->GetName(true));
     
-    QMenu *pEditMenu = m_pItemSprite->GetEditMenu();
-    pEditMenu->addAction(ui->actionAddState);
-    pEditMenu->addAction(ui->actionRemoveState);
-    pEditMenu->addAction(ui->actionRenameState);
-    pEditMenu->addAction(ui->actionOrderStateBackwards);
-    pEditMenu->addAction(ui->actionOrderStateForwards);
-    pEditMenu->addSeparator();
-    pEditMenu->addAction(ui->actionImportFrames);
-    pEditMenu->addAction(ui->actionRemoveFrames);
-    pEditMenu->addAction(ui->actionOrderFrameUpwards);
-    pEditMenu->addAction(ui->actionOrderFrameDownwards);
-
     ui->btnAddState->setDefaultAction(ui->actionAddState);
     ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
     ui->btnRenameState->setDefaultAction(ui->actionRenameState);
@@ -55,16 +43,7 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
     m_StateActionsList.push_back(ui->actionOrderFrameDownwards);
     
     ui->cmbStates->clear();
-}
 
-WidgetSprite::~WidgetSprite()
-{
-    delete ui;
-}
-
-// This Load() code can't be put into the ctor because of GetAtlasManager().RequestFrames()
-void WidgetSprite::Load()
-{
     // If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
     if(m_pItemSprite->GetInitValue().type() != QJsonValue::Null)
     {
@@ -112,20 +91,37 @@ void WidgetSprite::Load()
     UpdateActions();
 }
 
+WidgetSprite::~WidgetSprite()
+{
+    delete ui;
+}
+
 ItemSprite *WidgetSprite::GetItemOwner()
 {
     return m_pItemSprite;
 }
 
-void WidgetSprite::AppendActionsForToolBar(QList<QAction *> &actionList)
+void WidgetSprite::OnGiveMenuActions(QMenu *pMenu)
 {
-    actionList.append(ui->actionAlignUp);
-    actionList.append(ui->actionAlignLeft);
-    actionList.append(ui->actionAlignDown);
-    actionList.append(ui->actionAlignRight);
-    actionList.append(ui->actionAlignCenterHorizontal);
-    actionList.append(ui->actionAlignCenterVertical);
-    actionList.append(ui->actionApplyToAll);
+    pMenu->addAction(ui->actionAddState);
+    pMenu->addAction(ui->actionRemoveState);
+    pMenu->addAction(ui->actionRenameState);
+    pMenu->addAction(ui->actionOrderStateBackwards);
+    pMenu->addAction(ui->actionOrderStateForwards);
+    pMenu->addSeparator();
+    pMenu->addAction(ui->actionImportFrames);
+    pMenu->addAction(ui->actionRemoveFrames);
+    pMenu->addAction(ui->actionOrderFrameUpwards);
+    pMenu->addAction(ui->actionOrderFrameDownwards);
+    pMenu->addSeparator();
+    pMenu->addAction(ui->actionAlignUp);
+    pMenu->addAction(ui->actionAlignUp);
+    pMenu->addAction(ui->actionAlignLeft);
+    pMenu->addAction(ui->actionAlignDown);
+    pMenu->addAction(ui->actionAlignRight);
+    pMenu->addAction(ui->actionAlignCenterHorizontal);
+    pMenu->addAction(ui->actionAlignCenterVertical);
+    pMenu->addAction(ui->actionApplyToAll);
 }
 
 void WidgetSprite::GetSaveInfo(QJsonArray &spriteStateArrayRef)

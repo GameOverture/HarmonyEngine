@@ -29,9 +29,9 @@ public:
     ItemFont(const QString sPrefix, const QString sName, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef);
     virtual ~ItemFont();
     
-    virtual QList<QAction *> GetActionsForToolBar();
-    
 protected:
+    virtual void OnGiveMenuActions(QMenu *pMenu);
+
     virtual void OnLoad(IHyApplication &hyApp);
     virtual void OnUnload(IHyApplication &hyApp);
 

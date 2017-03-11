@@ -13,32 +13,24 @@
 
 ItemSpine::ItemSpine(const QString sPrefix, const QString sName, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) :   ItemWidget(ITEM_Spine, sPrefix, sName, initVal, atlasManRef, audioManRef)
 {
-    m_pWidget = new WidgetSpine(this);
 }
 
 /*virtual*/ ItemSpine::~ItemSpine()
 {
 }
 
-/*virtual*/ QList<QAction *> ItemSpine::GetActionsForToolBar()
+/*virtual*/ void ItemSpine::OnGiveMenuActions(QMenu *pMenu)
 {
-    QList<QAction *> returnList;
-    
-    returnList.append(FindAction(m_pEditMenu->actions(), "Undo"));
-    returnList.append(FindAction(m_pEditMenu->actions(), "Redo"));
-    returnList.append(FindAction(m_pEditMenu->actions(), "UndoSeparator"));
-    
-    //static_cast<WidgetSprite *>(m_pWidget)->AppendActionsForToolBar(returnList);
-    
-    return returnList;
 }
 
 /*virtual*/ void ItemSpine::OnLoad(IHyApplication &hyApp)
 {
+    m_pWidget = new WidgetSpine(this);
 }
 
 /*virtual*/ void ItemSpine::OnUnload(IHyApplication &hyApp)
 {
+    delete m_pWidget;
 }
 
 /*virtual*/ void ItemSpine::OnDraw_Show(IHyApplication &hyApp)

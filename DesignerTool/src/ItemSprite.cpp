@@ -34,9 +34,6 @@ ItemSprite::ItemSprite(const QString sPrefix, const QString sName, QJsonValue in
     
     m_primOriginHorz.SetTint(1.0f, 0.0f, 0.0f);
     m_primOriginVert.SetTint(1.0f, 0.0f, 0.0f);
-
-    m_pWidget = new WidgetSprite(this);
-    static_cast<WidgetSprite *>(m_pWidget)->Load();
 }
 
 /*virtual*/ ItemSprite::~ItemSprite()
@@ -44,21 +41,15 @@ ItemSprite::ItemSprite(const QString sPrefix, const QString sName, QJsonValue in
     delete m_pWidget;
 }
 
-/*virtual*/ QList<QAction *> ItemSprite::GetActionsForToolBar()
+/*virtual*/ void ItemSprite::OnGiveMenuActions(QMenu *pMenu)
 {
-    QList<QAction *> returnList;
-    
-    returnList.append(FindAction(m_pEditMenu->actions(), "Undo"));
-    returnList.append(FindAction(m_pEditMenu->actions(), "Redo"));
-    returnList.append(FindAction(m_pEditMenu->actions(), "UndoSeparator"));
-    
-    static_cast<WidgetSprite *>(m_pWidget)->AppendActionsForToolBar(returnList);
-    
-    return returnList;
+    static_cast<WidgetSprite *>(m_pWidget)->OnGiveMenuActions(pMenu);
 }
 
 /*virtual*/ void ItemSprite::OnLoad(IHyApplication &hyApp)
 {
+    m_pWidget = new WidgetSprite(this);
+
     m_primOriginHorz.Load();
     m_primOriginVert.Load();
 }
@@ -71,6 +62,8 @@ ItemSprite::ItemSprite(const QString sPrefix, const QString sName, QJsonValue in
     QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
     for(int i = 0; i < frameList.count(); i++)
         frameList[i]->DrawInst(this)->Unload();
+
+    delete m_pWidget;
 }
 
 /*virtual*/ void ItemSprite::OnDraw_Show(IHyApplication &hyApp)

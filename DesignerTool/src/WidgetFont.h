@@ -92,6 +92,8 @@ class WidgetFont : public QWidget
 public:
     explicit WidgetFont(ItemFont *pOwner, QWidget *parent = 0);
     ~WidgetFont();
+
+    void OnGiveMenuActions(QMenu *pMenu);
     
     ItemFont *GetItemFont();
 

@@ -25,14 +25,14 @@ namespace Ui {
 class WidgetExplorer;
 }
 
-class ItemProjectLoadThread : public QThread
+class WidgetExplorerLoadThread : public QThread
 {
     Q_OBJECT
 
     QString m_sPath;
 
 public:
-    ItemProjectLoadThread(QString sPath, QObject *pParent) :    QThread(pParent),
+    WidgetExplorerLoadThread(QString sPath, QObject *pParent) :    QThread(pParent),
                                                                 m_sPath(sPath)
     { }
 

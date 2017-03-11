@@ -41,9 +41,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
                                             ui(new Ui::MainWindow),
                                             m_Settings("Overture Games", "Harmony Designer Tool"),
                                             m_bIsInitialized(false),
-                                            m_pCurSelectedProj(NULL),
-                                            m_pCurRenderer(NULL),
-                                            m_pCurEditMenu(NULL)
+                                            m_pCurSelectedProj(nullptr),
+                                            m_pCurRenderer(nullptr)
 {
     ui->setupUi(this);
     sm_pInstance = this;
@@ -72,6 +71,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
         m_pLoadingSpinners[i]->setInnerRadius(20);
         m_pLoadingSpinners[i]->setRevolutionsPerSecond(1.5);
         m_pLoadingSpinners[i]->setColor(QColor(25, 255, 25));
+
+        m_uiLoadingSpinnerRefCounts[i] = 0;
     }
 
     //StartLoading(MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties);
@@ -281,26 +282,19 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->ui->actionViewProperties->setVisible(true);
     sm_pInstance->ui->actionViewProperties->setText(sWindowTitle);
 
-    sm_pInstance->ui->dockWidgetCurrentItem->setVisible(true);
+    sm_pInstance->ui->dockWidgetCurrentItem->show();
     sm_pInstance->ui->dockWidgetCurrentItem->setWindowTitle(sWindowTitle);
     sm_pInstance->ui->dockWidgetCurrentItem->setWidget(pItem->GetWidget());
 
-    // Remove any "Edit" menu, and replace it with the current item's "Edit" menu
-    if(sm_pInstance->m_pCurEditMenu)
-        sm_pInstance->ui->menuBar->removeAction(sm_pInstance->m_pCurEditMenu->menuAction());
+    // Remove all the actions in the "Edit" menu, and replace it with the current item's actions
+    QList<QAction *> editActionList = sm_pInstance->ui->menu_Edit->actions();
+    for(uint i = 0; i < editActionList.size(); ++i)
+        sm_pInstance->ui->mainToolBar->removeAction(editActionList[i]);
 
-    sm_pInstance->m_pCurEditMenu = pItem->GetEditMenu();
-    if(sm_pInstance->m_pCurEditMenu)
-        sm_pInstance->ui->menuBar->insertMenu(sm_pInstance->ui->menu_View->menuAction(), sm_pInstance->m_pCurEditMenu);
-    
-    // Remove any item specific actions in the main toolbar, and add the current item's desired actions to be shown to the main toolbar
-    for(int i = 0; i < sm_pInstance->m_ToolBarItemActionsList.count(); ++i)
-        sm_pInstance->ui->mainToolBar->removeAction(sm_pInstance->m_ToolBarItemActionsList[i]);
-    
-    sm_pInstance->m_ToolBarItemActionsList.clear();
-    sm_pInstance->m_ToolBarItemActionsList = pItem->GetActionsForToolBar();
-    
-    sm_pInstance->ui->mainToolBar->addActions(sm_pInstance->m_ToolBarItemActionsList);
+    sm_pInstance->ui->menu_Edit->clear();
+
+    pItem->GiveMenuActions(sm_pInstance->ui->menu_Edit);
+    sm_pInstance->ui->mainToolBar->addActions(sm_pInstance->ui->menu_Edit->actions());
 }
 
 /*static*/ void MainWindow::CloseItem(ItemWidget *pItem)
@@ -323,15 +317,13 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     // If this is the item that is currently being shown, unhook all its actions and widget
     if(sm_pInstance->ui->dockWidgetCurrentItem->widget() == pItem->GetWidget())
     {
-        sm_pInstance->ui->menuBar->removeAction(sm_pInstance->m_pCurEditMenu->menuAction());
-        sm_pInstance->m_pCurEditMenu = NULL;
-        
         sm_pInstance->ui->dockWidgetCurrentItem->hide();
-        
-        for(int i = 0; i < sm_pInstance->m_ToolBarItemActionsList.count(); ++i)
-            sm_pInstance->ui->mainToolBar->removeAction(sm_pInstance->m_ToolBarItemActionsList[i]);
-        
-        sm_pInstance->m_ToolBarItemActionsList.clear();
+
+        QList<QAction *> editActionList = sm_pInstance->ui->menu_Edit->actions();
+        for(uint i = 0; i < editActionList.size(); ++i)
+            sm_pInstance->ui->mainToolBar->removeAction(editActionList[i]);
+
+        sm_pInstance->ui->menu_Edit->clear();
     }
     
     ItemProject *pItemProj = sm_pInstance->ui->explorer->GetCurProjSelected();

@@ -13,31 +13,24 @@
 
 ItemAudio::ItemAudio(const QString sPrefix, const QString sName, QJsonValue initVal, WidgetAtlasManager &atlasManRef, WidgetAudioManager &audioManRef) : ItemWidget(ITEM_Audio, sPrefix, sName, initVal, atlasManRef, audioManRef)
 {
-    m_pWidget = new WidgetAudio(this);
 }
 
 /*virtual*/ ItemAudio::~ItemAudio()
 {
-    delete m_pWidget;
 }
 
-/*virtual*/ QList<QAction *> ItemAudio::GetActionsForToolBar()
+/*virtual*/ void ItemAudio::OnGiveMenuActions(QMenu *pMenu)
 {
-    QList<QAction *> returnList;
-    
-//    returnList.append(FindAction(m_pEditMenu->actions(), "Undo"));
-//    returnList.append(FindAction(m_pEditMenu->actions(), "Redo"));
-//    returnList.append(FindAction(m_pEditMenu->actions(), "UndoSeparator"));
-    
-    return returnList;
 }
 
 /*virtual*/ void ItemAudio::OnLoad(IHyApplication &hyApp)
 {
+    m_pWidget = new WidgetAudio(this);
 }
 
 /*virtual*/ void ItemAudio::OnUnload(IHyApplication &hyApp)
 {
+    delete m_pWidget;
 }
 
 /*virtual*/ void ItemAudio::OnDraw_Show(IHyApplication &hyApp)

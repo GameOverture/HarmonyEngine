@@ -36,7 +36,6 @@ SOURCES += main.cpp \
     HyGuiRenderer.cpp \
     DlgAtlasGroupSettings.cpp \
     WidgetAtlasManager.cpp \
-    WidgetAtlasGroup.cpp \
     HyGuiDebugger.cpp \
     DlgSetEngineLocation.cpp \
     WidgetSpriteState.cpp \
@@ -83,7 +82,6 @@ HEADERS  += \
     HyGuiRenderer.h \
     DlgAtlasGroupSettings.h \
     WidgetAtlasManager.h \
-    WidgetAtlasGroup.h \
     HyGuiDebugger.h \
     DlgSetEngineLocation.h \
     WidgetSpriteState.h \
@@ -123,7 +121,6 @@ FORMS    += \
     WidgetLiveVarManager.ui \
     DlgAtlasGroupSettings.ui \
     WidgetAtlasManager.ui \
-    WidgetAtlasGroup.ui \
     DlgSetEngineLocation.ui \
     WidgetSpriteState.ui \
     WidgetFont.ui \

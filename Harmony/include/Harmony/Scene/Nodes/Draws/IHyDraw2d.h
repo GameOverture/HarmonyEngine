@@ -107,7 +107,7 @@ public:
 	bool IsLoaded() const;
 
 	void Load();
-	virtual void Unload();
+	void Unload();
 
 protected:
 	bool IsSelfLoaded();
