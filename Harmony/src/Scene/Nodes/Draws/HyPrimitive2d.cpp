@@ -12,9 +12,9 @@
 #include "IHyApplication.h"
 #include "Utilities/HyMath.h"
 
-HyPrimitive2d::HyPrimitive2d() :	IHyDraw2d(HYTYPE_Primitive2d, nullptr, nullptr),
-									m_pDrawBuffer(nullptr),
-									m_uiBufferSize(0)
+HyPrimitive2d::HyPrimitive2d(IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
+																m_pDrawBuffer(nullptr),
+																m_uiBufferSize(0)
 {
 	ClearData();
 }

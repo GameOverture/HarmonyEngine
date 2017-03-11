@@ -17,7 +17,7 @@ class IHyTransform3d : public IHyTransform<HyTweenVec3>
 public:
 	HyTweenVec3						rot;
 
-	IHyTransform3d(HyType eInstType);
+	IHyTransform3d(HyType eInstType, IHyNode *pParent = nullptr);
 	virtual ~IHyTransform3d();
 
 	virtual void GetLocalTransform(glm::mat4 &outMtx) const override;

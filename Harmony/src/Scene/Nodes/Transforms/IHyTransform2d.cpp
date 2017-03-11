@@ -9,11 +9,11 @@
 *************************************************************************/
 #include "Scene/Nodes/Transforms/IHyTransform2d.h"
 
-IHyTransform2d::IHyTransform2d(HyType eInstType) :	IHyTransform<HyTweenVec2>(eInstType),
-													m_eCoordUnit(HYCOORDUNIT_Default),
-													m_fRotation(0.0f),
-													m_BoundingVolume(*this),
-													rot(m_fRotation, *this)
+IHyTransform2d::IHyTransform2d(HyType eInstType, IHyNode *pParent /*= nullptr*/) :	IHyTransform<HyTweenVec2>(eInstType, pParent),
+																					m_eCoordUnit(HYCOORDUNIT_Default),
+																					m_fRotation(0.0f),
+																					m_BoundingVolume(*this),
+																					rot(m_fRotation, *this)
 {
 }
 

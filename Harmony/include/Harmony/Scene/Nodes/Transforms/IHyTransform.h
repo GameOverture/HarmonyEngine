@@ -26,7 +26,7 @@ public:
 	tVec					scale;
 	tVec					scale_pivot;
 
-	IHyTransform(HyType eInstType);
+	IHyTransform(HyType eInstType, IHyNode *pParent = nullptr);
 	virtual ~IHyTransform(void);
 	
 	// Returns the converted pixel position to the specified HyCoordinateType
@@ -35,11 +35,11 @@ public:
 };
 
 template<typename tVec>
-IHyTransform<tVec>::IHyTransform(HyType eInstType) :	IHyNode(eInstType),
-														pos(*this),
-														rot_pivot(*this),
-														scale(*this),
-														scale_pivot(*this)
+IHyTransform<tVec>::IHyTransform(HyType eInstType, IHyNode *pParent = nullptr) :	IHyNode(eInstType, pParent),
+																					pos(*this),
+																					rot_pivot(*this),
+																					scale(*this),
+																					scale_pivot(*this)
 {
 	scale.Set(1.0f);
 }

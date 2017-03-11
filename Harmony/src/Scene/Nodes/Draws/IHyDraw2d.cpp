@@ -22,21 +22,21 @@
 
 /*static*/ HyAssets *IHyDraw2d::sm_pHyAssets = nullptr;
 
-IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName) :	IHyTransform2d(eInstType),
-																					m_eLoadState(HYLOADSTATE_Inactive),
-																					m_sPREFIX(szPrefix ? szPrefix : ""),
-																					m_sNAME(szName ? szName : ""),
-																					m_pData(nullptr),
-																					m_uiAttributes(0),
-																					m_eMouseInputState(MOUSEINPUT_None),
-																					m_pMouseInputUserParam(nullptr),
-																					m_iDisplayOrder(0),
-																					m_iDisplayOrderMax(0),
-																					topColor(*this),
-																					botColor(*this),
-																					m_fAlpha(1.0f),
-																					m_fPrevAlphaValue(1.0f),
-																					alpha(m_fAlpha, *this)
+IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName, IHyNode *pParent /*= nullptr*/) :	IHyTransform2d(eInstType, pParent),
+																													m_eLoadState(HYLOADSTATE_Inactive),
+																													m_sPREFIX(szPrefix ? szPrefix : ""),
+																													m_sNAME(szName ? szName : ""),
+																													m_pData(nullptr),
+																													m_uiAttributes(0),
+																													m_eMouseInputState(MOUSEINPUT_None),
+																													m_pMouseInputUserParam(nullptr),
+																													m_iDisplayOrder(0),
+																													m_iDisplayOrderMax(0),
+																													topColor(*this),
+																													botColor(*this),
+																													m_fAlpha(1.0f),
+																													m_fPrevAlphaValue(1.0f),
+																													alpha(m_fAlpha, *this)
 {
 	m_bIsDraw2d = true;
 

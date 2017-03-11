@@ -27,7 +27,7 @@ protected:
 public:
 	HyTweenFloat					rot;
 
-	IHyTransform2d(HyType eInstType);
+	IHyTransform2d(HyType eInstType, IHyNode *pParent = nullptr);
 	virtual ~IHyTransform2d();
 
 	HyCoordinateUnit GetCoordinateUnit();

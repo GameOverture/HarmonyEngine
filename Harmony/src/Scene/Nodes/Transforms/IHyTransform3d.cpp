@@ -9,8 +9,8 @@
 *************************************************************************/
 #include "Scene/Nodes/Transforms/IHyTransform3d.h"
 
-IHyTransform3d::IHyTransform3d(HyType eInstType) :	IHyTransform<HyTweenVec3>(eInstType),
-													rot(*this)
+IHyTransform3d::IHyTransform3d(HyType eInstType, IHyNode *pParent /*= nullptr*/) :	IHyTransform<HyTweenVec3>(eInstType, pParent),
+																					rot(*this)
 {
 }
 

@@ -13,18 +13,18 @@
 
 #include <iostream>
 
-HyText2d::HyText2d(const char *szPrefix, const char *szName) :	IHyDraw2d(HYTYPE_Text2d, szPrefix, szName),
-																m_bIsDirty(true),
-																m_sCurrentString(""),
-																m_uiCurFontState(0),
-																m_vBoxDimensions(0.0f, 0.0f),
-																m_fScaleBoxModifier(1.0f),
-																m_uiBoxAttributes(0),
-																m_eAlignment(HYALIGN_Left),
-																m_pGlyphOffsets(nullptr),
-																m_uiNumReservedGlyphOffsets(0),
-																m_uiNumValidCharacters(0),
-																m_fUsedPixelWidth(0.0f)
+HyText2d::HyText2d(const char *szPrefix, const char *szName, IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Text2d, szPrefix, szName, pParent),
+																								m_bIsDirty(true),
+																								m_sCurrentString(""),
+																								m_uiCurFontState(0),
+																								m_vBoxDimensions(0.0f, 0.0f),
+																								m_fScaleBoxModifier(1.0f),
+																								m_uiBoxAttributes(0),
+																								m_eAlignment(HYALIGN_Left),
+																								m_pGlyphOffsets(nullptr),
+																								m_uiNumReservedGlyphOffsets(0),
+																								m_uiNumValidCharacters(0),
+																								m_fUsedPixelWidth(0.0f)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);

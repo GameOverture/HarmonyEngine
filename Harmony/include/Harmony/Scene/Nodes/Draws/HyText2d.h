@@ -64,7 +64,7 @@ protected:
 	float				m_fUsedPixelWidth;
 
 public:
-	HyText2d(const char *szPrefix, const char *szName);
+	HyText2d(const char *szPrefix, const char *szName, IHyNode *pParent = nullptr);
 	virtual ~HyText2d(void);
 
 	// Assumes UTF-8 encoding. Accepts newline characters '\n'
