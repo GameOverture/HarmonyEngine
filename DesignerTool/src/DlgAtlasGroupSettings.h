@@ -40,7 +40,7 @@ class DlgAtlasGroupSettings : public QDialog
     bool        m_bNameChanged;
 
 public:
-    explicit DlgAtlasGroupSettings(QWidget *parent = 0);
+    explicit DlgAtlasGroupSettings(QJsonObject packerSettingsObj, QWidget *parent = 0);
     ~DlgAtlasGroupSettings();
     
     bool IsSettingsDirty()      { return m_bSettingsDirty; }

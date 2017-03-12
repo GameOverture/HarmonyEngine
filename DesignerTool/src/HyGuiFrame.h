@@ -22,7 +22,7 @@ class AtlasTreeItem;
 
 class HyGuiFrame
 {
-    friend class ItemProject;
+    friend class ItemAtlases;
     
     eAtlasNodeType                      m_eType;
 

@@ -35,16 +35,20 @@ public:
     ItemAtlases(ItemProject *pProjOwner);
     virtual ~ItemAtlases();
 
+    QJsonObject GetPackerSettings();
+
     QList<AtlasTreeItem *> GetAtlasTreeItemList();
 
     QSize GetAtlasDimensions();
+
+    int GetNumTextures();
 
     void WriteMetaSettings();
     void WriteMetaSettings(QJsonArray frameArray);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors);
-    void RemoveFrame(HyGuiFrame *pFrame, QDir metaDir);
+    void RemoveFrame(HyGuiFrame *pFrame);
 
     HyGuiFrame *GenerateFrame(ItemWidget *pItem, QString sName, QImage &newImage, eAtlasNodeType eType);
     void ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
@@ -56,16 +60,15 @@ public:
     void RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *> relinquishList);
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-private:
+    QSet<HyGuiFrame *> ImportImages(QStringList sImportImgList);
+    HyGuiFrame *ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType);
+
     void SaveData();
 
     void SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
     void RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
 
     void GetAtlasInfoForGameData(QJsonObject &atlasObjOut);
-
-    QSet<HyGuiFrame *> ImportImages(QStringList sImportImgList);
-    HyGuiFrame *ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType);
 
     void SetPackerSettings();
 

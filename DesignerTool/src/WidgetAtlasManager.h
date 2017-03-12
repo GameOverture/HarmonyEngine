@@ -39,6 +39,8 @@ protected:
 class AtlasTreeItem : public QTreeWidgetItem
 {
 public:
+    AtlasTreeItem(WidgetAtlasGroupTreeWidget *pView, int type = Type) : QTreeWidgetItem(pView, type)
+    { }
     AtlasTreeItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type)
     { }
 
@@ -52,17 +54,18 @@ class WidgetAtlasManager : public QWidget
 
     friend class WidgetAtlasGroup;
 
-    ItemAtlases &                   m_DataRef;
+    ItemAtlases *                   m_pDataRef;
 
-    QDir                            m_MetaDir;
-    QDir                            m_DataDir;
-    
     QTreeWidgetItem *               m_pMouseHoverItem;
 
 public:
     explicit WidgetAtlasManager(QWidget *parent = 0);
     explicit WidgetAtlasManager(ItemAtlases &itemDataRef, QWidget *parent = 0);
     ~WidgetAtlasManager();
+
+    ItemAtlases &GetData();
+
+    QTreeWidget *GetFramesTreeWidget();
 
     friend void AtlasManager_DrawOpen(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
     friend void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);

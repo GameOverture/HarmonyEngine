@@ -16,13 +16,31 @@
 
 #include "HyGlobal.h"
 
-DlgAtlasGroupSettings::DlgAtlasGroupSettings(QWidget *parent) : QDialog(parent),
-                                                                ui(new Ui::DlgAtlasGroupSettings),
-                                                                m_bSettingsDirty(false),
-                                                                m_bNameChanged(false)
+DlgAtlasGroupSettings::DlgAtlasGroupSettings(QJsonObject packerSettingsObj, QWidget *parent) :  QDialog(parent),
+                                                                                                ui(new Ui::DlgAtlasGroupSettings),
+                                                                                                m_bSettingsDirty(false),
+                                                                                                m_bNameChanged(false)
 {
     ui->setupUi(this);
-    WidgetsToData();
+
+    ui->txtName->setText(m_sName);
+
+    ui->cmbSortOrder->setCurrentIndex(packerSettingsObj["cmbSortOrder"].toInt());
+    ui->sbFrameMarginTop->setValue(packerSettingsObj["sbFrameMarginTop"].toInt());
+    ui->sbFrameMarginLeft->setValue(packerSettingsObj["sbFrameMarginLeft"].toInt());
+    ui->sbFrameMarginRight->setValue(packerSettingsObj["sbFrameMarginRight"].toInt());
+    ui->sbFrameMarginBottom->setValue(packerSettingsObj["sbFrameMarginBottom"].toInt());
+    ui->extrude->setValue(packerSettingsObj["extrude"].toInt());
+    ui->chkMerge->setChecked(packerSettingsObj["chkMerge"].toBool());
+    ui->chkSquare->setChecked(packerSettingsObj["chkSquare"].toBool());
+    ui->chkAutosize->setChecked(packerSettingsObj["chkAutosize"].toBool());
+    ui->minFillRate->setValue(packerSettingsObj["minFillRate"].toInt());
+
+    ui->sbTextureWidth->setValue(packerSettingsObj["sbTextureWidth"].toInt());
+    ui->sbTextureHeight->setValue(packerSettingsObj["sbTextureHeight"].toInt());
+    ui->cmbHeuristic->setCurrentIndex(packerSettingsObj["cmbHeuristic"].toInt());
+
+    m_bSettingsDirty = m_bNameChanged = false;
 }
 
 DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
@@ -54,27 +72,7 @@ void DlgAtlasGroupSettings::WidgetsToData()
 
 void DlgAtlasGroupSettings::DataToWidgets()
 {
-    ui->txtName->setText(m_sName);
 
-    ui->cmbSortOrder->setCurrentIndex(m_iSortOrderIndex);
-    ui->sbFrameMarginTop->setValue(m_iFrameMarginTop);
-    ui->sbFrameMarginLeft->setValue(m_iFrameMarginLeft);
-    ui->sbFrameMarginRight->setValue(m_iFrameMarginRight);
-    ui->sbFrameMarginBottom->setValue(m_iFrameMarginBottom);
-    ui->extrude->setValue(m_iExtrude);
-    ui->chkMerge->setChecked(m_bMerge);
-    ui->chkSquare->setChecked(m_bSquare);
-    ui->chkAutosize->setChecked(m_bAutoSize);
-    ui->minFillRate->setValue(m_iFillRate);
-    
-    // NOTE: Removing rotation from atlas packing
-    //ui->cmbRotationStrategy->setCurrentIndex(m_iRotationStrategyIndex);
-
-    ui->sbTextureWidth->setValue(m_iTextureWidth);
-    ui->sbTextureHeight->setValue(m_iTextureHeight);
-    ui->cmbHeuristic->setCurrentIndex(m_iHeuristicIndex);
-    
-    m_bSettingsDirty = m_bNameChanged = false;
 }
 
 QString DlgAtlasGroupSettings::GetName()

@@ -40,6 +40,8 @@ public:
     explicit WidgetAudioManager(QWidget *parent = 0);
     explicit WidgetAudioManager(ItemProject *pProjOwner, QWidget *parent = 0);
     ~WidgetAudioManager();
+
+    ItemProject *GetItemProject();
     
     HyGuiWave *CreateWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint32 uiErrors);
     

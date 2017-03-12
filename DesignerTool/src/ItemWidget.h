@@ -30,6 +30,7 @@ class ItemWidget : public Item
     friend class WidgetAtlasManager;
     friend class WidgetAtlasGroup;
     friend class ItemProject;
+    friend class ItemAtlases;
 
 protected:
     ItemProject *       m_pItemProj;

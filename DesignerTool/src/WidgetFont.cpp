@@ -372,9 +372,9 @@ void WidgetFont::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
         QImage fontAtlasImage(m_pTrueAtlasPixelData, static_cast<int>(m_pAtlas->width), static_cast<int>(m_pAtlas->height), QImage::Format_RGBA8888);
 
         if(m_pTrueAtlasFrame)
-            m_pItemFont->GetAtlasManager().ReplaceFrame(m_pTrueAtlasFrame, m_pItemFont->GetName(false), fontAtlasImage, true);
+            m_pItemFont->GetItemProject()->GetAtlasesData().ReplaceFrame(m_pTrueAtlasFrame, m_pItemFont->GetName(false), fontAtlasImage, true);
         else
-            m_pTrueAtlasFrame = m_pItemFont->GetAtlasManager().GenerateFrame(m_pItemFont, m_pItemFont->GetName(false), fontAtlasImage, ATLAS_Font);
+            m_pTrueAtlasFrame = m_pItemFont->GetItemProject()->GetAtlasesData().GenerateFrame(m_pItemFont, m_pItemFont->GetName(false), fontAtlasImage, ATLAS_Font);
     }
     
     // Signals ItemFont to upload and refresh the preview texture
@@ -401,7 +401,7 @@ void WidgetFont::UpdateActions()
 {
     bool bGeneratePreview = false;
     
-    QSize curSize = m_pItemFont->GetAtlasManager().GetAtlasDimensions();
+    QSize curSize = m_pItemFont->GetItemProject()->GetAtlasesData().GetAtlasDimensions();
     if(m_PrevAtlasSize.width() < curSize.width() || m_PrevAtlasSize.height() < curSize.height())
         bGeneratePreview = true;
 

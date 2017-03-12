@@ -85,7 +85,7 @@ AtlasTreeItem *HyGuiFrame::GetTreeItem()
     if(m_pTreeWidgetItem)
         return m_pTreeWidgetItem;
 
-    m_pTreeWidgetItem = new AtlasTreeItem(nullptr, QTreeWidgetItem::Type);
+    m_pTreeWidgetItem = new AtlasTreeItem((QTreeWidgetItem *)nullptr, QTreeWidgetItem::Type);
     m_pTreeWidgetItem->setText(0, GetName());
 
     if(m_iTextureIndex >= 0)

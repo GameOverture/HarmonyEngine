@@ -98,6 +98,11 @@ WidgetAudioManager::~WidgetAudioManager()
     delete ui;
 }
 
+ItemProject *WidgetAudioManager::GetItemProject()
+{
+    return m_pProjOwner;
+}
+
 HyGuiWave *WidgetAudioManager::CreateWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint32 uiErrors)
 {
     HyGuiWave *pNewWave = NULL;

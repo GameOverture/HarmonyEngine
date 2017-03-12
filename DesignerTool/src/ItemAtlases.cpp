@@ -9,14 +9,31 @@
  *************************************************************************/
 #include "ItemAtlases.h"
 
-//#include "HyGlobal.h"
+#include "ItemProject.h"
+#include "WidgetAtlasManager.h"
+#include "MainWindow.h"
+
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QPainter>
 
 ItemAtlases::ItemAtlases(ItemProject *pProjOwner) : m_pProjOwner(pProjOwner),
                                                     m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
                                                     m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases))
 {
-    QDir metaAtlasDir(GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases));
-    QFile settingsFile(metaAtlasDir.absoluteFilePath(HYGUIPATH_MetaSettings));
+    if(m_MetaDir.exists() == false)
+    {
+        HyGuiLog("Meta atlas directory is missing, recreating", LOGTYPE_Info);
+        m_MetaDir.mkpath(m_MetaDir.absolutePath());
+    }
+    if(m_DataDir.exists() == false)
+    {
+        HyGuiLog("Data atlas directory is missing, recreating", LOGTYPE_Info);
+        m_DataDir.mkpath(m_DataDir.absolutePath());
+    }
+
+    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
     if(settingsFile.exists())
     {
         if(!settingsFile.open(QIODevice::ReadOnly))
@@ -37,7 +54,7 @@ ItemAtlases::ItemAtlases(ItemProject *pProjOwner) : m_pProjOwner(pProjOwner),
         {
             QDir filterPathDir(filtersArray.at(i).toString());
 
-            AtlasTreeItem *pNewTreeItem = new AtlasTreeItem(nullptr, QTreeWidgetItem::Type);
+            AtlasTreeItem *pNewTreeItem = new AtlasTreeItem((QTreeWidgetItem *)nullptr, QTreeWidgetItem::Type);
 
             pNewTreeItem->setText(0, filterPathDir.dirName());
             pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix));
@@ -110,7 +127,7 @@ ItemAtlases::ItemAtlases(ItemProject *pProjOwner) : m_pProjOwner(pProjOwner),
                 }
             }
 
-            if(QFile::exists(metaAtlasDir.absoluteFilePath(pNewFrame->ConstructImageFileName())) == false)
+            if(QFile::exists(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName())) == false)
                 pNewFrame->SetError(GUIFRAMEERROR_CannotFindMetaImg);
             else
                 pNewFrame->ClearError(GUIFRAMEERROR_CannotFindMetaImg);
@@ -121,11 +138,19 @@ ItemAtlases::ItemAtlases(ItemProject *pProjOwner) : m_pProjOwner(pProjOwner),
                 m_TopLevelAtlasTreeItemList.append(pNewFrame->GetTreeItem());
         }
     }
+
+    if(m_TopLevelAtlasTreeItemList.empty())
+        WriteMetaSettings();
 }
 
 /*virtual*/ ItemAtlases::~ItemAtlases()
 {
 
+}
+
+QJsonObject ItemAtlases::GetPackerSettings()
+{
+    return m_PackerSettings;
 }
 
 QList<AtlasTreeItem *> ItemAtlases::GetAtlasTreeItemList()
@@ -135,7 +160,12 @@ QList<AtlasTreeItem *> ItemAtlases::GetAtlasTreeItemList()
 
 QSize ItemAtlases::GetAtlasDimensions()
 {
-    return QSize(m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight());
+    return QSize(m_PackerSettings["sbTextureWidth"].toInt(), m_PackerSettings["sbTextureHeight"].toInt());
+}
+
+int ItemAtlases::GetNumTextures()
+{
+    return m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot).size() - 1;  // - 1 because don't include atlasInfo.json
 }
 
 void ItemAtlases::WriteMetaSettings()
@@ -153,11 +183,12 @@ void ItemAtlases::WriteMetaSettings()
 
 void ItemAtlases::WriteMetaSettings(QJsonArray frameArray)
 {
-    QJsonObject settingsObj = m_dlgSettings.GetSettings();
+    QJsonObject settingsObj;
+    settingsObj.insert("settings", m_PackerSettings);
     settingsObj.insert("frames", frameArray);
 
     QJsonArray filtersArray;
-    QTreeWidgetItemIterator iter(ui->atlasList);
+    QTreeWidgetItemIterator iter(m_pProjOwner->GetAtlasManager().GetFramesTreeWidget());
     while(*iter)
     {
         if((*iter)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
@@ -218,10 +249,12 @@ HyGuiFrame *ItemAtlases::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlph
     return pNewFrame;
 }
 
-void ItemAtlases::RemoveFrame(HyGuiFrame *pFrame, QDir metaDir)
+void ItemAtlases::RemoveFrame(HyGuiFrame *pFrame)
 {
     m_DependencyMap.remove(pFrame->GetChecksum());
-    pFrame->DeleteMetaImage(metaDir);
+    pFrame->DeleteMetaImage(m_MetaDir);
+
+    m_FrameList.removeOne(pFrame);
 
     delete pFrame;
 
@@ -277,10 +310,10 @@ void ItemAtlases::ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newIma
 
 QList<HyGuiFrame *> ItemAtlases::RequestFrames(ItemWidget *pItem)
 {
-    QList<QTreeWidgetItem *> selectedItems = ui->atlasList->selectedItems();
+    QList<QTreeWidgetItem *> selectedItems = m_pProjOwner->GetAtlasManager().GetFramesTreeWidget()->selectedItems();
     qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
 
-    ui->atlasList->clearSelection();
+    m_pProjOwner->GetAtlasManager().GetFramesTreeWidget()->clearSelection();
 
     QList<HyGuiFrame *> frameRequestList;
     for(int i = 0; i < selectedItems.size(); ++i)
@@ -340,6 +373,40 @@ void ItemAtlases::RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *> relinq
         RemoveDependency(relinquishList[i], pItem);
 }
 
+QSet<HyGuiFrame *> ItemAtlases::ImportImages(QStringList sImportImgList)
+{
+    QSet<HyGuiFrame *> returnSet;
+
+    for(int i = 0; i < sImportImgList.size(); ++i)
+    {
+        QFileInfo fileInfo(sImportImgList[i]);
+
+        QImage newImage(fileInfo.absoluteFilePath());
+
+        returnSet.insert(ImportImage(fileInfo.baseName(), newImage, ATLAS_Frame));
+    }
+
+    return returnSet;
+}
+
+HyGuiFrame *ItemAtlases::ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType)
+{
+    quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
+
+    QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
+    if(eType != ATLAS_Font && eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
+        rAlphaCrop = ImagePacker::crop(newImage);
+
+    HyGuiFrame *pNewFrame = CreateFrame(uiChecksum, sName, rAlphaCrop, eType, newImage.width(), newImage.height(), -1, -1, -1, 0);
+    if(pNewFrame)
+    {
+        newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
+        m_pProjOwner->GetAtlasManager().GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
+    }
+
+    return pNewFrame;
+}
+
 void ItemAtlases::SaveData()
 {
     QJsonObject atlasObj;
@@ -380,8 +447,8 @@ void ItemAtlases::RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem)
 void ItemAtlases::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
 {
     atlasObjOut.insert("id", m_DataDir.dirName().toInt());
-    atlasObjOut.insert("width", m_dlgSettings.TextureWidth());
-    atlasObjOut.insert("height", m_dlgSettings.TextureHeight());
+    atlasObjOut.insert("width", m_PackerSettings["sbTextureWidth"].toInt());
+    atlasObjOut.insert("height", m_PackerSettings["sbTextureHeight"].toInt());
     atlasObjOut.insert("num8BitClrChannels", 4);   // TODO: Actually make this configurable?
 
     QJsonArray textureArray;
@@ -408,40 +475,6 @@ void ItemAtlases::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
         textureArray.append(frameArrayList[i]);
 
     atlasObjOut.insert("textures", textureArray);
-}
-
-QSet<HyGuiFrame *> ItemAtlases::ImportImages(QStringList sImportImgList)
-{
-    QSet<HyGuiFrame *> returnSet;
-
-    for(int i = 0; i < sImportImgList.size(); ++i)
-    {
-        QFileInfo fileInfo(sImportImgList[i]);
-
-        QImage newImage(fileInfo.absoluteFilePath());
-
-        returnSet.insert(ImportImage(fileInfo.baseName(), newImage, ATLAS_Frame));
-    }
-
-    return returnSet;
-}
-
-HyGuiFrame *ItemAtlases::ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType)
-{
-    quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
-
-    QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
-    if(eType != ATLAS_Font && eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
-        rAlphaCrop = ImagePacker::crop(newImage);
-
-    HyGuiFrame *pNewFrame = m_pProjOwner->CreateFrame(uiChecksum, sName, rAlphaCrop, eType, newImage.width(), newImage.height(), -1, -1, -1, 0);
-    if(pNewFrame)
-    {
-        newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
-        ui->atlasList->addTopLevelItem(pNewFrame->GetTreeItem());
-    }
-
-    return pNewFrame;
 }
 
 void ItemAtlases::SetPackerSettings()
@@ -505,8 +538,8 @@ void ItemAtlases::Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> newFr
                          newFramesList[i],
                          m_MetaDir.absoluteFilePath(newFramesList[i]->ConstructImageFileName()));
     }
-    m_dlgSettings.SetPackerSettings(&m_Packer);
-    m_Packer.pack(m_dlgSettings.GetHeuristic(), m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight());
+    SetPackerSettings();
+    m_Packer.pack(m_PackerSettings["cmdHeuristic"].toInt(), m_PackerSettings["sbTextureWidth"].toInt(), m_PackerSettings["sbTextureHeight"].toInt());
 
     // Subtract '1' from the number of new textures because we want to ensure the last generated (and likely least filled) texture is last
     int iNumNewTextures = m_Packer.bins.size() - 1;
@@ -522,7 +555,6 @@ void ItemAtlases::Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> newFr
 
     // Using our stock of newly generated textures, fill in any gaps in the texture array. If there aren't enough new textures then shift textures (and their frames) to fill any remaining gaps in the indices.
     int iTotalNumTextures = iNumNewTextures + existingTexturesInfoList.size();
-    ui->lcdNumTextures->display(iTotalNumTextures);
 
     int iNumNewTexturesUsed = 0;
     int iCurrentIndex = 0;
@@ -590,10 +622,10 @@ void ItemAtlases::Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> newFr
 
 void ItemAtlases::ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIndex)
 {
-    if(m_dlgSettings.TextureWidth() != m_Packer.bins[iPackerBinIndex].width() || m_dlgSettings.TextureHeight() != m_Packer.bins[iPackerBinIndex].height())
+    if(m_PackerSettings["sbTextureWidth"].toInt() != m_Packer.bins[iPackerBinIndex].width() || m_PackerSettings["sbTextureHeight"].toInt() != m_Packer.bins[iPackerBinIndex].height())
         HyGuiLog("WidgetAtlasGroup::ConstructAtlasTexture() Mismatching texture dimentions", LOGTYPE_Error);
 
-    QImage newTexture(m_dlgSettings.TextureWidth(), m_dlgSettings.TextureHeight(), QImage::Format_ARGB32);
+    QImage newTexture(m_PackerSettings["sbTextureWidth"].toInt(), m_PackerSettings["sbTextureHeight"].toInt(), QImage::Format_ARGB32);
     newTexture.fill(Qt::transparent);
 
     QPainter p(&newTexture);
@@ -731,10 +763,10 @@ void ItemAtlases::Refresh()
 
     MainWindow::ReloadHarmony();
 
-    ui->atlasList->sortItems(0, Qt::AscendingOrder);
+    m_pProjOwner->GetAtlasManager().GetFramesTreeWidget()->sortItems(0, Qt::AscendingOrder);
 
-    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
-    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
+//    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
+//    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
 
     HyGuiLog("Atlas Group Refresh finished", LOGTYPE_Normal);
 
