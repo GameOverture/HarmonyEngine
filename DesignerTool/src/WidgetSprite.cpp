@@ -43,7 +43,16 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
     m_StateActionsList.push_back(ui->actionOrderFrameDownwards);
     
     ui->cmbStates->clear();
+}
 
+WidgetSprite::~WidgetSprite()
+{
+    delete ui;
+}
+
+// This function exists because below cannot be placed in constructor due to RequestFrames() trying to access ItemSprite::m_pWidget (aka this) before variable is assigned
+void WidgetSprite::Load()
+{
     // If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
     if(m_pItemSprite->GetInitValue().type() != QJsonValue::Null)
     {
@@ -89,11 +98,6 @@ WidgetSprite::WidgetSprite(ItemSprite *pItemSprite, QWidget *parent) :   QWidget
     m_pItemSprite->GetUndoStack()->clear();
 
     UpdateActions();
-}
-
-WidgetSprite::~WidgetSprite()
-{
-    delete ui;
 }
 
 ItemSprite *WidgetSprite::GetData()

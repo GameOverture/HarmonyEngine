@@ -314,6 +314,8 @@ Item *WidgetExplorer::GetCurDirSelected(bool bIncludePrefixDirs)
 
 void WidgetExplorer::OnProjectLoaded(ItemProject *pLoadedProj)
 {
+    pLoadedProj->moveToThread(QApplication::instance()->thread());
+
     pLoadedProj->LoadWidgets();
 
     if(pLoadedProj->HasError())

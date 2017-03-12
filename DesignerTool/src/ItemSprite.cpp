@@ -49,6 +49,7 @@ ItemSprite::ItemSprite(ItemProject *pItemProj, const QString sPrefix, const QStr
 /*virtual*/ void ItemSprite::OnLoad(IHyApplication &hyApp)
 {
     m_pWidget = new WidgetSprite(this);
+    static_cast<WidgetSprite *>(m_pWidget)->Load();
 
     m_primOriginHorz.Load();
     m_primOriginVert.Load();

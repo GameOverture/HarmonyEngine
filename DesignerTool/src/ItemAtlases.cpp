@@ -48,6 +48,8 @@ ItemAtlases::ItemAtlases(ItemProject *pProjOwner) : m_pProjOwner(pProjOwner),
 
         QJsonObject settingsObj = settingsDoc.object();
 
+        m_PackerSettings = settingsObj["settings"].toObject();
+
         // Create all the filter items first, storing their actual path in their data (for now)
         QJsonArray filtersArray = settingsObj["filters"].toArray();
         for(int i = 0; i < filtersArray.size(); ++i)
