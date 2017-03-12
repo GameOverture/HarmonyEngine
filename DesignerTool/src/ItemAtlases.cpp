@@ -143,6 +143,16 @@ ItemAtlases::ItemAtlases(ItemProject *pProjOwner) : m_pProjOwner(pProjOwner),
 
     if(m_TopLevelAtlasTreeItemList.empty())
         WriteMetaSettings();
+    else
+    {
+        for(int i = 0; i < m_TopLevelAtlasTreeItemList.size(); ++i)
+        {
+            for(int j = 0; j < m_TopLevelAtlasTreeItemList[i]->childCount(); ++j)
+            {
+
+            }
+        }
+    }
 }
 
 /*virtual*/ ItemAtlases::~ItemAtlases()
