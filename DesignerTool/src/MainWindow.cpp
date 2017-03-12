@@ -20,7 +20,7 @@
 #include "WidgetAudioManager.h"
 
 #include "ItemSprite.h"
-
+#include "HyGuiRenderer.h"
 #include "HyGlobal.h"
 
 #include <QFileDialog>

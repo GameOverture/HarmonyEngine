@@ -20,6 +20,7 @@
 #include "Threading/Threading.h"
 
 #include <queue>
+#include <future>
 
 class IHyDraw2d;
 
@@ -32,9 +33,13 @@ class HyTexturedQuad2dData;
 class HyPrimitive2dData;
 class HyMesh3dData;
 
+void HyAssetInit(HyAssets *pThis);
+
 class HyAssets
 {
 	const std::string									m_sDATADIR;
+
+	std::future<void>									m_InitFuture;
 
 	HyGfxComms &										m_GfxCommsRef;
 	HyScene &											m_SceneRef;
@@ -103,6 +108,9 @@ class HyAssets
 public:
 	HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
 	virtual ~HyAssets();
+
+	bool IsLoaded();
+	void ParseInitInfo();
 
 	HyAtlas *GetAtlas(uint32 uiIndex);
 	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);

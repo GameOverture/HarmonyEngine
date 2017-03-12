@@ -12,7 +12,7 @@
 
 #include "ItemWidget.h"
 #include "ItemAtlases.h"
-#include "HyGuiRenderer.h"
+
 
 #include <QQueue>
 #include <QJsonObject>

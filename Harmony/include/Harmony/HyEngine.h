@@ -48,7 +48,7 @@ class HyEngine
 	
 	HyGfxComms				m_GfxBuffer;
 	HyScene					m_Scene;
-	HyAssets 				m_AssetManager;
+	HyAssets 				m_Assets;
 	HyGuiComms				m_GuiComms;
 
 	HyTimeInterop			m_Time;
@@ -71,6 +71,7 @@ public:
 #ifndef HY_PLATFORM_GUI
 private:
 #endif
+	bool BootUpdate();
 	bool Update();
 
 	bool PollPlatformApi();

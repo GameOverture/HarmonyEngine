@@ -17,8 +17,8 @@ HyEngine *		HyEngine::sm_pInstance = NULL;
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxBuffer, m_AppRef.m_WindowList),
-												m_AssetManager(m_AppRef.sm_Init.sDataDir, m_GfxBuffer, m_Scene),
-												m_GuiComms(m_AppRef.sm_Init.uiDebugPort, m_AssetManager),
+												m_Assets(m_AppRef.sm_Init.sDataDir, m_GfxBuffer, m_Scene),
+												m_GuiComms(m_AppRef.sm_Init.uiDebugPort, m_Assets),
 												m_Input(m_AppRef.sm_Init.uiNumInputMappings),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList)
@@ -26,8 +26,6 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
 	m_AppRef.SetInputMapPtr(static_cast<HyInputMapInterop *>(m_Input.GetInputMapArray()));
-	if(m_AppRef.Initialize() == false)
-		HyError("IApplication Initialize() failed");
 }
 
 HyEngine::~HyEngine()
@@ -37,6 +35,12 @@ HyEngine::~HyEngine()
 /*static*/ void HyEngine::RunGame(IHyApplication &gameRef)
 {
 	sm_pInstance = HY_NEW HyEngine(gameRef);
+
+	while(sm_pInstance->BootUpdate())
+	{ }
+
+	if(gameRef.Initialize() == false)
+		HyError("IApplication Initialize() failed");
 	
 	while(sm_pInstance->Update())
 	{ }
@@ -50,6 +54,18 @@ HyEngine::~HyEngine()
 #if defined(HY_DEBUG) && defined(_MSC_VER)
 	HY_SET_CRT_DEBUG_FIELD(_CRTDBG_LEAK_CHECK_DF);
 #endif
+}
+
+bool HyEngine::BootUpdate()
+{
+	while(m_Time.ThrottleTime())
+	{
+		if(PollPlatformApi() == false)
+			return false;
+	}
+	m_Renderer.Update();
+
+	return (m_Assets.IsLoaded() == false);
 }
 
 bool HyEngine::Update()
@@ -66,7 +82,7 @@ bool HyEngine::Update()
 		if(m_AppRef.Update() == false)
 			return false;
 
-		m_AssetManager.Update();
+		m_Assets.Update();
 		m_Scene.PostUpdate();
 
 		m_GuiComms.Update();
@@ -105,10 +121,10 @@ bool HyEngine::PollPlatformApi()
 void HyEngine::Shutdown()
 {
 	// Unload any load-pending assets
-	m_AssetManager.Shutdown();
-	while(m_AssetManager.IsShutdown() == false)
+	m_Assets.Shutdown();
+	while(m_Assets.IsShutdown() == false)
 	{
-		m_AssetManager.Update();
+		m_Assets.Update();
 		m_Scene.PostUpdate();
 		m_Renderer.Update();
 	}

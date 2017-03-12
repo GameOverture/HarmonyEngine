@@ -12,9 +12,21 @@
 #include <QTimer>
 #include <QSurfaceFormat>
 #include <QDir>
+#include <QApplication>
 
 #include "HyGlobal.h"
-#include "ItemProject.h"
+
+//void HyGuiRendererLoadThread::run()
+//{
+//    m_pGLContext->makeCurrent(m_pSurface);
+//    HyEngine *pNewHyEngine = nullptr;
+//    if(m_pProjOwner)
+//        pNewHyEngine = new HyEngine(*m_pProjOwner);
+
+//    m_pGLContext->doneCurrent();
+
+//    Q_EMIT EngineLoaded(pNewHyEngine, m_pGLContext);
+//}
 
 HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent),
                                                 m_pProjOwner(NULL),
@@ -83,8 +95,22 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
     HyGuiLog("Version: " % QString(reinterpret_cast<const char *>(glGetString(GL_VERSION))), LOGTYPE_Normal);
     HyGuiLog("GLSL: " % QString(reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION))), LOGTYPE_Normal);
 
+    // TESTING ///
     if(m_pProjOwner)
         m_pHyEngine = new HyEngine(*m_pProjOwner);
+
+//    QOpenGLContext *pThreadContext = new QOpenGLContext;
+//    pThreadContext->setFormat(context()->format());
+//    pThreadContext->setShareContext(context());
+//    pThreadContext->create();
+
+//    HyGuiRendererLoadThread *pNewLoadThread = new HyGuiRendererLoadThread(m_pProjOwner, pThreadContext, context()->surface(), this);
+//    connect(pNewLoadThread, &HyGuiRendererLoadThread::EngineLoaded, this, &HyGuiRenderer::OnEngineLoaded);
+//    connect(pNewLoadThread, &HyGuiRendererLoadThread::finished, pNewLoadThread, &QObject::deleteLater);
+
+//    //MainWindow::StartLoading(MDI_Explorer);
+//    pThreadContext->moveToThread(pNewLoadThread);
+//    pNewLoadThread->start();
 }
 
 /*virtual*/ void HyGuiRenderer::paintGL()
@@ -104,3 +130,11 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
     if(m_pProjOwner)
         m_pProjOwner->SetRenderSize(w, h);
 }
+
+//void HyGuiRenderer::OnEngineLoaded(HyEngine *pNewHyEngine, QOpenGLContext *pGLContext)
+//{
+//    delete pGLContext;
+//    //pGLContext->moveToThread(QApplication::instance()->thread());
+//    //pGLContext->makeCurrent(context()->surface());
+//    m_pHyEngine = pNewHyEngine;
+//}

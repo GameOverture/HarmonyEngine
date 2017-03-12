@@ -13,10 +13,33 @@
 #include "GL/glew.h"
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
+#include <QThread>
 
 #include "Harmony/HyEngine.h"
+#include "ItemProject.h"
 
-class ItemProject;
+////class ItemProject;
+
+//class HyGuiRendererLoadThread : public QThread
+//{
+//    Q_OBJECT
+
+//    ItemProject *       m_pProjOwner;
+//    QOpenGLContext *    m_pGLContext;
+//    QSurface *          m_pSurface;
+
+//public:
+//    HyGuiRendererLoadThread(ItemProject *pProjOwner, QOpenGLContext *pGLContext, QSurface *pSurface, QObject *pParent) :    QThread(pParent),
+//                                                                                                                            m_pProjOwner(pProjOwner),
+//                                                                                                                            m_pGLContext(pGLContext),
+//                                                                                                                            m_pSurface(pSurface)
+//    { }
+
+//    void run() Q_DECL_OVERRIDE;
+
+//Q_SIGNALS:
+//    void EngineLoaded(HyEngine *pNewHyEngine, QOpenGLContext *pGLContext);
+//};
 
 class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
 {
@@ -40,6 +63,9 @@ public:
     virtual void initializeGL();
     virtual void paintGL();
     virtual void resizeGL(int w, int h);
+
+//private Q_SLOTS:
+//    void OnEngineLoaded(HyEngine *pNewHyEngine, QOpenGLContext *pGLContext);
 };
 
 #endif // HYGUIRENDERER_H

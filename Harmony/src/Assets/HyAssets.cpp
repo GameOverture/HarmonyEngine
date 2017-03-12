@@ -22,6 +22,11 @@
 
 #define HYASSETS_AtlasDir "Atlases/"
 
+void HyAssetInit(HyAssets *pThis)
+{
+	pThis->ParseInitInfo();
+}
+
 template<typename tData>
 void HyAssets::NodeData<tData>::Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef)
 {
@@ -65,6 +70,64 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 {
 	IHyDraw2d::sm_pHyAssets = this;
 
+	m_InitFuture = std::async(std::launch::async, &HyAssetInit, this);
+
+	// Create promises
+	//std::packaged_task<int(int)> task1();
+
+	// Get futures
+	//std::future<int> val1 = task1.get_future();
+
+	// Schedule promises
+	//std::thread t1();
+
+	// Print status while we wait
+	//bool s1 = false, s2 = false;
+	//do
+	//{
+		//s1 = val1.wait_for(std::chrono::milliseconds(50)) == std::future_status::ready;
+		//s2 = val2.wait_for(std::chrono::milliseconds(50)) == std::future_status::ready;
+		//std::this_thread::sleep_for(std::chrono::milliseconds(300));
+	//} while (!s1 || !s2);
+
+	// Cleanup threads-- we could obviously block and wait for our threads to finish if we don't want to print status.
+	//t1.join();
+	//t2.join();
+
+	// Final result
+	//int iValTest = val1.get();
+	//int iValTest2 = val2.get();
+
+
+
+
+
+
+}
+
+HyAssets::~HyAssets()
+{
+	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+		m_pAtlases[i].~HyAtlas();
+
+	unsigned char *pAtlases = reinterpret_cast<unsigned char *>(m_pAtlases);
+	delete[] pAtlases;
+	m_pAtlases = nullptr;
+
+	for(auto iter = m_Quad2d.begin(); iter != m_Quad2d.end(); ++iter)
+		delete iter->second;
+
+	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
+}
+
+bool HyAssets::IsLoaded()
+{
+	auto status = m_InitFuture.wait_for(std::chrono::milliseconds(0));
+	return status == std::future_status::ready;
+}
+
+void HyAssets::ParseInitInfo()
+{
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::string sAtlasInfoFilePath(m_sDATADIR + HYASSETS_AtlasDir);
 	sAtlasInfoFilePath += "atlasInfo.json";
@@ -119,21 +182,6 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 	
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
-}
-
-HyAssets::~HyAssets()
-{
-	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
-		m_pAtlases[i].~HyAtlas();
-
-	unsigned char *pAtlases = reinterpret_cast<unsigned char *>(m_pAtlases);
-	delete[] pAtlases;
-	m_pAtlases = nullptr;
-
-	for(auto iter = m_Quad2d.begin(); iter != m_Quad2d.end(); ++iter)
-		delete iter->second;
-
-	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
 }
 
 HyAtlas *HyAssets::GetAtlas(uint32 uiIndex)
