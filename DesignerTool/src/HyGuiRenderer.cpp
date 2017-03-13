@@ -48,8 +48,10 @@ HyGuiRenderer::HyGuiRenderer(ItemProject *pProj, QWidget *parent /*= 0*/) : QOpe
 //    setFormat(format);
 
     m_pTimer = new QTimer(this);
-    connect(m_pTimer, SIGNAL(timeout()), this, SLOT(update()));
-    m_pTimer->start(10);
+    connect(m_pTimer, SIGNAL(timeout()), this, SLOT(OnBootCheck()));
+    m_pTimer->start(50);
+    
+    m_bIsUpdating = true;
 }
 
 HyGuiRenderer::~HyGuiRenderer()
@@ -129,6 +131,21 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
 {
     if(m_pProjOwner)
         m_pProjOwner->SetRenderSize(w, h);
+}
+
+void HyGuiRenderer::OnBootCheck()
+{
+    if(m_pHyEngine && m_pHyEngine->BootUpdate() == false)
+    {
+        m_bIsUpdating = false;
+        m_pTimer->stop();
+        
+        if(false == m_pTimer->disconnect())
+            HyGuiLog("Harmony OnBootCheck could not disconnect its signal.", LOGTYPE_Error);
+        
+        connect(m_pTimer, SIGNAL(timeout()), this, SLOT(update()));
+        m_pTimer->start(10);
+    }
 }
 
 //void HyGuiRenderer::OnEngineLoaded(HyEngine *pNewHyEngine, QOpenGLContext *pGLContext)

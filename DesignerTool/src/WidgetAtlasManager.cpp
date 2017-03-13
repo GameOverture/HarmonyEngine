@@ -116,8 +116,8 @@ WidgetAtlasManager::WidgetAtlasManager(ItemAtlases &itemDataRef, QWidget *parent
     for(int i = 0; i < atlasTreeItemList.size(); ++i)
         ui->atlasList->addTopLevelItem(atlasTreeItemList[i]);
 
-    ui->atlasList->sortByColumn(0, Qt::AscendingOrder);
-    ui->atlasList->setSortingEnabled(true);
+    //ui->atlasList->sortByColumn(0, Qt::AscendingOrder);
+    //ui->atlasList->setSortingEnabled(true);
     //ui->atlasList->sortItems(0, Qt::AscendingOrder);
 
     ui->lcdNumTextures->display(m_pDataRef->GetNumTextures());

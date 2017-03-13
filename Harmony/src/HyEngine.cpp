@@ -38,9 +38,6 @@ HyEngine::~HyEngine()
 
 	while(sm_pInstance->BootUpdate())
 	{ }
-
-	if(gameRef.Initialize() == false)
-		HyError("IApplication Initialize() failed");
 	
 	while(sm_pInstance->Update())
 	{ }
@@ -65,7 +62,14 @@ bool HyEngine::BootUpdate()
 	}
 	m_Renderer.Update();
 
-	return (m_Assets.IsLoaded() == false);
+	if(m_Assets.IsLoaded() == false)
+		return true;
+
+	// If here, then engine fully loaded
+	if(m_AppRef.Initialize() == false)
+		HyError("IApplication Initialize() failed");
+
+	return false;
 }
 
 bool HyEngine::Update()

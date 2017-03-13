@@ -64,8 +64,8 @@ public:
     virtual void paintGL();
     virtual void resizeGL(int w, int h);
 
-//private Q_SLOTS:
-//    void OnEngineLoaded(HyEngine *pNewHyEngine, QOpenGLContext *pGLContext);
+private Q_SLOTS:
+    void OnBootCheck();
 };
 
 #endif // HYGUIRENDERER_H
