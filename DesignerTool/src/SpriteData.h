@@ -7,24 +7,24 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef ITEMSPRITE_H
-#define ITEMSPRITE_H
+#ifndef SPRITEDATA_H
+#define SPRITEDATA_H
 
 #include "IData.h"
 #include "SpriteWidget.h"
 
-class WidgetAtlasManager;
+class AtlasesWidget;
 
 class SpriteFrame
 {
 public:
-    HyGuiFrame *            m_pFrame;
+    AtlasFrame *            m_pFrame;
     int                     m_iRowIndex;
     
     QPoint                  m_vOffset;
     float                   m_fDuration;
     
-    SpriteFrame(HyGuiFrame *pFrame, int iRowIndex) :    m_pFrame(pFrame),
+    SpriteFrame(AtlasFrame *pFrame, int iRowIndex) :    m_pFrame(pFrame),
                                                         m_iRowIndex(iRowIndex),
                                                         m_vOffset(0, 0),
                                                         m_fDuration(0.016f)
@@ -41,7 +41,7 @@ public:
     }
 };
 
-class ItemSprite : public ItemWidget
+class SpriteData : public IData
 {
     Q_OBJECT
 
@@ -49,8 +49,8 @@ class ItemSprite : public ItemWidget
     HyPrimitive2d               m_primOriginVert;
     
 public:
-    ItemSprite(ItemProject *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
-    virtual ~ItemSprite();
+    SpriteData(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
+    virtual ~SpriteData();
     
 protected:
     virtual void OnGiveMenuActions(QMenu *pMenu);
@@ -61,11 +61,11 @@ protected:
     virtual void OnGuiHide(IHyApplication &hyApp);
     virtual void OnGuiUpdate(IHyApplication &hyApp);
 
-    virtual void OnLink(HyGuiFrame *pFrame);
-    virtual void OnReLink(HyGuiFrame *pFrame);
-    virtual void OnUnlink(HyGuiFrame *pFrame);
+    virtual void OnLink(AtlasFrame *pFrame);
+    virtual void OnReLink(AtlasFrame *pFrame);
+    virtual void OnUnlink(AtlasFrame *pFrame);
     
     virtual QJsonValue OnSave();
 };
 
-#endif // ITEMSPRITE_H
+#endif // SPRITEDATA_H

@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETFONT_H
-#define WIDGETFONT_H
+#ifndef FONTWIDGET_H
+#define FONTWIDGET_H
 
 #include "FontWidgetState.h"
 
@@ -19,11 +19,11 @@
 #include "freetype-gl/freetype-gl.h"
 
 namespace Ui {
-class WidgetFont;
+class FontWidget;
 }
 
-class ItemFont;
-class WidgetFontModel;
+class FontData;
+class FontTableModel;
 
 struct FontStagePass
 {
@@ -63,11 +63,11 @@ struct FontStagePass
     }
 };
 
-class WidgetFont : public QWidget
+class FontWidget : public QWidget
 {
     Q_OBJECT
 
-    ItemFont *                  m_pItemFont;
+    FontData *                  m_pItemFont;
     
     QString                     m_sAvailableTypefaceGlyphs;
     QRegExpValidator            m_PreviewValidator;
@@ -77,11 +77,11 @@ class WidgetFont : public QWidget
     bool                        m_bFontPreviewDirty;
 
     QList<QAction *>            m_StateActionsList;
-    WidgetFontState *           m_pCurFontState;
+    FontWidgetState *           m_pCurFontState;
     
     texture_atlas_t *           m_pAtlas;
     unsigned char *             m_pTrueAtlasPixelData;
-    HyGuiFrame *                m_pTrueAtlasFrame;
+    AtlasFrame *                m_pTrueAtlasFrame;
     
     QDir                        m_FontMetaDir;
     
@@ -90,18 +90,18 @@ class WidgetFont : public QWidget
     QSize                       m_PrevAtlasSize;
     
 public:
-    explicit WidgetFont(ItemFont *pOwner, QWidget *parent = 0);
-    ~WidgetFont();
+    explicit FontWidget(FontData *pOwner, QWidget *parent = 0);
+    ~FontWidget();
 
     void OnGiveMenuActions(QMenu *pMenu);
     
-    ItemFont *GetItemFont();
+    FontData *GetItemFont();
 
     QString GetFullItemName();
 
     QComboBox *GetCmbStates();
     
-    WidgetFontModel *GetCurrentFontModel();
+    FontTableModel *GetCurrentFontModel();
     
     void SetGlyphsDirty();
     
@@ -157,7 +157,7 @@ private Q_SLOTS:
     void on_txtPreviewString_editingFinished();
 
 private:
-    Ui::WidgetFont *ui;
+    Ui::FontWidget *ui;
 };
 
-#endif // WIDGETFONT_H
+#endif // FONTWIDGET_H

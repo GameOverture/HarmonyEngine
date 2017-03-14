@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETFONTMODELVIEW_H
-#define WIDGETFONTMODELVIEW_H
+#ifndef FONTMODELVIEW_H
+#define FONTMODELVIEW_H
 
 #include "FontData.h"
 #include "freetype-gl/freetype-gl.h"
@@ -22,26 +22,26 @@
 struct FontStagePass;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetFontTableView : public QTableView
+class FontTableView : public QTableView
 {
     Q_OBJECT
 
  public:
-     WidgetFontTableView(QWidget *pParent = 0);
+     FontTableView(QWidget *pParent = 0);
 
  protected:
      virtual void resizeEvent(QResizeEvent *pResizeEvent) override;
  };
  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetFontDelegate : public QStyledItemDelegate
+class FontDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
-    ItemFont *              m_pItemFont;
+    FontData *              m_pItemFont;
     QComboBox *             m_pCmbStates;
 
 public:
-    WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbStates, QObject *pParent = 0);
+    FontDelegate(FontData *pItemFont, QComboBox *pCmbStates, QObject *pParent = 0);
 
     virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const override;
@@ -49,7 +49,7 @@ public:
     virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetFontModel : public QAbstractTableModel
+class FontTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 
@@ -89,8 +89,8 @@ public:
         NUMCOLUMNS
     };
     
-    WidgetFontModel(QObject *parent);
-    virtual ~WidgetFontModel();
+    FontTableModel(QObject *parent);
+    virtual ~FontTableModel();
 
     QString GetRenderModeString(rendermode_t eMode) const;
     
@@ -131,4 +131,4 @@ public:
     virtual Qt::ItemFlags flags(const QModelIndex & index) const override;
 };
 
-#endif // WIDGETFONTMODELVIEW_H
+#endif // FONTMODELVIEW_H

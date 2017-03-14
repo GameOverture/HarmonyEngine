@@ -10,9 +10,9 @@
 #include "AtlasFrame.h"
 #include "scriptum/imagepacker.h"
 
-#include "AtlasWidget.h"
+#include "AtlasesWidget.h"
 
-HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors) :  m_eType(eType),
+AtlasFrame::AtlasFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors) :  m_eType(eType),
                                                                                                                                                                     m_pTreeWidgetItem(nullptr),
                                                                                                                                                                     m_uiChecksum(uiChecksum),
                                                                                                                                                                     m_sName(sN),
@@ -26,7 +26,7 @@ HyGuiFrame::HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasN
 {
 }
 
-HyGuiFrame::~HyGuiFrame()
+AtlasFrame::~AtlasFrame()
 {
     QMapIterator<void *, HyTexturedQuad2d *> iter(m_DrawInstMap);
     while(iter.hasNext())
@@ -36,7 +36,7 @@ HyGuiFrame::~HyGuiFrame()
     }
 }
 
-HyTexturedQuad2d *HyGuiFrame::DrawInst(void *pKey)
+HyTexturedQuad2d *AtlasFrame::DrawInst(void *pKey)
 {
     QMap<void *, HyTexturedQuad2d *>::iterator iter = m_DrawInstMap.find(pKey);
     if(iter != m_DrawInstMap.end())
@@ -59,7 +59,7 @@ HyTexturedQuad2d *HyGuiFrame::DrawInst(void *pKey)
     return pDrawInst;
 }
 
-void HyGuiFrame::DeleteDrawInst(void *pKey)
+void AtlasFrame::DeleteDrawInst(void *pKey)
 {
     QMap<void *, HyTexturedQuad2d *>::iterator iter = m_DrawInstMap.find(pKey);
     if(iter != m_DrawInstMap.end())
@@ -69,7 +69,7 @@ void HyGuiFrame::DeleteDrawInst(void *pKey)
     }
 }
 
-void HyGuiFrame::DeleteAllDrawInst()
+void AtlasFrame::DeleteAllDrawInst()
 {
     QMap<void *, HyTexturedQuad2d *>::iterator iter = m_DrawInstMap.begin();
     for(; iter != m_DrawInstMap.end(); ++iter)
@@ -80,7 +80,7 @@ void HyGuiFrame::DeleteAllDrawInst()
     m_DrawInstMap.clear();
 }
 
-AtlasTreeItem *HyGuiFrame::GetTreeItem()
+AtlasTreeItem *AtlasFrame::GetTreeItem()
 {
     if(m_pTreeWidgetItem)
         return m_pTreeWidgetItem;
@@ -114,57 +114,57 @@ AtlasTreeItem *HyGuiFrame::GetTreeItem()
     return m_pTreeWidgetItem;
 }
 
-quint32 HyGuiFrame::GetChecksum()
+quint32 AtlasFrame::GetChecksum()
 {
     return m_uiChecksum;
 }
 
-QString HyGuiFrame::GetName()
+QString AtlasFrame::GetName()
 {
     return m_sName;
 }
 
-QSize HyGuiFrame::GetSize()
+QSize AtlasFrame::GetSize()
 {
     return QSize(m_iWidth, m_iHeight);
 }
 
-QRect HyGuiFrame::GetCrop()
+QRect AtlasFrame::GetCrop()
 {
     return m_rAlphaCrop;
 }
 
-QPoint HyGuiFrame::GetPosition()
+QPoint AtlasFrame::GetPosition()
 {
     return QPoint(m_iPosX, m_iPosY);
 }
 
-QSet<ItemWidget *> HyGuiFrame::GetLinks()
+QSet<IData *> AtlasFrame::GetLinks()
 {
     return m_Links;
 }
 
-eAtlasNodeType HyGuiFrame::GetType()
+eAtlasNodeType AtlasFrame::GetType()
 {
     return m_eType;
 }
 
-int HyGuiFrame::GetTextureIndex()
+int AtlasFrame::GetTextureIndex()
 {
     return m_iTextureIndex;
 }
 
-int HyGuiFrame::GetX()
+int AtlasFrame::GetX()
 {
     return m_iPosX;
 }
 
-int HyGuiFrame::GetY()
+int AtlasFrame::GetY()
 {
     return m_iPosY;
 }
 
-void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
+void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 {
     DeleteAllDrawInst();
 
@@ -194,7 +194,7 @@ void HyGuiFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
     }
 }
 
-QString HyGuiFrame::ConstructImageFileName()
+QString AtlasFrame::ConstructImageFileName()
 {
     QString sMetaImgName;
     sMetaImgName = sMetaImgName.sprintf("%010u", m_uiChecksum);
@@ -203,7 +203,7 @@ QString HyGuiFrame::ConstructImageFileName()
     return sMetaImgName;
 }
 
-void HyGuiFrame::GetJsonObj(QJsonObject &frameObj)
+void AtlasFrame::GetJsonObj(QJsonObject &frameObj)
 {
     frameObj.insert("checksum", QJsonValue(static_cast<qint64>(GetChecksum())));
     frameObj.insert("name", QJsonValue(GetName()));
@@ -234,7 +234,7 @@ void HyGuiFrame::GetJsonObj(QJsonObject &frameObj)
     frameObj.insert("filter", QJsonValue(sFilterPath));
 }
 
-void HyGuiFrame::SetError(eGuiFrameError eError)
+void AtlasFrame::SetError(eGuiFrameError eError)
 {
     m_uiErrors |= (1 << eError);
 
@@ -245,7 +245,7 @@ void HyGuiFrame::SetError(eGuiFrameError eError)
     }
 }
 
-void HyGuiFrame::ClearError(eGuiFrameError eError)
+void AtlasFrame::ClearError(eGuiFrameError eError)
 {
     m_uiErrors &= ~(1 << eError);
 
@@ -264,12 +264,12 @@ void HyGuiFrame::ClearError(eGuiFrameError eError)
     }
 }
 
-uint HyGuiFrame::GetErrors()
+uint AtlasFrame::GetErrors()
 {
     return m_uiErrors;
 }
 
-bool HyGuiFrame::DeleteMetaImage(QDir metaDir)
+bool AtlasFrame::DeleteMetaImage(QDir metaDir)
 {
     if(0 != (m_uiErrors & GUIFRAMEERROR_Duplicate))
         return true;
@@ -281,7 +281,7 @@ bool HyGuiFrame::DeleteMetaImage(QDir metaDir)
     return true;
 }
 
-void HyGuiFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir)
+void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir)
 {
     DeleteMetaImage(metaDir);
 
@@ -303,13 +303,13 @@ void HyGuiFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
         HyGuiLog("Could not save frame image to meta directory: " % m_sName, LOGTYPE_Error);
 }
 
-QDataStream &operator<<(QDataStream &out, HyGuiFrame *const &rhs)
+QDataStream &operator<<(QDataStream &out, AtlasFrame *const &rhs)
 {
     out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
     return out;
 }
 
-QDataStream &operator>>(QDataStream &in, HyGuiFrame *rhs)
+QDataStream &operator>>(QDataStream &in, AtlasFrame *rhs)
 {
     in.readRawData(reinterpret_cast<char *>(rhs), sizeof(rhs));
     return in;

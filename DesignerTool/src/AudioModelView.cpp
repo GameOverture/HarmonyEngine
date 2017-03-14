@@ -18,50 +18,50 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetAudioBankTableView::WidgetAudioBankTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
+AudioBankTableView::AudioBankTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
 {
 }
 
-/*virtual*/ void WidgetAudioBankTableView::resizeEvent(QResizeEvent *pResizeEvent)
+/*virtual*/ void AudioBankTableView::resizeEvent(QResizeEvent *pResizeEvent)
 {
     int iWidth = pResizeEvent->size().width();
     
-    setColumnWidth(WidgetAudioBankModel::COLUMN_Name, iWidth / 2);
-    setColumnWidth(WidgetAudioBankModel::COLUMN_Info, iWidth / 2);
+    setColumnWidth(AudioBankTableModel::COLUMN_Name, iWidth / 2);
+    setColumnWidth(AudioBankTableModel::COLUMN_Info, iWidth / 2);
 
     QTableView::resizeEvent(pResizeEvent);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetAudioBankModel::WidgetAudioBankModel(QObject *pParent) :  QAbstractTableModel(pParent),
+AudioBankTableModel::AudioBankTableModel(QObject *pParent) :  QAbstractTableModel(pParent),
                                                                 m_sName("Unnamed")
 {
 }
 
-QString WidgetAudioBankModel::GetName()
+QString AudioBankTableModel::GetName()
 {
     return m_sName;
 }
 
-void WidgetAudioBankModel::SetName(QString sName)
+void AudioBankTableModel::SetName(QString sName)
 {
     m_sName = sName;
 }
 
-void WidgetAudioBankModel::AddWave(HyGuiWave *pNewWave)
+void AudioBankTableModel::AddWave(AudioWave *pNewWave)
 {
     beginInsertRows(QModelIndex(), m_WaveList.count(), m_WaveList.count());
     m_WaveList.append(pNewWave);
     endInsertRows();
 }
 
-HyGuiWave *WidgetAudioBankModel::GetWaveAt(int iIndex)
+AudioWave *AudioBankTableModel::GetWaveAt(int iIndex)
 {
     return m_WaveList[iIndex];
 }
 
-void WidgetAudioBankModel::GetJsonObj(QJsonObject &audioBankObj)
+void AudioBankTableModel::GetJsonObj(QJsonObject &audioBankObj)
 {
     audioBankObj.insert("name", QJsonValue(m_sName));
 
@@ -75,19 +75,19 @@ void WidgetAudioBankModel::GetJsonObj(QJsonObject &audioBankObj)
     audioBankObj.insert("waves", waveArray);
 }
 
-/*virtual*/ int WidgetAudioBankModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
+/*virtual*/ int AudioBankTableModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
     return m_WaveList.size();
 }
 
-/*virtual*/ int WidgetAudioBankModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
+/*virtual*/ int AudioBankTableModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
     return NUM_COLUMNS;
 }
 
-/*virtual*/ QVariant WidgetAudioBankModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant AudioBankTableModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
 {
-    HyGuiWave *pWave = m_WaveList[index.row()];
+    AudioWave *pWave = m_WaveList[index.row()];
     
     if(role == Qt::DecorationRole && index.column() == COLUMN_Name)
         return pWave->GetIcon();
@@ -115,7 +115,7 @@ void WidgetAudioBankModel::GetJsonObj(QJsonObject &audioBankObj)
     return QVariant();
 }
 
-/*virtual*/ QVariant WidgetAudioBankModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant AudioBankTableModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
 {
     if (role == Qt::DisplayRole)
     {
@@ -134,12 +134,12 @@ void WidgetAudioBankModel::GetJsonObj(QJsonObject &audioBankObj)
     return QVariant();
 }
 
-/*virtual*/ bool WidgetAudioBankModel::setData(const QModelIndex & index, const QVariant & value, int role /*= Qt::EditRole*/)
+/*virtual*/ bool AudioBankTableModel::setData(const QModelIndex & index, const QVariant & value, int role /*= Qt::EditRole*/)
 {
     return true;
 }
 
-/*virtual*/ Qt::ItemFlags WidgetAudioBankModel::flags(const QModelIndex & index) const
+/*virtual*/ Qt::ItemFlags AudioBankTableModel::flags(const QModelIndex & index) const
 {
     if(index.column() == COLUMN_Name)
         return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
@@ -149,35 +149,35 @@ void WidgetAudioBankModel::GetJsonObj(QJsonObject &audioBankObj)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetAudioManagerModel::WidgetAudioManagerModel(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
+AudioManagerStringListModel::AudioManagerStringListModel(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
                                                                                                 m_AudioBanksRef(atlasGroupsRef)
 { }
 
-/*virtual*/ QVariant WidgetAudioManagerModel::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant AudioManagerStringListModel::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
 {
     if(role == Qt::DisplayRole)
     {
         if(m_AudioBanksRef.count() == 0)
             return "";
         else
-            return static_cast<WidgetAudioBank *>(m_AudioBanksRef.widget(index.row()))->GetName();
+            return static_cast<AudioWidgetBank *>(m_AudioBanksRef.widget(index.row()))->GetName();
     }
     else
         return QStringListModel::data(index, role);
 }
 
-/*virtual*/ int	WidgetAudioManagerModel::rowCount(const QModelIndex & parent /*= QModelIndex()*/) const
+/*virtual*/ int	AudioManagerStringListModel::rowCount(const QModelIndex & parent /*= QModelIndex()*/) const
 {
     return m_AudioBanksRef.count();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetAudioCategoryDelegate::WidgetAudioCategoryDelegate(QObject *pParent /*= 0*/) :   QStyledItemDelegate(pParent)
+AudioCategoryDelegate::AudioCategoryDelegate(QObject *pParent /*= 0*/) :   QStyledItemDelegate(pParent)
 {
 }
 
-/*virtual*/ QWidget* WidgetAudioCategoryDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+/*virtual*/ QWidget* AudioCategoryDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     if(index.column() == 0)
     {
@@ -196,7 +196,7 @@ WidgetAudioCategoryDelegate::WidgetAudioCategoryDelegate(QObject *pParent /*= 0*
     QStyledItemDelegate::createEditor(pParent, option, index);
 }
 
-/*virtual*/ void WidgetAudioCategoryDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const
+/*virtual*/ void AudioCategoryDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const
 {
     if(index.column() == 0)
     {
@@ -206,7 +206,7 @@ WidgetAudioCategoryDelegate::WidgetAudioCategoryDelegate(QObject *pParent /*= 0*
         QStyledItemDelegate::setEditorData(pEditor, index);
 }
 
-/*virtual*/ void WidgetAudioCategoryDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
+/*virtual*/ void AudioCategoryDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
 {
     if(index.column() == 0)
         pModel->setData(index, static_cast<QLineEdit *>(pEditor)->text());
@@ -214,13 +214,13 @@ WidgetAudioCategoryDelegate::WidgetAudioCategoryDelegate(QObject *pParent /*= 0*
         QStyledItemDelegate::setModelData(pEditor, pModel, index);
 }
 
-/*virtual*/ void WidgetAudioCategoryDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+/*virtual*/ void AudioCategoryDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 }
 
 /////////////////////////////////////////////////
 
-WidgetAudioCategoryModel::WidgetAudioCategoryModel(QDir audioBankDir, QObject *pParent) :   QStringListModel(pParent),
+AudioCategoryStringListModel::AudioCategoryStringListModel(QDir audioBankDir, QObject *pParent) :   QStringListModel(pParent),
                                                                                             m_AudioBankDir(audioBankDir)
 {
     QJsonArray categoryArray;
@@ -260,7 +260,7 @@ WidgetAudioCategoryModel::WidgetAudioCategoryModel(QDir audioBankDir, QObject *p
         SaveData();
 }
 
-/*virtual*/ QVariant WidgetAudioCategoryModel::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant AudioCategoryStringListModel::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
 {
     if(role == Qt::DisplayRole && index.column() == 1)
     {
@@ -273,7 +273,7 @@ WidgetAudioCategoryModel::WidgetAudioCategoryModel(QDir audioBankDir, QObject *p
         return QStringListModel::data(index, role);
 }
 
-/*virtual*/ bool WidgetAudioCategoryModel::insertRows(int row, int count, const QModelIndex &parent /*= QModelIndex()*/)
+/*virtual*/ bool AudioCategoryStringListModel::insertRows(int row, int count, const QModelIndex &parent /*= QModelIndex()*/)
 {
     bool bReturnValue = QStringListModel::insertRows(row, count, parent);
     SaveData();
@@ -281,7 +281,7 @@ WidgetAudioCategoryModel::WidgetAudioCategoryModel(QDir audioBankDir, QObject *p
     return bReturnValue;
 }
 
-/*virtual*/ bool WidgetAudioCategoryModel::removeRows(int row, int count, const QModelIndex &parent /*= QModelIndex()*/)
+/*virtual*/ bool AudioCategoryStringListModel::removeRows(int row, int count, const QModelIndex &parent /*= QModelIndex()*/)
 {
     bool bReturnValue = false;
     if(row == 0)
@@ -299,7 +299,7 @@ WidgetAudioCategoryModel::WidgetAudioCategoryModel(QDir audioBankDir, QObject *p
     return bReturnValue;
 }
 
-/*virtual*/ bool WidgetAudioCategoryModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
+/*virtual*/ bool AudioCategoryStringListModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
 {
     if(index.row() == 0)
         return false;   // Don't allow changing of "Default"
@@ -310,7 +310,7 @@ WidgetAudioCategoryModel::WidgetAudioCategoryModel(QDir audioBankDir, QObject *p
     return bReturnValue;
 }
 
-void WidgetAudioCategoryModel::SaveData()
+void AudioCategoryStringListModel::SaveData()
 {
     QJsonDocument audioCategoryDoc;
 

@@ -16,7 +16,6 @@ CONFIG += no_keywords
 
 SOURCES += main.cpp \
     DlgNewProject.cpp \
-    WidgetExplorer.cpp \
     WidgetOutputLog.cpp \
     MainWindow.cpp \
     DlgNewItem.cpp \
@@ -59,13 +58,13 @@ SOURCES += main.cpp \
     AtlasFrame.cpp \
     AudioWave.cpp \
     HyGuiGlobal.cpp \
-    ProjectItem.cpp \
     AtlasesData.cpp \
-    AtlasesWidget.cpp
+    AtlasesWidget.cpp \
+    ExplorerItem.cpp \
+    ExplorerWidget.cpp
 
 HEADERS  += \
     DlgNewProject.h \
-    WidgetExplorer.h \
     WidgetOutputLog.h \
     MainWindow.h \
     DlgNewItem.h \
@@ -107,13 +106,13 @@ HEADERS  += \
     AtlasFrame.h \
     AudioWave.h \
     HyGuiGlobal.h \
-    ProjectItem.h \
     AtlasesData.h \
-    AtlasesWidget.h
+    AtlasesWidget.h \
+    ExplorerItem.h \
+    ExplorerWidget.h
 
 FORMS    += \
     DlgNewProject.ui \
-    WidgetExplorer.ui \
     WidgetOutputLog.ui \
     MainWindow.ui \
     DlgNewItem.ui \
@@ -134,7 +133,8 @@ FORMS    += \
     AudioWidgetBank.ui \
     AudioWidgetManager.ui \
     AtlasesWidget.ui \
-    AudioWidgetState.ui
+    AudioWidgetState.ui \
+    ExplorerWidget.ui
 
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER HY_PLATFORM_GUI
 

@@ -7,90 +7,90 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef ITEMFONTCMDS_H
-#define ITEMFONTCMDS_H
+#ifndef FONTUNDOCMDS_H
+#define FONTUNDOCMDS_H
 
 #include "FontModelView.h"
 
 #include <QUndoCommand>
 #include <QComboBox>
 
-class WidgetFont;
-class WidgetFontState;
+class FontWidget;
+class FontWidgetState;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetFontUndoCmd_AddLayer : public QUndoCommand
+class FontUndoCmd_AddLayer : public QUndoCommand
 {
-    WidgetFont &            m_WidgetFontRef;
+    FontWidget &            m_WidgetFontRef;
     QComboBox *             m_pCmbStates;
-    WidgetFontState *       m_pFontState;
+    FontWidgetState *       m_pFontState;
     rendermode_t            m_eRenderMode;
     float                   m_fSize;
     float                   m_fThickness;
     int                     m_iId;
 
 public:
-    WidgetFontUndoCmd_AddLayer(WidgetFont &widgetFont, QComboBox *pCmbStates, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent = 0);
-    virtual ~WidgetFontUndoCmd_AddLayer();
+    FontUndoCmd_AddLayer(FontWidget &widgetFont, QComboBox *pCmbStates, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent = 0);
+    virtual ~FontUndoCmd_AddLayer();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetFontUndoCmd_RemoveLayer : public QUndoCommand
+class FontUndoCmd_RemoveLayer : public QUndoCommand
 {
-    WidgetFont &            m_WidgetFontRef;
+    FontWidget &            m_WidgetFontRef;
     QComboBox *             m_pCmbStates;
-    WidgetFontState *       m_pFontState;
+    FontWidgetState *       m_pFontState;
     int                     m_iId;
 
 public:
-    WidgetFontUndoCmd_RemoveLayer(WidgetFont &widgetFont, QComboBox *pCmbStates, int iId, QUndoCommand *pParent = 0);
-    virtual ~WidgetFontUndoCmd_RemoveLayer();
+    FontUndoCmd_RemoveLayer(FontWidget &widgetFont, QComboBox *pCmbStates, int iId, QUndoCommand *pParent = 0);
+    virtual ~FontUndoCmd_RemoveLayer();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetFontUndoCmd_LayerRenderMode : public QUndoCommand
+class FontUndoCmd_LayerRenderMode : public QUndoCommand
 {
-    WidgetFont &        m_WidgetFontRef;
+    FontWidget &        m_WidgetFontRef;
     QComboBox *         m_pCmbStates;
-    WidgetFontState *   m_pFontState;
+    FontWidgetState *   m_pFontState;
     int                 m_iLayerId;
     rendermode_t        m_ePrevRenderMode;
     rendermode_t        m_eNewRenderMode;
 
 public:
-    WidgetFontUndoCmd_LayerRenderMode(WidgetFont &widgetFont, QComboBox *pCmbStates, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = 0);
-    virtual ~WidgetFontUndoCmd_LayerRenderMode();
+    FontUndoCmd_LayerRenderMode(FontWidget &widgetFont, QComboBox *pCmbStates, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = 0);
+    virtual ~FontUndoCmd_LayerRenderMode();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetFontUndoCmd_LayerOutlineThickness : public QUndoCommand
+class FontUndoCmd_LayerOutlineThickness : public QUndoCommand
 {
-    WidgetFont &        m_WidgetFontRef;
+    FontWidget &        m_WidgetFontRef;
     QComboBox *         m_pCmbStates;
-    WidgetFontState *   m_pFontState;
+    FontWidgetState *   m_pFontState;
     int                 m_iLayerId;
     float               m_fPrevThickness;
     float               m_fNewThickness;
 
 public:
-    WidgetFontUndoCmd_LayerOutlineThickness(WidgetFont &widgetFont, QComboBox *pCmbStates, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent = 0);
-    virtual ~WidgetFontUndoCmd_LayerOutlineThickness();
+    FontUndoCmd_LayerOutlineThickness(FontWidget &widgetFont, QComboBox *pCmbStates, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent = 0);
+    virtual ~FontUndoCmd_LayerOutlineThickness();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetFontUndoCmd_LayerColors : public QUndoCommand
+class FontUndoCmd_LayerColors : public QUndoCommand
 {
-    WidgetFont &        m_WidgetFontRef;
+    FontWidget &        m_WidgetFontRef;
     QComboBox *         m_pCmbStates;
-    WidgetFontState *   m_pFontState;
+    FontWidgetState *   m_pFontState;
     int                 m_iLayerId;
     QColor              m_PrevTopColor;
     QColor              m_PrevBotColor;
@@ -98,28 +98,28 @@ class WidgetFontUndoCmd_LayerColors : public QUndoCommand
     QColor              m_NewBotColor;
 
 public:
-    WidgetFontUndoCmd_LayerColors(WidgetFont &widgetFont, QComboBox *pCmbStates, int iLayerId, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent = 0);
-    virtual ~WidgetFontUndoCmd_LayerColors();
+    FontUndoCmd_LayerColors(FontWidget &widgetFont, QComboBox *pCmbStates, int iLayerId, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent = 0);
+    virtual ~FontUndoCmd_LayerColors();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetFontUndoCmd_LayerOrder : public QUndoCommand
+class FontUndoCmd_LayerOrder : public QUndoCommand
 {
-    WidgetFont &                m_WidgetFontRef;
+    FontWidget &                m_WidgetFontRef;
     QComboBox *                 m_pCmbStates;
-    WidgetFontState *           m_pFontState;
-    WidgetFontTableView *       m_pFontTableView;
+    FontWidgetState *           m_pFontState;
+    FontTableView *       m_pFontTableView;
     int                         m_iPrevRowIndex;
     int                         m_iNewRowIndex;
 
 public:
-    WidgetFontUndoCmd_LayerOrder(WidgetFont &widgetFont, QComboBox *pCmbStates, WidgetFontTableView *pFontTableView, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent = 0);
-    virtual ~WidgetFontUndoCmd_LayerOrder();
+    FontUndoCmd_LayerOrder(FontWidget &widgetFont, QComboBox *pCmbStates, FontTableView *pFontTableView, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent = 0);
+    virtual ~FontUndoCmd_LayerOrder();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 
-#endif // ITEMFONTCMDS_H
+#endif // FONTUNDOCMDS_H

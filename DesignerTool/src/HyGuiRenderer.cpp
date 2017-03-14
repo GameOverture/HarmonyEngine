@@ -35,7 +35,7 @@ HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent),
     HyGuiLog("Wrong ctor HyGuiRenderer()", LOGTYPE_Error);
 }
 
-HyGuiRenderer::HyGuiRenderer(ItemProject *pProj, QWidget *parent /*= 0*/) : QOpenGLWidget(parent),
+HyGuiRenderer::HyGuiRenderer(Project *pProj, QWidget *parent /*= 0*/) : QOpenGLWidget(parent),
                                                                             m_pProjOwner(pProj),
                                                                             m_pHyEngine(NULL),
                                                                             m_bIsUpdating(false)

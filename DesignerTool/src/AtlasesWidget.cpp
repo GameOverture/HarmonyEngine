@@ -11,7 +11,7 @@
 #include "ui_WidgetAtlasManager.h"
 #include "HyGuiGlobal.h"
 #include "SpriteWidget.h"
-#include "ProjectItem.h"
+#include "ExplorerItem.h"
 
 #include <QFileDialog>
 #include <QJsonDocument>
@@ -51,14 +51,14 @@ struct PreviewRow
     }
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-WidgetAtlasGroupTreeWidget::WidgetAtlasGroupTreeWidget(QWidget *parent /*= Q_NULLPTR*/) : QTreeWidget(parent)
+AtlasesTreeWidget::AtlasesTreeWidget(QWidget *parent /*= Q_NULLPTR*/) : QTreeWidget(parent)
 {
 }
-void WidgetAtlasGroupTreeWidget::SetOwner(WidgetAtlasManager *pOwner)
+void AtlasesTreeWidget::SetOwner(AtlasesWidget *pOwner)
 {
     m_pOwner = pOwner;
 }
-/*virtual*/ void WidgetAtlasGroupTreeWidget::dropEvent(QDropEvent *e)
+/*virtual*/ void AtlasesTreeWidget::dropEvent(QDropEvent *e)
 {
     QTreeWidget::dropEvent(e);
 
@@ -80,9 +80,9 @@ bool AtlasTreeItem::operator<(const QTreeWidgetItem &rhs) const
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetAtlasManager::WidgetAtlasManager(QWidget *parent) :   QWidget(parent),
+AtlasesWidget::AtlasesWidget(QWidget *parent) :   QWidget(parent),
                                                             m_pDataRef(nullptr),
-                                                            ui(new Ui::WidgetAtlasManager)
+                                                            ui(new Ui::AtlasesWidget)
 {
     ui->setupUi(this);
     
@@ -90,8 +90,8 @@ WidgetAtlasManager::WidgetAtlasManager(QWidget *parent) :   QWidget(parent),
     HyGuiLog("WidgetAtlasManager::WidgetAtlasManager() invalid constructor used", LOGTYPE_Error);
 }
 
-WidgetAtlasManager::WidgetAtlasManager(ItemAtlases &itemDataRef, QWidget *parent /*= 0*/) :  QWidget(parent),
-                                                                                             ui(new Ui::WidgetAtlasManager),
+AtlasesWidget::AtlasesWidget(AtlasesData &itemDataRef, QWidget *parent /*= 0*/) :  QWidget(parent),
+                                                                                             ui(new Ui::AtlasesWidget),
                                                                                              m_pDataRef(&itemDataRef),
                                                                                              m_pMouseHoverItem(NULL)
 {
@@ -127,22 +127,22 @@ WidgetAtlasManager::WidgetAtlasManager(ItemAtlases &itemDataRef, QWidget *parent
     ui->atlasList->collapseAll();
 }
 
-WidgetAtlasManager::~WidgetAtlasManager()
+AtlasesWidget::~AtlasesWidget()
 {
     delete ui;
 }
 
-ItemAtlases &WidgetAtlasManager::GetData()
+AtlasesData &AtlasesWidget::GetData()
 {
     return *m_pDataRef;
 }
 
-QTreeWidget *WidgetAtlasManager::GetFramesTreeWidget()
+QTreeWidget *AtlasesWidget::GetFramesTreeWidget()
 {
     return ui->atlasList;
 }
 
-/*friend*/ void AtlasManager_DrawOpen(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
+/*friend*/ void AtlasManager_DrawOpen(IHyApplication &hyApp, AtlasesWidget &atlasMan)
 {
 //    for(int i = 0; i < atlasMan.m_FrameList.size(); ++i)
 //    {
@@ -155,11 +155,11 @@ QTreeWidget *WidgetAtlasManager::GetFramesTreeWidget()
 //    }
 }
 
-/*friend*/ void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
+/*friend*/ void AtlasManager_DrawShow(IHyApplication &hyApp, AtlasesWidget &atlasMan)
 {
 }
 
-/*friend*/ void AtlasManager_DrawHide(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
+/*friend*/ void AtlasManager_DrawHide(IHyApplication &hyApp, AtlasesWidget &atlasMan)
 {
 //    for(int i = 0; i < atlasMan.ui->atlasGroups->count(); ++i)
 //    {
@@ -171,7 +171,7 @@ QTreeWidget *WidgetAtlasManager::GetFramesTreeWidget()
 //    }
 }
 
-/*friend*/ void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan)
+/*friend*/ void AtlasManager_DrawUpdate(IHyApplication &hyApp, AtlasesWidget &atlasMan)
 {
 //    WidgetAtlasGroup &atlasGrp = *static_cast<WidgetAtlasGroup *>(atlasMan.ui->atlasGroups->currentWidget());
     
@@ -311,18 +311,18 @@ QTreeWidget *WidgetAtlasManager::GetFramesTreeWidget()
         //pProj->m_pCamera->pos.Animate(iFrameCount * 12, iFrameCount * 12, 1.0f, HyEase::quadInOut);
 }
 
-void WidgetAtlasManager::PreviewAtlasGroup()
+void AtlasesWidget::PreviewAtlasGroup()
 {
     //m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_AtlasManager);
 }
 
-void WidgetAtlasManager::HideAtlasGroup()
+void AtlasesWidget::HideAtlasGroup()
 {
     //m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_Nothing);
 }
 
 
-void WidgetAtlasManager::on_btnAddImages_clicked()
+void AtlasesWidget::on_btnAddImages_clicked()
 {
     QFileDialog dlg(this);
     dlg.setFileMode(QFileDialog::ExistingFile);
@@ -341,7 +341,7 @@ void WidgetAtlasManager::on_btnAddImages_clicked()
         m_pDataRef->Repack(QSet<int>(), m_pDataRef->ImportImages(sImportImgList));
 }
 
-void WidgetAtlasManager::on_btnAddDir_clicked()
+void AtlasesWidget::on_btnAddDir_clicked()
 {
     QFileDialog dlg(this);
     dlg.setFileMode(QFileDialog::Directory);
@@ -365,7 +365,7 @@ void WidgetAtlasManager::on_btnAddDir_clicked()
         m_pDataRef->Repack(QSet<int>(), m_pDataRef->ImportImages(sImportImgList));
 }
 
-void WidgetAtlasManager::on_btnSettings_clicked()
+void AtlasesWidget::on_btnSettings_clicked()
 {
     DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(m_pDataRef->GetPackerSettings());
     if(pDlg->GetName().isEmpty())
@@ -385,19 +385,19 @@ void WidgetAtlasManager::on_btnSettings_clicked()
         pDlg->DataToWidgets();  // Reverts changes made
 }
 
-void WidgetAtlasManager::on_actionDeleteImages_triggered()
+void AtlasesWidget::on_actionDeleteImages_triggered()
 {
     QSet<int> affectedTextureIndexSet;
 
     QList<QTreeWidgetItem *> selectedImageList = ui->atlasList->selectedItems();
     for(int i = 0; i < selectedImageList.count(); ++i)
     {
-        HyGuiFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<HyGuiFrame *>();
-        QSet<ItemWidget *> sLinks = pFrame->GetLinks();
+        AtlasFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
+        QSet<IData *> sLinks = pFrame->GetLinks();
         if(sLinks.empty() == false)
         {
             QString sMessage = "'" % pFrame->GetName() % "' image cannot be deleted because it is in use by the following items: \n\n";
-            for(QSet<ItemWidget *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+            for(QSet<IData *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
                 sMessage.append(HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem((*LinksIter)->GetType())) % "/" % (*LinksIter)->GetName(true) % "\n");
 
             HyGuiLog(sMessage, LOGTYPE_Warning);
@@ -410,19 +410,19 @@ void WidgetAtlasManager::on_actionDeleteImages_triggered()
         delete selectedImageList[i];
     }
 
-    m_pDataRef->Repack(affectedTextureIndexSet, QSet<HyGuiFrame *>());
+    m_pDataRef->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
 }
 
-void WidgetAtlasManager::on_actionReplaceImages_triggered()
+void AtlasesWidget::on_actionReplaceImages_triggered()
 {
     QSet<int> affectedTextureIndexSet;
 
     QList<QTreeWidgetItem *> atlasSelectedImageList = ui->atlasList->selectedItems();
 
     // Store a list of the frames, since 'atlasSelectedImageList' will become invalid within Refresh()
-    QList<HyGuiFrame *> selectedImageList;
+    QList<AtlasFrame *> selectedImageList;
     for(int i = 0; i < atlasSelectedImageList.count(); ++i)
-        selectedImageList.append(atlasSelectedImageList[i]->data(0, Qt::UserRole).value<HyGuiFrame *>());
+        selectedImageList.append(atlasSelectedImageList[i]->data(0, Qt::UserRole).value<AtlasFrame *>());
 
     QFileDialog dlg(this);
 
@@ -467,17 +467,17 @@ void WidgetAtlasManager::on_actionReplaceImages_triggered()
         m_pDataRef->ReplaceFrame(selectedImageList[i], fileInfo.fileName(), newImage, false);
     }
 
-    m_pDataRef->Repack(affectedTextureIndexSet, QSet<HyGuiFrame *>());
+    m_pDataRef->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
 
     for(int i = 0; i < selectedImageList.count(); ++i)
     {
-        QSet<ItemWidget *> sLinks = selectedImageList[i]->GetLinks();
-        for(QSet<ItemWidget *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+        QSet<IData *> sLinks = selectedImageList[i]->GetLinks();
+        for(QSet<IData *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
             (*LinksIter)->Relink(selectedImageList[i]);
     }
 }
 
-void WidgetAtlasManager::on_actionAddFilter_triggered()
+void AtlasesWidget::on_actionAddFilter_triggered()
 {
     AtlasTreeItem *pNewTreeItem = new AtlasTreeItem(ui->atlasList);
 
@@ -500,7 +500,7 @@ void WidgetAtlasManager::on_actionAddFilter_triggered()
     m_pDataRef->WriteMetaSettings();
 }
 
-/*virtual*/ void WidgetAtlasManager::resizeEvent(QResizeEvent *event)
+/*virtual*/ void AtlasesWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
 
@@ -511,7 +511,7 @@ void WidgetAtlasManager::on_actionAddFilter_triggered()
     ui->atlasList->setColumnWidth(0, iTotalWidth - 60);
 }
 
-void WidgetAtlasManager::on_atlasList_itemSelectionChanged()
+void AtlasesWidget::on_atlasList_itemSelectionChanged()
 {
     int iNumSelected = ui->atlasList->selectedItems().count();
 

@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "WidgetExplorer.h"
+#include "ExplorerWidget.h"
 #include "ui_WidgetExplorer.h"
 
 #include "MainWindow.h"
@@ -18,8 +18,8 @@
 #include "AtlasesWidget.h"
 #include "HyGuiGlobal.h"
 
-WidgetExplorer::WidgetExplorer(QWidget *parent) :   QWidget(parent),
-                                                    ui(new Ui::WidgetExplorer)
+ExplorerWidget::ExplorerWidget(QWidget *parent) :   QWidget(parent),
+                                                    ui(new Ui::ExplorerWidget)
 {
     ui->setupUi(this);
 
@@ -32,12 +32,12 @@ WidgetExplorer::WidgetExplorer(QWidget *parent) :   QWidget(parent),
     connect(ui->treeWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 }
 
-WidgetExplorer::~WidgetExplorer()
+ExplorerWidget::~ExplorerWidget()
 {
     delete ui;
 }
 
-void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
+void ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
 {
     //m_LoadProjectThread
     //QThread *pNewThread = new QThread();
@@ -69,23 +69,23 @@ void WidgetExplorer::AddItemProject(const QString sNewProjectFilePath)
 
 
     MainWindow::StartLoading(MDI_Explorer);
-    WidgetExplorerLoadThread *pNewLoadThread = new WidgetExplorerLoadThread(sNewProjectFilePath, this);
-    connect(pNewLoadThread, &WidgetExplorerLoadThread::LoadFinished, this, &WidgetExplorer::OnProjectLoaded);
-    connect(pNewLoadThread, &WidgetExplorerLoadThread::finished, pNewLoadThread, &QObject::deleteLater);
+    ExplorerLoadThread *pNewLoadThread = new ExplorerLoadThread(sNewProjectFilePath, this);
+    connect(pNewLoadThread, &ExplorerLoadThread::LoadFinished, this, &ExplorerWidget::OnProjectLoaded);
+    connect(pNewLoadThread, &ExplorerLoadThread::finished, pNewLoadThread, &QObject::deleteLater);
     pNewLoadThread->start();
 }
 
-void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd)
+void ExplorerWidget::AddItem(eItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd)
 {
     // Find the proper project tree item
-    ItemProject *pCurProj = GetCurProjSelected();
+    Project *pCurProj = GetCurProjSelected();
     if(pCurProj == nullptr)
     {
         HyGuiLog("Could not find associated project for item: " % sPrefix % "/" % sName, LOGTYPE_Error);
         return;
     }
     
-    Item *pItem;
+    ExplorerItem *pItem;
     switch(eNewItemType)
     {
     case ITEM_Project:
@@ -100,13 +100,13 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sPrefix, cons
         HyGuiLog("Do not use WidgetExplorer::AddItem for Sub dirs or prefixes", LOGTYPE_Error);
         return;
     case ITEM_Audio:
-        pItem = new ItemAudio(pCurProj, sPrefix, sName, QJsonValue());
+        pItem = new AudioData(pCurProj, sPrefix, sName, QJsonValue());
         break;
     case ITEM_Sprite:
-        pItem = new ItemSprite(pCurProj, sPrefix, sName, QJsonValue());
+        pItem = new SpriteData(pCurProj, sPrefix, sName, QJsonValue());
         break;
     case ITEM_Font:
-        pItem = new ItemFont(pCurProj, sPrefix, sName, QJsonValue());
+        pItem = new FontData(pCurProj, sPrefix, sName, QJsonValue());
         break;
     default:
         HyGuiLog("Item: " % sPrefix % "/" % sName % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
@@ -145,9 +145,9 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sPrefix, cons
             {
                 // Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
                 //
-                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<Item *>()->GetName(true) % sPathSplitList[i];
+                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>()->GetName(true) % sPathSplitList[i];
                 
-                Item *pPrefixItem = new Item(ITEM_Prefix, sPath);
+                ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sPath);
                 QTreeWidgetItem *pPrefixTreeItem = pPrefixItem->GetTreeItem();
 
                 pParentTreeItem->addChild(pPrefixTreeItem);
@@ -178,11 +178,11 @@ void WidgetExplorer::AddItem(eItemType eNewItemType, const QString sPrefix, cons
             pExpandItem = pExpandItem->parent();
         }
         
-        MainWindow::OpenItem(static_cast<ItemWidget *>(pItem));
+        MainWindow::OpenItem(static_cast<IData *>(pItem));
     }
 }
 
-void WidgetExplorer::RemoveItem(Item *pItem)
+void ExplorerWidget::RemoveItem(ExplorerItem *pItem)
 {
     if(pItem == NULL)
         return;
@@ -190,14 +190,14 @@ void WidgetExplorer::RemoveItem(Item *pItem)
     for(int i = 0; i < pItem->GetTreeItem()->childCount(); ++i)
     {
         QVariant v = pItem->GetTreeItem()->child(i)->data(0, Qt::UserRole);
-        RemoveItem(v.value<Item *>());
+        RemoveItem(v.value<ExplorerItem *>());
     }
     
     // Children are taken care of at this point, now remove self
     delete pItem;
 }
 
-void WidgetExplorer::SelectItem(Item *pItem)
+void ExplorerWidget::SelectItem(ExplorerItem *pItem)
 {
     for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
     {
@@ -212,11 +212,11 @@ void WidgetExplorer::SelectItem(Item *pItem)
     pItem->GetTreeItem()->setSelected(true);
 }
 
-void WidgetExplorer::ProcessItem(Item *pItem)
+void ExplorerWidget::ProcessItem(ExplorerItem *pItem)
 {
 }
 
-QTreeWidgetItem *WidgetExplorer::GetSelectedTreeItem()
+QTreeWidgetItem *ExplorerWidget::GetSelectedTreeItem()
 {
     QTreeWidgetItem *pCurSelected = NULL;
     if(ui->treeWidget->selectedItems().empty() == false)
@@ -225,15 +225,15 @@ QTreeWidgetItem *WidgetExplorer::GetSelectedTreeItem()
     return pCurSelected;
 }
 
-QStringList WidgetExplorer::GetOpenProjectPaths()
+QStringList ExplorerWidget::GetOpenProjectPaths()
 {
     QStringList sListOpenProjs;
     sListOpenProjs.clear();
     
     for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
     {
-        Item *pItem = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<Item *>();
-        ItemProject *pItemProject = static_cast<ItemProject *>(pItem);
+        ExplorerItem *pItem = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<ExplorerItem *>();
+        Project *pItemProject = static_cast<Project *>(pItem);
         sListOpenProjs.append(pItemProject->GetAbsPath());
 
         pItemProject->SaveUserData();
@@ -242,7 +242,7 @@ QStringList WidgetExplorer::GetOpenProjectPaths()
     return sListOpenProjs;
 }
 
-ItemProject *WidgetExplorer::GetCurProjSelected()
+Project *ExplorerWidget::GetCurProjSelected()
 {
     QTreeWidgetItem *pCurProjItem = GetSelectedTreeItem();
     if(pCurProjItem == NULL)
@@ -252,31 +252,31 @@ ItemProject *WidgetExplorer::GetCurProjSelected()
         pCurProjItem = pCurProjItem->parent();
     
     QVariant v = pCurProjItem->data(0, Qt::UserRole);
-    Item *pItem = v.value<Item *>();
+    ExplorerItem *pItem = v.value<ExplorerItem *>();
 
     if(pItem->GetType() != ITEM_Project)
         HyGuiLog("WidgetExplorer::GetCurProjSelected() returned a non project item", LOGTYPE_Error);
 
-    return reinterpret_cast<ItemProject *>(pItem);
+    return reinterpret_cast<Project *>(pItem);
 }
 
-Item *WidgetExplorer::GetCurItemSelected()
+ExplorerItem *ExplorerWidget::GetCurItemSelected()
 {
     QTreeWidgetItem *pCurItem = GetSelectedTreeItem();
     if(pCurItem == NULL)
         return NULL;
     
     QVariant v = pCurItem->data(0, Qt::UserRole);
-    return v.value<Item *>();
+    return v.value<ExplorerItem *>();
 }
 
-Item *WidgetExplorer::GetCurDirSelected(bool bIncludePrefixDirs)
+ExplorerItem *ExplorerWidget::GetCurDirSelected(bool bIncludePrefixDirs)
 {
     QTreeWidgetItem *pCurTreeItem = GetSelectedTreeItem();
     if(pCurTreeItem == NULL)
         return NULL;
     
-    Item *pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<Item *>();
+    ExplorerItem *pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
     while(pCurItem->GetType() != ITEM_DirAudio &&
           pCurItem->GetType() != ITEM_DirParticles &&
           pCurItem->GetType() != ITEM_DirFonts &&
@@ -290,7 +290,7 @@ Item *WidgetExplorer::GetCurDirSelected(bool bIncludePrefixDirs)
         if(pCurTreeItem == NULL)
             return NULL;
         
-        pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<Item *>();
+        pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
     }
     
     return pCurItem;
@@ -312,7 +312,7 @@ Item *WidgetExplorer::GetCurDirSelected(bool bIncludePrefixDirs)
 //    return NULL;
 //}
 
-void WidgetExplorer::OnProjectLoaded(ItemProject *pLoadedProj)
+void ExplorerWidget::OnProjectLoaded(Project *pLoadedProj)
 {
     pLoadedProj->moveToThread(QApplication::instance()->thread());
 
@@ -333,7 +333,7 @@ void WidgetExplorer::OnProjectLoaded(ItemProject *pLoadedProj)
     MainWindow::StopLoading(MDI_Explorer);
 }
 
-void WidgetExplorer::OnContextMenu(const QPoint &pos)
+void ExplorerWidget::OnContextMenu(const QPoint &pos)
 {
     QPoint globalPos = ui->treeWidget->mapToGlobal(pos);
     QTreeWidgetItem *pTreeNode = ui->treeWidget->itemAt(pos);
@@ -367,12 +367,12 @@ void WidgetExplorer::OnContextMenu(const QPoint &pos)
     }
 }
 
-void WidgetExplorer::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
+void ExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     // setCurrentItem() required if this function is manually invoked. E.g. AddItem()
     ui->treeWidget->setCurrentItem(item);
     
-    Item *pTreeVariantItem = item->data(0, Qt::UserRole).value<Item *>();
+    ExplorerItem *pTreeVariantItem = item->data(0, Qt::UserRole).value<ExplorerItem *>();
     
     switch(pTreeVariantItem->GetType())
     {
@@ -395,12 +395,12 @@ void WidgetExplorer::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int 
     case ITEM_Sprite:
     case ITEM_Shader:
     case ITEM_Entity:
-        MainWindow::OpenItem(static_cast<ItemWidget *>(pTreeVariantItem));
+        MainWindow::OpenItem(static_cast<IData *>(pTreeVariantItem));
         break;
     }
 }
 
-void WidgetExplorer::on_treeWidget_itemSelectionChanged()
+void ExplorerWidget::on_treeWidget_itemSelectionChanged()
 {
     QTreeWidgetItem *pCurSelected = GetSelectedTreeItem();
     
@@ -418,7 +418,7 @@ void WidgetExplorer::on_treeWidget_itemSelectionChanged()
     {
         bValidItem = false;
         
-        Item *pItemDir = GetCurDirSelected(false);
+        ExplorerItem *pItemDir = GetCurDirSelected(false);
         bValidItem = pItemDir->GetType() == ITEM_DirSprites || pItemDir->GetType() == ITEM_DirFonts;
 
         MainWindow::SetSelectedProj(GetCurProjSelected());

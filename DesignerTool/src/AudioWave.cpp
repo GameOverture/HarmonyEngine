@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "AudioWave.h"
 
-HyGuiWave::HyGuiWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint uiErrors) :  m_uiWAVE_BANK_ID(uiWaveBankId),
+AudioWave::AudioWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint uiErrors) :  m_uiWAVE_BANK_ID(uiWaveBankId),
                                                                                                                                                                                         m_uiChecksum(uiChecksum),
                                                                                                                                                                                         m_sName(sName),
                                                                                                                                                                                         m_uiFormatType(uiFormatType),
@@ -20,21 +20,21 @@ HyGuiWave::HyGuiWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint1
 {
 }
 
-HyGuiWave::~HyGuiWave()
+AudioWave::~AudioWave()
 {
 }
 
-quint32 HyGuiWave::GetChecksum()
+quint32 AudioWave::GetChecksum()
 {
     return m_uiChecksum;
 }
 
-QString HyGuiWave::GetName()
+QString AudioWave::GetName()
 {
     return m_sName;
 }
 
-QIcon HyGuiWave::GetIcon()
+QIcon AudioWave::GetIcon()
 {
     if(m_uiErrors == 0)
         return HyGlobal::AudioIcon(AUDIO_Wave);
@@ -42,7 +42,7 @@ QIcon HyGuiWave::GetIcon()
         return HyGlobal::AudioIcon(AUDIO_Wave_Warning);
 }
 
-QString HyGuiWave::ConstructWaveFileName()
+QString AudioWave::ConstructWaveFileName()
 {
     QString sMetaImgName;
     sMetaImgName = sMetaImgName.sprintf("%010u-%s", m_uiChecksum, m_sName.toStdString().c_str());
@@ -51,12 +51,12 @@ QString HyGuiWave::ConstructWaveFileName()
     return sMetaImgName;
 }
 
-uint32 HyGuiWave::GetDataSize()
+uint32 AudioWave::GetDataSize()
 {
     return m_uiDataSize;
 }
 
-QString HyGuiWave::GetDescription()
+QString AudioWave::GetDescription()
 {
     QString sDesc;
     sDesc = QString::number(m_uiBitsPerSample) % "-bit ";
@@ -84,12 +84,12 @@ QString HyGuiWave::GetDescription()
     return sDesc;
 }
 
-QString HyGuiWave::GetSizeDescription()
+QString AudioWave::GetSizeDescription()
 {
     return m_sName % " - " % QString::number(m_uiDataSize) % "bytes";
 }
 
-void HyGuiWave::GetJsonObj(QJsonObject &waveObj)
+void AudioWave::GetJsonObj(QJsonObject &waveObj)
 {
     waveObj.insert("checksum", QJsonValue(static_cast<qint64>(m_uiChecksum)));
     waveObj.insert("name", m_sName);
@@ -101,7 +101,7 @@ void HyGuiWave::GetJsonObj(QJsonObject &waveObj)
     waveObj.insert("errors", QJsonValue(static_cast<int>(m_uiErrors)));
 }
 
-void HyGuiWave::SetError(eGuiFrameError eError)
+void AudioWave::SetError(eGuiFrameError eError)
 {
     m_uiErrors |= (1 << eError);
 
@@ -112,7 +112,7 @@ void HyGuiWave::SetError(eGuiFrameError eError)
 //    }
 }
 
-void HyGuiWave::ClearError(eGuiFrameError eError)
+void AudioWave::ClearError(eGuiFrameError eError)
 {
     m_uiErrors &= ~(1 << eError);
 
@@ -128,7 +128,7 @@ void HyGuiWave::ClearError(eGuiFrameError eError)
 //    }
 }
 
-uint HyGuiWave::GetErrors()
+uint AudioWave::GetErrors()
 {
     return m_uiErrors;
 }
@@ -236,7 +236,7 @@ const RIFFChunk *FindChunk(const uint8_t *pData, uint32 uiDataSize, uint32_t uiT
 
 //--------------------------------------------------------------------------------------
 
-/*static*/ bool HyGuiWave::ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksumOut, QString &sNameOut, uint16 &uiFormatTagOut, uint16 &uiNumChannelsOut, uint16 &uiBitsPerSampleOut, uint32 &uiSamplesPerSecOut)
+/*static*/ bool AudioWave::ParseWaveFile(QFileInfo waveFileInfo, quint32 &uiChecksumOut, QString &sNameOut, uint16 &uiFormatTagOut, uint16 &uiNumChannelsOut, uint16 &uiBitsPerSampleOut, uint32 &uiSamplesPerSecOut)
 {
     if(waveFileInfo.exists() == false)
     {

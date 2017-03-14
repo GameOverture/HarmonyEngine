@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETSPRITEMODELVIEW_H
-#define WIDGETSPRITEMODELVIEW_H
+#ifndef SPRITEMODELVIEW_H
+#define SPRITEMODELVIEW_H
 
 #include "AtlasFrame.h"
 
@@ -18,16 +18,16 @@
 #include <QTableView>
 #include <QStyledItemDelegate>
 
-class ItemSprite;
+class SpriteData;
 class SpriteFrame;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetSpriteTableView : public QTableView
+class SpriteTableView : public QTableView
 {
     Q_OBJECT
 
 public:
-    WidgetSpriteTableView(QWidget *pParent = 0);
+    SpriteTableView(QWidget *pParent = 0);
 
 protected:
     virtual void resizeEvent(QResizeEvent *pResizeEvent);
@@ -37,11 +37,11 @@ class WidgetSpriteDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
-    ItemSprite *                m_pItemSprite;
-    WidgetSpriteTableView *     m_pTableView;
+    SpriteData *                m_pItemSprite;
+    SpriteTableView *     m_pTableView;
 
 public:
-    WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSpriteTableView *pTableView, QObject *pParent = 0);
+    WidgetSpriteDelegate(SpriteData *pItemSprite, SpriteTableView *pTableView, QObject *pParent = 0);
 
     virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const;
@@ -49,7 +49,7 @@ public:
     virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetSpriteModel : public QAbstractTableModel
+class SpriteTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 
@@ -68,13 +68,13 @@ public:
         NUMCOLUMNS
     };
 
-    WidgetSpriteModel(QObject *pParent);
+    SpriteTableModel(QObject *pParent);
 
-    int Add(HyGuiFrame *pFrame);
-    void Remove(HyGuiFrame *pFrame);
+    int Add(AtlasFrame *pFrame);
+    void Remove(AtlasFrame *pFrame);
     void MoveRowUp(int iIndex);
     void MoveRowDown(int iIndex);
-    void RefreshFrame(HyGuiFrame *pFrame);
+    void RefreshFrame(AtlasFrame *pFrame);
     void OffsetFrame(int iIndex, QPoint vOffset);       // iIndex of -1 will apply to all
     void DurationFrame(int iIndex, float fDuration);    // iIndex of -1 will apply to all
 
@@ -91,4 +91,4 @@ Q_SIGNALS:
     void editCompleted(const QString &);
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#endif // WIDGETSPRITEMODELVIEW_H
+#endif // SPRITEMODELVIEW_H

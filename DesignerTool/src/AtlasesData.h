@@ -7,19 +7,19 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef ITEMATLASES_H
-#define ITEMATLASES_H
+#ifndef ATLASESDATA_H
+#define ATLASESDATA_H
 
 #include <QObject>
 
 #include "AtlasFrame.h"
 #include "scriptum/imagepacker.h"
 
-class ItemAtlases : public QObject
+class AtlasesData : public QObject
 {
     Q_OBJECT
 
-    ItemProject *                                   m_pProjOwner;
+    Project *                                   m_pProjOwner;
 
     QDir                                            m_MetaDir;
     QDir                                            m_DataDir;
@@ -27,13 +27,13 @@ class ItemAtlases : public QObject
     QJsonObject                                     m_PackerSettings;
     ImagePacker                                     m_Packer;
 
-    QList<HyGuiFrame *>                             m_FrameList;
+    QList<AtlasFrame *>                             m_FrameList;
     QList<AtlasTreeItem *>                          m_TopLevelAtlasTreeItemList;
-    QMap<quint32, HyGuiFrame *>                     m_DependencyMap;
+    QMap<quint32, AtlasFrame *>                     m_DependencyMap;
 
 public:
-    ItemAtlases(ItemProject *pProjOwner);
-    virtual ~ItemAtlases();
+    AtlasesData(Project *pProjOwner);
+    virtual ~AtlasesData();
 
     QJsonObject GetPackerSettings();
 
@@ -47,35 +47,35 @@ public:
     void WriteMetaSettings(QJsonArray frameArray);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    HyGuiFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors);
-    void RemoveFrame(HyGuiFrame *pFrame);
+    AtlasFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors);
+    void RemoveFrame(AtlasFrame *pFrame);
 
-    HyGuiFrame *GenerateFrame(ItemWidget *pItem, QString sName, QImage &newImage, eAtlasNodeType eType);
-    void ReplaceFrame(HyGuiFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
+    AtlasFrame *GenerateFrame(IData *pItem, QString sName, QImage &newImage, eAtlasNodeType eType);
+    void ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
 
-    QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem);
-    QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem, QList<HyGuiFrame *> requestList);
-    QList<HyGuiFrame *> RequestFrames(ItemWidget *pItem, QList<quint32> requestList);
+    QList<AtlasFrame *> RequestFrames(IData *pItem);
+    QList<AtlasFrame *> RequestFrames(IData *pItem, QList<AtlasFrame *> requestList);
+    QList<AtlasFrame *> RequestFrames(IData *pItem, QList<quint32> requestList);
 
-    void RelinquishFrames(ItemWidget *pItem, QList<HyGuiFrame *> relinquishList);
+    void RelinquishFrames(IData *pItem, QList<AtlasFrame *> relinquishList);
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    QSet<HyGuiFrame *> ImportImages(QStringList sImportImgList);
-    HyGuiFrame *ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType);
+    QSet<AtlasFrame *> ImportImages(QStringList sImportImgList);
+    AtlasFrame *ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType);
 
     void SaveData();
 
-    void SetDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
-    void RemoveDependency(HyGuiFrame *pFrame, ItemWidget *pItem);
+    void SetDependency(AtlasFrame *pFrame, IData *pItem);
+    void RemoveDependency(AtlasFrame *pFrame, IData *pItem);
 
     void GetAtlasInfoForGameData(QJsonObject &atlasObjOut);
 
     void SetPackerSettings();
 
     void RepackAll();
-    void Repack(QSet<int> repackTexIndicesSet, QSet<HyGuiFrame *> newFramesSet);
+    void Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet);
     void ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIndex);
     void Refresh();
 };
 
-#endif // ITEMATLASES_H
+#endif // ATLASESDATA_H

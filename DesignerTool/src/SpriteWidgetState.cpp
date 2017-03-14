@@ -19,9 +19,9 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stateActionList, QWidget *parent) : QWidget(parent),
+SpriteWidgetState::SpriteWidgetState(SpriteWidget *pOwner, QList<QAction *> stateActionList, QWidget *parent) : QWidget(parent),
                                                                                                                 m_pOwner(pOwner),
-                                                                                                                ui(new Ui::WidgetSpriteState),
+                                                                                                                ui(new Ui::SpriteWidgetState),
                                                                                                                 m_sName("Unnamed"),
                                                                                                                 m_bPlayActive(false),
                                                                                                                 m_fElapsedTime(0.0),
@@ -34,7 +34,7 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
     ui->btnOrderFrameUp->setDefaultAction(FindAction(stateActionList, "actionOrderFrameUpwards"));
     ui->btnOrderFrameDown->setDefaultAction(FindAction(stateActionList, "actionOrderFrameDownwards"));
 
-    m_pSpriteFramesModel = new WidgetSpriteModel(this);
+    m_pSpriteFramesModel = new SpriteTableModel(this);
 
     ui->framesView->setModel(m_pSpriteFramesModel);
     ui->framesView->resize(ui->framesView->size());
@@ -47,59 +47,59 @@ WidgetSpriteState::WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stat
     ui->btnLastFrame->setDefaultAction(ui->actionLastFrame);
 }
 
-WidgetSpriteState::~WidgetSpriteState()
+SpriteWidgetState::~SpriteWidgetState()
 {
     ui->framesView->blockSignals(true);
     delete ui;
 }
 
-QString WidgetSpriteState::GetName()
+QString SpriteWidgetState::GetName()
 {
     return m_sName;
 }
 
-void WidgetSpriteState::SetName(QString sNewName)
+void SpriteWidgetState::SetName(QString sNewName)
 {
     m_sName = sNewName;
 }
 
-void WidgetSpriteState::InsertFrame(HyGuiFrame *pFrame)
+void SpriteWidgetState::InsertFrame(AtlasFrame *pFrame)
 {
     int iRowIndex = m_pSpriteFramesModel->Add(pFrame);
     ui->framesView->selectRow(iRowIndex);
 }
 
-void WidgetSpriteState::RefreshFrame(HyGuiFrame *pFrame)
+void SpriteWidgetState::RefreshFrame(AtlasFrame *pFrame)
 {
     m_pSpriteFramesModel->RefreshFrame(pFrame);
 }
 
-void WidgetSpriteState::RemoveFrame(HyGuiFrame *pFrame)
+void SpriteWidgetState::RemoveFrame(AtlasFrame *pFrame)
 {
     m_pSpriteFramesModel->Remove(pFrame);
 }
 
-QCheckBox *WidgetSpriteState::GetChkBox_Reverse()
+QCheckBox *SpriteWidgetState::GetChkBox_Reverse()
 {
     return ui->chkReverse;
 }
 
-QCheckBox *WidgetSpriteState::GetChkBox_Looping()
+QCheckBox *SpriteWidgetState::GetChkBox_Looping()
 {
     return ui->chkLoop;
 }
 
-QCheckBox *WidgetSpriteState::GetChkBox_Bounce()
+QCheckBox *SpriteWidgetState::GetChkBox_Bounce()
 {
     return ui->chkBounce;
 }
 
-WidgetSpriteTableView *WidgetSpriteState::GetFrameView()
+SpriteTableView *SpriteWidgetState::GetFrameView()
 {
-    return static_cast<WidgetSpriteTableView *>(ui->framesView);
+    return static_cast<SpriteTableView *>(ui->framesView);
 }
 
-SpriteFrame *WidgetSpriteState::GetSelectedFrame()
+SpriteFrame *SpriteWidgetState::GetSelectedFrame()
 {
     if(m_pSpriteFramesModel->rowCount() == 0)
         return NULL;
@@ -108,23 +108,23 @@ SpriteFrame *WidgetSpriteState::GetSelectedFrame()
     return pSpriteFrame;
 }
 
-int WidgetSpriteState::GetSelectedIndex()
+int SpriteWidgetState::GetSelectedIndex()
 {
     return ui->framesView->currentIndex().row();
 }
 
-int WidgetSpriteState::GetNumFrames()
+int SpriteWidgetState::GetNumFrames()
 {
     return m_pSpriteFramesModel->rowCount();
 }
 
-void WidgetSpriteState::AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef)
+void SpriteWidgetState::AppendFramesToListRef(QList<AtlasFrame *> &drawInstListRef)
 {
     for(int i = 0; i < GetNumFrames(); ++i)
         drawInstListRef.append(m_pSpriteFramesModel->GetFrameAt(i)->m_pFrame);
 }
 
-void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
+void SpriteWidgetState::GetStateFrameInfo(QJsonObject &stateObjOut)
 {
     QJsonArray frameArray;
     float fTotalDuration = 0.0f;
@@ -151,7 +151,7 @@ void WidgetSpriteState::GetStateFrameInfo(QJsonObject &stateObjOut)
     stateObjOut.insert("frames", QJsonValue(frameArray));
 }
 
-void WidgetSpriteState::UpdateTimeStep()
+void SpriteWidgetState::UpdateTimeStep()
 {
     SpriteFrame *pFrame = GetSelectedFrame();
     
@@ -231,16 +231,16 @@ void WidgetSpriteState::UpdateTimeStep()
     }
 }
 
-void WidgetSpriteState::UpdateActions()
+void SpriteWidgetState::UpdateActions()
 {
 }
 
-void WidgetSpriteState::on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
+void SpriteWidgetState::on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
 {
     m_pOwner->UpdateActions();
 }
 
-void WidgetSpriteState::on_actionPlay_triggered()
+void SpriteWidgetState::on_actionPlay_triggered()
 {
     m_bPlayActive = !m_bPlayActive;
     
@@ -254,84 +254,84 @@ void WidgetSpriteState::on_actionPlay_triggered()
         ui->btnPlay->setIcon(QIcon(":/icons16x16/media-play.png"));
 }
 
-void WidgetSpriteState::on_btnHz10_clicked()
+void SpriteWidgetState::on_btnHz10_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetData();
+    SpriteData *pItemSprite = m_pOwner->GetData();
     
-    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 10.0f);
+    QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 10.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
-void WidgetSpriteState::on_btnHz20_clicked()
+void SpriteWidgetState::on_btnHz20_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetData();
+    SpriteData *pItemSprite = m_pOwner->GetData();
     
-    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 20.0f);
+    QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 20.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
-void WidgetSpriteState::on_btnHz30_clicked()
+void SpriteWidgetState::on_btnHz30_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetData();
+    SpriteData *pItemSprite = m_pOwner->GetData();
     
-    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 30.0f);
+    QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 30.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
-void WidgetSpriteState::on_btnHz40_clicked()
+void SpriteWidgetState::on_btnHz40_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetData();
+    SpriteData *pItemSprite = m_pOwner->GetData();
     
-    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 40.0f);
+    QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 40.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
-void WidgetSpriteState::on_btnHz50_clicked()
+void SpriteWidgetState::on_btnHz50_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetData();
+    SpriteData *pItemSprite = m_pOwner->GetData();
     
-    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 50.0f);
+    QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 50.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
-void WidgetSpriteState::on_btnHz60_clicked()
+void SpriteWidgetState::on_btnHz60_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetData();
+    SpriteData *pItemSprite = m_pOwner->GetData();
     
-    QUndoCommand *pCmd = new WidgetSpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 60.0f);
+    QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 60.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
-void WidgetSpriteState::on_actionFirstFrame_triggered()
+void SpriteWidgetState::on_actionFirstFrame_triggered()
 {
     ui->framesView->selectRow(0);
 }
 
-void WidgetSpriteState::on_actionLastFrame_triggered()
+void SpriteWidgetState::on_actionLastFrame_triggered()
 {
     ui->framesView->selectRow(GetNumFrames() - 1);
 }
 
-void WidgetSpriteState::on_chkReverse_clicked()
+void SpriteWidgetState::on_chkReverse_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetData();
+    SpriteData *pItemSprite = m_pOwner->GetData();
 
-    QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetSpriteState>(this, ui->chkReverse);
+    QUndoCommand *pCmd = new UndoCmd_CheckBox<SpriteWidgetState>(this, ui->chkReverse);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
-void WidgetSpriteState::on_chkLoop_clicked()
+void SpriteWidgetState::on_chkLoop_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetData();
+    SpriteData *pItemSprite = m_pOwner->GetData();
 
-    QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetSpriteState>(this, ui->chkLoop);
+    QUndoCommand *pCmd = new UndoCmd_CheckBox<SpriteWidgetState>(this, ui->chkLoop);
     pItemSprite->GetUndoStack()->push(pCmd);
 }
 
-void WidgetSpriteState::on_chkBounce_clicked()
+void SpriteWidgetState::on_chkBounce_clicked()
 {
-    ItemSprite *pItemSprite = m_pOwner->GetData();
+    SpriteData *pItemSprite = m_pOwner->GetData();
 
-    QUndoCommand *pCmd = new WidgetUndoCmd_CheckBox<WidgetSpriteState>(this, ui->chkBounce);
+    QUndoCommand *pCmd = new UndoCmd_CheckBox<SpriteWidgetState>(this, ui->chkBounce);
     pItemSprite->GetUndoStack()->push(pCmd);
 }

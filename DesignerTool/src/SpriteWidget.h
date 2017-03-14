@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETSPRITE_H
-#define WIDGETSPRITE_H
+#ifndef SPRITEWIDGET_H
+#define SPRITEWIDGET_H
 
 #include "SpriteWidgetState.h"
 #include "AtlasFrame.h"
@@ -18,38 +18,38 @@
 #include <QComboBox>
 
 namespace Ui {
-class WidgetSprite;
+class SpriteWidget;
 }
 
-class ItemSprite;
-class WidgetAtlasManager;
+class SpriteData;
+class AtlasesWidget;
 
-class WidgetSprite : public QWidget
+class SpriteWidget : public QWidget
 {
     Q_OBJECT
     
-    ItemSprite *            m_pItemSprite;
+    SpriteData *            m_pItemSprite;
 
     QList<QAction *>        m_StateActionsList;
-    WidgetSpriteState *     m_pCurSpriteState;
+    SpriteWidgetState *     m_pCurSpriteState;
 
 public:
-    explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
-    ~WidgetSprite();
+    explicit SpriteWidget(SpriteData *pItemSprite, QWidget *parent = 0);
+    ~SpriteWidget();
 
     void Load();  // This function exists because below cannot be placed in constructor due to RequestFrames() trying to access ItemSprite::m_pWidget (aka this) before variable is assigned
     
-    ItemSprite *GetData();
+    SpriteData *GetData();
     
     void OnGiveMenuActions(QMenu *pMenu);
 
     void GetSaveInfo(QJsonArray &spriteStateArrayRef);
     
-    WidgetSpriteState *GetCurSpriteState();
+    SpriteWidgetState *GetCurSpriteState();
 
-    void RefreshFrame(HyGuiFrame *pFrame);
+    void RefreshFrame(AtlasFrame *pFrame);
     
-    QList<HyGuiFrame *> GetAllDrawInsts();
+    QList<AtlasFrame *> GetAllDrawInsts();
     
     void UpdateActions();
     
@@ -87,7 +87,7 @@ private Q_SLOTS:
     void on_actionOrderFrameDownwards_triggered();
 
 private:
-    Ui::WidgetSprite *ui;
+    Ui::SpriteWidget *ui;
 };
 
-#endif // WIDGETSPRITE_H
+#endif // SPRITEWIDGET_H

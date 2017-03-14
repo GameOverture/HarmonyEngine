@@ -7,33 +7,33 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef ITEMWIDGET_H
-#define ITEMWIDGET_H
+#ifndef IDATA_H
+#define IDATA_H
 
-#include "ProjectItem.h"
+#include "ExplorerItem.h"
 #include "Harmony/HyEngine.h"
 #include "IDraw.h"
 
 #include <QUndoStack>
 #include <QJsonObject>
 
-class WidgetAtlasManager;
-class WidgetAudioManager;
-class ItemProject;
-class HyGuiFrame;
+class AtlasesWidget;
+class AudioWidgetManager;
+class Project;
+class AtlasFrame;
 
-class ItemWidget : public Item
+class IData : public ExplorerItem
 {
     Q_OBJECT
 
     friend class MainWindow;
-    friend class WidgetAtlasManager;
+    friend class AtlasesWidget;
     friend class WidgetAtlasGroup;
-    friend class ItemProject;
-    friend class ItemAtlases;
+    friend class Project;
+    friend class AtlasesData;
 
 protected:
-    ItemProject *       m_pItemProj;
+    Project *       m_pItemProj;
     QJsonValue          m_InitValue;
 
     IDraw *             m_pDraw;
@@ -43,7 +43,7 @@ protected:
     QAction *           m_pActionUndo;
     QAction *           m_pActionRedo;
 
-    QSet<HyGuiFrame *>  m_Links;
+    QSet<AtlasFrame *>  m_Links;
 
     HyCamera2d *        m_pCamera;
     bool                m_bReloadDraw;
@@ -56,17 +56,17 @@ protected:
     virtual void OnGuiHide(IHyApplication &hyApp) = 0;
     virtual void OnGuiUpdate(IHyApplication &hyApp) = 0;
 
-    virtual void OnLink(HyGuiFrame *pFrame) = 0;
-    virtual void OnReLink(HyGuiFrame *pFrame) = 0;
-    virtual void OnUnlink(HyGuiFrame *pFrame) = 0;
+    virtual void OnLink(AtlasFrame *pFrame) = 0;
+    virtual void OnReLink(AtlasFrame *pFrame) = 0;
+    virtual void OnUnlink(AtlasFrame *pFrame) = 0;
     
     virtual QJsonValue OnSave() = 0;
 
 public:
-    ItemWidget(ItemProject *pItemProj, eItemType eType, const QString sPrefix, const QString sName, QJsonValue initVal);
-    virtual ~ItemWidget();
+    IData(Project *pItemProj, eItemType eType, const QString sPrefix, const QString sName, QJsonValue initVal);
+    virtual ~IData();
     
-    ItemProject *GetItemProject();
+    Project *GetItemProject();
 
     QJsonValue GetInitValue()                       { return m_InitValue; }
 
@@ -88,14 +88,14 @@ private:
     void DrawHide(IHyApplication &hyApp);
     void DrawUpdate(IHyApplication &hyApp);
 
-    void Link(HyGuiFrame *pFrame);
-    void Relink(HyGuiFrame *pFrame);
-    void Unlink(HyGuiFrame *pFrame);
+    void Link(AtlasFrame *pFrame);
+    void Relink(AtlasFrame *pFrame);
+    void Unlink(AtlasFrame *pFrame);
 
 private Q_SLOTS:
     void on_undoStack_cleanChanged(bool bClean);
     
 };
-Q_DECLARE_METATYPE(ItemWidget *)
+Q_DECLARE_METATYPE(IData *)
 
-#endif // ITEMWIDGET_H
+#endif // IDATA_H

@@ -19,7 +19,7 @@
 #include <QJsonArray>
 #include <QLineEdit>
 
-WidgetAudioManager::WidgetAudioManager(QWidget *parent) :   QWidget(parent),
+AudioWidgetManager::AudioWidgetManager(QWidget *parent) :   QWidget(parent),
                                                             ui(new Ui::WidgetAudioManager)
 {
     ui->setupUi(this);
@@ -28,7 +28,7 @@ WidgetAudioManager::WidgetAudioManager(QWidget *parent) :   QWidget(parent),
     HyGuiLog("WidgetAudioManager::WidgetAudioManager() invalid constructor used", LOGTYPE_Error);
 }
 
-WidgetAudioManager::WidgetAudioManager(ItemProject *pProjOwner, QWidget *parent) :  QWidget(parent),
+AudioWidgetManager::AudioWidgetManager(Project *pProjOwner, QWidget *parent) :  QWidget(parent),
                                                                                     ui(new Ui::WidgetAudioManager),
                                                                                     m_pProjOwner(pProjOwner),
                                                                                     m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAudioBanks) + HyGlobal::ItemExt(ITEM_DirAudioBanks)),
@@ -78,19 +78,19 @@ WidgetAudioManager::WidgetAudioManager(ItemProject *pProjOwner, QWidget *parent)
         }
     }
 
-    m_pCategoryDelegate = new WidgetAudioCategoryDelegate(this);
+    m_pCategoryDelegate = new AudioCategoryDelegate(this);
     ui->categoryList->setItemDelegate(m_pCategoryDelegate);
 
-    m_pCategoryModel = new WidgetAudioCategoryModel(m_DataDir, this);
+    m_pCategoryModel = new AudioCategoryStringListModel(m_DataDir, this);
     ui->categoryList->setModel(m_pCategoryModel);
 
     QItemSelectionModel *pSelModel = ui->categoryList->selectionModel();
     connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_categoryList_selectionChanged(const QItemSelection &, const QItemSelection &)));
 
-    ui->cmbAudioBanks->setModel(new WidgetAudioManagerModel(*ui->audioBanks, this));
+    ui->cmbAudioBanks->setModel(new AudioManagerStringListModel(*ui->audioBanks, this));
 }
 
-WidgetAudioManager::~WidgetAudioManager()
+AudioWidgetManager::~AudioWidgetManager()
 {
     while(ui->audioBanks->currentWidget())
         delete ui->audioBanks->currentWidget();
@@ -98,37 +98,37 @@ WidgetAudioManager::~WidgetAudioManager()
     delete ui;
 }
 
-ItemProject *WidgetAudioManager::GetItemProject()
+Project *AudioWidgetManager::GetItemProject()
 {
     return m_pProjOwner;
 }
 
-HyGuiWave *WidgetAudioManager::CreateWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint32 uiErrors)
+AudioWave *AudioWidgetManager::CreateWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint32 uiErrors)
 {
-    HyGuiWave *pNewWave = NULL;
+    AudioWave *pNewWave = NULL;
 
     if(m_DependencyMap.contains(uiChecksum))
     {
         HyGuiLog("WidgetAtlasManager::CreateWave() already contains wave with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
 
-        pNewWave = new HyGuiWave(uiWaveBankId, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, uiErrors);
+        pNewWave = new AudioWave(uiWaveBankId, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, uiErrors);
         pNewWave->SetError(GUIFRAMEERROR_Duplicate);
     }
     else
     {
-        pNewWave = new HyGuiWave(uiWaveBankId, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, uiErrors);
+        pNewWave = new AudioWave(uiWaveBankId, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, uiErrors);
         m_DependencyMap[uiChecksum] = pNewWave;
     }
 
     return pNewWave;
 }
 
-WidgetAudioCategoryModel *WidgetAudioManager::GetCategoryModel()
+AudioCategoryStringListModel *AudioWidgetManager::GetCategoryModel()
 {
     return m_pCategoryModel;
 }
 
-void WidgetAudioManager::AddAudioBankGroup(int iId /*= -1*/)
+void AudioWidgetManager::AddAudioBankGroup(int iId /*= -1*/)
 {
     if(iId == -1)
     {
@@ -155,18 +155,18 @@ void WidgetAudioManager::AddAudioBankGroup(int iId /*= -1*/)
         return;
     }
 
-    WidgetAudioBank *pNewAudioBank = new WidgetAudioBank(newMetaAudioBankDir, m_DataDir, this, this);
+    AudioWidgetBank *pNewAudioBank = new AudioWidgetBank(newMetaAudioBankDir, m_DataDir, this, this);
     ui->audioBanks->setCurrentIndex(ui->audioBanks->addWidget(pNewAudioBank));
     ui->cmbAudioBanks->setCurrentIndex(ui->audioBanks->currentIndex());
 }
 
-void WidgetAudioManager::on_cmbAudioBanks_currentIndexChanged(int index)
+void AudioWidgetManager::on_cmbAudioBanks_currentIndexChanged(int index)
 {
     // Then set the new atlas group
     ui->audioBanks->setCurrentIndex(index);
 }
 
-void WidgetAudioManager::on_actionAddCategory_triggered()
+void AudioWidgetManager::on_actionAddCategory_triggered()
 {
     DlgInputName *pDlg = new DlgInputName("New Category Name", "Unnamed", this);
     if(pDlg->exec() == QDialog::Accepted)
@@ -180,22 +180,22 @@ void WidgetAudioManager::on_actionAddCategory_triggered()
     delete pDlg;
 }
 
-void WidgetAudioManager::on_actionRemoveCategory_triggered()
+void AudioWidgetManager::on_actionRemoveCategory_triggered()
 {
     m_pCategoryModel->removeRow(ui->categoryList->currentIndex().row());
 }
 
-void WidgetAudioManager::on_actionAddAudioBank_triggered()
+void AudioWidgetManager::on_actionAddAudioBank_triggered()
 {
     
 }
 
-void WidgetAudioManager::on_actionDeleteAudioBank_triggered()
+void AudioWidgetManager::on_actionDeleteAudioBank_triggered()
 {
     
 }
 
-void WidgetAudioManager::on_categoryList_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+void AudioWidgetManager::on_categoryList_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     ui->actionRemoveCategory->setEnabled(ui->categoryList->currentIndex().row() != 0);
 }

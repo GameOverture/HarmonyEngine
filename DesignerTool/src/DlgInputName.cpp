@@ -33,7 +33,7 @@ DlgInputName::DlgInputName(const QString sDlgTitle, QString sCurName, QWidget *p
     CtorInit(sDlgTitle, sCurName);
 }
 
-DlgInputName::DlgInputName(const QString sDlgTitle, Item *pItem, QWidget *parent /*= 0*/) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+DlgInputName::DlgInputName(const QString sDlgTitle, ExplorerItem *pItem, QWidget *parent /*= 0*/) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
                                                                                             ui(new Ui::DlgInputName)
 {
     CtorInit(sDlgTitle, pItem->GetName(false));

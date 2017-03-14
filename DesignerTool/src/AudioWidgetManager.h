@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETAUDIOMANAGER_H
-#define WIDGETAUDIOMANAGER_H
+#ifndef AUDIOWIDGETMANAGER_H
+#define AUDIOWIDGETMANAGER_H
 
 #include "Project.h"
 #include "AudioWidgetBank.h"
@@ -21,31 +21,31 @@ namespace Ui {
 class WidgetAudioManager;
 }
 
-class WidgetAudioManager : public QWidget
+class AudioWidgetManager : public QWidget
 {
     Q_OBJECT
     
-    ItemProject *                   m_pProjOwner;
+    Project *                   m_pProjOwner;
     
     QDir                            m_MetaDir;
     QDir                            m_DataDir;
 
-    QMap<quint32, HyGuiWave *>      m_DependencyMap;
+    QMap<quint32, AudioWave *>      m_DependencyMap;
 
-    WidgetAudioManagerModel *       m_pBankModel;
-    WidgetAudioCategoryModel *      m_pCategoryModel;
-    WidgetAudioCategoryDelegate *   m_pCategoryDelegate;
+    AudioManagerStringListModel *       m_pBankModel;
+    AudioCategoryStringListModel *      m_pCategoryModel;
+    AudioCategoryDelegate *   m_pCategoryDelegate;
 
 public:
-    explicit WidgetAudioManager(QWidget *parent = 0);
-    explicit WidgetAudioManager(ItemProject *pProjOwner, QWidget *parent = 0);
-    ~WidgetAudioManager();
+    explicit AudioWidgetManager(QWidget *parent = 0);
+    explicit AudioWidgetManager(Project *pProjOwner, QWidget *parent = 0);
+    ~AudioWidgetManager();
 
-    ItemProject *GetItemProject();
+    Project *GetItemProject();
     
-    HyGuiWave *CreateWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint32 uiErrors);
+    AudioWave *CreateWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint32 uiErrors);
     
-    WidgetAudioCategoryModel *GetCategoryModel();
+    AudioCategoryStringListModel *GetCategoryModel();
 
 private Q_SLOTS:
     void on_cmbAudioBanks_currentIndexChanged(int index);
@@ -66,4 +66,4 @@ private:
     void AddAudioBankGroup(int iId = -1);
 };
 
-#endif // WIDGETAUDIOMANAGER_H
+#endif // AUDIOWIDGETMANAGER_H

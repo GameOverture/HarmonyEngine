@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HYGUIFRAME_H
-#define HYGUIFRAME_H
+#ifndef ATLASFRAME_H
+#define ATLASFRAME_H
 
 #include "Harmony/HyEngine.h"
 #include "IData.h"
@@ -20,9 +20,9 @@
 
 class AtlasTreeItem;
 
-class HyGuiFrame
+class AtlasFrame
 {
-    friend class ItemAtlases;
+    friend class AtlasesData;
     
     eAtlasNodeType                      m_eType;
 
@@ -39,15 +39,15 @@ class HyGuiFrame
     int                                 m_iPosX;
     int                                 m_iPosY;
 
-    QSet<ItemWidget *>                  m_Links;
+    QSet<IData *>                  m_Links;
 
     QMap<void *, HyTexturedQuad2d *>    m_DrawInstMap;
 
     uint                                m_uiErrors; // '0' when there is no error
 
     // Private ctor as WidgetAtlasManager should only construct these
-    HyGuiFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors);
-    ~HyGuiFrame();
+    AtlasFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors);
+    ~AtlasFrame();
     
 public:
     HyTexturedQuad2d *DrawInst(void *pKey);
@@ -61,7 +61,7 @@ public:
     QSize GetSize();
     QRect GetCrop();
     QPoint GetPosition();
-    QSet<ItemWidget *> GetLinks();
+    QSet<IData *> GetLinks();
     eAtlasNodeType GetType();
 
     int GetTextureIndex();
@@ -84,9 +84,9 @@ private:
     bool DeleteMetaImage(QDir metaDir);
     void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);
 };
-Q_DECLARE_METATYPE(HyGuiFrame *)
+Q_DECLARE_METATYPE(AtlasFrame *)
 
-QDataStream &operator<<(QDataStream &out, HyGuiFrame *const &rhs);
-QDataStream &operator>>(QDataStream &in, HyGuiFrame *rhs);
+QDataStream &operator<<(QDataStream &out, AtlasFrame *const &rhs);
+QDataStream &operator>>(QDataStream &in, AtlasFrame *rhs);
 
-#endif // HYGUIFRAME_H
+#endif // ATLASFRAME_H

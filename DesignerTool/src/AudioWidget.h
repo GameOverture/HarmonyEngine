@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETAUDIO_H
-#define WIDGETAUDIO_H
+#ifndef AUDIOWIDGET_H
+#define AUDIOWIDGET_H
 
 #include "AudioData.h"
 #include "AudioWidgetState.h"
@@ -16,23 +16,23 @@
 #include <QWidget>
 
 namespace Ui {
-class WidgetAudio;
+class AudioWidget;
 }
 
-class WidgetAudio : public QWidget
+class AudioWidget : public QWidget
 {
     Q_OBJECT
     
-    ItemAudio *             m_pItemAudio;
-    WidgetAudioState *      m_pCurAudioState;
+    AudioData *             m_pItemAudio;
+    AudioWidgetState *      m_pCurAudioState;
 
     QList<QAction *>        m_StateActionsList;
     
 public:
-    explicit WidgetAudio(ItemAudio *pOwner, QWidget *parent = 0);
-    ~WidgetAudio();
+    explicit AudioWidget(AudioData *pOwner, QWidget *parent = 0);
+    ~AudioWidget();
     
-    ItemAudio *GetData();
+    AudioData *GetData();
     
     QComboBox *GetCmbStates();
     
@@ -52,7 +52,7 @@ private Q_SLOTS:
     void on_cmbStates_currentIndexChanged(int index);
 
 private:
-    Ui::WidgetAudio *ui;
+    Ui::AudioWidget *ui;
 };
 
-#endif // WIDGETAUDIO_H
+#endif // AUDIOWIDGET_H

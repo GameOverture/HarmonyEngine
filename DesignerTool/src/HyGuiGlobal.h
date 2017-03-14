@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HYGLOBALS_H
-#define HYGLOBALS_H
+#ifndef HYGUIGLOBALS_H
+#define HYGUIGLOBALS_H
 
 #include <QString>
 #include <QIcon>
@@ -431,4 +431,4 @@ struct SortTreeWidgetsPredicate
     }
 };
 
-#endif // HYGLOBALS_H
+#endif // HYGUIGLOBALS_H

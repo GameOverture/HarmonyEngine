@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    qRegisterMetaTypeStreamOperators<HyGuiFrame *>("HyGuiFrame *");
+    qRegisterMetaTypeStreamOperators<AtlasFrame *>("HyGuiFrame *");
 
     HyGlobal::Initialize();
 

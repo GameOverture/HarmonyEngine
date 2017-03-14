@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETSPRITESTATE_H
-#define WIDGETSPRITESTATE_H
+#ifndef SPRITEWIDGETSTATE_H
+#define SPRITEWIDGETSTATE_H
 
 #include "AtlasFrame.h"
 #include "SpriteModelView.h"
@@ -17,18 +17,18 @@
 #include <QCheckBox>
 
 namespace Ui {
-class WidgetSpriteState;
+class SpriteWidgetState;
 }
 
 class SpriteFrame;
-class WidgetSprite;
+class SpriteWidget;
 
-class WidgetSpriteState : public QWidget
+class SpriteWidgetState : public QWidget
 {
     Q_OBJECT
 
-    WidgetSprite *                      m_pOwner;
-    WidgetSpriteModel *                 m_pSpriteFramesModel;
+    SpriteWidget *                      m_pOwner;
+    SpriteTableModel *                 m_pSpriteFramesModel;
     
     QString                             m_sName;
     
@@ -37,25 +37,25 @@ class WidgetSpriteState : public QWidget
     bool                                m_bIsBounced;
 
 public:
-    explicit WidgetSpriteState(WidgetSprite *pOwner, QList<QAction *> stateActionList, QWidget *parent = 0);
-    ~WidgetSpriteState();
+    explicit SpriteWidgetState(SpriteWidget *pOwner, QList<QAction *> stateActionList, QWidget *parent = 0);
+    ~SpriteWidgetState();
     
     QString GetName();
     void SetName(QString sNewName);
 
-    void InsertFrame(HyGuiFrame *pFrame);
-    void RefreshFrame(HyGuiFrame *pFrame);
-    void RemoveFrame(HyGuiFrame *pFrame);
+    void InsertFrame(AtlasFrame *pFrame);
+    void RefreshFrame(AtlasFrame *pFrame);
+    void RemoveFrame(AtlasFrame *pFrame);
 
     QCheckBox *GetChkBox_Reverse();
     QCheckBox *GetChkBox_Looping();
     QCheckBox *GetChkBox_Bounce();
-    WidgetSpriteTableView *GetFrameView();
+    SpriteTableView *GetFrameView();
     SpriteFrame *GetSelectedFrame();
     int GetSelectedIndex();
     int GetNumFrames();
     
-    void AppendFramesToListRef(QList<HyGuiFrame *> &drawInstListRef);
+    void AppendFramesToListRef(QList<AtlasFrame *> &drawInstListRef);
     
     void GetStateFrameInfo(QJsonObject &stateObjOut);
     
@@ -91,8 +91,8 @@ private Q_SLOTS:
     void on_chkBounce_clicked();
     
 private:
-    Ui::WidgetSpriteState *ui;
+    Ui::SpriteWidgetState *ui;
 };
-Q_DECLARE_METATYPE(WidgetSpriteState *)
+Q_DECLARE_METATYPE(SpriteWidgetState *)
 
-#endif // WIDGETSPRITESTATE_H
+#endif // SPRITEWIDGETSTATE_H

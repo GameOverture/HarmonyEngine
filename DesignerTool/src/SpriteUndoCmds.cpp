@@ -13,7 +13,7 @@
 #include "SpriteData.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-WidgetSpriteUndoCmd_OrderFrame::WidgetSpriteUndoCmd_OrderFrame(WidgetSpriteTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+SpriteUndoCmd_OrderFrame::SpriteUndoCmd_OrderFrame(SpriteTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
                                                                                                                                                                                         m_pSpriteTableView(pSpriteTableView),
                                                                                                                                                                                         m_iFrameIndex(iFrameIndex),
                                                                                                                                                                                         m_iFrameIndexDest(iFrameIndexDestination)
@@ -24,13 +24,13 @@ WidgetSpriteUndoCmd_OrderFrame::WidgetSpriteUndoCmd_OrderFrame(WidgetSpriteTable
         setText("Order Frame Downwards");
 }
 
-/*virtual*/ WidgetSpriteUndoCmd_OrderFrame::~WidgetSpriteUndoCmd_OrderFrame()
+/*virtual*/ SpriteUndoCmd_OrderFrame::~SpriteUndoCmd_OrderFrame()
 {
 }
 
-void WidgetSpriteUndoCmd_OrderFrame::redo()
+void SpriteUndoCmd_OrderFrame::redo()
 {
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
     
     int iOffset = m_iFrameIndexDest - m_iFrameIndex;
     while(iOffset > 0)
@@ -48,9 +48,9 @@ void WidgetSpriteUndoCmd_OrderFrame::redo()
     m_pSpriteTableView->selectRow(m_iFrameIndexDest);
 }
 
-void WidgetSpriteUndoCmd_OrderFrame::undo()
+void SpriteUndoCmd_OrderFrame::undo()
 {
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
     
     int iOffset = m_iFrameIndex - m_iFrameIndexDest;
     while(iOffset > 0)
@@ -69,14 +69,14 @@ void WidgetSpriteUndoCmd_OrderFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-WidgetSpriteUndoCmd_OffsetFrame::WidgetSpriteUndoCmd_OffsetFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, QPoint vOffset, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+SpriteUndoCmd_OffsetFrame::SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint vOffset, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
                                                                                                                                                                         m_pSpriteTableView(pSpriteTableView),
                                                                                                                                                                         m_iFrameIndex(iIndex),
                                                                                                                                                                         m_vNewOffset(vOffset)
 {
 
     
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -92,13 +92,13 @@ WidgetSpriteUndoCmd_OffsetFrame::WidgetSpriteUndoCmd_OffsetFrame(WidgetSpriteTab
     }
 }
 
-/*virtual*/ WidgetSpriteUndoCmd_OffsetFrame::~WidgetSpriteUndoCmd_OffsetFrame()
+/*virtual*/ SpriteUndoCmd_OffsetFrame::~SpriteUndoCmd_OffsetFrame()
 {
 }
 
-void WidgetSpriteUndoCmd_OffsetFrame::redo()
+void SpriteUndoCmd_OffsetFrame::redo()
 {
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -112,9 +112,9 @@ void WidgetSpriteUndoCmd_OffsetFrame::redo()
     }
 }
 
-void WidgetSpriteUndoCmd_OffsetFrame::undo()
+void SpriteUndoCmd_OffsetFrame::undo()
 {
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -129,12 +129,12 @@ void WidgetSpriteUndoCmd_OffsetFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-WidgetSpriteUndoCmd_OffsetXFrame::WidgetSpriteUndoCmd_OffsetXFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+SpriteUndoCmd_OffsetXFrame::SpriteUndoCmd_OffsetXFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
                                                                                                                                                                                     m_pSpriteTableView(pSpriteTableView),
                                                                                                                                                                                     m_iFrameIndex(iIndex),
                                                                                                                                                                                     m_NewOffsetList(newOffsetList)
 {
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -150,13 +150,13 @@ WidgetSpriteUndoCmd_OffsetXFrame::WidgetSpriteUndoCmd_OffsetXFrame(WidgetSpriteT
     }
 }
 
-/*virtual*/ WidgetSpriteUndoCmd_OffsetXFrame::~WidgetSpriteUndoCmd_OffsetXFrame()
+/*virtual*/ SpriteUndoCmd_OffsetXFrame::~SpriteUndoCmd_OffsetXFrame()
 {
 }
 
-void WidgetSpriteUndoCmd_OffsetXFrame::redo()
+void SpriteUndoCmd_OffsetXFrame::redo()
 {
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -174,9 +174,9 @@ void WidgetSpriteUndoCmd_OffsetXFrame::redo()
     }
 }
 
-void WidgetSpriteUndoCmd_OffsetXFrame::undo()
+void SpriteUndoCmd_OffsetXFrame::undo()
 {
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -191,12 +191,12 @@ void WidgetSpriteUndoCmd_OffsetXFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-WidgetSpriteUndoCmd_OffsetYFrame::WidgetSpriteUndoCmd_OffsetYFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+SpriteUndoCmd_OffsetYFrame::SpriteUndoCmd_OffsetYFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
                                                                                                                                                                                     m_pSpriteTableView(pSpriteTableView),
                                                                                                                                                                                     m_iFrameIndex(iIndex),
                                                                                                                                                                                     m_NewOffsetList(newOffsetList)
 {
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -212,13 +212,13 @@ WidgetSpriteUndoCmd_OffsetYFrame::WidgetSpriteUndoCmd_OffsetYFrame(WidgetSpriteT
     }
 }
 
-/*virtual*/ WidgetSpriteUndoCmd_OffsetYFrame::~WidgetSpriteUndoCmd_OffsetYFrame()
+/*virtual*/ SpriteUndoCmd_OffsetYFrame::~SpriteUndoCmd_OffsetYFrame()
 {
 }
 
-void WidgetSpriteUndoCmd_OffsetYFrame::redo()
+void SpriteUndoCmd_OffsetYFrame::redo()
 {
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -236,9 +236,9 @@ void WidgetSpriteUndoCmd_OffsetYFrame::redo()
     }
 }
 
-void WidgetSpriteUndoCmd_OffsetYFrame::undo()
+void SpriteUndoCmd_OffsetYFrame::undo()
 {
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -253,14 +253,14 @@ void WidgetSpriteUndoCmd_OffsetYFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-WidgetSpriteUndoCmd_DurationFrame::WidgetSpriteUndoCmd_DurationFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, float fDuration, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+SpriteUndoCmd_DurationFrame::SpriteUndoCmd_DurationFrame(SpriteTableView *pSpriteTableView, int iIndex, float fDuration, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
                                                                                                                                                                             m_pSpriteTableView(pSpriteTableView),
                                                                                                                                                                             m_iFrameIndex(iIndex),
                                                                                                                                                                             m_fNewDuration(fDuration)
 {
     setText("Modify Frame Duration");
     
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -271,13 +271,13 @@ WidgetSpriteUndoCmd_DurationFrame::WidgetSpriteUndoCmd_DurationFrame(WidgetSprit
         m_OriginalDurationList.append(pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_fDuration);
 }
 
-/*virtual*/ WidgetSpriteUndoCmd_DurationFrame::~WidgetSpriteUndoCmd_DurationFrame()
+/*virtual*/ SpriteUndoCmd_DurationFrame::~SpriteUndoCmd_DurationFrame()
 {
 }
 
-void WidgetSpriteUndoCmd_DurationFrame::redo()
+void SpriteUndoCmd_DurationFrame::redo()
 {
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -291,9 +291,9 @@ void WidgetSpriteUndoCmd_DurationFrame::redo()
     }
 }
 
-void WidgetSpriteUndoCmd_DurationFrame::undo()
+void SpriteUndoCmd_DurationFrame::undo()
 {
-    WidgetSpriteModel *pSpriteFramesModel = static_cast<WidgetSpriteModel *>(m_pSpriteTableView->model());
+    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {

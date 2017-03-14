@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef ITEM_H
-#define ITEM_H
+#ifndef EXPLORERITEM_H
+#define EXPLORERITEM_H
 
 #include <QTreeWidget>
 
@@ -17,9 +17,9 @@
 
 class HyGuiDependencies;
 class WidgetRenderer;
-class HyGuiFrame;
+class AtlasFrame;
 
-class Item : public QObject
+class ExplorerItem : public QObject
 {
     Q_OBJECT
 
@@ -30,8 +30,8 @@ protected:
     QTreeWidgetItem *   m_pTreeItemPtr;
     
 public:
-    Item(eItemType eType, const QString sPath);
-    virtual ~Item();
+    ExplorerItem(eItemType eType, const QString sPath);
+    virtual ~ExplorerItem();
 
     eItemType GetType() const                       { return m_eTYPE; }
     QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
@@ -40,6 +40,6 @@ public:
     QString GetPath() const                         { return m_sPATH; }
     QIcon GetIcon() const                           { return HyGlobal::ItemIcon(m_eTYPE); }
 };
-Q_DECLARE_METATYPE(Item *)
+Q_DECLARE_METATYPE(ExplorerItem *)
 
-#endif // ITEM_H
+#endif // EXPLORERITEM_H

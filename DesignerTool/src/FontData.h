@@ -7,13 +7,13 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef ITEMFONT_H
-#define ITEMFONT_H
+#ifndef FONTDATA_H
+#define FONTDATA_H
 
 #include "IData.h"
 #include "freetype-gl/freetype-gl.h"
 
-class ItemFont : public ItemWidget
+class FontData : public IData
 {
     Q_OBJECT
 
@@ -26,8 +26,8 @@ class ItemFont : public ItemWidget
     
     
 public:
-    ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
-    virtual ~ItemFont();
+    FontData(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
+    virtual ~FontData();
     
 protected:
     virtual void OnGiveMenuActions(QMenu *pMenu);
@@ -38,11 +38,11 @@ protected:
     virtual void OnGuiHide(IHyApplication &hyApp);
     virtual void OnGuiUpdate(IHyApplication &hyApp);
 
-    virtual void OnLink(HyGuiFrame *pFrame);
-    virtual void OnReLink(HyGuiFrame *pFrame);
-    virtual void OnUnlink(HyGuiFrame *pFrame);
+    virtual void OnLink(AtlasFrame *pFrame);
+    virtual void OnReLink(AtlasFrame *pFrame);
+    virtual void OnUnlink(AtlasFrame *pFrame);
     
     virtual QJsonValue OnSave();
 };
 
-#endif // ITEMFONT_H
+#endif // FONTDATA_H

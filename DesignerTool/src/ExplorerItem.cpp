@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "ProjectItem.h"
+#include "ExplorerItem.h"
 #include "SpriteWidget.h"
 
 #include <QFileInfo>
@@ -17,7 +17,7 @@
 #include "Project.h"
 #include "Harmony/Utilities/HyStrManip.h"
 
-Item::Item(eItemType eType, const QString sPath) :  m_eTYPE(eType),
+ExplorerItem::ExplorerItem(eItemType eType, const QString sPath) :  m_eTYPE(eType),
                                                     m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str())
 {
     m_pTreeItemPtr = new QTreeWidgetItem();
@@ -29,12 +29,12 @@ Item::Item(eItemType eType, const QString sPath) :  m_eTYPE(eType),
     m_pTreeItemPtr->setData(0, Qt::UserRole, v);
 }
 
-Item::~Item()
+ExplorerItem::~ExplorerItem()
 {
     delete m_pTreeItemPtr;
 }
 
-QString Item::GetName(bool bWithPrefix) const
+QString ExplorerItem::GetName(bool bWithPrefix) const
 {
     // Check to see if this item can have a valid prefix, otherwise force 'bWithPrefix' to false
     if(bWithPrefix)

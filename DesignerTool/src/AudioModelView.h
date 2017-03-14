@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETAUDIOMODELVIEW_H
-#define WIDGETAUDIOMODELVIEW_H
+#ifndef AUDIOMODELVIEW_H
+#define AUDIOMODELVIEW_H
 
 #include "AudioWave.h"
 
@@ -64,25 +64,25 @@
 //};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetAudioBankTableView : public QTableView
+class AudioBankTableView : public QTableView
 {
     Q_OBJECT
 
 public:
-    WidgetAudioBankTableView(QWidget *pParent = 0);
+    AudioBankTableView(QWidget *pParent = 0);
 
 protected:
     virtual void resizeEvent(QResizeEvent *pResizeEvent) override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class WidgetAudioBankModel : public QAbstractTableModel
+class AudioBankTableModel : public QAbstractTableModel
 {
     Q_OBJECT
     
     QString                     m_sName;
 
-    QList<HyGuiWave *>          m_WaveList;
+    QList<AudioWave *>          m_WaveList;
     
 public:
     
@@ -94,13 +94,13 @@ public:
         NUM_COLUMNS
     };
     
-    WidgetAudioBankModel(QObject *pParent);
+    AudioBankTableModel(QObject *pParent);
 
     QString GetName();
     void SetName(QString sName);
     
-    void AddWave(HyGuiWave *pNewWave);
-    HyGuiWave *GetWaveAt(int iIndex);
+    void AddWave(AudioWave *pNewWave);
+    AudioWave *GetWaveAt(int iIndex);
 
     void GetJsonObj(QJsonObject &audioBankObj);
 
@@ -114,24 +114,24 @@ public:
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class WidgetAudioManagerModel : public QStringListModel
+class AudioManagerStringListModel : public QStringListModel
 {
     QStackedWidget &        m_AudioBanksRef;
 
 public:
-    WidgetAudioManagerModel(QStackedWidget &audioBanksRef, QObject *pParent);
+    AudioManagerStringListModel(QStackedWidget &audioBanksRef, QObject *pParent);
 
     virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
     virtual int	rowCount(const QModelIndex & parent = QModelIndex()) const override;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetAudioCategoryDelegate : public QStyledItemDelegate
+class AudioCategoryDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
 public:
-    WidgetAudioCategoryDelegate(QObject *pParent = 0);
+    AudioCategoryDelegate(QObject *pParent = 0);
 
     virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const override;
@@ -140,12 +140,12 @@ public:
 };
 
 
-class WidgetAudioCategoryModel : public QStringListModel
+class AudioCategoryStringListModel : public QStringListModel
 {
     QDir             m_AudioBankDir;
 
 public:
-    WidgetAudioCategoryModel(QDir audioBankDir, QObject *pParent);
+    AudioCategoryStringListModel(QDir audioBankDir, QObject *pParent);
 
     virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
     virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
@@ -157,4 +157,4 @@ public:
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // WIDGETAUDIOMODELVIEW_H
+#endif // AUDIOMODELVIEW_H

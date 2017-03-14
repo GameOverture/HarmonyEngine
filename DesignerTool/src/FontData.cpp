@@ -21,25 +21,25 @@
 
 #include "Harmony/HyEngine.h"
 
-ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) :  ItemWidget(pItemProj, ITEM_Font, sPrefix, sName, initVal),
+FontData::FontData(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) :  IData(pItemProj, ITEM_Font, sPrefix, sName, initVal),
                                                                                                               m_pDrawAtlasPreview(NULL),
                                                                                                               m_pFontCamera(NULL)
 {
 }
 
-/*virtual*/ ItemFont::~ItemFont()
+/*virtual*/ FontData::~FontData()
 {
     delete m_pWidget;
 }
 
-/*virtual*/ void ItemFont::OnGiveMenuActions(QMenu *pMenu)
+/*virtual*/ void FontData::OnGiveMenuActions(QMenu *pMenu)
 {
-    static_cast<WidgetFont *>(m_pWidget)->OnGiveMenuActions(pMenu);
+    static_cast<FontWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
 }
 
-/*virtual*/ void ItemFont::OnGuiLoad(IHyApplication &hyApp)
+/*virtual*/ void FontData::OnGuiLoad(IHyApplication &hyApp)
 {
-    m_pWidget = new WidgetFont(this);
+    m_pWidget = new FontWidget(this);
 
     if(m_pFontCamera == NULL)
         m_pFontCamera = hyApp.Window().CreateCamera2d();
@@ -60,7 +60,7 @@ ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString 
     m_DividerLine.Load();
 }
 
-/*virtual*/ void ItemFont::OnGuiUnload(IHyApplication &hyApp)
+/*virtual*/ void FontData::OnGuiUnload(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->Unload();
@@ -72,7 +72,7 @@ ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString 
     delete m_pWidget;
 }
 
-/*virtual*/ void ItemFont::OnGuiShow(IHyApplication &hyApp)
+/*virtual*/ void FontData::OnGuiShow(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->SetEnabled(true);
@@ -85,7 +85,7 @@ ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString 
     m_DividerLine.SetEnabled(true);
 }
 
-/*virtual*/ void ItemFont::OnGuiHide(IHyApplication &hyApp)
+/*virtual*/ void FontData::OnGuiHide(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->SetEnabled(false);
@@ -98,9 +98,9 @@ ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString 
     m_DividerLine.SetEnabled(false);
 }
 
-/*virtual*/ void ItemFont::OnGuiUpdate(IHyApplication &hyApp)
+/*virtual*/ void FontData::OnGuiUpdate(IHyApplication &hyApp)
 {
-    WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
+    FontWidget *pWidget = static_cast<FontWidget *>(m_pWidget);
     texture_atlas_t *pAtlas = pWidget->GetAtlas();
 
     m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetResolution().y / 2 - 5.0f);
@@ -144,7 +144,7 @@ ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString 
 
         m_DrawFontPreviewList.clear();
 
-        WidgetFontModel *pFontModel = pWidget->GetCurrentFontModel();
+        FontTableModel *pFontModel = pWidget->GetCurrentFontModel();
 
         QString sFontPreviewString = pWidget->GetPreviewString();
 
@@ -211,21 +211,21 @@ ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString 
     }
 }
 
-/*virtual*/ void ItemFont::OnLink(HyGuiFrame *pFrame)
+/*virtual*/ void FontData::OnLink(AtlasFrame *pFrame)
 {
 }
 
-/*virtual*/ void ItemFont::OnReLink(HyGuiFrame *pFrame)
+/*virtual*/ void FontData::OnReLink(AtlasFrame *pFrame)
 {
 }
 
-/*virtual*/ void ItemFont::OnUnlink(HyGuiFrame *pFrame)
+/*virtual*/ void FontData::OnUnlink(AtlasFrame *pFrame)
 {
 }
 
-/*virtual*/ QJsonValue ItemFont::OnSave()
+/*virtual*/ QJsonValue FontData::OnSave()
 { 
-    WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
+    FontWidget *pWidget = static_cast<FontWidget *>(m_pWidget);
     pWidget->SaveFontFilesToMetaDir();
     
     pWidget->GeneratePreview(true);

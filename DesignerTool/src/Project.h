@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef ITEMPROJECT_H
-#define ITEMPROJECT_H
+#ifndef PROJECT_H
+#define PROJECT_H
 
 #include "IData.h"
 #include "AtlasesData.h"
@@ -18,8 +18,8 @@
 #include <QJsonObject>
 
 // Forward declaration
-class WidgetAtlasManager;
-class WidgetAudioManager;
+class AtlasesWidget;
+class AudioWidgetManager;
 
 class AtlasTreeItem;
 
@@ -36,14 +36,14 @@ public:
     virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
 };
 
-class ItemProject : public Item, public IHyApplication
+class Project : public ExplorerItem, public IHyApplication
 {
     Q_OBJECT
 
-    ItemAtlases *                                   m_pAtlasesData;
-    WidgetAtlasManager *                            m_pAtlasMan;
+    AtlasesData *                                   m_pAtlasesData;
+    AtlasesWidget *                                 m_pAtlasMan;
 
-    WidgetAudioManager *                            m_pAudioMan;
+    AudioWidgetManager *                            m_pAudioMan;
     QTabBar *                                       m_pTabBar;
     
     QString                                         m_sGameName;
@@ -66,8 +66,8 @@ class ItemProject : public Item, public IHyApplication
     bool                                            m_bHasError;
     
 public:
-    ItemProject(const QString sNewProjectFilePath);
-    ~ItemProject();
+    Project(const QString sNewProjectFilePath);
+    ~Project();
 
     void LoadWidgets();
 
@@ -86,9 +86,9 @@ public:
     QString GetSourceAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation) + '/'; }
     QString GetSourceRelPath() const                    { return QDir::cleanPath(m_sRelativeSourceLocation) + '/'; }
 
-    ItemAtlases &GetAtlasesData()                       { return *m_pAtlasesData; }
-    WidgetAtlasManager &GetAtlasManager()               { return *m_pAtlasMan; }
-    WidgetAudioManager &GetAudioManager()               { return *m_pAudioMan; }
+    AtlasesData &GetAtlasesData()                       { return *m_pAtlasesData; }
+    AtlasesWidget &GetAtlasManager()               { return *m_pAtlasMan; }
+    AudioWidgetManager &GetAudioManager()               { return *m_pAudioMan; }
     QTabBar *GetTabBar()                                { return m_pTabBar; }
     
     QList<QAction *> GetSaveActions();
@@ -122,4 +122,4 @@ private Q_SLOTS:
     void on_tabBar_closeRequested(int iIndex);
 };
 
-#endif // ITEMPROJECT_H
+#endif // PROJECT_H

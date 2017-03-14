@@ -7,17 +7,17 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HYGUIWAVE_H
-#define HYGUIWAVE_H
+#ifndef AUDIOWAVE_H
+#define AUDIOWAVE_H
 
 #include "IData.h"
 
 #include <QWidget>
 #include <QJsonObject>
 
-class HyGuiWave
+class AudioWave
 {
-    friend class WidgetAudioManager;
+    friend class AudioWidgetManager;
     
     const uint                          m_uiWAVE_BANK_ID;
     
@@ -34,8 +34,8 @@ class HyGuiWave
     uint                                m_uiErrors; // '0' when there is no error
     
     // Private ctor as WidgetAudioManager should only construct these
-    HyGuiWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint uiErrors);
-    ~HyGuiWave();
+    AudioWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint uiErrors);
+    ~AudioWave();
     
 public:
     quint32 GetChecksum();
@@ -59,4 +59,4 @@ public:
     uint GetErrors();
 };
 
-#endif // HYGUIWAVE_H
+#endif // AUDIOWAVE_H

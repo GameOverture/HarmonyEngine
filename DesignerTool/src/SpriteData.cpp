@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "SpriteData.h"
-#include "AtlasWidget.h"
+#include "AtlasesWidget.h"
 
 #include <QAction>
 #include <QUndoView>
@@ -16,7 +16,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-ItemSprite::ItemSprite(ItemProject *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) : ItemWidget(pItemProj, ITEM_Sprite, sPrefix, sName, initVal)
+SpriteData::SpriteData(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) : IData(pItemProj, ITEM_Sprite, sPrefix, sName, initVal)
 {
     std::vector<glm::vec2> lineList(2, glm::vec2());
     
@@ -36,66 +36,66 @@ ItemSprite::ItemSprite(ItemProject *pItemProj, const QString sPrefix, const QStr
     m_primOriginVert.SetTint(1.0f, 0.0f, 0.0f);
 }
 
-/*virtual*/ ItemSprite::~ItemSprite()
+/*virtual*/ SpriteData::~SpriteData()
 {
     delete m_pWidget;
 }
 
-/*virtual*/ void ItemSprite::OnGiveMenuActions(QMenu *pMenu)
+/*virtual*/ void SpriteData::OnGiveMenuActions(QMenu *pMenu)
 {
-    static_cast<WidgetSprite *>(m_pWidget)->OnGiveMenuActions(pMenu);
+    static_cast<SpriteWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
 }
 
-/*virtual*/ void ItemSprite::OnGuiLoad(IHyApplication &hyApp)
+/*virtual*/ void SpriteData::OnGuiLoad(IHyApplication &hyApp)
 {
-    m_pWidget = new WidgetSprite(this);
-    static_cast<WidgetSprite *>(m_pWidget)->Load();
+    m_pWidget = new SpriteWidget(this);
+    static_cast<SpriteWidget *>(m_pWidget)->Load();
 
     m_primOriginHorz.Load();
     m_primOriginVert.Load();
 }
 
-/*virtual*/ void ItemSprite::OnGuiUnload(IHyApplication &hyApp)
+/*virtual*/ void SpriteData::OnGuiUnload(IHyApplication &hyApp)
 {
     m_primOriginHorz.Unload();
     m_primOriginVert.Unload();
 
-    QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
+    QList<AtlasFrame *> frameList = static_cast<SpriteWidget *>(m_pWidget)->GetAllDrawInsts();
     for(int i = 0; i < frameList.count(); i++)
         frameList[i]->DrawInst(this)->Unload();
 
     delete m_pWidget;
 }
 
-/*virtual*/ void ItemSprite::OnGuiShow(IHyApplication &hyApp)
+/*virtual*/ void SpriteData::OnGuiShow(IHyApplication &hyApp)
 {
     m_primOriginHorz.SetEnabled(true);
     m_primOriginVert.SetEnabled(true);
 }
 
-/*virtual*/ void ItemSprite::OnGuiHide(IHyApplication &hyApp)
+/*virtual*/ void SpriteData::OnGuiHide(IHyApplication &hyApp)
 {
     m_primOriginHorz.SetEnabled(false);
     m_primOriginVert.SetEnabled(false);
 
-    QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
+    QList<AtlasFrame *> frameList = static_cast<SpriteWidget *>(m_pWidget)->GetAllDrawInsts();
     for(int i = 0; i < frameList.count(); i++)
         frameList[i]->DrawInst(this)->SetEnabled(false);
 }
 
-/*virtual*/ void ItemSprite::OnGuiUpdate(IHyApplication &hyApp)
+/*virtual*/ void SpriteData::OnGuiUpdate(IHyApplication &hyApp)
 {
-    QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
+    QList<AtlasFrame *> frameList = static_cast<SpriteWidget *>(m_pWidget)->GetAllDrawInsts();
     for(int i = 0; i < frameList.count(); i++)
         frameList[i]->DrawInst(this)->SetEnabled(false);
 
-    WidgetSpriteState *pCurSpriteState = static_cast<WidgetSprite *>(m_pWidget)->GetCurSpriteState();
+    SpriteWidgetState *pCurSpriteState = static_cast<SpriteWidget *>(m_pWidget)->GetCurSpriteState();
     SpriteFrame *pSpriteFrame = pCurSpriteState->GetSelectedFrame();
 
     if(pSpriteFrame == NULL)
         return;
 
-    HyGuiFrame *pGuiFrame = pSpriteFrame->m_pFrame;
+    AtlasFrame *pGuiFrame = pSpriteFrame->m_pFrame;
     HyTexturedQuad2d *pDrawInst = pGuiFrame->DrawInst(this);
 
     pDrawInst->alpha.Set(1.0f);
@@ -114,28 +114,28 @@ ItemSprite::ItemSprite(ItemProject *pItemProj, const QString sPrefix, const QStr
     pCurSpriteState->UpdateTimeStep();
 }
 
-/*virtual*/ void ItemSprite::OnLink(HyGuiFrame *pFrame)
+/*virtual*/ void SpriteData::OnLink(AtlasFrame *pFrame)
 {
-    WidgetSpriteState *pCurSpriteState = static_cast<WidgetSprite *>(m_pWidget)->GetCurSpriteState();
+    SpriteWidgetState *pCurSpriteState = static_cast<SpriteWidget *>(m_pWidget)->GetCurSpriteState();
     pCurSpriteState->InsertFrame(pFrame);
 }
 
-/*virtual*/ void ItemSprite::OnReLink(HyGuiFrame *pFrame)
+/*virtual*/ void SpriteData::OnReLink(AtlasFrame *pFrame)
 {
-    WidgetSprite *pWidgetSprite = static_cast<WidgetSprite *>(m_pWidget);
+    SpriteWidget *pWidgetSprite = static_cast<SpriteWidget *>(m_pWidget);
     pWidgetSprite->RefreshFrame(pFrame);
 }
 
-/*virtual*/ void ItemSprite::OnUnlink(HyGuiFrame *pFrame)
+/*virtual*/ void SpriteData::OnUnlink(AtlasFrame *pFrame)
 {
-    WidgetSpriteState *pCurSpriteState = static_cast<WidgetSprite *>(m_pWidget)->GetCurSpriteState();
+    SpriteWidgetState *pCurSpriteState = static_cast<SpriteWidget *>(m_pWidget)->GetCurSpriteState();
     pCurSpriteState->RemoveFrame(pFrame);
 }
 
-/*virtual*/ QJsonValue ItemSprite::OnSave()
+/*virtual*/ QJsonValue SpriteData::OnSave()
 {
     QJsonArray spriteStateArray;
-    static_cast<WidgetSprite *>(m_pWidget)->GetSaveInfo(spriteStateArray);
+    static_cast<SpriteWidget *>(m_pWidget)->GetSaveInfo(spriteStateArray);
 
     return spriteStateArray;
 }

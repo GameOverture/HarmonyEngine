@@ -15,11 +15,11 @@
 
 #include <QMenu>
 
-ItemWidget::ItemWidget(ItemProject *pItemProj,
+IData::IData(Project *pItemProj,
                        eItemType eType,
                        const QString sPrefix,
                        const QString sName,
-                       QJsonValue initVal) :    Item(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
+                       QJsonValue initVal) :    ExplorerItem(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
                                                 m_pItemProj(pItemProj),
                                                 m_InitValue(initVal),
                                                 m_pWidget(nullptr),
@@ -58,17 +58,17 @@ ItemWidget::ItemWidget(ItemProject *pItemProj,
     connect(m_pUndoStack, SIGNAL(cleanChanged(bool)), this, SLOT(on_undoStack_cleanChanged(bool)));
 }
 
-ItemWidget::~ItemWidget()
+IData::~IData()
 {
     
 }
 
-ItemProject *ItemWidget::GetItemProject()
+Project *IData::GetItemProject()
 {
     return m_pItemProj;
 }
 
-void ItemWidget::GiveMenuActions(QMenu *pMenu)
+void IData::GiveMenuActions(QMenu *pMenu)
 {
     pMenu->addAction(m_pActionUndo);
     pMenu->addAction(m_pActionRedo);
@@ -77,23 +77,23 @@ void ItemWidget::GiveMenuActions(QMenu *pMenu)
     OnGiveMenuActions(pMenu);
 }
 
-void ItemWidget::Save()
+void IData::Save()
 {
     GetItemProject()->SaveGameData(m_eTYPE, GetName(true), OnSave());
     m_pUndoStack->setClean();
 }
 
-bool ItemWidget::IsSaveClean()
+bool IData::IsSaveClean()
 {
     return m_pUndoStack->isClean();
 }
 
-void ItemWidget::DiscardChanges()
+void IData::DiscardChanges()
 {
     m_pUndoStack->clear();
 }
 
-void ItemWidget::Load(IHyApplication &hyApp)
+void IData::Load(IHyApplication &hyApp)
 {
     // A non NULL camera signifies that this has been loaded already
     if(m_pCamera)
@@ -106,7 +106,7 @@ void ItemWidget::Load(IHyApplication &hyApp)
     //m_HyEntity.Load();
 }
 
-void ItemWidget::Unload(IHyApplication &hyApp)
+void IData::Unload(IHyApplication &hyApp)
 {
     // A NULL camera signifies that this has hasn't been loaded
     if(m_pCamera == NULL)
@@ -119,21 +119,21 @@ void ItemWidget::Unload(IHyApplication &hyApp)
     //m_HyEntity.Load();
 }
 
-void ItemWidget::DrawShow(IHyApplication &hyApp)
+void IData::DrawShow(IHyApplication &hyApp)
 {
     m_pCamera->SetEnabled(true);
 
     OnGuiShow(hyApp);
 }
 
-void ItemWidget::DrawHide(IHyApplication &hyApp)
+void IData::DrawHide(IHyApplication &hyApp)
 {
     m_pCamera->SetEnabled(false);
 
     OnGuiHide(hyApp);
 }
 
-void ItemWidget::DrawUpdate(IHyApplication &hyApp)
+void IData::DrawUpdate(IHyApplication &hyApp)
 {
     if(m_bReloadDraw || IsLoaded() == false)
     {
@@ -149,13 +149,13 @@ void ItemWidget::DrawUpdate(IHyApplication &hyApp)
     OnGuiUpdate(hyApp);
 }
 
-void ItemWidget::Link(HyGuiFrame *pFrame)
+void IData::Link(AtlasFrame *pFrame)
 {
     OnLink(pFrame);
     m_Links.insert(pFrame);
 }
 
-void ItemWidget::Relink(HyGuiFrame *pFrame)
+void IData::Relink(AtlasFrame *pFrame)
 {
     if(IsLoaded())
         m_bReloadDraw = true;
@@ -164,7 +164,7 @@ void ItemWidget::Relink(HyGuiFrame *pFrame)
     Save();
 }
 
-void ItemWidget::Unlink(HyGuiFrame *pFrame)
+void IData::Unlink(AtlasFrame *pFrame)
 {
     pFrame->DeleteDrawInst(this);
 
@@ -172,7 +172,7 @@ void ItemWidget::Unlink(HyGuiFrame *pFrame)
     m_Links.remove(pFrame);
 }
 
-void ItemWidget::on_undoStack_cleanChanged(bool bClean)
+void IData::on_undoStack_cleanChanged(bool bClean)
 {
     QTabBar *pTabBar = m_pItemProj->GetTabBar();
     
@@ -181,7 +181,7 @@ void ItemWidget::on_undoStack_cleanChanged(bool bClean)
     
     for(int i = 0; i < pTabBar->count(); ++i)
     {
-        if(pTabBar->tabData(i).value<ItemWidget *>() == this)
+        if(pTabBar->tabData(i).value<IData *>() == this)
         {
             if(bClean)
                 pTabBar->setTabText(i, GetName(false));

@@ -18,26 +18,26 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetSpriteTableView::WidgetSpriteTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
+SpriteTableView::SpriteTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
 {
 }
 
-/*virtual*/ void WidgetSpriteTableView::resizeEvent(QResizeEvent *pResizeEvent)
+/*virtual*/ void SpriteTableView::resizeEvent(QResizeEvent *pResizeEvent)
 {
     int iWidth = pResizeEvent->size().width();
 
     iWidth -= 64 + 64 + 64;
-    setColumnWidth(WidgetSpriteModel::COLUMN_Frame, iWidth);
-    setColumnWidth(WidgetSpriteModel::COLUMN_OffsetX, 64);
-    setColumnWidth(WidgetSpriteModel::COLUMN_OffsetY, 64);
-    setColumnWidth(WidgetSpriteModel::COLUMN_Duration, 64);
+    setColumnWidth(SpriteTableModel::COLUMN_Frame, iWidth);
+    setColumnWidth(SpriteTableModel::COLUMN_OffsetX, 64);
+    setColumnWidth(SpriteTableModel::COLUMN_OffsetY, 64);
+    setColumnWidth(SpriteTableModel::COLUMN_Duration, 64);
 
     QTableView::resizeEvent(pResizeEvent);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetSpriteDelegate::WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSpriteTableView *pTableView, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
+WidgetSpriteDelegate::WidgetSpriteDelegate(SpriteData *pItemSprite, SpriteTableView *pTableView, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
                                                                                                                                     m_pItemSprite(pItemSprite),
                                                                                                                                     m_pTableView(pTableView)
 {
@@ -49,19 +49,19 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSprite
 
     switch(index.column())
     {
-    case WidgetSpriteModel::COLUMN_OffsetX:
+    case SpriteTableModel::COLUMN_OffsetX:
         pReturnWidget = new QSpinBox(pParent);
         static_cast<QSpinBox *>(pReturnWidget)->setPrefix("X:");
         static_cast<QSpinBox *>(pReturnWidget)->setRange(-4096, 4096);
         break;
         
-    case WidgetSpriteModel::COLUMN_OffsetY:
+    case SpriteTableModel::COLUMN_OffsetY:
         pReturnWidget = new QSpinBox(pParent);
         static_cast<QSpinBox *>(pReturnWidget)->setPrefix("Y:");
         static_cast<QSpinBox *>(pReturnWidget)->setRange(-4096, 4096);
         break;
 
-    case WidgetSpriteModel::COLUMN_Duration:
+    case SpriteTableModel::COLUMN_Duration:
         pReturnWidget = new QDoubleSpinBox(pParent);
         static_cast<QDoubleSpinBox *>(pReturnWidget)->setSingleStep(0.001);
         static_cast<QDoubleSpinBox *>(pReturnWidget)->setDecimals(3);
@@ -78,15 +78,15 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSprite
 
     switch(index.column())
     {
-    case WidgetSpriteModel::COLUMN_OffsetX:
+    case SpriteTableModel::COLUMN_OffsetX:
         static_cast<QSpinBox *>(pEditor)->setValue(sCurValue.toInt());
         break;
         
-    case WidgetSpriteModel::COLUMN_OffsetY:
+    case SpriteTableModel::COLUMN_OffsetY:
         static_cast<QSpinBox *>(pEditor)->setValue(sCurValue.toInt());
         break;
 
-    case WidgetSpriteModel::COLUMN_Duration:
+    case SpriteTableModel::COLUMN_Duration:
         static_cast<QDoubleSpinBox *>(pEditor)->setValue(sCurValue.toDouble());
         break;
     }
@@ -96,29 +96,29 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSprite
 {
     switch(index.column())
     {
-    case WidgetSpriteModel::COLUMN_OffsetX:
+    case SpriteTableModel::COLUMN_OffsetX:
     {
-        WidgetSpriteModel *pSpriteModel = static_cast<WidgetSpriteModel *>(pModel);
+        SpriteTableModel *pSpriteModel = static_cast<SpriteTableModel *>(pModel);
         QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
         vOffset.setX(static_cast<QSpinBox *>(pEditor)->value());
 
-        m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
+        m_pItemSprite->GetUndoStack()->push(new SpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
         break;
     }
 
-    case WidgetSpriteModel::COLUMN_OffsetY:
+    case SpriteTableModel::COLUMN_OffsetY:
     {
-        WidgetSpriteModel *pSpriteModel = static_cast<WidgetSpriteModel *>(pModel);
+        SpriteTableModel *pSpriteModel = static_cast<SpriteTableModel *>(pModel);
         QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
         vOffset.setY(static_cast<QSpinBox *>(pEditor)->value());
 
-        m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
+        m_pItemSprite->GetUndoStack()->push(new SpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
         break;
     }
     
 
-    case WidgetSpriteModel::COLUMN_Duration:
-        m_pItemSprite->GetUndoStack()->push(new WidgetSpriteUndoCmd_DurationFrame(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value()));
+    case SpriteTableModel::COLUMN_Duration:
+        m_pItemSprite->GetUndoStack()->push(new SpriteUndoCmd_DurationFrame(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value()));
         break;
     }
 }
@@ -130,11 +130,11 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ItemSprite *pItemSprite, WidgetSprite
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetSpriteModel::WidgetSpriteModel(QObject *parent) : QAbstractTableModel(parent)
+SpriteTableModel::SpriteTableModel(QObject *parent) : QAbstractTableModel(parent)
 {
 }
 
-int WidgetSpriteModel::Add(HyGuiFrame *pFrame)
+int SpriteTableModel::Add(AtlasFrame *pFrame)
 {
     SpriteFrame *pFrameToInsert = NULL;
 
@@ -155,7 +155,7 @@ int WidgetSpriteModel::Add(HyGuiFrame *pFrame)
     return pFrameToInsert->m_iRowIndex;
 }
 
-void WidgetSpriteModel::Remove(HyGuiFrame *pFrame)
+void SpriteTableModel::Remove(AtlasFrame *pFrame)
 {
     for(int i = 0; i < m_FramesList.count(); ++i)
     {
@@ -171,7 +171,7 @@ void WidgetSpriteModel::Remove(HyGuiFrame *pFrame)
     }
 }
 
-void WidgetSpriteModel::MoveRowUp(int iIndex)
+void SpriteTableModel::MoveRowUp(int iIndex)
 {
     if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
         return;
@@ -180,7 +180,7 @@ void WidgetSpriteModel::MoveRowUp(int iIndex)
     endMoveRows();
 }
 
-void WidgetSpriteModel::MoveRowDown(int iIndex)
+void SpriteTableModel::MoveRowDown(int iIndex)
 {
     if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt is retarded
         return;
@@ -189,7 +189,7 @@ void WidgetSpriteModel::MoveRowDown(int iIndex)
     endMoveRows();
 }
 
-void WidgetSpriteModel::RefreshFrame(HyGuiFrame *pFrame)
+void SpriteTableModel::RefreshFrame(AtlasFrame *pFrame)
 {
     bool bFound = false;
     for(int i = 0; i < m_FramesList.count(); ++i)
@@ -206,7 +206,7 @@ void WidgetSpriteModel::RefreshFrame(HyGuiFrame *pFrame)
 }
 
 // iIndex of -1 will apply to all
-void WidgetSpriteModel::OffsetFrame(int iIndex, QPoint vOffset)
+void SpriteTableModel::OffsetFrame(int iIndex, QPoint vOffset)
 {
     if(iIndex == -1)
     {
@@ -223,7 +223,7 @@ void WidgetSpriteModel::OffsetFrame(int iIndex, QPoint vOffset)
 }
 
 // iIndex of -1 will apply to all
-void WidgetSpriteModel::DurationFrame(int iIndex, float fDuration)
+void SpriteTableModel::DurationFrame(int iIndex, float fDuration)
 {
     if(iIndex == -1)
     {
@@ -239,7 +239,7 @@ void WidgetSpriteModel::DurationFrame(int iIndex, float fDuration)
     }
 }
 
-SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
+SpriteFrame *SpriteTableModel::GetFrameAt(int iIndex)
 {
     if(iIndex < 0)
         return NULL;
@@ -247,17 +247,17 @@ SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
     return m_FramesList[iIndex];
 }
 
-/*virtual*/ int WidgetSpriteModel::rowCount(const QModelIndex & /*parent*/) const
+/*virtual*/ int SpriteTableModel::rowCount(const QModelIndex & /*parent*/) const
 {
    return m_FramesList.count();
 }
 
-/*virtual*/ int WidgetSpriteModel::columnCount(const QModelIndex & /*parent*/) const
+/*virtual*/ int SpriteTableModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return NUMCOLUMNS;
 }
 
-/*virtual*/ QVariant WidgetSpriteModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant SpriteTableModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
 {
     SpriteFrame *pFrame = m_FramesList[index.row()];
 
@@ -284,7 +284,7 @@ SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
     return QVariant();
 }
 
-/*virtual*/ QVariant WidgetSpriteModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant SpriteTableModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
 {
     if (role == Qt::DisplayRole)
     {
@@ -309,7 +309,7 @@ SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
     return QVariant();
 }
 
-/*virtual*/ bool WidgetSpriteModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
+/*virtual*/ bool SpriteTableModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
 {
     HyGuiLog("SpriteFramesModel::setData was invoked", LOGTYPE_Error);
 
@@ -338,7 +338,7 @@ SpriteFrame *WidgetSpriteModel::GetFrameAt(int iIndex)
     return true;
 }
 
-/*virtual*/ Qt::ItemFlags WidgetSpriteModel::flags(const QModelIndex &index) const
+/*virtual*/ Qt::ItemFlags SpriteTableModel::flags(const QModelIndex &index) const
 {
     if(index.column() == COLUMN_Frame)
         return Qt::ItemIsSelectable | Qt::ItemIsEnabled;

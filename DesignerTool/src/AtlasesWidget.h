@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETATLASMANAGER_H
-#define WIDGETATLASMANAGER_H
+#ifndef ATLASESWIDGET_H
+#define ATLASESWIDGET_H
 
 #include <QWidget>
 #include <QDir>
@@ -20,17 +20,17 @@
 #include "AtlasesData.h"
 
 namespace Ui {
-class WidgetAtlasManager;
+class AtlasesWidget;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetAtlasGroupTreeWidget : public QTreeWidget
+class AtlasesTreeWidget : public QTreeWidget
 {
-    WidgetAtlasManager *      m_pOwner;
+    AtlasesWidget *      m_pOwner;
 
 public:
-    WidgetAtlasGroupTreeWidget(QWidget *parent = Q_NULLPTR);
-    void SetOwner(WidgetAtlasManager *pOwner);
+    AtlasesTreeWidget(QWidget *parent = Q_NULLPTR);
+    void SetOwner(AtlasesWidget *pOwner);
 
 protected:
     virtual void dropEvent(QDropEvent *e) override;
@@ -39,7 +39,7 @@ protected:
 class AtlasTreeItem : public QTreeWidgetItem
 {
 public:
-    AtlasTreeItem(WidgetAtlasGroupTreeWidget *pView, int type = Type) : QTreeWidgetItem(pView, type)
+    AtlasTreeItem(AtlasesTreeWidget *pView, int type = Type) : QTreeWidgetItem(pView, type)
     { }
     AtlasTreeItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type)
     { }
@@ -48,29 +48,29 @@ public:
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class WidgetAtlasManager : public QWidget
+class AtlasesWidget : public QWidget
 {
     Q_OBJECT
 
     friend class WidgetAtlasGroup;
 
-    ItemAtlases *                   m_pDataRef;
+    AtlasesData *                   m_pDataRef;
 
     QTreeWidgetItem *               m_pMouseHoverItem;
 
 public:
-    explicit WidgetAtlasManager(QWidget *parent = 0);
-    explicit WidgetAtlasManager(ItemAtlases &itemDataRef, QWidget *parent = 0);
-    ~WidgetAtlasManager();
+    explicit AtlasesWidget(QWidget *parent = 0);
+    explicit AtlasesWidget(AtlasesData &itemDataRef, QWidget *parent = 0);
+    ~AtlasesWidget();
 
-    ItemAtlases &GetData();
+    AtlasesData &GetData();
 
     QTreeWidget *GetFramesTreeWidget();
 
-    friend void AtlasManager_DrawOpen(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
-    friend void AtlasManager_DrawShow(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
-    friend void AtlasManager_DrawHide(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
-    friend void AtlasManager_DrawUpdate(IHyApplication &hyApp, WidgetAtlasManager &atlasMan);
+    friend void AtlasManager_DrawOpen(IHyApplication &hyApp, AtlasesWidget &atlasMan);
+    friend void AtlasManager_DrawShow(IHyApplication &hyApp, AtlasesWidget &atlasMan);
+    friend void AtlasManager_DrawHide(IHyApplication &hyApp, AtlasesWidget &atlasMan);
+    friend void AtlasManager_DrawUpdate(IHyApplication &hyApp, AtlasesWidget &atlasMan);
 
 private Q_SLOTS:
     void on_btnAddImages_clicked();
@@ -88,7 +88,7 @@ private Q_SLOTS:
     void on_atlasList_itemSelectionChanged();
 
 private:
-    Ui::WidgetAtlasManager *ui;
+    Ui::AtlasesWidget *ui;
 
     void PreviewAtlasGroup();
     void HideAtlasGroup();
@@ -97,4 +97,4 @@ protected:
     virtual void resizeEvent(QResizeEvent *event) override;
 };
 
-#endif // WIDGETATLASMANAGER_H
+#endif // ATLASESWIDGET_H

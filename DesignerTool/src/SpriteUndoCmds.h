@@ -7,92 +7,92 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETSPRITEUNDOCMDS_H
-#define WIDGETSPRITEUNDOCMDS_H
+#ifndef SPRITEUNDOCMDS_H
+#define SPRITEUNDOCMDS_H
 
 #include <QUndoCommand>
 #include <QTableWidget>
 
-class WidgetSpriteTableView;
-class ItemWidget;
+class SpriteTableView;
+class IData;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetSpriteUndoCmd_OrderFrame : public QUndoCommand
+class SpriteUndoCmd_OrderFrame : public QUndoCommand
 {
-    WidgetSpriteTableView *     m_pSpriteTableView;
+    SpriteTableView *     m_pSpriteTableView;
     int                         m_iFrameIndex;
     int                         m_iFrameIndexDest;
     
 public:
-    WidgetSpriteUndoCmd_OrderFrame(WidgetSpriteTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent = 0);
-    virtual ~WidgetSpriteUndoCmd_OrderFrame();
+    SpriteUndoCmd_OrderFrame(SpriteTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent = 0);
+    virtual ~SpriteUndoCmd_OrderFrame();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetSpriteUndoCmd_OffsetFrame : public QUndoCommand
+class SpriteUndoCmd_OffsetFrame : public QUndoCommand
 {
-    WidgetSpriteTableView *     m_pSpriteTableView;
+    SpriteTableView *     m_pSpriteTableView;
     int                         m_iFrameIndex;
     QList<QPoint>               m_OriginalOffsetList;
     QPoint                      m_vNewOffset;
     
 public:
-    WidgetSpriteUndoCmd_OffsetFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, QPoint vOffset, QUndoCommand *pParent = 0);
-    virtual ~WidgetSpriteUndoCmd_OffsetFrame();
+    SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint vOffset, QUndoCommand *pParent = 0);
+    virtual ~SpriteUndoCmd_OffsetFrame();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetSpriteUndoCmd_OffsetXFrame : public QUndoCommand
+class SpriteUndoCmd_OffsetXFrame : public QUndoCommand
 {
-    WidgetSpriteTableView *     m_pSpriteTableView;
+    SpriteTableView *     m_pSpriteTableView;
     int                         m_iFrameIndex;
     QList<QPoint>               m_OriginalOffsetList;
     QList<int>                  m_NewOffsetList;
 
 public:
-    WidgetSpriteUndoCmd_OffsetXFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent = 0);
-    virtual ~WidgetSpriteUndoCmd_OffsetXFrame();
+    SpriteUndoCmd_OffsetXFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent = 0);
+    virtual ~SpriteUndoCmd_OffsetXFrame();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetSpriteUndoCmd_OffsetYFrame : public QUndoCommand
+class SpriteUndoCmd_OffsetYFrame : public QUndoCommand
 {
-    WidgetSpriteTableView *     m_pSpriteTableView;
+    SpriteTableView *     m_pSpriteTableView;
     int                         m_iFrameIndex;
     QList<QPoint>               m_OriginalOffsetList;
     QList<int>                  m_NewOffsetList;
 
 public:
-    WidgetSpriteUndoCmd_OffsetYFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent = 0);
-    virtual ~WidgetSpriteUndoCmd_OffsetYFrame();
+    SpriteUndoCmd_OffsetYFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent = 0);
+    virtual ~SpriteUndoCmd_OffsetYFrame();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WidgetSpriteUndoCmd_DurationFrame : public QUndoCommand
+class SpriteUndoCmd_DurationFrame : public QUndoCommand
 {
-    WidgetSpriteTableView *    m_pSpriteTableView;
+    SpriteTableView *    m_pSpriteTableView;
     int                        m_iFrameIndex;
     QList<float>               m_OriginalDurationList;
     float                      m_fNewDuration;
     
 public:
-    WidgetSpriteUndoCmd_DurationFrame(WidgetSpriteTableView *pSpriteTableView, int iIndex, float fDuration, QUndoCommand *pParent = 0);
-    virtual ~WidgetSpriteUndoCmd_DurationFrame();
+    SpriteUndoCmd_DurationFrame(SpriteTableView *pSpriteTableView, int iIndex, float fDuration, QUndoCommand *pParent = 0);
+    virtual ~SpriteUndoCmd_DurationFrame();
 
     void redo() Q_DECL_OVERRIDE;
     void undo() Q_DECL_OVERRIDE;
 };
 
-#endif // WIDGETSPRITEUNDOCMDS_H
+#endif // SPRITEUNDOCMDS_H

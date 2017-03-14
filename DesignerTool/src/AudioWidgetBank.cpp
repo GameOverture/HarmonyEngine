@@ -18,8 +18,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
-WidgetAudioBank::WidgetAudioBank(QWidget *parent) : QWidget(parent),
-                                                    ui(new Ui::WidgetAudioBank)
+AudioWidgetBank::AudioWidgetBank(QWidget *parent) : QWidget(parent),
+                                                    ui(new Ui::AudioWidgetBank)
 {
     ui->setupUi(this);
     
@@ -27,15 +27,15 @@ WidgetAudioBank::WidgetAudioBank(QWidget *parent) : QWidget(parent),
     HyGuiLog("WidgetAudioBank::WidgetAudioBank() invalid constructor used", LOGTYPE_Error);
 }
 
-WidgetAudioBank::WidgetAudioBank(QDir metaDir, QDir dataDir, WidgetAudioManager *pManager, QWidget *pParent /*= 0*/) :  QWidget(pParent),
-                                                                                                                        ui(new Ui::WidgetAudioBank),
+AudioWidgetBank::AudioWidgetBank(QDir metaDir, QDir dataDir, AudioWidgetManager *pManager, QWidget *pParent /*= 0*/) :  QWidget(pParent),
+                                                                                                                        ui(new Ui::AudioWidgetBank),
                                                                                                                         m_pManager(pManager),
                                                                                                                         m_MetaDir(metaDir),
                                                                                                                         m_DataDir(dataDir)
 {
     ui->setupUi(this);
     
-    m_pModel = new WidgetAudioBankModel(this);
+    m_pModel = new AudioBankTableModel(this);
     ui->waveTable->setModel(m_pModel);
     ui->waveTable->setShowGrid(false);
 
@@ -61,7 +61,7 @@ WidgetAudioBank::WidgetAudioBank(QDir metaDir, QDir dataDir, WidgetAudioManager 
         {
             QJsonObject waveObj = wavesArray[i].toObject();
             
-            HyGuiWave *pNewWave = m_pManager->CreateWave(GetId(),
+            AudioWave *pNewWave = m_pManager->CreateWave(GetId(),
                                                          JSONOBJ_TOINT(waveObj, "checksum"),
                                                          waveObj["name"].toString(),
                                                          waveObj["formatType"].toInt(),
@@ -81,27 +81,27 @@ WidgetAudioBank::WidgetAudioBank(QDir metaDir, QDir dataDir, WidgetAudioManager 
 
 }
 
-WidgetAudioBank::~WidgetAudioBank()
+AudioWidgetBank::~AudioWidgetBank()
 {
     delete ui;
 }
 
-QString WidgetAudioBank::GetName()
+QString AudioWidgetBank::GetName()
 {
     return m_pModel->GetName();
 }
 
-void WidgetAudioBank::SetName(QString sName)
+void AudioWidgetBank::SetName(QString sName)
 {
     m_pModel->SetName(sName);
 }
 
-int WidgetAudioBank::GetId()
+int AudioWidgetBank::GetId()
 {
     return m_MetaDir.dirName().toInt();
 }
 
-void WidgetAudioBank::on_btnAddWaves_pressed()
+void AudioWidgetBank::on_btnAddWaves_pressed()
 {
     QFileDialog dlg(this);
     dlg.setFileMode(QFileDialog::ExistingFile);
@@ -123,7 +123,7 @@ void WidgetAudioBank::on_btnAddWaves_pressed()
     }
 }
 
-void WidgetAudioBank::on_btnAddDir_pressed()
+void AudioWidgetBank::on_btnAddDir_pressed()
 {
     QFileDialog dlg(this);
     dlg.setFileMode(QFileDialog::Directory);
@@ -150,7 +150,7 @@ void WidgetAudioBank::on_btnAddDir_pressed()
     }
 }
 
-void WidgetAudioBank::ImportWaves(QStringList sWaveFileList)
+void AudioWidgetBank::ImportWaves(QStringList sWaveFileList)
 {
     for(int i = 0; i < sWaveFileList.size(); ++i)
     {
@@ -163,9 +163,9 @@ void WidgetAudioBank::ImportWaves(QStringList sWaveFileList)
         uint16 uiBitsPerSample;
         uint32 uiSamplesPerSec;
         
-        if(HyGuiWave::ParseWaveFile(waveFileInfo, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec))
+        if(AudioWave::ParseWaveFile(waveFileInfo, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec))
         {
-            HyGuiWave *pNewWave = m_pManager->CreateWave(GetId(), uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, 0);
+            AudioWave *pNewWave = m_pManager->CreateWave(GetId(), uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, 0);
             if(pNewWave)
             {
                 if(QFile::copy(waveFileInfo.absoluteFilePath(), m_MetaDir.absoluteFilePath(pNewWave->ConstructWaveFileName())))
@@ -191,7 +191,7 @@ void WidgetAudioBank::ImportWaves(QStringList sWaveFileList)
     }
 }
 
-void WidgetAudioBank::Refresh()
+void AudioWidgetBank::Refresh()
 {
 //    // Gather wave files
 //    std::unique_ptr<uint8_t[]> entries;

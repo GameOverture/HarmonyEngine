@@ -15,7 +15,7 @@
 #include "DlgNewItem.h"
 #include "DlgInputName.h"
 
-#include "WidgetExplorer.h"
+#include "ExplorerWidget.h"
 #include "AtlasesWidget.h"
 #include "AudioWidgetManager.h"
 
@@ -233,12 +233,12 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     return sm_pInstance->m_sEngineLocation;
 }
 
-/*static*/ void MainWindow::OpenItem(ItemWidget *pItem)
+/*static*/ void MainWindow::OpenItem(IData *pItem)
 {
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
     
-    ItemProject *pItemProj = sm_pInstance->ui->explorer->GetCurProjSelected();
+    Project *pItemProj = sm_pInstance->ui->explorer->GetCurProjSelected();
     QTabBar *pTabBar = pItemProj->GetTabBar();
 
     if(pItem->IsLoaded() == false)
@@ -257,7 +257,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     {
         for(int i = 0; i < pTabBar->count(); ++i)
         {
-            if(pTabBar->tabData(i).value<ItemWidget *>() == pItem)
+            if(pTabBar->tabData(i).value<IData *>() == pItem)
             {
                 pTabBar->blockSignals(true);
                 pTabBar->setCurrentIndex(i);
@@ -269,7 +269,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     
     // Hide everything
     for(int i = 0; i < pTabBar->count(); ++i)
-        pTabBar->tabData(i).value<ItemWidget *>()->DrawHide(*pItemProj);
+        pTabBar->tabData(i).value<IData *>()->DrawHide(*pItemProj);
 
     // Then show
     pItem->DrawShow(*pItemProj);
@@ -297,7 +297,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->ui->mainToolBar->addActions(sm_pInstance->ui->menu_Edit->actions());
 }
 
-/*static*/ void MainWindow::CloseItem(ItemWidget *pItem)
+/*static*/ void MainWindow::CloseItem(IData *pItem)
 {
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
@@ -326,11 +326,11 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         sm_pInstance->ui->menu_Edit->clear();
     }
     
-    ItemProject *pItemProj = sm_pInstance->ui->explorer->GetCurProjSelected();
+    Project *pItemProj = sm_pInstance->ui->explorer->GetCurProjSelected();
     QTabBar *pTabBar = pItemProj->GetTabBar();
     for(int i = 0; i < pTabBar->count(); ++i)
     {
-        if(pTabBar->tabData(i).value<ItemWidget *>() == pItem)
+        if(pTabBar->tabData(i).value<IData *>() == pItem)
         {
             pTabBar->removeTab(i);
             break;
@@ -340,7 +340,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     pItem->Unload(*pItemProj);
 }
 
-/*static*/ void MainWindow::SetSelectedProj(ItemProject *pProj)
+/*static*/ void MainWindow::SetSelectedProj(Project *pProj)
 {
     if(sm_pInstance->m_pCurSelectedProj == pProj)
         return;
@@ -383,7 +383,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurRenderer = new HyGuiRenderer(pProj, sm_pInstance);
     sm_pInstance->ui->centralVerticalLayout->addWidget(sm_pInstance->m_pCurRenderer);
 
-    ItemProject *pTest = sm_pInstance->m_pCurSelectedProj;
+    Project *pTest = sm_pInstance->m_pCurSelectedProj;
 
     if(sm_pInstance->m_pCurSelectedProj)
     {
@@ -405,7 +405,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     delete sm_pInstance->m_pCurRenderer;
     sm_pInstance->m_pCurRenderer = NULL;
     
-    ItemProject *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
+    Project *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
     sm_pInstance->m_pCurSelectedProj = NULL;    // Set m_pCurSelectedProj to 'NULL' so SetSelectedProj() doesn't imediately return
     
     SetSelectedProj(pCurItemProj);

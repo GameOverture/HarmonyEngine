@@ -7,22 +7,22 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETAUDIOSTATE_H
-#define WIDGETAUDIOSTATE_H
+#ifndef AUDIOWIDGETSTATE_H
+#define AUDIOWIDGETSTATE_H
 
 #include <QWidget>
 
 namespace Ui {
-class WidgetAudioState;
+class AudioWidgetState;
 }
 
-class WidgetAudio;
+class AudioWidget;
 
-class WidgetAudioState : public QWidget
+class AudioWidgetState : public QWidget
 {
     Q_OBJECT
     
-    WidgetAudio *                       m_pOwner;
+    AudioWidget *                       m_pOwner;
     QString                             m_sName;
     
     int                                 m_iPrevCategoryIndex;
@@ -30,8 +30,8 @@ class WidgetAudioState : public QWidget
     int                                 m_iPrevNumInst;
     
 public:
-    explicit WidgetAudioState(WidgetAudio *pOwner, QList<QAction *> stateActionList, QWidget *parent = 0);
-    ~WidgetAudioState();
+    explicit AudioWidgetState(AudioWidget *pOwner, QList<QAction *> stateActionList, QWidget *parent = 0);
+    ~AudioWidgetState();
     
     QString GetName();
     void SetName(QString sName);
@@ -55,7 +55,7 @@ private Q_SLOTS:
     void on_radInstQueue_toggled(bool checked);
     
 private:
-    Ui::WidgetAudioState *ui;
+    Ui::AudioWidgetState *ui;
 };
 
-#endif // WIDGETAUDIOSTATE_H
+#endif // AUDIOWIDGETSTATE_H

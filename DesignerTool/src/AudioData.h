@@ -12,13 +12,13 @@
 
 #include "IData.h"
 
-class ItemAudio : public ItemWidget
+class AudioData : public IData
 {
     Q_OBJECT
     
 public:
-    ItemAudio(ItemProject *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
-    virtual ~ItemAudio();
+    AudioData(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
+    virtual ~AudioData();
     
 protected:
     virtual void OnGiveMenuActions(QMenu *pMenu);
@@ -30,9 +30,9 @@ protected:
     virtual void OnGuiHide(IHyApplication &hyApp);
     virtual void OnGuiUpdate(IHyApplication &hyApp);
 
-    virtual void OnLink(HyGuiFrame *pFrame);
-    virtual void OnReLink(HyGuiFrame *pFrame);
-    virtual void OnUnlink(HyGuiFrame *pFrame);
+    virtual void OnLink(AtlasFrame *pFrame);
+    virtual void OnReLink(AtlasFrame *pFrame);
+    virtual void OnUnlink(AtlasFrame *pFrame);
     
     virtual QJsonValue OnSave();
 };

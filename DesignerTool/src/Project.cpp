@@ -135,7 +135,7 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
     }
 }
 
-ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Project, sNewProjectFilePath),
+Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Project, sNewProjectFilePath),
                                                                 IHyApplication(HarmonyInit()),
                                                                 m_pAtlasesData(nullptr),
                                                                 m_pAtlasMan(nullptr),
@@ -246,7 +246,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
             continue;
 
         QString sSubDirPath = GetAssetsAbsPath() % HyGlobal::ItemName(subDirList[i]) % HyGlobal::ItemExt(subDirList[i]);
-        Item *pSubDirItem = new Item(subDirList[i], sSubDirPath);
+        ExplorerItem *pSubDirItem = new ExplorerItem(subDirList[i], sSubDirPath);
 
         // Adding sub dir tree item
         QTreeWidgetItem *pSubDirTreeItem = pSubDirItem->GetTreeItem();
@@ -296,7 +296,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
 
                     if(bPrefixFound == false)
                     {
-                        Item *pPrefixItem = new Item(ITEM_Prefix, sCurPrefix);
+                        ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sCurPrefix);
                         QTreeWidgetItem *pNewPrefixTreeWidget = pPrefixItem->GetTreeItem();
 
                         pCurPrefixTreeItem->addChild(pNewPrefixTreeWidget);
@@ -305,17 +305,17 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
                 }
                 else // Last path part, so must be the actual data item
                 {
-                    Item *pNewDataItem = nullptr;
+                    ExplorerItem *pNewDataItem = nullptr;
                     switch(subDirList[i])
                     {
                     case ITEM_DirAudio:
-                        pNewDataItem = new ItemAudio(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new AudioData(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirFonts:
-                        pNewDataItem = new ItemFont(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new FontData(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirSprites:
-                        pNewDataItem = new ItemSprite(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new SpriteData(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirParticles:
                     case ITEM_DirSpine:
@@ -371,18 +371,18 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
         //}
     }
 
-    m_pAtlasesData = new ItemAtlases(this);
+    m_pAtlasesData = new AtlasesData(this);
 }
 
-ItemProject::~ItemProject()
+Project::~Project()
 {
     delete m_pAtlasMan;
 }
 
-void ItemProject::LoadWidgets()
+void Project::LoadWidgets()
 {
-    m_pAtlasMan = new WidgetAtlasManager(*m_pAtlasesData, nullptr);
-    m_pAudioMan = new WidgetAudioManager(this, nullptr);
+    m_pAtlasMan = new AtlasesWidget(*m_pAtlasesData, nullptr);
+    m_pAudioMan = new AudioWidgetManager(this, nullptr);
 
     m_pTabBar = new QTabBar(nullptr);
     m_pTabBar->setTabsClosable(true);
@@ -391,23 +391,23 @@ void ItemProject::LoadWidgets()
     connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
 }
 
-bool ItemProject::HasError() const
+bool Project::HasError() const
 {
     return m_bHasError;
 }
 
-QList<AtlasTreeItem *> ItemProject::GetAtlasTreeItemList()
+QList<AtlasTreeItem *> Project::GetAtlasTreeItemList()
 {
     return m_pAtlasesData->GetAtlasTreeItemList();
 }
 
-QString ItemProject::GetDirPath() const
+QString Project::GetDirPath() const
 {
     QFileInfo file(m_sPATH);
     return file.dir().absolutePath() + '/';
 }
 
-QList<QAction *> ItemProject::GetSaveActions()
+QList<QAction *> Project::GetSaveActions()
 {
     QList<QAction *> actionList;
     actionList.append(&m_ActionSave);
@@ -416,14 +416,14 @@ QList<QAction *> ItemProject::GetSaveActions()
     return actionList;
 }
 
-void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
+void Project::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 {
     m_ActionSave.setEnabled(bSaveEnabled);
     m_ActionSaveAll.setEnabled(bSaveAllEnabled);
 }
 
 // IHyApplication override
-/*virtual*/ bool ItemProject::Initialize()
+/*virtual*/ bool Project::Initialize()
 {
     IHyShader *pShader_CheckerGrid = IHyRenderer::MakeCustomShader();
     pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
@@ -444,14 +444,14 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 }
 
 // IHyApplication override
-/*virtual*/ bool ItemProject::Update()
+/*virtual*/ bool Project::Update()
 {
     if(IsOverrideDraw())
         OverrideDraw();
     else if(m_pTabBar->count() > 0)
     {
         m_pCamera->SetEnabled(false);
-        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ItemWidget *>()->DrawUpdate(*this);
+        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<IData *>()->DrawUpdate(*this);
     }
     else
         m_pCamera->SetEnabled(true);
@@ -460,26 +460,26 @@ void ItemProject::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 }
 
 // IHyApplication override
-/*virtual*/ void ItemProject::Shutdown()
+/*virtual*/ void Project::Shutdown()
 {
 }
 
-void ItemProject::SetRenderSize(int iWidth, int iHeight)
+void Project::SetRenderSize(int iWidth, int iHeight)
 {
     Window().SetResolution(glm::ivec2(iWidth, iHeight));
 }
 
-void ItemProject::SetOverrideDrawState(eProjDrawState eDrawState)
+void Project::SetOverrideDrawState(eProjDrawState eDrawState)
 {
     m_DrawStateQueue.append(eDrawState);
 }
 
-bool ItemProject::IsOverrideDraw()
+bool Project::IsOverrideDraw()
 {
     return (m_eDrawState != PROJDRAWSTATE_Nothing || m_ePrevDrawState != PROJDRAWSTATE_Nothing || m_DrawStateQueue.empty() == false);
 }
 
-void ItemProject::OverrideDraw()
+void Project::OverrideDraw()
 {
     m_pCamera->SetEnabled(true);
 
@@ -503,7 +503,7 @@ void ItemProject::OverrideDraw()
 
             // Show the selected tab since we're done with override draw
             if(m_pTabBar->currentIndex() != -1)
-                m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ItemWidget *>()->DrawShow(*this);
+                m_pTabBar->tabData(m_pTabBar->currentIndex()).value<IData *>()->DrawShow(*this);
             
             m_ePrevDrawState = PROJDRAWSTATE_Nothing;
         }
@@ -519,7 +519,7 @@ void ItemProject::OverrideDraw()
             
             // Hide any currently shown items, since we're being draw override
             for(int i = 0; i < m_pTabBar->count(); ++i)
-                m_pTabBar->tabData(i).value<ItemWidget *>()->DrawHide(*this);
+                m_pTabBar->tabData(i).value<IData *>()->DrawHide(*this);
 
             if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
                 AtlasManager_DrawShow(*this, *m_pAtlasMan);
@@ -530,7 +530,7 @@ void ItemProject::OverrideDraw()
         AtlasManager_DrawUpdate(*this, *m_pAtlasMan);
 }
 
-void ItemProject::Reset()
+void Project::Reset()
 {
     for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
         m_bDrawStateLoaded[i] = false;
@@ -539,7 +539,7 @@ void ItemProject::Reset()
     sm_Init.sDataDir = GetAssetsAbsPath().toStdString();
 }
 
-void ItemProject::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal)
+void Project::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal)
 {
     eItemType eSubDirType = HyGlobal::GetCorrespondingDirItem(eType);
     QString sSubDirName = HyGlobal::ItemName(eSubDirType);
@@ -562,7 +562,7 @@ void ItemProject::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVa
 #endif
 }
 
-void ItemProject::SaveGameData()
+void Project::SaveGameData()
 {
     QFile dataFile(GetAssetsAbsPath() % HYGUIPATH_DataFile);
     if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
@@ -583,7 +583,7 @@ void ItemProject::SaveGameData()
     }
 }
 
-void ItemProject::SaveUserData()
+void Project::SaveUserData()
 {
     QFile userFile(GetMetaDataAbsPath() % HYGUIPATH_MetaUserFile);
     if(userFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
@@ -623,41 +623,41 @@ void ItemProject::SaveUserData()
     }
 }
 
-QJsonObject ItemProject::GetSubDirObj(eItemType eType)
+QJsonObject Project::GetSubDirObj(eItemType eType)
 {
     return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType))].toObject();
 }
 
-void ItemProject::on_tabBar_currentChanged(int index)
+void Project::on_tabBar_currentChanged(int index)
 {
     if(index < 0)
         return;
 
     int iIndex = m_pTabBar->currentIndex();
     QVariant v = m_pTabBar->tabData(iIndex);
-    ItemWidget *pItem = v.value<ItemWidget *>();
+    IData *pItem = v.value<IData *>();
 
     MainWindow::OpenItem(pItem);
 }
 
-void ItemProject::on_save_triggered()
+void Project::on_save_triggered()
 {
     int iIndex = m_pTabBar->currentIndex();
     QVariant v = m_pTabBar->tabData(iIndex);
-    ItemWidget *pItem = v.value<ItemWidget *>();
+    IData *pItem = v.value<IData *>();
     pItem->Save();
     
     HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
 }
 
-void ItemProject::on_saveAll_triggered()
+void Project::on_saveAll_triggered()
 {
     for(int i = 0; i < m_pTabBar->count(); ++i)
     {
         // TODO: instead look for dirty?
         if(m_pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
         {
-            ItemWidget *pItem = m_pTabBar->tabData(i).value<ItemWidget *>();
+            IData *pItem = m_pTabBar->tabData(i).value<IData *>();
             pItem->Save();
             
             HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
@@ -665,8 +665,8 @@ void ItemProject::on_saveAll_triggered()
     }
 }
 
-void ItemProject::on_tabBar_closeRequested(int iIndex)
+void Project::on_tabBar_closeRequested(int iIndex)
 {
-    ItemWidget *pItem = m_pTabBar->tabData(iIndex).value<ItemWidget *>();
+    IData *pItem = m_pTabBar->tabData(iIndex).value<IData *>();
     MainWindow::CloseItem(pItem);
 }

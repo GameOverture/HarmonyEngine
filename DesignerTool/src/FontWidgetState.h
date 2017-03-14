@@ -7,25 +7,25 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETFONTSTATE_H
-#define WIDGETFONTSTATE_H
+#ifndef FONTWIDGETSTATE_H
+#define FONTWIDGETSTATE_H
 
 #include "FontModelView.h"
 
 #include <QWidget>
 
 namespace Ui {
-class WidgetFontState;
+class FontWidgetState;
 }
 
-class WidgetFont;
+class FontWidget;
 
-class WidgetFontState : public QWidget
+class FontWidgetState : public QWidget
 {
     Q_OBJECT
     
-    WidgetFont *                    m_pOwner;
-    WidgetFontModel *               m_pFontModel;
+    FontWidget *                    m_pOwner;
+    FontTableModel *               m_pFontModel;
     
     QString                         m_sName;
 
@@ -33,16 +33,16 @@ class WidgetFontState : public QWidget
     double                          m_dPrevFontSize;
     
 public:
-    explicit WidgetFontState(WidgetFont *pOwner, QList<QAction *> stateActionList, QWidget *parent = 0);
-    virtual ~WidgetFontState();
+    explicit FontWidgetState(FontWidget *pOwner, QList<QAction *> stateActionList, QWidget *parent = 0);
+    virtual ~FontWidgetState();
     
     QString GetName();
     void SetName(QString sNewName);
     
     void SetSelectedFont(QString sFontName);
     
-    WidgetFontModel *GetFontModel();
-    WidgetFontTableView *GetFontLayerView();
+    FontTableModel *GetFontModel();
+    FontTableView *GetFontLayerView();
     
     QString GetFontFilePath();
     
@@ -67,8 +67,7 @@ private Q_SLOTS:
     void on_layersView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection);
     
 private:
-    Ui::WidgetFontState *ui;
+    Ui::FontWidgetState *ui;
 };
-Q_DECLARE_METATYPE(WidgetFontState *)
 
-#endif // WIDGETFONTSTATE_H
+#endif // FONTWIDGETSTATE_H

@@ -45,7 +45,7 @@ class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
 {
     Q_OBJECT
 
-    ItemProject *       m_pProjOwner;
+    Project *       m_pProjOwner;
     HyEngine *          m_pHyEngine;
     
     bool                m_bIsUpdating;
@@ -54,7 +54,7 @@ class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
 
 public:
     HyGuiRenderer(QWidget *parent = 0);
-    HyGuiRenderer(ItemProject *pProj, QWidget *parent = 0);
+    HyGuiRenderer(Project *pProj, QWidget *parent = 0);
     ~HyGuiRenderer();
     
     HyRendererInterop *GetHarmonyRenderer();

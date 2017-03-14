@@ -38,7 +38,7 @@ class MainWindow : public QMainWindow
 
     bool                    m_bIsInitialized;
 
-    ItemProject *           m_pCurSelectedProj;
+    Project *           m_pCurSelectedProj;
     HyGuiRenderer *         m_pCurRenderer;
 
     QAction *               m_pCurSaveAction;
@@ -56,10 +56,10 @@ public:
     
     static QString EngineLocation();
     
-    static void OpenItem(ItemWidget *pItem);
-    static void CloseItem(ItemWidget *pItem);
+    static void OpenItem(IData *pItem);
+    static void CloseItem(IData *pItem);
     
-    static void SetSelectedProj(ItemProject *pProj);
+    static void SetSelectedProj(Project *pProj);
     static void ReloadHarmony();
 
     static void StartLoading(uint uiAreaFlags);

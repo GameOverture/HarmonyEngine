@@ -11,53 +11,53 @@
 #include "AudioWidget.h"
 
 
-ItemAudio::ItemAudio(ItemProject *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) : ItemWidget(pItemProj, ITEM_Audio, sPrefix, sName, initVal)
+AudioData::AudioData(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) : IData(pItemProj, ITEM_Audio, sPrefix, sName, initVal)
 {
 }
 
-/*virtual*/ ItemAudio::~ItemAudio()
+/*virtual*/ AudioData::~AudioData()
 {
 }
 
-/*virtual*/ void ItemAudio::OnGiveMenuActions(QMenu *pMenu)
+/*virtual*/ void AudioData::OnGiveMenuActions(QMenu *pMenu)
 {
 }
 
-/*virtual*/ void ItemAudio::OnGuiLoad(IHyApplication &hyApp)
+/*virtual*/ void AudioData::OnGuiLoad(IHyApplication &hyApp)
 {
-    m_pWidget = new WidgetAudio(this);
+    m_pWidget = new AudioWidget(this);
 }
 
-/*virtual*/ void ItemAudio::OnGuiUnload(IHyApplication &hyApp)
+/*virtual*/ void AudioData::OnGuiUnload(IHyApplication &hyApp)
 {
     delete m_pWidget;
 }
 
-/*virtual*/ void ItemAudio::OnGuiShow(IHyApplication &hyApp)
+/*virtual*/ void AudioData::OnGuiShow(IHyApplication &hyApp)
 {
 }
 
-/*virtual*/ void ItemAudio::OnGuiHide(IHyApplication &hyApp)
+/*virtual*/ void AudioData::OnGuiHide(IHyApplication &hyApp)
 {
 }
 
-/*virtual*/ void ItemAudio::OnGuiUpdate(IHyApplication &hyApp)
+/*virtual*/ void AudioData::OnGuiUpdate(IHyApplication &hyApp)
 {
 }
 
-/*virtual*/ void ItemAudio::OnLink(HyGuiFrame *pFrame)
+/*virtual*/ void AudioData::OnLink(AtlasFrame *pFrame)
 {
 }
 
-/*virtual*/ void ItemAudio::OnReLink(HyGuiFrame *pFrame)
+/*virtual*/ void AudioData::OnReLink(AtlasFrame *pFrame)
 {
 }
 
-/*virtual*/ void ItemAudio::OnUnlink(HyGuiFrame *pFrame)
+/*virtual*/ void AudioData::OnUnlink(AtlasFrame *pFrame)
 {
 }
 
-/*virtual*/ QJsonValue ItemAudio::OnSave()
+/*virtual*/ QJsonValue AudioData::OnSave()
 {
     return QJsonObject();
 }

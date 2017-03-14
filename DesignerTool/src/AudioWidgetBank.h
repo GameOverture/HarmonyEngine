@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETAUDIOBANK_H
-#define WIDGETAUDIOBANK_H
+#ifndef AUDIOWIDGETBANK_H
+#define AUDIOWIDGETBANK_H
 
 #include "HyGuiGlobal.h"
 
@@ -17,27 +17,27 @@
 #include <QWidget>
 
 namespace Ui {
-class WidgetAudioBank;
+class AudioWidgetBank;
 }
 
-class WidgetAudioManager;
+class AudioWidgetManager;
 
-class WidgetAudioBank : public QWidget
+class AudioWidgetBank : public QWidget
 {
     Q_OBJECT
     
     // NOTE: Order of these member variables matter here for the member initializer list
-    WidgetAudioManager *        m_pManager;
+    AudioWidgetManager *        m_pManager;
     
     QDir                        m_MetaDir;
     QDir                        m_DataDir;
     
-    WidgetAudioBankModel *      m_pModel;
+    AudioBankTableModel *      m_pModel;
 
 public:
-    explicit WidgetAudioBank(QWidget *parent = 0);
-    explicit WidgetAudioBank(QDir metaDir, QDir dataDir, WidgetAudioManager *pManager, QWidget *pParent = 0);
-    ~WidgetAudioBank();
+    explicit AudioWidgetBank(QWidget *parent = 0);
+    explicit AudioWidgetBank(QDir metaDir, QDir dataDir, AudioWidgetManager *pManager, QWidget *pParent = 0);
+    ~AudioWidgetBank();
     
     QString GetName();
     void SetName(QString sName);
@@ -50,11 +50,11 @@ private Q_SLOTS:
     void on_btnAddDir_pressed();
 
 private:
-    Ui::WidgetAudioBank *ui;
+    Ui::AudioWidgetBank *ui;
 
     void ImportWaves(QStringList sWaveFileList);
 
     void Refresh();
 };
 
-#endif // WIDGETAUDIOBANK_H
+#endif // AUDIOWIDGETBANK_H

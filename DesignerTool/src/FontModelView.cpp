@@ -18,39 +18,39 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetFontTableView::WidgetFontTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
+FontTableView::FontTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
 {
 }
 
-/*virtual*/ void WidgetFontTableView::resizeEvent(QResizeEvent *pResizeEvent)
+/*virtual*/ void FontTableView::resizeEvent(QResizeEvent *pResizeEvent)
 {
     int iWidth = pResizeEvent->size().width();
 
     iWidth -= 144;
-    setColumnWidth(WidgetFontModel::COLUMN_Type, iWidth);
-    setColumnWidth(WidgetFontModel::COLUMN_Thickness, 64);
-    setColumnWidth(WidgetFontModel::COLUMN_DefaultColor, 80);
+    setColumnWidth(FontTableModel::COLUMN_Type, iWidth);
+    setColumnWidth(FontTableModel::COLUMN_Thickness, 64);
+    setColumnWidth(FontTableModel::COLUMN_DefaultColor, 80);
 
     QTableView::resizeEvent(pResizeEvent);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbStates, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
+FontDelegate::FontDelegate(FontData *pItemFont, QComboBox *pCmbStates, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
                                                                                                                 m_pItemFont(pItemFont),
                                                                                                                 m_pCmbStates(pCmbStates)
 {
 }
 
-/*virtual*/ QWidget* WidgetFontDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+/*virtual*/ QWidget* FontDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QWidget *pReturnWidget = NULL;
 
-    const WidgetFontModel *pFontModel = static_cast<const WidgetFontModel *>(index.model());
+    const FontTableModel *pFontModel = static_cast<const FontTableModel *>(index.model());
 
     switch(index.column())
     {
-    case WidgetFontModel::COLUMN_Type:
+    case FontTableModel::COLUMN_Type:
         pReturnWidget = new QComboBox(pParent);
         static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_NORMAL));
         static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_OUTLINE_EDGE));
@@ -59,12 +59,12 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbState
         static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_SIGNED_DISTANCE_FIELD));
         break;
 
-    case WidgetFontModel::COLUMN_Thickness:
+    case FontTableModel::COLUMN_Thickness:
         pReturnWidget = new QDoubleSpinBox(pParent);
         static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(0.0, 4096.0);
         break;
 
-    case WidgetFontModel::COLUMN_DefaultColor:
+    case FontTableModel::COLUMN_DefaultColor:
         DlgColorPicker *pDlg = new DlgColorPicker("Choose Font Layer Color", pFontModel->GetLayerTopColor(index.row()), pFontModel->GetLayerBotColor(index.row()), pParent);
         if(pDlg->exec() == QDialog::Accepted)
         {
@@ -79,7 +79,7 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbState
                 topColor = pDlg->GetVgTopColor();
                 botColor = pDlg->GetVgBotColor();
             }
-            m_pItemFont->GetUndoStack()->push(new WidgetFontUndoCmd_LayerColors(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
+            m_pItemFont->GetUndoStack()->push(new FontUndoCmd_LayerColors(*static_cast<FontWidget *>(m_pItemFont->GetWidget()),
                                                                                 m_pCmbStates,
                                                                                 pFontModel->GetLayerId(index.row()),
                                                                                 pFontModel->GetLayerTopColor(index.row()),
@@ -93,63 +93,63 @@ WidgetFontDelegate::WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbState
     return pReturnWidget;
 }
 
-/*virtual*/ void WidgetFontDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const
+/*virtual*/ void FontDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const
 {
-    const WidgetFontModel *pFontModel = static_cast<const WidgetFontModel *>(index.model());
+    const FontTableModel *pFontModel = static_cast<const FontTableModel *>(index.model());
 
     switch(index.column())
     {
-    case WidgetFontModel::COLUMN_Type:
+    case FontTableModel::COLUMN_Type:
         static_cast<QComboBox *>(pEditor)->setCurrentIndex(pFontModel->GetLayerRenderMode(index.row()));
         break;
 
-    case WidgetFontModel::COLUMN_Thickness:
+    case FontTableModel::COLUMN_Thickness:
         static_cast<QDoubleSpinBox *>(pEditor)->setValue(pFontModel->GetLayerOutlineThickness(index.row()));
         break;
 
-    case WidgetFontModel::COLUMN_DefaultColor:
+    case FontTableModel::COLUMN_DefaultColor:
         break;
     }
 }
 
-/*virtual*/ void WidgetFontDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
+/*virtual*/ void FontDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
 {
-    WidgetFontModel *pFontModel = static_cast<WidgetFontModel *>(pModel);
+    FontTableModel *pFontModel = static_cast<FontTableModel *>(pModel);
 
     switch(index.column())
     {
-    case WidgetFontModel::COLUMN_Type:
-        m_pItemFont->GetUndoStack()->push(new WidgetFontUndoCmd_LayerRenderMode(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
+    case FontTableModel::COLUMN_Type:
+        m_pItemFont->GetUndoStack()->push(new FontUndoCmd_LayerRenderMode(*static_cast<FontWidget *>(m_pItemFont->GetWidget()),
                                                                                 m_pCmbStates,
                                                                                 pFontModel->GetLayerId(index.row()),
                                                                                 pFontModel->GetLayerRenderMode(index.row()),
                                                                                 static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
         break;
 
-    case WidgetFontModel::COLUMN_Thickness:
-        m_pItemFont->GetUndoStack()->push(new WidgetFontUndoCmd_LayerOutlineThickness(*static_cast<WidgetFont *>(m_pItemFont->GetWidget()),
+    case FontTableModel::COLUMN_Thickness:
+        m_pItemFont->GetUndoStack()->push(new FontUndoCmd_LayerOutlineThickness(*static_cast<FontWidget *>(m_pItemFont->GetWidget()),
                                                                                       m_pCmbStates,
                                                                                       pFontModel->GetLayerId(index.row()),
                                                                                       pFontModel->GetLayerOutlineThickness(index.row()),
                                                                                       static_cast<QDoubleSpinBox *>(pEditor)->value()));
         break;
 
-    case WidgetFontModel::COLUMN_DefaultColor:
+    case FontTableModel::COLUMN_DefaultColor:
         //m_pItemFont->GetUndoStack()->push(new ItemFontCmd_StageColor(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value()));
         break;
     }
 }
 
-/*virtual*/ void WidgetFontDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+/*virtual*/ void FontDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     pEditor->setGeometry(option.rect);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int WidgetFontModel::sm_iUniqueIdCounter = 0;
+int FontTableModel::sm_iUniqueIdCounter = 0;
 
-WidgetFontModel::WidgetFontModel(QObject *parent) : QAbstractTableModel(parent)
+FontTableModel::FontTableModel(QObject *parent) : QAbstractTableModel(parent)
 {
     m_sRenderModeStringList.append("Normal");
     m_sRenderModeStringList.append("Outline Edge");
@@ -158,17 +158,17 @@ WidgetFontModel::WidgetFontModel(QObject *parent) : QAbstractTableModel(parent)
     m_sRenderModeStringList.append("Distance Field");
 }
 
-/*virtual*/ WidgetFontModel::~WidgetFontModel()
+/*virtual*/ FontTableModel::~FontTableModel()
 {
 }
 
 
-QString WidgetFontModel::GetRenderModeString(rendermode_t eMode) const
+QString FontTableModel::GetRenderModeString(rendermode_t eMode) const
 {
     return m_sRenderModeStringList[eMode];
 }
 
-int WidgetFontModel::AddNewLayer(rendermode_t eRenderMode, float fSize, float fOutlineThickness)
+int FontTableModel::AddNewLayer(rendermode_t eRenderMode, float fSize, float fOutlineThickness)
 {
     sm_iUniqueIdCounter++;
 
@@ -182,7 +182,7 @@ int WidgetFontModel::AddNewLayer(rendermode_t eRenderMode, float fSize, float fO
     return pLayer->iUNIQUE_ID;
 }
 
-void WidgetFontModel::RemoveLayer(int iId)
+void FontTableModel::RemoveLayer(int iId)
 {
     for(int i = 0; i < m_LayerList.count(); ++i)
     {
@@ -196,7 +196,7 @@ void WidgetFontModel::RemoveLayer(int iId)
     }
 }
 
-void WidgetFontModel::ReAddLayer(int iId)
+void FontTableModel::ReAddLayer(int iId)
 {
     for(int i = 0; i < m_RemovedLayerList.count(); ++i)
     {
@@ -210,22 +210,22 @@ void WidgetFontModel::ReAddLayer(int iId)
     }
 }
 
-int WidgetFontModel::GetLayerId(int iRowIndex) const
+int FontTableModel::GetLayerId(int iRowIndex) const
 {
     return m_LayerList[iRowIndex]->iUNIQUE_ID;
 }
 
-FontStagePass *WidgetFontModel::GetStageRef(int iRowIndex)
+FontStagePass *FontTableModel::GetStageRef(int iRowIndex)
 {
     return m_LayerList[iRowIndex]->pReference;
 }
 
-rendermode_t WidgetFontModel::GetLayerRenderMode(int iRowIndex) const
+rendermode_t FontTableModel::GetLayerRenderMode(int iRowIndex) const
 {
     return m_LayerList[iRowIndex]->eMode;
 }
 
-void WidgetFontModel::SetLayerRenderMode(int iId, rendermode_t eMode)
+void FontTableModel::SetLayerRenderMode(int iId, rendermode_t eMode)
 {
     for(int i = 0; i < m_LayerList.count(); ++i)
     {
@@ -237,12 +237,12 @@ void WidgetFontModel::SetLayerRenderMode(int iId, rendermode_t eMode)
     }
 }
 
-float WidgetFontModel::GetLayerOutlineThickness(int iRowIndex) const
+float FontTableModel::GetLayerOutlineThickness(int iRowIndex) const
 {
     return m_LayerList[iRowIndex]->fOutlineThickness;
 }
 
-void WidgetFontModel::SetLayerOutlineThickness(int iId, float fThickness)
+void FontTableModel::SetLayerOutlineThickness(int iId, float fThickness)
 {
     for(int i = 0; i < m_LayerList.count(); ++i)
     {
@@ -254,17 +254,17 @@ void WidgetFontModel::SetLayerOutlineThickness(int iId, float fThickness)
     }
 }
 
-QColor WidgetFontModel::GetLayerTopColor(int iRowIndex) const
+QColor FontTableModel::GetLayerTopColor(int iRowIndex) const
 {
     return QColor(m_LayerList[iRowIndex]->vTopColor.x * 255.0f, m_LayerList[iRowIndex]->vTopColor.y * 255.0f, m_LayerList[iRowIndex]->vTopColor.z * 255.0f);
 }
 
-QColor WidgetFontModel::GetLayerBotColor(int iRowIndex) const
+QColor FontTableModel::GetLayerBotColor(int iRowIndex) const
 {
     return QColor(m_LayerList[iRowIndex]->vBotColor.x * 255.0f, m_LayerList[iRowIndex]->vBotColor.y * 255.0f, m_LayerList[iRowIndex]->vBotColor.z * 255.0f);
 }
 
-void WidgetFontModel::SetLayerColors(int iId, QColor topColor, QColor botColor)
+void FontTableModel::SetLayerColors(int iId, QColor topColor, QColor botColor)
 {
     for(int i = 0; i < m_LayerList.count(); ++i)
     {
@@ -277,7 +277,7 @@ void WidgetFontModel::SetLayerColors(int iId, QColor topColor, QColor botColor)
     }
 }
 
-float WidgetFontModel::GetLineHeight()
+float FontTableModel::GetLineHeight()
 {
     float fHeight = 0.0f;
     
@@ -290,7 +290,7 @@ float WidgetFontModel::GetLineHeight()
     return fHeight;
 }
 
-float WidgetFontModel::GetLineAscender()
+float FontTableModel::GetLineAscender()
 {
     float fAscender = 0.0f;
     
@@ -303,7 +303,7 @@ float WidgetFontModel::GetLineAscender()
     return fAscender;
 }
 
-float WidgetFontModel::GetLineDescender()
+float FontTableModel::GetLineDescender()
 {
     float fDescender = 0.0f;
     
@@ -316,7 +316,7 @@ float WidgetFontModel::GetLineDescender()
     return fDescender;
 }
 
-float WidgetFontModel::GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs)
+float FontTableModel::GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs)
 {
     float fLeftSideNudgeAmt = 0.0f;
 
@@ -337,7 +337,7 @@ float WidgetFontModel::GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs)
     return fLeftSideNudgeAmt;
 }
 
-void WidgetFontModel::MoveRowUp(int iIndex)
+void FontTableModel::MoveRowUp(int iIndex)
 {
     if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
         return;
@@ -346,7 +346,7 @@ void WidgetFontModel::MoveRowUp(int iIndex)
     endMoveRows();
 }
 
-void WidgetFontModel::MoveRowDown(int iIndex)
+void FontTableModel::MoveRowDown(int iIndex)
 {
     if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt is retarded
         return;
@@ -355,28 +355,28 @@ void WidgetFontModel::MoveRowDown(int iIndex)
     endMoveRows();
 }
 
-void WidgetFontModel::SetFontSize(float fSize)
+void FontTableModel::SetFontSize(float fSize)
 {
     for(int i = 0; i < m_LayerList.count(); ++i)
         m_LayerList[i]->fSize = fSize;
 }
 
-void WidgetFontModel::SetFontStageReference(int iRowIndex, FontStagePass *pStageRef)
+void FontTableModel::SetFontStageReference(int iRowIndex, FontStagePass *pStageRef)
 {
     m_LayerList[iRowIndex]->pReference = pStageRef;
 }
 
-/*virtual*/ int WidgetFontModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
+/*virtual*/ int FontTableModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
     return m_LayerList.count();
 }
 
-/*virtual*/ int WidgetFontModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
+/*virtual*/ int FontTableModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
     return NUMCOLUMNS;
 }
 
-/*virtual*/ QVariant WidgetFontModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant FontTableModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
 {
     FontLayer *pLayer = m_LayerList[index.row()];
 
@@ -428,7 +428,7 @@ void WidgetFontModel::SetFontStageReference(int iRowIndex, FontStagePass *pStage
     return QVariant();
 }
 
-/*virtual*/ QVariant WidgetFontModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant FontTableModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
 {
     if (role == Qt::DisplayRole)
     {
@@ -451,7 +451,7 @@ void WidgetFontModel::SetFontStageReference(int iRowIndex, FontStagePass *pStage
     return QVariant();
 }
 
-/*virtual*/ bool WidgetFontModel::setData(const QModelIndex & index, const QVariant & value, int role /*= Qt::EditRole*/)
+/*virtual*/ bool FontTableModel::setData(const QModelIndex & index, const QVariant & value, int role /*= Qt::EditRole*/)
 {
     HyGuiLog("WidgetFontModel::setData was invoked", LOGTYPE_Error);
 
@@ -480,7 +480,7 @@ void WidgetFontModel::SetFontStageReference(int iRowIndex, FontStagePass *pStage
     return true;
 }
 
-/*virtual*/ Qt::ItemFlags WidgetFontModel::flags(const QModelIndex & index) const
+/*virtual*/ Qt::ItemFlags FontTableModel::flags(const QModelIndex & index) const
 {
     // TODO: Make a read only version of all entries
 //    if(index.column() == COLUMN_Type)

@@ -15,15 +15,15 @@
 
 #include <QStandardPaths>
 
-WidgetFontState::WidgetFontState(WidgetFont *pOwner, QList<QAction *> stateActionList, QWidget *parent /*= 0*/) :   QWidget(parent),
+FontWidgetState::FontWidgetState(FontWidget *pOwner, QList<QAction *> stateActionList, QWidget *parent /*= 0*/) :   QWidget(parent),
                                                                                                                     m_pOwner(pOwner),
                                                                                                                     m_sName("Unnamed"),
                                                                                                                     m_iPrevFontCmbIndex(0),
-                                                                                                                    ui(new Ui::WidgetFontState)
+                                                                                                                    ui(new Ui::FontWidgetState)
 {
     ui->setupUi(this);
     
-    m_pFontModel = new WidgetFontModel(this);
+    m_pFontModel = new FontTableModel(this);
     
     ui->cmbRenderMode->addItem("Normal", QVariant(static_cast<int>(RENDER_NORMAL)));
     ui->cmbRenderMode->addItem("Outline Edge", QVariant(static_cast<int>(RENDER_OUTLINE_EDGE)));
@@ -38,7 +38,7 @@ WidgetFontState::WidgetFontState(WidgetFont *pOwner, QList<QAction *> stateActio
 
     ui->stagesView->setModel(m_pFontModel);
     ui->stagesView->resize(ui->stagesView->size());
-    ui->stagesView->setItemDelegate(new WidgetFontDelegate(m_pOwner->GetItemFont(), m_pOwner->GetCmbStates(), this));
+    ui->stagesView->setItemDelegate(new FontDelegate(m_pOwner->GetItemFont(), m_pOwner->GetCmbStates(), this));
     QItemSelectionModel *pSelModel = ui->stagesView->selectionModel();
     connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
     
@@ -90,22 +90,22 @@ WidgetFontState::WidgetFontState(WidgetFont *pOwner, QList<QAction *> stateActio
     UpdateActions();
 }
 
-/*virtual*/ WidgetFontState::~WidgetFontState()
+/*virtual*/ FontWidgetState::~FontWidgetState()
 {
     delete ui;
 }
 
-QString WidgetFontState::GetName()
+QString FontWidgetState::GetName()
 {
     return m_sName;
 }
 
-void WidgetFontState::SetName(QString sNewName)
+void FontWidgetState::SetName(QString sNewName)
 {
     m_sName = sNewName;
 }
 
-void WidgetFontState::SetSelectedFont(QString sFontName)
+void FontWidgetState::SetSelectedFont(QString sFontName)
 {
     int iFontIndex = ui->cmbFontList->findText(sFontName, Qt::MatchFixedString);
     if(iFontIndex != -1)
@@ -114,43 +114,43 @@ void WidgetFontState::SetSelectedFont(QString sFontName)
     m_iPrevFontCmbIndex = ui->cmbFontList->currentIndex();
 }
 
-WidgetFontModel *WidgetFontState::GetFontModel()
+FontTableModel *FontWidgetState::GetFontModel()
 {
     return m_pFontModel;
 }
 
-WidgetFontTableView *WidgetFontState::GetFontLayerView()
+FontTableView *FontWidgetState::GetFontLayerView()
 {
     return ui->stagesView;
 }
 
-QString WidgetFontState::GetFontFilePath()
+QString FontWidgetState::GetFontFilePath()
 {
     return ui->cmbFontList->currentData().toString();
 }
 
-rendermode_t WidgetFontState::GetCurSelectedRenderMode()
+rendermode_t FontWidgetState::GetCurSelectedRenderMode()
 {
     return static_cast<rendermode_t>(ui->cmbRenderMode->currentData().toInt());
 }
 
-float WidgetFontState::GetSize()
+float FontWidgetState::GetSize()
 {
     return static_cast<float>(ui->sbSize->value());
 }
 
-void WidgetFontState::SetSize(double dSize)
+void FontWidgetState::SetSize(double dSize)
 {
     ui->sbSize->setValue(dSize);
     on_sbSize_editingFinished();
 }
 
-float WidgetFontState::GetThickness()
+float FontWidgetState::GetThickness()
 {
     return static_cast<float>(ui->sbThickness->value());
 }
 
-int WidgetFontState::GetSelectedStageId()
+int FontWidgetState::GetSelectedStageId()
 {
     int iRowIndex = ui->stagesView->currentIndex().row();
     
@@ -164,7 +164,7 @@ int WidgetFontState::GetSelectedStageId()
     return m_pFontModel->GetLayerId(iRowIndex);
 }
 
-void WidgetFontState::UpdateActions()
+void FontWidgetState::UpdateActions()
 {
     if(m_iPrevFontCmbIndex != ui->cmbFontList->currentIndex())
         m_pOwner->GeneratePreview();
@@ -175,7 +175,7 @@ void WidgetFontState::UpdateActions()
     QComboBox *pCmbStates = m_pOwner->GetCmbStates();
     for(int i = 0; i < pCmbStates->count(); ++i)
     {
-        if(pCmbStates->itemData(i).value<WidgetFontState *>() == this)
+        if(pCmbStates->itemData(i).value<FontWidgetState *>() == this)
         {
             pCmbStates->setCurrentIndex(i);
             break;
@@ -183,13 +183,13 @@ void WidgetFontState::UpdateActions()
     }
 }
 
-void WidgetFontState::on_cmbFontList_currentIndexChanged(int index)
+void FontWidgetState::on_cmbFontList_currentIndexChanged(int index)
 {
-    QUndoCommand *pCmd = new WidgetUndoCmd_ComboBox<WidgetFontState>("Font Selection", this, ui->cmbFontList, m_iPrevFontCmbIndex, index);
+    QUndoCommand *pCmd = new UndoCmd_ComboBox<FontWidgetState>("Font Selection", this, ui->cmbFontList, m_iPrevFontCmbIndex, index);
     m_pOwner->GetItemFont()->GetUndoStack()->push(pCmd);
 }
 
-void WidgetFontState::on_cmbRenderMode_currentIndexChanged(int index)
+void FontWidgetState::on_cmbRenderMode_currentIndexChanged(int index)
 {
     switch(index)
     {
@@ -210,16 +210,16 @@ void WidgetFontState::on_cmbRenderMode_currentIndexChanged(int index)
     }
 }
 
-void WidgetFontState::on_sbSize_editingFinished()
+void FontWidgetState::on_sbSize_editingFinished()
 {
     if(m_dPrevFontSize == ui->sbSize->value())
         return;
     
-    QUndoCommand *pCmd = new WidgetUndoCmd_DoubleSpinBox<WidgetFontState>("Font Size", this, ui->sbSize, m_dPrevFontSize, ui->sbSize->value());
+    QUndoCommand *pCmd = new UndoCmd_DoubleSpinBox<FontWidgetState>("Font Size", this, ui->sbSize, m_dPrevFontSize, ui->sbSize->value());
     m_pOwner->GetItemFont()->GetUndoStack()->push(pCmd);
 }
 
-void WidgetFontState::on_layersView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
+void FontWidgetState::on_layersView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
 {
     m_pOwner->UpdateActions();
 }

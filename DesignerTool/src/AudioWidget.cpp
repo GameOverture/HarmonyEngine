@@ -18,8 +18,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-WidgetAudio::WidgetAudio(ItemAudio *pOwner, QWidget *parent) :  QWidget(parent),
-                                                                ui(new Ui::WidgetAudio),
+AudioWidget::AudioWidget(AudioData *pOwner, QWidget *parent) :  QWidget(parent),
+                                                                ui(new Ui::AudioWidget),
                                                                 m_pItemAudio(pOwner),
                                                                 m_pCurAudioState(NULL)
 {
@@ -63,66 +63,66 @@ WidgetAudio::WidgetAudio(ItemAudio *pOwner, QWidget *parent) :  QWidget(parent),
     UpdateActions();
 }
 
-WidgetAudio::~WidgetAudio()
+AudioWidget::~AudioWidget()
 {
     delete ui;
 }
 
-ItemAudio *WidgetAudio::GetData()
+AudioData *AudioWidget::GetData()
 {
     return m_pItemAudio;
 }
 
-QComboBox *WidgetAudio::GetCmbStates()
+QComboBox *AudioWidget::GetCmbStates()
 {
     return ui->cmbStates;
 }
 
-void WidgetAudio::UpdateActions()
+void AudioWidget::UpdateActions()
 {
     ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
     ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
 }
 
-void WidgetAudio::on_actionAddState_triggered()
+void AudioWidget::on_actionAddState_triggered()
 {
-    QUndoCommand *pCmd = new WidgetUndoCmd_AddState<WidgetAudio, WidgetAudioState>("Add Audio State", this, m_StateActionsList, ui->cmbStates);
+    QUndoCommand *pCmd = new UndoCmd_AddState<AudioWidget, AudioWidgetState>("Add Audio State", this, m_StateActionsList, ui->cmbStates);
     m_pItemAudio->GetUndoStack()->push(pCmd);
 }
 
-void WidgetAudio::on_actionRemoveState_triggered()
+void AudioWidget::on_actionRemoveState_triggered()
 {
-    QUndoCommand *pCmd = new WidgetUndoCmd_RemoveState<WidgetAudio, WidgetAudioState>("Remove Audio State", this, ui->cmbStates);
+    QUndoCommand *pCmd = new UndoCmd_RemoveState<AudioWidget, AudioWidgetState>("Remove Audio State", this, ui->cmbStates);
     m_pItemAudio->GetUndoStack()->push(pCmd);
 }
 
-void WidgetAudio::on_actionRenameState_triggered()
+void AudioWidget::on_actionRenameState_triggered()
 {
-    DlgInputName *pDlg = new DlgInputName("Rename Audio State", ui->cmbStates->currentData().value<WidgetAudioState *>()->GetName());
+    DlgInputName *pDlg = new DlgInputName("Rename Audio State", ui->cmbStates->currentData().value<AudioWidgetState *>()->GetName());
     if(pDlg->exec() == QDialog::Accepted)
     {
-        QUndoCommand *pCmd = new WidgetUndoCmd_RenameState<WidgetAudioState>("Rename Audio State", ui->cmbStates, pDlg->GetName());
+        QUndoCommand *pCmd = new UndoCmd_RenameState<AudioWidgetState>("Rename Audio State", ui->cmbStates, pDlg->GetName());
         m_pItemAudio->GetUndoStack()->push(pCmd);
     }
     delete pDlg;
 }
 
-void WidgetAudio::on_actionOrderStateBackwards_triggered()
+void AudioWidget::on_actionOrderStateBackwards_triggered()
 {
-    QUndoCommand *pCmd = new WidgetUndoCmd_MoveStateBack<WidgetAudio, WidgetAudioState>("Shift Audio State Index <-", this, ui->cmbStates);
+    QUndoCommand *pCmd = new UndoCmd_MoveStateBack<AudioWidget, AudioWidgetState>("Shift Audio State Index <-", this, ui->cmbStates);
     m_pItemAudio->GetUndoStack()->push(pCmd);
 }
 
-void WidgetAudio::on_actionOrderStateForwards_triggered()
+void AudioWidget::on_actionOrderStateForwards_triggered()
 {
-    QUndoCommand *pCmd = new WidgetUndoCmd_MoveStateForward<WidgetAudio, WidgetAudioState>("Shift Audio State Index ->", this, ui->cmbStates);
+    QUndoCommand *pCmd = new UndoCmd_MoveStateForward<AudioWidget, AudioWidgetState>("Shift Audio State Index ->", this, ui->cmbStates);
     m_pItemAudio->GetUndoStack()->push(pCmd);
 }
 
-void WidgetAudio::on_cmbStates_currentIndexChanged(int index)
+void AudioWidget::on_cmbStates_currentIndexChanged(int index)
 {
-    WidgetAudioState *pAudioState = ui->cmbStates->itemData(index).value<WidgetAudioState *>();
+    AudioWidgetState *pAudioState = ui->cmbStates->itemData(index).value<AudioWidgetState *>();
     if(m_pCurAudioState == pAudioState)
         return;
 

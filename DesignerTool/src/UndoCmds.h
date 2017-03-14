@@ -1,5 +1,5 @@
 /**************************************************************************
- *	WidgetUndoCmds.h
+ *	UndoCmds.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WIDGETUNDOCMDS
-#define WIDGETUNDOCMDS
+#ifndef UNDOCMDS
+#define UNDOCMDS
 
 #include "HyGuiGlobal.h"
 #include "IData.h"
@@ -23,14 +23,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename OWNER, typename STATE>
-class WidgetUndoCmd_AddState : public QUndoCommand
+class UndoCmd_AddState : public QUndoCommand
 {
     OWNER *             m_pOwner;
     STATE *             m_pState;
     QComboBox *         m_pComboBox;
 
 public:
-    WidgetUndoCmd_AddState(QString sText, OWNER *pOwner, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
+    UndoCmd_AddState(QString sText, OWNER *pOwner, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
                                                                                                                                             m_pOwner(pOwner),
                                                                                                                                             m_pState(new STATE(m_pOwner, stateActionList)),
                                                                                                                                             m_pComboBox(pCmb)
@@ -38,7 +38,7 @@ public:
         setText(sText);
     }
     
-    virtual ~WidgetUndoCmd_AddState()
+    virtual ~UndoCmd_AddState()
     { }
 
     void redo() Q_DECL_OVERRIDE
@@ -72,7 +72,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename OWNER, typename STATE>
-class WidgetUndoCmd_RemoveState : public QUndoCommand
+class UndoCmd_RemoveState : public QUndoCommand
 {
     OWNER *             m_pOwner;
     QComboBox *         m_pComboBox;
@@ -80,7 +80,7 @@ class WidgetUndoCmd_RemoveState : public QUndoCommand
     int                 m_iIndex;
 
 public:
-    WidgetUndoCmd_RemoveState(QString sText, OWNER *pOwner, QComboBox *pCmb, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
+    UndoCmd_RemoveState(QString sText, OWNER *pOwner, QComboBox *pCmb, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
                                                                                                             m_pOwner(pOwner),
                                                                                                             m_pComboBox(pCmb),
                                                                                                             m_pState(m_pComboBox->currentData().value<STATE *>()),
@@ -89,7 +89,7 @@ public:
         setText(sText);
     }
 
-    virtual ~WidgetUndoCmd_RemoveState()
+    virtual ~UndoCmd_RemoveState()
     { }
 
     void redo() Q_DECL_OVERRIDE
@@ -116,7 +116,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename STATE>
-class WidgetUndoCmd_RenameState : public QUndoCommand
+class UndoCmd_RenameState : public QUndoCommand
 {
     QComboBox *         m_pComboBox;
     STATE *             m_pState;
@@ -124,7 +124,7 @@ class WidgetUndoCmd_RenameState : public QUndoCommand
     QString             m_sOldName;
 
 public:
-    WidgetUndoCmd_RenameState(QString sText, QComboBox *pCmb, QString sNewName, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
+    UndoCmd_RenameState(QString sText, QComboBox *pCmb, QString sNewName, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
                                                                                                                 m_pComboBox(pCmb),
                                                                                                                 m_pState(m_pComboBox->currentData().value<STATE *>()),
                                                                                                                 m_sNewName(sNewName),
@@ -133,7 +133,7 @@ public:
         setText(sText);
     }
     
-    virtual ~WidgetUndoCmd_RenameState()
+    virtual ~UndoCmd_RenameState()
     { }
 
     void redo() Q_DECL_OVERRIDE
@@ -169,14 +169,14 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename OWNER, typename STATE>
-class WidgetUndoCmd_MoveStateBack : public QUndoCommand
+class UndoCmd_MoveStateBack : public QUndoCommand
 {
     OWNER *             m_pOwner;
     QComboBox *         m_pComboBox;
     STATE *             m_pState;
 
 public:
-    WidgetUndoCmd_MoveStateBack(QString sText, OWNER *pOwner, QComboBox *pCmb, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
+    UndoCmd_MoveStateBack(QString sText, OWNER *pOwner, QComboBox *pCmb, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
                                                                                                             m_pOwner(pOwner),
                                                                                                             m_pComboBox(pCmb),
                                                                                                             m_pState(m_pComboBox->currentData().value<STATE *>())
@@ -184,7 +184,7 @@ public:
         setText(sText);
     }
     
-    virtual ~WidgetUndoCmd_MoveStateBack()
+    virtual ~UndoCmd_MoveStateBack()
     { }
 
     void redo() Q_DECL_OVERRIDE
@@ -224,14 +224,14 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename OWNER, typename STATE>
-class WidgetUndoCmd_MoveStateForward : public QUndoCommand
+class UndoCmd_MoveStateForward : public QUndoCommand
 {
     OWNER *             m_pOwner;
     QComboBox *         m_pComboBox;
     STATE *             m_pState;
 
 public:
-    WidgetUndoCmd_MoveStateForward(QString sText, OWNER *pOwner, QComboBox *pCmb, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
+    UndoCmd_MoveStateForward(QString sText, OWNER *pOwner, QComboBox *pCmb, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
                                                                                                                 m_pOwner(pOwner),
                                                                                                                 m_pComboBox(pCmb),
                                                                                                                 m_pState(m_pComboBox->currentData().value<STATE *>())
@@ -239,7 +239,7 @@ public:
         setText(sText);
     }
     
-    virtual ~WidgetUndoCmd_MoveStateForward()
+    virtual ~UndoCmd_MoveStateForward()
     { }
 
     void redo() Q_DECL_OVERRIDE
@@ -279,7 +279,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename OWNER>
-class WidgetUndoCmd_ComboBox : public QUndoCommand
+class UndoCmd_ComboBox : public QUndoCommand
 {
     OWNER *             m_pOwner;
 
@@ -288,7 +288,7 @@ class WidgetUndoCmd_ComboBox : public QUndoCommand
     int                 m_iNewIndex;
     
 public:
-    WidgetUndoCmd_ComboBox(QString sText, OWNER *pOwner, QComboBox *pCmb, int iPrevIndex, int iNewIndex, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
+    UndoCmd_ComboBox(QString sText, OWNER *pOwner, QComboBox *pCmb, int iPrevIndex, int iNewIndex, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
                                                                                                                                         m_pOwner(pOwner),
                                                                                                                                         m_pComboBox(pCmb),
                                                                                                                                         m_iPrevIndex(iPrevIndex),
@@ -297,7 +297,7 @@ public:
         setText(sText);
     }
             
-    virtual ~WidgetUndoCmd_ComboBox()
+    virtual ~UndoCmd_ComboBox()
     { }
 
     void redo() Q_DECL_OVERRIDE
@@ -321,14 +321,14 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename OWNER>
-class WidgetUndoCmd_CheckBox : public QUndoCommand
+class UndoCmd_CheckBox : public QUndoCommand
 {
     OWNER *             m_pOwner;
     QCheckBox *         m_pCheckBox;
     bool                m_bInitialValue;
 
 public:
-    WidgetUndoCmd_CheckBox(OWNER *pOwner, QCheckBox *pCheckBox, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
+    UndoCmd_CheckBox(OWNER *pOwner, QCheckBox *pCheckBox, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
                                                                                                 m_pOwner(pOwner),
                                                                                                 m_pCheckBox(pCheckBox)
     {
@@ -336,7 +336,7 @@ public:
         setText((m_bInitialValue ? "Checked " : "Unchecked ") % m_pCheckBox->text());
     }
     
-    virtual ~WidgetUndoCmd_CheckBox()
+    virtual ~UndoCmd_CheckBox()
     { }
 
     void redo() Q_DECL_OVERRIDE
@@ -354,7 +354,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename OWNER>
-class WidgetUndoCmd_SpinBox : public QUndoCommand
+class UndoCmd_SpinBox : public QUndoCommand
 {
     OWNER *             m_pOwner;
     QSpinBox *          m_pSpinBox;
@@ -362,7 +362,7 @@ class WidgetUndoCmd_SpinBox : public QUndoCommand
     int                 m_iNewSize;
 
 public:
-    WidgetUndoCmd_SpinBox(QString sText, OWNER *pOwner, QSpinBox *pSpinBox, int iPrevSize, int iNewSize, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
+    UndoCmd_SpinBox(QString sText, OWNER *pOwner, QSpinBox *pSpinBox, int iPrevSize, int iNewSize, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
                                                                                                                                         m_pOwner(pOwner),
                                                                                                                                         m_pSpinBox(pSpinBox),
                                                                                                                                         m_iPrevSize(iPrevSize),
@@ -371,7 +371,7 @@ public:
         setText(sText);
     }
     
-    virtual ~WidgetUndoCmd_SpinBox()
+    virtual ~UndoCmd_SpinBox()
     { }
 
     void redo() Q_DECL_OVERRIDE
@@ -395,7 +395,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename OWNER>
-class WidgetUndoCmd_DoubleSpinBox : public QUndoCommand
+class UndoCmd_DoubleSpinBox : public QUndoCommand
 {
     OWNER *             m_pOwner;
     QDoubleSpinBox *    m_pDoubleSpinBox;
@@ -403,7 +403,7 @@ class WidgetUndoCmd_DoubleSpinBox : public QUndoCommand
     double              m_dNewSize;
 
 public:
-    WidgetUndoCmd_DoubleSpinBox(QString sText, OWNER *pOwner, QDoubleSpinBox *pDoubleSpinBox, double dPrevSize, double dNewSize, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
+    UndoCmd_DoubleSpinBox(QString sText, OWNER *pOwner, QDoubleSpinBox *pDoubleSpinBox, double dPrevSize, double dNewSize, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
                                                                                                                                                                 m_pOwner(pOwner),
                                                                                                                                                                 m_pDoubleSpinBox(pDoubleSpinBox),
                                                                                                                                                                 m_dPrevSize(dPrevSize),
@@ -412,7 +412,7 @@ public:
         setText(sText);
     }
     
-    virtual ~WidgetUndoCmd_DoubleSpinBox()
+    virtual ~UndoCmd_DoubleSpinBox()
     { }
 
     void redo() Q_DECL_OVERRIDE
@@ -436,21 +436,21 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename OWNER>
-class WidgetUndoCmd_LineEdit : public QUndoCommand
+class UndoCmd_LineEdit : public QUndoCommand
 {
     OWNER *             m_pOwner;
     QLineEdit *         m_pLineEdit;
     bool                m_bFirstTimeSkipRedo;
 
 public:
-    WidgetUndoCmd_LineEdit(QString sText, OWNER *pOwner, QLineEdit *pLineEdit, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
+    UndoCmd_LineEdit(QString sText, OWNER *pOwner, QLineEdit *pLineEdit, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
                                                                                                             m_pOwner(pOwner),
                                                                                                             m_pLineEdit(pLineEdit),
                                                                                                             m_bFirstTimeSkipRedo(true)
     {
     }
     
-    virtual ~WidgetUndoCmd_LineEdit()
+    virtual ~UndoCmd_LineEdit()
     { }
 
     void redo() Q_DECL_OVERRIDE
@@ -473,7 +473,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename OWNER>
-class WidgetUndoCmd_RadioToggle : public QUndoCommand
+class UndoCmd_RadioToggle : public QUndoCommand
 {
     QComboBox *         m_pCmbStates;
     OWNER *             m_pOwner;
@@ -481,7 +481,7 @@ class WidgetUndoCmd_RadioToggle : public QUndoCommand
     QRadioButton *      m_pPrevRadBtnToggle;
     
 public:
-    WidgetUndoCmd_RadioToggle(QString sText, OWNER *pOwner, QRadioButton *pNewRadBtnToggle, QRadioButton *pPrevRadBtnToggle, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
+    UndoCmd_RadioToggle(QString sText, OWNER *pOwner, QRadioButton *pNewRadBtnToggle, QRadioButton *pPrevRadBtnToggle, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
                                                                                                                                                             m_pOwner(pOwner),
                                                                                                                                                             m_pNewRadBtnToggle(pNewRadBtnToggle),
                                                                                                                                                             m_pPrevRadBtnToggle(pPrevRadBtnToggle)
@@ -489,7 +489,7 @@ public:
         setText(sText);
     }
     
-    virtual ~WidgetUndoCmd_RadioToggle()
+    virtual ~UndoCmd_RadioToggle()
     { }
     
     void redo() Q_DECL_OVERRIDE
@@ -521,20 +521,20 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename OWNER>
-class WidgetUndoCmd_AddFrames : public QUndoCommand
+class UndoCmd_AddFrames : public QUndoCommand
 {
     OWNER *                                 m_pOwner;
-    QList<HyGuiFrame *>                     m_Frames;
+    QList<AtlasFrame *>                     m_Frames;
     
 public:
-    WidgetUndoCmd_AddFrames(QString sText, OWNER *pOwner, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
+    UndoCmd_AddFrames(QString sText, OWNER *pOwner, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
                                                                                         m_pOwner(pOwner)
     {
         setText(sText);
         m_Frames.clear();
     }
     
-    virtual ~WidgetUndoCmd_AddFrames()
+    virtual ~UndoCmd_AddFrames()
     { }
 
     void redo() Q_DECL_OVERRIDE
@@ -552,20 +552,20 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename OWNER>
-class WidgetUndoCmd_DeleteFrame : public QUndoCommand
+class UndoCmd_DeleteFrame : public QUndoCommand
 {
     OWNER *                                 m_pOwner;
-    QList<HyGuiFrame *>                     m_Frames;
+    QList<AtlasFrame *>                     m_Frames;
 
 public:
-    WidgetUndoCmd_DeleteFrame(QString sText, OWNER *pOwner, HyGuiFrame *pFrame, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
+    UndoCmd_DeleteFrame(QString sText, OWNER *pOwner, AtlasFrame *pFrame, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
                                                                                                                 m_pOwner(pOwner)
     {
         setText(sText);
         m_Frames.append(pFrame);
     }
     
-    virtual ~WidgetUndoCmd_DeleteFrame()
+    virtual ~UndoCmd_DeleteFrame()
     { }
 
     void redo() Q_DECL_OVERRIDE
@@ -581,4 +581,4 @@ public:
     }
 };
 
-#endif // WIDGETUNDOCMDS
+#endif // UNDOCMDS
