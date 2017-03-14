@@ -10,7 +10,7 @@
 #ifndef AUDIOWAVE_H
 #define AUDIOWAVE_H
 
-#include "IData.h"
+#include "IProjItem.h"
 
 #include <QWidget>
 #include <QJsonObject>

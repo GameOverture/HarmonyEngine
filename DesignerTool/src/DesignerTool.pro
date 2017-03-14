@@ -50,18 +50,20 @@ SOURCES += main.cpp \
     FontUndoCmds.cpp \
     SpriteModelView.cpp \
     SpriteUndoCmds.cpp \
-    IData.cpp \
-    AudioData.cpp \
-    FontData.cpp \
     Project.cpp \
-    SpriteData.cpp \
     AtlasFrame.cpp \
     AudioWave.cpp \
     HyGuiGlobal.cpp \
     AtlasesData.cpp \
     AtlasesWidget.cpp \
     ExplorerItem.cpp \
-    ExplorerWidget.cpp
+    ExplorerWidget.cpp \
+    FontDraw.cpp \
+    AudioDraw.cpp \
+    IProjItem.cpp \
+    SpriteItem.cpp \
+    AudioItem.cpp \
+    FontItem.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -98,18 +100,20 @@ HEADERS  += \
     AudioWidgetBank.h \
     AudioWidgetManager.h \
     AudioModelView.h \
-    IData.h \
-    AudioData.h \
-    FontData.h \
     Project.h \
-    SpriteData.h \
     AtlasFrame.h \
     AudioWave.h \
     HyGuiGlobal.h \
     AtlasesData.h \
     AtlasesWidget.h \
     ExplorerItem.h \
-    ExplorerWidget.h
+    ExplorerWidget.h \
+    FontDraw.h \
+    AudioDraw.h \
+    IProjItem.h \
+    SpriteItem.h \
+    AudioItem.h \
+    FontItem.h
 
 FORMS    += \
     DlgNewProject.ui \

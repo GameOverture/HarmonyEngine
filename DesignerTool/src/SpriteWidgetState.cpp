@@ -10,7 +10,7 @@
 #include "SpriteWidgetState.h"
 #include "ui_WidgetSpriteState.h"
 
-#include "SpriteData.h"
+#include "SpriteItem.h"
 #include "SpriteWidget.h"
 #include "UndoCmds.h"
 #include "SpriteUndoCmds.h"
@@ -256,7 +256,7 @@ void SpriteWidgetState::on_actionPlay_triggered()
 
 void SpriteWidgetState::on_btnHz10_clicked()
 {
-    SpriteData *pItemSprite = m_pOwner->GetData();
+    SpriteItem *pItemSprite = m_pOwner->GetData();
     
     QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 10.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
@@ -264,7 +264,7 @@ void SpriteWidgetState::on_btnHz10_clicked()
 
 void SpriteWidgetState::on_btnHz20_clicked()
 {
-    SpriteData *pItemSprite = m_pOwner->GetData();
+    SpriteItem *pItemSprite = m_pOwner->GetData();
     
     QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 20.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
@@ -272,7 +272,7 @@ void SpriteWidgetState::on_btnHz20_clicked()
 
 void SpriteWidgetState::on_btnHz30_clicked()
 {
-    SpriteData *pItemSprite = m_pOwner->GetData();
+    SpriteItem *pItemSprite = m_pOwner->GetData();
     
     QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 30.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
@@ -280,7 +280,7 @@ void SpriteWidgetState::on_btnHz30_clicked()
 
 void SpriteWidgetState::on_btnHz40_clicked()
 {
-    SpriteData *pItemSprite = m_pOwner->GetData();
+    SpriteItem *pItemSprite = m_pOwner->GetData();
     
     QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 40.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
@@ -288,7 +288,7 @@ void SpriteWidgetState::on_btnHz40_clicked()
 
 void SpriteWidgetState::on_btnHz50_clicked()
 {
-    SpriteData *pItemSprite = m_pOwner->GetData();
+    SpriteItem *pItemSprite = m_pOwner->GetData();
     
     QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 50.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
@@ -296,7 +296,7 @@ void SpriteWidgetState::on_btnHz50_clicked()
 
 void SpriteWidgetState::on_btnHz60_clicked()
 {
-    SpriteData *pItemSprite = m_pOwner->GetData();
+    SpriteItem *pItemSprite = m_pOwner->GetData();
     
     QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 60.0f);
     pItemSprite->GetUndoStack()->push(pCmd);
@@ -314,7 +314,7 @@ void SpriteWidgetState::on_actionLastFrame_triggered()
 
 void SpriteWidgetState::on_chkReverse_clicked()
 {
-    SpriteData *pItemSprite = m_pOwner->GetData();
+    SpriteItem *pItemSprite = m_pOwner->GetData();
 
     QUndoCommand *pCmd = new UndoCmd_CheckBox<SpriteWidgetState>(this, ui->chkReverse);
     pItemSprite->GetUndoStack()->push(pCmd);
@@ -322,7 +322,7 @@ void SpriteWidgetState::on_chkReverse_clicked()
 
 void SpriteWidgetState::on_chkLoop_clicked()
 {
-    SpriteData *pItemSprite = m_pOwner->GetData();
+    SpriteItem *pItemSprite = m_pOwner->GetData();
 
     QUndoCommand *pCmd = new UndoCmd_CheckBox<SpriteWidgetState>(this, ui->chkLoop);
     pItemSprite->GetUndoStack()->push(pCmd);
@@ -330,7 +330,7 @@ void SpriteWidgetState::on_chkLoop_clicked()
 
 void SpriteWidgetState::on_chkBounce_clicked()
 {
-    SpriteData *pItemSprite = m_pOwner->GetData();
+    SpriteItem *pItemSprite = m_pOwner->GetData();
 
     QUndoCommand *pCmd = new UndoCmd_CheckBox<SpriteWidgetState>(this, ui->chkBounce);
     pItemSprite->GetUndoStack()->push(pCmd);

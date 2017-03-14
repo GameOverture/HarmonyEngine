@@ -7,10 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef SPRITEDATA_H
-#define SPRITEDATA_H
+#ifndef SPRITEITEM_H
+#define SPRITEITEM_H
 
-#include "IData.h"
+#include "IProjItem.h"
 #include "SpriteWidget.h"
 
 class AtlasesWidget;
@@ -41,31 +41,22 @@ public:
     }
 };
 
-class SpriteData : public IData
+class SpriteItem : public IProjItem
 {
     Q_OBJECT
-
-    HyPrimitive2d               m_primOriginHorz;
-    HyPrimitive2d               m_primOriginVert;
     
 public:
-    SpriteData(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
-    virtual ~SpriteData();
+    SpriteItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
+    virtual ~SpriteItem();
     
 protected:
-    virtual void OnGiveMenuActions(QMenu *pMenu);
+    virtual void OnGiveMenuActions(QMenu *pMenu) override;
 
-    virtual void OnGuiLoad(IHyApplication &hyApp);
-    virtual void OnGuiUnload(IHyApplication &hyApp);
-    virtual void OnGuiShow(IHyApplication &hyApp);
-    virtual void OnGuiHide(IHyApplication &hyApp);
-    virtual void OnGuiUpdate(IHyApplication &hyApp);
-
-    virtual void OnLink(AtlasFrame *pFrame);
-    virtual void OnReLink(AtlasFrame *pFrame);
-    virtual void OnUnlink(AtlasFrame *pFrame);
+    virtual void OnLink(AtlasFrame *pFrame) override;
+    virtual void OnReLink(AtlasFrame *pFrame) override;
+    virtual void OnUnlink(AtlasFrame *pFrame) override;
     
-    virtual QJsonValue OnSave();
+    virtual QJsonValue OnSave() override;
 };
 
-#endif // SPRITEDATA_H
+#endif // SPRITEITEM_H

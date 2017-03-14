@@ -7,24 +7,30 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "IData.h"
+#include "IProjItem.h"
 #include "MainWindow.h"
 #include "AtlasesWidget.h"
 #include "AudioWidgetManager.h"
 #include "AtlasFrame.h"
 
+#include "SpriteWidget.h"
+#include "SpriteDraw.h"
+#include "SpriteItem.h"
+#include "FontWidget.h"
+#include "FontDraw.h"
+#include "AudioWidget.h"
+#include "AudioDraw.h"
+
 #include <QMenu>
 
-IData::IData(Project *pItemProj,
+IProjItem::IProjItem(Project *pItemProj,
                        eItemType eType,
                        const QString sPrefix,
                        const QString sName,
                        QJsonValue initVal) :    ExplorerItem(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
                                                 m_pItemProj(pItemProj),
                                                 m_InitValue(initVal),
-                                                m_pWidget(nullptr),
-                                                m_pCamera(nullptr),
-                                                m_bReloadDraw(false)
+                                                m_pWidget(nullptr)
 {
     switch(m_eTYPE)
     {
@@ -58,17 +64,17 @@ IData::IData(Project *pItemProj,
     connect(m_pUndoStack, SIGNAL(cleanChanged(bool)), this, SLOT(on_undoStack_cleanChanged(bool)));
 }
 
-IData::~IData()
+IProjItem::~IProjItem()
 {
     
 }
 
-Project *IData::GetItemProject()
+Project *IProjItem::GetItemProject()
 {
     return m_pItemProj;
 }
 
-void IData::GiveMenuActions(QMenu *pMenu)
+void IProjItem::GiveMenuActions(QMenu *pMenu)
 {
     pMenu->addAction(m_pActionUndo);
     pMenu->addAction(m_pActionRedo);
@@ -77,94 +83,95 @@ void IData::GiveMenuActions(QMenu *pMenu)
     OnGiveMenuActions(pMenu);
 }
 
-void IData::Save()
+void IProjItem::Save()
 {
     GetItemProject()->SaveGameData(m_eTYPE, GetName(true), OnSave());
     m_pUndoStack->setClean();
 }
 
-bool IData::IsSaveClean()
+bool IProjItem::IsSaveClean()
 {
     return m_pUndoStack->isClean();
 }
 
-void IData::DiscardChanges()
+void IProjItem::DiscardChanges()
 {
     m_pUndoStack->clear();
 }
 
-void IData::Load(IHyApplication &hyApp)
+void IProjItem::ProjLoad(IHyApplication &hyApp)
 {
-    // A non NULL camera signifies that this has been loaded already
-    if(m_pCamera)
-        return;
-
-    m_pCamera = hyApp.Window().CreateCamera2d();
-    m_pCamera->SetEnabled(false);
-
-    OnGuiLoad(hyApp);
-    //m_HyEntity.Load();
-}
-
-void IData::Unload(IHyApplication &hyApp)
-{
-    // A NULL camera signifies that this has hasn't been loaded
-    if(m_pCamera == NULL)
-        return;
-
-    hyApp.Window().RemoveCamera(m_pCamera);
-    m_pCamera = NULL;
-
-    OnGuiUnload(hyApp);
-    //m_HyEntity.Load();
-}
-
-void IData::DrawShow(IHyApplication &hyApp)
-{
-    m_pCamera->SetEnabled(true);
-
-    OnGuiShow(hyApp);
-}
-
-void IData::DrawHide(IHyApplication &hyApp)
-{
-    m_pCamera->SetEnabled(false);
-
-    OnGuiHide(hyApp);
-}
-
-void IData::DrawUpdate(IHyApplication &hyApp)
-{
-    if(m_bReloadDraw || IsLoaded() == false)
+    switch(m_eTYPE)
     {
-        m_bReloadDraw = false;
+    case ITEM_Sprite:
+        m_pWidget = new SpriteWidget(static_cast<SpriteItem *>(this));
+        static_cast<SpriteWidget *>(m_pWidget)->Load();
 
-        if(IsLoaded())
-            Unload(hyApp);
-
-        Load(hyApp);
-        DrawShow(hyApp);
+        m_pDraw = new SpriteDraw(static_cast<SpriteItem *>(this));
+        break;
+    case ITEM_Font:
+        m_pWidget = new FontWidget(static_cast<FontItem *>(this));
+        m_pDraw = new FontDraw(this);
+        break;
+    case ITEM_Audio:
+        m_pWidget = new AudioWidget(this);
+        break;
+    case ITEM_Project:
+    case ITEM_DirAudio:
+    case ITEM_DirParticles:
+    case ITEM_DirFonts:
+    case ITEM_DirSpine:
+    case ITEM_DirSprites:
+    case ITEM_DirShaders:
+    case ITEM_DirEntities:
+    case ITEM_DirAtlases:
+    case ITEM_DirAudioBanks:
+    case ITEM_Prefix:
+    case ITEM_Particles:
+    case ITEM_Spine:
+    case ITEM_Shader:
+    case ITEM_Entity:
+        HyGuiLog("Unsupported IProjItem::ProjLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        break;
     }
 
-    OnGuiUpdate(hyApp);
+    m_pDraw->GuiLoad(hyApp);
 }
 
-void IData::Link(AtlasFrame *pFrame)
+void IProjItem::ProjUnload(IHyApplication &hyApp)
+{
+    delete m_pWidget;
+    delete m_pDraw;
+}
+
+void IProjItem::ProjShow(IHyApplication &hyApp)
+{
+}
+
+void IProjItem::ProjHide(IHyApplication &hyApp)
+{
+}
+
+void IProjItem::ProjUpdate(IHyApplication &hyApp)
+{
+}
+
+void IProjItem::Link(AtlasFrame *pFrame)
 {
     OnLink(pFrame);
     m_Links.insert(pFrame);
 }
 
-void IData::Relink(AtlasFrame *pFrame)
+void IProjItem::Relink(AtlasFrame *pFrame)
 {
-    if(IsLoaded())
-        m_bReloadDraw = true;
+//    if(IsLoaded())
+//        m_bReloadDraw = true;
 
     OnReLink(pFrame);
     Save();
 }
 
-void IData::Unlink(AtlasFrame *pFrame)
+void IProjItem::Unlink(AtlasFrame *pFrame)
 {
     pFrame->DeleteDrawInst(this);
 
@@ -172,7 +179,7 @@ void IData::Unlink(AtlasFrame *pFrame)
     m_Links.remove(pFrame);
 }
 
-void IData::on_undoStack_cleanChanged(bool bClean)
+void IProjItem::on_undoStack_cleanChanged(bool bClean)
 {
     QTabBar *pTabBar = m_pItemProj->GetTabBar();
     
@@ -181,7 +188,7 @@ void IData::on_undoStack_cleanChanged(bool bClean)
     
     for(int i = 0; i < pTabBar->count(); ++i)
     {
-        if(pTabBar->tabData(i).value<IData *>() == this)
+        if(pTabBar->tabData(i).value<IProjItem *>() == this)
         {
             if(bClean)
                 pTabBar->setTabText(i, GetName(false));

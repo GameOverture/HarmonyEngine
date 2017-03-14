@@ -10,7 +10,7 @@
 #include "SpriteWidget.h"
 #include "ui_WidgetSprite.h"
 
-#include "SpriteData.h"
+#include "SpriteItem.h"
 #include "UndoCmds.h"
 #include "SpriteUndoCmds.h"
 #include "DlgInputName.h"
@@ -22,7 +22,7 @@
 #include <QJsonArray>
 #include <QAction>
 
-SpriteWidget::SpriteWidget(SpriteData *pItemSprite, QWidget *parent) :   QWidget(parent),
+SpriteWidget::SpriteWidget(SpriteItem *pItemSprite, QWidget *parent) :   QWidget(parent),
                                                                          m_pItemSprite(pItemSprite),
                                                                          ui(new Ui::SpriteWidget),
                                                                          m_pCurSpriteState(NULL)
@@ -100,7 +100,7 @@ void SpriteWidget::Load()
     UpdateActions();
 }
 
-SpriteData *SpriteWidget::GetData()
+SpriteItem *SpriteWidget::GetData()
 {
     return m_pItemSprite;
 }

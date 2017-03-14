@@ -12,9 +12,9 @@
 #include "AtlasesWidget.h"
 #include "AudioWidgetManager.h"
 #include "MainWindow.h"
-#include "AudioData.h"
-#include "SpriteData.h"
-#include "FontData.h"
+#include "AudioItem.h"
+#include "SpriteItem.h"
+#include "FontItem.h"
 #include "HyGuiGlobal.h"
 
 #include <QFile>
@@ -141,17 +141,12 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
                                                                 m_pAtlasMan(nullptr),
                                                                 m_pAudioMan(nullptr),
                                                                 m_pTabBar(nullptr),
-                                                                m_eDrawState(PROJDRAWSTATE_Nothing),
-                                                                m_ePrevDrawState(PROJDRAWSTATE_Nothing),
+                                                                m_pCurOpenItem(nullptr),
                                                                 m_pCamera(nullptr),
                                                                 m_ActionSave(0),
                                                                 m_ActionSaveAll(0),
                                                                 m_bHasError(false)
 {
-    for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
-        m_bDrawStateLoaded[i] = false;
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     QFile projFile(sNewProjectFilePath);
     if(projFile.exists())
     {
@@ -309,13 +304,13 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
                     switch(subDirList[i])
                     {
                     case ITEM_DirAudio:
-                        pNewDataItem = new AudioData(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new AudioItem(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirFonts:
-                        pNewDataItem = new FontData(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new FontItem(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirSprites:
-                        pNewDataItem = new SpriteData(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new SpriteItem(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirParticles:
                     case ITEM_DirSpine:
@@ -422,6 +417,45 @@ void Project::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
     m_ActionSaveAll.setEnabled(bSaveAllEnabled);
 }
 
+void Project::OpenItem(IProjItem *pItem)
+{
+    if(m_pCurOpenItem && m_pCurOpenItem != pItem)
+        m_pCurOpenItem->ProjHide();
+
+    if(pItem->IsLoaded() == false)
+    {
+        pItem->Load(*pItemProj);
+
+        m_pTabBar->blockSignals(true);
+        int iIndex = m_pTabBar->addTab(pItem->GetIcon(), pItem->GetName(false));
+        QVariant v;
+        v.setValue(pItem);
+        m_pTabBar->setTabData(iIndex, v);
+        m_pTabBar->setCurrentIndex(iIndex);
+        m_pTabBar->blockSignals(false);
+    }
+    else
+    {
+        for(int i = 0; i < m_pTabBar->count(); ++i)
+        {
+            if(m_pTabBar->tabData(i).value<IProjItem *>() == pItem)
+            {
+                m_pTabBar->blockSignals(true);
+                m_pTabBar->setCurrentIndex(i);
+                m_pTabBar->blockSignals(false);
+                break;
+            }
+        }
+    }
+
+    // Hide everything
+    for(int i = 0; i < m_pTabBar->count(); ++i)
+        m_pTabBar->tabData(i).value<IProjItem *>()->DrawHide(*pItemProj);
+
+    // Then show
+    pItem->GuiShow(*this);
+}
+
 // IHyApplication override
 /*virtual*/ bool Project::Initialize()
 {
@@ -451,7 +485,7 @@ void Project::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
     else if(m_pTabBar->count() > 0)
     {
         m_pCamera->SetEnabled(false);
-        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<IData *>()->DrawUpdate(*this);
+        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<IProjItem *>()->DrawUpdate(*this);
     }
     else
         m_pCamera->SetEnabled(true);
@@ -469,72 +503,69 @@ void Project::SetRenderSize(int iWidth, int iHeight)
     Window().SetResolution(glm::ivec2(iWidth, iHeight));
 }
 
-void Project::SetOverrideDrawState(eProjDrawState eDrawState)
-{
-    m_DrawStateQueue.append(eDrawState);
-}
+//void Project::SetOverrideDrawState(eProjDrawState eDrawState)
+//{
+//    m_DrawStateQueue.append(eDrawState);
+//}
 
-bool Project::IsOverrideDraw()
-{
-    return (m_eDrawState != PROJDRAWSTATE_Nothing || m_ePrevDrawState != PROJDRAWSTATE_Nothing || m_DrawStateQueue.empty() == false);
-}
+//bool Project::IsOverrideDraw()
+//{
+//    return (m_eDrawState != PROJDRAWSTATE_Nothing || m_ePrevDrawState != PROJDRAWSTATE_Nothing || m_DrawStateQueue.empty() == false);
+//}
 
-void Project::OverrideDraw()
-{
-    m_pCamera->SetEnabled(true);
+//void Project::OverrideDraw()
+//{
+//    m_pCamera->SetEnabled(true);
 
-    while(m_DrawStateQueue.empty() == false)
-    {
-        m_ePrevDrawState = m_eDrawState;
-        m_eDrawState = m_DrawStateQueue.dequeue();
+//    while(m_DrawStateQueue.empty() == false)
+//    {
+//        m_ePrevDrawState = m_eDrawState;
+//        m_eDrawState = m_DrawStateQueue.dequeue();
 
-        // This shouldn't happen, but if it did it would break logic below it
-        if(m_eDrawState == PROJDRAWSTATE_Nothing && m_ePrevDrawState == PROJDRAWSTATE_Nothing)
-            continue;
+//        // This shouldn't happen, but if it did it would break logic below it
+//        if(m_eDrawState == PROJDRAWSTATE_Nothing && m_ePrevDrawState == PROJDRAWSTATE_Nothing)
+//            continue;
 
-        // If our current state is 'nothing', then Hide() what was previous if it was loaded
-        if(m_eDrawState == PROJDRAWSTATE_Nothing)
-        {
-            if(m_bDrawStateLoaded[m_ePrevDrawState])
-            {
-                if(m_ePrevDrawState == PROJDRAWSTATE_AtlasManager)
-                    AtlasManager_DrawHide(*this, *m_pAtlasMan);
-            }
+//        // If our current state is 'nothing', then Hide() what was previous if it was loaded
+//        if(m_eDrawState == PROJDRAWSTATE_Nothing)
+//        {
+//            if(m_bDrawStateLoaded[m_ePrevDrawState])
+//            {
+//                if(m_ePrevDrawState == PROJDRAWSTATE_AtlasManager)
+//                    AtlasManager_DrawHide(*this, *m_pAtlasMan);
+//            }
 
-            // Show the selected tab since we're done with override draw
-            if(m_pTabBar->currentIndex() != -1)
-                m_pTabBar->tabData(m_pTabBar->currentIndex()).value<IData *>()->DrawShow(*this);
+//            // Show the selected tab since we're done with override draw
+//            if(m_pTabBar->currentIndex() != -1)
+//                m_pTabBar->tabData(m_pTabBar->currentIndex()).value<IData *>()->DrawShow(*this);
             
-            m_ePrevDrawState = PROJDRAWSTATE_Nothing;
-        }
-        else
-        {
-            if(m_bDrawStateLoaded[m_eDrawState] == false)
-            {
-                if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-                    AtlasManager_DrawOpen(*this, *m_pAtlasMan);
+//            m_ePrevDrawState = PROJDRAWSTATE_Nothing;
+//        }
+//        else
+//        {
+//            if(m_bDrawStateLoaded[m_eDrawState] == false)
+//            {
+//                if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
+//                    AtlasManager_DrawOpen(*this, *m_pAtlasMan);
 
-                m_bDrawStateLoaded[m_eDrawState] = true;
-            }
+//                m_bDrawStateLoaded[m_eDrawState] = true;
+//            }
             
-            // Hide any currently shown items, since we're being draw override
-            for(int i = 0; i < m_pTabBar->count(); ++i)
-                m_pTabBar->tabData(i).value<IData *>()->DrawHide(*this);
+//            // Hide any currently shown items, since we're being draw override
+//            for(int i = 0; i < m_pTabBar->count(); ++i)
+//                m_pTabBar->tabData(i).value<IData *>()->DrawHide(*this);
 
-            if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-                AtlasManager_DrawShow(*this, *m_pAtlasMan);
-        }
-    }
+//            if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
+//                AtlasManager_DrawShow(*this, *m_pAtlasMan);
+//        }
+//    }
 
-    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-        AtlasManager_DrawUpdate(*this, *m_pAtlasMan);
-}
+//    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
+//        AtlasManager_DrawUpdate(*this, *m_pAtlasMan);
+//}
 
 void Project::Reset()
 {
-    for(int i = 0; i < NUMPROJDRAWSTATE; ++i)
-        m_bDrawStateLoaded[i] = false;
-
     sm_Init.sGameName = GetName(false).toStdString();
     sm_Init.sDataDir = GetAssetsAbsPath().toStdString();
 }
@@ -635,7 +666,7 @@ void Project::on_tabBar_currentChanged(int index)
 
     int iIndex = m_pTabBar->currentIndex();
     QVariant v = m_pTabBar->tabData(iIndex);
-    IData *pItem = v.value<IData *>();
+    IProjItem *pItem = v.value<IProjItem *>();
 
     MainWindow::OpenItem(pItem);
 }
@@ -644,7 +675,7 @@ void Project::on_save_triggered()
 {
     int iIndex = m_pTabBar->currentIndex();
     QVariant v = m_pTabBar->tabData(iIndex);
-    IData *pItem = v.value<IData *>();
+    IProjItem *pItem = v.value<IProjItem *>();
     pItem->Save();
     
     HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
@@ -657,7 +688,7 @@ void Project::on_saveAll_triggered()
         // TODO: instead look for dirty?
         if(m_pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
         {
-            IData *pItem = m_pTabBar->tabData(i).value<IData *>();
+            IProjItem *pItem = m_pTabBar->tabData(i).value<IProjItem *>();
             pItem->Save();
             
             HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
@@ -667,6 +698,6 @@ void Project::on_saveAll_triggered()
 
 void Project::on_tabBar_closeRequested(int iIndex)
 {
-    IData *pItem = m_pTabBar->tabData(iIndex).value<IData *>();
+    IProjItem *pItem = m_pTabBar->tabData(iIndex).value<IProjItem *>();
     MainWindow::CloseItem(pItem);
 }

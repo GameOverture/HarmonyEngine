@@ -36,7 +36,7 @@ FontTableView::FontTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontDelegate::FontDelegate(FontData *pItemFont, QComboBox *pCmbStates, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
+FontDelegate::FontDelegate(FontItem *pItemFont, QComboBox *pCmbStates, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
                                                                                                                 m_pItemFont(pItemFont),
                                                                                                                 m_pCmbStates(pCmbStates)
 {

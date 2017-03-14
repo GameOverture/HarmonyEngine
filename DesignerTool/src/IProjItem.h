@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef IDATA_H
-#define IDATA_H
+#ifndef IPROJDATA_H
+#define IPROJDATA_H
 
 #include "ExplorerItem.h"
 #include "Harmony/HyEngine.h"
@@ -22,7 +22,7 @@ class AudioWidgetManager;
 class Project;
 class AtlasFrame;
 
-class IData : public ExplorerItem
+class IProjItem : public ExplorerItem
 {
     Q_OBJECT
 
@@ -33,7 +33,7 @@ class IData : public ExplorerItem
     friend class AtlasesData;
 
 protected:
-    Project *       m_pItemProj;
+    Project *           m_pItemProj;
     QJsonValue          m_InitValue;
 
     IDraw *             m_pDraw;
@@ -45,16 +45,7 @@ protected:
 
     QSet<AtlasFrame *>  m_Links;
 
-    HyCamera2d *        m_pCamera;
-    bool                m_bReloadDraw;
-
     virtual void OnGiveMenuActions(QMenu *pMenu) = 0;
-
-    virtual void OnGuiLoad(IHyApplication &hyApp) = 0;
-    virtual void OnGuiUnload(IHyApplication &hyApp) = 0;
-    virtual void OnGuiShow(IHyApplication &hyApp) = 0;
-    virtual void OnGuiHide(IHyApplication &hyApp) = 0;
-    virtual void OnGuiUpdate(IHyApplication &hyApp) = 0;
 
     virtual void OnLink(AtlasFrame *pFrame) = 0;
     virtual void OnReLink(AtlasFrame *pFrame) = 0;
@@ -63,14 +54,12 @@ protected:
     virtual QJsonValue OnSave() = 0;
 
 public:
-    IData(Project *pItemProj, eItemType eType, const QString sPrefix, const QString sName, QJsonValue initVal);
-    virtual ~IData();
+    IProjItem(Project *pItemProj, eItemType eType, const QString sPrefix, const QString sName, QJsonValue initVal);
+    virtual ~IProjItem();
     
     Project *GetItemProject();
 
     QJsonValue GetInitValue()                       { return m_InitValue; }
-
-    bool IsLoaded() const                           { return (m_pCamera != NULL); }
 
     QWidget *GetWidget() const                      { return m_pWidget; }
     QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
@@ -82,11 +71,11 @@ public:
     void DiscardChanges();
 
 private:
-    void Load(IHyApplication &hyApp);
-    void Unload(IHyApplication &hyApp);
-    void DrawShow(IHyApplication &hyApp);
-    void DrawHide(IHyApplication &hyApp);
-    void DrawUpdate(IHyApplication &hyApp);
+    void ProjLoad(IHyApplication &hyApp);
+    void ProjUnload(IHyApplication &hyApp);
+    void ProjShow(IHyApplication &hyApp);
+    void ProjHide(IHyApplication &hyApp);
+    void ProjUpdate(IHyApplication &hyApp);
 
     void Link(AtlasFrame *pFrame);
     void Relink(AtlasFrame *pFrame);
@@ -96,6 +85,6 @@ private Q_SLOTS:
     void on_undoStack_cleanChanged(bool bClean);
     
 };
-Q_DECLARE_METATYPE(IData *)
+Q_DECLARE_METATYPE(IProjItem *)
 
-#endif // IDATA_H
+#endif // IPROJDATA_H

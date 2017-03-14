@@ -11,9 +11,9 @@
 #include "ui_WidgetExplorer.h"
 
 #include "MainWindow.h"
-#include "AudioData.h"
-#include "SpriteData.h"
-#include "FontData.h"
+#include "AudioItem.h"
+#include "SpriteItem.h"
+#include "FontItem.h"
 #include "Project.h"
 #include "AtlasesWidget.h"
 #include "HyGuiGlobal.h"
@@ -100,13 +100,13 @@ void ExplorerWidget::AddItem(eItemType eNewItemType, const QString sPrefix, cons
         HyGuiLog("Do not use WidgetExplorer::AddItem for Sub dirs or prefixes", LOGTYPE_Error);
         return;
     case ITEM_Audio:
-        pItem = new AudioData(pCurProj, sPrefix, sName, QJsonValue());
+        pItem = new AudioItem(pCurProj, sPrefix, sName, QJsonValue());
         break;
     case ITEM_Sprite:
-        pItem = new SpriteData(pCurProj, sPrefix, sName, QJsonValue());
+        pItem = new SpriteItem(pCurProj, sPrefix, sName, QJsonValue());
         break;
     case ITEM_Font:
-        pItem = new FontData(pCurProj, sPrefix, sName, QJsonValue());
+        pItem = new FontItem(pCurProj, sPrefix, sName, QJsonValue());
         break;
     default:
         HyGuiLog("Item: " % sPrefix % "/" % sName % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
@@ -178,7 +178,7 @@ void ExplorerWidget::AddItem(eItemType eNewItemType, const QString sPrefix, cons
             pExpandItem = pExpandItem->parent();
         }
         
-        MainWindow::OpenItem(static_cast<IData *>(pItem));
+        MainWindow::OpenItem(static_cast<IProjItem *>(pItem));
     }
 }
 
@@ -395,7 +395,7 @@ void ExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int 
     case ITEM_Sprite:
     case ITEM_Shader:
     case ITEM_Entity:
-        MainWindow::OpenItem(static_cast<IData *>(pTreeVariantItem));
+        MainWindow::OpenItem(static_cast<IProjItem *>(pTreeVariantItem));
         break;
     }
 }

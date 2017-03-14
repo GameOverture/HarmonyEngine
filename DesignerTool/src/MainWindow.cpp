@@ -19,7 +19,7 @@
 #include "AtlasesWidget.h"
 #include "AudioWidgetManager.h"
 
-#include "SpriteData.h"
+#include "SpriteItem.h"
 #include "HyGuiRenderer.h"
 #include "HyGuiGlobal.h"
 
@@ -233,46 +233,13 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     return sm_pInstance->m_sEngineLocation;
 }
 
-/*static*/ void MainWindow::OpenItem(IData *pItem)
+/*static*/ void MainWindow::OpenItem(IProjItem *pItem)
 {
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
     
     Project *pItemProj = sm_pInstance->ui->explorer->GetCurProjSelected();
-    QTabBar *pTabBar = pItemProj->GetTabBar();
-
-    if(pItem->IsLoaded() == false)
-    {
-        pItem->Load(*pItemProj);
-
-        pTabBar->blockSignals(true);
-        int iIndex = pTabBar->addTab(pItem->GetIcon(), pItem->GetName(false));
-        QVariant v;
-        v.setValue(pItem);
-        pTabBar->setTabData(iIndex, v);
-        pTabBar->setCurrentIndex(iIndex);
-        pTabBar->blockSignals(false);
-    }
-    else
-    {
-        for(int i = 0; i < pTabBar->count(); ++i)
-        {
-            if(pTabBar->tabData(i).value<IData *>() == pItem)
-            {
-                pTabBar->blockSignals(true);
-                pTabBar->setCurrentIndex(i);
-                pTabBar->blockSignals(false);
-                break;
-            }
-        }
-    }
-    
-    // Hide everything
-    for(int i = 0; i < pTabBar->count(); ++i)
-        pTabBar->tabData(i).value<IData *>()->DrawHide(*pItemProj);
-
-    // Then show
-    pItem->DrawShow(*pItemProj);
+    pItemProj->OpenItem(pItem);
     
     sm_pInstance->ui->explorer->SelectItem(pItem);
 
@@ -297,7 +264,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->ui->mainToolBar->addActions(sm_pInstance->ui->menu_Edit->actions());
 }
 
-/*static*/ void MainWindow::CloseItem(IData *pItem)
+/*static*/ void MainWindow::CloseItem(IProjItem *pItem)
 {
     if(pItem == NULL || pItem->GetType() == ITEM_Project)
         return;
@@ -330,7 +297,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     QTabBar *pTabBar = pItemProj->GetTabBar();
     for(int i = 0; i < pTabBar->count(); ++i)
     {
-        if(pTabBar->tabData(i).value<IData *>() == pItem)
+        if(pTabBar->tabData(i).value<IProjItem *>() == pItem)
         {
             pTabBar->removeTab(i);
             break;

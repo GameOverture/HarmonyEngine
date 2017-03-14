@@ -10,7 +10,7 @@
 #include "SpriteUndoCmds.h"
 
 #include "SpriteModelView.h"
-#include "SpriteData.h"
+#include "SpriteItem.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SpriteUndoCmd_OrderFrame::SpriteUndoCmd_OrderFrame(SpriteTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),

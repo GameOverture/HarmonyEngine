@@ -11,7 +11,7 @@
 #define ATLASFRAME_H
 
 #include "Harmony/HyEngine.h"
-#include "IData.h"
+#include "IProjItem.h"
 
 #include <QWidget>
 #include <QSet>
@@ -39,7 +39,7 @@ class AtlasFrame
     int                                 m_iPosX;
     int                                 m_iPosY;
 
-    QSet<IData *>                  m_Links;
+    QSet<IProjItem *>                  m_Links;
 
     QMap<void *, HyTexturedQuad2d *>    m_DrawInstMap;
 
@@ -61,7 +61,7 @@ public:
     QSize GetSize();
     QRect GetCrop();
     QPoint GetPosition();
-    QSet<IData *> GetLinks();
+    QSet<IProjItem *> GetLinks();
     eAtlasNodeType GetType();
 
     int GetTextureIndex();

@@ -18,7 +18,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-AudioWidget::AudioWidget(AudioData *pOwner, QWidget *parent) :  QWidget(parent),
+AudioWidget::AudioWidget(AudioItem *pOwner, QWidget *parent) :  QWidget(parent),
                                                                 ui(new Ui::AudioWidget),
                                                                 m_pItemAudio(pOwner),
                                                                 m_pCurAudioState(NULL)
@@ -68,7 +68,7 @@ AudioWidget::~AudioWidget()
     delete ui;
 }
 
-AudioData *AudioWidget::GetData()
+AudioItem *AudioWidget::GetData()
 {
     return m_pItemAudio;
 }

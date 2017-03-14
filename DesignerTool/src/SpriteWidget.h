@@ -21,25 +21,25 @@ namespace Ui {
 class SpriteWidget;
 }
 
-class SpriteData;
+class SpriteItem;
 class AtlasesWidget;
 
 class SpriteWidget : public QWidget
 {
     Q_OBJECT
     
-    SpriteData *            m_pItemSprite;
+    SpriteItem *            m_pItemSprite;
 
     QList<QAction *>        m_StateActionsList;
     SpriteWidgetState *     m_pCurSpriteState;
 
 public:
-    explicit SpriteWidget(SpriteData *pItemSprite, QWidget *parent = 0);
+    explicit SpriteWidget(SpriteItem *pItemSprite, QWidget *parent = 0);
     ~SpriteWidget();
 
     void Load();  // This function exists because below cannot be placed in constructor due to RequestFrames() trying to access ItemSprite::m_pWidget (aka this) before variable is assigned
     
-    SpriteData *GetData();
+    SpriteItem *GetData();
     
     void OnGiveMenuActions(QMenu *pMenu);
 

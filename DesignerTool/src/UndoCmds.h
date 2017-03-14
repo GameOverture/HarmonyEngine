@@ -11,7 +11,7 @@
 #define UNDOCMDS
 
 #include "HyGuiGlobal.h"
-#include "IData.h"
+#include "IProjItem.h"
 
 #include "Project.h"
 

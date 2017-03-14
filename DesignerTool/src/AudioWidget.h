@@ -10,7 +10,7 @@
 #ifndef AUDIOWIDGET_H
 #define AUDIOWIDGET_H
 
-#include "AudioData.h"
+#include "AudioItem.h"
 #include "AudioWidgetState.h"
 
 #include <QWidget>
@@ -23,16 +23,16 @@ class AudioWidget : public QWidget
 {
     Q_OBJECT
     
-    AudioData *             m_pItemAudio;
+    AudioItem *             m_pItemAudio;
     AudioWidgetState *      m_pCurAudioState;
 
     QList<QAction *>        m_StateActionsList;
     
 public:
-    explicit AudioWidget(AudioData *pOwner, QWidget *parent = 0);
+    explicit AudioWidget(AudioItem *pOwner, QWidget *parent = 0);
     ~AudioWidget();
     
-    AudioData *GetData();
+    AudioItem *GetData();
     
     QComboBox *GetCmbStates();
     

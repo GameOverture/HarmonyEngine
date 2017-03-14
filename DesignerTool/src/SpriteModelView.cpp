@@ -10,7 +10,7 @@
 #include "SpriteModelView.h"
 
 #include "HyGuiGlobal.h"
-#include "SpriteData.h"
+#include "SpriteItem.h"
 #include "SpriteUndoCmds.h"
 
 #include <QLineEdit>
@@ -37,7 +37,7 @@ SpriteTableView::SpriteTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetSpriteDelegate::WidgetSpriteDelegate(SpriteData *pItemSprite, SpriteTableView *pTableView, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
+WidgetSpriteDelegate::WidgetSpriteDelegate(SpriteItem *pItemSprite, SpriteTableView *pTableView, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
                                                                                                                                     m_pItemSprite(pItemSprite),
                                                                                                                                     m_pTableView(pTableView)
 {

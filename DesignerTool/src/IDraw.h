@@ -14,6 +14,10 @@
 
 class IDraw : public HyEntity2d
 {
+protected:
+    HyCamera2d *        m_pCamera;
+    bool                m_bReloadDraw;
+
 public:
     IDraw();
 
@@ -25,11 +29,11 @@ protected:
     virtual void OnGuiUpdate(IHyApplication &hyApp) = 0;
 
 private:
-    void Load(IHyApplication &hyApp);
-    void Unload(IHyApplication &hyApp);
-    void DrawShow(IHyApplication &hyApp);
-    void DrawHide(IHyApplication &hyApp);
-    void DrawUpdate(IHyApplication &hyApp);
+    void GuiLoad(IHyApplication &hyApp);
+    void GuiUnload(IHyApplication &hyApp);
+    void GuiShow(IHyApplication &hyApp);
+    void GuiHide(IHyApplication &hyApp);
+    void GuiUpdate(IHyApplication &hyApp);
 };
 
 #endif // IDRAW_H

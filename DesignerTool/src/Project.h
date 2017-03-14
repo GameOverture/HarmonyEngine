@@ -10,7 +10,7 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
-#include "IData.h"
+#include "IProjItem.h"
 #include "AtlasesData.h"
 
 
@@ -45,6 +45,8 @@ class Project : public ExplorerItem, public IHyApplication
 
     AudioWidgetManager *                            m_pAudioMan;
     QTabBar *                                       m_pTabBar;
+
+    IProjItem *                                     m_pCurOpenItem;
     
     QString                                         m_sGameName;
 
@@ -52,10 +54,6 @@ class Project : public ExplorerItem, public IHyApplication
     QString                                         m_sRelativeMetaDataLocation;
     QString                                         m_sRelativeSourceLocation;
 
-    QQueue<eProjDrawState>                          m_DrawStateQueue;
-    eProjDrawState                                  m_ePrevDrawState;
-    eProjDrawState                                  m_eDrawState;
-    bool                                            m_bDrawStateLoaded[NUMPROJDRAWSTATE];
     HyCamera2d *                                    m_pCamera;
     CheckerGrid                                     m_CheckerGridBG;
 
@@ -70,7 +68,6 @@ public:
     ~Project();
 
     void LoadWidgets();
-
     bool HasError() const;
 
     QList<AtlasTreeItem *> GetAtlasTreeItemList();
@@ -87,12 +84,14 @@ public:
     QString GetSourceRelPath() const                    { return QDir::cleanPath(m_sRelativeSourceLocation) + '/'; }
 
     AtlasesData &GetAtlasesData()                       { return *m_pAtlasesData; }
-    AtlasesWidget &GetAtlasManager()               { return *m_pAtlasMan; }
+    AtlasesWidget &GetAtlasManager()                    { return *m_pAtlasMan; }
     AudioWidgetManager &GetAudioManager()               { return *m_pAudioMan; }
     QTabBar *GetTabBar()                                { return m_pTabBar; }
     
     QList<QAction *> GetSaveActions();
     void SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled);
+
+    void OpenItem(IProjItem *pItem);
 
     // IHyApplication overrides
     virtual bool Initialize();
@@ -101,9 +100,6 @@ public:
 
     void SetRenderSize(int iWidth, int iHeight);
     
-    void SetOverrideDrawState(eProjDrawState eDrawState);
-    bool IsOverrideDraw();
-    void OverrideDraw();
     void Reset();
 
     void SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal);

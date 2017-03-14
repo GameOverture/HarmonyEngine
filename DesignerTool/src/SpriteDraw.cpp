@@ -1,6 +1,6 @@
 #include "SpriteDraw.h"
 
-SpriteDraw::SpriteDraw()
+SpriteDraw::SpriteDraw(SpriteItem *pItem) : m_pItem(pItem)
 {
 
 }
@@ -9,70 +9,65 @@ SpriteDraw::SpriteDraw()
 {
 }
 
-///*virtual*/ void SpriteDraw::OnGuiLoad(IHyApplication &hyApp)
-//{
-//    m_pWidget = new WidgetSprite(this);
-//    static_cast<WidgetSprite *>(m_pWidget)->Load();
+/*virtual*/ void SpriteDraw::OnGuiLoad(IHyApplication &hyApp)
+{
+    m_primOriginHorz.Load();
+    m_primOriginVert.Load();
+}
 
-//    m_primOriginHorz.Load();
-//    m_primOriginVert.Load();
-//}
+/*virtual*/ void SpriteDraw::OnGuiUnload(IHyApplication &hyApp)
+{
+    m_primOriginHorz.Unload();
+    m_primOriginVert.Unload();
 
-///*virtual*/ void SpriteDraw::OnGuiUnload(IHyApplication &hyApp)
-//{
-//    m_primOriginHorz.Unload();
-//    m_primOriginVert.Unload();
+    QList<AtlasFrame *> frameList = static_cast<SpriteWidget *>(m_pItem->GetWidget())->GetAllDrawInsts();
+    for(int i = 0; i < frameList.count(); i++)
+        frameList[i]->DrawInst(this)->Unload();
+}
 
-//    QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
-//    for(int i = 0; i < frameList.count(); i++)
-//        frameList[i]->DrawInst(this)->Unload();
+/*virtual*/ void SpriteDraw::OnGuiShow(IHyApplication &hyApp)
+{
+    m_primOriginHorz.SetEnabled(true);
+    m_primOriginVert.SetEnabled(true);
+}
 
-//    delete m_pWidget;
-//}
+/*virtual*/ void SpriteDraw::OnGuiHide(IHyApplication &hyApp)
+{
+    m_primOriginHorz.SetEnabled(false);
+    m_primOriginVert.SetEnabled(false);
 
-///*virtual*/ void SpriteDraw::OnGuiShow(IHyApplication &hyApp)
-//{
-//    m_primOriginHorz.SetEnabled(true);
-//    m_primOriginVert.SetEnabled(true);
-//}
+    QList<AtlasFrame *> frameList = static_cast<SpriteWidget *>(m_pItem->GetWidget())->GetAllDrawInsts();
+    for(int i = 0; i < frameList.count(); i++)
+        frameList[i]->DrawInst(this)->SetEnabled(false);
+}
 
-///*virtual*/ void SpriteDraw::OnGuiHide(IHyApplication &hyApp)
-//{
-//    m_primOriginHorz.SetEnabled(false);
-//    m_primOriginVert.SetEnabled(false);
+/*virtual*/ void SpriteDraw::OnGuiUpdate(IHyApplication &hyApp)
+{
+    QList<AtlasFrame *> frameList = static_cast<SpriteWidget *>(m_pItem->GetWidget())->GetAllDrawInsts();
+    for(int i = 0; i < frameList.count(); i++)
+        frameList[i]->DrawInst(this)->SetEnabled(false);
 
-//    QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
-//    for(int i = 0; i < frameList.count(); i++)
-//        frameList[i]->DrawInst(this)->SetEnabled(false);
-//}
+    SpriteWidgetState *pCurSpriteState = static_cast<SpriteWidget *>(m_pItem->GetWidget())->GetCurSpriteState();
+    SpriteFrame *pSpriteFrame = pCurSpriteState->GetSelectedFrame();
 
-///*virtual*/ void SpriteDraw::OnGuiUpdate(IHyApplication &hyApp)
-//{
-//    QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
-//    for(int i = 0; i < frameList.count(); i++)
-//        frameList[i]->DrawInst(this)->SetEnabled(false);
+    if(pSpriteFrame == NULL)
+        return;
 
-//    WidgetSpriteState *pCurSpriteState = static_cast<WidgetSprite *>(m_pWidget)->GetCurSpriteState();
-//    SpriteFrame *pSpriteFrame = pCurSpriteState->GetSelectedFrame();
+    AtlasFrame *pGuiFrame = pSpriteFrame->m_pFrame;
+    HyTexturedQuad2d *pDrawInst = pGuiFrame->DrawInst(this);
 
-//    if(pSpriteFrame == NULL)
-//        return;
+    pDrawInst->alpha.Set(1.0f);
 
-//    HyGuiFrame *pGuiFrame = pSpriteFrame->m_pFrame;
-//    HyTexturedQuad2d *pDrawInst = pGuiFrame->DrawInst(this);
+    QPoint ptRenderOffset = pSpriteFrame->GetRenderOffset();
+    pDrawInst->pos.X(ptRenderOffset.x());
+    pDrawInst->pos.Y(ptRenderOffset.y());
 
-//    pDrawInst->alpha.Set(1.0f);
+    pDrawInst->SetDisplayOrder(100);
 
-//    QPoint ptRenderOffset = pSpriteFrame->GetRenderOffset();
-//    pDrawInst->pos.X(ptRenderOffset.x());
-//    pDrawInst->pos.Y(ptRenderOffset.y());
+    if(pDrawInst->IsLoaded() == false)
+        pDrawInst->Load();
 
-//    pDrawInst->SetDisplayOrder(100);
+    pDrawInst->SetEnabled(true);
 
-//    if(pDrawInst->IsLoaded() == false)
-//        pDrawInst->Load();
-
-//    pDrawInst->SetEnabled(true);
-
-//    pCurSpriteState->UpdateTimeStep();
-//}
+    pCurSpriteState->UpdateTimeStep();
+}

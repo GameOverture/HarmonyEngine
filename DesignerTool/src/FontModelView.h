@@ -10,7 +10,7 @@
 #ifndef FONTMODELVIEW_H
 #define FONTMODELVIEW_H
 
-#include "FontData.h"
+#include "FontItem.h"
 #include "freetype-gl/freetype-gl.h"
 
 #include <QWidget>
@@ -37,11 +37,11 @@ class FontDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
-    FontData *              m_pItemFont;
+    FontItem *              m_pItemFont;
     QComboBox *             m_pCmbStates;
 
 public:
-    FontDelegate(FontData *pItemFont, QComboBox *pCmbStates, QObject *pParent = 0);
+    FontDelegate(FontItem *pItemFont, QComboBox *pCmbStates, QObject *pParent = 0);
 
     virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const override;

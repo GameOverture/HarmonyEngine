@@ -139,7 +139,7 @@ QPoint AtlasFrame::GetPosition()
     return QPoint(m_iPosX, m_iPosY);
 }
 
-QSet<IData *> AtlasFrame::GetLinks()
+QSet<IProjItem *> AtlasFrame::GetLinks()
 {
     return m_Links;
 }

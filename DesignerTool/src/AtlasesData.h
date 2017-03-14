@@ -19,7 +19,7 @@ class AtlasesData : public QObject
 {
     Q_OBJECT
 
-    Project *                                   m_pProjOwner;
+    Project *                                       m_pProjOwner;
 
     QDir                                            m_MetaDir;
     QDir                                            m_DataDir;
@@ -50,14 +50,14 @@ public:
     AtlasFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors);
     void RemoveFrame(AtlasFrame *pFrame);
 
-    AtlasFrame *GenerateFrame(IData *pItem, QString sName, QImage &newImage, eAtlasNodeType eType);
+    AtlasFrame *GenerateFrame(IProjItem *pItem, QString sName, QImage &newImage, eAtlasNodeType eType);
     void ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
 
-    QList<AtlasFrame *> RequestFrames(IData *pItem);
-    QList<AtlasFrame *> RequestFrames(IData *pItem, QList<AtlasFrame *> requestList);
-    QList<AtlasFrame *> RequestFrames(IData *pItem, QList<quint32> requestList);
+    QList<AtlasFrame *> RequestFrames(IProjItem *pItem);
+    QList<AtlasFrame *> RequestFrames(IProjItem *pItem, QList<AtlasFrame *> requestList);
+    QList<AtlasFrame *> RequestFrames(IProjItem *pItem, QList<quint32> requestList);
 
-    void RelinquishFrames(IData *pItem, QList<AtlasFrame *> relinquishList);
+    void RelinquishFrames(IProjItem *pItem, QList<AtlasFrame *> relinquishList);
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     QSet<AtlasFrame *> ImportImages(QStringList sImportImgList);
@@ -65,8 +65,8 @@ public:
 
     void SaveData();
 
-    void SetDependency(AtlasFrame *pFrame, IData *pItem);
-    void RemoveDependency(AtlasFrame *pFrame, IData *pItem);
+    void SetDependency(AtlasFrame *pFrame, IProjItem *pItem);
+    void RemoveDependency(AtlasFrame *pFrame, IProjItem *pItem);
 
     void GetAtlasInfoForGameData(QJsonObject &atlasObjOut);
 

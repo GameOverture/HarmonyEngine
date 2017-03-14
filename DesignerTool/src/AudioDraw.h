@@ -1,19 +1,16 @@
-#ifndef SPRITEDRAW_H
-#define SPRITEDRAW_H
+#ifndef AUDIODRAW_H
+#define AUDIODRAW_H
 
 #include "IDraw.h"
-#include "SpriteItem.h"
+#include "AudioItem.h"
 
-class SpriteDraw : public IDraw
+class AudioDraw : public IDraw
 {
-    SpriteItem *                m_pItem;
-
-    HyPrimitive2d               m_primOriginHorz;
-    HyPrimitive2d               m_primOriginVert;
+    AudioItem *     m_pItem;
 
 public:
-    SpriteDraw(SpriteItem *pItem);
-    virtual ~SpriteDraw();
+    AudioDraw(AudioItem *pItem);
+    virtual ~AudioDraw();
 
 protected:
     virtual void OnGuiLoad(IHyApplication &hyApp) override;
@@ -23,4 +20,4 @@ protected:
     virtual void OnGuiUpdate(IHyApplication &hyApp) override;
 };
 
-#endif // SPRITEDRAW_H
+#endif // AUDIODRAW_H

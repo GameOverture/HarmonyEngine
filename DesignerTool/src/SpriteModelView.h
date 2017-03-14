@@ -18,7 +18,7 @@
 #include <QTableView>
 #include <QStyledItemDelegate>
 
-class SpriteData;
+class SpriteItem;
 class SpriteFrame;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,11 +37,11 @@ class WidgetSpriteDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
-    SpriteData *                m_pItemSprite;
+    SpriteItem *                m_pItemSprite;
     SpriteTableView *     m_pTableView;
 
 public:
-    WidgetSpriteDelegate(SpriteData *pItemSprite, SpriteTableView *pTableView, QObject *pParent = 0);
+    WidgetSpriteDelegate(SpriteItem *pItemSprite, SpriteTableView *pTableView, QObject *pParent = 0);
 
     virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const;

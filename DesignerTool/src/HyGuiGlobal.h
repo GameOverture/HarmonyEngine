@@ -71,14 +71,6 @@ enum eAudioNodeType
     NUMAUDIO
 };
 
-enum eProjDrawState
-{
-    PROJDRAWSTATE_Nothing = 0,
-    PROJDRAWSTATE_AtlasManager,
-    
-    NUMPROJDRAWSTATE
-};
-
 enum eGuiFrameError
 {
     GUIFRAMEERROR_CannotFindMetaImg = 0,

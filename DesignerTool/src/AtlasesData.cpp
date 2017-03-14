@@ -274,7 +274,7 @@ void AtlasesData::RemoveFrame(AtlasFrame *pFrame)
     //m_pMouseHoverItem = NULL;
 }
 
-AtlasFrame *AtlasesData::GenerateFrame(IData *pItem, QString sName, QImage &newImage, eAtlasNodeType eType)
+AtlasFrame *AtlasesData::GenerateFrame(IProjItem *pItem, QString sName, QImage &newImage, eAtlasNodeType eType)
 {
     // This allocates a new HyGuiFrame into the dependency map
     AtlasFrame *pFrame = ImportImage(sName, newImage, eType);
@@ -320,7 +320,7 @@ void AtlasesData::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newIma
         Repack(textureIndexToReplaceSet, QSet<AtlasFrame *>());
 }
 
-QList<AtlasFrame *> AtlasesData::RequestFrames(IData *pItem)
+QList<AtlasFrame *> AtlasesData::RequestFrames(IProjItem *pItem)
 {
     QList<QTreeWidgetItem *> selectedItems = m_pProjOwner->GetAtlasManager().GetFramesTreeWidget()->selectedItems();
     qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
@@ -343,7 +343,7 @@ QList<AtlasFrame *> AtlasesData::RequestFrames(IData *pItem)
     return RequestFrames(pItem, frameRequestList);
 }
 
-QList<AtlasFrame *> AtlasesData::RequestFrames(IData *pItem, QList<quint32> requestList)
+QList<AtlasFrame *> AtlasesData::RequestFrames(IProjItem *pItem, QList<quint32> requestList)
 {
     if(requestList.empty())
         return RequestFrames(pItem);
@@ -364,7 +364,7 @@ QList<AtlasFrame *> AtlasesData::RequestFrames(IData *pItem, QList<quint32> requ
     return RequestFrames(pItem, frameRequestList);
 }
 
-QList<AtlasFrame *> AtlasesData::RequestFrames(IData *pItem, QList<AtlasFrame *> requestList)
+QList<AtlasFrame *> AtlasesData::RequestFrames(IProjItem *pItem, QList<AtlasFrame *> requestList)
 {
     if(requestList.empty())
         return RequestFrames(pItem);
@@ -379,7 +379,7 @@ QList<AtlasFrame *> AtlasesData::RequestFrames(IData *pItem, QList<AtlasFrame *>
     return returnList;
 }
 
-void AtlasesData::RelinquishFrames(IData *pItem, QList<AtlasFrame *> relinquishList)
+void AtlasesData::RelinquishFrames(IProjItem *pItem, QList<AtlasFrame *> relinquishList)
 {
     for(int i = 0; i < relinquishList.size(); ++i)
         RemoveDependency(relinquishList[i], pItem);
@@ -444,13 +444,13 @@ void AtlasesData::SaveData()
     }
 }
 
-void AtlasesData::SetDependency(AtlasFrame *pFrame, IData *pItem)
+void AtlasesData::SetDependency(AtlasFrame *pFrame, IProjItem *pItem)
 {
     pFrame->m_Links.insert(pItem);
     pItem->Link(pFrame);
 }
 
-void AtlasesData::RemoveDependency(AtlasFrame *pFrame, IData *pItem)
+void AtlasesData::RemoveDependency(AtlasFrame *pFrame, IProjItem *pItem)
 {
     pFrame->m_Links.remove(pItem);
     pItem->Unlink(pFrame);

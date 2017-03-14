@@ -1,55 +1,26 @@
-/**************************************************************************
- *	ItemFont.cpp
- *
- *	Harmony Engine - Designer Tool
- *	Copyright (c) 2016 Jason Knobler
- *
- *	The zlib License (zlib)
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
- *************************************************************************/
-#include "FontData.h"
+#include "FontDraw.h"
 
-#include <QMenu>
-#include <QAction>
-#include <QUndoView>
-#include <QJsonObject>
-#include <QJsonDocument>
-
-#include "MainWindow.h"
-#include "FontWidget.h"
-#include "AtlasesWidget.h"
-
-#include "Harmony/HyEngine.h"
-
-FontData::FontData(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) :  IData(pItemProj, ITEM_Font, sPrefix, sName, initVal),
-                                                                                                              m_pDrawAtlasPreview(NULL),
-                                                                                                              m_pFontCamera(NULL)
+FontDraw::FontDraw(FontItem *pItem) :   m_pItem(pItem),
+                                        m_pDrawAtlasPreview(nullptr),
+                                        m_pFontCamera(nullptr)
 {
 }
 
-/*virtual*/ FontData::~FontData()
+/*virtual*/ FontDraw::~FontDraw()
 {
-    delete m_pWidget;
 }
 
-/*virtual*/ void FontData::OnGiveMenuActions(QMenu *pMenu)
+/*virtual*/ void FontDraw::OnGuiLoad(IHyApplication &hyApp)
 {
-    static_cast<FontWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
-}
-
-/*virtual*/ void FontData::OnGuiLoad(IHyApplication &hyApp)
-{
-    m_pWidget = new FontWidget(this);
-
-    if(m_pFontCamera == NULL)
+    if(m_pFontCamera == nullptr)
         m_pFontCamera = hyApp.Window().CreateCamera2d();
-    
+
     m_pCamera->SetViewport(0.0f, 0.5f, 1.0f, 0.5f);
     m_pCamera->pos.Set(0.0f, 2500.0f);
-    
+
     m_pFontCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.5f);
     m_pFontCamera->pos.Set(0.0f, -2500.0f);
-    
+
     m_DrawAtlasOutline.SetTint(1.0f, 0.0f, 0.0f);
     m_DrawAtlasOutline.Load();
 
@@ -60,51 +31,49 @@ FontData::FontData(Project *pItemProj, const QString sPrefix, const QString sNam
     m_DividerLine.Load();
 }
 
-/*virtual*/ void FontData::OnGuiUnload(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnGuiUnload(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->Unload();
 
     m_DrawAtlasOutline.Unload();
-    
-    m_DividerLine.Unload();
 
-    delete m_pWidget;
+    m_DividerLine.Unload();
 }
 
-/*virtual*/ void FontData::OnGuiShow(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnGuiShow(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->SetEnabled(true);
 
     m_DrawAtlasOutline.SetEnabled(true);
-    
+
     if(m_pFontCamera)
         m_pFontCamera->SetEnabled(true);
-    
+
     m_DividerLine.SetEnabled(true);
 }
 
-/*virtual*/ void FontData::OnGuiHide(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnGuiHide(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->SetEnabled(false);
 
     m_DrawAtlasOutline.SetEnabled(false);
-    
+
     if(m_pFontCamera)
         m_pFontCamera->SetEnabled(false);
-    
+
     m_DividerLine.SetEnabled(false);
 }
 
-/*virtual*/ void FontData::OnGuiUpdate(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnGuiUpdate(IHyApplication &hyApp)
 {
     FontWidget *pWidget = static_cast<FontWidget *>(m_pWidget);
     texture_atlas_t *pAtlas = pWidget->GetAtlas();
 
     m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetResolution().y / 2 - 5.0f);
-    
+
     if(pAtlas == NULL)
         return;
 
@@ -190,7 +159,7 @@ FontData::FontData(Project *pItemProj, const QString sPrefix, const QString sNam
                 pDrawGlyphQuad->Load();
                 pDrawGlyphQuad->SetTextureSource(iX, iY, iWidth, iHeight);
                 pDrawGlyphQuad->pos.Set(ptGlyphPos.x + pGlyph->offset_x, ptGlyphPos.y);
-                
+
                 QColor topColor = pFontModel->GetLayerTopColor(i);
                 QColor botColor = pFontModel->GetLayerBotColor(i);
                 pDrawGlyphQuad->topColor.Set(topColor.redF(), topColor.greenF(), topColor.blueF());
@@ -209,29 +178,4 @@ FontData::FontData(Project *pItemProj, const QString sPrefix, const QString sNam
 
         m_pFontCamera->pos.X(fTextPixelLength * 0.5f);
     }
-}
-
-/*virtual*/ void FontData::OnLink(AtlasFrame *pFrame)
-{
-}
-
-/*virtual*/ void FontData::OnReLink(AtlasFrame *pFrame)
-{
-}
-
-/*virtual*/ void FontData::OnUnlink(AtlasFrame *pFrame)
-{
-}
-
-/*virtual*/ QJsonValue FontData::OnSave()
-{ 
-    FontWidget *pWidget = static_cast<FontWidget *>(m_pWidget);
-    pWidget->SaveFontFilesToMetaDir();
-    
-    pWidget->GeneratePreview(true);
-    
-    QJsonObject fontObj;
-    pWidget->GetSaveInfo(fontObj);
-
-    return fontObj;
 }

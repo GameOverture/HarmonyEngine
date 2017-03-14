@@ -22,7 +22,7 @@ namespace Ui {
 class FontWidget;
 }
 
-class FontData;
+class FontItem;
 class FontTableModel;
 
 struct FontStagePass
@@ -67,7 +67,7 @@ class FontWidget : public QWidget
 {
     Q_OBJECT
 
-    FontData *                  m_pItemFont;
+    FontItem *                  m_pItemFont;
     
     QString                     m_sAvailableTypefaceGlyphs;
     QRegExpValidator            m_PreviewValidator;
@@ -90,12 +90,12 @@ class FontWidget : public QWidget
     QSize                       m_PrevAtlasSize;
     
 public:
-    explicit FontWidget(FontData *pOwner, QWidget *parent = 0);
+    explicit FontWidget(FontItem *pOwner, QWidget *parent = 0);
     ~FontWidget();
 
     void OnGiveMenuActions(QMenu *pMenu);
     
-    FontData *GetItemFont();
+    FontItem *GetItemFont();
 
     QString GetFullItemName();
 

@@ -11,7 +11,7 @@
 #include "ui_WidgetFont.h"
 
 #include "HyGuiGlobal.h"
-#include "FontData.h"
+#include "FontItem.h"
 #include "FontUndoCmds.h"
 #include "UndoCmds.h"
 #include "AtlasesWidget.h"
@@ -25,7 +25,7 @@
 #include <QMenu>
 #include <QColor>
 
-FontWidget::FontWidget(FontData *pOwner, QWidget *parent) : QWidget(parent),
+FontWidget::FontWidget(FontItem *pOwner, QWidget *parent) : QWidget(parent),
                                                             m_pItemFont(pOwner),
                                                             m_bGlyphsDirty(false),
                                                             m_bFontPreviewDirty(false),
@@ -165,7 +165,7 @@ void FontWidget::OnGiveMenuActions(QMenu *pMenu)
     pMenu->addAction(ui->actionOrderLayerDownwards);
 }
 
-FontData *FontWidget::GetItemFont()
+FontItem *FontWidget::GetItemFont()
 {
     return m_pItemFont;
 }
