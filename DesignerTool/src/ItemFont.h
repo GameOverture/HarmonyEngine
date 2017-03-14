@@ -34,7 +34,6 @@ protected:
 
     virtual void OnGuiLoad(IHyApplication &hyApp);
     virtual void OnGuiUnload(IHyApplication &hyApp);
-
     virtual void OnGuiShow(IHyApplication &hyApp);
     virtual void OnGuiHide(IHyApplication &hyApp);
     virtual void OnGuiUpdate(IHyApplication &hyApp);

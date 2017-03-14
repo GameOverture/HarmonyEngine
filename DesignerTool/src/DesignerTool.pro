@@ -62,7 +62,8 @@ SOURCES += main.cpp \
     ItemSpine.cpp \
     WidgetSpine.cpp \
     ItemAtlases.cpp \
-    IDraw.cpp
+    IDraw.cpp \
+    SpriteDraw.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -111,7 +112,8 @@ HEADERS  += \
     ItemSpine.h \
     WidgetSpine.h \
     ItemAtlases.h \
-    IDraw.h
+    IDraw.h \
+    SpriteDraw.h
 
 FORMS    += \
     DlgNewProject.ui \

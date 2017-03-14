@@ -11,8 +11,8 @@
 #define ITEMWIDGET_H
 
 #include "Item.h"
-
 #include "Harmony/HyEngine.h"
+#include "IDraw.h"
 
 #include <QUndoStack>
 #include <QJsonObject>
@@ -36,7 +36,7 @@ protected:
     ItemProject *       m_pItemProj;
     QJsonValue          m_InitValue;
 
-    HyEntity2d          m_HyEntity;
+    //IDraw *             m_pDraw;
     QWidget *           m_pWidget;
 
     QUndoStack *        m_pUndoStack;
@@ -84,10 +84,8 @@ public:
 private:
     void Load(IHyApplication &hyApp);
     void Unload(IHyApplication &hyApp);
-
     void DrawShow(IHyApplication &hyApp);
     void DrawHide(IHyApplication &hyApp);
-
     void DrawUpdate(IHyApplication &hyApp);
 
     void Link(HyGuiFrame *pFrame);

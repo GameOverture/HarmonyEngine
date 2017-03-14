@@ -103,7 +103,7 @@ void ItemWidget::Load(IHyApplication &hyApp)
     m_pCamera->SetEnabled(false);
 
     OnGuiLoad(hyApp);
-    m_HyEntity.Load();
+    //m_HyEntity.Load();
 }
 
 void ItemWidget::Unload(IHyApplication &hyApp)
@@ -116,7 +116,7 @@ void ItemWidget::Unload(IHyApplication &hyApp)
     m_pCamera = NULL;
 
     OnGuiUnload(hyApp);
-    m_HyEntity.Load();
+    //m_HyEntity.Load();
 }
 
 void ItemWidget::DrawShow(IHyApplication &hyApp)

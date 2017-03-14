@@ -22,7 +22,7 @@ class HyGuiFrame;
 class Item : public QObject
 {
     Q_OBJECT
-    
+
 protected:
     const eItemType     m_eTYPE;
     const QString       m_sPATH;
@@ -38,7 +38,6 @@ public:
     
     QString GetName(bool bWithPrefix) const;
     QString GetPath() const                         { return m_sPATH; }
-    //QString GetRelPath() const;
     QIcon GetIcon() const                           { return HyGlobal::ItemIcon(m_eTYPE); }
 };
 Q_DECLARE_METATYPE(Item *)

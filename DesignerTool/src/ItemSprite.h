@@ -44,7 +44,7 @@ public:
 class ItemSprite : public ItemWidget
 {
     Q_OBJECT
-    
+
     HyPrimitive2d               m_primOriginHorz;
     HyPrimitive2d               m_primOriginVert;
     
