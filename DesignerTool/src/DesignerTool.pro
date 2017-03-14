@@ -61,7 +61,8 @@ SOURCES += main.cpp \
     WidgetGradientEditor.cpp \
     ItemSpine.cpp \
     WidgetSpine.cpp \
-    ItemAtlases.cpp
+    ItemAtlases.cpp \
+    IDraw.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -109,7 +110,8 @@ HEADERS  += \
     WidgetGradientEditor.h \
     ItemSpine.h \
     WidgetSpine.h \
-    ItemAtlases.h
+    ItemAtlases.h \
+    IDraw.h
 
 FORMS    += \
     DlgNewProject.ui \

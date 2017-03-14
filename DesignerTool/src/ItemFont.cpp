@@ -37,7 +37,7 @@ ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString 
     static_cast<WidgetFont *>(m_pWidget)->OnGiveMenuActions(pMenu);
 }
 
-/*virtual*/ void ItemFont::OnLoad(IHyApplication &hyApp)
+/*virtual*/ void ItemFont::OnGuiLoad(IHyApplication &hyApp)
 {
     m_pWidget = new WidgetFont(this);
 
@@ -60,7 +60,7 @@ ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString 
     m_DividerLine.Load();
 }
 
-/*virtual*/ void ItemFont::OnUnload(IHyApplication &hyApp)
+/*virtual*/ void ItemFont::OnGuiUnload(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->Unload();
@@ -72,7 +72,7 @@ ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString 
     delete m_pWidget;
 }
 
-/*virtual*/ void ItemFont::OnDraw_Show(IHyApplication &hyApp)
+/*virtual*/ void ItemFont::OnGuiShow(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->SetEnabled(true);
@@ -85,7 +85,7 @@ ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString 
     m_DividerLine.SetEnabled(true);
 }
 
-/*virtual*/ void ItemFont::OnDraw_Hide(IHyApplication &hyApp)
+/*virtual*/ void ItemFont::OnGuiHide(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->SetEnabled(false);
@@ -98,7 +98,7 @@ ItemFont::ItemFont(ItemProject *pItemProj, const QString sPrefix, const QString 
     m_DividerLine.SetEnabled(false);
 }
 
-/*virtual*/ void ItemFont::OnDraw_Update(IHyApplication &hyApp)
+/*virtual*/ void ItemFont::OnGuiUpdate(IHyApplication &hyApp)
 {
     WidgetFont *pWidget = static_cast<WidgetFont *>(m_pWidget);
     texture_atlas_t *pAtlas = pWidget->GetAtlas();

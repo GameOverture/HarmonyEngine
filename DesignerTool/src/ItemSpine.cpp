@@ -23,25 +23,25 @@ ItemSpine::ItemSpine(ItemProject *pItemProj, const QString sPrefix, const QStrin
 {
 }
 
-/*virtual*/ void ItemSpine::OnLoad(IHyApplication &hyApp)
+/*virtual*/ void ItemSpine::OnGuiLoad(IHyApplication &hyApp)
 {
     m_pWidget = new WidgetSpine(this);
 }
 
-/*virtual*/ void ItemSpine::OnUnload(IHyApplication &hyApp)
+/*virtual*/ void ItemSpine::OnGuiUnload(IHyApplication &hyApp)
 {
     delete m_pWidget;
 }
 
-/*virtual*/ void ItemSpine::OnDraw_Show(IHyApplication &hyApp)
+/*virtual*/ void ItemSpine::OnGuiShow(IHyApplication &hyApp)
 {
 }
 
-/*virtual*/ void ItemSpine::OnDraw_Hide(IHyApplication &hyApp)
+/*virtual*/ void ItemSpine::OnGuiHide(IHyApplication &hyApp)
 {
 }
 
-/*virtual*/ void ItemSpine::OnDraw_Update(IHyApplication &hyApp)
+/*virtual*/ void ItemSpine::OnGuiUpdate(IHyApplication &hyApp)
 {
 }
 

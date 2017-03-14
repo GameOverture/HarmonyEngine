@@ -23,25 +23,25 @@ ItemAudio::ItemAudio(ItemProject *pItemProj, const QString sPrefix, const QStrin
 {
 }
 
-/*virtual*/ void ItemAudio::OnLoad(IHyApplication &hyApp)
+/*virtual*/ void ItemAudio::OnGuiLoad(IHyApplication &hyApp)
 {
     m_pWidget = new WidgetAudio(this);
 }
 
-/*virtual*/ void ItemAudio::OnUnload(IHyApplication &hyApp)
+/*virtual*/ void ItemAudio::OnGuiUnload(IHyApplication &hyApp)
 {
     delete m_pWidget;
 }
 
-/*virtual*/ void ItemAudio::OnDraw_Show(IHyApplication &hyApp)
+/*virtual*/ void ItemAudio::OnGuiShow(IHyApplication &hyApp)
 {
 }
 
-/*virtual*/ void ItemAudio::OnDraw_Hide(IHyApplication &hyApp)
+/*virtual*/ void ItemAudio::OnGuiHide(IHyApplication &hyApp)
 {
 }
 
-/*virtual*/ void ItemAudio::OnDraw_Update(IHyApplication &hyApp)
+/*virtual*/ void ItemAudio::OnGuiUpdate(IHyApplication &hyApp)
 {
 }
 

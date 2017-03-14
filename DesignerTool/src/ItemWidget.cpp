@@ -102,7 +102,7 @@ void ItemWidget::Load(IHyApplication &hyApp)
     m_pCamera = hyApp.Window().CreateCamera2d();
     m_pCamera->SetEnabled(false);
 
-    OnLoad(hyApp);
+    OnGuiLoad(hyApp);
     m_HyEntity.Load();
 }
 
@@ -115,7 +115,7 @@ void ItemWidget::Unload(IHyApplication &hyApp)
     hyApp.Window().RemoveCamera(m_pCamera);
     m_pCamera = NULL;
 
-    OnUnload(hyApp);
+    OnGuiUnload(hyApp);
     m_HyEntity.Load();
 }
 
@@ -123,14 +123,14 @@ void ItemWidget::DrawShow(IHyApplication &hyApp)
 {
     m_pCamera->SetEnabled(true);
 
-    OnDraw_Show(hyApp);
+    OnGuiShow(hyApp);
 }
 
 void ItemWidget::DrawHide(IHyApplication &hyApp)
 {
     m_pCamera->SetEnabled(false);
 
-    OnDraw_Hide(hyApp);
+    OnGuiHide(hyApp);
 }
 
 void ItemWidget::DrawUpdate(IHyApplication &hyApp)
@@ -146,7 +146,7 @@ void ItemWidget::DrawUpdate(IHyApplication &hyApp)
         DrawShow(hyApp);
     }
 
-    OnDraw_Update(hyApp);
+    OnGuiUpdate(hyApp);
 }
 
 void ItemWidget::Link(HyGuiFrame *pFrame)

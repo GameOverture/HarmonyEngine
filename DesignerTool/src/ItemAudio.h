@@ -23,12 +23,12 @@ public:
 protected:
     virtual void OnGiveMenuActions(QMenu *pMenu);
 
-    virtual void OnLoad(IHyApplication &hyApp);
-    virtual void OnUnload(IHyApplication &hyApp);
+    virtual void OnGuiLoad(IHyApplication &hyApp);
+    virtual void OnGuiUnload(IHyApplication &hyApp);
 
-    virtual void OnDraw_Show(IHyApplication &hyApp);
-    virtual void OnDraw_Hide(IHyApplication &hyApp);
-    virtual void OnDraw_Update(IHyApplication &hyApp);
+    virtual void OnGuiShow(IHyApplication &hyApp);
+    virtual void OnGuiHide(IHyApplication &hyApp);
+    virtual void OnGuiUpdate(IHyApplication &hyApp);
 
     virtual void OnLink(HyGuiFrame *pFrame);
     virtual void OnReLink(HyGuiFrame *pFrame);

@@ -46,7 +46,7 @@ ItemSprite::ItemSprite(ItemProject *pItemProj, const QString sPrefix, const QStr
     static_cast<WidgetSprite *>(m_pWidget)->OnGiveMenuActions(pMenu);
 }
 
-/*virtual*/ void ItemSprite::OnLoad(IHyApplication &hyApp)
+/*virtual*/ void ItemSprite::OnGuiLoad(IHyApplication &hyApp)
 {
     m_pWidget = new WidgetSprite(this);
     static_cast<WidgetSprite *>(m_pWidget)->Load();
@@ -55,7 +55,7 @@ ItemSprite::ItemSprite(ItemProject *pItemProj, const QString sPrefix, const QStr
     m_primOriginVert.Load();
 }
 
-/*virtual*/ void ItemSprite::OnUnload(IHyApplication &hyApp)
+/*virtual*/ void ItemSprite::OnGuiUnload(IHyApplication &hyApp)
 {
     m_primOriginHorz.Unload();
     m_primOriginVert.Unload();
@@ -67,13 +67,13 @@ ItemSprite::ItemSprite(ItemProject *pItemProj, const QString sPrefix, const QStr
     delete m_pWidget;
 }
 
-/*virtual*/ void ItemSprite::OnDraw_Show(IHyApplication &hyApp)
+/*virtual*/ void ItemSprite::OnGuiShow(IHyApplication &hyApp)
 {
     m_primOriginHorz.SetEnabled(true);
     m_primOriginVert.SetEnabled(true);
 }
 
-/*virtual*/ void ItemSprite::OnDraw_Hide(IHyApplication &hyApp)
+/*virtual*/ void ItemSprite::OnGuiHide(IHyApplication &hyApp)
 {
     m_primOriginHorz.SetEnabled(false);
     m_primOriginVert.SetEnabled(false);
@@ -83,7 +83,7 @@ ItemSprite::ItemSprite(ItemProject *pItemProj, const QString sPrefix, const QStr
         frameList[i]->DrawInst(this)->SetEnabled(false);
 }
 
-/*virtual*/ void ItemSprite::OnDraw_Update(IHyApplication &hyApp)
+/*virtual*/ void ItemSprite::OnGuiUpdate(IHyApplication &hyApp)
 {
     QList<HyGuiFrame *> frameList = static_cast<WidgetSprite *>(m_pWidget)->GetAllDrawInsts();
     for(int i = 0; i < frameList.count(); i++)
