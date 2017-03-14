@@ -1,0 +1,93 @@
+/**************************************************************************
+ *	WidgetSprite.h
+ *
+ *	Harmony Engine - Designer Tool
+ *	Copyright (c) 2016 Jason Knobler
+ *
+ *	The zlib License (zlib)
+ *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *************************************************************************/
+#ifndef WIDGETSPRITE_H
+#define WIDGETSPRITE_H
+
+#include "SpriteWidgetState.h"
+#include "AtlasFrame.h"
+
+#include <QWidget>
+#include <QMenu>
+#include <QComboBox>
+
+namespace Ui {
+class WidgetSprite;
+}
+
+class ItemSprite;
+class WidgetAtlasManager;
+
+class WidgetSprite : public QWidget
+{
+    Q_OBJECT
+    
+    ItemSprite *            m_pItemSprite;
+
+    QList<QAction *>        m_StateActionsList;
+    WidgetSpriteState *     m_pCurSpriteState;
+
+public:
+    explicit WidgetSprite(ItemSprite *pItemSprite, QWidget *parent = 0);
+    ~WidgetSprite();
+
+    void Load();  // This function exists because below cannot be placed in constructor due to RequestFrames() trying to access ItemSprite::m_pWidget (aka this) before variable is assigned
+    
+    ItemSprite *GetData();
+    
+    void OnGiveMenuActions(QMenu *pMenu);
+
+    void GetSaveInfo(QJsonArray &spriteStateArrayRef);
+    
+    WidgetSpriteState *GetCurSpriteState();
+
+    void RefreshFrame(HyGuiFrame *pFrame);
+    
+    QList<HyGuiFrame *> GetAllDrawInsts();
+    
+    void UpdateActions();
+    
+private Q_SLOTS:
+    void on_actionAddState_triggered();
+    
+    void on_actionRemoveState_triggered();
+    
+    void on_actionRenameState_triggered();
+    
+    void on_actionOrderStateBackwards_triggered();
+    
+    void on_actionOrderStateForwards_triggered();
+
+    void on_actionImportFrames_triggered();
+
+    void on_actionRemoveFrames_triggered();
+    
+    void on_cmbStates_currentIndexChanged(int index);
+
+    void on_actionAlignLeft_triggered();
+    
+    void on_actionAlignRight_triggered();
+    
+    void on_actionAlignUp_triggered();
+    
+    void on_actionAlignDown_triggered();
+    
+    void on_actionAlignCenterVertical_triggered();
+    
+    void on_actionAlignCenterHorizontal_triggered();
+    
+    void on_actionOrderFrameUpwards_triggered();
+
+    void on_actionOrderFrameDownwards_triggered();
+
+private:
+    Ui::WidgetSprite *ui;
+};
+
+#endif // WIDGETSPRITE_H

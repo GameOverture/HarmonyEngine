@@ -14,7 +14,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 
-#include "HyGlobal.h"
+#include "HyGuiGlobal.h"
 
 DlgAtlasGroupSettings::DlgAtlasGroupSettings(QJsonObject packerSettingsObj, QWidget *parent) :  QDialog(parent),
                                                                                                 ui(new Ui::DlgAtlasGroupSettings),

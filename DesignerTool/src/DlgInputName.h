@@ -11,7 +11,7 @@
 #define DLGINPUTNAME_H
 
 #include <QDialog>
-#include "Item.h"
+#include "ProjectItem.h"
 
 namespace Ui {
 class DlgInputName;

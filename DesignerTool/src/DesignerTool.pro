@@ -19,101 +19,97 @@ SOURCES += main.cpp \
     WidgetExplorer.cpp \
     WidgetOutputLog.cpp \
     MainWindow.cpp \
-    HyGlobal.cpp \
-    Item.cpp \
-    ItemSprite.cpp \
-    ItemFont.cpp \
     DlgNewItem.cpp \
     scriptum/imagecrop.cpp \
     scriptum/imagepacker.cpp \
     scriptum/imagesort.cpp \
     scriptum/maxrects.cpp \
-    WidgetSprite.cpp \
     DlgInputName.cpp \
-    ItemProject.cpp \
     WidgetLiveVariable.cpp \
     WidgetLiveVarManager.cpp \
     HyGuiRenderer.cpp \
     DlgAtlasGroupSettings.cpp \
-    WidgetAtlasManager.cpp \
     HyGuiDebugger.cpp \
     DlgSetEngineLocation.cpp \
-    WidgetSpriteState.cpp \
-    HyGuiFrame.cpp \
-    ItemWidget.cpp \
-    WidgetSpriteModelView.cpp \
-    WidgetFont.cpp \
-    WidgetFontModelView.cpp \
     DlgColorPicker.cpp \
-    WidgetFontState.cpp \
     WidgetColor.cpp \
     QtWaitingSpinner/waitingspinnerwidget.cpp \
-    WidgetAudioManager.cpp \
-    WidgetAudioBank.cpp \
-    WidgetAudioModelView.cpp \
-    HyGuiWave.cpp \
-    WidgetAudio.cpp \
-    ItemAudio.cpp \
-    WidgetAudioState.cpp \
     WidgetRangedSlider.cpp \
-    WidgetFontUndoCmds.cpp \
-    WidgetSpriteUndoCmds.cpp \
     WidgetGradientEditor.cpp \
-    ItemSpine.cpp \
-    WidgetSpine.cpp \
-    ItemAtlases.cpp \
     IDraw.cpp \
-    SpriteDraw.cpp
+    SpriteDraw.cpp \
+    SpriteWidget.cpp \
+    FontWidget.cpp \
+    FontWidgetState.cpp \
+    SpriteWidgetState.cpp \
+    AudioWidget.cpp \
+    AudioWidgetBank.cpp \
+    AudioWidgetManager.cpp \
+    AudioModelView.cpp \
+    AudioWidgetState.cpp \
+    FontModelView.cpp \
+    FontUndoCmds.cpp \
+    SpriteModelView.cpp \
+    SpriteUndoCmds.cpp \
+    IData.cpp \
+    AudioData.cpp \
+    FontData.cpp \
+    Project.cpp \
+    SpriteData.cpp \
+    AtlasData.cpp \
+    AtlasWidget.cpp \
+    AtlasFrame.cpp \
+    AudioWave.cpp \
+    HyGuiGlobal.cpp \
+    ProjectItem.cpp
 
 HEADERS  += \
     DlgNewProject.h \
     WidgetExplorer.h \
     WidgetOutputLog.h \
     MainWindow.h \
-    HyGlobal.h \
-    Item.h \
-    ItemSprite.h \
-    ItemFont.h \
     DlgNewItem.h \
     scriptum/imagepacker.h \
     scriptum/maxrects.h \
-    WidgetSprite.h \
     DlgInputName.h \
-    ItemProject.h \
     WidgetLiveVariable.h \
     WidgetLiveVarManager.h \
     HyGuiRenderer.h \
     DlgAtlasGroupSettings.h \
-    WidgetAtlasManager.h \
     HyGuiDebugger.h \
     DlgSetEngineLocation.h \
-    WidgetSpriteState.h \
-    HyGuiFrame.h \
-    ItemWidget.h \
-    WidgetSpriteModelView.h \
-    WidgetFont.h \
-    WidgetFontModelView.h \
     DlgColorPicker.h \
-    WidgetFontState.h \
     WidgetColor.h \
     QtWaitingSpinner/waitingspinnerwidget.h \
-    WidgetAudioManager.h \
-    WidgetAudioBank.h \
-    WidgetAudioModelView.h \
-    HyGuiWave.h \
-    WidgetAudio.h \
-    ItemAudio.h \
-    WidgetAudioState.h \
     WidgetRangedSlider.h \
-    WidgetUndoCmds.h \
-    WidgetFontUndoCmds.h \
-    WidgetSpriteUndoCmds.h \
     WidgetGradientEditor.h \
-    ItemSpine.h \
-    WidgetSpine.h \
-    ItemAtlases.h \
     IDraw.h \
-    SpriteDraw.h
+    SpriteDraw.h \
+    SpriteWidget.h \
+    FontWidget.h \
+    FontWidgetState.h \
+    SpriteWidgetState.h \
+    AudioWidget.h \
+    UndoCmds.h \
+    SpriteUndoCmds.h \
+    SpriteModelView.h \
+    FontUndoCmds.h \
+    FontModelView.h \
+    AudioWidgetState.h \
+    AudioWidgetBank.h \
+    AudioWidgetManager.h \
+    AudioModelView.h \
+    IData.h \
+    AudioData.h \
+    FontData.h \
+    Project.h \
+    SpriteData.h \
+    AtlasFrame.h \
+    AtlasWidget.h \
+    AtlasData.h \
+    AudioWave.h \
+    HyGuiGlobal.h \
+    ProjectItem.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -121,25 +117,24 @@ FORMS    += \
     WidgetOutputLog.ui \
     MainWindow.ui \
     DlgNewItem.ui \
-    WidgetSprite.ui \
     DlgInputName.ui \
     WidgetLiveVariable.ui \
     WidgetLiveVarManager.ui \
     DlgAtlasGroupSettings.ui \
-    WidgetAtlasManager.ui \
     DlgSetEngineLocation.ui \
-    WidgetSpriteState.ui \
-    WidgetFont.ui \
     DlgColorPicker.ui \
-    WidgetFontState.ui \
     WidgetColor.ui \
-    WidgetAudioManager.ui \
-    WidgetAudioBank.ui \
-    WidgetAudio.ui \
-    WidgetAudioState.ui \
     WidgetRangedSlider.ui \
     WidgetGradientEditor.ui \
-    WidgetSpine.ui
+    SpriteWidget.ui \
+    FontWidget.ui \
+    FontWidgetState.ui \
+    SpriteWidgetState.ui \
+    AudioWidget.ui \
+    AudioWidgetBank.ui \
+    AudioWidgetManager.ui \
+    AtlasesWidget.ui \
+    AudioWidgetState.ui
 
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER HY_PLATFORM_GUI
 

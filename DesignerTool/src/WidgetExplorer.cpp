@@ -11,12 +11,12 @@
 #include "ui_WidgetExplorer.h"
 
 #include "MainWindow.h"
-#include "ItemAudio.h"
-#include "ItemSprite.h"
-#include "ItemFont.h"
-#include "ItemProject.h"
-#include "WidgetAtlasManager.h"
-#include "HyGlobal.h"
+#include "AudioData.h"
+#include "SpriteData.h"
+#include "FontData.h"
+#include "Project.h"
+#include "AtlasWidget.h"
+#include "HyGuiGlobal.h"
 
 WidgetExplorer::WidgetExplorer(QWidget *parent) :   QWidget(parent),
                                                     ui(new Ui::WidgetExplorer)

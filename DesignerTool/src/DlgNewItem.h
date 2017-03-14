@@ -12,8 +12,8 @@
 
 #include <QDialog>
 
-#include "HyGlobal.h"
-#include "ItemProject.h"
+#include "HyGuiGlobal.h"
+#include "Project.h"
 
 namespace Ui {
 class DlgNewItem;

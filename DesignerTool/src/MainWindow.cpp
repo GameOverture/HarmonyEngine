@@ -16,12 +16,12 @@
 #include "DlgInputName.h"
 
 #include "WidgetExplorer.h"
-#include "WidgetAtlasManager.h"
-#include "WidgetAudioManager.h"
+#include "AtlasWidget.h"
+#include "AudioWidgetManager.h"
 
-#include "ItemSprite.h"
+#include "SpriteData.h"
 #include "HyGuiRenderer.h"
-#include "HyGlobal.h"
+#include "HyGuiGlobal.h"
 
 #include <QFileDialog>
 #include <QShowEvent>

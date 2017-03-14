@@ -16,7 +16,7 @@
 #include <QMenu>
 #include <QThread>
 
-#include "ItemProject.h"
+#include "Project.h"
 
 #include <vector>
 using std::vector;

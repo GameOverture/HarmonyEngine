@@ -10,7 +10,7 @@
 #include "HyGuiDebugger.h"
 
 #include "Harmony/HyEngine.h"
-#include "HyGlobal.h"
+#include "HyGuiGlobal.h"
 
 #include <QDateTime>
 

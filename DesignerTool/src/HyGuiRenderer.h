@@ -16,7 +16,7 @@
 #include <QThread>
 
 #include "Harmony/HyEngine.h"
-#include "ItemProject.h"
+#include "Project.h"
 
 ////class ItemProject;
 

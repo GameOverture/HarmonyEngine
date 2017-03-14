@@ -10,8 +10,8 @@
 #include "MainWindow.h"
 #include <QApplication>
 
-#include "HyGlobal.h"
-#include "HyGuiFrame.h"
+#include "HyGuiGlobal.h"
+#include "AtlasFrame.h"
 
 int main(int argc, char *argv[])
 {

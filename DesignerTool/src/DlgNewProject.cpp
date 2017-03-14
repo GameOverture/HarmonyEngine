@@ -10,7 +10,7 @@
 #include "DlgNewProject.h"
 #include "ui_DlgNewProject.h"
 
-#include "HyGlobal.h"
+#include "HyGuiGlobal.h"
 #include "MainWindow.h"
 
 #include "Harmony/Utilities/HyStrManip.h"

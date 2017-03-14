@@ -12,7 +12,7 @@
 
 #include <QFileDialog>
 
-#include "HyGlobal.h"
+#include "HyGuiGlobal.h"
 
 
 DlgSetEngineLocation::DlgSetEngineLocation(QWidget *parent) :

@@ -14,7 +14,7 @@
 #include <QDir>
 #include <QApplication>
 
-#include "HyGlobal.h"
+#include "HyGuiGlobal.h"
 
 //void HyGuiRendererLoadThread::run()
 //{

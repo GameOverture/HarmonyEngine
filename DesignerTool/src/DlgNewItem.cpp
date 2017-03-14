@@ -10,7 +10,7 @@
 #include "DlgNewItem.h"
 #include "ui_DlgNewItem.h"
 
-#include "HyGlobal.h"
+#include "HyGuiGlobal.h"
 
 #include <QDirIterator>
 #include <QStringBuilder>

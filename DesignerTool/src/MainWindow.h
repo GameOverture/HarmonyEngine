@@ -14,7 +14,7 @@
 #include <QSettings>
 #include <QTcpServer>
 
-#include "ItemProject.h"
+#include "Project.h"
 #include "HyGuiDebugger.h"
 
 #include "QtWaitingSpinner/waitingspinnerwidget.h"
