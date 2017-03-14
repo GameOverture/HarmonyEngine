@@ -143,7 +143,7 @@ ItemProject::ItemProject(const QString sNewProjectFilePath) :   Item(ITEM_Projec
                                                                 m_pTabBar(nullptr),
                                                                 m_eDrawState(PROJDRAWSTATE_Nothing),
                                                                 m_ePrevDrawState(PROJDRAWSTATE_Nothing),
-                                                                m_pCamera(NULL),
+                                                                m_pCamera(nullptr),
                                                                 m_ActionSave(0),
                                                                 m_ActionSaveAll(0),
                                                                 m_bHasError(false)

@@ -71,38 +71,6 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 	IHyDraw2d::sm_pHyAssets = this;
 
 	m_InitFuture = std::async(std::launch::async, &HyAssetInit, this);
-
-	// Create promises
-	//std::packaged_task<int(int)> task1();
-
-	// Get futures
-	//std::future<int> val1 = task1.get_future();
-
-	// Schedule promises
-	//std::thread t1();
-
-	// Print status while we wait
-	//bool s1 = false, s2 = false;
-	//do
-	//{
-		//s1 = val1.wait_for(std::chrono::milliseconds(50)) == std::future_status::ready;
-		//s2 = val2.wait_for(std::chrono::milliseconds(50)) == std::future_status::ready;
-		//std::this_thread::sleep_for(std::chrono::milliseconds(300));
-	//} while (!s1 || !s2);
-
-	// Cleanup threads-- we could obviously block and wait for our threads to finish if we don't want to print status.
-	//t1.join();
-	//t2.join();
-
-	// Final result
-	//int iValTest = val1.get();
-	//int iValTest2 = val2.get();
-
-
-
-
-
-
 }
 
 HyAssets::~HyAssets()
@@ -161,6 +129,7 @@ void HyAssets::ParseInitInfo()
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifndef HY_PLATFORM_GUI
 	std::string sGameDataFilePath(m_sDATADIR);
 	sGameDataFilePath += "Data.json";
 
@@ -178,6 +147,7 @@ void HyAssets::ParseInitInfo()
 	//jsonxx::Object &particlesDataObjRef = gameDataObj.get<jsonxx::Object>("Particles");
 	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");
 	//jsonxx::Object &spineDataObjRef = gameDataObj.get<jsonxx::Object>("Spine");
+#endif
 
 	
 	// Start up Loading thread
