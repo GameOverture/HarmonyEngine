@@ -33,7 +33,7 @@ public:
     void SetOwner(WidgetAtlasManager *pOwner);
 
 protected:
-    virtual void dropEvent(QDropEvent *e);
+    virtual void dropEvent(QDropEvent *e) override;
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class AtlasTreeItem : public QTreeWidgetItem
@@ -94,7 +94,7 @@ private:
     void HideAtlasGroup();
 
 protected:
-    virtual void resizeEvent(QResizeEvent *event);
+    virtual void resizeEvent(QResizeEvent *event) override;
 };
 
 #endif // WIDGETATLASMANAGER_H

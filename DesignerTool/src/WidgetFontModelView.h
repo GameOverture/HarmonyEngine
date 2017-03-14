@@ -30,7 +30,7 @@ class WidgetFontTableView : public QTableView
      WidgetFontTableView(QWidget *pParent = 0);
 
  protected:
-     virtual void resizeEvent(QResizeEvent *pResizeEvent);
+     virtual void resizeEvent(QResizeEvent *pResizeEvent) override;
  };
  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class WidgetFontDelegate : public QStyledItemDelegate
@@ -43,10 +43,10 @@ class WidgetFontDelegate : public QStyledItemDelegate
 public:
     WidgetFontDelegate(ItemFont *pItemFont, QComboBox *pCmbStates, QObject *pParent = 0);
 
-    virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const;
-    virtual void setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const;
-    virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const override;
+    virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class WidgetFontModel : public QAbstractTableModel
@@ -123,12 +123,12 @@ public:
     
     void SetFontStageReference(int iRowIndex, FontStagePass *pStageRef);
     
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole) override;
+    virtual Qt::ItemFlags flags(const QModelIndex & index) const override;
 };
 
 #endif // WIDGETFONTMODELVIEW_H

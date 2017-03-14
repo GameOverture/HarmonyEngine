@@ -72,7 +72,7 @@ public:
     WidgetAudioBankTableView(QWidget *pParent = 0);
 
 protected:
-    virtual void resizeEvent(QResizeEvent *pResizeEvent);
+    virtual void resizeEvent(QResizeEvent *pResizeEvent) override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -104,12 +104,12 @@ public:
 
     void GetJsonObj(QJsonObject &audioBankObj);
 
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
-    virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole) Q_DECL_OVERRIDE;
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const Q_DECL_OVERRIDE;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole) override;
+    virtual Qt::ItemFlags flags(const QModelIndex & index) const override;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,8 +121,8 @@ class WidgetAudioManagerModel : public QStringListModel
 public:
     WidgetAudioManagerModel(QStackedWidget &audioBanksRef, QObject *pParent);
 
-    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-    virtual int	rowCount(const QModelIndex & parent = QModelIndex()) const;
+    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
+    virtual int	rowCount(const QModelIndex & parent = QModelIndex()) const override;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,10 +133,10 @@ class WidgetAudioCategoryDelegate : public QStyledItemDelegate
 public:
     WidgetAudioCategoryDelegate(QObject *pParent = 0);
 
-    virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const;
-    virtual void setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const;
-    virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const override;
+    virtual void setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const override;
+    virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
 
@@ -147,13 +147,10 @@ class WidgetAudioCategoryModel : public QStringListModel
 public:
     WidgetAudioCategoryModel(QDir audioBankDir, QObject *pParent);
 
-    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-
-    virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
-
-    virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
+    virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+    virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     void SaveData();
 };
