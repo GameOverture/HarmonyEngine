@@ -15,7 +15,7 @@
 #include "SpriteData.h"
 #include "FontData.h"
 #include "Project.h"
-#include "AtlasWidget.h"
+#include "AtlasesWidget.h"
 #include "HyGuiGlobal.h"
 
 WidgetExplorer::WidgetExplorer(QWidget *parent) :   QWidget(parent),

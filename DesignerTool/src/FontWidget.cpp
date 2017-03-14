@@ -14,7 +14,7 @@
 #include "FontData.h"
 #include "FontUndoCmds.h"
 #include "UndoCmds.h"
-#include "AtlasWidget.h"
+#include "AtlasesWidget.h"
 #include "FontModelView.h"
 #include "DlgInputName.h"
 

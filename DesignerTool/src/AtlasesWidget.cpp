@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "AtlasWidget.h"
+#include "AtlasesWidget.h"
 #include "ui_WidgetAtlasManager.h"
 #include "HyGuiGlobal.h"
 #include "SpriteWidget.h"

@@ -14,7 +14,7 @@
 #include "UndoCmds.h"
 #include "SpriteUndoCmds.h"
 #include "DlgInputName.h"
-#include "AtlasWidget.h"
+#include "AtlasesWidget.h"
 
 #include <QFile>
 #include <QJsonDocument>

@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "IData.h"
 #include "MainWindow.h"
-#include "AtlasWidget.h"
+#include "AtlasesWidget.h"
 #include "AudioWidgetManager.h"
 #include "AtlasFrame.h"
 

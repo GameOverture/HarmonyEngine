@@ -56,12 +56,12 @@ SOURCES += main.cpp \
     FontData.cpp \
     Project.cpp \
     SpriteData.cpp \
-    AtlasData.cpp \
-    AtlasWidget.cpp \
     AtlasFrame.cpp \
     AudioWave.cpp \
     HyGuiGlobal.cpp \
-    ProjectItem.cpp
+    ProjectItem.cpp \
+    AtlasesData.cpp \
+    AtlasesWidget.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -105,11 +105,11 @@ HEADERS  += \
     Project.h \
     SpriteData.h \
     AtlasFrame.h \
-    AtlasWidget.h \
-    AtlasData.h \
     AudioWave.h \
     HyGuiGlobal.h \
-    ProjectItem.h
+    ProjectItem.h \
+    AtlasesData.h \
+    AtlasesWidget.h
 
 FORMS    += \
     DlgNewProject.ui \

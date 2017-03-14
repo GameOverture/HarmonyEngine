@@ -17,7 +17,7 @@
 #include <QStackedWidget>
 #include <QThread>
 
-#include "AtlasData.h"
+#include "AtlasesData.h"
 
 namespace Ui {
 class WidgetAtlasManager;

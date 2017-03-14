@@ -11,7 +11,7 @@
 #define ITEMPROJECT_H
 
 #include "IData.h"
-#include "AtlasData.h"
+#include "AtlasesData.h"
 
 
 #include <QQueue>
