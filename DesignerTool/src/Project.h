@@ -12,7 +12,7 @@
 
 #include "IProjItem.h"
 #include "AtlasesData.h"
-
+#include "ExplorerItem.h"
 
 #include <QQueue>
 #include <QJsonObject>
@@ -65,7 +65,7 @@ class Project : public ExplorerItem, public IHyApplication
     
 public:
     Project(const QString sNewProjectFilePath);
-    ~Project();
+    virtual ~Project();
 
     void LoadWidgets();
     bool HasError() const;
@@ -108,8 +108,8 @@ public:
 
     QJsonObject GetSubDirObj(eItemType eType);
 
-private Q_SLOTS:
-    void on_tabBar_currentChanged(int index);
+public Q_SLOTS:
+    void OnTabBarCurrentChanged(int iIndex);
 
     void on_save_triggered();
 

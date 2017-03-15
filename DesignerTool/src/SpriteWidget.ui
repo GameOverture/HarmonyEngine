@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WidgetSprite</class>
- <widget class="QWidget" name="WidgetSprite">
+ <class>SpriteWidget</class>
+ <widget class="QWidget" name="SpriteWidget">
   <property name="geometry">
    <rect>
     <x>0</x>

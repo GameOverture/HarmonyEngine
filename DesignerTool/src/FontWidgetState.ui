@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WidgetFontState</class>
- <widget class="QWidget" name="WidgetFontState">
+ <class>FontWidgetState</class>
+ <widget class="QWidget" name="FontWidgetState">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -108,7 +108,7 @@
        </layout>
       </item>
       <item>
-       <widget class="WidgetFontTableView" name="stagesView">
+       <widget class="FontTableView" name="stagesView">
         <property name="selectionMode">
          <enum>QAbstractItemView::SingleSelection</enum>
         </property>
@@ -162,9 +162,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>WidgetFontTableView</class>
+   <class>FontTableView</class>
    <extends>QTableView</extends>
-   <header>WidgetFontModelView.h</header>
+   <header>FontModelView.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

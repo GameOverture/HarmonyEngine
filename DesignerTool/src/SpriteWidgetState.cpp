@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "SpriteWidgetState.h"
-#include "ui_WidgetSpriteState.h"
+#include "ui_SpriteWidgetState.h"
 
 #include "SpriteItem.h"
 #include "SpriteWidget.h"

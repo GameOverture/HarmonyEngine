@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WidgetSpriteState</class>
- <widget class="QWidget" name="WidgetSpriteState">
+ <class>SpriteWidgetState</class>
+ <widget class="QWidget" name="SpriteWidgetState">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -165,7 +165,7 @@
     </layout>
    </item>
    <item>
-    <widget class="WidgetSpriteTableView" name="framesView">
+    <widget class="SpriteTableView" name="framesView">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -274,9 +274,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>WidgetSpriteTableView</class>
+   <class>SpriteTableView</class>
    <extends>QTableView</extends>
-   <header>WidgetSpriteModelView.h</header>
+   <header>SpriteModelView.h</header>
   </customwidget>
  </customwidgets>
  <resources>

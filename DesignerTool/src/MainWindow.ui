@@ -155,7 +155,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="WidgetExplorer" name="explorer" native="true"/>
+      <widget class="ExplorerWidget" name="explorer" native="true"/>
      </item>
     </layout>
    </widget>
@@ -595,9 +595,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>WidgetExplorer</class>
+   <class>ExplorerWidget</class>
    <extends>QWidget</extends>
-   <header>WidgetExplorer.h</header>
+   <header>ExplorerWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

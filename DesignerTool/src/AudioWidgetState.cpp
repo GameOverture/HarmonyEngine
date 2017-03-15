@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "AudioWidgetState.h"
-#include "ui_WidgetAudioState.h"
+#include "ui_AudioWidgetState.h"
 
 #include "HyGuiGlobal.h"
 

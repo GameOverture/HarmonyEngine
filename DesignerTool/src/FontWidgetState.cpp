@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "FontWidgetState.h"
-#include "ui_WidgetFontState.h"
+#include "ui_FontWidgetState.h"
 
 #include "FontWidget.h"
 #include "UndoCmds.h"

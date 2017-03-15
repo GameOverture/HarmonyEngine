@@ -18,7 +18,7 @@
 #include <QMap>
 
 namespace Ui {
-class WidgetAudioManager;
+class AudioWidgetManager;
 }
 
 class AudioWidgetManager : public QWidget
@@ -61,7 +61,7 @@ private Q_SLOTS:
     void on_categoryList_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     
 private:
-    Ui::WidgetAudioManager *ui;
+    Ui::AudioWidgetManager *ui;
     
     void AddAudioBankGroup(int iId = -1);
 };

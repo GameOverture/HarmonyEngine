@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WidgetAudio</class>
- <widget class="QWidget" name="WidgetAudio">
+ <class>AudioWidget</class>
+ <widget class="QWidget" name="AudioWidget">
   <property name="geometry">
    <rect>
     <x>0</x>

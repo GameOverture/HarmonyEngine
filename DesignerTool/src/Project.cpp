@@ -369,7 +369,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     m_pAtlasesData = new AtlasesData(this);
 }
 
-Project::~Project()
+/*virtual*/ Project::~Project()
 {
     delete m_pAtlasMan;
 }
@@ -382,8 +382,9 @@ void Project::LoadWidgets()
     m_pTabBar = new QTabBar(nullptr);
     m_pTabBar->setTabsClosable(true);
     m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
-    connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
-    connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
+    //m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
+    connect(m_pTabBar, SIGNAL(QTabBar::currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
+    connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
 }
 
 bool Project::HasError() const
@@ -422,10 +423,12 @@ void Project::OpenItem(IProjItem *pItem)
     if(m_pCurOpenItem && m_pCurOpenItem != pItem)
         m_pCurOpenItem->ProjHide(*this);
 
+    m_pCurOpenItem = pItem;
+
     bool bAlreadyLoaded = false;
     for(int i = 0; i < m_pTabBar->count(); ++i)
     {
-        if(m_pTabBar->tabData(i).value<IProjItem *>() == pItem)
+        if(m_pTabBar->tabData(i).value<IProjItem *>() == m_pCurOpenItem)
         {
             bAlreadyLoaded = true;
 
@@ -433,24 +436,24 @@ void Project::OpenItem(IProjItem *pItem)
             m_pTabBar->setCurrentIndex(i);
             m_pTabBar->blockSignals(false);
 
-            pItem->ProjShow(*this);
+            m_pCurOpenItem->ProjShow(*this);
             break;
         }
     }
 
     if(bAlreadyLoaded == false)
     {
-        pItem->ProjLoad(*this);
+        m_pCurOpenItem->ProjLoad(*this);
 
         m_pTabBar->blockSignals(true);
-        int iIndex = m_pTabBar->addTab(pItem->GetIcon(), pItem->GetName(false));
+        int iIndex = m_pTabBar->addTab(m_pCurOpenItem->GetIcon(), m_pCurOpenItem->GetName(false));
         QVariant v;
-        v.setValue(pItem);
+        v.setValue(m_pCurOpenItem);
         m_pTabBar->setTabData(iIndex, v);
         m_pTabBar->setCurrentIndex(iIndex);
         m_pTabBar->blockSignals(false);
 
-        pItem->ProjShow(*this);
+        m_pCurOpenItem->ProjShow(*this);
     }
 }
 
@@ -655,13 +658,13 @@ QJsonObject Project::GetSubDirObj(eItemType eType)
     return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType))].toObject();
 }
 
-void Project::on_tabBar_currentChanged(int index)
+void Project::OnTabBarCurrentChanged(int iIndex)
 {
-    if(index < 0)
+    if(iIndex < 0)
         return;
 
-    int iIndex = m_pTabBar->currentIndex();
-    QVariant v = m_pTabBar->tabData(iIndex);
+    int iCurIndex = m_pTabBar->currentIndex();
+    QVariant v = m_pTabBar->tabData(iCurIndex);
     IProjItem *pItem = v.value<IProjItem *>();
 
     MainWindow::OpenItem(pItem);

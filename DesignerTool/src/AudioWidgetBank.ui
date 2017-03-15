@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WidgetAudioBank</class>
- <widget class="QWidget" name="WidgetAudioBank">
+ <class>AudioWidgetBank</class>
+ <widget class="QWidget" name="AudioWidgetBank">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -65,7 +65,7 @@
     </layout>
    </item>
    <item>
-    <widget class="WidgetAudioBankTableView" name="waveTable">
+    <widget class="AudioBankTableView" name="waveTable">
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
@@ -106,9 +106,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>WidgetAudioBankTableView</class>
+   <class>AudioBankTableView</class>
    <extends>QTableView</extends>
-   <header>WidgetAudioModelView.h</header>
+   <header>AudioModelView.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

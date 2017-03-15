@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "AudioWidgetBank.h"
-#include "ui_WidgetAudioBank.h"
+#include "ui_AudioWidgetBank.h"
 
 #include "MainWindow.h"
 #include "AudioWidgetManager.h"

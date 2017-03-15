@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "AtlasesWidget.h"
-#include "ui_WidgetAtlasManager.h"
+#include "ui_AtlasesWidget.h"
 #include "HyGuiGlobal.h"
 #include "SpriteWidget.h"
 #include "ExplorerItem.h"

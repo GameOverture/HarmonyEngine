@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "FontWidget.h"
-#include "ui_WidgetFont.h"
+#include "ui_FontWidget.h"
 
 #include "HyGuiGlobal.h"
 #include "FontItem.h"

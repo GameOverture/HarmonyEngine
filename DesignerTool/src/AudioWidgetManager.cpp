@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "AudioWidgetManager.h"
-#include "ui_WidgetAudioManager.h"
+#include "ui_AudioWidgetManager.h"
 
 #include "AudioWidgetBank.h"
 #include "DlgInputName.h"
@@ -20,7 +20,7 @@
 #include <QLineEdit>
 
 AudioWidgetManager::AudioWidgetManager(QWidget *parent) :   QWidget(parent),
-                                                            ui(new Ui::WidgetAudioManager)
+                                                            ui(new Ui::AudioWidgetManager)
 {
     ui->setupUi(this);
     
@@ -29,7 +29,7 @@ AudioWidgetManager::AudioWidgetManager(QWidget *parent) :   QWidget(parent),
 }
 
 AudioWidgetManager::AudioWidgetManager(Project *pProjOwner, QWidget *parent) :  QWidget(parent),
-                                                                                    ui(new Ui::WidgetAudioManager),
+                                                                                    ui(new Ui::AudioWidgetManager),
                                                                                     m_pProjOwner(pProjOwner),
                                                                                     m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAudioBanks) + HyGlobal::ItemExt(ITEM_DirAudioBanks)),
                                                                                     m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAudioBanks) + HyGlobal::ItemExt(ITEM_DirAudioBanks))

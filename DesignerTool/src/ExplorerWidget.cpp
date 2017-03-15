@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "ExplorerWidget.h"
-#include "ui_WidgetExplorer.h"
+#include "ui_ExplorerWidget.h"
 
 #include "MainWindow.h"
 #include "AudioItem.h"
