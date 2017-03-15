@@ -16,11 +16,11 @@ public:
     virtual ~SpriteDraw();
 
 protected:
-    virtual void OnGuiLoad(IHyApplication &hyApp) override;
-    virtual void OnGuiUnload(IHyApplication &hyApp) override;
-    virtual void OnGuiShow(IHyApplication &hyApp) override;
-    virtual void OnGuiHide(IHyApplication &hyApp) override;
-    virtual void OnGuiUpdate(IHyApplication &hyApp) override;
+    virtual void OnProjLoad(IHyApplication &hyApp) override;
+    virtual void OnProjUnload(IHyApplication &hyApp) override;
+    virtual void OnProjShow(IHyApplication &hyApp) override;
+    virtual void OnProjHide(IHyApplication &hyApp) override;
+    virtual void OnProjUpdate(IHyApplication &hyApp) override;
 };
 
 #endif // SPRITEDRAW_H

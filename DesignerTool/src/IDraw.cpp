@@ -15,7 +15,7 @@ IDraw::IDraw() :    m_pCamera(nullptr),
 
 }
 
-void IDraw::GuiLoad(IHyApplication &hyApp)
+void IDraw::ProjLoad(IHyApplication &hyApp)
 {
     // A non NULL camera signifies that this has been loaded already
     if(m_pCamera)
@@ -24,11 +24,11 @@ void IDraw::GuiLoad(IHyApplication &hyApp)
     m_pCamera = hyApp.Window().CreateCamera2d();
     m_pCamera->SetEnabled(false);
 
-    OnGuiLoad(hyApp);
+    OnProjLoad(hyApp);
     Load();
 }
 
-void IDraw::GuiUnload(IHyApplication &hyApp)
+void IDraw::ProjUnload(IHyApplication &hyApp)
 {
     // A NULL camera signifies that this has hasn't been loaded
     if(m_pCamera == NULL)
@@ -37,37 +37,37 @@ void IDraw::GuiUnload(IHyApplication &hyApp)
     hyApp.Window().RemoveCamera(m_pCamera);
     m_pCamera = NULL;
 
-    OnGuiUnload(hyApp);
+    OnProjUnload(hyApp);
     Unload();
 }
 
-void IDraw::GuiShow(IHyApplication &hyApp)
+void IDraw::ProjShow(IHyApplication &hyApp)
 {
     m_pCamera->SetEnabled(true);
 
-    OnGuiShow(hyApp);
+    OnProjShow(hyApp);
 }
 
-void IDraw::GuiHide(IHyApplication &hyApp)
+void IDraw::ProjHide(IHyApplication &hyApp)
 {
     m_pCamera->SetEnabled(false);
 
-    OnGuiHide(hyApp);
+    OnProjHide(hyApp);
 }
 
-void IDraw::GuiUpdate(IHyApplication &hyApp)
+void IDraw::ProjUpdate(IHyApplication &hyApp)
 {
     if(m_bReloadDraw || IsLoaded() == false)
     {
         m_bReloadDraw = false;
 
         if(IsLoaded())
-            GuiUnload(hyApp);
+            ProjUnload(hyApp);
 
-        GuiLoad(hyApp);
-        GuiShow(hyApp);
+        ProjLoad(hyApp);
+        ProjShow(hyApp);
     }
 
-    OnGuiUpdate(hyApp);
+    OnProjUpdate(hyApp);
 }
 

@@ -135,7 +135,7 @@ void IProjItem::ProjLoad(IHyApplication &hyApp)
         break;
     }
 
-    m_pDraw->GuiLoad(hyApp);
+    m_pDraw->ProjLoad(hyApp);
 }
 
 void IProjItem::ProjUnload(IHyApplication &hyApp)
@@ -146,17 +146,17 @@ void IProjItem::ProjUnload(IHyApplication &hyApp)
 
 void IProjItem::ProjShow(IHyApplication &hyApp)
 {
-    m_pDraw->GuiShow(hyApp);
+    m_pDraw->ProjShow(hyApp);
 }
 
 void IProjItem::ProjHide(IHyApplication &hyApp)
 {
-    m_pDraw->GuiHide(hyApp);
+    m_pDraw->ProjHide(hyApp);
 }
 
 void IProjItem::ProjUpdate(IHyApplication &hyApp)
 {
-    m_pDraw->GuiUpdate(hyApp);
+    m_pDraw->ProjUpdate(hyApp);
 }
 
 void IProjItem::Link(AtlasFrame *pFrame)

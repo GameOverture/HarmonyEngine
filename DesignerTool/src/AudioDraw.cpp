@@ -9,23 +9,23 @@ AudioDraw::AudioDraw(AudioItem *pItem)
 {
 }
 
-/*virtual*/ void AudioDraw::OnGuiLoad(IHyApplication &hyApp)
+/*virtual*/ void AudioDraw::OnProjLoad(IHyApplication &hyApp)
 {
 
 }
 
-/*virtual*/ void AudioDraw::OnGuiUnload(IHyApplication &hyApp)
+/*virtual*/ void AudioDraw::OnProjUnload(IHyApplication &hyApp)
 {
 }
 
-/*virtual*/ void AudioDraw::OnGuiShow(IHyApplication &hyApp)
+/*virtual*/ void AudioDraw::OnProjShow(IHyApplication &hyApp)
 {
 }
 
-/*virtual*/ void AudioDraw::OnGuiHide(IHyApplication &hyApp)
+/*virtual*/ void AudioDraw::OnProjHide(IHyApplication &hyApp)
 {
 }
 
-/*virtual*/ void AudioDraw::OnGuiUpdate(IHyApplication &hyApp)
+/*virtual*/ void AudioDraw::OnProjUpdate(IHyApplication &hyApp)
 {
 }

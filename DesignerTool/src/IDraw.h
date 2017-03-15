@@ -21,18 +21,18 @@ protected:
 public:
     IDraw();
 
-    void GuiLoad(IHyApplication &hyApp);
-    void GuiUnload(IHyApplication &hyApp);
-    void GuiShow(IHyApplication &hyApp);
-    void GuiHide(IHyApplication &hyApp);
-    void GuiUpdate(IHyApplication &hyApp);
+    void ProjLoad(IHyApplication &hyApp);
+    void ProjUnload(IHyApplication &hyApp);
+    void ProjShow(IHyApplication &hyApp);
+    void ProjHide(IHyApplication &hyApp);
+    void ProjUpdate(IHyApplication &hyApp);
 
 protected:
-    virtual void OnGuiLoad(IHyApplication &hyApp) = 0;
-    virtual void OnGuiUnload(IHyApplication &hyApp) = 0;
-    virtual void OnGuiShow(IHyApplication &hyApp) = 0;
-    virtual void OnGuiHide(IHyApplication &hyApp) = 0;
-    virtual void OnGuiUpdate(IHyApplication &hyApp) = 0;
+    virtual void OnProjLoad(IHyApplication &hyApp) = 0;
+    virtual void OnProjUnload(IHyApplication &hyApp) = 0;
+    virtual void OnProjShow(IHyApplication &hyApp) = 0;
+    virtual void OnProjHide(IHyApplication &hyApp) = 0;
+    virtual void OnProjUpdate(IHyApplication &hyApp) = 0;
 };
 
 #endif // IDRAW_H

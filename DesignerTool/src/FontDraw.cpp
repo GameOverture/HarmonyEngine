@@ -12,7 +12,7 @@ FontDraw::FontDraw(FontItem *pItem) :   m_pItem(pItem),
 {
 }
 
-/*virtual*/ void FontDraw::OnGuiLoad(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnProjLoad(IHyApplication &hyApp)
 {
     if(m_pFontCamera == nullptr)
         m_pFontCamera = hyApp.Window().CreateCamera2d();
@@ -33,7 +33,7 @@ FontDraw::FontDraw(FontItem *pItem) :   m_pItem(pItem),
     m_DividerLine.Load();
 }
 
-/*virtual*/ void FontDraw::OnGuiUnload(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnProjUnload(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->Unload();
@@ -43,7 +43,7 @@ FontDraw::FontDraw(FontItem *pItem) :   m_pItem(pItem),
     m_DividerLine.Unload();
 }
 
-/*virtual*/ void FontDraw::OnGuiShow(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnProjShow(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->SetEnabled(true);
@@ -56,7 +56,7 @@ FontDraw::FontDraw(FontItem *pItem) :   m_pItem(pItem),
     m_DividerLine.SetEnabled(true);
 }
 
-/*virtual*/ void FontDraw::OnGuiHide(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnProjHide(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->SetEnabled(false);
@@ -69,7 +69,7 @@ FontDraw::FontDraw(FontItem *pItem) :   m_pItem(pItem),
     m_DividerLine.SetEnabled(false);
 }
 
-/*virtual*/ void FontDraw::OnGuiUpdate(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnProjUpdate(IHyApplication &hyApp)
 {
     FontWidget *pWidget = static_cast<FontWidget *>(m_pItem->GetWidget());
     texture_atlas_t *pAtlas = pWidget->GetAtlas();

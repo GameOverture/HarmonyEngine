@@ -24,13 +24,13 @@ SpriteDraw::SpriteDraw(SpriteItem *pItem) : m_pItem(pItem)
 {
 }
 
-/*virtual*/ void SpriteDraw::OnGuiLoad(IHyApplication &hyApp)
+/*virtual*/ void SpriteDraw::OnProjLoad(IHyApplication &hyApp)
 {
     m_primOriginHorz.Load();
     m_primOriginVert.Load();
 }
 
-/*virtual*/ void SpriteDraw::OnGuiUnload(IHyApplication &hyApp)
+/*virtual*/ void SpriteDraw::OnProjUnload(IHyApplication &hyApp)
 {
     m_primOriginHorz.Unload();
     m_primOriginVert.Unload();
@@ -40,13 +40,13 @@ SpriteDraw::SpriteDraw(SpriteItem *pItem) : m_pItem(pItem)
         frameList[i]->DrawInst(this)->Unload();
 }
 
-/*virtual*/ void SpriteDraw::OnGuiShow(IHyApplication &hyApp)
+/*virtual*/ void SpriteDraw::OnProjShow(IHyApplication &hyApp)
 {
     m_primOriginHorz.SetEnabled(true);
     m_primOriginVert.SetEnabled(true);
 }
 
-/*virtual*/ void SpriteDraw::OnGuiHide(IHyApplication &hyApp)
+/*virtual*/ void SpriteDraw::OnProjHide(IHyApplication &hyApp)
 {
     m_primOriginHorz.SetEnabled(false);
     m_primOriginVert.SetEnabled(false);
@@ -56,7 +56,7 @@ SpriteDraw::SpriteDraw(SpriteItem *pItem) : m_pItem(pItem)
         frameList[i]->DrawInst(this)->SetEnabled(false);
 }
 
-/*virtual*/ void SpriteDraw::OnGuiUpdate(IHyApplication &hyApp)
+/*virtual*/ void SpriteDraw::OnProjUpdate(IHyApplication &hyApp)
 {
     QList<AtlasFrame *> frameList = static_cast<SpriteWidget *>(m_pItem->GetWidget())->GetAllDrawInsts();
     for(int i = 0; i < frameList.count(); i++)
