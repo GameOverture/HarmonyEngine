@@ -2,7 +2,22 @@
 
 SpriteDraw::SpriteDraw(SpriteItem *pItem) : m_pItem(pItem)
 {
+    std::vector<glm::vec2> lineList(2, glm::vec2());
 
+    lineList[0].x = -2048.0f;
+    lineList[0].y = 0.0f;
+    lineList[1].x = 2048.0f;
+    lineList[1].y = 0.0f;
+    m_primOriginHorz.SetAsLineChain(lineList);
+
+    lineList[0].x = 0.0f;
+    lineList[0].y = -2048.0f;
+    lineList[1].x = 0.0f;
+    lineList[1].y = 2048.0f;
+    m_primOriginVert.SetAsLineChain(lineList);
+
+    m_primOriginHorz.SetTint(1.0f, 0.0f, 0.0f);
+    m_primOriginVert.SetTint(1.0f, 0.0f, 0.0f);
 }
 
 /*virtual*/ SpriteDraw::~SpriteDraw()

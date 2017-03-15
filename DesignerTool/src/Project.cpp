@@ -420,11 +420,27 @@ void Project::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 void Project::OpenItem(IProjItem *pItem)
 {
     if(m_pCurOpenItem && m_pCurOpenItem != pItem)
-        m_pCurOpenItem->ProjHide();
+        m_pCurOpenItem->ProjHide(*this);
 
-    if(pItem->IsLoaded() == false)
+    bool bAlreadyLoaded = false;
+    for(int i = 0; i < m_pTabBar->count(); ++i)
     {
-        pItem->Load(*pItemProj);
+        if(m_pTabBar->tabData(i).value<IProjItem *>() == pItem)
+        {
+            bAlreadyLoaded = true;
+
+            m_pTabBar->blockSignals(true);
+            m_pTabBar->setCurrentIndex(i);
+            m_pTabBar->blockSignals(false);
+
+            pItem->ProjShow(*this);
+            break;
+        }
+    }
+
+    if(bAlreadyLoaded == false)
+    {
+        pItem->ProjLoad(*this);
 
         m_pTabBar->blockSignals(true);
         int iIndex = m_pTabBar->addTab(pItem->GetIcon(), pItem->GetName(false));
@@ -433,27 +449,9 @@ void Project::OpenItem(IProjItem *pItem)
         m_pTabBar->setTabData(iIndex, v);
         m_pTabBar->setCurrentIndex(iIndex);
         m_pTabBar->blockSignals(false);
-    }
-    else
-    {
-        for(int i = 0; i < m_pTabBar->count(); ++i)
-        {
-            if(m_pTabBar->tabData(i).value<IProjItem *>() == pItem)
-            {
-                m_pTabBar->blockSignals(true);
-                m_pTabBar->setCurrentIndex(i);
-                m_pTabBar->blockSignals(false);
-                break;
-            }
-        }
-    }
 
-    // Hide everything
-    for(int i = 0; i < m_pTabBar->count(); ++i)
-        m_pTabBar->tabData(i).value<IProjItem *>()->DrawHide(*pItemProj);
-
-    // Then show
-    pItem->GuiShow(*this);
+        pItem->ProjShow(*this);
+    }
 }
 
 // IHyApplication override
@@ -480,12 +478,10 @@ void Project::OpenItem(IProjItem *pItem)
 // IHyApplication override
 /*virtual*/ bool Project::Update()
 {
-    if(IsOverrideDraw())
-        OverrideDraw();
-    else if(m_pTabBar->count() > 0)
+    if(m_pTabBar->count() > 0)
     {
         m_pCamera->SetEnabled(false);
-        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<IProjItem *>()->DrawUpdate(*this);
+        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<IProjItem *>()->ProjUpdate(*this);
     }
     else
         m_pCamera->SetEnabled(true);

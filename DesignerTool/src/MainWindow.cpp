@@ -235,7 +235,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 /*static*/ void MainWindow::OpenItem(IProjItem *pItem)
 {
-    if(pItem == NULL || pItem->GetType() == ITEM_Project)
+    if(pItem == nullptr || pItem->GetType() == ITEM_Project)
         return;
     
     Project *pItemProj = sm_pInstance->ui->explorer->GetCurProjSelected();
@@ -266,7 +266,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 /*static*/ void MainWindow::CloseItem(IProjItem *pItem)
 {
-    if(pItem == NULL || pItem->GetType() == ITEM_Project)
+    if(pItem == nullptr || pItem->GetType() == ITEM_Project)
         return;
 
     if(pItem->IsSaveClean() == false)
@@ -304,7 +304,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         }
     }
     
-    pItem->Unload(*pItemProj);
+    //pItem->Unload(*pItemProj);
 }
 
 /*static*/ void MainWindow::SetSelectedProj(Project *pProj)

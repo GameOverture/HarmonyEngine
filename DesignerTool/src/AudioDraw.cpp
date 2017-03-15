@@ -16,7 +16,6 @@ AudioDraw::AudioDraw(AudioItem *pItem)
 
 /*virtual*/ void AudioDraw::OnGuiUnload(IHyApplication &hyApp)
 {
-    delete m_pWidget;
 }
 
 /*virtual*/ void AudioDraw::OnGuiShow(IHyApplication &hyApp)

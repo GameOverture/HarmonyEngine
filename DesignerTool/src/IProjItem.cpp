@@ -111,10 +111,10 @@ void IProjItem::ProjLoad(IHyApplication &hyApp)
         break;
     case ITEM_Font:
         m_pWidget = new FontWidget(static_cast<FontItem *>(this));
-        m_pDraw = new FontDraw(this);
+        m_pDraw = new FontDraw(static_cast<FontItem *>(this));
         break;
     case ITEM_Audio:
-        m_pWidget = new AudioWidget(this);
+        m_pWidget = new AudioWidget(static_cast<AudioItem *>(this));
         break;
     case ITEM_Project:
     case ITEM_DirAudio:
@@ -146,14 +146,17 @@ void IProjItem::ProjUnload(IHyApplication &hyApp)
 
 void IProjItem::ProjShow(IHyApplication &hyApp)
 {
+    m_pDraw->GuiShow(hyApp);
 }
 
 void IProjItem::ProjHide(IHyApplication &hyApp)
 {
+    m_pDraw->GuiHide(hyApp);
 }
 
 void IProjItem::ProjUpdate(IHyApplication &hyApp)
 {
+    m_pDraw->GuiUpdate(hyApp);
 }
 
 void IProjItem::Link(AtlasFrame *pFrame)

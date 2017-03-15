@@ -1,4 +1,6 @@
 #include "FontDraw.h"
+#include "FontWidget.h"
+#include "MainWindow.h"
 
 FontDraw::FontDraw(FontItem *pItem) :   m_pItem(pItem),
                                         m_pDrawAtlasPreview(nullptr),
@@ -69,7 +71,7 @@ FontDraw::FontDraw(FontItem *pItem) :   m_pItem(pItem),
 
 /*virtual*/ void FontDraw::OnGuiUpdate(IHyApplication &hyApp)
 {
-    FontWidget *pWidget = static_cast<FontWidget *>(m_pWidget);
+    FontWidget *pWidget = static_cast<FontWidget *>(m_pItem->GetWidget());
     texture_atlas_t *pAtlas = pWidget->GetAtlas();
 
     m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetResolution().y / 2 - 5.0f);
