@@ -10,6 +10,7 @@
 #ifndef EXPLORERITEM_H
 #define EXPLORERITEM_H
 
+#include <QObject>
 #include <QTreeWidget>
 
 #include "HyGuiGlobal.h"

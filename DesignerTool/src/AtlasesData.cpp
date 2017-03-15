@@ -518,7 +518,7 @@ void AtlasesData::RepackAll()
 
 void AtlasesData::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
 {
-    for(uint32 i = 0; i < m_FrameList.size(); ++i)
+    for(int i = 0; i < m_FrameList.size(); ++i)
         m_FrameList[i]->DeleteAllDrawInst();
 
     // Always repack the last texture to ensure it gets filled as much as it can

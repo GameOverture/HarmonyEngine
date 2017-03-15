@@ -40,7 +40,8 @@ SpriteWidgetState::SpriteWidgetState(SpriteWidget *pOwner, QList<QAction *> stat
     ui->framesView->resize(ui->framesView->size());
     ui->framesView->setItemDelegate(new WidgetSpriteDelegate(m_pOwner->GetData(), ui->framesView, this));
     QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
-    connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
+    connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+            this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
     
     ui->btnPlay->setDefaultAction(ui->actionPlay);
     ui->btnFirstFrame->setDefaultAction(ui->actionFirstFrame);

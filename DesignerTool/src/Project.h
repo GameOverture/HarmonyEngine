@@ -73,20 +73,20 @@ public:
     QList<AtlasTreeItem *> GetAtlasTreeItemList();
 
     QString GetDirPath() const;
-    QString GetGameName() const                         { return m_sGameName; }
-    
-    QString GetAbsPath() const                          { return m_sPATH; }
-    QString GetAssetsAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeAssetsLocation) + '/'; }
-    QString GetAssetsRelPath() const                    { return QDir::cleanPath(m_sRelativeAssetsLocation) + '/'; }
-    QString GetMetaDataAbsPath() const                  { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeMetaDataLocation) + '/'; }
-    QString GetMetaDataRelPath() const                  { return QDir::cleanPath(m_sRelativeMetaDataLocation) + '/'; }
-    QString GetSourceAbsPath() const                    { return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation) + '/'; }
-    QString GetSourceRelPath() const                    { return QDir::cleanPath(m_sRelativeSourceLocation) + '/'; }
+    QString GetGameName() const;
 
-    AtlasesData &GetAtlasesData()                       { return *m_pAtlasesData; }
-    AtlasesWidget &GetAtlasManager()                    { return *m_pAtlasMan; }
-    AudioWidgetManager &GetAudioManager()               { return *m_pAudioMan; }
-    QTabBar *GetTabBar()                                { return m_pTabBar; }
+    QString GetAbsPath() const;
+    QString GetAssetsAbsPath() const;
+    QString GetAssetsRelPath() const;
+    QString GetMetaDataAbsPath() const;
+    QString GetMetaDataRelPath() const;
+    QString GetSourceAbsPath() const;
+    QString GetSourceRelPath() const;
+
+    AtlasesData &GetAtlasesData();
+    AtlasesWidget &GetAtlasManager();
+    AudioWidgetManager &GetAudioManager();
+    QTabBar *GetTabBar();
     
     QList<QAction *> GetSaveActions();
     void SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled);

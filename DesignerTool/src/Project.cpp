@@ -17,6 +17,8 @@
 #include "FontItem.h"
 #include "HyGuiGlobal.h"
 
+#include "Harmony/HyEngine.h"
+
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonDocument>
@@ -88,7 +90,7 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 /*virtual*/ void CheckerGrid::OnUpdateUniforms()
 {
     glm::mat4 mtx;
-    GetWorldTransform(mtx);
+    HyPrimitive2d::GetWorldTransform(mtx);
 
     m_ShaderUniforms.Set("transformMtx", mtx);
     m_ShaderUniforms.Set("uGridSize", 25.0f);
@@ -99,7 +101,7 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 
 /*virtual*/ void CheckerGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-    assert(m_RenderState.GetNumVerticesPerInstance() == 4, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
+    HyAssert(m_RenderState.GetNumVerticesPerInstance() == 4, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
 
     for(int i = 0; i < 4; ++i)
     {
@@ -134,6 +136,7 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
         pRefDataWritePos += sizeof(glm::vec2);
     }
 }
+
 
 Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Project, sNewProjectFilePath),
                                                                 IHyApplication(HarmonyInit()),
@@ -188,14 +191,16 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     m_ActionSave.setShortcuts(QKeySequence::Save);
     m_ActionSave.setShortcutContext(Qt::ApplicationShortcut);
     m_ActionSave.setEnabled(false);
-    connect(&m_ActionSave, SIGNAL(triggered(bool)), this, SLOT(on_save_triggered()));
+    QObject::connect(&m_ActionSave, SIGNAL(triggered(bool)),
+                     this, SLOT(on_save_triggered()));
 
     m_ActionSaveAll.setText("Save &All");
     m_ActionSaveAll.setIcon(QIcon(":/icons16x16/file-saveAll.png"));
     m_ActionSaveAll.setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
     m_ActionSaveAll.setShortcutContext(Qt::ApplicationShortcut);
     m_ActionSaveAll.setEnabled(false);
-    connect(&m_ActionSaveAll, SIGNAL(triggered(bool)), this, SLOT(on_saveAll_triggered()));
+    QObject::connect(&m_ActionSaveAll, SIGNAL(triggered(bool)),
+                     this, SLOT(on_saveAll_triggered()));
     
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -371,6 +376,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 
 /*virtual*/ Project::~Project()
 {
+    HyGuiLog("Project destructor", LOGTYPE_Error);
     delete m_pAtlasMan;
 }
 
@@ -383,8 +389,10 @@ void Project::LoadWidgets()
     m_pTabBar->setTabsClosable(true);
     m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
     //m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
-    connect(m_pTabBar, SIGNAL(QTabBar::currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
-    connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
+    connect(m_pTabBar, SIGNAL(QTabBar::currentChanged(int)),
+            this, SLOT(OnTabBarCurrentChanged(int)));
+    connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)),
+            this, SLOT(on_tabBar_closeRequested(int)));
 }
 
 bool Project::HasError() const
@@ -401,6 +409,66 @@ QString Project::GetDirPath() const
 {
     QFileInfo file(m_sPATH);
     return file.dir().absolutePath() + '/';
+}
+
+QString Project::GetGameName() const
+{
+    return m_sGameName;
+}
+
+QString Project::GetAbsPath() const
+{
+    return m_sPATH;
+}
+
+QString Project::GetAssetsAbsPath() const
+{
+    return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeAssetsLocation) + '/';
+}
+
+QString Project::GetAssetsRelPath() const
+{
+    return QDir::cleanPath(m_sRelativeAssetsLocation) + '/';
+}
+
+QString Project::GetMetaDataAbsPath() const
+{
+    return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeMetaDataLocation) + '/';
+}
+
+QString Project::GetMetaDataRelPath() const
+{
+    return QDir::cleanPath(m_sRelativeMetaDataLocation) + '/';
+}
+
+QString Project::GetSourceAbsPath() const
+{
+    return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation) + '/';
+}
+
+QString Project::GetSourceRelPath() const
+{
+    return QDir::cleanPath(m_sRelativeSourceLocation) + '/';
+}
+
+AtlasesData &Project::GetAtlasesData()
+{
+    return *m_pAtlasesData;
+}
+
+AtlasesWidget &Project::GetAtlasManager()
+{
+    return *m_pAtlasMan;
+}
+
+AudioWidgetManager &Project::GetAudioManager()
+{
+    return *m_pAudioMan;
+}
+
+QTabBar *Project::GetTabBar()
+{
+    return m_pTabBar;
 }
 
 QList<QAction *> Project::GetSaveActions()

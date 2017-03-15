@@ -85,14 +85,14 @@ FontDraw::FontDraw(FontItem *pItem) :   m_pItem(pItem),
             MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawAtlasPreview->GetGraphicsApiHandle());
 
         // Upload texture to gfx api
-        pAtlas->id = MainWindow::GetCurrentRenderer()->AddTexture(4 /*converted texture depth*/, pAtlas->width, pAtlas->height, pWidget->GetAtlasPixelData());
+        pAtlas->id = MainWindow::GetCurrentRenderer()->AddTexture(4 /*converted texture depth*/, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), pWidget->GetAtlasPixelData());
 
         // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
         delete m_pDrawAtlasPreview;
-        m_pDrawAtlasPreview = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
+        m_pDrawAtlasPreview = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height));
         m_pDrawAtlasPreview->Load();
         m_pDrawAtlasPreview->SetCoordinateType(HYCOORDTYPE_Camera, NULL);
-        m_pDrawAtlasPreview->SetTextureSource(0, 0, pAtlas->width, pAtlas->height);
+        m_pDrawAtlasPreview->SetTextureSource(0, 0, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height));
 
         m_DrawAtlasOutline.SetAsQuad(static_cast<int>(pAtlas->width), static_cast<int>(pAtlas->height), true);
 
@@ -157,7 +157,7 @@ FontDraw::FontDraw(FontItem *pItem) :   m_pItem(pItem),
                 int iWidth = static_cast<int>(pGlyph->s1 * static_cast<float>(pAtlas->width)) - iX - 1;
                 int iHeight = static_cast<int>(pGlyph->t1 * static_cast<float>(pAtlas->height)) - iY - 1;
 
-                HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, pAtlas->width, pAtlas->height);
+                HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height));
                 pDrawGlyphQuad->Load();
                 pDrawGlyphQuad->SetTextureSource(iX, iY, iWidth, iHeight);
                 pDrawGlyphQuad->pos.Set(ptGlyphPos.x + pGlyph->offset_x, ptGlyphPos.y);

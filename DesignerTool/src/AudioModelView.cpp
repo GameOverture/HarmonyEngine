@@ -193,7 +193,7 @@ AudioCategoryDelegate::AudioCategoryDelegate(QObject *pParent /*= 0*/) :   QStyl
         return pLineEdit;
     }
 
-    QStyledItemDelegate::createEditor(pParent, option, index);
+    return QStyledItemDelegate::createEditor(pParent, option, index);
 }
 
 /*virtual*/ void AudioCategoryDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const

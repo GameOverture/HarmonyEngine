@@ -331,6 +331,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         {
             sm_pInstance->ui->stackedTabWidgets->addWidget(pProj->GetTabBar());
             sm_pInstance->ui->stackedTabWidgets->setCurrentWidget(pProj->GetTabBar());
+            pProj->GetTabBar()->setParent(sm_pInstance->ui->stackedTabWidgets);
         }
         
         // Replace the save actions in the 'File' menu
