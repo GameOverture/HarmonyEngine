@@ -15,7 +15,6 @@
 #include <QMouseEvent>
 #include <QStringListModel>
 #include <QStackedWidget>
-#include <QThread>
 
 #include "AtlasesData.h"
 

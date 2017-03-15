@@ -13,7 +13,6 @@
 #include "GL/glew.h"
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
-#include <QThread>
 
 #include "Harmony/HyEngine.h"
 #include "Project.h"

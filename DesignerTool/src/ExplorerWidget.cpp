@@ -39,40 +39,17 @@ ExplorerWidget::~ExplorerWidget()
 
 void ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
 {
-    //m_LoadProjectThread
-    //QThread *pNewThread = new QThread();
+    Project *pNewItemProject = new Project(sNewProjectFilePath);
+    OnProjectLoaded(pNewItemProject);
+    return;
 
-
-
-    //ItemProject *pItemProject = new ItemProject(sNewProjectFilePath);
-
-
-
-    //pItemProject->moveToThread(pNewThread);
-    //connect(this, &WidgetExplorer::LoadItemProject, pItemProject, &ItemProject::OnLoadThread);
-    //connect(pItemProject, &ItemProject::LoadFinished, this, &WidgetExplorer::OnProjectLoaded);
-    //connect(pNewThread, &QThread::finished, pNewThread, &QObject::deleteLater);
-
-
-
-    //OnProjectLoaded(pItemProject);
-
-
-
-    //Q_EMIT LoadItemProject();
+    // BELOW BREAKS QTABBAR and UNDOSTACK SIGNAL/SLOT CONNECTIONS (I guess because QObject must be created on main thread?.. fucking waste of time)
+    //
     //MainWindow::StartLoading(MDI_Explorer);
-    //pNewThread->start();
-
-
-
-
-
-
-    MainWindow::StartLoading(MDI_Explorer);
-    ExplorerLoadThread *pNewLoadThread = new ExplorerLoadThread(sNewProjectFilePath, this);
-    connect(pNewLoadThread, &ExplorerLoadThread::LoadFinished, this, &ExplorerWidget::OnProjectLoaded);
-    connect(pNewLoadThread, &ExplorerLoadThread::finished, pNewLoadThread, &QObject::deleteLater);
-    pNewLoadThread->start();
+    //ExplorerLoadThread *pNewLoadThread = new ExplorerLoadThread(sNewProjectFilePath, this);
+    //connect(pNewLoadThread, &ExplorerLoadThread::LoadFinished, this, &ExplorerWidget::OnProjectLoaded);
+    //connect(pNewLoadThread, &ExplorerLoadThread::finished, pNewLoadThread, &QObject::deleteLater);
+    //pNewLoadThread->start();
 }
 
 void ExplorerWidget::AddItem(eItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd)
@@ -314,7 +291,7 @@ ExplorerItem *ExplorerWidget::GetCurDirSelected(bool bIncludePrefixDirs)
 
 void ExplorerWidget::OnProjectLoaded(Project *pLoadedProj)
 {
-    pLoadedProj->moveToThread(QApplication::instance()->thread());
+    //pLoadedProj->moveToThread(QApplication::instance()->thread());
 
     pLoadedProj->LoadWidgets();
 

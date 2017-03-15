@@ -382,17 +382,19 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 
 void Project::LoadWidgets()
 {
-    m_pAtlasMan = new AtlasesWidget(*m_pAtlasesData, nullptr);
-    m_pAudioMan = new AudioWidgetManager(this, nullptr);
-
     m_pTabBar = new QTabBar(nullptr);
     m_pTabBar->setTabsClosable(true);
     m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
-    //m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(on_tabBar_currentChanged(int)));
-    connect(m_pTabBar, SIGNAL(QTabBar::currentChanged(int)),
-            this, SLOT(OnTabBarCurrentChanged(int)));
-    connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)),
-            this, SLOT(on_tabBar_closeRequested(int)));
+    m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
+    m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
+
+    //connect(m_pTabBar, SIGNAL(QTabBar::currentChanged(int)),
+    //        this, SLOT(OnTabBarCurrentChanged(int)));
+    //connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)),
+    //        this, SLOT(on_tabBar_closeRequested(int)));
+
+    m_pAtlasMan = new AtlasesWidget(*m_pAtlasesData, nullptr);
+    m_pAudioMan = new AudioWidgetManager(this, nullptr);
 }
 
 bool Project::HasError() const
@@ -569,67 +571,6 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 {
     Window().SetResolution(glm::ivec2(iWidth, iHeight));
 }
-
-//void Project::SetOverrideDrawState(eProjDrawState eDrawState)
-//{
-//    m_DrawStateQueue.append(eDrawState);
-//}
-
-//bool Project::IsOverrideDraw()
-//{
-//    return (m_eDrawState != PROJDRAWSTATE_Nothing || m_ePrevDrawState != PROJDRAWSTATE_Nothing || m_DrawStateQueue.empty() == false);
-//}
-
-//void Project::OverrideDraw()
-//{
-//    m_pCamera->SetEnabled(true);
-
-//    while(m_DrawStateQueue.empty() == false)
-//    {
-//        m_ePrevDrawState = m_eDrawState;
-//        m_eDrawState = m_DrawStateQueue.dequeue();
-
-//        // This shouldn't happen, but if it did it would break logic below it
-//        if(m_eDrawState == PROJDRAWSTATE_Nothing && m_ePrevDrawState == PROJDRAWSTATE_Nothing)
-//            continue;
-
-//        // If our current state is 'nothing', then Hide() what was previous if it was loaded
-//        if(m_eDrawState == PROJDRAWSTATE_Nothing)
-//        {
-//            if(m_bDrawStateLoaded[m_ePrevDrawState])
-//            {
-//                if(m_ePrevDrawState == PROJDRAWSTATE_AtlasManager)
-//                    AtlasManager_DrawHide(*this, *m_pAtlasMan);
-//            }
-
-//            // Show the selected tab since we're done with override draw
-//            if(m_pTabBar->currentIndex() != -1)
-//                m_pTabBar->tabData(m_pTabBar->currentIndex()).value<IData *>()->DrawShow(*this);
-            
-//            m_ePrevDrawState = PROJDRAWSTATE_Nothing;
-//        }
-//        else
-//        {
-//            if(m_bDrawStateLoaded[m_eDrawState] == false)
-//            {
-//                if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-//                    AtlasManager_DrawOpen(*this, *m_pAtlasMan);
-
-//                m_bDrawStateLoaded[m_eDrawState] = true;
-//            }
-            
-//            // Hide any currently shown items, since we're being draw override
-//            for(int i = 0; i < m_pTabBar->count(); ++i)
-//                m_pTabBar->tabData(i).value<IData *>()->DrawHide(*this);
-
-//            if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-//                AtlasManager_DrawShow(*this, *m_pAtlasMan);
-//        }
-//    }
-
-//    if(m_eDrawState == PROJDRAWSTATE_AtlasManager)
-//        AtlasManager_DrawUpdate(*this, *m_pAtlasMan);
-//}
 
 void Project::Reset()
 {
