@@ -393,16 +393,16 @@ void AtlasesWidget::on_actionReplaceImages_triggered()
 {
     QSet<int> affectedTextureIndexSet;
 
-    QList<QTreeWidgetItem *> atlasSelectedImageList = ui->atlasList->selectedItems();
+    QList<QTreeWidgetItem *> selectedAtlasTreeItemList = ui->atlasList->selectedItems();
 
-    // Store a list of the frames, since 'atlasSelectedImageList' will become invalid within Refresh()
-    QList<AtlasFrame *> selectedImageList;
-    for(int i = 0; i < atlasSelectedImageList.count(); ++i)
-        selectedImageList.append(atlasSelectedImageList[i]->data(0, Qt::UserRole).value<AtlasFrame *>());
+    // Store a list of the frames, since 'selectedAtlasTreeItemList' will become invalid within Refresh()
+    QList<AtlasFrame *> selectedFrameList;
+    for(int i = 0; i < selectedAtlasTreeItemList.count(); ++i)
+        selectedFrameList.append(selectedAtlasTreeItemList[i]->data(0, Qt::UserRole).value<AtlasFrame *>());
 
     QFileDialog dlg(this);
 
-    if(selectedImageList.count() == 1)
+    if(selectedFrameList.count() == 1)
     {
         dlg.setFileMode(QFileDialog::ExistingFile);
         dlg.setWindowTitle("Select an image as the replacement");
@@ -410,7 +410,7 @@ void AtlasesWidget::on_actionReplaceImages_triggered()
     else
     {
         dlg.setFileMode(QFileDialog::ExistingFiles);
-        dlg.setWindowTitle("Select " % QString::number(selectedImageList.count()) % " images as replacements");
+        dlg.setWindowTitle("Select " % QString::number(selectedFrameList.count()) % " images as replacements");
     }
     dlg.setWindowModality(Qt::ApplicationModal);
     dlg.setModal(true);
@@ -426,30 +426,30 @@ void AtlasesWidget::on_actionReplaceImages_triggered()
 
         sImportImgList = dlg.selectedFiles();
 
-        if(sImportImgList.count() != selectedImageList.count())
-            HyGuiLog("You must select " % QString::number(selectedImageList.count()) % " images", LOGTYPE_Warning);
+        if(sImportImgList.count() != selectedFrameList.count())
+            HyGuiLog("You must select " % QString::number(selectedFrameList.count()) % " images", LOGTYPE_Warning);
     }
-    while(sImportImgList.count() != selectedImageList.count());
+    while(sImportImgList.count() != selectedFrameList.count());
 
-    for(int i = 0; i < selectedImageList.count(); ++i)
+    for(int i = 0; i < selectedFrameList.count(); ++i)
     {
-        HyGuiLog("Replacing: " % selectedImageList[i]->GetName() % " -> " % sImportImgList[i], LOGTYPE_Info);
+        HyGuiLog("Replacing: " % selectedFrameList[i]->GetName() % " -> " % sImportImgList[i], LOGTYPE_Info);
 
         QFileInfo fileInfo(sImportImgList[i]);
         QImage newImage(fileInfo.absoluteFilePath());
 
-        affectedTextureIndexSet.insert(selectedImageList[i]->GetTextureIndex());
+        affectedTextureIndexSet.insert(selectedFrameList[i]->GetTextureIndex());
 
-        m_pDataRef->ReplaceFrame(selectedImageList[i], fileInfo.fileName(), newImage, false);
+        m_pDataRef->ReplaceFrame(selectedFrameList[i], fileInfo.fileName(), newImage, false);
     }
 
     m_pDataRef->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
 
-    for(int i = 0; i < selectedImageList.count(); ++i)
+    for(int i = 0; i < selectedFrameList.count(); ++i)
     {
-        QSet<IProjItem *> sLinks = selectedImageList[i]->GetLinks();
+        QSet<IProjItem *> sLinks = selectedFrameList[i]->GetLinks();
         for(QSet<IProjItem *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
-            (*LinksIter)->Relink(selectedImageList[i]);
+            (*LinksIter)->Relink(selectedFrameList[i]);
     }
 }
 
