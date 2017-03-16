@@ -107,6 +107,8 @@ public:
     void SaveUserData();
 
     QJsonObject GetSubDirObj(eItemType eType);
+    
+    bool CloseAllTabs();
 
 public Q_SLOTS:
     void OnTabBarCurrentChanged(int iIndex);

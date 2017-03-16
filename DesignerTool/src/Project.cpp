@@ -137,6 +137,8 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Project, sNewProjectFilePath),
                                                                 IHyApplication(HarmonyInit()),
@@ -670,6 +672,18 @@ void Project::SaveUserData()
 QJsonObject Project::GetSubDirObj(eItemType eType)
 {
     return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType))].toObject();
+}
+
+bool Project::CloseAllTabs()
+{
+    for(int i = 0; i < m_pTabBar->count(); ++i)
+    {
+        IProjItem *pItem = m_pTabBar->tabData(i).value<IProjItem *>();
+        if(false == MainWindow::CloseItem(pItem))
+            return false;
+    }
+    
+    return true;
 }
 
 void Project::OnTabBarCurrentChanged(int iIndex)

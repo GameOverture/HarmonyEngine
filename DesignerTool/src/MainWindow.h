@@ -57,7 +57,7 @@ public:
     static QString EngineLocation();
     
     static void OpenItem(IProjItem *pItem);
-    static void CloseItem(IProjItem *pItem);
+    static bool CloseItem(IProjItem *pItem);
     
     static void SetSelectedProj(Project *pProj);
     static void ReloadHarmony();

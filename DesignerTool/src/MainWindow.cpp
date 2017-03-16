@@ -264,10 +264,10 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->ui->mainToolBar->addActions(sm_pInstance->ui->menu_Edit->actions());
 }
 
-/*static*/ void MainWindow::CloseItem(IProjItem *pItem)
+/*static*/ bool MainWindow::CloseItem(IProjItem *pItem)
 {
     if(pItem == nullptr || pItem->GetType() == ITEM_Project)
-        return;
+        return false;
 
     if(pItem->IsSaveClean() == false)
     {
@@ -278,7 +278,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         else if(iDlgReturn == QMessageBox::Discard)
             pItem->DiscardChanges();
         else if(iDlgReturn == QMessageBox::Cancel)
-            return;
+            return false;
     }
 
     // If this is the item that is currently being shown, unhook all its actions and widget
@@ -304,7 +304,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         }
     }
     
-    //pItem->Unload(*pItemProj);
+    return true;
 }
 
 /*static*/ void MainWindow::SetSelectedProj(Project *pProj)
@@ -476,6 +476,10 @@ void MainWindow::NewItem(eItemType eItem)
 
 void MainWindow::closeEvent(QCloseEvent * event)
 {
+    // This will ensure that the user has a chance to save all unsaved open documents, or cancel which will abort the close
+    if(m_pCurSelectedProj && m_pCurSelectedProj->CloseAllTabs() == false)
+        return;
+    
     SaveSettings();
     QMainWindow::closeEvent(event);
 }
