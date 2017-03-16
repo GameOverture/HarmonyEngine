@@ -398,16 +398,38 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 
 void Project::InitAtlasDependencies(QTreeWidgetItem *pTreeItem)
 {
-//    ExplorerItem *pItem = pTreeItem->data(0, Qt::UserRole).data<ExplorerItem *>();
-//    pItem->GetType(
-//    m_pTreeItemPtr->childCount(
-//    while (*iter)
-//    {
-//        //if ((*iter)->text(0) == itemText)
-//        //    (*iter)->setSelected(true);
-        
-//        ++iter;
-//    }
+    ExplorerItem *pItem = pTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
+    switch(pItem->GetType())
+    {
+    case ITEM_Project:
+    case ITEM_Prefix:
+    case ITEM_DirAudio:
+    case ITEM_DirParticles:
+    case ITEM_DirFonts: 
+    case ITEM_DirSpine:
+    case ITEM_DirSprites:
+    case ITEM_DirShaders:
+    case ITEM_DirEntities:
+    case ITEM_DirAtlases:
+    case ITEM_DirAudioBanks:
+        break;
+    case ITEM_Font:
+        break;
+    case ITEM_Sprite:
+        break;
+    case ITEM_Entity:
+        break;
+    case ITEM_Particles:
+    case ITEM_Spine:
+    case ITEM_Audio:
+    case ITEM_Shader:
+    default:
+        HyGuiLog("Project::InitAtlasDependencies() unhandled item type: " % QString::number(static_cast<int>(pItem->GetType())), LOGTYPE_Error);
+        break;
+    }
+
+    for(int i = 0; i < pTreeItem->childCount(); ++i)
+        InitAtlasDependencies(pTreeItem->child(i));
 }
 
 bool Project::HasError() const
