@@ -28,56 +28,6 @@ AtlasFrame::AtlasFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasN
 
 AtlasFrame::~AtlasFrame()
 {
-    QMapIterator<void *, HyTexturedQuad2d *> iter(m_DrawInstMap);
-    while(iter.hasNext())
-    {
-        iter.next();
-        delete iter.value();
-    }
-}
-
-HyTexturedQuad2d *AtlasFrame::DrawInst(void *pKey)
-{
-    QMap<void *, HyTexturedQuad2d *>::iterator iter = m_DrawInstMap.find(pKey);
-    if(iter != m_DrawInstMap.end())
-        return iter.value();
-
-    if(m_iTextureIndex == -1) {
-        HyGuiLog("HyGuiFrame::DrawInst() has m_iTextureIndex as -1", LOGTYPE_Error);
-        return nullptr;
-    }
-    
-    // Not found, create a new HyTexturedQuad2d based on key
-    HyTexturedQuad2d *pDrawInst = new HyTexturedQuad2d(m_iTextureIndex);
-    pDrawInst->SetTextureSource(GetX(), GetY(), m_rAlphaCrop.width(), m_rAlphaCrop.height());
-
-    pDrawInst->SetEnabled(false);
-    pDrawInst->SetTag(reinterpret_cast<int64>(this));
-
-    m_DrawInstMap.insert(pKey, pDrawInst);
-
-    return pDrawInst;
-}
-
-void AtlasFrame::DeleteDrawInst(void *pKey)
-{
-    QMap<void *, HyTexturedQuad2d *>::iterator iter = m_DrawInstMap.find(pKey);
-    if(iter != m_DrawInstMap.end())
-    {
-        iter.value()->Unload();
-        m_DrawInstMap.remove(pKey);
-    }
-}
-
-void AtlasFrame::DeleteAllDrawInst()
-{
-    QMap<void *, HyTexturedQuad2d *>::iterator iter = m_DrawInstMap.begin();
-    for(; iter != m_DrawInstMap.end(); ++iter)
-    {
-        delete iter.value();
-    }
-    
-    m_DrawInstMap.clear();
 }
 
 AtlasTreeItem *AtlasFrame::GetTreeItem()
@@ -166,8 +116,6 @@ int AtlasFrame::GetY()
 
 void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 {
-    DeleteAllDrawInst();
-
     m_iTextureIndex = iTextureIndex;
     m_iPosX = iX;
     m_iPosY = iY;
@@ -175,13 +123,6 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
     if(m_iTextureIndex != -1)
     {
         ClearError(GUIFRAMEERROR_CouldNotPack);
-
-        QMapIterator<void *, HyTexturedQuad2d *> iter(m_DrawInstMap);
-        while(iter.hasNext())
-        {
-            iter.next();
-            iter.value()->SetTextureSource(GetX(), GetY(), m_rAlphaCrop.width(), m_rAlphaCrop.height());
-        }
 
         if(m_pTreeWidgetItem)
             m_pTreeWidgetItem->setText(1, "Tex:" % QString::number(m_iTextureIndex));

@@ -10,7 +10,6 @@
 #ifndef ATLASFRAME_H
 #define ATLASFRAME_H
 
-#include "Harmony/HyEngine.h"
 #include "IProjItem.h"
 
 #include <QWidget>
@@ -39,9 +38,7 @@ class AtlasFrame
     int                                 m_iPosX;
     int                                 m_iPosY;
 
-    QSet<IProjItem *>                  m_Links;
-
-    QMap<void *, HyTexturedQuad2d *>    m_DrawInstMap;
+    QSet<IProjItem *>                   m_Links;
 
     uint                                m_uiErrors; // '0' when there is no error
 
@@ -50,10 +47,6 @@ class AtlasFrame
     ~AtlasFrame();
     
 public:
-    HyTexturedQuad2d *DrawInst(void *pKey);
-    void DeleteDrawInst(void *pKey);
-    void DeleteAllDrawInst();
-
     AtlasTreeItem *GetTreeItem();
 
     quint32 GetChecksum();

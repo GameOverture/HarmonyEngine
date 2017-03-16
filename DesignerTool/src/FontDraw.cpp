@@ -12,7 +12,7 @@ FontDraw::FontDraw(FontItem *pItem) :   m_pItem(pItem),
 {
 }
 
-/*virtual*/ void FontDraw::OnProjLoad(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnPreLoad(IHyApplication &hyApp)
 {
     if(m_pFontCamera == nullptr)
         m_pFontCamera = hyApp.Window().CreateCamera2d();
@@ -33,7 +33,7 @@ FontDraw::FontDraw(FontItem *pItem) :   m_pItem(pItem),
     m_DividerLine.Load();
 }
 
-/*virtual*/ void FontDraw::OnProjUnload(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnPostUnload(IHyApplication &hyApp)
 {
     if(m_pDrawAtlasPreview)
         m_pDrawAtlasPreview->Unload();

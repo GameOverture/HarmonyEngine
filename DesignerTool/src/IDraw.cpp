@@ -24,7 +24,8 @@ void IDraw::ProjLoad(IHyApplication &hyApp)
     m_pCamera = hyApp.Window().CreateCamera2d();
     m_pCamera->SetEnabled(false);
 
-    OnProjLoad(hyApp);
+    OnPreLoad(hyApp);
+    SetEnabled(false);
     Load();
 }
 
@@ -37,21 +38,19 @@ void IDraw::ProjUnload(IHyApplication &hyApp)
     hyApp.Window().RemoveCamera(m_pCamera);
     m_pCamera = NULL;
 
-    OnProjUnload(hyApp);
     Unload();
+    OnPostUnload(hyApp);
 }
 
 void IDraw::ProjShow(IHyApplication &hyApp)
 {
     m_pCamera->SetEnabled(true);
-
     OnProjShow(hyApp);
 }
 
 void IDraw::ProjHide(IHyApplication &hyApp)
 {
     m_pCamera->SetEnabled(false);
-
     OnProjHide(hyApp);
 }
 

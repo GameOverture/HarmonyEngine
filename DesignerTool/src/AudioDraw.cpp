@@ -9,12 +9,12 @@ AudioDraw::AudioDraw(AudioItem *pItem)
 {
 }
 
-/*virtual*/ void AudioDraw::OnProjLoad(IHyApplication &hyApp)
+/*virtual*/ void AudioDraw::OnPreLoad(IHyApplication &hyApp)
 {
 
 }
 
-/*virtual*/ void AudioDraw::OnProjUnload(IHyApplication &hyApp)
+/*virtual*/ void AudioDraw::OnPostUnload(IHyApplication &hyApp)
 {
 }
 

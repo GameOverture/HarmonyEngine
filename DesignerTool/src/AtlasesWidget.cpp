@@ -27,30 +27,6 @@
 const float fTRANS_DUR = 0.5f;
 const int iPADDING = 2;
 
-struct PreviewRow
-{
-    QList<HyTexturedQuad2d *>   m_Frames;
-    int                         m_iLargestHeight;
-
-    void Clear()
-    {
-        m_Frames.clear();
-        m_iLargestHeight = 0;
-    }
-
-    void TweenPosY(int iStartPosY)
-    {
-        float fMidRow = (m_iLargestHeight * 0.5f);
-        float fPosY = 0.0f;
-        for(int i = 0; i < m_Frames.size(); ++i)
-        {
-            fPosY = iStartPosY - (m_Frames[i]->GetHeight() * 0.5f) - fMidRow;
-            if(m_Frames[i]->pos.IsTweening() == false && m_Frames[i]->pos.Y() != fPosY)
-                m_Frames[i]->pos.Tween(m_Frames[i]->pos.X(), fPosY, fTRANS_DUR, HyTween::QuadInOut);
-        }
-    }
-};
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 AtlasesTreeWidget::AtlasesTreeWidget(QWidget *parent /*= Q_NULLPTR*/) : QTreeWidget(parent)
 {
 }

@@ -13,8 +13,8 @@ public:
     virtual ~AudioDraw();
 
 protected:
-    virtual void OnProjLoad(IHyApplication &hyApp) override;
-    virtual void OnProjUnload(IHyApplication &hyApp) override;
+    virtual void OnPreLoad(IHyApplication &hyApp) override;
+    virtual void OnPostUnload(IHyApplication &hyApp) override;
     virtual void OnProjShow(IHyApplication &hyApp) override;
     virtual void OnProjHide(IHyApplication &hyApp) override;
     virtual void OnProjUpdate(IHyApplication &hyApp) override;

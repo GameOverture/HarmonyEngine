@@ -28,8 +28,8 @@ public:
     void ProjUpdate(IHyApplication &hyApp);
 
 protected:
-    virtual void OnProjLoad(IHyApplication &hyApp) = 0;
-    virtual void OnProjUnload(IHyApplication &hyApp) = 0;
+    virtual void OnPreLoad(IHyApplication &hyApp) = 0;
+    virtual void OnPostUnload(IHyApplication &hyApp) = 0;
     virtual void OnProjShow(IHyApplication &hyApp) = 0;
     virtual void OnProjHide(IHyApplication &hyApp) = 0;
     virtual void OnProjUpdate(IHyApplication &hyApp) = 0;

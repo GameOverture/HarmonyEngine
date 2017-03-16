@@ -493,9 +493,13 @@ void Project::OpenItem(IProjItem *pItem)
     if(m_pCurOpenItem && m_pCurOpenItem != pItem)
         m_pCurOpenItem->ProjHide(*this);
 
+    if(m_pCurOpenItem == pItem)
+        return;
+
     m_pCurOpenItem = pItem;
 
     bool bAlreadyLoaded = false;
+    // Search for existing tab
     for(int i = 0; i < m_pTabBar->count(); ++i)
     {
         if(m_pTabBar->tabData(i).value<IProjItem *>() == m_pCurOpenItem)
@@ -511,6 +515,7 @@ void Project::OpenItem(IProjItem *pItem)
         }
     }
 
+    // Add tab, otherwise
     if(bAlreadyLoaded == false)
     {
         m_pCurOpenItem->ProjLoad(*this);
@@ -707,5 +712,10 @@ void Project::on_saveAll_triggered()
 void Project::on_tabBar_closeRequested(int iIndex)
 {
     IProjItem *pItem = m_pTabBar->tabData(iIndex).value<IProjItem *>();
+    pItem->ProjUnload(*this);
+
+    if(pItem == m_pCurOpenItem)
+        m_pCurOpenItem = nullptr;
+
     MainWindow::CloseItem(pItem);
 }

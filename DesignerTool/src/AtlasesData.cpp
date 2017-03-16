@@ -518,9 +518,6 @@ void AtlasesData::RepackAll()
 
 void AtlasesData::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
 {
-    for(int i = 0; i < m_FrameList.size(); ++i)
-        m_FrameList[i]->DeleteAllDrawInst();
-
     // Always repack the last texture to ensure it gets filled as much as it can
     QFileInfoList existingTexturesInfoList = m_DataDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
     for(int i = HyClamp(existingTexturesInfoList.size() - 1, 0, existingTexturesInfoList.size()); i < existingTexturesInfoList.size(); ++i)

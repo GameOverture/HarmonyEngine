@@ -176,8 +176,6 @@ void IProjItem::Relink(AtlasFrame *pFrame)
 
 void IProjItem::Unlink(AtlasFrame *pFrame)
 {
-    pFrame->DeleteDrawInst(this);
-
     OnUnlink(pFrame);
     m_Links.remove(pFrame);
 }

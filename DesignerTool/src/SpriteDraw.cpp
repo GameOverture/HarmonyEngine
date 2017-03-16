@@ -1,6 +1,7 @@
 #include "SpriteDraw.h"
 
-SpriteDraw::SpriteDraw(SpriteItem *pItem) : m_pItem(pItem)
+SpriteDraw::SpriteDraw(SpriteItem *pItem) : m_pItem(pItem),
+                                            m_pCurFrame(nullptr)
 {
     std::vector<glm::vec2> lineList(2, glm::vec2());
 
@@ -18,49 +19,42 @@ SpriteDraw::SpriteDraw(SpriteItem *pItem) : m_pItem(pItem)
 
     m_primOriginHorz.SetTint(1.0f, 0.0f, 0.0f);
     m_primOriginVert.SetTint(1.0f, 0.0f, 0.0f);
+
+    AddChild(m_primOriginHorz);
+    AddChild(m_primOriginVert);
 }
 
 /*virtual*/ SpriteDraw::~SpriteDraw()
 {
 }
 
-/*virtual*/ void SpriteDraw::OnProjLoad(IHyApplication &hyApp)
+/*virtual*/ void SpriteDraw::OnPreLoad(IHyApplication &hyApp)
 {
-    m_primOriginHorz.Load();
-    m_primOriginVert.Load();
+    QList<AtlasFrame *> frameList = static_cast<SpriteWidget *>(m_pItem->GetWidget())->GetAllDrawInsts();
+    for(int i = 0; i < frameList.size(); ++i)
+    {
+        if(false == m_FrameMap.contains(frameList[i]->GetChecksum()))
+        {
+            HyTexturedQuad2d *pNewFrame = new HyTexturedQuad2d(frameList[i]->GetTextureIndex(), this);
+            pNewFrame->SetTextureSource(frameList[i]->GetX(), frameList[i]->GetY(), frameList[i]->GetCrop().width(), frameList[i]->GetCrop().height());
+            m_FrameMap.insert(frameList[i]->GetChecksum(), pNewFrame);
+        }
+    }
 }
 
-/*virtual*/ void SpriteDraw::OnProjUnload(IHyApplication &hyApp)
+/*virtual*/ void SpriteDraw::OnPostUnload(IHyApplication &hyApp)
 {
-    m_primOriginHorz.Unload();
-    m_primOriginVert.Unload();
+    for(auto iter = m_FrameMap.begin(); iter != m_FrameMap.end(); ++iter)
+        delete iter.value();
 
-    QList<AtlasFrame *> frameList = static_cast<SpriteWidget *>(m_pItem->GetWidget())->GetAllDrawInsts();
-    for(int i = 0; i < frameList.count(); i++)
-        frameList[i]->DrawInst(this)->Unload();
+    m_FrameMap.clear();
+    m_pCurFrame = nullptr;
 }
 
 /*virtual*/ void SpriteDraw::OnProjShow(IHyApplication &hyApp)
 {
     m_primOriginHorz.SetEnabled(true);
     m_primOriginVert.SetEnabled(true);
-}
-
-/*virtual*/ void SpriteDraw::OnProjHide(IHyApplication &hyApp)
-{
-    m_primOriginHorz.SetEnabled(false);
-    m_primOriginVert.SetEnabled(false);
-
-    QList<AtlasFrame *> frameList = static_cast<SpriteWidget *>(m_pItem->GetWidget())->GetAllDrawInsts();
-    for(int i = 0; i < frameList.count(); i++)
-        frameList[i]->DrawInst(this)->SetEnabled(false);
-}
-
-/*virtual*/ void SpriteDraw::OnProjUpdate(IHyApplication &hyApp)
-{
-    QList<AtlasFrame *> frameList = static_cast<SpriteWidget *>(m_pItem->GetWidget())->GetAllDrawInsts();
-    for(int i = 0; i < frameList.count(); i++)
-        frameList[i]->DrawInst(this)->SetEnabled(false);
 
     SpriteWidgetState *pCurSpriteState = static_cast<SpriteWidget *>(m_pItem->GetWidget())->GetCurSpriteState();
     SpriteFrame *pSpriteFrame = pCurSpriteState->GetSelectedFrame();
@@ -68,21 +62,43 @@ SpriteDraw::SpriteDraw(SpriteItem *pItem) : m_pItem(pItem)
     if(pSpriteFrame == NULL)
         return;
 
-    AtlasFrame *pGuiFrame = pSpriteFrame->m_pFrame;
-    HyTexturedQuad2d *pDrawInst = pGuiFrame->DrawInst(this);
+    if(m_pCurFrame)
+        m_pCurFrame->SetEnabled(false);
 
-    pDrawInst->alpha.Set(1.0f);
+    auto iter = m_FrameMap.find(pSpriteFrame->m_pFrame->GetChecksum());
+    if(iter != m_FrameMap.end())
+        m_pCurFrame = iter.value();
+
+    m_pCurFrame->SetEnabled(true);
+}
+
+/*virtual*/ void SpriteDraw::OnProjHide(IHyApplication &hyApp)
+{
+    m_primOriginHorz.SetEnabled(false);
+    m_primOriginVert.SetEnabled(false);
+
+    m_pCurFrame->SetEnabled(false);
+}
+
+/*virtual*/ void SpriteDraw::OnProjUpdate(IHyApplication &hyApp)
+{
+    SpriteWidgetState *pCurSpriteState = static_cast<SpriteWidget *>(m_pItem->GetWidget())->GetCurSpriteState();
+    SpriteFrame *pSpriteFrame = pCurSpriteState->GetSelectedFrame();
+
+    if(pSpriteFrame == NULL)
+        return;
+
+    auto iter = m_FrameMap.find(pSpriteFrame->m_pFrame->GetChecksum());
+    if(iter != m_FrameMap.end() && m_pCurFrame != iter.value())
+    {
+        m_pCurFrame->SetEnabled(false);
+        m_pCurFrame = iter.value();
+        m_pCurFrame->SetEnabled(true);
+    }
 
     QPoint ptRenderOffset = pSpriteFrame->GetRenderOffset();
-    pDrawInst->pos.X(ptRenderOffset.x());
-    pDrawInst->pos.Y(ptRenderOffset.y());
-
-    pDrawInst->SetDisplayOrder(100);
-
-    if(pDrawInst->IsLoaded() == false)
-        pDrawInst->Load();
-
-    pDrawInst->SetEnabled(true);
+    m_pCurFrame->pos.X(ptRenderOffset.x());
+    m_pCurFrame->pos.Y(ptRenderOffset.y());
 
     pCurSpriteState->UpdateTimeStep();
 }
