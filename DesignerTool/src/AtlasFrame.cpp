@@ -91,7 +91,7 @@ QPoint AtlasFrame::GetPosition()
 
 QSet<IProjItem *> AtlasFrame::GetLinks()
 {
-    return m_Links;
+    return m_DependencySet;
 }
 
 eAtlasNodeType AtlasFrame::GetType()

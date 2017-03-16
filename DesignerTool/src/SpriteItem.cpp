@@ -38,6 +38,7 @@ SpriteItem::SpriteItem(Project *pItemProj, const QString sPrefix, const QString 
 
 /*virtual*/ void SpriteItem::OnReLink(AtlasFrame *pFrame)
 {
+    // TODO: 
     SpriteWidget *pWidgetSprite = static_cast<SpriteWidget *>(m_pWidget);
     pWidgetSprite->RefreshFrame(pFrame);
 }

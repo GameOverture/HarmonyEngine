@@ -70,8 +70,6 @@ public:
 private:
     Ui::ExplorerWidget *ui;
     
-    void ProcessItem(ExplorerItem *pItem);
-    
     QTreeWidgetItem *GetSelectedTreeItem();
     
 private Q_SLOTS:

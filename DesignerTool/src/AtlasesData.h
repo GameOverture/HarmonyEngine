@@ -29,7 +29,7 @@ class AtlasesData : public QObject
 
     QList<AtlasFrame *>                             m_FrameList;
     QList<AtlasTreeItem *>                          m_TopLevelAtlasTreeItemList;
-    QMap<quint32, AtlasFrame *>                     m_DependencyMap;
+    QMap<quint32, AtlasFrame *>                     m_FrameChecksumMap;
 
 public:
     AtlasesData(Project *pProjOwner);

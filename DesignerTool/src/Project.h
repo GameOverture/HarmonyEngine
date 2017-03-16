@@ -66,6 +66,8 @@ class Project : public ExplorerItem, public IHyApplication
 public:
     Project(const QString sNewProjectFilePath);
     virtual ~Project();
+    
+    void InitAtlasDependencies(QTreeWidgetItem *pTreeItem);
 
     bool HasError() const;
 

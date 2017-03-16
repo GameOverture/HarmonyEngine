@@ -241,9 +241,9 @@ AtlasFrame *AtlasesData::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlph
 {
     AtlasFrame *pNewFrame = NULL;
 
-    if(m_DependencyMap.contains(uiChecksum))
+    if(m_FrameChecksumMap.contains(uiChecksum))
     {
-        AtlasFrame *pExistingFrame = m_DependencyMap.find(uiChecksum).value();
+        AtlasFrame *pExistingFrame = m_FrameChecksumMap.find(uiChecksum).value();
         HyGuiLog("'" % sN % "' is a duplicate of '" % pExistingFrame->GetName() % "' with the checksum: " % QString::number(uiChecksum), LOGTYPE_Info);
 
         pNewFrame = new AtlasFrame(uiChecksum, sN, rAlphaCrop, eType, iW, iH, iX, iY, uiAtlasIndex, uiErrors);
@@ -254,7 +254,7 @@ AtlasFrame *AtlasesData::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlph
     else
     {
         pNewFrame = new AtlasFrame(uiChecksum, sN, rAlphaCrop, eType, iW, iH, iX, iY, uiAtlasIndex, uiErrors);
-        m_DependencyMap[uiChecksum] = pNewFrame;
+        m_FrameChecksumMap[uiChecksum] = pNewFrame;
     }
 
     m_FrameList.append(pNewFrame);
@@ -263,7 +263,7 @@ AtlasFrame *AtlasesData::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlph
 
 void AtlasesData::RemoveFrame(AtlasFrame *pFrame)
 {
-    m_DependencyMap.remove(pFrame->GetChecksum());
+    m_FrameChecksumMap.remove(pFrame->GetChecksum());
     pFrame->DeleteMetaImage(m_MetaDir);
 
     m_FrameList.removeOne(pFrame);
@@ -300,19 +300,19 @@ void AtlasesData::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newIma
     textureIndexToReplaceSet.insert(pFrame->GetTextureIndex());
 
     if(0 == (pFrame->GetErrors() & GUIFRAMEERROR_Duplicate))
-        m_DependencyMap.remove(pFrame->GetChecksum());
+        m_FrameChecksumMap.remove(pFrame->GetChecksum());
 
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
     pFrame->ReplaceImage(sName, uiChecksum, newImage, m_MetaDir);
 
-    if(m_DependencyMap.contains(uiChecksum))
+    if(m_FrameChecksumMap.contains(uiChecksum))
     {
         HyGuiLog("ItemAtlases::ReplaceFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Info);
         pFrame->SetError(GUIFRAMEERROR_Duplicate);
     }
     else
     {
-        m_DependencyMap[uiChecksum] = pFrame;
+        m_FrameChecksumMap[uiChecksum] = pFrame;
         pFrame->ClearError(GUIFRAMEERROR_Duplicate);
     }
 
@@ -351,8 +351,8 @@ QList<AtlasFrame *> AtlasesData::RequestFrames(IProjItem *pItem, QList<quint32> 
     QList<AtlasFrame *> frameRequestList;
     for(int i = 0; i < requestList.size(); ++i)
     {
-        QMap<quint32, AtlasFrame *>::iterator iter = m_DependencyMap.find(requestList[i]);
-        if(iter == m_DependencyMap.end())
+        QMap<quint32, AtlasFrame *>::iterator iter = m_FrameChecksumMap.find(requestList[i]);
+        if(iter == m_FrameChecksumMap.end())
         {
             // TODO: Support a "Yes to all" dialog functionality here
             HyGuiLog("Cannot find image with checksum: " % QString::number(requestList[i]) % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
@@ -446,13 +446,13 @@ void AtlasesData::SaveData()
 
 void AtlasesData::SetDependency(AtlasFrame *pFrame, IProjItem *pItem)
 {
-    pFrame->m_Links.insert(pItem);
+    pFrame->m_DependencySet.insert(pItem);
     pItem->Link(pFrame);
 }
 
 void AtlasesData::RemoveDependency(AtlasFrame *pFrame, IProjItem *pItem)
 {
-    pFrame->m_Links.remove(pItem);
+    pFrame->m_DependencySet.remove(pItem);
     pItem->Unlink(pFrame);
 }
 

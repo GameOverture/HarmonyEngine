@@ -25,6 +25,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDirIterator>
+#include <QTreeWidgetItemIterator>
 
 // Keep this commented out unless you want the entire project to save every item upon boot (used if 'Data.json' layout has changed and needs to propagate all its changes)
 //#define RESAVE_ENTIRE_PROJECT
@@ -393,6 +394,20 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 {
     HyGuiLog("Project destructor", LOGTYPE_Error);
     delete m_pAtlasMan;
+}
+
+void Project::InitAtlasDependencies(QTreeWidgetItem *pTreeItem)
+{
+//    ExplorerItem *pItem = pTreeItem->data(0, Qt::UserRole).data<ExplorerItem *>();
+//    pItem->GetType(
+//    m_pTreeItemPtr->childCount(
+//    while (*iter)
+//    {
+//        //if ((*iter)->text(0) == itemText)
+//        //    (*iter)->setSelected(true);
+        
+//        ++iter;
+//    }
 }
 
 bool Project::HasError() const

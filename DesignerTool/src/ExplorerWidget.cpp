@@ -40,6 +40,9 @@ ExplorerWidget::~ExplorerWidget()
 void ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
 {
     Project *pNewItemProject = new Project(sNewProjectFilePath);
+    
+    pNewItemProject->InitAtlasDependencies(pNewItemProject->GetTreeItem());
+    
     if(pNewItemProject->HasError())
     {
         HyGuiLog("Abort opening project: " % pNewItemProject->GetAbsPath(), LOGTYPE_Error);
@@ -199,10 +202,6 @@ void ExplorerWidget::SelectItem(ExplorerItem *pItem)
     }
     
     pItem->GetTreeItem()->setSelected(true);
-}
-
-void ExplorerWidget::ProcessItem(ExplorerItem *pItem)
-{
 }
 
 QTreeWidgetItem *ExplorerWidget::GetSelectedTreeItem()
