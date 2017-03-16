@@ -548,7 +548,7 @@ void AtlasesData::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFr
                          m_MetaDir.absoluteFilePath(newFramesList[i]->ConstructImageFileName()));
     }
     SetPackerSettings();
-    m_Packer.pack(m_PackerSettings["cmdHeuristic"].toInt(), m_PackerSettings["sbTextureWidth"].toInt(), m_PackerSettings["sbTextureHeight"].toInt());
+    m_Packer.pack(m_PackerSettings["cmbHeuristic"].toInt(), m_PackerSettings["sbTextureWidth"].toInt(), m_PackerSettings["sbTextureHeight"].toInt());
 
     // Subtract '1' from the number of new textures because we want to ensure the last generated (and likely least filled) texture is last
     int iNumNewTextures = m_Packer.bins.size() - 1;
