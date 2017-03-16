@@ -40,6 +40,18 @@ ExplorerWidget::~ExplorerWidget()
 void ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
 {
     Project *pNewItemProject = new Project(sNewProjectFilePath);
+    if(pNewItemProject->HasError())
+    {
+        HyGuiLog("Abort opening project: " % pNewItemProject->GetAbsPath(), LOGTYPE_Error);
+        return;
+    }
+    else
+        HyGuiLog("Opening project: " % pNewItemProject->GetAbsPath(), LOGTYPE_Info);
+
+    QTreeWidgetItem *pProjTreeItem = pNewItemProject->GetTreeItem();
+    ui->treeWidget->insertTopLevelItem(0, pProjTreeItem);
+    ui->treeWidget->expandItem(pProjTreeItem);
+    
     OnProjectLoaded(pNewItemProject);
     return;
 
@@ -292,21 +304,6 @@ ExplorerItem *ExplorerWidget::GetCurDirSelected(bool bIncludePrefixDirs)
 void ExplorerWidget::OnProjectLoaded(Project *pLoadedProj)
 {
     //pLoadedProj->moveToThread(QApplication::instance()->thread());
-
-    pLoadedProj->LoadWidgets();
-
-    if(pLoadedProj->HasError())
-    {
-        HyGuiLog("Abort opening project: " % pLoadedProj->GetAbsPath(), LOGTYPE_Error);
-        return;
-    }
-    else
-        HyGuiLog("Opening project: " % pLoadedProj->GetAbsPath(), LOGTYPE_Info);
-
-    QTreeWidgetItem *pProjTreeItem = pLoadedProj->GetTreeItem();
-    ui->treeWidget->insertTopLevelItem(0, pProjTreeItem);
-    ui->treeWidget->expandItem(pProjTreeItem);
-
     MainWindow::StopLoading(MDI_Explorer);
 }
 

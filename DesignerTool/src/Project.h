@@ -67,7 +67,6 @@ public:
     Project(const QString sNewProjectFilePath);
     virtual ~Project();
 
-    void LoadWidgets();
     bool HasError() const;
 
     QList<AtlasTreeItem *> GetAtlasTreeItemList();

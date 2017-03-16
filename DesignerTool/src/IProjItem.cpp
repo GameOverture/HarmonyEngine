@@ -30,6 +30,7 @@ IProjItem::IProjItem(Project *pItemProj,
                        QJsonValue initVal) :    ExplorerItem(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
                                                 m_pItemProj(pItemProj),
                                                 m_InitValue(initVal),
+                                                m_pDraw(nullptr),
                                                 m_pWidget(nullptr)
 {
     switch(m_eTYPE)
@@ -140,8 +141,11 @@ void IProjItem::ProjLoad(IHyApplication &hyApp)
 
 void IProjItem::ProjUnload(IHyApplication &hyApp)
 {
-    delete m_pWidget;
     delete m_pDraw;
+    delete m_pWidget;
+    
+    m_pDraw = nullptr;
+    m_pWidget = nullptr;
 }
 
 void IProjItem::ProjShow(IHyApplication &hyApp)
@@ -167,9 +171,11 @@ void IProjItem::Link(AtlasFrame *pFrame)
 
 void IProjItem::Relink(AtlasFrame *pFrame)
 {
-//    if(IsLoaded())
-//        m_bReloadDraw = true;
-
+//    if(m_pDraw)
+//        m_pDraw->
+    
+    // TODO: Apply AtlasFrame changes to this item
+    
     OnReLink(pFrame);
     Save();
 }

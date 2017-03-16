@@ -372,31 +372,27 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
         //        OpenItem(pItem);
         //}
     }
+    
+    m_pTabBar = new QTabBar(nullptr);
+    m_pTabBar->setTabsClosable(true);
+    m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
+    m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
+    m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
+    //connect(m_pTabBar, SIGNAL(QTabBar::currentChanged(int)),
+    //        this, SLOT(OnTabBarCurrentChanged(int)));
+    //connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)),
+    //        this, SLOT(on_tabBar_closeRequested(int)));
 
     m_pAtlasesData = new AtlasesData(this);
+    m_pAtlasMan = new AtlasesWidget(*m_pAtlasesData, nullptr);
+    
+    m_pAudioMan = new AudioWidgetManager(this, nullptr);
 }
 
 /*virtual*/ Project::~Project()
 {
     HyGuiLog("Project destructor", LOGTYPE_Error);
     delete m_pAtlasMan;
-}
-
-void Project::LoadWidgets()
-{
-    m_pTabBar = new QTabBar(nullptr);
-    m_pTabBar->setTabsClosable(true);
-    m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
-    m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
-    m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
-
-    //connect(m_pTabBar, SIGNAL(QTabBar::currentChanged(int)),
-    //        this, SLOT(OnTabBarCurrentChanged(int)));
-    //connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)),
-    //        this, SLOT(on_tabBar_closeRequested(int)));
-
-    m_pAtlasMan = new AtlasesWidget(*m_pAtlasesData, nullptr);
-    m_pAudioMan = new AudioWidgetManager(this, nullptr);
 }
 
 bool Project::HasError() const
