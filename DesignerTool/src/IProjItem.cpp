@@ -87,7 +87,6 @@ void IProjItem::GiveMenuActions(QMenu *pMenu)
 void IProjItem::Save()
 {
     // TODO: Save must work with item not opened/loaded
-    asdf
     GetItemProject()->SaveGameData(m_eTYPE, GetName(true), OnSave());
     m_pUndoStack->setClean();
 }

@@ -43,16 +43,8 @@ SpriteWidget::SpriteWidget(SpriteItem *pItemSprite, QWidget *parent) :   QWidget
     m_StateActionsList.push_back(ui->actionOrderFrameDownwards);
     
     ui->cmbStates->clear();
-}
-
-SpriteWidget::~SpriteWidget()
-{
-    delete ui;
-}
-
-// This function exists because below cannot be placed in constructor due to RequestFrames() trying to access ItemSprite::m_pWidget (aka this) before variable is assigned
-void SpriteWidget::Load()
-{
+    
+    
     // If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
     if(m_pItemSprite->GetInitValue().type() != QJsonValue::Null)
     {
@@ -61,7 +53,7 @@ void SpriteWidget::Load()
         {
             QJsonObject stateObj = stateArray[i].toObject();
 
-            m_pItemSprite->GetUndoStack()->push(new UndoCmd_AddState<SpriteWidget, SpriteWidgetState>("Add Sprite State", this, m_StateActionsList, ui->cmbStates));
+            m_pItemSprite->GetUndoStack()->push(new UndoCmd_AddState<SpriteWidget, SpriteTableModel, SpriteWidgetState>("Add Sprite State", this, asdf, m_StateActionsList, ui->cmbStates));
             m_pItemSprite->GetUndoStack()->push(new UndoCmd_RenameState<SpriteWidgetState>("Rename Sprite State", ui->cmbStates, stateObj["name"].toString()));
 
             SpriteWidgetState *pSpriteState = GetCurSpriteState();
@@ -98,6 +90,11 @@ void SpriteWidget::Load()
     m_pItemSprite->GetUndoStack()->clear();
 
     UpdateActions();
+}
+
+SpriteWidget::~SpriteWidget()
+{
+    delete ui;
 }
 
 SpriteItem *SpriteWidget::GetData()

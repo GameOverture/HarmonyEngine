@@ -19,13 +19,14 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-SpriteWidgetState::SpriteWidgetState(SpriteWidget *pOwner, QList<QAction *> stateActionList, QWidget *parent) : QWidget(parent),
-                                                                                                                m_pOwner(pOwner),
-                                                                                                                ui(new Ui::SpriteWidgetState),
-                                                                                                                m_sName("Unnamed"),
-                                                                                                                m_bPlayActive(false),
-                                                                                                                m_fElapsedTime(0.0),
-                                                                                                                m_bIsBounced(false)
+SpriteWidgetState::SpriteWidgetState(SpriteWidget *pOwner, SpriteTableModel *pTableModel, QList<QAction *> stateActionList, QWidget *parent) :  QWidget(parent),
+                                                                                                                                                m_pOwner(pOwner),
+                                                                                                                                                m_pSpriteFramesModel(pTableModel),
+                                                                                                                                                ui(new Ui::SpriteWidgetState),
+                                                                                                                                                m_sName("Unnamed"),
+                                                                                                                                                m_bPlayActive(false),
+                                                                                                                                                m_fElapsedTime(0.0),
+                                                                                                                                                m_bIsBounced(false)
 {
     ui->setupUi(this);
 
@@ -33,9 +34,7 @@ SpriteWidgetState::SpriteWidgetState(SpriteWidget *pOwner, QList<QAction *> stat
     ui->btnRemoveFrame->setDefaultAction(FindAction(stateActionList, "actionRemoveFrames"));
     ui->btnOrderFrameUp->setDefaultAction(FindAction(stateActionList, "actionOrderFrameUpwards"));
     ui->btnOrderFrameDown->setDefaultAction(FindAction(stateActionList, "actionOrderFrameDownwards"));
-
-    m_pSpriteFramesModel = new SpriteTableModel(this);
-
+    
     ui->framesView->setModel(m_pSpriteFramesModel);
     ui->framesView->resize(ui->framesView->size());
     ui->framesView->setItemDelegate(new WidgetSpriteDelegate(m_pOwner->GetData(), ui->framesView, this));

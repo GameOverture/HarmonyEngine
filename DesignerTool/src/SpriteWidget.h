@@ -36,8 +36,6 @@ class SpriteWidget : public QWidget
 public:
     explicit SpriteWidget(SpriteItem *pItemSprite, QWidget *parent = 0);
     ~SpriteWidget();
-
-    void Load();  // This function exists because below cannot be placed in constructor due to RequestFrames() trying to access ItemSprite::m_pWidget (aka this) before variable is assigned
     
     SpriteItem *GetData();
     

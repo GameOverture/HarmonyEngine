@@ -87,7 +87,7 @@ void AudioWidget::UpdateActions()
 
 void AudioWidget::on_actionAddState_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_AddState<AudioWidget, AudioWidgetState>("Add Audio State", this, m_StateActionsList, ui->cmbStates);
+    QUndoCommand *pCmd = new UndoCmd_AddState<AudioWidget, void *, AudioWidgetState>("Add Audio State", this, nullptr, m_StateActionsList, ui->cmbStates);
     m_pItemAudio->GetUndoStack()->push(pCmd);
 }
 

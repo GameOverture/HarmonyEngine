@@ -12,7 +12,6 @@
 
 #include "HyGuiGlobal.h"
 #include "IProjItem.h"
-
 #include "Project.h"
 
 #include <QUndoCommand>
@@ -22,7 +21,7 @@
 #include <QRadioButton>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename OWNER, typename STATE>
+template<typename OWNER, typename INIT, typename STATE>
 class UndoCmd_AddState : public QUndoCommand
 {
     OWNER *             m_pOwner;
@@ -30,10 +29,10 @@ class UndoCmd_AddState : public QUndoCommand
     QComboBox *         m_pComboBox;
 
 public:
-    UndoCmd_AddState(QString sText, OWNER *pOwner, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
-                                                                                                                                            m_pOwner(pOwner),
-                                                                                                                                            m_pState(new STATE(m_pOwner, stateActionList)),
-                                                                                                                                            m_pComboBox(pCmb)
+    UndoCmd_AddState(QString sText, OWNER *pOwner, INIT *pInit, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
+                                                                                                                                                m_pOwner(pOwner),
+                                                                                                                                                m_pState(new STATE(m_pOwner, pInit, stateActionList)),
+                                                                                                                                                m_pComboBox(pCmb)
     {
         setText(sText);
     }
