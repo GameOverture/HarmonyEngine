@@ -25,7 +25,6 @@ protected:
     virtual void OnGiveMenuActions(QMenu *pMenu) override;
 
     virtual void OnLink(AtlasFrame *pFrame) override;
-    virtual void OnReLink(AtlasFrame *pFrame) override;
     virtual void OnUnlink(AtlasFrame *pFrame) override;
     
     virtual QJsonValue OnSave() override;

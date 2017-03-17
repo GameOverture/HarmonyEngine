@@ -86,6 +86,8 @@ void IProjItem::GiveMenuActions(QMenu *pMenu)
 
 void IProjItem::Save()
 {
+    // TODO: Save must work with item not opened/loaded
+    asdf
     GetItemProject()->SaveGameData(m_eTYPE, GetName(true), OnSave());
     m_pUndoStack->setClean();
 }
@@ -171,12 +173,37 @@ void IProjItem::Link(AtlasFrame *pFrame)
 
 void IProjItem::Relink(AtlasFrame *pFrame)
 {
-//    if(m_pDraw)
-//        m_pDraw->
+    if(m_pDraw)
+        m_pDraw->Relink(pFrame);
+
+    if(m_pWidget)
+    {
+        switch(m_eTYPE)
+        {
+        case ITEM_Sprite:   static_cast<SpriteWidget *>(m_pWidget)->Relink(pFrame);     break;
+        case ITEM_Font:     /*static_cast<FontWidget *>(m_pWidget)->Relink(pFrame);*/   break;
+        case ITEM_Audio:    /*static_cast<AudioWidget *>(m_pWidget)->Relink(pFrame);*/  break;
+        case ITEM_Project:
+        case ITEM_DirAudio:
+        case ITEM_DirParticles:
+        case ITEM_DirFonts:
+        case ITEM_DirSpine:
+        case ITEM_DirSprites:
+        case ITEM_DirShaders:
+        case ITEM_DirEntities:
+        case ITEM_DirAtlases:
+        case ITEM_DirAudioBanks:
+        case ITEM_Prefix:
+        case ITEM_Particles:
+        case ITEM_Spine:
+        case ITEM_Shader:
+        case ITEM_Entity:
+        default:
+            HyGuiLog("Unsupported IProjItem::Relink() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+            break;
+        }
+    }
     
-    // TODO: Apply AtlasFrame changes to this item
-    
-    OnReLink(pFrame);
     Save();
 }
 

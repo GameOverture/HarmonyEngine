@@ -8,6 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "IDraw.h"
+#include "AtlasFrame.h"
 
 IDraw::IDraw() :    m_pCamera(nullptr),
                     m_bReloadDraw(false)

@@ -48,7 +48,6 @@ protected:
     virtual void OnGiveMenuActions(QMenu *pMenu) = 0;
 
     virtual void OnLink(AtlasFrame *pFrame) = 0;
-    virtual void OnReLink(AtlasFrame *pFrame) = 0;
     virtual void OnUnlink(AtlasFrame *pFrame) = 0;
     
     virtual QJsonValue OnSave() = 0;

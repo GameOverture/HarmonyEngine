@@ -36,13 +36,6 @@ SpriteItem::SpriteItem(Project *pItemProj, const QString sPrefix, const QString 
     pCurSpriteState->InsertFrame(pFrame);
 }
 
-/*virtual*/ void SpriteItem::OnReLink(AtlasFrame *pFrame)
-{
-    // TODO: 
-    SpriteWidget *pWidgetSprite = static_cast<SpriteWidget *>(m_pWidget);
-    pWidgetSprite->RefreshFrame(pFrame);
-}
-
 /*virtual*/ void SpriteItem::OnUnlink(AtlasFrame *pFrame)
 {
     SpriteWidgetState *pCurSpriteState = static_cast<SpriteWidget *>(m_pWidget)->GetCurSpriteState();

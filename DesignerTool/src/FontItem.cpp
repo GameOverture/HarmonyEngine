@@ -39,9 +39,6 @@ FontItem::FontItem(Project *pItemProj, const QString sPrefix, const QString sNam
 {
 }
 
-/*virtual*/ void FontItem::OnReLink(AtlasFrame *pFrame)
-{
-}
 
 /*virtual*/ void FontItem::OnUnlink(AtlasFrame *pFrame)
 {

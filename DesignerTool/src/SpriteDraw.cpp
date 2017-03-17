@@ -28,6 +28,13 @@ SpriteDraw::SpriteDraw(SpriteItem *pItem) : m_pItem(pItem),
 {
 }
 
+/*virtual*/ void SpriteDraw::Relink(AtlasFrame *pFrame)
+{
+    auto iter = m_FrameMap.find(pFrame->GetChecksum());
+    if(iter != m_FrameMap.end())
+        iter.value()->SetTextureSource(pFrame->GetX(), pFrame->GetY(), pFrame->GetCrop().width(), pFrame->GetCrop().height());
+}
+
 /*virtual*/ void SpriteDraw::OnPreLoad(IHyApplication &hyApp)
 {
     QList<AtlasFrame *> frameList = static_cast<SpriteWidget *>(m_pItem->GetWidget())->GetAllDrawInsts();

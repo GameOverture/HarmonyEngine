@@ -27,10 +27,6 @@ AudioItem::AudioItem(Project *pItemProj, const QString sPrefix, const QString sN
 {
 }
 
-/*virtual*/ void AudioItem::OnReLink(AtlasFrame *pFrame)
-{
-}
-
 /*virtual*/ void AudioItem::OnUnlink(AtlasFrame *pFrame)
 {
 }

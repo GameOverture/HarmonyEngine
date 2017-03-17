@@ -18,12 +18,15 @@ public:
     SpriteDraw(SpriteItem *pItem);
     virtual ~SpriteDraw();
 
+    virtual void Relink(AtlasFrame *pFrame) override;
+
 protected:
     virtual void OnPreLoad(IHyApplication &hyApp) override;
     virtual void OnPostUnload(IHyApplication &hyApp) override;
     virtual void OnProjShow(IHyApplication &hyApp) override;
     virtual void OnProjHide(IHyApplication &hyApp) override;
     virtual void OnProjUpdate(IHyApplication &hyApp) override;
+
 };
 
 #endif // SPRITEDRAW_H

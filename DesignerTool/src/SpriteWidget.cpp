@@ -144,7 +144,7 @@ SpriteWidgetState *SpriteWidget::GetCurSpriteState()
     return ui->cmbStates->currentData().value<SpriteWidgetState *>();
 }
 
-void SpriteWidget::RefreshFrame(AtlasFrame *pFrame)
+void SpriteWidget::Relink(AtlasFrame *pFrame)
 {
     for(int i = 0; i < ui->cmbStates->count(); ++i)
     {

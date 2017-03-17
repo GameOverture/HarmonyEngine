@@ -47,7 +47,7 @@ public:
     
     SpriteWidgetState *GetCurSpriteState();
 
-    void RefreshFrame(AtlasFrame *pFrame);
+    void Relink(AtlasFrame *pFrame);
     
     QList<AtlasFrame *> GetAllDrawInsts();
     

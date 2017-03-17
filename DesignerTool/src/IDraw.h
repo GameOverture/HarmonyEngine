@@ -12,6 +12,8 @@
 
 #include "Harmony/HyEngine.h"
 
+class AtlasFrame;
+
 class IDraw : public HyEntity2d
 {
 protected:
@@ -26,6 +28,8 @@ public:
     void ProjShow(IHyApplication &hyApp);
     void ProjHide(IHyApplication &hyApp);
     void ProjUpdate(IHyApplication &hyApp);
+
+    virtual void Relink(AtlasFrame *pFrame) { }
 
 protected:
     virtual void OnPreLoad(IHyApplication &hyApp) = 0;
