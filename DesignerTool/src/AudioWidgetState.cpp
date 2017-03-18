@@ -29,7 +29,7 @@ AudioWidgetState::AudioWidgetState(AudioWidget *pOwner, QList<QAction *> stateAc
     ui->btnOrderWaveUp->setDefaultAction(FindAction(stateActionList, "actionOrderWaveUpwards"));
     ui->btnOrderWaveDown->setDefaultAction(FindAction(stateActionList, "actionOrderWaveDownwards"));
     
-    ui->cmbCategory->setModel(m_pOwner->GetData()->GetItemProject()->GetAudioManager().GetCategoryModel());
+    ui->cmbCategory->setModel(m_pOwner->GetData()->GetProject()->GetAudioManager().GetCategoryModel());
     
     UpdateActions();
 }

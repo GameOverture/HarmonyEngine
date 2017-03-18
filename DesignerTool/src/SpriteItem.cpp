@@ -16,234 +16,28 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-SpriteTableModel::SpriteTableModel(QObject *parent) : QAbstractTableModel(parent)
+SpriteItem::SpriteItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonArray stateArray) : IProjItem(pItemProj, ITEM_Sprite, sPrefix, sName)
 {
-}
+    m_pStatesModel = new SpriteStatesModel(this);
 
-int SpriteTableModel::Add(AtlasFrame *pFrame)
-{
-    SpriteFrame *pFrameToInsert = NULL;
-
-    // See if this frame has been recently removed, and re-add if possible. Otherwise, create a new Frame
-    QMap<quint32, SpriteFrame *>::iterator iter = m_RemovedFrameMap.find(pFrame->GetChecksum());
-    if(iter == m_RemovedFrameMap.end())
-        pFrameToInsert = new SpriteFrame(pFrame, m_FramesList.count());
-    else
+    // If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
+    if(stateArray.empty() == false)
     {
-        pFrameToInsert = iter.value();
-        m_RemovedFrameMap.remove(pFrame->GetChecksum());
-    }
-
-    beginInsertRows(QModelIndex(), pFrameToInsert->m_iRowIndex, pFrameToInsert->m_iRowIndex);
-    m_FramesList.insert(pFrameToInsert->m_iRowIndex, pFrameToInsert);
-    endInsertRows();
-
-    return pFrameToInsert->m_iRowIndex;
-}
-
-void SpriteTableModel::Remove(AtlasFrame *pFrame)
-{
-    for(int i = 0; i < m_FramesList.count(); ++i)
-    {
-        if(m_FramesList[i]->m_pFrame == pFrame)
-        {
-            m_RemovedFrameMap[pFrame->GetChecksum()] = m_FramesList[i];
-
-            beginRemoveRows(QModelIndex(), i, i);
-            m_FramesList.removeAt(i);
-            endRemoveRows();
-            break;
-        }
-    }
-}
-
-void SpriteTableModel::MoveRowUp(int iIndex)
-{
-    if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
-        return;
-
-    m_FramesList.swap(iIndex, iIndex - 1);
-    endMoveRows();
-}
-
-void SpriteTableModel::MoveRowDown(int iIndex)
-{
-    if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt is retarded
-        return;
-
-    m_FramesList.swap(iIndex, iIndex + 1);
-    endMoveRows();
-}
-
-void SpriteTableModel::RefreshFrame(AtlasFrame *pFrame)
-{
-    bool bFound = false;
-    for(int i = 0; i < m_FramesList.count(); ++i)
-    {
-        if(m_FramesList[i]->m_pFrame == pFrame)
-        {
-            bFound = true;
-            break;
-        }
-    }
-
-    if(bFound)
-        dataChanged(createIndex(0, 0), createIndex(m_FramesList.count() - 1, NUMCOLUMNS - 1));
-}
-
-// iIndex of -1 will apply to all
-void SpriteTableModel::OffsetFrame(int iIndex, QPoint vOffset)
-{
-    if(iIndex == -1)
-    {
-        for(int i = 0; i < m_FramesList.count(); ++i)
-            m_FramesList[i]->m_vOffset = vOffset;
-
-        dataChanged(createIndex(0, COLUMN_OffsetX), createIndex(m_FramesList.count() - 1, COLUMN_OffsetY));
+        for(int i = 0; i < stateArray.size(); ++i)
+            m_pStatesModel->AppendState(stateArray[i].toObject());
     }
     else
-    {
-        m_FramesList[iIndex]->m_vOffset = vOffset;
-        dataChanged(createIndex(iIndex, COLUMN_OffsetX), createIndex(iIndex, COLUMN_OffsetY));
-    }
-}
-
-// iIndex of -1 will apply to all
-void SpriteTableModel::DurationFrame(int iIndex, float fDuration)
-{
-    if(iIndex == -1)
-    {
-        for(int i = 0; i < m_FramesList.count(); ++i)
-            m_FramesList[i]->m_fDuration = fDuration;
-
-        dataChanged(createIndex(0, COLUMN_Duration), createIndex(m_FramesList.count() - 1, COLUMN_Duration));
-    }
-    else
-    {
-        m_FramesList[iIndex]->m_fDuration = fDuration;
-        dataChanged(createIndex(iIndex, COLUMN_Duration), createIndex(iIndex, COLUMN_Duration));
-    }
-}
-
-SpriteFrame *SpriteTableModel::GetFrameAt(int iIndex)
-{
-    if(iIndex < 0)
-        return NULL;
-
-    return m_FramesList[iIndex];
-}
-
-/*virtual*/ int SpriteTableModel::rowCount(const QModelIndex & /*parent*/) const
-{
-   return m_FramesList.count();
-}
-
-/*virtual*/ int SpriteTableModel::columnCount(const QModelIndex & /*parent*/) const
-{
-    return NUMCOLUMNS;
-}
-
-/*virtual*/ QVariant SpriteTableModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
-{
-    SpriteFrame *pFrame = m_FramesList[index.row()];
-
-    if (role == Qt::TextAlignmentRole && index.column() != COLUMN_Frame)
-    {
-        return Qt::AlignCenter;
-    }
-    
-    if(role == Qt::DisplayRole || role == Qt::EditRole)
-    {
-        switch(index.column())
-        {
-        case COLUMN_Frame:
-            return pFrame->m_pFrame->GetName();
-        case COLUMN_OffsetX:
-            return QString::number(pFrame->m_vOffset.x());
-        case COLUMN_OffsetY:
-            return QString::number(pFrame->m_vOffset.y());
-        case COLUMN_Duration:
-            return QString::number(pFrame->m_fDuration, 'g', 3) % ((role == Qt::DisplayRole) ? "sec" : "");
-        }
-    }
-
-    return QVariant();
-}
-
-/*virtual*/ QVariant SpriteTableModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
-{
-    if (role == Qt::DisplayRole)
-    {
-        if (orientation == Qt::Horizontal)
-        {
-            switch(iIndex)
-            {
-            case COLUMN_Frame:
-                return QString("Frame");
-            case COLUMN_OffsetX:
-                return QString("X Offset");
-            case COLUMN_OffsetY:
-                return QString("Y Offset");
-            case COLUMN_Duration:
-                return QString("Duration");
-            }
-        }
-        else
-            return QString::number(iIndex);
-    }
-
-    return QVariant();
-}
-
-/*virtual*/ bool SpriteTableModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
-{
-    HyGuiLog("SpriteFramesModel::setData was invoked", LOGTYPE_Error);
-
-    SpriteFrame *pFrame = m_FramesList[index.row()];
-
-    if(role == Qt::EditRole)
-    {
-        switch(index.column())
-        {
-        case COLUMN_OffsetX:
-            pFrame->m_vOffset.setX(value.toInt());
-            break;
-        case COLUMN_OffsetY:
-            pFrame->m_vOffset.setY(value.toInt());
-            break;
-        case COLUMN_Duration:
-            pFrame->m_fDuration = value.toFloat();
-            break;
-        }
-    }
-
-    QVector<int> vRolesChanged;
-    vRolesChanged.append(role);
-    dataChanged(index, index, vRolesChanged);
-
-    return true;
-}
-
-/*virtual*/ Qt::ItemFlags SpriteTableModel::flags(const QModelIndex &index) const
-{
-    if(index.column() == COLUMN_Frame)
-        return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-    else
-        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-SpriteItem::SpriteItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) : IProjItem(pItemProj, ITEM_Sprite, sPrefix, sName, initVal)
-{
-    m_pStateNameModel = new QStringListModel(this);
-    m_pStateNameModel-
-                m_StateList;
+        m_pStatesModel->AppendState(QJsonObject());
 }
 
 /*virtual*/ SpriteItem::~SpriteItem()
 {
     delete m_pWidget;
+}
+
+SpriteStatesModel *SpriteItem::GetSpritesModel()
+{
+    return m_pStatesModel;
 }
 
 /*virtual*/ void SpriteItem::OnGiveMenuActions(QMenu *pMenu)

@@ -11,7 +11,7 @@
 #include "AudioWidget.h"
 
 
-AudioItem::AudioItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) : IProjItem(pItemProj, ITEM_Audio, sPrefix, sName, initVal)
+AudioItem::AudioItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) : IProjItem(pItemProj, ITEM_Audio, sPrefix, sName)
 {
 }
 

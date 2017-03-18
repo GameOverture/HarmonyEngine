@@ -354,7 +354,7 @@ QList<AtlasFrame *> AtlasesData::RequestFrames(IProjItem *pItem, QList<quint32> 
         QMap<quint32, AtlasFrame *>::iterator iter = m_FrameChecksumMap.find(requestList[i]);
         if(iter == m_FrameChecksumMap.end())
         {
-            // TODO: Support a "Yes to all" dialog functionality here
+            // TODO: Support a "Yes to all" dialog functionality here. Also note that the request list will not == the return list
             HyGuiLog("Cannot find image with checksum: " % QString::number(requestList[i]) % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
         }
         else

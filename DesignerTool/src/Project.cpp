@@ -318,7 +318,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
                         pNewDataItem = new FontItem(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirSprites:
-                        pNewDataItem = new SpriteItem(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new SpriteItem(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value().toArray());
                         break;
                     case ITEM_DirParticles:
                     case ITEM_DirSpine:
@@ -396,62 +396,62 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     delete m_pAtlasMan;
 }
 
-void Project::InitAtlasDependencies(QTreeWidgetItem *pTreeItem)
-{
-    ExplorerItem *pItem = pTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
-    switch(pItem->GetType())
-    {
-    case ITEM_Project:
-    case ITEM_Prefix:
-    case ITEM_DirAudio:
-    case ITEM_DirParticles:
-    case ITEM_DirFonts: 
-    case ITEM_DirSpine:
-    case ITEM_DirSprites:
-    case ITEM_DirShaders:
-    case ITEM_DirEntities:
-    case ITEM_DirAtlases:
-    case ITEM_DirAudioBanks:
-        break;
-    case ITEM_Font: {
-        FontItem *pFontItem = static_cast<FontItem *>(pItem);
-        QJsonObject fontObj = pFontItem->GetInitValue().toObject();
+//void Project::InitAtlasDependencies(QTreeWidgetItem *pTreeItem)
+//{
+//    ExplorerItem *pItem = pTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
+//    switch(pItem->GetType())
+//    {
+//    case ITEM_Project:
+//    case ITEM_Prefix:
+//    case ITEM_DirAudio:
+//    case ITEM_DirParticles:
+//    case ITEM_DirFonts:
+//    case ITEM_DirSpine:
+//    case ITEM_DirSprites:
+//    case ITEM_DirShaders:
+//    case ITEM_DirEntities:
+//    case ITEM_DirAtlases:
+//    case ITEM_DirAudioBanks:
+//        break;
+//    case ITEM_Font: {
+//        FontItem *pFontItem = static_cast<FontItem *>(pItem);
+//        QJsonObject fontObj = pFontItem->GetInitValue().toObject();
 
-        QList<quint32> requestList;
-        requestList.append(JSONOBJ_TOINT(fontObj, "checksum"));
-        m_pAtlasesData->RequestFrames(pFontItem, requestList);
-        break; }
-    case ITEM_Sprite: {
-        SpriteItem *pSpriteItem = static_cast<SpriteItem *>(pItem);
-        QJsonArray stateArray = pSpriteItem->GetInitValue().toArray();
-        for(int i = 0; i < stateArray.size(); ++i)
-        {
-            QJsonObject stateObj = stateArray[i].toObject();
-            QJsonArray spriteFrameArray = stateObj["frames"].toArray();
-            for(int j = 0; j < spriteFrameArray.size(); ++j)
-            {
-                QJsonObject spriteFrameObj = spriteFrameArray[j].toObject();
+//        QList<quint32> requestList;
+//        requestList.append(JSONOBJ_TOINT(fontObj, "checksum"));
+//        m_pAtlasesData->RequestFrames(pFontItem, requestList);
+//        break; }
+//    case ITEM_Sprite: {
+//        SpriteItem *pSpriteItem = static_cast<SpriteItem *>(pItem);
+//        QJsonArray stateArray = pSpriteItem->GetInitValue().toArray();
+//        for(int i = 0; i < stateArray.size(); ++i)
+//        {
+//            QJsonObject stateObj = stateArray[i].toObject();
+//            QJsonArray spriteFrameArray = stateObj["frames"].toArray();
+//            for(int j = 0; j < spriteFrameArray.size(); ++j)
+//            {
+//                QJsonObject spriteFrameObj = spriteFrameArray[j].toObject();
 
-                QList<quint32> requestList;
-                requestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
-                m_pAtlasesData->RequestFrames(pSpriteItem, requestList);
-            }
-        }
-        break; }
-    case ITEM_Entity:
-        break;
-    case ITEM_Particles:
-    case ITEM_Spine:
-    case ITEM_Audio:
-    case ITEM_Shader:
-    default:
-        HyGuiLog("Project::InitAtlasDependencies() unhandled item type: " % QString::number(static_cast<int>(pItem->GetType())), LOGTYPE_Error);
-        break;
-    }
+//                QList<quint32> requestList;
+//                requestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
+//                m_pAtlasesData->RequestFrames(pSpriteItem, requestList);
+//            }
+//        }
+//        break; }
+//    case ITEM_Entity:
+//        break;
+//    case ITEM_Particles:
+//    case ITEM_Spine:
+//    case ITEM_Audio:
+//    case ITEM_Shader:
+//    default:
+//        HyGuiLog("Project::InitAtlasDependencies() unhandled item type: " % QString::number(static_cast<int>(pItem->GetType())), LOGTYPE_Error);
+//        break;
+//    }
 
-    for(int i = 0; i < pTreeItem->childCount(); ++i)
-        InitAtlasDependencies(pTreeItem->child(i));
-}
+//    for(int i = 0; i < pTreeItem->childCount(); ++i)
+//        InitAtlasDependencies(pTreeItem->child(i));
+//}
 
 bool Project::HasError() const
 {

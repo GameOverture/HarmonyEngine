@@ -37,7 +37,7 @@ public:
     explicit SpriteWidget(SpriteItem *pItemSprite, QWidget *parent = 0);
     ~SpriteWidget();
     
-    SpriteItem *GetData();
+    SpriteItem *GetItem();
     
     void OnGiveMenuActions(QMenu *pMenu);
 

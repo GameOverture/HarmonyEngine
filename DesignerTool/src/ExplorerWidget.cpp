@@ -18,6 +18,8 @@
 #include "AtlasesWidget.h"
 #include "HyGuiGlobal.h"
 
+#include <QJsonArray>
+
 ExplorerWidget::ExplorerWidget(QWidget *parent) :   QWidget(parent),
                                                     ui(new Ui::ExplorerWidget)
 {
@@ -39,10 +41,7 @@ ExplorerWidget::~ExplorerWidget()
 
 void ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
 {
-    Project *pNewItemProject = new Project(sNewProjectFilePath);
-    
-    pNewItemProject->InitAtlasDependencies(pNewItemProject->GetTreeItem());
-    
+    Project *pNewItemProject = new Project(sNewProjectFilePath);    
     if(pNewItemProject->HasError())
     {
         HyGuiLog("Abort opening project: " % pNewItemProject->GetAbsPath(), LOGTYPE_Error);
@@ -95,7 +94,7 @@ void ExplorerWidget::AddItem(eItemType eNewItemType, const QString sPrefix, cons
         pItem = new AudioItem(pCurProj, sPrefix, sName, QJsonValue());
         break;
     case ITEM_Sprite:
-        pItem = new SpriteItem(pCurProj, sPrefix, sName, QJsonValue());
+        pItem = new SpriteItem(pCurProj, sPrefix, sName, QJsonArray());
         break;
     case ITEM_Font:
         pItem = new FontItem(pCurProj, sPrefix, sName, QJsonValue());

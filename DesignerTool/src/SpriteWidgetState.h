@@ -22,14 +22,14 @@ class SpriteWidgetState;
 
 class SpriteFrame;
 class SpriteWidget;
-class SpriteTableModel;
+class SpriteFramesModel;
 
 class SpriteWidgetState : public QWidget
 {
     Q_OBJECT
 
     SpriteWidget *                      m_pOwner;
-    SpriteTableModel *                  m_pSpriteFramesModel;
+    SpriteFramesModel *                  m_pSpriteFramesModel;
     
     QString                             m_sName;
     
@@ -38,7 +38,7 @@ class SpriteWidgetState : public QWidget
     bool                                m_bIsBounced;
 
 public:
-    explicit SpriteWidgetState(SpriteWidget *pOwner, SpriteTableModel *pTableModel, QList<QAction *> stateActionList, QWidget *parent = 0);
+    explicit SpriteWidgetState(SpriteWidget *pOwner, SpriteFramesModel *pTableModel, QList<QAction *> stateActionList, QWidget *parent = 0);
     ~SpriteWidgetState();
     
     QString GetName();
@@ -48,9 +48,9 @@ public:
     void RefreshFrame(AtlasFrame *pFrame);
     void RemoveFrame(AtlasFrame *pFrame);
 
-    QCheckBox *GetChkBox_Reverse();
-    QCheckBox *GetChkBox_Looping();
-    QCheckBox *GetChkBox_Bounce();
+//    QCheckBox *GetChkBox_Reverse();
+//    QCheckBox *GetChkBox_Looping();
+//    QCheckBox *GetChkBox_Bounce();
     SpriteTableView *GetFrameView();
     SpriteFrame *GetSelectedFrame();
     int GetSelectedIndex();

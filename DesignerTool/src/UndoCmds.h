@@ -21,18 +21,20 @@
 #include <QRadioButton>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename OWNER, typename INIT, typename STATE>
+template<typename WIDGET, typename MODEL>
 class UndoCmd_AddState : public QUndoCommand
 {
-    OWNER *             m_pOwner;
-    STATE *             m_pState;
+    WIDGET *            m_pWidget;
+    MODEL *             m_pModel;
     QComboBox *         m_pComboBox;
 
+    int                 m_iIndex;
+
 public:
-    UndoCmd_AddState(QString sText, OWNER *pOwner, INIT *pInit, QList<QAction *> stateActionList, QComboBox *pCmb, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
-                                                                                                                                                m_pOwner(pOwner),
-                                                                                                                                                m_pState(new STATE(m_pOwner, pInit, stateActionList)),
-                                                                                                                                                m_pComboBox(pCmb)
+    UndoCmd_AddState(QString sText, WIDGET *pWidget, MODEL *pModel, QComboBox *pCmb, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
+                                                                                                                    m_pWidget(pWidget),
+                                                                                                                    m_pModel(pModel),
+                                                                                                                    m_pComboBox(pCmb)
     {
         setText(sText);
     }
@@ -40,50 +42,40 @@ public:
     virtual ~UndoCmd_AddState()
     { }
 
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
-        int iIndex = m_pComboBox->count();
-    
-        QVariant v;
-        v.setValue(m_pState);
-    
-        m_pComboBox->addItem(QString::number(iIndex) % " - " % m_pState->GetName(), v);
-        SetStateNamingConventionInComboBox<STATE>(m_pComboBox);
-    
-        m_pComboBox->setCurrentIndex(iIndex);
-        
-        m_pOwner->UpdateActions();
+        m_iIndex = m_pModel->AppendState(QJsonObject());
+        m_pWidget->UpdateActions();
+
+        m_pComboBox->setCurrentIndex(m_iIndex);
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
-        QVariant v;
-        v.setValue(m_pState);
-    
-        int iIndex = m_pComboBox->findData(v);
-        m_pComboBox->removeItem(iIndex);
-    
-        SetStateNamingConventionInComboBox<STATE>(m_pComboBox);
-        
-        m_pOwner->UpdateActions();
+        m_pModel->PopStateAt(m_iIndex);
+        m_pWidget->UpdateActions();
+
+        m_pComboBox->setCurrentIndex(m_iIndex);
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename OWNER, typename STATE>
+template<typename WIDGET, typename MODEL>
 class UndoCmd_RemoveState : public QUndoCommand
 {
-    OWNER *             m_pOwner;
+    WIDGET *            m_pWidget;
+    MODEL *             m_pModel;
     QComboBox *         m_pComboBox;
-    STATE *             m_pState;
+
     int                 m_iIndex;
+    QJsonObject         m_PoppedStateObj;
 
 public:
-    UndoCmd_RemoveState(QString sText, OWNER *pOwner, QComboBox *pCmb, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
-                                                                                                            m_pOwner(pOwner),
-                                                                                                            m_pComboBox(pCmb),
-                                                                                                            m_pState(m_pComboBox->currentData().value<STATE *>()),
-                                                                                                            m_iIndex(m_pComboBox->currentIndex())
+    UndoCmd_RemoveState(QString sText, WIDGET *pWidget, MODEL *pModel, int iIndex, QComboBox *pCmb, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
+                                                                                                                                    m_pWidget(pWidget),
+                                                                                                                                    m_pModel(pModel),
+                                                                                                                                    m_pComboBox(pCmb),
+                                                                                                                                    m_iIndex(iIndex)
     {
         setText(sText);
     }
@@ -91,43 +83,40 @@ public:
     virtual ~UndoCmd_RemoveState()
     { }
 
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
-        m_pComboBox->removeItem(m_iIndex);
-        SetStateNamingConventionInComboBox<STATE>(m_pComboBox);
-        
-        m_pOwner->UpdateActions();
+        m_PoppedStateObj = m_pModel->PopStateAt(m_iIndex);
+        m_pWidget->UpdateActions();
+
+        m_pComboBox->setCurrentIndex(m_iIndex);
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
-        QVariant v;
-        v.setValue(m_pState);
-    
-        m_pComboBox->insertItem(m_iIndex, QString::number(m_iIndex) % " - " % m_pState->GetName(), v);
+        m_iIndex = m_pModel->AppendState(m_PoppedStateObj);
+        m_pWidget->UpdateActions();
+
         m_pComboBox->setCurrentIndex(m_iIndex);
-    
-        SetStateNamingConventionInComboBox<STATE>(m_pComboBox);
-        
-        m_pOwner->UpdateActions();
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename STATE>
+template<typename MODEL>
 class UndoCmd_RenameState : public QUndoCommand
 {
+    MODEL *             m_pModel;
     QComboBox *         m_pComboBox;
-    STATE *             m_pState;
+    int                 m_iIndex;
+
     QString             m_sNewName;
     QString             m_sOldName;
 
 public:
-    UndoCmd_RenameState(QString sText, QComboBox *pCmb, QString sNewName, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
-                                                                                                                m_pComboBox(pCmb),
-                                                                                                                m_pState(m_pComboBox->currentData().value<STATE *>()),
-                                                                                                                m_sNewName(sNewName),
-                                                                                                                m_sOldName(m_pState->GetName())
+    UndoCmd_RenameState(QString sText, MODEL *pModel, int iIndex, QString sNewName, QComboBox *pCmb, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
+                                                                                                                                    m_pModel(pModel),
+                                                                                                                                    m_pComboBox(pCmb),
+                                                                                                                                    m_iIndex(iIndex),
+                                                                                                                                    m_sNewName(sNewName)
     {
         setText(sText);
     }
@@ -135,50 +124,34 @@ public:
     virtual ~UndoCmd_RenameState()
     { }
 
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
-        m_pState->SetName(m_sNewName);
-        SetStateNamingConventionInComboBox<STATE>(m_pComboBox);
-    
-        for(int i = 0; i < m_pComboBox->count(); ++i)
-        {
-            if(m_pComboBox->itemData(i).value<STATE *>() == m_pState)
-            {
-                m_pComboBox->setCurrentIndex(i);
-                break;
-            }
-        }
+        m_sOldName = m_pModel->SetStateName(m_iIndex, m_sNewName);
+        m_pComboBox->setCurrentIndex(m_iIndex);
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
-        m_pState->SetName(m_sOldName);
-        SetStateNamingConventionInComboBox<STATE>(m_pComboBox);
-    
-        for(int i = 0; i < m_pComboBox->count(); ++i)
-        {
-            if(m_pComboBox->itemData(i).value<STATE *>() == m_pState)
-            {
-                m_pComboBox->setCurrentIndex(i);
-                break;
-            }
-        }
+        m_pModel->SetStateName(m_iIndex, m_sOldName);
+        m_pComboBox->setCurrentIndex(m_iIndex);
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename OWNER, typename STATE>
+template<typename WIDGET, typename MODEL>
 class UndoCmd_MoveStateBack : public QUndoCommand
 {
-    OWNER *             m_pOwner;
+    WIDGET *            m_pWidget;
+    MODEL *             m_pModel;
     QComboBox *         m_pComboBox;
-    STATE *             m_pState;
+    int                 m_iIndex;
 
 public:
-    UndoCmd_MoveStateBack(QString sText, OWNER *pOwner, QComboBox *pCmb, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
-                                                                                                            m_pOwner(pOwner),
-                                                                                                            m_pComboBox(pCmb),
-                                                                                                            m_pState(m_pComboBox->currentData().value<STATE *>())
+    UndoCmd_MoveStateBack(QString sText, WIDGET *pWidget, MODEL *pModel, QComboBox *pCmb, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
+                                                                                                                        m_pWidget(pWidget),
+                                                                                                                        m_pModel(pModel),
+                                                                                                                        m_pComboBox(pCmb),
+                                                                                                                        m_iIndex(m_pComboBox->currentIndex())
     {
         setText(sText);
     }
@@ -186,54 +159,38 @@ public:
     virtual ~UndoCmd_MoveStateBack()
     { }
 
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
-        QVariant v;
-        v.setValue(m_pState);
-    
-        int iIndex = m_pComboBox->findData(v);
-    
-        m_pComboBox->removeItem(iIndex);
-        iIndex -= 1;
-        m_pComboBox->insertItem(iIndex, QString::number(iIndex) % " - " % m_pState->GetName(), v);
-        m_pComboBox->setCurrentIndex(iIndex);
-    
-        SetStateNamingConventionInComboBox<STATE>(m_pComboBox);
-        
-        m_pOwner->UpdateActions();
+        m_pModel->MoveStateBack(m_iIndex);
+        m_iIndex -= 1;
+        m_pComboBox->setCurrentIndex(m_iIndex);
+        m_pWidget->UpdateActions();
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
-        QVariant v;
-        v.setValue(m_pState);
-    
-        int iIndex = m_pComboBox->findData(v);
-    
-        m_pComboBox->removeItem(iIndex);
-        iIndex += 1;
-        m_pComboBox->insertItem(iIndex, QString::number(iIndex) % " - " % m_pState->GetName(), v);
-        m_pComboBox->setCurrentIndex(iIndex);
-    
-        SetStateNamingConventionInComboBox<STATE>(m_pComboBox);
-        
-        m_pOwner->UpdateActions();
+        m_pModel->MoveStateForward(m_iIndex);
+        m_iIndex += 1;
+        m_pComboBox->setCurrentIndex(m_iIndex);
+        m_pWidget->UpdateActions();
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename OWNER, typename STATE>
+template<typename WIDGET, typename MODEL>
 class UndoCmd_MoveStateForward : public QUndoCommand
 {
-    OWNER *             m_pOwner;
+    WIDGET *            m_pWidget;
+    MODEL *             m_pModel;
     QComboBox *         m_pComboBox;
-    STATE *             m_pState;
+    int                 m_iIndex;
 
 public:
-    UndoCmd_MoveStateForward(QString sText, OWNER *pOwner, QComboBox *pCmb, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
-                                                                                                                m_pOwner(pOwner),
-                                                                                                                m_pComboBox(pCmb),
-                                                                                                                m_pState(m_pComboBox->currentData().value<STATE *>())
+    UndoCmd_MoveStateForward(QString sText, WIDGET *pWidget, MODEL *pModel, QComboBox *pCmb, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
+                                                                                                                            m_pWidget(pWidget),
+                                                                                                                            m_pModel(pModel),
+                                                                                                                            m_pComboBox(pCmb),
+                                                                                                                            m_iIndex(m_pComboBox->currentIndex())
     {
         setText(sText);
     }
@@ -241,38 +198,20 @@ public:
     virtual ~UndoCmd_MoveStateForward()
     { }
 
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
-        QVariant v;
-        v.setValue(m_pState);
-    
-        int iIndex = m_pComboBox->findData(v);
-    
-        m_pComboBox->removeItem(iIndex);
-        iIndex += 1;
-        m_pComboBox->insertItem(iIndex, QString::number(iIndex) % " - " % m_pState->GetName(), v);
-        m_pComboBox->setCurrentIndex(iIndex);
-    
-        SetStateNamingConventionInComboBox<STATE>(m_pComboBox);
-        
-        m_pOwner->UpdateActions();
+        m_pModel->MoveStateForward(m_iIndex);
+        m_iIndex += 1;
+        m_pComboBox->setCurrentIndex(m_iIndex);
+        m_pWidget->UpdateActions();
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
-        QVariant v;
-        v.setValue(m_pState);
-    
-        int iIndex = m_pComboBox->findData(v);
-    
-        m_pComboBox->removeItem(iIndex);
-        iIndex -= 1;
-        m_pComboBox->insertItem(iIndex, QString::number(iIndex) % " - " % m_pState->GetName(), v);
-        m_pComboBox->setCurrentIndex(iIndex);
-    
-        SetStateNamingConventionInComboBox<STATE>(m_pComboBox);
-        
-        m_pOwner->UpdateActions();
+        m_pModel->MoveStateBack(m_iIndex);
+        m_iIndex -= 1;
+        m_pComboBox->setCurrentIndex(m_iIndex);
+        m_pWidget->UpdateActions();
     }
 };
 
@@ -299,7 +238,7 @@ public:
     virtual ~UndoCmd_ComboBox()
     { }
 
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
         m_pComboBox->blockSignals(true);
         m_pComboBox->setCurrentIndex(m_iNewIndex);
@@ -308,7 +247,7 @@ public:
         m_pOwner->UpdateActions();
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
         m_pComboBox->blockSignals(true);
         m_pComboBox->setCurrentIndex(m_iPrevIndex);
@@ -338,13 +277,13 @@ public:
     virtual ~UndoCmd_CheckBox()
     { }
 
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
         m_pCheckBox->setChecked(m_bInitialValue);
         m_pOwner->UpdateActions();
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
         m_pCheckBox->setChecked(!m_bInitialValue);
         m_pOwner->UpdateActions();
@@ -373,7 +312,7 @@ public:
     virtual ~UndoCmd_SpinBox()
     { }
 
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
         m_pSpinBox->blockSignals(true);
         m_pSpinBox->setValue(m_iNewSize);
@@ -382,7 +321,7 @@ public:
         m_pOwner->UpdateActions();
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
         m_pSpinBox->blockSignals(true);
         m_pSpinBox->setValue(m_iPrevSize);
@@ -414,7 +353,7 @@ public:
     virtual ~UndoCmd_DoubleSpinBox()
     { }
 
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
         m_pDoubleSpinBox->blockSignals(true);
         m_pDoubleSpinBox->setValue(m_dNewSize);
@@ -423,7 +362,7 @@ public:
         m_pOwner->UpdateActions();
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
         m_pDoubleSpinBox->blockSignals(true);
         m_pDoubleSpinBox->setValue(m_dPrevSize);
@@ -452,7 +391,7 @@ public:
     virtual ~UndoCmd_LineEdit()
     { }
 
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
         if(m_bFirstTimeSkipRedo)
             m_bFirstTimeSkipRedo = false;
@@ -463,7 +402,7 @@ public:
         
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
         m_pLineEdit->undo();
         m_pOwner->UpdateActions();
@@ -491,7 +430,7 @@ public:
     virtual ~UndoCmd_RadioToggle()
     { }
     
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
         m_pNewRadBtnToggle->blockSignals(true);
         m_pPrevRadBtnToggle->blockSignals(true);
@@ -504,7 +443,7 @@ public:
         m_pOwner->UpdateActions();
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
         m_pNewRadBtnToggle->blockSignals(true);
         m_pPrevRadBtnToggle->blockSignals(true);
@@ -519,15 +458,15 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename OWNER>
+template<typename WIDGET>
 class UndoCmd_AddFrames : public QUndoCommand
 {
-    OWNER *                                 m_pOwner;
+    WIDGET *                                m_pWidget;
     QList<AtlasFrame *>                     m_Frames;
     
 public:
-    UndoCmd_AddFrames(QString sText, OWNER *pOwner, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
-                                                                                        m_pOwner(pOwner)
+    UndoCmd_AddFrames(QString sText, WIDGET *pWidget, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
+                                                                                    m_pWidget(pWidget)
     {
         setText(sText);
         m_Frames.clear();
@@ -536,16 +475,16 @@ public:
     virtual ~UndoCmd_AddFrames()
     { }
 
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
-        m_Frames = m_pOwner->GetData()->GetItemProject()->GetAtlasesData().RequestFrames(m_pOwner->GetData(), m_Frames);
-        m_pOwner->UpdateActions();
+        m_Frames = m_pWidget->GetItem()->GetProject()->GetAtlasesData().RequestFrames(m_pWidget->GetItem(), m_Frames);
+        m_pWidget->UpdateActions();
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
-        m_pOwner->GetData()->GetItemProject()->GetAtlasesData().RelinquishFrames(m_pOwner->GetData(), m_Frames);
-        m_pOwner->UpdateActions();
+        m_pWidget->GetItem()->GetProject()->GetAtlasesData().RelinquishFrames(m_pWidget->GetItem(), m_Frames);
+        m_pWidget->UpdateActions();
     }
 };
 
@@ -567,15 +506,15 @@ public:
     virtual ~UndoCmd_DeleteFrame()
     { }
 
-    void redo() Q_DECL_OVERRIDE
+    void redo() override
     {
-        m_pOwner->GetData()->GetItemProject()->GetAtlasesData().RelinquishFrames(m_pOwner->GetData(), m_Frames);
+        m_pOwner->GetItem()->GetProject()->GetAtlasesData().RelinquishFrames(m_pOwner->GetItem(), m_Frames);
         m_pOwner->UpdateActions();
     }
     
-    void undo() Q_DECL_OVERRIDE
+    void undo() override
     {
-        m_Frames = m_pOwner->GetData()->GetItemProject()->GetAtlasesData().RequestFrames(m_pOwner->GetData(), m_Frames);
+        m_Frames = m_pOwner->GetItem()->GetProject()->GetAtlasesData().RequestFrames(m_pOwner->GetItem(), m_Frames);
         m_pOwner->UpdateActions();
     }
 };

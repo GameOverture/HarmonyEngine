@@ -30,7 +30,7 @@ SpriteUndoCmd_OrderFrame::SpriteUndoCmd_OrderFrame(SpriteTableView *pSpriteTable
 
 void SpriteUndoCmd_OrderFrame::redo()
 {
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
     
     int iOffset = m_iFrameIndexDest - m_iFrameIndex;
     while(iOffset > 0)
@@ -50,7 +50,7 @@ void SpriteUndoCmd_OrderFrame::redo()
 
 void SpriteUndoCmd_OrderFrame::undo()
 {
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
     
     int iOffset = m_iFrameIndex - m_iFrameIndexDest;
     while(iOffset > 0)
@@ -76,7 +76,7 @@ SpriteUndoCmd_OffsetFrame::SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTab
 {
 
     
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -98,7 +98,7 @@ SpriteUndoCmd_OffsetFrame::SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTab
 
 void SpriteUndoCmd_OffsetFrame::redo()
 {
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -114,7 +114,7 @@ void SpriteUndoCmd_OffsetFrame::redo()
 
 void SpriteUndoCmd_OffsetFrame::undo()
 {
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -134,7 +134,7 @@ SpriteUndoCmd_OffsetXFrame::SpriteUndoCmd_OffsetXFrame(SpriteTableView *pSpriteT
                                                                                                                                                                                     m_iFrameIndex(iIndex),
                                                                                                                                                                                     m_NewOffsetList(newOffsetList)
 {
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -156,7 +156,7 @@ SpriteUndoCmd_OffsetXFrame::SpriteUndoCmd_OffsetXFrame(SpriteTableView *pSpriteT
 
 void SpriteUndoCmd_OffsetXFrame::redo()
 {
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -176,7 +176,7 @@ void SpriteUndoCmd_OffsetXFrame::redo()
 
 void SpriteUndoCmd_OffsetXFrame::undo()
 {
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -196,7 +196,7 @@ SpriteUndoCmd_OffsetYFrame::SpriteUndoCmd_OffsetYFrame(SpriteTableView *pSpriteT
                                                                                                                                                                                     m_iFrameIndex(iIndex),
                                                                                                                                                                                     m_NewOffsetList(newOffsetList)
 {
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -218,7 +218,7 @@ SpriteUndoCmd_OffsetYFrame::SpriteUndoCmd_OffsetYFrame(SpriteTableView *pSpriteT
 
 void SpriteUndoCmd_OffsetYFrame::redo()
 {
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -238,7 +238,7 @@ void SpriteUndoCmd_OffsetYFrame::redo()
 
 void SpriteUndoCmd_OffsetYFrame::undo()
 {
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -260,7 +260,7 @@ SpriteUndoCmd_DurationFrame::SpriteUndoCmd_DurationFrame(SpriteTableView *pSprit
 {
     setText("Modify Frame Duration");
     
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -277,7 +277,7 @@ SpriteUndoCmd_DurationFrame::SpriteUndoCmd_DurationFrame(SpriteTableView *pSprit
 
 void SpriteUndoCmd_DurationFrame::redo()
 {
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {
@@ -293,7 +293,7 @@ void SpriteUndoCmd_DurationFrame::redo()
 
 void SpriteUndoCmd_DurationFrame::undo()
 {
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(m_pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
     if(m_iFrameIndex == -1)
     {

@@ -43,8 +43,10 @@ SpriteWidget::SpriteWidget(SpriteItem *pItemSprite, QWidget *parent) :   QWidget
     m_StateActionsList.push_back(ui->actionOrderFrameDownwards);
     
     ui->cmbStates->clear();
+
+    ui->cmbStates->setModel(pItemSprite->GetSpritesModel());
     
-    
+#if 0
     // If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
     if(m_pItemSprite->GetInitValue().type() != QJsonValue::Null)
     {
@@ -90,6 +92,7 @@ SpriteWidget::SpriteWidget(SpriteItem *pItemSprite, QWidget *parent) :   QWidget
     m_pItemSprite->GetUndoStack()->clear();
 
     UpdateActions();
+#endif
 }
 
 SpriteWidget::~SpriteWidget()
@@ -97,7 +100,7 @@ SpriteWidget::~SpriteWidget()
     delete ui;
 }
 
-SpriteItem *SpriteWidget::GetData()
+SpriteItem *SpriteWidget::GetItem()
 {
     return m_pItemSprite;
 }
@@ -182,7 +185,7 @@ void SpriteWidget::UpdateActions()
 
 void SpriteWidget::on_actionAddState_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_AddState<SpriteWidget, SpriteWidgetState>("Add Sprite State", this, m_StateActionsList, ui->cmbStates);
+    QUndoCommand *pCmd = new UndoCmd_AddState<SpriteWidget, SpriteStatesModel>("Add Sprite State", this, static_cast<SpriteStatesModel *>(ui->cmbStates->model()), ui->cmbStates);
     m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
@@ -190,7 +193,7 @@ void SpriteWidget::on_actionAddState_triggered()
 
 void SpriteWidget::on_actionRemoveState_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_RemoveState<SpriteWidget, SpriteWidgetState>("Remove Sprite State", this, ui->cmbStates);
+    QUndoCommand *pCmd = new UndoCmd_RemoveState<SpriteWidget, SpriteStatesModel>("Remove Sprite State", this, static_cast<SpriteStatesModel *>(ui->cmbStates->model()), ui->cmbStates->currentIndex(), ui->cmbStates);
     m_pItemSprite->GetUndoStack()->push(pCmd);
 
     UpdateActions();
@@ -201,20 +204,20 @@ void SpriteWidget::on_actionRenameState_triggered()
     DlgInputName *pDlg = new DlgInputName("Rename Sprite State", ui->cmbStates->currentData().value<SpriteWidgetState *>()->GetName());
     if(pDlg->exec() == QDialog::Accepted)
     {
-        QUndoCommand *pCmd = new UndoCmd_RenameState<SpriteWidgetState>("Rename Sprite State", ui->cmbStates, pDlg->GetName());
+        QUndoCommand *pCmd = new UndoCmd_RenameState<SpriteStatesModel>("Rename Sprite State", ui->cmbStates, pDlg->GetName(), ui->cmbStates);
         m_pItemSprite->GetUndoStack()->push(pCmd);
     }
 }
 
 void SpriteWidget::on_actionOrderStateBackwards_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_MoveStateBack<SpriteWidget, SpriteWidgetState>("Shift Sprite State Index <-", this, ui->cmbStates);
+    QUndoCommand *pCmd = new UndoCmd_MoveStateBack<SpriteWidget, SpriteStatesModel>("Shift Sprite State Index <-", this, ui->cmbStates);
     m_pItemSprite->GetUndoStack()->push(pCmd);
 }
 
 void SpriteWidget::on_actionOrderStateForwards_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_MoveStateForward<SpriteWidget, SpriteWidgetState>("Shift Sprite State Index ->", this, ui->cmbStates);
+    QUndoCommand *pCmd = new UndoCmd_MoveStateForward<SpriteWidget, SpriteStatesModel>("Shift Sprite State Index ->", this, ui->cmbStates);
     m_pItemSprite->GetUndoStack()->push(pCmd);
 }
 
@@ -253,7 +256,7 @@ void SpriteWidget::on_cmbStates_currentIndexChanged(int index)
 void SpriteWidget::on_actionAlignLeft_triggered()
 {
     SpriteTableView *pSpriteTableView = m_pCurSpriteState->GetFrameView();
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(pSpriteTableView->model());
 
     if(pSpriteFramesModel->rowCount() == 0)
         return;
@@ -276,7 +279,7 @@ void SpriteWidget::on_actionAlignLeft_triggered()
 void SpriteWidget::on_actionAlignRight_triggered()
 {
     SpriteTableView *pSpriteTableView = m_pCurSpriteState->GetFrameView();
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(pSpriteTableView->model());
 
     if(pSpriteFramesModel->rowCount() == 0)
         return;
@@ -299,7 +302,7 @@ void SpriteWidget::on_actionAlignRight_triggered()
 void SpriteWidget::on_actionAlignUp_triggered()
 {
     SpriteTableView *pSpriteTableView = m_pCurSpriteState->GetFrameView();
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(pSpriteTableView->model());
 
     if(pSpriteFramesModel->rowCount() == 0)
         return;
@@ -322,7 +325,7 @@ void SpriteWidget::on_actionAlignUp_triggered()
 void SpriteWidget::on_actionAlignDown_triggered()
 {
     SpriteTableView *pSpriteTableView = m_pCurSpriteState->GetFrameView();
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(pSpriteTableView->model());
 
     if(pSpriteFramesModel->rowCount() == 0)
         return;
@@ -345,7 +348,7 @@ void SpriteWidget::on_actionAlignDown_triggered()
 void SpriteWidget::on_actionAlignCenterVertical_triggered()
 {
     SpriteTableView *pSpriteTableView = m_pCurSpriteState->GetFrameView();
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(pSpriteTableView->model());
 
     if(pSpriteFramesModel->rowCount() == 0)
         return;
@@ -368,7 +371,7 @@ void SpriteWidget::on_actionAlignCenterVertical_triggered()
 void SpriteWidget::on_actionAlignCenterHorizontal_triggered()
 {
     SpriteTableView *pSpriteTableView = m_pCurSpriteState->GetFrameView();
-    SpriteTableModel *pSpriteFramesModel = static_cast<SpriteTableModel *>(pSpriteTableView->model());
+    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(pSpriteTableView->model());
 
     if(pSpriteFramesModel->rowCount() == 0)
         return;

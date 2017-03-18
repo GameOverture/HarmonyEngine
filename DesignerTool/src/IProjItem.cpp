@@ -26,10 +26,8 @@
 IProjItem::IProjItem(Project *pItemProj,
                        eItemType eType,
                        const QString sPrefix,
-                       const QString sName,
-                       QJsonValue initVal) :    ExplorerItem(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
+                       const QString sName) :   ExplorerItem(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
                                                 m_pItemProj(pItemProj),
-                                                m_InitValue(initVal),
                                                 m_pDraw(nullptr),
                                                 m_pWidget(nullptr)
 {
@@ -70,7 +68,7 @@ IProjItem::~IProjItem()
     
 }
 
-Project *IProjItem::GetItemProject()
+Project *IProjItem::GetProject()
 {
     return m_pItemProj;
 }
@@ -87,7 +85,7 @@ void IProjItem::GiveMenuActions(QMenu *pMenu)
 void IProjItem::Save()
 {
     // TODO: Save must work with item not opened/loaded
-    GetItemProject()->SaveGameData(m_eTYPE, GetName(true), OnSave());
+    GetProject()->SaveGameData(m_eTYPE, GetName(true), OnSave());
     m_pUndoStack->setClean();
 }
 
@@ -107,8 +105,6 @@ void IProjItem::ProjLoad(IHyApplication &hyApp)
     {
     case ITEM_Sprite:
         m_pWidget = new SpriteWidget(static_cast<SpriteItem *>(this));
-        static_cast<SpriteWidget *>(m_pWidget)->Load();
-
         m_pDraw = new SpriteDraw(static_cast<SpriteItem *>(this));
         break;
     case ITEM_Font:

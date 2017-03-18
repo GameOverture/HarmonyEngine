@@ -34,7 +34,6 @@ class IProjItem : public ExplorerItem
 
 protected:
     Project *           m_pItemProj;
-    QJsonValue          m_InitValue;
 
     IDraw *             m_pDraw;
     QWidget *           m_pWidget;
@@ -53,12 +52,10 @@ protected:
     virtual QJsonValue OnSave() = 0;
 
 public:
-    IProjItem(Project *pItemProj, eItemType eType, const QString sPrefix, const QString sName, QJsonValue initVal);
+    IProjItem(Project *pItemProj, eItemType eType, const QString sPrefix, const QString sName);
     virtual ~IProjItem();
     
-    Project *GetItemProject();
-
-    QJsonValue GetInitValue()                       { return m_InitValue; }
+    Project *GetProject();
 
     QWidget *GetWidget() const                      { return m_pWidget; }
     QUndoStack *GetUndoStack()                      { return m_pUndoStack; }

@@ -19,7 +19,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-SpriteWidgetState::SpriteWidgetState(SpriteWidget *pOwner, SpriteTableModel *pTableModel, QList<QAction *> stateActionList, QWidget *parent) :  QWidget(parent),
+SpriteWidgetState::SpriteWidgetState(SpriteWidget *pOwner, SpriteFramesModel *pTableModel, QList<QAction *> stateActionList, QWidget *parent) :  QWidget(parent),
                                                                                                                                                 m_pOwner(pOwner),
                                                                                                                                                 m_pSpriteFramesModel(pTableModel),
                                                                                                                                                 ui(new Ui::SpriteWidgetState),
@@ -79,20 +79,20 @@ void SpriteWidgetState::RemoveFrame(AtlasFrame *pFrame)
     m_pSpriteFramesModel->Remove(pFrame);
 }
 
-QCheckBox *SpriteWidgetState::GetChkBox_Reverse()
-{
-    return ui->chkReverse;
-}
+//QCheckBox *SpriteWidgetState::GetChkBox_Reverse()
+//{
+//    return ui->chkReverse;
+//}
 
-QCheckBox *SpriteWidgetState::GetChkBox_Looping()
-{
-    return ui->chkLoop;
-}
+//QCheckBox *SpriteWidgetState::GetChkBox_Looping()
+//{
+//    return ui->chkLoop;
+//}
 
-QCheckBox *SpriteWidgetState::GetChkBox_Bounce()
-{
-    return ui->chkBounce;
-}
+//QCheckBox *SpriteWidgetState::GetChkBox_Bounce()
+//{
+//    return ui->chkBounce;
+//}
 
 SpriteTableView *SpriteWidgetState::GetFrameView()
 {

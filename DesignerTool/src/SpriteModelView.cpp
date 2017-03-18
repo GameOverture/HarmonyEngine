@@ -27,10 +27,10 @@ SpriteTableView::SpriteTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
     int iWidth = pResizeEvent->size().width();
 
     iWidth -= 64 + 64 + 64;
-    setColumnWidth(SpriteTableModel::COLUMN_Frame, iWidth);
-    setColumnWidth(SpriteTableModel::COLUMN_OffsetX, 64);
-    setColumnWidth(SpriteTableModel::COLUMN_OffsetY, 64);
-    setColumnWidth(SpriteTableModel::COLUMN_Duration, 64);
+    setColumnWidth(SpriteFramesModel::COLUMN_Frame, iWidth);
+    setColumnWidth(SpriteFramesModel::COLUMN_OffsetX, 64);
+    setColumnWidth(SpriteFramesModel::COLUMN_OffsetY, 64);
+    setColumnWidth(SpriteFramesModel::COLUMN_Duration, 64);
 
     QTableView::resizeEvent(pResizeEvent);
 }
@@ -49,19 +49,19 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(SpriteItem *pItemSprite, SpriteTableV
 
     switch(index.column())
     {
-    case SpriteTableModel::COLUMN_OffsetX:
+    case SpriteFramesModel::COLUMN_OffsetX:
         pReturnWidget = new QSpinBox(pParent);
         static_cast<QSpinBox *>(pReturnWidget)->setPrefix("X:");
         static_cast<QSpinBox *>(pReturnWidget)->setRange(-4096, 4096);
         break;
         
-    case SpriteTableModel::COLUMN_OffsetY:
+    case SpriteFramesModel::COLUMN_OffsetY:
         pReturnWidget = new QSpinBox(pParent);
         static_cast<QSpinBox *>(pReturnWidget)->setPrefix("Y:");
         static_cast<QSpinBox *>(pReturnWidget)->setRange(-4096, 4096);
         break;
 
-    case SpriteTableModel::COLUMN_Duration:
+    case SpriteFramesModel::COLUMN_Duration:
         pReturnWidget = new QDoubleSpinBox(pParent);
         static_cast<QDoubleSpinBox *>(pReturnWidget)->setSingleStep(0.001);
         static_cast<QDoubleSpinBox *>(pReturnWidget)->setDecimals(3);
@@ -78,15 +78,15 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(SpriteItem *pItemSprite, SpriteTableV
 
     switch(index.column())
     {
-    case SpriteTableModel::COLUMN_OffsetX:
+    case SpriteFramesModel::COLUMN_OffsetX:
         static_cast<QSpinBox *>(pEditor)->setValue(sCurValue.toInt());
         break;
         
-    case SpriteTableModel::COLUMN_OffsetY:
+    case SpriteFramesModel::COLUMN_OffsetY:
         static_cast<QSpinBox *>(pEditor)->setValue(sCurValue.toInt());
         break;
 
-    case SpriteTableModel::COLUMN_Duration:
+    case SpriteFramesModel::COLUMN_Duration:
         static_cast<QDoubleSpinBox *>(pEditor)->setValue(sCurValue.toDouble());
         break;
     }
@@ -96,9 +96,9 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(SpriteItem *pItemSprite, SpriteTableV
 {
     switch(index.column())
     {
-    case SpriteTableModel::COLUMN_OffsetX:
+    case SpriteFramesModel::COLUMN_OffsetX:
     {
-        SpriteTableModel *pSpriteModel = static_cast<SpriteTableModel *>(pModel);
+        SpriteFramesModel *pSpriteModel = static_cast<SpriteFramesModel *>(pModel);
         QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
         vOffset.setX(static_cast<QSpinBox *>(pEditor)->value());
 
@@ -106,9 +106,9 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(SpriteItem *pItemSprite, SpriteTableV
         break;
     }
 
-    case SpriteTableModel::COLUMN_OffsetY:
+    case SpriteFramesModel::COLUMN_OffsetY:
     {
-        SpriteTableModel *pSpriteModel = static_cast<SpriteTableModel *>(pModel);
+        SpriteFramesModel *pSpriteModel = static_cast<SpriteFramesModel *>(pModel);
         QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
         vOffset.setY(static_cast<QSpinBox *>(pEditor)->value());
 
@@ -117,7 +117,7 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(SpriteItem *pItemSprite, SpriteTableV
     }
     
 
-    case SpriteTableModel::COLUMN_Duration:
+    case SpriteFramesModel::COLUMN_Duration:
         m_pItemSprite->GetUndoStack()->push(new SpriteUndoCmd_DurationFrame(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value()));
         break;
     }

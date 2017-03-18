@@ -21,7 +21,7 @@
 
 #include "Harmony/HyEngine.h"
 
-FontItem::FontItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) :  IProjItem(pItemProj, ITEM_Font, sPrefix, sName, initVal)
+FontItem::FontItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) :  IProjItem(pItemProj, ITEM_Font, sPrefix, sName)
 {
 }
 
