@@ -369,11 +369,11 @@ void AtlasesWidget::on_actionDeleteImages_triggered()
     for(int i = 0; i < selectedImageList.count(); ++i)
     {
         AtlasFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
-        QSet<IProjItem *> sLinks = pFrame->GetLinks();
+        QSet<ProjectItem *> sLinks = pFrame->GetLinks();
         if(sLinks.empty() == false)
         {
             QString sMessage = "'" % pFrame->GetName() % "' image cannot be deleted because it is in use by the following items: \n\n";
-            for(QSet<IProjItem *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+            for(QSet<ProjectItem *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
                 sMessage.append(HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem((*LinksIter)->GetType())) % "/" % (*LinksIter)->GetName(true) % "\n");
 
             HyGuiLog(sMessage, LOGTYPE_Warning);
@@ -447,8 +447,8 @@ void AtlasesWidget::on_actionReplaceImages_triggered()
 
     for(int i = 0; i < selectedFrameList.count(); ++i)
     {
-        QSet<IProjItem *> sLinks = selectedFrameList[i]->GetLinks();
-        for(QSet<IProjItem *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+        QSet<ProjectItem *> sLinks = selectedFrameList[i]->GetLinks();
+        for(QSet<ProjectItem *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
             (*LinksIter)->Relink(selectedFrameList[i]);
     }
 }

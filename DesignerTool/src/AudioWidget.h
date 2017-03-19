@@ -23,16 +23,16 @@ class AudioWidget : public QWidget
 {
     Q_OBJECT
     
-    AudioItem *             m_pItemAudio;
+    ProjectItem &           m_ItemRef;
     AudioWidgetState *      m_pCurAudioState;
 
     QList<QAction *>        m_StateActionsList;
     
 public:
-    explicit AudioWidget(AudioItem *pOwner, QWidget *parent = 0);
+    explicit AudioWidget(ProjectItem &itemRef, QWidget *parent = 0);
     ~AudioWidget();
     
-    AudioItem *GetData();
+    ProjectItem &GetItem();
     
     QComboBox *GetCmbStates();
     

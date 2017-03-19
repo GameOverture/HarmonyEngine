@@ -1,5 +1,5 @@
 /**************************************************************************
- *	ItemWidget.h
+ *	ProjectItem.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef IPROJDATA_H
-#define IPROJDATA_H
+#ifndef PROJECTITEM_H
+#define PROJECTITEM_H
 
 #include "ExplorerItem.h"
 #include "Harmony/HyEngine.h"
@@ -22,50 +22,42 @@ class AudioWidgetManager;
 class Project;
 class AtlasFrame;
 
-class IProjItem : public ExplorerItem
+class ProjectItem : public ExplorerItem
 {
     Q_OBJECT
 
-    friend class MainWindow;
-    friend class AtlasesWidget;
-    friend class WidgetAtlasGroup;
     friend class Project;
-    friend class AtlasesData;
 
-protected:
-    Project *           m_pItemProj;
+    Project &               m_ProjectRef;
 
-    IDraw *             m_pDraw;
-    QWidget *           m_pWidget;
+    // Loaded in constructor
+    QAbstractItemModel *    m_pModel;
+    QUndoStack *            m_pUndoStack;
+    QAction *               m_pActionUndo;
+    QAction *               m_pActionRedo;
 
-    QUndoStack *        m_pUndoStack;
-    QAction *           m_pActionUndo;
-    QAction *           m_pActionRedo;
-
-    QSet<AtlasFrame *>  m_Links;
-
-    virtual void OnGiveMenuActions(QMenu *pMenu) = 0;
-
-    virtual void OnLink(AtlasFrame *pFrame) = 0;
-    virtual void OnUnlink(AtlasFrame *pFrame) = 0;
+    // Loaded when item is opened
+    QWidget *               m_pWidget;
     
-    virtual QJsonValue OnSave() = 0;
 
 public:
-    IProjItem(Project *pItemProj, eItemType eType, const QString sPrefix, const QString sName);
-    virtual ~IProjItem();
+    ProjectItem(Project &projRef, eItemType eType, const QString sPrefix, const QString sName, QJsonValue initValue);
+    virtual ~ProjectItem();
     
-    Project *GetProject();
+    Project &GetProject();
 
+    QAbstractItemModel *GetModel()                  { return m_pModel; }
     QWidget *GetWidget() const                      { return m_pWidget; }
     QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
-
     
     void GiveMenuActions(QMenu *pMenu);
     void Save();
     bool IsSaveClean();
     void DiscardChanges();
 
+    void RefreshWidget(QVariant param);
+
+    void Relink(AtlasFrame *pFrame);
 private:
     void ProjLoad(IHyApplication &hyApp);
     void ProjUnload(IHyApplication &hyApp);
@@ -73,14 +65,11 @@ private:
     void ProjHide(IHyApplication &hyApp);
     void ProjUpdate(IHyApplication &hyApp);
 
-    void Link(AtlasFrame *pFrame);
-    void Relink(AtlasFrame *pFrame);
-    void Unlink(AtlasFrame *pFrame);
 
 private Q_SLOTS:
     void on_undoStack_cleanChanged(bool bClean);
     
 };
-Q_DECLARE_METATYPE(IProjItem *)
+Q_DECLARE_METATYPE(ProjectItem *)
 
-#endif // IPROJDATA_H
+#endif // PROJECTITEM_H

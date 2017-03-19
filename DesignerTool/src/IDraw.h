@@ -17,23 +17,18 @@ class AtlasFrame;
 class IDraw : public HyEntity2d
 {
 protected:
+    IHyApplication &    m_HyAppRef;
     HyCamera2d *        m_pCamera;
-    bool                m_bReloadDraw;
 
 public:
-    IDraw();
+    IDraw(IHyApplication &hyApp);
+    virtual ~IDraw();
 
-    void ProjLoad(IHyApplication &hyApp);
-    void ProjUnload(IHyApplication &hyApp);
-    void ProjShow(IHyApplication &hyApp);
-    void ProjHide(IHyApplication &hyApp);
-    void ProjUpdate(IHyApplication &hyApp);
-
-    virtual void Relink(AtlasFrame *pFrame) { }
+    void ProjShow();
+    void ProjHide();
+    void ProjUpdate();
 
 protected:
-    virtual void OnPreLoad(IHyApplication &hyApp) = 0;
-    virtual void OnPostUnload(IHyApplication &hyApp) = 0;
     virtual void OnProjShow(IHyApplication &hyApp) = 0;
     virtual void OnProjHide(IHyApplication &hyApp) = 0;
     virtual void OnProjUpdate(IHyApplication &hyApp) = 0;

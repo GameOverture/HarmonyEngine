@@ -37,11 +37,11 @@ class FontDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
-    FontItem *              m_pItemFont;
+    ProjectItem *           m_pItem;
     QComboBox *             m_pCmbStates;
 
 public:
-    FontDelegate(FontItem *pItemFont, QComboBox *pCmbStates, QObject *pParent = 0);
+    FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *pParent = 0);
 
     virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const override;

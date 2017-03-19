@@ -67,7 +67,7 @@ class FontWidget : public QWidget
 {
     Q_OBJECT
 
-    FontItem *                  m_pItemFont;
+    ProjectItem &               m_ItemRef;
     
     QString                     m_sAvailableTypefaceGlyphs;
     QRegExpValidator            m_PreviewValidator;
@@ -90,12 +90,12 @@ class FontWidget : public QWidget
     QSize                       m_PrevAtlasSize;
     
 public:
-    explicit FontWidget(FontItem *pOwner, QWidget *parent = 0);
+    explicit FontWidget(ProjectItem &itemRef, QWidget *parent = 0);
     ~FontWidget();
 
     void OnGiveMenuActions(QMenu *pMenu);
     
-    FontItem *GetItemFont();
+    ProjectItem &GetItem();
 
     QString GetFullItemName();
 

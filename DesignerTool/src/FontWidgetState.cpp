@@ -38,7 +38,7 @@ FontWidgetState::FontWidgetState(FontWidget *pOwner, QList<QAction *> stateActio
 
     ui->stagesView->setModel(m_pFontModel);
     ui->stagesView->resize(ui->stagesView->size());
-    ui->stagesView->setItemDelegate(new FontDelegate(m_pOwner->GetItemFont(), m_pOwner->GetCmbStates(), this));
+    ui->stagesView->setItemDelegate(new FontDelegate(&m_pOwner->GetItem(), m_pOwner->GetCmbStates(), this));
     QItemSelectionModel *pSelModel = ui->stagesView->selectionModel();
     connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
     
@@ -185,8 +185,8 @@ void FontWidgetState::UpdateActions()
 
 void FontWidgetState::on_cmbFontList_currentIndexChanged(int index)
 {
-    QUndoCommand *pCmd = new UndoCmd_ComboBox<FontWidgetState>("Font Selection", this, ui->cmbFontList, m_iPrevFontCmbIndex, index);
-    m_pOwner->GetItemFont()->GetUndoStack()->push(pCmd);
+//    QUndoCommand *pCmd = new UndoCmd_ComboBox<FontWidgetState>("Font Selection", this, ui->cmbFontList, m_iPrevFontCmbIndex, index);
+//    m_pOwner->GetItem().GetUndoStack()->push(pCmd);
 }
 
 void FontWidgetState::on_cmbRenderMode_currentIndexChanged(int index)
@@ -216,7 +216,7 @@ void FontWidgetState::on_sbSize_editingFinished()
         return;
     
     QUndoCommand *pCmd = new UndoCmd_DoubleSpinBox<FontWidgetState>("Font Size", this, ui->sbSize, m_dPrevFontSize, ui->sbSize->value());
-    m_pOwner->GetItemFont()->GetUndoStack()->push(pCmd);
+    m_pOwner->GetItem().GetUndoStack()->push(pCmd);
 }
 
 void FontWidgetState::on_layersView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)

@@ -50,14 +50,14 @@ public:
     AtlasFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors);
     void RemoveFrame(AtlasFrame *pFrame);
 
-    AtlasFrame *GenerateFrame(IProjItem *pItem, QString sName, QImage &newImage, eAtlasNodeType eType);
+    AtlasFrame *GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, eAtlasNodeType eType);
     void ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
 
-    QList<AtlasFrame *> RequestFrames(IProjItem *pItem);
-    QList<AtlasFrame *> RequestFrames(IProjItem *pItem, QList<AtlasFrame *> requestList);
-    QList<AtlasFrame *> RequestFrames(IProjItem *pItem, QList<quint32> requestList);
+    QList<AtlasFrame *> RequestFrames(ProjectItem *pItem);
+    QList<AtlasFrame *> RequestFrames(ProjectItem *pItem, QList<AtlasFrame *> requestList);
+    QList<AtlasFrame *> RequestFrames(ProjectItem *pItem, QList<quint32> requestList);
 
-    void RelinquishFrames(IProjItem *pItem, QList<AtlasFrame *> relinquishList);
+    void RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinquishList);
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     QSet<AtlasFrame *> ImportImages(QStringList sImportImgList);
@@ -65,8 +65,8 @@ public:
 
     void SaveData();
 
-    void SetDependency(AtlasFrame *pFrame, IProjItem *pItem);
-    void RemoveDependency(AtlasFrame *pFrame, IProjItem *pItem);
+    //void SetDependency(AtlasFrame *pFrame, IProjItem *pItem);
+    //void RemoveDependency(AtlasFrame *pFrame, IProjItem *pItem);
 
     void GetAtlasInfoForGameData(QJsonObject &atlasObjOut);
 

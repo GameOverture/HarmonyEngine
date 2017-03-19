@@ -12,9 +12,6 @@
 #include "AtlasesWidget.h"
 #include "AudioWidgetManager.h"
 #include "MainWindow.h"
-#include "AudioItem.h"
-#include "SpriteItem.h"
-#include "FontItem.h"
 #include "HyGuiGlobal.h"
 
 #include "Harmony/HyEngine.h"
@@ -241,6 +238,10 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    m_pAtlasesData = new AtlasesData(this);
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     // Initialize the project by processing each type of sub dir
     QList<eItemType> subDirList = HyGlobal::SubDirList();
     for(int i = 0; i < subDirList.size(); ++i)
@@ -312,13 +313,13 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
                     switch(subDirList[i])
                     {
                     case ITEM_DirAudio:
-                        pNewDataItem = new AudioItem(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new ProjectItem(*this, ITEM_Audio, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirFonts:
-                        pNewDataItem = new FontItem(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new ProjectItem(*this, ITEM_Font, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirSprites:
-                        pNewDataItem = new SpriteItem(this, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value().toArray());
+                        pNewDataItem = new ProjectItem(*this, ITEM_Sprite, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
                         break;
                     case ITEM_DirParticles:
                     case ITEM_DirSpine:
@@ -383,8 +384,6 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     //        this, SLOT(OnTabBarCurrentChanged(int)));
     //connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)),
     //        this, SLOT(on_tabBar_closeRequested(int)));
-
-    m_pAtlasesData = new AtlasesData(this);
     m_pAtlasMan = new AtlasesWidget(*m_pAtlasesData, nullptr);
     
     m_pAudioMan = new AudioWidgetManager(this, nullptr);
@@ -544,7 +543,7 @@ void Project::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
     m_ActionSaveAll.setEnabled(bSaveAllEnabled);
 }
 
-void Project::OpenItem(IProjItem *pItem)
+void Project::OpenItem(ProjectItem *pItem)
 {
     if(m_pCurOpenItem && m_pCurOpenItem != pItem)
         m_pCurOpenItem->ProjHide(*this);
@@ -558,7 +557,7 @@ void Project::OpenItem(IProjItem *pItem)
     // Search for existing tab
     for(int i = 0; i < m_pTabBar->count(); ++i)
     {
-        if(m_pTabBar->tabData(i).value<IProjItem *>() == m_pCurOpenItem)
+        if(m_pTabBar->tabData(i).value<ProjectItem *>() == m_pCurOpenItem)
         {
             bAlreadyLoaded = true;
 
@@ -615,7 +614,7 @@ void Project::OpenItem(IProjItem *pItem)
     if(m_pTabBar->count() > 0)
     {
         m_pCamera->SetEnabled(false);
-        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<IProjItem *>()->ProjUpdate(*this);
+        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->ProjUpdate(*this);
     }
     else
         m_pCamera->SetEnabled(true);
@@ -732,7 +731,7 @@ bool Project::CloseAllTabs()
 {
     for(int i = 0; i < m_pTabBar->count(); ++i)
     {
-        IProjItem *pItem = m_pTabBar->tabData(i).value<IProjItem *>();
+        ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();
         if(false == MainWindow::CloseItem(pItem))
             return false;
     }
@@ -747,7 +746,7 @@ void Project::OnTabBarCurrentChanged(int iIndex)
 
     int iCurIndex = m_pTabBar->currentIndex();
     QVariant v = m_pTabBar->tabData(iCurIndex);
-    IProjItem *pItem = v.value<IProjItem *>();
+    ProjectItem *pItem = v.value<ProjectItem *>();
 
     MainWindow::OpenItem(pItem);
 }
@@ -756,7 +755,7 @@ void Project::on_save_triggered()
 {
     int iIndex = m_pTabBar->currentIndex();
     QVariant v = m_pTabBar->tabData(iIndex);
-    IProjItem *pItem = v.value<IProjItem *>();
+    ProjectItem *pItem = v.value<ProjectItem *>();
     pItem->Save();
     
     HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
@@ -769,7 +768,7 @@ void Project::on_saveAll_triggered()
         // TODO: instead look for dirty?
         if(m_pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
         {
-            IProjItem *pItem = m_pTabBar->tabData(i).value<IProjItem *>();
+            ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();
             pItem->Save();
             
             HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
@@ -779,7 +778,7 @@ void Project::on_saveAll_triggered()
 
 void Project::on_tabBar_closeRequested(int iIndex)
 {
-    IProjItem *pItem = m_pTabBar->tabData(iIndex).value<IProjItem *>();
+    ProjectItem *pItem = m_pTabBar->tabData(iIndex).value<ProjectItem *>();
     pItem->ProjUnload(*this);
 
     if(pItem == m_pCurOpenItem)

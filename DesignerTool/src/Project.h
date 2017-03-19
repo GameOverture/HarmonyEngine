@@ -10,7 +10,7 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
-#include "IProjItem.h"
+#include "ProjectItem.h"
 #include "AtlasesData.h"
 #include "ExplorerItem.h"
 
@@ -46,7 +46,7 @@ class Project : public ExplorerItem, public IHyApplication
     AudioWidgetManager *                            m_pAudioMan;
     QTabBar *                                       m_pTabBar;
 
-    IProjItem *                                     m_pCurOpenItem;
+    ProjectItem *                                     m_pCurOpenItem;
     
     QString                                         m_sGameName;
 
@@ -92,7 +92,7 @@ public:
     QList<QAction *> GetSaveActions();
     void SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled);
 
-    void OpenItem(IProjItem *pItem);
+    void OpenItem(ProjectItem *pItem);
 
     // IHyApplication overrides
     virtual bool Initialize();

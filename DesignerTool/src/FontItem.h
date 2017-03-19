@@ -10,24 +10,24 @@
 #ifndef FONTITEM_H
 #define FONTITEM_H
 
-#include "IProjItem.h"
+#include "ProjectItem.h"
 #include "freetype-gl/freetype-gl.h"
 
-class FontItem : public IProjItem
-{
-    Q_OBJECT
+//class FontItem : public ProjectItem
+//{
+//    Q_OBJECT
 
-public:
-    FontItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
-    virtual ~FontItem();
+//public:
+//    FontItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
+//    virtual ~FontItem();
     
-protected:
-    virtual void OnGiveMenuActions(QMenu *pMenu) override;
+//protected:
+//    virtual void OnGiveMenuActions(QMenu *pMenu) override;
 
-    virtual void OnLink(AtlasFrame *pFrame) override;
-    virtual void OnUnlink(AtlasFrame *pFrame) override;
+////    virtual void OnLink(AtlasFrame *pFrame) override;
+////    virtual void OnUnlink(AtlasFrame *pFrame) override;
     
-    virtual QJsonValue OnSave() override;
-};
+//    virtual QJsonValue OnSave() override;
+//};
 
 #endif // FONTITEM_H

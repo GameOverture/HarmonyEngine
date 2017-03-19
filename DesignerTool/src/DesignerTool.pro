@@ -40,7 +40,6 @@ SOURCES += main.cpp \
     SpriteWidget.cpp \
     FontWidget.cpp \
     FontWidgetState.cpp \
-    SpriteWidgetState.cpp \
     AudioWidget.cpp \
     AudioWidgetBank.cpp \
     AudioWidgetManager.cpp \
@@ -60,11 +59,11 @@ SOURCES += main.cpp \
     ExplorerWidget.cpp \
     FontDraw.cpp \
     AudioDraw.cpp \
-    IProjItem.cpp \
-    SpriteItem.cpp \
     AudioItem.cpp \
     FontItem.cpp \
-    SpriteModels.cpp
+    SpriteModels.cpp \
+    ProjectItem.cpp \
+    ProjectModel.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -90,7 +89,6 @@ HEADERS  += \
     SpriteWidget.h \
     FontWidget.h \
     FontWidgetState.h \
-    SpriteWidgetState.h \
     AudioWidget.h \
     UndoCmds.h \
     SpriteUndoCmds.h \
@@ -111,11 +109,11 @@ HEADERS  += \
     ExplorerWidget.h \
     FontDraw.h \
     AudioDraw.h \
-    IProjItem.h \
-    SpriteItem.h \
     AudioItem.h \
     FontItem.h \
-    SpriteModels.h
+    SpriteModels.h \
+    ProjectItem.h \
+    ProjectModel.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -134,7 +132,6 @@ FORMS    += \
     SpriteWidget.ui \
     FontWidget.ui \
     FontWidgetState.ui \
-    SpriteWidgetState.ui \
     AudioWidget.ui \
     AudioWidgetBank.ui \
     AudioWidgetManager.ui \

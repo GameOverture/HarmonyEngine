@@ -11,28 +11,28 @@
 #include "AudioWidget.h"
 
 
-AudioItem::AudioItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) : IProjItem(pItemProj, ITEM_Audio, sPrefix, sName)
-{
-}
+//AudioItem::AudioItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) : ProjectItem(pItemProj, ITEM_Audio, sPrefix, sName)
+//{
+//}
 
-/*virtual*/ AudioItem::~AudioItem()
-{
-}
+///*virtual*/ AudioItem::~AudioItem()
+//{
+//}
 
-/*virtual*/ void AudioItem::OnGiveMenuActions(QMenu *pMenu)
-{
-}
+///*virtual*/ void AudioItem::OnGiveMenuActions(QMenu *pMenu)
+//{
+//}
 
-/*virtual*/ void AudioItem::OnLink(AtlasFrame *pFrame)
-{
-}
+/////*virtual*/ void AudioItem::OnLink(AtlasFrame *pFrame)
+////{
+////}
 
-/*virtual*/ void AudioItem::OnUnlink(AtlasFrame *pFrame)
-{
-}
+/////*virtual*/ void AudioItem::OnUnlink(AtlasFrame *pFrame)
+////{
+////}
 
-/*virtual*/ QJsonValue AudioItem::OnSave()
-{
-    return QJsonObject();
-}
+///*virtual*/ QJsonValue AudioItem::OnSave()
+//{
+//    return QJsonObject();
+//}
 

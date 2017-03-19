@@ -8,9 +8,8 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "SpriteModelView.h"
-
+#include "SpriteModels.h"
 #include "HyGuiGlobal.h"
-#include "SpriteItem.h"
 #include "SpriteUndoCmds.h"
 
 #include <QLineEdit>
@@ -37,9 +36,9 @@ SpriteTableView::SpriteTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetSpriteDelegate::WidgetSpriteDelegate(SpriteItem *pItemSprite, SpriteTableView *pTableView, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
-                                                                                                                                    m_pItemSprite(pItemSprite),
-                                                                                                                                    m_pTableView(pTableView)
+WidgetSpriteDelegate::WidgetSpriteDelegate(ProjectItem *pItem, SpriteTableView *pTableView, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
+                                                                                                                         m_pItem(pItem),
+                                                                                                                         m_pTableView(pTableView)
 {
 }
 
@@ -102,7 +101,7 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(SpriteItem *pItemSprite, SpriteTableV
         QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
         vOffset.setX(static_cast<QSpinBox *>(pEditor)->value());
 
-        m_pItemSprite->GetUndoStack()->push(new SpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
+        m_pItem->GetUndoStack()->push(new SpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
         break;
     }
 
@@ -112,13 +111,13 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(SpriteItem *pItemSprite, SpriteTableV
         QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
         vOffset.setY(static_cast<QSpinBox *>(pEditor)->value());
 
-        m_pItemSprite->GetUndoStack()->push(new SpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
+        m_pItem->GetUndoStack()->push(new SpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
         break;
     }
     
 
     case SpriteFramesModel::COLUMN_Duration:
-        m_pItemSprite->GetUndoStack()->push(new SpriteUndoCmd_DurationFrame(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value()));
+        m_pItem->GetUndoStack()->push(new SpriteUndoCmd_DurationFrame(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value()));
         break;
     }
 }

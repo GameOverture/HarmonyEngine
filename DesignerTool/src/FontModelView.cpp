@@ -36,9 +36,9 @@ FontTableView::FontTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontDelegate::FontDelegate(FontItem *pItemFont, QComboBox *pCmbStates, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
-                                                                                                                m_pItemFont(pItemFont),
-                                                                                                                m_pCmbStates(pCmbStates)
+FontDelegate::FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *pParent /*= 0*/) :   QStyledItemDelegate(pParent),
+                                                                                                    m_pItem(pItem),
+                                                                                                    m_pCmbStates(pCmbStates)
 {
 }
 
@@ -79,13 +79,13 @@ FontDelegate::FontDelegate(FontItem *pItemFont, QComboBox *pCmbStates, QObject *
                 topColor = pDlg->GetVgTopColor();
                 botColor = pDlg->GetVgBotColor();
             }
-            m_pItemFont->GetUndoStack()->push(new FontUndoCmd_LayerColors(*static_cast<FontWidget *>(m_pItemFont->GetWidget()),
-                                                                                m_pCmbStates,
-                                                                                pFontModel->GetLayerId(index.row()),
-                                                                                pFontModel->GetLayerTopColor(index.row()),
-                                                                                pFontModel->GetLayerBotColor(index.row()),
-                                                                                topColor,
-                                                                                botColor));
+            m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerColors(*static_cast<FontWidget *>(m_pItem->GetWidget()),
+                                                                      m_pCmbStates,
+                                                                      pFontModel->GetLayerId(index.row()),
+                                                                      pFontModel->GetLayerTopColor(index.row()),
+                                                                      pFontModel->GetLayerBotColor(index.row()),
+                                                                      topColor,
+                                                                      botColor));
         }
         break;
     }
@@ -119,19 +119,19 @@ FontDelegate::FontDelegate(FontItem *pItemFont, QComboBox *pCmbStates, QObject *
     switch(index.column())
     {
     case FontTableModel::COLUMN_Type:
-        m_pItemFont->GetUndoStack()->push(new FontUndoCmd_LayerRenderMode(*static_cast<FontWidget *>(m_pItemFont->GetWidget()),
-                                                                                m_pCmbStates,
-                                                                                pFontModel->GetLayerId(index.row()),
-                                                                                pFontModel->GetLayerRenderMode(index.row()),
-                                                                                static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
+        m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerRenderMode(*static_cast<FontWidget *>(m_pItem->GetWidget()),
+                                                                      m_pCmbStates,
+                                                                      pFontModel->GetLayerId(index.row()),
+                                                                      pFontModel->GetLayerRenderMode(index.row()),
+                                                                      static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
         break;
 
     case FontTableModel::COLUMN_Thickness:
-        m_pItemFont->GetUndoStack()->push(new FontUndoCmd_LayerOutlineThickness(*static_cast<FontWidget *>(m_pItemFont->GetWidget()),
-                                                                                      m_pCmbStates,
-                                                                                      pFontModel->GetLayerId(index.row()),
-                                                                                      pFontModel->GetLayerOutlineThickness(index.row()),
-                                                                                      static_cast<QDoubleSpinBox *>(pEditor)->value()));
+        m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerOutlineThickness(*static_cast<FontWidget *>(m_pItem->GetWidget()),
+                                                                            m_pCmbStates,
+                                                                            pFontModel->GetLayerId(index.row()),
+                                                                            pFontModel->GetLayerOutlineThickness(index.row()),
+                                                                            static_cast<QDoubleSpinBox *>(pEditor)->value()));
         break;
 
     case FontTableModel::COLUMN_DefaultColor:

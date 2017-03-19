@@ -21,38 +21,38 @@
 
 #include "Harmony/HyEngine.h"
 
-FontItem::FontItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) :  IProjItem(pItemProj, ITEM_Font, sPrefix, sName)
-{
-}
+//FontItem::FontItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal) :  ProjectItem(pItemProj, ITEM_Font, sPrefix, sName)
+//{
+//}
 
-/*virtual*/ FontItem::~FontItem()
-{
-    delete m_pWidget;
-}
+///*virtual*/ FontItem::~FontItem()
+//{
+//    delete m_pWidget;
+//}
 
-/*virtual*/ void FontItem::OnGiveMenuActions(QMenu *pMenu)
-{
-    static_cast<FontWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
-}
+///*virtual*/ void FontItem::OnGiveMenuActions(QMenu *pMenu)
+//{
+//    static_cast<FontWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
+//}
 
-/*virtual*/ void FontItem::OnLink(AtlasFrame *pFrame)
-{
-}
+/////*virtual*/ void FontItem::OnLink(AtlasFrame *pFrame)
+////{
+////}
 
 
-/*virtual*/ void FontItem::OnUnlink(AtlasFrame *pFrame)
-{
-}
+/////*virtual*/ void FontItem::OnUnlink(AtlasFrame *pFrame)
+////{
+////}
 
-/*virtual*/ QJsonValue FontItem::OnSave()
-{ 
-    FontWidget *pWidget = static_cast<FontWidget *>(m_pWidget);
-    pWidget->SaveFontFilesToMetaDir();
+///*virtual*/ QJsonValue FontItem::OnSave()
+//{
+//    FontWidget *pWidget = static_cast<FontWidget *>(m_pWidget);
+//    pWidget->SaveFontFilesToMetaDir();
     
-    pWidget->GeneratePreview(true);
+//    pWidget->GeneratePreview(true);
     
-    QJsonObject fontObj;
-    pWidget->GetSaveInfo(fontObj);
+//    QJsonObject fontObj;
+//    pWidget->GetSaveInfo(fontObj);
 
-    return fontObj;
-}
+//    return fontObj;
+//}

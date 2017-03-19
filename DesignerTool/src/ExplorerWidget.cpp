@@ -12,7 +12,6 @@
 
 #include "MainWindow.h"
 #include "AudioItem.h"
-#include "SpriteItem.h"
 #include "FontItem.h"
 #include "Project.h"
 #include "AtlasesWidget.h"
@@ -76,33 +75,13 @@ void ExplorerWidget::AddItem(eItemType eNewItemType, const QString sPrefix, cons
         return;
     }
     
-    ExplorerItem *pItem;
-    switch(eNewItemType)
+    if(eNewItemType == ITEM_Project)
     {
-    case ITEM_Project:
         HyGuiLog("Do not use WidgetExplorer::AddItem for projects... use AddProjectItem instead", LOGTYPE_Error);
         return;
-    case ITEM_DirAudio:
-    case ITEM_DirFonts:
-    case ITEM_DirShaders:
-    case ITEM_DirSpine:
-    case ITEM_DirSprites:
-    case ITEM_Prefix:
-        HyGuiLog("Do not use WidgetExplorer::AddItem for Sub dirs or prefixes", LOGTYPE_Error);
-        return;
-    case ITEM_Audio:
-        pItem = new AudioItem(pCurProj, sPrefix, sName, QJsonValue());
-        break;
-    case ITEM_Sprite:
-        pItem = new SpriteItem(pCurProj, sPrefix, sName, QJsonArray());
-        break;
-    case ITEM_Font:
-        pItem = new FontItem(pCurProj, sPrefix, sName, QJsonValue());
-        break;
-    default:
-        HyGuiLog("Item: " % sPrefix % "/" % sName % " is not handled in WidgetExplorer::AddItem()", LOGTYPE_Error);
-        return;
     }
+
+    ExplorerItem *pItem = new ProjectItem(*pCurProj, eNewItemType, sPrefix, sName, QJsonValue());
     
     // Get the relative path from [ProjectDir->ItemPath] e.g. "Sprites/SpritePrefix/MySprite"
     QString sRelativePath = pItem->GetPath();
@@ -169,7 +148,7 @@ void ExplorerWidget::AddItem(eItemType eNewItemType, const QString sPrefix, cons
             pExpandItem = pExpandItem->parent();
         }
         
-        MainWindow::OpenItem(static_cast<IProjItem *>(pItem));
+        MainWindow::OpenItem(static_cast<ProjectItem *>(pItem));
     }
 }
 
@@ -367,7 +346,7 @@ void ExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int 
     case ITEM_Sprite:
     case ITEM_Shader:
     case ITEM_Entity:
-        MainWindow::OpenItem(static_cast<IProjItem *>(pTreeVariantItem));
+        MainWindow::OpenItem(static_cast<ProjectItem *>(pTreeVariantItem));
         break;
     }
 }

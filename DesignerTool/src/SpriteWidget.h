@@ -10,8 +10,8 @@
 #ifndef SPRITEWIDGET_H
 #define SPRITEWIDGET_H
 
-#include "SpriteWidgetState.h"
 #include "AtlasFrame.h"
+#include "SpriteDraw.h"
 
 #include <QWidget>
 #include <QMenu>
@@ -21,37 +21,46 @@ namespace Ui {
 class SpriteWidget;
 }
 
-class SpriteItem;
 class AtlasesWidget;
 
 class SpriteWidget : public QWidget
 {
     Q_OBJECT
     
-    SpriteItem *            m_pItemSprite;
+    ProjectItem &           m_ItemRef;
+    SpriteDraw              m_Draw;
 
-    QList<QAction *>        m_StateActionsList;
-    SpriteWidgetState *     m_pCurSpriteState;
+    bool                    m_bPlayActive;
+    float                   m_fElapsedTime;
+    bool                    m_bIsBounced;
 
 public:
-    explicit SpriteWidget(SpriteItem *pItemSprite, QWidget *parent = 0);
+    explicit SpriteWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget *parent = 0);
     ~SpriteWidget();
+
+    void SetSelectedState(int iIndex);
     
-    SpriteItem *GetItem();
+    ProjectItem &GetItem();
+
+//    SpriteFrame *GetSelectedFrame();
+//    int GetSelectedIndex();
+//    int GetNumFrames();
     
     void OnGiveMenuActions(QMenu *pMenu);
-
     void GetSaveInfo(QJsonArray &spriteStateArrayRef);
-    
-    SpriteWidgetState *GetCurSpriteState();
 
-    void Relink(AtlasFrame *pFrame);
-    
-    QList<AtlasFrame *> GetAllDrawInsts();
-    
+    void ProjShow();
+    void ProjHide();
+    void ProjUpdate();
+
+    void UpdateTimeStep();
+
+    void Refresh(QVariant param);
     void UpdateActions();
     
 private Q_SLOTS:
+    void on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection);
+
     void on_actionAddState_triggered();
     
     void on_actionRemoveState_triggered();
@@ -61,10 +70,6 @@ private Q_SLOTS:
     void on_actionOrderStateBackwards_triggered();
     
     void on_actionOrderStateForwards_triggered();
-
-    void on_actionImportFrames_triggered();
-
-    void on_actionRemoveFrames_triggered();
     
     void on_cmbStates_currentIndexChanged(int index);
 
@@ -79,10 +84,38 @@ private Q_SLOTS:
     void on_actionAlignCenterVertical_triggered();
     
     void on_actionAlignCenterHorizontal_triggered();
-    
+
+    void on_actionImportFrames_triggered();
+
+    void on_actionRemoveFrames_triggered();
+
     void on_actionOrderFrameUpwards_triggered();
 
     void on_actionOrderFrameDownwards_triggered();
+
+    void on_actionPlay_triggered();
+
+    void on_actionFirstFrame_triggered();
+
+    void on_actionLastFrame_triggered();
+
+    void on_chkReverse_clicked();
+
+    void on_chkLoop_clicked();
+
+    void on_chkBounce_clicked();
+
+    void on_btnHz10_clicked();
+
+    void on_btnHz20_clicked();
+
+    void on_btnHz30_clicked();
+
+    void on_btnHz40_clicked();
+
+    void on_btnHz50_clicked();
+
+    void on_btnHz60_clicked();
 
 private:
     Ui::SpriteWidget *ui;

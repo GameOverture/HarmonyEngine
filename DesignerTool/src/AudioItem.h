@@ -10,23 +10,23 @@
 #ifndef AUDIOITEM_H
 #define AUDIOITEM_H
 
-#include "IProjItem.h"
+#include "ProjectItem.h"
 
-class AudioItem : public IProjItem
-{
-    Q_OBJECT
+//class AudioItem : public ProjectItem
+//{
+//    Q_OBJECT
     
-public:
-    AudioItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
-    virtual ~AudioItem();
+//public:
+//    AudioItem(Project *pItemProj, const QString sPrefix, const QString sName, QJsonValue initVal);
+//    virtual ~AudioItem();
     
-protected:
-    virtual void OnGiveMenuActions(QMenu *pMenu) override;
+//protected:
+//    virtual void OnGiveMenuActions(QMenu *pMenu) override;
 
-    virtual void OnLink(AtlasFrame *pFrame) override;
-    virtual void OnUnlink(AtlasFrame *pFrame) override;
+////    virtual void OnLink(AtlasFrame *pFrame) override;
+////    virtual void OnUnlink(AtlasFrame *pFrame) override;
     
-    virtual QJsonValue OnSave() override;
-};
+//    virtual QJsonValue OnSave() override;
+//};
 
 #endif // AUDIOITEM_H

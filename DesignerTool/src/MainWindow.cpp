@@ -19,7 +19,6 @@
 #include "AtlasesWidget.h"
 #include "AudioWidgetManager.h"
 
-#include "SpriteItem.h"
 #include "HyGuiRenderer.h"
 #include "HyGuiGlobal.h"
 
@@ -233,7 +232,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     return sm_pInstance->m_sEngineLocation;
 }
 
-/*static*/ void MainWindow::OpenItem(IProjItem *pItem)
+/*static*/ void MainWindow::OpenItem(ProjectItem *pItem)
 {
     if(pItem == nullptr || pItem->GetType() == ITEM_Project)
         return;
@@ -264,7 +263,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->ui->mainToolBar->addActions(sm_pInstance->ui->menu_Edit->actions());
 }
 
-/*static*/ bool MainWindow::CloseItem(IProjItem *pItem)
+/*static*/ bool MainWindow::CloseItem(ProjectItem *pItem)
 {
     if(pItem == nullptr || pItem->GetType() == ITEM_Project)
         return false;
@@ -297,7 +296,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     QTabBar *pTabBar = pItemProj->GetTabBar();
     for(int i = 0; i < pTabBar->count(); ++i)
     {
-        if(pTabBar->tabData(i).value<IProjItem *>() == pItem)
+        if(pTabBar->tabData(i).value<ProjectItem *>() == pItem)
         {
             pTabBar->removeTab(i);
             break;

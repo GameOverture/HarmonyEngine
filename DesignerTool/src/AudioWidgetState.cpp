@@ -29,7 +29,7 @@ AudioWidgetState::AudioWidgetState(AudioWidget *pOwner, QList<QAction *> stateAc
     ui->btnOrderWaveUp->setDefaultAction(FindAction(stateActionList, "actionOrderWaveUpwards"));
     ui->btnOrderWaveDown->setDefaultAction(FindAction(stateActionList, "actionOrderWaveDownwards"));
     
-    ui->cmbCategory->setModel(m_pOwner->GetData()->GetProject()->GetAudioManager().GetCategoryModel());
+    ui->cmbCategory->setModel(m_pOwner->GetItem().GetProject().GetAudioManager().GetCategoryModel());
     
     UpdateActions();
 }
@@ -72,26 +72,26 @@ void AudioWidgetState::UpdateActions()
 
 void AudioWidgetState::on_cmbCategory_currentIndexChanged(int index)
 {
-    QUndoCommand *pCmd = new UndoCmd_ComboBox<AudioWidgetState>("Audio Category", this, ui->cmbCategory, m_iPrevCategoryIndex, index);
-    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
+//    QUndoCommand *pCmd = new UndoCmd_ComboBox<AudioWidgetState>("Audio Category", this, ui->cmbCategory, m_iPrevCategoryIndex, index);
+//    m_pOwner->GetItem().GetUndoStack()->push(pCmd);
 }
 
 void AudioWidgetState::on_chkLimitInst_clicked()
 {
-    QUndoCommand *pCmd = new UndoCmd_CheckBox<AudioWidgetState>(this, ui->chkLimitInst);
-    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
+//    QUndoCommand *pCmd = new UndoCmd_CheckBox<AudioWidgetState>(this, ui->chkLimitInst);
+//    m_pOwner->GetItem().GetUndoStack()->push(pCmd);
 }
 
 void AudioWidgetState::on_chkLooping_clicked()
 {
-    QUndoCommand *pCmd = new UndoCmd_CheckBox<AudioWidgetState>(this, ui->chkLooping);
-    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
+//    QUndoCommand *pCmd = new UndoCmd_CheckBox<AudioWidgetState>(this, ui->chkLooping);
+//    m_pOwner->GetItem().GetUndoStack()->push(pCmd);
 }
 
 void AudioWidgetState::on_cmbPlayType_currentIndexChanged(int index)
 {
-    QUndoCommand *pCmd = new UndoCmd_ComboBox<AudioWidgetState>("Play Type", this, ui->cmbPlayType, m_iPrevPlayTypeIndex, index);
-    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
+//    QUndoCommand *pCmd = new UndoCmd_ComboBox<AudioWidgetState>("Play Type", this, ui->cmbPlayType, m_iPrevPlayTypeIndex, index);
+//    m_pOwner->GetItem().GetUndoStack()->push(pCmd);
 }
 
 void AudioWidgetState::on_sbInstMax_editingFinished()
@@ -100,7 +100,7 @@ void AudioWidgetState::on_sbInstMax_editingFinished()
         return;
     
     QUndoCommand *pCmd = new UndoCmd_SpinBox<AudioWidgetState>("Number of Instances", this, ui->sbInstMax, m_iPrevNumInst, ui->sbInstMax->value());
-    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
+    m_pOwner->GetItem().GetUndoStack()->push(pCmd);
 }
 
 void AudioWidgetState::on_radInstFail_toggled(bool checked)
@@ -109,7 +109,7 @@ void AudioWidgetState::on_radInstFail_toggled(bool checked)
         return;
     
     QUndoCommand *pCmd = new UndoCmd_RadioToggle<AudioWidgetState>("Instance Limit Behavior", this, ui->radInstFail, ui->radInstQueue);
-    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
+    m_pOwner->GetItem().GetUndoStack()->push(pCmd);
 }
 
 void AudioWidgetState::on_radInstQueue_toggled(bool checked)
@@ -118,5 +118,5 @@ void AudioWidgetState::on_radInstQueue_toggled(bool checked)
         return;
     
     QUndoCommand *pCmd = new UndoCmd_RadioToggle<AudioWidgetState>("Instance Limit Behavior", this, ui->radInstQueue, ui->radInstFail);
-    m_pOwner->GetData()->GetUndoStack()->push(pCmd);
+    m_pOwner->GetItem().GetUndoStack()->push(pCmd);
 }

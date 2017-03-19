@@ -18,10 +18,10 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-AudioWidget::AudioWidget(AudioItem *pOwner, QWidget *parent) :  QWidget(parent),
-                                                                ui(new Ui::AudioWidget),
-                                                                m_pItemAudio(pOwner),
-                                                                m_pCurAudioState(NULL)
+AudioWidget::AudioWidget(ProjectItem &itemRef, QWidget *parent) :   QWidget(parent),
+                                                                    ui(new Ui::AudioWidget),
+                                                                    m_ItemRef(itemRef),
+                                                                    m_pCurAudioState(NULL)
 {
     ui->setupUi(this);
     
@@ -58,7 +58,7 @@ AudioWidget::AudioWidget(AudioItem *pOwner, QWidget *parent) :  QWidget(parent),
     }
     
     // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
-    m_pItemAudio->GetUndoStack()->clear();
+    //m_pItemAudio->GetUndoStack()->clear();
 
     UpdateActions();
 }
@@ -68,9 +68,9 @@ AudioWidget::~AudioWidget()
     delete ui;
 }
 
-AudioItem *AudioWidget::GetData()
+ProjectItem &AudioWidget::GetItem()
 {
-    return m_pItemAudio;
+    return m_ItemRef;
 }
 
 QComboBox *AudioWidget::GetCmbStates()
@@ -93,31 +93,31 @@ void AudioWidget::on_actionAddState_triggered()
 
 void AudioWidget::on_actionRemoveState_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_RemoveState<AudioWidget, AudioWidgetState>("Remove Audio State", this, ui->cmbStates);
-    m_pItemAudio->GetUndoStack()->push(pCmd);
+//    QUndoCommand *pCmd = new UndoCmd_RemoveState<AudioWidget, AudioWidgetState>("Remove Audio State", this, ui->cmbStates);
+//    m_pItemAudio->GetUndoStack()->push(pCmd);
 }
 
 void AudioWidget::on_actionRenameState_triggered()
 {
-    DlgInputName *pDlg = new DlgInputName("Rename Audio State", ui->cmbStates->currentData().value<AudioWidgetState *>()->GetName());
-    if(pDlg->exec() == QDialog::Accepted)
-    {
-        QUndoCommand *pCmd = new UndoCmd_RenameState<AudioWidgetState>("Rename Audio State", ui->cmbStates, pDlg->GetName());
-        m_pItemAudio->GetUndoStack()->push(pCmd);
-    }
-    delete pDlg;
+//    DlgInputName *pDlg = new DlgInputName("Rename Audio State", ui->cmbStates->currentData().value<AudioWidgetState *>()->GetName());
+//    if(pDlg->exec() == QDialog::Accepted)
+//    {
+//        QUndoCommand *pCmd = new UndoCmd_RenameState<AudioWidgetState>("Rename Audio State", ui->cmbStates, pDlg->GetName());
+//        m_pItemAudio->GetUndoStack()->push(pCmd);
+//    }
+//    delete pDlg;
 }
 
 void AudioWidget::on_actionOrderStateBackwards_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_MoveStateBack<AudioWidget, AudioWidgetState>("Shift Audio State Index <-", this, ui->cmbStates);
-    m_pItemAudio->GetUndoStack()->push(pCmd);
+//    QUndoCommand *pCmd = new UndoCmd_MoveStateBack<AudioWidget, AudioWidgetState>("Shift Audio State Index <-", this, ui->cmbStates);
+//    m_pItemAudio->GetUndoStack()->push(pCmd);
 }
 
 void AudioWidget::on_actionOrderStateForwards_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_MoveStateForward<AudioWidget, AudioWidgetState>("Shift Audio State Index ->", this, ui->cmbStates);
-    m_pItemAudio->GetUndoStack()->push(pCmd);
+//    QUndoCommand *pCmd = new UndoCmd_MoveStateForward<AudioWidget, AudioWidgetState>("Shift Audio State Index ->", this, ui->cmbStates);
+//    m_pItemAudio->GetUndoStack()->push(pCmd);
 }
 
 void AudioWidget::on_cmbStates_currentIndexChanged(int index)

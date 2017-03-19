@@ -89,7 +89,7 @@ QPoint AtlasFrame::GetPosition()
     return QPoint(m_iPosX, m_iPosY);
 }
 
-QSet<IProjItem *> AtlasFrame::GetLinks()
+QSet<ProjectItem *> AtlasFrame::GetLinks()
 {
     return m_DependencySet;
 }

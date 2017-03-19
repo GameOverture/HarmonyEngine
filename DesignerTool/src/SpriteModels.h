@@ -11,8 +11,12 @@
 #define SPRITEMODELS_H
 
 #include "AtlasFrame.h"
+#include "ProjectModel.h"
 
 #include <QObject>
+#include <QDataWidgetMapper>
+#include <QCheckBox>
+#include <QJsonArray>
 
 class SpriteItem;
 
@@ -41,9 +45,7 @@ public:
         return ptRenderOffset;
     }
 };
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class SpriteFramesModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -73,7 +75,7 @@ public:
     void OffsetFrame(int iIndex, QPoint vOffset);       // iIndex of -1 will apply to all
     void DurationFrame(int iIndex, float fDuration);    // iIndex of -1 will apply to all
 
-    QJsonArray GetFrames(float &fTotalDurationRef);
+    QJsonArray GetFramesInfo(float &fTotalDurationRef);
     SpriteFrame *GetFrameAt(int iIndex);
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -86,27 +88,108 @@ public:
 Q_SIGNALS:
     void editCompleted(const QString &);
 };
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CheckBoxMapper : public QDataWidgetMapper
+{
+    class ModelCheckBox : public QAbstractListModel
+    {
+    public:
+        ModelCheckBox(QObject *pParent = nullptr) : QAbstractListModel(pParent)
+        { }
 
-class SpriteStatesModel : public QAbstractListModel
+        virtual ~ModelCheckBox()
+        { }
+
+        virtual int ModelCheckBox::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
+        {
+            return 2;
+        }
+
+        virtual QVariant ModelCheckBox::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
+        {
+            return index.row() == 0 ? false : true;
+        }
+    };
+
+public:
+    CheckBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
+    {
+        setModel(new ModelCheckBox(this));
+    }
+    virtual ~CheckBoxMapper()
+    { }
+
+    bool IsChecked()
+    {
+        return currentIndex() == 0 ? false : true;
+    }
+
+    void SetChecked(bool bChecked)
+    {
+        setCurrentIndex(bChecked ? 1 : 0);
+    }
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct SpriteStateData
+{
+    QString             sName;
+    CheckBoxMapper *    pLoopMapper;
+    CheckBoxMapper *    pReverseMapper;
+    CheckBoxMapper *    pBounceMapper;
+    SpriteFramesModel * pFramesModel;
+
+    SpriteStateData() : pLoopMapper(nullptr),
+                        pReverseMapper(nullptr),
+                        pBounceMapper(nullptr),
+                        pFramesModel(nullptr)
+    { }
+
+    void GetStateInfo(QJsonObject &stateObjOut)
+    {
+        QJsonArray frameArray;
+        float fTotalDuration = 0.0f;
+        for(int i = 0; i < pFramesModel->rowCount(); ++i)
+        {
+            SpriteFrame *pSpriteFrame = pFramesModel->GetFrameAt(i);
+
+            QJsonObject frameObj;
+            frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));
+            fTotalDuration += pSpriteFrame->m_fDuration;
+            frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x() + pSpriteFrame->m_pFrame->GetCrop().left()));
+            frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + (pSpriteFrame->m_pFrame->GetSize().height() - pSpriteFrame->m_pFrame->GetCrop().bottom())));
+            frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetChecksum())));
+            frameObj.insert("atlasIndex", QJsonValue(pSpriteFrame->m_pFrame->GetTextureIndex()));
+
+            frameArray.append(frameObj);
+        }
+
+        stateObjOut.insert("name", QJsonValue(sName));
+        stateObjOut.insert("loop", pLoopMapper->IsChecked());
+        stateObjOut.insert("reverse", pReverseMapper->IsChecked());
+        stateObjOut.insert("bounce", pBounceMapper->IsChecked());
+        stateObjOut.insert("duration", QJsonValue(fTotalDuration));
+        stateObjOut.insert("frames", QJsonValue(frameArray));
+    }
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class SpriteModel : public QAbstractListModel
 {
     Q_OBJECT
 
-    SpriteItem *            m_pSpriteItem;
-
-    struct AnimState
-    {
-        QString             sName;
-        bool                bBounce;
-        bool                bLoop;
-        bool                bReverse;
-        SpriteFramesModel *  pFramesModel;
-    };
-    QList<AnimState *>      m_StateList;
+    ProjectItem *               m_pItem;
+    QList<SpriteStateData *>    m_StateList;
 
 public:
-    SpriteStatesModel(SpriteItem *pSpriteItem);
+    SpriteModel(ProjectItem *pItem, QJsonArray stateArray);
+    virtual ~SpriteModel();
+
+    int GetNumStates();
+    SpriteStateData *GetStateData(int iStateIndex);
+
+    QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList);
+    void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
+
+    void RefreshFrame(AtlasFrame *pFrame);
 
     int AppendState(QJsonObject stateObj);
     void InsertState(int iStateIndex, QJsonObject stateObj);
@@ -116,11 +199,13 @@ public:
     void MoveStateBack(int iStateIndex);
     void MoveStateForward(int iStateIndex);
 
+    QJsonArray GetSaveInfo();
+
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 };
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // SPRITEMODELS_H

@@ -10,7 +10,7 @@
 #ifndef ATLASFRAME_H
 #define ATLASFRAME_H
 
-#include "IProjItem.h"
+#include "ProjectItem.h"
 
 #include <QWidget>
 #include <QSet>
@@ -38,7 +38,7 @@ class AtlasFrame
     int                                 m_iPosX;
     int                                 m_iPosY;
 
-    QSet<IProjItem *>                   m_DependencySet;
+    QSet<ProjectItem *>                   m_DependencySet;
 
     uint                                m_uiErrors; // '0' when there is no error
 
@@ -54,7 +54,7 @@ public:
     QSize GetSize();
     QRect GetCrop();
     QPoint GetPosition();
-    QSet<IProjItem *> GetLinks();
+    QSet<ProjectItem *> GetLinks();
     eAtlasNodeType GetType();
 
     int GetTextureIndex();
