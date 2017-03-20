@@ -52,7 +52,10 @@ class HyScene
 	HyGfxComms &										m_GfxCommsRef;
 	std::vector<HyWindow *> &							m_WindowListRef;
 
-	static std::vector<IHyNode *>				sm_MasterList;
+	static std::vector<IHyNode *>						sm_MasterList;
+
+	static std::vector<IHyNode *>						sm_PauseUpdateList;
+	bool												m_bPauseGame;
 
 	std::vector<IHyDraw2d *>							m_LoadedInst2dList;
 	std::vector<IHyDraw2d *>							m_LoadedInst3dList;
@@ -69,12 +72,17 @@ public:
 	static void AddNode(IHyNode *pNode);
 	static void RemoveNode(IHyNode *pNode);
 
+	static void AddPauseOverrideNode(IHyNode *pNode);
+	static void RemovePauseOverrideNode(IHyNode *pNode);
+
 	void AddInstance(IHyDraw2d *pInst);
 	void RemoveInst(IHyDraw2d *pInst);
 
 	void CopyAllInsts(std::vector<IHyDraw2d *> &vInstsToCopy);
 
 	void DebugDrawPhysics2d(bool bDraw)					{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
+
+	void SetPause(bool bPause);
 
 private:
 	void PreUpdate();

@@ -139,3 +139,7 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return m_Renderer;
 }
 
+/*friend*/ void HyPauseGame(bool bPause)
+{
+	HyEngine::sm_pInstance->m_Scene.SetPause(bPause);
+}

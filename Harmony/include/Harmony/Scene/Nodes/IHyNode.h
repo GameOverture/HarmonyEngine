@@ -26,6 +26,7 @@ protected:
 	bool							m_bDirty;
 	bool							m_bIsDraw2d;
 	bool							m_bEnabled;
+	bool							m_bPauseOverride;	// Will continue to Update when game is paused
 
 	IHyNode *						m_pParent;
 	std::vector<IHyNode *>			m_ChildList;
@@ -44,6 +45,9 @@ public:
 
 	bool IsEnabled();
 	virtual void SetEnabled(bool bEnabled);
+
+	// Sets whether to Update when game is paused
+	void SetPauseOverride(bool bPauseOverride);
 
 	int64 GetTag();
 	void SetTag(int64 iTag);

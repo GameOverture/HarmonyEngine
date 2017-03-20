@@ -26,12 +26,14 @@
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
 std::vector<IHyNode *> HyScene::sm_MasterList;
+std::vector<IHyNode *> HyScene::sm_PauseUpdateList;
 
 HyScene::HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
 																					m_iPhysVelocityIterations(8),
 																					m_iPhysPositionIterations(3),
 																					m_GfxCommsRef(gfxCommsRef),
-																					m_WindowListRef(WindowListRef)
+																					m_WindowListRef(WindowListRef),
+																					m_bPauseGame(false)
 {
 	m_b2World.SetDebugDraw(&m_DrawPhys2d);
 	m_b2World.SetContactListener(&m_Phys2dContactListener);
@@ -65,6 +67,24 @@ HyScene::~HyScene(void)
 	}
 }
 
+/*static*/ void HyScene::AddPauseOverrideNode(IHyNode *pNode)
+{
+	sm_PauseUpdateList.push_back(pNode);
+}
+
+/*static*/ void HyScene::RemovePauseOverrideNode(IHyNode *pNode)
+{
+	for(std::vector<IHyNode *>::iterator it = sm_PauseUpdateList.begin(); it != sm_PauseUpdateList.end(); ++it)
+	{
+		if((*it) == pNode)
+		{
+			// TODO: Log about erasing Node
+			sm_PauseUpdateList.erase(it);
+			break;
+		}
+	}
+}
+
 void HyScene::AddInstance(IHyDraw2d *pInst)
 {
 	m_LoadedInst2dList.push_back(pInst);
@@ -89,6 +109,11 @@ void HyScene::CopyAllInsts(std::vector<IHyDraw2d *> &vInstsToCopy)
 	vInstsToCopy = m_LoadedInst2dList;
 }
 
+void HyScene::SetPause(bool bPause)
+{
+	m_bPauseGame = bPause;
+}
+
 //PRIVATE//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void HyScene::PreUpdate()
@@ -107,8 +132,16 @@ void HyScene::PostUpdate()
 	for(uint32 i = 0; i < m_WindowListRef.size(); ++i)
 		m_WindowListRef[i]->Update();
 
-	for(uint32 i = 0; i < sm_MasterList.size(); ++i)
-		sm_MasterList[i]->Update();
+	if(m_bPauseGame == false)
+	{
+		for(uint32 i = 0; i < sm_MasterList.size(); ++i)
+			sm_MasterList[i]->Update();
+	}
+	else
+	{
+		for(uint32 i = 0; i < sm_PauseUpdateList.size(); ++i)
+			sm_PauseUpdateList[i]->Update();
+	}
 
 	WriteDrawBuffer();
 }

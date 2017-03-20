@@ -79,6 +79,8 @@ private:
 	void Shutdown();
 
 	HyRendererInterop &GetRenderer();
+
+	friend void HyPauseGame(bool bPause);
 };
 
 #endif /* __HyEngine_h__ */

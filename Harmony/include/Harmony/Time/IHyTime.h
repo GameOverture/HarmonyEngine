@@ -30,7 +30,6 @@ class IHyTime
 
 	double						m_dTotalElapsedTime;
 	double						m_dThrottledTime;
-	double						m_dTimeManipulation;
 
 	// FPS members
 	int							m_iFPSUpdateFrames;

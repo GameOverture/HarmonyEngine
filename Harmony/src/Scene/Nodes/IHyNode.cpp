@@ -14,6 +14,7 @@ IHyNode::IHyNode(HyType eType, IHyNode *pParent /*= nullptr*/) :	m_eTYPE(eType),
 																	m_bDirty(false),
 																	m_bIsDraw2d(false),
 																	m_bEnabled(true),
+																	m_bPauseOverride(false),
 																	m_pParent(nullptr),
 																	m_iTag(0)
 {
@@ -34,6 +35,9 @@ IHyNode::IHyNode(HyType eType, IHyNode *pParent /*= nullptr*/) :	m_eTYPE(eType),
 
 	Detach();
 	HyScene::RemoveNode(this);
+
+	if(m_bPauseOverride)
+		HyScene::RemovePauseOverrideNode(this);
 }
 
 HyType IHyNode::GetType()
@@ -57,6 +61,25 @@ bool IHyNode::IsEnabled()
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->SetEnabled(m_bEnabled);
+}
+
+void IHyNode::SetPauseOverride(bool bPauseOverride)
+{
+	if(bPauseOverride)
+	{
+		if(m_bPauseOverride == false)
+			HyScene::AddPauseOverrideNode(this);
+	}
+	else
+	{
+		if(m_bPauseOverride == true)
+			HyScene::RemovePauseOverrideNode(this);
+	}
+
+	m_bPauseOverride = bPauseOverride;
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->SetPauseOverride(m_bPauseOverride);
 }
 
 int64 IHyNode::GetTag()
