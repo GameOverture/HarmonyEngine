@@ -200,7 +200,7 @@ void AtlasesData::WriteMetaSettings(QJsonArray frameArray)
     settingsObj.insert("frames", frameArray);
 
     QJsonArray filtersArray;
-    QTreeWidgetItemIterator iter(m_pProjOwner->GetAtlasManager().GetFramesTreeWidget());
+    QTreeWidgetItemIterator iter(m_pProjOwner->GetAtlasManager()->GetFramesTreeWidget());
     while(*iter)
     {
         if((*iter)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
@@ -322,10 +322,14 @@ void AtlasesData::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newIma
 
 QList<AtlasFrame *> AtlasesData::RequestFrames(ProjectItem *pItem)
 {
-    QList<QTreeWidgetItem *> selectedItems = m_pProjOwner->GetAtlasManager().GetFramesTreeWidget()->selectedItems();
-    qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
+    QList<QTreeWidgetItem *> selectedItems;
+    if(m_pProjOwner->GetAtlasManager())
+    {
+        selectedItems = m_pProjOwner->GetAtlasManager()->GetFramesTreeWidget()->selectedItems();
+        qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
 
-    m_pProjOwner->GetAtlasManager().GetFramesTreeWidget()->clearSelection();
+        m_pProjOwner->GetAtlasManager()->GetFramesTreeWidget()->clearSelection();
+    }
 
     QList<AtlasFrame *> frameRequestList;
     for(int i = 0; i < selectedItems.size(); ++i)
@@ -416,7 +420,7 @@ AtlasFrame *AtlasesData::ImportImage(QString sName, QImage &newImage, eAtlasNode
     if(pNewFrame)
     {
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
-        m_pProjOwner->GetAtlasManager().GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
+        m_pProjOwner->GetAtlasManager()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
     }
 
     return pNewFrame;
@@ -775,7 +779,7 @@ void AtlasesData::Refresh()
 
     MainWindow::ReloadHarmony();
 
-    m_pProjOwner->GetAtlasManager().GetFramesTreeWidget()->sortItems(0, Qt::AscendingOrder);
+    m_pProjOwner->GetAtlasManager()->GetFramesTreeWidget()->sortItems(0, Qt::AscendingOrder);
 
 //    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
 //    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());

@@ -85,8 +85,8 @@ public:
     QString GetSourceRelPath() const;
 
     AtlasesData &GetAtlasesData();
-    AtlasesWidget &GetAtlasManager();
-    AudioWidgetManager &GetAudioManager();
+    AtlasesWidget *GetAtlasManager();
+    AudioWidgetManager *GetAudioManager();
     QTabBar *GetTabBar();
     
     QList<QAction *> GetSaveActions();

@@ -385,7 +385,6 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     //connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)),
     //        this, SLOT(on_tabBar_closeRequested(int)));
     m_pAtlasMan = new AtlasesWidget(*m_pAtlasesData, nullptr);
-    
     m_pAudioMan = new AudioWidgetManager(this, nullptr);
 }
 
@@ -513,14 +512,14 @@ AtlasesData &Project::GetAtlasesData()
     return *m_pAtlasesData;
 }
 
-AtlasesWidget &Project::GetAtlasManager()
+AtlasesWidget *Project::GetAtlasManager()
 {
-    return *m_pAtlasMan;
+    return m_pAtlasMan;
 }
 
-AudioWidgetManager &Project::GetAudioManager()
+AudioWidgetManager *Project::GetAudioManager()
 {
-    return *m_pAudioMan;
+    return m_pAudioMan;
 }
 
 QTabBar *Project::GetTabBar()
