@@ -63,7 +63,8 @@ SOURCES += main.cpp \
     FontItem.cpp \
     SpriteModels.cpp \
     ProjectItem.cpp \
-    ProjectModel.cpp
+    ProjectModel.cpp \
+    FontModels.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -113,7 +114,8 @@ HEADERS  += \
     FontItem.h \
     SpriteModels.h \
     ProjectItem.h \
-    ProjectModel.h
+    ProjectModel.h \
+    FontModels.h
 
 FORMS    += \
     DlgNewProject.ui \

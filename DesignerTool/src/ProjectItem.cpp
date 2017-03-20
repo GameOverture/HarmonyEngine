@@ -14,9 +14,8 @@
 #include "AtlasFrame.h"
 
 #include "SpriteWidget.h"
-#include "SpriteDraw.h"
 #include "FontWidget.h"
-#include "FontDraw.h"
+#include "FontModels.h"
 #include "AudioWidget.h"
 #include "AudioDraw.h"
 
@@ -34,6 +33,9 @@ ProjectItem::ProjectItem(Project &projRef,
     {
     case ITEM_Sprite:
         m_pModel = new SpriteModel(this, initValue.toArray());
+        break;
+    case ITEM_Font:
+        m_pModel = new FontModel(this, initValue.toObject());
         break;
     default:
         HyGuiLog("Improper ItemWidget type created: " % QString::number(m_eTYPE), LOGTYPE_Error);
