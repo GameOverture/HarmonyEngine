@@ -71,6 +71,9 @@ void SpriteWidget::SetSelectedState(int iIndex)
     SpriteStateData *pCurStateData = static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(iIndex);
 
     ui->framesView->setModel(pCurStateData->pFramesModel);
+    if(ui->framesView->currentIndex().row() < 0 && ui->framesView->model()->rowCount() > 0)
+        ui->framesView->selectRow(0);
+    
     pCurStateData->pLoopMapper->AddCheckBoxMapping(ui->chkLoop);
     pCurStateData->pReverseMapper->AddCheckBoxMapping(ui->chkReverse);
     pCurStateData->pBounceMapper->AddCheckBoxMapping(ui->chkBounce);
