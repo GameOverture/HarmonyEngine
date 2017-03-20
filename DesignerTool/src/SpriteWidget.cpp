@@ -500,28 +500,19 @@ void SpriteWidget::on_actionLastFrame_triggered()
 
 void SpriteWidget::on_chkReverse_clicked()
 {
-    QUndoCommand *pCmd = new UndoCmd_CheckBox<CheckBoxMapper>(ui->chkReverse->text(),
-                                                              GetItem(),
-                                                              GetCurStateData()->pReverseMapper,
-                                                              ui->cmbStates->currentIndex());
+    QUndoCommand *pCmd = new UndoCmd_CheckBox<CheckBoxMapper>(ui->chkReverse->text(), GetItem(), GetCurStateData()->pReverseMapper, ui->cmbStates->currentIndex());
     GetItem().GetUndoStack()->push(pCmd);
 }
 
 void SpriteWidget::on_chkLoop_clicked()
 {
-    QUndoCommand *pCmd = new UndoCmd_CheckBox<CheckBoxMapper>(ui->chkLoop->text(),
-                                                              GetItem(),
-                                                              GetCurStateData()->pLoopMapper,
-                                                              ui->cmbStates->currentIndex());
+    QUndoCommand *pCmd = new UndoCmd_CheckBox<CheckBoxMapper>(ui->chkLoop->text(), GetItem(), GetCurStateData()->pLoopMapper, ui->cmbStates->currentIndex());
     GetItem().GetUndoStack()->push(pCmd);
 }
 
 void SpriteWidget::on_chkBounce_clicked()
 {
-    QUndoCommand *pCmd = new UndoCmd_CheckBox<CheckBoxMapper>(ui->chkBounce->text(),
-                                                              GetItem(),
-                                                              GetCurStateData()->pBounceMapper,
-                                                              ui->cmbStates->currentIndex());
+    QUndoCommand *pCmd = new UndoCmd_CheckBox<CheckBoxMapper>(ui->chkBounce->text(), GetItem(), GetCurStateData()->pBounceMapper, ui->cmbStates->currentIndex());
     GetItem().GetUndoStack()->push(pCmd);
 }
 

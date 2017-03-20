@@ -240,7 +240,7 @@ public:
                                                                                                                             m_ItemRef(itemRef),
                                                                                                                             m_pMapper(pMapper),
                                                                                                                             m_iStateIndex(iStateIndex),
-                                                                                                                            m_bNewValue(pMapper->IsChecked())
+                                                                                                                            m_bNewValue(!pMapper->IsChecked())
     {
         setText((m_bNewValue ? "Checked " : "Unchecked ") % sText);
     }
