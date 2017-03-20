@@ -49,14 +49,17 @@ public:
     void OnGiveMenuActions(QMenu *pMenu);
     void GetSaveInfo(QJsonArray &spriteStateArrayRef);
 
-    void ProjShow();
-    void ProjHide();
-    void ProjUpdate();
+    void DrawShow();
+    void DrawHide();
+    void DrawUpdate();
 
     void UpdateTimeStep();
 
     void Refresh(QVariant param);
     void UpdateActions();
+
+private:
+    SpriteStateData *GetCurStateData();
     
 private Q_SLOTS:
     void on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection);

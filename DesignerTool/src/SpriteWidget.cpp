@@ -31,6 +31,9 @@ SpriteWidget::SpriteWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget 
 {
     ui->setupUi(this);
 
+    m_Draw.Load();
+    m_Draw.SetEnabled(false);
+
     ui->txtPrefixAndName->setText(m_ItemRef.GetName(true));
     
     ui->btnAddState->setDefaultAction(ui->actionAddState);
@@ -65,11 +68,12 @@ SpriteWidget::~SpriteWidget()
 
 void SpriteWidget::SetSelectedState(int iIndex)
 {
-    ui->framesView->setModel(static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(iIndex)->pFramesModel);
+    SpriteStateData *pCurStateData = static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(iIndex);
 
-    static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(iIndex)->pLoopMapper->addMapping(ui->chkLoop, 0);
-    static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(iIndex)->pReverseMapper->addMapping(ui->chkReverse, 0);
-    static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(iIndex)->pBounceMapper->addMapping(ui->chkBounce, 0);
+    ui->framesView->setModel(pCurStateData->pFramesModel);
+    pCurStateData->pLoopMapper->AddCheckBoxMapping(ui->chkLoop);
+    pCurStateData->pReverseMapper->AddCheckBoxMapping(ui->chkReverse);
+    pCurStateData->pBounceMapper->AddCheckBoxMapping(ui->chkBounce);
 
     UpdateActions();
 }
@@ -95,7 +99,7 @@ ProjectItem &SpriteWidget::GetItem()
 
 //int SpriteWidget::GetNumFrames()
 //{
-//    return static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(ui->cmbStates->currentIndex())->pFramesModel->rowCount();
+//    return GetCurStateData()->pFramesModel->rowCount();
 //}
 
 void SpriteWidget::OnGiveMenuActions(QMenu *pMenu)
@@ -121,24 +125,31 @@ void SpriteWidget::OnGiveMenuActions(QMenu *pMenu)
     pMenu->addAction(ui->actionApplyToAll);
 }
 
-void SpriteWidget::ProjShow()
+void SpriteWidget::DrawShow()
 {
-    m_Draw.ProjShow();
+    m_Draw.Show();
 }
 
-void SpriteWidget::ProjHide()
+void SpriteWidget::DrawHide()
 {
-    m_Draw.ProjHide();
+    m_Draw.Hide();
 }
 
-void SpriteWidget::ProjUpdate()
+void SpriteWidget::DrawUpdate()
 {
-    m_Draw.ProjUpdate();
+    int iFrameIndex = ui->framesView->currentIndex().row();
+    if(iFrameIndex >= 0)
+    {
+        SpriteFrame *pFrame = GetCurStateData()->pFramesModel->GetFrameAt(iFrameIndex);
+        m_Draw.SetFrame(pFrame->m_pFrame->GetChecksum(), glm::vec2(pFrame->m_vOffset.x(), pFrame->m_vOffset.y()));
+
+        UpdateTimeStep();
+    }
 }
 
 void SpriteWidget::UpdateTimeStep()
 {
-    SpriteFrame *pFrame = static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(ui->cmbStates->currentIndex())->pFramesModel->GetFrameAt(ui->framesView->currentIndex().row());
+    SpriteFrame *pFrame = GetCurStateData()->pFramesModel->GetFrameAt(ui->framesView->currentIndex().row());
 
     if(m_bPlayActive == false && pFrame != NULL)
         return;
@@ -149,7 +160,7 @@ void SpriteWidget::UpdateTimeStep()
         bool bBounce = ui->chkBounce->isChecked();
         bool bReverse = ui->chkReverse->isChecked();
         bool bLoop = ui->chkLoop->isChecked();
-        int iNumFrames = static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(ui->cmbStates->currentIndex())->pFramesModel->rowCount();
+        int iNumFrames = GetCurStateData()->pFramesModel->rowCount();
 
         int iNextRow = ui->framesView->currentIndex().row();
 
@@ -227,7 +238,7 @@ void SpriteWidget::UpdateActions()
     ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
     
-    int iCurNumFrames = static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(ui->cmbStates->currentIndex())->pFramesModel->rowCount();
+    int iCurNumFrames = GetCurStateData()->pFramesModel->rowCount();
     bool bFrameIsSelected = iCurNumFrames > 0 && ui->framesView->currentIndex().row() >= 0;
     
     ui->actionAlignCenterHorizontal->setEnabled(bFrameIsSelected);
@@ -240,6 +251,11 @@ void SpriteWidget::UpdateActions()
     ui->actionOrderFrameUpwards->setEnabled(ui->framesView->currentIndex().row() != 0 && iCurNumFrames > 1);
     ui->actionOrderFrameDownwards->setEnabled(ui->framesView->currentIndex().row() != iCurNumFrames - 1 && iCurNumFrames > 1);
     ui->actionRemoveFrames->setEnabled(bFrameIsSelected);
+}
+
+SpriteStateData *SpriteWidget::GetCurStateData()
+{
+    return static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(ui->cmbStates->currentIndex());
 }
 
 void SpriteWidget::on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
@@ -261,7 +277,7 @@ void SpriteWidget::on_actionRemoveState_triggered()
 
 void SpriteWidget::on_actionRenameState_triggered()
 {
-    DlgInputName *pDlg = new DlgInputName("Rename Sprite State", static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(ui->cmbStates->currentIndex())->sName);
+    DlgInputName *pDlg = new DlgInputName("Rename Sprite State", GetCurStateData()->sName);
     if(pDlg->exec() == QDialog::Accepted)
     {
         QUndoCommand *pCmd = new UndoCmd_RenameState<SpriteModel>("Rename Sprite State", m_ItemRef, pDlg->GetName(), ui->cmbStates->currentIndex());
@@ -486,7 +502,7 @@ void SpriteWidget::on_chkReverse_clicked()
 {
     QUndoCommand *pCmd = new UndoCmd_CheckBox<CheckBoxMapper>(ui->chkReverse->text(),
                                                               GetItem(),
-                                                              static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(ui->cmbStates->currentIndex())->pReverseMapper,
+                                                              GetCurStateData()->pReverseMapper,
                                                               ui->cmbStates->currentIndex());
     GetItem().GetUndoStack()->push(pCmd);
 }
@@ -495,7 +511,7 @@ void SpriteWidget::on_chkLoop_clicked()
 {
     QUndoCommand *pCmd = new UndoCmd_CheckBox<CheckBoxMapper>(ui->chkLoop->text(),
                                                               GetItem(),
-                                                              static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(ui->cmbStates->currentIndex())->pLoopMapper,
+                                                              GetCurStateData()->pLoopMapper,
                                                               ui->cmbStates->currentIndex());
     GetItem().GetUndoStack()->push(pCmd);
 }
@@ -504,7 +520,7 @@ void SpriteWidget::on_chkBounce_clicked()
 {
     QUndoCommand *pCmd = new UndoCmd_CheckBox<CheckBoxMapper>(ui->chkBounce->text(),
                                                               GetItem(),
-                                                              static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(ui->cmbStates->currentIndex())->pBounceMapper,
+                                                              GetCurStateData()->pBounceMapper,
                                                               ui->cmbStates->currentIndex());
     GetItem().GetUndoStack()->push(pCmd);
 }

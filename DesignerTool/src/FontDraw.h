@@ -21,11 +21,11 @@ public:
     virtual ~FontDraw();
 
 protected:
-    virtual void OnPreLoad(IHyApplication &hyApp) ;
-    virtual void OnPostUnload(IHyApplication &hyApp) ;
-    virtual void OnProjShow(IHyApplication &hyApp) override;
-    virtual void OnProjHide(IHyApplication &hyApp) override;
-    virtual void OnProjUpdate(IHyApplication &hyApp) override;
+    void OnPreLoad(IHyApplication &hyApp) ;
+    void OnPostUnload(IHyApplication &hyApp) ;
+    virtual void OnShow(IHyApplication &hyApp) override;
+    virtual void OnHide(IHyApplication &hyApp) override;
+    void OnUpdate(IHyApplication &hyApp);
 };
 
 #endif // FONTDRAW_H

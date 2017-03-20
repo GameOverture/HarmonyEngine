@@ -546,7 +546,7 @@ void Project::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 void Project::OpenItem(ProjectItem *pItem)
 {
     if(m_pCurOpenItem && m_pCurOpenItem != pItem)
-        m_pCurOpenItem->ProjHide(*this);
+        m_pCurOpenItem->DrawHide(*this);
 
     if(m_pCurOpenItem == pItem)
         return;
@@ -565,7 +565,7 @@ void Project::OpenItem(ProjectItem *pItem)
             m_pTabBar->setCurrentIndex(i);
             m_pTabBar->blockSignals(false);
 
-            m_pCurOpenItem->ProjShow(*this);
+            m_pCurOpenItem->DrawShow(*this);
             break;
         }
     }
@@ -583,7 +583,7 @@ void Project::OpenItem(ProjectItem *pItem)
         m_pTabBar->setCurrentIndex(iIndex);
         m_pTabBar->blockSignals(false);
 
-        m_pCurOpenItem->ProjShow(*this);
+        m_pCurOpenItem->DrawShow(*this);
     }
 }
 
@@ -614,7 +614,7 @@ void Project::OpenItem(ProjectItem *pItem)
     if(m_pTabBar->count() > 0)
     {
         m_pCamera->SetEnabled(false);
-        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->ProjUpdate(*this);
+        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->DrawUpdate(*this);
     }
     else
         m_pCamera->SetEnabled(true);

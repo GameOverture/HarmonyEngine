@@ -12,8 +12,6 @@
 
 #include "Harmony/HyEngine.h"
 
-class AtlasFrame;
-
 class IDraw : public HyEntity2d
 {
 protected:
@@ -24,14 +22,12 @@ public:
     IDraw(IHyApplication &hyApp);
     virtual ~IDraw();
 
-    void ProjShow();
-    void ProjHide();
-    void ProjUpdate();
+    void Show();
+    void Hide();
 
 protected:
-    virtual void OnProjShow(IHyApplication &hyApp) = 0;
-    virtual void OnProjHide(IHyApplication &hyApp) = 0;
-    virtual void OnProjUpdate(IHyApplication &hyApp) = 0;
+    virtual void OnShow(IHyApplication &hyApp) = 0;
+    virtual void OnHide(IHyApplication &hyApp) = 0;
 };
 
 #endif // IDRAW_H

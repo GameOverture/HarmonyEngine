@@ -8,23 +8,8 @@ class SpriteDraw : public IDraw
 {
     SpriteModel &                           m_ModelRef;
 
-    class AnimState : public HyEntity2d
-    {
-    public:
-        QMap<quint32, HyTexturedQuad2d *>   m_FrameMap;
-        HyTexturedQuad2d *                  m_pCurFrame;
-
-        AnimState() : m_pCurFrame(nullptr)
-        { }
-
-        ~AnimState()
-        {
-            for(auto iter = m_FrameMap.begin(); iter != m_FrameMap.end(); ++iter)
-                delete iter.value();
-        }
-    };
-    QList<AnimState *>                      m_AnimStates;
-    int                                     m_iCurStateIndex;
+    QMap<quint32, HyTexturedQuad2d *>       m_TexturedQuadMap;
+    HyTexturedQuad2d *                      m_pCurFrame;
 
     HyPrimitive2d                           m_primOriginHorz;
     HyPrimitive2d                           m_primOriginVert;
@@ -35,10 +20,11 @@ public:
 
     //virtual void Relink(AtlasFrame *pFrame) override;
 
+    void SetFrame(quint32 uiChecksum, glm::vec2 vOffset);
+
 protected:
-    virtual void OnProjShow(IHyApplication &hyApp) override;
-    virtual void OnProjHide(IHyApplication &hyApp) override;
-    virtual void OnProjUpdate(IHyApplication &hyApp) override;
+    virtual void OnShow(IHyApplication &hyApp) override;
+    virtual void OnHide(IHyApplication &hyApp) override;
 };
 
 #endif // SPRITEDRAW_H

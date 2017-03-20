@@ -171,12 +171,12 @@ void ProjectItem::ProjUnload(IHyApplication &hyApp)
     m_pWidget = nullptr;
 }
 
-void ProjectItem::ProjShow(IHyApplication &hyApp)
+void ProjectItem::DrawShow(IHyApplication &hyApp)
 {
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
-        static_cast<SpriteWidget *>(m_pWidget)->ProjShow();
+        static_cast<SpriteWidget *>(m_pWidget)->DrawShow();
         break;
     case ITEM_Font:
         //m_pWidget = new FontWidget(*this);
@@ -190,12 +190,12 @@ void ProjectItem::ProjShow(IHyApplication &hyApp)
     }
 }
 
-void ProjectItem::ProjHide(IHyApplication &hyApp)
+void ProjectItem::DrawHide(IHyApplication &hyApp)
 {
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
-        static_cast<SpriteWidget *>(m_pWidget)->ProjHide();
+        static_cast<SpriteWidget *>(m_pWidget)->DrawHide();
         break;
     case ITEM_Font:
         //m_pWidget = new FontWidget(*this);
@@ -209,12 +209,12 @@ void ProjectItem::ProjHide(IHyApplication &hyApp)
     }
 }
 
-void ProjectItem::ProjUpdate(IHyApplication &hyApp)
+void ProjectItem::DrawUpdate(IHyApplication &hyApp)
 {
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
-        static_cast<SpriteWidget *>(m_pWidget)->ProjUpdate();
+        static_cast<SpriteWidget *>(m_pWidget)->DrawUpdate();
         break;
     case ITEM_Font:
         //m_pWidget = new FontWidget(*this);

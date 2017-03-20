@@ -43,7 +43,7 @@ FontDraw::FontDraw(IHyApplication &hyApp) : IDraw(hyApp),
 //    m_DividerLine.Unload();
 }
 
-/*virtual*/ void FontDraw::OnProjShow(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnShow(IHyApplication &hyApp)
 {
 //    if(m_pDrawAtlasPreview)
 //        m_pDrawAtlasPreview->SetEnabled(true);
@@ -56,7 +56,7 @@ FontDraw::FontDraw(IHyApplication &hyApp) : IDraw(hyApp),
 //    m_DividerLine.SetEnabled(true);
 }
 
-/*virtual*/ void FontDraw::OnProjHide(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnHide(IHyApplication &hyApp)
 {
 //    if(m_pDrawAtlasPreview)
 //        m_pDrawAtlasPreview->SetEnabled(false);
@@ -69,7 +69,7 @@ FontDraw::FontDraw(IHyApplication &hyApp) : IDraw(hyApp),
 //    m_DividerLine.SetEnabled(false);
 }
 
-/*virtual*/ void FontDraw::OnProjUpdate(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnUpdate(IHyApplication &hyApp)
 {
 //    FontWidget *pWidget = static_cast<FontWidget *>(m_pItem->GetWidget());
 //    texture_atlas_t *pAtlas = pWidget->GetAtlas();

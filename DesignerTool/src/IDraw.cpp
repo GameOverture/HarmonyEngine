@@ -8,7 +8,6 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "IDraw.h"
-#include "AtlasFrame.h"
 
 IDraw::IDraw(IHyApplication &hyApp) :   m_HyAppRef(hyApp),
                                         m_pCamera(nullptr)
@@ -22,20 +21,15 @@ IDraw::IDraw(IHyApplication &hyApp) :   m_HyAppRef(hyApp),
     m_HyAppRef.Window().RemoveCamera(m_pCamera);
 }
 
-void IDraw::ProjShow()
+void IDraw::Show()
 {
     m_pCamera->SetEnabled(true);
-    OnProjShow(m_HyAppRef);
+    OnShow(m_HyAppRef);
 }
 
-void IDraw::ProjHide()
+void IDraw::Hide()
 {
     m_pCamera->SetEnabled(false);
-    OnProjHide(m_HyAppRef);
-}
-
-void IDraw::ProjUpdate()
-{
-    OnProjUpdate(m_HyAppRef);
+    OnHide(m_HyAppRef);
 }
 

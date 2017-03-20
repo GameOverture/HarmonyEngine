@@ -61,9 +61,9 @@ public:
 private:
     void ProjLoad(IHyApplication &hyApp);
     void ProjUnload(IHyApplication &hyApp);
-    void ProjShow(IHyApplication &hyApp);
-    void ProjHide(IHyApplication &hyApp);
-    void ProjUpdate(IHyApplication &hyApp);
+    void DrawShow(IHyApplication &hyApp);
+    void DrawHide(IHyApplication &hyApp);
+    void DrawUpdate(IHyApplication &hyApp);
 
 
 private Q_SLOTS:

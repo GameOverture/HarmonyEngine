@@ -119,6 +119,12 @@ public:
     virtual ~CheckBoxMapper()
     { }
 
+    void AddCheckBoxMapping(QCheckBox *pCheckBox)
+    {
+        addMapping(pCheckBox, 0);
+        this->setCurrentIndex(this->currentIndex());
+    }
+
     bool IsChecked()
     {
         return currentIndex() == 0 ? false : true;
