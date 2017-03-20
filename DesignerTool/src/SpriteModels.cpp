@@ -349,8 +349,8 @@ void SpriteModel::InsertState(int iStateIndex, QJsonObject stateObj)
         for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
         {
             QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
-            QPoint vOffset(spriteFrameObj["offsetX"].toInt() - requestedAtlasFramesList[0]->GetCrop().left(),
-                           spriteFrameObj["offsetY"].toInt() - (requestedAtlasFramesList[0]->GetSize().height() - requestedAtlasFramesList[0]->GetCrop().bottom()));
+            QPoint vOffset(spriteFrameObj["offsetX"].toInt() - requestedAtlasFramesList[i]->GetCrop().left(),
+                           spriteFrameObj["offsetY"].toInt() - (requestedAtlasFramesList[i]->GetSize().height() - requestedAtlasFramesList[i]->GetCrop().bottom()));
 
             int iFrameIndex = pNewState->pFramesModel->Add(requestedAtlasFramesList[i]);
             pNewState->pFramesModel->OffsetFrame(iFrameIndex, vOffset);

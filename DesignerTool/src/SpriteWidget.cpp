@@ -141,7 +141,7 @@ void SpriteWidget::DrawUpdate()
     if(iFrameIndex >= 0)
     {
         SpriteFrame *pFrame = GetCurStateData()->pFramesModel->GetFrameAt(iFrameIndex);
-        m_Draw.SetFrame(pFrame->m_pFrame->GetChecksum(), glm::vec2(pFrame->m_vOffset.x(), pFrame->m_vOffset.y()));
+        m_Draw.SetFrame(pFrame->m_pFrame->GetChecksum(), glm::vec2(pFrame->GetRenderOffset().x(), pFrame->GetRenderOffset().y()));
 
         UpdateTimeStep();
     }
