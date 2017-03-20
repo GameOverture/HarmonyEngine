@@ -449,7 +449,7 @@ void AtlasesWidget::on_actionReplaceImages_triggered()
     {
         QSet<ProjectItem *> sLinks = selectedFrameList[i]->GetLinks();
         for(QSet<ProjectItem *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
-            (*LinksIter)->Relink(selectedFrameList[i]);
+            (*LinksIter)->RelinkFrame(selectedFrameList[i]);
     }
 }
 

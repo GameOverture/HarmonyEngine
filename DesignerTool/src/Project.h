@@ -101,7 +101,7 @@ public:
 
     void SetRenderSize(int iWidth, int iHeight);
     
-    void Reset();
+    void Reload();
 
     void SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal);
     void SaveGameData();

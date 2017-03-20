@@ -99,7 +99,10 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
 
     // TESTING ///
     if(m_pProjOwner)
+    {
         m_pHyEngine = new HyEngine(*m_pProjOwner);
+        m_pProjOwner->Reload();
+    }
 
 //    QOpenGLContext *pThreadContext = new QOpenGLContext;
 //    pThreadContext->setFormat(context()->format());

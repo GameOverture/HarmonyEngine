@@ -631,10 +631,23 @@ void Project::SetRenderSize(int iWidth, int iHeight)
     Window().SetResolution(glm::ivec2(iWidth, iHeight));
 }
 
-void Project::Reset()
+void Project::Reload()
 {
     sm_Init.sGameName = GetName(false).toStdString();
     sm_Init.sDataDir = GetAssetsAbsPath().toStdString();
+    
+    
+    // TODO: Fix this
+//    if(m_pTabBar)
+//    {
+//        for(int i = 0; i < m_pTabBar->count(); ++i)
+//        {
+//            m_pTabBar->tabData(i).value<ProjectItem *>()->ProjUnload(*this);
+//            m_pTabBar->tabData(i).value<ProjectItem *>()->ProjLoad(*this);
+//        }
+        
+//        MainWindow::OpenItem(m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>());
+//    }
 }
 
 void Project::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal)

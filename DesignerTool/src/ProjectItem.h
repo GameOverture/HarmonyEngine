@@ -56,8 +56,8 @@ public:
     void DiscardChanges();
 
     void RefreshWidget(QVariant param);
-
-    void Relink(AtlasFrame *pFrame);
+    void RelinkFrame(AtlasFrame *pFrame);
+    
 private:
     void ProjLoad(IHyApplication &hyApp);
     void ProjUnload(IHyApplication &hyApp);

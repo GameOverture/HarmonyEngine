@@ -314,8 +314,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->m_pCurSelectedProj = pProj;
     if(sm_pInstance->m_pCurSelectedProj)
     {
-        sm_pInstance->m_pCurSelectedProj->Reset();
-
         // Insert the project's TabBar
         bool bTabsFound = false;
         for(int i = 0; i < sm_pInstance->ui->stackedTabWidgets->count(); ++i)

@@ -44,7 +44,7 @@ class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
 {
     Q_OBJECT
 
-    Project *       m_pProjOwner;
+    Project *           m_pProjOwner;
     HyEngine *          m_pHyEngine;
     
     bool                m_bIsUpdating;

@@ -129,7 +129,7 @@ void ProjectItem::RefreshWidget(QVariant param)
     }
 }
 
-void ProjectItem::Relink(AtlasFrame *pFrame)
+void ProjectItem::RelinkFrame(AtlasFrame *pFrame)
 {
     switch(m_eTYPE)
     {
