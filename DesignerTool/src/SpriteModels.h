@@ -164,7 +164,6 @@ struct SpriteStateData
             frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x() + pSpriteFrame->m_pFrame->GetCrop().left()));
             frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + (pSpriteFrame->m_pFrame->GetSize().height() - pSpriteFrame->m_pFrame->GetCrop().bottom())));
             frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetChecksum())));
-            frameObj.insert("atlasIndex", QJsonValue(pSpriteFrame->m_pFrame->GetTextureIndex()));
 
             frameArray.append(frameObj);
         }
@@ -195,7 +194,7 @@ public:
     QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList);
     void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
 
-    void RefreshFrame(AtlasFrame *pFrame);
+    void RelinkFrame(AtlasFrame *pFrame);
 
     int AppendState(QJsonObject stateObj);
     void InsertState(int iStateIndex, QJsonObject stateObj);

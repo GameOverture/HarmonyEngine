@@ -484,8 +484,6 @@ void FontWidget::GetSaveInfo(QJsonObject &fontObj)
 {
     fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetChecksum())));
 
-    fontObj.insert("atlasIndex", m_pTrueAtlasFrame->GetTextureIndex());
-
     QJsonObject availableGlyphsObj;
     availableGlyphsObj.insert("0-9", ui->chk_09->isChecked());
     availableGlyphsObj.insert("A-Z", ui->chk_AZ->isChecked());

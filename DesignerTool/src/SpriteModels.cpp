@@ -132,7 +132,6 @@ QJsonArray SpriteFramesModel::GetFramesInfo(float &fTotalDurationRef)
         QJsonObject frameObj;
         fTotalDurationRef += m_FramesList[i]->m_fDuration;
 
-        frameObj.insert("atlasIndex", m_FramesList[i]->m_pFrame->GetTextureIndex());
         frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetChecksum())));
         frameObj.insert("duration", m_FramesList[i]->m_fDuration);
         frameObj.insert("offsetX", m_FramesList[i]->m_vOffset.x());
@@ -298,7 +297,7 @@ void SpriteModel::RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinqui
     m_pItem->GetProject().GetAtlasesData().RelinquishFrames(m_pItem, relinquishList);
 }
 
-void SpriteModel::RefreshFrame(AtlasFrame *pFrame)
+void SpriteModel::RelinkFrame(AtlasFrame *pFrame)
 {
     for(int i = 0; i < m_StateList.size(); ++i)
         m_StateList[i]->pFramesModel->RefreshFrame(pFrame);

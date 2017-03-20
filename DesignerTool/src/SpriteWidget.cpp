@@ -232,7 +232,12 @@ void SpriteWidget::UpdateTimeStep()
 
 void SpriteWidget::Refresh(QVariant param)
 {
-    UpdateActions();
+    bool bParamOk = false;
+    int iStateAffected = param.toInt(&bParamOk);
+    if(bParamOk && iStateAffected >= 0)
+        SetSelectedState(iStateAffected);
+    else
+        UpdateActions();
 }
 
 void SpriteWidget::UpdateActions()
