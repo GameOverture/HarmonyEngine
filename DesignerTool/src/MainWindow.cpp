@@ -352,10 +352,10 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
     if(sm_pInstance->m_pCurSelectedProj)
     {
-        sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasManager());
+        sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasWidget());
         sm_pInstance->ui->dockWidgetAtlas->widget()->show();
         
-        sm_pInstance->ui->dockWidgetAudio->setWidget(sm_pInstance->m_pCurSelectedProj->GetAudioManager());
+        sm_pInstance->ui->dockWidgetAudio->setWidget(sm_pInstance->m_pCurSelectedProj->GetAudioWidget());
         sm_pInstance->ui->dockWidgetAudio->widget()->show();
     }
     else

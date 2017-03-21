@@ -303,7 +303,7 @@ void FontWidget::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
         m_MasterStageList[i]->iReferenceCount = m_MasterStageList[i]->iTmpReferenceCount;
     
     // if 'bFindBestFit' == true, adjust atlas dimentions until we utilize efficient space on the smallest texture
-    QSize atlasSize = m_ItemRef.GetProject().GetAtlasesData().GetAtlasDimensions();
+    QSize atlasSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions();
     float fAtlasSizeModifier = 1.0f;
     bool bDoInitialShrink = true;
     size_t iNumMissedGlyphs = 0;
@@ -373,9 +373,9 @@ void FontWidget::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
         QImage fontAtlasImage(m_pTrueAtlasPixelData, static_cast<int>(m_pAtlas->width), static_cast<int>(m_pAtlas->height), QImage::Format_RGBA8888);
 
         if(m_pTrueAtlasFrame)
-            m_ItemRef.GetProject().GetAtlasesData().ReplaceFrame(m_pTrueAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true);
+            m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pTrueAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true);
         else
-            m_pTrueAtlasFrame = m_ItemRef.GetProject().GetAtlasesData().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, ATLAS_Font);
+            m_pTrueAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, ATLAS_Font);
     }
     
     // Signals ItemFont to upload and refresh the preview texture
@@ -402,7 +402,7 @@ void FontWidget::UpdateActions()
 {
     bool bGeneratePreview = false;
     
-    QSize curSize = m_ItemRef.GetProject().GetAtlasesData().GetAtlasDimensions();
+    QSize curSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions();
     if(m_PrevAtlasSize.width() < curSize.width() || m_PrevAtlasSize.height() < curSize.height())
         bGeneratePreview = true;
 

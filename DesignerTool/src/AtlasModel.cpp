@@ -200,7 +200,7 @@ void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
     settingsObj.insert("frames", frameArray);
 
     QJsonArray filtersArray;
-    QTreeWidgetItemIterator iter(m_pProjOwner->GetAtlasManager()->GetFramesTreeWidget());
+    QTreeWidgetItemIterator iter(m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget());
     while(*iter)
     {
         if((*iter)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
@@ -323,12 +323,12 @@ void AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem)
 {
     QList<QTreeWidgetItem *> selectedItems;
-    if(m_pProjOwner->GetAtlasManager())
+    if(m_pProjOwner->GetAtlasWidget())
     {
-        selectedItems = m_pProjOwner->GetAtlasManager()->GetFramesTreeWidget()->selectedItems();
+        selectedItems = m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->selectedItems();
         qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
 
-        m_pProjOwner->GetAtlasManager()->GetFramesTreeWidget()->clearSelection();
+        m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->clearSelection();
     }
 
     QList<AtlasFrame *> frameRequestList;
@@ -420,7 +420,7 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, eAtlasNodeT
     if(pNewFrame)
     {
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
-        m_pProjOwner->GetAtlasManager()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
+        m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
     }
 
     return pNewFrame;
@@ -779,7 +779,7 @@ void AtlasModel::Refresh()
 
     MainWindow::ReloadHarmony();
 
-    m_pProjOwner->GetAtlasManager()->GetFramesTreeWidget()->sortItems(0, Qt::AscendingOrder);
+    m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->sortItems(0, Qt::AscendingOrder);
 
 //    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
 //    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());

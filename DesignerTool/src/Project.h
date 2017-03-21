@@ -40,8 +40,8 @@ class Project : public ExplorerItem, public IHyApplication
 {
     Q_OBJECT
 
-    AtlasModel *                                   m_pAtlasesData;
-    AtlasWidget *                                 m_pAtlasMan;
+    AtlasModel *                                    m_pAtlasesData;
+    AtlasWidget *                                   m_pAtlasMan;
 
     AudioWidgetManager *                            m_pAudioMan;
     QTabBar *                                       m_pTabBar;
@@ -66,8 +66,6 @@ class Project : public ExplorerItem, public IHyApplication
 public:
     Project(const QString sNewProjectFilePath);
     virtual ~Project();
-    
-    //void InitAtlasDependencies(QTreeWidgetItem *pTreeItem);
 
     bool HasError() const;
 
@@ -84,9 +82,10 @@ public:
     QString GetSourceAbsPath() const;
     QString GetSourceRelPath() const;
 
-    AtlasModel &GetAtlasesData();
-    AtlasWidget *GetAtlasManager();
-    AudioWidgetManager *GetAudioManager();
+    AtlasModel &GetAtlasModel();
+    AtlasWidget *GetAtlasWidget();
+    AudioWidgetManager *GetAudioWidget();
+
     QTabBar *GetTabBar();
     
     QList<QAction *> GetSaveActions();

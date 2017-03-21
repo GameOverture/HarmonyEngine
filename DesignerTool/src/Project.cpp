@@ -394,63 +394,6 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     delete m_pAtlasMan;
 }
 
-//void Project::InitAtlasDependencies(QTreeWidgetItem *pTreeItem)
-//{
-//    ExplorerItem *pItem = pTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
-//    switch(pItem->GetType())
-//    {
-//    case ITEM_Project:
-//    case ITEM_Prefix:
-//    case ITEM_DirAudio:
-//    case ITEM_DirParticles:
-//    case ITEM_DirFonts:
-//    case ITEM_DirSpine:
-//    case ITEM_DirSprites:
-//    case ITEM_DirShaders:
-//    case ITEM_DirEntities:
-//    case ITEM_DirAtlases:
-//    case ITEM_DirAudioBanks:
-//        break;
-//    case ITEM_Font: {
-//        FontItem *pFontItem = static_cast<FontItem *>(pItem);
-//        QJsonObject fontObj = pFontItem->GetInitValue().toObject();
-
-//        QList<quint32> requestList;
-//        requestList.append(JSONOBJ_TOINT(fontObj, "checksum"));
-//        m_pAtlasesData->RequestFrames(pFontItem, requestList);
-//        break; }
-//    case ITEM_Sprite: {
-//        SpriteItem *pSpriteItem = static_cast<SpriteItem *>(pItem);
-//        QJsonArray stateArray = pSpriteItem->GetInitValue().toArray();
-//        for(int i = 0; i < stateArray.size(); ++i)
-//        {
-//            QJsonObject stateObj = stateArray[i].toObject();
-//            QJsonArray spriteFrameArray = stateObj["frames"].toArray();
-//            for(int j = 0; j < spriteFrameArray.size(); ++j)
-//            {
-//                QJsonObject spriteFrameObj = spriteFrameArray[j].toObject();
-
-//                QList<quint32> requestList;
-//                requestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
-//                m_pAtlasesData->RequestFrames(pSpriteItem, requestList);
-//            }
-//        }
-//        break; }
-//    case ITEM_Entity:
-//        break;
-//    case ITEM_Particles:
-//    case ITEM_Spine:
-//    case ITEM_Audio:
-//    case ITEM_Shader:
-//    default:
-//        HyGuiLog("Project::InitAtlasDependencies() unhandled item type: " % QString::number(static_cast<int>(pItem->GetType())), LOGTYPE_Error);
-//        break;
-//    }
-
-//    for(int i = 0; i < pTreeItem->childCount(); ++i)
-//        InitAtlasDependencies(pTreeItem->child(i));
-//}
-
 bool Project::HasError() const
 {
     return m_bHasError;
@@ -507,17 +450,17 @@ QString Project::GetSourceRelPath() const
     return QDir::cleanPath(m_sRelativeSourceLocation) + '/';
 }
 
-AtlasModel &Project::GetAtlasesData()
+AtlasModel &Project::GetAtlasModel()
 {
     return *m_pAtlasesData;
 }
 
-AtlasWidget *Project::GetAtlasManager()
+AtlasWidget *Project::GetAtlasWidget()
 {
     return m_pAtlasMan;
 }
 
-AudioWidgetManager *Project::GetAudioManager()
+AudioWidgetManager *Project::GetAudioWidget()
 {
     return m_pAudioMan;
 }

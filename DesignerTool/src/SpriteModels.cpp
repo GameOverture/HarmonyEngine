@@ -281,7 +281,7 @@ SpriteStateData *SpriteModel::GetStateData(int iStateIndex)
 
 QList<AtlasFrame *> SpriteModel::RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList)
 {
-    QList<AtlasFrame *> returnedAtlasFramesList = m_pItem->GetProject().GetAtlasesData().RequestFrames(m_pItem, requestList);
+    QList<AtlasFrame *> returnedAtlasFramesList = m_pItem->GetProject().GetAtlasModel().RequestFrames(m_pItem, requestList);
 
     for(int i = 0; i < returnedAtlasFramesList.size(); ++i)
         m_StateList[iStateIndex]->pFramesModel->Add(returnedAtlasFramesList[i]);
@@ -294,7 +294,7 @@ void SpriteModel::RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinqui
     for(int i = 0; i < relinquishList.size(); ++i)
         m_StateList[iStateIndex]->pFramesModel->Remove(relinquishList[i]);
 
-    m_pItem->GetProject().GetAtlasesData().RelinquishFrames(m_pItem, relinquishList);
+    m_pItem->GetProject().GetAtlasModel().RelinquishFrames(m_pItem, relinquishList);
 }
 
 void SpriteModel::RelinkFrame(AtlasFrame *pFrame)
@@ -337,7 +337,7 @@ void SpriteModel::InsertState(int iStateIndex, QJsonObject stateObj)
         }
 
         QList<AtlasFrame *> requestedAtlasFramesList;
-        requestedAtlasFramesList = m_pItem->GetProject().GetAtlasesData().RequestFrames(m_pItem, checksumRequestList);
+        requestedAtlasFramesList = m_pItem->GetProject().GetAtlasModel().RequestFrames(m_pItem, checksumRequestList);
 
         if(spriteFrameArray.size() != requestedAtlasFramesList.size())
         {
