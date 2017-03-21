@@ -11,8 +11,6 @@
 
 #include "Renderer/Components/HyWindow.h"
 
-HarmonyInit IHyApplication::sm_Init;
-
 HarmonyInit::HarmonyInit()
 {
 	sGameName = "Untitled Game";
@@ -94,19 +92,19 @@ HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
 IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(NULL),
 															m_Console(initStruct.bUseConsole, initStruct.consoleInfo)
 {
-	sm_Init = initStruct;
-	HyAssert(sm_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HarmonyInit's actual 'eDefaultCoordinateType' cannot be 'HYCOORDTYPE_Default'");
-	HyAssert(sm_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HarmonyInit's actual 'eDefaultCoordinateUnit' cannot be 'HYCOORDUNIT_Default'");
-	HyAssert(sm_Init.fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
+	m_Init = initStruct;
+	HyAssert(m_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HarmonyInit's actual 'eDefaultCoordinateType' cannot be 'HYCOORDTYPE_Default'");
+	HyAssert(m_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HarmonyInit's actual 'eDefaultCoordinateUnit' cannot be 'HYCOORDUNIT_Default'");
+	HyAssert(m_Init.fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	
-	for(uint32 i = 0; i < sm_Init.uiNumWindows; ++i)
+	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
 	{
 		m_WindowList.push_back(HY_NEW HyWindow());
 
-		m_WindowList[i]->SetTitle(sm_Init.windowInfo[i].sName);
-		m_WindowList[i]->SetResolution(sm_Init.windowInfo[i].vResolution);
-		m_WindowList[i]->SetLocation(sm_Init.windowInfo[i].vLocation);
-		m_WindowList[i]->SetType(sm_Init.windowInfo[i].eType);
+		m_WindowList[i]->SetTitle(m_Init.windowInfo[i].sName);
+		m_WindowList[i]->SetResolution(m_Init.windowInfo[i].vResolution);
+		m_WindowList[i]->SetLocation(m_Init.windowInfo[i].vLocation);
+		m_WindowList[i]->SetType(m_Init.windowInfo[i].eType);
 	}
 
 	//for(uint32 i = 0; i < sm_Init.uiNumInputMappings; ++i)
@@ -121,34 +119,34 @@ IHyApplication::~IHyApplication()
 
 HyCoordinateType IHyApplication::DefaultCoordinateType()
 {
-	HyAssert(sm_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HyScene::DefaultCoordinateType() invoked before engine initialized");
-	return sm_Init.eDefaultCoordinateType;
+	HyAssert(m_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HyScene::DefaultCoordinateType() invoked before engine initialized");
+	return m_Init.eDefaultCoordinateType;
 }
 HyCoordinateUnit IHyApplication::DefaultCoordinateUnit()
 {
-	HyAssert(sm_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HyScene::DefaultCoordinateUnit() invoked before engine initialized");
-	return sm_Init.eDefaultCoordinateUnit;
+	HyAssert(m_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HyScene::DefaultCoordinateUnit() invoked before engine initialized");
+	return m_Init.eDefaultCoordinateUnit;
 }
 
 float IHyApplication::PixelsPerMeter()
 {
-	return sm_Init.fPixelsPerMeter;
+	return m_Init.fPixelsPerMeter;
 }
 
 HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)
 {
-	HyAssert(uiIndex < sm_Init.uiNumWindows, "IApplication::Viewport() took an invalid index: " << uiIndex);
+	HyAssert(uiIndex < m_Init.uiNumWindows, "IApplication::Viewport() took an invalid index: " << uiIndex);
 	return *m_WindowList[uiIndex];
 }
 
 uint32 IHyApplication::GetNumWindows()
 {
-	return sm_Init.uiNumWindows;
+	return m_Init.uiNumWindows;
 }
 
 HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 {
-	HyAssert(uiIndex < sm_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
+	HyAssert(uiIndex < m_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
 	return static_cast<HyInputMapInterop &>(m_pInputMaps[uiIndex]);
 }
 

@@ -8,16 +8,12 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *********************************************************************************/
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
-
-#include "IHyApplication.h"
-
+#include "HyEngine.h"
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
 #include "Scene/Nodes/Misc/HyCamera.h"
-#include "Renderer/Components/HyWindow.h"
-
 #include "Scene/Nodes/HyEntity2d.h"
-
+#include "Renderer/Components/HyWindow.h"
 #include "Diagnostics/HyGuiComms.h"
 
 /*static*/ HyAssets *IHyDraw2d::sm_pHyAssets = nullptr;
@@ -87,7 +83,7 @@ HyCoordinateType IHyDraw2d::GetCoordinateType()
 void IHyDraw2d::SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom)
 {
 	if(eCoordType == HYCOORDTYPE_Default)
-		eCoordType = IHyApplication::DefaultCoordinateType();
+		eCoordType = HyDefaultCoordinateType();
 
 	if(pCameraToCovertFrom)
 	{
@@ -250,9 +246,9 @@ void IHyDraw2d::Load()
 	HyAssert(sm_pHyAssets, "IHyDraw2d::Load was invoked before engine has been initialized");
 
 	if(GetCoordinateType() == HYCOORDTYPE_Default)
-		SetCoordinateType(IHyApplication::DefaultCoordinateType(), NULL);
+		SetCoordinateType(HyDefaultCoordinateType(), NULL);
 	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
-		SetCoordinateUnit(IHyApplication::DefaultCoordinateUnit(), false);
+		SetCoordinateUnit(HyDefaultCoordinateUnit(), false);
 
 	if(m_eTYPE != HYTYPE_Entity2d)
 	{

@@ -71,8 +71,8 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     m_sRelativeSourceLocation   = projPathsObj["SourcePath"].toString();
 
 
-    sm_Init.sGameName = GetName(false).toStdString();
-    sm_Init.sDataDir = GetAssetsAbsPath().toStdString();
+    m_Init.sGameName = GetName(false).toStdString();
+    m_Init.sDataDir = GetAssetsAbsPath().toStdString();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -452,9 +452,8 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 
 void Project::Reload()
 {
-    sm_Init.sGameName = GetName(false).toStdString();
-    sm_Init.sDataDir = GetAssetsAbsPath().toStdString();
-    
+    m_Init.sGameName = GetName(false).toStdString();
+    m_Init.sDataDir = GetAssetsAbsPath().toStdString();
     
     // TODO: Fix this
 //    if(m_pTabBar)

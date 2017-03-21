@@ -17,9 +17,9 @@ HyEngine *		HyEngine::sm_pInstance = NULL;
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxBuffer, m_AppRef.m_WindowList),
-												m_Assets(m_AppRef.sm_Init.sDataDir, m_GfxBuffer, m_Scene),
-												m_GuiComms(m_AppRef.sm_Init.uiDebugPort, m_Assets),
-												m_Input(m_AppRef.sm_Init.uiNumInputMappings),
+												m_Assets(m_AppRef.m_Init.sDataDir, m_GfxBuffer, m_Scene),
+												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_Assets),
+												m_Input(m_AppRef.m_Init.uiNumInputMappings),
 												m_Renderer(m_GfxBuffer, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList)
 {
@@ -142,4 +142,19 @@ HyRendererInterop &HyEngine::GetRenderer()
 /*friend*/ void HyPauseGame(bool bPause)
 {
 	HyEngine::sm_pInstance->m_Scene.SetPause(bPause);
+}
+
+/*friend*/ float HyPixelsPerMeter()
+{
+	return HyEngine::sm_pInstance->m_AppRef.PixelsPerMeter();
+}
+
+/*friend*/ HyCoordinateType HyDefaultCoordinateType()
+{
+	return HyEngine::sm_pInstance->m_AppRef.DefaultCoordinateType();
+}
+
+/*friend*/ HyCoordinateUnit HyDefaultCoordinateUnit()
+{
+	return HyEngine::sm_pInstance->m_AppRef.DefaultCoordinateUnit();
 }

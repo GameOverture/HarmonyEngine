@@ -8,8 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Nodes/Draws/HyPrimitive2d.h"
-
-#include "IHyApplication.h"
+#include "HyEngine.h"
 #include "Utilities/HyMath.h"
 
 HyPrimitive2d::HyPrimitive2d(IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
@@ -58,8 +57,8 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe)
 		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP);
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
-		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
-	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? IHyApplication::PixelsPerMeter() : 1.0f;
+		m_eCoordUnit = HyDefaultCoordinateUnit();
+	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? HyPixelsPerMeter() : 1.0f;
 	fWidth *= fCoordMod;
 	fHeight *= fCoordMod;
 
@@ -109,8 +108,8 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 	m_uiBufferSize = iNumSegments * sizeof(glm::vec2);
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
-		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
-	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? IHyApplication::PixelsPerMeter() : 1.0f;
+		m_eCoordUnit = HyDefaultCoordinateUnit();
+	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? HyPixelsPerMeter() : 1.0f;
 	fRadius *= fCoordMod;
 
 	float t = 0.0f;
@@ -140,8 +139,8 @@ void HyPrimitive2d::SetAsLineChain(std::vector<glm::vec2> &vertexList)
 	m_uiBufferSize = (m_RenderState.GetNumInstances() * 8) * sizeof(glm::vec2);
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
-		m_eCoordUnit = IHyApplication::DefaultCoordinateUnit();
-	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? IHyApplication::PixelsPerMeter() : 1.0f;
+		m_eCoordUnit = HyDefaultCoordinateUnit();
+	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? HyPixelsPerMeter() : 1.0f;
 
 	uint32 i, j;
 	for(i = j = 0; i < m_RenderState.GetNumInstances(); ++i, j += 8)

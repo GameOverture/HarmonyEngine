@@ -81,6 +81,9 @@ private:
 	HyRendererInterop &GetRenderer();
 
 	friend void HyPauseGame(bool bPause);
+	friend float HyPixelsPerMeter();
+	friend HyCoordinateType HyDefaultCoordinateType();
+	friend HyCoordinateUnit HyDefaultCoordinateUnit();
 };
 
 #endif /* __HyEngine_h__ */

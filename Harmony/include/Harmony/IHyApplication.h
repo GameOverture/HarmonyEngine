@@ -42,7 +42,7 @@ class IHyApplication
 #ifdef HY_PLATFORM_GUI
 protected:
 #endif
-	static HarmonyInit				sm_Init;
+	HarmonyInit						m_Init;
 
 	std::vector<HyWindow *>			m_WindowList;
 
@@ -57,9 +57,9 @@ public:
 	IHyApplication(HarmonyInit &initStruct);
 	virtual ~IHyApplication();
 
-	static HyCoordinateType DefaultCoordinateType();
-	static HyCoordinateUnit DefaultCoordinateUnit();
-	static float PixelsPerMeter();
+	HyCoordinateType DefaultCoordinateType();
+	HyCoordinateUnit DefaultCoordinateUnit();
+	float PixelsPerMeter();
 
 	HyWindow &Window(uint32 uiIndex = 0);
 	uint32 GetNumWindows();

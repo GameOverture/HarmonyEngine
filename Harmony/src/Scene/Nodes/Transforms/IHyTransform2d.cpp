@@ -8,6 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Nodes/Transforms/IHyTransform2d.h"
+#include "HyEngine.h"
 
 IHyTransform2d::IHyTransform2d(HyType eInstType, IHyNode *pParent /*= nullptr*/) :	IHyTransform<HyTweenVec2>(eInstType, pParent),
 																					m_eCoordUnit(HYCOORDUNIT_Default),
@@ -29,7 +30,7 @@ HyCoordinateUnit IHyTransform2d::GetCoordinateUnit()
 void IHyTransform2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion)
 {
 	if(eCoordUnit == HYCOORDUNIT_Default)
-		eCoordUnit = IHyApplication::DefaultCoordinateUnit();
+		eCoordUnit = HyDefaultCoordinateUnit();
 
 	if(m_eCoordUnit == eCoordUnit)
 		return;
@@ -38,8 +39,8 @@ void IHyTransform2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConv
 	{
 		switch(eCoordUnit)
 		{
-		case HYCOORDUNIT_Meters:	pos *= IHyApplication::PixelsPerMeter();	break;
-		case HYCOORDUNIT_Pixels:	pos /= IHyApplication::PixelsPerMeter();	break;
+		case HYCOORDUNIT_Meters:	pos *= HyPixelsPerMeter();	break;
+		case HYCOORDUNIT_Pixels:	pos /= HyPixelsPerMeter();	break;
 		}
 	}
 	m_eCoordUnit = eCoordUnit;
@@ -68,7 +69,7 @@ void IHyTransform2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConv
 	ptScalePivot.y = scale_pivot.Y();
 
 	if(m_eCoordUnit == HYCOORDUNIT_Meters)
-		outMtx = glm::translate(outMtx, ptPos * IHyApplication::PixelsPerMeter());
+		outMtx = glm::translate(outMtx, ptPos * HyPixelsPerMeter());
 	else
 		outMtx = glm::translate(outMtx, ptPos);
 
@@ -107,7 +108,7 @@ void IHyTransform2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConv
 	outMtx = glm::rotate(outMtx, rot.Get(), glm::vec3(0, 0, 1));
 
 	if(m_eCoordUnit == HYCOORDUNIT_Meters)
-		outMtx = glm::translate(outMtx, ptPos * IHyApplication::PixelsPerMeter());
+		outMtx = glm::translate(outMtx, ptPos * HyPixelsPerMeter());
 	else
 		outMtx = glm::translate(outMtx, ptPos);
 }
