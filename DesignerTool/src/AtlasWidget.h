@@ -10,13 +10,15 @@
 #ifndef ATLASWIDGET_H
 #define ATLASWIDGET_H
 
+#include "AtlasModel.h"
+#include "AtlasDraw.h"
+
 #include <QWidget>
 #include <QDir>
 #include <QMouseEvent>
 #include <QStringListModel>
 #include <QStackedWidget>
 
-#include "AtlasModel.h"
 
 namespace Ui {
 class AtlasWidget;
@@ -54,24 +56,17 @@ class AtlasWidget : public QWidget
     friend class WidgetAtlasGroup;
 
     AtlasModel *                    m_pModel;
-    //AtlasDraw *
-
+    AtlasDraw                       m_Draw;
 
     QTreeWidgetItem *               m_pMouseHoverItem;
 
 public:
     explicit AtlasWidget(QWidget *parent = 0);
-    explicit AtlasWidget(AtlasModel *pModel, QWidget *parent = 0);
+    explicit AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *parent = 0);
     ~AtlasWidget();
 
     AtlasModel &GetData();
-
     QTreeWidget *GetFramesTreeWidget();
-
-    friend void AtlasManager_DrawOpen(IHyApplication &hyApp, AtlasWidget &atlasMan);
-    friend void AtlasManager_DrawShow(IHyApplication &hyApp, AtlasWidget &atlasMan);
-    friend void AtlasManager_DrawHide(IHyApplication &hyApp, AtlasWidget &atlasMan);
-    friend void AtlasManager_DrawUpdate(IHyApplication &hyApp, AtlasWidget &atlasMan);
 
 private Q_SLOTS:
     void on_btnAddImages_clicked();

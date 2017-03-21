@@ -274,7 +274,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     //        this, SLOT(OnTabBarCurrentChanged(int)));
     //connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)),
     //        this, SLOT(on_tabBar_closeRequested(int)));
-    m_pAtlasMan = new AtlasWidget(m_pAtlasModel, nullptr);
+    m_pAtlasMan = new AtlasWidget(m_pAtlasModel, this, nullptr);
     m_pAudioMan = new AudioWidgetManager(this, nullptr);
 }
 

@@ -35,6 +35,8 @@ public:
     AtlasModel(Project *pProjOwner);
     virtual ~AtlasModel();
 
+    QList<AtlasFrame *> GetFrames();
+
     QJsonObject GetPackerSettings();
 
     QList<AtlasTreeItem *> GetTopLevelTreeItemList();

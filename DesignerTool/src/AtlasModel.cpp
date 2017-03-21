@@ -160,6 +160,11 @@ AtlasModel::AtlasModel(Project *pProjOwner) : m_pProjOwner(pProjOwner),
 
 }
 
+QList<AtlasFrame *> AtlasModel::GetFrames()
+{
+    return m_FrameList;
+}
+
 QJsonObject AtlasModel::GetPackerSettings()
 {
     return m_PackerSettings;
