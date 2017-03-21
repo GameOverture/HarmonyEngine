@@ -30,7 +30,7 @@ class Project : public ExplorerItem, public IHyApplication
 
     ProjectDraw *                                   m_pDraw;
 
-    AtlasModel *                                    m_pAtlasesData;
+    AtlasModel *                                    m_pAtlasModel;
     AtlasWidget *                                   m_pAtlasMan;
 
     AudioWidgetManager *                            m_pAudioMan;

@@ -28,7 +28,7 @@ class AtlasModel : public QObject
     ImagePacker                                     m_Packer;
 
     QList<AtlasFrame *>                             m_FrameList;
-    QList<AtlasTreeItem *>                          m_TopLevelAtlasTreeItemList;
+    QList<AtlasTreeItem *>                          m_TopLevelTreeItemList;
     QMap<quint32, AtlasFrame *>                     m_FrameChecksumMap;
 
 public:
@@ -37,7 +37,7 @@ public:
 
     QJsonObject GetPackerSettings();
 
-    QList<AtlasTreeItem *> GetAtlasTreeItemList();
+    QList<AtlasTreeItem *> GetTopLevelTreeItemList();
 
     QSize GetAtlasDimensions();
 
@@ -64,9 +64,6 @@ public:
     AtlasFrame *ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType);
 
     void SaveData();
-
-    //void SetDependency(AtlasFrame *pFrame, IProjItem *pItem);
-    //void RemoveDependency(AtlasFrame *pFrame, IProjItem *pItem);
 
     void GetAtlasInfoForGameData(QJsonObject &atlasObjOut);
 

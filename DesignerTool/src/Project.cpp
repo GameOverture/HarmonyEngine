@@ -29,7 +29,7 @@
 
 Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Project, sNewProjectFilePath),
                                                         IHyApplication(HarmonyInit()),
-                                                        m_pAtlasesData(nullptr),
+                                                        m_pAtlasModel(nullptr),
                                                         m_pAtlasMan(nullptr),
                                                         m_pAudioMan(nullptr),
                                                         m_pTabBar(nullptr),
@@ -128,7 +128,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    m_pAtlasesData = new AtlasModel(this);
+    m_pAtlasModel = new AtlasModel(this);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -274,7 +274,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     //        this, SLOT(OnTabBarCurrentChanged(int)));
     //connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)),
     //        this, SLOT(on_tabBar_closeRequested(int)));
-    m_pAtlasMan = new AtlasWidget(*m_pAtlasesData, nullptr);
+    m_pAtlasMan = new AtlasWidget(m_pAtlasModel, nullptr);
     m_pAudioMan = new AudioWidgetManager(this, nullptr);
 }
 
@@ -291,7 +291,7 @@ bool Project::HasError() const
 
 QList<AtlasTreeItem *> Project::GetAtlasTreeItemList()
 {
-    return m_pAtlasesData->GetAtlasTreeItemList();
+    return m_pAtlasModel->GetTopLevelTreeItemList();
 }
 
 QString Project::GetDirPath() const
@@ -342,7 +342,7 @@ QString Project::GetSourceRelPath() const
 
 AtlasModel &Project::GetAtlasModel()
 {
-    return *m_pAtlasesData;
+    return *m_pAtlasModel;
 }
 
 AtlasWidget *Project::GetAtlasWidget()

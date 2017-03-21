@@ -57,8 +57,8 @@ bool AtlasTreeItem::operator<(const QTreeWidgetItem &rhs) const
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 AtlasWidget::AtlasWidget(QWidget *parent) :   QWidget(parent),
-                                                            m_pDataRef(nullptr),
-                                                            ui(new Ui::AtlasWidget)
+                                              m_pModel(nullptr),
+                                              ui(new Ui::AtlasWidget)
 {
     ui->setupUi(this);
     
@@ -66,10 +66,10 @@ AtlasWidget::AtlasWidget(QWidget *parent) :   QWidget(parent),
     HyGuiLog("WidgetAtlasManager::WidgetAtlasManager() invalid constructor used", LOGTYPE_Error);
 }
 
-AtlasWidget::AtlasWidget(AtlasModel &itemDataRef, QWidget *parent /*= 0*/) :  QWidget(parent),
-                                                                                             ui(new Ui::AtlasWidget),
-                                                                                             m_pDataRef(&itemDataRef),
-                                                                                             m_pMouseHoverItem(NULL)
+AtlasWidget::AtlasWidget(AtlasModel *pModel, QWidget *parent /*= 0*/) : QWidget(parent),
+                                                                        ui(new Ui::AtlasWidget),
+                                                                        m_pModel(pModel),
+                                                                        m_pMouseHoverItem(nullptr)
 {
     ui->setupUi(this);
 
@@ -88,7 +88,7 @@ AtlasWidget::AtlasWidget(AtlasModel &itemDataRef, QWidget *parent /*= 0*/) :  QW
     ui->atlasList->setDropIndicatorShown(true);
     ui->atlasList->setDragDropMode(QAbstractItemView::InternalMove);
 
-    QList<AtlasTreeItem *> atlasTreeItemList = m_pDataRef->GetAtlasTreeItemList();
+    QList<AtlasTreeItem *> atlasTreeItemList = m_pModel->GetTopLevelTreeItemList();
     for(int i = 0; i < atlasTreeItemList.size(); ++i)
         ui->atlasList->addTopLevelItem(atlasTreeItemList[i]);
 
@@ -96,9 +96,9 @@ AtlasWidget::AtlasWidget(AtlasModel &itemDataRef, QWidget *parent /*= 0*/) :  QW
     //ui->atlasList->setSortingEnabled(true);
     //ui->atlasList->sortItems(0, Qt::AscendingOrder);
 
-    ui->lcdNumTextures->display(m_pDataRef->GetNumTextures());
-    ui->lcdTexWidth->display(m_pDataRef->GetAtlasDimensions().width());
-    ui->lcdTexHeight->display(m_pDataRef->GetAtlasDimensions().height());
+    ui->lcdNumTextures->display(m_pModel->GetNumTextures());
+    ui->lcdTexWidth->display(m_pModel->GetAtlasDimensions().width());
+    ui->lcdTexHeight->display(m_pModel->GetAtlasDimensions().height());
 
     ui->atlasList->collapseAll();
 }
@@ -110,7 +110,7 @@ AtlasWidget::~AtlasWidget()
 
 AtlasModel &AtlasWidget::GetData()
 {
-    return *m_pDataRef;
+    return *m_pModel;
 }
 
 QTreeWidget *AtlasWidget::GetFramesTreeWidget()
@@ -314,7 +314,7 @@ void AtlasWidget::on_btnAddImages_clicked()
                                                                &sSelectedFilter);
 
     if(sImportImgList.empty() == false)
-        m_pDataRef->Repack(QSet<int>(), m_pDataRef->ImportImages(sImportImgList));
+        m_pModel->Repack(QSet<int>(), m_pModel->ImportImages(sImportImgList));
 }
 
 void AtlasWidget::on_btnAddDir_clicked()
@@ -338,12 +338,12 @@ void AtlasWidget::on_btnAddDir_clicked()
     }
 
     if(sImportImgList.empty() == false)
-        m_pDataRef->Repack(QSet<int>(), m_pDataRef->ImportImages(sImportImgList));
+        m_pModel->Repack(QSet<int>(), m_pModel->ImportImages(sImportImgList));
 }
 
 void AtlasWidget::on_btnSettings_clicked()
 {
-    DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(m_pDataRef->GetPackerSettings());
+    DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(m_pModel->GetPackerSettings());
     if(pDlg->GetName().isEmpty())
         pDlg->SetName("Atlas Group");
 
@@ -353,9 +353,9 @@ void AtlasWidget::on_btnSettings_clicked()
         pDlg->WidgetsToData();  // Save the changes
 
         if(pDlg->IsSettingsDirty())
-            m_pDataRef->RepackAll();
+            m_pModel->RepackAll();
         else if(pDlg->IsNameChanged())
-            m_pDataRef->WriteMetaSettings();
+            m_pModel->WriteMetaSettings();
     }
     else
         pDlg->DataToWidgets();  // Reverts changes made
@@ -382,11 +382,11 @@ void AtlasWidget::on_actionDeleteImages_triggered()
 
         affectedTextureIndexSet.insert(pFrame->GetTextureIndex());
 
-        m_pDataRef->RemoveFrame(pFrame);
+        m_pModel->RemoveFrame(pFrame);
         delete selectedImageList[i];
     }
 
-    m_pDataRef->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
+    m_pModel->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
 }
 
 void AtlasWidget::on_actionReplaceImages_triggered()
@@ -440,10 +440,10 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 
         affectedTextureIndexSet.insert(selectedFrameList[i]->GetTextureIndex());
 
-        m_pDataRef->ReplaceFrame(selectedFrameList[i], fileInfo.fileName(), newImage, false);
+        m_pModel->ReplaceFrame(selectedFrameList[i], fileInfo.fileName(), newImage, false);
     }
 
-    m_pDataRef->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
+    m_pModel->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
 
     for(int i = 0; i < selectedFrameList.count(); ++i)
     {
@@ -473,7 +473,7 @@ void AtlasWidget::on_actionAddFilter_triggered()
 
     ui->atlasList->sortItems(0, Qt::AscendingOrder);
 
-    m_pDataRef->WriteMetaSettings();
+    m_pModel->WriteMetaSettings();
 }
 
 /*virtual*/ void AtlasWidget::resizeEvent(QResizeEvent *event)

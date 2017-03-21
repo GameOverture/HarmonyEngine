@@ -64,16 +64,16 @@ AtlasModel::AtlasModel(Project *pProjOwner) : m_pProjOwner(pProjOwner),
             QVariant v(QString(filterPathDir.absolutePath()));
             pNewTreeItem->setData(0, Qt::UserRole, v);
 
-            m_TopLevelAtlasTreeItemList.append(pNewTreeItem);
+            m_TopLevelTreeItemList.append(pNewTreeItem);
         }
 
         // Then place the filters correctly as a parent heirarchy using the path string stored in their data
-        QList<AtlasTreeItem *> atlasFiltersTreeItemList(m_TopLevelAtlasTreeItemList);
-        for(int i = 0; i < m_TopLevelAtlasTreeItemList.size(); ++i)
+        QList<AtlasTreeItem *> atlasFiltersTreeItemList(m_TopLevelTreeItemList);
+        for(int i = 0; i < m_TopLevelTreeItemList.size(); ++i)
         {
             AtlasTreeItem *pParentFilter = NULL;
 
-            QString sFilterPath = m_TopLevelAtlasTreeItemList[i]->data(0, Qt::UserRole).toString();
+            QString sFilterPath = m_TopLevelTreeItemList[i]->data(0, Qt::UserRole).toString();
             sFilterPath.truncate(sFilterPath.lastIndexOf("/"));
             if(sFilterPath != "")
             {
@@ -89,7 +89,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) : m_pProjOwner(pProjOwner),
 
             if(pParentFilter)
             {
-                pParentFilter->addChild(m_TopLevelAtlasTreeItemList.takeAt(i));
+                pParentFilter->addChild(m_TopLevelTreeItemList.takeAt(i));
                 i = -1;
             }
         }
@@ -137,17 +137,17 @@ AtlasModel::AtlasModel(Project *pProjOwner) : m_pProjOwner(pProjOwner),
             if(pFrameParent)
                 pFrameParent->addChild(pNewFrame->GetTreeItem());
             else
-                m_TopLevelAtlasTreeItemList.append(pNewFrame->GetTreeItem());
+                m_TopLevelTreeItemList.append(pNewFrame->GetTreeItem());
         }
     }
 
-    if(m_TopLevelAtlasTreeItemList.empty())
+    if(m_TopLevelTreeItemList.empty())
         WriteMetaSettings();
     else
     {
-        for(int i = 0; i < m_TopLevelAtlasTreeItemList.size(); ++i)
+        for(int i = 0; i < m_TopLevelTreeItemList.size(); ++i)
         {
-            for(int j = 0; j < m_TopLevelAtlasTreeItemList[i]->childCount(); ++j)
+            for(int j = 0; j < m_TopLevelTreeItemList[i]->childCount(); ++j)
             {
 
             }
@@ -165,9 +165,9 @@ QJsonObject AtlasModel::GetPackerSettings()
     return m_PackerSettings;
 }
 
-QList<AtlasTreeItem *> AtlasModel::GetAtlasTreeItemList()
+QList<AtlasTreeItem *> AtlasModel::GetTopLevelTreeItemList()
 {
-    return m_TopLevelAtlasTreeItemList;
+    return m_TopLevelTreeItemList;
 }
 
 QSize AtlasModel::GetAtlasDimensions()
@@ -450,18 +450,6 @@ void AtlasModel::SaveData()
         atlasInfoFile.close();
     }
 }
-
-//void AtlasesData::SetDependency(AtlasFrame *pFrame, IProjItem *pItem)
-//{
-//    pFrame->m_DependencySet.insert(pItem);
-//    pItem->Link(pFrame);
-//}
-
-//void AtlasesData::RemoveDependency(AtlasFrame *pFrame, IProjItem *pItem)
-//{
-//    pFrame->m_DependencySet.remove(pItem);
-//    pItem->Unlink(pFrame);
-//}
 
 void AtlasModel::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
 {
