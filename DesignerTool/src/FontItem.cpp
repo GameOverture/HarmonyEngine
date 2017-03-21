@@ -17,7 +17,7 @@
 
 #include "MainWindow.h"
 #include "FontWidget.h"
-#include "AtlasesWidget.h"
+#include "AtlasWidget.h"
 
 #include "Harmony/HyEngine.h"
 

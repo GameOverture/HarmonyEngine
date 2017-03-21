@@ -21,7 +21,7 @@ namespace Ui {
 class SpriteWidget;
 }
 
-class AtlasesWidget;
+class AtlasWidget;
 
 class SpriteWidget : public QWidget
 {

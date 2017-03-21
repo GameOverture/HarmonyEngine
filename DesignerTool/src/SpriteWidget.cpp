@@ -13,7 +13,7 @@
 #include "UndoCmds.h"
 #include "SpriteUndoCmds.h"
 #include "DlgInputName.h"
-#include "AtlasesWidget.h"
+#include "AtlasWidget.h"
 
 #include <QFile>
 #include <QJsonDocument>

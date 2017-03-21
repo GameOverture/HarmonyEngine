@@ -17,7 +17,7 @@
 #include <QUndoStack>
 #include <QJsonObject>
 
-class AtlasesWidget;
+class AtlasWidget;
 class AudioWidgetManager;
 class Project;
 class AtlasFrame;

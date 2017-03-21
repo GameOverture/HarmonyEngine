@@ -1,5 +1,5 @@
 /**************************************************************************
- *	WidgetExplorer.cpp
+ *	ExplorerWidget.cpp
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -11,10 +11,9 @@
 #include "ui_ExplorerWidget.h"
 
 #include "MainWindow.h"
-#include "AudioItem.h"
 #include "FontItem.h"
 #include "Project.h"
-#include "AtlasesWidget.h"
+#include "AtlasWidget.h"
 #include "HyGuiGlobal.h"
 
 #include <QJsonArray>

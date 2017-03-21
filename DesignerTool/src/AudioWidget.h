@@ -1,5 +1,5 @@
 /**************************************************************************
- *	WidgetAudio.h
+ *	AudioWidget.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -10,8 +10,8 @@
 #ifndef AUDIOWIDGET_H
 #define AUDIOWIDGET_H
 
-#include "AudioItem.h"
 #include "AudioWidgetState.h"
+#include "ProjectItem.h"
 
 #include <QWidget>
 

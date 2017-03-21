@@ -53,18 +53,18 @@ SOURCES += main.cpp \
     AtlasFrame.cpp \
     AudioWave.cpp \
     HyGuiGlobal.cpp \
-    AtlasesData.cpp \
-    AtlasesWidget.cpp \
     ExplorerItem.cpp \
     ExplorerWidget.cpp \
     FontDraw.cpp \
     AudioDraw.cpp \
-    AudioItem.cpp \
     FontItem.cpp \
     SpriteModels.cpp \
     ProjectItem.cpp \
     ProjectModel.cpp \
-    FontModels.cpp
+    FontModels.cpp \
+    AtlasDraw.cpp \
+    AtlasModel.cpp \
+    AtlasWidget.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -104,18 +104,18 @@ HEADERS  += \
     AtlasFrame.h \
     AudioWave.h \
     HyGuiGlobal.h \
-    AtlasesData.h \
-    AtlasesWidget.h \
     ExplorerItem.h \
     ExplorerWidget.h \
     FontDraw.h \
     AudioDraw.h \
-    AudioItem.h \
     FontItem.h \
     SpriteModels.h \
     ProjectItem.h \
     ProjectModel.h \
-    FontModels.h
+    FontModels.h \
+    AtlasDraw.h \
+    AtlasModel.h \
+    AtlasWidget.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -137,9 +137,9 @@ FORMS    += \
     AudioWidget.ui \
     AudioWidgetBank.ui \
     AudioWidgetManager.ui \
-    AtlasesWidget.ui \
     AudioWidgetState.ui \
-    ExplorerWidget.ui
+    ExplorerWidget.ui \
+    AtlasWidget.ui
 
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER HY_PLATFORM_GUI
 

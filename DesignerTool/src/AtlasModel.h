@@ -1,5 +1,5 @@
 /**************************************************************************
- *	ItemAtlases.h
+ *	AtlasModel.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2017 Jason Knobler
@@ -7,15 +7,15 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef ATLASESDATA_H
-#define ATLASESDATA_H
+#ifndef ATLASMODEL_H
+#define ATLASMODEL_H
 
 #include <QObject>
 
 #include "AtlasFrame.h"
 #include "scriptum/imagepacker.h"
 
-class AtlasesData : public QObject
+class AtlasModel : public QObject
 {
     Q_OBJECT
 
@@ -32,8 +32,8 @@ class AtlasesData : public QObject
     QMap<quint32, AtlasFrame *>                     m_FrameChecksumMap;
 
 public:
-    AtlasesData(Project *pProjOwner);
-    virtual ~AtlasesData();
+    AtlasModel(Project *pProjOwner);
+    virtual ~AtlasModel();
 
     QJsonObject GetPackerSettings();
 
@@ -78,4 +78,4 @@ public:
     void Refresh();
 };
 
-#endif // ATLASESDATA_H
+#endif // ATLASMODEL_H

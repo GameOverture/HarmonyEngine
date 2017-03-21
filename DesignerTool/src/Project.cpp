@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Project.h"
 
-#include "AtlasesWidget.h"
+#include "AtlasWidget.h"
 #include "AudioWidgetManager.h"
 #include "MainWindow.h"
 #include "HyGuiGlobal.h"
@@ -238,7 +238,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    m_pAtlasesData = new AtlasesData(this);
+    m_pAtlasesData = new AtlasModel(this);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -384,7 +384,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     //        this, SLOT(OnTabBarCurrentChanged(int)));
     //connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)),
     //        this, SLOT(on_tabBar_closeRequested(int)));
-    m_pAtlasMan = new AtlasesWidget(*m_pAtlasesData, nullptr);
+    m_pAtlasMan = new AtlasWidget(*m_pAtlasesData, nullptr);
     m_pAudioMan = new AudioWidgetManager(this, nullptr);
 }
 
@@ -507,12 +507,12 @@ QString Project::GetSourceRelPath() const
     return QDir::cleanPath(m_sRelativeSourceLocation) + '/';
 }
 
-AtlasesData &Project::GetAtlasesData()
+AtlasModel &Project::GetAtlasesData()
 {
     return *m_pAtlasesData;
 }
 
-AtlasesWidget *Project::GetAtlasManager()
+AtlasWidget *Project::GetAtlasManager()
 {
     return m_pAtlasMan;
 }

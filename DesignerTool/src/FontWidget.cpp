@@ -13,7 +13,7 @@
 #include "HyGuiGlobal.h"
 #include "FontUndoCmds.h"
 #include "UndoCmds.h"
-#include "AtlasesWidget.h"
+#include "AtlasWidget.h"
 #include "FontModelView.h"
 #include "DlgInputName.h"
 

@@ -10,7 +10,7 @@
 #include "AtlasFrame.h"
 #include "scriptum/imagepacker.h"
 
-#include "AtlasesWidget.h"
+#include "AtlasWidget.h"
 
 AtlasFrame::AtlasFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors) :  m_eType(eType),
                                                                                                                                                                     m_pTreeWidgetItem(nullptr),

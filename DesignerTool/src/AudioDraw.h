@@ -1,8 +1,16 @@
+/**************************************************************************
+ *	AudioDraw.h
+ *
+ *	Harmony Engine - Designer Tool
+ *	Copyright (c) 2017 Jason Knobler
+ *
+ *	The zlib License (zlib)
+ *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *************************************************************************/
 #ifndef AUDIODRAW_H
 #define AUDIODRAW_H
 
 #include "IDraw.h"
-#include "AudioItem.h"
 
 //class AudioDraw : public IDraw
 //{

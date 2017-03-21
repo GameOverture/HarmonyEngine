@@ -11,14 +11,14 @@
 #define PROJECT_H
 
 #include "ProjectItem.h"
-#include "AtlasesData.h"
+#include "AtlasModel.h"
 #include "ExplorerItem.h"
 
 #include <QQueue>
 #include <QJsonObject>
 
 // Forward declaration
-class AtlasesWidget;
+class AtlasWidget;
 class AudioWidgetManager;
 
 class AtlasTreeItem;
@@ -40,13 +40,13 @@ class Project : public ExplorerItem, public IHyApplication
 {
     Q_OBJECT
 
-    AtlasesData *                                   m_pAtlasesData;
-    AtlasesWidget *                                 m_pAtlasMan;
+    AtlasModel *                                   m_pAtlasesData;
+    AtlasWidget *                                 m_pAtlasMan;
 
     AudioWidgetManager *                            m_pAudioMan;
     QTabBar *                                       m_pTabBar;
 
-    ProjectItem *                                     m_pCurOpenItem;
+    ProjectItem *                                   m_pCurOpenItem;
     
     QString                                         m_sGameName;
 
@@ -84,8 +84,8 @@ public:
     QString GetSourceAbsPath() const;
     QString GetSourceRelPath() const;
 
-    AtlasesData &GetAtlasesData();
-    AtlasesWidget *GetAtlasManager();
+    AtlasModel &GetAtlasesData();
+    AtlasWidget *GetAtlasManager();
     AudioWidgetManager *GetAudioManager();
     QTabBar *GetTabBar();
     

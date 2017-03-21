@@ -21,7 +21,7 @@ class AtlasTreeItem;
 
 class AtlasFrame
 {
-    friend class AtlasesData;
+    friend class AtlasModel;
     
     eAtlasNodeType                      m_eType;
 

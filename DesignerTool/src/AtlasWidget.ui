@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AtlasesWidget</class>
- <widget class="QWidget" name="AtlasesWidget">
+ <class>AtlasWidget</class>
+ <widget class="QWidget" name="AtlasWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -146,7 +146,7 @@
     </layout>
    </item>
    <item>
-    <widget class="AtlasesTreeWidget" name="atlasList">
+    <widget class="AtlasTreeWidget" name="atlasList">
      <property name="mouseTracking">
       <bool>false</bool>
      </property>
@@ -252,9 +252,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>AtlasesTreeWidget</class>
+   <class>AtlasTreeWidget</class>
    <extends>QTreeWidget</extends>
-   <header>AtlasesData.h</header>
+   <header>AtlasWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

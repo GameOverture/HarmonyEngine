@@ -1,5 +1,5 @@
 /**************************************************************************
- *	ItemAtlases.cpp
+ *	AtlasModel.cpp
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2017 Jason Knobler
@@ -7,10 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "AtlasesData.h"
+#include "AtlasModel.h"
 
 #include "Project.h"
-#include "AtlasesWidget.h"
+#include "AtlasWidget.h"
 #include "MainWindow.h"
 
 #include <QJsonDocument>
@@ -18,7 +18,7 @@
 #include <QJsonArray>
 #include <QPainter>
 
-AtlasesData::AtlasesData(Project *pProjOwner) : m_pProjOwner(pProjOwner),
+AtlasModel::AtlasModel(Project *pProjOwner) : m_pProjOwner(pProjOwner),
                                                     m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
                                                     m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases))
 {
@@ -155,32 +155,32 @@ AtlasesData::AtlasesData(Project *pProjOwner) : m_pProjOwner(pProjOwner),
     }
 }
 
-/*virtual*/ AtlasesData::~AtlasesData()
+/*virtual*/ AtlasModel::~AtlasModel()
 {
 
 }
 
-QJsonObject AtlasesData::GetPackerSettings()
+QJsonObject AtlasModel::GetPackerSettings()
 {
     return m_PackerSettings;
 }
 
-QList<AtlasTreeItem *> AtlasesData::GetAtlasTreeItemList()
+QList<AtlasTreeItem *> AtlasModel::GetAtlasTreeItemList()
 {
     return m_TopLevelAtlasTreeItemList;
 }
 
-QSize AtlasesData::GetAtlasDimensions()
+QSize AtlasModel::GetAtlasDimensions()
 {
     return QSize(m_PackerSettings["sbTextureWidth"].toInt(), m_PackerSettings["sbTextureHeight"].toInt());
 }
 
-int AtlasesData::GetNumTextures()
+int AtlasModel::GetNumTextures()
 {
     return m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot).size() - 1;  // - 1 because don't include atlasInfo.json
 }
 
-void AtlasesData::WriteMetaSettings()
+void AtlasModel::WriteMetaSettings()
 {
     QJsonArray frameArray;
     for(int i = 0; i < m_FrameList.size(); ++i)
@@ -193,7 +193,7 @@ void AtlasesData::WriteMetaSettings()
     WriteMetaSettings(frameArray);
 }
 
-void AtlasesData::WriteMetaSettings(QJsonArray frameArray)
+void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
 {
     QJsonObject settingsObj;
     settingsObj.insert("settings", m_PackerSettings);
@@ -237,7 +237,7 @@ void AtlasesData::WriteMetaSettings(QJsonArray frameArray)
     }
 }
 
-AtlasFrame *AtlasesData::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors)
+AtlasFrame *AtlasModel::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors)
 {
     AtlasFrame *pNewFrame = NULL;
 
@@ -261,7 +261,7 @@ AtlasFrame *AtlasesData::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlph
     return pNewFrame;
 }
 
-void AtlasesData::RemoveFrame(AtlasFrame *pFrame)
+void AtlasModel::RemoveFrame(AtlasFrame *pFrame)
 {
     m_FrameChecksumMap.remove(pFrame->GetChecksum());
     pFrame->DeleteMetaImage(m_MetaDir);
@@ -274,7 +274,7 @@ void AtlasesData::RemoveFrame(AtlasFrame *pFrame)
     //m_pMouseHoverItem = NULL;
 }
 
-AtlasFrame *AtlasesData::GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, eAtlasNodeType eType)
+AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, eAtlasNodeType eType)
 {
     // This allocates a new HyGuiFrame into the dependency map
     AtlasFrame *pFrame = ImportImage(sName, newImage, eType);
@@ -294,7 +294,7 @@ AtlasFrame *AtlasesData::GenerateFrame(ProjectItem *pItem, QString sName, QImage
     return NULL;
 }
 
-void AtlasesData::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack)
+void AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack)
 {
     QSet<int> textureIndexToReplaceSet;
     textureIndexToReplaceSet.insert(pFrame->GetTextureIndex());
@@ -320,7 +320,7 @@ void AtlasesData::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newIma
         Repack(textureIndexToReplaceSet, QSet<AtlasFrame *>());
 }
 
-QList<AtlasFrame *> AtlasesData::RequestFrames(ProjectItem *pItem)
+QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem)
 {
     QList<QTreeWidgetItem *> selectedItems;
     if(m_pProjOwner->GetAtlasManager())
@@ -347,7 +347,7 @@ QList<AtlasFrame *> AtlasesData::RequestFrames(ProjectItem *pItem)
     return RequestFrames(pItem, frameRequestList);
 }
 
-QList<AtlasFrame *> AtlasesData::RequestFrames(ProjectItem *pItem, QList<quint32> requestList)
+QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem, QList<quint32> requestList)
 {
     if(requestList.empty())
         return RequestFrames(pItem);
@@ -368,7 +368,7 @@ QList<AtlasFrame *> AtlasesData::RequestFrames(ProjectItem *pItem, QList<quint32
     return RequestFrames(pItem, frameRequestList);
 }
 
-QList<AtlasFrame *> AtlasesData::RequestFrames(ProjectItem *pItem, QList<AtlasFrame *> requestList)
+QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem, QList<AtlasFrame *> requestList)
 {
     if(requestList.empty())
         return RequestFrames(pItem);
@@ -384,7 +384,7 @@ QList<AtlasFrame *> AtlasesData::RequestFrames(ProjectItem *pItem, QList<AtlasFr
     return returnList;
 }
 
-void AtlasesData::RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinquishList)
+void AtlasModel::RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinquishList)
 {
     for(int i = 0; i < relinquishList.size(); ++i)
         relinquishList[i]->m_DependencySet.remove(pItem);
@@ -392,7 +392,7 @@ void AtlasesData::RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relin
 //    RemoveDependency(relinquishList[i], pItem);
 }
 
-QSet<AtlasFrame *> AtlasesData::ImportImages(QStringList sImportImgList)
+QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList)
 {
     QSet<AtlasFrame *> returnSet;
 
@@ -408,7 +408,7 @@ QSet<AtlasFrame *> AtlasesData::ImportImages(QStringList sImportImgList)
     return returnSet;
 }
 
-AtlasFrame *AtlasesData::ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType)
+AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType)
 {
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
 
@@ -426,7 +426,7 @@ AtlasFrame *AtlasesData::ImportImage(QString sName, QImage &newImage, eAtlasNode
     return pNewFrame;
 }
 
-void AtlasesData::SaveData()
+void AtlasModel::SaveData()
 {
     QJsonObject atlasObj;
     GetAtlasInfoForGameData(atlasObj);
@@ -463,7 +463,7 @@ void AtlasesData::SaveData()
 //    pItem->Unlink(pFrame);
 //}
 
-void AtlasesData::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
+void AtlasModel::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
 {
     atlasObjOut.insert("id", m_DataDir.dirName().toInt());
     atlasObjOut.insert("width", m_PackerSettings["sbTextureWidth"].toInt());
@@ -496,7 +496,7 @@ void AtlasesData::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
     atlasObjOut.insert("textures", textureArray);
 }
 
-void AtlasesData::SetPackerSettings()
+void AtlasModel::SetPackerSettings()
 {
     m_Packer.sortOrder = m_PackerSettings["cmbSortOrder"].toInt();// m_iSortOrderIndex;//ui->cmbSortOrder->currentIndex();
     m_Packer.border.t = m_PackerSettings["sbFrameMarginTop"].toInt();// m_iFrameMarginTop;//ui->sbFrameMarginTop->value();
@@ -512,7 +512,7 @@ void AtlasesData::SetPackerSettings()
     m_Packer.rotate = ImagePacker::NEVER;
 }
 
-void AtlasesData::RepackAll()
+void AtlasModel::RepackAll()
 {
     int iNumTotalTextures = m_DataDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name).size();
 
@@ -523,7 +523,7 @@ void AtlasesData::RepackAll()
     Repack(textureIndexSet, QSet<AtlasFrame *>());
 }
 
-void AtlasesData::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
+void AtlasModel::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
 {
     // Always repack the last texture to ensure it gets filled as much as it can
     QFileInfoList existingTexturesInfoList = m_DataDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
@@ -636,7 +636,7 @@ void AtlasesData::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFr
     Refresh();
 }
 
-void AtlasesData::ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIndex)
+void AtlasModel::ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIndex)
 {
     if(m_PackerSettings["sbTextureWidth"].toInt() != m_Packer.bins[iPackerBinIndex].width() || m_PackerSettings["sbTextureHeight"].toInt() != m_Packer.bins[iPackerBinIndex].height())
         HyGuiLog("WidgetAtlasGroup::ConstructAtlasTexture() Mismatching texture dimentions", LOGTYPE_Error);
@@ -761,7 +761,7 @@ void AtlasesData::ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIn
     pTexture->save(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iTextureArrayIndex) % ".png"));
 }
 
-void AtlasesData::Refresh()
+void AtlasModel::Refresh()
 {
     QJsonArray frameArray;
     for(int i = 0; i < m_FrameList.size(); ++i)

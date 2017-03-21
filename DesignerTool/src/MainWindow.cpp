@@ -16,7 +16,7 @@
 #include "DlgInputName.h"
 
 #include "ExplorerWidget.h"
-#include "AtlasesWidget.h"
+#include "AtlasWidget.h"
 #include "AudioWidgetManager.h"
 
 #include "HyGuiRenderer.h"
