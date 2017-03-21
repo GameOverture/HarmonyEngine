@@ -60,12 +60,12 @@ SOURCES += main.cpp \
     FontItem.cpp \
     SpriteModels.cpp \
     ProjectItem.cpp \
-    ProjectModel.cpp \
     FontModels.cpp \
     AtlasDraw.cpp \
     AtlasModel.cpp \
     AtlasWidget.cpp \
-    ProjectDraw.cpp
+    ProjectDraw.cpp \
+    IModel.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -112,12 +112,12 @@ HEADERS  += \
     FontItem.h \
     SpriteModels.h \
     ProjectItem.h \
-    ProjectModel.h \
     FontModels.h \
     AtlasDraw.h \
     AtlasModel.h \
     AtlasWidget.h \
-    ProjectDraw.h
+    ProjectDraw.h \
+    IModel.h
 
 FORMS    += \
     DlgNewProject.ui \

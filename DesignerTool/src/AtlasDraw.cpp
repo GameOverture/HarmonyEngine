@@ -12,7 +12,7 @@
 AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(*pHyApp),
                                                                         m_ModelRef(*pModelRef)
 {
-    m_ModelRef.GetFrames();
+    //m_ModelRef.GetFrames();
 }
 
 /*virtual*/ AtlasDraw::~AtlasDraw()

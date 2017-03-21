@@ -37,7 +37,7 @@ class SpriteWidget : public QWidget
 public:
     explicit SpriteWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget *parent = 0);
     ~SpriteWidget();
-
+    
     void SetSelectedState(int iIndex);
     
     ProjectItem &GetItem();

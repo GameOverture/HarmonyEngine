@@ -26,10 +26,10 @@ SpriteDraw::SpriteDraw(SpriteModel &modelRef, IHyApplication &hyApp) :  IDraw(hy
 
     for(int i = 0; i < modelRef.GetNumStates(); ++i)
     {
-        SpriteStateData *pStateData = modelRef.GetStateData(i);
-        for(int j = 0; j < pStateData->pFramesModel->rowCount(); ++j)
+        SpriteStateData *pStateData = static_cast<SpriteStateData *>(modelRef.GetStateData(i));
+        for(int j = 0; j < pStateData->GetFramesModel()->rowCount(); ++j)
         {
-            AtlasFrame *pFrame = pStateData->pFramesModel->GetFrameAt(j)->m_pFrame;
+            AtlasFrame *pFrame = pStateData->GetFramesModel()->GetFrameAt(j)->m_pFrame;
 
             HyTexturedQuad2d *pNewTexturedQuad = new HyTexturedQuad2d(pFrame->GetTextureIndex(), this);
             pNewTexturedQuad->SetTextureSource(pFrame->GetX(), pFrame->GetY(), pFrame->GetCrop().width(), pFrame->GetCrop().height());

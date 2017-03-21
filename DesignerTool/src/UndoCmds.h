@@ -13,6 +13,7 @@
 #include "HyGuiGlobal.h"
 #include "ProjectItem.h"
 #include "Project.h"
+#include "IModel.h"
 
 #include <QUndoCommand>
 #include <QComboBox>
@@ -21,7 +22,6 @@
 #include <QRadioButton>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename MODEL>
 class UndoCmd_AddState : public QUndoCommand
 {
     ProjectItem &       m_ItemRef;
@@ -39,19 +39,18 @@ public:
 
     void redo() override
     {
-        m_iIndex = static_cast<MODEL *>(m_ItemRef.GetModel())->AppendState(QJsonObject());
+        m_iIndex = static_cast<IModel *>(m_ItemRef.GetModel())->AppendState(QJsonObject());
         m_ItemRef.RefreshWidget(m_iIndex);
     }
     
     void undo() override
     {
-        static_cast<MODEL *>(m_ItemRef.GetModel())->PopStateAt(m_iIndex);
+        static_cast<IModel *>(m_ItemRef.GetModel())->PopStateAt(m_iIndex);
         m_ItemRef.RefreshWidget(m_iIndex);
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename MODEL>
 class UndoCmd_RemoveState : public QUndoCommand
 {
     ProjectItem &       m_ItemRef;
@@ -71,19 +70,18 @@ public:
 
     void redo() override
     {
-        m_PoppedStateObj = static_cast<MODEL *>(m_ItemRef.GetModel())->PopStateAt(m_iIndex);
+        m_PoppedStateObj = static_cast<IModel *>(m_ItemRef.GetModel())->PopStateAt(m_iIndex);
         m_ItemRef.RefreshWidget(m_iIndex);
     }
     
     void undo() override
     {
-        m_iIndex = static_cast<MODEL *>(m_ItemRef.GetModel())->AppendState(m_PoppedStateObj);
+        m_iIndex = static_cast<IModel *>(m_ItemRef.GetModel())->AppendState(m_PoppedStateObj);
         m_ItemRef.RefreshWidget(m_iIndex);
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename MODEL>
 class UndoCmd_RenameState : public QUndoCommand
 {
     ProjectItem &       m_ItemRef;
@@ -106,19 +104,18 @@ public:
 
     void redo() override
     {
-        m_sOldName = static_cast<MODEL *>(m_ItemRef.GetModel())->SetStateName(m_iIndex, m_sNewName);
+        m_sOldName = static_cast<IModel *>(m_ItemRef.GetModel())->SetStateName(m_iIndex, m_sNewName);
         m_ItemRef.RefreshWidget(m_iIndex);
     }
     
     void undo() override
     {
-        static_cast<MODEL *>(m_ItemRef.GetModel())->SetStateName(m_iIndex, m_sOldName);
+        static_cast<IModel *>(m_ItemRef.GetModel())->SetStateName(m_iIndex, m_sOldName);
         m_ItemRef.RefreshWidget(m_iIndex);
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename MODEL>
 class UndoCmd_MoveStateBack : public QUndoCommand
 {
     ProjectItem &       m_ItemRef;
@@ -137,7 +134,7 @@ public:
 
     void redo() override
     {
-        static_cast<MODEL *>(m_ItemRef.GetModel())->MoveStateBack(m_iStateIndex);
+        static_cast<IModel *>(m_ItemRef.GetModel())->MoveStateBack(m_iStateIndex);
         m_iStateIndex -= 1;
 
         m_ItemRef.RefreshWidget(m_iStateIndex);
@@ -145,7 +142,7 @@ public:
     
     void undo() override
     {
-        static_cast<MODEL *>(m_ItemRef.GetModel())->MoveStateForward(m_iStateIndex);
+        static_cast<IModel *>(m_ItemRef.GetModel())->MoveStateForward(m_iStateIndex);
         m_iStateIndex += 1;
 
         m_ItemRef.RefreshWidget(m_iStateIndex);
@@ -153,7 +150,6 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename MODEL>
 class UndoCmd_MoveStateForward : public QUndoCommand
 {
     ProjectItem &       m_ItemRef;
@@ -172,7 +168,7 @@ public:
 
     void redo() override
     {
-        static_cast<MODEL *>(m_ItemRef.GetModel())->MoveStateForward(m_iStateIndex);
+        static_cast<IModel *>(m_ItemRef.GetModel())->MoveStateForward(m_iStateIndex);
         m_iStateIndex += 1;
 
         m_ItemRef.RefreshWidget(m_iStateIndex);
@@ -180,7 +176,7 @@ public:
     
     void undo() override
     {
-        static_cast<MODEL *>(m_ItemRef.GetModel())->MoveStateBack(m_iStateIndex);
+        static_cast<IModel *>(m_ItemRef.GetModel())->MoveStateBack(m_iStateIndex);
         m_iStateIndex -= 1;
 
         m_ItemRef.RefreshWidget(m_iStateIndex);
@@ -226,21 +222,20 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename MAPPER>
 class UndoCmd_CheckBox : public QUndoCommand
 {
     ProjectItem &       m_ItemRef;
-    MAPPER *            m_pMapper;
+    CheckBoxMapper *    m_pMapper;
     int                 m_iStateIndex;
 
     bool                m_bNewValue;
 
 public:
-    UndoCmd_CheckBox(QString sText, ProjectItem &itemRef, MAPPER *pMapper, int iStateIndex, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
-                                                                                                                            m_ItemRef(itemRef),
-                                                                                                                            m_pMapper(pMapper),
-                                                                                                                            m_iStateIndex(iStateIndex),
-                                                                                                                            m_bNewValue(!pMapper->IsChecked())
+    UndoCmd_CheckBox(QString sText, ProjectItem &itemRef, CheckBoxMapper *pMapper, int iStateIndex, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
+                                                                                                                                    m_ItemRef(itemRef),
+                                                                                                                                    m_pMapper(pMapper),
+                                                                                                                                    m_iStateIndex(iStateIndex),
+                                                                                                                                    m_bNewValue(!pMapper->IsChecked())
     {
         setText((m_bNewValue ? "Checked " : "Unchecked ") % sText);
     }
@@ -429,7 +424,6 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename MODEL>
 class UndoCmd_AddFrames : public QUndoCommand
 {
     ProjectItem &           m_ItemRef;
@@ -451,19 +445,18 @@ public:
 
     void redo() override
     {
-        m_Frames = static_cast<MODEL *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames);
+        m_Frames = static_cast<IModel *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames);
         m_ItemRef.RefreshWidget(m_iStateIndex);
     }
     
     void undo() override
     {
-        static_cast<MODEL *>(m_ItemRef.GetModel())->RelinquishFrames(m_iStateIndex, m_Frames);
+        static_cast<IModel *>(m_ItemRef.GetModel())->RelinquishFrames(m_iStateIndex, m_Frames);
         m_ItemRef.RefreshWidget(m_iStateIndex);
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename MODEL>
 class UndoCmd_DeleteFrame : public QUndoCommand
 {
     ProjectItem &           m_ItemRef;
@@ -485,13 +478,13 @@ public:
 
     void redo() override
     {
-        static_cast<MODEL *>(m_ItemRef.GetModel())->RelinquishFrames(m_iStateIndex, m_Frames);
+        static_cast<IModel *>(m_ItemRef.GetModel())->RelinquishFrames(m_iStateIndex, m_Frames);
         m_ItemRef.RefreshWidget(m_iStateIndex);
     }
     
     void undo() override
     {
-        static_cast<MODEL *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames);
+        static_cast<IModel *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames);
         m_ItemRef.RefreshWidget(m_iStateIndex);
     }
 };

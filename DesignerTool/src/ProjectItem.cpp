@@ -134,7 +134,7 @@ void ProjectItem::RelinkFrame(AtlasFrame *pFrame)
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
-        static_cast<SpriteModel *>(m_pModel)->RelinkFrame(pFrame);
+        static_cast<SpriteModel *>(m_pModel)->RefreshFrame(pFrame);
         break;
     default:
         HyGuiLog("Unsupported ProjectItem::Relink() type: " % QString::number(m_eTYPE), LOGTYPE_Error);

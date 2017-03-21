@@ -10,12 +10,10 @@
 #ifndef SPRITEMODELS_H
 #define SPRITEMODELS_H
 
+#include "IModel.h"
 #include "AtlasFrame.h"
-#include "ProjectModel.h"
 
 #include <QObject>
-#include <QDataWidgetMapper>
-#include <QCheckBox>
 #include <QJsonArray>
 
 class SpriteItem;
@@ -89,74 +87,74 @@ Q_SIGNALS:
     void editCompleted(const QString &);
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class CheckBoxMapper : public QDataWidgetMapper
+class SpriteStateData : public IStateData
 {
-    class ModelCheckBox : public QAbstractListModel
-    {
-    public:
-        ModelCheckBox(QObject *pParent = nullptr) : QAbstractListModel(pParent)
-        { }
-
-        virtual ~ModelCheckBox()
-        { }
-
-        virtual int ModelCheckBox::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
-        {
-            return 2;
-        }
-
-        virtual QVariant ModelCheckBox::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
-        {
-            return index.row() == 0 ? false : true;
-        }
-    };
+    CheckBoxMapper *    m_pChkMapper_Loop;
+    CheckBoxMapper *    m_pChkMapper_Reverse;
+    CheckBoxMapper *    m_pChkMapper_Bounce;
+    SpriteFramesModel * m_pFramesModel;
 
 public:
-    CheckBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
+    SpriteStateData(IModel &modelRef, QJsonObject stateObj) :   IStateData(modelRef, stateObj["name"].toString()),
+                                                                m_pChkMapper_Loop(nullptr),
+                                                                m_pChkMapper_Reverse(nullptr),
+                                                                m_pChkMapper_Bounce(nullptr),
+                                                                m_pFramesModel(nullptr)
     {
-        setModel(new ModelCheckBox(this));
+        m_pChkMapper_Loop = new CheckBoxMapper(&m_ModelRef);
+        m_pChkMapper_Reverse = new CheckBoxMapper(&m_ModelRef);
+        m_pChkMapper_Bounce = new CheckBoxMapper(&m_ModelRef);
+        m_pFramesModel = new SpriteFramesModel(&m_ModelRef);
+        
+        if(stateObj.empty() == false)
+        {
+            m_pChkMapper_Loop->SetChecked(stateObj["loop"].toBool());
+            m_pChkMapper_Reverse->SetChecked(stateObj["reverse"].toBool());
+            m_pChkMapper_Bounce->SetChecked(stateObj["bounce"].toBool());
+            
+            QJsonArray spriteFrameArray = stateObj["frames"].toArray();
+            QList<quint32> checksumRequestList;
+            for(int i = 0; i < spriteFrameArray.size(); ++i)
+            {
+                QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
+                checksumRequestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
+            }
+    
+            
+            QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFrames(this, checksumRequestList);
+            if(spriteFrameArray.size() != requestedAtlasFramesList.size())
+                HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
+    
+            for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
+            {
+                QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
+                QPoint vOffset(spriteFrameObj["offsetX"].toInt() - requestedAtlasFramesList[i]->GetCrop().left(),
+                               spriteFrameObj["offsetY"].toInt() - (requestedAtlasFramesList[i]->GetSize().height() - requestedAtlasFramesList[i]->GetCrop().bottom()));
+    
+                m_pFramesModel->OffsetFrame(i, vOffset);
+                m_pFramesModel->DurationFrame(i, spriteFrameObj["duration"].toDouble());
+            }
+        }
+        else
+        {
+            m_pChkMapper_Loop->SetChecked(false);
+            m_pChkMapper_Reverse->SetChecked(false);
+            m_pChkMapper_Bounce->SetChecked(false);
+        }
     }
-    virtual ~CheckBoxMapper()
-    { }
-
-    void AddCheckBoxMapping(QCheckBox *pCheckBox)
-    {
-        addMapping(pCheckBox, 0);
-        this->setCurrentIndex(this->currentIndex());
-    }
-
-    bool IsChecked()
-    {
-        return currentIndex() == 0 ? false : true;
-    }
-
-    void SetChecked(bool bChecked)
-    {
-        setCurrentIndex(bChecked ? 1 : 0);
-    }
-};
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-struct SpriteStateData
-{
-    QString             sName;
-    CheckBoxMapper *    pLoopMapper;
-    CheckBoxMapper *    pReverseMapper;
-    CheckBoxMapper *    pBounceMapper;
-    SpriteFramesModel * pFramesModel;
-
-    SpriteStateData() : pLoopMapper(nullptr),
-                        pReverseMapper(nullptr),
-                        pBounceMapper(nullptr),
-                        pFramesModel(nullptr)
-    { }
+    
+    CheckBoxMapper *GetLoopMapper()     { return m_pChkMapper_Loop; }
+    CheckBoxMapper *GetReverseMapper()  { return m_pChkMapper_Reverse; }
+    CheckBoxMapper *GetBounceMapper()   { return m_pChkMapper_Bounce; }
+    SpriteFramesModel *GetFramesModel() { return m_pFramesModel; }
 
     void GetStateInfo(QJsonObject &stateObjOut)
     {
         QJsonArray frameArray;
         float fTotalDuration = 0.0f;
-        for(int i = 0; i < pFramesModel->rowCount(); ++i)
+        for(int i = 0; i < m_pFramesModel->rowCount(); ++i)
         {
-            SpriteFrame *pSpriteFrame = pFramesModel->GetFrameAt(i);
+            SpriteFrame *pSpriteFrame = m_pFramesModel->GetFrameAt(i);
 
             QJsonObject frameObj;
             frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));
@@ -168,48 +166,43 @@ struct SpriteStateData
             frameArray.append(frameObj);
         }
 
-        stateObjOut.insert("name", QJsonValue(sName));
-        stateObjOut.insert("loop", pLoopMapper->IsChecked());
-        stateObjOut.insert("reverse", pReverseMapper->IsChecked());
-        stateObjOut.insert("bounce", pBounceMapper->IsChecked());
+        stateObjOut.insert("name", QJsonValue(GetName()));
+        stateObjOut.insert("loop", m_pChkMapper_Loop->IsChecked());
+        stateObjOut.insert("reverse", m_pChkMapper_Reverse->IsChecked());
+        stateObjOut.insert("bounce", m_pChkMapper_Bounce->IsChecked());
         stateObjOut.insert("duration", QJsonValue(fTotalDuration));
         stateObjOut.insert("frames", QJsonValue(frameArray));
     }
+    
+    virtual void AddFrame(AtlasFrame *pFrame)
+    {
+        m_pFramesModel->Add(pFrame);
+    }
+    
+    virtual void RelinquishFrame(AtlasFrame *pFrame)
+    {
+        m_pFramesModel->Remove(pFrame);
+    }
+    
+    virtual void RefreshFrame(AtlasFrame *pFrame)
+    {
+        m_pFramesModel->RefreshFrame(pFrame);
+    }
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class SpriteModel : public QAbstractListModel
+class SpriteModel : public IModel
 {
     Q_OBJECT
-
-    ProjectItem *               m_pItem;
-    QList<SpriteStateData *>    m_StateList;
 
 public:
     SpriteModel(ProjectItem *pItem, QJsonArray stateArray);
     virtual ~SpriteModel();
-
-    int GetNumStates();
-    SpriteStateData *GetStateData(int iStateIndex);
-
-    QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList);
-    void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
-
-    void RelinkFrame(AtlasFrame *pFrame);
-
-    int AppendState(QJsonObject stateObj);
-    void InsertState(int iStateIndex, QJsonObject stateObj);
-    QJsonObject PopStateAt(uint32 uiIndex);
-
-    QString SetStateName(int iStateIndex, QString sNewName);
-    void MoveStateBack(int iStateIndex);
-    void MoveStateForward(int iStateIndex);
-
-    QJsonArray GetSaveInfo();
-
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-    virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    
+    virtual int AppendState(QJsonObject stateObj);
+    virtual void InsertState(int iStateIndex, QJsonObject stateObj);
+    virtual QJsonObject PopStateAt(uint32 uiIndex);
+    
+    virtual QJsonValue GetSaveInfo();
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

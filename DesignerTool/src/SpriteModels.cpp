@@ -252,8 +252,7 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SpriteModel::SpriteModel(ProjectItem *pItem, QJsonArray stateArray) :   QAbstractListModel(pItem),
-                                                                        m_pItem(pItem)
+SpriteModel::SpriteModel(ProjectItem *pItem, QJsonArray stateArray) :   IModel(pItem)
 {
     // If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
     if(stateArray.empty() == false)
@@ -269,39 +268,6 @@ SpriteModel::SpriteModel(ProjectItem *pItem, QJsonArray stateArray) :   QAbstrac
 {
 }
 
-int SpriteModel::GetNumStates()
-{
-    return m_StateList.size();
-}
-
-SpriteStateData *SpriteModel::GetStateData(int iStateIndex)
-{
-    return m_StateList[iStateIndex];
-}
-
-QList<AtlasFrame *> SpriteModel::RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList)
-{
-    QList<AtlasFrame *> returnedAtlasFramesList = m_pItem->GetProject().GetAtlasModel().RequestFrames(m_pItem, requestList);
-
-    for(int i = 0; i < returnedAtlasFramesList.size(); ++i)
-        m_StateList[iStateIndex]->pFramesModel->Add(returnedAtlasFramesList[i]);
-
-    return returnedAtlasFramesList;
-}
-
-void SpriteModel::RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList)
-{
-    for(int i = 0; i < relinquishList.size(); ++i)
-        m_StateList[iStateIndex]->pFramesModel->Remove(relinquishList[i]);
-
-    m_pItem->GetProject().GetAtlasModel().RelinquishFrames(m_pItem, relinquishList);
-}
-
-void SpriteModel::RelinkFrame(AtlasFrame *pFrame)
-{
-    for(int i = 0; i < m_StateList.size(); ++i)
-        m_StateList[i]->pFramesModel->RefreshFrame(pFrame);
-}
 
 int SpriteModel::AppendState(QJsonObject stateObj)
 {
@@ -313,64 +279,7 @@ int SpriteModel::AppendState(QJsonObject stateObj)
 
 void SpriteModel::InsertState(int iStateIndex, QJsonObject stateObj)
 {
-    SpriteStateData *pNewState = new SpriteStateData();
-
-    if(stateObj.empty() == false)
-    {
-        pNewState->sName = stateObj["name"].toString();
-
-        pNewState->pLoopMapper = new CheckBoxMapper(this);
-        pNewState->pLoopMapper->SetChecked(stateObj["loop"].toBool());
-
-        pNewState->pReverseMapper = new CheckBoxMapper(this);
-        pNewState->pReverseMapper->SetChecked(stateObj["reverse"].toBool());
-
-        pNewState->pBounceMapper = new CheckBoxMapper(this);
-        pNewState->pBounceMapper->SetChecked(stateObj["bounce"].toBool());
-
-        QJsonArray spriteFrameArray = stateObj["frames"].toArray();
-        QList<quint32> checksumRequestList;
-        for(int i = 0; i < spriteFrameArray.size(); ++i)
-        {
-            QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
-            checksumRequestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
-        }
-
-        QList<AtlasFrame *> requestedAtlasFramesList;
-        requestedAtlasFramesList = m_pItem->GetProject().GetAtlasModel().RequestFrames(m_pItem, checksumRequestList);
-
-        if(spriteFrameArray.size() != requestedAtlasFramesList.size())
-        {
-            HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
-        }
-
-        pNewState->pFramesModel = new SpriteFramesModel(this);
-        for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
-        {
-            QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
-            QPoint vOffset(spriteFrameObj["offsetX"].toInt() - requestedAtlasFramesList[i]->GetCrop().left(),
-                           spriteFrameObj["offsetY"].toInt() - (requestedAtlasFramesList[i]->GetSize().height() - requestedAtlasFramesList[i]->GetCrop().bottom()));
-
-            int iFrameIndex = pNewState->pFramesModel->Add(requestedAtlasFramesList[i]);
-            pNewState->pFramesModel->OffsetFrame(iFrameIndex, vOffset);
-            pNewState->pFramesModel->DurationFrame(iFrameIndex, spriteFrameObj["duration"].toDouble());
-        }
-    }
-    else
-    {
-        pNewState->sName = "Unnamed";
-
-        pNewState->pLoopMapper = new CheckBoxMapper(this);
-        pNewState->pLoopMapper->SetChecked(false);
-
-        pNewState->pReverseMapper = new CheckBoxMapper(this);
-        pNewState->pReverseMapper->SetChecked(false);
-
-        pNewState->pBounceMapper = new CheckBoxMapper(this);
-        pNewState->pBounceMapper->SetChecked(false);
-
-        pNewState->pFramesModel = new SpriteFramesModel(this);
-    }
+    SpriteStateData *pNewState = new SpriteStateData(*this, stateObj);
 
     beginInsertRows(QModelIndex(), iStateIndex, iStateIndex);
     m_StateList.insert(iStateIndex, pNewState);
@@ -384,13 +293,13 @@ void SpriteModel::InsertState(int iStateIndex, QJsonObject stateObj)
 QJsonObject SpriteModel::PopStateAt(uint32 uiIndex)
 {
     QJsonObject retStateObj;
-    retStateObj.insert("name", m_StateList[uiIndex]->sName);
-    retStateObj.insert("loop", m_StateList[uiIndex]->pLoopMapper->currentIndex());
-    retStateObj.insert("reverse", m_StateList[uiIndex]->pReverseMapper->currentIndex());
-    retStateObj.insert("bounce", m_StateList[uiIndex]->pBounceMapper->currentIndex());
+    retStateObj.insert("name", m_StateList[uiIndex]->GetName());
+    retStateObj.insert("loop", static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetLoopMapper()->currentIndex());
+    retStateObj.insert("reverse", static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetReverseMapper()->currentIndex());
+    retStateObj.insert("bounce", static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetBounceMapper()->currentIndex());
 
     float fTotalDuration = 0.0f;
-    QJsonArray framesArray = m_StateList[uiIndex]->pFramesModel->GetFramesInfo(fTotalDuration);
+    QJsonArray framesArray = static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetFramesModel()->GetFramesInfo(fTotalDuration);
     retStateObj.insert("frames", framesArray);
     retStateObj.insert("duration", fTotalDuration);
 
@@ -405,79 +314,15 @@ QJsonObject SpriteModel::PopStateAt(uint32 uiIndex)
     return retStateObj;
 }
 
-QString SpriteModel::SetStateName(int iStateIndex, QString sNewName)
-{
-    QString sOldName = m_StateList[iStateIndex]->sName;
-    m_StateList[iStateIndex]->sName = sNewName;
-
-    QVector<int> roleList;
-    roleList.append(Qt::DisplayRole);
-    dataChanged(createIndex(iStateIndex, 0), createIndex(iStateIndex, 0), roleList);
-
-    return sOldName;
-}
-
-void SpriteModel::MoveStateBack(int iStateIndex)
-{
-    if(beginMoveRows(QModelIndex(), iStateIndex, iStateIndex, QModelIndex(), iStateIndex - 1) == false)
-        return;
-
-    m_StateList.swap(iStateIndex, iStateIndex - 1);
-    endMoveRows();
-
-    QVector<int> roleList;
-    roleList.append(Qt::DisplayRole);
-    dataChanged(createIndex(iStateIndex, 0), createIndex(iStateIndex, 0), roleList);
-}
-
-void SpriteModel::MoveStateForward(int iStateIndex)
-{
-    if(beginMoveRows(QModelIndex(), iStateIndex, iStateIndex, QModelIndex(), iStateIndex + 2) == false)    // + 2 is here because Qt is retarded
-        return;
-
-    m_StateList.swap(iStateIndex, iStateIndex + 1);
-    endMoveRows();
-
-    QVector<int> roleList;
-    roleList.append(Qt::DisplayRole);
-    dataChanged(createIndex(iStateIndex, 0), createIndex(iStateIndex, 0), roleList);
-}
-
-QJsonArray SpriteModel::GetSaveInfo()
+QJsonValue SpriteModel::GetSaveInfo()
 {
     QJsonArray retArray;
     for(int i = 0; i < m_StateList.size(); ++i)
     {
         QJsonObject spriteState;
-        m_StateList[i]->GetStateInfo(spriteState);
+        static_cast<SpriteStateData *>(m_StateList[i])->GetStateInfo(spriteState);
         retArray.append(spriteState);
     }
 
     return retArray;
-}
-
-/*virtual*/ int SpriteModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
-{
-    return m_StateList.size();
-}
-
-/*virtual*/ QVariant SpriteModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
-{
-    if (role == Qt::TextAlignmentRole)
-        return Qt::AlignLeft;
-
-    if(role == Qt::DisplayRole || role == Qt::EditRole)
-        return QString::number(index.row()) % " - " % m_StateList[index.row()]->sName;
-
-    return QVariant();
-}
-
-/*virtual*/ bool SpriteModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
-{
-    return QAbstractItemModel::setData(index, value, role);
-}
-
-/*virtual*/ QVariant SpriteModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
-{
-    return (iIndex == 0) ? QVariant(QString("State Names")) : QVariant();
 }
