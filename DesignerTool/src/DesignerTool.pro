@@ -64,7 +64,8 @@ SOURCES += main.cpp \
     FontModels.cpp \
     AtlasDraw.cpp \
     AtlasModel.cpp \
-    AtlasWidget.cpp
+    AtlasWidget.cpp \
+    ProjectDraw.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -115,7 +116,8 @@ HEADERS  += \
     FontModels.h \
     AtlasDraw.h \
     AtlasModel.h \
-    AtlasWidget.h
+    AtlasWidget.h \
+    ProjectDraw.h
 
 FORMS    += \
     DlgNewProject.ui \

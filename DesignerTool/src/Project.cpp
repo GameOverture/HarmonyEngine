@@ -1,5 +1,5 @@
 /**************************************************************************
- *	ItemProject.cpp
+ *	Project.cpp
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -27,129 +27,19 @@
 // Keep this commented out unless you want the entire project to save every item upon boot (used if 'Data.json' layout has changed and needs to propagate all its changes)
 //#define RESAVE_ENTIRE_PROJECT
 
-const char * const szCHECKERGRID_VERTEXSHADER = R"src(
-#version 400
-
-/*layout(location = 0)*/ in vec2 position;
-/*layout(location = 1)*/ in vec2 UVcoord;
-
-smooth out vec2 interpUV;
-
-uniform mat4 transformMtx;
-uniform mat4 u_mtxWorldToCamera;
-uniform mat4 u_mtxCameraToClip;
-
-void main()
-{
-    interpUV.x = UVcoord.x;
-    interpUV.y = UVcoord.y;
-
-    vec4 temp = transformMtx * vec4(position, 0, 1);
-    temp = u_mtxWorldToCamera * temp;
-    gl_Position = u_mtxCameraToClip * temp;
-}
-)src";
-
-
-const char *const szCHECKERGRID_FRAGMENTSHADER = R"src(
-#version 400
-
-in vec2 interpUV;
-out vec4 FragColor;
-
-uniform float uGridSize;
-uniform vec2 uResolution;
-uniform vec4 gridColor1;
-uniform vec4 gridColor2;
-
-void main()
-{
-    vec2 screenCoords = (interpUV.xy * (uResolution /** 0.5f*/)) / uGridSize;
-    FragColor = mix(gridColor1, gridColor2, step((float(int(floor(screenCoords.x) + floor(screenCoords.y)) & 1)), 0.9));
-}
-)src";
-
-CheckerGrid::CheckerGrid()
-{
-}
-
-CheckerGrid::~CheckerGrid()
-{
-}
-
-void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
-{
-    m_Resolution.x = iWidth;
-    m_Resolution.y = iHeight;
-    SetAsQuad(m_Resolution.x, m_Resolution.y, false);
-    pos.Set(m_Resolution.x * -0.5f, m_Resolution.y * -0.5f);
-}
-
-/*virtual*/ void CheckerGrid::OnUpdateUniforms()
-{
-    glm::mat4 mtx;
-    HyPrimitive2d::GetWorldTransform(mtx);
-
-    m_ShaderUniforms.Set("transformMtx", mtx);
-    m_ShaderUniforms.Set("uGridSize", 25.0f);
-    m_ShaderUniforms.Set("uResolution", m_Resolution);
-    m_ShaderUniforms.Set("gridColor1", glm::vec4(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f, 1.0f));
-    m_ShaderUniforms.Set("gridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
-}
-
-/*virtual*/ void CheckerGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)
-{
-    HyAssert(m_RenderState.GetNumVerticesPerInstance() == 4, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
-
-    for(int i = 0; i < 4; ++i)
-    {
-        *reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pDrawBuffer[i];
-        pRefDataWritePos += sizeof(glm::vec2);
-
-        glm::vec2 vUV;
-        switch(i)
-        {
-        case 0:
-            vUV.x = 1.0f;
-            vUV.y = 0.0f;
-            break;
-
-        case 1:
-            vUV.x = 0.0f;
-            vUV.y = 0.0f;
-            break;
-
-        case 2:
-            vUV.x = 1.0f;
-            vUV.y = 1.0f;
-            break;
-
-        case 3:
-            vUV.x = 0.0f;
-            vUV.y = 1.0f;
-            break;
-        }
-
-        *reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
-        pRefDataWritePos += sizeof(glm::vec2);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Project, sNewProjectFilePath),
-                                                                IHyApplication(HarmonyInit()),
-                                                                m_pAtlasesData(nullptr),
-                                                                m_pAtlasMan(nullptr),
-                                                                m_pAudioMan(nullptr),
-                                                                m_pTabBar(nullptr),
-                                                                m_pCurOpenItem(nullptr),
-                                                                m_pCamera(nullptr),
-                                                                m_ActionSave(0),
-                                                                m_ActionSaveAll(0),
-                                                                m_bHasError(false)
+                                                        IHyApplication(HarmonyInit()),
+                                                        m_pAtlasesData(nullptr),
+                                                        m_pAtlasMan(nullptr),
+                                                        m_pAudioMan(nullptr),
+                                                        m_pTabBar(nullptr),
+                                                        m_pCurOpenItem(nullptr),
+                                                        m_ActionSave(0),
+                                                        m_ActionSaveAll(0),
+                                                        m_bHasError(false)
 {
+    m_pDraw = new ProjectDraw(*this);
+
     QFile projFile(sNewProjectFilePath);
     if(projFile.exists())
     {
@@ -390,7 +280,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 
 /*virtual*/ Project::~Project()
 {
-    HyGuiLog("Project destructor", LOGTYPE_Error);
+    delete m_pDraw;
     delete m_pAtlasMan;
 }
 
@@ -532,21 +422,7 @@ void Project::OpenItem(ProjectItem *pItem)
 // IHyApplication override
 /*virtual*/ bool Project::Initialize()
 {
-    IHyShader *pShader_CheckerGrid = IHyRenderer::MakeCustomShader();
-    pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
-    pShader_CheckerGrid->SetVertexAttribute("position", HYSHADERVAR_vec2);
-    pShader_CheckerGrid->SetVertexAttribute("UVcoord", HYSHADERVAR_vec2);
-    pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
-    pShader_CheckerGrid->Finalize(HYSHADERPROG_Primitive);
-
-    m_CheckerGridBG.SetCustomShader(pShader_CheckerGrid);
-    m_CheckerGridBG.SetDisplayOrder(-1000);
-    m_CheckerGridBG.SetSurfaceSize(10000, 10000);  // Use a large size that is a multiple of grid size (25)
-    m_CheckerGridBG.Load();
-
-    m_pCamera = Window().CreateCamera2d();
-    m_pCamera->SetEnabled(true);
-
+    m_pDraw->Load();
     return true;
 }
 
@@ -555,11 +431,11 @@ void Project::OpenItem(ProjectItem *pItem)
 {
     if(m_pTabBar->count() > 0)
     {
-        m_pCamera->SetEnabled(false);
+        m_pDraw->Hide();
         m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->DrawUpdate(*this);
     }
     else
-        m_pCamera->SetEnabled(true);
+        m_pDraw->Show();
 
     return true;
 }
