@@ -19,18 +19,23 @@ class AtlasDraw : public IDraw
     
     HyPrimitive2d               m_ShadeBackground;
     
+    // TODO: Test whether splitting HyTexturedQuad's into multiple maps has any lookup/insert benefit, rather than one massive QMap
     struct TextureEnt : public HyEntity2d
     {
-        QList<HyTexturedQuad2d *>   m_PreviewQuadList;
+        QMap<quint32, HyTexturedQuad2d *>   m_TexQuadMap;
         
         TextureEnt(IHyNode *pParent) : HyEntity2d(pParent)
         { }
     };
-    QList<TextureEnt *>         m_TextureEntList;
+    QList<TextureEnt *>             m_MasterList;
+    
+    QMap<quint32, HyTexturedQuad2d *>     m_CurrentPreviewMap;
 
 public:
     AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp);
     virtual ~AtlasDraw();
+    
+    void SetSelected(QList<QTreeWidgetItem *> selectedList);
 
     virtual void OnShow(IHyApplication &hyApp);
     virtual void OnHide(IHyApplication &hyApp);

@@ -322,6 +322,7 @@ void AtlasWidget::on_actionAddFilter_triggered()
 
 void AtlasWidget::on_atlasList_itemSelectionChanged()
 {
+    m_Draw.SetSelected(ui->atlasList->selectedItems());
     int iNumSelected = ui->atlasList->selectedItems().count();
 
     ui->actionDeleteImages->setEnabled(iNumSelected != 0);

@@ -23,18 +23,38 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(*p
     {
         uint32 uiTextureIndex = frameList[i]->GetTextureIndex();
         
-        while(m_TextureEntList.size() <= uiTextureIndex)
-            m_TextureEntList.append(new TextureEnt(this));
+        while(m_MasterList.size() <= uiTextureIndex)
+            m_MasterList.append(new TextureEnt(this));
         
-        HyTexturedQuad2d *pNewTexQuad = new HyTexturedQuad2d(uiTextureIndex, m_TextureEntList[uiTextureIndex]);
-        pNewTexQuad->SetTextureSource(frameList[i]->GetX(), frameList[i]->GetY(), frameList[i]->GetSize().width(), frameList[i]->GetSize().height());
-        m_TextureEntList[uiTextureIndex]->m_PreviewQuadList.append(pNewTexQuad);
+        HyTexturedQuad2d *pNewTexQuad = new HyTexturedQuad2d(uiTextureIndex, m_MasterList[uiTextureIndex]);
+        pNewTexQuad->SetTextureSource(frameList[i]->GetX(), frameList[i]->GetY(), frameList[i]->GetCrop().width(), frameList[i]->GetCrop().height());
+        
+        m_MasterList[uiTextureIndex]->m_TexQuadMap.insert(frameList[i]->GetChecksum(), pNewTexQuad);
     }
 }
 
 /*virtual*/ AtlasDraw::~AtlasDraw()
 {
 
+}
+
+void AtlasDraw::SetSelected(QList<QTreeWidgetItem *> selectedList)
+{
+    for(int i = 0; i < selectedList.size(); ++i)
+    {
+        AtlasFrame *pFrame = selectedList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
+        
+        if(pFrame)
+        {
+            if(m_CurrentPreviewMap.contains(pFrame->GetChecksum()) ==  false)
+            {
+                HyTexturedQuad2d *pQuad = m_MasterList[pFrame->GetTextureIndex()]->m_TexQuadMap[pFrame->GetChecksum()];
+                
+                pQuad->Load();
+                m_CurrentPreviewMap.insert(pFrame->GetChecksum(), pQuad);
+            }
+        }
+    }
 }
 
 /*virtual*/ void AtlasDraw::OnShow(IHyApplication &hyApp)
