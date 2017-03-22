@@ -11,6 +11,10 @@
 
 #include "Renderer/Components/HyWindow.h"
 
+HyCoordinateType IHyApplication::sm_eDefaultCoordinateType = HYCOORDTYPE_Default;
+HyCoordinateUnit IHyApplication::sm_eDefaultCoordinateUnit = HYCOORDUNIT_Default;
+float IHyApplication::sm_fPixelsPerMeter = 0.0f;
+
 HarmonyInit::HarmonyInit()
 {
 	sGameName = "Untitled Game";
@@ -92,10 +96,14 @@ HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
 IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(NULL),
 															m_Console(initStruct.bUseConsole, initStruct.consoleInfo)
 {
-	m_Init = initStruct;
 	HyAssert(m_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HarmonyInit's actual 'eDefaultCoordinateType' cannot be 'HYCOORDTYPE_Default'");
 	HyAssert(m_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HarmonyInit's actual 'eDefaultCoordinateUnit' cannot be 'HYCOORDUNIT_Default'");
 	HyAssert(m_Init.fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
+	
+	m_Init = initStruct;
+	sm_eDefaultCoordinateType = m_Init.eDefaultCoordinateType;
+	sm_eDefaultCoordinateUnit = m_Init.eDefaultCoordinateUnit;
+	sm_fPixelsPerMeter = m_Init.fPixelsPerMeter;
 	
 	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
 	{
@@ -119,18 +127,19 @@ IHyApplication::~IHyApplication()
 
 HyCoordinateType IHyApplication::DefaultCoordinateType()
 {
-	HyAssert(m_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HyScene::DefaultCoordinateType() invoked before engine initialized");
-	return m_Init.eDefaultCoordinateType;
+	HyAssert(sm_eDefaultCoordinateType != HYCOORDTYPE_Default, "HyScene::DefaultCoordinateType() invoked before IHyApplication initialized");
+	return sm_eDefaultCoordinateType;
 }
 HyCoordinateUnit IHyApplication::DefaultCoordinateUnit()
 {
-	HyAssert(m_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HyScene::DefaultCoordinateUnit() invoked before engine initialized");
-	return m_Init.eDefaultCoordinateUnit;
+	HyAssert(sm_eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HyScene::DefaultCoordinateUnit() invoked before IHyApplication initialized");
+	return sm_eDefaultCoordinateUnit;
 }
 
 float IHyApplication::PixelsPerMeter()
 {
-	return m_Init.fPixelsPerMeter;
+	HyAssert(sm_fPixelsPerMeter > 0.0f, "HyScene::PixelsPerMeter() invoked before IHyApplication initialized");
+	return sm_fPixelsPerMeter;
 }
 
 HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)

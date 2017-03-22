@@ -146,15 +146,15 @@ HyRendererInterop &HyEngine::GetRenderer()
 
 /*friend*/ float HyPixelsPerMeter()
 {
-	return HyEngine::sm_pInstance->m_AppRef.PixelsPerMeter();
+	return IHyApplication::PixelsPerMeter();
 }
 
 /*friend*/ HyCoordinateType HyDefaultCoordinateType()
 {
-	return HyEngine::sm_pInstance->m_AppRef.DefaultCoordinateType();
+	return IHyApplication::DefaultCoordinateType();
 }
 
 /*friend*/ HyCoordinateUnit HyDefaultCoordinateUnit()
 {
-	return HyEngine::sm_pInstance->m_AppRef.DefaultCoordinateUnit();
+	return IHyApplication::DefaultCoordinateUnit();
 }
