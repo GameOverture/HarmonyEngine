@@ -104,8 +104,6 @@ AtlasWidget::AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *pa
 
     ui->atlasList->collapseAll();
     
-    
-    m_Draw.Load();
 }
 
 AtlasWidget::~AtlasWidget()
