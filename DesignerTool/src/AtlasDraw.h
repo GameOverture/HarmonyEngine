@@ -19,7 +19,14 @@ class AtlasDraw : public IDraw
     
     HyPrimitive2d               m_ShadeBackground;
     
-    QList<HyTexturedQuad2d *>   m_PreviewQuadList;
+    struct TextureEnt : public HyEntity2d
+    {
+        QList<HyTexturedQuad2d *>   m_PreviewQuadList;
+        
+        TextureEnt(IHyNode *pParent) : HyEntity2d(pParent)
+        { }
+    };
+    QList<TextureEnt *>         m_TextureEntList;
 
 public:
     AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp);

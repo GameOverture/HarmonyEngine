@@ -17,7 +17,19 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(*p
     m_ShadeBackground.alpha.Set(0.3f);
     
     AddChild(m_ShadeBackground);
-    //m_ModelRef.GetFrames();
+    
+    QList<AtlasFrame *> frameList = m_ModelRef.GetFrames();
+    for(int i = 0; i < frameList.size(); ++i)
+    {
+        uint32 uiTextureIndex = frameList[i]->GetTextureIndex();
+        
+        while(m_TextureEntList.size() <= uiTextureIndex)
+            m_TextureEntList.append(new TextureEnt(this));
+        
+        HyTexturedQuad2d *pNewTexQuad = new HyTexturedQuad2d(uiTextureIndex, m_TextureEntList[uiTextureIndex]);
+        pNewTexQuad->SetTextureSource(frameList[i]->GetX(), frameList[i]->GetY(), frameList[i]->GetSize().width(), frameList[i]->GetSize().height());
+        m_TextureEntList[uiTextureIndex]->m_PreviewQuadList.append(pNewTexQuad);
+    }
 }
 
 /*virtual*/ AtlasDraw::~AtlasDraw()

@@ -101,7 +101,6 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
     if(m_pProjOwner)
     {
         m_pHyEngine = new HyEngine(*m_pProjOwner);
-        m_pProjOwner->Reload();
     }
 
 //    QOpenGLContext *pThreadContext = new QOpenGLContext;
@@ -140,6 +139,8 @@ void HyGuiRenderer::OnBootCheck()
 {
     if(m_pHyEngine && m_pHyEngine->BootUpdate() == false)
     {
+        m_pProjOwner->Reload();
+        
         m_bIsUpdating = false;
         m_pTimer->stop();
         
