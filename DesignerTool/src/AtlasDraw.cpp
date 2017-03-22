@@ -12,6 +12,11 @@
 AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(*pHyApp),
                                                                         m_ModelRef(*pModelRef)
 {
+    m_ShadeBackground.SetAsQuad(100.0f, 100.0f, false);
+    m_ShadeBackground.SetTint(0.0f, 0.0f, 0.0f);
+    m_ShadeBackground.alpha.Set(0.3f);
+    
+    AddChild(m_ShadeBackground);
     //m_ModelRef.GetFrames();
 }
 

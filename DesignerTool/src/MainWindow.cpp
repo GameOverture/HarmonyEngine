@@ -312,57 +312,56 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         return;
 
     sm_pInstance->m_pCurSelectedProj = pProj;
-    if(sm_pInstance->m_pCurSelectedProj)
-    {
-        // Insert the project's TabBar
-        bool bTabsFound = false;
-        for(int i = 0; i < sm_pInstance->ui->stackedTabWidgets->count(); ++i)
-        {
-            if(sm_pInstance->ui->stackedTabWidgets->widget(i) == pProj->GetTabBar())
-            {
-                sm_pInstance->ui->stackedTabWidgets->setCurrentIndex(i);
-                bTabsFound = true;
-            }
-        }
-        if(bTabsFound == false)
-        {
-            sm_pInstance->ui->stackedTabWidgets->addWidget(pProj->GetTabBar());
-            sm_pInstance->ui->stackedTabWidgets->setCurrentWidget(pProj->GetTabBar());
-            pProj->GetTabBar()->setParent(sm_pInstance->ui->stackedTabWidgets);
-        }
-        
-        // Replace the save actions in the 'File' menu
-        QList<QAction *> projSaveActionList = sm_pInstance->m_pCurSelectedProj->GetSaveActions();
-        if(sm_pInstance->m_pCurSaveAction != projSaveActionList[0])
-        {
-            sm_pInstance->ui->menu_File->insertActions(sm_pInstance->m_pCurSaveAction, projSaveActionList);
-            sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAction);
-            sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAllAction);
-            sm_pInstance->m_pCurSaveAction = projSaveActionList[0];
-            sm_pInstance->m_pCurSaveAllAction = projSaveActionList[1];
-        }
-    }
 
     // Swap the harmony engine renderers
     delete sm_pInstance->m_pCurRenderer;
-    sm_pInstance->m_pCurRenderer = new HyGuiRenderer(pProj, sm_pInstance);
+    sm_pInstance->m_pCurRenderer = new HyGuiRenderer(sm_pInstance->m_pCurSelectedProj, sm_pInstance);
     sm_pInstance->ui->centralVerticalLayout->addWidget(sm_pInstance->m_pCurRenderer);
 
-    Project *pTest = sm_pInstance->m_pCurSelectedProj;
+    // Below will be set when HyEngine is fully loaded
+    sm_pInstance->ui->dockWidgetAtlas->setWidget(nullptr);
+    sm_pInstance->ui->dockWidgetAudio->setWidget(nullptr);
+}
 
-    if(sm_pInstance->m_pCurSelectedProj)
+/*static*/ void MainWindow::SetSelectedProjWidgets(Project *pProj)
+{
+    if(sm_pInstance->m_pCurSelectedProj != pProj)
+        HyGuiLog("MainWindow::SetSelectedProjWidgets was passed a project that wasn't the currently selected one", LOGTYPE_Error);
+    
+    // Insert the project's TabBar
+    bool bTabsFound = false;
+    for(int i = 0; i < sm_pInstance->ui->stackedTabWidgets->count(); ++i)
     {
-        sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasWidget());
-        sm_pInstance->ui->dockWidgetAtlas->widget()->show();
-        
-        sm_pInstance->ui->dockWidgetAudio->setWidget(sm_pInstance->m_pCurSelectedProj->GetAudioWidget());
-        sm_pInstance->ui->dockWidgetAudio->widget()->show();
+        if(sm_pInstance->ui->stackedTabWidgets->widget(i) == sm_pInstance->m_pCurSelectedProj->GetTabBar())
+        {
+            sm_pInstance->ui->stackedTabWidgets->setCurrentIndex(i);
+            bTabsFound = true;
+        }
     }
-    else
+    if(bTabsFound == false)
     {
-        sm_pInstance->ui->dockWidgetAtlas->setWidget(NULL);
-        sm_pInstance->ui->dockWidgetAudio->setWidget(NULL);
+        sm_pInstance->ui->stackedTabWidgets->addWidget(sm_pInstance->m_pCurSelectedProj->GetTabBar());
+        sm_pInstance->ui->stackedTabWidgets->setCurrentWidget(sm_pInstance->m_pCurSelectedProj->GetTabBar());
+        sm_pInstance->m_pCurSelectedProj->GetTabBar()->setParent(sm_pInstance->ui->stackedTabWidgets);
     }
+    
+    // Replace the save actions in the 'File' menu
+    QList<QAction *> projSaveActionList = sm_pInstance->m_pCurSelectedProj->GetSaveActions();
+    if(sm_pInstance->m_pCurSaveAction != projSaveActionList[0])
+    {
+        sm_pInstance->ui->menu_File->insertActions(sm_pInstance->m_pCurSaveAction, projSaveActionList);
+        sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAction);
+        sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAllAction);
+        sm_pInstance->m_pCurSaveAction = projSaveActionList[0];
+        sm_pInstance->m_pCurSaveAllAction = projSaveActionList[1];
+    }
+    
+    // Project manager widgets
+    sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasWidget());
+    sm_pInstance->ui->dockWidgetAtlas->widget()->show();
+    
+    sm_pInstance->ui->dockWidgetAudio->setWidget(sm_pInstance->m_pCurSelectedProj->GetAudioWidget());
+    sm_pInstance->ui->dockWidgetAudio->widget()->show();
 }
 
 /*static*/ void MainWindow::ReloadHarmony()

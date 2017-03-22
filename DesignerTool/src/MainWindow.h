@@ -13,6 +13,7 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QTcpServer>
+#include <QStackedWidget>
 
 #include "Project.h"
 #include "HyGuiDebugger.h"
@@ -60,6 +61,7 @@ public:
     static bool CloseItem(ProjectItem *pItem);
     
     static void SetSelectedProj(Project *pProj);
+    static void SetSelectedProjWidgets(Project *pProj);
     static void ReloadHarmony();
 
     static void StartLoading(uint uiAreaFlags);

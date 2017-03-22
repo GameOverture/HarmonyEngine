@@ -265,17 +265,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
         //}
     }
     
-    m_pTabBar = new QTabBar(nullptr);
-    m_pTabBar->setTabsClosable(true);
-    m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
-    m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
-    m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
-    //connect(m_pTabBar, SIGNAL(QTabBar::currentChanged(int)),
-    //        this, SLOT(OnTabBarCurrentChanged(int)));
-    //connect(m_pTabBar, SIGNAL(QTabBar::tabCloseRequested(int)),
-    //        this, SLOT(on_tabBar_closeRequested(int)));
-    m_pAtlasMan = new AtlasWidget(m_pAtlasModel, this, nullptr);
-    m_pAudioMan = new AudioWidgetManager(this, nullptr);
+
 }
 
 /*virtual*/ Project::~Project()
@@ -455,17 +445,22 @@ void Project::Reload()
     m_Init.sGameName = GetName(false).toStdString();
     m_Init.sDataDir = GetAssetsAbsPath().toStdString();
     
-    // TODO: Fix this
-//    if(m_pTabBar)
-//    {
-//        for(int i = 0; i < m_pTabBar->count(); ++i)
-//        {
-//            m_pTabBar->tabData(i).value<ProjectItem *>()->ProjUnload(*this);
-//            m_pTabBar->tabData(i).value<ProjectItem *>()->ProjLoad(*this);
-//        }
-        
-//        MainWindow::OpenItem(m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>());
-//    }
+    if(m_pTabBar == nullptr)
+    {
+        m_pTabBar = new QTabBar(nullptr);
+        m_pTabBar->setTabsClosable(true);
+        m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
+        m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
+        m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
+    }
+    
+    delete m_pAtlasMan;
+    delete m_pAudioMan;
+    m_pAtlasMan = new AtlasWidget(m_pAtlasModel, this, nullptr);
+    m_pAudioMan = new AudioWidgetManager(this, nullptr);
+    
+    
+    MainWindow::SetSelectedProjWidgets(this);
 }
 
 void Project::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal)

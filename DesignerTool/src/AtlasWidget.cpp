@@ -94,15 +94,18 @@ AtlasWidget::AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *pa
     for(int i = 0; i < atlasTreeItemList.size(); ++i)
         ui->atlasList->addTopLevelItem(atlasTreeItemList[i]);
 
-    //ui->atlasList->sortByColumn(0, Qt::AscendingOrder);
-    //ui->atlasList->setSortingEnabled(true);
-    //ui->atlasList->sortItems(0, Qt::AscendingOrder);
+    ui->atlasList->sortByColumn(0, Qt::AscendingOrder);
+    ui->atlasList->setSortingEnabled(true);
+    ui->atlasList->sortItems(0, Qt::AscendingOrder);
 
     ui->lcdNumTextures->display(m_pModel->GetNumTextures());
     ui->lcdTexWidth->display(m_pModel->GetAtlasDimensions().width());
     ui->lcdTexHeight->display(m_pModel->GetAtlasDimensions().height());
 
     ui->atlasList->collapseAll();
+    
+    
+    m_Draw.Load();
 }
 
 AtlasWidget::~AtlasWidget()

@@ -53,7 +53,7 @@ class Project : public ExplorerItem, public IHyApplication
 public:
     Project(const QString sNewProjectFilePath);
     virtual ~Project();
-
+    
     bool HasError() const;
 
     QList<AtlasTreeItem *> GetAtlasTreeItemList();

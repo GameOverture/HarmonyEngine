@@ -15,7 +15,11 @@
 
 class AtlasDraw : public IDraw
 {
-    AtlasModel &    m_ModelRef;
+    AtlasModel &                m_ModelRef;
+    
+    HyPrimitive2d               m_ShadeBackground;
+    
+    QList<HyTexturedQuad2d *>   m_PreviewQuadList;
 
 public:
     AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp);
