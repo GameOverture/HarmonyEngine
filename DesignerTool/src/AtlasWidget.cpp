@@ -127,14 +127,27 @@ void AtlasWidget::DrawUpdate(IHyApplication &hyApp)
     m_Draw.Update(hyApp);
 }
 
-void AtlasWidget::PreviewAtlasGroup()
+/*virtual*/ void AtlasWidget::enterEvent(QEvent *pEvent) /*override*/
 {
-    //m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_AtlasManager);
+    m_Draw.Show();
+    QWidget::enterEvent(pEvent);
 }
 
-void AtlasWidget::HideAtlasGroup()
+/*virtual*/ void AtlasWidget::leaveEvent(QEvent *pEvent) /*override*/
 {
-    //m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_Nothing);
+    m_Draw.Hide();
+    QWidget::leaveEvent(pEvent);
+}
+
+/*virtual*/ void AtlasWidget::resizeEvent(QResizeEvent *event) /*override*/
+{
+    QWidget::resizeEvent(event);
+
+    if(ui->atlasList == NULL)
+        return;
+
+    int iTotalWidth = ui->atlasList->size().width();
+    ui->atlasList->setColumnWidth(0, iTotalWidth - 60);
 }
 
 void AtlasWidget::on_btnAddImages_clicked()
@@ -313,17 +326,6 @@ void AtlasWidget::on_actionAddFilter_triggered()
     ui->atlasList->sortItems(0, Qt::AscendingOrder);
 
     m_pModel->WriteMetaSettings();
-}
-
-/*virtual*/ void AtlasWidget::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-
-    if(ui->atlasList == NULL)
-        return;
-
-    int iTotalWidth = ui->atlasList->size().width();
-    ui->atlasList->setColumnWidth(0, iTotalWidth - 60);
 }
 
 void AtlasWidget::on_atlasList_itemSelectionChanged()

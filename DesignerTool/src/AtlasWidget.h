@@ -69,6 +69,11 @@ public:
     QTreeWidget *GetFramesTreeWidget();
 
     void DrawUpdate(IHyApplication &hyApp);
+    
+protected:
+    virtual void enterEvent(QEvent *pEvent) override;
+    virtual void leaveEvent(QEvent *pEvent) override;
+    virtual void resizeEvent(QResizeEvent *event) override;
 
 private Q_SLOTS:
     void on_btnAddImages_clicked();
@@ -87,12 +92,6 @@ private Q_SLOTS:
 
 private:
     Ui::AtlasWidget *ui;
-
-    void PreviewAtlasGroup();
-    void HideAtlasGroup();
-
-protected:
-    virtual void resizeEvent(QResizeEvent *event) override;
 };
 
 #endif // ATLASWIDGET_H

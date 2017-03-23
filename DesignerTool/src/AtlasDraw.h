@@ -17,6 +17,8 @@ class AtlasDraw : public IDraw
 {
     AtlasModel &                m_ModelRef;
     
+    bool                        m_bIsMouseOver;
+    
     // TODO: Test whether splitting HyTexturedQuad's into multiple maps has any lookup/insert benefit, rather than one massive QMap
     struct TextureEnt : public HyEntity2d
     {
@@ -30,6 +32,8 @@ class AtlasDraw : public IDraw
     QList<HyTexturedQuad2d *>       m_SelectedTexQuadList;
 
     HyPrimitive2d                   m_HoverBackground;
+    HyPrimitive2d                   m_HoverStrokeInner;
+    HyPrimitive2d                   m_HoverStrokeOutter;
     HyTexturedQuad2d *              m_pHoverTexQuad;
 
 public:
