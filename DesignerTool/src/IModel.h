@@ -14,10 +14,67 @@
 
 #include <QAbstractListModel>
 #include <QDataWidgetMapper>
+#include <QLineEdit>
 #include <QCheckBox>
 
 class IModel;
 
+class LineEditMapper : public QDataWidgetMapper
+{
+    class ModelLineEdit : public QAbstractListModel
+    {
+        QString     m_sString;
+        
+    public:
+        ModelLineEdit(QObject *pParent = nullptr) : QAbstractListModel(pParent) {
+        }
+
+        virtual ~ModelLineEdit() {
+        }
+        
+        QString GetString() {
+            return m_sString;
+        }
+        
+        void SetString(QString sString) {
+            m_sString = sString;
+        }
+
+        virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
+            return 1;
+        }
+
+        virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
+            return m_sString;
+        }
+    };
+    
+public:
+    LineEditMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
+    {
+        setModel(new ModelLineEdit(this));
+    }
+    virtual ~LineEditMapper()
+    { }
+
+    void AddCheckBoxMapping(QLineEdit *pLineEdit)
+    {
+        addMapping(pLineEdit, 0);
+        this->setCurrentIndex(0);
+    }
+
+    QString GetString()
+    {
+        return static_cast<ModelLineEdit *>(model())->GetString();
+    }
+
+    void SetString(QString sString)
+    {
+        static_cast<ModelLineEdit *>(model())->SetString(sString);
+        setCurrentIndex(0);
+    }
+};
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CheckBoxMapper : public QDataWidgetMapper
 {
     class ModelCheckBox : public QAbstractListModel
@@ -29,11 +86,11 @@ class CheckBoxMapper : public QDataWidgetMapper
         virtual ~ModelCheckBox() {
         }
 
-        virtual int ModelCheckBox::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const {
+        virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
             return 2;
         }
 
-        virtual QVariant ModelCheckBox::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const {
+        virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
             return index.row() == 0 ? false : true;
         }
     };

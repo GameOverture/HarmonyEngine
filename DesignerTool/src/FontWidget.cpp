@@ -54,94 +54,11 @@ FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
     m_StateActionsList.push_back(ui->actionRemoveLayer);
     m_StateActionsList.push_back(ui->actionOrderLayerUpwards);
     m_StateActionsList.push_back(ui->actionOrderLayerDownwards);
-
-#if 0
-    // If item's init value is defined, parse and initalize with it, otherwise make default empty font
-    if(m_pItemFont->GetInitValue().type() != QJsonValue::Null)
-    {
-        QJsonObject fontObj = m_pItemFont->GetInitValue().toObject();
-
-        QJsonObject availGlyphsObj = fontObj["availableGlyphs"].toObject();
-        ui->chk_09->setChecked(availGlyphsObj["0-9"].toBool());
-        ui->chk_AZ->setChecked(availGlyphsObj["A-Z"].toBool());
-        ui->chk_az->setChecked(availGlyphsObj["a-z"].toBool());
-        ui->chk_symbols->setChecked(availGlyphsObj["symbols"].toBool());
-        ui->txtAdditionalSymbols->setText(availGlyphsObj["additional"].toString());
-        SetGlyphsDirty();
-
-        QList<quint32> requestList;
-        requestList.append(JSONOBJ_TOINT(fontObj, "checksum"));
-        QList<AtlasFrame *> pRequestedList = m_pItemFont->GetProject().GetAtlasesData().RequestFrames(m_pItemFont, requestList);
-        m_pTrueAtlasFrame = pRequestedList[0];
-        
-//        for(int i = 0; i < ui->cmbAtlasGroups->count(); ++i)
-//        {
-//            if(m_pItemFont->GetAtlasManager().GetAtlasIdFromIndex(i) == m_pTrueAtlasFrame->GetAtlasIndex())
-//            {
-//                ui->cmbAtlasGroups->setCurrentIndex(i);
-//                m_iPrevAtlasCmbIndex = i;
-//                break;
-//            }
-//        }
-        
-        QJsonArray stateArray = fontObj["stateArray"].toArray();
-        QJsonArray typefaceArray = fontObj["typefaceArray"].toArray();
-        
-        for(int i = 0; i < stateArray.size(); ++i)
-        {
-            QJsonObject stateObj = stateArray.at(i).toObject();
-            
-            m_pItemFont->GetUndoStack()->push(new UndoCmd_AddState<FontWidget, FontWidgetState>("Add Font State", this, m_StateActionsList, ui->cmbStates));
-            m_pItemFont->GetUndoStack()->push(new UndoCmd_RenameState<FontWidgetState>("Rename Font State", ui->cmbStates, stateObj["name"].toString()));
-            
-            QJsonArray layerArray = stateObj["layers"].toArray();
-            for(int j = 0; j < layerArray.size(); ++j)
-            {
-                QJsonObject layerObj = layerArray.at(j).toObject();
-                QJsonObject typefaceObj = typefaceArray.at(layerObj["typefaceIndex"].toInt()).toObject();
-                FontTableModel *pCurFontModel = m_pCurFontState->GetFontModel();
-                
-                if(j == 0) // Only need to set the state's font and size once
-                {
-                    m_pCurFontState->SetSelectedFont(typefaceObj["font"].toString());
-                    m_pCurFontState->SetSize(typefaceObj["size"].toDouble());
-                }
-                
-                m_pItemFont->GetUndoStack()->push(new FontUndoCmd_AddLayer(*this,
-                                                                                 ui->cmbStates,
-                                                                                 static_cast<rendermode_t>(typefaceObj["mode"].toInt()),
-                                                                                 typefaceObj["size"].toDouble(),
-                                                                                 typefaceObj["outlineThickness"].toDouble()));
-                
-                QColor topColor, botColor;
-                topColor.setRgbF(layerObj["topR"].toDouble(), layerObj["topG"].toDouble(), layerObj["topB"].toDouble());
-                botColor.setRgbF(layerObj["botR"].toDouble(), layerObj["botG"].toDouble(), layerObj["botB"].toDouble());
-                m_pItemFont->GetUndoStack()->push(new FontUndoCmd_LayerColors(*this,
-                                                                                    ui->cmbStates,
-                                                                                    pCurFontModel->GetLayerId(j),
-                                                                                    pCurFontModel->GetLayerTopColor(j),
-                                                                                    pCurFontModel->GetLayerBotColor(j),
-                                                                                    topColor,
-                                                                                    botColor));
-            }
-        }
-    }
-    else
-    {
-        SetGlyphsDirty();
-        
-        on_actionAddState_triggered();
-        on_actionAddLayer_triggered();
-    }
     
-    // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
-    m_pItemFont->GetUndoStack()->clear();
-
-    UpdateActions();
     
-    m_bBlockGeneratePreview = false;
-    GeneratePreview();
-#endif
+    // ...set models
+    
+    SetGlyphsDirty();
 }
 
 FontWidget::~FontWidget()

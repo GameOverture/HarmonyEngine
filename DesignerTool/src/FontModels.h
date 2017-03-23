@@ -11,40 +11,50 @@
 #define FONTMODELS_H
 
 #include "ProjectItem.h"
-#include <QAbstractListModel>
+#include "IModel.h"
 
-class FontModel : public QAbstractListModel
+class FontStateData : public IStateData
 {
-    Q_OBJECT
-
-    ProjectItem *               m_pItem;
+    CheckBoxMapper *    m_pChkMapper_Loop;
+    CheckBoxMapper *    m_pChkMapper_Reverse;
+    CheckBoxMapper *    m_pChkMapper_Bounce;
+    SpriteFramesModel * m_pFramesModel;
 
 public:
-    FontModel(ProjectItem *pItem, QJsonObject stateArray);
+    SpriteStateData(IModel &modelRef, QJsonObject stateObj);
+    virtual ~SpriteStateData();
+    
+    CheckBoxMapper *GetLoopMapper();
+    CheckBoxMapper *GetReverseMapper();
+    CheckBoxMapper *GetBounceMapper();
+    SpriteFramesModel *GetFramesModel();
+
+    void GetStateInfo(QJsonObject &stateObjOut);
+    
+    virtual void AddFrame(AtlasFrame *pFrame);
+    virtual void RelinquishFrame(AtlasFrame *pFrame);
+    virtual void RefreshFrame(AtlasFrame *pFrame);
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class FontModel : public IModel
+{
+    Q_OBJECT
+    
+    CheckBoxMapper *            m_pChkMapper_09;
+    CheckBoxMapper *            m_pChkMapper_AZ;
+    CheckBoxMapper *            m_pChkMapper_az;
+    CheckBoxMapper *            m_pChkMapper_Symbols;
+    LineEditMapper *            m_pTxtMapper_AdditionalSymbols;
+
+public:
+    FontModel(ProjectItem *pItem, QJsonObject fontObj);
     virtual ~FontModel();
-
-    int GetNumStates();
-    //SpriteStateData *GetStateData(int iStateIndex);
-
-    QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList);
-    void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
-
-    void RefreshFrame(AtlasFrame *pFrame);
-
-    int AppendState(QJsonObject stateObj);
-    void InsertState(int iStateIndex, QJsonObject stateObj);
-    QJsonObject PopStateAt(uint32 uiIndex);
-
-    QString SetStateName(int iStateIndex, QString sNewName);
-    void MoveStateBack(int iStateIndex);
-    void MoveStateForward(int iStateIndex);
-
-    QJsonArray GetSaveInfo();
-
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-    virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    
+    virtual int AppendState(QJsonObject stateObj);
+    virtual void InsertState(int iStateIndex, QJsonObject stateObj);
+    virtual QJsonObject PopStateAt(uint32 uiIndex);
+    
+    virtual QJsonValue GetSaveInfo();
 };
 
 #endif // FONTMODELS_H
