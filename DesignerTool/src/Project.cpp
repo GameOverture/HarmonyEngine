@@ -30,7 +30,7 @@
 Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Project, sNewProjectFilePath),
                                                         IHyApplication(HarmonyInit()),
                                                         m_pAtlasModel(nullptr),
-                                                        m_pAtlasMan(nullptr),
+                                                        m_pAtlasWidget(nullptr),
                                                         m_pAudioMan(nullptr),
                                                         m_pTabBar(nullptr),
                                                         m_pCurOpenItem(nullptr),
@@ -271,7 +271,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 /*virtual*/ Project::~Project()
 {
     delete m_pDraw;
-    delete m_pAtlasMan;
+    delete m_pAtlasWidget;
 }
 
 bool Project::HasError() const
@@ -337,7 +337,7 @@ AtlasModel &Project::GetAtlasModel()
 
 AtlasWidget *Project::GetAtlasWidget()
 {
-    return m_pAtlasMan;
+    return m_pAtlasWidget;
 }
 
 AudioWidgetManager *Project::GetAudioWidget()
@@ -419,6 +419,9 @@ void Project::OpenItem(ProjectItem *pItem)
 // IHyApplication override
 /*virtual*/ bool Project::Update()
 {
+    if(m_pAtlasWidget)
+        m_pAtlasWidget->DrawUpdate(*this);
+
     if(m_pTabBar->count() > 0)
     {
         m_pDraw->Hide();
@@ -454,9 +457,9 @@ void Project::Reload()
         m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
     }
     
-    delete m_pAtlasMan;
+    delete m_pAtlasWidget;
     delete m_pAudioMan;
-    m_pAtlasMan = new AtlasWidget(m_pAtlasModel, this, nullptr);
+    m_pAtlasWidget = new AtlasWidget(m_pAtlasModel, this, nullptr);
     m_pAudioMan = new AudioWidgetManager(this, nullptr);
     
     

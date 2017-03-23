@@ -31,7 +31,7 @@ class Project : public ExplorerItem, public IHyApplication
     ProjectDraw *                                   m_pDraw;
 
     AtlasModel *                                    m_pAtlasModel;
-    AtlasWidget *                                   m_pAtlasMan;
+    AtlasWidget *                                   m_pAtlasWidget;
 
     AudioWidgetManager *                            m_pAudioMan;
     QTabBar *                                       m_pTabBar;

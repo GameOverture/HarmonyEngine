@@ -121,6 +121,11 @@ QTreeWidget *AtlasWidget::GetFramesTreeWidget()
     return ui->atlasList;
 }
 
+void AtlasWidget::DrawUpdate(IHyApplication &hyApp)
+{
+    m_Draw.Update(hyApp);
+}
+
 void AtlasWidget::PreviewAtlasGroup()
 {
     //m_pProjOwner->SetOverrideDrawState(PROJDRAWSTATE_AtlasManager);

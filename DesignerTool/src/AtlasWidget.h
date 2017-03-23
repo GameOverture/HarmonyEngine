@@ -68,6 +68,8 @@ public:
     AtlasModel &GetData();
     QTreeWidget *GetFramesTreeWidget();
 
+    void DrawUpdate(IHyApplication &hyApp);
+
 private Q_SLOTS:
     void on_btnAddImages_clicked();
 
