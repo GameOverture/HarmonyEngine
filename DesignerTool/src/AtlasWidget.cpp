@@ -123,6 +123,7 @@ QTreeWidget *AtlasWidget::GetFramesTreeWidget()
 
 void AtlasWidget::DrawUpdate(IHyApplication &hyApp)
 {
+    m_Draw.SetHover(ui->atlasList->itemAt(ui->atlasList->mapFromGlobal(QCursor::pos())));
     m_Draw.Update(hyApp);
 }
 

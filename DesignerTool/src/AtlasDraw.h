@@ -27,15 +27,16 @@ class AtlasDraw : public IDraw
     };
     QList<TextureEnt *>             m_MasterList;
     
-    QList<HyTexturedQuad2d *>       m_CurrentPreviewList;
+    QList<HyTexturedQuad2d *>       m_SelectedTexQuadList;
 
     HyPrimitive2d                   m_HoverBackground;
-    HyTexturedQuad2d *              m_pTexQuadHover;
+    HyTexturedQuad2d *              m_pHoverTexQuad;
 
 public:
     AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp);
     virtual ~AtlasDraw();
     
+    void SetHover(QTreeWidgetItem *pHoverItem);
     void SetSelected(QList<QTreeWidgetItem *> selectedList);
 
     void Update(IHyApplication &hyApp);
