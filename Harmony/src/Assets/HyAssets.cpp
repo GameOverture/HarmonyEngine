@@ -225,7 +225,7 @@ void HyAssets::LoadGfxData(IHyDraw2d *pDrawNode2d)
 			bFullyLoaded = false;
 	}
 
-	// Set the instance
+	// Set the node's 'm_eLoadState' appropriately below to prevent additional Loads
 	if(bFullyLoaded == false)
 	{
 		pDrawNode2d->m_eLoadState = HYLOADSTATE_Queued;
