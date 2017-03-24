@@ -21,7 +21,7 @@ class FontStateData : public IStateData
     SpriteFramesModel * m_pFramesModel;
 
 public:
-    SpriteStateData(IModel &modelRef, QJsonObject stateObj);
+    FontStateData(IModel &modelRef, QJsonObject stateObj);
     virtual ~SpriteStateData();
     
     CheckBoxMapper *GetLoopMapper();

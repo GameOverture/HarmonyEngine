@@ -277,8 +277,10 @@ SpriteStateData::SpriteStateData(IModel &modelRef, QJsonObject stateObj) :  ISta
             checksumRequestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
         }
 
+        QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFrames(checksumRequestList);
+        for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
+            AddFrame(returnedAtlasFramesList[i]);
 
-        QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFrames(this, checksumRequestList);
         if(spriteFrameArray.size() != requestedAtlasFramesList.size())
             HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
 

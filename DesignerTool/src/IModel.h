@@ -155,9 +155,9 @@ public:
     void MoveStateBack(int iStateIndex);
     void MoveStateForward(int iStateIndex);
     
-    QList<AtlasFrame *> RequestFrames(IStateData *pState, QList<quint32> requestList);
-    QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList);
-    void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
+    QList<AtlasFrame *> RequestFrames(QList<quint32> requestList);
+    QList<AtlasFrame *> RequestFrames(QList<AtlasFrame *> requestList);
+    void RelinquishFrames(QList<AtlasFrame *> relinquishList);
     void RefreshFrame(AtlasFrame *pFrame);
     
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
