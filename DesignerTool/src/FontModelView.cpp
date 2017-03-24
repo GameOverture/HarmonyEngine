@@ -215,7 +215,7 @@ int FontTableModel::GetLayerId(int iRowIndex) const
     return m_LayerList[iRowIndex]->iUNIQUE_ID;
 }
 
-FontStagePass *FontTableModel::GetStageRef(int iRowIndex)
+FontTypeface *FontTableModel::GetStageRef(int iRowIndex)
 {
     return m_LayerList[iRowIndex]->pReference;
 }
@@ -361,7 +361,7 @@ void FontTableModel::SetFontSize(float fSize)
         m_LayerList[i]->fSize = fSize;
 }
 
-void FontTableModel::SetFontStageReference(int iRowIndex, FontStagePass *pStageRef)
+void FontTableModel::SetFontStageReference(int iRowIndex, FontTypeface *pStageRef)
 {
     m_LayerList[iRowIndex]->pReference = pStageRef;
 }

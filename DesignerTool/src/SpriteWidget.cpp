@@ -277,13 +277,13 @@ void SpriteWidget::on_framesView_selectionChanged(const QItemSelection &newSelec
 
 void SpriteWidget::on_actionAddState_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_AddState("Add Sprite State", m_ItemRef, nullptr);
+    QUndoCommand *pCmd = new UndoCmd_AddState<SpriteStateData>("Add Sprite State", m_ItemRef, nullptr);
     m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void SpriteWidget::on_actionRemoveState_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_RemoveState("Remove Sprite State", m_ItemRef, ui->cmbStates->currentIndex());
+    QUndoCommand *pCmd = new UndoCmd_RemoveState<SpriteStateData>("Remove Sprite State", m_ItemRef, ui->cmbStates->currentIndex());
     m_ItemRef.GetUndoStack()->push(pCmd);
 }
 

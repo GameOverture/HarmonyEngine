@@ -19,6 +19,62 @@
 
 class IModel;
 
+class DoubleSpinBoxMapper : public QDataWidgetMapper
+{
+    class ModelDoubleSpinBox : public QAbstractListModel
+    {
+        double          m_dValue;
+        
+    public:
+        ModelDoubleSpinBox(QObject *pParent = nullptr) : QAbstractListModel(pParent), m_dValue(0.0) {
+        }
+
+        virtual ~ModelDoubleSpinBox() {
+        }
+        
+        double GetValue() {
+            return m_dValue;
+        }
+        
+        void SetValue(double dValue) {
+            m_dValue = dValue;
+        }
+
+        virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
+            return 1;
+        }
+
+        virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
+            return m_dValue;
+        }
+    };
+    
+public:
+    DoubleSpinBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
+    {
+        setModel(new ModelDoubleSpinBox(this));
+    }
+    virtual ~DoubleSpinBoxMapper()
+    { }
+
+    void AddCheckBoxMapping(QLineEdit *pLineEdit)
+    {
+        addMapping(pLineEdit, 0);
+        this->setCurrentIndex(0);
+    }
+
+    double GetValue()
+    {
+        return static_cast<ModelDoubleSpinBox *>(model())->GetValue();
+    }
+
+    void SetValue(double dValue)
+    {
+        static_cast<ModelDoubleSpinBox *>(model())->SetValue(dValue);
+        setCurrentIndex(0);
+    }
+};
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class LineEditMapper : public QDataWidgetMapper
 {
     class ModelLineEdit : public QAbstractListModel
@@ -155,9 +211,9 @@ public:
     void MoveStateBack(int iStateIndex);
     void MoveStateForward(int iStateIndex);
     
-    QList<AtlasFrame *> RequestFrames(QList<quint32> requestList);
-    QList<AtlasFrame *> RequestFrames(QList<AtlasFrame *> requestList);
-    void RelinquishFrames(QList<AtlasFrame *> relinquishList);
+    QList<AtlasFrame *> RequestFrames(IStateData *pState, QList<quint32> requestList);
+    QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList);
+    void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
     void RefreshFrame(AtlasFrame *pFrame);
     
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -165,11 +221,30 @@ public:
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     
+    template<typename STATEDATA>
+    int AppendState(QJsonObject stateObj)
+    {
+        int iIndex = m_StateList.size();
+        InsertState<STATEDATA>(iIndex, stateObj);
     
-    virtual int AppendState(QJsonObject stateObj) = 0;
-    virtual void InsertState(int iStateIndex, QJsonObject stateObj) = 0;
+        return iIndex;
+    }
+    
+    template<typename STATEDATA>
+    void InsertState(int iStateIndex, QJsonObject stateObj)
+    {
+        STATEDATA *pNewState = new STATEDATA(*this, stateObj);
+    
+        beginInsertRows(QModelIndex(), iStateIndex, iStateIndex);
+        m_StateList.insert(iStateIndex, pNewState);
+        endInsertRows();
+    
+        QVector<int> roleList;
+        roleList.append(Qt::DisplayRole);
+        dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
+    }
+    
     virtual QJsonObject PopStateAt(uint32 uiIndex) = 0;
-    
     virtual QJsonValue GetSaveInfo() = 0;
 };
 

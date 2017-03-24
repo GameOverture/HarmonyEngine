@@ -87,24 +87,40 @@ void IModel::MoveStateForward(int iStateIndex)
     dataChanged(createIndex(iStateIndex, 0), createIndex(iStateIndex, 0), roleList);
 }
 
-QList<AtlasFrame *> IModel::RequestFrames(QList<quint32> requestList)
+QList<AtlasFrame *> IModel::RequestFrames(IStateData *pState, QList<quint32> requestList)
 {
     QList<AtlasFrame *> returnedAtlasFramesList = m_pItem->GetProject().GetAtlasModel().RequestFrames(m_pItem, requestList);
+    
+    if(pState)
+    {
+        for(int i = 0; i < returnedAtlasFramesList.size(); ++i)
+            pState->AddFrame(returnedAtlasFramesList[i]);
+    }
+    
     return returnedAtlasFramesList;
 }
 
-QList<AtlasFrame *> IModel::RequestFrames(QList<AtlasFrame *> requestList)
+QList<AtlasFrame *> IModel::RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList)
 {
     QList<AtlasFrame *> returnedAtlasFramesList = m_pItem->GetProject().GetAtlasModel().RequestFrames(m_pItem, requestList);
 
-    for(int i = 0; i < returnedAtlasFramesList.size(); ++i)
-        m_StateList[iStateIndex]->AddFrame(returnedAtlasFramesList[i]);
+    if(iStateIndex >= 0)
+    {
+        for(int i = 0; i < returnedAtlasFramesList.size(); ++i)
+            m_StateList[iStateIndex]->AddFrame(returnedAtlasFramesList[i]);
+    }
 
     return returnedAtlasFramesList;
 }
 
-void IModel::RelinquishFrames(QList<AtlasFrame *> relinquishList)
+void IModel::RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList)
 {
+    if(iStateIndex >= 0)
+    {
+        for(int i = 0; i < relinquishList.size(); ++i)
+            m_StateList[iStateIndex]->RelinquishFrame(relinquishList[i]);
+    }
+    
     m_pItem->GetProject().GetAtlasModel().RelinquishFrames(m_pItem, relinquishList);
 }
 

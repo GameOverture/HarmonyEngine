@@ -118,10 +118,7 @@ public:
     SpriteModel(ProjectItem *pItem, QJsonArray stateArray);
     virtual ~SpriteModel();
     
-    virtual int AppendState(QJsonObject stateObj);
-    virtual void InsertState(int iStateIndex, QJsonObject stateObj);
     virtual QJsonObject PopStateAt(uint32 uiIndex);
-    
     virtual QJsonValue GetSaveInfo();
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -59,6 +59,11 @@ FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
     // ...set models
     
     SetGlyphsDirty();
+    
+    UpdateActions();
+    
+    m_bBlockGeneratePreview = false;
+    GeneratePreview();
 }
 
 FontWidget::~FontWidget()
@@ -178,7 +183,7 @@ void FontWidget::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
             // Could not find a match, so adding a new FontStagePass to 'm_MasterStageList'
             if(bMatched == false)
             {
-                m_MasterStageList.append(new FontStagePass(pFontState->GetFontFilePath(), pFontModel->GetLayerRenderMode(j), pFontState->GetSize(), pFontModel->GetLayerOutlineThickness(j)));
+                m_MasterStageList.append(new FontTypeface(pFontState->GetFontFilePath(), pFontModel->GetLayerRenderMode(j), pFontState->GetSize(), pFontModel->GetLayerOutlineThickness(j)));
                 m_MasterStageList[m_MasterStageList.count() - 1]->iTmpReferenceCount = 1;
                 
                 pFontModel->SetFontStageReference(j, m_MasterStageList[m_MasterStageList.count() - 1]);
@@ -399,118 +404,7 @@ bool FontWidget::SaveFontFilesToMetaDir()
 
 void FontWidget::GetSaveInfo(QJsonObject &fontObj)
 {
-    fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetChecksum())));
-
-    QJsonObject availableGlyphsObj;
-    availableGlyphsObj.insert("0-9", ui->chk_09->isChecked());
-    availableGlyphsObj.insert("A-Z", ui->chk_AZ->isChecked());
-    availableGlyphsObj.insert("a-z", ui->chk_az->isChecked());
-    availableGlyphsObj.insert("symbols", ui->chk_symbols->isChecked());
-    availableGlyphsObj.insert("additional", ui->txtAdditionalSymbols->text());
-
-    fontObj.insert("availableGlyphs", availableGlyphsObj);
     
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    QJsonArray typefaceArray;
-    for(int i = 0; i < m_MasterStageList.count(); ++i)
-    {
-        QJsonObject stageObj;
-        QFileInfo fontFileInfo(m_MasterStageList[i]->pTextureFont->filename);
-        
-        stageObj.insert("font", fontFileInfo.fileName());
-        stageObj.insert("size", m_MasterStageList[i]->fSize);
-        stageObj.insert("mode", m_MasterStageList[i]->eMode);
-        stageObj.insert("outlineThickness", m_MasterStageList[i]->fOutlineThickness);
-        
-        QJsonArray glyphsArray;
-        for(int j = 0; j < m_sAvailableTypefaceGlyphs.count(); ++j)
-        {
-            // NOTE: Assumes LITTLE ENDIAN
-            QString sSingleChar = m_sAvailableTypefaceGlyphs[j];
-            texture_glyph_t *pGlyph = texture_font_get_glyph(m_MasterStageList[i]->pTextureFont, sSingleChar.toUtf8().data());
-
-            QJsonObject glyphInfoObj;
-            if(pGlyph == nullptr)
-            {
-                HyGuiLog("Could not find glyph: '" % sSingleChar % "'\nPlace a breakpoint and walk into texture_font_get_glyph() below before continuing", LOGTYPE_Error);
-
-                pGlyph = texture_font_get_glyph(m_MasterStageList[i]->pTextureFont, sSingleChar.toUtf8().data());
-            }
-            else
-            {
-                glyphInfoObj.insert("code", QJsonValue(static_cast<qint64>(pGlyph->codepoint)));
-                glyphInfoObj.insert("advance_x", pGlyph->advance_x);
-                glyphInfoObj.insert("advance_y", pGlyph->advance_y);
-                glyphInfoObj.insert("width", static_cast<int>(pGlyph->width));
-                glyphInfoObj.insert("height", static_cast<int>(pGlyph->height));
-                glyphInfoObj.insert("offset_x", pGlyph->offset_x);
-                glyphInfoObj.insert("offset_y", pGlyph->offset_y);
-                glyphInfoObj.insert("left", pGlyph->s0);
-                glyphInfoObj.insert("top", pGlyph->t0);
-                glyphInfoObj.insert("right", pGlyph->s1);
-                glyphInfoObj.insert("bottom", pGlyph->t1);
-            }
-            
-            QJsonObject kerningInfoObj;
-            for(int k = 0; k < m_sAvailableTypefaceGlyphs.count(); ++k)
-            {
-                char cTmpChar = m_sAvailableTypefaceGlyphs.toStdString().c_str()[k];
-                float fKerningAmt = texture_glyph_get_kerning(pGlyph, &cTmpChar);
-                
-                if(fKerningAmt != 0.0f)
-                    kerningInfoObj.insert(QString(m_sAvailableTypefaceGlyphs[k]), fKerningAmt);
-            }
-            glyphInfoObj.insert("kerning", kerningInfoObj);
-            
-            glyphsArray.append(glyphInfoObj);
-        }
-        stageObj.insert("glyphs", glyphsArray);
-        
-        typefaceArray.append(QJsonValue(stageObj));
-    }
-    fontObj.insert("typefaceArray", typefaceArray);
-    
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    QJsonArray stateArray;
-    for(int i = 0; i < ui->cmbStates->count(); ++i)
-    {
-        FontWidgetState *pState = ui->cmbStates->itemData(i).value<FontWidgetState *>();
-        FontTableModel *pFontModel = pState->GetFontModel();
-        
-        QJsonObject stateObj;
-        stateObj.insert("name", pState->GetName());
-        stateObj.insert("lineHeight", pFontModel->GetLineHeight());
-        stateObj.insert("lineAscender", pFontModel->GetLineAscender());
-        stateObj.insert("lineDescender", pFontModel->GetLineDescender());
-        stateObj.insert("leftSideNudgeAmt", pFontModel->GetLeftSideNudgeAmt(m_sAvailableTypefaceGlyphs));
-        
-        QJsonArray layersArray;
-        for(int j = 0; j < pFontModel->rowCount(); ++j)
-        {
-            QJsonObject layerObj;
-            
-            int iIndex = 0;
-            FontStagePass *pFontStage = pFontModel->GetStageRef(j);
-            for(; iIndex < m_MasterStageList.count(); ++iIndex)
-            {
-                if(m_MasterStageList[iIndex] == pFontStage)
-                    break;
-            }
-            layerObj.insert("typefaceIndex", iIndex);
-            layerObj.insert("topR", pFontModel->GetLayerTopColor(j).redF());
-            layerObj.insert("topG", pFontModel->GetLayerTopColor(j).greenF());
-            layerObj.insert("topB", pFontModel->GetLayerTopColor(j).blueF());
-            layerObj.insert("botR", pFontModel->GetLayerBotColor(j).redF());
-            layerObj.insert("botG", pFontModel->GetLayerBotColor(j).greenF());
-            layerObj.insert("botB", pFontModel->GetLayerBotColor(j).blueF());
-            
-            layersArray.append(layerObj);
-        }
-        stateObj.insert("layers", layersArray);
-        
-        stateArray.append(stateObj);
-    }
-    fontObj.insert("stateArray", stateArray);
 }
 
 void FontWidget::on_chk_09_clicked()

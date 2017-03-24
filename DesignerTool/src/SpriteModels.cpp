@@ -276,11 +276,9 @@ SpriteStateData::SpriteStateData(IModel &modelRef, QJsonObject stateObj) :  ISta
             QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
             checksumRequestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
         }
-
-        QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFrames(checksumRequestList);
-        for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
-            AddFrame(returnedAtlasFramesList[i]);
-
+       
+        QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFrames(this, checksumRequestList);
+        
         if(spriteFrameArray.size() != requestedAtlasFramesList.size())
             HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
 
@@ -379,36 +377,14 @@ SpriteModel::SpriteModel(ProjectItem *pItem, QJsonArray stateArray) :   IModel(p
     if(stateArray.empty() == false)
     {
         for(int i = 0; i < stateArray.size(); ++i)
-            AppendState(stateArray[i].toObject());
+            AppendState<SpriteStateData>(stateArray[i].toObject());
     }
     else
-        AppendState(QJsonObject());
+        AppendState<SpriteStateData>(QJsonObject());
 }
 
 /*virtual*/ SpriteModel::~SpriteModel()
 {
-}
-
-
-int SpriteModel::AppendState(QJsonObject stateObj)
-{
-    int iIndex = m_StateList.size();
-    InsertState(iIndex, stateObj);
-
-    return iIndex;
-}
-
-void SpriteModel::InsertState(int iStateIndex, QJsonObject stateObj)
-{
-    SpriteStateData *pNewState = new SpriteStateData(*this, stateObj);
-
-    beginInsertRows(QModelIndex(), iStateIndex, iStateIndex);
-    m_StateList.insert(iStateIndex, pNewState);
-    endInsertRows();
-
-    QVector<int> roleList;
-    roleList.append(Qt::DisplayRole);
-    dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
 }
 
 QJsonObject SpriteModel::PopStateAt(uint32 uiIndex)

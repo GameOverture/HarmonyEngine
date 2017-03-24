@@ -11,29 +11,27 @@
 #define FONTMODELS_H
 
 #include "ProjectItem.h"
+#include "FontModelView.h"
 #include "IModel.h"
+
+#include <QJsonArray>
 
 class FontStateData : public IStateData
 {
-    CheckBoxMapper *    m_pChkMapper_Loop;
-    CheckBoxMapper *    m_pChkMapper_Reverse;
-    CheckBoxMapper *    m_pChkMapper_Bounce;
-    SpriteFramesModel * m_pFramesModel;
-
+	FontTableModel *			m_pFontTableModel;
+	
+	LineEditMapper *            m_pTxtMapper_Font;
+	DoubleSpinBoxMapper *		m_pSbMapper_Size;
+	
 public:
     FontStateData(IModel &modelRef, QJsonObject stateObj);
-    virtual ~SpriteStateData();
-    
-    CheckBoxMapper *GetLoopMapper();
-    CheckBoxMapper *GetReverseMapper();
-    CheckBoxMapper *GetBounceMapper();
-    SpriteFramesModel *GetFramesModel();
+    virtual ~FontStateData();
 
     void GetStateInfo(QJsonObject &stateObjOut);
     
-    virtual void AddFrame(AtlasFrame *pFrame);
-    virtual void RelinquishFrame(AtlasFrame *pFrame);
-    virtual void RefreshFrame(AtlasFrame *pFrame);
+	virtual void AddFrame(AtlasFrame *pFrame) { }
+	virtual void RelinquishFrame(AtlasFrame *pFrame) { }
+	virtual void RefreshFrame(AtlasFrame *pFrame) { }
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class FontModel : public IModel
@@ -45,15 +43,18 @@ class FontModel : public IModel
     CheckBoxMapper *            m_pChkMapper_az;
     CheckBoxMapper *            m_pChkMapper_Symbols;
     LineEditMapper *            m_pTxtMapper_AdditionalSymbols;
+	
+	AtlasFrame *                m_pTrueAtlasFrame;
+	
+	QJsonArray					m_TypefaceArray;
 
 public:
     FontModel(ProjectItem *pItem, QJsonObject fontObj);
     virtual ~FontModel();
+	
+	QJsonObject GetTypefaceObj(int iTypefaceIndex);
     
-    virtual int AppendState(QJsonObject stateObj);
-    virtual void InsertState(int iStateIndex, QJsonObject stateObj);
     virtual QJsonObject PopStateAt(uint32 uiIndex);
-    
     virtual QJsonValue GetSaveInfo();
 };
 

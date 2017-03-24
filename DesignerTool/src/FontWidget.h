@@ -25,7 +25,7 @@ class FontWidget;
 class FontItem;
 class FontTableModel;
 
-struct FontStagePass
+struct FontTypeface
 {
     int                 iReferenceCount;
     int                 iTmpReferenceCount;
@@ -36,7 +36,7 @@ struct FontStagePass
     float               fSize;
     float               fOutlineThickness;
 
-    FontStagePass(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iReferenceCount(0),
+    FontTypeface(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iReferenceCount(0),
                                                                                                             iTmpReferenceCount(0),
                                                                                                             sFontPath(sFontFilePath),
                                                                                                             pTextureFont(NULL),
@@ -45,7 +45,7 @@ struct FontStagePass
                                                                                                             fOutlineThickness(fOutlineThickness)
     { }
 
-    ~FontStagePass()
+    ~FontTypeface()
     {
         if(pTextureFont)
             texture_font_delete(pTextureFont);
@@ -72,7 +72,7 @@ class FontWidget : public QWidget
     QString                     m_sAvailableTypefaceGlyphs;
     QRegExpValidator            m_PreviewValidator;
 
-    QList<FontStagePass *>      m_MasterStageList;
+    QList<FontTypeface *>       m_MasterStageList;
     bool                        m_bGlyphsDirty;
     bool                        m_bFontPreviewDirty;
 
@@ -81,7 +81,6 @@ class FontWidget : public QWidget
     
     texture_atlas_t *           m_pAtlas;
     unsigned char *             m_pTrueAtlasPixelData;
-    AtlasFrame *                m_pTrueAtlasFrame;
     
     QDir                        m_FontMetaDir;
     

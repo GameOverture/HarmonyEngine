@@ -22,6 +22,7 @@
 #include <QRadioButton>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <typename STATEDATA>
 class UndoCmd_AddState : public QUndoCommand
 {
     ProjectItem &       m_ItemRef;
@@ -39,7 +40,7 @@ public:
 
     void redo() override
     {
-        m_iIndex = static_cast<IModel *>(m_ItemRef.GetModel())->AppendState(QJsonObject());
+        m_iIndex = static_cast<IModel *>(m_ItemRef.GetModel())->AppendState<STATEDATA>(QJsonObject());
         m_ItemRef.RefreshWidget(m_iIndex);
     }
     
@@ -51,6 +52,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <typename STATEDATA>
 class UndoCmd_RemoveState : public QUndoCommand
 {
     ProjectItem &       m_ItemRef;
@@ -76,7 +78,7 @@ public:
     
     void undo() override
     {
-        m_iIndex = static_cast<IModel *>(m_ItemRef.GetModel())->AppendState(m_PoppedStateObj);
+        m_iIndex = static_cast<IModel *>(m_ItemRef.GetModel())->AppendState<STATEDATA>(m_PoppedStateObj);
         m_ItemRef.RefreshWidget(m_iIndex);
     }
 };

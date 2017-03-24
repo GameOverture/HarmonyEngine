@@ -19,7 +19,7 @@
 #include <QStyledItemDelegate>
 #include <QColor>
 
-struct FontStagePass;
+struct FontTypeface;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class FontTableView : public QTableView
@@ -56,7 +56,7 @@ class FontTableModel : public QAbstractTableModel
     struct FontLayer
     {
         const int           iUNIQUE_ID;
-        FontStagePass *     pReference;
+        FontTypeface *     pReference;
 
         rendermode_t        eMode;
         float               fSize;
@@ -99,7 +99,7 @@ public:
     void ReAddLayer(int iId);
 
     int GetLayerId(int iRowIndex) const;
-    FontStagePass *GetStageRef(int iRowIndex);
+    FontTypeface *GetStageRef(int iRowIndex);
     
     rendermode_t GetLayerRenderMode(int iRowIndex) const;
     void SetLayerRenderMode(int iId, rendermode_t eMode);
@@ -121,7 +121,7 @@ public:
     
     void SetFontSize(float fSize);
     
-    void SetFontStageReference(int iRowIndex, FontStagePass *pStageRef);
+    void SetFontStageReference(int iRowIndex, FontTypeface *pStageRef);
     
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
