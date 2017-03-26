@@ -10,7 +10,6 @@
 #ifndef FONTWIDGET_H
 #define FONTWIDGET_H
 
-#include "FontWidgetState.h"
 #include "FontDraw.h"
 
 #include <QWidget>
