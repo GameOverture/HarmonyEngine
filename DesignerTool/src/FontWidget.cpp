@@ -68,6 +68,11 @@ FontWidget::~FontWidget()
     delete ui;
 }
 
+ProjectItem &FontWidget::GetItem()
+{
+    return m_ItemRef;
+}
+
 void FontWidget::SetSelectedState(int iIndex)
 {
     FontStateData *pCurStateData = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(iIndex));
@@ -100,9 +105,19 @@ void FontWidget::OnGiveMenuActions(QMenu *pMenu)
     pMenu->addAction(ui->actionOrderLayerDownwards);
 }
 
-ProjectItem &FontWidget::GetItem()
+void FontWidget::DrawShow()
 {
-    return m_ItemRef;
+    m_Draw.Show();
+}
+
+void FontWidget::DrawHide()
+{
+    m_Draw.Hide();
+}
+
+void FontWidget::DrawUpdate()
+{
+    //m_Draw
 }
 
 QString FontWidget::GetFullItemName()

@@ -66,6 +66,11 @@ SpriteWidget::~SpriteWidget()
     delete ui;
 }
 
+ProjectItem &SpriteWidget::GetItem()
+{
+    return m_ItemRef;
+}
+
 void SpriteWidget::SetSelectedState(int iIndex)
 {
     SpriteStateData *pCurStateData = static_cast<SpriteStateData *>(static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(iIndex));
@@ -83,11 +88,6 @@ void SpriteWidget::SetSelectedState(int iIndex)
     ui->cmbStates->blockSignals(false);
     
     UpdateActions();
-}
-
-ProjectItem &SpriteWidget::GetItem()
-{
-    return m_ItemRef;
 }
 
 //SpriteFrame *SpriteWidget::GetSelectedFrame()

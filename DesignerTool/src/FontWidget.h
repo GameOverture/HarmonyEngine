@@ -38,11 +38,16 @@ public:
     explicit FontWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget *parent = 0);
     ~FontWidget();
 
+    ProjectItem &GetItem();
+
     void SetSelectedState(int iIndex);
 
     void OnGiveMenuActions(QMenu *pMenu);
+
+    void DrawShow();
+    void DrawHide();
+    void DrawUpdate();
     
-    ProjectItem &GetItem();
 
     QString GetFullItemName();
 

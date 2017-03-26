@@ -80,6 +80,9 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
     case ITEM_Sprite:
         static_cast<SpriteWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
         break;
+    case ITEM_Font:
+        static_cast<FontWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
+        break;
     default:
         HyGuiLog("Improper item GiveMenuActions(): " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
@@ -93,6 +96,9 @@ void ProjectItem::Save()
     {
     case ITEM_Sprite:
         saveValue = static_cast<SpriteModel *>(m_pModel)->GetSaveInfo();
+        break;
+    case ITEM_Font:
+        saveValue = static_cast<FontModel *>(m_pModel)->GetSaveInfo();
         break;
     default:
         HyGuiLog("Improper item Save(): " % QString::number(m_eTYPE), LOGTYPE_Error);
@@ -123,9 +129,9 @@ void ProjectItem::RefreshWidget(QVariant param)
     case ITEM_Sprite:
         static_cast<SpriteWidget *>(m_pWidget)->Refresh(param);
         break;
-
     case ITEM_Font:
         static_cast<FontWidget *>(m_pWidget)->Refresh(param);
+        break;
     default:
         HyGuiLog("Unsupported IProjItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
@@ -182,8 +188,8 @@ void ProjectItem::DrawShow(IHyApplication &hyApp)
         static_cast<SpriteWidget *>(m_pWidget)->DrawShow();
         break;
     case ITEM_Font:
-        //m_pWidget = new FontWidget(*this);
-        //break;
+        static_cast<FontWidget *>(m_pWidget)->DrawShow();
+        break;
     case ITEM_Audio:
         //m_pWidget = new AudioWidget(*this);
         //break;
@@ -201,8 +207,8 @@ void ProjectItem::DrawHide(IHyApplication &hyApp)
         static_cast<SpriteWidget *>(m_pWidget)->DrawHide();
         break;
     case ITEM_Font:
-        //m_pWidget = new FontWidget(*this);
-        //break;
+        static_cast<FontWidget *>(m_pWidget)->DrawHide();
+        break;
     case ITEM_Audio:
         //m_pWidget = new AudioWidget(*this);
         //break;
@@ -220,8 +226,8 @@ void ProjectItem::DrawUpdate(IHyApplication &hyApp)
         static_cast<SpriteWidget *>(m_pWidget)->DrawUpdate();
         break;
     case ITEM_Font:
-        //m_pWidget = new FontWidget(*this);
-        //break;
+        static_cast<FontWidget *>(m_pWidget)->DrawUpdate();
+        break;
     case ITEM_Audio:
         //m_pWidget = new AudioWidget(*this);
         //break;
