@@ -3,11 +3,12 @@
 
 #include "IDraw.h"
 #include "FontItem.h"
+#include "FontModels.h"
 #include <QList>
 
 class FontDraw : public IDraw
 {
-    //FontModel &                 m_ModelRef;
+    FontModel &                 m_ModelRef;
 
     HyTexturedQuad2d *          m_pDrawAtlasPreview;
     HyPrimitive2d               m_DrawAtlasOutline;
@@ -17,7 +18,7 @@ class FontDraw : public IDraw
     QList<HyTexturedQuad2d *>   m_DrawFontPreviewList;
 
 public:
-    FontDraw(IHyApplication &hyApp);
+    FontDraw(FontModel &modelRef, IHyApplication &hyApp);
     virtual ~FontDraw();
 
 protected:

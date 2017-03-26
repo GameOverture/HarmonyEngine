@@ -16,6 +16,7 @@
 #include <QDataWidgetMapper>
 #include <QLineEdit>
 #include <QCheckBox>
+#include <QDoubleSpinBox>
 
 class IModel;
 
@@ -57,9 +58,9 @@ public:
     virtual ~DoubleSpinBoxMapper()
     { }
 
-    void AddCheckBoxMapping(QLineEdit *pLineEdit)
+    void AddSpinBoxMapping(QDoubleSpinBox *pSpinBox)
     {
-        addMapping(pLineEdit, 0);
+        addMapping(pSpinBox, 0);
         this->setCurrentIndex(0);
     }
 
@@ -173,6 +174,93 @@ public:
     void SetChecked(bool bChecked)
     {
         setCurrentIndex(bChecked ? 1 : 0);
+    }
+};
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ComboBoxMapper : public QDataWidgetMapper
+{
+    class ModelComboBox : public QAbstractListModel
+    {
+        QStringList         m_sItemList;
+        QVariantList        m_DataList;
+
+    public:
+        ModelComboBox(QObject *pParent = nullptr) : QAbstractListModel(pParent) {
+        }
+
+        virtual ~ModelComboBox() {
+        }
+
+        void AddItem(QString sName, QVariant data) {
+            m_sItemList.append(sName);
+            m_DataList.append(data);
+        }
+
+        QString GetItem(int iIndex) {
+            return m_sItemList[iIndex];
+        }
+
+        QVariant GetData(int iIndex) {
+            return m_DataList[iIndex];
+        }
+
+        int FindItemIndex(QString sName) {
+            for(int i = 0; i < m_sItemList.size(); ++i)
+            {
+                if(sName == m_sItemList[i])
+                    return i;
+            }
+        }
+
+        virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
+            return m_sItemList.size();
+        }
+
+        virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
+            if(role == Qt::UserRole)
+                return m_DataList[index.row()];
+            else
+                return m_sItemList[index.row()];
+        }
+    };
+
+public:
+    ComboBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
+    {
+        setModel(new ModelComboBox(this));
+    }
+    virtual ~ComboBoxMapper()
+    { }
+
+    void AddComboBoxMapping(QComboBox *pComboBox)
+    {
+        addMapping(pComboBox, 0);
+        this->setCurrentIndex(this->currentIndex());
+    }
+
+    void AddItem(QString sName, QVariant data)
+    {
+        static_cast<ModelComboBox *>(model())->AddItem(sName, data);
+    }
+
+    QString GetCurrentItem()
+    {
+        return static_cast<ModelComboBox *>(model())->GetItem(currentIndex());
+    }
+
+    QVariant GetCurrentData()
+    {
+        return static_cast<ModelComboBox *>(model())->GetData(currentIndex());
+    }
+
+    void SetIndex(int iIndex)
+    {
+        setCurrentIndex(iIndex);
+    }
+
+    void SetIndex(QString sName)
+    {
+        setCurrentIndex(static_cast<ModelComboBox *>(model())->FindItemIndex(sName));
     }
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

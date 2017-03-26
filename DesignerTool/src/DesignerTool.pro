@@ -39,7 +39,6 @@ SOURCES += main.cpp \
     SpriteDraw.cpp \
     SpriteWidget.cpp \
     FontWidget.cpp \
-    FontWidgetState.cpp \
     AudioWidget.cpp \
     AudioWidgetBank.cpp \
     AudioWidgetManager.cpp \
@@ -90,7 +89,6 @@ HEADERS  += \
     SpriteDraw.h \
     SpriteWidget.h \
     FontWidget.h \
-    FontWidgetState.h \
     AudioWidget.h \
     UndoCmds.h \
     SpriteUndoCmds.h \
@@ -135,7 +133,6 @@ FORMS    += \
     WidgetGradientEditor.ui \
     SpriteWidget.ui \
     FontWidget.ui \
-    FontWidgetState.ui \
     AudioWidget.ui \
     AudioWidgetBank.ui \
     AudioWidgetManager.ui \

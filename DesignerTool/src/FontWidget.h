@@ -11,6 +11,7 @@
 #define FONTWIDGET_H
 
 #include "FontWidgetState.h"
+#include "FontDraw.h"
 
 #include <QWidget>
 #include <QDir>
@@ -25,72 +26,20 @@ class FontWidget;
 class FontItem;
 class FontTableModel;
 
-struct FontTypeface
-{
-    int                 iReferenceCount;
-    int                 iTmpReferenceCount;
-
-    QString             sFontPath;
-    texture_font_t *    pTextureFont;
-    rendermode_t        eMode;
-    float               fSize;
-    float               fOutlineThickness;
-
-    FontTypeface(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iReferenceCount(0),
-                                                                                                            iTmpReferenceCount(0),
-                                                                                                            sFontPath(sFontFilePath),
-                                                                                                            pTextureFont(NULL),
-                                                                                                            eMode(eRenderMode),
-                                                                                                            fSize(fSize),
-                                                                                                            fOutlineThickness(fOutlineThickness)
-    { }
-
-    ~FontTypeface()
-    {
-        if(pTextureFont)
-            texture_font_delete(pTextureFont);
-    }
-
-    void SetFont(texture_font_t *pNewFont)
-    {
-        if(pTextureFont)
-            texture_font_delete(pTextureFont);
-
-        pTextureFont = pNewFont;
-        pTextureFont->size = fSize;
-        pTextureFont->rendermode = eMode;
-        pTextureFont->outline_thickness = fOutlineThickness;
-    }
-};
-
 class FontWidget : public QWidget
 {
     Q_OBJECT
 
     ProjectItem &               m_ItemRef;
+    FontDraw                    m_Draw;
     
-    QString                     m_sAvailableTypefaceGlyphs;
-    QRegExpValidator            m_PreviewValidator;
-
-    QList<FontTypeface *>       m_MasterStageList;
-    bool                        m_bGlyphsDirty;
-    bool                        m_bFontPreviewDirty;
-
-    QList<QAction *>            m_StateActionsList;
-    FontWidgetState *           m_pCurFontState;
-    
-    texture_atlas_t *           m_pAtlas;
-    unsigned char *             m_pTrueAtlasPixelData;
-    
-    QDir                        m_FontMetaDir;
-    
-    bool                        m_bBlockGeneratePreview;
-
     QSize                       m_PrevAtlasSize;
     
 public:
-    explicit FontWidget(ProjectItem &itemRef, QWidget *parent = 0);
+    explicit FontWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget *parent = 0);
     ~FontWidget();
+
+    void SetSelectedState(int iIndex);
 
     void OnGiveMenuActions(QMenu *pMenu);
     
@@ -100,27 +49,15 @@ public:
 
     QComboBox *GetCmbStates();
     
-    FontTableModel *GetCurrentFontModel();
-    
     void SetGlyphsDirty();
     
-    void GeneratePreview(bool bStoreIntoAtlasManager = false);
-    
-    texture_atlas_t *GetAtlas();
 
-    unsigned char *GetAtlasPixelData();
-    
-    QDir GetFontMetaDir();
 
+    void Refresh(QVariant param);
     void UpdateActions();
 
-    QString GetPreviewString();
-
-    bool ClearFontDirtyFlag();
-    
-    bool SaveFontFilesToMetaDir();
-    
-    void GetSaveInfo(QJsonObject &fontObj);
+    FontStateData *GetCurStateData();
+    int GetSelectedStageId();
 
 private Q_SLOTS:
     void on_chk_09_clicked();
@@ -153,7 +90,9 @@ private Q_SLOTS:
 
     void on_actionOrderLayerUpwards_triggered();
 
-    void on_txtPreviewString_editingFinished();
+    void on_cmbRenderMode_currentIndexChanged(int index);
+
+    void on_sbSize_editingFinished();
 
 private:
     Ui::FontWidget *ui;

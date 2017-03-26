@@ -123,6 +123,9 @@ void ProjectItem::RefreshWidget(QVariant param)
     case ITEM_Sprite:
         static_cast<SpriteWidget *>(m_pWidget)->Refresh(param);
         break;
+
+    case ITEM_Font:
+        static_cast<FontWidget *>(m_pWidget)->Refresh(param);
     default:
         HyGuiLog("Unsupported IProjItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
@@ -154,7 +157,7 @@ void ProjectItem::ProjLoad(IHyApplication &hyApp)
         m_pWidget = new SpriteWidget(*this, hyApp);
         break;
     case ITEM_Font:
-        m_pWidget = new FontWidget(*this);
+        m_pWidget = new FontWidget(*this, hyApp);
         break;
     case ITEM_Audio:
         m_pWidget = new AudioWidget(*this);

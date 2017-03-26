@@ -300,20 +300,22 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename OWNER>
 class UndoCmd_DoubleSpinBox : public QUndoCommand
 {
-    OWNER *             m_pOwner;
-    QDoubleSpinBox *    m_pDoubleSpinBox;
-    double              m_dPrevSize;
-    double              m_dNewSize;
+    ProjectItem &           m_ItemRef;
+    DoubleSpinBoxMapper *   m_pMapper;
+    int                     m_iStateIndex;
+
+    double                  m_dNew;
+    double                  m_dOld;
 
 public:
-    UndoCmd_DoubleSpinBox(QString sText, OWNER *pOwner, QDoubleSpinBox *pDoubleSpinBox, double dPrevSize, double dNewSize, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
-                                                                                                                                                                m_pOwner(pOwner),
-                                                                                                                                                                m_pDoubleSpinBox(pDoubleSpinBox),
-                                                                                                                                                                m_dPrevSize(dPrevSize),
-                                                                                                                                                                m_dNewSize(dNewSize)
+    UndoCmd_DoubleSpinBox(QString sText, ProjectItem &itemRef, DoubleSpinBoxMapper *pMapper, int iStateIndex, double dNew, double dOld, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
+                                                                                                                                                                        m_ItemRef(itemRef),
+                                                                                                                                                                        m_pMapper(pMapper),
+                                                                                                                                                                        m_iStateIndex(iStateIndex),
+                                                                                                                                                                        m_dNew(dNew),
+                                                                                                                                                                        m_dOld(dOld)
     {
         setText(sText);
     }
@@ -323,36 +325,34 @@ public:
 
     void redo() override
     {
-        m_pDoubleSpinBox->blockSignals(true);
-        m_pDoubleSpinBox->setValue(m_dNewSize);
-        m_pDoubleSpinBox->blockSignals(false);
-        
-        m_pOwner->UpdateActions();
+        m_pMapper->SetValue(m_dNew);
+        m_ItemRef.RefreshWidget(m_iStateIndex);
     }
     
     void undo() override
     {
-        m_pDoubleSpinBox->blockSignals(true);
-        m_pDoubleSpinBox->setValue(m_dPrevSize);
-        m_pDoubleSpinBox->blockSignals(false);
-        
-        m_pOwner->UpdateActions();
+        m_pMapper->SetValue(m_dOld);
+        m_ItemRef.RefreshWidget(m_iStateIndex);
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename OWNER>
 class UndoCmd_LineEdit : public QUndoCommand
 {
-    OWNER *             m_pOwner;
-    QLineEdit *         m_pLineEdit;
-    bool                m_bFirstTimeSkipRedo;
+    ProjectItem &       m_ItemRef;
+    LineEditMapper *    m_pMapper;
+    int                 m_iStateIndex;
+
+    QString             m_sNew;
+    QString             m_sOld;
 
 public:
-    UndoCmd_LineEdit(QString sText, OWNER *pOwner, QLineEdit *pLineEdit, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
-                                                                                                            m_pOwner(pOwner),
-                                                                                                            m_pLineEdit(pLineEdit),
-                                                                                                            m_bFirstTimeSkipRedo(true)
+    UndoCmd_LineEdit(QString sText, ProjectItem &itemRef, LineEditMapper *pMapper, int iStateIndex, QString sNew, QString sOld, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
+                                                                                                                                                                m_ItemRef(itemRef),
+                                                                                                                                                                m_pMapper(pMapper),
+                                                                                                                                                                m_iStateIndex(iStateIndex),
+                                                                                                                                                                m_sNew(sNew),
+                                                                                                                                                                m_sOld(sOld)
     {
     }
     
@@ -361,19 +361,14 @@ public:
 
     void redo() override
     {
-        if(m_bFirstTimeSkipRedo)
-            m_bFirstTimeSkipRedo = false;
-        else
-            m_pLineEdit->redo();
-    
-        m_pOwner->UpdateActions();
-        
+        m_pMapper->SetString(m_sNew);
+        m_ItemRef.RefreshWidget(m_iStateIndex);
     }
     
     void undo() override
     {
-        m_pLineEdit->undo();
-        m_pOwner->UpdateActions();
+        m_pMapper->SetString(m_sOld);
+        m_ItemRef.RefreshWidget(m_iStateIndex);
     }
 };
 

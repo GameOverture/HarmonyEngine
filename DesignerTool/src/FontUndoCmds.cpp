@@ -9,19 +9,21 @@
  *************************************************************************/
 #include "FontUndoCmds.h"
 
+#include "ProjectItem.h"
 #include "FontWidget.h"
+#include "FontModels.h"
+#include "FontModelView.h"
 #include "HyGuiGlobal.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_AddLayer::FontUndoCmd_AddLayer(FontWidget &widgetFont, QComboBox *pCmbStates, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                                                                                                                m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                                m_pCmbStates(pCmbStates),
-                                                                                                                                                                                                m_pFontState(m_pCmbStates->currentData().value<FontWidgetState *>()),
-                                                                                                                                                                                                m_eRenderMode(eRenderMode),
-                                                                                                                                                                                                m_fSize(fSize),
-                                                                                                                                                                                                m_fThickness(fThickness),
-                                                                                                                                                                                                m_iId(-1)
+FontUndoCmd_AddLayer::FontUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+                                                                                                                                                            m_ItemRef(itemRef),
+                                                                                                                                                            m_iStateIndex(iStateIndex),
+                                                                                                                                                            m_eRenderMode(eRenderMode),
+                                                                                                                                                            m_fSize(fSize),
+                                                                                                                                                            m_fThickness(fThickness),
+                                                                                                                                                            m_iId(-1)
 {
     setText("Add Font Layer");
 }
@@ -32,52 +34,30 @@ FontUndoCmd_AddLayer::FontUndoCmd_AddLayer(FontWidget &widgetFont, QComboBox *pC
 
 void FontUndoCmd_AddLayer::redo()
 {
-    FontTableModel *pModel = m_pFontState->GetFontModel();
+    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
     
     if(m_iId == -1)
         m_iId = pModel->AddNewLayer(m_eRenderMode, m_fSize, m_fThickness);
     else
         pModel->ReAddLayer(m_iId);
-    
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<FontWidgetState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
 
-    m_WidgetFontRef.GeneratePreview();
-    m_WidgetFontRef.UpdateActions();
+    m_ItemRef.RefreshWidget(m_iStateIndex);
 }
 
 void FontUndoCmd_AddLayer::undo()
 {
-    FontTableModel *pModel = m_pFontState->GetFontModel();
-    
+    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
     pModel->RemoveLayer(m_iId);
     
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<FontWidgetState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
-    
-    m_WidgetFontRef.GeneratePreview();
-    m_WidgetFontRef.UpdateActions();
+    m_ItemRef.RefreshWidget(m_iStateIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_RemoveLayer::FontUndoCmd_RemoveLayer(FontWidget &widgetFont, QComboBox *pCmbStates, int iId, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                                                            m_WidgetFontRef(widgetFont),
-                                                                                                                                            m_pCmbStates(pCmbStates),
-                                                                                                                                            m_pFontState(m_pCmbStates->currentData().value<FontWidgetState *>()),
-                                                                                                                                            m_iId(iId)
+FontUndoCmd_RemoveLayer::FontUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, int iId, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                    m_ItemRef(itemRef),
+                                                                                                                                    m_iStateIndex(iStateIndex),
+                                                                                                                                    m_iId(iId)
 {
     setText("Remove Font Layer");
 }
@@ -88,51 +68,30 @@ FontUndoCmd_RemoveLayer::FontUndoCmd_RemoveLayer(FontWidget &widgetFont, QComboB
 
 void FontUndoCmd_RemoveLayer::redo()
 {
-    FontTableModel *pModel = m_pFontState->GetFontModel();
+    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
     
     pModel->RemoveLayer(m_iId);
     
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<FontWidgetState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
-    
-    m_WidgetFontRef.GeneratePreview();
-    m_WidgetFontRef.UpdateActions();
+    m_ItemRef.RefreshWidget(m_iStateIndex);
 }
 
 void FontUndoCmd_RemoveLayer::undo()
 {
-    FontTableModel *pModel = m_pFontState->GetFontModel();
+    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
     
     pModel->ReAddLayer(m_iId);
     
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<FontWidgetState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
-    
-    m_WidgetFontRef.GeneratePreview();
-    m_WidgetFontRef.UpdateActions();
+    m_ItemRef.RefreshWidget(m_iStateIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_LayerRenderMode::FontUndoCmd_LayerRenderMode(FontWidget &widgetFont, QComboBox *pCmbStates, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-                                                                                                                                                                                                                    m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                                                    m_pCmbStates(pCmbStates),
-                                                                                                                                                                                                                    m_pFontState(m_pCmbStates->currentData().value<FontWidgetState *>()),
-                                                                                                                                                                                                                    m_iLayerId(iLayerId),
-                                                                                                                                                                                                                    m_ePrevRenderMode(ePrevMode),
-                                                                                                                                                                                                                    m_eNewRenderMode(eNewMode)
+FontUndoCmd_LayerRenderMode::FontUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                                                                                m_ItemRef(itemRef),
+                                                                                                                                                                                                m_iStateIndex(iStateIndex),
+                                                                                                                                                                                                m_iLayerId(iLayerId),
+                                                                                                                                                                                                m_ePrevRenderMode(ePrevMode),
+                                                                                                                                                                                                m_eNewRenderMode(eNewMode)
 {
     setText("Stage Render Mode");
 }
@@ -143,49 +102,30 @@ FontUndoCmd_LayerRenderMode::FontUndoCmd_LayerRenderMode(FontWidget &widgetFont,
 
 void FontUndoCmd_LayerRenderMode::redo()
 {
-    FontTableModel *pModel = m_pFontState->GetFontModel();
+    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
     
     pModel->SetLayerRenderMode(m_iLayerId, m_eNewRenderMode);
     
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<FontWidgetState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
-    
-    m_WidgetFontRef.GeneratePreview();
+    m_ItemRef.RefreshWidget(m_iStateIndex);
 }
 
 void FontUndoCmd_LayerRenderMode::undo()
 {
-    FontTableModel *pModel = m_pFontState->GetFontModel();
+    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
     
     pModel->SetLayerRenderMode(m_iLayerId, m_ePrevRenderMode);
     
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<FontWidgetState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
-    
-    m_WidgetFontRef.GeneratePreview();
+    m_ItemRef.RefreshWidget(m_iStateIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_LayerOutlineThickness::FontUndoCmd_LayerOutlineThickness(FontWidget &widgetFont, QComboBox *pCmbStates, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-                                                                                                                                                                                                                            m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                                                            m_pCmbStates(pCmbStates),
-                                                                                                                                                                                                                            m_pFontState(m_pCmbStates->currentData().value<FontWidgetState *>()),
-                                                                                                                                                                                                                            m_iLayerId(iLayerId),
-                                                                                                                                                                                                                            m_fPrevThickness(fPrevThickness),
-                                                                                                                                                                                                                            m_fNewThickness(fNewThickness)
+FontUndoCmd_LayerOutlineThickness::FontUndoCmd_LayerOutlineThickness(ProjectItem &itemRef, int iStateIndex, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                                                                                                        m_ItemRef(itemRef),
+                                                                                                                                                                                                        m_iStateIndex(iStateIndex),
+                                                                                                                                                                                                        m_iLayerId(iLayerId),
+                                                                                                                                                                                                        m_fPrevThickness(fPrevThickness),
+                                                                                                                                                                                                        m_fNewThickness(fNewThickness)
 {
     setText("Stage Outline Thickness");
 }
@@ -196,51 +136,32 @@ FontUndoCmd_LayerOutlineThickness::FontUndoCmd_LayerOutlineThickness(FontWidget 
 
 void FontUndoCmd_LayerOutlineThickness::redo()
 {
-    FontTableModel *pModel = m_pFontState->GetFontModel();
+    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
     
     pModel->SetLayerOutlineThickness(m_iLayerId, m_fNewThickness);
     
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<FontWidgetState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
-    
-    m_WidgetFontRef.GeneratePreview();
+    m_ItemRef.RefreshWidget(m_iStateIndex);
 }
 
 void FontUndoCmd_LayerOutlineThickness::undo()
 {
-    FontTableModel *pModel = m_pFontState->GetFontModel();
+    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
     
     pModel->SetLayerOutlineThickness(m_iLayerId, m_fPrevThickness);
     
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<FontWidgetState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
-    
-    m_WidgetFontRef.GeneratePreview();
+    m_ItemRef.RefreshWidget(m_iStateIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_LayerColors::FontUndoCmd_LayerColors(FontWidget &widgetFont, QComboBox *pCmbStates, int iLayerId, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
-                                                                                                                                                                                                                                                m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                                                                                m_pCmbStates(pCmbStates),
-                                                                                                                                                                                                                                                m_pFontState(m_pCmbStates->currentData().value<FontWidgetState *>()),
-                                                                                                                                                                                                                                                m_iLayerId(iLayerId),
-                                                                                                                                                                                                                                                m_PrevTopColor(prevTopColor),
-                                                                                                                                                                                                                                                m_PrevBotColor(prevBotColor),
-                                                                                                                                                                                                                                                m_NewTopColor(newTopColor),
-                                                                                                                                                                                                                                                m_NewBotColor(newBotColor)
+FontUndoCmd_LayerColors::FontUndoCmd_LayerColors(ProjectItem &itemRef, int iStateIndex, int iLayerId, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
+                                                                                                                                                                                                                            m_ItemRef(itemRef),
+                                                                                                                                                                                                                            m_iStateIndex(iStateIndex),
+                                                                                                                                                                                                                            m_iLayerId(iLayerId),
+                                                                                                                                                                                                                            m_PrevTopColor(prevTopColor),
+                                                                                                                                                                                                                            m_PrevBotColor(prevBotColor),
+                                                                                                                                                                                                                            m_NewTopColor(newTopColor),
+                                                                                                                                                                                                                            m_NewBotColor(newBotColor)
 {
     setText("Set Layer Colors");
 }
@@ -251,49 +172,30 @@ FontUndoCmd_LayerColors::FontUndoCmd_LayerColors(FontWidget &widgetFont, QComboB
 
 void FontUndoCmd_LayerColors::redo()
 {
-    FontTableModel *pModel = m_pFontState->GetFontModel();
+    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
 
     pModel->SetLayerColors(m_iLayerId, m_NewTopColor, m_NewBotColor);
 
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<FontWidgetState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
-
-    m_WidgetFontRef.UpdateActions();
+    m_ItemRef.RefreshWidget(m_iStateIndex);
 }
 
 void FontUndoCmd_LayerColors::undo()
 {
-    FontTableModel *pModel = m_pFontState->GetFontModel();
+    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
 
     pModel->SetLayerColors(m_iLayerId, m_PrevTopColor, m_PrevBotColor);
 
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<FontWidgetState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
-
-    m_WidgetFontRef.UpdateActions();
+    m_ItemRef.RefreshWidget(m_iStateIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_LayerOrder::FontUndoCmd_LayerOrder(FontWidget &widgetFont, QComboBox *pCmbStates, FontTableView *pFontTableView, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
-                                                                                                                                                                                                                        m_WidgetFontRef(widgetFont),
-                                                                                                                                                                                                                        m_pCmbStates(pCmbStates),
-                                                                                                                                                                                                                        m_pFontState(m_pCmbStates->currentData().value<FontWidgetState *>()),
-                                                                                                                                                                                                                        m_pFontTableView(pFontTableView),
-                                                                                                                                                                                                                        m_iPrevRowIndex(iPrevRowIndex),
-                                                                                                                                                                                                                        m_iNewRowIndex(iNewRowIndex)
+FontUndoCmd_LayerOrder::FontUndoCmd_LayerOrder(ProjectItem &itemRef, int iStateIndex, FontTableView *pTableView, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+                                                                                                                                                                                        m_ItemRef(itemRef),
+                                                                                                                                                                                        m_iStateIndex(iStateIndex),
+                                                                                                                                                                                        m_pFontTableView(pTableView),
+                                                                                                                                                                                        m_iPrevRowIndex(iPrevRowIndex),
+                                                                                                                                                                                        m_iNewRowIndex(iNewRowIndex)
 {
     if(m_iPrevRowIndex > m_iNewRowIndex)
         setText("Order Layer Upwards");
@@ -307,7 +209,7 @@ FontUndoCmd_LayerOrder::FontUndoCmd_LayerOrder(FontWidget &widgetFont, QComboBox
 
 void FontUndoCmd_LayerOrder::redo()
 {
-    FontTableModel *pModel = static_cast<FontTableModel *>(m_pFontTableView->model());
+    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
     
     int iOffset = m_iNewRowIndex - m_iPrevRowIndex;
     if(iOffset > 0)
@@ -315,24 +217,14 @@ void FontUndoCmd_LayerOrder::redo()
     else
         pModel->MoveRowUp(m_iPrevRowIndex);
         
-    m_pFontTableView->selectRow(m_iNewRowIndex);
+    //m_pFontTableView->selectRow(m_iNewRowIndex);
     
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<FontWidgetState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
-    
-    m_WidgetFontRef.GeneratePreview();
-    m_WidgetFontRef.UpdateActions();
+    m_ItemRef.RefreshWidget(m_iStateIndex);
 }
 
 void FontUndoCmd_LayerOrder::undo()
 {
-    FontTableModel *pModel = static_cast<FontTableModel *>(m_pFontTableView->model());
+    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
     
     int iOffset = m_iPrevRowIndex - m_iNewRowIndex;
     if(iOffset > 0)
@@ -340,18 +232,8 @@ void FontUndoCmd_LayerOrder::undo()
     else
         pModel->MoveRowUp(m_iNewRowIndex);
     
-    m_pFontTableView->selectRow(m_iPrevRowIndex);
+    //m_pFontTableView->selectRow(m_iPrevRowIndex);
     
-    for(int i = 0; i < m_pCmbStates->count(); ++i)
-    {
-        if(m_pCmbStates->itemData(i).value<FontWidgetState *>() == m_pFontState)
-        {
-            m_pCmbStates->setCurrentIndex(i);
-            break;
-        }
-    }
-    
-    m_WidgetFontRef.GeneratePreview();
-    m_WidgetFontRef.UpdateActions();
+    m_ItemRef.RefreshWidget(m_iStateIndex);
 }
 

@@ -79,8 +79,8 @@ FontDelegate::FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *p
                 topColor = pDlg->GetVgTopColor();
                 botColor = pDlg->GetVgBotColor();
             }
-            m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerColors(*static_cast<FontWidget *>(m_pItem->GetWidget()),
-                                                                      m_pCmbStates,
+            m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerColors(*m_pItem,
+                                                                      m_pCmbStates->currentIndex(),
                                                                       pFontModel->GetLayerId(index.row()),
                                                                       pFontModel->GetLayerTopColor(index.row()),
                                                                       pFontModel->GetLayerBotColor(index.row()),
@@ -119,16 +119,16 @@ FontDelegate::FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *p
     switch(index.column())
     {
     case FontTableModel::COLUMN_Type:
-        m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerRenderMode(*static_cast<FontWidget *>(m_pItem->GetWidget()),
-                                                                      m_pCmbStates,
+        m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerRenderMode(*m_pItem,
+                                                                      m_pCmbStates->currentIndex(),
                                                                       pFontModel->GetLayerId(index.row()),
                                                                       pFontModel->GetLayerRenderMode(index.row()),
                                                                       static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
         break;
 
     case FontTableModel::COLUMN_Thickness:
-        m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerOutlineThickness(*static_cast<FontWidget *>(m_pItem->GetWidget()),
-                                                                            m_pCmbStates,
+        m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerOutlineThickness(*m_pItem,
+                                                                            m_pCmbStates->currentIndex(),
                                                                             pFontModel->GetLayerId(index.row()),
                                                                             pFontModel->GetLayerOutlineThickness(index.row()),
                                                                             static_cast<QDoubleSpinBox *>(pEditor)->value()));

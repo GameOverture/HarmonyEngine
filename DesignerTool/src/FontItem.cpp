@@ -46,13 +46,5 @@
 
 ///*virtual*/ QJsonValue FontItem::OnSave()
 //{
-//    FontWidget *pWidget = static_cast<FontWidget *>(m_pWidget);
-//    pWidget->SaveFontFilesToMetaDir();
-    
-//    pWidget->GeneratePreview(true);
-    
-//    QJsonObject fontObj;
-//    pWidget->GetSaveInfo(fontObj);
 
-//    return fontObj;
 //}

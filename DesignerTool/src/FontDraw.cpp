@@ -2,9 +2,10 @@
 #include "FontWidget.h"
 #include "MainWindow.h"
 
-FontDraw::FontDraw(IHyApplication &hyApp) : IDraw(hyApp),
-                                            m_pDrawAtlasPreview(nullptr),
-                                            m_pFontCamera(nullptr)
+FontDraw::FontDraw(FontModel &modelRef, IHyApplication &hyApp) :    IDraw(hyApp),
+                                                                    m_ModelRef(modelRef),
+                                                                    m_pDrawAtlasPreview(nullptr),
+                                                                    m_pFontCamera(nullptr)
 {
 }
 
