@@ -29,15 +29,15 @@
 //}
 
 HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent),
-                                                m_pProjOwner(NULL),
-                                                m_pHyEngine(NULL)
+                                                m_pProjOwner(nullptr),
+                                                m_pHyEngine(nullptr)
 {
     HyGuiLog("Wrong ctor HyGuiRenderer()", LOGTYPE_Error);
 }
 
 HyGuiRenderer::HyGuiRenderer(Project *pProj, QWidget *parent /*= 0*/) : QOpenGLWidget(parent),
                                                                             m_pProjOwner(pProj),
-                                                                            m_pHyEngine(NULL),
+                                                                            m_pHyEngine(nullptr),
                                                                             m_bIsUpdating(false)
 {
 //    QSurfaceFormat format;
@@ -62,10 +62,13 @@ HyGuiRenderer::~HyGuiRenderer()
     m_bIsUpdating = true;
     
     if(m_pHyEngine)
+    {
+        m_pProjOwner->Shutdown();
         m_pHyEngine->Shutdown();
+    }
     
     delete m_pHyEngine;
-    m_pHyEngine = NULL;
+    m_pHyEngine = nullptr;
     m_bIsUpdating = false;
 }
 
@@ -74,7 +77,7 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
     if(m_pHyEngine)
         return &m_pHyEngine->GetRenderer();
     else
-        return NULL;
+        return nullptr;
 }
 
 /*virtual*/ void HyGuiRenderer::initializeGL()

@@ -56,8 +56,6 @@ public:
     
     bool HasError() const;
 
-    QList<AtlasTreeItem *> GetAtlasTreeItemList();
-
     QString GetDirPath() const;
     QString GetGameName() const;
 

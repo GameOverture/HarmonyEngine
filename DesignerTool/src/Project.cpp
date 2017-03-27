@@ -29,6 +29,7 @@
 
 Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Project, sNewProjectFilePath),
                                                         IHyApplication(HarmonyInit()),
+                                                        m_pDraw(nullptr),
                                                         m_pAtlasModel(nullptr),
                                                         m_pAtlasWidget(nullptr),
                                                         m_pAudioMan(nullptr),
@@ -38,8 +39,6 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
                                                         m_ActionSaveAll(0),
                                                         m_bHasError(false)
 {
-    m_pDraw = new ProjectDraw(*this);
-
     QFile projFile(sNewProjectFilePath);
     if(projFile.exists())
     {
@@ -279,11 +278,6 @@ bool Project::HasError() const
     return m_bHasError;
 }
 
-QList<AtlasTreeItem *> Project::GetAtlasTreeItemList()
-{
-    return m_pAtlasModel->GetTopLevelTreeItemList();
-}
-
 QString Project::GetDirPath() const
 {
     QFileInfo file(m_sPATH);
@@ -412,6 +406,7 @@ void Project::OpenItem(ProjectItem *pItem)
 // IHyApplication override
 /*virtual*/ bool Project::Initialize()
 {
+    m_pDraw = new ProjectDraw(*this);
     m_pDraw->Load();
     return true;
 }
@@ -436,6 +431,11 @@ void Project::OpenItem(ProjectItem *pItem)
 // IHyApplication override
 /*virtual*/ void Project::Shutdown()
 {
+    delete m_pAtlasModel;
+    m_pAtlasModel = nullptr;
+    
+    delete m_pDraw;
+    m_pDraw = nullptr;
 }
 
 void Project::SetRenderSize(int iWidth, int iHeight)
@@ -456,6 +456,9 @@ void Project::Reload()
         m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
         m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
     }
+    
+    if(m_pAtlasModel == nullptr)
+        m_pAtlasModel = new AtlasModel(this);
     
     delete m_pAtlasWidget;
     delete m_pAudioMan;

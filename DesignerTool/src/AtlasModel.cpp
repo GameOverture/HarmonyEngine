@@ -772,8 +772,6 @@ void AtlasModel::Refresh()
 
     MainWindow::ReloadHarmony();
 
-    m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->sortItems(0, Qt::AscendingOrder);
-
 //    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
 //    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
 
