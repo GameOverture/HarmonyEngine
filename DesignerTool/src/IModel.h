@@ -234,6 +234,8 @@ public:
 
     void AddComboBoxMapping(QComboBox *pComboBox)
     {
+        pComboBox->setModel(model());
+
         addMapping(pComboBox, 0);
         this->setCurrentIndex(this->currentIndex());
     }
@@ -260,7 +262,8 @@ public:
 
     void SetIndex(QString sName)
     {
-        setCurrentIndex(static_cast<ModelComboBox *>(model())->FindItemIndex(sName));
+        int iFoundIndex = static_cast<ModelComboBox *>(model())->FindItemIndex(sName);
+        setCurrentIndex(iFoundIndex);
     }
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

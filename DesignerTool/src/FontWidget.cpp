@@ -32,6 +32,9 @@ FontWidget::FontWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget *par
 {
     ui->setupUi(this);
 
+    m_Draw.Load();
+    m_Draw.SetEnabled(false);
+
     m_PrevAtlasSize.setWidth(0);
     m_PrevAtlasSize.setHeight(0);
 
@@ -52,6 +55,9 @@ FontWidget::FontWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget *par
     ui->stagesView->setItemDelegate(new FontDelegate(&m_ItemRef, ui->cmbStates, this));
     QItemSelectionModel *pSelModel = ui->stagesView->selectionModel();
     connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
+
+    ui->cmbStates->clear();
+    ui->cmbStates->setModel(m_ItemRef.GetModel());
 
     static_cast<FontModel *>(m_ItemRef.GetModel())->Get09Mapper()->AddCheckBoxMapping(ui->chk_09);
     static_cast<FontModel *>(m_ItemRef.GetModel())->GetAZMapper()->AddCheckBoxMapping(ui->chk_AZ);
@@ -90,6 +96,7 @@ void FontWidget::SetSelectedState(int iIndex)
 
     pCurStateData->GetSizeMapper()->AddSpinBoxMapping(ui->sbSize);
     pCurStateData->GetRenderModeMapper()->AddComboBoxMapping(ui->cmbRenderMode);
+
     pCurStateData->GetFontMapper()->AddComboBoxMapping(ui->cmbFontList);
 
     ui->stagesView->setModel(pCurStateData->GetFontModel());
