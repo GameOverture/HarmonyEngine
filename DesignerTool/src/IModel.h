@@ -114,7 +114,7 @@ public:
     virtual ~LineEditMapper()
     { }
 
-    void AddCheckBoxMapping(QLineEdit *pLineEdit)
+    void AddLineEditMapping(QLineEdit *pLineEdit)
     {
         addMapping(pLineEdit, 0);
         this->setCurrentIndex(0);

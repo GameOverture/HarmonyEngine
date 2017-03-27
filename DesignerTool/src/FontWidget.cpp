@@ -53,6 +53,12 @@ FontWidget::FontWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget *par
     QItemSelectionModel *pSelModel = ui->stagesView->selectionModel();
     connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
 
+    static_cast<FontModel *>(m_ItemRef.GetModel())->Get09Mapper()->AddCheckBoxMapping(ui->chk_09);
+    static_cast<FontModel *>(m_ItemRef.GetModel())->GetAZMapper()->AddCheckBoxMapping(ui->chk_AZ);
+    static_cast<FontModel *>(m_ItemRef.GetModel())->GetazMapper()->AddCheckBoxMapping(ui->chk_az);
+    static_cast<FontModel *>(m_ItemRef.GetModel())->GetSymbolsMapper()->AddCheckBoxMapping(ui->chk_symbols);
+    static_cast<FontModel *>(m_ItemRef.GetModel())->GetAdditionalSymbolsMapper()->AddLineEditMapping(ui->txtAdditionalSymbols);
+
     // ...set models
     SetSelectedState(0);
     
@@ -80,6 +86,7 @@ void FontWidget::SetSelectedState(int iIndex)
     ui->stagesView->setModel(pCurStateData->GetFontModel());
     if(ui->stagesView->currentIndex().row() < 0 && ui->stagesView->model()->rowCount() > 0)
         ui->stagesView->selectRow(0);
+
 
     pCurStateData->GetSizeMapper()->AddSpinBoxMapping(ui->sbSize);
     pCurStateData->GetRenderModeMapper()->AddComboBoxMapping(ui->cmbRenderMode);
