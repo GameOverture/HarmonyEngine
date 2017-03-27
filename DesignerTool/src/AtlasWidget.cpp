@@ -215,9 +215,9 @@ void AtlasWidget::on_btnSettings_clicked()
 
 void AtlasWidget::on_actionDeleteImages_triggered()
 {
-    QSet<int> affectedTextureIndexSet;
-
     QList<QTreeWidgetItem *> selectedImageList = ui->atlasList->selectedItems();
+    
+    // First loop through and check to see if any links are present, and abort if dependecies are found
     for(int i = 0; i < selectedImageList.count(); ++i)
     {
         AtlasFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
@@ -229,9 +229,15 @@ void AtlasWidget::on_actionDeleteImages_triggered()
                 sMessage.append(HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem((*LinksIter)->GetType())) % "/" % (*LinksIter)->GetName(true) % "\n");
 
             HyGuiLog(sMessage, LOGTYPE_Warning);
-            continue;
+            return;
         }
-
+    }
+    
+    // No dependencies found, resume with deleting
+    QSet<int> affectedTextureIndexSet;
+    for(int i = 0; i < selectedImageList.count(); ++i)
+    {
+        AtlasFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
         affectedTextureIndexSet.insert(pFrame->GetTextureIndex());
 
         m_pModel->RemoveFrame(pFrame);
