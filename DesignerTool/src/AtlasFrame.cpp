@@ -49,13 +49,7 @@ AtlasTreeItem *AtlasFrame::GetTreeItem()
         SetError(GUIFRAMEERROR_CouldNotPack);
     }
 
-    if(m_uiErrors == 0)
-        m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(m_eType));
-    else
-    {
-        m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
-        m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
-    }
+    UpdateTreeItemIconAndToolTip();
 
     QVariant v; v.setValue(this);
     m_pTreeWidgetItem->setData(0, Qt::UserRole, v);
@@ -177,37 +171,38 @@ void AtlasFrame::GetJsonObj(QJsonObject &frameObj)
 
 void AtlasFrame::SetError(eGuiFrameError eError)
 {
+    if(eError == GUIFRAMEERROR_CannotFindMetaImg)
+        HyGuiLog(m_sName % " - GUIFRAMEERROR_CannotFindMetaImg", LOGTYPE_Error);
+            
     m_uiErrors |= (1 << eError);
-
-    if(m_pTreeWidgetItem)
-    {
-        m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
-        m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
-    }
+    
+    UpdateTreeItemIconAndToolTip();
 }
 
 void AtlasFrame::ClearError(eGuiFrameError eError)
 {
     m_uiErrors &= ~(1 << eError);
 
-    if(m_pTreeWidgetItem)
-    {
-        if(m_uiErrors == 0)
-        {
-            m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(m_eType));
-            m_pTreeWidgetItem->setToolTip(0, "");
-        }
-        else
-        {
-            m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
-            m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
-        }
-    }
+    UpdateTreeItemIconAndToolTip();
 }
 
 uint AtlasFrame::GetErrors()
 {
     return m_uiErrors;
+}
+
+void AtlasFrame::UpdateTreeItemIconAndToolTip()
+{
+    if(m_pTreeWidgetItem)
+    {
+        // Duplicates are not considered and error so don't mark the icon as a warning (if only error)
+        if(m_uiErrors == 0 || m_uiErrors == (1 << GUIFRAMEERROR_Duplicate))
+            m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(m_eType));
+        else
+            m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
+        
+        m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
+    }
 }
 
 bool AtlasFrame::DeleteMetaImage(QDir metaDir)

@@ -74,6 +74,7 @@ public:
     uint GetErrors();
 
 private:
+    void UpdateTreeItemIconAndToolTip();
     bool DeleteMetaImage(QDir metaDir);
     void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);
 };
