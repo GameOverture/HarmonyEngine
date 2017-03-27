@@ -505,9 +505,17 @@ void AtlasModel::SetPackerSettings()
     m_Packer.rotate = ImagePacker::NEVER;
 }
 
+QFileInfoList AtlasModel::GetExistingTextureInfoList()
+{
+    QStringList sNameFilterList;
+    sNameFilterList << "*.png";
+    
+    return m_DataDir.entryInfoList(sNameFilterList, QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
+}
+
 void AtlasModel::RepackAll()
 {
-    int iNumTotalTextures = m_DataDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name).size();
+    int iNumTotalTextures = GetNumTextures();
 
     QSet<int> textureIndexSet;
     for(int i = 0; i < iNumTotalTextures; ++i)
@@ -519,7 +527,7 @@ void AtlasModel::RepackAll()
 void AtlasModel::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
 {
     // Always repack the last texture to ensure it gets filled as much as it can
-    QFileInfoList existingTexturesInfoList = m_DataDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
+    QFileInfoList existingTexturesInfoList = GetExistingTextureInfoList();
     for(int i = HyClamp(existingTexturesInfoList.size() - 1, 0, existingTexturesInfoList.size()); i < existingTexturesInfoList.size(); ++i)
         repackTexIndicesSet.insert(i);
 
@@ -558,9 +566,7 @@ void AtlasModel::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFra
         QFile::remove(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".png"));
 
     // Regrab 'existingTexturesInfoList' after deleting obsolete textures
-    QStringList sNameFilterList;
-    sNameFilterList << "*.png";
-    existingTexturesInfoList = m_DataDir.entryInfoList(sNameFilterList, QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
+    existingTexturesInfoList = GetExistingTextureInfoList();
 
     // Using our stock of newly generated textures, fill in any gaps in the texture array. If there aren't enough new textures then shift textures (and their frames) to fill any remaining gaps in the indices.
     int iTotalNumTextures = iNumNewTextures + existingTexturesInfoList.size();
@@ -612,7 +618,7 @@ void AtlasModel::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFra
                         QFile::rename(existingTexturesInfoList[i].absoluteFilePath(), m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iCurrentIndex) % ".png"));
 
                         // Regrab 'existingTexturesInfoList' after renaming a texture
-                        existingTexturesInfoList = m_DataDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
+                        existingTexturesInfoList = GetExistingTextureInfoList();
 
                         bHandled = true;
                         break;

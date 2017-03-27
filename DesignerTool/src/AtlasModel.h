@@ -70,6 +70,8 @@ public:
     void GetAtlasInfoForGameData(QJsonObject &atlasObjOut);
 
     void SetPackerSettings();
+    
+    QFileInfoList GetExistingTextureInfoList();
 
     void RepackAll();
     void Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet);
