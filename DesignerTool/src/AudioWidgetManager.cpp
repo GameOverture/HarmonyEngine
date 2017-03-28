@@ -112,7 +112,7 @@ AudioWave *AudioWidgetManager::CreateWave(uint uiWaveBankId, quint32 uiChecksum,
         HyGuiLog("WidgetAtlasManager::CreateWave() already contains wave with this checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
 
         pNewWave = new AudioWave(uiWaveBankId, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, uiErrors);
-        pNewWave->SetError(GUIFRAMEERROR_Duplicate);
+        //pNewWave->SetError(GUIFRAMEERROR_Duplicate);
     }
     else
     {

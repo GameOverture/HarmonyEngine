@@ -196,7 +196,7 @@ void AtlasFrame::UpdateTreeItemIconAndToolTip()
     if(m_pTreeWidgetItem)
     {
         // Duplicates are not considered and error so don't mark the icon as a warning (if only error)
-        if(m_uiErrors == 0 || m_uiErrors == (1 << GUIFRAMEERROR_Duplicate))
+        if(m_uiErrors == 0)
             m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(m_eType));
         else
             m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
@@ -207,9 +207,6 @@ void AtlasFrame::UpdateTreeItemIconAndToolTip()
 
 bool AtlasFrame::DeleteMetaImage(QDir metaDir)
 {
-    if(0 != (m_uiErrors & GUIFRAMEERROR_Duplicate))
-        return true;
-
     QFile imageFile(metaDir.path() % "/" % ConstructImageFileName());
     if(imageFile.remove() == false)
         return false;
@@ -219,8 +216,6 @@ bool AtlasFrame::DeleteMetaImage(QDir metaDir)
 
 void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir)
 {
-    DeleteMetaImage(metaDir);
-
     m_sName = sName;
     m_pTreeWidgetItem->setText(0, m_sName);
 

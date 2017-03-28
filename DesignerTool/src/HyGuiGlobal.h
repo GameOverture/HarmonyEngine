@@ -75,7 +75,6 @@ enum eGuiFrameError
 {
     GUIFRAMEERROR_CannotFindMetaImg = 0,
     GUIFRAMEERROR_CouldNotPack,
-    GUIFRAMEERROR_Duplicate,
 
     NUMGUIFRAMEERROR
 };
@@ -200,7 +199,6 @@ public:
 
         sm_ErrorStrings[GUIFRAMEERROR_CannotFindMetaImg] = "Cannot find source meta-image";
         sm_ErrorStrings[GUIFRAMEERROR_CouldNotPack] = "Could not pack this frame in atlas";
-        sm_ErrorStrings[GUIFRAMEERROR_Duplicate] = "Duplicate frame exists";
     }
 
     static eItemType GetCorrespondingDirItem(eItemType eItem)

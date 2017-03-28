@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     while(ui->stackedTabWidgets->count())
         ui->stackedTabWidgets->removeWidget(ui->stackedTabWidgets->currentWidget());
 
-    m_pCurRenderer = new HyGuiRenderer(NULL, this);
+    m_pCurRenderer = new HyGuiRenderer(nullptr, this);
     ui->centralVerticalLayout->addWidget(m_pCurRenderer);
 
     m_pLoadingSpinners[0 /*MDI_MainWindow*/] = new WaitingSpinnerWidget(this, true, true);
@@ -435,10 +435,13 @@ void MainWindow::on_actionOpenProject_triggered()
 void MainWindow::on_actionCloseProject_triggered()
 {
     delete m_pCurRenderer;
-    m_pCurRenderer = 0;
+    m_pCurRenderer = new HyGuiRenderer(nullptr, this);
+    ui->centralVerticalLayout->addWidget(m_pCurRenderer);
 
     ui->explorer->GetCurProjSelected()->SaveUserData();
     ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
+
+    m_pCurSelectedProj = nullptr;
 }
 
 void MainWindow::on_actionNewAudio_triggered()

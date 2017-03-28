@@ -244,22 +244,18 @@ void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
 
 AtlasFrame *AtlasModel::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors)
 {
-    AtlasFrame *pNewFrame = NULL;
+    AtlasFrame *pNewFrame = new AtlasFrame(uiChecksum, sN, rAlphaCrop, eType, iW, iH, iX, iY, uiAtlasIndex, uiErrors);
 
     if(m_FrameChecksumMap.contains(uiChecksum))
     {
-        AtlasFrame *pExistingFrame = m_FrameChecksumMap.find(uiChecksum).value();
-        HyGuiLog("'" % sN % "' is a duplicate of '" % pExistingFrame->GetName() % "' with the checksum: " % QString::number(uiChecksum), LOGTYPE_Info);
-
-        pNewFrame = new AtlasFrame(uiChecksum, sN, rAlphaCrop, eType, iW, iH, iX, iY, uiAtlasIndex, uiErrors);
-
-        pNewFrame->SetError(GUIFRAMEERROR_Duplicate);
-        pExistingFrame->SetError(GUIFRAMEERROR_Duplicate);
+        m_FrameChecksumMap.find(uiChecksum).value().append(pNewFrame);
+        HyGuiLog("'" % sN % "' is a duplicate of '" % m_FrameChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_FrameChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Info);
     }
     else
     {
-        pNewFrame = new AtlasFrame(uiChecksum, sN, rAlphaCrop, eType, iW, iH, iX, iY, uiAtlasIndex, uiErrors);
-        m_FrameChecksumMap[uiChecksum] = pNewFrame;
+        QList<AtlasFrame *> newFrameList;
+        newFrameList.append(pNewFrame);
+        m_FrameChecksumMap[uiChecksum] = newFrameList;
     }
 
     m_FrameList.append(pNewFrame);
@@ -268,15 +264,19 @@ AtlasFrame *AtlasModel::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlpha
 
 void AtlasModel::RemoveFrame(AtlasFrame *pFrame)
 {
-    m_FrameChecksumMap.remove(pFrame->GetChecksum());
-    pFrame->DeleteMetaImage(m_MetaDir);
+    auto iter = m_FrameChecksumMap.find(pFrame->GetChecksum());
+    if(iter == m_FrameChecksumMap.end())
+        HyGuiLog("AtlasModel::RemoveFrame could not find frame", LOGTYPE_Error);
+    iter.value().removeOne(pFrame);
+    if(iter.value().size() == 0)
+    {
+        pFrame->DeleteMetaImage(m_MetaDir);
+        m_FrameChecksumMap.remove(pFrame->GetChecksum());
+    }
 
     m_FrameList.removeOne(pFrame);
 
     delete pFrame;
-
-    // In case the removed image happened to be the current 'm_pMouseHoverItem'
-    //m_pMouseHoverItem = NULL;
 }
 
 AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, eAtlasNodeType eType)
@@ -304,21 +304,32 @@ void AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
     QSet<int> textureIndexToReplaceSet;
     textureIndexToReplaceSet.insert(pFrame->GetTextureIndex());
 
-    if(0 == (pFrame->GetErrors() & GUIFRAMEERROR_Duplicate))
+    // First remove the frame from the map
+    auto iter = m_FrameChecksumMap.find(pFrame->GetChecksum());
+    if(iter == m_FrameChecksumMap.end())
+        HyGuiLog("AtlasModel::ReplaceFrame could not find frame", LOGTYPE_Error);
+    iter.value().removeOne(pFrame);
+    if(iter.value().size() == 0)
+    {
+        pFrame->DeleteMetaImage(m_MetaDir);
         m_FrameChecksumMap.remove(pFrame->GetChecksum());
+    }
 
+    // Determine the new checksum into the map
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
     pFrame->ReplaceImage(sName, uiChecksum, newImage, m_MetaDir);
 
+    // Re-enter the frame into the map
     if(m_FrameChecksumMap.contains(uiChecksum))
     {
-        HyGuiLog("ItemAtlases::ReplaceFrame() already contains frame with this checksum: " % QString::number(uiChecksum), LOGTYPE_Info);
-        pFrame->SetError(GUIFRAMEERROR_Duplicate);
+        m_FrameChecksumMap.find(uiChecksum).value().append(pFrame);
+        HyGuiLog("'" % pFrame->GetName() % "' is a duplicate of '" % m_FrameChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_FrameChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Info);
     }
     else
     {
-        m_FrameChecksumMap[uiChecksum] = pFrame;
-        pFrame->ClearError(GUIFRAMEERROR_Duplicate);
+        QList<AtlasFrame *> newFrameList;
+        newFrameList.append(pFrame);
+        m_FrameChecksumMap[uiChecksum] = newFrameList;
     }
 
     if(bDoAtlasGroupRepack)
@@ -360,14 +371,16 @@ QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem, QList<quint32>
     QList<AtlasFrame *> frameRequestList;
     for(int i = 0; i < requestList.size(); ++i)
     {
-        QMap<quint32, AtlasFrame *>::iterator iter = m_FrameChecksumMap.find(requestList[i]);
+        auto iter = m_FrameChecksumMap.find(requestList[i]);
         if(iter == m_FrameChecksumMap.end())
         {
             // TODO: Support a "Yes to all" dialog functionality here. Also note that the request list will not == the return list
             HyGuiLog("Cannot find image with checksum: " % QString::number(requestList[i]) % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
         }
         else
-            frameRequestList.append(iter.value());
+        {
+            frameRequestList.append(iter.value()[0]);
+        }
     }
 
     return RequestFrames(pItem, frameRequestList);
@@ -424,6 +437,7 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, eAtlasNodeT
     AtlasFrame *pNewFrame = CreateFrame(uiChecksum, sName, rAlphaCrop, eType, newImage.width(), newImage.height(), -1, -1, -1, 0);
     if(pNewFrame)
     {
+        // TODO: Should I care about overwriting a duplicate image?
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
         m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
     }
@@ -666,11 +680,8 @@ void AtlasModel::ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayInd
                                          imgInfoRef.pos.x() + m_Packer.border.l,
                                          imgInfoRef.pos.y() + m_Packer.border.t);
 
-            pFrame->SetError(GUIFRAMEERROR_Duplicate);
             bValidToDraw = false;
         }
-        else
-            pFrame->ClearError(GUIFRAMEERROR_Duplicate);
 
         if(imgInfoRef.textureId != iPackerBinIndex)
             bValidToDraw = false;
