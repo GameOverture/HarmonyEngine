@@ -18,6 +18,48 @@
 #include <QJsonArray>
 #include <QPainter>
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void AtlasModel::ChecksumLookup::AddLookup(AtlasFrame *pFrame)
+{
+    uint32 uiChecksum = pFrame->GetChecksum();
+    
+    if(m_FrameChecksumMap.contains(uiChecksum))
+    {
+        m_FrameChecksumMap.find(uiChecksum).value().append(pFrame);
+        HyGuiLog("'" % pFrame->GetName() % "' is a duplicate of '" % m_FrameChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_FrameChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Info);
+    }
+    else
+    {
+        QList<AtlasFrame *> newFrameList;
+        newFrameList.append(pFrame);
+        m_FrameChecksumMap[uiChecksum] = newFrameList;
+    }
+}
+bool AtlasModel::ChecksumLookup::RemoveLookup(AtlasFrame *pFrame)
+{
+    auto iter = m_FrameChecksumMap.find(pFrame->GetChecksum());
+    if(iter == m_FrameChecksumMap.end())
+        HyGuiLog("AtlasModel::RemoveLookup could not find frame", LOGTYPE_Error);
+    
+    iter.value().removeOne(pFrame);
+    if(iter.value().size() == 0)
+    {
+        m_FrameChecksumMap.remove(pFrame->GetChecksum());
+        return true;
+    }
+    
+    return false;
+}
+AtlasFrame *AtlasModel::ChecksumLookup::Find(quint32 uiChecksum)
+{
+    auto iter = m_FrameChecksumMap.find(uiChecksum);
+    if(iter == m_FrameChecksumMap.end())
+        return nullptr;
+    else
+        return iter.value()[0];
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 AtlasModel::AtlasModel(Project *pProjOwner) : m_pProjOwner(pProjOwner),
                                                     m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
                                                     m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases))
@@ -246,34 +288,17 @@ AtlasFrame *AtlasModel::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlpha
 {
     AtlasFrame *pNewFrame = new AtlasFrame(uiChecksum, sN, rAlphaCrop, eType, iW, iH, iX, iY, uiAtlasIndex, uiErrors);
 
-    if(m_FrameChecksumMap.contains(uiChecksum))
-    {
-        m_FrameChecksumMap.find(uiChecksum).value().append(pNewFrame);
-        HyGuiLog("'" % sN % "' is a duplicate of '" % m_FrameChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_FrameChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Info);
-    }
-    else
-    {
-        QList<AtlasFrame *> newFrameList;
-        newFrameList.append(pNewFrame);
-        m_FrameChecksumMap[uiChecksum] = newFrameList;
-    }
-
+    m_ChecksumLookup.AddLookup(pNewFrame);
     m_FrameList.append(pNewFrame);
+    
     return pNewFrame;
 }
 
 void AtlasModel::RemoveFrame(AtlasFrame *pFrame)
 {
-    auto iter = m_FrameChecksumMap.find(pFrame->GetChecksum());
-    if(iter == m_FrameChecksumMap.end())
-        HyGuiLog("AtlasModel::RemoveFrame could not find frame", LOGTYPE_Error);
-    iter.value().removeOne(pFrame);
-    if(iter.value().size() == 0)
-    {
+    if(m_ChecksumLookup.RemoveLookup(pFrame))
         pFrame->DeleteMetaImage(m_MetaDir);
-        m_FrameChecksumMap.remove(pFrame->GetChecksum());
-    }
-
+    
     m_FrameList.removeOne(pFrame);
 
     delete pFrame;
@@ -281,7 +306,7 @@ void AtlasModel::RemoveFrame(AtlasFrame *pFrame)
 
 AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, eAtlasNodeType eType)
 {
-    // This allocates a new HyGuiFrame into the dependency map
+    // This will create a meta image
     AtlasFrame *pFrame = ImportImage(sName, newImage, eType);
 
     QSet<AtlasFrame *> newFrameSet;
@@ -305,32 +330,15 @@ void AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
     textureIndexToReplaceSet.insert(pFrame->GetTextureIndex());
 
     // First remove the frame from the map
-    auto iter = m_FrameChecksumMap.find(pFrame->GetChecksum());
-    if(iter == m_FrameChecksumMap.end())
-        HyGuiLog("AtlasModel::ReplaceFrame could not find frame", LOGTYPE_Error);
-    iter.value().removeOne(pFrame);
-    if(iter.value().size() == 0)
-    {
+    if(m_ChecksumLookup.RemoveLookup(pFrame))
         pFrame->DeleteMetaImage(m_MetaDir);
-        m_FrameChecksumMap.remove(pFrame->GetChecksum());
-    }
 
     // Determine the new checksum into the map
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
     pFrame->ReplaceImage(sName, uiChecksum, newImage, m_MetaDir);
 
     // Re-enter the frame into the map
-    if(m_FrameChecksumMap.contains(uiChecksum))
-    {
-        m_FrameChecksumMap.find(uiChecksum).value().append(pFrame);
-        HyGuiLog("'" % pFrame->GetName() % "' is a duplicate of '" % m_FrameChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_FrameChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Info);
-    }
-    else
-    {
-        QList<AtlasFrame *> newFrameList;
-        newFrameList.append(pFrame);
-        m_FrameChecksumMap[uiChecksum] = newFrameList;
-    }
+    m_ChecksumLookup.AddLookup(pFrame);
 
     if(bDoAtlasGroupRepack)
         Repack(textureIndexToReplaceSet, QSet<AtlasFrame *>());
@@ -371,15 +379,15 @@ QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem, QList<quint32>
     QList<AtlasFrame *> frameRequestList;
     for(int i = 0; i < requestList.size(); ++i)
     {
-        auto iter = m_FrameChecksumMap.find(requestList[i]);
-        if(iter == m_FrameChecksumMap.end())
+        AtlasFrame *pFoundFrame = m_ChecksumLookup.Find(requestList[i]);
+        if(pFoundFrame == nullptr)
         {
             // TODO: Support a "Yes to all" dialog functionality here. Also note that the request list will not == the return list
             HyGuiLog("Cannot find image with checksum: " % QString::number(requestList[i]) % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
         }
         else
         {
-            frameRequestList.append(iter.value()[0]);
+            frameRequestList.append(pFoundFrame);
         }
     }
 

@@ -29,7 +29,17 @@ class AtlasModel : public QObject
 
     QList<AtlasFrame *>                             m_FrameList;
     QList<AtlasTreeItem *>                          m_TopLevelTreeItemList;
-    QMap<quint32, QList<AtlasFrame *> >             m_FrameChecksumMap;
+    
+    class ChecksumLookup
+    {
+        QMap<quint32, QList<AtlasFrame *> >         m_FrameChecksumMap;
+        
+    public:
+        void AddLookup(AtlasFrame *pFrame);
+        bool RemoveLookup(AtlasFrame *pFrame);
+        AtlasFrame *Find(quint32 uiChecksum);
+    };
+    ChecksumLookup                                  m_ChecksumLookup;
 
 public:
     AtlasModel(Project *pProjOwner);
