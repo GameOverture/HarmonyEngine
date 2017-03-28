@@ -645,6 +645,20 @@ void AtlasModel::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFra
 
     // Place the last generated texture at the end of the array
     ConstructAtlasTexture(m_Packer.bins.size() - 1, iCurrentIndex);
+    
+    
+    // Assign all the duplicate frames
+    for(int i = 0; i < m_Packer.images.size(); ++i)
+    {
+        inputImage &imgInfoRef = m_Packer.images[i];
+        if(imgInfoRef.duplicateId != nullptr)
+        {
+            AtlasFrame *pFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.id);
+            AtlasFrame *pDupFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.duplicateId);
+            
+            pFrame->UpdateInfoFromPacker(pDupFrame->GetTextureIndex(), pDupFrame->GetX(), pDupFrame->GetY());
+        }
+    }
 
     Refresh();
 }
@@ -674,17 +688,8 @@ void AtlasModel::ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayInd
         else
             pFrame->ClearError(GUIFRAMEERROR_CouldNotPack);
 
-        if(imgInfoRef.duplicateId != NULL && m_Packer.merge)
-        {
-            // NOTE: pDupFrame might not actually hold the correct information (yet). It eventually will get
-            //       set, which upon the last ConstructAtlasTexture() call of this Repack(), it will finally be set correctly.
-            AtlasFrame *pDupFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.duplicateId);
-            pFrame->UpdateInfoFromPacker(pDupFrame->GetTextureIndex(),
-                                         pDupFrame->GetX(),
-                                         pDupFrame->GetY());
-
+        if(imgInfoRef.duplicateId != nullptr)
             bValidToDraw = false;
-        }
 
         if(imgInfoRef.textureId != iPackerBinIndex)
             bValidToDraw = false;
