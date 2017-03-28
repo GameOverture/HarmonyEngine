@@ -676,9 +676,12 @@ void AtlasModel::ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayInd
 
         if(imgInfoRef.duplicateId != NULL && m_Packer.merge)
         {
-            pFrame->UpdateInfoFromPacker(iTextureArrayIndex,
-                                         imgInfoRef.pos.x() + m_Packer.border.l,
-                                         imgInfoRef.pos.y() + m_Packer.border.t);
+            // NOTE: pDupFrame might not actually hold the correct information (yet). It eventually will get
+            //       set, which upon the last ConstructAtlasTexture() call of this Repack(), it will finally be set correctly.
+            AtlasFrame *pDupFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.duplicateId);
+            pFrame->UpdateInfoFromPacker(pDupFrame->GetTextureIndex(),
+                                         pDupFrame->GetX(),
+                                         pDupFrame->GetY());
 
             bValidToDraw = false;
         }
