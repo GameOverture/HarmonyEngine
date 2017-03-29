@@ -18,8 +18,6 @@
 #include <QQueue>
 #include <QJsonObject>
 
-#define TEMPREMOVE_ChecksumsAsIds
-
 // Forward declaration
 class AtlasWidget;
 class AudioWidgetManager;

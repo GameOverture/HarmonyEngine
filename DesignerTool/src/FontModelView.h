@@ -56,7 +56,7 @@ class FontTableModel : public QAbstractTableModel
     struct FontLayer
     {
         const int           iUNIQUE_ID;
-        FontTypeface *     pReference;
+        FontTypeface *      pReference;
 
         rendermode_t        eMode;
         float               fSize;
@@ -66,7 +66,7 @@ class FontTableModel : public QAbstractTableModel
         glm::vec4           vBotColor;
 
         FontLayer(int iUniqueId, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iUNIQUE_ID(iUniqueId),
-                                                                                                    pReference(NULL),
+                                                                                                    pReference(nullptr),
                                                                                                     eMode(eRenderMode),
                                                                                                     fSize(fSize),
                                                                                                     fOutlineThickness(fOutlineThickness)

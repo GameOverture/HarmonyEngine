@@ -56,19 +56,11 @@ bool AtlasModel::FrameLookup::RemoveLookup(AtlasFrame *pFrame)  // Returns true 
 }
 AtlasFrame *AtlasModel::FrameLookup::Find(quint32 uiId)
 {
-#ifdef TEMPREMOVE_ChecksumsAsIds
-    auto iter = m_FrameChecksumMap.find(uiId);
-    if(iter == m_FrameChecksumMap.end())
-        return nullptr;
-    else
-        return iter.value()[0];
-#else
     auto iter = m_FrameIdMap.find(uiId);
     if(iter == m_FrameIdMap.end())
         return nullptr;
     else
         return iter.value();
-#endif
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -205,9 +197,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) : m_pProjOwner(pProjOwner),
         }
     }
 
-#ifndef TEMPREMOVE_ChecksumsAsIds
     if(m_TopLevelTreeItemList.empty())
-#endif
         WriteMetaSettings();
 }
 
@@ -233,7 +223,9 @@ QList<AtlasTreeItem *> AtlasModel::GetTopLevelTreeItemList()
 
 QSize AtlasModel::GetAtlasDimensions()
 {
-    return QSize(m_PackerSettings["sbTextureWidth"].toInt(), m_PackerSettings["sbTextureHeight"].toInt());
+    int iWidth = m_PackerSettings["sbTextureWidth"].toInt();
+    int iHeight = m_PackerSettings["sbTextureHeight"].toInt();
+    return QSize(iWidth, iHeight);
 }
 
 int AtlasModel::GetNumTextures()
@@ -356,17 +348,15 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage 
     newFrameSet.insert(pFrame);
     Repack(QSet<int>(), newFrameSet);
 
-    return pFrame;
+    // This retrieves the newly created AtlasFrame and links it to its ProjectItem
+    QList<quint32> idList;
+    idList.append(pFrame->GetId());
+    QList<AtlasFrame *> returnList = RequestFramesById(pItem, idList);
 
-//    // This retrieves the newly created HyGuiFrame from the dependency map
-//    QList<quint32> checksumList;
-//    checksumList.append(pFrame->GetId());
-//    QList<AtlasFrame *> returnList = RequestFramesById(pItem, checksumList);
+    if(returnList.empty() == false)
+        return returnList[0];
 
-//    if(returnList.empty() == false)
-//        return returnList[0];
-
-//    return NULL;
+    return nullptr;
 }
 
 void AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack)

@@ -271,16 +271,6 @@ SpriteStateData::SpriteStateData(IModel &modelRef, QJsonObject stateObj) :  ISta
 
         QJsonArray spriteFrameArray = stateObj["frames"].toArray();
 
-#ifdef TEMPREMOVE_ChecksumsAsIds
-        QList<quint32> checksumRequestList;
-        for(int i = 0; i < spriteFrameArray.size(); ++i)
-        {
-            QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
-            checksumRequestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
-        }
-       
-        QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesById(this, checksumRequestList);
-#else
         QList<quint32> idRequestList;
         for(int i = 0; i < spriteFrameArray.size(); ++i)
         {
@@ -289,7 +279,6 @@ SpriteStateData::SpriteStateData(IModel &modelRef, QJsonObject stateObj) :  ISta
         }
 
         QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesById(this, idRequestList);
-#endif
         
         if(spriteFrameArray.size() != requestedAtlasFramesList.size())
             HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);

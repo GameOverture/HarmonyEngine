@@ -189,18 +189,10 @@ FontModel::FontModel(ProjectItem *pItem, QJsonObject fontObj) : IModel(pItem),
         m_pChkMapper_Symbols->SetChecked(availGlyphsObj["symbols"].toBool());
         m_pTxtMapper_AdditionalSymbols->SetString(availGlyphsObj["additional"].toString());
         
-#ifdef TEMPREMOVE_ChecksumsAsIds
-        QList<quint32> checksumRequestList;
-        checksumRequestList.append(JSONOBJ_TOINT(fontObj, "checksum"));
-
-        QList<AtlasFrame *> pRequestedList = RequestFramesById(nullptr, checksumRequestList);
-#else
         QList<quint32> idRequestList;
         idRequestList.append(JSONOBJ_TOINT(fontObj, "id"));
 
         QList<AtlasFrame *> pRequestedList = RequestFramesById(nullptr, idRequestList);
-#endif
-
         m_pTrueAtlasFrame = pRequestedList[0];
 
         m_TypefaceArray = fontObj["typefaceArray"].toArray();
