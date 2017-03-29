@@ -189,11 +189,18 @@ FontModel::FontModel(ProjectItem *pItem, QJsonObject fontObj) : IModel(pItem),
         m_pChkMapper_Symbols->SetChecked(availGlyphsObj["symbols"].toBool());
         m_pTxtMapper_AdditionalSymbols->SetString(availGlyphsObj["additional"].toString());
         
+#ifdef TEMPREMOVE_ChecksumsAsIds
+        QList<quint32> checksumRequestList;
+        checksumRequestList.append(JSONOBJ_TOINT(fontObj, "checksum"));
 
-        QList<quint32> requestList;
-        requestList.append(JSONOBJ_TOINT(fontObj, "checksum"));
+        QList<AtlasFrame *> pRequestedList = RequestFramesById(nullptr, checksumRequestList);
+#else
+        QList<quint32> idRequestList;
+        idRequestList.append(JSONOBJ_TOINT(fontObj, "id"));
 
-        QList<AtlasFrame *> pRequestedList = RequestFrames(nullptr, requestList);
+        QList<AtlasFrame *> pRequestedList = RequestFramesById(nullptr, idRequestList);
+#endif
+
         m_pTrueAtlasFrame = pRequestedList[0];
 
         m_TypefaceArray = fontObj["typefaceArray"].toArray();
@@ -497,6 +504,7 @@ bool FontModel::ClearFontDirtyFlag()
     QJsonObject fontObj;
     
     fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetChecksum())));
+    fontObj.insert("id", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetId())));
 
     QJsonObject availableGlyphsObj;
     availableGlyphsObj.insert("0-9", m_pChkMapper_09->IsChecked());
@@ -580,4 +588,6 @@ bool FontModel::ClearFontDirtyFlag()
         stateArray.append(stateObj);
     }
     fontObj.insert("stateArray", stateArray);
+
+    return fontObj;
 }

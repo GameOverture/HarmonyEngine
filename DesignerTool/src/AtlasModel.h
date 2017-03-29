@@ -21,6 +21,8 @@ class AtlasModel : public QObject
 
     Project *                                       m_pProjOwner;
 
+    quint32                                         m_uiNextFrameId;
+
     QDir                                            m_MetaDir;
     QDir                                            m_DataDir;
 
@@ -30,16 +32,17 @@ class AtlasModel : public QObject
     QList<AtlasFrame *>                             m_FrameList;
     QList<AtlasTreeItem *>                          m_TopLevelTreeItemList;
     
-    class ChecksumLookup
+    class FrameLookup
     {
+        QMap<quint32, AtlasFrame *>                 m_FrameIdMap;
         QMap<quint32, QList<AtlasFrame *> >         m_FrameChecksumMap;
         
     public:
         void AddLookup(AtlasFrame *pFrame);
-        bool RemoveLookup(AtlasFrame *pFrame);
-        AtlasFrame *Find(quint32 uiChecksum);
+        bool RemoveLookup(AtlasFrame *pFrame);  // Returns true if no remaining duplicates exist
+        AtlasFrame *Find(quint32 uiId);
     };
-    ChecksumLookup                                  m_ChecksumLookup;
+    FrameLookup                                     m_FrameLookup;
 
 public:
     AtlasModel(Project *pProjOwner);
@@ -59,7 +62,7 @@ public:
     void WriteMetaSettings(QJsonArray frameArray);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    AtlasFrame *CreateFrame(quint32 uiCRC, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors);
+    AtlasFrame *CreateFrame(quint32 uiId, quint32 uiCRC, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iAtlasIndex, uint uiErrors);
     void RemoveFrame(AtlasFrame *pFrame);
 
     AtlasFrame *GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, eAtlasNodeType eType);
@@ -67,7 +70,7 @@ public:
 
     QList<AtlasFrame *> RequestFrames(ProjectItem *pItem);
     QList<AtlasFrame *> RequestFrames(ProjectItem *pItem, QList<AtlasFrame *> requestList);
-    QList<AtlasFrame *> RequestFrames(ProjectItem *pItem, QList<quint32> requestList);
+    QList<AtlasFrame *> RequestFramesById(ProjectItem *pItem, QList<quint32> requestList);
 
     void RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinquishList);
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

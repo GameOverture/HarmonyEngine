@@ -19,8 +19,10 @@
 #include <QPainter>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void AtlasModel::ChecksumLookup::AddLookup(AtlasFrame *pFrame)
+void AtlasModel::FrameLookup::AddLookup(AtlasFrame *pFrame)
 {
+    m_FrameIdMap[pFrame->GetId()] = pFrame;
+
     uint32 uiChecksum = pFrame->GetChecksum();
     
     if(m_FrameChecksumMap.contains(uiChecksum))
@@ -35,8 +37,10 @@ void AtlasModel::ChecksumLookup::AddLookup(AtlasFrame *pFrame)
         m_FrameChecksumMap[uiChecksum] = newFrameList;
     }
 }
-bool AtlasModel::ChecksumLookup::RemoveLookup(AtlasFrame *pFrame)
+bool AtlasModel::FrameLookup::RemoveLookup(AtlasFrame *pFrame)  // Returns true if no remaining duplicates exist
 {
+    m_FrameIdMap.remove(pFrame->GetId());
+
     auto iter = m_FrameChecksumMap.find(pFrame->GetChecksum());
     if(iter == m_FrameChecksumMap.end())
         HyGuiLog("AtlasModel::RemoveLookup could not find frame", LOGTYPE_Error);
@@ -50,13 +54,21 @@ bool AtlasModel::ChecksumLookup::RemoveLookup(AtlasFrame *pFrame)
     
     return false;
 }
-AtlasFrame *AtlasModel::ChecksumLookup::Find(quint32 uiChecksum)
+AtlasFrame *AtlasModel::FrameLookup::Find(quint32 uiId)
 {
-    auto iter = m_FrameChecksumMap.find(uiChecksum);
+#ifdef TEMPREMOVE_ChecksumsAsIds
+    auto iter = m_FrameChecksumMap.find(uiId);
     if(iter == m_FrameChecksumMap.end())
         return nullptr;
     else
         return iter.value()[0];
+#else
+    auto iter = m_FrameIdMap.find(uiId);
+    if(iter == m_FrameIdMap.end())
+        return nullptr;
+    else
+        return iter.value();
+#endif
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -89,6 +101,8 @@ AtlasModel::AtlasModel(Project *pProjOwner) : m_pProjOwner(pProjOwner),
         settingsFile.close();
 
         QJsonObject settingsObj = settingsDoc.object();
+
+        m_uiNextFrameId = JSONOBJ_TOINT(settingsObj, "startFrameId");
 
         m_PackerSettings = settingsObj["settings"].toObject();
 
@@ -145,8 +159,16 @@ AtlasModel::AtlasModel(Project *pProjOwner) : m_pProjOwner(pProjOwner),
         {
             QJsonObject frameObj = frameArray[i].toObject();
 
+            // TODO: Put this in parameter list, once snow white updated
+            quint32 uiFrameId;
+            if(false == frameObj.contains("id"))
+                uiFrameId = ATLASFRAMEID_NotSet;
+            else
+                uiFrameId = JSONOBJ_TOINT(frameObj, "id");
+
             QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-            AtlasFrame *pNewFrame = CreateFrame(JSONOBJ_TOINT(frameObj, "checksum"),
+            AtlasFrame *pNewFrame = CreateFrame(uiFrameId,
+                                                JSONOBJ_TOINT(frameObj, "checksum"),
                                                 frameObj["name"].toString(),
                                                 rAlphaCrop,
                                                 static_cast<eAtlasNodeType>(frameObj["type"].toInt()),
@@ -183,18 +205,10 @@ AtlasModel::AtlasModel(Project *pProjOwner) : m_pProjOwner(pProjOwner),
         }
     }
 
+#ifndef TEMPREMOVE_ChecksumsAsIds
     if(m_TopLevelTreeItemList.empty())
+#endif
         WriteMetaSettings();
-    else
-    {
-        for(int i = 0; i < m_TopLevelTreeItemList.size(); ++i)
-        {
-            for(int j = 0; j < m_TopLevelTreeItemList[i]->childCount(); ++j)
-            {
-
-            }
-        }
-    }
 }
 
 /*virtual*/ AtlasModel::~AtlasModel()
@@ -243,20 +257,43 @@ void AtlasModel::WriteMetaSettings()
 void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
 {
     QJsonObject settingsObj;
+    settingsObj.insert("startFrameId", QJsonValue(static_cast<qint64>(m_uiNextFrameId)));
     settingsObj.insert("settings", m_PackerSettings);
     settingsObj.insert("frames", frameArray);
 
     QJsonArray filtersArray;
-    QTreeWidgetItemIterator iter(m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget());
-    while(*iter)
+    if(m_pProjOwner->GetAtlasWidget())
     {
-        if((*iter)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+        QTreeWidgetItemIterator iter(m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget());
+        while(*iter)
         {
-            QString sFilterPath = HyGlobal::GetTreeWidgetItemPath(*iter);
-            filtersArray.append(QJsonValue(sFilterPath));
-        }
+            if((*iter)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+            {
+                QString sFilterPath = HyGlobal::GetTreeWidgetItemPath(*iter);
+                filtersArray.append(QJsonValue(sFilterPath));
+            }
 
-        ++iter;
+            ++iter;
+        }
+    }
+    else
+    {
+        QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
+        if(settingsFile.exists())
+        {
+            if(!settingsFile.open(QIODevice::ReadOnly))
+                HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaSettings, LOGTYPE_Error);
+
+#ifdef HYGUI_UseBinaryMetaFiles
+            QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
+#else
+            QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
+#endif
+            settingsFile.close();
+
+            QJsonObject settingsObj = settingsDoc.object();
+            filtersArray = settingsObj["filters"].toArray();
+        }
     }
 
     settingsObj.insert("filters", filtersArray);
@@ -284,11 +321,17 @@ void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
     }
 }
 
-AtlasFrame *AtlasModel::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, uint uiAtlasIndex, uint uiErrors)
+AtlasFrame *AtlasModel::CreateFrame(quint32 uiId, quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iAtlasIndex, uint uiErrors)
 {
-    AtlasFrame *pNewFrame = new AtlasFrame(uiChecksum, sN, rAlphaCrop, eType, iW, iH, iX, iY, uiAtlasIndex, uiErrors);
+    if(uiId == ATLASFRAMEID_NotSet)
+    {
+        uiId = m_uiNextFrameId;
+        m_uiNextFrameId++;
+    }
 
-    m_ChecksumLookup.AddLookup(pNewFrame);
+    AtlasFrame *pNewFrame = new AtlasFrame(uiId, uiChecksum, sN, rAlphaCrop, eType, iW, iH, iX, iY, iAtlasIndex, uiErrors);
+
+    m_FrameLookup.AddLookup(pNewFrame);
     m_FrameList.append(pNewFrame);
     
     return pNewFrame;
@@ -296,7 +339,7 @@ AtlasFrame *AtlasModel::CreateFrame(quint32 uiChecksum, QString sN, QRect rAlpha
 
 void AtlasModel::RemoveFrame(AtlasFrame *pFrame)
 {
-    if(m_ChecksumLookup.RemoveLookup(pFrame))
+    if(m_FrameLookup.RemoveLookup(pFrame))
         pFrame->DeleteMetaImage(m_MetaDir);
     
     m_FrameList.removeOne(pFrame);
@@ -313,15 +356,17 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage 
     newFrameSet.insert(pFrame);
     Repack(QSet<int>(), newFrameSet);
 
-    // This retrieves the newly created HyGuiFrame from the dependency map
-    QList<quint32> checksumList;
-    checksumList.append(pFrame->GetChecksum());
-    QList<AtlasFrame *> returnList = RequestFrames(pItem, checksumList);
+    return pFrame;
 
-    if(returnList.empty() == false)
-        return returnList[0];
+//    // This retrieves the newly created HyGuiFrame from the dependency map
+//    QList<quint32> checksumList;
+//    checksumList.append(pFrame->GetId());
+//    QList<AtlasFrame *> returnList = RequestFramesById(pItem, checksumList);
 
-    return NULL;
+//    if(returnList.empty() == false)
+//        return returnList[0];
+
+//    return NULL;
 }
 
 void AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack)
@@ -330,7 +375,7 @@ void AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
     textureIndexToReplaceSet.insert(pFrame->GetTextureIndex());
 
     // First remove the frame from the map
-    if(m_ChecksumLookup.RemoveLookup(pFrame))
+    if(m_FrameLookup.RemoveLookup(pFrame))
         pFrame->DeleteMetaImage(m_MetaDir);
 
     // Determine the new checksum into the map
@@ -338,7 +383,7 @@ void AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
     pFrame->ReplaceImage(sName, uiChecksum, newImage, m_MetaDir);
 
     // Re-enter the frame into the map
-    m_ChecksumLookup.AddLookup(pFrame);
+    m_FrameLookup.AddLookup(pFrame);
 
     if(bDoAtlasGroupRepack)
         Repack(textureIndexToReplaceSet, QSet<AtlasFrame *>());
@@ -371,15 +416,15 @@ QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem)
     return RequestFrames(pItem, frameRequestList);
 }
 
-QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem, QList<quint32> requestList)
+QList<AtlasFrame *> AtlasModel::RequestFramesById(ProjectItem *pItem, QList<quint32> requestList)
 {
     if(requestList.empty())
-        return RequestFrames(pItem);
+        return QList<AtlasFrame *>();
 
     QList<AtlasFrame *> frameRequestList;
     for(int i = 0; i < requestList.size(); ++i)
     {
-        AtlasFrame *pFoundFrame = m_ChecksumLookup.Find(requestList[i]);
+        AtlasFrame *pFoundFrame = m_FrameLookup.Find(requestList[i]);
         if(pFoundFrame == nullptr)
         {
             // TODO: Support a "Yes to all" dialog functionality here. Also note that the request list will not == the return list
@@ -442,7 +487,7 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, eAtlasNodeT
     if(eType != ATLAS_Font && eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
         rAlphaCrop = ImagePacker::crop(newImage);
 
-    AtlasFrame *pNewFrame = CreateFrame(uiChecksum, sName, rAlphaCrop, eType, newImage.width(), newImage.height(), -1, -1, -1, 0);
+    AtlasFrame *pNewFrame = CreateFrame(ATLASFRAMEID_NotSet, uiChecksum, sName, rAlphaCrop, eType, newImage.width(), newImage.height(), -1, -1, -1, 0);
     if(pNewFrame)
     {
         // TODO: Should I care about overwriting a duplicate image?

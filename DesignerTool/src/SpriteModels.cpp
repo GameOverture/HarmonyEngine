@@ -270,6 +270,8 @@ SpriteStateData::SpriteStateData(IModel &modelRef, QJsonObject stateObj) :  ISta
         m_pChkMapper_Bounce->SetChecked(stateObj["bounce"].toBool());
 
         QJsonArray spriteFrameArray = stateObj["frames"].toArray();
+
+#ifdef TEMPREMOVE_ChecksumsAsIds
         QList<quint32> checksumRequestList;
         for(int i = 0; i < spriteFrameArray.size(); ++i)
         {
@@ -277,7 +279,17 @@ SpriteStateData::SpriteStateData(IModel &modelRef, QJsonObject stateObj) :  ISta
             checksumRequestList.append(JSONOBJ_TOINT(spriteFrameObj, "checksum"));
         }
        
-        QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFrames(this, checksumRequestList);
+        QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesById(this, checksumRequestList);
+#else
+        QList<quint32> idRequestList;
+        for(int i = 0; i < spriteFrameArray.size(); ++i)
+        {
+            QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
+            idRequestList.append(JSONOBJ_TOINT(spriteFrameObj, "id"));
+        }
+
+        QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesById(this, idRequestList);
+#endif
         
         if(spriteFrameArray.size() != requestedAtlasFramesList.size())
             HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
@@ -342,6 +354,7 @@ void SpriteStateData::GetStateInfo(QJsonObject &stateObjOut)
         frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x() + pSpriteFrame->m_pFrame->GetCrop().left()));
         frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + (pSpriteFrame->m_pFrame->GetSize().height() - pSpriteFrame->m_pFrame->GetCrop().bottom())));
         frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetChecksum())));
+        frameObj.insert("id", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetId())));
 
         frameArray.append(frameObj);
     }

@@ -222,7 +222,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
                     pCurPrefixTreeItem->addChild(pNewDataItem->GetTreeItem());
 
 #ifdef RESAVE_ENTIRE_PROJECT
-                    static_cast<ItemWidget *>(pNewDataItem)->Save();
+                    static_cast<ProjectItem *>(pNewDataItem)->Save();
 #endif
 
                 }
