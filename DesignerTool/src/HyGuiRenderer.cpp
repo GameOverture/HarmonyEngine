@@ -142,7 +142,7 @@ void HyGuiRenderer::OnBootCheck()
 {
     if(m_pHyEngine && m_pHyEngine->BootUpdate() == false)
     {
-        m_pProjOwner->Reload();
+        m_pProjOwner->OnHarmonyLoaded();
         
         m_bIsUpdating = false;
         m_pTimer->stop();

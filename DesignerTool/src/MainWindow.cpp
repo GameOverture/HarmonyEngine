@@ -367,10 +367,13 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 /*static*/ void MainWindow::ReloadHarmony()
 {
     delete sm_pInstance->m_pCurRenderer;
-    sm_pInstance->m_pCurRenderer = NULL;
+    sm_pInstance->m_pCurRenderer = nullptr;
+    
+    if(sm_pInstance->m_pCurSelectedProj)
+        sm_pInstance->m_pCurSelectedProj->StashOpenItems();
     
     Project *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
-    sm_pInstance->m_pCurSelectedProj = NULL;    // Set m_pCurSelectedProj to 'NULL' so SetSelectedProj() doesn't imediately return
+    sm_pInstance->m_pCurSelectedProj = nullptr;    // Set m_pCurSelectedProj to 'nullptr' so SetSelectedProj() doesn't imediately return
     
     SetSelectedProj(pCurItemProj);
 }

@@ -403,6 +403,38 @@ void Project::OpenItem(ProjectItem *pItem)
     }
 }
 
+void Project::StashCurrentItems()
+{
+    for(int i = 0; i < m_pTabBar->count(); ++i)
+    {
+        ProjectItem *pOpenItem = m_pTabBar->tabData(i).value<ProjectItem *>();
+        m_StashedItemList.append(pOpenItem);
+    }
+    
+    CloseAllTabs();
+        pOpenItem->Unload
+        if( == m_pCurOpenItem)
+        {
+            bAlreadyLoaded = true;
+
+            m_pTabBar->blockSignals(true);
+            m_pTabBar->setCurrentIndex(i);
+            m_pTabBar->blockSignals(false);
+
+            m_pCurOpenItem->DrawShow(*this);
+            break;
+        }
+    }
+}
+
+void Project::OpenStashedItems()
+{
+    for(int i = 0; i < m_StashedItemList.size(); ++i)
+        MainWindow::OpenItem(m_StashedItemList[i]);
+    
+    m_StashedItemList.clear();
+}
+
 // IHyApplication override
 /*virtual*/ bool Project::Initialize()
 {
@@ -443,7 +475,7 @@ void Project::SetRenderSize(int iWidth, int iHeight)
     Window().SetResolution(glm::ivec2(iWidth, iHeight));
 }
 
-void Project::Reload()
+void Project::OnHarmonyLoaded()
 {
     m_Init.sGameName = GetName(false).toStdString();
     m_Init.sDataDir = GetAssetsAbsPath().toStdString();
@@ -560,6 +592,9 @@ QJsonObject Project::GetSubDirObj(eItemType eType)
 
 bool Project::CloseAllTabs()
 {
+    while(m_pTabBar->count() != 0)
+        on_tabBar_closeRequested(0);
+    
     for(int i = 0; i < m_pTabBar->count(); ++i)
     {
         ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();

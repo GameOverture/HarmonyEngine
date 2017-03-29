@@ -37,6 +37,7 @@ class Project : public ExplorerItem, public IHyApplication
     QTabBar *                                       m_pTabBar;
 
     ProjectItem *                                   m_pCurOpenItem;
+    QList<ProjectItem *>                            m_StashedItemList;
     
     QString                                         m_sGameName;
 
@@ -77,6 +78,9 @@ public:
     void SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled);
 
     void OpenItem(ProjectItem *pItem);
+    
+    void StashCurrentItems();
+    void OpenStashedItems();
 
     // IHyApplication overrides
     virtual bool Initialize();
@@ -85,7 +89,7 @@ public:
 
     void SetRenderSize(int iWidth, int iHeight);
     
-    void Reload();
+    void OnHarmonyLoaded();
 
     void SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal);
     void SaveGameData();
