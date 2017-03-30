@@ -465,7 +465,8 @@ void Project::OnHarmonyLoaded()
             pOpenItem->WidgetRefreshDraw(*this);
         }
 
-        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetShow(*this);
+        if(m_pTabBar->currentIndex() >= 0)
+            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetShow(*this);
     }
     
     if(m_pAtlasModel == nullptr)
