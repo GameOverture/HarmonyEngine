@@ -583,3 +583,7 @@ bool FontModel::ClearFontDirtyFlag()
 
     return fontObj;
 }
+
+/*virtual*/ void FontModel::Refresh()
+{
+}

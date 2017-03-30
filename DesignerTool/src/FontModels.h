@@ -80,9 +80,8 @@ public:
     QString GetFontFilePath();
     float GetSize();
     
-	virtual void AddFrame(AtlasFrame *pFrame) { }
-	virtual void RelinquishFrame(AtlasFrame *pFrame) { }
-	virtual void RefreshFrame(AtlasFrame *pFrame) { }
+    virtual void AddFrame(AtlasFrame *pFrame) override { }
+    virtual void RelinquishFrame(AtlasFrame *pFrame) override { }
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class FontModel : public IModel
@@ -131,8 +130,9 @@ public:
 
     bool ClearFontDirtyFlag();
 
-    virtual QJsonObject PopStateAt(uint32 uiIndex);
-    virtual QJsonValue GetSaveInfo();
+    virtual QJsonObject PopStateAt(uint32 uiIndex) override;
+    virtual QJsonValue GetSaveInfo() override;
+    virtual void Refresh() override;
 };
 
 #endif // FONTMODELS_H

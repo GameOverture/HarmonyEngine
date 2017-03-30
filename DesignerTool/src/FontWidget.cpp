@@ -25,15 +25,15 @@
 #include <QMenu>
 #include <QColor>
 
-FontWidget::FontWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget *parent) :  QWidget(parent),
-                                                                                        ui(new Ui::FontWidget),
-                                                                                        m_Draw(*static_cast<FontModel *>(itemRef.GetModel()), hyApp),
-                                                                                        m_ItemRef(itemRef)
+FontWidget::FontWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *parent) :   QWidget(parent),
+                                                                                            ui(new Ui::FontWidget),
+                                                                                            m_pDraw(new FontDraw(*static_cast<FontModel *>(itemRef.GetModel()), hyAppRef)),
+                                                                                            m_ItemRef(itemRef)
 {
     ui->setupUi(this);
 
-    m_Draw.Load();
-    m_Draw.SetEnabled(false);
+    m_pDraw->Load();
+    m_pDraw->SetEnabled(false);
 
     m_PrevAtlasSize.setWidth(0);
     m_PrevAtlasSize.setHeight(0);
@@ -77,6 +77,7 @@ FontWidget::FontWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget *par
 
 FontWidget::~FontWidget()
 {
+    delete m_pDraw;
     delete ui;
 }
 
@@ -119,17 +120,17 @@ void FontWidget::OnGiveMenuActions(QMenu *pMenu)
     pMenu->addAction(ui->actionOrderLayerDownwards);
 }
 
-void FontWidget::DrawShow()
+void FontWidget::OnShow()
 {
-    m_Draw.Show();
+    m_pDraw->Show();
 }
 
-void FontWidget::DrawHide()
+void FontWidget::OnHide()
 {
-    m_Draw.Hide();
+    m_pDraw->Hide();
 }
 
-void FontWidget::DrawUpdate()
+void FontWidget::OnUpdate()
 {
     //m_Draw
 }
@@ -144,7 +145,7 @@ QComboBox *FontWidget::GetCmbStates()
     return ui->cmbStates;
 }
 
-void FontWidget::Refresh(QVariant param)
+void FontWidget::RefreshData(QVariant param)
 {
     bool bParamOk = false;
     int iStateAffected = param.toInt(&bParamOk);
@@ -153,6 +154,12 @@ void FontWidget::Refresh(QVariant param)
 
     static_cast<FontModel *>(m_ItemRef.GetModel())->GeneratePreview();
     UpdateActions();
+}
+
+void FontWidget::RefreshDraw(IHyApplication &hyAppRef)
+{
+    delete m_pDraw;
+    m_pDraw = new FontDraw(*static_cast<FontModel *>(m_ItemRef.GetModel()), hyAppRef);
 }
 
 void FontWidget::UpdateActions()

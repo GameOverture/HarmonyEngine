@@ -69,12 +69,13 @@ public:
     void Remove(AtlasFrame *pFrame);
     void MoveRowUp(int iIndex);
     void MoveRowDown(int iIndex);
-    void RefreshFrame(AtlasFrame *pFrame);
     void OffsetFrame(int iIndex, QPoint vOffset);       // iIndex of -1 will apply to all
     void DurationFrame(int iIndex, float fDuration);    // iIndex of -1 will apply to all
 
     QJsonArray GetFramesInfo(float &fTotalDurationRef);
     SpriteFrame *GetFrameAt(int iIndex);
+
+    void Refresh();
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -104,10 +105,11 @@ public:
     SpriteFramesModel *GetFramesModel();
 
     void GetStateInfo(QJsonObject &stateObjOut);
+
+    void Refresh();
     
-    virtual void AddFrame(AtlasFrame *pFrame);
-    virtual void RelinquishFrame(AtlasFrame *pFrame);
-    virtual void RefreshFrame(AtlasFrame *pFrame);
+    virtual void AddFrame(AtlasFrame *pFrame) override;
+    virtual void RelinquishFrame(AtlasFrame *pFrame) override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class SpriteModel : public IModel
@@ -118,8 +120,9 @@ public:
     SpriteModel(ProjectItem *pItem, QJsonArray stateArray);
     virtual ~SpriteModel();
     
-    virtual QJsonObject PopStateAt(uint32 uiIndex);
-    virtual QJsonValue GetSaveInfo();
+    virtual QJsonObject PopStateAt(uint32 uiIndex) override;
+    virtual QJsonValue GetSaveInfo() override;
+    virtual void Refresh() override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

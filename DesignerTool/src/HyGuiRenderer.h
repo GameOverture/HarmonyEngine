@@ -17,29 +17,6 @@
 #include "Harmony/HyEngine.h"
 #include "Project.h"
 
-////class ItemProject;
-
-//class HyGuiRendererLoadThread : public QThread
-//{
-//    Q_OBJECT
-
-//    ItemProject *       m_pProjOwner;
-//    QOpenGLContext *    m_pGLContext;
-//    QSurface *          m_pSurface;
-
-//public:
-//    HyGuiRendererLoadThread(ItemProject *pProjOwner, QOpenGLContext *pGLContext, QSurface *pSurface, QObject *pParent) :    QThread(pParent),
-//                                                                                                                            m_pProjOwner(pProjOwner),
-//                                                                                                                            m_pGLContext(pGLContext),
-//                                                                                                                            m_pSurface(pSurface)
-//    { }
-
-//    void run() Q_DECL_OVERRIDE;
-
-//Q_SIGNALS:
-//    void EngineLoaded(HyEngine *pNewHyEngine, QOpenGLContext *pGLContext);
-//};
-
 class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
 {
     Q_OBJECT

@@ -843,7 +843,7 @@ void AtlasModel::Refresh()
 //    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
 //    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
 
-    HyGuiLog("Atlas Group Refresh finished", LOGTYPE_Normal);
+    HyGuiLog("Atlas Refresh finished", LOGTYPE_Normal);
 
 }
 

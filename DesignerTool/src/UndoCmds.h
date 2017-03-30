@@ -41,13 +41,13 @@ public:
     void redo() override
     {
         m_iIndex = static_cast<IModel *>(m_ItemRef.GetModel())->AppendState<STATEDATA>(QJsonObject());
-        m_ItemRef.RefreshWidget(m_iIndex);
+        m_ItemRef.WidgetRefreshData(m_iIndex);
     }
     
     void undo() override
     {
         static_cast<IModel *>(m_ItemRef.GetModel())->PopStateAt(m_iIndex);
-        m_ItemRef.RefreshWidget(m_iIndex);
+        m_ItemRef.WidgetRefreshData(m_iIndex);
     }
 };
 
@@ -73,13 +73,13 @@ public:
     void redo() override
     {
         m_PoppedStateObj = static_cast<IModel *>(m_ItemRef.GetModel())->PopStateAt(m_iIndex);
-        m_ItemRef.RefreshWidget(m_iIndex);
+        m_ItemRef.WidgetRefreshData(m_iIndex);
     }
     
     void undo() override
     {
         m_iIndex = static_cast<IModel *>(m_ItemRef.GetModel())->AppendState<STATEDATA>(m_PoppedStateObj);
-        m_ItemRef.RefreshWidget(m_iIndex);
+        m_ItemRef.WidgetRefreshData(m_iIndex);
     }
 };
 
@@ -107,13 +107,13 @@ public:
     void redo() override
     {
         m_sOldName = static_cast<IModel *>(m_ItemRef.GetModel())->SetStateName(m_iIndex, m_sNewName);
-        m_ItemRef.RefreshWidget(m_iIndex);
+        m_ItemRef.WidgetRefreshData(m_iIndex);
     }
     
     void undo() override
     {
         static_cast<IModel *>(m_ItemRef.GetModel())->SetStateName(m_iIndex, m_sOldName);
-        m_ItemRef.RefreshWidget(m_iIndex);
+        m_ItemRef.WidgetRefreshData(m_iIndex);
     }
 };
 
@@ -139,7 +139,7 @@ public:
         static_cast<IModel *>(m_ItemRef.GetModel())->MoveStateBack(m_iStateIndex);
         m_iStateIndex -= 1;
 
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
     
     void undo() override
@@ -147,7 +147,7 @@ public:
         static_cast<IModel *>(m_ItemRef.GetModel())->MoveStateForward(m_iStateIndex);
         m_iStateIndex += 1;
 
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
 };
 
@@ -173,7 +173,7 @@ public:
         static_cast<IModel *>(m_ItemRef.GetModel())->MoveStateForward(m_iStateIndex);
         m_iStateIndex += 1;
 
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
     
     void undo() override
@@ -181,7 +181,7 @@ public:
         static_cast<IModel *>(m_ItemRef.GetModel())->MoveStateBack(m_iStateIndex);
         m_iStateIndex -= 1;
 
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
 };
 
@@ -213,13 +213,13 @@ public:
     void redo() override
     {
         m_pMapper->SetIndex(m_iNewValue);
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
     
     void undo() override
     {
         m_pMapper->SetIndex(m_iPrevValue);
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
 };
 
@@ -248,13 +248,13 @@ public:
     void redo() override
     {
         m_pMapper->SetChecked(m_bNewValue);
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
     
     void undo() override
     {
         m_pMapper->SetChecked(!m_bNewValue);
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
 };
 
@@ -326,13 +326,13 @@ public:
     void redo() override
     {
         m_pMapper->SetValue(m_dNew);
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
     
     void undo() override
     {
         m_pMapper->SetValue(m_dOld);
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
 };
 
@@ -362,13 +362,13 @@ public:
     void redo() override
     {
         m_pMapper->SetString(m_sNew);
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
     
     void undo() override
     {
         m_pMapper->SetString(m_sOld);
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
 };
 
@@ -443,13 +443,13 @@ public:
     void redo() override
     {
         m_Frames = static_cast<IModel *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames);
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
     
     void undo() override
     {
         static_cast<IModel *>(m_ItemRef.GetModel())->RelinquishFrames(m_iStateIndex, m_Frames);
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
 };
 
@@ -476,13 +476,13 @@ public:
     void redo() override
     {
         static_cast<IModel *>(m_ItemRef.GetModel())->RelinquishFrames(m_iStateIndex, m_Frames);
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
     
     void undo() override
     {
         static_cast<IModel *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames);
-        m_ItemRef.RefreshWidget(m_iStateIndex);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
 };
 

@@ -263,22 +263,10 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->ui->mainToolBar->addActions(sm_pInstance->ui->menu_Edit->actions());
 }
 
-/*static*/ bool MainWindow::CloseItem(ProjectItem *pItem)
+/*static*/ void MainWindow::CloseItem(ProjectItem *pItem)
 {
     if(pItem == nullptr || pItem->GetType() == ITEM_Project)
-        return false;
-
-    if(pItem->IsSaveClean() == false)
-    {
-        int iDlgReturn = QMessageBox::question(sm_pInstance, "Save Changes", pItem->GetName(true) % " has unsaved changes. Do you want to save before closing?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-
-        if(iDlgReturn == QMessageBox::Save)
-            pItem->Save();
-        else if(iDlgReturn == QMessageBox::Discard)
-            pItem->DiscardChanges();
-        else if(iDlgReturn == QMessageBox::Cancel)
-            return false;
-    }
+        return;
 
     // If this is the item that is currently being shown, unhook all its actions and widget
     if(sm_pInstance->ui->dockWidgetCurrentItem->widget() == pItem->GetWidget())
@@ -291,19 +279,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
         sm_pInstance->ui->menu_Edit->clear();
     }
-    
-    Project *pItemProj = sm_pInstance->ui->explorer->GetCurProjSelected();
-    QTabBar *pTabBar = pItemProj->GetTabBar();
-    for(int i = 0; i < pTabBar->count(); ++i)
-    {
-        if(pTabBar->tabData(i).value<ProjectItem *>() == pItem)
-        {
-            pTabBar->removeTab(i);
-            break;
-        }
-    }
-    
-    return true;
 }
 
 /*static*/ void MainWindow::SetSelectedProj(Project *pProj)
@@ -368,9 +343,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 {
     delete sm_pInstance->m_pCurRenderer;
     sm_pInstance->m_pCurRenderer = nullptr;
-    
-    if(sm_pInstance->m_pCurSelectedProj)
-        sm_pInstance->m_pCurSelectedProj->StashOpenItems();
     
     Project *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
     sm_pInstance->m_pCurSelectedProj = nullptr;    // Set m_pCurSelectedProj to 'nullptr' so SetSelectedProj() doesn't imediately return
@@ -476,14 +448,17 @@ void MainWindow::NewItem(eItemType eItem)
     delete pDlg;
 }
 
-void MainWindow::closeEvent(QCloseEvent * event)
+void MainWindow::closeEvent(QCloseEvent *pEvent)
 {
     // This will ensure that the user has a chance to save all unsaved open documents, or cancel which will abort the close
     if(m_pCurSelectedProj && m_pCurSelectedProj->CloseAllTabs() == false)
+    {
+        pEvent->ignore();
         return;
+    }
     
     SaveSettings();
-    QMainWindow::closeEvent(event);
+    QMainWindow::closeEvent(pEvent);
 }
 
 void MainWindow::SaveSettings()

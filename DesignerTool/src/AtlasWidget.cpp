@@ -303,12 +303,12 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 
     m_pModel->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
 
-    for(int i = 0; i < selectedFrameList.count(); ++i)
-    {
-        QSet<ProjectItem *> sLinks = selectedFrameList[i]->GetLinks();
-        for(QSet<ProjectItem *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
-            (*LinksIter)->RelinkFrame(selectedFrameList[i]);
-    }
+//    for(int i = 0; i < selectedFrameList.count(); ++i)
+//    {
+//        QSet<ProjectItem *> sLinks = selectedFrameList[i]->GetLinks();
+//        for(QSet<ProjectItem *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+//            (*LinksIter)->RelinkFrame(selectedFrameList[i]);
+//    }
 }
 
 void AtlasWidget::on_actionAddFilter_triggered()

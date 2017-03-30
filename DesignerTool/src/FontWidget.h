@@ -30,12 +30,12 @@ class FontWidget : public QWidget
     Q_OBJECT
 
     ProjectItem &               m_ItemRef;
-    FontDraw                    m_Draw;
+    FontDraw *                  m_pDraw;
     
     QSize                       m_PrevAtlasSize;
     
 public:
-    explicit FontWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget *parent = 0);
+    explicit FontWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *parent = 0);
     ~FontWidget();
 
     ProjectItem &GetItem();
@@ -44,9 +44,9 @@ public:
 
     void OnGiveMenuActions(QMenu *pMenu);
 
-    void DrawShow();
-    void DrawHide();
-    void DrawUpdate();
+    void OnShow();
+    void OnHide();
+    void OnUpdate();
     
 
     QString GetFullItemName();
@@ -55,9 +55,9 @@ public:
     
     void SetGlyphsDirty();
     
+    void RefreshData(QVariant param);
+    void RefreshDraw(IHyApplication &hyAppRef);
 
-
-    void Refresh(QVariant param);
     void UpdateActions();
 
     FontStateData *GetCurStateData();

@@ -21,18 +21,18 @@
 #include <QJsonArray>
 #include <QAction>
 
-SpriteWidget::SpriteWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget *parent) :  QWidget(parent),
-                                                                                            ui(new Ui::SpriteWidget),
-                                                                                            m_Draw(*static_cast<SpriteModel *>(itemRef.GetModel()), hyApp),
-                                                                                            m_ItemRef(itemRef),
-                                                                                            m_bPlayActive(false),
-                                                                                            m_fElapsedTime(0.0),
-                                                                                            m_bIsBounced(false)
+SpriteWidget::SpriteWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *parent) :   QWidget(parent),
+                                                                                                ui(new Ui::SpriteWidget),
+                                                                                                m_pDraw(new SpriteDraw(*static_cast<SpriteModel *>(itemRef.GetModel()), hyAppRef)),
+                                                                                                m_ItemRef(itemRef),
+                                                                                                m_bPlayActive(false),
+                                                                                                m_fElapsedTime(0.0),
+                                                                                                m_bIsBounced(false)
 {
     ui->setupUi(this);
 
-    m_Draw.Load();
-    m_Draw.SetEnabled(false);
+    m_pDraw->Load();
+    m_pDraw->SetEnabled(false);
 
     ui->txtPrefixAndName->setText(m_ItemRef.GetName(true));
     
@@ -63,6 +63,7 @@ SpriteWidget::SpriteWidget(ProjectItem &itemRef, IHyApplication &hyApp, QWidget 
 
 SpriteWidget::~SpriteWidget()
 {
+    delete m_pDraw;
     delete ui;
 }
 
@@ -132,23 +133,23 @@ void SpriteWidget::OnGiveMenuActions(QMenu *pMenu)
     pMenu->addAction(ui->actionApplyToAll);
 }
 
-void SpriteWidget::DrawShow()
+void SpriteWidget::OnShow()
 {
-    m_Draw.Show();
+    m_pDraw->Show();
 }
 
-void SpriteWidget::DrawHide()
+void SpriteWidget::OnHide()
 {
-    m_Draw.Hide();
+    m_pDraw->Hide();
 }
 
-void SpriteWidget::DrawUpdate()
+void SpriteWidget::OnUpdate()
 {
     int iFrameIndex = ui->framesView->currentIndex().row();
     if(iFrameIndex >= 0)
     {
         SpriteFrame *pFrame = GetCurStateData()->GetFramesModel()->GetFrameAt(iFrameIndex);
-        m_Draw.SetFrame(pFrame->m_pFrame->GetChecksum(), glm::vec2(pFrame->GetRenderOffset().x(), pFrame->GetRenderOffset().y()));
+        m_pDraw->SetFrame(pFrame->m_pFrame->GetChecksum(), glm::vec2(pFrame->GetRenderOffset().x(), pFrame->GetRenderOffset().y()));
 
         UpdateTimeStep();
     }
@@ -234,7 +235,7 @@ void SpriteWidget::UpdateTimeStep()
     }
 }
 
-void SpriteWidget::Refresh(QVariant param)
+void SpriteWidget::RefreshData(QVariant param)
 {
     bool bParamOk = false;
     int iStateAffected = param.toInt(&bParamOk);
@@ -242,6 +243,12 @@ void SpriteWidget::Refresh(QVariant param)
         SetSelectedState(iStateAffected);
     else
         UpdateActions();
+}
+
+void SpriteWidget::RefreshDraw(IHyApplication &hyAppRef)
+{
+    delete m_pDraw;
+    m_pDraw = new SpriteDraw(*static_cast<SpriteModel *>(m_ItemRef.GetModel()), hyAppRef);
 }
 
 void SpriteWidget::UpdateActions()

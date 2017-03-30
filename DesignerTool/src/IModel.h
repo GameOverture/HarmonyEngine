@@ -282,7 +282,6 @@ public:
     
     virtual void AddFrame(AtlasFrame *pFrame) = 0;
     virtual void RelinquishFrame(AtlasFrame *pFrame) = 0;
-    virtual void RefreshFrame(AtlasFrame *pFrame) = 0;
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class IModel : public QAbstractListModel
@@ -305,7 +304,6 @@ public:
     QList<AtlasFrame *> RequestFramesById(IStateData *pState, QList<quint32> requestList);
     QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList);
     void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
-    void RefreshFrame(AtlasFrame *pFrame);
     
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -337,6 +335,7 @@ public:
     
     virtual QJsonObject PopStateAt(uint32 uiIndex) = 0;
     virtual QJsonValue GetSaveInfo() = 0;
+    virtual void Refresh() = 0;
 };
 
 #endif // IMODEL_H

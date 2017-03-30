@@ -37,7 +37,6 @@ class Project : public ExplorerItem, public IHyApplication
     QTabBar *                                       m_pTabBar;
 
     ProjectItem *                                   m_pCurOpenItem;
-    QList<ProjectItem *>                            m_StashedItemList;
     
     QString                                         m_sGameName;
 
@@ -78,9 +77,6 @@ public:
     void SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled);
 
     void OpenItem(ProjectItem *pItem);
-    
-    void StashCurrentItems();
-    void OpenStashedItems();
 
     // IHyApplication overrides
     virtual bool Initialize();
@@ -106,7 +102,7 @@ public Q_SLOTS:
 
     void on_saveAll_triggered();
 
-    void on_tabBar_closeRequested(int iIndex);
+    void OnCloseTab(int iIndex);
 };
 
 #endif // PROJECT_H

@@ -23,6 +23,7 @@
 #include <QJsonArray>
 #include <QDirIterator>
 #include <QTreeWidgetItemIterator>
+#include <QMessageBox>
 
 // Keep this commented out unless you want the entire project to save every item upon boot (used if 'Data.json' layout has changed and needs to propagate all its changes)
 //#define RESAVE_ENTIRE_PROJECT
@@ -362,7 +363,7 @@ void Project::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
 void Project::OpenItem(ProjectItem *pItem)
 {
     if(m_pCurOpenItem && m_pCurOpenItem != pItem)
-        m_pCurOpenItem->DrawHide(*this);
+        m_pCurOpenItem->WidgetHide(*this);
 
     if(m_pCurOpenItem == pItem)
         return;
@@ -381,7 +382,7 @@ void Project::OpenItem(ProjectItem *pItem)
             m_pTabBar->setCurrentIndex(i);
             m_pTabBar->blockSignals(false);
 
-            m_pCurOpenItem->DrawShow(*this);
+            m_pCurOpenItem->WidgetShow(*this);
             break;
         }
     }
@@ -389,7 +390,7 @@ void Project::OpenItem(ProjectItem *pItem)
     // Add tab, otherwise
     if(bAlreadyLoaded == false)
     {
-        m_pCurOpenItem->ProjLoad(*this);
+        m_pCurOpenItem->WidgetLoad(*this);
 
         m_pTabBar->blockSignals(true);
         int iIndex = m_pTabBar->addTab(m_pCurOpenItem->GetIcon(), m_pCurOpenItem->GetName(false));
@@ -399,40 +400,8 @@ void Project::OpenItem(ProjectItem *pItem)
         m_pTabBar->setCurrentIndex(iIndex);
         m_pTabBar->blockSignals(false);
 
-        m_pCurOpenItem->DrawShow(*this);
+        m_pCurOpenItem->WidgetShow(*this);
     }
-}
-
-void Project::StashCurrentItems()
-{
-    for(int i = 0; i < m_pTabBar->count(); ++i)
-    {
-        ProjectItem *pOpenItem = m_pTabBar->tabData(i).value<ProjectItem *>();
-        m_StashedItemList.append(pOpenItem);
-    }
-    
-    CloseAllTabs();
-        pOpenItem->Unload
-        if( == m_pCurOpenItem)
-        {
-            bAlreadyLoaded = true;
-
-            m_pTabBar->blockSignals(true);
-            m_pTabBar->setCurrentIndex(i);
-            m_pTabBar->blockSignals(false);
-
-            m_pCurOpenItem->DrawShow(*this);
-            break;
-        }
-    }
-}
-
-void Project::OpenStashedItems()
-{
-    for(int i = 0; i < m_StashedItemList.size(); ++i)
-        MainWindow::OpenItem(m_StashedItemList[i]);
-    
-    m_StashedItemList.clear();
 }
 
 // IHyApplication override
@@ -452,7 +421,7 @@ void Project::OpenStashedItems()
     if(m_pTabBar->count() > 0)
     {
         m_pDraw->Hide();
-        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->DrawUpdate(*this);
+        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetUpdate(*this);
     }
     else
         m_pDraw->Show();
@@ -486,7 +455,17 @@ void Project::OnHarmonyLoaded()
         m_pTabBar->setTabsClosable(true);
         m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
         m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
-        m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabBar_closeRequested(int)));
+        m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(OnCloseTab(int)));
+    }
+    else
+    {
+        for(int i = 0; i < m_pTabBar->count(); ++i)
+        {
+            ProjectItem *pOpenItem = m_pTabBar->tabData(i).value<ProjectItem *>();
+            pOpenItem->WidgetRefreshDraw(*this);
+        }
+
+        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetShow(*this);
     }
     
     if(m_pAtlasModel == nullptr)
@@ -592,17 +571,11 @@ QJsonObject Project::GetSubDirObj(eItemType eType)
 
 bool Project::CloseAllTabs()
 {
-    while(m_pTabBar->count() != 0)
-        on_tabBar_closeRequested(0);
+    int iNumTabsOpened = m_pTabBar->count();
+    for(int i = iNumTabsOpened - 1; i >= 0; --i)
+        OnCloseTab(i);
     
-    for(int i = 0; i < m_pTabBar->count(); ++i)
-    {
-        ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();
-        if(false == MainWindow::CloseItem(pItem))
-            return false;
-    }
-    
-    return true;
+    return m_pTabBar->count() == 0;
 }
 
 void Project::OnTabBarCurrentChanged(int iIndex)
@@ -642,13 +615,27 @@ void Project::on_saveAll_triggered()
     }
 }
 
-void Project::on_tabBar_closeRequested(int iIndex)
+void Project::OnCloseTab(int iIndex)
 {
     ProjectItem *pItem = m_pTabBar->tabData(iIndex).value<ProjectItem *>();
-    pItem->ProjUnload(*this);
+
+    if(pItem->IsSaveClean() == false)
+    {
+        int iDlgReturn = QMessageBox::question(nullptr, "Save Changes", pItem->GetName(true) % " has unsaved changes. Do you want to save before closing?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+
+        if(iDlgReturn == QMessageBox::Save)
+            pItem->Save();
+        else if(iDlgReturn == QMessageBox::Discard)
+            pItem->DiscardChanges();
+        else if(iDlgReturn == QMessageBox::Cancel)
+            return;
+    }
+
+    MainWindow::CloseItem(pItem);
+    pItem->WidgetUnload(*this);
 
     if(pItem == m_pCurOpenItem)
         m_pCurOpenItem = nullptr;
 
-    MainWindow::CloseItem(pItem);
+    m_pTabBar->removeTab(iIndex);
 }

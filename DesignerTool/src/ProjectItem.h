@@ -21,6 +21,7 @@ class AtlasWidget;
 class AudioWidgetManager;
 class Project;
 class AtlasFrame;
+class IModel;
 
 class ProjectItem : public ExplorerItem
 {
@@ -29,9 +30,10 @@ class ProjectItem : public ExplorerItem
     friend class Project;
 
     Project &               m_ProjectRef;
+    QJsonValue              m_SaveValue;
 
     // Loaded in constructor
-    QAbstractItemModel *    m_pModel;
+    IModel *                m_pModel;
     QUndoStack *            m_pUndoStack;
     QAction *               m_pActionUndo;
     QAction *               m_pActionRedo;
@@ -39,14 +41,15 @@ class ProjectItem : public ExplorerItem
     // Loaded when item is opened
     QWidget *               m_pWidget;
     
-
 public:
     ProjectItem(Project &projRef, eItemType eType, const QString sPrefix, const QString sName, QJsonValue initValue);
     virtual ~ProjectItem();
+
+    void LoadModel();
     
     Project &GetProject();
 
-    QAbstractItemModel *GetModel()                  { return m_pModel; }
+    IModel *GetModel()                              { return m_pModel; }
     QWidget *GetWidget() const                      { return m_pWidget; }
     QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
     
@@ -55,16 +58,15 @@ public:
     bool IsSaveClean();
     void DiscardChanges();
 
-    void RefreshWidget(QVariant param);
-    void RelinkFrame(AtlasFrame *pFrame);
+    void WidgetRefreshData(QVariant param);
+    void WidgetRefreshDraw(IHyApplication &hyApp);
     
 private:
-    void ProjLoad(IHyApplication &hyApp);
-    void ProjUnload(IHyApplication &hyApp);
-    void DrawShow(IHyApplication &hyApp);
-    void DrawHide(IHyApplication &hyApp);
-    void DrawUpdate(IHyApplication &hyApp);
-
+    void WidgetLoad(IHyApplication &hyApp);
+    void WidgetUnload(IHyApplication &hyApp);
+    void WidgetShow(IHyApplication &hyApp);
+    void WidgetHide(IHyApplication &hyApp);
+    void WidgetUpdate(IHyApplication &hyApp);
 
 private Q_SLOTS:
     void on_undoStack_cleanChanged(bool bClean);

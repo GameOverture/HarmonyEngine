@@ -72,22 +72,6 @@ void SpriteFramesModel::MoveRowDown(int iIndex)
     endMoveRows();
 }
 
-void SpriteFramesModel::RefreshFrame(AtlasFrame *pFrame)
-{
-    bool bFound = false;
-    for(int i = 0; i < m_FramesList.count(); ++i)
-    {
-        if(m_FramesList[i]->m_pFrame == pFrame)
-        {
-            bFound = true;
-            break;
-        }
-    }
-
-    if(bFound)
-        dataChanged(createIndex(0, 0), createIndex(m_FramesList.count() - 1, NUMCOLUMNS - 1));
-}
-
 // iIndex of -1 will apply to all
 void SpriteFramesModel::OffsetFrame(int iIndex, QPoint vOffset)
 {
@@ -149,6 +133,11 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
         return NULL;
 
     return m_FramesList[iIndex];
+}
+
+void SpriteFramesModel::Refresh()
+{
+    dataChanged(createIndex(0, 0), createIndex(m_FramesList.count() - 1, NUMCOLUMNS - 1));
 }
 
 /*virtual*/ int SpriteFramesModel::rowCount(const QModelIndex & /*parent*/) const
@@ -356,6 +345,11 @@ void SpriteStateData::GetStateInfo(QJsonObject &stateObjOut)
     stateObjOut.insert("frames", QJsonValue(frameArray));
 }
 
+void SpriteStateData::Refresh()
+{
+    m_pFramesModel->Refresh();
+}
+
 /*virtual*/ void SpriteStateData::AddFrame(AtlasFrame *pFrame)
 {
     m_pFramesModel->Add(pFrame);
@@ -364,11 +358,6 @@ void SpriteStateData::GetStateInfo(QJsonObject &stateObjOut)
 /*virtual*/ void SpriteStateData::RelinquishFrame(AtlasFrame *pFrame)
 {
     m_pFramesModel->Remove(pFrame);
-}
-
-/*virtual*/ void SpriteStateData::RefreshFrame(AtlasFrame *pFrame)
-{
-    m_pFramesModel->RefreshFrame(pFrame);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -424,4 +413,10 @@ QJsonValue SpriteModel::GetSaveInfo()
     }
 
     return retArray;
+}
+
+/*virtual*/ void SpriteModel::Refresh()
+{
+    for(int i = 0; i < m_StateList.size(); ++i)
+        static_cast<SpriteStateData *>(m_StateList[i])->Refresh();
 }

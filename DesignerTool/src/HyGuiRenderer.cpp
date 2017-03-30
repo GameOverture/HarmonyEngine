@@ -100,24 +100,8 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
     HyGuiLog("Version: " % QString(reinterpret_cast<const char *>(glGetString(GL_VERSION))), LOGTYPE_Normal);
     HyGuiLog("GLSL: " % QString(reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION))), LOGTYPE_Normal);
 
-    // TESTING ///
     if(m_pProjOwner)
-    {
         m_pHyEngine = new HyEngine(*m_pProjOwner);
-    }
-
-//    QOpenGLContext *pThreadContext = new QOpenGLContext;
-//    pThreadContext->setFormat(context()->format());
-//    pThreadContext->setShareContext(context());
-//    pThreadContext->create();
-
-//    HyGuiRendererLoadThread *pNewLoadThread = new HyGuiRendererLoadThread(m_pProjOwner, pThreadContext, context()->surface(), this);
-//    connect(pNewLoadThread, &HyGuiRendererLoadThread::EngineLoaded, this, &HyGuiRenderer::OnEngineLoaded);
-//    connect(pNewLoadThread, &HyGuiRendererLoadThread::finished, pNewLoadThread, &QObject::deleteLater);
-
-//    //MainWindow::StartLoading(MDI_Explorer);
-//    pThreadContext->moveToThread(pNewLoadThread);
-//    pNewLoadThread->start();
 }
 
 /*virtual*/ void HyGuiRenderer::paintGL()
@@ -154,11 +138,3 @@ void HyGuiRenderer::OnBootCheck()
         m_pTimer->start(10);
     }
 }
-
-//void HyGuiRenderer::OnEngineLoaded(HyEngine *pNewHyEngine, QOpenGLContext *pGLContext)
-//{
-//    delete pGLContext;
-//    //pGLContext->moveToThread(QApplication::instance()->thread());
-//    //pGLContext->makeCurrent(context()->surface());
-//    m_pHyEngine = pNewHyEngine;
-//}

@@ -58,7 +58,7 @@ public:
     static QString EngineLocation();
     
     static void OpenItem(ProjectItem *pItem);
-    static bool CloseItem(ProjectItem *pItem);
+    static void CloseItem(ProjectItem *pItem);
     
     static void SetSelectedProj(Project *pProj);
     static void SetSelectedProjWidgets(Project *pProj);
@@ -105,7 +105,7 @@ private:
 
     void NewItem(eItemType eItem);
     
-    void closeEvent(QCloseEvent * event);
+    void closeEvent(QCloseEvent *pEvent);
 
     void SaveSettings();
 };
