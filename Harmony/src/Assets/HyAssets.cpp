@@ -347,6 +347,8 @@ void HyAssets::QueueData(IHyLoadableData *pData)
 
 			m_pLastQueuedData = pData;
 		}
+		else if(pData->m_eLoadState == HYLOADSTATE_Discarded)
+			m_ReloadDataList.push_back(pData);
 	}
 
 	pData->m_uiRefCount++;
@@ -366,6 +368,15 @@ void HyAssets::DequeData(IHyLoadableData *pData)
 			m_Load_Prepare.push(pData);
 
 			m_pLastDiscardedData = pData;
+		}
+
+		for(auto iter = m_ReloadDataList.begin(); iter != m_ReloadDataList.end(); ++iter)
+		{
+			if((*iter) == pData)
+			{
+				m_ReloadDataList.erase(iter);
+				break;
+			}
 		}
 	}
 }
@@ -398,13 +409,31 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 			}
 		}
 	}
-	else
+	else // HYLOADSTATE_Discarded
 	{
-		pData->m_eLoadState = HYLOADSTATE_Inactive;
-		HyLog("Deleted loadable data");
+		bool bFoundInReloadList = false;
+		for(auto iter = m_ReloadDataList.begin(); iter != m_ReloadDataList.end(); ++iter)
+		{
+			if((*iter) == pData)
+			{
+				pData->m_eLoadState = HYLOADSTATE_Queued;
+				m_Load_Prepare.push(pData);
+				m_pLastQueuedData = pData;
 
-		if(pData == m_pLastDiscardedData)
-			m_pLastDiscardedData = nullptr;
+				bFoundInReloadList = true;
+				m_ReloadDataList.erase(iter);
+				break;
+			}
+		}
+
+		if(bFoundInReloadList == false)
+		{
+			pData->m_eLoadState = HYLOADSTATE_Inactive;
+			HyLog("Deleted loadable data");
+
+			if(pData == m_pLastDiscardedData)
+				m_pLastDiscardedData = nullptr;
+		}
 	}
 }
 

@@ -68,6 +68,8 @@ class HyAssets
 	IHyLoadableData *									m_pLastDiscardedData;
 	std::vector<IHyDraw2d *>							m_QueuedInst2dList;
 
+	std::vector<IHyLoadableData *>						m_ReloadDataList;
+
 	// Queues responsible for passing and retrieving factory data between the loading thread
 	std::queue<IHyLoadableData *>						m_Load_Prepare;
 	std::queue<IHyLoadableData *>						m_Load_Shared;
