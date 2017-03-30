@@ -449,6 +449,14 @@ void Project::OnHarmonyLoaded()
     m_Init.sGameName = GetName(false).toStdString();
     m_Init.sDataDir = GetAssetsAbsPath().toStdString();
     
+    if(m_pAtlasModel == nullptr)
+        m_pAtlasModel = new AtlasModel(this);
+    
+    delete m_pAtlasWidget;
+    delete m_pAudioMan;
+    m_pAtlasWidget = new AtlasWidget(m_pAtlasModel, this, nullptr);
+    m_pAudioMan = new AudioWidgetManager(this, nullptr);
+    
     if(m_pTabBar == nullptr)
     {
         m_pTabBar = new QTabBar(nullptr);
@@ -468,15 +476,6 @@ void Project::OnHarmonyLoaded()
         if(m_pTabBar->currentIndex() >= 0)
             m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetShow(*this);
     }
-    
-    if(m_pAtlasModel == nullptr)
-        m_pAtlasModel = new AtlasModel(this);
-    
-    delete m_pAtlasWidget;
-    delete m_pAudioMan;
-    m_pAtlasWidget = new AtlasWidget(m_pAtlasModel, this, nullptr);
-    m_pAudioMan = new AudioWidgetManager(this, nullptr);
-    
     
     MainWindow::SetSelectedProjWidgets(this);
 }
