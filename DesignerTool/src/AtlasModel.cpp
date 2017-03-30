@@ -203,7 +203,8 @@ AtlasModel::AtlasModel(Project *pProjOwner) : m_pProjOwner(pProjOwner),
 
 /*virtual*/ AtlasModel::~AtlasModel()
 {
-
+    for(int i = 0; i < m_FrameList.size(); ++i)
+        delete m_FrameList[i];
 }
 
 QList<AtlasFrame *> AtlasModel::GetFrames()
