@@ -93,6 +93,8 @@ public:
 
     QJsonObject GetSubDirObj(eItemType eType);
     
+    void RefreshCurrentItemDraw();
+
     bool CloseAllTabs();
 
 public Q_SLOTS:

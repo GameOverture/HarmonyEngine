@@ -23,7 +23,7 @@
 
 SpriteWidget::SpriteWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *parent) :   QWidget(parent),
                                                                                                 ui(new Ui::SpriteWidget),
-                                                                                                m_pDraw(new SpriteDraw(*static_cast<SpriteModel *>(itemRef.GetModel()), hyAppRef)),
+                                                                                                m_pDraw(nullptr),
                                                                                                 m_ItemRef(itemRef),
                                                                                                 m_bPlayActive(false),
                                                                                                 m_fElapsedTime(0.0),
@@ -31,8 +31,7 @@ SpriteWidget::SpriteWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidg
 {
     ui->setupUi(this);
 
-    m_pDraw->Load();
-    m_pDraw->SetEnabled(false);
+    RefreshDraw(hyAppRef);
 
     ui->txtPrefixAndName->setText(m_ItemRef.GetName(true));
     
@@ -90,25 +89,6 @@ void SpriteWidget::SetSelectedState(int iIndex)
     
     UpdateActions();
 }
-
-//SpriteFrame *SpriteWidget::GetSelectedFrame()
-//{
-//    if(m_pData->pFramesModel->rowCount() == 0)
-//        return NULL;
-
-//    SpriteFrame *pSpriteFrame = m_pData->pFramesModel->GetFrameAt(ui->framesView->currentIndex().row());
-//    return pSpriteFrame;
-//}
-
-//int SpriteWidget::GetSelectedIndex()
-//{
-//    return ui->framesView->currentIndex().row();
-//}
-
-//int SpriteWidget::GetNumFrames()
-//{
-//    return GetCurStateData()->pFramesModel->rowCount();
-//}
 
 void SpriteWidget::OnGiveMenuActions(QMenu *pMenu)
 {
@@ -248,7 +228,10 @@ void SpriteWidget::RefreshData(QVariant param)
 void SpriteWidget::RefreshDraw(IHyApplication &hyAppRef)
 {
     delete m_pDraw;
+
     m_pDraw = new SpriteDraw(*static_cast<SpriteModel *>(m_ItemRef.GetModel()), hyAppRef);
+    m_pDraw->Load();
+    m_pDraw->SetEnabled(false);
 }
 
 void SpriteWidget::UpdateActions()
@@ -470,6 +453,8 @@ void SpriteWidget::on_actionImportFrames_triggered()
 {
     QUndoCommand *pCmd = new UndoCmd_AddFrames("Add Frames", m_ItemRef, ui->cmbStates->currentIndex());
     GetItem().GetUndoStack()->push(pCmd);
+
+    m_ItemRef.GetProject().RefreshCurrentItemDraw();
 }
 
 void SpriteWidget::on_actionRemoveFrames_triggered()

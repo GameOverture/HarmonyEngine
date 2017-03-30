@@ -59,7 +59,6 @@ public:
     void DiscardChanges();
 
     void WidgetRefreshData(QVariant param);
-    void WidgetRefreshDraw(IHyApplication &hyApp);
     
 private:
     void WidgetLoad(IHyApplication &hyApp);
@@ -67,6 +66,8 @@ private:
     void WidgetShow(IHyApplication &hyApp);
     void WidgetHide(IHyApplication &hyApp);
     void WidgetUpdate(IHyApplication &hyApp);
+
+    void WidgetRefreshDraw(IHyApplication &hyApp);
 
 private Q_SLOTS:
     void on_undoStack_cleanChanged(bool bClean);

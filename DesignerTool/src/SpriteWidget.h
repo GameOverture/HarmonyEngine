@@ -41,10 +41,6 @@ public:
     ProjectItem &GetItem();
 
     void SetSelectedState(int iIndex);
-
-//    SpriteFrame *GetSelectedFrame();
-//    int GetSelectedIndex();
-//    int GetNumFrames();
     
     void OnGiveMenuActions(QMenu *pMenu);
     void GetSaveInfo(QJsonArray &spriteStateArrayRef);

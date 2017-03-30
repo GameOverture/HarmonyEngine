@@ -129,25 +129,6 @@ void ProjectItem::DiscardChanges()
     LoadModel();
 }
 
-void ProjectItem::WidgetRefreshData(QVariant param)
-{
-    if(m_pWidget == nullptr)
-        return;
-
-    switch(m_eTYPE)
-    {
-    case ITEM_Sprite:
-        static_cast<SpriteWidget *>(m_pWidget)->RefreshData(param);
-        break;
-    case ITEM_Font:
-        static_cast<FontWidget *>(m_pWidget)->RefreshData(param);
-        break;
-    default:
-        HyGuiLog("Unsupported IProjItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
-        break;
-    }
-}
-
 void ProjectItem::WidgetRefreshDraw(IHyApplication &hyApp)
 {
     if(m_pWidget == nullptr)
@@ -250,6 +231,26 @@ void ProjectItem::WidgetUpdate(IHyApplication &hyApp)
         break;
     }
 }
+
+void ProjectItem::WidgetRefreshData(QVariant param)
+{
+    if(m_pWidget == nullptr)
+        return;
+
+    switch(m_eTYPE)
+    {
+    case ITEM_Sprite:
+        static_cast<SpriteWidget *>(m_pWidget)->RefreshData(param);
+        break;
+    case ITEM_Font:
+        static_cast<FontWidget *>(m_pWidget)->RefreshData(param);
+        break;
+    default:
+        HyGuiLog("Unsupported IProjItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        break;
+    }
+}
+
 
 void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 {

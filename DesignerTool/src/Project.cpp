@@ -569,6 +569,14 @@ QJsonObject Project::GetSubDirObj(eItemType eType)
     return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType))].toObject();
 }
 
+void Project::RefreshCurrentItemDraw()
+{
+    ProjectItem *pCurrentItem = m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>();
+
+    pCurrentItem->WidgetRefreshDraw(*this);
+    pCurrentItem->WidgetShow(*this);
+}
+
 bool Project::CloseAllTabs()
 {
     int iNumTabsOpened = m_pTabBar->count();
