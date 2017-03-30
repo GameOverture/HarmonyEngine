@@ -450,7 +450,43 @@ void Project::OnHarmonyLoaded()
     m_Init.sDataDir = GetAssetsAbsPath().toStdString();
     
     if(m_pAtlasModel == nullptr)
+    {
         m_pAtlasModel = new AtlasModel(this);
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // TODO: Do something better than this
+        
+        // Also refresh every model who would refrence an AtlasFrame *
+        QTreeWidgetItemIterator it(m_pTreeItemPtr);
+        while (*it)
+        {
+            ExplorerItem *pItem = (*it)->data(0, Qt::UserRole).value<ExplorerItem *>();
+            switch(pItem->GetType())
+            {
+            case ITEM_Project:
+            case ITEM_Prefix:
+            case ITEM_DirAudio:
+            case ITEM_DirParticles:
+            case ITEM_DirFonts:
+            case ITEM_DirSpine:
+            case ITEM_DirSprites:
+            case ITEM_DirShaders:
+            case ITEM_DirEntities:
+            case ITEM_DirAtlases:
+                break;
+            case ITEM_Sprite:
+            case ITEM_Font:
+                static_cast<ProjectItem *>(pItem)->DiscardChanges();
+                break;
+
+            default:
+                HyGuiLog("Unknown ProjectItem to reload model: " % QString::number(m_eTYPE), LOGTYPE_Error);
+                break;
+            }
+            ++it;
+        }
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    }
     
     delete m_pAtlasWidget;
     delete m_pAudioMan;
