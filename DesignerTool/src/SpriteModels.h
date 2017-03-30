@@ -49,7 +49,7 @@ class SpriteFramesModel : public QAbstractTableModel
     Q_OBJECT
 
     QList<SpriteFrame *>            m_FramesList;
-    QMap<quint32, SpriteFrame *>    m_RemovedFrameMap;  // Used to reinsert frames (via undo/redo) while keeping their attributes
+    QMap<quint32, SpriteFrame *>    m_RemovedFrameIdMap;  // Used to reinsert frames (via undo/redo) while keeping their attributes
 
 
 public:

@@ -22,7 +22,7 @@ class AtlasDraw : public IDraw
     // TODO: Test whether splitting HyTexturedQuad's into multiple maps has any lookup/insert benefit, rather than one massive QMap
     struct TextureEnt : public HyEntity2d
     {
-        QMap<quint32, HyTexturedQuad2d *>   m_TexQuadMap;
+        QMap<quint32, HyTexturedQuad2d *>   m_TexQuadIdMap;
         
         TextureEnt(IHyNode *pParent) : HyEntity2d(pParent)
         { }

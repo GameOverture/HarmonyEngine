@@ -23,7 +23,7 @@ void AtlasModel::FrameLookup::AddLookup(AtlasFrame *pFrame)
 {
     m_FrameIdMap[pFrame->GetId()] = pFrame;
 
-    uint32 uiChecksum = pFrame->GetChecksum();
+    uint32 uiChecksum = pFrame->GetImageChecksum();
     
     if(m_FrameChecksumMap.contains(uiChecksum))
     {
@@ -41,14 +41,14 @@ bool AtlasModel::FrameLookup::RemoveLookup(AtlasFrame *pFrame)  // Returns true 
 {
     m_FrameIdMap.remove(pFrame->GetId());
 
-    auto iter = m_FrameChecksumMap.find(pFrame->GetChecksum());
+    auto iter = m_FrameChecksumMap.find(pFrame->GetImageChecksum());
     if(iter == m_FrameChecksumMap.end())
         HyGuiLog("AtlasModel::RemoveLookup could not find frame", LOGTYPE_Error);
     
     iter.value().removeOne(pFrame);
     if(iter.value().size() == 0)
     {
-        m_FrameChecksumMap.remove(pFrame->GetChecksum());
+        m_FrameChecksumMap.remove(pFrame->GetImageChecksum());
         return true;
     }
     
@@ -531,7 +531,7 @@ void AtlasModel::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
             frameArrayList.append(QJsonArray());
 
         QJsonObject frameObj;
-        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FrameList[i]->GetChecksum())));
+        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FrameList[i]->GetImageChecksum())));
         frameObj.insert("left", QJsonValue(m_FrameList[i]->GetX()));
         frameObj.insert("top", QJsonValue(m_FrameList[i]->GetY()));
         frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().width()));
@@ -608,7 +608,7 @@ void AtlasModel::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFra
     {
         m_Packer.addItem(newFramesList[i]->GetSize(),
                          newFramesList[i]->GetCrop(),
-                         newFramesList[i]->GetChecksum(),
+                         newFramesList[i]->GetImageChecksum(),
                          newFramesList[i],
                          m_MetaDir.absoluteFilePath(newFramesList[i]->ConstructImageFileName()));
     }

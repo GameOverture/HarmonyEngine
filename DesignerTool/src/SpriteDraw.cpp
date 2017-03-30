@@ -34,31 +34,24 @@ SpriteDraw::SpriteDraw(SpriteModel &modelRef, IHyApplication &hyApp) :  IDraw(hy
             HyTexturedQuad2d *pNewTexturedQuad = new HyTexturedQuad2d(pFrame->GetTextureIndex(), this);
             pNewTexturedQuad->SetTextureSource(pFrame->GetX(), pFrame->GetY(), pFrame->GetCrop().width(), pFrame->GetCrop().height());
 
-            m_TexturedQuadMap.insert(pFrame->GetChecksum(), pNewTexturedQuad);
+            m_TexturedQuadIdMap.insert(pFrame->GetId(), pNewTexturedQuad);
         }
     }
 }
 
 /*virtual*/ SpriteDraw::~SpriteDraw()
 {
-    for(auto iter = m_TexturedQuadMap.begin(); iter != m_TexturedQuadMap.end(); ++iter)
+    for(auto iter = m_TexturedQuadIdMap.begin(); iter != m_TexturedQuadIdMap.end(); ++iter)
         delete iter.value();
 }
 
-///*virtual*/ void SpriteDraw::Relink(AtlasFrame *pFrame)
-//{
-//    auto iter = m_FrameMap.find(pFrame->GetChecksum());
-//    if(iter != m_FrameMap.end())
-//        iter.value()->SetTextureSource(pFrame->GetX(), pFrame->GetY(), pFrame->GetCrop().width(), pFrame->GetCrop().height());
-//}
-
-void SpriteDraw::SetFrame(quint32 uiChecksum, glm::vec2 vOffset)
+void SpriteDraw::SetFrame(quint32 uiId, glm::vec2 vOffset)
 {
     if(m_pCurFrame)
         m_pCurFrame->SetEnabled(false);
 
-    auto iter = m_TexturedQuadMap.find(uiChecksum);
-    if(iter != m_TexturedQuadMap.end())
+    auto iter = m_TexturedQuadIdMap.find(uiId);
+    if(iter != m_TexturedQuadIdMap.end())
     {
         m_pCurFrame = iter.value();
         m_pCurFrame->pos.Set(vOffset);

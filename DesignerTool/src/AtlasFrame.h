@@ -28,7 +28,7 @@ class AtlasFrame
 
     AtlasTreeItem *                     m_pTreeWidgetItem;
 
-    quint32                             m_uiChecksum;
+    quint32                             m_uiImageChecksum;
     QString                             m_sName;
     int                                 m_iWidth;
     int                                 m_iHeight;
@@ -51,7 +51,7 @@ public:
     AtlasTreeItem *GetTreeItem();
 
     quint32 GetId();
-    quint32 GetChecksum();
+    quint32 GetImageChecksum();
     QString GetName();
     QSize GetSize();
     QRect GetCrop();

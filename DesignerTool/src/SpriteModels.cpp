@@ -21,13 +21,13 @@ int SpriteFramesModel::Add(AtlasFrame *pFrame)
     SpriteFrame *pFrameToInsert = NULL;
 
     // See if this frame has been recently removed, and re-add if possible. Otherwise, create a new Frame
-    QMap<quint32, SpriteFrame *>::iterator iter = m_RemovedFrameMap.find(pFrame->GetChecksum());
-    if(iter == m_RemovedFrameMap.end())
+    QMap<quint32, SpriteFrame *>::iterator iter = m_RemovedFrameIdMap.find(pFrame->GetId());
+    if(iter == m_RemovedFrameIdMap.end())
         pFrameToInsert = new SpriteFrame(pFrame, m_FramesList.count());
     else
     {
         pFrameToInsert = iter.value();
-        m_RemovedFrameMap.remove(pFrame->GetChecksum());
+        m_RemovedFrameIdMap.remove(pFrame->GetId());
     }
 
     beginInsertRows(QModelIndex(), pFrameToInsert->m_iRowIndex, pFrameToInsert->m_iRowIndex);
@@ -41,10 +41,10 @@ void SpriteFramesModel::Remove(AtlasFrame *pFrame)
 {
     for(int i = 0; i < m_FramesList.count(); ++i)
     {
-        // NOTE: Don't delete this frame as it may be 'undone'
+        // NOTE: Don't delete this frame as the remove may be 'undone'
         if(m_FramesList[i]->m_pFrame == pFrame)
         {
-            m_RemovedFrameMap[pFrame->GetChecksum()] = m_FramesList[i];
+            m_RemovedFrameIdMap[pFrame->GetId()] = m_FramesList[i];
 
             beginRemoveRows(QModelIndex(), i, i);
             m_FramesList.removeAt(i);
@@ -116,7 +116,8 @@ QJsonArray SpriteFramesModel::GetFramesInfo(float &fTotalDurationRef)
         QJsonObject frameObj;
         fTotalDurationRef += m_FramesList[i]->m_fDuration;
 
-        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetChecksum())));
+        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetImageChecksum())));
+        frameObj.insert("id", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetId())));
         frameObj.insert("duration", m_FramesList[i]->m_fDuration);
         frameObj.insert("offsetX", m_FramesList[i]->m_vOffset.x());
         frameObj.insert("offsetY", m_FramesList[i]->m_vOffset.y());
@@ -331,7 +332,7 @@ void SpriteStateData::GetStateInfo(QJsonObject &stateObjOut)
         fTotalDuration += pSpriteFrame->m_fDuration;
         frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x() + pSpriteFrame->m_pFrame->GetCrop().left()));
         frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + (pSpriteFrame->m_pFrame->GetSize().height() - pSpriteFrame->m_pFrame->GetCrop().bottom())));
-        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetChecksum())));
+        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetImageChecksum())));
         frameObj.insert("id", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetId())));
 
         frameArray.append(frameObj);

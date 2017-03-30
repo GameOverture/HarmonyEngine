@@ -15,7 +15,7 @@
 AtlasFrame::AtlasFrame(quint32 uiId, quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iAtlasIndex, uint uiErrors) :  m_uiUNIQUE_ID(uiId),
                                                                                                                                                                                 m_eType(eType),
                                                                                                                                                                                 m_pTreeWidgetItem(nullptr),
-                                                                                                                                                                                m_uiChecksum(uiChecksum),
+                                                                                                                                                                                m_uiImageChecksum(uiChecksum),
                                                                                                                                                                                 m_sName(sN),
                                                                                                                                                                                 m_iWidth(iW),
                                                                                                                                                                                 m_iHeight(iH),
@@ -64,9 +64,9 @@ quint32 AtlasFrame::GetId()
     return m_uiUNIQUE_ID;
 }
 
-quint32 AtlasFrame::GetChecksum()
+quint32 AtlasFrame::GetImageChecksum()
 {
-    return m_uiChecksum;
+    return m_uiImageChecksum;
 }
 
 QString AtlasFrame::GetName()
@@ -138,7 +138,7 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 QString AtlasFrame::ConstructImageFileName()
 {
     QString sMetaImgName;
-    sMetaImgName = sMetaImgName.sprintf("%010u", m_uiChecksum);
+    sMetaImgName = sMetaImgName.sprintf("%010u", m_uiImageChecksum);
     sMetaImgName += ".png";
 
     return sMetaImgName;
@@ -147,7 +147,7 @@ QString AtlasFrame::ConstructImageFileName()
 void AtlasFrame::GetJsonObj(QJsonObject &frameObj)
 {
     frameObj.insert("id", QJsonValue(static_cast<qint64>(GetId())));
-    frameObj.insert("checksum", QJsonValue(static_cast<qint64>(GetChecksum())));
+    frameObj.insert("checksum", QJsonValue(static_cast<qint64>(GetImageChecksum())));
     frameObj.insert("name", QJsonValue(GetName()));
     frameObj.insert("width", QJsonValue(GetSize().width()));
     frameObj.insert("height", QJsonValue(GetSize().height()));
@@ -226,7 +226,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
     m_sName = sName;
     m_pTreeWidgetItem->setText(0, m_sName);
 
-    m_uiChecksum = uiChecksum;
+    m_uiImageChecksum = uiChecksum;
     m_iWidth = newImage.width();
     m_iHeight = newImage.height();
 

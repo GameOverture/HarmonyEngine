@@ -8,7 +8,7 @@ class SpriteDraw : public IDraw
 {
     SpriteModel &                           m_ModelRef;
 
-    QMap<quint32, HyTexturedQuad2d *>       m_TexturedQuadMap;
+    QMap<quint32, HyTexturedQuad2d *>       m_TexturedQuadIdMap;
     HyTexturedQuad2d *                      m_pCurFrame;
 
     HyPrimitive2d                           m_primOriginHorz;
@@ -18,9 +18,7 @@ public:
     SpriteDraw(SpriteModel &modelRef, IHyApplication &hyApp);
     virtual ~SpriteDraw();
 
-    //virtual void Relink(AtlasFrame *pFrame) override;
-
-    void SetFrame(quint32 uiChecksum, glm::vec2 vOffset);
+    void SetFrame(quint32 uiId, glm::vec2 vOffset);
 
 protected:
     virtual void OnShow(IHyApplication &hyApp) override;

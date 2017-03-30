@@ -495,7 +495,7 @@ bool FontModel::ClearFontDirtyFlag()
 
     QJsonObject fontObj;
     
-    fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetChecksum())));
+    fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetImageChecksum())));
     fontObj.insert("id", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetId())));
 
     QJsonObject availableGlyphsObj;
