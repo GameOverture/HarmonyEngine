@@ -52,6 +52,7 @@ public:
 
     QJsonObject GetPackerSettings();
 
+    void TakeTreeWidgets(QList<AtlasTreeItem *> treeItemList);
     QList<AtlasTreeItem *> GetTopLevelTreeItemList();
 
     QSize GetAtlasDimensions();

@@ -64,9 +64,9 @@ AtlasFrame *AtlasModel::FrameLookup::Find(quint32 uiId)
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AtlasModel::AtlasModel(Project *pProjOwner) : m_pProjOwner(pProjOwner),
-                                                    m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
-                                                    m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases))
+AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
+                                                m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
+                                                m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases))
 {
     if(m_MetaDir.exists() == false)
     {
@@ -215,6 +215,11 @@ QList<AtlasFrame *> AtlasModel::GetFrames()
 QJsonObject AtlasModel::GetPackerSettings()
 {
     return m_PackerSettings;
+}
+
+void AtlasModel::TakeTreeWidgets(QList<AtlasTreeItem *> treeItemList)
+{
+    m_TopLevelTreeItemList = treeItemList;
 }
 
 QList<AtlasTreeItem *> AtlasModel::GetTopLevelTreeItemList()

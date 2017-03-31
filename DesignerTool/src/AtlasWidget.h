@@ -69,6 +69,8 @@ public:
     QTreeWidget *GetFramesTreeWidget();
 
     void DrawUpdate(IHyApplication &hyApp);
+
+    void StashTreeWidgets();
     
 protected:
     virtual void enterEvent(QEvent *pEvent) override;

@@ -127,6 +127,15 @@ void AtlasWidget::DrawUpdate(IHyApplication &hyApp)
     m_Draw.Update(hyApp);
 }
 
+void AtlasWidget::StashTreeWidgets()
+{
+    QList<AtlasTreeItem *> stashedTreeItemList;
+    while(ui->atlasList->topLevelItemCount())
+        stashedTreeItemList.append(static_cast<AtlasTreeItem *>(ui->atlasList->takeTopLevelItem(0)));
+
+    m_pModel->TakeTreeWidgets(stashedTreeItemList);
+}
+
 /*virtual*/ void AtlasWidget::enterEvent(QEvent *pEvent) /*override*/
 {
     m_Draw.Show();
