@@ -277,7 +277,7 @@ SpriteStateData::SpriteStateData(IModel &modelRef, QJsonObject stateObj) :  ISta
         {
             QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
             QPoint vOffset(spriteFrameObj["offsetX"].toInt() - requestedAtlasFramesList[i]->GetCrop().left(),
-                           spriteFrameObj["offsetY"].toInt() - (requestedAtlasFramesList[i]->GetSize().height() - requestedAtlasFramesList[i]->GetCrop().bottom()));
+                           spriteFrameObj["offsetY"].toInt() - ((requestedAtlasFramesList[i]->GetSize().height() - 1) - requestedAtlasFramesList[i]->GetCrop().bottom()));  // -1 on height because it's NOT zero based like everything else
 
             m_pFramesModel->OffsetFrame(i, vOffset);
             m_pFramesModel->DurationFrame(i, spriteFrameObj["duration"].toDouble());
