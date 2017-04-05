@@ -144,10 +144,10 @@ uint32 IHyNode::ChildCount()
 	return static_cast<uint32>(m_ChildList.size());
 }
 
-IHyNode &IHyNode::ChildGet(uint32 uiIndex)
+IHyNode *IHyNode::ChildGet(uint32 uiIndex)
 {
 	HyAssert(uiIndex < static_cast<uint32>(m_ChildList.size()), "IHyNode::ChildGet passed an invalid index");
-	return *m_ChildList[uiIndex];
+	return m_ChildList[uiIndex];
 }
 
 void IHyNode::ParentDetach()

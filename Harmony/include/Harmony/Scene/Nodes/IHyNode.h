@@ -57,7 +57,7 @@ public:
 	bool ChildFind(IHyNode &childInst);
 	void ChildrenTransfer(IHyNode &newParent);
 	uint32 ChildCount();
-	IHyNode &ChildGet(uint32 uiIndex);
+	IHyNode *ChildGet(uint32 uiIndex);
 
 	void ParentDetach();
 	bool ParentExists();
