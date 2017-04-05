@@ -319,7 +319,7 @@ void IHyDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 									 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.width),
 									 static_cast<uint32>(mtx[1].y * m_LocalScissorRect.height));
 
-		ForEachNode([&](IHyNode *pChildNode)
+		ForEachChild([&](IHyNode *pChildNode)
 					{
 						if(pChildNode->IsDraw2d())
 							static_cast<IHyDraw2d *>(pChildNode)->m_RenderState.SetScissorRect(this->m_RenderState.GetScissorRect());
@@ -386,7 +386,7 @@ void IHyDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 				static_cast<IHyDraw2d *>(m_ChildList[i])->alpha.Set(alpha.Get());
 		}
 
-		//ForEachNode([&](IHyNode *pChildNode)
+		//ForEachChild([&](IHyNode *pChildNode)
 		//			{
 		//				if(pChildNode->IsDraw2d())
 		//				{

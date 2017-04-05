@@ -52,13 +52,17 @@ public:
 	int64 GetTag();
 	void SetTag(int64 iTag);
 
-	void AddChild(IHyNode &childInst);
-	bool InsertChild(IHyNode &insertBefore, IHyNode &childInst);
-	bool HasChild(IHyNode &childInst);
-	void Detach();
-	bool HasParent();
+	void ChildAppend(IHyNode &childInst);
+	bool ChildInsert(IHyNode &insertBefore, IHyNode &childInst);
+	bool ChildFind(IHyNode &childInst);
+	void ChildrenTransfer(IHyNode &newParent);
+	uint32 ChildCount();
+	IHyNode &ChildGet(uint32 uiIndex);
 
-	void ForEachNode(std::function<void(IHyNode *)> func);
+	void ParentDetach();
+	bool ParentExists();
+
+	void ForEachChild(std::function<void(IHyNode *)> func);
 
 protected:
 	void Update();
