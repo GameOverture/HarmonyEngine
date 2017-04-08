@@ -277,7 +277,7 @@ SpriteStateData::SpriteStateData(IModel &modelRef, QJsonObject stateObj) :  ISta
         {
             QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
             QPoint vOffset(spriteFrameObj["offsetX"].toInt() - requestedAtlasFramesList[i]->GetCrop().left(),
-                           spriteFrameObj["offsetY"].toInt() - (requestedAtlasFramesList[i]->GetSize().height() - requestedAtlasFramesList[i]->GetCrop().bottom()));
+                           spriteFrameObj["offsetY"].toInt() - ((requestedAtlasFramesList[i]->GetSize().height() - 1) - requestedAtlasFramesList[i]->GetCrop().bottom()));  // -1 on height because it's NOT zero based like everything else
 
             m_pFramesModel->OffsetFrame(i, vOffset);
             m_pFramesModel->DurationFrame(i, spriteFrameObj["duration"].toDouble());
@@ -331,7 +331,7 @@ void SpriteStateData::GetStateInfo(QJsonObject &stateObjOut)
         frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));
         fTotalDuration += pSpriteFrame->m_fDuration;
         frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x() + pSpriteFrame->m_pFrame->GetCrop().left()));
-        frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + (pSpriteFrame->m_pFrame->GetSize().height() - pSpriteFrame->m_pFrame->GetCrop().bottom())));
+        frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + ((pSpriteFrame->m_pFrame->GetSize().height() - 1) - pSpriteFrame->m_pFrame->GetCrop().bottom()))); // -1 on height because it's NOT zero based like everything else
         frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetImageChecksum())));
         frameObj.insert("id", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetId())));
 

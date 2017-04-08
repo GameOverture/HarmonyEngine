@@ -21,7 +21,7 @@ IHyNode::IHyNode(HyType eType, IHyNode *pParent /*= nullptr*/) :	m_eTYPE(eType),
 	HyScene::AddNode(this);
 	
 	if(pParent)
-		pParent->AddChild(*this);
+		pParent->ChildAppend(*this);
 }
 
 /*virtual*/ IHyNode::~IHyNode()
@@ -30,10 +30,10 @@ IHyNode::IHyNode(HyType eType, IHyNode *pParent /*= nullptr*/) :	m_eTYPE(eType),
 	{
 		//HyLogWarning("Deleting Scene Node with '" << m_ChildList.size() << "' children attached. These children are now orphaned");
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->Detach();
+			m_ChildList[i]->ParentDetach();
 	}
 
-	Detach();
+	ParentDetach();
 	HyScene::RemoveNode(this);
 
 	if(m_bPauseOverride)
@@ -92,21 +92,21 @@ void IHyNode::SetTag(int64 iTag)
 	m_iTag = iTag;
 }
 
-void IHyNode::AddChild(IHyNode &childInst)
+void IHyNode::ChildAppend(IHyNode &childInst)
 {
-	childInst.Detach();
+	childInst.ParentDetach();
 	childInst.m_pParent = this;
 
 	m_ChildList.push_back(&childInst);
 }
 
-bool IHyNode::InsertChild(IHyNode &insertBefore, IHyNode &childInst)
+bool IHyNode::ChildInsert(IHyNode &insertBefore, IHyNode &childInst)
 {
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
-		if((*iter) == &insertBefore || (*iter)->HasChild(insertBefore))
+		if((*iter) == &insertBefore || (*iter)->ChildFind(insertBefore))
 		{
-			childInst.Detach();
+			childInst.ParentDetach();
 			childInst.m_pParent = this;
 
 			m_ChildList.insert(iter, &childInst);
@@ -117,7 +117,7 @@ bool IHyNode::InsertChild(IHyNode &insertBefore, IHyNode &childInst)
 	return false;
 }
 
-bool IHyNode::HasChild(IHyNode &childInst)
+bool IHyNode::ChildFind(IHyNode &childInst)
 {
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
@@ -125,7 +125,7 @@ bool IHyNode::HasChild(IHyNode &childInst)
 			return true;
 		else if((*iter)->m_ChildList.empty() == false)
 		{
-			if((*iter)->HasChild(childInst))
+			if((*iter)->ChildFind(childInst))
 				return true;
 		}
 	}
@@ -133,7 +133,24 @@ bool IHyNode::HasChild(IHyNode &childInst)
 	return false;
 }
 
-void IHyNode::Detach()
+void IHyNode::ChildrenTransfer(IHyNode &newParent)
+{
+	while(m_ChildList.empty() == false)
+		newParent.ChildAppend(*m_ChildList[0]);
+}
+
+uint32 IHyNode::ChildCount()
+{
+	return static_cast<uint32>(m_ChildList.size());
+}
+
+IHyNode *IHyNode::ChildGet(uint32 uiIndex)
+{
+	HyAssert(uiIndex < static_cast<uint32>(m_ChildList.size()), "IHyNode::ChildGet passed an invalid index");
+	return m_ChildList[uiIndex];
+}
+
+void IHyNode::ParentDetach()
 {
 	if(m_pParent == nullptr)
 		return;
@@ -148,20 +165,20 @@ void IHyNode::Detach()
 		}
 	}
 
-	HyError("IHyNode::Detach() could not find itself in parent's child list");
+	HyError("IHyNode::ParentDetach() could not find itself in parent's child list");
 }
 
-bool IHyNode::HasParent()
+bool IHyNode::ParentExists()
 {
 	return m_pParent != nullptr;
 }
 
-void IHyNode::ForEachNode(std::function<void(IHyNode *)> func)
+void IHyNode::ForEachChild(std::function<void(IHyNode *)> func)
 {
 	func(this);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->ForEachNode(func);
+		m_ChildList[i]->ForEachChild(func);
 }
 
 void IHyNode::Update()
