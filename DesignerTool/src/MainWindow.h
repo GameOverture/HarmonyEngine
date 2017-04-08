@@ -100,6 +100,8 @@ private Q_SLOTS:
 
     void on_actionAudioManager_triggered();
     
+    void on_actionExit_triggered();
+
 private:
     Ui::MainWindow *ui;
 

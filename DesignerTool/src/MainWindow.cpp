@@ -612,3 +612,8 @@ void MainWindow::on_actionAudioManager_triggered()
 {
     ui->dockWidgetAudio->setHidden(!ui->dockWidgetAudio->isHidden());
 }
+
+void MainWindow::on_actionExit_triggered()
+{
+    close();
+}
