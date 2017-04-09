@@ -14,6 +14,7 @@
 #include "DlgNewProject.h"
 #include "DlgNewItem.h"
 #include "DlgInputName.h"
+#include "DlgProjectSettings.h"
 
 #include "ExplorerWidget.h"
 #include "AtlasWidget.h"
@@ -94,6 +95,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     m_pCurSaveAllAction = ui->actionSaveAll;
     
     // Link the actions to their proper widgets
+    ui->explorer->addAction(ui->actionProjectSettings);
     ui->explorer->addAction(ui->actionCloseProject);
     ui->explorer->addAction(ui->actionCopy);
     ui->explorer->addAction(ui->actionCut);
@@ -616,4 +618,18 @@ void MainWindow::on_actionAudioManager_triggered()
 void MainWindow::on_actionExit_triggered()
 {
     close();
+}
+
+void MainWindow::on_actionProjectSettings_triggered()
+{
+    if(ui->explorer->GetCurProjSelected() == nullptr)
+        return;
+
+    DlgProjectSettings *pDlg = new DlgProjectSettings(*ui->explorer->GetCurProjSelected(), this);
+    if(pDlg->exec() == QDialog::Accepted)
+    {
+        pDlg->SaveSettings();
+    }
+
+    delete pDlg;
 }

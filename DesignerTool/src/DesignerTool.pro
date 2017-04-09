@@ -64,7 +64,8 @@ SOURCES += main.cpp \
     AtlasModel.cpp \
     AtlasWidget.cpp \
     ProjectDraw.cpp \
-    IModel.cpp
+    IModel.cpp \
+    DlgProjectSettings.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -115,7 +116,8 @@ HEADERS  += \
     AtlasModel.h \
     AtlasWidget.h \
     ProjectDraw.h \
-    IModel.h
+    IModel.h \
+    DlgProjectSettings.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -138,7 +140,8 @@ FORMS    += \
     AudioWidgetManager.ui \
     AudioWidgetState.ui \
     ExplorerWidget.ui \
-    AtlasWidget.ui
+    AtlasWidget.ui \
+    DlgProjectSettings.ui
 
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER HY_PLATFORM_GUI
 

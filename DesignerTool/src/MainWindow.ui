@@ -591,6 +591,14 @@
     <string>Dockable tool panel that imports audio</string>
    </property>
   </action>
+  <action name="actionProjectSettings">
+   <property name="text">
+    <string>Project Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Changes project settings such as the name, initial resolution, assets location, etc.</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

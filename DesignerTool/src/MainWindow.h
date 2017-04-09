@@ -102,6 +102,8 @@ private Q_SLOTS:
     
     void on_actionExit_triggered();
 
+    void on_actionProjectSettings_triggered();
+
 private:
     Ui::MainWindow *ui;
 

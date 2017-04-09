@@ -290,15 +290,18 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
     
     QMenu contextMenu;
 
-    if(pTreeNode == NULL)
+    if(pTreeNode == nullptr)
     {
         contextMenu.addAction(FINDACTION("actionNewProject"));
         contextMenu.addAction(FINDACTION("actionOpenProject"));
     }
     else
     {
-        if(pTreeNode->parent() == NULL)
+        if(pTreeNode->parent() == nullptr)
+        {
             contextMenu.addAction(FINDACTION("actionCloseProject"));
+            contextMenu.addAction(FINDACTION("actionProjectSettings"));
+        }
         else
         {
             

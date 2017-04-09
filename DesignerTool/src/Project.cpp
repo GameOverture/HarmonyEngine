@@ -61,16 +61,16 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     QJsonDocument settingsDoc = QJsonDocument::fromJson(projFile.readAll());
     projFile.close();
 
-    QJsonObject projPathsObj = settingsDoc.object();
+    m_SettingsObj = settingsDoc.object();
 
-    m_sGameName                 = projPathsObj["GameName"].toString();
-    m_pTreeItemPtr->setText(0, m_sGameName);
+//    m_sGameName                 = projPathsObj["GameName"].toString();
 
-    m_sRelativeAssetsLocation   = projPathsObj["DataPath"].toString();
-    m_sRelativeMetaDataLocation = projPathsObj["MetaDataPath"].toString();
-    m_sRelativeSourceLocation   = projPathsObj["SourcePath"].toString();
+//    m_sRelativeAssetsLocation   = projPathsObj["DataPath"].toString();
+//    m_sRelativeMetaDataLocation = projPathsObj["MetaDataPath"].toString();
+//    m_sRelativeSourceLocation   = projPathsObj["SourcePath"].toString();
 
 
+    m_pTreeItemPtr->setText(0, GetName(false));
     m_Init.sGameName = GetName(false).toStdString();
     m_Init.sDataDir = GetAssetsAbsPath().toStdString();
 
@@ -279,6 +279,11 @@ bool Project::HasError() const
     return m_bHasError;
 }
 
+QJsonObject Project::GetSettingsObj() const
+{
+    return m_SettingsObj;
+}
+
 QString Project::GetDirPath() const
 {
     QFileInfo file(m_sPATH);
@@ -287,7 +292,7 @@ QString Project::GetDirPath() const
 
 QString Project::GetGameName() const
 {
-    return m_sGameName;
+    return m_SettingsObj["GameName"].toString();
 }
 
 QString Project::GetAbsPath() const
@@ -297,32 +302,32 @@ QString Project::GetAbsPath() const
 
 QString Project::GetAssetsAbsPath() const
 {
-    return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeAssetsLocation) + '/';
+    return QDir::cleanPath(GetDirPath() + '/' + m_SettingsObj["DataPath"].toString() /*m_sRelativeAssetsLocation*/) + '/';
 }
 
 QString Project::GetAssetsRelPath() const
 {
-    return QDir::cleanPath(m_sRelativeAssetsLocation) + '/';
+    return QDir::cleanPath(m_SettingsObj["DataPath"].toString()/*m_sRelativeAssetsLocation*/) + '/';
 }
 
 QString Project::GetMetaDataAbsPath() const
 {
-    return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeMetaDataLocation) + '/';
+    return QDir::cleanPath(GetDirPath() + '/' + m_SettingsObj["MetaDataPath"].toString()/*m_sRelativeMetaDataLocation*/) + '/';
 }
 
 QString Project::GetMetaDataRelPath() const
 {
-    return QDir::cleanPath(m_sRelativeMetaDataLocation) + '/';
+    return QDir::cleanPath(m_SettingsObj["MetaDataPath"].toString()/*m_sRelativeMetaDataLocation*/) + '/';
 }
 
 QString Project::GetSourceAbsPath() const
 {
-    return QDir::cleanPath(GetDirPath() + '/' + m_sRelativeSourceLocation) + '/';
+    return QDir::cleanPath(GetDirPath() + '/' + m_SettingsObj["SourcePath"].toString() /*m_sRelativeSourceLocation*/) + '/';
 }
 
 QString Project::GetSourceRelPath() const
 {
-    return QDir::cleanPath(m_sRelativeSourceLocation) + '/';
+    return QDir::cleanPath(m_SettingsObj["SourcePath"].toString()/*m_sRelativeSourceLocation*/) + '/';
 }
 
 AtlasModel &Project::GetAtlasModel()

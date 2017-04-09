@@ -29,6 +29,7 @@ class Project : public ExplorerItem, public IHyApplication
     Q_OBJECT
 
     ProjectDraw *                                   m_pDraw;
+    QJsonObject                                     m_SettingsObj;
 
     AtlasModel *                                    m_pAtlasModel;
     AtlasWidget *                                   m_pAtlasWidget;
@@ -38,11 +39,11 @@ class Project : public ExplorerItem, public IHyApplication
 
     ProjectItem *                                   m_pCurOpenItem;
     
-    QString                                         m_sGameName;
+    //QString                                         m_sGameName;
 
-    QString                                         m_sRelativeAssetsLocation;
-    QString                                         m_sRelativeMetaDataLocation;
-    QString                                         m_sRelativeSourceLocation;
+    //QString                                         m_sRelativeAssetsLocation;
+    //QString                                         m_sRelativeMetaDataLocation;
+    //QString                                         m_sRelativeSourceLocation;
 
     QAction                                         m_ActionSave;
     QAction                                         m_ActionSaveAll;
@@ -55,6 +56,8 @@ public:
     virtual ~Project();
     
     bool HasError() const;
+
+    QJsonObject GetSettingsObj() const;
 
     QString GetDirPath() const;
     QString GetGameName() const;
