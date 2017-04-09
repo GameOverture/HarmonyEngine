@@ -21,8 +21,8 @@ SpriteDraw::SpriteDraw(SpriteModel &modelRef, IHyApplication &hyApp) :  IDraw(hy
     m_primOriginHorz.SetTint(1.0f, 0.0f, 0.0f);
     m_primOriginVert.SetTint(1.0f, 0.0f, 0.0f);
 
-    AddChild(m_primOriginHorz);
-    AddChild(m_primOriginVert);
+    ChildAppend(m_primOriginHorz);
+    ChildAppend(m_primOriginVert);
 
     for(int i = 0; i < modelRef.GetNumStates(); ++i)
     {

@@ -133,7 +133,7 @@ ProjectDraw::ProjectDraw(IHyApplication &hyApp) : IDraw(hyApp)
     m_CheckerGridBG.SetDisplayOrder(-1000);
     m_CheckerGridBG.SetSurfaceSize(10000, 10000);  // Use a large size that is a multiple of grid size (25)
 
-    AddChild(m_CheckerGridBG);
+    ChildAppend(m_CheckerGridBG);
 }
 
 /*virtual*/ ProjectDraw::~ProjectDraw()

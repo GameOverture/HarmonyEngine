@@ -249,6 +249,18 @@
     <string>Insert a new filter to organize images</string>
    </property>
   </action>
+  <action name="actionRename">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename</string>
+   </property>
+   <property name="toolTip">
+    <string>Renames the selected filter or frame</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

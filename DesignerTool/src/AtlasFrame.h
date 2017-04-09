@@ -53,6 +53,7 @@ public:
     quint32 GetId();
     quint32 GetImageChecksum();
     QString GetName();
+    void SetName(QString sNewName);
     QSize GetSize();
     QRect GetCrop();
     QPoint GetPosition();

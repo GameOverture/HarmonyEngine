@@ -94,6 +94,8 @@ private Q_SLOTS:
 
     void OnContextMenu(const QPoint &pos);
 
+    void on_actionRename_triggered();
+
 private:
     Ui::AtlasWidget *ui;
 

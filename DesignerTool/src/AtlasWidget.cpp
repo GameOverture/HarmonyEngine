@@ -19,6 +19,7 @@
 #include <QJsonObject>
 #include <QImage>
 #include <QPainter>
+#include <QMessageBox>
 
 #include "MainWindow.h"
 #include "DlgInputName.h"
@@ -248,7 +249,10 @@ void AtlasWidget::on_actionDeleteImages_triggered()
             return;
         }
     }
-    
+
+    if(QMessageBox::No == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete " % QString::number(selectedFrameList.size()) % " frames?", QMessageBox::Yes, QMessageBox::No))
+        return;
+
     // No dependencies found, resume with deleting
     QSet<int> affectedTextureIndexSet;
     for(int i = 0; i < selectedFrameList.count(); ++i)
@@ -262,6 +266,10 @@ void AtlasWidget::on_actionDeleteImages_triggered()
 
     if(affectedTextureIndexSet.empty() == false)
         m_pModel->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
+
+    // TODO: Delete the selected filters (not working)
+    for(int i = 0; i < selectedFilterList.size(); ++i)
+        ui->atlasList->removeItemWidget(selectedFilterList[i], 0);
 }
 
 void AtlasWidget::on_actionReplaceImages_triggered()
@@ -356,6 +364,8 @@ void AtlasWidget::on_atlasList_itemSelectionChanged()
     m_Draw.SetSelected(ui->atlasList->selectedItems());
     int iNumSelected = ui->atlasList->selectedItems().count();
 
+    ui->actionRename->setEnabled(iNumSelected == 1);
+
     ui->actionDeleteImages->setEnabled(iNumSelected != 0);
     ui->actionReplaceImages->setEnabled(iNumSelected != 0);
 }
@@ -374,6 +384,7 @@ void AtlasWidget::OnContextMenu(const QPoint &pos)
     {
         contextMenu.addAction(ui->actionDeleteImages);
         contextMenu.addAction(ui->actionReplaceImages);
+        contextMenu.addAction(ui->actionRename);
     }
 
     QAction* selectedItem = contextMenu.exec(globalPos);
@@ -406,4 +417,25 @@ void AtlasWidget::GetSelectedTreeItems(QList<QTreeWidgetItem *> selectedTreeItem
         else
             frameListRef.append(selectedTreeItems[i]);
     }
+}
+
+void AtlasWidget::on_actionRename_triggered()
+{
+    QTreeWidgetItem *pSelectedItem = ui->atlasList->selectedItems()[0];
+
+    DlgInputName *pDlg = new DlgInputName("Rename " % pSelectedItem->text(0), pSelectedItem->text(0));
+    if(pDlg->exec() == QDialog::Accepted)
+    {
+        if(pSelectedItem->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+            pSelectedItem->setText(0, pDlg->GetName());
+        else
+        {
+            AtlasFrame *pFrame = pSelectedItem->data(0, Qt::UserRole).value<AtlasFrame *>();
+            pFrame->SetName(pDlg->GetName());
+
+            m_pModel->WriteMetaSettings();
+        }
+    }
+
+    delete pDlg;
 }

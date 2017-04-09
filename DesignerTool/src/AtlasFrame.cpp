@@ -74,6 +74,12 @@ QString AtlasFrame::GetName()
     return m_sName;
 }
 
+void AtlasFrame::SetName(QString sNewName)
+{
+    m_sName = sNewName;
+    m_pTreeWidgetItem->setText(0, m_sName);
+}
+
 QSize AtlasFrame::GetSize()
 {
     return QSize(m_iWidth, m_iHeight);
