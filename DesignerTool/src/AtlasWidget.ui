@@ -222,7 +222,7 @@
     <string>Delete Images</string>
    </property>
    <property name="toolTip">
-    <string>Removes the selected image(s) from the atlas group. The entire group will then be regenerated.</string>
+    <string>Removes the selected image(s) from the atlas manager. All affected textures will be regenerated.</string>
    </property>
   </action>
   <action name="actionReplaceImages">
@@ -234,7 +234,7 @@
     <string>Replace Images</string>
    </property>
    <property name="toolTip">
-    <string>Replace the selected image(s) from the atlas group. The entire group will then be regenerated.</string>
+    <string>Replace the selected frame(s) from the atlas manager. All affected textures will be regnerated.</string>
    </property>
   </action>
   <action name="actionAddFilter">

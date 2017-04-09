@@ -92,8 +92,12 @@ private Q_SLOTS:
 
     void on_atlasList_itemSelectionChanged();
 
+    void OnContextMenu(const QPoint &pos);
+
 private:
     Ui::AtlasWidget *ui;
+
+    void GetSelectedTreeItems(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef);
 };
 
 #endif // ATLASWIDGET_H

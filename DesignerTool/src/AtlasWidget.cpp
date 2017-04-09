@@ -103,7 +103,9 @@ AtlasWidget::AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *pa
     ui->lcdTexHeight->display(m_pModel->GetAtlasDimensions().height());
 
     ui->atlasList->collapseAll();
-    
+
+    ui->atlasList->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->atlasList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 }
 
 AtlasWidget::~AtlasWidget()
@@ -224,12 +226,17 @@ void AtlasWidget::on_btnSettings_clicked()
 
 void AtlasWidget::on_actionDeleteImages_triggered()
 {
-    QList<QTreeWidgetItem *> selectedImageList = ui->atlasList->selectedItems();
+    QList<QTreeWidgetItem *> selectedTreeItemList = ui->atlasList->selectedItems();
+
+    QList<QTreeWidgetItem *> selectedFrameList;
+    QList<QTreeWidgetItem *> selectedFilterList;
+
+    GetSelectedTreeItems(selectedTreeItemList, selectedFrameList, selectedFilterList);
     
     // First loop through and check to see if any links are present, and abort if dependecies are found
-    for(int i = 0; i < selectedImageList.count(); ++i)
+    for(int i = 0; i < selectedFrameList.count(); ++i)
     {
-        AtlasFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
+        AtlasFrame *pFrame = selectedFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
         QSet<ProjectItem *> sLinks = pFrame->GetLinks();
         if(sLinks.empty() == false)
         {
@@ -244,16 +251,17 @@ void AtlasWidget::on_actionDeleteImages_triggered()
     
     // No dependencies found, resume with deleting
     QSet<int> affectedTextureIndexSet;
-    for(int i = 0; i < selectedImageList.count(); ++i)
+    for(int i = 0; i < selectedFrameList.count(); ++i)
     {
-        AtlasFrame *pFrame = selectedImageList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
+        AtlasFrame *pFrame = selectedFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
         affectedTextureIndexSet.insert(pFrame->GetTextureIndex());
 
         m_pModel->RemoveFrame(pFrame);
-        delete selectedImageList[i];
+        delete selectedFrameList[i];
     }
 
-    m_pModel->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
+    if(affectedTextureIndexSet.empty() == false)
+        m_pModel->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
 }
 
 void AtlasWidget::on_actionReplaceImages_triggered()
@@ -350,4 +358,52 @@ void AtlasWidget::on_atlasList_itemSelectionChanged()
 
     ui->actionDeleteImages->setEnabled(iNumSelected != 0);
     ui->actionReplaceImages->setEnabled(iNumSelected != 0);
+}
+
+void AtlasWidget::OnContextMenu(const QPoint &pos)
+{
+    QPoint globalPos = ui->atlasList->mapToGlobal(pos);
+    QTreeWidgetItem *pTreeNode = ui->atlasList->itemAt(pos);
+
+    QMenu contextMenu;
+    if(pTreeNode == NULL)
+    {
+        contextMenu.addAction(ui->actionAddFilter);
+    }
+    else
+    {
+        contextMenu.addAction(ui->actionDeleteImages);
+        contextMenu.addAction(ui->actionReplaceImages);
+    }
+
+    QAction* selectedItem = contextMenu.exec(globalPos);
+    if (selectedItem)
+    {
+        // which returns a QTreeWidgetItem.
+       // something was chosen, do stuff
+    }
+    else
+    {
+       // nothing was chosen
+    }
+}
+
+void AtlasWidget::GetSelectedTreeItems(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef)
+{
+    // First determine if any selected QTreeWidgetItem is a filter
+    for(int i = 0; i < selectedTreeItems.count(); ++i)
+    {
+        if(selectedTreeItems[i]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+        {
+            filterListRef.append(selectedTreeItems[i]);
+
+            QList<QTreeWidgetItem *> filterContentsList;
+            for(int j = 0; j < selectedTreeItems[i]->childCount(); ++j)
+                filterContentsList.append(selectedTreeItems[i]->child(j));
+
+            GetSelectedTreeItems(filterContentsList, frameListRef, filterListRef);
+        }
+        else
+            frameListRef.append(selectedTreeItems[i]);
+    }
 }

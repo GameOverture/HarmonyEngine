@@ -488,7 +488,20 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, eAtlasNodeT
     {
         // TODO: Should I care about overwriting a duplicate image?
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
-        m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
+
+        QList<QTreeWidgetItem *> selectedList = m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->selectedItems();
+
+        if(selectedList.empty() == false)
+        {
+            if(selectedList[0]->parent() != nullptr)
+                selectedList[0]->parent()->addChild(pNewFrame->GetTreeItem());
+            else if(selectedList[0]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+                selectedList[0]->addChild(pNewFrame->GetTreeItem());
+            else
+                m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
+        }
+        else
+            m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
     }
 
     return pNewFrame;
