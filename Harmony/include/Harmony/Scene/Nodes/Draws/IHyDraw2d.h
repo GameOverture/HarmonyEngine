@@ -59,9 +59,7 @@ protected:
 	eMouseInputState				m_eMouseInputState;
 	void *							m_pMouseInputUserParam;
 
-	HyCoordinateType				m_eCoordType;
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
-	int32							m_iDisplayOrderMax;	// The highest display order in this hierarchy (children attached)
 	HyRenderState					m_RenderState;
 	HyScreenRect<int32>				m_LocalScissorRect;
 
@@ -84,16 +82,17 @@ public:
 	IHyNodeData *AcquireData();
 
 	HyCoordinateType GetCoordinateType();
-	void SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom);
+	void SetCoordinateType(HyCoordinateType eCoordType);
 
 	int32 GetDisplayOrder() const;
-	int32 GetDisplayOrderMax() const;
-	void SetDisplayOrder(int32 iOrderValue);
+
+	// Returns the max display order assigned to children
+	int32 SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren = true);
 
 	void SetTint(float fR, float fG, float fB);
 	void SetTint(uint32 uiColor);
 
-	void EnableMouseInput(bool bEnable, void *pUserParam = NULL);
+	void EnableMouseInput(bool bEnable, void *pUserParam = nullptr);
 	void EnableCollider(bool bEnable);
 	void EnablePhysics(bool bEnable);
 
@@ -114,6 +113,8 @@ protected:
 	IHyNodeData *UncheckedGetData();
 	void MakeBoundingVolumeDirty();
 
+	virtual void SetNewChildAttributes(IHyNode &childInst);
+
 private:
 	const HyRenderState &GetRenderState() const;
 
@@ -132,6 +133,8 @@ private:
 	virtual void OnMouseClicked(void *pUserParam) { }
 
 	virtual void InstUpdate() override final;
+
+	int32 _SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
 };
 
 #endif /* __IHyInst2d_h__ */

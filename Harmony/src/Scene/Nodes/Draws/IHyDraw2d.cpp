@@ -27,7 +27,6 @@ IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName,
 																													m_eMouseInputState(MOUSEINPUT_None),
 																													m_pMouseInputUserParam(nullptr),
 																													m_iDisplayOrder(0),
-																													m_iDisplayOrderMax(0),
 																													topColor(*this),
 																													botColor(*this),
 																													m_fAlpha(1.0f),
@@ -77,38 +76,17 @@ IHyNodeData *IHyDraw2d::AcquireData()
 
 HyCoordinateType IHyDraw2d::GetCoordinateType()
 {
-	return m_eCoordType;
+	return m_RenderState.IsEnabled(HyRenderState::USINGSCREENCOORDS) ? HYCOORDTYPE_Screen : HYCOORDTYPE_Camera;
 }
 
-void IHyDraw2d::SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCameraToCovertFrom)
+void IHyDraw2d::SetCoordinateType(HyCoordinateType eCoordType)
 {
+	HyAssert(m_pParent == nullptr, "IHyDraw2d::SetCoordinateType() should only be set on a top level node (i.e. not a child node)");
+
 	if(eCoordType == HYCOORDTYPE_Default)
 		eCoordType = HyDefaultCoordinateType();
 
-	if(pCameraToCovertFrom)
-	{
-		HyError("IHyDraw2d::SetCoordinateType() conversion code needs implementation");
-		switch(eCoordType)
-		{
-		case HYCOORDTYPE_Camera:
-			if(m_eCoordType == HYCOORDTYPE_Camera)
-				break;
-
-			pos.X(pCameraToCovertFrom->pos.X() + (pCameraToCovertFrom->GetWindow().GetResolution().x * 0.5f));
-			pos.X(pCameraToCovertFrom->GetWindow().GetResolution().y * 0.5f);
-			break;
-
-		case HYCOORDTYPE_Screen:
-			if(m_eCoordType == HYCOORDTYPE_Screen)
-				break;
-
-			//pos.X(pCameraToCovertFrom->
-			break;
-		}
-	}
-	
-	m_eCoordType = eCoordType;
-	if(m_eCoordType == HYCOORDTYPE_Screen)
+	if(eCoordType == HYCOORDTYPE_Screen)
 		m_RenderState.Enable(HyRenderState::USINGSCREENCOORDS);
 	else
 		m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
@@ -116,7 +94,12 @@ void IHyDraw2d::SetCoordinateType(HyCoordinateType eCoordType, HyCamera2d *pCame
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(m_ChildList[i]->IsDraw2d())
-			static_cast<IHyDraw2d *>(m_ChildList[i])->SetCoordinateType(eCoordType, pCameraToCovertFrom);
+		{
+			if(eCoordType == HYCOORDTYPE_Screen)
+				static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.Enable(HyRenderState::USINGSCREENCOORDS);
+			else
+				static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
+		}
 	}
 }
 
@@ -125,28 +108,21 @@ int32 IHyDraw2d::GetDisplayOrder() const
 	return m_iDisplayOrder;
 }
 
-int32 IHyDraw2d::GetDisplayOrderMax() const
-{
-	return m_iDisplayOrderMax;
-}
-
-void IHyDraw2d::SetDisplayOrder(int32 iOrderValue)
+// Returns the max display order assigned to children
+int32 IHyDraw2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren /*= true*/)
 {
 	m_iDisplayOrder = iOrderValue;
+	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(m_ChildList[i]->IsDraw2d())
-		{
-			++iOrderValue;
-			static_cast<IHyDraw2d *>(m_ChildList[i])->SetDisplayOrder(iOrderValue);
-			iOrderValue = static_cast<IHyDraw2d *>(m_ChildList[i])->GetDisplayOrderMax();
-		}
+			iOrderValue = static_cast<IHyDraw2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
 	}
 
-	m_iDisplayOrderMax = iOrderValue;
-
 	HyScene::SetInstOrderingDirty();
+
+	return iOrderValue;
 }
 
 void IHyDraw2d::SetTint(float fR, float fG, float fB)
@@ -246,7 +222,7 @@ void IHyDraw2d::Load()
 	HyAssert(sm_pHyAssets, "IHyDraw2d::Load was invoked before engine has been initialized");
 
 	if(GetCoordinateType() == HYCOORDTYPE_Default)
-		SetCoordinateType(HyDefaultCoordinateType(), NULL);
+		SetCoordinateType(HyDefaultCoordinateType());
 	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
 		SetCoordinateUnit(HyDefaultCoordinateUnit(), false);
 
@@ -295,6 +271,24 @@ IHyNodeData *IHyDraw2d::UncheckedGetData()
 void IHyDraw2d::MakeBoundingVolumeDirty()
 {
 	m_uiAttributes |= ATTRIBFLAG_BoundingVolumeDirty;
+}
+
+/*virtual*/ void IHyDraw2d::SetNewChildAttributes(IHyNode &childInst)
+{
+	IHyNode::SetNewChildAttributes(childInst);
+
+	if(childInst.IsDraw2d())
+	{
+		if(GetCoordinateType() == HYCOORDTYPE_Screen)
+			static_cast<IHyDraw2d &>(childInst).m_RenderState.Enable(HyRenderState::USINGSCREENCOORDS);
+		else
+			static_cast<IHyDraw2d &>(childInst).m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
+
+		static_cast<IHyDraw2d &>(childInst).alpha.Set(this->alpha.Get());
+
+		// This will reassign all the display orders in the hierarchy, including this newly added child
+		_SetDisplayOrder(m_iDisplayOrder, false);
+	}
 }
 
 const HyRenderState &IHyDraw2d::GetRenderState() const
@@ -402,4 +396,24 @@ void IHyDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 		OnUpdateUniforms();
 		m_RenderState.SetUniformCrc32(m_ShaderUniforms.GetCrc32());
 	}
+}
+
+int32 IHyDraw2d::_SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren)
+{
+	if(bOverrideExplicitChildren)
+		m_uiExplicitFlags &= ~EXPLICIT_DisplayOrder;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_DisplayOrder))
+	{
+		++iOrderValue;
+		m_iDisplayOrder = iOrderValue;
+
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		{
+			if(m_ChildList[i]->IsDraw2d())
+				iOrderValue = static_cast<IHyDraw2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
+		}
+	}
+
+	return iOrderValue;
 }

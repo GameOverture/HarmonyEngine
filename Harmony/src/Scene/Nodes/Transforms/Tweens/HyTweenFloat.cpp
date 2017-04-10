@@ -21,7 +21,7 @@ HyTweenFloat::HyTweenFloat(float &valueReference, IHyNode &ownerRef) :	m_fValueR
 																				m_fElapsedTime(0.0f),
 																				m_fpTweenFunc(NULL),
 																				m_fpBehaviorUpdate(NULL),
-																				m_fpTweenFinishedFunc(HyTween::_NullTweenCallback),
+																				m_fpTweenFinishedFunc(HyTween::NullTweenCallback),
 																				m_bAddedToOwnerUpdate(false)
 {
 }
@@ -59,7 +59,7 @@ bool HyTweenFloat::IsTweening()
 	return m_bAddedToOwnerUpdate;
 }
 
-void HyTweenFloat::Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpTweenFunc /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::_NullTweenCallback*/)
+void HyTweenFloat::Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpTweenFunc /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::NullTweenCallback*/)
 {
 	m_fStart = m_fValueRef;
 	m_fTarget = fTo;
@@ -72,7 +72,7 @@ void HyTweenFloat::Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpTweenFun
 	m_OwnerRef.InsertActiveAnimFloat(this);
 }
 
-void HyTweenFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFunc fpTweenFunc /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::_NullTweenCallback*/)
+void HyTweenFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFunc fpTweenFunc /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::NullTweenCallback*/)
 {
 	m_fStart = m_fValueRef;
 	m_fTarget = m_fValueRef + fOffsetAmt;
@@ -88,7 +88,7 @@ void HyTweenFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFu
 void HyTweenFloat::StopTween()
 {
 	m_fpBehaviorUpdate = NULL;
-	m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
+	m_fpTweenFinishedFunc = HyTween::NullTweenCallback;
 }
 
 HyTweenFloat &HyTweenFloat::operator=(const float &rhs)
@@ -205,7 +205,7 @@ bool HyTweenFloat::UpdateFloat()
 	if((this->*m_fpBehaviorUpdate)())
 	{
 		m_fpTweenFinishedFunc(&m_OwnerRef);
-		m_fpTweenFinishedFunc = HyTween::_NullTweenCallback;
+		m_fpTweenFinishedFunc = HyTween::NullTweenCallback;
 		return true;
 	}
 	else

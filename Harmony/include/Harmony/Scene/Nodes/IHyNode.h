@@ -31,23 +31,34 @@ protected:
 	IHyNode *						m_pParent;
 	std::vector<IHyNode *>			m_ChildList;
 
+	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
+	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
+	enum ExplicitFlags
+	{
+		EXPLICIT_Enabled		= 1 << 0,
+		EXPLICIT_PauseUpdate	= 1 << 1,
+		EXPLICIT_DisplayOrder	= 1 << 2,
+		EXPLICIT_Tint			= 1 << 3,
+		EXPLICIT_Alpha			= 1 << 4,
+	};
+	uint32							m_uiExplicitFlags;
 
 	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 
 	std::vector<HyTweenFloat *>		m_ActiveAnimFloatsList;
 
 public:
-	IHyNode(HyType eInstType, IHyNode *pParent = nullptr);
+	IHyNode(HyType eInstType, IHyNode *pParent);
 	virtual ~IHyNode();
 	
 	HyType GetType();
 	bool IsDraw2d();
 
 	bool IsEnabled();
-	virtual void SetEnabled(bool bEnabled);
+	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren = true);
 
 	// Sets whether to Update when game is paused
-	void SetPauseOverride(bool bPauseOverride);
+	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren = true);
 
 	int64 GetTag();
 	void SetTag(int64 iTag);
@@ -70,6 +81,13 @@ protected:
 
 	void SetDirty();
 	void InsertActiveAnimFloat(HyTweenFloat *pAnimFloat);
+
+	virtual void SetNewChildAttributes(IHyNode &childInst);
+
+private:
+	void _SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
+	void _SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
+
 };
 
 #endif /* __IHyTransformNode_h__ */

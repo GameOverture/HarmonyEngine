@@ -221,7 +221,7 @@ public:
 	}
 
 	// Default (do-nothing) callback when tween finishes
-	static void _NullTweenCallback(IHyNode *)
+	static void NullTweenCallback(IHyNode *)
 	{ }
 };
 #endif /* __HyTweenFuncs_h__ */

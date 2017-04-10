@@ -123,14 +123,14 @@ void HyTweenVec3::Offset(const HyTweenVec3 &srcVec)
 	m_AnimFloatList[2].Offset(srcVec[2]);
 }
 
-void HyTweenVec3::Tween(float fX, float fY, float fZ, float fSeconds, HyTweenUpdateFunc fpEase /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::_NullTweenCallback*/)
+void HyTweenVec3::Tween(float fX, float fY, float fZ, float fSeconds, HyTweenUpdateFunc fpEase /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::NullTweenCallback*/)
 {
 	m_AnimFloatList[0].Tween(fX, fSeconds, fpEase, tweenFinishedCallback);
 	m_AnimFloatList[1].Tween(fY, fSeconds, fpEase);
 	m_AnimFloatList[2].Tween(fZ, fSeconds, fpEase);
 }
 
-void HyTweenVec3::TweenOffset(float fOffsetX, float fOffsetY, float fOffsetZ, float fSeconds, HyTweenUpdateFunc fpEase /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::_NullTweenCallback*/)
+void HyTweenVec3::TweenOffset(float fOffsetX, float fOffsetY, float fOffsetZ, float fSeconds, HyTweenUpdateFunc fpEase /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::NullTweenCallback*/)
 {
 	m_AnimFloatList[0].TweenOffset(fOffsetX, fSeconds, fpEase, tweenFinishedCallback);
 	m_AnimFloatList[1].TweenOffset(fOffsetY, fSeconds, fpEase);
