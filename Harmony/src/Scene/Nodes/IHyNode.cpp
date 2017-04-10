@@ -225,10 +225,10 @@ void IHyNode::InsertActiveAnimFloat(HyTweenFloat *pAnimFloat)
 
 /*virtual*/ void IHyNode::SetNewChildAttributes(IHyNode &childInst)
 {
-	childInst.m_uiExplicitFlags = 0;
+	//childInst.m_uiExplicitFlags = 0;
 
-	childInst.m_bEnabled = m_bEnabled;
-	childInst.m_bPauseOverride = m_bPauseOverride;
+	childInst._SetEnabled(m_bEnabled, false);
+	childInst._SetPauseUpdate(m_bPauseOverride, false);
 }
 
 void IHyNode::_SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
