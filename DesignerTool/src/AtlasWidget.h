@@ -99,7 +99,7 @@ private Q_SLOTS:
 private:
     Ui::AtlasWidget *ui;
 
-    void GetSelectedTreeItems(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef);
+    void GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef);
 };
 
 #endif // ATLASWIDGET_H

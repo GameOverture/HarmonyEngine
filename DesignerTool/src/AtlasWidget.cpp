@@ -232,7 +232,7 @@ void AtlasWidget::on_actionDeleteImages_triggered()
     QList<QTreeWidgetItem *> selectedFrameList;
     QList<QTreeWidgetItem *> selectedFilterList;
 
-    GetSelectedTreeItems(selectedTreeItemList, selectedFrameList, selectedFilterList);
+    GetSelectedItemsRecursively(selectedTreeItemList, selectedFrameList, selectedFilterList);
     
     // First loop through and check to see if any links are present, and abort if dependecies are found
     for(int i = 0; i < selectedFrameList.count(); ++i)
@@ -250,8 +250,11 @@ void AtlasWidget::on_actionDeleteImages_triggered()
         }
     }
 
-    if(QMessageBox::No == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete " % QString::number(selectedFrameList.size()) % " frames?", QMessageBox::Yes, QMessageBox::No))
-        return;
+    if(selectedFrameList.size() > 0)
+    {
+        if(QMessageBox::No == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete " % QString::number(selectedFrameList.size()) % " frames?", QMessageBox::Yes, QMessageBox::No))
+            return;
+    }
 
     // No dependencies found, resume with deleting
     QSet<int> affectedTextureIndexSet;
@@ -267,9 +270,10 @@ void AtlasWidget::on_actionDeleteImages_triggered()
     if(affectedTextureIndexSet.empty() == false)
         m_pModel->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
 
-    // TODO: Delete the selected filters (not working)
-    for(int i = 0; i < selectedFilterList.size(); ++i)
-        ui->atlasList->removeItemWidget(selectedFilterList[i], 0);
+    // Delete the selected filters. When deleting a parent of another filter, it will delete its children too.
+    // Make sure to just delete children filters first or else it will crash, so process 'selectedFilterList' backwards
+    for(int i = selectedFilterList.size() - 1; i >= 0; --i)
+        delete selectedFilterList[i];
 }
 
 void AtlasWidget::on_actionReplaceImages_triggered()
@@ -368,6 +372,16 @@ void AtlasWidget::on_atlasList_itemSelectionChanged()
 
     ui->actionDeleteImages->setEnabled(iNumSelected != 0);
     ui->actionReplaceImages->setEnabled(iNumSelected != 0);
+    
+    QList<QTreeWidgetItem *> selectedItemList = ui->atlasList->selectedItems();
+    for(int i = 0; i < selectedItemList.size(); ++i)
+    {
+        if(selectedItemList[i]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+        {
+            ui->actionReplaceImages->setEnabled(false);
+            break;
+        }
+    }
 }
 
 void AtlasWidget::OnContextMenu(const QPoint &pos)
@@ -399,11 +413,11 @@ void AtlasWidget::OnContextMenu(const QPoint &pos)
     }
 }
 
-void AtlasWidget::GetSelectedTreeItems(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef)
+void AtlasWidget::GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef)
 {
-    // First determine if any selected QTreeWidgetItem is a filter
     for(int i = 0; i < selectedTreeItems.count(); ++i)
     {
+        // First determine if any selected QTreeWidgetItem is a filter, and dig into its children if so
         if(selectedTreeItems[i]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
         {
             filterListRef.append(selectedTreeItems[i]);
@@ -412,7 +426,7 @@ void AtlasWidget::GetSelectedTreeItems(QList<QTreeWidgetItem *> selectedTreeItem
             for(int j = 0; j < selectedTreeItems[i]->childCount(); ++j)
                 filterContentsList.append(selectedTreeItems[i]->child(j));
 
-            GetSelectedTreeItems(filterContentsList, frameListRef, filterListRef);
+            GetSelectedItemsRecursively(filterContentsList, frameListRef, filterListRef);
         }
         else
             frameListRef.append(selectedTreeItems[i]);

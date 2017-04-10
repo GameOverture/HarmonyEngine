@@ -219,7 +219,7 @@
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
-    <string>Delete Images</string>
+    <string>Delete</string>
    </property>
    <property name="toolTip">
     <string>Removes the selected image(s) from the atlas manager. All affected textures will be regenerated.</string>
