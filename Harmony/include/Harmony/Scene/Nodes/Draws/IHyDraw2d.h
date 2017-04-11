@@ -96,6 +96,7 @@ public:
 	void EnableCollider(bool bEnable);
 	void EnablePhysics(bool bEnable);
 
+	bool IsScissorSet();
 	const HyScreenRect<int32> &GetScissor();
 	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
 	void ClearScissor();

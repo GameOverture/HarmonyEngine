@@ -42,6 +42,15 @@ IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName,
 
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
+
+
+	if(m_pParent && m_pParent->IsDraw2d())
+	{
+		if(static_cast<IHyDraw2d *>(m_pParent)->m_RenderState.IsScissorRect())
+		{
+			m_RenderState.SetScissorRect(static_cast<IHyDraw2d *>(m_pParent)->m_RenderState.GetScissorRect());
+		}
+	}
 }
 
 /*virtual*/ IHyDraw2d::~IHyDraw2d(void)
@@ -158,6 +167,11 @@ void IHyDraw2d::EnableCollider(bool bEnable)
 
 void IHyDraw2d::EnablePhysics(bool bEnable)
 {
+}
+
+bool IHyDraw2d::IsScissorSet()
+{
+	return (0 != (m_uiAttributes & ATTRIBFLAG_Scissor));
 }
 
 const HyScreenRect<int32> &IHyDraw2d::GetScissor()
