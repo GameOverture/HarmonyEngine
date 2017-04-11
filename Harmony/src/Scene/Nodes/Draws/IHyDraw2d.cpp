@@ -287,7 +287,7 @@ void IHyDraw2d::MakeBoundingVolumeDirty()
 		static_cast<IHyDraw2d &>(childInst).alpha.Set(this->alpha.Get());
 
 		// This will reassign all the display orders in the hierarchy, including this newly added child
-		_SetDisplayOrder(m_iDisplayOrder, false);
+		//_SetDisplayOrder(m_iDisplayOrder, false);
 	}
 }
 
