@@ -22,7 +22,7 @@ class HyTweenFloat
 	friend class IHyNode;
 
 	float &					m_fValueRef;
-	IHyNode &		m_OwnerRef;
+	IHyNode &				m_OwnerRef;
 
 	float					m_fStart;
 	float					m_fTarget;

@@ -14,15 +14,15 @@
 #include "Utilities/HyMath.h"
 
 HyTweenFloat::HyTweenFloat(float &valueReference, IHyNode &ownerRef) :	m_fValueRef(valueReference),
-																				m_OwnerRef(ownerRef),
-																				m_fStart(0.0f),
-																				m_fTarget(0.0f),
-																				m_fDuration(0.0f),
-																				m_fElapsedTime(0.0f),
-																				m_fpTweenFunc(NULL),
-																				m_fpBehaviorUpdate(NULL),
-																				m_fpTweenFinishedFunc(HyTween::NullTweenCallback),
-																				m_bAddedToOwnerUpdate(false)
+																		m_OwnerRef(ownerRef),
+																		m_fStart(0.0f),
+																		m_fTarget(0.0f),
+																		m_fDuration(0.0f),
+																		m_fElapsedTime(0.0f),
+																		m_fpTweenFunc(NULL),
+																		m_fpBehaviorUpdate(NULL),
+																		m_fpTweenFinishedFunc(HyTween::NullTweenCallback),
+																		m_bAddedToOwnerUpdate(false)
 {
 }
 
