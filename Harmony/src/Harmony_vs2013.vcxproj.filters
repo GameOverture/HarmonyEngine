@@ -237,6 +237,9 @@
     <ClCompile Include="Diagnostics\Interop\HyConsole_Gui.cpp">
       <Filter>Diagnostics\Interop</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Nodes\Leafs\IHyLeafNode.cpp">
+      <Filter>Scene\Nodes\Leafs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -334,6 +337,9 @@
     </Filter>
     <Filter Include="Diagnostics\Interop">
       <UniqueIdentifier>{c3fdf12c-8b66-4143-935b-197586559ff3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Nodes\Leafs">
+      <UniqueIdentifier>{cbda319e-ad66-45be-a136-10d2765ca633}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -644,6 +650,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Gui.h">
       <Filter>Diagnostics\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\IHyLeafNode.h">
+      <Filter>Scene\Nodes\Leafs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

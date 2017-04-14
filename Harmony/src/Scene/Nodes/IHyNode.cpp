@@ -10,14 +10,14 @@
 #include "Scene/Nodes/IHyNode.h"
 #include "Scene/Nodes/Transforms/Tweens/HyTweenFloat.h"
 
-IHyNode::IHyNode(HyType eType, IHyNode *pParent) :	m_eTYPE(eType),
-													m_bDirty(false),
-													m_bIsDraw2d(false),
-													m_bEnabled(true),
-													m_bPauseOverride(false),
-													m_pParent(nullptr),
-													m_uiExplicitFlags(0),
-													m_iTag(0)
+IHyNode::IHyNode(HyType eNodeType, IHyNode *pParent) :	m_eTYPE(eNodeType),
+														m_bDirty(false),
+														m_bIsDraw2d(false),
+														m_bEnabled(true),
+														m_bPauseOverride(false),
+														m_pParent(nullptr),
+														m_uiExplicitFlags(0),
+														m_iTag(0)
 {
 	HyScene::AddNode(this);
 	
