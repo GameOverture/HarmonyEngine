@@ -52,12 +52,12 @@ class HyScene
 	HyGfxComms &										m_GfxCommsRef;
 	std::vector<HyWindow *> &							m_WindowListRef;
 
-	static std::vector<IHyNode *>						sm_MasterList;
+	static std::vector<IHyNode *>						sm_NodeList;				// Master list of all nodes
 
-	static std::vector<IHyNode *>						sm_PauseUpdateList;
+	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;	// List of nodes who will update when the game is paused
 	bool												m_bPauseGame;
 
-	std::vector<IHyDraw2d *>							m_LoadedInst2dList;
+	std::vector<IHyDraw2d *>							m_NodeList_Loaded;			// List of nodes who can be drawn, and their graphics assets are fully loaded
 	std::vector<IHyDraw2d *>							m_LoadedInst3dList;
 
 	// Used when writing the graphics draw buffer
@@ -67,18 +67,18 @@ public:
 	HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
 
-	static void SetInstOrderingDirty()						{ sm_bInst2dOrderingDirty = true; }
+	static void SetInstOrderingDirty()					{ sm_bInst2dOrderingDirty = true; }
 	
 	static void AddNode(IHyNode *pNode);
 	static void RemoveNode(IHyNode *pNode);
 
-	static void AddPauseOverrideNode(IHyNode *pNode);
-	static void RemovePauseOverrideNode(IHyNode *pNode);
+	static void AddNode_PauseUpdate(IHyNode *pNode);
+	static void RemoveNode_PauseUpdate(IHyNode *pNode);
 
-	void AddInstance(IHyDraw2d *pInst);
-	void RemoveInst(IHyDraw2d *pInst);
+	void AddNode_Loaded(IHyDraw2d *pInst);
+	void RemoveNode_Loaded(IHyDraw2d *pInst);
 
-	void CopyAllInsts(std::vector<IHyDraw2d *> &vInstsToCopy);
+	void CopyAllLoadedNodes(std::vector<IHyDraw2d *> &vInstsToCopy);
 
 	void DebugDrawPhysics2d(bool bDraw)					{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
 

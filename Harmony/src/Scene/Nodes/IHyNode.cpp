@@ -38,7 +38,7 @@ IHyNode::IHyNode(HyType eNodeType, IHyNode *pParent) :	m_eTYPE(eNodeType),
 	HyScene::RemoveNode(this);
 
 	if(m_bPauseOverride)
-		HyScene::RemovePauseOverrideNode(this);
+		HyScene::RemoveNode_PauseUpdate(this);
 }
 
 HyType IHyNode::GetType()
@@ -70,12 +70,12 @@ void IHyNode::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChild
 	if(bUpdateWhenPaused)
 	{
 		if(m_bPauseOverride == false)
-			HyScene::AddPauseOverrideNode(this);
+			HyScene::AddNode_PauseUpdate(this);
 	}
 	else
 	{
 		if(m_bPauseOverride == true)
-			HyScene::RemovePauseOverrideNode(this);
+			HyScene::RemoveNode_PauseUpdate(this);
 	}
 
 	m_bPauseOverride = bUpdateWhenPaused;
@@ -255,12 +255,12 @@ void IHyNode::_SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChil
 		if(bUpdateWhenPaused)
 		{
 			if(m_bPauseOverride == false)
-				HyScene::AddPauseOverrideNode(this);
+				HyScene::AddNode_PauseUpdate(this);
 		}
 		else
 		{
 			if(m_bPauseOverride == true)
-				HyScene::RemovePauseOverrideNode(this);
+				HyScene::RemoveNode_PauseUpdate(this);
 		}
 
 		m_bPauseOverride = bUpdateWhenPaused;

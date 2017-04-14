@@ -267,7 +267,7 @@ void HyAssets::RemoveGfxData(IHyDraw2d *pDrawNode2d)
 		}
 	}
 
-	m_SceneRef.RemoveInst(pDrawNode2d);
+	m_SceneRef.RemoveNode_Loaded(pDrawNode2d);
 	pDrawNode2d->m_eLoadState = HYLOADSTATE_Inactive;
 }
 
@@ -275,7 +275,7 @@ void HyAssets::RemoveGfxData(IHyDraw2d *pDrawNode2d)
 void HyAssets::Shutdown()
 {
 	std::vector<IHyDraw2d *> vReloadInsts;
-	m_SceneRef.CopyAllInsts(vReloadInsts);
+	m_SceneRef.CopyAllLoadedNodes(vReloadInsts);
 
 	for(uint32 i = 0; i < m_QueuedInst2dList.size(); ++i)
 		vReloadInsts.push_back(m_QueuedInst2dList[i]);
@@ -440,7 +440,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 
 void HyAssets::SetNodeAsLoaded(IHyDraw2d *pDrawNode2d)
 {
-	m_SceneRef.AddInstance(pDrawNode2d);
+	m_SceneRef.AddNode_Loaded(pDrawNode2d);
 	pDrawNode2d->m_eLoadState = HYLOADSTATE_Loaded;
 	pDrawNode2d->OnLoaded();
 }

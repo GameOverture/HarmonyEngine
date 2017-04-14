@@ -25,8 +25,8 @@
 #include "Time/IHyTime.h"
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
-std::vector<IHyNode *> HyScene::sm_MasterList;
-std::vector<IHyNode *> HyScene::sm_PauseUpdateList;
+std::vector<IHyNode *> HyScene::sm_NodeList;
+std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
 
 HyScene::HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
 																					m_iPhysVelocityIterations(8),
@@ -51,62 +51,62 @@ HyScene::~HyScene(void)
 
 /*static*/ void HyScene::AddNode(IHyNode *pNode)
 {
-	sm_MasterList.push_back(pNode);
+	sm_NodeList.push_back(pNode);
 }
 
 /*static*/ void HyScene::RemoveNode(IHyNode *pNode)
 {
-	for(std::vector<IHyNode *>::iterator it = sm_MasterList.begin(); it != sm_MasterList.end(); ++it)
+	for(std::vector<IHyNode *>::iterator it = sm_NodeList.begin(); it != sm_NodeList.end(); ++it)
 	{
 		if((*it) == pNode)
 		{
 			// TODO: Log about erasing Node
-			sm_MasterList.erase(it);
+			sm_NodeList.erase(it);
 			break;
 		}
 	}
 }
 
-/*static*/ void HyScene::AddPauseOverrideNode(IHyNode *pNode)
+/*static*/ void HyScene::AddNode_PauseUpdate(IHyNode *pNode)
 {
-	sm_PauseUpdateList.push_back(pNode);
+	sm_NodeList_PauseUpdate.push_back(pNode);
 }
 
-/*static*/ void HyScene::RemovePauseOverrideNode(IHyNode *pNode)
+/*static*/ void HyScene::RemoveNode_PauseUpdate(IHyNode *pNode)
 {
-	for(std::vector<IHyNode *>::iterator it = sm_PauseUpdateList.begin(); it != sm_PauseUpdateList.end(); ++it)
+	for(std::vector<IHyNode *>::iterator it = sm_NodeList_PauseUpdate.begin(); it != sm_NodeList_PauseUpdate.end(); ++it)
 	{
 		if((*it) == pNode)
 		{
 			// TODO: Log about erasing Node
-			sm_PauseUpdateList.erase(it);
+			sm_NodeList_PauseUpdate.erase(it);
 			break;
 		}
 	}
 }
 
-void HyScene::AddInstance(IHyDraw2d *pInst)
+void HyScene::AddNode_Loaded(IHyDraw2d *pInst)
 {
-	m_LoadedInst2dList.push_back(pInst);
+	m_NodeList_Loaded.push_back(pInst);
 	sm_bInst2dOrderingDirty = true;
 }
 
-void HyScene::RemoveInst(IHyDraw2d *pInst)
+void HyScene::RemoveNode_Loaded(IHyDraw2d *pInst)
 {
-	for(std::vector<IHyDraw2d *>::iterator it = m_LoadedInst2dList.begin(); it != m_LoadedInst2dList.end(); ++it)
+	for(std::vector<IHyDraw2d *>::iterator it = m_NodeList_Loaded.begin(); it != m_NodeList_Loaded.end(); ++it)
 	{
 		if((*it) == pInst)
 		{
 			// TODO: Log about erasing instance
-			m_LoadedInst2dList.erase(it);
+			m_NodeList_Loaded.erase(it);
 			break;
 		}
 	}
 }
 
-void HyScene::CopyAllInsts(std::vector<IHyDraw2d *> &vInstsToCopy)
+void HyScene::CopyAllLoadedNodes(std::vector<IHyDraw2d *> &vInstsToCopy)
 {
-	vInstsToCopy = m_LoadedInst2dList;
+	vInstsToCopy = m_NodeList_Loaded;
 }
 
 void HyScene::SetPause(bool bPause)
@@ -125,7 +125,7 @@ void HyScene::PostUpdate()
 {
 	if(sm_bInst2dOrderingDirty)
 	{
-		std::sort(m_LoadedInst2dList.begin(), m_LoadedInst2dList.end(), &Inst2dSortPredicate);
+		std::sort(m_NodeList_Loaded.begin(), m_NodeList_Loaded.end(), &Inst2dSortPredicate);
 		sm_bInst2dOrderingDirty = false;
 	}
 
@@ -134,13 +134,13 @@ void HyScene::PostUpdate()
 
 	if(m_bPauseGame == false)
 	{
-		for(uint32 i = 0; i < sm_MasterList.size(); ++i)
-			sm_MasterList[i]->Update();
+		for(uint32 i = 0; i < sm_NodeList.size(); ++i)
+			sm_NodeList[i]->Update();
 	}
 	else
 	{
-		for(uint32 i = 0; i < sm_PauseUpdateList.size(); ++i)
-			sm_PauseUpdateList[i]->Update();
+		for(uint32 i = 0; i < sm_NodeList_PauseUpdate.size(); ++i)
+			sm_NodeList_PauseUpdate[i]->Update();
 	}
 
 	WriteDrawBuffer();
@@ -242,7 +242,7 @@ void HyScene::WriteDrawBuffer()
 		if(m_LoadedInst3dList[i]->IsEnabled())
 		{
 			// TODO: 
-			//new (m_pCurWritePos) HyDrawText2d(reinterpret_cast<HyText2d *>(m_LoadedInst2dList[i]), uiVertexDataOffset, pCurVertexWritePos);
+			//new (m_pCurWritePos) HyDrawText2d(reinterpret_cast<HyText2d *>(m_NodeList_Loaded[i]), uiVertexDataOffset, pCurVertexWritePos);
 			//m_pCurWritePos += sizeof(HyDrawText2d);
 			iCount++;
 		}
@@ -256,7 +256,7 @@ void HyScene::WriteDrawBuffer()
 	m_pCurWritePos += sizeof(int32);
 
 	iCount = 0;
-	uiTotalNumInsts = static_cast<uint32>(m_LoadedInst2dList.size());
+	uiTotalNumInsts = static_cast<uint32>(m_NodeList_Loaded.size());
 
 	char *pStartVertexWritePos = m_pCurWritePos + (uiTotalNumInsts * sizeof(HyRenderState));
 	pDrawHeader->uiOffsetToVertexData2d = pStartVertexWritePos - m_GfxCommsRef.GetDrawBuffer();
@@ -267,19 +267,19 @@ void HyScene::WriteDrawBuffer()
 
 	for(size_t i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_LoadedInst2dList[i]->IsEnabled() == false)// || m_LoadedInst2dList[i]->GetRenderState().GetShaderId() < 0)
+		if(m_NodeList_Loaded[i]->IsEnabled() == false)// || m_NodeList_Loaded[i]->GetRenderState().GetShaderId() < 0)
 			continue;
 
 		// If previously written instance has equal render state by "operator ==" then it's to be assumed the instance data can be batched and doesn't need to write another render state
-		if(pCurRenderState2d == NULL || m_LoadedInst2dList[i]->GetRenderState() != *pCurRenderState2d)
+		if(pCurRenderState2d == NULL || m_NodeList_Loaded[i]->GetRenderState() != *pCurRenderState2d)
 		{
 			// Start a new draw. Write render state to buffer to be sent to render thread
-			memcpy(m_pCurWritePos, &m_LoadedInst2dList[i]->GetRenderState(), sizeof(HyRenderState));
+			memcpy(m_pCurWritePos, &m_NodeList_Loaded[i]->GetRenderState(), sizeof(HyRenderState));
 			pCurRenderState2d = reinterpret_cast<HyRenderState *>(m_pCurWritePos);
 			pCurRenderState2d->SetDataOffset(uiVertexDataOffset);
 
 			// This function is responsible for incrementing the draw pointer to after what's written
-			m_LoadedInst2dList[i]->WriteShaderUniformBuffer(pCurVertexWritePos);
+			m_NodeList_Loaded[i]->WriteShaderUniformBuffer(pCurVertexWritePos);
 
 			m_pCurWritePos += sizeof(HyRenderState);
 			iCount++;
@@ -287,11 +287,11 @@ void HyScene::WriteDrawBuffer()
 		else
 		{
 			// This instance will be batched with the current render state
-			pCurRenderState2d->AppendInstances(m_LoadedInst2dList[i]->GetRenderState().GetNumInstances());
+			pCurRenderState2d->AppendInstances(m_NodeList_Loaded[i]->GetRenderState().GetNumInstances());
 		}
 		
 		// OnWriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
-		m_LoadedInst2dList[i]->OnWriteDrawBufferData(pCurVertexWritePos);
+		m_NodeList_Loaded[i]->OnWriteDrawBufferData(pCurVertexWritePos);
 		uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
 	}
 
