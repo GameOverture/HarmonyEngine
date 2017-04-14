@@ -16,6 +16,7 @@ HyTransform3d::HyTransform3d(HyType eInstType, IHyNode *pParent /*= nullptr*/) :
 																					scale(*this),
 																					scale_pivot(*this)
 {
+	scale.Set(1.0f);
 }
 
 HyTransform3d::~HyTransform3d()
