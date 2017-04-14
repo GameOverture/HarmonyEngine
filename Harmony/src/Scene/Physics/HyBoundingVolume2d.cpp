@@ -9,9 +9,9 @@
 *************************************************************************/
 #include "Scene/Physics/HyBoundingVolume2d.h"
 
-#include "Scene/Nodes/Transforms/IHyTransform2d.h"
+#include "Scene/Nodes/Transforms/HyTransform2d.h"
 
-HyBoundingVolume2d::HyBoundingVolume2d(IHyTransform2d &ownerRef) :	m_OwnerRef(ownerRef),
+HyBoundingVolume2d::HyBoundingVolume2d(HyTransform2d &ownerRef) :	m_OwnerRef(ownerRef),
 																	m_eType(TYPE_None)
 {
 }

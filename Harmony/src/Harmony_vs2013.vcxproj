@@ -92,8 +92,8 @@
     <ClCompile Include="Scene\Nodes\Leafs\IHyLeafNode.cpp" />
     <ClCompile Include="Scene\Nodes\Misc\HyAudio2d.cpp" />
     <ClCompile Include="Scene\Nodes\Misc\HyCamera.cpp" />
-    <ClCompile Include="Scene\Nodes\Transforms\IHyTransform2d.cpp" />
-    <ClCompile Include="Scene\Nodes\Transforms\IHyTransform3d.cpp" />
+    <ClCompile Include="Scene\Nodes\Transforms\HyTransform2d.cpp" />
+    <ClCompile Include="Scene\Nodes\Transforms\HyTransform3d.cpp" />
     <ClCompile Include="Scene\Nodes\Transforms\Tweens\HyTweenFloat.cpp" />
     <ClCompile Include="Scene\Nodes\Transforms\Tweens\HyTweenFuncs.cpp" />
     <ClCompile Include="Scene\Nodes\Transforms\Tweens\HyTweenVec2.cpp" />
@@ -202,9 +202,8 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\IHyLeafNode.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyAudio2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyCamera.h" />
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\IHyTransform.h" />
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\IHyTransform2d.h" />
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\IHyTransform3d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\HyTransform2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\HyTransform3d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\Tweens\HyTweenFloat.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\Tweens\HyTweenFuncs.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\Tweens\HyTweenVec2.h" />

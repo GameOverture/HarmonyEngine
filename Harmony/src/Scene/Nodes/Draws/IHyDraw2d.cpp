@@ -18,7 +18,7 @@
 
 /*static*/ HyAssets *IHyDraw2d::sm_pHyAssets = nullptr;
 
-IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName, IHyNode *pParent /*= nullptr*/) :	IHyTransform2d(eInstType, pParent),
+IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName, IHyNode *pParent /*= nullptr*/) :	HyTransform2d(eInstType, pParent),
 																													m_eLoadState(HYLOADSTATE_Inactive),
 																													m_sPREFIX(szPrefix ? szPrefix : ""),
 																													m_sNAME(szName ? szName : ""),

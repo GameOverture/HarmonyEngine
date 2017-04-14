@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyTransform2d.cpp
+*	HyTransform2d.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2013 Jason Knobler
@@ -7,27 +7,31 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Nodes/Transforms/IHyTransform2d.h"
+#include "Scene/Nodes/Transforms/HyTransform2d.h"
 #include "HyEngine.h"
 
-IHyTransform2d::IHyTransform2d(HyType eInstType, IHyNode *pParent /*= nullptr*/) :	IHyTransform<HyTweenVec2>(eInstType, pParent),
+HyTransform2d::HyTransform2d(HyType eInstType, IHyNode *pParent /*= nullptr*/) :	IHyNode(eInstType, pParent),
 																					m_eCoordUnit(HYCOORDUNIT_Default),
 																					m_fRotation(0.0f),
 																					m_BoundingVolume(*this),
-																					rot(m_fRotation, *this)
+																					pos(*this),
+																					rot(m_fRotation, *this),
+																					rot_pivot(*this),
+																					scale(*this),
+																					scale_pivot(*this)
 {
 }
 
-IHyTransform2d::~IHyTransform2d()
+HyTransform2d::~HyTransform2d()
 {
 }
 
-HyCoordinateUnit IHyTransform2d::GetCoordinateUnit()
+HyCoordinateUnit HyTransform2d::GetCoordinateUnit()
 {
 	return m_eCoordUnit;
 }
 
-void IHyTransform2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion)
+void HyTransform2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion)
 {
 	if(eCoordUnit == HYCOORDUNIT_Default)
 		eCoordUnit = HyDefaultCoordinateUnit();
@@ -48,7 +52,7 @@ void IHyTransform2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConv
 	SetDirty();
 }
 
-/*virtual*/ void IHyTransform2d::GetLocalTransform(glm::mat4 &outMtx) const
+void HyTransform2d::GetLocalTransform(glm::mat4 &outMtx) const
 {
 	outMtx = glm::mat4(1.0f);
 
@@ -82,13 +86,13 @@ void IHyTransform2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConv
 	outMtx = glm::translate(outMtx, ptScalePivot * -1.0f);
 }
 
-void IHyTransform2d::GetWorldTransform(glm::mat4 &outMtx)
+void HyTransform2d::GetWorldTransform(glm::mat4 &outMtx)
 {
 	if(m_bDirty)
 	{
 		if(m_pParent)
 		{
-			static_cast<IHyTransform2d *>(m_pParent)->GetWorldTransform(m_mtxCached);
+			static_cast<HyTransform2d *>(m_pParent)->GetWorldTransform(m_mtxCached);
 			GetLocalTransform(outMtx);	// Just use 'outMtx' rather than pushing another mat4 on the stack
 
 			m_mtxCached *= outMtx;

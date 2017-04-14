@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Scene/Nodes/Transforms/IHyTransform2d.h"
+#include "Scene/Nodes/Transforms/HyTransform2d.h"
 #include "Scene/Nodes/Misc/HyCamera.h"
 
 #include "Assets/Nodes/IHyNodeData.h"
@@ -23,7 +23,7 @@
 
 #include <set>
 
-class IHyDraw2d : public IHyTransform2d
+class IHyDraw2d : public HyTransform2d
 {
 	friend class HyScene;
 	friend class HyAssets;

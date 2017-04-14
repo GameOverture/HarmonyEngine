@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Afx/HyInteropAfx.h"
 #include "Renderer/IHyRenderer.h"
-
 #include "Renderer/Components/HyWindow.h"
 
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;

@@ -15,11 +15,11 @@
 
 #include "Utilities/HyMath.h"
 
-class IHyTransform2d;
+class HyTransform2d;
 
 class HyBoundingVolume2d
 {
-	IHyTransform2d &		m_OwnerRef;
+	HyTransform2d &		m_OwnerRef;
 
 	enum eType
 	{
@@ -32,7 +32,7 @@ class HyBoundingVolume2d
 	b2AABB					m_WorldAABB;
 
 public:
-	HyBoundingVolume2d(IHyTransform2d &ownerRef);
+	HyBoundingVolume2d(HyTransform2d &ownerRef);
 	~HyBoundingVolume2d();
 
 	bool IsEnabled();

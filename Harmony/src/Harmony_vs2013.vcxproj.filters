@@ -156,12 +156,6 @@
     <ClCompile Include="Scene\Nodes\Misc\HyCamera.cpp">
       <Filter>Scene\Nodes\Misc</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Transforms\IHyTransform2d.cpp">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Transforms\IHyTransform3d.cpp">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Nodes\Transforms\Tweens\HyTweenFloat.cpp">
       <Filter>Scene\Nodes\Transforms\Tweens</Filter>
     </ClCompile>
@@ -239,6 +233,12 @@
     </ClCompile>
     <ClCompile Include="Scene\Nodes\Leafs\IHyLeafNode.cpp">
       <Filter>Scene\Nodes\Leafs</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Transforms\HyTransform2d.cpp">
+      <Filter>Scene\Nodes\Transforms</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Transforms\HyTransform3d.cpp">
+      <Filter>Scene\Nodes\Transforms</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -543,15 +543,6 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode.h">
       <Filter>Scene\Nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\IHyTransform.h">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\IHyTransform2d.h">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\IHyTransform3d.h">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\Tweens\HyTweenFloat.h">
       <Filter>Scene\Nodes\Transforms\Tweens</Filter>
     </ClInclude>
@@ -653,6 +644,12 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\IHyLeafNode.h">
       <Filter>Scene\Nodes\Leafs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\HyTransform2d.h">
+      <Filter>Scene\Nodes\Transforms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\HyTransform3d.h">
+      <Filter>Scene\Nodes\Transforms</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -7,18 +7,22 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Nodes/Transforms/IHyTransform3d.h"
+#include "Scene/Nodes/Transforms/HyTransform3d.h"
 
-IHyTransform3d::IHyTransform3d(HyType eInstType, IHyNode *pParent /*= nullptr*/) :	IHyTransform<HyTweenVec3>(eInstType, pParent),
-																					rot(*this)
+HyTransform3d::HyTransform3d(HyType eInstType, IHyNode *pParent /*= nullptr*/) :	IHyNode(eInstType, pParent),
+																					pos(*this),
+																					rot(*this),
+																					rot_pivot(*this),
+																					scale(*this),
+																					scale_pivot(*this)
 {
 }
 
-IHyTransform3d::~IHyTransform3d()
+HyTransform3d::~HyTransform3d()
 {
 }
 
-/*virtual*/ void IHyTransform3d::GetLocalTransform(glm::mat4 &outMtx) const
+void HyTransform3d::GetLocalTransform(glm::mat4 &outMtx) const
 {
 	outMtx = glm::mat4(1.0f);
 
