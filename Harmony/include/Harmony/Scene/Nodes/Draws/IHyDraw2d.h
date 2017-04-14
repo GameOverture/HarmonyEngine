@@ -73,7 +73,7 @@ public:
 	HyTweenVec3						botColor;
 	HyTweenFloat					alpha;
 
-	IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName, IHyNode *pParent = nullptr);
+	IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName, IHyNode2d *pParent = nullptr);
 	virtual ~IHyDraw2d(void);
 
 	const std::string &GetName();
@@ -114,7 +114,7 @@ protected:
 	IHyNodeData *UncheckedGetData();
 	void MakeBoundingVolumeDirty();
 
-	virtual void SetNewChildAttributes(IHyNode &childInst);
+	virtual void SetNewChildAttributes(IHyNode2d &childInst);
 
 private:
 	const HyRenderState &GetRenderState() const;

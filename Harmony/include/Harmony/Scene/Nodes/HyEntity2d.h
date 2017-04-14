@@ -17,8 +17,8 @@
 class HyEntity2d : public IHyDraw2d
 {
 public:
-	HyEntity2d(IHyNode *pParent = nullptr);
-	HyEntity2d(const char *szPrefix, const char *szName, IHyNode *pParent = nullptr);
+	HyEntity2d(IHyNode2d *pParent = nullptr);
+	HyEntity2d(const char *szPrefix, const char *szName, IHyNode2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
 
 	// Optional user overrides below

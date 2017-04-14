@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyNode.h
+*	IHyNode2d.h
 *
 *	Harmony Engine
 *	Copyright (c) 2016 Jason Knobler
@@ -15,7 +15,7 @@
 
 #include <functional>
 
-class IHyNode
+class IHyNode2d
 {
 	friend class HyScene;
 	friend class HyTweenFloat;
@@ -28,8 +28,8 @@ protected:
 	bool							m_bEnabled;
 	bool							m_bPauseOverride;	// Will continue to Update when game is paused
 
-	IHyNode *						m_pParent;
-	std::vector<IHyNode *>			m_ChildList;
+	IHyNode2d *						m_pParent;
+	std::vector<IHyNode2d *>			m_ChildList;
 
 	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
@@ -48,8 +48,8 @@ protected:
 	std::vector<HyTweenFloat *>		m_ActiveAnimFloatsList;
 
 public:
-	IHyNode(HyType eNodeType, IHyNode *pParent);
-	virtual ~IHyNode();
+	IHyNode2d(HyType eNodeType, IHyNode2d *pParent);
+	virtual ~IHyNode2d();
 	
 	HyType GetType();
 	bool IsDraw2d();
@@ -63,17 +63,17 @@ public:
 	int64 GetTag();
 	void SetTag(int64 iTag);
 
-	void ChildAppend(IHyNode &childInst);
-	bool ChildInsert(IHyNode &insertBefore, IHyNode &childInst);
-	bool ChildFind(IHyNode &childInst);
-	void ChildrenTransfer(IHyNode &newParent);
+	void ChildAppend(IHyNode2d &childInst);
+	bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childInst);
+	bool ChildFind(IHyNode2d &childInst);
+	void ChildrenTransfer(IHyNode2d &newParent);
 	uint32 ChildCount();
-	IHyNode *ChildGet(uint32 uiIndex);
+	IHyNode2d *ChildGet(uint32 uiIndex);
 
 	void ParentDetach();
 	bool ParentExists();
 
-	void ForEachChild(std::function<void(IHyNode *)> func);
+	void ForEachChild(std::function<void(IHyNode2d *)> func);
 
 protected:
 	void Update();
@@ -82,7 +82,7 @@ protected:
 	void SetDirty();
 	void InsertActiveAnimFloat(HyTweenFloat *pAnimFloat);
 
-	virtual void SetNewChildAttributes(IHyNode &childInst);
+	virtual void SetNewChildAttributes(IHyNode2d &childInst);
 
 private:
 	void _SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);

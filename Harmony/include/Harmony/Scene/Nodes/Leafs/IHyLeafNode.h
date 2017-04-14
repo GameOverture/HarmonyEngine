@@ -10,9 +10,9 @@
 #ifndef __IHyLeafNode_h__
 #define __IHyLeafNode_h__
 
-#include "Scene/Nodes/IHyNode.h"
+#include "Scene/Nodes/IHyNode2d.h"
 
-class IHyLeafNode : public IHyNode
+class IHyLeafNode : public IHyNode2d
 {
 	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
@@ -27,7 +27,7 @@ class IHyLeafNode : public IHyNode
 	uint32							m_uiExplicitFlags;
 
 public:
-	IHyLeafNode(HyType eNodeType, IHyNode *pParent);
+	IHyLeafNode(HyType eNodeType, IHyNode2d *pParent);
 	virtual ~IHyLeafNode();
 
 	void SetEnabled(bool bEnabled);

@@ -25,8 +25,8 @@
 #include "Time/IHyTime.h"
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
-std::vector<IHyNode *> HyScene::sm_NodeList;
-std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
+std::vector<IHyNode2d *> HyScene::sm_NodeList;
+std::vector<IHyNode2d *> HyScene::sm_NodeList_PauseUpdate;
 
 HyScene::HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
 																					m_iPhysVelocityIterations(8),
@@ -49,14 +49,14 @@ HyScene::~HyScene(void)
 	IHyDraw2d::sm_pHyAssets = NULL;
 }
 
-/*static*/ void HyScene::AddNode(IHyNode *pNode)
+/*static*/ void HyScene::AddNode(IHyNode2d *pNode)
 {
 	sm_NodeList.push_back(pNode);
 }
 
-/*static*/ void HyScene::RemoveNode(IHyNode *pNode)
+/*static*/ void HyScene::RemoveNode(IHyNode2d *pNode)
 {
-	for(std::vector<IHyNode *>::iterator it = sm_NodeList.begin(); it != sm_NodeList.end(); ++it)
+	for(std::vector<IHyNode2d *>::iterator it = sm_NodeList.begin(); it != sm_NodeList.end(); ++it)
 	{
 		if((*it) == pNode)
 		{
@@ -67,14 +67,14 @@ HyScene::~HyScene(void)
 	}
 }
 
-/*static*/ void HyScene::AddNode_PauseUpdate(IHyNode *pNode)
+/*static*/ void HyScene::AddNode_PauseUpdate(IHyNode2d *pNode)
 {
 	sm_NodeList_PauseUpdate.push_back(pNode);
 }
 
-/*static*/ void HyScene::RemoveNode_PauseUpdate(IHyNode *pNode)
+/*static*/ void HyScene::RemoveNode_PauseUpdate(IHyNode2d *pNode)
 {
-	for(std::vector<IHyNode *>::iterator it = sm_NodeList_PauseUpdate.begin(); it != sm_NodeList_PauseUpdate.end(); ++it)
+	for(std::vector<IHyNode2d *>::iterator it = sm_NodeList_PauseUpdate.begin(); it != sm_NodeList_PauseUpdate.end(); ++it)
 	{
 		if((*it) == pNode)
 		{

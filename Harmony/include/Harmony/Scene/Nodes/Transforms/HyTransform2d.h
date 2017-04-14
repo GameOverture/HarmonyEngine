@@ -10,11 +10,11 @@
 #ifndef __HyTransform2d_h__
 #define __HyTransform2d_h__
 
-#include "Scene/Nodes/IHyNode.h"
+#include "Scene/Nodes/IHyNode2d.h"
 #include "Scene/Nodes/Transforms/Tweens/HyTweenVec2.h"
 #include "Scene/Physics/HyBoundingVolume2d.h"
 
-class HyTransform2d : public IHyNode
+class HyTransform2d : public IHyNode2d
 {
 protected:
 	glm::mat4						m_mtxCached;
@@ -31,7 +31,7 @@ public:
 	HyTweenVec2						scale;
 	HyTweenVec2						scale_pivot;
 
-	HyTransform2d(HyType eInstType, IHyNode *pParent = nullptr);
+	HyTransform2d(HyType eInstType, IHyNode2d *pParent = nullptr);
 	virtual ~HyTransform2d();
 
 	HyCoordinateUnit GetCoordinateUnit();

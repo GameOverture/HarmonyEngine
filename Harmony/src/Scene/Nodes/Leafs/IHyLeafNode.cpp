@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Scene/Nodes/Leafs/IHyLeafNode.h"
 
-IHyLeafNode::IHyLeafNode(HyType eNodeType, IHyNode *pParent) :	IHyNode(eNodeType, pParent),
+IHyLeafNode::IHyLeafNode(HyType eNodeType, IHyNode2d *pParent) :	IHyNode2d(eNodeType, pParent),
 																m_uiExplicitFlags(0)
 {
 }

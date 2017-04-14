@@ -171,9 +171,6 @@
     <ClCompile Include="Scene\Nodes\HyEntity2d.cpp">
       <Filter>Scene\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\IHyNode.cpp">
-      <Filter>Scene\Nodes</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Components\HyGfxComms.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
@@ -239,6 +236,9 @@
     </ClCompile>
     <ClCompile Include="Scene\Nodes\Transforms\HyTransform3d.cpp">
       <Filter>Scene\Nodes\Transforms</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\IHyNode2d.cpp">
+      <Filter>Scene\Nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -540,9 +540,6 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\HyEntity2d.h">
       <Filter>Scene\Nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode.h">
-      <Filter>Scene\Nodes</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\Tweens\HyTweenFloat.h">
       <Filter>Scene\Nodes\Transforms\Tweens</Filter>
     </ClInclude>
@@ -650,6 +647,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\HyTransform3d.h">
       <Filter>Scene\Nodes\Transforms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode2d.h">
+      <Filter>Scene\Nodes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

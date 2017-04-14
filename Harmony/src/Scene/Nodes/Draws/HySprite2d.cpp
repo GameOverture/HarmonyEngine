@@ -11,7 +11,7 @@
 #include "Diagnostics/HyConsole.h"
 #include "Time/IHyTime.h"
 
-HySprite2d::HySprite2d(const char *szPrefix, const char *szName, IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
+HySprite2d::HySprite2d(const char *szPrefix, const char *szName, IHyNode2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
 																									m_bIsAnimPaused(false),
 																									m_fAnimPlayRate(1.0f),
 																									m_fElapsedFrameTime(0.0f),

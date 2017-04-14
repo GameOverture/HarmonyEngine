@@ -10,7 +10,7 @@
 #include "Scene/Nodes/Transforms/HyTransform2d.h"
 #include "HyEngine.h"
 
-HyTransform2d::HyTransform2d(HyType eInstType, IHyNode *pParent /*= nullptr*/) :	IHyNode(eInstType, pParent),
+HyTransform2d::HyTransform2d(HyType eInstType, IHyNode2d *pParent /*= nullptr*/) :	IHyNode2d(eInstType, pParent),
 																					m_eCoordUnit(HYCOORDUNIT_Default),
 																					m_fRotation(0.0f),
 																					m_BoundingVolume(*this),

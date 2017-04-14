@@ -13,7 +13,7 @@
 
 #include <iostream>
 
-HyText2d::HyText2d(const char *szPrefix, const char *szName, IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Text2d, szPrefix, szName, pParent),
+HyText2d::HyText2d(const char *szPrefix, const char *szName, IHyNode2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Text2d, szPrefix, szName, pParent),
 																								m_bIsDirty(true),
 																								m_sCurrentString(""),
 																								m_uiCurFontState(0),

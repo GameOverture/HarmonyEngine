@@ -10,10 +10,10 @@
 #ifndef __IHyTransform3d_h__
 #define __IHyTransform3d_h__
 
-#include "Scene/Nodes/IHyNode.h"
+#include "Scene/Nodes/IHyNode2d.h"
 #include "Scene/Nodes/Transforms/Tweens/HyTweenVec3.h"
 
-class HyTransform3d : public IHyNode
+class HyTransform3d : public IHyNode2d
 {
 public:
 	HyTweenVec3					pos;
@@ -22,7 +22,7 @@ public:
 	HyTweenVec3					scale;
 	HyTweenVec3					scale_pivot;
 
-	HyTransform3d(HyType eInstType, IHyNode *pParent = nullptr);
+	HyTransform3d(HyType eInstType, IHyNode2d *pParent = nullptr);
 	virtual ~HyTransform3d();
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;

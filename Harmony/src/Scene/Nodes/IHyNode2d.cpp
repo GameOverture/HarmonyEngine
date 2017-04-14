@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyNode.cpp
+*	IHyNode2d.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2016 Jason Knobler
@@ -7,10 +7,10 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Nodes/IHyNode.h"
+#include "Scene/Nodes/IHyNode2d.h"
 #include "Scene/Nodes/Transforms/Tweens/HyTweenFloat.h"
 
-IHyNode::IHyNode(HyType eNodeType, IHyNode *pParent) :	m_eTYPE(eNodeType),
+IHyNode2d::IHyNode2d(HyType eNodeType, IHyNode2d *pParent) :	m_eTYPE(eNodeType),
 														m_bDirty(false),
 														m_bIsDraw2d(false),
 														m_bEnabled(true),
@@ -25,7 +25,7 @@ IHyNode::IHyNode(HyType eNodeType, IHyNode *pParent) :	m_eTYPE(eNodeType),
 		pParent->ChildAppend(*this);
 }
 
-/*virtual*/ IHyNode::~IHyNode()
+/*virtual*/ IHyNode2d::~IHyNode2d()
 {
 	if(m_ChildList.empty() == false)
 	{
@@ -41,22 +41,22 @@ IHyNode::IHyNode(HyType eNodeType, IHyNode *pParent) :	m_eTYPE(eNodeType),
 		HyScene::RemoveNode_PauseUpdate(this);
 }
 
-HyType IHyNode::GetType()
+HyType IHyNode2d::GetType()
 {
 	return m_eTYPE;
 }
 
-bool IHyNode::IsDraw2d()
+bool IHyNode2d::IsDraw2d()
 {
 	return m_bIsDraw2d;
 }
 
-bool IHyNode::IsEnabled()
+bool IHyNode2d::IsEnabled()
 {
 	return m_bEnabled;
 }
 
-void IHyNode::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren /*= true*/)
+void IHyNode2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren /*= true*/)
 {
 	m_bEnabled = bEnabled;
 	m_uiExplicitFlags |= EXPLICIT_Enabled;
@@ -65,7 +65,7 @@ void IHyNode::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren /*= true*
 		m_ChildList[i]->_SetEnabled(bEnabled, bOverrideExplicitChildren);
 }
 
-void IHyNode::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren /*= true*/)
+void IHyNode2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren /*= true*/)
 {
 	if(bUpdateWhenPaused)
 	{
@@ -85,17 +85,17 @@ void IHyNode::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChild
 		m_ChildList[i]->_SetPauseUpdate(m_bPauseOverride, bOverrideExplicitChildren);
 }
 
-int64 IHyNode::GetTag()
+int64 IHyNode2d::GetTag()
 {
 	return m_iTag;
 }
 
-void IHyNode::SetTag(int64 iTag)
+void IHyNode2d::SetTag(int64 iTag)
 {
 	m_iTag = iTag;
 }
 
-void IHyNode::ChildAppend(IHyNode &childInst)
+void IHyNode2d::ChildAppend(IHyNode2d &childInst)
 {
 	childInst.ParentDetach();
 	childInst.m_pParent = this;
@@ -104,7 +104,7 @@ void IHyNode::ChildAppend(IHyNode &childInst)
 	SetNewChildAttributes(childInst);
 }
 
-bool IHyNode::ChildInsert(IHyNode &insertBefore, IHyNode &childInst)
+bool IHyNode2d::ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childInst)
 {
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
@@ -123,7 +123,7 @@ bool IHyNode::ChildInsert(IHyNode &insertBefore, IHyNode &childInst)
 	return false;
 }
 
-bool IHyNode::ChildFind(IHyNode &childInst)
+bool IHyNode2d::ChildFind(IHyNode2d &childInst)
 {
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
@@ -139,29 +139,29 @@ bool IHyNode::ChildFind(IHyNode &childInst)
 	return false;
 }
 
-void IHyNode::ChildrenTransfer(IHyNode &newParent)
+void IHyNode2d::ChildrenTransfer(IHyNode2d &newParent)
 {
 	while(m_ChildList.empty() == false)
 		newParent.ChildAppend(*m_ChildList[0]);
 }
 
-uint32 IHyNode::ChildCount()
+uint32 IHyNode2d::ChildCount()
 {
 	return static_cast<uint32>(m_ChildList.size());
 }
 
-IHyNode *IHyNode::ChildGet(uint32 uiIndex)
+IHyNode2d *IHyNode2d::ChildGet(uint32 uiIndex)
 {
-	HyAssert(uiIndex < static_cast<uint32>(m_ChildList.size()), "IHyNode::ChildGet passed an invalid index");
+	HyAssert(uiIndex < static_cast<uint32>(m_ChildList.size()), "IHyNode2d::ChildGet passed an invalid index");
 	return m_ChildList[uiIndex];
 }
 
-void IHyNode::ParentDetach()
+void IHyNode2d::ParentDetach()
 {
 	if(m_pParent == nullptr)
 		return;
 
-	for(std::vector<IHyNode *>::iterator iter = m_pParent->m_ChildList.begin(); iter != m_pParent->m_ChildList.end(); ++iter)
+	for(std::vector<IHyNode2d *>::iterator iter = m_pParent->m_ChildList.begin(); iter != m_pParent->m_ChildList.end(); ++iter)
 	{
 		if(*iter == this)
 		{
@@ -171,15 +171,15 @@ void IHyNode::ParentDetach()
 		}
 	}
 
-	HyError("IHyNode::ParentDetach() could not find itself in parent's child list");
+	HyError("IHyNode2d::ParentDetach() could not find itself in parent's child list");
 }
 
-bool IHyNode::ParentExists()
+bool IHyNode2d::ParentExists()
 {
 	return m_pParent != nullptr;
 }
 
-void IHyNode::ForEachChild(std::function<void(IHyNode *)> func)
+void IHyNode2d::ForEachChild(std::function<void(IHyNode2d *)> func)
 {
 	func(this);
 
@@ -187,7 +187,7 @@ void IHyNode::ForEachChild(std::function<void(IHyNode *)> func)
 		m_ChildList[i]->ForEachChild(func);
 }
 
-void IHyNode::Update()
+void IHyNode2d::Update()
 {
 	// Update any currently active AnimFloat associated with this transform, and remove any of them that are finished.
 	for(std::vector<HyTweenFloat *>::iterator iter = m_ActiveAnimFloatsList.begin(); iter != m_ActiveAnimFloatsList.end();)
@@ -206,7 +206,7 @@ void IHyNode::Update()
 	InstUpdate();
 }
 
-void IHyNode::SetDirty()
+void IHyNode2d::SetDirty()
 {
 	m_bDirty = true;
 
@@ -214,7 +214,7 @@ void IHyNode::SetDirty()
 		m_ChildList[i]->SetDirty();
 }
 
-void IHyNode::InsertActiveAnimFloat(HyTweenFloat *pAnimFloat)
+void IHyNode2d::InsertActiveAnimFloat(HyTweenFloat *pAnimFloat)
 {
 	if(pAnimFloat->m_bAddedToOwnerUpdate == false)
 	{
@@ -223,7 +223,7 @@ void IHyNode::InsertActiveAnimFloat(HyTweenFloat *pAnimFloat)
 	}
 }
 
-/*virtual*/ void IHyNode::SetNewChildAttributes(IHyNode &childInst)
+/*virtual*/ void IHyNode2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
 	//childInst.m_uiExplicitFlags = 0;
 
@@ -231,7 +231,7 @@ void IHyNode::InsertActiveAnimFloat(HyTweenFloat *pAnimFloat)
 	childInst._SetPauseUpdate(m_bPauseOverride, false);
 }
 
-void IHyNode::_SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
+void IHyNode2d::_SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
 {
 	if(bOverrideExplicitChildren)
 		m_uiExplicitFlags &= ~EXPLICIT_Enabled;
@@ -245,7 +245,7 @@ void IHyNode::_SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
 	}
 }
 
-void IHyNode::_SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren)
+void IHyNode2d::_SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren)
 {
 	if(bOverrideExplicitChildren)
 		m_uiExplicitFlags &= ~EXPLICIT_PauseUpdate;

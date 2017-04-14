@@ -14,15 +14,15 @@
 #include "Scene/Nodes/Transforms/Tweens/HyTweenFuncs.h"
 #include <functional>
 
-class IHyNode;
-typedef std::function<void(IHyNode *)> HyTweenFinishedCallback;
+class IHyNode2d;
+typedef std::function<void(IHyNode2d *)> HyTweenFinishedCallback;
 
 class HyTweenFloat
 {
-	friend class IHyNode;
+	friend class IHyNode2d;
 
 	float &					m_fValueRef;
-	IHyNode &				m_OwnerRef;
+	IHyNode2d &				m_OwnerRef;
 
 	float					m_fStart;
 	float					m_fTarget;
@@ -36,7 +36,7 @@ class HyTweenFloat
 	bool (HyTweenFloat::*m_fpBehaviorUpdate)();
 
 public:
-	HyTweenFloat(float &valueReference, IHyNode &ownerRef);
+	HyTweenFloat(float &valueReference, IHyNode2d &ownerRef);
 	~HyTweenFloat(void);
 
 	float Get() const;
@@ -63,7 +63,7 @@ public:
 	HyTweenFloat &operator/=(const HyTweenFloat &rhs);
 
 private:
-	// Returns false if updating is still continuing. True when finished, which signals to IHyNode to remove this instance from the ActiveAnimFloat vector
+	// Returns false if updating is still continuing. True when finished, which signals to IHyNode2d to remove this instance from the ActiveAnimFloat vector
 	bool UpdateFloat();
 
 	//////////////////////////////////////////////////////////////////////////

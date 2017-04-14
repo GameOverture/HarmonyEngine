@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Scene/Nodes/Draws/HyMesh3d.h"
 
-HyMesh3d::HyMesh3d(const char *szPrefix, const char *szName, IHyNode *pParent /*= nullptr*/) : IHyDraw2d(HYTYPE_Mesh3d, szPrefix, szName, pParent)
+HyMesh3d::HyMesh3d(const char *szPrefix, const char *szName, IHyNode2d *pParent /*= nullptr*/) : IHyDraw2d(HYTYPE_Mesh3d, szPrefix, szName, pParent)
 {
 
 }

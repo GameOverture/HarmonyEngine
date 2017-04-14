@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Scene/Nodes/Transforms/HyTransform3d.h"
 
-HyTransform3d::HyTransform3d(HyType eInstType, IHyNode *pParent /*= nullptr*/) :	IHyNode(eInstType, pParent),
+HyTransform3d::HyTransform3d(HyType eInstType, IHyNode2d *pParent /*= nullptr*/) :	IHyNode2d(eInstType, pParent),
 																					pos(*this),
 																					rot(*this),
 																					rot_pivot(*this),

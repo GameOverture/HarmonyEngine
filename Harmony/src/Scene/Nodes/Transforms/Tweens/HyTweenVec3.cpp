@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Scene/Nodes/Transforms/Tweens/HyTweenVec3.h"
 
-HyTweenVec3::HyTweenVec3(IHyNode &ownerRef)
+HyTweenVec3::HyTweenVec3(IHyNode2d &ownerRef)
 {
 	m_AnimFloatList.push_back(HyTweenFloat(m_vValue[0], ownerRef));
 	m_AnimFloatList.push_back(HyTweenFloat(m_vValue[1], ownerRef));

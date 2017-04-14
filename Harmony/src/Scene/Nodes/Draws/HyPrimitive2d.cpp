@@ -11,7 +11,7 @@
 #include "HyEngine.h"
 #include "Utilities/HyMath.h"
 
-HyPrimitive2d::HyPrimitive2d(IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
+HyPrimitive2d::HyPrimitive2d(IHyNode2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
 																m_pDrawBuffer(nullptr),
 																m_uiBufferSize(0)
 {

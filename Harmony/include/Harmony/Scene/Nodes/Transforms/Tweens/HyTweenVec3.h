@@ -22,7 +22,7 @@ class HyTweenVec3
 	std::vector<HyTweenFloat>	m_AnimFloatList;
 
 public:
-	HyTweenVec3(IHyNode &ownerRef);
+	HyTweenVec3(IHyNode2d &ownerRef);
 	~HyTweenVec3();
 
 	const glm::vec3 &Get() const;

@@ -88,7 +88,7 @@
     <ClCompile Include="Scene\Nodes\Draws\HyTexturedQuad2d.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\IHyDraw2d.cpp" />
     <ClCompile Include="Scene\Nodes\HyEntity2d.cpp" />
-    <ClCompile Include="Scene\Nodes\IHyNode.cpp" />
+    <ClCompile Include="Scene\Nodes\IHyNode2d.cpp" />
     <ClCompile Include="Scene\Nodes\Leafs\IHyLeafNode.cpp" />
     <ClCompile Include="Scene\Nodes\Misc\HyAudio2d.cpp" />
     <ClCompile Include="Scene\Nodes\Misc\HyCamera.cpp" />
@@ -198,7 +198,7 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\HyTexturedQuad2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\IHyDraw2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\HyEntity2d.h" />
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\IHyLeafNode.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyAudio2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyCamera.h" />

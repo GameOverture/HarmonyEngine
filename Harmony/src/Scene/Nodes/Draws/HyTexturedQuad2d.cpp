@@ -11,7 +11,7 @@
 
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasIndex, IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, std::to_string(uiAtlasIndex).c_str(), pParent),
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasIndex, IHyNode2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, std::to_string(uiAtlasIndex).c_str(), pParent),
 																							m_bIS_RAW(false),
 																							m_uiATLAS_INDEX(uiAtlasIndex),
 																							m_uiRAW_TEXTURE_WIDTH(0),
@@ -24,7 +24,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasIndex, IHyNode *pParent /*= nul
 	m_RenderState.SetNumVerticesPerInstance(4);
 }
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, IHyNode *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, "raw", pParent),
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, IHyNode2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, "raw", pParent),
 																																			m_bIS_RAW(true),
 																																			m_uiATLAS_INDEX(0),
 																																			m_uiRAW_TEXTURE_WIDTH(uiTextureWidth),
