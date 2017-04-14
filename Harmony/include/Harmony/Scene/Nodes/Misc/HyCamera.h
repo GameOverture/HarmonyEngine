@@ -66,6 +66,9 @@ public:
 
 	virtual void SetZoom(const float fZoom) override;
 	virtual float GetZoom() const override;
+
+private:
+	virtual void InstUpdate() override;
 };
 
 #endif /* __HyCamera_h__ */

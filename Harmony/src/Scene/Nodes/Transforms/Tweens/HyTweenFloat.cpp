@@ -8,12 +8,12 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Nodes/Transforms/Tweens/HyTweenFloat.h"
-#include "Scene/Nodes/IHyNode2d.h"
+#include "Scene/Nodes/IHyNode.h"
 
 #include "Time/IHyTime.h"
 #include "Utilities/HyMath.h"
 
-HyTweenFloat::HyTweenFloat(float &valueReference, IHyNode2d &ownerRef) :	m_fValueRef(valueReference),
+HyTweenFloat::HyTweenFloat(float &valueReference, IHyNode &ownerRef) :	m_fValueRef(valueReference),
 																		m_OwnerRef(ownerRef),
 																		m_fStart(0.0f),
 																		m_fTarget(0.0f),
@@ -196,7 +196,7 @@ HyTweenFloat &HyTweenFloat::operator/=(const HyTweenFloat &rhs)
 	return *this;
 }
 
-// Returns false if updating is still continuing. True when finished, which signals to IHyNode2d to remove this instance from the ActiveAnimFloat vector
+// Returns false if updating is still continuing. True when finished, which signals to IHyNode to remove this instance from the ActiveAnimFloat vector
 bool HyTweenFloat::UpdateFloat()
 {
 	if(m_fpBehaviorUpdate == NULL)

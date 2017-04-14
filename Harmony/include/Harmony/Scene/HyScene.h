@@ -18,6 +18,7 @@
 #include <vector>
 
 // Forward declarations
+class IHyNode;
 class IHyNode2d;
 class IHyDraw2d;
 
@@ -52,9 +53,9 @@ class HyScene
 	HyGfxComms &										m_GfxCommsRef;
 	std::vector<HyWindow *> &							m_WindowListRef;
 
-	static std::vector<IHyNode2d *>						sm_NodeList;				// Master list of all nodes
+	static std::vector<IHyNode *>						sm_NodeList;				// Master list of all nodes
 
-	static std::vector<IHyNode2d *>						sm_NodeList_PauseUpdate;	// List of nodes who will update when the game is paused
+	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;	// List of nodes who will update when the game is paused
 	bool												m_bPauseGame;
 
 	std::vector<IHyDraw2d *>							m_NodeList_Loaded;			// List of nodes who can be drawn, and their graphics assets are fully loaded
@@ -69,11 +70,11 @@ public:
 
 	static void SetInstOrderingDirty()					{ sm_bInst2dOrderingDirty = true; }
 	
-	static void AddNode(IHyNode2d *pNode);
-	static void RemoveNode(IHyNode2d *pNode);
+	static void AddNode(IHyNode *pNode);
+	static void RemoveNode(IHyNode *pNode);
 
-	static void AddNode_PauseUpdate(IHyNode2d *pNode);
-	static void RemoveNode_PauseUpdate(IHyNode2d *pNode);
+	static void AddNode_PauseUpdate(IHyNode *pNode);
+	static void RemoveNode_PauseUpdate(IHyNode *pNode);
 
 	void AddNode_Loaded(IHyDraw2d *pInst);
 	void RemoveNode_Loaded(IHyDraw2d *pInst);
@@ -90,7 +91,7 @@ private:
 	
 	void WriteDrawBuffer();
 	
-	static bool Inst2dSortPredicate(const IHyDraw2d *pInst1, const IHyDraw2d *pInst2);
+	static bool Node2dSortPredicate(const IHyDraw2d *pInst1, const IHyDraw2d *pInst2);
 };
 
 #endif /* __HyScene_h__ */

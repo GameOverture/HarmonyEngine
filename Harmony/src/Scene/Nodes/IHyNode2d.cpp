@@ -8,17 +8,14 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Nodes/IHyNode2d.h"
-#include "Scene/Nodes/Transforms/Tweens/HyTweenFloat.h"
 #include "HyEngine.h"
 
-IHyNode2d::IHyNode2d(HyType eNodeType, IHyNode2d *pParent) :	m_eTYPE(eNodeType),
+IHyNode2d::IHyNode2d(HyType eNodeType, IHyNode2d *pParent) :	IHyNode(eNodeType),
 																m_bDirty(false),
 																m_bIsDraw2d(false),
-																m_bEnabled(true),
 																m_bPauseOverride(false),
 																m_pParent(nullptr),
 																m_uiExplicitFlags(0),
-																m_iTag(0),
 																m_eCoordUnit(HYCOORDUNIT_Default),
 																m_fRotation(0.0f),
 																m_BoundingVolume(*this),
@@ -62,11 +59,6 @@ bool IHyNode2d::IsDraw2d()
 	return m_bIsDraw2d;
 }
 
-bool IHyNode2d::IsEnabled()
-{
-	return m_bEnabled;
-}
-
 void IHyNode2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren /*= true*/)
 {
 	m_bEnabled = bEnabled;
@@ -94,16 +86,6 @@ void IHyNode2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChi
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->_SetPauseUpdate(m_bPauseOverride, bOverrideExplicitChildren);
-}
-
-int64 IHyNode2d::GetTag()
-{
-	return m_iTag;
-}
-
-void IHyNode2d::SetTag(int64 iTag)
-{
-	m_iTag = iTag;
 }
 
 void IHyNode2d::ChildAppend(IHyNode2d &childInst)
@@ -278,40 +260,12 @@ void IHyNode2d::GetWorldTransform(glm::mat4 &outMtx)
 	outMtx = m_mtxCached;
 }
 
-void IHyNode2d::Update()
-{
-	// Update any currently active AnimFloat associated with this transform, and remove any of them that are finished.
-	for(std::vector<HyTweenFloat *>::iterator iter = m_ActiveAnimFloatsList.begin(); iter != m_ActiveAnimFloatsList.end();)
-	{
-		if((*iter)->UpdateFloat())
-		{
-			(*iter)->m_bAddedToOwnerUpdate = false;
-			iter = m_ActiveAnimFloatsList.erase(iter);
-		}
-		else
-			++iter;
-	}
-
-	// TODO: Process the action queue
-
-	InstUpdate();
-}
-
 void IHyNode2d::SetDirty()
 {
 	m_bDirty = true;
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->SetDirty();
-}
-
-void IHyNode2d::InsertActiveAnimFloat(HyTweenFloat *pAnimFloat)
-{
-	if(pAnimFloat->m_bAddedToOwnerUpdate == false)
-	{
-		pAnimFloat->m_bAddedToOwnerUpdate = true;
-		m_ActiveAnimFloatsList.push_back(pAnimFloat);
-	}
 }
 
 /*virtual*/ void IHyNode2d::SetNewChildAttributes(IHyNode2d &childInst)

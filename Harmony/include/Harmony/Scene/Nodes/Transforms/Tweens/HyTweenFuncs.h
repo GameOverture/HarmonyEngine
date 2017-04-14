@@ -14,7 +14,7 @@
 
 #include <math.h>
 
-class IHyNode2d;
+class IHyNode;
 
 typedef float (*HyTweenUpdateFunc)(float);
 
@@ -221,7 +221,7 @@ public:
 	}
 
 	// Default (do-nothing) callback when tween finishes
-	static void NullTweenCallback(IHyNode2d *)
+	static void NullTweenCallback(IHyNode *)
 	{ }
 };
 #endif /* __HyTweenFuncs_h__ */

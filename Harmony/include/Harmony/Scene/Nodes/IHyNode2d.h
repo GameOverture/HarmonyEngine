@@ -11,23 +11,17 @@
 #define __IHyNode2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/HyScene.h"
+#include "Scene/Nodes/IHyNode.h"
 #include "Scene/Nodes/Transforms/Tweens/HyTweenVec2.h"
 #include "Scene/Physics/HyBoundingVolume2d.h"
 
 #include <functional>
 
-class IHyNode2d
+class IHyNode2d : public IHyNode
 {
-	friend class HyScene;
-	friend class HyTweenFloat;
-
 protected:
-	const HyType					m_eTYPE;
-
 	bool							m_bDirty;
 	bool							m_bIsDraw2d;
-	bool							m_bEnabled;
 	bool							m_bPauseOverride;	// Will continue to Update when game is paused
 
 	IHyNode2d *						m_pParent;
@@ -44,10 +38,6 @@ protected:
 		EXPLICIT_Alpha			= 1 << 4,
 	};
 	uint32							m_uiExplicitFlags;
-
-	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
-
-	std::vector<HyTweenFloat *>		m_ActiveAnimFloatsList;
 
 	glm::mat4						m_mtxCached;
 	HyCoordinateUnit				m_eCoordUnit;
@@ -70,14 +60,10 @@ public:
 	HyType GetType();
 	bool IsDraw2d();
 
-	bool IsEnabled();
 	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren = true);
 
 	// Sets whether to Update when game is paused
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren = true);
-
-	int64 GetTag();
-	void SetTag(int64 iTag);
 
 	void ChildAppend(IHyNode2d &childInst);
 	bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childInst);
@@ -98,15 +84,11 @@ public:
 	void GetWorldTransform(glm::mat4 &outMtx);
 
 protected:
-	void Update();
-	virtual void InstUpdate() = 0;
-
-	void SetDirty();
-	void InsertActiveAnimFloat(HyTweenFloat *pAnimFloat);
-
 	virtual void SetNewChildAttributes(IHyNode2d &childInst);
 
 private:
+	virtual void SetDirty() override;
+
 	void _SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
 	void _SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
 

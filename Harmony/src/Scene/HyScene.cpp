@@ -25,8 +25,8 @@
 #include "Time/IHyTime.h"
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
-std::vector<IHyNode2d *> HyScene::sm_NodeList;
-std::vector<IHyNode2d *> HyScene::sm_NodeList_PauseUpdate;
+std::vector<IHyNode *> HyScene::sm_NodeList;
+std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
 
 HyScene::HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
 																					m_iPhysVelocityIterations(8),
@@ -49,14 +49,14 @@ HyScene::~HyScene(void)
 	IHyDraw2d::sm_pHyAssets = NULL;
 }
 
-/*static*/ void HyScene::AddNode(IHyNode2d *pNode)
+/*static*/ void HyScene::AddNode(IHyNode *pNode)
 {
 	sm_NodeList.push_back(pNode);
 }
 
-/*static*/ void HyScene::RemoveNode(IHyNode2d *pNode)
+/*static*/ void HyScene::RemoveNode(IHyNode *pNode)
 {
-	for(std::vector<IHyNode2d *>::iterator it = sm_NodeList.begin(); it != sm_NodeList.end(); ++it)
+	for(std::vector<IHyNode *>::iterator it = sm_NodeList.begin(); it != sm_NodeList.end(); ++it)
 	{
 		if((*it) == pNode)
 		{
@@ -67,14 +67,14 @@ HyScene::~HyScene(void)
 	}
 }
 
-/*static*/ void HyScene::AddNode_PauseUpdate(IHyNode2d *pNode)
+/*static*/ void HyScene::AddNode_PauseUpdate(IHyNode *pNode)
 {
 	sm_NodeList_PauseUpdate.push_back(pNode);
 }
 
-/*static*/ void HyScene::RemoveNode_PauseUpdate(IHyNode2d *pNode)
+/*static*/ void HyScene::RemoveNode_PauseUpdate(IHyNode *pNode)
 {
-	for(std::vector<IHyNode2d *>::iterator it = sm_NodeList_PauseUpdate.begin(); it != sm_NodeList_PauseUpdate.end(); ++it)
+	for(std::vector<IHyNode *>::iterator it = sm_NodeList_PauseUpdate.begin(); it != sm_NodeList_PauseUpdate.end(); ++it)
 	{
 		if((*it) == pNode)
 		{
@@ -125,7 +125,7 @@ void HyScene::PostUpdate()
 {
 	if(sm_bInst2dOrderingDirty)
 	{
-		std::sort(m_NodeList_Loaded.begin(), m_NodeList_Loaded.end(), &Inst2dSortPredicate);
+		std::sort(m_NodeList_Loaded.begin(), m_NodeList_Loaded.end(), &Node2dSortPredicate);
 		sm_bInst2dOrderingDirty = false;
 	}
 
@@ -320,14 +320,8 @@ void HyScene::WriteDrawBuffer()
 	m_GfxCommsRef.SetSharedPointers();
 }
 
-/*static*/ bool HyScene::Inst2dSortPredicate(const IHyDraw2d *pInst1, const IHyDraw2d *pInst2)
+/*static*/ bool HyScene::Node2dSortPredicate(const IHyDraw2d *pInst1, const IHyDraw2d *pInst2)
 {
-	// TODO: Below is commented out because std::sort expects less-than operator to supply a transitive relationship, 
-	//		 i.e. when the sort sees A < B is true and B < C is true, it implies that A < C is true as well.
-	//
-	//		...for some reason this fails that? 
-	//	(testing something new, if no problem delete TODO)
-	
 	if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
 	{
 		if(pInst1->GetRenderState() == pInst2->GetRenderState())

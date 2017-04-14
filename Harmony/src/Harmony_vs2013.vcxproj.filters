@@ -237,6 +237,9 @@
     <ClCompile Include="Scene\Nodes\IHyNode3d.cpp">
       <Filter>Scene\Nodes</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Nodes\IHyNode.cpp">
+      <Filter>Scene\Nodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -643,6 +646,9 @@
       <Filter>Scene\Nodes</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode3d.h">
+      <Filter>Scene\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode.h">
       <Filter>Scene\Nodes</Filter>
     </ClInclude>
   </ItemGroup>

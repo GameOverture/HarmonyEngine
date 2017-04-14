@@ -9,24 +9,18 @@
 *************************************************************************/
 #include "Scene/Nodes/IHyNode3d.h"
 
-// TODO: fix compile hack of settings IHyNode2d parent into TweenVecs
-IHyNode3d::IHyNode3d(HyType eInstType, IHyNode2d *pParent) :	m_bEnabled(true),
-																pos(*pParent),
-																rot(*pParent),
-																rot_pivot(*pParent),
-																scale(*pParent),
-																scale_pivot(*pParent)
+IHyNode3d::IHyNode3d(HyType eNodeType, IHyNode3d *pParent) :	IHyNode(eNodeType),
+																pos(*this),
+																rot(*this),
+																rot_pivot(*this),
+																scale(*this),
+																scale_pivot(*this)
 {
 	scale.Set(1.0f);
 }
 
 IHyNode3d::~IHyNode3d()
 {
-}
-
-bool IHyNode3d::IsEnabled()
-{
-	return m_bEnabled;
 }
 
 void IHyNode3d::GetLocalTransform(glm::mat4 &outMtx) const
@@ -44,4 +38,8 @@ void IHyNode3d::GetLocalTransform(glm::mat4 &outMtx) const
 	outMtx = glm::translate(outMtx, scale_pivot.Get());
 	outMtx = glm::scale(outMtx, scale.Get());
 	outMtx = glm::translate(outMtx, scale_pivot.Get() * -1.0f);
+}
+
+/*virtual*/ void IHyNode3d::SetDirty()
+{
 }

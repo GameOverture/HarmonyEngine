@@ -84,3 +84,7 @@ HyCamera3d::~HyCamera3d()
 {
 	return scale.Get().z;
 }
+
+/*virtual*/ void HyCamera3d::InstUpdate()
+{
+}
