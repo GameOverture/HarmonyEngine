@@ -31,7 +31,6 @@ public:
 	
 	// Returns the converted pixel position to the specified HyCoordinateType
 	virtual void GetLocalTransform(glm::mat4 &outMtx) const = 0;
-	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const = 0;
 };
 
 template<typename tVec>

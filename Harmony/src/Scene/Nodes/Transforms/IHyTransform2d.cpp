@@ -82,37 +82,6 @@ void IHyTransform2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConv
 	outMtx = glm::translate(outMtx, ptScalePivot * -1.0f);
 }
 
-/*virtual*/ void IHyTransform2d::GetLocalTransform_SRT(glm::mat4 &outMtx) const
-{
-	outMtx = glm::mat4(1.0f);
-
-	glm::vec3 ptPos(0.0f);
-	ptPos.x = pos.X();
-	ptPos.y = pos.Y();
-
-	glm::vec3 vScale(1.0f);
-	vScale.x = scale.X();
-	vScale.y = scale.Y();
-
-	glm::vec3 ptRotPivot(0.0f);
-	ptRotPivot.x = rot_pivot.X();
-	ptRotPivot.y = rot_pivot.Y();
-
-	glm::vec3 ptScalePivot(0.0f);
-	ptScalePivot.x = scale_pivot.X();
-	ptScalePivot.y = scale_pivot.Y();
-
-	// TODO: Use ptRotPivot and ptScalePivot below
-
-	outMtx = glm::scale(outMtx, vScale);
-	outMtx = glm::rotate(outMtx, rot.Get(), glm::vec3(0, 0, 1));
-
-	if(m_eCoordUnit == HYCOORDUNIT_Meters)
-		outMtx = glm::translate(outMtx, ptPos * HyPixelsPerMeter());
-	else
-		outMtx = glm::translate(outMtx, ptPos);
-}
-
 void IHyTransform2d::GetWorldTransform(glm::mat4 &outMtx)
 {
 	if(m_bDirty)

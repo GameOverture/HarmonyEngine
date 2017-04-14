@@ -21,7 +21,6 @@ public:
 	virtual ~IHyTransform3d();
 
 	virtual void GetLocalTransform(glm::mat4 &outMtx) const override;
-	virtual void GetLocalTransform_SRT(glm::mat4 &outMtx) const override;
 };
 
 #endif /* __IHyTransform3d_h__ */

@@ -184,7 +184,7 @@ void HyScene::WriteDrawBuffer()
 				m_pCurWritePos += sizeof(HyRectangle<float>);
 			
 				HyError("GetLocalTransform_SRT should be 3d");
-				m_WindowListRef[i]->m_Cams3dList[j]->GetLocalTransform_SRT(mtxView);
+				m_WindowListRef[i]->m_Cams3dList[j]->GetLocalTransform(mtxView);
 				*(reinterpret_cast<glm::mat4 *>(m_pCurWritePos)) = mtxView;
 				m_pCurWritePos += sizeof(glm::mat4);
 
