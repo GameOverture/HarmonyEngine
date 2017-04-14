@@ -30,7 +30,7 @@ void IHyCamera::SetViewport(float fPosX, float fPosY, float fWidth, float fHeigh
 	m_ViewportRect.top = m_ViewportRect.bottom + fHeight;
 }
 
-HyCamera2d::HyCamera2d(HyWindow *pWindow) :	HyTransform2d(HYTYPE_Camera2d),
+HyCamera2d::HyCamera2d(HyWindow *pWindow) : IHyNode2d(HYTYPE_Camera2d, nullptr),
 											IHyCamera(pWindow)
 { }
 
@@ -68,7 +68,7 @@ HyRectangle<float> HyCamera2d::GetWorldViewBounds()
 {
 }
 
-HyCamera3d::HyCamera3d(HyWindow *pWindow) :	HyTransform3d(HYTYPE_Camera3d),
+HyCamera3d::HyCamera3d(HyWindow *pWindow) : IHyNode3d(HYTYPE_Camera3d, nullptr),
 											IHyCamera(pWindow)
 { }
 
@@ -83,8 +83,4 @@ HyCamera3d::~HyCamera3d()
 /*virtual*/ float HyCamera3d::GetZoom() const
 {
 	return scale.Get().z;
-}
-
-/*virtual*/ void HyCamera3d::InstUpdate()
-{
 }

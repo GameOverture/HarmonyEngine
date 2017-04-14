@@ -8,11 +8,10 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Physics/HyBoundingVolume2d.h"
+#include "Scene/Nodes/IHyNode2d.h"
 
-#include "Scene/Nodes/Transforms/HyTransform2d.h"
-
-HyBoundingVolume2d::HyBoundingVolume2d(HyTransform2d &ownerRef) :	m_OwnerRef(ownerRef),
-																	m_eType(TYPE_None)
+HyBoundingVolume2d::HyBoundingVolume2d(IHyNode2d &ownerRef) :	m_OwnerRef(ownerRef),
+																m_eType(TYPE_None)
 {
 }
 

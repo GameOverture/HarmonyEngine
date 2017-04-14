@@ -12,14 +12,13 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Box2D/Box2D.h"
-
 #include "Utilities/HyMath.h"
 
-class HyTransform2d;
+class IHyNode2d;
 
 class HyBoundingVolume2d
 {
-	HyTransform2d &		m_OwnerRef;
+	IHyNode2d &		m_OwnerRef;
 
 	enum eType
 	{
@@ -32,7 +31,7 @@ class HyBoundingVolume2d
 	b2AABB					m_WorldAABB;
 
 public:
-	HyBoundingVolume2d(HyTransform2d &ownerRef);
+	HyBoundingVolume2d(IHyNode2d &ownerRef);
 	~HyBoundingVolume2d();
 
 	bool IsEnabled();

@@ -1,29 +1,35 @@
 /**************************************************************************
-*	IHyTransform2d.cpp
+*	IHyNode3d.cpp
 *
 *	Harmony Engine
-*	Copyright (c) 2013 Jason Knobler
+*	Copyright (c) 2017 Jason Knobler
 *
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Nodes/Transforms/HyTransform3d.h"
+#include "Scene/Nodes/IHyNode3d.h"
 
-HyTransform3d::HyTransform3d(HyType eInstType, IHyNode2d *pParent /*= nullptr*/) :	IHyNode2d(eInstType, pParent),
-																					pos(*this),
-																					rot(*this),
-																					rot_pivot(*this),
-																					scale(*this),
-																					scale_pivot(*this)
+// TODO: fix compile hack of settings IHyNode2d parent into TweenVecs
+IHyNode3d::IHyNode3d(HyType eInstType, IHyNode2d *pParent) :	m_bEnabled(true),
+																pos(*pParent),
+																rot(*pParent),
+																rot_pivot(*pParent),
+																scale(*pParent),
+																scale_pivot(*pParent)
 {
 	scale.Set(1.0f);
 }
 
-HyTransform3d::~HyTransform3d()
+IHyNode3d::~IHyNode3d()
 {
 }
 
-void HyTransform3d::GetLocalTransform(glm::mat4 &outMtx) const
+bool IHyNode3d::IsEnabled()
+{
+	return m_bEnabled;
+}
+
+void IHyNode3d::GetLocalTransform(glm::mat4 &outMtx) const
 {
 	outMtx = glm::mat4(1.0f);
 

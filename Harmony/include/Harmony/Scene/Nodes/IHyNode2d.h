@@ -7,11 +7,13 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __IHyTransformNode_h__
-#define __IHyTransformNode_h__
+#ifndef __IHyNode2d_h__
+#define __IHyNode2d_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/HyScene.h"
+#include "Scene/Nodes/Transforms/Tweens/HyTweenVec2.h"
+#include "Scene/Physics/HyBoundingVolume2d.h"
 
 #include <functional>
 
@@ -29,7 +31,7 @@ protected:
 	bool							m_bPauseOverride;	// Will continue to Update when game is paused
 
 	IHyNode2d *						m_pParent;
-	std::vector<IHyNode2d *>			m_ChildList;
+	std::vector<IHyNode2d *>		m_ChildList;
 
 	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
@@ -46,6 +48,20 @@ protected:
 	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 
 	std::vector<HyTweenFloat *>		m_ActiveAnimFloatsList;
+
+	glm::mat4						m_mtxCached;
+	HyCoordinateUnit				m_eCoordUnit;
+
+	float							m_fRotation;		// Reference value used in 'rot' HyTweenFloat
+
+	HyBoundingVolume2d				m_BoundingVolume;
+
+public:
+	HyTweenVec2						pos;
+	HyTweenFloat					rot;
+	HyTweenVec2						rot_pivot;
+	HyTweenVec2						scale;
+	HyTweenVec2						scale_pivot;
 
 public:
 	IHyNode2d(HyType eNodeType, IHyNode2d *pParent);
@@ -75,6 +91,12 @@ public:
 
 	void ForEachChild(std::function<void(IHyNode2d *)> func);
 
+	HyCoordinateUnit GetCoordinateUnit();
+	void SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion);
+
+	void GetLocalTransform(glm::mat4 &outMtx) const;
+	void GetWorldTransform(glm::mat4 &outMtx);
+
 protected:
 	void Update();
 	virtual void InstUpdate() = 0;
@@ -90,4 +112,4 @@ private:
 
 };
 
-#endif /* __IHyTransformNode_h__ */
+#endif /* __IHyNode2d_h__ */

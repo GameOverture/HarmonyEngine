@@ -13,8 +13,8 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Utilities/HyMath.h"
-#include "Scene/Nodes/Transforms/HyTransform2d.h"
-#include "Scene/Nodes/Transforms/HyTransform3d.h"
+#include "Scene/Nodes/IHyNode2d.h"
+#include "Scene/Nodes/IHyNode3d.h"
 
 class HyWindow;
 
@@ -38,7 +38,7 @@ public:
 	virtual float GetZoom() const = 0;
 };
 
-class HyCamera2d : public HyTransform2d, public IHyCamera
+class HyCamera2d : public IHyNode2d, public IHyCamera
 {
 	friend class HyWindow;
 
@@ -56,7 +56,7 @@ private:
 	virtual void InstUpdate() override;
 };
 
-class HyCamera3d : public HyTransform3d, public IHyCamera
+class HyCamera3d : public IHyNode3d, public IHyCamera
 {
 	friend class HyWindow;
 
@@ -66,9 +66,6 @@ public:
 
 	virtual void SetZoom(const float fZoom) override;
 	virtual float GetZoom() const override;
-
-private:
-	virtual void InstUpdate() override;
 };
 
 #endif /* __HyCamera_h__ */

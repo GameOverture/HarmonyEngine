@@ -16,13 +16,9 @@
 class HyTransform3d : public IHyNode2d
 {
 public:
-	HyTweenVec3					pos;
-	HyTweenVec3					rot;
-	HyTweenVec3					rot_pivot;
-	HyTweenVec3					scale;
-	HyTweenVec3					scale_pivot;
 
-	HyTransform3d(HyType eInstType, IHyNode2d *pParent = nullptr);
+
+	HyTransform3d();
 	virtual ~HyTransform3d();
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;

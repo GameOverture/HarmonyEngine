@@ -231,13 +231,10 @@
     <ClCompile Include="Scene\Nodes\Leafs\IHyLeafNode.cpp">
       <Filter>Scene\Nodes\Leafs</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Transforms\HyTransform2d.cpp">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Transforms\HyTransform3d.cpp">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Nodes\IHyNode2d.cpp">
+      <Filter>Scene\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\IHyNode3d.cpp">
       <Filter>Scene\Nodes</Filter>
     </ClCompile>
   </ItemGroup>
@@ -642,13 +639,10 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\IHyLeafNode.h">
       <Filter>Scene\Nodes\Leafs</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\HyTransform2d.h">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\HyTransform3d.h">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode2d.h">
+      <Filter>Scene\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode3d.h">
       <Filter>Scene\Nodes</Filter>
     </ClInclude>
   </ItemGroup>
