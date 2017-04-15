@@ -19,6 +19,11 @@ IHyNode::~IHyNode()
 {
 }
 
+HyType IHyNode::GetType()
+{
+	return m_eTYPE;
+}
+
 bool IHyNode::IsEnabled()
 {
 	return m_bEnabled;

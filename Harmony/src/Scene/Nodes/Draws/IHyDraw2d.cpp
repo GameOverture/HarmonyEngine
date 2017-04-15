@@ -11,14 +11,13 @@
 #include "HyEngine.h"
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
-#include "Scene/Nodes/Misc/HyCamera.h"
 #include "Scene/Nodes/HyEntity2d.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Diagnostics/HyGuiComms.h"
 
 /*static*/ HyAssets *IHyDraw2d::sm_pHyAssets = nullptr;
 
-IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName, IHyNode2d *pParent /*= nullptr*/) :	IHyNode2d(eInstType, pParent),
+IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyNode2d(eInstType, pParent),
 																														m_eLoadState(HYLOADSTATE_Inactive),
 																														m_sPREFIX(szPrefix ? szPrefix : ""),
 																														m_sNAME(szName ? szName : ""),
@@ -42,15 +41,6 @@ IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName,
 
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
-
-
-	if(m_pParent && m_pParent->IsDraw2d())
-	{
-		if(static_cast<IHyDraw2d *>(m_pParent)->m_RenderState.IsScissorRect())
-		{
-			m_RenderState.SetScissorRect(static_cast<IHyDraw2d *>(m_pParent)->m_RenderState.GetScissorRect());
-		}
-	}
 }
 
 /*virtual*/ IHyDraw2d::~IHyDraw2d(void)
@@ -270,6 +260,37 @@ void IHyDraw2d::Load()
 	}
 	
 	sm_pHyAssets->RemoveGfxData(this);
+}
+
+float IHyDraw2d::CalcAlpha()
+{
+	float fCalculatedAlpha = alpha.Get();
+	//if(m_bDirty)
+	//{
+	//	if(m_pParent)
+	//	{
+	//		m_pParent->GetWorldTransform(m_mtxCached);
+	//		GetLocalTransform(outMtx);	// Just use 'outMtx' rather than pushing another mat4 on the stack
+
+	//		m_mtxCached *= outMtx;
+	//	}
+	//	else
+	//		GetLocalTransform(m_mtxCached);
+
+	//	m_bDirty = false;
+	//}
+
+	//outMtx = m_mtxCached;
+
+	return fCalculatedAlpha;
+}
+
+void IHyDraw2d::CalcTopTint(glm::vec3 &tintOut)
+{
+}
+
+void IHyDraw2d::CalcBotTint(glm::vec3 &tintOut)
+{
 }
 
 bool IHyDraw2d::IsSelfLoaded()

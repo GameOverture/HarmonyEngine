@@ -8,7 +8,6 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Physics/HyPhysEntity2d.h"
-
 #include "HyEngine.h"
 
 /*static*/ b2World *HyPhysEntity2d::sm_b2WorldRef = NULL;

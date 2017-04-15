@@ -141,12 +141,6 @@
     <ClCompile Include="Scene\Nodes\Draws\HyTexturedQuad2d.cpp">
       <Filter>Scene\Nodes\Draws</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Transforms\IHyTransform2d.cpp">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Transforms\IHyTransform3d.cpp">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Nodes\Transforms\Tweens\HyTweenFloat.cpp">
       <Filter>Scene\Nodes\Transforms\Tweens</Filter>
     </ClCompile>
@@ -236,6 +230,15 @@
     </ClCompile>
     <ClCompile Include="Diagnostics\Interop\HyConsole_Win.cpp">
       <Filter>Diagnostics\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\IHyNode2d.cpp">
+      <Filter>Scene\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\IHyNode3d.cpp">
+      <Filter>Scene\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Leafs\IHyLeafNode2d.cpp">
+      <Filter>Scene\Nodes\Leafs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -334,6 +337,9 @@
     </Filter>
     <Filter Include="Diagnostics\Interop">
       <UniqueIdentifier>{e72199ab-395c-4343-a244-cffc6669020a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Nodes\Leafs">
+      <UniqueIdentifier>{80a75801-4613-4cd5-963d-15e7673a7239}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -528,15 +534,6 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode.h">
       <Filter>Scene\Nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\IHyTransform.h">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\IHyTransform2d.h">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\IHyTransform3d.h">
-      <Filter>Scene\Nodes\Transforms</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\Tweens\HyTweenFloat.h">
       <Filter>Scene\Nodes\Transforms\Tweens</Filter>
     </ClInclude>
@@ -644,6 +641,15 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Win.h">
       <Filter>Diagnostics\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode2d.h">
+      <Filter>Scene\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode3d.h">
+      <Filter>Scene\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\IHyLeafNode2d.h">
+      <Filter>Scene\Nodes\Leafs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

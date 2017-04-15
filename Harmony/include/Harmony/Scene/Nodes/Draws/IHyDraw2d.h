@@ -73,7 +73,7 @@ public:
 	HyTweenVec3						botColor;
 	HyTweenFloat					alpha;
 
-	IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName, IHyNode2d *pParent = nullptr);
+	IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	virtual ~IHyDraw2d(void);
 
 	const std::string &GetName();
@@ -108,6 +108,10 @@ public:
 
 	void Load();
 	void Unload();
+
+	float CalcAlpha();
+	void CalcTopTint(glm::vec3 &tintOut);
+	void CalcBotTint(glm::vec3 &tintOut);
 
 protected:
 	bool IsSelfLoaded();

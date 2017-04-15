@@ -30,6 +30,8 @@ public:
 	IHyNode(HyType eNodeType);
 	virtual ~IHyNode();
 
+	HyType GetType();
+
 	bool IsEnabled();
 
 	int64 GetTag();

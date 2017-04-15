@@ -12,14 +12,39 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Scene/Nodes/Draws/IHyDraw2d.h"
+#include "Scene/Nodes/IHyNode2d.h"
+#include "Scene/Nodes/Transforms/Tweens/HyTweenVec3.h"
 
-class HyEntity2d : public IHyDraw2d
+class HyEntity2d : public IHyNode2d
 {
+protected:
+	std::vector<IHyNode2d *>		m_ChildList;
+
+	float							m_fAlpha;
+
 public:
-	HyEntity2d(IHyNode2d *pParent = nullptr);
-	HyEntity2d(const char *szPrefix, const char *szName, IHyNode2d *pParent = nullptr);
+	HyTweenVec3						tint;
+	HyTweenFloat					alpha;
+
+public:
+	HyEntity2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
+
+	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
+	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
+
+	float CalcAlpha();
+	void CalcTopTint(glm::vec3 &tintOut);
+
+	void ChildAppend(IHyNode2d &childRef);
+	bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef);
+	bool ChildExists(IHyNode2d &childRef);
+	bool ChildRemove(IHyNode2d *pChild);
+	void ChildrenTransfer(HyEntity2d &newParent);
+	uint32 ChildCount();
+	IHyNode2d *ChildGet(uint32 uiIndex);
+
+	void ForEachChild(std::function<void(IHyNode2d *)> func);
 
 	// Optional user overrides below
 	virtual void OnUpdate() { };
@@ -29,6 +54,14 @@ public:
 	virtual void OnMouseDown(void *pUserParam) { }
 	virtual void OnMouseUp(void *pUserParam) { }
 	virtual void OnMouseClicked(void *pUserParam) { }
+
+private:
+	virtual void SetNewChildAttributes(IHyNode2d &childInst);
+
+	virtual void SetDirty() override;
+
+	virtual void _SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
+	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
 };
 
 #endif /* __HyEntity2d_h__ */
