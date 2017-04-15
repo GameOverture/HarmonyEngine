@@ -20,6 +20,7 @@ class HyEntity2d : public IHyNode2d
 protected:
 	std::vector<IHyNode2d *>		m_ChildList;
 
+	HyScreenRect<int32>				m_LocalScissorRect;
 	float							m_fAlpha;
 
 public:

@@ -64,7 +64,6 @@ protected:
 	HyScreenRect<int32>				m_LocalScissorRect;
 
 	float							m_fAlpha;
-	float							m_fPrevAlphaValue;
 
 	HyShaderUniforms 				m_ShaderUniforms;
 
