@@ -11,7 +11,7 @@
 #include "HyEngine.h"
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
-#include "Scene/Nodes/HyEntity2d.h"
+#include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Diagnostics/HyGuiComms.h"
 
@@ -22,15 +22,9 @@ IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName,
 																														m_sPREFIX(szPrefix ? szPrefix : ""),
 																														m_sNAME(szName ? szName : ""),
 																														m_pData(nullptr),
-																														m_uiAttributes(0),
-																														m_eMouseInputState(MOUSEINPUT_None),
-																														m_pMouseInputUserParam(nullptr),
 																														m_iDisplayOrder(0),
-																														topColor(*this),
-																														botColor(*this),
-																														m_fAlpha(1.0f),
-																														m_fPrevAlphaValue(1.0f),
-																														alpha(m_fAlpha, *this)
+																														color(*this),
+																														scissor(*this)
 {
 	m_bIsDraw2d = true;
 
@@ -38,9 +32,6 @@ IHyDraw2d::IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName,
 	if(m_eTYPE != HYTYPE_Entity2d && m_eTYPE != HYTYPE_Primitive2d)
 		HyAssert(m_sNAME.empty() == false, "IHyDraw2d of type '" << m_eTYPE << "' was constructed with a blank name");
 #endif
-
-	topColor.Set(1.0f);
-	botColor.Set(1.0f);
 }
 
 /*virtual*/ IHyDraw2d::~IHyDraw2d(void)
@@ -90,16 +81,16 @@ void IHyDraw2d::SetCoordinateType(HyCoordinateType eCoordType)
 	else
 		m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
 
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		if(m_ChildList[i]->IsDraw2d())
-		{
-			if(eCoordType == HYCOORDTYPE_Screen)
-				static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.Enable(HyRenderState::USINGSCREENCOORDS);
-			else
-				static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
-		}
-	}
+	//for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	//{
+	//	if(m_ChildList[i]->IsDraw2d())
+	//	{
+	//		if(eCoordType == HYCOORDTYPE_Screen)
+	//			static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.Enable(HyRenderState::USINGSCREENCOORDS);
+	//		else
+	//			static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
+	//	}
+	//}
 }
 
 int32 IHyDraw2d::GetDisplayOrder() const
@@ -107,88 +98,12 @@ int32 IHyDraw2d::GetDisplayOrder() const
 	return m_iDisplayOrder;
 }
 
-// Returns the max display order assigned to children
-int32 IHyDraw2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren /*= true*/)
+void IHyDraw2d::SetDisplayOrder(int32 iOrderValue)
 {
 	m_iDisplayOrder = iOrderValue;
 	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
 
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		if(m_ChildList[i]->IsDraw2d())
-			iOrderValue = static_cast<IHyDraw2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
-	}
-
 	HyScene::SetInstOrderingDirty();
-
-	return iOrderValue;
-}
-
-void IHyDraw2d::SetTint(float fR, float fG, float fB)
-{
-	topColor.Set(fR, fG, fB);
-	botColor.Set(fR, fG, fB);
-}
-
-void IHyDraw2d::SetTint(uint32 uiColor)
-{
-	SetTint(((uiColor >> 16) & 0xFF) / 255.0f,
-			((uiColor >> 8) & 0xFF) / 255.0f,
-			(uiColor & 0xFF) / 255.0f);
-}
-
-void IHyDraw2d::EnableMouseInput(bool bEnable, void *pUserParam /*= NULL*/)
-{
-	if(bEnable)
-		m_uiAttributes |= (ATTRIBFLAG_MouseInput | ATTRIBFLAG_BoundingVolumeDirty);
-	else
-		m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
-
-	m_pMouseInputUserParam = pUserParam;
-}
-
-void IHyDraw2d::EnableCollider(bool bEnable)
-{
-	if(bEnable)
-		m_uiAttributes |= (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_BoundingVolumeDirty);
-	else
-		m_uiAttributes &= ~ATTRIBFLAG_HasBoundingVolume;
-}
-
-void IHyDraw2d::EnablePhysics(bool bEnable)
-{
-}
-
-bool IHyDraw2d::IsScissorSet()
-{
-	return (0 != (m_uiAttributes & ATTRIBFLAG_Scissor));
-}
-
-const HyScreenRect<int32> &IHyDraw2d::GetScissor()
-{
-	return m_LocalScissorRect;
-}
-
-void IHyDraw2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
-{
-	m_LocalScissorRect.x = uiLocalX;
-	m_LocalScissorRect.y = uiLocalY;
-	m_LocalScissorRect.width = uiWidth;
-	m_LocalScissorRect.height = uiHeight;
-
-	m_uiAttributes |= ATTRIBFLAG_Scissor;
-}
-
-void IHyDraw2d::ClearScissor()
-{
-	m_uiAttributes &= ~ATTRIBFLAG_Scissor;
-	m_RenderState.ClearScissorRect();
-
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		if(m_ChildList[i]->IsDraw2d())
-			static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.ClearScissorRect();
-	}
 }
 
 int32 IHyDraw2d::GetShaderId()
@@ -260,37 +175,6 @@ void IHyDraw2d::Load()
 	}
 	
 	sm_pHyAssets->RemoveGfxData(this);
-}
-
-float IHyDraw2d::CalcAlpha()
-{
-	float fCalculatedAlpha = alpha.Get();
-	//if(m_bDirty)
-	//{
-	//	if(m_pParent)
-	//	{
-	//		m_pParent->GetWorldTransform(m_mtxCached);
-	//		GetLocalTransform(outMtx);	// Just use 'outMtx' rather than pushing another mat4 on the stack
-
-	//		m_mtxCached *= outMtx;
-	//	}
-	//	else
-	//		GetLocalTransform(m_mtxCached);
-
-	//	m_bDirty = false;
-	//}
-
-	//outMtx = m_mtxCached;
-
-	return fCalculatedAlpha;
-}
-
-void IHyDraw2d::CalcTopTint(glm::vec3 &tintOut)
-{
-}
-
-void IHyDraw2d::CalcBotTint(glm::vec3 &tintOut)
-{
 }
 
 bool IHyDraw2d::IsSelfLoaded()
@@ -433,7 +317,16 @@ void IHyDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 	}
 }
 
-int32 IHyDraw2d::_SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren)
+/*virtual*/ void IHyDraw2d::_SetScissor(HyScissor &scissorRef, bool bOverrideExplicitChildren)
+{
+	scissor = scissorRef;
+	if(static_cast<IHyDraw2d *>(m_pParent)->m_RenderState.IsScissorRect())
+	{
+		m_RenderState.SetScissorRect(static_cast<IHyDraw2d *>(m_pParent)->m_RenderState.GetScissorRect());
+	}
+}
+
+/*virtual*/ int32 IHyDraw2d::_SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren)
 {
 	if(bOverrideExplicitChildren)
 		m_uiExplicitFlags &= ~EXPLICIT_DisplayOrder;

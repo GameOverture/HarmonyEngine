@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
-#include "Scene/Nodes/Transforms/Tweens/HyTweenVec3.h"
+#include "Scene/Nodes/Components/Tweens/HyTweenVec3.h"
 
 class IHyNode3d : public IHyNode
 {
@@ -28,9 +28,6 @@ public:
 	virtual ~IHyNode3d();
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
-
-protected:
-	virtual void SetDirty() override;
 };
 
 #endif /* __IHyNode3d_h__ */

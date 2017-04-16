@@ -7,22 +7,22 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Transforms/Tweens/HyTweenFloat.h"
-#include "Scene/Nodes/IHyNode.h"
+#include "Scene/Nodes/Components/Tweens/HyTweenFloat.h"
 
 #include "Time/IHyTime.h"
 #include "Utilities/HyMath.h"
 
-HyTweenFloat::HyTweenFloat(float &valueReference, IHyNode &ownerRef) :	m_fValueRef(valueReference),
-																		m_OwnerRef(ownerRef),
-																		m_fStart(0.0f),
-																		m_fTarget(0.0f),
-																		m_fDuration(0.0f),
-																		m_fElapsedTime(0.0f),
-																		m_fpTweenFunc(NULL),
-																		m_fpBehaviorUpdate(NULL),
-																		m_fpTweenFinishedFunc(HyTween::NullTweenCallback),
-																		m_bAddedToOwnerUpdate(false)
+HyTweenFloat::HyTweenFloat(float &valueReference, IHyNode &ownerRef, HyNodeDirtyType eDirtyType) :	m_fValueRef(valueReference),
+																									m_OwnerRef(ownerRef),
+																									m_eDIRTY_TYPE(eDirtyType),
+																									m_fStart(0.0f),
+																									m_fTarget(0.0f),
+																									m_fDuration(0.0f),
+																									m_fElapsedTime(0.0f),
+																									m_fpTweenFunc(NULL),
+																									m_fpBehaviorUpdate(NULL),
+																									m_fpTweenFinishedFunc(HyTween::NullTweenCallback),
+																									m_bAddedToOwnerUpdate(false)
 {
 }
 
@@ -39,7 +39,7 @@ float HyTweenFloat::Get() const
 void HyTweenFloat::Set(float fValue)
 {
 	if(m_fValueRef != fValue)
-		m_OwnerRef.SetDirty();
+		m_OwnerRef.SetDirty(m_eDIRTY_TYPE);
 
 	m_fValueRef = fValue;
 	StopTween();
@@ -48,7 +48,7 @@ void HyTweenFloat::Set(float fValue)
 void HyTweenFloat::Offset(float fValue)
 {
 	if(fValue != 0.0f)
-		m_OwnerRef.SetDirty();
+		m_OwnerRef.SetDirty(m_eDIRTY_TYPE);
 
 	m_fValueRef += fValue;
 	StopTween();
@@ -69,7 +69,7 @@ void HyTweenFloat::Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpTweenFun
 	m_fpBehaviorUpdate = &HyTweenFloat::Tween;
 	m_fpTweenFinishedFunc = tweenFinishedCallback;
 
-	m_OwnerRef.InsertActiveAnimFloat(this);
+	m_OwnerRef.InsertActiveTweenFloat(this);
 }
 
 void HyTweenFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFunc fpTweenFunc /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::NullTweenCallback*/)
@@ -82,7 +82,7 @@ void HyTweenFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFu
 	m_fpBehaviorUpdate = &HyTweenFloat::Tween;
 	m_fpTweenFinishedFunc = tweenFinishedCallback;
 
-	m_OwnerRef.InsertActiveAnimFloat(this);
+	m_OwnerRef.InsertActiveTweenFloat(this);
 }
 
 void HyTweenFloat::StopTween()
@@ -94,7 +94,7 @@ void HyTweenFloat::StopTween()
 HyTweenFloat &HyTweenFloat::operator=(const float &rhs)
 {
 	if(m_fValueRef != rhs)
-		m_OwnerRef.SetDirty();
+		m_OwnerRef.SetDirty(m_eDIRTY_TYPE);
 
 	m_fValueRef = rhs;
 	StopTween();
@@ -105,7 +105,7 @@ HyTweenFloat &HyTweenFloat::operator=(const float &rhs)
 HyTweenFloat &HyTweenFloat::operator+=(const float &rhs)
 {
 	if(rhs != 0.0f)
-		m_OwnerRef.SetDirty();
+		m_OwnerRef.SetDirty(m_eDIRTY_TYPE);
 
 	m_fValueRef += rhs;
 	StopTween();
@@ -116,7 +116,7 @@ HyTweenFloat &HyTweenFloat::operator+=(const float &rhs)
 HyTweenFloat &HyTweenFloat::operator-=(const float &rhs)
 {
 	if(rhs != 0.0f)
-		m_OwnerRef.SetDirty();
+		m_OwnerRef.SetDirty(m_eDIRTY_TYPE);
 
 	m_fValueRef -= rhs;
 	StopTween();
@@ -128,7 +128,7 @@ HyTweenFloat &HyTweenFloat::operator*=(const float &rhs)
 {
 	float fProduct = m_fValueRef * rhs;
 	if(fProduct != m_fValueRef)
-		m_OwnerRef.SetDirty();
+		m_OwnerRef.SetDirty(m_eDIRTY_TYPE);
 
 	m_fValueRef = fProduct;
 	StopTween();
@@ -140,7 +140,7 @@ HyTweenFloat &HyTweenFloat::operator/=(const float &rhs)
 {
 	HyAssert(rhs != 0.0f, "HyTweenFloat::operator/= was passed a float that == 0.0f");
 	if(rhs != 1.0f)
-		m_OwnerRef.SetDirty();
+		m_OwnerRef.SetDirty(m_eDIRTY_TYPE);
 
 	m_fValueRef /= rhs;
 	StopTween();
@@ -152,7 +152,7 @@ HyTweenFloat &HyTweenFloat::operator/=(const float &rhs)
 HyTweenFloat &HyTweenFloat::operator+=(const HyTweenFloat &rhs)
 {
 	if(rhs.Get() != 0.0f)
-		m_OwnerRef.SetDirty();
+		m_OwnerRef.SetDirty(m_eDIRTY_TYPE);
 
 	m_fValueRef += rhs.Get();
 	StopTween();
@@ -163,7 +163,7 @@ HyTweenFloat &HyTweenFloat::operator+=(const HyTweenFloat &rhs)
 HyTweenFloat &HyTweenFloat::operator-=(const HyTweenFloat &rhs)
 {
 	if(rhs.Get() != 0.0f)
-		m_OwnerRef.SetDirty();
+		m_OwnerRef.SetDirty(m_eDIRTY_TYPE);
 
 	m_fValueRef -= rhs.Get();
 	StopTween();
@@ -175,7 +175,7 @@ HyTweenFloat &HyTweenFloat::operator*=(const HyTweenFloat &rhs)
 {
 	float fProduct = m_fValueRef * rhs.Get();
 	if(m_fValueRef != fProduct)
-		m_OwnerRef.SetDirty();
+		m_OwnerRef.SetDirty(m_eDIRTY_TYPE);
 
 	m_fValueRef = fProduct;
 	StopTween();
@@ -188,7 +188,7 @@ HyTweenFloat &HyTweenFloat::operator/=(const HyTweenFloat &rhs)
 	HyAssert(rhs.Get() != 0.0f, "HyTweenFloat::operator/= was passed a HyTweenFloat that == 0.0f");
 
 	if(rhs.Get() != 1.0f)
-		m_OwnerRef.SetDirty();
+		m_OwnerRef.SetDirty(m_eDIRTY_TYPE);
 
 	m_fValueRef /= rhs.Get();
 	StopTween();
@@ -221,7 +221,7 @@ bool HyTweenFloat::Tween()
 	
 	float fFromVal = m_fValueRef;
 	m_fValueRef = m_fStart + (m_fTarget - m_fStart) * m_fpTweenFunc(m_fElapsedTime / m_fDuration);
-	m_OwnerRef.SetDirty();
+	m_OwnerRef.SetDirty(m_eDIRTY_TYPE);
 
 	return m_fElapsedTime == m_fDuration;
 }

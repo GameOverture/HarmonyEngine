@@ -13,29 +13,48 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Scene/Nodes/IHyNode2d.h"
-#include "Scene/Nodes/Transforms/Tweens/HyTweenVec3.h"
+#include "Scene/Nodes/Components/HyColor.h"
+#include "Scene/Nodes/Components/HyScissor.h"
 
 class HyEntity2d : public IHyNode2d
 {
 protected:
 	std::vector<IHyNode2d *>		m_ChildList;
 
-	HyScreenRect<int32>				m_LocalScissorRect;
-	float							m_fAlpha;
+	enum eAttributes
+	{
+		ATTRIBFLAG_Scissor					= 1 << 0,
+		ATTRIBFLAG_MouseInput				= 1 << 1,
+		ATTRIBFLAG_HasBoundingVolume		= 1 << 2,
+		ATTRIBFLAG_BoundingVolumeDirty		= 1 << 3,
+		ATTRIBFLAG_Physics					= 1 << 4
+	};
+	uint32							m_uiAttributes;
+
+	enum eMouseInputState
+	{
+		MOUSEINPUT_None = 0,
+		MOUSEINPUT_Hover,
+		MOUSEINPUT_Down
+	};
+	eMouseInputState				m_eMouseInputState;
+	void *							m_pMouseInputUserParam;
+
+	int32							m_iDisplayOrder;	// Higher values are displayed front-most
 
 public:
-	HyTweenVec3						tint;
-	HyTweenFloat					alpha;
+	HyColor							color;
+	HyScissor						scissor;
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
 
+	int32 GetDisplayOrder() const;
+
 	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
-
-	float CalcAlpha();
-	void CalcTopTint(glm::vec3 &tintOut);
+	int32 SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
 
 	void ChildAppend(IHyNode2d &childRef);
 	bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef);
@@ -44,8 +63,11 @@ public:
 	void ChildrenTransfer(HyEntity2d &newParent);
 	uint32 ChildCount();
 	IHyNode2d *ChildGet(uint32 uiIndex);
-
 	void ForEachChild(std::function<void(IHyNode2d *)> func);
+
+	void EnableMouseInput(bool bEnable, void *pUserParam = nullptr);
+	void EnableCollider(bool bEnable);
+	void EnablePhysics(bool bEnable);
 
 	// Optional user overrides below
 	virtual void OnUpdate() { };
@@ -56,13 +78,16 @@ public:
 	virtual void OnMouseUp(void *pUserParam) { }
 	virtual void OnMouseClicked(void *pUserParam) { }
 
+	virtual void SetDirty(HyNodeDirtyType eDirtyType) override;
+
+protected:
+	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding) override;
+	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override;
+	virtual void _SetScissor(HyScissor &scissorRef, bool bIsOverriding) override;
+	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
+
 private:
 	virtual void SetNewChildAttributes(IHyNode2d &childInst);
-
-	virtual void SetDirty() override;
-
-	virtual void _SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
-	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
 };
 
 #endif /* __HyEntity2d_h__ */

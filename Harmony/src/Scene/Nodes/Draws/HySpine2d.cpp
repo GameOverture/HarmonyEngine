@@ -8,12 +8,11 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Nodes/Draws/HySpine2d.h"
-
+#include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Scene/HyScene.h"
-
 #include "Time/IHyTime.h"
 
-HySpine2d::HySpine2d(const char *szPrefix, const char *szName, IHyNode2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Spine2d, szPrefix, szName, pParent),
+HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Spine2d, szPrefix, szName, pParent),
 																									m_pSpineSkeleton(NULL),
 																									m_ppSpineAnims(NULL),
 																									m_ppAnimStates(NULL),
@@ -185,11 +184,11 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 	//m_pSpineSkeleton->y = m_ptPosition.Get().y * fCoordModifier;
 	
 	// TODO: Use botColor as well
-	const glm::vec3 &rawColor = topColor.Get();
-	m_pSpineSkeleton->r = rawColor.r;
-	m_pSpineSkeleton->g = rawColor.g;
-	m_pSpineSkeleton->b = rawColor.b;
-	m_pSpineSkeleton->a = alpha.Get();
+	const glm::vec3 &tint = color.CalculateTopTint();
+	m_pSpineSkeleton->r = tint.r;
+	m_pSpineSkeleton->g = tint.g;
+	m_pSpineSkeleton->b = tint.b;
+	m_pSpineSkeleton->a = color.CalculateAlpha();
 
 	//m_pSpineSkeleton->root->rotation = m_vRotation.Get().z;
 

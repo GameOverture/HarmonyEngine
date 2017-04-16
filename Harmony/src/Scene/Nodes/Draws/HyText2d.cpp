@@ -8,23 +8,23 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Nodes/Draws/HyText2d.h"
-
+#include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Utilities/HyStrManip.h"
 
 #include <iostream>
 
-HyText2d::HyText2d(const char *szPrefix, const char *szName, IHyNode2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Text2d, szPrefix, szName, pParent),
-																								m_bIsDirty(true),
-																								m_sCurrentString(""),
-																								m_uiCurFontState(0),
-																								m_vBoxDimensions(0.0f, 0.0f),
-																								m_fScaleBoxModifier(1.0f),
-																								m_uiBoxAttributes(0),
-																								m_eAlignment(HYALIGN_Left),
-																								m_pGlyphOffsets(nullptr),
-																								m_uiNumReservedGlyphOffsets(0),
-																								m_uiNumValidCharacters(0),
-																								m_fUsedPixelWidth(0.0f)
+HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Text2d, szPrefix, szName, pParent),
+																									m_bIsDirty(true),
+																									m_sCurrentString(""),
+																									m_uiCurFontState(0),
+																									m_vBoxDimensions(0.0f, 0.0f),
+																									m_fScaleBoxModifier(1.0f),
+																									m_uiBoxAttributes(0),
+																									m_eAlignment(HYALIGN_Left),
+																									m_pGlyphOffsets(nullptr),
+																									m_uiNumReservedGlyphOffsets(0),
+																									m_uiNumValidCharacters(0),
+																									m_fUsedPixelWidth(0.0f)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
@@ -595,12 +595,12 @@ offsetCalculation:
 
 			*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->topColor.Get();
 			pRefDataWritePos += sizeof(glm::vec3);
-			*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
+			*reinterpret_cast<float *>(pRefDataWritePos) = color.CalculateAlpha();
 			pRefDataWritePos += sizeof(float);
 
 			*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->botColor.Get();
 			pRefDataWritePos += sizeof(glm::vec3);
-			*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
+			*reinterpret_cast<float *>(pRefDataWritePos) = color.CalculateAlpha();
 			pRefDataWritePos += sizeof(float);
 
 			//*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(pData->GetAtlas()->GetActualGfxApiTextureIndex(pData->GetAtlasGroupTextureIndex()));

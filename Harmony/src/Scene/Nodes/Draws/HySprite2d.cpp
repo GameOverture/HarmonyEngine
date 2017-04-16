@@ -8,15 +8,16 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Nodes/Draws/HySprite2d.h"
+#include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Diagnostics/HyConsole.h"
 #include "Time/IHyTime.h"
 
-HySprite2d::HySprite2d(const char *szPrefix, const char *szName, IHyNode2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
-																									m_bIsAnimPaused(false),
-																									m_fAnimPlayRate(1.0f),
-																									m_fElapsedFrameTime(0.0f),
-																									m_uiCurAnimState(0),
-																									m_uiCurFrame(0)
+HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
+																										m_bIsAnimPaused(false),
+																										m_fAnimPlayRate(1.0f),
+																										m_fElapsedFrameTime(0.0f),
+																										m_uiCurAnimState(0),
+																										m_uiCurFrame(0)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
@@ -348,14 +349,14 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vOffset;
 	pRefDataWritePos += sizeof(glm::vec2);
 
-	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = topColor.Get();
+	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = color.CalculateTopTint();
 	pRefDataWritePos += sizeof(glm::vec3);
-	*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
+	*reinterpret_cast<float *>(pRefDataWritePos) = color.CalculateAlpha();
 	pRefDataWritePos += sizeof(float);
 
-	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = botColor.Get();
+	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = color.CalculateBotTint();
 	pRefDataWritePos += sizeof(glm::vec3);
-	*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
+	*reinterpret_cast<float *>(pRefDataWritePos) = color.CalculateAlpha();
 	pRefDataWritePos += sizeof(float);
 	
 	//*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(frameRef.GetActualTextureIndex());

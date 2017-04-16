@@ -8,15 +8,15 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Nodes/Draws/HyTexturedQuad2d.h"
-
+#include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasIndex, IHyNode2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, std::to_string(uiAtlasIndex).c_str(), pParent),
-																							m_bIS_RAW(false),
-																							m_uiATLAS_INDEX(uiAtlasIndex),
-																							m_uiRAW_TEXTURE_WIDTH(0),
-																							m_uiRAW_TEXTURE_HEIGHT(0),
-																							m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasIndex, HyEntity2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, std::to_string(uiAtlasIndex).c_str(), pParent),
+																								m_bIS_RAW(false),
+																								m_uiATLAS_INDEX(uiAtlasIndex),
+																								m_uiRAW_TEXTURE_WIDTH(0),
+																								m_uiRAW_TEXTURE_HEIGHT(0),
+																								m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
@@ -24,12 +24,12 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasIndex, IHyNode2d *pParent /*= n
 	m_RenderState.SetNumVerticesPerInstance(4);
 }
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, IHyNode2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, "raw", pParent),
-																																			m_bIS_RAW(true),
-																																			m_uiATLAS_INDEX(0),
-																																			m_uiRAW_TEXTURE_WIDTH(uiTextureWidth),
-																																			m_uiRAW_TEXTURE_HEIGHT(uiTextureHeight),
-																																			m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_TexturedQuad2d, NULL, "raw", pParent),
+																																				m_bIS_RAW(true),
+																																				m_uiATLAS_INDEX(0),
+																																				m_uiRAW_TEXTURE_WIDTH(uiTextureWidth),
+																																				m_uiRAW_TEXTURE_HEIGHT(uiTextureHeight),
+																																				m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
@@ -127,14 +127,14 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vOffset;
 	pRefDataWritePos += sizeof(glm::vec2);
 
-	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = topColor.Get();
+	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = color.CalculateTopTint();
 	pRefDataWritePos += sizeof(glm::vec3);
-	*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
+	*reinterpret_cast<float *>(pRefDataWritePos) = color.CalculateAlpha();
 	pRefDataWritePos += sizeof(float);
 
-	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = botColor.Get();
+	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = color.CalculateBotTint();
 	pRefDataWritePos += sizeof(glm::vec3);
-	*reinterpret_cast<float *>(pRefDataWritePos) = alpha.Get();
+	*reinterpret_cast<float *>(pRefDataWritePos) = color.CalculateAlpha();
 	pRefDataWritePos += sizeof(float);
 
 	//*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(m_bIS_RAW ? m_uiTextureIndex : pData->GetAtlas()->GetActualGfxApiTextureIndex(m_uiTextureIndex));

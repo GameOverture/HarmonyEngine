@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Scene/Nodes/Transforms/Tweens/HyTweenFloat.h"
+#include "Scene/Nodes/Components/Tweens/HyTweenFloat.h"
 
 #include <vector>
 
@@ -22,7 +22,7 @@ class HyTweenVec2
 	std::vector<HyTweenFloat>	m_AnimFloatList;
 
 public:
-	HyTweenVec2(IHyNode &ownerRef);
+	HyTweenVec2(IHyNode &ownerRef, HyNodeDirtyType eDirtyType);
 	~HyTweenVec2();
 
 	const glm::vec2 &Get() const;

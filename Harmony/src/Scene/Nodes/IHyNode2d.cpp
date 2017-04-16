@@ -8,22 +8,20 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Nodes/IHyNode2d.h"
+#include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "HyEngine.h"
 
 IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType),
-																m_bDirty(false),
 																m_bIsDraw2d(false),
-																m_bPauseOverride(false),
 																m_pParent(pParent),
-																m_uiExplicitFlags(0),
 																m_eCoordUnit(HYCOORDUNIT_Default),
 																m_fRotation(0.0f),
 																m_BoundingVolume(*this),
-																pos(*this),
-																rot(m_fRotation, *this),
-																rot_pivot(*this),
-																scale(*this),
-																scale_pivot(*this)
+																pos(*this, HYNODEDIRTY_Transform),
+																rot(m_fRotation, *this, HYNODEDIRTY_Transform),
+																rot_pivot(*this, HYNODEDIRTY_Transform),
+																scale(*this, HYNODEDIRTY_Transform),
+																scale_pivot(*this, HYNODEDIRTY_Transform)
 {
 	scale.Set(1.0f);
 
@@ -66,6 +64,7 @@ HyCoordinateUnit IHyNode2d::GetCoordinateUnit()
 	return m_eCoordUnit;
 }
 
+// TODO: This needs to apply to everything in its hierarchy
 void IHyNode2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion)
 {
 	if(eCoordUnit == HYCOORDUNIT_Default)
@@ -84,7 +83,7 @@ void IHyNode2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversio
 	}
 	m_eCoordUnit = eCoordUnit;
 
-	SetDirty();
+	SetDirty(HYNODEDIRTY_Transform);
 }
 
 void IHyNode2d::GetLocalTransform(glm::mat4 &outMtx) const
@@ -123,11 +122,11 @@ void IHyNode2d::GetLocalTransform(glm::mat4 &outMtx) const
 
 void IHyNode2d::GetWorldTransform(glm::mat4 &outMtx)
 {
-	if(m_bDirty)
+	if(IsDirty(HYNODEDIRTY_Transform))
 	{
 		if(m_pParent)
 		{
-			static_cast<IHyNode2d *>(m_pParent)->GetWorldTransform(m_mtxCached);
+			m_pParent->GetWorldTransform(m_mtxCached);
 			GetLocalTransform(outMtx);	// Just use 'outMtx' rather than pushing another mat4 on the stack
 
 			m_mtxCached *= outMtx;
@@ -135,45 +134,8 @@ void IHyNode2d::GetWorldTransform(glm::mat4 &outMtx)
 		else
 			GetLocalTransform(m_mtxCached);
 
-		m_bDirty = false;
+		ClearDirty(HYNODEDIRTY_Transform);
 	}
 
 	outMtx = m_mtxCached;
-}
-
-void IHyNode2d::SetDirty()
-{
-	m_bDirty = true;
-}
-
-/*virtual*/ void IHyNode2d::_SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
-{
-	if(bOverrideExplicitChildren)
-		m_uiExplicitFlags &= ~EXPLICIT_Enabled;
-
-	if(0 == (m_uiExplicitFlags & EXPLICIT_Enabled))
-		m_bEnabled = bEnabled;
-}
-
-/*virtual*/ void IHyNode2d::_SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren)
-{
-	if(bOverrideExplicitChildren)
-		m_uiExplicitFlags &= ~EXPLICIT_PauseUpdate;
-
-	if(0 == (m_uiExplicitFlags & EXPLICIT_PauseUpdate))
-	{
-		if(bUpdateWhenPaused)
-		{
-			if(m_bPauseOverride == false)
-				HyScene::AddNode_PauseUpdate(this);
-		}
-		else
-		{
-			if(m_bPauseOverride == true)
-				HyScene::RemoveNode_PauseUpdate(this);
-		}
-
-		m_bPauseOverride = bUpdateWhenPaused;
-		m_uiExplicitFlags |= EXPLICIT_PauseUpdate;
-	}
 }

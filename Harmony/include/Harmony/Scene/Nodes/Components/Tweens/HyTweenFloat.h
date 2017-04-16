@@ -11,7 +11,8 @@
 #define __HyTweenFloat_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Transforms/Tweens/HyTweenFuncs.h"
+#include "Scene/Nodes/IHyNode.h"
+#include "Scene/Nodes/Components/Tweens/HyTweenFuncs.h"
 #include <functional>
 
 class IHyNode;
@@ -21,22 +22,23 @@ class HyTweenFloat
 {
 	friend class IHyNode;
 
-	float &					m_fValueRef;
-	IHyNode &				m_OwnerRef;
+	float &							m_fValueRef;
+	IHyNode &						m_OwnerRef;
+	const HyNodeDirtyType			m_eDIRTY_TYPE;
 
-	float					m_fStart;
-	float					m_fTarget;
-	float					m_fDuration;
-	float					m_fElapsedTime;
-	bool					m_bAddedToOwnerUpdate;
+	float							m_fStart;
+	float							m_fTarget;
+	float							m_fDuration;
+	float							m_fElapsedTime;
+	bool							m_bAddedToOwnerUpdate;
 
-	HyTweenUpdateFunc		m_fpTweenFunc;
-	HyTweenFinishedCallback	m_fpTweenFinishedFunc;
+	HyTweenUpdateFunc				m_fpTweenFunc;
+	HyTweenFinishedCallback			m_fpTweenFinishedFunc;
 
 	bool (HyTweenFloat::*m_fpBehaviorUpdate)();
 
 public:
-	HyTweenFloat(float &valueReference, IHyNode &ownerRef);
+	HyTweenFloat(float &valueReference, IHyNode &ownerRef, HyNodeDirtyType eDirtyType);
 	~HyTweenFloat(void);
 
 	float Get() const;

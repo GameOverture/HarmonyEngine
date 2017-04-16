@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
-#include "Scene/Nodes/Transforms/Tweens/HyTweenVec2.h"
+#include "Scene/Nodes/Components/Tweens/HyTweenVec2.h"
 #include "Scene/Physics/HyBoundingVolume2d.h"
 
 #include <functional>
@@ -22,23 +22,13 @@ class HyEntity2d;
 class IHyNode2d : public IHyNode
 {
 	friend class HyEntity2d;
+	friend class HyColor;
+	friend class HyScissor;
 
 protected:
-	bool							m_bDirty;
 	bool							m_bIsDraw2d;
-	bool							m_bPauseOverride;	// Will continue to Update when game is paused
 
 	HyEntity2d *					m_pParent;
-
-	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
-	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
-	enum ExplicitFlags
-	{
-		EXPLICIT_Enabled		= 1 << 0,
-		EXPLICIT_PauseUpdate	= 1 << 1,
-		EXPLICIT_DisplayOrder	= 1 << 2
-	};
-	uint32							m_uiExplicitFlags;
 
 	glm::mat4						m_mtxCached;
 	HyCoordinateUnit				m_eCoordUnit;
@@ -64,19 +54,15 @@ public:
 	bool ParentExists();
 
 	HyCoordinateUnit GetCoordinateUnit();
+	// TODO: This needs to apply to everything in its hierarchy
 	void SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion);
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
 	void GetWorldTransform(glm::mat4 &outMtx);
 
 protected:
-	virtual void SetNewChildAttributes(IHyNode2d &childInst);
-
-private:
-	virtual void SetDirty() override;
-
-	virtual void _SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
-	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
+	virtual void _SetScissor(HyScissor &scissorRef, bool bIsOverriding) { }			// Only Entity2d/3d will invoke this
+	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) { }		// Only Entity2d/3d will invoke this
 };
 
 #endif /* __IHyNode2d_h__ */

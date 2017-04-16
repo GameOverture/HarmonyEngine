@@ -11,19 +11,18 @@
 #define __IHyInst2d_h__
 
 #include "Afx/HyStdAfx.h"
-
-#include "Scene/Nodes/IHyNode2d.h"
+#include "Scene/Nodes/Leafs/IHyLeafNode2d.h"
 #include "Scene/Nodes/Misc/HyCamera.h"
-
+#include "Scene/Nodes/Components/HyColor.h"
+#include "Scene/Nodes/Components/HyScissor.h"
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/Loadables/IHyShader.h"
-
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
 #include <set>
 
-class IHyDraw2d : public IHyNode2d
+class IHyDraw2d : public IHyLeafNode2d
 {
 	friend class HyScene;
 	friend class HyAssets;
@@ -40,38 +39,15 @@ protected:
 	const std::string				m_sNAME;
 	const std::string				m_sPREFIX;
 
-	enum eAttributes
-	{
-		ATTRIBFLAG_Scissor					= 1 << 0,
-		ATTRIBFLAG_MouseInput				= 1 << 1,
-		ATTRIBFLAG_HasBoundingVolume		= 1 << 2,
-		ATTRIBFLAG_BoundingVolumeDirty		= 1 << 3,
-		ATTRIBFLAG_Physics					= 1 << 4
-	};
-	uint32							m_uiAttributes;
-
-	enum eMouseInputState
-	{
-		MOUSEINPUT_None = 0,
-		MOUSEINPUT_Hover,
-		MOUSEINPUT_Down
-	};
-	eMouseInputState				m_eMouseInputState;
-	void *							m_pMouseInputUserParam;
-
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
 	HyRenderState					m_RenderState;
-	HyScreenRect<int32>				m_LocalScissorRect;
-
-	float							m_fAlpha;
-
 	HyShaderUniforms 				m_ShaderUniforms;
 
 public:
-	HyTweenVec3						topColor;
-	HyTweenVec3						botColor;
-	HyTweenFloat					alpha;
+	HyColor							color;
+	HyScissor						scissor;
 
+public:
 	IHyDraw2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	virtual ~IHyDraw2d(void);
 
@@ -84,21 +60,7 @@ public:
 	void SetCoordinateType(HyCoordinateType eCoordType);
 
 	int32 GetDisplayOrder() const;
-
-	// Returns the max display order assigned to children
-	int32 SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren = true);
-
-	void SetTint(float fR, float fG, float fB);
-	void SetTint(uint32 uiColor);
-
-	void EnableMouseInput(bool bEnable, void *pUserParam = nullptr);
-	void EnableCollider(bool bEnable);
-	void EnablePhysics(bool bEnable);
-
-	bool IsScissorSet();
-	const HyScreenRect<int32> &GetScissor();
-	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
-	void ClearScissor();
+	void SetDisplayOrder(int32 iOrderValue);
 
 	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);
@@ -107,11 +69,7 @@ public:
 
 	void Load();
 	void Unload();
-
-	float CalcAlpha();
-	void CalcTopTint(glm::vec3 &tintOut);
-	void CalcBotTint(glm::vec3 &tintOut);
-
+	
 protected:
 	bool IsSelfLoaded();
 	IHyNodeData *UncheckedGetData();
@@ -130,15 +88,12 @@ private:
 	virtual void OnCalcBoundingVolume() { }								// Should calculate the local bounding volume in 'm_BoundingVolume'
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) { }		// This function is responsible for incrementing the passed in reference pointer the size of the data written
-	virtual void OnMouseEnter(void *pUserParam) { }
-	virtual void OnMouseLeave(void *pUserParam) { }
-	virtual void OnMouseDown(void *pUserParam) { }
-	virtual void OnMouseUp(void *pUserParam) { }
-	virtual void OnMouseClicked(void *pUserParam) { }
 
 	virtual void InstUpdate() override final;
 
-	int32 _SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
+protected:
+	virtual void _SetScissor(HyScissor &scissorRef, bool bOverrideExplicitChildren);			// Only Entity2d/3d will invoke this
+	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);			// Only Entity2d/3d will invoke this
 };
 
 #endif /* __IHyInst2d_h__ */

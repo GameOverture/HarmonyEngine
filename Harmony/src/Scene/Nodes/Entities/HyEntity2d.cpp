@@ -7,13 +7,16 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/HyEntity2d.h"
+#include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Scene/HyScene.h"
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyNode2d(HYTYPE_Entity2d, pParent),
-															m_fAlpha(1.0f),
-															tint(*this),
-															alpha(m_fAlpha, *this)
+															m_uiAttributes(0),
+															m_eMouseInputState(MOUSEINPUT_None),
+															m_pMouseInputUserParam(nullptr),
+															m_iDisplayOrder(0),
+															color(*this),
+															scissor(*this)
 {
 }
 
@@ -52,31 +55,13 @@ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitCh
 		m_ChildList[i]->_SetPauseUpdate(m_bPauseOverride, bOverrideExplicitChildren);
 }
 
-float HyEntity2d::CalcAlpha()
+int32 HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren)
 {
-	float fCalculatedAlpha = alpha.Get();
-	//if(m_bDirty)
-	//{
-	//	if(m_pParent)
-	//	{
-	//		m_pParent->GetWorldTransform(m_mtxCached);
-	//		GetLocalTransform(outMtx);	// Just use 'outMtx' rather than pushing another mat4 on the stack
+	m_iDisplayOrder = iOrderValue;
+	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
 
-	//		m_mtxCached *= outMtx;
-	//	}
-	//	else
-	//		GetLocalTransform(m_mtxCached);
-
-	//	m_bDirty = false;
-	//}
-
-	//outMtx = m_mtxCached;
-
-	return fCalculatedAlpha;
-}
-
-void HyEntity2d::CalcTopTint(glm::vec3 &tintOut)
-{
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
 }
 
 void HyEntity2d::ChildAppend(IHyNode2d &childInst)
@@ -165,64 +150,80 @@ void HyEntity2d::ForEachChild(std::function<void(IHyNode2d *)> func)
 	}
 }
 
-/*virtual*/ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
+void HyEntity2d::EnableMouseInput(bool bEnable, void *pUserParam /*= NULL*/)
 {
-	//childInst.m_uiExplicitFlags = 0;
+	if(bEnable)
+		m_uiAttributes |= (ATTRIBFLAG_MouseInput | ATTRIBFLAG_BoundingVolumeDirty);
+	else
+		m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
 
-		if(static_cast<IHyDraw2d *>(m_pParent)->m_RenderState.IsScissorRect())
-		{
-			m_RenderState.SetScissorRect(static_cast<IHyDraw2d *>(m_pParent)->m_RenderState.GetScissorRect());
-		}
-
-	childInst._SetEnabled(m_bEnabled, false);
-	childInst._SetPauseUpdate(m_bPauseOverride, false);
+	m_pMouseInputUserParam = pUserParam;
 }
 
-
-/*virtual*/ void HyEntity2d::SetDirty()
+void HyEntity2d::EnableCollider(bool bEnable)
 {
-	IHyNode2d::SetDirty();
+	if(bEnable)
+		m_uiAttributes |= (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_BoundingVolumeDirty);
+	else
+		m_uiAttributes &= ~ATTRIBFLAG_HasBoundingVolume;
+}
+
+void HyEntity2d::EnablePhysics(bool bEnable)
+{
+}
+
+/*virtual*/ void HyEntity2d::SetDirty(HyNodeDirtyType eDirtyType)
+{
+	IHyNode2d::SetDirty(eDirtyType);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->SetDirty();
+		m_ChildList[i]->SetDirty(eDirtyType);
 }
 
-/*virtual*/ void HyEntity2d::_SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
+/*virtual*/ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
-	if(bOverrideExplicitChildren)
-		m_uiExplicitFlags &= ~EXPLICIT_Enabled;
+	childInst._SetEnabled(m_bEnabled, false);
+	childInst._SetPauseUpdate(m_bPauseOverride, false);
+	childInst._SetScissor(scissor, false);
+	//childInst._SetDisplayOrder(
+}
+
+/*virtual*/ void HyEntity2d::_SetEnabled(bool bEnabled, bool bIsOverriding)
+{
+	IHyNode::_SetEnabled(bEnabled, bIsOverriding);
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_Enabled))
 	{
-		m_bEnabled = bEnabled;
-
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_SetEnabled(m_bEnabled, bOverrideExplicitChildren);
+			m_ChildList[i]->_SetEnabled(m_bEnabled, bIsOverriding);
 	}
 }
 
-/*virtual*/ void HyEntity2d::_SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren)
+/*virtual*/ void HyEntity2d::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding)
 {
-	if(bOverrideExplicitChildren)
-		m_uiExplicitFlags &= ~EXPLICIT_PauseUpdate;
+	IHyNode::_SetPauseUpdate(bUpdateWhenPaused, bIsOverriding);
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_PauseUpdate))
 	{
-		if(bUpdateWhenPaused)
-		{
-			if(m_bPauseOverride == false)
-				HyScene::AddNode_PauseUpdate(this);
-		}
-		else
-		{
-			if(m_bPauseOverride == true)
-				HyScene::RemoveNode_PauseUpdate(this);
-		}
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+			m_ChildList[i]->_SetPauseUpdate(m_bPauseOverride, bIsOverriding);
+	}
+}
 
-		m_bPauseOverride = bUpdateWhenPaused;
-		m_uiExplicitFlags |= EXPLICIT_PauseUpdate;
+/*virtual*/ void HyEntity2d::_SetScissor(HyScissor &scissorRef, bool bIsOverriding)
+{
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
+	{
+		scissor = scissorRef;
 
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_SetPauseUpdate(m_bPauseOverride, bOverrideExplicitChildren);
+			m_ChildList[i]->_SetScissor(scissor, bIsOverriding);
 	}
+}
+
+/*virtual*/ int32 HyEntity2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)
+{
 }

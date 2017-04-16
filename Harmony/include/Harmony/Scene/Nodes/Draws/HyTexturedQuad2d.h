@@ -26,8 +26,8 @@ protected:
 	HyRectangle<float>		m_SrcRect;
 
 public:
-	HyTexturedQuad2d(uint32 uiAtlasIndex, IHyNode2d *pParent = nullptr);
-	HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, IHyNode2d *pParent = nullptr);
+	HyTexturedQuad2d(uint32 uiAtlasIndex, HyEntity2d *pParent = nullptr);
+	HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent = nullptr);
 	virtual ~HyTexturedQuad2d();
 
 	uint32 GetGraphicsApiHandle() const;

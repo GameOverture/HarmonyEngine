@@ -8,6 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Nodes/Draws/HyPrimitive2d.h"
+#include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "HyEngine.h"
 #include "Utilities/HyMath.h"
 
@@ -218,17 +219,18 @@ void HyPrimitive2d::ClearData()
 	GetWorldTransform(mtx);
 
 	// TODO: Get rid of top/bot color
+	glm::vec3 tint = color.CalculateTopTint();
 	glm::vec4 vTop;
-	vTop.x = topColor.X();
-	vTop.y = topColor.Y();
-	vTop.z = topColor.Z();
-	vTop.a = alpha.Get();
+	vTop.x = tint.x;
+	vTop.y = tint.y;
+	vTop.z = tint.z;
+	vTop.a = color.CalculateAlpha();
 	
-	glm::vec4 vBot;
-	vTop.x = botColor.X();
-	vTop.y = botColor.Y();
-	vTop.z = botColor.Z();
-	vBot.a = alpha.Get();
+	//glm::vec4 vBot;
+	//vTop.x = botColor.X();
+	//vTop.y = botColor.Y();
+	//vTop.z = botColor.Z();
+	//vBot.a = alpha.Get();
 
 	m_ShaderUniforms.Set("u_mtxTransform", mtx);
 	m_ShaderUniforms.Set("u_vColor", vTop);

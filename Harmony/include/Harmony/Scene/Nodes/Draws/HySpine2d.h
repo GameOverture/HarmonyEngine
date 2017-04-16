@@ -34,7 +34,7 @@ protected:
 	bool					m_bLooping;
 
 public:
-	HySpine2d(const char *szPrefix, const char *szName, IHyNode2d *pParent = nullptr);
+	HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	virtual ~HySpine2d(void);
 
 	spSkeleton *GetSkeleton()		{ return m_pSpineSkeleton; }

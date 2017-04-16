@@ -7,12 +7,12 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Nodes/Transforms/Tweens/HyTweenVec2.h"
+#include "Scene/Nodes/Components/Tweens/HyTweenVec2.h"
 
-HyTweenVec2::HyTweenVec2(IHyNode &ownerRef)
+HyTweenVec2::HyTweenVec2(IHyNode &ownerRef, HyNodeDirtyType eDirtyType)
 {
-	m_AnimFloatList.push_back(HyTweenFloat(m_vValue[0], ownerRef));
-	m_AnimFloatList.push_back(HyTweenFloat(m_vValue[1], ownerRef));
+	m_AnimFloatList.push_back(HyTweenFloat(m_vValue[0], ownerRef, eDirtyType));
+	m_AnimFloatList.push_back(HyTweenFloat(m_vValue[1], ownerRef, eDirtyType));
 }
 
 HyTweenVec2::~HyTweenVec2()

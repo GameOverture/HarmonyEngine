@@ -8,20 +8,16 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/HyScene.h"
-
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyWindow.h"
-
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
 #include "Scene/Nodes/Draws/HySprite2d.h"
 #include "Scene/Nodes/Draws/HySpine2d.h"
 #include "Scene/Nodes/Draws/HyPrimitive2d.h"
 #include "Scene/Nodes/Draws/HyText2d.h"
 #include "Scene/Nodes/Draws/HyTexturedQuad2d.h"
-#include "Scene/Nodes/HyEntity2d.h"
 #include "Scene/Physics/HyPhysEntity2d.h"
-
 #include "Time/IHyTime.h"
 
 bool HyScene::sm_bInst2dOrderingDirty = false;

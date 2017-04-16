@@ -10,11 +10,11 @@
 #include "Scene/Nodes/IHyNode3d.h"
 
 IHyNode3d::IHyNode3d(HyType eNodeType, IHyNode3d *pParent) :	IHyNode(eNodeType),
-																pos(*this),
-																rot(*this),
-																rot_pivot(*this),
-																scale(*this),
-																scale_pivot(*this)
+																pos(*this, HYNODEDIRTY_Transform),
+																rot(*this, HYNODEDIRTY_Transform),
+																rot_pivot(*this, HYNODEDIRTY_Transform),
+																scale(*this, HYNODEDIRTY_Transform),
+																scale_pivot(*this, HYNODEDIRTY_Transform)
 {
 	scale.Set(1.0f);
 }
@@ -38,8 +38,4 @@ void IHyNode3d::GetLocalTransform(glm::mat4 &outMtx) const
 	outMtx = glm::translate(outMtx, scale_pivot.Get());
 	outMtx = glm::scale(outMtx, scale.Get());
 	outMtx = glm::translate(outMtx, scale_pivot.Get() * -1.0f);
-}
-
-/*virtual*/ void IHyNode3d::SetDirty()
-{
 }

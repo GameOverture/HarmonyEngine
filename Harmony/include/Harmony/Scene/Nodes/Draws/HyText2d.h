@@ -31,8 +31,8 @@ protected:
 			HyTweenVec3 		topColor;
 			HyTweenVec3 		botColor;
 
-			LayerColor(IHyNode2d &colorOwner) :	topColor(colorOwner),
-												botColor(colorOwner)
+			LayerColor(IHyNode2d &colorOwner) :	topColor(colorOwner, HYNODEDIRTY_DontCare),
+												botColor(colorOwner, HYNODEDIRTY_DontCare)
 			{ }
 		};
 		std::vector<LayerColor *>	m_LayerColors;
@@ -64,7 +64,7 @@ protected:
 	float				m_fUsedPixelWidth;
 
 public:
-	HyText2d(const char *szPrefix, const char *szName, IHyNode2d *pParent = nullptr);
+	HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	virtual ~HyText2d(void);
 
 	// Assumes UTF-8 encoding. Accepts newline characters '\n'
