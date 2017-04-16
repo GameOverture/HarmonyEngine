@@ -43,6 +43,11 @@ public:
 	const glm::vec3 &CalculateTopTint();
 	const glm::vec3 &CalculateBotTint();
 
+	bool IsScissorSet();
+	const HyScreenRect<int32> &GetScissor();
+	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
+	void ClearScissor();
+
 protected:
 	virtual void NodeUpdate() = 0;
 

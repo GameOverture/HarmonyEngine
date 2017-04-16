@@ -63,6 +63,8 @@ public:
 protected:
 	virtual void NodeUpdate() = 0;
 
+	//virtual void _SetEnabled(bool bEnabled, bool bIsOverriding);						// Only Entity2d/3d will invoke this
+	//virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
 	virtual void _SetScissor(HyScissor &scissorRef, bool bIsOverriding) { }			// Only Entity2d/3d will invoke this
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) { }		// Only Entity2d/3d will invoke this
 };

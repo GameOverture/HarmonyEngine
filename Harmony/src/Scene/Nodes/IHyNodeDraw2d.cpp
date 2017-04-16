@@ -59,6 +59,33 @@ const glm::vec3 &IHyNodeDraw2d::CalculateBotTint()
 	return m_CachedBotColor;
 }
 
+bool IHyNodeDraw2d::IsScissorSet()
+{
+	return (m_LocalScissorRect.iTag == 1);
+}
+
+const HyScreenRect<int32> &IHyNodeDraw2d::GetScissor()
+{
+	return m_LocalScissorRect;
+}
+
+void IHyNodeDraw2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
+{
+	m_LocalScissorRect.x = uiLocalX;
+	m_LocalScissorRect.y = uiLocalY;
+	m_LocalScissorRect.width = uiWidth;
+	m_LocalScissorRect.height = uiHeight;
+	
+	m_LocalScissorRect.iTag = 1;
+	SetDirty(HYNODEDIRTY_Scissor);
+}
+
+void IHyNodeDraw2d::ClearScissor()
+{
+	m_LocalScissorRect.iTag = 0;
+	SetDirty(HYNODEDIRTY_Scissor);
+}
+
 void IHyNodeDraw2d::Calculate()
 {
 	if(IsDirty(HYNODEDIRTY_Color))
