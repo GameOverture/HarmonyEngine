@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Scene/Nodes/Misc/HyCamera.h"
+#include "Scene/Nodes/Leafs/Misc/HyCamera.h"
 
 #include "Threading/BasicSync.h"
 

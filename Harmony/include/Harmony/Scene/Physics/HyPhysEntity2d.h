@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Box2D/Box2D.h"
 
-#include "Scene/Nodes/Draws/HyPrimitive2d.h"
+#include "Scene/Nodes/Leafs/Draws/HyPrimitive2d.h"
 #include "Scene/Nodes/Entities/HyEntity2d.h"
 
 class HyPhysEntity2d : public HyEntity2d

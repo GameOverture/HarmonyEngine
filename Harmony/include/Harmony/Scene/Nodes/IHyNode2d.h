@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
-#include "Scene/Nodes/Components/Tweens/HyTweenVec2.h"
+#include "Scene/Nodes/Tweens/HyTweenVec2.h"
 #include "Scene/Physics/HyBoundingVolume2d.h"
 
 #include <functional>
@@ -61,6 +61,8 @@ public:
 	void GetWorldTransform(glm::mat4 &outMtx);
 
 protected:
+	virtual void NodeUpdate() = 0;
+
 	virtual void _SetScissor(HyScissor &scissorRef, bool bIsOverriding) { }			// Only Entity2d/3d will invoke this
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) { }		// Only Entity2d/3d will invoke this
 };

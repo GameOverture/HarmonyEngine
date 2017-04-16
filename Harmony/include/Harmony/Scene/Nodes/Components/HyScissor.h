@@ -17,7 +17,9 @@
 class HyScissor
 {
 	IHyNode2d &						m_OwnerRef;
+	
 	HyScreenRect<int32>				m_LocalScissorRect;
+	HyScreenRect<int32>				m_WorldScissorRect;
 
 public:
 	HyScissor(IHyNode2d &ownerRef);
@@ -26,9 +28,11 @@ public:
 	HyScissor &operator =(HyScissor &rightSideRef);
 
 	bool IsEnabled();
-	const HyScreenRect<int32> &Get();
+	const HyScreenRect<int32> &GetLocal();
 	void Set(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
 	void Clear();
+
+	const HyScreenRect<int32> &GetWorld();
 };
 
 #endif /* HyScissor_h__ */

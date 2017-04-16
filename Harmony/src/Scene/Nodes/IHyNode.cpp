@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Scene/Nodes/IHyNode.h"
 #include "Scene/HyScene.h"
-#include "Scene/Nodes/Components/Tweens/HyTweenFloat.h"
+#include "Scene/Nodes/Tweens/HyTweenFloat.h"
 
 IHyNode::IHyNode(HyType eNodeType) :	m_eTYPE(eNodeType),
 										m_uiExplicitFlags(0),
@@ -115,5 +115,5 @@ void IHyNode::Update()
 
 	// TODO: Process the action queue
 
-	InstUpdate();
+	NodeUpdate();
 }

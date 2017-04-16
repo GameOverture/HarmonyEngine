@@ -10,13 +10,10 @@
 #include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Scene/HyScene.h"
 
-HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyNode2d(HYTYPE_Entity2d, pParent),
+HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyNodeDraw2d(HYTYPE_Entity2d, pParent),
 															m_uiAttributes(0),
 															m_eMouseInputState(MOUSEINPUT_None),
-															m_pMouseInputUserParam(nullptr),
-															m_iDisplayOrder(0),
-															color(*this),
-															scissor(*this)
+															m_pMouseInputUserParam(nullptr)
 {
 }
 
@@ -24,6 +21,17 @@ HyEntity2d::~HyEntity2d(void)
 {
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
+}
+
+bool HyEntity2d::IsLoaded() const
+{
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(m_ChildList[i]->IsDraw2d() && static_cast<IHyDraw2d *>(m_ChildList[i])->IsLoaded() == false)
+			return false;
+	}
+
+	return true;
 }
 
 void HyEntity2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
@@ -172,6 +180,11 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 {
 }
 
+/*virtual*/ void HyEntity2d::NodeUpdate() /*override final*/
+{
+
+}
+
 /*virtual*/ void HyEntity2d::SetDirty(HyNodeDirtyType eDirtyType)
 {
 	IHyNode2d::SetDirty(eDirtyType);
@@ -186,6 +199,19 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 	childInst._SetPauseUpdate(m_bPauseOverride, false);
 	childInst._SetScissor(scissor, false);
 	//childInst._SetDisplayOrder(
+}
+
+/*virtual*/ void HyEntity2d::NodeUpdate()
+{
+	if(IsDirty(HYNODEDIRTY_Scissor))
+	{
+		if(scissor.IsEnabled())
+		{
+			scissor.
+		}
+
+		ClearDirty(HYNODEDIRTY_Scissor);
+	}
 }
 
 /*virtual*/ void HyEntity2d::_SetEnabled(bool bEnabled, bool bIsOverriding)

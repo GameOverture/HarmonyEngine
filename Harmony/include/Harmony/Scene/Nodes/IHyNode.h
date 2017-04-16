@@ -63,7 +63,7 @@ public:
 	void SetTag(int64 iTag);
 
 protected:
-	virtual void InstUpdate() = 0;
+	virtual void NodeUpdate() = 0;
 	
 	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding);						// Only Entity2d/3d will invoke this
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this

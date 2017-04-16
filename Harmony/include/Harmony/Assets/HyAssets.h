@@ -22,7 +22,7 @@
 #include <queue>
 #include <future>
 
-class IHyDraw2d;
+class IHyLeafDraw2d;
 
 class IHyNodeData;
 class HyAudioData;
@@ -66,7 +66,7 @@ class HyAssets
 
 	IHyLoadableData *									m_pLastQueuedData;
 	IHyLoadableData *									m_pLastDiscardedData;
-	std::vector<IHyDraw2d *>							m_QueuedInst2dList;
+	std::vector<IHyLeafDraw2d *>						m_QueuedInst2dList;
 
 	std::vector<IHyLoadableData *>						m_ReloadDataList;
 
@@ -117,9 +117,9 @@ public:
 	HyAtlas *GetAtlas(uint32 uiIndex);
 	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
 
-	void GetNodeData(IHyDraw2d *pDrawNode, IHyNodeData *&pDataOut);
-	void LoadGfxData(IHyDraw2d *pDraw2d);
-	void RemoveGfxData(IHyDraw2d *pDraw2d);
+	void GetNodeData(IHyLeafDraw2d *pDrawNode, IHyNodeData *&pDataOut);
+	void LoadGfxData(IHyLeafDraw2d *pDraw2d);
+	void RemoveGfxData(IHyLeafDraw2d *pDraw2d);
 
 	void Shutdown();
 	bool IsShutdown();
@@ -131,7 +131,7 @@ private:
 	void DequeData(IHyLoadableData *pData);
 	void FinalizeData(IHyLoadableData *pData);
 
-	void SetNodeAsLoaded(IHyDraw2d *pDrawNode2d);
+	void SetNodeAsLoaded(IHyLeafDraw2d *pDrawNode2d);
 
 	static void LoadingThread(void *pParam);
 };

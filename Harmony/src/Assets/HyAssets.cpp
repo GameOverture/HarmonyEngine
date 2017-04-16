@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
-#include "Scene/Nodes/Draws/IHyDraw2d.h"
+#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Nodes/HySpine2dData.h"
 #include "Assets/Nodes/HySprite2dData.h"
@@ -69,7 +69,7 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 																							m_pLastDiscardedData(nullptr),
 																							m_LoadingCtrl(m_Load_Shared, m_Load_Retrieval)
 {
-	IHyDraw2d::sm_pHyAssets = this;
+	IHyLeafDraw2d::sm_pHyAssets = this;
 
 	m_InitFuture = std::async(std::launch::async, &HyAssetInit, this);
 }
@@ -172,7 +172,7 @@ HyAtlas *HyAssets::GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut)
 	return nullptr;
 }
 
-void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyNodeData *&pDataOut)
+void HyAssets::GetNodeData(IHyLeafDraw2d *pDrawNode, IHyNodeData *&pDataOut)
 {
 	switch(pDrawNode->GetType())
 	{
@@ -199,7 +199,7 @@ void HyAssets::GetNodeData(IHyDraw2d *pDrawNode, IHyNodeData *&pDataOut)
 	}
 }
 
-void HyAssets::LoadGfxData(IHyDraw2d *pDrawNode2d)
+void HyAssets::LoadGfxData(IHyLeafDraw2d *pDrawNode2d)
 {
 	if(pDrawNode2d->m_eLoadState != HYLOADSTATE_Inactive)
 		return;
@@ -238,7 +238,7 @@ void HyAssets::LoadGfxData(IHyDraw2d *pDrawNode2d)
 	}
 }
 
-void HyAssets::RemoveGfxData(IHyDraw2d *pDrawNode2d)
+void HyAssets::RemoveGfxData(IHyLeafDraw2d *pDrawNode2d)
 {
 	if(pDrawNode2d->m_eLoadState == HYLOADSTATE_Inactive)
 		return;
@@ -438,7 +438,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 	}
 }
 
-void HyAssets::SetNodeAsLoaded(IHyDraw2d *pDrawNode2d)
+void HyAssets::SetNodeAsLoaded(IHyLeafDraw2d *pDrawNode2d)
 {
 	m_SceneRef.AddNode_Loaded(pDrawNode2d);
 	pDrawNode2d->m_eLoadState = HYLOADSTATE_Loaded;

@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
-#include "Scene/Nodes/Components/Tweens/HyTweenVec3.h"
+#include "Scene/Nodes/Tweens/HyTweenVec3.h"
 
 class IHyNode3d : public IHyNode
 {

@@ -12,11 +12,9 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Scene/Nodes/IHyNode2d.h"
-#include "Scene/Nodes/Components/HyColor.h"
-#include "Scene/Nodes/Components/HyScissor.h"
+#include "Scene/Nodes/IHyNodeDraw2d.h"
 
-class HyEntity2d : public IHyNode2d
+class HyEntity2d : public IHyNodeDraw2d
 {
 protected:
 	std::vector<IHyNode2d *>		m_ChildList;
@@ -40,20 +38,15 @@ protected:
 	eMouseInputState				m_eMouseInputState;
 	void *							m_pMouseInputUserParam;
 
-	int32							m_iDisplayOrder;	// Higher values are displayed front-most
-
-public:
-	HyColor							color;
-	HyScissor						scissor;
-
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
 
-	int32 GetDisplayOrder() const;
+	bool IsLoaded() const;
 
 	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
+	//void SetScissor(
 	int32 SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
 
 	void ChildAppend(IHyNode2d &childRef);
@@ -68,6 +61,9 @@ public:
 	void EnableMouseInput(bool bEnable, void *pUserParam = nullptr);
 	void EnableCollider(bool bEnable);
 	void EnablePhysics(bool bEnable);
+	
+protected:
+	virtual void NodeUpdate() override final;
 
 	// Optional user overrides below
 	virtual void OnUpdate() { };
@@ -80,7 +76,6 @@ public:
 
 	virtual void SetDirty(HyNodeDirtyType eDirtyType) override;
 
-protected:
 	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding) override;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override;
 	virtual void _SetScissor(HyScissor &scissorRef, bool bIsOverriding) override;
