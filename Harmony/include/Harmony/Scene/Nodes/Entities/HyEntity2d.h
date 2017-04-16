@@ -42,11 +42,10 @@ public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
 
-	bool IsLoaded() const;
-
 	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
-	//void SetScissor(
+	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren);
+	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren);
 	int32 SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
 
 	void ChildAppend(IHyNode2d &childRef);
@@ -61,6 +60,10 @@ public:
 	void EnableMouseInput(bool bEnable, void *pUserParam = nullptr);
 	void EnableCollider(bool bEnable);
 	void EnablePhysics(bool bEnable);
+
+	virtual bool IsLoaded() const override;
+	virtual void Load() override;
+	virtual void Unload() override;
 	
 protected:
 	virtual void NodeUpdate() override final;
@@ -78,7 +81,6 @@ protected:
 
 	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding) override;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override;
-	virtual void _SetScissor(HyScissor &scissorRef, bool bIsOverriding) override;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
 
 private:

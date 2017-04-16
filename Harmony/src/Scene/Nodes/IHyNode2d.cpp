@@ -12,7 +12,6 @@
 #include "HyEngine.h"
 
 IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType),
-																m_bIsDraw2d(false),
 																m_pParent(pParent),
 																m_eCoordUnit(HYCOORDUNIT_Default),
 																m_fRotation(0.0f),
@@ -39,12 +38,6 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 	if(m_bPauseOverride)
 		HyScene::RemoveNode_PauseUpdate(this);
 }
-
-bool IHyNode2d::IsDraw2d()
-{
-	return m_bIsDraw2d;
-}
-
 
 void IHyNode2d::ParentDetach()
 {

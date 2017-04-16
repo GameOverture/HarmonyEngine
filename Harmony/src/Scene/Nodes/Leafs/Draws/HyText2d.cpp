@@ -59,7 +59,7 @@ uint32 HyText2d::TextGetStrLength()
 float HyText2d::TextGetScaleBoxModifer()
 {
 	if(m_bIsDirty)
-		OnUpdate();
+		DrawUpdate();
 
 	return m_fScaleBoxModifier;
 }
@@ -219,7 +219,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	m_RenderState.SetTextureHandle(pTextData->GetAtlas()->GetGfxApiHandle());
 }
 
-/*virtual*/ void HyText2d::OnUpdate()
+/*virtual*/ void HyText2d::DrawUpdate()
 {
 	if(m_bIsDirty == false)
 		return;
@@ -564,8 +564,8 @@ offsetCalculation:
 
 /*virtual*/ void HyText2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-	// OnUpdate called here to ensure 'm_uiNumValidCharacters' is up to date with 'm_sCurrentString'
-	OnUpdate();
+	// DrawUpdate called here to ensure 'm_uiNumValidCharacters' is up to date with 'm_sCurrentString'
+	DrawUpdate();
 
 	HyText2dData *pData = static_cast<HyText2dData *>(UncheckedGetData());
 

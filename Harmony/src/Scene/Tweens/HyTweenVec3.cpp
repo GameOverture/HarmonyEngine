@@ -7,7 +7,7 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Nodes/Tweens/HyTweenVec3.h"
+#include "Scene/Tweens/HyTweenVec3.h"
 
 HyTweenVec3::HyTweenVec3(IHyNode &ownerRef, HyNodeDirtyType eDirtyType)
 {

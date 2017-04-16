@@ -96,7 +96,7 @@ public:
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true, bool bPreserveGlyphRatios = false);
 
 protected:
-	virtual void OnUpdate() override;
+	virtual void DrawUpdate() override;
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;
 	virtual void OnUpdateUniforms() override;

@@ -18,8 +18,7 @@ enum HyNodeDirtyType
 {
 	HYNODEDIRTY_Transform	= 1 << 0,
 	HYNODEDIRTY_Color		= 1 << 1,
-	HYNODEDIRTY_Scissor		= 1 << 2,
-	HYNODEDIRTY_DontCare	= 1 << 3
+	HYNODEDIRTY_DontCare	= 1 << 2
 };
 
 class IHyNode

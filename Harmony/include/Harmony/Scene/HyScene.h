@@ -20,7 +20,8 @@
 // Forward declarations
 class IHyNode;
 class IHyNode2d;
-class IHyDraw2d;
+class IHyLeafDraw2d;
+class IHyNode3d;
 
 class HySound;
 class HySpine2d;
@@ -58,8 +59,8 @@ class HyScene
 	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;	// List of nodes who will update when the game is paused
 	bool												m_bPauseGame;
 
-	std::vector<IHyDraw2d *>							m_NodeList_Loaded;			// List of nodes who can be drawn, and their graphics assets are fully loaded
-	std::vector<IHyDraw2d *>							m_LoadedInst3dList;
+	std::vector<IHyLeafDraw2d *>						m_NodeList_Loaded;			// List of nodes who can be drawn, and their graphics assets are fully loaded
+	std::vector<IHyNode3d *>							m_LoadedInst3dList;	// TODO: rename this
 
 	// Used when writing the graphics draw buffer
 	char *												m_pCurWritePos;
@@ -76,10 +77,10 @@ public:
 	static void AddNode_PauseUpdate(IHyNode *pNode);
 	static void RemoveNode_PauseUpdate(IHyNode *pNode);
 
-	void AddNode_Loaded(IHyDraw2d *pInst);
-	void RemoveNode_Loaded(IHyDraw2d *pInst);
+	void AddNode_Loaded(IHyLeafDraw2d *pInst);
+	void RemoveNode_Loaded(IHyLeafDraw2d *pInst);
 
-	void CopyAllLoadedNodes(std::vector<IHyDraw2d *> &vInstsToCopy);
+	void CopyAllLoadedNodes(std::vector<IHyLeafDraw2d *> &vInstsToCopy);
 
 	void DebugDrawPhysics2d(bool bDraw)					{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
 
@@ -91,7 +92,7 @@ private:
 	
 	void WriteDrawBuffer();
 	
-	static bool Node2dSortPredicate(const IHyDraw2d *pInst1, const IHyDraw2d *pInst2);
+	static bool Node2dSortPredicate(const IHyLeafDraw2d *pInst1, const IHyLeafDraw2d *pInst2);
 };
 
 #endif /* __HyScene_h__ */

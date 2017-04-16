@@ -11,12 +11,11 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyWindow.h"
-#include "Scene/Nodes/Draws/IHyDraw2d.h"
-#include "Scene/Nodes/Draws/HySprite2d.h"
-#include "Scene/Nodes/Draws/HySpine2d.h"
-#include "Scene/Nodes/Draws/HyPrimitive2d.h"
-#include "Scene/Nodes/Draws/HyText2d.h"
-#include "Scene/Nodes/Draws/HyTexturedQuad2d.h"
+#include "Scene/Nodes/Leafs/Draws/HySprite2d.h"
+#include "Scene/Nodes/Leafs/Draws/HySpine2d.h"
+#include "Scene/Nodes/Leafs/Draws/HyPrimitive2d.h"
+#include "Scene/Nodes/Leafs/Draws/HyText2d.h"
+#include "Scene/Nodes/Leafs/Draws/HyTexturedQuad2d.h"
 #include "Scene/Physics/HyPhysEntity2d.h"
 #include "Time/IHyTime.h"
 
@@ -42,7 +41,7 @@ HyScene::HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef
 
 HyScene::~HyScene(void)
 {
-	IHyDraw2d::sm_pHyAssets = NULL;
+	IHyLeafDraw2d::sm_pHyAssets = nullptr;
 }
 
 /*static*/ void HyScene::AddNode(IHyNode *pNode)
@@ -52,7 +51,7 @@ HyScene::~HyScene(void)
 
 /*static*/ void HyScene::RemoveNode(IHyNode *pNode)
 {
-	for(std::vector<IHyNode *>::iterator it = sm_NodeList.begin(); it != sm_NodeList.end(); ++it)
+	for(auto it = sm_NodeList.begin(); it != sm_NodeList.end(); ++it)
 	{
 		if((*it) == pNode)
 		{
@@ -70,7 +69,7 @@ HyScene::~HyScene(void)
 
 /*static*/ void HyScene::RemoveNode_PauseUpdate(IHyNode *pNode)
 {
-	for(std::vector<IHyNode *>::iterator it = sm_NodeList_PauseUpdate.begin(); it != sm_NodeList_PauseUpdate.end(); ++it)
+	for(auto it = sm_NodeList_PauseUpdate.begin(); it != sm_NodeList_PauseUpdate.end(); ++it)
 	{
 		if((*it) == pNode)
 		{
@@ -81,15 +80,15 @@ HyScene::~HyScene(void)
 	}
 }
 
-void HyScene::AddNode_Loaded(IHyDraw2d *pInst)
+void HyScene::AddNode_Loaded(IHyLeafDraw2d *pInst)
 {
 	m_NodeList_Loaded.push_back(pInst);
 	sm_bInst2dOrderingDirty = true;
 }
 
-void HyScene::RemoveNode_Loaded(IHyDraw2d *pInst)
+void HyScene::RemoveNode_Loaded(IHyLeafDraw2d *pInst)
 {
-	for(std::vector<IHyDraw2d *>::iterator it = m_NodeList_Loaded.begin(); it != m_NodeList_Loaded.end(); ++it)
+	for(auto it = m_NodeList_Loaded.begin(); it != m_NodeList_Loaded.end(); ++it)
 	{
 		if((*it) == pInst)
 		{
@@ -100,7 +99,7 @@ void HyScene::RemoveNode_Loaded(IHyDraw2d *pInst)
 	}
 }
 
-void HyScene::CopyAllLoadedNodes(std::vector<IHyDraw2d *> &vInstsToCopy)
+void HyScene::CopyAllLoadedNodes(std::vector<IHyLeafDraw2d *> &vInstsToCopy)
 {
 	vInstsToCopy = m_NodeList_Loaded;
 }
@@ -316,7 +315,7 @@ void HyScene::WriteDrawBuffer()
 	m_GfxCommsRef.SetSharedPointers();
 }
 
-/*static*/ bool HyScene::Node2dSortPredicate(const IHyDraw2d *pInst1, const IHyDraw2d *pInst2)
+/*static*/ bool HyScene::Node2dSortPredicate(const IHyLeafDraw2d *pInst1, const IHyLeafDraw2d *pInst2)
 {
 	if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
 	{

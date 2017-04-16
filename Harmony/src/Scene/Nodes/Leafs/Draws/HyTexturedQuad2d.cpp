@@ -101,7 +101,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	return static_cast<HyTexturedQuad2dData *>(AcquireData())->GetAtlas()->GetHeight();
 }
 
-/*virtual*/ void HyTexturedQuad2d::OnUpdate()
+/*virtual*/ void HyTexturedQuad2d::DrawUpdate()
 {
 	if(IsLoaded() == false || m_bIS_RAW)
 		return;

@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode2d.h"
-#include "Scene/Nodes/Tweens/HyTweenVec3.h"
+#include "Scene/Tweens/HyTweenVec3.h"
 
 class IHyNodeDraw2d : public IHyNode2d
 {
@@ -45,8 +45,12 @@ public:
 
 	bool IsScissorSet();
 	const HyScreenRect<int32> &GetScissor();
-	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
-	void ClearScissor();
+	//void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
+	//void ClearScissor();
+
+	virtual bool IsLoaded() const = 0;
+	virtual void Load() = 0;
+	virtual void Unload() = 0;
 
 protected:
 	virtual void NodeUpdate() = 0;

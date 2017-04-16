@@ -12,7 +12,8 @@
 
 /*static*/ b2World *HyPhysEntity2d::sm_b2WorldRef = NULL;
 
-HyPhysEntity2d::HyPhysEntity2d(b2BodyType eBodyType) :	m_keBodyType(eBodyType),
+HyPhysEntity2d::HyPhysEntity2d(b2BodyType eBodyType) :	HyEntity2d(nullptr),
+														m_keBodyType(eBodyType),
 														m_b2Body(NULL),
 														m_ptPrevPos(0.0f),
 														m_fPrevRotation(0.0f),

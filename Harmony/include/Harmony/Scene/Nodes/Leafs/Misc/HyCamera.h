@@ -54,6 +54,9 @@ public:
 
 private:
 	virtual void NodeUpdate() override;
+	virtual bool IsLoaded() { return true; }
+	virtual void Load() { }
+	virtual void Unload() { }
 };
 
 class HyCamera3d : public IHyNode3d, public IHyCamera

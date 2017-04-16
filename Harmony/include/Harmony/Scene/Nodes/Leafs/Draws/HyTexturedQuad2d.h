@@ -41,7 +41,7 @@ public:
 	uint32 GetEntireTextureHeight();
 
 private:
-	virtual void OnUpdate() override;
+	virtual void DrawUpdate() override;
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 };

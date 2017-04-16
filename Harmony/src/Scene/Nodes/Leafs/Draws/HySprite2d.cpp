@@ -106,8 +106,6 @@ void HySprite2d::AnimSetFrame(uint32 uiFrameIndex)
 	}
 
 	m_uiCurFrame = uiFrameIndex;
-
-	MakeBoundingVolumeDirty();
 }
 
 float HySprite2d::AnimGetPlayRate() const
@@ -143,8 +141,6 @@ void HySprite2d::AnimSetState(uint32 uiStateIndex)
 		m_uiCurFrame = 0;
 	else
 		m_uiCurFrame = AnimGetNumFrames() - 1;
-
-	MakeBoundingVolumeDirty();
 }
 
 bool HySprite2d::AnimIsFinished()
@@ -210,7 +206,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	return frameRef.vOFFSET;
 }
 
-/*virtual*/ void HySprite2d::OnUpdate()
+/*virtual*/ void HySprite2d::DrawUpdate()
 {
 	if(IsLoaded() == false)
 		return;
@@ -285,8 +281,6 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 
 		m_uiCurFrame = iNextFrameIndex;
 		m_fElapsedFrameTime -= frameRef.fDURATION;
-
-		MakeBoundingVolumeDirty();
 	}
 
 	const HySprite2dFrame &UpdatedFrameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);

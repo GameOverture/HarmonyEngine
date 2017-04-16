@@ -274,7 +274,7 @@ void HyAssets::RemoveGfxData(IHyLeafDraw2d *pDrawNode2d)
 // Unload everything
 void HyAssets::Shutdown()
 {
-	std::vector<IHyDraw2d *> vReloadInsts;
+	std::vector<IHyLeafDraw2d *> vReloadInsts;
 	m_SceneRef.CopyAllLoadedNodes(vReloadInsts);
 
 	for(uint32 i = 0; i < m_QueuedInst2dList.size(); ++i)

@@ -160,7 +160,7 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 //}
 
 // Will only be called after it has been initialized by the Factory
-/*virtual*/ void HySpine2d::OnUpdate()
+/*virtual*/ void HySpine2d::DrawUpdate()
 {
 	if(IsLoaded() == false)
 		return;

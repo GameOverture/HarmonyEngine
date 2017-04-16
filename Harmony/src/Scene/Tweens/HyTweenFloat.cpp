@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Tweens/HyTweenFloat.h"
+#include "Scene/Tweens/HyTweenFloat.h"
 
 #include "Time/IHyTime.h"
 #include "Utilities/HyMath.h"

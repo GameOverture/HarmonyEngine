@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
-#include "Scene/Nodes/Tweens/HyTweenFuncs.h"
+#include "Scene/Tweens/HyTweenFuncs.h"
 #include <functional>
 
 class IHyNode;

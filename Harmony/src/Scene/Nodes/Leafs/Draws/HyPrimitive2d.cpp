@@ -37,8 +37,6 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 		m_uiBufferSize = p.m_uiBufferSize;
 		memcpy(m_pDrawBuffer, p.m_pDrawBuffer, m_uiBufferSize);
 	}
-
-	MakeBoundingVolumeDirty();
 	
 	return *this;
 }
@@ -88,8 +86,6 @@ void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe)
 		m_pDrawBuffer[3].x = fWidth;
 		m_pDrawBuffer[3].y = fHeight;
 	}
-
-	MakeBoundingVolumeDirty();
 }
 
 void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe)
@@ -121,8 +117,6 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 		m_pDrawBuffer[i].x = (sin(t) * fRadius);
 		m_pDrawBuffer[i].y = (cos(t) * fRadius);
 	}
-
-	MakeBoundingVolumeDirty();
 }
 
 void HyPrimitive2d::SetAsLineChain(std::vector<glm::vec2> &vertexList)
@@ -158,8 +152,6 @@ void HyPrimitive2d::SetAsLineChain(std::vector<glm::vec2> &vertexList)
 		/*postion 2 dup*/ m_pDrawBuffer[j + 6] = m_pDrawBuffer[j + 4];
 		/*Normal  2 inv*/ m_pDrawBuffer[j + 7] = m_pDrawBuffer[j + 5] * -1.0f;
 	}
-
-	MakeBoundingVolumeDirty();
 }
 
 float HyPrimitive2d::GetLineThickness()
@@ -181,8 +173,6 @@ void HyPrimitive2d::ClearData()
 	m_RenderState.SetNumInstances(1);
 	m_RenderState.Disable(HyRenderState::DRAWMODEMASK);
 	m_ShaderUniforms.Clear();
-
-	MakeBoundingVolumeDirty();
 }
 
 /*virtual*/ void HyPrimitive2d::OnCalcBoundingVolume()

@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Scene/HyScene.h"
+#include "HyEngine.h"
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyNodeDraw2d(HYTYPE_Entity2d, pParent),
 															m_uiAttributes(0),
@@ -21,17 +22,6 @@ HyEntity2d::~HyEntity2d(void)
 {
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
-}
-
-bool HyEntity2d::IsLoaded() const
-{
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		if(m_ChildList[i]->IsDraw2d() && static_cast<IHyDraw2d *>(m_ChildList[i])->IsLoaded() == false)
-			return false;
-	}
-
-	return true;
 }
 
 void HyEntity2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
@@ -63,6 +53,27 @@ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitCh
 		m_ChildList[i]->_SetPauseUpdate(m_bPauseOverride, bOverrideExplicitChildren);
 }
 
+void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren)
+{
+	m_LocalScissorRect.x = uiLocalX;
+	m_LocalScissorRect.y = uiLocalY;
+	m_LocalScissorRect.width = uiWidth;
+	m_LocalScissorRect.height = uiHeight;
+	
+	m_LocalScissorRect.iTag = 1;
+	m_uiExplicitFlags |= EXPLICIT_Scissor;
+}
+
+void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren)
+{
+	m_LocalScissorRect.iTag = 0;
+
+	if(bUseParentScissor == false)
+		m_uiExplicitFlags |= EXPLICIT_Scissor;
+	else
+		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+}
+
 int32 HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren)
 {
 	m_iDisplayOrder = iOrderValue;
@@ -70,6 +81,9 @@ int32 HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChild
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
+
+	// TODO: fix
+	return iOrderValue;
 }
 
 void HyEntity2d::ChildAppend(IHyNode2d &childInst)
@@ -180,9 +194,82 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 {
 }
 
+/*virtual*/ bool HyEntity2d::IsLoaded() const /*override*/
+{
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(m_ChildList[i]->IsLoaded() == false)
+			return false;
+	}
+
+	return true;
+}
+
+/*virtual*/ void HyEntity2d::Load() /*override*/
+{
+	// Load any attached children
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->Load();
+}
+
+/*virtual*/ void HyEntity2d::Unload() /*override*/
+{
+	// Unload any attached children
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->Unload();
+}
+
 /*virtual*/ void HyEntity2d::NodeUpdate() /*override final*/
 {
+	if((m_uiAttributes & (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_MouseInput)) != 0)
+	{
+		if(m_uiAttributes & ATTRIBFLAG_BoundingVolumeDirty)
+		{
+			OnCalcBoundingVolume();
+			m_uiAttributes &= ~ATTRIBFLAG_BoundingVolumeDirty;
+		}
 
+		if((m_uiAttributes & ATTRIBFLAG_MouseInput) != 0)
+		{
+			bool bLeftClickDown = IHyInputMap::IsMouseLeftDown();
+			bool bMouseInBounds = m_BoundingVolume.IsWorldPointCollide(IHyInputMap::GetWorldMousePos());
+
+			switch(m_eMouseInputState)
+			{
+			case MOUSEINPUT_None:
+				if(bLeftClickDown == false && bMouseInBounds)
+				{
+					m_eMouseInputState = MOUSEINPUT_Hover;
+					OnMouseEnter(m_pMouseInputUserParam);
+				}
+				break;
+
+			case MOUSEINPUT_Hover:
+				if(bMouseInBounds == false)
+				{
+					m_eMouseInputState = MOUSEINPUT_None;
+					OnMouseLeave(m_pMouseInputUserParam);
+				}
+				else if(bLeftClickDown)
+				{
+					m_eMouseInputState = MOUSEINPUT_Down;
+					OnMouseDown(m_pMouseInputUserParam);
+				}
+				break;
+
+			case MOUSEINPUT_Down:
+				if(bLeftClickDown == false)
+				{
+					m_eMouseInputState = MOUSEINPUT_None;
+					OnMouseUp(m_pMouseInputUserParam);
+
+					if(bMouseInBounds)
+						OnMouseClicked(m_pMouseInputUserParam);
+				}
+				break;
+			}
+		}
+	}
 }
 
 /*virtual*/ void HyEntity2d::SetDirty(HyNodeDirtyType eDirtyType)
@@ -197,21 +284,8 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 {
 	childInst._SetEnabled(m_bEnabled, false);
 	childInst._SetPauseUpdate(m_bPauseOverride, false);
-	childInst._SetScissor(scissor, false);
+	//childInst._SetScissor(scissor, false);
 	//childInst._SetDisplayOrder(
-}
-
-/*virtual*/ void HyEntity2d::NodeUpdate()
-{
-	if(IsDirty(HYNODEDIRTY_Scissor))
-	{
-		if(scissor.IsEnabled())
-		{
-			scissor.
-		}
-
-		ClearDirty(HYNODEDIRTY_Scissor);
-	}
 }
 
 /*virtual*/ void HyEntity2d::_SetEnabled(bool bEnabled, bool bIsOverriding)
@@ -236,20 +310,7 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 	}
 }
 
-/*virtual*/ void HyEntity2d::_SetScissor(HyScissor &scissorRef, bool bIsOverriding)
-{
-	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
-
-	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
-	{
-		scissor = scissorRef;
-
-		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_SetScissor(scissor, bIsOverriding);
-	}
-}
-
 /*virtual*/ int32 HyEntity2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)
 {
+	return iOrderValue;
 }

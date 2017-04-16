@@ -25,6 +25,37 @@ IHyLeafDraw2d::~IHyLeafDraw2d()
 	Unload();
 }
 
+void IHyLeafDraw2d::SetEnabled(bool bEnabled)
+{
+	m_bEnabled = bEnabled;
+	m_uiExplicitFlags |= EXPLICIT_Enabled;
+}
+
+void IHyLeafDraw2d::SetPauseUpdate(bool bUpdateWhenPaused)
+{
+	if(bUpdateWhenPaused)
+	{
+		if(m_bPauseOverride == false)
+			HyScene::AddNode_PauseUpdate(this);
+	}
+	else
+	{
+		if(m_bPauseOverride == true)
+			HyScene::RemoveNode_PauseUpdate(this);
+	}
+
+	m_bPauseOverride = bUpdateWhenPaused;
+	m_uiExplicitFlags |= EXPLICIT_PauseUpdate;
+}
+
+void IHyLeafDraw2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
+{
+}
+
+void IHyLeafDraw2d::ClearScissor(bool bUseParentScissor)
+{
+}
+
 const std::string &IHyLeafDraw2d::GetName()
 {
 	return m_sNAME;
@@ -35,21 +66,13 @@ const std::string &IHyLeafDraw2d::GetPrefix()
 	return m_sPREFIX;
 }
 
-bool IHyLeafDraw2d::IsLoaded() const
-{
-	return m_eLoadState == HYLOADSTATE_Loaded;
-}
-
 IHyNodeData *IHyLeafDraw2d::AcquireData()
 {
 	if(m_pData == nullptr)
 	{
 		sm_pHyAssets->GetNodeData(this, m_pData);
 		if(m_pData)
-		{
-			MakeBoundingVolumeDirty();
 			OnDataAcquired();
-		}
 	}
 
 	return m_pData;
@@ -113,7 +136,12 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 	m_RenderState.SetShaderId(pShader->GetId());
 }
 
-void IHyLeafDraw2d::Load()
+/*virtual*/ bool IHyLeafDraw2d::IsLoaded() const /*override*/
+{
+	return m_eLoadState == HYLOADSTATE_Loaded;
+}
+
+/*virtual*/ void IHyLeafDraw2d::Load() /*override*/
 {
 	HyAssert(sm_pHyAssets, "IHyDraw2d::Load was invoked before engine has been initialized");
 
@@ -131,27 +159,40 @@ void IHyLeafDraw2d::Load()
 
 		sm_pHyAssets->LoadGfxData(this);
 	}
-
-	// Load any attached children
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		if(m_ChildList[i]->IsDraw2d())
-			static_cast<IHyDraw2d *>(m_ChildList[i])->Load();
-	}
 }
 
-/*virtual*/ void IHyLeafDraw2d::Unload()
+/*virtual*/ void IHyLeafDraw2d::Unload() /*override*/
 {
-	HyAssert(sm_pHyAssets, "IHyDraw2d::Unload was invoked before engine has been initialized");
-
-	// Unload any attached children
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		if(m_ChildList[i]->IsDraw2d())
-			static_cast<IHyDraw2d *>(m_ChildList[i])->Unload();
-	}
-	
+	HyAssert(sm_pHyAssets, "IHyDraw2d::Unload was invoked before engine has been initialized");	
 	sm_pHyAssets->RemoveGfxData(this);
+}
+
+/*virtual*/ void IHyLeafDraw2d::NodeUpdate() /*override final*/
+{
+	//if((m_uiAttributes & ATTRIBFLAG_Scissor) != 0)
+	//{
+	//	glm::mat4 mtx;
+	//	GetWorldTransform(mtx);
+
+	//	m_RenderState.SetScissorRect(static_cast<int32>(mtx[3].x + m_LocalScissorRect.x),
+	//								 static_cast<int32>(mtx[3].y + m_LocalScissorRect.y),
+	//								 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.width),
+	//								 static_cast<uint32>(mtx[1].y * m_LocalScissorRect.height));
+
+	//	ForEachChild([&](IHyNode *pChildNode)
+	//				{
+	//					if(pChildNode->IsDraw2d())
+	//						static_cast<IHyDraw2d *>(pChildNode)->m_RenderState.SetScissorRect(this->m_RenderState.GetScissorRect());
+	//				});
+	//}
+
+	DrawUpdate();
+
+	if(m_eLoadState == HYLOADSTATE_Loaded)
+	{
+		OnUpdateUniforms();
+		m_RenderState.SetUniformCrc32(m_ShaderUniforms.GetCrc32());
+	}
 }
 
 IHyNodeData *IHyLeafDraw2d::UncheckedGetData()

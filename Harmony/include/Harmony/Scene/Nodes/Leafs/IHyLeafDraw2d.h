@@ -19,6 +19,7 @@
 
 #include <set>
 
+// NOTE: This class should contain a copy of all the functions/members of IHyLeaf2d. Multiple inheritance is not an option
 class IHyLeafDraw2d : public IHyNodeDraw2d
 {	
 	friend class HyScene;
@@ -43,10 +44,14 @@ public:
 	IHyLeafDraw2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	virtual ~IHyLeafDraw2d();
 
+	void SetEnabled(bool bEnabled);
+	void SetPauseUpdate(bool bUpdateWhenPaused);
+
+	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
+	void ClearScissor(bool bUseParentScissor);
+
 	const std::string &GetName();
 	const std::string &GetPrefix();
-
-	bool IsLoaded() const;
 
 	IHyNodeData *AcquireData();
 
@@ -59,16 +64,19 @@ public:
 	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);
 
-	void Load();
-	void Unload();
+	virtual bool IsLoaded() const override;
+	virtual void Load() override;
+	virtual void Unload() override;
 
 protected:
+	virtual void NodeUpdate() override final;
+
 	IHyNodeData *UncheckedGetData();
 	const HyRenderState &GetRenderState() const;
 
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
-	virtual void OnUpdate() { };
+	virtual void DrawUpdate() { };
 	virtual void OnDataAcquired() { }									// Invoked once on the first time this node's data is queried
 	virtual void OnLoaded() { }											// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
 	virtual void OnCalcBoundingVolume() { }								// Should calculate the local bounding volume in 'm_BoundingVolume'

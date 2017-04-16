@@ -231,20 +231,17 @@
     <ClCompile Include="Scene\Nodes\Leafs\Draws\HyTexturedQuad2d.cpp">
       <Filter>Scene\Nodes\Leafs\Draws</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Leafs\Draws\IHyDraw2d.cpp">
-      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    <ClCompile Include="Scene\Tweens\HyTweenFloat.cpp">
+      <Filter>Scene\Tweens</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Tweens\HyTweenFloat.cpp">
-      <Filter>Scene\Nodes\Tweens</Filter>
+    <ClCompile Include="Scene\Tweens\HyTweenFuncs.cpp">
+      <Filter>Scene\Tweens</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Tweens\HyTweenFuncs.cpp">
-      <Filter>Scene\Nodes\Tweens</Filter>
+    <ClCompile Include="Scene\Tweens\HyTweenVec2.cpp">
+      <Filter>Scene\Tweens</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Tweens\HyTweenVec2.cpp">
-      <Filter>Scene\Nodes\Tweens</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Tweens\HyTweenVec3.cpp">
-      <Filter>Scene\Nodes\Tweens</Filter>
+    <ClCompile Include="Scene\Tweens\HyTweenVec3.cpp">
+      <Filter>Scene\Tweens</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -344,7 +341,7 @@
     <Filter Include="Scene\Nodes\Leafs\Misc">
       <UniqueIdentifier>{0cc31b32-78b7-436c-8a60-22311beb346e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scene\Nodes\Tweens">
+    <Filter Include="Scene\Tweens">
       <UniqueIdentifier>{86c28654-7313-4a8e-b418-a60556fb4fd7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -648,20 +645,17 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\Draws\HyTexturedQuad2d.h">
       <Filter>Scene\Nodes\Leafs\Draws</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\Draws\IHyDraw2d.h">
-      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    <ClInclude Include="..\include\Harmony\Scene\Tweens\HyTweenFloat.h">
+      <Filter>Scene\Tweens</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Tweens\HyTweenFloat.h">
-      <Filter>Scene\Nodes\Tweens</Filter>
+    <ClInclude Include="..\include\Harmony\Scene\Tweens\HyTweenFuncs.h">
+      <Filter>Scene\Tweens</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Tweens\HyTweenFuncs.h">
-      <Filter>Scene\Nodes\Tweens</Filter>
+    <ClInclude Include="..\include\Harmony\Scene\Tweens\HyTweenVec2.h">
+      <Filter>Scene\Tweens</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Tweens\HyTweenVec2.h">
-      <Filter>Scene\Nodes\Tweens</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Tweens\HyTweenVec3.h">
-      <Filter>Scene\Nodes\Tweens</Filter>
+    <ClInclude Include="..\include\Harmony\Scene\Tweens\HyTweenVec3.h">
+      <Filter>Scene\Tweens</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

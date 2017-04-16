@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
-#include "Scene/Nodes/Tweens/HyTweenVec2.h"
+#include "Scene/Tweens/HyTweenVec2.h"
 #include "Scene/Physics/HyBoundingVolume2d.h"
 
 #include <functional>
@@ -22,12 +22,8 @@ class HyEntity2d;
 class IHyNode2d : public IHyNode
 {
 	friend class HyEntity2d;
-	friend class HyColor;
-	friend class HyScissor;
 
 protected:
-	bool							m_bIsDraw2d;
-
 	HyEntity2d *					m_pParent;
 
 	glm::mat4						m_mtxCached;
@@ -47,8 +43,6 @@ public:
 public:
 	IHyNode2d(HyType eNodeType, HyEntity2d *pParent);
 	virtual ~IHyNode2d();
-	
-	bool IsDraw2d();
 
 	void ParentDetach();
 	bool ParentExists();
@@ -65,8 +59,12 @@ protected:
 
 	//virtual void _SetEnabled(bool bEnabled, bool bIsOverriding);						// Only Entity2d/3d will invoke this
 	//virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
-	virtual void _SetScissor(HyScissor &scissorRef, bool bIsOverriding) { }			// Only Entity2d/3d will invoke this
-	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) { }		// Only Entity2d/3d will invoke this
+	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) = 0;		// Only Entity2d/3d will invoke this
+
+private:
+	virtual bool IsLoaded() = 0;
+	virtual void Load() = 0;
+	virtual void Unload() = 0;
 };
 
 #endif /* __IHyNode2d_h__ */

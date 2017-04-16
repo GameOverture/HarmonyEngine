@@ -109,7 +109,7 @@ public:
 private:
 	//virtual void OnDataLoaded() override;
 
-	virtual void OnUpdate() override;
+	virtual void DrawUpdate() override;
 	
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;

@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Scene/Nodes/Tweens/HyTweenFloat.h"
+#include "Scene/Tweens/HyTweenFloat.h"
 
 #include <vector>
 
