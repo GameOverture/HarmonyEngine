@@ -50,6 +50,8 @@ public:
 	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
 	void ClearScissor(bool bUseParentScissor);
 
+	void SetDisplayOrder(int32 iOrderValue);
+
 	const std::string &GetName();
 	const std::string &GetPrefix();
 
@@ -58,8 +60,6 @@ public:
 	HyCoordinateType GetCoordinateType();
 	void SetCoordinateType(HyCoordinateType eCoordType);
 
-	int32 GetDisplayOrder() const;
-	void SetDisplayOrder(int32 iOrderValue);
 
 	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);

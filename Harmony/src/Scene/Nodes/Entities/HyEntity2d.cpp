@@ -59,9 +59,20 @@ void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint
 	m_LocalScissorRect.y = uiLocalY;
 	m_LocalScissorRect.width = uiWidth;
 	m_LocalScissorRect.height = uiHeight;
-	
+
 	m_LocalScissorRect.iTag = 1;
 	m_uiExplicitFlags |= EXPLICIT_Scissor;
+
+	glm::mat4 mtx;
+	GetWorldTransform(mtx);
+	m_WorldScissorRect.x = static_cast<int32>(mtx[3].x + m_LocalScissorRect.x);
+	m_WorldScissorRect.y = static_cast<int32>(mtx[3].y + m_LocalScissorRect.y);
+	m_WorldScissorRect.width = static_cast<int32>(mtx[0].x * m_LocalScissorRect.width);
+	m_WorldScissorRect.height = static_cast<int32>(mtx[1].y * m_LocalScissorRect.height);
+	m_WorldScissorRect.iTag = 1;
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->_SetScissor(m_WorldScissorRect, bOverrideExplicitChildren);
 }
 
 void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren)
@@ -69,21 +80,25 @@ void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChil
 	m_LocalScissorRect.iTag = 0;
 
 	if(bUseParentScissor == false)
+	{
 		m_uiExplicitFlags |= EXPLICIT_Scissor;
+
+		m_WorldScissorRect.iTag = 0;
+
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+			m_ChildList[i]->_SetScissor(m_WorldScissorRect, bOverrideExplicitChildren);
+	}
 	else
 		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
 }
 
-int32 HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren)
+void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren)
 {
 	m_iDisplayOrder = iOrderValue;
 	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
-
-	// TODO: fix
-	return iOrderValue;
 }
 
 void HyEntity2d::ChildAppend(IHyNode2d &childInst)
@@ -241,8 +256,6 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 			m_ChildList[i]->_SetScissor(m_WorldScissorRect, false);
 	}
 
-
-
 	if((m_uiAttributes & (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_MouseInput)) != 0)
 	{
 		if(m_uiAttributes & ATTRIBFLAG_BoundingVolumeDirty)
@@ -306,8 +319,8 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 {
 	childInst._SetEnabled(m_bEnabled, false);
 	childInst._SetPauseUpdate(m_bPauseOverride, false);
-	//childInst._SetScissor(scissor, false);
-	//childInst._SetDisplayOrder(
+	childInst._SetScissor(m_WorldScissorRect, false);
+	childInst._SetDisplayOrder(m_iDisplayOrder, false);
 }
 
 /*virtual*/ void HyEntity2d::_SetEnabled(bool bEnabled, bool bIsOverriding) /*override*/
@@ -339,7 +352,7 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
 	{
-		m_
+		m_WorldScissorRect = worldScissorRectRef;
 
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 			m_ChildList[i]->_SetScissor(worldScissorRectRef, bIsOverriding);
@@ -348,5 +361,14 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 
 /*virtual*/ int32 HyEntity2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
 {
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_DisplayOrder;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_DisplayOrder))
+	{
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+			iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, bIsOverriding);
+	}
+
 	return iOrderValue;
 }

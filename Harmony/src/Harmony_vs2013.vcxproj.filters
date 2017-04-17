@@ -129,48 +129,6 @@
     <ClCompile Include="Scene\Physics\HyPhysEntity2d.cpp">
       <Filter>Scene\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\HyMesh3d.cpp">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\HyPrimitive2d.cpp">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\HySpine2d.cpp">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\HySprite2d.cpp">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\HyText2d.cpp">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\HyTexturedQuad2d.cpp">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\IHyDraw2d.cpp">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Misc\HyAudio2d.cpp">
-      <Filter>Scene\Nodes\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Misc\HyCamera.cpp">
-      <Filter>Scene\Nodes\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Transforms\Tweens\HyTweenFloat.cpp">
-      <Filter>Scene\Nodes\Transforms\Tweens</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Transforms\Tweens\HyTweenFuncs.cpp">
-      <Filter>Scene\Nodes\Transforms\Tweens</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Transforms\Tweens\HyTweenVec2.cpp">
-      <Filter>Scene\Nodes\Transforms\Tweens</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Transforms\Tweens\HyTweenVec3.cpp">
-      <Filter>Scene\Nodes\Transforms\Tweens</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\HyEntity2d.cpp">
-      <Filter>Scene\Nodes</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Components\HyGfxComms.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
@@ -228,8 +186,20 @@
     <ClCompile Include="Diagnostics\Interop\HyConsole_Gui.cpp">
       <Filter>Diagnostics\Interop</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Leafs\IHyLeafNode.cpp">
-      <Filter>Scene\Nodes\Leafs</Filter>
+    <ClCompile Include="Scene\Tweens\HyTweenFloat.cpp">
+      <Filter>Scene\Tweens</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Tweens\HyTweenFuncs.cpp">
+      <Filter>Scene\Tweens</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Tweens\HyTweenVec2.cpp">
+      <Filter>Scene\Tweens</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Tweens\HyTweenVec3.cpp">
+      <Filter>Scene\Tweens</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\IHyNode.cpp">
+      <Filter>Scene\Nodes</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Nodes\IHyNode2d.cpp">
       <Filter>Scene\Nodes</Filter>
@@ -237,8 +207,41 @@
     <ClCompile Include="Scene\Nodes\IHyNode3d.cpp">
       <Filter>Scene\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\IHyNode.cpp">
+    <ClCompile Include="Scene\Nodes\IHyNodeDraw2d.cpp">
       <Filter>Scene\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Entities\HyEntity2d.cpp">
+      <Filter>Scene\Nodes\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Leafs\IHyLeaf2d.cpp">
+      <Filter>Scene\Nodes\Leafs</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Leafs\IHyLeafDraw2d.cpp">
+      <Filter>Scene\Nodes\Leafs</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Leafs\Draws\HyMesh3d.cpp">
+      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Leafs\Draws\HyPrimitive2d.cpp">
+      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Leafs\Draws\HySpine2d.cpp">
+      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Leafs\Draws\HySprite2d.cpp">
+      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Leafs\Draws\HyText2d.cpp">
+      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Leafs\Draws\HyTexturedQuad2d.cpp">
+      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Leafs\Misc\HyAudio2d.cpp">
+      <Filter>Scene\Nodes\Leafs\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Leafs\Misc\HyCamera.cpp">
+      <Filter>Scene\Nodes\Leafs\Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -314,18 +317,6 @@
     <Filter Include="Scene\Nodes">
       <UniqueIdentifier>{ecf26613-bed0-4aae-85a9-369e58d3a1f6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scene\Nodes\Draws">
-      <UniqueIdentifier>{0787f4f4-0285-4c32-a727-556b785e9ba1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scene\Nodes\Misc">
-      <UniqueIdentifier>{854cc37e-626a-4a09-8d26-c3f70744421c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scene\Nodes\Transforms">
-      <UniqueIdentifier>{da8e22d6-0571-4f0a-9a4c-371cdcd0288a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scene\Nodes\Transforms\Tweens">
-      <UniqueIdentifier>{373d9967-c9fc-4fe6-b352-3e2a2a596f32}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Renderer\Components">
       <UniqueIdentifier>{f88cc56b-d7e8-4470-828b-8c4b27791e7a}</UniqueIdentifier>
     </Filter>
@@ -340,6 +331,18 @@
     </Filter>
     <Filter Include="Scene\Nodes\Leafs">
       <UniqueIdentifier>{cbda319e-ad66-45be-a136-10d2765ca633}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Tweens">
+      <UniqueIdentifier>{373d9967-c9fc-4fe6-b352-3e2a2a596f32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Nodes\Leafs\Misc">
+      <UniqueIdentifier>{854cc37e-626a-4a09-8d26-c3f70744421c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Nodes\Leafs\Draws">
+      <UniqueIdentifier>{bd1fde72-29ac-4a1b-8ec6-775d869afb1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Nodes\Entities">
+      <UniqueIdentifier>{8beedd04-a520-4144-9b90-c30a22343337}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -537,48 +540,6 @@
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyPhysEntity2d.h">
       <Filter>Scene\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\HyEntity2d.h">
-      <Filter>Scene\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\Tweens\HyTweenFloat.h">
-      <Filter>Scene\Nodes\Transforms\Tweens</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\Tweens\HyTweenFuncs.h">
-      <Filter>Scene\Nodes\Transforms\Tweens</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\Tweens\HyTweenVec2.h">
-      <Filter>Scene\Nodes\Transforms\Tweens</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Transforms\Tweens\HyTweenVec3.h">
-      <Filter>Scene\Nodes\Transforms\Tweens</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyAudio2d.h">
-      <Filter>Scene\Nodes\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyCamera.h">
-      <Filter>Scene\Nodes\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\HyMesh3d.h">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\HyPrimitive2d.h">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\HySpine2d.h">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\HySprite2d.h">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\HyText2d.h">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\HyTexturedQuad2d.h">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\IHyDraw2d.h">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyGfxComms.h">
       <Filter>Renderer\Components</Filter>
     </ClInclude>
@@ -639,8 +600,53 @@
     <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Gui.h">
       <Filter>Diagnostics\Interop</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\IHyLeafNode.h">
+    <ClInclude Include="..\include\Harmony\Scene\Tweens\HyTweenFloat.h">
+      <Filter>Scene\Tweens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Tweens\HyTweenFuncs.h">
+      <Filter>Scene\Tweens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Tweens\HyTweenVec2.h">
+      <Filter>Scene\Tweens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Tweens\HyTweenVec3.h">
+      <Filter>Scene\Tweens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\IHyLeaf2d.h">
       <Filter>Scene\Nodes\Leafs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\IHyLeafDraw2d.h">
+      <Filter>Scene\Nodes\Leafs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\Draws\HyMesh3d.h">
+      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\Draws\HyPrimitive2d.h">
+      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\Draws\HySpine2d.h">
+      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\Draws\HySprite2d.h">
+      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\Draws\HyText2d.h">
+      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\Draws\HyTexturedQuad2d.h">
+      <Filter>Scene\Nodes\Leafs\Draws</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\Misc\HyAudio2d.h">
+      <Filter>Scene\Nodes\Leafs\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\Misc\HyCamera.h">
+      <Filter>Scene\Nodes\Leafs\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Entities\HyEntity2d.h">
+      <Filter>Scene\Nodes\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode.h">
+      <Filter>Scene\Nodes</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode2d.h">
       <Filter>Scene\Nodes</Filter>
@@ -648,7 +654,7 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode3d.h">
       <Filter>Scene\Nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode.h">
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNodeDraw2d.h">
       <Filter>Scene\Nodes</Filter>
     </ClInclude>
   </ItemGroup>

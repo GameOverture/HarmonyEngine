@@ -57,15 +57,14 @@ public:
 protected:
 	virtual void NodeUpdate() = 0;
 
-	//virtual void _SetEnabled(bool bEnabled, bool bIsOverriding);						// Only Entity2d/3d will invoke this
-	//virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
-	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) = 0;
-	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) = 0;		// Only Entity2d/3d will invoke this
+	// '_' functions are used to propagate values down from parent, and are overridden with proper functionality later in hierarchy
+	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding)	{ }
+	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)							{ return iOrderValue; }
 
 private:
-	virtual bool IsLoaded() const = 0;
-	virtual void Load() = 0;
-	virtual void Unload() = 0;
+	virtual bool IsLoaded() const { return true; }
+	virtual void Load() { }
+	virtual void Unload() { }
 };
 
 #endif /* __IHyNode2d_h__ */

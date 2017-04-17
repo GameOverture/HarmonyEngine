@@ -52,12 +52,8 @@ public:
 	// NOTE: Does not properly calculate camera twist - must be axis aligned
 	HyRectangle<float> GetWorldViewBounds();
 
-private:
+protected:
 	virtual void NodeUpdate() override;
-	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) { return iOrderValue; }
-	virtual bool IsLoaded() const { return true; }
-	virtual void Load() { }
-	virtual void Unload() { }
 };
 
 class HyCamera3d : public IHyNode3d, public IHyCamera
@@ -71,7 +67,7 @@ public:
 	virtual void SetZoom(const float fZoom) override;
 	virtual float GetZoom() const override;
 
-private:
+protected:
 	virtual void NodeUpdate() override;
 };
 

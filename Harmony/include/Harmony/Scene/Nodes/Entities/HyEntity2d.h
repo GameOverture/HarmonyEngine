@@ -45,7 +45,7 @@ public:
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
 	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren);
 	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren);
-	int32 SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
+	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
 
 	void ChildAppend(IHyNode2d &childRef);
 	bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef);

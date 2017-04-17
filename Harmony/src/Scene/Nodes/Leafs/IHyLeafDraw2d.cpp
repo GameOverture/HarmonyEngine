@@ -50,10 +50,31 @@ void IHyLeafDraw2d::SetPauseUpdate(bool bUpdateWhenPaused)
 
 void IHyLeafDraw2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
 {
+	m_LocalScissorRect.x = uiLocalX;
+	m_LocalScissorRect.y = uiLocalY;
+	m_LocalScissorRect.width = uiWidth;
+	m_LocalScissorRect.height = uiHeight;
+
+	m_LocalScissorRect.iTag = 1;
+	m_uiExplicitFlags |= EXPLICIT_Scissor;
 }
 
 void IHyLeafDraw2d::ClearScissor(bool bUseParentScissor)
 {
+	m_LocalScissorRect.iTag = 0;
+
+	if(bUseParentScissor == false)
+		m_uiExplicitFlags |= EXPLICIT_Scissor;
+	else
+		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+}
+
+void IHyLeafDraw2d::SetDisplayOrder(int32 iOrderValue)
+{
+	m_iDisplayOrder = iOrderValue;
+	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
+
+	HyScene::SetInstOrderingDirty();
 }
 
 const std::string &IHyLeafDraw2d::GetName()
@@ -107,19 +128,6 @@ void IHyLeafDraw2d::SetCoordinateType(HyCoordinateType eCoordType)
 	//}
 }
 
-int32 IHyLeafDraw2d::GetDisplayOrder() const
-{
-	return m_iDisplayOrder;
-}
-
-void IHyLeafDraw2d::SetDisplayOrder(int32 iOrderValue)
-{
-	m_iDisplayOrder = iOrderValue;
-	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
-
-	HyScene::SetInstOrderingDirty();
-}
-
 int32 IHyLeafDraw2d::GetShaderId()
 {
 	return m_RenderState.GetShaderId();
@@ -171,19 +179,27 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 {
 	if((m_uiExplicitFlags & EXPLICIT_Scissor) != 0)
 	{
-		glm::mat4 mtx;
-		GetWorldTransform(mtx);
+		if(m_LocalScissorRect.iTag == 1)
+		{
+			glm::mat4 mtx;
+			GetWorldTransform(mtx);
 
-		m_RenderState.SetScissorRect(static_cast<int32>(mtx[3].x + m_LocalScissorRect.x),
-									 static_cast<int32>(mtx[3].y + m_LocalScissorRect.y),
-									 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.width),
-									 static_cast<uint32>(mtx[1].y * m_LocalScissorRect.height));
+			m_WorldScissorRect.x = static_cast<int32>(mtx[3].x + m_LocalScissorRect.x);
+			m_WorldScissorRect.y = static_cast<int32>(mtx[3].y + m_LocalScissorRect.y);
+			m_WorldScissorRect.width = static_cast<int32>(mtx[0].x * m_LocalScissorRect.width);
+			m_WorldScissorRect.height = static_cast<int32>(mtx[1].y * m_LocalScissorRect.height);
+			m_WorldScissorRect.iTag = 1;
 
-		ForEachChild([&](IHyNode *pChildNode)
-					{
-						if(pChildNode->IsDraw2d())
-							static_cast<IHyDraw2d *>(pChildNode)->m_RenderState.SetScissorRect(this->m_RenderState.GetScissorRect());
-					});
+			m_RenderState.SetScissorRect(static_cast<int32>(mtx[3].x + m_LocalScissorRect.x),
+										 static_cast<int32>(mtx[3].y + m_LocalScissorRect.y),
+										 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.width),
+										 static_cast<uint32>(mtx[1].y * m_LocalScissorRect.height));
+		}
+		else
+		{
+			m_WorldScissorRect.iTag = 0;
+			m_RenderState.ClearScissorRect();
+		}
 	}
 
 	DrawUpdate();
@@ -211,6 +227,17 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 
 /*virtual*/ int32 IHyLeafDraw2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
 {
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_DisplayOrder;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_DisplayOrder))
+	{
+		m_iDisplayOrder = iOrderValue;
+		iOrderValue += 1;
+
+		HyScene::SetInstOrderingDirty();
+	}
+
 	return iOrderValue;
 }
 
