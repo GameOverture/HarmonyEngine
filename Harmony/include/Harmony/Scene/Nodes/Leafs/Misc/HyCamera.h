@@ -54,7 +54,8 @@ public:
 
 private:
 	virtual void NodeUpdate() override;
-	virtual bool IsLoaded() { return true; }
+	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) { return iOrderValue; }
+	virtual bool IsLoaded() const { return true; }
 	virtual void Load() { }
 	virtual void Unload() { }
 };

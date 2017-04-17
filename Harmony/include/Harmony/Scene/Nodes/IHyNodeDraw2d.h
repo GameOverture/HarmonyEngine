@@ -48,6 +48,8 @@ public:
 	//void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
 	//void ClearScissor();
 
+	int32 GetDisplayOrder() const;
+
 	virtual bool IsLoaded() const = 0;
 	virtual void Load() = 0;
 	virtual void Unload() = 0;

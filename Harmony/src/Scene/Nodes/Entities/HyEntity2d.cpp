@@ -24,7 +24,7 @@ HyEntity2d::~HyEntity2d(void)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 }
 
-void HyEntity2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
+void HyEntity2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren /*= true*/)
 {
 	m_bEnabled = bEnabled;
 	m_uiExplicitFlags |= EXPLICIT_Enabled;
@@ -221,6 +221,28 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 
 /*virtual*/ void HyEntity2d::NodeUpdate() /*override final*/
 {
+	if((m_uiExplicitFlags & EXPLICIT_Scissor) != 0)
+	{
+		if(m_LocalScissorRect.iTag == 1)
+		{
+			glm::mat4 mtx;
+			GetWorldTransform(mtx);
+
+			m_WorldScissorRect.x = static_cast<int32>(mtx[3].x + m_LocalScissorRect.x);
+			m_WorldScissorRect.y = static_cast<int32>(mtx[3].y + m_LocalScissorRect.y);
+			m_WorldScissorRect.width = static_cast<int32>(mtx[0].x * m_LocalScissorRect.width);
+			m_WorldScissorRect.height = static_cast<int32>(mtx[1].y * m_LocalScissorRect.height);
+			m_WorldScissorRect.iTag = 1;
+		}
+		else
+			m_WorldScissorRect.iTag = 0;
+
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+			m_ChildList[i]->_SetScissor(m_WorldScissorRect, false);
+	}
+
+
+
 	if((m_uiAttributes & (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_MouseInput)) != 0)
 	{
 		if(m_uiAttributes & ATTRIBFLAG_BoundingVolumeDirty)
@@ -288,7 +310,7 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 	//childInst._SetDisplayOrder(
 }
 
-/*virtual*/ void HyEntity2d::_SetEnabled(bool bEnabled, bool bIsOverriding)
+/*virtual*/ void HyEntity2d::_SetEnabled(bool bEnabled, bool bIsOverriding) /*override*/
 {
 	IHyNode::_SetEnabled(bEnabled, bIsOverriding);
 
@@ -299,7 +321,7 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 	}
 }
 
-/*virtual*/ void HyEntity2d::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding)
+/*virtual*/ void HyEntity2d::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) /*override*/
 {
 	IHyNode::_SetPauseUpdate(bUpdateWhenPaused, bIsOverriding);
 
@@ -310,7 +332,21 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 	}
 }
 
-/*virtual*/ int32 HyEntity2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)
+/*virtual*/ void HyEntity2d::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override*/
+{
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
+	{
+		m_
+
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+			m_ChildList[i]->_SetScissor(worldScissorRectRef, bIsOverriding);
+	}
+}
+
+/*virtual*/ int32 HyEntity2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
 {
 	return iOrderValue;
 }

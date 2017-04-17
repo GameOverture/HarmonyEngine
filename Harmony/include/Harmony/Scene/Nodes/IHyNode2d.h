@@ -59,10 +59,11 @@ protected:
 
 	//virtual void _SetEnabled(bool bEnabled, bool bIsOverriding);						// Only Entity2d/3d will invoke this
 	//virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
+	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) = 0;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) = 0;		// Only Entity2d/3d will invoke this
 
 private:
-	virtual bool IsLoaded() = 0;
+	virtual bool IsLoaded() const = 0;
 	virtual void Load() = 0;
 	virtual void Unload() = 0;
 };

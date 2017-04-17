@@ -69,6 +69,11 @@ const HyScreenRect<int32> &IHyNodeDraw2d::GetScissor()
 	return m_LocalScissorRect;
 }
 
+int32 IHyNodeDraw2d::GetDisplayOrder() const
+{
+	return m_iDisplayOrder;
+}
+
 void IHyNodeDraw2d::Calculate()
 {
 	if(IsDirty(HYNODEDIRTY_Color))

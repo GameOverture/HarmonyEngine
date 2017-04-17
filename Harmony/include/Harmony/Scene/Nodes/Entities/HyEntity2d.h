@@ -21,7 +21,6 @@ protected:
 
 	enum eAttributes
 	{
-		ATTRIBFLAG_Scissor					= 1 << 0,
 		ATTRIBFLAG_MouseInput				= 1 << 1,
 		ATTRIBFLAG_HasBoundingVolume		= 1 << 2,
 		ATTRIBFLAG_BoundingVolumeDirty		= 1 << 3,
@@ -42,7 +41,7 @@ public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
 
-	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
+	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren = true);
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
 	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren);
 	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren);
@@ -81,6 +80,7 @@ protected:
 
 	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding) override;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override;
+	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) = 0;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
 
 private:

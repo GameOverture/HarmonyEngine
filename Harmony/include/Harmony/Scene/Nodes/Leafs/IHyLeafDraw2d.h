@@ -71,6 +71,9 @@ public:
 protected:
 	virtual void NodeUpdate() override final;
 
+	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
+	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
+
 	IHyNodeData *UncheckedGetData();
 	const HyRenderState &GetRenderState() const;
 

@@ -169,22 +169,22 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 
 /*virtual*/ void IHyLeafDraw2d::NodeUpdate() /*override final*/
 {
-	//if((m_uiAttributes & ATTRIBFLAG_Scissor) != 0)
-	//{
-	//	glm::mat4 mtx;
-	//	GetWorldTransform(mtx);
+	if((m_uiExplicitFlags & EXPLICIT_Scissor) != 0)
+	{
+		glm::mat4 mtx;
+		GetWorldTransform(mtx);
 
-	//	m_RenderState.SetScissorRect(static_cast<int32>(mtx[3].x + m_LocalScissorRect.x),
-	//								 static_cast<int32>(mtx[3].y + m_LocalScissorRect.y),
-	//								 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.width),
-	//								 static_cast<uint32>(mtx[1].y * m_LocalScissorRect.height));
+		m_RenderState.SetScissorRect(static_cast<int32>(mtx[3].x + m_LocalScissorRect.x),
+									 static_cast<int32>(mtx[3].y + m_LocalScissorRect.y),
+									 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.width),
+									 static_cast<uint32>(mtx[1].y * m_LocalScissorRect.height));
 
-	//	ForEachChild([&](IHyNode *pChildNode)
-	//				{
-	//					if(pChildNode->IsDraw2d())
-	//						static_cast<IHyDraw2d *>(pChildNode)->m_RenderState.SetScissorRect(this->m_RenderState.GetScissorRect());
-	//				});
-	//}
+		ForEachChild([&](IHyNode *pChildNode)
+					{
+						if(pChildNode->IsDraw2d())
+							static_cast<IHyDraw2d *>(pChildNode)->m_RenderState.SetScissorRect(this->m_RenderState.GetScissorRect());
+					});
+	}
 
 	DrawUpdate();
 
@@ -193,6 +193,25 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 		OnUpdateUniforms();
 		m_RenderState.SetUniformCrc32(m_ShaderUniforms.GetCrc32());
 	}
+}
+
+/*virtual*/ void IHyLeafDraw2d::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override*/
+{
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
+	{
+		if(worldScissorRectRef.iTag == 1)
+			m_RenderState.SetScissorRect(worldScissorRectRef);
+		else
+			m_RenderState.ClearScissorRect();
+	}
+}
+
+/*virtual*/ int32 IHyLeafDraw2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
+{
+	return iOrderValue;
 }
 
 IHyNodeData *IHyLeafDraw2d::UncheckedGetData()
