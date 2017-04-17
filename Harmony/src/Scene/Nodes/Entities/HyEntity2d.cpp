@@ -148,7 +148,7 @@ bool HyEntity2d::ChildRemove(IHyNode2d *pChild)
 {
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
-		if(*iter == this)
+		if(*iter == pChild)
 		{
 			(*iter)->m_pParent = nullptr;
 			m_ChildList.erase(iter);
