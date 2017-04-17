@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-//class HyMesh3d final : public IHyDraw2d
+//class HyMesh3d : public IHyDraw2d
 //{
 //	
 //public:

@@ -15,7 +15,7 @@
 
 #include <vector>
 
-class HyText2d final : public IHyLeafDraw2d
+class HyText2d : public IHyLeafDraw2d
 {
 protected:
 	bool							m_bIsDirty;
