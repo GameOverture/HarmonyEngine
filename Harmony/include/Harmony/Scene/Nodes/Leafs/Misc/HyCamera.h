@@ -38,7 +38,7 @@ public:
 	virtual float GetZoom() const = 0;
 };
 
-class HyCamera2d : public IHyNode2d, public IHyCamera
+class HyCamera2d final : public IHyNode2d, public IHyCamera
 {
 	friend class HyWindow;
 
@@ -56,7 +56,7 @@ protected:
 	virtual void NodeUpdate() override;
 };
 
-class HyCamera3d : public IHyNode3d, public IHyCamera
+class HyCamera3d final : public IHyNode3d, public IHyCamera
 {
 	friend class HyWindow;
 

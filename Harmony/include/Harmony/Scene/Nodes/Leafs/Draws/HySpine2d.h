@@ -14,7 +14,7 @@
 #include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 #include "Assets/Nodes/HySpine2dData.h"
 
-class HySpine2d : public IHyLeafDraw2d
+class HySpine2d final : public IHyLeafDraw2d
 {
 protected:
 	spSkeleton*				m_pSpineSkeleton;

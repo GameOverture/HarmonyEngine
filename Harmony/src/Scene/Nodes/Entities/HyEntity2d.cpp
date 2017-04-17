@@ -33,7 +33,7 @@ void HyEntity2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren /*= tr
 		m_ChildList[i]->_SetEnabled(bEnabled, bOverrideExplicitChildren);
 }
 
-void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren)
+void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren /*= true*/)
 {
 	if(bUpdateWhenPaused)
 	{
@@ -53,7 +53,7 @@ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitCh
 		m_ChildList[i]->_SetPauseUpdate(m_bPauseOverride, bOverrideExplicitChildren);
 }
 
-void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren)
+void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren /*= true*/)
 {
 	m_LocalScissorRect.x = uiLocalX;
 	m_LocalScissorRect.y = uiLocalY;
@@ -75,7 +75,7 @@ void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint
 		m_ChildList[i]->_SetScissor(m_WorldScissorRect, bOverrideExplicitChildren);
 }
 
-void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren)
+void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren /*= true*/)
 {
 	m_LocalScissorRect.iTag = 0;
 
@@ -92,7 +92,7 @@ void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChil
 		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
 }
 
-void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren)
+void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren /*= true*/)
 {
 	m_iDisplayOrder = iOrderValue;
 	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;

@@ -16,7 +16,7 @@
 
 class HyAtlasGroupData;
 
-class HyPrimitive2d : public IHyLeafDraw2d
+class HyPrimitive2d final : public IHyLeafDraw2d
 {
 protected:
 	glm::vec2 *		m_pDrawBuffer;

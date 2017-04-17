@@ -16,7 +16,7 @@
 
 #include "Utilities/HyMath.h"
 
-class HySprite2d : public IHyLeafDraw2d
+class HySprite2d final : public IHyLeafDraw2d
 {
 protected:
 	// Array of BYTE's where each BYTE describes how each animation state is supposed to play
