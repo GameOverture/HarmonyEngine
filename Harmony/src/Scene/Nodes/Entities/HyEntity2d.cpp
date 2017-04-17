@@ -305,6 +305,8 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 			}
 		}
 	}
+
+	OnUpdate();
 }
 
 /*virtual*/ void HyEntity2d::SetDirty(HyNodeDirtyType eDirtyType)
