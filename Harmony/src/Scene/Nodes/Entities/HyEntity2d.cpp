@@ -325,7 +325,10 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 	childInst._SetEnabled(m_bEnabled, false);
 	childInst._SetPauseUpdate(m_bPauseOverride, false);
 	childInst._SetScissor(m_WorldScissorRect, false);
-	_SetDisplayOrder(m_iDisplayOrder, false);
+
+	int32 iOrderValue = m_iDisplayOrder;
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, false);
 }
 
 /*virtual*/ void HyEntity2d::_SetEnabled(bool bEnabled, bool bIsOverriding) /*override*/
