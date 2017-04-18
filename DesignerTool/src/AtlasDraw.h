@@ -24,7 +24,7 @@ class AtlasDraw : public IDraw
     {
         QMap<quint32, HyTexturedQuad2d *>   m_TexQuadIdMap;
         
-        TextureEnt(IHyNode *pParent) : HyEntity2d(pParent)
+        TextureEnt(HyEntity2d *pParent) : HyEntity2d(pParent)
         { }
     };
     QList<TextureEnt *>             m_MasterList;

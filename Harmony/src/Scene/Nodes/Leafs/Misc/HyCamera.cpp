@@ -30,7 +30,7 @@ void IHyCamera::SetViewport(float fPosX, float fPosY, float fWidth, float fHeigh
 	m_ViewportRect.top = m_ViewportRect.bottom + fHeight;
 }
 
-HyCamera2d::HyCamera2d(HyWindow *pWindow) : IHyNode2d(HYTYPE_Camera2d, nullptr),
+HyCamera2d::HyCamera2d(HyWindow *pWindow) : IHyLeaf2d(HYTYPE_Camera2d, nullptr),
 											IHyCamera(pWindow)
 { }
 

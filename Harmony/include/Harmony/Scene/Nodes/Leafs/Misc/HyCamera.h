@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Utilities/HyMath.h"
-#include "Scene/Nodes/IHyNode2d.h"
+#include "Scene/Nodes/Leafs/IHyLeaf2d.h"
 #include "Scene/Nodes/IHyNode3d.h"
 
 class HyWindow;
@@ -38,7 +38,7 @@ public:
 	virtual float GetZoom() const = 0;
 };
 
-class HyCamera2d final : public IHyNode2d, public IHyCamera
+class HyCamera2d final : public IHyLeaf2d, public IHyCamera
 {
 	friend class HyWindow;
 
