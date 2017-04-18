@@ -29,7 +29,7 @@
 #include "Scene/Nodes/Leafs/Draws/HyPrimitive2d.h"
 #include "Scene/Nodes/Leafs/Draws/HyText2d.h"
 #include "Scene/Nodes/Leafs/Draws/HyTexturedQuad2d.h"
-#include "Scene/Physics/HyPhysEntity2d.h"
+#include "Scene/Nodes/Entities/HyEntityLeaf2d.h"
 
 #include "Assets/HyAssets.h"
 

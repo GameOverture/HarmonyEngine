@@ -45,7 +45,7 @@ public:
 	virtual ~IHyNode2d();
 
 	void ParentDetach();
-	bool ParentExists();
+	HyEntity2d *ParentGet();
 
 	HyCoordinateUnit GetCoordinateUnit();
 	// TODO: This needs to apply to everything in its hierarchy

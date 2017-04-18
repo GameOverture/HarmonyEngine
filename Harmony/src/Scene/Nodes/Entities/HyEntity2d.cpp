@@ -110,7 +110,7 @@ void HyEntity2d::ChildAppend(IHyNode2d &childInst)
 	SetNewChildAttributes(childInst);
 }
 
-bool HyEntity2d::ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childInst)
+/*virtual*/ bool HyEntity2d::ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childInst)
 {
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
@@ -144,7 +144,7 @@ bool HyEntity2d::ChildExists(IHyNode2d &childRef)
 	return false;
 }
 
-bool HyEntity2d::ChildRemove(IHyNode2d *pChild)
+/*virtual*/ bool HyEntity2d::ChildRemove(IHyNode2d *pChild)
 {
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
@@ -159,20 +159,20 @@ bool HyEntity2d::ChildRemove(IHyNode2d *pChild)
 	return false;
 }
 
-void HyEntity2d::ChildrenTransfer(HyEntity2d &newParent)
+/*virtual*/ void HyEntity2d::ChildrenTransfer(HyEntity2d &newParent)
 {
 	while(m_ChildList.empty() == false)
 		newParent.ChildAppend(*m_ChildList[0]);
 }
 
-uint32 HyEntity2d::ChildCount()
+/*virtual*/ uint32 HyEntity2d::ChildCount()
 {
 	return static_cast<uint32>(m_ChildList.size());
 }
 
-IHyNode2d *HyEntity2d::ChildGet(uint32 uiIndex)
+/*virtual*/ IHyNode2d *HyEntity2d::ChildGet(uint32 uiIndex)
 {
-	HyAssert(uiIndex < static_cast<uint32>(m_ChildList.size()), "IHyNode2d::ChildGet passed an invalid index");
+	HyAssert(uiIndex < static_cast<uint32>(m_ChildList.size()), "HyEntityLeaf2d::ChildGet passed an invalid index");
 	return m_ChildList[uiIndex];
 }
 
@@ -319,6 +319,9 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 
 /*virtual*/ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
+	SetDirty(HYNODEDIRTY_Transform);
+	SetDirty(HYNODEDIRTY_Color);
+
 	childInst._SetEnabled(m_bEnabled, false);
 	childInst._SetPauseUpdate(m_bPauseOverride, false);
 	childInst._SetScissor(m_WorldScissorRect, false);

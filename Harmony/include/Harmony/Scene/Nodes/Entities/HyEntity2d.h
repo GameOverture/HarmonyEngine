@@ -48,12 +48,12 @@ public:
 	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren = true);
 
 	void ChildAppend(IHyNode2d &childRef);
-	bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef);
+	virtual bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef);
 	bool ChildExists(IHyNode2d &childRef);
-	bool ChildRemove(IHyNode2d *pChild);
-	void ChildrenTransfer(HyEntity2d &newParent);
-	uint32 ChildCount();
-	IHyNode2d *ChildGet(uint32 uiIndex);
+	virtual bool ChildRemove(IHyNode2d *pChild);
+	virtual void ChildrenTransfer(HyEntity2d &newParent);
+	virtual uint32 ChildCount();
+	virtual IHyNode2d *ChildGet(uint32 uiIndex);
 	void ForEachChild(std::function<void(IHyNode2d *)> func);
 
 	void EnableMouseInput(bool bEnable, void *pUserParam = nullptr);
@@ -83,7 +83,6 @@ protected:
 	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
 
-private:
 	virtual void SetNewChildAttributes(IHyNode2d &childInst);
 };
 

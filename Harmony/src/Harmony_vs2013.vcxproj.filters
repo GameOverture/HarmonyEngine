@@ -657,5 +657,8 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNodeDraw2d.h">
       <Filter>Scene\Nodes</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Entities\HyEntityLeaf2d.h">
+      <Filter>Scene\Nodes\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

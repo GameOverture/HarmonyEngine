@@ -47,9 +47,9 @@ void IHyNode2d::ParentDetach()
 	m_pParent->ChildRemove(this);
 }
 
-bool IHyNode2d::ParentExists()
+HyEntity2d *IHyNode2d::ParentGet()
 {
-	return m_pParent != nullptr;
+	return m_pParent;
 }
 
 HyCoordinateUnit IHyNode2d::GetCoordinateUnit()
