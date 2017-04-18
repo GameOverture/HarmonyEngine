@@ -371,6 +371,8 @@ void HyEntity2d::EnablePhysics(bool bEnable)
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_DisplayOrder))
 	{
+		m_iDisplayOrder = iOrderValue;
+
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 			iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, bIsOverriding);
 	}
