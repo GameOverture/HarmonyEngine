@@ -30,6 +30,8 @@ public:
 
 	virtual ~HyEntityLeaf2d()
 	{
+		// Manually remove the defining leaf here so it doesn't assert when 'm_Leaf' destructs and removes itself from this class
+		HyEntity2d::ChildRemove(&m_Leaf);
 	}
 
 	LEAF &GetLeaf()
