@@ -28,7 +28,7 @@ struct FontTypeface
     float               fSize;
     float               fOutlineThickness;
 
-    FontTypeface(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iReferenceCount(0),
+    FontTypeface(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :   iReferenceCount(0),
                                                                                                             iTmpReferenceCount(0),
                                                                                                             sFontPath(sFontFilePath),
                                                                                                             pTextureFont(NULL),
@@ -60,7 +60,6 @@ class FontStateData : public IStateData
 	FontTableModel *			m_pFontTableModel;
 	
 	DoubleSpinBoxMapper *		m_pSbMapper_Size;
-    DoubleSpinBoxMapper *		m_pSbMapper_Thickness;
     ComboBoxMapper *            m_pCmbMapper_Fonts;
 	
 public:
@@ -70,7 +69,6 @@ public:
     FontTableModel *GetFontModel();
 
     DoubleSpinBoxMapper *GetSizeMapper();
-    DoubleSpinBoxMapper *GetThicknessMapper();
     ComboBoxMapper *GetFontMapper();
 
     void GetStateInfo(QJsonObject &stateObjOut);

@@ -17,7 +17,6 @@ FontStateData::FontStateData(IModel &modelRef, QJsonObject stateObj) : IStateDat
 {
     m_pFontTableModel = new FontTableModel(&m_ModelRef);
     m_pSbMapper_Size = new DoubleSpinBoxMapper(&m_ModelRef);
-    m_pSbMapper_Thickness = new DoubleSpinBoxMapper(&m_ModelRef);
 
     // Populate the font list combo box
     m_pCmbMapper_Fonts = new ComboBoxMapper(&m_ModelRef);
@@ -94,11 +93,6 @@ FontTableModel *FontStateData::GetFontModel()
 DoubleSpinBoxMapper *FontStateData::GetSizeMapper()
 {
     return m_pSbMapper_Size;
-}
-
-DoubleSpinBoxMapper *FontStateData::GetThicknessMapper()
-{
-    return m_pSbMapper_Thickness;
 }
 
 ComboBoxMapper *FontStateData::GetFontMapper()

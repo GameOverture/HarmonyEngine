@@ -316,7 +316,7 @@ void FontWidget::on_actionAddLayer_triggered()
                                                   ui->cmbStates->currentIndex(),
                                                   static_cast<ftgl::rendermode_t>(ui->cmbRenderMode->currentData().toInt()),
                                                   GetCurStateData()->GetSizeMapper()->GetValue(),
-                                                  GetCurStateData()->GetThicknessMapper()->GetValue());
+                                                  ui->sbThickness->value());
     m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
