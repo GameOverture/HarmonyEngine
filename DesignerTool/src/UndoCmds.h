@@ -186,23 +186,22 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename MAPPER>
 class UndoCmd_ComboBox : public QUndoCommand
 {
     ProjectItem &       m_ItemRef;
-    MAPPER *            m_pMapper;
+    ComboBoxMapper *    m_pMapper;
     int                 m_iStateIndex;
 
     int                 m_iPrevValue;
     int                 m_iNewValue;
     
 public:
-    UndoCmd_ComboBox(QString sText, ProjectItem &itemRef, MAPPER *pMapper, int iStateIndex, int iPrevValue, int iNewValue, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
-                                                                                                                                                        m_ItemRef(itemRef),
-                                                                                                                                                        m_pMapper(pMapper),
-                                                                                                                                                        m_iStateIndex(iStateIndex),
-                                                                                                                                                        m_iPrevValue(iPrevValue),
-                                                                                                                                                        m_iNewValue(iNewValue)
+    UndoCmd_ComboBox(QString sText, ProjectItem &itemRef, ComboBoxMapper *pMapper, int iStateIndex, int iPrevValue, int iNewValue, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
+                                                                                                                                                                m_ItemRef(itemRef),
+                                                                                                                                                                m_pMapper(pMapper),
+                                                                                                                                                                m_iStateIndex(iStateIndex),
+                                                                                                                                                                m_iPrevValue(iPrevValue),
+                                                                                                                                                                m_iNewValue(iNewValue)
     {
         setText(sText);
     }

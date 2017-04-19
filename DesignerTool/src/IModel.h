@@ -13,6 +13,7 @@
 #include "ProjectItem.h"
 
 #include <QAbstractListModel>
+#include <QStringListModel>
 #include <QDataWidgetMapper>
 #include <QLineEdit>
 #include <QCheckBox>
@@ -212,15 +213,17 @@ class ComboBoxMapper : public QDataWidgetMapper
             }
         }
 
-        virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
+        virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override {
             return m_sItemList.size();
         }
 
-        virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
+        virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override {
             if(role == Qt::UserRole)
                 return m_DataList[index.row()];
-            else
+            else if(role == Qt::DisplayRole)
                 return m_sItemList[index.row()];
+            else
+                return QVariant();
         }
     };
 
@@ -234,10 +237,17 @@ public:
 
     void AddComboBoxMapping(QComboBox *pComboBox)
     {
+        pComboBox->blockSignals(true);
+        
         pComboBox->setModel(model());
-
         addMapping(pComboBox, 0);
-        this->setCurrentIndex(this->currentIndex());
+        
+        if(this->currentIndex() == -1 && static_cast<ModelComboBox *>(model())->rowCount() != 0)
+            this->SetIndex(0);
+        
+        pComboBox->setCurrentIndex(this->currentIndex());
+        
+        pComboBox->blockSignals(false);
     }
 
     void AddItem(QString sName, QVariant data)
@@ -258,6 +268,9 @@ public:
     void SetIndex(int iIndex)
     {
         setCurrentIndex(iIndex);
+        
+        int iTest = currentIndex();
+        iTest = iTest;
     }
 
     void SetIndex(QString sName)

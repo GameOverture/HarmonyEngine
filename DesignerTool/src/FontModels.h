@@ -61,7 +61,6 @@ class FontStateData : public IStateData
 	
 	DoubleSpinBoxMapper *		m_pSbMapper_Size;
     DoubleSpinBoxMapper *		m_pSbMapper_Thickness;
-    ComboBoxMapper *            m_pCmbMapper_RenderMode;
     ComboBoxMapper *            m_pCmbMapper_Fonts;
 	
 public:
@@ -72,7 +71,6 @@ public:
 
     DoubleSpinBoxMapper *GetSizeMapper();
     DoubleSpinBoxMapper *GetThicknessMapper();
-    ComboBoxMapper *GetRenderModeMapper();
     ComboBoxMapper *GetFontMapper();
 
     void GetStateInfo(QJsonObject &stateObjOut);

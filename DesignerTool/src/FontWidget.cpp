@@ -51,13 +51,22 @@ FontWidget::FontWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *
     ui->btnOrderLayerUp->setDefaultAction(ui->actionOrderLayerUpwards);
     ui->btnOrderLayerDown->setDefaultAction(ui->actionOrderLayerDownwards);
 
-    ui->stagesView->resize(ui->stagesView->size());
-    ui->stagesView->setItemDelegate(new FontDelegate(&m_ItemRef, ui->cmbStates, this));
-    QItemSelectionModel *pSelModel = ui->stagesView->selectionModel();
+    ui->stagesTableView->resize(ui->stagesTableView->size());
+    ui->stagesTableView->setItemDelegate(new FontDelegate(&m_ItemRef, ui->cmbStates, this));
+    QItemSelectionModel *pSelModel = ui->stagesTableView->selectionModel();
     connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
 
+    ui->cmbStates->blockSignals(true);
     ui->cmbStates->clear();
     ui->cmbStates->setModel(m_ItemRef.GetModel());
+    ui->cmbStates->blockSignals(false);
+    
+    ui->cmbRenderMode->clear();
+    ui->cmbRenderMode->addItem("Normal", QVariant(static_cast<int>(RENDER_NORMAL)));
+    ui->cmbRenderMode->addItem("Outline Edge", QVariant(static_cast<int>(RENDER_OUTLINE_EDGE)));
+    ui->cmbRenderMode->addItem("Outline Positive", QVariant(static_cast<int>(RENDER_OUTLINE_POSITIVE)));
+    ui->cmbRenderMode->addItem("Outline Negative", QVariant(static_cast<int>(RENDER_OUTLINE_NEGATIVE)));
+    ui->cmbRenderMode->addItem("Signed Distance Field", QVariant(static_cast<int>(RENDER_SIGNED_DISTANCE_FIELD)));
 
     static_cast<FontModel *>(m_ItemRef.GetModel())->Get09Mapper()->AddCheckBoxMapping(ui->chk_09);
     static_cast<FontModel *>(m_ItemRef.GetModel())->GetAZMapper()->AddCheckBoxMapping(ui->chk_AZ);
@@ -90,18 +99,17 @@ void FontWidget::SetSelectedState(int iIndex)
 {
     FontStateData *pCurStateData = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(iIndex));
 
-    ui->stagesView->setModel(pCurStateData->GetFontModel());
-    if(ui->stagesView->currentIndex().row() < 0 && ui->stagesView->model()->rowCount() > 0)
-        ui->stagesView->selectRow(0);
+    ui->stagesTableView->setModel(pCurStateData->GetFontModel());
+    if(ui->stagesTableView->currentIndex().row() < 0 && ui->stagesTableView->model()->rowCount() > 0)
+        ui->stagesTableView->selectRow(0);
 
 
     pCurStateData->GetSizeMapper()->AddSpinBoxMapping(ui->sbSize);
-    pCurStateData->GetRenderModeMapper()->AddComboBoxMapping(ui->cmbRenderMode);
-
     pCurStateData->GetFontMapper()->AddComboBoxMapping(ui->cmbFontList);
 
-    ui->stagesView->setModel(pCurStateData->GetFontModel());
-
+    ui->cmbStates->blockSignals(true);
+    ui->cmbStates->setCurrentIndex(iIndex);
+    ui->cmbStates->blockSignals(false);
 
     UpdateActions();
 }
@@ -181,9 +189,9 @@ void FontWidget::UpdateActions()
     ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
 
-    bool bFrameIsSelected = ui->stagesView->model()->rowCount() > 0 && ui->stagesView->currentIndex().row() >= 0;
-    ui->actionOrderLayerUpwards->setEnabled(bFrameIsSelected && ui->stagesView->currentIndex().row() != 0);
-    ui->actionOrderLayerDownwards->setEnabled(bFrameIsSelected && ui->stagesView->currentIndex().row() != ui->stagesView->model()->rowCount() - 1);
+    bool bFrameIsSelected = ui->stagesTableView->model()->rowCount() > 0 && ui->stagesTableView->currentIndex().row() >= 0;
+    ui->actionOrderLayerUpwards->setEnabled(bFrameIsSelected && ui->stagesTableView->currentIndex().row() != 0);
+    ui->actionOrderLayerDownwards->setEnabled(bFrameIsSelected && ui->stagesTableView->currentIndex().row() != ui->stagesTableView->model()->rowCount() - 1);
 
     if(bGeneratePreview)
         static_cast<FontModel *>(m_ItemRef.GetModel())->GeneratePreview();
@@ -198,16 +206,16 @@ FontStateData *FontWidget::GetCurStateData()
 
 int FontWidget::GetSelectedStageId()
 {
-    int iRowIndex = ui->stagesView->currentIndex().row();
+    int iRowIndex = ui->stagesTableView->currentIndex().row();
 
-    if(ui->stagesView->model()->rowCount() == 0 ||
+    if(ui->stagesTableView->model()->rowCount() == 0 ||
        iRowIndex < 0 ||
-       iRowIndex >= ui->stagesView->model()->rowCount())
+       iRowIndex >= ui->stagesTableView->model()->rowCount())
     {
         return -1;
     }
 
-    return static_cast<FontTableModel *>(ui->stagesView->model())->GetLayerId(iRowIndex);
+    return static_cast<FontTableModel *>(ui->stagesTableView->model())->GetLayerId(iRowIndex);
 }
 
 void FontWidget::on_chk_09_clicked()
@@ -306,7 +314,7 @@ void FontWidget::on_actionAddLayer_triggered()
 {
     QUndoCommand *pCmd = new FontUndoCmd_AddLayer(m_ItemRef,
                                                   ui->cmbStates->currentIndex(),
-                                                  static_cast<ftgl::rendermode_t>(GetCurStateData()->GetRenderModeMapper()->GetCurrentData().toInt()),
+                                                  static_cast<ftgl::rendermode_t>(ui->cmbRenderMode->currentData().toInt()),
                                                   GetCurStateData()->GetSizeMapper()->GetValue(),
                                                   GetCurStateData()->GetThicknessMapper()->GetValue());
     m_ItemRef.GetUndoStack()->push(pCmd);
@@ -326,9 +334,9 @@ void FontWidget::on_actionOrderLayerDownwards_triggered()
 {
     QUndoCommand *pCmd = new FontUndoCmd_LayerOrder(m_ItemRef,
                                                     ui->cmbStates->currentIndex(),
-                                                    ui->stagesView,
-                                                    ui->stagesView->currentIndex().row(),
-                                                    ui->stagesView->currentIndex().row() + 1);
+                                                    ui->stagesTableView,
+                                                    ui->stagesTableView->currentIndex().row(),
+                                                    ui->stagesTableView->currentIndex().row() + 1);
     m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
@@ -336,9 +344,9 @@ void FontWidget::on_actionOrderLayerUpwards_triggered()
 {
     QUndoCommand *pCmd = new FontUndoCmd_LayerOrder(m_ItemRef,
                                                     ui->cmbStates->currentIndex(),
-                                                    ui->stagesView,
-                                                    ui->stagesView->currentIndex().row(),
-                                                    ui->stagesView->currentIndex().row() - 1);
+                                                    ui->stagesTableView,
+                                                    ui->stagesTableView->currentIndex().row(),
+                                                    ui->stagesTableView->currentIndex().row() - 1);
     m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
@@ -371,5 +379,11 @@ void FontWidget::on_sbSize_editingFinished()
                                                    ui->cmbStates->currentIndex(),
                                                    ui->sbSize->value(),
                                                    GetCurStateData()->GetSizeMapper()->GetValue());
+    m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void FontWidget::on_cmbFontList_currentIndexChanged(int index)
+{
+    QUndoCommand *pCmd = new UndoCmd_ComboBox("Font Selection", m_ItemRef, GetCurStateData()->GetFontMapper(), ui->cmbStates->currentIndex(), GetCurStateData()->GetFontMapper()->currentIndex(), index);
     m_ItemRef.GetUndoStack()->push(pCmd);
 }

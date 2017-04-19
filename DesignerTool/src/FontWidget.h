@@ -98,6 +98,8 @@ private Q_SLOTS:
 
     void on_sbSize_editingFinished();
 
+    void on_cmbFontList_currentIndexChanged(int index);
+    
 private:
     Ui::FontWidget *ui;
 };

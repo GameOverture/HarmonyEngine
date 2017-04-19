@@ -449,7 +449,7 @@
           </layout>
          </item>
          <item>
-          <widget class="FontTableView" name="stagesView">
+          <widget class="FontTableView" name="stagesTableView">
            <property name="selectionMode">
             <enum>QAbstractItemView::SingleSelection</enum>
            </property>

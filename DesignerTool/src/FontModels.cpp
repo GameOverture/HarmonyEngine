@@ -19,13 +19,6 @@ FontStateData::FontStateData(IModel &modelRef, QJsonObject stateObj) : IStateDat
     m_pSbMapper_Size = new DoubleSpinBoxMapper(&m_ModelRef);
     m_pSbMapper_Thickness = new DoubleSpinBoxMapper(&m_ModelRef);
 
-    m_pCmbMapper_RenderMode = new ComboBoxMapper(&m_ModelRef);
-    m_pCmbMapper_RenderMode->AddItem("Normal", QVariant(static_cast<int>(RENDER_NORMAL)));
-    m_pCmbMapper_RenderMode->AddItem("Outline Edge", QVariant(static_cast<int>(RENDER_OUTLINE_EDGE)));
-    m_pCmbMapper_RenderMode->AddItem("Outline Positive", QVariant(static_cast<int>(RENDER_OUTLINE_POSITIVE)));
-    m_pCmbMapper_RenderMode->AddItem("Outline Negative", QVariant(static_cast<int>(RENDER_OUTLINE_NEGATIVE)));
-    m_pCmbMapper_RenderMode->AddItem("Signed Distance Field", QVariant(static_cast<int>(RENDER_SIGNED_DISTANCE_FIELD)));
-
     // Populate the font list combo box
     m_pCmbMapper_Fonts = new ComboBoxMapper(&m_ModelRef);
     //
@@ -85,6 +78,7 @@ FontStateData::FontStateData(IModel &modelRef, QJsonObject stateObj) : IStateDat
     }
     else
     {
+        m_pCmbMapper_Fonts->SetIndex(0);
     }
 }
 
@@ -105,11 +99,6 @@ DoubleSpinBoxMapper *FontStateData::GetSizeMapper()
 DoubleSpinBoxMapper *FontStateData::GetThicknessMapper()
 {
     return m_pSbMapper_Thickness;
-}
-
-ComboBoxMapper *FontStateData::GetRenderModeMapper()
-{
-    return m_pCmbMapper_RenderMode;
 }
 
 ComboBoxMapper *FontStateData::GetFontMapper()
