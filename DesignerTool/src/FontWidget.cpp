@@ -373,6 +373,9 @@ void FontWidget::on_cmbRenderMode_currentIndexChanged(int index)
 
 void FontWidget::on_sbSize_editingFinished()
 {
+    if(ui->sbSize->value() == GetCurStateData()->GetSizeMapper()->GetValue())
+        return;
+    
     QUndoCommand *pCmd = new UndoCmd_DoubleSpinBox("Font Size",
                                                    m_ItemRef,
                                                    GetCurStateData()->GetSizeMapper(),

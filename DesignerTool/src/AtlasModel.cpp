@@ -597,7 +597,8 @@ void AtlasModel::RepackAll()
     for(int i = 0; i < iNumTotalTextures; ++i)
         textureIndexSet.insert(i);
 
-    Repack(textureIndexSet, QSet<AtlasFrame *>());
+    if(textureIndexSet.empty() == false)
+        Repack(textureIndexSet, QSet<AtlasFrame *>());
 }
 
 void AtlasModel::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)

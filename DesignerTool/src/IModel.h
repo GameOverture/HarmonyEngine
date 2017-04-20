@@ -61,8 +61,19 @@ public:
 
     void AddSpinBoxMapping(QDoubleSpinBox *pSpinBox)
     {
+        pSpinBox->blockSignals(true);
+        
         addMapping(pSpinBox, 0);
         this->setCurrentIndex(0);
+        
+        if(GetValue() < pSpinBox->minimum())
+            SetValue(pSpinBox->minimum());
+        if(GetValue() > pSpinBox->maximum())
+            SetValue(pSpinBox->maximum());
+        
+        pSpinBox->setValue(GetValue());
+        
+        pSpinBox->blockSignals(false);
     }
 
     double GetValue()
