@@ -99,9 +99,7 @@ AtlasWidget::AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *pa
     ui->atlasList->setSortingEnabled(true);
     ui->atlasList->sortItems(0, Qt::AscendingOrder);
 
-    ui->lcdNumTextures->display(m_pModel->GetNumTextures());
-    ui->lcdTexWidth->display(m_pModel->GetAtlasDimensions().width());
-    ui->lcdTexHeight->display(m_pModel->GetAtlasDimensions().height());
+    RefreshLcds();
 
     ui->atlasList->collapseAll();
 
@@ -137,6 +135,13 @@ void AtlasWidget::StashTreeWidgets()
         stashedTreeItemList.append(static_cast<AtlasTreeItem *>(ui->atlasList->takeTopLevelItem(0)));
 
     m_pModel->TakeTreeWidgets(stashedTreeItemList);
+}
+
+void AtlasWidget::RefreshLcds()
+{
+    ui->lcdNumTextures->display(m_pModel->GetNumTextures());
+    ui->lcdTexWidth->display(m_pModel->GetAtlasDimensions().width());
+    ui->lcdTexHeight->display(m_pModel->GetAtlasDimensions().height());
 }
 
 /*virtual*/ void AtlasWidget::enterEvent(QEvent *pEvent) /*override*/
@@ -179,6 +184,8 @@ void AtlasWidget::on_btnAddImages_clicked()
 
     if(sImportImgList.empty() == false)
         m_pModel->Repack(QSet<int>(), m_pModel->ImportImages(sImportImgList));
+    
+    RefreshLcds();
 }
 
 void AtlasWidget::on_btnAddDir_clicked()
@@ -203,6 +210,8 @@ void AtlasWidget::on_btnAddDir_clicked()
 
     if(sImportImgList.empty() == false)
         m_pModel->Repack(QSet<int>(), m_pModel->ImportImages(sImportImgList));
+    
+    RefreshLcds();
 }
 
 void AtlasWidget::on_btnSettings_clicked()
@@ -223,6 +232,8 @@ void AtlasWidget::on_btnSettings_clicked()
     }
     else
         pDlg->DataToWidgets();  // Reverts changes made
+    
+    RefreshLcds();
 }
 
 void AtlasWidget::on_actionDeleteImages_triggered()
@@ -274,6 +285,8 @@ void AtlasWidget::on_actionDeleteImages_triggered()
     // Make sure to just delete children filters first or else it will crash, so process 'selectedFilterList' backwards
     for(int i = selectedFilterList.size() - 1; i >= 0; --i)
         delete selectedFilterList[i];
+    
+    RefreshLcds();
 }
 
 void AtlasWidget::on_actionReplaceImages_triggered()
@@ -338,6 +351,8 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 //        for(QSet<ProjectItem *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
 //            (*LinksIter)->RelinkFrame(selectedFrameList[i]);
 //    }
+    
+    RefreshLcds();
 }
 
 void AtlasWidget::on_actionAddFilter_triggered()

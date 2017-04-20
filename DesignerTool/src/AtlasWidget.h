@@ -72,6 +72,8 @@ public:
 
     void StashTreeWidgets();
     
+    void RefreshLcds();
+    
 protected:
     virtual void enterEvent(QEvent *pEvent) override;
     virtual void leaveEvent(QEvent *pEvent) override;

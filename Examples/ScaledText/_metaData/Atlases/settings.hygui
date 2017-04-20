@@ -4,6 +4,19 @@
     "frames": [
     ],
     "settings": {
+        "chkAutosize": true,
+        "chkMerge": true,
+        "chkSquare": true,
+        "cmbHeuristic": 1,
+        "cmbSortOrder": 0,
+        "extrude": 1,
+        "minFillRate": 80,
+        "sbFrameMarginBottom": 1,
+        "sbFrameMarginLeft": 0,
+        "sbFrameMarginRight": 1,
+        "sbFrameMarginTop": 0,
+        "sbTextureHeight": 2048,
+        "sbTextureWidth": 2048
     },
-    "startFrameId": 3452816845
+    "startFrameId": 0
 }

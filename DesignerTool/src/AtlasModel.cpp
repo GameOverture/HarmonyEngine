@@ -196,6 +196,24 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
                 m_TopLevelTreeItemList.append(pNewFrame->GetTreeItem());
         }
     }
+    else
+    {
+        m_uiNextFrameId = 0;
+        
+        m_PackerSettings.insert("chkAutosize", true);
+        m_PackerSettings.insert("chkMerge", true);
+        m_PackerSettings.insert("chkSquare", true);
+        m_PackerSettings.insert("cmbHeuristic", 1);
+        m_PackerSettings.insert("cmbSortOrder", 0);
+        m_PackerSettings.insert("extrude", 1);
+        m_PackerSettings.insert("minFillRate", 80);
+        m_PackerSettings.insert("sbFrameMarginBottom", 1);
+        m_PackerSettings.insert("sbFrameMarginLeft", 0);
+        m_PackerSettings.insert("sbFrameMarginRight", 1);
+        m_PackerSettings.insert("sbFrameMarginTop", 0);
+        m_PackerSettings.insert("sbTextureHeight", 2048);
+        m_PackerSettings.insert("sbTextureWidth", 2048);
+    }
 
     if(m_TopLevelTreeItemList.empty())
         WriteMetaSettings();
@@ -236,7 +254,12 @@ QSize AtlasModel::GetAtlasDimensions()
 
 int AtlasModel::GetNumTextures()
 {
-    return m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot).size() - 1;  // - 1 because don't include atlasInfo.json
+    int iNumTextures = m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot).size() - 1;  // - 1 because don't include atlasInfo.json
+    
+    if(iNumTextures < 0)
+        iNumTextures = 0;
+    
+    return iNumTextures;
 }
 
 void AtlasModel::WriteMetaSettings()
