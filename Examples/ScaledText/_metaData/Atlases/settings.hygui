@@ -2,6 +2,23 @@
     "filters": [
     ],
     "frames": [
+        {
+            "checksum": 3955252471,
+            "cropBottom": 334,
+            "cropLeft": 0,
+            "cropRight": 334,
+            "cropTop": 0,
+            "errors": 0,
+            "filter": "",
+            "height": 335,
+            "id": 0,
+            "name": "NewFont",
+            "textureIndex": 0,
+            "type": 4,
+            "width": 335,
+            "x": 0,
+            "y": 0
+        }
     ],
     "settings": {
         "chkAutosize": true,
@@ -18,5 +35,5 @@
         "sbTextureHeight": 2048,
         "sbTextureWidth": 2048
     },
-    "startFrameId": 0
+    "startFrameId": 1
 }

@@ -140,7 +140,16 @@ void FontWidget::OnHide()
 
 void FontWidget::OnUpdate()
 {
-    //m_Draw
+    texture_atlas_t *pAtlas = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlas();
+    unsigned char *pAtlasPixelData = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlasPixelData();
+    if(pAtlas == nullptr || pAtlasPixelData == nullptr)
+        return;
+
+    if(pAtlas->id == 0)
+        m_pDraw->LoadNewAtlas(pAtlas, pAtlasPixelData);
+    
+    if(static_cast<FontModel *>(m_ItemRef.GetModel())->ClearFontDirtyFlag())
+        m_pDraw->GenerateTextPreview(GetCurStateData()->GetFontModel(), "The quick brown fox jumped over the lazy dog. 01234567890", pAtlas);
 }
 
 QString FontWidget::GetFullItemName()

@@ -120,6 +120,10 @@ public:
     QList<FontTypeface *> GetMasterStageList();
 	
 	QJsonObject GetTypefaceObj(int iTypefaceIndex);
+    
+    texture_atlas_t *GetAtlas();
+    unsigned char *GetAtlasPixelData();
+    
     void GeneratePreview(bool bStoreIntoAtlasManager = false);
     
     void SetGlyphsDirty();

@@ -238,6 +238,16 @@ QJsonObject FontModel::GetTypefaceObj(int iTypefaceIndex)
     return m_TypefaceArray.at(iTypefaceIndex).toObject();
 }
 
+texture_atlas_t *FontModel::GetAtlas()
+{
+    return m_pAtlas;
+}
+
+unsigned char *FontModel::GetAtlasPixelData()
+{
+    return m_pTrueAtlasPixelData;
+}
+
 void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
 {
     // 'bIsDirty' will determine whether we actually need to regenerate this typeface atlas
