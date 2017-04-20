@@ -208,7 +208,7 @@ void ProjectItem::WidgetHide(IHyApplication &hyApp)
         //m_pWidget = new AudioWidget(*this);
         //break;
     default:
-        HyGuiLog("Unsupported IProjItem::WidgetHide() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unsupported ProjectItem::WidgetHide() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
 }
@@ -227,9 +227,19 @@ void ProjectItem::WidgetUpdate(IHyApplication &hyApp)
         //m_pWidget = new AudioWidget(*this);
         //break;
     default:
-        HyGuiLog("Unsupported IProjItem::WidgetUpdate() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unsupported ProjectItem::WidgetUpdate() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
+}
+
+void ProjectItem::BlockAllWidgetSignals(bool bBlock)
+{
+    if(m_pWidget == nullptr)
+        return;
+    
+    QList<QWidget *> widgetList = m_pWidget->findChildren<QWidget *>();
+    for(auto iter = widgetList.begin(); iter != widgetList.end(); ++iter)
+        (*iter)->blockSignals(bBlock);
 }
 
 void ProjectItem::WidgetRefreshData(QVariant param)
@@ -246,7 +256,7 @@ void ProjectItem::WidgetRefreshData(QVariant param)
         static_cast<FontWidget *>(m_pWidget)->RefreshData(param);
         break;
     default:
-        HyGuiLog("Unsupported IProjItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unsupported ProjectItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
 }

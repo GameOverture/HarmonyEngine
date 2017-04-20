@@ -273,6 +273,8 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     // If this is the item that is currently being shown, unhook all its actions and widget
     if(sm_pInstance->ui->dockWidgetCurrentItem->widget() == pItem->GetWidget())
     {
+        pItem->BlockAllWidgetSignals(true);
+
         sm_pInstance->ui->dockWidgetCurrentItem->hide();
 
         QList<QAction *> editActionList = sm_pInstance->ui->menu_Edit->actions();
@@ -280,6 +282,8 @@ void MainWindow::showEvent(QShowEvent *pEvent)
             sm_pInstance->ui->mainToolBar->removeAction(editActionList[i]);
 
         sm_pInstance->ui->menu_Edit->clear();
+        
+        pItem->BlockAllWidgetSignals(false);
     }
 }
 

@@ -57,6 +57,8 @@ public:
     void Save();
     bool IsSaveClean();
     void DiscardChanges();
+    
+    void BlockAllWidgetSignals(bool bBlock);
 
     void WidgetRefreshData(QVariant param);
     
