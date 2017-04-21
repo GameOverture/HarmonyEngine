@@ -14,7 +14,7 @@
 #include <iostream>
 
 HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_Text2d, szPrefix, szName, pParent),
-																									m_bIsDirty(true),
+																									m_bIsDirty(false),
 																									m_sCurrentString(""),
 																									m_uiCurFontState(0),
 																									m_vBoxDimensions(0.0f, 0.0f),
@@ -43,7 +43,8 @@ void HyText2d::TextSet(const std::string &sTextRef)
 		return;
 
 	m_sCurrentString = sTextRef;
-	m_bIsDirty = true;
+	if(IsLoaded())
+		m_bIsDirty = true;
 }
 
 const std::string &HyText2d::TextGet() const
@@ -72,7 +73,8 @@ uint32 HyText2d::TextGetState()
 void HyText2d::TextSetState(uint32 uiStateIndex)
 {
 	m_uiCurFontState = uiStateIndex;
-	m_bIsDirty = true;
+	if(IsLoaded())
+		m_bIsDirty = true;
 }
 
 uint32 HyText2d::TextGetNumLayers()
@@ -127,7 +129,8 @@ HyAlign HyText2d::TextGetAlignment()
 void HyText2d::TextSetAlignment(HyAlign eAlignment)
 {
 	m_eAlignment = eAlignment;
-	m_bIsDirty = true;
+	if(IsLoaded())
+		m_bIsDirty = true;
 }
 
 const glm::vec2 &HyText2d::TextGetBox()
@@ -141,7 +144,8 @@ void HyText2d::SetAsLine()
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
-	m_bIsDirty = true;
+	if(IsLoaded())
+		m_bIsDirty = true;
 }
 
 void HyText2d::SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitWordsToFit /*= false*/)
@@ -162,7 +166,8 @@ void HyText2d::SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitW
 
 	m_uiBoxAttributes = iFlags;
 
-	m_bIsDirty = true;
+	if(IsLoaded())
+		m_bIsDirty = true;
 }
 
 void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
@@ -180,7 +185,8 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 	m_uiBoxAttributes = iFlags;
 
-	m_bIsDirty = true;
+	if(IsLoaded())
+		m_bIsDirty = true;
 }
 
 /*virtual*/ void HyText2d::OnDataAcquired()
@@ -213,7 +219,12 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 /*virtual*/ void HyText2d::OnLoaded()
 {
 	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(UncheckedGetData());
+	if(pTextData == nullptr)
+		return;
+
 	m_RenderState.SetTextureHandle(pTextData->GetAtlas()->GetGfxApiHandle());
+
+	m_bIsDirty = true;
 }
 
 /*virtual*/ void HyText2d::DrawUpdate()

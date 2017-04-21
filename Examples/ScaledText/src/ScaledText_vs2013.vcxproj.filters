@@ -17,9 +17,15 @@
     <ClCompile Include="ScaledText.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BaseGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ScaledText.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

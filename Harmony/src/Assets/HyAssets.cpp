@@ -55,7 +55,8 @@ tData *HyAssets::NodeData<tData>::GetData(const std::string &sPrefix, const std:
 	sPath = MakeStringProperPath(sPath.c_str(), nullptr, true);
 
 	auto iter = m_LookupIndexMap.find(sPath);
-	HyAssert(iter != m_LookupIndexMap.end(), "Could not find data: " << sPath.c_str());
+	if(iter == m_LookupIndexMap.end())
+		return nullptr;
 
 	return &m_DataList[iter->second];
 }

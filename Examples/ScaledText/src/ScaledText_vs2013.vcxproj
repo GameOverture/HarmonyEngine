@@ -22,7 +22,7 @@
     <ProjectGuid>{246e8951-a7e3-4d82-993e-db7346f8d548}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ScaledText</RootNamespace>
-	<ProjectName>ScaledText</ProjectName>
+    <ProjectName>ScaledText</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -93,8 +93,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../../Harmony/include</AdditionalIncludeDirectories>
-	  <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>../../../Harmony/include;D:\soft\LG\trunk\SlotFramework\Libraries\LgSlotGame;$(DXSDK_DIR)\include;D:\soft\LG\trunk\SlotFramework\Libraries\LgUtilLib\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -110,7 +110,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../../Harmony/include</AdditionalIncludeDirectories>
-	  <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -128,8 +128,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../../Harmony/include</AdditionalIncludeDirectories>
-	  <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>../../../Harmony/include;D:\soft\LG\trunk\SlotFramework\Libraries\LgSlotGame;$(DXSDK_DIR)\include;D:\soft\LG\trunk\SlotFramework\Libraries\LgUtilLib\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -150,7 +150,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../../Harmony/include</AdditionalIncludeDirectories>
-	  <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -162,15 +162,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseGame.cpp" />
     <ClCompile Include="ScaledText.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseGame.h" />
     <ClInclude Include="ScaledText.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../../Harmony/src/Harmony_vs2013.vcxproj">
       <Project>{fccd89c1-bc25-41e0-8ee4-b77e0fc9273a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Libraries\LgSlotGame\LgSlotGame.vcxproj">
+      <Project>{7809b551-c136-4371-a0e6-9086ec0968bd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Libraries\LgUtilLib\LgUtilLib.vcxproj">
+      <Project>{7566b41d-c12f-4771-bd25-d642fdf9fd42}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

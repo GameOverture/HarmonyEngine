@@ -10,6 +10,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScaledText", "ScaledText_vs
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Harmony", "..\..\..\Harmony\src\Harmony_vs2013.vcxproj", "{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LgSlotGame", "..\..\..\..\..\Libraries\LgSlotGame\LgSlotGame.vcxproj", "{7809B551-C136-4371-A0E6-9086EC0968BD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LgUtilLib", "..\..\..\..\..\Libraries\LgUtilLib\LgUtilLib.vcxproj", "{7566B41D-C12F-4771-BD25-D642FDF9FD42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -34,6 +38,18 @@ Global
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.Release|Win32.Build.0 = Release|Win32
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.Release|x64.ActiveCfg = Release|x64
 		{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}.Release|x64.Build.0 = Release|x64
+		{7809B551-C136-4371-A0E6-9086EC0968BD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7809B551-C136-4371-A0E6-9086EC0968BD}.Debug|Win32.Build.0 = Debug|Win32
+		{7809B551-C136-4371-A0E6-9086EC0968BD}.Debug|x64.ActiveCfg = Debug|Win32
+		{7809B551-C136-4371-A0E6-9086EC0968BD}.Release|Win32.ActiveCfg = Release|Win32
+		{7809B551-C136-4371-A0E6-9086EC0968BD}.Release|Win32.Build.0 = Release|Win32
+		{7809B551-C136-4371-A0E6-9086EC0968BD}.Release|x64.ActiveCfg = Release|Win32
+		{7566B41D-C12F-4771-BD25-D642FDF9FD42}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7566B41D-C12F-4771-BD25-D642FDF9FD42}.Debug|Win32.Build.0 = Debug|Win32
+		{7566B41D-C12F-4771-BD25-D642FDF9FD42}.Debug|x64.ActiveCfg = Debug|Win32
+		{7566B41D-C12F-4771-BD25-D642FDF9FD42}.Release|Win32.ActiveCfg = Release|Win32
+		{7566B41D-C12F-4771-BD25-D642FDF9FD42}.Release|Win32.Build.0 = Release|Win32
+		{7566B41D-C12F-4771-BD25-D642FDF9FD42}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

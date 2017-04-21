@@ -153,6 +153,10 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 {
 	HyAssert(sm_pHyAssets, "IHyDraw2d::Load was invoked before engine has been initialized");
 
+	// Don't load if the name is blank, and it's required by this node type
+	if(m_sNAME.empty() && m_eTYPE != HYTYPE_Entity2d && m_eTYPE != HYTYPE_Primitive2d && m_eTYPE != HYTYPE_TexturedQuad2d)
+		return;
+
 	if(GetCoordinateType() == HYCOORDTYPE_Default)
 		SetCoordinateType(HyDefaultCoordinateType());
 	if(GetCoordinateUnit() == HYCOORDUNIT_Default)

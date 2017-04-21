@@ -16,7 +16,41 @@
             "textureIndex": 0,
             "type": 4,
             "width": 335,
+            "x": 1132,
+            "y": 0
+        },
+        {
+            "checksum": 1451715536,
+            "cropBottom": 619,
+            "cropLeft": 0,
+            "cropRight": 619,
+            "cropTop": 0,
+            "errors": 0,
+            "filter": "",
+            "height": 620,
+            "id": 1,
+            "name": "Default",
+            "textureIndex": 0,
+            "type": 4,
+            "width": 620,
             "x": 0,
+            "y": 0
+        },
+        {
+            "checksum": 3254422035,
+            "cropBottom": 508,
+            "cropLeft": 2,
+            "cropRight": 507,
+            "cropTop": 0,
+            "errors": 0,
+            "filter": "",
+            "height": 512,
+            "id": 2,
+            "name": "00000",
+            "textureIndex": 0,
+            "type": 1,
+            "width": 512,
+            "x": 623,
             "y": 0
         }
     ],
@@ -35,5 +69,5 @@
         "sbTextureHeight": 2048,
         "sbTextureWidth": 2048
     },
-    "startFrameId": 1
+    "startFrameId": 3
 }
