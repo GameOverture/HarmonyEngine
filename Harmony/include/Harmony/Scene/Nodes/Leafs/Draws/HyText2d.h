@@ -46,7 +46,6 @@ protected:
 		BOXATTRIB_SplitWordsToFit		= 1 << 3,
 		BOXATTRIB_IsScaleBox			= 1 << 4,
 		BOXATTRIB_FitWithinBounds		= 1 << 5,	// Whether any fancy glyph is allowed to hang outside the bounds
-		BOXATTRIB_PreserveGlyphRatios	= 1 << 6
 		//BOXATTRIB_DigitBox
 	};
 	uint32				m_uiBoxAttributes;
@@ -93,7 +92,7 @@ public:
 
 	void SetAsLine();
 	void SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitWordsToFit = false);
-	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true, bool bPreserveGlyphRatios = false);
+	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 
 protected:
 	virtual void DrawUpdate() override;

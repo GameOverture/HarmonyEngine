@@ -165,15 +165,12 @@ void HyText2d::SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitW
 	m_bIsDirty = true;
 }
 
-void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/, bool bPreserveGlyphRatios /*= false*/)
+void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
 {
 	int32 iFlags = BOXATTRIB_IsScaleBox | BOXATTRIB_FitWithinBounds;
 
 	if(bCenterVertically)
 		iFlags |= BOXATTRIB_CenterVertically;
-
-	if(bPreserveGlyphRatios)
-		iFlags |= BOXATTRIB_PreserveGlyphRatios;
 
 	if(m_uiBoxAttributes == iFlags && m_vBoxDimensions.x == fWidth && m_vBoxDimensions.y == fHeight)
 		return;
@@ -389,7 +386,7 @@ offsetCalculation:
 						uint32 iGlyphOffsetIndex = static_cast<uint32>(iFirstLineStrIndex + (uiSTR_SIZE * ((uiNUM_LAYERS - 1) - iLayerIndex)));
 
 						pWritePos[iLayerIndex].y = m_vBoxDimensions.y;
-						pWritePos[iLayerIndex].y -= (0 == (m_uiBoxAttributes & BOXATTRIB_PreserveGlyphRatios)) ? fCurLineAscender : (pData->GetLineHeight(m_uiCurFontState) * m_fScaleBoxModifier);
+						pWritePos[iLayerIndex].y -= fCurLineAscender;
 
 						// Because this is the first line, we know that the previous value of 'm_pGlyphOffsets' is positioned from 0.0f (y-axis)
 						m_pGlyphOffsets[iGlyphOffsetIndex].y += pWritePos[iLayerIndex].y;
@@ -532,7 +529,7 @@ offsetCalculation:
 	{
 		float fTotalHeight = 0.0f;
 		for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
-			fTotalHeight += (0 == (m_uiBoxAttributes & BOXATTRIB_PreserveGlyphRatios)) ? vNewlineInfo[i].fUSED_HEIGHT : (pData->GetLineHeight(m_uiCurFontState) * m_fScaleBoxModifier);
+			fTotalHeight += vNewlineInfo[i].fUSED_HEIGHT;
 
 		if(bScaleBoxModiferIsSet == false)
 		{
