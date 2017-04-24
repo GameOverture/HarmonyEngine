@@ -271,10 +271,17 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	m_fScaleBoxModifier = 1.0f;
 
 	float *pMonospaceWidths = nullptr;
+	float *pMonospaceAscender = nullptr;
+	float *pMonospaceDecender = nullptr;
 	if(m_bMonospacedDigits)
 	{
 		pMonospaceWidths = HY_NEW float[uiNUM_LAYERS];
+		pMonospaceAscender = HY_NEW float[uiNUM_LAYERS];
+		pMonospaceDecender = HY_NEW float[uiNUM_LAYERS];
+
 		memset(pMonospaceWidths, 0, sizeof(float) * uiNUM_LAYERS);
+		memset(pMonospaceAscender, 0, sizeof(float) * uiNUM_LAYERS);
+		memset(pMonospaceDecender, 0, sizeof(float) * uiNUM_LAYERS);
 
 		// Determine the largest digit width for each layer which will become the "digit mono-space" amount
 		for(uint32 iLayerIndex = 0; iLayerIndex < uiNUM_LAYERS; ++iLayerIndex)
@@ -285,6 +292,12 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 				const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, iDigit);
 				if(pMonospaceWidths[iLayerIndex] < glyphRef.fADVANCE_X)
 					pMonospaceWidths[iLayerIndex] = glyphRef.fADVANCE_X;
+
+				if(pMonospaceAscender[iLayerIndex] < glyphRef.iOFFSET_Y)
+					pMonospaceAscender[iLayerIndex] = static_cast<float>(glyphRef.iOFFSET_Y);
+
+				if(pMonospaceDecender[iLayerIndex] < (glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y))
+					pMonospaceDecender[iLayerIndex] = static_cast<float>(glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y);
 			}
 		}
 	}
@@ -361,8 +374,15 @@ offsetCalculation:
 				}
 
 				float fAdvanceAmtX = glyphRef.fADVANCE_X;
+				float fAscender = static_cast<float>(glyphRef.iOFFSET_Y);
+				float fDecender = static_cast<float>(glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y);
+
 				if(m_bMonospacedDigits && uiUtf32Code >= 48 && uiUtf32Code <= 57)
+				{
 					fAdvanceAmtX = pMonospaceWidths[iLayerIndex];
+					fAscender = pMonospaceAscender[iLayerIndex];
+					fDecender = pMonospaceDecender[iLayerIndex];
+				}
 
 				uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiSTR_SIZE * ((uiNUM_LAYERS - 1) - iLayerIndex)));
 				m_pGlyphOffsets[iGlyphOffsetIndex].x = pWritePos[iLayerIndex].x + ((fKerning + glyphRef.iOFFSET_X) * m_fScaleBoxModifier);
@@ -376,11 +396,11 @@ offsetCalculation:
 				if(fCurLineWidth < pWritePos[iLayerIndex].x)//m_pGlyphOffsets[iGlyphOffsetIndex].x + (fAdvanceAmtX * m_fScaleBoxModifier))
 					fCurLineWidth = pWritePos[iLayerIndex].x;//m_pGlyphOffsets[iGlyphOffsetIndex].x + (fAdvanceAmtX * m_fScaleBoxModifier);
 
-				if(fCurLineAscender < (glyphRef.iOFFSET_Y * m_fScaleBoxModifier))
-					fCurLineAscender = (glyphRef.iOFFSET_Y * m_fScaleBoxModifier);
+				if(fCurLineAscender < (fAscender * m_fScaleBoxModifier))
+					fCurLineAscender = (fAscender * m_fScaleBoxModifier);
 
-				if(fCurLineDecender < ((glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y) * m_fScaleBoxModifier))
-					fCurLineDecender = ((glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y) * m_fScaleBoxModifier);
+				if(fCurLineDecender < (fDecender * m_fScaleBoxModifier))
+					fCurLineDecender = (fDecender * m_fScaleBoxModifier);
 
 				// If drawing text within a box, and we advance past our width, determine if we should newline
 				if((m_uiBoxAttributes & BOXATTRIB_IsScaleBox) == 0 &&
@@ -601,6 +621,8 @@ offsetCalculation:
 
 	delete[] pWritePos;
 	delete[] pMonospaceWidths;
+	delete[] pMonospaceAscender;
+	delete[] pMonospaceDecender;
 
 	m_bIsDirty = false;
 }
