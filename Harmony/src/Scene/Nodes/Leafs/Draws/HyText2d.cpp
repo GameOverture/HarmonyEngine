@@ -376,16 +376,19 @@ offsetCalculation:
 				float fAdvanceAmtX = glyphRef.fADVANCE_X;
 				float fAscender = static_cast<float>(glyphRef.iOFFSET_Y);
 				float fDecender = static_cast<float>(glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y);
+				float fOffsetX = static_cast<float>(glyphRef.iOFFSET_X);
 
 				if(m_bMonospacedDigits && uiUtf32Code >= 48 && uiUtf32Code <= 57)
 				{
 					fAdvanceAmtX = pMonospaceWidths[iLayerIndex];
 					fAscender = pMonospaceAscender[iLayerIndex];
 					fDecender = pMonospaceDecender[iLayerIndex];
+
+					fOffsetX += (fAdvanceAmtX - glyphRef.fADVANCE_X) * 0.5f;	// This will center monospaced digits (horizontally) within their alloted space
 				}
 
 				uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiSTR_SIZE * ((uiNUM_LAYERS - 1) - iLayerIndex)));
-				m_pGlyphOffsets[iGlyphOffsetIndex].x = pWritePos[iLayerIndex].x + ((fKerning + glyphRef.iOFFSET_X) * m_fScaleBoxModifier);
+				m_pGlyphOffsets[iGlyphOffsetIndex].x = pWritePos[iLayerIndex].x + ((fKerning + fOffsetX) * m_fScaleBoxModifier);
 				m_pGlyphOffsets[iGlyphOffsetIndex].y = pWritePos[iLayerIndex].y - ((glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y) * m_fScaleBoxModifier);
 
 				if(fLastCharWidth < pWritePos[iLayerIndex].x)
