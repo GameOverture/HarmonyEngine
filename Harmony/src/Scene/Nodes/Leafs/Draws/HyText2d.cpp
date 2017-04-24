@@ -21,6 +21,7 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent
 																									m_fScaleBoxModifier(1.0f),
 																									m_uiBoxAttributes(0),
 																									m_eAlignment(HYALIGN_Left),
+																									m_bMonospacedDigits(false),
 																									m_pGlyphOffsets(nullptr),
 																									m_uiNumReservedGlyphOffsets(0),
 																									m_uiNumValidCharacters(0),
@@ -72,9 +73,10 @@ uint32 HyText2d::TextGetState()
 
 void HyText2d::TextSetState(uint32 uiStateIndex)
 {
-	m_uiCurFontState = uiStateIndex;
-	if(IsLoaded())
+	if(IsLoaded() && m_uiCurFontState != uiStateIndex)
 		m_bIsDirty = true;
+	
+	m_uiCurFontState = uiStateIndex;
 }
 
 uint32 HyText2d::TextGetNumLayers()
@@ -128,9 +130,23 @@ HyAlign HyText2d::TextGetAlignment()
 
 void HyText2d::TextSetAlignment(HyAlign eAlignment)
 {
-	m_eAlignment = eAlignment;
-	if(IsLoaded())
+	if(IsLoaded() && m_eAlignment != eAlignment)
 		m_bIsDirty = true;
+	
+	m_eAlignment = eAlignment;
+}
+
+bool HyText2d::TextIsMonospacedDigits()
+{
+	return m_bMonospacedDigits;
+}
+
+void HyText2d::TextSetMonospacedDigits(bool bSet)
+{
+	if(IsLoaded() && m_bMonospacedDigits != bSet)
+		m_bIsDirty = true;
+	
+	m_bMonospacedDigits = bSet;
 }
 
 const glm::vec2 &HyText2d::TextGetBox()
@@ -254,6 +270,25 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	bool bScaleBoxModiferIsSet = false;
 	m_fScaleBoxModifier = 1.0f;
 
+	float *pMonospaceWidths = nullptr;
+	if(m_bMonospacedDigits)
+	{
+		pMonospaceWidths = HY_NEW float[uiNUM_LAYERS];
+		memset(pMonospaceWidths, 0, sizeof(float) * uiNUM_LAYERS);
+
+		// Determine the largest digit width for each layer which will become the "digit mono-space" amount
+		for(uint32 iLayerIndex = 0; iLayerIndex < uiNUM_LAYERS; ++iLayerIndex)
+		{
+			// UTF-32 value of '48' == zero (...and '57' == nine)
+			for(uint32 iDigit = 48; iDigit < 58; ++iDigit)
+			{
+				const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, iDigit);
+				if(pMonospaceWidths[iLayerIndex] < glyphRef.fADVANCE_X)
+					pMonospaceWidths[iLayerIndex] = glyphRef.fADVANCE_X;
+			}
+		}
+	}
+
 offsetCalculation:
 
 	memset(m_pGlyphOffsets, 0, sizeof(glm::vec2) * m_uiNumReservedGlyphOffsets);
@@ -288,6 +323,7 @@ offsetCalculation:
 	for(uint32 uiStrIndex = 0; uiStrIndex < uiSTR_SIZE; ++uiStrIndex)
 	{
 		bool bDoNewline = false;
+		uint32 uiUtf32Code = HyUtf8_to_Utf32(&m_sCurrentString[uiStrIndex]);
 
 		if(m_sCurrentString[uiStrIndex] == ' ')
 		{
@@ -310,7 +346,7 @@ offsetCalculation:
 			// Handle every layer for this character
 			for(uint32 iLayerIndex = 0; iLayerIndex < uiNUM_LAYERS; ++iLayerIndex)
 			{
-				const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, HyUtf8_to_Utf32(&m_sCurrentString[uiStrIndex]));
+				const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, uiUtf32Code);
 
 				float fKerning = 0.0f;
 				if(bFirstCharacterOnNewLine)
@@ -324,6 +360,10 @@ offsetCalculation:
 					fKerning = 0.0f;
 				}
 
+				float fAdvanceAmtX = glyphRef.fADVANCE_X;
+				if(m_bMonospacedDigits && uiUtf32Code >= 48 && uiUtf32Code <= 57)
+					fAdvanceAmtX = pMonospaceWidths[iLayerIndex];
+
 				uint32 iGlyphOffsetIndex = static_cast<uint32>(uiStrIndex + (uiSTR_SIZE * ((uiNUM_LAYERS - 1) - iLayerIndex)));
 				m_pGlyphOffsets[iGlyphOffsetIndex].x = pWritePos[iLayerIndex].x + ((fKerning + glyphRef.iOFFSET_X) * m_fScaleBoxModifier);
 				m_pGlyphOffsets[iGlyphOffsetIndex].y = pWritePos[iLayerIndex].y - ((glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y) * m_fScaleBoxModifier);
@@ -331,10 +371,10 @@ offsetCalculation:
 				if(fLastCharWidth < pWritePos[iLayerIndex].x)
 					fLastCharWidth = pWritePos[iLayerIndex].x;
 
-				pWritePos[iLayerIndex].x += (glyphRef.fADVANCE_X * m_fScaleBoxModifier);
+				pWritePos[iLayerIndex].x += (fAdvanceAmtX * m_fScaleBoxModifier);
 
-				if(fCurLineWidth < m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier))
-					fCurLineWidth = m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier);
+				if(fCurLineWidth < pWritePos[iLayerIndex].x)//m_pGlyphOffsets[iGlyphOffsetIndex].x + (fAdvanceAmtX * m_fScaleBoxModifier))
+					fCurLineWidth = pWritePos[iLayerIndex].x;//m_pGlyphOffsets[iGlyphOffsetIndex].x + (fAdvanceAmtX * m_fScaleBoxModifier);
 
 				if(fCurLineAscender < (glyphRef.iOFFSET_Y * m_fScaleBoxModifier))
 					fCurLineAscender = (glyphRef.iOFFSET_Y * m_fScaleBoxModifier);
@@ -372,9 +412,8 @@ offsetCalculation:
 						m_pGlyphOffsets[iGlyphOffsetIndex].x += (fFirstCharacterNudgeRightAmt * m_fScaleBoxModifier);
 						pWritePos[iLayerIndex].x += (fFirstCharacterNudgeRightAmt * m_fScaleBoxModifier);
 
-						const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, iLayerIndex, HyUtf8_to_Utf32(&m_sCurrentString[uiStrIndex]));
-						if(fCurLineWidth < m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier))
-							fCurLineWidth = m_pGlyphOffsets[iGlyphOffsetIndex].x + (glyphRef.uiWIDTH * m_fScaleBoxModifier);
+						if(fCurLineWidth < pWritePos[iLayerIndex].x)
+							fCurLineWidth = pWritePos[iLayerIndex].x;
 					}
 				}
 
@@ -561,6 +600,7 @@ offsetCalculation:
 	}
 
 	delete[] pWritePos;
+	delete[] pMonospaceWidths;
 
 	m_bIsDirty = false;
 }

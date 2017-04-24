@@ -46,13 +46,13 @@ protected:
 		BOXATTRIB_SplitWordsToFit		= 1 << 3,
 		BOXATTRIB_IsScaleBox			= 1 << 4,
 		BOXATTRIB_FitWithinBounds		= 1 << 5,	// Whether any fancy glyph is allowed to hang outside the bounds
-		//BOXATTRIB_DigitBox
 	};
 	uint32				m_uiBoxAttributes;
 	glm::vec2			m_vBoxDimensions;
 	float				m_fScaleBoxModifier;
 
 	HyAlign				m_eAlignment;
+	bool				m_bMonospacedDigits;
 
 	glm::vec2 *			m_pGlyphOffsets;
 	uint32				m_uiNumReservedGlyphOffsets;
@@ -87,6 +87,9 @@ public:
 
 	HyAlign TextGetAlignment();
 	void TextSetAlignment(HyAlign eAlignment);
+
+	bool TextIsMonospacedDigits();
+	void TextSetMonospacedDigits(bool bSet);
 
 	const glm::vec2 &TextGetBox();
 
