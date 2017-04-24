@@ -3,7 +3,6 @@
 
 ScaledText::ScaledText(HarmonyInit &initStruct) :	LgSlotGame(initStruct),
 													m_Text("", "NewFont"),
-													m_pMeter(nullptr),
 													m_Telnet(m_Tilt)
 {
 	
@@ -15,10 +14,6 @@ ScaledText::~ScaledText()
 
 /*virtual*/ void ScaledText::OnConstruct() /*override*/
 {
-	LgInfoPanelInit init;
-	init.text_loadPath.Set("", "NewFont");
-	m_pMeter = new LgMeter(init);
-	m_pMeter->Load();
 }
 
 /*virtual*/ ILgSubGame *ScaledText::OnSubGame_Allocate(const ILgxGameData *pXmlGameData) /*override*/

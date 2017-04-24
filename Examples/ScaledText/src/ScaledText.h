@@ -13,8 +13,6 @@ class ScaledText : public LgSlotGame
 	HyText2d		m_Text;
 	HyPrimitive2d	m_TextBox;
 
-	LgMeter *		m_pMeter;
-
 	LgTilt							m_Tilt;
 	LgTelnet						m_Telnet;
 
