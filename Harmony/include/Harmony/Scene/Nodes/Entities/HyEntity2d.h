@@ -37,6 +37,8 @@ protected:
 	eMouseInputState				m_eMouseInputState;
 	void *							m_pMouseInputUserParam;
 
+	HyScreenRect<int32>				m_WorldScissorRect;
+
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);

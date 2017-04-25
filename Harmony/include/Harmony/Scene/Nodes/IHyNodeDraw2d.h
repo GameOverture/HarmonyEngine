@@ -23,7 +23,6 @@ protected:
 	glm::vec3						m_CachedBotColor;
 
 	HyScreenRect<int32>				m_LocalScissorRect;
-	HyScreenRect<int32>				m_WorldScissorRect;
 
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
 

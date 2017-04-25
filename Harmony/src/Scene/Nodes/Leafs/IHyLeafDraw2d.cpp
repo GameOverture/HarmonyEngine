@@ -62,6 +62,7 @@ void IHyLeafDraw2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, u
 void IHyLeafDraw2d::ClearScissor(bool bUseParentScissor)
 {
 	m_LocalScissorRect.iTag = 0;
+	m_RenderState.ClearScissorRect();
 
 	if(bUseParentScissor == false)
 		m_uiExplicitFlags |= EXPLICIT_Scissor;
@@ -188,12 +189,6 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 			glm::mat4 mtx;
 			GetWorldTransform(mtx);
 
-			m_WorldScissorRect.x = static_cast<int32>(mtx[3].x + m_LocalScissorRect.x);
-			m_WorldScissorRect.y = static_cast<int32>(mtx[3].y + m_LocalScissorRect.y);
-			m_WorldScissorRect.width = static_cast<int32>(mtx[0].x * m_LocalScissorRect.width);
-			m_WorldScissorRect.height = static_cast<int32>(mtx[1].y * m_LocalScissorRect.height);
-			m_WorldScissorRect.iTag = 1;
-
 			m_RenderState.SetScissorRect(static_cast<int32>(mtx[3].x + m_LocalScissorRect.x),
 										 static_cast<int32>(mtx[3].y + m_LocalScissorRect.y),
 										 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.width),
@@ -201,7 +196,6 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 		}
 		else
 		{
-			m_WorldScissorRect.iTag = 0;
 			m_RenderState.ClearScissorRect();
 		}
 	}

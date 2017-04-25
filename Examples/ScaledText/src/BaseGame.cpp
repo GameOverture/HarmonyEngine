@@ -43,7 +43,7 @@ BaseGame::~BaseGame()
 {
 	if(m_GameRef.Input().IsBtnDownBuffered(DEBUGKEY_MeterSpin))
 	{
-		m_pMeter->SetValue(m_pMeter->GetValue() + 1, 1.0f);
+		m_pMeter->SetValue(m_pMeter->GetValue() + 10, 1.0f);
 	}
 
 	if(m_GameRef.Input().IsBtnDownBuffered(DEBUGKEY_MeterToggleSpin))
@@ -81,4 +81,6 @@ BaseGame::~BaseGame()
 		m_Text.SetAsScaleBox(vScaleBox.x - 1.0f, vScaleBox.y);
 		m_TextBox.SetAsQuad(m_Text.TextGetBox().x, m_Text.TextGetBox().y, true);
 	}
+
+	m_Text.TextSet(m_pMeter->GetStr());
 }
