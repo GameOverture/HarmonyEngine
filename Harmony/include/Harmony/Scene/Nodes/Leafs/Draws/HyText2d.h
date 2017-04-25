@@ -72,6 +72,9 @@ public:
 	uint32 TextGetStrLength();
 	float TextGetScaleBoxModifer();
 
+	glm::vec2 TextGetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);
+	glm::vec2 TextGetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex);
+
 	uint32 TextGetState();
 	void TextSetState(uint32 uiStateIndex);
 

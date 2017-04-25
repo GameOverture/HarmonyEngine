@@ -66,6 +66,34 @@ float HyText2d::TextGetScaleBoxModifer()
 	return m_fScaleBoxModifier;
 }
 
+glm::vec2 HyText2d::TextGetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex)
+{
+	if(m_bIsDirty)
+		DrawUpdate();
+
+	if(m_pGlyphOffsets == nullptr)
+		return glm::vec2(0);
+
+	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
+	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
+
+	uint32 iGlyphOffsetIndex = static_cast<uint32>(uiCharIndex + (m_sCurrentString.size() * ((uiNumLayers - 1) - uiLayerIndex)));
+	return m_pGlyphOffsets[iGlyphOffsetIndex];
+}
+
+glm::vec2 HyText2d::TextGetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex)
+{
+	if(m_bIsDirty)
+		DrawUpdate();
+
+	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
+	const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, HyUtf8_to_Utf32(&m_sCurrentString[uiCharIndex]));
+
+	glm::vec2 vSize(glyphRef.uiWIDTH, glyphRef.uiHEIGHT);
+	vSize *= m_fScaleBoxModifier;
+	return vSize;
+}
+
 uint32 HyText2d::TextGetState()
 {
 	return m_uiCurFontState;
