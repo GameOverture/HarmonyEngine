@@ -54,8 +54,19 @@ protected:
 	HyAlign				m_eAlignment;
 	bool				m_bMonospacedDigits;
 
-	glm::vec2 *			m_pGlyphOffsets;
-	uint32				m_uiNumReservedGlyphOffsets;
+	struct GlyphInfo
+	{
+		glm::vec2			vOffset;
+		float				fAlpha;
+
+		GlyphInfo() :	vOffset(0.0f),
+						fAlpha(1.0f)
+		{ }
+		~GlyphInfo()
+		{ }
+	};
+	GlyphInfo *			m_pGlyphInfos;
+	uint32				m_uiNumReservedGlyphs;
 
 	uint32				m_uiNumValidCharacters;
 
@@ -74,6 +85,8 @@ public:
 
 	glm::vec2 TextGetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);
 	glm::vec2 TextGetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex);
+	float TextGetGlyphAlpha(uint32 uiCharIndex);
+	void TextSetGlyphAlpha(uint32 uiCharIndex, float fAlpha);
 
 	uint32 TextGetState();
 	void TextSetState(uint32 uiStateIndex);
