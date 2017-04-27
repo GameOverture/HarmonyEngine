@@ -43,7 +43,7 @@ BaseGame::~BaseGame()
 {
 	if(m_GameRef.Input().IsBtnDownBuffered(DEBUGKEY_MeterSpin))
 	{
-		m_pMeter->SetValue(m_pMeter->GetValue() + 10, 1.0f);
+		m_pMeter->SetValue(m_pMeter->GetValue() - 1, 1.0f);
 	}
 
 	if(m_GameRef.Input().IsBtnDownBuffered(DEBUGKEY_MeterToggleSpin))

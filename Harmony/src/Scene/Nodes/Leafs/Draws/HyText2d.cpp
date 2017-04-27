@@ -13,11 +13,11 @@
 
 #include <iostream>
 
-#define HYTEXT2D_GlyphIndex(uiStrIndex, uiNumLayers, uiLayerIndex) static_cast<uint32>(uiStrIndex + (m_sCurrentString.size() * ((uiNumLayers - 1) - uiLayerIndex)))
+#define HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex) static_cast<uint32>(uiCharIndex + (m_Utf32CodeList.size() * ((uiNumLayers - 1) - uiLayerIndex)))
 
 HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_Text2d, szPrefix, szName, pParent),
 																									m_bIsDirty(false),
-																									m_sCurrentString(""),
+																									m_sRawString(""),
 																									m_uiCurFontState(0),
 																									m_vBoxDimensions(0.0f, 0.0f),
 																									m_fScaleBoxModifier(1.0f),
@@ -42,22 +42,39 @@ HyText2d::~HyText2d(void)
 // Assumes UTF-8 encoding. Accepts newline characters '\n'
 void HyText2d::TextSet(const std::string &sTextRef)
 {
-	if(sTextRef == m_sCurrentString)
+	if(sTextRef == m_sRawString)
 		return;
 
-	m_sCurrentString = sTextRef;
+	m_sRawString = sTextRef;
+
+	// Convert 'm_sRawString' from UTF - 8 to UTF - 32LE
+	m_Utf32CodeList.clear();
+	m_Utf32CodeList.reserve(m_sRawString.size());
+
+	uint32 uiNumBytesUsed = 0;
+	for(uint32 i = 0; i < m_sRawString.size(); i += uiNumBytesUsed)
+	{
+		m_Utf32CodeList.push_back(HyUtf8_to_Utf32(&m_sRawString[i], uiNumBytesUsed));
+		HyAssert(uiNumBytesUsed > 0, "HyText2d::TextSet failed to convert utf8 -> utf32");
+	}
+
 	if(IsLoaded())
 		m_bIsDirty = true;
 }
 
 const std::string &HyText2d::TextGet() const
 {
-	return m_sCurrentString;
+	return m_sRawString;
 }
 
-uint32 HyText2d::TextGetStrLength()
+uint32 HyText2d::TextGetNumCharacters()
 {
-	return static_cast<uint32>(m_sCurrentString.size());
+	return static_cast<uint32>(m_Utf32CodeList.size());
+}
+
+uint32 HyText2d::TextGetNumShownCharacters()
+{
+	return m_uiNumValidCharacters;
 }
 
 float HyText2d::TextGetScaleBoxModifer()
@@ -89,7 +106,7 @@ glm::vec2 HyText2d::TextGetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex)
 		DrawUpdate();
 
 	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
-	const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, HyUtf8_to_Utf32(&m_sCurrentString[uiCharIndex]));
+	const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
 
 	glm::vec2 vSize(glyphRef.uiWIDTH, glyphRef.uiHEIGHT);
 	vSize *= m_fScaleBoxModifier;
@@ -312,11 +329,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 	m_uiNumValidCharacters = 0;
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
-
-
-	// TODO: Convert 'm_sCurrentString' from UTF-8 to UTF-32LE
-
-	const uint32 uiSTR_SIZE = static_cast<uint32>(m_sCurrentString.size());
+	const uint32 uiSTR_SIZE = static_cast<uint32>(m_Utf32CodeList.size());
 	
 	if(m_pGlyphInfos == nullptr || m_uiNumReservedGlyphs < uiSTR_SIZE * uiNUM_LAYERS)
 	{
@@ -399,15 +412,14 @@ offsetCalculation:
 	for(uint32 uiStrIndex = 0; uiStrIndex < uiSTR_SIZE; ++uiStrIndex)
 	{
 		bool bDoNewline = false;
-		uint32 uiUtf32Code = HyUtf8_to_Utf32(&m_sCurrentString[uiStrIndex]);
 
-		if(m_sCurrentString[uiStrIndex] == ' ')
+		if(m_Utf32CodeList[uiStrIndex] == 32)	// 32 = ' ' character
 		{
 			uiLastSpaceIndex = uiStrIndex;
 			fLastSpaceWidth = fCurLineWidth;
 		}
 
-		if(m_sCurrentString[uiStrIndex] == '\n')
+		if(m_Utf32CodeList[uiStrIndex] == '\n')
 		{
 			++uiNumNewlineCharacters;
 
@@ -422,7 +434,9 @@ offsetCalculation:
 			// Handle every layer for this character
 			for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
 			{
-				const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, uiUtf32Code);
+				uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiStrIndex, uiNUM_LAYERS, uiLayerIndex);
+
+				const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, m_Utf32CodeList[uiStrIndex]);
 
 				float fKerning = 0.0f;
 				if(bFirstCharacterOnNewLine)
@@ -441,7 +455,7 @@ offsetCalculation:
 				float fDecender = static_cast<float>(glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y);
 				float fOffsetX = static_cast<float>(glyphRef.iOFFSET_X);
 
-				if(m_bMonospacedDigits && uiUtf32Code >= 48 && uiUtf32Code <= 57)
+				if(m_bMonospacedDigits && m_Utf32CodeList[uiStrIndex] >= 48 && m_Utf32CodeList[uiStrIndex] <= 57)
 				{
 					fAdvanceAmtX = pMonospaceWidths[uiLayerIndex];
 					fAscender = pMonospaceAscender[uiLayerIndex];
@@ -450,7 +464,6 @@ offsetCalculation:
 					fOffsetX += (fAdvanceAmtX - glyphRef.fADVANCE_X) * 0.5f;	// This will center monospaced digits (horizontally) within their alloted space
 				}
 
-				uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiStrIndex, uiNUM_LAYERS, uiLayerIndex);
 				m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.x = pWritePos[uiLayerIndex].x + ((fKerning + fOffsetX) * m_fScaleBoxModifier);
 				m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.y = pWritePos[uiLayerIndex].y - ((glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y) * m_fScaleBoxModifier);
 
@@ -535,7 +548,7 @@ offsetCalculation:
 
 		if(bDoNewline)
 		{
-			if(uiStrIndex == 0 && m_sCurrentString[uiStrIndex] != '\n')
+			if(uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n')
 			{
 				// Text box is too small to fit a single character
 				m_uiNumValidCharacters = 0;
@@ -579,7 +592,7 @@ offsetCalculation:
 
 	if(bTerminatedEarly == false)
 	{
-		m_uiNumValidCharacters = static_cast<uint32>(m_sCurrentString.size());
+		m_uiNumValidCharacters = uiSTR_SIZE;
 		vNewlineInfo.push_back(LineInfo(fCurLineWidth, (fCurLineAscender + fCurLineDecender), uiNewlineIndex));	// Push the final line (row)
 	}
 
@@ -618,10 +631,10 @@ offsetCalculation:
 				bool bSpaceFound = false;
 				for(; uiStrIndex < uiEndIndex; ++uiStrIndex)
 				{
-					if(m_sCurrentString[uiStrIndex] == ' ')
+					if(m_Utf32CodeList[uiStrIndex] == ' ')
 						bSpaceFound = true;
 
-					if(bSpaceFound && m_sCurrentString[uiStrIndex] != ' ')
+					if(bSpaceFound && m_Utf32CodeList[uiStrIndex] != ' ')
 					{
 						++uiNumWords;
 						bSpaceFound = false;
@@ -635,10 +648,10 @@ offsetCalculation:
 				bSpaceFound = false;
 				for(; uiStrIndex < uiEndIndex; ++uiStrIndex)
 				{
-					if(m_sCurrentString[uiStrIndex] == ' ')
+					if(m_Utf32CodeList[uiStrIndex] == ' ')
 						bSpaceFound = true;
 
-					if(bSpaceFound && m_sCurrentString[uiStrIndex] != ' ')
+					if(bSpaceFound && m_Utf32CodeList[uiStrIndex] != ' ')
 					{
 						++uiCurWord;
 						bSpaceFound = false;
@@ -715,17 +728,18 @@ offsetCalculation:
 	{
 		for(uint32 j = 0; j < m_uiNumValidCharacters; ++j, ++iOffsetIndex)
 		{
-			if(m_sCurrentString[j] == '\n')
+			uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(j, uiNumLayers, i);
+
+			if(m_Utf32CodeList[j] == '\n')
 				continue;
 
-			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, i, HyUtf8_to_Utf32(&m_sCurrentString[j]));
+			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, i, m_Utf32CodeList[j]);
 
 			glm::vec2 vSize(glyphRef.uiWIDTH, glyphRef.uiHEIGHT);
 			vSize *= m_fScaleBoxModifier;
 			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vSize;
 			pRefDataWritePos += sizeof(glm::vec2);
 
-			uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(j, uiNumLayers, i);
 			*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset;
 			pRefDataWritePos += sizeof(glm::vec2);
 

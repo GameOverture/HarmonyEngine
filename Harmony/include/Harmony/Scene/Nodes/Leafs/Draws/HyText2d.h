@@ -19,7 +19,8 @@ class HyText2d : public IHyLeafDraw2d
 {
 protected:
 	bool							m_bIsDirty;
-	std::string						m_sCurrentString;
+	std::string						m_sRawString;
+	std::vector<uint32>				m_Utf32CodeList;
 
 	uint32							m_uiCurFontState;
 
@@ -62,13 +63,11 @@ protected:
 		GlyphInfo() :	vOffset(0.0f),
 						fAlpha(1.0f)
 		{ }
-		~GlyphInfo()
-		{ }
 	};
 	GlyphInfo *			m_pGlyphInfos;
-	uint32				m_uiNumReservedGlyphs;
+	uint32				m_uiNumReservedGlyphs;		// Essentially NUM_LAYERS * NUM_UTF32_CHARACTERS
 
-	uint32				m_uiNumValidCharacters;
+	uint32				m_uiNumValidCharacters;		// How many graphically shown characters
 
 	float				m_fUsedPixelWidth;
 
@@ -80,7 +79,8 @@ public:
 	void TextSet(const std::string &sTextRef);
 	const std::string &TextGet() const;
 
-	uint32 TextGetStrLength();
+	uint32 TextGetNumCharacters();
+	uint32 TextGetNumShownCharacters();
 	float TextGetScaleBoxModifer();
 
 	glm::vec2 TextGetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);

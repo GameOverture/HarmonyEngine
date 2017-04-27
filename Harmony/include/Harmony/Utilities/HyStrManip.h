@@ -28,7 +28,7 @@ std::string WStringToString(const std::wstring& p_Str);
 uint32 StringToHash(const unsigned char *szStr);
 
 // Converts a given UTF-8 encoded character (array) to its UTF-32 LE equivalent
-uint32 HyUtf8_to_Utf32(const char *pChar);
+uint32 HyUtf8_to_Utf32(const char *pChar, uint32 &uiNumBytesUsedRef);
 
 #endif /* __HyStrManip_h__ */
 
