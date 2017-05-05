@@ -9,11 +9,11 @@
  *************************************************************************/
 #include "Time/IHyTime.h"
 
-/*static*/ const uint32			IHyTime::sm_uiUPDATESTEP_MILLISECONDS = 16;
-/*static*/ const double			IHyTime::sm_dUPDATESTEP_SECONDS = sm_uiUPDATESTEP_MILLISECONDS / 1000.0;
+/*static*/ uint32			IHyTime::sm_uiUPDATESTEP_MILLISECONDS = 16;
+/*static*/ double			IHyTime::sm_dUPDATESTEP_SECONDS = sm_uiUPDATESTEP_MILLISECONDS / 1000.0;
+/*static*/ double			IHyTime::m_dCurDeltaTime = 0.0;
 
-IHyTime::IHyTime() :	m_dCurDeltaTime(0.0),
-						m_dTotalElapsedTime(0.0),
+IHyTime::IHyTime() :	m_dTotalElapsedTime(0.0),
 						m_dThrottledTime(0.0),
 						m_iThrottleSafetyCounter(0)
 {
@@ -23,6 +23,20 @@ IHyTime::~IHyTime(void)
 {
 	while(m_TimeInstList.size() != 0)
 		RemoveTimeInst(m_TimeInstList[0]);
+}
+
+///*static*/ uint32 IHyTime::GetUpdateStepMilliseconds()
+//{
+//	return sm_uiUPDATESTEP_MILLISECONDS;
+//}
+
+/*static*/ float IHyTime::GetUpdateStepSeconds()
+{
+#ifdef HYSETTING_ThrottleUpdate
+	return static_cast<float>(sm_dUPDATESTEP_SECONDS);
+#else
+	return static_cast<float>(m_dCurDeltaTime);
+#endif
 }
 
 bool IHyTime::ThrottleTime()

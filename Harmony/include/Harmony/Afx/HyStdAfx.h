@@ -17,6 +17,8 @@
 #include "Utilities/jsonxx.h"
 #include "Utilities/HyFileIO.h"
 
+//#define HYSETTING_ThrottleUpdate
+
 enum HyType
 {
 	HYTYPE_Unknown = 0,

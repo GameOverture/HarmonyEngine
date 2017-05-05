@@ -74,7 +74,11 @@ bool HyEngine::BootUpdate()
 
 bool HyEngine::Update()
 {
+#ifdef HYSETTING_ThrottleUpdate
 	while(m_Time.ThrottleTime())
+#else
+	m_Time.ThrottleTime();
+#endif
 	{
 		m_Input.Update();
 
@@ -92,7 +96,7 @@ bool HyEngine::Update()
 		m_GuiComms.Update();
 				
 		// GUI renderer paints on a timer which doesn't work well with fixed updates like this. Ensures only single updates per frame.
-#ifdef HY_PLATFORM_GUI
+#if defined(HY_PLATFORM_GUI) && defined(HYSETTING_ThrottleUpdate)
 		break;
 #endif
 	}
