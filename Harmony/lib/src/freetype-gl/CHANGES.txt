@@ -1,0 +1,4 @@
+src\freetype-gl\src\texture-font.c
+
+Line 601:
+Increasing padding to '2' to avoid sampling other glyphs in atlas when using bi-linear filtering and scaling
