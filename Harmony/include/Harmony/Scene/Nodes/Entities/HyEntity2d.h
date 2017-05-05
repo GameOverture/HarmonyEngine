@@ -24,7 +24,8 @@ protected:
 		ATTRIBFLAG_MouseInput				= 1 << 1,
 		ATTRIBFLAG_HasBoundingVolume		= 1 << 2,
 		ATTRIBFLAG_BoundingVolumeDirty		= 1 << 3,
-		ATTRIBFLAG_Physics					= 1 << 4
+		ATTRIBFLAG_Physics					= 1 << 4,
+		ATTRIBFLAG_ReverseDisplayOrder		= 1 << 5
 	};
 	uint32							m_uiAttributes;
 
@@ -61,6 +62,7 @@ public:
 	void EnableMouseInput(bool bEnable, void *pUserParam = nullptr);
 	void EnableCollider(bool bEnable);
 	void EnablePhysics(bool bEnable);
+	void ReverseDisplayOrder(bool bReverse);
 
 	virtual bool IsLoaded() const override;
 	virtual void Load() override;

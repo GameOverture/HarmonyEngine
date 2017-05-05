@@ -97,8 +97,16 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	m_iDisplayOrder = iOrderValue;
 	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
 
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
+	if((m_uiAttributes & ATTRIBFLAG_ReverseDisplayOrder) == 0)
+	{
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+			iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
+	}
+	else
+	{
+		for(int32 i = m_ChildList.size() - 1; i >= 0; --i)
+			iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
+	}
 }
 
 void HyEntity2d::ChildAppend(IHyNode2d &childInst)
@@ -207,6 +215,16 @@ void HyEntity2d::EnableCollider(bool bEnable)
 
 void HyEntity2d::EnablePhysics(bool bEnable)
 {
+}
+
+void HyEntity2d::ReverseDisplayOrder(bool bReverse)
+{
+	if(bReverse)
+		m_uiAttributes |= ATTRIBFLAG_ReverseDisplayOrder;
+	else
+		m_uiAttributes &= ~ATTRIBFLAG_ReverseDisplayOrder;
+
+	SetDisplayOrder(m_iDisplayOrder, false);
 }
 
 /*virtual*/ bool HyEntity2d::IsLoaded() const /*override*/
