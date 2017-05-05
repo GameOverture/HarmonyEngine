@@ -104,7 +104,7 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	}
 	else
 	{
-		for(int32 i = m_ChildList.size() - 1; i >= 0; --i)
+		for(size_t i = m_ChildList.size() - 1; i >= 0; --i)
 			iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
 	}
 }
