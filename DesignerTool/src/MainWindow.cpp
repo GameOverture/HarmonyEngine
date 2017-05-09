@@ -394,7 +394,8 @@ void MainWindow::on_actionNewProject_triggered()
             m_sDefaultProjectLocation = defaultProjDir.absolutePath();
         }
 
-        ui->explorer->AddItemProject(pDlg->GetProjFilePath());
+        ui->explorer->SelectItem(ui->explorer->AddItemProject(pDlg->GetProjFilePath()));
+        ui->explorer->GetCurProjSelected()->GetAtlasModel().RepackAll(true);
     }
     delete pDlg;
 }

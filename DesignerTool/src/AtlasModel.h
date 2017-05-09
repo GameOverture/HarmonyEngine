@@ -87,7 +87,7 @@ public:
     
     QFileInfoList GetExistingTextureInfoList();
 
-    void RepackAll();
+    void RepackAll(bool bForceRepack = false);
     void Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet);
     void ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIndex);
     void Refresh();

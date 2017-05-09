@@ -612,7 +612,7 @@ QFileInfoList AtlasModel::GetExistingTextureInfoList()
     return m_DataDir.entryInfoList(sNameFilterList, QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
 }
 
-void AtlasModel::RepackAll()
+void AtlasModel::RepackAll(bool bForceRepack /*= false*/)
 {
     int iNumTotalTextures = GetNumTextures();
 
@@ -620,7 +620,7 @@ void AtlasModel::RepackAll()
     for(int i = 0; i < iNumTotalTextures; ++i)
         textureIndexSet.insert(i);
 
-    if(textureIndexSet.empty() == false)
+    if(textureIndexSet.empty() == false || bForceRepack)
         Repack(textureIndexSet, QSet<AtlasFrame *>());
 }
 
@@ -730,8 +730,8 @@ void AtlasModel::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFra
     }
 
     // Place the last generated texture at the end of the array
-    ConstructAtlasTexture(m_Packer.bins.size() - 1, iCurrentIndex);
-    
+    if(m_Packer.bins.empty() == false)
+        ConstructAtlasTexture(m_Packer.bins.size() - 1, iCurrentIndex);
     
     // Assign all the duplicate frames
     for(int i = 0; i < m_Packer.images.size(); ++i)

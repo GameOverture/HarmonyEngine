@@ -54,7 +54,7 @@ public:
     explicit ExplorerWidget(QWidget *parent = 0);
     ~ExplorerWidget();
     
-    void AddItemProject(const QString sNewProjectFilePath);
+    Project *AddItemProject(const QString sNewProjectFilePath);
     void AddItem(eItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd);
     void RemoveItem(ExplorerItem *pItem);
     

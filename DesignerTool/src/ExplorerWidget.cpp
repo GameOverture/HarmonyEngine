@@ -37,23 +37,23 @@ ExplorerWidget::~ExplorerWidget()
     delete ui;
 }
 
-void ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
+Project *ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
 {
-    Project *pNewItemProject = new Project(sNewProjectFilePath);    
-    if(pNewItemProject->HasError())
+    Project *pNewProject = new Project(sNewProjectFilePath);
+    if(pNewProject->HasError())
     {
-        HyGuiLog("Abort opening project: " % pNewItemProject->GetAbsPath(), LOGTYPE_Error);
-        return;
+        HyGuiLog("Abort opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Error);
+        return pNewProject;
     }
     else
-        HyGuiLog("Opening project: " % pNewItemProject->GetAbsPath(), LOGTYPE_Info);
+        HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
 
-    QTreeWidgetItem *pProjTreeItem = pNewItemProject->GetTreeItem();
+    QTreeWidgetItem *pProjTreeItem = pNewProject->GetTreeItem();
     ui->treeWidget->insertTopLevelItem(0, pProjTreeItem);
     ui->treeWidget->expandItem(pProjTreeItem);
     
-    OnProjectLoaded(pNewItemProject);
-    return;
+    OnProjectLoaded(pNewProject);
+    return pNewProject;
 
     // BELOW BREAKS QTABBAR and UNDOSTACK SIGNAL/SLOT CONNECTIONS (I guess because QObject must be created on main thread?.. fucking waste of time)
     //
