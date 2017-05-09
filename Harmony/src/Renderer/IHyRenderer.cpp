@@ -97,8 +97,8 @@ void IHyRenderer::Update()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
-	if(!m_pRxDataQueue->empty())
-		HyLog("Renderer Data Queue: " << m_pRxDataQueue->size());
+	//if(!m_pRxDataQueue->empty())
+	//	HyLog("Renderer Data Queue: " << m_pRxDataQueue->size());
 
 	while(!m_pRxDataQueue->empty())
 	{
