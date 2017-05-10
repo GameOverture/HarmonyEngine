@@ -15,7 +15,7 @@
 #include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyRenderState.h"
 
-//#define HYSETTING_MultithreadedRenderer
+#define HYSETTING_MultithreadedRenderer
 
 class IHyShader;
 class HyWindow;

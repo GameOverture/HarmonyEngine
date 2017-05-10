@@ -42,8 +42,6 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &win
 	m_PixelFormatDescriptor.dwVisibleMask = 0;
 	m_PixelFormatDescriptor.dwDamageMask = 0;
 
-	DescribePixelFormat(0, 1, sizeof(PIXELFORMATDESCRIPTOR), &m_PixelFormatDescriptor);
-
 	for(uint32 i = 0; i < m_RenderSurfaces.size(); ++i)
 		m_RenderSurfaces[i].m_pExData = ConstructWindow(m_WindowListRef[i]->GetWindowInfo());
 
@@ -232,6 +230,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			HDC hDeviceContext = GetDC(hWnd);
 
+			DescribePixelFormat(hDeviceContext, 1, sizeof(PIXELFORMATDESCRIPTOR), &pThis->m_PixelFormatDescriptor);
 			int iPixelFormat = ChoosePixelFormat(hDeviceContext, &pThis->m_PixelFormatDescriptor);
 			SetPixelFormat(hDeviceContext, iPixelFormat, &pThis->m_PixelFormatDescriptor);
 
