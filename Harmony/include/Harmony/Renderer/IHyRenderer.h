@@ -15,6 +15,8 @@
 #include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyRenderState.h"
 
+//#define HYSETTING_MultithreadedRenderer
+
 class IHyShader;
 class HyWindow;
 struct HyMonitorDeviceInfo;
@@ -62,6 +64,10 @@ public:
 	IHyRenderer(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
+	void StartUp();
+
+	virtual bool Initialize() = 0;
+
 	virtual void StartRender() = 0;
 
 	virtual void Init_3d() = 0;
@@ -95,13 +101,15 @@ public:
 	HyRenderState *GetRenderStatesPtr2d()					{ return reinterpret_cast<HyRenderState *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToInst2d + sizeof(int32)); } // Last sizeof(int32) is skipping number of 2dInsts
 	char *GetVertexData2d()									{ return reinterpret_cast<char *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToVertexData2d); }
 
+	static IHyShader *FindShader(int32 iId);
+	static IHyShader *MakeCustomShader();
+	static IHyShader *MakeCustomShader(const char *szPrefix, const char *szName);
+
 	void Update();
 	void Draw2d();
 	void SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info);
 
-	static IHyShader *FindShader(int32 iId);
-	static IHyShader *MakeCustomShader();
-	static IHyShader *MakeCustomShader(const char *szPrefix, const char *szName);
+	static void RenderThread(IHyRenderer *pRenderer);
 };
 
 #endif /* __IHyRenderer_h__ */

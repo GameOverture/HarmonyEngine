@@ -13,13 +13,75 @@
 HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(gfxCommsRef, windowListRef),
 																						m_mtxView(1.0f)
 {
-#ifdef HY_PLATFORM_GUI
-	Initialize();
-#endif
 }
 
 HyOpenGL::~HyOpenGL(void)
 {
+}
+
+/*virtual*/ bool HyOpenGL::Initialize() /*override*/
+{
+	//////////////////////////////////////////////////////////////////////////
+	// Init GLEW
+	//////////////////////////////////////////////////////////////////////////
+	GLenum err = glewInit();
+	if(err != GLEW_OK)
+	{
+		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
+	}
+
+	//const GLubyte *pExtStr = glGetString(GL_EXTENSIONS);
+	//WriteTextFile("GLExtensions.txt", glGetString(GL_EXTENSIONS));
+
+	if(glewIsSupported("GL_VERSION_3_3"))
+		printf("Ready for OpenGL 3.3\n");
+	else
+	{
+		HyError("At least OpenGL 3.3 must be supported");
+	}
+
+	HyLogTitle("OpenGL Initialization");
+	HyLog("Vendor: " << glGetString(GL_VENDOR));
+	HyLog("Renderer: " << glGetString(GL_RENDERER));
+	HyLog("Version: " << glGetString(GL_VERSION));
+	HyLog("GLSL: " << glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+	//////////////////////////////////////////////////////////////////////////
+	// 2D setup
+	//////////////////////////////////////////////////////////////////////////
+
+	glGenBuffers(1, &m_hVBO2d);
+	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
+
+	// Quad batch //////////////////////////////////////////////////////////////////////////
+	HyOpenGLShader *pShaderQuadBatch = HY_NEW HyOpenGLShader(HYSHADERPROG_QuadBatch);
+	sm_ShaderMap[HYSHADERPROG_QuadBatch] = pShaderQuadBatch;
+	pShaderQuadBatch->Finalize(HYSHADERPROG_QuadBatch);
+	pShaderQuadBatch->OnRenderThread(*this);
+
+	// Primitive //////////////////////////////////////////////////////////////////////////
+	HyOpenGLShader *pShaderPrimitive = HY_NEW HyOpenGLShader(HYSHADERPROG_Primitive);
+	sm_ShaderMap[HYSHADERPROG_Primitive] = pShaderPrimitive;
+	pShaderPrimitive->Finalize(HYSHADERPROG_Primitive);
+	pShaderPrimitive->OnRenderThread(*this);
+
+	// Line2D //////////////////////////////////////////////////////////////////////////
+	HyOpenGLShader *pShaderLine2d = HY_NEW HyOpenGLShader(HYSHADERPROG_Lines2d);
+	sm_ShaderMap[HYSHADERPROG_Lines2d] = pShaderLine2d;
+	pShaderLine2d->Finalize(HYSHADERPROG_Lines2d);
+	pShaderLine2d->OnRenderThread(*this);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
+
+	// Line anti-aliasing on always for now.
+	//glEnable(GL_LINE_SMOOTH);
+
+	return true;
 }
 
 /*virtual*/ void HyOpenGL::StartRender()
@@ -377,71 +439,6 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags)
 {
-}
-
-bool HyOpenGL::Initialize()
-{
-	//////////////////////////////////////////////////////////////////////////
-	// Init GLEW
-	//////////////////////////////////////////////////////////////////////////
-	GLenum err = glewInit();
-	if(err != GLEW_OK)
-	{
-		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
-	}
-
-	//const GLubyte *pExtStr = glGetString(GL_EXTENSIONS);
-	//WriteTextFile("GLExtensions.txt", glGetString(GL_EXTENSIONS));
-
-	if(glewIsSupported("GL_VERSION_3_3"))
-		printf("Ready for OpenGL 3.3\n");
-	else
-	{
-		HyError("At least OpenGL 3.3 must be supported");
-	}
-	
-	HyLogTitle("OpenGL Initialization");
-	HyLog("Vendor: " << glGetString(GL_VENDOR));
-	HyLog("Renderer: " << glGetString(GL_RENDERER));
-	HyLog("Version: " << glGetString(GL_VERSION));
-	HyLog("GLSL: " << glGetString(GL_SHADING_LANGUAGE_VERSION));
-
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-	//////////////////////////////////////////////////////////////////////////
-	// 2D setup
-	//////////////////////////////////////////////////////////////////////////
-
-	glGenBuffers(1, &m_hVBO2d);
-	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
-
-	// Quad batch //////////////////////////////////////////////////////////////////////////
-	HyOpenGLShader *pShaderQuadBatch = HY_NEW HyOpenGLShader(HYSHADERPROG_QuadBatch);
-	sm_ShaderMap[HYSHADERPROG_QuadBatch] = pShaderQuadBatch;
-	pShaderQuadBatch->Finalize(HYSHADERPROG_QuadBatch);
-	pShaderQuadBatch->OnRenderThread(*this);
-
-	// Primitive //////////////////////////////////////////////////////////////////////////
-	HyOpenGLShader *pShaderPrimitive = HY_NEW HyOpenGLShader(HYSHADERPROG_Primitive);
-	sm_ShaderMap[HYSHADERPROG_Primitive] = pShaderPrimitive;
-	pShaderPrimitive->Finalize(HYSHADERPROG_Primitive);
-	pShaderPrimitive->OnRenderThread(*this);
-
-	// Line2D //////////////////////////////////////////////////////////////////////////
-	HyOpenGLShader *pShaderLine2d = HY_NEW HyOpenGLShader(HYSHADERPROG_Lines2d);
-	sm_ShaderMap[HYSHADERPROG_Lines2d] = pShaderLine2d;
-	pShaderLine2d->Finalize(HYSHADERPROG_Lines2d);
-	pShaderLine2d->OnRenderThread(*this);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
-
-	// Line anti-aliasing on always for now.
-	//glEnable(GL_LINE_SMOOTH);
-
-	return true;
 }
 
 void HyOpenGL::SetCameraMatrices_2d(eMatrixStack eMtxStack)

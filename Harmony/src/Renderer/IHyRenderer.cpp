@@ -11,6 +11,10 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyWindow.h"
 
+#ifdef HYSETTING_MultithreadedRenderer
+	#include <thread>
+#endif
+
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
 int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 
@@ -51,6 +55,42 @@ IHyRenderer::~IHyRenderer(void)
 	// Needed for GUI reloads
 	sm_ShaderMap.clear();
 	sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
+}
+
+void IHyRenderer::StartUp()
+{
+#if defined(HYSETTING_MultithreadedRenderer) && !defined(HY_PLATFORM_GUI)
+	std::thread(RenderThread, this);
+#else
+	Initialize();
+#endif
+}
+
+/*static*/ IHyShader *IHyRenderer::FindShader(int32 iId)
+{
+	if(sm_ShaderMap.find(iId) != sm_ShaderMap.end())
+		return sm_ShaderMap[iId];
+
+	HyError("IHyRenderer::FindShader could not find a valid shader");
+	return NULL;
+}
+
+/*static*/ IHyShader *IHyRenderer::MakeCustomShader()
+{
+	IHyShader *pNewShader = HY_NEW HyShaderInterop(sm_iShaderIdCount);
+	sm_ShaderMap[sm_iShaderIdCount] = pNewShader;
+
+	sm_iShaderIdCount++;
+	return pNewShader;
+}
+
+/*static*/ IHyShader *IHyRenderer::MakeCustomShader(const char *szPrefix, const char *szName)
+{
+	IHyShader *pNewShader = HY_NEW HyShaderInterop(sm_iShaderIdCount, szPrefix, szName);
+	sm_ShaderMap[sm_iShaderIdCount] = pNewShader;
+
+	sm_iShaderIdCount++;
+	return pNewShader;
 }
 
 void IHyRenderer::Update()
@@ -157,29 +197,11 @@ void IHyRenderer::SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info)
 	HyWindow::SetMonitorDeviceInfo(info);
 }
 
-/*static*/ IHyShader *IHyRenderer::FindShader(int32 iId)
+/*static*/ void IHyRenderer::RenderThread(IHyRenderer *pRenderer)
 {
-	if(sm_ShaderMap.find(iId) != sm_ShaderMap.end())
-		return sm_ShaderMap[iId];
-	
-	HyError("IHyRenderer::FindShader could not find a valid shader");
-	return NULL;
-}
+	if(false == pRenderer->Initialize())
+		HyError("Renderer API's Initialize() failed");
 
-/*static*/ IHyShader *IHyRenderer::MakeCustomShader()
-{
-	IHyShader *pNewShader = HY_NEW HyShaderInterop(sm_iShaderIdCount);
-	sm_ShaderMap[sm_iShaderIdCount] = pNewShader;
-
-	sm_iShaderIdCount++;
-	return pNewShader;
-}
-
-/*static*/ IHyShader *IHyRenderer::MakeCustomShader(const char *szPrefix, const char *szName)
-{
-	IHyShader *pNewShader = HY_NEW HyShaderInterop(sm_iShaderIdCount, szPrefix, szName);
-	sm_ShaderMap[sm_iShaderIdCount] = pNewShader;
-
-	sm_iShaderIdCount++;
-	return pNewShader;
+	while(true)
+		pRenderer->Update();
 }

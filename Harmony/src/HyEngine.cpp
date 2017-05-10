@@ -25,6 +25,7 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
+	m_Renderer.StartUp();
 	m_AppRef.SetInputMapPtr(static_cast<HyInputMapInterop *>(m_Input.GetInputMapArray()));
 }
 
@@ -100,7 +101,10 @@ bool HyEngine::Update()
 		break;
 #endif
 	}
+
+#ifndef HYSETTING_MultithreadedRenderer
 	m_Renderer.Update();
+#endif
 
 	return true;
 }

@@ -40,6 +40,8 @@ public:
 	HyOpenGL(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~HyOpenGL(void);
 
+	virtual bool Initialize() override;
+
 	virtual void StartRender() override;
 	
 	virtual void Init_3d() override;
@@ -62,8 +64,6 @@ public:
 	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags) override;
 
 protected:
-	bool Initialize();
-
 	void SetCameraMatrices_2d(eMatrixStack eMtxStack);
 };
 
