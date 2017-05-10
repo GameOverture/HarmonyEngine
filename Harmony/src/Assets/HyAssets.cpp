@@ -431,7 +431,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 		if(bFoundInReloadList == false)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Inactive;
-			HyLog("Deleted loadable data");
+			HyLogInfo("Deleted loadable data");
 
 			if(pData == m_pLastDiscardedData)
 				m_pLastDiscardedData = nullptr;

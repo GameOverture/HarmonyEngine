@@ -10,6 +10,7 @@
 #include "Scene/Nodes/Leafs/Draws/HyText2d.h"
 #include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Utilities/HyStrManip.h"
+#include "Diagnostics/HyConsole.h"
 
 #include <iostream>
 
