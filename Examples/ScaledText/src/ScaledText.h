@@ -1,26 +1,19 @@
 #pragma once
 
 #include "Harmony/HyEngine.h"
-#include "LgSlotAfx.h"
-#include "LgMeter.h"
 
-#include "LgSlotGame.h"
-
-class ScaledText : public LgSlotGame
+class ScaledText : public IHyApplication
 {
 	HyCamera2d *	m_pCamera;
 
 	HyText2d		m_Text;
 	HyPrimitive2d	m_TextBox;
 
-	LgTilt							m_Tilt;
-	LgTelnet						m_Telnet;
-
 public:
 	ScaledText(HarmonyInit &initStruct);
 	virtual ~ScaledText();
 
-	virtual void OnConstruct() override;
-
-	virtual ILgSubGame *OnSubGame_Allocate(const ILgxGameData *pXmlGameData) override;
+	virtual bool Initialize() override;
+	virtual bool Update() override;
+	virtual void Shutdown() override;
 };

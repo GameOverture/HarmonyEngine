@@ -1,8 +1,5 @@
 #pragma once
 
-#include "LgReelGame.h"
-#include "LgMeter.h"
-
 class BaseGame : public LgReelGame
 {
 	LgMeter *		m_pMeter;
