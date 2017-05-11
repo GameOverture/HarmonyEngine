@@ -12,11 +12,11 @@
 
 #include "Renderer/Components/HyWindow.h"
 
-HyInput_Gainput::HyInput_Gainput(uint32 uiNumInputMappings) :	IHyInput(uiNumInputMappings),
-																m_uiKeyboardId(gainput::InvalidDeviceId),
-																m_uiMouseId(gainput::InvalidDeviceId),
-																m_eRecordState(RECORD_Off),
-																m_uiRecordCount(0)
+HyInput_Gainput::HyInput_Gainput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :	IHyInput(uiNumInputMappings, windowListRef),
+																										m_uiKeyboardId(gainput::InvalidDeviceId),
+																										m_uiMouseId(gainput::InvalidDeviceId),
+																										m_eRecordState(RECORD_Off),
+																										m_uiRecordCount(0)
 {
 	if(uiNumInputMappings > 0)
 	{
@@ -58,9 +58,9 @@ gainput::InputManager &HyInput_Gainput::GetGainputManager()
 }
 
 #ifdef HY_PLATFORM_WINDOWS
-void HyInput_Gainput::HandleMsg(HyWindow *pCurrentWindow, const MSG& msg)
+void HyInput_Gainput::HandleMsg(uint32 uiWindowIndex, int32 iWidth, int32 iHeight, const MSG &msg)
 {
-	m_Manager.SetDisplaySize(pCurrentWindow->GetResolution().x, pCurrentWindow->GetResolution().y);
+	m_Manager.SetDisplaySize(iWidth, iHeight);
 	m_Manager.HandleMessage(msg);
 
 	if(msg.message == WM_MOUSEMOVE)
@@ -68,7 +68,8 @@ void HyInput_Gainput::HandleMsg(HyWindow *pCurrentWindow, const MSG& msg)
 		glm::vec2 ptMouseAxisNormalized(m_pInputMaps[0].GetAxis(MOUSEID_X), m_pInputMaps[0].GetAxis(MOUSEID_Y));
 		ptMouseAxisNormalized.y = 1.0f - ptMouseAxisNormalized.y; // Invert Y-coordinate
 
-		IHyInputMap::sm_ptWorldMousePos = pCurrentWindow->ConvertViewportCoordinateToWorldPos(ptMouseAxisNormalized);
+		m_ptLocalMousePos = ptMouseAxisNormalized;
+		m_uiMouseWindowIndex = uiWindowIndex;
 	}
 }
 #endif
@@ -99,8 +100,8 @@ gainput::DeviceId HyInput_Gainput::GetGamePadDeviceId(uint32 uiIndex)
 	// TODO: pass in m_uiRecordCount and wrap logic around this call
 	m_Manager.Update();
 
-	IHyInputMap::sm_bMouseLeftDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Left);
-	IHyInputMap::sm_bMouseRightDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Right);
+	m_bMouseLeftDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Left);
+	m_bMouseRightDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Right);
 
 	//m_Manager.GetDeviceCountByType(
 }

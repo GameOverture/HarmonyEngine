@@ -13,12 +13,16 @@
 #include "Input/IHyInput.h"
 #include "Input/IHyInputMap.h"
 
+class HyWindow;
+
 class HyInput_NULL : public IHyInput
 {
 public:
-	HyInput_NULL(uint32 uiNumInputMappings) : IHyInput(uiNumInputMappings) { }
+	HyInput_NULL(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) : IHyInput(uiNumInputMappings, windowListRef) { }
 
 	virtual void Update() override { }
+
+	void HandleMsg(uint32 uiWindowIndex, int32 iWidth, int32 iHeight, const MSG &msg) { }
 
 	virtual void StartRecording() override { }
 	virtual void StopRecording() override { }
@@ -31,7 +35,7 @@ public:
 class HyInputMap_NULL : public IHyInputMap
 {
 public:
-	HyInputMap_NULL(IHyInput *pInputManager) : IHyInputMap(pInputManager) { }
+	HyInputMap_NULL(IHyInput *pInputManager) : IHyInputMap() { }
 
 	virtual bool MapBtn_KB(uint32 iUserId, HyKeyboardBtn eBtn) override { return false; }
 	virtual bool MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn) override { return false; }

@@ -10,40 +10,18 @@
 #include "Afx/HyInteropAfx.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyWindow.h"
-
-#ifdef HYSETTING_MultithreadedRenderer
-	#include <thread>
-#endif
+#include "Renderer/Components/HyRenderSurface.h"
 
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
 int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 
-IHyRenderer::RenderSurface::RenderSurface(eRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight) :	m_eType(eType),
-																																			m_iID(iID),
-																																			m_iRenderSurfaceWidth(iRenderSurfaceWidth),
-																																			m_iRenderSurfaceHeight(iRenderSurfaceHeight),
-																																			m_pExData(NULL)
-{ }
-
-void IHyRenderer::RenderSurface::Resize(int32 iWidth, int32 iHeight)
-{
-	// Prevent A Divide By Zero
-	if(iHeight == 0)
-		iHeight = 1;
-
-	if(m_iRenderSurfaceWidth == iWidth && m_iRenderSurfaceHeight == iHeight)
-		return;
-
-	m_iRenderSurfaceWidth = iWidth;
-	m_iRenderSurfaceHeight = iHeight;
-}
-
-IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef) :	m_GfxCommsRef(gfxCommsRef),
-																							m_WindowListRef(windowListRef)
+IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, IHyInput &inputRef, std::vector<HyWindow *> &windowListRef) : m_GfxCommsRef(gfxCommsRef),
+																												m_InputRef(inputRef),
+																												m_WindowListRef(windowListRef)
 {
 	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
-		m_RenderSurfaces.push_back(RenderSurface(RENDERSURFACE_Window, i, m_WindowListRef[i]->GetResolution().x, m_WindowListRef[i]->GetResolution().y));
+		m_RenderSurfaces.push_back(HyRenderSurface(HYRENDERSURFACE_Window, i, m_WindowListRef[i]->GetResolution().x, m_WindowListRef[i]->GetResolution().y));
 }
 
 IHyRenderer::~IHyRenderer(void)
@@ -60,7 +38,7 @@ IHyRenderer::~IHyRenderer(void)
 void IHyRenderer::StartUp()
 {
 #if defined(HYSETTING_MultithreadedRenderer) && !defined(HY_PLATFORM_GUI)
-	std::thread(RenderThread, this);
+	m_pRenderThread = ThreadManager::Get()->BeginThread(_T("Render Thread"), THREAD_START_PROCEDURE(RenderThread), this);
 #else
 	Initialize();
 #endif
@@ -103,10 +81,10 @@ void IHyRenderer::Update()
 		HyWindowInfo &windowInfoRef = m_WindowListRef[i]->Update_Render();
 		if(windowInfoRef.uiDirtyFlags)
 		{
-			RenderSurface *pRenderSurface = NULL;
+			HyRenderSurface *pRenderSurface = NULL;
 			for(uint32 j = 0; j < m_RenderSurfaces.size(); ++j)
 			{
-				if(m_RenderSurfaces[j].m_eType == RENDERSURFACE_Window && m_RenderSurfaces[j].m_iID == i)
+				if(m_RenderSurfaces[j].GetType() == HYRENDERSURFACE_Window && m_RenderSurfaces[j].GetId() == i)
 				{
 					pRenderSurface = &m_RenderSurfaces[j];
 					break;
@@ -197,11 +175,38 @@ void IHyRenderer::SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info)
 	HyWindow::SetMonitorDeviceInfo(info);
 }
 
-/*static*/ void IHyRenderer::RenderThread(IHyRenderer *pRenderer)
+bool IHyRenderer::PollPlatformApi()
 {
+#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
+	// TODO: return false when windows close message comes in or something similar
+	MSG msg = { 0 };
+	int32 iWindowIndex = 0;
+	HWND hWnd = static_cast<HyOpenGL_Win *>(this)->GetHWND(iWindowIndex);
+	while(hWnd != nullptr)
+	{
+		while(PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+
+			static_cast<HyInputInterop &>(m_InputRef).HandleMsg(iWindowIndex, m_RenderSurfaces[iWindowIndex].GetWidth(), m_RenderSurfaces[iWindowIndex].GetHeight(), msg);
+		}
+
+		iWindowIndex++;
+		hWnd = static_cast<HyOpenGL_Win *>(this)->GetHWND(iWindowIndex);
+	}
+#endif
+
+	return true;
+}
+
+/*static*/ void IHyRenderer::RenderThread(void *pParam)
+{
+	IHyRenderer *pRenderer = reinterpret_cast<IHyRenderer *>(pParam);
+
 	if(false == pRenderer->Initialize())
 		HyError("Renderer API's Initialize() failed");
 
-	while(true)
+	while(pRenderer->PollPlatformApi())
 		pRenderer->Update();
 }

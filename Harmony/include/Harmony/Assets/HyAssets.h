@@ -11,12 +11,9 @@
 #define __IHyAssets_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Assets/Loadables/HyAtlasGroup.h"
-
 #include "Renderer/Components/HyGfxComms.h"
 #include "Scene/HyScene.h"
-
 #include "Threading/Threading.h"
 
 #include <queue>

@@ -59,8 +59,6 @@ class HyWindow
 	std::vector<HyCamera2d *>				m_Cams2dList;
 	std::vector<HyCamera3d *>				m_Cams3dList;
 
-	bool									m_bTakeInput;
-
 	BasicSection							m_cs;
 
 public:
@@ -77,9 +75,6 @@ public:
 
 	glm::ivec2			GetLocation();
 	void				SetLocation(glm::ivec2 ptLocation);
-
-	bool				IsInputEnabled();
-	void				SetInputEnabled(bool bEnabled);
 
 	HyWindowType		GetType();
 	void				SetType(HyWindowType eType);

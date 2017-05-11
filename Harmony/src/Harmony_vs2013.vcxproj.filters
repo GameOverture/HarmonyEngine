@@ -243,6 +243,9 @@
     <ClCompile Include="Scene\Nodes\Leafs\Misc\HyCamera.cpp">
       <Filter>Scene\Nodes\Leafs\Misc</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Components\HyRenderSurface.cpp">
+      <Filter>Renderer\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -659,6 +662,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Entities\HyEntityLeaf2d.h">
       <Filter>Scene\Nodes\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyRenderSurface.h">
+      <Filter>Renderer\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

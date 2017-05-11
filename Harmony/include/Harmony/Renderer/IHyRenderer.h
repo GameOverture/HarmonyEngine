@@ -14,17 +14,21 @@
 
 #include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyRenderState.h"
+#include "Input/IHyInput.h"
+#include "Threading/Threading.h"
 
 #define HYSETTING_MultithreadedRenderer
 
 class IHyShader;
 class HyWindow;
 struct HyMonitorDeviceInfo;
+class HyRenderSurface;
 
 class IHyRenderer
 {
 protected:
 	HyGfxComms &							m_GfxCommsRef;
+	IHyInput &								m_InputRef;
 	std::vector<HyWindow *> &				m_WindowListRef;
 
 	std::queue<IHyLoadableData *> *			m_pRxDataQueue;		// The pointer to the currently active render message queue
@@ -37,31 +41,14 @@ protected:
 	HyGfxComms::tDrawHeader *				m_pDrawBufferHeader;
 	HyRenderState *							m_pCurRenderState;
 	HyRenderState							m_PrevRenderState;
-
-	enum eRenderSurfaceType
-	{
-		RENDERSURFACE_Texture = 0,
-		RENDERSURFACE_Window
-	};
 	
-	struct RenderSurface
-	{
-		eRenderSurfaceType					m_eType;
-		int32								m_iID;
-		int32								m_iRenderSurfaceWidth;
-		int32								m_iRenderSurfaceHeight;
+	std::vector<HyRenderSurface>			m_RenderSurfaces;
+	std::vector<HyRenderSurface>::iterator	m_RenderSurfaceIter;
 
-		void *								m_pExData;
-
-		RenderSurface(eRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight);
-
-		void Resize(int32 iWidth, int32 iHeight);
-	};
-	std::vector<RenderSurface>				m_RenderSurfaces;
-	std::vector<RenderSurface>::iterator	m_RenderSurfaceIter;
+	ThreadInfoPtr							m_pRenderThread;
 
 public:
-	IHyRenderer(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef);
+	IHyRenderer(HyGfxComms &gfxCommsRef, IHyInput &inputRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
 	void StartUp();
@@ -87,7 +74,7 @@ public:
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;
 	virtual void DeleteTextureArray(uint32 uiTextureHandle) = 0;
 
-	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags) = 0;
+	virtual void OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags) = 0;
 
 	int32 GetNumCameras2d()									{ return *(reinterpret_cast<int32 *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToCameras2d)); }
 	uint32 GetCameraWindowIndex2d(int iCameraIndex)			{ return *(reinterpret_cast<uint32 *>(m_pDrawBuffer + m_pDrawBufferHeader->uiOffsetToCameras2d + sizeof(int32) + (iCameraIndex		* (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))))); }
@@ -109,7 +96,9 @@ public:
 	void Draw2d();
 	void SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info);
 
-	static void RenderThread(IHyRenderer *pRenderer);
+	bool PollPlatformApi();
+
+	static void RenderThread(void *pParam);
 };
 
 #endif /* __IHyRenderer_h__ */

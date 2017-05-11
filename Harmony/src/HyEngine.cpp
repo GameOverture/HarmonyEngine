@@ -19,8 +19,8 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxBuffer, m_AppRef.m_WindowList),
 												m_Assets(m_AppRef.m_Init.sDataDir, m_GfxBuffer, m_Scene),
 												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_Assets),
-												m_Input(m_AppRef.m_Init.uiNumInputMappings),
-												m_Renderer(m_GfxBuffer, m_AppRef.m_WindowList),
+												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList),
+												m_Renderer(m_GfxBuffer, m_Input, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
@@ -56,12 +56,15 @@ HyEngine::~HyEngine()
 
 bool HyEngine::BootUpdate()
 {
-	while(m_Time.ThrottleTime())
-	{
-		if(PollPlatformApi() == false)
-			return false;
-	}
+	//while(m_Time.ThrottleTime())
+	//{
+	//	if(PollPlatformApi() == false)
+	//		return false;
+	//}
+
+#ifndef HYSETTING_MultithreadedRenderer
 	m_Renderer.Update();
+#endif
 
 	if(m_Assets.IsLoaded() == false)
 		return true;
@@ -82,10 +85,6 @@ bool HyEngine::Update()
 #endif
 	{
 		m_Input.Update();
-
-		if(PollPlatformApi() == false)
-			return false;
-		
 		m_Scene.PreUpdate();
 
 		if(m_AppRef.Update() == false)
@@ -93,7 +92,6 @@ bool HyEngine::Update()
 
 		m_Assets.Update();
 		m_Scene.PostUpdate();
-
 		m_GuiComms.Update();
 				
 		// GUI renderer paints on a timer which doesn't work well with fixed updates like this. Ensures only single updates per frame.
@@ -103,28 +101,10 @@ bool HyEngine::Update()
 	}
 
 #ifndef HYSETTING_MultithreadedRenderer
+	if(m_Renderer.PollPlatformApi() == false)
+		return false;
+
 	m_Renderer.Update();
-#endif
-
-	return true;
-}
-
-bool HyEngine::PollPlatformApi()
-{
-#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
-	// TODO: return false when windows close message comes in or something similar
-	MSG msg = { 0 };
-	for(uint32 i = 0; i < static_cast<uint32>(m_AppRef.m_WindowList.size()); ++i)
-	{
-		while(PeekMessage(&msg, m_Renderer.GetHWND(i), 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-			
-			if(m_AppRef.m_WindowList[i]->IsInputEnabled())
-				m_Input.HandleMsg(m_AppRef.m_WindowList[i], msg);
-		}
-	}
 #endif
 
 	return true;
@@ -138,7 +118,9 @@ void HyEngine::Shutdown()
 	{
 		m_Assets.Update();
 		m_Scene.PostUpdate();
+#ifndef HYSETTING_MultithreadedRenderer
 		m_Renderer.Update();
+#endif
 	}
 }
 

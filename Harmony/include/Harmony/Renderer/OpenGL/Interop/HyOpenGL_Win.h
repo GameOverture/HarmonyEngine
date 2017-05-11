@@ -21,7 +21,7 @@ class HyOpenGL_Win : public HyOpenGL
 	PIXELFORMATDESCRIPTOR	m_PixelFormatDescriptor;
 
 public:
-	HyOpenGL_Win(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef);
+	HyOpenGL_Win(HyGfxComms &gfxCommsRef, IHyInput &inputRef, std::vector<HyWindow *> &windowListRef);
 	~HyOpenGL_Win();
 
 	virtual bool Initialize() override;
@@ -33,7 +33,7 @@ public:
 	virtual void StartRender() override;
 	virtual void FinishRender() override;
 
-	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags) override;
+	virtual void OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags) override;
 };
 
 #endif /* __HyOpenGL_Win_h__ */

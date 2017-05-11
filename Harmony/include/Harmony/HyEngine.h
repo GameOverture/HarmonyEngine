@@ -74,8 +74,6 @@ private:
 	bool BootUpdate();
 	bool Update();
 
-	bool PollPlatformApi();
-
 	void Shutdown();
 
 	HyRendererInterop &GetRenderer();

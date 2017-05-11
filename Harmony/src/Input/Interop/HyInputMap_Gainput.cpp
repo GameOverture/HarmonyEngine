@@ -8,10 +8,12 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Input/Interop/HyInputMap_Gainput.h"
+#include "Input/IHyInput.h"
 
-HyInputMap_Gainput::HyInputMap_Gainput(IHyInput *pInputManager) : IHyInputMap(pInputManager)
+HyInputMap_Gainput::HyInputMap_Gainput(IHyInput *pInputManager)
 {
-	m_pGainputMap = HY_NEW gainput::InputMap(static_cast<HyInput_Gainput *>(m_pInputManager)->GetGainputManager());
+	gainput::InputManager &gainputManRef = static_cast<HyInput_Gainput *>(sm_pInputManager)->GetGainputManager();
+	m_pGainputMap = HY_NEW gainput::InputMap(gainputManRef);
 }
 
 HyInputMap_Gainput::~HyInputMap_Gainput()
@@ -23,22 +25,22 @@ HyInputMap_Gainput::~HyInputMap_Gainput()
 {
 	HyAssert(m_pGainputMap, "HyInputMap_Gainput::MapBtn_KB() used before manager initialized");
 
-	return m_pGainputMap->MapBool(iUserId, static_cast<HyInput_Gainput *>(m_pInputManager)->GetKeyboardDeviceId(), eBtn);
+	return m_pGainputMap->MapBool(iUserId, static_cast<HyInput_Gainput *>(sm_pInputManager)->GetKeyboardDeviceId(), eBtn);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::MapBtn_MO(uint32 iUserId, HyMouseBtn eBtn)
 {
-	return m_pGainputMap->MapBool(iUserId, static_cast<HyInput_Gainput *>(m_pInputManager)->GetMouseDeviceId(), eBtn);
+	return m_pGainputMap->MapBool(iUserId, static_cast<HyInput_Gainput *>(sm_pInputManager)->GetMouseDeviceId(), eBtn);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::MapBtn_GP(uint32 iUserId, HyGamePadBtn eBtn, uint32 uiGamePadIndex)
 {
-	return m_pGainputMap->MapBool(iUserId, static_cast<HyInput_Gainput *>(m_pInputManager)->GetGamePadDeviceId(uiGamePadIndex), eBtn);
+	return m_pGainputMap->MapBool(iUserId, static_cast<HyInput_Gainput *>(sm_pInputManager)->GetGamePadDeviceId(uiGamePadIndex), eBtn);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::MapAxis_MO(uint32 iUserId, HyMouseAxis eAxis, float fMin /*= 0.0f*/, float fMax /*= 1.0f*/)
 {
-	return m_pGainputMap->MapFloat(iUserId, static_cast<HyInput_Gainput *>(m_pInputManager)->GetMouseDeviceId(), eAxis, fMin, fMax);
+	return m_pGainputMap->MapFloat(iUserId, static_cast<HyInput_Gainput *>(sm_pInputManager)->GetMouseDeviceId(), eAxis, fMin, fMax);
 }
 
 /*virtual*/ bool HyInputMap_Gainput::MapAxis_GP(uint32 iUserId, HyGamePadBtn eAxis, float fMin /*= 0.0f*/, float fMax /*= 1.0f*/)

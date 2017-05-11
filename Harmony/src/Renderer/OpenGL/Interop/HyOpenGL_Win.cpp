@@ -10,14 +10,15 @@
 #include "Renderer/OpenGL/Interop/HyOpenGL_Win.h"
 
 #include "Renderer/Components/HyWindow.h"
+#include "Renderer/Components/HyRenderSurface.h"
 #include "Diagnostics/HyGuiComms.h"
 #include "Utilities/HyStrManip.h"
 
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef) :	HyOpenGL(gfxCommsRef, windowListRef),
-																								m_hGLContext(NULL)
+HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, IHyInput &inputRef, std::vector<HyWindow *> &windowListRef) :	HyOpenGL(gfxCommsRef, inputRef, windowListRef),
+																													m_hGLContext(NULL)
 {
 }
 
@@ -43,7 +44,7 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &win
 	m_PixelFormatDescriptor.dwDamageMask = 0;
 
 	for(uint32 i = 0; i < m_RenderSurfaces.size(); ++i)
-		m_RenderSurfaces[i].m_pExData = ConstructWindow(m_WindowListRef[i]->GetWindowInfo());
+		m_RenderSurfaces[i].SetHandle(ConstructWindow(m_WindowListRef[i]->GetWindowInfo()));
 
 	std::vector<HyMonitorDeviceInfo> vMonitorDeviceInfo;
 	if(EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&vMonitorDeviceInfo) == false)
@@ -184,18 +185,18 @@ HWND HyOpenGL_Win::GetHWND(int32 iWindowIndex)
 {
 	for(uint32 i = 0; i < m_RenderSurfaces.size(); ++i)
 	{
-		if(m_RenderSurfaces[i].m_eType == IHyRenderer::RENDERSURFACE_Window && m_RenderSurfaces[i].m_iID == iWindowIndex)
-			return reinterpret_cast<HWND>(m_RenderSurfaces[i].m_pExData);
+		if(m_RenderSurfaces[i].GetType() == HYRENDERSURFACE_Window && m_RenderSurfaces[i].GetId() == iWindowIndex)
+			return m_RenderSurfaces[i].GetHandle();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*virtual*/ void HyOpenGL_Win::StartRender()
 {
-	if(m_RenderSurfaceIter->m_eType == IHyRenderer::RENDERSURFACE_Window)
+	if(m_RenderSurfaceIter->GetType() == HYRENDERSURFACE_Window)
 	{
-		wglMakeCurrent(GetDC(reinterpret_cast<HWND>(m_RenderSurfaceIter->m_pExData)), m_hGLContext);
+		wglMakeCurrent(GetDC(m_RenderSurfaceIter->GetHandle()), m_hGLContext);
 
 		//if(bDirty)
 		// TODO: If fullscreen, make change here
@@ -206,11 +207,11 @@ HWND HyOpenGL_Win::GetHWND(int32 iWindowIndex)
 
 /*virtual*/ void HyOpenGL_Win::FinishRender()
 {
-	HDC hDeviceContext = GetDC(reinterpret_cast<HWND>(m_RenderSurfaceIter->m_pExData));
+	HDC hDeviceContext = GetDC(m_RenderSurfaceIter->GetHandle());
 	SwapBuffers(hDeviceContext);
 }
 
-/*virtual*/ void HyOpenGL_Win::OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags)
+/*virtual*/ void HyOpenGL_Win::OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags)
 {
 	// TODO: Update window size, change window title, etc based on uiChangedFlags
 
@@ -281,7 +282,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			for(uint32 i = 0; i < static_cast<uint32>(pThis->m_RenderSurfaces.size()); ++i)
 			{
-				if(reinterpret_cast<HWND>(pThis->m_RenderSurfaces[i].m_pExData) == hWnd)
+				if(pThis->m_RenderSurfaces[i].GetHandle() == hWnd)
 					pThis->m_RenderSurfaces[i].Resize(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
 			}
 			return 0;

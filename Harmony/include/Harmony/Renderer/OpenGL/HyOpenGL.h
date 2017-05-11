@@ -37,7 +37,7 @@ protected:
 	GLenum					m_eDrawMode;
 
 public:
-	HyOpenGL(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef);
+	HyOpenGL(HyGfxComms &gfxCommsRef, IHyInput &inputRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~HyOpenGL(void);
 
 	virtual bool Initialize() override;
@@ -61,7 +61,7 @@ public:
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) override;
 	virtual void DeleteTextureArray(uint32 uiTextureHandle) override;
 
-	virtual void OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags) override;
+	virtual void OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags) override;
 
 protected:
 	void SetCameraMatrices_2d(eMatrixStack eMtxStack);

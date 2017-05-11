@@ -334,14 +334,10 @@ class IHyInputMap
 	friend class IHyInput;
 
 protected:
-	IHyInput *			m_pInputManager;
-
-	static glm::vec2	sm_ptWorldMousePos;
-	static bool			sm_bMouseLeftDown;
-	static bool			sm_bMouseRightDown;
+	static IHyInput *		sm_pInputManager;
 
 public:
-	IHyInputMap(IHyInput *pInputManager);
+	IHyInputMap();
 	virtual ~IHyInputMap(void);
 
 	static glm::vec2 GetWorldMousePos();

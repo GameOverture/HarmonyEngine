@@ -8,10 +8,11 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGL.h"
+#include "Renderer/Components/HyRenderSurface.h"
 #include "Diagnostics/HyConsole.h"
 
-HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(gfxCommsRef, windowListRef),
-																						m_mtxView(1.0f)
+HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, IHyInput &inputRef, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(gfxCommsRef, inputRef, windowListRef),
+																											m_mtxView(1.0f)
 {
 }
 
@@ -120,7 +121,7 @@ HyOpenGL::~HyOpenGL(void)
 	int32 iNumRenderStates2d = GetNumRenderStates2d();
 
 	// Only draw cameras that are apart of this render surface
-	while(m_RenderSurfaceIter->m_iID != GetCameraWindowIndex2d(m_iCurCamIndex) && m_iCurCamIndex < iNumCameras2d)
+	while(m_RenderSurfaceIter->GetId() != GetCameraWindowIndex2d(m_iCurCamIndex) && m_iCurCamIndex < iNumCameras2d)
 		m_iCurCamIndex++;
 
 	if(iNumRenderStates2d == 0 || m_iCurCamIndex >= iNumCameras2d)
@@ -180,8 +181,8 @@ HyOpenGL::~HyOpenGL(void)
 	{
 		const HyScreenRect<int32> &scissorRectRef = renderState.GetScissorRect();
 
-		glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_RenderSurfaceIter->m_iRenderSurfaceWidth / 2),
-				  static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_RenderSurfaceIter->m_iRenderSurfaceHeight / 2),
+		glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_RenderSurfaceIter->GetWidth() / 2),
+				  static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_RenderSurfaceIter->GetHeight() / 2),
 				  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
 				  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
 
@@ -437,7 +438,7 @@ HyOpenGL::~HyOpenGL(void)
 	glDeleteTextures(1, &uiTextureHandle);
 }
 
-/*virtual*/ void HyOpenGL::OnRenderSurfaceChanged(RenderSurface &renderSurfaceRef, uint32 uiChangedFlags)
+/*virtual*/ void HyOpenGL::OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags)
 {
 }
 
@@ -457,14 +458,14 @@ void HyOpenGL::SetCameraMatrices_2d(eMatrixStack eMtxStack)
 		viewportRect.top = 1.0f;
 
 		m_mtxView = glm::mat4(1.0f);
-		m_mtxView = glm::translate(m_mtxView, m_RenderSurfaceIter->m_iRenderSurfaceWidth * -0.5f, m_RenderSurfaceIter->m_iRenderSurfaceHeight * -0.5f, 0.0f);
+		m_mtxView = glm::translate(m_mtxView, m_RenderSurfaceIter->GetWidth() * -0.5f, m_RenderSurfaceIter->GetHeight() * -0.5f, 0.0f);
 	}
 
-	float fWidth = (viewportRect.Width() * m_RenderSurfaceIter->m_iRenderSurfaceWidth);
-	float fHeight = (viewportRect.Height() * m_RenderSurfaceIter->m_iRenderSurfaceHeight);
+	float fWidth = (viewportRect.Width() * m_RenderSurfaceIter->GetWidth());
+	float fHeight = (viewportRect.Height() * m_RenderSurfaceIter->GetHeight());
 
-	glViewport(static_cast<GLint>(viewportRect.left * m_RenderSurfaceIter->m_iRenderSurfaceWidth),
-			   static_cast<GLint>(viewportRect.bottom * m_RenderSurfaceIter->m_iRenderSurfaceHeight),
+	glViewport(static_cast<GLint>(viewportRect.left * m_RenderSurfaceIter->GetWidth()),
+			   static_cast<GLint>(viewportRect.bottom * m_RenderSurfaceIter->GetHeight()),
 			   static_cast<GLsizei>(fWidth),
 			   static_cast<GLsizei>(fHeight));
 

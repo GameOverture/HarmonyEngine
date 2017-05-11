@@ -12,7 +12,7 @@
 std::vector<HyMonitorDeviceInfo>	HyWindow::sm_MonitorInfoList;
 BasicSection						HyWindow::sm_csInfo;
 
-HyWindow::HyWindow() : m_bTakeInput(true)
+HyWindow::HyWindow()
 {
 }
 
@@ -61,16 +61,6 @@ void HyWindow::SetLocation(glm::ivec2 ptLocation)
 {
 	m_Info_Update.vLocation = ptLocation;
 	m_Info_Update.uiDirtyFlags |= HyWindowInfo::FLAG_Location;
-}
-
-bool HyWindow::IsInputEnabled()
-{
-	return m_bTakeInput;
-}
-
-void HyWindow::SetInputEnabled(bool bEnabled)
-{
-	m_bTakeInput = bEnabled;
 }
 
 HyWindowType HyWindow::GetType()

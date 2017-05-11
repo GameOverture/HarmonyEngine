@@ -7,16 +7,14 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Afx/HyInteropAfx.h"
 #include "Input/IHyInputMap.h"
 #include "Input/IHyInput.h"
+#include "Renderer/Components/HyWindow.h"
 
-#include "Afx/HyInteropAfx.h"
+/*static*/ IHyInput *IHyInputMap::sm_pInputManager = nullptr;
 
-/*static*/ glm::vec2 IHyInputMap::sm_ptWorldMousePos(0.0f);
-/*static*/ bool IHyInputMap::sm_bMouseLeftDown = false;
-/*static*/ bool IHyInputMap::sm_bMouseRightDown = false;
-
-IHyInputMap::IHyInputMap(IHyInput *pInputManager) : m_pInputManager(pInputManager)
+IHyInputMap::IHyInputMap()
 {
 }
 
@@ -26,40 +24,40 @@ IHyInputMap::IHyInputMap(IHyInput *pInputManager) : m_pInputManager(pInputManage
 
 /*static*/ glm::vec2 IHyInputMap::GetWorldMousePos()
 {
-	return sm_ptWorldMousePos;
+	return sm_pInputManager->GetWorldMousePos();
 }
 
 /*static*/ bool IHyInputMap::IsMouseLeftDown()
 {
-	return sm_bMouseLeftDown;
+	return sm_pInputManager->IsMouseLeftDown();
 }
 
 /*static*/ bool IHyInputMap::IsMouseRightDown()
 {
-	return sm_bMouseRightDown;
+	return sm_pInputManager->IsMouseRightDown();
 }
 
 void IHyInputMap::StartRecording()
 {
-	m_pInputManager->StartRecording();
+	sm_pInputManager->StartRecording();
 }
 
 void IHyInputMap::StopRecording()
 {
-	m_pInputManager->StopRecording();
+	sm_pInputManager->StopRecording();
 }
 
 void IHyInputMap::SerializeRecording()
 {
-	m_pInputManager->SerializeRecording();
+	sm_pInputManager->SerializeRecording();
 }
 
 void IHyInputMap::StartPlayback()
 {
-	m_pInputManager->StartPlayback();
+	sm_pInputManager->StartPlayback();
 }
 
 void IHyInputMap::StopPlayback()
 {
-	m_pInputManager->StartPlayback();
+	sm_pInputManager->StartPlayback();
 }
