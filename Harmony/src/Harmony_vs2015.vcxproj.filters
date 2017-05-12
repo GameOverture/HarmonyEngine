@@ -243,6 +243,9 @@
     <ClCompile Include="Scene\Tweens\HyTweenVec3.cpp">
       <Filter>Scene\Tweens</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Components\HyRenderSurface.cpp">
+      <Filter>Renderer\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
