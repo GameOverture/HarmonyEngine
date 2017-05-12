@@ -23,6 +23,8 @@ bool HyScene::sm_bInst2dOrderingDirty = false;
 std::vector<IHyNode *> HyScene::sm_NodeList;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
 
+uint32 HyScene::sm_uiRenderedBufferCount = 0;
+
 HyScene::HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
 																					m_iPhysVelocityIterations(8),
 																					m_iPhysPositionIterations(3),
@@ -109,6 +111,14 @@ void HyScene::SetPause(bool bPause)
 	m_bPauseGame = bPause;
 }
 
+/*static*/ uint32 HyScene::GetAndClearRenderedBufferCount()
+{
+	uint32 uiCount = sm_uiRenderedBufferCount;
+	sm_uiRenderedBufferCount = 0;
+
+	return uiCount;
+}
+
 //PRIVATE//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void HyScene::PreUpdate()
@@ -153,6 +163,11 @@ void HyScene::WriteDrawBuffer()
 	m_pCurWritePos = m_GfxCommsRef.GetDrawBuffer();
 	
 	HyGfxComms::tDrawHeader *pDrawHeader = new (m_pCurWritePos) HyGfxComms::tDrawHeader;
+
+	// 'sm_uiRenderedBufferCount' will store the approx. number of times a buffer was rendered
+	if((pDrawHeader->uiReturnFlags & HyGfxComms::GFXFLAG_HasRendered) != 0)
+		sm_uiRenderedBufferCount++;
+
 	pDrawHeader->uiReturnFlags = 0;
 	m_pCurWritePos += sizeof(HyGfxComms::tDrawHeader);
 

@@ -44,7 +44,7 @@ HyTime_Win::~HyTime_Win(void)
 {
 }
 
-// Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
+// Sets member variable 'sm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
 // Delta time is in seconds.
 /*virtual*/ void HyTime_Win::SetCurDeltaTime()
 {
@@ -55,7 +55,7 @@ HyTime_Win::~HyTime_Win(void)
 	//	m_i64CurTime = timeGetTime();
 
 	// scale time value and save
-	m_dCurDeltaTime = (m_i64CurTime - m_i64LastTime) * m_dTimeFactor;
+	sm_dCurDeltaTime = (m_i64CurTime - m_i64LastTime) * m_dTimeFactor;
 
 	// save new time reading for next pass through the loop
 	m_i64LastTime = m_i64CurTime;

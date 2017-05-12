@@ -32,15 +32,12 @@ class IHyTime
 	double						m_dThrottledTime;
 
 	// FPS members
-	int							m_iFPSUpdateFrames;
-	int							m_iCurFPSUpdate;
-	double						m_dFPSLogCounter;
+	uint32						m_uiFpsFrameCount;
+	double						m_dFpsElapsedTime;
 	bool						m_bDumpFPSToConsole;
 
-	int							m_iThrottleSafetyCounter;
-
 protected:
-	static double				m_dCurDeltaTime;
+	static double				sm_dCurDeltaTime;
 
 public:
 	IHyTime();
@@ -49,7 +46,7 @@ public:
 	//static uint32 GetUpdateStepMilliseconds();
 	static float GetUpdateStepSeconds();
 
-	// Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
+	// Sets member variable 'sm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
 	// Delta time is in seconds.
 	virtual void SetCurDeltaTime() = 0;
 
@@ -63,7 +60,7 @@ public:
 	void ResetDelta();
 
 	//int GetUpdateFPS()		{ return m_iCurFPSUpdate; }
-	//void ToggleFPSOutput()	{ m_bDumpFPSToConsole = !m_bDumpFPSToConsole; }
+	void ShowFps(bool bShow);
 
 	void AddTimeInst(IHyTimeInst *pTimeInst);
 	void RemoveTimeInst(IHyTimeInst *pTimeInst);

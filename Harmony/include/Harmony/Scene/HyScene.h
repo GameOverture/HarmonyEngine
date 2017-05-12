@@ -62,6 +62,8 @@ class HyScene
 	std::vector<IHyLeafDraw2d *>						m_NodeList_Loaded;			// List of nodes who can be drawn, and their graphics assets are fully loaded
 	std::vector<IHyNode3d *>							m_LoadedInst3dList;	// TODO: rename this
 
+	static uint32										sm_uiRenderedBufferCount;	// Increments every time a buffered is marked 'GFXFLAG_HasRendered' to be used performance diagnostics
+
 	// Used when writing the graphics draw buffer
 	char *												m_pCurWritePos;
 
@@ -85,6 +87,8 @@ public:
 	void DebugDrawPhysics2d(bool bDraw)					{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
 
 	void SetPause(bool bPause);
+
+	static uint32 GetAndClearRenderedBufferCount();
 
 private:
 	void PreUpdate();
