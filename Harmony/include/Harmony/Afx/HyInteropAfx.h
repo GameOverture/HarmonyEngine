@@ -29,16 +29,10 @@
 		#include "Renderer/OpenGL/Interop/HyOpenGL_Win.h"
 		typedef HyOpenGL_Win HyRendererInterop;
 
-#if 1	// Temp removal of gainput until I fix input to support windows being created on another thread
-		#include "Input/Interop/HyInput_NULL.h"
-		typedef HyInput_NULL HyInputInterop;
-		typedef HyInputMap_NULL HyInputMapInterop;
-#else
 		#include "Input/Interop/HyInput_Gainput.h"
 		#include "Input/Interop/HyInputMap_Gainput.h"
 		typedef HyInput_Gainput HyInputInterop;
 		typedef HyInputMap_Gainput HyInputMapInterop;
-#endif
 
 		#include "Diagnostics/Interop/HyConsole_Win.h"
 		typedef HyConsole_Win HyConsoleInterop;

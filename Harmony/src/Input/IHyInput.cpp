@@ -16,12 +16,13 @@ IHyInput::IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowLis
 																						m_WindowListRef(windowListRef),
 																						m_uiMouseWindowIndex(0)
 {
+	IHyInputMap::sm_pInputManager = this;
+
 	m_pInputMaps = reinterpret_cast<HyInputMapInterop *>(HY_NEW unsigned char[sizeof(HyInputMapInterop) * m_uiNUM_INPUT_MAPS]);
 	HyInputMapInterop *pWriteLoc = static_cast<HyInputMapInterop *>(m_pInputMaps);
 	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i, ++pWriteLoc)
 		new (pWriteLoc)HyInputMapInterop(this);
 
-	IHyInputMap::sm_pInputManager = this;
 }
 
 /*virtual*/ IHyInput::~IHyInput()
