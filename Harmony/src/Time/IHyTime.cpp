@@ -48,7 +48,7 @@ bool IHyTime::ThrottleTime()
 	// sm_dCurDeltaTime will be set within SetCurDeltaTime()
 	SetCurDeltaTime();
 	m_dTotalElapsedTime += sm_dCurDeltaTime;
-//	m_dThrottledTime += sm_dCurDeltaTime;
+	m_dThrottledTime += sm_dCurDeltaTime;
 
 	// Update all timers
 	if(m_TimeInstList.empty() == false)
@@ -58,20 +58,20 @@ bool IHyTime::ThrottleTime()
 			m_TimeInstList[i]->Update(sm_dCurDeltaTime);
 	}
 
-//	if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS)
-//	{
-//		m_dThrottledTime -= sm_dUPDATESTEP_SECONDS;
-//
-//		// TODO: Handle this better or input replays will not work
-//		if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS * 5.0f)
-//		{
-//#ifndef HY_PLATFORM_GUI
-//			m_dThrottledTime = 0.0f;
-//#endif
-//		}
-//
-//		return true;
-//	}
+	if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS)
+	{
+		m_dThrottledTime -= sm_dUPDATESTEP_SECONDS;
+
+		// TODO: Handle this better or input replays will not work
+		if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS * 5.0f)
+		{
+#ifndef HY_PLATFORM_GUI
+			m_dThrottledTime = 0.0f;
+#endif
+		}
+
+		return true;
+	}
 
 	if(m_bDumpFPSToConsole)
 	{

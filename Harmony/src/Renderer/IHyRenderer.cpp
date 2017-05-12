@@ -109,6 +109,8 @@ void IHyRenderer::Update()
 	if(!m_GfxCommsRef.Render_TakeSharedPointers(m_pRxDataQueue, m_pTxDataQueue, m_pDrawBuffer))
 	{
 		//InteropSleep(10);
+
+		//HyLogWarning("Renderer got stale buffer");
 		return;
 	}
 	m_pDrawBufferHeader = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBuffer);
