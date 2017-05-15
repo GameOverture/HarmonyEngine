@@ -28,6 +28,7 @@ struct HarmonyInit
 	uint32					uiNumInputMappings;
 	uint16					uiDebugPort;
 	bool					bUseConsole;
+	bool					bShowCursor;
 	HyWindowInfo			consoleInfo;
 
 	HarmonyInit();

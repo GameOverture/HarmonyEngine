@@ -11,8 +11,8 @@
 #include "Renderer/Components/HyRenderSurface.h"
 #include "Diagnostics/HyConsole.h"
 
-HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, IHyInput &inputRef, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(gfxCommsRef, inputRef, windowListRef),
-																											m_mtxView(1.0f)
+HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, IHyInput &inputRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) : IHyRenderer(gfxCommsRef, inputRef, bShowCursor, windowListRef),
+																															m_mtxView(1.0f)
 {
 }
 

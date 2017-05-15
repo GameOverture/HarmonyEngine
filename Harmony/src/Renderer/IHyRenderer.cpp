@@ -15,9 +15,10 @@
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
 int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 
-IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, IHyInput &inputRef, std::vector<HyWindow *> &windowListRef) : m_GfxCommsRef(gfxCommsRef),
-																												m_InputRef(inputRef),
-																												m_WindowListRef(windowListRef)
+IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, IHyInput &inputRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	m_GfxCommsRef(gfxCommsRef),
+																																	m_InputRef(inputRef),
+																																	m_bShowCursor(bShowCursor),
+																																	m_WindowListRef(windowListRef)
 {
 	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)

@@ -17,8 +17,8 @@
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, IHyInput &inputRef, std::vector<HyWindow *> &windowListRef) :	HyOpenGL(gfxCommsRef, inputRef, windowListRef),
-																													m_hGLContext(NULL)
+HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, IHyInput &inputRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) : HyOpenGL(gfxCommsRef, inputRef, bShowCursor, windowListRef),
+																																	m_hGLContext(NULL)
 {
 }
 
@@ -51,6 +51,8 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, IHyInput &inputRef, std::vec
 		HyError("EnumDisplayMonitors failed");
 
 	SetMonitorDeviceInfo(vMonitorDeviceInfo);
+
+	ShowCursor(m_bShowCursor);
 
 	return HyOpenGL::Initialize();
 }

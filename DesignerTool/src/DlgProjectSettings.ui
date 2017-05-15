@@ -148,6 +148,13 @@
     </layout>
    </item>
    <item>
+    <widget class="QCheckBox" name="chkShowCursor">
+     <property name="text">
+      <string>Show Cursor in window</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>

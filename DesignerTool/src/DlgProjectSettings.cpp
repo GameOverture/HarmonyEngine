@@ -44,6 +44,7 @@ DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :  
 
     ui->sbInputMaps->setValue(projObj["NumInputMappings"].toInt());
     ui->sbPixelsPerMeter->setValue(projObj["PixelsPerMeter"].toInt());
+    ui->chkShowCursor->setChecked(projObj["ShowCursor"].toBool());
 }
 
 DlgProjectSettings::~DlgProjectSettings()

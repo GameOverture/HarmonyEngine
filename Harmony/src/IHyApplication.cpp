@@ -22,6 +22,7 @@ HarmonyInit::HarmonyInit()
 	eDefaultCoordinateType = HYCOORDTYPE_Camera;
 	eDefaultCoordinateUnit = HYCOORDUNIT_Pixels;
 	fPixelsPerMeter = 80.0f;
+	bShowCursor = true;
 	uiNumInputMappings = 1;
 	uiDebugPort = 1313;
 
@@ -61,6 +62,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
 	eDefaultCoordinateType	= static_cast<HyCoordinateType>(static_cast<int32>(projObject.get<jsonxx::Number>("DefaultCoordinateType")));
 	eDefaultCoordinateUnit	= static_cast<HyCoordinateUnit>(static_cast<int32>(projObject.get<jsonxx::Number>("DefaultCoordinateUnit")));
 	fPixelsPerMeter			= static_cast<float>(projObject.get<jsonxx::Number>("PixelsPerMeter"));
+	bShowCursor				= projObject.get<jsonxx::Boolean>("ShowCursor");
 	uiNumInputMappings		= static_cast<uint32>(projObject.get<jsonxx::Number>("NumInputMappings"));
 	uiDebugPort				= static_cast<uint32>(projObject.get<jsonxx::Number>("DebugPort"));
 

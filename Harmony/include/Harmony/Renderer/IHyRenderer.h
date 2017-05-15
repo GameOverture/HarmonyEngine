@@ -29,6 +29,7 @@ class IHyRenderer
 protected:
 	HyGfxComms &							m_GfxCommsRef;
 	IHyInput &								m_InputRef;
+	bool									m_bShowCursor;
 	std::vector<HyWindow *> &				m_WindowListRef;
 
 	std::queue<IHyLoadableData *> *			m_pRxDataQueue;		// The pointer to the currently active render message queue
@@ -48,7 +49,7 @@ protected:
 	ThreadInfoPtr							m_pRenderThread;
 
 public:
-	IHyRenderer(HyGfxComms &gfxCommsRef, IHyInput &inputRef, std::vector<HyWindow *> &windowListRef);
+	IHyRenderer(HyGfxComms &gfxCommsRef, IHyInput &inputRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
 	void StartUp();
