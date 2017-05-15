@@ -98,14 +98,14 @@ bool HyEngine::Update()
 #if defined(HY_PLATFORM_GUI) && defined(HYSETTING_ThrottleUpdate)
 		break;
 #endif
-
-#ifndef HYSETTING_MultithreadedRenderer
-		if(m_Renderer.PollPlatformApi() == false)
-			return false;
-
-		m_Renderer.Update();
-#endif
 	}
+
+#if !defined(HYSETTING_MultithreadedRenderer) || defined(HY_PLATFORM_GUI)
+	if(m_Renderer.PollPlatformApi() == false)
+		return false;
+
+	m_Renderer.Update();
+#endif
 
 	return true;
 }
@@ -118,7 +118,7 @@ void HyEngine::Shutdown()
 	{
 		m_Assets.Update();
 		m_Scene.PostUpdate();
-#ifndef HYSETTING_MultithreadedRenderer
+#if !defined(HYSETTING_MultithreadedRenderer) || defined(HY_PLATFORM_GUI)
 		m_Renderer.Update();
 #endif
 	}
