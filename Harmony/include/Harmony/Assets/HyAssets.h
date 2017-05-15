@@ -115,8 +115,8 @@ public:
 	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
 
 	void GetNodeData(IHyLeafDraw2d *pDrawNode, IHyNodeData *&pDataOut);
-	void LoadGfxData(IHyLeafDraw2d *pDraw2d);
-	void RemoveGfxData(IHyLeafDraw2d *pDraw2d);
+	void LoadNodeData(IHyLeafDraw2d *pDraw2d);
+	void RemoveNodeData(IHyLeafDraw2d *pDraw2d);
 
 	void Shutdown();
 	bool IsShutdown();

@@ -12,16 +12,12 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
-
 #include "IHyApplication.h"
-
 #include "Memory/HyMemoryHeap.h"
-
 #include "Audio/IHyAudio.h"
+#include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/HyGuiComms.h"
-
 #include "Renderer/Components/HyWindow.h"
-
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Leafs/Misc/HyAudio2d.h"
 #include "Scene/Nodes/Leafs/Draws/HySprite2d.h"
@@ -30,9 +26,7 @@
 #include "Scene/Nodes/Leafs/Draws/HyText2d.h"
 #include "Scene/Nodes/Leafs/Draws/HyTexturedQuad2d.h"
 #include "Scene/Nodes/Entities/HyEntityLeaf2d.h"
-
 #include "Assets/HyAssets.h"
-
 #include "Utilities/HyMath.h"
 #include "Utilities/HyFileIO.h"
 #include "Utilities/HyStrManip.h"
@@ -46,6 +40,8 @@ class HyEngine
 	// The order of these member declarations matter
 	IHyApplication &		m_AppRef;
 	
+	HyDiagnostics			m_Diagnostics;
+
 	HyGfxComms				m_GfxBuffer;
 	HyScene					m_Scene;
 	HyAssets 				m_Assets;

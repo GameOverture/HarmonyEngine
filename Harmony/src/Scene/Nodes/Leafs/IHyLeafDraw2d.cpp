@@ -170,14 +170,14 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 		if(m_pData)
 			m_pData->AppendRequiredAtlasIndices(m_RequiredAtlasIndices);
 
-		sm_pHyAssets->LoadGfxData(this);
+		sm_pHyAssets->LoadNodeData(this);
 	}
 }
 
 /*virtual*/ void IHyLeafDraw2d::Unload() /*override*/
 {
 	HyAssert(sm_pHyAssets, "IHyDraw2d::Unload was invoked before engine has been initialized");	
-	sm_pHyAssets->RemoveGfxData(this);
+	sm_pHyAssets->RemoveNodeData(this);
 }
 
 /*virtual*/ void IHyLeafDraw2d::NodeUpdate() /*override final*/

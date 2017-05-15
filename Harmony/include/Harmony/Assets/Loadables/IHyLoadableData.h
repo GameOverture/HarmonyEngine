@@ -29,7 +29,9 @@ public:
 										m_uiRefCount(0)
 	{ }
 
-	HyLoadState GetLoadState() { return m_eLoadState; }
+	HyGfxType GetType()											{ return m_eTYPE; }
+
+	HyLoadState GetLoadState()									{ return m_eLoadState; }
 
 	virtual void OnLoadThread() = 0;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) = 0;

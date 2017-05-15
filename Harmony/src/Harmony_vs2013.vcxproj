@@ -59,6 +59,7 @@
     <ClCompile Include="Audio\Interop\HyAudio_Win.cpp" />
     <ClCompile Include="Audio\Interop\IHyAudioInst_Win.cpp" />
     <ClCompile Include="Diagnostics\HyConsole.cpp" />
+    <ClCompile Include="Diagnostics\HyDiagnostics.cpp" />
     <ClCompile Include="Diagnostics\HyGuiComms.cpp" />
     <ClCompile Include="Diagnostics\HyGuiMessage.cpp" />
     <ClCompile Include="Diagnostics\HyLiveVarManager.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="..\include\Harmony\Audio\Interop\HyAudio_Win.h" />
     <ClInclude Include="..\include\Harmony\Audio\Interop\IHyAudioInst_Win.h" />
     <ClInclude Include="..\include\Harmony\Diagnostics\HyConsole.h" />
+    <ClInclude Include="..\include\Harmony\Diagnostics\HyDiagnostics.h" />
     <ClInclude Include="..\include\Harmony\Diagnostics\HyGuiComms.h" />
     <ClInclude Include="..\include\Harmony\Diagnostics\HyGuiMessage.h" />
     <ClInclude Include="..\include\Harmony\Diagnostics\HyLiveVarManager.h" />

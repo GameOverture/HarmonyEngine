@@ -72,16 +72,20 @@
   #define HY_FORCE_INLINE  inline
 #endif
 
-#ifndef SGXAPI
-  #define SGXAPI
-#endif
+//#ifndef SGXAPI
+//  #define SGXAPI
+//#endif
 
 
 //-----------------------------------------------------------------------------------------
-// Safty checks
+// Safety checks
 //-----------------------------------------------------------------------------------------
 #if (defined(HY_DEBUG) && defined(HY_RELEASE)) || (!defined(HY_DEBUG) && !defined(HY_RELEASE))
 	#error HyCompiler.h: Invalid Build Configuration.
+#endif
+
+#if (defined(HY_ENV_32) && defined(HY_ENV_64)) || (!defined(HY_ENV_32) && !defined(HY_ENV_64))
+	#error HyCompiler.h: Invalid Platform Environment.
 #endif
 
 #endif /* __HyCompiler_h__ */

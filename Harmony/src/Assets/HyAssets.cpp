@@ -200,7 +200,7 @@ void HyAssets::GetNodeData(IHyLeafDraw2d *pDrawNode, IHyNodeData *&pDataOut)
 	}
 }
 
-void HyAssets::LoadGfxData(IHyLeafDraw2d *pDrawNode2d)
+void HyAssets::LoadNodeData(IHyLeafDraw2d *pDrawNode2d)
 {
 	if(pDrawNode2d->m_eLoadState != HYLOADSTATE_Inactive)
 		return;
@@ -239,7 +239,7 @@ void HyAssets::LoadGfxData(IHyLeafDraw2d *pDrawNode2d)
 	}
 }
 
-void HyAssets::RemoveGfxData(IHyLeafDraw2d *pDrawNode2d)
+void HyAssets::RemoveNodeData(IHyLeafDraw2d *pDrawNode2d)
 {
 	if(pDrawNode2d->m_eLoadState == HYLOADSTATE_Inactive)
 		return;
@@ -299,22 +299,23 @@ void HyAssets::Update()
 	if(m_Load_Prepare.empty() == false)
 	{
 		// Copy load queue data into shared data
-		m_LoadingCtrl.m_csSharedQueue.Lock();
+		if(m_LoadingCtrl.m_csSharedQueue.Lock(1))
 		{
 			while(m_Load_Prepare.empty() == false)
 			{
 				m_Load_Shared.push(m_Load_Prepare.front());
 				m_Load_Prepare.pop();
 			}
+		
+			m_LoadingCtrl.m_csSharedQueue.Unlock();
 		}
-		m_LoadingCtrl.m_csSharedQueue.Unlock();
 
 		m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check to see if any loaded data (from the load thread) is ready to go to the render thread
-	m_LoadingCtrl.m_csRetrievalQueue.Lock();
+	if(m_LoadingCtrl.m_csRetrievalQueue.Lock(1))
 	{
 		while(m_Load_Retrieval.empty() == false)
 		{
@@ -323,8 +324,9 @@ void HyAssets::Update()
 
 			m_GfxCommsRef.TxData(pData);
 		}
+	
+		m_LoadingCtrl.m_csRetrievalQueue.Unlock();
 	}
-	m_LoadingCtrl.m_csRetrievalQueue.Unlock();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Grab and process any returning data from the Render thread
@@ -401,6 +403,13 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Loaded;
 
+			if(pData->GetType() == HYGFXTYPE_AtlasGroup) {
+				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetIndex() << "] loaded");
+			}
+			else {
+				HyLogInfo("Custom Shader Loaded");
+			}
+
 			if(pData == m_pLastQueuedData)
 			{
 				for(auto iter = m_QueuedInst2dList.begin(); iter != m_QueuedInst2dList.end(); ++iter)
@@ -431,7 +440,13 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 		if(bFoundInReloadList == false)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Inactive;
-			HyLogInfo("Deleted loadable data");
+
+			if(pData->GetType() == HYGFXTYPE_AtlasGroup) {
+				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetIndex() << "] deleted");
+			}
+			else {
+				HyLogInfo("Custom Shader deleted");
+			}
 
 			if(pData == m_pLastDiscardedData)
 				m_pLastDiscardedData = nullptr;

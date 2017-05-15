@@ -46,4 +46,10 @@
 	#define HY_NEW new
 #endif
 
+#if defined(_WIN64)
+	#define HY_ENV_64
+#else
+	#define HY_ENV_32
+#endif
+
 #endif /* __HyCompiler_msvc_h__ */

@@ -246,6 +246,9 @@
     <ClCompile Include="Renderer\Components\HyRenderSurface.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Diagnostics\HyDiagnostics.cpp">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -665,6 +668,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyRenderSurface.h">
       <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\HyDiagnostics.h">
+      <Filter>Diagnostics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
