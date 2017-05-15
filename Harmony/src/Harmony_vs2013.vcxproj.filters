@@ -246,6 +246,12 @@
     <ClCompile Include="Renderer\Components\HyRenderSurface.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Profiler\HyProfileManager.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler\HyProfileNode.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -346,6 +352,9 @@
     </Filter>
     <Filter Include="Scene\Nodes\Entities">
       <UniqueIdentifier>{8beedd04-a520-4144-9b90-c30a22343337}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Profiler">
+      <UniqueIdentifier>{e1ccce08-756e-4c3e-aebd-3feaf710262d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -665,6 +674,12 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyRenderSurface.h">
       <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Profiler\HyProfileManager.h">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Profiler\HyProfileNode.h">
+      <Filter>Profiler</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
