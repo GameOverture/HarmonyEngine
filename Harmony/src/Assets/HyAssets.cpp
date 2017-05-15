@@ -20,7 +20,6 @@
 #include "Utilities/HyMath.h"
 #include "Utilities/HyStrManip.h"
 #include "Diagnostics/HyConsole.h"
-#include "Profiler/HyProfileManager.h"
 
 #define HYASSETS_AtlasDir "Atlases/"
 
@@ -296,8 +295,6 @@ bool HyAssets::IsShutdown()
 
 void HyAssets::Update()
 {
-//	PROFILE("HyAssets::Update()");
-
 	// Check to see if we have any pending loads to make
 	if(m_Load_Prepare.empty() == false)
 	{

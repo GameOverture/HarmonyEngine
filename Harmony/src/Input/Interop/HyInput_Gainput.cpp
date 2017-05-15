@@ -10,7 +10,6 @@
 #include "Input/Interop/HyInput_Gainput.h"
 #include "Input/Interop/HyInputMap_Gainput.h"
 #include "Renderer/Components/HyWindow.h"
-#include "Profiler/HyProfileManager.h"
 
 HyInput_Gainput::HyInput_Gainput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :	IHyInput(uiNumInputMappings, windowListRef),
 																										m_uiKeyboardId(gainput::InvalidDeviceId),
@@ -97,8 +96,6 @@ gainput::DeviceId HyInput_Gainput::GetGamePadDeviceId(uint32 uiIndex)
 
 /*virtual*/ void HyInput_Gainput::Update()
 {
-//	PROFILE("HyInput_Gainput::Update()");
-
 	// TODO: pass in m_uiRecordCount and wrap logic around this call
 	m_Manager.Update();
 

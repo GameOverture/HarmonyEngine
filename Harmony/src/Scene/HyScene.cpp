@@ -18,7 +18,6 @@
 #include "Scene/Nodes/Leafs/Draws/HyTexturedQuad2d.h"
 #include "Scene/Physics/HyPhysEntity2d.h"
 #include "Time/IHyTime.h"
-#include "Profiler/HyProfileManager.h"
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
 std::vector<IHyNode *> HyScene::sm_NodeList;
@@ -124,15 +123,11 @@ void HyScene::SetPause(bool bPause)
 
 void HyScene::PreUpdate()
 {
-	PROFILE("HyScene::PreUpdate()");
-
 	m_b2World.Step(IHyTime::GetUpdateStepSeconds(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 }
 
 void HyScene::PostUpdate()
 {
-	PROFILE("HyScene::PostUpdate()");
-
 	if(sm_bInst2dOrderingDirty)
 	{
 		std::sort(m_NodeList_Loaded.begin(), m_NodeList_Loaded.end(), &Node2dSortPredicate);

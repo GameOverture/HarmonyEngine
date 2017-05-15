@@ -26,7 +26,6 @@
 #include "Scene/Nodes/Leafs/Draws/HyText2d.h"
 #include "Scene/Nodes/Leafs/Draws/HyTexturedQuad2d.h"
 #include "Scene/Nodes/Entities/HyEntityLeaf2d.h"
-#include "Profiler/HyProfileManager.h"
 #include "Assets/HyAssets.h"
 #include "Utilities/HyMath.h"
 #include "Utilities/HyFileIO.h"

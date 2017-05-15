@@ -78,12 +78,6 @@ bool HyEngine::BootUpdate()
 
 bool HyEngine::Update()
 {
-	
-
-	PROFILE("HyEngine::Update()");
-
-	
-	
 #ifdef HYSETTING_ThrottleUpdate
 	while(m_Time.ThrottleTime())
 #else
@@ -112,8 +106,6 @@ bool HyEngine::Update()
 
 	m_Renderer.Update();
 #endif
-
-	HYProfileManager::GetInstance()->Update();
 
 	return true;
 }

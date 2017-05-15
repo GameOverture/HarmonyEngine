@@ -11,8 +11,6 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyRenderSurface.h"
-#include "Profiler/HyProfileManager.h"
-
 
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
 int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
@@ -76,8 +74,6 @@ void IHyRenderer::StartUp()
 
 void IHyRenderer::Update()
 {
-//	PROFILE("IHyRenderer::Update()");
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Iterate through 'm_WindowListRef' to find any dirty RenderSurface's that need processing
 	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
@@ -164,8 +160,6 @@ void IHyRenderer::Update()
 
 void IHyRenderer::Draw2d()
 {
-//	PROFILE("IHyRenderer::Draw2d()");
-
 	// Each render state will require its own draw. The order of these render states should be 
 	// depth sorted with render states batched together to reduce state changes.
 	m_pCurRenderState = GetRenderStatesPtr2d();
@@ -211,8 +205,6 @@ bool IHyRenderer::PollPlatformApi()
 
 /*static*/ void IHyRenderer::RenderThread(void *pParam)
 {
-//	PROFILE("IHyRenderer::RenderThread()");
-
 	IHyRenderer *pRenderer = reinterpret_cast<IHyRenderer *>(pParam);
 
 	if(false == pRenderer->Initialize())
