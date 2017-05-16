@@ -21,8 +21,3 @@ HyMesh3dData::HyMesh3dData(const std::string &sPath, const jsonxx::Value &dataVa
 HyMesh3dData::~HyMesh3dData(void)
 {
 }
-
-/*virtual*/ void HyMesh3dData::AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut)
-{
-	HyError("Not implemented");
-}

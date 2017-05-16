@@ -42,11 +42,6 @@ HySpine2dData::~HySpine2dData()
 	spAtlas_dispose(m_SpineAtlasData);
 }
 
-/*virtual*/ void HySpine2dData::AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut)
-{
-	HyError("Not implemented");
-}
-
 // Below functions are invoked within the Spine API and expect to be overloaded
 void _spAtlasPage_createTexture(spAtlasPage* self, const char* path)
 {

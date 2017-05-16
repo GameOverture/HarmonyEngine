@@ -19,7 +19,3 @@ HyPrimitive2dData::HyPrimitive2dData(const std::string &sPath, const jsonxx::Val
 HyPrimitive2dData::~HyPrimitive2dData()
 {
 }
-
-/*virtual*/ void HyPrimitive2dData::AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut)
-{
-}

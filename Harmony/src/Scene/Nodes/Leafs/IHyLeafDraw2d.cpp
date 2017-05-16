@@ -164,14 +164,7 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 		SetCoordinateUnit(HyDefaultCoordinateUnit(), false);
 
 	if(m_eTYPE != HYTYPE_Entity2d)
-	{
-		m_RequiredAtlasIndices.clear();
-		AcquireData();
-		if(m_pData)
-			m_pData->AppendRequiredAtlasIndices(m_RequiredAtlasIndices);
-
 		sm_pHyAssets->LoadNodeData(this);
-	}
 }
 
 /*virtual*/ void IHyLeafDraw2d::Unload() /*override*/

@@ -7,13 +7,11 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __IHyData_h__
-#define __IHyData_h__
+#ifndef IHyNodeData_h__
+#define IHyNodeData_h__
 
 #include "Afx/HyStdAfx.h"
-
-#include <set>
-using std::set;
+#include "Assets/Loadables/HyAtlasIndices.h"
 
 // Forward declarations
 class IHyRenderer;
@@ -24,6 +22,9 @@ class IHyNodeData
 	const HyType					m_eTYPE;
 	const std::string				m_sPATH;
 
+protected:
+	HyAtlasIndices					m_RequiredAtlasIndices;
+
 public:
 	IHyNodeData(HyType eInstType, const std::string &sPath);
 	virtual ~IHyNodeData(void);
@@ -31,7 +32,7 @@ public:
 	HyType GetInstType();
 	const std::string &GetPath();
 
-	virtual void AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut) = 0;
+	const HyAtlasIndices &GetRequiredAtlasIndices();
 };
 
-#endif /* __IHyData_h__ */
+#endif /* IHyNodeData_h__ */

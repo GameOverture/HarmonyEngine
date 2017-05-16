@@ -58,9 +58,7 @@ public:
 		HySprite2dFrame *	m_pFrames;
 		const uint32		m_uiNUMFRAMES;
 
-		std::set<uint32>	m_UsedAtlasIndices;
-
-		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, float fDuration, jsonxx::Array &frameArray, HyAssets &assetsRef);
+		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, float fDuration, HyAtlasIndices &requiredAtlasIndicesRef, jsonxx::Array &frameArray, HyAssets &assetsRef);
 		~AnimState();
 
 		const HySprite2dFrame &GetFrame(uint32 uiFrameIndex);
@@ -71,8 +69,6 @@ public:
 	uint32 GetNumStates() const;
 	const AnimState &GetState(uint32 uiAnimStateIndex) const;
 	const HySprite2dFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const;
-
-	virtual void AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut) override;
 };
 
 #endif /* __HySprite2dData_h__ */

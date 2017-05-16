@@ -140,8 +140,6 @@ public:
 	float GetLineAscender(uint32 uiStateIndex);
 	float GetLineDescender(uint32 uiStateIndex);
 	float GetLeftSideNudgeAmt(uint32 uiStateIndex);
-
-	virtual void AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIndicesOut) override;
 };
 
 #endif /* __HyText2dData_h__ */

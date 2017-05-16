@@ -249,6 +249,9 @@
     <ClCompile Include="Assets\Loadables\HyAtlas.cpp">
       <Filter>Assets\Loadables</Filter>
     </ClCompile>
+    <ClCompile Include="Assets\Loadables\HyAtlasIndices.cpp">
+      <Filter>Assets\Loadables</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -670,6 +673,9 @@
       <Filter>Diagnostics</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlas.h">
+      <Filter>Assets\Loadables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlasIndices.h">
       <Filter>Assets\Loadables</Filter>
     </ClInclude>
   </ItemGroup>

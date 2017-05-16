@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/HyAtlas.h"
+#include "Assets/Loadables/HyAtlasIndices.h"
 #include "Renderer/Components/HyGfxComms.h"
 #include "Scene/HyScene.h"
 #include "Threading/Threading.h"
@@ -43,9 +44,7 @@ class HyAssets
 
 	HyAtlas *											m_pAtlases;
 	uint32												m_uiNumAtlases;
-
-	uint32 *											m_pLoadedAtlasFlags;			// Each bit represents whether the texture index is currently loaded
-	uint32												m_uiLoadedAtlasFlagsArraySize;	// How many 'uint32' are needed to account for every texture index in 'm_pLoadedAtlasFlags'
+	HyAtlasIndices *									m_pLoadedAtlasIndices;
 
 	template<typename tData>
 	class NodeData
@@ -64,10 +63,7 @@ class HyAssets
 	NodeData<HyText2dData>								m_Txt2d;
 	std::map<int32, HyTexturedQuad2dData *>				m_Quad2d;
 
-	IHyLoadableData *									m_pLastQueuedData;
-	IHyLoadableData *									m_pLastDiscardedData;
 	std::vector<IHyLeafDraw2d *>						m_QueuedInst2dList;
-
 	std::vector<IHyLoadableData *>						m_ReloadDataList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
@@ -117,9 +113,10 @@ public:
 	HyAtlas *GetAtlas(uint32 uiIndex);
 	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
 
-	void GetNodeData(IHyLeafDraw2d *pDrawNode, IHyNodeData *&pDataOut);
-	void LoadNodeData(IHyLeafDraw2d *pDraw2d);
-	void RemoveNodeData(IHyLeafDraw2d *pDraw2d);
+	void GetNodeData(IHyLeafDraw2d *pDrawNode2d, IHyNodeData *&pDataOut);
+	void LoadNodeData(IHyLeafDraw2d *pDrawNode2d);
+	void RemoveNodeData(IHyLeafDraw2d *pDrawNode2d);
+	bool IsNodeLoaded(IHyLeafDraw2d *pDrawNode2d);
 
 	void Shutdown();
 	bool IsShutdown();

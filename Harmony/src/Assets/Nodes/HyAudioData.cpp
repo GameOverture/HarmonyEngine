@@ -17,7 +17,3 @@ HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Value &dataValu
 HyAudioData::~HyAudioData(void)
 {
 }
-
-/*virtual*/ void HyAudioData::AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut)
-{
-}

@@ -25,8 +25,6 @@ class HyMesh3dData : public IHyNodeData
 public:
 	HyMesh3dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAtlasContainer &atlasContainerRef);
 	virtual ~HyMesh3dData(void);
-
-	virtual void AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIdsOut) override;
 };
 
 #endif /* __HyMesh3dData_h__ */

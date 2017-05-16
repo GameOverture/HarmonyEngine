@@ -20,7 +20,10 @@ HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath, HyAssets &a
 	//	SetLoadState(HYLOADSTATE_Loaded);
 	
 	if(m_uiATLAS_INDEX != 0xFFFFFFFF)
+	{
 		m_pAtlas = assetsRef.GetAtlas(m_uiATLAS_INDEX);
+		m_RequiredAtlasIndices.Set(m_uiATLAS_INDEX);
+	}
 }
 
 HyTexturedQuad2dData::~HyTexturedQuad2dData()
@@ -30,9 +33,4 @@ HyTexturedQuad2dData::~HyTexturedQuad2dData()
 HyAtlas *HyTexturedQuad2dData::GetAtlas()
 {
 	return m_pAtlas;
-}
-
-/*virtual*/ void HyTexturedQuad2dData::AppendRequiredAtlasIndices(std::set<uint32> &requiredAtlasIndicesOut)
-{
-	requiredAtlasIndicesOut.insert(m_uiATLAS_INDEX);
 }
