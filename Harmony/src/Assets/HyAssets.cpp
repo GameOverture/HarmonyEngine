@@ -151,6 +151,9 @@ void HyAssets::ParseInitInfo()
 	//jsonxx::Object &spineDataObjRef = gameDataObj.get<jsonxx::Object>("Spine");
 #endif
 
+	// Atlas Bit flag loading init
+	m_uiLoadedAtlasFlagsArraySize = (m_uiNumAtlases / 32) + 1;
+
 	
 	// Start up Loading thread
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
@@ -428,6 +431,14 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 			if((*iter) == pData)
 			{
 				pData->m_eLoadState = HYLOADSTATE_Queued;
+
+				if(pData->GetType() == HYGFXTYPE_AtlasGroup) {
+					HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetIndex() << "] reloading");
+				}
+				else {
+					HyLogInfo("Custom Shader reloading");
+				}
+
 				m_Load_Prepare.push(pData);
 				m_pLastQueuedData = pData;
 

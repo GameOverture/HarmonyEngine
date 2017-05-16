@@ -147,9 +147,6 @@
     <ClCompile Include="Utilities\jasonxx.cc">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\Loadables\HyAtlasGroup.cpp">
-      <Filter>Assets\Loadables</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Components\HyShaderUniforms.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
@@ -248,6 +245,9 @@
     </ClCompile>
     <ClCompile Include="Diagnostics\HyDiagnostics.cpp">
       <Filter>Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Loadables\HyAtlas.cpp">
+      <Filter>Assets\Loadables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -567,9 +567,6 @@
     <ClInclude Include="..\include\Harmony\Assets\Loadables\IHyLoadableData.h">
       <Filter>Assets\Loadables</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlasGroup.h">
-      <Filter>Assets\Loadables</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyShaderUniforms.h">
       <Filter>Renderer\Components</Filter>
     </ClInclude>
@@ -671,6 +668,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Diagnostics\HyDiagnostics.h">
       <Filter>Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlas.h">
+      <Filter>Assets\Loadables</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

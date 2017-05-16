@@ -19,7 +19,7 @@ IHyTime::IHyTime() :	m_dTotalElapsedTime(0.0),
 						m_dThrottledTime(0.0),
 						m_uiFpsFrameCount(0),
 						m_dFpsElapsedTime(0.0),
-						m_bDumpFPSToConsole(true)
+						m_bDumpFPSToConsole(false)
 {
 }
 

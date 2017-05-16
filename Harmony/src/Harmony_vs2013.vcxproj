@@ -44,7 +44,7 @@
     <ClCompile Include="..\include\Harmony\Threading\WaitObject.cpp" />
     <ClCompile Include="..\include\Harmony\Threading\WaitObjectEx.cpp" />
     <ClCompile Include="Assets\HyAssets.cpp" />
-    <ClCompile Include="Assets\Loadables\HyAtlasGroup.cpp" />
+    <ClCompile Include="Assets\Loadables\HyAtlas.cpp" />
     <ClCompile Include="Assets\Loadables\IHyShader.cpp" />
     <ClCompile Include="Assets\Nodes\HyAudioData.cpp" />
     <ClCompile Include="Assets\Nodes\HyMesh3dData.cpp" />
@@ -151,7 +151,7 @@
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
     <ClInclude Include="..\include\Harmony\Assets\HyAssets.h" />
-    <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlasGroup.h" />
+    <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlas.h" />
     <ClInclude Include="..\include\Harmony\Assets\Loadables\IHyLoadableData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Loadables\IHyShader.h" />
     <ClInclude Include="..\include\Harmony\Assets\Nodes\HyAudioData.h" />

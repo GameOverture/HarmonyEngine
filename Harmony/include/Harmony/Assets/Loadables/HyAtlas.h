@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyAtlasGroup.h
+ *	HyAtlas.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyAtlasGroup_h__
-#define __HyAtlasGroup_h__
+#ifndef HyAtlas_h__
+#define HyAtlas_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -63,32 +63,4 @@ public:
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 };
 
-//class HyAtlasGroup
-//{
-//	friend class HyAtlasContainer;
-//
-//	const uint32				m_uiLOADGROUPID;
-//	const uint32				m_uiWIDTH;
-//	const uint32				m_uiHEIGHT;
-//	
-//
-//	HyAtlas *					m_pAtlases;
-//	const uint32				m_uiNUM_ATLASES;
-//
-//public:
-//	HyAtlasGroup(std::string sTexturePath, uint32 uiLoadGroupId, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &texturesArrayRef);
-//	~HyAtlasGroup();
-//
-//	uint32 GetGfxApiHandle(uint32 uiAtlasGroupTextureIndex);
-//	uint32 GetActualGfxApiTextureIndex(uint32 uiAtlasGroupTextureIndex);
-//
-//	uint32 GetId() const;
-//	uint32 GetNumColorChannels() const;
-//	uint32 GetWidth() const;
-//	uint32 GetHeight() const;
-//	uint32 GetNumTextures() const;
-//
-//	void GetUvRect(uint32 uiChecksum, uint32 &uiTextureIndexOut, HyRectangle<float> &UVRectOut) const;
-//};
-
-#endif /* __HyAtlasGroup_h__ */
+#endif /* HyAtlas_h__ */

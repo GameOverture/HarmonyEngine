@@ -11,7 +11,7 @@
 #define __IHyAssets_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Loadables/HyAtlasGroup.h"
+#include "Assets/Loadables/HyAtlas.h"
 #include "Renderer/Components/HyGfxComms.h"
 #include "Scene/HyScene.h"
 #include "Threading/Threading.h"
@@ -43,6 +43,9 @@ class HyAssets
 
 	HyAtlas *											m_pAtlases;
 	uint32												m_uiNumAtlases;
+
+	uint32 *											m_pLoadedAtlasFlags;			// Each bit represents whether the texture index is currently loaded
+	uint32												m_uiLoadedAtlasFlagsArraySize;	// How many 'uint32' are needed to account for every texture index in 'm_pLoadedAtlasFlags'
 
 	template<typename tData>
 	class NodeData
