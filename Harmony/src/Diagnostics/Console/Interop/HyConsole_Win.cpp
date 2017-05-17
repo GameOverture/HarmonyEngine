@@ -95,13 +95,13 @@ HyConsole_Win::~HyConsole_Win()
 		CONSOLE_SCREEN_BUFFER_INFO coninfo;
 		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &coninfo);
 
-		os << std::endl;
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_BLUE);
-		//for(int i = 0; i < coninfo.dwSize.X; i++)
-		//	os << "~";
-		//os << std::endl;
+		for(int i = 0; i < coninfo.dwSize.X; i++)
+			os << "~";
+
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE);
 		os << '\t' << szMsg << std::endl;
+
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_BLUE);
 		for(int i = 0; i < coninfo.dwSize.X; i++)
 			os << "~";

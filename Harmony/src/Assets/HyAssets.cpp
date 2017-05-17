@@ -25,6 +25,7 @@
 
 void HyAssetInit(HyAssets *pThis)
 {
+	HyLog("Assets are initializing...");
 	pThis->ParseInitInfo();
 }
 

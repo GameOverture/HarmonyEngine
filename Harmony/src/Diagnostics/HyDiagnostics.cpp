@@ -78,6 +78,7 @@ void HyDiagnostics::BootMessage()
 	sGameTitle += " [Release]";
 #endif
 
+	HyLog("");
 	HyLogTitle(sGameTitle);
 	HyLog("Data Dir:       " << m_InitStructRef.sDataDir);
 	HyLog("Default Coord:  " << (m_InitStructRef.eDefaultCoordinateType == HYCOORDTYPE_Camera) ? "Camera" : "Screen");

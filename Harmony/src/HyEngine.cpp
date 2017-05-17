@@ -43,7 +43,7 @@ HyEngine::~HyEngine()
 
 	sm_pInstance->m_Diagnostics.BootMessage();
 	
-	HyLog("Starting Update Loop...");
+	HyLogTitle("Starting Update Loop");
 	while(sm_pInstance->Update())
 	{ }
 
