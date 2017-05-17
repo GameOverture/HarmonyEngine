@@ -37,7 +37,7 @@ protected:
 	GLenum					m_eDrawMode;
 
 public:
-	HyOpenGL(HyGfxComms &gfxCommsRef, IHyInput &inputRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
+	HyOpenGL(HyGfxComms &gfxCommsRef, IHyInput &inputRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
 	virtual ~HyOpenGL(void);
 
 	virtual bool Initialize() override;

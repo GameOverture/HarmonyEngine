@@ -16,7 +16,7 @@
 #include "Memory/HyMemoryHeap.h"
 #include "Audio/IHyAudio.h"
 #include "Diagnostics/HyDiagnostics.h"
-#include "Diagnostics/HyGuiComms.h"
+#include "Diagnostics/GuiComms/HyGuiComms.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Leafs/Misc/HyAudio2d.h"
@@ -40,11 +40,11 @@ class HyEngine
 	// The order of these member declarations matter
 	IHyApplication &		m_AppRef;
 	
-	HyDiagnostics			m_Diagnostics;
 
 	HyGfxComms				m_GfxBuffer;
 	HyScene					m_Scene;
 	HyAssets 				m_Assets;
+	HyDiagnostics			m_Diagnostics;
 	HyGuiComms				m_GuiComms;
 
 	HyTimeInterop			m_Time;
@@ -75,6 +75,7 @@ private:
 	HyRendererInterop &GetRenderer();
 
 	friend void HyPauseGame(bool bPause);
+	friend HyDiagnostics &HyGetDiagnostics();
 	friend float HyPixelsPerMeter();
 	friend HyCoordinateType HyDefaultCoordinateType();
 	friend HyCoordinateUnit HyDefaultCoordinateUnit();

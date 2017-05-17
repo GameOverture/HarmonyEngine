@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Diagnostics/HyConsole.h"
+#include "Diagnostics/Console/HyConsole.h"
 
 HyConsole *HyConsole::sm_pInstance = nullptr;
 std::stringstream HyConsole::sm_ss;

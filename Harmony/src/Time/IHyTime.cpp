@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Time/IHyTime.h"
 #include "Scene/HyScene.h"
-#include "Diagnostics/HyConsole.h"
+#include "Diagnostics/Console/HyConsole.h"
 
 /*static*/ uint32			IHyTime::sm_uiUPDATESTEP_MILLISECONDS = 16;
 /*static*/ double			IHyTime::sm_dUPDATESTEP_SECONDS = sm_uiUPDATESTEP_MILLISECONDS / 1000.0;

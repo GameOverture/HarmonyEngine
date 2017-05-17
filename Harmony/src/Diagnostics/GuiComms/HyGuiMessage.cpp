@@ -7,7 +7,7 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Diagnostics/HyGuiMessage.h"
+#include "Diagnostics/GuiComms/HyGuiMessage.h"
 
 HyGuiMessage::HyGuiMessage()
 {

@@ -82,7 +82,7 @@ public:
 	void AddNode_Loaded(IHyLeafDraw2d *pInst);
 	void RemoveNode_Loaded(IHyLeafDraw2d *pInst);
 
-	void CopyAllLoadedNodes(std::vector<IHyLeafDraw2d *> &vInstsToCopy);
+	void CopyAllLoadedNodes(std::vector<IHyLeafDraw2d *> &nodeListOut);
 
 	void DebugDrawPhysics2d(bool bDraw)					{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
 

@@ -7,7 +7,7 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Diagnostics/Interop/HyConsole_Gui.h"
+#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
 
 HyConsole_Gui::HyConsole_Gui(bool bCreateConsole, HyWindowInfo &consoleInfo)
 {

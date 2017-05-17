@@ -18,9 +18,10 @@ HyEngine *		HyEngine::sm_pInstance = NULL;
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxBuffer, m_AppRef.m_WindowList),
 												m_Assets(m_AppRef.m_Init.sDataDir, m_GfxBuffer, m_Scene),
+												m_Diagnostics(m_AppRef.m_Init, m_Assets, m_Scene),
 												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_Assets),
 												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList),
-												m_Renderer(m_GfxBuffer, m_Input, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
+												m_Renderer(m_GfxBuffer, m_Input, m_Diagnostics, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
@@ -39,7 +40,10 @@ HyEngine::~HyEngine()
 
 	while(sm_pInstance->BootUpdate())
 	{ }
+
+	sm_pInstance->m_Diagnostics.BootMessage();
 	
+	HyLog("Starting Update Loop...");
 	while(sm_pInstance->Update())
 	{ }
 
@@ -131,7 +135,14 @@ HyRendererInterop &HyEngine::GetRenderer()
 
 /*friend*/ void HyPauseGame(bool bPause)
 {
+	HyAssert(HyEngine::sm_pInstance != nullptr, "HyPauseGame() was invoked before engine has been initialized.");
 	HyEngine::sm_pInstance->m_Scene.SetPause(bPause);
+}
+
+/*friend*/ HyDiagnostics &HyGetDiagnostics()
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "HyGetDiagnostics() was invoked before engine has been initialized.");
+	return HyEngine::sm_pInstance->m_Diagnostics;
 }
 
 /*friend*/ float HyPixelsPerMeter()

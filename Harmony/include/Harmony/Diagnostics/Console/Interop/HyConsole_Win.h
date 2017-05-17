@@ -7,10 +7,10 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __HyConsole_Win_h__
-#define __HyConsole_Win_h__
+#ifndef HyConsole_Win_h__
+#define HyConsole_Win_h__
 
-#include "Diagnostics\HyConsole.h"
+#include "Diagnostics/Console/HyConsole.h"
 
 class HyConsole_Win : public HyConsole
 {
@@ -21,4 +21,4 @@ public:
 	virtual void Log(std::ostream &os, const char *szMsg, LogType eType);
 };
 
-#endif /* __HyConsole_Win_h__ */
+#endif /* HyConsole_Win_h__ */

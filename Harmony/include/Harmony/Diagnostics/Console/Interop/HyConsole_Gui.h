@@ -10,7 +10,7 @@
 #ifndef __HyConsole_Gui_h__
 #define __HyConsole_Gui_h__
 
-#include "Diagnostics\HyConsole.h"
+#include "Diagnostics/Console/HyConsole.h"
 
 class HyConsole_Gui : public HyConsole
 {

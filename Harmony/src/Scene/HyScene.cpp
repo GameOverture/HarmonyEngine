@@ -101,9 +101,9 @@ void HyScene::RemoveNode_Loaded(IHyLeafDraw2d *pInst)
 	}
 }
 
-void HyScene::CopyAllLoadedNodes(std::vector<IHyLeafDraw2d *> &vInstsToCopy)
+void HyScene::CopyAllLoadedNodes(std::vector<IHyLeafDraw2d *> &nodeListOut)
 {
-	vInstsToCopy = m_NodeList_Loaded;
+	nodeListOut = m_NodeList_Loaded;
 }
 
 void HyScene::SetPause(bool bPause)

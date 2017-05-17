@@ -34,7 +34,7 @@
 		typedef HyInput_Gainput HyInputInterop;
 		typedef HyInputMap_Gainput HyInputMapInterop;
 
-		#include "Diagnostics/Interop/HyConsole_Win.h"
+		#include "Diagnostics/Console/Interop/HyConsole_Win.h"
 		typedef HyConsole_Win HyConsoleInterop;
 	#endif
 

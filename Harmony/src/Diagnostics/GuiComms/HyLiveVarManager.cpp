@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Diagnostics/HyLiveVarManager.h"
+#include "Diagnostics/GuiComms/HyLiveVarManager.h"
 
 HyLiveVarManager *HyLiveVarManager::sm_pInstance = NULL;
 

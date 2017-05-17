@@ -12,15 +12,38 @@
 
 #include "Afx/HyStdAfx.h"
 
+struct HarmonyInit;
+class HyAssets;
+class HyScene;
+
 class HyDiagnostics
 {
+	friend class IHyRenderer;
+
+	HarmonyInit &		m_InitStructRef;
+	HyAssets &			m_AssetsRef;
+	HyScene &			m_SceneRef;
+
 	std::string			m_sPlatform;
-	uint32				m_uiNumCPUs;
-	uint64				m_uiRamSize;
+	uint32				m_uiNumCpuCores;
+	uint64				m_uiRamSizeBytes;
+
+	std::string			m_sGfxApi;
+	std::string			m_sVersion;
+	std::string			m_sVendor;
+	std::string			m_sRenderer;
+	std::string			m_sShader;
 
 public:
-	HyDiagnostics();
+	HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef);
 	~HyDiagnostics();
+
+	void BootMessage();
+	void DumpAtlasUsage();
+	void DumpNodeUsage();
+
+private:
+	void SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader);
 };
 
 #endif /* HyDiagnostics_h__ */

@@ -9,10 +9,10 @@
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGL.h"
 #include "Renderer/Components/HyRenderSurface.h"
-#include "Diagnostics/HyConsole.h"
+#include "Diagnostics/Console/HyConsole.h"
 
-HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, IHyInput &inputRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) : IHyRenderer(gfxCommsRef, inputRef, bShowCursor, windowListRef),
-																															m_mtxView(1.0f)
+HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, IHyInput &inputRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(gfxCommsRef, inputRef, diagnosticsRef, bShowCursor, windowListRef),
+																																							m_mtxView(1.0f)
 {
 }
 
@@ -22,9 +22,10 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ bool HyOpenGL::Initialize() /*override*/
 {
+	HyLog("OpenGL is initializing...");
+
 	//////////////////////////////////////////////////////////////////////////
 	// Init GLEW
-	//////////////////////////////////////////////////////////////////////////
 	GLenum err = glewInit();
 	if(err != GLEW_OK)
 	{
@@ -32,28 +33,24 @@ HyOpenGL::~HyOpenGL(void)
 	}
 
 	//const GLubyte *pExtStr = glGetString(GL_EXTENSIONS);
+
 	//WriteTextFile("GLExtensions.txt", glGetString(GL_EXTENSIONS));
 
-	if(glewIsSupported("GL_VERSION_3_3"))
-		printf("Ready for OpenGL 3.3\n");
-	else
-	{
+	if(glewIsSupported("GL_VERSION_3_3") == false) {
 		HyError("At least OpenGL 3.3 must be supported");
 	}
 
-	HyLogTitle("OpenGL Initialization");
-	HyLog("Vendor: " << glGetString(GL_VENDOR));
-	HyLog("Renderer: " << glGetString(GL_RENDERER));
-	HyLog("Version: " << glGetString(GL_VERSION));
-	HyLog("GLSL: " << glGetString(GL_SHADING_LANGUAGE_VERSION));
+	SetRendererInfo("OpenGL",
+					reinterpret_cast<const char *>(glGetString(GL_VERSION)),
+					reinterpret_cast<const char *>(glGetString(GL_VENDOR)),
+					reinterpret_cast<const char *>(glGetString(GL_RENDERER)),
+					reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
 
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	//////////////////////////////////////////////////////////////////////////
 	// 2D setup
-	//////////////////////////////////////////////////////////////////////////
-
 	glGenBuffers(1, &m_hVBO2d);
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 
@@ -78,9 +75,6 @@ HyOpenGL::~HyOpenGL(void)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
-
-	// Line anti-aliasing on always for now.
-	//glEnable(GL_LINE_SMOOTH);
 
 	return true;
 }

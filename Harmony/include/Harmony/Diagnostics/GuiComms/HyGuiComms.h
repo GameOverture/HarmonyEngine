@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/HyAssets.h"
-#include "Diagnostics/HyGuiMessage.h"
+#include "Diagnostics/GuiComms/HyGuiMessage.h"
 
 #if 0//#ifndef HY_PLATFORM_GUI
 

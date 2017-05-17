@@ -15,10 +15,11 @@
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
 int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 
-IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, IHyInput &inputRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	m_GfxCommsRef(gfxCommsRef),
-																																	m_InputRef(inputRef),
-																																	m_bShowCursor(bShowCursor),
-																																	m_WindowListRef(windowListRef)
+IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, IHyInput &inputRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	m_GfxCommsRef(gfxCommsRef),
+																																									m_InputRef(inputRef),
+																																									m_DiagnosticsRef(diagnosticsRef),
+																																									m_bShowCursor(bShowCursor),
+																																									m_WindowListRef(windowListRef)
 {
 	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
@@ -43,6 +44,11 @@ void IHyRenderer::StartUp()
 #else
 	Initialize();
 #endif
+}
+
+void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader)
+{
+	m_DiagnosticsRef.SetRendererInfo(sApiName, sVersion, sVendor, sRenderer, sShader);
 }
 
 /*static*/ IHyShader *IHyRenderer::FindShader(int32 iId)

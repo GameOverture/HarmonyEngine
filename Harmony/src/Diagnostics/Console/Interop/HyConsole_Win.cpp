@@ -7,7 +7,7 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Diagnostics/Interop/HyConsole_Win.h"
+#include "Diagnostics/Console/Interop/HyConsole_Win.h"
 
 #include <fcntl.h>
 #include <io.h>
@@ -97,9 +97,9 @@ HyConsole_Win::~HyConsole_Win()
 
 		os << std::endl;
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_BLUE);
-		for(int i = 0; i < coninfo.dwSize.X; i++)
-			os << "~";
-		os << std::endl;
+		//for(int i = 0; i < coninfo.dwSize.X; i++)
+		//	os << "~";
+		//os << std::endl;
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE);
 		os << '\t' << szMsg << std::endl;
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_BLUE);
@@ -110,7 +110,7 @@ HyConsole_Win::~HyConsole_Win()
 	case LOG_Section: {
 		os << std::endl;
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE);
-		os << "\t-==== " << szMsg << " ====-";
+		os << "-==== " << szMsg << " ====-";
 		break; }
 	}
 

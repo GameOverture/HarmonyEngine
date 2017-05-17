@@ -15,6 +15,7 @@
 #include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyRenderState.h"
 #include "Input/IHyInput.h"
+#include "Diagnostics/HyDiagnostics.h"
 #include "Threading/Threading.h"
 
 #define HYSETTING_MultithreadedRenderer
@@ -29,6 +30,7 @@ class IHyRenderer
 protected:
 	HyGfxComms &							m_GfxCommsRef;
 	IHyInput &								m_InputRef;
+	HyDiagnostics &							m_DiagnosticsRef;
 	bool									m_bShowCursor;
 	std::vector<HyWindow *> &				m_WindowListRef;
 
@@ -49,10 +51,11 @@ protected:
 	ThreadInfoPtr							m_pRenderThread;
 
 public:
-	IHyRenderer(HyGfxComms &gfxCommsRef, IHyInput &inputRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
+	IHyRenderer(HyGfxComms &gfxCommsRef, IHyInput &inputRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
 	void StartUp();
+	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader);
 
 	virtual bool Initialize() = 0;
 

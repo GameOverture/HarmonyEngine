@@ -19,7 +19,7 @@
 #include "Assets/Nodes/HyMesh3dData.h"
 #include "Utilities/HyMath.h"
 #include "Utilities/HyStrManip.h"
-#include "Diagnostics/HyConsole.h"
+#include "Diagnostics/Console/HyConsole.h"
 
 #define HYASSETS_AtlasDir "Atlases/"
 
@@ -176,6 +176,16 @@ HyAtlas *HyAssets::GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut)
 	}
 
 	return nullptr;
+}
+
+uint32 HyAssets::GetNumAtlases()
+{
+	return m_uiNumAtlases;
+}
+
+HyAtlasIndices *HyAssets::GetLoadedAtlases()
+{
+	return m_pLoadedAtlasIndices;
 }
 
 void HyAssets::GetNodeData(IHyLeafDraw2d *pDrawNode2d, IHyNodeData *&pDataOut)
