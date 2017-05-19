@@ -25,6 +25,8 @@ class AtlasFrame
     
     const quint32                       m_uiUNIQUE_ID;
     eAtlasNodeType                      m_eType;
+    
+    quint32                             m_uiAtlasGrpId;
 
     AtlasTreeItem *                     m_pTreeWidgetItem;
 

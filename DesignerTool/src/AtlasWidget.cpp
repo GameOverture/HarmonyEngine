@@ -411,6 +411,17 @@ void AtlasWidget::OnContextMenu(const QPoint &pos)
     }
     else
     {
+        QMenu atlasGrpMenu;
+        atlasGrpMenu.setIcon(QIcon(":/icons16x16/atlas-assemble.png"));
+        atlasGrpMenu.setTitle("Atlas Groups...");
+        atlasGrpMenu.setToolTip("By organizing images into groups, you can logically partition assets to avoid unnecessary loads.");
+        
+        m_pModel->
+        
+        contextMenu.addMenu(atlasGrpMenu);
+        
+        contextMenu.addAction(ui->actionAtlasGroups);
+        contextMenu.addSeparator();
         contextMenu.addAction(ui->actionDeleteImages);
         contextMenu.addAction(ui->actionReplaceImages);
         contextMenu.addAction(ui->actionRename);

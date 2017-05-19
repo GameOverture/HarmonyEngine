@@ -261,6 +261,18 @@
     <string>Renames the selected filter or frame</string>
    </property>
   </action>
+  <action name="actionAtlasGroups">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/atlas-assemble.png</normaloff>:/icons16x16/atlas-assemble.png</iconset>
+   </property>
+   <property name="text">
+    <string>Atlas Groups...</string>
+   </property>
+   <property name="toolTip">
+    <string>By organizing images into groups, you can logically partition assets to avoid unnecessary loads.</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

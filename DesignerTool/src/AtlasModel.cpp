@@ -95,6 +95,17 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
         QJsonObject settingsObj = settingsDoc.object();
 
         m_uiNextFrameId = JSONOBJ_TOINT(settingsObj, "startFrameId");
+        
+        
+        QJsonArray atlasGrpArray = settingsObj["groups"].toArray();
+        for(int i = 0; i < atlasGrpArray.size(); ++i)
+        {
+            AtlasGrp *pNewAtlasGrp = new AtlasGrp();
+            pNewAtlasGrp->m_PackerSettings = atlasGrpArray[i].toObject();
+            
+            m_AtlasGrpList.push_back(pNewAtlasGrp);
+        }
+        
 
         m_PackerSettings = settingsObj["settings"].toObject();
 

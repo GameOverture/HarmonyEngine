@@ -26,8 +26,12 @@ class AtlasModel : public QObject
     QDir                                            m_MetaDir;
     QDir                                            m_DataDir;
 
-    QJsonObject                                     m_PackerSettings;
-    ImagePacker                                     m_Packer;
+    struct AtlasGrp
+    {
+        QJsonObject                                 m_PackerSettings;
+        ImagePacker                                 m_Packer;
+    };
+    QList<AtlasGrp *>                               m_AtlasGrpList;
 
     QList<AtlasFrame *>                             m_FrameList;
     QList<AtlasTreeItem *>                          m_TopLevelTreeItemList;
