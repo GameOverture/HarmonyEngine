@@ -601,6 +601,9 @@
         </item>
        </layout>
       </item>
+      <item>
+       <widget class="QComboBox" name="cmbTextureType"/>
+      </item>
      </layout>
     </widget>
    </item>

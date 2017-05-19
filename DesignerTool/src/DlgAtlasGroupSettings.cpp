@@ -23,7 +23,7 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(QJsonObject packerSettingsObj, QWid
 {
     ui->setupUi(this);
 
-    ui->txtName->setText(m_sName);
+    ui->txtName->setText(packerSettingsObj["txtName"].toString());
 
     ui->cmbSortOrder->setCurrentIndex(packerSettingsObj["cmbSortOrder"].toInt());
     ui->sbFrameMarginTop->setValue(packerSettingsObj["sbFrameMarginTop"].toInt());
@@ -39,6 +39,7 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(QJsonObject packerSettingsObj, QWid
     ui->sbTextureWidth->setValue(packerSettingsObj["sbTextureWidth"].toInt());
     ui->sbTextureHeight->setValue(packerSettingsObj["sbTextureHeight"].toInt());
     ui->cmbHeuristic->setCurrentIndex(packerSettingsObj["cmbHeuristic"].toInt());
+    ui->cmbTextureType->setCurrentIndex(packerSettingsObj["cmbTextureType"].toInt());
 
     m_bSettingsDirty = m_bNameChanged = false;
 }

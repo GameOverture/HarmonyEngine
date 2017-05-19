@@ -22,6 +22,7 @@ class AtlasModel : public QObject
     Project *                                       m_pProjOwner;
 
     quint32                                         m_uiNextFrameId;
+    quint32                                         m_uiNextAtlasId;
 
     QDir                                            m_MetaDir;
     QDir                                            m_DataDir;

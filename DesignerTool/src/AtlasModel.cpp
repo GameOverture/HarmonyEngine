@@ -95,7 +95,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
         QJsonObject settingsObj = settingsDoc.object();
 
         m_uiNextFrameId = JSONOBJ_TOINT(settingsObj, "startFrameId");
-        
+        m_uiNextAtlasId = JSONOBJ_TOINT(settingsObj, "startAtlasId");
         
         QJsonArray atlasGrpArray = settingsObj["groups"].toArray();
         for(int i = 0; i < atlasGrpArray.size(); ++i)
@@ -105,9 +105,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
             
             m_AtlasGrpList.push_back(pNewAtlasGrp);
         }
-        
-
-        m_PackerSettings = settingsObj["settings"].toObject();
+        //m_PackerSettings = settingsObj["settings"].toObject();
 
         // Create all the filter items first, storing their actual path in their data (for now)
         QJsonArray filtersArray = settingsObj["filters"].toArray();
@@ -210,20 +208,28 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
     else
     {
         m_uiNextFrameId = 0;
+        m_uiNextAtlasId = 1;
         
-        m_PackerSettings.insert("chkAutosize", true);
-        m_PackerSettings.insert("chkMerge", true);
-        m_PackerSettings.insert("chkSquare", true);
-        m_PackerSettings.insert("cmbHeuristic", 1);
-        m_PackerSettings.insert("cmbSortOrder", 0);
-        m_PackerSettings.insert("extrude", 1);
-        m_PackerSettings.insert("minFillRate", 80);
-        m_PackerSettings.insert("sbFrameMarginBottom", 1);
-        m_PackerSettings.insert("sbFrameMarginLeft", 0);
-        m_PackerSettings.insert("sbFrameMarginRight", 1);
-        m_PackerSettings.insert("sbFrameMarginTop", 0);
-        m_PackerSettings.insert("sbTextureHeight", 2048);
-        m_PackerSettings.insert("sbTextureWidth", 2048);
+        AtlasGrp *pNewAtlasGrp = new AtlasGrp();
+        
+        pNewAtlasGrp->m_PackerSettings.insert("txtName", "Default");
+        pNewAtlasGrp->m_PackerSettings.insert("id", 0);
+        pNewAtlasGrp->m_PackerSettings.insert("type", 0);
+        pNewAtlasGrp->m_PackerSettings.insert("chkAutosize", true);
+        pNewAtlasGrp->m_PackerSettings.insert("chkMerge", true);
+        pNewAtlasGrp->m_PackerSettings.insert("chkSquare", true);
+        pNewAtlasGrp->m_PackerSettings.insert("cmbHeuristic", 1);
+        pNewAtlasGrp->m_PackerSettings.insert("cmbSortOrder", 0);
+        pNewAtlasGrp->m_PackerSettings.insert("extrude", 1);
+        pNewAtlasGrp->m_PackerSettings.insert("minFillRate", 80);
+        pNewAtlasGrp->m_PackerSettings.insert("sbFrameMarginBottom", 1);
+        pNewAtlasGrp->m_PackerSettings.insert("sbFrameMarginLeft", 0);
+        pNewAtlasGrp->m_PackerSettings.insert("sbFrameMarginRight", 1);
+        pNewAtlasGrp->m_PackerSettings.insert("sbFrameMarginTop", 0);
+        pNewAtlasGrp->m_PackerSettings.insert("sbTextureHeight", 2048);
+        pNewAtlasGrp->m_PackerSettings.insert("sbTextureWidth", 2048);
+        
+        m_AtlasGrpList.push_back(pNewAtlasGrp);
     }
 
     if(m_TopLevelTreeItemList.empty())
