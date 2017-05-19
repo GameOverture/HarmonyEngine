@@ -73,12 +73,12 @@ public:
     void redo() override
     {
         m_PoppedStateObj = static_cast<IModel *>(m_ItemRef.GetModel())->PopStateAt(m_iIndex);
-        m_ItemRef.WidgetRefreshData(m_iIndex);
+        m_ItemRef.WidgetRefreshData(0);
     }
     
     void undo() override
     {
-        m_iIndex = static_cast<IModel *>(m_ItemRef.GetModel())->AppendState<STATEDATA>(m_PoppedStateObj);
+        static_cast<IModel *>(m_ItemRef.GetModel())->InsertState<STATEDATA>(m_iIndex, m_PoppedStateObj);
         m_ItemRef.WidgetRefreshData(m_iIndex);
     }
 };
