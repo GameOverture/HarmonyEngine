@@ -90,15 +90,6 @@
     <ClCompile Include="Utilities\stb_image.c">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="Diagnostics\HyGuiComms.cpp">
-      <Filter>Diagnostics</Filter>
-    </ClCompile>
-    <ClCompile Include="Diagnostics\HyLiveVarManager.cpp">
-      <Filter>Diagnostics</Filter>
-    </ClCompile>
-    <ClCompile Include="Diagnostics\HyGuiMessage.cpp">
-      <Filter>Diagnostics</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\HyFileIO.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -144,9 +135,6 @@
     <ClCompile Include="Scene\Physics\HyDebugPhys2d.cpp">
       <Filter>Scene\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Diagnostics\HyConsole.cpp">
-      <Filter>Diagnostics</Filter>
-    </ClCompile>
     <ClCompile Include="Assets\HyAssets.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
@@ -174,20 +162,11 @@
     <ClCompile Include="Assets\Nodes\IHyNodeData.cpp">
       <Filter>Assets\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\Loadables\HyAtlasGroup.cpp">
-      <Filter>Assets\Loadables</Filter>
-    </ClCompile>
     <ClCompile Include="Assets\Loadables\IHyShader.cpp">
       <Filter>Assets\Loadables</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\Components\HyShaderUniforms.cpp">
       <Filter>Renderer\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Diagnostics\Interop\HyConsole_Gui.cpp">
-      <Filter>Diagnostics\Interop</Filter>
-    </ClCompile>
-    <ClCompile Include="Diagnostics\Interop\HyConsole_Win.cpp">
-      <Filter>Diagnostics\Interop</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Nodes\IHyNode2d.cpp">
       <Filter>Scene\Nodes</Filter>
@@ -245,6 +224,33 @@
     </ClCompile>
     <ClCompile Include="Renderer\Components\HyRenderSurface.cpp">
       <Filter>Renderer\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\HyDiagnostics.cpp">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\Console\HyConsole.cpp">
+      <Filter>Diagnostics\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\Console\Interop\HyConsole_Gui.cpp">
+      <Filter>Diagnostics\Console\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\Console\Interop\HyConsole_Win.cpp">
+      <Filter>Diagnostics\Console\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\GuiComms\HyGuiComms.cpp">
+      <Filter>Diagnostics\GuiComms</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\GuiComms\HyGuiMessage.cpp">
+      <Filter>Diagnostics\GuiComms</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\GuiComms\HyLiveVarManager.cpp">
+      <Filter>Diagnostics\GuiComms</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Loadables\HyAtlas.cpp">
+      <Filter>Assets\Loadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Loadables\HyAtlasIndices.cpp">
+      <Filter>Assets\Loadables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -329,9 +335,6 @@
     <Filter Include="Assets\Loadables">
       <UniqueIdentifier>{846e1724-4c9c-40c4-b6bb-3ca33bc2ff3e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Diagnostics\Interop">
-      <UniqueIdentifier>{e72199ab-395c-4343-a244-cffc6669020a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scene\Nodes\Leafs">
       <UniqueIdentifier>{80a75801-4613-4cd5-963d-15e7673a7239}</UniqueIdentifier>
     </Filter>
@@ -346,6 +349,15 @@
     </Filter>
     <Filter Include="Scene\Tweens">
       <UniqueIdentifier>{86c28654-7313-4a8e-b418-a60556fb4fd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Diagnostics\Console">
+      <UniqueIdentifier>{2fcf7fcc-f5bc-46bf-bd87-6c3ad00610e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Diagnostics\Console\Interop">
+      <UniqueIdentifier>{5f90a8cc-79f2-4931-a948-f9827cb2c6bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Diagnostics\GuiComms">
+      <UniqueIdentifier>{f2366932-f88d-445c-ae18-f00623702241}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -501,15 +513,6 @@
     <ClInclude Include="..\include\Harmony\Utilities\jsonxx.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Diagnostics\HyGuiComms.h">
-      <Filter>Diagnostics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Diagnostics\HyLiveVarManager.h">
-      <Filter>Diagnostics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Diagnostics\HyGuiMessage.h">
-      <Filter>Diagnostics</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Utilities\HyFileIO.h">
       <Filter>Utilities</Filter>
     </ClInclude>
@@ -558,14 +561,8 @@
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyDebugPhys2d.h">
       <Filter>Scene\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Diagnostics\HyConsole.h">
-      <Filter>Diagnostics</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Assets\HyAssets.h">
       <Filter>Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlasGroup.h">
-      <Filter>Assets\Loadables</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Assets\Loadables\IHyLoadableData.h">
       <Filter>Assets\Loadables</Filter>
@@ -599,12 +596,6 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyShaderUniforms.h">
       <Filter>Renderer\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Gui.h">
-      <Filter>Diagnostics\Interop</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Diagnostics\Interop\HyConsole_Win.h">
-      <Filter>Diagnostics\Interop</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode2d.h">
       <Filter>Scene\Nodes</Filter>
@@ -659,6 +650,33 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Tweens\HyTweenVec3.h">
       <Filter>Scene\Tweens</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\GuiComms\HyGuiComms.h">
+      <Filter>Diagnostics\GuiComms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\GuiComms\HyGuiMessage.h">
+      <Filter>Diagnostics\GuiComms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\GuiComms\HyLiveVarManager.h">
+      <Filter>Diagnostics\GuiComms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\HyDiagnostics.h">
+      <Filter>Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\Console\HyConsole.h">
+      <Filter>Diagnostics\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\Console\Interop\HyConsole_Gui.h">
+      <Filter>Diagnostics\Console\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Diagnostics\Console\Interop\HyConsole_Win.h">
+      <Filter>Diagnostics\Console\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlas.h">
+      <Filter>Assets\Loadables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlasIndices.h">
+      <Filter>Assets\Loadables</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
