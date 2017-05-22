@@ -39,7 +39,7 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(QJsonObject packerSettingsObj, QWid
     ui->sbTextureWidth->setValue(packerSettingsObj["sbTextureWidth"].toInt());
     ui->sbTextureHeight->setValue(packerSettingsObj["sbTextureHeight"].toInt());
     ui->cmbHeuristic->setCurrentIndex(packerSettingsObj["cmbHeuristic"].toInt());
-    ui->cmbTextureType->setCurrentIndex(packerSettingsObj["cmbTextureType"].toInt());
+    ui->cmbTextureType->setCurrentIndex(packerSettingsObj["textureType"].toInt());
 
     m_bSettingsDirty = m_bNameChanged = false;
 }

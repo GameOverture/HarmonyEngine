@@ -12,18 +12,30 @@
 
 #include "AtlasWidget.h"
 
-AtlasFrame::AtlasFrame(quint32 uiId, quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iAtlasIndex, uint uiErrors) :  m_uiUNIQUE_ID(uiId),
-                                                                                                                                                                                m_eType(eType),
-                                                                                                                                                                                m_pTreeWidgetItem(nullptr),
-                                                                                                                                                                                m_uiImageChecksum(uiChecksum),
-                                                                                                                                                                                m_sName(sN),
-                                                                                                                                                                                m_iWidth(iW),
-                                                                                                                                                                                m_iHeight(iH),
-                                                                                                                                                                                m_rAlphaCrop(rAlphaCrop),
-                                                                                                                                                                                m_iPosX(iX),
-                                                                                                                                                                                m_iPosY(iY),
-                                                                                                                                                                                m_iTextureIndex(iAtlasIndex),
-                                                                                                                                                                                m_uiErrors(uiErrors)
+AtlasFrame::AtlasFrame(quint32 uiId,
+                       quint32 uiChecksum,
+                       quint32 uiAtlasGrpId,
+                       QString sN,
+                       QRect rAlphaCrop,
+                       eAtlasNodeType eType,
+                       int iW,
+                       int iH,
+                       int iX,
+                       int iY,
+                       int iAtlasIndex,
+                       uint uiErrors) : m_uiUNIQUE_ID(uiId),
+                                        m_eType(eType),
+                                        m_uiAtlasGrpId(uiAtlasGrpId),
+                                        m_pTreeWidgetItem(nullptr),
+                                        m_uiImageChecksum(uiChecksum),
+                                        m_sName(sN),
+                                        m_iWidth(iW),
+                                        m_iHeight(iH),
+                                        m_rAlphaCrop(rAlphaCrop),
+                                        m_iPosX(iX),
+                                        m_iPosY(iY),
+                                        m_iTextureIndex(iAtlasIndex),
+                                        m_uiErrors(uiErrors)
 {
 }
 
@@ -62,6 +74,11 @@ AtlasTreeItem *AtlasFrame::GetTreeItem()
 quint32 AtlasFrame::GetId()
 {
     return m_uiUNIQUE_ID;
+}
+
+quint32 AtlasFrame::GetAtlasId()
+{
+    return m_uiAtlasGrpId;
 }
 
 quint32 AtlasFrame::GetImageChecksum()
@@ -153,6 +170,7 @@ QString AtlasFrame::ConstructImageFileName()
 void AtlasFrame::GetJsonObj(QJsonObject &frameObj)
 {
     frameObj.insert("id", QJsonValue(static_cast<qint64>(GetId())));
+    frameObj.insert("atlasGrpId", QJsonValue(static_cast<qint64>(GetAtlasId())));
     frameObj.insert("checksum", QJsonValue(static_cast<qint64>(GetImageChecksum())));
     frameObj.insert("name", QJsonValue(GetName()));
     frameObj.insert("width", QJsonValue(GetSize().width()));

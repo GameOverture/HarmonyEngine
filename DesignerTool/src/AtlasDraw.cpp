@@ -43,19 +43,22 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(*p
     m_HoverStrokeOutter.SetEnabled(false);
     m_HoverStrokeOutter.Load();
     
-    QList<AtlasFrame *> frameList = m_ModelRef.GetFrames();
-    for(int i = 0; i < frameList.size(); ++i)
+    for(int i = 0; i < m_ModelRef.GetNumAtlasGroups(); ++i)
     {
-        uint32 uiTextureIndex = frameList[i]->GetTextureIndex();
-        
-        while(m_MasterList.size() <= uiTextureIndex)
-            m_MasterList.append(new TextureEnt(this));
-        
-        HyTexturedQuad2d *pNewTexQuad = new HyTexturedQuad2d(uiTextureIndex, m_MasterList[uiTextureIndex]);
-        pNewTexQuad->SetTextureSource(frameList[i]->GetX(), frameList[i]->GetY(), frameList[i]->GetCrop().width(), frameList[i]->GetCrop().height());
-        pNewTexQuad->SetDisplayOrder(DISPLAYORDER_AtlasSelectedFrames);
-        
-        m_MasterList[uiTextureIndex]->m_TexQuadIdMap.insert(frameList[i]->GetId(), pNewTexQuad);
+        QList<AtlasFrame *> frameList = m_ModelRef.GetFrames(i);
+        for(int j = 0; j < frameList.size(); ++j)
+        {
+            uint32 uiTextureIndex = frameList[j]->GetTextureIndex();
+            
+            while(m_MasterList.size() <= uiTextureIndex)
+                m_MasterList.append(new TextureEnt(this));
+            
+            HyTexturedQuad2d *pNewTexQuad = new HyTexturedQuad2d(uiTextureIndex, m_MasterList[uiTextureIndex]);
+            pNewTexQuad->SetTextureSource(frameList[j]->GetX(), frameList[j]->GetY(), frameList[j]->GetCrop().width(), frameList[j]->GetCrop().height());
+            pNewTexQuad->SetDisplayOrder(DISPLAYORDER_AtlasSelectedFrames);
+            
+            m_MasterList[uiTextureIndex]->m_TexQuadIdMap.insert(frameList[j]->GetId(), pNewTexQuad);
+        }
     }
 }
 

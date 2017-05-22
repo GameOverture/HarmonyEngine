@@ -161,15 +161,16 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
             QJsonObject frameObj = frameArray[i].toObject();
 
             // TODO: Put this in parameter list, once snow white updated
-            quint32 uiFrameId;
-            if(false == frameObj.contains("id"))
-                uiFrameId = ATLASFRAMEID_NotSet;
+            quint32 uiAtlasGrpId;
+            if(false == frameObj.contains("atlasGrpId"))
+                uiAtlasGrpId = 0; // 0 == Default
             else
-                uiFrameId = JSONOBJ_TOINT(frameObj, "id");
+                uiAtlasGrpId = JSONOBJ_TOINT(frameObj, "atlasGrpId");
 
             QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-            AtlasFrame *pNewFrame = CreateFrame(uiFrameId,
+            AtlasFrame *pNewFrame = CreateFrame(JSONOBJ_TOINT(frameObj, "id"),
                                                 JSONOBJ_TOINT(frameObj, "checksum"),
+                                                uiAtlasGrpId,
                                                 frameObj["name"].toString(),
                                                 rAlphaCrop,
                                                 static_cast<eAtlasNodeType>(frameObj["type"].toInt()),
@@ -213,8 +214,8 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
         AtlasGrp *pNewAtlasGrp = new AtlasGrp();
         
         pNewAtlasGrp->m_PackerSettings.insert("txtName", "Default");
-        pNewAtlasGrp->m_PackerSettings.insert("id", 0);
-        pNewAtlasGrp->m_PackerSettings.insert("type", 0);
+        pNewAtlasGrp->m_PackerSettings.insert("atlasGrpId", 0);
+        pNewAtlasGrp->m_PackerSettings.insert("textureType", 0);
         pNewAtlasGrp->m_PackerSettings.insert("chkAutosize", true);
         pNewAtlasGrp->m_PackerSettings.insert("chkMerge", true);
         pNewAtlasGrp->m_PackerSettings.insert("chkSquare", true);
@@ -238,18 +239,27 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
 
 /*virtual*/ AtlasModel::~AtlasModel()
 {
-    for(int i = 0; i < m_FrameList.size(); ++i)
-        delete m_FrameList[i];
+    for(int i = 0; i < m_AtlasGrpList.size(); ++i)
+    {
+        QList<AtlasFrame *> &atlasFramesRef = m_AtlasGrpList[i]->m_FrameList;
+        for(int j = 0; j < atlasFramesRef.size(); ++j)
+            delete atlasFramesRef[j];
+    }
 }
 
-QList<AtlasFrame *> AtlasModel::GetFrames()
+int AtlasModel::GetNumAtlasGroups()
 {
-    return m_FrameList;
+    return m_AtlasGrpList.size();
 }
 
-QJsonObject AtlasModel::GetPackerSettings()
+QList<AtlasFrame *> AtlasModel::GetFrames(uint uiGrpIndex)
 {
-    return m_PackerSettings;
+    return m_AtlasGrpList[uiGrpIndex]->m_FrameList;
+}
+
+QJsonObject AtlasModel::GetPackerSettings(uint uiGrpIndex)
+{
+    return m_AtlasGrpList[uiGrpIndex]->m_PackerSettings;
 }
 
 void AtlasModel::TakeTreeWidgets(QList<AtlasTreeItem *> treeItemList)
@@ -262,10 +272,11 @@ QList<AtlasTreeItem *> AtlasModel::GetTopLevelTreeItemList()
     return m_TopLevelTreeItemList;
 }
 
-QSize AtlasModel::GetAtlasDimensions()
+QSize AtlasModel::GetAtlasDimensions(uint uiGrpIndex)
 {
-    int iWidth = m_PackerSettings["sbTextureWidth"].toInt();
-    int iHeight = m_PackerSettings["sbTextureHeight"].toInt();
+    int iWidth = m_AtlasGrpList[uiGrpIndex]->m_PackerSettings["sbTextureWidth"].toInt();
+    int iHeight = m_AtlasGrpList[uiGrpIndex]->m_PackerSettings["sbTextureHeight"].toInt();
+    
     return QSize(iWidth, iHeight);
 }
 
@@ -282,11 +293,15 @@ int AtlasModel::GetNumTextures()
 void AtlasModel::WriteMetaSettings()
 {
     QJsonArray frameArray;
-    for(int i = 0; i < m_FrameList.size(); ++i)
+    for(int i = 0; i < m_AtlasGrpList.size(); ++i)
     {
-        QJsonObject frameObj;
-        m_FrameList[i]->GetJsonObj(frameObj);
-        frameArray.append(QJsonValue(frameObj));
+        QList<AtlasFrame *> &atlasFramesRef = m_AtlasGrpList[i]->m_FrameList;
+        for(int j = 0; j < atlasFramesRef.size(); ++j)
+        {
+            QJsonObject frameObj;
+            atlasFramesRef[j]->GetJsonObj(frameObj);
+            frameArray.append(QJsonValue(frameObj));
+        }
     }
 
     WriteMetaSettings(frameArray);
@@ -296,7 +311,12 @@ void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
 {
     QJsonObject settingsObj;
     settingsObj.insert("startFrameId", QJsonValue(static_cast<qint64>(m_uiNextFrameId)));
-    settingsObj.insert("settings", m_PackerSettings);
+    
+    QJsonArray groupsArray;
+    for(int i = 0; i < m_AtlasGrpList.size(); ++i)
+        groupsArray.append(m_AtlasGrpList[i]->m_PackerSettings);
+    
+    settingsObj.insert("groups", groupsArray);
     settingsObj.insert("frames", frameArray);
 
     QJsonArray filtersArray;
@@ -350,8 +370,7 @@ void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
 #else
         qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
 #endif
-        if(0 == iBytesWritten || -1 == iBytesWritten)
-        {
+        if(0 == iBytesWritten || -1 == iBytesWritten) {
             HyGuiLog("Could not write to atlas settings file: " % settingsFile.errorString(), LOGTYPE_Error);
         }
 
@@ -359,7 +378,7 @@ void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
     }
 }
 
-AtlasFrame *AtlasModel::CreateFrame(quint32 uiId, quint32 uiChecksum, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iAtlasIndex, uint uiErrors)
+AtlasFrame *AtlasModel::CreateFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iAtlasIndex, uint uiErrors)
 {
     if(uiId == ATLASFRAMEID_NotSet)
     {
@@ -367,10 +386,25 @@ AtlasFrame *AtlasModel::CreateFrame(quint32 uiId, quint32 uiChecksum, QString sN
         m_uiNextFrameId++;
     }
 
-    AtlasFrame *pNewFrame = new AtlasFrame(uiId, uiChecksum, sN, rAlphaCrop, eType, iW, iH, iX, iY, iAtlasIndex, uiErrors);
+    AtlasFrame *pNewFrame = new AtlasFrame(uiId, uiChecksum, uiAtlasGrpId, sN, rAlphaCrop, eType, iW, iH, iX, iY, iAtlasIndex, uiErrors);
 
     m_FrameLookup.AddLookup(pNewFrame);
-    m_FrameList.append(pNewFrame);
+    
+    for(int i = 0; i < m_AtlasGrpList.size(); ++i)
+    {
+        if(m_AtlasGrpList[i]->m_PackerSettings.contains("atlasGrpId") == false) {
+            HyGuiLog("AtlasModel::CreateFrame could not find atlasGrpId", LOGTYPE_Error);
+        }
+        else
+        {
+            quint32 uiAtlasGrpId = JSONOBJ_TOINT(m_AtlasGrpList[i]->m_PackerSettings, "atlasGrpId");
+            if(uiAtlasGrpId == uiAtlasGrpId)
+            {
+                m_AtlasGrpList[i]->m_FrameList.append(pNewFrame);
+                break;
+            }
+        }
+    }
     
     return pNewFrame;
 }
@@ -380,15 +414,30 @@ void AtlasModel::RemoveFrame(AtlasFrame *pFrame)
     if(m_FrameLookup.RemoveLookup(pFrame))
         pFrame->DeleteMetaImage(m_MetaDir);
     
-    m_FrameList.removeOne(pFrame);
+    
+    for(int i = 0; i < m_AtlasGrpList.size(); ++i)
+    {
+        if(m_AtlasGrpList[i]->m_PackerSettings.contains("atlasGrpId") == false) {
+            HyGuiLog("AtlasModel::CreateFrame could not find atlasGrpId", LOGTYPE_Error);
+        }
+        else
+        {
+            quint32 uiAtlasGrpId = JSONOBJ_TOINT(m_AtlasGrpList[i]->m_PackerSettings, "atlasGrpId");
+            if(uiAtlasGrpId == uiAtlasGrpId)
+            {
+                m_AtlasGrpList[i]->m_FrameList.removeOne(pFrame);
+                break;
+            }
+        }
+    }
 
     delete pFrame;
 }
 
-AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, eAtlasNodeType eType)
+AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpId, eAtlasNodeType eType)
 {
     // This will create a meta image
-    AtlasFrame *pFrame = ImportImage(sName, newImage, eType);
+    AtlasFrame *pFrame = ImportImage(sName, newImage, uiAtlasGrpId, eType);
 
     QSet<AtlasFrame *> newFrameSet;
     newFrameSet.insert(pFrame);
@@ -499,7 +548,7 @@ void AtlasModel::RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinq
 //    RemoveDependency(relinquishList[i], pItem);
 }
 
-QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList)
+QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId)
 {
     QSet<AtlasFrame *> returnSet;
 
@@ -509,13 +558,13 @@ QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList)
 
         QImage newImage(fileInfo.absoluteFilePath());
 
-        returnSet.insert(ImportImage(fileInfo.baseName(), newImage, ATLAS_Frame));
+        returnSet.insert(ImportImage(fileInfo.baseName(), newImage, uiAtlasGrpId, ATLAS_Frame));
     }
 
     return returnSet;
 }
 
-AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, eAtlasNodeType eType)
+AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, eAtlasNodeType eType)
 {
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
 
@@ -523,7 +572,7 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, eAtlasNodeT
     if(eType != ATLAS_Font && eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
         rAlphaCrop = ImagePacker::crop(newImage);
 
-    AtlasFrame *pNewFrame = CreateFrame(ATLASFRAMEID_NotSet, uiChecksum, sName, rAlphaCrop, eType, newImage.width(), newImage.height(), -1, -1, -1, 0);
+    AtlasFrame *pNewFrame = CreateFrame(ATLASFRAMEID_NotSet, uiChecksum, uiAtlasGrpId, sName, rAlphaCrop, eType, newImage.width(), newImage.height(), -1, -1, -1, 0);
     if(pNewFrame)
     {
         // TODO: Should I care about overwriting a duplicate image?
@@ -549,22 +598,57 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, eAtlasNodeT
 
 void AtlasModel::SaveData()
 {
-    QJsonObject atlasObj;
-    GetAtlasInfoForGameData(atlasObj);
+    QJsonArray atlasGrpArray;
+    for(int i = 0; i < m_AtlasGrpList.size(); ++i)
+    {
+        QJsonObject atlasGrpObj;
+        atlasGrpObj.insert("width", m_AtlasGrpList[i]->m_PackerSettings["sbTextureWidth"].toInt());
+        atlasGrpObj.insert("height", m_AtlasGrpList[i]->m_PackerSettings["sbTextureHeight"].toInt());
+        atlasGrpObj.insert("atlasGrpId", m_AtlasGrpList[i]->m_PackerSettings["atlasGrpId"].toInt());
+        atlasGrpObj.insert("textureType", m_AtlasGrpList[i]->m_PackerSettings["textureType"].toInt());
+        
+        QJsonArray textureArray;
+        QList<QJsonArray> frameArrayList;
+        QList<AtlasFrame *> &atlasGrpFrameListRef = m_AtlasGrpList[i]->m_FrameList;
+        for(int i = 0; i < atlasGrpFrameListRef.size(); ++i)
+        {
+            if(atlasGrpFrameListRef[i]->GetTextureIndex() < 0)
+                continue;
+    
+            while(frameArrayList.empty() || frameArrayList.size() <= atlasGrpFrameListRef[i]->GetTextureIndex())
+                frameArrayList.append(QJsonArray());
+    
+            QJsonObject frameObj;
+            frameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasGrpFrameListRef[i]->GetImageChecksum())));
+            frameObj.insert("left", QJsonValue(atlasGrpFrameListRef[i]->GetX()));
+            frameObj.insert("top", QJsonValue(atlasGrpFrameListRef[i]->GetY()));
+            frameObj.insert("right", QJsonValue(atlasGrpFrameListRef[i]->GetX() + atlasGrpFrameListRef[i]->GetCrop().width()));
+            frameObj.insert("bottom", QJsonValue(atlasGrpFrameListRef[i]->GetY() + atlasGrpFrameListRef[i]->GetCrop().height()));
+    
+            frameArrayList[atlasGrpFrameListRef[i]->GetTextureIndex()].append(frameObj);
+        }
+    
+        for(int i = 0; i < frameArrayList.size(); ++i)
+            textureArray.append(frameArrayList[i]);
+    
+        atlasGrpObj.insert("textures", textureArray);
+
+        atlasGrpArray.append(atlasGrpObj);
+    }
+    
+    //GetAtlasInfoForGameData(atlasObj);
 
     QJsonDocument atlasInfoDoc;
-    atlasInfoDoc.setObject(atlasObj);
+    atlasInfoDoc.setArray(atlasGrpArray);
 
     QFile atlasInfoFile(m_DataDir.absolutePath() % "/" % HYGUIPATH_DataAtlases);
-    if(atlasInfoFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
-    {
+    if(atlasInfoFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
        HyGuiLog("Couldn't open atlas data info file for writing", LOGTYPE_Error);
     }
     else
     {
         qint64 iBytesWritten = atlasInfoFile.write(atlasInfoDoc.toJson());
-        if(0 == iBytesWritten || -1 == iBytesWritten)
-        {
+        if(0 == iBytesWritten || -1 == iBytesWritten) {
             HyGuiLog("Could not write to atlas settings file: " % atlasInfoFile.errorString(), LOGTYPE_Error);
         }
 
@@ -572,54 +656,38 @@ void AtlasModel::SaveData()
     }
 }
 
-void AtlasModel::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
-{
-    atlasObjOut.insert("id", m_DataDir.dirName().toInt());
-    atlasObjOut.insert("width", m_PackerSettings["sbTextureWidth"].toInt());
-    atlasObjOut.insert("height", m_PackerSettings["sbTextureHeight"].toInt());
-    atlasObjOut.insert("num8BitClrChannels", 4);   // TODO: Actually make this configurable?
+//void AtlasModel::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
+//{
+//    atlasObjOut.insert("id", m_DataDir.dirName().toInt());
+//    atlasObjOut.insert("width", m_PackerSettings["sbTextureWidth"].toInt());
+//    atlasObjOut.insert("height", m_PackerSettings["sbTextureHeight"].toInt());
+//    atlasObjOut.insert("num8BitClrChannels", 4);   // TODO: Actually make this configurable?
 
-    QJsonArray textureArray;
-    QList<QJsonArray> frameArrayList;
-    for(int i = 0; i < m_FrameList.size(); ++i)
-    {
-        if(m_FrameList[i]->GetTextureIndex() < 0)
-            continue;
+//    QJsonArray textureArray;
+//    QList<QJsonArray> frameArrayList;
+//    for(int i = 0; i < m_FrameList.size(); ++i)
+//    {
+//        if(m_FrameList[i]->GetTextureIndex() < 0)
+//            continue;
 
-        while(frameArrayList.empty() || frameArrayList.size() <= m_FrameList[i]->GetTextureIndex())
-            frameArrayList.append(QJsonArray());
+//        while(frameArrayList.empty() || frameArrayList.size() <= m_FrameList[i]->GetTextureIndex())
+//            frameArrayList.append(QJsonArray());
 
-        QJsonObject frameObj;
-        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FrameList[i]->GetImageChecksum())));
-        frameObj.insert("left", QJsonValue(m_FrameList[i]->GetX()));
-        frameObj.insert("top", QJsonValue(m_FrameList[i]->GetY()));
-        frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().width()));
-        frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().height()));
+//        QJsonObject frameObj;
+//        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FrameList[i]->GetImageChecksum())));
+//        frameObj.insert("left", QJsonValue(m_FrameList[i]->GetX()));
+//        frameObj.insert("top", QJsonValue(m_FrameList[i]->GetY()));
+//        frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().width()));
+//        frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().height()));
 
-        frameArrayList[m_FrameList[i]->GetTextureIndex()].append(frameObj);
-    }
+//        frameArrayList[m_FrameList[i]->GetTextureIndex()].append(frameObj);
+//    }
 
-    for(int i = 0; i < frameArrayList.size(); ++i)
-        textureArray.append(frameArrayList[i]);
+//    for(int i = 0; i < frameArrayList.size(); ++i)
+//        textureArray.append(frameArrayList[i]);
 
-    atlasObjOut.insert("textures", textureArray);
-}
-
-void AtlasModel::SetPackerSettings()
-{
-    m_Packer.sortOrder = m_PackerSettings["cmbSortOrder"].toInt();// m_iSortOrderIndex;//ui->cmbSortOrder->currentIndex();
-    m_Packer.border.t = m_PackerSettings["sbFrameMarginTop"].toInt();// m_iFrameMarginTop;//ui->sbFrameMarginTop->value();
-    m_Packer.border.l = m_PackerSettings["sbFrameMarginLeft"].toInt();// m_iFrameMarginLeft;//ui->sbFrameMarginLeft->value();
-    m_Packer.border.r = m_PackerSettings["sbFrameMarginRight"].toInt();// m_iFrameMarginRight;//ui->sbFrameMarginRight->value();
-    m_Packer.border.b = m_PackerSettings["sbFrameMarginBottom"].toInt();// m_iFrameMarginBottom;//ui->sbFrameMarginBottom->value();
-    m_Packer.extrude = m_PackerSettings["extrude"].toInt();// m_iExtrude;//ui->extrude->value();
-    m_Packer.merge = m_PackerSettings["chkMerge"].toBool();// m_bMerge;//ui->chkMerge->isChecked();
-    m_Packer.square = m_PackerSettings["chkSquare"].toBool();// m_bSquare;//ui->chkSquare->isChecked();
-    m_Packer.autosize = m_PackerSettings["chkAutosize"].toBool();// m_bAutoSize;//ui->chkAutosize->isChecked();
-    m_Packer.minFillRate = m_PackerSettings["minFillRate"].toInt();// m_iFillRate;//ui->minFillRate->value();
-    m_Packer.mergeBF = false;
-    m_Packer.rotate = ImagePacker::NEVER;
-}
+//    atlasObjOut.insert("textures", textureArray);
+//}
 
 QFileInfoList AtlasModel::GetExistingTextureInfoList()
 {
@@ -629,11 +697,18 @@ QFileInfoList AtlasModel::GetExistingTextureInfoList()
     return m_DataDir.entryInfoList(sNameFilterList, QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
 }
 
-void AtlasModel::RepackAll(bool bForceRepack /*= false*/)
+void AtlasModel::RepackAll(uint uiGrpIndex, bool bForceRepack)
 {
     int iNumTotalTextures = GetNumTextures();
 
+    QList<AtlasFrame *> &atlasGrpFrameListRef = m_AtlasGrpList[uiGrpIndex]->m_FrameList;
+    
     QSet<int> textureIndexSet;
+    for(int i = 0; i < atlasGrpFrameListRef.size(); ++i)
+    {
+        
+    }
+    
     for(int i = 0; i < iNumTotalTextures; ++i)
         textureIndexSet.insert(i);
 
@@ -641,7 +716,7 @@ void AtlasModel::RepackAll(bool bForceRepack /*= false*/)
         Repack(textureIndexSet, QSet<AtlasFrame *>());
 }
 
-void AtlasModel::Repack(QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
+void AtlasModel::Repack(QSet<QPair<int, int> > repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
 {
     // Always repack the last texture to ensure it gets filled as much as it can
     QFileInfoList existingTexturesInfoList = GetExistingTextureInfoList();
