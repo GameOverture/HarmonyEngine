@@ -334,7 +334,7 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
         m_MasterStageList[i]->iReferenceCount = m_MasterStageList[i]->iTmpReferenceCount;
 
     // if 'bFindBestFit' == true, adjust atlas dimentions until we utilize efficient space on the smallest texture
-    QSize atlasSize = m_pItem->GetProject().GetAtlasModel().GetAtlasDimensions();
+    QSize atlasSize = m_pItem->GetProject().GetAtlasModel().GetAtlasDimensions(TEMP_FONT_ATLAS_INDEX);
     float fAtlasSizeModifier = 1.0f;
     bool bDoInitialShrink = true;
     size_t iNumMissedGlyphs = 0;
@@ -406,7 +406,7 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
         if(m_pTrueAtlasFrame)
             m_pItem->GetProject().GetAtlasModel().ReplaceFrame(m_pTrueAtlasFrame, m_pItem->GetName(false), fontAtlasImage, true);
         else
-            m_pTrueAtlasFrame = m_pItem->GetProject().GetAtlasModel().GenerateFrame(m_pItem, m_pItem->GetName(false), fontAtlasImage, ATLAS_Font);
+            m_pTrueAtlasFrame = m_pItem->GetProject().GetAtlasModel().GenerateFrame(m_pItem, m_pItem->GetName(false), fontAtlasImage, TEMP_FONT_ATLAS_INDEX, ATLAS_Font);
     }
 
     // Signals ItemFont to upload and refresh the preview texture

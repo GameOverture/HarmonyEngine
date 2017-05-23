@@ -25,13 +25,23 @@ class AtlasModel : public QObject
     quint32                                         m_uiNextAtlasId;
 
     QDir                                            m_MetaDir;
-    QDir                                            m_DataDir;
+    QDir                                            m_RootDataDir;
 
     struct AtlasGrp
     {
+        QDir                                        m_DataDir;
+        
         QJsonObject                                 m_PackerSettings;
         ImagePacker                                 m_Packer;
         QList<AtlasFrame *>                         m_FrameList;
+        
+        AtlasGrp(QString sAbsDataDirPath) : m_DataDir(sAbsDataDirPath)
+        { }
+        
+        quint32 GetId()
+        {
+            return JSONOBJ_TOINT(m_PackerSettings, "atlasGrpId");
+        }
         
         void SetPackerSettings()
         {
@@ -71,25 +81,23 @@ public:
 
     int GetNumAtlasGroups();
     
-    QList<AtlasFrame *> GetFrames(uint uiGrpIndex);
+    QList<AtlasFrame *> GetFrames(uint uiAtlasGrpIndex);
 
-    QJsonObject GetPackerSettings(uint uiGrpIndex);
+    QJsonObject GetPackerSettings(uint uiAtlasGrpIndex);
 
-    void TakeTreeWidgets(QList<AtlasTreeItem *> treeItemList);
+    void StashTreeWidgets(QList<AtlasTreeItem *> treeItemList);
     QList<AtlasTreeItem *> GetTopLevelTreeItemList();
 
-    QSize GetAtlasDimensions(uint uiGrpIndex);
-
-    int GetNumTextures();
+    QSize GetAtlasDimensions(uint uiAtlasGrpIndex);
 
     void WriteMetaSettings();
     void WriteMetaSettings(QJsonArray frameArray);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    AtlasFrame *CreateFrame(quint32 uiId, quint32 uiCRC, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iAtlasIndex, uint uiErrors);
+    AtlasFrame *CreateFrame(quint32 uiId, quint32 uiCRC, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
     void RemoveFrame(AtlasFrame *pFrame);
 
-    AtlasFrame *GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpId, eAtlasNodeType eType);
+    AtlasFrame *GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, eAtlasNodeType eType);
     void ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
 
     QList<AtlasFrame *> RequestFrames(ProjectItem *pItem);
@@ -104,13 +112,14 @@ public:
 
     void SaveData();
 
-    //void GetAtlasInfoForGameData(QJsonObject &atlasObjOut);
+    uint GetAtlasGrpIndexFromAtlasGrpId(quint32 uiAtlasGrpId);
+    quint32 GetAtlasGrpIdFromAtlasGrpIndex(uint uiAtlasGrpIndex);
     
-    QFileInfoList GetExistingTextureInfoList();
+    QFileInfoList GetExistingTextureInfoList(uint uiAtlasGrpIndex);
 
-    void RepackAll(uint uiGrpIndex, bool bForceRepack);
-    void Repack(QSet<QPair<int, int> > repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet);
-    void ConstructAtlasTexture(int iPackerBinIndex, int iTextureArrayIndex);
+    void RepackAll(uint uiAtlasGrpIndex, bool bForceRepack);
+    void Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet);
+    void ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex, int iActualTextureIndex);
     void Refresh();
 };
 

@@ -134,14 +134,16 @@ void AtlasWidget::StashTreeWidgets()
     while(ui->atlasList->topLevelItemCount())
         stashedTreeItemList.append(static_cast<AtlasTreeItem *>(ui->atlasList->takeTopLevelItem(0)));
 
-    m_pModel->TakeTreeWidgets(stashedTreeItemList);
+    m_pModel->StashTreeWidgets(stashedTreeItemList);
 }
 
 void AtlasWidget::RefreshLcds()
 {
-    ui->lcdNumTextures->display(m_pModel->GetNumTextures());
-    ui->lcdTexWidth->display(m_pModel->GetAtlasDimensions().width());
-    ui->lcdTexHeight->display(m_pModel->GetAtlasDimensions().height());
+    uint uiAtlasGrpIndex = ui->cmbAtlasGroups->currentIndex();
+    
+    ui->lcdNumTextures->display(m_pModel->GetExistingTextureInfoList(uiAtlasGrpIndex).size());
+    ui->lcdTexWidth->display(m_pModel->GetAtlasDimensions(uiAtlasGrpIndex).width());
+    ui->lcdTexHeight->display(m_pModel->GetAtlasDimensions(uiAtlasGrpIndex).height());
 }
 
 /*virtual*/ void AtlasWidget::enterEvent(QEvent *pEvent) /*override*/
@@ -183,7 +185,7 @@ void AtlasWidget::on_btnAddImages_clicked()
                                                                &sSelectedFilter);
 
     if(sImportImgList.empty() == false)
-        m_pModel->Repack(QSet<int>(), m_pModel->ImportImages(sImportImgList));
+        m_pModel->Repack(ui->cmbAtlasGroups->currentIndex(), QSet<int>(), m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex())));
     
     RefreshLcds();
 }
@@ -209,14 +211,14 @@ void AtlasWidget::on_btnAddDir_clicked()
     }
 
     if(sImportImgList.empty() == false)
-        m_pModel->Repack(QSet<int>(), m_pModel->ImportImages(sImportImgList));
+        m_pModel->Repack(ui->cmbAtlasGroups->currentIndex(), QSet<int>(), m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex())));
     
     RefreshLcds();
 }
 
 void AtlasWidget::on_btnSettings_clicked()
 {
-    DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(m_pModel->GetPackerSettings());
+    DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex()));
     if(pDlg->GetName().isEmpty())
         pDlg->SetName("Atlas Group");
 
@@ -226,7 +228,7 @@ void AtlasWidget::on_btnSettings_clicked()
         pDlg->WidgetsToData();  // Save the changes
 
         if(pDlg->IsSettingsDirty())
-            m_pModel->RepackAll();
+            m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex(), false);
         else if(pDlg->IsNameChanged())
             m_pModel->WriteMetaSettings();
     }
@@ -268,18 +270,21 @@ void AtlasWidget::on_actionDeleteImages_triggered()
     }
 
     // No dependencies found, resume with deleting
-    QSet<int> affectedTextureIndexSet;
+    QMap<uint, QSet<int> > affectedTextureIndexMap;
     for(int i = 0; i < selectedFrameList.count(); ++i)
     {
         AtlasFrame *pFrame = selectedFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
-        affectedTextureIndexSet.insert(pFrame->GetTextureIndex());
+        affectedTextureIndexMap[m_pModel->GetAtlasGrpIndexFromAtlasGrpId(pFrame->GetAtlasGrpId())].insert(pFrame->GetTextureIndex());
 
         m_pModel->RemoveFrame(pFrame);
         delete selectedFrameList[i];
     }
 
-    if(affectedTextureIndexSet.empty() == false)
-        m_pModel->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
+    if(affectedTextureIndexMap.empty() == false)
+    {
+        for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
+            m_pModel->Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
+    }
 
     // Delete the selected filters. When deleting a parent of another filter, it will delete its children too.
     // Make sure to just delete children filters first or else it will crash, so process 'selectedFilterList' backwards
@@ -291,7 +296,6 @@ void AtlasWidget::on_actionDeleteImages_triggered()
 
 void AtlasWidget::on_actionReplaceImages_triggered()
 {
-    QSet<int> affectedTextureIndexSet;
 
     QList<QTreeWidgetItem *> selectedAtlasTreeItemList = ui->atlasList->selectedItems();
 
@@ -331,6 +335,7 @@ void AtlasWidget::on_actionReplaceImages_triggered()
     }
     while(sImportImgList.count() != selectedFrameList.count());
 
+    QMap<uint, QSet<int> > affectedTextureIndexMap;
     for(int i = 0; i < selectedFrameList.count(); ++i)
     {
         HyGuiLog("Replacing: " % selectedFrameList[i]->GetName() % " -> " % sImportImgList[i], LOGTYPE_Info);
@@ -338,19 +343,16 @@ void AtlasWidget::on_actionReplaceImages_triggered()
         QFileInfo fileInfo(sImportImgList[i]);
         QImage newImage(fileInfo.absoluteFilePath());
 
-        affectedTextureIndexSet.insert(selectedFrameList[i]->GetTextureIndex());
-
+        affectedTextureIndexMap[m_pModel->GetAtlasGrpIndexFromAtlasGrpId(selectedFrameList[i]->GetAtlasGrpId())].insert(selectedFrameList[i]->GetTextureIndex());
+        
         m_pModel->ReplaceFrame(selectedFrameList[i], fileInfo.fileName(), newImage, false);
     }
 
-    m_pModel->Repack(affectedTextureIndexSet, QSet<AtlasFrame *>());
-
-//    for(int i = 0; i < selectedFrameList.count(); ++i)
-//    {
-//        QSet<ProjectItem *> sLinks = selectedFrameList[i]->GetLinks();
-//        for(QSet<ProjectItem *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
-//            (*LinksIter)->RelinkFrame(selectedFrameList[i]);
-//    }
+    if(affectedTextureIndexMap.empty() == false)
+    {
+        for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
+            m_pModel->Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
+    }
     
     RefreshLcds();
 }
@@ -411,14 +413,14 @@ void AtlasWidget::OnContextMenu(const QPoint &pos)
     }
     else
     {
-        QMenu atlasGrpMenu;
-        atlasGrpMenu.setIcon(QIcon(":/icons16x16/atlas-assemble.png"));
-        atlasGrpMenu.setTitle("Atlas Groups...");
-        atlasGrpMenu.setToolTip("By organizing images into groups, you can logically partition assets to avoid unnecessary loads.");
+//        QMenu atlasGrpMenu;
+//        atlasGrpMenu.setIcon(QIcon(":/icons16x16/atlas-assemble.png"));
+//        atlasGrpMenu.setTitle("Atlas Groups...");
+//        atlasGrpMenu.setToolTip("By organizing images into groups, you can logically partition assets to avoid unnecessary loads.");
         
-        m_pModel->
+        //m_pModel->
         
-        contextMenu.addMenu(atlasGrpMenu);
+        //contextMenu.addMenu(&atlasGrpMenu);
         
         contextMenu.addAction(ui->actionAtlasGroups);
         contextMenu.addSeparator();

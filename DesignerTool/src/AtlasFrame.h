@@ -46,14 +46,14 @@ class AtlasFrame
     uint                                m_uiErrors; // '0' when there is no error
 
     // Private ctor as WidgetAtlasManager should only construct these
-    AtlasFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iAtlasIndex, uint uiErrors);
+    AtlasFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
     ~AtlasFrame();
     
 public:
     AtlasTreeItem *GetTreeItem();
 
     quint32 GetId();
-    quint32 GetAtlasId();
+    quint32 GetAtlasGrpId();
     quint32 GetImageChecksum();
     QString GetName();
     void SetName(QString sNewName);

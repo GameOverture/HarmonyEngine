@@ -183,7 +183,7 @@ void FontWidget::UpdateActions()
 {
     bool bGeneratePreview = false;
 
-    QSize curSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions();
+    QSize curSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(TEMP_FONT_ATLAS_INDEX);
     if(m_PrevAtlasSize.width() < curSize.width() || m_PrevAtlasSize.height() < curSize.height())
         bGeneratePreview = true;
 
