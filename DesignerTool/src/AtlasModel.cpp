@@ -304,6 +304,7 @@ void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
 {
     QJsonObject settingsObj;
     settingsObj.insert("startFrameId", QJsonValue(static_cast<qint64>(m_uiNextFrameId)));
+    settingsObj.insert("startAtlasId", QJsonValue(static_cast<qint64>(m_uiNextAtlasId)));
     
     QJsonArray groupsArray;
     for(int i = 0; i < m_AtlasGrpList.size(); ++i)
