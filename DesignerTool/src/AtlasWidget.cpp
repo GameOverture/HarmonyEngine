@@ -90,6 +90,9 @@ AtlasWidget::AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *pa
     //ui->atlasList->viewport()->setAcceptDrops(true);
     ui->atlasList->setDropIndicatorShown(true);
     ui->atlasList->setDragDropMode(QAbstractItemView::InternalMove);
+    
+    ui->cmbAtlasGroups->clear();
+    ui->cmbAtlasGroups->setModel(m_pModel);
 
     QList<AtlasTreeItem *> atlasTreeItemList = m_pModel->GetTopLevelTreeItemList();
     for(int i = 0; i < atlasTreeItemList.size(); ++i)

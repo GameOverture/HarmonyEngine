@@ -997,3 +997,28 @@ void AtlasModel::Refresh()
 
 }
 
+/*virtual*/ int AtlasModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
+{
+    return m_AtlasGrpList.size();
+}
+
+/*virtual*/ QVariant AtlasModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
+{
+    if (role == Qt::TextAlignmentRole)
+        return Qt::AlignLeft;
+
+    if(role == Qt::DisplayRole || role == Qt::EditRole)
+        return m_AtlasGrpList[index.row()]->m_PackerSettings["txtName"].toString();
+
+    return QVariant();
+}
+
+/*virtual*/ bool AtlasModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
+{
+    return QAbstractItemModel::setData(index, value, role);
+}
+
+/*virtual*/ QVariant AtlasModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
+{
+    return QVariant();
+}

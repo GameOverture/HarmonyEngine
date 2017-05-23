@@ -10,12 +10,12 @@
 #ifndef ATLASMODEL_H
 #define ATLASMODEL_H
 
-#include <QObject>
+#include <QAbstractListModel>
 
 #include "AtlasFrame.h"
 #include "scriptum/imagepacker.h"
 
-class AtlasModel : public QObject
+class AtlasModel : public QAbstractListModel
 {
     Q_OBJECT
 
@@ -121,6 +121,11 @@ public:
     void Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet);
     void ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex, int iActualTextureIndex);
     void Refresh();
+    
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+    virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 };
 
 #endif // ATLASMODEL_H
