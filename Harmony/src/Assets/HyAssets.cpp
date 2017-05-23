@@ -104,29 +104,56 @@ void HyAssets::ParseInitInfo()
 	std::string sAtlasInfoFileContents;
 	HyReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
 
-	jsonxx::Object atlasObject;
-	if(atlasObject.parse(sAtlasInfoFileContents))
+	jsonxx::Array atlasGrpArray;
+	if(atlasGrpArray.parse(sAtlasInfoFileContents))
 	{
-		jsonxx::Array texturesArray = atlasObject.get<jsonxx::Array>("textures");
-
-		m_uiNumAtlases = static_cast<uint32>(texturesArray.size());
+		// Iterate through each atlas group and determine how many textures total there are between all groups
+		m_uiNumAtlases = 0;
+		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
+		{
+			jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
+			jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
+			m_uiNumAtlases += static_cast<uint32>(texturesArray.size());
+		}
 		m_pAtlases = reinterpret_cast<HyAtlas *>(HY_NEW unsigned char[sizeof(HyAtlas) * m_uiNumAtlases]);
 		HyAtlas *pAtlasWriteLocation = m_pAtlases;
 
-		for(uint32 i = 0; i < m_uiNumAtlases; ++i, ++pAtlasWriteLocation)
+		// Then iterate back over each atlas group and instantiate a HyAtlas for each texture
+		uint32 uiAtlasIndex = 0;
+		char szTmpBuffer[16];
+		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
 		{
-			std::string sAtlasFilePath = m_sDATADIR + HYASSETS_AtlasDir;
-			char szTmpBuffer[16];
-			std::sprintf(szTmpBuffer, "%05d", i);
-			sAtlasFilePath += szTmpBuffer;
-			sAtlasFilePath += ".png";
+			jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
 
-			new (pAtlasWriteLocation)HyAtlas(sAtlasFilePath,
-											 i,
-											 static_cast<int32>(atlasObject.get<jsonxx::Number>("width")),
-											 static_cast<int32>(atlasObject.get<jsonxx::Number>("height")),
-											 static_cast<int32>(atlasObject.get<jsonxx::Number>("num8BitClrChannels")),
-											 texturesArray.get<jsonxx::Array>(i));
+			std::string sRootAtlasFilePath = m_sDATADIR + HYASSETS_AtlasDir;
+			std::sprintf(szTmpBuffer, "%05d", atlasGrpObj.get<jsonxx::Number>("atlasGrpId"));
+			sRootAtlasFilePath += szTmpBuffer;
+			sRootAtlasFilePath += "/";
+
+			jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
+			for(uint32 j = 0; j < static_cast<uint32>(texturesArray.size()); ++j)
+			{
+				HyAssert(uiAtlasIndex < m_uiNumAtlases, "HyAssets::ParseInitInfo instantiated too many atlases");
+
+				std::string sAtlasFilePath = sRootAtlasFilePath;
+				std::sprintf(szTmpBuffer, "%05d", j);
+				sAtlasFilePath += szTmpBuffer;
+
+				if(atlasGrpObj.get<jsonxx::Number>("textureType") == 0)
+					sAtlasFilePath += ".png";
+				else
+					sAtlasFilePath += ".dds";
+
+				new (pAtlasWriteLocation)HyAtlas(sAtlasFilePath,
+												 j,
+												 static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("width")),
+												 static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("height")),
+												 4,//static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("num8BitClrChannels")),
+												 texturesArray.get<jsonxx::Array>(j));
+
+				++pAtlasWriteLocation;
+				++uiAtlasIndex;
+			}
 		}
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
