@@ -19,8 +19,8 @@ HyTweenFloat::HyTweenFloat(float &valueReference, IHyNode &ownerRef, HyNodeDirty
 																									m_fTarget(0.0f),
 																									m_fDuration(0.0f),
 																									m_fElapsedTime(0.0f),
-																									m_fpTweenFunc(NULL),
-																									m_fpBehaviorUpdate(NULL),
+																									m_fpTweenFunc(nullptr),
+																									m_fpBehaviorUpdate(nullptr),
 																									m_fpTweenFinishedFunc(HyTween::NullTweenCallback),
 																									m_bAddedToOwnerUpdate(false)
 {
@@ -87,7 +87,7 @@ void HyTweenFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFu
 
 void HyTweenFloat::StopTween()
 {
-	m_fpBehaviorUpdate = NULL;
+	m_fpBehaviorUpdate = nullptr;
 	m_fpTweenFinishedFunc = HyTween::NullTweenCallback;
 }
 
@@ -199,14 +199,20 @@ HyTweenFloat &HyTweenFloat::operator/=(const HyTweenFloat &rhs)
 // Returns false if updating is still continuing. True when finished, which signals to IHyNode to remove this instance from the ActiveAnimFloat vector
 bool HyTweenFloat::UpdateFloat()
 {
-	if(m_fpBehaviorUpdate == NULL)
+	if(m_fpBehaviorUpdate == nullptr)
 		return true;
 
 	if((this->*m_fpBehaviorUpdate)())
 	{
-		m_fpTweenFinishedFunc(&m_OwnerRef);
-		m_fpTweenFinishedFunc = HyTween::NullTweenCallback;
-		return true;
+		// Store the callback in a temp func pointer and clear 'm_fpBehaviorUpdate' with StopTween().
+		// When invoking the temp callback, if it happens to set 'm_fpBehaviorUpdate' again, it will stay 
+		// assigned and not be removed from m_OwnerRef's update
+		HyTweenFinishedCallback tmpTweenFinishedFunc = m_fpTweenFinishedFunc;
+
+		StopTween();
+		tmpTweenFinishedFunc(&m_OwnerRef);
+
+		return (m_fpBehaviorUpdate == nullptr);
 	}
 	else
 		return false;
