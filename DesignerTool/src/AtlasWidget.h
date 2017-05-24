@@ -98,6 +98,8 @@ private Q_SLOTS:
 
     void on_actionRename_triggered();
 
+    void on_cmbAtlasGroups_currentIndexChanged(int index);
+    
 private:
     Ui::AtlasWidget *ui;
 

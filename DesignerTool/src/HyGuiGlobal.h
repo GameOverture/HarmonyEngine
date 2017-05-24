@@ -63,6 +63,16 @@ enum eAtlasNodeType
     NUMATLAS
 };
 
+enum AtlasTextureType
+{
+    ATLASTEXTYPE_R8G8B8A8 = 0,
+    ATLASTEXTYPE_DTX5,
+    ATLASTEXTYPE_DTX3,
+    ATLASTEXTYPE_DTX1,
+    
+    NUMATLASTEXTYPE
+};
+
 enum eAudioNodeType
 {
     AUDIO_Wave = 0,
@@ -257,6 +267,23 @@ public:
             list.append(sm_sItemNames[itemList[i]]);
         
         return list;
+    }
+    
+    static QString AtlasTextureTypeString(AtlasTextureType eType)
+    {
+        switch(eType)
+        {
+        case ATLASTEXTYPE_R8G8B8A8:
+            return "R8G8B8A8";
+        case ATLASTEXTYPE_DTX5:
+            return "DTX5";
+        case ATLASTEXTYPE_DTX3:
+            return "DTX3";
+        case ATLASTEXTYPE_DTX1:
+            return "DTX1";
+        }
+        
+        return "";
     }
     
     static const QString &ItemName(eItemType eItm)                  { return sm_sItemNames[eItm]; }

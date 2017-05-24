@@ -84,11 +84,13 @@ public:
     QList<AtlasFrame *> GetFrames(uint uiAtlasGrpIndex);
 
     QJsonObject GetPackerSettings(uint uiAtlasGrpIndex);
+    void SetPackerSettings(uint uiAtlasGrpIndex, QJsonObject newPackerSettingsObj);
 
     void StashTreeWidgets(QList<AtlasTreeItem *> treeItemList);
     QList<AtlasTreeItem *> GetTopLevelTreeItemList();
 
     QSize GetAtlasDimensions(uint uiAtlasGrpIndex);
+    AtlasTextureType GetAtlasTextureType(uint uiAtlasGrpIndex);
 
     void WriteMetaSettings();
     void WriteMetaSettings(QJsonArray frameArray);
@@ -117,7 +119,7 @@ public:
     
     QFileInfoList GetExistingTextureInfoList(uint uiAtlasGrpIndex);
 
-    void RepackAll(uint uiAtlasGrpIndex, bool bForceRepack);
+    void RepackAll(uint uiAtlasGrpIndex);
     void Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet);
     void ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex, int iActualTextureIndex);
     void Refresh();

@@ -395,7 +395,7 @@ void MainWindow::on_actionNewProject_triggered()
         }
 
         ui->explorer->SelectItem(ui->explorer->AddItemProject(pDlg->GetProjFilePath()));
-        ui->explorer->GetCurProjSelected()->GetAtlasModel().RepackAll(0, true);
+        ui->explorer->GetCurProjSelected()->GetAtlasModel().RepackAll(0);
     }
     delete pDlg;
 }

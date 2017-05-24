@@ -13,6 +13,7 @@
 #include "AtlasWidget.h"
 #include "MainWindow.h"
 #include "HyGuiGlobal.h"
+#include "DlgAtlasGroupSettings.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -214,23 +215,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
         m_uiNextAtlasId = 1;
         
         AtlasGrp *pNewAtlasGrp = new AtlasGrp(m_RootDataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(0)));
-        
-        pNewAtlasGrp->m_PackerSettings.insert("txtName", "Default");
-        pNewAtlasGrp->m_PackerSettings.insert("atlasGrpId", 0);
-        pNewAtlasGrp->m_PackerSettings.insert("textureType", 0);
-        pNewAtlasGrp->m_PackerSettings.insert("chkAutosize", true);
-        pNewAtlasGrp->m_PackerSettings.insert("chkMerge", true);
-        pNewAtlasGrp->m_PackerSettings.insert("chkSquare", true);
-        pNewAtlasGrp->m_PackerSettings.insert("cmbHeuristic", 1);
-        pNewAtlasGrp->m_PackerSettings.insert("cmbSortOrder", 0);
-        pNewAtlasGrp->m_PackerSettings.insert("extrude", 1);
-        pNewAtlasGrp->m_PackerSettings.insert("minFillRate", 80);
-        pNewAtlasGrp->m_PackerSettings.insert("sbFrameMarginBottom", 1);
-        pNewAtlasGrp->m_PackerSettings.insert("sbFrameMarginLeft", 0);
-        pNewAtlasGrp->m_PackerSettings.insert("sbFrameMarginRight", 1);
-        pNewAtlasGrp->m_PackerSettings.insert("sbFrameMarginTop", 0);
-        pNewAtlasGrp->m_PackerSettings.insert("sbTextureHeight", 2048);
-        pNewAtlasGrp->m_PackerSettings.insert("sbTextureWidth", 2048);
+        pNewAtlasGrp->m_PackerSettings = DlgAtlasGroupSettings::GenerateDefaultSettingsObj();
         
         m_AtlasGrpList.push_back(pNewAtlasGrp);
     }
@@ -264,6 +249,11 @@ QJsonObject AtlasModel::GetPackerSettings(uint uiAtlasGrpIndex)
     return m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings;
 }
 
+void AtlasModel::SetPackerSettings(uint uiAtlasGrpIndex, QJsonObject newPackerSettingsObj)
+{
+    m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings = newPackerSettingsObj;
+}
+
 void AtlasModel::StashTreeWidgets(QList<AtlasTreeItem *> treeItemList)
 {
     m_TopLevelTreeItemList = treeItemList;
@@ -280,6 +270,11 @@ QSize AtlasModel::GetAtlasDimensions(uint uiAtlasGrpIndex)
     int iHeight = m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbTextureHeight"].toInt();
     
     return QSize(iWidth, iHeight);
+}
+
+AtlasTextureType AtlasModel::GetAtlasTextureType(uint uiAtlasGrpIndex)
+{
+    return static_cast<AtlasTextureType>(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["textureType"].toInt());
 }
 
 void AtlasModel::WriteMetaSettings()
@@ -708,7 +703,7 @@ QFileInfoList AtlasModel::GetExistingTextureInfoList(uint uiAtlasGrpIndex)
     return m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 }
 
-void AtlasModel::RepackAll(uint uiAtlasGrpIndex, bool bForceRepack)
+void AtlasModel::RepackAll(uint uiAtlasGrpIndex)
 {
     int iNumTotalTextures = GetExistingTextureInfoList(uiAtlasGrpIndex).size();
     
@@ -716,8 +711,10 @@ void AtlasModel::RepackAll(uint uiAtlasGrpIndex, bool bForceRepack)
     for(int i = 0; i < iNumTotalTextures; ++i)
         textureIndexSet.insert(i);
 
-    if(textureIndexSet.empty() == false || bForceRepack)
+    if(textureIndexSet.empty() == false)
         Repack(uiAtlasGrpIndex, textureIndexSet, QSet<AtlasFrame *>());
+    else
+        Refresh();
 }
 
 void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)

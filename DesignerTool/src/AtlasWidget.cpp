@@ -82,6 +82,9 @@ AtlasWidget::AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *pa
     ui->btnDeleteImages->setDefaultAction(ui->actionDeleteImages);
     ui->btnReplaceImages->setDefaultAction(ui->actionReplaceImages);
     ui->btnAddFilter->setDefaultAction(ui->actionAddFilter);
+    
+    ui->btnAddGroup->setDefaultAction(ui->actionAddGroup);
+    ui->btnRemoveGroup->setDefaultAction(ui->actionRemoveGroup);
 
     ui->atlasList->SetOwner(this);
 
@@ -144,9 +147,11 @@ void AtlasWidget::RefreshLcds()
 {
     uint uiAtlasGrpIndex = ui->cmbAtlasGroups->currentIndex();
     
-    ui->lcdNumTextures->display(m_pModel->GetExistingTextureInfoList(uiAtlasGrpIndex).size());
-    ui->lcdTexWidth->display(m_pModel->GetAtlasDimensions(uiAtlasGrpIndex).width());
-    ui->lcdTexHeight->display(m_pModel->GetAtlasDimensions(uiAtlasGrpIndex).height());
+    ui->lblNumTextures->setText(QString::number(m_pModel->GetExistingTextureInfoList(uiAtlasGrpIndex).size()));
+    ui->lblTexDimensions->setText("(" % QString::number(m_pModel->GetAtlasDimensions(uiAtlasGrpIndex).width()) % "x" % QString::number(m_pModel->GetAtlasDimensions(uiAtlasGrpIndex).height()) % ")");
+    ui->lblTexType->setText(HyGlobal::AtlasTextureTypeString(m_pModel->GetAtlasTextureType(uiAtlasGrpIndex)));
+    
+    ui->actionRemoveGroup->setEnabled(uiAtlasGrpIndex != 0);
 }
 
 /*virtual*/ void AtlasWidget::enterEvent(QEvent *pEvent) /*override*/
@@ -222,22 +227,20 @@ void AtlasWidget::on_btnAddDir_clicked()
 void AtlasWidget::on_btnSettings_clicked()
 {
     DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex()));
-    if(pDlg->GetName().isEmpty())
-        pDlg->SetName("Atlas Group");
-
-    pDlg->DataToWidgets();
     if(QDialog::Accepted == pDlg->exec())
     {
-        pDlg->WidgetsToData();  // Save the changes
-
+        QJsonObject newPackerSettings = m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex());
+        pDlg->ApplyCurrentSettingsToObj(newPackerSettings);
+        
+        m_pModel->SetPackerSettings(ui->cmbAtlasGroups->currentIndex(), newPackerSettings);
+        
         if(pDlg->IsSettingsDirty())
-            m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex(), false);
+            m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex());
         else if(pDlg->IsNameChanged())
             m_pModel->WriteMetaSettings();
     }
-    else
-        pDlg->DataToWidgets();  // Reverts changes made
     
+    delete pDlg;
     RefreshLcds();
 }
 
@@ -483,4 +486,9 @@ void AtlasWidget::on_actionRename_triggered()
     }
 
     delete pDlg;
+}
+
+void AtlasWidget::on_cmbAtlasGroups_currentIndexChanged(int index)
+{
+    RefreshLcds();
 }

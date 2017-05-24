@@ -11,6 +11,7 @@
 #define DLGATLASGROUPSETTINGS_H
 
 #include <QDialog>
+#include <QJsonObject>
 
 namespace Ui {
 class DlgAtlasGroupSettings;
@@ -19,54 +20,27 @@ class DlgAtlasGroupSettings;
 class DlgAtlasGroupSettings : public QDialog
 {
     Q_OBJECT
-
-    QString     m_sName;
     
-    int         m_iTextureWidth;
-    int         m_iTextureHeight;
-    int         m_iHeuristicIndex;
-    int         m_iSortOrderIndex;
-    int         m_iFrameMarginTop;
-    int         m_iFrameMarginLeft;
-    int         m_iFrameMarginRight;
-    int         m_iFrameMarginBottom;
-    int         m_iExtrude;
-    bool        m_bMerge;
-    bool        m_bAutoSize;
-    bool        m_bSquare;
-    int         m_iFillRate;
-
-    bool        m_bSettingsDirty;
-    bool        m_bNameChanged;
+    QJsonObject m_InitialPackerSettingsObj;
 
 public:
     explicit DlgAtlasGroupSettings(QJsonObject packerSettingsObj, QWidget *parent = 0);
     ~DlgAtlasGroupSettings();
     
-    bool IsSettingsDirty()      { return m_bSettingsDirty; }
-    bool IsNameChanged()        { return m_bNameChanged; }
-
-    void WidgetsToData();
-    void DataToWidgets();
-
-    QString GetName();
-    void SetName(QString sName);
+    static QJsonObject GenerateDefaultSettingsObj();
     
-    int TextureWidth();
-    int TextureHeight();
-
-    int GetHeuristic();
-
-    QJsonObject GetSettings();
-    void LoadSettings(QJsonObject settings);
+    bool IsSettingsDirty();
+    bool IsNameChanged();
+    
+    void ApplyCurrentSettingsToObj(QJsonObject &settingsObjOut);
 
 private Q_SLOTS:
     void on_btnTexSize256_clicked();
     void on_btnTexSize512_clicked();
     void on_btnTexSize1024_clicked();
     void on_btnTexSize2048_clicked();
-    void on_buttonBox_accepted();
-    void on_buttonBox_rejected();
+    
+    virtual void done(int r);
 
 private:
     Ui::DlgAtlasGroupSettings *ui;
