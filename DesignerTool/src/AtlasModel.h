@@ -113,6 +113,9 @@ public:
     AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, eAtlasNodeType eType);
 
     void SaveData();
+    
+    void CreateNewAtlasGrp(QString sName);
+    void RemoveAtlasGrp(quint32 uiAtlasGrpId);
 
     uint GetAtlasGrpIndexFromAtlasGrpId(quint32 uiAtlasGrpId);
     quint32 GetAtlasGrpIdFromAtlasGrpIndex(uint uiAtlasGrpIndex);

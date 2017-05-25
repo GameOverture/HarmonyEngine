@@ -17,11 +17,12 @@
 
 class HyTexturedQuad2dData : public IHyNodeData
 {
-	const uint32		m_uiATLAS_INDEX;
+	const uint32		m_uiATLAS_GROUP_ID;
+	const uint32		m_uiINDEX_IN_GROUP;
 	HyAtlas *			m_pAtlas;
 
 public:
-	HyTexturedQuad2dData(const std::string &sPath, HyAssets &assetsRef);
+	HyTexturedQuad2dData(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyAssets &assetsRef);
 	virtual ~HyTexturedQuad2dData();
 
 	HyAtlas *GetAtlas();

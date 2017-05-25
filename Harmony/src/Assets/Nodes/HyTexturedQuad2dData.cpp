@@ -12,18 +12,13 @@
 #include "Renderer/IHyRenderer.h"
 
 
-HyTexturedQuad2dData::HyTexturedQuad2dData(const std::string &sPath, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_TexturedQuad2d, sPath),
-																							m_uiATLAS_INDEX(sPath == "raw" ? 0xFFFFFFFF : std::stoi(sPath)),
-																							m_pAtlas(nullptr)
+HyTexturedQuad2dData::HyTexturedQuad2dData(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_TexturedQuad2d, "N/A"),
+																												m_uiATLAS_GROUP_ID(uiAtlasGrpId),
+																												m_uiINDEX_IN_GROUP(uiIndexInGroup),
+																												m_pAtlas(nullptr)
 {
-	//if(m_uiATLASGROUP_ID == 0xFFFFFFFF)
-	//	SetLoadState(HYLOADSTATE_Loaded);
-	
-	if(m_uiATLAS_INDEX != 0xFFFFFFFF)
-	{
-		m_pAtlas = assetsRef.GetAtlas(m_uiATLAS_INDEX);
-		m_RequiredAtlasIndices.Set(m_uiATLAS_INDEX);
-	}
+	m_pAtlas = assetsRef.GetAtlasUsingGroupId(m_uiATLAS_GROUP_ID, m_uiINDEX_IN_GROUP);
+	m_RequiredAtlasIndices.Set(m_pAtlas->GetMasterIndex());
 }
 
 HyTexturedQuad2dData::~HyTexturedQuad2dData()

@@ -53,7 +53,7 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(*p
             while(m_MasterList.size() <= uiTextureIndex)
                 m_MasterList.append(new TextureEnt(this));
             
-            HyTexturedQuad2d *pNewTexQuad = new HyTexturedQuad2d(uiTextureIndex, m_MasterList[uiTextureIndex]);
+            HyTexturedQuad2d *pNewTexQuad = new HyTexturedQuad2d(frameList[j]->GetAtlasGrpId(), uiTextureIndex, m_MasterList[uiTextureIndex]);
             pNewTexQuad->SetTextureSource(frameList[j]->GetX(), frameList[j]->GetY(), frameList[j]->GetCrop().width(), frameList[j]->GetCrop().height());
             pNewTexQuad->SetDisplayOrder(DISPLAYORDER_AtlasSelectedFrames);
             

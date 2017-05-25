@@ -212,16 +212,10 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
     else
     {
         m_uiNextFrameId = 0;
-        m_uiNextAtlasId = 1;
+        m_uiNextAtlasId = 0;
         
-        AtlasGrp *pNewAtlasGrp = new AtlasGrp(m_RootDataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(0)));
-        pNewAtlasGrp->m_PackerSettings = DlgAtlasGroupSettings::GenerateDefaultSettingsObj();
-        
-        m_AtlasGrpList.push_back(pNewAtlasGrp);
+        CreateNewAtlasGrp("Default");
     }
-
-    if(m_TopLevelTreeItemList.empty())
-        WriteMetaSettings();
 }
 
 /*virtual*/ AtlasModel::~AtlasModel()
@@ -672,6 +666,57 @@ void AtlasModel::SaveData()
 //    atlasObjOut.insert("textures", textureArray);
 //}
 
+void AtlasModel::CreateNewAtlasGrp(QString sName)
+{
+    m_RootDataDir.mkdir(HyGlobal::MakeFileNameFromCounter(m_uiNextAtlasId));
+    
+    AtlasGrp *pNewAtlasGrp = new AtlasGrp(m_RootDataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_uiNextAtlasId)));
+    pNewAtlasGrp->m_PackerSettings = DlgAtlasGroupSettings::GenerateDefaultSettingsObj();
+    pNewAtlasGrp->m_PackerSettings.insert("txtName", sName);
+    pNewAtlasGrp->m_PackerSettings.insert("atlasGrpId", QJsonValue(static_cast<qint64>(m_uiNextAtlasId)));
+    
+    beginInsertRows(QModelIndex(), m_AtlasGrpList.count(), m_AtlasGrpList.count());
+    m_AtlasGrpList.push_back(pNewAtlasGrp);
+    endInsertRows();
+    
+    m_uiNextAtlasId++;
+    WriteMetaSettings();
+}
+
+void AtlasModel::RemoveAtlasGrp(quint32 uiAtlasGrpId)
+{
+    if(uiAtlasGrpId == 0) {
+        HyGuiLog("AtlasModel::RemoveAtlasGrp is trying to remove atlas group id: 0", LOGTYPE_Error);
+    }
+    
+    for(int i = 0; i < m_AtlasGrpList.size(); ++i)
+    {
+        if(m_AtlasGrpList[i]->GetId() == uiAtlasGrpId)
+        {
+            if(m_AtlasGrpList[i]->m_FrameList.empty())
+            {
+                AtlasGrp *pAtlasGrpToBeRemoved = m_AtlasGrpList[i];
+                
+                beginRemoveRows(QModelIndex(), i, i);
+                m_AtlasGrpList.removeAt(i);
+                endRemoveRows();
+                
+                delete pAtlasGrpToBeRemoved;
+                m_RootDataDir.rmdir(HyGlobal::MakeFileNameFromCounter(uiAtlasGrpId));
+                
+                WriteMetaSettings();
+            }
+            else {
+                HyGuiLog("Cannot remove atlas group since it has " % QString::number(m_AtlasGrpList[i]->m_FrameList.size()) % " image(s) that are still linked to this group.", LOGTYPE_Info);
+            }
+            
+            return;
+        }
+    }
+    
+    HyGuiLog("AtlasModel::RemoveAtlasGrp could not find atlas group ID: " % QString::number(uiAtlasGrpId), LOGTYPE_Error);
+}
+
 uint AtlasModel::GetAtlasGrpIndexFromAtlasGrpId(quint32 uiAtlasGrpId)
 {
     uint uiAtlasGrpIndex = 0xFFFFFFFF;
@@ -967,13 +1012,20 @@ void AtlasModel::ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex
     
     // TODO: Properly save differernt types of textures here (PNG, DTX5, DTX3, etc.)
     if(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["textureType"].toInt() == 0)
-        pTexture->save(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".png"));
+    {
+        if(pTexture->save(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".png")) == false) {
+            HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a PNG atlas", LOGTYPE_Error);
+        }
+    }
     else
     {
         QImageWriter writer(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds"));
         if (writer.supportsOption(QImageIOHandler::SubType))
             writer.setSubType("A8R8G8B8");
-        writer.write(*pTexture);
+        
+        if(writer.write(*pTexture) == false) {
+            HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a DDS atlas.\n\n" % writer.errorString(), LOGTYPE_Error);
+        }
     }
 }
 
@@ -1005,7 +1057,7 @@ void AtlasModel::Refresh()
         return Qt::AlignLeft;
 
     if(role == Qt::DisplayRole || role == Qt::EditRole)
-        return m_AtlasGrpList[index.row()]->m_PackerSettings["txtName"].toString();
+        return "Grp: " % QString::number(m_AtlasGrpList[index.row()]->GetId()) % " - " % m_AtlasGrpList[index.row()]->m_PackerSettings["txtName"].toString();
 
     return QVariant();
 }

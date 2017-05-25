@@ -53,7 +53,7 @@ AtlasTreeItem *AtlasFrame::GetTreeItem()
 
     if(m_iTextureIndex >= 0)
     {
-        m_pTreeWidgetItem->setText(1, "Tex:" % QString::number(GetTextureIndex()));
+        m_pTreeWidgetItem->setText(1, "Grp:" % QString::number(m_uiAtlasGrpId));
         ClearError(GUIFRAMEERROR_CouldNotPack);
     }
     else
@@ -148,7 +148,7 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
         ClearError(GUIFRAMEERROR_CouldNotPack);
 
         if(m_pTreeWidgetItem)
-            m_pTreeWidgetItem->setText(1, "Tex:" % QString::number(m_iTextureIndex));
+            m_pTreeWidgetItem->setText(1, "Grp:" % QString::number(m_uiAtlasGrpId));
     }
     else
     {

@@ -495,10 +495,18 @@ void AtlasWidget::on_cmbAtlasGroups_currentIndexChanged(int index)
 
 void AtlasWidget::on_actionAddGroup_triggered()
 {
-
+    DlgInputName *pDlg = new DlgInputName("Creating New Atlas Group", "NewAtlasGroup");
+    
+    if(pDlg->exec() == QDialog::Accepted)
+        m_pModel->CreateNewAtlasGrp(pDlg->GetName());
+    
+    delete pDlg;
 }
 
 void AtlasWidget::on_actionRemoveGroup_triggered()
 {
-
+    uint uiCurIndex = ui->cmbAtlasGroups->currentIndex();
+    ui->cmbAtlasGroups->setCurrentIndex(0);
+    
+    m_pModel->RemoveAtlasGrp(m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(uiCurIndex));
 }

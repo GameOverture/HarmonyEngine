@@ -119,21 +119,22 @@ void HyAssets::ParseInitInfo()
 		HyAtlas *pAtlasWriteLocation = m_pAtlases;
 
 		// Then iterate back over each atlas group and instantiate a HyAtlas for each texture
-		uint32 uiAtlasIndex = 0;
+		uint32 uiMasterIndex = 0;
 		char szTmpBuffer[16];
 		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
 		{
 			jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
+			uint32 uiAtlasGroupId = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("atlasGrpId"));
 
 			std::string sRootAtlasFilePath = m_sDATADIR + HYASSETS_AtlasDir;
-			std::sprintf(szTmpBuffer, "%05d", static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("atlasGrpId")));
+			std::sprintf(szTmpBuffer, "%05d", uiAtlasGroupId);
 			sRootAtlasFilePath += szTmpBuffer;
 			sRootAtlasFilePath += "/";
 
 			jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
 			for(uint32 j = 0; j < static_cast<uint32>(texturesArray.size()); ++j)
 			{
-				HyAssert(uiAtlasIndex < m_uiNumAtlases, "HyAssets::ParseInitInfo instantiated too many atlases");
+				HyAssert(uiMasterIndex < m_uiNumAtlases, "HyAssets::ParseInitInfo instantiated too many atlases");
 
 				std::string sAtlasFilePath = sRootAtlasFilePath;
 				std::sprintf(szTmpBuffer, "%05d", j);
@@ -145,14 +146,16 @@ void HyAssets::ParseInitInfo()
 					sAtlasFilePath += ".dds";
 
 				new (pAtlasWriteLocation)HyAtlas(sAtlasFilePath,
+												 uiAtlasGroupId,
 												 j,
+												 uiMasterIndex,
 												 static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("width")),
 												 static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("height")),
 												 4,//static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("num8BitClrChannels")),
 												 texturesArray.get<jsonxx::Array>(j));
 
 				++pAtlasWriteLocation;
-				++uiAtlasIndex;
+				++uiMasterIndex;
 			}
 		}
 	}
@@ -206,6 +209,17 @@ HyAtlas *HyAssets::GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut)
 	return nullptr;
 }
 
+HyAtlas *HyAssets::GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup)
+{
+	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+	{
+		if(m_pAtlases[i].GetAtlasGroupId() == uiAtlasGrpId && m_pAtlases[i].GetIndexInGroup() == uiIndexInGroup)
+			return &m_pAtlases[i];
+	}
+
+	return nullptr;
+}
+
 uint32 HyAssets::GetNumAtlases()
 {
 	return m_uiNumAtlases;
@@ -232,12 +246,13 @@ void HyAssets::GetNodeData(IHyLeafDraw2d *pDrawNode2d, IHyNodeData *&pDataOut)
 	case HYTYPE_TexturedQuad2d:
 		if(pDrawNode2d->GetName() != "raw")
 		{
-			if(m_Quad2d.find(std::stoi(pDrawNode2d->GetName())) == m_Quad2d.end())
+			std::pair<uint32, uint32> key(std::stoi(pDrawNode2d->GetPrefix()), std::stoi(pDrawNode2d->GetName()));
+			if(m_Quad2d.find(key) == m_Quad2d.end())
 			{
-				HyTexturedQuad2dData *pNewQuadData = HY_NEW HyTexturedQuad2dData(pDrawNode2d->GetName(), *this);
-				m_Quad2d[std::stoi(pDrawNode2d->GetName())] = pNewQuadData;
+				HyTexturedQuad2dData *pNewQuadData = HY_NEW HyTexturedQuad2dData(key.first, key.second, *this);
+				m_Quad2d[key] = pNewQuadData;
 			}
-			pDataOut = m_Quad2d[std::stoi(pDrawNode2d->GetName())];
+			pDataOut = m_Quad2d[key];
 		}
 		break;
 	}
@@ -449,7 +464,7 @@ void HyAssets::DequeData(IHyLoadableData *pData)
 			pData->m_eLoadState = HYLOADSTATE_Discarded;
 
 			if(pData->GetType() == HYGFXTYPE_AtlasGroup)
-				m_pLoadedAtlasIndices->Clear(static_cast<HyAtlas *>(pData)->GetIndex());
+				m_pLoadedAtlasIndices->Clear(static_cast<HyAtlas *>(pData)->GetMasterIndex());
 
 			m_Load_Prepare.push(pData);
 		}
@@ -483,8 +498,8 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 
 			if(pData->GetType() == HYGFXTYPE_AtlasGroup)
 			{
-				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetIndex() << "] loaded");
-				m_pLoadedAtlasIndices->Set(static_cast<HyAtlas *>(pData)->GetIndex());
+				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] loaded");
+				m_pLoadedAtlasIndices->Set(static_cast<HyAtlas *>(pData)->GetMasterIndex());
 			}
 			else {
 				HyLogInfo("Custom Shader Loaded");
@@ -513,7 +528,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 				pData->m_eLoadState = HYLOADSTATE_Queued;
 
 				if(pData->GetType() == HYGFXTYPE_AtlasGroup) {
-					HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetIndex() << "] reloading");
+					HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] reloading");
 				}
 				else {
 					HyLogInfo("Custom Shader reloading");
@@ -532,7 +547,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 			pData->m_eLoadState = HYLOADSTATE_Inactive;
 
 			if(pData->GetType() == HYGFXTYPE_AtlasGroup) {
-				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetIndex() << "] deleted");
+				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] deleted");
 			}
 			else {
 				HyLogInfo("Custom Shader deleted");

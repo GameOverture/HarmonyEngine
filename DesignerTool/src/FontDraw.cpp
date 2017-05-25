@@ -58,7 +58,7 @@ void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelD
 
     // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
     delete m_pDrawAtlasPreview;
-    m_pDrawAtlasPreview = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height));
+    m_pDrawAtlasPreview = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), nullptr);
     m_pDrawAtlasPreview->Load();
     m_pDrawAtlasPreview->SetTextureSource(0, 0, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height));
 
@@ -120,7 +120,7 @@ void FontDraw::GenerateTextPreview(FontTableModel *pFontModel, QString sFontPrev
             int iWidth = static_cast<int>(pGlyph->s1 * static_cast<float>(pAtlas->width)) - iX - 1;
             int iHeight = static_cast<int>(pGlyph->t1 * static_cast<float>(pAtlas->height)) - iY - 1;
 
-            HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height));
+            HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), nullptr);
             pDrawGlyphQuad->Load();
             pDrawGlyphQuad->SetTextureSource(iX, iY, iWidth, iHeight);
             pDrawGlyphQuad->pos.Set(ptGlyphPos.x + pGlyph->offset_x, ptGlyphPos.y);

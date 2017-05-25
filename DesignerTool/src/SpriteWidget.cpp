@@ -285,6 +285,8 @@ void SpriteWidget::on_actionRenameState_triggered()
         QUndoCommand *pCmd = new UndoCmd_RenameState("Rename Sprite State", m_ItemRef, pDlg->GetName(), ui->cmbStates->currentIndex());
         m_ItemRef.GetUndoStack()->push(pCmd);
     }
+    
+    delete pDlg;
 }
 
 void SpriteWidget::on_actionOrderStateBackwards_triggered()

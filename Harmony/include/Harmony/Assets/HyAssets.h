@@ -56,12 +56,12 @@ class HyAssets
 		void Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef);
 		tData *GetData(const std::string &sPrefix, const std::string &sName);
 	};
-	NodeData<HyAudioData>								m_Audio;
-	NodeData<HySprite2dData>							m_Sprite2d;
-	NodeData<HySpine2dData>								m_Spine2d;
-	NodeData<HyMesh3dData>								m_Mesh3d;
-	NodeData<HyText2dData>								m_Txt2d;
-	std::map<int32, HyTexturedQuad2dData *>				m_Quad2d;
+	NodeData<HyAudioData>										m_Audio;
+	NodeData<HySprite2dData>									m_Sprite2d;
+	NodeData<HySpine2dData>										m_Spine2d;
+	NodeData<HyMesh3dData>										m_Mesh3d;
+	NodeData<HyText2dData>										m_Txt2d;
+	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
 	std::vector<IHyLeafDraw2d *>						m_QueuedInst2dList;
 	std::vector<IHyLoadableData *>						m_ReloadDataList;
@@ -112,6 +112,7 @@ public:
 
 	HyAtlas *GetAtlas(uint32 uiIndex);
 	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
+	HyAtlas *GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup);
 
 	uint32 GetNumAtlases();
 	HyAtlasIndices *GetLoadedAtlases();

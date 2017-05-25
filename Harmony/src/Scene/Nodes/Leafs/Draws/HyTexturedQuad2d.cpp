@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyTexturedQuad2d.h
+*	HyTexturedQuad2d.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2015 Jason Knobler
@@ -11,12 +11,13 @@
 #include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasIndex, HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_TexturedQuad2d, NULL, std::to_string(uiAtlasIndex).c_str(), pParent),
-																								m_bIS_RAW(false),
-																								m_uiATLAS_INDEX(uiAtlasIndex),
-																								m_uiRAW_TEXTURE_WIDTH(0),
-																								m_uiRAW_TEXTURE_HEIGHT(0),
-																								m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyEntity2d *pParent) :	IHyLeafDraw2d(HYTYPE_TexturedQuad2d, std::to_string(uiAtlasGrpId).c_str(), std::to_string(uiIndexInGroup).c_str(), pParent),
+																										m_bIS_RAW(false),
+																										m_uiATLAS_GROUP_ID(uiAtlasGrpId),
+																										m_uiATLAS_INDEX_IN_GROUP(uiIndexInGroup),
+																										m_uiRAW_TEXTURE_WIDTH(0),
+																										m_uiRAW_TEXTURE_HEIGHT(0),
+																										m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
@@ -24,12 +25,13 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasIndex, HyEntity2d *pParent /*= 
 	m_RenderState.SetNumVerticesPerInstance(4);
 }
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_TexturedQuad2d, NULL, "raw", pParent),
-																																				m_bIS_RAW(true),
-																																				m_uiATLAS_INDEX(0),
-																																				m_uiRAW_TEXTURE_WIDTH(uiTextureWidth),
-																																				m_uiRAW_TEXTURE_HEIGHT(uiTextureHeight),
-																																				m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent) :	IHyLeafDraw2d(HYTYPE_TexturedQuad2d, nullptr, "raw", pParent),
+																																m_bIS_RAW(true),
+																																m_uiATLAS_GROUP_ID(0),
+																																m_uiATLAS_INDEX_IN_GROUP(0),
+																																m_uiRAW_TEXTURE_WIDTH(uiTextureWidth),
+																																m_uiRAW_TEXTURE_HEIGHT(uiTextureHeight),
+																																m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
 {
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
@@ -41,14 +43,6 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth,
 HyTexturedQuad2d::~HyTexturedQuad2d()
 {
 }
-
-//uint32 HyTexturedQuad2d::GetAtlasIndex()
-//{
-//	if(m_bIS_RAW)
-//		return 0xFFFFFFFF;
-//
-//	return static_cast<HyTexturedQuad2dData *>(AcquireData())->GetAtlas()->GetId();
-//}
 
 uint32 HyTexturedQuad2d::GetGraphicsApiHandle() const
 {
@@ -70,9 +64,9 @@ void HyTexturedQuad2d::SetTextureSource(int iX, int iY, int iWidth, int iHeight)
 	m_SrcRect.bottom = (fY + fHeight) / fTexHeight;
 }
 
-uint32 HyTexturedQuad2d::GetAtlasIndex()
+uint32 HyTexturedQuad2d::GetAtlasIndexInGroup()
 {
-	return m_uiATLAS_INDEX;
+	return m_uiATLAS_INDEX_IN_GROUP;
 }
 
 uint32 HyTexturedQuad2d::GetWidth()

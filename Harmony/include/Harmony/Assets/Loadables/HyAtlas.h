@@ -22,7 +22,9 @@ class HyAssets;
 class HyAtlas : public IHyLoadableData
 {
 	const std::string						m_sFILE_PATH;
-	const uint32							m_uiINDEX;
+	const uint32							m_uiATLAS_GROUP_ID;
+	const uint32							m_uiINDEX_IN_GROUP;
+	const uint32							m_uiMASTER_INDEX;
 	const uint32							m_uiWIDTH;
 	const uint32							m_uiHEIGHT;
 	const uint32							m_uiNUM_8BIT_CHANNELS;
@@ -48,10 +50,12 @@ class HyAtlas : public IHyLoadableData
 	BasicSection							m_csPixelData;
 
 public:
-	HyAtlas(std::string sFilePath, uint32 uiIndex, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &srcFramesArrayRef);
+	HyAtlas(std::string sFilePath, uint32 uiAtlasGroupId, uint32 uiIndexInGroup, uint32 uiMasterIndex, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &srcFramesArrayRef);
 	~HyAtlas();
 
-	uint32 GetIndex() const;
+	uint32 GetAtlasGroupId() const;
+	uint32 GetIndexInGroup() const;
+	uint32 GetMasterIndex() const;
 	uint32 GetWidth() const;
 	uint32 GetHeight() const;
 	uint32 GetGfxApiHandle() const;

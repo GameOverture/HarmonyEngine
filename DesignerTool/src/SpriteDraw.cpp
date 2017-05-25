@@ -31,7 +31,7 @@ SpriteDraw::SpriteDraw(SpriteModel &modelRef, IHyApplication &hyApp) :  IDraw(hy
         {
             AtlasFrame *pFrame = pStateData->GetFramesModel()->GetFrameAt(j)->m_pFrame;
 
-            HyTexturedQuad2d *pNewTexturedQuad = new HyTexturedQuad2d(pFrame->GetTextureIndex(), this);
+            HyTexturedQuad2d *pNewTexturedQuad = new HyTexturedQuad2d(pFrame->GetAtlasGrpId(), pFrame->GetTextureIndex(), this);
             pNewTexturedQuad->SetTextureSource(pFrame->GetX(), pFrame->GetY(), pFrame->GetCrop().width(), pFrame->GetCrop().height());
 
             m_TexturedQuadIdMap.insert(pFrame->GetId(), pNewTexturedQuad);

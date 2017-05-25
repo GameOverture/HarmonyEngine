@@ -101,7 +101,7 @@ HySprite2dData::AnimState::AnimState(std::string sName,
 
 			pAtlas = assetsRef.GetAtlas(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), rUVRect);
 
-			requiredAtlasIndicesRef.Set(pAtlas->GetIndex());
+			requiredAtlasIndicesRef.Set(pAtlas->GetMasterIndex());
 			//m_UsedAtlasIndices.insert(pAtlas->GetIndex());
 
 			HySetVec(vOffset, static_cast<int32>(frameObj.get<jsonxx::Number>("offsetX")), static_cast<int32>(frameObj.get<jsonxx::Number>("offsetY")));

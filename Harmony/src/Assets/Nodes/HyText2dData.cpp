@@ -54,7 +54,7 @@ HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataVa
 	HyRectangle<float> rSubAtlasUVRect;
 	m_pAtlas = assetsRef.GetAtlas(static_cast<uint32>(textObject.get<jsonxx::Number>("checksum")), rSubAtlasUVRect);
 
-	m_RequiredAtlasIndices.Set(m_pAtlas->GetIndex());
+	m_RequiredAtlasIndices.Set(m_pAtlas->GetMasterIndex());
 
 	float fSubAtlasWidth = m_pAtlas->GetWidth() * (rSubAtlasUVRect.right - rSubAtlasUVRect.left);
 	float fSubAtlasHeight = m_pAtlas->GetHeight() * (rSubAtlasUVRect.bottom - rSubAtlasUVRect.top);
