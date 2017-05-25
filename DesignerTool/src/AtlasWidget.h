@@ -100,6 +100,10 @@ private Q_SLOTS:
 
     void on_cmbAtlasGroups_currentIndexChanged(int index);
     
+    void on_actionAddGroup_triggered();
+
+    void on_actionRemoveGroup_triggered();
+
 private:
     Ui::AtlasWidget *ui;
 

@@ -492,3 +492,13 @@ void AtlasWidget::on_cmbAtlasGroups_currentIndexChanged(int index)
 {
     RefreshLcds();
 }
+
+void AtlasWidget::on_actionAddGroup_triggered()
+{
+
+}
+
+void AtlasWidget::on_actionRemoveGroup_triggered()
+{
+
+}
