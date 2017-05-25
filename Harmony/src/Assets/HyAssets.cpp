@@ -126,7 +126,7 @@ void HyAssets::ParseInitInfo()
 			jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
 
 			std::string sRootAtlasFilePath = m_sDATADIR + HYASSETS_AtlasDir;
-			std::sprintf(szTmpBuffer, "%05d", atlasGrpObj.get<jsonxx::Number>("atlasGrpId"));
+			std::sprintf(szTmpBuffer, "%05d", static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("atlasGrpId")));
 			sRootAtlasFilePath += szTmpBuffer;
 			sRootAtlasFilePath += "/";
 
