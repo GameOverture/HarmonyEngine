@@ -12,7 +12,10 @@
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
 
-#include "Utilities/stb_image.h"
+#define STBI_MALLOC
+#define STBI_REALLOC
+#define STBI_FREE
+#include "soil2/SOIL2.h"
 
 #include <set>
 
@@ -111,8 +114,8 @@ bool HyAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
 
 void HyAtlas::DeletePixelData()
 {
-	stbi_image_free(m_pPixelData);
-	m_pPixelData = NULL;
+	SOIL_free_image_data(m_pPixelData);// stbi_image_free(m_pPixelData);
+	m_pPixelData = nullptr;
 }
 
 void HyAtlas::OnLoadThread()
@@ -128,9 +131,9 @@ void HyAtlas::OnLoadThread()
 		}
 
 		int iWidth, iHeight, iNum8bitClrChannels;
-		m_pPixelData = stbi_load(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 0);
+		m_pPixelData = SOIL_load_image(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);// stbi_load(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 0);
 
-		HyAssert(m_pPixelData != NULL, "HyAtlas failed to load image data");
+		HyAssert(m_pPixelData != nullptr, "HyAtlas failed to load image data");
 	}
 
 	m_csPixelData.Unlock();

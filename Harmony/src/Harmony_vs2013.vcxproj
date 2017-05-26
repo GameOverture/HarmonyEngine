@@ -119,25 +119,6 @@
     <ClCompile Include="Utilities\HyStrManip.cpp" />
     <ClCompile Include="Utilities\HyVariant.cpp" />
     <ClCompile Include="Utilities\jasonxx.cc" />
-    <ClCompile Include="Utilities\stb_image.c">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
-      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
-      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</WholeProgramOptimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
-      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IntrinsicFunctions>
-      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</WholeProgramOptimization>
-      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">MaxSpeed</Optimization>
-      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">true</IntrinsicFunctions>
-      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">true</WholeProgramOptimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='GuiDebug|x64'">MaxSpeed</Optimization>
-      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='GuiDebug|x64'">true</IntrinsicFunctions>
-      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='GuiDebug|x64'">true</WholeProgramOptimization>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">Default</BasicRuntimeChecks>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='GuiDebug|x64'">Default</BasicRuntimeChecks>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Harmony\Afx\Compilers\HyCompiler.h" />
@@ -248,7 +229,6 @@
     <ClInclude Include="..\include\Harmony\Utilities\HyStrManip.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyVariant.h" />
     <ClInclude Include="..\include\Harmony\Utilities\jsonxx.h" />
-    <ClInclude Include="..\include\Harmony\Utilities\stb_image.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FCCD89C1-BC25-41E0-8EE4-B77E0FC9273A}</ProjectGuid>
@@ -392,11 +372,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>x3daudio.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -419,11 +400,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>x3daudio.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -446,7 +428,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2.lib;AdvAPI32.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
@@ -475,7 +457,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2.lib;AdvAPI32.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
@@ -507,7 +489,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>x3daudio.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
@@ -533,7 +515,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>x3daudio.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
@@ -559,7 +541,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2.lib;AdvAPI32.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
@@ -587,7 +569,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>x3daudio.lib;AdvAPI32.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2.lib;AdvAPI32.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>

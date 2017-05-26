@@ -84,9 +84,6 @@
     <ClCompile Include="Scene\HyScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\stb_image.c">
-      <Filter>Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\HyFileIO.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -506,9 +503,6 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\HyScene.h">
       <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\stb_image.h">
-      <Filter>Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Utilities\HyFileIO.h">
       <Filter>Utilities</Filter>
