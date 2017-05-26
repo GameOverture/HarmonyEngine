@@ -107,6 +107,8 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
             pNewAtlasGrp->m_PackerSettings = atlasGrpArray[i].toObject();
             
             m_AtlasGrpList.push_back(pNewAtlasGrp);
+            
+            m_RootDataDir.mkdir(HyGlobal::MakeFileNameFromCounter(pNewAtlasGrp->GetId()));
         }
         //m_PackerSettings = settingsObj["settings"].toObject();
 
