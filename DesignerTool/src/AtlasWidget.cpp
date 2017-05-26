@@ -136,6 +136,8 @@ void AtlasWidget::DrawUpdate(IHyApplication &hyApp)
 
 void AtlasWidget::StashTreeWidgets()
 {
+    ui->atlasList->selectionModel()->clearSelection();
+    
     QList<AtlasTreeItem *> stashedTreeItemList;
     while(ui->atlasList->topLevelItemCount())
         stashedTreeItemList.append(static_cast<AtlasTreeItem *>(ui->atlasList->takeTopLevelItem(0)));
@@ -302,13 +304,23 @@ void AtlasWidget::on_actionDeleteImages_triggered()
 
 void AtlasWidget::on_actionReplaceImages_triggered()
 {
+    QList<QTreeWidgetItem *> selectedTreeItemList = ui->atlasList->selectedItems();
+    
+    QList<QTreeWidgetItem *> selectedTreeItemFrameList;
+    QList<QTreeWidgetItem *> selectedFilterList;
 
-    QList<QTreeWidgetItem *> selectedAtlasTreeItemList = ui->atlasList->selectedItems();
+    GetSelectedItemsRecursively(selectedTreeItemList, selectedTreeItemFrameList, selectedFilterList);
+    
+    if(selectedFilterList.empty() == false)
+    {
+        HyGuiLog("Please unselect any atlas filters before replacing images", LOGTYPE_Warning);
+        return;
+    }
 
     // Store a list of the frames, since 'selectedAtlasTreeItemList' will become invalid within Refresh()
     QList<AtlasFrame *> selectedFrameList;
-    for(int i = 0; i < selectedAtlasTreeItemList.count(); ++i)
-        selectedFrameList.append(selectedAtlasTreeItemList[i]->data(0, Qt::UserRole).value<AtlasFrame *>());
+    for(int i = 0; i < selectedTreeItemFrameList.count(); ++i)
+        selectedFrameList.append(selectedTreeItemFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>());
 
     QFileDialog dlg(this);
 
@@ -413,38 +425,47 @@ void AtlasWidget::OnContextMenu(const QPoint &pos)
     QTreeWidgetItem *pTreeNode = ui->atlasList->itemAt(pos);
 
     QMenu contextMenu;
+    QMenu atlasGrpMenu;
+    
     if(pTreeNode == NULL)
     {
         contextMenu.addAction(ui->actionAddFilter);
     }
     else
     {
-//        QMenu atlasGrpMenu;
-//        atlasGrpMenu.setIcon(QIcon(":/icons16x16/atlas-assemble.png"));
-//        atlasGrpMenu.setTitle("Atlas Groups...");
-//        atlasGrpMenu.setToolTip("By organizing images into groups, you can logically partition assets to avoid unnecessary loads.");
+        if(m_pModel->GetNumAtlasGroups() > 1)
+        {
+            atlasGrpMenu.setIcon(QIcon(":/icons16x16/atlas-assemble.png"));
+            atlasGrpMenu.setTitle("Atlas Groups...");
+            atlasGrpMenu.setToolTip("By organizing images into groups, you can logically partition assets to avoid unnecessary loads.");
+            
+            for(int i = 0; i < m_pModel->GetNumAtlasGroups(); ++i)
+            {
+                QAction *pActionAtlasGrpMove = new QAction();
+                pActionAtlasGrpMove->setText(m_pModel->GetAtlasGroupName(i));
+                pActionAtlasGrpMove->setIcon(QIcon(":/icons16x16/atlas-assemble.png"));
+                pActionAtlasGrpMove->setData(m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(i));
+                
+                atlasGrpMenu.addAction(pActionAtlasGrpMove);
+            }
+            
+             connect(&atlasGrpMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_actionAtlasGrpTransfer_triggered(QAction*)));
+            
+            contextMenu.addMenu(&atlasGrpMenu);
+            contextMenu.addSeparator();
+        }
         
-        //m_pModel->
-        
-        //contextMenu.addMenu(&atlasGrpMenu);
-        
-        contextMenu.addAction(ui->actionAtlasGroups);
-        contextMenu.addSeparator();
+        contextMenu.addAction(ui->actionAddFilter);
         contextMenu.addAction(ui->actionDeleteImages);
         contextMenu.addAction(ui->actionReplaceImages);
         contextMenu.addAction(ui->actionRename);
     }
 
-    QAction* selectedItem = contextMenu.exec(globalPos);
-    if (selectedItem)
-    {
-        // which returns a QTreeWidgetItem.
-       // something was chosen, do stuff
-    }
-    else
-    {
-       // nothing was chosen
-    }
+    contextMenu.exec(globalPos);
+    
+    QList<QAction *> actionAtlasGrpMoveList = atlasGrpMenu.actions();
+    for(int i = 0; i < actionAtlasGrpMoveList.size(); ++i)
+        delete actionAtlasGrpMoveList[i];
 }
 
 void AtlasWidget::GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef)
@@ -509,4 +530,44 @@ void AtlasWidget::on_actionRemoveGroup_triggered()
     ui->cmbAtlasGroups->setCurrentIndex(0);
     
     m_pModel->RemoveAtlasGrp(m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(uiCurIndex));
+}
+
+void AtlasWidget::on_actionAtlasGrpTransfer_triggered(QAction *pAction)
+{
+    quint32 uiNewAtlasGrpId = static_cast<quint32>(pAction->data().toInt());    // Which atlas group ID we're transfering to
+    
+    
+    QList<QTreeWidgetItem *> selectedTreeItemList = ui->atlasList->selectedItems();
+    
+    QList<QTreeWidgetItem *> selectedTreeItemFrameList;
+    QList<QTreeWidgetItem *> selectedFilterList;
+
+    GetSelectedItemsRecursively(selectedTreeItemList, selectedTreeItemFrameList, selectedFilterList);
+
+    QMap<uint, QSet<int> > affectedTextureIndexMap; // old
+    QSet<AtlasFrame *> framesGoingToNewAtlasGrpSet; // new
+    
+    for(int i = 0; i < selectedTreeItemFrameList.count(); ++i)
+    {
+        AtlasFrame *pFrame = selectedTreeItemFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
+        if(pFrame->GetAtlasGrpId() == uiNewAtlasGrpId)
+            continue;
+        
+        affectedTextureIndexMap[m_pModel->GetAtlasGrpIndexFromAtlasGrpId(pFrame->GetAtlasGrpId())].insert(pFrame->GetTextureIndex());
+        framesGoingToNewAtlasGrpSet.insert(pFrame);
+        
+        m_pModel->TransferFrame(pFrame, uiNewAtlasGrpId);
+    }
+    
+    // Repack all old affected atlas groups
+    if(affectedTextureIndexMap.empty() == false)
+    {
+        for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
+            m_pModel->Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
+    }
+    
+    // Repack new affected atlas group
+    m_pModel->Repack(m_pModel->GetAtlasGrpIndexFromAtlasGrpId(uiNewAtlasGrpId), QSet<int>(), framesGoingToNewAtlasGrpSet);
+    
+    RefreshLcds();
 }

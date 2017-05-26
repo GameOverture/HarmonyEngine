@@ -103,6 +103,8 @@ private Q_SLOTS:
     void on_actionAddGroup_triggered();
 
     void on_actionRemoveGroup_triggered();
+    
+    void on_actionAtlasGrpTransfer_triggered(QAction *pAction);
 
 private:
     Ui::AtlasWidget *ui;

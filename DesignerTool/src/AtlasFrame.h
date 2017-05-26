@@ -53,7 +53,10 @@ public:
     AtlasTreeItem *GetTreeItem();
 
     quint32 GetId();
+    
     quint32 GetAtlasGrpId();
+    void SetAtlasGrpId(quint32 uiNewAtlasGrpId);
+    
     quint32 GetImageChecksum();
     QString GetName();
     void SetName(QString sNewName);

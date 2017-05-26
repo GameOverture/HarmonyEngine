@@ -233,6 +233,11 @@ int AtlasModel::GetNumAtlasGroups()
     return m_AtlasGrpList.size();
 }
 
+QString AtlasModel::GetAtlasGroupName(uint uiAtlasGrpIndex)
+{
+    return m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["txtName"].toString();
+}
+
 QList<AtlasFrame *> AtlasModel::GetFrames(uint uiAtlasGrpIndex)
 {
     return m_AtlasGrpList[uiAtlasGrpIndex]->m_FrameList;
@@ -406,6 +411,41 @@ void AtlasModel::RemoveFrame(AtlasFrame *pFrame)
     }
 
     delete pFrame;
+}
+
+bool AtlasModel::TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId)
+{
+    if(uiNewAtlasGrpId == pFrame->GetAtlasGrpId())
+        return false;
+    
+    bool bValid = false;
+    for(int i = 0; i < m_AtlasGrpList.size(); ++i)
+    {
+        if(pFrame->GetAtlasGrpId() == m_AtlasGrpList[i]->GetId())
+        {
+            m_AtlasGrpList[i]->m_FrameList.removeOne(pFrame);
+            bValid = true;
+            break;
+        }
+    }
+    
+    if(bValid == false)
+        return false;
+    
+    bValid = false;
+    for(int i = 0; i < m_AtlasGrpList.size(); ++i)
+    {
+        if(uiNewAtlasGrpId == m_AtlasGrpList[i]->GetId())
+        {
+            pFrame->SetAtlasGrpId(uiNewAtlasGrpId);
+            
+            m_AtlasGrpList[i]->m_FrameList.append(pFrame);
+            bValid = true;
+            break;
+        }
+    }
+    
+    return bValid;
 }
 
 AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, eAtlasNodeType eType)

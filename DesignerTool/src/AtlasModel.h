@@ -80,6 +80,7 @@ public:
     virtual ~AtlasModel();
 
     int GetNumAtlasGroups();
+    QString GetAtlasGroupName(uint uiAtlasGrpIndex);
     
     QList<AtlasFrame *> GetFrames(uint uiAtlasGrpIndex);
 
@@ -98,6 +99,8 @@ public:
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     AtlasFrame *CreateFrame(quint32 uiId, quint32 uiCRC, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
     void RemoveFrame(AtlasFrame *pFrame);
+    
+    bool TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId);
 
     AtlasFrame *GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, eAtlasNodeType eType);
     void ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
