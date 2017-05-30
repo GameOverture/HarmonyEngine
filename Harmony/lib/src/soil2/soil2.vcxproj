@@ -148,10 +148,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">
     <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)Qtd</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
@@ -160,14 +162,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
     <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)Qt</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|x64'">
     <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)Qtd</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
@@ -176,6 +181,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|x64'">
     <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)Qt</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

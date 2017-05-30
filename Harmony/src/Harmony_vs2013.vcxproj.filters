@@ -249,6 +249,9 @@
     <ClCompile Include="Diagnostics\GuiComms\HyLiveVarManager.cpp">
       <Filter>Diagnostics\GuiComms</Filter>
     </ClCompile>
+    <ClCompile Include="Utilities\HyImage.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -677,6 +680,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Diagnostics\GuiComms\HyLiveVarManager.h">
       <Filter>Diagnostics\GuiComms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Utilities\HyImage.h">
+      <Filter>Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

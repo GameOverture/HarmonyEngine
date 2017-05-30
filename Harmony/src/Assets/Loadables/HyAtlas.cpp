@@ -11,10 +11,6 @@
 
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
-
-#define STBI_MALLOC
-#define STBI_REALLOC
-#define STBI_FREE
 #include "soil2/SOIL2.h"
 
 #include <set>

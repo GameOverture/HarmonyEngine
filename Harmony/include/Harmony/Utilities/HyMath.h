@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyMath_h__
-#define __HyMath_h__
+#ifndef HyMath_h__
+#define HyMath_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -141,4 +141,4 @@ struct HyScreenRect
 	}
 };
 
-#endif /* __HyMath_h__ */
+#endif /* HyMath_h__ */

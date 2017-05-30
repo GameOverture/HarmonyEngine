@@ -67,7 +67,6 @@ enum AtlasTextureType
 {
     ATLASTEXTYPE_R8G8B8A8 = 0,
     ATLASTEXTYPE_DTX5,
-    ATLASTEXTYPE_DTX3,
     ATLASTEXTYPE_DTX1,
     
     NUMATLASTEXTYPE
@@ -277,8 +276,6 @@ public:
             return "R8G8B8A8";
         case ATLASTEXTYPE_DTX5:
             return "DTX5";
-        case ATLASTEXTYPE_DTX3:
-            return "DTX3";
         case ATLASTEXTYPE_DTX1:
             return "DTX1";
         }

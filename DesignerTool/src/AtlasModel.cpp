@@ -15,6 +15,8 @@
 #include "HyGuiGlobal.h"
 #include "DlgAtlasGroupSettings.h"
 
+#include "Harmony/HyEngine.h"
+
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -784,9 +786,6 @@ quint32 AtlasModel::GetAtlasGrpIdFromAtlasGrpIndex(uint uiAtlasGrpIndex)
 
 QFileInfoList AtlasModel::GetExistingTextureInfoList(uint uiAtlasGrpIndex)
 {
-    //QStringList sNameFilterList;
-    //sNameFilterList << "*.png" << "*.dds";
-    //return m_AtlasGrpList[uiGrpIndex]->m_DataDir.entryInfoList(sNameFilterList, QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
     return m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 }
 
@@ -1051,23 +1050,43 @@ void AtlasModel::ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex
     }
 
     QImage *pTexture = static_cast<QImage *>(p.device());
+    AtlasTextureType eTextureType = static_cast<AtlasTextureType>(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["textureType"].toInt());
     
-    // TODO: Properly save differernt types of textures here (PNG, DTX5, DTX3, etc.)
-    if(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["textureType"].toInt() == 0)
+    switch(eTextureType)
     {
-        if(pTexture->save(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".png")) == false) {
-            HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a PNG atlas", LOGTYPE_Error);
-        }
-    }
-    else
-    {
-        QImageWriter writer(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds"));
-        if (writer.supportsOption(QImageIOHandler::SubType))
-            writer.setSubType("A8R8G8B8");
+        case ATLASTEXTYPE_R8G8B8A8: {
+            if(false == pTexture->save(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".png"))) {
+                HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a PNG atlas", LOGTYPE_Error);
+            }
+        } break;
+    
+        case ATLASTEXTYPE_DTX5: {
+            QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGBA8888);
+            if(0 == SOIL_save_image_quality(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
+                                            SOIL_SAVE_TYPE_DDS,
+                                            imgProperlyFormatted.width(),
+                                            imgProperlyFormatted.height(),
+                                            4,
+                                            imgProperlyFormatted.bits(),
+                                            0))
+            {
+                HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a DTX5 atlas", LOGTYPE_Error);
+            }
+        } break;
         
-        if(writer.write(*pTexture) == false) {
-            HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a DDS atlas.\n\n" % writer.errorString(), LOGTYPE_Error);
-        }
+        case ATLASTEXTYPE_DTX1: {
+            QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGB888);
+            if(0 == SOIL_save_image_quality(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
+                                            SOIL_SAVE_TYPE_DDS,
+                                            imgProperlyFormatted.width(),
+                                            imgProperlyFormatted.height(),
+                                            3,
+                                            imgProperlyFormatted.bits(),
+                                            0))
+            {
+                HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a DTX1 atlas", LOGTYPE_Error);
+            }
+        } break;
     }
 }
 

@@ -30,6 +30,7 @@
 #include "Utilities/HyMath.h"
 #include "Utilities/HyFileIO.h"
 #include "Utilities/HyStrManip.h"
+#include "Utilities/HyImage.h"
 
 class HyEngine
 {

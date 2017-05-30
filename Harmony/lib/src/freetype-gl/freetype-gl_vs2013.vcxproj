@@ -228,7 +228,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>freetyped.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetypedQtd.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)/</AdditionalLibraryDirectories>
@@ -315,7 +315,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>freetype.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetypeQt.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)/</AdditionalLibraryDirectories>

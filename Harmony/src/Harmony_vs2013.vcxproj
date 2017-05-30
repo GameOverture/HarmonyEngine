@@ -115,6 +115,7 @@
     <ClCompile Include="Utilities\HyBitManip.cpp" />
     <ClCompile Include="Utilities\HyFileIO.cpp" />
     <ClCompile Include="Utilities\HyHardwareInfo.cpp" />
+    <ClCompile Include="Utilities\HyImage.cpp" />
     <ClCompile Include="Utilities\HyMath.cpp" />
     <ClCompile Include="Utilities\HyStrManip.cpp" />
     <ClCompile Include="Utilities\HyVariant.cpp" />
@@ -225,6 +226,7 @@
     <ClInclude Include="..\include\Harmony\Utilities\HyBitManip.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyFileIO.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyHardwareInfo.h" />
+    <ClInclude Include="..\include\Harmony\Utilities\HyImage.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyMath.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyStrManip.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyVariant.h" />
@@ -372,10 +374,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2d.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Lib>
@@ -400,10 +402,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2d.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Lib>
@@ -428,10 +430,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2.lib;AdvAPI32.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2d.lib;AdvAPI32.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -457,10 +459,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2.lib;AdvAPI32.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2d.lib;AdvAPI32.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -492,7 +494,7 @@
       <AdditionalDependencies>soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -518,7 +520,7 @@
       <AdditionalDependencies>soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
@@ -541,10 +543,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2.lib;AdvAPI32.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2Qt.lib;AdvAPI32.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
@@ -569,10 +571,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2.lib;AdvAPI32.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>soil2Qt.lib;AdvAPI32.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
