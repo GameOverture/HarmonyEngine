@@ -14,9 +14,10 @@
 
 #include "HyGuiGlobal.h"
 
-DlgAtlasGroupSettings::DlgAtlasGroupSettings(QJsonObject packerSettingsObj, QWidget *parent) :  QDialog(parent),
-                                                                                                ui(new Ui::DlgAtlasGroupSettings),
-                                                                                                m_InitialPackerSettingsObj(packerSettingsObj)
+DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObject packerSettingsObj, QWidget *parent) : QDialog(parent),
+                                                                                                                        ui(new Ui::DlgAtlasGroupSettings),
+                                                                                                                        m_bAtlasGrpHasImages(bAtlasGrpHasImages),
+                                                                                                                        m_InitialPackerSettingsObj(packerSettingsObj)
 {
     ui->setupUi(this);
 
@@ -159,7 +160,7 @@ void DlgAtlasGroupSettings::on_btnTexSize2048_clicked()
     if(r == QDialog::Accepted)
     {
         // check if it is ok or not
-        if(IsSettingsDirty())
+        if(IsSettingsDirty() && m_bAtlasGrpHasImages)
         {
             if(QMessageBox::Ok == QMessageBox::warning(NULL, QString("Save Atlas Group Settings?"), QString("By modifying the Atlas Group settings, it is required to regenerate the entire Atlas Group."), QMessageBox::Ok, QMessageBox::Cancel))
                 QDialog::done(r);

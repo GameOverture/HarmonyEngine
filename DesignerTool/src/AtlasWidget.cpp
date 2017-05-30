@@ -228,7 +228,9 @@ void AtlasWidget::on_btnAddDir_clicked()
 
 void AtlasWidget::on_btnSettings_clicked()
 {
-    DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex()));
+    bool bAtlasGrpHasImages = m_pModel->GetFrames(ui->cmbAtlasGroups->currentIndex()).size() > 0;
+    
+    DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(bAtlasGrpHasImages, m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex()));
     if(QDialog::Accepted == pDlg->exec())
     {
         QJsonObject newPackerSettings = m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex());
@@ -236,9 +238,9 @@ void AtlasWidget::on_btnSettings_clicked()
         
         m_pModel->SetPackerSettings(ui->cmbAtlasGroups->currentIndex(), newPackerSettings);
         
-        if(pDlg->IsSettingsDirty())
+        if(pDlg->IsSettingsDirty() && bAtlasGrpHasImages)
             m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex());
-        else if(pDlg->IsNameChanged())
+        else if(pDlg->IsNameChanged() || pDlg->IsSettingsDirty())
             m_pModel->WriteMetaSettings();
     }
     

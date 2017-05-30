@@ -22,9 +22,10 @@ class DlgAtlasGroupSettings : public QDialog
     Q_OBJECT
     
     QJsonObject m_InitialPackerSettingsObj;
+    bool        m_bAtlasGrpHasImages;
 
 public:
-    explicit DlgAtlasGroupSettings(QJsonObject packerSettingsObj, QWidget *parent = 0);
+    explicit DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObject packerSettingsObj, QWidget *parent = 0);
     ~DlgAtlasGroupSettings();
     
     static QJsonObject GenerateDefaultSettingsObj();
