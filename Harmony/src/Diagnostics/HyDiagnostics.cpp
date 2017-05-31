@@ -17,7 +17,7 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 																								m_SceneRef(sceneRef),
 																								m_sPlatform("Unknown"),
 																								m_uiNumCpuCores(0),
-																								m_uiRamSizeBytes(0),
+																								m_uiTotalMemBytes(0),
 																								m_sGfxApi("Unknown"),
 																								m_sVersion("Unknown"),
 																								m_sVendor("Unknown"),
@@ -38,9 +38,11 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 	m_uiNumCpuCores = sysinfo.dwNumberOfProcessors;
 
 	// Get total memory size
-	MEMORYSTATUSEX meminfo;
+	MEMORYSTATUSEX meminfo = {};
+	meminfo.dwLength = sizeof(MEMORYSTATUSEX);
 	GlobalMemoryStatusEx(&meminfo);
-	m_uiRamSizeBytes = static_cast<uint64>(meminfo.ullTotalPhys); // as opposed to dwTotalPhys
+	m_uiTotalMemBytes = static_cast<uint64>(meminfo.ullTotalPhys);
+	m_uiVirtualMemBytes = static_cast<uint64>(meminfo.ullTotalVirtual);
 
 #elif defined(HY_PLATFORM_OSX)
 	// Set info
@@ -80,20 +82,21 @@ void HyDiagnostics::BootMessage()
 
 	HyLog("");
 	HyLogTitle(sGameTitle);
-	HyLog("Data Dir:       " << m_InitStructRef.sDataDir);
-	HyLog("Default Coord:  " << (m_InitStructRef.eDefaultCoordinateType == HYCOORDTYPE_Camera) ? "Camera" : "Screen");
-	HyLog("Default Unit:   " << (m_InitStructRef.eDefaultCoordinateUnit == HYCOORDUNIT_Pixels) ? "Pixels" : "Meters");
-	HyLog("Pixels/Meter:   " << m_InitStructRef.fPixelsPerMeter);
-	HyLog("Num Input Maps: " << m_InitStructRef.uiNumInputMappings);
+	HyLog("Data Dir:         " << m_InitStructRef.sDataDir);
+	HyLog("Default Coord:    " << (m_InitStructRef.eDefaultCoordinateType == HYCOORDTYPE_Camera) ? "Camera" : "Screen");
+	HyLog("Default Unit:     " << (m_InitStructRef.eDefaultCoordinateUnit == HYCOORDUNIT_Pixels) ? "Pixels" : "Meters");
+	HyLog("Pixels/Meter:     " << m_InitStructRef.fPixelsPerMeter);
+	HyLog("Num Input Maps:   " << m_InitStructRef.uiNumInputMappings);
 	
 	HyLogSection("Platform");
 	HyLog(m_sPlatform);
-	HyLog("Num CPU Cores:  " << m_uiNumCpuCores);
-	HyLog("Memory:         " << (m_uiRamSizeBytes / 1024 / 1024) << "MB");
+	HyLog("Num CPU Cores:    " << m_uiNumCpuCores);
+	HyLog("System Memory:    " << (m_uiTotalMemBytes / 1024 / 1024) << " MB");
+	HyLog("Available Memory: " << (m_uiVirtualMemBytes / 1024 / 1024) << " MB");
 #if defined(HY_ENDIAN_LITTLE)
-	HyLog("Endian:         " << "Little");
+	HyLog("Endian:           " << "Little");
 #else
-	HyLog("Endian:         " << "Big");
+	HyLog("Endian:           " << "Big");
 #endif
 
 	HyLogSection(m_sGfxApi);
