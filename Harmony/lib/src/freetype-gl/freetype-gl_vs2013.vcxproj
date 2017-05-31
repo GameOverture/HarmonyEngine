@@ -228,7 +228,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>freetypedQtd.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetypeQtd.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)/</AdditionalLibraryDirectories>
