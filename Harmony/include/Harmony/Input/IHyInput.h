@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Input/IHyInputMap.h"
+#include "Threading/Threading.h"
 
 class IHyDraw2d;
 class HyWindow;
@@ -29,6 +30,8 @@ protected:
 	bool						m_bMouseLeftDown;
 	bool						m_bMouseRightDown;
 
+	BasicSection				m_csMouse;
+
 public:
 	IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyInput();
@@ -38,6 +41,9 @@ public:
 	glm::vec2 GetWorldMousePos();
 	bool IsMouseLeftDown();
 	bool IsMouseRightDown();
+
+	void CsLock();
+	void CsUnlock();
 
 	virtual void StartRecording() = 0;
 	virtual void StopRecording() = 0;

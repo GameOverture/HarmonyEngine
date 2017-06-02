@@ -62,6 +62,8 @@ public:
 	//int GetUpdateFPS()		{ return m_iCurFPSUpdate; }
 	void ShowFps(bool bShow);
 
+	virtual std::string GetDateTime() = 0;
+
 	void AddTimeInst(IHyTimeInst *pTimeInst);
 	void RemoveTimeInst(IHyTimeInst *pTimeInst);
 };

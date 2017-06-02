@@ -10,6 +10,7 @@
 #include "Input/Interop/HyInput_Gainput.h"
 #include "Input/Interop/HyInputMap_Gainput.h"
 #include "Renderer/Components/HyWindow.h"
+#include "Diagnostics/Console/HyConsole.h"
 
 HyInput_Gainput::HyInput_Gainput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :	IHyInput(uiNumInputMappings, windowListRef),
 																										m_uiKeyboardId(gainput::InvalidDeviceId),
@@ -62,13 +63,18 @@ void HyInput_Gainput::HandleMsg(uint32 uiWindowIndex, int32 iWidth, int32 iHeigh
 	m_Manager.SetDisplaySize(iWidth, iHeight);
 	m_Manager.HandleMessage(msg);
 
-	if(msg.message == WM_MOUSEMOVE)
+	//HyLog(msg.message);
+	if(msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST)
 	{
 		glm::vec2 ptMouseAxisNormalized(m_pInputMaps[0].GetAxis(MOUSEID_X), m_pInputMaps[0].GetAxis(MOUSEID_Y));
 		ptMouseAxisNormalized.y = 1.0f - ptMouseAxisNormalized.y; // Invert Y-coordinate
 
 		m_ptLocalMousePos = ptMouseAxisNormalized;
 		m_uiMouseWindowIndex = uiWindowIndex;
+
+		//if(msg.message == WM_MOUSEMOVE) {
+		//	HyLog("MOUSE MOVE: (" << GetWorldMousePos().x << ", " << GetWorldMousePos().y << ")");
+		//}
 	}
 }
 #endif

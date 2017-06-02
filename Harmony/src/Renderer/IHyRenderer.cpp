@@ -191,6 +191,7 @@ bool IHyRenderer::PollPlatformApi()
 	MSG msg = { 0 };
 	int32 iWindowIndex = 0;
 	HWND hWnd = static_cast<HyOpenGL_Win *>(this)->GetHWND(iWindowIndex);
+
 	while(hWnd != nullptr)
 	{
 		while(PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE))
@@ -216,6 +217,14 @@ bool IHyRenderer::PollPlatformApi()
 	if(false == pRenderer->Initialize())
 		HyError("Renderer API's Initialize() failed");
 
-	while(pRenderer->PollPlatformApi())
+	while(true)
+	{
+		pRenderer->m_InputRef.CsLock();
+		pRenderer->m_InputRef.Update();
+		if(pRenderer->PollPlatformApi() == false)
+			break;
+		pRenderer->m_InputRef.CsUnlock();
+
 		pRenderer->Update();
+	}
 }

@@ -41,15 +41,37 @@ IHyInputMap *IHyInput::GetInputMapArray()
 
 glm::vec2 IHyInput::GetWorldMousePos()
 {
-	return m_WindowListRef[m_uiMouseWindowIndex]->ConvertViewportCoordinateToWorldPos(m_ptLocalMousePos);
+	m_csMouse.Lock();
+	glm::vec2 vRetVec = m_WindowListRef[m_uiMouseWindowIndex]->ConvertViewportCoordinateToWorldPos(m_ptLocalMousePos);
+	m_csMouse.Unlock();
+
+	return vRetVec;
 }
 
 bool IHyInput::IsMouseLeftDown()
 {
-	return m_bMouseLeftDown;
+	m_csMouse.Lock();
+	bool bReturnVal = m_bMouseLeftDown;
+	m_csMouse.Unlock();
+
+	return bReturnVal;
 }
 
 bool IHyInput::IsMouseRightDown()
 {
-	return m_bMouseRightDown;
+	m_csMouse.Lock();
+	bool bReturnVal = m_bMouseRightDown;
+	m_csMouse.Unlock();
+
+	return bReturnVal;
+}
+
+void IHyInput::CsLock()
+{
+	m_csMouse.Lock();
+}
+
+void IHyInput::CsUnlock()
+{
+	m_csMouse.Unlock();
 }

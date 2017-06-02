@@ -80,6 +80,7 @@ private:
 	friend float HyPixelsPerMeter();
 	friend HyCoordinateType HyDefaultCoordinateType();
 	friend HyCoordinateUnit HyDefaultCoordinateUnit();
+	friend std::string HyDateTime();
 };
 
 #endif /* __HyEngine_h__ */

@@ -11,6 +11,7 @@
 #include "IHyApplication.h"
 #include "Assets/HyAssets.h"
 #include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "HyEngine.h"
 
 HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef) :	m_InitStructRef(initStruct),
 																								m_AssetsRef(assetsRef),
@@ -81,7 +82,7 @@ void HyDiagnostics::BootMessage()
 #endif
 
 	HyLog("");
-	HyLogTitle(sGameTitle);
+	HyLogTitle(sGameTitle << "\n\t" << HyDateTime());
 	HyLog("Data Dir:         " << m_InitStructRef.sDataDir);
 	HyLog("Default Coord:    " << (m_InitStructRef.eDefaultCoordinateType == HYCOORDTYPE_Camera) ? "Camera" : "Screen");
 	HyLog("Default Unit:     " << (m_InitStructRef.eDefaultCoordinateUnit == HYCOORDUNIT_Pixels) ? "Pixels" : "Meters");

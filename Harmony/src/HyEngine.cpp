@@ -88,7 +88,6 @@ bool HyEngine::Update()
 	m_Time.ThrottleTime();
 #endif
 	{
-		m_Input.Update();
 		m_Scene.PreUpdate();
 
 		if(m_AppRef.Update() == false)
@@ -105,6 +104,7 @@ bool HyEngine::Update()
 	}
 
 #if !defined(HYSETTING_MultithreadedRenderer) || defined(HY_PLATFORM_GUI)
+	m_Input.Update();
 	if(m_Renderer.PollPlatformApi() == false)
 		return false;
 
@@ -158,4 +158,10 @@ HyRendererInterop &HyEngine::GetRenderer()
 /*friend*/ HyCoordinateUnit HyDefaultCoordinateUnit()
 {
 	return IHyApplication::DefaultCoordinateUnit();
+}
+
+/*friend*/ std::string HyDateTime()
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "HyDateTime() was invoked before engine has been initialized.");
+	return HyEngine::sm_pInstance->m_Time.GetDateTime();
 }
