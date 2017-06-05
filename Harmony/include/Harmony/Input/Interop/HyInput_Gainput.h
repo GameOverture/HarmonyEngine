@@ -43,7 +43,7 @@ class HyInput_Gainput : public IHyInput
 
 
 public:
-	HyInput_Gainput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
+	HyInput_Gainput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef, HyGfxComms &gfxCommsRef);
 	~HyInput_Gainput();
 
 	gainput::InputManager &GetGainputManager();
@@ -54,10 +54,6 @@ public:
 
 	virtual void StartPlayback() override;
 	virtual void StopPlayback() override;
-
-#ifdef HY_PLATFORM_WINDOWS
-	void HandleMsg(uint32 uiWindowIndex, int32 iWidth, int32 iHeight, const MSG &msg);
-#endif
 
 	gainput::DeviceId GetKeyboardDeviceId();
 

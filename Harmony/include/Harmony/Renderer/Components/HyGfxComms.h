@@ -7,10 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyGfxBuffers_h__
-#define __HyGfxBuffers_h__
+#ifndef HyGfxBuffers_h__
+#define HyGfxBuffers_h__
 
-#include "Afx/HyStdAfx.h"
+#include "Afx/HyInteropAfx.h"
 
 #include "Assets/Loadables/IHyLoadableData.h"
 #include "Threading/BasicSync.h"
@@ -60,6 +60,9 @@ private:
 
 	BasicSection					m_csPointers;
 
+	std::queue<HyApiMsgInterop>		m_ApiMsgQueue;
+	BasicSection					m_csApiMsgQueue;
+
 public:
 	HyGfxComms();
 	~HyGfxComms();
@@ -78,6 +81,12 @@ public:
 
 	// This should only be invoked from the Render thread
 	bool Render_TakeSharedPointers(std::queue<IHyLoadableData *> *&pRxDataQueue, std::queue<IHyLoadableData *> *&pTxDataQueue, char *&pDrawBuffer);
+
+	// This should only be invoked from the Render thread
+	bool Render_PollPlatformApi(IHyRenderer *pRenderer);
+
+	// This should only be invoked from the Update/Game thread
+	void RxApiMsgs(std::queue<HyApiMsgInterop> &msgQueueOut);
 };
 
-#endif /* __HyGfxBuffers_h__ */
+#endif /* HyGfxBuffers_h__ */

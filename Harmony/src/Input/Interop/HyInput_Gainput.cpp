@@ -7,16 +7,20 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Afx/HyInteropAfx.h"
 #include "Input/Interop/HyInput_Gainput.h"
 #include "Input/Interop/HyInputMap_Gainput.h"
+#include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-HyInput_Gainput::HyInput_Gainput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :	IHyInput(uiNumInputMappings, windowListRef),
-																										m_uiKeyboardId(gainput::InvalidDeviceId),
-																										m_uiMouseId(gainput::InvalidDeviceId),
-																										m_eRecordState(RECORD_Off),
-																										m_uiRecordCount(0)
+#include <queue>
+
+HyInput_Gainput::HyInput_Gainput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef, HyGfxComms &gfxCommsRef) :	IHyInput(uiNumInputMappings, windowListRef, gfxCommsRef),
+																																m_uiKeyboardId(gainput::InvalidDeviceId),
+																																m_uiMouseId(gainput::InvalidDeviceId),
+																																m_eRecordState(RECORD_Off),
+																																m_uiRecordCount(0)
 {
 	if(uiNumInputMappings > 0)
 	{
@@ -57,28 +61,6 @@ gainput::InputManager &HyInput_Gainput::GetGainputManager()
 {
 }
 
-#ifdef HY_PLATFORM_WINDOWS
-void HyInput_Gainput::HandleMsg(uint32 uiWindowIndex, int32 iWidth, int32 iHeight, const MSG &msg)
-{
-	m_Manager.SetDisplaySize(iWidth, iHeight);
-	m_Manager.HandleMessage(msg);
-
-	//HyLog(msg.message);
-	if(msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST)
-	{
-		glm::vec2 ptMouseAxisNormalized(m_pInputMaps[0].GetAxis(MOUSEID_X), m_pInputMaps[0].GetAxis(MOUSEID_Y));
-		ptMouseAxisNormalized.y = 1.0f - ptMouseAxisNormalized.y; // Invert Y-coordinate
-
-		m_ptLocalMousePos = ptMouseAxisNormalized;
-		m_uiMouseWindowIndex = uiWindowIndex;
-
-		//if(msg.message == WM_MOUSEMOVE) {
-		//	HyLog("MOUSE MOVE: (" << GetWorldMousePos().x << ", " << GetWorldMousePos().y << ")");
-		//}
-	}
-}
-#endif
-
 gainput::DeviceId HyInput_Gainput::GetKeyboardDeviceId()
 {
 	if(m_uiKeyboardId == gainput::InvalidDeviceId)
@@ -104,6 +86,34 @@ gainput::DeviceId HyInput_Gainput::GetGamePadDeviceId(uint32 uiIndex)
 {
 	// TODO: pass in m_uiRecordCount and wrap logic around this call
 	m_Manager.Update();
+
+	std::queue<HyApiMsgInterop> apiMsgQueue;
+	m_GfxCommsRef.RxApiMsgs(apiMsgQueue);
+
+	while(apiMsgQueue.empty() == false)
+	{
+		HyApiMsgInterop msg = apiMsgQueue.front();
+		apiMsgQueue.pop();
+
+#ifdef HY_PLATFORM_WINDOWS
+		m_Manager.SetDisplaySize(static_cast<int>(m_WindowListRef[0]->GetResolution().x), static_cast<int>(m_WindowListRef[0]->GetResolution().y));
+		m_Manager.HandleMessage(msg);
+#endif
+	}
+
+	// TODO: Don't hardcode '0'
+	//if(msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST)
+		{
+			glm::vec2 ptMouseAxisNormalized(m_pInputMaps[0].GetAxis(MOUSEID_X), m_pInputMaps[0].GetAxis(MOUSEID_Y));
+			ptMouseAxisNormalized.y = 1.0f - ptMouseAxisNormalized.y; // Invert Y-coordinate
+
+			m_ptLocalMousePos = ptMouseAxisNormalized;
+			m_uiMouseWindowIndex = 0;
+
+			//if(msg.message == WM_MOUSEMOVE) {
+			//	HyLog("MOUSE MOVE: (" << GetWorldMousePos().x << ", " << GetWorldMousePos().y << ")");
+			//}
+		}
 
 	m_bMouseLeftDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Left);
 	m_bMouseRightDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Right);

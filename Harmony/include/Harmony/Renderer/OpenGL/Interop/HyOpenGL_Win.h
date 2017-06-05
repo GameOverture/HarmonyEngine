@@ -21,7 +21,7 @@ class HyOpenGL_Win : public HyOpenGL
 	PIXELFORMATDESCRIPTOR	m_PixelFormatDescriptor;
 
 public:
-	HyOpenGL_Win(HyGfxComms &gfxCommsRef, IHyInput &inputRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
+	HyOpenGL_Win(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
 	~HyOpenGL_Win();
 
 	virtual bool Initialize() override;

@@ -16,8 +16,8 @@
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, IHyInput &inputRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	HyOpenGL(gfxCommsRef, inputRef, diagnosticsRef, bShowCursor, windowListRef),
-																																									m_hGLContext(NULL)
+HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	HyOpenGL(gfxCommsRef, diagnosticsRef, bShowCursor, windowListRef),
+																																				m_hGLContext(NULL)
 {
 }
 

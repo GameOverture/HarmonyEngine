@@ -16,10 +16,13 @@
 
 class IHyDraw2d;
 class HyWindow;
+class HyGfxComms;
 
 class IHyInput
 {
 protected:
+	HyGfxComms &				m_GfxCommsRef;
+
 	const uint32				m_uiNUM_INPUT_MAPS;
 	IHyInputMap *				m_pInputMaps;
 
@@ -30,10 +33,8 @@ protected:
 	bool						m_bMouseLeftDown;
 	bool						m_bMouseRightDown;
 
-	BasicSection				m_csMouse;
-
 public:
-	IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
+	IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef, HyGfxComms &gfxCommsRef);
 	virtual ~IHyInput();
 
 	IHyInputMap *GetInputMapArray();
@@ -41,9 +42,6 @@ public:
 	glm::vec2 GetWorldMousePos();
 	bool IsMouseLeftDown();
 	bool IsMouseRightDown();
-
-	void CsLock();
-	void CsUnlock();
 
 	virtual void StartRecording() = 0;
 	virtual void StopRecording() = 0;

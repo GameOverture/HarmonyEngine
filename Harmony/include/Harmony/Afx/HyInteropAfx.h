@@ -38,6 +38,8 @@
 		typedef HyConsole_Win HyConsoleInterop;
 	#endif
 
+	typedef MSG HyApiMsgInterop;
+
 	typedef HWND HyRenderSurfaceHandleInterop;
 
 	typedef HyOpenGLShader HyShaderInterop;

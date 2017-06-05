@@ -9,10 +9,11 @@
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGL.h"
 #include "Renderer/Components/HyRenderSurface.h"
+#include "Renderer/Components/HyGfxComms.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, IHyInput &inputRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(gfxCommsRef, inputRef, diagnosticsRef, bShowCursor, windowListRef),
-																																							m_mtxView(1.0f)
+HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(gfxCommsRef, diagnosticsRef, bShowCursor, windowListRef),
+																																		m_mtxView(1.0f)
 {
 }
 
@@ -104,7 +105,7 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::Init_2d()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
-	glBufferData(GL_ARRAY_BUFFER, m_pDrawBufferHeader->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, HYDRAWBUFFERHEADER->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
 
 	m_iCurCamIndex = 0;
 }

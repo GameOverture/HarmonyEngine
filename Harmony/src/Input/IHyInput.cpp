@@ -10,11 +10,13 @@
 #include "Afx/HyInteropAfx.h"
 #include "Input/IHyInput.h"
 #include "Input/IHyInputMap.h"
+#include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyWindow.h"
 
-IHyInput::IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :	m_uiNUM_INPUT_MAPS(uiNumInputMappings),
-																						m_WindowListRef(windowListRef),
-																						m_uiMouseWindowIndex(0)
+IHyInput::IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef, HyGfxComms &gfxCommsRef) :	m_GfxCommsRef(gfxCommsRef),
+																													m_uiNUM_INPUT_MAPS(uiNumInputMappings),
+																													m_WindowListRef(windowListRef),
+																													m_uiMouseWindowIndex(0)
 {
 	IHyInputMap::sm_pInputManager = this;
 
@@ -22,7 +24,6 @@ IHyInput::IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowLis
 	HyInputMapInterop *pWriteLoc = static_cast<HyInputMapInterop *>(m_pInputMaps);
 	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i, ++pWriteLoc)
 		new (pWriteLoc)HyInputMapInterop(this);
-
 }
 
 /*virtual*/ IHyInput::~IHyInput()
@@ -41,37 +42,18 @@ IHyInputMap *IHyInput::GetInputMapArray()
 
 glm::vec2 IHyInput::GetWorldMousePos()
 {
-	m_csMouse.Lock();
 	glm::vec2 vRetVec = m_WindowListRef[m_uiMouseWindowIndex]->ConvertViewportCoordinateToWorldPos(m_ptLocalMousePos);
-	m_csMouse.Unlock();
-
 	return vRetVec;
 }
 
 bool IHyInput::IsMouseLeftDown()
 {
-	m_csMouse.Lock();
 	bool bReturnVal = m_bMouseLeftDown;
-	m_csMouse.Unlock();
-
 	return bReturnVal;
 }
 
 bool IHyInput::IsMouseRightDown()
 {
-	m_csMouse.Lock();
 	bool bReturnVal = m_bMouseRightDown;
-	m_csMouse.Unlock();
-
 	return bReturnVal;
-}
-
-void IHyInput::CsLock()
-{
-	m_csMouse.Lock();
-}
-
-void IHyInput::CsUnlock()
-{
-	m_csMouse.Unlock();
 }

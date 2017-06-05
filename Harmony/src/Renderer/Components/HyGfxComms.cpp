@@ -8,6 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/Components/HyGfxComms.h"
+#include "Afx/HyInteropAfx.h"
 
 HyGfxComms::HyGfxComms()
 {
@@ -115,4 +116,51 @@ bool HyGfxComms::Render_TakeSharedPointers(std::queue<IHyLoadableData *> *&pRxDa
 	m_csPointers.Unlock();
 
 	return true;
+}
+
+// This should only be invoked from the Render thread
+bool HyGfxComms::Render_PollPlatformApi(IHyRenderer *pRenderer)
+{
+	m_csApiMsgQueue.Lock();
+
+#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
+	// TODO: return false when windows close message comes in or something similar
+	MSG msg = { 0 };
+	int32 iWindowIndex = 0;
+	HWND hWnd = static_cast<HyOpenGL_Win *>(pRenderer)->GetHWND(iWindowIndex);
+
+	while(hWnd != nullptr)
+	{
+		while(PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+
+			m_ApiMsgQueue.push(msg);
+
+			//static_cast<HyInputInterop &>(m_InputRef).HandleMsg(iWindowIndex, m_RenderSurfaces[iWindowIndex].GetWidth(), m_RenderSurfaces[iWindowIndex].GetHeight(), msg);
+		}
+
+		iWindowIndex++;
+		hWnd = static_cast<HyOpenGL_Win *>(pRenderer)->GetHWND(iWindowIndex);
+	}
+#endif
+
+	m_csApiMsgQueue.Unlock();
+
+	return true;
+}
+
+// This should only be invoked from the Update/Game thread
+void HyGfxComms::RxApiMsgs(std::queue<HyApiMsgInterop> &msgQueueOut)
+{
+	m_csApiMsgQueue.Lock();
+
+	while(m_ApiMsgQueue.empty() == false)
+	{
+		msgQueueOut.push(m_ApiMsgQueue.front());
+		m_ApiMsgQueue.pop();
+	}
+
+	m_csApiMsgQueue.Unlock();
 }

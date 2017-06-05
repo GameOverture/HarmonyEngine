@@ -16,12 +16,12 @@ HyEngine *		HyEngine::sm_pInstance = NULL;
 
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
-												m_Scene(m_GfxBuffer, m_AppRef.m_WindowList),
-												m_Assets(m_AppRef.m_Init.sDataDir, m_GfxBuffer, m_Scene),
+												m_Scene(m_GfxComms, m_AppRef.m_WindowList),
+												m_Assets(m_AppRef.m_Init.sDataDir, m_GfxComms, m_Scene),
 												m_Diagnostics(m_AppRef.m_Init, m_Assets, m_Scene),
 												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_Assets),
-												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList),
-												m_Renderer(m_GfxBuffer, m_Input, m_Diagnostics, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
+												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList, m_GfxComms),
+												m_Renderer(m_GfxComms, m_Diagnostics, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
@@ -88,6 +88,7 @@ bool HyEngine::Update()
 	m_Time.ThrottleTime();
 #endif
 	{
+		m_Input.Update();
 		m_Scene.PreUpdate();
 
 		if(m_AppRef.Update() == false)
@@ -104,8 +105,7 @@ bool HyEngine::Update()
 	}
 
 #if !defined(HYSETTING_MultithreadedRenderer) || defined(HY_PLATFORM_GUI)
-	m_Input.Update();
-	if(m_Renderer.PollPlatformApi() == false)
+	if(m_GfxComms.Render_PollPlatformApi(&m_Renderer) == false)
 		return false;
 
 	m_Renderer.Update();

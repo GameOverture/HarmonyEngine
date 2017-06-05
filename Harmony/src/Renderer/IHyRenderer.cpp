@@ -11,12 +11,12 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyRenderSurface.h"
+#include "Renderer/Components/HyGfxComms.h"
 
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
 int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 
-IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, IHyInput &inputRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	m_GfxCommsRef(gfxCommsRef),
-																																									m_InputRef(inputRef),
+IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	m_GfxCommsRef(gfxCommsRef),
 																																									m_DiagnosticsRef(diagnosticsRef),
 																																									m_bShowCursor(bShowCursor),
 																																									m_WindowListRef(windowListRef)
@@ -49,6 +49,63 @@ void IHyRenderer::StartUp()
 void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader)
 {
 	m_DiagnosticsRef.SetRendererInfo(sApiName, sVersion, sVendor, sRenderer, sShader);
+}
+
+int32 IHyRenderer::GetNumCameras2d()
+{
+	return *(reinterpret_cast<int32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras2d));
+}
+
+uint32 IHyRenderer::GetCameraWindowIndex2d(int iCameraIndex)
+{
+	return *(reinterpret_cast<uint32 *>(m_pDrawBuffer +
+										HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
+										sizeof(int32) +
+										(iCameraIndex * (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4)))));
+}
+
+HyRectangle<float> *IHyRenderer::GetCameraViewportRect2d(int iIndex)
+{
+	return reinterpret_cast<HyRectangle<float> *>(m_pDrawBuffer +
+												  HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
+												  sizeof(int32) +
+												  (iIndex * (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) +
+												  sizeof(uint32));
+}
+
+glm::mat4 *IHyRenderer::GetCameraView2d(int iIndex)
+{
+	return reinterpret_cast<glm::mat4 *>(m_pDrawBuffer +
+										 HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
+										 sizeof(int32) +
+										 (iIndex * (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) +
+										 sizeof(uint32) +
+										 sizeof(HyRectangle<float>));
+}
+
+int32 IHyRenderer::GetNumInsts3d()
+{
+	return *(reinterpret_cast<int32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras3d));
+}
+
+int32 IHyRenderer::GetNumCameras3d()
+{
+	return *(reinterpret_cast<int32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras3d));
+}
+
+int32 IHyRenderer::GetNumRenderStates2d()
+{
+	return *(reinterpret_cast<int32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToInst2d));
+}
+
+HyRenderState *IHyRenderer::GetRenderStatesPtr2d()
+{
+	return reinterpret_cast<HyRenderState *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToInst2d + sizeof(int32)); // Last sizeof(int32) is skipping number of 2dInsts
+}
+
+char *IHyRenderer::GetVertexData2d()
+{
+	return reinterpret_cast<char *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToVertexData2d);
 }
 
 /*static*/ IHyShader *IHyRenderer::FindShader(int32 iId)
@@ -120,7 +177,7 @@ void IHyRenderer::Update()
 		//HyLogWarning("Renderer got stale buffer");
 		return;
 	}
-	m_pDrawBufferHeader = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBuffer);
+	//HyGfxComms::tDrawHeader *pDrawBufferHeader = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBuffer);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
@@ -184,32 +241,6 @@ void IHyRenderer::SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info)
 	HyWindow::SetMonitorDeviceInfo(info);
 }
 
-bool IHyRenderer::PollPlatformApi()
-{
-#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
-	// TODO: return false when windows close message comes in or something similar
-	MSG msg = { 0 };
-	int32 iWindowIndex = 0;
-	HWND hWnd = static_cast<HyOpenGL_Win *>(this)->GetHWND(iWindowIndex);
-
-	while(hWnd != nullptr)
-	{
-		while(PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-
-			static_cast<HyInputInterop &>(m_InputRef).HandleMsg(iWindowIndex, m_RenderSurfaces[iWindowIndex].GetWidth(), m_RenderSurfaces[iWindowIndex].GetHeight(), msg);
-		}
-
-		iWindowIndex++;
-		hWnd = static_cast<HyOpenGL_Win *>(this)->GetHWND(iWindowIndex);
-	}
-#endif
-
-	return true;
-}
-
 /*static*/ void IHyRenderer::RenderThread(void *pParam)
 {
 	IHyRenderer *pRenderer = reinterpret_cast<IHyRenderer *>(pParam);
@@ -217,14 +248,6 @@ bool IHyRenderer::PollPlatformApi()
 	if(false == pRenderer->Initialize())
 		HyError("Renderer API's Initialize() failed");
 
-	while(true)
-	{
-		pRenderer->m_InputRef.CsLock();
-		pRenderer->m_InputRef.Update();
-		if(pRenderer->PollPlatformApi() == false)
-			break;
-		pRenderer->m_InputRef.CsUnlock();
-
+	while(pRenderer->m_GfxCommsRef.Render_PollPlatformApi(pRenderer))
 		pRenderer->Update();
-	}
 }

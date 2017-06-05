@@ -20,7 +20,7 @@ class HyInput_NULL : public IHyInput
 public:
 	HyInput_NULL(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) : IHyInput(uiNumInputMappings, windowListRef) { }
 
-	virtual void Update() override { }
+	virtual void Update(std::queue<HyApiMsgInterop> &apiMsgQueueRef) override { }
 
 	void HandleMsg(uint32 uiWindowIndex, int32 iWidth, int32 iHeight, const MSG &msg) { }
 
