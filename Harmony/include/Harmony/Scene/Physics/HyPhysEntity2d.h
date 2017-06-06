@@ -29,7 +29,7 @@ class HyPhysEntity2d : public HyEntity2d
 
 	struct tFixture
 	{
-		enum eFixtureFlag
+		enum FixtureFlag
 		{
 			FIXTUREFLAG_IsGrounded = 1 << 0
 		};

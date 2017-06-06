@@ -19,7 +19,7 @@ class HyEntity2d : public IHyNodeDraw2d
 protected:
 	std::vector<IHyNode2d *>		m_ChildList;
 
-	enum eAttributes
+	enum Attributes
 	{
 		ATTRIBFLAG_MouseInput				= 1 << 1,
 		ATTRIBFLAG_HasBoundingVolume		= 1 << 2,
@@ -29,13 +29,13 @@ protected:
 	};
 	uint32							m_uiAttributes;
 
-	enum eMouseInputState
+	enum MouseInputState
 	{
 		MOUSEINPUT_None = 0,
 		MOUSEINPUT_Hover,
 		MOUSEINPUT_Down
 	};
-	eMouseInputState				m_eMouseInputState;
+	MouseInputState					m_eMouseInputState;
 	void *							m_pMouseInputUserParam;
 
 	HyScreenRect<int32>				m_WorldScissorRect;

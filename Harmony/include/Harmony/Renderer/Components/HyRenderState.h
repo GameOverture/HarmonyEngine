@@ -24,7 +24,7 @@ class HyRenderState
 	// WARNING: This class should not dynamically allocate any memory or use any object that does so
 
 public:
-	enum eAttributes
+	enum Attributes
 	{
 		SCISSORTEST				= 1 << 0,
 		USINGSCREENCOORDS		= 1 << 1,	// If disabled, then using world coordinates
@@ -75,7 +75,7 @@ public:
 	void Enable(uint32 uiAttributes);
 	void Disable(uint32 uiAttributes);
 	bool CompareAttribute(const HyRenderState &rs, uint32 uiMask);
-	bool IsEnabled(eAttributes eAttrib);
+	bool IsEnabled(Attributes eAttrib);
 	uint32 GetAttributeBitFlags() const;
 
 	int32 GetShaderId() const;

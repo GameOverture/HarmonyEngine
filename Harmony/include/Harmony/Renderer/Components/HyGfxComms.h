@@ -23,7 +23,7 @@
 class HyGfxComms
 {
 public:
-	enum eGfxReturnFlags
+	enum GfxReturnFlags
 	{
 		GFXFLAG_HasRendered = 1 << 0
 	};

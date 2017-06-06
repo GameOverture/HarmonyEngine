@@ -17,14 +17,14 @@ class HyAudio2d : public IHyAudioInstInterop
 {
 	HyAudioData *						m_pDataPtr;
 
-	enum eCueType
+	enum CueType
 	{
 		SNDCUETYPE_Unknown = -1,
 		SNDCUETYPE_Single = 0,
 		SNDCUETYPE_WeightTable = 1,
 		SNDCUETYPE_Cycle = 2,
 	};
-	eCueType		m_eCueType;
+	CueType		m_eCueType;
 
 public:
 	HyAudio2d();

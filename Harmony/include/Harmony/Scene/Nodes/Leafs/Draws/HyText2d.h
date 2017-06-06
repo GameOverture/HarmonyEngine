@@ -39,7 +39,7 @@ protected:
 	};
 	std::vector<StateColors *>		m_StateColors;
 
-	enum eBoxAttributes
+	enum BoxAttributes
 	{
 		BOXATTRIB_IsColumn				= 1 << 0,
 		BOXATTRIB_CenterVertically		= 1 << 1,

@@ -110,7 +110,7 @@ bool HyRenderState::CompareAttribute(const HyRenderState &rs, uint32 uiMask)
 	return (m_uiAttributeFlags & uiMask) == (rs.m_uiAttributeFlags & uiMask);
 }
 
-bool HyRenderState::IsEnabled(eAttributes eAttrib)
+bool HyRenderState::IsEnabled(Attributes eAttrib)
 {
 	return 0 != (m_uiAttributeFlags & eAttrib);
 }
