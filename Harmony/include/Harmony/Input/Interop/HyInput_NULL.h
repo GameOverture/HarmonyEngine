@@ -18,9 +18,9 @@ class HyWindow;
 class HyInput_NULL : public IHyInput
 {
 public:
-	HyInput_NULL(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) : IHyInput(uiNumInputMappings, windowListRef) { }
+	HyInput_NULL(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef, HyGfxComms &gfxCommsRef) : IHyInput(uiNumInputMappings, windowListRef, gfxCommsRef) { }
 
-	virtual void Update(std::queue<HyApiMsgInterop> &apiMsgQueueRef) override { }
+	virtual void Update() override { }
 
 	void HandleMsg(uint32 uiWindowIndex, int32 iWidth, int32 iHeight, const MSG &msg) { }
 
