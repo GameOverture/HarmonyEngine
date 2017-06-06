@@ -23,7 +23,8 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 																								m_sVersion("Unknown"),
 																								m_sVendor("Unknown"),
 																								m_sRenderer("Unknown"),
-																								m_sShader("Unknown")
+																								m_sShader("Unknown"),
+																								m_sCompressedTextures("Unknown")
 {
 #if defined(HY_PLATFORM_WINDOWS)
 	m_sPlatform = "Windows";
@@ -105,6 +106,7 @@ void HyDiagnostics::BootMessage()
 	HyLog("Vendor:         " << m_sVendor);
 	HyLog("Renderer:       " << m_sRenderer);
 	HyLog("Shader:         " << m_sShader);
+	HyLog("Compression:    " << m_sCompressedTextures);
 	HyLog("");
 }
 
@@ -174,11 +176,12 @@ void HyDiagnostics::DumpNodeUsage()
 	HyLog("3D Mesh Nodes:      " << uiNumMesh3d);
 }
 
-void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader)
+void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, const std::string &sCompressedTextures)
 {
 	m_sGfxApi = sApi;
 	m_sVersion = sVersion;
 	m_sVendor = sVendor;
 	m_sRenderer = sRenderer;
 	m_sShader = sShader;
+	m_sCompressedTextures = sCompressedTextures;
 }

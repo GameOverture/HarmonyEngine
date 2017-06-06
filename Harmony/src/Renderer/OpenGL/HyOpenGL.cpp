@@ -41,11 +41,55 @@ HyOpenGL::~HyOpenGL(void)
 		HyError("At least OpenGL 3.3 must be supported");
 	}
 
+	GLint iFormatCount = 0;
+	glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS, &iFormatCount);
+	GLint *pFormatArray = new GLint[iFormatCount];
+	glGetIntegerv(GL_COMPRESSED_TEXTURE_FORMATS, pFormatArray);
+	std::string sCompressedTextureFormats;
+	for(int32 i = 0; i < iFormatCount; ++i)
+	{
+		switch(pFormatArray[i])
+		{
+		//case GL_COMPRESSED_RGBA_BPTC_UNORM:					sCompressedTextureFormats += "DXT_BC7";	break;
+		//case GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB:		sCompressedTextureFormats += "";	break;
+		//case GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB:		sCompressedTextureFormats += "";	break;
+		//case GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB:		sCompressedTextureFormats += "";	break;
+		//case GL_COMPRESSED_RGB8_ETC2:						sCompressedTextureFormats += "";	break;
+		//case GL_COMPRESSED_SRGB8_ETC2:						sCompressedTextureFormats += "";	break;
+		//case GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:	sCompressedTextureFormats += "";	break;
+		//case GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:	sCompressedTextureFormats += "";	break;
+		//case GL_COMPRESSED_RGBA8_ETC2_EAC:					sCompressedTextureFormats += "";	break;
+		//case GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:			sCompressedTextureFormats += "";	break;
+		//case GL_COMPRESSED_R11_EAC:							sCompressedTextureFormats += "";	break;
+		//case GL_COMPRESSED_SIGNED_R11_EAC:					sCompressedTextureFormats += "";	break;
+		//case GL_COMPRESSED_RG11_EAC:						sCompressedTextureFormats += "";	break;
+		//case GL_COMPRESSED_SIGNED_RG11_EAC:					sCompressedTextureFormats += "";	break;
+		case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
+			sCompressedTextureFormats += "RGB_DXT1 ";
+			m_uiSupportedTextureFormats |= HYTEXTURE_RGB_DTX1;
+			break;
+		case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
+			sCompressedTextureFormats += "RGBA_DXT1 ";
+			m_uiSupportedTextureFormats |= HYTEXTURE_RGB_DTX1;
+			break;
+		case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
+			sCompressedTextureFormats += "DXT3 ";
+			m_uiSupportedTextureFormats |= HYTEXTURE_DTX3;
+			break;
+		case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+			sCompressedTextureFormats += "DXT5 ";
+			m_uiSupportedTextureFormats |= HYTEXTURE_DTX5;
+			break;
+		}
+	}
+	delete[] pFormatArray;
+
 	SetRendererInfo("OpenGL",
 					reinterpret_cast<const char *>(glGetString(GL_VERSION)),
 					reinterpret_cast<const char *>(glGetString(GL_VENDOR)),
 					reinterpret_cast<const char *>(glGetString(GL_RENDERER)),
-					reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
+					reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION)),
+					sCompressedTextureFormats);
 
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -350,10 +394,54 @@ HyOpenGL::~HyOpenGL(void)
 
 }
 
-/*virtual*/ uint32 HyOpenGL::AddTexture(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData)
+/*virtual*/ uint32 HyOpenGL::AddTexture(HyTextureFormat eDesiredFormat, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, HyTextureFormat ePixelDataFormat)
 {
-	GLenum eInternalFormat = uiNumColorChannels == 4 ? GL_RGBA : (uiNumColorChannels == 3 ? GL_RGB : GL_ALPHA);
-	GLenum eFormat = uiNumColorChannels == 4 ? GL_RGBA : (uiNumColorChannels == 3 ? GL_RGB : GL_RED);
+	GLenum eInternalFormat = GL_RGBA;
+	switch(eDesiredFormat)
+	{
+		case HYTEXTURE_R8G8B8A8: {
+			eInternalFormat = GL_RGBA;
+		} break;
+		case HYTEXTURE_R8G8B8: {
+			eInternalFormat = GL_RGB;
+		} break;
+		case HYTEXTURE_RGB_DTX1: {
+			eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_RGB_DTX1)) ? GL_COMPRESSED_RGB_S3TC_DXT1_EXT : GL_COMPRESSED_RGB;
+		} break;
+		case HYTEXTURE_RGBA_DTX1: {
+			eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_RGBA_DTX1)) ? GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : GL_COMPRESSED_RGBA;
+		} break;
+		case HYTEXTURE_DTX3: {
+			eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_DTX3)) ? GL_COMPRESSED_RGBA_S3TC_DXT3_EXT : GL_COMPRESSED_RGBA;
+		} break;
+		case HYTEXTURE_DTX5: {
+			eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_DTX5)) ? GL_COMPRESSED_RGBA_S3TC_DXT5_EXT : GL_COMPRESSED_RGBA;
+		} break;
+		default: {
+			HyLogError("Unknown TextureFormat used for 'eDesiredFormat'");
+		} break;
+	}
+
+	GLenum eFormat = GL_RGBA;
+	bool bIsPixelDataCompressed = false;
+	switch(ePixelDataFormat)
+	{
+		case HYTEXTURE_R8G8B8A8: {
+			eFormat = GL_RGBA;
+		} break;
+		case HYTEXTURE_R8G8B8: {
+			eFormat = GL_RGB;
+		} break;
+		case HYTEXTURE_RGB_DTX1:
+		case HYTEXTURE_RGBA_DTX1:
+		case HYTEXTURE_DTX3:
+		case HYTEXTURE_DTX5: {
+			bIsPixelDataCompressed = true;
+		} break;
+		default: {
+			HyLogError("Unknown TextureFormat used for 'ePixelDataFormat'");
+		} break;
+	}
 
 	GLuint hGLTexture;
 	glGenTextures(1, &hGLTexture);
@@ -364,11 +452,19 @@ HyOpenGL::~HyOpenGL(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // GL_NEAREST
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // GL_NEAREST
 
-	glTexImage2D(GL_TEXTURE_2D, 0, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
-	HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
+	if(bIsPixelDataCompressed == false)
+	{
+		glTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
+		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
+	}
+	else
+	{
+		glCompressedTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, 4194304/*uiWidth*uiHeight*4*/, pPixelData);
+		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glCompressedTexImage2D");
+	}
+
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-
 	return hGLTexture;
 }
 

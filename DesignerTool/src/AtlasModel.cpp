@@ -275,9 +275,9 @@ QSize AtlasModel::GetAtlasDimensions(uint uiAtlasGrpIndex)
     return QSize(iWidth, iHeight);
 }
 
-AtlasTextureType AtlasModel::GetAtlasTextureType(uint uiAtlasGrpIndex)
+HyTextureFormat AtlasModel::GetAtlasTextureType(uint uiAtlasGrpIndex)
 {
-    return static_cast<AtlasTextureType>(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["textureType"].toInt());
+    return static_cast<HyTextureFormat>(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["textureType"].toInt());
 }
 
 void AtlasModel::WriteMetaSettings()
@@ -1050,17 +1050,17 @@ void AtlasModel::ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex
     }
 
     QImage *pTexture = static_cast<QImage *>(p.device());
-    AtlasTextureType eTextureType = static_cast<AtlasTextureType>(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["textureType"].toInt());
+    HyTextureFormat eTextureType = static_cast<HyTextureFormat>(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["textureType"].toInt());
     
     switch(eTextureType)
     {
-        case ATLASTEXTYPE_R8G8B8A8: {
+        case HYTEXTURE_R8G8B8A8: {
             if(false == pTexture->save(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".png"))) {
                 HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a PNG atlas", LOGTYPE_Error);
             }
         } break;
     
-        case ATLASTEXTYPE_DTX5: {
+        case HYTEXTURE_DTX5: {
             QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGBA8888);
             if(0 == SOIL_save_image_quality(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
                                             SOIL_SAVE_TYPE_DDS,
@@ -1074,7 +1074,7 @@ void AtlasModel::ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex
             }
         } break;
         
-        case ATLASTEXTYPE_DTX1: {
+        case HYTEXTURE_RGB_DTX1: {
             QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGB888);
             if(0 == SOIL_save_image_quality(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
                                             SOIL_SAVE_TYPE_DDS,
@@ -1084,8 +1084,26 @@ void AtlasModel::ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex
                                             imgProperlyFormatted.bits(),
                                             0))
             {
-                HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a DTX1 atlas", LOGTYPE_Error);
+                HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a RGB DTX1 atlas", LOGTYPE_Error);
             }
+        } break;
+        
+        case HYTEXTURE_RGBA_DTX1: {
+            QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGBA8888);
+            if(0 == SOIL_save_image_quality(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
+                                            SOIL_SAVE_TYPE_DDS,
+                                            imgProperlyFormatted.width(),
+                                            imgProperlyFormatted.height(),
+                                            4,
+                                            imgProperlyFormatted.bits(),
+                                            0))
+            {
+                HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a RGBA DTX1 atlas", LOGTYPE_Error);
+            }
+        } break;
+        
+        default: {
+            HyGuiLog("AtlasModel::ConstructAtlasTexture tried to create an unsupported texture type: " % QString::number(eTextureType), LOGTYPE_Error);
         } break;
     }
 }

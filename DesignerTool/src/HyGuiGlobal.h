@@ -21,6 +21,7 @@
 #include <QStack>
 
 #include "WidgetOutputLog.h"
+#include "Harmony/HyEngine.h"
 
 #define HyDesignerToolName "Harmony Designer Tool"
 
@@ -61,15 +62,6 @@ enum eAtlasNodeType
     ATLAS_Font,
     
     NUMATLAS
-};
-
-enum AtlasTextureType
-{
-    ATLASTEXTYPE_R8G8B8A8 = 0,
-    ATLASTEXTYPE_DTX5,
-    ATLASTEXTYPE_DTX1,
-    
-    NUMATLASTEXTYPE
 };
 
 enum eAudioNodeType
@@ -268,19 +260,25 @@ public:
         return list;
     }
     
-    static QString AtlasTextureTypeString(AtlasTextureType eType)
+    static QString AtlasTextureTypeString(HyTextureFormat eType)
     {
         switch(eType)
         {
-        case ATLASTEXTYPE_R8G8B8A8:
+        case HYTEXTURE_R8G8B8A8:
             return "R8G8B8A8";
-        case ATLASTEXTYPE_DTX5:
+        case HYTEXTURE_R8G8B8:
+            return "R8G8B8 (unsupported)";
+        case HYTEXTURE_RGB_DTX1:
+            return "RGB_DTX1 (unsupported)";
+        case HYTEXTURE_RGBA_DTX1:
+            return "RGBA_DTX1";
+        case HYTEXTURE_DTX3:
+            return "DTX3 (unsupported)";
+        case HYTEXTURE_DTX5:
             return "DTX5";
-        case ATLASTEXTYPE_DTX1:
-            return "DTX1";
         }
         
-        return "";
+        return "Unknown";
     }
     
     static const QString &ItemName(eItemType eItm)                  { return sm_sItemNames[eItm]; }

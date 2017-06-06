@@ -27,7 +27,7 @@ class HyAtlas : public IHyLoadableData
 	const uint32							m_uiMASTER_INDEX;
 	const uint32							m_uiWIDTH;
 	const uint32							m_uiHEIGHT;
-	const uint32							m_uiNUM_8BIT_CHANNELS;
+	const HyTextureFormat					m_eTEXTURE_FORMAT;
 
 	uint32									m_uiGfxApiHandle;
 
@@ -50,7 +50,7 @@ class HyAtlas : public IHyLoadableData
 	BasicSection							m_csPixelData;
 
 public:
-	HyAtlas(std::string sFilePath, uint32 uiAtlasGroupId, uint32 uiIndexInGroup, uint32 uiMasterIndex, uint32 uiWidth, uint32 uiHeight, uint32 uiNumClrChannels, jsonxx::Array &srcFramesArrayRef);
+	HyAtlas(std::string sFilePath, uint32 uiAtlasGroupId, uint32 uiIndexInGroup, uint32 uiMasterIndex, uint32 uiWidth, uint32 uiHeight, HyTextureFormat eTextureFormat, jsonxx::Array &srcFramesArrayRef);
 	~HyAtlas();
 
 	uint32 GetAtlasGroupId() const;

@@ -54,7 +54,7 @@ void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelD
         MainWindow::GetCurrentRenderer()->DeleteTextureArray(m_pDrawAtlasPreview->GetGraphicsApiHandle());
 
     // Upload texture to gfx api
-    pAtlas->id = MainWindow::GetCurrentRenderer()->AddTexture(4 /*converted texture depth*/, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), pAtlasPixelData);
+    pAtlas->id = MainWindow::GetCurrentRenderer()->AddTexture(HYTEXTURE_R8G8B8A8, 0, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), pAtlasPixelData, HYTEXTURE_R8G8B8A8);
 
     // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
     delete m_pDrawAtlasPreview;

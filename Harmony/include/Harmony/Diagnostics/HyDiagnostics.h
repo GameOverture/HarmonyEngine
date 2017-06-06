@@ -34,6 +34,7 @@ class HyDiagnostics
 	std::string			m_sVendor;
 	std::string			m_sRenderer;
 	std::string			m_sShader;
+	std::string			m_sCompressedTextures;
 
 public:
 	HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef);
@@ -44,7 +45,7 @@ public:
 	void DumpNodeUsage();
 
 private:
-	void SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader);
+	void SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, const std::string &sCompressedTextures);
 };
 
 #endif /* HyDiagnostics_h__ */

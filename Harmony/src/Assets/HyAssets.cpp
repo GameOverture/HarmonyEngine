@@ -140,7 +140,9 @@ void HyAssets::ParseInitInfo()
 				std::sprintf(szTmpBuffer, "%05d", j);
 				sAtlasFilePath += szTmpBuffer;
 
-				if(atlasGrpObj.get<jsonxx::Number>("textureType") == 0)
+				uint32 uiTextureFormat = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("textureType"));
+
+				if(uiTextureFormat == HYTEXTURE_R8G8B8A8 || uiTextureFormat == HYTEXTURE_R8G8B8)
 					sAtlasFilePath += ".png";
 				else
 					sAtlasFilePath += ".dds";
@@ -151,7 +153,7 @@ void HyAssets::ParseInitInfo()
 												 uiMasterIndex,
 												 static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("width")),
 												 static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("height")),
-												 4,//static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("num8BitClrChannels")),
+												 static_cast<HyTextureFormat>(uiTextureFormat),
 												 texturesArray.get<jsonxx::Array>(j));
 
 				++pAtlasWriteLocation;

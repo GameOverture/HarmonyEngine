@@ -91,7 +91,7 @@ public:
     QList<AtlasTreeItem *> GetTopLevelTreeItemList();
 
     QSize GetAtlasDimensions(uint uiAtlasGrpIndex);
-    AtlasTextureType GetAtlasTextureType(uint uiAtlasGrpIndex);
+    HyTextureFormat GetAtlasTextureType(uint uiAtlasGrpIndex);
 
     void WriteMetaSettings();
     void WriteMetaSettings(QJsonArray frameArray);

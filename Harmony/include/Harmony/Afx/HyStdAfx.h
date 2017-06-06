@@ -69,6 +69,18 @@ enum HyLoadState
 	HYLOADSTATE_Loaded
 };
 
+enum HyTextureFormat
+{
+	HYTEXTURE_R8G8B8A8 = 0,	// Uncompressed with alpha (32-bpp)
+	HYTEXTURE_R8G8B8,		// Uncompressed no alpha (24-bpp)
+	HYTEXTURE_RGB_DTX1,
+	HYTEXTURE_RGBA_DTX1,
+	HYTEXTURE_DTX3,
+	HYTEXTURE_DTX5,
+
+	HYNUMTEXTUREFORMATS
+};
+
 enum HyShaderProgram
 {
 	HYSHADERPROG_QuadBatch = 0,
