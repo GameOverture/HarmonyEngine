@@ -290,7 +290,7 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 			switch(m_eMouseInputState)
 			{
 			case MOUSEINPUT_None:
-				if(bLeftClickDown == false && bMouseInBounds)
+				if(bMouseInBounds)
 				{
 					m_eMouseInputState = MOUSEINPUT_Hover;
 					OnMouseEnter(m_pMouseInputUserParam);
