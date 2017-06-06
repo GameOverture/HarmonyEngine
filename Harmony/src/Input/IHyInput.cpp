@@ -42,18 +42,15 @@ IHyInputMap *IHyInput::GetInputMapArray()
 
 glm::vec2 IHyInput::GetWorldMousePos()
 {
-	glm::vec2 vRetVec = m_WindowListRef[m_uiMouseWindowIndex]->ConvertViewportCoordinateToWorldPos(m_ptLocalMousePos);
-	return vRetVec;
+	return m_WindowListRef[m_uiMouseWindowIndex]->ConvertViewportCoordinateToWorldPos(m_ptLocalMousePos);
 }
 
 bool IHyInput::IsMouseLeftDown()
 {
-	bool bReturnVal = m_bMouseLeftDown;
-	return bReturnVal;
+	return m_bMouseLeftDown;
 }
 
 bool IHyInput::IsMouseRightDown()
 {
-	bool bReturnVal = m_bMouseRightDown;
-	return bReturnVal;
+	return m_bMouseRightDown;
 }
