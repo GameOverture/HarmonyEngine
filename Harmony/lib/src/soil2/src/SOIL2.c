@@ -2312,6 +2312,304 @@ unsigned int SOIL_direct_load_DDS(
 	return tex_ID;
 }
 
+/** Gets the (possibly compressed) DDS texture memory that can be directly to the
+	GPU memory (removes check for support 'cuz we're invoking on a different thread than OpenGL)
+
+	Added by Jason Knobler for Harmony Engine
+**/
+unsigned char *SOIL_load_DDS(const char *filename, int loading_as_cubemap)
+{
+	FILE *f;
+	unsigned char *buffer;
+	size_t buffer_length, bytes_read;
+	//unsigned int tex_ID = 0;
+	/*	error checks	*/
+	if(NULL == filename)
+	{
+		result_string_pointer = "NULL filename";
+		return 0;
+	}
+	f = fopen(filename, "rb");
+	if(NULL == f)
+	{
+		/*	the file doesn't seem to exist (or be open-able)	*/
+		result_string_pointer = "Can not find DDS file";
+		return 0;
+	}
+	fseek(f, 0, SEEK_END);
+	buffer_length = ftell(f);
+	fseek(f, 0, SEEK_SET);
+	buffer = (unsigned char *)malloc(buffer_length);
+	if(NULL == buffer)
+	{
+		result_string_pointer = "malloc failed";
+		fclose(f);
+		return 0;
+	}
+	bytes_read = fread((void*)buffer, 1, buffer_length, f);
+	fclose(f);
+	if(bytes_read < buffer_length)
+	{
+		/*	huh?	*/
+		buffer_length = bytes_read;
+	}
+
+
+	/*	variables	*/
+	DDS_header header;
+	unsigned int buffer_index = 0;
+	//unsigned int tex_ID = 0;
+	/*	file reading variables	*/
+	unsigned int S3TC_type = 0;
+	unsigned char *DDS_data = NULL;
+	unsigned int DDS_main_size;
+	unsigned int DDS_full_size;
+	unsigned int width, height;
+	int mipmaps, cubemap, uncompressed, block_size = 16;
+	unsigned int flag;
+	unsigned int cf_target, ogl_target_start, ogl_target_end;
+	unsigned int opengl_texture_type;
+	int i;
+	/*	1st off, does the filename even exist?	*/
+	if(NULL == buffer)
+	{
+		/*	we can't do it!	*/
+		result_string_pointer = "NULL buffer";
+		return 0;
+	}
+	if(buffer_length < sizeof(DDS_header))
+	{
+		/*	we can't do it!	*/
+		result_string_pointer = "DDS file was too small to contain the DDS header";
+		return 0;
+	}
+	/*	try reading in the header	*/
+	memcpy((void*)(&header), (const void *)buffer, sizeof(DDS_header));
+	buffer_index = sizeof(DDS_header);
+	/*	guilty until proven innocent	*/
+	result_string_pointer = "Failed to read a known DDS header";
+	/*	validate the header (warning, "goto"'s ahead, shield your eyes!!)	*/
+	flag = ('D' << 0) | ('D' << 8) | ('S' << 16) | (' ' << 24);
+	if(header.dwMagic != flag) { goto quick_exit; }
+	if(header.dwSize != 124) { goto quick_exit; }
+	/*	I need all of these	*/
+	flag = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
+	if((header.dwFlags & flag) != flag) { goto quick_exit; }
+	/*	According to the MSDN spec, the dwFlags should contain
+	DDSD_LINEARSIZE if it's compressed, or DDSD_PITCH if
+	uncompressed.  Some DDS writers do not conform to the
+	spec, so I need to make my reader more tolerant	*/
+	/*	I need one of these	*/
+	flag = DDPF_FOURCC | DDPF_RGB;
+	if((header.sPixelFormat.dwFlags & flag) == 0) { goto quick_exit; }
+	if(header.sPixelFormat.dwSize != 32) { goto quick_exit; }
+	if((header.sCaps.dwCaps1 & DDSCAPS_TEXTURE) == 0) { goto quick_exit; }
+	/*	make sure it is a type we can upload	*/
+	if((header.sPixelFormat.dwFlags & DDPF_FOURCC) &&
+		!(
+		(header.sPixelFormat.dwFourCC == (('D' << 0) | ('X' << 8) | ('T' << 16) | ('1' << 24))) ||
+		(header.sPixelFormat.dwFourCC == (('D' << 0) | ('X' << 8) | ('T' << 16) | ('3' << 24))) ||
+		(header.sPixelFormat.dwFourCC == (('D' << 0) | ('X' << 8) | ('T' << 16) | ('5' << 24)))
+		))
+	{
+		goto quick_exit;
+	}
+	/*	OK, validated the header, let's load the image data	*/
+	result_string_pointer = "DDS header loaded and validated";
+	width = header.dwWidth;
+	height = header.dwHeight;
+	uncompressed = 1 - (header.sPixelFormat.dwFlags & DDPF_FOURCC) / DDPF_FOURCC;
+	cubemap = (header.sCaps.dwCaps2 & DDSCAPS2_CUBEMAP) / DDSCAPS2_CUBEMAP;
+	if(uncompressed)
+	{
+		S3TC_type = GL_RGB;
+		block_size = 3;
+		if(header.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS)
+		{
+			S3TC_type = GL_RGBA;
+			block_size = 4;
+		}
+		DDS_main_size = width * height * block_size;
+	}
+	else
+	{
+		///*	can we even handle direct uploading to OpenGL DXT compressed images?	*/
+		//if(query_DXT_capability() != SOIL_CAPABILITY_PRESENT)
+		//{
+		//	/*	we can't do it!	*/
+		//	result_string_pointer = "Direct upload of S3TC images not supported by the OpenGL driver";
+		//	return 0;
+		//}
+		/*	well, we know it is DXT1/3/5, because we checked above	*/
+		switch((header.sPixelFormat.dwFourCC >> 24) - '0')
+		{
+		case 1:
+			S3TC_type = SOIL_RGBA_S3TC_DXT1;
+			block_size = 8;
+			break;
+		case 3:
+			S3TC_type = SOIL_RGBA_S3TC_DXT3;
+			block_size = 16;
+			break;
+		case 5:
+			S3TC_type = SOIL_RGBA_S3TC_DXT5;
+			block_size = 16;
+			break;
+		}
+		DDS_main_size = ((width + 3) >> 2)*((height + 3) >> 2)*block_size;
+	}
+	if(cubemap)
+	{
+		/* does the user want a cubemap?	*/
+		if(!loading_as_cubemap)
+		{
+			/*	we can't do it!	*/
+			result_string_pointer = "DDS image was a cubemap";
+			return 0;
+		}
+		///*	can we even handle cubemaps with the OpenGL driver?	*/
+		//if(query_cubemap_capability() != SOIL_CAPABILITY_PRESENT)
+		//{
+		//	/*	we can't do it!	*/
+		//	result_string_pointer = "Direct upload of cubemap images not supported by the OpenGL driver";
+		//	return 0;
+		//}
+		ogl_target_start = SOIL_TEXTURE_CUBE_MAP_POSITIVE_X;
+		ogl_target_end = SOIL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
+		opengl_texture_type = SOIL_TEXTURE_CUBE_MAP;
+	}
+	else
+	{
+		/* does the user want a non-cubemap?	*/
+		if(loading_as_cubemap)
+		{
+			/*	we can't do it!	*/
+			result_string_pointer = "DDS image was not a cubemap";
+			return 0;
+		}
+		ogl_target_start = GL_TEXTURE_2D;
+		ogl_target_end = GL_TEXTURE_2D;
+		opengl_texture_type = GL_TEXTURE_2D;
+	}
+	if((header.sCaps.dwCaps1 & DDSCAPS_MIPMAP) && (header.dwMipMapCount > 1))
+	{
+		mipmaps = header.dwMipMapCount - 1;
+		DDS_full_size = DDS_main_size;
+		for(i = 1; i <= mipmaps; ++i)
+		{
+			int w, h;
+			w = width >> i;
+			h = height >> i;
+			if(w < 1)
+			{
+				w = 1;
+			}
+			if(h < 1)
+			{
+				h = 1;
+			}
+			if(uncompressed)
+			{
+				/*	uncompressed DDS, simple MIPmap size calculation	*/
+				DDS_full_size += w*h*block_size;
+			}
+			else
+			{
+				/*	compressed DDS, MIPmap size calculation is block based	*/
+				DDS_full_size += ((w + 3) / 4)*((h + 3) / 4)*block_size;
+			}
+		}
+	}
+	else
+	{
+		mipmaps = 0;
+		DDS_full_size = DDS_main_size;
+	}
+
+	DDS_data = (unsigned char*)malloc(DDS_full_size);
+
+
+	/*	do this for each face of the cubemap!	*/
+	for(cf_target = ogl_target_start; cf_target <= ogl_target_end; ++cf_target)
+	{
+		if(buffer_index + DDS_full_size <= (unsigned int)buffer_length)
+		{
+			unsigned int byte_offset = DDS_main_size;
+			memcpy((void*)DDS_data, (const void*)(&buffer[buffer_index]), DDS_full_size);
+			buffer_index += DDS_full_size;
+			/*	upload the main chunk	*/
+			if(uncompressed)
+			{
+				/*	and remember, DXT uncompressed uses BGR(A),
+				so swap to RGB(A) for ALL MIPmap levels	*/
+				for(i = 0; i < (int)DDS_full_size; i += block_size)
+				{
+					unsigned char temp = DDS_data[i];
+					DDS_data[i] = DDS_data[i + 2];
+					DDS_data[i + 2] = temp;
+				}
+				//glTexImage2D(
+				//	cf_target, 0,
+				//	S3TC_type, width, height, 0,
+				//	S3TC_type, GL_UNSIGNED_BYTE, DDS_data);
+			}
+			//else
+			//{
+			//	soilGlCompressedTexImage2D(
+			//		cf_target, 0,
+			//		S3TC_type, width, height, 0,
+			//		DDS_main_size, DDS_data);
+			//}
+			/*	upload the mipmaps, if we have them	*/
+			//for(i = 1; i <= mipmaps; ++i)
+			//{
+			//	int w, h, mip_size;
+			//	w = width >> i;
+			//	h = height >> i;
+			//	if(w < 1)
+			//	{
+			//		w = 1;
+			//	}
+			//	if(h < 1)
+			//	{
+			//		h = 1;
+			//	}
+			//	/*	upload this mipmap	*/
+			//	if(uncompressed)
+			//	{
+			//		mip_size = w*h*block_size;
+			//		glTexImage2D(
+			//			cf_target, i,
+			//			S3TC_type, w, h, 0,
+			//			S3TC_type, GL_UNSIGNED_BYTE, &DDS_data[byte_offset]);
+			//	}
+			//	else
+			//	{
+			//		mip_size = ((w + 3) / 4)*((h + 3) / 4)*block_size;
+			//		soilGlCompressedTexImage2D(
+			//			cf_target, i,
+			//			S3TC_type, w, h, 0,
+			//			mip_size, &DDS_data[byte_offset]);
+			//	}
+			//	/*	and move to the next mipmap	*/
+			//	byte_offset += mip_size;
+			//}
+			/*	it worked!	*/
+			result_string_pointer = "DDS file loaded";
+		}
+		else
+		{
+			//glDeleteTextures(1, &tex_ID);
+			//tex_ID = 0;
+			cf_target = ogl_target_end + 1;
+			result_string_pointer = "DDS file was too small for expected image data";
+		}
+	}/* end reading each face */
+
+quick_exit:
+	return DDS_data;
+}
+
 unsigned int SOIL_direct_load_PVR_from_memory(
 		const unsigned char *const buffer,
 		int buffer_length,

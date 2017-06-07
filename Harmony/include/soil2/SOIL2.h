@@ -470,6 +470,13 @@ unsigned int SOIL_direct_load_DDS(
 		int flags,
 		int loading_as_cubemap );
 
+/** Gets the (possibly compressed) DDS texture memory that can be directly to the 
+	GPU memory (removes check for support 'cuz we're invoking on a different thread than OpenGL)
+
+	Added by Jason Knobler for Harmony Engine
+**/
+unsigned char *SOIL_load_DDS(const char *filename, int loading_as_cubemap);
+
 /** Loads the DDS texture directly to the GPU memory ( if supported ) */
 unsigned int SOIL_direct_load_DDS_from_memory(
 		const unsigned char *const buffer,

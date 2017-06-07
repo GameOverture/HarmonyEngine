@@ -127,7 +127,11 @@ void HyAtlas::OnLoadThread()
 		}
 
 		int iWidth, iHeight, iNum8bitClrChannels;
-		m_pPixelData = SOIL_load_image(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);// stbi_load(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 0);
+
+		if(m_sFILE_PATH[m_sFILE_PATH.size() - 1] == 'g')
+			m_pPixelData = SOIL_load_image(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);// stbi_load(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 0);
+		else
+			m_pPixelData = SOIL_load_DDS(m_sFILE_PATH.c_str(), 0);
 
 		HyAssert(m_pPixelData != nullptr, "HyAtlas failed to load image data");
 	}
