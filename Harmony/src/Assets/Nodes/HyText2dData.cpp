@@ -123,6 +123,11 @@ HyText2dData::~HyText2dData(void)
 	unsigned char *pFontStatesBuffer = reinterpret_cast<unsigned char *>(m_pFontStates);
 	delete[] pFontStatesBuffer;
 
+	for(uint32 i = 0; i < m_uiNumTypefaces; ++i)
+	{
+		for(auto iter = m_pTypefaces[i].begin(); iter != m_pTypefaces[i].end(); ++iter)
+			delete iter->second;
+	}
 	delete[] m_pTypefaces;
 }
 

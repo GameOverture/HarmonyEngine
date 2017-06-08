@@ -148,6 +148,13 @@ enum HyWindowType
 	HYWINDOW_BorderlessWindow
 };
 
+enum HyThreadState
+{
+	HYTHREADSTATE_Run = 0,
+	HYTHREADSTATE_ShouldExit,
+	HYTHREADSTATE_HasExited
+};
+
 struct HyWindowInfo
 {
 	std::string		sName;

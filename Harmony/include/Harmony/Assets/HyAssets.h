@@ -84,19 +84,14 @@ class HyAssets
 		BasicSection						m_csSharedQueue;
 		BasicSection						m_csRetrievalQueue;
 
-		enum eState
-		{
-			STATE_Run = 0,
-			STATE_ShouldExit,
-			STATE_HasExited
-		};
-		eState				m_eState;
+		
+		HyThreadState						m_eState;
 
 		LoadThreadCtrl(std::queue<IHyLoadableData *> &load_SharedRef,
 					   std::queue<IHyLoadableData *> &Load_RetrievalRef) :	m_Load_SharedRef(load_SharedRef),
 																			m_Load_RetrievalRef(Load_RetrievalRef),
 																			m_WaitEvent_HasNewData(L"Thread Idler", true),
-																			m_eState(STATE_Run)
+																			m_eState(HYTHREADSTATE_Run)
 		{ }
 	};
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

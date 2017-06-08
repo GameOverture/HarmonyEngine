@@ -10,7 +10,7 @@
 #include "Renderer/Components/HyGfxComms.h"
 #include "Afx/HyInteropAfx.h"
 
-HyGfxComms::HyGfxComms()
+HyGfxComms::HyGfxComms() : m_eThreadState(HYTHREADSTATE_Run)
 {
 	m_pDrawBuffer_Update = HY_NEW char[HY_GFX_BUFFER_SIZE];
 	memset(m_pDrawBuffer_Update, 0, HY_GFX_BUFFER_SIZE);
@@ -146,9 +146,16 @@ bool HyGfxComms::Render_PollPlatformApi(IHyRenderer *pRenderer)
 	}
 #endif
 
+	bool bRetValue = true;
+	if(m_eThreadState == HYTHREADSTATE_ShouldExit)
+	{
+		m_eThreadState = HYTHREADSTATE_HasExited;
+		bRetValue = false;
+	}
+
 	m_csApiMsgQueue.Unlock();
 
-	return true;
+	return bRetValue;
 }
 
 // This should only be invoked from the Update/Game thread
@@ -163,4 +170,20 @@ void HyGfxComms::RxApiMsgs(std::queue<HyApiMsgInterop> &msgQueueOut)
 	}
 
 	m_csApiMsgQueue.Unlock();
+}
+
+void HyGfxComms::RequestThreadExit()
+{
+	m_csApiMsgQueue.Lock();
+	m_eThreadState = HYTHREADSTATE_ShouldExit;
+	m_csApiMsgQueue.Unlock();
+}
+
+bool HyGfxComms::IsShutdown()
+{
+	m_csApiMsgQueue.Lock();
+	bool bRetVal = (m_eThreadState == HYTHREADSTATE_HasExited);
+	m_csApiMsgQueue.Unlock();
+
+	return bRetVal;
 }

@@ -22,7 +22,8 @@ IHyLeafDraw2d::IHyLeafDraw2d(HyType eNodeType, const char *szPrefix, const char 
 
 IHyLeafDraw2d::~IHyLeafDraw2d()
 {
-	Unload();
+	if(m_eLoadState != HYLOADSTATE_Inactive)
+		Unload();
 }
 
 void IHyLeafDraw2d::SetEnabled(bool bEnabled)

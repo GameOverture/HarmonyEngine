@@ -63,6 +63,8 @@ private:
 	std::queue<HyApiMsgInterop>		m_ApiMsgQueue;
 	BasicSection					m_csApiMsgQueue;
 
+	HyThreadState					m_eThreadState;
+
 public:
 	HyGfxComms();
 	~HyGfxComms();
@@ -87,6 +89,9 @@ public:
 
 	// This should only be invoked from the Update/Game thread
 	void RxApiMsgs(std::queue<HyApiMsgInterop> &msgQueueOut);
+
+	void RequestThreadExit();
+	bool IsShutdown();
 };
 
 #endif /* HyGfxBuffers_h__ */

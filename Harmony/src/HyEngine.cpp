@@ -126,6 +126,12 @@ void HyEngine::Shutdown()
 		m_Renderer.Update();
 #endif
 	}
+
+#if defined(HYSETTING_MultithreadedRenderer) && !defined(HY_PLATFORM_GUI)
+	m_GfxComms.RequestThreadExit();
+	while(m_GfxComms.IsShutdown() == false)
+	{ }
+#endif
 }
 
 HyRendererInterop &HyEngine::GetRenderer()

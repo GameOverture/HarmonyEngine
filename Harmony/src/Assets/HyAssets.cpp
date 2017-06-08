@@ -380,14 +380,22 @@ void HyAssets::Shutdown()
 
 	for(uint32 i = 0; i < vReloadInsts.size(); ++i)
 		vReloadInsts[i]->Unload();
-
-	//m_LoadingCtrl.m_eState = LoadThreadCtrl::STATE_ShouldExit;
-	//m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
 }
 
 bool HyAssets::IsShutdown()
 {
-	return m_pLoadedAtlasIndices->IsEmpty();
+	if(m_pLoadedAtlasIndices->IsEmpty())
+	{
+		if(m_LoadingCtrl.m_eState == HYTHREADSTATE_Run)
+			m_LoadingCtrl.m_eState = HYTHREADSTATE_ShouldExit;
+
+		m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
+
+		if(m_LoadingCtrl.m_eState == HYTHREADSTATE_HasExited)
+			return true;
+	}
+
+	return false;
 }
 
 void HyAssets::Update()
@@ -570,7 +578,7 @@ void HyAssets::SetNodeAsLoaded(IHyLeafDraw2d *pDrawNode2d)
 	LoadThreadCtrl *pLoadingCtrl = reinterpret_cast<LoadThreadCtrl *>(pParam);
 	std::vector<IHyLoadableData *>	dataList;
 
-	while(pLoadingCtrl->m_eState == LoadThreadCtrl::STATE_Run)
+	while(pLoadingCtrl->m_eState == HYTHREADSTATE_Run)
 	{
 		// Wait idle indefinitely until there is new data to be grabbed
 		pLoadingCtrl->m_WaitEvent_HasNewData.Wait();
@@ -609,5 +617,5 @@ void HyAssets::SetNodeAsLoaded(IHyLeafDraw2d *pDrawNode2d)
 		dataList.clear();
 	}
 
-	pLoadingCtrl->m_eState = LoadThreadCtrl::STATE_HasExited;
+	pLoadingCtrl->m_eState = HYTHREADSTATE_HasExited;
 }
