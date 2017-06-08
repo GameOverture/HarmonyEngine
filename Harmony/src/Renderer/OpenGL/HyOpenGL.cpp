@@ -43,7 +43,7 @@ HyOpenGL::~HyOpenGL(void)
 
 	GLint iFormatCount = 0;
 	glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS, &iFormatCount);
-	GLint *pFormatArray = new GLint[iFormatCount];
+	GLint *pFormatArray = HY_NEW GLint[iFormatCount];
 	glGetIntegerv(GL_COMPRESSED_TEXTURE_FORMATS, pFormatArray);
 	std::string sCompressedTextureFormats;
 	for(int32 i = 0; i < iFormatCount; ++i)

@@ -30,7 +30,7 @@ void HyDebugPhys2d::Reset()
 /// Draw a closed polygon provided in CCW order.
 /*virtual*/ void HyDebugPhys2d::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-	//HyEntity2d *pNewEnt = new HyEntity2d();
+	//HyEntity2d *pNewEnt = HY_NEW HyEntity2d();
 	//HyPrimitive2d *pInst = pNewEnt->SetPrimitive();
 
 	//pInst->Color().Set(color.r, color.g, color.b, 1.0f);
@@ -42,7 +42,7 @@ void HyDebugPhys2d::Reset()
 /// Draw a solid closed polygon provided in CCW order.
 /*virtual*/ void HyDebugPhys2d::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-	//HyEntity2d *pNewEnt = new HyEntity2d();
+	//HyEntity2d *pNewEnt = HY_NEW HyEntity2d();
 	//HyPrimitive2d *pInst = pNewEnt->SetPrimitive();
 
 	//pInst->Color().Set(color.r, color.g, color.b, 1.0f);
@@ -54,7 +54,7 @@ void HyDebugPhys2d::Reset()
 /// Draw a circle.
 /*virtual*/ void HyDebugPhys2d::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color)
 {
-	//HyEntity2d *pNewEnt = new HyEntity2d();
+	//HyEntity2d *pNewEnt = HY_NEW HyEntity2d();
 	//HyPrimitive2d *pInst = pNewEnt->SetPrimitive();
 
 	//pInst->Color().Set(color.r, color.g, color.b, 1.0f);
@@ -67,7 +67,7 @@ void HyDebugPhys2d::Reset()
 /// Draw a solid circle.
 /*virtual*/ void HyDebugPhys2d::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
 {
-	//HyEntity2d *pNewEnt = new HyEntity2d();
+	//HyEntity2d *pNewEnt = HY_NEW HyEntity2d();
 	//HyPrimitive2d *pInst = pNewEnt->SetPrimitive();
 
 	//pInst->Color().Set(color.r, color.g, color.b, 1.0f);
@@ -80,7 +80,7 @@ void HyDebugPhys2d::Reset()
 /// Draw a line segment.
 /*virtual*/ void HyDebugPhys2d::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
-	//HyEntity2d *pNewEnt = new HyEntity2d();
+	//HyEntity2d *pNewEnt = HY_NEW HyEntity2d();
 	//HyPrimitive2d *pInst = pNewEnt->SetPrimitive();
 
 	//vec2 ptVerts[2];
