@@ -53,9 +53,9 @@ HyEngine::~HyEngine()
 	delete sm_pInstance;
 
 	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler)
-#if defined(HY_DEBUG) && defined(_MSC_VER)
-	HY_SET_CRT_DEBUG_FIELD(_CRTDBG_LEAK_CHECK_DF);
-#endif
+//#if defined(HY_DEBUG) && defined(_MSC_VER)
+//	HY_SET_CRT_DEBUG_FIELD(_CRTDBG_LEAK_CHECK_DF);
+//#endif
 }
 
 bool HyEngine::BootUpdate()
