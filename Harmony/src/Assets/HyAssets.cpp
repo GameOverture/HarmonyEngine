@@ -77,6 +77,8 @@ HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &s
 
 HyAssets::~HyAssets()
 {
+	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
+
 	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 		m_pAtlases[i].~HyAtlas();
 
@@ -87,7 +89,7 @@ HyAssets::~HyAssets()
 	for(auto iter = m_Quad2d.begin(); iter != m_Quad2d.end(); ++iter)
 		delete iter->second;
 
-	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
+	delete m_pLoadedAtlasIndices;
 }
 
 bool HyAssets::IsLoaded()

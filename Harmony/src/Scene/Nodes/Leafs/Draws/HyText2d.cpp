@@ -38,6 +38,14 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent
 HyText2d::~HyText2d(void)
 {
 	delete[] m_pGlyphInfos;
+
+	for(uint32 i = 0; i < static_cast<uint32>(m_StateColors.size()); ++i)
+	{
+		for(uint32 j = 0; j < static_cast<uint32>(m_StateColors[i]->m_LayerColors.size()); ++j)
+			delete m_StateColors[i]->m_LayerColors[j];
+
+		delete m_StateColors[i];
+	}
 }
 
 // Assumes UTF-8 encoding. Accepts newline characters '\n'
