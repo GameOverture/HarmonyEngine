@@ -21,12 +21,12 @@ ThreadInfo::ThreadInfo() : m_RefCounter(1)
 
 	// create synchronization object if we are able to open a thread handle
 	if(m_hThread)
-		m_hThreadEvent = new BasicEvent(m_hThread, false);
+		m_hThreadEvent = HY_NEW BasicEvent(m_hThread, false);
 	
 #elif defined(HY_PLATFORM_UNIX)
 	m_ThreadId = InteropGetCurrentThreadId();
 	m_hThread = (ThreadHandle)m_ThreadId;
-	m_hThreadEvent = new BasicEvent(true);
+	m_hThreadEvent = HY_NEW BasicEvent(true);
 #endif
 
 #if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_UNIX) || defined(HY_PLATFORM_OSX)
@@ -184,7 +184,7 @@ void ThreadInfo::StartThread()
 	}
 	else
 	{
-		m_hThreadEvent = new BasicEvent(m_hThread, false);
+		m_hThreadEvent = HY_NEW BasicEvent(m_hThread, false);
 		if(::ResumeThread(m_hThread) == (DWORD)-1)
 		{
 			// don't forget to release thread reference in case of an error!
@@ -196,7 +196,7 @@ void ThreadInfo::StartThread()
 #elif defined(HY_PLATFORM_UNIX)
 
 	// create thread event
-	m_hThreadEvent = new BasicEvent(true);
+	m_hThreadEvent = HY_NEW BasicEvent(true);
 
 	// thread attribute
 	pthread_attr_t threadAttr;
@@ -359,7 +359,7 @@ ThreadManager::~ThreadManager()
 ThreadInfoPtr ThreadManager::BeginThread(LPCTSTR p_ThreadName, PTHREAD_START_PROCEDURE p_pThreadProc, PVOID p_pParam)
 {
 	SLock Lock(m_SyncObj);
-	ThreadInfo* tmp = new ThreadInfo(p_ThreadName, p_pThreadProc, p_pParam);
+	ThreadInfo* tmp = HY_NEW ThreadInfo(p_ThreadName, p_pThreadProc, p_pParam);
 	m_ThreadInfo.push_back(tmp);
 	tmp->StartThread();
 	return ThreadInfoPtrAddRef(tmp);
@@ -489,7 +489,7 @@ ThreadInfoPtr ThreadManager::GetThreadInfo(uint32 p_ThreadId)
 	// thread info not found in list, create new one
 	if(InteropGetCurrentThreadId() != p_ThreadId)
 		THROW_ERROR_INVALIDARGUMENT();
-	ThreadInfo* tmp = new ThreadInfo;
+	ThreadInfo* tmp = HY_NEW ThreadInfo;
 	m_ThreadInfo.push_back(tmp);
 	return ThreadInfoPtrAddRef(tmp);
 }

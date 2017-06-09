@@ -7,6 +7,9 @@
 
 #pragma once
 
+// NOTE: Harmony modifications: Including HyStdAfx.h header, and all "HY_NEW"'s
+#include "Afx/HyStdAfx.h"
+
 #include <cassert>
 #include <iostream>
 #include <map>
@@ -231,17 +234,17 @@ namespace jsonxx {
 		void import( const String &s ) {
 			reset();
 			type_ = STRING_;
-			*( string_value_ = new String() ) = s;
+			*( string_value_ = HY_NEW String() ) = s;
 		}
 		void import( const Array &a ) {
 			reset();
 			type_ = ARRAY_;
-			*( array_value_ = new Array() ) = a;
+			*(array_value_ = HY_NEW Array()) = a;
 		}
 		void import( const Object &o ) {
 			reset();
 			type_ = OBJECT_;
-			*( object_value_ = new Object() ) = o;
+			*(object_value_ = HY_NEW Object()) = o;
 		}
 		void import( const Value &other ) {
 			if (this != &other)

@@ -302,7 +302,7 @@ namespace jsonxx {
 			if (!match(":", input)) {
 				return false;
 			}
-			Value* v = new Value();
+			Value* v = HY_NEW Value();
 			if (!parse_value(input, *v)) {
 				delete v;
 				break;
@@ -340,7 +340,7 @@ namespace jsonxx {
 
 		std::string string_value;
 		if (parse_string(input, string_value)) {
-			value.string_value_ = new std::string();
+			value.string_value_ = HY_NEW std::string();
 			value.string_value_->swap(string_value);
 			value.type_ = STRING_;
 			return true;
@@ -359,14 +359,14 @@ namespace jsonxx {
 			return true;
 		}
 		if (input.peek() == '[') {
-			value.array_value_ = new Array();
+			value.array_value_ = HY_NEW Array();
 			if (parse_array(input, *value.array_value_)) {
 				value.type_ = ARRAY_;
 				return true;
 			}
 			delete value.array_value_;
 		}
-		value.object_value_ = new Object();
+		value.object_value_ = HY_NEW Object();
 		if (parse_object(input, *value.object_value_)) {
 			value.type_ = OBJECT_;
 			return true;
@@ -392,7 +392,7 @@ namespace jsonxx {
 		}
 
 		do {
-			Value* v = new Value();
+			Value* v = HY_NEW Value();
 			if (!parse_value(input, *v)) {
 				delete v;
 				break;
@@ -996,7 +996,7 @@ namespace jsonxx {
 				if( found != value_map_.end() ) {
 					delete found->second;
 				}
-				value_map_[ it->first ] = new Value( *it->second );
+				value_map_[it->first] = HY_NEW Value(*it->second);
 			}
 		} else {
 			// recursion is supported here
@@ -1009,7 +1009,7 @@ namespace jsonxx {
 		if( found != value_map_.end() ) {
 			delete found->second;
 		}
-		value_map_[ key ] = new Value( value );
+		value_map_[key] = HY_NEW Value(value);
 	}
 	Object &Object::operator=(const Object &other) {
 		odd.clear();
@@ -1074,7 +1074,7 @@ namespace jsonxx {
 				it = other.values_.begin(),
 				end = other.values_.end();
 			for (/**/ ; it != end; ++it) {
-				values_.push_back( new Value(**it) );
+				values_.push_back(HY_NEW Value(**it));
 			}
 		} else {
 			// recursion is supported here
@@ -1082,7 +1082,7 @@ namespace jsonxx {
 		}
 	}
 	void Array::import(const Value &value) {
-		values_.push_back( new Value(value) );
+		values_.push_back(HY_NEW Value(value));
 	}
 	size_t Array::size() const {
 		return values_.size();

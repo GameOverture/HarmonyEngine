@@ -34,9 +34,11 @@ HyEngine::~HyEngine()
 {
 }
 
-/*static*/ void HyEngine::RunGame(IHyApplication &gameRef)
+/*static*/ void HyEngine::RunGame(IHyApplication *pGame)
 {
-	sm_pInstance = HY_NEW HyEngine(gameRef);
+	HyAssert(pGame, "HyEngine::RunGame was passed a nullptr");
+
+	sm_pInstance = HY_NEW HyEngine(*pGame);
 
 	while(sm_pInstance->BootUpdate())
 	{ }
@@ -47,15 +49,16 @@ HyEngine::~HyEngine()
 	while(sm_pInstance->Update())
 	{ }
 
-	gameRef.Shutdown();
+	pGame->Shutdown();
 	sm_pInstance->Shutdown();
 
 	delete sm_pInstance;
+	delete pGame;
 
 	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler)
-//#if defined(HY_DEBUG) && defined(_MSC_VER)
-//	HY_SET_CRT_DEBUG_FIELD(_CRTDBG_LEAK_CHECK_DF);
-//#endif
+#if defined(HY_DEBUG) && defined(_MSC_VER)
+	HY_SET_CRT_DEBUG_FIELD(_CRTDBG_LEAK_CHECK_DF);
+#endif
 }
 
 bool HyEngine::BootUpdate()

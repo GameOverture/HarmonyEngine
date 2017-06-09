@@ -62,7 +62,7 @@ public:
 public:
 	~HyEngine();
 
-	static void RunGame(IHyApplication &gameRef);
+	static void RunGame(IHyApplication *pGame);
 
 #ifndef HY_PLATFORM_GUI
 private:
