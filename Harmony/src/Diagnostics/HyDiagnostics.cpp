@@ -190,7 +190,7 @@ void HyDiagnostics::DumpMemoryUsage()
 	}
 	uint64 uiUsedMem = static_cast<uint64>(memCounter.WorkingSetSize);
 
-	HyLog("Used memory:        " << (uiUsedMem / 1024 / 1024) << " MB (" << (static_cast<float>(uiUsedMem) / static_cast<float>(m_uiVirtualMemBytes)) * 100.0f << "%)");
+	HyLog("Used memory:        " << (static_cast<double>(uiUsedMem) / 1024.0 / 1024.0) << " MB (" << (static_cast<float>(uiUsedMem) / static_cast<float>(m_uiVirtualMemBytes)) * 100.0f << "%)");
 	HyLog("Available Memory:   " << (m_uiVirtualMemBytes / 1024 / 1024) << " MB");
 #else
 	HyLogWarning("HyDiagnostics::DumpMemoryUsage not implemented for this platform");
