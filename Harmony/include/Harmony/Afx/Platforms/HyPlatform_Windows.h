@@ -17,6 +17,7 @@
 #include <Windows.h>
 #include <sstream>
 #include <tchar.h>
+#include <Psapi.h>
 
 //#define GLM_SWIZZLE
 #include "glm/glm.hpp"

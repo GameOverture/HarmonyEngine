@@ -43,6 +43,7 @@ public:
 	void BootMessage();
 	void DumpAtlasUsage();
 	void DumpNodeUsage();
+	void DumpMemoryUsage();
 
 private:
 	void SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, const std::string &sCompressedTextures);

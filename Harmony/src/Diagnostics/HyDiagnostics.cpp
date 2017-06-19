@@ -102,11 +102,11 @@ void HyDiagnostics::BootMessage()
 #endif
 
 	HyLogSection(m_sGfxApi);
-	HyLog("Version:        " << m_sVersion);
-	HyLog("Vendor:         " << m_sVendor);
-	HyLog("Renderer:       " << m_sRenderer);
-	HyLog("Shader:         " << m_sShader);
-	HyLog("Compression:    " << m_sCompressedTextures);
+	HyLog("Version:          " << m_sVersion);
+	HyLog("Vendor:           " << m_sVendor);
+	HyLog("Renderer:         " << m_sRenderer);
+	HyLog("Shader:           " << m_sShader);
+	HyLog("Compression:      " << m_sCompressedTextures);
 	HyLog("");
 }
 
@@ -132,7 +132,7 @@ void HyDiagnostics::DumpAtlasUsage()
 	}
 	
 	HyLogSection("Atlas Usage");
-	HyLog(uiNumUsed << "/" << m_AssetsRef.GetNumAtlases() << " used. (" << (static_cast<float>(uiNumUsed) / static_cast<float>(m_AssetsRef.GetNumAtlases())) << "%)");
+	HyLog(uiNumUsed << "/" << m_AssetsRef.GetNumAtlases() << " used. (" << (static_cast<float>(uiNumUsed) / static_cast<float>(m_AssetsRef.GetNumAtlases())) * 100.0f << "%)");
 	HyLog(sAtlasNumbering);
 	HyLog(sAtlasUsage);
 }
@@ -174,6 +174,27 @@ void HyDiagnostics::DumpNodeUsage()
 	HyLog("Primitive Nodes:    " << uiNumPrimitive2d);
 	HyLog("Text Nodes:         " << uiNumText2d);
 	HyLog("3D Mesh Nodes:      " << uiNumMesh3d);
+}
+
+void HyDiagnostics::DumpMemoryUsage()
+{
+	HyLogSection("Memory Usage");
+
+#if defined(HY_PLATFORM_WINDOWS)
+	PROCESS_MEMORY_COUNTERS memCounter;
+	BOOL bResult = GetProcessMemoryInfo(GetCurrentProcess(), &memCounter, sizeof(memCounter));
+	if(bResult == false)
+	{
+		HyLogError("HyDiagnostics::DumpMemoryUsage - GetProcessMemoryInfo() failed and returned error: " << GetLastError());
+		return;
+	}
+	uint64 uiUsedMem = static_cast<uint64>(memCounter.WorkingSetSize);
+
+	HyLog("Used memory:        " << (uiUsedMem / 1024 / 1024) << " MB (" << (static_cast<float>(uiUsedMem) / static_cast<float>(m_uiVirtualMemBytes)) * 100.0f << "%)");
+	HyLog("Available Memory:   " << (m_uiVirtualMemBytes / 1024 / 1024) << " MB");
+#else
+	HyLogWarning("HyDiagnostics::DumpMemoryUsage not implemented for this platform");
+#endif
 }
 
 void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, const std::string &sCompressedTextures)
