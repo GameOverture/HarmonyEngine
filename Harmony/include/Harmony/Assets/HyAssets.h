@@ -105,7 +105,7 @@ public:
 	bool IsLoaded();
 	void ParseInitInfo();
 
-	HyAtlas *GetAtlas(uint32 uiIndex);
+	HyAtlas *GetAtlas(uint32 uiMasterIndex);
 	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
 	HyAtlas *GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup);
 

@@ -113,28 +113,50 @@ void HyDiagnostics::BootMessage()
 void HyDiagnostics::DumpAtlasUsage()
 {
 	HyAtlasIndices *pLoadedAtlases = m_AssetsRef.GetLoadedAtlases();
+	std::map<uint32, std::vector<bool>> atlasGrpLoadsMap;
 
-	std::string sAtlasNumbering("");
-	std::string sAtlasUsage("");
 	uint32 uiNumUsed = 0;
 	for(uint32 i = 0; i < m_AssetsRef.GetNumAtlases(); ++i)
 	{
-		sAtlasNumbering += std::to_string(i);
-		sAtlasNumbering += " ";
+		HyAtlas *pAtlas = m_AssetsRef.GetAtlas(i);
+		uint32 uiAtlasGrpId = pAtlas->GetAtlasGroupId();
+
+		if(atlasGrpLoadsMap.find(uiAtlasGrpId) == atlasGrpLoadsMap.end())
+			atlasGrpLoadsMap[uiAtlasGrpId] = std::vector<bool>();
 
 		if(pLoadedAtlases->IsSet(i))
 		{
+			atlasGrpLoadsMap[uiAtlasGrpId].push_back(true);
 			uiNumUsed++;
-			sAtlasUsage += "O ";
 		}
 		else
-			sAtlasUsage += "X ";
+			atlasGrpLoadsMap[uiAtlasGrpId].push_back(false);
 	}
 	
 	HyLogSection("Atlas Usage");
-	HyLog(uiNumUsed << "/" << m_AssetsRef.GetNumAtlases() << " used. (" << (static_cast<float>(uiNumUsed) / static_cast<float>(m_AssetsRef.GetNumAtlases())) * 100.0f << "%)");
-	HyLog(sAtlasNumbering);
-	HyLog(sAtlasUsage);
+	HyLog("Total:\t" << uiNumUsed << "/" << m_AssetsRef.GetNumAtlases() << " used (" << (static_cast<float>(uiNumUsed) / static_cast<float>(m_AssetsRef.GetNumAtlases())) * 100.0f << "%)");
+	for(auto iter = atlasGrpLoadsMap.begin(); iter != atlasGrpLoadsMap.end(); ++iter)
+	{
+		uint32 uiNumUsedInGrp = 0;
+		std::string sUsedList;
+		for(uint32 i = 0; i < iter->second.size(); ++i)
+		{
+			if(iter->second[i])
+			{
+				sUsedList += "1";
+				uiNumUsedInGrp++;
+			}
+			else
+				sUsedList += "0";
+
+			if(i != iter->second.size() - 1)
+				sUsedList += ",";
+		}
+
+		HyLog("");
+		HyLog("Grp " << iter->first << ":\t" << uiNumUsedInGrp << "/" << iter->second.size() << " used (" << (static_cast<float>(uiNumUsedInGrp) / static_cast<float>(iter->second.size())) * 100.0f << "%)");
+		HyLog("\t" << sUsedList);
+	}
 }
 
 void HyDiagnostics::DumpNodeUsage()

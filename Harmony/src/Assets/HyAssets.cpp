@@ -196,10 +196,10 @@ void HyAssets::ParseInitInfo()
 	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
 }
 
-HyAtlas *HyAssets::GetAtlas(uint32 uiIndex)
+HyAtlas *HyAssets::GetAtlas(uint32 uiMasterIndex)
 {
-	HyAssert(uiIndex < m_uiNumAtlases, "HyAssets::GetAtlas was given an invalid index: " << uiIndex);
-	return &m_pAtlases[uiIndex];
+	HyAssert(uiMasterIndex < m_uiNumAtlases, "HyAssets::GetAtlas was given an invalid index: " << uiMasterIndex);
+	return &m_pAtlases[uiMasterIndex];
 }
 
 HyAtlas *HyAssets::GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut)
