@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyPlatform_h__
-#define __HyPlatform_h__
+#ifndef HyPlatform_h__
+#define HyPlatform_h__
 
 #include "Afx/Platforms/HyPlatAfx.h"
 
@@ -116,4 +116,4 @@ HY_INLINE uint32 EndianSwap32(uint32 var)
 #error HyPlatform.h: HyError is not defined!
 #endif
 
-#endif // __HyPlatform_h__
+#endif // HyPlatform_h__
