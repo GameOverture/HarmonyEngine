@@ -7,14 +7,17 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HySprite2d_h__
-#define __HySprite2d_h__
+#ifndef HySprite2d_h__
+#define HySprite2d_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 #include "Assets/Nodes/HySprite2dData.h"
 
 #include "Utilities/HyMath.h"
+
+class HySprite2d;
+typedef std::function<void(HySprite2d *pSelf, void *pParam)> HySprite2dAnimFinishedCallback;
 
 class HySprite2d : public IHyLeafDraw2d
 {
@@ -26,6 +29,7 @@ protected:
 		ANIMCTRLATTRIB_Reverse					= 1 << 1,
 		ANIMCTRLATTRIB_Bounce					= 1 << 2,
 		ANIMCTRLATTRIB_IsBouncing				= 1 << 3,	// True if anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
+		ANIMCTRLATTRIB_Finished					= 1 << 4,	// True if a non-looping animation finishes its full sequence and reset to false whenever any animation is played
 
 		// Do not exceed '8' attributes, or else increase uint8s
 	};
@@ -39,8 +43,7 @@ protected:
 	uint32					m_uiCurFrame;
 
 	// Optional callback invoked upon anim completion/loop
-	typedef void(*fpHySprite2dCallback)(HySprite2d &selfRef, void *pParam);
-	std::vector<std::pair<fpHySprite2dCallback, void *> >	m_AnimCallbackList;
+	std::vector<std::pair<HySprite2dAnimFinishedCallback, void *> >	m_AnimCallbackList;
 
 public:
 	HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
@@ -96,15 +99,12 @@ public:
 	float AnimGetDuration();
 	
 	//--------------------------------------------------------------------------------------
-	// Client may specify whether to invoke a callback function when animation completes. The
-	// callback will pass this entity as a ptr and return void.
+	// Invoke a callback function when animation loops or completes. The
+	// callback will pass this sprite as a pointer with an optional parameter.
 	//
-	// Passing 'NULL' will clear any callback that may be set.
-	//
-	// Note: if the animation is set to loop and a callback is specified, the callback will
-	//       be invoked on every loop.
+	// Leaving default arguments will clear any currently assigned call back.
 	//--------------------------------------------------------------------------------------
-	void AnimSetCallback(uint32 uiStateID, void(*fpCallback)(HySprite2d &, void *), void *pParam = NULL);
+	void AnimSetCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack = HySprite2d::NullAnimCallback, void *pParam = nullptr);
 
 	float AnimGetCurFrameWidth(bool bIncludeScaling = true);
 	float AnimGetCurFrameHeight(bool bIncludScaling = true);
@@ -119,6 +119,8 @@ protected:
 
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
+
+	static void NullAnimCallback(HySprite2d *pSelf, void *pParam);
 };
 
-#endif /* __HySprite2d_h__ */
+#endif /* HySprite2d_h__ */
