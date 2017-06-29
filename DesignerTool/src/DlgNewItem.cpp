@@ -32,8 +32,8 @@ DlgNewItem::DlgNewItem(Project *pItemProject, eItemType eItem, QWidget *parent) 
     on_chkNewPrefix_stateChanged(ui->chkNewPrefix->isChecked() ? Qt::Checked : Qt::Unchecked);
 
     m_sListOfDirPrefixes.clear();
-    m_sListOfDirPrefixes.append(QString("<no prefix>"));
-
+    
+    QSet<QString> prefixSet;
     QJsonObject subDirObj = m_pItemProject->GetSubDirObj(HyGlobal::GetCorrespondingDirItem(eItem));
 
     // ITEMS IN SUBDIR
@@ -52,12 +52,15 @@ DlgNewItem::DlgNewItem(Project *pItemProject, eItemType eItem, QWidget *parent) 
             sCurPrefix += sPathPartList[iPathPartIndex];
         }
 
-        m_sListOfDirPrefixes.append(sCurPrefix);
+        prefixSet.insert(sCurPrefix);
     }
+    
+    m_sListOfDirPrefixes = prefixSet.toList();
+    qSort(m_sListOfDirPrefixes.begin(), m_sListOfDirPrefixes.end());
+    m_sListOfDirPrefixes.prepend(QString("<no prefix>"));
 
     ui->cmbPrefixList->clear();
     ui->cmbPrefixList->addItems(m_sListOfDirPrefixes);
-    
     
     ui->lblName->setText(HyGlobal::ItemName(eItem) % " Name:");
     ui->txtName->setText("New" % HyGlobal::ItemName(eItem));
