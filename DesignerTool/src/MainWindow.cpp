@@ -420,7 +420,6 @@ void MainWindow::on_actionCloseProject_triggered()
     m_pCurRenderer = new HyGuiRenderer(nullptr, this);
     ui->centralVerticalLayout->addWidget(m_pCurRenderer);
 
-    ui->explorer->GetCurProjSelected()->SaveUserData();
     ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
 
     m_pCurSelectedProj = nullptr;

@@ -38,12 +38,6 @@ class Project : public ExplorerItem, public IHyApplication
     QTabBar *                                       m_pTabBar;
 
     ProjectItem *                                   m_pCurOpenItem;
-    
-    //QString                                         m_sGameName;
-
-    //QString                                         m_sRelativeAssetsLocation;
-    //QString                                         m_sRelativeMetaDataLocation;
-    //QString                                         m_sRelativeSourceLocation;
 
     QAction                                         m_ActionSave;
     QAction                                         m_ActionSaveAll;
@@ -92,7 +86,6 @@ public:
 
     void SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal);
     void SaveGameData();
-    void SaveUserData();
 
     QJsonObject GetSubDirObj(eItemType eType);
     

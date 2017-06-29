@@ -234,38 +234,6 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 #ifdef RESAVE_ENTIRE_PROJECT
     SaveGameData();
 #endif
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // Load user settings from meta data
-    QFile userFile(GetMetaDataAbsPath() % HYGUIPATH_MetaUserFile);
-    if(userFile.exists())
-    {
-        if(!userFile.open(QIODevice::ReadOnly))
-        {
-            HyGuiLog("ItemProject::ItemProject() could not open " % sNewProjectFilePath % "'s " % HYGUIPATH_MetaUserFile % " file for project: " % userFile.errorString(), LOGTYPE_Error);
-        }
-
-        QJsonDocument userDoc = QJsonDocument::fromJson(userFile.readAll());
-        userFile.close();
-
-        QJsonObject userObj = userDoc.object();
-
-        //m_pAtlasMan->SetSelectedAtlasGroup(userObj["DefaultAtlasGroup"].toString());
-
-        // TODO:
-
-        //QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
-        //sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
-        //foreach(QString sItemPath, sListOpenItems)
-        //{
-        //    Item *pItem = ui->explorer->GetItemByPath(sItemPath);
-        //    if(pItem)
-        //        OpenItem(pItem);
-        //}
-    }
-    
-
 }
 
 /*virtual*/ Project::~Project()
@@ -523,46 +491,6 @@ void Project::SaveGameData()
         }
 
         dataFile.close();
-    }
-}
-
-void Project::SaveUserData()
-{
-    QFile userFile(GetMetaDataAbsPath() % HYGUIPATH_MetaUserFile);
-    if(userFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
-    {
-       HyGuiLog(QString("Couldn't open ") % HYGUIPATH_MetaUserFile % " for writing: " % userFile.errorString(), LOGTYPE_Error);
-    }
-    else
-    {
-        QJsonObject userObj;
-        userObj.insert("DefaultAtlasGroup", "Not used anymore");
-
-
-        // TODO:
-
-        //QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
-        //sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
-        //foreach(QString sItemPath, sListOpenItems)
-        //{
-        //    Item *pItem = ui->explorer->GetItemByPath(sItemPath);
-        //    if(pItem)
-        //        OpenItem(pItem);
-        //}
-
-
-
-
-
-        QJsonDocument userDoc;
-        userDoc.setObject(userObj);
-        qint64 iBytesWritten = userFile.write(userDoc.toJson());
-        if(0 == iBytesWritten || -1 == iBytesWritten)
-        {
-            HyGuiLog(QString("Could not write to ") % HYGUIPATH_MetaUserFile % " file: " % userFile.errorString(), LOGTYPE_Error);
-        }
-
-        userFile.close();
     }
 }
 

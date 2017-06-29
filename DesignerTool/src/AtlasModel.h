@@ -78,6 +78,8 @@ class AtlasModel : public QAbstractListModel
 public:
     AtlasModel(Project *pProjOwner);
     virtual ~AtlasModel();
+    
+    Project *GetProjOwner();
 
     int GetNumAtlasGroups();
     QString GetAtlasGroupName(uint uiAtlasGrpIndex);
