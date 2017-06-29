@@ -455,8 +455,7 @@ void Project::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal)
     eItemType eSubDirType = HyGlobal::GetCorrespondingDirItem(eType);
     QString sSubDirName = HyGlobal::ItemName(eSubDirType);
 
-    if(m_SaveDataObj.contains(sSubDirName) == false)
-    {
+    if(m_SaveDataObj.contains(sSubDirName) == false) {
         HyGuiLog("Could not find subdir: " % sSubDirName % " within ItemProject::SaveGameData", LOGTYPE_Error);
     }
 
@@ -476,8 +475,7 @@ void Project::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal)
 void Project::SaveGameData()
 {
     QFile dataFile(GetAssetsAbsPath() % HYGUIPATH_DataFile);
-    if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
-    {
+    if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
        HyGuiLog(QString("Couldn't open ") % HYGUIPATH_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
     }
     else
@@ -491,6 +489,35 @@ void Project::SaveGameData()
         }
 
         dataFile.close();
+    }
+}
+
+void Project::DeleteGameData(eItemType eType, QString sPath)
+{
+    eItemType eSubDirType = HyGlobal::GetCorrespondingDirItem(eType);
+    QString sSubDirName = HyGlobal::ItemName(eSubDirType);
+
+    if(m_SaveDataObj.contains(sSubDirName) == false) {
+        HyGuiLog("Could not find subdir: " % sSubDirName % " within ItemProject::SaveGameData", LOGTYPE_Error);
+    }
+
+    QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
+
+    subDirObj.remove(sPath);
+
+    m_SaveDataObj.remove(sSubDirName);
+    m_SaveDataObj.insert(sSubDirName, subDirObj);
+
+    SaveGameData();
+    
+    // If open, make sure to close as it's been deleted from project
+    for(int i = 0; i < m_pTabBar->count(); ++i)
+    {
+        QVariant v = m_pTabBar->tabData(i);
+        ProjectItem *pItem = v.value<ProjectItem *>();
+        
+        if(pItem->GetName(true) == sPath)
+            OnCloseTab(i);
     }
 }
 

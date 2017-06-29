@@ -63,7 +63,6 @@ public:
     Project *GetCurProjSelected();
     ExplorerItem *GetCurItemSelected();
     ExplorerItem *GetCurDirSelected(bool bIncludePrefixDirs);
-    //Item *GetItemByPath(QString sItemPathAbsolute);
     
     QStringList GetOpenProjectPaths();
 
@@ -78,6 +77,10 @@ private Q_SLOTS:
     void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_treeWidget_itemSelectionChanged();
 
+    void on_actionRename_triggered();
+    
+    void on_actionDeleteItem_triggered();
+    
 Q_SIGNALS:
     void LoadItemProject();
 };

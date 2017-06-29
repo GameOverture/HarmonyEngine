@@ -62,6 +62,8 @@ public:
 
     void WidgetRefreshData(QVariant param);
     
+    void DeleteFromProject();
+    
 private:
     void WidgetLoad(IHyApplication &hyApp);
     void WidgetUnload(IHyApplication &hyApp);

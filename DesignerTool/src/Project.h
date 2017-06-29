@@ -86,6 +86,8 @@ public:
 
     void SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal);
     void SaveGameData();
+    
+    void DeleteGameData(eItemType eType, QString sPath);
 
     QJsonObject GetSubDirObj(eItemType eType);
     
