@@ -84,12 +84,13 @@ public:
     
     void OnHarmonyLoaded();
 
-    void SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal);
+    void SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal);
     void SaveGameData();
     
-    void DeleteGameData(eItemType eType, QString sPath);
+    void DeleteGameData(HyGuiItemType eType, QString sPath);
+    void DeletePrefixAndContents(HyGuiItemType eSubDirType, QString sPrefix);
 
-    QJsonObject GetSubDirObj(eItemType eType);
+    QJsonObject GetSubDirObj(HyGuiItemType eType);
     
     void RefreshCurrentItemDraw();
 

@@ -445,7 +445,7 @@ void MainWindow::on_actionNewFont_triggered()
     NewItem(ITEM_Font);
 }
 
-void MainWindow::NewItem(eItemType eItem)
+void MainWindow::NewItem(HyGuiItemType eItem)
 {
     DlgNewItem *pDlg = new DlgNewItem(m_pCurSelectedProj, eItem, this);
     if(pDlg->exec())

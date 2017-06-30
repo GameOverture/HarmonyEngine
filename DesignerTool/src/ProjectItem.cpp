@@ -23,7 +23,7 @@
 #include <QMenu>
 
 ProjectItem::ProjectItem(Project &projRef,
-                         eItemType eType,
+                         HyGuiItemType eType,
                          const QString sPrefix,
                          const QString sName,
                          QJsonValue initValue) :    ExplorerItem(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),

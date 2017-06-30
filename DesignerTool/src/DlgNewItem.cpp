@@ -16,7 +16,7 @@
 #include <QStringBuilder>
 #include <QPushButton>
 
-DlgNewItem::DlgNewItem(Project *pItemProject, eItemType eItem, QWidget *parent) :   QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *parent) :   QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
                                                                                         ui(new Ui::DlgNewItem),
                                                                                         m_pItemProject(pItemProject),
                                                                                         m_eItemType(eItem)

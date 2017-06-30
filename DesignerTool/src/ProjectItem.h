@@ -42,7 +42,7 @@ class ProjectItem : public ExplorerItem
     QWidget *               m_pWidget;
     
 public:
-    ProjectItem(Project &projRef, eItemType eType, const QString sPrefix, const QString sName, QJsonValue initValue);
+    ProjectItem(Project &projRef, HyGuiItemType eType, const QString sPrefix, const QString sName, QJsonValue initValue);
     virtual ~ProjectItem();
 
     void LoadModel();

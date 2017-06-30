@@ -55,14 +55,14 @@ public:
     ~ExplorerWidget();
     
     Project *AddItemProject(const QString sNewProjectFilePath);
-    void AddItem(eItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd);
+    void AddItem(HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd);
     void RemoveItem(ExplorerItem *pItem);
     
     void SelectItem(ExplorerItem *pItem);
     
     Project *GetCurProjSelected();
     ExplorerItem *GetCurItemSelected();
-    ExplorerItem *GetCurDirSelected(bool bIncludePrefixDirs);
+    ExplorerItem *GetCurSubDirSelected();
     
     QStringList GetOpenProjectPaths();
 

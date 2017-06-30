@@ -113,7 +113,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     else
     {
         // Initialize the project by processing each type of sub dir
-        QList<eItemType> subDirList = HyGlobal::SubDirList();
+        QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
         for(int i = 0; i < subDirList.size(); ++i)
         {
             if(subDirList[i] == ITEM_DirAtlases || subDirList[i] == ITEM_DirAudioBanks)
@@ -133,7 +133,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Initialize the project by processing each type of sub dir
-    QList<eItemType> subDirList = HyGlobal::SubDirList();
+    QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
     for(int i = 0; i < subDirList.size(); ++i)
     {
         if(subDirList[i] == ITEM_DirAtlases || subDirList[i] == ITEM_DirAudioBanks)
@@ -450,9 +450,9 @@ void Project::OnHarmonyLoaded()
     MainWindow::SetSelectedProjWidgets(this);
 }
 
-void Project::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal)
+void Project::SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal)
 {
-    eItemType eSubDirType = HyGlobal::GetCorrespondingDirItem(eType);
+    HyGuiItemType eSubDirType = HyGlobal::GetCorrespondingDirItem(eType);
     QString sSubDirName = HyGlobal::ItemName(eSubDirType);
 
     if(m_SaveDataObj.contains(sSubDirName) == false) {
@@ -492,13 +492,13 @@ void Project::SaveGameData()
     }
 }
 
-void Project::DeleteGameData(eItemType eType, QString sPath)
+void Project::DeleteGameData(HyGuiItemType eType, QString sPath)
 {
-    eItemType eSubDirType = HyGlobal::GetCorrespondingDirItem(eType);
+    HyGuiItemType eSubDirType = HyGlobal::GetCorrespondingDirItem(eType);
     QString sSubDirName = HyGlobal::ItemName(eSubDirType);
 
     if(m_SaveDataObj.contains(sSubDirName) == false) {
-        HyGuiLog("Could not find subdir: " % sSubDirName % " within ItemProject::SaveGameData", LOGTYPE_Error);
+        HyGuiLog("Could not find subdir: " % sSubDirName % " within ItemProject::DeleteGameData", LOGTYPE_Error);
     }
 
     QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
@@ -521,7 +521,28 @@ void Project::DeleteGameData(eItemType eType, QString sPath)
     }
 }
 
-QJsonObject Project::GetSubDirObj(eItemType eType)
+void Project::DeletePrefixAndContents(HyGuiItemType eSubDirType, QString sPrefix)
+{
+    HyGuiItemType eActualSubDir = HyGlobal::GetCorrespondingDirItem(eSubDirType);
+    QString sSubDirName = HyGlobal::ItemName(eActualSubDir);
+    
+    if(m_SaveDataObj.contains(sSubDirName) == false) {
+        HyGuiLog("Could not find subdir: " % sSubDirName % " within ItemProject::DeletePrefix", LOGTYPE_Error);
+    }
+
+    QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
+    for(auto iter = subDirObj.begin(); iter != subDirObj.end(); ++iter)
+    {
+        QFileInfo itemInfo;
+        itemInfo.setFile(iter.key());
+        QString sCurPrefix = itemInfo.path() % "/";
+        
+        if(sCurPrefix == sPrefix)
+            DeleteGameData(eActualSubDir, iter.key());
+    }
+}
+
+QJsonObject Project::GetSubDirObj(HyGuiItemType eType)
 {
     return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType))].toObject();
 }

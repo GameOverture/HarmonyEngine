@@ -102,7 +102,7 @@ void HyAssets::ParseInitInfo()
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::string sAtlasInfoFilePath(m_sDATADIR + HYASSETS_AtlasDir);
-	sAtlasInfoFilePath += "atlasInfo.json";
+	sAtlasInfoFilePath += "atlas.json";
 	std::string sAtlasInfoFileContents;
 	HyReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
 
@@ -174,7 +174,7 @@ void HyAssets::ParseInitInfo()
 
 #ifndef HY_PLATFORM_GUI
 	std::string sGameDataFilePath(m_sDATADIR);
-	sGameDataFilePath += "Data.json";
+	sGameDataFilePath += "data.json";
 
 	std::string sGameDataFileContents;
 	HyReadTextFile(sGameDataFilePath.c_str(), sGameDataFileContents);
