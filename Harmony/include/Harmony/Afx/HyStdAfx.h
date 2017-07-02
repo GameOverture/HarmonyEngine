@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyStdAfx_h__
-#define __HyStdAfx_h__
+#ifndef HyStdAfx_h__
+#define HyStdAfx_h__
 
 // Order of these #includes matter!
 #include "Compilers/HyCompiler.h"
@@ -172,4 +172,4 @@ struct HyWindowInfo
 	uint32			uiDirtyFlags;
 };
 
-#endif // __HyStdAfx_h__
+#endif // HyStdAfx_h__

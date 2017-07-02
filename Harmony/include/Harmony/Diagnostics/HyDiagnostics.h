@@ -36,6 +36,12 @@ class HyDiagnostics
 	std::string			m_sShader;
 	std::string			m_sCompressedTextures;
 
+	bool				m_bInitialMemCheckpointSet;
+#if defined(HY_DEBUG) && defined(HY_COMPILER_MSVC) && defined(HY_PLATFORM_WINDOWS)
+	_CrtMemState		m_MemCheckpoint1;
+	_CrtMemState		m_MemCheckpoint2;
+#endif
+
 public:
 	HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef);
 	~HyDiagnostics();
@@ -43,6 +49,10 @@ public:
 	void BootMessage();
 	void DumpAtlasUsage();
 	void DumpNodeUsage();
+	void DumpMemoryUsage();
+
+	void StartMemoryCheckpoint();
+	void EndMemoryCheckpoint();
 
 private:
 	void SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, const std::string &sCompressedTextures);

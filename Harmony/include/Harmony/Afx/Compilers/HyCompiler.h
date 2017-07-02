@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyCompiler_h__
-#define __HyCompiler_h__
+#ifndef HyCompiler_h__
+#define HyCompiler_h__
 
 #include <string>
 
@@ -17,7 +17,6 @@
 #if !defined(HARMONY_COMPILER_DEFINED)
 
 	#if defined(_UNICODE)
-
 		#define HY_UNICODE
 		typedef std::wstring HyString;
 		typedef std::wostringstream HyStringStream;
@@ -32,11 +31,16 @@
 	#endif
 
 	#if defined(_MSC_VER)
+		#define HY_COMPILER_MSVC
 		#include "HyCompiler_MSVC.h"
 	#elif defined(__MWERKS__)
+		#define HY_COMPILER_MWERKS
 		#include "HyCompiler_MWerks.h"
 	#elif defined(__GNUC__)
+		#define HY_COMPILER_GNU
 		#include "HyCompiler_GNU.h"
+	#else
+		#define HY_COMPILER_UNKNOWN
 	#endif
 
 	#define HARMONY_COMPILER_DEFINED
@@ -72,11 +76,6 @@
   #define HY_FORCE_INLINE  inline
 #endif
 
-//#ifndef SGXAPI
-//  #define SGXAPI
-//#endif
-
-
 //-----------------------------------------------------------------------------------------
 // Safety checks
 //-----------------------------------------------------------------------------------------
@@ -88,4 +87,8 @@
 	#error HyCompiler.h: Invalid Platform Environment.
 #endif
 
-#endif /* __HyCompiler_h__ */
+#if defined(HY_COMPILER_UNKNOWN)
+	#error HyCompiler.h: Could not determine the compiler.
+#endif
+
+#endif /* HyCompiler_h__ */

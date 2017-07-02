@@ -38,12 +38,6 @@ class Project : public ExplorerItem, public IHyApplication
     QTabBar *                                       m_pTabBar;
 
     ProjectItem *                                   m_pCurOpenItem;
-    
-    //QString                                         m_sGameName;
-
-    //QString                                         m_sRelativeAssetsLocation;
-    //QString                                         m_sRelativeMetaDataLocation;
-    //QString                                         m_sRelativeSourceLocation;
 
     QAction                                         m_ActionSave;
     QAction                                         m_ActionSaveAll;
@@ -90,11 +84,13 @@ public:
     
     void OnHarmonyLoaded();
 
-    void SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal);
+    void SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal);
     void SaveGameData();
-    void SaveUserData();
+    
+    void DeleteGameData(HyGuiItemType eType, QString sPath);
+    void DeletePrefixAndContents(HyGuiItemType eSubDirType, QString sPrefix);
 
-    QJsonObject GetSubDirObj(eItemType eType);
+    QJsonObject GetSubDirObj(HyGuiItemType eType);
     
     void RefreshCurrentItemDraw();
 

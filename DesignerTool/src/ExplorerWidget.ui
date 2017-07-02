@@ -42,7 +42,33 @@
     </widget>
    </item>
   </layout>
+  <action name="actionRename">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename</string>
+   </property>
+   <property name="toolTip">
+    <string>Renames the selected item or prefix</string>
+   </property>
+  </action>
+  <action name="actionDeleteItem">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes the selected item(s) or prefix(es)</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="res/DesignerTool.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyPlatAfx_h__
-#define __HyPlatAfx_h__
+#ifndef HyPlatAfx_h__
+#define HyPlatAfx_h__
 
 #if !defined(HARMONY_PLATFORM_DEFINED)
 
@@ -39,4 +39,4 @@
 	#define HARMONY_PLATFORM_DEFINED
 #endif
 
-#endif __HyPlatAfx_h__
+#endif HyPlatAfx_h__

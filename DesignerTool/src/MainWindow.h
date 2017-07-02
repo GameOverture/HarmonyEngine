@@ -107,7 +107,7 @@ private Q_SLOTS:
 private:
     Ui::MainWindow *ui;
 
-    void NewItem(eItemType eItem);
+    void NewItem(HyGuiItemType eItem);
     
     void closeEvent(QCloseEvent *pEvent);
 

@@ -66,6 +66,8 @@ public:
 	static HyCoordinateUnit DefaultCoordinateUnit();
 	static float PixelsPerMeter();
 
+	std::string GameName() const;
+
 	HyWindow &Window(uint32 uiIndex = 0);
 	uint32 GetNumWindows();
 	HyInputMapInterop &Input(uint32 uiIndex = 0);

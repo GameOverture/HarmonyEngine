@@ -144,6 +144,11 @@ float IHyApplication::PixelsPerMeter()
 	return sm_fPixelsPerMeter;
 }
 
+std::string IHyApplication::GameName() const
+{
+	return m_Init.sGameName;
+}
+
 HyWindow &IHyApplication::Window(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(uiIndex < m_Init.uiNumWindows, "IApplication::Viewport() took an invalid index: " << uiIndex);

@@ -25,19 +25,20 @@ class ExplorerItem : public QObject
     Q_OBJECT
 
 protected:
-    const eItemType     m_eTYPE;
+    const HyGuiItemType     m_eTYPE;
     const QString       m_sPATH;
     
     QTreeWidgetItem *   m_pTreeItemPtr;
     
 public:
-    ExplorerItem(eItemType eType, const QString sPath);
+    ExplorerItem(HyGuiItemType eType, const QString sPath);
     virtual ~ExplorerItem();
 
-    eItemType GetType() const                       { return m_eTYPE; }
+    HyGuiItemType GetType() const                       { return m_eTYPE; }
     QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
     
     QString GetName(bool bWithPrefix) const;
+    QString GetPrefix() const;
     QString GetPath() const                         { return m_sPATH; }
     QIcon GetIcon() const                           { return HyGlobal::ItemIcon(m_eTYPE); }
 };

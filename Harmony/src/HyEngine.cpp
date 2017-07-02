@@ -10,7 +10,6 @@
 #include "HyEngine.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 
 HyEngine *		HyEngine::sm_pInstance = NULL;
 

@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyPlatform_Windows_h__
-#define __HyPlatform_Windows_h__
+#ifndef HyPlatform_Windows_h__
+#define HyPlatform_Windows_h__
 
 // TODO: Windows SDK 8.x sets builds to be Windows 8 by default, make it Windows 7 instead
 //#define _WIN32_WINNT 0x0601
@@ -17,6 +17,7 @@
 #include <Windows.h>
 #include <sstream>
 #include <tchar.h>
+#include <Psapi.h>
 
 //#define GLM_SWIZZLE
 #include "glm/glm.hpp"
@@ -74,4 +75,4 @@ typedef unsigned __int64	uint64;
 	#define HyError(message) do { } while (false)
 #endif
 
-#endif /* __HyPlatform_Windows_h__ */
+#endif /* HyPlatform_Windows_h__ */

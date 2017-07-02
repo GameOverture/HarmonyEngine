@@ -23,7 +23,7 @@
 #include <QMenu>
 
 ProjectItem::ProjectItem(Project &projRef,
-                         eItemType eType,
+                         HyGuiItemType eType,
                          const QString sPrefix,
                          const QString sName,
                          QJsonValue initValue) :    ExplorerItem(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
@@ -261,6 +261,11 @@ void ProjectItem::WidgetRefreshData(QVariant param)
     }
 }
 
+void ProjectItem::DeleteFromProject()
+{
+    m_pUndoStack->setClean();
+    GetProject().DeleteGameData(m_eTYPE, GetName(true));
+}
 
 void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 {

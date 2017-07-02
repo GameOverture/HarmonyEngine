@@ -2607,6 +2607,7 @@ unsigned char *SOIL_load_DDS(const char *filename, int loading_as_cubemap)
 	}/* end reading each face */
 
 quick_exit:
+	SOIL_free_image_data(buffer);
 	return DDS_data;
 }
 

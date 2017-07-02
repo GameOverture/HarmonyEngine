@@ -51,6 +51,7 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 		break;
 	case HYANIMCTRL_Reset:
 		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_IsBouncing;
+		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Finished;
 		if(m_AnimCtrlAttribList[uiAnimState] & ANIMCTRLATTRIB_Reverse && static_cast<HySprite2dData *>(AcquireData())->GetState(uiAnimState).m_uiNUMFRAMES > 0)
 			m_uiCurFrame = static_cast<HySprite2dData *>(AcquireData())->GetState(uiAnimState).m_uiNUMFRAMES - 1;
 		else
@@ -58,6 +59,7 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 		break;
 	case HYANIMCTRL_Loop:
 		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_Loop;
+		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Finished;
 		break;
 	case HYANIMCTRL_DontLoop:
 		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Loop;
@@ -145,26 +147,8 @@ void HySprite2d::AnimSetState(uint32 uiStateIndex)
 
 bool HySprite2d::AnimIsFinished()
 {
-	uint8 uiCtrlAttribs = m_AnimCtrlAttribList[m_uiCurAnimState];
-	if(uiCtrlAttribs & ANIMCTRLATTRIB_Loop)
-		return false;
-
-	if((uiCtrlAttribs & ANIMCTRLATTRIB_Reverse) == 0)
-	{
-		// Playing forward
-		if(uiCtrlAttribs & ANIMCTRLATTRIB_IsBouncing || AnimGetNumFrames() == 0)
-			return m_uiCurFrame == 0;
-		else
-			return m_uiCurFrame == (AnimGetNumFrames() - 1);
-	}
-	else
-	{
-		// Playing reverse
-		if(uiCtrlAttribs & ANIMCTRLATTRIB_IsBouncing && AnimGetNumFrames() != 0)
-			return m_uiCurFrame == (AnimGetNumFrames() - 1);
-		else
-			return m_uiCurFrame == 0;
-	}
+	AcquireData();
+	return (m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Finished) != 0;
 }
 
 bool HySprite2d::AnimIsPaused()
@@ -177,13 +161,16 @@ float HySprite2d::AnimGetDuration()
 	return static_cast<HySprite2dData *>(AcquireData())->GetState(m_uiCurAnimState).m_fDURATION;
 }
 
-void HySprite2d::AnimSetCallback(uint32 uiStateID, void(*fpCallback)(HySprite2d &, void *), void *pParam /*= nullptr*/)
+void HySprite2d::AnimSetCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack /*= HySprite2d::NullAnimCallback*/, void *pParam /*= nullptr*/)
 {
-	while(uiStateID >= m_AnimCallbackList.size())
-		m_AnimCallbackList.push_back(std::pair<fpHySprite2dCallback, void *>(nullptr, nullptr));
+	if(uiStateIndex >= static_cast<HySprite2dData *>(AcquireData())->GetNumStates())
+	{
+		HyLogWarning("HySprite2d::AnimSetCallback wants to set anim callback on index of '" << uiStateIndex << "' when total number of states is '" << static_cast<HySprite2dData *>(AcquireData())->GetNumStates() << "'");
+		return;
+	}
 
-	m_AnimCallbackList[uiStateID].first = fpCallback;
-	m_AnimCallbackList[uiStateID].second = pParam;
+	m_AnimCallbackList[uiStateIndex].first = callBack;
+	m_AnimCallbackList[uiStateIndex].second = pParam;
 }
 
 float HySprite2d::AnimGetCurFrameWidth(bool bIncludeScaling /*= true*/)
@@ -227,13 +214,19 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 
 			if(iNextFrameIndex < 0)
 			{
+				if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
+					m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
+
 				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
 				{
 					uiAnimCtrlRef &= ~ANIMCTRLATTRIB_IsBouncing;
 					iNextFrameIndex = 1;
 				}
 				else
+				{
+					uiAnimCtrlRef |= ANIMCTRLATTRIB_Finished;
 					iNextFrameIndex = 0;
+				}
 			}
 			else if(iNextFrameIndex >= iNumFrames)
 			{
@@ -242,13 +235,22 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 					uiAnimCtrlRef |= ANIMCTRLATTRIB_IsBouncing;
 					iNextFrameIndex = iNumFrames - 2;
 				}
-				else if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
-					iNextFrameIndex = 0;
 				else
-					iNextFrameIndex = iNumFrames - 1;
+				{
+					if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
+						m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
+
+					if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
+						iNextFrameIndex = 0;
+					else
+					{
+						uiAnimCtrlRef |= ANIMCTRLATTRIB_Finished;
+						iNextFrameIndex = iNumFrames - 1;
+					}
+				}
 			}
 		}
-		else
+		else // Playing in Reverse
 		{
 			(uiAnimCtrlRef & ANIMCTRLATTRIB_IsBouncing) ? iNextFrameIndex++ : iNextFrameIndex--;
 
@@ -259,20 +261,35 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 					uiAnimCtrlRef |= ANIMCTRLATTRIB_IsBouncing;
 					iNextFrameIndex = 1;
 				}
-				else if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
-					iNextFrameIndex = iNumFrames - 1;
 				else
-					iNextFrameIndex = 0;
+				{
+					if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
+						m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
+
+					if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
+						iNextFrameIndex = iNumFrames - 1;
+					else
+					{
+						uiAnimCtrlRef |= ANIMCTRLATTRIB_Finished;
+						iNextFrameIndex = 0;
+					}
+				}
 			}
 			else if(iNextFrameIndex >= iNumFrames)
 			{
+				if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
+					m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
+
 				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
 				{
 					uiAnimCtrlRef &= ~ANIMCTRLATTRIB_IsBouncing;
 					iNextFrameIndex = iNumFrames - 2;
 				}
 				else
+				{
+					uiAnimCtrlRef |= ANIMCTRLATTRIB_Finished;
 					iNextFrameIndex = iNumFrames - 1;
+				}
 			}
 		}
 
@@ -297,6 +314,9 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 
 	while(m_AnimCtrlAttribList.size() < uiNumStates)
 		m_AnimCtrlAttribList.push_back(0);
+
+	while(m_AnimCallbackList.size() < uiNumStates)
+		m_AnimCallbackList.push_back(std::pair<HySprite2dAnimFinishedCallback, void *>(NullAnimCallback, nullptr));
 
 	for(uint32 i = 0; i < uiNumStates; ++i)
 	{
@@ -381,4 +401,8 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	GetWorldTransform(*reinterpret_cast<glm::mat4 *>(pRefDataWritePos));
 
 	pRefDataWritePos += sizeof(glm::mat4);
+}
+
+/*static*/ void HySprite2d::NullAnimCallback(HySprite2d *pSelf, void *pParam)
+{
 }

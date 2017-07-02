@@ -232,6 +232,11 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
     }
 }
 
+Project *AtlasModel::GetProjOwner()
+{
+    return m_pProjOwner;
+}
+
 int AtlasModel::GetNumAtlasGroups()
 {
     return m_AtlasGrpList.size();

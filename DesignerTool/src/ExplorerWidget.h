@@ -55,15 +55,14 @@ public:
     ~ExplorerWidget();
     
     Project *AddItemProject(const QString sNewProjectFilePath);
-    void AddItem(eItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd);
+    void AddItem(HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd);
     void RemoveItem(ExplorerItem *pItem);
     
     void SelectItem(ExplorerItem *pItem);
     
     Project *GetCurProjSelected();
     ExplorerItem *GetCurItemSelected();
-    ExplorerItem *GetCurDirSelected(bool bIncludePrefixDirs);
-    //Item *GetItemByPath(QString sItemPathAbsolute);
+    ExplorerItem *GetCurSubDirSelected();
     
     QStringList GetOpenProjectPaths();
 
@@ -78,6 +77,10 @@ private Q_SLOTS:
     void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_treeWidget_itemSelectionChanged();
 
+    void on_actionRename_triggered();
+    
+    void on_actionDeleteItem_triggered();
+    
 Q_SIGNALS:
     void LoadItemProject();
 };

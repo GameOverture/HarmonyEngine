@@ -4,9 +4,13 @@
 // Slicing-by-16 contributed by Bulat Ziganshin
 // see http://create.stephan-brumme.com/disclaimer.html
 //
+//
+// NOTE: This file has been adapted to work with Harmony Engine -JJK
 
 #ifndef __Crc32_h__
 #define __Crc32_h__
+
+#include "Afx/HyStdAfx.h"
 
 // g++ -o Crc32 Crc32.cpp -O3 -lrt -march=native -mtune=native
 
@@ -20,8 +24,6 @@
 // - crc32_4x8bytes needs only Crc32Lookup[0..7]
 // - crc32_16bytes  needs all of Crc32Lookup
 
-
-#include <stdlib.h>
 
 // define endianess and some integer data types
 #if defined(_MSC_VER) || defined(__MINGW32__)

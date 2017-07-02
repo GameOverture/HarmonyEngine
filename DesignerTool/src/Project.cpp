@@ -113,7 +113,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     else
     {
         // Initialize the project by processing each type of sub dir
-        QList<eItemType> subDirList = HyGlobal::SubDirList();
+        QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
         for(int i = 0; i < subDirList.size(); ++i)
         {
             if(subDirList[i] == ITEM_DirAtlases || subDirList[i] == ITEM_DirAudioBanks)
@@ -133,7 +133,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Initialize the project by processing each type of sub dir
-    QList<eItemType> subDirList = HyGlobal::SubDirList();
+    QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
     for(int i = 0; i < subDirList.size(); ++i)
     {
         if(subDirList[i] == ITEM_DirAtlases || subDirList[i] == ITEM_DirAudioBanks)
@@ -234,38 +234,6 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 #ifdef RESAVE_ENTIRE_PROJECT
     SaveGameData();
 #endif
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // Load user settings from meta data
-    QFile userFile(GetMetaDataAbsPath() % HYGUIPATH_MetaUserFile);
-    if(userFile.exists())
-    {
-        if(!userFile.open(QIODevice::ReadOnly))
-        {
-            HyGuiLog("ItemProject::ItemProject() could not open " % sNewProjectFilePath % "'s " % HYGUIPATH_MetaUserFile % " file for project: " % userFile.errorString(), LOGTYPE_Error);
-        }
-
-        QJsonDocument userDoc = QJsonDocument::fromJson(userFile.readAll());
-        userFile.close();
-
-        QJsonObject userObj = userDoc.object();
-
-        //m_pAtlasMan->SetSelectedAtlasGroup(userObj["DefaultAtlasGroup"].toString());
-
-        // TODO:
-
-        //QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
-        //sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
-        //foreach(QString sItemPath, sListOpenItems)
-        //{
-        //    Item *pItem = ui->explorer->GetItemByPath(sItemPath);
-        //    if(pItem)
-        //        OpenItem(pItem);
-        //}
-    }
-    
-
 }
 
 /*virtual*/ Project::~Project()
@@ -482,13 +450,12 @@ void Project::OnHarmonyLoaded()
     MainWindow::SetSelectedProjWidgets(this);
 }
 
-void Project::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal)
+void Project::SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal)
 {
-    eItemType eSubDirType = HyGlobal::GetCorrespondingDirItem(eType);
+    HyGuiItemType eSubDirType = HyGlobal::GetCorrespondingDirItem(eType);
     QString sSubDirName = HyGlobal::ItemName(eSubDirType);
 
-    if(m_SaveDataObj.contains(sSubDirName) == false)
-    {
+    if(m_SaveDataObj.contains(sSubDirName) == false) {
         HyGuiLog("Could not find subdir: " % sSubDirName % " within ItemProject::SaveGameData", LOGTYPE_Error);
     }
 
@@ -508,8 +475,7 @@ void Project::SaveGameData(eItemType eType, QString sPath, QJsonValue itemVal)
 void Project::SaveGameData()
 {
     QFile dataFile(GetAssetsAbsPath() % HYGUIPATH_DataFile);
-    if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
-    {
+    if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
        HyGuiLog(QString("Couldn't open ") % HYGUIPATH_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
     }
     else
@@ -526,47 +492,57 @@ void Project::SaveGameData()
     }
 }
 
-void Project::SaveUserData()
+void Project::DeleteGameData(HyGuiItemType eType, QString sPath)
 {
-    QFile userFile(GetMetaDataAbsPath() % HYGUIPATH_MetaUserFile);
-    if(userFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
-    {
-       HyGuiLog(QString("Couldn't open ") % HYGUIPATH_MetaUserFile % " for writing: " % userFile.errorString(), LOGTYPE_Error);
+    HyGuiItemType eSubDirType = HyGlobal::GetCorrespondingDirItem(eType);
+    QString sSubDirName = HyGlobal::ItemName(eSubDirType);
+
+    if(m_SaveDataObj.contains(sSubDirName) == false) {
+        HyGuiLog("Could not find subdir: " % sSubDirName % " within ItemProject::DeleteGameData", LOGTYPE_Error);
     }
-    else
+
+    QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
+
+    subDirObj.remove(sPath);
+
+    m_SaveDataObj.remove(sSubDirName);
+    m_SaveDataObj.insert(sSubDirName, subDirObj);
+
+    SaveGameData();
+    
+    // If open, make sure to close as it's been deleted from project
+    for(int i = 0; i < m_pTabBar->count(); ++i)
     {
-        QJsonObject userObj;
-        userObj.insert("DefaultAtlasGroup", "Not used anymore");
-
-
-        // TODO:
-
-        //QStringList sListOpenItems = m_Settings.value("openItems").toStringList();
-        //sListOpenItems.sort();  // This sort should organize each open item by project to reduce unloading/loading projects
-        //foreach(QString sItemPath, sListOpenItems)
-        //{
-        //    Item *pItem = ui->explorer->GetItemByPath(sItemPath);
-        //    if(pItem)
-        //        OpenItem(pItem);
-        //}
-
-
-
-
-
-        QJsonDocument userDoc;
-        userDoc.setObject(userObj);
-        qint64 iBytesWritten = userFile.write(userDoc.toJson());
-        if(0 == iBytesWritten || -1 == iBytesWritten)
-        {
-            HyGuiLog(QString("Could not write to ") % HYGUIPATH_MetaUserFile % " file: " % userFile.errorString(), LOGTYPE_Error);
-        }
-
-        userFile.close();
+        QVariant v = m_pTabBar->tabData(i);
+        ProjectItem *pItem = v.value<ProjectItem *>();
+        
+        if(pItem->GetName(true) == sPath)
+            OnCloseTab(i);
     }
 }
 
-QJsonObject Project::GetSubDirObj(eItemType eType)
+void Project::DeletePrefixAndContents(HyGuiItemType eSubDirType, QString sPrefix)
+{
+    HyGuiItemType eActualSubDir = HyGlobal::GetCorrespondingDirItem(eSubDirType);
+    QString sSubDirName = HyGlobal::ItemName(eActualSubDir);
+    
+    if(m_SaveDataObj.contains(sSubDirName) == false) {
+        HyGuiLog("Could not find subdir: " % sSubDirName % " within ItemProject::DeletePrefix", LOGTYPE_Error);
+    }
+
+    QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
+    for(auto iter = subDirObj.begin(); iter != subDirObj.end(); ++iter)
+    {
+        QFileInfo itemInfo;
+        itemInfo.setFile(iter.key());
+        QString sCurPrefix = itemInfo.path() % "/";
+        
+        if(sCurPrefix == sPrefix)
+            DeleteGameData(eActualSubDir, iter.key());
+    }
+}
+
+QJsonObject Project::GetSubDirObj(HyGuiItemType eType)
 {
     return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType))].toObject();
 }

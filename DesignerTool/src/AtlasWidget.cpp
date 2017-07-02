@@ -306,17 +306,48 @@ void AtlasWidget::on_actionDeleteImages_triggered()
 
 void AtlasWidget::on_actionReplaceImages_triggered()
 {
+    // Query all selected frames in Atlas Manager
     QList<QTreeWidgetItem *> selectedTreeItemList = ui->atlasList->selectedItems();
-    
     QList<QTreeWidgetItem *> selectedTreeItemFrameList;
     QList<QTreeWidgetItem *> selectedFilterList;
-
     GetSelectedItemsRecursively(selectedTreeItemList, selectedTreeItemFrameList, selectedFilterList);
-    
     if(selectedFilterList.empty() == false)
     {
         HyGuiLog("Please unselect any atlas filters before replacing images", LOGTYPE_Warning);
         return;
+    }
+    
+    QTabBar *pTabBar = m_pModel->GetProjOwner()->GetTabBar();
+    
+    // Keep track of any linked/refrenced items as they will need to be resaved after image replacement
+    QList<ProjectItem *> affectedItemList;
+    for(int i = 0; i < selectedTreeItemFrameList.count(); ++i)
+    {
+        AtlasFrame *pFrame = selectedTreeItemFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
+        QSet<ProjectItem *> sLinks = pFrame->GetLinks();
+        
+        if(sLinks.empty() == false)
+        {
+            for(QSet<ProjectItem *>::iterator linksIter = sLinks.begin(); linksIter != sLinks.end(); ++linksIter)
+            {
+                ProjectItem *pLinkedItem = *linksIter;
+                affectedItemList.append(pLinkedItem);
+                
+                // Abort if any of these linked items are currently opened & unsaved
+                for(int i = 0; i < pTabBar->count(); ++i)
+                {
+                    QVariant v = pTabBar->tabData(i);
+                    ProjectItem *pOpenItem = v.value<ProjectItem *>();
+                    
+                    if(pLinkedItem == pOpenItem && pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
+                    {
+                        QString sMessage = "'" % pFrame->GetName() % "' image cannot be replaced because an item that refrences it is currently opened and unsaved:\n" % pOpenItem->GetName(true);
+                        HyGuiLog(sMessage, LOGTYPE_Warning);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     // Store a list of the frames, since 'selectedAtlasTreeItemList' will become invalid within Refresh()
@@ -375,6 +406,10 @@ void AtlasWidget::on_actionReplaceImages_triggered()
     }
     
     RefreshLcds();
+    
+    // Resave all affected items that had a replaced atlas frame
+    for(int i = 0; i < affectedItemList.size(); ++i)
+        affectedItemList[i]->Save();
 }
 
 void AtlasWidget::on_actionAddFilter_triggered()

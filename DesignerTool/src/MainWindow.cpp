@@ -420,7 +420,6 @@ void MainWindow::on_actionCloseProject_triggered()
     m_pCurRenderer = new HyGuiRenderer(nullptr, this);
     ui->centralVerticalLayout->addWidget(m_pCurRenderer);
 
-    ui->explorer->GetCurProjSelected()->SaveUserData();
     ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
 
     m_pCurSelectedProj = nullptr;
@@ -446,7 +445,7 @@ void MainWindow::on_actionNewFont_triggered()
     NewItem(ITEM_Font);
 }
 
-void MainWindow::NewItem(eItemType eItem)
+void MainWindow::NewItem(HyGuiItemType eItem)
 {
     DlgNewItem *pDlg = new DlgNewItem(m_pCurSelectedProj, eItem, this);
     if(pDlg->exec())

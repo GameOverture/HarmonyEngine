@@ -27,7 +27,7 @@
 
 //#define HYGUI_UseBinaryMetaFiles
 
-enum eItemType
+enum HyGuiItemType
 {
     ITEM_Unknown = -1,
     
@@ -95,11 +95,10 @@ enum MdiArea
 
 #define HYTREEWIDGETITEM_IsFilter               "HyTreeFilter"
 
-#define HYGUIPATH_MetaUserFile                  "Project.user"
-#define HYGUIPATH_DataFile                      "Data.json"
+#define HYGUIPATH_DataFile                      "data.json"
 #define HYGUIPATH_TempDir                       "temp/"
-#define HYGUIPATH_DataAtlases                   "atlasInfo.json"
-#define HYGUIPATH_MetaSettings                  "settings.hygui"
+#define HYGUIPATH_DataAtlases                   "atlas.json"
+#define HYGUIPATH_MetaSettings                  "atlas.hygui"
 #define HYGUIPATH_DataAudioCategories           "categories.json"
 
 QAction *FindAction(QList<QAction *> list, QString sName);
@@ -148,6 +147,7 @@ public:
         sm_sItemNames[ITEM_Entity] = "Entity";
         sm_sItemNames[ITEM_DirAtlases] = "Atlases";
         sm_sItemNames[ITEM_DirAudioBanks] = "AudioBanks";
+        sm_sItemNames[ITEM_Prefix] = "Prefix";
         
         sm_sItemExt[ITEM_Project] = ".hyproj";
         sm_sItemExt[ITEM_DirAudio] = "/";
@@ -204,7 +204,7 @@ public:
         sm_ErrorStrings[GUIFRAMEERROR_CouldNotPack] = "Could not pack this frame in atlas";
     }
 
-    static eItemType GetCorrespondingDirItem(eItemType eItem)
+    static HyGuiItemType GetCorrespondingDirItem(HyGuiItemType eItem)
     {
         switch(eItem)
         {
@@ -233,9 +233,9 @@ public:
         return ITEM_Unknown;
     }
     
-    static QList<eItemType> SubDirList()
+    static QList<HyGuiItemType> SubDirList()
     {
-        QList<eItemType> list;
+        QList<HyGuiItemType> list;
         list.append(ITEM_DirAudio);
         list.append(ITEM_DirParticles);
         list.append(ITEM_DirFonts);
@@ -251,7 +251,7 @@ public:
     
     static QStringList SubDirNameList()
     {
-        QList<eItemType> itemList = SubDirList();
+        QList<HyGuiItemType> itemList = SubDirList();
         
         QStringList list;
         for(int i = 0; i < itemList.size(); ++i)
@@ -281,13 +281,13 @@ public:
         return "Unknown";
     }
     
-    static const QString &ItemName(eItemType eItm)                  { return sm_sItemNames[eItm]; }
+    static const QString &ItemName(HyGuiItemType eItm)                  { return sm_sItemNames[eItm]; }
 
     static const QString &ItemExt(int iIndex)                       { Q_ASSERT(iIndex >= 0 && iIndex < NUMITEM); return sm_sItemExt[iIndex]; }
-    static const QString &ItemExt(eItemType eItm)                   { return sm_sItemExt[eItm]; }
+    static const QString &ItemExt(HyGuiItemType eItm)                   { return sm_sItemExt[eItm]; }
 
     static const QIcon &ItemIcon(int iIndex)                        { Q_ASSERT(iIndex >= 0 && iIndex < NUMITEM); return sm_ItemIcons[iIndex]; }
-    static const QIcon &ItemIcon(eItemType eItm)                    { return sm_ItemIcons[eItm]; }
+    static const QIcon &ItemIcon(HyGuiItemType eItm)                    { return sm_ItemIcons[eItm]; }
 
     static const QIcon &AtlasIcon(eAtlasNodeType eNode)             { return sm_AtlasIcons[eNode]; }
     static const QIcon &AudioIcon(eAudioNodeType eNode)             { return sm_AudioIcons[eNode]; }

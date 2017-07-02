@@ -23,13 +23,12 @@ class DlgNewItem : public QDialog
 {
     Q_OBJECT
 
-    Project *   m_pItemProject;
-    eItemType       m_eItemType;
+    Project *       m_pItemProject;
+    HyGuiItemType       m_eItemType;
     QStringList     m_sListOfDirPrefixes;
-    QStringList     m_sListOfDirFullPaths;
 
 public:
-    explicit DlgNewItem(Project *pItemProject, eItemType eItem, QWidget *parent = 0);
+    explicit DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *parent = 0);
     ~DlgNewItem();
     
     QString GetName();
