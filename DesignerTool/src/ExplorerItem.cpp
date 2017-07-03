@@ -69,34 +69,42 @@ QString ExplorerItem::GetPrefix() const
     
     QStringList sPathSplitList = m_sPATH.split('/', QString::SkipEmptyParts);
     QStringList sSubDirList = HyGlobal::SubDirNameList();
-    
-    int iSplitIndex = sPathSplitList.size() - 1;
-    bool bSubDirFound = false;
-    for(; iSplitIndex >= 0; --iSplitIndex)
+
+    if(m_eTYPE == ITEM_Prefix)
     {
-        for(int i = 0; i < sSubDirList.size(); ++i)
-        {
-            if(sSubDirList[i].compare(sPathSplitList[iSplitIndex], Qt::CaseInsensitive) == 0)
-            {
-                bSubDirFound = true;
-                break;
-            }
-        }
-        
-        if(bSubDirFound)
-            break;
-    }
-    
-    if(bSubDirFound)
-    {
-        for(int i = iSplitIndex + 1; i < sPathSplitList.size() - 1; ++i)    // The '+ 1' so we don't include the sub directory, and the '- 1' is so we don't include the name
+        for(int i = 1; i < sPathSplitList.size(); ++i)    // The 'i = 1' so we don't include the sub directory
             sPrefix += sPathSplitList[i] % "/";
     }
     else
     {
-        QFileInfo itemInfo;
-        itemInfo.setFile(m_sPATH);
-        sPrefix = itemInfo.path() % "/";
+        int iSplitIndex = sPathSplitList.size() - 1;
+        bool bSubDirFound = false;
+        for(; iSplitIndex >= 0; --iSplitIndex)
+        {
+            for(int i = 0; i < sSubDirList.size(); ++i)
+            {
+                if(sSubDirList[i].compare(sPathSplitList[iSplitIndex], Qt::CaseInsensitive) == 0)
+                {
+                    bSubDirFound = true;
+                    break;
+                }
+            }
+
+            if(bSubDirFound)
+                break;
+        }
+
+        if(bSubDirFound)
+        {
+            for(int i = iSplitIndex + 1; i < sPathSplitList.size() - 1; ++i)    // The '+ 1' so we don't include the sub directory, and the '- 1' is so we don't include the name
+                sPrefix += sPathSplitList[i] % "/";
+        }
+        else
+        {
+            QFileInfo itemInfo;
+            itemInfo.setFile(m_sPATH);
+            sPrefix = itemInfo.path() % "/";
+        }
     }
     
     return sPrefix;

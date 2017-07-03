@@ -140,7 +140,7 @@ void AudioWidgetBank::on_btnAddDir_pressed()
     for(int iDirIndex = 0; iDirIndex < sDirs.size(); ++iDirIndex)
     {
         QDir dirEntry(sDirs[iDirIndex]);
-        HyGlobal::RecursiveFindOfFileExt("wav", sImportWaveList, dirEntry);
+        HyGlobal::RecursiveFindFileOfExt("wav", sImportWaveList, dirEntry);
     }
 
     if(sImportWaveList.empty() == false)
