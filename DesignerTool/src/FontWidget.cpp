@@ -142,11 +142,12 @@ void FontWidget::OnUpdate()
 {
     texture_atlas_t *pAtlas = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlas();
     unsigned char *pAtlasPixelData = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlasPixelData();
+    uint uiAtlasPixelDataSize = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlasPixelDataSize();
     if(pAtlas == nullptr || pAtlasPixelData == nullptr)
         return;
 
     if(pAtlas->id == 0)
-        m_pDraw->LoadNewAtlas(pAtlas, pAtlasPixelData);
+        m_pDraw->LoadNewAtlas(pAtlas, pAtlasPixelData, uiAtlasPixelDataSize);
     
     if(static_cast<FontModel *>(m_ItemRef.GetModel())->ClearFontDirtyFlag())
         m_pDraw->GenerateTextPreview(GetCurStateData()->GetFontModel(), "The quick brown fox jumped over the lazy dog. 01234567890", pAtlas);

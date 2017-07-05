@@ -152,7 +152,8 @@ FontModel::FontModel(ProjectItem *pItem, QJsonObject fontObj) : IModel(pItem),
                                                                 m_bGlyphsDirty(false),
                                                                 m_bFontPreviewDirty(false),
                                                                 m_pAtlas(nullptr),
-                                                                m_pTrueAtlasPixelData(nullptr)
+                                                                m_pTrueAtlasPixelData(nullptr),
+                                                                m_uiTrueAtlasPixelDataSize(0)
 {
     m_pChkMapper_09 = new CheckBoxMapper(this);
     m_pChkMapper_AZ = new CheckBoxMapper(this);
@@ -246,6 +247,11 @@ texture_atlas_t *FontModel::GetAtlas()
 unsigned char *FontModel::GetAtlasPixelData()
 {
     return m_pTrueAtlasPixelData;
+}
+
+uint FontModel::GetAtlasPixelDataSize()
+{
+    return m_uiTrueAtlasPixelDataSize;
 }
 
 void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
@@ -393,8 +399,9 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
     // Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
     delete [] m_pTrueAtlasPixelData;
     uint uiNumPixels = static_cast<uint>(m_pAtlas->width * m_pAtlas->height);
-    m_pTrueAtlasPixelData = new unsigned char[uiNumPixels * 4];
-    memset(m_pTrueAtlasPixelData, 0xFF, uiNumPixels * 4);
+    m_uiTrueAtlasPixelDataSize = uiNumPixels * 4;
+    m_pTrueAtlasPixelData = new unsigned char[m_uiTrueAtlasPixelDataSize];
+    memset(m_pTrueAtlasPixelData, 0xFF, m_uiTrueAtlasPixelDataSize);
     // Overwriting alpha channel
     for(uint i = 0; i < uiNumPixels; ++i)
         m_pTrueAtlasPixelData[i*4+3] = m_pAtlas->data[i];

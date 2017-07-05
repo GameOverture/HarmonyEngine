@@ -107,6 +107,7 @@ class FontModel : public IModel
 
     texture_atlas_t *           m_pAtlas;
     unsigned char *             m_pTrueAtlasPixelData;
+    uint                        m_uiTrueAtlasPixelDataSize;
 
 public:
     FontModel(ProjectItem *pItem, QJsonObject fontObj);
@@ -126,6 +127,7 @@ public:
     
     texture_atlas_t *GetAtlas();
     unsigned char *GetAtlasPixelData();
+    uint GetAtlasPixelDataSize();
     
     void GeneratePreview(bool bStoreIntoAtlasManager = false);
     

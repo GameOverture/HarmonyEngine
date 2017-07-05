@@ -27,7 +27,7 @@ public:
     
     void ShowSubAtlas(bool bShow);
     
-    void LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelData);
+    void LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelData, uint uiAtlasPixelDataSize);
     void GenerateTextPreview(FontTableModel *pFontModel, QString sFontPreviewString, texture_atlas_t *pAtlas);
 
 protected:
