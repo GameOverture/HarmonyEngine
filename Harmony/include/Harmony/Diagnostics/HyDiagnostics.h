@@ -11,6 +11,7 @@
 #define HyDiagnostics_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Time/IHyTime.h"
 
 struct HarmonyInit;
 class HyAssets;
@@ -23,6 +24,7 @@ class HyDiagnostics
 	HarmonyInit &		m_InitStructRef;
 	HyAssets &			m_AssetsRef;
 	HyScene &			m_SceneRef;
+	IHyTime &			m_TimeRef;
 
 	std::string			m_sPlatform;
 	uint32				m_uiNumCpuCores;
@@ -43,10 +45,14 @@ class HyDiagnostics
 #endif
 
 public:
-	HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef);
+	HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef, IHyTime &timeRef);
 	~HyDiagnostics();
 
 	void BootMessage();
+	
+	void ShowFpsInConsole(bool bShow);
+	bool IsShowFpsInConsole();
+
 	void DumpAtlasUsage();
 	void DumpNodeUsage();
 	void DumpMemoryUsage();

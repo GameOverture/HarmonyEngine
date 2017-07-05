@@ -101,6 +101,11 @@ void IHyTime::ShowFps(bool bShow)
 	m_bDumpFPSToConsole = bShow;
 }
 
+bool IHyTime::IsShowFps()
+{
+	return m_bDumpFPSToConsole;
+}
+
 void IHyTime::AddTimeInst(IHyTimeInst *pTimeInst)
 {
 	if(pTimeInst == NULL)
