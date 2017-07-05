@@ -12,7 +12,7 @@
 
 #include "Diagnostics/Console/HyConsole.h"
 
-HyTime_Win::HyTime_Win() : IHyTime()
+HyTime_Win::HyTime_Win(HyDiagnostics &diagRef) : IHyTime(diagRef)
 {
 	int64 i64PerfCnt;
 	if (QueryPerformanceFrequency((LARGE_INTEGER *) &i64PerfCnt)) 

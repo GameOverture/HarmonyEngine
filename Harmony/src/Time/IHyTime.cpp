@@ -9,17 +9,20 @@
  *************************************************************************/
 #include "Time/IHyTime.h"
 #include "Scene/HyScene.h"
+#include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/Console/HyConsole.h"
 
 /*static*/ uint32			IHyTime::sm_uiUPDATESTEP_MILLISECONDS = 16;
 /*static*/ double			IHyTime::sm_dUPDATESTEP_SECONDS = sm_uiUPDATESTEP_MILLISECONDS / 1000.0;
 /*static*/ double			IHyTime::sm_dCurDeltaTime = 0.0;
 
-IHyTime::IHyTime() :	m_dTotalElapsedTime(0.0),
-						m_dThrottledTime(0.0),
-						m_uiFpsFrameCount(0),
-						m_dFpsElapsedTime(0.0),
-						m_bDumpFPSToConsole(false)
+IHyTime::IHyTime(HyDiagnostics &diagRef) :	m_DiagosticsRef(diagRef),
+											m_dTotalElapsedTime(0.0),
+											m_dThrottledTime(0.0),
+											m_uiCurFpsCount(0),
+											m_uiFps_Update(0),
+											m_uiFps_Render(0),
+											m_dFpsElapsedTime(0.0)
 {
 }
 
@@ -73,18 +76,18 @@ bool IHyTime::ThrottleTime()
 		return true;
 	}
 
-	if(m_bDumpFPSToConsole)
+	// FPS diagnostics
+	m_dFpsElapsedTime += sm_dCurDeltaTime;
+	m_uiCurFpsCount++;
+	if(m_dFpsElapsedTime >= 1.0)
 	{
-		m_dFpsElapsedTime += sm_dCurDeltaTime;
-		m_uiFpsFrameCount++;
-		if(m_dFpsElapsedTime >= 1.0)
-		{
-			HyLog("Update: " << m_uiFpsFrameCount << "fps (" << (sm_dCurDeltaTime * 1000) << "ms)");
-			HyLog("Render: " << HyScene::GetAndClearRenderedBufferCount() << "fps");
+		m_uiFps_Update = m_uiCurFpsCount;
+		m_uiFps_Render = HyScene::GetAndClearRenderedBufferCount();
 
-			m_dFpsElapsedTime = 0.0;
-			m_uiFpsFrameCount = 0;
-		}
+		m_dFpsElapsedTime = 0.0;
+		m_uiCurFpsCount = 0;
+
+		m_DiagosticsRef.SetCurrentFps(m_uiFps_Update, m_uiFps_Render);
 	}
 
 	return false;
@@ -96,14 +99,14 @@ void IHyTime::ResetDelta()
 	SetCurDeltaTime();
 }
 
-void IHyTime::ShowFps(bool bShow)
+uint32 IHyTime::GetFps_Update()
 {
-	m_bDumpFPSToConsole = bShow;
+	return m_uiFps_Update;
 }
 
-bool IHyTime::IsShowFps()
+uint32 IHyTime::GetFps_Render()
 {
-	return m_bDumpFPSToConsole;
+	return m_uiFps_Render;
 }
 
 void IHyTime::AddTimeInst(IHyTimeInst *pTimeInst)

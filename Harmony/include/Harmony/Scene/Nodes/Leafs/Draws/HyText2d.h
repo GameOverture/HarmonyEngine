@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyText2d_h__
-#define __HyText2d_h__
+#ifndef HyText2d_h__
+#define HyText2d_h__
 
 #include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 #include "Assets/Nodes/HyText2dData.h"
@@ -121,4 +121,4 @@ protected:
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 };
 
-#endif /* __HyText2d_h__ */
+#endif /* HyText2d_h__ */

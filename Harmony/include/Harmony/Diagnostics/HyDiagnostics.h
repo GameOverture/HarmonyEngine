@@ -16,15 +16,16 @@
 struct HarmonyInit;
 class HyAssets;
 class HyScene;
+class HyText2d;
 
 class HyDiagnostics
 {
 	friend class IHyRenderer;
+	friend class IHyTime;
 
 	HarmonyInit &		m_InitStructRef;
 	HyAssets &			m_AssetsRef;
 	HyScene &			m_SceneRef;
-	IHyTime &			m_TimeRef;
 
 	std::string			m_sPlatform;
 	uint32				m_uiNumCpuCores;
@@ -44,14 +45,20 @@ class HyDiagnostics
 	_CrtMemState		m_MemCheckpoint2;
 #endif
 
+	uint32				m_uiFps_Update;
+	uint32				m_uiFps_Render;
+	HyText2d *			m_pOnScreenText;
+
 public:
-	HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef, IHyTime &timeRef);
+	HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef);
 	~HyDiagnostics();
+
+	void InitOnScreenText(const char *szTextPrefix, const char *szTextName);
 
 	void BootMessage();
 	
-	void ShowFpsInConsole(bool bShow);
-	bool IsShowFpsInConsole();
+	void ShowFps(bool bShowOnScreen, bool bShowConsole);
+	bool IsShowFps();
 
 	void DumpAtlasUsage();
 	void DumpNodeUsage();
@@ -62,6 +69,8 @@ public:
 
 private:
 	void SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, const std::string &sCompressedTextures);
+
+	void SetCurrentFps(uint32 uiFps_Update, uint32 uiFps_Render);
 };
 
 #endif /* HyDiagnostics_h__ */

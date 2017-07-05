@@ -7,11 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __IHyTime_h__
-#define __IHyTime_h__
+#ifndef IHyTime_h__
+#define IHyTime_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Watches/HyTimer.h"
 #include "Watches/HyStopwatch.h"
 
@@ -20,11 +19,14 @@
 // Forward declarations
 class IHyTimeInst;
 class HyStopwatch;
+class HyDiagnostics;
 
 class IHyTime
 {
 	static uint32				sm_uiUPDATESTEP_MILLISECONDS;
 	static double				sm_dUPDATESTEP_SECONDS;
+
+	HyDiagnostics &				m_DiagosticsRef;
 
 	std::vector<IHyTimeInst *>	m_TimeInstList;
 
@@ -32,15 +34,16 @@ class IHyTime
 	double						m_dThrottledTime;
 
 	// FPS members
-	uint32						m_uiFpsFrameCount;
+	uint32						m_uiCurFpsCount;
+	uint32						m_uiFps_Update;
+	uint32						m_uiFps_Render;
 	double						m_dFpsElapsedTime;
-	bool						m_bDumpFPSToConsole;
 
 protected:
 	static double				sm_dCurDeltaTime;
 
 public:
-	IHyTime();
+	IHyTime(HyDiagnostics &diagRef);
 	~IHyTime();
 
 	//static uint32 GetUpdateStepMilliseconds();
@@ -59,9 +62,8 @@ public:
 	// produce a delta from this point.
 	void ResetDelta();
 
-	//int GetUpdateFPS()		{ return m_iCurFPSUpdate; }
-	void ShowFps(bool bShow);
-	bool IsShowFps();
+	uint32 GetFps_Update();
+	uint32 GetFps_Render();
 
 	virtual std::string GetDateTime() = 0;
 
@@ -69,4 +71,4 @@ public:
 	void RemoveTimeInst(IHyTimeInst *pTimeInst);
 };
 
-#endif /* __IHyTime_h__ */
+#endif /* IHyTime_h__ */

@@ -21,7 +21,7 @@ class HyTime_Win : public IHyTime
 	int64						m_i64CurTime;				// Current timer value
 
 public:
-	HyTime_Win();
+	HyTime_Win(HyDiagnostics &diagRef);
 	virtual ~HyTime_Win(void);
 
 	// Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)

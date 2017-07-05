@@ -45,13 +45,13 @@ class HyEngine
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
 	HyGuiComms					m_GuiComms;
+	HyDiagnostics				m_Diagnostics;
 
 	HyTimeInterop				m_Time;
 	HyInputInterop				m_Input;
 	HyRendererInterop			m_Renderer;
 	HyAudioInterop				m_Audio;
 	
-	HyDiagnostics				m_Diagnostics;
 
 // If HY_PLATFORM_GUI, make this ctor public as gui tool requires special usage.
 #ifdef HY_PLATFORM_GUI
