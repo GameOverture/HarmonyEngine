@@ -30,7 +30,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "netLink", "lib\src\netLink\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spine-c", "lib\src\spine-c\spine-c_vs2013.vcxproj", "{04D5C584-8373-44F2-A6DF-568325CDC043}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "soil2", "lib\src\soil2\soil2.vcxproj", "{D568CA91-0761-43B1-9EA3-D139A74F4B70}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "soil2_vs2013", "lib\src\soil2\soil2_vs2013.vcxproj", "{D568CA91-0761-43B1-9EA3-D139A74F4B70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -246,14 +246,14 @@ Global
 		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.Debug|Win32.Build.0 = Debug|Win32
 		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.Debug|x64.ActiveCfg = Debug|x64
 		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.Debug|x64.Build.0 = Debug|x64
-		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiDebug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiDebug|Mixed Platforms.Build.0 = Debug|Win32
+		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiDebug|Mixed Platforms.ActiveCfg = GuiDebug|Win32
+		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiDebug|Mixed Platforms.Build.0 = GuiDebug|Win32
 		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiDebug|Win32.ActiveCfg = GuiDebug|Win32
 		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiDebug|Win32.Build.0 = GuiDebug|Win32
 		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiDebug|x64.ActiveCfg = GuiDebug|x64
 		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiDebug|x64.Build.0 = GuiDebug|x64
-		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiRelease|Mixed Platforms.ActiveCfg = Release|Win32
-		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiRelease|Mixed Platforms.Build.0 = Release|Win32
+		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiRelease|Mixed Platforms.ActiveCfg = GuiRelease|Win32
+		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiRelease|Mixed Platforms.Build.0 = GuiRelease|Win32
 		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiRelease|Win32.ActiveCfg = GuiRelease|Win32
 		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiRelease|Win32.Build.0 = GuiRelease|Win32
 		{D568CA91-0761-43B1-9EA3-D139A74F4B70}.GuiRelease|x64.ActiveCfg = GuiRelease|x64

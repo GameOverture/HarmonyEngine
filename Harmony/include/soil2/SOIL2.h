@@ -475,7 +475,7 @@ unsigned int SOIL_direct_load_DDS(
 
 	Added by Jason Knobler for Harmony Engine
 **/
-unsigned char *SOIL_load_DDS(const char *filename, int loading_as_cubemap);
+unsigned char *SOIL_load_DDS(const char *filename, unsigned int *pSizeBytesOut, int loading_as_cubemap);
 
 /** Loads the DDS texture directly to the GPU memory ( if supported ) */
 unsigned int SOIL_direct_load_DDS_from_memory(

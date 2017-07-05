@@ -11,22 +11,23 @@
 #include "IHyApplication.h"
 #include "Assets/HyAssets.h"
 #include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Scene/Nodes/Leafs/Draws/HyText2d.h"
 #include "HyEngine.h"
 
-HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef, IHyTime &timeRef) :	m_InitStructRef(initStruct),
-																													m_AssetsRef(assetsRef),
-																													m_SceneRef(sceneRef),
-																													m_TimeRef(timeRef),
-																													m_sPlatform("Unknown"),
-																													m_uiNumCpuCores(0),
-																													m_uiTotalMemBytes(0),
-																													m_sGfxApi("Unknown"),
-																													m_sVersion("Unknown"),
-																													m_sVendor("Unknown"),
-																													m_sRenderer("Unknown"),
-																													m_sShader("Unknown"),
-																													m_sCompressedTextures("Unknown"),
-																													m_bInitialMemCheckpointSet(false)
+HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef) :	m_InitStructRef(initStruct),
+																								m_AssetsRef(assetsRef),
+																								m_SceneRef(sceneRef),
+																								m_sPlatform("Unknown"),
+																								m_uiNumCpuCores(0),
+																								m_uiTotalMemBytes(0),
+																								m_sGfxApi("Unknown"),
+																								m_sVersion("Unknown"),
+																								m_sVendor("Unknown"),
+																								m_sRenderer("Unknown"),
+																								m_sShader("Unknown"),
+																								m_sCompressedTextures("Unknown"),
+																								m_bInitialMemCheckpointSet(false),
+																								m_pOnScreenText(nullptr)
 {
 #if defined(HY_PLATFORM_WINDOWS)
 	m_sPlatform = "Windows";
@@ -73,6 +74,14 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 
 HyDiagnostics::~HyDiagnostics()
 {
+	delete m_pOnScreenText;
+}
+
+void HyDiagnostics::InitOnScreenText(const char *szTextPrefix, const char *szTextName)
+{
+	delete m_pOnScreenText;
+	m_pOnScreenText = HY_NEW HyText2d(szTextPrefix, szTextName);
+	m_pOnScreenText->Load();
 }
 
 void HyDiagnostics::BootMessage()
@@ -112,14 +121,15 @@ void HyDiagnostics::BootMessage()
 	HyLog("");
 }
 
-void HyDiagnostics::ShowFpsInConsole(bool bShow)
+void HyDiagnostics::ShowFps(bool bShowOnScreen, bool bShowConsole)
 {
-	m_TimeRef.ShowFps(bShow);
+	if(bShowOnScreen && m_pOnScreenText)
+		m_pOnScreenText->SetEnabled(true);
 }
 
-bool HyDiagnostics::IsShowFpsInConsole()
+bool HyDiagnostics::IsShowFps()
 {
-	return m_TimeRef.IsShowFps();
+	return false;
 }
 
 void HyDiagnostics::DumpAtlasUsage()
@@ -276,4 +286,10 @@ void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &
 	m_sRenderer = sRenderer;
 	m_sShader = sShader;
 	m_sCompressedTextures = sCompressedTextures;
+}
+
+void HyDiagnostics::SetCurrentFps(uint32 uiFps_Update, uint32 uiFps_Render)
+{
+	m_uiFps_Update = uiFps_Update;
+	m_uiFps_Render = uiFps_Render;
 }

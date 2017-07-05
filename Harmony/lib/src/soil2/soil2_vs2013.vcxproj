@@ -63,6 +63,7 @@
     <ProjectGuid>{D568CA91-0761-43B1-9EA3-D139A74F4B70}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>soil2</RootNamespace>
+    <ProjectName>soil2</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

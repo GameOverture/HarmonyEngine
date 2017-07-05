@@ -43,6 +43,7 @@ class HyAtlas : public IHyLoadableData
 	// have been output otherwise. E.g. if you set req_comp to 4, you will always
 	// get RGBA output, but you can check *comp to easily see if it's opaque.
 	unsigned char *							m_pPixelData;
+	uint32									m_uiPixelDataSize;
 
 	HyRectangle<int32> *					m_pFrames;
 	std::map<uint32, HyRectangle<int32> *>	m_ChecksumMap;

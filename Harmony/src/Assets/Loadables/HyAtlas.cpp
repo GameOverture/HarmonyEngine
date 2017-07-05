@@ -32,7 +32,8 @@ HyAtlas::HyAtlas(std::string sFilePath,
 														m_eTEXTURE_FORMAT(eTextureFormat),
 														m_uiGfxApiHandle(0),
 														m_uiNUM_FRAMES(static_cast<uint32>(srcFramesArrayRef.size())),
-														m_pPixelData(NULL)
+														m_pPixelData(nullptr),
+														m_uiPixelDataSize(0)
 {
 	m_pFrames = HY_NEW HyRectangle<int32>[m_uiNUM_FRAMES];
 
@@ -112,6 +113,7 @@ void HyAtlas::DeletePixelData()
 {
 	SOIL_free_image_data(m_pPixelData);// stbi_image_free(m_pPixelData);
 	m_pPixelData = nullptr;
+	m_uiPixelDataSize = 0;
 }
 
 void HyAtlas::OnLoadThread()
@@ -129,9 +131,12 @@ void HyAtlas::OnLoadThread()
 		int iWidth, iHeight, iNum8bitClrChannels;
 
 		if(m_sFILE_PATH[m_sFILE_PATH.size() - 1] == 'g')
+		{
 			m_pPixelData = SOIL_load_image(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);// stbi_load(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 0);
+			m_uiPixelDataSize = iWidth * iHeight * 4;
+		}
 		else
-			m_pPixelData = SOIL_load_DDS(m_sFILE_PATH.c_str(), 0);
+			m_pPixelData = SOIL_load_DDS(m_sFILE_PATH.c_str(), &m_uiPixelDataSize, 0);
 
 		HyAssert(m_pPixelData != nullptr, "HyAtlas failed to load image data");
 	}
@@ -144,7 +149,7 @@ void HyAtlas::OnRenderThread(IHyRenderer &rendererRef)
 	m_csPixelData.Lock();
 	if(GetLoadState() == HYLOADSTATE_Queued)
 	{
-		m_uiGfxApiHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, 0, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_eTEXTURE_FORMAT);
+		m_uiGfxApiHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, 0, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
 		DeletePixelData();
 	}
 	else // GetLoadState() == HYLOADSTATE_Discarded
