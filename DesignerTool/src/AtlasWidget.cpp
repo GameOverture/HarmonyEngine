@@ -217,7 +217,7 @@ void AtlasWidget::on_btnAddDir_clicked()
     for(int iDirIndex = 0; iDirIndex < sDirs.size(); ++iDirIndex)
     {
         QDir dirEntry(sDirs[iDirIndex]);
-        HyGlobal::RecursiveFindOfFileExt("png", sImportImgList, dirEntry);
+        HyGlobal::RecursiveFindFileOfExt("png", sImportImgList, dirEntry);
     }
 
     if(sImportImgList.empty() == false)

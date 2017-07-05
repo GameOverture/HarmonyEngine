@@ -110,7 +110,7 @@ void ExplorerWidget::AddItem(HyGuiItemType eNewItemType, const QString sPrefix, 
             {
                 // Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
                 //
-                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>()->GetName(true) % sPathSplitList[i];
+                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>()->GetName(true) % "/" % sPathSplitList[i];
                 
                 ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sPath);
                 QTreeWidgetItem *pPrefixTreeItem = pPrefixItem->GetTreeItem();

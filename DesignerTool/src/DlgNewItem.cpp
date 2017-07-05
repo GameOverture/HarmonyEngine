@@ -31,36 +31,35 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *pare
     ui->txtPrefix->setValidator(HyGlobal::FilePathValidator());
     on_chkNewPrefix_stateChanged(ui->chkNewPrefix->isChecked() ? Qt::Checked : Qt::Unchecked);
 
-    m_sListOfDirPrefixes.clear();
-    
-    QSet<QString> prefixSet;
-    QJsonObject subDirObj = m_pItemProject->GetSubDirObj(HyGlobal::GetCorrespondingDirItem(eItem));
+    m_PrefixStringList.clear();
 
-    // ITEMS IN SUBDIR
-    for(auto objsInSubDirIter = subDirObj.begin(); objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
+    QTreeWidgetItem *pSubDirItem = nullptr;
+    for(int i = 0; i < m_pItemProject->GetTreeItem()->childCount(); ++i)
     {
-        QString sItemPath = objsInSubDirIter.key();
-        QStringList sPathPartList = sItemPath.split("/");
-        QString sCurPrefix = "";
+        pSubDirItem = m_pItemProject->GetTreeItem()->child(i);
+        ExplorerItem *pCurItem = pSubDirItem->data(0, Qt::UserRole).value<ExplorerItem *>();
 
-        // PATH PARTS
-        for(int iPathPartIndex = 0; iPathPartIndex < sPathPartList.size() - 1; ++iPathPartIndex)
-        {
-            if(iPathPartIndex != 0)
-                sCurPrefix += "/";
-
-            sCurPrefix += sPathPartList[iPathPartIndex];
-        }
-
-        prefixSet.insert(sCurPrefix);
+        if(pCurItem->GetType() == HyGlobal::GetCorrespondingDirItem(eItem))
+            break;
     }
-    
-    m_sListOfDirPrefixes = prefixSet.toList();
-    qSort(m_sListOfDirPrefixes.begin(), m_sListOfDirPrefixes.end());
-    m_sListOfDirPrefixes.prepend(QString("<no prefix>"));
+
+    // prefixes in subdir
+    QList<QTreeWidgetItem *> itemList = HyGlobal::RecursiveTreeChildren(pSubDirItem);
+    for(int i = 0; i < itemList.size(); ++i)
+    {
+        if(itemList[i] == pSubDirItem)
+            continue;
+
+        ExplorerItem *pItem = itemList[i]->data(0, Qt::UserRole).value<ExplorerItem *>();
+        if(pItem->GetType() == ITEM_Prefix)
+            m_PrefixStringList.append(pItem->GetPrefix());
+    }
+
+    qSort(m_PrefixStringList.begin(), m_PrefixStringList.end());
+    m_PrefixStringList.prepend(QString("<no prefix>"));
 
     ui->cmbPrefixList->clear();
-    ui->cmbPrefixList->addItems(m_sListOfDirPrefixes);
+    ui->cmbPrefixList->addItems(m_PrefixStringList);
     
     ui->lblName->setText(HyGlobal::ItemName(eItem) % " Name:");
     ui->txtName->setText("New" % HyGlobal::ItemName(eItem));
@@ -126,6 +125,8 @@ void DlgNewItem::on_cmbPrefixList_currentIndexChanged(const QString &arg1)
 void DlgNewItem::ErrorCheck()
 {
     QString sPrefix = GetPrefix();
+    if(sPrefix.endsWith('/', Qt::CaseInsensitive) == false)
+        sPrefix += "/";
     
     bool bIsError = false;
     do
@@ -156,9 +157,9 @@ void DlgNewItem::ErrorCheck()
         bool bFoundDup = false;
         if(ui->chkNewPrefix->isChecked())
         {
-            for(uint i = 0; i < m_sListOfDirPrefixes.size(); ++i)
+            for(uint i = 0; i < m_PrefixStringList.size(); ++i)
             {
-                if(0 == sPrefix.compare(m_sListOfDirPrefixes[i], Qt::CaseInsensitive))
+                if(0 == sPrefix.compare(m_PrefixStringList[i], Qt::CaseInsensitive))
                 {
                     bFoundDup = true;
                     break;

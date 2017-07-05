@@ -383,7 +383,7 @@ public:
         return sNewString;
     }
 
-    static void RecursiveFindOfFileExt(QString sExt, QStringList &appendList, QDir dirEntry)
+    static void RecursiveFindFileOfExt(QString sExt, QStringList &appendList, QDir dirEntry)
     {
         sExt = sExt.toLower();
 
@@ -423,6 +423,27 @@ public:
         }
 
         return sPath;
+    }
+
+    // Includes 'pParentItem' in returned list
+    static QList<QTreeWidgetItem *> RecursiveTreeChildren(QTreeWidgetItem *pParentItem)
+    {
+        QStack<QTreeWidgetItem *> itemStack;
+        itemStack.push(pParentItem);
+
+        QList<QTreeWidgetItem *> returnList;
+        QStringList testList;
+        while(!itemStack.isEmpty())
+        {
+            QTreeWidgetItem *pItem = itemStack.pop();
+            returnList.append(pItem);
+            testList.append(pItem->text(0));
+
+            for(int i = 0; i < pItem->childCount(); ++i)
+                itemStack.push(pItem->child(i));
+        }
+
+        return returnList;
     }
 };
 

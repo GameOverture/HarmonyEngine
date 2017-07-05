@@ -6,6 +6,7 @@ Release/
 GuiRelease/
 ipch/
 build-DesignerTool-*/
+.vs/
 
 *.exe
 *.sdf
@@ -16,3 +17,5 @@ build-DesignerTool-*/
 *.user
 *.db
 *.opendb
+
+
