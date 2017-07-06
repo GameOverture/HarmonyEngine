@@ -27,7 +27,8 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 																								m_sShader("Unknown"),
 																								m_sCompressedTextures("Unknown"),
 																								m_bInitialMemCheckpointSet(false),
-																								m_pOnScreenText(nullptr)
+																								m_pFpsText(nullptr),
+																								m_bPrintFpsToConsole(false)
 {
 #if defined(HY_PLATFORM_WINDOWS)
 	m_sPlatform = "Windows";
@@ -74,14 +75,20 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 
 HyDiagnostics::~HyDiagnostics()
 {
-	delete m_pOnScreenText;
+	delete m_pFpsText;
 }
 
-void HyDiagnostics::InitOnScreenText(const char *szTextPrefix, const char *szTextName)
+void HyDiagnostics::InitFpsText(const char *szTextPrefix, const char *szTextName)
 {
-	delete m_pOnScreenText;
-	m_pOnScreenText = HY_NEW HyText2d(szTextPrefix, szTextName);
-	m_pOnScreenText->Load();
+	delete m_pFpsText;
+	m_pFpsText = HY_NEW HyText2d(szTextPrefix, szTextName);
+	m_pFpsText->Load();
+	m_pFpsText->SetEnabled(false);
+}
+
+HyText2d *HyDiagnostics::GetFpsText()
+{
+	return m_pFpsText;
 }
 
 void HyDiagnostics::BootMessage()
@@ -123,13 +130,15 @@ void HyDiagnostics::BootMessage()
 
 void HyDiagnostics::ShowFps(bool bShowOnScreen, bool bShowConsole)
 {
-	if(bShowOnScreen && m_pOnScreenText)
-		m_pOnScreenText->SetEnabled(true);
-}
+	if(bShowOnScreen)
+	{
+		if(m_pFpsText)
+			m_pFpsText->SetEnabled(true);
+	}
+	else
+		m_pFpsText->SetEnabled(false);
 
-bool HyDiagnostics::IsShowFps()
-{
-	return false;
+	m_bPrintFpsToConsole = bShowConsole;
 }
 
 void HyDiagnostics::DumpAtlasUsage()
@@ -292,4 +301,20 @@ void HyDiagnostics::SetCurrentFps(uint32 uiFps_Update, uint32 uiFps_Render)
 {
 	m_uiFps_Update = uiFps_Update;
 	m_uiFps_Render = uiFps_Render;
+
+	if(m_pFpsText && m_pFpsText->IsEnabled())
+	{
+		std::string sText = "Update-FPS: ";
+		sText += std::to_string(m_uiFps_Update);
+		sText += "\nRender-FPS: ";
+		sText += std::to_string(m_uiFps_Render);
+		
+		m_pFpsText->TextSet(sText);
+	}
+
+	if(m_bPrintFpsToConsole)
+	{
+		HyLog("Update FPS: " << m_uiFps_Update);
+		HyLog("Render FPS: " << m_uiFps_Render);
+	}
 }

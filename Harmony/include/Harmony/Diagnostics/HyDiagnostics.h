@@ -47,18 +47,19 @@ class HyDiagnostics
 
 	uint32				m_uiFps_Update;
 	uint32				m_uiFps_Render;
-	HyText2d *			m_pOnScreenText;
+	HyText2d *			m_pFpsText;
+	bool				m_bPrintFpsToConsole;
 
 public:
 	HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef);
 	~HyDiagnostics();
 
-	void InitOnScreenText(const char *szTextPrefix, const char *szTextName);
+	void InitFpsText(const char *szTextPrefix, const char *szTextName);
+	HyText2d *GetFpsText();
 
 	void BootMessage();
 	
 	void ShowFps(bool bShowOnScreen, bool bShowConsole);
-	bool IsShowFps();
 
 	void DumpAtlasUsage();
 	void DumpNodeUsage();
