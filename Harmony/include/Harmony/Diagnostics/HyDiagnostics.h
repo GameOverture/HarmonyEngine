@@ -37,6 +37,7 @@ class HyDiagnostics
 	std::string			m_sVendor;
 	std::string			m_sRenderer;
 	std::string			m_sShader;
+	int32				m_iMaxTextureSize;
 	std::string			m_sCompressedTextures;
 
 	bool				m_bInitialMemCheckpointSet;
@@ -69,7 +70,7 @@ public:
 	void EndMemoryCheckpoint();
 
 private:
-	void SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, const std::string &sCompressedTextures);
+	void SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
 
 	void SetCurrentFps(uint32 uiFps_Update, uint32 uiFps_Render);
 };

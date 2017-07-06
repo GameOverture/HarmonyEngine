@@ -41,6 +41,8 @@ HyOpenGL::~HyOpenGL(void)
 		HyError("At least OpenGL 3.3 must be supported");
 	}
 
+	GLint iMaxTextureSize = 0;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &iMaxTextureSize);
 	GLint iFormatCount = 0;
 	glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS, &iFormatCount);
 	GLint *pFormatArray = HY_NEW GLint[iFormatCount];
@@ -89,6 +91,7 @@ HyOpenGL::~HyOpenGL(void)
 					reinterpret_cast<const char *>(glGetString(GL_VENDOR)),
 					reinterpret_cast<const char *>(glGetString(GL_RENDERER)),
 					reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION)),
+					iMaxTextureSize,
 					sCompressedTextureFormats);
 
 	glEnable(GL_DEPTH_TEST);

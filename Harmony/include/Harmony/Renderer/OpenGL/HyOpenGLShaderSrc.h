@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyOpenGLShaderSrc_h__
-#define __HyOpenGLShaderSrc_h__
+#ifndef HyOpenGLShaderSrc_h__
+#define HyOpenGLShaderSrc_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -175,4 +175,4 @@ void main()
 )src";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif __HyOpenGLShaderSrc_h__
+#endif /* HyOpenGLShaderSrc_h__ */

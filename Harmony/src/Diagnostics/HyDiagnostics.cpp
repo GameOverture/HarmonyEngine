@@ -25,6 +25,7 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 																								m_sVendor("Unknown"),
 																								m_sRenderer("Unknown"),
 																								m_sShader("Unknown"),
+																								m_iMaxTextureSize(0),
 																								m_sCompressedTextures("Unknown"),
 																								m_bInitialMemCheckpointSet(false),
 																								m_pFpsText(nullptr),
@@ -124,6 +125,7 @@ void HyDiagnostics::BootMessage()
 	HyLog("Vendor:           " << m_sVendor);
 	HyLog("Renderer:         " << m_sRenderer);
 	HyLog("Shader:           " << m_sShader);
+	HyLog("Max Texture Size: " << m_iMaxTextureSize);
 	HyLog("Compression:      " << m_sCompressedTextures);
 	HyLog("");
 }
@@ -287,13 +289,14 @@ void HyDiagnostics::EndMemoryCheckpoint()
 #endif
 }
 
-void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, const std::string &sCompressedTextures)
+void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures)
 {
 	m_sGfxApi = sApi;
 	m_sVersion = sVersion;
 	m_sVendor = sVendor;
 	m_sRenderer = sRenderer;
 	m_sShader = sShader;
+	m_iMaxTextureSize = iMaxTextureSize;
 	m_sCompressedTextures = sCompressedTextures;
 }
 

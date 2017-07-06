@@ -406,7 +406,6 @@ void HyOpenGLShader::PrintActiveUniforms()
 
 void HyOpenGLShader::PrintActiveAttribs()
 {
-
 	GLint written, size, location, maxLength, nAttribs;
 	GLenum type;
 	GLchar * name;
