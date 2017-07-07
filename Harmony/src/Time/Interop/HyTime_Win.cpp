@@ -12,7 +12,7 @@
 
 #include "Diagnostics/Console/HyConsole.h"
 
-HyTime_Win::HyTime_Win(HyScene &sceneRef, HyDiagnostics &diagRef) : IHyTime(sceneRef, diagRef)
+HyTime_Win::HyTime_Win(HyScene &sceneRef, HyDiagnostics &diagRef, uint32 uiInitialFpsCap) : IHyTime(sceneRef, diagRef, uiInitialFpsCap)
 {
 	int64 i64PerfCnt;
 	if (QueryPerformanceFrequency((LARGE_INTEGER *) &i64PerfCnt)) 
@@ -44,7 +44,7 @@ HyTime_Win::~HyTime_Win(void)
 {
 }
 
-// Sets member variable 'sm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
+// Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
 // Delta time is in seconds.
 /*virtual*/ void HyTime_Win::SetCurDeltaTime()
 {
@@ -55,7 +55,7 @@ HyTime_Win::~HyTime_Win(void)
 	//	m_i64CurTime = timeGetTime();
 
 	// scale time value and save
-	sm_dCurDeltaTime = (m_i64CurTime - m_i64LastTime) * m_dTimeFactor;
+	m_dCurDeltaTime = (m_i64CurTime - m_i64LastTime) * m_dTimeFactor;
 
 	// save new time reading for next pass through the loop
 	m_i64LastTime = m_i64CurTime;

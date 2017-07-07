@@ -142,7 +142,7 @@ void SpriteWidget::UpdateTimeStep()
     if(m_bPlayActive == false && pFrame != NULL)
         return;
 
-    m_fElapsedTime += IHyTime::GetUpdateStepSeconds();
+    m_fElapsedTime += HyUpdateDelta();
     while(m_fElapsedTime >= pFrame->m_fDuration)
     {
         bool bBounce = ui->chkBounce->isChecked();

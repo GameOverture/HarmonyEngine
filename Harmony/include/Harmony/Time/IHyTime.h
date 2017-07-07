@@ -24,15 +24,16 @@ class HyScene;
 
 class IHyTime
 {
-	static uint32				sm_uiUPDATESTEP_MILLISECONDS;
-	static double				sm_dUPDATESTEP_SECONDS;
-
 	HyScene &					m_SceneRef;
 	HyDiagnostics &				m_DiagosticsRef;
+	uint32						m_uiFpsCap;					// 0 == no throttle
+
+	bool (IHyTime::*m_fpThrottleUpdate)();
 
 	std::vector<IHyTimeInst *>	m_TimeInstList;
 
 	double						m_dTotalElapsedTime;
+	double						m_dUpdateStep_Seconds;
 	double						m_dThrottledTime;
 
 	double						m_dSpiralOfDeathCounter;	// In 'ThrottledUpdate' environments a potential to have updates take longer than the alloted time step will cause an infinite loop
@@ -45,16 +46,18 @@ class IHyTime
 	double						m_dFpsElapsedTime;
 
 protected:
-	static double				sm_dCurDeltaTime;
+	double						m_dCurDeltaTime;
 
 public:
-	IHyTime(HyScene &sceneRef, HyDiagnostics &diagRef);
+	IHyTime(HyScene &sceneRef, HyDiagnostics &diagRef, uint32 uiInitialFpsCap);
 	~IHyTime();
 
-	//static uint32 GetUpdateStepMilliseconds();
-	static float GetUpdateStepSeconds();
+	uint32 GetFpsCap();
+	void SetFpsCap(uint32 uiFpsCap);
 
-	// Sets member variable 'sm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
+	float GetUpdateStepSeconds();
+
+	// Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
 	// Delta time is in seconds.
 	virtual void SetCurDeltaTime() = 0;
 
@@ -74,6 +77,10 @@ public:
 
 	void AddTimeInst(IHyTimeInst *pTimeInst);
 	void RemoveTimeInst(IHyTimeInst *pTimeInst);
+
+private:
+	bool UpdateThrottle_Deterministic();
+	bool UpdateThrottle_Variable();
 };
 
 #endif /* IHyTime_h__ */

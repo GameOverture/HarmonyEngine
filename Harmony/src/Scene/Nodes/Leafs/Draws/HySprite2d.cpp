@@ -8,9 +8,9 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Nodes/Leafs/Draws/HySprite2d.h"
+#include "HyEngine.h"
 #include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Diagnostics/Console/HyConsole.h"
-#include "Time/IHyTime.h"
 
 HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
 																										m_bIsAnimPaused(false),
@@ -199,7 +199,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 		return;
 
 	if(m_bIsAnimPaused == false)
-		m_fElapsedFrameTime += IHyTime::GetUpdateStepSeconds() * m_fAnimPlayRate;
+		m_fElapsedFrameTime += HyUpdateDelta() * m_fAnimPlayRate;
 
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiCurAnimState];

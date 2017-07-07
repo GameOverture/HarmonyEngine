@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>438</width>
-    <height>328</height>
+    <height>344</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -118,6 +118,24 @@
      <zorder>txtSourceLocation</zorder>
      <zorder>btnBrowseSource</zorder>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>Initial Update FPS Cap (throttle)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="sbUpdateFpsCap">
+       <property name="maximum">
+        <number>300</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">

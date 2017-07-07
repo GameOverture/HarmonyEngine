@@ -11,7 +11,6 @@
 #define HyDiagnostics_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Time/IHyTime.h"
 
 struct HarmonyInit;
 class HyAssets;

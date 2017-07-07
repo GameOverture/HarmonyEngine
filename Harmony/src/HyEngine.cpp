@@ -22,7 +22,7 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Renderer(m_GfxComms, m_Diagnostics, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList),
 												m_Diagnostics(m_AppRef.m_Init, m_Assets, m_Scene),
-												m_Time(m_Scene, m_Diagnostics)
+												m_Time(m_Scene, m_Diagnostics, m_AppRef.m_Init.uiUpdateFpsCap)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
@@ -80,11 +80,7 @@ bool HyEngine::BootUpdate()
 
 bool HyEngine::Update()
 {
-#if defined(HYSETTING_ThrottleUpdate) && !defined(HY_PLATFORM_GUI)
 	while(m_Time.ThrottleTime())
-#else
-	m_Time.ThrottleTime();
-#endif
 	{
 		m_Input.Update();
 		m_Scene.PreUpdate();
@@ -95,6 +91,9 @@ bool HyEngine::Update()
 		m_Assets.Update();
 		m_Scene.PostUpdate();
 		m_GuiComms.Update();
+
+		if(m_Time.GetFpsCap() == 0)
+			break;
 	}
 
 #if !defined(HYSETTING_MultithreadedRenderer) || defined(HY_PLATFORM_GUI)
@@ -128,6 +127,12 @@ void HyEngine::Shutdown()
 HyRendererInterop &HyEngine::GetRenderer()
 {
 	return m_Renderer;
+}
+
+/*friend*/ float HyUpdateDelta()
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "HyUpdateDelta() was invoked before engine has been initialized.");
+	return HyEngine::sm_pInstance->m_Time.GetUpdateStepSeconds();
 }
 
 /*friend*/ void HyPauseGame(bool bPause)

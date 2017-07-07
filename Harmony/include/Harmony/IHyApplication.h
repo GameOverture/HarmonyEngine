@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __IHyApplication_h__
-#define __IHyApplication_h__
+#ifndef IHyApplication_h__
+#define IHyApplication_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
@@ -24,6 +24,7 @@ struct HarmonyInit
 	HyWindowInfo			windowInfo[HY_MAXWINDOWS];
 	HyCoordinateType		eDefaultCoordinateType;
 	HyCoordinateUnit		eDefaultCoordinateUnit;
+	uint32					uiUpdateFpsCap;
 	float					fPixelsPerMeter;
 	uint32					uiNumInputMappings;
 	uint16					uiDebugPort;
@@ -76,4 +77,4 @@ private:
 	void SetInputMapPtr(HyInputMapInterop *pInputMaps);
 };
 
-#endif /* __IHyApplication_h__ */
+#endif /* IHyApplication_h__ */

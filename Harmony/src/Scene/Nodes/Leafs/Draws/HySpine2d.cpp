@@ -8,9 +8,9 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Nodes/Leafs/Draws/HySpine2d.h"
+#include "HyEngine.h"
 #include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Scene/HyScene.h"
-#include "Time/IHyTime.h"
 
 HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_Spine2d, szPrefix, szName, pParent),
 																									m_pSpineSkeleton(NULL),
@@ -166,14 +166,14 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 		return;
 
 	// Update the time field used for attachments and such
-	spSkeleton_update(m_pSpineSkeleton, IHyTime::GetUpdateStepSeconds());
+	spSkeleton_update(m_pSpineSkeleton, HyUpdateDelta());
 
 	// Calculate the animation state
 	for(uint32 i = 0; i < m_uiNumAnimStates; ++i)
 	{
 		if(m_pIsAnimStateEnabled[i])
 		{
-			spAnimationState_update(m_ppAnimStates[i], IHyTime::GetUpdateStepSeconds() * m_fAnimPlayRate);
+			spAnimationState_update(m_ppAnimStates[i], HyUpdateDelta() * m_fAnimPlayRate);
 			spAnimationState_apply(m_ppAnimStates[i], m_pSpineSkeleton);
 		}
 	}

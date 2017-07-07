@@ -117,6 +117,7 @@ void DlgNewProject::on_buttonBox_accepted()
     
     jsonObj.insert("DefaultCoordinateType", QJsonValue(1));
     jsonObj.insert("DefaultCoordinateUnit", QJsonValue(1));
+    jsonObj.insert("UpdateFpsCap", QJsonValue(0));
     jsonObj.insert("PixelsPerMeter", QJsonValue(80.0f));
     jsonObj.insert("ShowCursor", QJsonValue(true));
 	jsonObj.insert("NumInputMappings", QJsonValue(1));

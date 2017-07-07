@@ -43,6 +43,7 @@ DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :  
     ui->txtSourceLocation->setText(projObj["SourcePath"].toString());
 
     ui->sbInputMaps->setValue(projObj["NumInputMappings"].toInt());
+    ui->sbUpdateFpsCap->setValue(projObj["UpdateFpsCap"].toInt());
     ui->sbPixelsPerMeter->setValue(projObj["PixelsPerMeter"].toInt());
     ui->chkShowCursor->setChecked(projObj["ShowCursor"].toBool());
 }

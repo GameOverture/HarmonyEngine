@@ -8,6 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/HyScene.h"
+#include "HyEngine.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyWindow.h"
@@ -17,7 +18,6 @@
 #include "Scene/Nodes/Leafs/Draws/HyText2d.h"
 #include "Scene/Nodes/Leafs/Draws/HyTexturedQuad2d.h"
 #include "Scene/Physics/HyPhysEntity2d.h"
-#include "Time/IHyTime.h"
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
 std::vector<IHyNode *> HyScene::sm_NodeList;
@@ -122,7 +122,7 @@ void HyScene::SetPause(bool bPause)
 
 void HyScene::PreUpdate()
 {
-	m_b2World.Step(IHyTime::GetUpdateStepSeconds(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+	m_b2World.Step(HyUpdateDelta(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 }
 
 void HyScene::PostUpdate()

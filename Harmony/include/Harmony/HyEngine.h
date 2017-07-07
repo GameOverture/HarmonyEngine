@@ -75,6 +75,7 @@ private:
 
 	HyRendererInterop &GetRenderer();
 
+	friend float HyUpdateDelta();
 	friend void HyPauseGame(bool bPause);
 	friend HyDiagnostics &HyGetDiagnostics();
 	friend float HyPixelsPerMeter();
