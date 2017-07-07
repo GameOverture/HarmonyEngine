@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyTime_Win_h__
-#define __HyTime_Win_h__
+#ifndef HyTime_Win_h__
+#define HyTime_Win_h__
 
 #include "Time/IHyTime.h"
 
@@ -21,7 +21,7 @@ class HyTime_Win : public IHyTime
 	int64						m_i64CurTime;				// Current timer value
 
 public:
-	HyTime_Win(HyDiagnostics &diagRef);
+	HyTime_Win(HyScene &sceneRef, HyDiagnostics &diagRef);
 	virtual ~HyTime_Win(void);
 
 	// Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
@@ -31,4 +31,4 @@ public:
 	virtual std::string GetDateTime() override;
 };
 
-#endif /* __HyTime_Win_h__ */
+#endif /* HyTime_Win_h__ */

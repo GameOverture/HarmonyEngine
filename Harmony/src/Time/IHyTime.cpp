@@ -16,13 +16,18 @@
 /*static*/ double			IHyTime::sm_dUPDATESTEP_SECONDS = sm_uiUPDATESTEP_MILLISECONDS / 1000.0;
 /*static*/ double			IHyTime::sm_dCurDeltaTime = 0.0;
 
-IHyTime::IHyTime(HyDiagnostics &diagRef) :	m_DiagosticsRef(diagRef),
-											m_dTotalElapsedTime(0.0),
-											m_dThrottledTime(0.0),
-											m_uiCurFpsCount(0),
-											m_uiFps_Update(0),
-											m_uiFps_Render(0),
-											m_dFpsElapsedTime(0.0)
+#define HYTIME_ThresholdWarningsEvery 25.0	// How often to print a warning
+#define HYTIME_ThresholdMaxReset 100.0		// Maximum threshold until we hard reset
+
+IHyTime::IHyTime(HyScene &sceneRef, HyDiagnostics &diagRef) :	m_SceneRef(sceneRef),
+																m_DiagosticsRef(diagRef),
+																m_dTotalElapsedTime(0.0),
+																m_dThrottledTime(0.0),
+																m_uiCurFpsCount(0),
+																m_uiFps_Update(0),
+																m_uiFps_Render(0),
+																m_dFpsElapsedTime(0.0),
+																m_dSpiralOfDeathCounter(HYTIME_ThresholdWarningsEvery)
 {
 }
 
@@ -61,34 +66,48 @@ bool IHyTime::ThrottleTime()
 			m_TimeInstList[i]->Update(sm_dCurDeltaTime);
 	}
 
-	if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS)
-	{
-		m_dThrottledTime -= sm_dUPDATESTEP_SECONDS;
-
-		// TODO: Handle this better or input replays will not work
-		if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS * 5.0f)
-		{
-#ifndef HY_PLATFORM_GUI
-			m_dThrottledTime = 0.0f;
-#endif
-		}
-
-		return true;
-	}
-
 	// FPS diagnostics
 	m_dFpsElapsedTime += sm_dCurDeltaTime;
-	m_uiCurFpsCount++;
 	if(m_dFpsElapsedTime >= 1.0)
 	{
 		m_uiFps_Update = m_uiCurFpsCount;
-		m_uiFps_Render = HyScene::GetAndClearRenderedBufferCount();
+		m_uiFps_Render = m_SceneRef.GetAndClearRenderedBufferCount();
 
 		m_dFpsElapsedTime = 0.0;
 		m_uiCurFpsCount = 0;
 
 		m_DiagosticsRef.SetCurrentFps(m_uiFps_Update, m_uiFps_Render);
 	}
+
+#ifdef HYSETTING_ThrottleUpdate
+	if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS)
+	{
+		m_dThrottledTime -= sm_dUPDATESTEP_SECONDS;
+
+		if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS)
+		{
+			// We're falling behind in updates, keep track to avoid "Spiral of Death"
+			if(m_dThrottledTime >= sm_dUPDATESTEP_SECONDS * m_dSpiralOfDeathCounter)
+			{
+				HyLogWarning("IHyTime::ThrottleTime is behind by '" << static_cast<uint32>(m_dSpiralOfDeathCounter) << "' update thresholds");
+				m_dSpiralOfDeathCounter += HYTIME_ThresholdWarningsEvery;
+
+				if(m_dSpiralOfDeathCounter >= HYTIME_ThresholdMaxReset)
+				{
+					HyLogError("IHyTime::ThrottleTime behind by max '" << static_cast<uint32>(HYTIME_ThresholdMaxReset) << "' - resetting delta (this will corrupt input replays)");
+					m_dThrottledTime = 0.0f;
+				}
+			}
+		}
+		else // We're on time, reset "SoD" counter
+			m_dSpiralOfDeathCounter = HYTIME_ThresholdWarningsEvery;
+
+		m_uiCurFpsCount++;
+		return true;
+	}
+#else
+	m_uiCurFpsCount++;
+#endif
 
 	return false;
 }

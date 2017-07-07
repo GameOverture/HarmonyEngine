@@ -63,7 +63,7 @@ public:
 public:
 	~HyEngine();
 
-	static void RunGame(IHyApplication *pGame);
+	static void RunGame(IHyApplication *pDynamicallyAllocatedGame);
 
 #ifndef HY_PLATFORM_GUI
 private:

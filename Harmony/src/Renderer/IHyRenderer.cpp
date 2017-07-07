@@ -136,8 +136,11 @@ char *IHyRenderer::GetVertexData2d()
 	return pNewShader;
 }
 
-void IHyRenderer::Update()
+bool IHyRenderer::Update()
 {
+	if(m_GfxCommsRef.Render_PollPlatformApi(this) == false)
+		return false;
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Iterate through 'm_WindowListRef' to find any dirty RenderSurface's that need processing
 	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
@@ -172,19 +175,10 @@ void IHyRenderer::Update()
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Swap to newest draw buffers (is only thread-safe on Render thread)
 	if(!m_GfxCommsRef.Render_TakeSharedPointers(m_pRxDataQueue, m_pTxDataQueue, m_pDrawBuffer))
-	{
-		//InteropSleep(10);
-
-		//HyLogWarning("Renderer got stale buffer");
-		return;
-	}
-	//HyGfxComms::tDrawHeader *pDrawBufferHeader = reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBuffer);
+		return true;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
-	//if(!m_pRxDataQueue->empty())
-	//	HyLog("Renderer Data Queue: " << m_pRxDataQueue->size());
-
 	while(!m_pRxDataQueue->empty())
 	{
 		IHyLoadableData *pData = m_pRxDataQueue->front();
@@ -220,6 +214,7 @@ void IHyRenderer::Update()
 	}
 
 	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBuffer)->uiReturnFlags |= HyGfxComms::GFXFLAG_HasRendered;
+	return true;
 }
 
 void IHyRenderer::Draw2d()
@@ -249,6 +244,6 @@ void IHyRenderer::SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info)
 	if(false == pRenderer->Initialize())
 		HyError("Renderer API's Initialize() failed");
 
-	while(pRenderer->m_GfxCommsRef.Render_PollPlatformApi(pRenderer))
-		pRenderer->Update();
+	while(pRenderer->Update())
+	{ }
 }

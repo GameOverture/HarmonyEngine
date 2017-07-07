@@ -20,18 +20,23 @@
 class IHyTimeInst;
 class HyStopwatch;
 class HyDiagnostics;
+class HyScene;
 
 class IHyTime
 {
 	static uint32				sm_uiUPDATESTEP_MILLISECONDS;
 	static double				sm_dUPDATESTEP_SECONDS;
 
+	HyScene &					m_SceneRef;
 	HyDiagnostics &				m_DiagosticsRef;
 
 	std::vector<IHyTimeInst *>	m_TimeInstList;
 
 	double						m_dTotalElapsedTime;
 	double						m_dThrottledTime;
+
+	double						m_dSpiralOfDeathCounter;	// In 'ThrottledUpdate' environments a potential to have updates take longer than the alloted time step will cause an infinite loop
+															// This counter keeps track of these scenarios
 
 	// FPS members
 	uint32						m_uiCurFpsCount;
@@ -43,7 +48,7 @@ protected:
 	static double				sm_dCurDeltaTime;
 
 public:
-	IHyTime(HyDiagnostics &diagRef);
+	IHyTime(HyScene &sceneRef, HyDiagnostics &diagRef);
 	~IHyTime();
 
 	//static uint32 GetUpdateStepMilliseconds();

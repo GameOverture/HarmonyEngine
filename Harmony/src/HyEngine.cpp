@@ -22,7 +22,7 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Renderer(m_GfxComms, m_Diagnostics, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList),
 												m_Diagnostics(m_AppRef.m_Init, m_Assets, m_Scene),
-												m_Time(m_Diagnostics)
+												m_Time(m_Scene, m_Diagnostics)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
@@ -44,7 +44,8 @@ HyEngine::~HyEngine()
 	{ }
 
 	sm_pInstance->m_Diagnostics.BootMessage();
-	
+	sm_pInstance->m_Time.ResetDelta();
+
 	HyLogTitle("Starting Update Loop");
 	while(sm_pInstance->Update())
 	{ }
@@ -63,12 +64,6 @@ HyEngine::~HyEngine()
 
 bool HyEngine::BootUpdate()
 {
-	//while(m_Time.ThrottleTime())
-	//{
-	//	if(PollPlatformApi() == false)
-	//		return false;
-	//}
-
 #ifndef HYSETTING_MultithreadedRenderer
 	m_Renderer.Update();
 #endif
@@ -85,7 +80,7 @@ bool HyEngine::BootUpdate()
 
 bool HyEngine::Update()
 {
-#ifdef HYSETTING_ThrottleUpdate
+#if defined(HYSETTING_ThrottleUpdate) && !defined(HY_PLATFORM_GUI)
 	while(m_Time.ThrottleTime())
 #else
 	m_Time.ThrottleTime();
@@ -100,18 +95,11 @@ bool HyEngine::Update()
 		m_Assets.Update();
 		m_Scene.PostUpdate();
 		m_GuiComms.Update();
-				
-		// GUI renderer paints on a timer which doesn't work well with fixed updates like this. Ensures only single updates per frame.
-#if defined(HY_PLATFORM_GUI) && defined(HYSETTING_ThrottleUpdate)
-		break;
-#endif
 	}
 
 #if !defined(HYSETTING_MultithreadedRenderer) || defined(HY_PLATFORM_GUI)
-	if(m_GfxComms.Render_PollPlatformApi(&m_Renderer) == false)
+	if(m_Renderer.Update() == false)
 		return false;
-
-	m_Renderer.Update();
 #endif
 
 	return true;

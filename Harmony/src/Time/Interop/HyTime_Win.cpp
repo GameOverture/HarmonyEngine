@@ -12,7 +12,7 @@
 
 #include "Diagnostics/Console/HyConsole.h"
 
-HyTime_Win::HyTime_Win(HyDiagnostics &diagRef) : IHyTime(diagRef)
+HyTime_Win::HyTime_Win(HyScene &sceneRef, HyDiagnostics &diagRef) : IHyTime(sceneRef, diagRef)
 {
 	int64 i64PerfCnt;
 	if (QueryPerformanceFrequency((LARGE_INTEGER *) &i64PerfCnt)) 
@@ -25,8 +25,7 @@ HyTime_Win::HyTime_Win(HyDiagnostics &diagRef) : IHyTime(diagRef)
 		// read initial time
 		QueryPerformanceCounter((LARGE_INTEGER *) &m_i64LastTime);
 	}
-	else
-	{
+	else {
 		HyError("Windows - QueryPerformanceFrequency failed, Must run Windows XP or later.");
 	}
 	//else 
