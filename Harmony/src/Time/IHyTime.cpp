@@ -43,10 +43,11 @@ uint32 IHyTime::GetFpsCap()
 void IHyTime::SetFpsCap(uint32 uiFpsCap)
 {
 	m_uiFpsCap = uiFpsCap;
-	m_dUpdateStep_Seconds = (1.0 / static_cast<double>(m_uiFpsCap)* 1000.0) / 1000.0;
-
 	if(m_uiFpsCap != 0)
+	{
+		m_dUpdateStep_Seconds = (1.0 / static_cast<double>(m_uiFpsCap)* 1000.0) / 1000.0;
 		m_fpThrottleUpdate = &IHyTime::UpdateThrottle_Deterministic;
+	}
 	else
 		m_fpThrottleUpdate = &IHyTime::UpdateThrottle_Variable;
 

@@ -135,6 +135,12 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return HyEngine::sm_pInstance->m_Time.GetUpdateStepSeconds();
 }
 
+/*friend*/ void HySetFpsCap(uint32 uiFpsCap)
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "HyUpdateDelta() was invoked before engine has been initialized.");
+	HyEngine::sm_pInstance->m_Time.SetFpsCap(uiFpsCap);
+}
+
 /*friend*/ void HyPauseGame(bool bPause)
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "HyPauseGame() was invoked before engine has been initialized.");
