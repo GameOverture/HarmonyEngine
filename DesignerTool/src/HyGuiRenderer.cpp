@@ -101,7 +101,10 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
     HyGuiLog("GLSL: " % QString(reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION))), LOGTYPE_Normal);
 
     if(m_pProjOwner)
+    {
         m_pHyEngine = new HyEngine(*m_pProjOwner);
+        m_pHyEngine->sm_pInstance = m_pHyEngine;
+    }
 }
 
 /*virtual*/ void HyGuiRenderer::paintGL()

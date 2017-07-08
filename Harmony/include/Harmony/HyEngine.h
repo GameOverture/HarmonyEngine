@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyEngine_h__
-#define __HyEngine_h__
+#ifndef HyEngine_h__
+#define HyEngine_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
@@ -70,11 +70,11 @@ private:
 #endif
 	bool BootUpdate();
 	bool Update();
-
 	void Shutdown();
 
 	HyRendererInterop &GetRenderer();
 
+	// TODO: Rename these better when in LG game project
 	friend float HyUpdateDelta();
 	friend void HySetFpsCap(uint32 uiFpsCap);
 	friend void HyPauseGame(bool bPause);
@@ -85,4 +85,4 @@ private:
 	friend std::string HyDateTime();
 };
 
-#endif /* __HyEngine_h__ */
+#endif /* HyEngine_h__ */
