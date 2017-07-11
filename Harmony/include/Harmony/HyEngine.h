@@ -80,7 +80,6 @@ private:
 	friend void HyPauseGame(bool bPause);
 	friend HyDiagnostics &HyGetDiagnostics();
 	friend float HyPixelsPerMeter();
-	friend HyCoordinateType HyDefaultCoordinateType();
 	friend HyCoordinateUnit HyDefaultCoordinateUnit();
 	friend std::string HyDateTime();
 };

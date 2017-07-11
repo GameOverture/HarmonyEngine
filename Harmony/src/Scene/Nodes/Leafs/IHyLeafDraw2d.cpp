@@ -103,31 +103,17 @@ IHyNodeData *IHyLeafDraw2d::AcquireData()
 
 HyCoordinateType IHyLeafDraw2d::GetCoordinateType()
 {
-	return m_RenderState.IsEnabled(HyRenderState::USINGSCREENCOORDS) ? HYCOORDTYPE_Screen : HYCOORDTYPE_Camera;
+	return m_RenderState.IsUsingCameraCoordinates() ? HYCOORDTYPE_Camera : HYCOORDTYPE_Window;
 }
 
-void IHyLeafDraw2d::SetCoordinateType(HyCoordinateType eCoordType)
+void IHyLeafDraw2d::UseCameraCoordinates()
 {
-	HyAssert(m_pParent == nullptr, "IHyDraw2d::SetCoordinateType() should only be set on a top level node (i.e. not a child node)");
+	m_RenderState.SetCoordinateSystem(-1);
+}
 
-	if(eCoordType == HYCOORDTYPE_Default)
-		eCoordType = HyDefaultCoordinateType();
-
-	if(eCoordType == HYCOORDTYPE_Screen)
-		m_RenderState.Enable(HyRenderState::USINGSCREENCOORDS);
-	else
-		m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
-
-	//for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	//{
-	//	if(m_ChildList[i]->IsDraw2d())
-	//	{
-	//		if(eCoordType == HYCOORDTYPE_Screen)
-	//			static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.Enable(HyRenderState::USINGSCREENCOORDS);
-	//		else
-	//			static_cast<IHyDraw2d *>(m_ChildList[i])->m_RenderState.Disable(HyRenderState::USINGSCREENCOORDS);
-	//	}
-	//}
+void IHyLeafDraw2d::UseWindowCoordinates(uint32 uiWindowIndex)
+{
+	m_RenderState.SetCoordinateSystem(static_cast<int32>(uiWindowIndex));
 }
 
 int32 IHyLeafDraw2d::GetShaderId()
@@ -159,8 +145,6 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 	if(m_sNAME.empty() && m_eTYPE != HYTYPE_Entity2d && m_eTYPE != HYTYPE_Primitive2d && m_eTYPE != HYTYPE_TexturedQuad2d)
 		return;
 
-	if(GetCoordinateType() == HYCOORDTYPE_Default)
-		SetCoordinateType(HyDefaultCoordinateType());
 	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
 		SetCoordinateUnit(HyDefaultCoordinateUnit(), false);
 

@@ -24,13 +24,6 @@ protected:
 	glm::mat4				m_mtxProj;
 
 	int32					m_iCurCamIndex;
-	
-	enum eMatrixStack
-	{
-		MTX_NOTSET = 0,
-		MTX_CAMVIEW,
-		MTX_SCREENVIEW
-	};
 
 	///////// 2D MEMBERS ////////////////////
 	GLuint					m_hVBO2d;
@@ -64,7 +57,7 @@ public:
 	virtual void OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags) override;
 
 protected:
-	void SetCameraMatrices_2d(eMatrixStack eMtxStack);
+	void SetCameraMatrices_2d(bool bUseCameraView);
 };
 
 #endif /* __HyOpenGL_h__ */

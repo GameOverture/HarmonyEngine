@@ -27,14 +27,12 @@ public:
 	enum Attributes
 	{
 		SCISSORTEST				= 1 << 0,
-		USINGSCREENCOORDS		= 1 << 1,	// If disabled, then using world coordinates
+		DRAWINSTANCED			= 1 << 1,	// If enabled, will attempt to batch render multiple instances if they have matching HyRenderStates
 
-		DRAWINSTANCED			= 1 << 2,	// If enabled, will attempt to batch render multiple instances if they have matching HyRenderStates
-
-		DRAWMODE_TRIANGLESTRIP	= 1 << 3,
-		DRAWMODE_TRIANGLEFAN	= 1 << 4,
-		DRAWMODE_LINELOOP		= 1 << 5,
-		DRAWMODE_LINESTRIP		= 1 << 6,
+		DRAWMODE_TRIANGLESTRIP	= 1 << 2,
+		DRAWMODE_TRIANGLEFAN	= 1 << 3,
+		DRAWMODE_LINELOOP		= 1 << 4,
+		DRAWMODE_LINESTRIP		= 1 << 5,
 		DRAWMODEMASK			= DRAWMODE_TRIANGLESTRIP | DRAWMODE_TRIANGLEFAN | DRAWMODE_LINELOOP | DRAWMODE_LINESTRIP,
 	};
 
@@ -51,6 +49,7 @@ private:
 	size_t				m_uiDataOffset;
 
 	HyScreenRect<int32>	m_ScissorRect;
+	int32				m_iWindowIndex;	// -1 Means using world coordinates
 
 public:
 	HyRenderState();
@@ -71,6 +70,10 @@ public:
 	void SetScissorRect(const HyScreenRect<int32> &rect);
 	void SetScissorRect(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight);
 	void ClearScissorRect();
+
+	bool IsUsingCameraCoordinates();
+	void SetCoordinateSystem(int32 iWindowIndex);	// -1 Means use world space, otherwise specify a window index to be the local coordinates
+	int32 GetAssignedWindow();						// -1 Means using world space and a camera
 
 	void Enable(uint32 uiAttributes);
 	void Disable(uint32 uiAttributes);

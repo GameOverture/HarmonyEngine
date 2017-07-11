@@ -104,7 +104,6 @@ void HyDiagnostics::BootMessage()
 	HyLog("");
 	HyLogTitle(sGameTitle << "\n\t" << HyDateTime());
 	HyLog("Data Dir:         " << m_InitStructRef.sDataDir);
-	HyLog("Default Coord:    " << (m_InitStructRef.eDefaultCoordinateType == HYCOORDTYPE_Camera) ? "Camera" : "Screen");
 	HyLog("Default Unit:     " << (m_InitStructRef.eDefaultCoordinateUnit == HYCOORDUNIT_Pixels) ? "Pixels" : "Meters");
 	HyLog("Pixels/Meter:     " << m_InitStructRef.fPixelsPerMeter);
 	HyLog("Num Input Maps:   " << m_InitStructRef.uiNumInputMappings);

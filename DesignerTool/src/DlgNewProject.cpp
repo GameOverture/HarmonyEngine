@@ -115,7 +115,6 @@ void DlgNewProject::on_buttonBox_accepted()
     jsonObj.insert("MetaDataPath", sRelMetaDataPath);
     jsonObj.insert("SourcePath", sRelSourcePath);
     
-    jsonObj.insert("DefaultCoordinateType", QJsonValue(1));
     jsonObj.insert("DefaultCoordinateUnit", QJsonValue(1));
     jsonObj.insert("UpdateFpsCap", QJsonValue(0));
     jsonObj.insert("PixelsPerMeter", QJsonValue(80.0f));

@@ -18,7 +18,8 @@ HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
 									m_uiNumInstances(0),
 									m_uiNumVerticesPerInstance(0),
 									m_uiDataOffset(0),
-									m_ScissorRect(0, 0, 0, 0)
+									m_ScissorRect(0, 0, 0, 0),
+									m_iWindowIndex(-1)
 {
 }
 
@@ -93,6 +94,21 @@ void HyRenderState::ClearScissorRect()
 {
 	memset(&m_ScissorRect, 0, sizeof(HyScreenRect<uint32>));
 	m_uiAttributeFlags &= ~SCISSORTEST;
+}
+
+bool HyRenderState::IsUsingCameraCoordinates()
+{
+	return m_iWindowIndex == -1;
+}
+
+void HyRenderState::SetCoordinateSystem(int32 iWindowIndex)
+{
+	m_iWindowIndex = iWindowIndex;
+}
+
+int32 HyRenderState::GetAssignedWindow()
+{
+	return m_iWindowIndex;
 }
 
 void HyRenderState::Enable(uint32 uiAttributes)

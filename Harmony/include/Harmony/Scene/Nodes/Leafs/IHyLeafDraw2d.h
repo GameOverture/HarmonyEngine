@@ -57,8 +57,8 @@ public:
 	IHyNodeData *AcquireData();
 
 	HyCoordinateType GetCoordinateType();
-	void SetCoordinateType(HyCoordinateType eCoordType);
-
+	void UseCameraCoordinates();
+	void UseWindowCoordinates(uint32 uiWindowIndex);
 
 	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);

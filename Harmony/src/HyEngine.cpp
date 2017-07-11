@@ -158,11 +158,6 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return IHyApplication::PixelsPerMeter();
 }
 
-/*friend*/ HyCoordinateType HyDefaultCoordinateType()
-{
-	return IHyApplication::DefaultCoordinateType();
-}
-
 /*friend*/ HyCoordinateUnit HyDefaultCoordinateUnit()
 {
 	return IHyApplication::DefaultCoordinateUnit();

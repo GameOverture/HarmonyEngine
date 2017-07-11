@@ -198,11 +198,8 @@ HyOpenGL::~HyOpenGL(void)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if(renderState.IsEnabled(HyRenderState::USINGSCREENCOORDS))
-		SetCameraMatrices_2d(MTX_SCREENVIEW);
-	else
-		SetCameraMatrices_2d(MTX_CAMVIEW);
-
+	SetCameraMatrices_2d(renderState.IsUsingCameraCoordinates());
+	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_ShaderMap[renderState.GetShaderId()]);
@@ -210,11 +207,18 @@ HyOpenGL::~HyOpenGL(void)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, renderState.GetTextureHandle());
-	if(renderState.GetTextureHandle() != 0)
-		pShader->SetUniformGLSL("Tex", 0);
-	//glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture1"), 0);
+	if(HYSHADERPROG_QuadBatch == renderState.GetShaderId())
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, renderState.GetTextureHandle());
+		if(renderState.GetTextureHandle() != 0)
+			pShader->SetUniformGLSL("Tex", 0);
+	}
+	else
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -535,15 +539,15 @@ HyOpenGL::~HyOpenGL(void)
 {
 }
 
-void HyOpenGL::SetCameraMatrices_2d(eMatrixStack eMtxStack)
+void HyOpenGL::SetCameraMatrices_2d(bool bUseCameraView)
 {
 	HyRectangle<float> viewportRect;
-	if(eMtxStack == MTX_CAMVIEW)
+	if(bUseCameraView)
 	{
 		viewportRect = *GetCameraViewportRect2d(m_iCurCamIndex);
 		m_mtxView = *GetCameraView2d(m_iCurCamIndex);
 	}
-	else
+	else // Using window coordinates
 	{
 		viewportRect.left = 0.0f;
 		viewportRect.bottom = 0.0f;

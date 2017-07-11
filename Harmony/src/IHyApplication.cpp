@@ -11,7 +11,6 @@
 
 #include "Renderer/Components/HyWindow.h"
 
-HyCoordinateType IHyApplication::sm_eDefaultCoordinateType = HYCOORDTYPE_Default;
 HyCoordinateUnit IHyApplication::sm_eDefaultCoordinateUnit = HYCOORDUNIT_Default;
 float IHyApplication::sm_fPixelsPerMeter = 0.0f;
 
@@ -19,7 +18,6 @@ HarmonyInit::HarmonyInit()
 {
 	sGameName = "Untitled Game";
 	sDataDir = "/data";
-	eDefaultCoordinateType = HYCOORDTYPE_Camera;
 	eDefaultCoordinateUnit = HYCOORDUNIT_Pixels;
 	uiUpdateFpsCap = 0;
 	fPixelsPerMeter = 80.0f;
@@ -60,7 +58,6 @@ HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
 
 	sGameName				= projObject.get<jsonxx::String>("GameName");
 	sDataDir				= projObject.get<jsonxx::String>("DataPath");
-	eDefaultCoordinateType	= static_cast<HyCoordinateType>(static_cast<int32>(projObject.get<jsonxx::Number>("DefaultCoordinateType")));
 	eDefaultCoordinateUnit	= static_cast<HyCoordinateUnit>(static_cast<int32>(projObject.get<jsonxx::Number>("DefaultCoordinateUnit")));
 	uiUpdateFpsCap			= static_cast<uint32>(projObject.get<jsonxx::Number>("UpdateFpsCap"));
 	fPixelsPerMeter			= static_cast<float>(projObject.get<jsonxx::Number>("PixelsPerMeter"));
@@ -100,12 +97,10 @@ HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
 IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(NULL),
 															m_Console(initStruct.bUseConsole, initStruct.consoleInfo)
 {
-	HyAssert(m_Init.eDefaultCoordinateType != HYCOORDTYPE_Default, "HarmonyInit's actual 'eDefaultCoordinateType' cannot be 'HYCOORDTYPE_Default'");
 	HyAssert(m_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HarmonyInit's actual 'eDefaultCoordinateUnit' cannot be 'HYCOORDUNIT_Default'");
 	HyAssert(m_Init.fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	
 	m_Init = initStruct;
-	sm_eDefaultCoordinateType = m_Init.eDefaultCoordinateType;
 	sm_eDefaultCoordinateUnit = m_Init.eDefaultCoordinateUnit;
 	sm_fPixelsPerMeter = m_Init.fPixelsPerMeter;
 	
@@ -129,11 +124,6 @@ IHyApplication::~IHyApplication()
 		delete m_WindowList[i];
 }
 
-HyCoordinateType IHyApplication::DefaultCoordinateType()
-{
-	HyAssert(sm_eDefaultCoordinateType != HYCOORDTYPE_Default, "HyScene::DefaultCoordinateType() invoked before IHyApplication initialized");
-	return sm_eDefaultCoordinateType;
-}
 HyCoordinateUnit IHyApplication::DefaultCoordinateUnit()
 {
 	HyAssert(sm_eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HyScene::DefaultCoordinateUnit() invoked before IHyApplication initialized");

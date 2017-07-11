@@ -124,10 +124,8 @@ enum HyShaderVariable
 
 enum HyCoordinateType
 {
-	HYCOORDTYPE_Default = 0,
-
-	HYCOORDTYPE_Camera,
-	HYCOORDTYPE_Screen
+	HYCOORDTYPE_Camera = 0,
+	HYCOORDTYPE_Window
 };
 
 enum HyCoordinateUnit
