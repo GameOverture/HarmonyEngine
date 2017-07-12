@@ -547,6 +547,7 @@ QJsonObject Project::GetSubDirObj(HyGuiItemType eType)
     return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType))].toObject();
 }
 
+// TODO: Remove this
 void Project::RefreshCurrentItemDraw()
 {
     ProjectItem *pCurrentItem = m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>();

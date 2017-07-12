@@ -21,17 +21,17 @@
 #include <QJsonArray>
 #include <QAction>
 
-SpriteWidget::SpriteWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *parent) :   QWidget(parent),
-                                                                                                ui(new Ui::SpriteWidget),
-                                                                                                m_pDraw(nullptr),
-                                                                                                m_ItemRef(itemRef),
-                                                                                                m_bPlayActive(false),
-                                                                                                m_fElapsedTime(0.0),
-                                                                                                m_bIsBounced(false)
+SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
+                                                                    ui(new Ui::SpriteWidget),
+                                                                    //m_pDraw(nullptr),
+                                                                    m_ItemRef(itemRef),
+                                                                    m_bPlayActive(false),
+                                                                    m_fElapsedTime(0.0),
+                                                                    m_bIsBounced(false)
 {
     ui->setupUi(this);
 
-    RefreshDraw(hyAppRef);
+    //RefreshDraw(hyAppRef);
 
     ui->txtPrefixAndName->setText(m_ItemRef.GetName(true));
     
@@ -62,7 +62,7 @@ SpriteWidget::SpriteWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidg
 
 SpriteWidget::~SpriteWidget()
 {
-    delete m_pDraw;
+    //delete m_pDraw;
     delete ui;
 }
 
@@ -113,15 +113,15 @@ void SpriteWidget::OnGiveMenuActions(QMenu *pMenu)
     pMenu->addAction(ui->actionApplyToAll);
 }
 
-void SpriteWidget::OnShow()
-{
-    m_pDraw->Show();
-}
+//void SpriteWidget::OnShow()
+//{
+//    m_pDraw->Show();
+//}
 
-void SpriteWidget::OnHide()
-{
-    m_pDraw->Hide();
-}
+//void SpriteWidget::OnHide()
+//{
+//    m_pDraw->Hide();
+//}
 
 void SpriteWidget::OnUpdate()
 {
@@ -225,14 +225,14 @@ void SpriteWidget::RefreshData(QVariant param)
         UpdateActions();
 }
 
-void SpriteWidget::RefreshDraw(IHyApplication &hyAppRef)
-{
-    delete m_pDraw;
+//void SpriteWidget::RefreshDraw(IHyApplication &hyAppRef)
+//{
+//    delete m_pDraw;
 
-    m_pDraw = new SpriteDraw(*static_cast<SpriteModel *>(m_ItemRef.GetModel()), hyAppRef);
-    m_pDraw->Load();
-    m_pDraw->SetEnabled(false);
-}
+//    m_pDraw = new SpriteDraw(*static_cast<SpriteModel *>(m_ItemRef.GetModel()), hyAppRef);
+//    m_pDraw->Load();
+//    m_pDraw->SetEnabled(false);
+//}
 
 void SpriteWidget::UpdateActions()
 {
@@ -456,6 +456,7 @@ void SpriteWidget::on_actionImportFrames_triggered()
     QUndoCommand *pCmd = new UndoCmd_AddFrames("Add Frames", m_ItemRef, ui->cmbStates->currentIndex());
     GetItem().GetUndoStack()->push(pCmd);
 
+    // TODO: Remove this
     m_ItemRef.GetProject().RefreshCurrentItemDraw();
 }
 

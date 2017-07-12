@@ -31,6 +31,7 @@ class ProjectItem : public ExplorerItem
 
     Project &               m_ProjectRef;
     QJsonValue              m_SaveValue;
+    QJsonValue              m_CurValue;
 
     // Loaded in constructor
     IModel *                m_pModel;
@@ -40,6 +41,7 @@ class ProjectItem : public ExplorerItem
 
     // Loaded when item is opened
     QWidget *               m_pWidget;
+    IDraw *                 m_pDraw;
     
 public:
     ProjectItem(Project &projRef, HyGuiItemType eType, const QString sPrefix, const QString sName, QJsonValue initValue);
@@ -75,6 +77,7 @@ private:
 
 private Q_SLOTS:
     void on_undoStack_cleanChanged(bool bClean);
+    void on_undoStack_indexChanged(int iIndex);
     
 };
 Q_DECLARE_METATYPE(ProjectItem *)

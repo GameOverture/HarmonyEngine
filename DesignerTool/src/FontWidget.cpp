@@ -25,15 +25,15 @@
 #include <QMenu>
 #include <QColor>
 
-FontWidget::FontWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *parent) :   QWidget(parent),
-                                                                                            ui(new Ui::FontWidget),
-                                                                                            m_pDraw(new FontDraw(*static_cast<FontModel *>(itemRef.GetModel()), hyAppRef)),
-                                                                                            m_ItemRef(itemRef)
+FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
+                                                                ui(new Ui::FontWidget),
+                                                                //m_pDraw(new FontDraw(*static_cast<FontModel *>(itemRef.GetModel()), hyAppRef)),
+                                                                m_ItemRef(itemRef)
 {
     ui->setupUi(this);
 
-    m_pDraw->Load();
-    m_pDraw->SetEnabled(false);
+    //m_pDraw->Load();
+    //m_pDraw->SetEnabled(false);
 
     m_PrevAtlasSize.setWidth(0);
     m_PrevAtlasSize.setHeight(0);
@@ -86,7 +86,7 @@ FontWidget::FontWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *
 
 FontWidget::~FontWidget()
 {
-    delete m_pDraw;
+    //delete m_pDraw;
     delete ui;
 }
 
@@ -128,15 +128,15 @@ void FontWidget::OnGiveMenuActions(QMenu *pMenu)
     pMenu->addAction(ui->actionOrderLayerDownwards);
 }
 
-void FontWidget::OnShow()
-{
-    m_pDraw->Show();
-}
+//void FontWidget::OnShow()
+//{
+//    m_pDraw->Show();
+//}
 
-void FontWidget::OnHide()
-{
-    m_pDraw->Hide();
-}
+//void FontWidget::OnHide()
+//{
+//    m_pDraw->Hide();
+//}
 
 void FontWidget::OnUpdate()
 {

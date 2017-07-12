@@ -11,6 +11,7 @@
 #define IDRAW_H
 
 #include "Harmony/HyEngine.h"
+#include <QWidget>
 
 class IDraw : public HyEntity2d
 {
@@ -28,6 +29,8 @@ public:
 protected:
     virtual void OnShow(IHyApplication &hyApp) = 0;
     virtual void OnHide(IHyApplication &hyApp) = 0;
+    
+    virtual void WidgetUpdate(QWidget *pWidget) = 0;
 };
 
 #endif // IDRAW_H

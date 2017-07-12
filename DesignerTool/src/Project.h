@@ -92,6 +92,7 @@ public:
 
     QJsonObject GetSubDirObj(HyGuiItemType eType);
     
+    // TODO: Remove this
     void RefreshCurrentItemDraw();
 
     bool CloseAllTabs();
