@@ -8,8 +8,6 @@
 
 class FontDraw : public IDraw
 {
-    FontModel &                 m_ModelRef;
-    
     bool                        m_bShowAtlasPreview;
 
     HyCamera2d *                m_pAtlasCamera;
@@ -20,7 +18,7 @@ class FontDraw : public IDraw
     QList<HyTexturedQuad2d *>   m_DrawFontPreviewList;
 
 public:
-    FontDraw(FontModel &modelRef, IHyApplication &hyApp);
+    FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~FontDraw();
     
     void PositionDividerLine();
@@ -33,6 +31,8 @@ public:
 protected:
     virtual void OnShow(IHyApplication &hyApp) override;
     virtual void OnHide(IHyApplication &hyApp) override;
+    
+    virtual void OnUpdate() override;
 };
 
 #endif // FONTDRAW_H

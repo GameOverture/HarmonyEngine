@@ -394,7 +394,7 @@ void Project::OpenItem(ProjectItem *pItem)
     if(m_pTabBar->count() > 0)
     {
         m_pDraw->Hide();
-        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetUpdate(*this);
+        //m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetUpdate(*this);
     }
     else
         m_pDraw->Show();

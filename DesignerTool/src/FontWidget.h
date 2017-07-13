@@ -56,7 +56,7 @@ public:
     void SetGlyphsDirty();
     
     void RefreshData(QVariant param);
-    void RefreshDraw(IHyApplication &hyAppRef);
+    //void RefreshDraw(IHyApplication &hyAppRef);
 
     void UpdateActions();
 

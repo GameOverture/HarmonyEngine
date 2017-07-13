@@ -13,14 +13,17 @@
 #include "Harmony/HyEngine.h"
 #include <QWidget>
 
+class ProjectItem;
+
 class IDraw : public HyEntity2d
 {
 protected:
+    ProjectItem *       m_pProjItem;
     IHyApplication &    m_HyAppRef;
     HyCamera2d *        m_pCamera;
 
 public:
-    IDraw(ProjectItem &projItemRef, IHyApplication &hyApp);
+    IDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~IDraw();
 
     void Show();

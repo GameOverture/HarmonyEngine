@@ -47,9 +47,9 @@ public:
 
     //void OnShow();
     //void OnHide();
-    void OnUpdate();
+    //void OnUpdate();
 
-    void UpdateTimeStep();
+    //void UpdateTimeStep();
 
     void RefreshData(QVariant param);
     //void RefreshDraw(IHyApplication &hyAppRef);

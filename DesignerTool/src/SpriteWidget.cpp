@@ -123,97 +123,97 @@ void SpriteWidget::OnGiveMenuActions(QMenu *pMenu)
 //    m_pDraw->Hide();
 //}
 
-void SpriteWidget::OnUpdate()
-{
-    int iFrameIndex = ui->framesView->currentIndex().row();
-    if(iFrameIndex >= 0)
-    {
-        SpriteFrame *pFrame = GetCurStateData()->GetFramesModel()->GetFrameAt(iFrameIndex);
-        m_pDraw->SetFrame(pFrame->m_pFrame->GetId(), glm::vec2(pFrame->GetRenderOffset().x(), pFrame->GetRenderOffset().y()));
+//void SpriteWidget::OnUpdate()
+//{
+//    int iFrameIndex = ui->framesView->currentIndex().row();
+//    if(iFrameIndex >= 0)
+//    {
+//        SpriteFrame *pFrame = GetCurStateData()->GetFramesModel()->GetFrameAt(iFrameIndex);
+//        m_pDraw->SetFrame(pFrame->m_pFrame->GetId(), glm::vec2(pFrame->GetRenderOffset().x(), pFrame->GetRenderOffset().y()));
 
-        UpdateTimeStep();
-    }
-}
+//        UpdateTimeStep();
+//    }
+//}
 
-void SpriteWidget::UpdateTimeStep()
-{
-    SpriteFrame *pFrame = GetCurStateData()->GetFramesModel()->GetFrameAt(ui->framesView->currentIndex().row());
+//void SpriteWidget::UpdateTimeStep()
+//{
+//    SpriteFrame *pFrame = GetCurStateData()->GetFramesModel()->GetFrameAt(ui->framesView->currentIndex().row());
 
-    if(m_bPlayActive == false && pFrame != NULL)
-        return;
+//    if(m_bPlayActive == false && pFrame != NULL)
+//        return;
 
-    m_fElapsedTime += HyUpdateDelta();
-    while(m_fElapsedTime >= pFrame->m_fDuration)
-    {
-        bool bBounce = ui->chkBounce->isChecked();
-        bool bReverse = ui->chkReverse->isChecked();
-        bool bLoop = ui->chkLoop->isChecked();
-        int iNumFrames = GetCurStateData()->GetFramesModel()->rowCount();
+//    m_fElapsedTime += HyUpdateDelta();
+//    while(m_fElapsedTime >= pFrame->m_fDuration)
+//    {
+//        bool bBounce = ui->chkBounce->isChecked();
+//        bool bReverse = ui->chkReverse->isChecked();
+//        bool bLoop = ui->chkLoop->isChecked();
+//        int iNumFrames = GetCurStateData()->GetFramesModel()->rowCount();
 
-        int iNextRow = ui->framesView->currentIndex().row();
+//        int iNextRow = ui->framesView->currentIndex().row();
 
-        if(bReverse == false)
-        {
-            m_bIsBounced ? iNextRow-- : iNextRow++;
+//        if(bReverse == false)
+//        {
+//            m_bIsBounced ? iNextRow-- : iNextRow++;
 
-            if(iNextRow < 0)
-            {
-                m_bIsBounced = false;
+//            if(iNextRow < 0)
+//            {
+//                m_bIsBounced = false;
 
-                if(bLoop)
-                    iNextRow = 1;
-                else
-                    on_actionPlay_triggered();  // Stop playback
-            }
-            else if(iNextRow >= iNumFrames)
-            {
-                if(bBounce)
-                {
-                    iNextRow = iNumFrames - 2;
-                    m_bIsBounced = true;
-                }
-                else if(bLoop)
-                    iNextRow = 0;
-                else
-                    on_actionPlay_triggered();  // Stop playback
-            }
-        }
-        else
-        {
-            m_bIsBounced ? iNextRow++ : iNextRow--;
+//                if(bLoop)
+//                    iNextRow = 1;
+//                else
+//                    on_actionPlay_triggered();  // Stop playback
+//            }
+//            else if(iNextRow >= iNumFrames)
+//            {
+//                if(bBounce)
+//                {
+//                    iNextRow = iNumFrames - 2;
+//                    m_bIsBounced = true;
+//                }
+//                else if(bLoop)
+//                    iNextRow = 0;
+//                else
+//                    on_actionPlay_triggered();  // Stop playback
+//            }
+//        }
+//        else
+//        {
+//            m_bIsBounced ? iNextRow++ : iNextRow--;
 
-            if(iNextRow < 0)
-            {
-                if(bBounce)
-                {
-                    iNextRow = 1;
-                    m_bIsBounced = true;
-                }
-                else if(bLoop)
-                    iNextRow = iNumFrames - 1;
-                else
-                    on_actionPlay_triggered();  // Stop playback
-            }
-            else if(iNextRow >= iNumFrames)
-            {
-                m_bIsBounced = false;
+//            if(iNextRow < 0)
+//            {
+//                if(bBounce)
+//                {
+//                    iNextRow = 1;
+//                    m_bIsBounced = true;
+//                }
+//                else if(bLoop)
+//                    iNextRow = iNumFrames - 1;
+//                else
+//                    on_actionPlay_triggered();  // Stop playback
+//            }
+//            else if(iNextRow >= iNumFrames)
+//            {
+//                m_bIsBounced = false;
 
-                if(bLoop)
-                    iNextRow = iNumFrames - 2;
-                else
-                    on_actionPlay_triggered();  // Stop playback
-            }
-        }
+//                if(bLoop)
+//                    iNextRow = iNumFrames - 2;
+//                else
+//                    on_actionPlay_triggered();  // Stop playback
+//            }
+//        }
 
-        if(m_bPlayActive)
-        {
-            ui->framesView->selectRow(iNextRow);
-            m_fElapsedTime -= pFrame->m_fDuration;
-        }
-        else
-            break;
-    }
-}
+//        if(m_bPlayActive)
+//        {
+//            ui->framesView->selectRow(iNextRow);
+//            m_fElapsedTime -= pFrame->m_fDuration;
+//        }
+//        else
+//            break;
+//    }
+//}
 
 void SpriteWidget::RefreshData(QVariant param)
 {

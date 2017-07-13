@@ -138,21 +138,6 @@ void FontWidget::OnGiveMenuActions(QMenu *pMenu)
 //    m_pDraw->Hide();
 //}
 
-void FontWidget::OnUpdate()
-{
-    texture_atlas_t *pAtlas = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlas();
-    unsigned char *pAtlasPixelData = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlasPixelData();
-    uint uiAtlasPixelDataSize = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlasPixelDataSize();
-    if(pAtlas == nullptr || pAtlasPixelData == nullptr)
-        return;
-
-    if(pAtlas->id == 0)
-        m_pDraw->LoadNewAtlas(pAtlas, pAtlasPixelData, uiAtlasPixelDataSize);
-    
-    if(static_cast<FontModel *>(m_ItemRef.GetModel())->ClearFontDirtyFlag())
-        m_pDraw->GenerateTextPreview(GetCurStateData()->GetFontModel(), "The quick brown fox jumped over the lazy dog. 01234567890", pAtlas);
-}
-
 QString FontWidget::GetFullItemName()
 {
     return m_ItemRef.GetName(true);
@@ -174,11 +159,11 @@ void FontWidget::RefreshData(QVariant param)
     UpdateActions();
 }
 
-void FontWidget::RefreshDraw(IHyApplication &hyAppRef)
-{
-    delete m_pDraw;
-    m_pDraw = new FontDraw(*static_cast<FontModel *>(m_ItemRef.GetModel()), hyAppRef);
-}
+//void FontWidget::RefreshDraw(IHyApplication &hyAppRef)
+//{
+//    delete m_pDraw;
+//    m_pDraw = new FontDraw(*static_cast<FontModel *>(m_ItemRef.GetModel()), hyAppRef);
+//}
 
 void FontWidget::UpdateActions()
 {

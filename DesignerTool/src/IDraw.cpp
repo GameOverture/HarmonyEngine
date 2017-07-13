@@ -8,9 +8,11 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "IDraw.h"
+#include "ProjectItem.h"
 
-IDraw::IDraw(ProjectItem &projItemRef, IHyApplication &hyApp) :   m_HyAppRef(hyApp),
-                                        m_pCamera(nullptr)
+IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pProjItem),
+                                                                m_HyAppRef(hyApp),
+                                                                m_pCamera(nullptr)
 {
     m_pCamera = m_HyAppRef.Window().CreateCamera2d();
     m_pCamera->SetEnabled(false);
@@ -32,4 +34,3 @@ void IDraw::Hide()
     m_pCamera->SetEnabled(false);
     OnHide(m_HyAppRef);
 }
-

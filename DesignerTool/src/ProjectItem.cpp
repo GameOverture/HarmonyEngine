@@ -134,36 +134,39 @@ void ProjectItem::DiscardChanges()
 
 void ProjectItem::WidgetRefreshDraw(IHyApplication &hyApp)
 {
-    if(m_pWidget == nullptr)
-        return;
-
+    m_pModel->Refresh();
+    
+    delete m_pDraw;
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
-        static_cast<SpriteModel *>(m_pModel)->Refresh();
-        static_cast<SpriteWidget *>(m_pWidget)->RefreshDraw(hyApp);
+        m_pDraw = new SpriteDraw(this, hyApp);
         break;
     case ITEM_Font:
-        static_cast<FontModel *>(m_pModel)->Refresh();
-        static_cast<FontWidget *>(m_pWidget)->RefreshDraw(hyApp);
+        m_pDraw = new FontDraw(this, hyApp);
         break;
     default:
-        HyGuiLog("Unsupported IProjItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unimplemented WidgetRefreshDraw() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
+    
+    m_pDraw->Load();
+    m_pDraw->SetEnabled(false);
 }
 
 void ProjectItem::WidgetLoad(IHyApplication &hyApp)
 {
+    delete m_pWidget;
+    delete m_pDraw;
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
         m_pWidget = new SpriteWidget(*this);
-        m_pDraw = new SpriteDraw(*static_cast<SpriteModel *>(m_pModel), hyApp);
+        m_pDraw = new SpriteDraw(this, hyApp);
         break;
     case ITEM_Font:
-        m_pWidget = new FontWidget(*this, hyApp);
-        m_pDraw = new FontDraw(*static_cast<FontModel *>(m_pModel), hyApp);
+        m_pWidget = new FontWidget(*this);
+        m_pDraw = new FontDraw(this, hyApp);
         break;
     case ITEM_Audio:
         m_pWidget = new AudioWidget(*this);
@@ -173,12 +176,18 @@ void ProjectItem::WidgetLoad(IHyApplication &hyApp)
         HyGuiLog("Unimplemented WidgetLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
+    
+    m_pDraw->Load();
+    m_pDraw->SetEnabled(false);
 }
 
 void ProjectItem::WidgetUnload(IHyApplication &hyApp)
 {
     delete m_pWidget;
     m_pWidget = nullptr;
+    
+    delete m_pDraw;
+    m_pDraw = nullptr;
 }
 
 void ProjectItem::WidgetShow(IHyApplication &hyApp)
@@ -191,10 +200,10 @@ void ProjectItem::WidgetHide(IHyApplication &hyApp)
     m_pDraw->Hide();
 }
 
-void ProjectItem::WidgetUpdate(IHyApplication &hyApp)
-{
-    m_pDraw->WidgetUpdate(m_pWidget);
-}
+//void ProjectItem::WidgetUpdate(IHyApplication &hyApp)
+//{
+//    m_pDraw->WidgetUpdate(m_pWidget);
+//}
 
 void ProjectItem::BlockAllWidgetSignals(bool bBlock)
 {

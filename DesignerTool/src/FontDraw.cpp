@@ -2,11 +2,10 @@
 #include "FontWidget.h"
 #include "MainWindow.h"
 
-FontDraw::FontDraw(FontModel &modelRef, IHyApplication &hyApp) :    IDraw(hyApp),
-                                                                    m_ModelRef(modelRef),
-                                                                    m_bShowAtlasPreview(false),
-                                                                    m_pAtlasCamera(nullptr),
-                                                                    m_pDrawAtlasPreview(nullptr)
+FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :    IDraw(pProjItem, hyApp),
+                                                                        m_bShowAtlasPreview(false),
+                                                                        m_pAtlasCamera(nullptr),
+                                                                        m_pDrawAtlasPreview(nullptr)
 {
     m_pAtlasCamera = m_HyAppRef.Window().CreateCamera2d();
     m_pAtlasCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.5f);
@@ -162,4 +161,19 @@ void FontDraw::GenerateTextPreview(FontTableModel *pFontModel, QString sFontPrev
 /*virtual*/ void FontDraw::OnHide(IHyApplication &hyApp)
 {
     SetEnabled(false);
+}
+
+/*virtual*/ void FontDraw::OnUpdate() /*override*/
+{
+    texture_atlas_t *pAtlas = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlas();
+    unsigned char *pAtlasPixelData = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPixelData();
+    uint uiAtlasPixelDataSize = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPixelDataSize();
+    if(pAtlas == nullptr || pAtlasPixelData == nullptr)
+        return;
+
+    if(pAtlas->id == 0)
+        LoadNewAtlas(pAtlas, pAtlasPixelData, uiAtlasPixelDataSize);
+    
+    if(static_cast<FontModel *>(m_pProjItem->GetModel())->ClearFontDirtyFlag())
+        GenerateTextPreview(static_cast<FontWidget *>(m_pProjItem->GetWidget())->GetCurStateData()->GetFontModel(), "The quick brown fox jumped over the lazy dog. 01234567890", pAtlas);
 }

@@ -67,13 +67,13 @@ public:
     void DeleteFromProject();
     
 private:
+    void WidgetRefreshDraw(IHyApplication &hyApp);
+    
     void WidgetLoad(IHyApplication &hyApp);
     void WidgetUnload(IHyApplication &hyApp);
     void WidgetShow(IHyApplication &hyApp);
     void WidgetHide(IHyApplication &hyApp);
-    void WidgetUpdate(IHyApplication &hyApp);
-
-    void WidgetRefreshDraw(IHyApplication &hyApp);
+    //void WidgetUpdate(IHyApplication &hyApp);
 
 private Q_SLOTS:
     void on_undoStack_cleanChanged(bool bClean);

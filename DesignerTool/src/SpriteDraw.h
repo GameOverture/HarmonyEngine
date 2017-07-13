@@ -6,8 +6,6 @@
 
 class SpriteDraw : public IDraw
 {
-    SpriteModel &                           m_ModelRef;
-
     QMap<quint32, HyTexturedQuad2d *>       m_TexturedQuadIdMap;
     HyTexturedQuad2d *                      m_pCurFrame;
 
@@ -15,7 +13,7 @@ class SpriteDraw : public IDraw
     HyPrimitive2d                           m_primOriginVert;
 
 public:
-    SpriteDraw(SpriteModel &modelRef, IHyApplication &hyApp);
+    SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~SpriteDraw();
 
     void SetFrame(quint32 uiId, glm::vec2 vOffset);

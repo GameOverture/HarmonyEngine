@@ -16,7 +16,7 @@
 
 #define DISPLAYORDER_AtlasSelectedFrames 1000
 
-AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(*pHyApp),
+AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(nullptr, *pHyApp),
                                                                         m_ModelRef(*pModelRef),
                                                                         m_bIsMouseOver(false),
                                                                         m_HoverBackground(this),

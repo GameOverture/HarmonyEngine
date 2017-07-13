@@ -1,7 +1,6 @@
 #include "SpriteDraw.h"
 
-SpriteDraw::SpriteDraw(SpriteModel &modelRef, IHyApplication &hyApp) :  IDraw(hyApp),
-                                                                        m_ModelRef(modelRef),
+SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
                                                                         m_pCurFrame(nullptr)
 {
     std::vector<glm::vec2> lineList(2, glm::vec2());
@@ -24,9 +23,9 @@ SpriteDraw::SpriteDraw(SpriteModel &modelRef, IHyApplication &hyApp) :  IDraw(hy
     ChildAppend(m_primOriginHorz);
     ChildAppend(m_primOriginVert);
 
-    for(int i = 0; i < modelRef.GetNumStates(); ++i)
+    for(int i = 0; i < m_pProjItem->GetModel()->GetNumStates(); ++i)
     {
-        SpriteStateData *pStateData = static_cast<SpriteStateData *>(modelRef.GetStateData(i));
+        SpriteStateData *pStateData = static_cast<SpriteStateData *>(m_pProjItem->GetModel()->GetStateData(i));
         for(int j = 0; j < pStateData->GetFramesModel()->rowCount(); ++j)
         {
             AtlasFrame *pFrame = pStateData->GetFramesModel()->GetFrameAt(j)->m_pFrame;
