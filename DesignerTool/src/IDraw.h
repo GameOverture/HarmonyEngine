@@ -25,6 +25,8 @@ protected:
 public:
     IDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~IDraw();
+    
+    virtual void ApplyJsonData(QJsonValue &valueData) = 0;
 
     void Show();
     void Hide();

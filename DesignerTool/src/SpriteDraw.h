@@ -6,8 +6,7 @@
 
 class SpriteDraw : public IDraw
 {
-    QMap<quint32, HyTexturedQuad2d *>       m_TexturedQuadIdMap;
-    HyTexturedQuad2d *                      m_pCurFrame;
+    HySprite2d                              m_Sprite;
 
     HyPrimitive2d                           m_primOriginHorz;
     HyPrimitive2d                           m_primOriginVert;
@@ -15,6 +14,8 @@ class SpriteDraw : public IDraw
 public:
     SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~SpriteDraw();
+    
+    virtual void ApplyJsonData(QJsonValue &valueData) override;
 
     void SetFrame(quint32 uiId, glm::vec2 vOffset);
 

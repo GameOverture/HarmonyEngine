@@ -30,6 +30,10 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :    IDraw(pPr
     m_HyAppRef.Window().RemoveCamera(m_pAtlasCamera);
 }
 
+/*virtual*/ void FontDraw::ApplyJsonData(QJsonValue &valueData) /*override*/
+{
+}
+
 void FontDraw::PositionDividerLine()
 {
     m_DividerLine.pos.Set(-5000.0f, m_HyAppRef.Window().GetResolution().y / 2 - 5.0f);

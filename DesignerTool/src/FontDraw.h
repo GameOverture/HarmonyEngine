@@ -21,6 +21,8 @@ public:
     FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~FontDraw();
     
+    virtual void ApplyJsonData(QJsonValue &valueData) override;
+    
     void PositionDividerLine();
     
     void ShowSubAtlas(bool bShow);

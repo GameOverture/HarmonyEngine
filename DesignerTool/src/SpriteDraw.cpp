@@ -1,7 +1,10 @@
 #include "SpriteDraw.h"
+#include "Harmony/Utilities/jsonxx.h"
 
 SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
-                                                                        m_pCurFrame(nullptr)
+                                                                        m_Sprite("", "", this),
+                                                                        m_primOriginHorz(this),
+                                                                        m_primOriginVert(this)
 {
     std::vector<glm::vec2> lineList(2, glm::vec2());
 
@@ -19,9 +22,6 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
 
     m_primOriginHorz.SetTint(1.0f, 0.0f, 0.0f);
     m_primOriginVert.SetTint(1.0f, 0.0f, 0.0f);
-
-    ChildAppend(m_primOriginHorz);
-    ChildAppend(m_primOriginVert);
 
     for(int i = 0; i < m_pProjItem->GetModel()->GetNumStates(); ++i)
     {
@@ -43,6 +43,19 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
     for(auto iter = m_TexturedQuadIdMap.begin(); iter != m_TexturedQuadIdMap.end(); ++iter)
         delete iter.value();
 }
+
+/*virtual*/ void SpriteDraw::ApplyJsonData(QJsonValue &valueData) /*override*/
+{
+    QJsonArray &valueDataArrayRef = static_cast<QJsonArray &>(valueData);
+    
+    valueData.toString
+    valueDataArrayRef
+    
+    jsonxx::Value value;
+    value
+    HySprite2dData *pNewData = new HySprite2dData("GUI", 
+}
+
 
 void SpriteDraw::SetFrame(quint32 uiId, glm::vec2 vOffset)
 {

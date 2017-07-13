@@ -33,6 +33,8 @@ class ProjectDraw : public IDraw
 public:
     ProjectDraw(IHyApplication &hyApp);
     virtual ~ProjectDraw();
+    
+    virtual void ApplyJsonData(QJsonValue &valueData) override;
 
     virtual void OnShow(IHyApplication &hyApp);
     virtual void OnHide(IHyApplication &hyApp);

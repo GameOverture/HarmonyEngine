@@ -140,6 +140,10 @@ ProjectDraw::ProjectDraw(IHyApplication &hyApp) : IDraw(nullptr, hyApp)
 {
 }
 
+/*virtual*/ void ProjectDraw::ApplyJsonData(QJsonValue &valueData) /*override*/
+{
+}
+
 /*virtual*/ void ProjectDraw::OnShow(IHyApplication &hyApp)
 {
 }

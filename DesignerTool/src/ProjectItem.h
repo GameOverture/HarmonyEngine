@@ -31,7 +31,6 @@ class ProjectItem : public ExplorerItem
 
     Project &               m_ProjectRef;
     QJsonValue              m_SaveValue;
-    QJsonValue              m_CurValue;
 
     // Loaded in constructor
     IModel *                m_pModel;

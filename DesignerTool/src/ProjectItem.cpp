@@ -29,7 +29,6 @@ ProjectItem::ProjectItem(Project &projRef,
                          QJsonValue initValue) :    ExplorerItem(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
                                                     m_ProjectRef(projRef),
                                                     m_SaveValue(initValue),
-                                                    m_CurValue(initValue),
                                                     m_pModel(nullptr),
                                                     m_pWidget(nullptr),
                                                     m_pDraw(nullptr)
@@ -270,19 +269,10 @@ void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 
 void ProjectItem::on_undoStack_indexChanged(int iIndex)
 {
-    switch(m_eTYPE)
-    {
-    case ITEM_Sprite:
-        m_CurValue = static_cast<SpriteModel *>(m_pModel)->GetSaveInfo();
-        break;
-    case ITEM_Font:
-        m_CurValue = static_cast<FontModel *>(m_pModel)->GetSaveInfo();
-        break;
-    default:
-        HyGuiLog("Improper item in on_undoStack_indexChanged(): " % QString::number(m_eTYPE), LOGTYPE_Error);
-        break;
+    if(m_pDraw == nullptr) {
+        HyGuiLog("m_pDraw was nullptr in on_undoStack_indexChanged", LOGTYPE_Error);
     }
-
-    //GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue);
+    
+    m_pDraw->ApplyJsonData(m_pModel->GetSaveInfo());
 }
 
