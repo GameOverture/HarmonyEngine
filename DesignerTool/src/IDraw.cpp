@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "IDraw.h"
 
-IDraw::IDraw(IHyApplication &hyApp) :   m_HyAppRef(hyApp),
+IDraw::IDraw(ProjectItem &projItemRef, IHyApplication &hyApp) :   m_HyAppRef(hyApp),
                                         m_pCamera(nullptr)
 {
     m_pCamera = m_HyAppRef.Window().CreateCamera2d();

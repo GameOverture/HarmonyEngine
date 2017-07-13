@@ -23,8 +23,6 @@ public:
 protected:
     virtual void OnShow(IHyApplication &hyApp) override;
     virtual void OnHide(IHyApplication &hyApp) override;
-    
-    virtual void WidgetUpdate
 };
 
 #endif // SPRITEDRAW_H

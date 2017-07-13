@@ -20,7 +20,7 @@ protected:
     HyCamera2d *        m_pCamera;
 
 public:
-    IDraw(IHyApplication &hyApp);
+    IDraw(ProjectItem &projItemRef, IHyApplication &hyApp);
     virtual ~IDraw();
 
     void Show();
@@ -29,8 +29,6 @@ public:
 protected:
     virtual void OnShow(IHyApplication &hyApp) = 0;
     virtual void OnHide(IHyApplication &hyApp) = 0;
-    
-    virtual void WidgetUpdate(QWidget *pWidget) = 0;
 };
 
 #endif // IDRAW_H
