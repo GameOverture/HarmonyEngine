@@ -406,3 +406,12 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 /*static*/ void HySprite2d::NullAnimCallback(HySprite2d *pSelf, void *pParam)
 {
 }
+
+#ifdef HY_PLATFORM_GUI
+/*virtual*/ void HySprite2d::GuiOverrideData(jsonxx::Value &dataValueRef) /*override*/
+{
+	delete m_pData;
+	m_pData = HY_NEW HySprite2dData("GUI", dataValueRef, *sm_pHyAssets);
+	OnDataAcquired();
+}
+#endif

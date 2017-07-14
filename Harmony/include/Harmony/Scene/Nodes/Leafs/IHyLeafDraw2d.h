@@ -25,14 +25,13 @@ class IHyLeafDraw2d : public IHyNodeDraw2d
 	friend class HyScene;
 	friend class HyAssets;
 
+protected:
 	static HyAssets *				sm_pHyAssets;
 
 	HyLoadState						m_eLoadState;
 	std::set<int32>					m_RequiredCustomShaders;
 
 	IHyNodeData *					m_pData;
-
-protected:
 	const std::string				m_sNAME;
 	const std::string				m_sPREFIX;
 
@@ -84,6 +83,11 @@ protected:
 	virtual void OnCalcBoundingVolume() { }								// Should calculate the local bounding volume in 'm_BoundingVolume'
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) { }		// This function is responsible for incrementing the passed in reference pointer the size of the data written
+
+#ifdef HY_PLATFORM_GUI
+public:
+	virtual void GuiOverrideData(jsonxx::Value &dataValueRef) = 0;
+#endif
 };
 
 #endif /* IHyLeafDraw2d_h__ */

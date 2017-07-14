@@ -237,3 +237,10 @@ void HyPrimitive2d::ClearData()
 	memcpy(pRefDataWritePos, m_pDrawBuffer, m_uiBufferSize);
 	pRefDataWritePos += m_uiBufferSize;
 }
+
+#ifdef HY_PLATFORM_GUI
+/*virtual*/ void HyPrimitive2d::GuiOverrideData(jsonxx::Value &dataValueRef) /*override*/
+{
+	HyError("HyPrimitive2d::GuiOverrideData not implemented");
+}
+#endif

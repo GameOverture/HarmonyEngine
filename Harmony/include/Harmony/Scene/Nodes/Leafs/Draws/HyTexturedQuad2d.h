@@ -45,6 +45,11 @@ private:
 	virtual void DrawUpdate() override;
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
+
+#ifdef HY_PLATFORM_GUI
+public:
+	virtual void GuiOverrideData(jsonxx::Value &dataValueRef) override;
+#endif
 };
 
 #endif /* HyTexturedQuad2d_h__ */

@@ -121,6 +121,11 @@ protected:
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 
 	static void NullAnimCallback(HySprite2d *pSelf, void *pParam);
+
+#ifdef HY_PLATFORM_GUI
+public:
+	virtual void GuiOverrideData(jsonxx::Value &dataValueRef) override;
+#endif
 };
 
 #endif /* HySprite2d_h__ */
