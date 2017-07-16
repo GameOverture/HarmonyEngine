@@ -67,10 +67,6 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(nu
 
 }
 
-/*virtual*/ void AtlasDraw::ApplyJsonData(QJsonValue &valueData) /*override*/
-{
-}
-
 void AtlasDraw::SetHover(QTreeWidgetItem *pHoverItem)
 {
     HyTexturedQuad2d *pNewHoverTexQuad = nullptr;

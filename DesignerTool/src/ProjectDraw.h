@@ -17,7 +17,7 @@ class CheckerGrid : public HyPrimitive2d
     glm::vec2		m_Resolution;
 
 public:
-    CheckerGrid();
+    CheckerGrid(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
     virtual ~CheckerGrid();
 
     void SetSurfaceSize(int iWidth, int iHeight);
@@ -26,16 +26,12 @@ public:
     virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
 };
 
-class ProjectDraw : public IDraw
+class ProjectDraw : public IDraw<CheckerGrid>
 {
-    CheckerGrid                     m_CheckerGridBG;
-
 public:
     ProjectDraw(IHyApplication &hyApp);
     virtual ~ProjectDraw();
     
-    virtual void ApplyJsonData(QJsonValue &valueData) override;
-
     virtual void OnShow(IHyApplication &hyApp);
     virtual void OnHide(IHyApplication &hyApp);
 };

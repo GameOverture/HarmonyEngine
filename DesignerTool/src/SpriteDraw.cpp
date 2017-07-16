@@ -1,10 +1,7 @@
 #include "SpriteDraw.h"
-#include "Harmony/Utilities/jsonxx.h"
-
-#include <QJsonDocument>
 
 SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
-                                                                        m_Sprite("", "", this),
+                                                                        m_Sprite("", "GuiMadeSprite", this),
                                                                         m_primOriginHorz(this),
                                                                         m_primOriginVert(this)
 {
@@ -48,15 +45,8 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
 
 /*virtual*/ void SpriteDraw::ApplyJsonData(QJsonValue &valueData) /*override*/
 {
-    QJsonDocument tmpDoc(valueData.toArray());
-    QByteArray src = tmpDoc.toJson();
-    
-    jsonxx::Value newArray;
-    newArray.parse(src.toStdString());
-    
-    m_Sprite.GuiOverrideData(newArray);
-}
 
+}
 
 void SpriteDraw::SetFrame(quint32 uiId, glm::vec2 vOffset)
 {

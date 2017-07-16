@@ -14,9 +14,8 @@ class SpriteDraw : public IDraw
 public:
     SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~SpriteDraw();
-    
-    virtual void ApplyJsonData(QJsonValue &valueData) override;
 
+    virtual void ApplyJsonData(QJsonValue &valueData) override;
     void SetFrame(quint32 uiId, glm::vec2 vOffset);
 
 protected:

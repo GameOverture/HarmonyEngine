@@ -140,6 +140,8 @@ void ProjectItem::WidgetRefreshDraw(IHyApplication &hyApp)
     {
     case ITEM_Sprite:
         m_pDraw = new SpriteDraw(this, hyApp);
+        on_undoStack_indexChanged(0);
+        static_cast<SpriteDraw *>(m_pDraw)->Load();
         break;
     case ITEM_Font:
         m_pDraw = new FontDraw(this, hyApp);
@@ -148,6 +150,7 @@ void ProjectItem::WidgetRefreshDraw(IHyApplication &hyApp)
         HyGuiLog("Unimplemented WidgetRefreshDraw() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
+
     
     m_pDraw->Load();
     m_pDraw->SetEnabled(false);
@@ -272,7 +275,34 @@ void ProjectItem::on_undoStack_indexChanged(int iIndex)
     if(m_pDraw == nullptr) {
         HyGuiLog("m_pDraw was nullptr in on_undoStack_indexChanged", LOGTYPE_Error);
     }
-    
-    m_pDraw->ApplyJsonData(m_pModel->GetSaveInfo());
+
+    QJsonValue valueData = m_pModel->GetSaveInfo();
+    QByteArray src;
+    if(valueData.isArray())
+    {
+        QJsonDocument tmpDoc(valueData.toArray());
+        src = tmpDoc.toJson();
+    }
+    else
+    {
+        QJsonDocument tmpDoc(valueData.toObject());
+        src = tmpDoc.toJson();
+    }
+
+    jsonxx::Value newArray;
+    newArray.parse(src.toStdString());
+
+    switch(m_eTYPE)
+    {
+    case ITEM_Sprite:
+        static_cast<SpriteDraw *>(m_pDraw)->GetLeaf().GuiOverrideData(newArray);
+        break;
+    case ITEM_Font:
+        static_cast<FontDraw *>(m_pDraw)->GetLeaf().GuiOverrideData(newArray);
+        break;
+    default:
+        HyGuiLog("Unsupported ProjectItem::on_undoStack_indexChanged() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        break;
+
 }
 

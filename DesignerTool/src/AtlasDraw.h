@@ -40,8 +40,6 @@ public:
     AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp);
     virtual ~AtlasDraw();
     
-    virtual void ApplyJsonData(QJsonValue &valueData) override;
-    
     void SetHover(QTreeWidgetItem *pHoverItem);
     void SetSelected(QList<QTreeWidgetItem *> selectedList);
 

@@ -2,10 +2,11 @@
 #include "FontWidget.h"
 #include "MainWindow.h"
 
-FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :    IDraw(pProjItem, hyApp),
-                                                                        m_bShowAtlasPreview(false),
-                                                                        m_pAtlasCamera(nullptr),
-                                                                        m_pDrawAtlasPreview(nullptr)
+FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : HyEntityLeaf2d<HyText2d>("", "GuiMadeFont", nullptr),
+                                                                    IDraw(pProjItem, hyApp),
+                                                                    m_bShowAtlasPreview(false),
+                                                                    m_pAtlasCamera(nullptr),
+                                                                    m_pDrawAtlasPreview(nullptr)
 {
     m_pAtlasCamera = m_HyAppRef.Window().CreateCamera2d();
     m_pAtlasCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.5f);
@@ -28,10 +29,6 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :    IDraw(pPr
 {
     delete m_pDrawAtlasPreview;
     m_HyAppRef.Window().RemoveCamera(m_pAtlasCamera);
-}
-
-/*virtual*/ void FontDraw::ApplyJsonData(QJsonValue &valueData) /*override*/
-{
 }
 
 void FontDraw::PositionDividerLine()
