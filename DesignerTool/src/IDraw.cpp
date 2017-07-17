@@ -9,6 +9,10 @@
  *************************************************************************/
 #include "IDraw.h"
 #include "ProjectItem.h"
+#include "IModel.h"
+
+#include <QJsonDocument>
+#include <QJsonArray>
 
 IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pProjItem),
                                                                 m_HyAppRef(hyApp),
@@ -21,6 +25,30 @@ IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pPro
 /*virtual*/ IDraw::~IDraw()
 {
     m_HyAppRef.Window().RemoveCamera(m_pCamera);
+}
+
+void IDraw::ApplyJsonData()
+{
+    if(m_pProjItem == nullptr)
+        return;
+
+    QJsonValue valueData = m_pProjItem->GetModel()->GetSaveInfo();
+    QByteArray src;
+    if(valueData.isArray())
+    {
+        QJsonDocument tmpDoc(valueData.toArray());
+        src = tmpDoc.toJson();
+    }
+    else
+    {
+        QJsonDocument tmpDoc(valueData.toObject());
+        src = tmpDoc.toJson();
+    }
+
+    jsonxx::Value newValue;
+    newValue.parse(src.toStdString());
+
+    OnApplyJsonData(newValue);
 }
 
 void IDraw::Show()

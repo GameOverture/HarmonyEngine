@@ -6,7 +6,7 @@
 #include "FontModels.h"
 #include <QList>
 
-class FontDraw : public HyEntityLeaf2d<HyText2d>, public IDraw
+class FontDraw : public IDraw
 {
     bool                        m_bShowAtlasPreview;
 
@@ -20,6 +20,8 @@ class FontDraw : public HyEntityLeaf2d<HyText2d>, public IDraw
 public:
     FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~FontDraw();
+
+    virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;
     
     void PositionDividerLine();
     

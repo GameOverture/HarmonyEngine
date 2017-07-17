@@ -39,7 +39,7 @@ class AtlasDraw : public IDraw
 public:
     AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp);
     virtual ~AtlasDraw();
-    
+
     void SetHover(QTreeWidgetItem *pHoverItem);
     void SetSelected(QList<QTreeWidgetItem *> selectedList);
 

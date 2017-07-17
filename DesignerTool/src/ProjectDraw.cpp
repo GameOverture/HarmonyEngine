@@ -51,7 +51,7 @@ void main()
 }
 )src";
 
-CheckerGrid::CheckerGrid(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/)
+CheckerGrid::CheckerGrid()
 {
 }
 
@@ -120,8 +120,7 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   HyEntityLeaf2d<CheckerGrid>("", "GuiMade", nullptr),
-                                                    IDraw(nullptr, hyApp)
+ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp)
 {
     IHyShader *pShader_CheckerGrid = IHyRenderer::MakeCustomShader();
     pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
@@ -130,9 +129,11 @@ ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   HyEntityLeaf2d<CheckerGrid>(
     pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
     pShader_CheckerGrid->Finalize(HYSHADERPROG_Primitive);
 
-    GetLeaf().SetCustomShader(pShader_CheckerGrid);
-    GetLeaf().SetDisplayOrder(-1000);
-    GetLeaf().SetSurfaceSize(10000, 10000);  // Use a large size that is a multiple of grid size (25)
+    m_CheckerGrid.SetCustomShader(pShader_CheckerGrid);
+    m_CheckerGrid.SetDisplayOrder(-1000);
+    m_CheckerGrid.SetSurfaceSize(10000, 10000);  // Use a large size that is a multiple of grid size (25)
+
+    ChildAppend(m_CheckerGrid);
 }
 
 /*virtual*/ ProjectDraw::~ProjectDraw()

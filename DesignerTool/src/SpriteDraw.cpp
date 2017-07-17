@@ -43,9 +43,9 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
 //        delete iter.value();
 }
 
-/*virtual*/ void SpriteDraw::ApplyJsonData(QJsonValue &valueData) /*override*/
+/*virtual*/ void SpriteDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
 {
-
+    m_Sprite.GuiOverrideData(valueRef);
 }
 
 void SpriteDraw::SetFrame(quint32 uiId, glm::vec2 vOffset)

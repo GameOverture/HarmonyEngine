@@ -21,6 +21,8 @@
 #include "AudioDraw.h"
 
 #include <QMenu>
+#include <QJsonDocument>
+#include <QJsonArray>
 
 ProjectItem::ProjectItem(Project &projRef,
                          HyGuiItemType eType,
@@ -179,7 +181,7 @@ void ProjectItem::WidgetLoad(IHyApplication &hyApp)
         break;
     }
     
-    m_pDraw->Load();
+    m_pDraw->ApplyJsonData();
     m_pDraw->SetEnabled(false);
 }
 
@@ -276,33 +278,6 @@ void ProjectItem::on_undoStack_indexChanged(int iIndex)
         HyGuiLog("m_pDraw was nullptr in on_undoStack_indexChanged", LOGTYPE_Error);
     }
 
-    QJsonValue valueData = m_pModel->GetSaveInfo();
-    QByteArray src;
-    if(valueData.isArray())
-    {
-        QJsonDocument tmpDoc(valueData.toArray());
-        src = tmpDoc.toJson();
-    }
-    else
-    {
-        QJsonDocument tmpDoc(valueData.toObject());
-        src = tmpDoc.toJson();
-    }
-
-    jsonxx::Value newArray;
-    newArray.parse(src.toStdString());
-
-    switch(m_eTYPE)
-    {
-    case ITEM_Sprite:
-        static_cast<SpriteDraw *>(m_pDraw)->GetLeaf().GuiOverrideData(newArray);
-        break;
-    case ITEM_Font:
-        static_cast<FontDraw *>(m_pDraw)->GetLeaf().GuiOverrideData(newArray);
-        break;
-    default:
-        HyGuiLog("Unsupported ProjectItem::on_undoStack_indexChanged() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
-        break;
-
+    m_pDraw->ApplyJsonData();
 }
 

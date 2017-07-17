@@ -11,6 +11,8 @@
 #define IDRAW_H
 
 #include "Harmony/HyEngine.h"
+#include "Harmony/Utilities/jsonxx.h"
+
 #include <QWidget>
 
 class ProjectItem;
@@ -26,12 +28,13 @@ public:
     IDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~IDraw();
     
-    virtual void ApplyJsonData(QJsonValue &valueData) = 0;
+    void ApplyJsonData();
 
     void Show();
     void Hide();
 
 protected:
+    virtual void OnApplyJsonData(jsonxx::Value &valueRef) { }
     virtual void OnShow(IHyApplication &hyApp) = 0;
     virtual void OnHide(IHyApplication &hyApp) = 0;
 };
