@@ -15,12 +15,14 @@ public:
     SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~SpriteDraw();
 
-    virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;
-    void SetFrame(quint32 uiId, glm::vec2 vOffset);
+    virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) override;
+    void SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex);
 
 protected:
     virtual void OnShow(IHyApplication &hyApp) override;
     virtual void OnHide(IHyApplication &hyApp) override;
+    
+    virtual void OnUpdate() override;
 };
 
 #endif // SPRITEDRAW_H

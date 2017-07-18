@@ -181,7 +181,7 @@ void ProjectItem::WidgetLoad(IHyApplication &hyApp)
         break;
     }
     
-    m_pDraw->ApplyJsonData();
+    m_pDraw->ApplyJsonData(true);
     m_pDraw->SetEnabled(false);
 }
 
@@ -278,6 +278,7 @@ void ProjectItem::on_undoStack_indexChanged(int iIndex)
         HyGuiLog("m_pDraw was nullptr in on_undoStack_indexChanged", LOGTYPE_Error);
     }
 
-    m_pDraw->ApplyJsonData();
+    // TODO: figure out if need to reload in asset manager
+    m_pDraw->ApplyJsonData(true);
 }
 

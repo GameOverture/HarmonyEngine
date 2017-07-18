@@ -27,7 +27,7 @@ IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pPro
     m_HyAppRef.Window().RemoveCamera(m_pCamera);
 }
 
-void IDraw::ApplyJsonData()
+void IDraw::ApplyJsonData(bool bReloadInAssetManager)
 {
     if(m_pProjItem == nullptr)
         return;
@@ -48,7 +48,7 @@ void IDraw::ApplyJsonData()
     jsonxx::Value newValue;
     newValue.parse(src.toStdString());
 
-    OnApplyJsonData(newValue);
+    OnApplyJsonData(newValue, bReloadInAssetManager);
 }
 
 void IDraw::Show()

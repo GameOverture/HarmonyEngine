@@ -119,11 +119,6 @@ protected:
 	virtual void OnLoaded() override;
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
-
-#ifdef HY_PLATFORM_GUI
-public:
-	virtual void GuiOverrideData(jsonxx::Value &dataValueRef) override;
-#endif
 };
 
 #endif /* HyText2d_h__ */

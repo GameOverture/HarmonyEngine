@@ -77,7 +77,8 @@ protected:
 
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
-	virtual void DrawUpdate() { };
+	virtual bool IsLoadDataValid() { return true; }
+	virtual void DrawUpdate() { }
 	virtual void OnDataAcquired() { }									// Invoked once on the first time this node's data is queried
 	virtual void OnLoaded() { }											// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
 	virtual void OnCalcBoundingVolume() { }								// Should calculate the local bounding volume in 'm_BoundingVolume'
@@ -86,7 +87,23 @@ protected:
 
 #ifdef HY_PLATFORM_GUI
 public:
-	virtual void GuiOverrideData(jsonxx::Value &dataValueRef) = 0;
+	template<typename HYDATATYPE>
+	void GuiOverrideData(jsonxx::Value &dataValueRef, bool bReloadInAssetManager)
+	{
+		bool bWasEnabled = IsEnabled();
+
+		if(bReloadInAssetManager)
+			Unload();
+
+		delete m_pData;
+		m_pData = HY_NEW HYDATATYPE("GUI", dataValueRef, *sm_pHyAssets);
+		OnDataAcquired();
+
+		if(bReloadInAssetManager)
+			Load();
+
+		SetEnabled(bWasEnabled);
+	}
 #endif
 };
 

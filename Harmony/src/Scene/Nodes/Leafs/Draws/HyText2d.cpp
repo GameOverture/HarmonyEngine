@@ -796,12 +796,3 @@ offsetCalculation:
 		}
 	}
 }
-
-#ifdef HY_PLATFORM_GUI
-/*virtual*/ void HyText2d::GuiOverrideData(jsonxx::Value &dataValueRef) /*override*/
-{
-	delete m_pData;
-	m_pData = HY_NEW HyText2dData("GUI", dataValueRef, *sm_pHyAssets);
-	OnDataAcquired();
-}
-#endif

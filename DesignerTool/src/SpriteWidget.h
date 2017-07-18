@@ -48,8 +48,12 @@ public:
     //void OnShow();
     //void OnHide();
     //void OnUpdate();
+    
+    bool IsPlayingAnim();
 
-    //void UpdateTimeStep();
+    void SetSelectedFrame(int iFrameIndex);
+    void GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut);
+    void UpdateTimeStep(SpriteDraw *pDraw);
 
     void RefreshData(QVariant param);
     //void RefreshDraw(IHyApplication &hyAppRef);

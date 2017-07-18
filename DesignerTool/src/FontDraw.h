@@ -21,7 +21,7 @@ public:
     FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~FontDraw();
 
-    virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;
+    virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) override;
     
     void PositionDividerLine();
     
