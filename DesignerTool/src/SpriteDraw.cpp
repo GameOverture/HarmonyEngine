@@ -45,7 +45,7 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
 
 /*virtual*/ void SpriteDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
 {
-    m_Sprite.GuiOverrideData(valueRef);
+    m_Sprite.GuiOverrideData<HySprite2dData>(valueRef);
 }
 
 void SpriteDraw::SetFrame(quint32 uiId, glm::vec2 vOffset)

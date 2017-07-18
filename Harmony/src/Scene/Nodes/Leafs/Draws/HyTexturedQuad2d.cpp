@@ -159,10 +159,3 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	GetWorldTransform(*reinterpret_cast<glm::mat4 *>(pRefDataWritePos));
 	pRefDataWritePos += sizeof(glm::mat4);
 }
-
-#ifdef HY_PLATFORM_GUI
-/*virtual*/ void HyTexturedQuad2d::GuiOverrideData(jsonxx::Value &dataValueRef) /*override*/
-{
-	HyError("HyTexturedQuad2d::GuiOverrideData not implemented");
-}
-#endif

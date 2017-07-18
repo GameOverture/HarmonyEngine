@@ -193,7 +193,15 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	return frameRef.vOFFSET;
 }
 
-/*virtual*/ void HySprite2d::DrawUpdate()
+/*virtual*/ bool HySprite2d::IsLoadDataValid() /*override*/
+{
+	AcquireData();
+
+	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(0, 0);
+	return frameRef.pAtlas != nullptr;
+}
+
+/*virtual*/ void HySprite2d::DrawUpdate() /*override*/
 {
 	if(IsLoaded() == false)
 		return;
@@ -304,7 +312,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
 }
 
-/*virtual*/ void HySprite2d::OnDataAcquired()
+/*virtual*/ void HySprite2d::OnDataAcquired() /*override*/
 {
 	HySprite2dData *pData = static_cast<HySprite2dData *>(UncheckedGetData());
 	uint32 uiNumStates = pData->GetNumStates();
@@ -331,7 +339,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	}
 }
 
-/*virtual*/ void HySprite2d::OnCalcBoundingVolume()
+/*virtual*/ void HySprite2d::OnCalcBoundingVolume() /*override*/
 {
 	uint32 uiNumVerts = m_RenderState.GetNumVerticesPerInstance();
 	glm::vec2 vLowerBounds(0.0f);
@@ -346,12 +354,12 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	m_BoundingVolume.SetLocalAABB(vLowerBounds, vUpperBounds);
 }
 
-/*virtual*/ void HySprite2d::OnUpdateUniforms()
+/*virtual*/ void HySprite2d::OnUpdateUniforms() /*override*/
 {
 	//m_ShaderUniforms.Set(...);
 }
 
-/*virtual*/ void HySprite2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
+/*virtual*/ void HySprite2d::OnWriteDrawBufferData(char *&pRefDataWritePos) /*override*/
 {
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 
@@ -406,15 +414,3 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 /*static*/ void HySprite2d::NullAnimCallback(HySprite2d *pSelf, void *pParam)
 {
 }
-
-#ifdef HY_PLATFORM_GUI
-/*virtual*/ void HySprite2d::GuiOverrideData(jsonxx::Value &dataValueRef) /*override*/
-{
-	Unload();
-
-	delete m_pData;
-	m_pData = HY_NEW HySprite2dData("GUI", dataValueRef, *sm_pHyAssets);
-	OnDataAcquired();
-	Load();
-}
-#endif

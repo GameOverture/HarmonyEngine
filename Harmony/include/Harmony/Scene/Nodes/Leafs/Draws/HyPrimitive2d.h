@@ -7,11 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyPrimitive2d_h__
-#define __HyPrimitive2d_h__
+#ifndef HyPrimitive2d_h__
+#define HyPrimitive2d_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 
 class HyAtlasGroupData;
@@ -46,11 +45,6 @@ private:
 	
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
-
-#ifdef HY_PLATFORM_GUI
-public:
-	virtual void GuiOverrideData(jsonxx::Value &dataValueRef) override;
-#endif
 };
 
-#endif /* __HyPrimitive2d_h__ */
+#endif /* HyPrimitive2d_h__ */
