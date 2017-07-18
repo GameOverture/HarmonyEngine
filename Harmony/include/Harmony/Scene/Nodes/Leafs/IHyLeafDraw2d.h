@@ -88,14 +88,21 @@ protected:
 #ifdef HY_PLATFORM_GUI
 public:
 	template<typename HYDATATYPE>
-	void GuiOverrideData(jsonxx::Value &dataValueRef)
+	void GuiOverrideData(jsonxx::Value &dataValueRef, bool bReloadInAssetManager)
 	{
-		Unload();
+		bool bWasEnabled = IsEnabled();
+
+		if(bReloadInAssetManager)
+			Unload();
 
 		delete m_pData;
 		m_pData = HY_NEW HYDATATYPE("GUI", dataValueRef, *sm_pHyAssets);
 		OnDataAcquired();
-		Load();
+
+		if(bReloadInAssetManager)
+			Load();
+
+		SetEnabled(bWasEnabled);
 	}
 #endif
 };

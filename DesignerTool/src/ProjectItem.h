@@ -51,7 +51,8 @@ public:
     Project &GetProject();
 
     IModel *GetModel()                              { return m_pModel; }
-    QWidget *GetWidget() const                      { return m_pWidget; }
+    QWidget *GetWidget()                            { return m_pWidget; }
+    IDraw *GetDraw()                                { return m_pDraw; }
     QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
     
     void GiveMenuActions(QMenu *pMenu);

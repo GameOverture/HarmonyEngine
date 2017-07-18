@@ -30,7 +30,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
     m_HyAppRef.Window().RemoveCamera(m_pAtlasCamera);
 }
 
-/*virtual*/ void FontDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
+/*virtual*/ void FontDraw::OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) /*override*/
 {
 }
 

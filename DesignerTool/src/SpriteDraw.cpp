@@ -1,4 +1,5 @@
 #include "SpriteDraw.h"
+#include "SpriteWidget.h"
 
 SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
                                                                         m_Sprite("", "GuiMadeSprite", this),
@@ -43,26 +44,21 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
 //        delete iter.value();
 }
 
-/*virtual*/ void SpriteDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
+/*virtual*/ void SpriteDraw::OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) /*override*/
 {
-    m_Sprite.GuiOverrideData<HySprite2dData>(valueRef);
+    m_Sprite.GuiOverrideData<HySprite2dData>(valueRef, bReloadInAssetManager);
+    
+    SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
+    m_Sprite.AnimSetPause(pWidget->IsPlayingAnim() == false);
 }
 
-void SpriteDraw::SetFrame(quint32 uiId, glm::vec2 vOffset)
+void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 {
-//    if(m_pCurFrame)
-//        m_pCurFrame->SetEnabled(false);
-
-//    auto iter = m_TexturedQuadIdMap.find(uiId);
-//    if(iter != m_TexturedQuadIdMap.end())
-//    {
-//        m_pCurFrame = iter.value();
-//        m_pCurFrame->pos.Set(vOffset);
-//        m_pCurFrame->SetEnabled(true);
-//    }
+    m_Sprite.AnimSetState(uiStateIndex);
+    m_Sprite.AnimSetFrame(uiFrameIndex);
 }
 
-/*virtual*/ void SpriteDraw::OnShow(IHyApplication &hyApp)
+/*virtual*/ void SpriteDraw::OnShow(IHyApplication &hyApp) /*override*/
 {
     m_primOriginHorz.SetEnabled(true);
     m_primOriginVert.SetEnabled(true);
@@ -73,7 +69,25 @@ void SpriteDraw::SetFrame(quint32 uiId, glm::vec2 vOffset)
 //        m_pCurFrame->SetEnabled(true);
 }
 
-/*virtual*/ void SpriteDraw::OnHide(IHyApplication &hyApp)
+/*virtual*/ void SpriteDraw::OnHide(IHyApplication &hyApp) /*override*/
 {
     SetEnabled(false);
+}
+
+/*virtual*/ void SpriteDraw::OnUpdate() /*override*/
+{
+    SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
+    
+    m_Sprite.AnimSetPause(pWidget->IsPlayingAnim() == false);
+    
+    if(m_Sprite.AnimIsPaused())
+    {
+        int iStateIndex, iFrameIndex;
+        pWidget->GetSpriteInfo(iStateIndex, iFrameIndex);
+        
+        m_Sprite.AnimSetState(static_cast<uint32>(iStateIndex));
+        m_Sprite.AnimSetFrame(static_cast<uint32>(iFrameIndex));
+    }
+    else
+        pWidget->SetSelectedFrame(m_Sprite.AnimGetFrame());
 }

@@ -28,13 +28,13 @@ public:
     IDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~IDraw();
     
-    void ApplyJsonData();
+    void ApplyJsonData(bool bReloadInAssetManager);
 
     void Show();
     void Hide();
 
 protected:
-    virtual void OnApplyJsonData(jsonxx::Value &valueRef) { }
+    virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) { }
     virtual void OnShow(IHyApplication &hyApp) = 0;
     virtual void OnHide(IHyApplication &hyApp) = 0;
 };
