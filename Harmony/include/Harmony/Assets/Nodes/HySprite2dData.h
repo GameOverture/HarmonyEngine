@@ -35,6 +35,7 @@ struct HySprite2dFrame
 	{ }
 
 	uint32 GetGfxApiHandle() const;
+	bool IsValid() const;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +62,7 @@ public:
 		AnimState(std::string sName, bool bLoop, bool bReverse, bool bBounce, float fDuration, HyAtlasIndices &requiredAtlasIndicesRef, jsonxx::Array &frameArray, HyAssets &assetsRef);
 		~AnimState();
 
-		const HySprite2dFrame &GetFrame(uint32 uiFrameIndex);
+		const HySprite2dFrame &GetFrame(uint32 uiFrameIndex) const;
 	};
 	AnimState *			m_pAnimStates;
 	uint32				m_uiNumStates;

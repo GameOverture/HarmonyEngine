@@ -11,6 +11,7 @@
 #include "HyEngine.h"
 #include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Diagnostics/Console/HyConsole.h"
+#include "Assets/Nodes/HySprite2dData.h"
 
 HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
 																										m_bIsAnimPaused(false),
@@ -27,6 +28,11 @@ HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pPa
 
 HySprite2d::~HySprite2d(void)
 {
+}
+
+/*virtual*/ bool HySprite2d::IsEnabled() /*override*/
+{
+	return (IHyNode::IsEnabled() && ((m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Invalid) == 0));
 }
 
 void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl)
@@ -339,6 +345,8 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Bounce;
 		if(stateRef.m_bREVERSE)
 			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Reverse;
+		if(stateRef.m_uiNUMFRAMES == 0 || stateRef.GetFrame(0).IsValid() == false)
+			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Invalid;
 	}
 }
 

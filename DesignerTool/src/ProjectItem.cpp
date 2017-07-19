@@ -142,8 +142,6 @@ void ProjectItem::WidgetRefreshDraw(IHyApplication &hyApp)
     {
     case ITEM_Sprite:
         m_pDraw = new SpriteDraw(this, hyApp);
-        on_undoStack_indexChanged(0);
-        static_cast<SpriteDraw *>(m_pDraw)->Load();
         break;
     case ITEM_Font:
         m_pDraw = new FontDraw(this, hyApp);
@@ -153,6 +151,7 @@ void ProjectItem::WidgetRefreshDraw(IHyApplication &hyApp)
         break;
     }
 
+    m_pDraw->ApplyJsonData(true);
     
     m_pDraw->Load();
     m_pDraw->SetEnabled(false);

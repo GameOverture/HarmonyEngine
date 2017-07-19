@@ -18,6 +18,11 @@ uint32 HySprite2dFrame::GetGfxApiHandle() const
 	return pAtlas ? pAtlas->GetGfxApiHandle() : 0;
 }
 
+bool HySprite2dFrame::IsValid() const
+{
+	return pAtlas != nullptr;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -125,7 +130,7 @@ HySprite2dData::AnimState::~AnimState()
 	pSpriteFramesBuffer = NULL;
 }
 
-const HySprite2dFrame &HySprite2dData::AnimState::GetFrame(uint32 uiFrameIndex)
+const HySprite2dFrame &HySprite2dData::AnimState::GetFrame(uint32 uiFrameIndex) const
 {
 	return m_pFrames[uiFrameIndex];
 }

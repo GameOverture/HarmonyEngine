@@ -90,8 +90,6 @@ public:
 	template<typename HYDATATYPE>
 	void GuiOverrideData(jsonxx::Value &dataValueRef, bool bReloadInAssetManager)
 	{
-		bool bWasEnabled = IsEnabled();
-
 		if(bReloadInAssetManager)
 			Unload();
 
@@ -101,8 +99,6 @@ public:
 
 		if(bReloadInAssetManager)
 			Load();
-
-		SetEnabled(bWasEnabled);
 	}
 #endif
 };

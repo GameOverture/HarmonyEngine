@@ -23,6 +23,8 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
     m_primOriginHorz.SetTint(1.0f, 0.0f, 0.0f);
     m_primOriginVert.SetTint(1.0f, 0.0f, 0.0f);
 
+	ApplyJsonData(true);
+
 //    for(int i = 0; i < m_pProjItem->GetModel()->GetNumStates(); ++i)
 //    {
 //        SpriteStateData *pStateData = static_cast<SpriteStateData *>(m_pProjItem->GetModel()->GetStateData(i));
@@ -79,12 +81,22 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
     SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
     
     m_Sprite.AnimSetPause(pWidget->IsPlayingAnim() == false);
+
+    // NOTE: Data in sprite may be invalid/null because of GUI usage
+    if(m_Sprite.AcquireData() == nullptr)
+        return;
     
     if(m_Sprite.AnimIsPaused())
     {
         int iStateIndex, iFrameIndex;
         pWidget->GetSpriteInfo(iStateIndex, iFrameIndex);
         
+        if(iStateIndex < 0)
+            iStateIndex = 0;
+
+        if(iFrameIndex < 0)
+            iFrameIndex = 0;
+
         m_Sprite.AnimSetState(static_cast<uint32>(iStateIndex));
         m_Sprite.AnimSetFrame(static_cast<uint32>(iFrameIndex));
     }

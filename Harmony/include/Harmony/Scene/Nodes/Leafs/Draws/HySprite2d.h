@@ -30,6 +30,7 @@ protected:
 		ANIMCTRLATTRIB_Bounce					= 1 << 2,
 		ANIMCTRLATTRIB_IsBouncing				= 1 << 3,	// True if anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
 		ANIMCTRLATTRIB_Finished					= 1 << 4,	// True if a non-looping animation finishes its full sequence and reset to false whenever any animation is played
+		ANIMCTRLATTRIB_Invalid					= 1 << 5
 
 		// Do not exceed '8' attributes, or else increase uint8s
 	};
@@ -48,6 +49,8 @@ protected:
 public:
 	HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	virtual ~HySprite2d(void);
+
+	virtual bool IsEnabled() override;
 
 	//--------------------------------------------------------------------------------------
 	// Set how to playback the animation on the current (or specified) state/animation.
