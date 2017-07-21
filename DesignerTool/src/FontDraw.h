@@ -15,7 +15,8 @@ class FontDraw : public IDraw
     HyPrimitive2d               m_DrawAtlasOutline;
 
     HyPrimitive2d               m_DividerLine;
-    QList<HyTexturedQuad2d *>   m_DrawFontPreviewList;
+
+    HyText2d                    m_Text;
 
 public:
     FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp);

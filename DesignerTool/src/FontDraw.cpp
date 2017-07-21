@@ -5,7 +5,10 @@
 FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
                                                                     m_bShowAtlasPreview(false),
                                                                     m_pAtlasCamera(nullptr),
-                                                                    m_pDrawAtlasPreview(nullptr)
+                                                                    m_pDrawAtlasPreview(nullptr),
+                                                                    m_DrawAtlasOutline(this),
+                                                                    m_DividerLine(this),
+                                                                    m_Text("", "+GuiPreview", this),
 {
     m_pAtlasCamera = m_HyAppRef.Window().CreateCamera2d();
     m_pAtlasCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.5f);

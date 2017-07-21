@@ -2,7 +2,7 @@
 #include "SpriteWidget.h"
 
 SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
-                                                                        m_Sprite("", "GuiMadeSprite", this),
+                                                                        m_Sprite("", "+GuiPreview", this),
                                                                         m_primOriginHorz(this),
                                                                         m_primOriginVert(this)
 {
