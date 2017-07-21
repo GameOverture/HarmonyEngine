@@ -48,7 +48,19 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
 
 /*virtual*/ void SpriteDraw::OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) /*override*/
 {
+    if(m_Sprite.AcquireData() != nullptr)
+    {
+        // Clear whatever anim ctrl was set since it will only set the proper attributes from GuiOverrideData, leaving stale flags behind
+        for(uint32 i = 0; i < m_Sprite.AnimGetNumStates(); ++i)
+        {
+            m_Sprite.AnimCtrl(HYANIMCTRL_DontLoop, i);
+            m_Sprite.AnimCtrl(HYANIMCTRL_DontBounce, i);
+            m_Sprite.AnimCtrl(HYANIMCTRL_Play, i);
+        }
+    }
+
     m_Sprite.GuiOverrideData<HySprite2dData>(valueRef, bReloadInAssetManager);
+    m_Sprite.AnimCtrl(HYANIMCTRL_Reset);
     
     SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
     m_Sprite.AnimSetPause(pWidget->IsPlayingAnim() == false);
