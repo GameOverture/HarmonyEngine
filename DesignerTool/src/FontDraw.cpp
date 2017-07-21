@@ -39,7 +39,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 
 void FontDraw::PositionDividerLine()
 {
-    m_DividerLine.pos.Set(-5000.0f, m_HyAppRef.Window().GetResolution().y / 2 - 5.0f);
+    m_DividerLine.pos.Set(-5000.0f, m_HyAppRef.Window().GetResolution().y / 2 - 5.0f);c
 }
 
 void FontDraw::ShowSubAtlas(bool bShow)
