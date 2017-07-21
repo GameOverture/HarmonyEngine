@@ -65,32 +65,64 @@ HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
 	uiNumInputMappings		= static_cast<uint32>(projObject.get<jsonxx::Number>("NumInputMappings"));
 	uiDebugPort				= static_cast<uint32>(projObject.get<jsonxx::Number>("DebugPort"));
 
-	jsonxx::Array windowInfoArray = projObject.get<jsonxx::Array>("WindowInfoArray");
-	uiNumWindows = static_cast<uint32>(windowInfoArray.size());
-	for(uint32 i = 0; i < uiNumWindows; ++i)
+	if(projObject.has<jsonxx::Array>("WindowInfoArray") == true)
 	{
-		jsonxx::Object windowInfoObj = windowInfoArray.get<jsonxx::Object>(i);
+		jsonxx::Array windowInfoArray = projObject.get<jsonxx::Array>("WindowInfoArray");
+		uiNumWindows = static_cast<uint32>(windowInfoArray.size());
+		for(uint32 i = 0; i < uiNumWindows; ++i)
+		{
+			jsonxx::Object windowInfoObj = windowInfoArray.get<jsonxx::Object>(i);
 
-		windowInfo[i].sName			= windowInfoObj.get<jsonxx::String>("Name");
-		windowInfo[i].eType			= static_cast<HyWindowType>(static_cast<int32>(windowInfoObj.get<jsonxx::Number>("Type")));
-		windowInfo[i].vResolution.x	= static_cast<int32>(windowInfoObj.get<jsonxx::Number>("ResolutionX"));
-		windowInfo[i].vResolution.y	= static_cast<int32>(windowInfoObj.get<jsonxx::Number>("ResolutionY"));
-		windowInfo[i].vLocation.x	= static_cast<int32>(windowInfoObj.get<jsonxx::Number>("LocationX"));
-		windowInfo[i].vLocation.y	= static_cast<int32>(windowInfoObj.get<jsonxx::Number>("LocationY"));
+			windowInfo[i].sName = windowInfoObj.get<jsonxx::String>("Name");
+			windowInfo[i].eType = static_cast<HyWindowType>(static_cast<int32>(windowInfoObj.get<jsonxx::Number>("Type")));
+			windowInfo[i].vResolution.x = static_cast<int32>(windowInfoObj.get<jsonxx::Number>("ResolutionX"));
+			windowInfo[i].vResolution.y = static_cast<int32>(windowInfoObj.get<jsonxx::Number>("ResolutionY"));
+			windowInfo[i].vLocation.x = static_cast<int32>(windowInfoObj.get<jsonxx::Number>("LocationX"));
+			windowInfo[i].vLocation.y = static_cast<int32>(windowInfoObj.get<jsonxx::Number>("LocationY"));
 
-		windowInfo[i].uiDirtyFlags	= 0;
+			windowInfo[i].uiDirtyFlags = 0;
+		}
+	}
+	else
+	{
+		uiNumWindows = 1;
+		for(uint32 i = 0; i < HY_MAXWINDOWS; ++i)
+		{
+			windowInfo[i].sName = "Window: " + std::to_string(i);
+			windowInfo[i].eType = HYWINDOW_WindowedFixed;
+			windowInfo[i].vResolution.x = 512;
+			windowInfo[i].vResolution.y = 256;
+			windowInfo[i].vLocation.x = i * windowInfo[i].vResolution.x;
+			windowInfo[i].vLocation.y = 0;
+
+			windowInfo[i].uiDirtyFlags = 0;
+		}
 	}
 
-	// Log Console
-	bUseConsole = projObject.get<jsonxx::Boolean>("UseConsole");
-	jsonxx::Object consoleInfoObj = projObject.get<jsonxx::Object>("ConsoleInfo");
-	consoleInfo.sName = consoleInfoObj.get<jsonxx::String>("Name");
-	consoleInfo.eType = static_cast<HyWindowType>(static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("Type")));
-	consoleInfo.vResolution.x = static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("ResolutionX"));
-	consoleInfo.vResolution.y = static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("ResolutionY"));
-	consoleInfo.vLocation.x = static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("LocationX"));
-	consoleInfo.vLocation.y = static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("LocationY"));
-	consoleInfo.uiDirtyFlags = 0;
+	if(projObject.has<jsonxx::Boolean>("UseConsole") == true)
+	{
+		// Log Console
+		bUseConsole = projObject.get<jsonxx::Boolean>("UseConsole");
+		jsonxx::Object consoleInfoObj = projObject.get<jsonxx::Object>("ConsoleInfo");
+		consoleInfo.sName = consoleInfoObj.get<jsonxx::String>("Name");
+		consoleInfo.eType = static_cast<HyWindowType>(static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("Type")));
+		consoleInfo.vResolution.x = static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("ResolutionX"));
+		consoleInfo.vResolution.y = static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("ResolutionY"));
+		consoleInfo.vLocation.x = static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("LocationX"));
+		consoleInfo.vLocation.y = static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("LocationY"));
+		consoleInfo.uiDirtyFlags = 0;
+	}
+	else
+	{
+		bUseConsole = false;
+		consoleInfo.sName = "Harmony Log Console";
+		consoleInfo.eType = HYWINDOW_WindowedSizeable;
+		consoleInfo.vResolution.x = 64;
+		consoleInfo.vResolution.y = 80;
+		consoleInfo.vLocation.x = 512;
+		consoleInfo.vLocation.y = 256;
+		consoleInfo.uiDirtyFlags = 0;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
