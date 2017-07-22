@@ -48,6 +48,9 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(nu
         QList<AtlasFrame *> frameList = m_ModelRef.GetFrames(i);
         for(int j = 0; j < frameList.size(); ++j)
         {
+            if(frameList[j]->GetTextureIndex() < 0)
+                continue;
+
             uint32 uiTextureIndex = frameList[j]->GetTextureIndex();
             
             while(m_MasterList.size() <= uiTextureIndex)
