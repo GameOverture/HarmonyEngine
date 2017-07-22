@@ -167,7 +167,7 @@ void AtlasDraw::Update(IHyApplication &hyApp)
     }
 }
 
-/*virtual*/ void AtlasDraw::OnShow(IHyApplication &hyApp)
+/*virtual*/ void AtlasDraw::OnShow(IHyApplication &hyApp) /*override*/
 {
     m_bIsMouseOver = true;
     
@@ -182,7 +182,7 @@ void AtlasDraw::Update(IHyApplication &hyApp)
     m_HoverStrokeOutter.SetEnabled(true);
 }
 
-/*virtual*/ void AtlasDraw::OnHide(IHyApplication &hyApp)
+/*virtual*/ void AtlasDraw::OnHide(IHyApplication &hyApp) /*override*/
 {
     m_bIsMouseOver = false;
             
@@ -195,4 +195,8 @@ void AtlasDraw::Update(IHyApplication &hyApp)
     m_HoverBackground.SetEnabled(false);
     m_HoverStrokeInner.SetEnabled(false);
     m_HoverStrokeOutter.SetEnabled(false);
+}
+
+/*virtual*/ void AtlasDraw::OnResizeRenderer() /*override*/
+{
 }

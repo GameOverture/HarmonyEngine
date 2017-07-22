@@ -45,8 +45,9 @@ public:
 
     void Update(IHyApplication &hyApp);
 
-    virtual void OnShow(IHyApplication &hyApp);
-    virtual void OnHide(IHyApplication &hyApp);
+    virtual void OnShow(IHyApplication &hyApp) override;
+    virtual void OnHide(IHyApplication &hyApp) override;
+    virtual void OnResizeRenderer() override;
 };
 
 #endif // ATLASDRAW_H

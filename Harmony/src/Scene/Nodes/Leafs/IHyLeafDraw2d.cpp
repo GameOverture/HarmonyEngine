@@ -111,7 +111,7 @@ void IHyLeafDraw2d::UseCameraCoordinates()
 	m_RenderState.SetCoordinateSystem(-1);
 }
 
-void IHyLeafDraw2d::UseWindowCoordinates(uint32 uiWindowIndex)
+void IHyLeafDraw2d::UseWindowCoordinates(uint32 uiWindowIndex /*= 0*/)
 {
 	m_RenderState.SetCoordinateSystem(static_cast<int32>(uiWindowIndex));
 }

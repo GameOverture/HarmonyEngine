@@ -140,10 +140,14 @@ ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp)
 {
 }
 
-/*virtual*/ void ProjectDraw::OnShow(IHyApplication &hyApp)
+/*virtual*/ void ProjectDraw::OnShow(IHyApplication &hyApp) /*override*/
 {
 }
 
-/*virtual*/ void ProjectDraw::OnHide(IHyApplication &hyApp)
+/*virtual*/ void ProjectDraw::OnHide(IHyApplication &hyApp) /*override*/
+{
+}
+
+/*virtual*/ void ProjectDraw::OnResizeRenderer() /*override*/
 {
 }

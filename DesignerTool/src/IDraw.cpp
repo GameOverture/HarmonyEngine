@@ -54,6 +54,7 @@ void IDraw::ApplyJsonData(bool bReloadInAssetManager)
 void IDraw::Show()
 {
     m_pCamera->SetEnabled(true);
+    OnResizeRenderer();
     OnShow(m_HyAppRef);
 }
 
@@ -61,4 +62,9 @@ void IDraw::Hide()
 {
     m_pCamera->SetEnabled(false);
     OnHide(m_HyAppRef);
+}
+
+void IDraw::ResizeRenderer()
+{
+    OnResizeRenderer();
 }

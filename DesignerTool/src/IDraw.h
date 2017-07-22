@@ -32,11 +32,13 @@ public:
 
     void Show();
     void Hide();
+    void ResizeRenderer();
 
 protected:
     virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) { }
     virtual void OnShow(IHyApplication &hyApp) = 0;
     virtual void OnHide(IHyApplication &hyApp) = 0;
+    virtual void OnResizeRenderer() = 0;
 };
 
 #endif // IDRAW_H

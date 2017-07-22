@@ -57,7 +57,7 @@ public:
 
 	HyCoordinateType GetCoordinateType();
 	void UseCameraCoordinates();
-	void UseWindowCoordinates(uint32 uiWindowIndex);
+	void UseWindowCoordinates(uint32 uiWindowIndex = 0);
 
 	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);

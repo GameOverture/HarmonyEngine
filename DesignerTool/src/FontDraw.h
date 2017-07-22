@@ -24,8 +24,6 @@ public:
 
     virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) override;
     
-    void PositionDividerLine();
-    
     void ShowSubAtlas(bool bShow);
     
     void LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelData, uint uiAtlasPixelDataSize);
@@ -34,6 +32,7 @@ public:
 protected:
     virtual void OnShow(IHyApplication &hyApp) override;
     virtual void OnHide(IHyApplication &hyApp) override;
+    virtual void OnResizeRenderer() override;
     
     virtual void OnUpdate() override;
 };

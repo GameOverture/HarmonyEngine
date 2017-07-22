@@ -21,6 +21,7 @@ public:
 protected:
     virtual void OnShow(IHyApplication &hyApp) override;
     virtual void OnHide(IHyApplication &hyApp) override;
+    virtual void OnResizeRenderer() override;
     
     virtual void OnUpdate() override;
 };

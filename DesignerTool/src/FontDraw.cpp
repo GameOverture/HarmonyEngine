@@ -20,9 +20,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
     m_DividerLine.SetAsQuad(10000.0f, 10.0f, false);
     m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetResolution().y / 2 - 5.0f);
     m_DividerLine.SetTint(0.0f, 0.0f, 0.0f);
-    //m_DividerLine.SetCoordinateType(HYCOORDTYPE_Screen, NULL);
-    
-    ChildAppend(m_DividerLine);
+    //m_DividerLine.UseWindowCoordinates();
     
     ShowSubAtlas(m_bShowAtlasPreview);
 }
@@ -35,11 +33,6 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 
 /*virtual*/ void FontDraw::OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) /*override*/
 {
-}
-
-void FontDraw::PositionDividerLine()
-{
-    m_DividerLine.pos.Set(-5000.0f, m_HyAppRef.Window().GetResolution().y / 2 - 5.0f);
 }
 
 void FontDraw::ShowSubAtlas(bool bShow)
@@ -168,6 +161,11 @@ void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelD
 /*virtual*/ void FontDraw::OnHide(IHyApplication &hyApp)
 {
     SetEnabled(false);
+}
+
+/*virtual*/ void FontDraw::OnResizeRenderer() /*override*/
+{
+    m_DividerLine.pos.Set(-5000.0f, m_HyAppRef.Window().GetResolution().y / 2 - 5.0f);
 }
 
 /*virtual*/ void FontDraw::OnUpdate() /*override*/
