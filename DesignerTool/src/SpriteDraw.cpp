@@ -46,6 +46,51 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
 //        delete iter.value();
 }
 
+void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
+{
+    m_Sprite.AnimSetState(uiStateIndex);
+    m_Sprite.AnimSetFrame(uiFrameIndex);
+}
+
+/*virtual*/ void SpriteDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
+{
+}
+
+/*virtual*/ void SpriteDraw::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/
+{
+}
+
+/*virtual*/ void SpriteDraw::OnMousePressEvent(QMouseEvent *pEvent) /*override*/
+{
+}
+
+/*virtual*/ void SpriteDraw::OnMouseWheelEvent(QWheelEvent *pEvent) /*override*/
+{
+    QPoint numPixels = pEvent->pixelDelta();
+    QPoint numDegrees = pEvent->angleDelta() / 8;
+
+    /*if(!numPixels.isNull())
+    {
+        //scrollWithPixels(numPixels);
+    }
+    else */if(!numDegrees.isNull())
+    {
+        QPoint numSteps = numDegrees / 15;
+        m_pCamera->scale.TweenOffset(numSteps.y() * 0.2f, numSteps.y() * 0.2f, 0.5f, HyTween::QuadInOut);
+        //scrollWithDegrees(numSteps);
+    }
+
+    pEvent->accept();
+}
+
+/*virtual*/ void SpriteDraw::OnMouseMoveEvent(QMouseEvent *pEvent) /*override*/
+{
+}
+
+/*virtual*/ void SpriteDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
+{
+}
+
 /*virtual*/ void SpriteDraw::OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) /*override*/
 {
     if(m_Sprite.AcquireData() != nullptr)
@@ -64,12 +109,6 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
     
     SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
     m_Sprite.AnimSetPause(pWidget->IsPlayingAnim() == false);
-}
-
-void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
-{
-    m_Sprite.AnimSetState(uiStateIndex);
-    m_Sprite.AnimSetFrame(uiFrameIndex);
 }
 
 /*virtual*/ void SpriteDraw::OnShow(IHyApplication &hyApp) /*override*/

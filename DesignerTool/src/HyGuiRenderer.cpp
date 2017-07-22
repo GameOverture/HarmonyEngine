@@ -8,13 +8,14 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "HyGuiRenderer.h"
+#include "HyGuiGlobal.h"
 
 #include <QTimer>
 #include <QSurfaceFormat>
 #include <QDir>
 #include <QApplication>
+#include <QMouseEvent>
 
-#include "HyGuiGlobal.h"
 
 //void HyGuiRendererLoadThread::run()
 //{
@@ -80,7 +81,7 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
         return nullptr;
 }
 
-/*virtual*/ void HyGuiRenderer::initializeGL()
+/*virtual*/ void HyGuiRenderer::initializeGL() /*override*/
 {
     QString glType;
     QString glProfile;
@@ -107,7 +108,7 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
     }
 }
 
-/*virtual*/ void HyGuiRenderer::paintGL()
+/*virtual*/ void HyGuiRenderer::paintGL() /*override*/
 {
     if(m_pHyEngine && m_bIsUpdating == false)
     {
@@ -119,7 +120,7 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
     }
 }
 
-/*virtual*/ void HyGuiRenderer::resizeGL(int w, int h)
+/*virtual*/ void HyGuiRenderer::resizeGL(int w, int h) /*override*/
 {
     if(m_pProjOwner)
         m_pProjOwner->SetRenderSize(w, h);
@@ -140,4 +141,76 @@ void HyGuiRenderer::OnBootCheck()
         connect(m_pTimer, SIGNAL(timeout()), this, SLOT(update()));
         m_pTimer->start(10);
     }
+}
+
+/*virtual*/ void HyGuiRenderer::keyPressEvent(QKeyEvent *pEvent) /*override*/
+{
+    if(m_pProjOwner == nullptr)
+        return;
+
+    ProjectItem *pCurItem = m_pProjOwner->GetCurrentOpenItem();
+    if(pCurItem == nullptr)
+        return;
+
+    pCurItem->GetDraw()->OnKeyPressEvent(pEvent);
+}
+
+/*virtual*/ void HyGuiRenderer::keyReleaseEvent(QKeyEvent *pEvent) /*override*/
+{
+    if(m_pProjOwner == nullptr)
+        return;
+
+    ProjectItem *pCurItem = m_pProjOwner->GetCurrentOpenItem();
+    if(pCurItem == nullptr)
+        return;
+
+    pCurItem->GetDraw()->OnKeyReleaseEvent(pEvent);
+}
+
+/*virtual*/ void HyGuiRenderer::mousePressEvent(QMouseEvent *pEvent) /*override*/
+{
+    if(m_pProjOwner == nullptr)
+        return;
+
+    ProjectItem *pCurItem = m_pProjOwner->GetCurrentOpenItem();
+    if(pCurItem == nullptr)
+        return;
+
+    pCurItem->GetDraw()->OnMousePressEvent(pEvent);
+}
+
+/*virtual*/ void HyGuiRenderer::wheelEvent(QWheelEvent *pEvent) /*override*/
+{
+    if(m_pProjOwner == nullptr)
+        return;
+
+    ProjectItem *pCurItem = m_pProjOwner->GetCurrentOpenItem();
+    if(pCurItem == nullptr)
+        return;
+
+    pCurItem->GetDraw()->OnMouseWheelEvent(pEvent);
+}
+
+/*virtual*/ void HyGuiRenderer::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
+{
+    if(m_pProjOwner == nullptr)
+        return;
+
+    ProjectItem *pCurItem = m_pProjOwner->GetCurrentOpenItem();
+    if(pCurItem == nullptr)
+        return;
+
+    pCurItem->GetDraw()->OnMouseMoveEvent(pEvent);
+}
+
+/*virtual*/ void HyGuiRenderer::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/
+{
+    if(m_pProjOwner == nullptr)
+        return;
+
+    ProjectItem *pCurItem = m_pProjOwner->GetCurrentOpenItem();
+    if(pCurItem == nullptr)
+        return;
+
+    pCurItem->GetDraw()->OnMouseReleaseEvent(pEvent);
 }

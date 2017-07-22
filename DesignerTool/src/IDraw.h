@@ -34,6 +34,13 @@ public:
     void Hide();
     void ResizeRenderer();
 
+    virtual void OnKeyPressEvent(QKeyEvent *pEvent) { }
+    virtual void OnKeyReleaseEvent(QKeyEvent *pEvent) { }
+    virtual void OnMousePressEvent(QMouseEvent *pEvent) { }
+    virtual void OnMouseWheelEvent(QWheelEvent *pEvent) { }
+    virtual void OnMouseMoveEvent(QMouseEvent *pEvent) { }
+    virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) { }
+
 protected:
     virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) { }
     virtual void OnShow(IHyApplication &hyApp) = 0;

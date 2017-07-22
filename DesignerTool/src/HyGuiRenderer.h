@@ -36,12 +36,22 @@ public:
     HyRendererInterop *GetHarmonyRenderer();
 
     // QOpenGLWidget overrides
-    virtual void initializeGL();
-    virtual void paintGL();
-    virtual void resizeGL(int w, int h);
+    virtual void initializeGL() override;
+    virtual void paintGL() override;
+    virtual void resizeGL(int w, int h) override;
+
+    // QWidget overrides
 
 private Q_SLOTS:
     void OnBootCheck();
+
+protected:
+    virtual void keyPressEvent(QKeyEvent *pEvent) override;
+    virtual void keyReleaseEvent(QKeyEvent *pEvent) override;
+    virtual void mousePressEvent(QMouseEvent *pEvent) override;
+    virtual void wheelEvent(QWheelEvent *pEvent) override;
+    virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
+    virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;
 };
 
 #endif // HYGUIRENDERER_H

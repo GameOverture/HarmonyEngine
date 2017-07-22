@@ -335,6 +335,11 @@ void Project::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
     m_ActionSaveAll.setEnabled(bSaveAllEnabled);
 }
 
+ProjectItem *Project::GetCurrentOpenItem()
+{
+    return m_pCurOpenItem;
+}
+
 void Project::OpenItem(ProjectItem *pItem)
 {
     if(m_pCurOpenItem && m_pCurOpenItem != pItem)

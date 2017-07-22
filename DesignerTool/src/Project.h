@@ -73,6 +73,7 @@ public:
     QList<QAction *> GetSaveActions();
     void SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled);
 
+    ProjectItem *GetCurrentOpenItem();
     void OpenItem(ProjectItem *pItem);
 
     // IHyApplication overrides
