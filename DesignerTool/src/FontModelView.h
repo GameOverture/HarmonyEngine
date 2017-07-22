@@ -49,7 +49,7 @@ public:
     virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class FontTableModel : public QAbstractTableModel
+class FontLayersModel : public QAbstractTableModel
 {
     Q_OBJECT
 
@@ -89,8 +89,8 @@ public:
         NUMCOLUMNS
     };
     
-    FontTableModel(QObject *parent);
-    virtual ~FontTableModel();
+    FontLayersModel(QObject *parent);
+    virtual ~FontLayersModel();
 
     QString GetRenderModeString(rendermode_t eMode) const;
     

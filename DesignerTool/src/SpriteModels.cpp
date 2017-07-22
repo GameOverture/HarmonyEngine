@@ -403,7 +403,7 @@ QJsonObject SpriteModel::PopStateAt(uint32 uiIndex)
     return retStateObj;
 }
 
-QJsonValue SpriteModel::GetSaveInfo()
+QJsonValue SpriteModel::GetSaveInfo(bool bWritingToGameData)
 {
     QJsonArray retArray;
     for(int i = 0; i < m_StateList.size(); ++i)

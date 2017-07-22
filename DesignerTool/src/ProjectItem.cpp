@@ -103,18 +103,7 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 
 void ProjectItem::Save()
 {
-    switch(m_eTYPE)
-    {
-    case ITEM_Sprite:
-        m_SaveValue = static_cast<SpriteModel *>(m_pModel)->GetSaveInfo();
-        break;
-    case ITEM_Font:
-        m_SaveValue = static_cast<FontModel *>(m_pModel)->GetSaveInfo();
-        break;
-    default:
-        HyGuiLog("Improper item Save(): " % QString::number(m_eTYPE), LOGTYPE_Error);
-        break;
-    }
+    m_SaveValue = m_pModel->GetSaveInfo(true);
 
     GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue);
     m_pUndoStack->setClean();

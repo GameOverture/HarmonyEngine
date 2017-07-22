@@ -32,7 +32,7 @@ void IDraw::ApplyJsonData(bool bReloadInAssetManager)
     if(m_pProjItem == nullptr)
         return;
 
-    QJsonValue valueData = m_pProjItem->GetModel()->GetSaveInfo();
+    QJsonValue valueData = m_pProjItem->GetModel()->GetSaveInfo(false);
     QByteArray src;
     if(valueData.isArray())
     {

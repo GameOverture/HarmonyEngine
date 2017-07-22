@@ -60,7 +60,7 @@ struct FontTypeface
 
 class FontStateData : public IStateData
 {
-	FontTableModel *			m_pFontTableModel;
+	FontLayersModel *			m_pFontTableModel;
 	
 	DoubleSpinBoxMapper *		m_pSbMapper_Size;
     ComboBoxMapper *            m_pCmbMapper_Fonts;
@@ -69,7 +69,7 @@ public:
     FontStateData(IModel &modelRef, QJsonObject stateObj);
     virtual ~FontStateData();
 
-    FontTableModel *GetFontModel();
+    FontLayersModel *GetFontLayersModel();
 
     DoubleSpinBoxMapper *GetSizeMapper();
     ComboBoxMapper *GetFontMapper();
@@ -105,7 +105,7 @@ class FontModel : public IModel
     bool                        m_bGlyphsDirty;
     bool                        m_bFontPreviewDirty;
 
-    texture_atlas_t *           m_pAtlas;
+    texture_atlas_t *           m_pFtglAtlas;
     unsigned char *             m_pTrueAtlasPixelData;
     uint                        m_uiTrueAtlasPixelDataSize;
 
@@ -136,7 +136,7 @@ public:
     bool ClearFontDirtyFlag();
 
     virtual QJsonObject PopStateAt(uint32 uiIndex) override;
-    virtual QJsonValue GetSaveInfo() override;
+    virtual QJsonValue GetSaveInfo(bool bWritingToGameData) override;
     virtual void Refresh() override;
 };
 

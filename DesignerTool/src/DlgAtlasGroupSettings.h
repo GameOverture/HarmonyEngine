@@ -36,10 +36,14 @@ public:
     void ApplyCurrentSettingsToObj(QJsonObject &settingsObjOut);
 
 private Q_SLOTS:
+    void on_btnTexSize128_clicked();
     void on_btnTexSize256_clicked();
     void on_btnTexSize512_clicked();
     void on_btnTexSize1024_clicked();
     void on_btnTexSize2048_clicked();
+    void on_btnTexSize4096_clicked();
+    void on_btnTexSize8192_clicked();
+    void on_btnTexSize16384_clicked();
     
     virtual void done(int r);
 

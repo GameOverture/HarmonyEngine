@@ -121,7 +121,7 @@ public:
     virtual ~SpriteModel();
     
     virtual QJsonObject PopStateAt(uint32 uiIndex) override;
-    virtual QJsonValue GetSaveInfo() override;
+    virtual QJsonValue GetSaveInfo(bool bWritingToGameData) override;
     virtual void Refresh() override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -358,7 +358,7 @@ public:
     }
     
     virtual QJsonObject PopStateAt(uint32 uiIndex) = 0;
-    virtual QJsonValue GetSaveInfo() = 0;
+    virtual QJsonValue GetSaveInfo(bool bWritingToGameData) = 0;
     virtual void Refresh() = 0;
 };
 
