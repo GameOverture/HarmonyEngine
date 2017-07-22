@@ -19,19 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
+	<VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>HyProjGUID</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>HyTemplate</RootNamespace>
 	<ProjectName>HyTemplate</ProjectName>
+	<WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -42,6 +38,12 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -169,7 +171,7 @@
     <ClInclude Include="HyTemplate.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="[HyHarmonyProjLocation]src/Harmony_vs2015.vcxproj">
+    <ProjectReference Include="[HyHarmonyProjLocation]src/Harmony_vs2017.vcxproj">
       <Project>{fccd89c1-bc25-41e0-8ee4-b77e0fc9273a}</Project>
     </ProjectReference>
   </ItemGroup>

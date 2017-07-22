@@ -572,6 +572,9 @@ void MainWindow::on_actionLaunchIDE_triggered()
         bUseVs2013 = bUseVs2015 = false;
     else if(bUseVs2015)
         bUseVs2013 = false;
+    else if(bUseVs2013 == false) {
+        HyGuiLog("No appropriate IDE was detected on this machine.", LOGTYPE_Error);
+    }
 
     for(int i = 0; i < ideFileInfoList.size(); ++i)
     {

@@ -28,8 +28,10 @@
 // Keep this commented out unless you want the entire project to save every item upon boot (used if 'Data.json' layout has changed and needs to propagate all its changes)
 //#define RESAVE_ENTIRE_PROJECT
 
+HarmonyInit g_DefaultInit;
+
 Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Project, sNewProjectFilePath),
-                                                        IHyApplication(HarmonyInit()),
+                                                        IHyApplication(g_DefaultInit),
                                                         m_pDraw(nullptr),
                                                         m_pAtlasModel(nullptr),
                                                         m_pAtlasWidget(nullptr),
