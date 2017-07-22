@@ -551,8 +551,13 @@ void MainWindow::on_actionLaunchIDE_triggered()
     }
 
 #if defined(Q_OS_WIN)
+    bool bUseVs2017 = false;
     bool bUseVs2015 = false;
     bool bUseVs2013 = false;
+
+    QSettings windowsRegEntryVS2017("HKEY_CLASSES_ROOT\\VisualStudio.DTE.15.0", QSettings::NativeFormat);
+    if(windowsRegEntryVS2017.childKeys().empty() == false)
+        bUseVs2017 = true;
 
     QSettings windowsRegEntryVS2015("HKEY_CLASSES_ROOT\\VisualStudio.DTE.14.0", QSettings::NativeFormat);
     if(windowsRegEntryVS2015.childKeys().empty() == false)
@@ -562,8 +567,10 @@ void MainWindow::on_actionLaunchIDE_triggered()
     if(windowsRegEntryVS2013.childKeys().empty() == false)
         bUseVs2013 = true;
 
-    // Use the newer version
-    if(bUseVs2013 && bUseVs2015)
+    // Use the newest version
+    if(bUseVs2017)
+        bUseVs2013 = bUseVs2015 = false;
+    else if(bUseVs2015)
         bUseVs2013 = false;
 
     for(int i = 0; i < ideFileInfoList.size(); ++i)
@@ -576,6 +583,19 @@ void MainWindow::on_actionLaunchIDE_triggered()
             do
             {
                 line = in.readLine();
+
+                if(line.contains("# Visual Studio 15", Qt::CaseSensitive))
+                {
+                    if(bUseVs2017)
+                    {
+                        file.close();
+                        QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath()));
+                        return;
+                    }
+                    else
+                        break;
+                }
+
                 if(line.contains("# Visual Studio 14", Qt::CaseSensitive))
                 {
                     if(bUseVs2015)

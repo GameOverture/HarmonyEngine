@@ -326,6 +326,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="chkVs2017">
+        <property name="text">
+         <string>Visual Studio 2017</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

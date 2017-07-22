@@ -8,7 +8,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
                                                                     m_pDrawAtlasPreview(nullptr),
                                                                     m_DrawAtlasOutline(this),
                                                                     m_DividerLine(this),
-                                                                    m_Text("", "+GuiPreview", this),
+                                                                    m_Text("", "+GuiPreview", this)
 {
     m_pAtlasCamera = m_HyAppRef.Window().CreateCamera2d();
     m_pAtlasCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.5f);
@@ -39,7 +39,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 
 void FontDraw::PositionDividerLine()
 {
-    m_DividerLine.pos.Set(-5000.0f, m_HyAppRef.Window().GetResolution().y / 2 - 5.0f);c
+    m_DividerLine.pos.Set(-5000.0f, m_HyAppRef.Window().GetResolution().y / 2 - 5.0f);
 }
 
 void FontDraw::ShowSubAtlas(bool bShow)
@@ -80,75 +80,75 @@ void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelD
     m_DrawAtlasOutline.pos.Set(m_pDrawAtlasPreview->pos.Get());
 }
 
-void FontDraw::GenerateTextPreview(FontTableModel *pFontModel, QString sFontPreviewString, texture_atlas_t *pAtlas)
-{
-    // Generate m_DrawFontPreviewList here if font preview is dirty
-    for(int i = 0; i < m_DrawFontPreviewList.count(); ++i)
-        delete m_DrawFontPreviewList[i];
+//void FontDraw::GenerateTextPreview(FontTableModel *pFontModel, QString sFontPreviewString, texture_atlas_t *pAtlas)
+//{
+//    // Generate m_DrawFontPreviewList here if font preview is dirty
+//    for(int i = 0; i < m_DrawFontPreviewList.count(); ++i)
+//        delete m_DrawFontPreviewList[i];
 
-    m_DrawFontPreviewList.clear();
+//    m_DrawFontPreviewList.clear();
 
-    m_pCamera->pos.Set(0.0f, 0.0f);
-    glm::vec2 ptGlyphPos = m_pCamera->pos.Get();
+//    m_pCamera->pos.Set(0.0f, 0.0f);
+//    glm::vec2 ptGlyphPos = m_pCamera->pos.Get();
 
-    float fTextPixelLength = 0.0f;
+//    float fTextPixelLength = 0.0f;
 
-    // Each font layer
-    for(int i = 0; i < pFontModel->rowCount(); ++i)
-    {
-        ptGlyphPos.x = 0.0f;
+//    // Each font layer
+//    for(int i = 0; i < pFontModel->rowCount(); ++i)
+//    {
+//        ptGlyphPos.x = 0.0f;
 
-        for(int j = 0; j < sFontPreviewString.count(); ++j)
-        {
-            FontTypeface *pFontStage = pFontModel->GetStageRef(i);
+//        for(int j = 0; j < sFontPreviewString.count(); ++j)
+//        {
+//            FontTypeface *pFontStage = pFontModel->GetStageRef(i);
 
-            // NOTE: Assumes LITTLE ENDIAN
-            QString sSingleChar = sFontPreviewString[j];
-            texture_glyph_t *pGlyph = texture_font_get_glyph(pFontStage->pTextureFont, sSingleChar.toUtf8().data());
+//            // NOTE: Assumes LITTLE ENDIAN
+//            QString sSingleChar = sFontPreviewString[j];
+//            texture_glyph_t *pGlyph = texture_font_get_glyph(pFontStage->pTextureFont, sSingleChar.toUtf8().data());
 
-            if(pGlyph == NULL)
-            {
-                return;
-            }
+//            if(pGlyph == NULL)
+//            {
+//                return;
+//            }
 
-            float fKerning = 0.0f;
-            if(j != 0)
-            {
-                char cPrevCharacter = sFontPreviewString.toStdString().c_str()[j - 1];
-                fKerning = texture_glyph_get_kerning(pGlyph, &cPrevCharacter);
-            }
+//            float fKerning = 0.0f;
+//            if(j != 0)
+//            {
+//                char cPrevCharacter = sFontPreviewString.toStdString().c_str()[j - 1];
+//                fKerning = texture_glyph_get_kerning(pGlyph, &cPrevCharacter);
+//            }
 
-            ptGlyphPos.x += fKerning;
-            ptGlyphPos.y = m_pCamera->pos.Y() - (pGlyph->height - pGlyph->offset_y);
+//            ptGlyphPos.x += fKerning;
+//            ptGlyphPos.y = m_pCamera->pos.Y() - (pGlyph->height - pGlyph->offset_y);
 
-            int iX = static_cast<int>(pGlyph->s0 * static_cast<float>(pAtlas->width));
-            int iY = static_cast<int>(pGlyph->t0 * static_cast<float>(pAtlas->height));
-            int iWidth = static_cast<int>(pGlyph->s1 * static_cast<float>(pAtlas->width)) - iX - 1;
-            int iHeight = static_cast<int>(pGlyph->t1 * static_cast<float>(pAtlas->height)) - iY - 1;
+//            int iX = static_cast<int>(pGlyph->s0 * static_cast<float>(pAtlas->width));
+//            int iY = static_cast<int>(pGlyph->t0 * static_cast<float>(pAtlas->height));
+//            int iWidth = static_cast<int>(pGlyph->s1 * static_cast<float>(pAtlas->width)) - iX - 1;
+//            int iHeight = static_cast<int>(pGlyph->t1 * static_cast<float>(pAtlas->height)) - iY - 1;
 
-            HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), nullptr);
-            pDrawGlyphQuad->Load();
-            pDrawGlyphQuad->SetTextureSource(iX, iY, iWidth, iHeight);
-            pDrawGlyphQuad->pos.Set(ptGlyphPos.x + pGlyph->offset_x, ptGlyphPos.y);
+//            HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), nullptr);
+//            pDrawGlyphQuad->Load();
+//            pDrawGlyphQuad->SetTextureSource(iX, iY, iWidth, iHeight);
+//            pDrawGlyphQuad->pos.Set(ptGlyphPos.x + pGlyph->offset_x, ptGlyphPos.y);
 
-            QColor topColor = pFontModel->GetLayerTopColor(i);
-            QColor botColor = pFontModel->GetLayerBotColor(i);
-            pDrawGlyphQuad->topColor.Set(topColor.redF(), topColor.greenF(), topColor.blueF());
-            pDrawGlyphQuad->botColor.Set(botColor.redF(), botColor.greenF(), botColor.blueF());
+//            QColor topColor = pFontModel->GetLayerTopColor(i);
+//            QColor botColor = pFontModel->GetLayerBotColor(i);
+//            pDrawGlyphQuad->topColor.Set(topColor.redF(), topColor.greenF(), topColor.blueF());
+//            pDrawGlyphQuad->botColor.Set(botColor.redF(), botColor.greenF(), botColor.blueF());
 
-            pDrawGlyphQuad->SetDisplayOrder(i * -1);
+//            pDrawGlyphQuad->SetDisplayOrder(i * -1);
 
-            m_DrawFontPreviewList.append(pDrawGlyphQuad);
+//            m_DrawFontPreviewList.append(pDrawGlyphQuad);
 
-            ptGlyphPos.x += pGlyph->advance_x;
-        }
+//            ptGlyphPos.x += pGlyph->advance_x;
+//        }
 
-        if(fTextPixelLength < ptGlyphPos.x)
-            fTextPixelLength = ptGlyphPos.x;
-    }
+//        if(fTextPixelLength < ptGlyphPos.x)
+//            fTextPixelLength = ptGlyphPos.x;
+//    }
 
-    m_pCamera->pos.X(fTextPixelLength * 0.5f);
-}
+//    m_pCamera->pos.X(fTextPixelLength * 0.5f);
+//}
 
 /*virtual*/ void FontDraw::OnShow(IHyApplication &hyApp)
 {
@@ -181,6 +181,6 @@ void FontDraw::GenerateTextPreview(FontTableModel *pFontModel, QString sFontPrev
     if(pAtlas->id == 0)
         LoadNewAtlas(pAtlas, pAtlasPixelData, uiAtlasPixelDataSize);
     
-    if(static_cast<FontModel *>(m_pProjItem->GetModel())->ClearFontDirtyFlag())
-        GenerateTextPreview(static_cast<FontWidget *>(m_pProjItem->GetWidget())->GetCurStateData()->GetFontModel(), "The quick brown fox jumped over the lazy dog. 01234567890", pAtlas);
+    //if(static_cast<FontModel *>(m_pProjItem->GetModel())->ClearFontDirtyFlag())
+    //    GenerateTextPreview(static_cast<FontWidget *>(m_pProjItem->GetWidget())->GetCurStateData()->GetFontModel(), "The quick brown fox jumped over the lazy dog. 01234567890", pAtlas);
 }
