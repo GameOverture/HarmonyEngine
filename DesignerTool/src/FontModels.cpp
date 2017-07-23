@@ -413,7 +413,7 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
         if(m_pTrueAtlasFrame)
             m_pItem->GetProject().GetAtlasModel().ReplaceFrame(m_pTrueAtlasFrame, m_pItem->GetName(false), fontAtlasImage, true);
         else
-            m_pTrueAtlasFrame = m_pItem->GetProject().GetAtlasModel().GenerateFrame(m_pItem, m_pItem->GetName(false), fontAtlasImage, TEMP_FONT_ATLAS_INDEX, ATLAS_Font);
+            m_pTrueAtlasFrame = m_pItem->GetProject().GetAtlasModel().GenerateFrame(m_pItem, m_pItem->GetName(false), fontAtlasImage, TEMP_FONT_ATLAS_INDEX, ITEM_Font);
     }
 
     // Signals ItemFont to upload and refresh the preview texture

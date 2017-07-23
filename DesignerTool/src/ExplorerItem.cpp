@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "ExplorerItem.h"
 #include "SpriteWidget.h"
-
+#include "HyGuiGlobal.h"
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -17,13 +17,13 @@
 #include "Project.h"
 #include "Harmony/Utilities/HyStrManip.h"
 
-ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath) :  m_eTYPE(eType),
-                                                    m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str())
+ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath) : m_eTYPE(eType),
+                                                                                            m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str())
 {
     m_pTreeItemPtr = new QTreeWidgetItem();
 
     m_pTreeItemPtr->setText(0, GetName(false));
-    m_pTreeItemPtr->setIcon(0, GetIcon());
+    m_pTreeItemPtr->setIcon(0, GetIcon(SUBICON_None));
 
     QVariant v; v.setValue(this);
     m_pTreeItemPtr->setData(0, Qt::UserRole, v);
@@ -110,3 +110,7 @@ QString ExplorerItem::GetPrefix() const
     return sPrefix;
 }
 
+void ExplorerItem::SetTreeItemSubIcon(SubIcon eSubIcon)
+{
+    m_pTreeItemPtr->setIcon(0, GetIcon(eSubIcon));
+}

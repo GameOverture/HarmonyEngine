@@ -123,7 +123,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
             AtlasTreeItem *pNewTreeItem = new AtlasTreeItem((QTreeWidgetItem *)nullptr, QTreeWidgetItem::Type);
 
             pNewTreeItem->setText(0, filterPathDir.dirName());
-            pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix));
+            pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
 
             QVariant v(QString(filterPathDir.absolutePath()));
             pNewTreeItem->setData(0, Qt::UserRole, v);
@@ -180,7 +180,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
                                                 uiAtlasGrpId,
                                                 frameObj["name"].toString(),
                                                 rAlphaCrop,
-                                                static_cast<eAtlasNodeType>(frameObj["type"].toInt()),
+                                                static_cast<HyGuiItemType>(frameObj["type"].toInt()),
                                                 frameObj["width"].toInt(),
                                                 frameObj["height"].toInt(),
                                                 frameObj["x"].toInt(),
@@ -375,7 +375,7 @@ void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
     }
 }
 
-AtlasFrame *AtlasModel::CreateFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors)
+AtlasFrame *AtlasModel::CreateFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, HyGuiItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors)
 {
     if(uiId == ATLASFRAMEID_NotSet)
     {
@@ -457,7 +457,7 @@ bool AtlasModel::TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId)
     return bValid;
 }
 
-AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, eAtlasNodeType eType)
+AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType)
 {
     // This will also create a meta image
     AtlasFrame *pFrame = ImportImage(sName, newImage, m_AtlasGrpList[uiAtlasGrpIndex]->GetId(), eType);
@@ -584,18 +584,18 @@ QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList, quint32 
 
         QImage newImage(fileInfo.absoluteFilePath());
 
-        returnSet.insert(ImportImage(fileInfo.baseName(), newImage, uiAtlasGrpId, ATLAS_Frame));
+        returnSet.insert(ImportImage(fileInfo.baseName(), newImage, uiAtlasGrpId, ITEM_AtlasImage));
     }
 
     return returnSet;
 }
 
-AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, eAtlasNodeType eType)
+AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, HyGuiItemType eType)
 {
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
 
     QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
-    if(eType != ATLAS_Font && eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
+    if(eType != ITEM_Font && eType != ITEM_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
         rAlphaCrop = ImagePacker::crop(newImage);
 
     AtlasFrame *pNewFrame = CreateFrame(ATLASFRAMEID_NotSet, uiChecksum, uiAtlasGrpId, sName, rAlphaCrop, eType, newImage.width(), newImage.height(), -1, -1, -1, 0);

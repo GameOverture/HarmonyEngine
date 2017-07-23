@@ -36,10 +36,11 @@ QString AudioWave::GetName()
 
 QIcon AudioWave::GetIcon()
 {
-    if(m_uiErrors == 0)
-        return HyGlobal::AudioIcon(AUDIO_Wave);
-    else
-        return HyGlobal::AudioIcon(AUDIO_Wave_Warning);
+    return QIcon();
+//    if(m_uiErrors == 0)
+//        return HyGlobal::AudioIcon(AUDIO_Wave);
+//    else
+//        return HyGlobal::AudioIcon(AUDIO_Wave_Warning);
 }
 
 QString AudioWave::ConstructWaveFileName()

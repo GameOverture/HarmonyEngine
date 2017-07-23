@@ -244,9 +244,15 @@ void ProjectItem::on_undoStack_cleanChanged(bool bClean)
         if(pTabBar->tabData(i).value<ProjectItem *>() == this)
         {
             if(bClean)
+            {
                 pTabBar->setTabText(i, GetName(false));
+                pTabBar->setTabIcon(i, GetIcon(SUBICON_None));
+            }
             else
+            {
                 pTabBar->setTabText(i, GetName(false) + "*");
+                pTabBar->setTabIcon(i, GetIcon(SUBICON_Dirty));
+            }
         }
         
         if(pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))

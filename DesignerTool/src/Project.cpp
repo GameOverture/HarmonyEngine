@@ -373,7 +373,7 @@ void Project::OpenItem(ProjectItem *pItem)
         m_pCurOpenItem->WidgetLoad(*this);
 
         m_pTabBar->blockSignals(true);
-        int iIndex = m_pTabBar->addTab(m_pCurOpenItem->GetIcon(), m_pCurOpenItem->GetName(false));
+        int iIndex = m_pTabBar->addTab(m_pCurOpenItem->GetIcon(SUBICON_None), m_pCurOpenItem->GetName(false));
         QVariant v;
         v.setValue(m_pCurOpenItem);
         m_pTabBar->setTabData(iIndex, v);

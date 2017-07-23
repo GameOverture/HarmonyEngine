@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>icons16x16/atlas.png</file>
         <file>icons16x16/atlas-assemble.png</file>
         <file>icons16x16/atlas-file.png</file>
         <file>icons16x16/edit-copy.png</file>
@@ -9,11 +8,8 @@
         <file>icons16x16/edit-paste.png</file>
         <file>icons16x16/edit-redo.png</file>
         <file>icons16x16/edit-undo.png</file>
-        <file>icons16x16/file-newProj.png</file>
-        <file>icons16x16/file-openProject.png</file>
         <file>icons16x16/file-save.png</file>
         <file>icons16x16/file-saveAll.png</file>
-        <file>icons16x16/project.png</file>
         <file>icons16x16/sprite-alignBottom.Image.png</file>
         <file>icons16x16/sprite-alignHorzCenter.png</file>
         <file>icons16x16/sprite-alignLeft.png</file>
@@ -23,23 +19,14 @@
         <file>icons16x16/view-explorer.png</file>
         <file>icons16x16/view-outputLog.png</file>
         <file>icons16x16/view-properties.png</file>
-        <file>icons16x16/file-closeProj.png</file>
         <file>icons16x16/file-exit.png</file>
-        <file>icons16x16/sprite-document.png</file>
         <file>icons16x16/sprite-folder.png</file>
-        <file>icons16x16/audio-document.png</file>
         <file>icons16x16/audio-folder.png</file>
-        <file>icons16x16/folder.png</file>
-        <file>icons16x16/font-document.png</file>
         <file>icons16x16/font-folder.png</file>
         <file>icons16x16/entity-folder.png</file>
         <file>icons16x16/particle-folder.png</file>
         <file>icons16x16/shader-folder.png</file>
         <file>icons16x16/spine-folder.png</file>
-        <file>icons16x16/particle-document.png</file>
-        <file>icons16x16/spine-document.png</file>
-        <file>icons16x16/atlas-frame.png</file>
-        <file>icons16x16/atlas-frameWarning.png</file>
         <file>icons16x16/debug-connected.png</file>
         <file>icons16x16/debug-notConnected.png</file>
         <file>icons16x16/generic-add.png</file>
@@ -58,7 +45,79 @@
         <file>icons16x16/atlas-replaceFrame.png</file>
         <file>icons16x16/generic-settings.png</file>
         <file>icons16x16/code.png</file>
-        <file>icons16x16/folder-new.png</file>
         <file>icons16x16/smiley-sad.gif</file>
+        <file>icons16x16/file-openProject.png</file>
+        <file>icons16x16/items/Atlas.png</file>
+        <file>icons16x16/items/Atlas-Close.png</file>
+        <file>icons16x16/items/Atlas-Delete.png</file>
+        <file>icons16x16/items/Atlas-Dirty.png</file>
+        <file>icons16x16/items/Atlas-New.png</file>
+        <file>icons16x16/items/Atlas-Open.png</file>
+        <file>icons16x16/items/Atlas-Settings.png</file>
+        <file>icons16x16/items/Atlas-Warning.png</file>
+        <file>icons16x16/items/Audio.png</file>
+        <file>icons16x16/items/Audio-Close.png</file>
+        <file>icons16x16/items/Audio-Delete.png</file>
+        <file>icons16x16/items/Audio-Dirty.png</file>
+        <file>icons16x16/items/Audio-New.png</file>
+        <file>icons16x16/items/Audio-Open.png</file>
+        <file>icons16x16/items/Audio-Settings.png</file>
+        <file>icons16x16/items/Audio-Warning.png</file>
+        <file>icons16x16/items/Entity.png</file>
+        <file>icons16x16/items/Entity-Close.png</file>
+        <file>icons16x16/items/Entity-Delete.png</file>
+        <file>icons16x16/items/Entity-Dirty.png</file>
+        <file>icons16x16/items/Entity-New.png</file>
+        <file>icons16x16/items/Entity-Open.png</file>
+        <file>icons16x16/items/Entity-Settings.png</file>
+        <file>icons16x16/items/Entity-Warning.png</file>
+        <file>icons16x16/items/Font.png</file>
+        <file>icons16x16/items/Font-Close.png</file>
+        <file>icons16x16/items/Font-Delete.png</file>
+        <file>icons16x16/items/Font-Dirty.png</file>
+        <file>icons16x16/items/Font-New.png</file>
+        <file>icons16x16/items/Font-Open.png</file>
+        <file>icons16x16/items/Font-Settings.png</file>
+        <file>icons16x16/items/Font-Warning.png</file>
+        <file>icons16x16/items/Particles.png</file>
+        <file>icons16x16/items/Particles-Close.png</file>
+        <file>icons16x16/items/Particles-Delete.png</file>
+        <file>icons16x16/items/Particles-Dirty.png</file>
+        <file>icons16x16/items/Particles-New.png</file>
+        <file>icons16x16/items/Particles-Open.png</file>
+        <file>icons16x16/items/Particles-Settings.png</file>
+        <file>icons16x16/items/Particles-Warning.png</file>
+        <file>icons16x16/items/Prefix.png</file>
+        <file>icons16x16/items/Prefix-Close.png</file>
+        <file>icons16x16/items/Prefix-Delete.png</file>
+        <file>icons16x16/items/Prefix-Dirty.png</file>
+        <file>icons16x16/items/Prefix-New.png</file>
+        <file>icons16x16/items/Prefix-Open.png</file>
+        <file>icons16x16/items/Prefix-Settings.png</file>
+        <file>icons16x16/items/Prefix-Warning.png</file>
+        <file>icons16x16/items/Project.png</file>
+        <file>icons16x16/items/Project-Close.png</file>
+        <file>icons16x16/items/Project-Delete.png</file>
+        <file>icons16x16/items/Project-Dirty.png</file>
+        <file>icons16x16/items/Project-New.png</file>
+        <file>icons16x16/items/Project-Open.png</file>
+        <file>icons16x16/items/Project-Settings.png</file>
+        <file>icons16x16/items/Project-Warning.png</file>
+        <file>icons16x16/items/Spine.png</file>
+        <file>icons16x16/items/Spine-Close.png</file>
+        <file>icons16x16/items/Spine-Delete.png</file>
+        <file>icons16x16/items/Spine-Dirty.png</file>
+        <file>icons16x16/items/Spine-New.png</file>
+        <file>icons16x16/items/Spine-Open.png</file>
+        <file>icons16x16/items/Spine-Settings.png</file>
+        <file>icons16x16/items/Spine-Warning.png</file>
+        <file>icons16x16/items/Sprite.png</file>
+        <file>icons16x16/items/Sprite-Close.png</file>
+        <file>icons16x16/items/Sprite-Delete.png</file>
+        <file>icons16x16/items/Sprite-Dirty.png</file>
+        <file>icons16x16/items/Sprite-New.png</file>
+        <file>icons16x16/items/Sprite-Open.png</file>
+        <file>icons16x16/items/Sprite-Settings.png</file>
+        <file>icons16x16/items/Sprite-Warning.png</file>
     </qresource>
 </RCC>

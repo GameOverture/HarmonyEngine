@@ -274,7 +274,7 @@
   <action name="actionNewProject">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/file-newProj.png</normaloff>:/icons16x16/file-newProj.png</iconset>
+     <normaloff>:/icons16x16/items/Project-New.png</normaloff>:/icons16x16/items/Project-New.png</iconset>
    </property>
    <property name="text">
     <string>New &amp;Project</string>
@@ -346,7 +346,7 @@
   <action name="actionOpenProject">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/file-openProject.png</normaloff>:/icons16x16/file-openProject.png</iconset>
+     <normaloff>:/icons16x16/items/Project-Open.png</normaloff>:/icons16x16/items/Project-Open.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Open Project</string>
@@ -409,7 +409,7 @@
   <action name="actionCloseProject">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/file-closeProj.png</normaloff>:/icons16x16/file-closeProj.png</iconset>
+     <normaloff>:/icons16x16/items/Project-Close.png</normaloff>:/icons16x16/items/Project-Close.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Close Project</string>
@@ -466,7 +466,7 @@
   <action name="actionNewSprite">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/sprite-document.png</normaloff>:/icons16x16/sprite-document.png</iconset>
+     <normaloff>:/icons16x16/items/Sprite-New.png</normaloff>:/icons16x16/items/Sprite-New.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Sprite</string>
@@ -479,6 +479,10 @@
    </property>
   </action>
   <action name="actionRename">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
+   </property>
    <property name="text">
     <string>Rename</string>
    </property>
@@ -489,7 +493,7 @@
   <action name="actionNewFont">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/font-document.png</normaloff>:/icons16x16/font-document.png</iconset>
+     <normaloff>:/icons16x16/items/Font-New.png</normaloff>:/icons16x16/items/Font-New.png</iconset>
    </property>
    <property name="text">
     <string>Font</string>
@@ -501,7 +505,7 @@
   <action name="actionNewParticle">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/particle-document.png</normaloff>:/icons16x16/particle-document.png</iconset>
+     <normaloff>:/icons16x16/items/Particles-New.png</normaloff>:/icons16x16/items/Particles-New.png</iconset>
    </property>
    <property name="text">
     <string>Particle Effect</string>
@@ -516,7 +520,7 @@
   <action name="actionNewAudio">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/audio-document.png</normaloff>:/icons16x16/audio-document.png</iconset>
+     <normaloff>:/icons16x16/items/Audio-New.png</normaloff>:/icons16x16/items/Audio-New.png</iconset>
    </property>
    <property name="text">
     <string>Audio</string>
@@ -581,7 +585,7 @@
   </action>
   <action name="actionAudioManager">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset>
      <normaloff>:/icons16x16/audio-document.png</normaloff>:/icons16x16/audio-document.png</iconset>
    </property>
    <property name="text">
@@ -592,6 +596,10 @@
    </property>
   </action>
   <action name="actionProjectSettings">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-settings.png</normaloff>:/icons16x16/generic-settings.png</iconset>
+   </property>
    <property name="text">
     <string>Project Settings</string>
    </property>

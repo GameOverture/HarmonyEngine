@@ -99,12 +99,12 @@ public:
     void WriteMetaSettings(QJsonArray frameArray);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    AtlasFrame *CreateFrame(quint32 uiId, quint32 uiCRC, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, eAtlasNodeType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
+    AtlasFrame *CreateFrame(quint32 uiId, quint32 uiCRC, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, HyGuiItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
     void RemoveFrame(AtlasFrame *pFrame);
     
     bool TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId);
 
-    AtlasFrame *GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, eAtlasNodeType eType);
+    AtlasFrame *GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType);
     void ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
 
     QList<AtlasFrame *> RequestFrames(ProjectItem *pItem);
@@ -115,7 +115,7 @@ public:
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     QSet<AtlasFrame *> ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId);
-    AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, eAtlasNodeType eType);
+    AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, HyGuiItemType eType);
 
     void SaveData();
     

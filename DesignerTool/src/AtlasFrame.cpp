@@ -17,7 +17,7 @@ AtlasFrame::AtlasFrame(quint32 uiId,
                        quint32 uiAtlasGrpId,
                        QString sN,
                        QRect rAlphaCrop,
-                       eAtlasNodeType eType,
+                       HyGuiItemType eType,
                        int iW,
                        int iH,
                        int iX,
@@ -124,7 +124,7 @@ QSet<ProjectItem *> AtlasFrame::GetLinks()
     return m_DependencySet;
 }
 
-eAtlasNodeType AtlasFrame::GetType()
+HyGuiItemType AtlasFrame::GetType()
 {
     return m_eType;
 }
@@ -235,9 +235,9 @@ void AtlasFrame::UpdateTreeItemIconAndToolTip()
     {
         // Duplicates are not considered and error so don't mark the icon as a warning (if only error)
         if(m_uiErrors == 0)
-            m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(m_eType));
+            m_pTreeWidgetItem->setIcon(0, HyGlobal::ItemIcon(m_eType, SUBICON_None));
         else
-            m_pTreeWidgetItem->setIcon(0, HyGlobal::AtlasIcon(ATLAS_Frame_Warning));
+            m_pTreeWidgetItem->setIcon(0, HyGlobal::ItemIcon(m_eType, SUBICON_Warning));
         
         m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
     }
@@ -261,7 +261,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
     m_iWidth = newImage.width();
     m_iHeight = newImage.height();
 
-    if(m_eType != ATLAS_Font && m_eType != ATLAS_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
+    if(m_eType != ITEM_Font && m_eType != ITEM_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
         m_rAlphaCrop = ImagePacker::crop(newImage);
     else
         m_rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
