@@ -23,15 +23,12 @@
 
 SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
                                                                     ui(new Ui::SpriteWidget),
-                                                                    //m_pDraw(nullptr),
                                                                     m_ItemRef(itemRef),
                                                                     m_bPlayActive(false),
                                                                     m_fElapsedTime(0.0),
                                                                     m_bIsBounced(false)
 {
     ui->setupUi(this);
-
-    //RefreshDraw(hyAppRef);
 
     ui->txtPrefixAndName->setText(m_ItemRef.GetName(true));
     
@@ -62,7 +59,6 @@ SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(pare
 
 SpriteWidget::~SpriteWidget()
 {
-    //delete m_pDraw;
     delete ui;
 }
 
@@ -113,28 +109,6 @@ void SpriteWidget::OnGiveMenuActions(QMenu *pMenu)
     pMenu->addAction(ui->actionApplyToAll);
 }
 
-//void SpriteWidget::OnShow()
-//{
-//    m_pDraw->Show();
-//}
-
-//void SpriteWidget::OnHide()
-//{
-//    m_pDraw->Hide();
-//}
-
-//void SpriteWidget::OnUpdate()
-//{
-//    int iFrameIndex = ui->framesView->currentIndex().row();
-//    if(iFrameIndex >= 0)
-//    {
-//        SpriteFrame *pFrame = GetCurStateData()->GetFramesModel()->GetFrameAt(iFrameIndex);
-//        m_pDraw->SetFrame(pFrame->m_pFrame->GetId(), glm::vec2(pFrame->GetRenderOffset().x(), pFrame->GetRenderOffset().y()));
-
-//        UpdateTimeStep();
-//    }
-//}
-
 bool SpriteWidget::IsPlayingAnim()
 {
     return m_bPlayActive;
@@ -151,90 +125,6 @@ void SpriteWidget::GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut)
     iFrameIndexOut = ui->framesView->currentIndex().row();
 }
 
-void SpriteWidget::UpdateTimeStep(SpriteDraw *pDraw)
-{
-    int iFrameIndex = ui->framesView->currentIndex().row();
-    if(iFrameIndex < 0)
-        return;
-    
-    SpriteFrame *pFrame = GetCurStateData()->GetFramesModel()->GetFrameAt(ui->framesView->currentIndex().row());
-
-    if(m_bPlayActive == false && pFrame != NULL)
-        return;
-
-    m_fElapsedTime += HyUpdateDelta();
-    while(m_fElapsedTime >= pFrame->m_fDuration)
-    {
-        bool bBounce = ui->chkBounce->isChecked();
-        bool bReverse = ui->chkReverse->isChecked();
-        bool bLoop = ui->chkLoop->isChecked();
-        int iNumFrames = GetCurStateData()->GetFramesModel()->rowCount();
-
-        int iNextRow = ui->framesView->currentIndex().row();
-
-        if(bReverse == false)
-        {
-            m_bIsBounced ? iNextRow-- : iNextRow++;
-
-            if(iNextRow < 0)
-            {
-                m_bIsBounced = false;
-
-                if(bLoop)
-                    iNextRow = 1;
-                else
-                    on_actionPlay_triggered();  // Stop playback
-            }
-            else if(iNextRow >= iNumFrames)
-            {
-                if(bBounce)
-                {
-                    iNextRow = iNumFrames - 2;
-                    m_bIsBounced = true;
-                }
-                else if(bLoop)
-                    iNextRow = 0;
-                else
-                    on_actionPlay_triggered();  // Stop playback
-            }
-        }
-        else
-        {
-            m_bIsBounced ? iNextRow++ : iNextRow--;
-
-            if(iNextRow < 0)
-            {
-                if(bBounce)
-                {
-                    iNextRow = 1;
-                    m_bIsBounced = true;
-                }
-                else if(bLoop)
-                    iNextRow = iNumFrames - 1;
-                else
-                    on_actionPlay_triggered();  // Stop playback
-            }
-            else if(iNextRow >= iNumFrames)
-            {
-                m_bIsBounced = false;
-
-                if(bLoop)
-                    iNextRow = iNumFrames - 2;
-                else
-                    on_actionPlay_triggered();  // Stop playback
-            }
-        }
-
-        if(m_bPlayActive)
-        {
-            ui->framesView->selectRow(iNextRow);
-            m_fElapsedTime -= pFrame->m_fDuration;
-        }
-        else
-            break;
-    }
-}
-
 void SpriteWidget::RefreshData(QVariant param)
 {
     bool bParamOk = false;
@@ -244,15 +134,6 @@ void SpriteWidget::RefreshData(QVariant param)
     else
         UpdateActions();
 }
-
-//void SpriteWidget::RefreshDraw(IHyApplication &hyAppRef)
-//{
-//    delete m_pDraw;
-
-//    m_pDraw = new SpriteDraw(*static_cast<SpriteModel *>(m_ItemRef.GetModel()), hyAppRef);
-//    m_pDraw->Load();
-//    m_pDraw->SetEnabled(false);
-//}
 
 void SpriteWidget::UpdateActions()
 {

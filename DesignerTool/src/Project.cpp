@@ -343,7 +343,7 @@ ProjectItem *Project::GetCurrentOpenItem()
 void Project::OpenItem(ProjectItem *pItem)
 {
     if(m_pCurOpenItem && m_pCurOpenItem != pItem)
-        m_pCurOpenItem->WidgetHide(*this);
+        m_pCurOpenItem->RenderHide(*this);
 
     if(m_pCurOpenItem == pItem)
         return;
@@ -362,7 +362,7 @@ void Project::OpenItem(ProjectItem *pItem)
             m_pTabBar->setCurrentIndex(i);
             m_pTabBar->blockSignals(false);
 
-            m_pCurOpenItem->WidgetShow(*this);
+            m_pCurOpenItem->RenderShow(*this);
             break;
         }
     }
@@ -380,7 +380,7 @@ void Project::OpenItem(ProjectItem *pItem)
         m_pTabBar->setCurrentIndex(iIndex);
         m_pTabBar->blockSignals(false);
 
-        m_pCurOpenItem->WidgetShow(*this);
+        m_pCurOpenItem->RenderShow(*this);
     }
 }
 
@@ -457,7 +457,7 @@ void Project::OnHarmonyLoaded()
         }
 
         if(m_pTabBar->currentIndex() >= 0)
-            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetShow(*this);
+            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->RenderShow(*this);
     }
     
     MainWindow::SetSelectedProjWidgets(this);
@@ -566,7 +566,7 @@ void Project::RefreshCurrentItemDraw()
     ProjectItem *pCurrentItem = m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>();
 
     pCurrentItem->WidgetRefreshDraw(*this);
-    pCurrentItem->WidgetShow(*this);
+    pCurrentItem->RenderShow(*this);
 }
 
 bool Project::CloseAllTabs()

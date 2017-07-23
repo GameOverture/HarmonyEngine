@@ -182,20 +182,15 @@ void ProjectItem::WidgetUnload(IHyApplication &hyApp)
     m_pDraw = nullptr;
 }
 
-void ProjectItem::WidgetShow(IHyApplication &hyApp)
+void ProjectItem::RenderShow(IHyApplication &hyApp)
 {
     m_pDraw->Show();
 }
 
-void ProjectItem::WidgetHide(IHyApplication &hyApp)
+void ProjectItem::RenderHide(IHyApplication &hyApp)
 {
     m_pDraw->Hide();
 }
-
-//void ProjectItem::WidgetUpdate(IHyApplication &hyApp)
-//{
-//    m_pDraw->WidgetUpdate(m_pWidget);
-//}
 
 void ProjectItem::BlockAllWidgetSignals(bool bBlock)
 {
