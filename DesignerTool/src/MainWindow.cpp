@@ -449,7 +449,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 {
     DlgNewItem *pDlg = new DlgNewItem(m_pCurSelectedProj, eItem, this);
     if(pDlg->exec())
-        ui->explorer->AddItem(eItem, pDlg->GetPrefix(), pDlg->GetName(), true);
+        ui->explorer->AddNewItem(eItem, pDlg->GetPrefix(), pDlg->GetName());
 
     delete pDlg;
 }

@@ -70,7 +70,7 @@ void ProjectItem::LoadModel()
         m_pModel = new FontModel(this, m_SaveValue.toObject());
         break;
     default:
-        HyGuiLog("Improper ItemWidget type created: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unimplemented ItemWidget type created: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
 }
@@ -96,7 +96,7 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
         static_cast<FontWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
         break;
     default:
-        HyGuiLog("Improper item GiveMenuActions(): " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unimplemented item GiveMenuActions(): " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
 }
@@ -216,7 +216,7 @@ void ProjectItem::WidgetRefreshData(QVariant param)
         static_cast<FontWidget *>(m_pWidget)->RefreshData(param);
         break;
     default:
-        HyGuiLog("Unsupported ProjectItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unimplemented ProjectItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
 }
