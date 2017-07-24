@@ -119,5 +119,6 @@
         <file>icons16x16/items/Sprite-Open.png</file>
         <file>icons16x16/items/Sprite-Settings.png</file>
         <file>icons16x16/items/Sprite-Warning.png</file>
+        <file>icons16x16/Harmony.png</file>
     </qresource>
 </RCC>

@@ -30,10 +30,8 @@
 #include <QTcpSocket>
 #include <QMessageBox>
 #include <QDesktopServices>
-
+#include <QDate>
 #include <QLabel>
-
-#define HYGUIVERSION_STRING "v0.0.1"
 
 /*static*/ MainWindow * MainWindow::sm_pInstance = NULL;
 
@@ -79,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     
     SetSelectedProj(NULL);
 
-    HyGuiLog("Harmony Designer Tool " % QString(HYGUIVERSION_STRING), LOGTYPE_Title);
+    HyGuiLog("Harmony Designer Tool", LOGTYPE_Title);
     HyGuiLog("Initializing...", LOGTYPE_Normal);
     
     ui->actionCloseProject->setEnabled(false);
@@ -180,11 +178,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     }
     m_Settings.endGroup();
 
-    // Restore opened items/tabs
-
-    // Append version to window title
-    setWindowTitle(windowTitle() % " " % HYGUIVERSION_STRING);
-
+    // TODO: Restore opened items/tabs here
+    //
 
     QLabel *pStatusLbl = new QLabel;
     statusBar()->showMessage("Ready");
@@ -634,7 +629,7 @@ void MainWindow::on_actionLaunchIDE_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, HyDesignerToolName, "Harmony Engine and Designer Tool\nCopyright (c) 2016 Jason Knobler");
+    QMessageBox::about(this, HyDesignerToolName, "Harmony Engine and Designer Tool\n\nJason Knobler " % QString::number(QDate::currentDate().year()));
 }
 
 void MainWindow::on_actionAudioManager_triggered()

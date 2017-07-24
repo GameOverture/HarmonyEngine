@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Harmony Designer Tool</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="res/DesignerTool.qrc">
+    <normaloff>:/icons16x16/Harmony.png</normaloff>:/icons16x16/Harmony.png</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="centralVerticalLayout">
     <property name="leftMargin">
