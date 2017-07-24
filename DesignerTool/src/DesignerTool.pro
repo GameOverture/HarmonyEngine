@@ -143,6 +143,8 @@ FORMS    += \
     AtlasWidget.ui \
     DlgProjectSettings.ui
 
+RC_FILE = DesignerTool.rc
+
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER HY_PLATFORM_GUI
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/bin/x64/ -lHarmonyQt

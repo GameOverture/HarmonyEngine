@@ -120,5 +120,6 @@
         <file>icons16x16/items/Sprite-Settings.png</file>
         <file>icons16x16/items/Sprite-Warning.png</file>
         <file>icons16x16/Harmony.png</file>
+        <file>icons64x64/HarmonyLogo.png</file>
     </qresource>
 </RCC>
