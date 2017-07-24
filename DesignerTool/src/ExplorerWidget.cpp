@@ -76,7 +76,7 @@ void ExplorerWidget::AddNewItem(HyGuiItemType eNewItemType, const QString sPrefi
         return;
     }
 
-    ExplorerItem *pItem = new ProjectItem(*pCurProj, eNewItemType, sPrefix, sName, QJsonValue());
+    ExplorerItem *pItem = new ProjectItem(*pCurProj, eNewItemType, sPrefix, sName, QJsonValue(), true);
     
     // Get the relative path from [ProjectDir->ItemPath] e.g. "Sprites/SpritePrefix/MySprite"
     QString sRelativePath = pItem->GetPath();
@@ -142,8 +142,7 @@ void ExplorerWidget::AddNewItem(HyGuiItemType eNewItemType, const QString sPrefi
         pExpandItem = pExpandItem->parent();
     }
 
-    pItem->SetTreeItemSubIcon(SUBICON_Dirty);
-
+    pItem->SetTreeItemSubIcon(SUBICON_New);
     MainWindow::OpenItem(static_cast<ProjectItem *>(pItem));
 }
 

@@ -31,6 +31,7 @@ class ProjectItem : public ExplorerItem
 
     Project &               m_ProjectRef;
     QJsonValue              m_SaveValue;
+    bool                    m_bExistencePendingSave;
 
     // Loaded in constructor
     IModel *                m_pModel;
@@ -43,7 +44,7 @@ class ProjectItem : public ExplorerItem
     IDraw *                 m_pDraw;
     
 public:
-    ProjectItem(Project &projRef, HyGuiItemType eType, const QString sPrefix, const QString sName, QJsonValue initValue);
+    ProjectItem(Project &projRef, HyGuiItemType eType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave);
     virtual ~ProjectItem();
 
     void LoadModel();
@@ -57,6 +58,7 @@ public:
     
     void GiveMenuActions(QMenu *pMenu);
     void Save();
+    bool IsExistencePendingSave();
     bool IsSaveClean();
     void DiscardChanges();
     

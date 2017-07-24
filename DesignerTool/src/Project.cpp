@@ -205,13 +205,13 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
                     switch(subDirList[i])
                     {
                     case ITEM_DirAudio:
-                        pNewDataItem = new ProjectItem(*this, ITEM_Audio, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new ProjectItem(*this, ITEM_Audio, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
                         break;
                     case ITEM_DirFonts:
-                        pNewDataItem = new ProjectItem(*this, ITEM_Font, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new ProjectItem(*this, ITEM_Font, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
                         break;
                     case ITEM_DirSprites:
-                        pNewDataItem = new ProjectItem(*this, ITEM_Sprite, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new ProjectItem(*this, ITEM_Sprite, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
                         break;
                     case ITEM_DirParticles:
                     case ITEM_DirSpine:
@@ -373,7 +373,7 @@ void Project::OpenItem(ProjectItem *pItem)
         m_pCurOpenItem->WidgetLoad(*this);
 
         m_pTabBar->blockSignals(true);
-        int iIndex = m_pTabBar->addTab(m_pCurOpenItem->GetIcon(SUBICON_None), m_pCurOpenItem->GetName(false));
+        int iIndex = m_pTabBar->addTab(m_pCurOpenItem->GetIcon(m_pCurOpenItem->IsExistencePendingSave() ? SUBICON_New : SUBICON_None), m_pCurOpenItem->GetName(false));
         QVariant v;
         v.setValue(m_pCurOpenItem);
         m_pTabBar->setTabData(iIndex, v);
@@ -638,4 +638,7 @@ void Project::OnCloseTab(int iIndex)
         m_pCurOpenItem = nullptr;
 
     m_pTabBar->removeTab(iIndex);
+
+    if(pItem->IsExistencePendingSave())
+        pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
 }

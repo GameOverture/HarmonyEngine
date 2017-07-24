@@ -28,12 +28,14 @@ ProjectItem::ProjectItem(Project &projRef,
                          HyGuiItemType eType,
                          const QString sPrefix,
                          const QString sName,
-                         QJsonValue initValue) :    ExplorerItem(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
-                                                    m_ProjectRef(projRef),
-                                                    m_SaveValue(initValue),
-                                                    m_pModel(nullptr),
-                                                    m_pWidget(nullptr),
-                                                    m_pDraw(nullptr)
+                         QJsonValue initValue,
+                         bool bIsPendingSave) : ExplorerItem(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
+                                                m_ProjectRef(projRef),
+                                                m_SaveValue(initValue),
+                                                m_bExistencePendingSave(bIsPendingSave),
+                                                m_pModel(nullptr),
+                                                m_pWidget(nullptr),
+                                                m_pDraw(nullptr)
 {
     m_pUndoStack = new QUndoStack(this);
     m_pActionUndo = m_pUndoStack->createUndoAction(nullptr, "&Undo");
@@ -107,11 +109,18 @@ void ProjectItem::Save()
 
     GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue);
     m_pUndoStack->setClean();
+
+    m_bExistencePendingSave = false;
+}
+
+bool ProjectItem::IsExistencePendingSave()
+{
+    return m_bExistencePendingSave;
 }
 
 bool ProjectItem::IsSaveClean()
 {
-    return m_pUndoStack->isClean();
+    return m_pUndoStack->isClean() && m_bExistencePendingSave == false;
 }
 
 void ProjectItem::DiscardChanges()
@@ -242,11 +251,13 @@ void ProjectItem::on_undoStack_cleanChanged(bool bClean)
             {
                 pTabBar->setTabText(i, GetName(false));
                 pTabBar->setTabIcon(i, GetIcon(SUBICON_None));
+                SetTreeItemSubIcon(SUBICON_None);
             }
             else
             {
                 pTabBar->setTabText(i, GetName(false) + "*");
                 pTabBar->setTabIcon(i, GetIcon(SUBICON_Dirty));
+                SetTreeItemSubIcon(SUBICON_Dirty);
             }
         }
         
