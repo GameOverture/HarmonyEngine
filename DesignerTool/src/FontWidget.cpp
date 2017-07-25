@@ -167,7 +167,13 @@ void FontWidget::UpdateActions()
 {
     bool bGeneratePreview = false;
 
-    QSize curSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(TEMP_FONT_ATLAS_INDEX);
+    AtlasFrame *pAtlasFrame = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlasFrame();
+
+    uint uiAtlasGrpIndex = 0;
+    if(pAtlasFrame != nullptr)
+        uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(pAtlasFrame->GetAtlasGrpId());
+
+    QSize curSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
     if(m_PrevAtlasSize.width() < curSize.width() || m_PrevAtlasSize.height() < curSize.height())
         bGeneratePreview = true;
 

@@ -170,7 +170,7 @@ void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelD
 
 /*virtual*/ void FontDraw::OnUpdate() /*override*/
 {
-    texture_atlas_t *pAtlas = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlas();
+    texture_atlas_t *pAtlas = static_cast<FontModel *>(m_pProjItem->GetModel())->GetFtglAtlas();
     unsigned char *pAtlasPixelData = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPixelData();
     uint uiAtlasPixelDataSize = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPixelDataSize();
     if(pAtlas == nullptr || pAtlasPixelData == nullptr)

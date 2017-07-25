@@ -17,9 +17,6 @@
 
 #include <QJsonArray>
 
-// TODO: Add combo box to font widget that can select which atlas group this font's sub-atlas belongs to
-#define TEMP_FONT_ATLAS_INDEX 0
-
 struct FontTypeface
 {
     int                 iReferenceCount;
@@ -125,7 +122,8 @@ public:
 	
 	QJsonObject GetTypefaceObj(int iTypefaceIndex);
     
-    texture_atlas_t *GetAtlas();
+    texture_atlas_t *GetFtglAtlas();
+    AtlasFrame *GetAtlasFrame();
     unsigned char *GetAtlasPixelData();
     uint GetAtlasPixelDataSize();
     

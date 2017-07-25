@@ -239,9 +239,14 @@ QJsonObject FontModel::GetTypefaceObj(int iTypefaceIndex)
     return m_TypefaceArray.at(iTypefaceIndex).toObject();
 }
 
-texture_atlas_t *FontModel::GetAtlas()
+texture_atlas_t *FontModel::GetFtglAtlas()
 {
     return m_pFtglAtlas;
+}
+
+AtlasFrame *FontModel::GetAtlasFrame()
+{
+    return m_pTrueAtlasFrame;
 }
 
 unsigned char *FontModel::GetAtlasPixelData()
@@ -339,8 +344,11 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
     for(int i = 0; i < m_MasterStageList.count(); ++i)
         m_MasterStageList[i]->iReferenceCount = m_MasterStageList[i]->iTmpReferenceCount;
 
-    // if 'bFindBestFit' == true, adjust atlas dimentions until we utilize efficient space on the smallest texture
-    QSize atlasSize = m_pItem->GetProject().GetAtlasModel().GetAtlasDimensions(TEMP_FONT_ATLAS_INDEX);
+    uint uiAtlasGrpIndex = 0;
+    if(m_pTrueAtlasFrame != nullptr)
+        uiAtlasGrpIndex = m_pItem->GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_pTrueAtlasFrame->GetAtlasGrpId());
+
+    QSize atlasSize = m_pItem->GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
     float fAtlasSizeModifier = 1.0f;
     bool bDoInitialShrink = true;
     size_t iNumMissedGlyphs = 0;
@@ -413,7 +421,7 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
         if(m_pTrueAtlasFrame)
             m_pItem->GetProject().GetAtlasModel().ReplaceFrame(m_pTrueAtlasFrame, m_pItem->GetName(false), fontAtlasImage, true);
         else
-            m_pTrueAtlasFrame = m_pItem->GetProject().GetAtlasModel().GenerateFrame(m_pItem, m_pItem->GetName(false), fontAtlasImage, TEMP_FONT_ATLAS_INDEX, ITEM_Font);
+            m_pTrueAtlasFrame = m_pItem->GetProject().GetAtlasModel().GenerateFrame(m_pItem, m_pItem->GetName(false), fontAtlasImage, 0, ITEM_Font);
     }
 
     // Signals ItemFont to upload and refresh the preview texture
