@@ -3,7 +3,7 @@
 #include "MainWindow.h"
 
 FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
-                                                                    m_bShowAtlasPreview(false),
+                                                                    m_bShowAtlasPreview(true),
                                                                     m_pAtlasCamera(nullptr),
                                                                     m_pDrawAtlasPreview(nullptr),
                                                                     m_DrawAtlasOutline(this),
@@ -15,12 +15,11 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
     m_pAtlasCamera->pos.Set(0.0f, -2500.0f);
     
     m_DrawAtlasOutline.SetTint(1.0f, 0.0f, 0.0f);
-    ChildAppend(m_DrawAtlasOutline);
 
     m_DividerLine.SetAsQuad(10000.0f, 10.0f, false);
     m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetResolution().y / 2 - 5.0f);
     m_DividerLine.SetTint(0.0f, 0.0f, 0.0f);
-    //m_DividerLine.UseWindowCoordinates();
+    m_DividerLine.UseWindowCoordinates();
     
     ShowSubAtlas(m_bShowAtlasPreview);
 }
@@ -57,7 +56,7 @@ void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelD
 
     // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
     delete m_pDrawAtlasPreview;
-    m_pDrawAtlasPreview = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), nullptr);
+    m_pDrawAtlasPreview = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), this);
     m_pDrawAtlasPreview->Load();
     m_pDrawAtlasPreview->SetTextureSource(0, 0, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height));
 

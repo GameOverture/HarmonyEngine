@@ -179,6 +179,7 @@ void ProjectItem::WidgetLoad(IHyApplication &hyApp)
     }
     
     m_pDraw->ApplyJsonData(true);
+    m_pDraw->Load();
     m_pDraw->SetEnabled(false);
 }
 
