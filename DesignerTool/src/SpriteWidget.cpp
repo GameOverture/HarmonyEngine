@@ -29,8 +29,6 @@ SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(pare
                                                                     m_bIsBounced(false)
 {
     ui->setupUi(this);
-
-    ui->txtPrefixAndName->setText(m_ItemRef.GetName(true));
     
     ui->btnAddState->setDefaultAction(ui->actionAddState);
     ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);

@@ -37,8 +37,6 @@ FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
 
     m_PrevAtlasSize.setWidth(0);
     m_PrevAtlasSize.setHeight(0);
-
-    ui->txtPrefixAndName->setText(m_ItemRef.GetName(true));
     
     ui->btnAddState->setDefaultAction(ui->actionAddState);
     ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);

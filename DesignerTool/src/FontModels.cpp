@@ -379,7 +379,7 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
         else if(bDoInitialShrink)
             fAtlasSizeModifier = static_cast<float>(m_pFtglAtlas->used) / static_cast<float>(m_pFtglAtlas->width * m_pFtglAtlas->height);
     }
-    while(bStoreIntoAtlasManager && (iNumMissedGlyphs != 0 || bDoInitialShrink));
+    while(bDoInitialShrink || (iNumMissedGlyphs != 0));
 
     if(iNumMissedGlyphs)
     {
