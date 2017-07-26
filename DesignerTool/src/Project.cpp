@@ -38,8 +38,6 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
                                                         m_pAudioMan(nullptr),
                                                         m_pTabBar(nullptr),
                                                         m_pCurOpenItem(nullptr),
-                                                        m_ActionSave(0),
-                                                        m_ActionSaveAll(0),
                                                         m_bHasError(false)
 {
     QFile projFile(sNewProjectFilePath);
@@ -75,24 +73,6 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     m_pTreeItemPtr->setText(0, GetName(false));
     m_Init.sGameName = GetName(false).toStdString();
     m_Init.sDataDir = GetAssetsAbsPath().toStdString();
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    m_ActionSave.setText("&Save");
-    m_ActionSave.setIcon(QIcon(":/icons16x16/file-save.png"));
-    m_ActionSave.setShortcuts(QKeySequence::Save);
-    m_ActionSave.setShortcutContext(Qt::ApplicationShortcut);
-    m_ActionSave.setEnabled(false);
-    QObject::connect(&m_ActionSave, SIGNAL(triggered(bool)),
-                     this, SLOT(on_save_triggered()));
-
-    m_ActionSaveAll.setText("Save &All");
-    m_ActionSaveAll.setIcon(QIcon(":/icons16x16/file-saveAll.png"));
-    m_ActionSaveAll.setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
-    m_ActionSaveAll.setShortcutContext(Qt::ApplicationShortcut);
-    m_ActionSaveAll.setEnabled(false);
-    QObject::connect(&m_ActionSaveAll, SIGNAL(triggered(bool)),
-                     this, SLOT(on_saveAll_triggered()));
     
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -320,21 +300,6 @@ QTabBar *Project::GetTabBar()
     return m_pTabBar;
 }
 
-QList<QAction *> Project::GetSaveActions()
-{
-    QList<QAction *> actionList;
-    actionList.append(&m_ActionSave);
-    actionList.append(&m_ActionSaveAll);
-    
-    return actionList;
-}
-
-void Project::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
-{
-    m_ActionSave.setEnabled(bSaveEnabled);
-    m_ActionSaveAll.setEnabled(bSaveAllEnabled);
-}
-
 ProjectItem *Project::GetCurrentOpenItem()
 {
     return m_pCurOpenItem;
@@ -382,6 +347,8 @@ void Project::OpenItem(ProjectItem *pItem)
 
         m_pCurOpenItem->RenderShow(*this);
     }
+
+    ApplySaveEnables();
 }
 
 // IHyApplication override
@@ -461,6 +428,24 @@ void Project::OnHarmonyLoaded()
     }
     
     MainWindow::SetSelectedProjWidgets(this);
+}
+
+void Project::ApplySaveEnables()
+{
+    bool bCurItemDirty = false;
+    bool bAnyItemDirty = false;
+    for(int i = 0; i < m_pTabBar->count(); ++i)
+    {
+        ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();
+        if(pItem->IsSaveClean() == false)
+        {
+            bAnyItemDirty = true;
+            if(m_pTabBar->currentIndex() == i)
+                bCurItemDirty = true;
+        }
+    }
+
+    MainWindow::SetSaveEnabled(bCurItemDirty, bAnyItemDirty);
 }
 
 void Project::SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal)
@@ -588,31 +573,6 @@ void Project::OnTabBarCurrentChanged(int iIndex)
     ProjectItem *pItem = v.value<ProjectItem *>();
 
     MainWindow::OpenItem(pItem);
-}
-
-void Project::on_save_triggered()
-{
-    int iIndex = m_pTabBar->currentIndex();
-    QVariant v = m_pTabBar->tabData(iIndex);
-    ProjectItem *pItem = v.value<ProjectItem *>();
-    pItem->Save();
-    
-    HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
-}
-
-void Project::on_saveAll_triggered()
-{
-    for(int i = 0; i < m_pTabBar->count(); ++i)
-    {
-        // TODO: instead look for dirty?
-        if(m_pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
-        {
-            ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();
-            pItem->Save();
-            
-            HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
-        }
-    }
 }
 
 void Project::OnCloseTab(int iIndex)

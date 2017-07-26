@@ -89,9 +89,6 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->actionSaveAll->setEnabled(false);
     ui->actionLaunchIDE->setEnabled(false);
     
-    m_pCurSaveAction = ui->actionSave;
-    m_pCurSaveAllAction = ui->actionSaveAll;
-    
     // Link the actions to their proper widgets
     ui->explorer->addAction(ui->actionProjectSettings);
     ui->explorer->addAction(ui->actionCloseProject);
@@ -282,6 +279,12 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
+/*static*/ void MainWindow::SetSaveEnabled(bool bCurItemDirty, bool bAnyItemDirty)
+{
+    sm_pInstance->ui->actionSave->setEnabled(bCurItemDirty);
+    sm_pInstance->ui->actionSaveAll->setEnabled(bAnyItemDirty);
+}
+
 /*static*/ void MainWindow::SetSelectedProj(Project *pProj)
 {
     if(sm_pInstance->m_pCurSelectedProj == pProj)
@@ -319,17 +322,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         sm_pInstance->ui->stackedTabWidgets->addWidget(sm_pInstance->m_pCurSelectedProj->GetTabBar());
         sm_pInstance->ui->stackedTabWidgets->setCurrentWidget(sm_pInstance->m_pCurSelectedProj->GetTabBar());
         sm_pInstance->m_pCurSelectedProj->GetTabBar()->setParent(sm_pInstance->ui->stackedTabWidgets);
-    }
-    
-    // Replace the save actions in the 'File' menu
-    QList<QAction *> projSaveActionList = sm_pInstance->m_pCurSelectedProj->GetSaveActions();
-    if(sm_pInstance->m_pCurSaveAction != projSaveActionList[0])
-    {
-        sm_pInstance->ui->menu_File->insertActions(sm_pInstance->m_pCurSaveAction, projSaveActionList);
-        sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAction);
-        sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAllAction);
-        sm_pInstance->m_pCurSaveAction = projSaveActionList[0];
-        sm_pInstance->m_pCurSaveAllAction = projSaveActionList[1];
     }
     
     // Project manager widgets
@@ -519,12 +511,39 @@ void MainWindow::on_actionViewProperties_triggered()
 
 void MainWindow::on_actionSave_triggered()
 {
-    
+    if(m_pCurSelectedProj == nullptr)
+    {
+        HyGuiLog("No valid project is active to save.", LOGTYPE_Error);
+        return;
+    }
+
+    QTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
+    int iIndex = pTabBar->currentIndex();
+    QVariant v = pTabBar->tabData(iIndex);
+    ProjectItem *pItem = v.value<ProjectItem *>();
+    pItem->Save();
+
+    HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
 }
 
 void MainWindow::on_actionSaveAll_triggered()
 {
-    
+    if(m_pCurSelectedProj == nullptr)
+    {
+        HyGuiLog("No valid project is active to save all.", LOGTYPE_Error);
+        return;
+    }
+
+    QTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
+    for(int i = 0; i < pTabBar->count(); ++i)
+    {
+        ProjectItem *pItem = pTabBar->tabData(i).value<ProjectItem *>();
+        if(pItem->IsSaveClean() == false)
+        {
+            pItem->Save();
+            HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
+        }
+    }
 }
 
 void MainWindow::on_actionLaunchIDE_triggered()

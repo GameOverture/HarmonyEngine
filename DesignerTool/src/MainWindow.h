@@ -42,8 +42,8 @@ class MainWindow : public QMainWindow
     Project *               m_pCurSelectedProj;
     HyGuiRenderer *         m_pCurRenderer;
 
-    QAction *               m_pCurSaveAction;
-    QAction *               m_pCurSaveAllAction;
+//    QAction *               m_pCurSaveAction;
+//    QAction *               m_pCurSaveAllAction;
 
     HyGuiDebugger *         m_pDebugConnection;
 
@@ -59,6 +59,8 @@ public:
     
     static void OpenItem(ProjectItem *pItem);
     static void CloseItem(ProjectItem *pItem);
+
+    static void SetSaveEnabled(bool bCurItemDirty, bool bAnyItemDirty);
     
     static void SetSelectedProj(Project *pProj);
     static void SetSelectedProjWidgets(Project *pProj);

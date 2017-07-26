@@ -13,7 +13,6 @@
 #include "AudioWidgetManager.h"
 #include "AtlasFrame.h"
 #include "IModel.h"
-
 #include "SpriteWidget.h"
 #include "FontWidget.h"
 #include "FontModels.h"
@@ -240,10 +239,6 @@ void ProjectItem::DeleteFromProject()
 void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 {
     QTabBar *pTabBar = m_ProjectRef.GetTabBar();
-    
-    bool bCurItemDirty = false;
-    bool bAnyItemDirty = false;
-    
     for(int i = 0; i < pTabBar->count(); ++i)
     {
         if(pTabBar->tabData(i).value<ProjectItem *>() == this)
@@ -260,17 +255,12 @@ void ProjectItem::on_undoStack_cleanChanged(bool bClean)
                 pTabBar->setTabIcon(i, GetIcon(SUBICON_Dirty));
                 SetTreeItemSubIcon(SUBICON_Dirty);
             }
-        }
-        
-        if(pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
-        {
-            bAnyItemDirty = true;
-            if(pTabBar->currentIndex() == i)
-                bCurItemDirty = true;
+
+            break;
         }
     }
-    
-    m_ProjectRef.SetSaveEnabled(bCurItemDirty, bAnyItemDirty);
+
+    m_ProjectRef.ApplySaveEnables();
 }
 
 void ProjectItem::on_undoStack_indexChanged(int iIndex)
