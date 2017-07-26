@@ -72,6 +72,9 @@ public:
     static HyRendererInterop *GetCurrentRenderer();
 
 private Q_SLOTS:
+
+    void OnCtrlTab();
+
     void on_actionNewProject_triggered();
     void on_actionOpenProject_triggered();
     void on_actionCloseProject_triggered();

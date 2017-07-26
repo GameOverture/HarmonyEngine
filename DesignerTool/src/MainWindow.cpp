@@ -32,6 +32,7 @@
 #include <QDesktopServices>
 #include <QDate>
 #include <QLabel>
+#include <QShortcut>
 
 /*static*/ MainWindow * MainWindow::sm_pInstance = NULL;
 
@@ -189,6 +190,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     QLabel *pSvnLoginLabel = new QLabel;
     pSvnLoginLabel->setText("SVN Not Detected");
     statusBar()->addPermanentWidget(pSvnLoginLabel);
+
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this, SLOT(OnCtrlTab()));
 
     //setStyleSheet("background-color:black;");
 
@@ -367,6 +370,15 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         sm_pInstance->m_pCurRenderer->GetHarmonyRenderer();
     else
         return NULL;
+}
+
+void MainWindow::OnCtrlTab()
+{
+    if(m_pCurSelectedProj == nullptr)
+        return;
+
+    QTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
+    //pTabBar
 }
 
 void MainWindow::on_actionNewProject_triggered()
