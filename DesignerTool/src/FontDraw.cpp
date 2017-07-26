@@ -60,6 +60,7 @@ void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelD
     m_pDrawAtlasPreview = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), this);
     m_pDrawAtlasPreview->Load();
     m_pDrawAtlasPreview->SetTextureSource(0, 0, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height));
+    m_pDrawAtlasPreview->SetEnabled(true);
 
     m_DrawAtlasOutline.SetAsQuad(static_cast<int>(pAtlas->width), static_cast<int>(pAtlas->height), true);
 
