@@ -3,10 +3,7 @@
 
 #include "IDraw.h"
 #include "SpriteModels.h"
-
-#include <QKeyEvent>
-#include <QMouseEvent>
-#include <QWheelEvent>
+#include "GlobalCameraInst.h"
 
 class SpriteDraw : public IDraw
 {
@@ -24,9 +21,9 @@ public:
     virtual void OnKeyPressEvent(QKeyEvent *pEvent) override;
     virtual void OnKeyReleaseEvent(QKeyEvent *pEvent) override;
     virtual void OnMousePressEvent(QMouseEvent *pEvent) override;
+    virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) override;
     virtual void OnMouseWheelEvent(QWheelEvent *pEvent) override;
     virtual void OnMouseMoveEvent(QMouseEvent *pEvent) override;
-    virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) override;
 
 protected:
     virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) override;

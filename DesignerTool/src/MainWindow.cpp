@@ -364,12 +364,9 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
-/*static*/ HyRendererInterop *MainWindow::GetCurrentRenderer()
+/*static*/ HyGuiRenderer *MainWindow::GetCurrentRenderer()
 {
-    if(sm_pInstance->m_pCurRenderer)
-        sm_pInstance->m_pCurRenderer->GetHarmonyRenderer();
-    else
-        return NULL;
+    return sm_pInstance->m_pCurRenderer;
 }
 
 void MainWindow::OnCtrlTab()

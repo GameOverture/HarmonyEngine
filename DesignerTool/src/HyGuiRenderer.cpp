@@ -53,6 +53,8 @@ HyGuiRenderer::HyGuiRenderer(Project *pProj, QWidget *parent /*= 0*/) : QOpenGLW
     m_pTimer->start(50);
     
     m_bIsUpdating = true;
+
+    RestoreCursor();
 }
 
 HyGuiRenderer::~HyGuiRenderer()
@@ -79,6 +81,16 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
         return &m_pHyEngine->GetRenderer();
     else
         return nullptr;
+}
+
+void HyGuiRenderer::SetCursor(Qt::CursorShape eShape)
+{
+    setCursor(eShape);
+}
+
+void HyGuiRenderer::RestoreCursor()
+{
+    setCursor(Qt::CrossCursor);
 }
 
 /*virtual*/ void HyGuiRenderer::initializeGL() /*override*/
@@ -124,6 +136,16 @@ HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
 {
     if(m_pProjOwner)
         m_pProjOwner->SetRenderSize(w, h);
+}
+
+/*virtual*/ void HyGuiRenderer::enterEvent(QEvent *pEvent) /*override*/
+{
+    this->setFocus();
+
+}
+
+/*virtual*/ void HyGuiRenderer::leaveEvent(QEvent *pEvent) /*override*/
+{
 }
 
 void HyGuiRenderer::OnBootCheck()

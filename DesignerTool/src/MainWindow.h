@@ -42,9 +42,6 @@ class MainWindow : public QMainWindow
     Project *               m_pCurSelectedProj;
     HyGuiRenderer *         m_pCurRenderer;
 
-//    QAction *               m_pCurSaveAction;
-//    QAction *               m_pCurSaveAllAction;
-
     HyGuiDebugger *         m_pDebugConnection;
 
 public:
@@ -69,7 +66,7 @@ public:
     static void StartLoading(uint uiAreaFlags);
     static void StopLoading(uint uiAreaFlags);
     
-    static HyRendererInterop *GetCurrentRenderer();
+    static HyGuiRenderer *GetCurrentRenderer();
 
 private Q_SLOTS:
 

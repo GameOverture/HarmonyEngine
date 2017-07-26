@@ -24,6 +24,10 @@ protected:
     IHyApplication &    m_HyAppRef;
     HyCamera2d *        m_pCamera;
 
+    bool                m_bPanCameraKeyDown;
+    bool                m_bIsCameraPanning;
+    QPointF             m_ptOldMousePos;
+
 public:
     IDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~IDraw();
@@ -34,12 +38,13 @@ public:
     void Hide();
     void ResizeRenderer();
 
-    virtual void OnKeyPressEvent(QKeyEvent *pEvent) { }
-    virtual void OnKeyReleaseEvent(QKeyEvent *pEvent) { }
-    virtual void OnMousePressEvent(QMouseEvent *pEvent) { }
-    virtual void OnMouseWheelEvent(QWheelEvent *pEvent) { }
-    virtual void OnMouseMoveEvent(QMouseEvent *pEvent) { }
-    virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) { }
+    // Derived classes should pass their input events to this class, if they want their main camera to accept user control
+    virtual void OnKeyPressEvent(QKeyEvent *pEvent);
+    virtual void OnKeyReleaseEvent(QKeyEvent *pEvent);
+    virtual void OnMousePressEvent(QMouseEvent *pEvent);
+    virtual void OnMouseReleaseEvent(QMouseEvent *pEvent);
+    virtual void OnMouseWheelEvent(QWheelEvent *pEvent);
+    virtual void OnMouseMoveEvent(QMouseEvent *pEvent);
 
 protected:
     virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) { }

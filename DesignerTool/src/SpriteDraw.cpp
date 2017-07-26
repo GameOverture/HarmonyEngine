@@ -20,8 +20,11 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
     lineList[1].y = 2048.0f;
     m_primOriginVert.SetAsLineChain(lineList);
 
-    m_primOriginHorz.SetTint(1.0f, 0.0f, 0.0f);
-    m_primOriginVert.SetTint(1.0f, 0.0f, 0.0f);
+    m_primOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
+    m_primOriginVert.SetTint(1.0f, 1.0f, 1.0f);
+
+    m_primOriginHorz.SetLineThickness(2.0f);
+    m_primOriginVert.SetLineThickness(2.0f);
 
 	ApplyJsonData(true);
 
@@ -54,41 +57,32 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
 {
+    IDraw::OnKeyPressEvent(pEvent);
 }
 
 /*virtual*/ void SpriteDraw::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/
 {
+    IDraw::OnKeyReleaseEvent(pEvent);
 }
 
 /*virtual*/ void SpriteDraw::OnMousePressEvent(QMouseEvent *pEvent) /*override*/
 {
-}
-
-/*virtual*/ void SpriteDraw::OnMouseWheelEvent(QWheelEvent *pEvent) /*override*/
-{
-    QPoint numPixels = pEvent->pixelDelta();
-    QPoint numDegrees = pEvent->angleDelta() / 8;
-
-    /*if(!numPixels.isNull())
-    {
-        //scrollWithPixels(numPixels);
-    }
-    else */if(!numDegrees.isNull())
-    {
-        QPoint numSteps = numDegrees / 15;
-        m_pCamera->scale.TweenOffset(numSteps.y() * 0.2f, numSteps.y() * 0.2f, 0.5f, HyTween::QuadInOut);
-        //scrollWithDegrees(numSteps);
-    }
-
-    pEvent->accept();
-}
-
-/*virtual*/ void SpriteDraw::OnMouseMoveEvent(QMouseEvent *pEvent) /*override*/
-{
+    IDraw::OnMousePressEvent(pEvent);
 }
 
 /*virtual*/ void SpriteDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
 {
+    IDraw::OnMouseReleaseEvent(pEvent);
+}
+
+/*virtual*/ void SpriteDraw::OnMouseWheelEvent(QWheelEvent *pEvent) /*override*/
+{
+    IDraw::OnMouseWheelEvent(pEvent);
+}
+
+/*virtual*/ void SpriteDraw::OnMouseMoveEvent(QMouseEvent *pEvent) /*override*/
+{
+    IDraw::OnMouseMoveEvent(pEvent);
 }
 
 /*virtual*/ void SpriteDraw::OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) /*override*/
