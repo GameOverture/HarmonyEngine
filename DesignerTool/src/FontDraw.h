@@ -8,9 +8,7 @@
 
 class FontDraw : public IDraw
 {
-    bool                        m_bShowAtlasPreview;
-
-    HyCamera2d *                m_pAtlasCamera;
+    HyCamera2d *                m_pPreviewTextCamera;
     HyTexturedQuad2d *          m_pDrawAtlasPreview;
     HyPrimitive2d               m_DrawAtlasOutline;
 
@@ -24,10 +22,8 @@ public:
 
     virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) override;
     
-    void ShowSubAtlas(bool bShow);
-    
     void LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelData, uint uiAtlasPixelDataSize);
-    void GenerateTextPreview(FontLayersModel *pFontModel, QString sFontPreviewString, texture_atlas_t *pAtlas);
+    //void GenerateTextPreview(FontLayersModel *pFontModel, QString sFontPreviewString, texture_atlas_t *pAtlas);
 
 protected:
     virtual void OnShow(IHyApplication &hyApp) override;

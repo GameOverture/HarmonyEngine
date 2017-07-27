@@ -3,7 +3,6 @@
 
 #include "IDraw.h"
 #include "SpriteModels.h"
-#include "GlobalCameraInst.h"
 
 class SpriteDraw : public IDraw
 {

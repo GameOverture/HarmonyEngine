@@ -4,47 +4,38 @@
 #include "HyGuiRenderer.h"
 
 FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
-                                                                    m_bShowAtlasPreview(true),
-                                                                    m_pAtlasCamera(nullptr),
+                                                                    m_pPreviewTextCamera(nullptr),
                                                                     m_pDrawAtlasPreview(nullptr),
                                                                     m_DrawAtlasOutline(this),
                                                                     m_DividerLine(this),
                                                                     m_Text("", "+GuiPreview", this)
 {
-    m_pAtlasCamera = m_HyAppRef.Window().CreateCamera2d();
-    m_pAtlasCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.5f);
-    m_pAtlasCamera->pos.Set(0.0f, -2500.0f);
+    m_pPreviewTextCamera = m_HyAppRef.Window().CreateCamera2d();
+    m_pPreviewTextCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.5f);
+    m_pPreviewTextCamera->pos.Set(0.0f, -2500.0f);
+    m_pPreviewTextCamera->SetEnabled(true);
+
+    m_Text.pos.Set(0.0f, -2500.0f);
     
+    m_pCamera->SetViewport(0.0f, 0.5f, 1.0f, 0.5f);
+
     m_DrawAtlasOutline.SetTint(1.0f, 0.0f, 0.0f);
 
     m_DividerLine.SetAsQuad(10000.0f, 10.0f, false);
     m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetResolution().y / 2 - 5.0f);
     m_DividerLine.SetTint(0.0f, 0.0f, 0.0f);
     m_DividerLine.UseWindowCoordinates();
-    
-    ShowSubAtlas(m_bShowAtlasPreview);
 }
 
 /*virtual*/ FontDraw::~FontDraw()
 {
     delete m_pDrawAtlasPreview;
-    m_HyAppRef.Window().RemoveCamera(m_pAtlasCamera);
+    m_HyAppRef.Window().RemoveCamera(m_pPreviewTextCamera);
 }
 
 /*virtual*/ void FontDraw::OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) /*override*/
 {
-}
-
-void FontDraw::ShowSubAtlas(bool bShow)
-{
-    m_bShowAtlasPreview = bShow;
-    
-    if(m_bShowAtlasPreview)
-        m_pCamera->SetViewport(0.0f, 0.5f, 1.0f, 0.5f);
-    else
-        m_pCamera->SetViewport(0.0f, 0.0f, 1.0f, 1.0f);
-    
-    m_pAtlasCamera->SetEnabled(m_bShowAtlasPreview);
+    m_Text.GuiOverrideData<HyText2dData>(valueRef, bReloadInAssetManager);
 }
 
 void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelData, uint uiAtlasPixelDataSize)
@@ -74,94 +65,21 @@ void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelD
     m_DrawAtlasOutline.pos.Set(m_pDrawAtlasPreview->pos.Get());
 }
 
-//void FontDraw::GenerateTextPreview(FontTableModel *pFontModel, QString sFontPreviewString, texture_atlas_t *pAtlas)
-//{
-//    // Generate m_DrawFontPreviewList here if font preview is dirty
-//    for(int i = 0; i < m_DrawFontPreviewList.count(); ++i)
-//        delete m_DrawFontPreviewList[i];
-
-//    m_DrawFontPreviewList.clear();
-
-//    m_pCamera->pos.Set(0.0f, 0.0f);
-//    glm::vec2 ptGlyphPos = m_pCamera->pos.Get();
-
-//    float fTextPixelLength = 0.0f;
-
-//    // Each font layer
-//    for(int i = 0; i < pFontModel->rowCount(); ++i)
-//    {
-//        ptGlyphPos.x = 0.0f;
-
-//        for(int j = 0; j < sFontPreviewString.count(); ++j)
-//        {
-//            FontTypeface *pFontStage = pFontModel->GetStageRef(i);
-
-//            // NOTE: Assumes LITTLE ENDIAN
-//            QString sSingleChar = sFontPreviewString[j];
-//            texture_glyph_t *pGlyph = texture_font_get_glyph(pFontStage->pTextureFont, sSingleChar.toUtf8().data());
-
-//            if(pGlyph == NULL)
-//            {
-//                return;
-//            }
-
-//            float fKerning = 0.0f;
-//            if(j != 0)
-//            {
-//                char cPrevCharacter = sFontPreviewString.toStdString().c_str()[j - 1];
-//                fKerning = texture_glyph_get_kerning(pGlyph, &cPrevCharacter);
-//            }
-
-//            ptGlyphPos.x += fKerning;
-//            ptGlyphPos.y = m_pCamera->pos.Y() - (pGlyph->height - pGlyph->offset_y);
-
-//            int iX = static_cast<int>(pGlyph->s0 * static_cast<float>(pAtlas->width));
-//            int iY = static_cast<int>(pGlyph->t0 * static_cast<float>(pAtlas->height));
-//            int iWidth = static_cast<int>(pGlyph->s1 * static_cast<float>(pAtlas->width)) - iX - 1;
-//            int iHeight = static_cast<int>(pGlyph->t1 * static_cast<float>(pAtlas->height)) - iY - 1;
-
-//            HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), nullptr);
-//            pDrawGlyphQuad->Load();
-//            pDrawGlyphQuad->SetTextureSource(iX, iY, iWidth, iHeight);
-//            pDrawGlyphQuad->pos.Set(ptGlyphPos.x + pGlyph->offset_x, ptGlyphPos.y);
-
-//            QColor topColor = pFontModel->GetLayerTopColor(i);
-//            QColor botColor = pFontModel->GetLayerBotColor(i);
-//            pDrawGlyphQuad->topColor.Set(topColor.redF(), topColor.greenF(), topColor.blueF());
-//            pDrawGlyphQuad->botColor.Set(botColor.redF(), botColor.greenF(), botColor.blueF());
-
-//            pDrawGlyphQuad->SetDisplayOrder(i * -1);
-
-//            m_DrawFontPreviewList.append(pDrawGlyphQuad);
-
-//            ptGlyphPos.x += pGlyph->advance_x;
-//        }
-
-//        if(fTextPixelLength < ptGlyphPos.x)
-//            fTextPixelLength = ptGlyphPos.x;
-//    }
-
-//    m_pCamera->pos.X(fTextPixelLength * 0.5f);
-//}
-
 /*virtual*/ void FontDraw::OnShow(IHyApplication &hyApp)
 {
-    if(m_bShowAtlasPreview)
-    {
-        if(m_pDrawAtlasPreview)
-            m_pDrawAtlasPreview->SetEnabled(true);
+    if(m_pDrawAtlasPreview)
+        m_pDrawAtlasPreview->SetEnabled(true);
+
+    m_DrawAtlasOutline.SetEnabled(true);
+    m_DividerLine.SetEnabled(true);
     
-        m_DrawAtlasOutline.SetEnabled(true);
-        m_DividerLine.SetEnabled(true);
-    }
-    
-    m_pAtlasCamera->SetEnabled(m_bShowAtlasPreview);
+    m_pPreviewTextCamera->SetEnabled(true);
 }
 
 /*virtual*/ void FontDraw::OnHide(IHyApplication &hyApp)
 {
     SetEnabled(false);
-    m_pAtlasCamera->SetEnabled(false);
+    m_pPreviewTextCamera->SetEnabled(false);
 }
 
 /*virtual*/ void FontDraw::OnResizeRenderer() /*override*/
@@ -180,6 +98,77 @@ void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelD
     if(pAtlas->id == 0)
         LoadNewAtlas(pAtlas, pAtlasPixelData, uiAtlasPixelDataSize);
     
-    //if(static_cast<FontModel *>(m_pProjItem->GetModel())->ClearFontDirtyFlag())
-    //    GenerateTextPreview(static_cast<FontWidget *>(m_pProjItem->GetWidget())->GetCurStateData()->GetFontModel(), "The quick brown fox jumped over the lazy dog. 01234567890", pAtlas);
+       // GenerateTextPreview(static_cast<FontWidget *>(m_pProjItem->GetWidget())->GetCurStateData()->GetFontModel(), "The quick brown fox jumped over the lazy dog. 01234567890", pAtlas);
+//    if(static_cast<FontModel *>(m_pProjItem->GetModel())->ClearFontDirtyFlag())
+//    {
+//        QString sFontPreviewString = "The quick brown fox jumped over the lazy dog. 01234567890";
+//        FontModel *pFontModel = static_cast<FontWidget *>(m_pProjItem->GetWidget())->GetCurStateData()->GetFontModel();
+
+//        // Generate m_DrawFontPreviewList here if font preview is dirty
+//        for(int i = 0; i < m_DrawFontPreviewList.count(); ++i)
+//            delete m_DrawFontPreviewList[i];
+
+//        m_DrawFontPreviewList.clear();
+
+//        m_pCamera->pos.Set(0.0f, 0.0f);
+//        glm::vec2 ptGlyphPos = m_pCamera->pos.Get();
+
+//        float fTextPixelLength = 0.0f;
+
+//        // Each font layer
+//        for(int i = 0; i < pFontModel->rowCount(); ++i)
+//        {
+//            ptGlyphPos.x = 0.0f;
+
+//            for(int j = 0; j < sFontPreviewString.count(); ++j)
+//            {
+//                FontTypeface *pFontStage = pFontModel->GetStageRef(i);
+
+//                // NOTE: Assumes LITTLE ENDIAN
+//                QString sSingleChar = sFontPreviewString[j];
+//                texture_glyph_t *pGlyph = texture_font_get_glyph(pFontStage->pTextureFont, sSingleChar.toUtf8().data());
+
+//                if(pGlyph == NULL)
+//                {
+//                    return;
+//                }
+
+//                float fKerning = 0.0f;
+//                if(j != 0)
+//                {
+//                    char cPrevCharacter = sFontPreviewString.toStdString().c_str()[j - 1];
+//                    fKerning = texture_glyph_get_kerning(pGlyph, &cPrevCharacter);
+//                }
+
+//                ptGlyphPos.x += fKerning;
+//                ptGlyphPos.y = m_pCamera->pos.Y() - (pGlyph->height - pGlyph->offset_y);
+
+//                int iX = static_cast<int>(pGlyph->s0 * static_cast<float>(pAtlas->width));
+//                int iY = static_cast<int>(pGlyph->t0 * static_cast<float>(pAtlas->height));
+//                int iWidth = static_cast<int>(pGlyph->s1 * static_cast<float>(pAtlas->width)) - iX - 1;
+//                int iHeight = static_cast<int>(pGlyph->t1 * static_cast<float>(pAtlas->height)) - iY - 1;
+
+//                HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), nullptr);
+//                pDrawGlyphQuad->Load();
+//                pDrawGlyphQuad->SetTextureSource(iX, iY, iWidth, iHeight);
+//                pDrawGlyphQuad->pos.Set(ptGlyphPos.x + pGlyph->offset_x, ptGlyphPos.y);
+
+//                QColor topColor = pFontModel->GetLayerTopColor(i);
+//                QColor botColor = pFontModel->GetLayerBotColor(i);
+//                pDrawGlyphQuad->topColor.Set(topColor.redF(), topColor.greenF(), topColor.blueF());
+//                pDrawGlyphQuad->botColor.Set(botColor.redF(), botColor.greenF(), botColor.blueF());
+
+//                pDrawGlyphQuad->SetDisplayOrder(i * -1);
+
+//                m_DrawFontPreviewList.append(pDrawGlyphQuad);
+
+//                ptGlyphPos.x += pGlyph->advance_x;
+//            }
+
+//            if(fTextPixelLength < ptGlyphPos.x)
+//                fTextPixelLength = ptGlyphPos.x;
+//        }
+
+//        m_pCamera->pos.X(fTextPixelLength * 0.5f);
+//    }
 }
