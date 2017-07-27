@@ -98,6 +98,21 @@
     <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputRecording.h">
       <Filter>Header Files\recorder</Filter>
     </ClInclude>
+    <ClInclude Include="src\mouse\GainputInputDeviceMouseWin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mouse\GainputInputDeviceMouseWinRaw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\keyboard\GainputInputDeviceKeyboardWin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\keyboard\GainputInputDeviceKeyboardWinRaw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pad\GainputInputDevicePadWin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\gainput.cpp">

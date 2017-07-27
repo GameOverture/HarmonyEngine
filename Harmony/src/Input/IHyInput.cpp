@@ -13,10 +13,9 @@
 #include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyWindow.h"
 
-IHyInput::IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef, HyGfxComms &gfxCommsRef) :	m_GfxCommsRef(gfxCommsRef),
-																													m_uiNUM_INPUT_MAPS(uiNumInputMappings),
-																													m_WindowListRef(windowListRef),
-																													m_uiMouseWindowIndex(0)
+IHyInput::IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :	m_uiNUM_INPUT_MAPS(uiNumInputMappings),
+																						m_WindowListRef(windowListRef),
+																						m_uiMouseWindowIndex(0)
 {
 	IHyInputMap::sm_pInputManager = this;
 

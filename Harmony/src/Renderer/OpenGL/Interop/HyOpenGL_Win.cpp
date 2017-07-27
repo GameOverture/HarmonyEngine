@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/OpenGL/Interop/HyOpenGL_Win.h"
-
+#include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyRenderSurface.h"
 #include "Utilities/HyStrManip.h"
@@ -223,8 +223,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message)
 	{
-		case WM_CREATE:
-		{
+		case WM_CREATE: {
 			CREATESTRUCT *pCreateStruct = reinterpret_cast<CREATESTRUCT *>(lParam);
 			HyOpenGL_Win *pThis = reinterpret_cast<HyOpenGL_Win *>(pCreateStruct->lpCreateParams);
 
@@ -242,11 +241,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				pThis->m_hGLContext = wglCreateContext(hDC);
 				wglMakeCurrent(hDC, pThis->m_hGLContext);
 			}
-		}
-		break;
+		} break;
 
-		case WM_DESTROY:
-		{
+		case WM_DESTROY: {
 			HyOpenGL_Win *pThis = reinterpret_cast<HyOpenGL_Win *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
 			HDC hDeviceContext = GetDC(hWnd);
@@ -255,18 +252,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			wglDeleteContext(pThis->m_hGLContext);
 			PostQuitMessage(0);
 
-			DefWindowProc(hWnd, message, wParam, lParam);
-		}
-		break;
+			pThis->GetGfxCommsRef().RequestThreadExit();
+		} break;
 
-		case WM_CLOSE:
-		{
-			PostQuitMessage(0);
-			return 0;
-		}
-
-		case WM_SYSCOMMAND:
-		{
+		case WM_SYSCOMMAND: {
 			switch(wParam)
 			{
 			case SC_SCREENSAVE:		// Screen saver Trying To Start?
@@ -274,11 +263,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				// Prevent From Happening
 				return 0;
 			}
-			break;
-		}
+		} break;
 
-		case WM_SIZE:
-		{
+		case WM_SIZE: {
 			HyOpenGL_Win *pThis = reinterpret_cast<HyOpenGL_Win *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
 			for(uint32 i = 0; i < static_cast<uint32>(pThis->m_RenderSurfaces.size()); ++i)
@@ -286,8 +273,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if(pThis->m_RenderSurfaces[i].GetHandle() == hWnd)
 					pThis->m_RenderSurfaces[i].Resize(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
 			}
-			return 0;
-		}
+		} break;
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);

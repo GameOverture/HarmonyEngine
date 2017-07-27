@@ -16,11 +16,11 @@
 
 #include <queue>
 
-HyInput_Gainput::HyInput_Gainput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef, HyGfxComms &gfxCommsRef) :	IHyInput(uiNumInputMappings, windowListRef, gfxCommsRef),
-																																m_uiKeyboardId(gainput::InvalidDeviceId),
-																																m_uiMouseId(gainput::InvalidDeviceId),
-																																m_eRecordState(RECORD_Off),
-																																m_uiRecordCount(0)
+HyInput_Gainput::HyInput_Gainput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :	IHyInput(uiNumInputMappings, windowListRef),
+																										m_uiKeyboardId(gainput::InvalidDeviceId),
+																										m_uiMouseId(gainput::InvalidDeviceId),
+																										m_eRecordState(RECORD_Off),
+																										m_uiRecordCount(0)
 {
 	if(uiNumInputMappings > 0)
 	{
@@ -82,38 +82,32 @@ gainput::DeviceId HyInput_Gainput::GetGamePadDeviceId(uint32 uiIndex)
 	return -1;
 }
 
-/*virtual*/ void HyInput_Gainput::Update()
+/*virtual*/ void HyInput_Gainput::HandleMsg(void *pMsg) /*override*/
+{
+#ifdef HY_PLATFORM_WINDOWS
+	m_Manager.SetDisplaySize(static_cast<int>(m_WindowListRef[0]->GetResolution().x), static_cast<int>(m_WindowListRef[0]->GetResolution().y));
+	m_Manager.HandleMessage(*reinterpret_cast<HyApiMsgInterop *>(pMsg));
+#endif
+}
+
+/*virtual*/ void HyInput_Gainput::Update() /*override*/
 {
 	// TODO: pass in m_uiRecordCount and wrap logic around this call
 	m_Manager.Update();
 
-	std::queue<HyApiMsgInterop> apiMsgQueue;
-	m_GfxCommsRef.RxApiMsgs(apiMsgQueue);
-
-	while(apiMsgQueue.empty() == false)
-	{
-		HyApiMsgInterop msg = apiMsgQueue.front();
-		apiMsgQueue.pop();
-
-#ifdef HY_PLATFORM_WINDOWS
-		m_Manager.SetDisplaySize(static_cast<int>(m_WindowListRef[0]->GetResolution().x), static_cast<int>(m_WindowListRef[0]->GetResolution().y));
-		m_Manager.HandleMessage(msg);
-#endif
-	}
-
 	// TODO: Don't hardcode '0'
 	//if(msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST)
-		{
-			glm::vec2 ptMouseAxisNormalized(m_pInputMaps[0].GetAxis(MOUSEID_X), m_pInputMaps[0].GetAxis(MOUSEID_Y));
-			ptMouseAxisNormalized.y = 1.0f - ptMouseAxisNormalized.y; // Invert Y-coordinate
+	{
+		glm::vec2 ptMouseAxisNormalized(m_pInputMaps[0].GetAxis(MOUSEID_X), m_pInputMaps[0].GetAxis(MOUSEID_Y));
+		ptMouseAxisNormalized.y = 1.0f - ptMouseAxisNormalized.y; // Invert Y-coordinate
 
-			m_ptLocalMousePos = ptMouseAxisNormalized;
-			m_uiMouseWindowIndex = 0;
+		m_ptLocalMousePos = ptMouseAxisNormalized;
+		m_uiMouseWindowIndex = 0;
 
-			//if(msg.message == WM_MOUSEMOVE) {
-			//	HyLog("MOUSE MOVE: (" << GetWorldMousePos().x << ", " << GetWorldMousePos().y << ")");
-			//}
-		}
+		//if(msg.message == WM_MOUSEMOVE) {
+		//	HyLog("MOUSE MOVE: (" << GetWorldMousePos().x << ", " << GetWorldMousePos().y << ")");
+		//}
+	}
 
 	m_bMouseLeftDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Left);
 	m_bMouseRightDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Right);

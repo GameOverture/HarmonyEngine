@@ -62,6 +62,11 @@
     <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputPlayer.h" />
     <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputRecorder.h" />
     <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputRecording.h" />
+    <ClInclude Include="src\keyboard\GainputInputDeviceKeyboardWin.h" />
+    <ClInclude Include="src\keyboard\GainputInputDeviceKeyboardWinRaw.h" />
+    <ClInclude Include="src\mouse\GainputInputDeviceMouseWin.h" />
+    <ClInclude Include="src\mouse\GainputInputDeviceMouseWinRaw.h" />
+    <ClInclude Include="src\pad\GainputInputDevicePadWin.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\builtin\GainputInputDeviceBuiltIn.cpp" />

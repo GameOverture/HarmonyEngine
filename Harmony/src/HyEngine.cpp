@@ -18,7 +18,7 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxComms, m_AppRef.m_WindowList),
 												m_Assets(m_AppRef.m_Init.sDataDir, m_GfxComms, m_Scene),
 												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_Assets),
-												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList, m_GfxComms),
+												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList),
 												m_Renderer(m_GfxComms, m_Diagnostics, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList),
 												m_Diagnostics(m_AppRef.m_Init, m_Assets, m_Scene),
@@ -82,6 +82,17 @@ bool HyEngine::Update()
 {
 	while(m_Time.ThrottleTime())
 	{
+		// TODO: Check with single threaded engine if this is necessary
+		std::queue<HyApiMsgInterop> apiMsgQueue;
+		m_GfxComms.RxApiMsgs(apiMsgQueue);
+		while(apiMsgQueue.empty() == false)
+		{
+			HyApiMsgInterop msg = apiMsgQueue.front();
+			apiMsgQueue.pop();
+
+			m_Input.HandleMsg(&msg);
+		}
+
 		m_Input.Update();
 		m_Scene.PreUpdate();
 
@@ -90,7 +101,7 @@ bool HyEngine::Update()
 
 		m_Assets.Update();
 		m_Scene.PostUpdate();
-		m_GuiComms.Update();
+		//m_GuiComms.Update();
 
 		if(m_Time.GetFpsCap() == 0)
 			break;
@@ -101,7 +112,7 @@ bool HyEngine::Update()
 		return false;
 #endif
 
-	return true;
+	return m_GfxComms.IsShutdown() == false;
 }
 
 void HyEngine::Shutdown()

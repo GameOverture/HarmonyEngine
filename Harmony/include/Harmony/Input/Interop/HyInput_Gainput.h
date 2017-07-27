@@ -43,7 +43,7 @@ class HyInput_Gainput : public IHyInput
 
 
 public:
-	HyInput_Gainput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef, HyGfxComms &gfxCommsRef);
+	HyInput_Gainput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
 	~HyInput_Gainput();
 
 	gainput::InputManager &GetGainputManager();
@@ -61,6 +61,7 @@ public:
 
 	gainput::DeviceId GetGamePadDeviceId(uint32 uiIndex);
 
+	virtual void HandleMsg(void *pMsg) override;
 	virtual void Update() override;
 };
 

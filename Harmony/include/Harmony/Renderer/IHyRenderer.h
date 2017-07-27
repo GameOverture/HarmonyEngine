@@ -55,6 +55,8 @@ public:
 	IHyRenderer(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
+	HyGfxComms &GetGfxCommsRef();
+
 	void StartUp();
 	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
 

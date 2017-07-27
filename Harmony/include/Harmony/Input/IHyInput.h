@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyInput_h__
-#define __HyInput_h__
+#ifndef HyInput_h__
+#define HyInput_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Input/IHyInputMap.h"
@@ -21,8 +21,6 @@ class HyGfxComms;
 class IHyInput
 {
 protected:
-	HyGfxComms &				m_GfxCommsRef;
-
 	const uint32				m_uiNUM_INPUT_MAPS;
 	IHyInputMap *				m_pInputMaps;
 
@@ -34,7 +32,7 @@ protected:
 	bool						m_bMouseRightDown;
 
 public:
-	IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef, HyGfxComms &gfxCommsRef);
+	IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyInput();
 
 	IHyInputMap *GetInputMapArray();
@@ -50,7 +48,8 @@ public:
 	virtual void StartPlayback() = 0;
 	virtual void StopPlayback() = 0;
 
+	virtual void HandleMsg(void *pMsg) = 0;
 	virtual void Update() = 0;
 };
 
-#endif /* __HyInput_h__ */
+#endif /* HyInput_h__ */

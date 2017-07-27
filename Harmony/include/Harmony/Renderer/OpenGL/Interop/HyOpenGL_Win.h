@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyOpenGL_Win_h__
-#define __HyOpenGL_Win_h__
+#ifndef HyOpenGL_Win_h__
+#define HyOpenGL_Win_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Renderer/OpenGL/HyOpenGL.h"
@@ -36,4 +36,4 @@ public:
 	virtual void OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags) override;
 };
 
-#endif /* __HyOpenGL_Win_h__ */
+#endif /* HyOpenGL_Win_h__ */

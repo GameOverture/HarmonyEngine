@@ -175,7 +175,8 @@ void HyGfxComms::RxApiMsgs(std::queue<HyApiMsgInterop> &msgQueueOut)
 void HyGfxComms::RequestThreadExit()
 {
 	m_csApiMsgQueue.Lock();
-	m_eThreadState = HYTHREADSTATE_ShouldExit;
+	if(m_eThreadState != HYTHREADSTATE_HasExited)
+		m_eThreadState = HYTHREADSTATE_ShouldExit;
 	m_csApiMsgQueue.Unlock();
 }
 

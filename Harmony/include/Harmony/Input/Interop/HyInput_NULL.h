@@ -18,11 +18,7 @@ class HyWindow;
 class HyInput_NULL : public IHyInput
 {
 public:
-	HyInput_NULL(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef, HyGfxComms &gfxCommsRef) : IHyInput(uiNumInputMappings, windowListRef, gfxCommsRef) { }
-
-	virtual void Update() override { }
-
-	void HandleMsg(uint32 uiWindowIndex, int32 iWidth, int32 iHeight, const MSG &msg) { }
+	HyInput_NULL(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) : IHyInput(uiNumInputMappings, windowListRef) { }
 
 	virtual void StartRecording() override { }
 	virtual void StopRecording() override { }
@@ -30,6 +26,9 @@ public:
 
 	virtual void StartPlayback() override { }
 	virtual void StopPlayback() override { }
+	
+	virtual void HandleMsg(void *pMsg) override { }
+	virtual void Update() override { }
 };
 
 class HyInputMap_NULL : public IHyInputMap

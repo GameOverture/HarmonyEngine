@@ -38,6 +38,11 @@ IHyRenderer::~IHyRenderer(void)
 	sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 }
 
+HyGfxComms &IHyRenderer::GetGfxCommsRef()
+{
+	return m_GfxCommsRef;
+}
+
 void IHyRenderer::StartUp()
 {
 #if defined(HYSETTING_MultithreadedRenderer) && !defined(HY_PLATFORM_GUI)
