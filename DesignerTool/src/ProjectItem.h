@@ -31,6 +31,7 @@ class ProjectItem : public ExplorerItem
 
     Project &               m_ProjectRef;
     QJsonValue              m_SaveValue;
+    bool                    m_bExistencePendingSave;
 
     // Loaded in constructor
     IModel *                m_pModel;
@@ -40,9 +41,10 @@ class ProjectItem : public ExplorerItem
 
     // Loaded when item is opened
     QWidget *               m_pWidget;
+    IDraw *                 m_pDraw;
     
 public:
-    ProjectItem(Project &projRef, HyGuiItemType eType, const QString sPrefix, const QString sName, QJsonValue initValue);
+    ProjectItem(Project &projRef, HyGuiItemType eType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave);
     virtual ~ProjectItem();
 
     void LoadModel();
@@ -50,11 +52,13 @@ public:
     Project &GetProject();
 
     IModel *GetModel()                              { return m_pModel; }
-    QWidget *GetWidget() const                      { return m_pWidget; }
+    QWidget *GetWidget()                            { return m_pWidget; }
+    IDraw *GetDraw()                                { return m_pDraw; }
     QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
     
     void GiveMenuActions(QMenu *pMenu);
     void Save();
+    bool IsExistencePendingSave();
     bool IsSaveClean();
     void DiscardChanges();
     
@@ -65,16 +69,16 @@ public:
     void DeleteFromProject();
     
 private:
+    void WidgetRefreshDraw(IHyApplication &hyApp);
+    
     void WidgetLoad(IHyApplication &hyApp);
     void WidgetUnload(IHyApplication &hyApp);
-    void WidgetShow(IHyApplication &hyApp);
-    void WidgetHide(IHyApplication &hyApp);
-    void WidgetUpdate(IHyApplication &hyApp);
-
-    void WidgetRefreshDraw(IHyApplication &hyApp);
+    void RenderShow(IHyApplication &hyApp);
+    void RenderHide(IHyApplication &hyApp);
 
 private Q_SLOTS:
     void on_undoStack_cleanChanged(bool bClean);
+    void on_undoStack_indexChanged(int iIndex);
     
 };
 Q_DECLARE_METATYPE(ProjectItem *)

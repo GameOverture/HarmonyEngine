@@ -427,7 +427,7 @@ void AtlasWidget::on_actionAddFilter_triggered()
 
     delete pDlg;
 
-    pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix));
+    pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
     pNewTreeItem->setData(0, Qt::UserRole, QVariant(QString(HYTREEWIDGETITEM_IsFilter)));
 
     ui->atlasList->sortItems(0, Qt::AscendingOrder);

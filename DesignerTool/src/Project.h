@@ -39,8 +39,6 @@ class Project : public ExplorerItem, public IHyApplication
 
     ProjectItem *                                   m_pCurOpenItem;
 
-    QAction                                         m_ActionSave;
-    QAction                                         m_ActionSaveAll;
     QJsonObject                                     m_SaveDataObj;
 
     bool                                            m_bHasError;
@@ -69,10 +67,8 @@ public:
     AudioWidgetManager *GetAudioWidget();
 
     QTabBar *GetTabBar();
-    
-    QList<QAction *> GetSaveActions();
-    void SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled);
 
+    ProjectItem *GetCurrentOpenItem();
     void OpenItem(ProjectItem *pItem);
 
     // IHyApplication overrides
@@ -84,6 +80,8 @@ public:
     
     void OnHarmonyLoaded();
 
+    void ApplySaveEnables();
+
     void SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal);
     void SaveGameData();
     
@@ -92,16 +90,13 @@ public:
 
     QJsonObject GetSubDirObj(HyGuiItemType eType);
     
+    // TODO: Remove this
     void RefreshCurrentItemDraw();
 
     bool CloseAllTabs();
 
 public Q_SLOTS:
     void OnTabBarCurrentChanged(int iIndex);
-
-    void on_save_triggered();
-
-    void on_saveAll_triggered();
 
     void OnCloseTab(int iIndex);
 };

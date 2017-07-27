@@ -202,6 +202,14 @@ void DlgNewProject::on_buttonBox_accepted()
         templateDirList.append(templateDir);
     }
 
+    if(ui->chkVs2017->isChecked())
+    {
+        QDir templateDir(MainWindow::EngineLocation() % "templates");
+        templateDir.cd("vs2017");
+
+        templateDirList.append(templateDir);
+    }
+
     QDir templateDir(MainWindow::EngineLocation() % "templates");
     templateDir.cd("common");
     templateDirList.append(templateDir);

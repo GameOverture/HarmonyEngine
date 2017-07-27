@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __IHyAssets_h__
-#define __IHyAssets_h__
+#ifndef HyAssets_h__
+#define HyAssets_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/HyAtlas.h"
@@ -35,22 +35,22 @@ void HyAssetInit(HyAssets *pThis);
 
 class HyAssets
 {
-	const std::string									m_sDATADIR;
+	const std::string											m_sDATADIR;
 
-	std::future<void>									m_InitFuture;
+	std::future<void>											m_InitFuture;
 
-	HyGfxComms &										m_GfxCommsRef;
-	HyScene &											m_SceneRef;
+	HyGfxComms &												m_GfxCommsRef;
+	HyScene &													m_SceneRef;
 
-	HyAtlas *											m_pAtlases;
-	uint32												m_uiNumAtlases;
-	HyAtlasIndices *									m_pLoadedAtlasIndices;
+	HyAtlas *													m_pAtlases;
+	uint32														m_uiNumAtlases;
+	HyAtlasIndices *											m_pLoadedAtlasIndices;
 
 	template<typename tData>
 	class NodeData
 	{
-		std::map<std::string, uint32>					m_LookupIndexMap;
-		std::vector<tData>								m_DataList;
+		std::map<std::string, uint32>							m_LookupIndexMap;
+		std::vector<tData>										m_DataList;
 
 	public:
 		void Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef);
@@ -63,29 +63,29 @@ class HyAssets
 	NodeData<HyText2dData>										m_Txt2d;
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
-	std::vector<IHyLeafDraw2d *>						m_QueuedInst2dList;
-	std::vector<IHyLoadableData *>						m_ReloadDataList;
+	std::vector<IHyLeafDraw2d *>								m_QueuedInst2dList;
+	std::vector<IHyLoadableData *>								m_ReloadDataList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
-	std::queue<IHyLoadableData *>						m_Load_Prepare;
-	std::queue<IHyLoadableData *>						m_Load_Shared;
-	std::queue<IHyLoadableData *>						m_Load_Retrieval;
+	std::queue<IHyLoadableData *>								m_Load_Prepare;
+	std::queue<IHyLoadableData *>								m_Load_Shared;
+	std::queue<IHyLoadableData *>								m_Load_Retrieval;
 
-	std::queue<IHyLoadableData *> *						m_pGfxQueue_Retrieval;
+	std::queue<IHyLoadableData *> *								m_pGfxQueue_Retrieval;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Thread control structure to help sync loading of factory data
 	struct LoadThreadCtrl
 	{
-		std::queue<IHyLoadableData *> &		m_Load_SharedRef;
-		std::queue<IHyLoadableData *> &		m_Load_RetrievalRef;
+		std::queue<IHyLoadableData *> &							m_Load_SharedRef;
+		std::queue<IHyLoadableData *> &							m_Load_RetrievalRef;
 
-		WaitEvent							m_WaitEvent_HasNewData;
-		BasicSection						m_csSharedQueue;
-		BasicSection						m_csRetrievalQueue;
+		WaitEvent												m_WaitEvent_HasNewData;
+		BasicSection											m_csSharedQueue;
+		BasicSection											m_csRetrievalQueue;
 
 		
-		HyThreadState						m_eState;
+		HyThreadState											m_eState;
 
 		LoadThreadCtrl(std::queue<IHyLoadableData *> &load_SharedRef,
 					   std::queue<IHyLoadableData *> &Load_RetrievalRef) :	m_Load_SharedRef(load_SharedRef),
@@ -95,8 +95,8 @@ class HyAssets
 		{ }
 	};
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	LoadThreadCtrl										m_LoadingCtrl;
-	ThreadInfoPtr										m_pLoadingThread;	// Loading thread info pointer
+	LoadThreadCtrl												m_LoadingCtrl;
+	ThreadInfoPtr												m_pLoadingThread;	// Loading thread info pointer
 
 public:
 	HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
@@ -132,4 +132,4 @@ private:
 	static void LoadingThread(void *pParam);
 };
 
-#endif /* __IHyAssets_h__ */
+#endif /* HyAssets_h__ */

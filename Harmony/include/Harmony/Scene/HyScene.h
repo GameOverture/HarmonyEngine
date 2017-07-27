@@ -54,7 +54,7 @@ class HyScene
 	HyGfxComms &										m_GfxCommsRef;
 	std::vector<HyWindow *> &							m_WindowListRef;
 
-	static std::vector<IHyNode *>						sm_NodeList;				// Master list of all nodes
+	static std::vector<IHyNode *>						sm_MasterNodeList;			// All nodes in program
 
 	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;	// List of nodes who will update when the game is paused
 	bool												m_bPauseGame;

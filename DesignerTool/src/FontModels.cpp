@@ -15,7 +15,7 @@
 
 FontStateData::FontStateData(IModel &modelRef, QJsonObject stateObj) : IStateData(modelRef, stateObj["name"].toString())
 {
-    m_pFontTableModel = new FontTableModel(&m_ModelRef);
+    m_pFontTableModel = new FontLayersModel(&m_ModelRef);
     m_pSbMapper_Size = new DoubleSpinBoxMapper(&m_ModelRef);
 
     // Populate the font list combo box
@@ -85,7 +85,7 @@ FontStateData::FontStateData(IModel &modelRef, QJsonObject stateObj) : IStateDat
 {
 }
 
-FontTableModel *FontStateData::GetFontModel()
+FontLayersModel *FontStateData::GetFontLayersModel()
 {
     return m_pFontTableModel;
 }
@@ -151,7 +151,7 @@ FontModel::FontModel(ProjectItem *pItem, QJsonObject fontObj) : IModel(pItem),
                                                                 m_pTrueAtlasFrame(nullptr),
                                                                 m_bGlyphsDirty(false),
                                                                 m_bFontPreviewDirty(false),
-                                                                m_pAtlas(nullptr),
+                                                                m_pFtglAtlas(nullptr),
                                                                 m_pTrueAtlasPixelData(nullptr),
                                                                 m_uiTrueAtlasPixelDataSize(0)
 {
@@ -239,9 +239,14 @@ QJsonObject FontModel::GetTypefaceObj(int iTypefaceIndex)
     return m_TypefaceArray.at(iTypefaceIndex).toObject();
 }
 
-texture_atlas_t *FontModel::GetAtlas()
+texture_atlas_t *FontModel::GetFtglAtlas()
 {
-    return m_pAtlas;
+    return m_pFtglAtlas;
+}
+
+AtlasFrame *FontModel::GetAtlasFrame()
+{
+    return m_pTrueAtlasFrame;
 }
 
 unsigned char *FontModel::GetAtlasPixelData()
@@ -266,10 +271,10 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
     for(int i = 0; i < m_StateList.size(); ++i) // Iterating each font state
     {
         FontStateData *pFontState = static_cast<FontStateData *>(m_StateList[i]);
-        FontTableModel *pFontModel = pFontState->GetFontModel();
+        FontLayersModel *pFontLayersModel = pFontState->GetFontLayersModel();
 
-        // Iterating each layer of this font
-        for(int j = 0; j < pFontModel->rowCount(); ++j)
+        // Iterating each layer/stage of this font
+        for(int j = 0; j < pFontLayersModel->rowCount(); ++j)
         {
             bool bMatched = false;
 
@@ -282,14 +287,14 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
                 QFileInfo stateFontPath(pFontState->GetFontFilePath());
 
                 if(QString::compare(stageFontPath.fileName(), stateFontPath.fileName(), Qt::CaseInsensitive) == 0 &&
-                   m_MasterStageList[k]->eMode == pFontModel->GetLayerRenderMode(j) &&
+                   m_MasterStageList[k]->eMode == pFontLayersModel->GetLayerRenderMode(j) &&
                    m_MasterStageList[k]->fSize == pFontState->GetSize() &&
-                   m_MasterStageList[k]->fOutlineThickness == pFontModel->GetLayerOutlineThickness(j))
+                   m_MasterStageList[k]->fOutlineThickness == pFontLayersModel->GetLayerOutlineThickness(j))
                 {
                     // Match found, incrementing reference
                     m_MasterStageList[k]->iTmpReferenceCount++;
 
-                    pFontModel->SetFontStageReference(j, m_MasterStageList[k]);
+                    pFontLayersModel->SetFontStageReference(j, m_MasterStageList[k]);
 
                     bMatched = true;
                 }
@@ -298,10 +303,10 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
             // Could not find a match, so adding a new FontStagePass to 'm_MasterStageList'
             if(bMatched == false)
             {
-                m_MasterStageList.append(new FontTypeface(pFontState->GetFontFilePath(), pFontModel->GetLayerRenderMode(j), pFontState->GetSize(), pFontModel->GetLayerOutlineThickness(j)));
+                m_MasterStageList.append(new FontTypeface(pFontState->GetFontFilePath(), pFontLayersModel->GetLayerRenderMode(j), pFontState->GetSize(), pFontLayersModel->GetLayerOutlineThickness(j)));
                 m_MasterStageList[m_MasterStageList.count() - 1]->iTmpReferenceCount = 1;
 
-                pFontModel->SetFontStageReference(j, m_MasterStageList[m_MasterStageList.count() - 1]);
+                pFontLayersModel->SetFontStageReference(j, m_MasterStageList[m_MasterStageList.count() - 1]);
 
                 bIsDirty = true;
             }
@@ -339,8 +344,11 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
     for(int i = 0; i < m_MasterStageList.count(); ++i)
         m_MasterStageList[i]->iReferenceCount = m_MasterStageList[i]->iTmpReferenceCount;
 
-    // if 'bFindBestFit' == true, adjust atlas dimentions until we utilize efficient space on the smallest texture
-    QSize atlasSize = m_pItem->GetProject().GetAtlasModel().GetAtlasDimensions(TEMP_FONT_ATLAS_INDEX);
+    uint uiAtlasGrpIndex = 0;
+    if(m_pTrueAtlasFrame != nullptr)
+        uiAtlasGrpIndex = m_pItem->GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_pTrueAtlasFrame->GetAtlasGrpId());
+
+    QSize atlasSize = m_pItem->GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
     float fAtlasSizeModifier = 1.0f;
     bool bDoInitialShrink = true;
     size_t iNumMissedGlyphs = 0;
@@ -354,32 +362,32 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
 
         iNumMissedGlyphs = 0;
 
-        if(m_pAtlas)
-            texture_atlas_delete(m_pAtlas);
-        m_pAtlas = texture_atlas_new(static_cast<size_t>(atlasSize.width() * fAtlasSizeModifier), static_cast<size_t>(atlasSize.height() * fAtlasSizeModifier), 1);
+        if(m_pFtglAtlas)
+            texture_atlas_delete(m_pFtglAtlas);
+        m_pFtglAtlas = texture_atlas_new(static_cast<size_t>(atlasSize.width() * fAtlasSizeModifier), static_cast<size_t>(atlasSize.height() * fAtlasSizeModifier), 1);
 
         for(int i = 0; i < m_MasterStageList.count(); ++i)
         {
-            texture_font_t *pFont = texture_font_new_from_file(m_pAtlas, m_MasterStageList[i]->fSize, m_MasterStageList[i]->sFontPath.toStdString().c_str());
-            if(pFont == NULL)
+            texture_font_t *pFtglFont = texture_font_new_from_file(m_pFtglAtlas, m_MasterStageList[i]->fSize, m_MasterStageList[i]->sFontPath.toStdString().c_str());
+            if(pFtglFont == NULL)
             {
                 HyGuiLog("Could not create freetype font from: " % m_MasterStageList[i]->sFontPath, LOGTYPE_Error);
                 return;
             }
 
-            m_MasterStageList[i]->SetFont(pFont);
-            iNumMissedGlyphs += texture_font_load_glyphs(pFont, m_sAvailableTypefaceGlyphs.toUtf8().data());
+            m_MasterStageList[i]->SetFont(pFtglFont);   // Applies its attributes like size, render mode, outline thickness
+            iNumMissedGlyphs += texture_font_load_glyphs(pFtglFont, m_sAvailableTypefaceGlyphs.toUtf8().data());
         }
 
         if(iNumMissedGlyphs && fAtlasSizeModifier == 1.0f)
-            break; // Failure
+            break; // Failure; will be printed below
 
         if(iNumMissedGlyphs)
             fAtlasSizeModifier = HyClamp(fAtlasSizeModifier + 0.05f, 0.0f, 1.0f);
         else if(bDoInitialShrink)
-            fAtlasSizeModifier = static_cast<float>(m_pAtlas->used) / static_cast<float>(m_pAtlas->width * m_pAtlas->height);
+            fAtlasSizeModifier = static_cast<float>(m_pFtglAtlas->used) / static_cast<float>(m_pFtglAtlas->width * m_pFtglAtlas->height);
     }
-    while(bStoreIntoAtlasManager && (iNumMissedGlyphs != 0 || bDoInitialShrink));
+    while(bDoInitialShrink || (iNumMissedGlyphs != 0));
 
     if(iNumMissedGlyphs)
     {
@@ -389,7 +397,7 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
     {
         HyGuiLog("Generated " % m_pItem->GetName(true) % " Preview", LOGTYPE_Info);
         HyGuiLog(QString::number(m_MasterStageList.count()) % " fonts with " % QString::number(m_sAvailableTypefaceGlyphs.size()) % " glyphs each (totaling " % QString::number(m_sAvailableTypefaceGlyphs.size() * m_MasterStageList.count()) % ").", LOGTYPE_Normal);
-        HyGuiLog("Font Atlas size: " % QString::number(m_pAtlas->width) % "x" % QString::number(m_pAtlas->height) % " (Utilizing " % QString::number(100.0*m_pAtlas->used / (float)(m_pAtlas->width*m_pAtlas->height)) % "%) (Num Passes: " % QString::number(iNumPasses) % " - Dimensions Modifier: " % QString::number(fAtlasSizeModifier) % ")", LOGTYPE_Normal);
+        HyGuiLog("Font Atlas size: " % QString::number(m_pFtglAtlas->width) % "x" % QString::number(m_pFtglAtlas->height) % " (Utilizing " % QString::number(100.0*m_pFtglAtlas->used / (float)(m_pFtglAtlas->width*m_pFtglAtlas->height)) % "%) (Num Passes: " % QString::number(iNumPasses) % " - Dimensions Modifier: " % QString::number(fAtlasSizeModifier) % ")", LOGTYPE_Normal);
     }
 
 //    ui->lcdCurTexWidth->display(static_cast<int>(m_pAtlas->width));
@@ -398,26 +406,26 @@ void FontModel::GeneratePreview(bool bStoreIntoAtlasManager /*= false*/)
 
     // Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
     delete [] m_pTrueAtlasPixelData;
-    uint uiNumPixels = static_cast<uint>(m_pAtlas->width * m_pAtlas->height);
+    uint uiNumPixels = static_cast<uint>(m_pFtglAtlas->width * m_pFtglAtlas->height);
     m_uiTrueAtlasPixelDataSize = uiNumPixels * 4;
     m_pTrueAtlasPixelData = new unsigned char[m_uiTrueAtlasPixelDataSize];
     memset(m_pTrueAtlasPixelData, 0xFF, m_uiTrueAtlasPixelDataSize);
     // Overwriting alpha channel
     for(uint i = 0; i < uiNumPixels; ++i)
-        m_pTrueAtlasPixelData[i*4+3] = m_pAtlas->data[i];
+        m_pTrueAtlasPixelData[i*4+3] = m_pFtglAtlas->data[i];
 
     if(bStoreIntoAtlasManager)
     {
-        QImage fontAtlasImage(m_pTrueAtlasPixelData, static_cast<int>(m_pAtlas->width), static_cast<int>(m_pAtlas->height), QImage::Format_RGBA8888);
+        QImage fontAtlasImage(m_pTrueAtlasPixelData, static_cast<int>(m_pFtglAtlas->width), static_cast<int>(m_pFtglAtlas->height), QImage::Format_RGBA8888);
 
         if(m_pTrueAtlasFrame)
             m_pItem->GetProject().GetAtlasModel().ReplaceFrame(m_pTrueAtlasFrame, m_pItem->GetName(false), fontAtlasImage, true);
         else
-            m_pTrueAtlasFrame = m_pItem->GetProject().GetAtlasModel().GenerateFrame(m_pItem, m_pItem->GetName(false), fontAtlasImage, TEMP_FONT_ATLAS_INDEX, ATLAS_Font);
+            m_pTrueAtlasFrame = m_pItem->GetProject().GetAtlasModel().GenerateFrame(m_pItem, m_pItem->GetName(false), fontAtlasImage, 0, ITEM_Font);
     }
 
     // Signals ItemFont to upload and refresh the preview texture
-    m_pAtlas->id = 0;
+    m_pFtglAtlas->id = 0;
     m_bFontPreviewDirty = true;
 }
 
@@ -469,34 +477,32 @@ bool FontModel::ClearFontDirtyFlag()
     return retObj;
 }
 
-/*virtual*/ QJsonValue FontModel::GetSaveInfo()
+/*virtual*/ QJsonValue FontModel::GetSaveInfo(bool bWritingToGameData)
 {
-    if(m_FontMetaDir.mkpath(".") == false)
-    {
+    if(m_FontMetaDir.mkpath(".") == false) {
         HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
-        return false;
     }
-
-    for(int i = 0; i < m_MasterStageList.count(); ++i)
+    else
     {
-        QFileInfo tmpFontFile(m_MasterStageList[i]->pTextureFont->filename);
-        QFileInfo metaFontFile(m_FontMetaDir.absoluteFilePath(tmpFontFile.fileName()));
-
-        if(metaFontFile.exists() == false)
+        for(int i = 0; i < m_MasterStageList.count(); ++i)
         {
-            if(QFile::copy(tmpFontFile.absoluteFilePath(), metaFontFile.absoluteFilePath()) == false)
-                HyGuiLog("Could not copy font file (" % tmpFontFile.filePath() % ") to the meta directory", LOGTYPE_Error);
+            QFileInfo tmpFontFile(m_MasterStageList[i]->pTextureFont->filename);
+            QFileInfo metaFontFile(m_FontMetaDir.absoluteFilePath(tmpFontFile.fileName()));
+
+            if(metaFontFile.exists() == false)
+            {
+                if(QFile::copy(tmpFontFile.absoluteFilePath(), metaFontFile.absoluteFilePath()) == false)
+                    HyGuiLog("Could not copy font file (" % tmpFontFile.filePath() % ") to the meta directory", LOGTYPE_Error);
+            }
         }
     }
 
-
-    GeneratePreview(true);
-
+    GeneratePreview(bWritingToGameData);
 
     QJsonObject fontObj;
     
-    fontObj.insert("checksum", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetImageChecksum())));
-    fontObj.insert("id", QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetId())));
+    fontObj.insert("checksum", m_pTrueAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetImageChecksum())));
+    fontObj.insert("id", m_pTrueAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetId())));
 
     QJsonObject availableGlyphsObj;
     availableGlyphsObj.insert("0-9", m_pChkMapper_09->IsChecked());
@@ -572,7 +578,7 @@ bool FontModel::ClearFontDirtyFlag()
     for(int i = 0; i < m_StateList.size(); ++i)
     {
         FontStateData *pState = static_cast<FontStateData *>(m_StateList[i]);
-        FontTableModel *pFontModel = pState->GetFontModel();
+        FontLayersModel *pFontModel = pState->GetFontLayersModel();
         
         QJsonObject stateObj;
         static_cast<FontStateData *>(m_StateList[i])->GetStateInfo(stateObj);

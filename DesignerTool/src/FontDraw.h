@@ -8,31 +8,29 @@
 
 class FontDraw : public IDraw
 {
-    FontModel &                 m_ModelRef;
-    
-    bool                        m_bShowAtlasPreview;
-
-    HyCamera2d *                m_pAtlasCamera;
+    HyCamera2d *                m_pPreviewTextCamera;
     HyTexturedQuad2d *          m_pDrawAtlasPreview;
     HyPrimitive2d               m_DrawAtlasOutline;
 
     HyPrimitive2d               m_DividerLine;
-    QList<HyTexturedQuad2d *>   m_DrawFontPreviewList;
+
+    HyText2d                    m_Text;
 
 public:
-    FontDraw(FontModel &modelRef, IHyApplication &hyApp);
+    FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~FontDraw();
-    
-    void PositionDividerLine();
-    
-    void ShowSubAtlas(bool bShow);
+
+    virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) override;
     
     void LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelData, uint uiAtlasPixelDataSize);
-    void GenerateTextPreview(FontTableModel *pFontModel, QString sFontPreviewString, texture_atlas_t *pAtlas);
+    //void GenerateTextPreview(FontLayersModel *pFontModel, QString sFontPreviewString, texture_atlas_t *pAtlas);
 
 protected:
     virtual void OnShow(IHyApplication &hyApp) override;
     virtual void OnHide(IHyApplication &hyApp) override;
+    virtual void OnResizeRenderer() override;
+    
+    virtual void OnUpdate() override;
 };
 
 #endif // FONTDRAW_H

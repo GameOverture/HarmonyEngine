@@ -55,7 +55,7 @@ public:
     ~ExplorerWidget();
     
     Project *AddItemProject(const QString sNewProjectFilePath);
-    void AddItem(HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd);
+    void AddNewItem(HyGuiItemType eNewItemType, const QString sPrefix, const QString sName);
     void RemoveItem(ExplorerItem *pItem);
     
     void SelectItem(ExplorerItem *pItem);

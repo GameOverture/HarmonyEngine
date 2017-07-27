@@ -79,7 +79,7 @@
            <string>Settings</string>
           </property>
           <property name="icon">
-           <iconset resource="res/DesignerTool.qrc">
+           <iconset>
             <normaloff>:/icons16x16/generic-settings.png</normaloff>:/icons16x16/generic-settings.png</iconset>
           </property>
          </widget>
@@ -254,8 +254,8 @@
   </layout>
   <action name="actionDeleteImages">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+    <iconset>
+     <normaloff>:/icons16x16/items/Atlas-Delete.png</normaloff>:/icons16x16/items/Atlas-Delete.png</iconset>
    </property>
    <property name="text">
     <string>Delete</string>
@@ -266,7 +266,7 @@
   </action>
   <action name="actionReplaceImages">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset>
      <normaloff>:/icons16x16/atlas-replaceFrame.png</normaloff>:/icons16x16/atlas-replaceFrame.png</iconset>
    </property>
    <property name="text">
@@ -278,8 +278,8 @@
   </action>
   <action name="actionAddFilter">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/folder-new.png</normaloff>:/icons16x16/folder-new.png</iconset>
+    <iconset>
+     <normaloff>:/icons16x16/items/Prefix-New.png</normaloff>:/icons16x16/items/Prefix-New.png</iconset>
    </property>
    <property name="text">
     <string>Add Filter</string>
@@ -290,7 +290,7 @@
   </action>
   <action name="actionRename">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset>
      <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
    </property>
    <property name="text">
@@ -302,7 +302,7 @@
   </action>
   <action name="actionAtlasGroups">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset>
      <normaloff>:/icons16x16/atlas-assemble.png</normaloff>:/icons16x16/atlas-assemble.png</iconset>
    </property>
    <property name="text">
@@ -314,7 +314,7 @@
   </action>
   <action name="actionAddGroup">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset>
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
@@ -326,7 +326,7 @@
   </action>
   <action name="actionRemoveGroup">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset>
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
@@ -344,8 +344,6 @@
    <header>AtlasWidget.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="res/DesignerTool.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

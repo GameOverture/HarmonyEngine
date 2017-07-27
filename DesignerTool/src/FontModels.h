@@ -17,9 +17,6 @@
 
 #include <QJsonArray>
 
-// TODO: Add combo box to font widget that can select which atlas group this font's sub-atlas belongs to
-#define TEMP_FONT_ATLAS_INDEX 0
-
 struct FontTypeface
 {
     int                 iReferenceCount;
@@ -60,7 +57,7 @@ struct FontTypeface
 
 class FontStateData : public IStateData
 {
-	FontTableModel *			m_pFontTableModel;
+	FontLayersModel *			m_pFontTableModel;
 	
 	DoubleSpinBoxMapper *		m_pSbMapper_Size;
     ComboBoxMapper *            m_pCmbMapper_Fonts;
@@ -69,7 +66,7 @@ public:
     FontStateData(IModel &modelRef, QJsonObject stateObj);
     virtual ~FontStateData();
 
-    FontTableModel *GetFontModel();
+    FontLayersModel *GetFontLayersModel();
 
     DoubleSpinBoxMapper *GetSizeMapper();
     ComboBoxMapper *GetFontMapper();
@@ -105,7 +102,7 @@ class FontModel : public IModel
     bool                        m_bGlyphsDirty;
     bool                        m_bFontPreviewDirty;
 
-    texture_atlas_t *           m_pAtlas;
+    texture_atlas_t *           m_pFtglAtlas;
     unsigned char *             m_pTrueAtlasPixelData;
     uint                        m_uiTrueAtlasPixelDataSize;
 
@@ -125,7 +122,8 @@ public:
 	
 	QJsonObject GetTypefaceObj(int iTypefaceIndex);
     
-    texture_atlas_t *GetAtlas();
+    texture_atlas_t *GetFtglAtlas();
+    AtlasFrame *GetAtlasFrame();
     unsigned char *GetAtlasPixelData();
     uint GetAtlasPixelDataSize();
     
@@ -136,7 +134,7 @@ public:
     bool ClearFontDirtyFlag();
 
     virtual QJsonObject PopStateAt(uint32 uiIndex) override;
-    virtual QJsonValue GetSaveInfo() override;
+    virtual QJsonValue GetSaveInfo(bool bWritingToGameData) override;
     virtual void Refresh() override;
 };
 

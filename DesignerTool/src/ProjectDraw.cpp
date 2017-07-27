@@ -120,7 +120,7 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProjectDraw::ProjectDraw(IHyApplication &hyApp) : IDraw(hyApp)
+ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp)
 {
     IHyShader *pShader_CheckerGrid = IHyRenderer::MakeCustomShader();
     pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
@@ -129,21 +129,25 @@ ProjectDraw::ProjectDraw(IHyApplication &hyApp) : IDraw(hyApp)
     pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
     pShader_CheckerGrid->Finalize(HYSHADERPROG_Primitive);
 
-    m_CheckerGridBG.SetCustomShader(pShader_CheckerGrid);
-    m_CheckerGridBG.SetDisplayOrder(-1000);
-    m_CheckerGridBG.SetSurfaceSize(10000, 10000);  // Use a large size that is a multiple of grid size (25)
+    m_CheckerGrid.SetCustomShader(pShader_CheckerGrid);
+    m_CheckerGrid.SetDisplayOrder(-1000);
+    m_CheckerGrid.SetSurfaceSize(10000, 10000);  // Use a large size that is a multiple of grid size (25)
 
-    ChildAppend(m_CheckerGridBG);
+    ChildAppend(m_CheckerGrid);
 }
 
 /*virtual*/ ProjectDraw::~ProjectDraw()
 {
 }
 
-/*virtual*/ void ProjectDraw::OnShow(IHyApplication &hyApp)
+/*virtual*/ void ProjectDraw::OnShow(IHyApplication &hyApp) /*override*/
 {
 }
 
-/*virtual*/ void ProjectDraw::OnHide(IHyApplication &hyApp)
+/*virtual*/ void ProjectDraw::OnHide(IHyApplication &hyApp) /*override*/
+{
+}
+
+/*virtual*/ void ProjectDraw::OnResizeRenderer() /*override*/
 {
 }

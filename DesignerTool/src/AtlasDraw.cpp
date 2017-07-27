@@ -16,7 +16,7 @@
 
 #define DISPLAYORDER_AtlasSelectedFrames 1000
 
-AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(*pHyApp),
+AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(nullptr, *pHyApp),
                                                                         m_ModelRef(*pModelRef),
                                                                         m_bIsMouseOver(false),
                                                                         m_HoverBackground(this),
@@ -48,6 +48,9 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(*p
         QList<AtlasFrame *> frameList = m_ModelRef.GetFrames(i);
         for(int j = 0; j < frameList.size(); ++j)
         {
+            if(frameList[j]->GetTextureIndex() < 0)
+                continue;
+
             uint32 uiTextureIndex = frameList[j]->GetTextureIndex();
             
             while(m_MasterList.size() <= uiTextureIndex)
@@ -164,7 +167,7 @@ void AtlasDraw::Update(IHyApplication &hyApp)
     }
 }
 
-/*virtual*/ void AtlasDraw::OnShow(IHyApplication &hyApp)
+/*virtual*/ void AtlasDraw::OnShow(IHyApplication &hyApp) /*override*/
 {
     m_bIsMouseOver = true;
     
@@ -179,7 +182,7 @@ void AtlasDraw::Update(IHyApplication &hyApp)
     m_HoverStrokeOutter.SetEnabled(true);
 }
 
-/*virtual*/ void AtlasDraw::OnHide(IHyApplication &hyApp)
+/*virtual*/ void AtlasDraw::OnHide(IHyApplication &hyApp) /*override*/
 {
     m_bIsMouseOver = false;
             
@@ -192,4 +195,8 @@ void AtlasDraw::Update(IHyApplication &hyApp)
     m_HoverBackground.SetEnabled(false);
     m_HoverStrokeInner.SetEnabled(false);
     m_HoverStrokeOutter.SetEnabled(false);
+}
+
+/*virtual*/ void AtlasDraw::OnResizeRenderer() /*override*/
+{
 }

@@ -131,6 +131,11 @@ void DlgAtlasGroupSettings::ApplyCurrentSettingsToObj(QJsonObject &settingsObjOu
     settingsObjOut.insert("textureType", ui->cmbTextureType->currentIndex());
 }
 
+void DlgAtlasGroupSettings::on_btnTexSize128_clicked()
+{
+
+}
+
 void DlgAtlasGroupSettings::on_btnTexSize256_clicked()
 {
     ui->sbTextureWidth->setValue(256);
@@ -153,6 +158,24 @@ void DlgAtlasGroupSettings::on_btnTexSize2048_clicked()
 {
     ui->sbTextureWidth->setValue(2048);
     ui->sbTextureHeight->setValue(2048);
+}
+
+void DlgAtlasGroupSettings::on_btnTexSize4096_clicked()
+{
+    ui->sbTextureWidth->setValue(4096);
+    ui->sbTextureHeight->setValue(4096);
+}
+
+void DlgAtlasGroupSettings::on_btnTexSize8192_clicked()
+{
+    ui->sbTextureWidth->setValue(8192);
+    ui->sbTextureHeight->setValue(8192);
+}
+
+void DlgAtlasGroupSettings::on_btnTexSize16384_clicked()
+{
+    ui->sbTextureWidth->setValue(16384);
+    ui->sbTextureHeight->setValue(16384);
 }
 
 /*virtual*/ void DlgAtlasGroupSettings::done(int r)

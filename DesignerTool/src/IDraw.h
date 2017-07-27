@@ -11,23 +11,46 @@
 #define IDRAW_H
 
 #include "Harmony/HyEngine.h"
+#include "Harmony/Utilities/jsonxx.h"
+
+#include <QWidget>
+
+class ProjectItem;
 
 class IDraw : public HyEntity2d
 {
 protected:
+    ProjectItem *       m_pProjItem;
     IHyApplication &    m_HyAppRef;
     HyCamera2d *        m_pCamera;
 
+    bool                m_bPanCameraKeyDown;
+    bool                m_bIsCameraPanning;
+    QPointF             m_ptOldMousePos;
+
 public:
-    IDraw(IHyApplication &hyApp);
+    IDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~IDraw();
+    
+    void ApplyJsonData(bool bReloadInAssetManager);
 
     void Show();
     void Hide();
+    void ResizeRenderer();
+
+    // Derived classes should pass their input events to this class, if they want their main camera to accept user control
+    virtual void OnKeyPressEvent(QKeyEvent *pEvent);
+    virtual void OnKeyReleaseEvent(QKeyEvent *pEvent);
+    virtual void OnMousePressEvent(QMouseEvent *pEvent);
+    virtual void OnMouseReleaseEvent(QMouseEvent *pEvent);
+    virtual void OnMouseWheelEvent(QWheelEvent *pEvent);
+    virtual void OnMouseMoveEvent(QMouseEvent *pEvent);
 
 protected:
+    virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) { }
     virtual void OnShow(IHyApplication &hyApp) = 0;
     virtual void OnHide(IHyApplication &hyApp) = 0;
+    virtual void OnResizeRenderer() = 0;
 };
 
 #endif // IDRAW_H

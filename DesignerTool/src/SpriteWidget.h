@@ -28,14 +28,13 @@ class SpriteWidget : public QWidget
     Q_OBJECT
     
     ProjectItem &           m_ItemRef;
-    SpriteDraw *            m_pDraw;
 
     bool                    m_bPlayActive;
     float                   m_fElapsedTime;
     bool                    m_bIsBounced;
 
 public:
-    explicit SpriteWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *parent = 0);
+    explicit SpriteWidget(ProjectItem &itemRef, QWidget *parent = 0);
     ~SpriteWidget();
     
     ProjectItem &GetItem();
@@ -44,15 +43,13 @@ public:
     
     void OnGiveMenuActions(QMenu *pMenu);
     void GetSaveInfo(QJsonArray &spriteStateArrayRef);
+    
+    bool IsPlayingAnim();
 
-    void OnShow();
-    void OnHide();
-    void OnUpdate();
-
-    void UpdateTimeStep();
+    void SetSelectedFrame(int iFrameIndex);
+    void GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut);
 
     void RefreshData(QVariant param);
-    void RefreshDraw(IHyApplication &hyAppRef);
     void UpdateActions();
 
 private:

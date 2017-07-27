@@ -60,7 +60,7 @@ Project *ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
     //pNewLoadThread->start();
 }
 
-void ExplorerWidget::AddItem(HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd)
+void ExplorerWidget::AddNewItem(HyGuiItemType eNewItemType, const QString sPrefix, const QString sName)
 {
     // Find the proper project tree item
     Project *pCurProj = GetCurProjSelected();
@@ -76,7 +76,7 @@ void ExplorerWidget::AddItem(HyGuiItemType eNewItemType, const QString sPrefix, 
         return;
     }
 
-    ExplorerItem *pItem = new ProjectItem(*pCurProj, eNewItemType, sPrefix, sName, QJsonValue());
+    ExplorerItem *pItem = new ProjectItem(*pCurProj, eNewItemType, sPrefix, sName, QJsonValue(), true);
     
     // Get the relative path from [ProjectDir->ItemPath] e.g. "Sprites/SpritePrefix/MySprite"
     QString sRelativePath = pItem->GetPath();
@@ -134,17 +134,16 @@ void ExplorerWidget::AddItem(HyGuiItemType eNewItemType, const QString sPrefix, 
         HyGuiLog("Did not add item: " % pItem->GetName(true) % " successfully", LOGTYPE_Error);
         return;
     }
-    else if(bOpenAfterAdd)
+
+    QTreeWidgetItem *pExpandItem = pItem->GetTreeItem();
+    while(pExpandItem->parent() != nullptr)
     {
-        QTreeWidgetItem *pExpandItem = pItem->GetTreeItem();
-        while(pExpandItem->parent() != nullptr)
-        {
-            ui->treeWidget->expandItem(pExpandItem->parent());
-            pExpandItem = pExpandItem->parent();
-        }
-        
-        MainWindow::OpenItem(static_cast<ProjectItem *>(pItem));
+        ui->treeWidget->expandItem(pExpandItem->parent());
+        pExpandItem = pExpandItem->parent();
     }
+
+    pItem->SetTreeItemSubIcon(SUBICON_New);
+    MainWindow::OpenItem(static_cast<ProjectItem *>(pItem));
 }
 
 void ExplorerWidget::RemoveItem(ExplorerItem *pItem)

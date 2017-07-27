@@ -264,7 +264,7 @@ void HyAssets::GetNodeData(IHyLeafDraw2d *pDrawNode2d, IHyNodeData *&pDataOut)
 
 void HyAssets::LoadNodeData(IHyLeafDraw2d *pDrawNode2d)
 {
-	if(pDrawNode2d->m_eLoadState != HYLOADSTATE_Inactive)
+	if(pDrawNode2d->m_eLoadState != HYLOADSTATE_Inactive || pDrawNode2d->IsLoadDataValid() == false)
 		return;
 
 	bool bFullyLoaded = true;

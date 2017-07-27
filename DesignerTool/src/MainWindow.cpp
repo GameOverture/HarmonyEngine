@@ -30,10 +30,9 @@
 #include <QTcpSocket>
 #include <QMessageBox>
 #include <QDesktopServices>
-
+#include <QDate>
 #include <QLabel>
-
-#define HYGUIVERSION_STRING "v0.0.1"
+#include <QShortcut>
 
 /*static*/ MainWindow * MainWindow::sm_pInstance = NULL;
 
@@ -79,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     
     SetSelectedProj(NULL);
 
-    HyGuiLog("Harmony Designer Tool " % QString(HYGUIVERSION_STRING), LOGTYPE_Title);
+    HyGuiLog("Harmony Designer Tool", LOGTYPE_Title);
     HyGuiLog("Initializing...", LOGTYPE_Normal);
     
     ui->actionCloseProject->setEnabled(false);
@@ -90,9 +89,6 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->actionSave->setEnabled(false);
     ui->actionSaveAll->setEnabled(false);
     ui->actionLaunchIDE->setEnabled(false);
-    
-    m_pCurSaveAction = ui->actionSave;
-    m_pCurSaveAllAction = ui->actionSaveAll;
     
     // Link the actions to their proper widgets
     ui->explorer->addAction(ui->actionProjectSettings);
@@ -180,11 +176,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     }
     m_Settings.endGroup();
 
-    // Restore opened items/tabs
-
-    // Append version to window title
-    setWindowTitle(windowTitle() % " " % HYGUIVERSION_STRING);
-
+    // TODO: Restore opened items/tabs here
+    //
 
     QLabel *pStatusLbl = new QLabel;
     statusBar()->showMessage("Ready");
@@ -197,6 +190,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     QLabel *pSvnLoginLabel = new QLabel;
     pSvnLoginLabel->setText("SVN Not Detected");
     statusBar()->addPermanentWidget(pSvnLoginLabel);
+
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this, SLOT(OnCtrlTab()));
 
     //setStyleSheet("background-color:black;");
 
@@ -287,6 +282,12 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
+/*static*/ void MainWindow::SetSaveEnabled(bool bCurItemDirty, bool bAnyItemDirty)
+{
+    sm_pInstance->ui->actionSave->setEnabled(bCurItemDirty);
+    sm_pInstance->ui->actionSaveAll->setEnabled(bAnyItemDirty);
+}
+
 /*static*/ void MainWindow::SetSelectedProj(Project *pProj)
 {
     if(sm_pInstance->m_pCurSelectedProj == pProj)
@@ -326,17 +327,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         sm_pInstance->m_pCurSelectedProj->GetTabBar()->setParent(sm_pInstance->ui->stackedTabWidgets);
     }
     
-    // Replace the save actions in the 'File' menu
-    QList<QAction *> projSaveActionList = sm_pInstance->m_pCurSelectedProj->GetSaveActions();
-    if(sm_pInstance->m_pCurSaveAction != projSaveActionList[0])
-    {
-        sm_pInstance->ui->menu_File->insertActions(sm_pInstance->m_pCurSaveAction, projSaveActionList);
-        sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAction);
-        sm_pInstance->ui->menu_File->removeAction(sm_pInstance->m_pCurSaveAllAction);
-        sm_pInstance->m_pCurSaveAction = projSaveActionList[0];
-        sm_pInstance->m_pCurSaveAllAction = projSaveActionList[1];
-    }
-    
     // Project manager widgets
     sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasWidget());
     sm_pInstance->ui->dockWidgetAtlas->widget()->show();
@@ -374,12 +364,18 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
-/*static*/ HyRendererInterop *MainWindow::GetCurrentRenderer()
+/*static*/ HyGuiRenderer *MainWindow::GetCurrentRenderer()
 {
-    if(sm_pInstance->m_pCurRenderer)
-        sm_pInstance->m_pCurRenderer->GetHarmonyRenderer();
-    else
-        return NULL;
+    return sm_pInstance->m_pCurRenderer;
+}
+
+void MainWindow::OnCtrlTab()
+{
+    if(m_pCurSelectedProj == nullptr)
+        return;
+
+    QTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
+    //pTabBar
 }
 
 void MainWindow::on_actionNewProject_triggered()
@@ -449,7 +445,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 {
     DlgNewItem *pDlg = new DlgNewItem(m_pCurSelectedProj, eItem, this);
     if(pDlg->exec())
-        ui->explorer->AddItem(eItem, pDlg->GetPrefix(), pDlg->GetName(), true);
+        ui->explorer->AddNewItem(eItem, pDlg->GetPrefix(), pDlg->GetName());
 
     delete pDlg;
 }
@@ -524,12 +520,39 @@ void MainWindow::on_actionViewProperties_triggered()
 
 void MainWindow::on_actionSave_triggered()
 {
-    
+    if(m_pCurSelectedProj == nullptr)
+    {
+        HyGuiLog("No valid project is active to save.", LOGTYPE_Error);
+        return;
+    }
+
+    QTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
+    int iIndex = pTabBar->currentIndex();
+    QVariant v = pTabBar->tabData(iIndex);
+    ProjectItem *pItem = v.value<ProjectItem *>();
+    pItem->Save();
+
+    HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
 }
 
 void MainWindow::on_actionSaveAll_triggered()
 {
-    
+    if(m_pCurSelectedProj == nullptr)
+    {
+        HyGuiLog("No valid project is active to save all.", LOGTYPE_Error);
+        return;
+    }
+
+    QTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
+    for(int i = 0; i < pTabBar->count(); ++i)
+    {
+        ProjectItem *pItem = pTabBar->tabData(i).value<ProjectItem *>();
+        if(pItem->IsSaveClean() == false)
+        {
+            pItem->Save();
+            HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
+        }
+    }
 }
 
 void MainWindow::on_actionLaunchIDE_triggered()
@@ -551,8 +574,13 @@ void MainWindow::on_actionLaunchIDE_triggered()
     }
 
 #if defined(Q_OS_WIN)
+    bool bUseVs2017 = false;
     bool bUseVs2015 = false;
     bool bUseVs2013 = false;
+
+    QSettings windowsRegEntryVS2017("HKEY_CLASSES_ROOT\\VisualStudio.DTE.15.0", QSettings::NativeFormat);
+    if(windowsRegEntryVS2017.childKeys().empty() == false)
+        bUseVs2017 = true;
 
     QSettings windowsRegEntryVS2015("HKEY_CLASSES_ROOT\\VisualStudio.DTE.14.0", QSettings::NativeFormat);
     if(windowsRegEntryVS2015.childKeys().empty() == false)
@@ -562,9 +590,14 @@ void MainWindow::on_actionLaunchIDE_triggered()
     if(windowsRegEntryVS2013.childKeys().empty() == false)
         bUseVs2013 = true;
 
-    // Use the newer version
-    if(bUseVs2013 && bUseVs2015)
+    // Use the newest version
+    if(bUseVs2017)
+        bUseVs2013 = bUseVs2015 = false;
+    else if(bUseVs2015)
         bUseVs2013 = false;
+    else if(bUseVs2013 == false) {
+        HyGuiLog("No appropriate IDE was detected on this machine.", LOGTYPE_Error);
+    }
 
     for(int i = 0; i < ideFileInfoList.size(); ++i)
     {
@@ -576,6 +609,19 @@ void MainWindow::on_actionLaunchIDE_triggered()
             do
             {
                 line = in.readLine();
+
+                if(line.contains("# Visual Studio 15", Qt::CaseSensitive))
+                {
+                    if(bUseVs2017)
+                    {
+                        file.close();
+                        QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath()));
+                        return;
+                    }
+                    else
+                        break;
+                }
+
                 if(line.contains("# Visual Studio 14", Qt::CaseSensitive))
                 {
                     if(bUseVs2015)
@@ -611,7 +657,7 @@ void MainWindow::on_actionLaunchIDE_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, HyDesignerToolName, "Harmony Engine and Designer Tool\nCopyright (c) 2016 Jason Knobler");
+    QMessageBox::about(this, HyDesignerToolName, "Harmony Engine and Designer Tool\n\nJason Knobler " % QString::number(QDate::currentDate().year()));
 }
 
 void MainWindow::on_actionAudioManager_triggered()

@@ -25,7 +25,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *pare
     ui->setupUi(this);
 
     setWindowTitle("Add a new " % HyGlobal::ItemName(eItem) % " item");
-    setWindowIcon(HyGlobal::ItemIcon(eItem));
+    setWindowIcon(HyGlobal::ItemIcon(eItem, SUBICON_New));
     
     ui->txtName->setValidator(HyGlobal::FileNameValidator());
     ui->txtPrefix->setValidator(HyGlobal::FilePathValidator());

@@ -28,16 +28,16 @@
 // Keep this commented out unless you want the entire project to save every item upon boot (used if 'Data.json' layout has changed and needs to propagate all its changes)
 //#define RESAVE_ENTIRE_PROJECT
 
+HarmonyInit g_DefaultInit;
+
 Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Project, sNewProjectFilePath),
-                                                        IHyApplication(HarmonyInit()),
+                                                        IHyApplication(g_DefaultInit),
                                                         m_pDraw(nullptr),
                                                         m_pAtlasModel(nullptr),
                                                         m_pAtlasWidget(nullptr),
                                                         m_pAudioMan(nullptr),
                                                         m_pTabBar(nullptr),
                                                         m_pCurOpenItem(nullptr),
-                                                        m_ActionSave(0),
-                                                        m_ActionSaveAll(0),
                                                         m_bHasError(false)
 {
     QFile projFile(sNewProjectFilePath);
@@ -73,24 +73,6 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     m_pTreeItemPtr->setText(0, GetName(false));
     m_Init.sGameName = GetName(false).toStdString();
     m_Init.sDataDir = GetAssetsAbsPath().toStdString();
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    m_ActionSave.setText("&Save");
-    m_ActionSave.setIcon(QIcon(":/icons16x16/file-save.png"));
-    m_ActionSave.setShortcuts(QKeySequence::Save);
-    m_ActionSave.setShortcutContext(Qt::ApplicationShortcut);
-    m_ActionSave.setEnabled(false);
-    QObject::connect(&m_ActionSave, SIGNAL(triggered(bool)),
-                     this, SLOT(on_save_triggered()));
-
-    m_ActionSaveAll.setText("Save &All");
-    m_ActionSaveAll.setIcon(QIcon(":/icons16x16/file-saveAll.png"));
-    m_ActionSaveAll.setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
-    m_ActionSaveAll.setShortcutContext(Qt::ApplicationShortcut);
-    m_ActionSaveAll.setEnabled(false);
-    QObject::connect(&m_ActionSaveAll, SIGNAL(triggered(bool)),
-                     this, SLOT(on_saveAll_triggered()));
     
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -203,13 +185,13 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
                     switch(subDirList[i])
                     {
                     case ITEM_DirAudio:
-                        pNewDataItem = new ProjectItem(*this, ITEM_Audio, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new ProjectItem(*this, ITEM_Audio, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
                         break;
                     case ITEM_DirFonts:
-                        pNewDataItem = new ProjectItem(*this, ITEM_Font, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new ProjectItem(*this, ITEM_Font, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
                         break;
                     case ITEM_DirSprites:
-                        pNewDataItem = new ProjectItem(*this, ITEM_Sprite, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value());
+                        pNewDataItem = new ProjectItem(*this, ITEM_Sprite, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
                         break;
                     case ITEM_DirParticles:
                     case ITEM_DirSpine:
@@ -318,25 +300,15 @@ QTabBar *Project::GetTabBar()
     return m_pTabBar;
 }
 
-QList<QAction *> Project::GetSaveActions()
+ProjectItem *Project::GetCurrentOpenItem()
 {
-    QList<QAction *> actionList;
-    actionList.append(&m_ActionSave);
-    actionList.append(&m_ActionSaveAll);
-    
-    return actionList;
-}
-
-void Project::SetSaveEnabled(bool bSaveEnabled, bool bSaveAllEnabled)
-{
-    m_ActionSave.setEnabled(bSaveEnabled);
-    m_ActionSaveAll.setEnabled(bSaveAllEnabled);
+    return m_pCurOpenItem;
 }
 
 void Project::OpenItem(ProjectItem *pItem)
 {
     if(m_pCurOpenItem && m_pCurOpenItem != pItem)
-        m_pCurOpenItem->WidgetHide(*this);
+        m_pCurOpenItem->RenderHide(*this);
 
     if(m_pCurOpenItem == pItem)
         return;
@@ -355,7 +327,7 @@ void Project::OpenItem(ProjectItem *pItem)
             m_pTabBar->setCurrentIndex(i);
             m_pTabBar->blockSignals(false);
 
-            m_pCurOpenItem->WidgetShow(*this);
+            m_pCurOpenItem->RenderShow(*this);
             break;
         }
     }
@@ -366,15 +338,17 @@ void Project::OpenItem(ProjectItem *pItem)
         m_pCurOpenItem->WidgetLoad(*this);
 
         m_pTabBar->blockSignals(true);
-        int iIndex = m_pTabBar->addTab(m_pCurOpenItem->GetIcon(), m_pCurOpenItem->GetName(false));
+        int iIndex = m_pTabBar->addTab(m_pCurOpenItem->GetIcon(m_pCurOpenItem->IsExistencePendingSave() ? SUBICON_New : SUBICON_None), m_pCurOpenItem->GetName(false));
         QVariant v;
         v.setValue(m_pCurOpenItem);
         m_pTabBar->setTabData(iIndex, v);
         m_pTabBar->setCurrentIndex(iIndex);
         m_pTabBar->blockSignals(false);
 
-        m_pCurOpenItem->WidgetShow(*this);
+        m_pCurOpenItem->RenderShow(*this);
     }
+
+    ApplySaveEnables();
 }
 
 // IHyApplication override
@@ -394,7 +368,7 @@ void Project::OpenItem(ProjectItem *pItem)
     if(m_pTabBar->count() > 0)
     {
         m_pDraw->Hide();
-        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetUpdate(*this);
+        //m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetUpdate(*this);
     }
     else
         m_pDraw->Show();
@@ -412,6 +386,12 @@ void Project::OpenItem(ProjectItem *pItem)
 void Project::SetRenderSize(int iWidth, int iHeight)
 {
     Window().SetResolution(glm::ivec2(iWidth, iHeight));
+
+    if(m_pTabBar && m_pTabBar->count() != 0)
+    {
+        if(m_pTabBar->currentIndex() >= 0)
+            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->GetDraw()->ResizeRenderer();
+    }
 }
 
 void Project::OnHarmonyLoaded()
@@ -444,10 +424,28 @@ void Project::OnHarmonyLoaded()
         }
 
         if(m_pTabBar->currentIndex() >= 0)
-            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetShow(*this);
+            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->RenderShow(*this);
     }
     
     MainWindow::SetSelectedProjWidgets(this);
+}
+
+void Project::ApplySaveEnables()
+{
+    bool bCurItemDirty = false;
+    bool bAnyItemDirty = false;
+    for(int i = 0; i < m_pTabBar->count(); ++i)
+    {
+        ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();
+        if(pItem->IsSaveClean() == false)
+        {
+            bAnyItemDirty = true;
+            if(m_pTabBar->currentIndex() == i)
+                bCurItemDirty = true;
+        }
+    }
+
+    MainWindow::SetSaveEnabled(bCurItemDirty, bAnyItemDirty);
 }
 
 void Project::SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal)
@@ -547,12 +545,13 @@ QJsonObject Project::GetSubDirObj(HyGuiItemType eType)
     return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType))].toObject();
 }
 
+// TODO: Remove this
 void Project::RefreshCurrentItemDraw()
 {
     ProjectItem *pCurrentItem = m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>();
 
     pCurrentItem->WidgetRefreshDraw(*this);
-    pCurrentItem->WidgetShow(*this);
+    pCurrentItem->RenderShow(*this);
 }
 
 bool Project::CloseAllTabs()
@@ -574,31 +573,6 @@ void Project::OnTabBarCurrentChanged(int iIndex)
     ProjectItem *pItem = v.value<ProjectItem *>();
 
     MainWindow::OpenItem(pItem);
-}
-
-void Project::on_save_triggered()
-{
-    int iIndex = m_pTabBar->currentIndex();
-    QVariant v = m_pTabBar->tabData(iIndex);
-    ProjectItem *pItem = v.value<ProjectItem *>();
-    pItem->Save();
-    
-    HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
-}
-
-void Project::on_saveAll_triggered()
-{
-    for(int i = 0; i < m_pTabBar->count(); ++i)
-    {
-        // TODO: instead look for dirty?
-        if(m_pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
-        {
-            ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();
-            pItem->Save();
-            
-            HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
-        }
-    }
 }
 
 void Project::OnCloseTab(int iIndex)
@@ -624,4 +598,7 @@ void Project::OnCloseTab(int iIndex)
         m_pCurOpenItem = nullptr;
 
     m_pTabBar->removeTab(iIndex);
+
+    if(pItem->IsExistencePendingSave())
+        pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
 }

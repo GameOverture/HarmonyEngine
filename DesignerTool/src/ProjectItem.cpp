@@ -13,7 +13,6 @@
 #include "AudioWidgetManager.h"
 #include "AtlasFrame.h"
 #include "IModel.h"
-
 #include "SpriteWidget.h"
 #include "FontWidget.h"
 #include "FontModels.h"
@@ -21,16 +20,21 @@
 #include "AudioDraw.h"
 
 #include <QMenu>
+#include <QJsonDocument>
+#include <QJsonArray>
 
 ProjectItem::ProjectItem(Project &projRef,
                          HyGuiItemType eType,
                          const QString sPrefix,
                          const QString sName,
-                         QJsonValue initValue) :    ExplorerItem(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
-                                                    m_ProjectRef(projRef),
-                                                    m_SaveValue(initValue),
-                                                    m_pModel(nullptr),
-                                                    m_pWidget(nullptr)
+                         QJsonValue initValue,
+                         bool bIsPendingSave) : ExplorerItem(eType, HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType)) % "/" % sPrefix % "/" % sName),
+                                                m_ProjectRef(projRef),
+                                                m_SaveValue(initValue),
+                                                m_bExistencePendingSave(bIsPendingSave),
+                                                m_pModel(nullptr),
+                                                m_pWidget(nullptr),
+                                                m_pDraw(nullptr)
 {
     m_pUndoStack = new QUndoStack(this);
     m_pActionUndo = m_pUndoStack->createUndoAction(nullptr, "&Undo");
@@ -48,6 +52,7 @@ ProjectItem::ProjectItem(Project &projRef,
     LoadModel();
 
     connect(m_pUndoStack, SIGNAL(cleanChanged(bool)), this, SLOT(on_undoStack_cleanChanged(bool)));
+    connect(m_pUndoStack, SIGNAL(indexChanged(int)), this, SLOT(on_undoStack_indexChanged(int)));
 }
 
 ProjectItem::~ProjectItem()
@@ -66,7 +71,7 @@ void ProjectItem::LoadModel()
         m_pModel = new FontModel(this, m_SaveValue.toObject());
         break;
     default:
-        HyGuiLog("Improper ItemWidget type created: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unimplemented ItemWidget type created: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
 }
@@ -92,33 +97,29 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
         static_cast<FontWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
         break;
     default:
-        HyGuiLog("Improper item GiveMenuActions(): " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unimplemented item GiveMenuActions(): " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
 }
 
 void ProjectItem::Save()
 {
-    switch(m_eTYPE)
-    {
-    case ITEM_Sprite:
-        m_SaveValue = static_cast<SpriteModel *>(m_pModel)->GetSaveInfo();
-        break;
-    case ITEM_Font:
-        m_SaveValue = static_cast<FontModel *>(m_pModel)->GetSaveInfo();
-        break;
-    default:
-        HyGuiLog("Improper item Save(): " % QString::number(m_eTYPE), LOGTYPE_Error);
-        break;
-    }
+    m_SaveValue = m_pModel->GetSaveInfo(true);
 
     GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue);
     m_pUndoStack->setClean();
+
+    m_bExistencePendingSave = false;
+}
+
+bool ProjectItem::IsExistencePendingSave()
+{
+    return m_bExistencePendingSave;
 }
 
 bool ProjectItem::IsSaveClean()
 {
-    return m_pUndoStack->isClean();
+    return m_pUndoStack->isClean() && m_bExistencePendingSave == false;
 }
 
 void ProjectItem::DiscardChanges()
@@ -131,105 +132,73 @@ void ProjectItem::DiscardChanges()
 
 void ProjectItem::WidgetRefreshDraw(IHyApplication &hyApp)
 {
-    if(m_pWidget == nullptr)
-        return;
-
+    m_pModel->Refresh();
+    
+    delete m_pDraw;
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
-        static_cast<SpriteModel *>(m_pModel)->Refresh();
-        static_cast<SpriteWidget *>(m_pWidget)->RefreshDraw(hyApp);
+        m_pDraw = new SpriteDraw(this, hyApp);
         break;
     case ITEM_Font:
-        static_cast<FontModel *>(m_pModel)->Refresh();
-        static_cast<FontWidget *>(m_pWidget)->RefreshDraw(hyApp);
+        m_pDraw = new FontDraw(this, hyApp);
         break;
     default:
-        HyGuiLog("Unsupported IProjItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unimplemented WidgetRefreshDraw() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
+
+    m_pDraw->ApplyJsonData(true);
+    
+    m_pDraw->Load();
+    m_pDraw->SetEnabled(false);
 }
 
 void ProjectItem::WidgetLoad(IHyApplication &hyApp)
 {
+    delete m_pWidget;
+    delete m_pDraw;
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
-        m_pWidget = new SpriteWidget(*this, hyApp);
+        m_pWidget = new SpriteWidget(*this);
+        m_pDraw = new SpriteDraw(this, hyApp);
         break;
     case ITEM_Font:
-        m_pWidget = new FontWidget(*this, hyApp);
+        m_pWidget = new FontWidget(*this);
+        m_pDraw = new FontDraw(this, hyApp);
         break;
     case ITEM_Audio:
         m_pWidget = new AudioWidget(*this);
+        //m_pDraw = new AudioDraw(*static_cast<AudioModel *>(m_pModel), hyApp);
         break;
     default:
-        HyGuiLog("Unsupported IProjItem::WidgetLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unimplemented WidgetLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
+    
+    m_pDraw->ApplyJsonData(true);
+    m_pDraw->Load();
+    m_pDraw->SetEnabled(false);
 }
 
 void ProjectItem::WidgetUnload(IHyApplication &hyApp)
 {
     delete m_pWidget;
     m_pWidget = nullptr;
+    
+    delete m_pDraw;
+    m_pDraw = nullptr;
 }
 
-void ProjectItem::WidgetShow(IHyApplication &hyApp)
+void ProjectItem::RenderShow(IHyApplication &hyApp)
 {
-    switch(m_eTYPE)
-    {
-    case ITEM_Sprite:
-        static_cast<SpriteWidget *>(m_pWidget)->OnShow();
-        break;
-    case ITEM_Font:
-        static_cast<FontWidget *>(m_pWidget)->OnShow();
-        break;
-    case ITEM_Audio:
-        //m_pWidget = new AudioWidget(*this);
-        //break;
-    default:
-        HyGuiLog("Unsupported IProjItem::WidgetShow() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
-        break;
-    }
+    m_pDraw->Show();
 }
 
-void ProjectItem::WidgetHide(IHyApplication &hyApp)
+void ProjectItem::RenderHide(IHyApplication &hyApp)
 {
-    switch(m_eTYPE)
-    {
-    case ITEM_Sprite:
-        static_cast<SpriteWidget *>(m_pWidget)->OnHide();
-        break;
-    case ITEM_Font:
-        static_cast<FontWidget *>(m_pWidget)->OnHide();
-        break;
-    case ITEM_Audio:
-        //m_pWidget = new AudioWidget(*this);
-        //break;
-    default:
-        HyGuiLog("Unsupported ProjectItem::WidgetHide() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
-        break;
-    }
-}
-
-void ProjectItem::WidgetUpdate(IHyApplication &hyApp)
-{
-    switch(m_eTYPE)
-    {
-    case ITEM_Sprite:
-        static_cast<SpriteWidget *>(m_pWidget)->OnUpdate();
-        break;
-    case ITEM_Font:
-        static_cast<FontWidget *>(m_pWidget)->OnUpdate();
-        break;
-    case ITEM_Audio:
-        //m_pWidget = new AudioWidget(*this);
-        //break;
-    default:
-        HyGuiLog("Unsupported ProjectItem::WidgetUpdate() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
-        break;
-    }
+    m_pDraw->Hide();
 }
 
 void ProjectItem::BlockAllWidgetSignals(bool bBlock)
@@ -256,7 +225,7 @@ void ProjectItem::WidgetRefreshData(QVariant param)
         static_cast<FontWidget *>(m_pWidget)->RefreshData(param);
         break;
     default:
-        HyGuiLog("Unsupported ProjectItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unimplemented ProjectItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
 }
@@ -270,28 +239,37 @@ void ProjectItem::DeleteFromProject()
 void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 {
     QTabBar *pTabBar = m_ProjectRef.GetTabBar();
-    
-    bool bCurItemDirty = false;
-    bool bAnyItemDirty = false;
-    
     for(int i = 0; i < pTabBar->count(); ++i)
     {
         if(pTabBar->tabData(i).value<ProjectItem *>() == this)
         {
             if(bClean)
+            {
                 pTabBar->setTabText(i, GetName(false));
+                pTabBar->setTabIcon(i, GetIcon(SUBICON_None));
+                SetTreeItemSubIcon(SUBICON_None);
+            }
             else
+            {
                 pTabBar->setTabText(i, GetName(false) + "*");
-        }
-        
-        if(pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
-        {
-            bAnyItemDirty = true;
-            if(pTabBar->currentIndex() == i)
-                bCurItemDirty = true;
+                pTabBar->setTabIcon(i, GetIcon(SUBICON_Dirty));
+                SetTreeItemSubIcon(SUBICON_Dirty);
+            }
+
+            break;
         }
     }
-    
-    m_ProjectRef.SetSaveEnabled(bCurItemDirty, bAnyItemDirty);
+
+    m_ProjectRef.ApplySaveEnables();
+}
+
+void ProjectItem::on_undoStack_indexChanged(int iIndex)
+{
+    if(m_pDraw == nullptr) {
+        HyGuiLog("m_pDraw was nullptr in on_undoStack_indexChanged", LOGTYPE_Error);
+    }
+
+    // TODO: figure out if need to reload in asset manager
+    m_pDraw->ApplyJsonData(true);
 }
 

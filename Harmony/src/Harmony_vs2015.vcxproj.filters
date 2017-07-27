@@ -672,5 +672,8 @@
     <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlasIndices.h">
       <Filter>Assets\Loadables</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Entities\HyEntityLeaf2d.h">
+      <Filter>Scene\Nodes\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -25,20 +25,18 @@
 #include <QMenu>
 #include <QColor>
 
-FontWidget::FontWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *parent) :   QWidget(parent),
-                                                                                            ui(new Ui::FontWidget),
-                                                                                            m_pDraw(new FontDraw(*static_cast<FontModel *>(itemRef.GetModel()), hyAppRef)),
-                                                                                            m_ItemRef(itemRef)
+FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
+                                                                ui(new Ui::FontWidget),
+                                                                //m_pDraw(new FontDraw(*static_cast<FontModel *>(itemRef.GetModel()), hyAppRef)),
+                                                                m_ItemRef(itemRef)
 {
     ui->setupUi(this);
 
-    m_pDraw->Load();
-    m_pDraw->SetEnabled(false);
+    //m_pDraw->Load();
+    //m_pDraw->SetEnabled(false);
 
     m_PrevAtlasSize.setWidth(0);
     m_PrevAtlasSize.setHeight(0);
-
-    ui->txtPrefixAndName->setText(m_ItemRef.GetName(true));
     
     ui->btnAddState->setDefaultAction(ui->actionAddState);
     ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
@@ -51,9 +49,9 @@ FontWidget::FontWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *
     ui->btnOrderLayerUp->setDefaultAction(ui->actionOrderLayerUpwards);
     ui->btnOrderLayerDown->setDefaultAction(ui->actionOrderLayerDownwards);
 
-    ui->stagesTableView->resize(ui->stagesTableView->size());
-    ui->stagesTableView->setItemDelegate(new FontDelegate(&m_ItemRef, ui->cmbStates, this));
-    QItemSelectionModel *pSelModel = ui->stagesTableView->selectionModel();
+    ui->layersTableView->resize(ui->layersTableView->size());
+    ui->layersTableView->setItemDelegate(new FontDelegate(&m_ItemRef, ui->cmbStates, this));
+    QItemSelectionModel *pSelModel = ui->layersTableView->selectionModel();
     connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
 
     ui->cmbStates->blockSignals(true);
@@ -86,7 +84,7 @@ FontWidget::FontWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *
 
 FontWidget::~FontWidget()
 {
-    delete m_pDraw;
+    //delete m_pDraw;
     delete ui;
 }
 
@@ -99,9 +97,9 @@ void FontWidget::SetSelectedState(int iIndex)
 {
     FontStateData *pCurStateData = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(iIndex));
 
-    ui->stagesTableView->setModel(pCurStateData->GetFontModel());
-    if(ui->stagesTableView->currentIndex().row() < 0 && ui->stagesTableView->model()->rowCount() > 0)
-        ui->stagesTableView->selectRow(0);
+    ui->layersTableView->setModel(pCurStateData->GetFontLayersModel());
+    if(ui->layersTableView->currentIndex().row() < 0 && ui->layersTableView->model()->rowCount() > 0)
+        ui->layersTableView->selectRow(0);
 
 
     pCurStateData->GetSizeMapper()->AddSpinBoxMapping(ui->sbSize);
@@ -128,30 +126,15 @@ void FontWidget::OnGiveMenuActions(QMenu *pMenu)
     pMenu->addAction(ui->actionOrderLayerDownwards);
 }
 
-void FontWidget::OnShow()
-{
-    m_pDraw->Show();
-}
+//void FontWidget::OnShow()
+//{
+//    m_pDraw->Show();
+//}
 
-void FontWidget::OnHide()
-{
-    m_pDraw->Hide();
-}
-
-void FontWidget::OnUpdate()
-{
-    texture_atlas_t *pAtlas = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlas();
-    unsigned char *pAtlasPixelData = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlasPixelData();
-    uint uiAtlasPixelDataSize = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlasPixelDataSize();
-    if(pAtlas == nullptr || pAtlasPixelData == nullptr)
-        return;
-
-    if(pAtlas->id == 0)
-        m_pDraw->LoadNewAtlas(pAtlas, pAtlasPixelData, uiAtlasPixelDataSize);
-    
-    if(static_cast<FontModel *>(m_ItemRef.GetModel())->ClearFontDirtyFlag())
-        m_pDraw->GenerateTextPreview(GetCurStateData()->GetFontModel(), "The quick brown fox jumped over the lazy dog. 01234567890", pAtlas);
-}
+//void FontWidget::OnHide()
+//{
+//    m_pDraw->Hide();
+//}
 
 QString FontWidget::GetFullItemName()
 {
@@ -174,17 +157,23 @@ void FontWidget::RefreshData(QVariant param)
     UpdateActions();
 }
 
-void FontWidget::RefreshDraw(IHyApplication &hyAppRef)
-{
-    delete m_pDraw;
-    m_pDraw = new FontDraw(*static_cast<FontModel *>(m_ItemRef.GetModel()), hyAppRef);
-}
+//void FontWidget::RefreshDraw(IHyApplication &hyAppRef)
+//{
+//    delete m_pDraw;
+//    m_pDraw = new FontDraw(*static_cast<FontModel *>(m_ItemRef.GetModel()), hyAppRef);
+//}
 
 void FontWidget::UpdateActions()
 {
     bool bGeneratePreview = false;
 
-    QSize curSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(TEMP_FONT_ATLAS_INDEX);
+    AtlasFrame *pAtlasFrame = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlasFrame();
+
+    uint uiAtlasGrpIndex = 0;
+    if(pAtlasFrame != nullptr)
+        uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(pAtlasFrame->GetAtlasGrpId());
+
+    QSize curSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
     if(m_PrevAtlasSize.width() < curSize.width() || m_PrevAtlasSize.height() < curSize.height())
         bGeneratePreview = true;
 
@@ -199,9 +188,9 @@ void FontWidget::UpdateActions()
     ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
 
-    bool bFrameIsSelected = ui->stagesTableView->model()->rowCount() > 0 && ui->stagesTableView->currentIndex().row() >= 0;
-    ui->actionOrderLayerUpwards->setEnabled(bFrameIsSelected && ui->stagesTableView->currentIndex().row() != 0);
-    ui->actionOrderLayerDownwards->setEnabled(bFrameIsSelected && ui->stagesTableView->currentIndex().row() != ui->stagesTableView->model()->rowCount() - 1);
+    bool bFrameIsSelected = ui->layersTableView->model()->rowCount() > 0 && ui->layersTableView->currentIndex().row() >= 0;
+    ui->actionOrderLayerUpwards->setEnabled(bFrameIsSelected && ui->layersTableView->currentIndex().row() != 0);
+    ui->actionOrderLayerDownwards->setEnabled(bFrameIsSelected && ui->layersTableView->currentIndex().row() != ui->layersTableView->model()->rowCount() - 1);
 
     if(bGeneratePreview)
         static_cast<FontModel *>(m_ItemRef.GetModel())->GeneratePreview();
@@ -216,16 +205,16 @@ FontStateData *FontWidget::GetCurStateData()
 
 int FontWidget::GetSelectedStageId()
 {
-    int iRowIndex = ui->stagesTableView->currentIndex().row();
+    int iRowIndex = ui->layersTableView->currentIndex().row();
 
-    if(ui->stagesTableView->model()->rowCount() == 0 ||
+    if(ui->layersTableView->model()->rowCount() == 0 ||
        iRowIndex < 0 ||
-       iRowIndex >= ui->stagesTableView->model()->rowCount())
+       iRowIndex >= ui->layersTableView->model()->rowCount())
     {
         return -1;
     }
 
-    return static_cast<FontTableModel *>(ui->stagesTableView->model())->GetLayerId(iRowIndex);
+    return static_cast<FontLayersModel *>(ui->layersTableView->model())->GetLayerId(iRowIndex);
 }
 
 void FontWidget::on_chk_09_clicked()
@@ -344,9 +333,9 @@ void FontWidget::on_actionOrderLayerDownwards_triggered()
 {
     QUndoCommand *pCmd = new FontUndoCmd_LayerOrder(m_ItemRef,
                                                     ui->cmbStates->currentIndex(),
-                                                    ui->stagesTableView,
-                                                    ui->stagesTableView->currentIndex().row(),
-                                                    ui->stagesTableView->currentIndex().row() + 1);
+                                                    ui->layersTableView,
+                                                    ui->layersTableView->currentIndex().row(),
+                                                    ui->layersTableView->currentIndex().row() + 1);
     m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
@@ -354,9 +343,9 @@ void FontWidget::on_actionOrderLayerUpwards_triggered()
 {
     QUndoCommand *pCmd = new FontUndoCmd_LayerOrder(m_ItemRef,
                                                     ui->cmbStates->currentIndex(),
-                                                    ui->stagesTableView,
-                                                    ui->stagesTableView->currentIndex().row(),
-                                                    ui->stagesTableView->currentIndex().row() - 1);
+                                                    ui->layersTableView,
+                                                    ui->layersTableView->currentIndex().row(),
+                                                    ui->layersTableView->currentIndex().row() - 1);
     m_ItemRef.GetUndoStack()->push(pCmd);
 }
 

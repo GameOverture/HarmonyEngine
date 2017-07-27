@@ -20,7 +20,7 @@
 #include "Scene/Physics/HyPhysEntity2d.h"
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
-std::vector<IHyNode *> HyScene::sm_NodeList;
+std::vector<IHyNode *> HyScene::sm_MasterNodeList;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
 
 HyScene::HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
@@ -47,17 +47,17 @@ HyScene::~HyScene(void)
 
 /*static*/ void HyScene::AddNode(IHyNode *pNode)
 {
-	sm_NodeList.push_back(pNode);
+	sm_MasterNodeList.push_back(pNode);
 }
 
 /*static*/ void HyScene::RemoveNode(IHyNode *pNode)
 {
-	for(auto it = sm_NodeList.begin(); it != sm_NodeList.end(); ++it)
+	for(auto it = sm_MasterNodeList.begin(); it != sm_MasterNodeList.end(); ++it)
 	{
 		if((*it) == pNode)
 		{
 			// TODO: Log about erasing Node
-			sm_NodeList.erase(it);
+			sm_MasterNodeList.erase(it);
 			break;
 		}
 	}
@@ -138,8 +138,8 @@ void HyScene::PostUpdate()
 
 	if(m_bPauseGame == false)
 	{
-		for(uint32 i = 0; i < sm_NodeList.size(); ++i)
-			sm_NodeList[i]->Update();
+		for(uint32 i = 0; i < sm_MasterNodeList.size(); ++i)
+			sm_MasterNodeList[i]->Update();
 	}
 	else
 	{

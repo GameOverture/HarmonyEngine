@@ -11,6 +11,7 @@
 #include "HyEngine.h"
 #include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Diagnostics/Console/HyConsole.h"
+#include "Assets/Nodes/HySprite2dData.h"
 
 HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
 																										m_bIsAnimPaused(false),
@@ -27,6 +28,11 @@ HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pPa
 
 HySprite2d::~HySprite2d(void)
 {
+}
+
+/*virtual*/ bool HySprite2d::IsEnabled() /*override*/
+{
+	return (IHyNode::IsEnabled() && ((m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Invalid) == 0));
 }
 
 void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl)
@@ -75,6 +81,9 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 
 void HySprite2d::AnimSetPause(bool bPause)
 {
+	if(m_bIsAnimPaused == bPause)
+		return;
+	
 	m_bIsAnimPaused = bPause;
 	m_fElapsedFrameTime = 0.0f;
 }
@@ -193,7 +202,15 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	return frameRef.vOFFSET;
 }
 
-/*virtual*/ void HySprite2d::DrawUpdate()
+/*virtual*/ bool HySprite2d::IsLoadDataValid() /*override*/
+{
+	AcquireData();
+
+	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(0, 0);
+	return frameRef.pAtlas != nullptr;
+}
+
+/*virtual*/ void HySprite2d::DrawUpdate() /*override*/
 {
 	if(IsLoaded() == false)
 		return;
@@ -304,7 +321,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
 }
 
-/*virtual*/ void HySprite2d::OnDataAcquired()
+/*virtual*/ void HySprite2d::OnDataAcquired() /*override*/
 {
 	HySprite2dData *pData = static_cast<HySprite2dData *>(UncheckedGetData());
 	uint32 uiNumStates = pData->GetNumStates();
@@ -328,10 +345,12 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Bounce;
 		if(stateRef.m_bREVERSE)
 			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Reverse;
+		if(stateRef.m_uiNUMFRAMES == 0 || stateRef.GetFrame(0).IsValid() == false)
+			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Invalid;
 	}
 }
 
-/*virtual*/ void HySprite2d::OnCalcBoundingVolume()
+/*virtual*/ void HySprite2d::OnCalcBoundingVolume() /*override*/
 {
 	uint32 uiNumVerts = m_RenderState.GetNumVerticesPerInstance();
 	glm::vec2 vLowerBounds(0.0f);
@@ -346,12 +365,12 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	m_BoundingVolume.SetLocalAABB(vLowerBounds, vUpperBounds);
 }
 
-/*virtual*/ void HySprite2d::OnUpdateUniforms()
+/*virtual*/ void HySprite2d::OnUpdateUniforms() /*override*/
 {
 	//m_ShaderUniforms.Set(...);
 }
 
-/*virtual*/ void HySprite2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
+/*virtual*/ void HySprite2d::OnWriteDrawBufferData(char *&pRefDataWritePos) /*override*/
 {
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 

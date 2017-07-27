@@ -56,7 +56,7 @@ public:
 
 	HyType GetType();
 
-	bool IsEnabled();
+	virtual bool IsEnabled();
 
 	int64 GetTag();
 	void SetTag(int64 iTag);

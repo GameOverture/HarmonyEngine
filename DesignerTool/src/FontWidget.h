@@ -23,19 +23,19 @@ class FontWidget;
 }
 
 class FontItem;
-class FontTableModel;
+class FontLayersModel;
 
 class FontWidget : public QWidget
 {
     Q_OBJECT
 
     ProjectItem &               m_ItemRef;
-    FontDraw *                  m_pDraw;
+    //FontDraw *                  m_pDraw;
     
     QSize                       m_PrevAtlasSize;
     
 public:
-    explicit FontWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *parent = 0);
+    explicit FontWidget(ProjectItem &itemRef, QWidget *parent = 0);
     ~FontWidget();
 
     ProjectItem &GetItem();
@@ -44,8 +44,8 @@ public:
 
     void OnGiveMenuActions(QMenu *pMenu);
 
-    void OnShow();
-    void OnHide();
+//    void OnShow();
+//    void OnHide();
     void OnUpdate();
     
 
@@ -56,7 +56,7 @@ public:
     void SetGlyphsDirty();
     
     void RefreshData(QVariant param);
-    void RefreshDraw(IHyApplication &hyAppRef);
+    //void RefreshDraw(IHyApplication &hyAppRef);
 
     void UpdateActions();
 

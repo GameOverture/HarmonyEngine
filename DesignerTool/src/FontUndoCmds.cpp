@@ -34,7 +34,7 @@ FontUndoCmd_AddLayer::FontUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex
 
 void FontUndoCmd_AddLayer::redo()
 {
-    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
+    FontLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
     
     if(m_iId == -1)
         m_iId = pModel->AddNewLayer(m_eRenderMode, m_fSize, m_fThickness);
@@ -46,7 +46,7 @@ void FontUndoCmd_AddLayer::redo()
 
 void FontUndoCmd_AddLayer::undo()
 {
-    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
+    FontLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
     pModel->RemoveLayer(m_iId);
     
     m_ItemRef.WidgetRefreshData(m_iStateIndex);
@@ -68,7 +68,7 @@ FontUndoCmd_RemoveLayer::FontUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStat
 
 void FontUndoCmd_RemoveLayer::redo()
 {
-    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
+    FontLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
     
     pModel->RemoveLayer(m_iId);
     
@@ -77,7 +77,7 @@ void FontUndoCmd_RemoveLayer::redo()
 
 void FontUndoCmd_RemoveLayer::undo()
 {
-    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
+    FontLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
     
     pModel->ReAddLayer(m_iId);
     
@@ -102,7 +102,7 @@ FontUndoCmd_LayerRenderMode::FontUndoCmd_LayerRenderMode(ProjectItem &itemRef, i
 
 void FontUndoCmd_LayerRenderMode::redo()
 {
-    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
+    FontLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
     
     pModel->SetLayerRenderMode(m_iLayerId, m_eNewRenderMode);
     
@@ -111,7 +111,7 @@ void FontUndoCmd_LayerRenderMode::redo()
 
 void FontUndoCmd_LayerRenderMode::undo()
 {
-    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
+    FontLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
     
     pModel->SetLayerRenderMode(m_iLayerId, m_ePrevRenderMode);
     
@@ -136,7 +136,7 @@ FontUndoCmd_LayerOutlineThickness::FontUndoCmd_LayerOutlineThickness(ProjectItem
 
 void FontUndoCmd_LayerOutlineThickness::redo()
 {
-    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
+    FontLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
     
     pModel->SetLayerOutlineThickness(m_iLayerId, m_fNewThickness);
     
@@ -145,7 +145,7 @@ void FontUndoCmd_LayerOutlineThickness::redo()
 
 void FontUndoCmd_LayerOutlineThickness::undo()
 {
-    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
+    FontLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
     
     pModel->SetLayerOutlineThickness(m_iLayerId, m_fPrevThickness);
     
@@ -172,7 +172,7 @@ FontUndoCmd_LayerColors::FontUndoCmd_LayerColors(ProjectItem &itemRef, int iStat
 
 void FontUndoCmd_LayerColors::redo()
 {
-    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
+    FontLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
 
     pModel->SetLayerColors(m_iLayerId, m_NewTopColor, m_NewBotColor);
 
@@ -181,7 +181,7 @@ void FontUndoCmd_LayerColors::redo()
 
 void FontUndoCmd_LayerColors::undo()
 {
-    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
+    FontLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
 
     pModel->SetLayerColors(m_iLayerId, m_PrevTopColor, m_PrevBotColor);
 
@@ -209,7 +209,7 @@ FontUndoCmd_LayerOrder::FontUndoCmd_LayerOrder(ProjectItem &itemRef, int iStateI
 
 void FontUndoCmd_LayerOrder::redo()
 {
-    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
+    FontLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
     
     int iOffset = m_iNewRowIndex - m_iPrevRowIndex;
     if(iOffset > 0)
@@ -224,7 +224,7 @@ void FontUndoCmd_LayerOrder::redo()
 
 void FontUndoCmd_LayerOrder::undo()
 {
-    FontTableModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontModel();
+    FontLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
     
     int iOffset = m_iPrevRowIndex - m_iNewRowIndex;
     if(iOffset > 0)

@@ -21,19 +21,14 @@
 #include <QJsonArray>
 #include <QAction>
 
-SpriteWidget::SpriteWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidget *parent) :   QWidget(parent),
-                                                                                                ui(new Ui::SpriteWidget),
-                                                                                                m_pDraw(nullptr),
-                                                                                                m_ItemRef(itemRef),
-                                                                                                m_bPlayActive(false),
-                                                                                                m_fElapsedTime(0.0),
-                                                                                                m_bIsBounced(false)
+SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
+                                                                    ui(new Ui::SpriteWidget),
+                                                                    m_ItemRef(itemRef),
+                                                                    m_bPlayActive(false),
+                                                                    m_fElapsedTime(0.0),
+                                                                    m_bIsBounced(false)
 {
     ui->setupUi(this);
-
-    RefreshDraw(hyAppRef);
-
-    ui->txtPrefixAndName->setText(m_ItemRef.GetName(true));
     
     ui->btnAddState->setDefaultAction(ui->actionAddState);
     ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
@@ -62,7 +57,6 @@ SpriteWidget::SpriteWidget(ProjectItem &itemRef, IHyApplication &hyAppRef, QWidg
 
 SpriteWidget::~SpriteWidget()
 {
-    delete m_pDraw;
     delete ui;
 }
 
@@ -113,106 +107,20 @@ void SpriteWidget::OnGiveMenuActions(QMenu *pMenu)
     pMenu->addAction(ui->actionApplyToAll);
 }
 
-void SpriteWidget::OnShow()
+bool SpriteWidget::IsPlayingAnim()
 {
-    m_pDraw->Show();
+    return m_bPlayActive;
 }
 
-void SpriteWidget::OnHide()
+void SpriteWidget::SetSelectedFrame(int iFrameIndex)
 {
-    m_pDraw->Hide();
+    ui->framesView->selectRow(iFrameIndex);
 }
 
-void SpriteWidget::OnUpdate()
+void SpriteWidget::GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut)
 {
-    int iFrameIndex = ui->framesView->currentIndex().row();
-    if(iFrameIndex >= 0)
-    {
-        SpriteFrame *pFrame = GetCurStateData()->GetFramesModel()->GetFrameAt(iFrameIndex);
-        m_pDraw->SetFrame(pFrame->m_pFrame->GetId(), glm::vec2(pFrame->GetRenderOffset().x(), pFrame->GetRenderOffset().y()));
-
-        UpdateTimeStep();
-    }
-}
-
-void SpriteWidget::UpdateTimeStep()
-{
-    SpriteFrame *pFrame = GetCurStateData()->GetFramesModel()->GetFrameAt(ui->framesView->currentIndex().row());
-
-    if(m_bPlayActive == false && pFrame != NULL)
-        return;
-
-    m_fElapsedTime += HyUpdateDelta();
-    while(m_fElapsedTime >= pFrame->m_fDuration)
-    {
-        bool bBounce = ui->chkBounce->isChecked();
-        bool bReverse = ui->chkReverse->isChecked();
-        bool bLoop = ui->chkLoop->isChecked();
-        int iNumFrames = GetCurStateData()->GetFramesModel()->rowCount();
-
-        int iNextRow = ui->framesView->currentIndex().row();
-
-        if(bReverse == false)
-        {
-            m_bIsBounced ? iNextRow-- : iNextRow++;
-
-            if(iNextRow < 0)
-            {
-                m_bIsBounced = false;
-
-                if(bLoop)
-                    iNextRow = 1;
-                else
-                    on_actionPlay_triggered();  // Stop playback
-            }
-            else if(iNextRow >= iNumFrames)
-            {
-                if(bBounce)
-                {
-                    iNextRow = iNumFrames - 2;
-                    m_bIsBounced = true;
-                }
-                else if(bLoop)
-                    iNextRow = 0;
-                else
-                    on_actionPlay_triggered();  // Stop playback
-            }
-        }
-        else
-        {
-            m_bIsBounced ? iNextRow++ : iNextRow--;
-
-            if(iNextRow < 0)
-            {
-                if(bBounce)
-                {
-                    iNextRow = 1;
-                    m_bIsBounced = true;
-                }
-                else if(bLoop)
-                    iNextRow = iNumFrames - 1;
-                else
-                    on_actionPlay_triggered();  // Stop playback
-            }
-            else if(iNextRow >= iNumFrames)
-            {
-                m_bIsBounced = false;
-
-                if(bLoop)
-                    iNextRow = iNumFrames - 2;
-                else
-                    on_actionPlay_triggered();  // Stop playback
-            }
-        }
-
-        if(m_bPlayActive)
-        {
-            ui->framesView->selectRow(iNextRow);
-            m_fElapsedTime -= pFrame->m_fDuration;
-        }
-        else
-            break;
-    }
+    iStateIndexOut = ui->cmbStates->currentIndex();
+    iFrameIndexOut = ui->framesView->currentIndex().row();
 }
 
 void SpriteWidget::RefreshData(QVariant param)
@@ -223,15 +131,6 @@ void SpriteWidget::RefreshData(QVariant param)
         SetSelectedState(iStateAffected);
     else
         UpdateActions();
-}
-
-void SpriteWidget::RefreshDraw(IHyApplication &hyAppRef)
-{
-    delete m_pDraw;
-
-    m_pDraw = new SpriteDraw(*static_cast<SpriteModel *>(m_ItemRef.GetModel()), hyAppRef);
-    m_pDraw->Load();
-    m_pDraw->SetEnabled(false);
 }
 
 void SpriteWidget::UpdateActions()
@@ -262,6 +161,7 @@ SpriteStateData *SpriteWidget::GetCurStateData()
 
 void SpriteWidget::on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
 {
+    static_cast<SpriteDraw *>(m_ItemRef.GetDraw())->SetFrame(ui->cmbStates->currentIndex(), ui->framesView->currentIndex().row());
     UpdateActions();
 }
 
@@ -456,6 +356,7 @@ void SpriteWidget::on_actionImportFrames_triggered()
     QUndoCommand *pCmd = new UndoCmd_AddFrames("Add Frames", m_ItemRef, ui->cmbStates->currentIndex());
     GetItem().GetUndoStack()->push(pCmd);
 
+    // TODO: Remove this
     m_ItemRef.GetProject().RefreshCurrentItemDraw();
 }
 

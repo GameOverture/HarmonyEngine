@@ -42,9 +42,6 @@ class MainWindow : public QMainWindow
     Project *               m_pCurSelectedProj;
     HyGuiRenderer *         m_pCurRenderer;
 
-    QAction *               m_pCurSaveAction;
-    QAction *               m_pCurSaveAllAction;
-
     HyGuiDebugger *         m_pDebugConnection;
 
 public:
@@ -59,6 +56,8 @@ public:
     
     static void OpenItem(ProjectItem *pItem);
     static void CloseItem(ProjectItem *pItem);
+
+    static void SetSaveEnabled(bool bCurItemDirty, bool bAnyItemDirty);
     
     static void SetSelectedProj(Project *pProj);
     static void SetSelectedProjWidgets(Project *pProj);
@@ -67,9 +66,12 @@ public:
     static void StartLoading(uint uiAreaFlags);
     static void StopLoading(uint uiAreaFlags);
     
-    static HyRendererInterop *GetCurrentRenderer();
+    static HyGuiRenderer *GetCurrentRenderer();
 
 private Q_SLOTS:
+
+    void OnCtrlTab();
+
     void on_actionNewProject_triggered();
     void on_actionOpenProject_triggered();
     void on_actionCloseProject_triggered();
