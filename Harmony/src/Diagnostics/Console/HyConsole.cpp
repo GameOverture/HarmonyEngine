@@ -15,11 +15,13 @@ BasicSection HyConsole::sm_csLog;
 
 HyConsole::HyConsole() 
 {
+	HyAssert(sm_pInstance == nullptr, "An instance of HyConsole already exists");
 	sm_pInstance = this;
 }
 
 HyConsole::~HyConsole()
 {
+	sm_pInstance = nullptr;
 }
 
 /*static*/ HyConsole *HyConsole::Get()

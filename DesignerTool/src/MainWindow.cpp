@@ -412,13 +412,8 @@ void MainWindow::on_actionOpenProject_triggered()
 
 void MainWindow::on_actionCloseProject_triggered()
 {
-    delete m_pCurRenderer;
-    m_pCurRenderer = new HyGuiRenderer(nullptr, this);
-    ui->centralVerticalLayout->addWidget(m_pCurRenderer);
-
+    SetSelectedProj(nullptr);
     ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
-
-    m_pCurSelectedProj = nullptr;
 }
 
 void MainWindow::on_actionNewAudio_triggered()

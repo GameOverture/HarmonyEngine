@@ -75,17 +75,14 @@ private Q_SLOTS:
     void on_actionNewProject_triggered();
     void on_actionOpenProject_triggered();
     void on_actionCloseProject_triggered();
+
     void on_actionNewSprite_triggered();
     void on_actionNewFont_triggered();
-    
     void on_actionNewParticle_triggered();
-    
     void on_actionNewAudio_triggered();
     
     void on_actionViewExplorer_triggered();
-    
     void on_actionViewAtlasManager_triggered();
-    
     void on_actionViewOutputLog_triggered();
     
     void on_actionConnect_triggered();
@@ -93,7 +90,6 @@ private Q_SLOTS:
     void on_actionViewProperties_triggered();
     
     void on_actionSave_triggered();
-    
     void on_actionSaveAll_triggered();
     
     void on_actionLaunchIDE_triggered();
