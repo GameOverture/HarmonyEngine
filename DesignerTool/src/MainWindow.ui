@@ -71,6 +71,8 @@
      <addaction name="actionNewParticle"/>
      <addaction name="actionNewSprite"/>
      <addaction name="actionNewFont"/>
+     <addaction name="separator"/>
+     <addaction name="actionNewEntity"/>
     </widget>
     <addaction name="actionNewProject"/>
     <addaction name="actionOpenProject"/>
@@ -609,6 +611,18 @@
    </property>
    <property name="toolTip">
     <string>Changes project settings such as the name, initial resolution, assets location, etc.</string>
+   </property>
+  </action>
+  <action name="actionNewEntity">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/items/Entity-New.png</normaloff>:/icons16x16/items/Entity-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>Entity</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new entity in the currently selected project</string>
    </property>
   </action>
  </widget>

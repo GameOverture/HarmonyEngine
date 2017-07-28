@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyEntity2d_h__
-#define __HyEntity2d_h__
+#ifndef HyEntity2d_h__
+#define HyEntity2d_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -90,4 +90,4 @@ protected:
 	virtual void SetNewChildAttributes(IHyNode2d &childInst);
 };
 
-#endif /* __HyEntity2d_h__ */
+#endif /* HyEntity2d_h__ */

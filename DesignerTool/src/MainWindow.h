@@ -80,6 +80,7 @@ private Q_SLOTS:
     void on_actionNewFont_triggered();
     void on_actionNewParticle_triggered();
     void on_actionNewAudio_triggered();
+    void on_actionNewEntity_triggered();
     
     void on_actionViewExplorer_triggered();
     void on_actionViewAtlasManager_triggered();

@@ -421,6 +421,11 @@ void MainWindow::on_actionNewAudio_triggered()
     NewItem(ITEM_Audio);
 }
 
+void MainWindow::on_actionNewEntity_triggered()
+{
+    NewItem(
+}
+
 void MainWindow::on_actionNewParticle_triggered()
 {
     NewItem(ITEM_Particles);
