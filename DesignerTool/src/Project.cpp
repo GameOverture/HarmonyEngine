@@ -172,7 +172,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 
                     if(bPrefixFound == false)
                     {
-                        ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sCurPrefix);
+                        ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sSubDirName % "/" % sCurPrefix);
                         QTreeWidgetItem *pNewPrefixTreeWidget = pPrefixItem->GetTreeItem();
 
                         pCurPrefixTreeItem->addChild(pNewPrefixTreeWidget);
