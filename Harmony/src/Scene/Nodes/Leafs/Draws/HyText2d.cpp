@@ -328,7 +328,8 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	if(pTextData == nullptr)
 		return;
 
-	m_RenderState.SetTextureHandle(pTextData->GetAtlas()->GetGfxApiHandle());
+	if(pTextData->GetAtlas())
+		m_RenderState.SetTextureHandle(pTextData->GetAtlas()->GetGfxApiHandle());
 
 	m_bIsDirty = true;
 }
@@ -339,6 +340,11 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 		return;
 
 	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
+
+#ifdef HY_PLATFORM_GUI
+	if(pData->GetAtlas() == nullptr)	// GUI tool may have incomplete data
+		return;
+#endif
 
 	m_uiNumValidCharacters = 0;
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
