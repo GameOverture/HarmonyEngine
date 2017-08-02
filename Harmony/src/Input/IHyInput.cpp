@@ -15,7 +15,7 @@
 
 IHyInput::IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :	m_uiNUM_INPUT_MAPS(uiNumInputMappings),
 																						m_WindowListRef(windowListRef),
-																						m_uiMouseWindowIndex(0)
+																						m_uiMouse_WindowIndex(0)
 {
 	IHyInputMap::sm_pInputManager = this;
 
@@ -41,15 +41,15 @@ IHyInputMap *IHyInput::GetInputMapArray()
 
 glm::vec2 IHyInput::GetWorldMousePos()
 {
-	return m_WindowListRef[m_uiMouseWindowIndex]->ConvertViewportCoordinateToWorldPos(m_ptLocalMousePos);
+	return m_WindowListRef[m_uiMouse_WindowIndex]->ConvertViewportCoordinateToWorldPos(m_ptMouse_CurNormalizedPos);
 }
 
 bool IHyInput::IsMouseLeftDown()
 {
-	return m_bMouseLeftDown;
+	return m_bMouse_LeftBtnDown;
 }
 
 bool IHyInput::IsMouseRightDown()
 {
-	return m_bMouseRightDown;
+	return m_bMouse_RightBtnDown;
 }

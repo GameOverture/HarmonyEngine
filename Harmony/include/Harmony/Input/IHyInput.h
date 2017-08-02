@@ -26,10 +26,10 @@ protected:
 
 	std::vector<HyWindow *> &	m_WindowListRef;
 
-	uint32						m_uiMouseWindowIndex;
-	glm::vec2					m_ptLocalMousePos;
-	bool						m_bMouseLeftDown;
-	bool						m_bMouseRightDown;
+	uint32						m_uiMouse_WindowIndex;
+	glm::vec2					m_ptMouse_CurNormalizedPos;
+	bool						m_bMouse_LeftBtnDown;
+	bool						m_bMouse_RightBtnDown;
 
 public:
 	IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
@@ -48,7 +48,9 @@ public:
 	virtual void StartPlayback() = 0;
 	virtual void StopPlayback() = 0;
 
+	// HandleMsg should be responsible for setting 'm_uiMouse_WindowIndex' to the correct value
 	virtual void HandleMsg(void *pMsg) = 0;
+
 	virtual void Update() = 0;
 };
 

@@ -16,7 +16,7 @@
 #include "Diagnostics/HyDiagnostics.h"
 #include "Threading/Threading.h"
 
-#define HYSETTING_MultithreadedRenderer
+//#define HYSETTING_MultithreadedRenderer
 
 class IHyShader;
 class HyWindow;
@@ -82,6 +82,8 @@ public:
 	virtual void DeleteTextureArray(uint32 uiTextureHandle) = 0;
 
 	virtual void OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags) = 0;
+
+	uint32 GetNumRenderSurfaces();
 
 	int32 GetNumCameras2d();
 	uint32 GetCameraWindowIndex2d(int iCameraIndex);

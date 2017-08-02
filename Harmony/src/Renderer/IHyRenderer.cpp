@@ -57,6 +57,11 @@ void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string
 	m_DiagnosticsRef.SetRendererInfo(sApiName, sVersion, sVendor, sRenderer, sShader, iMaxTextureSize, sCompressedTextures);
 }
 
+uint32 IHyRenderer::GetNumRenderSurfaces()
+{
+	return static_cast<uint32>(m_RenderSurfaces.size());
+}
+
 int32 IHyRenderer::GetNumCameras2d()
 {
 	return *(reinterpret_cast<int32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras2d));

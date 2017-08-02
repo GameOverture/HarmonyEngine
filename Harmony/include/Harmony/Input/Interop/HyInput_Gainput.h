@@ -61,7 +61,9 @@ public:
 
 	gainput::DeviceId GetGamePadDeviceId(uint32 uiIndex);
 
+	// HandleMsg should be responsible for setting 'm_uiMouseWindowIndex' to the correct value
 	virtual void HandleMsg(void *pMsg) override;
+
 	virtual void Update() override;
 };
 

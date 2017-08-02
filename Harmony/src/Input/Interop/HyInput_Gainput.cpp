@@ -82,11 +82,19 @@ gainput::DeviceId HyInput_Gainput::GetGamePadDeviceId(uint32 uiIndex)
 	return -1;
 }
 
+// HandleMsg should be responsible for setting 'm_uiMouse_WindowIndex' to the correct value
 /*virtual*/ void HyInput_Gainput::HandleMsg(void *pMsg) /*override*/
 {
 #ifdef HY_PLATFORM_WINDOWS
-	m_Manager.SetDisplaySize(static_cast<int>(m_WindowListRef[0]->GetResolution().x), static_cast<int>(m_WindowListRef[0]->GetResolution().y));
-	m_Manager.HandleMessage(*reinterpret_cast<HyApiMsgInterop *>(pMsg));
+	const MSG &msgRef = *reinterpret_cast<HyApiMsgInterop *>(pMsg);
+	if(msgRef.message == WM_MOUSEMOVE)
+	{
+		m_uiMouse_WindowIndex = static_cast<uint32>(msgRef.wParam);
+		m_Manager.SetDisplaySize(static_cast<int>(m_WindowListRef[m_uiMouse_WindowIndex]->GetResolution().x),
+												  static_cast<int>(m_WindowListRef[m_uiMouse_WindowIndex]->GetResolution().y));
+	}
+
+	m_Manager.HandleMessage(msgRef);
 #endif
 }
 
@@ -96,21 +104,9 @@ gainput::DeviceId HyInput_Gainput::GetGamePadDeviceId(uint32 uiIndex)
 	m_Manager.Update();
 
 	// TODO: Don't hardcode '0'
-	//if(msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST)
-	{
-		glm::vec2 ptMouseAxisNormalized(m_pInputMaps[0].GetAxis(MOUSEID_X), m_pInputMaps[0].GetAxis(MOUSEID_Y));
-		ptMouseAxisNormalized.y = 1.0f - ptMouseAxisNormalized.y; // Invert Y-coordinate
+	m_ptMouse_CurNormalizedPos.x = m_pInputMaps[0].GetAxis(MOUSEID_X);
+	m_ptMouse_CurNormalizedPos.y = 1.0f - m_pInputMaps[0].GetAxis(MOUSEID_Y); // Invert Y-coordinate
 
-		m_ptLocalMousePos = ptMouseAxisNormalized;
-		m_uiMouseWindowIndex = 0;
-
-		//if(msg.message == WM_MOUSEMOVE) {
-		//	HyLog("MOUSE MOVE: (" << GetWorldMousePos().x << ", " << GetWorldMousePos().y << ")");
-		//}
-	}
-
-	m_bMouseLeftDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Left);
-	m_bMouseRightDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Right);
-
-	//m_Manager.GetDeviceCountByType(
+	m_bMouse_LeftBtnDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Left);
+	m_bMouse_RightBtnDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Right);
 }
