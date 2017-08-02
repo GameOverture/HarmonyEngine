@@ -599,6 +599,6 @@ void Project::OnCloseTab(int iIndex)
 
     m_pTabBar->removeTab(iIndex);
 
-    if(pItem->IsExistencePendingSave())
+    if(pItem->IsExistencePendingSave() && pItem->GetTreeItem()->parent() != nullptr)
         pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
 }

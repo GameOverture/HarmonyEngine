@@ -523,6 +523,12 @@ void MainWindow::on_actionSave_triggered()
 
     QTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
     int iIndex = pTabBar->currentIndex();
+    if(iIndex < 0)
+    {
+        HyGuiLog("on_actionSave triggered with tab index of '-1'. Aborting save.", LOGTYPE_Error);
+        return;
+    }
+    
     QVariant v = pTabBar->tabData(iIndex);
     ProjectItem *pItem = v.value<ProjectItem *>();
     pItem->Save();
