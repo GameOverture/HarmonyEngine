@@ -124,7 +124,6 @@ bool HyGfxComms::Render_PollPlatformApi(IHyRenderer *pRenderer)
 	m_csApiMsgQueue.Lock();
 
 #if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
-	// TODO: return false when windows close message comes in or something similar
 	MSG msg = { 0 };
 	int32 iWindowIndex = 0;
 	HWND hWnd = static_cast<HyOpenGL_Win *>(pRenderer)->GetHWND(iWindowIndex);
@@ -136,9 +135,19 @@ bool HyGfxComms::Render_PollPlatformApi(IHyRenderer *pRenderer)
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 
-			m_ApiMsgQueue.push(msg);
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// NOTE: We replace the message's wParam field with the index of the window, to inform the Input manager which window the mouse is hovering over
+			if(msg.message == WM_MOUSEMOVE)
+			{
+				for(uint32 i = 0; i < static_cast<HyOpenGL_Win *>(pRenderer)->GetNumRenderSurfaces(); ++i)
+				{
+					if(static_cast<HyOpenGL_Win *>(pRenderer)->GetHWND(i) == msg.hwnd)
+						msg.wParam = i;
+				}
+			}
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			//static_cast<HyInputInterop &>(m_InputRef).HandleMsg(iWindowIndex, m_RenderSurfaces[iWindowIndex].GetWidth(), m_RenderSurfaces[iWindowIndex].GetHeight(), msg);
+			m_ApiMsgQueue.push(msg);
 		}
 
 		iWindowIndex++;

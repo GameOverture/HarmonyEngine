@@ -389,7 +389,9 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
         if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the " % HyGlobal::ItemName(pItem->GetType()) % ":\n" % pItem->GetName(true) % "?\n\nThis action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
         {
             static_cast<ProjectItem *>(pItem)->DeleteFromProject();
-            pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
+            
+            if(pItem->GetTreeItem()->parent() != nullptr)
+                pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
         }
         break;
         

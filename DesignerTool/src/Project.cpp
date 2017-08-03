@@ -172,7 +172,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
 
                     if(bPrefixFound == false)
                     {
-                        ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sCurPrefix);
+                        ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sSubDirName % "/" % sCurPrefix);
                         QTreeWidgetItem *pNewPrefixTreeWidget = pPrefixItem->GetTreeItem();
 
                         pCurPrefixTreeItem->addChild(pNewPrefixTreeWidget);
@@ -599,6 +599,6 @@ void Project::OnCloseTab(int iIndex)
 
     m_pTabBar->removeTab(iIndex);
 
-    if(pItem->IsExistencePendingSave())
+    if(pItem->IsExistencePendingSave() && pItem->GetTreeItem()->parent() != nullptr)
         pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
 }

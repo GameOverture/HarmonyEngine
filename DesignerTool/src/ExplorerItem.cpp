@@ -17,8 +17,8 @@
 #include "Project.h"
 #include "Harmony/Utilities/HyStrManip.h"
 
-ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath) : m_eTYPE(eType),
-                                                                                            m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str())
+ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath) :  m_eTYPE(eType),
+                                                                        m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str())
 {
     m_pTreeItemPtr = new QTreeWidgetItem();
 
