@@ -150,7 +150,7 @@ void HyGuiRenderer::RestoreCursor()
 
 void HyGuiRenderer::OnBootCheck()
 {
-    if(m_pHyEngine && m_pHyEngine->BootUpdate() == false)
+    if(m_pHyEngine && m_pHyEngine->IsInitialized())
     {
         m_pProjOwner->OnHarmonyLoaded();
         

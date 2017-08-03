@@ -396,6 +396,9 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 
 void Project::OnHarmonyLoaded()
 {
+    // IHyApplication::Initialize() override
+    Initialize();
+
     m_Init.sGameName = GetName(false).toStdString();
     m_Init.sDataDir = GetAssetsAbsPath().toStdString();
     

@@ -68,7 +68,7 @@ public:
 #ifndef HY_PLATFORM_GUI
 private:
 #endif
-	bool BootUpdate();
+	bool IsInitialized();
 	bool Update();
 	void Shutdown();
 

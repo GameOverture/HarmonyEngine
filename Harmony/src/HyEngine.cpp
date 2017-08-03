@@ -40,10 +40,14 @@ HyEngine::~HyEngine()
 
 	sm_pInstance = HY_NEW HyEngine(*pGame);
 
-	while(sm_pInstance->BootUpdate())
+	while(sm_pInstance->IsInitialized() == false)
 	{ }
 
 	sm_pInstance->m_Diagnostics.BootMessage();
+
+	if(pGame->Initialize() == false)
+		HyError("IApplication Initialize() failed");
+
 	sm_pInstance->m_Time.ResetDelta();
 
 	HyLogTitle("Starting Update Loop");
@@ -62,20 +66,16 @@ HyEngine::~HyEngine()
 #endif
 }
 
-bool HyEngine::BootUpdate()
+bool HyEngine::IsInitialized()
 {
 #ifndef HYSETTING_MultithreadedRenderer
 	m_Renderer.Update();
 #endif
 
 	if(m_Assets.IsLoaded() == false)
-		return true;
+		return false;
 
-	// If here, then engine fully loaded
-	if(m_AppRef.Initialize() == false)
-		HyError("IApplication Initialize() failed");
-
-	return false;
+	return true;
 }
 
 bool HyEngine::Update()
