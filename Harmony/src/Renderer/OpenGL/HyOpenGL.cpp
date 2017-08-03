@@ -95,7 +95,7 @@ HyOpenGL::~HyOpenGL(void)
 					sCompressedTextureFormats);
 
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
 	//////////////////////////////////////////////////////////////////////////
 	// 2D setup
@@ -169,7 +169,7 @@ HyOpenGL::~HyOpenGL(void)
 	if(iNumRenderStates2d == 0 || m_iCurCamIndex >= iNumCameras2d)
 		return false;
 	
-	// Without disabling glDepthMask, sprites fragments that overlap will be discarded, and primitive draws don't work
+	// TODO: Without disabling glDepthMask, sprites fragments that overlap will be discarded, and primitive draws don't work
 	glDepthMask(false);
 
 	return true;
@@ -388,7 +388,7 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::End_2d()
 {
 	m_iCurCamIndex++;
-	glDepthMask(true);
+	glDepthMask(true);	// TODO: Get rid of this once you implement proper depth
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);
@@ -566,5 +566,5 @@ void HyOpenGL::SetCameraMatrices_2d(bool bUseCameraView)
 			   static_cast<GLsizei>(fWidth),
 			   static_cast<GLsizei>(fHeight));
 
-	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f);
+	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f, 0.0f, 1.0f);
 }
