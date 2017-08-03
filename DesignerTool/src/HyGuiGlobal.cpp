@@ -121,6 +121,9 @@
     case ITEM_AtlasImage:
     case ITEM_DirAtlases:
         return ITEM_AtlasImage;
+    case ITEM_Entity:
+    case ITEM_DirEntities:
+        return ITEM_DirEntities;
     default:
         HyGuiLog("HyGlobal::GetCorrespondingDirItem() could not find the proper directory item", LOGTYPE_Warning);
     }
