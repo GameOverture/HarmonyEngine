@@ -18,6 +18,8 @@
 #include "FontModels.h"
 #include "AudioWidget.h"
 #include "AudioDraw.h"
+#include "EntityModel.h"
+#include "EntityWidget.h"
 
 #include <QMenu>
 #include <QJsonDocument>
@@ -70,8 +72,10 @@ void ProjectItem::LoadModel()
     case ITEM_Font:
         m_pModel = new FontModel(this, m_SaveValue.toObject());
         break;
+    case ITEM_Entity:
+        m_pModel = new EntityModel(this, m_SaveValue.toArray());
     default:
-        HyGuiLog("Unimplemented ItemWidget type created: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unimplemented item LoadModel(): " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
 }

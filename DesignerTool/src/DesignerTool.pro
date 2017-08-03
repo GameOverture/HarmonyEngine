@@ -65,7 +65,9 @@ SOURCES += main.cpp \
     AtlasWidget.cpp \
     ProjectDraw.cpp \
     IModel.cpp \
-    DlgProjectSettings.cpp
+    DlgProjectSettings.cpp \
+    EntityWidget.cpp \
+    EntityModel.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -117,7 +119,9 @@ HEADERS  += \
     AtlasWidget.h \
     ProjectDraw.h \
     IModel.h \
-    DlgProjectSettings.h
+    DlgProjectSettings.h \
+    EntityWidget.h \
+    EntityModel.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -141,7 +145,8 @@ FORMS    += \
     AudioWidgetState.ui \
     ExplorerWidget.ui \
     AtlasWidget.ui \
-    DlgProjectSettings.ui
+    DlgProjectSettings.ui \
+    EntityWidget.ui
 
 RC_FILE = DesignerTool.rc
 
