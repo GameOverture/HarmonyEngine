@@ -46,10 +46,10 @@ void IHyTime::SetFpsCap(uint32 uiFpsCap)
 	if(m_uiFpsCap != 0)
 	{
 		m_dUpdateStep_Seconds = (1.0 / static_cast<double>(m_uiFpsCap)* 1000.0) / 1000.0;
-		m_fpThrottleUpdate = &IHyTime::UpdateThrottle_Deterministic;
+		m_fpThrottleUpdate = &IHyTime::ThrottleUpdate_Deterministic;
 	}
 	else
-		m_fpThrottleUpdate = &IHyTime::UpdateThrottle_Variable;
+		m_fpThrottleUpdate = &IHyTime::ThrottleUpdate_Variable;
 
 	m_dThrottledTime = 0.0;
 }
@@ -129,7 +129,7 @@ void IHyTime::RemoveTimeInst(IHyTimeInst *pTimeInst)
 	}
 }
 
-bool IHyTime::UpdateThrottle_Deterministic()
+bool IHyTime::ThrottleUpdate_Deterministic()
 {
 	if(m_dThrottledTime >= m_dUpdateStep_Seconds)
 	{
@@ -160,7 +160,7 @@ bool IHyTime::UpdateThrottle_Deterministic()
 	return false;
 }
 
-bool IHyTime::UpdateThrottle_Variable()
+bool IHyTime::ThrottleUpdate_Variable()
 {
 	m_dUpdateStep_Seconds = m_dCurDeltaTime;
 	m_uiCurFpsCount++;

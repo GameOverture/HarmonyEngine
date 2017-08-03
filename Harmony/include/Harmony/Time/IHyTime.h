@@ -79,8 +79,8 @@ public:
 	void RemoveTimeInst(IHyTimeInst *pTimeInst);
 
 private:
-	bool UpdateThrottle_Deterministic();
-	bool UpdateThrottle_Variable();
+	bool ThrottleUpdate_Deterministic();
+	bool ThrottleUpdate_Variable();
 };
 
 #endif /* IHyTime_h__ */

@@ -86,6 +86,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->actionNewFont->setEnabled(false);
     ui->actionNewParticle->setEnabled(false);
     ui->actionNewAudio->setEnabled(false);
+    ui->actionNewEntity->setEnabled(false);
     ui->actionSave->setEnabled(false);
     ui->actionSaveAll->setEnabled(false);
     ui->actionLaunchIDE->setEnabled(false);
@@ -100,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->explorer->addAction(ui->actionNewParticle);
     ui->explorer->addAction(ui->actionNewFont);
     ui->explorer->addAction(ui->actionNewSprite);
+    ui->explorer->addAction(ui->actionNewEntity);
     ui->explorer->addAction(ui->actionOpenProject);
     ui->explorer->addAction(ui->actionPaste);
     ui->explorer->addAction(ui->actionRemove);

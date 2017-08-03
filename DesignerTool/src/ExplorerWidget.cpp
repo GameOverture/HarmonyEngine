@@ -336,6 +336,7 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
     FINDACTION("actionNewSprite")->setEnabled(bValidItem);
     FINDACTION("actionNewParticle")->setEnabled(bValidItem);
     FINDACTION("actionNewAudio")->setEnabled(bValidItem);
+    FINDACTION("actionNewEntity")->setEnabled(bValidItem);
     FINDACTION("actionLaunchIDE")->setEnabled(bValidItem);
     
     if(bValidItem)

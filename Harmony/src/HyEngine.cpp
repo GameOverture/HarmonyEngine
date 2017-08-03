@@ -94,7 +94,7 @@ bool HyEngine::Update()
 		}
 
 		m_Input.Update();
-		m_Scene.PreUpdate();
+		m_Scene.PreUpdate();	// Physics
 
 		if(m_AppRef.Update() == false)
 			return false;

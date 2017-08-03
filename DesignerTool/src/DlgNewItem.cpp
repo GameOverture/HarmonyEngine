@@ -21,7 +21,9 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *pare
                                                                                         m_pItemProject(pItemProject),
                                                                                         m_eItemType(eItem)
 {
-    
+    if(m_pItemProject == nullptr)
+        HyGuiLog("DlgNewItem::DlgNewItem was given a Project * that was nullptr", LOGTYPE_Error);
+
     ui->setupUi(this);
 
     setWindowTitle("Add a new " % HyGlobal::ItemName(eItem) % " item");
