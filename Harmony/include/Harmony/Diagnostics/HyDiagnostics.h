@@ -20,7 +20,7 @@ class HyScene;
 class HyText2d;
 
 // Comment this out to disable profiler
-//#define HYSETTING_ProfilerEnabled
+#define HYSETTING_ProfilerEnabled
 
 
 #ifdef HY_PLATFORM_GUI
@@ -74,6 +74,7 @@ class HyDiagnostics
 	ProfileState				m_CurProfileState;
 	std::vector<ProfileState>	m_ProfileStateList;
 	clock_t						m_TotalClockTicks;
+	HyText2d *					m_pProfileText;
 #endif
 
 	uint32						m_uiFps_Update;

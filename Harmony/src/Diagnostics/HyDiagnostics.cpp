@@ -74,6 +74,7 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 #endif
 
 #ifdef HYSETTING_ProfilerEnabled
+	m_pProfileText = nullptr;
 	m_ProfileStateList.reserve(10);
 #endif
 }
@@ -89,6 +90,13 @@ void HyDiagnostics::InitText(const char *szTextPrefix, const char *szTextName)
 	m_pFpsText = HY_NEW HyText2d(szTextPrefix, szTextName);
 	m_pFpsText->Load();
 	m_pFpsText->SetEnabled(false);
+
+#ifdef HYSETTING_ProfilerEnabled
+	delete m_pProfileText;
+	m_pProfileText = HY_NEW HyText2d(szTextPrefix, szTextName);
+	m_pProfileText->Load();
+	m_pProfileText->SetEnabled(false);
+#endif
 }
 
 HyText2d *HyDiagnostics::GetFpsText()
@@ -316,10 +324,24 @@ void HyDiagnostics::EndMemoryCheckpoint()
 void HyDiagnostics::Update()
 {
 #ifdef HYSETTING_ProfilerEnabled
-	HyAssert(m_CurProfileState.szName == nullptr, "HyDiagnostics::Update invoked with an open Profile begin");
+	if(m_pProfileText)
+	{
+		HyAssert(m_CurProfileState.szName == nullptr, "HyDiagnostics::Update invoked with an open Profile begin");
 
-	for(uint32 i = 0; i < m_ProfileStateList.size(); ++i)
-		asdf
+		uint32 uiNumProfileStates = m_ProfileStateList.size();
+		for(uint32 i = 0; i < uiNumProfileStates; ++i)
+		{
+			std::string sText = m_ProfileStateList[i].szName;
+			sText += ": ";
+			sText += std::to_string(static_cast<float>(m_ProfileStateList[i].time) / static_cast<float>(m_TotalClockTicks));
+			sText += "\n";
+
+			m_pProfileText->TextSet(sText);
+		}
+	}
+
+	m_ProfileStateList.clear();
+	m_TotalClockTicks = 0;
 #endif
 }
 
