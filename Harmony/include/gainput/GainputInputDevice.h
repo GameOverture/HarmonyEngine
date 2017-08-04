@@ -153,6 +153,9 @@ public:
 	/// Returns true if debug rendering is enabled, false otherwise.
 	bool IsDebugRenderingEnabled() const { return debugRenderingEnabled_; }
 
+	/// Added by -JJK
+	void ApplyBufferedButton(DeviceButtonId buttonId, bool pressed);
+
 #if defined(GAINPUT_DEV) || defined(GAINPUT_ENABLE_RECORDER)
 	/// Returns true if this device is being controlled by a remote device 
 	/// or a recorded input sequence, false otherwise.
@@ -178,6 +181,9 @@ protected:
 	InputState* state_;
 	/// The previous state of this device.
 	InputState* previousState_;
+
+	/// Stores any button that received both a "down" and "up" message before being handled by InputManager's Update() -JJK
+	Array<DeviceButtonId> bufferedButtonInputs_;
 
 	float* deadZones_;
 
