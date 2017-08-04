@@ -48,6 +48,9 @@ public:
 
 	gainput::InputManager &GetGainputManager();
 
+	virtual bool IsMouseLeftDown() override;
+	virtual bool IsMouseRightDown() override;
+
 	virtual void StartRecording() override;
 	virtual void StopRecording() override;
 	virtual void SerializeRecording() override;

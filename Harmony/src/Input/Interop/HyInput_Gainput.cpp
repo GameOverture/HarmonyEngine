@@ -41,6 +41,16 @@ gainput::InputManager &HyInput_Gainput::GetGainputManager()
 	return m_Manager;
 }
 
+/*virtual*/ bool HyInput_Gainput::IsMouseLeftDown() /*override*/
+{
+	return m_pInputMaps[0].IsBtnDown(MOUSEID_Left) || m_pInputMaps[0].IsBtnReleased(MOUSEID_Left) || m_pInputMaps[0].IsBtnDownBuffered(MOUSEID_Left);
+}
+
+/*virtual*/ bool HyInput_Gainput::IsMouseRightDown() /*override*/
+{
+	return m_pInputMaps[0].IsBtnDown(MOUSEID_Right) || m_pInputMaps[0].IsBtnReleased(MOUSEID_Right) || m_pInputMaps[0].IsBtnDownBuffered(MOUSEID_Right);
+}
+
 /*virtual*/ void HyInput_Gainput::StartRecording()
 {
 }
@@ -105,7 +115,4 @@ gainput::DeviceId HyInput_Gainput::GetGamePadDeviceId(uint32 uiIndex)
 	// TODO: Don't hardcode '0'
 	m_ptMouse_CurNormalizedPos.x = m_pInputMaps[0].GetAxis(MOUSEID_X);
 	m_ptMouse_CurNormalizedPos.y = 1.0f - m_pInputMaps[0].GetAxis(MOUSEID_Y); // Invert Y-coordinate
-
-	m_bMouse_LeftBtnDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Left);
-	m_bMouse_RightBtnDown = m_pInputMaps[0].IsBtnDown(MOUSEID_Right);
 }

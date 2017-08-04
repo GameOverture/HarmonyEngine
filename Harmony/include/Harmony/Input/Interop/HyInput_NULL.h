@@ -20,6 +20,9 @@ class HyInput_NULL : public IHyInput
 public:
 	HyInput_NULL(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) : IHyInput(uiNumInputMappings, windowListRef) { }
 
+	virtual bool IsMouseLeftDown() override { return false; }
+	virtual bool IsMouseRightDown() override { return false; }
+
 	virtual void StartRecording() override { }
 	virtual void StopRecording() override { }
 	virtual void SerializeRecording() override { }

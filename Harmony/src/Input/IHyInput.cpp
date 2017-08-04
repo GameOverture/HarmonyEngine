@@ -43,13 +43,3 @@ glm::vec2 IHyInput::GetWorldMousePos()
 {
 	return m_WindowListRef[m_uiMouse_WindowIndex]->ConvertViewportCoordinateToWorldPos(m_ptMouse_CurNormalizedPos);
 }
-
-bool IHyInput::IsMouseLeftDown()
-{
-	return m_bMouse_LeftBtnDown;
-}
-
-bool IHyInput::IsMouseRightDown()
-{
-	return m_bMouse_RightBtnDown;
-}

@@ -28,8 +28,6 @@ protected:
 
 	uint32						m_uiMouse_WindowIndex;
 	glm::vec2					m_ptMouse_CurNormalizedPos;
-	bool						m_bMouse_LeftBtnDown;
-	bool						m_bMouse_RightBtnDown;
 
 public:
 	IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
@@ -38,8 +36,8 @@ public:
 	IHyInputMap *GetInputMapArray();
 
 	glm::vec2 GetWorldMousePos();
-	bool IsMouseLeftDown();
-	bool IsMouseRightDown();
+	virtual bool IsMouseLeftDown() = 0;
+	virtual bool IsMouseRightDown() = 0;
 
 	virtual void StartRecording() = 0;
 	virtual void StopRecording() = 0;
