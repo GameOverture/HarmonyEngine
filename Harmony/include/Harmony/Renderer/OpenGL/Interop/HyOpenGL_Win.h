@@ -25,7 +25,7 @@ public:
 	~HyOpenGL_Win();
 
 	virtual bool Initialize() override;
-
+	
 	HWND ConstructWindow(const HyWindowInfo &wndInfo);
 
 	HWND GetHWND(int32 iWindowIndex);

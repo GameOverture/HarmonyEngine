@@ -51,7 +51,6 @@ class HyEngine
 	HyInputInterop				m_Input;
 	HyRendererInterop			m_Renderer;
 	HyAudioInterop				m_Audio;
-	
 
 // If HY_PLATFORM_GUI, make this ctor public as gui tool requires special usage.
 #ifdef HY_PLATFORM_GUI
@@ -71,6 +70,8 @@ private:
 	bool IsInitialized();
 	bool Update();
 	void Shutdown();
+
+	bool PollPlatformApi();
 
 	HyRendererInterop &GetRenderer();
 

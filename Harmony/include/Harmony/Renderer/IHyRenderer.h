@@ -16,8 +16,6 @@
 #include "Diagnostics/HyDiagnostics.h"
 #include "Threading/Threading.h"
 
-//#define HYSETTING_MultithreadedRenderer
-
 class IHyShader;
 class HyWindow;
 struct HyMonitorDeviceInfo;
@@ -47,17 +45,19 @@ protected:
 	std::vector<HyRenderSurface>			m_RenderSurfaces;
 	std::vector<HyRenderSurface>::iterator	m_RenderSurfaceIter;
 
-	ThreadInfoPtr							m_pRenderThread;
-
 	uint32									m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
+
+	bool									m_bRequestedQuit;
 
 public:
 	IHyRenderer(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
+	void RequestQuit();
+	bool IsQuitRequested();
+
 	HyGfxComms &GetGfxCommsRef();
 
-	void StartUp();
 	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
 
 	virtual bool Initialize() = 0;
@@ -101,11 +101,9 @@ public:
 	static IHyShader *MakeCustomShader();
 	static IHyShader *MakeCustomShader(const char *szPrefix, const char *szName);
 
-	bool Update();
+	void Update();
 	void Draw2d();
 	void SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info);
-
-	static void RenderThread(void *pParam);
 };
 
 #endif /* IHyRenderer_h__ */

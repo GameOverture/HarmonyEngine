@@ -48,7 +48,7 @@ public:
 	virtual void StartPlayback() = 0;
 	virtual void StopPlayback() = 0;
 
-	// HandleMsg should be responsible for setting 'm_uiMouse_WindowIndex' to the correct value
+	virtual void SetWindowIndex(uint32 uiCurrentWindowIndex) = 0;
 	virtual void HandleMsg(void *pMsg) = 0;
 
 	virtual void Update() = 0;

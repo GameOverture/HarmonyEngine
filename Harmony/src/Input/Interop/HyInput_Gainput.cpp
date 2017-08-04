@@ -82,18 +82,17 @@ gainput::DeviceId HyInput_Gainput::GetGamePadDeviceId(uint32 uiIndex)
 	return -1;
 }
 
-// HandleMsg should be responsible for setting 'm_uiMouse_WindowIndex' to the correct value
+/*virtual*/ void HyInput_Gainput::SetWindowIndex(uint32 uiCurrentWindowIndex) /*override*/
+{
+	m_uiMouse_WindowIndex = uiCurrentWindowIndex;
+	m_Manager.SetDisplaySize(static_cast<int>(m_WindowListRef[m_uiMouse_WindowIndex]->GetResolution().x),
+							 static_cast<int>(m_WindowListRef[m_uiMouse_WindowIndex]->GetResolution().y));
+}
+
 /*virtual*/ void HyInput_Gainput::HandleMsg(void *pMsg) /*override*/
 {
 #ifdef HY_PLATFORM_WINDOWS
 	const MSG &msgRef = *reinterpret_cast<HyApiMsgInterop *>(pMsg);
-	if(msgRef.message == WM_MOUSEMOVE)
-	{
-		m_uiMouse_WindowIndex = static_cast<uint32>(msgRef.wParam);
-		m_Manager.SetDisplaySize(static_cast<int>(m_WindowListRef[m_uiMouse_WindowIndex]->GetResolution().x),
-												  static_cast<int>(m_WindowListRef[m_uiMouse_WindowIndex]->GetResolution().y));
-	}
-
 	m_Manager.HandleMessage(msgRef);
 #endif
 }

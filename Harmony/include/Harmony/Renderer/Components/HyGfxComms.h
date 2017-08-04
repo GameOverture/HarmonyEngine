@@ -60,11 +60,6 @@ private:
 
 	BasicSection					m_csPointers;
 
-	std::queue<HyApiMsgInterop>		m_ApiMsgQueue;
-	BasicSection					m_csApiMsgQueue;
-
-	HyThreadState					m_eThreadState;
-
 public:
 	HyGfxComms();
 	~HyGfxComms();
@@ -84,14 +79,14 @@ public:
 	// This should only be invoked from the Render thread
 	bool Render_TakeSharedPointers(std::queue<IHyLoadableData *> *&pRxDataQueue, std::queue<IHyLoadableData *> *&pTxDataQueue, char *&pDrawBuffer);
 
-	// This should only be invoked from the Render thread
-	bool Render_PollPlatformApi(IHyRenderer *pRenderer);
+	//// This should only be invoked from the Render thread
+	//bool Render_PollPlatformApi(IHyRenderer *pRenderer);
 
-	// This should only be invoked from the Update/Game thread
-	void RxApiMsgs(std::queue<HyApiMsgInterop> &msgQueueOut);
+	//// This should only be invoked from the Update/Game thread
+	//void RxApiMsgs(std::queue<HyApiMsgInterop> &msgQueueOut);
 
-	void RequestThreadExit();
-	bool IsShutdown();
+	//void RequestThreadExit();
+	//bool IsShutdown();
 };
 
 #endif /* HyGfxBuffers_h__ */

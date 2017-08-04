@@ -79,7 +79,7 @@ HyDiagnostics::~HyDiagnostics()
 	delete m_pFpsText;
 }
 
-void HyDiagnostics::InitFpsText(const char *szTextPrefix, const char *szTextName)
+void HyDiagnostics::InitText(const char *szTextPrefix, const char *szTextName)
 {
 	delete m_pFpsText;
 	m_pFpsText = HY_NEW HyText2d(szTextPrefix, szTextName);

@@ -26,7 +26,7 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
-	m_Renderer.StartUp();
+	m_Renderer.Initialize();
 	m_AppRef.SetInputMapPtr(static_cast<HyInputMapInterop *>(m_Input.GetInputMapArray()));
 }
 
@@ -68,10 +68,7 @@ HyEngine::~HyEngine()
 
 bool HyEngine::IsInitialized()
 {
-#ifndef HYSETTING_MultithreadedRenderer
 	m_Renderer.Update();
-#endif
-
 	if(m_Assets.IsLoaded() == false)
 		return false;
 
@@ -82,21 +79,9 @@ bool HyEngine::Update()
 {
 	while(m_Time.ThrottleTime())
 	{
-		// TODO: Check with single threaded engine if this is necessary
-		std::queue<HyApiMsgInterop> apiMsgQueue;
-		m_GfxComms.RxApiMsgs(apiMsgQueue);
-		while(apiMsgQueue.empty() == false)
-		{
-			HyApiMsgInterop msg = apiMsgQueue.front();
-			apiMsgQueue.pop();
-
-			m_Input.HandleMsg(&msg);
-		}
-
-		m_Input.Update();
 		m_Scene.PreUpdate();	// Physics
 
-		if(m_AppRef.Update() == false)
+		if(PollPlatformApi() == false || m_AppRef.Update() == false)
 			return false;
 
 		m_Assets.Update();
@@ -107,12 +92,8 @@ bool HyEngine::Update()
 			break;
 	}
 
-#if !defined(HYSETTING_MultithreadedRenderer) || defined(HY_PLATFORM_GUI)
-	if(m_Renderer.Update() == false)
-		return false;
-#endif
-
-	return m_GfxComms.IsShutdown() == false;
+	m_Renderer.Update();
+	return true;
 }
 
 void HyEngine::Shutdown()
@@ -123,16 +104,47 @@ void HyEngine::Shutdown()
 	{
 		m_Assets.Update();
 		m_Scene.PostUpdate();
-#if !defined(HYSETTING_MultithreadedRenderer) || defined(HY_PLATFORM_GUI)
 		m_Renderer.Update();
-#endif
 	}
+}
 
-#if defined(HYSETTING_MultithreadedRenderer) && !defined(HY_PLATFORM_GUI)
-	m_GfxComms.RequestThreadExit();
-	while(m_GfxComms.IsShutdown() == false)
-	{ }
+bool HyEngine::PollPlatformApi()
+{
+#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
+	MSG msg = {0};
+	int32 iWindowIndex = 0;
+	HWND hWnd = m_Renderer.GetHWND(iWindowIndex);
+
+	while(hWnd != nullptr)
+	{
+		while(PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+
+			// Mouse hovering over a window will count as Input's current window
+			if(msg.message == WM_MOUSEMOVE)
+			{
+				for(uint32 i = 0; i < m_Renderer.GetNumRenderSurfaces(); ++i)
+				{
+					if(m_Renderer.GetHWND(i) == msg.hwnd)
+					{
+						m_Input.SetWindowIndex(i);
+						break;
+					}
+				}
+			}
+
+			m_Input.HandleMsg(&msg);
+		}
+
+		iWindowIndex++;
+		hWnd = m_Renderer.GetHWND(iWindowIndex);
+	}
 #endif
+
+	m_Input.Update();
+	return m_Renderer.IsQuitRequested() == false;
 }
 
 HyRendererInterop &HyEngine::GetRenderer()

@@ -20,7 +20,8 @@ IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef,
 																																				m_DiagnosticsRef(diagnosticsRef),
 																																				m_bShowCursor(bShowCursor),
 																																				m_WindowListRef(windowListRef),
-																																				m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8)
+																																				m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8),
+																																				m_bRequestedQuit(false)
 {
 	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
@@ -38,18 +39,19 @@ IHyRenderer::~IHyRenderer(void)
 	sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 }
 
+void IHyRenderer::RequestQuit()
+{
+	m_bRequestedQuit = true;
+}
+
+bool IHyRenderer::IsQuitRequested()
+{
+	return m_bRequestedQuit;
+}
+
 HyGfxComms &IHyRenderer::GetGfxCommsRef()
 {
 	return m_GfxCommsRef;
-}
-
-void IHyRenderer::StartUp()
-{
-#if defined(HYSETTING_MultithreadedRenderer) && !defined(HY_PLATFORM_GUI)
-	m_pRenderThread = ThreadManager::Get()->BeginThread(_T("Render Thread"), THREAD_START_PROCEDURE(RenderThread), this);
-#else
-	Initialize();
-#endif
 }
 
 void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures)
@@ -146,11 +148,8 @@ char *IHyRenderer::GetVertexData2d()
 	return pNewShader;
 }
 
-bool IHyRenderer::Update()
+void IHyRenderer::Update()
 {
-	if(m_GfxCommsRef.Render_PollPlatformApi(this) == false)
-		return false;
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Iterate through 'm_WindowListRef' to find any dirty RenderSurface's that need processing
 	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
@@ -185,7 +184,7 @@ bool IHyRenderer::Update()
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Swap to newest draw buffers (is only thread-safe on Render thread)
 	if(!m_GfxCommsRef.Render_TakeSharedPointers(m_pRxDataQueue, m_pTxDataQueue, m_pDrawBuffer))
-		return true;
+		return;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
@@ -224,7 +223,7 @@ bool IHyRenderer::Update()
 	}
 
 	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBuffer)->uiReturnFlags |= HyGfxComms::GFXFLAG_HasRendered;
-	return true;
+	return;
 }
 
 void IHyRenderer::Draw2d()
@@ -245,15 +244,4 @@ void IHyRenderer::Draw2d()
 void IHyRenderer::SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info)
 {
 	HyWindow::SetMonitorDeviceInfo(info);
-}
-
-/*static*/ void IHyRenderer::RenderThread(void *pParam)
-{
-	IHyRenderer *pRenderer = reinterpret_cast<IHyRenderer *>(pParam);
-
-	if(false == pRenderer->Initialize())
-		HyError("Renderer API's Initialize() failed");
-
-	while(pRenderer->Update())
-	{ }
 }

@@ -10,7 +10,7 @@
 #include "Renderer/Components/HyGfxComms.h"
 #include "Afx/HyInteropAfx.h"
 
-HyGfxComms::HyGfxComms() : m_eThreadState(HYTHREADSTATE_Run)
+HyGfxComms::HyGfxComms()
 {
 	m_pDrawBuffer_Update = HY_NEW char[HY_GFX_BUFFER_SIZE];
 	memset(m_pDrawBuffer_Update, 0, HY_GFX_BUFFER_SIZE);
@@ -118,82 +118,52 @@ bool HyGfxComms::Render_TakeSharedPointers(std::queue<IHyLoadableData *> *&pRxDa
 	return true;
 }
 
-// This should only be invoked from the Render thread
-bool HyGfxComms::Render_PollPlatformApi(IHyRenderer *pRenderer)
-{
-	m_csApiMsgQueue.Lock();
+//// This should only be invoked from the Render thread
+//bool HyGfxComms::Render_PollPlatformApi(IHyRenderer *pRenderer)
+//{
+//	m_csApiMsgQueue.Lock();
+//
+//
+//
+//	bool bRetValue = true;
+//	if(m_eThreadState == HYTHREADSTATE_ShouldExit)
+//	{
+//		m_eThreadState = HYTHREADSTATE_HasExited;
+//		bRetValue = false;
+//	}
+//
+//	m_csApiMsgQueue.Unlock();
+//
+//	return bRetValue;
+//}
 
-#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
-	MSG msg = { 0 };
-	int32 iWindowIndex = 0;
-	HWND hWnd = static_cast<HyOpenGL_Win *>(pRenderer)->GetHWND(iWindowIndex);
-
-	while(hWnd != nullptr)
-	{
-		while(PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// NOTE: We replace the message's wParam field with the index of the window, to inform the Input manager which window the mouse is hovering over
-			if(msg.message == WM_MOUSEMOVE)
-			{
-				for(uint32 i = 0; i < static_cast<HyOpenGL_Win *>(pRenderer)->GetNumRenderSurfaces(); ++i)
-				{
-					if(static_cast<HyOpenGL_Win *>(pRenderer)->GetHWND(i) == msg.hwnd)
-						msg.wParam = i;
-				}
-			}
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			m_ApiMsgQueue.push(msg);
-		}
-
-		iWindowIndex++;
-		hWnd = static_cast<HyOpenGL_Win *>(pRenderer)->GetHWND(iWindowIndex);
-	}
-#endif
-
-	bool bRetValue = true;
-	if(m_eThreadState == HYTHREADSTATE_ShouldExit)
-	{
-		m_eThreadState = HYTHREADSTATE_HasExited;
-		bRetValue = false;
-	}
-
-	m_csApiMsgQueue.Unlock();
-
-	return bRetValue;
-}
-
-// This should only be invoked from the Update/Game thread
-void HyGfxComms::RxApiMsgs(std::queue<HyApiMsgInterop> &msgQueueOut)
-{
-	m_csApiMsgQueue.Lock();
-
-	while(m_ApiMsgQueue.empty() == false)
-	{
-		msgQueueOut.push(m_ApiMsgQueue.front());
-		m_ApiMsgQueue.pop();
-	}
-
-	m_csApiMsgQueue.Unlock();
-}
-
-void HyGfxComms::RequestThreadExit()
-{
-	m_csApiMsgQueue.Lock();
-	if(m_eThreadState != HYTHREADSTATE_HasExited)
-		m_eThreadState = HYTHREADSTATE_ShouldExit;
-	m_csApiMsgQueue.Unlock();
-}
-
-bool HyGfxComms::IsShutdown()
-{
-	m_csApiMsgQueue.Lock();
-	bool bRetVal = (m_eThreadState == HYTHREADSTATE_HasExited);
-	m_csApiMsgQueue.Unlock();
-
-	return bRetVal;
-}
+//// This should only be invoked from the Update/Game thread
+//void HyGfxComms::RxApiMsgs(std::queue<HyApiMsgInterop> &msgQueueOut)
+//{
+//	m_csApiMsgQueue.Lock();
+//
+//	while(m_ApiMsgQueue.empty() == false)
+//	{
+//		msgQueueOut.push(m_ApiMsgQueue.front());
+//		m_ApiMsgQueue.pop();
+//	}
+//
+//	m_csApiMsgQueue.Unlock();
+//}
+//
+//void HyGfxComms::RequestThreadExit()
+//{
+//	m_csApiMsgQueue.Lock();
+//	if(m_eThreadState != HYTHREADSTATE_HasExited)
+//		m_eThreadState = HYTHREADSTATE_ShouldExit;
+//	m_csApiMsgQueue.Unlock();
+//}
+//
+//bool HyGfxComms::IsShutdown()
+//{
+//	m_csApiMsgQueue.Lock();
+//	bool bRetVal = (m_eThreadState == HYTHREADSTATE_HasExited);
+//	m_csApiMsgQueue.Unlock();
+//
+//	return bRetVal;
+//}

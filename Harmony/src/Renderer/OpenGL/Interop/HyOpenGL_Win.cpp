@@ -252,7 +252,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			wglDeleteContext(pThis->m_hGLContext);
 			PostQuitMessage(0);
 
-			pThis->GetGfxCommsRef().RequestThreadExit();
+			pThis->RequestQuit();
 		} break;
 
 		case WM_SYSCOMMAND: {

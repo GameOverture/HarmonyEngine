@@ -54,7 +54,7 @@ public:
 	HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef);
 	~HyDiagnostics();
 
-	void InitFpsText(const char *szTextPrefix, const char *szTextName);
+	void InitText(const char *szTextPrefix, const char *szTextName);
 	HyText2d *GetFpsText();
 
 	void BootMessage();
