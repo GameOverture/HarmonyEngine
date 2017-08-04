@@ -77,12 +77,16 @@ bool HyEngine::IsInitialized()
 
 bool HyEngine::Update()
 {
+	m_Diagnostics.Update();
+
 	while(m_Time.ThrottleTime())
 	{
-		m_Scene.PreUpdate();	// Physics
+		m_Scene.PreUpdate();
 
+		HY_PROFILE_BEGIN("Update")
 		if(PollPlatformApi() == false || m_AppRef.Update() == false)
 			return false;
+		HY_PROFILE_END
 
 		m_Assets.Update();
 		m_Scene.PostUpdate();

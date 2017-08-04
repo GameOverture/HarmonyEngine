@@ -122,11 +122,14 @@ void HyScene::SetPause(bool bPause)
 
 void HyScene::PreUpdate()
 {
+	HY_PROFILE_BEGIN("Physics")
 	m_b2World.Step(HyUpdateDelta(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+	HY_PROFILE_END
 }
 
 void HyScene::PostUpdate()
 {
+	HY_PROFILE_BEGIN("Batch")
 	if(sm_bInst2dOrderingDirty)
 	{
 		std::sort(m_NodeList_Loaded.begin(), m_NodeList_Loaded.end(), &Node2dSortPredicate);
@@ -148,6 +151,7 @@ void HyScene::PostUpdate()
 	}
 
 	WriteDrawBuffer();
+	HY_PROFILE_END
 }
 
 void HyScene::WriteDrawBuffer()

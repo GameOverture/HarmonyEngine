@@ -72,6 +72,10 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 		HyError("HY_ENDIAN_BIG was defined but did not pass calculation test");
 }
 #endif
+
+#ifdef HYSETTING_ProfilerEnabled
+	m_ProfileStateList.reserve(10);
+#endif
 }
 
 HyDiagnostics::~HyDiagnostics()
@@ -128,6 +132,27 @@ void HyDiagnostics::BootMessage()
 	HyLog("Compression:      " << m_sCompressedTextures);
 	HyLog("");
 }
+
+#ifdef HYSETTING_ProfilerEnabled
+void HyDiagnostics::ProfileBegin(const char *szName)
+{
+	HyAssert(m_CurProfileState.szName == nullptr, "HyDiagnostics::ProfileBegin invoked again without closing a previous call with ProfileEnd");
+
+	m_CurProfileState.szName = szName;
+	m_CurProfileState.time = clock();
+}
+
+void HyDiagnostics::ProfileEnd()
+{
+	HyAssert(m_CurProfileState.szName != nullptr, "HyDiagnostics::ProfileEnd invoked without an initial call from ProfileBegin");
+	m_CurProfileState.time = clock() - m_CurProfileState.time;
+
+	m_TotalClockTicks += m_CurProfileState.time;
+
+	m_ProfileStateList.push_back(m_CurProfileState);
+	m_CurProfileState.szName = nullptr;
+}
+#endif
 
 void HyDiagnostics::ShowFps(bool bShowOnScreen, bool bShowConsole)
 {
@@ -285,6 +310,16 @@ void HyDiagnostics::EndMemoryCheckpoint()
 	}
 #else
 	HyLogWarning("HyDiagnostics::EndMemoryCheckpoint does not function with the 'Release' build configuration OR it may not be supported by the compiler that was used");
+#endif
+}
+
+void HyDiagnostics::Update()
+{
+#ifdef HYSETTING_ProfilerEnabled
+	HyAssert(m_CurProfileState.szName == nullptr, "HyDiagnostics::Update invoked with an open Profile begin");
+
+	for(uint32 i = 0; i < m_ProfileStateList.size(); ++i)
+		asdf
 #endif
 }
 

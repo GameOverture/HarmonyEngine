@@ -34,7 +34,7 @@
 
 class HyEngine
 {
-	friend class HyGuiRenderer;
+	friend class HyGuiRenderer;	// lol
 
 	static HyEngine *			sm_pInstance;
 

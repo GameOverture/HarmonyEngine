@@ -12,6 +12,7 @@
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyRenderSurface.h"
 #include "Renderer/Components/HyGfxComms.h"
+#include "HyEngine.h"
 
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
 int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
@@ -150,6 +151,8 @@ char *IHyRenderer::GetVertexData2d()
 
 void IHyRenderer::Update()
 {
+	HY_PROFILE_BEGIN("Render")
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Iterate through 'm_WindowListRef' to find any dirty RenderSurface's that need processing
 	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
@@ -183,8 +186,13 @@ void IHyRenderer::Update()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Swap to newest draw buffers (is only thread-safe on Render thread)
+	//
+	// TODO: Remove this!
 	if(!m_GfxCommsRef.Render_TakeSharedPointers(m_pRxDataQueue, m_pTxDataQueue, m_pDrawBuffer))
+	{
+		HY_PROFILE_END
 		return;
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
@@ -223,7 +231,8 @@ void IHyRenderer::Update()
 	}
 
 	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBuffer)->uiReturnFlags |= HyGfxComms::GFXFLAG_HasRendered;
-	return;
+	
+	HY_PROFILE_END
 }
 
 void IHyRenderer::Draw2d()
