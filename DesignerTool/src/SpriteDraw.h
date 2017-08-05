@@ -8,9 +8,6 @@ class SpriteDraw : public IDraw
 {
     HySprite2d                              m_Sprite;
 
-    HyPrimitive2d                           m_primOriginHorz;
-    HyPrimitive2d                           m_primOriginVert;
-
 public:
     SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~SpriteDraw();

@@ -24,6 +24,9 @@ protected:
     IHyApplication &    m_HyAppRef;
     HyCamera2d *        m_pCamera;
 
+    HyPrimitive2d       m_primOriginHorz;
+    HyPrimitive2d       m_primOriginVert;
+
     bool                m_bPanCameraKeyDown;
     bool                m_bIsCameraPanning;
     QPointF             m_ptOldMousePos;

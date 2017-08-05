@@ -2,30 +2,8 @@
 #include "SpriteWidget.h"
 
 SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
-                                                                        m_Sprite("", "+GuiPreview", this),
-                                                                        m_primOriginHorz(this),
-                                                                        m_primOriginVert(this)
+                                                                        m_Sprite("", "+GuiPreview", this)
 {
-    std::vector<glm::vec2> lineList(2, glm::vec2());
-
-    lineList[0].x = -2048.0f;
-    lineList[0].y = 0.0f;
-    lineList[1].x = 2048.0f;
-    lineList[1].y = 0.0f;
-    m_primOriginHorz.SetAsLineChain(lineList);
-
-    lineList[0].x = 0.0f;
-    lineList[0].y = -2048.0f;
-    lineList[1].x = 0.0f;
-    lineList[1].y = 2048.0f;
-    m_primOriginVert.SetAsLineChain(lineList);
-
-    m_primOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
-    m_primOriginVert.SetTint(1.0f, 1.0f, 1.0f);
-
-    m_primOriginHorz.SetLineThickness(2.0f);
-    m_primOriginVert.SetLineThickness(2.0f);
-
 	ApplyJsonData(true);
 
 //    for(int i = 0; i < m_pProjItem->GetModel()->GetNumStates(); ++i)
@@ -107,9 +85,6 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnShow(IHyApplication &hyApp) /*override*/
 {
-    m_primOriginHorz.SetEnabled(true);
-    m_primOriginVert.SetEnabled(true);
-
     m_Sprite.SetEnabled(true);
     
 //    if(m_pCurFrame)

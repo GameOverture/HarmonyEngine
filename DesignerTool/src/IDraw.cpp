@@ -23,11 +23,33 @@
 IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pProjItem),
                                                                 m_HyAppRef(hyApp),
                                                                 m_pCamera(nullptr),
+                                                                m_primOriginHorz(this),
+                                                                m_primOriginVert(this),
                                                                 m_bPanCameraKeyDown(false),
                                                                 m_bIsCameraPanning(false)
 {
     m_pCamera = m_HyAppRef.Window().CreateCamera2d();
     m_pCamera->SetEnabled(false);
+
+    std::vector<glm::vec2> lineList(2, glm::vec2());
+
+    lineList[0].x = -2048.0f;
+    lineList[0].y = 0.0f;
+    lineList[1].x = 2048.0f;
+    lineList[1].y = 0.0f;
+    m_primOriginHorz.SetAsLineChain(lineList);
+    m_primOriginHorz.SetLineThickness(2.0f);
+    m_primOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
+    m_primOriginHorz.SetEnabled(false);
+
+    lineList[0].x = 0.0f;
+    lineList[0].y = -2048.0f;
+    lineList[1].x = 0.0f;
+    lineList[1].y = 2048.0f;
+    m_primOriginVert.SetAsLineChain(lineList);
+    m_primOriginVert.SetLineThickness(2.0f);
+    m_primOriginVert.SetTint(1.0f, 1.0f, 1.0f);
+    m_primOriginVert.SetEnabled(false);
 }
 
 /*virtual*/ IDraw::~IDraw()
@@ -63,12 +85,20 @@ void IDraw::Show()
 {
     m_pCamera->SetEnabled(true);
     OnResizeRenderer();
+
+    m_primOriginHorz.SetEnabled(true);
+    m_primOriginVert.SetEnabled(true);
+
     OnShow(m_HyAppRef);
 }
 
 void IDraw::Hide()
 {
     m_pCamera->SetEnabled(false);
+
+    m_primOriginHorz.SetEnabled(false);
+    m_primOriginVert.SetEnabled(false);
+
     OnHide(m_HyAppRef);
 }
 
@@ -103,7 +133,7 @@ void IDraw::ResizeRenderer()
     {
         if(m_bPanCameraKeyDown && m_bIsCameraPanning == false);
         {
-            m_bIsCameraPanning = true;\
+            m_bIsCameraPanning = true;
             m_ptOldMousePos = pEvent->localPos();
             MainWindow::GetCurrentRenderer()->SetCursor(Qt::ClosedHandCursor);
         }
