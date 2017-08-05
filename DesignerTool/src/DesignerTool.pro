@@ -67,7 +67,8 @@ SOURCES += main.cpp \
     IModel.cpp \
     DlgProjectSettings.cpp \
     EntityWidget.cpp \
-    EntityModel.cpp
+    EntityModel.cpp \
+    EntityDraw.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -121,7 +122,8 @@ HEADERS  += \
     IModel.h \
     DlgProjectSettings.h \
     EntityWidget.h \
-    EntityModel.h
+    EntityModel.h \
+    EntityDraw.h
 
 FORMS    += \
     DlgNewProject.ui \

@@ -14,12 +14,13 @@
 #include "AtlasFrame.h"
 #include "IModel.h"
 #include "SpriteWidget.h"
+#include "SpriteDraw.h"
 #include "FontWidget.h"
-#include "FontModels.h"
+#include "FontDraw.h"
 #include "AudioWidget.h"
 #include "AudioDraw.h"
-#include "EntityModel.h"
 #include "EntityWidget.h"
+#include "EntityDraw.h"
 
 #include <QMenu>
 #include <QJsonDocument>
@@ -74,6 +75,7 @@ void ProjectItem::LoadModel()
         break;
     case ITEM_Entity:
         m_pModel = new EntityModel(this, m_SaveValue.toArray());
+        break;
     default:
         HyGuiLog("Unimplemented item LoadModel(): " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
@@ -99,6 +101,9 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
         break;
     case ITEM_Font:
         static_cast<FontWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
+        break;
+    case ITEM_Entity:
+        static_cast<EntityWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
         break;
     default:
         HyGuiLog("Unimplemented item GiveMenuActions(): " % QString::number(m_eTYPE), LOGTYPE_Error);
@@ -172,9 +177,13 @@ void ProjectItem::WidgetLoad(IHyApplication &hyApp)
         m_pWidget = new FontWidget(*this);
         m_pDraw = new FontDraw(this, hyApp);
         break;
-    case ITEM_Audio:
-        m_pWidget = new AudioWidget(*this);
-        //m_pDraw = new AudioDraw(*static_cast<AudioModel *>(m_pModel), hyApp);
+//    case ITEM_Audio:
+//        m_pWidget = new AudioWidget(*this);
+//        m_pDraw = new AudioDraw(*static_cast<AudioModel *>(m_pModel), hyApp);
+//        break;
+    case ITEM_Entity:
+        m_pWidget = new EntityWidget(*this);
+        m_pDraw = new EntityDraw(this, hyApp);
         break;
     default:
         HyGuiLog("Unimplemented WidgetLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);

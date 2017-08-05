@@ -2,6 +2,7 @@
 #define ENTITYMODEL_H
 
 #include "IModel.h"
+#include "ProjectItem.h"
 
 #include <QObject>
 #include <QJsonArray>

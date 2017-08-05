@@ -11,7 +11,7 @@
 #define SPRITEWIDGET_H
 
 #include "AtlasFrame.h"
-#include "SpriteDraw.h"
+#include "SpriteModels.h"
 
 #include <QWidget>
 #include <QMenu>

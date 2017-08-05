@@ -10,7 +10,7 @@
 #ifndef FONTWIDGET_H
 #define FONTWIDGET_H
 
-#include "FontDraw.h"
+#include "FontModels.h"
 
 #include <QWidget>
 #include <QDir>
@@ -30,7 +30,6 @@ class FontWidget : public QWidget
     Q_OBJECT
 
     ProjectItem &               m_ItemRef;
-    //FontDraw *                  m_pDraw;
     
     QSize                       m_PrevAtlasSize;
     

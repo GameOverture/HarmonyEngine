@@ -624,6 +624,9 @@
    <property name="toolTip">
     <string>Add a new entity in the currently selected project</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N, Ctrl+E</string>
+   </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

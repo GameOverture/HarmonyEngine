@@ -7,8 +7,8 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __HyInput_NULL_h__
-#define __HyInput_NULL_h__
+#ifndef HyInput_NULL_h__
+#define HyInput_NULL_h__
 
 #include "Input/IHyInput.h"
 #include "Input/IHyInputMap.h"
@@ -30,6 +30,7 @@ public:
 	virtual void StartPlayback() override { }
 	virtual void StopPlayback() override { }
 	
+	virtual void SetWindowIndex(uint32 uiCurrentWindowIndex) { }
 	virtual void HandleMsg(void *pMsg) override { }
 	virtual void Update() override { }
 };
@@ -57,4 +58,4 @@ public:
 	virtual float GetAxisDelta(uint32 iUserId) const override { return 0.0f; }
 };
 
-#endif /* __HyInput_NULL_h__ */
+#endif /* HyInput_NULL_h__ */
