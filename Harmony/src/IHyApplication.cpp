@@ -10,6 +10,7 @@
 #include "IHyApplication.h"
 
 #include "Renderer/Components/HyWindow.h"
+#include "Utilities/HyStrManip.h"
 
 HyCoordinateUnit IHyApplication::sm_eDefaultCoordinateUnit = HYCOORDUNIT_Default;
 float IHyApplication::sm_fPixelsPerMeter = 0.0f;
@@ -48,13 +49,21 @@ HarmonyInit::HarmonyInit()
 	consoleInfo.uiDirtyFlags = 0;
 }
 
-HarmonyInit::HarmonyInit(std::string sHyProjFilePath)
+HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 {
+	sHyProjFileName = MakeStringProperPath(sHyProjFileName.c_str(), ".hyproj", false);
+
 	std::string sProjFileContents;
-	HyReadTextFile(sHyProjFilePath.c_str(), sProjFileContents);
+	HyReadTextFile(sHyProjFileName.c_str(), sProjFileContents);
 	
 	jsonxx::Object projObject;
 	projObject.parse(sProjFileContents);
+
+	if(projObject.has<jsonxx::String>("AdjustWorkingDirectory"))
+	{
+		std::string sWorkingDir = projObject.get<jsonxx::String>("AdjustWorkingDirectory");
+		HyError("HarmonyInit::HarmonyInit - AdjustWorkingDirectory not implemented yet.");
+	}
 
 	sGameName				= projObject.get<jsonxx::String>("GameName");
 	sDataDir				= projObject.get<jsonxx::String>("DataPath");

@@ -42,13 +42,7 @@ ExplorerWidget::~ExplorerWidget()
 Project *ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
 {
     Project *pNewProject = new Project(sNewProjectFilePath);
-    if(pNewProject->HasError())
-    {
-        HyGuiLog("Abort opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Error);
-        return pNewProject;
-    }
-    else
-        HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
+    HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
 
     QTreeWidgetItem *pProjTreeItem = pNewProject->GetTreeItem();
     ui->treeWidget->insertTopLevelItem(0, pProjTreeItem);

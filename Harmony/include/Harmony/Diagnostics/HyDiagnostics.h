@@ -20,7 +20,7 @@ class HyScene;
 class HyText2d;
 
 // Comment this out to disable profiler
-//#define HYSETTING_ProfilerEnabled
+#define HYSETTING_ProfilerEnabled
 
 
 #ifdef HY_PLATFORM_GUI

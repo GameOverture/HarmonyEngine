@@ -108,47 +108,21 @@ void DlgNewProject::on_buttonBox_accepted()
     projDir.cd(sRelSourcePath);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Insert the minimum required fields for settings file. The project's DlgProjectSettings will fill in the rest of the defaults
     QJsonObject jsonObj;
     jsonObj.insert("GameName", ui->txtTitleName->text());
     jsonObj.insert("ClassName", ui->txtClassName->text());
     jsonObj.insert("DataPath", sRelDataPath);
     jsonObj.insert("MetaDataPath", sRelMetaDataPath);
     jsonObj.insert("SourcePath", sRelSourcePath);
-    
-    jsonObj.insert("DefaultCoordinateUnit", QJsonValue(1));
-    jsonObj.insert("UpdateFpsCap", QJsonValue(0));
-    jsonObj.insert("PixelsPerMeter", QJsonValue(80.0f));
-    jsonObj.insert("ShowCursor", QJsonValue(true));
-	jsonObj.insert("NumInputMappings", QJsonValue(1));
-	jsonObj.insert("DebugPort", QJsonValue(1313));
-    
-    jsonObj.insert("UseConsole", QJsonValue(true));
-    QJsonObject consoleInfoObj;
-    consoleInfoObj.insert("Name", "Harmony Log Console");
-    consoleInfoObj.insert("Type", QJsonValue(3));
-    consoleInfoObj.insert("ResolutionX", QJsonValue(64));
-    consoleInfoObj.insert("ResolutionY", QJsonValue(80));
-    consoleInfoObj.insert("LocationX", QJsonValue(0));
-    consoleInfoObj.insert("LocationY", QJsonValue(0));
-    jsonObj.insert("ConsoleInfo", consoleInfoObj);
 
-    QJsonArray windowInfoArray;
-    QJsonObject windowInfoObj;
-    windowInfoObj.insert("Name", "Window 1");
-    windowInfoObj.insert("Type", QJsonValue(0));
-    windowInfoObj.insert("ResolutionX", QJsonValue(1280));
-    windowInfoObj.insert("ResolutionY", QJsonValue(720));
-    windowInfoObj.insert("LocationX", QJsonValue(0));
-    windowInfoObj.insert("LocationY", QJsonValue(0));
-    windowInfoArray.append(windowInfoObj);
-    
-    jsonObj.insert("WindowInfoArray", windowInfoArray);
-
-    QJsonObject jsonObjForSrc = jsonObj;
+    // Development .hyproj which sits in the src directory, has only one field which indicates the relative path to the actual settings file
+    QJsonObject jsonObjForSrc;
     QDir srcDir(GetProjDirPath() % sRelSourcePath);
-    jsonObjForSrc.insert("DataPath", QJsonValue(srcDir.relativeFilePath(GetProjDirPath()) % sRelDataPath));
-    jsonObjForSrc.insert("MetaDataPath", QJsonValue(srcDir.relativeFilePath(GetProjDirPath()) % sRelMetaDataPath));
-    jsonObjForSrc.insert("SourcePath", QJsonValue(srcDir.relativeFilePath(GetProjDirPath()) % sRelSourcePath));
+    jsonObjForSrc.insert("AdjustWorkingDirectory", QJsonValue(srcDir.relativeFilePath(GetProjDirPath())));
+    //jsonObjForSrc.insert("DataPath", QJsonValue(srcDir.relativeFilePath(GetProjDirPath()) % sRelDataPath));
+    //jsonObjForSrc.insert("MetaDataPath", QJsonValue(srcDir.relativeFilePath(GetProjDirPath()) % sRelMetaDataPath));
+    //jsonObjForSrc.insert("SourcePath", QJsonValue(srcDir.relativeFilePath(GetProjDirPath()) % sRelSourcePath));
 
     QFile newProjectFile(GetProjFilePath());
     if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)

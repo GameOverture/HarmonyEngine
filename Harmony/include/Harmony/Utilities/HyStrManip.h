@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyStrManip_h__
-#define __HyStrManip_h__
+#ifndef HyStrManip_h__
+#define HyStrManip_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -30,5 +30,5 @@ uint32 StringToHash(const unsigned char *szStr);
 // Converts a given UTF-8 encoded character (array) to its UTF-32 LE equivalent
 uint32 HyUtf8_to_Utf32(const char *pChar, uint32 &uiNumBytesUsedRef);
 
-#endif /* __HyStrManip_h__ */
+#endif /* HyStrManip_h__ */
 

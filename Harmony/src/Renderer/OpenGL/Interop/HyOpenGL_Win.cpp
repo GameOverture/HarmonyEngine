@@ -42,8 +42,8 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRe
 	m_PixelFormatDescriptor.dwVisibleMask = 0;
 	m_PixelFormatDescriptor.dwDamageMask = 0;
 
-	for(uint32 i = 0; i < m_RenderSurfaces.size(); ++i)
-		m_RenderSurfaces[i].SetHandle(ConstructWindow(m_WindowListRef[i]->GetWindowInfo()));
+	for(uint32 i = 0; i < m_RenderSurfaceList.size(); ++i)
+		m_RenderSurfaceList[i].SetHandle(ConstructWindow(m_WindowListRef[i]->GetWindowInfo()));
 
 	std::vector<HyMonitorDeviceInfo> vMonitorDeviceInfo;
 	if(EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&vMonitorDeviceInfo) == false)
@@ -184,10 +184,10 @@ HWND HyOpenGL_Win::ConstructWindow(const HyWindowInfo &wndInfo)
 
 HWND HyOpenGL_Win::GetHWND(int32 iWindowIndex)
 {
-	for(uint32 i = 0; i < m_RenderSurfaces.size(); ++i)
+	for(uint32 i = 0; i < m_RenderSurfaceList.size(); ++i)
 	{
-		if(m_RenderSurfaces[i].GetType() == HYRENDERSURFACE_Window && m_RenderSurfaces[i].GetId() == iWindowIndex)
-			return m_RenderSurfaces[i].GetHandle();
+		if(m_RenderSurfaceList[i].GetType() == HYRENDERSURFACE_Window && m_RenderSurfaceList[i].GetId() == iWindowIndex)
+			return m_RenderSurfaceList[i].GetHandle();
 	}
 
 	return nullptr;
@@ -268,10 +268,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_SIZE: {
 			HyOpenGL_Win *pThis = reinterpret_cast<HyOpenGL_Win *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
-			for(uint32 i = 0; i < static_cast<uint32>(pThis->m_RenderSurfaces.size()); ++i)
+			for(uint32 i = 0; i < static_cast<uint32>(pThis->m_RenderSurfaceList.size()); ++i)
 			{
-				if(pThis->m_RenderSurfaces[i].GetHandle() == hWnd)
-					pThis->m_RenderSurfaces[i].Resize(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
+				if(pThis->m_RenderSurfaceList[i].GetHandle() == hWnd)
+					pThis->m_RenderSurfaceList[i].Resize(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
 			}
 		} break;
 	}

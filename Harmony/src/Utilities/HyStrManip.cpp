@@ -24,13 +24,16 @@ void DynamicStringCopy(char *&dst, const char *src)
 std::string MakeStringProperPath(const char *szPath, const char *szExtension, bool bMakeLowercase)
 {
 	std::string sPath(szPath ? szPath : "");
-
 	std::replace(sPath.begin(), sPath.end(), '\\', '/');
 
 	if(szExtension)
 	{
-		if(sPath.empty() || 0 != strcmp(&sPath[sPath.length() - strlen(szExtension)], szExtension))
-			sPath.append(szExtension);
+		std::string sExtension(szExtension);
+		if(sExtension[0] != '.')
+			sExtension = "." + sExtension;
+
+		if(sPath.empty() || 0 != strcmp(&sPath[sPath.length() - sExtension.size()], sExtension.c_str()))
+			sPath += sExtension;
 	}
 
 	size_t uiIndex = 0;

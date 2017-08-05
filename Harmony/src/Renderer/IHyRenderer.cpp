@@ -26,7 +26,7 @@ IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef,
 {
 	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
-		m_RenderSurfaces.push_back(HyRenderSurface(HYRENDERSURFACE_Window, i, m_WindowListRef[i]->GetResolution().x, m_WindowListRef[i]->GetResolution().y));
+		m_RenderSurfaceList.push_back(HyRenderSurface(HYRENDERSURFACE_Window, i, m_WindowListRef[i]->GetResolution().x, m_WindowListRef[i]->GetResolution().y));
 }
 
 IHyRenderer::~IHyRenderer(void)
@@ -62,7 +62,7 @@ void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string
 
 uint32 IHyRenderer::GetNumRenderSurfaces()
 {
-	return static_cast<uint32>(m_RenderSurfaces.size());
+	return static_cast<uint32>(m_RenderSurfaceList.size());
 }
 
 int32 IHyRenderer::GetNumCameras2d()
@@ -162,11 +162,11 @@ void IHyRenderer::Update()
 		if(windowInfoRef.uiDirtyFlags)
 		{
 			HyRenderSurface *pRenderSurface = NULL;
-			for(uint32 j = 0; j < m_RenderSurfaces.size(); ++j)
+			for(uint32 j = 0; j < m_RenderSurfaceList.size(); ++j)
 			{
-				if(m_RenderSurfaces[j].GetType() == HYRENDERSURFACE_Window && m_RenderSurfaces[j].GetId() == i)
+				if(m_RenderSurfaceList[j].GetType() == HYRENDERSURFACE_Window && m_RenderSurfaceList[j].GetId() == i)
 				{
-					pRenderSurface = &m_RenderSurfaces[j];
+					pRenderSurface = &m_RenderSurfaceList[j];
 					break;
 				}
 			}
@@ -207,8 +207,8 @@ void IHyRenderer::Update()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Render all surfaces
-	m_RenderSurfaceIter = m_RenderSurfaces.begin();
-	while(m_RenderSurfaceIter != m_RenderSurfaces.end())
+	m_RenderSurfaceIter = m_RenderSurfaceList.begin();
+	while(m_RenderSurfaceIter != m_RenderSurfaceList.end())
 	{
 		StartRender();
 

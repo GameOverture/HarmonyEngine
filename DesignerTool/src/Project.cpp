@@ -30,50 +30,21 @@
 
 HarmonyInit g_DefaultInit;
 
-Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Project, sNewProjectFilePath),
-                                                        IHyApplication(g_DefaultInit),
-                                                        m_pDraw(nullptr),
-                                                        m_pAtlasModel(nullptr),
-                                                        m_pAtlasWidget(nullptr),
-                                                        m_pAudioMan(nullptr),
-                                                        m_pTabBar(nullptr),
-                                                        m_pCurOpenItem(nullptr),
-                                                        m_bHasError(false)
+Project::Project(const QString sProjectFilePath) :  ExplorerItem(ITEM_Project, sProjectFilePath),
+                                                    IHyApplication(g_DefaultInit),
+                                                    m_pDraw(nullptr),
+                                                    m_DlgProjectSettings(sProjectFilePath, MainWindow::GetInstance()),
+                                                    m_pAtlasModel(nullptr),
+                                                    m_pAtlasWidget(nullptr),
+                                                    m_pAudioMan(nullptr),
+                                                    m_pTabBar(nullptr),
+                                                    m_pCurOpenItem(nullptr),
+                                                    m_bHasError(false)
 {
-    QFile projFile(sNewProjectFilePath);
-    if(projFile.exists())
-    {
-        if(!projFile.open(QIODevice::ReadOnly))
-        {
-            HyGuiLog("ItemProject::ItemProject() could not open " % sNewProjectFilePath % ": " % projFile.errorString(), LOGTYPE_Error);
-            m_bHasError = true;
-        }
-    }
-    else
-    {
-        HyGuiLog("ItemProject::ItemProject() could not find the project file: " % sNewProjectFilePath, LOGTYPE_Error);
-        m_bHasError = true;
-    }
-
-    if(m_bHasError)
-        return;
-
-    QJsonDocument settingsDoc = QJsonDocument::fromJson(projFile.readAll());
-    projFile.close();
-
-    m_SettingsObj = settingsDoc.object();
-
-//    m_sGameName                 = projPathsObj["GameName"].toString();
-
-//    m_sRelativeAssetsLocation   = projPathsObj["DataPath"].toString();
-//    m_sRelativeMetaDataLocation = projPathsObj["MetaDataPath"].toString();
-//    m_sRelativeSourceLocation   = projPathsObj["SourcePath"].toString();
-
-
-    m_pTreeItemPtr->setText(0, GetName(false));
-    m_Init.sGameName = GetName(false).toStdString();
+    m_pTreeItemPtr->setText(0, GetGameName());
+    m_Init.sGameName = GetGameName().toStdString();
     m_Init.sDataDir = GetAssetsAbsPath().toStdString();
-    
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Load game data items
@@ -82,7 +53,7 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     {
         if(!dataFile.open(QIODevice::ReadOnly))
         {
-            HyGuiLog("ItemProject::ItemProject() could not open " % sNewProjectFilePath % "'s " % HYGUIPATH_DataFile % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
+            HyGuiLog("ItemProject::ItemProject() could not open " % sProjectFilePath % "'s " % HYGUIPATH_DataFile % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
             m_bHasError = true;
             return;
         }
@@ -224,14 +195,15 @@ Project::Project(const QString sNewProjectFilePath) :   ExplorerItem(ITEM_Projec
     delete m_pAtlasWidget;
 }
 
-bool Project::HasError() const
+void Project::ExecProjSettingsDlg()
 {
-    return m_bHasError;
+    if(m_DlgProjectSettings.exec() == QDialog::Accepted)
+        m_DlgProjectSettings.SaveSettings();
 }
 
 QJsonObject Project::GetSettingsObj() const
 {
-    return m_SettingsObj;
+    return m_DlgProjectSettings.GetSettingsObj();
 }
 
 QString Project::GetDirPath() const
@@ -242,7 +214,7 @@ QString Project::GetDirPath() const
 
 QString Project::GetGameName() const
 {
-    return m_SettingsObj["GameName"].toString();
+    return GetSettingsObj()["GameName"].toString();
 }
 
 QString Project::GetAbsPath() const
@@ -252,32 +224,32 @@ QString Project::GetAbsPath() const
 
 QString Project::GetAssetsAbsPath() const
 {
-    return QDir::cleanPath(GetDirPath() + '/' + m_SettingsObj["DataPath"].toString() /*m_sRelativeAssetsLocation*/) + '/';
+    return QDir::cleanPath(GetDirPath() + '/' + GetSettingsObj()["DataPath"].toString() /*m_sRelativeAssetsLocation*/) + '/';
 }
 
 QString Project::GetAssetsRelPath() const
 {
-    return QDir::cleanPath(m_SettingsObj["DataPath"].toString()/*m_sRelativeAssetsLocation*/) + '/';
+    return QDir::cleanPath(GetSettingsObj()["DataPath"].toString()/*m_sRelativeAssetsLocation*/) + '/';
 }
 
 QString Project::GetMetaDataAbsPath() const
 {
-    return QDir::cleanPath(GetDirPath() + '/' + m_SettingsObj["MetaDataPath"].toString()/*m_sRelativeMetaDataLocation*/) + '/';
+    return QDir::cleanPath(GetDirPath() + '/' + GetSettingsObj()["MetaDataPath"].toString()/*m_sRelativeMetaDataLocation*/) + '/';
 }
 
 QString Project::GetMetaDataRelPath() const
 {
-    return QDir::cleanPath(m_SettingsObj["MetaDataPath"].toString()/*m_sRelativeMetaDataLocation*/) + '/';
+    return QDir::cleanPath(GetSettingsObj()["MetaDataPath"].toString()/*m_sRelativeMetaDataLocation*/) + '/';
 }
 
 QString Project::GetSourceAbsPath() const
 {
-    return QDir::cleanPath(GetDirPath() + '/' + m_SettingsObj["SourcePath"].toString() /*m_sRelativeSourceLocation*/) + '/';
+    return QDir::cleanPath(GetDirPath() + '/' + GetSettingsObj()["SourcePath"].toString() /*m_sRelativeSourceLocation*/) + '/';
 }
 
 QString Project::GetSourceRelPath() const
 {
-    return QDir::cleanPath(m_SettingsObj["SourcePath"].toString()/*m_sRelativeSourceLocation*/) + '/';
+    return QDir::cleanPath(GetSettingsObj()["SourcePath"].toString()/*m_sRelativeSourceLocation*/) + '/';
 }
 
 AtlasModel &Project::GetAtlasModel()

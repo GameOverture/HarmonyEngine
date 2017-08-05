@@ -683,11 +683,5 @@ void MainWindow::on_actionProjectSettings_triggered()
     if(ui->explorer->GetCurProjSelected() == nullptr)
         return;
 
-    DlgProjectSettings *pDlg = new DlgProjectSettings(*ui->explorer->GetCurProjSelected(), this);
-    if(pDlg->exec() == QDialog::Accepted)
-    {
-        pDlg->SaveSettings();
-    }
-
-    delete pDlg;
+    ui->explorer->GetCurProjSelected()->ExecProjSettingsDlg();
 }

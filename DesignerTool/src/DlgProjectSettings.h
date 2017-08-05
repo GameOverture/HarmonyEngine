@@ -2,8 +2,7 @@
 #define DLGPROJECTSETTINGS_H
 
 #include <QDialog>
-
-#include "Project.h"
+#include <QJsonObject>
 
 namespace Ui {
 class DlgProjectSettings;
@@ -13,13 +12,23 @@ class DlgProjectSettings : public QDialog
 {
     Q_OBJECT
 
-    Project &           m_ProjectRef;
+    const QString       m_sPROJ_SETTINGS_FILE_PATH;
+    QJsonObject         m_SettingsObj;
 
 public:
-    explicit DlgProjectSettings(Project &projectRef, QWidget *parent = 0);
+    explicit DlgProjectSettings(const QString sProjectFilePath, QWidget *parent = 0);
     ~DlgProjectSettings();
 
+    QJsonObject GetSettingsObj() const;
+
+    bool MakeValid(QJsonObject &settingsObjRef);
+
+    void SetDefaults();
+
     void SaveSettings();
+
+public Q_SLOTS:
+    virtual int exec() override;
 
 private:
     Ui::DlgProjectSettings *ui;

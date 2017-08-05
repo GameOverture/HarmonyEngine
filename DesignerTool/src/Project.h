@@ -14,6 +14,7 @@
 #include "ProjectItem.h"
 #include "AtlasModel.h"
 #include "ExplorerItem.h"
+#include "DlgProjectSettings.h"
 
 #include <QQueue>
 #include <QJsonObject>
@@ -29,7 +30,7 @@ class Project : public ExplorerItem, public IHyApplication
     Q_OBJECT
 
     ProjectDraw *                                   m_pDraw;
-    QJsonObject                                     m_SettingsObj;
+    DlgProjectSettings                              m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
 
     AtlasModel *                                    m_pAtlasModel;
     AtlasWidget *                                   m_pAtlasWidget;
@@ -44,10 +45,10 @@ class Project : public ExplorerItem, public IHyApplication
     bool                                            m_bHasError;
     
 public:
-    Project(const QString sNewProjectFilePath);
+    Project(const QString sProjectFilePath);
     virtual ~Project();
     
-    bool HasError() const;
+    void ExecProjSettingsDlg();
 
     QJsonObject GetSettingsObj() const;
 

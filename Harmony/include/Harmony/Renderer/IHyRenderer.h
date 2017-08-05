@@ -42,7 +42,7 @@ protected:
 	HyRenderState *							m_pCurRenderState;
 	HyRenderState							m_PrevRenderState;
 	
-	std::vector<HyRenderSurface>			m_RenderSurfaces;
+	std::vector<HyRenderSurface>			m_RenderSurfaceList;
 	std::vector<HyRenderSurface>::iterator	m_RenderSurfaceIter;
 
 	uint32									m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
