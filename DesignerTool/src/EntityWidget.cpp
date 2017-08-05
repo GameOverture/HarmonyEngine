@@ -6,6 +6,11 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(pare
                                                                     m_ItemRef(itemRef)
 {
     ui->setupUi(this);
+
+    ui->childrenTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->childrenTree->setDragEnabled(true);
+    ui->childrenTree->setDropIndicatorShown(true);
+    ui->childrenTree->setDragDropMode(QAbstractItemView::InternalMove);
 }
 
 EntityWidget::~EntityWidget()

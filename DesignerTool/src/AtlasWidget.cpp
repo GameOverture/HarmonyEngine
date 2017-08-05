@@ -31,7 +31,7 @@ const int iPADDING = 2;
 AtlasTreeWidget::AtlasTreeWidget(QWidget *parent /*= Q_NULLPTR*/) : QTreeWidget(parent)
 {
 }
-void AtlasTreeWidget::SetOwner(AtlasWidget *pOwner)
+void AtlasTreeWidget::SetAtlasOwner(AtlasWidget *pOwner)
 {
     m_pOwner = pOwner;
 }
@@ -86,13 +86,13 @@ AtlasWidget::AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *pa
     ui->btnAddGroup->setDefaultAction(ui->actionAddGroup);
     ui->btnRemoveGroup->setDefaultAction(ui->actionRemoveGroup);
 
-    ui->atlasList->SetOwner(this);
+    ui->atlasList->SetAtlasOwner(this);
 
     ui->atlasList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->atlasList->setDragEnabled(true);
-    //ui->atlasList->viewport()->setAcceptDrops(true);
     ui->atlasList->setDropIndicatorShown(true);
     ui->atlasList->setDragDropMode(QAbstractItemView::InternalMove);
+    //ui->atlasList->viewport()->setAcceptDrops(true);
     
     ui->cmbAtlasGroups->clear();
     ui->cmbAtlasGroups->setModel(m_pModel);

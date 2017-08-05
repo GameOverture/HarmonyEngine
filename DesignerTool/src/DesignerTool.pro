@@ -68,7 +68,8 @@ SOURCES += main.cpp \
     DlgProjectSettings.cpp \
     EntityWidget.cpp \
     EntityModel.cpp \
-    EntityDraw.cpp
+    EntityDraw.cpp \
+    EntSpriteFrame.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -123,7 +124,8 @@ HEADERS  += \
     DlgProjectSettings.h \
     EntityWidget.h \
     EntityModel.h \
-    EntityDraw.h
+    EntityDraw.h \
+    EntSpriteFrame.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -148,7 +150,8 @@ FORMS    += \
     ExplorerWidget.ui \
     AtlasWidget.ui \
     DlgProjectSettings.ui \
-    EntityWidget.ui
+    EntityWidget.ui \
+    EntSpriteFrame.ui
 
 RC_FILE = DesignerTool.rc
 

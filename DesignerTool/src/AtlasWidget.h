@@ -31,7 +31,7 @@ class AtlasTreeWidget : public QTreeWidget
 
 public:
     AtlasTreeWidget(QWidget *parent = Q_NULLPTR);
-    void SetOwner(AtlasWidget *pOwner);
+    void SetAtlasOwner(AtlasWidget *pOwner);
 
 protected:
     virtual void dropEvent(QDropEvent *e) override;

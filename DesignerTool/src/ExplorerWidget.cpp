@@ -25,6 +25,12 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) :   QWidget(parent),
     ui->setupUi(this);
 
     ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    ui->treeWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->treeWidget->setDragEnabled(true);
+    ui->treeWidget->setDropIndicatorShown(true);
+    ui->treeWidget->setDragDropMode(QAbstractItemView::InternalMove);
+
     connect(ui->treeWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 }
 
