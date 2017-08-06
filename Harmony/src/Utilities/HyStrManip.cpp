@@ -30,7 +30,7 @@ std::string MakeStringProperPath(const char *szPath, const char *szExtension, bo
 	{
 		std::string sExtension(szExtension);
 		//if(sExtension[0] != '.')
-		//	sExtension = "." + sExtension;
+		//	sExtension = "." + sExtension;	// <-- Don't prepend '.' to szExtension, because GUI tool ItemDir's use just '/' as an extension
 
 		if(sPath.empty() || 0 != strcmp(&sPath[sPath.length() - sExtension.size()], sExtension.c_str()))
 			sPath += sExtension;

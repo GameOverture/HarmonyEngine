@@ -33,7 +33,7 @@ HarmonyInit g_DefaultInit;
 Project::Project(const QString sProjectFilePath) :  ExplorerItem(ITEM_Project, sProjectFilePath),
                                                     IHyApplication(g_DefaultInit),
                                                     m_pDraw(nullptr),
-                                                    m_DlgProjectSettings(sProjectFilePath, MainWindow::GetInstance()),
+                                                    m_DlgProjectSettings(sProjectFilePath),
                                                     m_pAtlasModel(nullptr),
                                                     m_pAtlasWidget(nullptr),
                                                     m_pAudioMan(nullptr),
