@@ -29,8 +29,8 @@ std::string MakeStringProperPath(const char *szPath, const char *szExtension, bo
 	if(szExtension)
 	{
 		std::string sExtension(szExtension);
-		if(sExtension[0] != '.')
-			sExtension = "." + sExtension;
+		//if(sExtension[0] != '.')
+		//	sExtension = "." + sExtension;
 
 		if(sPath.empty() || 0 != strcmp(&sPath[sPath.length() - sExtension.size()], sExtension.c_str()))
 			sPath += sExtension;
