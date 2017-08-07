@@ -21,6 +21,8 @@
 #include <QMessageBox>
 #include <QClipboard>
 
+QString ExplorerWidget::sm_sInternalClipboard = "";
+
 ExplorerWidget::ExplorerWidget(QWidget *parent) :   QWidget(parent),
                                                     ui(new Ui::ExplorerWidget)
 {
@@ -215,6 +217,8 @@ void ExplorerWidget::PutItemOnClipboard(ProjectItem *pProjItem)
     QByteArray src = JsonValueToSrc(QJsonValue(clipboardObj));
     QClipboard *pClipboard = QApplication::clipboard();
     pClipboard->setText(src);
+
+    sm_sInternalClipboard = src;
 }
 
 QStringList ExplorerWidget::GetOpenProjectPaths()
@@ -415,13 +419,14 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
     case ITEM_Entity:
         ui->actionCutItem->setEnabled(true);
         ui->actionCopyItem->setEnabled(true);
-        //ui->actionPaste
         break;
     default:
         ui->actionCutItem->setEnabled(false);
         ui->actionCopyItem->setEnabled(false);
         break;
     }
+
+    ui->actionPasteItem->setEnabled(sm_sInternalClipboard.isEmpty() == false);
     
     if(bValidItem)
         MainWindow::SetSelectedProj(GetCurProjSelected());
@@ -499,7 +504,7 @@ void ExplorerWidget::on_actionCutItem_triggered()
         case ITEM_Entity: {
             ProjectItem *pProjItem = static_cast<ProjectItem *>(pProjItem);
             PutItemOnClipboard(pProjItem);
-            HyGuiLog("Cut " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item to the clipboard.", LOGTYPE_Normal);
+            HyGuiLog("Cut " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
 
             ui->actionPasteItem->setEnabled(true);
         } break;
@@ -524,7 +529,7 @@ void ExplorerWidget::on_actionCopyItem_triggered()
         case ITEM_Entity: {
             ProjectItem *pProjItem = static_cast<ProjectItem *>(pCurItemSelected);
             PutItemOnClipboard(pProjItem);
-            HyGuiLog("Copied " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item to the clipboard.", LOGTYPE_Normal);
+            HyGuiLog("Copied " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
 
             ui->actionPasteItem->setEnabled(true);
         } break;
@@ -537,5 +542,6 @@ void ExplorerWidget::on_actionCopyItem_triggered()
 
 void ExplorerWidget::on_actionPasteItem_triggered()
 {
-
+    // Don't use QClipboard because someone can just copy random text before pasting and ruin the json format
+    QString sTest = sm_sInternalClipboard;
 }
