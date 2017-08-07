@@ -66,6 +66,42 @@
     <string>Removes the selected item(s) or prefix(es)</string>
    </property>
   </action>
+  <action name="actionCutItem">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-cut.png</normaloff>:/icons16x16/edit-cut.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="toolTip">
+    <string>Cut the selected item in Data Explorer</string>
+   </property>
+  </action>
+  <action name="actionCopyItem">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-copy.png</normaloff>:/icons16x16/edit-copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy the selected item in Data Explorer</string>
+   </property>
+  </action>
+  <action name="actionPasteItem">
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/edit-paste.png</normaloff>:/icons16x16/edit-paste.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="toolTip">
+    <string>Paste the item on the clipboard into the selected project</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="res/DesignerTool.qrc"/>

@@ -113,7 +113,7 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 
 void ProjectItem::Save()
 {
-    m_SaveValue = m_pModel->GetSaveInfo(true);
+    m_SaveValue = m_pModel->GetJson(true);
 
     GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue);
     m_pUndoStack->setClean();

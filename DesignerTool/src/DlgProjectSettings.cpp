@@ -7,6 +7,39 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
+QMap<QString, QJsonValue> DlgProjectSettings::sm_DefaultValues;
+
+/*static*/ void DlgProjectSettings::InitDefaultValues()
+{
+    sm_DefaultValues["DefaultCoordinateUnit"] = QJsonValue(HYCOORDUNIT_Pixels);
+    sm_DefaultValues["UpdateFpsCap"] = QJsonValue(0);
+    sm_DefaultValues["PixelsPerMeter"] = QJsonValue(80.0f);
+    sm_DefaultValues["ShowCursor"] = QJsonValue(true);
+    sm_DefaultValues["NumInputMappings"] = QJsonValue(1);
+    sm_DefaultValues["DebugPort"] = QJsonValue(1313);
+    sm_DefaultValues["UseConsole"] = QJsonValue(true);
+
+    QJsonObject consoleInfoObj;
+    consoleInfoObj.insert("Name", "Harmony Log Console");
+    consoleInfoObj.insert("Type", QJsonValue(3));
+    consoleInfoObj.insert("ResolutionX", QJsonValue(64));
+    consoleInfoObj.insert("ResolutionY", QJsonValue(80));
+    consoleInfoObj.insert("LocationX", QJsonValue(0));
+    consoleInfoObj.insert("LocationY", QJsonValue(0));
+    sm_DefaultValues["ConsoleInfo"] = consoleInfoObj;
+
+    QJsonArray windowInfoArray;
+    QJsonObject windowInfoObj;
+    windowInfoObj.insert("Name", "Window 1");
+    windowInfoObj.insert("Type", QJsonValue(0));
+    windowInfoObj.insert("ResolutionX", QJsonValue(1280));
+    windowInfoObj.insert("ResolutionY", QJsonValue(720));
+    windowInfoObj.insert("LocationX", QJsonValue(0));
+    windowInfoObj.insert("LocationY", QJsonValue(0));
+    windowInfoArray.append(windowInfoObj);
+    sm_DefaultValues["WindowInfoArray"] = windowInfoArray;
+}
+
 DlgProjectSettings::DlgProjectSettings(const QString sProjectFilePath, QWidget *parent) :   QDialog(parent),
                                                                                             ui(new Ui::DlgProjectSettings),
                                                                                             m_sPROJ_SETTINGS_FILE_PATH(sProjectFilePath)
@@ -29,6 +62,9 @@ DlgProjectSettings::DlgProjectSettings(const QString sProjectFilePath, QWidget *
 
     if(MakeValid(m_SettingsObj) == false)
         SaveSettings();
+
+    setWindowTitle(m_SettingsObj["GameName"].toString() % " Game Settings");
+    setWindowIcon(HyGlobal::ItemIcon(ITEM_Project, SUBICON_Settings));
 }
 
 DlgProjectSettings::~DlgProjectSettings()
@@ -53,81 +89,53 @@ bool DlgProjectSettings::MakeValid(QJsonObject &settingsObjRef)
     }
 
     bool bIsValid = true;
+    for(auto iter = sm_DefaultValues.begin(); iter != sm_DefaultValues.end(); ++iter)
+    {
+        if(settingsObjRef.contains(iter.key()) == false)
+        {
+            settingsObjRef.insert(iter.key(), iter.value());
+            bIsValid = false;
+        }
+        else if(iter.key() == "ConsoleInfo")
+        {
+            bool bIsConsoleInfoValid = true;
+            QJsonObject currentConsoleInfoObj = settingsObjRef["ConsoleInfo"].toObject();
+            QJsonObject defaultConsoleInfoObj = sm_DefaultValues["ConsoleInfo"].toObject();
+            for(auto defaultConsoleIter = defaultConsoleInfoObj.begin(); defaultConsoleIter != defaultConsoleInfoObj.end(); ++defaultConsoleIter)
+            {
+                if(currentConsoleInfoObj.contains(defaultConsoleIter.key()) == false)
+                {
+                    bIsConsoleInfoValid = false;
+                    bIsValid = false;
+                    break;
+                }
+            }
 
-    if(settingsObjRef.contains("DefaultCoordinateUnit") == false)
-    {
-        settingsObjRef.insert("DefaultCoordinateUnit", QJsonValue(1));
-        bIsValid = false;
-    }
-    if(settingsObjRef.contains("UpdateFpsCap") == false)
-    {
-        settingsObjRef.insert("UpdateFpsCap", QJsonValue(0));
-        bIsValid = false;
-    }
-    if(settingsObjRef.contains("PixelsPerMeter") == false)
-    {
-        settingsObjRef.insert("PixelsPerMeter", QJsonValue(80.0f));
-        bIsValid = false;
-    }
-    if(settingsObjRef.contains("ShowCursor") == false)
-    {
-        settingsObjRef.insert("ShowCursor", QJsonValue(true));
-        bIsValid = false;
-    }
-    if(settingsObjRef.contains("NumInputMappings") == false)
-    {
-        settingsObjRef.insert("NumInputMappings", QJsonValue(1));
-        bIsValid = false;
-    }
-    if(settingsObjRef.contains("DebugPort") == false)
-    {
-        settingsObjRef.insert("DebugPort", QJsonValue(1313));
-        bIsValid = false;
-    }
+            if(bIsConsoleInfoValid)
+                settingsObjRef.insert(iter.key(), iter.value());    // Replaces "ConsoleInfo" with defaults
+        }
+        else if(iter.key() == "WindowInfoArray")
+        {
+            bool bIsWindowInfoValid = true;
+            QJsonArray currentWindowInfoArray = settingsObjRef["WindowInfoArray"].toArray();
+            QJsonObject defaultWindowInfoObj = sm_DefaultValues["WindowInfoArray"].toArray().at(0).toObject();
+            for(int i = 0; i < currentWindowInfoArray.size(); ++i)
+            {
+                QJsonObject currentWindowInfoObj = currentWindowInfoArray[i].toObject();
+                for(auto defaultWindowInfoObjIter = defaultWindowInfoObj.begin(); defaultWindowInfoObjIter != defaultWindowInfoObj.end(); ++defaultWindowInfoObjIter)
+                {
+                    if(currentWindowInfoObj.contains(defaultWindowInfoObjIter.key()) == false)
+                    {
+                        bIsWindowInfoValid = false;
+                        bIsValid = false;
+                        break;
+                    }
+                }
+            }
 
-    if(settingsObjRef.contains("UseConsole") == false)
-    {
-        settingsObjRef.insert("UseConsole", QJsonValue(true));
-        bIsValid = false;
-    }
-
-    if(settingsObjRef.contains("ConsoleInfo") == false)
-    {
-        QJsonObject consoleInfoObj;
-        consoleInfoObj.insert("Name", "Harmony Log Console");
-        consoleInfoObj.insert("Type", QJsonValue(3));
-        consoleInfoObj.insert("ResolutionX", QJsonValue(64));
-        consoleInfoObj.insert("ResolutionY", QJsonValue(80));
-        consoleInfoObj.insert("LocationX", QJsonValue(0));
-        consoleInfoObj.insert("LocationY", QJsonValue(0));
-        settingsObjRef.insert("ConsoleInfo", consoleInfoObj);
-        bIsValid = false;
-    }
-    else
-    {
-        // TODO: Check contents of "ConsoleInfo"
-        QJsonObject consoleInfoObj = settingsObjRef["ConsoleInfo"].toObject();
-    }
-
-    if(settingsObjRef.contains("WindowInfoArray") == false)
-    {
-        QJsonArray windowInfoArray;
-        QJsonObject windowInfoObj;
-        windowInfoObj.insert("Name", "Window 1");
-        windowInfoObj.insert("Type", QJsonValue(0));
-        windowInfoObj.insert("ResolutionX", QJsonValue(1280));
-        windowInfoObj.insert("ResolutionY", QJsonValue(720));
-        windowInfoObj.insert("LocationX", QJsonValue(0));
-        windowInfoObj.insert("LocationY", QJsonValue(0));
-        windowInfoArray.append(windowInfoObj);
-
-        settingsObjRef.insert("WindowInfoArray", windowInfoArray);
-        bIsValid = false;
-    }
-    else
-    {
-        // TODO: Check contents of "WindowInfoArray"
-        QJsonArray consoleInfoObj = settingsObjRef["WindowInfoArray"].toArray();
+            if(bIsWindowInfoValid)
+                settingsObjRef.insert(iter.key(), iter.value());    // Replaces "WindowInfoArray" with defaults
+        }
     }
 
     return bIsValid;
@@ -172,10 +180,8 @@ void DlgProjectSettings::SaveSettings()
     }
 }
 
-/*virtual*/ int DlgProjectSettings::exec() /*override*/
+void DlgProjectSettings::InitWidgets(QJsonObject &settingsObjRef)
 {
-    MakeValid(m_SettingsObj);
-
     ui->txtTitleName->setText(m_SettingsObj["GameName"].toString());
     ui->txtClassName->setText(m_SettingsObj["ClassName"].toString());
 
@@ -187,6 +193,12 @@ void DlgProjectSettings::SaveSettings()
     ui->sbUpdateFpsCap->setValue(m_SettingsObj["UpdateFpsCap"].toInt());
     ui->sbPixelsPerMeter->setValue(m_SettingsObj["PixelsPerMeter"].toInt());
     ui->chkShowCursor->setChecked(m_SettingsObj["ShowCursor"].toBool());
+}
+
+/*virtual*/ int DlgProjectSettings::exec() /*override*/
+{
+    MakeValid(m_SettingsObj);
+    InitWidgets(m_SettingsObj);
 
     return QDialog::exec();
 }

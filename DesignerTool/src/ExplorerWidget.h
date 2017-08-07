@@ -70,6 +70,8 @@ private:
     Ui::ExplorerWidget *ui;
     
     QTreeWidgetItem *GetSelectedTreeItem();
+
+    void PutItemOnClipboard(ProjectItem *pProjItem);
     
 private Q_SLOTS:
     void OnProjectLoaded(Project *pLoadedProj);
@@ -81,6 +83,12 @@ private Q_SLOTS:
     
     void on_actionDeleteItem_triggered();
     
+    void on_actionCutItem_triggered();
+
+    void on_actionCopyItem_triggered();
+
+    void on_actionPasteItem_triggered();
+
 Q_SIGNALS:
     void LoadItemProject();
 };

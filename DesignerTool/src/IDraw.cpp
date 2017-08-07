@@ -12,6 +12,7 @@
 #include "IModel.h"
 #include "MainWindow.h"
 #include "HyGuiRenderer.h"
+#include "HyGuiGlobal.h"
 
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -62,18 +63,8 @@ void IDraw::ApplyJsonData(bool bReloadInAssetManager)
     if(m_pProjItem == nullptr)
         return;
 
-    QJsonValue valueData = m_pProjItem->GetModel()->GetSaveInfo(false);
-    QByteArray src;
-    if(valueData.isArray())
-    {
-        QJsonDocument tmpDoc(valueData.toArray());
-        src = tmpDoc.toJson();
-    }
-    else
-    {
-        QJsonDocument tmpDoc(valueData.toObject());
-        src = tmpDoc.toJson();
-    }
+    QJsonValue valueData = m_pProjItem->GetModel()->GetJson(false);
+    QByteArray src = JsonValueToSrc(valueData);
 
     jsonxx::Value newValue;
     newValue.parse(src.toStdString());

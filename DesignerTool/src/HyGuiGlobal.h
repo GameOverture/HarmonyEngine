@@ -19,6 +19,9 @@
 #include <QTreeWidgetItem>
 #include <QComboBox>
 #include <QStack>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 #include "WidgetOutputLog.h"
 #include "Harmony/HyEngine.h"
@@ -110,6 +113,7 @@ char *QStringToCharPtr(QString sString);
 
 QString PointToQString(QPointF ptPoint);
 QPointF StringToPoint(QString sPoint);
+QByteArray JsonValueToSrc(QJsonValue &valueRef);
 
 class HyGlobal
 {
@@ -130,6 +134,7 @@ public:
     static void Initialize();
 
     static HyGuiItemType GetCorrespondingDirItem(HyGuiItemType eItem);
+    static HyGuiItemType GetCorrespondingItemFromDir(HyGuiItemType eItem);
     static QList<HyGuiItemType> SubDirList();
     static QStringList SubDirNameList();
     static QString AtlasTextureTypeString(HyTextureFormat eType);

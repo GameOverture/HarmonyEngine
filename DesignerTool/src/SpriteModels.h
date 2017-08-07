@@ -106,6 +106,8 @@ public:
 
     void GetStateInfo(QJsonObject &stateObjOut);
 
+    QSet<AtlasFrame *> GetAtlasFrames();
+
     void Refresh();
     
     virtual void AddFrame(AtlasFrame *pFrame) override;
@@ -121,7 +123,8 @@ public:
     virtual ~SpriteModel();
     
     virtual QJsonObject PopStateAt(uint32 uiIndex) override;
-    virtual QJsonValue GetSaveInfo(bool bWritingToGameData) override;
+    virtual QJsonValue GetJson(bool bWritingToGameData) override;
+    virtual QList<AtlasFrame *> GetAtlasFrames() override;
     virtual void Refresh() override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

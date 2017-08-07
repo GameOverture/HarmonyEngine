@@ -81,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     HyGuiLog("Harmony Designer Tool", LOGTYPE_Title);
     HyGuiLog("Initializing...", LOGTYPE_Normal);
     
+    ui->actionProjectSettings->setEnabled(false);
     ui->actionCloseProject->setEnabled(false);
     ui->actionNewSprite->setEnabled(false);
     ui->actionNewFont->setEnabled(false);

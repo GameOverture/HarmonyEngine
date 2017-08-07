@@ -38,7 +38,8 @@ public:
     virtual ~EntityModel();
 
     virtual QJsonObject PopStateAt(uint32 uiIndex) override;
-    virtual QJsonValue GetSaveInfo(bool bWritingToGameData) override;
+    virtual QJsonValue GetJson(bool bWritingToGameData) override;
+    virtual QList<AtlasFrame *> GetAtlasFrames() override;
     virtual void Refresh() override;
 };
 

@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     qRegisterMetaTypeStreamOperators<AtlasFrame *>("HyGuiFrame *");
 
     HyGlobal::Initialize();
+    DlgProjectSettings::InitDefaultValues();
 
     MainWindow w;
     w.show();

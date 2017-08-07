@@ -346,6 +346,15 @@ void SpriteStateData::GetStateInfo(QJsonObject &stateObjOut)
     stateObjOut.insert("frames", QJsonValue(frameArray));
 }
 
+QSet<AtlasFrame *> SpriteStateData::GetAtlasFrames()
+{
+    QSet<AtlasFrame *> atlasSet;
+    for(int i = 0; i < m_pFramesModel->rowCount(); ++i)
+        atlasSet.insert(m_pFramesModel->GetFrameAt(i)->m_pFrame);
+
+    return atlasSet;
+}
+
 void SpriteStateData::Refresh()
 {
     m_pFramesModel->Refresh();
@@ -379,7 +388,7 @@ SpriteModel::SpriteModel(ProjectItem *pItem, QJsonArray stateArray) :   IModel(p
 {
 }
 
-QJsonObject SpriteModel::PopStateAt(uint32 uiIndex)
+QJsonObject SpriteModel::PopStateAt(uint32 uiIndex) /*override*/
 {
     QJsonObject retStateObj;
     retStateObj.insert("name", m_StateList[uiIndex]->GetName());
@@ -403,7 +412,7 @@ QJsonObject SpriteModel::PopStateAt(uint32 uiIndex)
     return retStateObj;
 }
 
-QJsonValue SpriteModel::GetSaveInfo(bool bWritingToGameData)
+/*virtual*/ QJsonValue SpriteModel::GetJson(bool bWritingToGameData) /*override*/
 {
     QJsonArray retArray;
     for(int i = 0; i < m_StateList.size(); ++i)
@@ -416,7 +425,19 @@ QJsonValue SpriteModel::GetSaveInfo(bool bWritingToGameData)
     return retArray;
 }
 
-/*virtual*/ void SpriteModel::Refresh()
+/*virtual*/ QList<AtlasFrame *> SpriteModel::GetAtlasFrames() /*override*/
+{
+    QList<AtlasFrame *> retAtlasFrameList;
+    for(int i = 0; i < m_StateList.size(); ++i)
+    {
+        QSet<AtlasFrame *> atlasFrameSet = static_cast<SpriteStateData *>(m_StateList[i])->GetAtlasFrames();
+        retAtlasFrameList += atlasFrameSet.toList();
+    }
+
+    return retAtlasFrameList;
+}
+
+/*virtual*/ void SpriteModel::Refresh() /*override*/
 {
     for(int i = 0; i < m_StateList.size(); ++i)
         static_cast<SpriteStateData *>(m_StateList[i])->Refresh();

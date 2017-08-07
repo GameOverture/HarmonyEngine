@@ -100,6 +100,7 @@
     <property name="title">
      <string>&amp;Tools</string>
     </property>
+    <addaction name="actionProjectSettings"/>
     <addaction name="actionLaunchIDE"/>
     <addaction name="actionConnect"/>
    </widget>
@@ -131,6 +132,7 @@
    <addaction name="actionOpenProject"/>
    <addaction name="actionCloseProject"/>
    <addaction name="separator"/>
+   <addaction name="actionProjectSettings"/>
    <addaction name="actionLaunchIDE"/>
    <addaction name="actionConnect"/>
    <addaction name="separator"/>
@@ -475,7 +477,7 @@
      <normaloff>:/icons16x16/items/Sprite-New.png</normaloff>:/icons16x16/items/Sprite-New.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Sprite</string>
+    <string>New Sprite</string>
    </property>
    <property name="toolTip">
     <string>Add a new sprite item in the currently selected project</string>
@@ -502,7 +504,7 @@
      <normaloff>:/icons16x16/items/Font-New.png</normaloff>:/icons16x16/items/Font-New.png</iconset>
    </property>
    <property name="text">
-    <string>Font</string>
+    <string>New Font</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N, Ctrl+F</string>
@@ -514,7 +516,7 @@
      <normaloff>:/icons16x16/items/Particles-New.png</normaloff>:/icons16x16/items/Particles-New.png</iconset>
    </property>
    <property name="text">
-    <string>Particle Effect</string>
+    <string>New Particle Effect</string>
    </property>
    <property name="toolTip">
     <string>Add a new particle effect in the currently selected project</string>
@@ -529,7 +531,7 @@
      <normaloff>:/icons16x16/items/Audio-New.png</normaloff>:/icons16x16/items/Audio-New.png</iconset>
    </property>
    <property name="text">
-    <string>Audio</string>
+    <string>New Audio</string>
    </property>
    <property name="toolTip">
     <string>Add a new audio bank in the currently selected project</string>
@@ -604,7 +606,7 @@
   <action name="actionProjectSettings">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/generic-settings.png</normaloff>:/icons16x16/generic-settings.png</iconset>
+     <normaloff>:/icons16x16/items/Project-Settings.png</normaloff>:/icons16x16/items/Project-Settings.png</iconset>
    </property>
    <property name="text">
     <string>Project Settings</string>
@@ -619,7 +621,7 @@
      <normaloff>:/icons16x16/items/Entity-New.png</normaloff>:/icons16x16/items/Entity-New.png</iconset>
    </property>
    <property name="text">
-    <string>Entity</string>
+    <string>New Entity</string>
    </property>
    <property name="toolTip">
     <string>Add a new entity in the currently selected project</string>

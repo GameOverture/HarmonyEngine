@@ -23,6 +23,7 @@
 
 /*static*/ void HyGlobal::Initialize()
 {
+    sm_sItemNames[ITEM_Project] = "Project";
     sm_sItemNames[ITEM_DirAudio] = sm_sItemNames[ITEM_Audio] = "Audio";
     sm_sItemNames[ITEM_DirParticles] = sm_sItemNames[ITEM_Particles] = "Particles";
     sm_sItemNames[ITEM_DirFonts] = "Fonts";
@@ -120,7 +121,7 @@
         return ITEM_DirShaders;
     case ITEM_AtlasImage:
     case ITEM_DirAtlases:
-        return ITEM_AtlasImage;
+        return ITEM_DirAtlases;
     case ITEM_Entity:
     case ITEM_DirEntities:
         return ITEM_DirEntities;
@@ -130,6 +131,42 @@
 
     return ITEM_Unknown;
 }
+
+/*static*/ HyGuiItemType HyGlobal::GetCorrespondingItemFromDir(HyGuiItemType eItem)
+{
+    switch(eItem)
+    {
+    case ITEM_Audio:
+    case ITEM_DirAudio:
+        return ITEM_Audio;
+    case ITEM_Particles:
+    case ITEM_DirParticles:
+        return ITEM_Particles;
+    case ITEM_Font:
+    case ITEM_DirFonts:
+        return ITEM_Font;
+    case ITEM_Spine:
+    case ITEM_DirSpine:
+        return ITEM_Spine;
+    case ITEM_Sprite:
+    case ITEM_DirSprites:
+        return ITEM_Sprite;
+    case ITEM_Shader:
+    case ITEM_DirShaders:
+        return ITEM_Shader;
+    case ITEM_AtlasImage:
+    case ITEM_DirAtlases:
+        return ITEM_AtlasImage;
+    case ITEM_Entity:
+    case ITEM_DirEntities:
+        return ITEM_Entity;
+    default:
+        HyGuiLog("HyGlobal::GetCorrespondingItemFromDir() could not find the proper directory item", LOGTYPE_Warning);
+    }
+
+    return ITEM_Unknown;
+}
+
 
 /*static*/ QList<HyGuiItemType> HyGlobal::SubDirList()
 {
@@ -361,6 +398,23 @@ QPointF StringToPoint(QString sPoint)
         return QPointF(0.0f, 0.0f);
     else
         return QPointF(sComponentList[0].toFloat(), sComponentList[1].toFloat());
+}
+
+QByteArray JsonValueToSrc(QJsonValue &valueRef)
+{
+    QByteArray src;
+    if(valueRef.isArray())
+    {
+        QJsonDocument tmpDoc(valueRef.toArray());
+        src = tmpDoc.toJson();
+    }
+    else
+    {
+        QJsonDocument tmpDoc(valueRef.toObject());
+        src = tmpDoc.toJson();
+    }
+
+    return src;
 }
 
 /*static*/ void HyGlobal::InitItemIcons(HyGuiItemType eItemType)

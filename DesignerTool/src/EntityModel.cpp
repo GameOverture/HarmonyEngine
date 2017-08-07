@@ -32,9 +32,14 @@ EntityModel::EntityModel(ProjectItem *pItem, QJsonArray stateArray) : IModel(pIt
     return QJsonObject();
 }
 
-/*virtual*/ QJsonValue EntityModel::GetSaveInfo(bool bWritingToGameData) /*override*/
+/*virtual*/ QJsonValue EntityModel::GetJson(bool bWritingToGameData) /*override*/
 {
     return QJsonValue();
+}
+
+/*virtual*/ QList<AtlasFrame *> EntityModel::GetAtlasFrames() /*override*/
+{
+    return QList<AtlasFrame *>();
 }
 
 /*virtual*/ void EntityModel::Refresh() /*override*/

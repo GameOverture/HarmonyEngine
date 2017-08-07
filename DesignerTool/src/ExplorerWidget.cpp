@@ -15,9 +15,11 @@
 #include "Project.h"
 #include "AtlasWidget.h"
 #include "HyGuiGlobal.h"
+#include "IModel.h"
 
 #include <QJsonArray>
 #include <QMessageBox>
+#include <QClipboard>
 
 ExplorerWidget::ExplorerWidget(QWidget *parent) :   QWidget(parent),
                                                     ui(new Ui::ExplorerWidget)
@@ -30,6 +32,10 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) :   QWidget(parent),
     ui->treeWidget->setDragEnabled(true);
     ui->treeWidget->setDropIndicatorShown(true);
     ui->treeWidget->setDragDropMode(QAbstractItemView::InternalMove);
+
+    ui->actionCutItem->setEnabled(false);
+    ui->actionCopyItem->setEnabled(false);
+    ui->actionPasteItem->setEnabled(false);
 
     connect(ui->treeWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 }
@@ -185,6 +191,32 @@ QTreeWidgetItem *ExplorerWidget::GetSelectedTreeItem()
     return pCurSelected;
 }
 
+void ExplorerWidget::PutItemOnClipboard(ProjectItem *pProjItem)
+{
+    QJsonValue itemValue = pProjItem->GetModel()->GetJson(false);
+
+    QJsonObject clipboardObj;
+    clipboardObj.insert(HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(pProjItem->GetType())), pProjItem->GetName(true));
+    clipboardObj.insert("src", itemValue);
+    QList<AtlasFrame *> atlasFrameList = pProjItem->GetModel()->GetAtlasFrames();
+    QJsonArray imagesArray;
+    for(int i = 0; i < atlasFrameList.size(); ++i)
+    {
+        QJsonObject atlasFrameObj;
+        atlasFrameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasFrameList[i]->GetImageChecksum())));
+        atlasFrameObj.insert("name", QJsonValue(atlasFrameList[i]->GetName()));
+        atlasFrameObj.insert("url", QJsonValue(GetCurProjSelected()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirAtlases) % "/" % atlasFrameList[i]->ConstructImageFileName()));
+        imagesArray.append(atlasFrameObj);
+    }
+    clipboardObj.insert("images", imagesArray);
+
+    // TODO: clipboardObj.insert("audio", GetAudioWavs())
+
+    QByteArray src = JsonValueToSrc(QJsonValue(clipboardObj));
+    QClipboard *pClipboard = QApplication::clipboard();
+    pClipboard->setText(src);
+}
+
 QStringList ExplorerWidget::GetOpenProjectPaths()
 {
     QStringList sListOpenProjs;
@@ -273,15 +305,46 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
     }
     else
     {
-        if(pTreeNode->parent() == nullptr)
+        ExplorerItem *pSelectedExplorerItem = pTreeNode->data(0, Qt::UserRole).value<ExplorerItem *>();
+        HyGuiItemType eSelectedItemType = pSelectedExplorerItem->GetType();
+        switch(eSelectedItemType)
         {
+        case ITEM_Project:
             contextMenu.addAction(FINDACTION("actionCloseProject"));
             contextMenu.addAction(FINDACTION("actionProjectSettings"));
-        }
-        else
-        {
+            break;
+        case ITEM_DirAudio:
+        case ITEM_DirParticles:
+        case ITEM_DirFonts:
+        case ITEM_DirSpine:
+        case ITEM_DirSprites:
+        case ITEM_DirShaders:
+        case ITEM_DirEntities:
+            contextMenu.addAction(FINDACTION("actionNew" % HyGlobal::ItemName(HyGlobal::GetCorrespondingItemFromDir(eSelectedItemType))));
+            break;
+        case ITEM_Audio:
+        case ITEM_Particles:
+        case ITEM_Font:
+        case ITEM_Spine:
+        case ITEM_Sprite:
+        case ITEM_Shader:
+        case ITEM_Entity:
+            contextMenu.addAction(FINDACTION("actionNew" % HyGlobal::ItemName(eSelectedItemType)));
+            contextMenu.addSeparator();
+            contextMenu.addAction(ui->actionCutItem);
+            contextMenu.addAction(ui->actionCopyItem);
+            contextMenu.addAction(ui->actionPasteItem);
+            contextMenu.addSeparator();
+        case ITEM_Prefix:
             contextMenu.addAction(ui->actionRename);
+            ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_Delete));
+            ui->actionDeleteItem->setText("Delete " % pSelectedExplorerItem->GetName(false));
             contextMenu.addAction(ui->actionDeleteItem);
+            break;
+
+        default: {
+            HyGuiLog("ExplorerWidget::OnContextMenu - Unknown ExplorerItem type", LOGTYPE_Error);
+            } break;
         }
     }
     
@@ -329,6 +392,7 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
     QTreeWidgetItem *pCurSelected = GetSelectedTreeItem();
     
     bool bValidItem = (pCurSelected != nullptr);
+    FINDACTION("actionProjectSettings")->setEnabled(bValidItem);
     FINDACTION("actionCloseProject")->setEnabled(bValidItem);
     FINDACTION("actionNewAudio")->setEnabled(bValidItem);
     FINDACTION("actionNewParticle")->setEnabled(bValidItem);
@@ -338,6 +402,26 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
     FINDACTION("actionNewAudio")->setEnabled(bValidItem);
     FINDACTION("actionNewEntity")->setEnabled(bValidItem);
     FINDACTION("actionLaunchIDE")->setEnabled(bValidItem);
+
+    ExplorerItem *pTreeVariantItem = pCurSelected->data(0, Qt::UserRole).value<ExplorerItem *>();
+    switch(pTreeVariantItem->GetType())
+    {
+    case ITEM_Audio:
+    case ITEM_Particles:
+    case ITEM_Font:
+    case ITEM_Spine:
+    case ITEM_Sprite:
+    case ITEM_Shader:
+    case ITEM_Entity:
+        ui->actionCutItem->setEnabled(true);
+        ui->actionCopyItem->setEnabled(true);
+        //ui->actionPaste
+        break;
+    default:
+        ui->actionCutItem->setEnabled(false);
+        ui->actionCopyItem->setEnabled(false);
+        break;
+    }
     
     if(bValidItem)
         MainWindow::SetSelectedProj(GetCurProjSelected());
@@ -399,4 +483,59 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
     default:
         HyGuiLog("ExplorerWidget::on_actionDeleteItem_triggered was invoked on an non-item/prefix:" % QString::number(pItem->GetType()), LOGTYPE_Error);
     }
+}
+
+void ExplorerWidget::on_actionCutItem_triggered()
+{
+    ExplorerItem *pCurItemSelected = GetCurItemSelected();
+    switch(pCurItemSelected->GetType())
+    {
+        case ITEM_Audio:
+        case ITEM_Particles:
+        case ITEM_Font:
+        case ITEM_Spine:
+        case ITEM_Sprite:
+        case ITEM_Shader:
+        case ITEM_Entity: {
+            ProjectItem *pProjItem = static_cast<ProjectItem *>(pProjItem);
+            PutItemOnClipboard(pProjItem);
+            HyGuiLog("Cut " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item to the clipboard.", LOGTYPE_Normal);
+
+            ui->actionPasteItem->setEnabled(true);
+        } break;
+
+        default: {
+            HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % QString::number(pCurItemSelected->GetType()), LOGTYPE_Error);
+        } break;
+    }
+}
+
+void ExplorerWidget::on_actionCopyItem_triggered()
+{
+    ExplorerItem *pCurItemSelected = GetCurItemSelected();
+    switch(pCurItemSelected->GetType())
+    {
+        case ITEM_Audio:
+        case ITEM_Particles:
+        case ITEM_Font:
+        case ITEM_Spine:
+        case ITEM_Sprite:
+        case ITEM_Shader:
+        case ITEM_Entity: {
+            ProjectItem *pProjItem = static_cast<ProjectItem *>(pCurItemSelected);
+            PutItemOnClipboard(pProjItem);
+            HyGuiLog("Copied " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item to the clipboard.", LOGTYPE_Normal);
+
+            ui->actionPasteItem->setEnabled(true);
+        } break;
+
+        default: {
+            HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % QString::number(pCurItemSelected->GetType()), LOGTYPE_Error);
+        } break;
+    }
+}
+
+void ExplorerWidget::on_actionPasteItem_triggered()
+{
+
 }

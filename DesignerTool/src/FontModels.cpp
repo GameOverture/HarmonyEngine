@@ -469,7 +469,7 @@ bool FontModel::ClearFontDirtyFlag()
 }
 
 
-/*virtual*/ QJsonObject FontModel::PopStateAt(uint32 uiIndex)
+/*virtual*/ QJsonObject FontModel::PopStateAt(uint32 uiIndex) /*override*/
 {
     QJsonObject retObj;
     static_cast<FontStateData *>(m_StateList[uiIndex])->GetStateInfo(retObj);
@@ -477,7 +477,7 @@ bool FontModel::ClearFontDirtyFlag()
     return retObj;
 }
 
-/*virtual*/ QJsonValue FontModel::GetSaveInfo(bool bWritingToGameData)
+/*virtual*/ QJsonValue FontModel::GetJson(bool bWritingToGameData) /*override*/
 {
     if(m_FontMetaDir.mkpath(".") == false) {
         HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
@@ -590,6 +590,14 @@ bool FontModel::ClearFontDirtyFlag()
     return fontObj;
 }
 
-/*virtual*/ void FontModel::Refresh()
+/*virtual*/ QList<AtlasFrame *> FontModel::GetAtlasFrames() /*override*/
+{
+    QList<AtlasFrame *> retAtlasFrameList;
+    retAtlasFrameList.push_back(m_pTrueAtlasFrame);
+
+    return retAtlasFrameList;
+}
+
+/*virtual*/ void FontModel::Refresh() /*override*/
 {
 }
