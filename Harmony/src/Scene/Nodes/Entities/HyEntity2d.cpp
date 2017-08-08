@@ -284,8 +284,10 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 
 		if((m_uiAttributes & ATTRIBFLAG_MouseInput) != 0)
 		{
+			glm::vec2 ptMousePos = IHyInputMap::GetWorldMousePos();
+
 			bool bLeftClickDown = IHyInputMap::IsMouseLeftDown();
-			bool bMouseInBounds = m_BoundingVolume.IsWorldPointCollide(IHyInputMap::GetWorldMousePos());
+			bool bMouseInBounds = m_BoundingVolume.IsWorldPointCollide(ptMousePos);
 
 			switch(m_eMouseInputState)
 			{
@@ -294,6 +296,12 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 				{
 					m_eMouseInputState = MOUSEINPUT_Hover;
 					OnMouseEnter(m_pMouseInputUserParam);
+
+					if(bLeftClickDown)
+					{
+						m_eMouseInputState = MOUSEINPUT_Down;
+						OnMouseDown(m_pMouseInputUserParam);
+					}
 				}
 				break;
 
@@ -311,14 +319,18 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 				break;
 
 			case MOUSEINPUT_Down:
-				if(bLeftClickDown == false)
+				if(bMouseInBounds == false)
 				{
 					m_eMouseInputState = MOUSEINPUT_None;
-					OnMouseUp(m_pMouseInputUserParam);
-
-					if(bMouseInBounds)
-						OnMouseClicked(m_pMouseInputUserParam);
+					OnMouseLeave(m_pMouseInputUserParam);
 				}
+				else if(bLeftClickDown == false)
+				{
+					m_eMouseInputState = MOUSEINPUT_Hover;
+					OnMouseUp(m_pMouseInputUserParam);
+					OnMouseClicked(m_pMouseInputUserParam);
+				}
+				
 				break;
 			}
 		}
