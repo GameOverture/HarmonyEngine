@@ -136,6 +136,7 @@ public:
     virtual QJsonObject PopStateAt(uint32 uiIndex) override;
     virtual QJsonValue GetJson(bool bWritingToGameData) override;
     virtual QList<AtlasFrame *> GetAtlasFrames() override;
+    virtual QStringList GetFontUrls() override;
     virtual void Refresh() override;
 };
 

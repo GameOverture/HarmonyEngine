@@ -598,6 +598,18 @@ bool FontModel::ClearFontDirtyFlag()
     return retAtlasFrameList;
 }
 
+/*virtual*/ QStringList FontModel::GetFontUrls() /*override*/
+{
+    QStringList fontUrlList;
+    for(int i = 0; i < m_StateList.size(); ++i)
+    {
+        FontStateData *pState = static_cast<FontStateData *>(m_StateList[i]);
+        fontUrlList.append(pState->GetFontFilePath());
+    }
+    
+    return fontUrlList;
+}
+
 /*virtual*/ void FontModel::Refresh() /*override*/
 {
 }

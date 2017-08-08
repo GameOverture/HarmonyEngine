@@ -437,6 +437,11 @@ QJsonObject SpriteModel::PopStateAt(uint32 uiIndex) /*override*/
     return retAtlasFrameList;
 }
 
+/*virtual*/ QStringList SpriteModel::GetFontUrls() /*override*/
+{
+    return QStringList();
+}
+
 /*virtual*/ void SpriteModel::Refresh() /*override*/
 {
     for(int i = 0; i < m_StateList.size(); ++i)

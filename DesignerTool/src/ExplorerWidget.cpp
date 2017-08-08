@@ -197,9 +197,13 @@ void ExplorerWidget::PutItemOnClipboard(ProjectItem *pProjItem)
 {
     QJsonValue itemValue = pProjItem->GetModel()->GetJson(false);
 
+    // STANDARD INFO
     QJsonObject clipboardObj;
-    clipboardObj.insert(HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(pProjItem->GetType())), pProjItem->GetName(true));
+    clipboardObj.insert("itemType", HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(pProjItem->GetType())));
+    clipboardObj.insert("itemName", pProjItem->GetName(true));
     clipboardObj.insert("src", itemValue);
+    
+    // IMAGE INFO
     QList<AtlasFrame *> atlasFrameList = pProjItem->GetModel()->GetAtlasFrames();
     QJsonArray imagesArray;
     for(int i = 0; i < atlasFrameList.size(); ++i)
@@ -211,9 +215,18 @@ void ExplorerWidget::PutItemOnClipboard(ProjectItem *pProjItem)
         imagesArray.append(atlasFrameObj);
     }
     clipboardObj.insert("images", imagesArray);
+    
+    // FONT INFO
+    QStringList fontUrlList = pProjItem->GetModel()->GetFontUrls();
+    QJsonArray fontUrlArray;
+    for(int i = 0; i < fontUrlList.size(); ++i)
+        fontUrlArray.append(fontUrlList[i]);
+    clipboardObj.insert("fonts", fontUrlArray);
 
-    // TODO: clipboardObj.insert("audio", GetAudioWavs())
+    // TODO: AUDIO INFO
+    //clipboardObj.insert("audio", GetAudioWavs())
 
+    // Serialize the item info into json source
     QByteArray src = JsonValueToSrc(QJsonValue(clipboardObj));
     QClipboard *pClipboard = QApplication::clipboard();
     pClipboard->setText(src);
@@ -407,23 +420,26 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
     FINDACTION("actionNewEntity")->setEnabled(bValidItem);
     FINDACTION("actionLaunchIDE")->setEnabled(bValidItem);
 
-    ExplorerItem *pTreeVariantItem = pCurSelected->data(0, Qt::UserRole).value<ExplorerItem *>();
-    switch(pTreeVariantItem->GetType())
+    if(pCurSelected)
     {
-    case ITEM_Audio:
-    case ITEM_Particles:
-    case ITEM_Font:
-    case ITEM_Spine:
-    case ITEM_Sprite:
-    case ITEM_Shader:
-    case ITEM_Entity:
-        ui->actionCutItem->setEnabled(true);
-        ui->actionCopyItem->setEnabled(true);
-        break;
-    default:
-        ui->actionCutItem->setEnabled(false);
-        ui->actionCopyItem->setEnabled(false);
-        break;
+        ExplorerItem *pTreeVariantItem = pCurSelected->data(0, Qt::UserRole).value<ExplorerItem *>();
+        switch(pTreeVariantItem->GetType())
+        {
+        case ITEM_Audio:
+        case ITEM_Particles:
+        case ITEM_Font:
+        case ITEM_Spine:
+        case ITEM_Sprite:
+        case ITEM_Shader:
+        case ITEM_Entity:
+            ui->actionCutItem->setEnabled(true);
+            ui->actionCopyItem->setEnabled(true);
+            break;
+        default:
+            ui->actionCutItem->setEnabled(false);
+            ui->actionCopyItem->setEnabled(false);
+            break;
+        }
     }
 
     ui->actionPasteItem->setEnabled(sm_sInternalClipboard.isEmpty() == false);
@@ -548,7 +564,7 @@ void ExplorerWidget::on_actionPasteItem_triggered()
     QJsonDocument pasteDoc = QJsonDocument::fromJson(sm_sInternalClipboard);
     QJsonObject pasteObj = pasteDoc.object();
 
-
+    
 
 //    QJsonValue itemValue = pProjItem->GetModel()->GetJson(false);
 

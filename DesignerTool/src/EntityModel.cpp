@@ -42,6 +42,11 @@ EntityModel::EntityModel(ProjectItem *pItem, QJsonArray stateArray) : IModel(pIt
     return QList<AtlasFrame *>();
 }
 
+/*virtual*/ QStringList EntityModel::GetFontUrls() /*override*/
+{
+    return QStringList();
+}
+
 /*virtual*/ void EntityModel::Refresh() /*override*/
 {
 }

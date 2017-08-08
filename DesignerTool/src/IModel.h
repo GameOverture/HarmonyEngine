@@ -360,6 +360,7 @@ public:
     virtual QJsonObject PopStateAt(uint32 uiIndex) = 0;
     virtual QJsonValue GetJson(bool bWritingToGameData) = 0;
     virtual QList<AtlasFrame *> GetAtlasFrames() = 0;
+    virtual QStringList GetFontUrls() = 0;
     virtual void Refresh() = 0;
 };
 
