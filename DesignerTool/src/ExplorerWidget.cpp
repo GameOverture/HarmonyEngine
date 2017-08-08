@@ -21,7 +21,7 @@
 #include <QMessageBox>
 #include <QClipboard>
 
-QString ExplorerWidget::sm_sInternalClipboard = "";
+QByteArray ExplorerWidget::sm_sInternalClipboard = "";
 
 ExplorerWidget::ExplorerWidget(QWidget *parent) :   QWidget(parent),
                                                     ui(new Ui::ExplorerWidget)
@@ -544,4 +544,26 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 {
     // Don't use QClipboard because someone can just copy random text before pasting and ruin the json format
     QString sTest = sm_sInternalClipboard;
+
+    QJsonDocument pasteDoc = QJsonDocument::fromJson(sm_sInternalClipboard);
+    QJsonObject pasteObj = pasteDoc.object();
+
+
+
+//    QJsonValue itemValue = pProjItem->GetModel()->GetJson(false);
+
+//    QJsonObject clipboardObj;
+//    clipboardObj.insert(HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(pProjItem->GetType())), pProjItem->GetName(true));
+//    clipboardObj.insert("src", itemValue);
+//    QList<AtlasFrame *> atlasFrameList = pProjItem->GetModel()->GetAtlasFrames();
+//    QJsonArray imagesArray;
+//    for(int i = 0; i < atlasFrameList.size(); ++i)
+//    {
+//        QJsonObject atlasFrameObj;
+//        atlasFrameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasFrameList[i]->GetImageChecksum())));
+//        atlasFrameObj.insert("name", QJsonValue(atlasFrameList[i]->GetName()));
+//        atlasFrameObj.insert("url", QJsonValue(GetCurProjSelected()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirAtlases) % "/" % atlasFrameList[i]->ConstructImageFileName()));
+//        imagesArray.append(atlasFrameObj);
+//    }
+//    clipboardObj.insert("images", imagesArray);
 }

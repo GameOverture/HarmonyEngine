@@ -50,7 +50,7 @@ class ExplorerWidget : public QWidget
 {
     Q_OBJECT
 
-    static QString      sm_sInternalClipboard;
+    static QByteArray      sm_sInternalClipboard;
 
 public:
     explicit ExplorerWidget(QWidget *parent = 0);
