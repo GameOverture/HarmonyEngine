@@ -113,6 +113,9 @@
     <ClInclude Include="src\pad\GainputInputDevicePadWin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\GainputHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\gainput.cpp">
