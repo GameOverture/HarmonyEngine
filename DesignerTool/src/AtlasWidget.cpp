@@ -118,6 +118,11 @@ AtlasWidget::~AtlasWidget()
     delete ui;
 }
 
+quint32 AtlasWidget::GetSelectedAtlasGrpId()
+{
+    return m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex());
+}
+
 AtlasModel &AtlasWidget::GetData()
 {
     return *m_pModel;

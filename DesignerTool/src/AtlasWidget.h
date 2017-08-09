@@ -65,6 +65,8 @@ public:
     explicit AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *parent = 0);
     ~AtlasWidget();
 
+    quint32 GetSelectedAtlasGrpId();
+
     AtlasModel &GetData();
     QTreeWidget *GetFramesTreeWidget();
 

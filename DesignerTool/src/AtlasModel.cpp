@@ -67,6 +67,10 @@ AtlasFrame *AtlasModel::FrameLookup::Find(quint32 uiId)
     else
         return iter.value();
 }
+bool AtlasModel::FrameLookup::DoesImageExist(quint32 uiChecksum)
+{
+    return m_FrameChecksumMap.contains(uiChecksum);
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
@@ -620,6 +624,11 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiA
     }
 
     return pNewFrame;
+}
+
+bool AtlasModel::DoesImageExist(quint32 uiChecksum)
+{
+    return m_FrameLookup.DoesImageExist(uiChecksum);
 }
 
 void AtlasModel::SaveData()

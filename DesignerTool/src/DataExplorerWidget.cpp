@@ -558,13 +558,61 @@ void DataExplorerWidget::on_actionCopyItem_triggered()
 
 void DataExplorerWidget::on_actionPasteItem_triggered()
 {
-    // Don't use QClipboard because someone can just copy random text before pasting and ruin the json format
+    Project *pCurProj = GetCurProjSelected();
+    QDir metaDir(pCurProj->GetMetaDataAbsPath());
+
+    // Don't use QClipboard because someone can just copy random text before pasting and ruin the expected json format
     QString sTest = sm_sInternalClipboard;
 
     QJsonDocument pasteDoc = QJsonDocument::fromJson(sm_sInternalClipboard);
     QJsonObject pasteObj = pasteDoc.object();
 
+    // Import any missing resources into managers (images, fonts, audio...)
+    QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_DirFonts));
+    QJsonArray fontArray = pasteObj["fonts"].toArray();
+    for(int i = 0; i < fontArray.size(); ++i)
+    {
+        QFileInfo pasteFontFileInfo(fontArray[i].toString());
 
+        if(QFile::copy(pasteFontFileInfo.absoluteFilePath(), sFontMetaDir % "/" % pasteFontFileInfo.fileName()))
+            HyGuiLog("Paste Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
+    }
+
+    QDir metaTempDir(metaDir.absoluteFilePath(HYGUIPATH_TempDir));
+    if(metaTempDir.exists())
+    {
+        QFileInfoList tempFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+        for(int i = 0; i < tempFileInfoList.size(); ++i)
+        {
+            if(false == QFile::remove(tempFileInfoList[i].absoluteFilePath()))
+                HyGuiLog("Could not remove temp file: " % tempFileInfoList[i].fileName(), LOGTYPE_Error);
+        }
+    }
+    else if(false == metaTempDir.mkpath("."))
+        HyGuiLog("Could not make meta temp directory", LOGTYPE_Error);
+
+    QJsonArray imageArray = pasteObj["images"].toArray();
+    for(int i = 0; i < imageArray.size(); ++i)
+    {
+        QJsonObject imageObj = imageArray[i].toObject();
+
+        if(pCurProj->GetAtlasModel().DoesImageExist(JSONOBJ_TOINT(imageObj, "checksum")) == false)
+        {
+            QFileInfo pasteImageFileInfo(imageObj["url"].toString());
+            QFile::copy(pasteImageFileInfo.absoluteFilePath(), metaTempDir.absolutePath() % "/" % imageObj["name"].toString() % "." % pasteImageFileInfo.suffix());
+        }
+    }
+
+    QStringList importImageList;
+    QFileInfoList importFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+    for(int i = 0; i < importFileInfoList.size(); ++i)
+        importImageList.append(importFileInfoList[i].absoluteFilePath());
+
+    quint32 uiAtlasGrpId = pCurProj->GetAtlasModel().GetAtlasGrpIdFromAtlasGrpIndex(0);
+    if(pCurProj->GetAtlasWidget())
+        uiAtlasGrpId = pCurProj->GetAtlasWidget()->GetSelectedAtlasGrpId();
+
+    pCurProj->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId);
     
 
 //    QJsonValue itemValue = pProjItem->GetModel()->GetJson(false);
