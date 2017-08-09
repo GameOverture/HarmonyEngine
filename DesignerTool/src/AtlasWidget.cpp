@@ -11,7 +11,7 @@
 #include "ui_AtlasWidget.h"
 #include "HyGuiGlobal.h"
 #include "SpriteWidget.h"
-#include "ExplorerItem.h"
+#include "DataExplorerItem.h"
 
 #include <QFileDialog>
 #include <QJsonDocument>

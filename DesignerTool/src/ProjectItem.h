@@ -10,7 +10,7 @@
 #ifndef PROJECTITEM_H
 #define PROJECTITEM_H
 
-#include "ExplorerItem.h"
+#include "DataExplorerItem.h"
 #include "Harmony/HyEngine.h"
 #include "IDraw.h"
 
@@ -23,7 +23,7 @@ class Project;
 class AtlasFrame;
 class IModel;
 
-class ProjectItem : public ExplorerItem
+class ProjectItem : public DataExplorerItem
 {
     Q_OBJECT
 

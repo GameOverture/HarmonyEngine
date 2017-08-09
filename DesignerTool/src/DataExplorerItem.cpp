@@ -1,5 +1,5 @@
 /**************************************************************************
- *	Item.cpp
+ *	DataExplorerItem.cpp
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "ExplorerItem.h"
+#include "DataExplorerItem.h"
 #include "SpriteWidget.h"
 #include "HyGuiGlobal.h"
 #include <QFileInfo>
@@ -17,8 +17,8 @@
 #include "Project.h"
 #include "Harmony/Utilities/HyStrManip.h"
 
-ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath) :  m_eTYPE(eType),
-                                                                        m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str())
+DataExplorerItem::DataExplorerItem(HyGuiItemType eType, const QString sPath) :  m_eTYPE(eType),
+                                                                                m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str())
 {
     m_pTreeItemPtr = new QTreeWidgetItem();
 
@@ -29,12 +29,12 @@ ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath) :  m_eTYPE(
     m_pTreeItemPtr->setData(0, Qt::UserRole, v);
 }
 
-ExplorerItem::~ExplorerItem()
+DataExplorerItem::~DataExplorerItem()
 {
     delete m_pTreeItemPtr;
 }
 
-QString ExplorerItem::GetName(bool bWithPrefix) const
+QString DataExplorerItem::GetName(bool bWithPrefix) const
 {
     QString sPrefix;
     if(bWithPrefix)
@@ -51,7 +51,7 @@ QString ExplorerItem::GetName(bool bWithPrefix) const
     return sName;
 }
 
-QString ExplorerItem::GetPrefix() const
+QString DataExplorerItem::GetPrefix() const
 {
     // Check to see if this item can have a valid prefix
     if(m_eTYPE == ITEM_Project)
@@ -110,7 +110,7 @@ QString ExplorerItem::GetPrefix() const
     return sPrefix;
 }
 
-void ExplorerItem::SetTreeItemSubIcon(SubIcon eSubIcon)
+void DataExplorerItem::SetTreeItemSubIcon(SubIcon eSubIcon)
 {
     m_pTreeItemPtr->setIcon(0, GetIcon(eSubIcon));
 }

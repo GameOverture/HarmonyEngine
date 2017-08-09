@@ -39,7 +39,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *pare
     for(int i = 0; i < m_pItemProject->GetTreeItem()->childCount(); ++i)
     {
         pSubDirItem = m_pItemProject->GetTreeItem()->child(i);
-        ExplorerItem *pCurItem = pSubDirItem->data(0, Qt::UserRole).value<ExplorerItem *>();
+        DataExplorerItem *pCurItem = pSubDirItem->data(0, Qt::UserRole).value<DataExplorerItem *>();
 
         if(pCurItem->GetType() == HyGlobal::GetCorrespondingDirItem(eItem))
             break;
@@ -52,7 +52,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *pare
         if(itemList[i] == pSubDirItem)
             continue;
 
-        ExplorerItem *pItem = itemList[i]->data(0, Qt::UserRole).value<ExplorerItem *>();
+        DataExplorerItem *pItem = itemList[i]->data(0, Qt::UserRole).value<DataExplorerItem *>();
         if(pItem->GetType() == ITEM_Prefix)
             m_PrefixStringList.append(pItem->GetPrefix());
     }

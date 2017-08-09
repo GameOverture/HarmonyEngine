@@ -52,8 +52,6 @@ SOURCES += main.cpp \
     AtlasFrame.cpp \
     AudioWave.cpp \
     HyGuiGlobal.cpp \
-    ExplorerItem.cpp \
-    ExplorerWidget.cpp \
     FontDraw.cpp \
     AudioDraw.cpp \
     FontItem.cpp \
@@ -69,7 +67,9 @@ SOURCES += main.cpp \
     EntityWidget.cpp \
     EntityModel.cpp \
     EntityDraw.cpp \
-    EntSpriteFrame.cpp
+    EntSpriteFrame.cpp \
+    DataExplorerWidget.cpp \
+    DataExplorerItem.cpp
 
 HEADERS  += \
     DlgNewProject.h \
@@ -108,8 +108,6 @@ HEADERS  += \
     AtlasFrame.h \
     AudioWave.h \
     HyGuiGlobal.h \
-    ExplorerItem.h \
-    ExplorerWidget.h \
     FontDraw.h \
     AudioDraw.h \
     FontItem.h \
@@ -125,7 +123,9 @@ HEADERS  += \
     EntityWidget.h \
     EntityModel.h \
     EntityDraw.h \
-    EntSpriteFrame.h
+    EntSpriteFrame.h \
+    DataExplorerWidget.h \
+    DataExplorerItem.h
 
 FORMS    += \
     DlgNewProject.ui \
@@ -147,11 +147,11 @@ FORMS    += \
     AudioWidgetBank.ui \
     AudioWidgetManager.ui \
     AudioWidgetState.ui \
-    ExplorerWidget.ui \
     AtlasWidget.ui \
     DlgProjectSettings.ui \
     EntityWidget.ui \
-    EntSpriteFrame.ui
+    EntSpriteFrame.ui \
+    DataExplorerWidget.ui
 
 RC_FILE = DesignerTool.rc
 

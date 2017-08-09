@@ -30,7 +30,7 @@
 
 HarmonyInit g_DefaultInit;
 
-Project::Project(const QString sProjectFilePath) :  ExplorerItem(ITEM_Project, sProjectFilePath),
+Project::Project(const QString sProjectFilePath) :  DataExplorerItem(ITEM_Project, sProjectFilePath),
                                                     IHyApplication(g_DefaultInit),
                                                     m_pDraw(nullptr),
                                                     m_DlgProjectSettings(sProjectFilePath),
@@ -93,7 +93,7 @@ Project::Project(const QString sProjectFilePath) :  ExplorerItem(ITEM_Project, s
             continue;
 
         QString sSubDirPath = GetAssetsAbsPath() % HyGlobal::ItemName(subDirList[i]) % HyGlobal::ItemExt(subDirList[i]);
-        ExplorerItem *pSubDirItem = new ExplorerItem(subDirList[i], sSubDirPath);
+        DataExplorerItem *pSubDirItem = new DataExplorerItem(subDirList[i], sSubDirPath);
 
         // Adding sub dir tree item
         QTreeWidgetItem *pSubDirTreeItem = pSubDirItem->GetTreeItem();
@@ -143,7 +143,7 @@ Project::Project(const QString sProjectFilePath) :  ExplorerItem(ITEM_Project, s
 
                     if(bPrefixFound == false)
                     {
-                        ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sSubDirName % "/" % sCurPrefix);
+                        DataExplorerItem *pPrefixItem = new DataExplorerItem(ITEM_Prefix, sSubDirName % "/" % sCurPrefix);
                         QTreeWidgetItem *pNewPrefixTreeWidget = pPrefixItem->GetTreeItem();
 
                         pCurPrefixTreeItem->addChild(pNewPrefixTreeWidget);
@@ -152,7 +152,7 @@ Project::Project(const QString sProjectFilePath) :  ExplorerItem(ITEM_Project, s
                 }
                 else // Last path part, so must be the actual data item
                 {
-                    ExplorerItem *pNewDataItem = nullptr;
+                    DataExplorerItem *pNewDataItem = nullptr;
                     switch(subDirList[i])
                     {
                     case ITEM_DirAudio:

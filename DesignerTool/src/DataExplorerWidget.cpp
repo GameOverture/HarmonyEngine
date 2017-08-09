@@ -1,5 +1,5 @@
 /**************************************************************************
- *	ExplorerWidget.cpp
+ *	DataExplorerWidget.cpp
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "ExplorerWidget.h"
-#include "ui_ExplorerWidget.h"
+#include "DataExplorerWidget.h"
+#include "ui_DataExplorerWidget.h"
 
 #include "MainWindow.h"
 #include "FontItem.h"
@@ -21,10 +21,10 @@
 #include <QMessageBox>
 #include <QClipboard>
 
-QByteArray ExplorerWidget::sm_sInternalClipboard = "";
+QByteArray DataExplorerWidget::sm_sInternalClipboard = "";
 
-ExplorerWidget::ExplorerWidget(QWidget *parent) :   QWidget(parent),
-                                                    ui(new Ui::ExplorerWidget)
+DataExplorerWidget::DataExplorerWidget(QWidget *parent) :   QWidget(parent),
+                                                            ui(new Ui::DataExplorerWidget)
 {
     ui->setupUi(this);
 
@@ -42,12 +42,12 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) :   QWidget(parent),
     connect(ui->treeWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 }
 
-ExplorerWidget::~ExplorerWidget()
+DataExplorerWidget::~DataExplorerWidget()
 {
     delete ui;
 }
 
-Project *ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
+Project *DataExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
 {
     Project *pNewProject = new Project(sNewProjectFilePath);
     HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
@@ -63,12 +63,12 @@ Project *ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
     //
     //MainWindow::StartLoading(MDI_Explorer);
     //ExplorerLoadThread *pNewLoadThread = new ExplorerLoadThread(sNewProjectFilePath, this);
-    //connect(pNewLoadThread, &ExplorerLoadThread::LoadFinished, this, &ExplorerWidget::OnProjectLoaded);
+    //connect(pNewLoadThread, &ExplorerLoadThread::LoadFinished, this, &DataExplorerWidget::OnProjectLoaded);
     //connect(pNewLoadThread, &ExplorerLoadThread::finished, pNewLoadThread, &QObject::deleteLater);
     //pNewLoadThread->start();
 }
 
-void ExplorerWidget::AddNewItem(HyGuiItemType eNewItemType, const QString sPrefix, const QString sName)
+void DataExplorerWidget::AddNewItem(HyGuiItemType eNewItemType, const QString sPrefix, const QString sName)
 {
     // Find the proper project tree item
     Project *pCurProj = GetCurProjSelected();
@@ -84,7 +84,7 @@ void ExplorerWidget::AddNewItem(HyGuiItemType eNewItemType, const QString sPrefi
         return;
     }
 
-    ExplorerItem *pItem = new ProjectItem(*pCurProj, eNewItemType, sPrefix, sName, QJsonValue(), true);
+    DataExplorerItem *pItem = new ProjectItem(*pCurProj, eNewItemType, sPrefix, sName, QJsonValue(), true);
     
     // Get the relative path from [ProjectDir->ItemPath] e.g. "Sprites/SpritePrefix/MySprite"
     QString sRelativePath = pItem->GetPath();
@@ -118,9 +118,9 @@ void ExplorerWidget::AddNewItem(HyGuiItemType eNewItemType, const QString sPrefi
             {
                 // Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
                 //
-                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>()->GetName(true) % "/" % sPathSplitList[i];
+                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<DataExplorerItem *>()->GetName(true) % "/" % sPathSplitList[i];
                 
-                ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sPath);
+                DataExplorerItem *pPrefixItem = new DataExplorerItem(ITEM_Prefix, sPath);
                 QTreeWidgetItem *pPrefixTreeItem = pPrefixItem->GetTreeItem();
 
                 pParentTreeItem->addChild(pPrefixTreeItem);
@@ -154,7 +154,7 @@ void ExplorerWidget::AddNewItem(HyGuiItemType eNewItemType, const QString sPrefi
     MainWindow::OpenItem(static_cast<ProjectItem *>(pItem));
 }
 
-void ExplorerWidget::RemoveItem(ExplorerItem *pItem)
+void DataExplorerWidget::RemoveItem(DataExplorerItem *pItem)
 {
     if(pItem == nullptr)
         return;
@@ -162,14 +162,14 @@ void ExplorerWidget::RemoveItem(ExplorerItem *pItem)
     for(int i = 0; i < pItem->GetTreeItem()->childCount(); ++i)
     {
         QVariant v = pItem->GetTreeItem()->child(i)->data(0, Qt::UserRole);
-        RemoveItem(v.value<ExplorerItem *>());
+        RemoveItem(v.value<DataExplorerItem *>());
     }
     
     // Children are taken care of at this point, now remove self
     delete pItem;
 }
 
-void ExplorerWidget::SelectItem(ExplorerItem *pItem)
+void DataExplorerWidget::SelectItem(DataExplorerItem *pItem)
 {
     for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
     {
@@ -184,7 +184,7 @@ void ExplorerWidget::SelectItem(ExplorerItem *pItem)
     pItem->GetTreeItem()->setSelected(true);
 }
 
-QTreeWidgetItem *ExplorerWidget::GetSelectedTreeItem()
+QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
 {
     QTreeWidgetItem *pCurSelected = nullptr;
     if(ui->treeWidget->selectedItems().empty() == false)
@@ -193,7 +193,7 @@ QTreeWidgetItem *ExplorerWidget::GetSelectedTreeItem()
     return pCurSelected;
 }
 
-void ExplorerWidget::PutItemOnClipboard(ProjectItem *pProjItem)
+void DataExplorerWidget::PutItemOnClipboard(ProjectItem *pProjItem)
 {
     QJsonValue itemValue = pProjItem->GetModel()->GetJson(false);
 
@@ -234,14 +234,14 @@ void ExplorerWidget::PutItemOnClipboard(ProjectItem *pProjItem)
     sm_sInternalClipboard = src;
 }
 
-QStringList ExplorerWidget::GetOpenProjectPaths()
+QStringList DataExplorerWidget::GetOpenProjectPaths()
 {
     QStringList sListOpenProjs;
     sListOpenProjs.clear();
     
     for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
     {
-        ExplorerItem *pItem = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<ExplorerItem *>();
+        DataExplorerItem *pItem = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<DataExplorerItem *>();
         Project *pItemProject = static_cast<Project *>(pItem);
         sListOpenProjs.append(pItemProject->GetAbsPath());
     }
@@ -249,7 +249,7 @@ QStringList ExplorerWidget::GetOpenProjectPaths()
     return sListOpenProjs;
 }
 
-Project *ExplorerWidget::GetCurProjSelected()
+Project *DataExplorerWidget::GetCurProjSelected()
 {
     QTreeWidgetItem *pCurProjItem = GetSelectedTreeItem();
     if(pCurProjItem == nullptr)
@@ -259,7 +259,7 @@ Project *ExplorerWidget::GetCurProjSelected()
         pCurProjItem = pCurProjItem->parent();
     
     QVariant v = pCurProjItem->data(0, Qt::UserRole);
-    ExplorerItem *pItem = v.value<ExplorerItem *>();
+    DataExplorerItem *pItem = v.value<DataExplorerItem *>();
 
     if(pItem->GetType() != ITEM_Project)
         HyGuiLog("WidgetExplorer::GetCurProjSelected() returned a non project item", LOGTYPE_Error);
@@ -267,23 +267,23 @@ Project *ExplorerWidget::GetCurProjSelected()
     return reinterpret_cast<Project *>(pItem);
 }
 
-ExplorerItem *ExplorerWidget::GetCurItemSelected()
+DataExplorerItem *DataExplorerWidget::GetCurItemSelected()
 {
     QTreeWidgetItem *pCurItem = GetSelectedTreeItem();
     if(pCurItem == nullptr)
         return nullptr;
     
     QVariant v = pCurItem->data(0, Qt::UserRole);
-    return v.value<ExplorerItem *>();
+    return v.value<DataExplorerItem *>();
 }
 
-ExplorerItem *ExplorerWidget::GetCurSubDirSelected()
+DataExplorerItem *DataExplorerWidget::GetCurSubDirSelected()
 {
     QTreeWidgetItem *pCurTreeItem = GetSelectedTreeItem();
     if(pCurTreeItem == nullptr)
         return nullptr;
     
-    ExplorerItem *pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
+    DataExplorerItem *pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<DataExplorerItem *>();
     while(pCurItem->GetType() != ITEM_DirAudio &&
           pCurItem->GetType() != ITEM_DirParticles &&
           pCurItem->GetType() != ITEM_DirFonts &&
@@ -296,19 +296,19 @@ ExplorerItem *ExplorerWidget::GetCurSubDirSelected()
         if(pCurTreeItem == nullptr)
             return nullptr;
         
-        pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
+        pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<DataExplorerItem *>();
     }
     
     return pCurItem;
 }
 
-void ExplorerWidget::OnProjectLoaded(Project *pLoadedProj)
+void DataExplorerWidget::OnProjectLoaded(Project *pLoadedProj)
 {
     //pLoadedProj->moveToThread(QApplication::instance()->thread());
     MainWindow::StopLoading(MDI_Explorer);
 }
 
-void ExplorerWidget::OnContextMenu(const QPoint &pos)
+void DataExplorerWidget::OnContextMenu(const QPoint &pos)
 {
     QPoint globalPos = ui->treeWidget->mapToGlobal(pos);
     QTreeWidgetItem *pTreeNode = ui->treeWidget->itemAt(pos);
@@ -322,7 +322,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
     }
     else
     {
-        ExplorerItem *pSelectedExplorerItem = pTreeNode->data(0, Qt::UserRole).value<ExplorerItem *>();
+        DataExplorerItem *pSelectedExplorerItem = pTreeNode->data(0, Qt::UserRole).value<DataExplorerItem *>();
         HyGuiItemType eSelectedItemType = pSelectedExplorerItem->GetType();
         switch(eSelectedItemType)
         {
@@ -368,12 +368,12 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
     contextMenu.exec(globalPos);
 }
 
-void ExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
+void DataExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     // setCurrentItem() required if this function is manually invoked. E.g. AddItem()
     ui->treeWidget->setCurrentItem(item);
     
-    ExplorerItem *pTreeVariantItem = item->data(0, Qt::UserRole).value<ExplorerItem *>();
+    DataExplorerItem *pTreeVariantItem = item->data(0, Qt::UserRole).value<DataExplorerItem *>();
     
     switch(pTreeVariantItem->GetType())
     {
@@ -404,7 +404,7 @@ void ExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int 
     }
 }
 
-void ExplorerWidget::on_treeWidget_itemSelectionChanged()
+void DataExplorerWidget::on_treeWidget_itemSelectionChanged()
 {
     QTreeWidgetItem *pCurSelected = GetSelectedTreeItem();
     
@@ -422,7 +422,7 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
 
     if(pCurSelected)
     {
-        ExplorerItem *pTreeVariantItem = pCurSelected->data(0, Qt::UserRole).value<ExplorerItem *>();
+        DataExplorerItem *pTreeVariantItem = pCurSelected->data(0, Qt::UserRole).value<DataExplorerItem *>();
         switch(pTreeVariantItem->GetType())
         {
         case ITEM_Audio:
@@ -448,9 +448,9 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
         MainWindow::SetSelectedProj(GetCurProjSelected());
 }
 
-void ExplorerWidget::on_actionRename_triggered()
+void DataExplorerWidget::on_actionRename_triggered()
 {
-    ExplorerItem *pItem = GetCurItemSelected();
+    DataExplorerItem *pItem = GetCurItemSelected();
     
     switch(pItem->GetType())
     {
@@ -471,9 +471,9 @@ void ExplorerWidget::on_actionRename_triggered()
     }
 }
 
-void ExplorerWidget::on_actionDeleteItem_triggered()
+void DataExplorerWidget::on_actionDeleteItem_triggered()
 {
-    ExplorerItem *pItem = GetCurItemSelected();
+    DataExplorerItem *pItem = GetCurItemSelected();
     
     switch(pItem->GetType())
     {
@@ -506,9 +506,9 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
     }
 }
 
-void ExplorerWidget::on_actionCutItem_triggered()
+void DataExplorerWidget::on_actionCutItem_triggered()
 {
-    ExplorerItem *pCurItemSelected = GetCurItemSelected();
+    DataExplorerItem *pCurItemSelected = GetCurItemSelected();
     switch(pCurItemSelected->GetType())
     {
         case ITEM_Audio:
@@ -531,9 +531,9 @@ void ExplorerWidget::on_actionCutItem_triggered()
     }
 }
 
-void ExplorerWidget::on_actionCopyItem_triggered()
+void DataExplorerWidget::on_actionCopyItem_triggered()
 {
-    ExplorerItem *pCurItemSelected = GetCurItemSelected();
+    DataExplorerItem *pCurItemSelected = GetCurItemSelected();
     switch(pCurItemSelected->GetType())
     {
         case ITEM_Audio:
@@ -556,13 +556,14 @@ void ExplorerWidget::on_actionCopyItem_triggered()
     }
 }
 
-void ExplorerWidget::on_actionPasteItem_triggered()
+void DataExplorerWidget::on_actionPasteItem_triggered()
 {
     // Don't use QClipboard because someone can just copy random text before pasting and ruin the json format
     QString sTest = sm_sInternalClipboard;
 
     QJsonDocument pasteDoc = QJsonDocument::fromJson(sm_sInternalClipboard);
     QJsonObject pasteObj = pasteDoc.object();
+
 
     
 

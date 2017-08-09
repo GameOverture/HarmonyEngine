@@ -1,5 +1,5 @@
 /**************************************************************************
- *	ExplorerWidget.h
+ *	DataExplorerWidget.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef EXPLORERWIDGET_H
-#define EXPLORERWIDGET_H
+#ifndef DATAEXPLORERWIDGET_H
+#define DATAEXPLORERWIDGET_H
 
 #include <QWidget>
 #include <QDir>
@@ -22,17 +22,17 @@
 using std::vector;
 
 namespace Ui {
-class ExplorerWidget;
+class DataExplorerWidget;
 }
 
-class ExplorerLoadThread : public QThread
+class DataExplorerLoadThread : public QThread
 {
     Q_OBJECT
 
     QString m_sPath;
 
 public:
-    ExplorerLoadThread(QString sPath, QObject *pParent) :    QThread(pParent),
+    DataExplorerLoadThread(QString sPath, QObject *pParent) :   QThread(pParent),
                                                                 m_sPath(sPath)
     { }
 
@@ -46,30 +46,30 @@ Q_SIGNALS:
     void LoadFinished(Project *pLoadedItemProject);
 };
 
-class ExplorerWidget : public QWidget
+class DataExplorerWidget : public QWidget
 {
     Q_OBJECT
 
     static QByteArray      sm_sInternalClipboard;
 
 public:
-    explicit ExplorerWidget(QWidget *parent = 0);
-    ~ExplorerWidget();
+    explicit DataExplorerWidget(QWidget *parent = 0);
+    ~DataExplorerWidget();
     
     Project *AddItemProject(const QString sNewProjectFilePath);
     void AddNewItem(HyGuiItemType eNewItemType, const QString sPrefix, const QString sName);
-    void RemoveItem(ExplorerItem *pItem);
+    void RemoveItem(DataExplorerItem *pItem);
     
-    void SelectItem(ExplorerItem *pItem);
+    void SelectItem(DataExplorerItem *pItem);
     
     Project *GetCurProjSelected();
-    ExplorerItem *GetCurItemSelected();
-    ExplorerItem *GetCurSubDirSelected();
+    DataExplorerItem *GetCurItemSelected();
+    DataExplorerItem *GetCurSubDirSelected();
     
     QStringList GetOpenProjectPaths();
 
 private:
-    Ui::ExplorerWidget *ui;
+    Ui::DataExplorerWidget *ui;
     
     QTreeWidgetItem *GetSelectedTreeItem();
 
@@ -95,4 +95,4 @@ Q_SIGNALS:
     void LoadItemProject();
 };
 
-#endif // EXPLORERWIDGET_H
+#endif // DATAEXPLORERWIDGET_H

@@ -1,5 +1,5 @@
 /**************************************************************************
- *	Item.h
+ *	DataExplorerItem.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef EXPLORERITEM_H
-#define EXPLORERITEM_H
+#ifndef DATAEXPLORERITEM_H
+#define DATAEXPLORERITEM_H
 
 #include <QObject>
 #include <QTreeWidget>
@@ -20,7 +20,7 @@ class HyGuiDependencies;
 class WidgetRenderer;
 class AtlasFrame;
 
-class ExplorerItem : public QObject
+class DataExplorerItem : public QObject
 {
     Q_OBJECT
 
@@ -31,8 +31,8 @@ protected:
     QTreeWidgetItem *       m_pTreeItemPtr;
     
 public:
-    ExplorerItem(HyGuiItemType eType, const QString sPath);
-    virtual ~ExplorerItem();
+    DataExplorerItem(HyGuiItemType eType, const QString sPath);
+    virtual ~DataExplorerItem();
 
     HyGuiItemType GetType() const                   { return m_eTYPE; }
     QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
@@ -43,6 +43,6 @@ public:
     QIcon GetIcon(SubIcon eSubIcon) const           { return HyGlobal::ItemIcon(m_eTYPE, eSubIcon); }
     void SetTreeItemSubIcon(SubIcon eSubIcon);
 };
-Q_DECLARE_METATYPE(ExplorerItem *)
+Q_DECLARE_METATYPE(DataExplorerItem *)
 
-#endif // EXPLORERITEM_H
+#endif // DATAEXPLORERITEM_H

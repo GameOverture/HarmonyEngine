@@ -13,7 +13,7 @@
 #include "ProjectDraw.h"
 #include "ProjectItem.h"
 #include "AtlasModel.h"
-#include "ExplorerItem.h"
+#include "DataExplorerItem.h"
 #include "DlgProjectSettings.h"
 
 #include <QQueue>
@@ -25,7 +25,7 @@ class AudioWidgetManager;
 
 class AtlasTreeItem;
 
-class Project : public ExplorerItem, public IHyApplication
+class Project : public DataExplorerItem, public IHyApplication
 {
     Q_OBJECT
 
