@@ -11,6 +11,8 @@
 #define HyDiagnostics_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Scene/Nodes/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Leafs/Draws/HyText2d.h"
 
 #include <time.h>
 
@@ -74,19 +76,35 @@ class HyDiagnostics
 	ProfileState				m_CurProfileState;
 	std::vector<ProfileState>	m_ProfileStateList;
 	clock_t						m_TotalClockTicks;
-	HyText2d *					m_pProfileText;
 #endif
 
-	uint32						m_uiFps_Update;
-	uint32						m_uiFps_Render;
-	HyText2d *					m_pFpsText;
+	float						m_fFrameTime_Low;
+	float						m_fFrameTime_High;
+	float						m_fFrameTime_Cumulative;
+	uint32						m_uiFrameCount;
 
 public:
+	class DiagOutput : public HyEntity2d
+	{
+		friend class HyDiagnostics;
+
+		HyText2d				m_txtLastFrameTime;
+		HyText2d				m_txtAvgFrameInfo;
+		HyText2d				m_txtProfilerResults;
+
+	public:
+		DiagOutput(const char *szPrefix, const char *szName) :	m_txtLastFrameTime(szPrefix, szName, this),
+																m_txtAvgFrameInfo(szPrefix, szName, this),
+																m_txtProfilerResults(szPrefix, szName, this)
+		{ }
+	};
+	DiagOutput *				m_pDiagOutput;
+
 	HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef);
 	~HyDiagnostics();
 
 	void InitText(const char *szTextPrefix, const char *szTextName);
-	HyText2d *GetFpsText();
+	HyDiagnostics::DiagOutput *GetDiagResultsPtr();
 
 	void BootMessage();
 
@@ -96,6 +114,7 @@ public:
 #endif
 	
 	void Show();
+	void Hide();
 
 	void DumpAtlasUsage();
 	void DumpNodeUsage();

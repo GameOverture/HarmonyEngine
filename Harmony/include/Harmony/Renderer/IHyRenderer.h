@@ -13,7 +13,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/IHyLoadableData.h"
 #include "Renderer/Components/HyRenderState.h"
-#include "Diagnostics/HyDiagnostics.h"
 #include "Threading/Threading.h"
 
 class IHyShader;
@@ -21,6 +20,7 @@ class HyWindow;
 struct HyMonitorDeviceInfo;
 class HyRenderSurface;
 class HyGfxComms;
+class HyDiagnostics;
 
 #define HYDRAWBUFFERHEADER reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBuffer)
 

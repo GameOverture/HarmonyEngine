@@ -66,7 +66,7 @@ HyEngine::~HyEngine()
 	delete sm_pInstance;
 	delete pGame;
 
-	// Below prints all the memory leaks to stdout once the program exits (if ddin debug and MSVC compiler)
+	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler)
 #if defined(HY_DEBUG) && defined(_MSC_VER)
 	HY_SET_CRT_DEBUG_FIELD(_CRTDBG_LEAK_CHECK_DF);
 #endif
@@ -97,11 +97,12 @@ bool HyEngine::Update()
 		HY_PROFILE_END
 
 		m_Assets.Update();
-		//m_GuiComms.Update();
+		m_GuiComms.Update();
 	}
 
 	m_Scene.PrepareRender();
 	m_Renderer.Render();
+
 	return true;
 }
 
