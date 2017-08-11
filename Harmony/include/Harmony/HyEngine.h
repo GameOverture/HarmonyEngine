@@ -77,7 +77,8 @@ private:
 
 	// TODO: Rename these better when in LG game project
 	friend float HyUpdateDelta();
-	friend void HySetFpsCap(uint32 uiFpsCap);
+	friend float Hy_LastFrameTime();
+	friend void Hy_SetUpdateTickMs(uint32 uiUpdateTickMs);
 	friend void HyPauseGame(bool bPause);
 	friend HyDiagnostics &HyGetDiagnostics();
 	friend float HyPixelsPerMeter();

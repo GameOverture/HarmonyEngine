@@ -76,7 +76,7 @@ public:
 	virtual ~HyText2d(void);
 
 	// Assumes UTF-8 encoding. Accepts newline characters '\n'
-	void TextSet(const std::string &sTextRef);
+	void TextSet(const std::string sText);
 	const std::string &TextGet() const;
 
 	uint32 TextGetNumCharacters();

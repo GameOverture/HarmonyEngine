@@ -28,8 +28,7 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 																								m_iMaxTextureSize(0),
 																								m_sCompressedTextures("Unknown"),
 																								m_bInitialMemCheckpointSet(false),
-																								m_pFpsText(nullptr),
-																								m_bPrintFpsToConsole(false)
+																								m_pFpsText(nullptr)
 {
 #if defined(HY_PLATFORM_WINDOWS)
 	m_sPlatform = "Windows";
@@ -162,17 +161,10 @@ void HyDiagnostics::ProfileEnd()
 }
 #endif
 
-void HyDiagnostics::ShowFps(bool bShowOnScreen, bool bShowConsole)
+void HyDiagnostics::Show()
 {
-	if(bShowOnScreen)
-	{
-		if(m_pFpsText)
-			m_pFpsText->SetEnabled(true);
-	}
-	else
-		m_pFpsText->SetEnabled(false);
-
-	m_bPrintFpsToConsole = bShowConsole;
+	if(m_pFpsText)
+		m_pFpsText->SetEnabled(true);
 }
 
 void HyDiagnostics::DumpAtlasUsage()
@@ -323,12 +315,19 @@ void HyDiagnostics::EndMemoryCheckpoint()
 
 void HyDiagnostics::Update()
 {
+	if(m_pFpsText)
+	{
+		std::stringstream ss;
+		ss << "Frame time: " << Hy_LastFrameTime() * 1000.0f << "ms";
+		m_pFpsText->TextSet(ss.str());
+	}
+
 #ifdef HYSETTING_ProfilerEnabled
 	if(m_pProfileText)
 	{
 		HyAssert(m_CurProfileState.szName == nullptr, "HyDiagnostics::Update invoked with an open Profile begin");
 
-		uint32 uiNumProfileStates = m_ProfileStateList.size();
+		uint32 uiNumProfileStates = static_cast<uint32>(m_ProfileStateList.size());
 		for(uint32 i = 0; i < uiNumProfileStates; ++i)
 		{
 			std::string sText = m_ProfileStateList[i].szName;
@@ -354,26 +353,4 @@ void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &
 	m_sShader = sShader;
 	m_iMaxTextureSize = iMaxTextureSize;
 	m_sCompressedTextures = sCompressedTextures;
-}
-
-void HyDiagnostics::SetCurrentFps(uint32 uiFps_Update, uint32 uiFps_Render)
-{
-	m_uiFps_Update = uiFps_Update;
-	m_uiFps_Render = uiFps_Render;
-
-	if(m_pFpsText && m_pFpsText->IsEnabled())
-	{
-		std::string sText = "Update-FPS: ";
-		sText += std::to_string(m_uiFps_Update);
-		sText += "\nRender-FPS: ";
-		sText += std::to_string(m_uiFps_Render);
-		
-		m_pFpsText->TextSet(sText);
-	}
-
-	if(m_bPrintFpsToConsole)
-	{
-		HyLog("Update FPS: " << m_uiFps_Update);
-		HyLog("Render FPS: " << m_uiFps_Render);
-	}
 }

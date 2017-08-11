@@ -14,14 +14,12 @@
 
 class HyTime_Win : public IHyTime
 {
-	//bool						m_bUsingPerformanceTimer;	// Timer Selection Flag
-
 	double						m_dTimeFactor;				// Time Scaling Factor
 	int64						m_i64LastTime;				// Previous timer value
 	int64						m_i64CurTime;				// Current timer value
 
 public:
-	HyTime_Win(HyScene &sceneRef, HyDiagnostics &diagRef, uint32 uiInitialFpsCap);
+	HyTime_Win(HyScene &sceneRef, uint32 uiUpdateTickMs);
 	virtual ~HyTime_Win(void);
 
 	// Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)

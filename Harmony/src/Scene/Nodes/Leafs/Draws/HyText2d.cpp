@@ -49,12 +49,12 @@ HyText2d::~HyText2d(void)
 }
 
 // Assumes UTF-8 encoding. Accepts newline characters '\n'
-void HyText2d::TextSet(const std::string &sTextRef)
+void HyText2d::TextSet(const std::string sText)
 {
-	if(sTextRef == m_sRawString)
+	if(sText == m_sRawString)
 		return;
 
-	m_sRawString = sTextRef;
+	m_sRawString = sText;
 
 	// Convert 'm_sRawString' from UTF - 8 to UTF - 32LE
 	m_Utf32CodeList.clear();

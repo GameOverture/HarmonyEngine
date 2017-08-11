@@ -101,7 +101,7 @@ public:
 	static IHyShader *MakeCustomShader();
 	static IHyShader *MakeCustomShader(const char *szPrefix, const char *szName);
 
-	void Update();
+	void Render();
 	void Draw2d();
 	void SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info);
 };

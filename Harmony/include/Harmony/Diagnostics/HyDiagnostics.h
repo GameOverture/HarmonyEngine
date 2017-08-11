@@ -20,7 +20,7 @@ class HyScene;
 class HyText2d;
 
 // Comment this out to disable profiler
-#define HYSETTING_ProfilerEnabled
+//#define HYSETTING_ProfilerEnabled
 
 
 #ifdef HY_PLATFORM_GUI
@@ -80,7 +80,6 @@ class HyDiagnostics
 	uint32						m_uiFps_Update;
 	uint32						m_uiFps_Render;
 	HyText2d *					m_pFpsText;
-	bool						m_bPrintFpsToConsole;
 
 public:
 	HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef);
@@ -96,7 +95,7 @@ public:
 	void ProfileEnd();
 #endif
 	
-	void ShowFps(bool bShowOnScreen, bool bShowConsole);
+	void Show();
 
 	void DumpAtlasUsage();
 	void DumpNodeUsage();

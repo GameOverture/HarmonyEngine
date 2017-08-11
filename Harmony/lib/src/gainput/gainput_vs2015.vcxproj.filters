@@ -98,6 +98,21 @@
     <ClInclude Include="..\..\..\include\gainput\recorder\GainputInputRecording.h">
       <Filter>Header Files\recorder</Filter>
     </ClInclude>
+    <ClInclude Include="src\GainputHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GainputHelpersEvdev.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GainputInputDeltaState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GainputLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GainputWindows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\gainput.cpp">
@@ -190,5 +205,9 @@
     <ClCompile Include="src\dev\GainputNetListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\GainputIos.mm" />
+    <None Include="src\GainputMac.mm" />
   </ItemGroup>
 </Project>
