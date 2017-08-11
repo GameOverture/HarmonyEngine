@@ -83,22 +83,12 @@ void IHyNode2d::GetLocalTransform(glm::mat4 &outMtx) const
 {
 	outMtx = glm::mat4(1.0f);
 
-	glm::vec3 ptPos(0.0f);
-	ptPos.x = pos.X();
-	ptPos.y = pos.Y();
-
-	glm::vec3 vScale(1.0f);
-	vScale.x = scale.X();
-	vScale.y = scale.Y();
-
-	glm::vec3 ptRotPivot(0.0f);
-	ptRotPivot.x = rot_pivot.X();
-	ptRotPivot.y = rot_pivot.Y();
-
-	glm::vec3 ptScalePivot(0.0f);
-	ptScalePivot.x = scale_pivot.X();
-	ptScalePivot.y = scale_pivot.Y();
-
+	glm::vec3 ptPos = pos.Extrapolate();
+	glm::vec3 vScale = scale.Extrapolate();
+	vScale.z = 1.0f;
+	glm::vec3 ptRotPivot = rot_pivot.Extrapolate();
+	glm::vec3 ptScalePivot = scale_pivot.Extrapolate();
+	
 	if(m_eCoordUnit == HYCOORDUNIT_Meters)
 		outMtx = glm::translate(outMtx, ptPos * HyPixelsPerMeter());
 	else

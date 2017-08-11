@@ -20,7 +20,7 @@ HarmonyInit::HarmonyInit()
 	sGameName = "Untitled Game";
 	sDataDir = "/data";
 	eDefaultCoordinateUnit = HYCOORDUNIT_Pixels;
-	uiUpdateFpsCap = 0;
+	uiUpdateTickMs = 0;
 	fPixelsPerMeter = 80.0f;
 	bShowCursor = true;
 	uiNumInputMappings = 1;
@@ -62,13 +62,20 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	if(projObject.has<jsonxx::String>("AdjustWorkingDirectory"))
 	{
 		std::string sWorkingDir = projObject.get<jsonxx::String>("AdjustWorkingDirectory");
-		HyError("HarmonyInit::HarmonyInit - AdjustWorkingDirectory not implemented yet.");
-	}
+		sHyProjFileName = sWorkingDir + "/" + sHyProjFileName;
+		sHyProjFileName = MakeStringProperPath(sHyProjFileName.c_str(), ".hyproj", false);
 
+		HyReadTextFile(sHyProjFileName.c_str(), sProjFileContents);
+		projObject.parse(sProjFileContents);
+
+		sDataDir = sWorkingDir + "/" + projObject.get<jsonxx::String>("DataPath");
+	}
+	else
+		sDataDir = projObject.get<jsonxx::String>("DataPath");
+	
 	sGameName				= projObject.get<jsonxx::String>("GameName");
-	sDataDir				= projObject.get<jsonxx::String>("DataPath");
 	eDefaultCoordinateUnit	= static_cast<HyCoordinateUnit>(static_cast<int32>(projObject.get<jsonxx::Number>("DefaultCoordinateUnit")));
-	uiUpdateFpsCap			= static_cast<uint32>(projObject.get<jsonxx::Number>("UpdateFpsCap"));
+	uiUpdateTickMs			= static_cast<uint32>(projObject.get<jsonxx::Number>("UpdateFpsCap")); // TODO: Change name
 	fPixelsPerMeter			= static_cast<float>(projObject.get<jsonxx::Number>("PixelsPerMeter"));
 	bShowCursor				= projObject.get<jsonxx::Boolean>("ShowCursor");
 	uiNumInputMappings		= static_cast<uint32>(projObject.get<jsonxx::Number>("NumInputMappings"));

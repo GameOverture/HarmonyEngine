@@ -28,8 +28,7 @@ HyScene::HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef
 																					m_iPhysPositionIterations(3),
 																					m_GfxCommsRef(gfxCommsRef),
 																					m_WindowListRef(WindowListRef),
-																					m_bPauseGame(false),
-																					m_uiRenderedBufferCount(0)
+																					m_bPauseGame(false)
 {
 	m_b2World.SetDebugDraw(&m_DrawPhys2d);
 	m_b2World.SetContactListener(&m_Phys2dContactListener);
@@ -110,35 +109,18 @@ void HyScene::SetPause(bool bPause)
 	m_bPauseGame = bPause;
 }
 
-/*static*/ uint32 HyScene::GetAndClearRenderedBufferCount()
-{
-	uint32 uiCount = m_uiRenderedBufferCount;
-	m_uiRenderedBufferCount = 0;
-
-	return uiCount;
-}
-
 //PRIVATE//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void HyScene::PreUpdate()
+void HyScene::UpdatePhysics()
 {
 	HY_PROFILE_BEGIN("Physics")
-	m_b2World.Step(HyUpdateDelta(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+		m_b2World.Step(HyUpdateDelta(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 	HY_PROFILE_END
 }
 
-void HyScene::PostUpdate()
+void HyScene::UpdateNodes()
 {
-	HY_PROFILE_BEGIN("Batch")
-	if(sm_bInst2dOrderingDirty)
-	{
-		std::sort(m_NodeList_Loaded.begin(), m_NodeList_Loaded.end(), &Node2dSortPredicate);
-		sm_bInst2dOrderingDirty = false;
-	}
-
-	for(uint32 i = 0; i < m_WindowListRef.size(); ++i)
-		m_WindowListRef[i]->Update();
-
+	HY_PROFILE_BEGIN("Nodes")
 	if(m_bPauseGame == false)
 	{
 		for(uint32 i = 0; i < sm_MasterNodeList.size(); ++i)
@@ -149,6 +131,20 @@ void HyScene::PostUpdate()
 		for(uint32 i = 0; i < sm_NodeList_PauseUpdate.size(); ++i)
 			sm_NodeList_PauseUpdate[i]->Update();
 	}
+	HY_PROFILE_END
+}
+
+void HyScene::PrepareRender()
+{
+	HY_PROFILE_BEGIN("PrepareRender")
+	if(sm_bInst2dOrderingDirty)
+	{
+		std::sort(m_NodeList_Loaded.begin(), m_NodeList_Loaded.end(), &Node2dSortPredicate);
+		sm_bInst2dOrderingDirty = false;
+	}
+
+	for(uint32 i = 0; i < m_WindowListRef.size(); ++i)
+		m_WindowListRef[i]->Update();
 
 	WriteDrawBuffer();
 	HY_PROFILE_END
@@ -166,10 +162,6 @@ void HyScene::WriteDrawBuffer()
 	m_pCurWritePos = m_GfxCommsRef.GetDrawBuffer();
 	
 	HyGfxComms::tDrawHeader *pDrawHeader = new (m_pCurWritePos) HyGfxComms::tDrawHeader;
-
-	// 'm_uiRenderedBufferCount' will store the approx. number of times a buffer was rendered
-	if((pDrawHeader->uiReturnFlags & HyGfxComms::GFXFLAG_HasRendered) != 0)
-		m_uiRenderedBufferCount++;
 
 	pDrawHeader->uiReturnFlags = 0;
 	m_pCurWritePos += sizeof(HyGfxComms::tDrawHeader);
@@ -196,7 +188,7 @@ void HyScene::WriteDrawBuffer()
 				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_WindowListRef[i]->m_Cams3dList[j]->GetViewport();
 				m_pCurWritePos += sizeof(HyRectangle<float>);
 			
-				HyError("GetLocalTransform_SRT should be 3d");
+				HyError("GetLocalTransform should be 3d");
 				m_WindowListRef[i]->m_Cams3dList[j]->GetLocalTransform(mtxView);
 				*(reinterpret_cast<glm::mat4 *>(m_pCurWritePos)) = mtxView;
 				m_pCurWritePos += sizeof(glm::mat4);

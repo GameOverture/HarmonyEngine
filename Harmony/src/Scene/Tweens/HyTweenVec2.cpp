@@ -23,6 +23,11 @@ const glm::vec2 &HyTweenVec2::Get() const
 	return m_vValue;
 }
 
+const glm::vec3 HyTweenVec2::Extrapolate() const
+{
+	return glm::vec3(m_vValue.x, m_vValue.y, 0.0f);
+}
+
 float HyTweenVec2::X() const
 {
 	return m_AnimFloatList[0].Get();

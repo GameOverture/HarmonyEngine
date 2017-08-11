@@ -12,32 +12,19 @@
 
 #include "Diagnostics/Console/HyConsole.h"
 
-HyTime_Win::HyTime_Win(HyScene &sceneRef, HyDiagnostics &diagRef, uint32 uiInitialFpsCap) : IHyTime(sceneRef, diagRef, uiInitialFpsCap)
+HyTime_Win::HyTime_Win(HyScene &sceneRef, uint32 uiUpdateTickMs) : IHyTime(sceneRef, uiUpdateTickMs)
 {
 	int64 i64PerfCnt;
 	if (QueryPerformanceFrequency((LARGE_INTEGER *) &i64PerfCnt)) 
 	{
-		//m_bUsingPerformanceTimer = true;
-
 		// set timer scaling factor
 		m_dTimeFactor = 1.0 / i64PerfCnt;
 
 		// read initial time
 		QueryPerformanceCounter((LARGE_INTEGER *) &m_i64LastTime);
 	}
-	else {
+	else
 		HyError("Windows - QueryPerformanceFrequency failed, Must run Windows XP or later.");
-	}
-	//else 
-	//{
-	//	m_bUsingPerformanceTimer = false;
-
-	//	// no performance counter, read in using timeGetTime
-	//	m_i64LastTime = timeGetTime();
-
-	//	// set timer scaling factor
-	//	m_dTimeFactor = 0.001;
-	//}
 }
 
 HyTime_Win::~HyTime_Win(void)
@@ -48,11 +35,7 @@ HyTime_Win::~HyTime_Win(void)
 // Delta time is in seconds.
 /*virtual*/ void HyTime_Win::SetCurDeltaTime()
 {
-	// read appropriate counter
-	//if (m_bUsingPerformanceTimer)
-		QueryPerformanceCounter((LARGE_INTEGER *) &m_i64CurTime);
-	//else
-	//	m_i64CurTime = timeGetTime();
+	QueryPerformanceCounter((LARGE_INTEGER *) &m_i64CurTime);
 
 	// scale time value and save
 	m_dCurDeltaTime = (m_i64CurTime - m_i64LastTime) * m_dTimeFactor;

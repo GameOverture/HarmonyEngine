@@ -149,7 +149,7 @@ char *IHyRenderer::GetVertexData2d()
 	return pNewShader;
 }
 
-void IHyRenderer::Update()
+void IHyRenderer::Render()
 {
 	HY_PROFILE_BEGIN("Render")
 

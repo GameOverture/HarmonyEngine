@@ -26,6 +26,7 @@ public:
 	~HyTweenVec2();
 
 	const glm::vec2 &Get() const;
+	const glm::vec3 Extrapolate() const;
 
 	float X() const;
 	void X(float fValue);

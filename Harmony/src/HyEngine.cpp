@@ -13,6 +13,12 @@
 
 HyEngine *		HyEngine::sm_pInstance = NULL;
 
+#ifdef HY_PLATFORM_GUI
+	#define HyThrottleUpdate
+#else
+	#define HyThrottleUpdate while(m_Time.ThrottleUpdate())
+#endif
+
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_GfxComms, m_AppRef.m_WindowList),
@@ -22,7 +28,7 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Renderer(m_GfxComms, m_Diagnostics, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList),
 												m_Diagnostics(m_AppRef.m_Init, m_Assets, m_Scene),
-												m_Time(m_Scene, m_Diagnostics, m_AppRef.m_Init.uiUpdateFpsCap)
+												m_Time(m_Scene, m_AppRef.m_Init.uiUpdateTickMs)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
@@ -60,7 +66,7 @@ HyEngine::~HyEngine()
 	delete sm_pInstance;
 	delete pGame;
 
-	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler)
+	// Below prints all the memory leaks to stdout once the program exits (if ddin debug and MSVC compiler)
 #if defined(HY_DEBUG) && defined(_MSC_VER)
 	HY_SET_CRT_DEBUG_FIELD(_CRTDBG_LEAK_CHECK_DF);
 #endif
@@ -68,7 +74,7 @@ HyEngine::~HyEngine()
 
 bool HyEngine::IsInitialized()
 {
-	m_Renderer.Update();
+	m_Renderer.Render();
 	if(m_Assets.IsLoaded() == false)
 		return false;
 
@@ -77,11 +83,13 @@ bool HyEngine::IsInitialized()
 
 bool HyEngine::Update()
 {
+	m_Time.CalcFrameDelta();
 	m_Diagnostics.Update();
 
-	while(m_Time.ThrottleTime())
+	//HyThrottleUpdate
 	{
-		m_Scene.PreUpdate();
+		m_Scene.UpdatePhysics();
+		m_Scene.UpdateNodes();
 
 		HY_PROFILE_BEGIN("Update")
 		if(PollPlatformApi() == false || m_AppRef.Update() == false)
@@ -89,14 +97,11 @@ bool HyEngine::Update()
 		HY_PROFILE_END
 
 		m_Assets.Update();
-		m_Scene.PostUpdate();
 		//m_GuiComms.Update();
-
-		if(m_Time.GetFpsCap() == 0)
-			break;
 	}
 
-	m_Renderer.Update();
+	m_Scene.PrepareRender();
+	m_Renderer.Render();
 	return true;
 }
 
@@ -107,8 +112,8 @@ void HyEngine::Shutdown()
 	while(m_Assets.IsShutdown() == false)
 	{
 		m_Assets.Update();
-		m_Scene.PostUpdate();
-		m_Renderer.Update();
+		m_Scene.PrepareRender();
+		m_Renderer.Render();
 	}
 }
 
@@ -162,10 +167,16 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return HyEngine::sm_pInstance->m_Time.GetUpdateStepSeconds();
 }
 
-/*friend*/ void HySetFpsCap(uint32 uiFpsCap)
+/*friend*/ float Hy_LastFrameTime()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "HyUpdateDelta() was invoked before engine has been initialized.");
-	HyEngine::sm_pInstance->m_Time.SetFpsCap(uiFpsCap);
+	return HyEngine::sm_pInstance->m_Time.GetFrameDelta();
+}
+
+/*friend*/ void Hy_SetUpdateTickMs(uint32 uiUpdateTickMs)
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_SetUpdateTickMs() was invoked before engine has been initialized.");
+	HyEngine::sm_pInstance->m_Time.SetUpdateTickMs(uiUpdateTickMs);
 }
 
 /*friend*/ void HyPauseGame(bool bPause)

@@ -23,7 +23,7 @@ struct HarmonyInit
 	uint32					uiNumWindows;
 	HyWindowInfo			windowInfo[HY_MAXWINDOWS];
 	HyCoordinateUnit		eDefaultCoordinateUnit;
-	uint32					uiUpdateFpsCap;
+	uint32					uiUpdateTickMs;
 	float					fPixelsPerMeter;
 	uint32					uiNumInputMappings;
 	uint16					uiDebugPort;
