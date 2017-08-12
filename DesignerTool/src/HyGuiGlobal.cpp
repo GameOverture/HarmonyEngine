@@ -400,17 +400,17 @@ QPointF StringToPoint(QString sPoint)
         return QPointF(sComponentList[0].toFloat(), sComponentList[1].toFloat());
 }
 
-QByteArray JsonValueToSrc(QJsonValue &valueRef)
+QByteArray JsonValueToSrc(QJsonValue value)
 {
     QByteArray src;
-    if(valueRef.isArray())
+    if(value.isArray())
     {
-        QJsonDocument tmpDoc(valueRef.toArray());
+        QJsonDocument tmpDoc(value.toArray());
         src = tmpDoc.toJson();
     }
     else
     {
-        QJsonDocument tmpDoc(valueRef.toObject());
+        QJsonDocument tmpDoc(value.toObject());
         src = tmpDoc.toJson();
     }
 

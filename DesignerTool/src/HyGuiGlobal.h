@@ -113,7 +113,7 @@ char *QStringToCharPtr(QString sString);
 
 QString PointToQString(QPointF ptPoint);
 QPointF StringToPoint(QString sPoint);
-QByteArray JsonValueToSrc(QJsonValue &valueRef);
+QByteArray JsonValueToSrc(QJsonValue value);
 
 class HyGlobal
 {
