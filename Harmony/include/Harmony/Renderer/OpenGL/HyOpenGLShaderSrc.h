@@ -33,49 +33,68 @@ smooth out vec4 interpColor;
 uniform mat4 u_mtxWorldToCamera;
 uniform mat4 u_mtxCameraToClip;
 
-const vec2 position[] = vec2[4](vec2(1.0f, 1.0f),
-									vec2(0.0f, 1.0f),
-									vec2(1.0f, 0.0f),
-									vec2(0.0f, 0.0f));
+const vec2 g_Position[] = vec2[4](vec2(1.0f, 1.0f),
+								  vec2(0.0f, 1.0f),
+								  vec2(1.0f, 0.0f),
+								  vec2(0.0f, 0.0f));
+
+const vec2 g_UVCoords[] = vec2[4](UVcoord0,
+								  UVcoord1,
+								  UVcoord2,
+								  UVcoord3);
+
+const vec4 g_Colors[] = vec4[4](topTint,
+								botTint,
+								botTint,
+								botTint);
 
 void main()
 {
-	switch(gl_VertexID)
-	{
-	case 0:
-		interpUV.x = UVcoord0.x;
-		interpUV.y = UVcoord0.y;
+	//switch(gl_VertexID)
+	//{
+	//case 0:
+	//	interpUV.x = UVcoord0.x;
+	//	interpUV.y = UVcoord0.y;
 
-		interpColor = topTint;
-		break;
-	case 1:
-		interpUV.x = UVcoord1.x;
-		interpUV.y = UVcoord1.y;
+	//	interpColor = topTint;
+	//	break;
+	//case 1:
+	//	interpUV.x = UVcoord1.x;
+	//	interpUV.y = UVcoord1.y;
 
-		interpColor = topTint;
-		break;
-	case 2:
-		interpUV.x = UVcoord2.x;
-		interpUV.y = UVcoord2.y;
+	//	interpColor = topTint;
+	//	break;
+	//case 2:
+	//	interpUV.x = UVcoord2.x;
+	//	interpUV.y = UVcoord2.y;
 
-		interpColor = botTint;
-		break;
-	case 3:
-		interpUV.x = UVcoord3.x;
-		interpUV.y = UVcoord3.y;
+	//	interpColor = botTint;
+	//	break;
+	//case 3:
+	//	interpUV.x = UVcoord3.x;
+	//	interpUV.y = UVcoord3.y;
 
-		interpColor = botTint;
-		break;
-	}
+	//	interpColor = botTint;
+	//	break;
+	//}
 
-	vec4 pos = vec4((position[gl_VertexID].x * size.x) + offset.x,
-					(position[gl_VertexID].y * size.y) + offset.y,
+	interpUV = g_UVCoords[gl_VertexID];
+	interpColor = g_Colors[gl_VertexID];
+
+	vec4 pos = vec4((g_Position[gl_VertexID].x * size.x) + offset.x,
+					(g_Position[gl_VertexID].y * size.y) + offset.y,
 					0.0, 1.0);
 
 	pos = mtxLocalToWorld * pos;
 	pos = u_mtxWorldToCamera * pos;
 	gl_Position = u_mtxCameraToClip * pos;
 }
+
+vec4 when_gt(vec4 x, vec4 y)
+{
+	return max(sign(x - y), 0.0);
+}
+
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(
