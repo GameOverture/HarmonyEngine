@@ -86,6 +86,17 @@ HyDiagnostics::~HyDiagnostics()
 	delete m_pDiagOutput;
 }
 
+HyDiagnostics::DiagOutput::DiagOutput(const char *szPrefix, const char *szName) :	m_txtLastFrameTime(szPrefix, szName, this),
+																					m_txtAvgFrameInfo(szPrefix, szName, this),
+																					m_txtProfilerResults(szPrefix, szName, this)
+{
+	m_txtLastFrameTime.SetAsScaleBox(500.0f, 14.0, true);
+	m_txtAvgFrameInfo.SetAsScaleBox(500.0f, 50.0, true);
+	m_txtAvgFrameInfo.pos.Y(-50.0f);
+	m_txtProfilerResults.SetAsScaleBox(500.0f, 50.0, true);
+	m_txtProfilerResults.pos.Y(-250.0f);
+}
+
 void HyDiagnostics::InitText(const char *szTextPrefix, const char *szTextName)
 {
 	delete m_pDiagOutput;
@@ -317,10 +328,10 @@ void HyDiagnostics::EndMemoryCheckpoint()
 void HyDiagnostics::Update()
 {
 	float fCurFrameTime = Hy_LastFrameTime();
-
+	m_fFrameTime_Cumulative += fCurFrameTime;
+	fCurFrameTime *= 1000.0f;
 	m_fFrameTime_Low = HyMin(m_fFrameTime_Low, fCurFrameTime);
 	m_fFrameTime_High = HyMax(m_fFrameTime_High, fCurFrameTime);
-	m_fFrameTime_Cumulative += fCurFrameTime;
 	m_uiFrameCount++;
 
 	if(m_pDiagOutput)
@@ -328,33 +339,8 @@ void HyDiagnostics::Update()
 		std::stringstream ss;
 		ss << "Cur: " << fCurFrameTime << "ms";
 		m_pDiagOutput->m_txtLastFrameTime.TextSet(ss.str());
-	}
-
-	if(m_fFrameTime_Cumulative >= 1.0f)
-	{
-		if(m_pDiagOutput)
-		{
-			std::stringstream ss;
-			ss << "Avg: " << static_cast<float>(m_fFrameTime_Cumulative / m_uiFrameCount) << "ms\n" << "Low: " << m_fFrameTime_Low << "ms\n" << "High: " << m_fFrameTime_High << "ms\n" << "FPS: " << m_uiFrameCount;
-			m_pDiagOutput->m_txtAvgFrameInfo.TextSet(ss.str());
-		}
-
-		m_fFrameTime_Low = 9999.0f;	// Any large value that should be greater than any single frame time
-		m_fFrameTime_High = 0.0f;
-		m_fFrameTime_Cumulative = 0.0f;
-		m_uiFrameCount = 0;
-	}
-
-	//if(m_pFpsText)
-	//{
-	//	std::stringstream ss;
-	//	ss << "Frame time: " << Hy_LastFrameTime() * 1000.0f << "ms";
-	//	m_pFpsText->TextSet(ss.str());
-	//}
 
 #ifdef HYSETTING_ProfilerEnabled
-	if(m_pProfileText)
-	{
 		HyAssert(m_CurProfileState.szName == nullptr, "HyDiagnostics::Update invoked with an open Profile begin");
 
 		uint32 uiNumProfileStates = static_cast<uint32>(m_ProfileStateList.size());
@@ -365,13 +351,31 @@ void HyDiagnostics::Update()
 			sText += std::to_string(static_cast<float>(m_ProfileStateList[i].time) / static_cast<float>(m_TotalClockTicks));
 			sText += "\n";
 
-			m_pProfileText->TextSet(sText);
+			m_pDiagOutput->m_txtProfilerResults.TextSet(sText);
 		}
+
+		m_ProfileStateList.clear();
+		m_TotalClockTicks = 0;
+#endif
 	}
 
-	m_ProfileStateList.clear();
-	m_TotalClockTicks = 0;
-#endif
+	if(m_fFrameTime_Cumulative >= 1.0f)
+	{
+		if(m_pDiagOutput)
+		{
+			std::stringstream ss;
+			ss << "Avg: " << static_cast<float>(m_fFrameTime_Cumulative / m_uiFrameCount) * 1000.0f << "ms\n" <<
+				  "Low: " << m_fFrameTime_Low << "ms\n" <<
+				  "High: " << m_fFrameTime_High << "ms\n" <<
+				  "FPS: " << m_uiFrameCount;
+			m_pDiagOutput->m_txtAvgFrameInfo.TextSet(ss.str());
+		}
+
+		m_fFrameTime_Low = 9999.0f;	// Any large value that should be greater than any single frame time
+		m_fFrameTime_High = 0.0f;
+		m_fFrameTime_Cumulative = 0.0f;
+		m_uiFrameCount = 0;
+	}
 }
 
 void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures)

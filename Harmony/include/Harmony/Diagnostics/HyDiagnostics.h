@@ -22,7 +22,7 @@ class HyScene;
 class HyText2d;
 
 // Comment this out to disable profiler
-//#define HYSETTING_ProfilerEnabled
+#define HYSETTING_ProfilerEnabled
 
 
 #ifdef HY_PLATFORM_GUI
@@ -93,10 +93,7 @@ public:
 		HyText2d				m_txtProfilerResults;
 
 	public:
-		DiagOutput(const char *szPrefix, const char *szName) :	m_txtLastFrameTime(szPrefix, szName, this),
-																m_txtAvgFrameInfo(szPrefix, szName, this),
-																m_txtProfilerResults(szPrefix, szName, this)
-		{ }
+		DiagOutput(const char *szPrefix, const char *szName);
 	};
 	DiagOutput *				m_pDiagOutput;
 
