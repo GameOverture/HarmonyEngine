@@ -22,12 +22,12 @@ class FontUndoCmd_AddLayer : public QUndoCommand
     int                     m_iStateIndex;
 
     rendermode_t            m_eRenderMode;
-    float                   m_fSize;
+    int                     m_iSize;
     float                   m_fThickness;
     int                     m_iId;
 
 public:
-    FontUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent = 0);
+    FontUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex, rendermode_t eRenderMode, int iSize, float fThickness, QUndoCommand *pParent = 0);
     virtual ~FontUndoCmd_AddLayer();
 
     void redo() override;

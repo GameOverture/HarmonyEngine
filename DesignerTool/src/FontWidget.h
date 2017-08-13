@@ -23,7 +23,7 @@ class FontWidget;
 }
 
 class FontItem;
-class FontLayersModel;
+class FontStateLayersModel;
 
 class FontWidget : public QWidget
 {

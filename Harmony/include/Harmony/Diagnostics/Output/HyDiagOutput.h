@@ -18,6 +18,7 @@
 
 #define HY_SYSTEM_FONT "Harmony", "Harmony"
 #define HY_SYSTEM_FONT_SIZE 25.0f
+#define HY_SYSTEM_FONT_STATE 0
 
 class HyDiagOutput : public HyEntity2d
 {
@@ -32,7 +33,7 @@ class HyDiagOutput : public HyEntity2d
 	HyText2d				m_txtAvgFrameHigh;
 	HyText2d				m_txtFps;
 
-	HyProfiler				m_Profiler;
+	//HyProfiler				m_Profiler;
 
 public:
 	HyDiagOutput();

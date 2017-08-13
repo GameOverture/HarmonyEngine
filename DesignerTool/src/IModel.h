@@ -21,6 +21,73 @@
 
 class IModel;
 
+class SpinBoxMapper : public QDataWidgetMapper
+{
+    class ModelSpinBox : public QAbstractListModel
+    {
+        int          m_iValue;
+
+    public:
+        ModelSpinBox(QObject *pParent = nullptr) : QAbstractListModel(pParent), m_iValue(0) {
+        }
+
+        virtual ~ModelSpinBox() {
+        }
+
+        int GetValue() {
+            return m_iValue;
+        }
+
+        void SetValue(int iValue) {
+            m_iValue = iValue;
+        }
+
+        virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
+            return 1;
+        }
+
+        virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
+            return m_iValue;
+        }
+    };
+
+public:
+    SpinBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
+    {
+        setModel(new ModelSpinBox(this));
+    }
+    virtual ~SpinBoxMapper()
+    { }
+
+    void AddSpinBoxMapping(QSpinBox *pSpinBox)
+    {
+        pSpinBox->blockSignals(true);
+
+        addMapping(pSpinBox, 0);
+        this->setCurrentIndex(0);
+
+        if(GetValue() < pSpinBox->minimum())
+            SetValue(pSpinBox->minimum());
+        if(GetValue() > pSpinBox->maximum())
+            SetValue(pSpinBox->maximum());
+
+        pSpinBox->setValue(GetValue());
+
+        pSpinBox->blockSignals(false);
+    }
+
+    int GetValue()
+    {
+        return static_cast<ModelSpinBox *>(model())->GetValue();
+    }
+
+    void SetValue(int iValue)
+    {
+        static_cast<ModelSpinBox *>(model())->SetValue(iValue);
+        setCurrentIndex(0);
+    }
+};
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class DoubleSpinBoxMapper : public QDataWidgetMapper
 {
     class ModelDoubleSpinBox : public QAbstractListModel

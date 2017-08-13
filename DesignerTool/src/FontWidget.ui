@@ -346,18 +346,15 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="sbSize">
+         <widget class="QSpinBox" name="sbSize">
           <property name="suffix">
-           <string>pt</string>
+           <string> pt</string>
           </property>
           <property name="minimum">
-           <double>4.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>4098.000000000000000</double>
+           <number>4</number>
           </property>
           <property name="value">
-           <double>24.000000000000000</double>
+           <number>24</number>
           </property>
          </widget>
         </item>

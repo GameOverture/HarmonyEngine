@@ -49,7 +49,7 @@ public:
     virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class FontLayersModel : public QAbstractTableModel
+class FontStateLayersModel : public QAbstractTableModel
 {
     Q_OBJECT
 
@@ -59,16 +59,16 @@ class FontLayersModel : public QAbstractTableModel
         FontTypeface *      pReference;
 
         rendermode_t        eMode;
-        float               fSize;
+        int                 iSize;
         float               fOutlineThickness;
 
         glm::vec4           vTopColor;
         glm::vec4           vBotColor;
 
-        FontLayer(int iUniqueId, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :  iUNIQUE_ID(iUniqueId),
+        FontLayer(int iUniqueId, rendermode_t eRenderMode, int iSize, float fOutlineThickness) :    iUNIQUE_ID(iUniqueId),
                                                                                                     pReference(nullptr),
                                                                                                     eMode(eRenderMode),
-                                                                                                    fSize(fSize),
+                                                                                                    iSize(iSize),
                                                                                                     fOutlineThickness(fOutlineThickness)
         { }
     };
@@ -89,12 +89,12 @@ public:
         NUMCOLUMNS
     };
     
-    FontLayersModel(QObject *parent);
-    virtual ~FontLayersModel();
+    FontStateLayersModel(QObject *parent);
+    virtual ~FontStateLayersModel();
 
     QString GetRenderModeString(rendermode_t eMode) const;
     
-    int AddNewLayer(rendermode_t eRenderMode, float fSize, float fOutlineThickness);
+    int AddNewLayer(rendermode_t eRenderMode, int iSize, float fOutlineThickness);
     void RemoveLayer(int iId);
     void ReAddLayer(int iId);
 
@@ -119,7 +119,7 @@ public:
     void MoveRowUp(int iIndex);
     void MoveRowDown(int iIndex);
     
-    void SetFontSize(float fSize);
+    void SetFontSize(int iSize);
     
     void SetFontStageReference(int iRowIndex, FontTypeface *pStageRef);
     

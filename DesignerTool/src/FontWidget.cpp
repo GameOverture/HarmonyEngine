@@ -153,6 +153,7 @@ void FontWidget::RefreshData(QVariant param)
     if(bParamOk && iStateAffected >= 0)
         SetSelectedState(iStateAffected);
 
+    static_cast<FontModel *>(m_ItemRef.GetModel())->SetGlyphsDirty();
     static_cast<FontModel *>(m_ItemRef.GetModel())->GeneratePreview();
     UpdateActions();
 }
@@ -214,7 +215,7 @@ int FontWidget::GetSelectedStageId()
         return -1;
     }
 
-    return static_cast<FontLayersModel *>(ui->layersTableView->model())->GetLayerId(iRowIndex);
+    return static_cast<FontStateLayersModel *>(ui->layersTableView->model())->GetLayerId(iRowIndex);
 }
 
 void FontWidget::on_chk_09_clicked()
@@ -375,7 +376,7 @@ void FontWidget::on_sbSize_editingFinished()
     if(ui->sbSize->value() == GetCurStateData()->GetSizeMapper()->GetValue())
         return;
     
-    QUndoCommand *pCmd = new UndoCmd_DoubleSpinBox("Font Size",
+    QUndoCommand *pCmd = new UndoCmd_SpinBox("Font Size",
                                                    m_ItemRef,
                                                    GetCurStateData()->GetSizeMapper(),
                                                    ui->cmbStates->currentIndex(),

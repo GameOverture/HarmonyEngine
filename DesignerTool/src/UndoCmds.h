@@ -258,20 +258,22 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename OWNER>
 class UndoCmd_SpinBox : public QUndoCommand
 {
-    OWNER *             m_pOwner;
-    QSpinBox *          m_pSpinBox;
-    int                 m_iPrevSize;
-    int                 m_iNewSize;
+    ProjectItem &       m_ItemRef;
+    SpinBoxMapper *     m_pMapper;
+    int                 m_iStateIndex;
+
+    int                 m_iNew;
+    int                 m_iOld;
 
 public:
-    UndoCmd_SpinBox(QString sText, OWNER *pOwner, QSpinBox *pSpinBox, int iPrevSize, int iNewSize, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
-                                                                                                                                        m_pOwner(pOwner),
-                                                                                                                                        m_pSpinBox(pSpinBox),
-                                                                                                                                        m_iPrevSize(iPrevSize),
-                                                                                                                                        m_iNewSize(iNewSize)
+    UndoCmd_SpinBox(QString sText, ProjectItem &itemRef, SpinBoxMapper *pMapper, int iStateIndex, int iNew, int iOld, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
+                                                                                                                                                    m_ItemRef(itemRef),
+                                                                                                                                                    m_pMapper(pMapper),
+                                                                                                                                                    m_iStateIndex(iStateIndex),
+                                                                                                                                                    m_iNew(iNew),
+                                                                                                                                                    m_iOld(iOld)
     {
         setText(sText);
     }
@@ -281,20 +283,14 @@ public:
 
     void redo() override
     {
-        m_pSpinBox->blockSignals(true);
-        m_pSpinBox->setValue(m_iNewSize);
-        m_pSpinBox->blockSignals(false);
-        
-        m_pOwner->UpdateActions();
+        m_pMapper->SetValue(m_iNew);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
     
     void undo() override
     {
-        m_pSpinBox->blockSignals(true);
-        m_pSpinBox->setValue(m_iPrevSize);
-        m_pSpinBox->blockSignals(false);
-        
-        m_pOwner->UpdateActions();
+        m_pMapper->SetValue(m_iOld);
+        m_ItemRef.WidgetRefreshData(m_iStateIndex);
     }
 };
 

@@ -99,8 +99,8 @@ void AudioWidgetState::on_sbInstMax_editingFinished()
     if(m_iPrevNumInst == ui->sbInstMax->value())
         return;
     
-    QUndoCommand *pCmd = new UndoCmd_SpinBox<AudioWidgetState>("Number of Instances", this, ui->sbInstMax, m_iPrevNumInst, ui->sbInstMax->value());
-    m_pOwner->GetItem().GetUndoStack()->push(pCmd);
+    //QUndoCommand *pCmd = new UndoCmd_SpinBox<AudioWidgetState>("Number of Instances", this, ui->sbInstMax, m_iPrevNumInst, ui->sbInstMax->value());
+    //m_pOwner->GetItem().GetUndoStack()->push(pCmd);
 }
 
 void AudioWidgetState::on_radInstFail_toggled(bool checked)

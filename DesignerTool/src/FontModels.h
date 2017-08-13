@@ -57,18 +57,18 @@ struct FontTypeface
 
 class FontStateData : public IStateData
 {
-	FontLayersModel *			m_pFontTableModel;
+    FontStateLayersModel *      m_pLayersModel;
 	
-	DoubleSpinBoxMapper *		m_pSbMapper_Size;
+    SpinBoxMapper *             m_pSbMapper_Size;
     ComboBoxMapper *            m_pCmbMapper_Fonts;
 	
 public:
     FontStateData(IModel &modelRef, QJsonObject stateObj);
     virtual ~FontStateData();
 
-    FontLayersModel *GetFontLayersModel();
+    FontStateLayersModel *GetFontLayersModel();
 
-    DoubleSpinBoxMapper *GetSizeMapper();
+    SpinBoxMapper *GetSizeMapper();
     ComboBoxMapper *GetFontMapper();
 
     void GetStateInfo(QJsonObject &stateObjOut);
