@@ -151,6 +151,20 @@ enum HyThreadState
 	HYTHREADSTATE_HasExited
 };
 
+enum HyDiagFlag
+{
+	HYDIAG_FrameTimeMs		= 1 << 0,
+	HYDIAG_AvgFrameTimes	= 1 << 1,
+	HYDIAG_Fps				= 1 << 2,
+	HYDIAG_FRAMETIMES		= (HYDIAG_FrameTimeMs | HYDIAG_AvgFrameTimes | HYDIAG_Fps),
+
+	HYDIAG_ProfilerGraph	= 1 << 3,
+	HYDIAG_ProfilerText		= 1 << 4,
+	HYDIAG_PROFILER			= (HYDIAG_ProfilerGraph | HYDIAG_ProfilerText),
+	
+	HYDIAG_ALL				= (HYDIAG_FRAMETIMES | HYDIAG_PROFILER)
+};
+
 struct HyWindowInfo
 {
 	std::string		sName;

@@ -83,8 +83,8 @@ bool HyEngine::IsInitialized()
 
 bool HyEngine::Update()
 {
-	m_Time.CalcFrameDelta();
-	m_Diagnostics.Update();
+	m_Time.CalcTimeDelta();
+	m_Diagnostics.ApplyTimeDelta();
 
 	//HyThrottleUpdate
 	{
@@ -168,9 +168,9 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return HyEngine::sm_pInstance->m_Time.GetUpdateStepSeconds();
 }
 
-/*friend*/ float Hy_LastFrameTime()
+/*friend*/ float Hy_TimeDelta()
 {
-	HyAssert(HyEngine::sm_pInstance != nullptr, "HyUpdateDelta() was invoked before engine has been initialized.");
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_TimeDelta() was invoked before engine has been initialized.");
 	return HyEngine::sm_pInstance->m_Time.GetFrameDelta();
 }
 

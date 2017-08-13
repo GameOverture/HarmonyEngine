@@ -52,7 +52,7 @@ public:
 	// Delta time is in seconds.
 	virtual void SetCurDeltaTime() = 0;
 
-	void CalcFrameDelta();
+	void CalcTimeDelta();
 
 	bool ThrottleUpdate();
 

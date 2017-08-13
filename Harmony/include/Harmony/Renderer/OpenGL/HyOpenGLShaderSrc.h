@@ -44,7 +44,7 @@ const vec2 g_UVCoords[] = vec2[4](UVcoord0,
 								  UVcoord3);
 
 const vec4 g_Colors[] = vec4[4](topTint,
-								botTint,
+								topTint,
 								botTint,
 								botTint);
 

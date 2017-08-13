@@ -59,7 +59,7 @@ float IHyTime::GetFrameDelta()
 	return static_cast<float>(m_dCurDeltaTime);
 }
 
-void IHyTime::CalcFrameDelta()
+void IHyTime::CalcTimeDelta()
 {
 	SetCurDeltaTime();	// m_dCurDeltaTime will be set within
 	

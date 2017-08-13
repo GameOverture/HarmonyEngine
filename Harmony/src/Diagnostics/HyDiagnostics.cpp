@@ -27,12 +27,7 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 																								m_sShader("Unknown"),
 																								m_iMaxTextureSize(0),
 																								m_sCompressedTextures("Unknown"),
-																								m_bInitialMemCheckpointSet(false),
-																								m_fFrameTime_Low(999.0f),
-																								m_fFrameTime_High(0.0f),
-																								m_fFrameTime_Cumulative(0.0f),
-																								m_uiFrameCount(0),
-																								m_pDiagOutput(nullptr)
+																								m_bInitialMemCheckpointSet(false)
 {
 #if defined(HY_PLATFORM_WINDOWS)
 	m_sPlatform = "Windows";
@@ -79,31 +74,6 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 
 HyDiagnostics::~HyDiagnostics()
 {
-	delete m_pDiagOutput;
-}
-
-HyDiagnostics::DiagOutput::DiagOutput(const char *szPrefix, const char *szName) :	m_txtLastFrameTime(szPrefix, szName, this),
-																					m_txtAvgFrameInfo(szPrefix, szName, this),
-																					m_txtProfilerResults(szPrefix, szName, this)
-{
-	m_txtLastFrameTime.SetAsScaleBox(500.0f, 14.0, true);
-	m_txtAvgFrameInfo.SetAsScaleBox(500.0f, 50.0, true);
-	m_txtAvgFrameInfo.pos.Y(-50.0f);
-	m_txtProfilerResults.SetAsScaleBox(500.0f, 50.0, true);
-	m_txtProfilerResults.pos.Y(-250.0f);
-}
-
-void HyDiagnostics::InitText(const char *szTextPrefix, const char *szTextName)
-{
-	delete m_pDiagOutput;
-	m_pDiagOutput = new HyDiagnostics::DiagOutput(szTextPrefix, szTextName);
-	m_pDiagOutput->Load();
-	m_pDiagOutput->SetEnabled(false);
-}
-
-HyDiagnostics::DiagOutput *HyDiagnostics::GetDiagResultsPtr()
-{
-	return m_pDiagOutput;
 }
 
 void HyDiagnostics::BootMessage()
@@ -143,36 +113,13 @@ void HyDiagnostics::BootMessage()
 	HyLog("");
 }
 
-#ifdef HYSETTING_ProfilerEnabled
-void HyDiagnostics::ProfileBegin(const char *szName)
+void HyDiagnostics::Show(uint32 uiDiagFlags)
 {
-	HyAssert(m_CurProfileState.szName == nullptr, "HyDiagnostics::ProfileBegin invoked again without closing a previous call with ProfileEnd");
+	if(m_DiagOutput.IsLoaded() == false)
+		m_DiagOutput.Load();
 
-	m_CurProfileState.szName = szName;
-	m_CurProfileState.time = clock();
-}
-
-void HyDiagnostics::ProfileEnd()
-{
-	HyAssert(m_CurProfileState.szName != nullptr, "HyDiagnostics::ProfileEnd invoked without an initial call from ProfileBegin");
-	m_CurProfileState.time = clock() - m_CurProfileState.time;
-
-	m_TotalClockTicks += m_CurProfileState.time;
-
-	m_ProfileStateList.push_back(m_CurProfileState);
-	m_CurProfileState.szName = nullptr;
-}
-#endif
-
-void HyDiagnostics::Show()
-{
-	if(m_pDiagOutput)
-		m_pDiagOutput->SetEnabled(true);
-}
-void HyDiagnostics::Hide()
-{
-	if(m_pDiagOutput)
-		m_pDiagOutput->SetEnabled(false);
+	m_DiagOutput.SetEnabled(uiDiagFlags != 0);
+	m_DiagOutput.SetShowFlags(uiDiagFlags);
 }
 
 void HyDiagnostics::DumpAtlasUsage()
@@ -321,59 +268,19 @@ void HyDiagnostics::EndMemoryCheckpoint()
 #endif
 }
 
-void HyDiagnostics::Update()
+void HyDiagnostics::ProfileBegin(const char *szName)
 {
-	float fCurFrameTime = Hy_LastFrameTime();
-	m_fFrameTime_Cumulative += fCurFrameTime;
-	fCurFrameTime *= 1000.0f;
-	m_fFrameTime_Low = HyMin(m_fFrameTime_Low, fCurFrameTime);
-	m_fFrameTime_High = HyMax(m_fFrameTime_High, fCurFrameTime);
-	m_uiFrameCount++;
+	m_DiagOutput.ProfileBegin(szName);
+}
 
-	if(m_pDiagOutput)
-	{
-		std::stringstream ss;
-		ss << "Cur: " << fCurFrameTime << "ms";
-		m_pDiagOutput->m_txtLastFrameTime.TextSet(ss.str());
+void HyDiagnostics::ProfileEnd()
+{
+	m_DiagOutput.ProfileEnd();
+}
 
-#ifdef HYSETTING_ProfilerEnabled
-		HyAssert(m_CurProfileState.szName == nullptr, "HyDiagnostics::Update invoked with an open Profile begin");
-
-		std::string sText;
-		uint32 uiNumProfileStates = static_cast<uint32>(m_ProfileStateList.size());
-		for(uint32 i = 0; i < uiNumProfileStates; ++i)
-		{
-			sText += m_ProfileStateList[i].szName;
-			sText += ": ";
-			sText += std::to_string(static_cast<float>(m_ProfileStateList[i].time) / static_cast<float>(m_TotalClockTicks));
-			sText += "\n";
-
-		}
-		m_pDiagOutput->m_txtProfilerResults.TextSet(sText);
-
-		m_uiPro
-
-		m_TotalClockTicks = 0;
-#endif
-	}
-
-	if(m_fFrameTime_Cumulative >= 1.0f)
-	{
-		if(m_pDiagOutput)
-		{
-			std::stringstream ss;
-			ss << "Avg: " << static_cast<float>(m_fFrameTime_Cumulative / m_uiFrameCount) * 1000.0f << "ms\n" <<
-				  "Low: " << m_fFrameTime_Low << "ms\n" <<
-				  "High: " << m_fFrameTime_High << "ms\n" <<
-				  "FPS: " << m_uiFrameCount;
-			m_pDiagOutput->m_txtAvgFrameInfo.TextSet(ss.str());
-		}
-
-		m_fFrameTime_Low = 9999.0f;	// Any large value that should be greater than any single frame time
-		m_fFrameTime_High = 0.0f;
-		m_fFrameTime_Cumulative = 0.0f;
-		m_uiFrameCount = 0;
-	}
+void HyDiagnostics::ApplyTimeDelta()
+{
+	m_DiagOutput.ApplyTimeDelta(Hy_TimeDelta());
 }
 
 void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures)
