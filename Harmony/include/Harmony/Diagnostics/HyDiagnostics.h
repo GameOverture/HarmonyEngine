@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Scene/Nodes/Leafs/Draws/HyText2d.h"
+#include "Scene/Nodes/Leafs/Draws/HyPrimitive2d.h"
 
 #include <time.h>
 
@@ -24,13 +25,14 @@ class HyText2d;
 // Comment this out to disable profiler
 #define HYSETTING_ProfilerEnabled
 
-
 #ifdef HY_PLATFORM_GUI
 	#undef HYSETTING_ProfilerEnabled
 #endif
 #ifdef HYSETTING_ProfilerEnabled
 	#define HY_PROFILE_BEGIN(name) HyGetDiagnostics().ProfileBegin(name);
 	#define HY_PROFILE_END HyGetDiagnostics().ProfileEnd();
+
+	#define HYDIAG_PROFILE_STACK_SIZE 32
 #else
 	#define HY_PROFILE_BEGIN(name) 
 	#define HY_PROFILE_END 
@@ -69,12 +71,14 @@ class HyDiagnostics
 	{
 		const char *	szName;
 		clock_t			time;
+		HyPrimitive2d	barSlice;
 
 		ProfileState() : szName(nullptr), time(0)
 		{ }
 	};
-	ProfileState				m_CurProfileState;
-	std::vector<ProfileState>	m_ProfileStateList;
+	uint32						m_uiProfileStateIndex;
+	ProfileState				m_ProfileStateList[HYDIAG_PROFILE_STACK_SIZE];
+	uint32						m_uiNumProfileStates;
 	clock_t						m_TotalClockTicks;
 #endif
 
@@ -91,6 +95,8 @@ public:
 		HyText2d				m_txtLastFrameTime;
 		HyText2d				m_txtAvgFrameInfo;
 		HyText2d				m_txtProfilerResults;
+
+		HyPrimitive2d			m_ProfileOutline;
 
 	public:
 		DiagOutput(const char *szPrefix, const char *szName);

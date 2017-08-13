@@ -75,10 +75,6 @@ HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HySce
 		HyError("HY_ENDIAN_BIG was defined but did not pass calculation test");
 }
 #endif
-
-#ifdef HYSETTING_ProfilerEnabled
-	m_ProfileStateList.reserve(10);
-#endif
 }
 
 HyDiagnostics::~HyDiagnostics()
@@ -343,18 +339,20 @@ void HyDiagnostics::Update()
 #ifdef HYSETTING_ProfilerEnabled
 		HyAssert(m_CurProfileState.szName == nullptr, "HyDiagnostics::Update invoked with an open Profile begin");
 
+		std::string sText;
 		uint32 uiNumProfileStates = static_cast<uint32>(m_ProfileStateList.size());
 		for(uint32 i = 0; i < uiNumProfileStates; ++i)
 		{
-			std::string sText = m_ProfileStateList[i].szName;
+			sText += m_ProfileStateList[i].szName;
 			sText += ": ";
 			sText += std::to_string(static_cast<float>(m_ProfileStateList[i].time) / static_cast<float>(m_TotalClockTicks));
 			sText += "\n";
 
-			m_pDiagOutput->m_txtProfilerResults.TextSet(sText);
 		}
+		m_pDiagOutput->m_txtProfilerResults.TextSet(sText);
 
-		m_ProfileStateList.clear();
+		m_uiPro
+
 		m_TotalClockTicks = 0;
 #endif
 	}
