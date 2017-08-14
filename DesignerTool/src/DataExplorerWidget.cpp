@@ -68,11 +68,9 @@ Project *DataExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
     //pNewLoadThread->start();
 }
 
-void DataExplorerWidget::AddNewItem(HyGuiItemType eNewItemType, const QString sPrefix, const QString sName)
+void DataExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue)
 {
-    // Find the proper project tree item
-    Project *pCurProj = GetCurProjSelected();
-    if(pCurProj == nullptr)
+    if(pProj == nullptr)
     {
         HyGuiLog("Could not find associated project for item: " % sPrefix % "/" % sName, LOGTYPE_Error);
         return;
@@ -84,14 +82,14 @@ void DataExplorerWidget::AddNewItem(HyGuiItemType eNewItemType, const QString sP
         return;
     }
 
-    DataExplorerItem *pItem = new ProjectItem(*pCurProj, eNewItemType, sPrefix, sName, QJsonValue(), true);
+    DataExplorerItem *pItem = new ProjectItem(*pProj, eNewItemType, sPrefix, sName, initValue, true);
     
     // Get the relative path from [ProjectDir->ItemPath] e.g. "Sprites/SpritePrefix/MySprite"
     QString sRelativePath = pItem->GetPath();
     QStringList sPathSplitList = sRelativePath.split(QChar('/'));
     
     // Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
-    QTreeWidgetItem *pParentTreeItem = pCurProj->GetTreeItem();
+    QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
     bool bSucceeded = false;
     for(int i = 0; i < sPathSplitList.size(); ++i)
     {
@@ -143,15 +141,19 @@ void DataExplorerWidget::AddNewItem(HyGuiItemType eNewItemType, const QString sP
         return;
     }
 
-    QTreeWidgetItem *pExpandItem = pItem->GetTreeItem();
-    while(pExpandItem->parent() != nullptr)
-    {
-        ui->treeWidget->expandItem(pExpandItem->parent());
-        pExpandItem = pExpandItem->parent();
-    }
-
     pItem->SetTreeItemSubIcon(SUBICON_New);
-    MainWindow::OpenItem(static_cast<ProjectItem *>(pItem));
+
+    if(bOpenAfterAdd)
+    {
+        QTreeWidgetItem *pExpandItem = pItem->GetTreeItem();
+        while(pExpandItem->parent() != nullptr)
+        {
+            ui->treeWidget->expandItem(pExpandItem->parent());
+            pExpandItem = pExpandItem->parent();
+        }
+    
+        MainWindow::OpenItem(static_cast<ProjectItem *>(pItem));
+    }
 }
 
 void DataExplorerWidget::RemoveItem(DataExplorerItem *pItem)
@@ -184,56 +186,6 @@ void DataExplorerWidget::SelectItem(DataExplorerItem *pItem)
     pItem->GetTreeItem()->setSelected(true);
 }
 
-QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
-{
-    QTreeWidgetItem *pCurSelected = nullptr;
-    if(ui->treeWidget->selectedItems().empty() == false)
-        pCurSelected = ui->treeWidget->selectedItems()[0];  // Only single selection is allowed in explorer because two projects may be opened
-    
-    return pCurSelected;
-}
-
-void DataExplorerWidget::PutItemOnClipboard(ProjectItem *pProjItem)
-{
-    QJsonValue itemValue = pProjItem->GetModel()->GetJson(false);
-
-    // STANDARD INFO
-    QJsonObject clipboardObj;
-    clipboardObj.insert("itemType", HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(pProjItem->GetType())));
-    clipboardObj.insert("itemName", pProjItem->GetName(true));
-    clipboardObj.insert("src", itemValue);
-    
-    // IMAGE INFO
-    QList<AtlasFrame *> atlasFrameList = pProjItem->GetModel()->GetAtlasFrames();
-    QJsonArray imagesArray;
-    for(int i = 0; i < atlasFrameList.size(); ++i)
-    {
-        QJsonObject atlasFrameObj;
-        atlasFrameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasFrameList[i]->GetImageChecksum())));
-        atlasFrameObj.insert("name", QJsonValue(atlasFrameList[i]->GetName()));
-        atlasFrameObj.insert("url", QJsonValue(GetCurProjSelected()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirAtlases) % "/" % atlasFrameList[i]->ConstructImageFileName()));
-        imagesArray.append(atlasFrameObj);
-    }
-    clipboardObj.insert("images", imagesArray);
-    
-    // FONT INFO
-    QStringList fontUrlList = pProjItem->GetModel()->GetFontUrls();
-    QJsonArray fontUrlArray;
-    for(int i = 0; i < fontUrlList.size(); ++i)
-        fontUrlArray.append(fontUrlList[i]);
-    clipboardObj.insert("fonts", fontUrlArray);
-
-    // TODO: AUDIO INFO
-    //clipboardObj.insert("audio", GetAudioWavs())
-
-    // Serialize the item info into json source
-    QByteArray src = JsonValueToSrc(QJsonValue(clipboardObj));
-    QClipboard *pClipboard = QApplication::clipboard();
-    pClipboard->setText(src);
-
-    sm_sInternalClipboard = src;
-}
-
 QStringList DataExplorerWidget::GetOpenProjectPaths()
 {
     QStringList sListOpenProjs;
@@ -247,6 +199,80 @@ QStringList DataExplorerWidget::GetOpenProjectPaths()
     }
     
     return sListOpenProjs;
+}
+
+void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
+{
+    QDir metaDir(pProject->GetMetaDataAbsPath());
+
+    QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
+    QJsonObject pasteObj = pasteDoc.object();
+
+    // Import any missing resources into managers (images, fonts, audio...)
+    QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_DirFonts));
+    QJsonArray fontArray = pasteObj["fonts"].toArray();
+    for(int i = 0; i < fontArray.size(); ++i)
+    {
+        QFileInfo pasteFontFileInfo(fontArray[i].toString());
+
+        if(QFile::copy(pasteFontFileInfo.absoluteFilePath(), sFontMetaDir % "/" % pasteFontFileInfo.fileName()))
+            HyGuiLog("Paste Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
+    }
+
+    QDir metaTempDir(metaDir.absoluteFilePath(HYGUIPATH_TempDir));
+    if(metaTempDir.exists())
+    {
+        QFileInfoList tempFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+        for(int i = 0; i < tempFileInfoList.size(); ++i)
+        {
+            if(false == QFile::remove(tempFileInfoList[i].absoluteFilePath()))
+                HyGuiLog("Could not remove temp file: " % tempFileInfoList[i].fileName(), LOGTYPE_Error);
+        }
+    }
+    else if(false == metaTempDir.mkpath("."))
+        HyGuiLog("Could not make meta temp directory", LOGTYPE_Error);
+
+    QJsonArray imageArray = pasteObj["images"].toArray();
+    for(int i = 0; i < imageArray.size(); ++i)
+    {
+        QJsonObject imageObj = imageArray[i].toObject();
+
+        if(pProject->GetAtlasModel().DoesImageExist(JSONOBJ_TOINT(imageObj, "checksum")) == false)
+        {
+            QFileInfo pasteImageFileInfo(imageObj["url"].toString());
+            QFile::copy(pasteImageFileInfo.absoluteFilePath(), metaTempDir.absolutePath() % "/" % imageObj["name"].toString() % "." % pasteImageFileInfo.suffix());
+        }
+    }
+
+    QStringList importImageList;
+    QFileInfoList importFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+    for(int i = 0; i < importFileInfoList.size(); ++i)
+        importImageList.append(importFileInfoList[i].absoluteFilePath());
+
+    quint32 uiAtlasGrpId = pProject->GetAtlasModel().GetAtlasGrpIdFromAtlasGrpIndex(0);
+    if(pProject->GetAtlasWidget())
+        uiAtlasGrpId = pProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
+
+    pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId);
+
+    // Determine the type of the pasted item
+    HyGuiItemType ePasteItemType;
+
+    QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
+    for(int i = 0; i < subDirList.size(); ++i)
+    {
+        if(pasteObj["itemType"] == HyGlobal::ItemName(subDirList[i]))
+        {
+            ePasteItemType = HyGlobal::GetCorrespondingItemFromDir(subDirList[i]);
+            break;
+        }
+    }
+
+    QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
+    QString sPrefix = itemNameFileInfo.path();
+    QString sName = itemNameFileInfo.baseName();
+
+    AddNewItem(pProject, ePasteItemType, sPrefix, sName, false, pasteObj["src"]);
 }
 
 Project *DataExplorerWidget::GetCurProjSelected()
@@ -300,6 +326,56 @@ DataExplorerItem *DataExplorerWidget::GetCurSubDirSelected()
     }
     
     return pCurItem;
+}
+
+QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
+{
+    QTreeWidgetItem *pCurSelected = nullptr;
+    if(ui->treeWidget->selectedItems().empty() == false)
+        pCurSelected = ui->treeWidget->selectedItems()[0];  // Only single selection is allowed in explorer because two projects may be opened
+
+    return pCurSelected;
+}
+
+void DataExplorerWidget::PutItemOnClipboard(ProjectItem *pProjItem)
+{
+    QJsonValue itemValue = pProjItem->GetModel()->GetJson(false);
+
+    // STANDARD INFO
+    QJsonObject clipboardObj;
+    clipboardObj.insert("itemType", HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(pProjItem->GetType())));
+    clipboardObj.insert("itemName", pProjItem->GetName(true));
+    clipboardObj.insert("src", itemValue);
+
+    // IMAGE INFO
+    QList<AtlasFrame *> atlasFrameList = pProjItem->GetModel()->GetAtlasFrames();
+    QJsonArray imagesArray;
+    for(int i = 0; i < atlasFrameList.size(); ++i)
+    {
+        QJsonObject atlasFrameObj;
+        atlasFrameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasFrameList[i]->GetImageChecksum())));
+        atlasFrameObj.insert("name", QJsonValue(atlasFrameList[i]->GetName()));
+        atlasFrameObj.insert("url", QJsonValue(GetCurProjSelected()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirAtlases) % "/" % atlasFrameList[i]->ConstructImageFileName()));
+        imagesArray.append(atlasFrameObj);
+    }
+    clipboardObj.insert("images", imagesArray);
+
+    // FONT INFO
+    QStringList fontUrlList = pProjItem->GetModel()->GetFontUrls();
+    QJsonArray fontUrlArray;
+    for(int i = 0; i < fontUrlList.size(); ++i)
+        fontUrlArray.append(fontUrlList[i]);
+    clipboardObj.insert("fonts", fontUrlArray);
+
+    // TODO: AUDIO INFO
+    //clipboardObj.insert("audio", GetAudioWavs())
+
+    // Serialize the item info into json source
+    QByteArray src = JsonValueToSrc(QJsonValue(clipboardObj));
+    QClipboard *pClipboard = QApplication::clipboard();
+    pClipboard->setText(src);
+
+    sm_sInternalClipboard = src;
 }
 
 void DataExplorerWidget::OnProjectLoaded(Project *pLoadedProj)
@@ -559,76 +635,7 @@ void DataExplorerWidget::on_actionCopyItem_triggered()
 void DataExplorerWidget::on_actionPasteItem_triggered()
 {
     Project *pCurProj = GetCurProjSelected();
-    QDir metaDir(pCurProj->GetMetaDataAbsPath());
 
     // Don't use QClipboard because someone can just copy random text before pasting and ruin the expected json format
-    QString sTest = sm_sInternalClipboard;
-
-    QJsonDocument pasteDoc = QJsonDocument::fromJson(sm_sInternalClipboard);
-    QJsonObject pasteObj = pasteDoc.object();
-
-    // Import any missing resources into managers (images, fonts, audio...)
-    QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_DirFonts));
-    QJsonArray fontArray = pasteObj["fonts"].toArray();
-    for(int i = 0; i < fontArray.size(); ++i)
-    {
-        QFileInfo pasteFontFileInfo(fontArray[i].toString());
-
-        if(QFile::copy(pasteFontFileInfo.absoluteFilePath(), sFontMetaDir % "/" % pasteFontFileInfo.fileName()))
-            HyGuiLog("Paste Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
-    }
-
-    QDir metaTempDir(metaDir.absoluteFilePath(HYGUIPATH_TempDir));
-    if(metaTempDir.exists())
-    {
-        QFileInfoList tempFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-        for(int i = 0; i < tempFileInfoList.size(); ++i)
-        {
-            if(false == QFile::remove(tempFileInfoList[i].absoluteFilePath()))
-                HyGuiLog("Could not remove temp file: " % tempFileInfoList[i].fileName(), LOGTYPE_Error);
-        }
-    }
-    else if(false == metaTempDir.mkpath("."))
-        HyGuiLog("Could not make meta temp directory", LOGTYPE_Error);
-
-    QJsonArray imageArray = pasteObj["images"].toArray();
-    for(int i = 0; i < imageArray.size(); ++i)
-    {
-        QJsonObject imageObj = imageArray[i].toObject();
-
-        if(pCurProj->GetAtlasModel().DoesImageExist(JSONOBJ_TOINT(imageObj, "checksum")) == false)
-        {
-            QFileInfo pasteImageFileInfo(imageObj["url"].toString());
-            QFile::copy(pasteImageFileInfo.absoluteFilePath(), metaTempDir.absolutePath() % "/" % imageObj["name"].toString() % "." % pasteImageFileInfo.suffix());
-        }
-    }
-
-    QStringList importImageList;
-    QFileInfoList importFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-    for(int i = 0; i < importFileInfoList.size(); ++i)
-        importImageList.append(importFileInfoList[i].absoluteFilePath());
-
-    quint32 uiAtlasGrpId = pCurProj->GetAtlasModel().GetAtlasGrpIdFromAtlasGrpIndex(0);
-    if(pCurProj->GetAtlasWidget())
-        uiAtlasGrpId = pCurProj->GetAtlasWidget()->GetSelectedAtlasGrpId();
-
-    pCurProj->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId);
-    
-
-//    QJsonValue itemValue = pProjItem->GetModel()->GetJson(false);
-
-//    QJsonObject clipboardObj;
-//    clipboardObj.insert(HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(pProjItem->GetType())), pProjItem->GetName(true));
-//    clipboardObj.insert("src", itemValue);
-//    QList<AtlasFrame *> atlasFrameList = pProjItem->GetModel()->GetAtlasFrames();
-//    QJsonArray imagesArray;
-//    for(int i = 0; i < atlasFrameList.size(); ++i)
-//    {
-//        QJsonObject atlasFrameObj;
-//        atlasFrameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasFrameList[i]->GetImageChecksum())));
-//        atlasFrameObj.insert("name", QJsonValue(atlasFrameList[i]->GetName()));
-//        atlasFrameObj.insert("url", QJsonValue(GetCurProjSelected()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirAtlases) % "/" % atlasFrameList[i]->ConstructImageFileName()));
-//        imagesArray.append(atlasFrameObj);
-//    }
-//    clipboardObj.insert("images", imagesArray);
+    PasteItemSrc(sm_sInternalClipboard, pCurProj);
 }

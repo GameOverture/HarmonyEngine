@@ -85,6 +85,8 @@ Project::Project(const QString sProjectFilePath) :  DataExplorerItem(ITEM_Projec
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    bool bDefaultFontFound = false;
+
     // Initialize the project by processing each type of sub dir
     QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
     for(int i = 0; i < subDirList.size(); ++i)
@@ -160,6 +162,9 @@ Project::Project(const QString sProjectFilePath) :  DataExplorerItem(ITEM_Projec
                         break;
                     case ITEM_DirFonts:
                         pNewDataItem = new ProjectItem(*this, ITEM_Font, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
+
+                        if(sCurPrefix == "+Hy" && sPathPartList[iPathPartIndex] == "+HyFont")
+                            bDefaultFontFound = true;
                         break;
                     case ITEM_DirSprites:
                         pNewDataItem = new ProjectItem(*this, ITEM_Sprite, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
@@ -187,6 +192,25 @@ Project::Project(const QString sProjectFilePath) :  DataExplorerItem(ITEM_Projec
 #ifdef RESAVE_ENTIRE_PROJECT
     SaveGameData();
 #endif
+
+//    if(bDefaultFontFound == false)
+//    {
+//        QDir templateDataDir(MainWindow::EngineLocation() % "templates/data");
+//        QFile srcFile(templateDataDir.absoluteFilePath("src.json"));
+//        if(!srcFile.open(QFile::ReadOnly))
+//        {
+//            HyGuiLog("Error reading " % srcFile.fileName() % " when generating default font: " % srcFile.errorString(), LOGTYPE_Error);
+//            return;
+//        }
+
+//        QByteArray sContents = srcFile.readAll();
+//        srcFile.close();
+
+//        QByteArray sBefore("[HyHarmonyTemplateDataDir]");
+//        QByteArray sAfter(QString(MainWindow::EngineLocation() % "templates/data/").toLocal8Bit());
+//        sContents.replace(sBefore, sAfter);
+//        MainWindow::PasteItemSrc(sContents, this);
+//    }
 }
 
 /*virtual*/ Project::~Project()

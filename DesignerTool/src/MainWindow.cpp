@@ -367,6 +367,11 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     }
 }
 
+/*static*/ void MainWindow::PasteItemSrc(QByteArray sSrc, Project *pProject)
+{
+    sm_pInstance->ui->explorer->PasteItemSrc(sSrc, pProject);
+}
+
 /*static*/ HyGuiRenderer *MainWindow::GetCurrentRenderer()
 {
     return sm_pInstance->m_pCurRenderer;
@@ -448,7 +453,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 {
     DlgNewItem *pDlg = new DlgNewItem(m_pCurSelectedProj, eItem, this);
     if(pDlg->exec())
-        ui->explorer->AddNewItem(eItem, pDlg->GetPrefix(), pDlg->GetName());
+        ui->explorer->AddNewItem(ui->explorer->GetCurProjSelected(), eItem, pDlg->GetPrefix(), pDlg->GetName(), true, QJsonValue());
 
     delete pDlg;
 }

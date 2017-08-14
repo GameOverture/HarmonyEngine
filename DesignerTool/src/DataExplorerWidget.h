@@ -57,16 +57,18 @@ public:
     ~DataExplorerWidget();
     
     Project *AddItemProject(const QString sNewProjectFilePath);
-    void AddNewItem(HyGuiItemType eNewItemType, const QString sPrefix, const QString sName);
+
+    void AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue);
     void RemoveItem(DataExplorerItem *pItem);
-    
     void SelectItem(DataExplorerItem *pItem);
     
+    QStringList GetOpenProjectPaths();
+
     Project *GetCurProjSelected();
     DataExplorerItem *GetCurItemSelected();
     DataExplorerItem *GetCurSubDirSelected();
-    
-    QStringList GetOpenProjectPaths();
+
+    void PasteItemSrc(QByteArray sSrc, Project *pProject);
 
 private:
     Ui::DataExplorerWidget *ui;

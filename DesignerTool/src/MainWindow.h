@@ -65,6 +65,8 @@ public:
 
     static void StartLoading(uint uiAreaFlags);
     static void StopLoading(uint uiAreaFlags);
+
+    static void PasteItemSrc(QByteArray sSrc, Project *pProject);
     
     static HyGuiRenderer *GetCurrentRenderer();
 

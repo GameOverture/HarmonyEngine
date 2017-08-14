@@ -1,15 +1,15 @@
 {
     "fonts": [
-        "C:/Soft/Games/NewGame/_metaData/Fonts/manaspc.ttf"
+        "[HyHarmonyTemplateDataDir]templates/data/manaspc.ttf"
     ],
     "images": [
         {
             "checksum": 3126633802,
-            "name": "Harmony",
-            "url": "C:/Soft/Games/NewGame/_metaData/Atlases/3126633802.png"
+            "name": "+HyFont",
+            "url": "[HyHarmonyTemplateDataDir]templates/data/+HyFont.png"
         }
     ],
-    "itemName": "harmony/Harmony",
+    "itemName": "+Hy/+HyFont",
     "itemType": "Fonts",
     "src": {
         "availableGlyphs": {
