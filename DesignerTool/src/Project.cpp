@@ -193,24 +193,24 @@ Project::Project(const QString sProjectFilePath) :  DataExplorerItem(ITEM_Projec
     SaveGameData();
 #endif
 
-//    if(bDefaultFontFound == false)
-//    {
-//        QDir templateDataDir(MainWindow::EngineLocation() % "templates/data");
-//        QFile srcFile(templateDataDir.absoluteFilePath("src.json"));
-//        if(!srcFile.open(QFile::ReadOnly))
-//        {
-//            HyGuiLog("Error reading " % srcFile.fileName() % " when generating default font: " % srcFile.errorString(), LOGTYPE_Error);
-//            return;
-//        }
+    if(bDefaultFontFound == false)
+    {
+        QDir templateDataDir(MainWindow::EngineLocation() % "templates/data");
+        QFile srcFile(templateDataDir.absoluteFilePath("src.json"));
+        if(!srcFile.open(QFile::ReadOnly))
+        {
+            HyGuiLog("Error reading " % srcFile.fileName() % " when generating default font: " % srcFile.errorString(), LOGTYPE_Error);
+            return;
+        }
 
-//        QByteArray sContents = srcFile.readAll();
-//        srcFile.close();
+        QByteArray sContents = srcFile.readAll();
+        srcFile.close();
 
-//        QByteArray sBefore("[HyHarmonyTemplateDataDir]");
-//        QByteArray sAfter(QString(MainWindow::EngineLocation() % "templates/data/").toLocal8Bit());
-//        sContents.replace(sBefore, sAfter);
-//        MainWindow::PasteItemSrc(sContents, this);
-//    }
+        QByteArray sBefore("[HyHarmonyTemplateDataDir]");
+        QByteArray sAfter(QString(MainWindow::EngineLocation() % "templates/data/").toLocal8Bit());
+        sContents.replace(sBefore, sAfter);
+        //MainWindow::PasteItemSrc(sContents, this);
+    }
 }
 
 /*virtual*/ Project::~Project()

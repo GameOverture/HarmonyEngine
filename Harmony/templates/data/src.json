@@ -1,12 +1,12 @@
 {
     "fonts": [
-        "[HyHarmonyTemplateDataDir]templates/data/manaspc.ttf"
+        "[HyHarmonyTemplateDataDir]manaspc.ttf"
     ],
     "images": [
         {
             "checksum": 3126633802,
             "name": "+HyFont",
-            "url": "[HyHarmonyTemplateDataDir]templates/data/+HyFont.png"
+            "url": "[HyHarmonyTemplateDataDir]+HyFont.png"
         }
     ],
     "itemName": "+Hy/+HyFont",

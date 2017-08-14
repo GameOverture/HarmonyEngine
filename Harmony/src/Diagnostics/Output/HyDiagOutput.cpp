@@ -34,6 +34,8 @@ HyDiagOutput::HyDiagOutput() :	m_dFrameTime_Low(9999.0),
 
 	m_txtFps.TextSetState(HY_SYSTEM_FONT_STATE);
 	m_txtFps.pos.Y(-HY_SYSTEM_FONT_SIZE * 4.0f);
+
+	SetDisplayOrder(HY_SYSTEM_FONT_DISPLAYORDER);
 }
 
 HyDiagOutput::~HyDiagOutput()
