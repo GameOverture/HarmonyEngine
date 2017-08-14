@@ -38,15 +38,15 @@ const vec2 g_Position[] = vec2[4](vec2(1.0f, 1.0f),
 								  vec2(1.0f, 0.0f),
 								  vec2(0.0f, 0.0f));
 
-const vec2 g_UVCoords[] = vec2[4](UVcoord0,
-								  UVcoord1,
-								  UVcoord2,
-								  UVcoord3);
+vec2 g_UVCoords[] = vec2[4](UVcoord0,
+							UVcoord1,
+							UVcoord2,
+							UVcoord3);
 
-const vec4 g_Colors[] = vec4[4](topTint,
-								topTint,
-								botTint,
-								botTint);
+vec4 g_Colors[] = vec4[4](topTint,
+						  topTint,
+						  botTint,
+						  botTint);
 
 void main()
 {
