@@ -34,9 +34,9 @@ IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pPro
 
     std::vector<glm::vec2> lineList(2, glm::vec2());
 
-    lineList[0].x = -2048.0f;
+    lineList[0].x = -5000.0f;
     lineList[0].y = 0.0f;
-    lineList[1].x = 2048.0f;
+    lineList[1].x = 5000.0f;
     lineList[1].y = 0.0f;
     m_primOriginHorz.SetAsLineChain(lineList);
     m_primOriginHorz.SetLineThickness(2.0f);
@@ -44,9 +44,9 @@ IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pPro
     m_primOriginHorz.SetEnabled(false);
 
     lineList[0].x = 0.0f;
-    lineList[0].y = -2048.0f;
+    lineList[0].y = -5000.0f;
     lineList[1].x = 0.0f;
-    lineList[1].y = 2048.0f;
+    lineList[1].y = 5000.0f;
     m_primOriginVert.SetAsLineChain(lineList);
     m_primOriginVert.SetLineThickness(2.0f);
     m_primOriginVert.SetTint(1.0f, 1.0f, 1.0f);

@@ -13,6 +13,7 @@ class FontDraw : public IDraw
     HyPrimitive2d               m_DrawAtlasOutline;
 
     HyPrimitive2d               m_DividerLine;
+    HyPrimitive2d               m_PreviewOriginHorz;
 
     HyText2d                    m_Text;
 

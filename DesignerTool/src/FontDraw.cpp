@@ -3,11 +3,14 @@
 #include "MainWindow.h"
 #include "HyGuiRenderer.h"
 
+#define PreviewOffsetY -2500.0f
+
 FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
                                                                     m_pPreviewTextCamera(nullptr),
                                                                     m_pDrawAtlasPreview(nullptr),
                                                                     m_DrawAtlasOutline(this),
                                                                     m_DividerLine(this),
+                                                                    m_PreviewOriginHorz(this),
                                                                     m_Text("", "+GuiPreview", this)
 {
     m_pPreviewTextCamera = m_HyAppRef.Window().CreateCamera2d();
@@ -15,7 +18,9 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
     m_pPreviewTextCamera->pos.Set(0.0f, -2500.0f);
     m_pPreviewTextCamera->SetEnabled(true);
 
-    m_Text.pos.Set(0.0f, -2500.0f);
+    m_Text.pos.Set(0.0f, PreviewOffsetY);
+    m_Text.TextSetAlignment(HYALIGN_Center);
+    m_Text.TextSet("The Quick Brown Fox Jumped Over the Lazy Dog 1234567890");
     
     m_pCamera->SetViewport(0.0f, 0.5f, 1.0f, 0.5f);
 
@@ -25,6 +30,17 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
     m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetResolution().y / 2 - 5.0f);
     m_DividerLine.SetTint(0.0f, 0.0f, 0.0f);
     m_DividerLine.UseWindowCoordinates();
+
+    std::vector<glm::vec2> lineList(2, glm::vec2());
+
+    lineList[0].x = -5000.0f;
+    lineList[0].y = PreviewOffsetY;
+    lineList[1].x = 5000.0f;
+    lineList[1].y = PreviewOffsetY;
+    m_PreviewOriginHorz.SetAsLineChain(lineList);
+    m_PreviewOriginHorz.SetLineThickness(2.0f);
+    m_PreviewOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
+    m_PreviewOriginHorz.SetEnabled(false);
 }
 
 /*virtual*/ FontDraw::~FontDraw()
@@ -72,14 +88,19 @@ void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelD
 
     m_DrawAtlasOutline.SetEnabled(true);
     m_DividerLine.SetEnabled(true);
+    m_PreviewOriginHorz.SetEnabled(true);
     
     m_pPreviewTextCamera->SetEnabled(true);
+
+    m_Text.SetEnabled(true);
 }
 
 /*virtual*/ void FontDraw::OnHide(IHyApplication &hyApp)
 {
     SetEnabled(false);
     m_pPreviewTextCamera->SetEnabled(false);
+    m_PreviewOriginHorz.SetEnabled(false);
+    m_Text.SetEnabled(false);
 }
 
 /*virtual*/ void FontDraw::OnResizeRenderer() /*override*/
