@@ -304,7 +304,10 @@ void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
     if(pProject->GetAtlasWidget())
         uiAtlasGrpId = pProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
 
-    QSet<AtlasFrame *> importedFrames = pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId);
+    // Repack this atlas group with imported images
+    QSet<AtlasFrame *> importedFramesSet = pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId);
+    if(importedFramesSet.empty() == false)
+        pProject->GetAtlasModel().Repack(pProject->GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId), QSet<int>(), importedFramesSet);
 
     // Determine the type of the pasted item
     HyGuiItemType ePasteItemType;
@@ -331,7 +334,7 @@ void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
         {
             QJsonObject srcArrayObj = srcArray[i].toObject();
 
-            srcArrayObj = ReplaceIdWithProperValue(srcArrayObj, importedFrames);
+            srcArrayObj = ReplaceIdWithProperValue(srcArrayObj, importedFramesSet);
             newSrcArray.append(srcArrayObj);
         }
 
@@ -340,7 +343,7 @@ void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
     else if(pasteObj["src"].isObject())
     {
         QJsonObject srcObj = pasteObj["src"].toObject();
-        srcObj = ReplaceIdWithProperValue(srcObj, importedFrames);
+        srcObj = ReplaceIdWithProperValue(srcObj, importedFramesSet);
 
         pasteObj["src"] = srcObj;
     }
