@@ -58,7 +58,7 @@ public:
     
     Project *AddItemProject(const QString sNewProjectFilePath);
 
-    void AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue);
+    ProjectItem *AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue);
     void RemoveItem(DataExplorerItem *pItem);
     void SelectItem(DataExplorerItem *pItem);
     
@@ -72,6 +72,8 @@ public:
 
 private:
     Ui::DataExplorerWidget *ui;
+
+    QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
     
     QTreeWidgetItem *GetSelectedTreeItem();
 

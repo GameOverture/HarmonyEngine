@@ -163,7 +163,7 @@ Project::Project(const QString sProjectFilePath) :  DataExplorerItem(ITEM_Projec
                     case ITEM_DirFonts:
                         pNewDataItem = new ProjectItem(*this, ITEM_Font, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
 
-                        if(sCurPrefix == "+Hy" && sPathPartList[iPathPartIndex] == "+HyFont")
+                        if(sCurPrefix == "+Hy/" && sPathPartList[iPathPartIndex] == "+HyFont")
                             bDefaultFontFound = true;
                         break;
                     case ITEM_DirSprites:

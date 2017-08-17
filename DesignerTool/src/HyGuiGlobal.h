@@ -26,8 +26,9 @@
 #include "WidgetOutputLog.h"
 #include "Harmony/HyEngine.h"
 
-#define HyDesignerToolName "Harmony Designer Tool"
+class Project;
 
+#define HyDesignerToolName "Harmony Designer Tool"
 //#define HYGUI_UseBinaryMetaFiles
 
 enum HyGuiItemType
@@ -93,6 +94,8 @@ enum SubIcon
 };
 
 #define HYTREEWIDGETITEM_IsFilter               "HyTreeFilter"
+
+#define HYDEFAULT_PrefixChar                    '+' // Names prefixed with a '+' are engine defaults that are automatically added to project
 
 #define HYGUIPATH_DataFile                      "data.json"
 #define HYGUIPATH_TempDir                       "temp/"
@@ -162,6 +165,8 @@ public:
 
     // Includes 'pParentItem' in returned list
     static QList<QTreeWidgetItem *> RecursiveTreeChildren(QTreeWidgetItem *pParentItem);
+
+    static QDir PrepTempDir(Project *pProject);
 
 private:
     static void InitItemIcons(HyGuiItemType eItemType);

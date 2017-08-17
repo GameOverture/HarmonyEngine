@@ -16,7 +16,7 @@
 #include "Scene/Nodes/Leafs/Draws/HyText2d.h"
 #include "Scene/Nodes/Leafs/Draws/HyPrimitive2d.h"
 
-#define HY_SYSTEM_FONT "Lg", "Default"
+#define HY_SYSTEM_FONT "+Hy", "+HyFont"
 #define HY_SYSTEM_FONT_SIZE 25.0f
 #define HY_SYSTEM_FONT_STATE 0
 #define HY_SYSTEM_FONT_DISPLAYORDER 0x7FFFFF00

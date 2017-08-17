@@ -193,16 +193,19 @@ void AtlasFrame::GetJsonObj(QJsonObject &frameObj)
     frameObj.insert("errors", QJsonValue(static_cast<int>(GetErrors())));
 
     QString sFilterPath = "";
-    QTreeWidgetItem *pTreeParent = m_pTreeWidgetItem->parent();
-    while(pTreeParent)
+    if(m_pTreeWidgetItem)
     {
-        if(pTreeParent->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
-            break;
+        QTreeWidgetItem *pTreeParent = m_pTreeWidgetItem->parent();
+        while(pTreeParent)
+        {
+            if(pTreeParent->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+                break;
 
-        pTreeParent = pTreeParent->parent();
+            pTreeParent = pTreeParent->parent();
+        }
+        if(pTreeParent)
+            sFilterPath = HyGlobal::GetTreeWidgetItemPath(pTreeParent);
     }
-    if(pTreeParent)
-        sFilterPath = HyGlobal::GetTreeWidgetItemPath(pTreeParent);
 
     frameObj.insert("filter", QJsonValue(sFilterPath));
 }
@@ -255,7 +258,9 @@ bool AtlasFrame::DeleteMetaImage(QDir metaDir)
 void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir)
 {
     m_sName = sName;
-    m_pTreeWidgetItem->setText(0, m_sName);
+
+    if(m_pTreeWidgetItem)
+        m_pTreeWidgetItem->setText(0, m_sName);
 
     m_uiImageChecksum = uiChecksum;
     m_iWidth = newImage.width();

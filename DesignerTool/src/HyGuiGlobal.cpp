@@ -8,6 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "HyGuiGlobal.h"
+#include "Project.h"
 
 /*static*/ QString HyGlobal::sm_sItemNames[NUMITEM];
 /*static*/ QString HyGlobal::sm_sItemExt[NUMITEM];
@@ -363,6 +364,25 @@
     }
 
     return returnList;
+}
+
+/*static*/ QDir HyGlobal::PrepTempDir(Project *pProject)
+{
+    QDir metaDir(pProject->GetMetaDataAbsPath());
+    QDir metaTempDir(metaDir.absoluteFilePath(HYGUIPATH_TempDir));
+    if(metaTempDir.exists())
+    {
+        QFileInfoList tempFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+        for(int i = 0; i < tempFileInfoList.size(); ++i)
+        {
+            if(false == QFile::remove(tempFileInfoList[i].absoluteFilePath()))
+                HyGuiLog("Could not remove temp file: " % tempFileInfoList[i].fileName(), LOGTYPE_Error);
+        }
+    }
+    else if(false == metaTempDir.mkpath("."))
+        HyGuiLog("Could not make meta temp directory", LOGTYPE_Error);
+
+    return metaTempDir;
 }
 
 QAction *FindAction(QList<QAction *> list, QString sName)

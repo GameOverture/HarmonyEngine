@@ -543,7 +543,7 @@ QList<AtlasFrame *> AtlasModel::RequestFramesById(ProjectItem *pItem, QList<quin
         if(pFoundFrame == nullptr)
         {
             // TODO: Support a "Yes to all" dialog functionality here. Also note that the request list will not == the return list
-            HyGuiLog("Cannot find image with checksum: " % QString::number(requestList[i]) % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
+            HyGuiLog("Cannot find image with id: " % QString::number(requestList[i]) % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
         }
         else
         {
@@ -608,19 +608,21 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiA
         // TODO: Should I care about overwriting a duplicate image?
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
 
-        QList<QTreeWidgetItem *> selectedList = m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->selectedItems();
-
-        if(selectedList.empty() == false)
+        if(sName[0] != HYDEFAULT_PrefixChar)
         {
-            if(selectedList[0]->parent() != nullptr)
-                selectedList[0]->parent()->addChild(pNewFrame->GetTreeItem());
-            else if(selectedList[0]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
-                selectedList[0]->addChild(pNewFrame->GetTreeItem());
+            QList<QTreeWidgetItem *> selectedList = m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->selectedItems();
+            if(selectedList.empty() == false)
+            {
+                if(selectedList[0]->parent() != nullptr)
+                    selectedList[0]->parent()->addChild(pNewFrame->GetTreeItem());
+                else if(selectedList[0]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+                    selectedList[0]->addChild(pNewFrame->GetTreeItem());
+                else
+                    m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
+            }
             else
                 m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
         }
-        else
-            m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
     }
 
     return pNewFrame;

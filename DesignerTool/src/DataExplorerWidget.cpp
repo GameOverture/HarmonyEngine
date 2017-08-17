@@ -68,80 +68,83 @@ Project *DataExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
     //pNewLoadThread->start();
 }
 
-void DataExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue)
+ProjectItem *DataExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue)
 {
     if(pProj == nullptr)
     {
         HyGuiLog("Could not find associated project for item: " % sPrefix % "/" % sName, LOGTYPE_Error);
-        return;
+        return nullptr;
     }
     
     if(eNewItemType == ITEM_Project)
     {
         HyGuiLog("Do not use WidgetExplorer::AddItem for projects... use AddProjectItem instead", LOGTYPE_Error);
-        return;
+        return nullptr;
     }
 
-    DataExplorerItem *pItem = new ProjectItem(*pProj, eNewItemType, sPrefix, sName, initValue, true);
+    ProjectItem *pItem = new ProjectItem(*pProj, eNewItemType, sPrefix, sName, initValue, true);
     
-    // Get the relative path from [ProjectDir->ItemPath] e.g. "Sprites/SpritePrefix/MySprite"
-    QString sRelativePath = pItem->GetPath();
-    QStringList sPathSplitList = sRelativePath.split(QChar('/'));
-    
-    // Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
-    QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
-    bool bSucceeded = false;
-    for(int i = 0; i < sPathSplitList.size(); ++i)
+    if(sName[0] != HYDEFAULT_PrefixChar)
     {
-        bool bFound = false;
-        for(int j = 0; j < pParentTreeItem->childCount(); ++j)
+        // Get the relative path from [ProjectDir->ItemPath] e.g. "Sprites/SpritePrefix/MySprite"
+        QString sRelativePath = pItem->GetPath();
+        QStringList sPathSplitList = sRelativePath.split(QChar('/'));
+
+        // Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
+        QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
+        bool bSucceeded = false;
+        for(int i = 0; i < sPathSplitList.size(); ++i)
         {
-            if(QString::compare(sPathSplitList[i], pParentTreeItem->child(j)->text(0), Qt::CaseInsensitive) == 0)
+            bool bFound = false;
+            for(int j = 0; j < pParentTreeItem->childCount(); ++j)
             {
-                pParentTreeItem = pParentTreeItem->child(j);
-                bFound = true;
-                break;
+                if(QString::compare(sPathSplitList[i], pParentTreeItem->child(j)->text(0), Qt::CaseInsensitive) == 0)
+                {
+                    pParentTreeItem = pParentTreeItem->child(j);
+                    bFound = true;
+                    break;
+                }
+            }
+
+            if(bFound == false)
+            {
+                if(i == 0)
+                {
+                    HyGuiLog("Cannot find valid sub directory: " % sPathSplitList[i], LOGTYPE_Error);
+                    return nullptr;
+                }
+
+                if(i != sPathSplitList.size()-1)
+                {
+                    // Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
+                    //
+                    QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<DataExplorerItem *>()->GetName(true) % "/" % sPathSplitList[i];
+
+                    DataExplorerItem *pPrefixItem = new DataExplorerItem(ITEM_Prefix, sPath);
+                    QTreeWidgetItem *pPrefixTreeItem = pPrefixItem->GetTreeItem();
+
+                    pParentTreeItem->addChild(pPrefixTreeItem);
+                    pParentTreeItem = pPrefixTreeItem;
+                }
+                else
+                {
+                    // At the final traversal, which is the item itself.
+                    pParentTreeItem->addChild(pItem->GetTreeItem());
+
+                    bSucceeded = true;
+                    break;
+                }
             }
         }
-        
-        if(bFound == false)
+
+        if(bSucceeded == false)
         {
-            if(i == 0)
-            {
-                HyGuiLog("Cannot find valid sub directory: " % sPathSplitList[i], LOGTYPE_Error);
-                return;
-            }
-            
-            if(i != sPathSplitList.size()-1)
-            {
-                // Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
-                //
-                QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<DataExplorerItem *>()->GetName(true) % "/" % sPathSplitList[i];
-                
-                DataExplorerItem *pPrefixItem = new DataExplorerItem(ITEM_Prefix, sPath);
-                QTreeWidgetItem *pPrefixTreeItem = pPrefixItem->GetTreeItem();
-
-                pParentTreeItem->addChild(pPrefixTreeItem);
-                pParentTreeItem = pPrefixTreeItem;
-            }
-            else
-            {
-                // At the final traversal, which is the item itself.
-                pParentTreeItem->addChild(pItem->GetTreeItem());
-                
-                bSucceeded = true;
-                break;
-            }
+            HyGuiLog("Did not add item: " % pItem->GetName(true) % " successfully", LOGTYPE_Error);
+            return nullptr;
         }
-    }
-    
-    if(bSucceeded == false)
-    {
-        HyGuiLog("Did not add item: " % pItem->GetName(true) % " successfully", LOGTYPE_Error);
-        return;
-    }
 
-    pItem->SetTreeItemSubIcon(SUBICON_New);
+        pItem->SetTreeItemSubIcon(SUBICON_New);
+    }
 
     if(bOpenAfterAdd)
     {
@@ -152,8 +155,10 @@ void DataExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemType, 
             pExpandItem = pExpandItem->parent();
         }
     
-        MainWindow::OpenItem(static_cast<ProjectItem *>(pItem));
+        MainWindow::OpenItem(pItem);
     }
+
+    return pItem;
 }
 
 void DataExplorerWidget::RemoveItem(DataExplorerItem *pItem)
@@ -199,80 +204,6 @@ QStringList DataExplorerWidget::GetOpenProjectPaths()
     }
     
     return sListOpenProjs;
-}
-
-void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
-{
-    QDir metaDir(pProject->GetMetaDataAbsPath());
-
-    QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
-    QJsonObject pasteObj = pasteDoc.object();
-
-    // Import any missing resources into managers (images, fonts, audio...)
-    QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_DirFonts));
-    QJsonArray fontArray = pasteObj["fonts"].toArray();
-    for(int i = 0; i < fontArray.size(); ++i)
-    {
-        QFileInfo pasteFontFileInfo(fontArray[i].toString());
-
-        if(QFile::copy(pasteFontFileInfo.absoluteFilePath(), sFontMetaDir % "/" % pasteFontFileInfo.fileName()))
-            HyGuiLog("Paste Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
-    }
-
-    QDir metaTempDir(metaDir.absoluteFilePath(HYGUIPATH_TempDir));
-    if(metaTempDir.exists())
-    {
-        QFileInfoList tempFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-        for(int i = 0; i < tempFileInfoList.size(); ++i)
-        {
-            if(false == QFile::remove(tempFileInfoList[i].absoluteFilePath()))
-                HyGuiLog("Could not remove temp file: " % tempFileInfoList[i].fileName(), LOGTYPE_Error);
-        }
-    }
-    else if(false == metaTempDir.mkpath("."))
-        HyGuiLog("Could not make meta temp directory", LOGTYPE_Error);
-
-    QJsonArray imageArray = pasteObj["images"].toArray();
-    for(int i = 0; i < imageArray.size(); ++i)
-    {
-        QJsonObject imageObj = imageArray[i].toObject();
-
-        if(pProject->GetAtlasModel().DoesImageExist(JSONOBJ_TOINT(imageObj, "checksum")) == false)
-        {
-            QFileInfo pasteImageFileInfo(imageObj["url"].toString());
-            QFile::copy(pasteImageFileInfo.absoluteFilePath(), metaTempDir.absolutePath() % "/" % imageObj["name"].toString() % "." % pasteImageFileInfo.suffix());
-        }
-    }
-
-    QStringList importImageList;
-    QFileInfoList importFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-    for(int i = 0; i < importFileInfoList.size(); ++i)
-        importImageList.append(importFileInfoList[i].absoluteFilePath());
-
-    quint32 uiAtlasGrpId = pProject->GetAtlasModel().GetAtlasGrpIdFromAtlasGrpIndex(0);
-    if(pProject->GetAtlasWidget())
-        uiAtlasGrpId = pProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
-
-    pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId);
-
-    // Determine the type of the pasted item
-    HyGuiItemType ePasteItemType;
-
-    QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
-    for(int i = 0; i < subDirList.size(); ++i)
-    {
-        if(pasteObj["itemType"] == HyGlobal::ItemName(subDirList[i]))
-        {
-            ePasteItemType = HyGlobal::GetCorrespondingItemFromDir(subDirList[i]);
-            break;
-        }
-    }
-
-    QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
-    QString sPrefix = itemNameFileInfo.path();
-    QString sName = itemNameFileInfo.baseName();
-
-    AddNewItem(pProject, ePasteItemType, sPrefix, sName, false, pasteObj["src"]);
 }
 
 Project *DataExplorerWidget::GetCurProjSelected()
@@ -326,6 +257,125 @@ DataExplorerItem *DataExplorerWidget::GetCurSubDirSelected()
     }
     
     return pCurItem;
+}
+
+void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
+{
+    QDir metaDir(pProject->GetMetaDataAbsPath());
+    QDir metaTempDir = HyGlobal::PrepTempDir(pProject);
+
+    QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
+    QJsonObject pasteObj = pasteDoc.object();
+
+    // Import any missing resources into managers (images, fonts, audio...)
+    //
+    // Fonts:
+    QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_DirFonts));
+    QJsonArray fontArray = pasteObj["fonts"].toArray();
+    for(int i = 0; i < fontArray.size(); ++i)
+    {
+        QFileInfo pasteFontFileInfo(fontArray[i].toString());
+
+        if(QFile::copy(pasteFontFileInfo.absoluteFilePath(), sFontMetaDir % "/" % pasteFontFileInfo.fileName()))
+            HyGuiLog("Paste Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
+    }
+
+    // Images:
+    // Copy images to meta-temp dir
+    QJsonArray imageArray = pasteObj["images"].toArray();
+    for(int i = 0; i < imageArray.size(); ++i)
+    {
+        QJsonObject imageObj = imageArray[i].toObject();
+
+        if(pProject->GetAtlasModel().DoesImageExist(JSONOBJ_TOINT(imageObj, "checksum")) == false)
+        {
+            QFileInfo pasteImageFileInfo(imageObj["url"].toString());
+            QFile::copy(pasteImageFileInfo.absoluteFilePath(), metaTempDir.absolutePath() % "/" % imageObj["name"].toString() % "." % pasteImageFileInfo.suffix());
+        }
+    }
+    // Get string list of the copied images paths
+    QStringList importImageList;
+    QFileInfoList importFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+    for(int i = 0; i < importFileInfoList.size(); ++i)
+        importImageList.append(importFileInfoList[i].absoluteFilePath());
+
+    // Import images into the selected atlas group, or default one
+    quint32 uiAtlasGrpId = pProject->GetAtlasModel().GetAtlasGrpIdFromAtlasGrpIndex(0);
+    if(pProject->GetAtlasWidget())
+        uiAtlasGrpId = pProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
+
+    QSet<AtlasFrame *> importedFrames = pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId);
+
+    // Determine the type of the pasted item
+    HyGuiItemType ePasteItemType;
+    QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
+    for(int i = 0; i < subDirList.size(); ++i)
+    {
+        if(pasteObj["itemType"] == HyGlobal::ItemName(subDirList[i]))
+        {
+            ePasteItemType = HyGlobal::GetCorrespondingItemFromDir(subDirList[i]);
+            break;
+        }
+    }
+
+    // Replace any image "id" with the newly imported frames' ids
+    if(pasteObj["src"].isArray())
+    {
+        QJsonArray srcArray = pasteObj["src"].toArray();
+        if(srcArray.empty() == false && srcArray[0].isObject() == false)
+            HyGuiLog("DataExplorerWidget::PasteItemSrc - src array isn't of QJsonObjects", LOGTYPE_Error);
+
+        // Copy everything into newSrcArray, while replacing "id" with proper value
+        QJsonArray newSrcArray;
+        for(int i = 0; i < srcArray.size(); ++i)
+        {
+            QJsonObject srcArrayObj = srcArray[i].toObject();
+
+            srcArrayObj = ReplaceIdWithProperValue(srcArrayObj, importedFrames);
+            newSrcArray.append(srcArrayObj);
+        }
+
+        pasteObj["src"] = newSrcArray;
+    }
+    else if(pasteObj["src"].isObject())
+    {
+        QJsonObject srcObj = pasteObj["src"].toObject();
+        srcObj = ReplaceIdWithProperValue(srcObj, importedFrames);
+
+        pasteObj["src"] = srcObj;
+    }
+    else
+        HyGuiLog("DataExplorerWidget::PasteItemSrc - src isn't an object or array", LOGTYPE_Error);
+
+    // Create a new project item representing the pasted item and save it
+    QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
+    QString sPrefix = itemNameFileInfo.path();
+    QString sName = itemNameFileInfo.baseName();
+    ProjectItem *pNewItem = AddNewItem(pProject, ePasteItemType, sPrefix, sName, false, pasteObj["src"]);
+    if(pNewItem)
+        pNewItem->Save();
+}
+
+QJsonObject DataExplorerWidget::ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames)
+{
+    QStringList srcObjKeyList = srcObj.keys();
+    for(int j = 0; j < srcObjKeyList.size(); ++j)
+    {
+        if(srcObjKeyList[j] == "checksum")
+        {
+            for(auto iter = importedFrames.begin(); iter != importedFrames.end(); ++iter)
+            {
+                if((*iter)->GetImageChecksum() == JSONOBJ_TOINT(srcObj, "checksum"))
+                {
+                    srcObj.insert("id", QJsonValue(static_cast<qint64>((*iter)->GetId())));
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
+    return srcObj;
 }
 
 QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
