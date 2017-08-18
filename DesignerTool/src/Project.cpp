@@ -209,7 +209,7 @@ Project::Project(const QString sProjectFilePath) :  DataExplorerItem(ITEM_Projec
         QByteArray sBefore("[HyHarmonyTemplateDataDir]");
         QByteArray sAfter(QString(MainWindow::EngineLocation() % "templates/data/").toLocal8Bit());
         sContents.replace(sBefore, sAfter);
-        //MainWindow::PasteItemSrc(sContents, this);
+        MainWindow::PasteItemSrc(sContents, this);
     }
 }
 

@@ -334,6 +334,12 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	m_bIsDirty = true;
 }
 
+/*virtual*/ bool HyText2d::IsLoadDataValid() /*override*/
+{
+	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
+	return pData->GetNumStates() != 0;
+}
+
 /*virtual*/ void HyText2d::DrawUpdate()
 {
 	if(m_bIsDirty == false)

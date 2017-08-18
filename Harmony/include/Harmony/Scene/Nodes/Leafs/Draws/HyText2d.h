@@ -114,6 +114,7 @@ public:
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 
 protected:
+	virtual bool IsLoadDataValid() override;
 	virtual void DrawUpdate() override;
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;
