@@ -90,9 +90,6 @@ public:
     void DeletePrefixAndContents(HyGuiItemType eSubDirType, QString sPrefix);
 
     QJsonObject GetSubDirObj(HyGuiItemType eType);
-    
-    // TODO: Remove this
-    void RefreshCurrentItemDraw();
 
     bool CloseAllTabs();
 

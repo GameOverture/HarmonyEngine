@@ -35,7 +35,7 @@ public:
     IDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~IDraw();
     
-    void ApplyJsonData(bool bReloadInAssetManager);
+    void ApplyJsonData();
 
     void Show();
     void Hide();
@@ -50,7 +50,7 @@ public:
     virtual void OnMouseMoveEvent(QMouseEvent *pEvent);
 
 protected:
-    virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) { }
+    virtual void OnApplyJsonData(jsonxx::Value &valueRef) { }
     virtual void OnShow(IHyApplication &hyApp) = 0;
     virtual void OnHide(IHyApplication &hyApp) = 0;
     virtual void OnResizeRenderer() = 0;

@@ -4,27 +4,10 @@
 SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
                                                                         m_Sprite("", "+GuiPreview", this)
 {
-	ApplyJsonData(true);
-
-//    for(int i = 0; i < m_pProjItem->GetModel()->GetNumStates(); ++i)
-//    {
-//        SpriteStateData *pStateData = static_cast<SpriteStateData *>(m_pProjItem->GetModel()->GetStateData(i));
-//        for(int j = 0; j < pStateData->GetFramesModel()->rowCount(); ++j)
-//        {
-//            AtlasFrame *pFrame = pStateData->GetFramesModel()->GetFrameAt(j)->m_pFrame;
-
-//            HyTexturedQuad2d *pNewTexturedQuad = new HyTexturedQuad2d(pFrame->GetAtlasGrpId(), pFrame->GetTextureIndex(), this);
-//            pNewTexturedQuad->SetTextureSource(pFrame->GetX(), pFrame->GetY(), pFrame->GetCrop().width(), pFrame->GetCrop().height());
-
-//            m_TexturedQuadIdMap.insert(pFrame->GetId(), pNewTexturedQuad);
-//        }
-//    }
 }
 
 /*virtual*/ SpriteDraw::~SpriteDraw()
 {
-//    for(auto iter = m_TexturedQuadIdMap.begin(); iter != m_TexturedQuadIdMap.end(); ++iter)
-//        delete iter.value();
 }
 
 void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
@@ -63,7 +46,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
     IDraw::OnMouseMoveEvent(pEvent);
 }
 
-/*virtual*/ void SpriteDraw::OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) /*override*/
+/*virtual*/ void SpriteDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
 {
     if(m_Sprite.AcquireData() != nullptr)
     {
@@ -76,7 +59,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
         }
     }
 
-    m_Sprite.GuiOverrideData<HySprite2dData>(valueRef, bReloadInAssetManager);
+    m_Sprite.GuiOverrideData<HySprite2dData>(valueRef);
     m_Sprite.AnimCtrl(HYANIMCTRL_Reset);
     
     SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());

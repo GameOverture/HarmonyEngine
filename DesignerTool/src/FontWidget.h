@@ -31,31 +31,21 @@ class FontWidget : public QWidget
 
     ProjectItem &               m_ItemRef;
     
-    QSize                       m_PrevAtlasSize;
-    
 public:
     explicit FontWidget(ProjectItem &itemRef, QWidget *parent = 0);
     ~FontWidget();
 
     ProjectItem &GetItem();
 
-    void SetSelectedState(int iIndex);
-
     void OnGiveMenuActions(QMenu *pMenu);
 
-//    void OnShow();
-//    void OnHide();
     void OnUpdate();
     
-
     QString GetFullItemName();
 
     QComboBox *GetCmbStates();
     
-    void SetGlyphsDirty();
-    
-    void RefreshData(QVariant param);
-    //void RefreshDraw(IHyApplication &hyAppRef);
+    void FocusState(int iStateIndex);
 
     void UpdateActions();
 

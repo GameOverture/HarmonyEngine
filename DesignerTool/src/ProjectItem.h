@@ -64,17 +64,16 @@ public:
     
     void BlockAllWidgetSignals(bool bBlock);
 
-    void WidgetRefreshData(QVariant param);
+    void FocusWidgetState(int iStateIndex);
     
     void DeleteFromProject();
     
 private:
-    void WidgetRefreshDraw(IHyApplication &hyApp);
-    
     void WidgetLoad(IHyApplication &hyApp);
-    void WidgetUnload(IHyApplication &hyApp);
-    void RenderShow(IHyApplication &hyApp);
-    void RenderHide(IHyApplication &hyApp);
+    void WidgetUnload();
+    
+    void DrawShow();
+    void DrawHide();
 
 private Q_SLOTS:
     void on_undoStack_cleanChanged(bool bClean);

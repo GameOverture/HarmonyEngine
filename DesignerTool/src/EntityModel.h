@@ -37,10 +37,11 @@ public:
     EntityModel(ProjectItem *pItem, QJsonArray stateArray);
     virtual ~EntityModel();
 
+    virtual void OnSave() override;
     virtual QJsonObject PopStateAt(uint32 uiIndex) override;
-    virtual QJsonValue GetJson(bool bWritingToGameData) override;
-    virtual QList<AtlasFrame *> GetAtlasFrames() override;
-    virtual QStringList GetFontUrls() override;
+    virtual QJsonValue GetJson() const override;
+    virtual QList<AtlasFrame *> GetAtlasFrames() const override;
+    virtual QStringList GetFontUrls() const override;
     virtual void Refresh() override;
 };
 

@@ -41,7 +41,7 @@ void FontUndoCmd_AddLayer::redo()
     else
         pModel->ReAddLayer(m_iId);
 
-    m_ItemRef.WidgetRefreshData(m_iStateIndex);
+    m_ItemRef.FocusWidgetState(m_iStateIndex);
 }
 
 void FontUndoCmd_AddLayer::undo()
@@ -49,7 +49,7 @@ void FontUndoCmd_AddLayer::undo()
     FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
     pModel->RemoveLayer(m_iId);
     
-    m_ItemRef.WidgetRefreshData(m_iStateIndex);
+    m_ItemRef.FocusWidgetState(m_iStateIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ void FontUndoCmd_RemoveLayer::redo()
     
     pModel->RemoveLayer(m_iId);
     
-    m_ItemRef.WidgetRefreshData(m_iStateIndex);
+    m_ItemRef.FocusWidgetState(m_iStateIndex);
 }
 
 void FontUndoCmd_RemoveLayer::undo()
@@ -81,7 +81,7 @@ void FontUndoCmd_RemoveLayer::undo()
     
     pModel->ReAddLayer(m_iId);
     
-    m_ItemRef.WidgetRefreshData(m_iStateIndex);
+    m_ItemRef.FocusWidgetState(m_iStateIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ void FontUndoCmd_LayerRenderMode::redo()
     
     pModel->SetLayerRenderMode(m_iLayerId, m_eNewRenderMode);
     
-    m_ItemRef.WidgetRefreshData(m_iStateIndex);
+    m_ItemRef.FocusWidgetState(m_iStateIndex);
 }
 
 void FontUndoCmd_LayerRenderMode::undo()
@@ -115,7 +115,7 @@ void FontUndoCmd_LayerRenderMode::undo()
     
     pModel->SetLayerRenderMode(m_iLayerId, m_ePrevRenderMode);
     
-    m_ItemRef.WidgetRefreshData(m_iStateIndex);
+    m_ItemRef.FocusWidgetState(m_iStateIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ void FontUndoCmd_LayerOutlineThickness::redo()
     
     pModel->SetLayerOutlineThickness(m_iLayerId, m_fNewThickness);
     
-    m_ItemRef.WidgetRefreshData(m_iStateIndex);
+    m_ItemRef.FocusWidgetState(m_iStateIndex);
 }
 
 void FontUndoCmd_LayerOutlineThickness::undo()
@@ -149,7 +149,7 @@ void FontUndoCmd_LayerOutlineThickness::undo()
     
     pModel->SetLayerOutlineThickness(m_iLayerId, m_fPrevThickness);
     
-    m_ItemRef.WidgetRefreshData(m_iStateIndex);
+    m_ItemRef.FocusWidgetState(m_iStateIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,7 +176,7 @@ void FontUndoCmd_LayerColors::redo()
 
     pModel->SetLayerColors(m_iLayerId, m_NewTopColor, m_NewBotColor);
 
-    m_ItemRef.WidgetRefreshData(m_iStateIndex);
+    m_ItemRef.FocusWidgetState(m_iStateIndex);
 }
 
 void FontUndoCmd_LayerColors::undo()
@@ -185,7 +185,7 @@ void FontUndoCmd_LayerColors::undo()
 
     pModel->SetLayerColors(m_iLayerId, m_PrevTopColor, m_PrevBotColor);
 
-    m_ItemRef.WidgetRefreshData(m_iStateIndex);
+    m_ItemRef.FocusWidgetState(m_iStateIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,7 +219,7 @@ void FontUndoCmd_LayerOrder::redo()
         
     //m_pFontTableView->selectRow(m_iNewRowIndex);
     
-    m_ItemRef.WidgetRefreshData(m_iStateIndex);
+    m_ItemRef.FocusWidgetState(m_iStateIndex);
 }
 
 void FontUndoCmd_LayerOrder::undo()
@@ -234,6 +234,6 @@ void FontUndoCmd_LayerOrder::undo()
     
     //m_pFontTableView->selectRow(m_iPrevRowIndex);
     
-    m_ItemRef.WidgetRefreshData(m_iStateIndex);
+    m_ItemRef.FocusWidgetState(m_iStateIndex);
 }
 

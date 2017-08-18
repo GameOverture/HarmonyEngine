@@ -530,7 +530,7 @@ HyOpenGL::~HyOpenGL(void)
 	return hGLTextureArray;
 }
 
-/*virtual*/ void HyOpenGL::DeleteTextureArray(uint32 uiTextureHandle)
+/*virtual*/ void HyOpenGL::DeleteTexture(uint32 uiTextureHandle)
 {
 	glDeleteTextures(1, &uiTextureHandle);
 }

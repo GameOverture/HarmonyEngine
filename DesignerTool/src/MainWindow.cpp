@@ -237,8 +237,8 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     if(pItem == nullptr || pItem->GetType() == ITEM_Project)
         return;
     
-    Project *pItemProj = sm_pInstance->ui->explorer->GetCurProjSelected();
-    pItemProj->OpenItem(pItem);
+    Project *pCurProject = sm_pInstance->ui->explorer->GetCurProjSelected();
+    pCurProject->OpenItem(pItem);
     
     sm_pInstance->ui->explorer->SelectItem(pItem);
 

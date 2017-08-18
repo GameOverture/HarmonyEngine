@@ -58,18 +58,18 @@ IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pPro
     m_HyAppRef.Window().RemoveCamera(m_pCamera);
 }
 
-void IDraw::ApplyJsonData(bool bReloadInAssetManager)
+void IDraw::ApplyJsonData()
 {
     if(m_pProjItem == nullptr)
         return;
 
-    QJsonValue valueData = m_pProjItem->GetModel()->GetJson(false);
+    QJsonValue valueData = m_pProjItem->GetModel()->GetJson();
     QByteArray src = JsonValueToSrc(valueData);
 
     jsonxx::Value newValue;
     newValue.parse(src.toStdString());
 
-    OnApplyJsonData(newValue, bReloadInAssetManager);
+    OnApplyJsonData(newValue);
 }
 
 void IDraw::Show()

@@ -388,6 +388,10 @@ SpriteModel::SpriteModel(ProjectItem *pItem, QJsonArray stateArray) :   IModel(p
 {
 }
 
+/*virtual*/ void SpriteModel::OnSave() /*override*/
+{
+}
+
 QJsonObject SpriteModel::PopStateAt(uint32 uiIndex) /*override*/
 {
     QJsonObject retStateObj;
@@ -412,7 +416,7 @@ QJsonObject SpriteModel::PopStateAt(uint32 uiIndex) /*override*/
     return retStateObj;
 }
 
-/*virtual*/ QJsonValue SpriteModel::GetJson(bool bWritingToGameData) /*override*/
+/*virtual*/ QJsonValue SpriteModel::GetJson() const /*override*/
 {
     QJsonArray retArray;
     for(int i = 0; i < m_StateList.size(); ++i)
@@ -425,7 +429,7 @@ QJsonObject SpriteModel::PopStateAt(uint32 uiIndex) /*override*/
     return retArray;
 }
 
-/*virtual*/ QList<AtlasFrame *> SpriteModel::GetAtlasFrames() /*override*/
+/*virtual*/ QList<AtlasFrame *> SpriteModel::GetAtlasFrames() const /*override*/
 {
     QList<AtlasFrame *> retAtlasFrameList;
     for(int i = 0; i < m_StateList.size(); ++i)
@@ -437,7 +441,7 @@ QJsonObject SpriteModel::PopStateAt(uint32 uiIndex) /*override*/
     return retAtlasFrameList;
 }
 
-/*virtual*/ QStringList SpriteModel::GetFontUrls() /*override*/
+/*virtual*/ QStringList SpriteModel::GetFontUrls() const /*override*/
 {
     return QStringList();
 }

@@ -22,7 +22,7 @@ public:
     virtual void OnMouseMoveEvent(QMouseEvent *pEvent) override;
 
 protected:
-    virtual void OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) override;
+    virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;
     virtual void OnShow(IHyApplication &hyApp) override;
     virtual void OnHide(IHyApplication &hyApp) override;
     virtual void OnResizeRenderer() override;

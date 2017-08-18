@@ -304,7 +304,7 @@ ProjectItem *Project::GetCurrentOpenItem()
 void Project::OpenItem(ProjectItem *pItem)
 {
     if(m_pCurOpenItem && m_pCurOpenItem != pItem)
-        m_pCurOpenItem->RenderHide(*this);
+        m_pCurOpenItem->DrawHide();
 
     if(m_pCurOpenItem == pItem)
         return;
@@ -323,7 +323,7 @@ void Project::OpenItem(ProjectItem *pItem)
             m_pTabBar->setCurrentIndex(i);
             m_pTabBar->blockSignals(false);
 
-            m_pCurOpenItem->RenderShow(*this);
+            m_pCurOpenItem->DrawShow();
             break;
         }
     }
@@ -341,7 +341,7 @@ void Project::OpenItem(ProjectItem *pItem)
         m_pTabBar->setCurrentIndex(iIndex);
         m_pTabBar->blockSignals(false);
 
-        m_pCurOpenItem->RenderShow(*this);
+        m_pCurOpenItem->DrawShow();
     }
 
     ApplySaveEnables();
@@ -419,11 +419,11 @@ void Project::OnHarmonyLoaded()
         for(int i = 0; i < m_pTabBar->count(); ++i)
         {
             ProjectItem *pOpenItem = m_pTabBar->tabData(i).value<ProjectItem *>();
-            pOpenItem->WidgetRefreshDraw(*this);
+            pOpenItem->WidgetLoad(*this);
         }
 
         if(m_pTabBar->currentIndex() >= 0)
-            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->RenderShow(*this);
+            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->DrawShow();
     }
     
     MainWindow::SetSelectedProjWidgets(this);
@@ -544,15 +544,6 @@ QJsonObject Project::GetSubDirObj(HyGuiItemType eType)
     return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType))].toObject();
 }
 
-// TODO: Remove this
-void Project::RefreshCurrentItemDraw()
-{
-    ProjectItem *pCurrentItem = m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>();
-
-    pCurrentItem->WidgetRefreshDraw(*this);
-    pCurrentItem->RenderShow(*this);
-}
-
 bool Project::CloseAllTabs()
 {
     int iNumTabsOpened = m_pTabBar->count();
@@ -591,7 +582,7 @@ void Project::OnCloseTab(int iIndex)
     }
 
     MainWindow::CloseItem(pItem);
-    pItem->WidgetUnload(*this);
+    pItem->WidgetUnload();
 
     if(pItem == m_pCurOpenItem)
         m_pCurOpenItem = nullptr;

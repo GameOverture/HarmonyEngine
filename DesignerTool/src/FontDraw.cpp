@@ -7,7 +7,7 @@
 
 FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
                                                                     m_pPreviewTextCamera(nullptr),
-                                                                    m_pDrawAtlasPreview(nullptr),
+                                                                    m_pAtlasPreviewTexQuad(nullptr),
                                                                     m_DrawAtlasOutline(this),
                                                                     m_DividerLine(this),
                                                                     m_PreviewOriginHorz(this),
@@ -20,7 +20,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 
     m_Text.pos.Set(0.0f, PreviewOffsetY);
     m_Text.TextSetAlignment(HYALIGN_Center);
-    m_Text.TextSet("The Quick Brown Fox Jumped Over the Lazy Dog 1234567890");
+    m_Text.TextSet("1234567890");
     
     m_pCamera->SetViewport(0.0f, 0.5f, 1.0f, 0.5f);
 
@@ -45,46 +45,52 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 
 /*virtual*/ FontDraw::~FontDraw()
 {
-    delete m_pDrawAtlasPreview;
+    delete m_pAtlasPreviewTexQuad;
     m_HyAppRef.Window().RemoveCamera(m_pPreviewTextCamera);
 }
 
-/*virtual*/ void FontDraw::OnApplyJsonData(jsonxx::Value &valueRef, bool bReloadInAssetManager) /*override*/
+/*virtual*/ void FontDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
 {
-    m_Text.GuiOverrideData<HyText2dData>(valueRef, bReloadInAssetManager);
-}
+    texture_atlas_t *pFtglAtlas = static_cast<FontModel *>(m_pProjItem->GetModel())->GetFtglAtlas();
+    unsigned char *pAtlasPixelData = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPixelData();
+    uint uiAtlasPixelDataSize = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPixelDataSize();
+    if(pFtglAtlas == nullptr || pAtlasPixelData == nullptr)
+        return;
 
-void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelData, uint uiAtlasPixelDataSize)
-{
-    if(m_pDrawAtlasPreview && m_pDrawAtlasPreview->GetGraphicsApiHandle() != 0)
-        MainWindow::GetCurrentRenderer()->GetHarmonyRenderer()->DeleteTextureArray(m_pDrawAtlasPreview->GetGraphicsApiHandle());
-
-    // Upload texture to gfx api
-    pAtlas->id = MainWindow::GetCurrentRenderer()->GetHarmonyRenderer()->AddTexture(HYTEXTURE_R8G8B8A8, 0, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), pAtlasPixelData, uiAtlasPixelDataSize, HYTEXTURE_R8G8B8A8);
-
-    // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
-    delete m_pDrawAtlasPreview;
-    m_pDrawAtlasPreview = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), this);
-    m_pDrawAtlasPreview->Load();
-    m_pDrawAtlasPreview->SetTextureSource(0, 0, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height));
-    m_pDrawAtlasPreview->SetEnabled(true);
-
-    m_DrawAtlasOutline.SetAsQuad(static_cast<int>(pAtlas->width), static_cast<int>(pAtlas->height), true);
-
-    // Calculate the proper zoom amount to fit the whole atlas width (plus some extra margin) in preview window
-    float fExtraMargin = 25.0f;
-    float fZoomAmt = ((m_HyAppRef.Window().GetResolution().x * 100.0f) / (pAtlas->width + (fExtraMargin * 2.0f))) / 100.0f;
-    m_pCamera->SetZoom(fZoomAmt);
-
-    HyRectangle<float> atlasViewBounds = m_pCamera->GetWorldViewBounds();
-    m_pDrawAtlasPreview->pos.Set(atlasViewBounds.left + fExtraMargin, atlasViewBounds.top - pAtlas->height - fExtraMargin);
-    m_DrawAtlasOutline.pos.Set(m_pDrawAtlasPreview->pos.Get());
+    if(pFtglAtlas->id == 0)
+    {
+        if(m_pAtlasPreviewTexQuad && m_pAtlasPreviewTexQuad->GetGraphicsApiHandle() != 0)
+            MainWindow::GetCurrentRenderer()->GetHarmonyRenderer()->DeleteTexture(m_pAtlasPreviewTexQuad->GetGraphicsApiHandle());
+    
+        // Upload texture to gfx api
+        pFtglAtlas->id = MainWindow::GetCurrentRenderer()->GetHarmonyRenderer()->AddTexture(HYTEXTURE_R8G8B8A8, 0, static_cast<uint32>(pFtglAtlas->width), static_cast<uint32>(pFtglAtlas->height), pAtlasPixelData, uiAtlasPixelDataSize, HYTEXTURE_R8G8B8A8);
+    
+        // Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
+        delete m_pAtlasPreviewTexQuad;
+        m_pAtlasPreviewTexQuad = new HyTexturedQuad2d(pFtglAtlas->id, static_cast<uint32>(pFtglAtlas->width), static_cast<uint32>(pFtglAtlas->height), this);
+        m_pAtlasPreviewTexQuad->Load();
+        m_pAtlasPreviewTexQuad->SetTextureSource(0, 0, static_cast<uint32>(pFtglAtlas->width), static_cast<uint32>(pFtglAtlas->height));
+        m_pAtlasPreviewTexQuad->SetEnabled(true);
+    
+        m_DrawAtlasOutline.SetAsQuad(static_cast<int>(pFtglAtlas->width), static_cast<int>(pFtglAtlas->height), true);
+    
+        // Calculate the proper zoom amount to fit the whole atlas width (plus some extra margin) in preview window
+        float fExtraMargin = 25.0f;
+        float fZoomAmt = ((m_HyAppRef.Window().GetResolution().x * 100.0f) / (pFtglAtlas->width + (fExtraMargin * 2.0f))) / 100.0f;
+        m_pCamera->SetZoom(fZoomAmt);
+    
+        HyRectangle<float> atlasViewBounds = m_pCamera->GetWorldViewBounds();
+        m_pAtlasPreviewTexQuad->pos.Set(atlasViewBounds.left + fExtraMargin, atlasViewBounds.top - pFtglAtlas->height - fExtraMargin);
+        m_DrawAtlasOutline.pos.Set(m_pAtlasPreviewTexQuad->pos.Get());
+    }
+    
+    m_Text.GuiOverrideData<HyText2dData>(valueRef);
 }
 
 /*virtual*/ void FontDraw::OnShow(IHyApplication &hyApp)
 {
-    if(m_pDrawAtlasPreview)
-        m_pDrawAtlasPreview->SetEnabled(true);
+    if(m_pAtlasPreviewTexQuad)
+        m_pAtlasPreviewTexQuad->SetEnabled(true);
 
     m_DrawAtlasOutline.SetEnabled(true);
     m_DividerLine.SetEnabled(true);
@@ -110,86 +116,4 @@ void FontDraw::LoadNewAtlas(texture_atlas_t *pAtlas, unsigned char *pAtlasPixelD
 
 /*virtual*/ void FontDraw::OnUpdate() /*override*/
 {
-    texture_atlas_t *pAtlas = static_cast<FontModel *>(m_pProjItem->GetModel())->GetFtglAtlas();
-    unsigned char *pAtlasPixelData = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPixelData();
-    uint uiAtlasPixelDataSize = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPixelDataSize();
-    if(pAtlas == nullptr || pAtlasPixelData == nullptr)
-        return;
-
-    if(pAtlas->id == 0)
-        LoadNewAtlas(pAtlas, pAtlasPixelData, uiAtlasPixelDataSize);
-    
-       // GenerateTextPreview(static_cast<FontWidget *>(m_pProjItem->GetWidget())->GetCurStateData()->GetFontModel(), "The quick brown fox jumped over the lazy dog. 01234567890", pAtlas);
-//    if(static_cast<FontModel *>(m_pProjItem->GetModel())->ClearFontDirtyFlag())
-//    {
-//        QString sFontPreviewString = "The quick brown fox jumped over the lazy dog. 01234567890";
-//        FontModel *pFontModel = static_cast<FontWidget *>(m_pProjItem->GetWidget())->GetCurStateData()->GetFontModel();
-
-//        // Generate m_DrawFontPreviewList here if font preview is dirty
-//        for(int i = 0; i < m_DrawFontPreviewList.count(); ++i)
-//            delete m_DrawFontPreviewList[i];
-
-//        m_DrawFontPreviewList.clear();
-
-//        m_pCamera->pos.Set(0.0f, 0.0f);
-//        glm::vec2 ptGlyphPos = m_pCamera->pos.Get();
-
-//        float fTextPixelLength = 0.0f;
-
-//        // Each font layer
-//        for(int i = 0; i < pFontModel->rowCount(); ++i)
-//        {
-//            ptGlyphPos.x = 0.0f;
-
-//            for(int j = 0; j < sFontPreviewString.count(); ++j)
-//            {
-//                FontTypeface *pFontStage = pFontModel->GetStageRef(i);
-
-//                // NOTE: Assumes LITTLE ENDIAN
-//                QString sSingleChar = sFontPreviewString[j];
-//                texture_glyph_t *pGlyph = texture_font_get_glyph(pFontStage->pTextureFont, sSingleChar.toUtf8().data());
-
-//                if(pGlyph == NULL)
-//                {
-//                    return;
-//                }
-
-//                float fKerning = 0.0f;
-//                if(j != 0)
-//                {
-//                    char cPrevCharacter = sFontPreviewString.toStdString().c_str()[j - 1];
-//                    fKerning = texture_glyph_get_kerning(pGlyph, &cPrevCharacter);
-//                }
-
-//                ptGlyphPos.x += fKerning;
-//                ptGlyphPos.y = m_pCamera->pos.Y() - (pGlyph->height - pGlyph->offset_y);
-
-//                int iX = static_cast<int>(pGlyph->s0 * static_cast<float>(pAtlas->width));
-//                int iY = static_cast<int>(pGlyph->t0 * static_cast<float>(pAtlas->height));
-//                int iWidth = static_cast<int>(pGlyph->s1 * static_cast<float>(pAtlas->width)) - iX - 1;
-//                int iHeight = static_cast<int>(pGlyph->t1 * static_cast<float>(pAtlas->height)) - iY - 1;
-
-//                HyTexturedQuad2d *pDrawGlyphQuad = new HyTexturedQuad2d(pAtlas->id, static_cast<uint32>(pAtlas->width), static_cast<uint32>(pAtlas->height), nullptr);
-//                pDrawGlyphQuad->Load();
-//                pDrawGlyphQuad->SetTextureSource(iX, iY, iWidth, iHeight);
-//                pDrawGlyphQuad->pos.Set(ptGlyphPos.x + pGlyph->offset_x, ptGlyphPos.y);
-
-//                QColor topColor = pFontModel->GetLayerTopColor(i);
-//                QColor botColor = pFontModel->GetLayerBotColor(i);
-//                pDrawGlyphQuad->topColor.Set(topColor.redF(), topColor.greenF(), topColor.blueF());
-//                pDrawGlyphQuad->botColor.Set(botColor.redF(), botColor.greenF(), botColor.blueF());
-
-//                pDrawGlyphQuad->SetDisplayOrder(i * -1);
-
-//                m_DrawFontPreviewList.append(pDrawGlyphQuad);
-
-//                ptGlyphPos.x += pGlyph->advance_x;
-//            }
-
-//            if(fTextPixelLength < ptGlyphPos.x)
-//                fTextPixelLength = ptGlyphPos.x;
-//        }
-
-//        m_pCamera->pos.X(fTextPixelLength * 0.5f);
-//    }
 }

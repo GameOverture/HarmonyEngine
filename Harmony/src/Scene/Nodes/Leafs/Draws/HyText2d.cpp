@@ -778,9 +778,6 @@ offsetCalculation:
 			*reinterpret_cast<float *>(pRefDataWritePos) = CalculateAlpha() * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
 			pRefDataWritePos += sizeof(float);
 
-			//*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(pData->GetAtlas()->GetActualGfxApiTextureIndex(pData->GetAtlasGroupTextureIndex()));
-			//pRefDataWritePos += sizeof(float);
-
 			glm::vec2 vUV;
 
 			vUV.x = glyphRef.rSRC_RECT.right;//1.0f;

@@ -19,8 +19,7 @@
 
 struct FontTypeface
 {
-    int                 iReferenceCount;
-    int                 iTmpReferenceCount;
+    uint                uiReferenceCount;
 
     QString             sFontPath;
     texture_font_t *    pTextureFont;
@@ -28,8 +27,7 @@ struct FontTypeface
     float               fSize;
     float               fOutlineThickness;
 
-    FontTypeface(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :   iReferenceCount(0),
-                                                                                                            iTmpReferenceCount(0),
+    FontTypeface(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :   uiReferenceCount(0),
                                                                                                             sFontPath(sFontFilePath),
                                                                                                             pTextureFont(NULL),
                                                                                                             eMode(eRenderMode),
@@ -91,16 +89,14 @@ class FontModel : public IModel
     CheckBoxMapper *            m_pChkMapper_az;
     CheckBoxMapper *            m_pChkMapper_Symbols;
     LineEditMapper *            m_pTxtMapper_AdditionalSymbols;
-	
-	AtlasFrame *                m_pTrueAtlasFrame;
+
+    AtlasFrame *                m_pTrueAtlasFrame;
 
     QString                     m_sAvailableTypefaceGlyphs;
-	
-	QJsonArray					m_TypefaceArray;
 
-    QList<FontTypeface *>       m_MasterStageList;
-    bool                        m_bGlyphsDirty;
-    bool                        m_bFontPreviewDirty;
+    QJsonArray                  m_TypefaceArray;
+
+    QList<FontTypeface *>       m_MasterLayerList;
 
     texture_atlas_t *           m_pFtglAtlas;
     unsigned char *             m_pTrueAtlasPixelData;
@@ -119,24 +115,21 @@ public:
     LineEditMapper *GetAdditionalSymbolsMapper();
 
     QList<FontTypeface *> GetMasterStageList();
-	
-	QJsonObject GetTypefaceObj(int iTypefaceIndex);
+
+    QJsonObject GetTypefaceObj(int iTypefaceIndex);
     
     texture_atlas_t *GetFtglAtlas();
     AtlasFrame *GetAtlasFrame();
     unsigned char *GetAtlasPixelData();
     uint GetAtlasPixelDataSize();
     
-    void GeneratePreview(bool bStoreIntoAtlasManager = false);
-    
-    void SetGlyphsDirty();
+    void GeneratePreview();
 
-    bool ClearFontDirtyFlag();
-
+    virtual void OnSave() override;
     virtual QJsonObject PopStateAt(uint32 uiIndex) override;
-    virtual QJsonValue GetJson(bool bWritingToGameData) override;
-    virtual QList<AtlasFrame *> GetAtlasFrames() override;
-    virtual QStringList GetFontUrls() override;
+    virtual QJsonValue GetJson() const override;
+    virtual QList<AtlasFrame *> GetAtlasFrames() const override;
+    virtual QStringList GetFontUrls() const override;
     virtual void Refresh() override;
 };
 

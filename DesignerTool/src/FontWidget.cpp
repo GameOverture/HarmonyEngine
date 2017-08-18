@@ -27,16 +27,9 @@
 
 FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
                                                                 ui(new Ui::FontWidget),
-                                                                //m_pDraw(new FontDraw(*static_cast<FontModel *>(itemRef.GetModel()), hyAppRef)),
                                                                 m_ItemRef(itemRef)
 {
     ui->setupUi(this);
-
-    //m_pDraw->Load();
-    //m_pDraw->SetEnabled(false);
-
-    m_PrevAtlasSize.setWidth(0);
-    m_PrevAtlasSize.setHeight(0);
     
     ui->btnAddState->setDefaultAction(ui->actionAddState);
     ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
@@ -73,13 +66,7 @@ FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
     static_cast<FontModel *>(m_ItemRef.GetModel())->GetAdditionalSymbolsMapper()->AddLineEditMapping(ui->txtAdditionalSymbols);
 
     // ...set models
-    SetSelectedState(0);
-    
-    
-
-    UpdateActions();
-    
-    static_cast<FontModel *>(m_ItemRef.GetModel())->GeneratePreview();
+    FocusState(0);
 }
 
 FontWidget::~FontWidget()
@@ -91,25 +78,6 @@ FontWidget::~FontWidget()
 ProjectItem &FontWidget::GetItem()
 {
     return m_ItemRef;
-}
-
-void FontWidget::SetSelectedState(int iIndex)
-{
-    FontStateData *pCurStateData = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(iIndex));
-
-    ui->layersTableView->setModel(pCurStateData->GetFontLayersModel());
-    if(ui->layersTableView->currentIndex().row() < 0 && ui->layersTableView->model()->rowCount() > 0)
-        ui->layersTableView->selectRow(0);
-
-
-    pCurStateData->GetSizeMapper()->AddSpinBoxMapping(ui->sbSize);
-    pCurStateData->GetFontMapper()->AddComboBoxMapping(ui->cmbFontList);
-
-    ui->cmbStates->blockSignals(true);
-    ui->cmbStates->setCurrentIndex(iIndex);
-    ui->cmbStates->blockSignals(false);
-
-    UpdateActions();
 }
 
 void FontWidget::OnGiveMenuActions(QMenu *pMenu)
@@ -126,16 +94,6 @@ void FontWidget::OnGiveMenuActions(QMenu *pMenu)
     pMenu->addAction(ui->actionOrderLayerDownwards);
 }
 
-//void FontWidget::OnShow()
-//{
-//    m_pDraw->Show();
-//}
-
-//void FontWidget::OnHide()
-//{
-//    m_pDraw->Hide();
-//}
-
 QString FontWidget::GetFullItemName()
 {
     return m_ItemRef.GetName(true);
@@ -146,45 +104,31 @@ QComboBox *FontWidget::GetCmbStates()
     return ui->cmbStates;
 }
 
-void FontWidget::RefreshData(QVariant param)
+void FontWidget::FocusState(int iStateIndex)
 {
-    bool bParamOk = false;
-    int iStateAffected = param.toInt(&bParamOk);
-    if(bParamOk && iStateAffected >= 0)
-        SetSelectedState(iStateAffected);
+    if(iStateIndex >= 0)
+    {
+        FontStateData *pCurStateData = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
+    
+        ui->layersTableView->setModel(pCurStateData->GetFontLayersModel());
+        if(ui->layersTableView->currentIndex().row() < 0 && ui->layersTableView->model()->rowCount() > 0)
+            ui->layersTableView->selectRow(0);
+    
+    
+        pCurStateData->GetSizeMapper()->AddSpinBoxMapping(ui->sbSize);
+        pCurStateData->GetFontMapper()->AddComboBoxMapping(ui->cmbFontList);
+    
+        ui->cmbStates->blockSignals(true);
+        ui->cmbStates->setCurrentIndex(iStateIndex);
+        ui->cmbStates->blockSignals(false);
+    
+    }
 
-    static_cast<FontModel *>(m_ItemRef.GetModel())->SetGlyphsDirty();
-    static_cast<FontModel *>(m_ItemRef.GetModel())->GeneratePreview();
     UpdateActions();
 }
 
-//void FontWidget::RefreshDraw(IHyApplication &hyAppRef)
-//{
-//    delete m_pDraw;
-//    m_pDraw = new FontDraw(*static_cast<FontModel *>(m_ItemRef.GetModel()), hyAppRef);
-//}
-
 void FontWidget::UpdateActions()
 {
-    bool bGeneratePreview = false;
-
-    AtlasFrame *pAtlasFrame = static_cast<FontModel *>(m_ItemRef.GetModel())->GetAtlasFrame();
-
-    uint uiAtlasGrpIndex = 0;
-    if(pAtlasFrame != nullptr)
-        uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(pAtlasFrame->GetAtlasGrpId());
-
-    QSize curSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
-    if(m_PrevAtlasSize.width() < curSize.width() || m_PrevAtlasSize.height() < curSize.height())
-        bGeneratePreview = true;
-
-    m_PrevAtlasSize = curSize;
-
-//    QString sPrevSymbols = m_sAvailableTypefaceGlyphs;
-//    SetGlyphsDirty();
-//    if(sPrevSymbols != m_sAvailableTypefaceGlyphs)
-//        bGeneratePreview = true;
-
     ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
     ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
@@ -192,11 +136,6 @@ void FontWidget::UpdateActions()
     bool bFrameIsSelected = ui->layersTableView->model()->rowCount() > 0 && ui->layersTableView->currentIndex().row() >= 0;
     ui->actionOrderLayerUpwards->setEnabled(bFrameIsSelected && ui->layersTableView->currentIndex().row() != 0);
     ui->actionOrderLayerDownwards->setEnabled(bFrameIsSelected && ui->layersTableView->currentIndex().row() != ui->layersTableView->model()->rowCount() - 1);
-
-    if(bGeneratePreview)
-        static_cast<FontModel *>(m_ItemRef.GetModel())->GeneratePreview();
-
-    //m_bFontPreviewDirty = true;
 }
 
 FontStateData *FontWidget::GetCurStateData()
@@ -254,25 +193,7 @@ void FontWidget::on_txtAdditionalSymbols_editingFinished()
 
 void FontWidget::on_cmbStates_currentIndexChanged(int index)
 {
-    SetSelectedState(index);
-
-//    FontWidgetState *pFontState = ui->cmbStates->itemData(index).value<FontWidgetState *>();
-//    if(m_pCurFontState == pFontState)
-//        return;
-
-//    if(m_pCurFontState)
-//        m_pCurFontState->hide();
-
-//    ui->grpFontStateLayout->addWidget(pFontState);
-
-//#if _DEBUG
-//    int iDebugTest = ui->grpFontStateLayout->count(); // TODO: test to see if duplicates keep appending if you switch between the same two font states
-//#endif
-
-//    m_pCurFontState = pFontState;
-//    m_pCurFontState->show();
-
-    UpdateActions();
+    FocusState(index);
 }
 
 void FontWidget::on_actionAddState_triggered()

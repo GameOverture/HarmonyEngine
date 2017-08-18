@@ -154,7 +154,7 @@ void HyAtlas::OnRenderThread(IHyRenderer &rendererRef)
 	}
 	else // GetLoadState() == HYLOADSTATE_Discarded
 	{
-		rendererRef.DeleteTextureArray(m_uiGfxApiHandle);
+		rendererRef.DeleteTexture(m_uiGfxApiHandle);
 	}
 	m_csPixelData.Unlock();
 }

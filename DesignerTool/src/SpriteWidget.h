@@ -38,8 +38,6 @@ public:
     ~SpriteWidget();
     
     ProjectItem &GetItem();
-
-    void SetSelectedState(int iIndex);
     
     void OnGiveMenuActions(QMenu *pMenu);
     void GetSaveInfo(QJsonArray &spriteStateArrayRef);
@@ -49,7 +47,7 @@ public:
     void SetSelectedFrame(int iFrameIndex);
     void GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut);
 
-    void RefreshData(QVariant param);
+    void FocusState(int iStateIndex);
     void UpdateActions();
 
 private:

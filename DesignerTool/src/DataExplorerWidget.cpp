@@ -392,7 +392,7 @@ QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
 
 void DataExplorerWidget::PutItemOnClipboard(ProjectItem *pProjItem)
 {
-    QJsonValue itemValue = pProjItem->GetModel()->GetJson(false);
+    QJsonValue itemValue = pProjItem->GetModel()->GetJson();
 
     // STANDARD INFO
     QJsonObject clipboardObj;

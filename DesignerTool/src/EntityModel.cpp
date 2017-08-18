@@ -27,22 +27,26 @@ EntityModel::EntityModel(ProjectItem *pItem, QJsonArray stateArray) : IModel(pIt
 {
 }
 
+/*virtual*/ void EntityModel::OnSave() /*override*/
+{
+}
+
 /*virtual*/ QJsonObject EntityModel::PopStateAt(uint32 uiIndex) /*override*/
 {
     return QJsonObject();
 }
 
-/*virtual*/ QJsonValue EntityModel::GetJson(bool bWritingToGameData) /*override*/
+/*virtual*/ QJsonValue EntityModel::GetJson() const /*override*/
 {
     return QJsonValue();
 }
 
-/*virtual*/ QList<AtlasFrame *> EntityModel::GetAtlasFrames() /*override*/
+/*virtual*/ QList<AtlasFrame *> EntityModel::GetAtlasFrames() const /*override*/
 {
     return QList<AtlasFrame *>();
 }
 
-/*virtual*/ QStringList EntityModel::GetFontUrls() /*override*/
+/*virtual*/ QStringList EntityModel::GetFontUrls() const /*override*/
 {
     return QStringList();
 }

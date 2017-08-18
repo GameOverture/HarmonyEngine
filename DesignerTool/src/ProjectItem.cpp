@@ -113,7 +113,8 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 
 void ProjectItem::Save()
 {
-    m_SaveValue = m_pModel->GetJson(true);
+    m_pModel->OnSave();
+    m_SaveValue = m_pModel->GetJson();
 
     GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue);
     m_pUndoStack->setClean();
@@ -139,34 +140,12 @@ void ProjectItem::DiscardChanges()
     LoadModel();
 }
 
-void ProjectItem::WidgetRefreshDraw(IHyApplication &hyApp)
+void ProjectItem::WidgetLoad(IHyApplication &hyApp)
 {
     m_pModel->Refresh();
     
-    delete m_pDraw;
-    switch(m_eTYPE)
-    {
-    case ITEM_Sprite:
-        m_pDraw = new SpriteDraw(this, hyApp);
-        break;
-    case ITEM_Font:
-        m_pDraw = new FontDraw(this, hyApp);
-        break;
-    default:
-        HyGuiLog("Unimplemented WidgetRefreshDraw() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
-        break;
-    }
-
-    m_pDraw->ApplyJsonData(true);
+    WidgetUnload();
     
-    m_pDraw->Load();
-    m_pDraw->SetEnabled(false);
-}
-
-void ProjectItem::WidgetLoad(IHyApplication &hyApp)
-{
-    delete m_pWidget;
-    delete m_pDraw;
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
@@ -177,10 +156,6 @@ void ProjectItem::WidgetLoad(IHyApplication &hyApp)
         m_pWidget = new FontWidget(*this);
         m_pDraw = new FontDraw(this, hyApp);
         break;
-//    case ITEM_Audio:
-//        m_pWidget = new AudioWidget(*this);
-//        m_pDraw = new AudioDraw(*static_cast<AudioModel *>(m_pModel), hyApp);
-//        break;
     case ITEM_Entity:
         m_pWidget = new EntityWidget(*this);
         m_pDraw = new EntityDraw(this, hyApp);
@@ -190,12 +165,12 @@ void ProjectItem::WidgetLoad(IHyApplication &hyApp)
         break;
     }
     
-    m_pDraw->ApplyJsonData(true);
+    m_pDraw->ApplyJsonData();
     m_pDraw->Load();
     m_pDraw->SetEnabled(false);
 }
 
-void ProjectItem::WidgetUnload(IHyApplication &hyApp)
+void ProjectItem::WidgetUnload()
 {
     delete m_pWidget;
     m_pWidget = nullptr;
@@ -204,12 +179,12 @@ void ProjectItem::WidgetUnload(IHyApplication &hyApp)
     m_pDraw = nullptr;
 }
 
-void ProjectItem::RenderShow(IHyApplication &hyApp)
+void ProjectItem::DrawShow()
 {
     m_pDraw->Show();
 }
 
-void ProjectItem::RenderHide(IHyApplication &hyApp)
+void ProjectItem::DrawHide()
 {
     m_pDraw->Hide();
 }
@@ -224,7 +199,7 @@ void ProjectItem::BlockAllWidgetSignals(bool bBlock)
         (*iter)->blockSignals(bBlock);
 }
 
-void ProjectItem::WidgetRefreshData(QVariant param)
+void ProjectItem::FocusWidgetState(int iStateIndex)
 {
     if(m_pWidget == nullptr)
         return;
@@ -232,10 +207,10 @@ void ProjectItem::WidgetRefreshData(QVariant param)
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
-        static_cast<SpriteWidget *>(m_pWidget)->RefreshData(param);
+        static_cast<SpriteWidget *>(m_pWidget)->FocusState(iStateIndex);
         break;
     case ITEM_Font:
-        static_cast<FontWidget *>(m_pWidget)->RefreshData(param);
+        static_cast<FontWidget *>(m_pWidget)->FocusState(iStateIndex);
         break;
     default:
         HyGuiLog("Unimplemented ProjectItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
@@ -278,11 +253,13 @@ void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 
 void ProjectItem::on_undoStack_indexChanged(int iIndex)
 {
-    if(m_pDraw == nullptr) {
+    if(m_pDraw == nullptr)
+    {
         HyGuiLog("m_pDraw was nullptr in on_undoStack_indexChanged", LOGTYPE_Error);
+        return;
     }
-
-    // TODO: figure out if need to reload in asset manager
-    m_pDraw->ApplyJsonData(true);
+    
+    m_pModel->Refresh();
+    m_pDraw->ApplyJsonData();
 }
 
