@@ -175,6 +175,8 @@ Project::Project(const QString sProjectFilePath) :  DataExplorerItem(ITEM_Projec
                     case ITEM_DirSpine:
                     case ITEM_DirShaders:
                     case ITEM_DirEntities:
+                        pNewDataItem = new ProjectItem(*this, ITEM_Entity, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
+                        break;
                     case ITEM_DirAtlases:
                     default:
                         { HyGuiLog("Unknown item type in ItemProject!", LOGTYPE_Error); }

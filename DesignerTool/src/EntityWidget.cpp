@@ -7,6 +7,12 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(pare
 {
     ui->setupUi(this);
 
+    ui->btnAddState->setDefaultAction(ui->actionAddState);
+    ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
+    ui->btnRenameState->setDefaultAction(ui->actionRenameState);
+    ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
+    ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
+
     ui->childrenTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->childrenTree->setDragEnabled(true);
     ui->childrenTree->setDropIndicatorShown(true);
