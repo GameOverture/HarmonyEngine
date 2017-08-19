@@ -18,7 +18,7 @@
 #include "Project.h"
 #include "HyGuiDebugger.h"
 
-#include "QtWaitingSpinner/waitingspinnerwidget.h"
+#include "_Dependencies/QtWaitingSpinner/waitingspinnerwidget.h"
 
 namespace Ui {
 class MainWindow;

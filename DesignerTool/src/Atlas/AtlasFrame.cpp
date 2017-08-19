@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "AtlasFrame.h"
-#include "scriptum/imagepacker.h"
+#include "_Dependencies/scriptum/imagepacker.h"
 
 #include "AtlasWidget.h"
 

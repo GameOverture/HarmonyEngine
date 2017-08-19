@@ -15,143 +15,143 @@ CONFIG += axcontainer
 CONFIG += no_keywords
 
 SOURCES += main.cpp \
-    DlgNewProject.cpp \
-    WidgetOutputLog.cpp \
     MainWindow.cpp \
-    DlgNewItem.cpp \
-    scriptum/imagecrop.cpp \
-    scriptum/imagepacker.cpp \
-    scriptum/imagesort.cpp \
-    scriptum/maxrects.cpp \
-    DlgInputName.cpp \
-    WidgetLiveVariable.cpp \
-    WidgetLiveVarManager.cpp \
     HyGuiRenderer.cpp \
-    DlgAtlasGroupSettings.cpp \
     HyGuiDebugger.cpp \
-    DlgSetEngineLocation.cpp \
-    DlgColorPicker.cpp \
-    WidgetColor.cpp \
-    QtWaitingSpinner/waitingspinnerwidget.cpp \
-    WidgetRangedSlider.cpp \
-    WidgetGradientEditor.cpp \
     IDraw.cpp \
-    SpriteDraw.cpp \
-    SpriteWidget.cpp \
-    FontWidget.cpp \
-    AudioWidget.cpp \
-    AudioWidgetBank.cpp \
-    AudioWidgetManager.cpp \
-    AudioModelView.cpp \
-    AudioWidgetState.cpp \
-    FontModelView.cpp \
-    FontUndoCmds.cpp \
-    SpriteModelView.cpp \
-    SpriteUndoCmds.cpp \
-    Project.cpp \
-    AtlasFrame.cpp \
-    AudioWave.cpp \
     HyGuiGlobal.cpp \
-    FontDraw.cpp \
-    AudioDraw.cpp \
-    FontItem.cpp \
-    SpriteModels.cpp \
-    ProjectItem.cpp \
-    FontModels.cpp \
-    AtlasDraw.cpp \
-    AtlasModel.cpp \
-    AtlasWidget.cpp \
-    ProjectDraw.cpp \
     IModel.cpp \
-    DlgProjectSettings.cpp \
-    EntityWidget.cpp \
-    EntityModel.cpp \
-    EntityDraw.cpp \
-    EntSpriteFrame.cpp \
-    DataExplorerWidget.cpp \
-    DataExplorerItem.cpp
+    _Dependencies/QtWaitingSpinner/waitingspinnerwidget.cpp \
+    _Dependencies/scriptum/imagecrop.cpp \
+    _Dependencies/scriptum/imagepacker.cpp \
+    _Dependencies/scriptum/imagesort.cpp \
+    _Dependencies/scriptum/maxrects.cpp \
+    Atlas/AtlasDraw.cpp \
+    Atlas/AtlasFrame.cpp \
+    Atlas/AtlasModel.cpp \
+    Atlas/AtlasWidget.cpp \
+    Audio/AudioDraw.cpp \
+    Audio/AudioModelView.cpp \
+    Audio/AudioWave.cpp \
+    Audio/AudioWidget.cpp \
+    Audio/AudioWidgetBank.cpp \
+    Audio/AudioWidgetManager.cpp \
+    Audio/AudioWidgetState.cpp \
+    Dialogs/DlgAtlasGroupSettings.cpp \
+    Dialogs/DlgColorPicker.cpp \
+    Dialogs/DlgInputName.cpp \
+    Dialogs/DlgNewItem.cpp \
+    Dialogs/DlgNewProject.cpp \
+    Dialogs/DlgProjectSettings.cpp \
+    Dialogs/DlgSetEngineLocation.cpp \
+    Entity/EntityDraw.cpp \
+    Entity/EntityModel.cpp \
+    Entity/EntityWidget.cpp \
+    Entity/EntSpriteFrame.cpp \
+    Font/FontDraw.cpp \
+    Font/FontItem.cpp \
+    Font/FontModels.cpp \
+    Font/FontModelView.cpp \
+    Font/FontUndoCmds.cpp \
+    Font/FontWidget.cpp \
+    Project/DataExplorerItem.cpp \
+    Project/DataExplorerWidget.cpp \
+    Project/Project.cpp \
+    Project/ProjectDraw.cpp \
+    Project/ProjectItem.cpp \
+    Sprite/SpriteDraw.cpp \
+    Sprite/SpriteModels.cpp \
+    Sprite/SpriteModelView.cpp \
+    Sprite/SpriteUndoCmds.cpp \
+    Sprite/SpriteWidget.cpp \
+    Widget/WidgetColor.cpp \
+    Widget/WidgetGradientEditor.cpp \
+    Widget/WidgetLiveVariable.cpp \
+    Widget/WidgetLiveVarManager.cpp \
+    Widget/WidgetOutputLog.cpp \
+    Widget/WidgetRangedSlider.cpp
 
 HEADERS  += \
-    DlgNewProject.h \
-    WidgetOutputLog.h \
     MainWindow.h \
-    DlgNewItem.h \
-    scriptum/imagepacker.h \
-    scriptum/maxrects.h \
-    DlgInputName.h \
-    WidgetLiveVariable.h \
-    WidgetLiveVarManager.h \
     HyGuiRenderer.h \
-    DlgAtlasGroupSettings.h \
     HyGuiDebugger.h \
-    DlgSetEngineLocation.h \
-    DlgColorPicker.h \
-    WidgetColor.h \
-    QtWaitingSpinner/waitingspinnerwidget.h \
-    WidgetRangedSlider.h \
-    WidgetGradientEditor.h \
     IDraw.h \
-    SpriteDraw.h \
-    SpriteWidget.h \
-    FontWidget.h \
-    AudioWidget.h \
     UndoCmds.h \
-    SpriteUndoCmds.h \
-    SpriteModelView.h \
-    FontUndoCmds.h \
-    FontModelView.h \
-    AudioWidgetState.h \
-    AudioWidgetBank.h \
-    AudioWidgetManager.h \
-    AudioModelView.h \
-    Project.h \
-    AtlasFrame.h \
-    AudioWave.h \
     HyGuiGlobal.h \
-    FontDraw.h \
-    AudioDraw.h \
-    FontItem.h \
-    SpriteModels.h \
-    ProjectItem.h \
-    FontModels.h \
-    AtlasDraw.h \
-    AtlasModel.h \
-    AtlasWidget.h \
-    ProjectDraw.h \
     IModel.h \
-    DlgProjectSettings.h \
-    EntityWidget.h \
-    EntityModel.h \
-    EntityDraw.h \
-    EntSpriteFrame.h \
-    DataExplorerWidget.h \
-    DataExplorerItem.h
+    _Dependencies/QtWaitingSpinner/waitingspinnerwidget.h \
+    _Dependencies/scriptum/imagepacker.h \
+    _Dependencies/scriptum/maxrects.h \
+    Atlas/AtlasDraw.h \
+    Atlas/AtlasFrame.h \
+    Atlas/AtlasModel.h \
+    Atlas/AtlasWidget.h \
+    Audio/AudioDraw.h \
+    Audio/AudioModelView.h \
+    Audio/AudioWave.h \
+    Audio/AudioWidget.h \
+    Audio/AudioWidgetBank.h \
+    Audio/AudioWidgetManager.h \
+    Audio/AudioWidgetState.h \
+    Dialogs/DlgAtlasGroupSettings.h \
+    Dialogs/DlgColorPicker.h \
+    Dialogs/DlgInputName.h \
+    Dialogs/DlgNewItem.h \
+    Dialogs/DlgNewProject.h \
+    Dialogs/DlgProjectSettings.h \
+    Dialogs/DlgSetEngineLocation.h \
+    Entity/EntityDraw.h \
+    Entity/EntityModel.h \
+    Entity/EntityWidget.h \
+    Entity/EntSpriteFrame.h \
+    Font/FontDraw.h \
+    Font/FontItem.h \
+    Font/FontModels.h \
+    Font/FontModelView.h \
+    Font/FontUndoCmds.h \
+    Font/FontWidget.h \
+    Project/DataExplorerItem.h \
+    Project/DataExplorerWidget.h \
+    Project/Project.h \
+    Project/ProjectDraw.h \
+    Project/ProjectItem.h \
+    Sprite/SpriteDraw.h \
+    Sprite/SpriteModels.h \
+    Sprite/SpriteModelView.h \
+    Sprite/SpriteUndoCmds.h \
+    Sprite/SpriteWidget.h \
+    Widget/WidgetColor.h \
+    Widget/WidgetGradientEditor.h \
+    Widget/WidgetLiveVariable.h \
+    Widget/WidgetLiveVarManager.h \
+    Widget/WidgetOutputLog.h \
+    Widget/WidgetRangedSlider.h
 
 FORMS    += \
-    DlgNewProject.ui \
-    WidgetOutputLog.ui \
     MainWindow.ui \
-    DlgNewItem.ui \
-    DlgInputName.ui \
-    WidgetLiveVariable.ui \
-    WidgetLiveVarManager.ui \
-    DlgAtlasGroupSettings.ui \
-    DlgSetEngineLocation.ui \
-    DlgColorPicker.ui \
-    WidgetColor.ui \
-    WidgetRangedSlider.ui \
-    WidgetGradientEditor.ui \
-    SpriteWidget.ui \
-    FontWidget.ui \
-    AudioWidget.ui \
-    AudioWidgetBank.ui \
-    AudioWidgetManager.ui \
-    AudioWidgetState.ui \
-    AtlasWidget.ui \
-    DlgProjectSettings.ui \
-    EntityWidget.ui \
-    EntSpriteFrame.ui \
-    DataExplorerWidget.ui
+    Atlas/AtlasWidget.ui \
+    Audio/AudioWidget.ui \
+    Audio/AudioWidgetBank.ui \
+    Audio/AudioWidgetManager.ui \
+    Audio/AudioWidgetState.ui \
+    Dialogs/DlgAtlasGroupSettings.ui \
+    Dialogs/DlgColorPicker.ui \
+    Dialogs/DlgInputName.ui \
+    Dialogs/DlgNewItem.ui \
+    Dialogs/DlgNewProject.ui \
+    Dialogs/DlgProjectSettings.ui \
+    Dialogs/DlgSetEngineLocation.ui \
+    Entity/EntityWidget.ui \
+    Entity/EntSpriteFrame.ui \
+    Font/FontWidget.ui \
+    Project/DataExplorerWidget.ui \
+    Sprite/SpriteWidget.ui \
+    Widget/WidgetColor.ui \
+    Widget/WidgetGradientEditor.ui \
+    Widget/WidgetLiveVariable.ui \
+    Widget/WidgetLiveVarManager.ui \
+    Widget/WidgetOutputLog.ui \
+    Widget/WidgetRangedSlider.ui
 
 RC_FILE = DesignerTool.rc
 
@@ -159,6 +159,15 @@ DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER HY_PLATFORM_GU
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/bin/x64/ -lHarmonyQt
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../Harmony/bin/x64/ -lHarmonyQtd
+
+INCLUDEPATH += "$$PWD/Atlas"
+INCLUDEPATH += "$$PWD/Audio"
+INCLUDEPATH += "$$PWD/Dialogs"
+INCLUDEPATH += "$$PWD/Entity"
+INCLUDEPATH += "$$PWD/Font"
+INCLUDEPATH += "$$PWD/Project"
+INCLUDEPATH += "$$PWD/Sprite"
+INCLUDEPATH += "$$PWD/Widget"
 
 INCLUDEPATH += "$$PWD/../../Harmony/include"
 DEPENDPATH += "$$PWD/../../Harmony/include"

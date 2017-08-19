@@ -13,7 +13,7 @@
 #include <QAbstractListModel>
 
 #include "AtlasFrame.h"
-#include "scriptum/imagepacker.h"
+#include "_Dependencies/scriptum/imagepacker.h"
 
 class AtlasModel : public QAbstractListModel
 {
