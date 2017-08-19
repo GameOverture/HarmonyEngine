@@ -114,6 +114,8 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 void ProjectItem::Save()
 {
     m_pModel->Refresh();
+
+    m_pModel->OnSave();
     m_SaveValue = m_pModel->GetJson();
 
     GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue);
@@ -121,7 +123,6 @@ void ProjectItem::Save()
 
     m_bExistencePendingSave = false;
 
-    m_pModel->OnSave();
 }
 
 bool ProjectItem::IsExistencePendingSave()
@@ -142,41 +143,62 @@ void ProjectItem::DiscardChanges()
     LoadModel();
 }
 
-void ProjectItem::WidgetLoad(IHyApplication &hyApp)
+void ProjectItem::WidgetLoad()
 {
     m_pModel->Refresh();
-    
     WidgetUnload();
     
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
         m_pWidget = new SpriteWidget(*this);
-        m_pDraw = new SpriteDraw(this, hyApp);
         break;
     case ITEM_Font:
         m_pWidget = new FontWidget(*this);
-        m_pDraw = new FontDraw(this, hyApp);
         break;
     case ITEM_Entity:
         m_pWidget = new EntityWidget(*this);
-        m_pDraw = new EntityDraw(this, hyApp);
         break;
     default:
         HyGuiLog("Unimplemented WidgetLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
-    
-    m_pDraw->ApplyJsonData();
-    m_pDraw->Load();
-    m_pDraw->SetEnabled(false);
 }
 
 void ProjectItem::WidgetUnload()
 {
     delete m_pWidget;
     m_pWidget = nullptr;
-    
+}
+
+void ProjectItem::DrawLoad(IHyApplication &hyApp)
+{
+    m_pModel->Refresh();
+    DrawUnload();
+
+    switch(m_eTYPE)
+    {
+    case ITEM_Sprite:
+        m_pDraw = new SpriteDraw(this, hyApp);
+        break;
+    case ITEM_Font:
+        m_pDraw = new FontDraw(this, hyApp);
+        break;
+    case ITEM_Entity:
+        m_pDraw = new EntityDraw(this, hyApp);
+        break;
+    default:
+        HyGuiLog("Unimplemented DrawLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        break;
+    }
+
+    m_pDraw->ApplyJsonData();
+    m_pDraw->Load();
+    m_pDraw->SetEnabled(false);
+}
+
+void ProjectItem::DrawUnload()
+{
     delete m_pDraw;
     m_pDraw = nullptr;
 }

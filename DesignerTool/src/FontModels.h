@@ -29,7 +29,7 @@ struct FontTypeface
 
     FontTypeface(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :   uiReferenceCount(0),
                                                                                                             sFontPath(sFontFilePath),
-                                                                                                            pTextureFont(NULL),
+                                                                                                            pTextureFont(nullptr),
                                                                                                             eMode(eRenderMode),
                                                                                                             fSize(fSize),
                                                                                                             fOutlineThickness(fOutlineThickness)

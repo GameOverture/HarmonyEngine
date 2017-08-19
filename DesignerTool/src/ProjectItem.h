@@ -69,9 +69,11 @@ public:
     void DeleteFromProject();
     
 private:
-    void WidgetLoad(IHyApplication &hyApp);
+    void WidgetLoad();
     void WidgetUnload();
     
+    void DrawLoad(IHyApplication &hyApp);
+    void DrawUnload();
     void DrawShow();
     void DrawHide();
 

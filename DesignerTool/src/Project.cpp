@@ -331,7 +331,8 @@ void Project::OpenItem(ProjectItem *pItem)
     // Add tab, otherwise
     if(bAlreadyLoaded == false)
     {
-        m_pCurOpenItem->WidgetLoad(*this);
+        m_pCurOpenItem->WidgetLoad();
+        m_pCurOpenItem->DrawLoad(*this);
 
         m_pTabBar->blockSignals(true);
         int iIndex = m_pTabBar->addTab(m_pCurOpenItem->GetIcon(m_pCurOpenItem->IsExistencePendingSave() ? SUBICON_New : SUBICON_None), m_pCurOpenItem->GetName(false));
@@ -419,7 +420,7 @@ void Project::OnHarmonyLoaded()
         for(int i = 0; i < m_pTabBar->count(); ++i)
         {
             ProjectItem *pOpenItem = m_pTabBar->tabData(i).value<ProjectItem *>();
-            pOpenItem->WidgetLoad(*this);
+            pOpenItem->DrawLoad(*this);
         }
 
         if(m_pTabBar->currentIndex() >= 0)
@@ -583,6 +584,7 @@ void Project::OnCloseTab(int iIndex)
 
     MainWindow::CloseItem(pItem);
     pItem->WidgetUnload();
+    pItem->DrawUnload();
 
     if(pItem == m_pCurOpenItem)
         m_pCurOpenItem = nullptr;
