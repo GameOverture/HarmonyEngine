@@ -113,13 +113,15 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 
 void ProjectItem::Save()
 {
-    m_pModel->OnSave();
+    m_pModel->Refresh();
     m_SaveValue = m_pModel->GetJson();
 
     GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue);
     m_pUndoStack->setClean();
 
     m_bExistencePendingSave = false;
+
+    m_pModel->OnSave();
 }
 
 bool ProjectItem::IsExistencePendingSave()

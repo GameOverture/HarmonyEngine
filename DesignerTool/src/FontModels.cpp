@@ -376,8 +376,8 @@ void FontModel::GeneratePreview()
     fontObj.insert("checksum", m_pTrueAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetImageChecksum())));
     fontObj.insert("id", m_pTrueAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetId())));
 
-    fontObj.insert("subAtlasWidth", QJsonValue(m_pTrueAtlasFrame->GetSize().width()));
-    fontObj.insert("subAtlasHeight", QJsonValue(m_pTrueAtlasFrame->GetSize().height()));
+    fontObj.insert("subAtlasWidth", m_pTrueAtlasFrame == nullptr ? 0 : QJsonValue(m_pTrueAtlasFrame->GetSize().width()));
+    fontObj.insert("subAtlasHeight", m_pTrueAtlasFrame == nullptr ? 0 : QJsonValue(m_pTrueAtlasFrame->GetSize().height()));
     
     QJsonObject availableGlyphsObj;
     availableGlyphsObj.insert("0-9", m_pChkMapper_09->IsChecked());
