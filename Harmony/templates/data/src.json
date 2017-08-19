@@ -10,7 +10,7 @@
         }
     ],
     "itemName": "+Hy/+HyFont",
-    "itemType": "Fonts",
+    "itemType": "Font",
     "src": {
         "availableGlyphs": {
             "0-9": true,

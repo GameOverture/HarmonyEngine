@@ -320,6 +320,8 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 			m_StateColors[i]->m_LayerColors[j]->botColor.Set(pTextData->GetDefaultColor(i, j, false));
 		}
 	}
+
+	m_bIsDirty = true;
 }
 
 /*virtual*/ void HyText2d::OnLoaded()

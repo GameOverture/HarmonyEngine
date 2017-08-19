@@ -200,7 +200,7 @@ void AtlasWidget::on_btnAddImages_clicked()
                                                                &sSelectedFilter);
 
     if(sImportImgList.empty() == false)
-        m_pModel->Repack(ui->cmbAtlasGroups->currentIndex(), QSet<int>(), m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex())));
+        m_pModel->Repack(ui->cmbAtlasGroups->currentIndex(), QSet<int>(), m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex()), ITEM_AtlasImage));
     
     RefreshLcds();
 }
@@ -226,7 +226,7 @@ void AtlasWidget::on_btnAddDir_clicked()
     }
 
     if(sImportImgList.empty() == false)
-        m_pModel->Repack(ui->cmbAtlasGroups->currentIndex(), QSet<int>(), m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex())));
+        m_pModel->Repack(ui->cmbAtlasGroups->currentIndex(), QSet<int>(), m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex()), ITEM_AtlasImage));
     
     RefreshLcds();
 }

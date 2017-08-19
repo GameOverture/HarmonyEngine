@@ -115,7 +115,7 @@ public:
     void RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinquishList);
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    QSet<AtlasFrame *> ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId);
+    QSet<AtlasFrame *> ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId, HyGuiItemType eType);
     AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, HyGuiItemType eType);
 
     bool DoesImageExist(quint32 uiChecksum);

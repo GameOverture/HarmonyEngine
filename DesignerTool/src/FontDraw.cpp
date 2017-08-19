@@ -85,6 +85,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
     }
     
     m_Text.GuiOverrideData<HyText2dData>(valueRef);
+    m_Text.TextSet("1234567890");
 }
 
 /*virtual*/ void FontDraw::OnShow(IHyApplication &hyApp)

@@ -267,21 +267,36 @@ void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
     QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
     QJsonObject pasteObj = pasteDoc.object();
 
-    // Import any missing resources into managers (images, fonts, audio...)
-    //
-    // Fonts:
-    QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_DirFonts));
-    QJsonArray fontArray = pasteObj["fonts"].toArray();
-    for(int i = 0; i < fontArray.size(); ++i)
+    // Determine the pasted item type
+    HyGuiItemType ePasteItemType = ITEM_Unknown;
+    QString sItemType = pasteObj["itemType"].toString();
+    QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
+    for(int i = 0; i < subDirList.size(); ++i)
     {
-        QFileInfo pasteFontFileInfo(fontArray[i].toString());
+        HyGuiItemType eItemType = HyGlobal::GetCorrespondingItemFromDir(subDirList[i]);
 
-        if(QFile::copy(pasteFontFileInfo.absoluteFilePath(), sFontMetaDir % "/" % pasteFontFileInfo.fileName()))
-            HyGuiLog("Paste Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
+        if(sItemType == HyGlobal::ItemName(eItemType))
+        {
+            ePasteItemType = eItemType;
+            break;
+        }
     }
 
-    // Images:
-    // Copy images to meta-temp dir
+    // Import any missing fonts (.ttf)
+    if(ePasteItemType == ITEM_Font)
+    {
+        QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_DirFonts));
+        QJsonArray fontArray = pasteObj["fonts"].toArray();
+        for(int i = 0; i < fontArray.size(); ++i)
+        {
+            QFileInfo pasteFontFileInfo(fontArray[i].toString());
+
+            if(QFile::copy(pasteFontFileInfo.absoluteFilePath(), sFontMetaDir % "/" % pasteFontFileInfo.fileName()))
+                HyGuiLog("Paste Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
+        }
+    }
+
+    // Copy images to meta-temp dir first
     QJsonArray imageArray = pasteObj["images"].toArray();
     for(int i = 0; i < imageArray.size(); ++i)
     {
@@ -305,21 +320,9 @@ void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
         uiAtlasGrpId = pProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
 
     // Repack this atlas group with imported images
-    QSet<AtlasFrame *> importedFramesSet = pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId);
+    QSet<AtlasFrame *> importedFramesSet = pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId, (ePasteItemType == ITEM_Font) ? ITEM_Font : ITEM_AtlasImage);
     if(importedFramesSet.empty() == false)
         pProject->GetAtlasModel().Repack(pProject->GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId), QSet<int>(), importedFramesSet);
-
-    // Determine the type of the pasted item
-    HyGuiItemType ePasteItemType;
-    QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
-    for(int i = 0; i < subDirList.size(); ++i)
-    {
-        if(pasteObj["itemType"] == HyGlobal::ItemName(subDirList[i]))
-        {
-            ePasteItemType = HyGlobal::GetCorrespondingItemFromDir(subDirList[i]);
-            break;
-        }
-    }
 
     // Replace any image "id" with the newly imported frames' ids
     if(pasteObj["src"].isArray())
@@ -396,7 +399,7 @@ void DataExplorerWidget::PutItemOnClipboard(ProjectItem *pProjItem)
 
     // STANDARD INFO
     QJsonObject clipboardObj;
-    clipboardObj.insert("itemType", HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(pProjItem->GetType())));
+    clipboardObj.insert("itemType", HyGlobal::ItemName(pProjItem->GetType()));
     clipboardObj.insert("itemName", pProjItem->GetName(true));
     clipboardObj.insert("src", itemValue);
 

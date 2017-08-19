@@ -578,7 +578,7 @@ void AtlasModel::RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinq
 //    RemoveDependency(relinquishList[i], pItem);
 }
 
-QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId)
+QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId, HyGuiItemType eType)
 {
     QSet<AtlasFrame *> returnSet;
 
@@ -588,7 +588,7 @@ QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList, quint32 
 
         QImage newImage(fileInfo.absoluteFilePath());
 
-        returnSet.insert(ImportImage(fileInfo.baseName(), newImage, uiAtlasGrpId, ITEM_AtlasImage));
+        returnSet.insert(ImportImage(fileInfo.baseName(), newImage, uiAtlasGrpId, eType));
     }
 
     return returnSet;
