@@ -148,7 +148,9 @@ Project::Project(const QString sProjectFilePath) :  DataExplorerItem(ITEM_Projec
                         DataExplorerItem *pPrefixItem = new DataExplorerItem(ITEM_Prefix, sSubDirName % "/" % sCurPrefix);
                         QTreeWidgetItem *pNewPrefixTreeWidget = pPrefixItem->GetTreeItem();
 
-                        pCurPrefixTreeItem->addChild(pNewPrefixTreeWidget);
+                        if(sCurPrefix[0] != HYDEFAULT_PrefixChar)
+                            pCurPrefixTreeItem->addChild(pNewPrefixTreeWidget);
+
                         pCurPrefixTreeItem = pNewPrefixTreeWidget;
                     }
                 }
@@ -178,7 +180,8 @@ Project::Project(const QString sProjectFilePath) :  DataExplorerItem(ITEM_Projec
                         { HyGuiLog("Unknown item type in ItemProject!", LOGTYPE_Error); }
                     }
 
-                    pCurPrefixTreeItem->addChild(pNewDataItem->GetTreeItem());
+                    if(sCurPrefix[0] != HYDEFAULT_PrefixChar)
+                        pCurPrefixTreeItem->addChild(pNewDataItem->GetTreeItem());
 
 #ifdef RESAVE_ENTIRE_PROJECT
                     static_cast<ProjectItem *>(pNewDataItem)->Save();

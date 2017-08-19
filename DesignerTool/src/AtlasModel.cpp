@@ -211,10 +211,13 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
             else
                 pNewFrame->ClearError(GUIFRAMEERROR_CannotFindMetaImg);
 
-            if(pFrameParent)
-                pFrameParent->addChild(pNewFrame->GetTreeItem());
-            else
-                m_TopLevelTreeItemList.append(pNewFrame->GetTreeItem());
+            if(pNewFrame->GetName()[0] != HYDEFAULT_PrefixChar)
+            {
+                if(pFrameParent)
+                    pFrameParent->addChild(pNewFrame->GetTreeItem());
+                else
+                    m_TopLevelTreeItemList.append(pNewFrame->GetTreeItem());
+            }
         }
     }
     else

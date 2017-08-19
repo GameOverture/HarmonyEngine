@@ -21,19 +21,9 @@ HyDiagOutput::HyDiagOutput() :	m_dFrameTime_Low(9999.0),
 								m_txtAvgFrameHigh(HY_SYSTEM_FONT, this),
 								m_txtFps(HY_SYSTEM_FONT, this)
 {
-	m_txtLastFrameTime.TextSetState(HY_SYSTEM_FONT_STATE);
-
-	m_txtAvgFrame.TextSetState(HY_SYSTEM_FONT_STATE);
 	m_txtAvgFrame.pos.Y(-HY_SYSTEM_FONT_SIZE);
-
-	m_txtAvgFrameLow.TextSetState(HY_SYSTEM_FONT_STATE);
-	m_txtAvgFrameLow.TextSetState(1);
 	m_txtAvgFrameLow.pos.Y(-HY_SYSTEM_FONT_SIZE * 2.0f);
-
-	m_txtAvgFrameHigh.TextSetState(HY_SYSTEM_FONT_STATE);
 	m_txtAvgFrameHigh.pos.Y(-HY_SYSTEM_FONT_SIZE * 3.0f);
-
-	m_txtFps.TextSetState(HY_SYSTEM_FONT_STATE);
 	m_txtFps.pos.Y(-HY_SYSTEM_FONT_SIZE * 4.0f);
 
 	SetDisplayOrder(HY_SYSTEM_FONT_DISPLAYORDER);
