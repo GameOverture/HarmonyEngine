@@ -118,6 +118,52 @@
     </layout>
    </item>
    <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>GroupBox</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QComboBox" name="comboBox">
+        <item>
+         <property name="text">
+          <string>Static</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Kinematic</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Dynamic</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>GroupBox</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QComboBox" name="comboBox_2"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Children</string>
@@ -136,7 +182,7 @@
   </layout>
   <action name="actionRenameState">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
    </property>
    <property name="text">
@@ -148,7 +194,7 @@
   </action>
   <action name="actionAddState">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
@@ -160,7 +206,7 @@
   </action>
   <action name="actionRemoveState">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
@@ -172,7 +218,7 @@
   </action>
   <action name="actionOrderStateBackwards">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/generic-left.png</normaloff>:/icons16x16/generic-left.png</iconset>
    </property>
    <property name="text">
@@ -184,7 +230,7 @@
   </action>
   <action name="actionOrderStateForwards">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/generic-right.png</normaloff>:/icons16x16/generic-right.png</iconset>
    </property>
    <property name="text">
@@ -196,7 +242,7 @@
   </action>
  </widget>
  <resources>
-  <include location="res/DesignerTool.qrc"/>
+  <include location="../res/DesignerTool.qrc"/>
  </resources>
  <connections/>
 </ui>
