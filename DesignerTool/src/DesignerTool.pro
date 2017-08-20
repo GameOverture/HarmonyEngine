@@ -69,7 +69,8 @@ SOURCES += main.cpp \
     Widget/WidgetLiveVariable.cpp \
     Widget/WidgetLiveVarManager.cpp \
     Widget/WidgetOutputLog.cpp \
-    Widget/WidgetRangedSlider.cpp
+    Widget/WidgetRangedSlider.cpp \
+    Entity/EntityToolbox.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -125,7 +126,8 @@ HEADERS  += \
     Widget/WidgetLiveVariable.h \
     Widget/WidgetLiveVarManager.h \
     Widget/WidgetOutputLog.h \
-    Widget/WidgetRangedSlider.h
+    Widget/WidgetRangedSlider.h \
+    Entity/EntityToolbox.h
 
 FORMS    += \
     MainWindow.ui \
@@ -151,7 +153,8 @@ FORMS    += \
     Widget/WidgetLiveVariable.ui \
     Widget/WidgetLiveVarManager.ui \
     Widget/WidgetOutputLog.ui \
-    Widget/WidgetRangedSlider.ui
+    Widget/WidgetRangedSlider.ui \
+    Entity/EntityToolbox.ui
 
 RC_FILE = DesignerTool.rc
 
