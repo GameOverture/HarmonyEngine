@@ -416,6 +416,7 @@ void Project::OnHarmonyLoaded()
     {
         m_pTabBar = new QTabBar(nullptr);
         m_pTabBar->setTabsClosable(true);
+        m_pTabBar->setShape(QTabBar::TriangularNorth);
         m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
         m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
         m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(OnCloseTab(int)));
