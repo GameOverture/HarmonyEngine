@@ -34,12 +34,14 @@ class HyDiagOutput : public HyEntity2d
 	HyText2d				m_txtFps;
 
 	//HyProfiler				m_Profiler;
+	uint32					m_uiShowFlags;
 
 public:
 	HyDiagOutput();
 	virtual ~HyDiagOutput();
 
 	void SetShowFlags(uint32 uiDiagFlags);
+	uint32 GetShowFlags();
 
 	void ApplyTimeDelta(double dTimeDelta);
 

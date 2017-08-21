@@ -67,7 +67,8 @@ public:
 
 	void BootMessage();
 	
-	void Show(uint32 uiDiagFlags);
+	void Show(uint32 uiDiagFlags, float fX = 0.0f, float fY = 0.0f);
+	uint32 GetShowFlags();
 
 	void DumpAtlasUsage();
 	void DumpNodeUsage();

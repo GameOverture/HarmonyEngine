@@ -113,13 +113,18 @@ void HyDiagnostics::BootMessage()
 	HyLog("");
 }
 
-void HyDiagnostics::Show(uint32 uiDiagFlags)
+void HyDiagnostics::Show(uint32 uiDiagFlags, float fX /*= 0.0f*/, float fY /*= 0.0f*/)
 {
-	if(m_DiagOutput.IsLoaded() == false)
+	if(uiDiagFlags != 0 && m_DiagOutput.IsLoaded() == false)
 		m_DiagOutput.Load();
 
-	m_DiagOutput.SetEnabled(uiDiagFlags != 0);
 	m_DiagOutput.SetShowFlags(uiDiagFlags);
+	m_DiagOutput.pos.Set(fX, fY);
+}
+
+uint32 HyDiagnostics::GetShowFlags()
+{
+	return m_DiagOutput.GetShowFlags();
 }
 
 void HyDiagnostics::DumpAtlasUsage()

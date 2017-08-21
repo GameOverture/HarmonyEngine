@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>210</width>
+    <width>213</width>
     <height>590</height>
    </rect>
   </property>
@@ -520,6 +520,11 @@
    </property>
    <property name="toolTip">
     <string>Inserts a physics body at the selected node that simulates forces and velocity</string>
+   </property>
+  </action>
+  <action name="actionTemp">
+   <property name="text">
+    <string>Temp</string>
    </property>
   </action>
  </widget>
