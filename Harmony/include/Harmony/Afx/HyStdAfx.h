@@ -153,6 +153,8 @@ enum HyThreadState
 
 enum HyDiagFlag
 {
+	HYDIAG_NONE				= 0,
+
 	HYDIAG_FrameTimeMs		= 1 << 0,
 	HYDIAG_AvgFrameTimes	= 1 << 1,
 	HYDIAG_Fps				= 1 << 2,
