@@ -70,7 +70,8 @@ SOURCES += main.cpp \
     Widget/WidgetLiveVarManager.cpp \
     Widget/WidgetOutputLog.cpp \
     Widget/WidgetRangedSlider.cpp \
-    Entity/EntityToolbox.cpp
+    Entity/EntityToolbox.cpp \
+    Entity/EntityTreeModel.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -127,7 +128,8 @@ HEADERS  += \
     Widget/WidgetLiveVarManager.h \
     Widget/WidgetOutputLog.h \
     Widget/WidgetRangedSlider.h \
-    Entity/EntityToolbox.h
+    Entity/EntityToolbox.h \
+    Entity/EntityTreeModel.h
 
 FORMS    += \
     MainWindow.ui \

@@ -17,6 +17,9 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(pare
     ui->childrenTree->setDragEnabled(true);
     ui->childrenTree->setDropIndicatorShown(true);
     ui->childrenTree->setDragDropMode(QAbstractItemView::InternalMove);
+
+    EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
+    ui->childrenTree->setModel(&pEntityModel->GetTreeModel());
 }
 
 EntityWidget::~EntityWidget()

@@ -18,13 +18,19 @@ EntityStateData::EntityStateData(IModel &modelRef, QJsonObject stateObj) : IStat
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityModel::EntityModel(ProjectItem *pItem, QJsonArray stateArray) : IModel(pItem)
+EntityModel::EntityModel(ProjectItem *pItem, QJsonArray stateArray) :   IModel(pItem),
+                                                                        m_TreeModel(*pItem)
 {
 
 }
 
 /*virtual*/ EntityModel::~EntityModel()
 {
+}
+
+EntityTreeModel &EntityModel::GetTreeModel()
+{
+    return m_TreeModel;
 }
 
 /*virtual*/ void EntityModel::OnSave() /*override*/

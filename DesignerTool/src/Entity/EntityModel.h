@@ -3,6 +3,7 @@
 
 #include "IModel.h"
 #include "ProjectItem.h"
+#include "EntityTreeModel.h"
 
 #include <QObject>
 #include <QJsonArray>
@@ -33,9 +34,13 @@ class EntityModel : public IModel
 {
     Q_OBJECT
 
+    EntityTreeModel         m_TreeModel;
+
 public:
     EntityModel(ProjectItem *pItem, QJsonArray stateArray);
     virtual ~EntityModel();
+
+    EntityTreeModel &GetTreeModel();
 
     virtual void OnSave() override;
     virtual QJsonObject PopStateAt(uint32 uiIndex) override;
