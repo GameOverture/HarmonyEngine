@@ -7,16 +7,16 @@
 
 class EntityTreeItem
 {
-    ProjectItem &                   m_ItemRef;
+    ProjectItem *                   m_pItem;
 
     EntityTreeItem *                m_pParentItem;
     QList<EntityTreeItem *>         m_ChildList;
 
 public:
-    explicit EntityTreeItem(ProjectItem &itemRef, EntityTreeItem *pParentTreeItem);
+    explicit EntityTreeItem(ProjectItem *pItem);
     ~EntityTreeItem();
 
-    ProjectItem &GetItem();
+    ProjectItem *GetItem();
     EntityTreeItem *GetParent();
 
     EntityTreeItem *GetChild(int iRow);
@@ -34,7 +34,8 @@ class EntityTreeModel : public QAbstractItemModel
 {
     Q_OBJECT
 
-    EntityTreeItem *                    m_pEntityRootItem;
+    EntityTreeItem *                    m_pRootItem;
+    EntityTreeItem *                    m_pEntityItem;
 
 public:
     explicit EntityTreeModel(ProjectItem &entityItemRef, QObject *parent = nullptr);
