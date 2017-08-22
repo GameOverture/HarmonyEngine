@@ -54,6 +54,8 @@ enum HyGuiItemType
     ITEM_Sprite,
     ITEM_Shader,
     ITEM_Entity,
+    ITEM_Physics,
+    ITEM_BoundingVolume,
 
     NUMITEM
 };
@@ -89,6 +91,7 @@ enum SubIcon
     SUBICON_Delete,
     SUBICON_Settings,
     SUBICON_Warning,
+    SUBICON_Pending,
 
     NUM_SUBICONS
 };

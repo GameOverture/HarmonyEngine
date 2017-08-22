@@ -121,5 +121,32 @@
         <file>icons16x16/sprite-alignRight.png</file>
         <file>icons16x16/sprite-alignUp.png</file>
         <file>icons16x16/sprite-alignVertCenter.png</file>
+        <file>icons16x16/items/Atlas-Pending.png</file>
+        <file>icons16x16/items/Audio-Pending.png</file>
+        <file>icons16x16/items/Entity-Pending.png</file>
+        <file>icons16x16/items/Font-Pending.png</file>
+        <file>icons16x16/items/Particles-Pending.png</file>
+        <file>icons16x16/items/Physics.png</file>
+        <file>icons16x16/items/Physics-Close.png</file>
+        <file>icons16x16/items/Physics-Delete.png</file>
+        <file>icons16x16/items/Physics-Dirty.png</file>
+        <file>icons16x16/items/Physics-New.png</file>
+        <file>icons16x16/items/Physics-Open.png</file>
+        <file>icons16x16/items/Physics-Pending.png</file>
+        <file>icons16x16/items/Physics-Settings.png</file>
+        <file>icons16x16/items/Physics-Warning.png</file>
+        <file>icons16x16/items/Prefix-Pending.png</file>
+        <file>icons16x16/items/Project-Pending.png</file>
+        <file>icons16x16/items/Spine-Pending.png</file>
+        <file>icons16x16/items/Sprite-Pending.png</file>
+        <file>icons16x16/items/BoundingVolume.png</file>
+        <file>icons16x16/items/BoundingVolume-Close.png</file>
+        <file>icons16x16/items/BoundingVolume-Delete.png</file>
+        <file>icons16x16/items/BoundingVolume-Dirty.png</file>
+        <file>icons16x16/items/BoundingVolume-New.png</file>
+        <file>icons16x16/items/BoundingVolume-Open.png</file>
+        <file>icons16x16/items/BoundingVolume-Pending.png</file>
+        <file>icons16x16/items/BoundingVolume-Settings.png</file>
+        <file>icons16x16/items/BoundingVolume-Warning.png</file>
     </qresource>
 </RCC>

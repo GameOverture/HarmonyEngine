@@ -65,6 +65,11 @@ int EntityTreeItem::GetRow() const
     return 0;
 }
 
+QString EntityTreeItem::GetToolTip() const
+{
+    return QString();
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 EntityTreeModel::EntityTreeModel(ProjectItem &entityItemRef, QObject *parent) : QAbstractItemModel(parent)
@@ -141,12 +146,16 @@ QVariant EntityTreeModel::data(const QModelIndex &index, int iRole /*= Qt::Displ
     if(index.isValid() == false)
         return QVariant();
 
-    ProjectItem *pProjItem = static_cast<EntityTreeItem *>(index.internalPointer())->GetItem();
+    EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer());
 
     switch(iRole)
     {
     case Qt::DisplayRole:
-        return pProjItem->GetName(false);
+        return pTreeItem->GetItem()->GetName(false);
+    case Qt::DecorationRole:
+        return pTreeItem->GetItem()->GetIcon(SUBICON_None);
+    case Qt::ToolTipRole:
+        return pTreeItem->GetToolTip();
     }
 
     return QVariant();

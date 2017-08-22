@@ -40,6 +40,8 @@
     sm_sItemNames[ITEM_AtlasImage] = "Atlas";
     sm_sItemNames[ITEM_DirAudioBanks] = "AudioBanks";
     sm_sItemNames[ITEM_Prefix] = "Prefix";
+    sm_sItemNames[ITEM_Physics] = "Physics";
+    sm_sItemNames[ITEM_BoundingVolume] = "BoundingVolume";
 
     sm_sItemExt[ITEM_Project] = ".hyproj";
     sm_sItemExt[ITEM_DirAudio] = "/";
@@ -69,6 +71,7 @@
     sm_sSubIconNames[SUBICON_Delete] = "-Delete";
     sm_sSubIconNames[SUBICON_Settings] = "-Settings";
     sm_sSubIconNames[SUBICON_Warning] = "-Warning";
+    sm_sSubIconNames[SUBICON_Pending] = "-Pending";
 
     InitItemIcons(ITEM_Project);
     sm_ItemIcons[ITEM_DirAudio][SUBICON_None].addFile(QString(":/icons16x16/audio-folder.png"));
@@ -88,6 +91,8 @@
     InitItemIcons(ITEM_Spine);
     InitItemIcons(ITEM_Sprite);
     InitItemIcons(ITEM_Entity);
+    InitItemIcons(ITEM_Physics);
+    InitItemIcons(ITEM_BoundingVolume);
 
     sm_pCodeNameValidator = new QRegExpValidator(QRegExp("[A-Za-z_]+[A-Za-z0-9_]*"));
     sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-]*"));
