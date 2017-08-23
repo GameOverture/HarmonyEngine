@@ -22,6 +22,7 @@
 #include <QJsonArray>
 #include <QMessageBox>
 #include <QDrag>
+#include <QClipboard>
 
 QByteArray DataExplorerWidget::sm_sInternalClipboard = "";
 
@@ -41,9 +42,9 @@ DataExplorerWidget::DataExplorerWidget(QWidget *parent) :   QWidget(parent),
     ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 
     ui->treeWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    //ui->treeWidget->setDragEnabled(true);
-    //ui->treeWidget->setDropIndicatorShown(true);
-    //ui->treeWidget->setDragDropMode(QAbstractItemView::InternalMove);
+    ui->treeWidget->setDragEnabled(true);
+    ui->treeWidget->setDropIndicatorShown(true);
+    ui->treeWidget->setDragDropMode(QAbstractItemView::InternalMove);
 
     ui->actionCutItem->setEnabled(false);
     ui->actionCopyItem->setEnabled(false);
@@ -277,6 +278,9 @@ void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
     QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
     QJsonObject pasteObj = pasteDoc.object();
 
+    if(pasteObj["project"].toString().toLower() == pProject->GetAbsPath().toLower())
+        return;
+
     // Determine the pasted item type
     HyGuiItemType ePasteItemType = ITEM_Unknown;
     QString sItemType = pasteObj["itemType"].toString();
@@ -314,7 +318,7 @@ void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
 
         if(pProject->GetAtlasModel().DoesImageExist(JSONOBJ_TOINT(imageObj, "checksum")) == false)
         {
-            QFileInfo pasteImageFileInfo(imageObj["url"].toString());
+            QFileInfo pasteImageFileInfo(imageObj["uri"].toString());
             QFile::copy(pasteImageFileInfo.absoluteFilePath(), metaTempDir.absolutePath() % "/" % imageObj["name"].toString() % "." % pasteImageFileInfo.suffix());
         }
     }
@@ -650,58 +654,37 @@ void DataExplorerWidget::on_actionDeleteItem_triggered()
 void DataExplorerWidget::on_actionCutItem_triggered()
 {
     DataExplorerItem *pCurItemSelected = GetCurItemSelected();
-    switch(pCurItemSelected->GetType())
+    if(pCurItemSelected->IsProjectItem() == false)
     {
-        case ITEM_Audio:
-        case ITEM_Particles:
-        case ITEM_Font:
-        case ITEM_Spine:
-        case ITEM_Sprite:
-        case ITEM_Shader:
-        case ITEM_Entity: {
-            ProjectItem *pProjItem = static_cast<ProjectItem *>(pProjItem);
-            ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(m_pDraggedProjItem);
-            sm_sInternalClipboard = pProjItem->AllocMimeData();
-            QClipboard *pClipboard = QApplication::clipboard();
-            pClipboard->setText(src);
-
-            HyGuiLog("Cut " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
-
-            ui->actionPasteItem->setEnabled(true);
-        } break;
-
-        default: {
-            HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % QString::number(pCurItemSelected->GetType()), LOGTYPE_Error);
-        } break;
+        HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % QString::number(pCurItemSelected->GetType()), LOGTYPE_Error);
+        return;
     }
+
+    ProjectItem *pProjItem = static_cast<ProjectItem *>(pCurItemSelected);
+    ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(pProjItem);
+    QClipboard *pClipboard = QApplication::clipboard();
+    pClipboard->setText(pNewMimeData->data(HYGUI_MIMETYPE));
+
+    HyGuiLog("Cut " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
+    ui->actionPasteItem->setEnabled(true);
 }
 
 void DataExplorerWidget::on_actionCopyItem_triggered()
 {
     DataExplorerItem *pCurItemSelected = GetCurItemSelected();
-    switch(pCurItemSelected->GetType())
+    if(pCurItemSelected->IsProjectItem() == false)
     {
-        case ITEM_Audio:
-        case ITEM_Particles:
-        case ITEM_Font:
-        case ITEM_Spine:
-        case ITEM_Sprite:
-        case ITEM_Shader:
-        case ITEM_Entity: {
-            ProjectItem *pProjItem = static_cast<ProjectItem *>(pCurItemSelected);
-            sm_sInternalClipboard =  pProjItem->AllocMimeData();
-            QClipboard *pClipboard = QApplication::clipboard();
-            pClipboard->setText(src);
-
-            HyGuiLog("Copied " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
-
-            ui->actionPasteItem->setEnabled(true);
-        } break;
-
-        default: {
-            HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % QString::number(pCurItemSelected->GetType()), LOGTYPE_Error);
-        } break;
+        HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % QString::number(pCurItemSelected->GetType()), LOGTYPE_Error);
+        return;
     }
+
+    ProjectItem *pProjItem = static_cast<ProjectItem *>(pCurItemSelected);
+    ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(pProjItem);
+    QClipboard *pClipboard = QApplication::clipboard();
+    pClipboard->setText(pNewMimeData->data(HYGUI_MIMETYPE));
+
+    HyGuiLog("Copied " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
+    ui->actionPasteItem->setEnabled(true);
 }
 
 void DataExplorerWidget::on_actionPasteItem_triggered()

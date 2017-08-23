@@ -12,6 +12,7 @@ class ProjectItemMimeData : public QMimeData
     Q_OBJECT
 
     ProjectItem *           m_pProjItem;
+    QByteArray              m_Data;
 
 public:
     ProjectItemMimeData(ProjectItem *pProjItem);

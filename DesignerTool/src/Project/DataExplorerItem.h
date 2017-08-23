@@ -49,4 +49,7 @@ public:
 };
 Q_DECLARE_METATYPE(DataExplorerItem *)
 
+QDataStream &operator<<(QDataStream &out, DataExplorerItem *const &rhs);
+QDataStream &operator>>(QDataStream &in, DataExplorerItem *rhs);
+
 #endif // DATAEXPLORERITEM_H

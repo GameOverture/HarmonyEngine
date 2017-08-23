@@ -120,3 +120,16 @@ void DataExplorerItem::SetTreeItemSubIcon(SubIcon eSubIcon)
 {
     m_pTreeItemPtr->setIcon(0, GetIcon(eSubIcon));
 }
+
+QDataStream &operator<<(QDataStream &out, DataExplorerItem *const &rhs)
+{
+    out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, DataExplorerItem *rhs)
+{
+    in.readRawData(reinterpret_cast<char *>(rhs), sizeof(rhs));
+    return in;
+}
+

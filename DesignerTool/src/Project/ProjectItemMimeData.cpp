@@ -1,8 +1,7 @@
 #include "ProjectItemMimeData.h"
 #include "ProjectItem.h"
 #include "Project.h"
-
-#include <QClipboard>
+#include "IModel.h"
 
 ProjectItemMimeData::ProjectItemMimeData(ProjectItem *pProjItem) : m_pProjItem(pProjItem)
 {
@@ -23,7 +22,7 @@ ProjectItemMimeData::ProjectItemMimeData(ProjectItem *pProjItem) : m_pProjItem(p
         QJsonObject atlasFrameObj;
         atlasFrameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasFrameList[i]->GetImageChecksum())));
         atlasFrameObj.insert("name", QJsonValue(atlasFrameList[i]->GetName()));
-        atlasFrameObj.insert("url", QJsonValue(GetCurProjSelected()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirAtlases) % "/" % atlasFrameList[i]->ConstructImageFileName()));
+        atlasFrameObj.insert("uri", QJsonValue(m_pProjItem->GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirAtlases) % "/" % atlasFrameList[i]->ConstructImageFileName()));
         imagesArray.append(atlasFrameObj);
     }
     clipboardObj.insert("images", imagesArray);
@@ -39,8 +38,8 @@ ProjectItemMimeData::ProjectItemMimeData(ProjectItem *pProjItem) : m_pProjItem(p
     //clipboardObj.insert("audio", GetAudioWavs())
 
     // Serialize the item info into json source
-    QByteArray src = JsonValueToSrc(QJsonValue(clipboardObj));
-    setData(HYGUI_MIMETYPE, src);
+    m_Data = JsonValueToSrc(QJsonValue(clipboardObj));
+    setData(HYGUI_MIMETYPE, m_Data);
 }
 
 /*virtual*/ ProjectItemMimeData::~ProjectItemMimeData()
@@ -69,7 +68,8 @@ ProjectItemMimeData::ProjectItemMimeData(ProjectItem *pProjItem) : m_pProjItem(p
     if((mimeType.toLower() == HYGUI_MIMETYPE || mimeType.toLower() == "application/json") &&
        (type == QVariant::UserType || type == QVariant::ByteArray || type == QVariant::String))
     {
-        return QVariant(QByteArray(data(HYGUI_MIMETYPE)));
+        QByteArray dataSrc = QByteArray(m_Data);
+        return QVariant(dataSrc);
     }
 
     return QVariant();
