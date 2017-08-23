@@ -18,7 +18,8 @@
 #include "Harmony/Utilities/HyStrManip.h"
 
 DataExplorerItem::DataExplorerItem(HyGuiItemType eType, const QString sPath) :  m_eTYPE(eType),
-                                                                                m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str())
+                                                                                m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str()),
+                                                                                m_bIsProjectItem(false)
 {
     m_pTreeItemPtr = new QTreeWidgetItem();
 
@@ -32,6 +33,11 @@ DataExplorerItem::DataExplorerItem(HyGuiItemType eType, const QString sPath) :  
 DataExplorerItem::~DataExplorerItem()
 {
     delete m_pTreeItemPtr;
+}
+
+bool DataExplorerItem::IsProjectItem() const
+{
+    return m_bIsProjectItem;
 }
 
 QString DataExplorerItem::GetName(bool bWithPrefix) const

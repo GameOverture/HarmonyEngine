@@ -33,7 +33,8 @@ QByteArray DataExplorerWidget::sm_sInternalClipboard = "";
 }
 
 DataExplorerWidget::DataExplorerWidget(QWidget *parent) :   QWidget(parent),
-                                                            ui(new Ui::DataExplorerWidget)
+                                                            ui(new Ui::DataExplorerWidget),
+                                                            m_pDraggedProjItem(nullptr)
 {
     ui->setupUi(this);
 
@@ -411,26 +412,30 @@ QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
         {
             DataExplorerItem *pExplorerItem = pClickedTreeItem->data(0, Qt::UserRole).value<DataExplorerItem *>();
 
-            switch(pExplorerItem->GetType())
+            if(pExplorerItem->IsProjectItem())
             {
-            case ITEM_Entity:
+                m_pDraggedProjItem = static_cast<ProjectItem *>(pExplorerItem);
                 m_ptDragStart = pEvent->pos();
             }
         }
     }
-
-    //m_Draw.Update(hyApp);
 }
 
 /*virtual*/ void DataExplorerWidget::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {
     if((pEvent->buttons() & Qt::LeftButton) == 0)
+    {
+        m_pDraggedProjItem = nullptr;
         return;
+    }
 
-    if((pEvent->pos() - m_ptDragStart).manhattanLength() < QApplication::startDragDistance())
+    if(m_pDraggedProjItem == nullptr ||
+       (pEvent->pos() - m_ptDragStart).manhattanLength() < QApplication::startDragDistance())
+    {
         return;
+    }
 
-    ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData();
+    ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(m_pDraggedProjItem);
 
     QDrag *pDrag = new QDrag(this);
     pDrag->setMimeData(pNewMimeData);
@@ -655,7 +660,11 @@ void DataExplorerWidget::on_actionCutItem_triggered()
         case ITEM_Shader:
         case ITEM_Entity: {
             ProjectItem *pProjItem = static_cast<ProjectItem *>(pProjItem);
+            ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(m_pDraggedProjItem);
             sm_sInternalClipboard = pProjItem->AllocMimeData();
+            QClipboard *pClipboard = QApplication::clipboard();
+            pClipboard->setText(src);
+
             HyGuiLog("Cut " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
 
             ui->actionPasteItem->setEnabled(true);
@@ -681,6 +690,9 @@ void DataExplorerWidget::on_actionCopyItem_triggered()
         case ITEM_Entity: {
             ProjectItem *pProjItem = static_cast<ProjectItem *>(pCurItemSelected);
             sm_sInternalClipboard =  pProjItem->AllocMimeData();
+            QClipboard *pClipboard = QApplication::clipboard();
+            pClipboard->setText(src);
+
             HyGuiLog("Copied " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
 
             ui->actionPasteItem->setEnabled(true);

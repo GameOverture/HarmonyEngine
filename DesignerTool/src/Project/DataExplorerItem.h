@@ -27,6 +27,8 @@ class DataExplorerItem : public QObject
 protected:
     const HyGuiItemType     m_eTYPE;
     const QString           m_sPATH;
+
+    bool                    m_bIsProjectItem;
     
     QTreeWidgetItem *       m_pTreeItemPtr;
     
@@ -36,6 +38,8 @@ public:
 
     HyGuiItemType GetType() const                   { return m_eTYPE; }
     QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
+
+    bool IsProjectItem() const;
     
     QString GetName(bool bWithPrefix) const;
     QString GetPrefix() const;

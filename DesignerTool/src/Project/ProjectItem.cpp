@@ -39,6 +39,8 @@ ProjectItem::ProjectItem(Project &projRef,
                                                 m_pWidget(nullptr),
                                                 m_pDraw(nullptr)
 {
+    m_bIsProjectItem = true;
+
     m_pUndoStack = new QUndoStack(this);
     m_pActionUndo = m_pUndoStack->createUndoAction(nullptr, "&Undo");
     m_pActionUndo->setIcon(QIcon(":/icons16x16/edit-undo.png"));

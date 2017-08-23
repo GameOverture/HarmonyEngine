@@ -40,9 +40,6 @@ ProjectItemMimeData::ProjectItemMimeData(ProjectItem *pProjItem) : m_pProjItem(p
 
     // Serialize the item info into json source
     QByteArray src = JsonValueToSrc(QJsonValue(clipboardObj));
-    QClipboard *pClipboard = QApplication::clipboard();
-    pClipboard->setText(src);
-
     setData(HYGUI_MIMETYPE, src);
 }
 

@@ -53,6 +53,7 @@ class DataExplorerWidget : public QWidget
 
     static QByteArray       sm_sInternalClipboard;
 
+    ProjectItem *           m_pDraggedProjItem;
     QPoint                  m_ptDragStart;
 
 public:
