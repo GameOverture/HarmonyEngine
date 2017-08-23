@@ -456,7 +456,7 @@ void Project::ApplySaveEnables()
 
 void Project::SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal)
 {
-    HyGuiItemType eSubDirType = HyGlobal::GetCorrespondingDirItem(eType);
+    HyGuiItemType eSubDirType = HyGlobal::GetDirFromItem(eType);
     QString sSubDirName = HyGlobal::ItemName(eSubDirType);
 
     if(m_SaveDataObj.contains(sSubDirName) == false) {
@@ -498,7 +498,7 @@ void Project::SaveGameData()
 
 void Project::DeleteGameData(HyGuiItemType eType, QString sPath)
 {
-    HyGuiItemType eSubDirType = HyGlobal::GetCorrespondingDirItem(eType);
+    HyGuiItemType eSubDirType = HyGlobal::GetDirFromItem(eType);
     QString sSubDirName = HyGlobal::ItemName(eSubDirType);
 
     if(m_SaveDataObj.contains(sSubDirName) == false) {
@@ -527,7 +527,7 @@ void Project::DeleteGameData(HyGuiItemType eType, QString sPath)
 
 void Project::DeletePrefixAndContents(HyGuiItemType eSubDirType, QString sPrefix)
 {
-    HyGuiItemType eActualSubDir = HyGlobal::GetCorrespondingDirItem(eSubDirType);
+    HyGuiItemType eActualSubDir = HyGlobal::GetDirFromItem(eSubDirType);
     QString sSubDirName = HyGlobal::ItemName(eActualSubDir);
     
     if(m_SaveDataObj.contains(sSubDirName) == false) {
@@ -548,7 +548,7 @@ void Project::DeletePrefixAndContents(HyGuiItemType eSubDirType, QString sPrefix
 
 QJsonObject Project::GetSubDirObj(HyGuiItemType eType)
 {
-    return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetCorrespondingDirItem(eType))].toObject();
+    return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetDirFromItem(eType))].toObject();
 }
 
 bool Project::CloseAllTabs()

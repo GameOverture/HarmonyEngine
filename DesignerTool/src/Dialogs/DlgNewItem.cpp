@@ -41,7 +41,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *pare
         pSubDirItem = m_pItemProject->GetTreeItem()->child(i);
         DataExplorerItem *pCurItem = pSubDirItem->data(0, Qt::UserRole).value<DataExplorerItem *>();
 
-        if(pCurItem->GetType() == HyGlobal::GetCorrespondingDirItem(eItem))
+        if(pCurItem->GetType() == HyGlobal::GetDirFromItem(eItem))
             break;
     }
 
@@ -176,7 +176,7 @@ void DlgNewItem::ErrorCheck()
         }
 
         QString sNewItemPath = sPrefix % '/' % ui->txtName->text();
-        QJsonObject subDirObj = m_pItemProject->GetSubDirObj(HyGlobal::GetCorrespondingDirItem(m_eItemType));
+        QJsonObject subDirObj = m_pItemProject->GetSubDirObj(HyGlobal::GetDirFromItem(m_eItemType));
         for(auto objsInSubDirIter = subDirObj.begin(); objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
         {
             QString sItemPath = objsInSubDirIter.key();

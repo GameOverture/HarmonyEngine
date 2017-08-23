@@ -13,15 +13,24 @@
 #include "MainWindow.h"
 #include "FontItem.h"
 #include "Project.h"
+#include "ProjectItemMimeData.h"
+#include "DataExplorerItem.h"
 #include "AtlasWidget.h"
 #include "HyGuiGlobal.h"
 #include "IModel.h"
 
 #include <QJsonArray>
 #include <QMessageBox>
-#include <QClipboard>
+#include <QDrag>
 
 QByteArray DataExplorerWidget::sm_sInternalClipboard = "";
+
+/*virtual*/ void DataExplorerLoadThread::run() /*override*/
+{
+    /* ... here is the expensive or blocking operation ... */
+    Project *pNewItemProject = new Project(m_sPath);
+    Q_EMIT LoadFinished(pNewItemProject);
+}
 
 DataExplorerWidget::DataExplorerWidget(QWidget *parent) :   QWidget(parent),
                                                             ui(new Ui::DataExplorerWidget)
@@ -31,9 +40,9 @@ DataExplorerWidget::DataExplorerWidget(QWidget *parent) :   QWidget(parent),
     ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 
     ui->treeWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->treeWidget->setDragEnabled(true);
-    ui->treeWidget->setDropIndicatorShown(true);
-    ui->treeWidget->setDragDropMode(QAbstractItemView::InternalMove);
+    //ui->treeWidget->setDragEnabled(true);
+    //ui->treeWidget->setDropIndicatorShown(true);
+    //ui->treeWidget->setDragDropMode(QAbstractItemView::InternalMove);
 
     ui->actionCutItem->setEnabled(false);
     ui->actionCopyItem->setEnabled(false);
@@ -273,7 +282,7 @@ void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
     QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
     for(int i = 0; i < subDirList.size(); ++i)
     {
-        HyGuiItemType eItemType = HyGlobal::GetCorrespondingItemFromDir(subDirList[i]);
+        HyGuiItemType eItemType = HyGlobal::GetItemFromDir(subDirList[i]);
 
         if(sItemType == HyGlobal::ItemName(eItemType))
         {
@@ -393,45 +402,40 @@ QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
     return pCurSelected;
 }
 
-void DataExplorerWidget::PutItemOnClipboard(ProjectItem *pProjItem)
+/*virtual*/ void DataExplorerWidget::mousePressEvent(QMouseEvent *pEvent) /*override*/
 {
-    QJsonValue itemValue = pProjItem->GetModel()->GetJson();
-
-    // STANDARD INFO
-    QJsonObject clipboardObj;
-    clipboardObj.insert("itemType", HyGlobal::ItemName(pProjItem->GetType()));
-    clipboardObj.insert("itemName", pProjItem->GetName(true));
-    clipboardObj.insert("src", itemValue);
-
-    // IMAGE INFO
-    QList<AtlasFrame *> atlasFrameList = pProjItem->GetModel()->GetAtlasFrames();
-    QJsonArray imagesArray;
-    for(int i = 0; i < atlasFrameList.size(); ++i)
+    if(pEvent->button() == Qt::LeftButton)
     {
-        QJsonObject atlasFrameObj;
-        atlasFrameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasFrameList[i]->GetImageChecksum())));
-        atlasFrameObj.insert("name", QJsonValue(atlasFrameList[i]->GetName()));
-        atlasFrameObj.insert("url", QJsonValue(GetCurProjSelected()->GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirAtlases) % "/" % atlasFrameList[i]->ConstructImageFileName()));
-        imagesArray.append(atlasFrameObj);
+        QTreeWidgetItem *pClickedTreeItem = ui->treeWidget->itemAt(ui->treeWidget->mapFromGlobal(QCursor::pos()));
+        if(pClickedTreeItem)
+        {
+            DataExplorerItem *pExplorerItem = pClickedTreeItem->data(0, Qt::UserRole).value<DataExplorerItem *>();
+
+            switch(pExplorerItem->GetType())
+            {
+            case ITEM_Entity:
+                m_ptDragStart = pEvent->pos();
+            }
+        }
     }
-    clipboardObj.insert("images", imagesArray);
 
-    // FONT INFO
-    QStringList fontUrlList = pProjItem->GetModel()->GetFontUrls();
-    QJsonArray fontUrlArray;
-    for(int i = 0; i < fontUrlList.size(); ++i)
-        fontUrlArray.append(fontUrlList[i]);
-    clipboardObj.insert("fonts", fontUrlArray);
+    //m_Draw.Update(hyApp);
+}
 
-    // TODO: AUDIO INFO
-    //clipboardObj.insert("audio", GetAudioWavs())
+/*virtual*/ void DataExplorerWidget::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
+{
+    if((pEvent->buttons() & Qt::LeftButton) == 0)
+        return;
 
-    // Serialize the item info into json source
-    QByteArray src = JsonValueToSrc(QJsonValue(clipboardObj));
-    QClipboard *pClipboard = QApplication::clipboard();
-    pClipboard->setText(src);
+    if((pEvent->pos() - m_ptDragStart).manhattanLength() < QApplication::startDragDistance())
+        return;
 
-    sm_sInternalClipboard = src;
+    ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData();
+
+    QDrag *pDrag = new QDrag(this);
+    pDrag->setMimeData(pNewMimeData);
+
+    Qt::DropAction dropAction = pDrag->exec(Qt::CopyAction | Qt::MoveAction);
 }
 
 void DataExplorerWidget::OnProjectLoaded(Project *pLoadedProj)
@@ -469,7 +473,7 @@ void DataExplorerWidget::OnContextMenu(const QPoint &pos)
         case ITEM_DirSprites:
         case ITEM_DirShaders:
         case ITEM_DirEntities:
-            contextMenu.addAction(FINDACTION("actionNew" % HyGlobal::ItemName(HyGlobal::GetCorrespondingItemFromDir(eSelectedItemType))));
+            contextMenu.addAction(FINDACTION("actionNew" % HyGlobal::ItemName(HyGlobal::GetItemFromDir(eSelectedItemType))));
             break;
         case ITEM_Audio:
         case ITEM_Particles:
@@ -651,7 +655,7 @@ void DataExplorerWidget::on_actionCutItem_triggered()
         case ITEM_Shader:
         case ITEM_Entity: {
             ProjectItem *pProjItem = static_cast<ProjectItem *>(pProjItem);
-            PutItemOnClipboard(pProjItem);
+            sm_sInternalClipboard = pProjItem->AllocMimeData();
             HyGuiLog("Cut " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
 
             ui->actionPasteItem->setEnabled(true);
@@ -676,7 +680,7 @@ void DataExplorerWidget::on_actionCopyItem_triggered()
         case ITEM_Shader:
         case ITEM_Entity: {
             ProjectItem *pProjItem = static_cast<ProjectItem *>(pCurItemSelected);
-            PutItemOnClipboard(pProjItem);
+            sm_sInternalClipboard =  pProjItem->AllocMimeData();
             HyGuiLog("Copied " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
 
             ui->actionPasteItem->setEnabled(true);

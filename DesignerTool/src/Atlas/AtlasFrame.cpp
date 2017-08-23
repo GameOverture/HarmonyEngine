@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyGuiFrame.cpp
+ *	AtlasFrame.cpp
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler

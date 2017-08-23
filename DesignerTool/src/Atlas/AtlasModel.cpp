@@ -966,7 +966,7 @@ void AtlasModel::ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex
 
     QPainter p(&newTexture);
 
-    // Iterate through the images that were packed, and update their corresponding HyGuiFrame. Then draw them to the blank textures
+    // Iterate through the images that were packed, and update their corresponding AtlasFrame. Then draw them to the blank textures
     for(int i = 0; i < m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.images.size(); ++i)
     {
         inputImage &imgInfoRef = m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.images[i];

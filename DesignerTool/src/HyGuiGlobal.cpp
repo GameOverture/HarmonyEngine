@@ -103,7 +103,7 @@
     sm_ErrorStrings[GUIFRAMEERROR_CouldNotPack] = "Could not pack this frame in atlas";
 }
 
-/*static*/ HyGuiItemType HyGlobal::GetCorrespondingDirItem(HyGuiItemType eItem)
+/*static*/ HyGuiItemType HyGlobal::GetDirFromItem(HyGuiItemType eItem)
 {
     switch(eItem)
     {
@@ -138,7 +138,7 @@
     return ITEM_Unknown;
 }
 
-/*static*/ HyGuiItemType HyGlobal::GetCorrespondingItemFromDir(HyGuiItemType eItem)
+/*static*/ HyGuiItemType HyGlobal::GetItemFromDir(HyGuiItemType eItem)
 {
     switch(eItem)
     {

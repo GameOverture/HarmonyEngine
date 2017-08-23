@@ -1,0 +1,27 @@
+#ifndef PROJECTITEMMIMEDATA_H
+#define PROJECTITEMMIMEDATA_H
+
+#include <QMimeData>
+
+#define HYGUI_MIMETYPE "application/x-harmony"
+
+class ProjectItem;
+
+class ProjectItemMimeData : public QMimeData
+{
+    Q_OBJECT
+
+    ProjectItem *           m_pProjItem;
+
+public:
+    ProjectItemMimeData(ProjectItem *pProjItem);
+    virtual ~ProjectItemMimeData();
+
+    virtual bool hasFormat(const QString &sMimeType) const override;
+    virtual QStringList formats() const override;
+
+protected:
+    virtual QVariant retrieveData(const QString &mimeType, QVariant::Type type) const override;
+};
+
+#endif // PROJECTITEMMIMEDATA_H

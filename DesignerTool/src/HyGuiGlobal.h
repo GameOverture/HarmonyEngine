@@ -139,8 +139,8 @@ class HyGlobal
 public:
     static void Initialize();
 
-    static HyGuiItemType GetCorrespondingDirItem(HyGuiItemType eItem);
-    static HyGuiItemType GetCorrespondingItemFromDir(HyGuiItemType eItem);
+    static HyGuiItemType GetDirFromItem(HyGuiItemType eItem);
+    static HyGuiItemType GetItemFromDir(HyGuiItemType eItem);
     static QList<HyGuiItemType> SubDirList();
     static QStringList SubDirNameList();
     static QString AtlasTextureTypeString(HyTextureFormat eType);

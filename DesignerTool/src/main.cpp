@@ -17,7 +17,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    qRegisterMetaTypeStreamOperators<AtlasFrame *>("HyGuiFrame *");
+//    qRegisterMetaTypeStreamOperators<AtlasFrame *>("AtlasFrame *");
+//    qRegisterMetaTypeStreamOperators<DataExplorerItem *>("DataExplorerItem *");
+//    qRegisterMetaTypeStreamOperators<ProjectItem *>("ProjectItem *");
 
     HyGlobal::Initialize();
     DlgProjectSettings::InitDefaultValues();

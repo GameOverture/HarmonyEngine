@@ -71,7 +71,8 @@ SOURCES += main.cpp \
     Widget/WidgetOutputLog.cpp \
     Widget/WidgetRangedSlider.cpp \
     Entity/EntityToolbox.cpp \
-    Entity/EntityTreeModel.cpp
+    Entity/EntityTreeModel.cpp \
+    Project/ProjectItemMimeData.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -129,7 +130,8 @@ HEADERS  += \
     Widget/WidgetOutputLog.h \
     Widget/WidgetRangedSlider.h \
     Entity/EntityToolbox.h \
-    Entity/EntityTreeModel.h
+    Entity/EntityTreeModel.h \
+    Project/ProjectItemMimeData.h
 
 FORMS    += \
     MainWindow.ui \

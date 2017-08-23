@@ -10,13 +10,13 @@
 #ifndef DATAEXPLORERWIDGET_H
 #define DATAEXPLORERWIDGET_H
 
+#include "HyGuiGlobal.h"
+
 #include <QWidget>
 #include <QDir>
 #include <QTreeWidget>
 #include <QMenu>
 #include <QThread>
-
-#include "Project.h"
 
 #include <vector>
 using std::vector;
@@ -24,6 +24,11 @@ using std::vector;
 namespace Ui {
 class DataExplorerWidget;
 }
+
+class Project;
+class ProjectItem;
+class DataExplorerItem;
+class AtlasFrame;
 
 class DataExplorerLoadThread : public QThread
 {
@@ -36,12 +41,8 @@ public:
                                                                 m_sPath(sPath)
     { }
 
-    void run() Q_DECL_OVERRIDE
-    {
-        /* ... here is the expensive or blocking operation ... */
-        Project *pNewItemProject = new Project(m_sPath);
-        Q_EMIT LoadFinished(pNewItemProject);
-    }
+    virtual void run() override;
+
 Q_SIGNALS:
     void LoadFinished(Project *pLoadedItemProject);
 };
@@ -50,7 +51,9 @@ class DataExplorerWidget : public QWidget
 {
     Q_OBJECT
 
-    static QByteArray      sm_sInternalClipboard;
+    static QByteArray       sm_sInternalClipboard;
+
+    QPoint                  m_ptDragStart;
 
 public:
     explicit DataExplorerWidget(QWidget *parent = 0);
@@ -74,10 +77,12 @@ private:
     Ui::DataExplorerWidget *ui;
 
     QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
-    
+
     QTreeWidgetItem *GetSelectedTreeItem();
 
-    void PutItemOnClipboard(ProjectItem *pProjItem);
+protected:
+    virtual void mousePressEvent(QMouseEvent *pEvent) override;
+    virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
     
 private Q_SLOTS:
     void OnProjectLoaded(Project *pLoadedProj);
