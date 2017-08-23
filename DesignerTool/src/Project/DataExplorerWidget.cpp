@@ -44,7 +44,8 @@ DataExplorerWidget::DataExplorerWidget(QWidget *parent) :   QWidget(parent),
     ui->treeWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->treeWidget->setDragEnabled(true);
     ui->treeWidget->setDropIndicatorShown(true);
-    ui->treeWidget->setDragDropMode(QAbstractItemView::InternalMove);
+
+    setAcceptDrops(true);
 
     ui->actionCutItem->setEnabled(false);
     ui->actionCopyItem->setEnabled(false);
@@ -447,6 +448,25 @@ QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
     Qt::DropAction dropAction = pDrag->exec(Qt::CopyAction | Qt::MoveAction);
 }
 
+/*virtual*/ void DataExplorerWidget::dragEnterEvent(QDragEnterEvent *event) /*override*/
+{
+    event->ignore();
+    return;
+
+    if(event->source() == this)
+    {
+        //event->mimeData()->data(HYGUI_MIMETYPE)
+    }
+
+    if(event->mimeData()->hasFormat(HYGUI_MIMETYPE))
+        event->acceptProposedAction();
+}
+
+/*virtual*/ void DataExplorerWidget::dropEvent(QDropEvent *event) /*override*/
+{
+    event->ignore();
+}
+
 void DataExplorerWidget::OnProjectLoaded(Project *pLoadedProj)
 {
     //pLoadedProj->moveToThread(QApplication::instance()->thread());
@@ -690,6 +710,10 @@ void DataExplorerWidget::on_actionCopyItem_triggered()
 void DataExplorerWidget::on_actionPasteItem_triggered()
 {
     Project *pCurProj = GetCurProjSelected();
+
+    HyGuiLog("Paste is not implemented", LOGTYPE_Error);
+
+    // TODO: Get rid of the sm_sInternalClipboard???
 
     // Don't use QClipboard because someone can just copy random text before pasting and ruin the expected json format
     PasteItemSrc(sm_sInternalClipboard, pCurProj);

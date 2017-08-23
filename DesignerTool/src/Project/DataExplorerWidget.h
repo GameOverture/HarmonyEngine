@@ -84,6 +84,9 @@ private:
 protected:
     virtual void mousePressEvent(QMouseEvent *pEvent) override;
     virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
+
+    virtual void dragEnterEvent(QDragEnterEvent *event) override;
+    virtual void dropEvent(QDropEvent *event) override;
     
 private Q_SLOTS:
     void OnProjectLoaded(Project *pLoadedProj);
