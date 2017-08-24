@@ -16,7 +16,7 @@
 #include "DlgInputName.h"
 #include "DlgProjectSettings.h"
 
-#include "DataExplorerWidget.h"
+#include "ProjectWidget.h"
 #include "AtlasWidget.h"
 #include "AudioWidgetManager.h"
 

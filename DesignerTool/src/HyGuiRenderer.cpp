@@ -9,13 +9,14 @@
  *************************************************************************/
 #include "HyGuiRenderer.h"
 #include "HyGuiGlobal.h"
+#include "ProjectItemMimeData.h"
 
 #include <QTimer>
 #include <QSurfaceFormat>
 #include <QDir>
 #include <QApplication>
 #include <QMouseEvent>
-
+#include <QMimeData>
 
 //void HyGuiRendererLoadThread::run()
 //{
@@ -145,6 +146,22 @@ void HyGuiRenderer::RestoreCursor()
 }
 
 /*virtual*/ void HyGuiRenderer::leaveEvent(QEvent *pEvent) /*override*/
+{
+}
+
+/*virtual*/ void HyGuiRenderer::dragEnterEvent(QDragEnterEvent *event) /*override*/
+{
+    //if(event->mimeData()-
+    //event->mimeData()->data(HYGUI_MIMETYPE)
+
+    QTabBar *pTabBar = m_pProjOwner->GetTabBar();
+    if(pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>()->GetType() == ITEM_Entity)
+    {
+
+    }
+}
+
+/*virtual*/ void HyGuiRenderer::dropEvent(QDropEvent *event) /*override*/
 {
 }
 

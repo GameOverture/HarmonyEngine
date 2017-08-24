@@ -49,6 +49,9 @@ protected:
     virtual void enterEvent(QEvent *pEvent) override;
     virtual void leaveEvent(QEvent *pEvent) override;
 
+    virtual void dragEnterEvent(QDragEnterEvent *event) override;
+    virtual void dropEvent(QDropEvent *event) override;
+
 private Q_SLOTS:
     void OnBootCheck();
 

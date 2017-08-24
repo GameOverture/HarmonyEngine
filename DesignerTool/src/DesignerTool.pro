@@ -55,7 +55,6 @@ SOURCES += main.cpp \
     Font/FontUndoCmds.cpp \
     Font/FontWidget.cpp \
     Project/DataExplorerItem.cpp \
-    Project/DataExplorerWidget.cpp \
     Project/Project.cpp \
     Project/ProjectDraw.cpp \
     Project/ProjectItem.cpp \
@@ -72,7 +71,8 @@ SOURCES += main.cpp \
     Widget/WidgetRangedSlider.cpp \
     Entity/EntityToolbox.cpp \
     Entity/EntityTreeModel.cpp \
-    Project/ProjectItemMimeData.cpp
+    Project/ProjectItemMimeData.cpp \
+    Project/ProjectWidget.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -114,7 +114,6 @@ HEADERS  += \
     Font/FontUndoCmds.h \
     Font/FontWidget.h \
     Project/DataExplorerItem.h \
-    Project/DataExplorerWidget.h \
     Project/Project.h \
     Project/ProjectDraw.h \
     Project/ProjectItem.h \
@@ -131,7 +130,8 @@ HEADERS  += \
     Widget/WidgetRangedSlider.h \
     Entity/EntityToolbox.h \
     Entity/EntityTreeModel.h \
-    Project/ProjectItemMimeData.h
+    Project/ProjectItemMimeData.h \
+    Project/ProjectWidget.h
 
 FORMS    += \
     MainWindow.ui \
@@ -150,7 +150,6 @@ FORMS    += \
     Entity/EntityWidget.ui \
     Entity/EntSpriteFrame.ui \
     Font/FontWidget.ui \
-    Project/DataExplorerWidget.ui \
     Sprite/SpriteWidget.ui \
     Widget/WidgetColor.ui \
     Widget/WidgetGradientEditor.ui \
@@ -158,7 +157,8 @@ FORMS    += \
     Widget/WidgetLiveVarManager.ui \
     Widget/WidgetOutputLog.ui \
     Widget/WidgetRangedSlider.ui \
-    Entity/EntityToolbox.ui
+    Entity/EntityToolbox.ui \
+    Project/ProjectWidget.ui
 
 RC_FILE = DesignerTool.rc
 

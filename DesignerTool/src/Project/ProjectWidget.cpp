@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "DataExplorerWidget.h"
-#include "ui_DataExplorerWidget.h"
+#include "ProjectWidget.h"
+#include "ui_ProjectWidget.h"
 
 #include "MainWindow.h"
 #include "FontItem.h"
@@ -24,7 +24,7 @@
 #include <QDrag>
 #include <QClipboard>
 
-QByteArray DataExplorerWidget::sm_sInternalClipboard = "";
+QByteArray ProjectWidget::sm_sInternalClipboard = "";
 
 /*virtual*/ void DataExplorerLoadThread::run() /*override*/
 {
@@ -33,8 +33,8 @@ QByteArray DataExplorerWidget::sm_sInternalClipboard = "";
     Q_EMIT LoadFinished(pNewItemProject);
 }
 
-DataExplorerWidget::DataExplorerWidget(QWidget *parent) :   QWidget(parent),
-                                                            ui(new Ui::DataExplorerWidget),
+ProjectWidget::ProjectWidget(QWidget *parent) :   QWidget(parent),
+                                                            ui(new Ui::ProjectWidget),
                                                             m_pDraggedProjItem(nullptr)
 {
     ui->setupUi(this);
@@ -54,12 +54,12 @@ DataExplorerWidget::DataExplorerWidget(QWidget *parent) :   QWidget(parent),
     connect(ui->treeWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 }
 
-DataExplorerWidget::~DataExplorerWidget()
+ProjectWidget::~ProjectWidget()
 {
     delete ui;
 }
 
-Project *DataExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
+Project *ProjectWidget::AddItemProject(const QString sNewProjectFilePath)
 {
     Project *pNewProject = new Project(sNewProjectFilePath);
     HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
@@ -80,7 +80,7 @@ Project *DataExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
     //pNewLoadThread->start();
 }
 
-ProjectItem *DataExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue)
+ProjectItem *ProjectWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue)
 {
     if(pProj == nullptr)
     {
@@ -173,7 +173,7 @@ ProjectItem *DataExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewIt
     return pItem;
 }
 
-void DataExplorerWidget::RemoveItem(DataExplorerItem *pItem)
+void ProjectWidget::RemoveItem(DataExplorerItem *pItem)
 {
     if(pItem == nullptr)
         return;
@@ -188,7 +188,7 @@ void DataExplorerWidget::RemoveItem(DataExplorerItem *pItem)
     delete pItem;
 }
 
-void DataExplorerWidget::SelectItem(DataExplorerItem *pItem)
+void ProjectWidget::SelectItem(DataExplorerItem *pItem)
 {
     for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
     {
@@ -203,7 +203,7 @@ void DataExplorerWidget::SelectItem(DataExplorerItem *pItem)
     pItem->GetTreeItem()->setSelected(true);
 }
 
-QStringList DataExplorerWidget::GetOpenProjectPaths()
+QStringList ProjectWidget::GetOpenProjectPaths()
 {
     QStringList sListOpenProjs;
     sListOpenProjs.clear();
@@ -218,7 +218,7 @@ QStringList DataExplorerWidget::GetOpenProjectPaths()
     return sListOpenProjs;
 }
 
-Project *DataExplorerWidget::GetCurProjSelected()
+Project *ProjectWidget::GetCurProjSelected()
 {
     QTreeWidgetItem *pCurProjItem = GetSelectedTreeItem();
     if(pCurProjItem == nullptr)
@@ -236,7 +236,7 @@ Project *DataExplorerWidget::GetCurProjSelected()
     return reinterpret_cast<Project *>(pItem);
 }
 
-DataExplorerItem *DataExplorerWidget::GetCurItemSelected()
+DataExplorerItem *ProjectWidget::GetCurItemSelected()
 {
     QTreeWidgetItem *pCurItem = GetSelectedTreeItem();
     if(pCurItem == nullptr)
@@ -246,7 +246,7 @@ DataExplorerItem *DataExplorerWidget::GetCurItemSelected()
     return v.value<DataExplorerItem *>();
 }
 
-DataExplorerItem *DataExplorerWidget::GetCurSubDirSelected()
+DataExplorerItem *ProjectWidget::GetCurSubDirSelected()
 {
     QTreeWidgetItem *pCurTreeItem = GetSelectedTreeItem();
     if(pCurTreeItem == nullptr)
@@ -271,7 +271,7 @@ DataExplorerItem *DataExplorerWidget::GetCurSubDirSelected()
     return pCurItem;
 }
 
-void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
+void ProjectWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
 {
     QDir metaDir(pProject->GetMetaDataAbsPath());
     QDir metaTempDir = HyGlobal::PrepTempDir(pProject);
@@ -377,7 +377,7 @@ void DataExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
         pNewItem->Save();
 }
 
-QJsonObject DataExplorerWidget::ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames)
+QJsonObject ProjectWidget::ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames)
 {
     QStringList srcObjKeyList = srcObj.keys();
     for(int j = 0; j < srcObjKeyList.size(); ++j)
@@ -399,7 +399,7 @@ QJsonObject DataExplorerWidget::ReplaceIdWithProperValue(QJsonObject srcObj, QSe
     return srcObj;
 }
 
-QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
+QTreeWidgetItem *ProjectWidget::GetSelectedTreeItem()
 {
     QTreeWidgetItem *pCurSelected = nullptr;
     if(ui->treeWidget->selectedItems().empty() == false)
@@ -408,7 +408,7 @@ QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
     return pCurSelected;
 }
 
-/*virtual*/ void DataExplorerWidget::mousePressEvent(QMouseEvent *pEvent) /*override*/
+/*virtual*/ void ProjectWidget::mousePressEvent(QMouseEvent *pEvent) /*override*/
 {
     if(pEvent->button() == Qt::LeftButton)
     {
@@ -426,7 +426,7 @@ QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
     }
 }
 
-/*virtual*/ void DataExplorerWidget::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
+/*virtual*/ void ProjectWidget::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {
     if((pEvent->buttons() & Qt::LeftButton) == 0)
     {
@@ -448,7 +448,7 @@ QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
     Qt::DropAction dropAction = pDrag->exec(Qt::CopyAction | Qt::MoveAction);
 }
 
-/*virtual*/ void DataExplorerWidget::dragEnterEvent(QDragEnterEvent *event) /*override*/
+/*virtual*/ void ProjectWidget::dragEnterEvent(QDragEnterEvent *event) /*override*/
 {
     event->ignore();
     return;
@@ -462,18 +462,18 @@ QTreeWidgetItem *DataExplorerWidget::GetSelectedTreeItem()
         event->acceptProposedAction();
 }
 
-/*virtual*/ void DataExplorerWidget::dropEvent(QDropEvent *event) /*override*/
+/*virtual*/ void ProjectWidget::dropEvent(QDropEvent *event) /*override*/
 {
     event->ignore();
 }
 
-void DataExplorerWidget::OnProjectLoaded(Project *pLoadedProj)
+void ProjectWidget::OnProjectLoaded(Project *pLoadedProj)
 {
     //pLoadedProj->moveToThread(QApplication::instance()->thread());
     MainWindow::StopLoading(MDI_Explorer);
 }
 
-void DataExplorerWidget::OnContextMenu(const QPoint &pos)
+void ProjectWidget::OnContextMenu(const QPoint &pos)
 {
     QPoint globalPos = ui->treeWidget->mapToGlobal(pos);
     QTreeWidgetItem *pTreeNode = ui->treeWidget->itemAt(pos);
@@ -533,7 +533,7 @@ void DataExplorerWidget::OnContextMenu(const QPoint &pos)
     contextMenu.exec(globalPos);
 }
 
-void DataExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
+void ProjectWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     // setCurrentItem() required if this function is manually invoked. E.g. AddItem()
     ui->treeWidget->setCurrentItem(item);
@@ -569,7 +569,7 @@ void DataExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, 
     }
 }
 
-void DataExplorerWidget::on_treeWidget_itemSelectionChanged()
+void ProjectWidget::on_treeWidget_itemSelectionChanged()
 {
     QTreeWidgetItem *pCurSelected = GetSelectedTreeItem();
     
@@ -613,7 +613,7 @@ void DataExplorerWidget::on_treeWidget_itemSelectionChanged()
         MainWindow::SetSelectedProj(GetCurProjSelected());
 }
 
-void DataExplorerWidget::on_actionRename_triggered()
+void ProjectWidget::on_actionRename_triggered()
 {
     DataExplorerItem *pItem = GetCurItemSelected();
     
@@ -636,7 +636,7 @@ void DataExplorerWidget::on_actionRename_triggered()
     }
 }
 
-void DataExplorerWidget::on_actionDeleteItem_triggered()
+void ProjectWidget::on_actionDeleteItem_triggered()
 {
     DataExplorerItem *pItem = GetCurItemSelected();
     
@@ -671,7 +671,7 @@ void DataExplorerWidget::on_actionDeleteItem_triggered()
     }
 }
 
-void DataExplorerWidget::on_actionCutItem_triggered()
+void ProjectWidget::on_actionCutItem_triggered()
 {
     DataExplorerItem *pCurItemSelected = GetCurItemSelected();
     if(pCurItemSelected->IsProjectItem() == false)
@@ -689,7 +689,7 @@ void DataExplorerWidget::on_actionCutItem_triggered()
     ui->actionPasteItem->setEnabled(true);
 }
 
-void DataExplorerWidget::on_actionCopyItem_triggered()
+void ProjectWidget::on_actionCopyItem_triggered()
 {
     DataExplorerItem *pCurItemSelected = GetCurItemSelected();
     if(pCurItemSelected->IsProjectItem() == false)
@@ -707,7 +707,7 @@ void DataExplorerWidget::on_actionCopyItem_triggered()
     ui->actionPasteItem->setEnabled(true);
 }
 
-void DataExplorerWidget::on_actionPasteItem_triggered()
+void ProjectWidget::on_actionPasteItem_triggered()
 {
     Project *pCurProj = GetCurProjSelected();
 

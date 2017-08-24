@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DataExplorerWidget</class>
- <widget class="QWidget" name="DataExplorerWidget">
+ <class>ProjectWidget</class>
+ <widget class="QWidget" name="ProjectWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -44,7 +44,7 @@
   </layout>
   <action name="actionRename">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
    </property>
    <property name="text">
@@ -56,7 +56,7 @@
   </action>
   <action name="actionDeleteItem">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
@@ -68,7 +68,7 @@
   </action>
   <action name="actionCutItem">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/edit-cut.png</normaloff>:/icons16x16/edit-cut.png</iconset>
    </property>
    <property name="text">
@@ -80,7 +80,7 @@
   </action>
   <action name="actionCopyItem">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/edit-copy.png</normaloff>:/icons16x16/edit-copy.png</iconset>
    </property>
    <property name="text">
@@ -92,7 +92,7 @@
   </action>
   <action name="actionPasteItem">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/edit-paste.png</normaloff>:/icons16x16/edit-paste.png</iconset>
    </property>
    <property name="text">
@@ -104,7 +104,7 @@
   </action>
  </widget>
  <resources>
-  <include location="res/DesignerTool.qrc"/>
+  <include location="../res/DesignerTool.qrc"/>
  </resources>
  <connections/>
 </ui>

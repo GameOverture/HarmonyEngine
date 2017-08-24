@@ -22,7 +22,7 @@
 using std::vector;
 
 namespace Ui {
-class DataExplorerWidget;
+class ProjectWidget;
 }
 
 class Project;
@@ -47,7 +47,7 @@ Q_SIGNALS:
     void LoadFinished(Project *pLoadedItemProject);
 };
 
-class DataExplorerWidget : public QWidget
+class ProjectWidget : public QWidget
 {
     Q_OBJECT
 
@@ -57,8 +57,8 @@ class DataExplorerWidget : public QWidget
     QPoint                  m_ptDragStart;
 
 public:
-    explicit DataExplorerWidget(QWidget *parent = 0);
-    ~DataExplorerWidget();
+    explicit ProjectWidget(QWidget *parent = 0);
+    ~ProjectWidget();
     
     Project *AddItemProject(const QString sNewProjectFilePath);
 
@@ -75,7 +75,7 @@ public:
     void PasteItemSrc(QByteArray sSrc, Project *pProject);
 
 private:
-    Ui::DataExplorerWidget *ui;
+    Ui::ProjectWidget *ui;
 
     QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 
