@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QTreeWidget" name="treeWidget">
+    <widget class="ExplorerTreeWidget" name="treeWidget">
      <property name="animated">
       <bool>true</bool>
      </property>
@@ -103,6 +103,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ExplorerTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>ExplorerTreeWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../res/DesignerTool.qrc"/>
  </resources>

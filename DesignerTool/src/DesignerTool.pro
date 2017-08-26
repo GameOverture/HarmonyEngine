@@ -72,7 +72,8 @@ SOURCES += main.cpp \
     Entity/EntityToolbox.cpp \
     Entity/EntityTreeModel.cpp \
     Project/ProjectItemMimeData.cpp \
-    Project/ProjectWidget.cpp
+    Project/ProjectWidget.cpp \
+    Explorer/ExplorerTreeWidget.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -131,7 +132,8 @@ HEADERS  += \
     Entity/EntityToolbox.h \
     Entity/EntityTreeModel.h \
     Project/ProjectItemMimeData.h \
-    Project/ProjectWidget.h
+    Project/ProjectWidget.h \
+    Explorer/ExplorerTreeWidget.h
 
 FORMS    += \
     MainWindow.ui \
@@ -175,6 +177,7 @@ INCLUDEPATH += "$$PWD/Font"
 INCLUDEPATH += "$$PWD/Project"
 INCLUDEPATH += "$$PWD/Sprite"
 INCLUDEPATH += "$$PWD/Widget"
+INCLUDEPATH += "$$PWD/Explorer"
 
 INCLUDEPATH += "$$PWD/../../Harmony/include"
 DEPENDPATH += "$$PWD/../../Harmony/include"

@@ -28,19 +28,14 @@ class AtlasTreeItem;
 class ProjectTabBar : public QTabBar
 {
     Project *           m_pProjectOwner;
-    int                 m_iDragIndex;
-    QPoint              m_ptDragStart;
 
 public:
     ProjectTabBar(Project *pProjectOwner);
     virtual ~ProjectTabBar();
 
 protected:
-//    virtual void mousePressEvent(QMouseEvent *pEvent) override;
-//    virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
-
-    virtual void dragEnterEvent(QDragEnterEvent *event) override;
-    virtual void dropEvent(QDropEvent *event) override;
+    virtual void dragEnterEvent(QDragEnterEvent *pEvent) override;
+    virtual void dropEvent(QDropEvent *pEvent) override;
 };
 
 class Project : public DataExplorerItem, public IHyApplication
@@ -54,7 +49,7 @@ class Project : public DataExplorerItem, public IHyApplication
     AtlasWidget *                                   m_pAtlasWidget;
 
     AudioWidgetManager *                            m_pAudioMan;
-    QTabBar *                                       m_pTabBar;
+    ProjectTabBar *                                 m_pTabBar;
 
     ProjectItem *                                   m_pCurOpenItem;
 
@@ -85,7 +80,7 @@ public:
     AtlasWidget *GetAtlasWidget();
     AudioWidgetManager *GetAudioWidget();
 
-    QTabBar *GetTabBar();
+    ProjectTabBar *GetTabBar();
 
     ProjectItem *GetCurrentOpenItem();
     void OpenItem(ProjectItem *pItem);

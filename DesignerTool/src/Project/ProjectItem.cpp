@@ -252,7 +252,7 @@ void ProjectItem::DeleteFromProject()
 
 void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 {
-    QTabBar *pTabBar = m_ProjectRef.GetTabBar();
+    ProjectTabBar *pTabBar = m_ProjectRef.GetTabBar();
     for(int i = 0; i < pTabBar->count(); ++i)
     {
         if(pTabBar->tabData(i).value<ProjectItem *>() == this)

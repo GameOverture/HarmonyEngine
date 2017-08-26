@@ -154,7 +154,7 @@ void HyGuiRenderer::RestoreCursor()
     //if(event->mimeData()-
     //event->mimeData()->data(HYGUI_MIMETYPE)
 
-    QTabBar *pTabBar = m_pProjOwner->GetTabBar();
+    ProjectTabBar *pTabBar = m_pProjOwner->GetTabBar();
     if(pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>()->GetType() == ITEM_Entity)
     {
 

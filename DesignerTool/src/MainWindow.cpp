@@ -382,7 +382,7 @@ void MainWindow::OnCtrlTab()
     if(m_pCurSelectedProj == nullptr)
         return;
 
-    QTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
+    ProjectTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
     //pTabBar
 }
 
@@ -534,7 +534,7 @@ void MainWindow::on_actionSave_triggered()
         return;
     }
 
-    QTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
+    ProjectTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
     int iIndex = pTabBar->currentIndex();
     if(iIndex < 0)
     {
@@ -557,7 +557,7 @@ void MainWindow::on_actionSaveAll_triggered()
         return;
     }
 
-    QTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
+    ProjectTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
     for(int i = 0; i < pTabBar->count(); ++i)
     {
         ProjectItem *pItem = pTabBar->tabData(i).value<ProjectItem *>();

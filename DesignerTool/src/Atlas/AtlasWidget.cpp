@@ -322,7 +322,7 @@ void AtlasWidget::on_actionReplaceImages_triggered()
         return;
     }
     
-    QTabBar *pTabBar = m_pModel->GetProjOwner()->GetTabBar();
+    ProjectTabBar *pTabBar = m_pModel->GetProjOwner()->GetTabBar();
     
     // Keep track of any linked/refrenced items as they will need to be resaved after image replacement
     QList<ProjectItem *> affectedItemList;

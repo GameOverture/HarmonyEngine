@@ -13,6 +13,7 @@
 #include "AudioWidgetManager.h"
 #include "MainWindow.h"
 #include "HyGuiGlobal.h"
+#include "ProjectItemMimeData.h"
 
 #include "Harmony/HyEngine.h"
 
@@ -30,8 +31,7 @@
 
 HarmonyInit g_DefaultInit;
 
-ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProjectOwner),
-                                                        m_iDragIndex(-1)
+ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProjectOwner)
 {
 }
 
@@ -39,42 +39,36 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProject
 {
 }
 
-///*virtual*/ void ProjectTabBar::mousePressEvent(QMouseEvent *pEvent) /*override*/
-//{
-//    if(pEvent->button() == Qt::LeftButton)
-//    {
-//        m_iDragIndex = this->tabAt(this->mapFromGlobal(QCursor::pos()));
-//        if(m_iDragIndex != -1)
-//        {
-//            m_ptDragStart = pEvent->pos();
-//        }
-//    }
-//}
-
-///*virtual*/ void ProjectTabBar::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
-//{
-//    if((pEvent->buttons() & Qt::LeftButton) == 0)
-//    {
-//        m_iDragIndex = -1;
-//        return;
-//    }
-
-//    if(m_iDragIndex != -1 &&
-//       (pEvent->pos() - m_ptDragStart).manhattanLength() < QApplication::startDragDistance())
-//    {
-//        for(int i = 0; i < count(); ++i)
-//        {
-//            tabButton(
-//        }
-//    }
-//}
-
-/*virtual*/ void ProjectTabBar::dragEnterEvent(QDragEnterEvent *event) /*override*/
+/*virtual*/ void ProjectTabBar::dragEnterEvent(QDragEnterEvent *pEvent) /*override*/
 {
+    const QMimeData *pMimeData = pEvent->mimeData();
+
+    if(pMimeData->hasFormat(HYGUI_MIMETYPE))
+        pEvent->acceptProposedAction();
 }
 
-/*virtual*/ void ProjectTabBar::dropEvent(QDropEvent *event) /*override*/
+/*virtual*/ void ProjectTabBar::dropEvent(QDropEvent *pEvent) /*override*/
 {
+    if(pEvent->proposedAction() == Qt::LinkAction && pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE))
+    {
+        // Process the data from the event.
+        QByteArray dragDataSrc = pEvent->mimeData()->data(HYGUI_MIMETYPE);
+        QJsonDocument userDoc = QJsonDocument::fromJson(dragDataSrc);
+
+        QJsonObject dragObj = userDoc.object();
+        if(dragObj["project"].toString().toLower() != m_pProjectOwner->GetAbsPath().toLower())
+        {
+            pEvent->ignore();
+            return;
+        }
+
+        ProjectItem *pProjItem = static_cast<ProjectItem *>(pEvent->source());
+        MainWindow::OpenItem(pProjItem);
+
+        pEvent->acceptProposedAction();
+    }
+    else
+        pEvent->ignore();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -345,7 +339,7 @@ AudioWidgetManager *Project::GetAudioWidget()
     return m_pAudioMan;
 }
 
-QTabBar *Project::GetTabBar()
+ProjectTabBar *Project::GetTabBar()
 {
     return m_pTabBar;
 }
@@ -463,7 +457,7 @@ void Project::OnHarmonyLoaded()
     
     if(m_pTabBar == nullptr)
     {
-        m_pTabBar = new QTabBar(nullptr);
+        m_pTabBar = new ProjectTabBar(this);
         m_pTabBar->setTabsClosable(true);
         m_pTabBar->setShape(QTabBar::TriangularNorth);
         m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);

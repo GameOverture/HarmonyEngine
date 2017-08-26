@@ -21,7 +21,6 @@
 
 #include <QJsonArray>
 #include <QMessageBox>
-#include <QDrag>
 #include <QClipboard>
 
 QByteArray ProjectWidget::sm_sInternalClipboard = "";
@@ -33,11 +32,11 @@ QByteArray ProjectWidget::sm_sInternalClipboard = "";
     Q_EMIT LoadFinished(pNewItemProject);
 }
 
-ProjectWidget::ProjectWidget(QWidget *parent) :   QWidget(parent),
-                                                            ui(new Ui::ProjectWidget),
-                                                            m_pDraggedProjItem(nullptr)
+ProjectWidget::ProjectWidget(QWidget *parent) : QWidget(parent),
+                                                ui(new Ui::ProjectWidget)
 {
     ui->setupUi(this);
+    ui->treeWidget->SetOwner(this); // <- this is redundant right? I've seen the owner be a vertical layout though...
 
     ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -406,65 +405,6 @@ QTreeWidgetItem *ProjectWidget::GetSelectedTreeItem()
         pCurSelected = ui->treeWidget->selectedItems()[0];  // Only single selection is allowed in explorer because two projects may be opened
 
     return pCurSelected;
-}
-
-/*virtual*/ void ProjectWidget::mousePressEvent(QMouseEvent *pEvent) /*override*/
-{
-    if(pEvent->button() == Qt::LeftButton)
-    {
-        QTreeWidgetItem *pClickedTreeItem = ui->treeWidget->itemAt(ui->treeWidget->mapFromGlobal(QCursor::pos()));
-        if(pClickedTreeItem)
-        {
-            DataExplorerItem *pExplorerItem = pClickedTreeItem->data(0, Qt::UserRole).value<DataExplorerItem *>();
-
-            if(pExplorerItem->IsProjectItem())
-            {
-                m_pDraggedProjItem = static_cast<ProjectItem *>(pExplorerItem);
-                m_ptDragStart = pEvent->pos();
-            }
-        }
-    }
-}
-
-/*virtual*/ void ProjectWidget::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
-{
-    if((pEvent->buttons() & Qt::LeftButton) == 0)
-    {
-        m_pDraggedProjItem = nullptr;
-        return;
-    }
-
-    if(m_pDraggedProjItem == nullptr ||
-       (pEvent->pos() - m_ptDragStart).manhattanLength() < QApplication::startDragDistance())
-    {
-        return;
-    }
-
-    ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(m_pDraggedProjItem);
-
-    QDrag *pDrag = new QDrag(this);
-    pDrag->setMimeData(pNewMimeData);
-
-    Qt::DropAction dropAction = pDrag->exec(Qt::CopyAction | Qt::MoveAction);
-}
-
-/*virtual*/ void ProjectWidget::dragEnterEvent(QDragEnterEvent *event) /*override*/
-{
-    event->ignore();
-    return;
-
-    if(event->source() == this)
-    {
-        //event->mimeData()->data(HYGUI_MIMETYPE)
-    }
-
-    if(event->mimeData()->hasFormat(HYGUI_MIMETYPE))
-        event->acceptProposedAction();
-}
-
-/*virtual*/ void ProjectWidget::dropEvent(QDropEvent *event) /*override*/
-{
-    event->ignore();
 }
 
 void ProjectWidget::OnProjectLoaded(Project *pLoadedProj)

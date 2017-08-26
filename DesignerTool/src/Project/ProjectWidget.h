@@ -53,9 +53,6 @@ class ProjectWidget : public QWidget
 
     static QByteArray       sm_sInternalClipboard;
 
-    ProjectItem *           m_pDraggedProjItem;
-    QPoint                  m_ptDragStart;
-
 public:
     explicit ProjectWidget(QWidget *parent = 0);
     ~ProjectWidget();
@@ -80,13 +77,6 @@ private:
     QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 
     QTreeWidgetItem *GetSelectedTreeItem();
-
-protected:
-    virtual void mousePressEvent(QMouseEvent *pEvent) override;
-    virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
-
-    virtual void dragEnterEvent(QDragEnterEvent *event) override;
-    virtual void dropEvent(QDropEvent *event) override;
     
 private Q_SLOTS:
     void OnProjectLoaded(Project *pLoadedProj);
