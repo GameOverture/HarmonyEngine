@@ -25,6 +25,24 @@ class AudioWidgetManager;
 
 class AtlasTreeItem;
 
+class ProjectTabBar : public QTabBar
+{
+    Project *           m_pProjectOwner;
+    int                 m_iDragIndex;
+    QPoint              m_ptDragStart;
+
+public:
+    ProjectTabBar(Project *pProjectOwner);
+    virtual ~ProjectTabBar();
+
+protected:
+//    virtual void mousePressEvent(QMouseEvent *pEvent) override;
+//    virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
+
+    virtual void dragEnterEvent(QDragEnterEvent *event) override;
+    virtual void dropEvent(QDropEvent *event) override;
+};
+
 class Project : public DataExplorerItem, public IHyApplication
 {
     Q_OBJECT

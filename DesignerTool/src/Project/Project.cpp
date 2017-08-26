@@ -30,6 +30,55 @@
 
 HarmonyInit g_DefaultInit;
 
+ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProjectOwner),
+                                                        m_iDragIndex(-1)
+{
+}
+
+/*virtual*/ ProjectTabBar::~ProjectTabBar()
+{
+}
+
+///*virtual*/ void ProjectTabBar::mousePressEvent(QMouseEvent *pEvent) /*override*/
+//{
+//    if(pEvent->button() == Qt::LeftButton)
+//    {
+//        m_iDragIndex = this->tabAt(this->mapFromGlobal(QCursor::pos()));
+//        if(m_iDragIndex != -1)
+//        {
+//            m_ptDragStart = pEvent->pos();
+//        }
+//    }
+//}
+
+///*virtual*/ void ProjectTabBar::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
+//{
+//    if((pEvent->buttons() & Qt::LeftButton) == 0)
+//    {
+//        m_iDragIndex = -1;
+//        return;
+//    }
+
+//    if(m_iDragIndex != -1 &&
+//       (pEvent->pos() - m_ptDragStart).manhattanLength() < QApplication::startDragDistance())
+//    {
+//        for(int i = 0; i < count(); ++i)
+//        {
+//            tabButton(
+//        }
+//    }
+//}
+
+/*virtual*/ void ProjectTabBar::dragEnterEvent(QDragEnterEvent *event) /*override*/
+{
+}
+
+/*virtual*/ void ProjectTabBar::dropEvent(QDropEvent *event) /*override*/
+{
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Project::Project(const QString sProjectFilePath) :  DataExplorerItem(ITEM_Project, sProjectFilePath),
                                                     IHyApplication(g_DefaultInit),
                                                     m_pDraw(nullptr),
@@ -418,6 +467,8 @@ void Project::OnHarmonyLoaded()
         m_pTabBar->setTabsClosable(true);
         m_pTabBar->setShape(QTabBar::TriangularNorth);
         m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
+        m_pTabBar->setAcceptDrops(true);
+        m_pTabBar->setMovable(true);
         m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
         m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(OnCloseTab(int)));
     }
