@@ -55,6 +55,7 @@ HyGuiRenderer::HyGuiRenderer(Project *pProj, QWidget *parent /*= 0*/) : QOpenGLW
     
     m_bIsUpdating = true;
 
+    setAcceptDrops(true);
     RestoreCursor();
 }
 
@@ -154,7 +155,8 @@ void HyGuiRenderer::RestoreCursor()
     ProjectTabBar *pTabBar = m_pProjOwner->GetTabBar();
     ProjectItem *pCurProjItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
 
-    if(pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE) &&
+    if(pCurProjItem &&
+       pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE) &&
        static_cast<ProjectItem *>(pEvent->source()) != pCurProjItem &&
        pCurProjItem->GetType() == ITEM_Entity)
     {
@@ -167,7 +169,8 @@ void HyGuiRenderer::RestoreCursor()
     ProjectTabBar *pTabBar = m_pProjOwner->GetTabBar();
     ProjectItem *pCurProjItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
 
-    if(pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE) &&
+    if(pCurProjItem &&
+       pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE) &&
        static_cast<ProjectItem *>(pEvent->source()) != pCurProjItem &&
        pCurProjItem->GetType() == ITEM_Entity &&
        pCurProjItem->GetWidget())
