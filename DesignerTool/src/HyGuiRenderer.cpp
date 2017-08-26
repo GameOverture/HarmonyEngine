@@ -149,20 +149,31 @@ void HyGuiRenderer::RestoreCursor()
 {
 }
 
-/*virtual*/ void HyGuiRenderer::dragEnterEvent(QDragEnterEvent *event) /*override*/
+/*virtual*/ void HyGuiRenderer::dragEnterEvent(QDragEnterEvent *pEvent) /*override*/
 {
-    //if(event->mimeData()-
-    //event->mimeData()->data(HYGUI_MIMETYPE)
-
     ProjectTabBar *pTabBar = m_pProjOwner->GetTabBar();
-    if(pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>()->GetType() == ITEM_Entity)
-    {
+    ProjectItem *pCurProjItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
 
+    if(pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE) &&
+       static_cast<ProjectItem *>(pEvent->source()) != pCurProjItem &&
+       pCurProjItem->GetType() == ITEM_Entity)
+    {
+        pEvent->acceptProposedAction();
     }
 }
 
-/*virtual*/ void HyGuiRenderer::dropEvent(QDropEvent *event) /*override*/
+/*virtual*/ void HyGuiRenderer::dropEvent(QDropEvent *pEvent) /*override*/
 {
+    ProjectTabBar *pTabBar = m_pProjOwner->GetTabBar();
+    ProjectItem *pCurProjItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
+
+    if(pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE) &&
+       static_cast<ProjectItem *>(pEvent->source()) != pCurProjItem &&
+       pCurProjItem->GetType() == ITEM_Entity &&
+       pCurProjItem->GetWidget())
+    {
+
+    }
 }
 
 void HyGuiRenderer::OnBootCheck()
