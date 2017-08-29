@@ -73,7 +73,8 @@ SOURCES += main.cpp \
     Entity/EntityTreeModel.cpp \
     Project/ProjectItemMimeData.cpp \
     Project/ProjectWidget.cpp \
-    Explorer/ExplorerTreeWidget.cpp
+    Explorer/ExplorerTreeWidget.cpp \
+    Entity/EntityCommon.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -133,7 +134,8 @@ HEADERS  += \
     Entity/EntityTreeModel.h \
     Project/ProjectItemMimeData.h \
     Project/ProjectWidget.h \
-    Explorer/ExplorerTreeWidget.h
+    Explorer/ExplorerTreeWidget.h \
+    Entity/EntityCommon.h
 
 FORMS    += \
     MainWindow.ui \
@@ -160,7 +162,8 @@ FORMS    += \
     Widget/WidgetOutputLog.ui \
     Widget/WidgetRangedSlider.ui \
     Entity/EntityToolbox.ui \
-    Project/ProjectWidget.ui
+    Project/ProjectWidget.ui \
+    Entity/EntityCommon.ui
 
 RC_FILE = DesignerTool.rc
 

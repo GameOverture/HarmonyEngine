@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>213</width>
-    <height>590</height>
+    <width>338</width>
+    <height>666</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -118,13 +118,6 @@
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="chkStartEnabled">
-     <property name="text">
-      <string>Start Enabled</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QVBoxLayout" name="verticalLayout_8">
      <property name="spacing">
       <number>0</number>
@@ -133,6 +126,13 @@
       <layout class="QHBoxLayout" name="ChildrenToolbar">
        <item>
         <widget class="QToolButton" name="btnAddChild">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="btnAddChildPrimitive">
          <property name="text">
           <string>...</string>
          </property>
@@ -204,7 +204,7 @@
          <number>1</number>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="pageNull">
          <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -232,6 +232,56 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="pageEntity">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="EntityCommon" name="commonTools">
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="page">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>308</width>
+               <height>79</height>
+              </rect>
+             </property>
+             <attribute name="label">
+              <string>Page 1</string>
+             </attribute>
+            </widget>
+            <widget class="QWidget" name="page_2">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>308</width>
+               <height>79</height>
+              </rect>
+             </property>
+             <attribute name="label">
+              <string>Page 2</string>
+             </attribute>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
         <widget class="QWidget" name="pageSprite">
          <layout class="QVBoxLayout" name="verticalLayout_7">
           <property name="leftMargin">
@@ -246,9 +296,6 @@
           <property name="bottomMargin">
            <number>2</number>
           </property>
-          <item>
-           <widget class="QTableView" name="tableView"/>
-          </item>
          </layout>
         </widget>
         <widget class="QWidget" name="pageFont"/>
@@ -501,16 +548,16 @@
     <string>Shift the index of the current state forward by 1</string>
    </property>
   </action>
-  <action name="actionInsertPrimitive">
+  <action name="actionAddPrimitive">
    <property name="icon">
     <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/media-pauseRecord.png</normaloff>:/icons16x16/media-pauseRecord.png</iconset>
    </property>
    <property name="text">
-    <string>Insert Primitive</string>
+    <string>Add a Primitive shape as a child</string>
    </property>
    <property name="toolTip">
-    <string>Inserts a child primitive at the selected node</string>
+    <string>Inserts a primitive shape as a child, at the selected node</string>
    </property>
   </action>
   <action name="actionInsertBoundingVolume">
@@ -529,12 +576,31 @@
     <string>Inserts a physics body at the selected node that simulates forces and velocity</string>
    </property>
   </action>
-  <action name="actionTemp">
+  <action name="actionAddScissorBox">
    <property name="text">
-    <string>Temp</string>
+    <string>Add Scissor Box</string>
+   </property>
+   <property name="toolTip">
+    <string>Inserts a scissor box which culls away a portion of the visual</string>
+   </property>
+  </action>
+  <action name="actionAddSelectedChild">
+   <property name="text">
+    <string>Add Selected Child</string>
+   </property>
+   <property name="toolTip">
+    <string>Add the selected item in Project Explorer as a child</string>
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>EntityCommon</class>
+   <extends>QToolBox</extends>
+   <header>EntityCommon.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../res/DesignerTool.qrc"/>
  </resources>
