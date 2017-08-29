@@ -132,28 +132,35 @@
      <item>
       <layout class="QHBoxLayout" name="ChildrenToolbar">
        <item>
-        <widget class="QToolButton" name="toolButton">
+        <widget class="QToolButton" name="btnAddChild">
          <property name="text">
           <string>...</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="toolButton_4">
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="btnAddBoundingVolume">
          <property name="text">
           <string>...</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="toolButton_3">
+        <widget class="QToolButton" name="btnAddPhysics">
          <property name="text">
           <string>...</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="toolButton_2">
+        <widget class="QToolButton" name="btnAddScissor">
          <property name="text">
           <string>...</string>
          </property>
