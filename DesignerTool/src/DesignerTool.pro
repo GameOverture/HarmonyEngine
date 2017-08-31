@@ -74,7 +74,8 @@ SOURCES += main.cpp \
     Project/ProjectItemMimeData.cpp \
     Project/ProjectWidget.cpp \
     Explorer/ExplorerTreeWidget.cpp \
-    Entity/EntityCommon.cpp
+    Entity/EntityCommon.cpp \
+    Entity/EntityUndoCmds.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -135,7 +136,8 @@ HEADERS  += \
     Project/ProjectItemMimeData.h \
     Project/ProjectWidget.h \
     Explorer/ExplorerTreeWidget.h \
-    Entity/EntityCommon.h
+    Entity/EntityCommon.h \
+    Entity/EntityUndoCmds.h
 
 FORMS    += \
     MainWindow.ui \

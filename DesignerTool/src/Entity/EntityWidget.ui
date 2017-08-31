@@ -146,14 +146,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="btnAddBoundingVolume">
+        <widget class="QToolButton" name="btnInsertBoundingVolume">
          <property name="text">
           <string>...</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="btnAddPhysics">
+        <widget class="QToolButton" name="btnInsertPhysics">
          <property name="text">
           <string>...</string>
          </property>
@@ -244,8 +244,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>360</width>
-               <height>191</height>
+               <width>100</width>
+               <height>30</height>
               </rect>
              </property>
              <attribute name="label">
@@ -257,8 +257,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>360</width>
-               <height>191</height>
+               <width>68</width>
+               <height>16</height>
               </rect>
              </property>
              <attribute name="label">
@@ -301,7 +301,7 @@
                <x>0</x>
                <y>0</y>
                <width>360</width>
-               <height>301</height>
+               <height>144</height>
               </rect>
              </property>
              <attribute name="label">
@@ -313,8 +313,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>360</width>
-               <height>301</height>
+               <width>100</width>
+               <height>30</height>
               </rect>
              </property>
              <attribute name="label">
@@ -431,7 +431,7 @@
                <x>0</x>
                <y>0</y>
                <width>360</width>
-               <height>151</height>
+               <height>144</height>
               </rect>
              </property>
              <attribute name="label">
@@ -443,8 +443,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>360</width>
-               <height>151</height>
+               <width>100</width>
+               <height>30</height>
               </rect>
              </property>
              <attribute name="label">
@@ -783,6 +783,10 @@
    </property>
   </action>
   <action name="actionInsertBoundingVolume">
+   <property name="icon">
+    <iconset resource="../res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/items/BoundingVolume-New.png</normaloff>:/icons16x16/items/BoundingVolume-New.png</iconset>
+   </property>
    <property name="text">
     <string>Insert Bounding Volume</string>
    </property>
@@ -791,6 +795,10 @@
    </property>
   </action>
   <action name="actionInsertPhysicsBody">
+   <property name="icon">
+    <iconset resource="../res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/items/Physics-New.png</normaloff>:/icons16x16/items/Physics-New.png</iconset>
+   </property>
    <property name="text">
     <string>Insert Physics Body</string>
    </property>
@@ -807,6 +815,10 @@
    </property>
   </action>
   <action name="actionAddSelectedChild">
+   <property name="icon">
+    <iconset resource="../res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+   </property>
    <property name="text">
     <string>Add Selected Child</string>
    </property>

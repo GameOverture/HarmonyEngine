@@ -1,5 +1,5 @@
 /**************************************************************************
- *	WidgetSpriteUndoCmds.cpp
+ *	SpriteUndoCmds.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler

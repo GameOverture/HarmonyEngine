@@ -23,6 +23,13 @@ public:
 
     void OnGiveMenuActions(QMenu *pMenu);
 
+private Q_SLOTS:
+    void on_actionAddSelectedChild_triggered();
+    void on_actionAddPrimitive_triggered();
+    void on_actionInsertBoundingVolume_triggered();
+    void on_actionInsertPhysicsBody_triggered();
+
+
 private:
     Ui::EntityWidget *ui;
 };

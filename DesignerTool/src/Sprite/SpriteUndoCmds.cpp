@@ -1,5 +1,5 @@
 /**************************************************************************
- *	WidgetSpriteUndoCmds.cpp
+ *	SpriteUndoCmds.cpp
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -13,10 +13,10 @@
 #include "SpriteModels.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SpriteUndoCmd_OrderFrame::SpriteUndoCmd_OrderFrame(SpriteTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-                                                                                                                                                                                        m_pSpriteTableView(pSpriteTableView),
-                                                                                                                                                                                        m_iFrameIndex(iFrameIndex),
-                                                                                                                                                                                        m_iFrameIndexDest(iFrameIndexDestination)
+SpriteUndoCmd_OrderFrame::SpriteUndoCmd_OrderFrame(SpriteTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                    m_pSpriteTableView(pSpriteTableView),
+                                                                                                                                                                    m_iFrameIndex(iFrameIndex),
+                                                                                                                                                                    m_iFrameIndexDest(iFrameIndexDestination)
 {
     if(m_iFrameIndex > m_iFrameIndexDest)
         setText("Order Frame Upwards");

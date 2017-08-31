@@ -5,15 +5,20 @@
 
 #include <QAbstractItemModel>
 
+class EntityTreeModel;
+
 class EntityTreeItem
 {
+    EntityTreeModel *               m_pTreeModel;
     ProjectItem *                   m_pItem;
 
     EntityTreeItem *                m_pParentItem;
     QList<EntityTreeItem *>         m_ChildList;
 
+    QList<QJsonObject>              m_StateDataList;
+
 public:
-    explicit EntityTreeItem(ProjectItem *pItem);
+    explicit EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem);
     ~EntityTreeItem();
 
     ProjectItem *GetItem();
@@ -26,6 +31,7 @@ public:
 
     int GetNumChildren() const;
     int GetRow() const;
+    int GetCol() const;
 
     QString GetToolTip() const;
 };
@@ -52,7 +58,10 @@ public:
 
     QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 
-    void InsertItems(int iRow, QList<EntityTreeItem *> itemList, const QModelIndex &parentIndex);
+    void InsertItem(int iRow, EntityTreeItem * pItem, EntityTreeItem *pParentItem);
+    void InsertItems(int iRow, QList<EntityTreeItem *> itemList, EntityTreeItem *pParentItem);
+
+    void RemoveItems(int iRow, int iCount, EntityTreeItem *pParentItem);
     bool removeRows(int iRow, int iCount, const QModelIndex &parentIndex = QModelIndex()) override;
 
 private:

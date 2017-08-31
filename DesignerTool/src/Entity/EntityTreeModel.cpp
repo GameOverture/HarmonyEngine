@@ -1,7 +1,8 @@
 #include "EntityTreeModel.h"
 
-EntityTreeItem::EntityTreeItem(ProjectItem *pItem) :    m_pItem(pItem),
-                                                        m_pParentItem(nullptr)
+EntityTreeItem::EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem) :   m_pTreeModel(pTreeModel),
+                                                                                    m_pItem(pItem),
+                                                                                    m_pParentItem(nullptr)
 {
 }
 
@@ -65,6 +66,11 @@ int EntityTreeItem::GetRow() const
     return 0;
 }
 
+int EntityTreeItem::GetCol() const
+{
+    return 0;
+}
+
 QString EntityTreeItem::GetToolTip() const
 {
     return QString();
@@ -74,12 +80,10 @@ QString EntityTreeItem::GetToolTip() const
 
 EntityTreeModel::EntityTreeModel(ProjectItem &entityItemRef, QObject *parent) : QAbstractItemModel(parent)
 {
-    m_pRootItem = new EntityTreeItem(nullptr);
-    m_pEntityItem = new EntityTreeItem(&entityItemRef);
+    m_pRootItem = new EntityTreeItem(this, nullptr);
+    m_pEntityItem = new EntityTreeItem(this, &entityItemRef);
 
-    QList<EntityTreeItem *> list;
-    list.append(m_pEntityItem);
-    InsertItems(0, list, createIndex(0, 0, m_pRootItem));
+    InsertItem(0, m_pEntityItem, m_pRootItem);
 }
 
 /*virtual*/ EntityTreeModel::~EntityTreeModel()
@@ -161,8 +165,17 @@ QVariant EntityTreeModel::data(const QModelIndex &index, int iRole /*= Qt::Displ
     return QVariant();
 }
 
-void EntityTreeModel::InsertItems(int iRow, QList<EntityTreeItem *> itemList, const QModelIndex &parentIndex)
+void EntityTreeModel::InsertItem(int iRow, EntityTreeItem *pItem, EntityTreeItem *pParentItem)
 {
+    QList<EntityTreeItem *> itemList;
+    itemList << pItem;
+    InsertItems(iRow, itemList, pParentItem);
+}
+
+void EntityTreeModel::InsertItems(int iRow, QList<EntityTreeItem *> itemList, EntityTreeItem *pParentItem)
+{
+    QModelIndex parentIndex = pParentItem ? createIndex(pParentItem->GetRow(), pParentItem->GetCol(), pParentItem) : QModelIndex();
+
     EntityTreeItem *pParent;
     if(parentIndex.isValid() == false)
         pParent = m_pRootItem;
@@ -177,6 +190,11 @@ void EntityTreeModel::InsertItems(int iRow, QList<EntityTreeItem *> itemList, co
         pParent->InsertChild(iRow + i, itemList[i]);
 
     endInsertRows();
+}
+
+void EntityTreeModel::RemoveItems(int iRow, int iCount, EntityTreeItem *pParentItem)
+{
+    removeRows(iRow, iCount, pParentItem ? createIndex(pParentItem->GetRow(), pParentItem->GetCol(), pParentItem) : QModelIndex());
 }
 
 bool EntityTreeModel::removeRows(int iRow, int iCount, const QModelIndex &parentIndex)
