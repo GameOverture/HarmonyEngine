@@ -204,7 +204,7 @@
          <number>1</number>
         </property>
         <property name="currentIndex">
-         <number>5</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="pageNull">
          <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -245,7 +245,7 @@
                <x>0</x>
                <y>0</y>
                <width>360</width>
-               <height>122</height>
+               <height>191</height>
               </rect>
              </property>
              <attribute name="label">
@@ -258,7 +258,7 @@
                <x>0</x>
                <y>0</y>
                <width>360</width>
-               <height>122</height>
+               <height>191</height>
               </rect>
              </property>
              <attribute name="label">
@@ -301,7 +301,7 @@
                <x>0</x>
                <y>0</y>
                <width>360</width>
-               <height>151</height>
+               <height>301</height>
               </rect>
              </property>
              <attribute name="label">
@@ -314,7 +314,7 @@
                <x>0</x>
                <y>0</y>
                <width>360</width>
-               <height>151</height>
+               <height>301</height>
               </rect>
              </property>
              <attribute name="label">
@@ -431,7 +431,7 @@
                <x>0</x>
                <y>0</y>
                <width>360</width>
-               <height>144</height>
+               <height>151</height>
               </rect>
              </property>
              <attribute name="label">
@@ -444,7 +444,7 @@
                <x>0</x>
                <y>0</y>
                <width>360</width>
-               <height>144</height>
+               <height>151</height>
               </rect>
              </property>
              <attribute name="label">
