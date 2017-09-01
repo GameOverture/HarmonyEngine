@@ -18,6 +18,8 @@
 // Client supplies these initialization parameters to the engine
 struct HarmonyInit
 {
+	std::string				sProjectDir;
+
 	std::string				sGameName;
 	std::string				sDataDir;
 	uint32					uiNumWindows;

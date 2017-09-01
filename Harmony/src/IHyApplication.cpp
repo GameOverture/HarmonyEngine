@@ -17,6 +17,8 @@ float IHyApplication::sm_fPixelsPerMeter = 0.0f;
 
 HarmonyInit::HarmonyInit()
 {
+	sProjectDir = ".";
+
 	sGameName = "Untitled Game";
 	sDataDir = "/data";
 	eDefaultCoordinateUnit = HYCOORDUNIT_Pixels;
@@ -61,17 +63,20 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 
 	if(projObject.has<jsonxx::String>("AdjustWorkingDirectory"))
 	{
-		std::string sWorkingDir = projObject.get<jsonxx::String>("AdjustWorkingDirectory");
-		sHyProjFileName = sWorkingDir + "/" + sHyProjFileName;
+		sProjectDir = projObject.get<jsonxx::String>("AdjustWorkingDirectory");
+		sHyProjFileName = sProjectDir + "/" + sHyProjFileName;
 		sHyProjFileName = MakeStringProperPath(sHyProjFileName.c_str(), ".hyproj", false);
 
 		HyReadTextFile(sHyProjFileName.c_str(), sProjFileContents);
 		projObject.parse(sProjFileContents);
 
-		sDataDir = sWorkingDir + "/" + projObject.get<jsonxx::String>("DataPath");
+		sDataDir = sProjectDir + "/" + projObject.get<jsonxx::String>("DataPath");
 	}
 	else
+	{
+		sProjectDir = ".";
 		sDataDir = projObject.get<jsonxx::String>("DataPath");
+	}
 	
 	sGameName				= projObject.get<jsonxx::String>("GameName");
 	eDefaultCoordinateUnit	= static_cast<HyCoordinateUnit>(static_cast<int32>(projObject.get<jsonxx::Number>("DefaultCoordinateUnit")));
