@@ -8,14 +8,17 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "EntityUndoCmds.h"
+#include "EntityTreeModel.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-EntityUndoCmd_AddNewChild::EntityUndoCmd_AddNewChild(SpriteTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                                                                                    m_pSpriteTableView(pSpriteTableView),
-                                                                                                                                                                    m_iFrameIndex(iFrameIndex),
-                                                                                                                                                                    m_iFrameIndexDest(iFrameIndexDestination)
+EntityUndoCmd_AddNewChild::EntityUndoCmd_AddNewChild(EntityTreeItem *pParentTreeItem, EntityTreeModel *pTreeModel, ProjectItem *pItem, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
+                                                                                                                                                                        m_pParentTreeItem(pParentTreeItem),
+                                                                                                                                                                        m_pTreeModel(pTreeModel),
+                                                                                                                                                                        m_pItem(pItem),
+                                                                                                                                                                        m_pNewTreeItem(new EntityTreeItem(m_pTreeModel, m_pItem)),
+                                                                                                                                                                        m_iRow(0)
 {
-    setText("New Child");
+    setText("Add New Child");
 }
 
 /*virtual*/ EntityUndoCmd_AddNewChild::~EntityUndoCmd_AddNewChild()
@@ -24,43 +27,13 @@ EntityUndoCmd_AddNewChild::EntityUndoCmd_AddNewChild(SpriteTableView *pSpriteTab
 
 void EntityUndoCmd_AddNewChild::redo()
 {
-    GetTreeModel()
-    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
-
-    int iOffset = m_iFrameIndexDest - m_iFrameIndex;
-    while(iOffset > 0)
-    {
-        pSpriteFramesModel->MoveRowDown(m_iFrameIndex);
-        iOffset--;
-    }
-
-    while(iOffset < 0)
-    {
-        pSpriteFramesModel->MoveRowUp(m_iFrameIndex);
-        iOffset++;
-    }
-
-    m_pSpriteTableView->selectRow(m_iFrameIndexDest);
+    m_pTreeModel->InsertItem(m_iRow, m_pNewTreeItem, m_pParentTreeItem);
 }
 
 void EntityUndoCmd_AddNewChild::undo()
 {
-    SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
-
-    int iOffset = m_iFrameIndex - m_iFrameIndexDest;
-    while(iOffset > 0)
-    {
-        pSpriteFramesModel->MoveRowDown(m_iFrameIndexDest);
-        iOffset--;
-    }
-
-    while(iOffset < 0)
-    {
-        pSpriteFramesModel->MoveRowUp(m_iFrameIndexDest);
-        iOffset++;
-    }
-
-    m_pSpriteTableView->selectRow(m_iFrameIndex);
+    m_iRow = m_pNewTreeItem->GetRow();
+    m_pTreeModel->RemoveItems(m_iRow, 1, m_pParentTreeItem);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

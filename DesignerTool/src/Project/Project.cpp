@@ -73,16 +73,17 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProject
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Project::Project(const QString sProjectFilePath) :  DataExplorerItem(ITEM_Project, sProjectFilePath),
-                                                    IHyApplication(g_DefaultInit),
-                                                    m_pDraw(nullptr),
-                                                    m_DlgProjectSettings(sProjectFilePath),
-                                                    m_pAtlasModel(nullptr),
-                                                    m_pAtlasWidget(nullptr),
-                                                    m_pAudioMan(nullptr),
-                                                    m_pTabBar(nullptr),
-                                                    m_pCurOpenItem(nullptr),
-                                                    m_bHasError(false)
+Project::Project(ProjectWidget *pProjWidget, const QString sProjectFilePath) :  DataExplorerItem(ITEM_Project, sProjectFilePath),
+                                                                                IHyApplication(g_DefaultInit),
+                                                                                m_pWidget(pProjWidget),
+                                                                                m_pDraw(nullptr),
+                                                                                m_DlgProjectSettings(sProjectFilePath),
+                                                                                m_pAtlasModel(nullptr),
+                                                                                m_pAtlasWidget(nullptr),
+                                                                                m_pAudioMan(nullptr),
+                                                                                m_pTabBar(nullptr),
+                                                                                m_pCurOpenItem(nullptr),
+                                                                                m_bHasError(false)
 {
     m_pTreeItemPtr->setText(0, GetGameName());
     m_Init.sGameName = GetGameName().toStdString();
@@ -347,6 +348,11 @@ ProjectTabBar *Project::GetTabBar()
 ProjectItem *Project::GetCurrentOpenItem()
 {
     return m_pCurOpenItem;
+}
+
+ProjectWidget *Project::GetExplorerWidget()
+{
+    return m_pWidget;
 }
 
 void Project::OpenItem(ProjectItem *pItem)

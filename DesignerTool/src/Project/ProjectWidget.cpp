@@ -25,12 +25,12 @@
 
 QByteArray ProjectWidget::sm_sInternalClipboard = "";
 
-/*virtual*/ void DataExplorerLoadThread::run() /*override*/
-{
-    /* ... here is the expensive or blocking operation ... */
-    Project *pNewItemProject = new Project(m_sPath);
-    Q_EMIT LoadFinished(pNewItemProject);
-}
+///*virtual*/ void DataExplorerLoadThread::run() /*override*/
+//{
+//    /* ... here is the expensive or blocking operation ... */
+//    Project *pNewItemProject = new Project(nullptr, m_sPath);
+//    Q_EMIT LoadFinished(pNewItemProject);
+//}
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QWidget(parent),
                                                 ui(new Ui::ProjectWidget)
@@ -60,7 +60,7 @@ ProjectWidget::~ProjectWidget()
 
 Project *ProjectWidget::AddItemProject(const QString sNewProjectFilePath)
 {
-    Project *pNewProject = new Project(sNewProjectFilePath);
+    Project *pNewProject = new Project(this, sNewProjectFilePath);
     HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
 
     QTreeWidgetItem *pProjTreeItem = pNewProject->GetTreeItem();

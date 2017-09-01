@@ -1,6 +1,6 @@
 #include "EntityWidget.h"
 #include "ui_EntityWidget.h"
-
+#include "Project.h"
 #include "EntityUndoCmds.h"
 
 EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
@@ -39,6 +39,19 @@ ProjectItem &EntityWidget::GetItem()
     return m_ItemRef;
 }
 
+EntityModel *EntityWidget::GetEntityModel()
+{
+    return static_cast<EntityModel *>(m_ItemRef.GetModel());
+}
+
+EntityTreeItem *EntityWidget::GetCurSelectedTreeItem()
+{
+    QModelIndex curIndex = ui->childrenTree->currentIndex();
+    return static_cast<EntityTreeItem *>(curIndex.internalPointer());
+
+    //return static_cast<EntityTreeItem *>(GetEntityModel()->GetTreeModel().index(curIndex.row(), curIndex.column(), curIndex.parent()).internalPointer());
+}
+
 void EntityWidget::OnGiveMenuActions(QMenu *pMenu)
 {
 //    pMenu->addAction(ui->actionAddState);
@@ -55,7 +68,21 @@ void EntityWidget::OnGiveMenuActions(QMenu *pMenu)
 
 void EntityWidget::on_actionAddSelectedChild_triggered()
 {
-    QUndoCommand *pCmd = new EntityUndoCmd_AddNewChild();
+    if(GetCurSelectedTreeItem() == nullptr)
+    {
+        HyGuiLog("Currently selected entity tree item is nullptr. Cannot add child.", LOGTYPE_Error);
+        return;
+    }
+
+    DataExplorerItem *pExplorerItem = m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
+    if(pExplorerItem->IsProjectItem() == false)
+    {
+        HyGuiLog("Currently selected item in Explorer is not a ProjectItem. Cannot add child to entity.", LOGTYPE_Error);
+        return;
+    }
+
+    ProjectItem *pItem = static_cast<ProjectItem *>(pExplorerItem);
+    QUndoCommand *pCmd = new EntityUndoCmd_AddNewChild(GetCurSelectedTreeItem(), &GetEntityModel()->GetTreeModel(), pItem);
     m_ItemRef.GetUndoStack()->push(pCmd);
 }
 

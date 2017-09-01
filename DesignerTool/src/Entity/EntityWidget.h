@@ -20,6 +20,9 @@ public:
     ~EntityWidget();
 
     ProjectItem &GetItem();
+    EntityModel *GetEntityModel();
+
+    EntityTreeItem *GetCurSelectedTreeItem();
 
     void OnGiveMenuActions(QMenu *pMenu);
 

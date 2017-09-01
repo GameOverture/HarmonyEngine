@@ -11,19 +11,23 @@
 #define ENTITYUNDOCMDS_H
 
 #include <QUndoCommand>
-//#include <QTableWidget>
 
 class EntityTreeItem;
+class ProjectItem;
+class EntityTreeModel;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityUndoCmd_AddNewChild : public QUndoCommand
 {
-    ProjectItem *               m_pSpriteTableView;
-    int                         m_iFrameIndex;
-    int                         m_iFrameIndexDest;
+    EntityTreeItem *    m_pParentTreeItem;
+    EntityTreeModel *   m_pTreeModel;
+    ProjectItem *       m_pItem;
+    EntityTreeItem *    m_pNewTreeItem;
+
+    int                 m_iRow;
 
 public:
-    EntityUndoCmd_AddNewChild(EntityTreeItem *pParentTreeItem, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent = 0);
+    EntityUndoCmd_AddNewChild(EntityTreeItem *pParentTreeItem, EntityTreeModel *pTreeModel, ProjectItem *pItem, QUndoCommand *pParent = 0);
     virtual ~EntityUndoCmd_AddNewChild();
 
     void redo() override;
