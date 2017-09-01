@@ -23,9 +23,8 @@
 #include <QTextCodec>
 #include <QUuid>
 
-DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
-    QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-    ui(new Ui::DlgNewProject)
+DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :  QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+                                                                            ui(new Ui::DlgNewProject)
 {
     ui->setupUi(this);
     ui->txtTitleName->setText("NewGame");
@@ -42,10 +41,7 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
     ui->txtMetaDataDirName->setValidator(HyGlobal::FileNameValidator());
     ui->txtSourceDirName->setValidator(HyGlobal::FileNameValidator());
     
-    m_sRelativeAssetsLocation.clear();
-    m_sRelativeMetaDataLocation.clear();
-    m_sRelativeSourceLocation.clear();
-    
+    m_sAbsoluteAssetsDir = m_sAbsoluteMetaDataDir = m_sAbsoluteSourceDir = GetProjDirPath();
     SetRelativePaths();
 
     ErrorCheck();
@@ -271,76 +267,35 @@ void DlgNewProject::on_btnBrowse_clicked()
 
 void DlgNewProject::on_txtGameLocation_textChanged(const QString &arg1)
 {
+    // Update the asset/meta/src directories in attempt to stay relative to new directory
+    QDir gameDir(GetProjDirPath());
+    m_sAbsoluteAssetsDir = QDir::cleanPath(gameDir.absoluteFilePath(ui->txtAssetsLocation->text()));
+    m_sAbsoluteMetaDataDir = QDir::cleanPath(gameDir.absoluteFilePath(ui->txtMetaDataLocation->text()));
+    m_sAbsoluteSourceDir = QDir::cleanPath(gameDir.absoluteFilePath(ui->txtSourceLocation->text()));
+    
+    SetRelativePaths();
     ErrorCheck();
 }
 
 void DlgNewProject::SetRelativePaths()
 {
-    QDir assetsDir(m_sRelativeAssetsLocation);
-    if(assetsDir.isAbsolute())
-    {
-        QDir rootLocation(GetProjDirPath());
-        m_sRelativeAssetsLocation = rootLocation.relativeFilePath(m_sRelativeAssetsLocation);
-    }
-    ui->txtAssetsLocation->setText(m_sRelativeAssetsLocation);
+    QDir rootLocation(GetProjDirPath());
+    
+    QString sRelativeAssetsLocation = rootLocation.relativeFilePath(m_sAbsoluteAssetsDir);
+    ui->txtAssetsLocation->setText(sRelativeAssetsLocation);
     if(ui->txtAssetsLocation->text().isEmpty())
-    {
         ui->txtAssetsLocation->setText("./");
-        m_sRelativeAssetsLocation.clear();
-    }
     
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    QDir metaDir(m_sRelativeMetaDataLocation);
-    if(metaDir.isAbsolute())
-    {
-        QDir rootLocation(GetProjDirPath());
-        m_sRelativeMetaDataLocation = rootLocation.relativeFilePath(m_sRelativeMetaDataLocation);
-    }
-    ui->txtMetaDataLocation->setText(m_sRelativeMetaDataLocation);
+    QString sRelativeMetaDataLocation = rootLocation.relativeFilePath(m_sAbsoluteMetaDataDir);
+    ui->txtMetaDataLocation->setText(sRelativeMetaDataLocation);
     if(ui->txtMetaDataLocation->text().isEmpty())
-    {
         ui->txtMetaDataLocation->setText("./");
-        m_sRelativeMetaDataLocation = "";
-    }
     
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    QDir sourceDir(m_sRelativeSourceLocation);
-    if(sourceDir.isAbsolute())
-    {
-        QDir rootLocation(GetProjDirPath());
-        m_sRelativeSourceLocation = rootLocation.relativeFilePath(m_sRelativeSourceLocation);
-    }
-    ui->txtSourceLocation->setText(m_sRelativeSourceLocation);
+    QString sRelativeSourceLocation = rootLocation.relativeFilePath(m_sAbsoluteSourceDir);
+    ui->txtSourceLocation->setText(sRelativeSourceLocation);
     if(ui->txtSourceLocation->text().isEmpty())
-    {
         ui->txtSourceLocation->setText("./");
-        m_sRelativeSourceLocation = "";
-    }
     
-    ErrorCheck();
-}
-
-void DlgNewProject::on_txtAssetsLocation_textEdited(const QString &arg1)
-{
-    m_sRelativeAssetsLocation = ui->txtAssetsLocation->text();
-
-    SetRelativePaths();
-    ErrorCheck();
-}
-
-void DlgNewProject::on_txtMetaDataLocation_textEdited(const QString &arg1)
-{
-    m_sRelativeMetaDataLocation = ui->txtMetaDataLocation->text();
-
-    SetRelativePaths();
-    ErrorCheck();
-}
-
-void DlgNewProject::on_txtSourceLocation_textEdited(const QString &arg1)
-{
-    m_sRelativeSourceLocation = ui->txtSourceLocation->text();
-
-    SetRelativePaths();
     ErrorCheck();
 }
 
@@ -464,7 +419,7 @@ void DlgNewProject::on_btnBrowseAssets_clicked()
 
     if(pDlg->exec() == QDialog::Accepted)
     {
-        m_sRelativeAssetsLocation = pDlg->selectedFiles()[0];
+        m_sAbsoluteAssetsDir = pDlg->selectedFiles()[0];
         SetRelativePaths();
     }
 }
@@ -481,7 +436,7 @@ void DlgNewProject::on_btnBrowseMetaData_clicked()
 
     if(pDlg->exec() == QDialog::Accepted)
     {
-        m_sRelativeMetaDataLocation = pDlg->selectedFiles()[0];
+        m_sAbsoluteMetaDataDir = pDlg->selectedFiles()[0];
         SetRelativePaths();
     }
 }
@@ -498,28 +453,19 @@ void DlgNewProject::on_btnBrowseSource_clicked()
 
     if(pDlg->exec() == QDialog::Accepted)
     {
-        m_sRelativeSourceLocation = pDlg->selectedFiles()[0];
+        m_sAbsoluteSourceDir = pDlg->selectedFiles()[0];
         SetRelativePaths();
     }
 }
 
-void DlgNewProject::on_txtAssetsDirName_textChanged(const QString &arg1)
-{
-    ErrorCheck();
-}
-
-void DlgNewProject::on_txtMetaDataDirName_textChanged(const QString &arg1)
-{
-    ErrorCheck();
-}
-
-void DlgNewProject::on_txtSourceDirName_textChanged(const QString &arg1)
-{
-    ErrorCheck();
-}
-
 void DlgNewProject::on_chkCreateGameDir_clicked()
 {
+    // Update the asset/meta/src directories in attempt to stay relative to new directory
+    QDir gameDir(GetProjDirPath());
+    m_sAbsoluteAssetsDir = QDir::cleanPath(gameDir.absoluteFilePath(ui->txtAssetsLocation->text()));
+    m_sAbsoluteMetaDataDir = QDir::cleanPath(gameDir.absoluteFilePath(ui->txtMetaDataLocation->text()));
+    m_sAbsoluteSourceDir = QDir::cleanPath(gameDir.absoluteFilePath(ui->txtSourceLocation->text()));
+    
     SetRelativePaths();
     ErrorCheck();
 }

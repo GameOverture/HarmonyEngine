@@ -20,9 +20,9 @@ class DlgNewProject : public QDialog
 {
     Q_OBJECT
     
-    QString               m_sRelativeAssetsLocation;
-    QString               m_sRelativeMetaDataLocation;
-    QString               m_sRelativeSourceLocation;
+    QString               m_sAbsoluteAssetsDir;
+    QString               m_sAbsoluteMetaDataDir;
+    QString               m_sAbsoluteSourceDir;
 
 public:
     explicit DlgNewProject(QString &sDefaultLocation, QWidget *parent = 0);
@@ -49,20 +49,8 @@ private Q_SLOTS:
     void on_btnBrowseMetaData_clicked();
     
     void on_btnBrowseSource_clicked();
-    
-    void on_txtAssetsDirName_textChanged(const QString &arg1);
-
-    void on_txtMetaDataDirName_textChanged(const QString &arg1);
-
-    void on_txtSourceDirName_textChanged(const QString &arg1);
 
     void on_chkCreateGameDir_clicked();
-
-    void on_txtAssetsLocation_textEdited(const QString &arg1);
-
-    void on_txtMetaDataLocation_textEdited(const QString &arg1);
-
-    void on_txtSourceLocation_textEdited(const QString &arg1);
 
     void on_txtTitleName_textChanged(const QString &arg1);
     

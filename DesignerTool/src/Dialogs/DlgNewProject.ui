@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>568</width>
-    <height>438</height>
+    <height>461</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -185,8 +185,14 @@
       </item>
       <item row="3" column="1">
        <widget class="QLineEdit" name="txtMetaDataLocation">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>./</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -244,8 +250,14 @@
       </item>
       <item row="1" column="1">
        <widget class="QLineEdit" name="txtAssetsLocation">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>./</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -270,8 +282,14 @@
       </item>
       <item row="5" column="1">
        <widget class="QLineEdit" name="txtSourceLocation">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>./</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
