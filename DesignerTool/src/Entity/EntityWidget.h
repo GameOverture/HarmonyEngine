@@ -18,6 +18,7 @@ class EntityWidget : public QWidget
         STACKED_Null = 0,
         STACKED_Entity,
         STACKED_Primitive,
+        STACKED_TexturedQuad,
         STACKED_Sprite,
         STACKED_Font,
         STACKED_BoundingVolume,

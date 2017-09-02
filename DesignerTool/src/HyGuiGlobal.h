@@ -58,8 +58,8 @@ enum HyGuiItemType
     ITEM_Sprite,
     ITEM_Shader,
     ITEM_Entity,
-    ITEM_Physics,
     ITEM_BoundingVolume,
+    ITEM_Physics,
 
     NUMTYPES,
     NUMITEMS = NUMTYPES - NUMDIR

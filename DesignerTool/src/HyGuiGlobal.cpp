@@ -44,8 +44,8 @@
     sm_sItemNames[ITEM_Entity] = "Entity";
     sm_sItemNames[ITEM_AtlasImage] = "Atlas";
     sm_sItemNames[ITEM_Prefix] = "Prefix";
-    sm_sItemNames[ITEM_Physics] = "Physics";
     sm_sItemNames[ITEM_BoundingVolume] = "BoundingVolume";
+    sm_sItemNames[ITEM_Physics] = "Physics";
 
     sm_sSubIconNames[SUBICON_None] = "";
     sm_sSubIconNames[SUBICON_New] = "-New";

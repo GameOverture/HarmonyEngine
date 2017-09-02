@@ -105,7 +105,10 @@ void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
 {
     EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer());
     if(pTreeItem == nullptr)
+    {
+        ui->stackedWidget->setCurrentIndex(STACKED_Null);
         return;
+    }
 
     switch(pTreeItem->GetItem()->GetType())
     {
@@ -115,19 +118,24 @@ void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
     case ITEM_Entity:
         ui->stackedWidget->setCurrentIndex(STACKED_Entity);
         break;
-    case ITEM_Physics:
-        ui->stackedWidget->setCurrentIndex(STACKED_Physics);
-        break;
-    case ITEM_BoundingVolume:
     case ITEM_Font:
+        ui->stackedWidget->setCurrentIndex(STACKED_Font);
         break;
     case ITEM_AtlasImage:
+        ui->stackedWidget->setCurrentIndex(STACKED_TexturedQuad);
+        break;
     case ITEM_Audio:
     case ITEM_Particles:
     case ITEM_Spine:
     case ITEM_Shader:
+    case ITEM_BoundingVolume:
+        ui->stackedWidget->setCurrentIndex(STACKED_BoundingVolume);
+        break;
+    case ITEM_Physics:
+        ui->stackedWidget->setCurrentIndex(STACKED_Physics);
+        break;
         HyGuiLog("Unsupported Entity childrenTree clicked", LOGTYPE_Error);
         break;
     }
-    //ui->stackedWidget->setCurrentIndex(
+
 }

@@ -32,7 +32,7 @@
    <string>ToolBox</string>
   </property>
   <property name="currentIndex">
-   <number>1</number>
+   <number>0</number>
   </property>
   <widget class="QWidget" name="TransformTools">
    <property name="geometry">
@@ -40,7 +40,7 @@
      <x>0</x>
      <y>0</y>
      <width>360</width>
-     <height>144</height>
+     <height>146</height>
     </rect>
    </property>
    <attribute name="label">
@@ -149,6 +149,12 @@
         <property name="prefix">
          <string>X: </string>
         </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.050000000000000</double>
+        </property>
         <property name="value">
          <double>1.000000000000000</double>
         </property>
@@ -166,10 +172,13 @@
          <string>X: </string>
         </property>
         <property name="minimum">
-         <double>-100.000000000000000</double>
+         <double>0.000000000000000</double>
         </property>
         <property name="maximum">
          <double>100.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.050000000000000</double>
         </property>
         <property name="value">
          <double>1.000000000000000</double>
@@ -254,7 +263,7 @@
      <x>0</x>
      <y>0</y>
      <width>360</width>
-     <height>144</height>
+     <height>146</height>
     </rect>
    </property>
    <attribute name="label">
