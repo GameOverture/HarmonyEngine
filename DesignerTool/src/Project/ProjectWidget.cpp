@@ -252,13 +252,13 @@ DataExplorerItem *ProjectWidget::GetCurSubDirSelected()
         return nullptr;
     
     DataExplorerItem *pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<DataExplorerItem *>();
-    while(pCurItem->GetType() != ITEM_DirAudio &&
-          pCurItem->GetType() != ITEM_DirParticles &&
-          pCurItem->GetType() != ITEM_DirFonts &&
-          pCurItem->GetType() != ITEM_DirSpine &&
-          pCurItem->GetType() != ITEM_DirSprites &&
-          pCurItem->GetType() != ITEM_DirShaders &&
-          pCurItem->GetType() != ITEM_DirEntities)
+    while(pCurItem->GetType() != DIR_Audio &&
+          pCurItem->GetType() != DIR_Particles &&
+          pCurItem->GetType() != DIR_Fonts &&
+          pCurItem->GetType() != DIR_Spine &&
+          pCurItem->GetType() != DIR_Sprites &&
+          pCurItem->GetType() != DIR_Shaders &&
+          pCurItem->GetType() != DIR_Entities)
     {
         pCurTreeItem = pCurItem->GetTreeItem()->parent();
         if(pCurTreeItem == nullptr)
@@ -282,7 +282,7 @@ void ProjectWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
         return;
 
     // Determine the pasted item type
-    HyGuiItemType ePasteItemType = ITEM_Unknown;
+    HyGuiItemType ePasteItemType = TYPE_Unknown;
     QString sItemType = pasteObj["itemType"].toString();
     QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
     for(int i = 0; i < subDirList.size(); ++i)
@@ -299,7 +299,7 @@ void ProjectWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
     // Import any missing fonts (.ttf)
     if(ePasteItemType == ITEM_Font)
     {
-        QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_DirFonts));
+        QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(DIR_Fonts));
         QJsonArray fontArray = pasteObj["fonts"].toArray();
         for(int i = 0; i < fontArray.size(); ++i)
         {
@@ -435,13 +435,13 @@ void ProjectWidget::OnContextMenu(const QPoint &pos)
             contextMenu.addAction(FINDACTION("actionCloseProject"));
             contextMenu.addAction(FINDACTION("actionProjectSettings"));
             break;
-        case ITEM_DirAudio:
-        case ITEM_DirParticles:
-        case ITEM_DirFonts:
-        case ITEM_DirSpine:
-        case ITEM_DirSprites:
-        case ITEM_DirShaders:
-        case ITEM_DirEntities:
+        case DIR_Audio:
+        case DIR_Particles:
+        case DIR_Fonts:
+        case DIR_Spine:
+        case DIR_Sprites:
+        case DIR_Shaders:
+        case DIR_Entities:
             contextMenu.addAction(FINDACTION("actionNew" % HyGlobal::ItemName(HyGlobal::GetItemFromDir(eSelectedItemType))));
             break;
         case ITEM_Audio:
@@ -482,14 +482,14 @@ void ProjectWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int c
     
     switch(pTreeVariantItem->GetType())
     {
+    case DIR_Audio:
+    case DIR_Particles:
+    case DIR_Fonts:
+    case DIR_Shaders:
+    case DIR_Spine:
+    case DIR_Sprites:
+    case DIR_Entities:
     case ITEM_Project:
-    case ITEM_DirAudio:
-    case ITEM_DirParticles:
-    case ITEM_DirFonts:
-    case ITEM_DirShaders:
-    case ITEM_DirSpine:
-    case ITEM_DirSprites:
-    case ITEM_DirEntities:
     case ITEM_Prefix:
         item->setExpanded(!item->isExpanded());
         break;

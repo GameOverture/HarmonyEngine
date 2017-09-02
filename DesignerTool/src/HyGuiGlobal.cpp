@@ -10,58 +10,42 @@
 #include "HyGuiGlobal.h"
 #include "Project.h"
 
-/*static*/ QString HyGlobal::sm_sItemNames[NUMITEM];
-/*static*/ QString HyGlobal::sm_sItemExt[NUMITEM];
+/*static*/ QString HyGlobal::sm_sItemNames[NUMTYPES];
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
-/*static*/ QIcon HyGlobal::sm_ItemIcons[NUMITEM][NUM_SUBICONS];
+
+/*static*/ QIcon HyGlobal::sm_ItemIcons[NUMITEMS][NUM_SUBICONS];
 
 /*static*/ QRegExpValidator *HyGlobal::sm_pCodeNameValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFileNameValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFilePathValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pVector2dValidator = nullptr;
 
-/*static*/ QString HyGlobal::sm_ErrorStrings[NUMGUIFRAMEERROR];
+/*static*/ QString HyGlobal::sm_ErrorStrings[NUMATLASFRAMEERROR];
 
 /*static*/ void HyGlobal::Initialize()
 {
+    sm_sItemNames[DIR_Audio] = "Audio";
+    sm_sItemNames[DIR_Particles] = "Particles";
+    sm_sItemNames[DIR_Fonts] = "Fonts";
+    sm_sItemNames[DIR_Spine] = "Spine";
+    sm_sItemNames[DIR_Sprites] = "Sprites";
+    sm_sItemNames[DIR_Shaders] = "Shaders";
+    sm_sItemNames[DIR_Entities] = "Entities";
+    sm_sItemNames[DIR_Atlases] = "Atlases";
+    sm_sItemNames[DIR_AudioBanks] = "AudioBanks";
     sm_sItemNames[ITEM_Project] = "Project";
-    sm_sItemNames[ITEM_DirAudio] = sm_sItemNames[ITEM_Audio] = "Audio";
-    sm_sItemNames[ITEM_DirParticles] = sm_sItemNames[ITEM_Particles] = "Particles";
-    sm_sItemNames[ITEM_DirFonts] = "Fonts";
+    sm_sItemNames[ITEM_Primitive] = "Primitive";
+    sm_sItemNames[ITEM_Audio] = "Audio";
+    sm_sItemNames[ITEM_Particles] = "Particles";
     sm_sItemNames[ITEM_Font] = "Font";
-    sm_sItemNames[ITEM_DirSpine] = sm_sItemNames[ITEM_Spine] = "Spine";
-    sm_sItemNames[ITEM_DirSprites] = "Sprites";
+    sm_sItemNames[ITEM_Spine] = "Spine";
     sm_sItemNames[ITEM_Sprite] = "Sprite";
-    sm_sItemNames[ITEM_DirShaders] = "Shaders";
     sm_sItemNames[ITEM_Shader] = "Shader";
-    sm_sItemNames[ITEM_DirEntities] = "Entities";
     sm_sItemNames[ITEM_Entity] = "Entity";
-    sm_sItemNames[ITEM_DirAtlases] = "Atlases";
     sm_sItemNames[ITEM_AtlasImage] = "Atlas";
-    sm_sItemNames[ITEM_DirAudioBanks] = "AudioBanks";
     sm_sItemNames[ITEM_Prefix] = "Prefix";
     sm_sItemNames[ITEM_Physics] = "Physics";
     sm_sItemNames[ITEM_BoundingVolume] = "BoundingVolume";
-
-    sm_sItemExt[ITEM_Project] = ".hyproj";
-    sm_sItemExt[ITEM_DirAudio] = "/";
-    sm_sItemExt[ITEM_DirParticles] = "/";
-    sm_sItemExt[ITEM_DirFonts] = "/";
-    sm_sItemExt[ITEM_DirShaders] = "/";
-    sm_sItemExt[ITEM_DirSpine] = "/";
-    sm_sItemExt[ITEM_DirSprites] = "/";
-    sm_sItemExt[ITEM_DirEntities] = "/";
-    sm_sItemExt[ITEM_DirAtlases] = "/";
-    sm_sItemExt[ITEM_DirAudioBanks] = "/";
-    sm_sItemExt[ITEM_Prefix] = "/";
-    sm_sItemExt[ITEM_AtlasImage] = "";
-    sm_sItemExt[ITEM_Audio] = "";//".hyaud";
-    sm_sItemExt[ITEM_Particles] = "";//".hypfx";
-    sm_sItemExt[ITEM_Font] = "";//".hyfnt";
-    sm_sItemExt[ITEM_Spine] = "";//".hyspi";
-    sm_sItemExt[ITEM_Sprite] = "";//".hyspr";
-    sm_sItemExt[ITEM_Shader] = "";
-    sm_sItemExt[ITEM_Entity] = "";//".hyent";
 
     sm_sSubIconNames[SUBICON_None] = "";
     sm_sSubIconNames[SUBICON_New] = "-New";
@@ -73,34 +57,32 @@
     sm_sSubIconNames[SUBICON_Warning] = "-Warning";
     sm_sSubIconNames[SUBICON_Pending] = "-Pending";
 
-    InitItemIcons(ITEM_Project);
-    sm_ItemIcons[ITEM_DirAudio][SUBICON_None].addFile(QString(":/icons16x16/audio-folder.png"));
-    sm_ItemIcons[ITEM_DirParticles][SUBICON_None].addFile(QString(":/icons16x16/particle-folder.png"));
-    sm_ItemIcons[ITEM_DirFonts][SUBICON_None].addFile(QString(":/icons16x16/font-folder.png"));
-    sm_ItemIcons[ITEM_DirSpine][SUBICON_None].addFile(QString(":/icons16x16/spine-folder.png"));
-    sm_ItemIcons[ITEM_DirSprites][SUBICON_None].addFile(QString(":/icons16x16/sprite-folder.png"));
-    sm_ItemIcons[ITEM_DirShaders][SUBICON_None].addFile(QString(":/icons16x16/shader-folder.png"));
-    sm_ItemIcons[ITEM_DirEntities][SUBICON_None].addFile(QString(":/icons16x16/entity-folder.png"));
-    sm_ItemIcons[ITEM_DirAtlases][SUBICON_None].addFile(QString(":/icons16x16/folder.png"));
-    sm_ItemIcons[ITEM_DirAudioBanks][SUBICON_None].addFile(QString(":/icons16x16/folder.png"));
-    InitItemIcons(ITEM_AtlasImage);
-    InitItemIcons(ITEM_Prefix);
-    InitItemIcons(ITEM_Audio);
-    InitItemIcons(ITEM_Particles);
-    InitItemIcons(ITEM_Font);
-    InitItemIcons(ITEM_Spine);
-    InitItemIcons(ITEM_Sprite);
-    InitItemIcons(ITEM_Entity);
-    InitItemIcons(ITEM_Physics);
-    InitItemIcons(ITEM_BoundingVolume);
+    sm_ItemIcons[DIR_Audio][SUBICON_None].addFile(QString(":/icons16x16/audio-folder.png"));
+    sm_ItemIcons[DIR_Particles][SUBICON_None].addFile(QString(":/icons16x16/particle-folder.png"));
+    sm_ItemIcons[DIR_Fonts][SUBICON_None].addFile(QString(":/icons16x16/font-folder.png"));
+    sm_ItemIcons[DIR_Spine][SUBICON_None].addFile(QString(":/icons16x16/spine-folder.png"));
+    sm_ItemIcons[DIR_Sprites][SUBICON_None].addFile(QString(":/icons16x16/sprite-folder.png"));
+    sm_ItemIcons[DIR_Shaders][SUBICON_None].addFile(QString(":/icons16x16/shader-folder.png"));
+    sm_ItemIcons[DIR_Entities][SUBICON_None].addFile(QString(":/icons16x16/entity-folder.png"));
+    sm_ItemIcons[DIR_Atlases][SUBICON_None].addFile(QString(":/icons16x16/folder.png"));
+    sm_ItemIcons[DIR_AudioBanks][SUBICON_None].addFile(QString(":/icons16x16/folder.png"));
+
+    for(int i = NUMDIR; i < NUMTYPES; ++i)
+    {
+        for(int j = 0; j < NUM_SUBICONS; ++j)
+        {
+            QString sUrl = ":/icons16x16/items/" % sm_sItemNames[i] % sm_sSubIconNames[j] % ".png";
+            sm_ItemIcons[i][j].addFile(sUrl);
+        }
+    }
 
     sm_pCodeNameValidator = new QRegExpValidator(QRegExp("[A-Za-z_]+[A-Za-z0-9_]*"));
     sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-]*"));
     sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_\\-]*"));
     sm_pVector2dValidator = new QRegExpValidator(QRegExp("\\([0-9]*\\.?[0-9]*,[0-9]*\\.?[0-9]*\\)"));
 
-    sm_ErrorStrings[GUIFRAMEERROR_CannotFindMetaImg] = "Cannot find source meta-image";
-    sm_ErrorStrings[GUIFRAMEERROR_CouldNotPack] = "Could not pack this frame in atlas";
+    sm_ErrorStrings[ATLASFRAMEERROR_CannotFindMetaImg] = "Cannot find source meta-image";
+    sm_ErrorStrings[ATLASFRAMEERROR_CouldNotPack] = "Could not pack this frame in atlas";
 }
 
 /*static*/ HyGuiItemType HyGlobal::GetDirFromItem(HyGuiItemType eItem)
@@ -108,95 +90,132 @@
     switch(eItem)
     {
     case ITEM_Audio:
-    case ITEM_DirAudio:
-        return ITEM_DirAudio;
+    case DIR_Audio:
+        return DIR_Audio;
     case ITEM_Particles:
-    case ITEM_DirParticles:
-        return ITEM_DirParticles;
+    case DIR_Particles:
+        return DIR_Particles;
     case ITEM_Font:
-    case ITEM_DirFonts:
-        return ITEM_DirFonts;
+    case DIR_Fonts:
+        return DIR_Fonts;
     case ITEM_Spine:
-    case ITEM_DirSpine:
-        return ITEM_DirSpine;
+    case DIR_Spine:
+        return DIR_Spine;
     case ITEM_Sprite:
-    case ITEM_DirSprites:
-        return ITEM_DirSprites;
+    case DIR_Sprites:
+        return DIR_Sprites;
     case ITEM_Shader:
-    case ITEM_DirShaders:
-        return ITEM_DirShaders;
+    case DIR_Shaders:
+        return DIR_Shaders;
     case ITEM_AtlasImage:
-    case ITEM_DirAtlases:
-        return ITEM_DirAtlases;
+    case DIR_Atlases:
+        return DIR_Atlases;
     case ITEM_Entity:
-    case ITEM_DirEntities:
-        return ITEM_DirEntities;
+    case DIR_Entities:
+        return DIR_Entities;
     default:
-        HyGuiLog("HyGlobal::GetCorrespondingDirItem() could not find the proper directory item", LOGTYPE_Warning);
+        HyGuiLog("HyGlobal::GetDirFromItem() could not find the proper directory item", LOGTYPE_Error);
     }
 
-    return ITEM_Unknown;
+    return TYPE_Unknown;
 }
 
-/*static*/ HyGuiItemType HyGlobal::GetItemFromDir(HyGuiItemType eItem)
+/*static*/ HyGuiItemType HyGlobal::GetItemFromDir(HyGuiItemType eDir)
+{
+    switch(eDir)
+    {
+    case DIR_Audio:
+    case ITEM_Audio:
+        return ITEM_Audio;
+    case DIR_Particles:
+    case ITEM_Particles:
+        return ITEM_Particles;
+    case DIR_Fonts:
+    case ITEM_Font:
+        return ITEM_Font;
+    case DIR_Spine:
+    case ITEM_Spine:
+        return ITEM_Spine;
+    case DIR_Sprites:
+    case ITEM_Sprite:
+        return ITEM_Sprite;
+    case DIR_Shaders:
+    case ITEM_Shader:
+        return ITEM_Shader;
+    case DIR_Atlases:
+    case ITEM_AtlasImage:
+        return ITEM_AtlasImage;
+    case DIR_Entities:
+    case ITEM_Entity:
+        return ITEM_Entity;
+    default:
+        HyGuiLog("HyGlobal::GetItemFromDir() could not find the proper item", LOGTYPE_Error);
+    }
+
+    return TYPE_Unknown;
+}
+
+/*static*/ HyGuiItemType HyGlobal::GetItemFromAtlasItem(AtlasItemType eFrameType)
+{
+    switch(eFrameType)
+    {
+    case ATLASITEM_Filter:
+        return ITEM_Prefix;
+    case ATLASITEM_Image:
+        return ITEM_AtlasImage;
+    case ATLASITEM_Font:
+        return ITEM_Font;
+    case ATLASITEM_Spine:
+        return ITEM_Spine;
+    default:
+        HyGuiLog("HyGlobal::GetItemFromAtlasFrameType() could not find the proper item", LOGTYPE_Error);
+    }
+
+    return TYPE_Unknown;
+}
+
+/*static*/ AtlasItemType HyGlobal::GetAtlasItemFromItem(HyGuiItemType eItem)
 {
     switch(eItem)
     {
-    case ITEM_Audio:
-    case ITEM_DirAudio:
-        return ITEM_Audio;
-    case ITEM_Particles:
-    case ITEM_DirParticles:
-        return ITEM_Particles;
-    case ITEM_Font:
-    case ITEM_DirFonts:
-        return ITEM_Font;
-    case ITEM_Spine:
-    case ITEM_DirSpine:
-        return ITEM_Spine;
-    case ITEM_Sprite:
-    case ITEM_DirSprites:
-        return ITEM_Sprite;
-    case ITEM_Shader:
-    case ITEM_DirShaders:
-        return ITEM_Shader;
+    case ITEM_Prefix:
+        return ATLASITEM_Filter;
     case ITEM_AtlasImage:
-    case ITEM_DirAtlases:
-        return ITEM_AtlasImage;
-    case ITEM_Entity:
-    case ITEM_DirEntities:
-        return ITEM_Entity;
+        return ATLASITEM_Image;
+    case ITEM_Font:
+        return ATLASITEM_Font;
+    case ITEM_Spine:
+        return ATLASITEM_Spine;
     default:
-        HyGuiLog("HyGlobal::GetCorrespondingItemFromDir() could not find the proper directory item", LOGTYPE_Warning);
+        HyGuiLog("HyGlobal::GetAtlasItemFromItem() could not find the atlas item", LOGTYPE_Error);
     }
 
-    return ITEM_Unknown;
+    return ATLASITEM_Unknown;
 }
-
 
 /*static*/ QList<HyGuiItemType> HyGlobal::SubDirList()
 {
     QList<HyGuiItemType> list;
-    list.append(ITEM_DirAudio);
-    list.append(ITEM_DirParticles);
-    list.append(ITEM_DirFonts);
-    list.append(ITEM_DirSpine);
-    list.append(ITEM_DirSprites);
-    list.append(ITEM_DirShaders);
-    list.append(ITEM_DirEntities);
-    list.append(ITEM_DirAtlases);
-    list.append(ITEM_DirAudioBanks);
+    list.append(DIR_Audio);
+    list.append(DIR_Particles);
+    list.append(DIR_Fonts);
+    list.append(DIR_Spine);
+    list.append(DIR_Sprites);
+    list.append(DIR_Shaders);
+    list.append(DIR_Entities);
+    list.append(DIR_Atlases);
+    list.append(DIR_AudioBanks);
 
     return list;
 }
 
 /*static*/ QStringList HyGlobal::SubDirNameList()
 {
-    QList<HyGuiItemType> itemList = SubDirList();
+    QList<HyGuiItemType> dirList = SubDirList();
 
     QStringList list;
-    for(int i = 0; i < itemList.size(); ++i)
-        list.append(sm_sItemNames[itemList[i]]);
+    for(int i = 0; i < dirList.size(); ++i)
+        list.append(sm_sItemNames[dirList[i]]);
 
     return list;
 }
@@ -222,12 +241,25 @@
     return "Unknown";
 }
 
+/*static*/ const QString HyGlobal::ItemExt(HyGuiItemType eItem)
+{
+    switch(eItem)
+    {
+    case ITEM_Project:
+        return ".hyproj";
+    case ITEM_Prefix:
+        return "/";
+    }
+
+    return "";
+}
+
 /*static*/ const QString HyGlobal::GetGuiFrameErrors(uint uiErrorFlags)
 {
     QString sErrorString;
     sErrorString.clear();
 
-    for(int i = 0; i < NUMGUIFRAMEERROR; ++i)
+    for(int i = 0; i < NUMATLASFRAMEERROR; ++i)
     {
         if((uiErrorFlags & (1 << i)) != 0)
         {
@@ -440,13 +472,4 @@ QByteArray JsonValueToSrc(QJsonValue value)
     }
 
     return src;
-}
-
-/*static*/ void HyGlobal::InitItemIcons(HyGuiItemType eItemType)
-{
-    for(int i = 0; i < NUM_SUBICONS; ++i)
-    {
-        QString sFileUrl = ":/icons16x16/items/" % sm_sItemNames[eItemType] % sm_sSubIconNames[i] % ".png";
-        sm_ItemIcons[eItemType][i].addFile(sFileUrl);
-    }
 }

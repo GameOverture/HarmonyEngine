@@ -24,7 +24,7 @@ class AtlasFrame
     friend class AtlasModel;
     
     const quint32                       m_uiUNIQUE_ID;
-    HyGuiItemType                       m_eType;
+    AtlasItemType                      m_eType;
     
     quint32                             m_uiAtlasGrpId;
 
@@ -46,7 +46,7 @@ class AtlasFrame
     uint                                m_uiErrors; // '0' when there is no error
 
     // Private ctor as WidgetAtlasManager should only construct these
-    AtlasFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, HyGuiItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
+    AtlasFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
     ~AtlasFrame();
     
 public:
@@ -64,7 +64,7 @@ public:
     QRect GetCrop();
     QPoint GetPosition();
     QSet<ProjectItem *> GetLinks();
-    HyGuiItemType GetType();
+    AtlasItemType GetType();
 
     int GetTextureIndex();
     int GetX();
@@ -78,8 +78,8 @@ public:
 
     void GetJsonObj(QJsonObject &frameObj);
 
-    void SetError(eGuiFrameError eError);
-    void ClearError(eGuiFrameError eError);
+    void SetError(AtlasFrameError eError);
+    void ClearError(AtlasFrameError eError);
     uint GetErrors();
 
 private:

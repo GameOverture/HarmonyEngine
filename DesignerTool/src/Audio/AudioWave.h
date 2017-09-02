@@ -54,8 +54,8 @@ public:
 
     void GetJsonObj(QJsonObject &waveObj);
 
-    void SetError(eGuiFrameError eError);
-    void ClearError(eGuiFrameError eError);
+    void SetError(AtlasFrameError eError);
+    void ClearError(AtlasFrameError eError);
     uint GetErrors();
 };
 

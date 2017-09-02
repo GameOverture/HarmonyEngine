@@ -148,5 +148,14 @@
         <file>icons16x16/items/BoundingVolume-Pending.png</file>
         <file>icons16x16/items/BoundingVolume-Settings.png</file>
         <file>icons16x16/items/BoundingVolume-Warning.png</file>
+        <file>icons16x16/items/Primitive.png</file>
+        <file>icons16x16/items/Primitive-Close.png</file>
+        <file>icons16x16/items/Primitive-Delete.png</file>
+        <file>icons16x16/items/Primitive-Dirty.png</file>
+        <file>icons16x16/items/Primitive-New.png</file>
+        <file>icons16x16/items/Primitive-Open.png</file>
+        <file>icons16x16/items/Primitive-Pending.png</file>
+        <file>icons16x16/items/Primitive-Settings.png</file>
+        <file>icons16x16/items/Primitive-Warning.png</file>
     </qresource>
 </RCC>

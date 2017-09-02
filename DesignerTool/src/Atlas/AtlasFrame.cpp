@@ -17,7 +17,7 @@ AtlasFrame::AtlasFrame(quint32 uiId,
                        quint32 uiAtlasGrpId,
                        QString sN,
                        QRect rAlphaCrop,
-                       HyGuiItemType eType,
+                       AtlasItemType eType,
                        int iW,
                        int iH,
                        int iX,
@@ -54,12 +54,12 @@ AtlasTreeItem *AtlasFrame::GetTreeItem()
     if(m_iTextureIndex >= 0)
     {
         m_pTreeWidgetItem->setText(1, "Grp:" % QString::number(m_uiAtlasGrpId));
-        ClearError(GUIFRAMEERROR_CouldNotPack);
+        ClearError(ATLASFRAMEERROR_CouldNotPack);
     }
     else
     {
         m_pTreeWidgetItem->setText(1, "Invalid");
-        SetError(GUIFRAMEERROR_CouldNotPack);
+        SetError(ATLASFRAMEERROR_CouldNotPack);
     }
 
     UpdateTreeItemIconAndToolTip();
@@ -124,7 +124,7 @@ QSet<ProjectItem *> AtlasFrame::GetLinks()
     return m_DependencySet;
 }
 
-HyGuiItemType AtlasFrame::GetType()
+AtlasItemType AtlasFrame::GetType()
 {
     return m_eType;
 }
@@ -152,14 +152,14 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 
     if(m_iTextureIndex != -1)
     {
-        ClearError(GUIFRAMEERROR_CouldNotPack);
+        ClearError(ATLASFRAMEERROR_CouldNotPack);
 
         if(m_pTreeWidgetItem)
             m_pTreeWidgetItem->setText(1, "Grp:" % QString::number(m_uiAtlasGrpId));
     }
     else
     {
-        SetError(GUIFRAMEERROR_CouldNotPack);
+        SetError(ATLASFRAMEERROR_CouldNotPack);
         if(m_pTreeWidgetItem)
             m_pTreeWidgetItem->setText(1, "Invalid");
     }
@@ -210,9 +210,9 @@ void AtlasFrame::GetJsonObj(QJsonObject &frameObj)
     frameObj.insert("filter", QJsonValue(sFilterPath));
 }
 
-void AtlasFrame::SetError(eGuiFrameError eError)
+void AtlasFrame::SetError(AtlasFrameError eError)
 {
-    if(eError == GUIFRAMEERROR_CannotFindMetaImg)
+    if(eError == ATLASFRAMEERROR_CannotFindMetaImg)
         HyGuiLog(m_sName % " - GUIFRAMEERROR_CannotFindMetaImg", LOGTYPE_Error);
             
     m_uiErrors |= (1 << eError);
@@ -220,7 +220,7 @@ void AtlasFrame::SetError(eGuiFrameError eError)
     UpdateTreeItemIconAndToolTip();
 }
 
-void AtlasFrame::ClearError(eGuiFrameError eError)
+void AtlasFrame::ClearError(AtlasFrameError eError)
 {
     m_uiErrors &= ~(1 << eError);
 
@@ -238,9 +238,9 @@ void AtlasFrame::UpdateTreeItemIconAndToolTip()
     {
         // Duplicates are not considered and error so don't mark the icon as a warning (if only error)
         if(m_uiErrors == 0)
-            m_pTreeWidgetItem->setIcon(0, HyGlobal::ItemIcon(m_eType, SUBICON_None));
+            m_pTreeWidgetItem->setIcon(0, HyGlobal::ItemIcon(HyGlobal::GetItemFromAtlasItem(m_eType), SUBICON_None));
         else
-            m_pTreeWidgetItem->setIcon(0, HyGlobal::ItemIcon(m_eType, SUBICON_Warning));
+            m_pTreeWidgetItem->setIcon(0, HyGlobal::ItemIcon(HyGlobal::GetItemFromAtlasItem(m_eType), SUBICON_Warning));
         
         m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
     }
@@ -266,7 +266,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
     m_iWidth = newImage.width();
     m_iHeight = newImage.height();
 
-    if(m_eType != ITEM_Font && m_eType != ITEM_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
+    if(m_eType != ATLASITEM_Font && m_eType != ATLASITEM_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
         m_rAlphaCrop = ImagePacker::crop(newImage);
     else
         m_rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());

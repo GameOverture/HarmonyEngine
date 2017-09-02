@@ -113,7 +113,7 @@ Project::Project(ProjectWidget *pProjWidget, const QString sProjectFilePath) :  
         QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
         for(int i = 0; i < subDirList.size(); ++i)
         {
-            if(subDirList[i] == ITEM_DirAtlases || subDirList[i] == ITEM_DirAudioBanks)
+            if(subDirList[i] == DIR_Atlases || subDirList[i] == DIR_AudioBanks)
                 continue;
 
             QString sSubDirName = HyGlobal::ItemName(subDirList[i]);
@@ -135,7 +135,7 @@ Project::Project(ProjectWidget *pProjWidget, const QString sProjectFilePath) :  
     QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
     for(int i = 0; i < subDirList.size(); ++i)
     {
-        if(subDirList[i] == ITEM_DirAtlases || subDirList[i] == ITEM_DirAudioBanks)
+        if(subDirList[i] == DIR_Atlases || subDirList[i] == DIR_AudioBanks)
             continue;
 
         QString sSubDirPath = GetAssetsAbsPath() % HyGlobal::ItemName(subDirList[i]) % HyGlobal::ItemExt(subDirList[i]);
@@ -203,25 +203,25 @@ Project::Project(ProjectWidget *pProjWidget, const QString sProjectFilePath) :  
                     DataExplorerItem *pNewDataItem = nullptr;
                     switch(subDirList[i])
                     {
-                    case ITEM_DirAudio:
+                    case DIR_Audio:
                         pNewDataItem = new ProjectItem(*this, ITEM_Audio, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
                         break;
-                    case ITEM_DirFonts:
+                    case DIR_Fonts:
                         pNewDataItem = new ProjectItem(*this, ITEM_Font, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
 
                         if(sCurPrefix == "+Hy/" && sPathPartList[iPathPartIndex] == "+HyFont")
                             bDefaultFontFound = true;
                         break;
-                    case ITEM_DirSprites:
+                    case DIR_Sprites:
                         pNewDataItem = new ProjectItem(*this, ITEM_Sprite, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
                         break;
-                    case ITEM_DirParticles:
-                    case ITEM_DirSpine:
-                    case ITEM_DirShaders:
-                    case ITEM_DirEntities:
+                    case DIR_Entities:
                         pNewDataItem = new ProjectItem(*this, ITEM_Entity, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
                         break;
-                    case ITEM_DirAtlases:
+                    case DIR_Particles:
+                    case DIR_Spine:
+                    case DIR_Shaders:
+                    case DIR_Atlases:
                     default:
                         { HyGuiLog("Unknown item type in ItemProject!", LOGTYPE_Error); }
                     }

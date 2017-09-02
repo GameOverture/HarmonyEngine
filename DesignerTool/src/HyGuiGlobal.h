@@ -33,19 +33,23 @@ class Project;
 
 enum HyGuiItemType
 {
-    ITEM_Unknown = -1,
+    TYPE_Unknown = -1,
+
+    DIR_Audio = 0,
+    DIR_Particles,
+    DIR_Fonts,
+    DIR_Spine,
+    DIR_Sprites,
+    DIR_Shaders,
+    DIR_Entities,
+    DIR_Atlases,
+    DIR_AudioBanks,
+
+    ITEM_Project,       // Sorted this way, so debugger uses "ITEM_Project" instead of "NUMDIR"
+    NUMDIR = ITEM_Project,
     
-    ITEM_Project = 0,
-    ITEM_DirAudio,
-    ITEM_DirParticles,
-    ITEM_DirFonts,
-    ITEM_DirSpine,
-    ITEM_DirSprites,
-    ITEM_DirShaders,
-    ITEM_DirEntities,
-    ITEM_DirAtlases,
-    ITEM_DirAudioBanks,
     ITEM_Prefix,        // Essentially a sub-directory
+    ITEM_Primitive,
     ITEM_AtlasImage,
     ITEM_Audio,
     ITEM_Particles,
@@ -57,15 +61,28 @@ enum HyGuiItemType
     ITEM_Physics,
     ITEM_BoundingVolume,
 
-    NUMITEM
+    NUMTYPES,
+    NUMITEMS = NUMTYPES - NUMDIR
 };
 
-enum eGuiFrameError
+enum AtlasItemType
 {
-    GUIFRAMEERROR_CannotFindMetaImg = 0,
-    GUIFRAMEERROR_CouldNotPack,
+    ATLASITEM_Unknown = -1,
 
-    NUMGUIFRAMEERROR
+    ATLASITEM_Filter = 0,
+    ATLASITEM_Image,
+    ATLASITEM_Font,
+    ATLASITEM_Spine,
+
+    NUMATLASITEM
+};
+
+enum AtlasFrameError
+{
+    ATLASFRAMEERROR_CannotFindMetaImg = 0,
+    ATLASFRAMEERROR_CouldNotPack,
+
+    NUMATLASFRAMEERROR
 };
 
 enum MdiArea
@@ -123,31 +140,32 @@ QByteArray JsonValueToSrc(QJsonValue value);
 
 class HyGlobal
 {
-    static QString                  sm_sItemNames[NUMITEM];
-    static QString                  sm_sItemExt[NUMITEM];
-
+    static QString                  sm_sItemNames[NUMTYPES];
     static QString                  sm_sSubIconNames[NUM_SUBICONS];
-    static QIcon                    sm_ItemIcons[NUMITEM][NUM_SUBICONS];
+
+    static QIcon                    sm_ItemIcons[NUMITEMS][NUM_SUBICONS];
 
     static QRegExpValidator *       sm_pCodeNameValidator;
     static QRegExpValidator *       sm_pFileNameValidator;
     static QRegExpValidator *       sm_pFilePathValidator;
     static QRegExpValidator *       sm_pVector2dValidator;
 
-    static QString                  sm_ErrorStrings[NUMGUIFRAMEERROR];
+    static QString                  sm_ErrorStrings[NUMATLASFRAMEERROR];
 
 public:
     static void Initialize();
 
     static HyGuiItemType GetDirFromItem(HyGuiItemType eItem);
-    static HyGuiItemType GetItemFromDir(HyGuiItemType eItem);
+    static HyGuiItemType GetItemFromDir(HyGuiItemType eDir);
+    static HyGuiItemType GetItemFromAtlasItem(AtlasItemType eFrameType);
+    static AtlasItemType GetAtlasItemFromItem(HyGuiItemType eItem);
     static QList<HyGuiItemType> SubDirList();
     static QStringList SubDirNameList();
     static QString AtlasTextureTypeString(HyTextureFormat eType);
     
-    static const QString &ItemName(HyGuiItemType eItm)                  { return sm_sItemNames[eItm]; }
-    static const QString &ItemExt(HyGuiItemType eItm)                   { return sm_sItemExt[eItm]; }
-    static const QIcon &ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)  { return sm_ItemIcons[eItm][eSubIcon]; }
+    static const QString ItemName(HyGuiItemType eItm)                  { return sm_sItemNames[eItm]; }
+    static const QString ItemExt(HyGuiItemType eItem);
+    static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)  { return sm_ItemIcons[eItm][eSubIcon]; }
 
     static const QRegExpValidator *CodeNameValidator()                  { return sm_pCodeNameValidator; }
     static const QRegExpValidator *FileNameValidator()                  { return sm_pFileNameValidator; }
@@ -170,9 +188,6 @@ public:
     static QList<QTreeWidgetItem *> RecursiveTreeChildren(QTreeWidgetItem *pParentItem);
 
     static QDir PrepTempDir(Project *pProject);
-
-private:
-    static void InitItemIcons(HyGuiItemType eItemType);
 };
 
 struct SortTreeWidgetsPredicate

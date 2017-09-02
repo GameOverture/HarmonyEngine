@@ -102,7 +102,7 @@ void AudioWave::GetJsonObj(QJsonObject &waveObj)
     waveObj.insert("errors", QJsonValue(static_cast<int>(m_uiErrors)));
 }
 
-void AudioWave::SetError(eGuiFrameError eError)
+void AudioWave::SetError(AtlasFrameError eError)
 {
     m_uiErrors |= (1 << eError);
 
@@ -113,7 +113,7 @@ void AudioWave::SetError(eGuiFrameError eError)
 //    }
 }
 
-void AudioWave::ClearError(eGuiFrameError eError)
+void AudioWave::ClearError(AtlasFrameError eError)
 {
     m_uiErrors &= ~(1 << eError);
 

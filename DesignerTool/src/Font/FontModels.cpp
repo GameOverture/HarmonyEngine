@@ -147,7 +147,7 @@ float FontStateData::GetSize()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 FontModel::FontModel(ProjectItem *pItem, QJsonObject fontObj) : IModel(pItem),
-                                                                m_FontMetaDir(m_pItem->GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirFonts)),
+                                                                m_FontMetaDir(m_pItem->GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(DIR_Fonts)),
                                                                 m_pTrueAtlasFrame(nullptr),
                                                                 m_pFtglAtlas(nullptr),
                                                                 m_pTrueAtlasPixelData(nullptr),

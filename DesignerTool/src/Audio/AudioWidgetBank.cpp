@@ -71,9 +71,9 @@ AudioWidgetBank::AudioWidgetBank(QDir metaDir, QDir dataDir, AudioWidgetManager 
                                                          waveObj["errors"].toInt(0));
 
             if(QFile::exists(m_MetaDir.absoluteFilePath(pNewWave->ConstructWaveFileName())) == false)
-                pNewWave->SetError(GUIFRAMEERROR_CannotFindMetaImg);
+                pNewWave->SetError(ATLASFRAMEERROR_CannotFindMetaImg);
             else
-                pNewWave->ClearError(GUIFRAMEERROR_CannotFindMetaImg);
+                pNewWave->ClearError(ATLASFRAMEERROR_CannotFindMetaImg);
 
             m_pModel->AddWave(pNewWave);
         }

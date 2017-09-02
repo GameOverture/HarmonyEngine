@@ -100,3 +100,34 @@ void EntityWidget::on_actionInsertPhysicsBody_triggered()
 {
 
 }
+
+void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
+{
+    EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer());
+    if(pTreeItem == nullptr)
+        return;
+
+    switch(pTreeItem->GetItem()->GetType())
+    {
+    case ITEM_Sprite:
+        ui->stackedWidget->setCurrentIndex(STACKED_Sprite);
+        break;
+    case ITEM_Entity:
+        ui->stackedWidget->setCurrentIndex(STACKED_Entity);
+        break;
+    case ITEM_Physics:
+        ui->stackedWidget->setCurrentIndex(STACKED_Physics);
+        break;
+    case ITEM_BoundingVolume:
+    case ITEM_Font:
+        break;
+    case ITEM_AtlasImage:
+    case ITEM_Audio:
+    case ITEM_Particles:
+    case ITEM_Spine:
+    case ITEM_Shader:
+        HyGuiLog("Unsupported Entity childrenTree clicked", LOGTYPE_Error);
+        break;
+    }
+    //ui->stackedWidget->setCurrentIndex(
+}

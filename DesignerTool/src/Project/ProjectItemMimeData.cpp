@@ -22,7 +22,7 @@ ProjectItemMimeData::ProjectItemMimeData(ProjectItem *pProjItem) : m_pProjItem(p
         QJsonObject atlasFrameObj;
         atlasFrameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasFrameList[i]->GetImageChecksum())));
         atlasFrameObj.insert("name", QJsonValue(atlasFrameList[i]->GetName()));
-        atlasFrameObj.insert("uri", QJsonValue(m_pProjItem->GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_DirAtlases) % "/" % atlasFrameList[i]->ConstructImageFileName()));
+        atlasFrameObj.insert("uri", QJsonValue(m_pProjItem->GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(DIR_Atlases) % "/" % atlasFrameList[i]->ConstructImageFileName()));
         imagesArray.append(atlasFrameObj);
     }
     clipboardObj.insert("images", imagesArray);

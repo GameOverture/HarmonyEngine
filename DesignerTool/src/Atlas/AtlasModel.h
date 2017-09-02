@@ -100,7 +100,7 @@ public:
     void WriteMetaSettings(QJsonArray frameArray);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    AtlasFrame *CreateFrame(quint32 uiId, quint32 uiCRC, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, HyGuiItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
+    AtlasFrame *CreateFrame(quint32 uiId, quint32 uiCRC, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
     void RemoveFrame(AtlasFrame *pFrame);
     
     bool TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId);

@@ -74,8 +74,8 @@ bool AtlasModel::FrameLookup::DoesImageExist(quint32 uiChecksum)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
-                                                m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases)),
-                                                m_RootDataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_DirAtlases) + HyGlobal::ItemExt(ITEM_DirAtlases))
+                                                m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(DIR_Atlases) + HyGlobal::ItemExt(DIR_Atlases)),
+                                                m_RootDataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(DIR_Atlases) + HyGlobal::ItemExt(DIR_Atlases))
 {
     if(m_MetaDir.exists() == false)
     {
@@ -184,7 +184,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
                                                 uiAtlasGrpId,
                                                 frameObj["name"].toString(),
                                                 rAlphaCrop,
-                                                static_cast<HyGuiItemType>(frameObj["type"].toInt()),
+                                                static_cast<AtlasItemType>(frameObj["type"].toInt()),
                                                 frameObj["width"].toInt(),
                                                 frameObj["height"].toInt(),
                                                 frameObj["x"].toInt(),
@@ -207,9 +207,9 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
             }
 
             if(QFile::exists(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName())) == false)
-                pNewFrame->SetError(GUIFRAMEERROR_CannotFindMetaImg);
+                pNewFrame->SetError(ATLASFRAMEERROR_CannotFindMetaImg);
             else
-                pNewFrame->ClearError(GUIFRAMEERROR_CannotFindMetaImg);
+                pNewFrame->ClearError(ATLASFRAMEERROR_CannotFindMetaImg);
 
             if(pNewFrame->GetName()[0] != HYDEFAULT_PrefixChar)
             {
@@ -382,7 +382,7 @@ void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
     }
 }
 
-AtlasFrame *AtlasModel::CreateFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, HyGuiItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors)
+AtlasFrame *AtlasModel::CreateFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors)
 {
     if(uiId == ATLASFRAMEID_NotSet)
     {
@@ -390,7 +390,7 @@ AtlasFrame *AtlasModel::CreateFrame(quint32 uiId, quint32 uiChecksum, quint32 ui
         m_uiNextFrameId++;
     }
 
-    AtlasFrame *pNewFrame = new AtlasFrame(uiId, uiChecksum, uiAtlasGrpId, sN, rAlphaCrop, eType, iW, iH, iX, iY, iTextureIndex, uiErrors);
+    AtlasFrame *pNewFrame = new AtlasFrame(uiId, uiChecksum, uiAtlasGrpId, sN, rAlphaCrop, eFrameType, iW, iH, iX, iY, iTextureIndex, uiErrors);
 
     m_FrameLookup.AddLookup(pNewFrame);
     
@@ -605,7 +605,7 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiA
     if(eType != ITEM_Font && eType != ITEM_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
         rAlphaCrop = ImagePacker::crop(newImage);
 
-    AtlasFrame *pNewFrame = CreateFrame(ATLASFRAMEID_NotSet, uiChecksum, uiAtlasGrpId, sName, rAlphaCrop, eType, newImage.width(), newImage.height(), -1, -1, -1, 0);
+    AtlasFrame *pNewFrame = CreateFrame(ATLASFRAMEID_NotSet, uiChecksum, uiAtlasGrpId, sName, rAlphaCrop, HyGlobal::GetAtlasItemFromItem(eType), newImage.width(), newImage.height(), -1, -1, -1, 0);
     if(pNewFrame)
     {
         // TODO: Should I care about overwriting a duplicate image?
@@ -979,7 +979,7 @@ void AtlasModel::ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex
             bValidToDraw = false;
         }
         else
-            pFrame->ClearError(GUIFRAMEERROR_CouldNotPack);
+            pFrame->ClearError(ATLASFRAMEERROR_CouldNotPack);
 
         if(imgInfoRef.duplicateId != nullptr)
             bValidToDraw = false;
