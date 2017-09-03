@@ -7,8 +7,8 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __HyBoundingVolume2d_h__
-#define __HyBoundingVolume2d_h__
+#ifndef HyBoundingVolume2d_h__
+#define HyBoundingVolume2d_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Box2D/Box2D.h"
@@ -19,6 +19,8 @@ class IHyNode2d;
 class HyBoundingVolume2d
 {
 	IHyNode2d &		m_OwnerRef;
+
+	b2Shape *		m_pPhysicsShape;
 
 	enum eType
 	{
@@ -47,4 +49,4 @@ private:
 	void UpdateWorldAABB();
 };
 
-#endif /* __HyBoundingVolume2d_h__ */
+#endif /* HyBoundingVolume2d_h__ */

@@ -80,6 +80,7 @@ private:
 	friend float Hy_TimeDelta();
 	friend void Hy_SetUpdateTickMs(uint32 uiUpdateTickMs);
 	friend void HyPauseGame(bool bPause);
+	friend b2World &Hy_Physics2d();
 	friend HyDiagnostics &HyGetDiagnostics();
 	friend float HyPixelsPerMeter();
 	friend HyCoordinateUnit HyDefaultCoordinateUnit();

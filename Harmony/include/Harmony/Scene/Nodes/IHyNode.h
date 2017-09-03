@@ -7,8 +7,8 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __IHyNode_h__
-#define __IHyNode_h__
+#ifndef IHyNode_h__
+#define IHyNode_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -62,6 +62,7 @@ public:
 	void SetTag(int64 iTag);
 
 protected:
+	virtual void PhysicsUpdate() = 0;
 	virtual void NodeUpdate() = 0;
 	
 	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding);						// Only Entity2d/3d will invoke this
@@ -72,8 +73,8 @@ protected:
 	void ClearDirty(HyNodeDirtyType eDirtyType);
 
 private:
-	void InsertActiveTweenFloat(HyTweenFloat *pTweenFloat);									// Only HyTweenFloat will invoke this
-	void Update();																			// Only Scene will invoke this
+	void InsertActiveTweenFloat(HyTweenFloat *pTweenFloat);								// Only HyTweenFloat will invoke this
+	void Update();																		// Only Scene will invoke this
 };
 
-#endif /* __IHyNode_h__ */
+#endif /* IHyNode_h__ */

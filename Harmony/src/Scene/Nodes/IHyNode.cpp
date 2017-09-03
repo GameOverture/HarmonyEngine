@@ -113,6 +113,8 @@ void IHyNode::Update()
 			++iter;
 	}
 
+	PhysicsUpdate();
+
 	// TODO: Process the action queue
 
 	NodeUpdate();

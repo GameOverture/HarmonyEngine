@@ -7,8 +7,8 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __IHyNode3d_h__
-#define __IHyNode3d_h__
+#ifndef IHyNode3d_h__
+#define IHyNode3d_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
@@ -28,6 +28,9 @@ public:
 	virtual ~IHyNode3d();
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
+
+protected:
+	virtual void PhysicsUpdate() override;
 };
 
-#endif /* __IHyNode3d_h__ */
+#endif /* IHyNode3d_h__ */

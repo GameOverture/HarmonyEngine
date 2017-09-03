@@ -16,6 +16,7 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 																m_eCoordUnit(HYCOORDUNIT_Default),
 																m_fRotation(0.0f),
 																m_BoundingVolume(*this),
+																m_pPhysicsBody(nullptr),
 																pos(*this, HYNODEDIRTY_Transform),
 																rot(m_fRotation, *this, HYNODEDIRTY_Transform),
 																rot_pivot(*this, HYNODEDIRTY_Transform),
@@ -32,6 +33,12 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 
 /*virtual*/ IHyNode2d::~IHyNode2d()
 {
+	if(m_pPhysicsBody)
+	{
+		Hy_Physics2d().DestroyBody(m_pPhysicsBody);
+		m_pPhysicsBody = nullptr;
+	}
+
 	ParentDetach();
 	HyScene::RemoveNode(this);
 
@@ -121,4 +128,32 @@ void IHyNode2d::GetWorldTransform(glm::mat4 &outMtx)
 	}
 
 	outMtx = m_mtxCached;
+}
+
+void IHyNode2d::PhysicsInit(b2BodyDef &bodyDefOut)
+{
+	b2World &worldRef = Hy_Physics2d();
+
+	if(m_pPhysicsBody)
+		worldRef.DestroyBody(m_pPhysicsBody);
+	
+	bodyDefOut.userData = this;
+	bodyDefOut.position.Set(pos.X(), pos.Y());
+	bodyDefOut.angle = rot.Get();
+
+	m_pPhysicsBody = worldRef.CreateBody(&bodyDefOut);
+}
+
+b2Body *IHyNode2d::PhysicsBody()
+{
+	return m_pPhysicsBody;
+}
+
+/*virtual*/ void IHyNode2d::PhysicsUpdate() /*override*/
+{
+	if(m_pPhysicsBody == nullptr && m_pPhysicsBody->IsActive())
+		return;
+
+	pos.Set(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);
+	rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()));
 }

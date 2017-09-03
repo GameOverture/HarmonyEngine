@@ -186,6 +186,12 @@ HyRendererInterop &HyEngine::GetRenderer()
 	HyEngine::sm_pInstance->m_Scene.SetPause(bPause);
 }
 
+/*friend*/ b2World &Hy_Physics2d()
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_Physics2d() was invoked before engine has been initialized.");
+	return HyEngine::sm_pInstance->m_Scene.GetPhysics2d();
+}
+
 /*friend*/ HyDiagnostics &HyGetDiagnostics()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "HyGetDiagnostics() was invoked before engine has been initialized.");

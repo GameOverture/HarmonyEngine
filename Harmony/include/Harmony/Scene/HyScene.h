@@ -82,6 +82,7 @@ public:
 
 	void CopyAllLoadedNodes(std::vector<IHyLeafDraw2d *> &nodeListOut);
 
+	b2World &GetPhysics2d();
 	void DebugDrawPhysics2d(bool bDraw)					{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
 
 	void SetPause(bool bPause);

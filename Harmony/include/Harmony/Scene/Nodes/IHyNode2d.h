@@ -7,8 +7,8 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __IHyNode2d_h__
-#define __IHyNode2d_h__
+#ifndef IHyNode2d_h__
+#define IHyNode2d_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
@@ -32,6 +32,9 @@ protected:
 	float							m_fRotation;		// Reference value used in 'rot' HyTweenFloat
 
 	HyBoundingVolume2d				m_BoundingVolume;
+	b2Shape *						m_pDefaultBoundingVolume;
+	std::vector<b2Shape *>			m_BoundingVolumeList;
+	b2Body *						m_pPhysicsBody;
 
 public:
 	HyTweenVec2						pos;
@@ -54,11 +57,15 @@ public:
 	void GetLocalTransform(glm::mat4 &outMtx) const;
 	void GetWorldTransform(glm::mat4 &outMtx);
 
+	void PhysicsInit(b2BodyDef &bodyDefOut);
+	b2Body *PhysicsBody();
+
 protected:
-	virtual void NodeUpdate() = 0;
+	virtual void PhysicsUpdate() override;
+	virtual void NodeUpdate() override = 0;
 
 	// '_' functions are used to propagate values down from parent, and are overridden with proper functionality later in hierarchy
-	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding)	{ }
+	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) 	{ }
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)							{ return iOrderValue; }
 
 private:
@@ -67,4 +74,4 @@ private:
 	virtual void Unload() { }
 };
 
-#endif /* __IHyNode2d_h__ */
+#endif /* IHyNode2d_h__ */

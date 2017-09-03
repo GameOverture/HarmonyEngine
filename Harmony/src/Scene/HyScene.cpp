@@ -104,6 +104,11 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLeafDraw2d *> &nodeListOut)
 	nodeListOut = m_NodeList_Loaded;
 }
 
+b2World &HyScene::GetPhysics2d()
+{
+	return m_b2World;
+}
+
 void HyScene::SetPause(bool bPause)
 {
 	m_bPauseGame = bPause;

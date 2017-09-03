@@ -39,3 +39,7 @@ void IHyNode3d::GetLocalTransform(glm::mat4 &outMtx) const
 	outMtx = glm::scale(outMtx, scale.Get());
 	outMtx = glm::translate(outMtx, scale_pivot.Get() * -1.0f);
 }
+
+/*virtual*/ void IHyNode3d::PhysicsUpdate() /*override*/
+{
+}
