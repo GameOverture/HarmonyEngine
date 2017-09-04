@@ -7,8 +7,8 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __IHyLeafNode2d_h__
-#define __IHyLeafNode2d_h__
+#ifndef IHyLeafNode2d_h__
+#define IHyLeafNode2d_h__
 
 #include "Scene/Nodes/IHyNode2d.h"
 
@@ -23,7 +23,10 @@ public:
 	void SetPauseUpdate(bool bUpdateWhenPaused);
 
 protected:
+	virtual void CalcBoundingVolume() override = 0;
+	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override = 0;
+
 	virtual void NodeUpdate() = 0;
 };
 
-#endif /* __IHyLeafNode2d_h__ */
+#endif /* IHyLeafNode2d_h__ */

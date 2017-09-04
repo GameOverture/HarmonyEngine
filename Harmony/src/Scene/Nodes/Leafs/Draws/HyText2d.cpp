@@ -336,6 +336,17 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	m_bIsDirty = true;
 }
 
+/*virtual*/ void HyText2d::CalcBoundingVolume() /*override*/
+{
+	HyError("HyText2d::CalcBoundingVolume() not implemented");
+}
+
+/*virtual*/ void HyText2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/
+{
+	uiStateOut = m_uiCurFontState;
+	uiSubStateOut = 0;
+}
+
 /*virtual*/ bool HyText2d::IsLoadDataValid() /*override*/
 {
 	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());

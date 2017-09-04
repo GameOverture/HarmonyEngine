@@ -16,9 +16,10 @@ class HyTweenFloat;
 
 enum HyNodeDirtyType
 {
-	HYNODEDIRTY_Transform	= 1 << 0,
-	HYNODEDIRTY_Color		= 1 << 1,
-	HYNODEDIRTY_DontCare	= 1 << 2
+	HYNODEDIRTY_BoundingVolume	= 1 << 0,
+	HYNODEDIRTY_Transform		= 1 << 1,
+	HYNODEDIRTY_Color			= 1 << 2,
+	HYNODEDIRTY_DontCare		= 1 << 3
 };
 
 class IHyNode
@@ -68,7 +69,7 @@ protected:
 	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding);						// Only Entity2d/3d will invoke this
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
 
-	virtual void SetDirty(HyNodeDirtyType eDirtyType);
+	virtual void SetDirty(uint32 uiDirtyFlags);
 	bool IsDirty(HyNodeDirtyType eDirtyType);
 	void ClearDirty(HyNodeDirtyType eDirtyType);
 

@@ -41,6 +41,10 @@ public:
 	uint32 GetEntireTextureWidth();
 	uint32 GetEntireTextureHeight();
 
+protected:
+	virtual void CalcBoundingVolume() override;
+	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override;
+
 private:
 	virtual void DrawUpdate() override;
 	virtual void OnUpdateUniforms() override;

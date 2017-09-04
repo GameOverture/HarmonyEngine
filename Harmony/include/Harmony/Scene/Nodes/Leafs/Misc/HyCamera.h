@@ -53,6 +53,8 @@ public:
 	HyRectangle<float> GetWorldViewBounds();
 
 protected:
+	virtual void CalcBoundingVolume() override;
+	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override;
 	virtual void NodeUpdate() override;
 };
 

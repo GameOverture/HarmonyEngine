@@ -114,6 +114,9 @@ public:
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 
 protected:
+	virtual void CalcBoundingVolume() override;
+	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override;
+
 	virtual bool IsLoadDataValid() override;
 	virtual void DrawUpdate() override;
 	virtual void OnDataAcquired() override;

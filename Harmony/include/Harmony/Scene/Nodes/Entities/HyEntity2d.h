@@ -69,18 +69,20 @@ public:
 	virtual void Unload() override;
 	
 protected:
+	virtual void CalcBoundingVolume() override;
+	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override;
+
 	virtual void NodeUpdate() override final;
 
 	// Optional user overrides below
 	virtual void OnUpdate() { };
-	virtual void OnCalcBoundingVolume() { }				// Should calculate the local bounding volume in 'm_BoundingVolume'
 	virtual void OnMouseEnter(void *pUserParam) { }
 	virtual void OnMouseLeave(void *pUserParam) { }
 	virtual void OnMouseDown(void *pUserParam) { }
 	virtual void OnMouseUp(void *pUserParam) { }
 	virtual void OnMouseClicked(void *pUserParam) { }
 
-	virtual void SetDirty(HyNodeDirtyType eDirtyType) override;
+	virtual void SetDirty(uint32 uiDirtyFlags) override;
 
 	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding) override;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override;

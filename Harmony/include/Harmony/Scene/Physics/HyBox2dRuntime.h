@@ -11,7 +11,6 @@
 #define __HyBox2dRuntime_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Box2d/Box2D.h"
 
 class HyBox2dRuntime : public b2ContactListener

@@ -27,22 +27,24 @@ public:
 
 	const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p);
 
-	void SetAsQuad(int iWidth, int iHeight, bool bWireframe);
-	void SetAsQuad(float fWidth, float fHeight, bool bWireframe);
-
-	void SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe);
-
-	void SetAsLineChain(std::vector<glm::vec2> &vertexList);
+	HyShape2d &GetShape();
 
 	float GetLineThickness();
 	void SetLineThickness(float fThickness);
 
 protected:
+	virtual void CalcBoundingVolume() override;
+	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override;
+
+	virtual void OnShapeSet(HyShape2d *pShape) override;
+
 	void ClearData();
 
 private:
-	virtual void OnCalcBoundingVolume() override;
-	
+	void SetAsQuad(float fWidth, float fHeight, bool bWireframe);
+	void SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe);
+	void SetAsLineChain(std::vector<glm::vec2> &vertexList);
+
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 };

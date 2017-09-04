@@ -16,6 +16,7 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 																m_eCoordUnit(HYCOORDUNIT_Default),
 																m_fRotation(0.0f),
 																m_BoundingVolume(*this),
+																m_CollisionVolume(*this),
 																m_pPhysicsBody(nullptr),
 																pos(*this, HYNODEDIRTY_Transform),
 																rot(m_fRotation, *this, HYNODEDIRTY_Transform),
@@ -128,6 +129,28 @@ void IHyNode2d::GetWorldTransform(glm::mat4 &outMtx)
 	}
 
 	outMtx = m_mtxCached;
+}
+
+const HyShape2d &IHyNode2d::GetBoundingVolume()
+{
+	if(IsDirty(HYNODEDIRTY_BoundingVolume) || m_BoundingVolume.IsValid() == false)
+	{
+		CalcBoundingVolume();
+		ClearDirty(HYNODEDIRTY_BoundingVolume);
+	}
+
+	return m_BoundingVolume;
+}
+
+HyShape2d &IHyNode2d::GetCollisionVolume()
+{
+	return m_CollisionVolume;
+}
+
+b2Shape *IHyNode2d::GetBoundingVolumeIndex(uint32 uiIndex)
+{
+	return nullptr;
+	//return m_BoundingVolumeList[uiIndex].Get;
 }
 
 void IHyNode2d::PhysicsInit(b2BodyDef &bodyDefOut)

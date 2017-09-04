@@ -13,7 +13,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
 #include "Scene/Tweens/HyTweenVec2.h"
-#include "Scene/Physics/HyBoundingVolume2d.h"
+#include "Scene/Physics/HyShape2d.h"
+#include "Utilities/HyMath.h"
 
 #include <functional>
 
@@ -22,6 +23,7 @@ class HyEntity2d;
 class IHyNode2d : public IHyNode
 {
 	friend class HyEntity2d;
+	friend class HyShape2d;
 
 protected:
 	HyEntity2d *					m_pParent;
@@ -31,9 +33,8 @@ protected:
 
 	float							m_fRotation;		// Reference value used in 'rot' HyTweenFloat
 
-	HyBoundingVolume2d				m_BoundingVolume;
-	b2Shape *						m_pDefaultBoundingVolume;
-	std::vector<b2Shape *>			m_BoundingVolumeList;
+	HyShape2d						m_BoundingVolume;
+	HyShape2d						m_CollisionVolume;
 	b2Body *						m_pPhysicsBody;
 
 public:
@@ -57,11 +58,21 @@ public:
 	void GetLocalTransform(glm::mat4 &outMtx) const;
 	void GetWorldTransform(glm::mat4 &outMtx);
 
+	const HyShape2d &IHyNode2d::GetBoundingVolume();
+	HyShape2d &IHyNode2d::GetCollisionVolume();
+
+	b2Shape *GetBoundingVolumeIndex(uint32 uiIndex);
+
 	void PhysicsInit(b2BodyDef &bodyDefOut);
 	b2Body *PhysicsBody();
 
 protected:
-	virtual void PhysicsUpdate() override;
+	virtual void CalcBoundingVolume() = 0;
+	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) = 0;
+
+	virtual void OnShapeSet(HyShape2d *pShape) { }
+
+	virtual void PhysicsUpdate() override final;
 	virtual void NodeUpdate() override = 0;
 
 	// '_' functions are used to propagate values down from parent, and are overridden with proper functionality later in hierarchy

@@ -252,6 +252,16 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 		m_ChildList[i]->Unload();
 }
 
+/*virtual*/ void HyEntity2d::CalcBoundingVolume() /*override*/
+{
+	HyError("HyEntity2d::CalcBoundingVolume() not implemented");
+}
+
+/*virtual*/ void HyEntity2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/
+{
+	uiStateOut = uiSubStateOut = 0;
+}
+
 /*virtual*/ void HyEntity2d::NodeUpdate() /*override final*/
 {
 	if((m_uiExplicitFlags & EXPLICIT_Scissor) != 0)
@@ -278,7 +288,7 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	{
 		if(m_uiAttributes & ATTRIBFLAG_BoundingVolumeDirty)
 		{
-			OnCalcBoundingVolume();
+			//OnCalcBoundingVolume();
 			m_uiAttributes &= ~ATTRIBFLAG_BoundingVolumeDirty;
 		}
 
@@ -287,7 +297,7 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 			glm::vec2 ptMousePos = IHyInputMap::GetWorldMousePos();
 
 			bool bLeftClickDown = IHyInputMap::IsMouseLeftDown();
-			bool bMouseInBounds = m_BoundingVolume.IsWorldPointCollide(ptMousePos);
+			bool bMouseInBounds = GetBoundingVolume().TestPoint(ptMousePos);
 
 			switch(m_eMouseInputState)
 			{
@@ -339,18 +349,17 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	OnUpdate();
 }
 
-/*virtual*/ void HyEntity2d::SetDirty(HyNodeDirtyType eDirtyType)
+/*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)
 {
-	IHyNode2d::SetDirty(eDirtyType);
+	IHyNode2d::SetDirty(uiDirtyFlags);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->SetDirty(eDirtyType);
+		m_ChildList[i]->SetDirty(uiDirtyFlags);
 }
 
 /*virtual*/ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
-	SetDirty(HYNODEDIRTY_Transform);
-	SetDirty(HYNODEDIRTY_Color);
+	SetDirty(HYNODEDIRTY_Transform | HYNODEDIRTY_Color);
 
 	childInst._SetEnabled(m_bEnabled, false);
 	childInst._SetPauseUpdate(m_bPauseOverride, false);

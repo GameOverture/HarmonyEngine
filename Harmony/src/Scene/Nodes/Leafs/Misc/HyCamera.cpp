@@ -64,6 +64,16 @@ HyRectangle<float> HyCamera2d::GetWorldViewBounds()
 	return returnRect;
 }
 
+/*virtual*/ void HyCamera2d::CalcBoundingVolume() /*override*/
+{
+	HyError("HyCamera2d::CalcBoundingVolume() not implemented");
+}
+
+/*virtual*/ void HyCamera2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/
+{
+	uiStateOut = uiSubStateOut = 0;
+}
+
 /*virtual*/ void HyCamera2d::NodeUpdate()
 {
 }

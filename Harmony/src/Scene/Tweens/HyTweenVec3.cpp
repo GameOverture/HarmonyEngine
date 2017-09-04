@@ -9,11 +9,11 @@
 *************************************************************************/
 #include "Scene/Tweens/HyTweenVec3.h"
 
-HyTweenVec3::HyTweenVec3(IHyNode &ownerRef, HyNodeDirtyType eDirtyType)
+HyTweenVec3::HyTweenVec3(IHyNode &ownerRef, uint32 uiDirtyFlags)
 {
-	m_AnimFloatList.push_back(HyTweenFloat(m_vValue[0], ownerRef, eDirtyType));
-	m_AnimFloatList.push_back(HyTweenFloat(m_vValue[1], ownerRef, eDirtyType));
-	m_AnimFloatList.push_back(HyTweenFloat(m_vValue[2], ownerRef, eDirtyType));
+	m_AnimFloatList.push_back(HyTweenFloat(m_vValue[0], ownerRef, uiDirtyFlags));
+	m_AnimFloatList.push_back(HyTweenFloat(m_vValue[1], ownerRef, uiDirtyFlags));
+	m_AnimFloatList.push_back(HyTweenFloat(m_vValue[2], ownerRef, uiDirtyFlags));
 }
 
 HyTweenVec3::~HyTweenVec3()

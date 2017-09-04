@@ -95,6 +95,16 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	return static_cast<HyTexturedQuad2dData *>(AcquireData())->GetAtlas()->GetHeight();
 }
 
+/*virtual*/ void HyTexturedQuad2d::CalcBoundingVolume() /*override*/
+{
+	HyError("HyText2d::CalcBoundingVolume() not implemented");
+}
+
+/*virtual*/ void HyTexturedQuad2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/
+{
+	uiStateOut = uiSubStateOut = 0;
+}
+
 /*virtual*/ void HyTexturedQuad2d::DrawUpdate()
 {
 	if(IsLoaded() == false || m_bIS_RAW)

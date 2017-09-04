@@ -100,7 +100,7 @@
     <ClCompile Include="Scene\Nodes\Leafs\IHyLeaf2d.cpp" />
     <ClCompile Include="Scene\Nodes\Leafs\Misc\HyAudio2d.cpp" />
     <ClCompile Include="Scene\Nodes\Leafs\Misc\HyCamera.cpp" />
-    <ClCompile Include="Scene\Physics\HyBoundingVolume2d.cpp" />
+    <ClCompile Include="Scene\Physics\HyShape2d.cpp" />
     <ClCompile Include="Scene\Physics\HyBox2dRuntime.cpp" />
     <ClCompile Include="Scene\Physics\HyDebugPhys2d.cpp" />
     <ClCompile Include="Scene\Physics\HyPhysEntity2d.cpp" />
@@ -197,7 +197,7 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\IHyLeaf2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\Misc\HyAudio2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Leafs\Misc\HyCamera.h" />
-    <ClInclude Include="..\include\Harmony\Scene\Physics\HyBoundingVolume2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Physics\HyShape2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyBox2dRuntime.h" />
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyDebugPhys2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyPhysEntity2d.h" />

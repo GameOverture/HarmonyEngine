@@ -24,7 +24,7 @@ class HyTweenFloat
 
 	float &							m_fValueRef;
 	IHyNode &						m_OwnerRef;
-	const HyNodeDirtyType			m_eDIRTY_TYPE;
+	const uint32					m_uiDIRTY_FLAGS;
 
 	float							m_fStart;
 	float							m_fTarget;
@@ -38,7 +38,7 @@ class HyTweenFloat
 	bool (HyTweenFloat::*m_fpBehaviorUpdate)();
 
 public:
-	HyTweenFloat(float &valueReference, IHyNode &ownerRef, HyNodeDirtyType eDirtyType);
+	HyTweenFloat(float &valueReference, IHyNode &ownerRef, uint32 uiDirtyFlags);
 	~HyTweenFloat(void);
 
 	float Get() const;

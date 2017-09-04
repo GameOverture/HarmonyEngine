@@ -75,9 +75,9 @@ void IHyNode::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding)
 	}
 }
 
-/*virtual*/ void IHyNode::SetDirty(HyNodeDirtyType eDirtyType)
+/*virtual*/ void IHyNode::SetDirty(uint32 uiDirtyFlags)
 {
-	m_uiTweenDirtyFlags |= static_cast<uint32>(eDirtyType);
+	m_uiTweenDirtyFlags |= uiDirtyFlags;
 }
 
 bool IHyNode::IsDirty(HyNodeDirtyType eDirtyType)
