@@ -22,7 +22,7 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(nu
                                                                         m_HoverBackground(this),
                                                                         m_pHoverTexQuad(nullptr)
 {
-    m_HoverBackground.SetAsQuad(100.0f, 100.0f, false);
+    m_HoverBackground.GetShape().SetAsBox(100.0f, 100.0f, false);
     m_HoverBackground.SetTint(0.0f, 0.0f, 0.0f);
     m_HoverBackground.SetDisplayOrder(DISPLAYORDER_AtlasHoverBG);
     m_HoverBackground.SetEnabled(false);
