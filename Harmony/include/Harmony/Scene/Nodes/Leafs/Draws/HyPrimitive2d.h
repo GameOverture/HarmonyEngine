@@ -41,9 +41,9 @@ protected:
 	void ClearData();
 
 private:
-	void SetAsQuad(float fWidth, float fHeight, bool bWireframe);
-	void SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe);
-	void SetAsLineChain(std::vector<glm::vec2> &vertexList);
+	void SetAsLineChain(glm::vec2 *pVertexList, uint32 uiNumVertices);
+	void SetAsCircle(glm::vec2 &ptCenter, float fRadius, int32 iNumSegments, bool bWireframe);
+	void SetAsPolygon(glm::vec2 *pVertexList, uint32 uiNumVertices);
 
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;

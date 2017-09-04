@@ -29,6 +29,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 {
 	m_RenderState = p.m_RenderState;
 	m_eCoordUnit = p.m_eCoordUnit;
+	m_BoundingVolume = p.m_BoundingVolume;
 
 	ClearData();
 	if(m_RenderState.GetNumVerticesPerInstance() != 0)
@@ -43,6 +44,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 
 HyShape2d &HyPrimitive2d::GetShape()
 {
+	// The bounding volume in HyPrimitive2d also doubles as the actual shape and type of this primitive
 	return m_BoundingVolume;
 }
 
@@ -58,6 +60,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 
 /*virtual*/ void HyPrimitive2d::CalcBoundingVolume() /*override*/
 {
+	// Do nothing as m_BoundingVolume is always up to date as it is the actual shape and type of this primitive
 }
 
 /*virtual*/ void HyPrimitive2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/
@@ -67,8 +70,40 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 
 /*virtual*/ void HyPrimitive2d::OnShapeSet(HyShape2d *pShape) /*override*/
 {
+	IHyNode2d::OnShapeSet(pShape);
 	if(pShape != &m_BoundingVolume)
 		return;
+	
+	b2Shape *pb2Shape = m_BoundingVolume.GetB2Shape();
+
+	switch(m_BoundingVolume.GetType())
+	{
+		case HYSHAPE_LineSegment: {
+			std::vector<glm::vec2> pointList;
+			pointList.push_back(glm::vec2(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1.x, static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1.y));
+			pointList.push_back(glm::vec2(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2.x, static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2.y));
+			SetAsLineChain(&pointList[0], 2);
+		} break;
+
+		case HYSHAPE_LineLoop:
+		case HYSHAPE_LineChain: {
+			glm::vec2 *pVertList = reinterpret_cast<glm::vec2 *>(static_cast<b2ChainShape *>(pb2Shape)->m_vertices);
+			SetAsLineChain(pVertList, static_cast<b2ChainShape *>(pb2Shape)->m_count);
+		} break;
+
+		case HYSHAPE_Circle:
+			SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x, static_cast<b2CircleShape *>(pb2Shape)->m_p.y), static_cast<b2CircleShape *>(pb2Shape)->m_radius, 20, false);
+			break;
+
+		case HYSHAPE_Polygon: {
+			glm::vec2 *pVertList = reinterpret_cast<glm::vec2 *>(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices);
+			SetAsPolygon(pVertList, static_cast<b2PolygonShape *>(pb2Shape)->m_count);
+		} break;
+
+	default:
+		HyLogError("HyPrimitive2d::OnShapeSet() - Unknown shape type: " << m_BoundingVolume.GetType());
+	}
+
 }
 
 void HyPrimitive2d::ClearData()
@@ -82,49 +117,42 @@ void HyPrimitive2d::ClearData()
 	m_ShaderUniforms.Clear();
 }
 
-void HyPrimitive2d::SetAsQuad(float fWidth, float fHeight, bool bWireframe)
+void HyPrimitive2d::SetAsLineChain(glm::vec2 *pVertexList, uint32 uiNumVertices)
 {
 	ClearData();
 
-	if(bWireframe)
-		m_RenderState.Enable(HyRenderState::DRAWMODE_LINELOOP);
-	else
-		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP);
+	HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
+
+	m_RenderState.SetShaderId(HYSHADERPROG_Lines2d);
+	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP);
+	m_RenderState.SetNumInstances(uiNumVertices - 1);
+	m_RenderState.SetNumVerticesPerInstance(4);				// 8 vertices per instance because of '2' duplicate vertex positions and normals on each end of line segment
+
+	m_pDrawBuffer = HY_NEW glm::vec2[m_RenderState.GetNumInstances() * 8];	// size*4 = Each vertex of segment has '2' duplicate vertex positions that are offset by '2' corresponding normals within vertex shader 
+	m_uiBufferSize = (m_RenderState.GetNumInstances() * 8) * sizeof(glm::vec2);
 
 	if(m_eCoordUnit == HYCOORDUNIT_Default)
 		m_eCoordUnit = HyDefaultCoordinateUnit();
 	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? HyPixelsPerMeter() : 1.0f;
-	fWidth *= fCoordMod;
-	fHeight *= fCoordMod;
 
-	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
-	m_RenderState.SetNumVerticesPerInstance(4);
-
-	m_pDrawBuffer = HY_NEW glm::vec2[4];
-	m_uiBufferSize = 4 * sizeof(glm::vec2);
-
-	m_pDrawBuffer[0].x = 0.0f;
-	m_pDrawBuffer[0].y = 0.0f;
-	m_pDrawBuffer[1].x = fWidth;
-	m_pDrawBuffer[1].y = 0.0f;
-
-	if(bWireframe)
+	uint32 i, j;
+	for(i = j = 0; i < m_RenderState.GetNumInstances(); ++i, j += 8)
 	{
-		m_pDrawBuffer[2].x = fWidth;
-		m_pDrawBuffer[2].y = fHeight;
-		m_pDrawBuffer[3].x = 0.0f;
-		m_pDrawBuffer[3].y = fHeight;
-	}
-	else
-	{
-		m_pDrawBuffer[2].x = 0.0f;
-		m_pDrawBuffer[2].y = fHeight;
-		m_pDrawBuffer[3].x = fWidth;
-		m_pDrawBuffer[3].y = fHeight;
+		glm::vec2 vVecDirection = pVertexList[i + 1] - pVertexList[i + 0];
+
+		/*postion 1    */ m_pDrawBuffer[j + 0] = pVertexList[i + 0] * fCoordMod;
+		/*Normal  1    */ m_pDrawBuffer[j + 1] = glm::normalize(glm::vec2(-vVecDirection.y, vVecDirection.x));
+		/*postion 1 dup*/ m_pDrawBuffer[j + 2] = m_pDrawBuffer[j + 0];
+		/*Normal  1 inv*/ m_pDrawBuffer[j + 3] = m_pDrawBuffer[j + 1] * -1.0f;
+
+		/*postion 2    */ m_pDrawBuffer[j + 4] = pVertexList[i + 1] * fCoordMod;
+		/*Normal  2    */ m_pDrawBuffer[j + 5] = glm::normalize(glm::vec2(vVecDirection.y, -vVecDirection.x)) * -1.0f;
+		/*postion 2 dup*/ m_pDrawBuffer[j + 6] = m_pDrawBuffer[j + 4];
+		/*Normal  2 inv*/ m_pDrawBuffer[j + 7] = m_pDrawBuffer[j + 5] * -1.0f;
 	}
 }
 
-void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWireframe)
+void HyPrimitive2d::SetAsCircle(glm::vec2 &ptCenter, float fRadius, int32 iNumSegments, bool bWireframe)
 {
 	ClearData();
 
@@ -152,41 +180,29 @@ void HyPrimitive2d::SetAsCircle(float fRadius, int32 iNumSegments, bool bWirefra
 
 		m_pDrawBuffer[i].x = (sin(t) * fRadius);
 		m_pDrawBuffer[i].y = (cos(t) * fRadius);
+
+		m_pDrawBuffer[i] += ptCenter;
 	}
 }
 
-void HyPrimitive2d::SetAsLineChain(std::vector<glm::vec2> &vertexList)
+void HyPrimitive2d::SetAsPolygon(glm::vec2 *pVertexList, uint32 uiNumVertices)
 {
 	ClearData();
 
-	HyAssert(vertexList.size() > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
+	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLES);
+	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
+	m_RenderState.SetNumVerticesPerInstance(3);
 
-	m_RenderState.SetShaderId(HYSHADERPROG_Lines2d);
-	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP);
-	m_RenderState.SetNumInstances(static_cast<uint32>(vertexList.size()) - 1);
-	m_RenderState.SetNumVerticesPerInstance(4);				// 8 vertices per instance because of '2' duplicate vertex positions and normals on each end of line segment
+	uint32 uiNumBufferVerts = (uiNumVertices - 2) * 3;
+	m_pDrawBuffer = HY_NEW glm::vec2[uiNumBufferVerts];
+	m_uiBufferSize = uiNumBufferVerts * sizeof(glm::vec2);
 
-	m_pDrawBuffer = HY_NEW glm::vec2[m_RenderState.GetNumInstances() * 8];	// size*4 = Each vertex of segment has '2' duplicate vertex positions that are offset by '2' corresponding normals within vertex shader 
-	m_uiBufferSize = (m_RenderState.GetNumInstances() * 8) * sizeof(glm::vec2);
-
-	if(m_eCoordUnit == HYCOORDUNIT_Default)
-		m_eCoordUnit = HyDefaultCoordinateUnit();
-	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? HyPixelsPerMeter() : 1.0f;
-
-	uint32 i, j;
-	for(i = j = 0; i < m_RenderState.GetNumInstances(); ++i, j += 8)
+	uint32 uiBufferIndex = 0;
+	for(uint32 i = 1; i < uiNumVertices - 1; ++i)
 	{
-		glm::vec2 vVecDirection = vertexList[i + 1] - vertexList[i + 0];
-
-		/*postion 1    */ m_pDrawBuffer[j + 0] = vertexList[i + 0] * fCoordMod;
-		/*Normal  1    */ m_pDrawBuffer[j + 1] = glm::normalize(glm::vec2(-vVecDirection.y, vVecDirection.x));
-		/*postion 1 dup*/ m_pDrawBuffer[j + 2] = m_pDrawBuffer[j + 0];
-		/*Normal  1 inv*/ m_pDrawBuffer[j + 3] = m_pDrawBuffer[j + 1] * -1.0f;
-
-		/*postion 2    */ m_pDrawBuffer[j + 4] = vertexList[i + 1] * fCoordMod;
-		/*Normal  2    */ m_pDrawBuffer[j + 5] = glm::normalize(glm::vec2(vVecDirection.y, -vVecDirection.x)) * -1.0f;
-		/*postion 2 dup*/ m_pDrawBuffer[j + 6] = m_pDrawBuffer[j + 4];
-		/*Normal  2 inv*/ m_pDrawBuffer[j + 7] = m_pDrawBuffer[j + 5] * -1.0f;
+		m_pDrawBuffer[uiBufferIndex++] = pVertexList[0];
+		m_pDrawBuffer[uiBufferIndex++] = pVertexList[i];
+		m_pDrawBuffer[uiBufferIndex++] = pVertexList[i+1];
 	}
 }
 

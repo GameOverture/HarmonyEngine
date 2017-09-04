@@ -181,6 +181,8 @@ HyOpenGL::~HyOpenGL(void)
 	{
 		if(renderState.IsEnabled(HyRenderState::DRAWMODE_TRIANGLESTRIP))
 			m_eDrawMode = GL_TRIANGLE_STRIP;
+		else if(renderState.IsEnabled(HyRenderState::DRAWMODE_TRIANGLES))
+			m_eDrawMode = GL_TRIANGLES;
 		else if(renderState.IsEnabled(HyRenderState::DRAWMODE_LINELOOP))
 			m_eDrawMode = GL_LINE_LOOP;
 		else if(renderState.IsEnabled(HyRenderState::DRAWMODE_LINESTRIP))

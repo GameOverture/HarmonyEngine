@@ -20,6 +20,7 @@
 enum HyType
 {
 	HYTYPE_Unknown = 0,
+
 	HYTYPE_Sound2d,
 	HYTYPE_Particles2d,
 	HYTYPE_Sprite2d,
@@ -32,6 +33,19 @@ enum HyType
 	HYTYPE_Entity3d,
 	HYTYPE_Camera2d,
 	HYTYPE_Camera3d
+};
+
+enum HyShapeType
+{
+	HYSHAPE_Unknown = -1,
+
+	HYSHAPE_LineSegment = 0,
+	HYSHAPE_LineChain,
+	HYSHAPE_LineLoop,
+	HYSHAPE_Circle,
+	HYSHAPE_Polygon,
+
+	HYNUM_SHAPE
 };
 
 enum HyGfxType
