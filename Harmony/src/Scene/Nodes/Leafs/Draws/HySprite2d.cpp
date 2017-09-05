@@ -119,7 +119,7 @@ void HySprite2d::AnimSetFrame(uint32 uiFrameIndex)
 	if(m_uiCurFrame != uiFrameIndex)
 	{
 		m_uiCurFrame = uiFrameIndex;
-		SetDirty(HYNODEDIRTY_BoundingVolume);
+		SetDirty(DIRTY_BoundingVolume);
 	}
 }
 
@@ -147,7 +147,7 @@ void HySprite2d::AnimSetState(uint32 uiStateIndex)
 	if(m_uiCurAnimState == uiStateIndex)
 		return;
 
-	SetDirty(HYNODEDIRTY_BoundingVolume);
+	SetDirty(DIRTY_BoundingVolume);
 
 	m_uiCurAnimState = uiStateIndex;
 
@@ -337,7 +337,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 		if(m_uiCurFrame != iNextFrameIndex)
 		{
 			m_uiCurFrame = iNextFrameIndex;
-			SetDirty(HYNODEDIRTY_BoundingVolume);
+			SetDirty(DIRTY_BoundingVolume);
 		}
 
 		m_fElapsedFrameTime -= frameRef.fDURATION;

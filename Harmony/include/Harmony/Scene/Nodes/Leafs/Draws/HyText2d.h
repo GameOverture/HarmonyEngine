@@ -31,8 +31,8 @@ protected:
 			HyTweenVec3 		topColor;
 			HyTweenVec3 		botColor;
 
-			LayerColor(IHyNode2d &colorOwner) :	topColor(colorOwner, HYNODEDIRTY_DontCare),
-												botColor(colorOwner, HYNODEDIRTY_DontCare)
+			LayerColor(IHyNode2d &colorOwner) :	topColor(colorOwner, DIRTY_DontCare),
+												botColor(colorOwner, DIRTY_DontCare)
 			{ }
 		};
 		std::vector<LayerColor *>	m_LayerColors;

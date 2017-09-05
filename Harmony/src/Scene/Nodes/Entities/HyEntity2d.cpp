@@ -359,7 +359,7 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 
 /*virtual*/ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
-	SetDirty(HYNODEDIRTY_Transform | HYNODEDIRTY_Color);
+	SetDirty(DIRTY_Transform | DIRTY_Color);
 
 	childInst._SetEnabled(m_bEnabled, false);
 	childInst._SetPauseUpdate(m_bPauseOverride, false);

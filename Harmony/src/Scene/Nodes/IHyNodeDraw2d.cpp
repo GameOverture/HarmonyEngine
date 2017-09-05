@@ -14,9 +14,9 @@ IHyNodeDraw2d::IHyNodeDraw2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode2d(
 																		m_fAlpha(1.0f),
 																		m_fCachedAlpha(1.0f),
 																		m_iDisplayOrder(0),
-																		topColor(*this, HYNODEDIRTY_Color),
-																		botColor(*this, HYNODEDIRTY_Color),
-																		alpha(m_fAlpha, *this, HYNODEDIRTY_Color)
+																		topColor(*this, DIRTY_Color),
+																		botColor(*this, DIRTY_Color),
+																		alpha(m_fAlpha, *this, DIRTY_Color)
 {
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
@@ -76,7 +76,7 @@ int32 IHyNodeDraw2d::GetDisplayOrder() const
 
 void IHyNodeDraw2d::Calculate()
 {
-	if(IsDirty(HYNODEDIRTY_Color))
+	if(IsDirty(DIRTY_Color))
 	{
 		m_fCachedAlpha = alpha.Get();
 		m_CachedTopColor = topColor.Get();
@@ -89,6 +89,6 @@ void IHyNodeDraw2d::Calculate()
 			m_CachedBotColor *= m_pParent->CalculateTopTint();
 		}
 
-		ClearDirty(HYNODEDIRTY_Color);
+		ClearDirty(DIRTY_Color);
 	}
 }

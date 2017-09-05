@@ -14,14 +14,6 @@
 
 class HyTweenFloat;
 
-enum HyNodeDirtyType
-{
-	HYNODEDIRTY_BoundingVolume	= 1 << 0,
-	HYNODEDIRTY_Transform		= 1 << 1,
-	HYNODEDIRTY_Color			= 1 << 2,
-	HYNODEDIRTY_DontCare		= 1 << 3
-};
-
 class IHyNode
 {
 	friend class HyScene;
@@ -30,6 +22,15 @@ class IHyNode
 
 protected:
 	const HyType					m_eTYPE;
+
+	enum HyNodeDirtyFlag
+	{
+		DIRTY_BoundingVolume	= 1 << 0,
+		DIRTY_Transform			= 1 << 1,
+		DIRTY_Color				= 1 << 2,
+		DIRTY_DontCare			= 1 << 3
+	};
+	uint32							m_uiDirtyFlags;
 
 	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
@@ -42,8 +43,6 @@ protected:
 	};
 	uint32							m_uiExplicitFlags;
 
-	
-	uint32							m_uiTweenDirtyFlags;
 	std::vector<HyTweenFloat *>		m_ActiveTweenFloatsList;
 
 	bool							m_bEnabled;
@@ -70,8 +69,8 @@ protected:
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
 
 	virtual void SetDirty(uint32 uiDirtyFlags);
-	bool IsDirty(HyNodeDirtyType eDirtyType);
-	void ClearDirty(HyNodeDirtyType eDirtyType);
+	bool IsDirty(HyNodeDirtyFlag eDirtyType);
+	void ClearDirty(HyNodeDirtyFlag eDirtyType);
 
 private:
 	void InsertActiveTweenFloat(HyTweenFloat *pTweenFloat);								// Only HyTweenFloat will invoke this

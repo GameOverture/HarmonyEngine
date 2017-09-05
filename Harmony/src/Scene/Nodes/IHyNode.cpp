@@ -12,8 +12,8 @@
 #include "Scene/Tweens/HyTweenFloat.h"
 
 IHyNode::IHyNode(HyType eNodeType) :	m_eTYPE(eNodeType),
+										m_uiDirtyFlags(0),
 										m_uiExplicitFlags(0),
-										m_uiTweenDirtyFlags(0),
 										m_bEnabled(true),
 										m_bPauseOverride(false),
 										m_iTag(0)
@@ -77,17 +77,17 @@ void IHyNode::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding)
 
 /*virtual*/ void IHyNode::SetDirty(uint32 uiDirtyFlags)
 {
-	m_uiTweenDirtyFlags |= uiDirtyFlags;
+	m_uiDirtyFlags |= uiDirtyFlags;
 }
 
-bool IHyNode::IsDirty(HyNodeDirtyType eDirtyType)
+bool IHyNode::IsDirty(HyNodeDirtyFlag eDirtyType)
 {
-	return ((m_uiTweenDirtyFlags & eDirtyType) != 0);
+	return ((m_uiDirtyFlags & eDirtyType) != 0);
 }
 
-void IHyNode::ClearDirty(HyNodeDirtyType eDirtyType)
+void IHyNode::ClearDirty(HyNodeDirtyFlag eDirtyType)
 {
-	m_uiTweenDirtyFlags &= ~eDirtyType;
+	m_uiDirtyFlags &= ~eDirtyType;
 }
 
 void IHyNode::InsertActiveTweenFloat(HyTweenFloat *pTweenFloat)

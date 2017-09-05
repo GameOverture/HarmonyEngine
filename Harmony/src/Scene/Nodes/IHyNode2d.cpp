@@ -18,11 +18,11 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 																m_BoundingVolume(*this),
 																m_CollisionVolume(*this),
 																m_pPhysicsBody(nullptr),
-																pos(*this, HYNODEDIRTY_Transform),
-																rot(m_fRotation, *this, HYNODEDIRTY_Transform),
-																rot_pivot(*this, HYNODEDIRTY_Transform),
-																scale(*this, HYNODEDIRTY_Transform),
-																scale_pivot(*this, HYNODEDIRTY_Transform)
+																pos(*this, DIRTY_Transform),
+																rot(m_fRotation, *this, DIRTY_Transform),
+																rot_pivot(*this, DIRTY_Transform),
+																scale(*this, DIRTY_Transform),
+																scale_pivot(*this, DIRTY_Transform)
 {
 	scale.Set(1.0f);
 
@@ -84,7 +84,7 @@ void IHyNode2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversio
 	}
 	m_eCoordUnit = eCoordUnit;
 
-	SetDirty(HYNODEDIRTY_Transform);
+	SetDirty(DIRTY_Transform);
 }
 
 void IHyNode2d::GetLocalTransform(glm::mat4 &outMtx) const
@@ -113,7 +113,7 @@ void IHyNode2d::GetLocalTransform(glm::mat4 &outMtx) const
 
 void IHyNode2d::GetWorldTransform(glm::mat4 &outMtx)
 {
-	if(IsDirty(HYNODEDIRTY_Transform))
+	if(IsDirty(DIRTY_Transform))
 	{
 		if(m_pParent)
 		{
@@ -125,7 +125,7 @@ void IHyNode2d::GetWorldTransform(glm::mat4 &outMtx)
 		else
 			GetLocalTransform(m_mtxCached);
 
-		ClearDirty(HYNODEDIRTY_Transform);
+		ClearDirty(DIRTY_Transform);
 	}
 
 	outMtx = m_mtxCached;
@@ -133,10 +133,10 @@ void IHyNode2d::GetWorldTransform(glm::mat4 &outMtx)
 
 const HyShape2d &IHyNode2d::GetBoundingVolume()
 {
-	if(IsDirty(HYNODEDIRTY_BoundingVolume) || m_BoundingVolume.IsValid() == false)
+	if(IsDirty(DIRTY_BoundingVolume) || m_BoundingVolume.IsValid() == false)
 	{
 		CalcBoundingVolume();
-		ClearDirty(HYNODEDIRTY_BoundingVolume);
+		ClearDirty(DIRTY_BoundingVolume);
 	}
 
 	return m_BoundingVolume;

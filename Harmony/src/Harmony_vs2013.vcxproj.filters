@@ -105,9 +105,6 @@
     <ClCompile Include="Audio\Interop\IHyAudioInst_Win.cpp">
       <Filter>Audio\Interop</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Physics\HyBoundingVolume2d.cpp">
-      <Filter>Scene\Physics</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Physics\HyBox2dRuntime.cpp">
       <Filter>Scene\Physics</Filter>
     </ClCompile>
@@ -257,6 +254,9 @@
     </ClCompile>
     <ClCompile Include="Diagnostics\Output\HyProfiler.cpp">
       <Filter>Diagnostics\Output</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Physics\HyShape2d.cpp">
+      <Filter>Scene\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -540,9 +540,6 @@
     <ClInclude Include="..\include\Harmony\Audio\Interop\IHyAudioInst_Win.h">
       <Filter>Audio\Interop</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Physics\HyBoundingVolume2d.h">
-      <Filter>Scene\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyBox2dRuntime.h">
       <Filter>Scene\Physics</Filter>
     </ClInclude>
@@ -698,6 +695,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Diagnostics\Output\HyProfiler.h">
       <Filter>Diagnostics\Output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Physics\HyShape2d.h">
+      <Filter>Scene\Physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
