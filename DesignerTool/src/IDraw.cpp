@@ -38,19 +38,19 @@ IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pPro
     lineList[0].y = 0.0f;
     lineList[1].x = 5000.0f;
     lineList[1].y = 0.0f;
-    m_primOriginHorz.SetAsLineChain(lineList);
     m_primOriginHorz.SetLineThickness(2.0f);
     m_primOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
     m_primOriginHorz.SetEnabled(false);
+    m_primOriginHorz.GetShape().SetAsLineChain(&lineList[0], lineList.size());
 
     lineList[0].x = 0.0f;
     lineList[0].y = -5000.0f;
     lineList[1].x = 0.0f;
     lineList[1].y = 5000.0f;
-    m_primOriginVert.SetAsLineChain(lineList);
     m_primOriginVert.SetLineThickness(2.0f);
     m_primOriginVert.SetTint(1.0f, 1.0f, 1.0f);
     m_primOriginVert.SetEnabled(false);
+    m_primOriginVert.GetShape().SetAsLineChain(&lineList[0], lineList.size());
 }
 
 /*virtual*/ IDraw::~IDraw()

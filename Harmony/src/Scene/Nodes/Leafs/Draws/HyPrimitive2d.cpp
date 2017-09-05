@@ -14,11 +14,11 @@
 
 HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
 																	m_pDrawBuffer(nullptr),
-																	m_uiBufferSize(0)
+																	m_uiBufferSize(0),
+																	m_bWireframe(false)
 {
 	ClearData();
 }
-
 
 HyPrimitive2d::~HyPrimitive2d(void)
 {
@@ -53,6 +53,20 @@ float HyPrimitive2d::GetLineThickness()
 	return m_RenderState.GetLineThickness();
 }
 
+bool HyPrimitive2d::IsWireframe()
+{
+	return m_bWireframe;
+}
+
+void HyPrimitive2d::SetWireframe(bool bIsWireframe)
+{
+	if(m_bWireframe == bIsWireframe)
+		return;
+
+	m_bWireframe = bIsWireframe;
+	m_bDirty = true;
+}
+
 void HyPrimitive2d::SetLineThickness(float fThickness)
 {
 	m_RenderState.SetLineThickness(fThickness);
@@ -71,39 +85,58 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 /*virtual*/ void HyPrimitive2d::OnShapeSet(HyShape2d *pShape) /*override*/
 {
 	IHyNode2d::OnShapeSet(pShape);
-	if(pShape != &m_BoundingVolume)
+
+	if(pShape == &m_BoundingVolume)
+		m_bDirty = true;
+}
+
+/*virtual*/ void HyPrimitive2d::DrawUpdate()
+{
+	if(m_bDirty == false)
 		return;
-	
+
 	b2Shape *pb2Shape = m_BoundingVolume.GetB2Shape();
 
 	switch(m_BoundingVolume.GetType())
 	{
-		case HYSHAPE_LineSegment: {
-			std::vector<glm::vec2> pointList;
-			pointList.push_back(glm::vec2(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1.x, static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1.y));
-			pointList.push_back(glm::vec2(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2.x, static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2.y));
-			SetAsLineChain(&pointList[0], 2);
-		} break;
+	case HYSHAPE_LineSegment: {
+		std::vector<glm::vec2> pointList;
+		pointList.push_back(glm::vec2(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1.x, static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1.y));
+		pointList.push_back(glm::vec2(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2.x, static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2.y));
+		SetAsLineChain(&pointList[0], 2);
+	} break;
 
-		case HYSHAPE_LineLoop:
-		case HYSHAPE_LineChain: {
-			glm::vec2 *pVertList = reinterpret_cast<glm::vec2 *>(static_cast<b2ChainShape *>(pb2Shape)->m_vertices);
-			SetAsLineChain(pVertList, static_cast<b2ChainShape *>(pb2Shape)->m_count);
-		} break;
+	case HYSHAPE_LineLoop:
+	case HYSHAPE_LineChain: {
+		glm::vec2 *pVertList = reinterpret_cast<glm::vec2 *>(static_cast<b2ChainShape *>(pb2Shape)->m_vertices);
+		SetAsLineChain(pVertList, static_cast<b2ChainShape *>(pb2Shape)->m_count);
+	} break;
 
-		case HYSHAPE_Circle:
-			SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x, static_cast<b2CircleShape *>(pb2Shape)->m_p.y), static_cast<b2CircleShape *>(pb2Shape)->m_radius, 20, false);
-			break;
+	case HYSHAPE_Circle:
+		SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x, static_cast<b2CircleShape *>(pb2Shape)->m_p.y), static_cast<b2CircleShape *>(pb2Shape)->m_radius);
+		break;
 
-		case HYSHAPE_Polygon: {
-			glm::vec2 *pVertList = reinterpret_cast<glm::vec2 *>(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices);
+	case HYSHAPE_Polygon: {
+		glm::vec2 *pVertList = reinterpret_cast<glm::vec2 *>(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices);
+
+		if(m_bWireframe)
+		{
+			// Make it loop
+			glm::vec2 vertLoopList[b2_maxPolygonVertices+1];
+			memcpy(vertLoopList, static_cast<b2PolygonShape *>(pb2Shape)->m_vertices, sizeof(glm::vec2) * static_cast<b2PolygonShape *>(pb2Shape)->m_count);
+			vertLoopList[static_cast<b2PolygonShape *>(pb2Shape)->m_count] = vertLoopList[0];
+
+			SetAsLineChain(vertLoopList, static_cast<b2PolygonShape *>(pb2Shape)->m_count + 1);
+		}
+		else
 			SetAsPolygon(pVertList, static_cast<b2PolygonShape *>(pb2Shape)->m_count);
-		} break;
+	} break;
 
 	default:
 		HyLogError("HyPrimitive2d::OnShapeSet() - Unknown shape type: " << m_BoundingVolume.GetType());
 	}
 
+	m_bDirty = false;
 }
 
 void HyPrimitive2d::ClearData()
@@ -152,36 +185,69 @@ void HyPrimitive2d::SetAsLineChain(glm::vec2 *pVertexList, uint32 uiNumVertices)
 	}
 }
 
-void HyPrimitive2d::SetAsCircle(glm::vec2 &ptCenter, float fRadius, int32 iNumSegments, bool bWireframe)
+void HyPrimitive2d::SetAsCircle(glm::vec2 &ptCenter, float fRadius)
 {
-	ClearData();
+	const float32 k_segments = 16.0f;
+	const float32 k_increment = 2.0f * b2_pi / k_segments;
+	float32 sinInc = sinf(k_increment);
+	float32 cosInc = cosf(k_increment);
+	glm::vec2 r1(cosInc, sinInc);
+	glm::vec2 v1 = ptCenter + fRadius * r1;
 
-	iNumSegments += 1;
-
-	if(bWireframe)
-		m_RenderState.Enable(HyRenderState::DRAWMODE_LINELOOP);
-	else
-		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLEFAN);
-
-	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
-	m_RenderState.SetNumVerticesPerInstance(iNumSegments);
-	m_pDrawBuffer = HY_NEW glm::vec2[iNumSegments];
-	m_uiBufferSize = iNumSegments * sizeof(glm::vec2);
-
-	if(m_eCoordUnit == HYCOORDUNIT_Default)
-		m_eCoordUnit = HyDefaultCoordinateUnit();
-	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? HyPixelsPerMeter() : 1.0f;
-	fRadius *= fCoordMod;
-
-	float t = 0.0f;
-	for(int32 i = 0; i < iNumSegments; ++i)
+	if(m_bWireframe == false)
 	{
-		t = 2.0f * HY_PI * static_cast<float>(i) / static_cast<float>(m_RenderState.GetNumVerticesPerInstance());
+		ClearData();
+		uint32 uiNumVerts = static_cast<uint32>(k_segments) * 3;
 
-		m_pDrawBuffer[i].x = (sin(t) * fRadius);
-		m_pDrawBuffer[i].y = (cos(t) * fRadius);
+		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLES);
+		m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
+		m_RenderState.SetNumVerticesPerInstance(uiNumVerts);
 
-		m_pDrawBuffer[i] += ptCenter;
+		m_pDrawBuffer = HY_NEW glm::vec2[uiNumVerts];
+		m_uiBufferSize = uiNumVerts * sizeof(glm::vec2);
+
+		uint32 uiBufferIndex = 0;
+		for(int32 i = 0; i < k_segments; ++i)
+		{
+			// Perform rotation to avoid additional trigonometry.
+			glm::vec2 r2;
+			r2.x = cosInc * r1.x - sinInc * r1.y;
+			r2.y = sinInc * r1.x + cosInc * r1.y;
+			glm::vec2 v2 = ptCenter + fRadius * r2;
+
+			m_pDrawBuffer[uiBufferIndex++] = ptCenter;
+			m_pDrawBuffer[uiBufferIndex++] = v1;
+			m_pDrawBuffer[uiBufferIndex++] = v2;
+
+			r1 = r2;
+			v1 = v2;
+		}
+	}
+	else
+	{
+		r1.x = 1.0f;
+		r1.y = 0.0f;
+		v1 = ptCenter + fRadius * r1;
+
+		std::vector<glm::vec2> vertexList;
+		vertexList.push_back(v1);
+		
+		for(int32 i = 0; i < k_segments; ++i)
+		{
+			glm::vec2 r2;
+			r2.x = cosInc * r1.x - sinInc * r1.y;
+			r2.y = sinInc * r1.x + cosInc * r1.y;
+			glm::vec2 v2 = ptCenter + fRadius * r2;
+
+			vertexList.push_back(v2);
+
+			//m_lines->Vertex(v1, color);
+			//m_lines->Vertex(v2, color);
+			r1 = r2;
+			//v1 = v2;
+		}
+
+		SetAsLineChain(&vertexList[0], static_cast<uint32>(vertexList.size()));
 	}
 }
 

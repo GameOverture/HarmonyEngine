@@ -21,6 +21,9 @@ protected:
 	glm::vec2 *		m_pDrawBuffer;
 	uint32			m_uiBufferSize;
 
+	bool			m_bWireframe;
+	bool			m_bDirty;
+
 public:
 	HyPrimitive2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyPrimitive2d(void);
@@ -28,6 +31,9 @@ public:
 	const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p);
 
 	HyShape2d &GetShape();
+
+	bool IsWireframe();
+	void SetWireframe(bool bIsWireframe);
 
 	float GetLineThickness();
 	void SetLineThickness(float fThickness);
@@ -38,11 +44,13 @@ protected:
 
 	virtual void OnShapeSet(HyShape2d *pShape) override;
 
-	void ClearData();
+	virtual void DrawUpdate();
 
 private:
+	void ClearData();
+
 	void SetAsLineChain(glm::vec2 *pVertexList, uint32 uiNumVertices);
-	void SetAsCircle(glm::vec2 &ptCenter, float fRadius, int32 iNumSegments, bool bWireframe);
+	void SetAsCircle(glm::vec2 &ptCenter, float fRadius);
 	void SetAsPolygon(glm::vec2 *pVertexList, uint32 uiNumVertices);
 
 	virtual void OnUpdateUniforms() override;

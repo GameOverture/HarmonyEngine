@@ -174,7 +174,7 @@ b2Body *IHyNode2d::PhysicsBody()
 
 /*virtual*/ void IHyNode2d::PhysicsUpdate() /*override*/
 {
-	if(m_pPhysicsBody == nullptr && m_pPhysicsBody->IsActive())
+	if(m_pPhysicsBody == nullptr || m_pPhysicsBody->IsActive())
 		return;
 
 	pos.Set(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);

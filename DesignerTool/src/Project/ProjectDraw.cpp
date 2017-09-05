@@ -63,7 +63,7 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 {
     m_Resolution.x = iWidth;
     m_Resolution.y = iHeight;
-    SetAsQuad(m_Resolution.x, m_Resolution.y, false);
+    GetShape().SetAsBox(m_Resolution.x, m_Resolution.y);
     pos.Set(m_Resolution.x * -0.5f, m_Resolution.y * -0.5f);
 }
 

@@ -26,7 +26,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 
     m_DrawAtlasOutline.SetTint(1.0f, 0.0f, 0.0f);
 
-    m_DividerLine.SetAsQuad(10000.0f, 10.0f, false);
+    m_DividerLine.GetShape().SetAsBox(10000.0f, 10.0f);
     m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetResolution().y / 2 - 5.0f);
     m_DividerLine.SetTint(0.0f, 0.0f, 0.0f);
     m_DividerLine.UseWindowCoordinates();
@@ -37,7 +37,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
     lineList[0].y = PreviewOffsetY;
     lineList[1].x = 5000.0f;
     lineList[1].y = PreviewOffsetY;
-    m_PreviewOriginHorz.SetAsLineChain(lineList);
+    m_PreviewOriginHorz.GetShape().SetAsLineChain(&lineList[0], lineList.size());
     m_PreviewOriginHorz.SetLineThickness(2.0f);
     m_PreviewOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
     m_PreviewOriginHorz.SetEnabled(false);
@@ -72,7 +72,8 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
         m_pAtlasPreviewTexQuad->SetTextureSource(0, 0, static_cast<uint32>(pFtglAtlas->width), static_cast<uint32>(pFtglAtlas->height));
         m_pAtlasPreviewTexQuad->SetEnabled(true);
     
-        m_DrawAtlasOutline.SetAsQuad(static_cast<int>(pFtglAtlas->width), static_cast<int>(pFtglAtlas->height), true);
+        m_DrawAtlasOutline.SetWireframe(true);
+        m_DrawAtlasOutline.GetShape().SetAsBox(static_cast<int>(pFtglAtlas->width), static_cast<int>(pFtglAtlas->height));
     
         // Calculate the proper zoom amount to fit the whole atlas width (plus some extra margin) in preview window
         float fExtraMargin = 25.0f;
