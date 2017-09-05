@@ -14,7 +14,8 @@
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyNodeDraw2d(HYTYPE_Entity2d, pParent),
 															m_uiAttributes(0),
 															m_eMouseInputState(MOUSEINPUT_None),
-															m_pMouseInputUserParam(nullptr)
+															m_pMouseInputUserParam(nullptr),
+															m_pMouseInputNode(nullptr)
 {
 }
 
@@ -158,6 +159,12 @@ bool HyEntity2d::ChildExists(IHyNode2d &childRef)
 	{
 		if(*iter == pChild)
 		{
+			if(m_pMouseInputNode == pChild)
+			{
+				m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
+				m_pMouseInputNode = nullptr;
+			}
+
 			(*iter)->m_pParent = nullptr;
 			m_ChildList.erase(iter);
 			return true;
@@ -195,26 +202,27 @@ void HyEntity2d::ForEachChild(std::function<void(IHyNode2d *)> func)
 	}
 }
 
-void HyEntity2d::EnableMouseInput(bool bEnable, void *pUserParam /*= NULL*/)
+bool HyEntity2d::EnableMouseInput(IHyNodeDraw2d *pInputChildNode, void *pUserParam /*= nullptr*/)
 {
-	if(bEnable)
-		m_uiAttributes |= (ATTRIBFLAG_MouseInput | ATTRIBFLAG_BoundingVolumeDirty);
+	if(pInputChildNode)
+	{
+		if(this != pInputChildNode && ChildExists(*pInputChildNode) == false)
+			return false;
+
+		m_pMouseInputNode = pInputChildNode;
+	}
 	else
-		m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
+		m_pMouseInputNode = this;
 
 	m_pMouseInputUserParam = pUserParam;
+	m_uiAttributes |= ATTRIBFLAG_MouseInput;
+
+	return true;
 }
 
-void HyEntity2d::EnableCollider(bool bEnable)
+void HyEntity2d::DisableMouseInput()
 {
-	if(bEnable)
-		m_uiAttributes |= (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_BoundingVolumeDirty);
-	else
-		m_uiAttributes &= ~ATTRIBFLAG_HasBoundingVolume;
-}
-
-void HyEntity2d::EnablePhysics(bool bEnable)
-{
+	m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
 }
 
 void HyEntity2d::ReverseDisplayOrder(bool bReverse)
@@ -284,65 +292,56 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 			m_ChildList[i]->_SetScissor(m_WorldScissorRect, false);
 	}
 
-	if((m_uiAttributes & (ATTRIBFLAG_HasBoundingVolume | ATTRIBFLAG_MouseInput)) != 0)
+	if((m_uiAttributes & ATTRIBFLAG_MouseInput) != 0)
 	{
-		if(m_uiAttributes & ATTRIBFLAG_BoundingVolumeDirty)
+		glm::vec2 ptMousePos = IHyInputMap::GetWorldMousePos();
+
+		bool bLeftClickDown = IHyInputMap::IsMouseLeftDown();
+		bool bMouseInBounds = m_pMouseInputNode->GetBoundingVolume().TestPoint(ptMousePos);
+
+		switch(m_eMouseInputState)
 		{
-			//OnCalcBoundingVolume();
-			m_uiAttributes &= ~ATTRIBFLAG_BoundingVolumeDirty;
-		}
-
-		if((m_uiAttributes & ATTRIBFLAG_MouseInput) != 0)
-		{
-			glm::vec2 ptMousePos = IHyInputMap::GetWorldMousePos();
-
-			bool bLeftClickDown = IHyInputMap::IsMouseLeftDown();
-			bool bMouseInBounds = GetBoundingVolume().TestPoint(ptMousePos);
-
-			switch(m_eMouseInputState)
+		case MOUSEINPUT_None:
+			if(bMouseInBounds)
 			{
-			case MOUSEINPUT_None:
-				if(bMouseInBounds)
-				{
-					m_eMouseInputState = MOUSEINPUT_Hover;
-					OnMouseEnter(m_pMouseInputUserParam);
+				m_eMouseInputState = MOUSEINPUT_Hover;
+				OnMouseEnter(m_pMouseInputUserParam);
 
-					if(bLeftClickDown)
-					{
-						m_eMouseInputState = MOUSEINPUT_Down;
-						OnMouseDown(m_pMouseInputUserParam);
-					}
-				}
-				break;
-
-			case MOUSEINPUT_Hover:
-				if(bMouseInBounds == false)
-				{
-					m_eMouseInputState = MOUSEINPUT_None;
-					OnMouseLeave(m_pMouseInputUserParam);
-				}
-				else if(bLeftClickDown)
+				if(bLeftClickDown)
 				{
 					m_eMouseInputState = MOUSEINPUT_Down;
 					OnMouseDown(m_pMouseInputUserParam);
 				}
-				break;
-
-			case MOUSEINPUT_Down:
-				if(bMouseInBounds == false)
-				{
-					m_eMouseInputState = MOUSEINPUT_None;
-					OnMouseLeave(m_pMouseInputUserParam);
-				}
-				else if(bLeftClickDown == false)
-				{
-					m_eMouseInputState = MOUSEINPUT_Hover;
-					OnMouseUp(m_pMouseInputUserParam);
-					OnMouseClicked(m_pMouseInputUserParam);
-				}
-				
-				break;
 			}
+			break;
+
+		case MOUSEINPUT_Hover:
+			if(bMouseInBounds == false)
+			{
+				m_eMouseInputState = MOUSEINPUT_None;
+				OnMouseLeave(m_pMouseInputUserParam);
+			}
+			else if(bLeftClickDown)
+			{
+				m_eMouseInputState = MOUSEINPUT_Down;
+				OnMouseDown(m_pMouseInputUserParam);
+			}
+			break;
+
+		case MOUSEINPUT_Down:
+			if(bMouseInBounds == false)
+			{
+				m_eMouseInputState = MOUSEINPUT_None;
+				OnMouseLeave(m_pMouseInputUserParam);
+			}
+			else if(bLeftClickDown == false)
+			{
+				m_eMouseInputState = MOUSEINPUT_Hover;
+				OnMouseUp(m_pMouseInputUserParam);
+				OnMouseClicked(m_pMouseInputUserParam);
+			}
+				
+			break;
 		}
 	}
 

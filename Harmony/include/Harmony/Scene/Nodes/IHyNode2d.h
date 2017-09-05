@@ -34,7 +34,6 @@ protected:
 	float							m_fRotation;		// Reference value used in 'rot' HyTweenFloat
 
 	HyShape2d						m_BoundingVolume;
-	HyShape2d						m_CollisionVolume;
 	b2Body *						m_pPhysicsBody;
 
 public:
@@ -59,8 +58,6 @@ public:
 	void GetWorldTransform(glm::mat4 &outMtx);
 
 	const HyShape2d &IHyNode2d::GetBoundingVolume();
-	HyShape2d &IHyNode2d::GetCollisionVolume();
-
 	b2Shape *GetBoundingVolumeIndex(uint32 uiIndex);
 
 	void PhysicsInit(b2BodyDef &bodyDefOut);

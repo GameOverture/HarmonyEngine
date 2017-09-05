@@ -45,6 +45,7 @@ public:
 	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts);
 
 	// Set as a circle with the specified center and radius
+	void SetAsCircle(float fRadius);
 	void SetAsCircle(const glm::vec2 &ptCenter, float fRadius);
 
 	// Set as a convex hull from the given array of local points.

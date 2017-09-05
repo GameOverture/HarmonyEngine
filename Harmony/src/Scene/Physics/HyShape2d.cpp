@@ -142,6 +142,11 @@ void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	m_OwnerRef.OnShapeSet(this);
 }
 
+void HyShape2d::SetAsCircle(float fRadius)
+{
+	SetAsCircle(glm::vec2(0.0f, 0.0f), fRadius);
+}
+
 void HyShape2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
 {
 	m_eType = HYSHAPE_Circle;

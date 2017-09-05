@@ -16,7 +16,6 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 																m_eCoordUnit(HYCOORDUNIT_Default),
 																m_fRotation(0.0f),
 																m_BoundingVolume(*this),
-																m_CollisionVolume(*this),
 																m_pPhysicsBody(nullptr),
 																pos(*this, DIRTY_Transform),
 																rot(m_fRotation, *this, DIRTY_Transform),
@@ -142,11 +141,6 @@ const HyShape2d &IHyNode2d::GetBoundingVolume()
 	return m_BoundingVolume;
 }
 
-HyShape2d &IHyNode2d::GetCollisionVolume()
-{
-	return m_CollisionVolume;
-}
-
 b2Shape *IHyNode2d::GetBoundingVolumeIndex(uint32 uiIndex)
 {
 	return nullptr;
@@ -174,9 +168,11 @@ b2Body *IHyNode2d::PhysicsBody()
 
 /*virtual*/ void IHyNode2d::PhysicsUpdate() /*override*/
 {
-	if(m_pPhysicsBody == nullptr || m_pPhysicsBody->IsActive())
-		return;
 
-	pos.Set(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);
-	rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()));
+
+	if(m_pPhysicsBody != nullptr && m_pPhysicsBody->IsActive())
+	{
+		pos.Set(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);
+		rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()));
+	}
 }

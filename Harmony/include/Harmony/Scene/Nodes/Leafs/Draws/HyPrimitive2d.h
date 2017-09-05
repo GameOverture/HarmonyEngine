@@ -30,6 +30,8 @@ public:
 
 	const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p);
 
+	virtual bool IsEnabled() override;
+
 	HyShape2d &GetShape();
 
 	bool IsWireframe();

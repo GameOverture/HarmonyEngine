@@ -42,6 +42,11 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 	return *this;
 }
 
+/*virtual*/ bool HyPrimitive2d::IsEnabled() /*override*/
+{
+	return (IHyNode::IsEnabled() && m_pDrawBuffer != nullptr);
+}
+
 HyShape2d &HyPrimitive2d::GetShape()
 {
 	// The bounding volume in HyPrimitive2d also doubles as the actual shape and type of this primitive
@@ -257,7 +262,7 @@ void HyPrimitive2d::SetAsPolygon(glm::vec2 *pVertexList, uint32 uiNumVertices)
 
 	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLES);
 	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
-	m_RenderState.SetNumVerticesPerInstance(3);
+	m_RenderState.SetNumVerticesPerInstance(uiNumVertices);
 
 	uint32 uiNumBufferVerts = (uiNumVertices - 2) * 3;
 	m_pDrawBuffer = HY_NEW glm::vec2[uiNumBufferVerts];

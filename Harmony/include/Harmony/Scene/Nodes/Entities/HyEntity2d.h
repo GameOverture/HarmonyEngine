@@ -22,10 +22,7 @@ protected:
 	enum Attributes
 	{
 		ATTRIBFLAG_MouseInput				= 1 << 1,
-		ATTRIBFLAG_HasBoundingVolume		= 1 << 2,
-		ATTRIBFLAG_BoundingVolumeDirty		= 1 << 3,
-		ATTRIBFLAG_Physics					= 1 << 4,
-		ATTRIBFLAG_ReverseDisplayOrder		= 1 << 5
+		ATTRIBFLAG_ReverseDisplayOrder		= 1 << 2
 	};
 	uint32							m_uiAttributes;
 
@@ -37,6 +34,7 @@ protected:
 	};
 	MouseInputState					m_eMouseInputState;
 	void *							m_pMouseInputUserParam;
+	IHyNodeDraw2d *					m_pMouseInputNode;
 
 	HyScreenRect<int32>				m_WorldScissorRect;
 
@@ -59,9 +57,9 @@ public:
 	virtual IHyNode2d *ChildGet(uint32 uiIndex);
 	void ForEachChild(std::function<void(IHyNode2d *)> func);
 
-	void EnableMouseInput(bool bEnable, void *pUserParam = nullptr);
-	void EnableCollider(bool bEnable);
-	void EnablePhysics(bool bEnable);
+	bool EnableMouseInput(IHyNodeDraw2d *pInputChildNode, void *pUserParam = nullptr);
+	void DisableMouseInput();
+
 	void ReverseDisplayOrder(bool bReverse);
 
 	virtual bool IsLoaded() const override;
