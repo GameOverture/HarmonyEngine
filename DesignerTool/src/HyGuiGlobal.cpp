@@ -13,7 +13,7 @@
 /*static*/ QString HyGlobal::sm_sItemNames[NUMTYPES];
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
 
-/*static*/ QIcon HyGlobal::sm_ItemIcons[NUMITEMS][NUM_SUBICONS];
+/*static*/ QIcon HyGlobal::sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
 
 /*static*/ QRegExpValidator *HyGlobal::sm_pCodeNameValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFileNameValidator = nullptr;

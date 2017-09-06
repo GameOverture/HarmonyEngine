@@ -143,7 +143,7 @@ class HyGlobal
     static QString                  sm_sItemNames[NUMTYPES];
     static QString                  sm_sSubIconNames[NUM_SUBICONS];
 
-    static QIcon                    sm_ItemIcons[NUMITEMS][NUM_SUBICONS];
+    static QIcon                    sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
 
     static QRegExpValidator *       sm_pCodeNameValidator;
     static QRegExpValidator *       sm_pFileNameValidator;
