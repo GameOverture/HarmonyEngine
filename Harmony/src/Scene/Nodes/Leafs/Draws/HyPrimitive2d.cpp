@@ -149,9 +149,11 @@ void HyPrimitive2d::ClearData()
 	delete [] m_pDrawBuffer;
 	m_pDrawBuffer = nullptr;
 	m_uiBufferSize = 0;
+
+	m_RenderState.SetRenderMode(HYRENDERMODE_Unknown);
 	m_RenderState.SetNumVerticesPerInstance(0);
 	m_RenderState.SetNumInstances(1);
-	m_RenderState.Disable(HyRenderState::DRAWMODEMASK);
+
 	m_ShaderUniforms.Clear();
 }
 
@@ -161,8 +163,8 @@ void HyPrimitive2d::SetAsLineChain(glm::vec2 *pVertexList, uint32 uiNumVertices)
 
 	HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
 
+	m_RenderState.SetRenderMode(HYRENDERMODE_TriangleStrip);
 	m_RenderState.SetShaderId(HYSHADERPROG_Lines2d);
-	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP);
 	m_RenderState.SetNumInstances(uiNumVertices - 1);
 	m_RenderState.SetNumVerticesPerInstance(4);				// 8 vertices per instance because of '2' duplicate vertex positions and normals on each end of line segment
 
@@ -204,7 +206,7 @@ void HyPrimitive2d::SetAsCircle(glm::vec2 &ptCenter, float fRadius)
 		ClearData();
 		uint32 uiNumVerts = static_cast<uint32>(k_segments) * 3;
 
-		m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLES);
+		m_RenderState.SetRenderMode(HYRENDERMODE_Triangles);
 		m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
 		m_RenderState.SetNumVerticesPerInstance(uiNumVerts);
 
@@ -260,11 +262,12 @@ void HyPrimitive2d::SetAsPolygon(glm::vec2 *pVertexList, uint32 uiNumVertices)
 {
 	ClearData();
 
-	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLES);
-	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
-	m_RenderState.SetNumVerticesPerInstance(uiNumVertices);
-
 	uint32 uiNumBufferVerts = (uiNumVertices - 2) * 3;
+
+	m_RenderState.SetRenderMode(HYRENDERMODE_Triangles);
+	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
+	m_RenderState.SetNumVerticesPerInstance(uiNumBufferVerts);
+
 	m_pDrawBuffer = HY_NEW glm::vec2[uiNumBufferVerts];
 	m_uiBufferSize = uiNumBufferVerts * sizeof(glm::vec2);
 

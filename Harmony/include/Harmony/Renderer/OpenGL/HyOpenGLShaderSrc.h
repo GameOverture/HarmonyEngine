@@ -50,34 +50,6 @@ vec4 g_Colors[] = vec4[4](topTint,
 
 void main()
 {
-	//switch(gl_VertexID)
-	//{
-	//case 0:
-	//	interpUV.x = UVcoord0.x;
-	//	interpUV.y = UVcoord0.y;
-
-	//	interpColor = topTint;
-	//	break;
-	//case 1:
-	//	interpUV.x = UVcoord1.x;
-	//	interpUV.y = UVcoord1.y;
-
-	//	interpColor = topTint;
-	//	break;
-	//case 2:
-	//	interpUV.x = UVcoord2.x;
-	//	interpUV.y = UVcoord2.y;
-
-	//	interpColor = botTint;
-	//	break;
-	//case 3:
-	//	interpUV.x = UVcoord3.x;
-	//	interpUV.y = UVcoord3.y;
-
-	//	interpColor = botTint;
-	//	break;
-	//}
-
 	interpUV = g_UVCoords[gl_VertexID];
 	interpColor = g_Colors[gl_VertexID];
 
@@ -90,11 +62,10 @@ void main()
 	gl_Position = u_mtxCameraToClip * pos;
 }
 
-vec4 when_gt(vec4 x, vec4 y)
-{
-	return max(sign(x - y), 0.0);
-}
-
+//vec4 when_greaterThan(vec4 x, vec4 y) // Can also overload to take vec2, vec3, and float
+//{
+//	return max(sign(x - y), 0.0);
+//}
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(
@@ -116,6 +87,7 @@ void main()
 	outputColor = interpColor * texelClr;
 }
 )src";
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // PRIMITIVE
 const char * const szHYPRIMATIVE_VERTEXSHADER = R"src(
@@ -148,6 +120,7 @@ void main()
 	vFragColorOut = u_vColor;
 }
 )src";
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // LINES2D
 const char * const szHYLINES2D_VERTEXSHADER = R"src(
@@ -192,6 +165,5 @@ void main()
 	vFragColorOut.w = smoothstep(u_fHalfWidth, u_fHalfWidth - u_fFeatherAmt, length(vNormalOut) * u_fHalfWidth);
 }
 )src";
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif /* HyOpenGLShaderSrc_h__ */

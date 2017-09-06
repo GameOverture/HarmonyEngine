@@ -19,6 +19,17 @@ class IHyDraw2d;
 class HyShaderUniforms;
 class IHyShader;
 
+enum HyRenderMode
+{
+	HYRENDERMODE_Unknown = -1,
+
+	HYRENDERMODE_Triangles = 0,
+	HYRENDERMODE_TriangleStrip,
+	HYRENDERMODE_TriangleFan,
+	HYRENDERMODE_LineLoop,
+	HYRENDERMODE_LineStrip
+};
+
 class HyRenderState
 {
 	// WARNING: This class should not dynamically allocate any memory or use any object that does so
@@ -28,16 +39,10 @@ public:
 	{
 		SCISSORTEST				= 1 << 0,
 		DRAWINSTANCED			= 1 << 1,	// If enabled, will attempt to batch render multiple instances if they have matching HyRenderStates
-
-		DRAWMODE_TRIANGLES		= 1 << 2,
-		DRAWMODE_TRIANGLESTRIP	= 1 << 3,
-		DRAWMODE_TRIANGLEFAN	= 1 << 4,
-		DRAWMODE_LINELOOP		= 1 << 5,
-		DRAWMODE_LINESTRIP		= 1 << 6,
-		DRAWMODEMASK			= DRAWMODE_TRIANGLES | DRAWMODE_TRIANGLESTRIP | DRAWMODE_TRIANGLEFAN | DRAWMODE_LINELOOP | DRAWMODE_LINESTRIP,
 	};
 
 private:
+	HyRenderMode		m_eRenderMode;
 	uint32				m_uiAttributeFlags;
 	uint32				m_uiTextureBindHandle;
 	float				m_fLineThickness;
@@ -46,7 +51,7 @@ private:
 	uint32				m_uiUniformsCrc32;
 
 	uint32				m_uiNumInstances;
-	uint32				m_uiNumVerticesPerInstance;
+	uint32				m_uiNumVerticesPerInstance;		// Or total number of vertices if single instance
 	size_t				m_uiDataOffset;
 
 	HyScreenRect<int32>	m_ScissorRect;
@@ -55,6 +60,9 @@ private:
 public:
 	HyRenderState();
 	~HyRenderState(void);
+
+	void SetRenderMode(HyRenderMode eRenderMode);
+	HyRenderMode GetRenderMode();
 
 	void SetDataOffset(size_t uiVertexDataOffset);
 	size_t GetDataOffset() const;
@@ -79,7 +87,7 @@ public:
 	void Enable(uint32 uiAttributes);
 	void Disable(uint32 uiAttributes);
 	bool CompareAttribute(const HyRenderState &rs, uint32 uiMask);
-	bool IsEnabled(Attributes eAttrib);
+	bool IsEnabled(Attributes eAttrib) const;
 	uint32 GetAttributeBitFlags() const;
 
 	int32 GetShaderId() const;

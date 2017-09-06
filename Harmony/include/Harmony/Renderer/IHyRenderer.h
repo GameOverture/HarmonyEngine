@@ -47,6 +47,9 @@ protected:
 
 	uint32									m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
 
+	// Diagnostics/Metrics
+	uint32									m_uiNumRenderStates;
+
 	bool									m_bRequestedQuit;
 
 public:
@@ -85,17 +88,18 @@ public:
 
 	uint32 GetNumRenderSurfaces();
 
-	int32 GetNumCameras2d();
+	// 2D buffer accessors
+	uint32 GetNumCameras2d();
+	uint32 GetNumRenderStates2d();
 	uint32 GetCameraWindowIndex2d(int iCameraIndex);
 	HyRectangle<float> *GetCameraViewportRect2d(int iIndex);
 	glm::mat4 *GetCameraView2d(int iIndex);
-
-	int32 GetNumInsts3d();
-	int32 GetNumCameras3d();
-
-	int32 GetNumRenderStates2d();
 	HyRenderState *GetRenderStatesPtr2d();
 	char *GetVertexData2d();
+
+	// 3D buffer accessors
+	uint32 GetNumCameras3d();
+	uint32 GetNumInsts3d();
 
 	static IHyShader *FindShader(int32 iId);
 	static IHyShader *MakeCustomShader();

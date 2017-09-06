@@ -20,10 +20,11 @@ HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pPa
 																										m_uiCurAnimState(0),
 																										m_uiCurFrame(0)
 {
-	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
+	m_RenderState.SetRenderMode(HYRENDERMODE_TriangleStrip);
+	m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
-	m_RenderState.SetNumInstances(1);
 	m_RenderState.SetNumVerticesPerInstance(4);
+	m_RenderState.SetNumInstances(1);
 }
 
 HySprite2d::~HySprite2d(void)

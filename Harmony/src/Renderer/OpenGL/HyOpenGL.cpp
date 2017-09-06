@@ -177,26 +177,18 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderState &renderState)
 {
-	if(m_PrevRenderState.CompareAttribute(renderState, HyRenderState::DRAWMODEMASK) == false)
+	switch(renderState.GetRenderMode())
 	{
-		if(renderState.IsEnabled(HyRenderState::DRAWMODE_TRIANGLESTRIP))
-			m_eDrawMode = GL_TRIANGLE_STRIP;
-		else if(renderState.IsEnabled(HyRenderState::DRAWMODE_TRIANGLES))
-			m_eDrawMode = GL_TRIANGLES;
-		else if(renderState.IsEnabled(HyRenderState::DRAWMODE_LINELOOP))
-			m_eDrawMode = GL_LINE_LOOP;
-		else if(renderState.IsEnabled(HyRenderState::DRAWMODE_LINESTRIP))
-			m_eDrawMode = GL_LINE_STRIP;
-		else if(renderState.IsEnabled(HyRenderState::DRAWMODE_TRIANGLEFAN))
-			m_eDrawMode = GL_TRIANGLE_FAN;
-		else
-		{
-			HyError("Unknown draw mode in render state");
-			return;
-		}
-	}
+	case HYRENDERMODE_Triangles:		m_eDrawMode = GL_TRIANGLES;			break;
+	case HYRENDERMODE_TriangleStrip:	m_eDrawMode = GL_TRIANGLE_STRIP;	break;
+	case HYRENDERMODE_TriangleFan:		m_eDrawMode = GL_TRIANGLE_FAN;		break;
+	case HYRENDERMODE_LineLoop:			m_eDrawMode = GL_LINE_LOOP;			break;
+	case HYRENDERMODE_LineStrip:		m_eDrawMode = GL_LINE_STRIP;		break;
 
-	//glLineWidth(renderState.GetLineThickness());
+	default:
+		HyError("Unknown draw mode in render state");
+		return;
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

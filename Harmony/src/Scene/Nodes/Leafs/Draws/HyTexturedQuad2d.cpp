@@ -19,7 +19,8 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, H
 																										m_uiRAW_TEXTURE_HEIGHT(0),
 																										m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
 {
-	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
+	m_RenderState.SetRenderMode(HYRENDERMODE_TriangleStrip);
+	m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
 	m_RenderState.SetNumInstances(1);
 	m_RenderState.SetNumVerticesPerInstance(4);
@@ -33,7 +34,8 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth,
 																																m_uiRAW_TEXTURE_HEIGHT(uiTextureHeight),
 																																m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
 {
-	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
+	m_RenderState.SetRenderMode(HYRENDERMODE_TriangleStrip);
+	m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
 	m_RenderState.SetNumInstances(1);
 	m_RenderState.SetNumVerticesPerInstance(4);

@@ -30,7 +30,8 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent
 																									m_uiNumValidCharacters(0),
 																									m_fUsedPixelWidth(0.0f)
 {
-	m_RenderState.Enable(HyRenderState::DRAWMODE_TRIANGLESTRIP | HyRenderState::DRAWINSTANCED);
+	m_RenderState.SetRenderMode(HYRENDERMODE_TriangleStrip);
+	m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
 	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
 	m_RenderState.SetNumVerticesPerInstance(4);
 }

@@ -10,7 +10,8 @@
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
-HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
+HyRenderState::HyRenderState() :	m_eRenderMode(HYRENDERMODE_Unknown),
+									m_uiAttributeFlags(0),
 									m_uiTextureBindHandle(0),
 									m_fLineThickness(1.0f),
 									m_iShaderId(-1),
@@ -26,6 +27,16 @@ HyRenderState::HyRenderState() :	m_uiAttributeFlags(0),
 
 HyRenderState::~HyRenderState(void)
 {
+}
+
+void HyRenderState::SetRenderMode(HyRenderMode eRenderMode)
+{
+	m_eRenderMode = eRenderMode;
+}
+
+HyRenderMode HyRenderState::GetRenderMode()
+{
+	return m_eRenderMode;
 }
 
 void HyRenderState::SetDataOffset(size_t uiVertexDataOffset)
@@ -126,7 +137,7 @@ bool HyRenderState::CompareAttribute(const HyRenderState &rs, uint32 uiMask)
 	return (m_uiAttributeFlags & uiMask) == (rs.m_uiAttributeFlags & uiMask);
 }
 
-bool HyRenderState::IsEnabled(Attributes eAttrib)
+bool HyRenderState::IsEnabled(Attributes eAttrib) const
 {
 	return 0 != (m_uiAttributeFlags & eAttrib);
 }
@@ -175,7 +186,8 @@ void HyRenderState::SetLineThickness(float fParam)
 
 bool HyRenderState::operator==(const HyRenderState &right) const
 {
-	if(m_uiAttributeFlags == right.m_uiAttributeFlags &&
+	if(m_eRenderMode == right.m_eRenderMode &&
+	   m_uiAttributeFlags == right.m_uiAttributeFlags &&
 	   m_uiTextureBindHandle == right.m_uiTextureBindHandle &&
 	   m_iShaderId == right.m_iShaderId &&
 	   m_uiUniformsCrc32 == right.m_uiUniformsCrc32 &&
@@ -195,15 +207,20 @@ bool HyRenderState::operator!=(const HyRenderState &right) const
 
 bool HyRenderState::operator< (const HyRenderState &right) const
 {
-	if(m_uiAttributeFlags == right.m_uiAttributeFlags)
+	if(this->m_eRenderMode == right.m_eRenderMode)
 	{
-		if(this->m_uiTextureBindHandle == right.m_uiTextureBindHandle)
-			return this->m_iShaderId < right.m_iShaderId;
+		if(m_uiAttributeFlags == right.m_uiAttributeFlags)
+		{
+			if(this->m_uiTextureBindHandle == right.m_uiTextureBindHandle)
+				return this->m_iShaderId < right.m_iShaderId;
+			else
+				return (this->m_uiTextureBindHandle < right.m_uiTextureBindHandle);
+		}
 		else
-			return (this->m_uiTextureBindHandle < right.m_uiTextureBindHandle);
+			return m_uiAttributeFlags < right.m_uiAttributeFlags;
 	}
-
-	return m_uiAttributeFlags < right.m_uiAttributeFlags;
+	else
+		return this->m_eRenderMode < right.m_eRenderMode;
 }
 
 bool HyRenderState::operator> (const HyRenderState &right) const

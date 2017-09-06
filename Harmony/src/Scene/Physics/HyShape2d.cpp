@@ -196,5 +196,5 @@ void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 
 bool HyShape2d::TestPoint(glm::vec2 ptWorldPoint) const
 {
-	return m_pShape->TestPoint(b2Transform(b2Vec2(m_OwnerRef.pos.X(), m_OwnerRef.pos.Y()), b2Rot(glm::radians(m_OwnerRef.rot.Get()))), b2Vec2(ptWorldPoint.x, ptWorldPoint.y));
+	return m_pShape && m_pShape->TestPoint(b2Transform(b2Vec2(m_OwnerRef.pos.X(), m_OwnerRef.pos.Y()), b2Rot(glm::radians(m_OwnerRef.rot.Get()))), b2Vec2(ptWorldPoint.x, ptWorldPoint.y));
 }

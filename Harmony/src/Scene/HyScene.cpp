@@ -202,7 +202,7 @@ void HyScene::WriteDrawBuffer()
 			}
 		}
 	}
-	*(reinterpret_cast<int32 *>(pWriteNum3dCamsHere)) = iCount;
+	*(reinterpret_cast<uint32 *>(pWriteNum3dCamsHere)) = iCount;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 2d CAMERA(S) BUFFER
@@ -237,7 +237,7 @@ void HyScene::WriteDrawBuffer()
 			}
 		}
 	}
-	*(reinterpret_cast<int32 *>(pWriteNum2dCamsHere)) = iCount;
+	*(reinterpret_cast<uint32 *>(pWriteNum2dCamsHere)) = iCount;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 3d DRAW BUFFER
@@ -257,7 +257,7 @@ void HyScene::WriteDrawBuffer()
 			iCount++;
 		}
 	}
-	*(reinterpret_cast<int32 *>(pWriteNum3dInstsHere)) = iCount;
+	*(reinterpret_cast<uint32 *>(pWriteNum3dInstsHere)) = iCount;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 2d DRAW BUFFER
@@ -273,15 +273,17 @@ void HyScene::WriteDrawBuffer()
 	char *pCurVertexWritePos = pStartVertexWritePos;
 
 	size_t	uiVertexDataOffset = 0;
-	HyRenderState *pCurRenderState2d = NULL;
+	HyRenderState *pCurRenderState2d = nullptr;
 
-	for(size_t i = 0; i < uiTotalNumInsts; ++i)
+	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_NodeList_Loaded[i]->IsEnabled() == false)// || m_NodeList_Loaded[i]->GetRenderState().GetShaderId() < 0)
+		if(m_NodeList_Loaded[i]->IsEnabled() == false)
 			continue;
 
 		// If previously written instance has equal render state by "operator ==" then it's to be assumed the instance data can be batched and doesn't need to write another render state
-		if(pCurRenderState2d == NULL || m_NodeList_Loaded[i]->GetRenderState() != *pCurRenderState2d)
+		if(pCurRenderState2d == nullptr ||
+		   m_NodeList_Loaded[i]->GetRenderState() != *pCurRenderState2d ||
+		   m_NodeList_Loaded[i]->GetRenderState().IsEnabled(HyRenderState::DRAWINSTANCED) == false)
 		{
 			// Start a new draw. Write render state to buffer to be sent to render thread
 			memcpy(m_pCurWritePos, &m_NodeList_Loaded[i]->GetRenderState(), sizeof(HyRenderState));
@@ -321,7 +323,7 @@ void HyScene::WriteDrawBuffer()
 	//	}
 	//}
 
-	*(reinterpret_cast<int32 *>(pWriteNum2dInstsHere)) = iCount;
+	*(reinterpret_cast<uint32 *>(pWriteNum2dInstsHere)) = iCount;
 	pDrawHeader->uiVertexBufferSize2d = pCurVertexWritePos - pStartVertexWritePos;
 
 	// Do final check to see if we wrote passed our bounds
