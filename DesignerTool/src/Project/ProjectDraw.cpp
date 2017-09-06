@@ -8,6 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "ProjectDraw.h"
+#include "HyGuiGlobal.h"
 
 const char * const szCHECKERGRID_VERTEXSHADER = R"src(
 #version 400
@@ -63,8 +64,8 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 {
     m_Resolution.x = iWidth;
     m_Resolution.y = iHeight;
-    GetShape().SetAsBox(m_Resolution.x, m_Resolution.y);
-    pos.Set(m_Resolution.x * -0.5f, m_Resolution.y * -0.5f);
+    GetShape().SetAsBox(m_Resolution.x * 0.5f, m_Resolution.y * 0.5f);
+    //pos.Set(m_Resolution.x * -0.5f, m_Resolution.y * -0.5f);
 }
 
 /*virtual*/ void CheckerGrid::OnUpdateUniforms()
@@ -81,9 +82,10 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 
 /*virtual*/ void CheckerGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-    HyAssert(m_RenderState.GetNumVerticesPerInstance() == 4, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
+    if(m_RenderState.GetNumVerticesPerInstance() != 6)
+        HyGuiLog("CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad", LOGTYPE_Error);
 
-    for(int i = 0; i < 4; ++i)
+    for(int i = 0; i < 6; ++i)
     {
         *reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pDrawBuffer[i];
         pRefDataWritePos += sizeof(glm::vec2);
@@ -92,23 +94,25 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
         switch(i)
         {
         case 0:
-            vUV.x = 1.0f;
-            vUV.y = 0.0f;
-            break;
-
-        case 1:
-            vUV.x = 0.0f;
-            vUV.y = 0.0f;
-            break;
-
-        case 2:
-            vUV.x = 1.0f;
-            vUV.y = 1.0f;
-            break;
-
         case 3:
             vUV.x = 0.0f;
             vUV.y = 1.0f;
+            break;
+
+        case 1:
+            vUV.x = 1.0f;
+            vUV.y = 1.0f;
+            break;
+
+        case 2:
+        case 4:
+            vUV.x = 1.0f;
+            vUV.y = 0.0f;
+            break;
+
+        case 5:
+            vUV.x = 0.0f;
+            vUV.y = 0.0f;
             break;
         }
 
