@@ -12,23 +12,34 @@
 
 #include <QUndoCommand>
 
-class EntityTreeItem;
 class ProjectItem;
+class EntityWidget;
+class EntityModel;
+class EntityTreeItem;
 class EntityTreeModel;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class EntityUndoCmd_AddNewChild : public QUndoCommand
+enum EntityCmd
 {
+    ENTITYCMD_AddNewChild = 0,
+    ENTITYCMD_AddPrimitive,
+};
+
+class EntityUndoCmd : public QUndoCommand
+{
+    // NOTE: Member order matters!
+    const EntityCmd     m_eCMD;
+    ProjectItem &       m_ItemRef;
+    void *              m_pParameter;
+
+    EntityWidget *      m_pWidget;
+    EntityModel *       m_pModel;
     EntityTreeItem *    m_pParentTreeItem;
-    EntityTreeModel *   m_pTreeModel;
-    ProjectItem *       m_pItem;
-    EntityTreeItem *    m_pNewTreeItem;
 
     int                 m_iRow;
 
 public:
-    EntityUndoCmd_AddNewChild(EntityTreeItem *pParentTreeItem, EntityTreeModel *pTreeModel, ProjectItem *pItem, QUndoCommand *pParent = 0);
-    virtual ~EntityUndoCmd_AddNewChild();
+    EntityUndoCmd(EntityCmd eCMD, ProjectItem &itemRef, void *pParameter, QUndoCommand *pParent = 0);
+    virtual ~EntityUndoCmd();
 
     void redo() override;
     void undo() override;

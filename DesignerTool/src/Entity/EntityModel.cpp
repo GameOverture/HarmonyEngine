@@ -21,7 +21,14 @@ EntityStateData::EntityStateData(IModel &modelRef, QJsonObject stateObj) : IStat
 EntityModel::EntityModel(ProjectItem *pItem, QJsonArray stateArray) :   IModel(pItem),
                                                                         m_TreeModel(*pItem)
 {
-
+    // If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
+    if(stateArray.empty() == false)
+    {
+        for(int i = 0; i < stateArray.size(); ++i)
+            AppendState<EntityStateData>(stateArray[i].toObject());
+    }
+    else
+        AppendState<EntityStateData>(QJsonObject());
 }
 
 /*virtual*/ EntityModel::~EntityModel()

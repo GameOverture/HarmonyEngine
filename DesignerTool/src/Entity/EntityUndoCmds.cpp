@@ -8,32 +8,61 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "EntityUndoCmds.h"
-#include "EntityTreeModel.h"
+#include "EntityModel.h"
+#include "EntityWidget.h"
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-EntityUndoCmd_AddNewChild::EntityUndoCmd_AddNewChild(EntityTreeItem *pParentTreeItem, EntityTreeModel *pTreeModel, ProjectItem *pItem, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-                                                                                                                                                                        m_pParentTreeItem(pParentTreeItem),
-                                                                                                                                                                        m_pTreeModel(pTreeModel),
-                                                                                                                                                                        m_pItem(pItem),
-                                                                                                                                                                        m_pNewTreeItem(new EntityTreeItem(m_pTreeModel, m_pItem)),
-                                                                                                                                                                        m_iRow(0)
+EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &itemRef, void *pParameter, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
+                                                                                                                        m_eCMD(eCMD),
+                                                                                                                        m_ItemRef(itemRef),
+                                                                                                                        m_pWidget(static_cast<EntityWidget *>(m_ItemRef.GetWidget())),
+                                                                                                                        m_pModel(static_cast<EntityModel *>(m_ItemRef.GetModel())),
+                                                                                                                        m_pParentTreeItem(m_pWidget->GetCurSelectedTreeItem()),
+                                                                                                                        m_iRow(0)
 {
-    setText("Add New Child");
+    if(m_ItemRef.GetType() != ITEM_Entity)
+        HyGuiLog("EntityUndoCmd recieved wrong type: " % QString::number(m_ItemRef.GetType()) , LOGTYPE_Error);
+
+    switch(m_eCMD)
+    {
+        case ENTITYCMD_AddNewChild: {
+            setText("Add New Child");
+            m_pParameter = new EntityTreeItem(&m_pModel->GetTreeModel(), static_cast<ProjectItem *>(pParameter));
+        } break;
+
+        case ENTITYCMD_AddPrimitive: {
+            setText("Add Primitive");
+        } break;
+    }
 }
 
-/*virtual*/ EntityUndoCmd_AddNewChild::~EntityUndoCmd_AddNewChild()
+/*virtual*/ EntityUndoCmd::~EntityUndoCmd()
 {
 }
 
-void EntityUndoCmd_AddNewChild::redo()
+void EntityUndoCmd::redo() /*override*/
 {
-    m_pTreeModel->InsertItem(m_iRow, m_pNewTreeItem, m_pParentTreeItem);
+    switch(m_eCMD)
+    {
+        case ENTITYCMD_AddNewChild: {
+            m_pModel->GetTreeModel().InsertItem(m_iRow, static_cast<EntityTreeItem *>(m_pParameter), m_pParentTreeItem);
+        } break;
+
+        case ENTITYCMD_AddPrimitive: {
+        } break;
+    }
 }
 
-void EntityUndoCmd_AddNewChild::undo()
+void EntityUndoCmd::undo() /*override*/
 {
-    m_iRow = m_pNewTreeItem->GetRow();
-    m_pTreeModel->RemoveItems(m_iRow, 1, m_pParentTreeItem);
-}
+    switch(m_eCMD)
+    {
+        case ENTITYCMD_AddNewChild: {
+            m_iRow = static_cast<EntityTreeItem *>(m_pParameter)->GetRow();
+            m_pModel->GetTreeModel().RemoveItems(m_iRow, 1, m_pParentTreeItem);
+        } break;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        case ENTITYCMD_AddPrimitive: {
+
+        } break;
+    }
+}

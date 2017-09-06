@@ -2,6 +2,8 @@
 #include "ui_EntityWidget.h"
 #include "Project.h"
 #include "EntityUndoCmds.h"
+#include "UndoCmds.h"
+#include "DlgInputName.h"
 
 EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
                                                                     ui(new Ui::EntityWidget),
@@ -66,6 +68,11 @@ void EntityWidget::OnGiveMenuActions(QMenu *pMenu)
 //    pMenu->addAction(ui->actionOrderLayerDownwards);
 }
 
+EntityStateData *EntityWidget::GetCurStateData()
+{
+    return static_cast<EntityStateData *>(GetEntityModel()->GetStateData(ui->cmbStates->currentIndex()));
+}
+
 void EntityWidget::on_actionAddSelectedChild_triggered()
 {
     if(GetCurSelectedTreeItem() == nullptr)
@@ -82,13 +89,20 @@ void EntityWidget::on_actionAddSelectedChild_triggered()
     }
 
     ProjectItem *pItem = static_cast<ProjectItem *>(pExplorerItem);
-    QUndoCommand *pCmd = new EntityUndoCmd_AddNewChild(GetCurSelectedTreeItem(), &GetEntityModel()->GetTreeModel(), pItem);
+    QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChild, m_ItemRef, pItem);
     m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddPrimitive_triggered()
 {
+    if(GetCurSelectedTreeItem() == nullptr)
+    {
+        HyGuiLog("Currently selected entity tree item is nullptr. Cannot add primitive.", LOGTYPE_Error);
+        return;
+    }
 
+    QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddPrimitive, m_ItemRef, nullptr);
+    m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionInsertBoundingVolume_triggered()
@@ -138,4 +152,40 @@ void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
         break;
     }
 
+}
+
+void EntityWidget::on_actionRenameState_triggered()
+{
+    DlgInputName *pDlg = new DlgInputName("Rename Entity State", GetCurStateData()->GetName());
+    if(pDlg->exec() == QDialog::Accepted)
+    {
+        QUndoCommand *pCmd = new UndoCmd_RenameState("Rename Entity State", m_ItemRef, pDlg->GetName(), ui->cmbStates->currentIndex());
+        m_ItemRef.GetUndoStack()->push(pCmd);
+    }
+
+    delete pDlg;
+}
+
+void EntityWidget::on_actionAddState_triggered()
+{
+    QUndoCommand *pCmd = new UndoCmd_AddState<EntityStateData>("Add Entity State", m_ItemRef, nullptr);
+    m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionRemoveState_triggered()
+{
+    QUndoCommand *pCmd = new UndoCmd_RemoveState<EntityStateData>("Remove Entity State", m_ItemRef, ui->cmbStates->currentIndex());
+    m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionOrderStateBackwards_triggered()
+{
+    QUndoCommand *pCmd = new UndoCmd_MoveStateBack("Shift Entity State Index <-", m_ItemRef, ui->cmbStates->currentIndex());
+    m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionOrderStateForwards_triggered()
+{
+    QUndoCommand *pCmd = new UndoCmd_MoveStateForward("Shift Entity State Index ->", m_ItemRef, ui->cmbStates->currentIndex());
+    m_ItemRef.GetUndoStack()->push(pCmd);
 }
