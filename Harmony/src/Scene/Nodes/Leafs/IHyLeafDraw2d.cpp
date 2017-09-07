@@ -96,6 +96,8 @@ IHyNodeData *IHyLeafDraw2d::AcquireData()
 		sm_pHyAssets->GetNodeData(this, m_pData);
 		if(m_pData)
 			OnDataAcquired();
+		else
+			HyAssert(m_eTYPE == HYTYPE_Primitive2d, "Could not find data for: " << GetPrefix() << "/" << GetName());
 	}
 
 	return m_pData;
