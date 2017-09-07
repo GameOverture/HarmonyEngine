@@ -13,17 +13,17 @@
 #include "Afx/HyStdAfx.h"
 #include "Box2D/Box2D.h"
 
-class IHyNode2d;
+class IHyLeafDraw2d;
 
 class HyShape2d
 {
-	IHyNode2d &						m_OwnerRef;
+	IHyLeafDraw2d &					m_OwnerRef;
 
 	HyShapeType						m_eType;
 	b2Shape *						m_pShape;
 
 public:
-	HyShape2d(IHyNode2d &ownerRef);
+	HyShape2d(IHyLeafDraw2d &ownerRef);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);

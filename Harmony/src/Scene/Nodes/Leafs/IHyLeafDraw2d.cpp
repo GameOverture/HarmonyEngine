@@ -15,8 +15,9 @@
 IHyLeafDraw2d::IHyLeafDraw2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyNodeDraw2d(eNodeType, pParent),
 																												m_eLoadState(HYLOADSTATE_Inactive),
 																												m_pData(nullptr),
+																												m_sNAME(szName ? szName : ""),
 																												m_sPREFIX(szPrefix ? szPrefix : ""),
-																												m_sNAME(szName ? szName : "")
+																												m_BoundingVolume(*this)
 {
 }
 
@@ -101,6 +102,41 @@ IHyNodeData *IHyLeafDraw2d::AcquireData()
 	}
 
 	return m_pData;
+}
+
+
+const HyShape2d &IHyLeafDraw2d::GetBoundingVolume()
+{
+	if(IsDirty(DIRTY_BoundingVolume) || m_BoundingVolume.IsValid() == false)
+	{
+		CalcBoundingVolume();
+		ClearDirty(DIRTY_BoundingVolume);
+	}
+
+	return m_BoundingVolume;
+}
+
+const b2AABB &IHyLeafDraw2d::GetWorldAABB()
+{
+	if(IsDirty(DIRTY_WorldAABB))
+	{
+		glm::mat4 mtxWorld;
+		GetWorldTransform(mtxWorld);
+		float fWorldRotationRadians = glm::atan(mtxWorld[0][1], mtxWorld[0][0]);
+
+		GetBoundingVolume(); // This will update BV if it's dirty
+		m_BoundingVolume.GetB2Shape()->ComputeAABB(&m_aabbCached, b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), 0);
+
+		ClearDirty(DIRTY_WorldAABB);
+	}
+
+	return m_aabbCached;
+}
+
+b2Shape *IHyLeafDraw2d::GetBoundingVolumeIndex(uint32 uiIndex)
+{
+	return nullptr;
+	//return m_BoundingVolumeList[uiIndex].Get;
 }
 
 HyCoordinateType IHyLeafDraw2d::GetCoordinateType()

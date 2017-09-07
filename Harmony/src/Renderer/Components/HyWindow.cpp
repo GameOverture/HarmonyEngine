@@ -122,7 +122,7 @@ glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoor
 {
 	glm::vec2 ptWorldPos(0.0f);
 
-	// Find the first camera that encompasses this normalized point in the viewport, then using that camera's transformation calculate the world position
+	// Find the first camera that encompasses this normalized point in the viewport
 	for(uint32 i = 0; i < m_Cams2dList.size(); ++i)
 	{
 		const HyRectangle<float> &viewportRect = m_Cams2dList[i]->GetViewport();
@@ -130,16 +130,33 @@ glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoor
 		if(ptViewportCoordinate.x >= viewportRect.left   && ptViewportCoordinate.x <= viewportRect.right &&
 		   ptViewportCoordinate.y >= viewportRect.bottom && ptViewportCoordinate.y <= viewportRect.top)
 		{
+			// Find local coordinate in found camera's viewport
 			glm::vec2 vOffsetInViewport;
 			vOffsetInViewport.x = (ptViewportCoordinate.x - viewportRect.left) / (viewportRect.right - viewportRect.left);
 			vOffsetInViewport.y = (ptViewportCoordinate.y - viewportRect.bottom) / (viewportRect.top - viewportRect.bottom);
 
-			HyRectangle<float> worldViewBoundRect = m_Cams2dList[i]->GetWorldViewBounds();
-			ptWorldPos.x = (worldViewBoundRect.right - worldViewBoundRect.left) * vOffsetInViewport.x;
-			ptWorldPos.x += worldViewBoundRect.left;
+			// Now using the found camera's transformation convert to the world position
+			const b2AABB &aabbWorldRef = m_Cams2dList[i]->GetWorldViewBounds();
+			
+			float fDeg = m_Cams2dList[i]->rot.Get();
 
-			ptWorldPos.y = (worldViewBoundRect.top - worldViewBoundRect.bottom) * vOffsetInViewport.y;
-			ptWorldPos.y += worldViewBoundRect.bottom;
+			if(fDeg != 0.0f)
+			{
+				// TODO: Calculate world vector orientation
+				HyError("ConvertViewportCoordinateToWorldPos() TODO: Calculate world vector orientation for camera");
+
+				glm::vec2 vOrientation(cos(glm::radians(fDeg)), sin(glm::radians(fDeg)));
+			}
+			else
+			{
+				//const b2AABB &aabbWorldRef = m_Cams2dList[i]->GetWorldAABB();
+
+				ptWorldPos.x = (aabbWorldRef.upperBound.x - aabbWorldRef.lowerBound.x) * vOffsetInViewport.x;
+				ptWorldPos.x += aabbWorldRef.lowerBound.x;
+
+				ptWorldPos.y = (aabbWorldRef.upperBound.y - aabbWorldRef.lowerBound.y) * vOffsetInViewport.y;
+				ptWorldPos.y += aabbWorldRef.lowerBound.y;
+			}
 
 			break;
 		}

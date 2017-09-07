@@ -24,6 +24,7 @@ class IHyLeafDraw2d : public IHyNodeDraw2d
 {	
 	friend class HyScene;
 	friend class HyAssets;
+	friend class HyShape2d;
 
 protected:
 	static HyAssets *				sm_pHyAssets;
@@ -37,6 +38,9 @@ protected:
 
 	HyRenderState					m_RenderState;
 	HyShaderUniforms 				m_ShaderUniforms;
+
+	HyShape2d						m_BoundingVolume;
+	b2AABB							m_aabbCached;
 
 public:
 	IHyLeafDraw2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
@@ -55,6 +59,10 @@ public:
 
 	IHyNodeData *AcquireData();
 
+	const HyShape2d &GetBoundingVolume();
+	const b2AABB &GetWorldAABB();
+	b2Shape *GetBoundingVolumeIndex(uint32 uiIndex);
+
 	HyCoordinateType GetCoordinateType();
 	void UseCameraCoordinates();
 	void UseWindowCoordinates(uint32 uiWindowIndex = 0);
@@ -67,8 +75,10 @@ public:
 	virtual void Unload() override;
 
 protected:
-	virtual void CalcBoundingVolume() override = 0;
-	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override = 0;
+	virtual void CalcBoundingVolume() = 0;
+	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) = 0;
+
+	virtual void OnShapeSet(HyShape2d *pShape) { }
 
 	virtual void NodeUpdate() override final;
 

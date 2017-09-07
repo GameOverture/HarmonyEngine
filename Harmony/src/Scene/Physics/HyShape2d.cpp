@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Physics/HyShape2d.h"
-#include "Scene/Nodes/IHyNode2d.h"
+#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 #include "Diagnostics/Console/HyConsole.h"
 
 #if 0 // Use this if sizeof(b2Vec2) != sizeof(glm::vec2)
@@ -18,9 +18,9 @@
 	#define HYSHAPEVECTOR_GLM_TO_B2(x) reinterpret_cast<const b2Vec2 *>(x);
 #endif
 
-HyShape2d::HyShape2d(IHyNode2d &ownerRef) :	m_OwnerRef(ownerRef),
-											m_eType(HYSHAPE_Unknown),
-											m_pShape(nullptr)
+HyShape2d::HyShape2d(IHyLeafDraw2d &ownerRef) :	m_OwnerRef(ownerRef),
+												m_eType(HYSHAPE_Unknown),
+												m_pShape(nullptr)
 {
 }
 
@@ -196,5 +196,9 @@ void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 
 bool HyShape2d::TestPoint(glm::vec2 ptWorldPoint) const
 {
-	return m_pShape && m_pShape->TestPoint(b2Transform(b2Vec2(m_OwnerRef.pos.X(), m_OwnerRef.pos.Y()), b2Rot(glm::radians(m_OwnerRef.rot.Get()))), b2Vec2(ptWorldPoint.x, ptWorldPoint.y));
+	glm::mat4 mtxWorld;
+	m_OwnerRef.GetWorldTransform(mtxWorld);
+	float fWorldRotationRadians = glm::atan(mtxWorld[0][1], mtxWorld[0][0]);
+
+	return m_pShape && m_pShape->TestPoint(b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), b2Vec2(ptWorldPoint.x, ptWorldPoint.y));
 }

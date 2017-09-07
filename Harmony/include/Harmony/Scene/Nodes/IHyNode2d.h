@@ -23,7 +23,6 @@ class HyEntity2d;
 class IHyNode2d : public IHyNode
 {
 	friend class HyEntity2d;
-	friend class HyShape2d;
 
 protected:
 	HyEntity2d *					m_pParent;
@@ -33,7 +32,6 @@ protected:
 
 	float							m_fRotation;		// Reference value used in 'rot' HyTweenFloat
 
-	HyShape2d						m_BoundingVolume;
 	b2Body *						m_pPhysicsBody;
 
 public:
@@ -57,18 +55,10 @@ public:
 	void GetLocalTransform(glm::mat4 &outMtx) const;
 	void GetWorldTransform(glm::mat4 &outMtx);
 
-	const HyShape2d &IHyNode2d::GetBoundingVolume();
-	b2Shape *GetBoundingVolumeIndex(uint32 uiIndex);
-
 	void PhysicsInit(b2BodyDef &bodyDefOut);
 	b2Body *PhysicsBody();
 
 protected:
-	virtual void CalcBoundingVolume() = 0;
-	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) = 0;
-
-	virtual void OnShapeSet(HyShape2d *pShape) { }
-
 	virtual void PhysicsUpdate() override final;
 	virtual void NodeUpdate() override = 0;
 

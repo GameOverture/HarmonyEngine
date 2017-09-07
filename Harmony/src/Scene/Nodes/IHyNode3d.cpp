@@ -10,11 +10,11 @@
 #include "Scene/Nodes/IHyNode3d.h"
 
 IHyNode3d::IHyNode3d(HyType eNodeType, IHyNode3d *pParent) :	IHyNode(eNodeType),
-																pos(*this, DIRTY_Transform),
-																rot(*this, DIRTY_Transform),
-																rot_pivot(*this, DIRTY_Transform),
-																scale(*this, DIRTY_Transform),
-																scale_pivot(*this, DIRTY_Transform)
+																pos(*this, DIRTY_Transform | DIRTY_WorldAABB),
+																rot(*this, DIRTY_Transform | DIRTY_WorldAABB),
+																rot_pivot(*this, DIRTY_Transform | DIRTY_WorldAABB),
+																scale(*this, DIRTY_Transform | DIRTY_WorldAABB),
+																scale_pivot(*this, DIRTY_Transform | DIRTY_WorldAABB)
 {
 	scale.Set(1.0f);
 }

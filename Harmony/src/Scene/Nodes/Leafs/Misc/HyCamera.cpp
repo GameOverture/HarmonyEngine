@@ -47,32 +47,33 @@ HyCamera2d::~HyCamera2d()
 	return scale.Get().x;
 }
 
-// NOTE: Does not properly calculate camera twist - must be axis aligned
-HyRectangle<float> HyCamera2d::GetWorldViewBounds()
+const b2AABB &HyCamera2d::GetWorldViewBounds()
 {
-	HyRectangle<float> returnRect;
-
 	float fHalfWidth = ((m_pWindowPtr->GetResolution().x * m_ViewportRect.Width()) * 0.5f) * (1.0f / scale.X());
 	float fHalfHeight = ((m_pWindowPtr->GetResolution().y * m_ViewportRect.Height()) * 0.5f) * (1.0f / scale.Y());
 
-	// TODO: 'pos' may not represent the world coordinates if it is attached to a parent transform hierarchy - GetWorldTransform() should be used first
-	returnRect.left = pos.X() - fHalfWidth;
-	returnRect.bottom = pos.Y() - fHalfHeight;
-	returnRect.right = pos.X() + fHalfWidth;
-	returnRect.top = pos.Y() + fHalfHeight;
+	m_aabbViewBounds.lowerBound.Set(pos.X() - fHalfWidth, pos.Y() - fHalfHeight);
+	m_aabbViewBounds.upperBound.Set(pos.X() + fHalfWidth, pos.Y() + fHalfHeight);
 
-	return returnRect;
+	return m_aabbViewBounds;
 }
 
-/*virtual*/ void HyCamera2d::CalcBoundingVolume() /*override*/
-{
-	HyError("HyCamera2d::CalcBoundingVolume() not implemented");
-}
-
-/*virtual*/ void HyCamera2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/
-{
-	uiStateOut = uiSubStateOut = 0;
-}
+//// NOTE: Does not properly calculate camera twist - must be axis aligned
+//HyRectangle<float> HyCamera2d::GetWorldViewBounds()
+//{
+//	HyRectangle<float> returnRect;
+//
+//	float fHalfWidth = ((m_pWindowPtr->GetResolution().x * m_ViewportRect.Width()) * 0.5f) * (1.0f / scale.X());
+//	float fHalfHeight = ((m_pWindowPtr->GetResolution().y * m_ViewportRect.Height()) * 0.5f) * (1.0f / scale.Y());
+//
+//	// TODO: 'pos' may not represent the world coordinates if it is attached to a parent transform hierarchy - GetWorldTransform() should be used first
+//	returnRect.left = pos.X() - fHalfWidth;
+//	returnRect.bottom = pos.Y() - fHalfHeight;
+//	returnRect.right = pos.X() + fHalfWidth;
+//	returnRect.top = pos.Y() + fHalfHeight;
+//
+//	return returnRect;
+//}
 
 /*virtual*/ void HyCamera2d::NodeUpdate()
 {

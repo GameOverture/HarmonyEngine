@@ -48,9 +48,6 @@ public:
 	int32 GetDisplayOrder() const;
 
 protected:
-	virtual void CalcBoundingVolume() override = 0;
-	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override = 0;
-
 	virtual void NodeUpdate() = 0;
 
 private:

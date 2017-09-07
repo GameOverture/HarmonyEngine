@@ -15,13 +15,12 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 																m_pParent(pParent),
 																m_eCoordUnit(HYCOORDUNIT_Default),
 																m_fRotation(0.0f),
-																m_BoundingVolume(*this),
 																m_pPhysicsBody(nullptr),
-																pos(*this, DIRTY_Transform),
-																rot(m_fRotation, *this, DIRTY_Transform),
-																rot_pivot(*this, DIRTY_Transform),
-																scale(*this, DIRTY_Transform),
-																scale_pivot(*this, DIRTY_Transform)
+																pos(*this, DIRTY_Transform | DIRTY_WorldAABB),
+																rot(m_fRotation, *this, DIRTY_Transform | DIRTY_WorldAABB),
+																rot_pivot(*this, DIRTY_Transform | DIRTY_WorldAABB),
+																scale(*this, DIRTY_Transform | DIRTY_WorldAABB),
+																scale_pivot(*this, DIRTY_Transform | DIRTY_WorldAABB)
 {
 	scale.Set(1.0f);
 
@@ -130,23 +129,6 @@ void IHyNode2d::GetWorldTransform(glm::mat4 &outMtx)
 	outMtx = m_mtxCached;
 }
 
-const HyShape2d &IHyNode2d::GetBoundingVolume()
-{
-	if(IsDirty(DIRTY_BoundingVolume) || m_BoundingVolume.IsValid() == false)
-	{
-		CalcBoundingVolume();
-		ClearDirty(DIRTY_BoundingVolume);
-	}
-
-	return m_BoundingVolume;
-}
-
-b2Shape *IHyNode2d::GetBoundingVolumeIndex(uint32 uiIndex)
-{
-	return nullptr;
-	//return m_BoundingVolumeList[uiIndex].Get;
-}
-
 void IHyNode2d::PhysicsInit(b2BodyDef &bodyDefOut)
 {
 	b2World &worldRef = Hy_Physics2d();
@@ -168,8 +150,6 @@ b2Body *IHyNode2d::PhysicsBody()
 
 /*virtual*/ void IHyNode2d::PhysicsUpdate() /*override*/
 {
-
-
 	if(m_pPhysicsBody != nullptr && m_pPhysicsBody->IsActive())
 	{
 		pos.Set(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);

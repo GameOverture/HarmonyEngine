@@ -34,7 +34,7 @@ protected:
 	};
 	MouseInputState					m_eMouseInputState;
 	void *							m_pMouseInputUserParam;
-	IHyNodeDraw2d *					m_pMouseInputNode;
+	IHyLeafDraw2d *					m_pMouseInputNode;
 
 	HyScreenRect<int32>				m_WorldScissorRect;
 
@@ -57,7 +57,7 @@ public:
 	virtual IHyNode2d *ChildGet(uint32 uiIndex);
 	void ForEachChild(std::function<void(IHyNode2d *)> func);
 
-	bool EnableMouseInput(IHyNodeDraw2d *pInputChildNode, void *pUserParam = nullptr);
+	bool EnableMouseInput(IHyLeafDraw2d *pInputChildNode, void *pUserParam = nullptr);
 	void DisableMouseInput();
 
 	void ReverseDisplayOrder(bool bReverse);
@@ -67,9 +67,6 @@ public:
 	virtual void Unload() override;
 	
 protected:
-	virtual void CalcBoundingVolume() override;
-	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override;
-
 	virtual void NodeUpdate() override final;
 
 	// Optional user overrides below

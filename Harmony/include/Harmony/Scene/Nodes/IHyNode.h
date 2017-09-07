@@ -26,9 +26,10 @@ protected:
 	enum HyNodeDirtyFlag
 	{
 		DIRTY_BoundingVolume	= 1 << 0,
-		DIRTY_Transform			= 1 << 1,
-		DIRTY_Color				= 1 << 2,
-		DIRTY_DontCare			= 1 << 3
+		DIRTY_WorldAABB			= 1 << 1,
+		DIRTY_Transform			= 1 << 2,
+		DIRTY_Color				= 1 << 3,
+		DIRTY_DontCare			= 1 << 4
 	};
 	uint32							m_uiDirtyFlags;
 

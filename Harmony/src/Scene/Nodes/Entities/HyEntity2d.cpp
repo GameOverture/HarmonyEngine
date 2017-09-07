@@ -202,18 +202,12 @@ void HyEntity2d::ForEachChild(std::function<void(IHyNode2d *)> func)
 	}
 }
 
-bool HyEntity2d::EnableMouseInput(IHyNodeDraw2d *pInputChildNode, void *pUserParam /*= nullptr*/)
+bool HyEntity2d::EnableMouseInput(IHyLeafDraw2d *pInputChildNode, void *pUserParam /*= nullptr*/)
 {
-	if(pInputChildNode)
-	{
-		if(this != pInputChildNode && ChildExists(*pInputChildNode) == false)
-			return false;
+	if(pInputChildNode == nullptr || ChildExists(*pInputChildNode) == false)
+		return false;
 
-		m_pMouseInputNode = pInputChildNode;
-	}
-	else
-		m_pMouseInputNode = this;
-
+	m_pMouseInputNode = pInputChildNode;
 	m_pMouseInputUserParam = pUserParam;
 	m_uiAttributes |= ATTRIBFLAG_MouseInput;
 
@@ -258,16 +252,6 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	// Unload any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->Unload();
-}
-
-/*virtual*/ void HyEntity2d::CalcBoundingVolume() /*override*/
-{
-	HyError("HyEntity2d::CalcBoundingVolume() not implemented");
-}
-
-/*virtual*/ void HyEntity2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/
-{
-	uiStateOut = uiSubStateOut = 0;
 }
 
 /*virtual*/ void HyEntity2d::NodeUpdate() /*override final*/

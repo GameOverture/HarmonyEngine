@@ -43,18 +43,21 @@ class HyCamera2d final : public IHyLeaf2d, public IHyCamera
 	friend class HyWindow;
 
 	HyCamera2d(HyWindow *pWindow);
+
+	b2AABB		m_aabbViewBounds;
+
 public:
 	virtual ~HyCamera2d();
 
 	virtual void SetZoom(const float fZoom) override;
 	virtual float GetZoom() const override;
 
-	// NOTE: Does not properly calculate camera twist - must be axis aligned
-	HyRectangle<float> GetWorldViewBounds();
+	const b2AABB &GetWorldViewBounds();
+
+	//// NOTE: Does not properly calculate camera twist - must be axis aligned
+	//HyRectangle<float> GetWorldViewBounds();
 
 protected:
-	virtual void CalcBoundingVolume() override;
-	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override;
 	virtual void NodeUpdate() override;
 };
 
