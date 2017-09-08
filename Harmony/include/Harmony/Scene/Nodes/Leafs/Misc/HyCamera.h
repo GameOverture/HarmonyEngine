@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyCamera_h__
-#define __HyCamera_h__
+#ifndef HyCamera_h__
+#define HyCamera_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -76,4 +76,4 @@ protected:
 	virtual void NodeUpdate() override;
 };
 
-#endif /* __HyCamera_h__ */
+#endif /* HyCamera_h__ */

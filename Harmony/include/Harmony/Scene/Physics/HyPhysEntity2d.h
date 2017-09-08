@@ -7,11 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyPhysEntity2d_h__
-#define __HyPhysEntity2d_h__
+#ifndef HyPhysEntity2d_h__
+#define HyPhysEntity2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Box2D/Box2D.h"
 
 #include "Scene/Nodes/Leafs/Draws/HyPrimitive2d.h"
 #include "Scene/Nodes/Entities/HyEntity2d.h"
@@ -79,4 +78,4 @@ private:
 	virtual void Update();
 };
 
-#endif /* __HyPhysEntity2d_h__ */
+#endif /* HyPhysEntity2d_h__ */

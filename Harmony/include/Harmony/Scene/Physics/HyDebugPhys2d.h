@@ -7,12 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyDebugPhys2d_h__
-#define __HyDebugPhys2d_h__
+#ifndef HyDebugPhys2d_h__
+#define HyDebugPhys2d_h__
 
 #include "Afx/HyStdAfx.h"
-
-#include "Box2D/Box2D.h"
 
 #include <vector>
 
@@ -57,4 +55,4 @@ public:
 	virtual void DrawTransform(const b2Transform& xf);
 };
 
-#endif /* __HyDebugPhys2d_h__ */
+#endif /* HyDebugPhys2d_h__ */

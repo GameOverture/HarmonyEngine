@@ -80,8 +80,8 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
         float fZoomAmt = ((m_HyAppRef.Window().GetResolution().x * 100.0f) / (pFtglAtlas->width + (fExtraMargin * 2.0f))) / 100.0f;
         m_pCamera->SetZoom(fZoomAmt);
     
-        HyRectangle<float> atlasViewBounds = m_pCamera->GetWorldViewBounds();
-        m_pAtlasPreviewTexQuad->pos.Set(atlasViewBounds.left + fExtraMargin, atlasViewBounds.top - pFtglAtlas->height - fExtraMargin);
+        const b2AABB &aabbWorldViewBounds = m_pCamera->GetWorldViewBounds();
+        m_pAtlasPreviewTexQuad->pos.Set(aabbWorldViewBounds.lowerBound.x + fExtraMargin, aabbWorldViewBounds.upperBound.y - pFtglAtlas->height - fExtraMargin);
         m_DrawAtlasOutline.pos.Set(m_pAtlasPreviewTexQuad->pos.Get());
     }
     

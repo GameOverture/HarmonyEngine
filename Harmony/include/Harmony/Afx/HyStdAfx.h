@@ -16,6 +16,7 @@
 
 #include "Utilities/jsonxx.h"
 #include "Utilities/HyFileIO.h"
+#include "Box2D/Box2D.h"
 
 enum HyType
 {

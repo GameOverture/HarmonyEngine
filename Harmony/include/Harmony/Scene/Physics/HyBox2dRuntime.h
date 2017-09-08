@@ -7,11 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyBox2dRuntime_h__
-#define __HyBox2dRuntime_h__
+#ifndef HyBox2dRuntime_h__
+#define HyBox2dRuntime_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Box2d/Box2D.h"
 
 class HyBox2dRuntime : public b2ContactListener
 {
@@ -46,4 +45,4 @@ public:
 	virtual void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse);
 };
 
-#endif /* __HyBox2dRuntime_h__ */
+#endif /* HyBox2dRuntime_h__ */

@@ -11,7 +11,6 @@
 #define HyShape2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Box2D/Box2D.h"
 
 class IHyLeafDraw2d;
 
