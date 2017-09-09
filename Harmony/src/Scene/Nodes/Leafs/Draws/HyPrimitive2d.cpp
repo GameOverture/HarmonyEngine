@@ -44,7 +44,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 
 /*virtual*/ bool HyPrimitive2d::IsEnabled() /*override*/
 {
-	return (IHyNode::IsEnabled() && m_pDrawBuffer != nullptr);
+	return (IHyNode::IsEnabled() && m_pDrawBuffer != nullptr && m_BoundingVolume.IsValid());
 }
 
 HyShape2d &HyPrimitive2d::GetShape()
@@ -105,36 +105,40 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 	switch(m_BoundingVolume.GetType())
 	{
 	case HYSHAPE_LineSegment: {
-		std::vector<glm::vec2> pointList;
-		pointList.push_back(glm::vec2(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1.x, static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1.y));
-		pointList.push_back(glm::vec2(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2.x, static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2.y));
+		std::vector<b2Vec2> pointList;
+		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1);
+		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2);
 		SetAsLineChain(&pointList[0], 2);
 	} break;
 
 	case HYSHAPE_LineLoop:
 	case HYSHAPE_LineChain: {
-		glm::vec2 *pVertList = reinterpret_cast<glm::vec2 *>(static_cast<b2ChainShape *>(pb2Shape)->m_vertices);
-		SetAsLineChain(pVertList, static_cast<b2ChainShape *>(pb2Shape)->m_count);
+		SetAsLineChain(static_cast<b2ChainShape *>(pb2Shape)->m_vertices, static_cast<b2ChainShape *>(pb2Shape)->m_count);
 	} break;
 
 	case HYSHAPE_Circle:
-		SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x, static_cast<b2CircleShape *>(pb2Shape)->m_p.y), static_cast<b2CircleShape *>(pb2Shape)->m_radius);
+		SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x,
+							  static_cast<b2CircleShape *>(pb2Shape)->m_p.y),
+					static_cast<b2CircleShape *>(pb2Shape)->m_radius);
 		break;
 
 	case HYSHAPE_Polygon: {
-		glm::vec2 *pVertList = reinterpret_cast<glm::vec2 *>(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices);
-
 		if(m_bWireframe)
 		{
-			// Make it loop
-			glm::vec2 vertLoopList[b2_maxPolygonVertices+1];
-			memcpy(vertLoopList, static_cast<b2PolygonShape *>(pb2Shape)->m_vertices, sizeof(glm::vec2) * static_cast<b2PolygonShape *>(pb2Shape)->m_count);
-			vertLoopList[static_cast<b2PolygonShape *>(pb2Shape)->m_count] = vertLoopList[0];
+			int32 iNumVerts = static_cast<b2PolygonShape *>(pb2Shape)->m_count;
+			HyAssert(iNumVerts >= 3, "HyPrimitive error, not enough verts for HYSHAPE_Polygon");
 
-			SetAsLineChain(vertLoopList, static_cast<b2PolygonShape *>(pb2Shape)->m_count + 1);
+			std::vector<b2Vec2> vertList;
+			for(int32 i = 0; i < iNumVerts; ++i)
+				vertList.push_back(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices[i]);
+
+			// Make it loop
+			vertList.push_back(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices[0]);
+
+			SetAsLineChain(&vertList[0], iNumVerts + 1);
 		}
 		else
-			SetAsPolygon(pVertList, static_cast<b2PolygonShape *>(pb2Shape)->m_count);
+			SetAsPolygon(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices, static_cast<b2PolygonShape *>(pb2Shape)->m_count);
 	} break;
 
 	default:
@@ -157,7 +161,7 @@ void HyPrimitive2d::ClearData()
 	m_ShaderUniforms.Clear();
 }
 
-void HyPrimitive2d::SetAsLineChain(glm::vec2 *pVertexList, uint32 uiNumVertices)
+void HyPrimitive2d::SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 {
 	ClearData();
 
@@ -178,14 +182,21 @@ void HyPrimitive2d::SetAsLineChain(glm::vec2 *pVertexList, uint32 uiNumVertices)
 	uint32 i, j;
 	for(i = j = 0; i < m_RenderState.GetNumInstances(); ++i, j += 8)
 	{
-		glm::vec2 vVecDirection = pVertexList[i + 1] - pVertexList[i + 0];
+		b2Vec2 vVecDirection = pVertexList[i + 1] - pVertexList[i + 0];
 
-		/*postion 1    */ m_pDrawBuffer[j + 0] = pVertexList[i + 0] * fCoordMod;
+		glm::vec2 ptVertScaled(pVertexList[i + 0].x, pVertexList[i + 0].y);
+		ptVertScaled *= fCoordMod;
+
+		/*postion 1    */ m_pDrawBuffer[j + 0] = ptVertScaled;
 		/*Normal  1    */ m_pDrawBuffer[j + 1] = glm::normalize(glm::vec2(-vVecDirection.y, vVecDirection.x));
 		/*postion 1 dup*/ m_pDrawBuffer[j + 2] = m_pDrawBuffer[j + 0];
 		/*Normal  1 inv*/ m_pDrawBuffer[j + 3] = m_pDrawBuffer[j + 1] * -1.0f;
 
-		/*postion 2    */ m_pDrawBuffer[j + 4] = pVertexList[i + 1] * fCoordMod;
+		ptVertScaled.x = pVertexList[i + 1].x;
+		ptVertScaled.y = pVertexList[i + 1].y;
+		ptVertScaled *= fCoordMod;
+
+		/*postion 2    */ m_pDrawBuffer[j + 4] = ptVertScaled;
 		/*Normal  2    */ m_pDrawBuffer[j + 5] = glm::normalize(glm::vec2(vVecDirection.y, -vVecDirection.x)) * -1.0f;
 		/*postion 2 dup*/ m_pDrawBuffer[j + 6] = m_pDrawBuffer[j + 4];
 		/*Normal  2 inv*/ m_pDrawBuffer[j + 7] = m_pDrawBuffer[j + 5] * -1.0f;
@@ -236,8 +247,8 @@ void HyPrimitive2d::SetAsCircle(glm::vec2 &ptCenter, float fRadius)
 		r1.y = 0.0f;
 		v1 = ptCenter + fRadius * r1;
 
-		std::vector<glm::vec2> vertexList;
-		vertexList.push_back(v1);
+		std::vector<b2Vec2> vertexList;
+		vertexList.push_back(b2Vec2(v1.x, v1.y));
 		
 		for(int32 i = 0; i < k_segments; ++i)
 		{
@@ -246,7 +257,7 @@ void HyPrimitive2d::SetAsCircle(glm::vec2 &ptCenter, float fRadius)
 			r2.y = sinInc * r1.x + cosInc * r1.y;
 			glm::vec2 v2 = ptCenter + fRadius * r2;
 
-			vertexList.push_back(v2);
+			vertexList.push_back(b2Vec2(v2.x, v2.y));
 
 			//m_lines->Vertex(v1, color);
 			//m_lines->Vertex(v2, color);
@@ -258,7 +269,7 @@ void HyPrimitive2d::SetAsCircle(glm::vec2 &ptCenter, float fRadius)
 	}
 }
 
-void HyPrimitive2d::SetAsPolygon(glm::vec2 *pVertexList, uint32 uiNumVertices)
+void HyPrimitive2d::SetAsPolygon(b2Vec2 *pVertexList, uint32 uiNumVertices)
 {
 	ClearData();
 
@@ -274,9 +285,17 @@ void HyPrimitive2d::SetAsPolygon(glm::vec2 *pVertexList, uint32 uiNumVertices)
 	uint32 uiBufferIndex = 0;
 	for(uint32 i = 1; i < uiNumVertices - 1; ++i)
 	{
-		m_pDrawBuffer[uiBufferIndex++] = pVertexList[0];
-		m_pDrawBuffer[uiBufferIndex++] = pVertexList[i];
-		m_pDrawBuffer[uiBufferIndex++] = pVertexList[i+1];
+		m_pDrawBuffer[uiBufferIndex].x = pVertexList[0].x;
+		m_pDrawBuffer[uiBufferIndex].y = pVertexList[0].y;
+		uiBufferIndex++;
+
+		m_pDrawBuffer[uiBufferIndex].x = pVertexList[i].x;
+		m_pDrawBuffer[uiBufferIndex].y = pVertexList[i].y;
+		uiBufferIndex++;
+
+		m_pDrawBuffer[uiBufferIndex].x = pVertexList[i+1].x;
+		m_pDrawBuffer[uiBufferIndex].y = pVertexList[i+1].y;
+		uiBufferIndex++;
 	}
 }
 

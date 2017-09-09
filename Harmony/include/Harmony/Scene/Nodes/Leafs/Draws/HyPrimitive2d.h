@@ -51,9 +51,9 @@ protected:
 private:
 	void ClearData();
 
-	void SetAsLineChain(glm::vec2 *pVertexList, uint32 uiNumVertices);
+	void SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices);
 	void SetAsCircle(glm::vec2 &ptCenter, float fRadius);
-	void SetAsPolygon(glm::vec2 *pVertexList, uint32 uiNumVertices);
+	void SetAsPolygon(b2Vec2 *pVertexList, uint32 uiNumVertices);
 
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
