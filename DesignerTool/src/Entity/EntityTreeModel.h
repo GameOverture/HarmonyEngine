@@ -7,6 +7,25 @@
 
 class EntityTreeModel;
 
+class EntityTreeItemData
+{
+public:
+    glm::vec2       m_ptPosition;
+    glm::vec2       m_vScale;
+    float           m_fRotation;
+
+    bool            m_bEnabled;
+    bool            m_bUpdateWhilePaused;
+    int             m_iTag;
+    int             m_iDisplayOrder;
+
+public:
+    EntityTreeItemData();
+    ~EntityTreeItemData();
+
+    QJsonObject GetJson();
+};
+
 class EntityTreeItem
 {
     EntityTreeModel *               m_pTreeModel;
@@ -15,7 +34,7 @@ class EntityTreeItem
     EntityTreeItem *                m_pParentItem;
     QList<EntityTreeItem *>         m_ChildList;
 
-    QList<QJsonObject>              m_StateDataList;
+    QList<EntityTreeItemData>              m_StateDataList;
 
 public:
     explicit EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem);

@@ -10,7 +10,7 @@
 #include "SpriteWidget.h"
 #include "ui_SpriteWidget.h"
 
-#include "UndoCmds.h"
+#include "GlobalUndoCmds.h"
 #include "SpriteUndoCmds.h"
 #include "DlgInputName.h"
 #include "AtlasWidget.h"

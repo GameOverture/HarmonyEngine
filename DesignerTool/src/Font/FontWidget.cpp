@@ -10,9 +10,9 @@
 #include "FontWidget.h"
 #include "ui_FontWidget.h"
 
-#include "HyGuiGlobal.h"
+#include "Global.h"
+#include "GlobalUndoCmds.h"
 #include "FontUndoCmds.h"
-#include "UndoCmds.h"
 #include "AtlasWidget.h"
 #include "FontModelView.h"
 #include "FontModels.h"

@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "ProjectDraw.h"
-#include "HyGuiGlobal.h"
+#include "GlobalUndoCmds.h"
 
 const char * const szCHECKERGRID_VERTEXSHADER = R"src(
 #version 400

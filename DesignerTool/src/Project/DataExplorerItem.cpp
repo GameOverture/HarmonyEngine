@@ -9,13 +9,13 @@
  *************************************************************************/
 #include "DataExplorerItem.h"
 #include "SpriteWidget.h"
-#include "HyGuiGlobal.h"
+#include "Global.h"
+#include "Project.h"
+#include "Harmony/Utilities/HyStrManip.h"
+
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
-
-#include "Project.h"
-#include "Harmony/Utilities/HyStrManip.h"
 
 DataExplorerItem::DataExplorerItem(HyGuiItemType eType, const QString sPath) :  m_eTYPE(eType),
                                                                                 m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str()),

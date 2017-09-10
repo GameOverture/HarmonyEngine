@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "SpriteModelView.h"
 #include "SpriteModels.h"
-#include "HyGuiGlobal.h"
+#include "Global.h"
 #include "SpriteUndoCmds.h"
 
 #include <QLineEdit>

@@ -4,6 +4,7 @@
 #include "IModel.h"
 #include "ProjectItem.h"
 #include "EntityTreeModel.h"
+#include "GlobalWidgetMappers.h"
 
 #include <QObject>
 #include <QJsonArray>

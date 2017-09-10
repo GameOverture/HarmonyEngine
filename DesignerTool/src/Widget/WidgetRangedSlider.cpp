@@ -10,7 +10,7 @@
 #include "WidgetRangedSlider.h"
 #include "ui_WidgetRangedSlider.h"
 
-#include "HyGuiGlobal.h"
+#include "Global.h"
 
 WidgetRangedSlider::WidgetRangedSlider(QWidget *parent) :   QWidget(parent),
                                                             ui(new Ui::WidgetRangedSlider)

@@ -12,7 +12,7 @@
 #include "AtlasWidget.h"
 #include "AudioWidgetManager.h"
 #include "MainWindow.h"
-#include "HyGuiGlobal.h"
+#include "Global.h"
 #include "ProjectItemMimeData.h"
 
 #include "Harmony/HyEngine.h"

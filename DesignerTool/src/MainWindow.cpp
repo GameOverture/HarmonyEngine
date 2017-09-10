@@ -10,18 +10,16 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+#include "Global.h"
 #include "DlgSetEngineLocation.h"
 #include "DlgNewProject.h"
 #include "DlgNewItem.h"
 #include "DlgInputName.h"
 #include "DlgProjectSettings.h"
-
 #include "ProjectWidget.h"
 #include "AtlasWidget.h"
 #include "AudioWidgetManager.h"
-
 #include "HyGuiRenderer.h"
-#include "HyGuiGlobal.h"
 
 #include <QFileDialog>
 #include <QShowEvent>

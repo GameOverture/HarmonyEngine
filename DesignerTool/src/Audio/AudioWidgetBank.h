@@ -10,8 +10,7 @@
 #ifndef AUDIOWIDGETBANK_H
 #define AUDIOWIDGETBANK_H
 
-#include "HyGuiGlobal.h"
-
+#include "Global.h"
 #include "AudioModelView.h"
 
 #include <QWidget>

@@ -182,10 +182,112 @@
          <bool>false</bool>
         </attribute>
        </widget>
-       <widget class="QWidget" name="verticalLayoutWidget">
-        <layout class="QVBoxLayout" name="verticalLayout_13">
+       <widget class="QFrame" name="SelectedItemFrame">
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
+        <property name="midLineWidth">
+         <number>1</number>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>2</number>
+         </property>
+         <property name="bottomMargin">
+          <number>2</number>
+         </property>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblSelectedItemIcon">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="pixmap">
+              <pixmap resource="../res/DesignerTool.qrc">:/icons16x16/Harmony.png</pixmap>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblSelectedItemText">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+               <underline>true</underline>
+              </font>
+             </property>
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
          <item>
           <widget class="QToolBox" name="toolBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>220</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>220</height>
+            </size>
+           </property>
            <property name="font">
             <font>
              <weight>75</weight>
@@ -193,15 +295,15 @@
             </font>
            </property>
            <property name="currentIndex">
-            <number>2</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="toolPageTransform">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>388</width>
-              <height>167</height>
+              <width>376</width>
+              <height>139</height>
              </rect>
             </property>
             <attribute name="label">
@@ -236,7 +338,7 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <item>
-                <widget class="QDoubleSpinBox" name="sbTransformX_2">
+                <widget class="QDoubleSpinBox" name="sbTransformX">
                  <property name="font">
                   <font>
                    <weight>50</weight>
@@ -255,7 +357,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QDoubleSpinBox" name="sbTransformY_2">
+                <widget class="QDoubleSpinBox" name="sbTransformY">
                  <property name="font">
                   <font>
                    <weight>50</weight>
@@ -294,7 +396,7 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_8">
                <item>
-                <widget class="QDoubleSpinBox" name="sbScaleX_2">
+                <widget class="QDoubleSpinBox" name="sbScaleX">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -322,7 +424,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QDoubleSpinBox" name="sbScaleY_2">
+                <widget class="QDoubleSpinBox" name="sbScaleY">
                  <property name="font">
                   <font>
                    <weight>50</weight>
@@ -356,7 +458,7 @@
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="lblRotation_2">
+                  <widget class="QLabel" name="lblRotation">
                    <property name="font">
                     <font>
                      <weight>50</weight>
@@ -372,7 +474,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="sbRotation_2">
+                  <widget class="QDoubleSpinBox" name="sbRotation">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
                      <horstretch>0</horstretch>
@@ -412,7 +514,7 @@
                 </layout>
                </item>
                <item>
-                <widget class="QDial" name="dial_2"/>
+                <widget class="QDial" name="dialRotation"/>
                </item>
               </layout>
              </item>
@@ -423,8 +525,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>388</width>
-              <height>121</height>
+              <width>376</width>
+              <height>139</height>
              </rect>
             </property>
             <attribute name="label">
@@ -448,7 +550,7 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QCheckBox" name="chkStartEnabled_2">
+              <widget class="QCheckBox" name="chkUpdateWhilePaused">
                <property name="font">
                 <font>
                  <weight>50</weight>
@@ -474,7 +576,7 @@
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QSpinBox" name="spinBox_9">
+              <widget class="QSpinBox" name="sbTag">
                <property name="font">
                 <font>
                  <weight>50</weight>
@@ -503,7 +605,7 @@
               </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QSpinBox" name="spinBox_8">
+              <widget class="QSpinBox" name="sbDisplayOrder">
                <property name="font">
                 <font>
                  <weight>50</weight>
@@ -521,6 +623,14 @@
             </layout>
            </widget>
            <widget class="QWidget" name="toolPageBoundingVolumes">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>376</width>
+              <height>139</height>
+             </rect>
+            </property>
             <attribute name="label">
              <string>User Bounding Volumes</string>
             </attribute>
@@ -632,24 +742,28 @@
           </widget>
          </item>
          <item>
+          <widget class="Line" name="toolBoxLine">
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <property name="lineWidth">
+            <number>3</number>
+           </property>
+           <property name="midLineWidth">
+            <number>1</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QStackedWidget" name="stackedWidget">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Sunken</enum>
-           </property>
-           <property name="lineWidth">
-            <number>2</number>
-           </property>
-           <property name="midLineWidth">
-            <number>1</number>
            </property>
            <property name="currentIndex">
             <number>0</number>

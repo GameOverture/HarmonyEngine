@@ -1,5 +1,20 @@
 #include "EntityTreeModel.h"
 
+EntityTreeItemData::EntityTreeItemData()
+{
+}
+
+EntityTreeItemData::~EntityTreeItemData()
+{
+}
+
+QJsonObject EntityTreeItemData::GetJson()
+{
+    return QJsonObject();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityTreeItem::EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem) :   m_pTreeModel(pTreeModel),
                                                                                     m_pItem(pItem),
                                                                                     m_pParentItem(nullptr)

@@ -10,10 +10,11 @@
 #ifndef UNDOCMDS
 #define UNDOCMDS
 
-#include "HyGuiGlobal.h"
+#include "Global.h"
 #include "ProjectItem.h"
 #include "Project.h"
 #include "IModel.h"
+#include "GlobalWidgetMappers.h"
 
 #include <QUndoCommand>
 #include <QComboBox>

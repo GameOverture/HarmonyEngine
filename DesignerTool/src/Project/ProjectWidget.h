@@ -10,7 +10,7 @@
 #ifndef DATAEXPLORERWIDGET_H
 #define DATAEXPLORERWIDGET_H
 
-#include "HyGuiGlobal.h"
+#include "Global.h"
 
 #include <QWidget>
 #include <QDir>

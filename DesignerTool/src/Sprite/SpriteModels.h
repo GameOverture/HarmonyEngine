@@ -12,6 +12,7 @@
 
 #include "IModel.h"
 #include "AtlasFrame.h"
+#include "GlobalWidgetMappers.h"
 
 #include <QObject>
 #include <QJsonArray>

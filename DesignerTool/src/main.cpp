@@ -10,7 +10,7 @@
 #include "MainWindow.h"
 #include <QApplication>
 
-#include "HyGuiGlobal.h"
+#include "Global.h"
 #include "AtlasFrame.h"
 
 int main(int argc, char *argv[])

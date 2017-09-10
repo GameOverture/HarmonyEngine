@@ -19,7 +19,6 @@ SOURCES += main.cpp \
     HyGuiRenderer.cpp \
     HyGuiDebugger.cpp \
     IDraw.cpp \
-    HyGuiGlobal.cpp \
     IModel.cpp \
     _Dependencies/QtWaitingSpinner/waitingspinnerwidget.cpp \
     _Dependencies/scriptum/imagecrop.cpp \
@@ -75,15 +74,14 @@ SOURCES += main.cpp \
     Project/ProjectWidget.cpp \
     Explorer/ExplorerTreeWidget.cpp \
     Entity/EntityCommon.cpp \
-    Entity/EntityUndoCmds.cpp
+    Entity/EntityUndoCmds.cpp \
+    Global/Global.cpp
 
 HEADERS  += \
     MainWindow.h \
     HyGuiRenderer.h \
     HyGuiDebugger.h \
     IDraw.h \
-    UndoCmds.h \
-    HyGuiGlobal.h \
     IModel.h \
     _Dependencies/QtWaitingSpinner/waitingspinnerwidget.h \
     _Dependencies/scriptum/imagepacker.h \
@@ -137,7 +135,10 @@ HEADERS  += \
     Project/ProjectWidget.h \
     Explorer/ExplorerTreeWidget.h \
     Entity/EntityCommon.h \
-    Entity/EntityUndoCmds.h
+    Entity/EntityUndoCmds.h \
+    Global/GlobalWidgetMappers.h \
+    Global/Global.h \
+    Global/GlobalUndoCmds.h
 
 FORMS    += \
     MainWindow.ui \
@@ -183,6 +184,7 @@ INCLUDEPATH += "$$PWD/Project"
 INCLUDEPATH += "$$PWD/Sprite"
 INCLUDEPATH += "$$PWD/Widget"
 INCLUDEPATH += "$$PWD/Explorer"
+INCLUDEPATH += "$$PWD/Global"
 
 INCLUDEPATH += "$$PWD/../../Harmony/include"
 DEPENDPATH += "$$PWD/../../Harmony/include"

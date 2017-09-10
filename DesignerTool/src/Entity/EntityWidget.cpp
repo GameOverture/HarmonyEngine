@@ -2,7 +2,7 @@
 #include "ui_EntityWidget.h"
 #include "Project.h"
 #include "EntityUndoCmds.h"
-#include "UndoCmds.h"
+#include "GlobalUndoCmds.h"
 #include "DlgInputName.h"
 
 EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
@@ -29,6 +29,11 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(pare
 
     EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
     ui->childrenTree->setModel(&pEntityModel->GetTreeModel());
+
+    connect(ui->sbRotation, SIGNAL(valueChanged(int)), ui->dialRotation, SLOT(setValue(int)));
+    connect(ui->dialRotation, SIGNAL(valueChanged(int)), ui->sbRotation, SLOT(setValue(int)));
+
+    on_childrenTree_clicked(QModelIndex());
 }
 
 EntityWidget::~EntityWidget()
@@ -120,9 +125,23 @@ void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
     EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer());
     if(pTreeItem == nullptr)
     {
+        ui->lblSelectedItemIcon->setVisible(false);
+        ui->lblSelectedItemText->setVisible(false);
+        ui->toolBox->setVisible(false);
+        ui->toolBoxLine->setVisible(false);
+
         ui->stackedWidget->setCurrentIndex(STACKED_Null);
         return;
     }
+
+    ui->lblSelectedItemIcon->setVisible(true);
+    ui->lblSelectedItemIcon->setPixmap(pTreeItem->GetItem()->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
+    ui->lblSelectedItemText->setVisible(true);
+    ui->lblSelectedItemText->setText(pTreeItem->GetItem()->GetName(false) % " Properties");
+    ui->toolBox->setVisible(true);
+    ui->toolBoxLine->setVisible(true);
+
+    //ui->sbTransformX-
 
     switch(pTreeItem->GetItem()->GetType())
     {
@@ -151,6 +170,7 @@ void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
         HyGuiLog("Unsupported Entity childrenTree clicked", LOGTYPE_Error);
         break;
     }
+
 
 }
 

@@ -12,7 +12,7 @@
 
 #include <QMessageBox>
 
-#include "HyGuiGlobal.h"
+#include "Global.h"
 
 DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObject packerSettingsObj, QWidget *parent) : QDialog(parent),
                                                                                                                         ui(new Ui::DlgAtlasGroupSettings),
