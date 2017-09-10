@@ -2,6 +2,7 @@
 #define ENTITYTREEMODEL_H
 
 #include "ProjectItem.h"
+#include "GlobalWidgetMappers.h"
 
 #include <QAbstractItemModel>
 
@@ -10,14 +11,16 @@ class EntityTreeModel;
 class EntityTreeItemData
 {
 public:
-    glm::vec2       m_ptPosition;
-    glm::vec2       m_vScale;
-    float           m_fRotation;
+    DoubleSpinBoxMapper     m_PosX;
+    DoubleSpinBoxMapper     m_PosY;
+    DoubleSpinBoxMapper     m_ScaleX;
+    DoubleSpinBoxMapper     m_ScaleY;
+    DoubleSpinBoxMapper     m_Rotation;
 
-    bool            m_bEnabled;
-    bool            m_bUpdateWhilePaused;
-    int             m_iTag;
-    int             m_iDisplayOrder;
+    CheckBoxMapper          m_Enabled;
+    CheckBoxMapper          m_UpdateWhilePaused;
+    SpinBoxMapper           m_Tag;
+    SpinBoxMapper           m_DisplayOrder;
 
 public:
     EntityTreeItemData();
@@ -28,13 +31,13 @@ public:
 
 class EntityTreeItem
 {
-    EntityTreeModel *               m_pTreeModel;
-    ProjectItem *                   m_pItem;
+    EntityTreeModel *                       m_pTreeModel;
+    ProjectItem *                           m_pItem;
 
-    EntityTreeItem *                m_pParentItem;
-    QList<EntityTreeItem *>         m_ChildList;
+    EntityTreeItem *                        m_pParentItem;
+    QList<EntityTreeItem *>                 m_ChildList;
 
-    QList<EntityTreeItemData>              m_StateDataList;
+    QList<EntityTreeItemData>               m_StateDataList;
 
 public:
     explicit EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem);
@@ -42,6 +45,7 @@ public:
 
     ProjectItem *GetItem();
     EntityTreeItem *GetParent();
+    EntityTreeItemData &GetData(int iIndex);
 
     EntityTreeItem *GetChild(int iRow);
     void AppendChild(EntityTreeItem *pChild);

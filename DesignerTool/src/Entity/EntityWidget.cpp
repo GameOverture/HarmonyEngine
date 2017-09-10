@@ -141,6 +141,16 @@ void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
     ui->toolBox->setVisible(true);
     ui->toolBoxLine->setVisible(true);
 
+    pTreeItem m_PosX;
+    m_PosY;
+    m_ScaleX;
+    m_ScaleY;
+    m_Rotation;
+
+    m_Enabled;
+    m_UpdateWhilePaused;
+    m_Tag;
+    m_DisplayOrder;
     //ui->sbTransformX-
 
     switch(pTreeItem->GetItem()->GetType())

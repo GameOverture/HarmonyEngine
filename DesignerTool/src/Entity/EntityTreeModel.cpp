@@ -35,6 +35,11 @@ EntityTreeItem *EntityTreeItem::GetParent()
     return m_pParentItem;
 }
 
+EntityTreeItemData &EntityTreeItem::GetData(int iIndex)
+{
+    return m_StateDataList[iIndex];
+}
+
 EntityTreeItem *EntityTreeItem::GetChild(int iRow)
 {
     if(iRow >= m_ChildList.size() || iRow < 0)
