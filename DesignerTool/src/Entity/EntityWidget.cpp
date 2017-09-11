@@ -78,6 +78,11 @@ EntityStateData *EntityWidget::GetCurStateData()
     return static_cast<EntityStateData *>(GetEntityModel()->GetStateData(ui->cmbStates->currentIndex()));
 }
 
+int EntityWidget::GetNumStates() const
+{
+    return ui->cmbStates->count();
+}
+
 void EntityWidget::on_actionAddSelectedChild_triggered()
 {
     if(GetCurSelectedTreeItem() == nullptr)
@@ -130,7 +135,8 @@ void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
         ui->toolBox->setVisible(false);
         ui->toolBoxLine->setVisible(false);
 
-        ui->stackedWidget->setCurrentIndex(STACKED_Null);
+        ui->propertyTree->setModel(nullptr);
+        //ui->stackedWidget->setCurrentIndex(STACKED_Null);
         return;
     }
 
@@ -138,48 +144,51 @@ void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
     ui->lblSelectedItemIcon->setPixmap(pTreeItem->GetItem()->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
     ui->lblSelectedItemText->setVisible(true);
     ui->lblSelectedItemText->setText(pTreeItem->GetItem()->GetName(false) % " Properties");
-    ui->toolBox->setVisible(true);
-    ui->toolBoxLine->setVisible(true);
 
-    pTreeItem m_PosX;
-    m_PosY;
-    m_ScaleX;
-    m_ScaleY;
-    m_Rotation;
+    ui->propertyTree->setModel(GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem));
 
-    m_Enabled;
-    m_UpdateWhilePaused;
-    m_Tag;
-    m_DisplayOrder;
-    //ui->sbTransformX-
+//    ui->toolBox->setVisible(true);
+//    ui->toolBoxLine->setVisible(true);
 
-    switch(pTreeItem->GetItem()->GetType())
-    {
-    case ITEM_Sprite:
-        ui->stackedWidget->setCurrentIndex(STACKED_Sprite);
-        break;
-    case ITEM_Entity:
-        ui->stackedWidget->setCurrentIndex(STACKED_Entity);
-        break;
-    case ITEM_Font:
-        ui->stackedWidget->setCurrentIndex(STACKED_Font);
-        break;
-    case ITEM_AtlasImage:
-        ui->stackedWidget->setCurrentIndex(STACKED_TexturedQuad);
-        break;
-    case ITEM_Audio:
-    case ITEM_Particles:
-    case ITEM_Spine:
-    case ITEM_Shader:
-    case ITEM_BoundingVolume:
-        ui->stackedWidget->setCurrentIndex(STACKED_BoundingVolume);
-        break;
-    case ITEM_Physics:
-        ui->stackedWidget->setCurrentIndex(STACKED_Physics);
-        break;
-        HyGuiLog("Unsupported Entity childrenTree clicked", LOGTYPE_Error);
-        break;
-    }
+////    pTreeItem->GetData(0).m_PosX;
+////    pTreeItem->GetData(0).m_PosY;
+////    pTreeItem->GetData(0).m_ScaleX;
+////    pTreeItem->GetData(0).m_ScaleY;
+////    pTreeItem->GetData(0).m_Rotation;
+
+////    pTreeItem->GetData(0).m_Enabled;
+////    pTreeItem->GetData(0).m_UpdateWhilePaused;
+////    pTreeItem->GetData(0).m_Tag;
+////    pTreeItem->GetData(0).m_DisplayOrder;
+//    //ui->sbTransformX-
+
+//    switch(pTreeItem->GetItem()->GetType())
+//    {
+//    case ITEM_Sprite:
+//        ui->stackedWidget->setCurrentIndex(STACKED_Sprite);
+//        break;
+//    case ITEM_Entity:
+//        ui->stackedWidget->setCurrentIndex(STACKED_Entity);
+//        break;
+//    case ITEM_Font:
+//        ui->stackedWidget->setCurrentIndex(STACKED_Font);
+//        break;
+//    case ITEM_AtlasImage:
+//        ui->stackedWidget->setCurrentIndex(STACKED_TexturedQuad);
+//        break;
+//    case ITEM_Audio:
+//    case ITEM_Particles:
+//    case ITEM_Spine:
+//    case ITEM_Shader:
+//    case ITEM_BoundingVolume:
+//        ui->stackedWidget->setCurrentIndex(STACKED_BoundingVolume);
+//        break;
+//    case ITEM_Physics:
+//        ui->stackedWidget->setCurrentIndex(STACKED_Physics);
+//        break;
+//        HyGuiLog("Unsupported Entity childrenTree clicked", LOGTYPE_Error);
+//        break;
+//    }
 
 
 }

@@ -1,11 +1,39 @@
 #include "EntityModel.h"
 
-EntityStateData::EntityStateData(IModel &modelRef, QJsonObject stateObj) : IStateData(modelRef, stateObj["name"].toString())
+EntityStateData::EntityStateData(IModel &modelRef, QJsonObject stateObj) :  IStateData(modelRef, stateObj["name"].toString())
 {
+    if(stateObj.empty() == false)
+    {
+    }
+    else
+    {
+
+    }
 }
 
 /*virtual*/ EntityStateData::~EntityStateData()
 {
+    for(auto iter = m_PropertiesMap.begin(); iter != m_PropertiesMap.end(); ++iter)
+    {
+        PropertiesModel *pPropertiesModel = iter.value();
+        delete pPropertiesModel;
+    }
+
+    m_PropertiesMap.clear();
+}
+
+PropertiesModel *EntityStateData::GetPropertiesModel(EntityTreeItem *pTreeItem)
+{
+    if(pTreeItem == nullptr)
+    {
+        HyGuiLog("EntityStateData::GetPropertiesModel was given a nullptr", LOGTYPE_Error);
+        return nullptr;
+    }
+
+    if(m_PropertiesMap.contains(pTreeItem) == false)
+        m_PropertiesMap[pTreeItem] = AllocNewPropertiesModel(pTreeItem->GetItem());
+
+    return m_PropertiesMap[pTreeItem];
 }
 
 /*virtual*/ void EntityStateData::AddFrame(AtlasFrame *pFrame) /*override*/
@@ -16,10 +44,46 @@ EntityStateData::EntityStateData(IModel &modelRef, QJsonObject stateObj) : IStat
 {
 }
 
+PropertiesModel *EntityStateData::AllocNewPropertiesModel(ProjectItem *pProjItem)
+{
+    PropertiesModel *pNewPropertiesModel = new PropertiesModel();
+
+    pNewPropertiesModel->AppendCategory("Transformation");
+    pNewPropertiesModel->AppendProperty("Transformation", "Position", PROPERTIESTYPE_ivec2);
+    pNewPropertiesModel->AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2);
+    pNewPropertiesModel->AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double);
+
+    pNewPropertiesModel->AppendCategory("Common");
+    pNewPropertiesModel->AppendProperty("Common", "Enabled", PROPERTIESTYPE_bool);
+    pNewPropertiesModel->AppendProperty("Common", "Update while game paused", PROPERTIESTYPE_bool);
+    pNewPropertiesModel->AppendProperty("Common", "User Tag", PROPERTIESTYPE_int);
+    pNewPropertiesModel->AppendProperty("Common", "Display Order", PROPERTIESTYPE_int);
+
+    switch(pProjItem->GetType())
+    {
+    case ITEM_Primitive:
+        pNewPropertiesModel->AppendCategory("Transformation");
+        break;
+    case ITEM_AtlasImage:
+        break;
+    case ITEM_Font:
+        break;
+    case ITEM_Sprite:
+        break;
+    case ITEM_Entity:
+        break;
+    default:
+        HyGuiLog("EntityTreeItem::EntityTreeItem - unsupported type: " % QString::number(pProjItem->GetType()), LOGTYPE_Error);
+    }
+
+    return pNewPropertiesModel;
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 EntityModel::EntityModel(ProjectItem *pItem, QJsonArray stateArray) :   IModel(pItem),
-                                                                        m_TreeModel(*pItem)
+                                                                        m_TreeModel(this, *pItem, stateArray.size())
 {
     // If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
     if(stateArray.empty() == false)
@@ -38,6 +102,14 @@ EntityModel::EntityModel(ProjectItem *pItem, QJsonArray stateArray) :   IModel(p
 EntityTreeModel &EntityModel::GetTreeModel()
 {
     return m_TreeModel;
+}
+
+PropertiesModel *EntityModel::GetPropertiesModel(int iStateIndex, EntityTreeItem *pTreeItem)
+{
+    if(iStateIndex < 0)
+        return nullptr;
+
+    return static_cast<EntityStateData *>(m_StateList[iStateIndex])->GetPropertiesModel(pTreeItem);
 }
 
 /*virtual*/ void EntityModel::OnSave() /*override*/

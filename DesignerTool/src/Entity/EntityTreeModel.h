@@ -3,60 +3,26 @@
 
 #include "ProjectItem.h"
 #include "GlobalWidgetMappers.h"
+#include "PropertiesModel.h"
+#include "IModelTreeItem.h"
 
 #include <QAbstractItemModel>
 
+class EntityModel;
 class EntityTreeModel;
 
-class EntityTreeItemData
+class EntityTreeItem : public IModelTreeItem
 {
-public:
-    DoubleSpinBoxMapper     m_PosX;
-    DoubleSpinBoxMapper     m_PosY;
-    DoubleSpinBoxMapper     m_ScaleX;
-    DoubleSpinBoxMapper     m_ScaleY;
-    DoubleSpinBoxMapper     m_Rotation;
-
-    CheckBoxMapper          m_Enabled;
-    CheckBoxMapper          m_UpdateWhilePaused;
-    SpinBoxMapper           m_Tag;
-    SpinBoxMapper           m_DisplayOrder;
+    EntityTreeModel *           m_pTreeModel;
+    ProjectItem *               m_pItem;
 
 public:
-    EntityTreeItemData();
-    ~EntityTreeItemData();
-
-    QJsonObject GetJson();
-};
-
-class EntityTreeItem
-{
-    EntityTreeModel *                       m_pTreeModel;
-    ProjectItem *                           m_pItem;
-
-    EntityTreeItem *                        m_pParentItem;
-    QList<EntityTreeItem *>                 m_ChildList;
-
-    QList<EntityTreeItemData>               m_StateDataList;
-
-public:
-    explicit EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem);
-    ~EntityTreeItem();
+    explicit EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem, uint uiNumStates);
+    virtual ~EntityTreeItem();
 
     ProjectItem *GetItem();
-    EntityTreeItem *GetParent();
-    EntityTreeItemData &GetData(int iIndex);
 
-    EntityTreeItem *GetChild(int iRow);
-    void AppendChild(EntityTreeItem *pChild);
-    void InsertChild(int iIndex, EntityTreeItem *pChild);
-    void RemoveChild(int iIndex);
-
-    int GetNumChildren() const;
-    int GetRow() const;
-    int GetCol() const;
-
-    QString GetToolTip() const;
+    virtual QString GetToolTip() const override;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,12 +31,15 @@ class EntityTreeModel : public QAbstractItemModel
 {
     Q_OBJECT
 
-    EntityTreeItem *                    m_pRootItem;
-    EntityTreeItem *                    m_pEntityItem;
+    EntityModel *               m_pEntityModel;
+    EntityTreeItem *            m_pRootItem;
+    EntityTreeItem *            m_pEntityItem;
 
 public:
-    explicit EntityTreeModel(ProjectItem &entityItemRef, QObject *parent = nullptr);
+    explicit EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityItemRef, int iNumStates, QObject *parent = nullptr);
     virtual ~EntityTreeModel();
+
+    int GetNumStates();
 
     // Basic functionality:
     QModelIndex index(int iRow, int iColumn, const QModelIndex &parent = QModelIndex()) const override;

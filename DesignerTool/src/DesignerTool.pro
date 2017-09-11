@@ -18,8 +18,6 @@ SOURCES += main.cpp \
     MainWindow.cpp \
     HyGuiRenderer.cpp \
     HyGuiDebugger.cpp \
-    IDraw.cpp \
-    IModel.cpp \
     _Dependencies/QtWaitingSpinner/waitingspinnerwidget.cpp \
     _Dependencies/scriptum/imagecrop.cpp \
     _Dependencies/scriptum/imagepacker.cpp \
@@ -75,14 +73,16 @@ SOURCES += main.cpp \
     Explorer/ExplorerTreeWidget.cpp \
     Entity/EntityCommon.cpp \
     Entity/EntityUndoCmds.cpp \
-    Global/Global.cpp
+    Shared/Global.cpp \
+    Shared/Properties/PropertiesModel.cpp \
+    Shared/IDraw.cpp \
+    Shared/IModel.cpp \
+    Shared/Properties/PropertiesTreeItems.cpp
 
 HEADERS  += \
     MainWindow.h \
     HyGuiRenderer.h \
     HyGuiDebugger.h \
-    IDraw.h \
-    IModel.h \
     _Dependencies/QtWaitingSpinner/waitingspinnerwidget.h \
     _Dependencies/scriptum/imagepacker.h \
     _Dependencies/scriptum/maxrects.h \
@@ -136,9 +136,14 @@ HEADERS  += \
     Explorer/ExplorerTreeWidget.h \
     Entity/EntityCommon.h \
     Entity/EntityUndoCmds.h \
-    Global/GlobalWidgetMappers.h \
-    Global/Global.h \
-    Global/GlobalUndoCmds.h
+    Shared/Global.h \
+    Shared/GlobalUndoCmds.h \
+    Shared/GlobalWidgetMappers.h \
+    Shared/Properties/PropertiesModel.h \
+    Shared/IDraw.h \
+    Shared/IModel.h \
+    Shared/Properties/PropertiesTreeItems.h \
+    Shared/IModelTreeItem.h
 
 FORMS    += \
     MainWindow.ui \
@@ -184,7 +189,8 @@ INCLUDEPATH += "$$PWD/Project"
 INCLUDEPATH += "$$PWD/Sprite"
 INCLUDEPATH += "$$PWD/Widget"
 INCLUDEPATH += "$$PWD/Explorer"
-INCLUDEPATH += "$$PWD/Global"
+INCLUDEPATH += "$$PWD/Shared"
+INCLUDEPATH += "$$PWD/Shared/Properties"
 
 INCLUDEPATH += "$$PWD/../../Harmony/include"
 DEPENDPATH += "$$PWD/../../Harmony/include"

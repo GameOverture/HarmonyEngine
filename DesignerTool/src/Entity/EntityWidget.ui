@@ -269,6 +269,13 @@
           </layout>
          </item>
          <item>
+          <widget class="QTreeView" name="propertyTree">
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QToolBox" name="toolBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -296,6 +303,21 @@
            </property>
            <property name="currentIndex">
             <number>0</number>
+           </property>
+           <property name="hjj" stdset="0">
+            <string/>
+           </property>
+           <property name="asdf" stdset="0">
+            <longLong>0</longLong>
+           </property>
+           <property name="fff" stdset="0">
+            <font/>
+           </property>
+           <property name="Position" stdset="0">
+            <point>
+             <x>-3</x>
+             <y>0</y>
+            </point>
            </property>
            <widget class="QWidget" name="toolPageTransform">
             <property name="geometry">
@@ -532,7 +554,7 @@
             <attribute name="label">
              <string>Common</string>
             </attribute>
-            <layout class="QFormLayout" name="formLayout">
+            <layout class="QGridLayout" name="gridLayout">
              <item row="0" column="0">
               <widget class="QCheckBox" name="chkStartEnabled">
                <property name="font">
@@ -766,7 +788,7 @@
             </sizepolicy>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="pageNull">
             <layout class="QVBoxLayout" name="verticalLayout_14">
