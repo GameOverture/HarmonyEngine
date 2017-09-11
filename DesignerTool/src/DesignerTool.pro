@@ -77,7 +77,8 @@ SOURCES += main.cpp \
     Shared/Properties/PropertiesModel.cpp \
     Shared/IDraw.cpp \
     Shared/IModel.cpp \
-    Shared/Properties/PropertiesTreeItems.cpp
+    Shared/Properties/PropertiesTreeItems.cpp \
+    Shared/Properties/PropertiesTreeView.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -143,7 +144,8 @@ HEADERS  += \
     Shared/IDraw.h \
     Shared/IModel.h \
     Shared/Properties/PropertiesTreeItems.h \
-    Shared/IModelTreeItem.h
+    Shared/IModelTreeItem.h \
+    Shared/Properties/PropertiesTreeView.h
 
 FORMS    += \
     MainWindow.ui \

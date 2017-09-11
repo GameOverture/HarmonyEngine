@@ -269,7 +269,7 @@
           </layout>
          </item>
          <item>
-          <widget class="QTreeView" name="propertyTree">
+          <widget class="PropertiesTreeView" name="propertyTree">
            <property name="alternatingRowColors">
             <bool>true</bool>
            </property>
@@ -1234,6 +1234,11 @@
    <class>FontTableView</class>
    <extends>QTableView</extends>
    <header>FontModelView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PropertiesTreeView</class>
+   <extends>QTreeView</extends>
+   <header>PropertiesTreeView.h</header>
   </customwidget>
  </customwidgets>
  <resources>

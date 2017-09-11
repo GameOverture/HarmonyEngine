@@ -57,40 +57,80 @@ bool PropertiesModel::setHeaderData(int section, Qt::Orientation orientation, co
     return false;
 }
 
-QModelIndex PropertiesModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex PropertiesModel::index(int iRow, int iColumn, const QModelIndex &parent) const
 {
-    // FIXME: Implement me!
-    return QModelIndex();
+    if(hasIndex(iRow, iColumn, parent) == false)
+        return QModelIndex();
+
+    PropertiesTreeItem *pParentItem;
+
+    if(parent.isValid() == false)
+        pParentItem = m_pRootItem;
+    else
+        pParentItem = static_cast<PropertiesTreeItem *>(parent.internalPointer());
+
+    PropertiesTreeItem *pChildItem = static_cast<PropertiesTreeItem *>(pParentItem->GetChild(iRow));
+    if(pChildItem)
+        return createIndex(iRow, iColumn, pChildItem);
+    else
+        return QModelIndex();
 }
 
 QModelIndex PropertiesModel::parent(const QModelIndex &index) const
 {
-    // FIXME: Implement me!
-    return QModelIndex();
+    if(index.isValid() == false)
+        return QModelIndex();
+
+    PropertiesTreeItem *pChildItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
+    PropertiesTreeItem *pParentItem = static_cast<PropertiesTreeItem *>(pChildItem->GetParent());
+
+    if(pParentItem == m_pRootItem)
+        return QModelIndex();
+
+    return createIndex(pParentItem->GetRow(), 0, pParentItem);
 }
 
-int PropertiesModel::rowCount(const QModelIndex &parent) const
+int PropertiesModel::rowCount(const QModelIndex &parentIndex) const
 {
-    if (!parent.isValid())
+    // Only data in column '0' has rows
+    if(!parentIndex.isValid() || parentIndex.column() > 0)
         return 0;
 
-    // FIXME: Implement me!
+    PropertiesTreeItem *pParentItem;
+    if(parentIndex.isValid() == false)
+        pParentItem = m_pRootItem;
+    else
+        pParentItem = static_cast<PropertiesTreeItem *>(parentIndex.internalPointer());
+
+    return pParentItem->GetNumChildren();
 }
 
 int PropertiesModel::columnCount(const QModelIndex &parent) const
 {
-    if (!parent.isValid())
-        return 0;
-
-    // FIXME: Implement me!
+    return 2;
 }
 
-QVariant PropertiesModel::data(const QModelIndex &index, int role) const
+QVariant PropertiesModel::data(const QModelIndex &index, int iRole) const
 {
-    if (!index.isValid())
+    if(index.isValid() == false)
         return QVariant();
 
-    // FIXME: Implement me!
+    PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
+
+    switch(iRole)
+    {
+    case Qt::DisplayRole:
+        if(index.column() == 0)
+            return pTreeItem->GetName();
+        else if(index.column() == 1)
+            return pTreeItem->GetValue();
+
+    //case Qt::DecorationRole:
+    //    return pTreeItem->GetItem()->GetIcon(SUBICON_None);
+    case Qt::ToolTipRole:
+        return pTreeItem->GetToolTip();
+    }
+
     return QVariant();
 }
 
