@@ -65,6 +65,7 @@ enum HyGuiItemType
     NUMITEMS = NUMTYPES - NUMDIR
 };
 
+// NOTE: Do not rearrange the order of this enum
 enum AtlasItemType
 {
     ATLASITEM_Unknown = -1,

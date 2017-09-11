@@ -363,6 +363,8 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	pShader->SetVertexAttributePtrs(uiDataOffset);
 
+	HyErrorCheck_OpenGL("DrawRenderState_2d", "Before DrawArrays");
+
 	if(renderState.IsEnabled(HyRenderState::DRAWINSTANCED))
 		glDrawArraysInstanced(m_eDrawMode, 0, renderState.GetNumVerticesPerInstance(), renderState.GetNumInstances());
 	else
