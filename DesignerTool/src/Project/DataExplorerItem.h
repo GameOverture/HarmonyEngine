@@ -13,7 +13,7 @@
 #include <QObject>
 #include <QTreeWidget>
 
-#include "HyGuiGlobal.h"
+#include "Global.h"
 #include "Harmony/HyEngine.h"
 
 class HyGuiDependencies;

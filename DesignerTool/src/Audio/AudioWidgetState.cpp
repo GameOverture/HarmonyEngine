@@ -10,12 +10,11 @@
 #include "AudioWidgetState.h"
 #include "ui_AudioWidgetState.h"
 
-#include "HyGuiGlobal.h"
-
+#include "Global.h"
 #include "AudioWidget.h"
 #include "AudioWidgetManager.h"
 
-#include "UndoCmds.h"
+#include "GlobalUndoCmds.h"
 
 AudioWidgetState::AudioWidgetState(AudioWidget *pOwner, QList<QAction *> stateActionList, QWidget *parent) :    QWidget(parent),
                                                                                                                 ui(new Ui::AudioWidgetState),

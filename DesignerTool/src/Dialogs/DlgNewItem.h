@@ -10,10 +10,10 @@
 #ifndef DLGNEWSPRITE_H
 #define DLGNEWSPRITE_H
 
-#include <QDialog>
-
-#include "HyGuiGlobal.h"
+#include "Global.h"
 #include "Project.h"
+
+#include <QDialog>
 
 namespace Ui {
 class DlgNewItem;

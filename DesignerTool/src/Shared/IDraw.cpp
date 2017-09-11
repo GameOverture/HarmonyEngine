@@ -12,7 +12,7 @@
 #include "IModel.h"
 #include "MainWindow.h"
 #include "HyGuiRenderer.h"
-#include "HyGuiGlobal.h"
+#include "Global.h"
 
 #include <QJsonDocument>
 #include <QJsonArray>

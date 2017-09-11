@@ -12,8 +12,7 @@
 
 #include "DlgInputName.h"
 #include "AudioWidgetState.h"
-
-#include "UndoCmds.h"
+#include "GlobalUndoCmds.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>

@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "HyGuiRenderer.h"
-#include "HyGuiGlobal.h"
+#include "Global.h"
 #include "ProjectItemMimeData.h"
 
 #include <QTimer>

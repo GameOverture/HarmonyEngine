@@ -14,6 +14,7 @@
 #include "FontModelView.h"
 #include "IModel.h"
 #include "AtlasFrame.h"
+#include "GlobalWidgetMappers.h"
 
 #include <QJsonArray>
 

@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "AtlasWidget.h"
 #include "ui_AtlasWidget.h"
-#include "HyGuiGlobal.h"
+#include "Global.h"
 #include "SpriteWidget.h"
 #include "DataExplorerItem.h"
 

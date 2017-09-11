@@ -40,6 +40,7 @@ public:
 
     void OnGiveMenuActions(QMenu *pMenu);
     EntityStateData *GetCurStateData();
+    int GetNumStates() const;
 
 private Q_SLOTS:
     void on_actionAddSelectedChild_triggered();

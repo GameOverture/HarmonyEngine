@@ -12,7 +12,7 @@
 #include "Project.h"
 #include "AtlasWidget.h"
 #include "MainWindow.h"
-#include "HyGuiGlobal.h"
+#include "Global.h"
 #include "DlgAtlasGroupSettings.h"
 
 #include "Harmony/HyEngine.h"

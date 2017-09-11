@@ -10,7 +10,7 @@
 #include "WidgetOutputLog.h"
 #include "ui_WidgetOutputLog.h"
 
-#include "HyGuiGlobal.h"
+#include "Global.h"
 
 #include <QStringBuilder>
 #include <QMessageBox>

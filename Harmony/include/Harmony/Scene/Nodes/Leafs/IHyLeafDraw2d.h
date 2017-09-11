@@ -61,7 +61,7 @@ public:
 
 	const HyShape2d &GetBoundingVolume();
 	const b2AABB &GetWorldAABB();
-	b2Shape *GetBoundingVolumeIndex(uint32 uiIndex);
+	b2Shape *GetUserBoundingVolume(uint32 uiIndex);
 
 	HyCoordinateType GetCoordinateType();
 	void UseCameraCoordinates();

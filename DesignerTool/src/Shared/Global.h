@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyGlobal.h
+ *	Global.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HYGUIGLOBALS_H
-#define HYGUIGLOBALS_H
+#ifndef GLOBAL_H
+#define GLOBAL_H
 
 #include <QString>
 #include <QIcon>
@@ -47,7 +47,7 @@ enum HyGuiItemType
 
     ITEM_Project,       // Sorted this way, so debugger uses "ITEM_Project" instead of "NUMDIR"
     NUMDIR = ITEM_Project,
-    
+
     ITEM_Prefix,        // Essentially a sub-directory
     ITEM_Primitive,
     ITEM_AtlasImage,
@@ -162,7 +162,7 @@ public:
     static QList<HyGuiItemType> SubDirList();
     static QStringList SubDirNameList();
     static QString AtlasTextureTypeString(HyTextureFormat eType);
-    
+
     static const QString ItemName(HyGuiItemType eItm)                  { return sm_sItemNames[eItm]; }
     static const QString ItemExt(HyGuiItemType eItem);
     static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)  { return sm_ItemIcons[eItm][eSubIcon]; }
@@ -173,7 +173,7 @@ public:
     static const QRegExpValidator *Vector2dValidator()                  { return sm_pVector2dValidator; }
 
     static const QString GetGuiFrameErrors(uint uiErrorFlags);
-    
+
     static bool IsEngineDirValid(const QDir &engineDir);
 
     static quint32 CRCData(quint32 crc, const uchar *buf, size_t len);
@@ -198,4 +198,4 @@ struct SortTreeWidgetsPredicate
     }
 };
 
-#endif // HYGUIGLOBALS_H
+#endif // GLOBAL_H

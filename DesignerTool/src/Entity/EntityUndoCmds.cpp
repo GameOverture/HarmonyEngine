@@ -26,7 +26,7 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &itemRef, void *pParame
     {
         case ENTITYCMD_AddNewChild: {
             setText("Add New Child");
-            m_pParameter = new EntityTreeItem(&m_pModel->GetTreeModel(), static_cast<ProjectItem *>(pParameter));
+            m_pParameter = new EntityTreeItem(&m_pModel->GetTreeModel(), static_cast<ProjectItem *>(pParameter), m_pWidget->GetNumStates());
         } break;
 
         case ENTITYCMD_AddPrimitive: {

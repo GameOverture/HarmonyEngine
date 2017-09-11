@@ -4,30 +4,29 @@
 #include "IModel.h"
 #include "ProjectItem.h"
 #include "EntityTreeModel.h"
+#include "GlobalWidgetMappers.h"
 
 #include <QObject>
 #include <QJsonArray>
 
 class EntityStateData : public IStateData
 {
-    CheckBoxMapper *    m_pChkMapper_Loop;
-    CheckBoxMapper *    m_pChkMapper_Reverse;
-    CheckBoxMapper *    m_pChkMapper_Bounce;
+    QMap<EntityTreeItem *, PropertiesModel *>   m_PropertiesMap;
 
 public:
     EntityStateData(IModel &modelRef, QJsonObject stateObj);
     virtual ~EntityStateData();
 
-    CheckBoxMapper *GetLoopMapper();
-    CheckBoxMapper *GetReverseMapper();
-    CheckBoxMapper *GetBounceMapper();
-
+    PropertiesModel *GetPropertiesModel(EntityTreeItem *pTreeItem);
     void GetStateInfo(QJsonObject &stateObjOut);
 
     void Refresh();
 
     virtual void AddFrame(AtlasFrame *pFrame) override;
     virtual void RelinquishFrame(AtlasFrame *pFrame) override;
+
+private:
+    PropertiesModel *AllocNewPropertiesModel(ProjectItem *pProjItem);
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityModel : public IModel
@@ -41,6 +40,7 @@ public:
     virtual ~EntityModel();
 
     EntityTreeModel &GetTreeModel();
+    PropertiesModel *GetPropertiesModel(int iStateIndex, EntityTreeItem *pTreeItem);
 
     virtual void OnSave() override;
     virtual QJsonObject PopStateAt(uint32 uiIndex) override;

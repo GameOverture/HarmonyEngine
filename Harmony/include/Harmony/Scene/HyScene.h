@@ -7,11 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyScene_h__
-#define __HyScene_h__
+#ifndef HyScene_h__
+#define HyScene_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Scene/Physics/HyBox2dRuntime.h"
 #include "Scene/Physics/HyDebugPhys2d.h"
 
@@ -19,24 +18,10 @@
 
 // Forward declarations
 class IHyNode;
-class IHyNode2d;
 class IHyLeafDraw2d;
 class IHyNode3d;
-
-class HySound;
-class HySpine2d;
-class HyMesh3d;
-class HyText2d;
-class HyPrimitive2d;
-
 class HyGfxComms;
-class HyPhysics2d;
-class HyTweenVec2;
-class HyTweenVec3;
-
 class HyWindow;
-class HyEntity2d;
-class HyTweenFloat;
 
 //////////////////////////////////////////////////////////////////////////
 class HyScene
@@ -98,5 +83,5 @@ private:
 	static bool Node2dSortPredicate(const IHyLeafDraw2d *pInst1, const IHyLeafDraw2d *pInst2);
 };
 
-#endif /* __HyScene_h__ */
+#endif /* HyScene_h__ */
 

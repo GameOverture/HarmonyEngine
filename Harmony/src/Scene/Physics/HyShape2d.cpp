@@ -11,13 +11,6 @@
 #include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-#if 0 // Use this if sizeof(b2Vec2) != sizeof(glm::vec2)
-	#define HYSHAPEVECTOR_GLM_TO_B2(x) new b2Vec2[uiNumVerts];
-...
-#else
-	#define HYSHAPEVECTOR_GLM_TO_B2(x) reinterpret_cast<const b2Vec2 *>(x);
-#endif
-
 HyShape2d::HyShape2d(IHyLeafDraw2d &ownerRef) :	m_OwnerRef(ownerRef),
 												m_eType(HYSHAPE_Unknown),
 												m_pShape(nullptr)
@@ -32,23 +25,22 @@ HyShape2d::HyShape2d(IHyLeafDraw2d &ownerRef) :	m_OwnerRef(ownerRef),
 const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 {
 	delete m_pShape;
+	m_pShape = nullptr;
 
 	switch(rhs.GetType())
 	{
 		case HYSHAPE_LineSegment: {
 			m_eType = HYSHAPE_LineSegment;
+			
 			b2EdgeShape *pRhsEdgeShape = static_cast<b2EdgeShape *>(rhs.m_pShape);
-
-			delete m_pShape;
-			m_pShape = new b2EdgeShape(*pRhsEdgeShape);
+			m_pShape = HY_NEW b2EdgeShape(*pRhsEdgeShape);
 		} break;
 
 		case HYSHAPE_LineLoop: {
 			m_eType = HYSHAPE_LineLoop;
+			
 			b2ChainShape *pRhsChainShape = static_cast<b2ChainShape *>(rhs.m_pShape);
-
-			delete m_pShape;
-			m_pShape = new b2ChainShape(*pRhsChainShape);
+			m_pShape = HY_NEW b2ChainShape(*pRhsChainShape);
 
 			// NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
 			static_cast<b2ChainShape *>(m_pShape)->m_vertices = nullptr;
@@ -57,10 +49,9 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 
 		case HYSHAPE_LineChain: {
 			m_eType = HYSHAPE_LineChain;
+			
 			b2ChainShape *pRhsChainShape = static_cast<b2ChainShape *>(rhs.m_pShape);
-
-			delete m_pShape;
-			m_pShape = new b2ChainShape(*pRhsChainShape);
+			m_pShape = HY_NEW b2ChainShape(*pRhsChainShape);
 
 			// NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
 			static_cast<b2ChainShape *>(m_pShape)->m_vertices = nullptr;
@@ -69,18 +60,16 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 
 		case HYSHAPE_Circle: {
 			m_eType = HYSHAPE_Circle;
+			
 			b2CircleShape *pRhsCircleShape = static_cast<b2CircleShape *>(rhs.m_pShape);
-
-			delete m_pShape;
-			m_pShape = new b2CircleShape(*pRhsCircleShape);
+			m_pShape = HY_NEW b2CircleShape(*pRhsCircleShape);
 		} break;
 		
 		case HYSHAPE_Polygon: {
 			m_eType = HYSHAPE_Polygon;
+			
 			b2PolygonShape *pRhsPolygonShape = static_cast<b2PolygonShape *>(rhs.m_pShape);
-
-			delete m_pShape;
-			m_pShape = new b2PolygonShape(*pRhsPolygonShape);
+			m_pShape = HY_NEW b2PolygonShape(*pRhsPolygonShape);
 		} break;
 
 		default:
@@ -110,7 +99,7 @@ void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
 	m_eType = HYSHAPE_LineSegment;
 
 	delete m_pShape;
-	m_pShape = new b2EdgeShape();
+	m_pShape = HY_NEW b2EdgeShape();
 	static_cast<b2EdgeShape *>(m_pShape)->Set(b2Vec2(pt1.x, pt1.y), b2Vec2(pt2.x, pt2.y));
 
 	m_OwnerRef.OnShapeSet(this);
@@ -118,26 +107,32 @@ void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
 
 void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
 {
+	HyAssert(uiNumVerts >= 3, "HyShape2d::SetAsLineLoop - not enough verts. Must be >= 3");
 	m_eType = HYSHAPE_LineLoop;
 
-	delete m_pShape;
-	m_pShape = new b2ChainShape();
+	std::vector<b2Vec2> vertList;
+	for(uint32 i = 0; i < uiNumVerts; ++i)
+		vertList.push_back(b2Vec2(pVertices[i].x, pVertices[i].y));
 
-	const b2Vec2 *pTmp = HYSHAPEVECTOR_GLM_TO_B2(pVertices);
-	static_cast<b2ChainShape *>(m_pShape)->CreateLoop(pTmp, uiNumVerts);
+	delete m_pShape;
+	m_pShape = HY_NEW b2ChainShape();
+	static_cast<b2ChainShape *>(m_pShape)->CreateLoop(&vertList[0], uiNumVerts);
 
 	m_OwnerRef.OnShapeSet(this);
 }
 
 void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 {
+	HyAssert(uiNumVerts >= 2, "HyShape2d::SetAsLineChain - not enough verts. Must be >= 2");
 	m_eType = HYSHAPE_LineChain;
 
-	delete m_pShape;
-	m_pShape = new b2ChainShape();
+	std::vector<b2Vec2> vertList;
+	for(uint32 i = 0; i < uiNumVerts; ++i)
+		vertList.push_back(b2Vec2(pVertices[i].x, pVertices[i].y));
 
-	const b2Vec2 *pTmp = HYSHAPEVECTOR_GLM_TO_B2(pVertices);
-	static_cast<b2ChainShape *>(m_pShape)->CreateChain(pTmp, uiNumVerts);
+	delete m_pShape;
+	m_pShape = HY_NEW b2ChainShape();
+	static_cast<b2ChainShape *>(m_pShape)->CreateChain(&vertList[0], uiNumVerts);
 
 	m_OwnerRef.OnShapeSet(this);
 }
@@ -152,7 +147,7 @@ void HyShape2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
 	m_eType = HYSHAPE_Circle;
 
 	delete m_pShape;
-	m_pShape = new b2CircleShape();
+	m_pShape = HY_NEW b2CircleShape();
 	static_cast<b2CircleShape *>(m_pShape)->m_p.Set(ptCenter.x, ptCenter.y);
 	static_cast<b2CircleShape *>(m_pShape)->m_radius = fRadius;
 
@@ -163,11 +158,13 @@ void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
 {
 	m_eType = HYSHAPE_Polygon;
 
-	delete m_pShape;
-	m_pShape = new b2PolygonShape();
+	std::vector<b2Vec2> vertList;
+	for(uint32 i = 0; i < uiCount; ++i)
+		vertList.push_back(b2Vec2(pPointArray[i].x, pPointArray[i].y));
 
-	const b2Vec2 *pTmp = HYSHAPEVECTOR_GLM_TO_B2(pPointArray);
-	static_cast<b2PolygonShape *>(m_pShape)->Set(pTmp, uiCount);
+	delete m_pShape;
+	m_pShape = HY_NEW b2PolygonShape();
+	static_cast<b2PolygonShape *>(m_pShape)->Set(&vertList[0], uiCount);
 
 	m_OwnerRef.OnShapeSet(this);
 }
@@ -177,7 +174,7 @@ void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight)
 	m_eType = HYSHAPE_Polygon;
 
 	delete m_pShape;
-	m_pShape = new b2PolygonShape();
+	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fHalfWidth, fHalfHeight);
 
 	m_OwnerRef.OnShapeSet(this);
@@ -188,7 +185,7 @@ void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 	m_eType = HYSHAPE_Polygon;
 
 	delete m_pShape;
-	m_pShape = new b2PolygonShape();
+	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(ptBoxCenter.x, ptBoxCenter.y), glm::radians(fRotDeg));
 
 	m_OwnerRef.OnShapeSet(this);

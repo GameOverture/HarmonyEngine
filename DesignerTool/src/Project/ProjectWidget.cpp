@@ -10,13 +10,13 @@
 #include "ProjectWidget.h"
 #include "ui_ProjectWidget.h"
 
+#include "Global.h"
 #include "MainWindow.h"
 #include "FontItem.h"
 #include "Project.h"
 #include "ProjectItemMimeData.h"
 #include "DataExplorerItem.h"
 #include "AtlasWidget.h"
-#include "HyGuiGlobal.h"
 #include "IModel.h"
 
 #include <QJsonArray>
