@@ -246,11 +246,6 @@ void IHyRenderer::Draw2d()
 	m_uiNumRenderStates = GetNumRenderStates2d();
 	for(uint32 i = 0; i < m_uiNumRenderStates; ++i, ++m_pCurRenderState)
 	{
-		if(i == 39)
-		{
-			int asdf = 0;
-			asdf++;
-		}
 		DrawRenderState_2d(*m_pCurRenderState);
 		m_PrevRenderState = *m_pCurRenderState;
 	}
