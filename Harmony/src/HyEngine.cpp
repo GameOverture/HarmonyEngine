@@ -74,7 +74,6 @@ HyEngine::~HyEngine()
 
 bool HyEngine::IsInitialized()
 {
-	m_Renderer.Render();
 	if(m_Assets.IsLoaded() == false)
 		return false;
 

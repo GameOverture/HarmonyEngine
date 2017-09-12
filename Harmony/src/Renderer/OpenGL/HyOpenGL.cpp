@@ -28,14 +28,14 @@ HyOpenGL::~HyOpenGL(void)
 	//////////////////////////////////////////////////////////////////////////
 	// Init GLEW
 	GLenum err = glewInit();
-	if(err != GLEW_OK)
-	{
-		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
+	if(err != GLEW_OK) {
+		HyError("glewInit() failed: " << err);
 	}
-
-	//const GLubyte *pExtStr = glGetString(GL_EXTENSIONS);
-
-	//WriteTextFile("GLExtensions.txt", glGetString(GL_EXTENSIONS));
+	else {
+		// Flush the OpenGL error state, as glew is known to bork it
+		while(GL_NO_ERROR != glGetError());
+	}
+	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
 
 	if(glewIsSupported("GL_VERSION_3_3") == false) {
 		HyError("At least OpenGL 3.3 must be supported");
@@ -95,12 +95,17 @@ HyOpenGL::~HyOpenGL(void)
 					sCompressedTextureFormats);
 
 	glEnable(GL_DEPTH_TEST);
+	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
+
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
 	//////////////////////////////////////////////////////////////////////////
 	// 2D setup
 	glGenBuffers(1, &m_hVBO2d);
+	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glGenBuffers");
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
+	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBindBuffer");
 
 	// Quad batch //////////////////////////////////////////////////////////////////////////
 	HyOpenGLShader *pShaderQuadBatch = HY_NEW HyOpenGLShader(HYSHADERPROG_QuadBatch);
@@ -121,6 +126,8 @@ HyOpenGL::~HyOpenGL(void)
 	pShaderLine2d->OnRenderThread(*this);
 
 	glEnable(GL_BLEND);
+	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
 
@@ -130,6 +137,7 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::StartRender()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	HyErrorCheck_OpenGL("HyOpenGL:StartRender", "glClear");
 }
 
 /*virtual*/ void HyOpenGL::Init_3d()
@@ -152,7 +160,10 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::Init_2d()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
+	HyErrorCheck_OpenGL("HyOpenGL:Init_2d", "glBindBuffer");
+
 	glBufferData(GL_ARRAY_BUFFER, HYDRAWBUFFERHEADER->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
+	HyErrorCheck_OpenGL("HyOpenGL:Init_2d", "glBufferData");
 
 	m_iCurCamIndex = 0;
 }
@@ -171,6 +182,7 @@ HyOpenGL::~HyOpenGL(void)
 	
 	// TODO: Without disabling glDepthMask, sprites fragments that overlap will be discarded, and primitive draws don't work
 	glDepthMask(false);
+	HyErrorCheck_OpenGL("HyOpenGL:BeginPass_2d", "glDepthMask");
 
 	return true;
 }
@@ -201,17 +213,21 @@ HyOpenGL::~HyOpenGL(void)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	glActiveTexture(GL_TEXTURE0);
+	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glActiveTexture");
+
 	if(HYSHADERPROG_QuadBatch == renderState.GetShaderId())
 	{
-		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, renderState.GetTextureHandle());
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
+
 		if(renderState.GetTextureHandle() != 0)
 			pShader->SetUniformGLSL("Tex", 0);
 	}
 	else
 	{
-		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -225,10 +241,16 @@ HyOpenGL::~HyOpenGL(void)
 				  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
 				  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
 
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glScissor");
+
 		glEnable(GL_SCISSOR_TEST);
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glEnable");
 	}
 	else
+	{
 		glDisable(GL_SCISSOR_TEST);
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDisable");
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -363,16 +385,19 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	pShader->SetVertexAttributePtrs(uiDataOffset);
 
-	HyErrorCheck_OpenGL("DrawRenderState_2d", "Before DrawArrays");
-
 	if(renderState.IsEnabled(HyRenderState::DRAWINSTANCED))
+	{
 		glDrawArraysInstanced(m_eDrawMode, 0, renderState.GetNumVerticesPerInstance(), renderState.GetNumInstances());
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDrawArraysInstanced");
+	}
 	else
 	{
 		uint32 uiStartVertex = 0;
 		for(uint32 i = 0; i < renderState.GetNumInstances(); ++i)
 		{
 			glDrawArrays(m_eDrawMode, uiStartVertex, renderState.GetNumVerticesPerInstance());
+			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDrawArrays");
+
 			uiStartVertex += renderState.GetNumVerticesPerInstance();
 		}
 	}
@@ -447,12 +472,16 @@ HyOpenGL::~HyOpenGL(void)
 
 	GLuint hGLTexture;
 	glGenTextures(1, &hGLTexture);
+	HyErrorCheck_OpenGL("HyOpenGLShader::AddTexture", "glGenTextures");
+
 	glBindTexture(GL_TEXTURE_2D, hGLTexture);
+	HyErrorCheck_OpenGL("HyOpenGLShader::AddTexture", "glBindTexture");
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // GL_NEAREST
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // GL_NEAREST
+	HyErrorCheck_OpenGL("HyOpenGLShader::AddTexture", "glTexParameteri");
 
 	if(bIsPixelDataCompressed == false)
 	{
@@ -478,9 +507,11 @@ HyOpenGL::~HyOpenGL(void)
 
 	GLuint hGLTextureArray;
 	glGenTextures(1, &hGLTextureArray);
+	HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glGenTextures");
 
 	//glActiveTexture(GL_TEXTURE0 + hGLTextureArray);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, hGLTextureArray);
+	HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glBindTexture");
 
 	// Create (blank) storage for the texture array
 	GLenum eError = GL_NO_ERROR;
@@ -514,6 +545,8 @@ HyOpenGL::~HyOpenGL(void)
 						eFormat,				// format
 						GL_UNSIGNED_BYTE,		// type
 						pixelDataList[i]);		// pointer to pixel data
+
+		HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glTexSubImage3D");
 	}
 
 	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -522,6 +555,7 @@ HyOpenGL::~HyOpenGL(void)
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glTexParameteri");
 
 	return hGLTextureArray;
 }
@@ -529,6 +563,7 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::DeleteTexture(uint32 uiTextureHandle)
 {
 	glDeleteTextures(1, &uiTextureHandle);
+	HyErrorCheck_OpenGL("HyOpenGL:DeleteTexture", "glDeleteTextures");
 }
 
 /*virtual*/ void HyOpenGL::OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags)
@@ -561,6 +596,8 @@ void HyOpenGL::SetCameraMatrices_2d(bool bUseCameraView)
 			   static_cast<GLint>(viewportRect.bottom * m_RenderSurfaceIter->GetHeight()),
 			   static_cast<GLsizei>(fWidth),
 			   static_cast<GLsizei>(fHeight));
+
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetCameraMatrices_2d", "glViewport");
 
 	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f, 0.0f, 1.0f);
 }

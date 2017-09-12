@@ -211,6 +211,7 @@ void IHyRenderer::Render()
 	m_RenderSurfaceIter = m_RenderSurfaceList.begin();
 	while(m_RenderSurfaceIter != m_RenderSurfaceList.end())
 	{
+		HyErrorCheck_OpenGL("Render", "Before StartRender");
 		StartRender();
 
 		Init_3d();

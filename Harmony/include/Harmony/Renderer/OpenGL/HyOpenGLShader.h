@@ -39,7 +39,7 @@ public:
 	bool IsLinked();
 
 	void BindAttribLocation(GLuint location, const char *szName);
-	uint32 GetAttribLocation(const char *szName);
+	GLint GetAttribLocation(const char *szName);
 
 	void BindFragDataLocation(GLuint location, const char *szName);
 

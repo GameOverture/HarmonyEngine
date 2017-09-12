@@ -198,6 +198,7 @@ HWND HyOpenGL_Win::GetHWND(int32 iWindowIndex)
 	if(m_RenderSurfaceIter->GetType() == HYRENDERSURFACE_Window)
 	{
 		wglMakeCurrent(GetDC(m_RenderSurfaceIter->GetHandle()), m_hGLContext);
+		HyErrorCheck_OpenGL("HyOpenGL_Win::StartRender", "wglMakeCurrent");
 
 		//if(bDirty)
 		// TODO: If fullscreen, make change here
@@ -240,6 +241,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				HDC hDC = GetDC(hWnd);
 				pThis->m_hGLContext = wglCreateContext(hDC);
 				wglMakeCurrent(hDC, pThis->m_hGLContext);
+				HyErrorCheck_OpenGL("WndProc:WM_CREATE", "wglMakeCurrent");
 			}
 		} break;
 
@@ -248,8 +250,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			HDC hDeviceContext = GetDC(hWnd);
 			wglMakeCurrent(hDeviceContext, pThis->m_hGLContext);
+			HyErrorCheck_OpenGL("WndProc:WM_DESTROY", "wglMakeCurrent");
 
 			wglDeleteContext(pThis->m_hGLContext);
+			HyErrorCheck_OpenGL("WndProc:WM_DESTROY", "wglDeleteContext");
+
 			PostQuitMessage(0);
 
 			pThis->RequestQuit();

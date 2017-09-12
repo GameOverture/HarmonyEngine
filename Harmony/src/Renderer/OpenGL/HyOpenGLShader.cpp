@@ -39,6 +39,7 @@ void HyOpenGLShader::CompileFromString(HyShaderType eType)
 	{
 		m_hProgHandle = glCreateProgram();
 		HyAssert(m_hProgHandle != 0, "Unable to create shader program");
+		HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glCreateProgram");
 	}
 
 	GLuint iShaderHandle = 0;
@@ -53,16 +54,22 @@ void HyOpenGLShader::CompileFromString(HyShaderType eType)
 	default:
 		HyError("Unknown shader type");
 	}
+	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glCreateShader");
 
 	// Compile the shader from the passed in source code
 	const char *szSrc = m_sSourceCode[eType].c_str();
 	glShaderSource(iShaderHandle, 1, &szSrc, NULL);
+	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glShaderSource");
+
 	glCompileShader(iShaderHandle);
+	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glCompileShader");
 
 #ifdef HY_DEBUG
 	// Check for errors
 	GLint result;
 	glGetShaderiv(iShaderHandle, GL_COMPILE_STATUS, &result);
+	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glGetShaderiv");
+
 	if(GL_FALSE == result)
 	{
 		// Compile failed
@@ -82,7 +89,7 @@ void HyOpenGLShader::CompileFromString(HyShaderType eType)
 	
 	// Compile succeeded, attach shader
 	glAttachShader(m_hProgHandle, iShaderHandle);
-	HyErrorCheck_OpenGL("HyOpenGLShader::CompileFromString", "glAttachShader");
+	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glAttachShader");
 }
 
 void HyOpenGLShader::Link()
@@ -126,7 +133,10 @@ void HyOpenGLShader::Use()
 		return;
 
 	glBindVertexArray(m_hVAO);
+	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
+
 	glUseProgram(m_hProgHandle);
+	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glUseProgram");
 }
 
 void HyOpenGLShader::SetVertexAttributePtrs(size_t uiStartOffset)
@@ -230,6 +240,8 @@ void HyOpenGLShader::SetVertexAttributePtrs(size_t uiStartOffset)
 			uiOffset += sizeof(glm::vec4);
 			break;
 		}
+
+		HyErrorCheck_OpenGL("HyOpenGLShader::SetVertexAttributePtrs", "glVertexAttribPointer[" << m_VertexAttributeList[i].eVarType << "]");
 	}
 #endif
 }
@@ -247,137 +259,174 @@ bool HyOpenGLShader::IsLinked()
 void HyOpenGLShader::BindAttribLocation(GLuint location, const char *szName)
 {
 	glEnableVertexAttribArray(location);
+	HyErrorCheck_OpenGL("HyOpenGLShader::BindAttribLocation", "glEnableVertexAttribArray");
+
 	glBindAttribLocation(m_hProgHandle, location, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::BindAttribLocation", "glBindAttribLocation");
 }
 
-uint32 HyOpenGLShader::GetAttribLocation(const char *szName)
+GLint HyOpenGLShader::GetAttribLocation(const char *szName)
 {
-	return glGetAttribLocation(m_hProgHandle, szName);
+	GLint iRetVal = glGetAttribLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::GetAttribLocation", "glGetAttribLocation");
+
+	return iRetVal;
 }
 
 void HyOpenGLShader::BindFragDataLocation(GLuint location, const char *szName)
 {
 	glBindFragDataLocation(m_hProgHandle, location, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::BindFragDataLocation", "glBindFragDataLocation");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::bvec2 &v)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniform2i(loc, v.x, v.y);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform2i");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::bvec3 &v)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniform3i(loc, v.x, v.y, v.z);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform3i");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::bvec4 &v)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 	
 	glUniform4i(loc, v.x, v.y, v.z, v.w);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform4i");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::ivec2 &v)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniform2i(loc, v.x, v.y);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform2i");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::ivec3 &v)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniform3i(loc, v.x, v.y, v.z);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform3i");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::ivec4 &v)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniform4i(loc, v.x, v.y, v.z, v.w);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform4i");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::vec2 &v)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniform2f(loc, v.x, v.y);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform2f");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::vec3 &v)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniform3f(loc, v.x, v.y, v.z);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform3f");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::vec4 &v)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniform4f(loc, v.x, v.y, v.z, v.w);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform4f");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::mat4 &m)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniformMatrix4fv(loc, 1, GL_FALSE, &m[0][0]);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniformMatrix4fv");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, const glm::mat3 &m)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniformMatrix3fv(loc, 1, GL_FALSE, &m[0][0]);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniformMatrix3fv");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, float val)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniform1f(loc, val);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1f");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, int32 val)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniform1i(loc, val);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1i");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, uint32 val)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniform1ui(loc, val);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1ui");
 }
 
 void HyOpenGLShader::SetUniformGLSL(const char *szName, bool val)
 {
 	GLint loc = glGetUniformLocation(m_hProgHandle, szName);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
 	HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szName << "\"");
 
 	glUniform1i(loc, val);
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1i");
 }
 
 void HyOpenGLShader::PrintActiveUniforms()
