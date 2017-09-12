@@ -10,7 +10,7 @@
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
-HyRenderState::HyRenderState() :	m_eRenderMode(HYRENDERMODE_Unknown),
+HyRenderState::HyRenderState() :	m_iRenderMode(HYRENDERMODE_Unknown),
 									m_uiAttributeFlags(0),
 									m_uiTextureBindHandle(0),
 									m_fLineThickness(1.0f),
@@ -31,12 +31,12 @@ HyRenderState::~HyRenderState(void)
 
 void HyRenderState::SetRenderMode(HyRenderMode eRenderMode)
 {
-	m_eRenderMode = eRenderMode;
+	m_iRenderMode = eRenderMode;
 }
 
 HyRenderMode HyRenderState::GetRenderMode()
 {
-	return m_eRenderMode;
+	return static_cast<HyRenderMode>(m_iRenderMode);
 }
 
 void HyRenderState::SetDataOffset(size_t uiVertexDataOffset)
@@ -186,7 +186,7 @@ void HyRenderState::SetLineThickness(float fParam)
 
 bool HyRenderState::operator==(const HyRenderState &right) const
 {
-	if(m_eRenderMode == right.m_eRenderMode &&
+	if(m_iRenderMode == right.m_iRenderMode &&
 	   m_uiAttributeFlags == right.m_uiAttributeFlags &&
 	   m_uiTextureBindHandle == right.m_uiTextureBindHandle &&
 	   m_iShaderId == right.m_iShaderId &&
@@ -207,7 +207,7 @@ bool HyRenderState::operator!=(const HyRenderState &right) const
 
 bool HyRenderState::operator< (const HyRenderState &right) const
 {
-	if(this->m_eRenderMode == right.m_eRenderMode)
+	if(this->m_iRenderMode == right.m_iRenderMode)
 	{
 		if(m_uiAttributeFlags == right.m_uiAttributeFlags)
 		{
@@ -220,7 +220,7 @@ bool HyRenderState::operator< (const HyRenderState &right) const
 			return m_uiAttributeFlags < right.m_uiAttributeFlags;
 	}
 	else
-		return this->m_eRenderMode < right.m_eRenderMode;
+		return this->m_iRenderMode < right.m_iRenderMode;
 }
 
 bool HyRenderState::operator> (const HyRenderState &right) const

@@ -307,22 +307,6 @@ void HyScene::WriteDrawBuffer()
 		uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
 	}
 
-	//if(m_DrawPhys2d.IsDrawEnabled())
-	//{
-	//	m_DrawPhys2d.Reset();
-	//	m_b2World.DrawDebugData();
-
-	//	uint32 uiNumPhysDraws = m_DrawPhys2d.GetNumPhysDraws();
-	//	for(uint32 i = 0; i < uiNumPhysDraws; ++i)
-	//	{
-	//		new (m_pCurWritePos) HyDrawPrimitive2d(*m_DrawPhys2d.GetInstPtr(i)->GetPrimitive(), uiVertexDataOffset, pCurVertexWritePos);
-	//		m_pCurWritePos += sizeof(HyDrawPrimitive2d);
-
-	//		uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
-	//		iCount++;
-	//	}
-	//}
-
 	*(reinterpret_cast<uint32 *>(pWriteNum2dInstsHere)) = iCount;
 	pDrawHeader->uiVertexBufferSize2d = pCurVertexWritePos - pStartVertexWritePos;
 
@@ -337,7 +321,7 @@ void HyScene::WriteDrawBuffer()
 	if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
 	{
 		if(pInst1->GetRenderState() == pInst2->GetRenderState())
-			return reinterpret_cast<const char *>(pInst1) > reinterpret_cast<const char *>(pInst2);
+			return reinterpret_cast<const char *>(pInst1) < reinterpret_cast<const char *>(pInst2);
 
 		return pInst1->GetRenderState() < pInst2->GetRenderState();
 	}

@@ -42,7 +42,7 @@ public:
 	};
 
 private:
-	HyRenderMode		m_eRenderMode;
+	int32				m_iRenderMode;
 	uint32				m_uiAttributeFlags;
 	uint32				m_uiTextureBindHandle;
 	float				m_fLineThickness;

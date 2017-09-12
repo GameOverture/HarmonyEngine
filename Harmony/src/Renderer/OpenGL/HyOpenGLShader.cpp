@@ -15,16 +15,18 @@
 #include <algorithm>
 
 HyOpenGLShader::HyOpenGLShader(int32 iId) :	IHyShader(iId),
+											m_hVAO(0),
+											m_uiStride(0),
 											m_hProgHandle(0),
-											m_bLinked(false),
-											m_uiStride(0)
+											m_bLinked(false)
 {
 }
 
 HyOpenGLShader::HyOpenGLShader(int32 iId, std::string sPrefix, std::string sName) :	IHyShader(iId, sPrefix, sName),
+																					m_hVAO(0),
+																					m_uiStride(0),
 																					m_hProgHandle(0),
-																					m_bLinked(false),
-																					m_uiStride(0)
+																					m_bLinked(false)
 {
 }
 
@@ -529,6 +531,8 @@ void HyOpenGLShader::PrintActiveAttribs()
 
 		if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec2 || m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec3 || m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec4)
 		{
+			HyError("HYSHADERVAR_dvec2, HYSHADERVAR_dvec3, or HYSHADERVAR_dvec4 is not implemented");
+
 			glEnableVertexAttribArray(uiLocation + 0);
 			glEnableVertexAttribArray(uiLocation + 1);
 
