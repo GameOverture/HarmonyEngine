@@ -22,6 +22,9 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(pare
     ui->btnInsertBoundingVolume->setDefaultAction(ui->actionInsertBoundingVolume);
     ui->btnInsertPhysics->setDefaultAction(ui->actionInsertPhysicsBody);
 
+    ui->cmbStates->clear();
+    ui->cmbStates->setModel(m_ItemRef.GetModel());
+
     ui->childrenTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->childrenTree->setDragEnabled(true);
     ui->childrenTree->setDropIndicatorShown(true);

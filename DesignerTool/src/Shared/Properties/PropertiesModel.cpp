@@ -41,21 +41,31 @@ bool PropertiesModel::AppendProperty(QString sCategoryName, QString sName, Prope
     pCategory->AppendChild(new PropertiesTreeItem(eType, sName, this));
 }
 
-QVariant PropertiesModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant PropertiesModel::headerData(int iSection, Qt::Orientation orientation, int role) const
 {
-    // FIXME: Implement me!
+    if(role == Qt::TextAlignmentRole)
+        return Qt::AlignCenter;
+
+    if(role == Qt::DisplayRole)
+    {
+        if(iSection == 0)
+            return "Property";
+        else
+            return "Value";
+    }
+
     return QVariant();
 }
 
-bool PropertiesModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
-{
-    if (value != headerData(section, orientation, role)) {
-        // FIXME: Implement me!
-        Q_EMIT headerDataChanged(orientation, section, section);
-        return true;
-    }
-    return false;
-}
+//bool PropertiesModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
+//{
+//    if (value != headerData(section, orientation, role)) {
+//        // FIXME: Implement me!
+//        Q_EMIT headerDataChanged(orientation, section, section);
+//        return true;
+//    }
+//    return false;
+//}
 
 QModelIndex PropertiesModel::index(int iRow, int iColumn, const QModelIndex &parent) const
 {
