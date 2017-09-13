@@ -7,14 +7,12 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyWindow_h__
-#define __HyWindow_h__
+#ifndef HyWindow_h__
+#define HyWindow_h__
 
 #include "Afx/HyStdAfx.h"
-
+#include "Renderer/Components/HyRenderSurface.h"
 #include "Scene/Nodes/Leafs/Misc/HyCamera.h"
-
-#include "Threading/BasicSync.h"
 
 struct HyMonitorDeviceInfo
 {
@@ -40,26 +38,19 @@ struct HyMonitorDeviceInfo
 			return this->iWidth == right.iWidth && this->iHeight == right.iHeight;
 		}
 	};
-	std::vector<Resolution>	vResolutions;
+	std::vector<Resolution>	resolutionList;
 };
 
-// TODO: Make this class threadsafe between game app and renderer
 class HyWindow
 {
-	friend class HyScene;
 	friend class IHyRenderer;
+	friend class HyScene;
 
+	HyWindowInfo							m_Info;
 	static std::vector<HyMonitorDeviceInfo>	sm_MonitorInfoList;
-	static BasicSection						sm_csInfo;
-
-	HyWindowInfo							m_Info_Update;	// On the application's update thread
-	HyWindowInfo							m_Info_Shared;
-	HyWindowInfo							m_Info_Render;	// Read-only contents for render thread
 	
 	std::vector<HyCamera2d *>				m_Cams2dList;
 	std::vector<HyCamera3d *>				m_Cams3dList;
-
-	BasicSection							m_cs;
 
 public:
 	HyWindow();
@@ -90,14 +81,11 @@ public:
 
 	glm::vec2			ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
 
-	static void			MonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &vDeviceInfoOut);
+	static void			MonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &monitorInfoListOut);
 
 private:
 	static void			SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info);
-
-	void				Update();
-
-	HyWindowInfo &		Update_Render();	// Only invoked on the render thread
+	void Update_Render(HyRenderSurface &renderSurfaceRef);
 };
 
-#endif /* __HyWindow_h__ */
+#endif /* HyWindow_h__ */

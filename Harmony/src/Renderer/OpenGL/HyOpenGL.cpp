@@ -567,10 +567,6 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGL:DeleteTexture", "glDeleteTextures");
 }
 
-/*virtual*/ void HyOpenGL::OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags)
-{
-}
-
 void HyOpenGL::SetCameraMatrices_2d(bool bUseCameraView)
 {
 	HyRectangle<float> viewportRect;

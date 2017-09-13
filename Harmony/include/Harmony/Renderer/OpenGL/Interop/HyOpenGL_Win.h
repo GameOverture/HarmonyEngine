@@ -32,8 +32,6 @@ public:
 
 	virtual void StartRender() override;
 	virtual void FinishRender() override;
-
-	virtual void OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags) override;
 };
 
 #endif /* HyOpenGL_Win_h__ */

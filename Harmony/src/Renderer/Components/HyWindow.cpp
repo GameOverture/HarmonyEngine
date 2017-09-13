@@ -10,7 +10,6 @@
 #include "Renderer/Components/HyWindow.h"
 
 std::vector<HyMonitorDeviceInfo>	HyWindow::sm_MonitorInfoList;
-BasicSection						HyWindow::sm_csInfo;
 
 HyWindow::HyWindow()
 {
@@ -27,51 +26,51 @@ HyWindow::~HyWindow(void)
 
 const HyWindowInfo &HyWindow::GetWindowInfo()
 {
-	return m_Info_Update;
+	return m_Info;
 }
 
 std::string HyWindow::GetTitle()
 {
-	return m_Info_Update.sName;
+	return m_Info.sName;
 }
 
 void HyWindow::SetTitle(std::string sTitle)
 {
-	m_Info_Update.sName = sTitle;
-	m_Info_Update.uiDirtyFlags |= HyWindowInfo::FLAG_Title;
+	m_Info.sName = sTitle;
+	m_Info.uiDirtyFlags |= HyWindowInfo::FLAG_Title;
 }
 
 glm::ivec2 HyWindow::GetResolution()
 {
-	return m_Info_Update.vResolution;
+	return m_Info.vResolution;
 }
 
 void HyWindow::SetResolution(glm::ivec2 vResolution)
 {
-	m_Info_Update.vResolution = vResolution;
-	m_Info_Update.uiDirtyFlags |= HyWindowInfo::FLAG_Resolution;
+	m_Info.vResolution = vResolution;
+	m_Info.uiDirtyFlags |= HyWindowInfo::FLAG_Resolution;
 }
 
 glm::ivec2 HyWindow::GetLocation()
 {
-	return m_Info_Update.vLocation;
+	return m_Info.vLocation;
 }
 
 void HyWindow::SetLocation(glm::ivec2 ptLocation)
 {
-	m_Info_Update.vLocation = ptLocation;
-	m_Info_Update.uiDirtyFlags |= HyWindowInfo::FLAG_Location;
+	m_Info.vLocation = ptLocation;
+	m_Info.uiDirtyFlags |= HyWindowInfo::FLAG_Location;
 }
 
 HyWindowType HyWindow::GetType()
 {
-	return m_Info_Update.eType;
+	return m_Info.eType;
 }
 
 void HyWindow::SetType(HyWindowType eType)
 {
-	m_Info_Update.eType = eType;
-	m_Info_Update.uiDirtyFlags |= HyWindowInfo::FLAG_Type;
+	m_Info.eType = eType;
+	m_Info.uiDirtyFlags |= HyWindowInfo::FLAG_Type;
 }
 
 HyCamera2d *HyWindow::CreateCamera2d()
@@ -165,47 +164,42 @@ glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoor
 	return ptWorldPos;
 }
 
-/*static*/ void HyWindow::MonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &vDeviceInfoOut)
+/*static*/ void HyWindow::MonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &monitorInfoListOut)
 {
-	vDeviceInfoOut.clear();
-
-	sm_csInfo.Lock();
+	monitorInfoListOut.clear();
 
 	for(uint32 i = 0; i < static_cast<uint32>(sm_MonitorInfoList.size()); ++i)
-		vDeviceInfoOut.push_back(sm_MonitorInfoList[i]);
-
-	sm_csInfo.Unlock();
+		monitorInfoListOut.push_back(sm_MonitorInfoList[i]);
 }
 
 /*static*/ void HyWindow::SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info)
 {
-	sm_csInfo.Lock();
 	sm_MonitorInfoList.clear();
 	sm_MonitorInfoList = info;
-	sm_csInfo.Unlock();
 }
 
-void HyWindow::Update()
+void HyWindow::Update_Render(HyRenderSurface &renderSurfaceRef)
 {
-	if(m_Info_Update.uiDirtyFlags)
+	if(m_Info.uiDirtyFlags)
 	{
-		m_cs.Lock();
-		m_Info_Shared = m_Info_Update;
-		m_cs.Unlock();
+		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Title)
+		{
+		}
 
-		m_Info_Update.uiDirtyFlags = 0;
+		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Resolution)
+		{
+			glm::ivec2 vResolution = GetResolution();
+			renderSurfaceRef.Resize(vResolution.x, vResolution.y);
+		}
+
+		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Location)
+		{
+		}
+
+		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Type)
+		{
+		}
+
+		m_Info.uiDirtyFlags = 0;
 	}
-}
-
-HyWindowInfo &HyWindow::Update_Render()
-{
-	m_cs.Lock();
-	if(m_Info_Shared.uiDirtyFlags)
-	{
-		m_Info_Render = m_Info_Shared;
-		m_Info_Shared.uiDirtyFlags = 0;
-	}
-	m_cs.Unlock();
-
-	return m_Info_Render;
 }

@@ -45,11 +45,11 @@ HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRe
 	for(uint32 i = 0; i < m_RenderSurfaceList.size(); ++i)
 		m_RenderSurfaceList[i].SetHandle(ConstructWindow(m_WindowListRef[i]->GetWindowInfo()));
 
-	std::vector<HyMonitorDeviceInfo> vMonitorDeviceInfo;
-	if(EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&vMonitorDeviceInfo) == false)
+	std::vector<HyMonitorDeviceInfo> monitorDeviceInfoList;
+	if(EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&monitorDeviceInfoList) == false)
 		HyError("EnumDisplayMonitors failed");
 
-	SetMonitorDeviceInfo(vMonitorDeviceInfo);
+	SetMonitorDeviceInfo(monitorDeviceInfoList);
 
 	ShowCursor(m_bShowCursor);
 
@@ -79,10 +79,10 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMoni
 	DEVMODE dm = { 0 };
 	dm.dmSize = sizeof(dm);
 	for(int iModeNum = 0; EnumDisplaySettings(monitorInfo.szDevice, iModeNum, &dm) != 0; ++iModeNum)
-		deviceInfo.vResolutions.push_back(HyMonitorDeviceInfo::Resolution(dm.dmPelsWidth, dm.dmPelsHeight));
+		deviceInfo.resolutionList.push_back(HyMonitorDeviceInfo::Resolution(dm.dmPelsWidth, dm.dmPelsHeight));
 
-	std::sort(deviceInfo.vResolutions.begin(), deviceInfo.vResolutions.end());
-	deviceInfo.vResolutions.erase(std::unique(deviceInfo.vResolutions.begin(), deviceInfo.vResolutions.end()), deviceInfo.vResolutions.end());
+	std::sort(deviceInfo.resolutionList.begin(), deviceInfo.resolutionList.end());
+	deviceInfo.resolutionList.erase(std::unique(deviceInfo.resolutionList.begin(), deviceInfo.resolutionList.end()), deviceInfo.resolutionList.end());
 
 	vMonitorDeviceInfo.push_back(deviceInfo);
 
@@ -211,13 +211,6 @@ HWND HyOpenGL_Win::GetHWND(int32 iWindowIndex)
 {
 	HDC hDeviceContext = GetDC(m_RenderSurfaceIter->GetHandle());
 	SwapBuffers(hDeviceContext);
-}
-
-/*virtual*/ void HyOpenGL_Win::OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags)
-{
-	// TODO: Update window size, change window title, etc based on uiChangedFlags
-
-	HyOpenGL::OnRenderSurfaceChanged(renderSurfaceRef, uiChangedFlags);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

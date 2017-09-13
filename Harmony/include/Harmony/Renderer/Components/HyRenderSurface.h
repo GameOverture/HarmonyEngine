@@ -7,8 +7,8 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __HyRenderSurface_h__
-#define __HyRenderSurface_h__
+#ifndef HyRenderSurface_h__
+#define HyRenderSurface_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
@@ -22,14 +22,14 @@ enum HyRenderSurfaceType
 class HyRenderSurface
 {
 	const HyRenderSurfaceType			m_eTYPE;
-	const int32							m_iID;
+	const uint32						m_uiID;
 	int32								m_iRenderSurfaceWidth;
 	int32								m_iRenderSurfaceHeight;
 
 	HyRenderSurfaceHandleInterop		m_hData;
 
 public:
-	HyRenderSurface(HyRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight);
+	HyRenderSurface(HyRenderSurfaceType eType, uint32 uiID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight);
 	~HyRenderSurface();
 
 	HyRenderSurfaceType GetType();
@@ -43,4 +43,4 @@ public:
 	void Resize(int32 iWidth, int32 iHeight);
 };
 
-#endif /* __HyRenderSurface_h__ */
+#endif /* HyRenderSurface_h__ */

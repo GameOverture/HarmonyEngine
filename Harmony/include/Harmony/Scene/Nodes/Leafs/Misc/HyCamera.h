@@ -24,10 +24,11 @@ protected:
 	HyWindow *			m_pWindowPtr;
 	HyRectangle<float>	m_ViewportRect;	// Values are [0.0-1.0] representing percentages
 
+protected:
 	IHyCamera(HyWindow *pWindow);
-public:
 	virtual ~IHyCamera();
 
+public:
 	HyWindow &GetWindow()						{ return *m_pWindowPtr; }
 	const HyRectangle<float> &GetViewport()		{ return m_ViewportRect; }
 
@@ -42,20 +43,17 @@ class HyCamera2d final : public IHyLeaf2d, public IHyCamera
 {
 	friend class HyWindow;
 
-	HyCamera2d(HyWindow *pWindow);
-
 	b2AABB		m_aabbViewBounds;
 
-public:
+private:
+	HyCamera2d(HyWindow *pWindow);
 	virtual ~HyCamera2d();
-
+	
+public:
 	virtual void SetZoom(const float fZoom) override;
 	virtual float GetZoom() const override;
 
 	const b2AABB &GetWorldViewBounds();
-
-	//// NOTE: Does not properly calculate camera twist - must be axis aligned
-	//HyRectangle<float> GetWorldViewBounds();
 
 protected:
 	virtual void NodeUpdate() override;
@@ -65,10 +63,11 @@ class HyCamera3d final : public IHyNode3d, public IHyCamera
 {
 	friend class HyWindow;
 
+protected:
 	HyCamera3d(HyWindow *pWindow);
-public:
 	virtual ~HyCamera3d();
 
+public:
 	virtual void SetZoom(const float fZoom) override;
 	virtual float GetZoom() const override;
 

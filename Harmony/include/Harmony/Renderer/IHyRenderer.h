@@ -84,9 +84,8 @@ public:
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
 
-	virtual void OnRenderSurfaceChanged(HyRenderSurface &renderSurfaceRef, uint32 uiChangedFlags) = 0;
-
 	uint32 GetNumRenderSurfaces();
+	std::vector<HyRenderSurface> &GetRenderSurfaceList();
 
 	// 2D buffer accessors
 	uint32 GetNumCameras2d();
@@ -107,6 +106,8 @@ public:
 
 	void Render();
 	void Draw2d();
+
+protected:
 	void SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info);
 };
 

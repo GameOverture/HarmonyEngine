@@ -25,7 +25,6 @@ IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef,
 																																				m_uiNumRenderStates(0),
 																																				m_bRequestedQuit(false)
 {
-	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 		m_RenderSurfaceList.push_back(HyRenderSurface(HYRENDERSURFACE_Window, i, m_WindowListRef[i]->GetResolution().x, m_WindowListRef[i]->GetResolution().y));
 }
@@ -64,6 +63,11 @@ void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string
 uint32 IHyRenderer::GetNumRenderSurfaces()
 {
 	return static_cast<uint32>(m_RenderSurfaceList.size());
+}
+
+std::vector<HyRenderSurface> &IHyRenderer::GetRenderSurfaceList()
+{
+	return m_RenderSurfaceList;
 }
 
 uint32 IHyRenderer::GetNumCameras2d()
@@ -156,34 +160,8 @@ void IHyRenderer::Render()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Iterate through 'm_WindowListRef' to find any dirty RenderSurface's that need processing
-	// TODO: Make the application's HyWindow (ref to 'm_WindowListRef') threadsafe
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
-	{
-		HyWindowInfo &windowInfoRef = m_WindowListRef[i]->Update_Render();
-		if(windowInfoRef.uiDirtyFlags)
-		{
-			HyRenderSurface *pRenderSurface = NULL;
-			for(uint32 j = 0; j < m_RenderSurfaceList.size(); ++j)
-			{
-				if(m_RenderSurfaceList[j].GetType() == HYRENDERSURFACE_Window && m_RenderSurfaceList[j].GetId() == i)
-				{
-					pRenderSurface = &m_RenderSurfaceList[j];
-					break;
-				}
-			}
-			HyAssert(pRenderSurface, "Could not find associated render surface from application's window reference");
-
-			if(windowInfoRef.uiDirtyFlags & HyWindowInfo::FLAG_Resolution)
-			{
-				glm::ivec2 vResolution = m_WindowListRef[i]->GetResolution();
-				pRenderSurface->Resize(vResolution.x, vResolution.y);
-			}
-
-			OnRenderSurfaceChanged(*pRenderSurface, windowInfoRef.uiDirtyFlags);
-
-			windowInfoRef.uiDirtyFlags = 0;
-		}
-	}
+		m_WindowListRef[i]->Update_Render(m_RenderSurfaceList[i]);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Swap to newest draw buffers (is only thread-safe on Render thread)

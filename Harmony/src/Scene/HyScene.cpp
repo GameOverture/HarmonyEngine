@@ -148,9 +148,6 @@ void HyScene::PrepareRender()
 		sm_bInst2dOrderingDirty = false;
 	}
 
-	for(uint32 i = 0; i < m_WindowListRef.size(); ++i)
-		m_WindowListRef[i]->Update();
-
 	WriteDrawBuffer();
 	HY_PROFILE_END
 }

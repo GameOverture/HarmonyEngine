@@ -9,8 +9,8 @@
  *************************************************************************/
 #include "Renderer/Components/HyRenderSurface.h"
 
-HyRenderSurface::HyRenderSurface(HyRenderSurfaceType eType, uint32 iID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight) :	m_eTYPE(eType),
-																																	m_iID(iID),
+HyRenderSurface::HyRenderSurface(HyRenderSurfaceType eType, uint32 uiID, int32 iRenderSurfaceWidth, int32 iRenderSurfaceHeight) :	m_eTYPE(eType),
+																																	m_uiID(uiID),
 																																	m_iRenderSurfaceWidth(iRenderSurfaceWidth),
 																																	m_iRenderSurfaceHeight(iRenderSurfaceHeight),
 																																	m_hData(nullptr)
@@ -28,7 +28,7 @@ HyRenderSurfaceType HyRenderSurface::GetType()
 
 int32 HyRenderSurface::GetId()
 {
-	return m_iID;
+	return m_uiID;
 }
 
 HyRenderSurfaceHandleInterop HyRenderSurface::GetHandle()
