@@ -192,19 +192,19 @@ void HyPrimitive2d::SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 		b2Vec2 ptExtents[4];
 		
 		ptExtents[0].Set(vDir.y, -vDir.x);
-		ptExtents[0] *= m_fLineThickness;
+		ptExtents[0] *= (m_fLineThickness * 0.5f);
 		ptExtents[0] += pVertexList[i];
 
 		ptExtents[1].Set(-vDir.y, vDir.x);
-		ptExtents[1] *= m_fLineThickness;
+		ptExtents[1] *= (m_fLineThickness * 0.5f);
 		ptExtents[1] += pVertexList[i];
 
-		ptExtents[2].Set(vDir.y, -vDir.x);
-		ptExtents[2] *= m_fLineThickness;
+		ptExtents[2].Set(-vDir.y, vDir.x);
+		ptExtents[2] *= (m_fLineThickness * 0.5f);
 		ptExtents[2] += pVertexList[i + 1];
 
-		ptExtents[3].Set(-vDir.y, vDir.x);
-		ptExtents[3] *= m_fLineThickness;
+		ptExtents[3].Set(vDir.y, -vDir.x);
+		ptExtents[3] *= (m_fLineThickness * 0.5f);
 		ptExtents[3] += pVertexList[i + 1];
 
 		for(uint32 i = 1; i < 3; ++i)
