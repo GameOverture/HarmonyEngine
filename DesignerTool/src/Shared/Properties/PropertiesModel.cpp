@@ -2,10 +2,12 @@
 
 PropertiesModel::PropertiesModel(QObject *parent) : QAbstractItemModel(parent)
 {
+    m_pRootItem = new PropertiesTreeItem(PROPERTIESTYPE_Root, "Root", this);
 }
 
 /*virtual*/ PropertiesModel::~PropertiesModel()
 {
+    delete m_pRootItem;
 }
 
 bool PropertiesModel::AppendCategory(QString sName)
@@ -16,7 +18,18 @@ bool PropertiesModel::AppendCategory(QString sName)
             return false;
     }
 
-    m_CategoryList.push_back(new PropertiesTreeItem(PROPERTIESTYPE_Category, sName, this));
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_Category, sName, this);
+    m_CategoryList.push_back(pNewTreeItem);
+
+
+    QModelIndex parentIndex = createIndex(m_pRootItem->GetRow(), 0, m_pRootItem);
+    int iRow = m_pRootItem->GetNumChildren();//HyClamp(iRow, 0, );
+
+    beginInsertRows(parentIndex, iRow, iRow);
+    m_pRootItem->InsertChild(iRow, pNewTreeItem);
+    endInsertRows();
+
+
     return true;
 }
 
@@ -38,7 +51,14 @@ bool PropertiesModel::AppendProperty(QString sCategoryName, QString sName, Prope
     if(pCategory == nullptr)
         return false;
 
-    pCategory->AppendChild(new PropertiesTreeItem(eType, sName, this));
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(eType, sName, this);
+
+    QModelIndex parentIndex = createIndex(pCategory->GetRow(), 0, pCategory);
+    int iRow = pCategory->GetNumChildren();//HyClamp(iRow, 0, );
+
+    beginInsertRows(parentIndex, iRow, iRow);
+    pCategory->InsertChild(iRow, pNewTreeItem);
+    endInsertRows();
 }
 
 QVariant PropertiesModel::headerData(int iSection, Qt::Orientation orientation, int role) const

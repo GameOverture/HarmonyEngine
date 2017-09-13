@@ -45,8 +45,6 @@ public:
     // Remove data:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
-
-private:
 };
 
 #endif // PROPERTIESMODEL_H
