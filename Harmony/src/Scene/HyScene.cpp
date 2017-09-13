@@ -277,7 +277,7 @@ void HyScene::WriteDrawBuffer()
 
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_NodeList_Loaded[i]->IsEnabled() == false)
+		if(m_NodeList_Loaded[i]->IsEnabled() == false)// || m_NodeList_Loaded[i]->GetType() == HYTYPE_Primitive2d)
 			continue;
 
 		// If previously written instance has equal render state by "operator ==" then it's to be assumed the instance data can be batched and doesn't need to write another render state
