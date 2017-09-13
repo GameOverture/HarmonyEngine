@@ -1,11 +1,14 @@
 #include "PropertiesModel.h"
+#include "Harmony/HyEngine.h"
 
 PropertiesModel::PropertiesModel(QObject *parent) : QAbstractItemModel(parent)
 {
+    m_pRootItem = new PropertiesTreeItem(PROPERTIESTYPE_Root, "Root", this);
 }
 
 /*virtual*/ PropertiesModel::~PropertiesModel()
 {
+    delete m_pRootItem;
 }
 
 bool PropertiesModel::AppendCategory(QString sName)
@@ -16,7 +19,11 @@ bool PropertiesModel::AppendCategory(QString sName)
             return false;
     }
 
-    m_CategoryList.push_back(new PropertiesTreeItem(PROPERTIESTYPE_Category, sName, this));
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_Category, sName, this);
+
+    InsertItem(m_CategoryList.size(), pNewTreeItem, m_pRootItem);
+    m_CategoryList.push_back(pNewTreeItem);
+
     return true;
 }
 
@@ -25,20 +32,21 @@ bool PropertiesModel::AppendProperty(QString sCategoryName, QString sName, Prope
     if(eType == PROPERTIESTYPE_Category || eType == PROPERTIESTYPE_Root)
         return false;
 
-    PropertiesTreeItem *pCategory = nullptr;
+    PropertiesTreeItem *pCategoryTreeItem = nullptr;
     for(int i = 0; i < m_CategoryList.size(); ++i)
     {
         if(0 == m_CategoryList[i]->GetName().compare(sCategoryName, Qt::CaseInsensitive))
         {
-            pCategory = m_CategoryList[i];
+            pCategoryTreeItem = m_CategoryList[i];
             break;
         }
     }
 
-    if(pCategory == nullptr)
+    if(pCategoryTreeItem == nullptr)
         return false;
 
-    pCategory->AppendChild(new PropertiesTreeItem(eType, sName, this));
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(eType, sName, this);
+    InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
 }
 
 QVariant PropertiesModel::headerData(int iSection, Qt::Orientation orientation, int role) const
@@ -102,10 +110,6 @@ QModelIndex PropertiesModel::parent(const QModelIndex &index) const
 
 int PropertiesModel::rowCount(const QModelIndex &parentIndex) const
 {
-    // Only data in column '0' has rows
-    if(!parentIndex.isValid() || parentIndex.column() > 0)
-        return 0;
-
     PropertiesTreeItem *pParentItem;
     if(parentIndex.isValid() == false)
         pParentItem = m_pRootItem;
@@ -162,23 +166,23 @@ Qt::ItemFlags PropertiesModel::flags(const QModelIndex &index) const
     return Qt::ItemIsEditable; // FIXME: Implement me!
 }
 
-bool PropertiesModel::insertRows(int row, int count, const QModelIndex &parent)
-{
-    beginInsertRows(parent, row, row + count - 1);
-    // FIXME: Implement me!
-    endInsertRows();
+//bool PropertiesModel::insertRows(int row, int count, const QModelIndex &parent)
+//{
+//    beginInsertRows(parent, row, row + count - 1);
+//    // FIXME: Implement me!
+//    endInsertRows();
 
-    return true;
-}
+//    return true;
+//}
 
-bool PropertiesModel::insertColumns(int column, int count, const QModelIndex &parent)
-{
-    beginInsertColumns(parent, column, column + count - 1);
-    // FIXME: Implement me!
-    endInsertColumns();
+//bool PropertiesModel::insertColumns(int column, int count, const QModelIndex &parent)
+//{
+//    beginInsertColumns(parent, column, column + count - 1);
+//    // FIXME: Implement me!
+//    endInsertColumns();
 
-    return true;
-}
+//    return true;
+//}
 
 bool PropertiesModel::removeRows(int row, int count, const QModelIndex &parent)
 {
@@ -189,11 +193,38 @@ bool PropertiesModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
-bool PropertiesModel::removeColumns(int column, int count, const QModelIndex &parent)
-{
-    beginRemoveColumns(parent, column, column + count - 1);
-    // FIXME: Implement me!
-    endRemoveColumns();
+//bool PropertiesModel::removeColumns(int column, int count, const QModelIndex &parent)
+//{
+//    beginRemoveColumns(parent, column, column + count - 1);
+//    // FIXME: Implement me!
+//    endRemoveColumns();
 
-    return true;
+//    return true;
+//}
+
+void PropertiesModel::InsertItem(int iRow, PropertiesTreeItem *pItem, PropertiesTreeItem *pParentItem)
+{
+    QList<PropertiesTreeItem *> itemList;
+    itemList << pItem;
+    InsertItems(iRow, itemList, pParentItem);
+}
+
+void PropertiesModel::InsertItems(int iRow, QList<PropertiesTreeItem *> itemList, PropertiesTreeItem *pParentItem)
+{
+    QModelIndex parentIndex = pParentItem ? createIndex(pParentItem->GetRow(), 0, pParentItem) : QModelIndex();
+
+    PropertiesTreeItem *pParent;
+    if(parentIndex.isValid() == false)
+        pParent = m_pRootItem;
+    else
+        pParent = static_cast<PropertiesTreeItem *>(parentIndex.internalPointer());
+
+    iRow = HyClamp(iRow, 0, pParent->GetNumChildren());
+
+    beginInsertRows(parentIndex, iRow, iRow + itemList.size() - 1);
+
+    for(int i = 0; i < itemList.size(); ++i)
+        pParent->InsertChild(iRow + i, itemList[i]);
+
+    endInsertRows();
 }
