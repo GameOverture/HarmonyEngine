@@ -13,7 +13,6 @@
 HyRenderState::HyRenderState() :	m_iRenderMode(HYRENDERMODE_Unknown),
 									m_uiAttributeFlags(0),
 									m_uiTextureBindHandle(0),
-									m_fLineThickness(1.0f),
 									m_iShaderId(-1),
 									m_uiUniformsCrc32(0),
 									m_uiNumInstances(0),
@@ -174,16 +173,6 @@ void HyRenderState::SetTextureHandle(uint32 uiHandleId)
 	m_uiTextureBindHandle = uiHandleId;
 }
 
-float HyRenderState::GetLineThickness() const
-{
-	return m_fLineThickness;
-}
-
-void HyRenderState::SetLineThickness(float fParam)
-{
-	m_fLineThickness = fParam;
-}
-
 bool HyRenderState::operator==(const HyRenderState &right) const
 {
 	if(m_iRenderMode == right.m_iRenderMode &&
@@ -191,8 +180,7 @@ bool HyRenderState::operator==(const HyRenderState &right) const
 	   m_uiTextureBindHandle == right.m_uiTextureBindHandle &&
 	   m_iShaderId == right.m_iShaderId &&
 	   m_uiUniformsCrc32 == right.m_uiUniformsCrc32 &&
-	   m_ScissorRect == right.m_ScissorRect &&
-	   m_fLineThickness == right.m_fLineThickness)
+	   m_ScissorRect == right.m_ScissorRect)
 	{
 		return true;
 	}

@@ -22,6 +22,7 @@ protected:
 	uint32			m_uiBufferSize;
 
 	bool			m_bWireframe;
+	float			m_fLineThickness;
 	bool			m_bDirty;
 
 public:

@@ -15,7 +15,9 @@
 HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
 																	m_pDrawBuffer(nullptr),
 																	m_uiBufferSize(0),
-																	m_bWireframe(false)
+																	m_bWireframe(false),
+																	m_fLineThickness(1.0f),
+																	m_bDirty(false)
 {
 	ClearData();
 }
@@ -53,11 +55,6 @@ HyShape2d &HyPrimitive2d::GetShape()
 	return m_BoundingVolume;
 }
 
-float HyPrimitive2d::GetLineThickness()
-{
-	return m_RenderState.GetLineThickness();
-}
-
 bool HyPrimitive2d::IsWireframe()
 {
 	return m_bWireframe;
@@ -72,9 +69,18 @@ void HyPrimitive2d::SetWireframe(bool bIsWireframe)
 	m_bDirty = true;
 }
 
+float HyPrimitive2d::GetLineThickness()
+{
+	return m_fLineThickness;
+}
+
 void HyPrimitive2d::SetLineThickness(float fThickness)
 {
-	m_RenderState.SetLineThickness(fThickness);
+	if(m_fLineThickness == fThickness)
+		return;
+
+	m_fLineThickness = fThickness;
+	m_bDirty = true;
 }
 
 /*virtual*/ void HyPrimitive2d::CalcBoundingVolume() /*override*/
@@ -108,7 +114,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 		std::vector<b2Vec2> pointList;
 		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1);
 		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2);
-		SetAsLineChain(&pointList[0], 2);
+		SetAsLineChain(pointList.data(), 2);
 	} break;
 
 	case HYSHAPE_LineLoop:
@@ -135,7 +141,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 			// Make it loop
 			vertList.push_back(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices[0]);
 
-			SetAsLineChain(&vertList[0], iNumVerts + 1);
+			SetAsLineChain(vertList.data(), iNumVerts + 1);
 		}
 		else
 			SetAsPolygon(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices, static_cast<b2PolygonShape *>(pb2Shape)->m_count);
@@ -157,50 +163,106 @@ void HyPrimitive2d::ClearData()
 	m_RenderState.SetRenderMode(HYRENDERMODE_Unknown);
 	m_RenderState.SetNumVerticesPerInstance(0);
 	m_RenderState.SetNumInstances(1);
+	//m_RenderState.Disable(HyRenderState::DRAWINSTANCED);
 
 	m_ShaderUniforms.Clear();
 }
 
 void HyPrimitive2d::SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 {
+	HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
 	ClearData();
 
-	HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
+	m_RenderState.SetRenderMode(HYRENDERMODE_Triangles);
+	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
+	m_RenderState.SetNumVerticesPerInstance((uiNumVertices - 1) * 6);
+	m_RenderState.SetNumInstances(1);
+	
+	m_pDrawBuffer = HY_NEW glm::vec2[m_RenderState.GetNumVerticesPerInstance()];
+	m_uiBufferSize = m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec2);
 
-	m_RenderState.SetRenderMode(HYRENDERMODE_TriangleStrip);
-	m_RenderState.SetShaderId(HYSHADERPROG_Lines2d);
-	m_RenderState.SetNumInstances(uiNumVertices - 1);
-	m_RenderState.SetNumVerticesPerInstance(4);				// 8 vertices per instance because of '2' duplicate vertex positions and normals on each end of line segment
+	uint32 uiBufferIndex = 0;
 
-	m_pDrawBuffer = HY_NEW glm::vec2[m_RenderState.GetNumInstances() * 8];	// size*4 = Each vertex of segment has '2' duplicate vertex positions that are offset by '2' corresponding normals within vertex shader 
-	m_uiBufferSize = (m_RenderState.GetNumInstances() * 8) * sizeof(glm::vec2);
-
-	if(m_eCoordUnit == HYCOORDUNIT_Default)
-		m_eCoordUnit = HyDefaultCoordinateUnit();
-	float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? HyPixelsPerMeter() : 1.0f;
-
-	uint32 i, j;
-	for(i = j = 0; i < m_RenderState.GetNumInstances(); ++i, j += 8)
+	std::vector<glm::vec2> vertList;
+	for(uint32 i = 0; i < uiNumVertices - 1; ++i)
 	{
-		b2Vec2 vVecDirection = pVertexList[i + 1] - pVertexList[i + 0];
+		b2Vec2 vDir = pVertexList[i + 1] - pVertexList[i];
+		vDir.Normalize();
 
-		glm::vec2 ptVertScaled(pVertexList[i + 0].x, pVertexList[i + 0].y);
-		ptVertScaled *= fCoordMod;
+		b2Vec2 ptExtents[4];
+		
+		ptExtents[0].Set(vDir.y, -vDir.x);
+		ptExtents[0] *= m_fLineThickness;
+		ptExtents[0] += pVertexList[i];
 
-		/*postion 1    */ m_pDrawBuffer[j + 0] = ptVertScaled;
-		/*Normal  1    */ m_pDrawBuffer[j + 1] = glm::normalize(glm::vec2(-vVecDirection.y, vVecDirection.x));
-		/*postion 1 dup*/ m_pDrawBuffer[j + 2] = m_pDrawBuffer[j + 0];
-		/*Normal  1 inv*/ m_pDrawBuffer[j + 3] = m_pDrawBuffer[j + 1] * -1.0f;
+		ptExtents[1].Set(-vDir.y, vDir.x);
+		ptExtents[1] *= m_fLineThickness;
+		ptExtents[1] += pVertexList[i];
 
-		ptVertScaled.x = pVertexList[i + 1].x;
-		ptVertScaled.y = pVertexList[i + 1].y;
-		ptVertScaled *= fCoordMod;
+		ptExtents[2].Set(vDir.y, -vDir.x);
+		ptExtents[2] *= m_fLineThickness;
+		ptExtents[2] += pVertexList[i + 1];
 
-		/*postion 2    */ m_pDrawBuffer[j + 4] = ptVertScaled;
-		/*Normal  2    */ m_pDrawBuffer[j + 5] = glm::normalize(glm::vec2(vVecDirection.y, -vVecDirection.x)) * -1.0f;
-		/*postion 2 dup*/ m_pDrawBuffer[j + 6] = m_pDrawBuffer[j + 4];
-		/*Normal  2 inv*/ m_pDrawBuffer[j + 7] = m_pDrawBuffer[j + 5] * -1.0f;
+		ptExtents[3].Set(-vDir.y, vDir.x);
+		ptExtents[3] *= m_fLineThickness;
+		ptExtents[3] += pVertexList[i + 1];
+
+		for(uint32 i = 1; i < 3; ++i)
+		{
+			m_pDrawBuffer[uiBufferIndex].x = ptExtents[0].x;
+			m_pDrawBuffer[uiBufferIndex].y = ptExtents[0].y;
+			uiBufferIndex++;
+
+			m_pDrawBuffer[uiBufferIndex].x = ptExtents[i].x;
+			m_pDrawBuffer[uiBufferIndex].y = ptExtents[i].y;
+			uiBufferIndex++;
+
+			m_pDrawBuffer[uiBufferIndex].x = ptExtents[i + 1].x;
+			m_pDrawBuffer[uiBufferIndex].y = ptExtents[i + 1].y;
+			uiBufferIndex++;
+		}
 	}
+
+	return;
+
+	//ClearData();
+
+	//HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
+
+	//m_RenderState.SetRenderMode(HYRENDERMODE_TriangleStrip);
+	//m_RenderState.SetShaderId(HYSHADERPROG_Lines2d);
+	//m_RenderState.SetNumInstances(uiNumVertices - 1);
+	//m_RenderState.SetNumVerticesPerInstance(4);				// 8 vertices per instance because of '2' duplicate vertex positions and normals on each end of line segment
+
+	//m_pDrawBuffer = HY_NEW glm::vec2[m_RenderState.GetNumInstances() * 8];	// size*4 = Each vertex of segment has '2' duplicate vertex positions that are offset by '2' corresponding normals within vertex shader 
+	//m_uiBufferSize = (m_RenderState.GetNumInstances() * 8) * sizeof(glm::vec2);
+
+	//if(m_eCoordUnit == HYCOORDUNIT_Default)
+	//	m_eCoordUnit = HyDefaultCoordinateUnit();
+	//float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? HyPixelsPerMeter() : 1.0f;
+
+	//uint32 i, j;
+	//for(i = j = 0; i < m_RenderState.GetNumInstances(); ++i, j += 8)
+	//{
+	//	b2Vec2 vVecDirection = pVertexList[i + 1] - pVertexList[i + 0];
+
+	//	glm::vec2 ptVertScaled(pVertexList[i + 0].x, pVertexList[i + 0].y);
+	//	ptVertScaled *= fCoordMod;
+
+	//	/*postion 1    */ m_pDrawBuffer[j + 0] = ptVertScaled;
+	//	/*Normal  1    */ m_pDrawBuffer[j + 1] = glm::normalize(glm::vec2(-vVecDirection.y, vVecDirection.x));
+	//	/*postion 1 dup*/ m_pDrawBuffer[j + 2] = m_pDrawBuffer[j + 0];
+	//	/*Normal  1 inv*/ m_pDrawBuffer[j + 3] = m_pDrawBuffer[j + 1] * -1.0f;
+
+	//	ptVertScaled.x = pVertexList[i + 1].x;
+	//	ptVertScaled.y = pVertexList[i + 1].y;
+	//	ptVertScaled *= fCoordMod;
+
+	//	/*postion 2    */ m_pDrawBuffer[j + 4] = ptVertScaled;
+	//	/*Normal  2    */ m_pDrawBuffer[j + 5] = glm::normalize(glm::vec2(vVecDirection.y, -vVecDirection.x)) * -1.0f;
+	//	/*postion 2 dup*/ m_pDrawBuffer[j + 6] = m_pDrawBuffer[j + 4];
+	//	/*Normal  2 inv*/ m_pDrawBuffer[j + 7] = m_pDrawBuffer[j + 5] * -1.0f;
+	//}
 }
 
 void HyPrimitive2d::SetAsCircle(glm::vec2 &ptCenter, float fRadius)
@@ -312,20 +374,14 @@ void HyPrimitive2d::SetAsPolygon(b2Vec2 *pVertexList, uint32 uiNumVertices)
 	vTop.z = tint.z;
 	vTop.a = CalculateAlpha();
 	
-	//glm::vec4 vBot;
-	//vTop.x = botColor.X();
-	//vTop.y = botColor.Y();
-	//vTop.z = botColor.Z();
-	//vBot.a = alpha.Get();
-
 	m_ShaderUniforms.Set("u_mtxTransform", mtx);
 	m_ShaderUniforms.Set("u_vColor", vTop);
 
-	if(m_RenderState.GetShaderId() == HYSHADERPROG_Lines2d)
-	{
-		m_ShaderUniforms.Set("u_fHalfWidth", m_RenderState.GetLineThickness() * 0.5f);
-		m_ShaderUniforms.Set("u_fFeatherAmt", 2.0f);	// Feather amount is how much anti-aliasing to apply. Greater values will make line fuzzier
-	}
+	//if(m_RenderState.GetShaderId() == HYSHADERPROG_Lines2d)
+	//{
+	//	m_ShaderUniforms.Set("u_fHalfWidth", m_RenderState.GetLineThickness() * 0.5f);
+	//	m_ShaderUniforms.Set("u_fFeatherAmt", 2.0f);	// Feather amount is how much anti-aliasing to apply. Greater values will make line fuzzier
+	//}
 }
 
 /*virtual*/ void HyPrimitive2d::OnWriteDrawBufferData(char *&pRefDataWritePos)

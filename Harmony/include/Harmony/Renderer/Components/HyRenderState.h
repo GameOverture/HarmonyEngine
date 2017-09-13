@@ -45,7 +45,6 @@ private:
 	int32				m_iRenderMode;
 	uint32				m_uiAttributeFlags;
 	uint32				m_uiTextureBindHandle;
-	float				m_fLineThickness;
 
 	int32				m_iShaderId;
 	uint32				m_uiUniformsCrc32;
