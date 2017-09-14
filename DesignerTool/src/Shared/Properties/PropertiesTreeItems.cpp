@@ -30,7 +30,6 @@ QString PropertiesTreeItem::GetValue()
         return QString();
 
     case PROPERTIESTYPE_bool:
-
     case PROPERTIESTYPE_int:
     case PROPERTIESTYPE_double:
     case PROPERTIESTYPE_ivec2:
@@ -39,6 +38,11 @@ QString PropertiesTreeItem::GetValue()
     }
 
     return QString();
+}
+
+QVariant PropertiesTreeItem::GetData()
+{
+    return m_Data;
 }
 
 /*virtual*/ QString PropertiesTreeItem::GetToolTip() const /*override*/

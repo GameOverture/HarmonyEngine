@@ -143,6 +143,26 @@ QVariant PropertiesModel::data(const QModelIndex &index, int iRole) const
     //    return pTreeItem->GetItem()->GetIcon(SUBICON_None);
     case Qt::ToolTipRole:
         return pTreeItem->GetToolTip();
+
+    case Qt::BackgroundRole:
+        if(pTreeItem->GetType() == PROPERTIESTYPE_Category)
+            return QBrush(QColor::fromRgb(160, 160, 160));
+
+    case Qt::ForegroundRole:
+        if(pTreeItem->GetType() == PROPERTIESTYPE_Category)
+            return QBrush(QColor::fromRgb(255, 255, 255));
+
+    case Qt::FontRole:
+        if(pTreeItem->GetType() == PROPERTIESTYPE_Category)
+        {
+            QFont font;
+            font.setBold(true);
+            return font;
+        }
+
+    case Qt::CheckStateRole:
+        if(pTreeItem->GetType() == PROPERTIESTYPE_bool)
+            return pTreeItem->GetData().toBool();
     }
 
     return QVariant();
@@ -163,7 +183,8 @@ Qt::ItemFlags PropertiesModel::flags(const QModelIndex &index) const
     if (!index.isValid())
         return Qt::NoItemFlags;
 
-    return Qt::ItemIsEditable; // FIXME: Implement me!
+    if(index.column() == 1)
+        return Qt::ItemIsEditable;
 }
 
 //bool PropertiesModel::insertRows(int row, int count, const QModelIndex &parent)

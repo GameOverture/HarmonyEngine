@@ -36,6 +36,7 @@ public:
     PropertiesType GetType();
     QString GetName();
     QString GetValue();
+    QVariant GetData();
 
     virtual QString GetToolTip() const override;
 };
