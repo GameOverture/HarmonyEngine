@@ -20,14 +20,12 @@
 class IHyNode;
 class IHyLeafDraw2d;
 class IHyNode3d;
-class HyGfxComms;
 class HyWindow;
+class IHyRenderer;
 
 //////////////////////////////////////////////////////////////////////////
 class HyScene
 {
-	friend class HyEngine;
-
 	static bool											sm_bInst2dOrderingDirty;
 
 	b2World												m_b2World;
@@ -36,7 +34,6 @@ class HyScene
 	HyDebugPhys2d										m_DrawPhys2d;
 	HyBox2dRuntime										m_Phys2dContactListener;
 
-	HyGfxComms &										m_GfxCommsRef;
 	std::vector<HyWindow *> &							m_WindowListRef;
 
 	// TODO: Make tightly packed (memory contiguous) node arrays
@@ -52,7 +49,7 @@ class HyScene
 	char *												m_pCurWritePos;
 
 public:
-	HyScene(HyGfxComms &gfxCommsRef, std::vector<HyWindow *> &WindowListRef);
+	HyScene(std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
 
 	static void SetInstOrderingDirty()					{ sm_bInst2dOrderingDirty = true; }
@@ -73,12 +70,9 @@ public:
 
 	void SetPause(bool bPause);
 
-private:
 	void UpdatePhysics();
 	void UpdateNodes();
-	void PrepareRender();
-	
-	void WriteDrawBuffer();
+	void PrepareRender(IHyRenderer &rendererRef);
 	
 	static bool Node2dSortPredicate(const IHyLeafDraw2d *pInst1, const IHyLeafDraw2d *pInst2);
 };

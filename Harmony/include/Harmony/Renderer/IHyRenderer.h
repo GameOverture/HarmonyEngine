@@ -22,19 +22,33 @@ class HyRenderSurface;
 class HyGfxComms;
 class HyDiagnostics;
 
-#define HYDRAWBUFFERHEADER reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBuffer)
+#define HY_GFX_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
+#define HYDRAWBUFFERHEADER reinterpret_cast<DrawBufferHeader *>(m_pDrawBuffer)
 
 class IHyRenderer
 {
+public:
+	// Note: All offsets below are from the beginning of the buffer pointer, containing this structure
+	struct DrawBufferHeader
+	{
+		uint32		uiReturnFlags;
+		size_t		uiOffsetToInst3d;
+		size_t		uiOffsetToInst2d;
+		size_t		uiOffsetToVertexData2d;
+		size_t		uiVertexBufferSize2d;
+		size_t		uiOffsetToCameras3d;
+		size_t		uiOffsetToCameras2d;
+	};
+
 protected:
-	HyGfxComms &							m_GfxCommsRef;
 	HyDiagnostics &							m_DiagnosticsRef;
 	bool									m_bShowCursor;
 	std::vector<HyWindow *> &				m_WindowListRef;
 
-	std::queue<IHyLoadableData *> *			m_pRxDataQueue;		// The pointer to the currently active render message queue
-	std::queue<IHyLoadableData *> *			m_pTxDataQueue;		// The pointer to the currently active render message queue
-	char *									m_pDrawBuffer;		// The pointer to the currently active draw buffer
+	char *									m_pDrawBuffer;
+
+	std::queue<IHyLoadableData *>			m_TxDataQueue;
+	std::queue<IHyLoadableData *>			m_RxDataQueue;
 
 	static int32							sm_iShaderIdCount;
 	static std::map<int32, IHyShader *>		sm_ShaderMap;
@@ -53,13 +67,16 @@ protected:
 	bool									m_bRequestedQuit;
 
 public:
-	IHyRenderer(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
+	IHyRenderer(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
+
+	char *GetDrawBuffer();
+
+	void TxData(IHyLoadableData *pData);
+	std::queue<IHyLoadableData *> &RxData();
 
 	void RequestQuit();
 	bool IsQuitRequested();
-
-	HyGfxComms &GetGfxCommsRef();
 
 	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
 

@@ -10,7 +10,6 @@
 #include "Afx/HyInteropAfx.h"
 #include "Input/Interop/HyInput_Gainput.h"
 #include "Input/Interop/HyInputMap_Gainput.h"
-#include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Diagnostics/Console/HyConsole.h"
 

@@ -8,7 +8,6 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/OpenGL/Interop/HyOpenGL_Win.h"
-#include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyRenderSurface.h"
 #include "Utilities/HyStrManip.h"
@@ -16,8 +15,8 @@
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-HyOpenGL_Win::HyOpenGL_Win(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	HyOpenGL(gfxCommsRef, diagnosticsRef, bShowCursor, windowListRef),
-																																				m_hGLContext(NULL)
+HyOpenGL_Win::HyOpenGL_Win(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	HyOpenGL(diagnosticsRef, bShowCursor, windowListRef),
+																														m_hGLContext(NULL)
 {
 }
 

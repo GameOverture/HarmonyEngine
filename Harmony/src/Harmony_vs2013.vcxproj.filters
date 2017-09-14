@@ -114,9 +114,6 @@
     <ClCompile Include="Scene\Physics\HyPhysEntity2d.cpp">
       <Filter>Scene\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Components\HyGfxComms.cpp">
-      <Filter>Renderer\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Components\HyRenderState.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
@@ -548,9 +545,6 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyPhysEntity2d.h">
       <Filter>Scene\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Renderer\Components\HyGfxComms.h">
-      <Filter>Renderer\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyRenderState.h">
       <Filter>Renderer\Components</Filter>

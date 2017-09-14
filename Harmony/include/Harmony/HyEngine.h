@@ -41,7 +41,6 @@ class HyEngine
 	// The order of these member declarations matter
 	IHyApplication &			m_AppRef;
 	
-	HyGfxComms					m_GfxComms;
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
 	HyGuiComms					m_GuiComms;

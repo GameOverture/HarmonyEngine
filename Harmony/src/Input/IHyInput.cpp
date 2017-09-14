@@ -10,7 +10,6 @@
 #include "Afx/HyInteropAfx.h"
 #include "Input/IHyInput.h"
 #include "Input/IHyInputMap.h"
-#include "Renderer/Components/HyGfxComms.h"
 #include "Renderer/Components/HyWindow.h"
 
 IHyInput::IHyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :	m_uiNUM_INPUT_MAPS(uiNumInputMappings),

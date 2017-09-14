@@ -11,26 +11,29 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyRenderSurface.h"
-#include "Renderer/Components/HyGfxComms.h"
 #include "HyEngine.h"
 
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
 int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 
-IHyRenderer::IHyRenderer(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	m_GfxCommsRef(gfxCommsRef),
-																																				m_DiagnosticsRef(diagnosticsRef),
-																																				m_bShowCursor(bShowCursor),
-																																				m_WindowListRef(windowListRef),
-																																				m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8),
-																																				m_uiNumRenderStates(0),
-																																				m_bRequestedQuit(false)
+IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
+																													m_bShowCursor(bShowCursor),
+																													m_WindowListRef(windowListRef),
+																													m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8),
+																													m_uiNumRenderStates(0),
+																													m_bRequestedQuit(false)
 {
+	m_pDrawBuffer = HY_NEW char[HY_GFX_BUFFER_SIZE];
+	memset(m_pDrawBuffer, 0, HY_GFX_BUFFER_SIZE);
+
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 		m_RenderSurfaceList.push_back(HyRenderSurface(HYRENDERSURFACE_Window, i, m_WindowListRef[i]->GetResolution().x, m_WindowListRef[i]->GetResolution().y));
 }
 
 IHyRenderer::~IHyRenderer(void)
 {
+	delete[] m_pDrawBuffer;
+
 	std::map<int32, IHyShader *>::iterator iter;
 	for(iter = sm_ShaderMap.begin(); iter != sm_ShaderMap.end(); ++iter)
 		delete iter->second;
@@ -38,6 +41,21 @@ IHyRenderer::~IHyRenderer(void)
 	// Needed for GUI reloads
 	sm_ShaderMap.clear();
 	sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
+}
+
+char *IHyRenderer::GetDrawBuffer()
+{
+	return m_pDrawBuffer;
+}
+
+void IHyRenderer::TxData(IHyLoadableData *pData)
+{
+	m_RxDataQueue.push(pData);
+}
+
+std::queue<IHyLoadableData *> &IHyRenderer::RxData()
+{
+	return m_TxDataQueue;
 }
 
 void IHyRenderer::RequestQuit()
@@ -48,11 +66,6 @@ void IHyRenderer::RequestQuit()
 bool IHyRenderer::IsQuitRequested()
 {
 	return m_bRequestedQuit;
-}
-
-HyGfxComms &IHyRenderer::GetGfxCommsRef()
-{
-	return m_GfxCommsRef;
 }
 
 void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures)
@@ -164,24 +177,14 @@ void IHyRenderer::Render()
 		m_WindowListRef[i]->Update_Render(m_RenderSurfaceList[i]);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Swap to newest draw buffers (is only thread-safe on Render thread)
-	//
-	// TODO: Remove this!
-	if(!m_GfxCommsRef.Render_TakeSharedPointers(m_pRxDataQueue, m_pTxDataQueue, m_pDrawBuffer))
-	{
-		HY_PROFILE_END
-		return;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
-	while(!m_pRxDataQueue->empty())
+	while(m_RxDataQueue.empty() == false)
 	{
-		IHyLoadableData *pData = m_pRxDataQueue->front();
-		m_pRxDataQueue->pop();
+		IHyLoadableData *pData = m_RxDataQueue.front();
+		m_RxDataQueue.pop();
 
 		pData->OnRenderThread(*this);
-		m_pTxDataQueue->push(pData);
+		m_TxDataQueue.push(pData);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -209,8 +212,6 @@ void IHyRenderer::Render()
 		FinishRender();
 		++m_RenderSurfaceIter;
 	}
-
-	reinterpret_cast<HyGfxComms::tDrawHeader *>(m_pDrawBuffer)->uiReturnFlags |= HyGfxComms::GFXFLAG_HasRendered;
 	
 	HY_PROFILE_END
 }

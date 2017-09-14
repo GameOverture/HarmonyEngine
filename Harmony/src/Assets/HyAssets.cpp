@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
+#include "Renderer/IHyRenderer.h"
 #include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Nodes/HySpine2dData.h"
@@ -62,13 +63,12 @@ tData *HyAssets::NodeData<tData>::GetData(const std::string &sPrefix, const std:
 	return &m_DataList[iter->second];
 }
 
-HyAssets::HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
-																							m_GfxCommsRef(gfxCommsRef),
-																							m_SceneRef(sceneRef),
-																							m_pAtlases(nullptr),
-																							m_uiNumAtlases(0),
-																							m_pLoadedAtlasIndices(nullptr),
-																							m_LoadingCtrl(m_Load_Shared, m_Load_Retrieval)
+HyAssets::HyAssets(std::string sDataDirPath, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
+																	m_SceneRef(sceneRef),
+																	m_pAtlases(nullptr),
+																	m_uiNumAtlases(0),
+																	m_pLoadedAtlasIndices(nullptr),
+																	m_LoadingCtrl(m_Load_Shared, m_Load_Retrieval)
 {
 	IHyLeafDraw2d::sm_pHyAssets = this;
 
@@ -400,7 +400,7 @@ bool HyAssets::IsShutdown()
 	return false;
 }
 
-void HyAssets::Update()
+void HyAssets::Update(IHyRenderer &rendererRef)
 {
 	// Check to see if we have any pending loads to make
 	if(m_Load_Prepare.empty() == false)
@@ -421,7 +421,7 @@ void HyAssets::Update()
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Check to see if any loaded data (from the load thread) is ready to go to the render thread
+	// Check to see if any loaded data (from the load thread) is ready to uploaded to graphics card
 	if(m_LoadingCtrl.m_csRetrievalQueue.Lock(1))
 	{
 		while(m_Load_Retrieval.empty() == false)
@@ -429,19 +429,19 @@ void HyAssets::Update()
 			IHyLoadableData *pData = m_Load_Retrieval.front();
 			m_Load_Retrieval.pop();
 
-			m_GfxCommsRef.TxData(pData);
+			rendererRef.TxData(pData);
 		}
 	
 		m_LoadingCtrl.m_csRetrievalQueue.Unlock();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Grab and process any returning data from the Render thread
-	m_pGfxQueue_Retrieval = m_GfxCommsRef.RxData();
-	while(!m_pGfxQueue_Retrieval->empty())
+	// Grab and process any returning data from the renderer
+	std::queue<IHyLoadableData *> rxDataQueueRef = rendererRef.RxData();
+	while(rxDataQueueRef.empty() == false)
 	{
-		IHyLoadableData *pData = m_pGfxQueue_Retrieval->front();
-		m_pGfxQueue_Retrieval->pop();
+		IHyLoadableData *pData = rxDataQueueRef.front();
+		rxDataQueueRef.pop();
 
 		FinalizeData(pData);
 	}

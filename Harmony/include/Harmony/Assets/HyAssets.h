@@ -13,15 +13,14 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/HyAtlas.h"
 #include "Assets/Loadables/HyAtlasIndices.h"
-#include "Renderer/Components/HyGfxComms.h"
 #include "Scene/HyScene.h"
 #include "Threading/Threading.h"
 
 #include <queue>
 #include <future>
 
+class IHyRenderer;
 class IHyLeafDraw2d;
-
 class IHyNodeData;
 class HyAudioData;
 class HySprite2dData;
@@ -39,7 +38,6 @@ class HyAssets
 
 	std::future<void>											m_InitFuture;
 
-	HyGfxComms &												m_GfxCommsRef;
 	HyScene &													m_SceneRef;
 
 	HyAtlas *													m_pAtlases;
@@ -71,8 +69,6 @@ class HyAssets
 	std::queue<IHyLoadableData *>								m_Load_Shared;
 	std::queue<IHyLoadableData *>								m_Load_Retrieval;
 
-	std::queue<IHyLoadableData *> *								m_pGfxQueue_Retrieval;
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Thread control structure to help sync loading of factory data
 	struct LoadThreadCtrl
@@ -99,7 +95,7 @@ class HyAssets
 	ThreadInfoPtr												m_pLoadingThread;	// Loading thread info pointer
 
 public:
-	HyAssets(std::string sDataDirPath, HyGfxComms &gfxCommsRef, HyScene &sceneRef);
+	HyAssets(std::string sDataDirPath, HyScene &sceneRef);
 	virtual ~HyAssets();
 
 	bool IsLoaded();
@@ -120,7 +116,7 @@ public:
 	void Shutdown();
 	bool IsShutdown();
 
-	void Update();
+	void Update(IHyRenderer &rendererRef);
 
 private:
 	void QueueData(IHyLoadableData *pData);

@@ -9,11 +9,10 @@
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGL.h"
 #include "Renderer/Components/HyRenderSurface.h"
-#include "Renderer/Components/HyGfxComms.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-HyOpenGL::HyOpenGL(HyGfxComms &gfxCommsRef, HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(gfxCommsRef, diagnosticsRef, bShowCursor, windowListRef),
-																																		m_mtxView(1.0f)
+HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(diagnosticsRef, bShowCursor, windowListRef),
+																												m_mtxView(1.0f)
 {
 }
 

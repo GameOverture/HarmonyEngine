@@ -21,11 +21,11 @@ HyEngine *		HyEngine::sm_pInstance = NULL;
 
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
-												m_Scene(m_GfxComms, m_AppRef.m_WindowList),
-												m_Assets(m_AppRef.m_Init.sDataDir, m_GfxComms, m_Scene),
+												m_Scene(m_AppRef.m_WindowList),
+												m_Assets(m_AppRef.m_Init.sDataDir, m_Scene),
 												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_Assets),
 												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList),
-												m_Renderer(m_GfxComms, m_Diagnostics, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
+												m_Renderer(m_Diagnostics, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList),
 												m_Diagnostics(m_AppRef.m_Init, m_Assets, m_Scene),
 												m_Time(m_Scene, m_AppRef.m_Init.uiUpdateTickMs)
@@ -95,11 +95,11 @@ bool HyEngine::Update()
 			return false;
 		HY_PROFILE_END
 
-		m_Assets.Update();
+		m_Assets.Update(m_Renderer);
 		m_GuiComms.Update();
 	}
 
-	m_Scene.PrepareRender();
+	m_Scene.PrepareRender(m_Renderer);
 	m_Renderer.Render();
 
 	return true;
@@ -111,8 +111,8 @@ void HyEngine::Shutdown()
 	m_Assets.Shutdown();
 	while(m_Assets.IsShutdown() == false)
 	{
-		m_Assets.Update();
-		m_Scene.PrepareRender();
+		m_Assets.Update(m_Renderer);
+		m_Scene.PrepareRender(m_Renderer);
 		m_Renderer.Render();
 	}
 }
