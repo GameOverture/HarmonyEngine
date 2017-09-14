@@ -437,7 +437,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Grab and process any returning data from the renderer
-	std::queue<IHyLoadableData *> rxDataQueueRef = rendererRef.RxData();
+	std::queue<IHyLoadableData *> &rxDataQueueRef = rendererRef.RxData();
 	while(rxDataQueueRef.empty() == false)
 	{
 		IHyLoadableData *pData = rxDataQueueRef.front();
