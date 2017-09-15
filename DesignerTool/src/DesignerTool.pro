@@ -143,9 +143,9 @@ HEADERS  += \
     Shared/Properties/PropertiesModel.h \
     Shared/IDraw.h \
     Shared/IModel.h \
-    Shared/Properties/PropertiesTreeItems.h \
     Shared/IModelTreeItem.h \
-    Shared/Properties/PropertiesTreeView.h
+    Shared/Properties/PropertiesTreeView.h \
+    Shared/Properties/PropertiesTreeItem.h
 
 FORMS    += \
     MainWindow.ui \

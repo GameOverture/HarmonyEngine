@@ -1,4 +1,4 @@
-#include "PropertiesTreeItems.h"
+#include "PropertiesTreeItem.h"
 #include "PropertiesModel.h"
 
 PropertiesTreeItem::PropertiesTreeItem(PropertiesType eType, QString sName, PropertiesModel *pTreeModel) :  m_eTYPE(eType),
@@ -27,14 +27,24 @@ QString PropertiesTreeItem::GetValue()
     {
     case PROPERTIESTYPE_Root:
     case PROPERTIESTYPE_Category:
+    case PROPERTIESTYPE_bool:
         return QString();
 
-    case PROPERTIESTYPE_bool:
     case PROPERTIESTYPE_int:
+        return QString::number(m_Data.toInt());
+
     case PROPERTIESTYPE_double:
-    case PROPERTIESTYPE_ivec2:
-    case PROPERTIESTYPE_vec2:
-        return QString();
+        return QString::number(m_Data.toDouble());
+
+    case PROPERTIESTYPE_ivec2: {
+            QPoint pt = m_Data.toPoint();
+            return QString::number(pt.x()) % " x " % QString::number(pt.y());
+        }
+
+    case PROPERTIESTYPE_vec2: {
+            QPointF pt = m_Data.toPointF();
+            return QString::number(pt.x()) % " x " % QString::number(pt.y());
+        }
     }
 
     return QString();
@@ -43,6 +53,11 @@ QString PropertiesTreeItem::GetValue()
 QVariant PropertiesTreeItem::GetData()
 {
     return m_Data;
+}
+
+void PropertiesTreeItem::SetData(const QVariant &newData)
+{
+    m_Data = newData;
 }
 
 /*virtual*/ QString PropertiesTreeItem::GetToolTip() const /*override*/

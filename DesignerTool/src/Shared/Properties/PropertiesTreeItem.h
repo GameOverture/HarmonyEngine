@@ -1,5 +1,5 @@
-#ifndef PROPERTIESTREEITEMS_H
-#define PROPERTIESTREEITEMS_H
+#ifndef PROPERTIESTREEITEM_H
+#define PROPERTIESTREEITEM_H
 
 #include "IModelTreeItem.h"
 
@@ -37,8 +37,9 @@ public:
     QString GetName();
     QString GetValue();
     QVariant GetData();
+    void SetData(const QVariant &newData);
 
     virtual QString GetToolTip() const override;
 };
 
-#endif // PROPERTIESTREEITEMS_H
+#endif // PROPERTIESTREEITEM_H

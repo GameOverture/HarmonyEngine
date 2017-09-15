@@ -1,6 +1,9 @@
 #include "PropertiesTreeView.h"
-#include "PropertiesTreeItems.h"
+#include "PropertiesTreeItem.h"
 #include "Global.h"
+
+#include <QPainter>
+#include <QHeaderView>
 
 PropertiesTreeView::PropertiesTreeView(QWidget *pParent /*= nullptr*/) : QTreeView(pParent)
 {
@@ -11,7 +14,26 @@ PropertiesTreeView::~PropertiesTreeView()
 {
 }
 
+/*virtual*/ void PropertiesTreeView::paintEvent(QPaintEvent *pEvent) /*override*/
+{
+    QTreeView::paintEvent(pEvent);
 
+    QPainter painter(viewport());
+    for(int i = 0; i < header()->count(); ++i)
+    {
+        // draw only visible sections starting from second column
+        if(header()->isSectionHidden(i) || header()->visualIndex(i) <= 0)
+            continue;
+
+        // position mapped to viewport
+        int iColumnStartPos = header()->sectionViewportPosition(i) - 1;
+        if(iColumnStartPos > 0)
+        {
+            //TODO: set QStyle::SH_Table_GridLineColor
+            painter.drawLine(QPoint(iColumnStartPos, 0), QPoint(iColumnStartPos, height()));
+        }
+    }
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),

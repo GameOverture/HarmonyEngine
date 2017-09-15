@@ -1,7 +1,7 @@
 #ifndef PROPERTIESMODEL_H
 #define PROPERTIESMODEL_H
 
-#include "PropertiesTreeItems.h"
+#include "PropertiesTreeItem.h"
 
 #include <QAbstractItemModel>
 
@@ -34,7 +34,7 @@ public:
     QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 
     // Editable:
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    bool setData(const QModelIndex &index, const QVariant &value, int iRole = Qt::EditRole) override;
 
     Qt::ItemFlags flags(const QModelIndex& index) const override;
 

@@ -161,30 +161,53 @@ QVariant PropertiesModel::data(const QModelIndex &index, int iRole) const
         }
 
     case Qt::CheckStateRole:
-        if(pTreeItem->GetType() == PROPERTIESTYPE_bool)
-            return pTreeItem->GetData().toBool();
+        if(index.column() == 1 && pTreeItem->GetType() == PROPERTIESTYPE_bool)
+            return pTreeItem->GetData().toInt();
     }
 
     return QVariant();
 }
 
-bool PropertiesModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool PropertiesModel::setData(const QModelIndex &index, const QVariant &value, int iRole)
 {
-    if (data(index, role) != value) {
-        // FIXME: Implement me!
-        Q_EMIT dataChanged(index, index, QVector<int>() << role);
+    if(index.isValid() == false)
+        return false;
+
+    if(data(index, iRole) != value)
+    {
+        PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
+        pTreeItem->SetData(value);
+
+        Q_EMIT dataChanged(index, index, QVector<int>() << iRole);
         return true;
     }
+
     return false;
 }
 
 Qt::ItemFlags PropertiesModel::flags(const QModelIndex &index) const
 {
-    if (!index.isValid())
-        return Qt::NoItemFlags;
+    Qt::ItemFlags returnFlags = Qt::NoItemFlags;
 
-    if(index.column() == 1)
-        return Qt::ItemIsEditable;
+    if(index.isValid() == false)
+        return returnFlags;
+
+    PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
+
+    returnFlags |= (Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+    if(index.column() == 0)
+    {
+    }
+    else if(index.column() == 1)
+    {
+        returnFlags |= Qt::ItemIsEditable;
+
+        if(pTreeItem->GetType() == PROPERTIESTYPE_bool)
+            returnFlags |= Qt::ItemIsUserCheckable;
+    }
+
+    return returnFlags;
 }
 
 //bool PropertiesModel::insertRows(int row, int count, const QModelIndex &parent)
