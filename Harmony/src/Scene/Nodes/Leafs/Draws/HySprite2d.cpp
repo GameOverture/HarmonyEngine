@@ -120,6 +120,9 @@ void HySprite2d::AnimSetFrame(uint32 uiFrameIndex)
 	if(m_uiCurFrame != uiFrameIndex)
 	{
 		m_uiCurFrame = uiFrameIndex;
+
+		const HySprite2dFrame &UpdatedFrameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+		m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
 		SetDirty(DIRTY_BoundingVolume);
 	}
 }
@@ -148,8 +151,6 @@ void HySprite2d::AnimSetState(uint32 uiStateIndex)
 	if(m_uiCurAnimState == uiStateIndex)
 		return;
 
-	SetDirty(DIRTY_BoundingVolume);
-
 	m_uiCurAnimState = uiStateIndex;
 
 	while(m_uiCurAnimState >= m_AnimCtrlAttribList.size())
@@ -159,6 +160,11 @@ void HySprite2d::AnimSetState(uint32 uiStateIndex)
 		m_uiCurFrame = 0;
 	else
 		m_uiCurFrame = AnimGetNumFrames() - 1;
+
+	// NOTE: UncheckedGetData() is safe because the above AnimGetNumFrames() calls AcquireData()
+	const HySprite2dFrame &UpdatedFrameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
+	SetDirty(DIRTY_BoundingVolume);
 }
 
 bool HySprite2d::AnimIsFinished()
