@@ -35,26 +35,77 @@ bool PropertiesTreeModel::AppendCategory(QString sName)
     return true;
 }
 
-bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, PropertiesType eType)
+bool PropertiesTreeModel::AppendProperty_Bool(QString sCategoryName, QString sName, bool bDefaultValue)
 {
-    if(eType == PROPERTIESTYPE_Category || eType == PROPERTIESTYPE_Root)
-        return false;
-
-    PropertiesTreeItem *pCategoryTreeItem = nullptr;
-    for(int i = 0; i < m_CategoryList.size(); ++i)
-    {
-        if(0 == m_CategoryList[i]->GetName().compare(sCategoryName, Qt::CaseInsensitive))
-        {
-            pCategoryTreeItem = m_CategoryList[i];
-            break;
-        }
-    }
-
+    PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
     if(pCategoryTreeItem == nullptr)
         return false;
 
-    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(eType, sName, this);
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_bool, sName, this);
+    pNewTreeItem->SetData(static_cast<int>(bDefaultValue ? Qt::Checked : Qt::Unchecked));
+
     InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
+    return true;
+}
+
+bool PropertiesTreeModel::AppendProperty_Int(QString sCategoryName, QString sName, int iDefaultValue, int iMinRange /*= -HYRANGE_Int*/, int iMaxRange /*= HYRANGE_Int*/, QString sPrefix /*= ""*/, QString sPostfix /*= ""*/)
+{
+    PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
+    if(pCategoryTreeItem == nullptr)
+        return false;
+
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_int, sName, this);
+    pNewTreeItem->SetData(iDefaultValue);
+
+    QVariant varRanges(QPoint(iMinRange, iMaxRange));
+    pNewTreeItem->SetDataRanges(varRanges);
+
+    InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
+    return true;
+}
+
+bool PropertiesTreeModel::AppendProperty_Double(QString sCategoryName, QString sName, double dDefaultValue, double dMinRange /*= -HYRANGE_double*/, double dMaxRange /*= HYRANGE_double*/, QString sPrefix /*= ""*/, QString sPostfix /*= ""*/)
+{
+    PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
+    if(pCategoryTreeItem == nullptr)
+        return false;
+
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_double, sName, this);
+    pNewTreeItem->SetData(dDefaultValue);
+
+    QVariant varRanges(QPointF(static_cast<float>(dMinRange), static_cast<float>(dMaxRange)));
+    pNewTreeItem->SetDataRanges(varRanges);
+
+    InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
+    return true;
+}
+
+bool PropertiesTreeModel::AppendProperty_IntVec2(QString sCategoryName, QString sName, glm::ivec2 vDefaultValue)
+{
+    PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
+    if(pCategoryTreeItem == nullptr)
+        return false;
+
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_ivec2, sName, this);
+    QVariant defaultData(QPoint(vDefaultValue.x, vDefaultValue.y));
+    pNewTreeItem->SetData(defaultData);
+
+    InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
+    return true;
+}
+
+bool PropertiesTreeModel::AppendProperty_Vec2(QString sCategoryName, QString sName, glm::vec2 vDefaultValue)
+{
+    PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
+    if(pCategoryTreeItem == nullptr)
+        return false;
+
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_vec2, sName, this);
+    QVariant defaultData(QPointF(vDefaultValue.x, vDefaultValue.y));
+    pNewTreeItem->SetData(defaultData);
+
+    InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
+    return true;
 }
 
 QVariant PropertiesTreeModel::headerData(int iSection, Qt::Orientation orientation, int role) const
@@ -255,6 +306,28 @@ bool PropertiesTreeModel::removeRows(int row, int count, const QModelIndex &pare
 
 //    return true;
 //}
+
+PropertiesTreeItem *PropertiesTreeModel::ValidateCategory(QString sCategoryName, QString sUniquePropertyName)
+{
+    PropertiesTreeItem *pCategoryTreeItem = nullptr;
+    for(int i = 0; i < m_CategoryList.size(); ++i)
+    {
+        if(0 == m_CategoryList[i]->GetName().compare(sCategoryName, Qt::CaseInsensitive))
+        {
+            pCategoryTreeItem = m_CategoryList[i];
+            break;
+        }
+    }
+
+    // Now ensure that no property with this name already exists
+    for(int i = 0; i < pCategoryTreeItem->GetNumChildren(); ++i)
+    {
+        if(0 == static_cast<PropertiesTreeItem *>(pCategoryTreeItem->GetChild(i))->GetName().compare(sUniquePropertyName, Qt::CaseInsensitive))
+            return nullptr; // nullptr indicates failure
+    }
+
+    return pCategoryTreeItem;
+}
 
 void PropertiesTreeModel::InsertItem(int iRow, PropertiesTreeItem *pItem, PropertiesTreeItem *pParentItem)
 {

@@ -54,15 +54,15 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
     PropertiesTreeModel *pNewPropertiesModel = new PropertiesTreeModel(entityItemRef, GetIndex(), subState);
 
     pNewPropertiesModel->AppendCategory("Transformation");
-    pNewPropertiesModel->AppendProperty("Transformation", "Position", PROPERTIESTYPE_ivec2);
-    pNewPropertiesModel->AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2);
-    pNewPropertiesModel->AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double);
+    pNewPropertiesModel->AppendProperty_Vec2("Transformation", "Position", glm::vec2(0.0f, 0.0f));
+    pNewPropertiesModel->AppendProperty_Vec2("Transformation", "Scale", glm::vec2(0.0f, 0.0f));
+    pNewPropertiesModel->AppendProperty_Double("Transformation", "Rotation", 0.0, 0.0, 360.0, "", "°");
 
     pNewPropertiesModel->AppendCategory("Common");
-    pNewPropertiesModel->AppendProperty("Common", "Enabled", PROPERTIESTYPE_bool);
-    pNewPropertiesModel->AppendProperty("Common", "Update while game paused", PROPERTIESTYPE_bool);
-    pNewPropertiesModel->AppendProperty("Common", "User Tag", PROPERTIESTYPE_int);
-    pNewPropertiesModel->AppendProperty("Common", "Display Order", PROPERTIESTYPE_int);
+    pNewPropertiesModel->AppendProperty_Bool("Common", "Enabled", true);
+    pNewPropertiesModel->AppendProperty_Bool("Common", "Update while game paused", false);
+    pNewPropertiesModel->AppendProperty_Int("Common", "User Tag", 0);
+    pNewPropertiesModel->AppendProperty_Int("Common", "Display Order", 0);
 
     switch(eSelectedType)
     {

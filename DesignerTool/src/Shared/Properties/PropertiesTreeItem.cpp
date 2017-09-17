@@ -60,6 +60,16 @@ void PropertiesTreeItem::SetData(const QVariant &newData)
     m_Data = newData;
 }
 
+QVariant PropertiesTreeItem::GetDataRanges()
+{
+    return m_DataRanges;
+}
+
+void PropertiesTreeItem::SetDataRanges(QVariant &ranges)
+{
+    m_DataRanges = ranges;
+}
+
 /*virtual*/ QString PropertiesTreeItem::GetToolTip() const /*override*/
 {
     return QString();

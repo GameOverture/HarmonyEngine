@@ -115,7 +115,14 @@ void EntityWidget::FocusState(int iStateIndex, QVariant subState)
             ui->lblSelectedItemText->setVisible(true);
             ui->lblSelectedItemText->setText(pTreeItem->GetItem()->GetName(false) % " Properties");
 
-            ui->propertyTree->setModel(GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem));
+            PropertiesTreeModel *pPropertiesModel = GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem);
+            ui->propertyTree->setModel(pPropertiesModel);
+
+            // Expand the top level nodes (the properties' categories)
+            QModelIndex rootIndex = ui->propertyTree->rootIndex();
+            ui->propertyTree->expand(rootIndex);
+            for(int i = 0; i < pPropertiesModel->rowCount(); ++i)
+                ui->propertyTree->expand(pPropertiesModel->index(i, 0, rootIndex));
         }
     }
 

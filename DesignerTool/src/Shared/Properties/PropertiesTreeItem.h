@@ -25,9 +25,13 @@ class PropertiesTreeItem : public IModelTreeItem
 protected:
     const PropertiesType                        m_eTYPE;
     const QString                               m_sNAME;
-    PropertiesTreeModel *                           m_pTreeModel;
+    PropertiesTreeModel *                       m_pTreeModel;
 
     QVariant                                    m_Data;
+    QVariant                                    m_DataRanges;   // If used, either a QPoint, or QPointF [x->y]
+
+    QString                                     m_sPrefix;
+    QString                                     m_sPostfix;
 
 public:
     explicit PropertiesTreeItem(PropertiesType eType, QString sName, PropertiesTreeModel *pTreeModel);
@@ -38,6 +42,9 @@ public:
     QString GetValue();
     QVariant GetData();
     void SetData(const QVariant &newData);
+
+    QVariant GetDataRanges();
+    void SetDataRanges(QVariant &ranges);
 
     virtual QString GetToolTip() const override;
 };

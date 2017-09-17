@@ -4,6 +4,8 @@
 
 #include <QPainter>
 #include <QHeaderView>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
 
 PropertiesTreeView::PropertiesTreeView(QWidget *pParent /*= nullptr*/) : QTreeView(pParent)
 {
@@ -54,16 +56,35 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
     PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
 
+    QVariant dataRanges = pTreeItem->GetDataRanges();
+
     switch(pTreeItem->GetType())
     {
-    case PROPERTIESTYPE_bool:
+    case PROPERTIESTYPE_bool:   // bool type already works with the model's Qt::CheckStateRole
         break;
+
     case PROPERTIESTYPE_int:
+        pReturnWidget = new QSpinBox(pParent);
+        if(dataRanges.isValid())
+        {
+            QPoint rangePoint = dataRanges.toPoint();
+            static_cast<QSpinBox *>(pReturnWidget)->setRange(rangePoint.x(), rangePoint.y());
+        }
         break;
+
     case PROPERTIESTYPE_double:
+        pReturnWidget = new QDoubleSpinBox(pParent);
+        if(dataRanges.isValid())
+        {
+            QPointF rangePointF = dataRanges.toPointF();
+            static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(rangePointF.x(), rangePointF.y());
+        }
         break;
+
     case PROPERTIESTYPE_ivec2:
+
         break;
+
     case PROPERTIESTYPE_vec2:
         break;
     }
