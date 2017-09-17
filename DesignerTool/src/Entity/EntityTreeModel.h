@@ -3,7 +3,7 @@
 
 #include "ProjectItem.h"
 #include "GlobalWidgetMappers.h"
-#include "PropertiesModel.h"
+#include "PropertiesTreeModel.h"
 #include "IModelTreeItem.h"
 
 #include <QAbstractItemModel>
@@ -17,7 +17,7 @@ class EntityTreeItem : public IModelTreeItem
     ProjectItem *               m_pItem;
 
 public:
-    explicit EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem, uint uiNumStates);
+    explicit EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem);
     virtual ~EntityTreeItem();
 
     ProjectItem *GetItem();
@@ -36,7 +36,7 @@ class EntityTreeModel : public QAbstractItemModel
     EntityTreeItem *            m_pEntityItem;
 
 public:
-    explicit EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityItemRef, int iNumStates, QObject *parent = nullptr);
+    explicit EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityItemRef, QObject *parent = nullptr);
     virtual ~EntityTreeModel();
 
     int GetNumStates();

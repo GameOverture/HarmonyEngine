@@ -45,7 +45,7 @@ public:
 
     QComboBox *GetCmbStates();
     
-    void FocusState(int iStateIndex);
+    void FocusState(int iStateIndex, QVariant subState);
 
     void UpdateActions();
 

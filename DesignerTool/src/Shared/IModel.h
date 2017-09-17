@@ -21,14 +21,17 @@ class IModel;
 class IStateData
 {
 protected:
+    const int       m_iINDEX;
     IModel &        m_ModelRef;
     QString         m_sName;
     
 public:
-    IStateData(IModel &modelRef, QString sName);
+    IStateData(int iIndex, IModel &modelRef, QString sName);
     virtual ~IStateData();
+
+    int GetIndex() const;
     
-    QString GetName();
+    QString GetName() const;
     void SetName(QString sNewName);
     
     virtual void AddFrame(AtlasFrame *pFrame) = 0;
@@ -38,12 +41,14 @@ public:
 class IModel : public QAbstractListModel
 {
 protected:
-    ProjectItem *               m_pItem;
+    ProjectItem &               m_ItemRef;
     QList<IStateData *>         m_StateList;
     
 public:
-    IModel(ProjectItem *pItem);
+    IModel(ProjectItem &itemRef);
     virtual ~IModel();
+
+    ProjectItem &GetItem();
     
     int GetNumStates();
     IStateData *GetStateData(int iStateIndex);
@@ -73,7 +78,7 @@ public:
     template<typename STATEDATA>
     void InsertState(int iStateIndex, QJsonObject stateObj)
     {
-        STATEDATA *pNewState = new STATEDATA(*this, stateObj);
+        STATEDATA *pNewState = new STATEDATA(iStateIndex, *this, stateObj);
     
         beginInsertRows(QModelIndex(), iStateIndex, iStateIndex);
         m_StateList.insert(iStateIndex, pNewState);

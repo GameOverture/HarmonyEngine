@@ -1,6 +1,8 @@
 #include "EntityModel.h"
 
-EntityStateData::EntityStateData(IModel &modelRef, QJsonObject stateObj) :  IStateData(modelRef, stateObj["name"].toString())
+#include <QVariant>
+
+EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) : IStateData(iStateIndex, modelRef, stateObj["name"].toString())
 {
     if(stateObj.empty() == false)
     {
@@ -15,14 +17,14 @@ EntityStateData::EntityStateData(IModel &modelRef, QJsonObject stateObj) :  ISta
 {
     for(auto iter = m_PropertiesMap.begin(); iter != m_PropertiesMap.end(); ++iter)
     {
-        PropertiesModel *pPropertiesModel = iter.value();
+        PropertiesTreeModel *pPropertiesModel = iter.value();
         delete pPropertiesModel;
     }
 
     m_PropertiesMap.clear();
 }
 
-PropertiesModel *EntityStateData::GetPropertiesModel(EntityTreeItem *pTreeItem)
+PropertiesTreeModel *EntityStateData::GetPropertiesModel(EntityTreeItem *pTreeItem)
 {
     if(pTreeItem == nullptr)
     {
@@ -31,7 +33,7 @@ PropertiesModel *EntityStateData::GetPropertiesModel(EntityTreeItem *pTreeItem)
     }
 
     if(m_PropertiesMap.contains(pTreeItem) == false)
-        m_PropertiesMap[pTreeItem] = AllocNewPropertiesModel(pTreeItem->GetItem());
+        m_PropertiesMap[pTreeItem] = AllocNewPropertiesModel(m_ModelRef.GetItem(), QVariant(reinterpret_cast<qulonglong>(pTreeItem)), pTreeItem->GetItem()->GetType());
 
     return m_PropertiesMap[pTreeItem];
 }
@@ -44,9 +46,9 @@ PropertiesModel *EntityStateData::GetPropertiesModel(EntityTreeItem *pTreeItem)
 {
 }
 
-PropertiesModel *EntityStateData::AllocNewPropertiesModel(ProjectItem *pProjItem)
+PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entityItemRef, QVariant &subState, HyGuiItemType eSelectedType)
 {
-    PropertiesModel *pNewPropertiesModel = new PropertiesModel();
+    PropertiesTreeModel *pNewPropertiesModel = new PropertiesTreeModel(entityItemRef, GetIndex(), subState);
 
     pNewPropertiesModel->AppendCategory("Transformation");
     pNewPropertiesModel->AppendProperty("Transformation", "Position", PROPERTIESTYPE_ivec2);
@@ -59,7 +61,7 @@ PropertiesModel *EntityStateData::AllocNewPropertiesModel(ProjectItem *pProjItem
     pNewPropertiesModel->AppendProperty("Common", "User Tag", PROPERTIESTYPE_int);
     pNewPropertiesModel->AppendProperty("Common", "Display Order", PROPERTIESTYPE_int);
 
-    switch(pProjItem->GetType())
+    switch(eSelectedType)
     {
     case ITEM_Primitive:
         pNewPropertiesModel->AppendCategory("Transformation");
@@ -73,7 +75,7 @@ PropertiesModel *EntityStateData::AllocNewPropertiesModel(ProjectItem *pProjItem
     case ITEM_Entity:
         break;
     default:
-        HyGuiLog("EntityTreeItem::EntityTreeItem - unsupported type: " % QString::number(pProjItem->GetType()), LOGTYPE_Error);
+        HyGuiLog("EntityTreeItem::EntityTreeItem - unsupported type: " % QString::number(eSelectedType), LOGTYPE_Error);
     }
 
     return pNewPropertiesModel;
@@ -82,8 +84,8 @@ PropertiesModel *EntityStateData::AllocNewPropertiesModel(ProjectItem *pProjItem
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityModel::EntityModel(ProjectItem *pItem, QJsonArray stateArray) :   IModel(pItem),
-                                                                        m_TreeModel(this, *pItem, stateArray.size())
+EntityModel::EntityModel(ProjectItem &itemRef, QJsonArray stateArray) : IModel(itemRef),
+                                                                        m_TreeModel(this, itemRef)
 {
     // If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
     if(stateArray.empty() == false)
@@ -104,12 +106,13 @@ EntityTreeModel &EntityModel::GetTreeModel()
     return m_TreeModel;
 }
 
-PropertiesModel *EntityModel::GetPropertiesModel(int iStateIndex, EntityTreeItem *pTreeItem)
+PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, EntityTreeItem *pTreeItem)
 {
     if(iStateIndex < 0)
         return nullptr;
 
-    return static_cast<EntityStateData *>(m_StateList[iStateIndex])->GetPropertiesModel(pTreeItem);
+    PropertiesTreeModel *pPropertiesModel = static_cast<EntityStateData *>(m_StateList[iStateIndex])->GetPropertiesModel(pTreeItem);
+    return pPropertiesModel;
 }
 
 /*virtual*/ void EntityModel::OnSave() /*override*/

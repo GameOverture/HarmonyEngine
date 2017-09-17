@@ -14,6 +14,13 @@ PropertiesTreeView::~PropertiesTreeView()
 {
 }
 
+/*virtual*/ void PropertiesTreeView::setModel(QAbstractItemModel *pModel) /*override*/
+{
+    QTreeView::setModel(pModel);
+
+    //connect(
+}
+
 /*virtual*/ void PropertiesTreeView::paintEvent(QPaintEvent *pEvent) /*override*/
 {
     QTreeView::paintEvent(pEvent);

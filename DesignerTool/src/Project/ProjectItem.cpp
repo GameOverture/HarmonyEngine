@@ -70,13 +70,13 @@ void ProjectItem::LoadModel()
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
-        m_pModel = new SpriteModel(this, m_SaveValue.toArray());
+        m_pModel = new SpriteModel(*this, m_SaveValue.toArray());
         break;
     case ITEM_Font:
-        m_pModel = new FontModel(this, m_SaveValue.toObject());
+        m_pModel = new FontModel(*this, m_SaveValue.toObject());
         break;
     case ITEM_Entity:
-        m_pModel = new EntityModel(this, m_SaveValue.toArray());
+        m_pModel = new EntityModel(*this, m_SaveValue.toArray());
         break;
     default:
         HyGuiLog("Unimplemented item LoadModel(): " % QString::number(m_eTYPE), LOGTYPE_Error);
@@ -225,7 +225,7 @@ void ProjectItem::BlockAllWidgetSignals(bool bBlock)
         (*iter)->blockSignals(bBlock);
 }
 
-void ProjectItem::FocusWidgetState(int iStateIndex)
+void ProjectItem::FocusWidgetState(int iStateIndex, QVariant subState)
 {
     if(m_pWidget == nullptr)
         return;
@@ -233,13 +233,16 @@ void ProjectItem::FocusWidgetState(int iStateIndex)
     switch(m_eTYPE)
     {
     case ITEM_Sprite:
-        static_cast<SpriteWidget *>(m_pWidget)->FocusState(iStateIndex);
+        static_cast<SpriteWidget *>(m_pWidget)->FocusState(iStateIndex, subState);
         break;
     case ITEM_Font:
-        static_cast<FontWidget *>(m_pWidget)->FocusState(iStateIndex);
+        static_cast<FontWidget *>(m_pWidget)->FocusState(iStateIndex, subState);
+        break;
+    case ITEM_Entity:
+        static_cast<EntityWidget *>(m_pWidget)->FocusState(iStateIndex, subState);
         break;
     default:
-        HyGuiLog("Unimplemented ProjectItem::RefreshWidget() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
+        HyGuiLog("Unimplemented ProjectItem::FocusWidgetState() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
         break;
     }
 }

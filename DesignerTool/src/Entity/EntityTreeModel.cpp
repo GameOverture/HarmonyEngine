@@ -1,8 +1,8 @@
 #include "EntityTreeModel.h"
 #include "EntityModel.h"
 
-EntityTreeItem::EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem, uint uiNumStates) :     m_pTreeModel(pTreeModel),
-                                                                                                        m_pItem(pItem)
+EntityTreeItem::EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem) :   m_pTreeModel(pTreeModel),
+                                                                                    m_pItem(pItem)
 {
 }
 
@@ -22,11 +22,11 @@ ProjectItem *EntityTreeItem::GetItem()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityItemRef, int iNumStates, QObject *parent) :  QAbstractItemModel(parent),
-                                                                                                                            m_pEntityModel(pEntityModel)
+EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityItemRef, QObject *parent) :  QAbstractItemModel(parent),
+                                                                                                            m_pEntityModel(pEntityModel)
 {
-    m_pRootItem = new EntityTreeItem(this, nullptr, 0);
-    m_pEntityItem = new EntityTreeItem(this, &entityItemRef, iNumStates);
+    m_pRootItem = new EntityTreeItem(this, nullptr);
+    m_pEntityItem = new EntityTreeItem(this, &entityItemRef);
 
     InsertItem(0, m_pEntityItem, m_pRootItem);
 }

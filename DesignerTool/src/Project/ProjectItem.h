@@ -64,7 +64,7 @@ public:
     
     void BlockAllWidgetSignals(bool bBlock);
 
-    void FocusWidgetState(int iStateIndex);
+    void FocusWidgetState(int iStateIndex, QVariant subState);
     
     void DeleteFromProject();
     

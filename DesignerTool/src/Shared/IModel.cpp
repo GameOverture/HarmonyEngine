@@ -11,14 +11,20 @@
 #include "AtlasModel.h"
 #include "Project.h"
 
-IStateData::IStateData(IModel &modelRef, QString sName) :   m_ModelRef(modelRef),
-                                                            m_sName(sName)
+IStateData::IStateData(int iIndex, IModel &modelRef, QString sName) :   m_iINDEX(iIndex),
+                                                                        m_ModelRef(modelRef),
+                                                                        m_sName(sName)
 { }
 
 /*virtual*/ IStateData::~IStateData()
 { }
 
-QString IStateData::GetName()
+int IStateData::GetIndex() const
+{
+    return m_iINDEX;
+}
+
+QString IStateData::GetName() const
 {
     return m_sName;
 }
@@ -30,13 +36,18 @@ void IStateData::SetName(QString sNewName)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-IModel::IModel(ProjectItem *pItem) :    QAbstractListModel(pItem),
-                                        m_pItem(pItem)
+IModel::IModel(ProjectItem &itemRef) :  QAbstractListModel(&itemRef),
+                                        m_ItemRef(itemRef)
 {
 }
 
 /*virtual*/ IModel::~IModel()
 {
+}
+
+ProjectItem &IModel::GetItem()
+{
+    return m_ItemRef;
 }
 
 int IModel::GetNumStates()
@@ -89,7 +100,7 @@ void IModel::MoveStateForward(int iStateIndex)
 
 QList<AtlasFrame *> IModel::RequestFramesById(IStateData *pState, QList<quint32> requestList)
 {
-    QList<AtlasFrame *> returnedAtlasFramesList = m_pItem->GetProject().GetAtlasModel().RequestFramesById(m_pItem, requestList);
+    QList<AtlasFrame *> returnedAtlasFramesList = m_ItemRef.GetProject().GetAtlasModel().RequestFramesById(&m_ItemRef, requestList);
     
     if(pState)
     {
@@ -102,7 +113,7 @@ QList<AtlasFrame *> IModel::RequestFramesById(IStateData *pState, QList<quint32>
 
 QList<AtlasFrame *> IModel::RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList)
 {
-    QList<AtlasFrame *> returnedAtlasFramesList = m_pItem->GetProject().GetAtlasModel().RequestFrames(m_pItem, requestList);
+    QList<AtlasFrame *> returnedAtlasFramesList = m_ItemRef.GetProject().GetAtlasModel().RequestFrames(&m_ItemRef, requestList);
 
     if(iStateIndex >= 0)
     {
@@ -121,7 +132,7 @@ void IModel::RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishLis
             m_StateList[iStateIndex]->RelinquishFrame(relinquishList[i]);
     }
     
-    m_pItem->GetProject().GetAtlasModel().RelinquishFrames(m_pItem, relinquishList);
+    m_ItemRef.GetProject().GetAtlasModel().RelinquishFrames(&m_ItemRef, relinquishList);
 }
 
 /*virtual*/ int IModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const

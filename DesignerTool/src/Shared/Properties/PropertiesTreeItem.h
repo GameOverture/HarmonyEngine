@@ -6,7 +6,7 @@
 #include <QWidget>
 #include <QVariant>
 
-class PropertiesModel;
+class PropertiesTreeModel;
 
 enum PropertiesType
 {
@@ -25,12 +25,12 @@ class PropertiesTreeItem : public IModelTreeItem
 protected:
     const PropertiesType                        m_eTYPE;
     const QString                               m_sNAME;
-    PropertiesModel *                           m_pTreeModel;
+    PropertiesTreeModel *                           m_pTreeModel;
 
     QVariant                                    m_Data;
 
 public:
-    explicit PropertiesTreeItem(PropertiesType eType, QString sName, PropertiesModel *pTreeModel);
+    explicit PropertiesTreeItem(PropertiesType eType, QString sName, PropertiesTreeModel *pTreeModel);
     virtual ~PropertiesTreeItem();
 
     PropertiesType GetType();

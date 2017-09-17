@@ -242,11 +242,11 @@ void SpriteFramesModel::Refresh()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SpriteStateData::SpriteStateData(IModel &modelRef, QJsonObject stateObj) :  IStateData(modelRef, stateObj["name"].toString()),
-                                                                            m_pChkMapper_Loop(nullptr),
-                                                                            m_pChkMapper_Reverse(nullptr),
-                                                                            m_pChkMapper_Bounce(nullptr),
-                                                                            m_pFramesModel(nullptr)
+SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) : IStateData(iStateIndex, modelRef, stateObj["name"].toString()),
+                                                                                            m_pChkMapper_Loop(nullptr),
+                                                                                            m_pChkMapper_Reverse(nullptr),
+                                                                                            m_pChkMapper_Bounce(nullptr),
+                                                                                            m_pFramesModel(nullptr)
 {
     m_pChkMapper_Loop = new CheckBoxMapper(&m_ModelRef);
     m_pChkMapper_Reverse = new CheckBoxMapper(&m_ModelRef);
@@ -372,7 +372,7 @@ void SpriteStateData::Refresh()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SpriteModel::SpriteModel(ProjectItem *pItem, QJsonArray stateArray) :   IModel(pItem)
+SpriteModel::SpriteModel(ProjectItem &itemRef, QJsonArray stateArray) : IModel(itemRef)
 {
     // If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
     if(stateArray.empty() == false)

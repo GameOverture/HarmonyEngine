@@ -97,7 +97,7 @@ class SpriteStateData : public IStateData
     SpriteFramesModel * m_pFramesModel;
 
 public:
-    SpriteStateData(IModel &modelRef, QJsonObject stateObj);
+    SpriteStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj);
     virtual ~SpriteStateData();
     
     CheckBoxMapper *GetLoopMapper();
@@ -120,7 +120,7 @@ class SpriteModel : public IModel
     Q_OBJECT
 
 public:
-    SpriteModel(ProjectItem *pItem, QJsonArray stateArray);
+    SpriteModel(ProjectItem &itemRef, QJsonArray stateArray);
     virtual ~SpriteModel();
     
     virtual void OnSave() override;

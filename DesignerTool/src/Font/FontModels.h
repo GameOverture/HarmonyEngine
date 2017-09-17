@@ -62,7 +62,7 @@ class FontStateData : public IStateData
     ComboBoxMapper *            m_pCmbMapper_Fonts;
 	
 public:
-    FontStateData(IModel &modelRef, QJsonObject stateObj);
+    FontStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj);
     virtual ~FontStateData();
 
     FontStateLayersModel *GetFontLayersModel();
@@ -104,7 +104,7 @@ class FontModel : public IModel
     uint                        m_uiTrueAtlasPixelDataSize;
 
 public:
-    FontModel(ProjectItem *pItem, QJsonObject fontObj);
+    FontModel(ProjectItem &itemRef, QJsonObject fontObj);
     virtual ~FontModel();
 
     QDir GetMetaDir();

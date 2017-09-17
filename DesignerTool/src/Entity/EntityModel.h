@@ -11,13 +11,13 @@
 
 class EntityStateData : public IStateData
 {
-    QMap<EntityTreeItem *, PropertiesModel *>   m_PropertiesMap;
+    QMap<EntityTreeItem *, PropertiesTreeModel *>    m_PropertiesMap;
 
 public:
-    EntityStateData(IModel &modelRef, QJsonObject stateObj);
+    EntityStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj);
     virtual ~EntityStateData();
 
-    PropertiesModel *GetPropertiesModel(EntityTreeItem *pTreeItem);
+    PropertiesTreeModel *GetPropertiesModel(EntityTreeItem *pTreeItem);
     void GetStateInfo(QJsonObject &stateObjOut);
 
     void Refresh();
@@ -26,7 +26,7 @@ public:
     virtual void RelinquishFrame(AtlasFrame *pFrame) override;
 
 private:
-    PropertiesModel *AllocNewPropertiesModel(ProjectItem *pProjItem);
+    PropertiesTreeModel *AllocNewPropertiesModel(ProjectItem &entityItemRef, QVariant &subState, HyGuiItemType eSelectedType);
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityModel : public IModel
@@ -36,11 +36,12 @@ class EntityModel : public IModel
     EntityTreeModel         m_TreeModel;
 
 public:
-    EntityModel(ProjectItem *pItem, QJsonArray stateArray);
+    EntityModel(ProjectItem &itemRef, QJsonArray stateArray);
     virtual ~EntityModel();
 
     EntityTreeModel &GetTreeModel();
-    PropertiesModel *GetPropertiesModel(int iStateIndex, EntityTreeItem *pTreeItem);
+
+    PropertiesTreeModel *GetPropertiesModel(int iStateIndex, EntityTreeItem *pTreeItem);
 
     virtual void OnSave() override;
     virtual QJsonObject PopStateAt(uint32 uiIndex) override;

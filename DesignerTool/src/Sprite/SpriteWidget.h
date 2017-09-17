@@ -47,7 +47,7 @@ public:
     void SetSelectedFrame(int iFrameIndex);
     void GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut);
 
-    void FocusState(int iStateIndex);
+    void FocusState(int iStateIndex, QVariant subState);
     void UpdateActions();
 
 private:

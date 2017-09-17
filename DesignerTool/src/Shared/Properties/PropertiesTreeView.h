@@ -11,6 +11,7 @@ public:
     PropertiesTreeView(QWidget *pParent = nullptr);
     virtual ~PropertiesTreeView();
 
+    virtual void setModel(QAbstractItemModel *pModel) override;
     virtual void paintEvent(QPaintEvent *pEvent) override;
 };
 

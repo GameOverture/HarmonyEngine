@@ -13,7 +13,7 @@
 #include <QJsonArray>
 #include <QStandardPaths>
 
-FontStateData::FontStateData(IModel &modelRef, QJsonObject stateObj) : IStateData(modelRef, stateObj["name"].toString())
+FontStateData::FontStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) : IStateData(iStateIndex, modelRef, stateObj["name"].toString())
 {
     m_pLayersModel = new FontStateLayersModel(&m_ModelRef);
     m_pSbMapper_Size = new SpinBoxMapper(&m_ModelRef);
@@ -146,12 +146,12 @@ float FontStateData::GetSize()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontModel::FontModel(ProjectItem *pItem, QJsonObject fontObj) : IModel(pItem),
-                                                                m_FontMetaDir(m_pItem->GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(DIR_Fonts)),
-                                                                m_pTrueAtlasFrame(nullptr),
-                                                                m_pFtglAtlas(nullptr),
-                                                                m_pTrueAtlasPixelData(nullptr),
-                                                                m_uiTrueAtlasPixelDataSize(0)
+FontModel::FontModel(ProjectItem &itemRef, QJsonObject fontObj) :   IModel(itemRef),
+                                                                    m_FontMetaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(DIR_Fonts)),
+                                                                    m_pTrueAtlasFrame(nullptr),
+                                                                    m_pFtglAtlas(nullptr),
+                                                                    m_pTrueAtlasPixelData(nullptr),
+                                                                    m_uiTrueAtlasPixelDataSize(0)
 {
     m_pChkMapper_09 = new CheckBoxMapper(this);
     m_pChkMapper_AZ = new CheckBoxMapper(this);
@@ -258,9 +258,9 @@ void FontModel::GeneratePreview()
 {
     uint uiAtlasGrpIndex = 0;
     if(m_pTrueAtlasFrame != nullptr)
-        uiAtlasGrpIndex = m_pItem->GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_pTrueAtlasFrame->GetAtlasGrpId());
+        uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_pTrueAtlasFrame->GetAtlasGrpId());
 
-    QSize atlasSize = m_pItem->GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
+    QSize atlasSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
     QSize curAtlasSize = atlasSize;
     bool bDoInitialShrink = true;
     size_t iNumMissedGlyphs = 0;
@@ -314,7 +314,7 @@ void FontModel::GeneratePreview()
     }
     else
     {
-        HyGuiLog("Generated " % m_pItem->GetName(true) % " Preview", LOGTYPE_Info);
+        HyGuiLog("Generated " % m_ItemRef.GetName(true) % " Preview", LOGTYPE_Info);
         HyGuiLog(QString::number(m_MasterLayerList.count()) % " fonts with " % QString::number(m_sAvailableTypefaceGlyphs.size()) % " glyphs each (totaling " % QString::number(m_sAvailableTypefaceGlyphs.size() * m_MasterLayerList.count()) % ").", LOGTYPE_Normal);
         HyGuiLog("Font Atlas size: " % QString::number(m_pFtglAtlas->width) % "x" % QString::number(m_pFtglAtlas->height) % " (Utilizing " % QString::number(100.0*m_pFtglAtlas->used / (float)(m_pFtglAtlas->width*m_pFtglAtlas->height)) % "%) (Num Passes: " % QString::number(iNumPasses) % ")", LOGTYPE_Normal);
     }
@@ -338,9 +338,9 @@ void FontModel::GeneratePreview()
     QImage fontAtlasImage(m_pTrueAtlasPixelData, static_cast<int>(m_pFtglAtlas->width), static_cast<int>(m_pFtglAtlas->height), QImage::Format_RGBA8888);
 
     if(m_pTrueAtlasFrame)
-        m_pItem->GetProject().GetAtlasModel().ReplaceFrame(m_pTrueAtlasFrame, m_pItem->GetName(false), fontAtlasImage, true);
+        m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pTrueAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true);
     else
-        m_pTrueAtlasFrame = m_pItem->GetProject().GetAtlasModel().GenerateFrame(m_pItem, m_pItem->GetName(false), fontAtlasImage, 0, ITEM_Font);
+        m_pTrueAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, 0, ITEM_Font);
 }
 
 /*virtual*/ QJsonObject FontModel::PopStateAt(uint32 uiIndex) /*override*/

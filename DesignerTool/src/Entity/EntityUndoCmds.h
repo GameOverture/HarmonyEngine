@@ -41,8 +41,8 @@ public:
     EntityUndoCmd(EntityCmd eCMD, ProjectItem &itemRef, void *pParameter, QUndoCommand *pParent = 0);
     virtual ~EntityUndoCmd();
 
-    void redo() override;
-    void undo() override;
+    virtual void redo() override;
+    virtual void undo() override;
 };
 
 #endif // ENTITYUNDOCMDS_H

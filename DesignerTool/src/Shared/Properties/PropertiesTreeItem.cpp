@@ -1,7 +1,7 @@
 #include "PropertiesTreeItem.h"
-#include "PropertiesModel.h"
+#include "PropertiesTreeModel.h"
 
-PropertiesTreeItem::PropertiesTreeItem(PropertiesType eType, QString sName, PropertiesModel *pTreeModel) :  m_eTYPE(eType),
+PropertiesTreeItem::PropertiesTreeItem(PropertiesType eType, QString sName, PropertiesTreeModel *pTreeModel) :  m_eTYPE(eType),
                                                                                                             m_sNAME(sName),
                                                                                                             m_pTreeModel(pTreeModel)
 {

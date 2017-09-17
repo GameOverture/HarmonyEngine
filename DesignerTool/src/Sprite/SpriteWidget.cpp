@@ -53,7 +53,7 @@ SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(pare
     connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
             this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
 
-    FocusState(0);
+    FocusState(0, -1);
 }
 
 SpriteWidget::~SpriteWidget()
@@ -105,23 +105,32 @@ void SpriteWidget::GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut)
     iFrameIndexOut = ui->framesView->currentIndex().row();
 }
 
-void SpriteWidget::FocusState(int iStateIndex)
+void SpriteWidget::FocusState(int iStateIndex, QVariant subState)
 {
     if(iStateIndex >= 0)
     {
-        SpriteStateData *pCurStateData = static_cast<SpriteStateData *>(static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
-    
-        ui->framesView->setModel(pCurStateData->GetFramesModel());
-        if(ui->framesView->currentIndex().row() < 0 && ui->framesView->model()->rowCount() > 0)
-            ui->framesView->selectRow(0);
-        
-        pCurStateData->GetLoopMapper()->AddCheckBoxMapping(ui->chkLoop);
-        pCurStateData->GetReverseMapper()->AddCheckBoxMapping(ui->chkReverse);
-        pCurStateData->GetBounceMapper()->AddCheckBoxMapping(ui->chkBounce);
-    
         ui->cmbStates->blockSignals(true);
         ui->cmbStates->setCurrentIndex(iStateIndex);
         ui->cmbStates->blockSignals(false);
+
+        // Set the model of 'iStateIndex'
+        SpriteStateData *pCurStateData = static_cast<SpriteStateData *>(static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
+        ui->framesView->setModel(pCurStateData->GetFramesModel());
+        pCurStateData->GetLoopMapper()->AddCheckBoxMapping(ui->chkLoop);
+        pCurStateData->GetReverseMapper()->AddCheckBoxMapping(ui->chkReverse);
+        pCurStateData->GetBounceMapper()->AddCheckBoxMapping(ui->chkBounce);
+
+        // iSubStateIndex represents which row to select
+        if(subState.toInt() >= 0)
+        {
+            if(subState.toInt() >= ui->framesView->model()->rowCount() &&
+               ui->framesView->model()->rowCount() > 0)
+            {
+                ui->framesView->selectRow(0);
+            }
+            else
+                ui->framesView->selectRow(subState.toInt());
+        }
     }
     
     UpdateActions();
@@ -197,7 +206,7 @@ void SpriteWidget::on_actionOrderStateForwards_triggered()
 
 void SpriteWidget::on_cmbStates_currentIndexChanged(int index)
 {
-    FocusState(index);
+    FocusState(index, -1);
 }
 
 void SpriteWidget::on_actionAlignLeft_triggered()

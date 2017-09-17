@@ -1,17 +1,25 @@
-#include "PropertiesModel.h"
+#include "PropertiesTreeModel.h"
 #include "Harmony/HyEngine.h"
 
-PropertiesModel::PropertiesModel(QObject *parent) : QAbstractItemModel(parent)
+PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant &subState, QObject *parent) :  QAbstractItemModel(parent),
+                                                                                                                        m_ItemRef(itemRef),
+                                                                                                                        m_iSTATE_INDEX(iStateIndex),
+                                                                                                                        m_iSUBSTATE(subState)
 {
     m_pRootItem = new PropertiesTreeItem(PROPERTIESTYPE_Root, "Root", this);
 }
 
-/*virtual*/ PropertiesModel::~PropertiesModel()
+/*virtual*/ PropertiesTreeModel::~PropertiesTreeModel()
 {
     delete m_pRootItem;
 }
 
-bool PropertiesModel::AppendCategory(QString sName)
+ProjectItem &PropertiesTreeModel::GetItem()
+{
+    return m_ItemRef;
+}
+
+bool PropertiesTreeModel::AppendCategory(QString sName)
 {
     for(int i = 0; i < m_CategoryList.size(); ++i)
     {
@@ -27,7 +35,7 @@ bool PropertiesModel::AppendCategory(QString sName)
     return true;
 }
 
-bool PropertiesModel::AppendProperty(QString sCategoryName, QString sName, PropertiesType eType)
+bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, PropertiesType eType)
 {
     if(eType == PROPERTIESTYPE_Category || eType == PROPERTIESTYPE_Root)
         return false;
@@ -49,7 +57,7 @@ bool PropertiesModel::AppendProperty(QString sCategoryName, QString sName, Prope
     InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
 }
 
-QVariant PropertiesModel::headerData(int iSection, Qt::Orientation orientation, int role) const
+QVariant PropertiesTreeModel::headerData(int iSection, Qt::Orientation orientation, int role) const
 {
     if(role == Qt::TextAlignmentRole)
         return Qt::AlignCenter;
@@ -75,7 +83,7 @@ QVariant PropertiesModel::headerData(int iSection, Qt::Orientation orientation, 
 //    return false;
 //}
 
-QModelIndex PropertiesModel::index(int iRow, int iColumn, const QModelIndex &parent) const
+QModelIndex PropertiesTreeModel::index(int iRow, int iColumn, const QModelIndex &parent) const
 {
     if(hasIndex(iRow, iColumn, parent) == false)
         return QModelIndex();
@@ -94,7 +102,7 @@ QModelIndex PropertiesModel::index(int iRow, int iColumn, const QModelIndex &par
         return QModelIndex();
 }
 
-QModelIndex PropertiesModel::parent(const QModelIndex &index) const
+QModelIndex PropertiesTreeModel::parent(const QModelIndex &index) const
 {
     if(index.isValid() == false)
         return QModelIndex();
@@ -108,7 +116,7 @@ QModelIndex PropertiesModel::parent(const QModelIndex &index) const
     return createIndex(pParentItem->GetRow(), 0, pParentItem);
 }
 
-int PropertiesModel::rowCount(const QModelIndex &parentIndex) const
+int PropertiesTreeModel::rowCount(const QModelIndex &parentIndex) const
 {
     PropertiesTreeItem *pParentItem;
     if(parentIndex.isValid() == false)
@@ -119,12 +127,12 @@ int PropertiesModel::rowCount(const QModelIndex &parentIndex) const
     return pParentItem->GetNumChildren();
 }
 
-int PropertiesModel::columnCount(const QModelIndex &parent) const
+int PropertiesTreeModel::columnCount(const QModelIndex &parent) const
 {
     return 2;
 }
 
-QVariant PropertiesModel::data(const QModelIndex &index, int iRole) const
+QVariant PropertiesTreeModel::data(const QModelIndex &index, int iRole) const
 {
     if(index.isValid() == false)
         return QVariant();
@@ -168,7 +176,7 @@ QVariant PropertiesModel::data(const QModelIndex &index, int iRole) const
     return QVariant();
 }
 
-bool PropertiesModel::setData(const QModelIndex &index, const QVariant &value, int iRole)
+bool PropertiesTreeModel::setData(const QModelIndex &index, const QVariant &value, int iRole)
 {
     if(index.isValid() == false)
         return false;
@@ -176,16 +184,18 @@ bool PropertiesModel::setData(const QModelIndex &index, const QVariant &value, i
     if(data(index, iRole) != value)
     {
         PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
-        pTreeItem->SetData(value);
 
-        Q_EMIT dataChanged(index, index, QVector<int>() << iRole);
+        QUndoCommand *pCmd = new PropertiesUndoCmd(*this, m_iSTATE_INDEX, m_iSUBSTATE, *pTreeItem, index, value, iRole);
+        m_ItemRef.GetUndoStack()->push(pCmd);
+
+        //Q_EMIT dataChanged(index, index, QVector<int>() << iRole); <- Called within PropertiesUndoCmd's redo/undo
         return true;
     }
 
     return false;
 }
 
-Qt::ItemFlags PropertiesModel::flags(const QModelIndex &index) const
+Qt::ItemFlags PropertiesTreeModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags returnFlags = Qt::NoItemFlags;
 
@@ -228,7 +238,7 @@ Qt::ItemFlags PropertiesModel::flags(const QModelIndex &index) const
 //    return true;
 //}
 
-bool PropertiesModel::removeRows(int row, int count, const QModelIndex &parent)
+bool PropertiesTreeModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     beginRemoveRows(parent, row, row + count - 1);
     // FIXME: Implement me!
@@ -246,14 +256,14 @@ bool PropertiesModel::removeRows(int row, int count, const QModelIndex &parent)
 //    return true;
 //}
 
-void PropertiesModel::InsertItem(int iRow, PropertiesTreeItem *pItem, PropertiesTreeItem *pParentItem)
+void PropertiesTreeModel::InsertItem(int iRow, PropertiesTreeItem *pItem, PropertiesTreeItem *pParentItem)
 {
     QList<PropertiesTreeItem *> itemList;
     itemList << pItem;
     InsertItems(iRow, itemList, pParentItem);
 }
 
-void PropertiesModel::InsertItems(int iRow, QList<PropertiesTreeItem *> itemList, PropertiesTreeItem *pParentItem)
+void PropertiesTreeModel::InsertItems(int iRow, QList<PropertiesTreeItem *> itemList, PropertiesTreeItem *pParentItem)
 {
     QModelIndex parentIndex = pParentItem ? createIndex(pParentItem->GetRow(), 0, pParentItem) : QModelIndex();
 

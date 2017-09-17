@@ -7,8 +7,8 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __HyShaderUniforms_h__
-#define __HyShaderUniforms_h__
+#ifndef HyShaderUniforms_h__
+#define HyShaderUniforms_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/HyAssets.h"
@@ -65,4 +65,4 @@ public:
 	void Clear();
 };
 
-#endif /* __HyShaderUniforms_h__ */
+#endif /* HyShaderUniforms_h__ */

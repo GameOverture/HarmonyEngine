@@ -37,6 +37,8 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(pare
     connect(ui->dialRotation, SIGNAL(valueChanged(int)), ui->sbRotation, SLOT(setValue(int)));
 
     on_childrenTree_clicked(QModelIndex());
+
+    FocusState(0, QVariant(static_cast<qulonglong>(0)));
 }
 
 EntityWidget::~EntityWidget()
@@ -86,6 +88,58 @@ int EntityWidget::GetNumStates() const
     return ui->cmbStates->count();
 }
 
+void EntityWidget::FocusState(int iStateIndex, QVariant subState)
+{
+    if(iStateIndex >= 0)
+    {
+        ui->cmbStates->blockSignals(true);
+        ui->cmbStates->setCurrentIndex(iStateIndex);
+        ui->cmbStates->blockSignals(false);
+
+        if(subState.toInt() >= 0)
+        {
+            // Get EntityStateData from 'iStateIndex', and select the correct EntityTreeItem using 'iSubStateIndex' as the key
+            EntityStateData *pCurStateData = static_cast<EntityStateData *>(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
+            EntityTreeItem *pTreeItem = reinterpret_cast<EntityTreeItem *>(subState.toULongLong());
+            if(pTreeItem == nullptr)
+            {
+                ui->lblSelectedItemIcon->setVisible(false);
+                ui->lblSelectedItemText->setVisible(false);
+                ui->toolBox->setVisible(false);
+                ui->toolBoxLine->setVisible(false);
+
+                ui->propertyTree->setModel(nullptr);
+            }
+            else
+            {
+                ui->lblSelectedItemIcon->setVisible(true);
+                ui->lblSelectedItemIcon->setPixmap(pTreeItem->GetItem()->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
+                ui->lblSelectedItemText->setVisible(true);
+                ui->lblSelectedItemText->setText(pTreeItem->GetItem()->GetName(false) % " Properties");
+
+                ui->propertyTree->setModel(GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem));
+            }
+        }
+    }
+
+    UpdateActions();
+}
+
+void EntityWidget::UpdateActions()
+{
+    ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
+    ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
+    ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
+
+    DataExplorerItem *pExplorerItem = m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
+    ui->actionAddSelectedChild->setEnabled(pExplorerItem && pExplorerItem->IsProjectItem());
+
+    bool bFrameIsSelected = ui->propertyTree->model() != nullptr && ui->propertyTree->currentIndex().row() >= 0;
+    ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
+    ui->actionInsertBoundingVolume->setEnabled(bFrameIsSelected);
+    ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
+}
+
 void EntityWidget::on_actionAddSelectedChild_triggered()
 {
     if(GetCurSelectedTreeItem() == nullptr)
@@ -131,24 +185,7 @@ void EntityWidget::on_actionInsertPhysicsBody_triggered()
 void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
 {
     EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer());
-    if(pTreeItem == nullptr)
-    {
-        ui->lblSelectedItemIcon->setVisible(false);
-        ui->lblSelectedItemText->setVisible(false);
-        ui->toolBox->setVisible(false);
-        ui->toolBoxLine->setVisible(false);
-
-        ui->propertyTree->setModel(nullptr);
-        //ui->stackedWidget->setCurrentIndex(STACKED_Null);
-        return;
-    }
-
-    ui->lblSelectedItemIcon->setVisible(true);
-    ui->lblSelectedItemIcon->setPixmap(pTreeItem->GetItem()->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
-    ui->lblSelectedItemText->setVisible(true);
-    ui->lblSelectedItemText->setText(pTreeItem->GetItem()->GetName(false) % " Properties");
-
-    ui->propertyTree->setModel(GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem));
+    FocusState(ui->cmbStates->currentIndex(), QVariant(reinterpret_cast<qulonglong>(pTreeItem)));
 
 //    ui->toolBox->setVisible(true);
 //    ui->toolBoxLine->setVisible(true);

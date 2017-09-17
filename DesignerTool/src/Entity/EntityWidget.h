@@ -42,6 +42,9 @@ public:
     EntityStateData *GetCurStateData();
     int GetNumStates() const;
 
+    void FocusState(int iStateIndex, QVariant subState);
+    void UpdateActions();
+
 private Q_SLOTS:
     void on_actionAddSelectedChild_triggered();
     void on_actionAddPrimitive_triggered();

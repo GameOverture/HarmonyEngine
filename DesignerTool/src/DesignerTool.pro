@@ -74,11 +74,11 @@ SOURCES += main.cpp \
     Entity/EntityCommon.cpp \
     Entity/EntityUndoCmds.cpp \
     Shared/Global.cpp \
-    Shared/Properties/PropertiesModel.cpp \
     Shared/IDraw.cpp \
     Shared/IModel.cpp \
     Shared/Properties/PropertiesTreeView.cpp \
-    Shared/Properties/PropertiesTreeItem.cpp
+    Shared/Properties/PropertiesTreeItem.cpp \
+    Shared/Properties/PropertiesTreeModel.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -140,12 +140,12 @@ HEADERS  += \
     Shared/Global.h \
     Shared/GlobalUndoCmds.h \
     Shared/GlobalWidgetMappers.h \
-    Shared/Properties/PropertiesModel.h \
     Shared/IDraw.h \
     Shared/IModel.h \
     Shared/IModelTreeItem.h \
     Shared/Properties/PropertiesTreeView.h \
-    Shared/Properties/PropertiesTreeItem.h
+    Shared/Properties/PropertiesTreeItem.h \
+    Shared/Properties/PropertiesTreeModel.h
 
 FORMS    += \
     MainWindow.ui \

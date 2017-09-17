@@ -66,7 +66,7 @@ FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
     static_cast<FontModel *>(m_ItemRef.GetModel())->GetAdditionalSymbolsMapper()->AddLineEditMapping(ui->txtAdditionalSymbols);
 
     // ...set models
-    FocusState(0);
+    FocusState(0, -1);
 }
 
 FontWidget::~FontWidget()
@@ -104,24 +104,31 @@ QComboBox *FontWidget::GetCmbStates()
     return ui->cmbStates;
 }
 
-void FontWidget::FocusState(int iStateIndex)
+void FontWidget::FocusState(int iStateIndex, QVariant subState)
 {
     if(iStateIndex >= 0)
     {
-        FontStateData *pCurStateData = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
-    
-        ui->layersTableView->setModel(pCurStateData->GetFontLayersModel());
-        if(ui->layersTableView->currentIndex().row() < 0 && ui->layersTableView->model()->rowCount() > 0)
-            ui->layersTableView->selectRow(0);
-    
-    
-        pCurStateData->GetSizeMapper()->AddSpinBoxMapping(ui->sbSize);
-        pCurStateData->GetFontMapper()->AddComboBoxMapping(ui->cmbFontList);
-    
         ui->cmbStates->blockSignals(true);
         ui->cmbStates->setCurrentIndex(iStateIndex);
         ui->cmbStates->blockSignals(false);
-    
+
+        // Set the model of 'iStateIndex'
+        FontStateData *pCurStateData = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
+        ui->layersTableView->setModel(pCurStateData->GetFontLayersModel());
+        pCurStateData->GetSizeMapper()->AddSpinBoxMapping(ui->sbSize);
+        pCurStateData->GetFontMapper()->AddComboBoxMapping(ui->cmbFontList);
+
+        // subState represents the ID of the row to select
+        if(subState.toInt() >= 0)
+        {
+            if(subState.toInt() >= ui->layersTableView->model()->rowCount() &&
+               ui->layersTableView->model()->rowCount() > 0)
+            {
+                ui->layersTableView->selectRow(0);
+            }
+            else
+                ui->layersTableView->selectRow(subState.toInt());
+        }
     }
 
     UpdateActions();
@@ -193,7 +200,7 @@ void FontWidget::on_txtAdditionalSymbols_editingFinished()
 
 void FontWidget::on_cmbStates_currentIndexChanged(int index)
 {
-    FocusState(index);
+    FocusState(index, -1);
 }
 
 void FontWidget::on_actionAddState_triggered()
