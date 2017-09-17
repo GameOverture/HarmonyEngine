@@ -33,7 +33,10 @@ PropertiesTreeModel *EntityStateData::GetPropertiesModel(EntityTreeItem *pTreeIt
     }
 
     if(m_PropertiesMap.contains(pTreeItem) == false)
-        m_PropertiesMap[pTreeItem] = AllocNewPropertiesModel(m_ModelRef.GetItem(), QVariant(reinterpret_cast<qulonglong>(pTreeItem)), pTreeItem->GetItem()->GetType());
+    {
+        QVariant var(reinterpret_cast<qulonglong>(pTreeItem));
+        m_PropertiesMap[pTreeItem] = AllocNewPropertiesModel(m_ModelRef.GetItem(), var, pTreeItem->GetItem()->GetType());
+    }
 
     return m_PropertiesMap[pTreeItem];
 }

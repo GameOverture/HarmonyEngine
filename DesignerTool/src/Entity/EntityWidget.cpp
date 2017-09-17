@@ -96,29 +96,26 @@ void EntityWidget::FocusState(int iStateIndex, QVariant subState)
         ui->cmbStates->setCurrentIndex(iStateIndex);
         ui->cmbStates->blockSignals(false);
 
-        if(subState.toInt() >= 0)
+        // Get EntityStateData from 'iStateIndex', and select the correct EntityTreeItem using 'iSubStateIndex' as the key
+        EntityStateData *pCurStateData = static_cast<EntityStateData *>(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
+        EntityTreeItem *pTreeItem = reinterpret_cast<EntityTreeItem *>(subState.toULongLong());
+        if(pTreeItem == nullptr)
         {
-            // Get EntityStateData from 'iStateIndex', and select the correct EntityTreeItem using 'iSubStateIndex' as the key
-            EntityStateData *pCurStateData = static_cast<EntityStateData *>(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
-            EntityTreeItem *pTreeItem = reinterpret_cast<EntityTreeItem *>(subState.toULongLong());
-            if(pTreeItem == nullptr)
-            {
-                ui->lblSelectedItemIcon->setVisible(false);
-                ui->lblSelectedItemText->setVisible(false);
-                ui->toolBox->setVisible(false);
-                ui->toolBoxLine->setVisible(false);
+            ui->lblSelectedItemIcon->setVisible(false);
+            ui->lblSelectedItemText->setVisible(false);
+            ui->toolBox->setVisible(false);
+            ui->toolBoxLine->setVisible(false);
 
-                ui->propertyTree->setModel(nullptr);
-            }
-            else
-            {
-                ui->lblSelectedItemIcon->setVisible(true);
-                ui->lblSelectedItemIcon->setPixmap(pTreeItem->GetItem()->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
-                ui->lblSelectedItemText->setVisible(true);
-                ui->lblSelectedItemText->setText(pTreeItem->GetItem()->GetName(false) % " Properties");
+            ui->propertyTree->setModel(nullptr);
+        }
+        else
+        {
+            ui->lblSelectedItemIcon->setVisible(true);
+            ui->lblSelectedItemIcon->setPixmap(pTreeItem->GetItem()->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
+            ui->lblSelectedItemText->setVisible(true);
+            ui->lblSelectedItemText->setText(pTreeItem->GetItem()->GetName(false) % " Properties");
 
-                ui->propertyTree->setModel(GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem));
-            }
+            ui->propertyTree->setModel(GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem));
         }
     }
 
