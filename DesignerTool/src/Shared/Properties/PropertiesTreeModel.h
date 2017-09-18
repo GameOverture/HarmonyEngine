@@ -8,9 +8,6 @@
 #include <QAbstractItemModel>
 #include <QUndoCommand>
 
-#define HYRANGE_Int 16777215 // Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
-#define HYRANGE_double 16777215.0
-
 class PropertiesTreeModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -28,13 +25,8 @@ public:
 
     ProjectItem &GetItem();
 
-    bool AppendCategory(QString sName);
-
-    bool AppendProperty_Bool(QString sCategoryName, QString sName, bool bDefaultValue);
-    bool AppendProperty_Int(QString sCategoryName, QString sName, int iDefaultValue, int iMinRange = -HYRANGE_Int, int iMaxRange = HYRANGE_Int, QString sPrefix = "", QString sPostfix = "");
-    bool AppendProperty_Double(QString sCategoryName, QString sName, double dDefaultValue, double dMinRange = -HYRANGE_double, double dMaxRange = HYRANGE_double, QString sPrefix = "", QString sPostfix = "");
-    bool AppendProperty_IntVec2(QString sCategoryName, QString sName, glm::ivec2 vDefaultValue);
-    bool AppendProperty_Vec2(QString sCategoryName, QString sName, glm::vec2 vDefaultValue);
+    bool AppendCategory(QString sName, QColor color);
+    bool AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion);
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;

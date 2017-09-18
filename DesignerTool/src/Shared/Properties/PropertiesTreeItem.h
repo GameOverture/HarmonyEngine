@@ -20,31 +20,60 @@ enum PropertiesType
     PROPERTIESTYPE_vec2,
 };
 
+struct PropertiesDef
+{
+    PropertiesType  eType;
+
+    QVariant        defaultValue;
+    QVariant        minRange;
+    QVariant        maxRange;
+    QVariant        stepAmt;
+    QString         sPrefix;
+    QString         sSuffix;
+
+    PropertiesDef()
+    { }
+
+    PropertiesDef(PropertiesType eType_,
+                  QVariant defaultValue_,
+                  QVariant minRange_,
+                  QVariant maxRange_,
+                  QVariant stepAmt_,
+                  QString sPrefix_,
+                  QString sSuffix_) :   eType(eType_),
+                                        defaultValue(defaultValue_),
+                                        minRange(minRange_),
+                                        maxRange(maxRange_),
+                                        stepAmt(stepAmt_),
+                                        sPrefix(sPrefix_),
+                                        sSuffix(sSuffix_)
+    { }
+};
+
 class PropertiesTreeItem : public IModelTreeItem
 {
 protected:
-    const PropertiesType                        m_eTYPE;
     const QString                               m_sNAME;
     PropertiesTreeModel *                       m_pTreeModel;
 
     QVariant                                    m_Data;
-    QVariant                                    m_DataRanges;   // If used, either a QPoint, or QPointF [x->y]
+    PropertiesDef                               m_DataDef;
 
-    QString                                     m_sPrefix;
-    QString                                     m_sPostfix;
+    QColor                                      m_Color;
 
 public:
-    explicit PropertiesTreeItem(PropertiesType eType, QString sName, PropertiesTreeModel *pTreeModel);
+    explicit PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color);
     virtual ~PropertiesTreeItem();
 
     PropertiesType GetType();
     QString GetName();
     QString GetValue();
+
     QVariant GetData();
     void SetData(const QVariant &newData);
+    const PropertiesDef &GetDataDef();
 
-    QVariant GetDataRanges();
-    void SetDataRanges(QVariant &ranges);
+    QColor GetColor();
 
     virtual QString GetToolTip() const override;
 };

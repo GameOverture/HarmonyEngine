@@ -51,23 +51,36 @@ PropertiesTreeModel *EntityStateData::GetPropertiesModel(EntityTreeItem *pTreeIt
 
 PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entityItemRef, QVariant &subState, HyGuiItemType eSelectedType)
 {
+    // Default ranges
+    const int iRANGE = 16777215;        // Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
+    const double fRANGE = 16777215.0f;
+    const double dRANGE = 16777215.0;
+
     PropertiesTreeModel *pNewPropertiesModel = new PropertiesTreeModel(entityItemRef, GetIndex(), subState);
 
-    pNewPropertiesModel->AppendCategory("Transformation");
-    pNewPropertiesModel->AppendProperty_Vec2("Transformation", "Position", glm::vec2(0.0f, 0.0f));
-    pNewPropertiesModel->AppendProperty_Vec2("Transformation", "Scale", glm::vec2(0.0f, 0.0f));
-    pNewPropertiesModel->AppendProperty_Double("Transformation", "Rotation", 0.0, 0.0, 360.0, "", "°");
+    PropertiesDef def;
+    PropertiesDef defInt(PROPERTIESTYPE_int, 0, -iRANGE, iRANGE, 1, "", "");
+    PropertiesDef defVec2(PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), QPointF(-fRANGE, -fRANGE), QPointF(fRANGE, fRANGE), 1.0, "[", "]");
 
-    pNewPropertiesModel->AppendCategory("Common");
-    pNewPropertiesModel->AppendProperty_Bool("Common", "Enabled", true);
-    pNewPropertiesModel->AppendProperty_Bool("Common", "Update while game paused", false);
-    pNewPropertiesModel->AppendProperty_Int("Common", "User Tag", 0);
-    pNewPropertiesModel->AppendProperty_Int("Common", "Display Order", 0);
+    pNewPropertiesModel->AppendCategory("Transformation", QColor(22, 22, 0));
+    pNewPropertiesModel->AppendProperty("Transformation", "Position", defVec2);
+    defVec2.defaultValue = QPointF(1.0f, 1.0f);
+    defVec2.stepAmt = 0.01;
+    pNewPropertiesModel->AppendProperty("Transformation", "Scale", defVec2);
+    pNewPropertiesModel->AppendProperty("Transformation", "Rotation", PropertiesDef(PROPERTIESTYPE_double, 0.0, 0.0, 360.0, 1.0, "", "°"));
+
+    pNewPropertiesModel->AppendCategory("Common", QColor(0, 22, 22));
+    def.eType = PROPERTIESTYPE_bool;
+    def.defaultValue = Qt::Checked;
+    pNewPropertiesModel->AppendProperty("Common", "Enabled", def);
+    def.defaultValue = Qt::Unchecked;
+    pNewPropertiesModel->AppendProperty("Common", "Update while game paused", def);
+    pNewPropertiesModel->AppendProperty("Common", "User Tag", defInt);
+    pNewPropertiesModel->AppendProperty("Common", "Display Order", defInt);
 
     switch(eSelectedType)
     {
     case ITEM_Primitive:
-        pNewPropertiesModel->AppendCategory("Transformation");
         break;
     case ITEM_AtlasImage:
         break;

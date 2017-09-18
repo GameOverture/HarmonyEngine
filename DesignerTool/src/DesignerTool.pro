@@ -78,7 +78,8 @@ SOURCES += main.cpp \
     Shared/IModel.cpp \
     Shared/Properties/PropertiesTreeView.cpp \
     Shared/Properties/PropertiesTreeItem.cpp \
-    Shared/Properties/PropertiesTreeModel.cpp
+    Shared/Properties/PropertiesTreeModel.cpp \
+    Widget/WidgetVectorSpinBox.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -145,7 +146,8 @@ HEADERS  += \
     Shared/IModelTreeItem.h \
     Shared/Properties/PropertiesTreeView.h \
     Shared/Properties/PropertiesTreeItem.h \
-    Shared/Properties/PropertiesTreeModel.h
+    Shared/Properties/PropertiesTreeModel.h \
+    Widget/WidgetVectorSpinBox.h
 
 FORMS    += \
     MainWindow.ui \
@@ -173,7 +175,8 @@ FORMS    += \
     Widget/WidgetRangedSlider.ui \
     Entity/EntityToolbox.ui \
     Project/ProjectWidget.ui \
-    Entity/EntityCommon.ui
+    Entity/EntityCommon.ui \
+    Widget/WidgetVectorSpinBox.ui
 
 RC_FILE = DesignerTool.rc
 

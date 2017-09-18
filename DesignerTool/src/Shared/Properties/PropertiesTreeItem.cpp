@@ -1,9 +1,10 @@
 #include "PropertiesTreeItem.h"
 #include "PropertiesTreeModel.h"
 
-PropertiesTreeItem::PropertiesTreeItem(PropertiesType eType, QString sName, PropertiesTreeModel *pTreeModel) :  m_eTYPE(eType),
-                                                                                                            m_sNAME(sName),
-                                                                                                            m_pTreeModel(pTreeModel)
+PropertiesTreeItem::PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color) :  m_sNAME(sName),
+                                                                                                                                            m_pTreeModel(pTreeModel),
+                                                                                                                                            m_DataDef(propertiesDef),
+                                                                                                                                            m_Color(color)
 {
 }
 
@@ -13,7 +14,7 @@ PropertiesTreeItem::PropertiesTreeItem(PropertiesType eType, QString sName, Prop
 
 PropertiesType PropertiesTreeItem::GetType()
 {
-    return m_eTYPE;
+    return m_DataDef.eType;
 }
 
 QString PropertiesTreeItem::GetName()
@@ -23,7 +24,8 @@ QString PropertiesTreeItem::GetName()
 
 QString PropertiesTreeItem::GetValue()
 {
-    switch(m_eTYPE)
+    QString sRetStr = m_DataDef.sPrefix;
+    switch(m_DataDef.eType)
     {
     case PROPERTIESTYPE_Root:
     case PROPERTIESTYPE_Category:
@@ -31,23 +33,26 @@ QString PropertiesTreeItem::GetValue()
         return QString();
 
     case PROPERTIESTYPE_int:
-        return QString::number(m_Data.toInt());
-
+        sRetStr += QString::number(m_Data.toInt());
+        break;
     case PROPERTIESTYPE_double:
-        return QString::number(m_Data.toDouble());
-
+        sRetStr += QString::number(m_Data.toDouble());
+        break;
     case PROPERTIESTYPE_ivec2: {
             QPoint pt = m_Data.toPoint();
-            return QString::number(pt.x()) % " x " % QString::number(pt.y());
+            sRetStr += QString::number(pt.x()) % " x " % QString::number(pt.y());
         }
-
+        break;
     case PROPERTIESTYPE_vec2: {
             QPointF pt = m_Data.toPointF();
-            return QString::number(pt.x()) % " x " % QString::number(pt.y());
+            sRetStr += QString::number(pt.x()) % " x " % QString::number(pt.y());
         }
+        break;
     }
 
-    return QString();
+    sRetStr += m_DataDef.sSuffix;
+
+    return sRetStr;
 }
 
 QVariant PropertiesTreeItem::GetData()
@@ -60,14 +65,14 @@ void PropertiesTreeItem::SetData(const QVariant &newData)
     m_Data = newData;
 }
 
-QVariant PropertiesTreeItem::GetDataRanges()
+const PropertiesDef &PropertiesTreeItem::GetDataDef()
 {
-    return m_DataRanges;
+    return m_DataDef;
 }
 
-void PropertiesTreeItem::SetDataRanges(QVariant &ranges)
+QColor PropertiesTreeItem::GetColor()
 {
-    m_DataRanges = ranges;
+    return m_Color;
 }
 
 /*virtual*/ QString PropertiesTreeItem::GetToolTip() const /*override*/

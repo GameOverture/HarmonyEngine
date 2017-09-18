@@ -6,7 +6,7 @@ PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, 
                                                                                                                         m_iSTATE_INDEX(iStateIndex),
                                                                                                                         m_iSUBSTATE(subState)
 {
-    m_pRootItem = new PropertiesTreeItem(PROPERTIESTYPE_Root, "Root", this);
+    m_pRootItem = new PropertiesTreeItem("Root", this, PropertiesDef(), QColor());
 }
 
 /*virtual*/ PropertiesTreeModel::~PropertiesTreeModel()
@@ -19,7 +19,7 @@ ProjectItem &PropertiesTreeModel::GetItem()
     return m_ItemRef;
 }
 
-bool PropertiesTreeModel::AppendCategory(QString sName)
+bool PropertiesTreeModel::AppendCategory(QString sName, QColor color)
 {
     for(int i = 0; i < m_CategoryList.size(); ++i)
     {
@@ -27,7 +27,10 @@ bool PropertiesTreeModel::AppendCategory(QString sName)
             return false;
     }
 
-    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_Category, sName, this);
+    PropertiesDef def;
+    def.eType = PROPERTIESTYPE_Category;
+
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, def, color);
 
     InsertItem(m_CategoryList.size(), pNewTreeItem, m_pRootItem);
     m_CategoryList.push_back(pNewTreeItem);
@@ -35,74 +38,14 @@ bool PropertiesTreeModel::AppendCategory(QString sName)
     return true;
 }
 
-bool PropertiesTreeModel::AppendProperty_Bool(QString sCategoryName, QString sName, bool bDefaultValue)
+bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion)
 {
     PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
     if(pCategoryTreeItem == nullptr)
         return false;
 
-    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_bool, sName, this);
-    pNewTreeItem->SetData(static_cast<int>(bDefaultValue ? Qt::Checked : Qt::Unchecked));
-
-    InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
-    return true;
-}
-
-bool PropertiesTreeModel::AppendProperty_Int(QString sCategoryName, QString sName, int iDefaultValue, int iMinRange /*= -HYRANGE_Int*/, int iMaxRange /*= HYRANGE_Int*/, QString sPrefix /*= ""*/, QString sPostfix /*= ""*/)
-{
-    PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
-    if(pCategoryTreeItem == nullptr)
-        return false;
-
-    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_int, sName, this);
-    pNewTreeItem->SetData(iDefaultValue);
-
-    QVariant varRanges(QPoint(iMinRange, iMaxRange));
-    pNewTreeItem->SetDataRanges(varRanges);
-
-    InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
-    return true;
-}
-
-bool PropertiesTreeModel::AppendProperty_Double(QString sCategoryName, QString sName, double dDefaultValue, double dMinRange /*= -HYRANGE_double*/, double dMaxRange /*= HYRANGE_double*/, QString sPrefix /*= ""*/, QString sPostfix /*= ""*/)
-{
-    PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
-    if(pCategoryTreeItem == nullptr)
-        return false;
-
-    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_double, sName, this);
-    pNewTreeItem->SetData(dDefaultValue);
-
-    QVariant varRanges(QPointF(static_cast<float>(dMinRange), static_cast<float>(dMaxRange)));
-    pNewTreeItem->SetDataRanges(varRanges);
-
-    InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
-    return true;
-}
-
-bool PropertiesTreeModel::AppendProperty_IntVec2(QString sCategoryName, QString sName, glm::ivec2 vDefaultValue)
-{
-    PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
-    if(pCategoryTreeItem == nullptr)
-        return false;
-
-    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_ivec2, sName, this);
-    QVariant defaultData(QPoint(vDefaultValue.x, vDefaultValue.y));
-    pNewTreeItem->SetData(defaultData);
-
-    InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
-    return true;
-}
-
-bool PropertiesTreeModel::AppendProperty_Vec2(QString sCategoryName, QString sName, glm::vec2 vDefaultValue)
-{
-    PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
-    if(pCategoryTreeItem == nullptr)
-        return false;
-
-    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(PROPERTIESTYPE_vec2, sName, this);
-    QVariant defaultData(QPointF(vDefaultValue.x, vDefaultValue.y));
-    pNewTreeItem->SetData(defaultData);
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, defintion, pCategoryTreeItem->GetColor());
+    pNewTreeItem->SetData(defintion.defaultValue);
 
     InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
     return true;
@@ -222,6 +165,10 @@ QVariant PropertiesTreeModel::data(const QModelIndex &index, int iRole) const
     case Qt::CheckStateRole:
         if(index.column() == 1 && pTreeItem->GetType() == PROPERTIESTYPE_bool)
             return pTreeItem->GetData().toInt();
+
+//    case Qt::DecorationRole:
+//        if(pTreeItem->GetType() != PROPERTIESTYPE_Category)
+//            return pTreeItem->GetColor();
     }
 
     return QVariant();
@@ -232,7 +179,7 @@ bool PropertiesTreeModel::setData(const QModelIndex &index, const QVariant &valu
     if(index.isValid() == false)
         return false;
 
-    if(data(index, iRole) != value)
+    if(data(index, iRole) != value) // TODO: Confirm if this is not pointless check
     {
         PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
 

@@ -1,9 +1,11 @@
 #include "PropertiesTreeView.h"
 #include "PropertiesTreeItem.h"
 #include "Global.h"
+#include "WidgetVectorSpinBox.h"
 
 #include <QPainter>
 #include <QHeaderView>
+#include <QCheckBox>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
 
@@ -55,61 +57,58 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
     QWidget *pReturnWidget = nullptr;
 
     PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
-
-    QVariant dataRanges = pTreeItem->GetDataRanges();
+    const PropertiesDef &defRef = pTreeItem->GetDataDef();
 
     switch(pTreeItem->GetType())
     {
-    case PROPERTIESTYPE_bool:   // bool type already works with the model's Qt::CheckStateRole
+    case PROPERTIESTYPE_bool:
+//        pReturnWidget = new QCheckBox(pParent);
+
+//        if(defRef.defaultValue.isValid())
+//            static_cast<QCheckBox *>(pReturnWidget)->setCheckState(static_cast<Qt::CheckState>(defRef.defaultValue.toInt()));
         break;
 
     case PROPERTIESTYPE_int:
         pReturnWidget = new QSpinBox(pParent);
-        if(dataRanges.isValid())
-        {
-            QPoint rangePoint = dataRanges.toPoint();
-            static_cast<QSpinBox *>(pReturnWidget)->setRange(rangePoint.x(), rangePoint.y());
-        }
+
+        if(defRef.defaultValue.isValid())
+            static_cast<QSpinBox *>(pReturnWidget)->setValue(defRef.defaultValue.toInt());
+        if(defRef.minRange.isValid() && defRef.maxRange.isValid())
+            static_cast<QSpinBox *>(pReturnWidget)->setRange(defRef.minRange.toInt(), defRef.maxRange.toInt());
+        if(defRef.stepAmt.isValid())
+            static_cast<QSpinBox *>(pReturnWidget)->setSingleStep(defRef.stepAmt.toInt());
+        if(defRef.sPrefix.isEmpty() == false)
+            static_cast<QSpinBox *>(pReturnWidget)->setPrefix(defRef.sPrefix);
+        if(defRef.sSuffix.isEmpty() == false)
+            static_cast<QSpinBox *>(pReturnWidget)->setSuffix(defRef.sSuffix);
         break;
 
     case PROPERTIESTYPE_double:
         pReturnWidget = new QDoubleSpinBox(pParent);
-        if(dataRanges.isValid())
-        {
-            QPointF rangePointF = dataRanges.toPointF();
-            static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(rangePointF.x(), rangePointF.y());
-        }
+
+        //static_cast<QDoubleSpinBox *>(pReturnWidget)->setDecimals(3);
+        if(defRef.defaultValue.isValid())
+            static_cast<QDoubleSpinBox *>(pReturnWidget)->setValue(defRef.defaultValue.toDouble());
+        if(defRef.minRange.isValid() && defRef.maxRange.isValid())
+            static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(defRef.minRange.toDouble(), defRef.maxRange.toDouble());
+        if(defRef.stepAmt.isValid())
+            static_cast<QDoubleSpinBox *>(pReturnWidget)->setSingleStep(defRef.stepAmt.toDouble());
+        if(defRef.sPrefix.isEmpty() == false)
+            static_cast<QDoubleSpinBox *>(pReturnWidget)->setPrefix(defRef.sPrefix);
+        if(defRef.sSuffix.isEmpty() == false)
+            static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix(defRef.sSuffix);
         break;
 
     case PROPERTIESTYPE_ivec2:
-
+        pReturnWidget = new WidgetVectorSpinBox(pParent);
+        static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetAsInt(true);
         break;
 
     case PROPERTIESTYPE_vec2:
+        pReturnWidget = new WidgetVectorSpinBox(pParent);
+        static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetAsInt(false);
         break;
     }
-
-//    switch(index.column())
-//    {
-//    case SpriteFramesModel::COLUMN_OffsetX:
-//        pReturnWidget = new QSpinBox(pParent);
-//        static_cast<QSpinBox *>(pReturnWidget)->setPrefix("X:");
-//        static_cast<QSpinBox *>(pReturnWidget)->setRange(-4096, 4096);
-//        break;
-
-//    case SpriteFramesModel::COLUMN_OffsetY:
-//        pReturnWidget = new QSpinBox(pParent);
-//        static_cast<QSpinBox *>(pReturnWidget)->setPrefix("Y:");
-//        static_cast<QSpinBox *>(pReturnWidget)->setRange(-4096, 4096);
-//        break;
-
-//    case SpriteFramesModel::COLUMN_Duration:
-//        pReturnWidget = new QDoubleSpinBox(pParent);
-//        static_cast<QDoubleSpinBox *>(pReturnWidget)->setSingleStep(0.001);
-//        static_cast<QDoubleSpinBox *>(pReturnWidget)->setDecimals(3);
-//        //static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix("sec");
-//        break;
-//    }
 
     return pReturnWidget;
 }
@@ -121,10 +120,13 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
     switch(pTreeItem->GetType())
     {
     case PROPERTIESTYPE_bool:
+        //static_cast<QCheckBox *>(pEditor)->setCheckState(static_cast<Qt::CheckState>(pTreeItem->GetData().toInt()));
         break;
     case PROPERTIESTYPE_int:
+        static_cast<QSpinBox *>(pEditor)->setValue(pTreeItem->GetData().toInt());
         break;
     case PROPERTIESTYPE_double:
+        static_cast<QDoubleSpinBox *>(pEditor)->setValue(pTreeItem->GetData().toDouble());
         break;
     case PROPERTIESTYPE_ivec2:
         break;
@@ -155,14 +157,15 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 /*virtual*/ void PropertiesDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
 {
     PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
-
     switch(pTreeItem->GetType())
     {
     case PROPERTIESTYPE_bool:
         break;
     case PROPERTIESTYPE_int:
+        pModel->setData(index, static_cast<QSpinBox *>(pEditor)->value());
         break;
     case PROPERTIESTYPE_double:
+        pModel->setData(index, static_cast<QDoubleSpinBox *>(pEditor)->value());
         break;
     case PROPERTIESTYPE_ivec2:
         break;
