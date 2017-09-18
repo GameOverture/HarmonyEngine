@@ -62,36 +62,46 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
     PropertiesDef defInt(PROPERTIESTYPE_int, 0, -iRANGE, iRANGE, 1, "", "");
     PropertiesDef defVec2(PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), QPointF(-fRANGE, -fRANGE), QPointF(fRANGE, fRANGE), 1.0, "[", "]");
 
-    pNewPropertiesModel->AppendCategory("Transformation", QColor(22, 22, 0));
+    pNewPropertiesModel->AppendCategory("Transformation", QColor(220, 220, 0));
     pNewPropertiesModel->AppendProperty("Transformation", "Position", defVec2);
-    defVec2.defaultValue = QPointF(1.0f, 1.0f);
+    defVec2.defaultData = QPointF(1.0f, 1.0f);
     defVec2.stepAmt = 0.01;
     pNewPropertiesModel->AppendProperty("Transformation", "Scale", defVec2);
     pNewPropertiesModel->AppendProperty("Transformation", "Rotation", PropertiesDef(PROPERTIESTYPE_double, 0.0, 0.0, 360.0, 1.0, "", "°"));
 
-    pNewPropertiesModel->AppendCategory("Common", QColor(0, 22, 22));
+    pNewPropertiesModel->AppendCategory("Common", QColor(0, 220, 220));
     def.eType = PROPERTIESTYPE_bool;
-    def.defaultValue = Qt::Checked;
+    def.defaultData = Qt::Checked;
     pNewPropertiesModel->AppendProperty("Common", "Enabled", def);
-    def.defaultValue = Qt::Unchecked;
+    def.defaultData = Qt::Unchecked;
     pNewPropertiesModel->AppendProperty("Common", "Update while game paused", def);
     pNewPropertiesModel->AppendProperty("Common", "User Tag", defInt);
     pNewPropertiesModel->AppendProperty("Common", "Display Order", defInt);
 
     switch(eSelectedType)
     {
-    case ITEM_Primitive:
-        break;
-    case ITEM_AtlasImage:
-        break;
-    case ITEM_Font:
-        break;
-    case ITEM_Sprite:
-        break;
-    case ITEM_Entity:
-        break;
-    default:
-        HyGuiLog("EntityTreeItem::EntityTreeItem - unsupported type: " % QString::number(eSelectedType), LOGTYPE_Error);
+        case ITEM_Entity: {
+            pNewPropertiesModel->AppendCategory("Physics", QColor(0, 220, 220));
+
+            PropertiesDef defComboBox;
+            defComboBox.eType = PROPERTIESTYPE_ComboBox;
+            defComboBox.defaultData = 0;
+            QStringList sList;
+            sList << "Static" << "Kinematic" << "Dynamic";
+            defComboBox.delegateBuilder = sList;
+            pNewPropertiesModel->AppendProperty("Physics", "Type", defComboBox);
+        } break;
+
+        case ITEM_Primitive:
+            break;
+        case ITEM_AtlasImage:
+            break;
+        case ITEM_Font:
+            break;
+        case ITEM_Sprite:
+            break;
+        default:
+            HyGuiLog("EntityTreeItem::EntityTreeItem - unsupported type: " % QString::number(eSelectedType), LOGTYPE_Error);
     }
 
     return pNewPropertiesModel;

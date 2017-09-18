@@ -1,10 +1,23 @@
 #include "WidgetVectorSpinBox.h"
 #include "ui_WidgetVectorSpinBox.h"
 
+#include "Global.h"
+
 WidgetVectorSpinBox::WidgetVectorSpinBox(QWidget *parent) : QWidget(parent),
                                                             ui(new Ui::WidgetVectorSpinBox)
 {
     ui->setupUi(this);
+
+    // NOTE: THIS CONSTRUCTOR IS INVALID TO USE. IT EXISTS FOR QT TO ALLOW Q_OBJECT TO WORK
+    HyGuiLog("WidgetVectorSpinBox::WidgetVectorSpinBox() invalid constructor used", LOGTYPE_Error);
+}
+
+WidgetVectorSpinBox::WidgetVectorSpinBox(bool bIsIntVector, QWidget *parent) :  QWidget(parent),
+                                                                                ui(new Ui::WidgetVectorSpinBox)
+{
+    ui->setupUi(this);
+
+    ui->stackedWidget->setCurrentIndex(bIsIntVector ? PAGE_Int : PAGE_Double);
 }
 
 /*virtual*/ WidgetVectorSpinBox::~WidgetVectorSpinBox()
@@ -12,7 +25,24 @@ WidgetVectorSpinBox::WidgetVectorSpinBox(QWidget *parent) : QWidget(parent),
     delete ui;
 }
 
-void WidgetVectorSpinBox::SetAsInt(bool bEnable)
+QVariant WidgetVectorSpinBox::GetValue()
 {
-    ui->stackedWidget->setCurrentIndex(bEnable ? 0 : 1);
+    if(ui->stackedWidget->currentIndex() == PAGE_Int)
+        return QVariant(QPoint(ui->intSpinBoxX->value(), ui->intSpinBoxY->value()));
+    else
+        return QVariant(QPointF(ui->doubleSpinBoxX->value(), ui->doubleSpinBoxY->value()));
+}
+
+void WidgetVectorSpinBox::SetValue(QVariant data)
+{
+    if(ui->stackedWidget->currentIndex() == PAGE_Int)
+    {
+        ui->intSpinBoxX->setValue(data.toPoint().x());
+        ui->intSpinBoxY->setValue(data.toPoint().y());
+    }
+    else
+    {
+        ui->doubleSpinBoxX->setValue(data.toPointF().x());
+        ui->doubleSpinBoxY->setValue(data.toPointF().y());
+    }
 }

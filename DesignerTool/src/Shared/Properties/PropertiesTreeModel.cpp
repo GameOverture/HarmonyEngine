@@ -45,7 +45,7 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, P
         return false;
 
     PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, defintion, pCategoryTreeItem->GetColor());
-    pNewTreeItem->SetData(defintion.defaultValue);
+    pNewTreeItem->SetData(defintion.defaultData);
 
     InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
     return true;
@@ -149,6 +149,8 @@ QVariant PropertiesTreeModel::data(const QModelIndex &index, int iRole) const
     case Qt::BackgroundRole:
         if(pTreeItem->GetType() == PROPERTIESTYPE_Category)
             return QBrush(QColor::fromRgb(160, 160, 160));
+        else
+            return QBrush((0 == (pTreeItem->GetRow() & 1)) ? pTreeItem->GetColor() : pTreeItem->GetColor().lighter());
 
     case Qt::ForegroundRole:
         if(pTreeItem->GetType() == PROPERTIESTYPE_Category)

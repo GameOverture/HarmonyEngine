@@ -8,10 +8,14 @@
 #include <QCheckBox>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
+#include <QLineEdit>
 
 PropertiesTreeView::PropertiesTreeView(QWidget *pParent /*= nullptr*/) : QTreeView(pParent)
 {
     setItemDelegate(new PropertiesDelegate(this, this));
+
+    this->setIndentation(0);
+    this->setAnimated(true);
 }
 
 PropertiesTreeView::~PropertiesTreeView()
@@ -62,17 +66,14 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
     switch(pTreeItem->GetType())
     {
     case PROPERTIESTYPE_bool:
-//        pReturnWidget = new QCheckBox(pParent);
-
-//        if(defRef.defaultValue.isValid())
-//            static_cast<QCheckBox *>(pReturnWidget)->setCheckState(static_cast<Qt::CheckState>(defRef.defaultValue.toInt()));
+        // Handled natively within tree model's CheckStateRole
         break;
 
     case PROPERTIESTYPE_int:
         pReturnWidget = new QSpinBox(pParent);
 
-        if(defRef.defaultValue.isValid())
-            static_cast<QSpinBox *>(pReturnWidget)->setValue(defRef.defaultValue.toInt());
+        if(defRef.defaultData.isValid())
+            static_cast<QSpinBox *>(pReturnWidget)->setValue(defRef.defaultData.toInt());
         if(defRef.minRange.isValid() && defRef.maxRange.isValid())
             static_cast<QSpinBox *>(pReturnWidget)->setRange(defRef.minRange.toInt(), defRef.maxRange.toInt());
         if(defRef.stepAmt.isValid())
@@ -86,9 +87,8 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
     case PROPERTIESTYPE_double:
         pReturnWidget = new QDoubleSpinBox(pParent);
 
-        //static_cast<QDoubleSpinBox *>(pReturnWidget)->setDecimals(3);
-        if(defRef.defaultValue.isValid())
-            static_cast<QDoubleSpinBox *>(pReturnWidget)->setValue(defRef.defaultValue.toDouble());
+        if(defRef.defaultData.isValid())
+            static_cast<QDoubleSpinBox *>(pReturnWidget)->setValue(defRef.defaultData.toDouble());
         if(defRef.minRange.isValid() && defRef.maxRange.isValid())
             static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(defRef.minRange.toDouble(), defRef.maxRange.toDouble());
         if(defRef.stepAmt.isValid())
@@ -97,16 +97,38 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
             static_cast<QDoubleSpinBox *>(pReturnWidget)->setPrefix(defRef.sPrefix);
         if(defRef.sSuffix.isEmpty() == false)
             static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix(defRef.sSuffix);
+        if(defRef.delegateBuilder.isValid())
+            static_cast<QDoubleSpinBox *>(pReturnWidget)->setDecimals(defRef.delegateBuilder.toInt());
         break;
 
     case PROPERTIESTYPE_ivec2:
-        pReturnWidget = new WidgetVectorSpinBox(pParent);
-        static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetAsInt(true);
+        pReturnWidget = new WidgetVectorSpinBox(true, pParent);
+
+        if(defRef.defaultData.isValid())
+            static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(defRef.defaultData);
         break;
 
     case PROPERTIESTYPE_vec2:
-        pReturnWidget = new WidgetVectorSpinBox(pParent);
-        static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetAsInt(false);
+        pReturnWidget = new WidgetVectorSpinBox(false, pParent);
+
+        if(defRef.defaultData.isValid())
+            static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(defRef.defaultData);
+        break;
+
+    case PROPERTIESTYPE_LineEdit:
+        pReturnWidget = new QLineEdit(pParent);
+
+        if(defRef.defaultData.isValid())
+            static_cast<QLineEdit *>(pReturnWidget)->setText(defRef.defaultData.toString());
+        break;
+
+    case PROPERTIESTYPE_ComboBox:
+        pReturnWidget = new QComboBox(pParent);
+
+        if(defRef.delegateBuilder.isValid())
+            static_cast<QComboBox *>(pReturnWidget)->addItems(defRef.delegateBuilder.toStringList());
+        if(defRef.defaultData.isValid())
+            static_cast<QComboBox *>(pReturnWidget)->setCurrentIndex(defRef.defaultData.toInt());
         break;
     }
 
@@ -120,7 +142,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
     switch(pTreeItem->GetType())
     {
     case PROPERTIESTYPE_bool:
-        //static_cast<QCheckBox *>(pEditor)->setCheckState(static_cast<Qt::CheckState>(pTreeItem->GetData().toInt()));
+        // Handled natively within tree model's CheckStateRole
         break;
     case PROPERTIESTYPE_int:
         static_cast<QSpinBox *>(pEditor)->setValue(pTreeItem->GetData().toInt());
@@ -129,29 +151,18 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
         static_cast<QDoubleSpinBox *>(pEditor)->setValue(pTreeItem->GetData().toDouble());
         break;
     case PROPERTIESTYPE_ivec2:
-        break;
     case PROPERTIESTYPE_vec2:
+        static_cast<WidgetVectorSpinBox *>(pEditor)->SetValue(pTreeItem->GetData());
+        break;
+    case PROPERTIESTYPE_LineEdit:
+        static_cast<QLineEdit *>(pEditor)->setText(pTreeItem->GetData().toString());
+        break;
+    case PROPERTIESTYPE_ComboBox:
+        static_cast<QComboBox *>(pEditor)->setCurrentIndex(pTreeItem->GetData().toInt());
         break;
     default:
-        HyGuiLog("Unsupported Delegate type", LOGTYPE_Error);
+        HyGuiLog("PropertiesDelegate::setEditorData() Unsupported Delegate type:" % QString::number(pTreeItem->GetType()), LOGTYPE_Error);
     }
-
-//    QString sCurValue = index.model()->data(index, Qt::EditRole).toString();
-
-//    switch(index.column())
-//    {
-//    case SpriteFramesModel::COLUMN_OffsetX:
-//        static_cast<QSpinBox *>(pEditor)->setValue(sCurValue.toInt());
-//        break;
-
-//    case SpriteFramesModel::COLUMN_OffsetY:
-//        static_cast<QSpinBox *>(pEditor)->setValue(sCurValue.toInt());
-//        break;
-
-//    case SpriteFramesModel::COLUMN_Duration:
-//        static_cast<QDoubleSpinBox *>(pEditor)->setValue(sCurValue.toDouble());
-//        break;
-//    }
 }
 
 /*virtual*/ void PropertiesDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
@@ -168,36 +179,18 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
         pModel->setData(index, static_cast<QDoubleSpinBox *>(pEditor)->value());
         break;
     case PROPERTIESTYPE_ivec2:
-        break;
     case PROPERTIESTYPE_vec2:
+        pModel->setData(index, static_cast<WidgetVectorSpinBox *>(pEditor)->GetValue());
+        break;
+    case PROPERTIESTYPE_LineEdit:
+        pModel->setData(index, static_cast<QLineEdit *>(pEditor)->text());
+        break;
+    case PROPERTIESTYPE_ComboBox:
+        pModel->setData(index, static_cast<QComboBox *>(pEditor)->currentIndex());
         break;
     default:
-        HyGuiLog("Unsupported Delegate type", LOGTYPE_Error);
+        HyGuiLog("PropertiesDelegate::setModelData() Unsupported Delegate type:" % QString::number(pTreeItem->GetType()), LOGTYPE_Error);
     }
-//    case SpriteFramesModel::COLUMN_OffsetX:
-//    {
-//        SpriteFramesModel *pSpriteModel = static_cast<SpriteFramesModel *>(pModel);
-//        QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
-//        vOffset.setX(static_cast<QSpinBox *>(pEditor)->value());
-
-//        m_pItem->GetUndoStack()->push(new SpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
-//        break;
-//    }
-
-//    case SpriteFramesModel::COLUMN_OffsetY:
-//    {
-//        SpriteFramesModel *pSpriteModel = static_cast<SpriteFramesModel *>(pModel);
-//        QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
-//        vOffset.setY(static_cast<QSpinBox *>(pEditor)->value());
-
-//        m_pItem->GetUndoStack()->push(new SpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset));
-//        break;
-//    }
-
-
-//    case SpriteFramesModel::COLUMN_Duration:
-//        m_pItem->GetUndoStack()->push(new SpriteUndoCmd_DurationFrame(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value()));
-//        break;
 }
 
 /*virtual*/ void PropertiesDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const

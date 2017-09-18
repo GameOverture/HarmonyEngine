@@ -12,26 +12,21 @@ PropertiesTreeItem::PropertiesTreeItem(QString sName, PropertiesTreeModel *pTree
 {
 }
 
-PropertiesType PropertiesTreeItem::GetType()
+PropertiesType PropertiesTreeItem::GetType() const
 {
     return m_DataDef.eType;
 }
 
-QString PropertiesTreeItem::GetName()
+QString PropertiesTreeItem::GetName() const
 {
     return m_sNAME;
 }
 
-QString PropertiesTreeItem::GetValue()
+QString PropertiesTreeItem::GetValue() const
 {
     QString sRetStr = m_DataDef.sPrefix;
     switch(m_DataDef.eType)
     {
-    case PROPERTIESTYPE_Root:
-    case PROPERTIESTYPE_Category:
-    case PROPERTIESTYPE_bool:
-        return QString();
-
     case PROPERTIESTYPE_int:
         sRetStr += QString::number(m_Data.toInt());
         break;
@@ -48,6 +43,13 @@ QString PropertiesTreeItem::GetValue()
             sRetStr += QString::number(pt.x()) % " x " % QString::number(pt.y());
         }
         break;
+
+    case PROPERTIESTYPE_LineEdit:
+        sRetStr = m_Data.toString();
+        break;
+    case PROPERTIESTYPE_ComboBox:
+        sRetStr = m_DataDef.delegateBuilder.toStringList()[m_Data.toInt()];
+        break;
     }
 
     sRetStr += m_DataDef.sSuffix;
@@ -55,24 +57,24 @@ QString PropertiesTreeItem::GetValue()
     return sRetStr;
 }
 
-QVariant PropertiesTreeItem::GetData()
+QVariant PropertiesTreeItem::GetData() const
 {
     return m_Data;
+}
+
+const PropertiesDef &PropertiesTreeItem::GetDataDef() const
+{
+    return m_DataDef;
+}
+
+QColor PropertiesTreeItem::GetColor() const
+{
+    return m_Color;
 }
 
 void PropertiesTreeItem::SetData(const QVariant &newData)
 {
     m_Data = newData;
-}
-
-const PropertiesDef &PropertiesTreeItem::GetDataDef()
-{
-    return m_DataDef;
-}
-
-QColor PropertiesTreeItem::GetColor()
-{
-    return m_Color;
 }
 
 /*virtual*/ QString PropertiesTreeItem::GetToolTip() const /*override*/
