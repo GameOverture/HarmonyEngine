@@ -6,7 +6,7 @@ PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, 
                                                                                                                         m_iSTATE_INDEX(iStateIndex),
                                                                                                                         m_iSUBSTATE(subState)
 {
-    m_pRootItem = new PropertiesTreeItem("Root", this, PropertiesDef(), QColor());
+    m_pRootItem = new PropertiesTreeItem("Root", this, PropertiesDef(), QColor(), "");
 }
 
 /*virtual*/ PropertiesTreeModel::~PropertiesTreeModel()
@@ -19,7 +19,7 @@ ProjectItem &PropertiesTreeModel::GetItem()
     return m_ItemRef;
 }
 
-bool PropertiesTreeModel::AppendCategory(QString sName, QColor color)
+bool PropertiesTreeModel::AppendCategory(QString sName, QColor color, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
 {
     for(int i = 0; i < m_CategoryList.size(); ++i)
     {
@@ -28,9 +28,10 @@ bool PropertiesTreeModel::AppendCategory(QString sName, QColor color)
     }
 
     PropertiesDef def;
-    def.eType = PROPERTIESTYPE_Category;
+    def.eType = bCheckable ? PROPERTIESTYPE_CategoryChecked : PROPERTIESTYPE_Category;
 
-    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, def, color);
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, def, color, sToolTip);
+    pNewTreeItem->SetData(bStartChecked ? Qt::Checked : Qt::Unchecked);
 
     InsertItem(m_CategoryList.size(), pNewTreeItem, m_pRootItem);
     m_CategoryList.push_back(pNewTreeItem);
@@ -38,17 +39,26 @@ bool PropertiesTreeModel::AppendCategory(QString sName, QColor color)
     return true;
 }
 
-bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion)
+bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion, QString sToolTip)
 {
     PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
     if(pCategoryTreeItem == nullptr)
         return false;
 
-    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, defintion, pCategoryTreeItem->GetColor());
+    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, defintion, pCategoryTreeItem->GetColor(), sToolTip);
     pNewTreeItem->SetData(defintion.defaultData);
 
     InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
     return true;
+}
+
+void PropertiesTreeModel::RefreshProperties()
+{
+    for(int i = 0; i < m_CategoryList.size(); ++i)
+    {
+        dataChanged(createIndex(0, 0, m_CategoryList[i]->GetChild(0)),
+                    createIndex(m_CategoryList[i]->GetNumChildren() - 1, 1, m_CategoryList[i]->GetChild(m_CategoryList[i]->GetNumChildren() - 1)));
+    }
 }
 
 QVariant PropertiesTreeModel::headerData(int iSection, Qt::Orientation orientation, int role) const
@@ -141,23 +151,25 @@ QVariant PropertiesTreeModel::data(const QModelIndex &index, int iRole) const
         else if(index.column() == 1)
             return pTreeItem->GetValue();
 
-    //case Qt::DecorationRole:
-    //    return pTreeItem->GetItem()->GetIcon(SUBICON_None);
+    case Qt::TextAlignmentRole:
+        if(pTreeItem->IsCategory())
+            return Qt::AlignHCenter;
+
     case Qt::ToolTipRole:
         return pTreeItem->GetToolTip();
 
     case Qt::BackgroundRole:
-        if(pTreeItem->GetType() == PROPERTIESTYPE_Category)
+        if(pTreeItem->IsCategory())
             return QBrush(QColor::fromRgb(160, 160, 160));
         else
             return QBrush((0 == (pTreeItem->GetRow() & 1)) ? pTreeItem->GetColor() : pTreeItem->GetColor().lighter());
 
     case Qt::ForegroundRole:
-        if(pTreeItem->GetType() == PROPERTIESTYPE_Category)
+        if(pTreeItem->IsCategory())
             return QBrush(QColor::fromRgb(255, 255, 255));
 
     case Qt::FontRole:
-        if(pTreeItem->GetType() == PROPERTIESTYPE_Category)
+        if(pTreeItem->IsCategory())
         {
             QFont font;
             font.setBold(true);
@@ -165,12 +177,11 @@ QVariant PropertiesTreeModel::data(const QModelIndex &index, int iRole) const
         }
 
     case Qt::CheckStateRole:
-        if(index.column() == 1 && pTreeItem->GetType() == PROPERTIESTYPE_bool)
+        if((index.column() == 0 && pTreeItem->GetType() == PROPERTIESTYPE_CategoryChecked) ||
+           (index.column() == 1 && pTreeItem->GetType() == PROPERTIESTYPE_bool))
+        {
             return pTreeItem->GetData().toInt();
-
-//    case Qt::DecorationRole:
-//        if(pTreeItem->GetType() != PROPERTIESTYPE_Category)
-//            return pTreeItem->GetColor();
+        }
     }
 
     return QVariant();
@@ -181,14 +192,14 @@ bool PropertiesTreeModel::setData(const QModelIndex &index, const QVariant &valu
     if(index.isValid() == false)
         return false;
 
-    if(data(index, iRole) != value) // TODO: Confirm if this is not pointless check
+    if(data(index, iRole) != value)
     {
         PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
 
         QUndoCommand *pCmd = new PropertiesUndoCmd(*this, m_iSTATE_INDEX, m_iSUBSTATE, *pTreeItem, index, value, iRole);
         m_ItemRef.GetUndoStack()->push(pCmd);
-
         //Q_EMIT dataChanged(index, index, QVector<int>() << iRole); <- Called within PropertiesUndoCmd's redo/undo
+
         return true;
     }
 
@@ -204,17 +215,32 @@ Qt::ItemFlags PropertiesTreeModel::flags(const QModelIndex &index) const
 
     PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
 
-    returnFlags |= (Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-
-    if(index.column() == 0)
+    if(pTreeItem->IsCategory())
     {
-    }
-    else if(index.column() == 1)
-    {
-        returnFlags |= Qt::ItemIsEditable;
+        returnFlags |= Qt::ItemIsEnabled;
 
-        if(pTreeItem->GetType() == PROPERTIESTYPE_bool)
+        if(pTreeItem->GetType() == PROPERTIESTYPE_CategoryChecked && index.column() == 0)
             returnFlags |= Qt::ItemIsUserCheckable;
+    }
+    else
+    {
+        PropertiesTreeItem *pCategoryItem = static_cast<PropertiesTreeItem *>(pTreeItem->GetParent());
+        if(pCategoryItem->IsCategory() == false)
+            HyGuiLog("PropertiesTreeModel::flags() passed in index is not a category and its parent is not one either", LOGTYPE_Error);
+
+        if(pCategoryItem->GetType() == PROPERTIESTYPE_Category ||
+           (pCategoryItem->GetType() == PROPERTIESTYPE_CategoryChecked && pCategoryItem->GetData().toInt() == Qt::Checked))
+        {
+            returnFlags |= Qt::ItemIsEnabled;
+        }
+
+        if(index.column() == 1)
+        {
+            returnFlags |= (Qt::ItemIsSelectable | Qt::ItemIsEditable);
+
+            if(pTreeItem->GetType() == PROPERTIESTYPE_bool)
+                returnFlags |= Qt::ItemIsUserCheckable;
+        }
     }
 
     return returnFlags;

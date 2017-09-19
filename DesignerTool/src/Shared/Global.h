@@ -145,6 +145,7 @@ class HyGlobal
     static QString                  sm_sSubIconNames[NUM_SUBICONS];
 
     static QIcon                    sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
+    static QColor                   sm_ItemColors[NUMTYPES];
 
     static QRegExpValidator *       sm_pCodeNameValidator;
     static QRegExpValidator *       sm_pFileNameValidator;
@@ -167,6 +168,7 @@ public:
     static const QString ItemName(HyGuiItemType eItm)                  { return sm_sItemNames[eItm]; }
     static const QString ItemExt(HyGuiItemType eItem);
     static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)  { return sm_ItemIcons[eItm][eSubIcon]; }
+    static const QColor ItemColor(HyGuiItemType eItem)                  { return sm_ItemColors[eItem]; }
 
     static const QRegExpValidator *CodeNameValidator()                  { return sm_pCodeNameValidator; }
     static const QRegExpValidator *FileNameValidator()                  { return sm_pFileNameValidator; }

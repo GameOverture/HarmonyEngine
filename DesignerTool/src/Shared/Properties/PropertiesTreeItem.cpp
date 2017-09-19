@@ -1,15 +1,22 @@
 #include "PropertiesTreeItem.h"
 #include "PropertiesTreeModel.h"
+#include "IModel.h"
 
-PropertiesTreeItem::PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color) :  m_sNAME(sName),
-                                                                                                                                            m_pTreeModel(pTreeModel),
-                                                                                                                                            m_DataDef(propertiesDef),
-                                                                                                                                            m_Color(color)
+PropertiesTreeItem::PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color, QString sToolTip) :    m_sNAME(sName),
+                                                                                                                                                                m_pTreeModel(pTreeModel),
+                                                                                                                                                                m_DataDef(propertiesDef),
+                                                                                                                                                                m_Color(color),
+                                                                                                                                                                m_sToolTip(sToolTip)
 {
 }
 
 /*virtual*/ PropertiesTreeItem::~PropertiesTreeItem()
 {
+}
+
+bool PropertiesTreeItem::IsCategory() const
+{
+    return m_DataDef.eType == PROPERTIESTYPE_Category || m_DataDef.eType == PROPERTIESTYPE_CategoryChecked;
 }
 
 PropertiesType PropertiesTreeItem::GetType() const
@@ -34,21 +41,26 @@ QString PropertiesTreeItem::GetValue() const
         sRetStr += QString::number(m_Data.toDouble());
         break;
     case PROPERTIESTYPE_ivec2: {
-            QPoint pt = m_Data.toPoint();
-            sRetStr += QString::number(pt.x()) % " x " % QString::number(pt.y());
-        }
-        break;
+        QPoint pt = m_Data.toPoint();
+        sRetStr += QString::number(pt.x()) % " x " % QString::number(pt.y());
+        } break;
     case PROPERTIESTYPE_vec2: {
-            QPointF pt = m_Data.toPointF();
-            sRetStr += QString::number(pt.x()) % " x " % QString::number(pt.y());
-        }
-        break;
-
+        QPointF pt = m_Data.toPointF();
+        sRetStr += QString::number(pt.x()) % " x " % QString::number(pt.y());
+        } break;
     case PROPERTIESTYPE_LineEdit:
-        sRetStr = m_Data.toString();
+        sRetStr += m_Data.toString();
         break;
     case PROPERTIESTYPE_ComboBox:
-        sRetStr = m_DataDef.delegateBuilder.toStringList()[m_Data.toInt()];
+        sRetStr += m_DataDef.delegateBuilder.toStringList()[m_Data.toInt()];
+        break;
+    case PROPERTIESTYPE_StatesComboBox: {
+        QComboBox tmpComboBox(nullptr);
+        tmpComboBox.setModel(m_DataDef.delegateBuilder.value<ProjectItem *>()->GetModel());
+        sRetStr += tmpComboBox.itemText(m_Data.toInt());
+        } break;
+    case PROPERTIESTYPE_Slider:
+        sRetStr += QString::number(m_Data.toInt());
         break;
     }
 
@@ -79,5 +91,5 @@ void PropertiesTreeItem::SetData(const QVariant &newData)
 
 /*virtual*/ QString PropertiesTreeItem::GetToolTip() const /*override*/
 {
-    return QString();
+    return m_sToolTip;
 }

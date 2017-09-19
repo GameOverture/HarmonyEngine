@@ -1,4 +1,5 @@
 #include "EntityModel.h"
+#include "Global.h"
 
 #include <QVariant>
 
@@ -58,30 +59,30 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
 
     PropertiesTreeModel *pNewPropertiesModel = new PropertiesTreeModel(entityItemRef, GetIndex(), subState);
 
-    PropertiesDef def;
+    PropertiesDef defBool;
+    defBool.eType = PROPERTIESTYPE_bool;
     PropertiesDef defInt(PROPERTIESTYPE_int, 0, -iRANGE, iRANGE, 1, "", "");
     PropertiesDef defVec2(PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), QPointF(-fRANGE, -fRANGE), QPointF(fRANGE, fRANGE), 1.0, "[", "]");
 
-    pNewPropertiesModel->AppendCategory("Transformation", QColor(220, 220, 0));
-    pNewPropertiesModel->AppendProperty("Transformation", "Position", defVec2);
+    pNewPropertiesModel->AppendCategory("Transformation", HyGlobal::ItemColor(ITEM_Project));
+    pNewPropertiesModel->AppendProperty("Transformation", "Position", defVec2, "Position is relative to parent node");
     defVec2.defaultData = QPointF(1.0f, 1.0f);
     defVec2.stepAmt = 0.01;
-    pNewPropertiesModel->AppendProperty("Transformation", "Scale", defVec2);
-    pNewPropertiesModel->AppendProperty("Transformation", "Rotation", PropertiesDef(PROPERTIESTYPE_double, 0.0, 0.0, 360.0, 1.0, "", "°"));
+    pNewPropertiesModel->AppendProperty("Transformation", "Scale", defVec2, "Scale is relative to parent node");
+    pNewPropertiesModel->AppendProperty("Transformation", "Rotation", PropertiesDef(PROPERTIESTYPE_double, 0.0, 0.0, 360.0, 1.0, "", "°"), "Rotation is relative to parent node");
 
-    pNewPropertiesModel->AppendCategory("Common", QColor(0, 220, 220));
-    def.eType = PROPERTIESTYPE_bool;
-    def.defaultData = Qt::Checked;
-    pNewPropertiesModel->AppendProperty("Common", "Enabled", def);
-    def.defaultData = Qt::Unchecked;
-    pNewPropertiesModel->AppendProperty("Common", "Update while game paused", def);
-    pNewPropertiesModel->AppendProperty("Common", "User Tag", defInt);
-    pNewPropertiesModel->AppendProperty("Common", "Display Order", defInt);
+    pNewPropertiesModel->AppendCategory("Common", HyGlobal::ItemColor(ITEM_Prefix));
+    defBool.defaultData = Qt::Checked;
+    pNewPropertiesModel->AppendProperty("Common", "Enabled", defBool, "Enabled dictates whether this gets drawn and updated");
+    defBool.defaultData = Qt::Unchecked;
+    pNewPropertiesModel->AppendProperty("Common", "Update while game paused", defBool, "Only items with this checked will recieve updates when the game/application is paused");
+    pNewPropertiesModel->AppendProperty("Common", "User Tag", defInt, "Not used by Harmony. You can set it to anything you like");
+    pNewPropertiesModel->AppendProperty("Common", "Display Order", defInt, "Higher display orders get drawn above other items with less. Undefined ordering when equal");
 
     switch(eSelectedType)
     {
         case ITEM_Entity: {
-            pNewPropertiesModel->AppendCategory("Physics", QColor(0, 220, 220));
+            pNewPropertiesModel->AppendCategory("Physics", HyGlobal::ItemColor(ITEM_Physics), true, false);
 
             PropertiesDef defComboBox;
             defComboBox.eType = PROPERTIESTYPE_ComboBox;
@@ -89,17 +90,46 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
             QStringList sList;
             sList << "Static" << "Kinematic" << "Dynamic";
             defComboBox.delegateBuilder = sList;
-            pNewPropertiesModel->AppendProperty("Physics", "Type", defComboBox);
+            pNewPropertiesModel->AppendProperty("Physics", "Type", defComboBox, "A static body does not move. A kinematic body moves only by forces. A dynamic body moves by forces and collision (fully simulated)");
+            pNewPropertiesModel->AppendProperty("Physics", "Gravity Scale", PropertiesDef(PROPERTIESTYPE_double, 1.0, -100.0, 100.0, 0.1, "", ""), "Adjusts the gravity on this single body. Negative values will reverse gravity. Increased gravity can decrease stability");
+            pNewPropertiesModel->AppendProperty("Physics", "Linear Damping", PropertiesDef(PROPERTIESTYPE_double, 0.0, 0.0, 100.0, 0.01, "", ""), "Reduces the world linear velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1");
+            pNewPropertiesModel->AppendProperty("Physics", "Angular Damping", PropertiesDef(PROPERTIESTYPE_double, 0.01, 0.0, 100.0, 0.01, "", ""), "Reduces the world angular velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1");
+            defBool.defaultData = Qt::Unchecked;
+            pNewPropertiesModel->AppendProperty("Physics", "Dynamic CCD", defBool, "Continous collision detection for other dynamic moving bodies. Note that all bodies are prevented from tunneling through kinematic and static bodies. This setting is only considered on dynamic bodies. You should use this flag sparingly since it increases processing time");
+            pNewPropertiesModel->AppendProperty("Physics", "Fixed Rotation", defBool, "Prevents this body from rotating if checked. Useful for characters");
+            pNewPropertiesModel->AppendProperty("Physics", "Initially Awake", defBool, "Check to make body initially awake. Start sleeping otherwise");
+            defBool.defaultData = Qt::Checked;
+            pNewPropertiesModel->AppendProperty("Physics", "Allow Sleep", defBool, "Uncheck this if this body should never fall asleep. This increases CPU usage");
+
         } break;
 
         case ITEM_Primitive:
+            pNewPropertiesModel->AppendCategory("Primitive", HyGlobal::ItemColor(ITEM_Primitive));
             break;
         case ITEM_AtlasImage:
+            pNewPropertiesModel->AppendCategory("Textured Quad", HyGlobal::ItemColor(ITEM_AtlasImage));
             break;
-        case ITEM_Font:
-            break;
-        case ITEM_Sprite:
-            break;
+
+        case ITEM_Font: {
+            pNewPropertiesModel->AppendCategory("Font", HyGlobal::ItemColor(ITEM_Font));
+
+            PropertiesDef defStateComboBox;
+            defStateComboBox.eType = PROPERTIESTYPE_StatesComboBox;
+            defStateComboBox.defaultData = 0;
+            defStateComboBox.delegateBuilder.setValue<ProjectItem *>(&entityItemRef);
+            pNewPropertiesModel->AppendProperty("Font", "State", defStateComboBox, "The font state to be displayed");
+            } break;
+
+        case ITEM_Sprite: {
+            pNewPropertiesModel->AppendCategory("Sprite", HyGlobal::ItemColor(ITEM_Sprite));
+
+            PropertiesDef defStateComboBox;
+            defStateComboBox.eType = PROPERTIESTYPE_StatesComboBox;
+            defStateComboBox.defaultData = 0;
+            defStateComboBox.delegateBuilder.setValue<ProjectItem *>(&entityItemRef);
+            pNewPropertiesModel->AppendProperty("Sprite", "State", defStateComboBox, "The sprite state to be displayed");
+            } break;
+
         default:
             HyGuiLog("EntityTreeItem::EntityTreeItem - unsupported type: " % QString::number(eSelectedType), LOGTYPE_Error);
     }

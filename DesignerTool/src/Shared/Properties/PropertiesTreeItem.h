@@ -12,6 +12,7 @@ enum PropertiesType
 {
     PROPERTIESTYPE_Root = 0,
     PROPERTIESTYPE_Category,
+    PROPERTIESTYPE_CategoryChecked,
 
     PROPERTIESTYPE_bool,
     PROPERTIESTYPE_int,
@@ -19,7 +20,9 @@ enum PropertiesType
     PROPERTIESTYPE_ivec2,
     PROPERTIESTYPE_vec2,
     PROPERTIESTYPE_LineEdit,
-    PROPERTIESTYPE_ComboBox         // delegateBuilder [QStringList] = QComboBox's selection list
+    PROPERTIESTYPE_ComboBox,        // delegateBuilder [QStringList] = QComboBox's selection list
+    PROPERTIESTYPE_StatesComboBox,  // delegateBuilder [ProjectItem *] = A pointer to the ProjectItem that owns this property
+    PROPERTIESTYPE_Slider,
 };
 
 struct PropertiesDef
@@ -66,10 +69,13 @@ protected:
     PropertiesDef                               m_DataDef;
 
     QColor                                      m_Color;
+    QString                                     m_sToolTip;
 
 public:
-    explicit PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color);
+    explicit PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color, QString sToolTip);
     virtual ~PropertiesTreeItem();
+
+    bool IsCategory() const;
 
     PropertiesType GetType() const;
     QString GetName() const;

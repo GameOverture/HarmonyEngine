@@ -33,9 +33,6 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(pare
     EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
     ui->childrenTree->setModel(&pEntityModel->GetTreeModel());
 
-    connect(ui->sbRotation, SIGNAL(valueChanged(int)), ui->dialRotation, SLOT(setValue(int)));
-    connect(ui->dialRotation, SIGNAL(valueChanged(int)), ui->sbRotation, SLOT(setValue(int)));
-
     on_childrenTree_clicked(QModelIndex());
 
     FocusState(0, QVariant(static_cast<qulonglong>(0)));
@@ -103,8 +100,6 @@ void EntityWidget::FocusState(int iStateIndex, QVariant subState)
         {
             ui->lblSelectedItemIcon->setVisible(false);
             ui->lblSelectedItemText->setVisible(false);
-            ui->toolBox->setVisible(false);
-            ui->toolBoxLine->setVisible(false);
 
             ui->propertyTree->setModel(nullptr);
         }

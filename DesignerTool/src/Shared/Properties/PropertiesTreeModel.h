@@ -25,8 +25,10 @@ public:
 
     ProjectItem &GetItem();
 
-    bool AppendCategory(QString sName, QColor color);
-    bool AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion);
+    bool AppendCategory(QString sName, QColor color, bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
+    bool AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion, QString sToolTip);
+
+    void RefreshProperties();
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -103,6 +105,10 @@ public:
         m_TreeItemRef.SetData(m_NewData);
 
         m_ModelRef.dataChanged(m_Index, m_Index, QVector<int>() << m_iRole);
+
+        if(m_TreeItemRef.GetType() == PROPERTIESTYPE_CategoryChecked && m_TreeItemRef.GetNumChildren() != 0)
+            m_ModelRef.RefreshProperties();
+
         m_ModelRef.GetItem().FocusWidgetState(m_iSTATE_INDEX, m_iSUBSTATE);
     }
 
@@ -111,6 +117,10 @@ public:
         m_TreeItemRef.SetData(m_OldData);
 
         m_ModelRef.dataChanged(m_Index, m_Index, QVector<int>() << m_iRole);
+
+        if(m_TreeItemRef.GetType() == PROPERTIESTYPE_CategoryChecked && m_TreeItemRef.GetNumChildren() != 0)
+            m_ModelRef.RefreshProperties();
+
         m_ModelRef.GetItem().FocusWidgetState(m_iSTATE_INDEX, m_iSUBSTATE);
     }
 };

@@ -14,6 +14,7 @@
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
 
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
+/*static*/ QColor HyGlobal::sm_ItemColors[NUMTYPES];
 
 /*static*/ QRegExpValidator *HyGlobal::sm_pCodeNameValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFileNameValidator = nullptr;
@@ -75,6 +76,20 @@
             sm_ItemIcons[i][j].addFile(sUrl);
         }
     }
+
+    sm_ItemColors[DIR_AudioBanks] = sm_ItemColors[DIR_Audio] = sm_ItemColors[ITEM_Audio] = QColor(203, 233, 131);
+    sm_ItemColors[DIR_Particles] = sm_ItemColors[ITEM_Particles] = QColor(218, 0, 0);
+    sm_ItemColors[DIR_Fonts] = sm_ItemColors[ITEM_Font] = QColor(179, 179, 179);
+    sm_ItemColors[DIR_Spine] = sm_ItemColors[ITEM_Spine] = QColor(209, 159, 223);
+    sm_ItemColors[DIR_Sprites] = sm_ItemColors[ITEM_Sprite] = QColor(129, 166, 225);
+    sm_ItemColors[DIR_Shaders] = sm_ItemColors[ITEM_Shader] = QColor(225, 151, 97);
+    sm_ItemColors[DIR_Entities] = sm_ItemColors[ITEM_Entity] = QColor(128, 128, 128);
+    sm_ItemColors[DIR_Atlases] = sm_ItemColors[ITEM_AtlasImage] = QColor(45, 131, 176);
+    sm_ItemColors[ITEM_Project] = QColor(9, 215, 33);
+    sm_ItemColors[ITEM_Primitive] = QColor(101, 233, 235);
+    sm_ItemColors[ITEM_Prefix] = QColor(228, 212, 128);
+    sm_ItemColors[ITEM_BoundingVolume] = QColor(234, 232, 58);
+    sm_ItemColors[ITEM_Physics] = QColor(201, 58, 203);
 
     sm_pCodeNameValidator = new QRegExpValidator(QRegExp("[A-Za-z_]+[A-Za-z0-9_]*"));
     sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-]*"));
