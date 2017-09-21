@@ -36,7 +36,7 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QWidget(parent),
                                                 ui(new Ui::ProjectWidget)
 {
     ui->setupUi(this);
-    ui->treeWidget->SetOwner(this); // <- this is redundant right? I've seen the owner be a vertical layout though...
+    ui->treeWidget->SetOwner(this);
 
     ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 

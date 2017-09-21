@@ -25,7 +25,7 @@ public:
 
     ProjectItem &GetItem();
 
-    bool AppendCategory(QString sName, QColor color, bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
+    bool AppendCategory(QString sName, QColor color, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
     bool AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion, QString sToolTip);
 
     void RefreshProperties();

@@ -36,7 +36,7 @@ PropertiesTreeModel *EntityStateData::GetPropertiesModel(EntityTreeItem *pTreeIt
     if(m_PropertiesMap.contains(pTreeItem) == false)
     {
         QVariant var(reinterpret_cast<qulonglong>(pTreeItem));
-        m_PropertiesMap[pTreeItem] = AllocNewPropertiesModel(m_ModelRef.GetItem(), var, pTreeItem->GetItem()->GetType());
+        m_PropertiesMap[pTreeItem] = AllocNewPropertiesModel(m_ModelRef.GetItem(), var, pTreeItem->GetItem());
     }
 
     return m_PropertiesMap[pTreeItem];
@@ -50,7 +50,7 @@ PropertiesTreeModel *EntityStateData::GetPropertiesModel(EntityTreeItem *pTreeIt
 {
 }
 
-PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entityItemRef, QVariant &subState, HyGuiItemType eSelectedType)
+PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entityItemRef, QVariant &subState, ProjectItem *pItemToAdd)
 {
     // Default ranges
     const int iRANGE = 16777215;        // Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
@@ -79,7 +79,7 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
     pNewPropertiesModel->AppendProperty("Common", "User Tag", defInt, "Not used by Harmony. You can set it to anything you like");
     pNewPropertiesModel->AppendProperty("Common", "Display Order", defInt, "Higher display orders get drawn above other items with less. Undefined ordering when equal");
 
-    switch(eSelectedType)
+    switch(pItemToAdd->GetType())
     {
         case ITEM_Entity: {
             pNewPropertiesModel->AppendCategory("Physics", HyGlobal::ItemColor(ITEM_Physics), true, false);
@@ -111,27 +111,32 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
             break;
 
         case ITEM_Font: {
-            pNewPropertiesModel->AppendCategory("Font", HyGlobal::ItemColor(ITEM_Font));
+            QVariant var;
+            var.setValue<ProjectItem *>(pItemToAdd);
+            pNewPropertiesModel->AppendCategory("Font", HyGlobal::ItemColor(ITEM_Font), var);
 
             PropertiesDef defStateComboBox;
             defStateComboBox.eType = PROPERTIESTYPE_StatesComboBox;
             defStateComboBox.defaultData = 0;
-            defStateComboBox.delegateBuilder.setValue<ProjectItem *>(&entityItemRef);
+            defStateComboBox.delegateBuilder.setValue<ProjectItem *>(pItemToAdd);
             pNewPropertiesModel->AppendProperty("Font", "State", defStateComboBox, "The font state to be displayed");
             } break;
 
         case ITEM_Sprite: {
-            pNewPropertiesModel->AppendCategory("Sprite", HyGlobal::ItemColor(ITEM_Sprite));
+            QVariant var;
+            var.setValue<ProjectItem *>(pItemToAdd);
+            pNewPropertiesModel->AppendCategory("Sprite", HyGlobal::ItemColor(ITEM_Sprite), var);
 
             PropertiesDef defStateComboBox;
             defStateComboBox.eType = PROPERTIESTYPE_StatesComboBox;
             defStateComboBox.defaultData = 0;
-            defStateComboBox.delegateBuilder.setValue<ProjectItem *>(&entityItemRef);
+            defStateComboBox.delegateBuilder.setValue<ProjectItem *>(pItemToAdd);
             pNewPropertiesModel->AppendProperty("Sprite", "State", defStateComboBox, "The sprite state to be displayed");
+            pNewPropertiesModel->AppendProperty("Sprite", "Frame", PropertiesDef(PROPERTIESTYPE_SpriteFrames, 0), "The sprite frame index to start on");
             } break;
 
         default:
-            HyGuiLog("EntityTreeItem::EntityTreeItem - unsupported type: " % QString::number(eSelectedType), LOGTYPE_Error);
+            HyGuiLog("EntityTreeItem::EntityTreeItem - unsupported type: " % QString::number(pItemToAdd->GetType()), LOGTYPE_Error);
     }
 
     return pNewPropertiesModel;

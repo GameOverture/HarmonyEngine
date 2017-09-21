@@ -19,7 +19,7 @@ ProjectItem &PropertiesTreeModel::GetItem()
     return m_ItemRef;
 }
 
-bool PropertiesTreeModel::AppendCategory(QString sName, QColor color, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
+bool PropertiesTreeModel::AppendCategory(QString sName, QColor color, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
 {
     for(int i = 0; i < m_CategoryList.size(); ++i)
     {
@@ -29,6 +29,7 @@ bool PropertiesTreeModel::AppendCategory(QString sName, QColor color, bool bChec
 
     PropertiesDef def;
     def.eType = bCheckable ? PROPERTIESTYPE_CategoryChecked : PROPERTIESTYPE_Category;
+    def.delegateBuilder = commonDelegateBuilder;
 
     PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, def, color, sToolTip);
     pNewTreeItem->SetData(bStartChecked ? Qt::Checked : Qt::Unchecked);

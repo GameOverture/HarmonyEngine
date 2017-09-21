@@ -23,6 +23,7 @@ enum PropertiesType
     PROPERTIESTYPE_ComboBox,        // delegateBuilder [QStringList] = QComboBox's selection list
     PROPERTIESTYPE_StatesComboBox,  // delegateBuilder [ProjectItem *] = A pointer to the ProjectItem that owns this property
     PROPERTIESTYPE_Slider,
+    PROPERTIESTYPE_SpriteFrames
 };
 
 struct PropertiesDef
@@ -36,11 +37,16 @@ struct PropertiesDef
     QString         sPrefix;
     QString         sSuffix;
 
-    QVariant        delegateBuilder; // Some types need an additional QVariant to build their delegate widget (e.g. ComboBox uses data as currently selected index, but also needs a string list to select from)
+    QVariant        delegateBuilder; // Some types need an additional QVariant to build their delegate widget (e.g. ComboBox uses defaultData as currently selected index, but also needs a string list to select from)
 
     PropertiesDef()
     { }
 
+    // Convience constructors
+    PropertiesDef(PropertiesType eType_,
+                  QVariant defaultData_) :  eType(eType_),
+                                            defaultData(defaultData_)
+    { }
     PropertiesDef(PropertiesType eType_,
                   QVariant defaultData_,
                   QVariant minRange_,

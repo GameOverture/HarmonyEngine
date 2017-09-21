@@ -4,6 +4,7 @@
 #include "WidgetVectorSpinBox.h"
 #include "ProjectItem.h"
 #include "IModel.h"
+#include "SpriteModels.h"
 
 #include <QPainter>
 #include <QHeaderView>
@@ -157,6 +158,20 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
             static_cast<QSlider *>(pReturnWidget)->setMaximum(defRef.maxRange.toInt());
         if(defRef.stepAmt.isValid())
             static_cast<QSlider *>(pReturnWidget)->setSingleStep(defRef.stepAmt.toInt());
+        break;
+
+    case PROPERTIESTYPE_SpriteFrames:
+        pReturnWidget = new QSlider(pParent);
+
+        if(defRef.delegateBuilder.isValid())
+        {
+            SpriteModel *pModel = static_cast<SpriteModel *>(defRef.delegateBuilder.value<ProjectItem *>()->GetModel());
+            static_cast<QSlider *>(pReturnWidget)->setMinimum(0);
+            static_cast<QSlider *>(pReturnWidget)->setMaximum(pModel->GetStateData(x)->GetFramesModel().rowCount());
+            static_cast<QSlider *>(pReturnWidget)->setSingleStep(1);
+        }
+        if(defRef.defaultData.isValid())
+            static_cast<QSlider *>(pReturnWidget)->setValue(defRef.defaultData.toInt());
         break;
     }
 

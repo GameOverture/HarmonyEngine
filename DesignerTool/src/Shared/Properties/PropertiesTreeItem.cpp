@@ -35,6 +35,8 @@ QString PropertiesTreeItem::GetValue() const
     switch(m_DataDef.eType)
     {
     case PROPERTIESTYPE_int:
+    case PROPERTIESTYPE_Slider:
+    case PROPERTIESTYPE_SpriteFrames:
         sRetStr += QString::number(m_Data.toInt());
         break;
     case PROPERTIESTYPE_double:
@@ -59,9 +61,6 @@ QString PropertiesTreeItem::GetValue() const
         tmpComboBox.setModel(m_DataDef.delegateBuilder.value<ProjectItem *>()->GetModel());
         sRetStr += tmpComboBox.itemText(m_Data.toInt());
         } break;
-    case PROPERTIESTYPE_Slider:
-        sRetStr += QString::number(m_Data.toInt());
-        break;
     }
 
     sRetStr += m_DataDef.sSuffix;

@@ -26,7 +26,7 @@ public:
     virtual void RelinquishFrame(AtlasFrame *pFrame) override;
 
 private:
-    PropertiesTreeModel *AllocNewPropertiesModel(ProjectItem &entityItemRef, QVariant &subState, HyGuiItemType eSelectedType);
+    PropertiesTreeModel *AllocNewPropertiesModel(ProjectItem &entityItemRef, QVariant &subState, ProjectItem *pItemToAdd);
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityModel : public IModel
