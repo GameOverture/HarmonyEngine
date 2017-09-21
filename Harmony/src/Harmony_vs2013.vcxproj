@@ -82,6 +82,7 @@
     <ClCompile Include="Renderer\IHyRenderer.cpp" />
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp" />
     <ClCompile Include="Renderer\OpenGL\HyOpenGLShader.cpp" />
+    <ClCompile Include="Renderer\OpenGL\Interop\HyOpenGL_Desktop.cpp" />
     <ClCompile Include="Renderer\OpenGL\Interop\HyOpenGL_Win.cpp" />
     <ClCompile Include="Scene\HyScene.cpp" />
     <ClCompile Include="Scene\Nodes\Entities\HyEntity2d.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGL.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShader.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Desktop.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Win.h" />
     <ClInclude Include="..\include\Harmony\Scene\HyScene.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Entities\HyEntity2d.h" />
