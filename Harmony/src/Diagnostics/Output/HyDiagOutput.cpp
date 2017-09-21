@@ -8,6 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Diagnostics/Output/HyDiagOutput.h"
+#include "Input/IHyInputMap.h"
 
 #define HYDIAG_WIDTH 600.0f
 
@@ -19,12 +20,15 @@ HyDiagOutput::HyDiagOutput() :	m_dFrameTime_Low(9999.0),
 								m_txtAvgFrame(HY_SYSTEM_FONT, this),
 								m_txtAvgFrameLow(HY_SYSTEM_FONT, this),
 								m_txtAvgFrameHigh(HY_SYSTEM_FONT, this),
-								m_txtFps(HY_SYSTEM_FONT, this)
+								m_txtFps(HY_SYSTEM_FONT, this),
+								m_txtMouse(HY_SYSTEM_FONT, this)
 {
 	m_txtAvgFrame.pos.Y(-HY_SYSTEM_FONT_SIZE);
 	m_txtAvgFrameLow.pos.Y(-HY_SYSTEM_FONT_SIZE * 2.0f);
 	m_txtAvgFrameHigh.pos.Y(-HY_SYSTEM_FONT_SIZE * 3.0f);
 	m_txtFps.pos.Y(-HY_SYSTEM_FONT_SIZE * 4.0f);
+	
+	m_txtMouse.pos.Y(-HY_SYSTEM_FONT_SIZE * 5.0f);
 
 	SetDisplayOrder(HY_SYSTEM_FONT_DISPLAYORDER);
 }
@@ -87,6 +91,12 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 		m_dFrameTime_Cumulative = 0.0;
 		m_uiFrameCount = 0;
 	}
+
+	glm::vec2 ptMousePos = IHyInputMap::GetWorldMousePos();
+	if(IHyInputMap::IsMouseLeftDown())
+		m_txtMouse.TextSet("MOUSE DOWN\nX:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
+	else
+		m_txtMouse.TextSet("MOUSE UP\nX:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
 }
 
 void HyDiagOutput::ProfileBegin(const char *szName)

@@ -117,14 +117,14 @@ void HySprite2d::AnimSetFrame(uint32 uiFrameIndex)
 		return;
 	}
 
-	if(m_uiCurFrame != uiFrameIndex)
-	{
-		m_uiCurFrame = uiFrameIndex;
+	if(m_uiCurFrame == uiFrameIndex)
+		return;
 
-		const HySprite2dFrame &UpdatedFrameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
-		m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
-		SetDirty(DIRTY_BoundingVolume);
-	}
+	m_uiCurFrame = uiFrameIndex;
+
+	const HySprite2dFrame &UpdatedFrameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
+	SetDirty(DIRTY_BoundingVolume);
 }
 
 float HySprite2d::AnimGetPlayRate() const

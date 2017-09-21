@@ -33,6 +33,8 @@ class HyDiagOutput : public HyEntity2d
 	HyText2d				m_txtAvgFrameHigh;
 	HyText2d				m_txtFps;
 
+	HyText2d				m_txtMouse;
+
 	//HyProfiler				m_Profiler;
 	uint32					m_uiShowFlags;
 
