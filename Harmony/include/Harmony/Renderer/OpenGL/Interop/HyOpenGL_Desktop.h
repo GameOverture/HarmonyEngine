@@ -13,23 +13,17 @@
 #include "Afx/HyStdAfx.h"
 #include "Renderer/OpenGL/HyOpenGL.h"
 
+#include <GLFW/glfw3.h>
+
 class HyOpenGL_Desktop : public HyOpenGL
 {
-	friend LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
-	HGLRC					m_hGLContext;
-	PIXELFORMATDESCRIPTOR	m_PixelFormatDescriptor;
+	std::vector<GLFWwindow *>		m_glfwWindowList;
 
 public:
 	HyOpenGL_Desktop(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
 	~HyOpenGL_Desktop();
 
 	virtual bool Initialize() override;
-	
-	HWND ConstructWindow(const HyWindowInfo &wndInfo);
-
-	HWND GetHWND(int32 iWindowIndex);
-
 	virtual void StartRender() override;
 	virtual void FinishRender() override;
 };

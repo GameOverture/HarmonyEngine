@@ -167,7 +167,9 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
         {
             SpriteModel *pModel = static_cast<SpriteModel *>(defRef.delegateBuilder.value<ProjectItem *>()->GetModel());
             static_cast<QSlider *>(pReturnWidget)->setMinimum(0);
-            static_cast<QSlider *>(pReturnWidget)->setMaximum(pModel->GetStateData(x)->GetFramesModel().rowCount());
+
+            // TODO: FIX ME
+            //static_cast<QSlider *>(pReturnWidget)->setMaximum(pModel->GetStateData(x)->GetFramesModel().rowCount());
             static_cast<QSlider *>(pReturnWidget)->setSingleStep(1);
         }
         if(defRef.defaultData.isValid())

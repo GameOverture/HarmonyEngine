@@ -32,7 +32,9 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
-	m_Renderer.Initialize();
+	if(m_Renderer.Initialize() == false)
+		HyLogError("IHyRenderer::Initialize() failed");
+
 	m_AppRef.SetInputMapPtr(static_cast<HyInputMapInterop *>(m_Input.GetInputMapArray()));
 }
 
