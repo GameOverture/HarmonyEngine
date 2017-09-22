@@ -7,8 +7,8 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __HyFileIO_h__
-#define __HyFileIO_h__
+#ifndef HyFileIO_h__
+#define HyFileIO_h__
 
 #include "Afx/HyStdAfx.h"
 #include <fstream>
@@ -21,4 +21,4 @@ void WriteTextFile(const char *szFilePath, const char *szContentBuffer);
 
 bool HyFileExists(const std::string &sFilePath);
 
-#endif /* __HyFileIO_h__ */
+#endif /* HyFileIO_h__ */

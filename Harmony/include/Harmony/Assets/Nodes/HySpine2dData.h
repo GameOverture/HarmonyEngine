@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyEnt2dData_h__
-#define __HyEnt2dData_h__
+#ifndef HyEnt2dData_h__
+#define HyEnt2dData_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -36,4 +36,4 @@ public:
 	void AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInterpDur);
 };
 
-#endif /* __HyEnt2dData_h__ */
+#endif /* HyEnt2dData_h__ */

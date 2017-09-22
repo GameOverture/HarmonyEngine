@@ -28,7 +28,6 @@
 #include "Scene/Nodes/Entities/HyEntityLeaf2d.h"
 #include "Assets/HyAssets.h"
 #include "Utilities/HyMath.h"
-#include "Utilities/HyFileIO.h"
 #include "Utilities/HyStrManip.h"
 #include "Utilities/HyImage.h"
 
@@ -70,7 +69,7 @@ private:
 	bool Update();
 	void Shutdown();
 
-	bool PollPlatformApi();
+	//bool PollPlatformApi();
 
 	HyRendererInterop &GetRenderer();
 

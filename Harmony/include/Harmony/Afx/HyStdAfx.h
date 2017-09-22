@@ -18,6 +18,11 @@
 #include "Utilities/HyFileIO.h"
 #include "Box2D/Box2D.h"
 
+//#define GLM_SWIZZLE
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/transform2.hpp"
+
 enum HyType
 {
 	HYTYPE_Unknown = 0,

@@ -10,23 +10,9 @@
 #ifndef HyPlatform_Windows_h__
 #define HyPlatform_Windows_h__
 
-// TODO: Windows SDK 8.x sets builds to be Windows 8 by default, make it Windows 7 instead
-//#define _WIN32_WINNT 0x0601
-
 #define WIN32_LEAN_AND_MEAN 
 #include <Windows.h>
-#include <sstream>
-#include <tchar.h>
-#include <Psapi.h>
-
-//#define GLM_SWIZZLE
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/transform2.hpp"
-
-#include "GL/glew.h"
-#include "GL/gl.h"
-#include "GL/glext.h"
+#include <Psapi.h>							// Used in HyDiagnostics for memory leak detection
 
 // Data types
 typedef signed char			char8;
@@ -46,7 +32,7 @@ typedef unsigned __int64	uint64;
 #define HY_ENDIAN_LITTLE
 
 // Diagnostics assertion
-#if defined(HY_DEBUG) && !defined(HY_PLATFORM_GUI)
+#if defined(HY_DEBUG)
 	#define HyAssert(condition, message) \
 		do { \
 			if(!(condition)) \

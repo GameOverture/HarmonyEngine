@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HySprite2dData_h__
-#define __HySprite2dData_h__
+#ifndef HySprite2dData_h__
+#define HySprite2dData_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -72,4 +72,4 @@ public:
 	const HySprite2dFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const;
 };
 
-#endif /* __HySprite2dData_h__ */
+#endif /* HySprite2dData_h__ */

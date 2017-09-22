@@ -14,13 +14,10 @@
 
 HyOpenGL_Desktop::HyOpenGL_Desktop(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	HyOpenGL(diagnosticsRef, bShowCursor, windowListRef)
 {
-	if(glfwInit() == GLFW_FALSE)
-		HyLogError("HyOpenGL_Desktop::Initialize() - glfwInit failed");
 }
 
 HyOpenGL_Desktop::~HyOpenGL_Desktop()
 {
-	glfwTerminate();
 }
 
 /*virtual*/ bool HyOpenGL_Desktop::Initialize() /*override*/
@@ -59,7 +56,7 @@ HyOpenGL_Desktop::~HyOpenGL_Desktop()
 
 /*virtual*/ void HyOpenGL_Desktop::FinishRender()
 {
-	glfwSwapBuffers(window);
+	//glfwSwapBuffers(window);
 
 	//glfwPollEvents();
 	HDC hDeviceContext = GetDC(m_RenderSurfaceIter->GetHandle());

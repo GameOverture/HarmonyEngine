@@ -15,6 +15,13 @@
 HyCoordinateUnit IHyApplication::sm_eDefaultCoordinateUnit = HYCOORDUNIT_Default;
 float IHyApplication::sm_fPixelsPerMeter = 0.0f;
 
+#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
+void glfw_ErrorCallback(int iError, const char *szDescription)
+{
+	HyLogError("GLFW Error: " << iError << "\n" << szDescription);
+}
+#endif
+
 HarmonyInit::HarmonyInit()
 {
 	sProjectDir = ".";
@@ -147,7 +154,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(NULL),
+IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(nullptr),
 															m_Console(initStruct.bUseConsole, initStruct.consoleInfo)
 {
 	HyAssert(m_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HarmonyInit's actual 'eDefaultCoordinateUnit' cannot be 'HYCOORDUNIT_Default'");
@@ -167,12 +174,20 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(NULL),
 		m_WindowList[i]->SetType(m_Init.windowInfo[i].eType);
 	}
 
-	//for(uint32 i = 0; i < sm_Init.uiNumInputMappings; ++i)
-	//	m_InputMapList.push_back(HY_NEW HyInputMapInterop());
+#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
+	if(glfwInit() == GLFW_FALSE)
+		HyLogError("glfwInit failed");
+
+	glfwSetErrorCallback(glfw_ErrorCallback);
+#endif
 }
 
 IHyApplication::~IHyApplication()
 {
+#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
+	glfwTerminate();
+#endif
+
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowList.size()); ++i)
 		delete m_WindowList[i];
 }
@@ -207,7 +222,7 @@ uint32 IHyApplication::GetNumWindows()
 
 HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 {
-	HyAssert(uiIndex < m_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
+	HyAssert(m_pInputMaps && uiIndex < m_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
 	return static_cast<HyInputMapInterop &>(m_pInputMaps[uiIndex]);
 }
 

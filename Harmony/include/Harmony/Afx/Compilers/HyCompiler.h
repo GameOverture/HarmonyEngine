@@ -46,14 +46,6 @@
 	#define HARMONY_COMPILER_DEFINED
 #endif
 
-#if defined(_HARMONYGUI)
-	#define HY_PLATFORM_GUI
-#endif
-
-#ifndef _HARMONYSINGLETHREAD
-	#define HY_MULTITHREADING
-#endif
-
 //
 // Add any generic macros the compiler doesn't support
 //

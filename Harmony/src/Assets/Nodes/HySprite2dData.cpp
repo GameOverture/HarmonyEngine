@@ -8,10 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Assets/Nodes/HySprite2dData.h"
-
 #include "Renderer/IHyRenderer.h"
-#include "Utilities/HyFileIO.h"
-
 
 uint32 HySprite2dFrame::GetGfxApiHandle() const
 {

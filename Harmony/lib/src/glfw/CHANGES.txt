@@ -1,0 +1,12 @@
+Preprocessor define in project: _GLFW_USE_CONFIG_H
+
+Also glfw project itself includes its "src" path as part of the includes
+
+-------------------------------------------------------------------------
+internal.h - Line 47 was changed to:
+#include "GLFW/glfw3.h"
+
+since this falls in the standard include paths
+
+-------------------------------------------------------------------------
+glfw_config.h should be edited to work with all platforms

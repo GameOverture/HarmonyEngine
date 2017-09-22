@@ -7,39 +7,37 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyInteropAfx_h__
-#define __HyInteropAfx_h__
+#ifndef HyInteropAfx_h__
+#define HyInteropAfx_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Afx/Platforms/HyPlatAfx.h"
 
-#if defined(HY_PLATFORM_WINDOWS)
-	
-	#if defined(HY_PLATFORM_GUI)
-		#include "Renderer/OpenGL/HyOpenGL.h"
-		typedef HyOpenGL HyRendererInterop;
+#if defined(HY_PLATFORM_GUI)
+	#include "Renderer/OpenGL/HyOpenGL.h"
+	typedef HyOpenGL HyRendererInterop;
 
-		#include "Input/Interop/HyInput_NULL.h"
-		typedef HyInput_NULL HyInputInterop;
-		typedef HyInputMap_NULL HyInputMapInterop;
+	#include "Input/Interop/HyInput_NULL.h"
+	typedef HyInput_NULL HyInputInterop;
+	typedef HyInputMap_NULL HyInputMapInterop;
 
-		#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
-		typedef HyConsole_Gui HyConsoleInterop;
-	#else
-		#include "Renderer/OpenGL/Interop/HyOpenGL_Win.h"
-		typedef HyOpenGL_Win HyRendererInterop;
+	#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
+	typedef HyConsole_Gui HyConsoleInterop;
 
-		#include "Input/Interop/HyInput_Gainput.h"
-		#include "Input/Interop/HyInputMap_Gainput.h"
-		typedef HyInput_Gainput HyInputInterop;
-		typedef HyInputMap_Gainput HyInputMapInterop;
+#elif defined(HY_PLATFORM_WINDOWS)
 
-		#include "Diagnostics/Console/Interop/HyConsole_Win.h"
-		typedef HyConsole_Win HyConsoleInterop;
-	#endif
+	#include "Renderer/OpenGL/Interop/HyOpenGL_Win.h"
+	typedef HyOpenGL_Win HyRendererInterop;
+
+	#include "Input/Interop/HyInput_Gainput.h"
+	#include "Input/Interop/HyInputMap_Gainput.h"
+	typedef HyInput_Gainput HyInputInterop;
+	typedef HyInputMap_Gainput HyInputMapInterop;
+
+	#include "Diagnostics/Console/Interop/HyConsole_Win.h"
+	typedef HyConsole_Win HyConsoleInterop;
 
 	typedef MSG HyApiMsgInterop;
-
 	typedef HWND HyRenderSurfaceHandleInterop;
 
 	typedef HyOpenGLShader HyShaderInterop;
@@ -54,12 +52,10 @@
 	#include "Memory/Interop/HyMemAPI_Windows.h"
 	typedef HyMemoryAPI_Windows HyMemoryInterop;
 
-#elif defined(HY_PLATFORM_OSX) && !defined(HY_PLATFORM_GUI)
+#elif defined(HY_PLATFORM_OSX)
 	#include "Renderer/OpenGL/Interop/HyOpenGL_OSX.h"
-#elif defined(HY_PLATFORM_LINUX) && !defined(HY_PLATFORM_GUI)
+#elif defined(HY_PLATFORM_LINUX)
 	#include "Renderer/OpenGL/Interop/HyOpenGL_Linux.h"
-#elif defined(HY_PLATFORM_GUI)
-	#include "Renderer/OpenGL/HyOpenGL.h"
 #endif
 
-#endif __HyInteropAfx_h__
+#endif HyInteropAfx_h__

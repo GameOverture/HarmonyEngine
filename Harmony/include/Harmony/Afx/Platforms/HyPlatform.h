@@ -50,19 +50,19 @@ HY_INLINE uint32 EndianSwap32(uint32 var)
 	#error No Endian is set.
 #endif
 
-//-----------------------------------------------------------------------------------------
-// Alignment
-//-----------------------------------------------------------------------------------------
-#define sgxAlign(_v, _align)   (((tMEMSIZE)(_v)+(_align)-1 ) & \
-	(~((_align)-1)))
-#define sgxAlignUp(_v, _align) (sgxAlign((_v), (_align)) + (_align))
-
-#define sgxAlign4(_v)      sgxAlign(_v,4)
-#define sgxAlign16(_v)     sgxAlign(_v,16)
-#define sgxAlign32(_v)     sgxAlign(_v,32)
-#define sgxAlign128(_v)    sgxAlign(_v,128)
-
-#define sgxIsAligned(_v, _align) (((tMEMSIZE)(_v)&((_align)-1)) == 0)
+////-----------------------------------------------------------------------------------------
+//// Alignment
+////-----------------------------------------------------------------------------------------
+//#define sgxAlign(_v, _align)   (((tMEMSIZE)(_v)+(_align)-1 ) & \
+//	(~((_align)-1)))
+//#define sgxAlignUp(_v, _align) (sgxAlign((_v), (_align)) + (_align))
+//
+//#define sgxAlign4(_v)      sgxAlign(_v,4)
+//#define sgxAlign16(_v)     sgxAlign(_v,16)
+//#define sgxAlign32(_v)     sgxAlign(_v,32)
+//#define sgxAlign128(_v)    sgxAlign(_v,128)
+//
+//#define sgxIsAligned(_v, _align) (((tMEMSIZE)(_v)&((_align)-1)) == 0)
 
 //-----------------------------------------------------------------------------------------
 // Misc
@@ -91,6 +91,7 @@ HY_INLINE uint32 EndianSwap32(uint32 var)
 
 // The size of an enum can vary, so add this element to the end
 // of any enumeration we use that's intended for saving to disc
+// which should force it to 4-bytes
 #define HY_ENUM_PADDING	0x7fffffff
 
 //-----------------------------------------------------------------------------------------

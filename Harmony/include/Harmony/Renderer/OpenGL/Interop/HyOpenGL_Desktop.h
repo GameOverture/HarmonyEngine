@@ -13,8 +13,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Renderer/OpenGL/HyOpenGL.h"
 
-#include <GLFW/glfw3.h>
-
 class HyOpenGL_Desktop : public HyOpenGL
 {
 	std::vector<GLFWwindow *>		m_glfwWindowList;

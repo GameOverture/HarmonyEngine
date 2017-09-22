@@ -119,44 +119,44 @@ void HyEngine::Shutdown()
 	}
 }
 
-bool HyEngine::PollPlatformApi()
-{
-#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
-	MSG msg = {0};
-	int32 iWindowIndex = 0;
-	HWND hWnd = m_Renderer.GetHWND(iWindowIndex);
-
-	while(hWnd != nullptr)
-	{
-		while(PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-
-			// Mouse hovering over a window will count as Input's current window
-			if(msg.message == WM_MOUSEMOVE)
-			{
-				for(uint32 i = 0; i < m_Renderer.GetNumRenderSurfaces(); ++i)
-				{
-					if(m_Renderer.GetHWND(i) == msg.hwnd)
-					{
-						m_Input.SetWindowIndex(i);
-						break;
-					}
-				}
-			}
-
-			m_Input.HandleMsg(&msg);
-		}
-
-		iWindowIndex++;
-		hWnd = m_Renderer.GetHWND(iWindowIndex);
-	}
-#endif
-
-	m_Input.Update();
-	return m_Renderer.IsQuitRequested() == false;
-}
+//bool HyEngine::PollPlatformApi()
+//{
+//#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
+//	MSG msg = {0};
+//	int32 iWindowIndex = 0;
+//	HWND hWnd = m_Renderer.GetHWND(iWindowIndex);
+//
+//	while(hWnd != nullptr)
+//	{
+//		while(PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE))
+//		{
+//			TranslateMessage(&msg);
+//			DispatchMessage(&msg);
+//
+//			// Mouse hovering over a window will count as Input's current window
+//			if(msg.message == WM_MOUSEMOVE)
+//			{
+//				for(uint32 i = 0; i < m_Renderer.GetNumRenderSurfaces(); ++i)
+//				{
+//					if(m_Renderer.GetHWND(i) == msg.hwnd)
+//					{
+//						m_Input.SetWindowIndex(i);
+//						break;
+//					}
+//				}
+//			}
+//
+//			m_Input.HandleMsg(&msg);
+//		}
+//
+//		iWindowIndex++;
+//		hWnd = m_Renderer.GetHWND(iWindowIndex);
+//	}
+//#endif
+//
+//	m_Input.Update();
+//	return m_Renderer.IsQuitRequested() == false;
+//}
 
 HyRendererInterop &HyEngine::GetRenderer()
 {
