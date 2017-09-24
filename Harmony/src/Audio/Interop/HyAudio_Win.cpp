@@ -7,7 +7,6 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
 #include "Audio/Interop/HyAudio_Win.h"
 

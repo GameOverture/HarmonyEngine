@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGL.h"
 #include "Renderer/Components/HyRenderSurface.h"
+#include "Renderer/Components/HyWindow.h"
 #include "Diagnostics/Console/HyConsole.h"
 
 HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(diagnosticsRef, bShowCursor, windowListRef),
@@ -25,7 +26,13 @@ HyOpenGL::~HyOpenGL(void)
 	HyLog("OpenGL is initializing...");
 
 #ifdef HY_PLATFORM_DESKTOP
-	glfwMakeContextCurrent(m_RenderSurfaceList[0].GetHandle());
+	if(m_WindowListRef.size() > 0)
+	{
+		m_pCurWindow = m_WindowListRef[0];
+		glfwMakeContextCurrent(m_pCurWindow->GetHandle());
+	}
+	else
+		HyLog("No windows created to render to");
 #endif
 
 	//////////////////////////////////////////////////////////////////////////
@@ -180,8 +187,8 @@ HyOpenGL::~HyOpenGL(void)
 	int32 iNumCameras2d = GetNumCameras2d();
 	int32 iNumRenderStates2d = GetNumRenderStates2d();
 
-	// Only draw cameras that are apart of this render surface
-	while(m_RenderSurfaceIter->GetId() != GetCameraWindowIndex2d(m_iCurCamIndex) && m_iCurCamIndex < iNumCameras2d)
+	// Only draw cameras that are apart of this HyWindow
+	while(m_pCurWindow->GetIndex() != GetCameraWindowIndex2d(m_iCurCamIndex) && m_iCurCamIndex < iNumCameras2d)
 		m_iCurCamIndex++;
 
 	if(iNumRenderStates2d == 0 || m_iCurCamIndex >= iNumCameras2d)
@@ -427,6 +434,7 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::FinishRender()
 {
 #ifdef HY_PLATFORM_DESKTOP
+	// This function will block if glfwSwapInterval is set to '1' (AKA VSync enabled)
 	glfwSwapBuffers(m_pCurWindow->GetHandle());
 #endif
 }

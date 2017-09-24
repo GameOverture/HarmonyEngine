@@ -10,8 +10,7 @@
 #ifndef HyWindow_h__
 #define HyWindow_h__
 
-#include "Afx/HyStdAfx.h"
-#include "Renderer/Components/HyRenderSurface.h"
+#include "Afx/HyInteropAfx.h"
 #include "Scene/Nodes/Leafs/Misc/HyCamera.h"
 
 struct HyMonitorDeviceInfo
@@ -46,6 +45,7 @@ class HyWindow
 	friend class IHyRenderer;
 	friend class HyScene;
 
+	const uint32							m_uiINDEX;
 	HyWindowInfo							m_Info;
 	static std::vector<HyMonitorDeviceInfo>	sm_MonitorInfoList;
 	
@@ -55,10 +55,10 @@ class HyWindow
 	HyRenderSurfaceHandleInterop			m_hData;
 
 public:
-	HyWindow(HyWindowInfo &windowInfoRef);
+	HyWindow(uint32 uiIndex, HyWindowInfo &windowInfoRef);
 	~HyWindow(void);
 
-	const HyWindowInfo &			GetWindowInfo();
+	uint32							GetIndex() const;
 
 	std::string						GetTitle();
 	void							SetTitle(std::string sTitle);
@@ -89,7 +89,7 @@ public:
 
 private:
 	static void			SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info);
-	void Update_Render(HyRenderSurface &renderSurfaceRef);
+	//void Update_Render(HyRenderSurface &renderSurfaceRef);
 };
 
 #endif /* HyWindow_h__ */

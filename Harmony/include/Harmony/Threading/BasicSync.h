@@ -38,6 +38,10 @@ pthread_cond_t* GetTimeoutCond();
 
 #endif
 
+#if defined(HY_PLATFORM_GUI) || defined(HY_PLATFORM_GUI_WIN)
+#define HY_PLATFORM_GUI_WIN
+#endif
+
 
 
 //*****************************************************************************
@@ -262,7 +266,7 @@ public:
 	// lock handle
 	inline bool Lock()
 	{
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		::EnterCriticalSection(&m_hObject);
 		return(true);
 #elif defined(HY_PLATFORM_UNIX)
@@ -278,7 +282,7 @@ public:
 	bool Lock(uint32 p_Timeout)
 	{
 		CHECK_EXPR(p_Timeout != INFINITE && p_Timeout != 0);
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		if(p_Timeout == INFINITE)
 			::EnterCriticalSection(&m_hObject);
 		else if(::TryEnterCriticalSection(&m_hObject) == FALSE)
@@ -309,7 +313,7 @@ public:
 	// unlock handle
 	inline void Unlock()
 	{
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		::LeaveCriticalSection(&m_hObject);
 #elif defined(HY_PLATFORM_UNIX)
 		int rc = pthread_mutex_unlock(&m_hObject);

@@ -3,7 +3,7 @@
 
 CTLSEntry::CTLSEntry()
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	// aquire TLS
 	m_TLSId = TlsAlloc();
 	CHECK_EXPR(m_TLSId != TLS_OUT_OF_INDEXES);
@@ -14,7 +14,7 @@ CTLSEntry::CTLSEntry()
 
 CTLSEntry::~CTLSEntry()
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	// free TLS
 	TlsFree(m_TLSId);
 #elif defined(HY_PLATFORM_UNIX)
@@ -24,7 +24,7 @@ CTLSEntry::~CTLSEntry()
 
 void CTLSEntry::Set(const PVOID p_Value)
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	TlsSetValue(m_TLSId, p_Value);
 #elif defined(HY_PLATFORM_UNIX)
 	pthread_setspecific(m_TLSKey, p_Value);
@@ -34,7 +34,7 @@ void CTLSEntry::Set(const PVOID p_Value)
 PVOID CTLSEntry::Get() const
 {
 	PVOID ptr;
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	ptr = (PVOID)TlsGetValue(m_TLSId);
 #elif defined(HY_PLATFORM_UNIX)
 	ptr = (PVOID)pthread_getspecific(m_TLSKey);

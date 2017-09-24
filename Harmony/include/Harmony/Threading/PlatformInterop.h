@@ -79,9 +79,8 @@
 // define primitive types
 //#include "PrimitiveTypeDefs.h"
 
-
 // win32 native api
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_GUI)
 #include "InteropWin.h"
 
 // unix api

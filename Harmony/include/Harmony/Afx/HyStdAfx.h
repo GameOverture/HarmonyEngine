@@ -23,6 +23,17 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform2.hpp"
 
+
+#if defined(HY_PLATFORM_GUI)// GUI -> Hack for now
+#define WIN32_LEAN_AND_MEAN 
+#include <Windows.h>
+//#define HY_PLATFORM_WINDOWS
+
+#include "GL/glew.h"
+#include "GL/gl.h"
+#include "GL/glext.h"
+#endif
+
 enum HyType
 {
 	HYTYPE_Unknown = 0,

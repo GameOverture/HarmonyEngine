@@ -38,7 +38,7 @@ class CTLSEntry
 
 	private:
 		// platform dependend TLS index
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		DWORD m_TLSId;
 #elif defined(HY_PLATFORM_UNIX)
 		pthread_key_t m_TLSKey;

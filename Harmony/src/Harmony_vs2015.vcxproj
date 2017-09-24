@@ -82,7 +82,6 @@
     <ClCompile Include="Renderer\IHyRenderer.cpp" />
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp" />
     <ClCompile Include="Renderer\OpenGL\HyOpenGLShader.cpp" />
-    <ClCompile Include="Renderer\OpenGL\Interop\HyOpenGL_Desktop.cpp" />
     <ClCompile Include="Renderer\OpenGL\Interop\HyOpenGL_Win.cpp" />
     <ClCompile Include="Scene\HyScene.cpp" />
     <ClCompile Include="Scene\Nodes\Entities\HyEntity2d.cpp" />
@@ -131,6 +130,7 @@
     <ClInclude Include="..\include\Harmony\Afx\HyStdAfx.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatAfx.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform.h" />
+    <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Gui.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_OSX.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
@@ -178,7 +178,6 @@
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGL.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShader.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h" />
-    <ClInclude Include="..\include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Desktop.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Win.h" />
     <ClInclude Include="..\include\Harmony\Scene\HyScene.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Entities\HyEntity2d.h" />
@@ -376,7 +375,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2d.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfwd.lib;soil2d.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
@@ -403,7 +402,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2d.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfwd.lib;soil2d.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
@@ -418,7 +417,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;HY_PLATFORM_GUI;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\Include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -447,7 +446,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;HY_PLATFORM_GUI;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\Include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -459,7 +458,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>ole32.lib;AdvAPI32.lib;soil2Qtd.lib;gainputQtd.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>AdvAPI32.lib;ole32.lib;soil2Qtd.lib;gainputQtd.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
@@ -491,7 +490,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw.lib;soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
@@ -517,7 +516,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw.lib;soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
@@ -530,7 +529,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;HY_PLATFORM_GUI;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
@@ -558,7 +557,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;HY_PLATFORM_GUI;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>

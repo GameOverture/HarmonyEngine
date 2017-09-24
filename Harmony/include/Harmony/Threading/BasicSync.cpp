@@ -19,6 +19,9 @@ pthread_cond_t* GetTimeoutCond()
 
 #endif
 
+#if defined(HY_PLATFORM_GUI) || defined(HY_PLATFORM_WINDOWS)
+#define HY_PLATFORM_GUI_WIN
+#endif
 
 
 //*****************************************************************************
@@ -29,7 +32,7 @@ BasicSemaphore::BasicSemaphore(uint32 p_InitialCount) : m_bCloseHandle(true)
 {
 	ASSERT_EXPR(p_InitialCount <= SEM_MAX_COUNT);
 	m_WasOpened = false;
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	m_hObject = ::CreateSemaphore(NULL, p_InitialCount, SEM_MAX_COUNT, NULL);
 	if(m_hObject == NULL)
 		THROW_LAST_WIN_ERROR();
@@ -44,7 +47,7 @@ BasicSemaphore::BasicSemaphore(uint32 p_InitialCount, PCTSTR p_Name) : m_bCloseH
 	m_WasOpened = false;
 	if(p_Name == NULL)
 	{
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		m_hObject = ::CreateSemaphore(NULL, p_InitialCount, SEM_MAX_COUNT, NULL);
 		if(m_hObject == NULL)
 			THROW_LAST_WIN_ERROR();
@@ -55,7 +58,7 @@ BasicSemaphore::BasicSemaphore(uint32 p_InitialCount, PCTSTR p_Name) : m_bCloseH
 	}
 	else
 	{
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		EmptySecurityAttributes EmtpyAttrib;
 		m_hObject = ::CreateSemaphore(&EmtpyAttrib.m_SecAttr, p_InitialCount, SEM_MAX_COUNT, p_Name);
 		if(m_hObject == NULL)
@@ -71,11 +74,11 @@ BasicSemaphore::BasicSemaphore(uint32 p_InitialCount, PCTSTR p_Name) : m_bCloseH
 BasicSemaphore::BasicSemaphore(SyncHandleSemaphore p_hSemaphore, bool p_bCloseHandle) : m_bCloseHandle(p_bCloseHandle)
 {
 	m_WasOpened = false;
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	CHECK_EXPR(p_hSemaphore);
 #endif
 	m_hObject = p_hSemaphore;
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	if(m_hObject == NULL)
 		THROW_ERROR_OUTOFRESOURCES();
 #endif
@@ -85,7 +88,7 @@ BasicSemaphore::~BasicSemaphore()
 {
 	if(m_bCloseHandle)
 	{
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		if(m_hObject != NULL)
 			::CloseHandle(m_hObject);
 		m_hObject = NULL;
@@ -100,7 +103,7 @@ BasicSemaphore::~BasicSemaphore()
 
 bool BasicSemaphore::Lock(uint32 p_Timeout)
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	DWORD dwRet = IGNORE_ABANDONED(::WaitForSingleObject(m_hObject, p_Timeout));
 	if(dwRet == WAIT_OBJECT_0)
 		return(true);
@@ -264,7 +267,7 @@ bool BasicSemaphore::Lock(uint32 p_Timeout)
 
 void BasicSemaphore::Unlock()
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	::ReleaseSemaphore(m_hObject, 1, NULL);
 #elif defined(HY_PLATFORM_UNIX)
 	// lock global timeout mutex
@@ -311,7 +314,7 @@ void BasicSemaphore::Unlock()
 BasicMutex::BasicMutex() : m_bCloseHandle(true)
 {
 	m_WasOpened = false;
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	m_hObject = ::CreateMutex(NULL, FALSE, NULL);
 	if(m_hObject == NULL)
 		THROW_LAST_WIN_ERROR();
@@ -334,7 +337,7 @@ BasicMutex::BasicMutex(bool p_bInitialOwner, PCTSTR p_Name) : m_bCloseHandle(tru
 	m_WasOpened = false;
 	if(p_Name == NULL)
 	{
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		m_hObject = ::CreateMutex(NULL, p_bInitialOwner, NULL);
 		if(m_hObject == NULL)
 			THROW_LAST_WIN_ERROR();
@@ -359,7 +362,7 @@ BasicMutex::BasicMutex(bool p_bInitialOwner, PCTSTR p_Name) : m_bCloseHandle(tru
 	}
 	else
 	{
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		EmptySecurityAttributes EmtpyAttrib;
 		m_hObject = ::CreateMutex(&EmtpyAttrib.m_SecAttr, p_bInitialOwner, p_Name);
 		if(m_hObject == NULL)
@@ -375,11 +378,11 @@ BasicMutex::BasicMutex(bool p_bInitialOwner, PCTSTR p_Name) : m_bCloseHandle(tru
 BasicMutex::BasicMutex(SyncHandleMutex p_hMutex, bool p_bCloseHandle) : m_bCloseHandle(p_bCloseHandle)
 {
 	m_WasOpened = false;
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	CHECK_EXPR(p_hMutex);
 #endif
 	m_hObject = p_hMutex;
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	if(m_hObject == NULL)
 		THROW_ERROR_OUTOFRESOURCES();
 #endif
@@ -389,7 +392,7 @@ BasicMutex::~BasicMutex()
 {
 	if(m_bCloseHandle)
 	{
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		if(m_hObject != NULL)
 			::CloseHandle(m_hObject);
 		m_hObject = NULL;
@@ -404,7 +407,7 @@ BasicMutex::~BasicMutex()
 
 bool BasicMutex::Lock(uint32 p_Timeout)
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	DWORD dwRet = IGNORE_ABANDONED(::WaitForSingleObject(m_hObject, p_Timeout));
 	if(dwRet == WAIT_OBJECT_0)
 		return(true);
@@ -567,7 +570,7 @@ bool BasicMutex::Lock(uint32 p_Timeout)
 
 void BasicMutex::Unlock()
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	::ReleaseMutex(m_hObject);
 #elif defined(HY_PLATFORM_UNIX)
 	{
@@ -620,7 +623,7 @@ void BasicMutex::Unlock()
 BasicEvent::BasicEvent(bool p_bManualReset) : m_bCloseHandle(true)
 {
 	m_WasOpened = false;
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	m_hObject = ::CreateEvent(NULL, p_bManualReset, FALSE, NULL);
 	if(!m_hObject)
 		THROW_LAST_WIN_ERROR();
@@ -656,7 +659,7 @@ BasicEvent::BasicEvent(bool p_bManualReset, bool p_bInitialState, PCTSTR p_Name)
 	m_WasOpened = false;
 	if(p_Name == NULL)
 	{
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		EmptySecurityAttributes EmtpyAttrib;
 		m_hObject = ::CreateEvent(&EmtpyAttrib.m_SecAttr, p_bManualReset, p_bInitialState, NULL);
 		if(!m_hObject)
@@ -692,7 +695,7 @@ BasicEvent::BasicEvent(bool p_bManualReset, bool p_bInitialState, PCTSTR p_Name)
 		tostringstream name;
 		name << p_Name << (p_bManualReset ? _T("m") : _T("a"));
 
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		EmptySecurityAttributes EmtpyAttrib;
 		m_hObject = ::CreateEvent(&EmtpyAttrib.m_SecAttr, p_bManualReset, p_bInitialState, name.str().c_str());
 		if(!m_hObject)
@@ -710,11 +713,11 @@ BasicEvent::BasicEvent(bool p_bManualReset, bool p_bInitialState, PCTSTR p_Name)
 BasicEvent::BasicEvent(SyncHandleEvent p_hEvent, bool p_bCloseHandle) : m_bCloseHandle(p_bCloseHandle)
 {
 	m_WasOpened = false;
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	CHECK_EXPR(p_hEvent);
 #endif
 	m_hObject = p_hEvent;
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	if(!m_hObject)
 		THROW_ERROR_OUTOFRESOURCES();
 #endif
@@ -724,7 +727,7 @@ BasicEvent::~BasicEvent()
 {
 	if(m_bCloseHandle)
 	{
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		if(m_hObject != NULL)
 			::CloseHandle(m_hObject);
 		m_hObject = NULL;
@@ -742,7 +745,7 @@ BasicEvent::~BasicEvent()
 
 bool BasicEvent::Wait(uint32 p_Timeout)
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	DWORD dwRet = IGNORE_ABANDONED(::WaitForSingleObject(m_hObject, p_Timeout));
 	if(dwRet == WAIT_OBJECT_0)
 		return(true);
@@ -985,7 +988,7 @@ bool BasicEvent::Wait(uint32 p_Timeout)
 
 void BasicEvent::Set()
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	if(SetEvent(m_hObject) == FALSE)
 		THROW_ERROR_LASTERROR();
 #elif defined(HY_PLATFORM_UNIX)
@@ -1062,7 +1065,7 @@ void BasicEvent::Set()
 
 void BasicEvent::Reset()
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	if(ResetEvent(m_hObject) == FALSE)
 		THROW_ERROR_LASTERROR();
 #elif defined(HY_PLATFORM_UNIX)
@@ -1099,7 +1102,7 @@ void BasicEvent::Reset()
 
 BasicSection::BasicSection()
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	::InitializeCriticalSection(&m_hObject);
 #elif defined(HY_PLATFORM_UNIX)
 	pthread_mutexattr_t attr;
@@ -1117,7 +1120,7 @@ BasicSection::BasicSection()
 
 BasicSection::~BasicSection()
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	::DeleteCriticalSection(&m_hObject);
 #elif defined(HY_PLATFORM_UNIX)
 	pthread_mutex_destroy(&m_hObject);

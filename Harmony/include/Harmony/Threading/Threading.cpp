@@ -9,7 +9,7 @@
 ThreadInfo::ThreadInfo() : m_RefCounter(1)
 {
 	// attach to current thread
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	m_ThreadId = InteropGetCurrentThreadId();
 
 	// try to open thread handle with different access rights, does not work in some restricted processes in Vista
@@ -29,7 +29,7 @@ ThreadInfo::ThreadInfo() : m_RefCounter(1)
 	m_hThreadEvent = HY_NEW BasicEvent(true);
 #endif
 
-#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_UNIX) || defined(HY_PLATFORM_OSX)
+#if defined(HY_PLATFORM_GUI_WIN) || defined(HY_PLATFORM_UNIX) || defined(HY_PLATFORM_OSX)
 	SetThreadName(_T("Attached Thread"));
 #endif
 
@@ -58,7 +58,7 @@ ThreadInfo::~ThreadInfo()
 	if(m_hThreadEvent != NULL)
 		delete(m_hThreadEvent);
 
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	if(m_hThread)
 		CloseHandle(m_hThread);
 #endif
@@ -107,7 +107,7 @@ tstring ThreadInfo::GetThreadName()
 
 bool ThreadInfo::IsAlive()
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	CHECK_EXPR(m_hThread);
 	return(WaitForSingleObject(m_hThread, 0) == WAIT_TIMEOUT);
 #elif defined(HY_PLATFORM_UNIX)
@@ -128,7 +128,7 @@ bool ThreadInfo::IsCurrentThread()
 
 void ThreadInfo::Abort()
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	CHECK_EXPR(m_hThread);
 	TerminateThread(m_hThread, 0);
 #elif defined(HY_PLATFORM_UNIX)
@@ -141,7 +141,7 @@ void ThreadInfo::Abort()
 void ThreadInfo::WaitForThreadStop()
 {
 	CHECK_EXPR(!IsCurrentThread());
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	CHECK_EXPR(m_hThread);
 	WaitForSingleObject(m_hThread, INFINITE);
 #elif defined(HY_PLATFORM_UNIX)
@@ -152,7 +152,7 @@ void ThreadInfo::WaitForThreadStop()
 bool ThreadInfo::WaitForThreadStop(uint32 p_TimeoutMs)
 {
 	CHECK_EXPR(!IsCurrentThread());
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	CHECK_EXPR(m_hThread);
 	return(WaitForSingleObject(m_hThread, p_TimeoutMs) == WAIT_OBJECT_0);
 #elif defined(HY_PLATFORM_UNIX)
@@ -174,7 +174,7 @@ void ThreadInfo::StartThread()
 	// set one reference for this thread
 	AddRef();
 
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	m_hThread = CreateThread(NULL, 0, ThreadProc, this, CREATE_SUSPENDED, (LPDWORD)&m_ThreadId);
 	if(!m_hThread)
 	{

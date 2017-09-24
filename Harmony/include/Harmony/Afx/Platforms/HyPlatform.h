@@ -16,6 +16,15 @@
 	#define HY_PLATFORM_DESKTOP
 #endif
 
+#ifdef HY_PLATFORM_DESKTOP
+	#include "GL/glew.h"
+	#include "GL/gl.h"
+	#include "GL/glext.h"
+
+	#include <GLFW/glfw3.h>
+#endif
+
+
 #if defined(HY_PLATFORM_32BIT)	// 32 bit environment
 	typedef int32 intx;
 	typedef uint32 uintx;

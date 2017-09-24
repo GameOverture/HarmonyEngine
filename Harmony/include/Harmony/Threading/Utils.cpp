@@ -4,7 +4,7 @@
 
 void Utils::SetDebugThreadName(uint32 p_ThreadId, PCSTR p_ThreadName)
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 #ifdef _DEBUG
 	if(!IsDebuggerPresent())
 		return;
@@ -42,7 +42,7 @@ void Utils::SetDebugThreadName(uint32 p_ThreadId, PCSTR p_ThreadName)
 
 void Utils::Beep(uint32 dwDurationMs, uint32 dwFreq)
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	::Beep(dwFreq, dwDurationMs);
 #elif defined(HY_PLATFORM_UNIX)
 	int fd, arg;

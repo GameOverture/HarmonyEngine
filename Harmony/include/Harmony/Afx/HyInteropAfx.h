@@ -23,11 +23,26 @@
 
 	#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
 	typedef HyConsole_Gui HyConsoleInterop;
+
+	#include "Renderer/OpenGL/HyOpenGLShader.h"
+	typedef HyOpenGLShader HyShaderInterop;
+
+	typedef HWND HyRenderSurfaceHandleInterop;
+
+	#include "Time/Interop/HyTime_Win.h"
+	typedef HyTime_Win HyTimeInterop;
+	#include "Audio/Interop/HyAudio_Win.h"
+	typedef HyAudio_Win HyAudioInterop;
+	typedef IHyAudioInst_Win IHyAudioInstInterop;
+	#include "Memory/Interop/HyMemAPI_Windows.h"
+	typedef HyMemoryAPI_Windows HyMemoryInterop;
+
+	typedef MSG HyApiMsgInterop;
 #else
 	#if defined(HY_PLATFORM_DESKTOP)
 		typedef GLFWwindow *HyRenderSurfaceHandleInterop;
-		#include "Renderer/OpenGL/Interop/HyOpenGL_Desktop.h"
-		typedef HyOpenGL_Desktop HyRendererInterop;
+		#include "Renderer/OpenGL/HyOpenGL.h"
+		typedef HyOpenGL HyRendererInterop;
 	#endif
 
 	#if defined(HY_PLATFORM_WINDOWS)
@@ -44,6 +59,7 @@
 
 		typedef MSG HyApiMsgInterop;
 
+		#include "Renderer/OpenGL/HyOpenGLShader.h"
 		typedef HyOpenGLShader HyShaderInterop;
 
 		#include "Audio/Interop/HyAudio_Win.h"

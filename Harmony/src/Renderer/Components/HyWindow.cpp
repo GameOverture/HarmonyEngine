@@ -11,7 +11,7 @@
 
 std::vector<HyMonitorDeviceInfo>	HyWindow::sm_MonitorInfoList;
 
-HyWindow::HyWindow(HyWindowInfo &windowInfoRef)
+HyWindow::HyWindow(uint32 uiIndex, HyWindowInfo &windowInfoRef) :	m_uiINDEX(uiIndex)
 {
 #ifdef HY_PLATFORM_DESKTOP
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -29,6 +29,8 @@ HyWindow::HyWindow(HyWindowInfo &windowInfoRef)
 		return;
 	}
 
+	glfwSetWindowUserPointer(m_hData, this);
+
 	glfwSetWindowPos(m_hData, windowInfoRef.vLocation.x, windowInfoRef.vLocation.y);
 	//m_WindowList[i]->SetType(m_Init.windowInfo[i].eType);
 #endif
@@ -42,12 +44,14 @@ HyWindow::~HyWindow(void)
 	while(m_Cams3dList.empty() == false)
 		RemoveCamera(m_Cams3dList.back());
 
+#ifdef HY_PLATFORM_DESKTOP
 	glfwDestroyWindow(m_hData);
+#endif
 }
 
-const HyWindowInfo &HyWindow::GetWindowInfo()
+uint32 HyWindow::GetIndex() const
 {
-	return m_Info;
+	return m_uiINDEX;
 }
 
 std::string HyWindow::GetTitle()
@@ -193,14 +197,9 @@ glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoor
 		monitorInfoListOut.push_back(sm_MonitorInfoList[i]);
 }
 
-HyRenderSurfaceHandleInterop HyRenderSurface::GetHandle()
+HyRenderSurfaceHandleInterop HyWindow::GetHandle()
 {
 	return m_hData;
-}
-
-void HyRenderSurface::SetHandle(HyRenderSurfaceHandleInterop hHandle)
-{
-	m_hData = hHandle;
 }
 
 /*static*/ void HyWindow::SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info)
@@ -209,28 +208,28 @@ void HyRenderSurface::SetHandle(HyRenderSurfaceHandleInterop hHandle)
 	sm_MonitorInfoList = info;
 }
 
-void HyWindow::Update_Render(HyRenderSurface &renderSurfaceRef)
-{
-	if(m_Info.uiDirtyFlags)
-	{
-		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Title)
-		{
-		}
-
-		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Resolution)
-		{
-			glm::ivec2 vResolution = GetResolution();
-			renderSurfaceRef.Resize(vResolution.x, vResolution.y);
-		}
-
-		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Location)
-		{
-		}
-
-		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Type)
-		{
-		}
-
-		m_Info.uiDirtyFlags = 0;
-	}
-}
+//void HyWindow::Update_Render(HyRenderSurface &renderSurfaceRef)
+//{
+//	if(m_Info.uiDirtyFlags)
+//	{
+//		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Title)
+//		{
+//		}
+//
+//		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Resolution)
+//		{
+//			glm::ivec2 vResolution = GetResolution();
+//			renderSurfaceRef.Resize(vResolution.x, vResolution.y);
+//		}
+//
+//		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Location)
+//		{
+//		}
+//
+//		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Type)
+//		{
+//		}
+//
+//		m_Info.uiDirtyFlags = 0;
+//	}
+//}

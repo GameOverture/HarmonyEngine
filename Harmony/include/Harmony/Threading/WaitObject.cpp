@@ -330,7 +330,7 @@ void WaitList::AddHandle(WaitObject* p_WaitHandle)
 {
 	ASSERT_EXPR(static_cast<uint32>(m_WaitHandles.size()) <= MAX_WAIT_OBJECTS);
 	m_WaitHandles.push_back(p_WaitHandle);
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	m_RawHandles.push_back(p_WaitHandle->GetHandle());
 #endif
 	p_WaitHandle->AddRef();
@@ -340,7 +340,7 @@ void WaitList::AddHandle(WaitObject& p_WaitHandle)
 {
 	ASSERT_EXPR(static_cast<uint32>(m_WaitHandles.size()) <= MAX_WAIT_OBJECTS);
 	m_WaitHandles.push_back(&p_WaitHandle);
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	m_RawHandles.push_back(p_WaitHandle.GetHandle());
 #endif
 	p_WaitHandle.AddRef();
@@ -363,7 +363,7 @@ void WaitList::RemoveHandle(intx p_Idx)
 	if(m_WaitHandles[p_Idx])
 		m_WaitHandles[p_Idx]->Release();
 	m_WaitHandles.erase(m_WaitHandles.begin() + p_Idx);
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	m_RawHandles.erase(m_RawHandles.begin() + p_Idx);
 #endif
 }
@@ -384,7 +384,7 @@ WaitObject* WaitList::GetWaitHandle(int p_Idx)
 
 SyncHandle WaitList::GetSyncHandle(int p_Idx)
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	CHECK_EXPR((size_t)p_Idx < m_RawHandles.size());
 	return m_RawHandles[p_Idx];
 #else
@@ -401,7 +401,7 @@ int WaitList::WaitForMultipleObjects()
 int WaitList::WaitForMultipleObjects(uint32 p_Timeout)
 {
 	SetStateWait(p_Timeout, -1);
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	int Res = (int)IGNORE_ABANDONED(::WaitForMultipleObjects((DWORD)m_RawHandles.size(), m_RawHandles.data(), FALSE, p_Timeout));
 #elif defined(HY_PLATFORM_UNIX)
 	int Res = WAIT_TIMEOUT_VALUE;
@@ -600,7 +600,7 @@ bool WaitList::WaitForSingleObject(int p_WaitObject, uint32 p_Timeout)
 #else
 		CHECK_EXPR(m_RawHandles[p_WaitObject] != NULL);
 		SetStateWait(p_Timeout, p_WaitObject);
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 		bool Res = IGNORE_ABANDONED(::WaitForSingleObject(m_RawHandles[p_WaitObject], p_Timeout)) == (DWORD)WAIT_OBJECT_0_VALUE;
 #endif
 		RemoveStateWait(p_WaitObject);

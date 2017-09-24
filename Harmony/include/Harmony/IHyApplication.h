@@ -10,9 +10,7 @@
 #ifndef IHyApplication_h__
 #define IHyApplication_h__
 
-#include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
-
 #include "Memory/HyMemoryHeap.h"
 
 // Client supplies these initialization parameters to the engine

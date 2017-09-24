@@ -13,12 +13,12 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/IHyLoadableData.h"
 #include "Renderer/Components/HyRenderState.h"
-#include "Threading/Threading.h"
+
+#include <queue>
 
 class IHyShader;
 class HyWindow;
 struct HyMonitorDeviceInfo;
-class HyRenderSurface;
 class HyGfxComms;
 class HyDiagnostics;
 
@@ -57,7 +57,7 @@ protected:
 	HyRenderState *							m_pCurRenderState;
 	HyRenderState							m_PrevRenderState;
 	
-	std::vector<HyRenderSurface>			m_RenderSurfaceList;
+	//std::vector<HyRenderSurface>			m_RenderSurfaceList;
 
 	uint32									m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
 
@@ -96,8 +96,8 @@ public:
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
 
-	uint32 GetNumRenderSurfaces();
-	std::vector<HyRenderSurface> &GetRenderSurfaceList();
+	//uint32 GetNumRenderSurfaces();
+	//std::vector<HyRenderSurface> &GetRenderSurfaceList();
 
 	// 2D buffer accessors
 	uint32 GetNumCameras2d();

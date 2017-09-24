@@ -362,7 +362,7 @@ public:
 protected:
 	typedef std::vector<WaitObject*> WaitObjectPtrArray;
 	WaitObjectPtrArray m_WaitHandles;
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	typedef std::vector<SyncHandle> SyncHandleArray;
 	SyncHandleArray m_RawHandles;
 #endif

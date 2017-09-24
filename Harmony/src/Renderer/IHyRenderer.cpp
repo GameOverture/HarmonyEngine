@@ -25,8 +25,8 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::v
 	m_pDrawBuffer = HY_NEW char[HY_GFX_BUFFER_SIZE];
 	memset(m_pDrawBuffer, 0, HY_GFX_BUFFER_SIZE);
 
-	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
-		m_RenderSurfaceList.push_back(HyRenderSurface(HYRENDERSURFACE_Window, i, m_WindowListRef[i]->GetResolution().x, m_WindowListRef[i]->GetResolution().y));
+	//for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
+	//	m_RenderSurfaceList.push_back(HyRenderSurface(HYRENDERSURFACE_Window, i, m_WindowListRef[i]->GetResolution().x, m_WindowListRef[i]->GetResolution().y));
 }
 
 IHyRenderer::~IHyRenderer(void)
@@ -62,15 +62,15 @@ void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string
 	m_DiagnosticsRef.SetRendererInfo(sApiName, sVersion, sVendor, sRenderer, sShader, iMaxTextureSize, sCompressedTextures);
 }
 
-uint32 IHyRenderer::GetNumRenderSurfaces()
-{
-	return static_cast<uint32>(m_RenderSurfaceList.size());
-}
-
-std::vector<HyRenderSurface> &IHyRenderer::GetRenderSurfaceList()
-{
-	return m_RenderSurfaceList;
-}
+//uint32 IHyRenderer::GetNumRenderSurfaces()
+//{
+//	return static_cast<uint32>(m_RenderSurfaceList.size());
+//}
+//
+//std::vector<HyRenderSurface> &IHyRenderer::GetRenderSurfaceList()
+//{
+//	return m_RenderSurfaceList;
+//}
 
 uint32 IHyRenderer::GetNumCameras2d()
 {
@@ -160,10 +160,10 @@ void IHyRenderer::Render()
 {
 	HY_PROFILE_BEGIN("Render")
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Iterate through 'm_WindowListRef' to find any dirty RenderSurface's that need processing
-	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
-		m_WindowListRef[i]->Update_Render(m_RenderSurfaceList[i]);
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//// Iterate through 'm_WindowListRef' to find any dirty RenderSurface's that need processing
+	//for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
+	//	m_WindowListRef[i]->Update_Render(m_RenderSurfaceList[i]);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)

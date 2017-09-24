@@ -179,7 +179,7 @@ protected:
 
 
 public:
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI_WIN)
 	// static windows platform thread procedure
 	static DWORD WINAPI ThreadProc(PVOID p_pParam)
 	{

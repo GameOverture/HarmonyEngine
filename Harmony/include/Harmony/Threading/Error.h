@@ -4,7 +4,11 @@
 #ifndef THREADINGFX_ERROR_H
 #define THREADINGFX_ERROR_H
 
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_GUI) || defined(HY_PLATFORM_WINDOWS)
+#define HY_PLATFORM_GUI_WIN
+#endif
+
+#if defined(HY_PLATFORM_GUI_WIN)
 class WinException : public std::exception
 {
 	public:

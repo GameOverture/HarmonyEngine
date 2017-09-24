@@ -10,7 +10,6 @@
 #ifndef HyEngine_h__
 #define HyEngine_h__
 
-#include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
 #include "IHyApplication.h"
 #include "Memory/HyMemoryHeap.h"
