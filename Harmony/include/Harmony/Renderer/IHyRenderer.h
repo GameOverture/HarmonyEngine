@@ -44,6 +44,7 @@ protected:
 	HyDiagnostics &							m_DiagnosticsRef;
 	bool									m_bShowCursor;
 	std::vector<HyWindow *> &				m_WindowListRef;
+	HyWindow *								m_pCurWindow;
 
 	char *									m_pDrawBuffer;
 
@@ -57,14 +58,11 @@ protected:
 	HyRenderState							m_PrevRenderState;
 	
 	std::vector<HyRenderSurface>			m_RenderSurfaceList;
-	std::vector<HyRenderSurface>::iterator	m_RenderSurfaceIter;
 
 	uint32									m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
 
 	// Diagnostics/Metrics
 	uint32									m_uiNumRenderStates;
-
-	bool									m_bRequestedQuit;
 
 public:
 	IHyRenderer(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
@@ -74,9 +72,6 @@ public:
 
 	void TxData(IHyLoadableData *pData);
 	std::queue<IHyLoadableData *> &RxData();
-
-	void RequestQuit();
-	bool IsQuitRequested();
 
 	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
 

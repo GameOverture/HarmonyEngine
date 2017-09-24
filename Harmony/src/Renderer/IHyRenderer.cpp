@@ -20,8 +20,7 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::v
 																													m_bShowCursor(bShowCursor),
 																													m_WindowListRef(windowListRef),
 																													m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8),
-																													m_uiNumRenderStates(0),
-																													m_bRequestedQuit(false)
+																													m_uiNumRenderStates(0)
 {
 	m_pDrawBuffer = HY_NEW char[HY_GFX_BUFFER_SIZE];
 	memset(m_pDrawBuffer, 0, HY_GFX_BUFFER_SIZE);
@@ -56,16 +55,6 @@ void IHyRenderer::TxData(IHyLoadableData *pData)
 std::queue<IHyLoadableData *> &IHyRenderer::RxData()
 {
 	return m_TxDataQueue;
-}
-
-void IHyRenderer::RequestQuit()
-{
-	m_bRequestedQuit = true;
-}
-
-bool IHyRenderer::IsQuitRequested()
-{
-	return m_bRequestedQuit;
 }
 
 void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures)
@@ -188,10 +177,11 @@ void IHyRenderer::Render()
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Render all surfaces
-	m_RenderSurfaceIter = m_RenderSurfaceList.begin();
-	while(m_RenderSurfaceIter != m_RenderSurfaceList.end())
+	// Render all Windows
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
+		m_pCurWindow = m_WindowListRef[i];
+
 		HyErrorCheck_OpenGL("Render", "Before StartRender");
 		StartRender();
 
@@ -210,7 +200,6 @@ void IHyRenderer::Render()
 		}
 
 		FinishRender();
-		++m_RenderSurfaceIter;
 	}
 	
 	HY_PROFILE_END

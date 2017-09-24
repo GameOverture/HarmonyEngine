@@ -15,8 +15,6 @@
 
 class HyOpenGL_Desktop : public HyOpenGL
 {
-	std::vector<GLFWwindow *>		m_glfwWindowList;
-
 public:
 	HyOpenGL_Desktop(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
 	~HyOpenGL_Desktop();

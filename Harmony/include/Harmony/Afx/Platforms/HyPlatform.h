@@ -12,6 +12,10 @@
 
 #include "Afx/Platforms/HyPlatAfx.h"
 
+#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
+	#define HY_PLATFORM_DESKTOP
+#endif
+
 #if defined(HY_PLATFORM_32BIT)	// 32 bit environment
 	typedef int32 intx;
 	typedef uint32 uintx;

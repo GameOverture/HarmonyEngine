@@ -11,8 +11,27 @@
 
 std::vector<HyMonitorDeviceInfo>	HyWindow::sm_MonitorInfoList;
 
-HyWindow::HyWindow()
+HyWindow::HyWindow(HyWindowInfo &windowInfoRef)
 {
+#ifdef HY_PLATFORM_DESKTOP
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
+	// NOTE: IHyRenderer initializes 'm_RenderSurfaceList' with enough surfaces to account for every window
+	m_hData = glfwCreateWindow(static_cast<int32>(windowInfoRef.vResolution.x),
+							   static_cast<int32>(windowInfoRef.vResolution.y),
+							   windowInfoRef.sName.c_str(),
+							   nullptr, // GLFWmonitor
+							   nullptr);// GLFWmonitor
+	if(m_hData == nullptr)
+	{
+		HyLogError("HyOpenGL_Desktop::Initialize() - glfwCreateWindow returned nullptr (At least OpenGL 3.3 is required, or window or OpenGL context creation failed)");
+		return;
+	}
+
+	glfwSetWindowPos(m_hData, windowInfoRef.vLocation.x, windowInfoRef.vLocation.y);
+	//m_WindowList[i]->SetType(m_Init.windowInfo[i].eType);
+#endif
 }
 
 HyWindow::~HyWindow(void)
@@ -22,6 +41,8 @@ HyWindow::~HyWindow(void)
 
 	while(m_Cams3dList.empty() == false)
 		RemoveCamera(m_Cams3dList.back());
+
+	glfwDestroyWindow(m_hData);
 }
 
 const HyWindowInfo &HyWindow::GetWindowInfo()
@@ -170,6 +191,16 @@ glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoor
 
 	for(uint32 i = 0; i < static_cast<uint32>(sm_MonitorInfoList.size()); ++i)
 		monitorInfoListOut.push_back(sm_MonitorInfoList[i]);
+}
+
+HyRenderSurfaceHandleInterop HyRenderSurface::GetHandle()
+{
+	return m_hData;
+}
+
+void HyRenderSurface::SetHandle(HyRenderSurfaceHandleInterop hHandle)
+{
+	m_hData = hHandle;
 }
 
 /*static*/ void HyWindow::SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info)

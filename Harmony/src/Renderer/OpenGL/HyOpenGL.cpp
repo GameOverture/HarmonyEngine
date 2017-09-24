@@ -24,6 +24,10 @@ HyOpenGL::~HyOpenGL(void)
 {
 	HyLog("OpenGL is initializing...");
 
+#ifdef HY_PLATFORM_DESKTOP
+	glfwMakeContextCurrent(m_RenderSurfaceList[0].GetHandle());
+#endif
+
 	//////////////////////////////////////////////////////////////////////////
 	// Init GLEW
 	GLenum err = glewInit();
@@ -135,6 +139,10 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::StartRender()
 {
+#ifdef HY_PLATFORM_DESKTOP
+	glfwMakeContextCurrent(m_pCurWindow->GetHandle());
+#endif 
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	HyErrorCheck_OpenGL("HyOpenGL:StartRender", "glClear");
 }
@@ -235,8 +243,8 @@ HyOpenGL::~HyOpenGL(void)
 	{
 		const HyScreenRect<int32> &scissorRectRef = renderState.GetScissorRect();
 
-		glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_RenderSurfaceIter->GetWidth() / 2),
-				  static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_RenderSurfaceIter->GetHeight() / 2),
+		glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_pCurWindow->GetResolution().x / 2),
+				  static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_pCurWindow->GetResolution().y / 2),
 				  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
 				  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
 
@@ -418,7 +426,9 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::FinishRender()
 {
-
+#ifdef HY_PLATFORM_DESKTOP
+	glfwSwapBuffers(m_pCurWindow->GetHandle());
+#endif
 }
 
 /*virtual*/ uint32 HyOpenGL::AddTexture(HyTextureFormat eDesiredFormat, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat)
@@ -568,6 +578,8 @@ HyOpenGL::~HyOpenGL(void)
 
 void HyOpenGL::SetCameraMatrices_2d(bool bUseCameraView)
 {
+	glm::ivec2 vResolution = m_pCurWindow->GetResolution();
+
 	HyRectangle<float> viewportRect;
 	if(bUseCameraView)
 	{
@@ -582,14 +594,14 @@ void HyOpenGL::SetCameraMatrices_2d(bool bUseCameraView)
 		viewportRect.top = 1.0f;
 
 		m_mtxView = glm::mat4(1.0f);
-		m_mtxView = glm::translate(m_mtxView, m_RenderSurfaceIter->GetWidth() * -0.5f, m_RenderSurfaceIter->GetHeight() * -0.5f, 0.0f);
+		m_mtxView = glm::translate(m_mtxView, vResolution.x * -0.5f, vResolution.y * -0.5f, 0.0f);
 	}
 
-	float fWidth = (viewportRect.Width() * m_RenderSurfaceIter->GetWidth());
-	float fHeight = (viewportRect.Height() * m_RenderSurfaceIter->GetHeight());
+	float fWidth = (viewportRect.Width() * vResolution.x);
+	float fHeight = (viewportRect.Height() * vResolution.y);
 
-	glViewport(static_cast<GLint>(viewportRect.left * m_RenderSurfaceIter->GetWidth()),
-			   static_cast<GLint>(viewportRect.bottom * m_RenderSurfaceIter->GetHeight()),
+	glViewport(static_cast<GLint>(viewportRect.left * vResolution.x),
+			   static_cast<GLint>(viewportRect.bottom * vResolution.y),
 			   static_cast<GLsizei>(fWidth),
 			   static_cast<GLsizei>(fHeight));
 

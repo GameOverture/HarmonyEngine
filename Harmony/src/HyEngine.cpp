@@ -119,8 +119,18 @@ void HyEngine::Shutdown()
 	}
 }
 
-//bool HyEngine::PollPlatformApi()
-//{
+bool HyEngine::PollPlatformApi()
+{
+#ifdef HY_PLATFORM_DESKTOP
+	for(uint32 i = 0; i < m_AppRef.GetNumWindows(); ++i)
+	{
+		if(glfwWindowShouldClose(m_AppRef.Window(i).GetHandle()))
+			return false;
+	}
+
+	glfwPollEvents();
+#endif
+
 //#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
 //	MSG msg = {0};
 //	int32 iWindowIndex = 0;
@@ -153,10 +163,10 @@ void HyEngine::Shutdown()
 //		hWnd = m_Renderer.GetHWND(iWindowIndex);
 //	}
 //#endif
-//
-//	m_Input.Update();
-//	return m_Renderer.IsQuitRequested() == false;
-//}
+
+	m_Input.Update();
+	return true;
+}
 
 HyRendererInterop &HyEngine::GetRenderer()
 {

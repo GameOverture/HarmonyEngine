@@ -15,7 +15,7 @@
 HyCoordinateUnit IHyApplication::sm_eDefaultCoordinateUnit = HYCOORDUNIT_Default;
 float IHyApplication::sm_fPixelsPerMeter = 0.0f;
 
-#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
+#ifdef HY_PLATFORM_DESKTOP
 void glfw_ErrorCallback(int iError, const char *szDescription)
 {
 	HyLogError("GLFW Error: " << iError << "\n" << szDescription);
@@ -165,16 +165,9 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(nullptr),
 	sm_fPixelsPerMeter = m_Init.fPixelsPerMeter;
 	
 	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
-	{
-		m_WindowList.push_back(HY_NEW HyWindow());
+		m_WindowList.push_back(HY_NEW HyWindow(m_Init.windowInfo[i]));
 
-		m_WindowList[i]->SetTitle(m_Init.windowInfo[i].sName);
-		m_WindowList[i]->SetResolution(m_Init.windowInfo[i].vResolution);
-		m_WindowList[i]->SetLocation(m_Init.windowInfo[i].vLocation);
-		m_WindowList[i]->SetType(m_Init.windowInfo[i].eType);
-	}
-
-#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
+#ifdef HY_PLATFORM_DESKTOP
 	if(glfwInit() == GLFW_FALSE)
 		HyLogError("glfwInit failed");
 
@@ -184,7 +177,7 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(nullptr),
 
 IHyApplication::~IHyApplication()
 {
-#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
+#ifdef HY_PLATFORM_DESKTOP
 	glfwTerminate();
 #endif
 

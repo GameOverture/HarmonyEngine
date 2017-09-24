@@ -52,36 +52,40 @@ class HyWindow
 	std::vector<HyCamera2d *>				m_Cams2dList;
 	std::vector<HyCamera3d *>				m_Cams3dList;
 
+	HyRenderSurfaceHandleInterop			m_hData;
+
 public:
-	HyWindow();
+	HyWindow(HyWindowInfo &windowInfoRef);
 	~HyWindow(void);
 
-	const HyWindowInfo &GetWindowInfo();
+	const HyWindowInfo &			GetWindowInfo();
 
-	std::string			GetTitle();
-	void				SetTitle(std::string sTitle);
+	std::string						GetTitle();
+	void							SetTitle(std::string sTitle);
 
-	glm::ivec2			GetResolution();
-	void				SetResolution(glm::ivec2 vResolution);
+	glm::ivec2						GetResolution();
+	void							SetResolution(glm::ivec2 vResolution);
 
-	glm::ivec2			GetLocation();
-	void				SetLocation(glm::ivec2 ptLocation);
+	glm::ivec2						GetLocation();
+	void							SetLocation(glm::ivec2 ptLocation);
 
-	HyWindowType		GetType();
-	void				SetType(HyWindowType eType);
+	HyWindowType					GetType();
+	void							SetType(HyWindowType eType);
 
-	int32				GetBitsPerPixel();
-	void				SetBitsPerPixel(int32 iBitsPerPixel);
+	int32							GetBitsPerPixel();
+	void							SetBitsPerPixel(int32 iBitsPerPixel);
 
-	HyCamera2d *		CreateCamera2d();
-	HyCamera3d *		CreateCamera3d();
+	HyCamera2d *					CreateCamera2d();
+	HyCamera3d *					CreateCamera3d();
 
-	void				RemoveCamera(HyCamera2d *&pCam);
-	void				RemoveCamera(HyCamera3d *&pCam);
+	void							RemoveCamera(HyCamera2d *&pCam);
+	void							RemoveCamera(HyCamera3d *&pCam);
 
-	glm::vec2			ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
+	glm::vec2						ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
 
-	static void			MonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &monitorInfoListOut);
+	static void						MonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &monitorInfoListOut);
+
+	HyRenderSurfaceHandleInterop	GetHandle();
 
 private:
 	static void			SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info);

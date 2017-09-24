@@ -69,7 +69,7 @@ private:
 	bool Update();
 	void Shutdown();
 
-	//bool PollPlatformApi();
+	bool PollPlatformApi();
 
 	HyRendererInterop &GetRenderer();
 
