@@ -67,6 +67,14 @@ void HyWindow::SetTitle(std::string sTitle)
 
 glm::ivec2 HyWindow::GetResolution()
 {
+#ifdef HY_PLATFORM_DESKTOP
+	int iWidth, iHeight;
+	glfwGetFramebufferSize(m_hData, &iWidth, &iHeight);
+
+	glm::ivec2 vRes(iWidth, iHeight);
+	return vRes;
+#endif
+
 	return m_Info.vResolution;
 }
 
