@@ -37,6 +37,7 @@ HyOpenGL::~HyOpenGL(void)
 
 	//////////////////////////////////////////////////////////////////////////
 	// Init GLEW
+	glewExperimental = GL_TRUE;	// This is required for GLFW to work
 	GLenum err = glewInit();
 	if(err != GLEW_OK) {
 		HyError("glewInit() failed: " << err);
