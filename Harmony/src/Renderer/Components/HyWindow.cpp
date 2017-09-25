@@ -9,20 +9,50 @@
  *************************************************************************/
 #include "Renderer/Components/HyWindow.h"
 
-std::vector<HyMonitorDeviceInfo>	HyWindow::sm_MonitorInfoList;
+uint32 HyWindow::sm_uiIdCounter = 0;
 
-HyWindow::HyWindow(uint32 uiIndex, HyWindowInfo &windowInfoRef) :	m_uiINDEX(uiIndex)
+#ifdef HY_PLATFORM_DESKTOP
+	void glfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight)
+	{
+		HyWindow *pHyWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
+		pHyWindow->m_Info.vSize.x = iWidth;
+		pHyWindow->m_Info.vSize.y = iHeight;
+	}
+
+	void glfw_FramebufferSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight)
+	{
+		HyWindow *pHyWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
+		pHyWindow->m_vFramebufferSize.x = iWidth;
+		pHyWindow->m_vFramebufferSize.y = iHeight;
+	}
+
+	void glfw_WindowPosCallback(GLFWwindow *pWindow, int32 iX, int32 iY)
+	{
+		HyWindow *pHyWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
+		pHyWindow->m_Info.ptLocation.x = iX;
+		pHyWindow->m_Info.ptLocation.y = iY;
+	}
+#endif
+
+HyWindow::HyWindow(const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInterop hSharedContext) : m_uiID(sm_uiIdCounter)
 {
+	sm_uiIdCounter++;
+	m_Info = windowInfoRef;
+
 #ifdef HY_PLATFORM_DESKTOP
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 
-	// NOTE: IHyRenderer initializes 'm_RenderSurfaceList' with enough surfaces to account for every window
-	m_hData = glfwCreateWindow(static_cast<int32>(windowInfoRef.vResolution.x),
-							   static_cast<int32>(windowInfoRef.vResolution.y),
-							   windowInfoRef.sName.c_str(),
+	//if(m_Init.eType
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+	//m_WindowList[i]->SetType(m_Init.windowInfo[i].eType);
+
+	m_hData = glfwCreateWindow(static_cast<int32>(m_Info.vSize.x),
+							   static_cast<int32>(m_Info.vSize.y),
+							   m_Info.sName.c_str(),
 							   nullptr, // GLFWmonitor
-							   nullptr);// GLFWmonitor
+							   hSharedContext);
 	if(m_hData == nullptr)
 	{
 		HyLogError("HyOpenGL_Desktop::Initialize() - glfwCreateWindow returned nullptr (At least OpenGL 3.3 is required, or window or OpenGL context creation failed)");
@@ -30,9 +60,12 @@ HyWindow::HyWindow(uint32 uiIndex, HyWindowInfo &windowInfoRef) :	m_uiINDEX(uiIn
 	}
 
 	glfwSetWindowUserPointer(m_hData, this);
+	glfwSetWindowPos(m_hData, m_Info.ptLocation.x, m_Info.ptLocation.y);
 
-	glfwSetWindowPos(m_hData, windowInfoRef.vLocation.x, windowInfoRef.vLocation.y);
-	//m_WindowList[i]->SetType(m_Init.windowInfo[i].eType);
+	// Set callbacks
+	glfwSetWindowSizeCallback(m_hData, glfw_WindowSizeCallback);
+	glfwSetFramebufferSizeCallback(m_hData, glfw_FramebufferSizeCallback);
+	glfwSetWindowPosCallback(m_hData, glfw_WindowPosCallback);
 #endif
 }
 
@@ -46,12 +79,13 @@ HyWindow::~HyWindow(void)
 
 #ifdef HY_PLATFORM_DESKTOP
 	glfwDestroyWindow(m_hData);
+	m_hData = nullptr;
 #endif
 }
 
-uint32 HyWindow::GetIndex() const
+uint32 HyWindow::GetId() const
 {
-	return m_uiINDEX;
+	return m_uiID;
 }
 
 std::string HyWindow::GetTitle()
@@ -59,40 +93,46 @@ std::string HyWindow::GetTitle()
 	return m_Info.sName;
 }
 
-void HyWindow::SetTitle(std::string sTitle)
+void HyWindow::SetTitle(const std::string &sTitle)
 {
 	m_Info.sName = sTitle;
-	m_Info.uiDirtyFlags |= HyWindowInfo::FLAG_Title;
-}
 
-glm::ivec2 HyWindow::GetResolution()
-{
 #ifdef HY_PLATFORM_DESKTOP
-	int iWidth, iHeight;
-	glfwGetFramebufferSize(m_hData, &iWidth, &iHeight);
-
-	glm::ivec2 vRes(iWidth, iHeight);
-	return vRes;
+	glfwSetWindowTitle(m_hData, m_Info.sName.c_str());
 #endif
-
-	return m_Info.vResolution;
 }
 
-void HyWindow::SetResolution(glm::ivec2 vResolution)
+glm::ivec2 HyWindow::GetWindowSize()
 {
-	m_Info.vResolution = vResolution;
-	m_Info.uiDirtyFlags |= HyWindowInfo::FLAG_Resolution;
+	return m_Info.vSize;
+}
+
+void HyWindow::SetWindowSize(glm::ivec2 vResolutionHint)
+{
+	m_Info.vSize = vResolutionHint;
+	
+#ifdef HY_PLATFORM_DESKTOP
+	glfwSetWindowSize(m_hData, m_Info.vSize.x, m_Info.vSize.y);
+#endif
+}
+
+glm::ivec2 HyWindow::GetFramebufferSize()
+{
+	return m_vFramebufferSize;
 }
 
 glm::ivec2 HyWindow::GetLocation()
 {
-	return m_Info.vLocation;
+	return m_Info.ptLocation;
 }
 
 void HyWindow::SetLocation(glm::ivec2 ptLocation)
 {
-	m_Info.vLocation = ptLocation;
-	m_Info.uiDirtyFlags |= HyWindowInfo::FLAG_Location;
+	m_Info.ptLocation = ptLocation;
+
+#ifdef HY_PLATFORM_DESKTOP
+	glfwSetWindowPos(m_hData, m_Info.ptLocation.x, m_Info.ptLocation.y);
+#endif
 }
 
 HyWindowType HyWindow::GetType()
@@ -102,8 +142,8 @@ HyWindowType HyWindow::GetType()
 
 void HyWindow::SetType(HyWindowType eType)
 {
+	HyError("HyWindow::SetType has not been implemented");
 	m_Info.eType = eType;
-	m_Info.uiDirtyFlags |= HyWindowInfo::FLAG_Type;
 }
 
 HyCamera2d *HyWindow::CreateCamera2d()
@@ -197,47 +237,7 @@ glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoor
 	return ptWorldPos;
 }
 
-/*static*/ void HyWindow::MonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &monitorInfoListOut)
-{
-	monitorInfoListOut.clear();
-
-	for(uint32 i = 0; i < static_cast<uint32>(sm_MonitorInfoList.size()); ++i)
-		monitorInfoListOut.push_back(sm_MonitorInfoList[i]);
-}
-
 HyRenderSurfaceHandleInterop HyWindow::GetHandle()
 {
 	return m_hData;
 }
-
-/*static*/ void HyWindow::SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info)
-{
-	sm_MonitorInfoList.clear();
-	sm_MonitorInfoList = info;
-}
-
-//void HyWindow::Update_Render(HyRenderSurface &renderSurfaceRef)
-//{
-//	if(m_Info.uiDirtyFlags)
-//	{
-//		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Title)
-//		{
-//		}
-//
-//		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Resolution)
-//		{
-//			glm::ivec2 vResolution = GetResolution();
-//			renderSurfaceRef.Resize(vResolution.x, vResolution.y);
-//		}
-//
-//		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Location)
-//		{
-//		}
-//
-//		if(m_Info.uiDirtyFlags & HyWindowInfo::FLAG_Type)
-//		{
-//		}
-//
-//		m_Info.uiDirtyFlags = 0;
-//	}
-//}

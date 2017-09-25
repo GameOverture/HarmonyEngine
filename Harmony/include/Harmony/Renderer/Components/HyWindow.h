@@ -45,9 +45,11 @@ class HyWindow
 	friend class IHyRenderer;
 	friend class HyScene;
 
-	const uint32							m_uiINDEX;
+	static uint32							sm_uiIdCounter;
+	const uint32							m_uiID;
+
 	HyWindowInfo							m_Info;
-	static std::vector<HyMonitorDeviceInfo>	sm_MonitorInfoList;
+	glm::ivec2								m_vFramebufferSize;
 	
 	std::vector<HyCamera2d *>				m_Cams2dList;
 	std::vector<HyCamera3d *>				m_Cams3dList;
@@ -55,16 +57,18 @@ class HyWindow
 	HyRenderSurfaceHandleInterop			m_hData;
 
 public:
-	HyWindow(uint32 uiIndex, HyWindowInfo &windowInfoRef);
+	HyWindow(const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInterop hSharedContext);
 	~HyWindow(void);
 
-	uint32							GetIndex() const;
+	uint32							GetId() const;
 
 	std::string						GetTitle();
-	void							SetTitle(std::string sTitle);
+	void							SetTitle(const std::string &sTitle);
 
-	glm::ivec2						GetResolution();
-	void							SetResolution(glm::ivec2 vResolution);
+	glm::ivec2						GetWindowSize();
+	void							SetWindowSize(glm::ivec2 vResolutionHint);
+
+	glm::ivec2						GetFramebufferSize();
 
 	glm::ivec2						GetLocation();
 	void							SetLocation(glm::ivec2 ptLocation);
@@ -83,13 +87,11 @@ public:
 
 	glm::vec2						ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
 
-	static void						MonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &monitorInfoListOut);
-
 	HyRenderSurfaceHandleInterop	GetHandle();
 
-private:
-	static void			SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info);
-	//void Update_Render(HyRenderSurface &renderSurfaceRef);
+	friend void glfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight);
+	friend void glfw_FramebufferSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight);
+	friend void glfw_WindowPosCallback(GLFWwindow *pWindow, int32 iX, int32 iY);
 };
 
 #endif /* HyWindow_h__ */

@@ -49,8 +49,8 @@ HyCamera2d::~HyCamera2d()
 
 const b2AABB &HyCamera2d::GetWorldViewBounds()
 {
-	float fHalfWidth = ((m_pWindowPtr->GetResolution().x * m_ViewportRect.Width()) * 0.5f) * (1.0f / scale.X());
-	float fHalfHeight = ((m_pWindowPtr->GetResolution().y * m_ViewportRect.Height()) * 0.5f) * (1.0f / scale.Y());
+	float fHalfWidth = ((m_pWindowPtr->GetFramebufferSize().x * m_ViewportRect.Width()) * 0.5f) * (1.0f / scale.X());
+	float fHalfHeight = ((m_pWindowPtr->GetFramebufferSize().y * m_ViewportRect.Height()) * 0.5f) * (1.0f / scale.Y());
 
 	m_aabbViewBounds.lowerBound.Set(pos.X() - fHalfWidth, pos.Y() - fHalfHeight);
 	m_aabbViewBounds.upperBound.Set(pos.X() + fHalfWidth, pos.Y() + fHalfHeight);
@@ -63,8 +63,8 @@ const b2AABB &HyCamera2d::GetWorldViewBounds()
 //{
 //	HyRectangle<float> returnRect;
 //
-//	float fHalfWidth = ((m_pWindowPtr->GetResolution().x * m_ViewportRect.Width()) * 0.5f) * (1.0f / scale.X());
-//	float fHalfHeight = ((m_pWindowPtr->GetResolution().y * m_ViewportRect.Height()) * 0.5f) * (1.0f / scale.Y());
+//	float fHalfWidth = ((m_pWindowPtr->GetFramebufferSize().x * m_ViewportRect.Width()) * 0.5f) * (1.0f / scale.X());
+//	float fHalfHeight = ((m_pWindowPtr->GetFramebufferSize().y * m_ViewportRect.Height()) * 0.5f) * (1.0f / scale.Y());
 //
 //	// TODO: 'pos' may not represent the world coordinates if it is attached to a parent transform hierarchy - GetWorldTransform() should be used first
 //	returnRect.left = pos.X() - fHalfWidth;

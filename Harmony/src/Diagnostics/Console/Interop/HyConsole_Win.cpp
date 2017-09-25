@@ -54,12 +54,12 @@ HyConsole_Win::HyConsole_Win(bool bCreateConsole, HyWindowInfo &consoleInfo)
 	CONSOLE_SCREEN_BUFFER_INFO coninfo;
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &coninfo);
 
-	coninfo.dwSize.X = consoleInfo.vResolution.x;
-	coninfo.dwSize.Y = consoleInfo.vResolution.y;
+	coninfo.dwSize.X = consoleInfo.vSize.x;
+	coninfo.dwSize.Y = consoleInfo.vSize.y;
 	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), coninfo.dwSize);
 
 	HWND hConsole = GetConsoleWindow();
-	MoveWindow(hConsole, consoleInfo.vLocation.x, consoleInfo.vLocation.y, consoleInfo.vResolution.x * 10, consoleInfo.vResolution.y * 10, TRUE); // Super hack!
+	MoveWindow(hConsole, consoleInfo.ptLocation.x, consoleInfo.ptLocation.y, consoleInfo.vSize.x * 10, consoleInfo.vSize.y * 10, TRUE); // Super hack!
 
 	// Disable the exit button on console window
 	HMENU  hm = GetSystemMenu(hConsole, false);

@@ -82,7 +82,7 @@ uint32 IHyRenderer::GetNumRenderStates2d()
 	return *(reinterpret_cast<uint32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToInst2d));
 }
 
-uint32 IHyRenderer::GetCameraWindowIndex2d(int iCameraIndex)
+uint32 IHyRenderer::GetCameraWindowId2d(int iCameraIndex)
 {
 	return *(reinterpret_cast<uint32 *>(m_pDrawBuffer +
 										HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
@@ -181,8 +181,6 @@ void IHyRenderer::Render()
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		m_pCurWindow = m_WindowListRef[i];
-
-		HyErrorCheck_OpenGL("Render", "Before StartRender");
 		StartRender();
 
 		Init_3d();
@@ -218,9 +216,4 @@ void IHyRenderer::Draw2d()
 		DrawRenderState_2d(*m_pCurRenderState);
 		m_PrevRenderState = *m_pCurRenderState;
 	}
-}
-
-void IHyRenderer::SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info)
-{
-	HyWindow::SetMonitorDeviceInfo(info);
 }

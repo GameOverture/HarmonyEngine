@@ -255,9 +255,6 @@
     <ClCompile Include="Scene\Physics\HyShape2d.cpp">
       <Filter>Scene\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\OpenGL\Interop\HyOpenGL_Desktop.cpp">
-      <Filter>Renderer\OpenGL\Interop</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -695,9 +692,6 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyShape2d.h">
       <Filter>Scene\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Desktop.h">
-      <Filter>Renderer\OpenGL\Interop</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

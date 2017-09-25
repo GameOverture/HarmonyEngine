@@ -18,7 +18,6 @@
 
 class IHyShader;
 class HyWindow;
-struct HyMonitorDeviceInfo;
 class HyGfxComms;
 class HyDiagnostics;
 
@@ -102,7 +101,7 @@ public:
 	// 2D buffer accessors
 	uint32 GetNumCameras2d();
 	uint32 GetNumRenderStates2d();
-	uint32 GetCameraWindowIndex2d(int iCameraIndex);
+	uint32 GetCameraWindowId2d(int iCameraIndex);
 	HyRectangle<float> *GetCameraViewportRect2d(int iIndex);
 	glm::mat4 *GetCameraView2d(int iIndex);
 	HyRenderState *GetRenderStatesPtr2d();
@@ -118,9 +117,6 @@ public:
 
 	void Render();
 	void Draw2d();
-
-protected:
-	void SetMonitorDeviceInfo(std::vector<HyMonitorDeviceInfo> &info);
 };
 
 #endif /* IHyRenderer_h__ */

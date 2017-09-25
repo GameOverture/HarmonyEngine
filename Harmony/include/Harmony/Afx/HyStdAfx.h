@@ -201,18 +201,19 @@ enum HyDiagFlag
 struct HyWindowInfo
 {
 	std::string		sName;
-	glm::ivec2		vResolution;
-	glm::ivec2		vLocation;
+	glm::ivec2		vSize;
+	glm::ivec2		ptLocation;
 	HyWindowType	eType;
 
-	enum eDirtyFlags
+	HyWindowInfo &operator =(const HyWindowInfo &rhs)
 	{
-		FLAG_Title = 1 << 0,
-		FLAG_Resolution = 1 << 1,
-		FLAG_Location = 1 << 2,
-		FLAG_Type = 1 << 3
-	};
-	uint32			uiDirtyFlags;
+		sName = rhs.sName;
+		vSize = rhs.vSize;
+		ptLocation = rhs.ptLocation;
+		eType = rhs.eType;
+
+		return *this;
+	}
 };
 
 #endif // HyStdAfx_h__

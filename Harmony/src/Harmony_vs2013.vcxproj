@@ -82,7 +82,6 @@
     <ClCompile Include="Renderer\IHyRenderer.cpp" />
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp" />
     <ClCompile Include="Renderer\OpenGL\HyOpenGLShader.cpp" />
-    <ClCompile Include="Renderer\OpenGL\Interop\HyOpenGL_Desktop.cpp" />
     <ClCompile Include="Renderer\OpenGL\Interop\HyOpenGL_Win.cpp" />
     <ClCompile Include="Scene\HyScene.cpp" />
     <ClCompile Include="Scene\Nodes\Entities\HyEntity2d.cpp" />
@@ -180,7 +179,6 @@
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGL.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShader.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h" />
-    <ClInclude Include="..\include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Desktop.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Win.h" />
     <ClInclude Include="..\include\Harmony\Scene\HyScene.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Entities\HyEntity2d.h" />
@@ -378,7 +376,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2d.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfwd.lib;soil2d.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -406,7 +404,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2d.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfwd.lib;soil2d.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -495,7 +493,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw.lib;soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -521,7 +519,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw.lib;soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>

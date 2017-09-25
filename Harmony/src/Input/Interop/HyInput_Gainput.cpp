@@ -94,8 +94,8 @@ gainput::DeviceId HyInput_Gainput::GetGamePadDeviceId(uint32 uiIndex)
 /*virtual*/ void HyInput_Gainput::SetWindowIndex(uint32 uiCurrentWindowIndex) /*override*/
 {
 	m_uiMouse_WindowIndex = uiCurrentWindowIndex;
-	m_Manager.SetDisplaySize(static_cast<int>(m_WindowListRef[m_uiMouse_WindowIndex]->GetResolution().x),
-							 static_cast<int>(m_WindowListRef[m_uiMouse_WindowIndex]->GetResolution().y));
+	m_Manager.SetDisplaySize(static_cast<int>(m_WindowListRef[m_uiMouse_WindowIndex]->GetFramebufferSize().x),
+							 static_cast<int>(m_WindowListRef[m_uiMouse_WindowIndex]->GetFramebufferSize().y));
 }
 
 /*virtual*/ void HyInput_Gainput::HandleMsg(void *pMsg) /*override*/

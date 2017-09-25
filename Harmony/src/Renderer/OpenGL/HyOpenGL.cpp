@@ -189,7 +189,7 @@ HyOpenGL::~HyOpenGL(void)
 	int32 iNumRenderStates2d = GetNumRenderStates2d();
 
 	// Only draw cameras that are apart of this HyWindow
-	while(m_pCurWindow->GetIndex() != GetCameraWindowIndex2d(m_iCurCamIndex) && m_iCurCamIndex < iNumCameras2d)
+	while(m_pCurWindow->GetId() != GetCameraWindowId2d(m_iCurCamIndex) && m_iCurCamIndex < iNumCameras2d)
 		m_iCurCamIndex++;
 
 	if(iNumRenderStates2d == 0 || m_iCurCamIndex >= iNumCameras2d)
@@ -251,8 +251,8 @@ HyOpenGL::~HyOpenGL(void)
 	{
 		const HyScreenRect<int32> &scissorRectRef = renderState.GetScissorRect();
 
-		glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_pCurWindow->GetResolution().x / 2),
-				  static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_pCurWindow->GetResolution().y / 2),
+		glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_pCurWindow->GetFramebufferSize().x / 2),
+			static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_pCurWindow->GetFramebufferSize().y / 2),
 				  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
 				  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
 
@@ -587,7 +587,7 @@ HyOpenGL::~HyOpenGL(void)
 
 void HyOpenGL::SetCameraMatrices_2d(bool bUseCameraView)
 {
-	glm::ivec2 vResolution = m_pCurWindow->GetResolution();
+	glm::ivec2 vFramebufferSize = m_pCurWindow->GetFramebufferSize();
 
 	HyRectangle<float> viewportRect;
 	if(bUseCameraView)
@@ -603,14 +603,14 @@ void HyOpenGL::SetCameraMatrices_2d(bool bUseCameraView)
 		viewportRect.top = 1.0f;
 
 		m_mtxView = glm::mat4(1.0f);
-		m_mtxView = glm::translate(m_mtxView, vResolution.x * -0.5f, vResolution.y * -0.5f, 0.0f);
+		m_mtxView = glm::translate(m_mtxView, vFramebufferSize.x * -0.5f, vFramebufferSize.y * -0.5f, 0.0f);
 	}
 
-	float fWidth = (viewportRect.Width() * vResolution.x);
-	float fHeight = (viewportRect.Height() * vResolution.y);
+	float fWidth = (viewportRect.Width() * vFramebufferSize.x);
+	float fHeight = (viewportRect.Height() * vFramebufferSize.y);
 
-	glViewport(static_cast<GLint>(viewportRect.left * vResolution.x),
-			   static_cast<GLint>(viewportRect.bottom * vResolution.y),
+	glViewport(static_cast<GLint>(viewportRect.left * vFramebufferSize.x),
+			   static_cast<GLint>(viewportRect.bottom * vFramebufferSize.y),
 			   static_cast<GLsizei>(fWidth),
 			   static_cast<GLsizei>(fHeight));
 
