@@ -58,7 +58,6 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 {
 	HyLog("OpenGL is initializing...");
 
-#ifdef HY_PLATFORM_DESKTOP
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		SetCurrentWindow(i);
@@ -91,7 +90,6 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 		SetCurrentWindow(0);
 	else
 		HyLog("No windows created to render to");
-#endif
 
 	////////////////////////////////////////////////////////////////////////////
 	//// Init GLEW

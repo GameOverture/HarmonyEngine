@@ -35,6 +35,7 @@
 HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInterop hSharedContext) : m_uiINDEX(uiIndex)
 {
 	m_Info = windowInfoRef;
+	m_vFramebufferSize = m_Info.vSize;
 
 #ifdef HY_PLATFORM_DESKTOP
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -117,6 +118,8 @@ void HyWindow::SetWindowSize(glm::ivec2 vResolutionHint)
 	
 #ifdef HY_PLATFORM_DESKTOP
 	glfwSetWindowSize(m_hData, m_Info.vSize.x, m_Info.vSize.y);
+#elif defined(HY_PLATFORM_GUI)
+	m_vFramebufferSize = m_Info.vSize;
 #endif
 }
 
