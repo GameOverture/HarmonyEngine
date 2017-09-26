@@ -41,7 +41,7 @@ HyWindow::HyWindow(const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInter
 
 #ifdef HY_PLATFORM_DESKTOP
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
 	//if(m_Init.eType
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
@@ -58,6 +58,11 @@ HyWindow::HyWindow(const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInter
 		HyLogError("HyOpenGL_Desktop::Initialize() - glfwCreateWindow returned nullptr (At least OpenGL 3.3 is required, or window or OpenGL context creation failed)");
 		return;
 	}
+
+	int32 iFrameBufferX, iFrameBufferY;
+	glfwGetFramebufferSize(m_hData, &iFrameBufferX, &iFrameBufferY);
+	m_vFramebufferSize.x = iFrameBufferX;
+	m_vFramebufferSize.y = iFrameBufferY;
 
 	glfwSetWindowUserPointer(m_hData, this);
 	glfwSetWindowPos(m_hData, m_Info.ptLocation.x, m_Info.ptLocation.y);
