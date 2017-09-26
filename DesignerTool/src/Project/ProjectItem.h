@@ -11,7 +11,6 @@
 #define PROJECTITEM_H
 
 #include "DataExplorerItem.h"
-#include "Harmony/HyEngine.h"
 #include "IDraw.h"
 
 #include <QUndoStack>

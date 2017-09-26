@@ -45,8 +45,7 @@ class HyWindow
 	friend class IHyRenderer;
 	friend class HyScene;
 
-	static uint32							sm_uiIdCounter;
-	const uint32							m_uiID;
+	const uint32							m_uiINDEX;
 
 	HyWindowInfo							m_Info;
 	glm::ivec2								m_vFramebufferSize;
@@ -57,10 +56,10 @@ class HyWindow
 	HyRenderSurfaceHandleInterop			m_hData;
 
 public:
-	HyWindow(const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInterop hSharedContext);
+	HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInterop hSharedContext);
 	~HyWindow(void);
 
-	uint32							GetId() const;
+	uint32							GetIndex() const;
 
 	std::string						GetTitle();
 	void							SetTitle(const std::string &sTitle);
@@ -89,9 +88,11 @@ public:
 
 	HyRenderSurfaceHandleInterop	GetHandle();
 
+#ifdef HY_PLATFORM_DESKTOP
 	friend void glfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight);
 	friend void glfw_FramebufferSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight);
 	friend void glfw_WindowPosCallback(GLFWwindow *pWindow, int32 iX, int32 iY);
+#endif
 };
 
 #endif /* HyWindow_h__ */

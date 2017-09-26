@@ -111,7 +111,7 @@ void AtlasDraw::Update(IHyApplication &hyApp)
     
     m_pCamera->SetZoom(1.0f);
     m_pCamera->pos.Set(0.0f);
-    glm::vec2 vResolution(static_cast<float>(hyApp.Window().GetResolution().x), static_cast<float>(hyApp.Window().GetResolution().y));
+    glm::vec2 vResolution(static_cast<float>(hyApp.Window().GetFramebufferSize().x), static_cast<float>(hyApp.Window().GetFramebufferSize().y));
 
     glm::vec2 ptPos(vResolution.x * -0.5f, vResolution.y * 0.5f);
     float fCurMaxHeight = 0.0f;

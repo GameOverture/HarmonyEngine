@@ -62,6 +62,16 @@ void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string
 	m_DiagnosticsRef.SetRendererInfo(sApiName, sVersion, sVendor, sRenderer, sShader, iMaxTextureSize, sCompressedTextures);
 }
 
+uint32 IHyRenderer::GetNumWindows()
+{
+	return static_cast<uint32>(m_WindowListRef.size());
+}
+
+/*virtual*/ void IHyRenderer::SetCurrentWindow(uint32 uiIndex)
+{
+	m_pCurWindow = m_WindowListRef[uiIndex];
+}
+
 //uint32 IHyRenderer::GetNumRenderSurfaces()
 //{
 //	return static_cast<uint32>(m_RenderSurfaceList.size());
@@ -180,7 +190,7 @@ void IHyRenderer::Render()
 	// Render all Windows
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
-		m_pCurWindow = m_WindowListRef[i];
+		SetCurrentWindow(i);
 		StartRender();
 
 		Init_3d();

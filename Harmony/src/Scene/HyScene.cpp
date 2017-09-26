@@ -177,7 +177,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		{
 			if(m_WindowListRef[i]->m_Cams3dList[j]->IsEnabled())
 			{
-				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = m_WindowListRef[i]->GetId();
+				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = m_WindowListRef[i]->GetIndex();
 				m_pCurWritePos += sizeof(uint32);
 
 				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_WindowListRef[i]->m_Cams3dList[j]->GetViewport();
@@ -208,7 +208,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		{
 			if(m_WindowListRef[i]->m_Cams2dList[j]->IsEnabled())
 			{
-				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = m_WindowListRef[i]->GetId();
+				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = m_WindowListRef[i]->GetIndex();
 				m_pCurWritePos += sizeof(uint32);
 
 				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_WindowListRef[i]->m_Cams2dList[j]->GetViewport();

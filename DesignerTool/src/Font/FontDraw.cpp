@@ -27,7 +27,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
     m_DrawAtlasOutline.SetTint(1.0f, 0.0f, 0.0f);
 
     m_DividerLine.GetShape().SetAsBox(10000.0f, 10.0f);
-    m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetResolution().y / 2 - 5.0f);
+    m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetFramebufferSize().y / 2 - 5.0f);
     m_DividerLine.SetTint(0.0f, 0.0f, 0.0f);
     m_DividerLine.UseWindowCoordinates();
 
@@ -77,7 +77,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
     
         // Calculate the proper zoom amount to fit the whole atlas width (plus some extra margin) in preview window
         float fExtraMargin = 25.0f;
-        float fZoomAmt = ((m_HyAppRef.Window().GetResolution().x * 100.0f) / (pFtglAtlas->width + (fExtraMargin * 2.0f))) / 100.0f;
+        float fZoomAmt = ((m_HyAppRef.Window().GetFramebufferSize().x * 100.0f) / (pFtglAtlas->width + (fExtraMargin * 2.0f))) / 100.0f;
         m_pCamera->SetZoom(fZoomAmt);
     
         const b2AABB &aabbWorldViewBounds = m_pCamera->GetWorldViewBounds();
@@ -113,7 +113,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 
 /*virtual*/ void FontDraw::OnResizeRenderer() /*override*/
 {
-    m_DividerLine.pos.Set(-5000.0f, m_HyAppRef.Window().GetResolution().y / 2 - 5.0f);
+    m_DividerLine.pos.Set(-5000.0f, m_HyAppRef.Window().GetFramebufferSize().y / 2 - 5.0f);
 }
 
 /*virtual*/ void FontDraw::OnUpdate() /*override*/

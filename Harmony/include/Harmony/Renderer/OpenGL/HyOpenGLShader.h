@@ -16,8 +16,6 @@
 
 class HyOpenGLShader : public IHyShader
 {
-	GLuint								m_hVAO;
-
 	GLsizei								m_uiStride;
 
 	// Shader creation

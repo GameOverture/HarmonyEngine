@@ -73,6 +73,9 @@ public:
 	std::queue<IHyLoadableData *> &RxData();
 
 	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
+	
+	uint32 GetNumWindows();
+	virtual void SetCurrentWindow(uint32 uiIndex);
 
 	virtual bool Initialize() = 0;
 

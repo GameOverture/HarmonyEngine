@@ -9,8 +9,6 @@
  *************************************************************************/
 #include "Renderer/Components/HyWindow.h"
 
-uint32 HyWindow::sm_uiIdCounter = 0;
-
 #ifdef HY_PLATFORM_DESKTOP
 	void glfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight)
 	{
@@ -34,9 +32,8 @@ uint32 HyWindow::sm_uiIdCounter = 0;
 	}
 #endif
 
-HyWindow::HyWindow(const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInterop hSharedContext) : m_uiID(sm_uiIdCounter)
+HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInterop hSharedContext) : m_uiINDEX(uiIndex)
 {
-	sm_uiIdCounter++;
 	m_Info = windowInfoRef;
 
 #ifdef HY_PLATFORM_DESKTOP
@@ -45,6 +42,7 @@ HyWindow::HyWindow(const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInter
 
 	//if(m_Init.eType
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);		// Will be shown after positioned
 
 	//m_WindowList[i]->SetType(m_Init.windowInfo[i].eType);
 
@@ -66,6 +64,7 @@ HyWindow::HyWindow(const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInter
 
 	glfwSetWindowUserPointer(m_hData, this);
 	glfwSetWindowPos(m_hData, m_Info.ptLocation.x, m_Info.ptLocation.y);
+	glfwShowWindow(m_hData);
 
 	// Set callbacks
 	glfwSetWindowSizeCallback(m_hData, glfw_WindowSizeCallback);
@@ -88,9 +87,9 @@ HyWindow::~HyWindow(void)
 #endif
 }
 
-uint32 HyWindow::GetId() const
+uint32 HyWindow::GetIndex() const
 {
-	return m_uiID;
+	return m_uiINDEX;
 }
 
 std::string HyWindow::GetTitle()

@@ -20,18 +20,25 @@
 class HyOpenGL : public IHyRenderer
 {
 protected:
-	glm::mat4				m_mtxView;
-	glm::mat4				m_mtxProj;
+	std::vector<std::map<HyOpenGLShader *, uint32> >	m_VaoMapList;
 
-	int32					m_iCurCamIndex;
+	glm::mat4					m_mtxView;
+	glm::mat4					m_mtxProj;
+
+	int32						m_iCurCamIndex;
 
 	///////// 2D MEMBERS ////////////////////
-	GLuint					m_hVBO2d;
-	GLenum					m_eDrawMode;
+	GLuint						m_hVBO2d;
+	GLenum						m_eDrawMode;
 
 public:
 	HyOpenGL(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
 	virtual ~HyOpenGL(void);
+
+	void GenVAOs(HyOpenGLShader *pShaderKey);
+	void BindVao(HyOpenGLShader *pShaderKey);
+
+	virtual void SetCurrentWindow(uint32 uiIndex);
 
 	virtual bool Initialize() override;
 

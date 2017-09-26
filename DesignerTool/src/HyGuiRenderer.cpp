@@ -38,9 +38,9 @@ HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent),
 }
 
 HyGuiRenderer::HyGuiRenderer(Project *pProj, QWidget *parent /*= 0*/) : QOpenGLWidget(parent),
-                                                                            m_pProjOwner(pProj),
-                                                                            m_pHyEngine(nullptr),
-                                                                            m_bIsUpdating(false)
+                                                                        m_pProjOwner(pProj),
+                                                                        m_pHyEngine(nullptr),
+                                                                        m_bIsUpdating(false)
 {
 //    QSurfaceFormat format;
 //    format.setRenderableType(QSurfaceFormat::OpenGL);

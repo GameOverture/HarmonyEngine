@@ -15,10 +15,43 @@
 HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(diagnosticsRef, bShowCursor, windowListRef),
 																												m_mtxView(1.0f)
 {
+	for(int i = 0; i < m_WindowListRef.size(); ++i)
+		m_VaoMapList.push_back(std::map<HyOpenGLShader *, uint32>());
 }
 
 HyOpenGL::~HyOpenGL(void)
 {
+}
+
+void HyOpenGL::GenVAOs(HyOpenGLShader *pShaderKey)
+{
+	for(int i = 0; i < m_WindowListRef.size(); ++i)
+	{
+		if(m_VaoMapList[i].find(pShaderKey) == m_VaoMapList[i].end())
+		{
+			SetCurrentWindow(i);
+
+			m_VaoMapList[i][pShaderKey] = 0;
+			glGenVertexArrays(1, &m_VaoMapList[i][pShaderKey]);
+			HyErrorCheck_OpenGL("HyOpenGLShader::OnUpload", "glGenVertexArrays");
+		}
+	}
+}
+
+void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
+{
+	uint32 uiVao = m_VaoMapList[m_pCurWindow->GetIndex()][pShaderKey];
+	glBindVertexArray(uiVao);
+	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
+}
+
+/*virtual*/ void HyOpenGL::SetCurrentWindow(uint32 uiIndex)
+{
+	IHyRenderer::SetCurrentWindow(uiIndex);
+
+#ifdef HY_PLATFORM_DESKTOP
+	glfwMakeContextCurrent(m_pCurWindow->GetHandle());
+#endif
 }
 
 /*virtual*/ bool HyOpenGL::Initialize() /*override*/
@@ -26,31 +59,56 @@ HyOpenGL::~HyOpenGL(void)
 	HyLog("OpenGL is initializing...");
 
 #ifdef HY_PLATFORM_DESKTOP
-	if(m_WindowListRef.size() > 0)
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
-		m_pCurWindow = m_WindowListRef[0];
-		glfwMakeContextCurrent(m_pCurWindow->GetHandle());
+		SetCurrentWindow(i);
+
+		//gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+		glewExperimental = GL_TRUE;	// This is required for GLFW to work
+		GLenum err = glewInit();
+		if(err != GLEW_OK) {
+			HyError("glewInit() failed: " << err);
+		}
+		else {
+			// Flush the OpenGL error state, as glew is known to bork it
+			while(GL_NO_ERROR != glGetError());
+		}
+		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
+
+		glEnable(GL_DEPTH_TEST);
+		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
+
+		glEnable(GL_BLEND);
+		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
+
+		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	}
+
+	if(m_WindowListRef.empty() == false)
+		SetCurrentWindow(0);
 	else
 		HyLog("No windows created to render to");
 #endif
 
-	//////////////////////////////////////////////////////////////////////////
-	// Init GLEW
-	glewExperimental = GL_TRUE;	// This is required for GLFW to work
-	GLenum err = glewInit();
-	if(err != GLEW_OK) {
-		HyError("glewInit() failed: " << err);
-	}
-	else {
-		// Flush the OpenGL error state, as glew is known to bork it
-		while(GL_NO_ERROR != glGetError());
-	}
-	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
+	////////////////////////////////////////////////////////////////////////////
+	//// Init GLEW
+	//glewExperimental = GL_TRUE;	// This is required for GLFW to work
+	//GLenum err = glewInit();
+	//if(err != GLEW_OK) {
+	//	HyError("glewInit() failed: " << err);
+	//}
+	//else {
+	//	// Flush the OpenGL error state, as glew is known to bork it
+	//	while(GL_NO_ERROR != glGetError());
+	//}
+	//HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
 
-	if(glewIsSupported("GL_VERSION_3_3") == false) {
-		HyError("At least OpenGL 3.3 must be supported");
-	}
+	//if(glewIsSupported("GL_VERSION_3_3") == false) {
+	//	HyError("At least OpenGL 3.3 must be supported");
+	//}
 
 	GLint iMaxTextureSize = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &iMaxTextureSize);
@@ -147,10 +205,6 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::StartRender()
 {
-#ifdef HY_PLATFORM_DESKTOP
-	glfwMakeContextCurrent(m_pCurWindow->GetHandle());
-#endif 
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	HyErrorCheck_OpenGL("HyOpenGL:StartRender", "glClear");
 }
@@ -189,7 +243,7 @@ HyOpenGL::~HyOpenGL(void)
 	int32 iNumRenderStates2d = GetNumRenderStates2d();
 
 	// Only draw cameras that are apart of this HyWindow
-	while(m_pCurWindow->GetId() != GetCameraWindowId2d(m_iCurCamIndex) && m_iCurCamIndex < iNumCameras2d)
+	while(m_pCurWindow->GetIndex() != GetCameraWindowId2d(m_iCurCamIndex) && m_iCurCamIndex < iNumCameras2d)
 		m_iCurCamIndex++;
 
 	if(iNumRenderStates2d == 0 || m_iCurCamIndex >= iNumCameras2d)
@@ -224,6 +278,7 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_ShaderMap[renderState.GetShaderId()]);
+	BindVao(pShader);
 	pShader->Use();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

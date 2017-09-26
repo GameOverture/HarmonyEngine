@@ -30,8 +30,7 @@
 //#define HY_PLATFORM_WINDOWS
 
 #include "GL/glew.h"
-#include "GL/gl.h"
-#include "GL/glext.h"
+//#include <glad/glad.h>
 #endif
 
 enum HyType

@@ -15,8 +15,6 @@
 #include "Global.h"
 #include "ProjectItemMimeData.h"
 
-#include "Harmony/HyEngine.h"
-
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonDocument>
@@ -436,7 +434,7 @@ void Project::OpenItem(ProjectItem *pItem)
 
 void Project::SetRenderSize(int iWidth, int iHeight)
 {
-    Window().SetResolution(glm::ivec2(iWidth, iHeight));
+    Window().SetWindowSize(glm::ivec2(iWidth, iHeight));
 
     if(m_pTabBar && m_pTabBar->count() != 0)
     {

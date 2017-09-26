@@ -24,6 +24,7 @@
 #include <QJsonArray>
 
 #include "WidgetOutputLog.h"
+
 #include "Harmony/HyEngine.h"
 
 class Project;

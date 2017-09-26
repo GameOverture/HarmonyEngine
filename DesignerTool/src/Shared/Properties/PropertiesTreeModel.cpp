@@ -1,5 +1,4 @@
 #include "PropertiesTreeModel.h"
-#include "Harmony/HyEngine.h"
 
 PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant &subState, QObject *parent) :  QAbstractItemModel(parent),
                                                                                                                         m_ItemRef(itemRef),

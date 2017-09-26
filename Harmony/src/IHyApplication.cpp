@@ -164,7 +164,7 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(nullptr),
 	sm_fPixelsPerMeter = m_Init.fPixelsPerMeter;
 	
 	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
-		m_WindowList.push_back(HY_NEW HyWindow(m_Init.windowInfo[i], i != 0 ? m_WindowList[0]->GetHandle() : nullptr));
+		m_WindowList.push_back(HY_NEW HyWindow(i, m_Init.windowInfo[i], i != 0 ? m_WindowList[0]->GetHandle() : nullptr));
 }
 
 IHyApplication::~IHyApplication()
