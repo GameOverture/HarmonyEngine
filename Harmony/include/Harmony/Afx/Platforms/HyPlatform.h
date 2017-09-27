@@ -13,17 +13,10 @@
 #include "Afx/Platforms/HyPlatAfx.h"
 
 #if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
+	#include "GL/glew.h"
+	#include <GLFW/glfw3.h>
 	#define HY_PLATFORM_DESKTOP
 #endif
-
-#ifdef HY_PLATFORM_DESKTOP
-	//#define GLEW_MX			// GLEW_MX makes glew work with multiple contexts
-	#include "GL/glew.h"
-
-	//#include <glad/glad.h>
-	#include <GLFW/glfw3.h>
-#endif
-
 
 #if defined(HY_PLATFORM_32BIT)	// 32 bit environment
 	typedef int32 intx;
@@ -80,27 +73,7 @@ HY_INLINE uint32 EndianSwap32(uint32 var)
 //-----------------------------------------------------------------------------------------
 // Misc
 //-----------------------------------------------------------------------------------------
-
 #define HY_TCP_PORT 1313
-
-// Some simple constants to replace the C++ types of 
-// true and false.
-// Most platforms define these too, so use ifndef 
-// around each of them,
-#ifdef TRUE
-	#undef TRUE
-#endif
-#define TRUE	1
-
-#ifdef FALSE
-	#undef FALSE
-#endif
-#define FALSE	0
-
-#ifdef NULL
-	#undef NULL
-#endif
-#define NULL	0
 
 // The size of an enum can vary, so add this element to the end
 // of any enumeration we use that's intended for saving to disc

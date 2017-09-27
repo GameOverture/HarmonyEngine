@@ -17,9 +17,9 @@
 	#include "Renderer/OpenGL/HyOpenGL.h"
 	typedef HyOpenGL HyRendererInterop;
 
-	#include "Input/Interop/HyInput_NULL.h"
-	typedef HyInput_NULL HyInputInterop;
-	typedef HyInputMap_NULL HyInputMapInterop;
+	//#include "Input/Interop/HyInput_NULL.h"
+	//typedef HyInput_NULL HyInputInterop;
+	//typedef HyInputMap_NULL HyInputMapInterop;
 
 	#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
 	typedef HyConsole_Gui HyConsoleInterop;
@@ -49,10 +49,10 @@
 		//#include "Renderer/OpenGL/Interop/HyOpenGL_Win.h"
 		//typedef HyOpenGL_Win HyRendererInterop;
 
-		#include "Input/Interop/HyInput_Gainput.h"
-		#include "Input/Interop/HyInputMap_Gainput.h"
-		typedef HyInput_Gainput HyInputInterop;
-		typedef HyInputMap_Gainput HyInputMapInterop;
+		//#include "Input/Interop/HyInput_Gainput.h"
+		//#include "Input/Interop/HyInputMap_Gainput.h"
+		//typedef HyInput_Gainput HyInputInterop;
+		//typedef HyInputMap_Gainput HyInputMapInterop;
 
 		#include "Diagnostics/Console/Interop/HyConsole_Win.h"
 		typedef HyConsole_Win HyConsoleInterop;

@@ -25,12 +25,9 @@
 
 
 #if defined(HY_PLATFORM_GUI)// GUI -> Hack for now
-#define WIN32_LEAN_AND_MEAN 
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
-//#define HY_PLATFORM_WINDOWS
-
 #include "GL/glew.h"
-//#include <glad/glad.h>
 #endif
 
 enum HyType

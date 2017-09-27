@@ -205,13 +205,13 @@ uint32 IHyApplication::GetNumWindows()
 	return m_Init.uiNumWindows;
 }
 
-HyInputMapInterop &IHyApplication::Input(uint32 uiIndex /*= 0*/)
+HyInputMap &IHyApplication::Input(uint32 uiIndex /*= 0*/)
 {
 	HyAssert(m_pInputMaps && uiIndex < m_Init.uiNumInputMappings, "IApplication::Input() took an invalid index: " << uiIndex);
-	return static_cast<HyInputMapInterop &>(m_pInputMaps[uiIndex]);
+	return static_cast<HyInputMap &>(m_pInputMaps[uiIndex]);
 }
 
-void IHyApplication::SetInputMapPtr(HyInputMapInterop *pInputMaps)
+void IHyApplication::SetInputMapPtr(HyInputMap *pInputMaps)
 {
 	m_pInputMaps = pInputMaps;
 }

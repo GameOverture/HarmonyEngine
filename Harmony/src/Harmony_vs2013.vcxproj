@@ -70,8 +70,8 @@
     <ClCompile Include="Diagnostics\Output\HyProfiler.cpp" />
     <ClCompile Include="HyEngine.cpp" />
     <ClCompile Include="IHyApplication.cpp" />
-    <ClCompile Include="Input\IHyInput.cpp" />
-    <ClCompile Include="Input\IHyInputMap.cpp" />
+    <ClCompile Include="Input\HyInput.cpp" />
+    <ClCompile Include="Input\HyInputMap.cpp" />
     <ClCompile Include="Input\Interop\HyInputMap_Gainput.cpp" />
     <ClCompile Include="Input\Interop\HyInput_Gainput.cpp" />
     <ClCompile Include="Memory\HyMemoryHeap.cpp" />
@@ -162,8 +162,9 @@
     <ClInclude Include="..\include\Harmony\Diagnostics\Output\HyProfiler.h" />
     <ClInclude Include="..\include\Harmony\HyEngine.h" />
     <ClInclude Include="..\include\Harmony\IHyApplication.h" />
-    <ClInclude Include="..\include\Harmony\Input\IHyInput.h" />
-    <ClInclude Include="..\include\Harmony\Input\IHyInputMap.h" />
+    <ClInclude Include="..\include\Harmony\Input\HyInput.h" />
+    <ClInclude Include="..\include\Harmony\Input\HyInputKeys.h" />
+    <ClInclude Include="..\include\Harmony\Input\HyInputMap.h" />
     <ClInclude Include="..\include\Harmony\Input\Interop\HyInputMap_Gainput.h" />
     <ClInclude Include="..\include\Harmony\Input\Interop\HyInput_Gainput.h" />
     <ClInclude Include="..\include\Harmony\Input\Interop\HyInput_NULL.h" />

@@ -24,18 +24,18 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_AppRef.m_WindowList),
 												m_Assets(m_AppRef.m_Init.sDataDir, m_Scene),
 												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_Assets),
-												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList),
-												m_Renderer(m_Diagnostics, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
-												m_Audio(m_AppRef.m_WindowList),
 												m_Diagnostics(m_AppRef.m_Init, m_Assets, m_Scene),
-												m_Time(m_Scene, m_AppRef.m_Init.uiUpdateTickMs)
+												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList),
+												m_Time(m_Scene, m_AppRef.m_Init.uiUpdateTickMs),
+												m_Renderer(m_Diagnostics, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
+												m_Audio(m_AppRef.m_WindowList)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 
 	if(m_Renderer.Initialize() == false)
 		HyLogError("IHyRenderer::Initialize() failed");
 
-	m_AppRef.SetInputMapPtr(static_cast<HyInputMapInterop *>(m_Input.GetInputMapArray()));
+	m_AppRef.SetInputMapPtr(m_Input.GetInputMapArray());
 }
 
 HyEngine::~HyEngine()
@@ -131,39 +131,6 @@ bool HyEngine::PollPlatformApi()
 	glfwPollEvents();
 #endif
 
-//#if defined(HY_PLATFORM_WINDOWS) && !defined(HY_PLATFORM_GUI)
-//	MSG msg = {0};
-//	int32 iWindowIndex = 0;
-//	HWND hWnd = m_Renderer.GetHWND(iWindowIndex);
-//
-//	while(hWnd != nullptr)
-//	{
-//		while(PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE))
-//		{
-//			TranslateMessage(&msg);
-//			DispatchMessage(&msg);
-//
-//			// Mouse hovering over a window will count as Input's current window
-//			if(msg.message == WM_MOUSEMOVE)
-//			{
-//				for(uint32 i = 0; i < m_Renderer.GetNumRenderSurfaces(); ++i)
-//				{
-//					if(m_Renderer.GetHWND(i) == msg.hwnd)
-//					{
-//						m_Input.SetWindowIndex(i);
-//						break;
-//					}
-//				}
-//			}
-//
-//			m_Input.HandleMsg(&msg);
-//		}
-//
-//		iWindowIndex++;
-//		hWnd = m_Renderer.GetHWND(iWindowIndex);
-//	}
-//#endif
-
 	m_Input.Update();
 	return true;
 }
@@ -195,6 +162,12 @@ HyRendererInterop &HyEngine::GetRenderer()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "HyPauseGame() was invoked before engine has been initialized.");
 	HyEngine::sm_pInstance->m_Scene.SetPause(bPause);
+}
+
+/*friend*/ HyInput &Hy_Input()
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_Input() was invoked before engine has been initialized.");
+	return HyEngine::sm_pInstance->m_Input;
 }
 
 /*friend*/ b2World &Hy_Physics2d()

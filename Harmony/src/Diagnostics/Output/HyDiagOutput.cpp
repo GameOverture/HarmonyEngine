@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Diagnostics/Output/HyDiagOutput.h"
-#include "Input/IHyInputMap.h"
+#include "HyEngine.h"
 
 #define HYDIAG_WIDTH 600.0f
 
@@ -92,8 +92,9 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 		m_uiFrameCount = 0;
 	}
 
-	glm::vec2 ptMousePos = IHyInputMap::GetWorldMousePos();
-	if(IHyInputMap::IsMouseLeftDown())
+	HyInput &inputRef = Hy_Input();
+	glm::vec2 ptMousePos = inputRef.GetWorldMousePos();
+	if(inputRef.IsMouseBtnDown(HYMOUSE_BtnLeft))
 		m_txtMouse.TextSet("MOUSE DOWN\nX:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
 	else
 		m_txtMouse.TextSet("MOUSE UP\nX:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));

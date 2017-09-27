@@ -13,44 +13,6 @@
 #include "Afx/HyInteropAfx.h"
 #include "Scene/Nodes/Leafs/Misc/HyCamera.h"
 
-//struct HyMonitorDeviceInfo
-//{
-//	bool					bIsPrimaryMonitor;
-//	std::wstring			sDeviceName;
-//	std::wstring			sDeviceDescription;
-//
-//	enum Mode
-//	{
-//		asdf
-//	};
-//	Mode					eMode;
-//	std::vector<Mode>		supportedModesList;
-//
-//	glm::ivec2				ptVirtualPos;
-//	glm::vec2				vPhysicalSize;
-//	float					fGammaRamp;
-//
-//	struct Resolution
-//	{
-//		int32 iWidth;
-//		int32 iHeight;
-//
-//		Resolution(int32 iW, int32 iH) : iWidth(iW), iHeight(iH)
-//		{ }
-//
-//		bool operator <(const Resolution &right) const
-//		{
-//			return (this->iWidth + this->iHeight) < (right.iWidth + right.iHeight);
-//		}
-//
-//		bool operator ==(const Resolution &right) const
-//		{
-//			return this->iWidth == right.iWidth && this->iHeight == right.iHeight;
-//		}
-//	};
-//	std::vector<Resolution>	resolutionList;
-//};
-
 class HyWindow
 {
 	friend class IHyRenderer;

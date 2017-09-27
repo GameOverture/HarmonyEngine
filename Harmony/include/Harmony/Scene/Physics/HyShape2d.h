@@ -63,7 +63,7 @@ public:
 	void SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
 
 	// Returns true if the world point intersects within this bounding volume's world transformation
-	bool TestPoint(glm::vec2 ptWorldPoint) const;
+	bool TestPoint(const glm::vec2 &ptWorldPointRef) const;
 };
 
 #endif /* HyShape2d_h__ */

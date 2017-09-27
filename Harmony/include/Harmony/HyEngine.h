@@ -12,10 +12,10 @@
 
 #include "Afx/HyInteropAfx.h"
 #include "IHyApplication.h"
-#include "Memory/HyMemoryHeap.h"
 #include "Audio/IHyAudio.h"
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
+#include "Input/HyInput.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Leafs/Misc/HyAudio2d.h"
@@ -43,9 +43,9 @@ class HyEngine
 	HyAssets 					m_Assets;
 	HyGuiComms					m_GuiComms;
 	HyDiagnostics				m_Diagnostics;
+	HyInput						m_Input;
 
 	HyTimeInterop				m_Time;
-	HyInputInterop				m_Input;
 	HyRendererInterop			m_Renderer;
 	HyAudioInterop				m_Audio;
 
@@ -77,6 +77,8 @@ private:
 	friend float Hy_TimeDelta();
 	friend void Hy_SetUpdateTickMs(uint32 uiUpdateTickMs);
 	friend void HyPauseGame(bool bPause);
+
+	friend HyInput &Hy_Input();
 	friend b2World &Hy_Physics2d();
 	friend HyDiagnostics &HyGetDiagnostics();
 	friend float HyPixelsPerMeter();

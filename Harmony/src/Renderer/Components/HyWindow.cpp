@@ -201,6 +201,9 @@ void HyWindow::RemoveCamera(HyCamera3d *&pCam)
 
 glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate)
 {
+	// Convert to normalized [0.0 - 1.0]
+	ptViewportCoordinate /= GetWindowSize();
+
 	glm::vec2 ptWorldPos(0.0f);
 
 	// Find the first camera that encompasses this normalized point in the viewport

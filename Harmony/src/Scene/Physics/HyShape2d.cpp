@@ -191,11 +191,11 @@ void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 	m_OwnerRef.OnShapeSet(this);
 }
 
-bool HyShape2d::TestPoint(glm::vec2 ptWorldPoint) const
+bool HyShape2d::TestPoint(const glm::vec2 &ptWorldPointRef) const
 {
 	glm::mat4 mtxWorld;
 	m_OwnerRef.GetWorldTransform(mtxWorld);
 	float fWorldRotationRadians = glm::atan(mtxWorld[0][1], mtxWorld[0][0]);
 
-	return m_pShape && m_pShape->TestPoint(b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), b2Vec2(ptWorldPoint.x, ptWorldPoint.y));
+	return m_pShape && m_pShape->TestPoint(b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), b2Vec2(ptWorldPointRef.x, ptWorldPointRef.y));
 }

@@ -12,6 +12,7 @@
 
 #include "Afx/HyInteropAfx.h"
 #include "Memory/HyMemoryHeap.h"
+#include "Input/HyInputMap.h"
 
 // Client supplies these initialization parameters to the engine
 struct HarmonyInit
@@ -50,7 +51,7 @@ protected:
 
 	std::vector<HyWindow *>			m_WindowList;
 
-	HyInputMapInterop *				m_pInputMaps;
+	HyInputMap *					m_pInputMaps;
 	HyConsoleInterop				m_Console;
 
 	virtual bool Initialize() = 0;
@@ -68,10 +69,10 @@ public:
 
 	HyWindow &Window(uint32 uiIndex = 0);
 	uint32 GetNumWindows();
-	HyInputMapInterop &Input(uint32 uiIndex = 0);
+	HyInputMap &Input(uint32 uiIndex = 0);
 
 private:
-	void SetInputMapPtr(HyInputMapInterop *pInputMaps);
+	void SetInputMapPtr(HyInputMap *pInputMaps);
 };
 
 #endif /* IHyApplication_h__ */
