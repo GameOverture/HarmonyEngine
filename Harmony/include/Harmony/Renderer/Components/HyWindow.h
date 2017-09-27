@@ -13,32 +13,43 @@
 #include "Afx/HyInteropAfx.h"
 #include "Scene/Nodes/Leafs/Misc/HyCamera.h"
 
-struct HyMonitorDeviceInfo
-{
-	bool					bIsPrimaryMonitor;
-	std::wstring			sDeviceName;
-	std::wstring			sDeviceDescription;
-
-	struct Resolution
-	{
-		int32 iWidth;
-		int32 iHeight;
-
-		Resolution(int32 iW, int32 iH) : iWidth(iW), iHeight(iH)
-		{ }
-
-		bool operator <(const Resolution &right) const
-		{
-			return (this->iWidth + this->iHeight) < (right.iWidth + right.iHeight);
-		}
-
-		bool operator ==(const Resolution &right) const
-		{
-			return this->iWidth == right.iWidth && this->iHeight == right.iHeight;
-		}
-	};
-	std::vector<Resolution>	resolutionList;
-};
+//struct HyMonitorDeviceInfo
+//{
+//	bool					bIsPrimaryMonitor;
+//	std::wstring			sDeviceName;
+//	std::wstring			sDeviceDescription;
+//
+//	enum Mode
+//	{
+//		asdf
+//	};
+//	Mode					eMode;
+//	std::vector<Mode>		supportedModesList;
+//
+//	glm::ivec2				ptVirtualPos;
+//	glm::vec2				vPhysicalSize;
+//	float					fGammaRamp;
+//
+//	struct Resolution
+//	{
+//		int32 iWidth;
+//		int32 iHeight;
+//
+//		Resolution(int32 iW, int32 iH) : iWidth(iW), iHeight(iH)
+//		{ }
+//
+//		bool operator <(const Resolution &right) const
+//		{
+//			return (this->iWidth + this->iHeight) < (right.iWidth + right.iHeight);
+//		}
+//
+//		bool operator ==(const Resolution &right) const
+//		{
+//			return this->iWidth == right.iWidth && this->iHeight == right.iHeight;
+//		}
+//	};
+//	std::vector<Resolution>	resolutionList;
+//};
 
 class HyWindow
 {
@@ -72,12 +83,6 @@ public:
 	glm::ivec2						GetLocation();
 	void							SetLocation(glm::ivec2 ptLocation);
 
-	HyWindowType					GetType();
-	void							SetType(HyWindowType eType);
-
-	int32							GetBitsPerPixel();
-	void							SetBitsPerPixel(int32 iBitsPerPixel);
-
 	HyCamera2d *					CreateCamera2d();
 	HyCamera3d *					CreateCamera3d();
 
@@ -89,6 +94,13 @@ public:
 	HyRenderSurfaceHandleInterop	GetHandle();
 
 #ifdef HY_PLATFORM_DESKTOP
+	// Returns the monitor this window is currently associated with.
+	// (Determined by the monitor closest to window's center)
+	GLFWmonitor *					GetGlfwMonitor();
+
+	bool							IsFullScreen();
+	void							SetFullScreen(bool bFullScreen);
+
 	friend void glfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight);
 	friend void glfw_FramebufferSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight);
 	friend void glfw_WindowPosCallback(GLFWwindow *pWindow, int32 iX, int32 iY);

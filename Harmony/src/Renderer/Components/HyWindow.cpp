@@ -41,16 +41,29 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, HyRenderSu
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	//if(m_Init.eType
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	GLFWmonitor *pMonitorOwner = nullptr;
+	switch(m_Info.eType)
+	{
+	case HYWINDOW_WindowedSizeable:
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+		break;
+	case HYWINDOW_WindowedFixed:
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+		break;
+	case HYWINDOW_BorderlessWindow:
+		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+		break;
+	case HYWINDOW_FullScreen:
+		pMonitorOwner = GetGlfwMonitor();
+		break;
+	}
+	
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);		// Will be shown after positioned
-
-	//m_WindowList[i]->SetType(m_Init.windowInfo[i].eType);
 
 	m_hData = glfwCreateWindow(static_cast<int32>(m_Info.vSize.x),
 							   static_cast<int32>(m_Info.vSize.y),
 							   m_Info.sName.c_str(),
-							   nullptr, // GLFWmonitor
+							   pMonitorOwner,
 							   hSharedContext);
 	if(m_hData == nullptr)
 	{
@@ -140,17 +153,6 @@ void HyWindow::SetLocation(glm::ivec2 ptLocation)
 #ifdef HY_PLATFORM_DESKTOP
 	glfwSetWindowPos(m_hData, m_Info.ptLocation.x, m_Info.ptLocation.y);
 #endif
-}
-
-HyWindowType HyWindow::GetType()
-{
-	return m_Info.eType;
-}
-
-void HyWindow::SetType(HyWindowType eType)
-{
-	HyError("HyWindow::SetType has not been implemented");
-	m_Info.eType = eType;
 }
 
 HyCamera2d *HyWindow::CreateCamera2d()
@@ -248,3 +250,46 @@ HyRenderSurfaceHandleInterop HyWindow::GetHandle()
 {
 	return m_hData;
 }
+
+#ifdef HY_PLATFORM_DESKTOP
+GLFWmonitor *HyWindow::GetGlfwMonitor()
+{
+	GLFWmonitor *pClosestMonitor = nullptr;
+
+	glm::vec2 ptWindowCenter = glm::vec2(m_Info.ptLocation.x, m_Info.ptLocation.y) + (glm::vec2(m_Info.vSize.x, m_Info.vSize.y) / 2.0f);
+	float fClosestDist = 999999999.0f;
+
+	int iNumMonitors;
+	GLFWmonitor **ppMonitors = glfwGetMonitors(&iNumMonitors);
+	for(int i = 0; i < iNumMonitors; ++i)
+	{
+		int32 iX, iY;
+		glfwGetMonitorPos(ppMonitors[i], &iX, &iY);
+		const GLFWvidmode *pVidMode = glfwGetVideoMode(ppMonitors[i]);
+
+		glm::vec2 ptMonitorCenter = glm::vec2(iX, iY) + (glm::vec2(pVidMode->width, pVidMode->height) / 2.0f);
+
+		float fDist = glm::distance(ptWindowCenter, ptMonitorCenter);
+		if(fClosestDist > fDist)
+		{
+			pClosestMonitor = ppMonitors[i];
+			fClosestDist = fDist;
+		}
+	}
+
+	return pClosestMonitor;
+}
+
+bool HyWindow::IsFullScreen()
+{
+	return glfwGetWindowMonitor(m_hData) != nullptr;
+}
+
+void HyWindow::SetFullScreen(bool bFullScreen)
+{
+	if(bFullScreen)
+		glfwSetWindowMonitor(m_hData, GetGlfwMonitor(), m_Info.ptLocation.x, m_Info.ptLocation.y, m_Info.vSize.x, m_Info.vSize.y, GLFW_DONT_CARE);
+	else
+		glfwSetWindowMonitor(m_hData, nullptr, m_Info.ptLocation.x, m_Info.ptLocation.y, m_Info.vSize.x, m_Info.vSize.y, GLFW_DONT_CARE);
+}
+#endif
