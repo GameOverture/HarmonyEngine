@@ -28,9 +28,11 @@
 
 	void glfw_CursorPosCallback(GLFWwindow *pWindow, double dX, double dY)
 	{
-		Hy_Input().m_pMouseWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
-		Hy_Input().m_ptMousePos.x = static_cast<float>(dX);
-		Hy_Input().m_ptMousePos.y = static_cast<float>(dY);
+		HyInput &inputRef = Hy_Input();
+
+		inputRef.m_pMouseWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
+		inputRef.m_ptMousePos.x = static_cast<float>(dX);
+		inputRef.m_ptMousePos.y = static_cast<float>(dY);
 	}
 
 	void glfw_ScrollCallback(GLFWwindow *pWindow, double dX, double dY)
@@ -39,6 +41,12 @@
 
 	void glfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods)
 	{
+		HyInput &inputRef = Hy_Input();
+
+		for(uint32 i = 0; i < inputRef.m_uiNUM_INPUT_MAPS; ++i)
+		{
+			inputRef.m_pInputMaps[i].
+		}
 	}
 
 	void glfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint)

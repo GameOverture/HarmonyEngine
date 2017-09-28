@@ -72,8 +72,6 @@
     <ClCompile Include="IHyApplication.cpp" />
     <ClCompile Include="Input\HyInput.cpp" />
     <ClCompile Include="Input\HyInputMap.cpp" />
-    <ClCompile Include="Input\Interop\HyInputMap_Gainput.cpp" />
-    <ClCompile Include="Input\Interop\HyInput_Gainput.cpp" />
     <ClCompile Include="Memory\HyMemoryHeap.cpp" />
     <ClCompile Include="Renderer\Components\HyRenderState.cpp" />
     <ClCompile Include="Renderer\Components\HyRenderSurface.cpp" />
@@ -165,9 +163,6 @@
     <ClInclude Include="..\include\Harmony\Input\HyInput.h" />
     <ClInclude Include="..\include\Harmony\Input\HyInputKeys.h" />
     <ClInclude Include="..\include\Harmony\Input\HyInputMap.h" />
-    <ClInclude Include="..\include\Harmony\Input\Interop\HyInputMap_Gainput.h" />
-    <ClInclude Include="..\include\Harmony\Input\Interop\HyInput_Gainput.h" />
-    <ClInclude Include="..\include\Harmony\Input\Interop\HyInput_NULL.h" />
     <ClInclude Include="..\include\Harmony\Memory\HyMemoryHeap.h" />
     <ClInclude Include="..\include\Harmony\Memory\Interop\HyMemAPI_Windows.h" />
     <ClInclude Include="..\include\Harmony\Memory\PageTypes\HyMedHeapPage.h" />
@@ -377,7 +372,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfwd.lib;soil2d.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfwd.lib;soil2d.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -405,7 +400,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfwd.lib;soil2d.lib;gainputd.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfwd.lib;soil2d.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -494,7 +489,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw.lib;soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw.lib;soil2.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>
@@ -520,7 +515,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw.lib;soil2.lib;gainput.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw.lib;soil2.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\</AdditionalLibraryDirectories>

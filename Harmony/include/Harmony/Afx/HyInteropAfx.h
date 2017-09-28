@@ -17,17 +17,13 @@
 	#include "Renderer/OpenGL/HyOpenGL.h"
 	typedef HyOpenGL HyRendererInterop;
 
-	//#include "Input/Interop/HyInput_NULL.h"
-	//typedef HyInput_NULL HyInputInterop;
-	//typedef HyInputMap_NULL HyInputMapInterop;
-
 	#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
 	typedef HyConsole_Gui HyConsoleInterop;
 
 	#include "Renderer/OpenGL/HyOpenGLShader.h"
 	typedef HyOpenGLShader HyShaderInterop;
 
-	typedef HWND HyRenderSurfaceHandleInterop;
+	typedef void *HyWindowHandle;
 
 	#include "Time/Interop/HyTime_Win.h"
 	typedef HyTime_Win HyTimeInterop;
@@ -36,28 +32,16 @@
 	typedef IHyAudioInst_Win IHyAudioInstInterop;
 	#include "Memory/Interop/HyMemAPI_Windows.h"
 	typedef HyMemoryAPI_Windows HyMemoryInterop;
-
-	typedef MSG HyApiMsgInterop;
 #else
 	#if defined(HY_PLATFORM_DESKTOP)
-		typedef GLFWwindow *HyRenderSurfaceHandleInterop;
+		typedef GLFWwindow *HyWindowHandle;
 		#include "Renderer/OpenGL/HyOpenGL.h"
 		typedef HyOpenGL HyRendererInterop;
 	#endif
 
 	#if defined(HY_PLATFORM_WINDOWS)
-		//#include "Renderer/OpenGL/Interop/HyOpenGL_Win.h"
-		//typedef HyOpenGL_Win HyRendererInterop;
-
-		//#include "Input/Interop/HyInput_Gainput.h"
-		//#include "Input/Interop/HyInputMap_Gainput.h"
-		//typedef HyInput_Gainput HyInputInterop;
-		//typedef HyInputMap_Gainput HyInputMapInterop;
-
 		#include "Diagnostics/Console/Interop/HyConsole_Win.h"
 		typedef HyConsole_Win HyConsoleInterop;
-
-		typedef MSG HyApiMsgInterop;
 
 		#include "Renderer/OpenGL/HyOpenGLShader.h"
 		typedef HyOpenGLShader HyShaderInterop;

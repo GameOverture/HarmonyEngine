@@ -19,32 +19,25 @@ class HyInputMap
 
 	struct ButtonInfo
 	{
-		enum Type
-		{
-			TYPE_Unknown = -1,
-			TYPE_KB = 0,
-			TYPE_MO,
-			TYPE_JOY
-		};
-		Type	eType;
 		int32	iBtn;
+		int32	iBtnAlternative;
 
 		bool	bPrevious;
 		bool	bCurrent;
 
-		ButtonInfo() :	eType(TYPE_Unknown),
-						iBtn(HYKEY_Unknown),
+		ButtonInfo() :	iBtn(HYKEY_Unknown),
 						bPrevious(false),
 						bCurrent(false)
 		{ }
 
-		ButtonInfo(int32 iBtn_, Type eType_) :	eType(eType_),
-												iBtn(iBtn_),
-												bPrevious(false),
-												bCurrent(false)
+		ButtonInfo(int32 iBtn_) :	iBtn(iBtn_),
+									bPrevious(false),
+									bCurrent(false)
 		{ }
 	};
-	std::map<int32, ButtonInfo>		m_ButtonMap;
+	std::map<int32, ButtonInfo>		m_ButtonMap_KB;
+	std::map<int32, ButtonInfo>		m_ButtonMap_MO;
+	std::map<int32, ButtonInfo>		m_ButtonMap_JOY;
 
 public:
 	HyInputMap();

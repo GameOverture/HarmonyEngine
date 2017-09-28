@@ -32,7 +32,7 @@
 	}
 #endif
 
-HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInterop hSharedContext) : m_uiINDEX(uiIndex)
+HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, HyWindowHandle hSharedContext) : m_uiINDEX(uiIndex)
 {
 	m_Info = windowInfoRef;
 	m_vFramebufferSize = m_Info.vSize;
@@ -201,6 +201,9 @@ void HyWindow::RemoveCamera(HyCamera3d *&pCam)
 
 glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate)
 {
+	// Y-axis goes up when working with world coordinates
+	ptViewportCoordinate.y = GetWindowSize().y - ptViewportCoordinate.y;
+
 	// Convert to normalized [0.0 - 1.0]
 	ptViewportCoordinate /= GetWindowSize();
 
@@ -249,7 +252,7 @@ glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoor
 	return ptWorldPos;
 }
 
-HyRenderSurfaceHandleInterop HyWindow::GetHandle()
+HyWindowHandle HyWindow::GetHandle()
 {
 	return m_hData;
 }

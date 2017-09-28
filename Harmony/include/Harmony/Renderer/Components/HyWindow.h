@@ -26,10 +26,10 @@ class HyWindow
 	std::vector<HyCamera2d *>				m_Cams2dList;
 	std::vector<HyCamera3d *>				m_Cams3dList;
 
-	HyRenderSurfaceHandleInterop			m_hData;
+	HyWindowHandle			m_hData;
 
 public:
-	HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, HyRenderSurfaceHandleInterop hSharedContext);
+	HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, HyWindowHandle hSharedContext);
 	~HyWindow(void);
 
 	uint32							GetIndex() const;
@@ -53,7 +53,7 @@ public:
 
 	glm::vec2						ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
 
-	HyRenderSurfaceHandleInterop	GetHandle();
+	HyWindowHandle	GetHandle();
 
 #ifdef HY_PLATFORM_DESKTOP
 	// Returns the monitor this window is currently associated with.

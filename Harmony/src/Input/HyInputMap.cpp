@@ -22,28 +22,28 @@ HyInputMap::~HyInputMap(void)
 
 bool HyInputMap::MapBtn(int32 iUserId, HyKeyboardBtn eBtn)
 {
-	if(m_ButtonMap.find(iUserId) != m_ButtonMap.end())
+	if(m_ButtonMap_KB.find(iUserId) != m_ButtonMap_KB.end())
 		return false;
 
-	m_ButtonMap[iUserId] = ButtonInfo(static_cast<int32>(eBtn), ButtonInfo::TYPE_KB);
+	m_ButtonMap_KB[iUserId] = ButtonInfo(static_cast<int32>(eBtn));
 	return true;
 }
 
 bool HyInputMap::MapBtn(int32 iUserId, HyMouseBtn eBtn)
 {
-	if(m_ButtonMap.find(iUserId) != m_ButtonMap.end())
+	if(m_ButtonMap_MO.find(iUserId) != m_ButtonMap_MO.end())
 		return false;
 
-	m_ButtonMap[iUserId] = ButtonInfo(static_cast<int32>(eBtn), ButtonInfo::TYPE_MO);
+	m_ButtonMap_MO[iUserId] = ButtonInfo(static_cast<int32>(eBtn));
 	return true;
 }
 
 bool HyInputMap::MapBtn(int32 iUserId, HyGamePadBtn eBtn)
 {
-	if(m_ButtonMap.find(iUserId) != m_ButtonMap.end())
+	if(m_ButtonMap_JOY.find(iUserId) != m_ButtonMap_JOY.end())
 		return false;
 
-	m_ButtonMap[iUserId] = ButtonInfo(static_cast<int32>(eBtn), ButtonInfo::TYPE_JOY);
+	m_ButtonMap_JOY[iUserId] = ButtonInfo(static_cast<int32>(eBtn));
 	return true;
 }
 

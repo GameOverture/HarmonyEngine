@@ -69,12 +69,6 @@
     <ClCompile Include="Renderer\IHyRenderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Input\Interop\HyInput_Gainput.cpp">
-      <Filter>Input\Interop</Filter>
-    </ClCompile>
-    <ClCompile Include="Input\Interop\HyInputMap_Gainput.cpp">
-      <Filter>Input\Interop</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\HyScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
@@ -308,9 +302,6 @@
     <Filter Include="Renderer\OpenGL\Interop">
       <UniqueIdentifier>{167448ad-d1cc-45b8-a402-87e7ee0e363b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Input\Interop">
-      <UniqueIdentifier>{da3e46b7-a390-4cf8-a227-8f59da37b6c8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scene">
       <UniqueIdentifier>{30a426c0-032d-4dbc-a560-acaad120a43f}</UniqueIdentifier>
     </Filter>
@@ -498,12 +489,6 @@
     <ClInclude Include="..\include\Harmony\Renderer\IHyRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Input\Interop\HyInput_Gainput.h">
-      <Filter>Input\Interop</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Input\Interop\HyInputMap_Gainput.h">
-      <Filter>Input\Interop</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\HyScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
@@ -515,9 +500,6 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Utilities\Crc32.h">
       <Filter>Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Input\Interop\HyInput_NULL.h">
-      <Filter>Input\Interop</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Audio\IHyAudio.h">
       <Filter>Audio</Filter>
