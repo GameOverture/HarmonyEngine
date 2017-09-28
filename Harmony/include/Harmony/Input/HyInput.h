@@ -47,7 +47,6 @@ private:
 	void Update();
 	HyInputMap *GetInputMapArray();
 
-	void ApplyKeyToInputMaps(
 
 #ifdef HY_PLATFORM_DESKTOP
 	friend void glfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods);
