@@ -47,7 +47,6 @@ private:
 	void Update();
 	HyInputMap *GetInputMapArray();
 
-
 #ifdef HY_PLATFORM_DESKTOP
 	friend void glfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods);
 	friend void glfw_CursorPosCallback(GLFWwindow *pWindow, double dX, double dY);
@@ -55,6 +54,8 @@ private:
 	friend void glfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods);
 	friend void glfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint);
 	friend void glfw_CharModsCallback(GLFWwindow *pWindow, uint32 uiCodepoint, int32 iMods);
+
+	void OnGlfwKey(int32 iKey, int32 iAction);
 #endif
 };
 

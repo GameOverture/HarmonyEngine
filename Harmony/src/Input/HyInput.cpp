@@ -41,12 +41,7 @@
 
 	void glfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods)
 	{
-		HyInput &inputRef = Hy_Input();
-
-		for(uint32 i = 0; i < inputRef.m_uiNUM_INPUT_MAPS; ++i)
-		{
-			inputRef.m_pInputMaps[i].
-		}
+		Hy_Input().OnGlfwKey(iKey, iAction);
 	}
 
 	void glfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint)
@@ -138,3 +133,11 @@ HyInputMap *HyInput::GetInputMapArray()
 {
 	return m_pInputMaps;
 }
+
+#ifdef HY_PLATFORM_DESKTOP
+void HyInput::OnGlfwKey(int32 iKey, int32 iAction)
+{
+	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+		m_pInputMaps[i].ApplyInput(iKey, static_cast<HyBtnPressState>(iAction));
+}
+#endif

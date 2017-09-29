@@ -12,40 +12,26 @@
 
 #include "Afx/HyStdAfx.h"
 
+// NOTE: Both HyKeyboardBtn and HyMouseBtn MUST NOT share any mapping values and all their entries must be unique.
+//		 (does not apply to Gamepad and Joystick mapping values)
+
+enum HyBtnPressState
+{
+#ifdef HY_PLATFORM_DESKTOP
+	HYBTN_Release	= GLFW_RELEASE,
+	HYBTN_Press		= GLFW_PRESS,
+	HYBTN_Repeat	= GLFW_REPEAT
+#else
+	HYBTN_Release	= 0,
+	HYBTN_Press		= 1,
+	HYBTN_Repeat	= 2
+#endif
+};
+
 enum HyKeyboardBtn
 {
 #ifdef HY_PLATFORM_DESKTOP
 	HYKEY_Unknown			= GLFW_KEY_UNKNOWN,
-
-	HYKEY_Escape			= GLFW_KEY_ESCAPE,
-	HYKEY_F1				= GLFW_KEY_F1,
-	HYKEY_F2				= GLFW_KEY_F2,
-	HYKEY_F3				= GLFW_KEY_F3,
-	HYKEY_F4				= GLFW_KEY_F4,
-	HYKEY_F5				= GLFW_KEY_F5,
-	HYKEY_F6				= GLFW_KEY_F6,
-	HYKEY_F7				= GLFW_KEY_F7,
-	HYKEY_F8				= GLFW_KEY_F8,
-	HYKEY_F9				= GLFW_KEY_F9,
-	HYKEY_F10				= GLFW_KEY_F10,
-	HYKEY_F11				= GLFW_KEY_F11,
-	HYKEY_F12				= GLFW_KEY_F12,
-	HYKEY_F13				= GLFW_KEY_F13,
-	HYKEY_F14				= GLFW_KEY_F14,
-	HYKEY_F15				= GLFW_KEY_F15,
-	HYKEY_F16				= GLFW_KEY_F16,
-	HYKEY_F17				= GLFW_KEY_F17,
-	HYKEY_F18				= GLFW_KEY_F18,
-	HYKEY_F19				= GLFW_KEY_F19,
-	HYKEY_F20				= GLFW_KEY_F20,
-	HYKEY_F21				= GLFW_KEY_F21,
-	HYKEY_F22				= GLFW_KEY_F22,
-	HYKEY_F23				= GLFW_KEY_F23,
-	HYKEY_F24				= GLFW_KEY_F24,
-	HYKEY_F25				= GLFW_KEY_F25,
-	HYKEY_Print				= GLFW_KEY_PRINT_SCREEN,
-	HYKEY_ScrollLock		= GLFW_KEY_SCROLL_LOCK,
-	HYKEY_Pause				= GLFW_KEY_PAUSE,
 
 	HYKEY_Grave				= GLFW_KEY_GRAVE_ACCENT,
 	HYKEY_0					= GLFW_KEY_0,
@@ -98,6 +84,36 @@ enum HyKeyboardBtn
 	HYKEY_Period			= GLFW_KEY_PERIOD,
 	HYKEY_Slash				= GLFW_KEY_SLASH,
 
+	HYKEY_Escape			= GLFW_KEY_ESCAPE,
+	HYKEY_F1				= GLFW_KEY_F1,
+	HYKEY_F2				= GLFW_KEY_F2,
+	HYKEY_F3				= GLFW_KEY_F3,
+	HYKEY_F4				= GLFW_KEY_F4,
+	HYKEY_F5				= GLFW_KEY_F5,
+	HYKEY_F6				= GLFW_KEY_F6,
+	HYKEY_F7				= GLFW_KEY_F7,
+	HYKEY_F8				= GLFW_KEY_F8,
+	HYKEY_F9				= GLFW_KEY_F9,
+	HYKEY_F10				= GLFW_KEY_F10,
+	HYKEY_F11				= GLFW_KEY_F11,
+	HYKEY_F12				= GLFW_KEY_F12,
+	HYKEY_F13				= GLFW_KEY_F13,
+	HYKEY_F14				= GLFW_KEY_F14,
+	HYKEY_F15				= GLFW_KEY_F15,
+	HYKEY_F16				= GLFW_KEY_F16,
+	HYKEY_F17				= GLFW_KEY_F17,
+	HYKEY_F18				= GLFW_KEY_F18,
+	HYKEY_F19				= GLFW_KEY_F19,
+	HYKEY_F20				= GLFW_KEY_F20,
+	HYKEY_F21				= GLFW_KEY_F21,
+	HYKEY_F22				= GLFW_KEY_F22,
+	HYKEY_F23				= GLFW_KEY_F23,
+	HYKEY_F24				= GLFW_KEY_F24,
+	HYKEY_F25				= GLFW_KEY_F25,
+	HYKEY_Print				= GLFW_KEY_PRINT_SCREEN,
+	HYKEY_ScrollLock		= GLFW_KEY_SCROLL_LOCK,
+	HYKEY_Pause				= GLFW_KEY_PAUSE,
+
 	HYKEY_BackSpace			= GLFW_KEY_BACKSPACE,
 	HYKEY_Tab				= GLFW_KEY_TAB,
 	HYKEY_Enter				= GLFW_KEY_ENTER,
@@ -144,36 +160,6 @@ enum HyKeyboardBtn
 	HYKEY_KpDecimal			= GLFW_KEY_KP_DECIMAL,
 #else
 	HYKEY_Unknown			= -1,
-
-	HYKEY_Escape			= 0,
-	HYKEY_F1				= 1,
-	HYKEY_F2				= 2,
-	HYKEY_F3				= 3,
-	HYKEY_F4				= 4,
-	HYKEY_F5				= 5,
-	HYKEY_F6				= 6,
-	HYKEY_F7				= 7,
-	HYKEY_F8				= 8,
-	HYKEY_F9				= 9,
-	HYKEY_F10				= 10,
-	HYKEY_F11				= 11,
-	HYKEY_F12				= 12,
-	HYKEY_F13				= 13,
-	HYKEY_F14				= 14,
-	HYKEY_F15				= 15,
-	HYKEY_F16				= 16,
-	HYKEY_F17				= 17,
-	HYKEY_F18				= 18,
-	HYKEY_F19				= 19,
-	HYKEY_F20				= 20,
-	HYKEY_F21				= 21,
-	HYKEY_F22				= 22,
-	HYKEY_F23				= 23,
-	HYKEY_F24				= 24,
-	HYKEY_F25				= 25,
-	HYKEY_Print				= 26,
-	HYKEY_ScrollLock		= 27,
-	HYKEY_Pause				= 28,
 
 	HYKEY_Grave				= 96,
 	HYKEY_0					= 48,
@@ -226,7 +212,37 @@ enum HyKeyboardBtn
 	HYKEY_Period			= 46,
 	HYKEY_Slash				= 47,
 
-	HYKEY_BackSpace			= 256,
+	HYKEY_Escape			= 256,
+	HYKEY_F1,
+	HYKEY_F2,
+	HYKEY_F3,
+	HYKEY_F4,
+	HYKEY_F5,
+	HYKEY_F6,
+	HYKEY_F7,
+	HYKEY_F8,
+	HYKEY_F9,
+	HYKEY_F10,
+	HYKEY_F11,
+	HYKEY_F12,
+	HYKEY_F13,
+	HYKEY_F14,
+	HYKEY_F15,
+	HYKEY_F16,
+	HYKEY_F17,
+	HYKEY_F18,
+	HYKEY_F19,
+	HYKEY_F20,
+	HYKEY_F21,
+	HYKEY_F22,
+	HYKEY_F23,
+	HYKEY_F24,
+	HYKEY_F25,
+	HYKEY_Print,
+	HYKEY_ScrollLock,
+	HYKEY_Pause,
+
+	HYKEY_BackSpace,
 	HYKEY_Tab,
 	HYKEY_Enter,
 	HYKEY_CapsLock,
@@ -285,6 +301,8 @@ enum HyMouseBtn
 	HYMOUSE_Btn7			= GLFW_MOUSE_BUTTON_7,
 	HYMOUSE_Btn8			= GLFW_MOUSE_BUTTON_8,
 
+	HYMOUSE_BtnLast			= GLFW_MOUSE_BUTTON_LAST,
+
 	HYMOUSE_BtnLeft			= GLFW_MOUSE_BUTTON_LEFT,
 	HYMOUSE_BtnRight		= GLFW_MOUSE_BUTTON_RIGHT,
 	HYMOUSE_BtnMiddle		= GLFW_MOUSE_BUTTON_MIDDLE,
@@ -298,13 +316,15 @@ enum HyMouseBtn
 	HYMOUSE_Btn7			= 6,
 	HYMOUSE_Btn8			= 7,
 
+	HYMOUSE_BtnLast			= HYMOUSE_Btn8,
+
 	HYMOUSE_BtnLeft			= HYMOUSE_Btn1,
 	HYMOUSE_BtnRight		= HYMOUSE_Btn2,
 	HYMOUSE_BtnMiddle		= HYMOUSE_Btn3,
 #endif
 };
 
-#if HYMOUSE_Btn1 >= 32 || HYMOUSE_Btn2 >= 32 || HYMOUSE_Btn2 >= 32 || HYMOUSE_Btn3 >= 32 || HYMOUSE_Btn4 >= 32 || HYMOUSE_Btn5 >= 32 || HYMOUSE_Btn6 >= 32 || HYMOUSE_Btn7 >= 32 || HYMOUSE_Btn8 >= 32 || HYMOUSE_BtnLeft >= 32 || HYMOUSE_BtnRight >= 32 || HYMOUSE_BtnMiddle >= 32
+#if HYMOUSE_BtnLast >= 32
 	#error "HyMouseBtn enum has a value greater than or equal to '32', which will cause HyInput's bitfield to fail"
 #endif
 

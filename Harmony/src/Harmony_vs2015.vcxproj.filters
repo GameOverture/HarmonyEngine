@@ -69,12 +69,6 @@
     <ClCompile Include="Renderer\IHyRenderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Input\IHyInput.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Input\IHyInputMap.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\HyScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
@@ -245,6 +239,12 @@
     </ClCompile>
     <ClCompile Include="Scene\Physics\HyShape2d.cpp">
       <Filter>Scene\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\HyInput.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\HyInputMap.cpp">
+      <Filter>Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -486,12 +486,6 @@
     <ClInclude Include="..\include\Harmony\Renderer\IHyRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Input\IHyInput.h">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Input\IHyInputMap.h">
-      <Filter>Input</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\HyScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
@@ -668,6 +662,15 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Gui.h">
       <Filter>Afx\Platforms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Input\HyInput.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Input\HyInputKeys.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Input\HyInputMap.h">
+      <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

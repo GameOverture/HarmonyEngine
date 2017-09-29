@@ -17,50 +17,57 @@ class HyInputMap
 {
 	friend class HyInput;
 
-	struct ButtonInfo
+	struct ActionInfo
 	{
+		const int32	iID;
+
 		int32	iBtn;
 		int32	iBtnAlternative;
 
-		bool	bPrevious;
-		bool	bCurrent;
+		enum Flag
+		{
+			FLAG_IsJoystick		= 1 << 0,
+			FLAG_Pressed		= 1 << 1,
+			FLAG_WasReleased	= 1 << 2,
+			FLAG_IsReleased		= 1 << 3
+		};
+		uint32	uiFlags;
 
-		ButtonInfo() :	iBtn(HYKEY_Unknown),
-						bPrevious(false),
-						bCurrent(false)
-		{ }
-
-		ButtonInfo(int32 iBtn_) :	iBtn(iBtn_),
-									bPrevious(false),
-									bCurrent(false)
+		ActionInfo(int32 iId) :	iID(iId),
+								iBtn(HYKEY_Unknown),
+								iBtnAlternative(HYKEY_Unknown),
+								uiFlags(0)
 		{ }
 	};
-	std::map<int32, ButtonInfo>		m_ButtonMap_KB;
-	std::map<int32, ButtonInfo>		m_ButtonMap_MO;
-	std::map<int32, ButtonInfo>		m_ButtonMap_JOY;
+	std::map<int32, ActionInfo *>	m_ActionPtrMap;
+	std::vector<ActionInfo>			m_ActionList;
 
 public:
 	HyInputMap();
 	~HyInputMap(void);
 
 	// Setup input
-	bool MapBtn(int32 iUserId, HyKeyboardBtn eBtn);
-	bool MapBtn(int32 iUserId, HyMouseBtn eBtn);
-	bool MapBtn(int32 iUserId, HyGamePadBtn eBtn);
+	int32 MapBtn(int32 iActionId, HyKeyboardBtn eBtn);
+	int32 MapBtn(int32 iActionId, HyMouseBtn eBtn);
+	int32 MapAlternativeBtn(int32 iActionId, HyKeyboardBtn eBtn);
+	int32 MapAlternativeBtn(int32 iActionId, HyMouseBtn eBtn);
+	bool MapJoystickBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiJoystickIndex);
 
 	bool MapAxis_GP(int32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f);
 
-	bool Unmap(int32 iUserId);
-	bool IsMapped(int32 iUserId) const;
+	bool Unmap(int32 iActionId);
+	bool IsMapped(int32 iActionId) const;
 
 	// Check input
-	bool IsBtnDown(int32 iUserId) const;
-	bool IsBtnReleased(int32 iUserId) const;	// Only true for a single frame upon button release
+	bool IsActionDown(int32 iUserId) const;
+	bool IsActionReleased(int32 iUserId) const;	// Only true for a single frame upon button release
 	float GetAxis(int32 iUserId) const;
 	float GetAxisDelta(int32 iUserId) const;
 
 private:
 	void Update();
+
+	void ApplyInput(int32 iKey, HyBtnPressState ePressState);
 };
 
 #endif /* HyInputMap_h__ */

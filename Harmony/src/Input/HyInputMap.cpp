@@ -20,31 +20,101 @@ HyInputMap::~HyInputMap(void)
 {
 }
 
-bool HyInputMap::MapBtn(int32 iUserId, HyKeyboardBtn eBtn)
+int32 HyInputMap::MapBtn(int32 iActionId, HyKeyboardBtn eBtn)
 {
-	if(m_ButtonMap_KB.find(iUserId) != m_ButtonMap_KB.end())
-		return false;
+	auto iter = m_ActionPtrMap.find(iActionId);
+	if(iter != m_ActionPtrMap.end())
+	{
+		// Don't allow for both iBtn and iBtnAlternative to have same value
+		if(iter->second->iBtnAlternative == eBtn)
+			iter->second->iBtnAlternative = HYKEY_Unknown;
 
-	m_ButtonMap_KB[iUserId] = ButtonInfo(static_cast<int32>(eBtn));
-	return true;
+		iter->second->iBtn = eBtn;
+	}
+	else
+	{
+		m_ActionList.emplace_back(iActionId);
+		m_ActionList.back().iBtn = eBtn;
+		
+		m_ActionPtrMap[iActionId] = &m_ActionList.back();
+	}
+
+	// Determine if eBtn was already used for a different action. If so, remove that button,
+	// and return the other action id it was assigned to.
+	for(uint32 i = 0; i < m_ActionList.size(); ++i)
+	{
+		if(m_ActionList[i].iID == iActionId)
+			continue;
+
+		if(m_ActionList[i].iBtn == eBtn)
+		{
+			m_ActionList[i].iBtn = HYKEY_Unknown;
+			return m_ActionList[i].iID;
+		}
+		else if(m_ActionList[i].iBtnAlternative == eBtn)
+		{
+			m_ActionList[i].iBtnAlternative = HYKEY_Unknown;
+			return m_ActionList[i].iID;
+		}
+	}
+
+	return -1;
 }
 
-bool HyInputMap::MapBtn(int32 iUserId, HyMouseBtn eBtn)
+int32 HyInputMap::MapBtn(int32 iActionId, HyMouseBtn eBtn)
 {
-	if(m_ButtonMap_MO.find(iUserId) != m_ButtonMap_MO.end())
-		return false;
-
-	m_ButtonMap_MO[iUserId] = ButtonInfo(static_cast<int32>(eBtn));
-	return true;
+	return MapBtn(iActionId, static_cast<HyKeyboardBtn>(eBtn));
 }
 
-bool HyInputMap::MapBtn(int32 iUserId, HyGamePadBtn eBtn)
+int32 HyInputMap::MapAlternativeBtn(int32 iActionId, HyKeyboardBtn eBtn)
 {
-	if(m_ButtonMap_JOY.find(iUserId) != m_ButtonMap_JOY.end())
-		return false;
+	auto iter = m_ActionPtrMap.find(iActionId);
+	if(iter != m_ActionPtrMap.end())
+	{
+		// Don't allow for both iBtn and iBtnAlternative to have same value
+		if(iter->second->iBtn == eBtn)
+			iter->second->iBtn = HYKEY_Unknown;
 
-	m_ButtonMap_JOY[iUserId] = ButtonInfo(static_cast<int32>(eBtn));
-	return true;
+		iter->second->iBtnAlternative = eBtn;
+	}
+	else
+	{
+		m_ActionList.emplace_back(iActionId);
+		m_ActionList.back().iBtnAlternative = eBtn;
+
+		m_ActionPtrMap[iActionId] = &m_ActionList.back();
+	}
+
+	// Determine if eBtn was already used for a different action. If so, remove that button,
+	// and return the other action id it was assigned to.
+	for(uint32 i = 0; i < m_ActionList.size(); ++i)
+	{
+		if(m_ActionList[i].iID == iActionId)
+			continue;
+
+		if(m_ActionList[i].iBtn == eBtn)
+		{
+			m_ActionList[i].iBtn = HYKEY_Unknown;
+			return m_ActionList[i].iID;
+		}
+		else if(m_ActionList[i].iBtnAlternative == eBtn)
+		{
+			m_ActionList[i].iBtnAlternative = HYKEY_Unknown;
+			return m_ActionList[i].iID;
+		}
+	}
+
+	return -1;
+}
+
+int32 HyInputMap::MapAlternativeBtn(int32 iActionId, HyMouseBtn eBtn)
+{
+	return MapAlternativeBtn(iActionId, static_cast<HyKeyboardBtn>(eBtn));
+}
+
+bool HyInputMap::MapJoystickBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiJoystickIndex)
+{
+	return false;
 }
 
 bool HyInputMap::MapAxis_GP(int32 iUserId, HyGamePadBtn eAxis, float fMin /*= 0.0f*/, float fMax /*= 1.0f*/)
@@ -54,35 +124,34 @@ bool HyInputMap::MapAxis_GP(int32 iUserId, HyGamePadBtn eAxis, float fMin /*= 0.
 
 bool HyInputMap::Unmap(int32 iUserId)
 {
-	std::map<int32, ButtonInfo>::iterator iter = m_ButtonMap.find(iUserId);
-	if(iter == m_ButtonMap.end())
-		return false;
-
-	m_ButtonMap.erase(iter);
-	return true;
+	// TODO:
+	HyError("HyInputMap::Unmap not implemented");
+	return false;
 }
 
 bool HyInputMap::IsMapped(int32 iUserId) const
 {
-	return (m_ButtonMap.find(iUserId) != m_ButtonMap.end());
+	// TODO:
+	HyError("HyInputMap::IsMapped not implemented");
+	return false;
 }
 
-bool HyInputMap::IsBtnDown(int32 iUserId) const
+bool HyInputMap::IsActionDown(int32 iActionId) const
 {
-	std::map<int32, ButtonInfo>::const_iterator iter = m_ButtonMap.find(iUserId);
-	if(iter == m_ButtonMap.end())
+	auto iter = m_ActionPtrMap.find(iActionId);
+	if(iter == m_ActionPtrMap.end())
 		return false;
 
-	return iter->second.bCurrent;
+	return (iter->second->uiFlags & ActionInfo::FLAG_Pressed) != 0;
 }
 
-bool HyInputMap::IsBtnReleased(int32 iUserId) const
+bool HyInputMap::IsActionReleased(int32 iActionId) const
 {
-	std::map<int32, ButtonInfo>::const_iterator iter = m_ButtonMap.find(iUserId);
-	if(iter == m_ButtonMap.end())
+	auto iter = m_ActionPtrMap.find(iActionId);
+	if(iter == m_ActionPtrMap.end())
 		return false;
 
-	return iter->second.bPrevious == true && iter->second.bCurrent == false;
+	return (iter->second->uiFlags & ActionInfo::FLAG_IsReleased) != 0;
 }
 
 float HyInputMap::GetAxis(int32 iUserId) const
@@ -97,4 +166,31 @@ float HyInputMap::GetAxisDelta(int32 iUserId) const
 
 void HyInputMap::Update()
 {
+	for(uint32 i = 0; i < static_cast<uint32>(m_ActionList.size()); ++i)
+	{
+		if(m_ActionList[i].uiFlags & ActionInfo::FLAG_WasReleased)
+		{
+			m_ActionList[i].uiFlags |= ActionInfo::FLAG_IsReleased;
+			m_ActionList[i].uiFlags &= ~ActionInfo::FLAG_WasReleased;
+		}
+		else
+			m_ActionList[i].uiFlags &= ~ActionInfo::FLAG_IsReleased;
+	}
+}
+
+void HyInputMap::ApplyInput(int32 iKey, HyBtnPressState ePressState)
+{
+	for(uint32 i = 0; i < static_cast<uint32>(m_ActionList.size()); ++i)
+	{
+		if(m_ActionList[i].iBtn == iKey || m_ActionList[i].iBtnAlternative == iKey)
+		{
+			if(ePressState == HYBTN_Press)
+				m_ActionList[i].uiFlags |= ActionInfo::FLAG_Pressed;
+			if(ePressState == HYBTN_Release)
+			{
+				m_ActionList[i].uiFlags &= ~ActionInfo::FLAG_Pressed;
+				m_ActionList[i].uiFlags |= ActionInfo::FLAG_WasReleased;
+			}
+		}
+	}
 }
