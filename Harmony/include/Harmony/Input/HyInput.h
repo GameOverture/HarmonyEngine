@@ -27,6 +27,7 @@ class HyInput
 	HyWindow *					m_pMouseWindow;
 	glm::vec2					m_ptMousePos;
 	uint32						m_uiMouseBtnFlags;
+	uint32						m_uiMouseBtnFlags_Buffered;
 
 public:
 	HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);

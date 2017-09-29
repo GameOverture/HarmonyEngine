@@ -55,7 +55,8 @@
 
 HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :	m_uiNUM_INPUT_MAPS(uiNumInputMappings),
 																						m_WindowListRef(windowListRef),
-																						m_uiMouseBtnFlags(0)
+																						m_uiMouseBtnFlags(0),
+																						m_uiMouseBtnFlags_Buffered(0)
 {
 	m_pInputMaps = reinterpret_cast<HyInputMap *>(HY_NEW unsigned char[sizeof(HyInputMap) * m_uiNUM_INPUT_MAPS]);
 
