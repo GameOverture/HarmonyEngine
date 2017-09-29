@@ -39,7 +39,7 @@ class HyInputMap
 								uiFlags(0)
 		{ }
 	};
-	std::map<int32, ActionInfo *>	m_ActionPtrMap;
+	std::map<int32, uint32>			m_ActionIndexMap;
 	std::vector<ActionInfo>			m_ActionList;
 
 public:

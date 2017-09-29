@@ -22,21 +22,23 @@ HyInputMap::~HyInputMap(void)
 
 int32 HyInputMap::MapBtn(int32 iActionId, HyKeyboardBtn eBtn)
 {
-	auto iter = m_ActionPtrMap.find(iActionId);
-	if(iter != m_ActionPtrMap.end())
+	auto iter = m_ActionIndexMap.find(iActionId);
+	if(iter != m_ActionIndexMap.end())
 	{
-		// Don't allow for both iBtn and iBtnAlternative to have same value
-		if(iter->second->iBtnAlternative == eBtn)
-			iter->second->iBtnAlternative = HYKEY_Unknown;
+		ActionInfo &actionRef = m_ActionList[iter->second];
 
-		iter->second->iBtn = eBtn;
+		// Don't allow for both iBtn and iBtnAlternative to have same value
+		if(actionRef.iBtnAlternative == eBtn)
+			actionRef.iBtnAlternative = HYKEY_Unknown;
+
+		actionRef.iBtn = eBtn;
 	}
 	else
 	{
 		m_ActionList.emplace_back(iActionId);
 		m_ActionList.back().iBtn = eBtn;
 		
-		m_ActionPtrMap[iActionId] = &m_ActionList.back();
+		m_ActionIndexMap[iActionId] = static_cast<uint32>(m_ActionList.size() - 1);
 	}
 
 	// Determine if eBtn was already used for a different action. If so, remove that button,
@@ -68,21 +70,23 @@ int32 HyInputMap::MapBtn(int32 iActionId, HyMouseBtn eBtn)
 
 int32 HyInputMap::MapAlternativeBtn(int32 iActionId, HyKeyboardBtn eBtn)
 {
-	auto iter = m_ActionPtrMap.find(iActionId);
-	if(iter != m_ActionPtrMap.end())
+	auto iter = m_ActionIndexMap.find(iActionId);
+	if(iter != m_ActionIndexMap.end())
 	{
-		// Don't allow for both iBtn and iBtnAlternative to have same value
-		if(iter->second->iBtn == eBtn)
-			iter->second->iBtn = HYKEY_Unknown;
+		ActionInfo &actionRef = m_ActionList[iter->second];
 
-		iter->second->iBtnAlternative = eBtn;
+		// Don't allow for both iBtn and iBtnAlternative to have same value
+		if(actionRef.iBtn == eBtn)
+			actionRef.iBtn = HYKEY_Unknown;
+
+		actionRef.iBtnAlternative = eBtn;
 	}
 	else
 	{
 		m_ActionList.emplace_back(iActionId);
 		m_ActionList.back().iBtnAlternative = eBtn;
 
-		m_ActionPtrMap[iActionId] = &m_ActionList.back();
+		m_ActionIndexMap[iActionId] = static_cast<uint32>(m_ActionList.size() - 1);
 	}
 
 	// Determine if eBtn was already used for a different action. If so, remove that button,
@@ -138,20 +142,20 @@ bool HyInputMap::IsMapped(int32 iUserId) const
 
 bool HyInputMap::IsActionDown(int32 iActionId) const
 {
-	auto iter = m_ActionPtrMap.find(iActionId);
-	if(iter == m_ActionPtrMap.end())
+	auto iter = m_ActionIndexMap.find(iActionId);
+	if(iter == m_ActionIndexMap.end())
 		return false;
 
-	return (iter->second->uiFlags & ActionInfo::FLAG_Pressed) != 0;
+	return (m_ActionList[iter->second].uiFlags & ActionInfo::FLAG_Pressed) != 0;
 }
 
 bool HyInputMap::IsActionReleased(int32 iActionId) const
 {
-	auto iter = m_ActionPtrMap.find(iActionId);
-	if(iter == m_ActionPtrMap.end())
+	auto iter = m_ActionIndexMap.find(iActionId);
+	if(iter == m_ActionIndexMap.end())
 		return false;
 
-	return (iter->second->uiFlags & ActionInfo::FLAG_IsReleased) != 0;
+	return (m_ActionList[iter->second].uiFlags & ActionInfo::FLAG_IsReleased) != 0;
 }
 
 float HyInputMap::GetAxis(int32 iUserId) const
