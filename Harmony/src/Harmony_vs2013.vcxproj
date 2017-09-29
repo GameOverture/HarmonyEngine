@@ -105,8 +105,7 @@
     <ClCompile Include="Scene\Tweens\HyTweenFuncs.cpp" />
     <ClCompile Include="Scene\Tweens\HyTweenVec2.cpp" />
     <ClCompile Include="Scene\Tweens\HyTweenVec3.cpp" />
-    <ClCompile Include="Time\Interop\HyTime_Win.cpp" />
-    <ClCompile Include="Time\IHyTime.cpp" />
+    <ClCompile Include="Time\HyTime.cpp" />
     <ClCompile Include="Time\Watches\HyStopwatch.cpp" />
     <ClCompile Include="Time\Watches\HyTimer.cpp" />
     <ClCompile Include="Time\Watches\IHyTimeInst.cpp" />
@@ -214,8 +213,7 @@
     <ClInclude Include="..\include\Harmony\Threading\Utils.h" />
     <ClInclude Include="..\include\Harmony\Threading\WaitObject.h" />
     <ClInclude Include="..\include\Harmony\Threading\WaitObjectEx.h" />
-    <ClInclude Include="..\include\Harmony\Time\Interop\HyTime_Win.h" />
-    <ClInclude Include="..\include\Harmony\Time\IHyTime.h" />
+    <ClInclude Include="..\include\Harmony\Time\HyTime.h" />
     <ClInclude Include="..\include\Harmony\Time\Watches\HyStopwatch.h" />
     <ClInclude Include="..\include\Harmony\Time\Watches\HyTimer.h" />
     <ClInclude Include="..\include\Harmony\Time\Watches\IHyTimeInst.h" />

@@ -26,7 +26,7 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_Assets),
 												m_Diagnostics(m_AppRef.m_Init, m_Assets, m_Scene),
 												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList),
-												m_Time(m_Scene, m_AppRef.m_Init.uiUpdateTickMs),
+												m_Time(m_AppRef.m_Init.uiUpdateTickMs),
 												m_Renderer(m_Diagnostics, m_AppRef.m_Init.bShowCursor, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList)
 {

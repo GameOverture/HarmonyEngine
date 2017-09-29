@@ -10,11 +10,11 @@
 #ifndef __IHyTimeInst_h__
 #define __IHyTimeInst_h__
 
-class IHyTime;
+class HyTime;
 
 class IHyTimeInst
 {
-	static IHyTime *sm_pTime;
+	static HyTime *sm_pTime;
 
 public:
 	IHyTimeInst(void);

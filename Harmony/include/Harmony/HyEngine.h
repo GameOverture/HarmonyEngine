@@ -16,6 +16,7 @@
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
 #include "Input/HyInput.h"
+#include "Time/HyTime.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Leafs/Misc/HyAudio2d.h"
@@ -44,8 +45,8 @@ class HyEngine
 	HyGuiComms					m_GuiComms;
 	HyDiagnostics				m_Diagnostics;
 	HyInput						m_Input;
+	HyTime						m_Time;
 
-	HyTimeInterop				m_Time;
 	HyRendererInterop			m_Renderer;
 	HyAudioInterop				m_Audio;
 

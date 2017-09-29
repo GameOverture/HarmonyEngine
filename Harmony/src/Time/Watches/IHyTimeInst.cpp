@@ -9,9 +9,9 @@
  *************************************************************************/
 #include "Time/Watches/IHyTimeInst.h"
 
-#include "Time/IHyTime.h"
+#include "Time/HyTime.h"
 
-IHyTime *IHyTimeInst::sm_pTime = NULL;
+HyTime *IHyTimeInst::sm_pTime = NULL;
 
 IHyTimeInst::IHyTimeInst(void)
 {
