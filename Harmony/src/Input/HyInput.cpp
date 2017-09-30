@@ -21,7 +21,10 @@
 		inputRef.m_pMouseWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
 
 		if(iAction == GLFW_PRESS)
+		{
 			inputRef.m_uiMouseBtnFlags |= (1 << iButton);
+			inputRef.m_uiMouseBtnFlags_NewlyPressed |= (1 << iButton);
+		}
 		else // GLFW_RELEASE
 			inputRef.m_uiMouseBtnFlags &= ~(1 << iButton);
 	}
@@ -56,6 +59,7 @@
 HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :	m_uiNUM_INPUT_MAPS(uiNumInputMappings),
 																						m_WindowListRef(windowListRef),
 																						m_uiMouseBtnFlags(0),
+																						m_uiMouseBtnFlags_NewlyPressed(0),
 																						m_uiMouseBtnFlags_Buffered(0)
 {
 	m_pInputMaps = reinterpret_cast<HyInputMap *>(HY_NEW unsigned char[sizeof(HyInputMap) * m_uiNUM_INPUT_MAPS]);
@@ -101,7 +105,7 @@ glm::vec2 HyInput::GetWorldMousePos()
 
 bool HyInput::IsMouseBtnDown(HyMouseBtn eBtn)
 {
-	return 0 != (m_uiMouseBtnFlags & (1 << eBtn));
+	return 0 != ((m_uiMouseBtnFlags | m_uiMouseBtnFlags_Buffered) & (1 << eBtn));
 }
 
 void HyInput::StartRecording()
@@ -126,6 +130,9 @@ void HyInput::StopPlayback()
 
 void HyInput::Update()
 {
+	m_uiMouseBtnFlags_Buffered = (m_uiMouseBtnFlags ^ m_uiMouseBtnFlags_NewlyPressed);
+	m_uiMouseBtnFlags_NewlyPressed = 0;
+	
 	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
 		m_pInputMaps[i].Update();
 }

@@ -60,12 +60,6 @@
     <ClCompile Include="Time\Watches\HyTimer.cpp">
       <Filter>Time\Watches</Filter>
     </ClCompile>
-    <ClCompile Include="Time\Interop\HyTime_Win.cpp">
-      <Filter>Time\Interop</Filter>
-    </ClCompile>
-    <ClCompile Include="Time\IHyTime.cpp">
-      <Filter>Time</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\IHyRenderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
@@ -246,6 +240,9 @@
     <ClCompile Include="Input\HyInputMap.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="Time\HyTime.cpp">
+      <Filter>Time</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -283,9 +280,6 @@
     </Filter>
     <Filter Include="Audio">
       <UniqueIdentifier>{674f9d66-c4d9-4b21-84bf-e4591c4ac684}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Time\Interop">
-      <UniqueIdentifier>{b2ff0804-0605-43fa-bfbd-c41b8a6dfd92}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utilities">
       <UniqueIdentifier>{6b89711e-e657-4696-9011-e81702fda34f}</UniqueIdentifier>
@@ -477,12 +471,6 @@
     <ClInclude Include="..\include\Harmony\Time\Watches\HyTimer.h">
       <Filter>Time\Watches</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Time\Interop\HyTime_Win.h">
-      <Filter>Time\Interop</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Time\IHyTime.h">
-      <Filter>Time</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\IHyRenderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
@@ -671,6 +659,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Input\HyInputMap.h">
       <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Time\HyTime.h">
+      <Filter>Time</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

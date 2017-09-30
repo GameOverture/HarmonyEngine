@@ -27,6 +27,7 @@ class HyInput
 	HyWindow *					m_pMouseWindow;
 	glm::vec2					m_ptMousePos;
 	uint32						m_uiMouseBtnFlags;
+	uint32						m_uiMouseBtnFlags_NewlyPressed;
 	uint32						m_uiMouseBtnFlags_Buffered;
 
 public:
@@ -35,6 +36,9 @@ public:
 
 	glm::vec2 GetMousePos();
 	glm::vec2 GetWorldMousePos();
+	
+	// All clicks are guaranteed to be down for at least '1' frame, even if it is released before the next update.
+	// Clicks released and then pressed down again within one frame will not be detected.
 	bool IsMouseBtnDown(HyMouseBtn eBtn);
 
 	void StartRecording();
