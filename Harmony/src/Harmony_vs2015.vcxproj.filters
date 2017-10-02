@@ -50,9 +50,6 @@
     <ClCompile Include="Renderer\OpenGL\HyOpenGLShader.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\OpenGL\Interop\HyOpenGL_Win.cpp">
-      <Filter>Renderer\OpenGL\Interop</Filter>
-    </ClCompile>
     <ClCompile Include="IHyApplication.cpp" />
     <ClCompile Include="Time\Watches\IHyTimeInst.cpp">
       <Filter>Time\Watches</Filter>
@@ -290,9 +287,6 @@
     <Filter Include="Renderer\OpenGL">
       <UniqueIdentifier>{266ff3c9-2890-44c9-90f1-b987c1598bc6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer\OpenGL\Interop">
-      <UniqueIdentifier>{167448ad-d1cc-45b8-a402-87e7ee0e363b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scene">
       <UniqueIdentifier>{30a426c0-032d-4dbc-a560-acaad120a43f}</UniqueIdentifier>
     </Filter>
@@ -457,9 +451,6 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShader.h">
       <Filter>Renderer\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Renderer\OpenGL\Interop\HyOpenGL_Win.h">
-      <Filter>Renderer\OpenGL\Interop</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\IHyApplication.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h">
