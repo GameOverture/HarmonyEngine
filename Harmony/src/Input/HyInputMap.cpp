@@ -63,10 +63,11 @@ int32 HyInputMap::MapBtn(int32 iActionId, HyKeyboardBtn eBtn)
 
 	// Determine if eBtn was already used for a different action in this same action category. If so, remove that button,
 	// and return the other action id it was assigned to.
+	ActionInfo &actionRef = (iter != m_ActionIndexMap.end()) ? m_ActionList[iter->second] : m_ActionList.back();
 	for(uint32 i = 0; i < m_ActionList.size(); ++i)
 	{
 		if(m_ActionList[i].iID == iActionId ||
-		   (m_ActionList[i].uiFlags & ActionInfo::FLAG_CategoryBitMask) != (m_ActionList[iter->second].uiFlags & ActionInfo::FLAG_CategoryBitMask))
+		  (m_ActionList[i].uiFlags & ActionInfo::FLAG_CategoryBitMask) != (actionRef.uiFlags & ActionInfo::FLAG_CategoryBitMask))
 		{
 			continue;
 		}
@@ -114,10 +115,11 @@ int32 HyInputMap::MapAlternativeBtn(int32 iActionId, HyKeyboardBtn eBtn)
 
 	// Determine if eBtn was already used for a different action in this same action category. If so, remove that button,
 	// and return the other action id it was assigned to.
+	ActionInfo &actionRef = (iter != m_ActionIndexMap.end()) ? m_ActionList[iter->second] : m_ActionList.back();
 	for(uint32 i = 0; i < m_ActionList.size(); ++i)
 	{
 		if(m_ActionList[i].iID == iActionId ||
-			(m_ActionList[i].uiFlags & ActionInfo::FLAG_CategoryBitMask) != (m_ActionList[iter->second].uiFlags & ActionInfo::FLAG_CategoryBitMask))
+			(m_ActionList[i].uiFlags & ActionInfo::FLAG_CategoryBitMask) != (actionRef.uiFlags & ActionInfo::FLAG_CategoryBitMask))
 		{
 			continue;
 		}

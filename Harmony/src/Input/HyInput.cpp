@@ -36,6 +36,9 @@
 		inputRef.m_pMouseWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
 		inputRef.m_ptMousePos.x = static_cast<float>(dX);
 		inputRef.m_ptMousePos.y = static_cast<float>(dY);
+
+		if(inputRef.m_bTouchScreenHack)
+			glfw_MouseButtonCallback(pWindow, HYMOUSE_BtnLeft, GLFW_PRESS, 0);
 	}
 
 	void glfw_ScrollCallback(GLFWwindow *pWindow, double dX, double dY)
@@ -91,6 +94,7 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 																						m_uiMouseBtnFlags(0),
 																						m_uiMouseBtnFlags_NewlyPressed(0),
 																						m_uiMouseBtnFlags_Buffered(0),
+																						m_bTouchScreenHack(false),
 																						m_uiJoystickCount(0)
 {
 	memset(m_JoystickList, 0, sizeof(int32) * HYNUM_JOYSTICK);
@@ -167,6 +171,11 @@ void HyInput::StartPlayback()
 
 void HyInput::StopPlayback()
 {
+}
+
+void HyInput::EnableTouchScreenHack(bool bEnable)
+{
+	m_bTouchScreenHack = bEnable;
 }
 
 void HyInput::Update()
