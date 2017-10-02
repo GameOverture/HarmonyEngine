@@ -54,14 +54,47 @@
 	void glfw_CharModsCallback(GLFWwindow *pWindow, uint32 uiCodepoint, int32 iMods)
 	{
 	}
+
+	void glfw_JoystickCallback(int32 iJoyId, int32 iEvent)
+	{
+		HyInput &inputRef = Hy_Input();
+
+		if(iEvent == GLFW_CONNECTED)
+		{
+			int32 iAxisCount, iButtonCount;
+			glfwGetJoystickAxes(iJoyId, &iAxisCount);
+			glfwGetJoystickButtons(iJoyId, &iButtonCount);
+
+			HyLog("Found joystick " << iJoyId + 1 << " named \"" << glfwGetJoystickName(iJoyId) << "\" with " << iAxisCount << " axes, " << iButtonCount <<" buttons");
+			inputRef.m_JoystickList[inputRef.m_uiJoystickCount++] = iJoyId;
+		}
+		else // GLFW_DISCONNECTED
+		{
+			uint32 i = 0;
+			for(; i < inputRef.m_uiJoystickCount; ++i)
+			{
+				if(inputRef.m_JoystickList[i] == iJoyId)
+					break;
+			}
+
+			for (i = i + 1; i < inputRef.m_uiJoystickCount; ++i)
+				inputRef.m_JoystickList[i - 1] = inputRef.m_JoystickList[i];
+
+			HyLog("Lost joystick " << iJoyId + 1);
+			inputRef.m_uiJoystickCount--;
+		}
+	}
 #endif
 
 HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :	m_uiNUM_INPUT_MAPS(uiNumInputMappings),
 																						m_WindowListRef(windowListRef),
 																						m_uiMouseBtnFlags(0),
 																						m_uiMouseBtnFlags_NewlyPressed(0),
-																						m_uiMouseBtnFlags_Buffered(0)
+																						m_uiMouseBtnFlags_Buffered(0),
+																						m_uiJoystickCount(0)
 {
+	memset(m_JoystickList, 0, sizeof(int32) * HYNUM_JOYSTICK);
+
 	m_pInputMaps = reinterpret_cast<HyInputMap *>(HY_NEW unsigned char[sizeof(HyInputMap) * m_uiNUM_INPUT_MAPS]);
 
 	HyInputMap *pWriteLoc = static_cast<HyInputMap *>(m_pInputMaps);
@@ -70,6 +103,7 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 
 	HyAssert(m_WindowListRef.empty() == false, "HyInput::HyInput has a window list that is empty");
 	m_pMouseWindow = m_WindowListRef[0];
+
 
 #ifdef HY_PLATFORM_DESKTOP
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
@@ -81,6 +115,13 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 		glfwSetCharCallback(m_WindowListRef[i]->GetHandle(), glfw_CharCallback);
 		glfwSetCharModsCallback(m_WindowListRef[i]->GetHandle(), glfw_CharModsCallback);
 	}
+
+	for(int32 i = HYJOYSTICK_0; i < HYNUM_JOYSTICK; ++i)
+	{
+		if(glfwJoystickPresent(i))
+			glfw_JoystickCallback(i, GLFW_CONNECTED);
+	}
+	glfwSetJoystickCallback(glfw_JoystickCallback);
 #endif
 }
 

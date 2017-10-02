@@ -26,10 +26,14 @@ class HyInputMap
 
 		enum Flag
 		{
-			FLAG_IsJoystick		= 1 << 0,
-			FLAG_Pressed		= 1 << 1,
-			FLAG_WasReleased	= 1 << 2,
-			FLAG_IsReleased		= 1 << 3
+			FLAG_Pressed			= 1 << 0,
+			FLAG_WasReleased		= 1 << 1,
+			FLAG_IsReleased			= 1 << 2,
+
+			// NOTE: Must use 8 or less flags above, as the upper 24bits are used for action category and joystick ids mapped
+			FLAG_CategoryBitMask	= 0x0000FF00,
+			FLAG_CategoryShiftAmt	= 8,
+			FLAG_JoystickBitMask	= 0xFFFF0000
 		};
 		uint32	uiFlags;
 
@@ -47,18 +51,29 @@ public:
 	~HyInputMap(void);
 
 	// Setup input
+	/////////////////////////
+
+	// Categorize actions (game, UI, etc.) so the same button can be used for multiple mappings.
+	void SetActionCategory(int32 iActionId, uint8 uiCategory);
+
+	// Returns -1, or the mapping 'eBtn' used to be assigned to
 	int32 MapBtn(int32 iActionId, HyKeyboardBtn eBtn);
 	int32 MapBtn(int32 iActionId, HyMouseBtn eBtn);
+
+	// Returns -1, or the mapping 'iBtnAlternative' used to be assigned to
 	int32 MapAlternativeBtn(int32 iActionId, HyKeyboardBtn eBtn);
 	int32 MapAlternativeBtn(int32 iActionId, HyMouseBtn eBtn);
-	bool MapJoystickBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiJoystickIndex);
 
-	bool MapAxis_GP(int32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f);
+
+	bool MapJoystickBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiJoystickIndex);
+	bool MapJoystickAxis(int32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f);
 
 	bool Unmap(int32 iActionId);
 	bool IsMapped(int32 iActionId) const;
 
 	// Check input
+	/////////////////////////
+
 	bool IsActionDown(int32 iUserId) const;
 	bool IsActionReleased(int32 iUserId) const;	// Only true for a single frame upon button release
 	float GetAxis(int32 iUserId) const;

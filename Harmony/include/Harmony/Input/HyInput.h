@@ -30,6 +30,12 @@ class HyInput
 	uint32						m_uiMouseBtnFlags_NewlyPressed;
 	uint32						m_uiMouseBtnFlags_Buffered;
 
+	// TODO: Test whether it is humanly possible to click multiple times within a frame, and store number of clicks if so.
+	//uint32					m_uiMouseBtnNumClicks[HYMOUSE_NumBtns];
+
+	int32						m_JoystickList[HYNUM_JOYSTICK];
+	uint32						m_uiJoystickCount;
+
 public:
 	HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
 	~HyInput();
@@ -59,6 +65,7 @@ private:
 	friend void glfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods);
 	friend void glfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint);
 	friend void glfw_CharModsCallback(GLFWwindow *pWindow, uint32 uiCodepoint, int32 iMods);
+	friend void glfw_JoystickCallback(int32 iJoyId, int32 iEvent);
 
 	void OnGlfwKey(int32 iKey, int32 iAction);
 #endif

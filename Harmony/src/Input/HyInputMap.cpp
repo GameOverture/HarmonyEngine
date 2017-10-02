@@ -20,6 +20,26 @@ HyInputMap::~HyInputMap(void)
 {
 }
 
+void HyInputMap::SetActionCategory(int32 iActionId, uint8 uiCategory)
+{
+	auto iter = m_ActionIndexMap.find(iActionId);
+	if(iter != m_ActionIndexMap.end())
+	{
+		ActionInfo &actionRef = m_ActionList[iter->second];
+
+		actionRef.uiFlags &= ~ActionInfo::FLAG_CategoryBitMask;
+		actionRef.uiFlags |= (uiCategory << ActionInfo::FLAG_CategoryShiftAmt);
+	}
+	else
+	{
+		m_ActionList.emplace_back(iActionId);
+		m_ActionList.back().uiFlags &= ~ActionInfo::FLAG_CategoryBitMask;
+		m_ActionList.back().uiFlags |= (uiCategory << ActionInfo::FLAG_CategoryShiftAmt);
+
+		m_ActionIndexMap[iActionId] = static_cast<uint32>(m_ActionList.size() - 1);
+	}
+}
+
 int32 HyInputMap::MapBtn(int32 iActionId, HyKeyboardBtn eBtn)
 {
 	auto iter = m_ActionIndexMap.find(iActionId);
@@ -41,12 +61,15 @@ int32 HyInputMap::MapBtn(int32 iActionId, HyKeyboardBtn eBtn)
 		m_ActionIndexMap[iActionId] = static_cast<uint32>(m_ActionList.size() - 1);
 	}
 
-	// Determine if eBtn was already used for a different action. If so, remove that button,
+	// Determine if eBtn was already used for a different action in this same action category. If so, remove that button,
 	// and return the other action id it was assigned to.
 	for(uint32 i = 0; i < m_ActionList.size(); ++i)
 	{
-		if(m_ActionList[i].iID == iActionId)
+		if(m_ActionList[i].iID == iActionId ||
+		   (m_ActionList[i].uiFlags & ActionInfo::FLAG_CategoryBitMask) != (m_ActionList[iter->second].uiFlags & ActionInfo::FLAG_CategoryBitMask))
+		{
 			continue;
+		}
 
 		if(m_ActionList[i].iBtn == eBtn)
 		{
@@ -89,12 +112,15 @@ int32 HyInputMap::MapAlternativeBtn(int32 iActionId, HyKeyboardBtn eBtn)
 		m_ActionIndexMap[iActionId] = static_cast<uint32>(m_ActionList.size() - 1);
 	}
 
-	// Determine if eBtn was already used for a different action. If so, remove that button,
+	// Determine if eBtn was already used for a different action in this same action category. If so, remove that button,
 	// and return the other action id it was assigned to.
 	for(uint32 i = 0; i < m_ActionList.size(); ++i)
 	{
-		if(m_ActionList[i].iID == iActionId)
+		if(m_ActionList[i].iID == iActionId ||
+			(m_ActionList[i].uiFlags & ActionInfo::FLAG_CategoryBitMask) != (m_ActionList[iter->second].uiFlags & ActionInfo::FLAG_CategoryBitMask))
+		{
 			continue;
+		}
 
 		if(m_ActionList[i].iBtn == eBtn)
 		{
@@ -121,7 +147,7 @@ bool HyInputMap::MapJoystickBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiJoy
 	return false;
 }
 
-bool HyInputMap::MapAxis_GP(int32 iUserId, HyGamePadBtn eAxis, float fMin /*= 0.0f*/, float fMax /*= 1.0f*/)
+bool HyInputMap::MapJoystickAxis(int32 iUserId, HyGamePadBtn eAxis, float fMin /*= 0.0f*/, float fMax /*= 1.0f*/)
 {
 	return false;
 }
