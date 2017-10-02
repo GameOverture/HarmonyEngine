@@ -32,7 +32,7 @@ enum HyRenderMode
 
 class HyRenderState
 {
-	// WARNING: This class should not dynamically allocate any memory or use any object that does so
+	// WARNING: This class should not dynamically allocate any memory or contain any object that does so
 
 public:
 	enum Attributes

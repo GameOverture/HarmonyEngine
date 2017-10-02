@@ -89,7 +89,7 @@ uint32 IHyRenderer::GetNumCameras2d()
 
 uint32 IHyRenderer::GetNumRenderStates2d()
 {
-	return *(reinterpret_cast<uint32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToInst2d));
+	return *(reinterpret_cast<uint32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetTo2d));
 }
 
 uint32 IHyRenderer::GetCameraWindowId2d(int iCameraIndex)
@@ -121,7 +121,7 @@ glm::mat4 *IHyRenderer::GetCameraView2d(int iIndex)
 
 HyRenderState *IHyRenderer::GetRenderStatesPtr2d()
 {
-	return reinterpret_cast<HyRenderState *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToInst2d + sizeof(uint32)); // Last sizeof(uint32) is skipping number of 2dInsts
+	return reinterpret_cast<HyRenderState *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetTo2d + sizeof(uint32)); // Last sizeof(uint32) is skipping number of 2dInsts
 }
 
 char *IHyRenderer::GetVertexData2d()

@@ -148,7 +148,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// BUFFER HEADER (contains offsets from here)-| Num 3d Cams (4bytes)-|-Cam3d-|-Cam3d-|...|-Num 2d Cams (4bytes)-|-Cam2d-|-Cam2d-|...|-Num 3d Insts (4bytes)-|-Inst3d-|-Inst3d-|-Inst3d...-|-Num 2d Insts (4bytes)-|-Inst2d-|-Inst2d-|-Inst2d...-|-<possible blank/empty data since we skip non-enabled instances>-|-RenderState info (Texture Binds, Uniform Data)-|-Vertex Data-|-RenderState info (Texture Binds, Uniform Data)-|-Vertex Data...
+	// BUFFER HEADER (contains offsets from here)-| Num 3d Cams (4bytes)-|-Cam3d-|-Cam3d-|...|-Num 2d Cams (4bytes)-|-Cam2d-|-Cam2d-|...|-Num 3d RenderStates (4bytes)-|-RenderState-|-RenderState-|-RenderState...-|-Num 2d RenderStates (4bytes)-|-RenderState-|-RenderState-|-RenderState...-|-<possible blank/empty data since we skip non-enabled instances>-|-Uniform/Vertex Data-|-Uniform/Vertex Data...
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
@@ -231,8 +231,8 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 3d DRAW BUFFER
-	pDrawHeader->uiOffsetToInst3d = m_pCurWritePos - rendererRef.GetDrawBuffer();
-	char *pWriteNum3dInstsHere = m_pCurWritePos;
+	pDrawHeader->uiOffsetTo3d = m_pCurWritePos - rendererRef.GetDrawBuffer();
+	char *pWriteNum3dRenderStatesHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 
 	iCount = 0;
@@ -247,12 +247,12 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 			iCount++;
 		}
 	}
-	*(reinterpret_cast<uint32 *>(pWriteNum3dInstsHere)) = iCount;
+	*(reinterpret_cast<uint32 *>(pWriteNum3dRenderStatesHere)) = iCount;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 2d DRAW BUFFER
-	pDrawHeader->uiOffsetToInst2d = m_pCurWritePos - rendererRef.GetDrawBuffer();
-	char *pWriteNum2dInstsHere = m_pCurWritePos;
+	pDrawHeader->uiOffsetTo2d = m_pCurWritePos - rendererRef.GetDrawBuffer();
+	char *pWriteNum2dRenderStatesHere = m_pCurWritePos;
 	m_pCurWritePos += sizeof(int32);
 
 	iCount = 0;
@@ -267,13 +267,17 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_NodeList_Loaded[i]->IsEnabled() == false)// || m_NodeList_Loaded[i]->GetType() == HYTYPE_Primitive2d)
+		if(m_NodeList_Loaded[i]->IsEnabled() == false)
 			continue;
 
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// TODO: BELOW BATCH CHECK IS CAUSING SPRITES/TEXT TO GLITCH OUT BY SAMPLING THE INCORRECT TEXTURE. FORCING NEW BATCH EVERY RENDERSTATE SEEMS TO FIX IT FOR NOW
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 		// If previously written instance has equal render state by "operator ==" then it's to be assumed the instance data can be batched and doesn't need to write another render state
-		if(pCurRenderState2d == nullptr ||
-			m_NodeList_Loaded[i]->GetRenderState() != *pCurRenderState2d ||
-			m_NodeList_Loaded[i]->GetRenderState().IsEnabled(HyRenderState::DRAWINSTANCED) == false)
+		//if(pCurRenderState2d == nullptr ||
+		//   m_NodeList_Loaded[i]->GetRenderState() != *pCurRenderState2d ||
+		//   m_NodeList_Loaded[i]->GetRenderState().IsEnabled(HyRenderState::DRAWINSTANCED) == false)
 		{
 			// Start a new draw. Write render state to buffer to be sent to render thread
 			memcpy(m_pCurWritePos, &m_NodeList_Loaded[i]->GetRenderState(), sizeof(HyRenderState));
@@ -286,18 +290,18 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 			m_pCurWritePos += sizeof(HyRenderState);
 			iCount++;
 		}
-		else
-		{
-			// This instance will be batched with the current render state
-			pCurRenderState2d->AppendInstances(m_NodeList_Loaded[i]->GetRenderState().GetNumInstances());
-		}
+		//else
+		//{
+		//	// This instance will be batched with the current render state
+		//	pCurRenderState2d->AppendInstances(m_NodeList_Loaded[i]->GetRenderState().GetNumInstances());
+		//}
 
 		// OnWriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
 		m_NodeList_Loaded[i]->OnWriteDrawBufferData(pCurVertexWritePos);
 		uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
 	}
 
-	*(reinterpret_cast<uint32 *>(pWriteNum2dInstsHere)) = iCount;
+	*(reinterpret_cast<uint32 *>(pWriteNum2dRenderStatesHere)) = iCount;
 	pDrawHeader->uiVertexBufferSize2d = pCurVertexWritePos - pStartVertexWritePos;
 
 	// Do final check to see if we wrote passed our bounds

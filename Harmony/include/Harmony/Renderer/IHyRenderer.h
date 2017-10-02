@@ -31,8 +31,8 @@ public:
 	struct DrawBufferHeader
 	{
 		uint32		uiReturnFlags;
-		size_t		uiOffsetToInst3d;
-		size_t		uiOffsetToInst2d;
+		size_t		uiOffsetTo3d;
+		size_t		uiOffsetTo2d;
 		size_t		uiOffsetToVertexData2d;
 		size_t		uiVertexBufferSize2d;
 		size_t		uiOffsetToCameras3d;
