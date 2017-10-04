@@ -184,7 +184,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLineEdit" name="txtMetaDataLocation">
+       <widget class="QLineEdit" name="txtRelativeMetaDataLocation">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -249,7 +249,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="txtAssetsLocation">
+       <widget class="QLineEdit" name="txtRelativeAssetsLocation">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -281,7 +281,7 @@
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="QLineEdit" name="txtSourceLocation">
+       <widget class="QLineEdit" name="txtRelativeSourceLocation">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -304,17 +304,17 @@
      <zorder>label</zorder>
      <zorder>label_5</zorder>
      <zorder>txtAssetsDirName</zorder>
-     <zorder>txtAssetsLocation</zorder>
+     <zorder>txtRelativeAssetsLocation</zorder>
      <zorder>btnBrowseAssets</zorder>
      <zorder>label_2</zorder>
      <zorder>label_6</zorder>
      <zorder>txtMetaDataDirName</zorder>
-     <zorder>txtMetaDataLocation</zorder>
+     <zorder>txtRelativeMetaDataLocation</zorder>
      <zorder>btnBrowseMetaData</zorder>
      <zorder>label_3</zorder>
      <zorder>label_7</zorder>
      <zorder>txtSourceDirName</zorder>
-     <zorder>txtSourceLocation</zorder>
+     <zorder>txtRelativeSourceLocation</zorder>
      <zorder>btnBrowseSource</zorder>
     </widget>
    </item>
@@ -389,13 +389,13 @@
   <tabstop>btnBrowse</tabstop>
   <tabstop>chkCreateGameDir</tabstop>
   <tabstop>txtAssetsDirName</tabstop>
-  <tabstop>txtAssetsLocation</tabstop>
+  <tabstop>txtRelativeAssetsLocation</tabstop>
   <tabstop>btnBrowseAssets</tabstop>
   <tabstop>txtMetaDataDirName</tabstop>
-  <tabstop>txtMetaDataLocation</tabstop>
+  <tabstop>txtRelativeMetaDataLocation</tabstop>
   <tabstop>btnBrowseMetaData</tabstop>
   <tabstop>txtSourceDirName</tabstop>
-  <tabstop>txtSourceLocation</tabstop>
+  <tabstop>txtRelativeSourceLocation</tabstop>
   <tabstop>btnBrowseSource</tabstop>
   <tabstop>chkVs2013</tabstop>
   <tabstop>chkVs2015</tabstop>

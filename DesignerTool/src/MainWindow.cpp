@@ -72,7 +72,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
         m_uiLoadingSpinnerRefCounts[i] = 0;
     }
 
-    //StartLoading(MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties);
+    StartLoading(MDI_Explorer);
+    //StartLoading(MDI_MainWindow | MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties);
     
     SetSelectedProj(NULL);
 

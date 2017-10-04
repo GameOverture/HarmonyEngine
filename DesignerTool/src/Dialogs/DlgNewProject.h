@@ -20,9 +20,9 @@ class DlgNewProject : public QDialog
 {
     Q_OBJECT
     
-    QString               m_sAbsoluteAssetsDir;
-    QString               m_sAbsoluteMetaDataDir;
-    QString               m_sAbsoluteSourceDir;
+    QString               m_sAbsoluteAssetsDirLocation;     // Just the absolute location of where the assets directory resides, not the directory itself
+    QString               m_sAbsoluteMetaDataDirLocation;   // Just the absolute location of where the meta-data directory resides, not the directory itself
+    QString               m_sAbsoluteSourceDirLocation;     // Just the absolute location of where the source directory resides, not the directory itself
 
 public:
     explicit DlgNewProject(QString &sDefaultLocation, QWidget *parent = 0);
@@ -54,6 +54,12 @@ private Q_SLOTS:
 
     void on_txtTitleName_textChanged(const QString &arg1);
     
+    void on_txtAssetsDirName_textChanged(const QString &arg1);
+
+    void on_txtMetaDataDirName_textChanged(const QString &arg1);
+
+    void on_txtSourceDirName_textChanged(const QString &arg1);
+
 private:
     Ui::DlgNewProject *ui;
     
