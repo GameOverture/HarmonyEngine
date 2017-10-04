@@ -627,7 +627,8 @@ void MainWindow::on_actionLaunchIDE_triggered()
                     if(bUseVs2017)
                     {
                         file.close();
-                        QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath()));
+                        if(false == QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath())))
+                            HyGuiLog("Could not open IDE at:\n" % ideFileInfoList[i].absoluteFilePath(), LOGTYPE_Error);
                         return;
                     }
                     else
@@ -639,7 +640,8 @@ void MainWindow::on_actionLaunchIDE_triggered()
                     if(bUseVs2015)
                     {
                         file.close();
-                        QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath()));
+                        if(false == QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath())))
+                            HyGuiLog("Could not open IDE at:\n" % ideFileInfoList[i].absoluteFilePath(), LOGTYPE_Error);
                         return;
                     }
                     else
@@ -651,7 +653,8 @@ void MainWindow::on_actionLaunchIDE_triggered()
                     if(bUseVs2013)
                     {
                         file.close();
-                        QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath()));
+                        if(false == QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath())))
+                            HyGuiLog("Could not open IDE at:\n" % ideFileInfoList[i].absoluteFilePath(), LOGTYPE_Error);
                         return;
                     }
                     else

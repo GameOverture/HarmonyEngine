@@ -40,8 +40,6 @@ public:
 
 	virtual void SetCurrentWindow(uint32 uiIndex);
 
-	virtual bool Initialize() override;
-
 	virtual void StartRender() override;
 	
 	virtual void Init_3d() override;

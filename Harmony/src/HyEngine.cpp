@@ -31,11 +31,6 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Audio(m_AppRef.m_WindowList)
 {
 	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
-
-	if(m_Renderer.Initialize() == false)
-		HyLogError("IHyRenderer::Initialize() failed");
-
-	m_AppRef.SetInputMapPtr(m_Input.GetInputMapArray());
 }
 
 HyEngine::~HyEngine()
@@ -47,6 +42,9 @@ HyEngine::~HyEngine()
 	HyAssert(pGame, "HyEngine::RunGame was passed a nullptr");
 
 	sm_pInstance = HY_NEW HyEngine(*pGame);
+
+	pGame->SetInputMapPtr(sm_pInstance->m_Input.GetInputMapArray());
+	sm_pInstance->m_Input.InitCallbacks();
 
 	while(sm_pInstance->IsInitialized() == false)
 	{ }

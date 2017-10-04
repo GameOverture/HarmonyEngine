@@ -77,8 +77,6 @@ public:
 	uint32 GetNumWindows();
 	virtual void SetCurrentWindow(uint32 uiIndex);
 
-	virtual bool Initialize() = 0;
-
 	virtual void StartRender() = 0;
 
 	virtual void Init_3d() = 0;

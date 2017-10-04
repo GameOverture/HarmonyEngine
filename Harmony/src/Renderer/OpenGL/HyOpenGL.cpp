@@ -17,52 +17,13 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<
 {
 	for(int i = 0; i < m_WindowListRef.size(); ++i)
 		m_VaoMapList.push_back(std::map<HyOpenGLShader *, uint32>());
-}
 
-HyOpenGL::~HyOpenGL(void)
-{
-}
-
-void HyOpenGL::GenVAOs(HyOpenGLShader *pShaderKey)
-{
-	for(int i = 0; i < m_WindowListRef.size(); ++i)
-	{
-		if(m_VaoMapList[i].find(pShaderKey) == m_VaoMapList[i].end())
-		{
-			SetCurrentWindow(i);
-
-			m_VaoMapList[i][pShaderKey] = 0;
-			glGenVertexArrays(1, &m_VaoMapList[i][pShaderKey]);
-			HyErrorCheck_OpenGL("HyOpenGLShader::OnUpload", "glGenVertexArrays");
-		}
-	}
-}
-
-void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
-{
-	uint32 uiVao = m_VaoMapList[m_pCurWindow->GetIndex()][pShaderKey];
-	glBindVertexArray(uiVao);
-	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
-}
-
-/*virtual*/ void HyOpenGL::SetCurrentWindow(uint32 uiIndex)
-{
-	IHyRenderer::SetCurrentWindow(uiIndex);
-
-#ifdef HY_PLATFORM_DESKTOP
-	glfwMakeContextCurrent(m_pCurWindow->GetHandle());
-#endif
-}
-
-/*virtual*/ bool HyOpenGL::Initialize() /*override*/
-{
 	HyLog("OpenGL is initializing...");
 
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		SetCurrentWindow(i);
 
-		//gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 		glewExperimental = GL_TRUE;	// This is required for GLFW to work
 		GLenum err = glewInit();
 		if(err != GLEW_OK) {
@@ -87,26 +48,14 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	}
 
 	if(m_WindowListRef.empty() == false)
+	{
 		SetCurrentWindow(0);
+		if(glewIsSupported("GL_VERSION_3_3") == false) {
+			HyError("At least OpenGL 3.3 must be supported");
+		}
+	}
 	else
-		HyLog("No windows created to render to");
-
-	////////////////////////////////////////////////////////////////////////////
-	//// Init GLEW
-	//glewExperimental = GL_TRUE;	// This is required for GLFW to work
-	//GLenum err = glewInit();
-	//if(err != GLEW_OK) {
-	//	HyError("glewInit() failed: " << err);
-	//}
-	//else {
-	//	// Flush the OpenGL error state, as glew is known to bork it
-	//	while(GL_NO_ERROR != glGetError());
-	//}
-	//HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
-
-	//if(glewIsSupported("GL_VERSION_3_3") == false) {
-	//	HyError("At least OpenGL 3.3 must be supported");
-	//}
+		HyLog("No windows created to render to");	
 
 	GLint iMaxTextureSize = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &iMaxTextureSize);
@@ -119,20 +68,20 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	{
 		switch(pFormatArray[i])
 		{
-		//case GL_COMPRESSED_RGBA_BPTC_UNORM:					sCompressedTextureFormats += "DXT_BC7";	break;
-		//case GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB:		sCompressedTextureFormats += "";	break;
-		//case GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB:		sCompressedTextureFormats += "";	break;
-		//case GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB:		sCompressedTextureFormats += "";	break;
-		//case GL_COMPRESSED_RGB8_ETC2:						sCompressedTextureFormats += "";	break;
-		//case GL_COMPRESSED_SRGB8_ETC2:						sCompressedTextureFormats += "";	break;
-		//case GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:	sCompressedTextureFormats += "";	break;
-		//case GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:	sCompressedTextureFormats += "";	break;
-		//case GL_COMPRESSED_RGBA8_ETC2_EAC:					sCompressedTextureFormats += "";	break;
-		//case GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:			sCompressedTextureFormats += "";	break;
-		//case GL_COMPRESSED_R11_EAC:							sCompressedTextureFormats += "";	break;
-		//case GL_COMPRESSED_SIGNED_R11_EAC:					sCompressedTextureFormats += "";	break;
-		//case GL_COMPRESSED_RG11_EAC:						sCompressedTextureFormats += "";	break;
-		//case GL_COMPRESSED_SIGNED_RG11_EAC:					sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_RGBA_BPTC_UNORM:					sCompressedTextureFormats += "DXT_BC7";	break;
+			//case GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB:		sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB:		sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB:		sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_RGB8_ETC2:						sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_SRGB8_ETC2:						sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:	sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:	sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_RGBA8_ETC2_EAC:					sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:			sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_R11_EAC:							sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_SIGNED_R11_EAC:					sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_RG11_EAC:						sCompressedTextureFormats += "";	break;
+			//case GL_COMPRESSED_SIGNED_RG11_EAC:					sCompressedTextureFormats += "";	break;
 		case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
 			sCompressedTextureFormats += "RGB_DXT1 ";
 			m_uiSupportedTextureFormats |= HYTEXTURE_RGB_DTX1;
@@ -154,12 +103,12 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	delete[] pFormatArray;
 
 	SetRendererInfo("OpenGL",
-					reinterpret_cast<const char *>(glGetString(GL_VERSION)),
-					reinterpret_cast<const char *>(glGetString(GL_VENDOR)),
-					reinterpret_cast<const char *>(glGetString(GL_RENDERER)),
-					reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION)),
-					iMaxTextureSize,
-					sCompressedTextureFormats);
+		reinterpret_cast<const char *>(glGetString(GL_VERSION)),
+		reinterpret_cast<const char *>(glGetString(GL_VENDOR)),
+		reinterpret_cast<const char *>(glGetString(GL_RENDERER)),
+		reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION)),
+		iMaxTextureSize,
+		sCompressedTextureFormats);
 
 	glEnable(GL_DEPTH_TEST);
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
@@ -197,8 +146,41 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
+}
 
-	return true;
+HyOpenGL::~HyOpenGL(void)
+{
+}
+
+void HyOpenGL::GenVAOs(HyOpenGLShader *pShaderKey)
+{
+	for(int i = 0; i < m_WindowListRef.size(); ++i)
+	{
+		if(m_VaoMapList[i].find(pShaderKey) == m_VaoMapList[i].end())
+		{
+			SetCurrentWindow(i);
+
+			m_VaoMapList[i][pShaderKey] = 0;
+			glGenVertexArrays(1, &m_VaoMapList[i][pShaderKey]);
+			HyErrorCheck_OpenGL("HyOpenGLShader::OnUpload", "glGenVertexArrays");
+		}
+	}
+}
+
+void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
+{
+	uint32 uiVao = m_VaoMapList[m_pCurWindow->GetIndex()][pShaderKey];
+	glBindVertexArray(uiVao);
+	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
+}
+
+/*virtual*/ void HyOpenGL::SetCurrentWindow(uint32 uiIndex)
+{
+	IHyRenderer::SetCurrentWindow(uiIndex);
+
+#ifdef HY_PLATFORM_DESKTOP
+	glfwMakeContextCurrent(m_pCurWindow->GetHandle());
+#endif
 }
 
 /*virtual*/ void HyOpenGL::StartRender()
