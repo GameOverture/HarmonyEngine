@@ -419,11 +419,19 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 
 void AtlasWidget::on_actionAddFilter_triggered()
 {
-    AtlasTreeItem *pNewTreeItem = new AtlasTreeItem(ui->atlasList);
+    AtlasTreeItem *pNewTreeItem = nullptr;
 
     DlgInputName *pDlg = new DlgInputName("Enter Atlas Group Filter Name", "New Filter");
     if(pDlg->exec() == QDialog::Accepted)
+    {
+        QList<QTreeWidgetItem *> selectedItemList = ui->atlasList->selectedItems();
+        if(selectedItemList.empty())
+            pNewTreeItem = new AtlasTreeItem(ui->atlasList);
+        else
+            pNewTreeItem = new AtlasTreeItem(static_cast<AtlasTreeItem *>(selectedItemList[0]));
+
         pNewTreeItem->setText(0, pDlg->GetName());
+    }
     else
     {
         delete pDlg;
