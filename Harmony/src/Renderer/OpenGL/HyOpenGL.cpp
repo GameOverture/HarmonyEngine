@@ -15,10 +15,10 @@
 HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(diagnosticsRef, bShowCursor, windowListRef),
 																												m_mtxView(1.0f)
 {
-	for(int i = 0; i < m_WindowListRef.size(); ++i)
-		m_VaoMapList.push_back(std::map<HyOpenGLShader *, uint32>());
-
 	HyLog("OpenGL is initializing...");
+
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
+		m_VaoMapList.push_back(std::map<HyOpenGLShader *, uint32>());
 
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
@@ -154,7 +154,7 @@ HyOpenGL::~HyOpenGL(void)
 
 void HyOpenGL::GenVAOs(HyOpenGLShader *pShaderKey)
 {
-	for(int i = 0; i < m_WindowListRef.size(); ++i)
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		if(m_VaoMapList[i].find(pShaderKey) == m_VaoMapList[i].end())
 		{
