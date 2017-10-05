@@ -428,7 +428,14 @@ void AtlasWidget::on_actionAddFilter_triggered()
         if(selectedItemList.empty())
             pNewTreeItem = new AtlasTreeItem(ui->atlasList);
         else
-            pNewTreeItem = new AtlasTreeItem(static_cast<AtlasTreeItem *>(selectedItemList[0]));
+        {
+            if(selectedItemList[0]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+                pNewTreeItem = new AtlasTreeItem(static_cast<AtlasTreeItem *>(selectedItemList[0]));
+            else if(selectedItemList[0]->parent())  // Parent must either be a filter or nullptr
+                pNewTreeItem = new AtlasTreeItem(static_cast<AtlasTreeItem *>(selectedItemList[0]->parent()));
+            else
+                pNewTreeItem = new AtlasTreeItem(ui->atlasList);
+        }
 
         pNewTreeItem->setText(0, pDlg->GetName());
     }
@@ -444,8 +451,11 @@ void AtlasWidget::on_actionAddFilter_triggered()
     pNewTreeItem->setData(0, Qt::UserRole, QVariant(QString(HYTREEWIDGETITEM_IsFilter)));
 
     ui->atlasList->sortItems(0, Qt::AscendingOrder);
-
     m_pModel->WriteMetaSettings();
+
+    ui->atlasList->clearSelection();
+    ui->atlasList->expandItem(pNewTreeItem);
+    pNewTreeItem->setSelected(true);
 }
 
 void AtlasWidget::on_atlasList_itemSelectionChanged()
