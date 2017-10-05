@@ -616,10 +616,10 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiA
             QList<QTreeWidgetItem *> selectedList = m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->selectedItems();
             if(selectedList.empty() == false)
             {
-                if(selectedList[0]->parent() != nullptr)
-                    selectedList[0]->parent()->addChild(pNewFrame->GetTreeItem());
-                else if(selectedList[0]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+                if(selectedList[0]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
                     selectedList[0]->addChild(pNewFrame->GetTreeItem());
+                else if(selectedList[0]->parent() != nullptr) // Parent tree item is always a filter
+                    selectedList[0]->parent()->addChild(pNewFrame->GetTreeItem());
                 else
                     m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
             }

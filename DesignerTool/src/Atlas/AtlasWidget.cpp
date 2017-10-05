@@ -79,6 +79,10 @@ AtlasWidget::AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *pa
     ui->actionDeleteImages->setEnabled(false);
     ui->actionReplaceImages->setEnabled(false);
 
+    ui->btnSettings->setDefaultAction(ui->actionGroupSettings);
+    ui->btnAddImages->setDefaultAction(ui->actionImportImages);
+    ui->btnAddDir->setDefaultAction(ui->actionImportDirectory);
+
     ui->btnDeleteImages->setDefaultAction(ui->actionDeleteImages);
     ui->btnReplaceImages->setDefaultAction(ui->actionReplaceImages);
     ui->btnAddFilter->setDefaultAction(ui->actionAddFilter);
@@ -182,75 +186,6 @@ void AtlasWidget::RefreshLcds()
 
     int iTotalWidth = ui->atlasList->size().width();
     ui->atlasList->setColumnWidth(0, iTotalWidth - 60);
-}
-
-void AtlasWidget::on_btnAddImages_clicked()
-{
-    QFileDialog dlg(this);
-    dlg.setFileMode(QFileDialog::ExistingFile);
-    dlg.setViewMode(QFileDialog::Detail);
-    dlg.setWindowModality(Qt::ApplicationModal);
-    dlg.setModal(true);
-
-    QString sSelectedFilter(tr("PNG (*.png)"));
-    QStringList sImportImgList = QFileDialog::getOpenFileNames(this,
-                                                               "Import image(s) into atlases",
-                                                               QString(),
-                                                               tr("All files (*.*);;PNG (*.png)"),
-                                                               &sSelectedFilter);
-
-    if(sImportImgList.empty() == false)
-        m_pModel->Repack(ui->cmbAtlasGroups->currentIndex(), QSet<int>(), m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex()), ITEM_AtlasImage));
-    
-    RefreshLcds();
-}
-
-void AtlasWidget::on_btnAddDir_clicked()
-{
-    QFileDialog dlg(this);
-    dlg.setFileMode(QFileDialog::Directory);
-    dlg.setOption(QFileDialog::ShowDirsOnly, true);
-    dlg.setViewMode(QFileDialog::Detail);
-    dlg.setWindowModality(Qt::ApplicationModal);
-    dlg.setModal(true);
-
-    if(dlg.exec() == QDialog::Rejected)
-        return;
-
-    QStringList sDirs = dlg.selectedFiles();
-    QStringList sImportImgList;
-    for(int iDirIndex = 0; iDirIndex < sDirs.size(); ++iDirIndex)
-    {
-        QDir dirEntry(sDirs[iDirIndex]);
-        HyGlobal::RecursiveFindFileOfExt("png", sImportImgList, dirEntry);
-    }
-
-    if(sImportImgList.empty() == false)
-        m_pModel->Repack(ui->cmbAtlasGroups->currentIndex(), QSet<int>(), m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex()), ITEM_AtlasImage));
-    
-    RefreshLcds();
-}
-
-void AtlasWidget::on_btnSettings_clicked()
-{
-    bool bAtlasGrpHasImages = m_pModel->GetFrames(ui->cmbAtlasGroups->currentIndex()).size() > 0;
-    
-    DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(bAtlasGrpHasImages, m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex()));
-    if(QDialog::Accepted == pDlg->exec())
-    {
-        QJsonObject newPackerSettings = m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex());
-        pDlg->ApplyCurrentSettingsToObj(newPackerSettings);
-        
-        m_pModel->SetPackerSettings(ui->cmbAtlasGroups->currentIndex(), newPackerSettings);
-        
-        if(pDlg->IsSettingsDirty() && bAtlasGrpHasImages)
-            m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex());
-        else if(pDlg->IsNameChanged() || pDlg->IsSettingsDirty())
-            m_pModel->WriteMetaSettings();
-    }
-    
-    delete pDlg;
-    RefreshLcds();
 }
 
 void AtlasWidget::on_actionDeleteImages_triggered()
@@ -490,6 +425,8 @@ void AtlasWidget::OnContextMenu(const QPoint &pos)
     
     if(pTreeNode == NULL)
     {
+        contextMenu.addAction(ui->actionImportImages);
+        contextMenu.addAction(ui->actionImportDirectory);
         contextMenu.addAction(ui->actionAddFilter);
     }
     else
@@ -516,7 +453,10 @@ void AtlasWidget::OnContextMenu(const QPoint &pos)
             contextMenu.addSeparator();
         }
         
+        contextMenu.addAction(ui->actionImportImages);
+        contextMenu.addAction(ui->actionImportDirectory);
         contextMenu.addAction(ui->actionAddFilter);
+        contextMenu.addSeparator();
         contextMenu.addAction(ui->actionDeleteImages);
         contextMenu.addAction(ui->actionReplaceImages);
         contextMenu.addAction(ui->actionRename);
@@ -630,5 +570,82 @@ void AtlasWidget::on_actionAtlasGrpTransfer_triggered(QAction *pAction)
     // Repack new affected atlas group
     m_pModel->Repack(m_pModel->GetAtlasGrpIndexFromAtlasGrpId(uiNewAtlasGrpId), QSet<int>(), framesGoingToNewAtlasGrpSet);
     
+    RefreshLcds();
+}
+
+void AtlasWidget::on_actionImportImages_triggered()
+{
+    QFileDialog dlg(this);
+    dlg.setFileMode(QFileDialog::ExistingFile);
+    dlg.setViewMode(QFileDialog::Detail);
+    dlg.setWindowModality(Qt::ApplicationModal);
+    dlg.setModal(true);
+
+    QString sSelectedFilter(tr("PNG (*.png)"));
+    QStringList sImportImgList = QFileDialog::getOpenFileNames(this,
+                                                               "Import image(s) into atlases",
+                                                               QString(),
+                                                               tr("All files (*.*);;PNG (*.png)"),
+                                                               &sSelectedFilter);
+
+    if(sImportImgList.empty() == false)
+    {
+        m_pModel->Repack(ui->cmbAtlasGroups->currentIndex(),
+                         QSet<int>(),
+                         m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex()), ITEM_AtlasImage));
+    }
+
+    RefreshLcds();
+}
+
+void AtlasWidget::on_actionImportDirectory_triggered()
+{
+    QFileDialog dlg(this);
+    dlg.setFileMode(QFileDialog::Directory);
+    dlg.setOption(QFileDialog::ShowDirsOnly, true);
+    dlg.setViewMode(QFileDialog::Detail);
+    dlg.setWindowModality(Qt::ApplicationModal);
+    dlg.setModal(true);
+
+    if(dlg.exec() == QDialog::Rejected)
+        return;
+
+    QStringList sDirs = dlg.selectedFiles();
+    QStringList sImportImgList;
+    for(int iDirIndex = 0; iDirIndex < sDirs.size(); ++iDirIndex)
+    {
+        QDir dirEntry(sDirs[iDirIndex]);
+        HyGlobal::RecursiveFindFileOfExt("png", sImportImgList, dirEntry);
+    }
+
+    if(sImportImgList.empty() == false)
+    {
+        m_pModel->Repack(ui->cmbAtlasGroups->currentIndex(),
+                         QSet<int>(),
+                         m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex()), ITEM_AtlasImage));
+    }
+
+    RefreshLcds();
+}
+
+void AtlasWidget::on_actionGroupSettings_triggered()
+{
+    bool bAtlasGrpHasImages = m_pModel->GetFrames(ui->cmbAtlasGroups->currentIndex()).size() > 0;
+
+    DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(bAtlasGrpHasImages, m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex()));
+    if(QDialog::Accepted == pDlg->exec())
+    {
+        QJsonObject newPackerSettings = m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex());
+        pDlg->ApplyCurrentSettingsToObj(newPackerSettings);
+
+        m_pModel->SetPackerSettings(ui->cmbAtlasGroups->currentIndex(), newPackerSettings);
+
+        if(pDlg->IsSettingsDirty() && bAtlasGrpHasImages)
+            m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex());
+        else if(pDlg->IsNameChanged() || pDlg->IsSettingsDirty())
+            m_pModel->WriteMetaSettings();
+    }
+
+    delete pDlg;
     RefreshLcds();
 }

@@ -82,12 +82,6 @@ protected:
     virtual void resizeEvent(QResizeEvent *event) override;
 
 private Q_SLOTS:
-    void on_btnAddImages_clicked();
-
-    void on_btnAddDir_clicked();
-
-    void on_btnSettings_clicked();
-
     void on_actionDeleteImages_triggered();
 
     void on_actionReplaceImages_triggered();
@@ -107,6 +101,12 @@ private Q_SLOTS:
     void on_actionRemoveGroup_triggered();
     
     void on_actionAtlasGrpTransfer_triggered(QAction *pAction);
+
+    void on_actionImportImages_triggered();
+
+    void on_actionImportDirectory_triggered();
+
+    void on_actionGroupSettings_triggered();
 
 private:
     Ui::AtlasWidget *ui;

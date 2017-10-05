@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>268</width>
+    <width>322</width>
     <height>387</height>
    </rect>
   </property>
@@ -34,10 +34,7 @@
      <property name="title">
       <string>Atlas Group</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <property name="spacing">
-       <number>2</number>
-      </property>
+     <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
        <number>2</number>
       </property>
@@ -50,11 +47,18 @@
       <property name="bottomMargin">
        <number>2</number>
       </property>
-      <item>
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <item row="0" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
          <widget class="QComboBox" name="cmbAtlasGroups"/>
         </item>
+       </layout>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QToolButton" name="btnAddGroup">
           <property name="text">
@@ -71,53 +75,11 @@
         </item>
        </layout>
       </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QPushButton" name="btnSettings">
-          <property name="text">
-           <string>Settings</string>
-          </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>:/icons16x16/generic-settings.png</normaloff>:/icons16x16/generic-settings.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnAddImages">
-          <property name="text">
-           <string>Add Image(s)</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnAddDir">
-          <property name="text">
-           <string>Add Image Dir</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
+      <item row="1" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <property name="spacing">
          <number>2</number>
         </property>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
         <item>
          <widget class="QLabel" name="label_3">
           <property name="text">
@@ -181,6 +143,13 @@
         </item>
        </layout>
       </item>
+      <item row="1" column="1">
+       <widget class="QToolButton" name="btnSettings">
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -215,6 +184,20 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QToolButton" name="btnAddImages">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnAddDir">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <widget class="QToolButton" name="btnAddFilter">
        <property name="text">
@@ -254,7 +237,7 @@
   </layout>
   <action name="actionDeleteImages">
    <property name="icon">
-    <iconset>
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/items/Atlas-Delete.png</normaloff>:/icons16x16/items/Atlas-Delete.png</iconset>
    </property>
    <property name="text">
@@ -266,7 +249,7 @@
   </action>
   <action name="actionReplaceImages">
    <property name="icon">
-    <iconset>
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/atlas-replaceFrame.png</normaloff>:/icons16x16/atlas-replaceFrame.png</iconset>
    </property>
    <property name="text">
@@ -278,7 +261,7 @@
   </action>
   <action name="actionAddFilter">
    <property name="icon">
-    <iconset>
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/items/Prefix-New.png</normaloff>:/icons16x16/items/Prefix-New.png</iconset>
    </property>
    <property name="text">
@@ -290,7 +273,7 @@
   </action>
   <action name="actionRename">
    <property name="icon">
-    <iconset>
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
    </property>
    <property name="text">
@@ -302,7 +285,7 @@
   </action>
   <action name="actionAtlasGroups">
    <property name="icon">
-    <iconset>
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/atlas-assemble.png</normaloff>:/icons16x16/atlas-assemble.png</iconset>
    </property>
    <property name="text">
@@ -314,7 +297,7 @@
   </action>
   <action name="actionAddGroup">
    <property name="icon">
-    <iconset>
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
@@ -326,7 +309,7 @@
   </action>
   <action name="actionRemoveGroup">
    <property name="icon">
-    <iconset>
+    <iconset resource="../res/DesignerTool.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
@@ -334,6 +317,42 @@
    </property>
    <property name="toolTip">
     <string>Removes the currently selected atlas group.</string>
+   </property>
+  </action>
+  <action name="actionImportImages">
+   <property name="icon">
+    <iconset resource="../res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/items/Atlas-New.png</normaloff>:/icons16x16/items/Atlas-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import Images</string>
+   </property>
+   <property name="toolTip">
+    <string>Import 1 or more images from a single directory</string>
+   </property>
+  </action>
+  <action name="actionImportDirectory">
+   <property name="icon">
+    <iconset resource="../res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/items/Atlas-Open.png</normaloff>:/icons16x16/items/Atlas-Open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import Image Directory</string>
+   </property>
+   <property name="toolTip">
+    <string>Imports all images found recursively from a start directory</string>
+   </property>
+  </action>
+  <action name="actionGroupSettings">
+   <property name="icon">
+    <iconset resource="../res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/generic-settings.png</normaloff>:/icons16x16/generic-settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Atlas Group Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Change packing options and texture type for the currently selected atlas group</string>
    </property>
   </action>
  </widget>
@@ -344,6 +363,8 @@
    <header>AtlasWidget.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../res/DesignerTool.qrc"/>
+ </resources>
  <connections/>
 </ui>
