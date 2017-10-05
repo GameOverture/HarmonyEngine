@@ -94,6 +94,8 @@ IHyNodeData *IHyLeafDraw2d::AcquireData()
 {
 	if(m_pData == nullptr)
 	{
+		HyAssert(sm_pHyAssets != nullptr, "AcquireData was called before the engine has initialized HyAssets");
+
 		sm_pHyAssets->GetNodeData(this, m_pData);
 		if(m_pData)
 			OnDataAcquired();
