@@ -44,6 +44,8 @@ private Q_SLOTS:
 
     void on_txtGameLocation_textChanged(const QString &arg1);
 
+    void on_txtTitleName_textChanged(const QString &arg1);
+
     void on_btnBrowseAssets_clicked();
     
     void on_btnBrowseMetaData_clicked();
@@ -51,8 +53,6 @@ private Q_SLOTS:
     void on_btnBrowseSource_clicked();
 
     void on_chkCreateGameDir_clicked();
-
-    void on_txtTitleName_textChanged(const QString &arg1);
     
     void on_txtAssetsDirName_textChanged(const QString &arg1);
 
@@ -63,6 +63,7 @@ private Q_SLOTS:
 private:
     Ui::DlgNewProject *ui;
     
+    void UpdateAbsoluteDirLocations();
     void SetRelativePaths();
 };
 
