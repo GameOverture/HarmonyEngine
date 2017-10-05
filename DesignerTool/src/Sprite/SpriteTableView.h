@@ -1,5 +1,5 @@
 /**************************************************************************
- *	WidgetSpriteModelView.h
+ *	SpriteTableView.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef SPRITEMODELVIEW_H
-#define SPRITEMODELVIEW_H
+#ifndef SPRITETABLEVIEW_H
+#define SPRITETABLEVIEW_H
 
 #include "AtlasFrame.h"
 
@@ -48,4 +48,4 @@ public:
     virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
-#endif // SPRITEMODELVIEW_H
+#endif // SPRITETABLEVIEW_H

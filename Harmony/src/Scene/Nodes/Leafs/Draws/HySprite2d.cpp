@@ -378,8 +378,11 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Bounce;
 		if(stateRef.m_bREVERSE)
 			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Reverse;
+
 		if(stateRef.m_uiNUMFRAMES == 0 || stateRef.GetFrame(0).IsValid() == false)
 			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Invalid;
+		else
+			m_AnimCtrlAttribList[i] &= ~ANIMCTRLATTRIB_Invalid;
 	}
 }
 

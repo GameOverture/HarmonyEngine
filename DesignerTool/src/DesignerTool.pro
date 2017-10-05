@@ -57,7 +57,6 @@ SOURCES += main.cpp \
     Project/ProjectItem.cpp \
     Sprite/SpriteDraw.cpp \
     Sprite/SpriteModels.cpp \
-    Sprite/SpriteModelView.cpp \
     Sprite/SpriteUndoCmds.cpp \
     Sprite/SpriteWidget.cpp \
     Widget/WidgetColor.cpp \
@@ -79,7 +78,8 @@ SOURCES += main.cpp \
     Shared/Properties/PropertiesTreeView.cpp \
     Shared/Properties/PropertiesTreeItem.cpp \
     Shared/Properties/PropertiesTreeModel.cpp \
-    Widget/WidgetVectorSpinBox.cpp
+    Widget/WidgetVectorSpinBox.cpp \
+    Sprite/SpriteTableView.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -122,7 +122,6 @@ HEADERS  += \
     Project/ProjectItem.h \
     Sprite/SpriteDraw.h \
     Sprite/SpriteModels.h \
-    Sprite/SpriteModelView.h \
     Sprite/SpriteUndoCmds.h \
     Sprite/SpriteWidget.h \
     Widget/WidgetColor.h \
@@ -147,7 +146,8 @@ HEADERS  += \
     Shared/Properties/PropertiesTreeView.h \
     Shared/Properties/PropertiesTreeItem.h \
     Shared/Properties/PropertiesTreeModel.h \
-    Widget/WidgetVectorSpinBox.h
+    Widget/WidgetVectorSpinBox.h \
+    Sprite/SpriteTableView.h
 
 FORMS    += \
     MainWindow.ui \

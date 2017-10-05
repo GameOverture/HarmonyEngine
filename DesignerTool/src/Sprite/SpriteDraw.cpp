@@ -64,6 +64,8 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
     
     SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
     m_Sprite.AnimSetPause(pWidget->IsPlayingAnim() == false);
+
+	m_Sprite.Load();
 }
 
 /*virtual*/ void SpriteDraw::OnShow(IHyApplication &hyApp) /*override*/

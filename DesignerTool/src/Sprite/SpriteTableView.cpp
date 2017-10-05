@@ -1,5 +1,5 @@
 /**************************************************************************
- *	WidgetSpriteModelView.cpp
+ *	SpriteTableView.cpp
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "SpriteModelView.h"
+#include "SpriteTableView.h"
 #include "SpriteModels.h"
 #include "Global.h"
 #include "SpriteUndoCmds.h"
