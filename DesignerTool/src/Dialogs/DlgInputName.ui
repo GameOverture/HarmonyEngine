@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>351</width>
-    <height>115</height>
+    <height>88</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,7 +31,7 @@
    <item>
     <widget class="QLabel" name="lblError">
      <property name="text">
-      <string>error msg</string>
+      <string/>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
