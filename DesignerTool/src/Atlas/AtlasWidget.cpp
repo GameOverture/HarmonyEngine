@@ -306,6 +306,7 @@ void AtlasWidget::on_actionDeleteImages_triggered()
     for(int i = selectedFilterList.size() - 1; i >= 0; --i)
         delete selectedFilterList[i];
     
+    m_pModel->WriteMetaSettings();
     RefreshLcds();
 }
 
