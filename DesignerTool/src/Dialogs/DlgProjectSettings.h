@@ -29,8 +29,6 @@ public:
 
     QJsonObject GetSettingsObj() const;
 
-    bool MakeValid(QJsonObject &settingsObjRef);
-
     void SetDefaults();
 
     void SaveSettings();
@@ -42,6 +40,8 @@ public Q_SLOTS:
 
 private:
     Ui::DlgProjectSettings *ui;
+
+    bool MakeValid(QJsonObject &settingsObjRef);
 };
 
 #endif // DLGPROJECTSETTINGS_H
