@@ -61,6 +61,13 @@ ProjectWidget::~ProjectWidget()
 Project *ProjectWidget::AddItemProject(const QString sNewProjectFilePath)
 {
     Project *pNewProject = new Project(this, sNewProjectFilePath);
+    if(pNewProject->HasError())
+    {
+        HyGuiLog("Project: " % pNewProject->GetAbsPath() % " had an error and will not be opened", LOGTYPE_Error);
+        delete pNewProject;
+        return nullptr;
+    }
+
     HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
 
     QTreeWidgetItem *pProjTreeItem = pNewProject->GetTreeItem();
@@ -189,6 +196,9 @@ void ProjectWidget::RemoveItem(DataExplorerItem *pItem)
 
 void ProjectWidget::SelectItem(DataExplorerItem *pItem)
 {
+    if(pItem == nullptr)
+        return;
+
     for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
     {
         QTreeWidgetItemIterator it(ui->treeWidget->topLevelItem(i));

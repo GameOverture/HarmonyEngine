@@ -83,6 +83,12 @@ Project::Project(ProjectWidget *pProjWidget, const QString sProjectFilePath) :  
                                                                                 m_pCurOpenItem(nullptr),
                                                                                 m_bHasError(false)
 {
+    if(m_DlgProjectSettings.HasError())
+    {
+        m_bHasError = true;
+        return;
+    }
+
     m_pTreeItemPtr->setText(0, GetGameName());
     m_Init.sGameName = GetGameName().toStdString();
     m_Init.sDataDir = GetAssetsAbsPath().toStdString();
@@ -247,6 +253,7 @@ Project::Project(ProjectWidget *pProjWidget, const QString sProjectFilePath) :  
         if(!srcFile.open(QFile::ReadOnly))
         {
             HyGuiLog("Error reading " % srcFile.fileName() % " when generating default font: " % srcFile.errorString(), LOGTYPE_Error);
+            m_bHasError = true;
             return;
         }
 
@@ -264,6 +271,11 @@ Project::Project(ProjectWidget *pProjWidget, const QString sProjectFilePath) :  
 {
     delete m_pDraw;
     delete m_pAtlasWidget;
+}
+
+bool Project::HasError() const
+{
+    return m_bHasError;
 }
 
 void Project::ExecProjSettingsDlg()

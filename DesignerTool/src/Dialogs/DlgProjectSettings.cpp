@@ -42,7 +42,8 @@ QMap<QString, QJsonValue> DlgProjectSettings::sm_DefaultValues;
 
 DlgProjectSettings::DlgProjectSettings(const QString sProjectFilePath, QWidget *parent) :   QDialog(parent),
                                                                                             ui(new Ui::DlgProjectSettings),
-                                                                                            m_sPROJ_SETTINGS_FILE_PATH(sProjectFilePath)
+                                                                                            m_sPROJ_SETTINGS_FILE_PATH(sProjectFilePath),
+                                                                                            m_bHasError(false)
 {
     ui->setupUi(this);
 
@@ -50,10 +51,16 @@ DlgProjectSettings::DlgProjectSettings(const QString sProjectFilePath, QWidget *
     if(projFile.exists())
     {
         if(!projFile.open(QIODevice::ReadOnly))
+        {
             HyGuiLog("DlgProjectSettings::DlgProjectSettings() could not open " % m_sPROJ_SETTINGS_FILE_PATH % ": " % projFile.errorString(), LOGTYPE_Error);
+            m_bHasError = true;
+        }
     }
     else
+    {
         HyGuiLog("DlgProjectSettings::DlgProjectSettings() could not find the project file: " % m_sPROJ_SETTINGS_FILE_PATH, LOGTYPE_Error);
+        m_bHasError = true;
+    }
 
     QJsonDocument settingsDoc = QJsonDocument::fromJson(projFile.readAll());
     projFile.close();
@@ -72,6 +79,11 @@ DlgProjectSettings::~DlgProjectSettings()
     delete ui;
 }
 
+bool DlgProjectSettings::HasError() const
+{
+    return m_bHasError;
+}
+
 QJsonObject DlgProjectSettings::GetSettingsObj() const
 {
     return m_SettingsObj;
@@ -86,6 +98,7 @@ bool DlgProjectSettings::MakeValid(QJsonObject &settingsObjRef)
        settingsObjRef.contains("SourcePath") == false)
     {
         HyGuiLog("DlgProjectSettings::CheckValidity() doesn't have the minimum requirements for a valid settings file", LOGTYPE_Error);
+        m_bHasError = true;
     }
 
     bool bIsValid = true;
@@ -164,16 +177,20 @@ void DlgProjectSettings::SetDefaults()
 void DlgProjectSettings::SaveSettings()
 {
     QFile settingsFile(m_sPROJ_SETTINGS_FILE_PATH);
-    if(settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
+    if(settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+    {
        HyGuiLog(QString("Couldn't open ") % m_sPROJ_SETTINGS_FILE_PATH % " for writing: " % settingsFile.errorString(), LOGTYPE_Error);
+       m_bHasError = true;
     }
     else
     {
         QJsonDocument settingsDoc;
         settingsDoc.setObject(m_SettingsObj);
         qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
-        if(0 == iBytesWritten || -1 == iBytesWritten) {
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+        {
             HyGuiLog(QString("Could not write to ") % m_sPROJ_SETTINGS_FILE_PATH % " file: " % settingsFile.errorString(), LOGTYPE_Error);
+            m_bHasError = true;
         }
 
         settingsFile.close();

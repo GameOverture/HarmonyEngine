@@ -17,11 +17,15 @@ class DlgProjectSettings : public QDialog
 
     static QMap<QString, QJsonValue>    sm_DefaultValues;
 
+    bool                                m_bHasError;
+
 public:
     static void InitDefaultValues();
 
     explicit DlgProjectSettings(const QString sProjectFilePath, QWidget *parent = 0);
     ~DlgProjectSettings();
+
+    bool HasError() const;
 
     QJsonObject GetSettingsObj() const;
 

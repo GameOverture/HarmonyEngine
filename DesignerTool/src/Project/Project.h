@@ -61,6 +61,8 @@ class Project : public DataExplorerItem, public IHyApplication
 public:
     Project(ProjectWidget *pProjWidget, const QString sProjectFilePath);
     virtual ~Project();
+
+    bool HasError() const;
     
     void ExecProjSettingsDlg();
 
