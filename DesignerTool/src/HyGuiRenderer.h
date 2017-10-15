@@ -24,14 +24,16 @@ class HyGuiRenderer : public QOpenGLWidget//, protected QOpenGLFunctions
     Project *           m_pProjOwner;
     HyEngine *          m_pHyEngine;
     
-    bool                m_bIsUpdating;
-
     QTimer *            m_pTimer;
+
+    bool                m_bIsLoading;
 
 public:
     HyGuiRenderer(QWidget *parent = 0);
     HyGuiRenderer(Project *pProj, QWidget *parent = 0);
     ~HyGuiRenderer();
+
+    bool IsLoading();
     
     HyRendererInterop *GetHarmonyRenderer();
 

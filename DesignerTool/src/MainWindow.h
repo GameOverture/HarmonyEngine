@@ -14,6 +14,7 @@
 #include <QSettings>
 #include <QTcpServer>
 #include <QStackedWidget>
+#include <QThread>
 
 #include "Project.h"
 #include "HyGuiDebugger.h"
@@ -23,6 +24,25 @@
 namespace Ui {
 class MainWindow;
 }
+
+class HyGuiRenderer;
+
+class SwitchRendererThread : public QThread
+{
+    Q_OBJECT
+
+    HyGuiRenderer *m_pCurrentRenderer;
+
+public:
+    SwitchRendererThread(HyGuiRenderer *pCurrentRenderer, QObject *pParent) :   QThread(pParent),
+                                                                                m_pCurrentRenderer(pCurrentRenderer)
+    { }
+
+    virtual void run() override;
+
+Q_SIGNALS:
+      void SwitchIsReady(HyGuiRenderer *pRenderer);
+};
 
 class MainWindow : public QMainWindow
 {
@@ -104,6 +124,8 @@ private Q_SLOTS:
     void on_actionExit_triggered();
 
     void on_actionProjectSettings_triggered();
+
+    void OnSwitchRendererReady(HyGuiRenderer *pRenderer);
 
 private:
     Ui::MainWindow *ui;

@@ -10,6 +10,7 @@
 #include "HyGuiRenderer.h"
 #include "Global.h"
 #include "ProjectItemMimeData.h"
+#include "MainWindow.h"
 
 #include <QTimer>
 #include <QSurfaceFormat>
@@ -40,7 +41,7 @@ HyGuiRenderer::HyGuiRenderer(QWidget *parent) : QOpenGLWidget(parent),
 HyGuiRenderer::HyGuiRenderer(Project *pProj, QWidget *parent /*= 0*/) : QOpenGLWidget(parent),
                                                                         m_pProjOwner(pProj),
                                                                         m_pHyEngine(nullptr),
-                                                                        m_bIsUpdating(false)
+                                                                        m_bIsLoading(pProj ? true : false)
 {
 //    QSurfaceFormat format;
 //    format.setRenderableType(QSurfaceFormat::OpenGL);
@@ -52,8 +53,6 @@ HyGuiRenderer::HyGuiRenderer(Project *pProj, QWidget *parent /*= 0*/) : QOpenGLW
     m_pTimer = new QTimer(this);
     connect(m_pTimer, SIGNAL(timeout()), this, SLOT(OnBootCheck()));
     m_pTimer->start(50);
-    
-    m_bIsUpdating = true;
 
     setAcceptDrops(true);
     RestoreCursor();
@@ -64,8 +63,7 @@ HyGuiRenderer::~HyGuiRenderer()
     m_pTimer->stop();
 
     makeCurrent();
-    m_bIsUpdating = true;
-    
+
     if(m_pHyEngine)
     {
         m_pProjOwner->Shutdown();
@@ -74,7 +72,11 @@ HyGuiRenderer::~HyGuiRenderer()
     
     delete m_pHyEngine;
     m_pHyEngine = nullptr;
-    m_bIsUpdating = false;
+}
+
+bool HyGuiRenderer::IsLoading()
+{
+    return m_bIsLoading;
 }
 
 HyRendererInterop *HyGuiRenderer::GetHarmonyRenderer()
@@ -124,13 +126,10 @@ void HyGuiRenderer::RestoreCursor()
 
 /*virtual*/ void HyGuiRenderer::paintGL() /*override*/
 {
-    if(m_pHyEngine && m_bIsUpdating == false)
+    if(m_pHyEngine && m_bIsLoading == false)
     {
-        m_bIsUpdating = true;
         if(m_pHyEngine->Update() == false)
             HyGuiLog("Harmony Gfx requested exit program.", LOGTYPE_Info);
-
-        m_bIsUpdating = false;
     }
 }
 
@@ -185,7 +184,7 @@ void HyGuiRenderer::OnBootCheck()
     {
         m_pProjOwner->OnHarmonyLoaded();
         
-        m_bIsUpdating = false;
+        m_bIsLoading = false;
         m_pTimer->stop();
         
         if(false == m_pTimer->disconnect())
@@ -193,6 +192,8 @@ void HyGuiRenderer::OnBootCheck()
         
         connect(m_pTimer, SIGNAL(timeout()), this, SLOT(update()));
         m_pTimer->start(10);
+
+        MainWindow::StopLoading(MDILOAD_Renderer);
     }
 }
 

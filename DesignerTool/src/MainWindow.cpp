@@ -34,6 +34,14 @@
 
 /*static*/ MainWindow * MainWindow::sm_pInstance = NULL;
 
+/*virtual*/ void SwitchRendererThread::run() /*override*/
+{
+    while(m_pCurrentRenderer && m_pCurrentRenderer->IsLoading())
+    { }
+
+    Q_EMIT SwitchIsReady(m_pCurrentRenderer);
+}
+
 MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
                                             ui(new Ui::MainWindow),
                                             m_Settings("Overture Games", "Harmony Designer Tool"),
@@ -75,7 +83,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     //StartLoading(MDI_Explorer);
     //StartLoading(MDI_MainWindow | MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties);
     
-    SetSelectedProj(NULL);
+    SetSelectedProj(nullptr);
 
     HyGuiLog("Harmony Designer Tool", LOGTYPE_Title);
     HyGuiLog("Initializing...", LOGTYPE_Normal);
@@ -297,10 +305,11 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
     sm_pInstance->m_pCurSelectedProj = pProj;
 
-    // Swap the harmony engine renderers
-    delete sm_pInstance->m_pCurRenderer;
-    sm_pInstance->m_pCurRenderer = new HyGuiRenderer(sm_pInstance->m_pCurSelectedProj, sm_pInstance);
-    sm_pInstance->ui->centralVerticalLayout->addWidget(sm_pInstance->m_pCurRenderer);
+    MainWindow::StartLoading(MDILOAD_Renderer);
+    SwitchRendererThread *pWorkerThread = new SwitchRendererThread(sm_pInstance->m_pCurRenderer, sm_pInstance);
+    connect(pWorkerThread, &SwitchRendererThread::finished, pWorkerThread, &QObject::deleteLater);
+    connect(pWorkerThread, &SwitchRendererThread::SwitchIsReady, sm_pInstance, &MainWindow::OnSwitchRendererReady);
+    pWorkerThread->start();
 
     // Below will be set when HyEngine is fully loaded
     sm_pInstance->ui->dockWidgetAtlas->setWidget(nullptr);
@@ -339,9 +348,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 /*static*/ void MainWindow::ReloadHarmony()
 {
-    delete sm_pInstance->m_pCurRenderer;
-    sm_pInstance->m_pCurRenderer = nullptr;
-    
     Project *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
     sm_pInstance->m_pCurSelectedProj = nullptr;    // Set m_pCurSelectedProj to 'nullptr' so SetSelectedProj() doesn't imediately return
     
@@ -419,6 +425,8 @@ void MainWindow::on_actionOpenProject_triggered()
 
 void MainWindow::on_actionCloseProject_triggered()
 {
+    MainWindow::StopLoading(MDILOAD_Renderer);
+
     SetSelectedProj(nullptr);
     ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
 }
@@ -692,4 +700,13 @@ void MainWindow::on_actionProjectSettings_triggered()
         return;
 
     ui->explorer->GetCurProjSelected()->ExecProjSettingsDlg();
+}
+
+void MainWindow::OnSwitchRendererReady(HyGuiRenderer *pRenderer)
+{
+    delete pRenderer;
+
+    // Swap the harmony engine renderers
+    sm_pInstance->m_pCurRenderer = new HyGuiRenderer(sm_pInstance->m_pCurSelectedProj, sm_pInstance);
+    sm_pInstance->ui->centralVerticalLayout->addWidget(sm_pInstance->m_pCurRenderer);
 }

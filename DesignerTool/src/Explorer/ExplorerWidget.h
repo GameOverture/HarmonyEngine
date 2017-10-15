@@ -30,23 +30,6 @@ class ProjectItem;
 class ExplorerTreeItem;
 class AtlasFrame;
 
-class DataExplorerLoadThread : public QThread
-{
-    Q_OBJECT
-
-    QString m_sPath;
-
-public:
-    DataExplorerLoadThread(QString sPath, QObject *pParent) :   QThread(pParent),
-                                                                m_sPath(sPath)
-    { }
-
-    virtual void run() override;
-
-Q_SIGNALS:
-    void LoadFinished(Project *pLoadedItemProject);
-};
-
 class ExplorerWidget : public QWidget
 {
     Q_OBJECT
