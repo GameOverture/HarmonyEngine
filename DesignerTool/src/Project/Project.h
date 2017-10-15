@@ -10,11 +10,11 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
-#include "ProjectWidget.h"
+#include "ExplorerWidget.h"
 #include "ProjectDraw.h"
 #include "ProjectItem.h"
 #include "AtlasModel.h"
-#include "DataExplorerItem.h"
+#include "ExplorerTreeItem.h"
 #include "DlgProjectSettings.h"
 #include <QQueue>
 #include <QJsonObject>
@@ -38,11 +38,11 @@ protected:
     virtual void dropEvent(QDropEvent *pEvent) override;
 };
 
-class Project : public DataExplorerItem, public IHyApplication
+class Project : public ExplorerTreeItem, public IHyApplication
 {
     Q_OBJECT
 
-    ProjectWidget *                                 m_pWidget;
+    ExplorerWidget *                                 m_pWidget;
     ProjectDraw *                                   m_pDraw;
     DlgProjectSettings                              m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
 
@@ -59,7 +59,7 @@ class Project : public DataExplorerItem, public IHyApplication
     bool                                            m_bHasError;
     
 public:
-    Project(ProjectWidget *pProjWidget, const QString sProjectFilePath);
+    Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath);
     virtual ~Project();
 
     bool HasError() const;
@@ -85,7 +85,7 @@ public:
 
     ProjectTabBar *GetTabBar();
 
-    ProjectWidget *GetExplorerWidget();
+    ExplorerWidget *GetExplorerWidget();
     ProjectItem *GetCurrentOpenItem();
 
     void OpenItem(ProjectItem *pItem);

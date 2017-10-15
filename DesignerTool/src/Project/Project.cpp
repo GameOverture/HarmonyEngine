@@ -71,7 +71,7 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProject
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Project::Project(ProjectWidget *pProjWidget, const QString sProjectFilePath) :  DataExplorerItem(ITEM_Project, sProjectFilePath),
+Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) :  ExplorerTreeItem(ITEM_Project, sProjectFilePath),
                                                                                 IHyApplication(g_DefaultInit),
                                                                                 m_pWidget(pProjWidget),
                                                                                 m_pDraw(nullptr),
@@ -143,7 +143,7 @@ Project::Project(ProjectWidget *pProjWidget, const QString sProjectFilePath) :  
             continue;
 
         QString sSubDirPath = GetAssetsAbsPath() % HyGlobal::ItemName(subDirList[i]) % HyGlobal::ItemExt(subDirList[i]);
-        DataExplorerItem *pSubDirItem = new DataExplorerItem(subDirList[i], sSubDirPath);
+        ExplorerTreeItem *pSubDirItem = new ExplorerTreeItem(subDirList[i], sSubDirPath);
 
         // Adding sub dir tree item
         QTreeWidgetItem *pSubDirTreeItem = pSubDirItem->GetTreeItem();
@@ -193,7 +193,7 @@ Project::Project(ProjectWidget *pProjWidget, const QString sProjectFilePath) :  
 
                     if(bPrefixFound == false)
                     {
-                        DataExplorerItem *pPrefixItem = new DataExplorerItem(ITEM_Prefix, sSubDirName % "/" % sCurPrefix);
+                        ExplorerTreeItem *pPrefixItem = new ExplorerTreeItem(ITEM_Prefix, sSubDirName % "/" % sCurPrefix);
                         QTreeWidgetItem *pNewPrefixTreeWidget = pPrefixItem->GetTreeItem();
 
                         if(sCurPrefix[0] != HYDEFAULT_PrefixChar)
@@ -204,7 +204,7 @@ Project::Project(ProjectWidget *pProjWidget, const QString sProjectFilePath) :  
                 }
                 else // Last path part, so must be the actual data item
                 {
-                    DataExplorerItem *pNewDataItem = nullptr;
+                    ExplorerTreeItem *pNewDataItem = nullptr;
                     switch(subDirList[i])
                     {
                     case DIR_Audio:
@@ -360,7 +360,7 @@ ProjectItem *Project::GetCurrentOpenItem()
     return m_pCurOpenItem;
 }
 
-ProjectWidget *Project::GetExplorerWidget()
+ExplorerWidget *Project::GetExplorerWidget()
 {
     return m_pWidget;
 }

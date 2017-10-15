@@ -51,7 +51,6 @@ SOURCES += main.cpp \
     Font/FontModelView.cpp \
     Font/FontUndoCmds.cpp \
     Font/FontWidget.cpp \
-    Project/DataExplorerItem.cpp \
     Project/Project.cpp \
     Project/ProjectDraw.cpp \
     Project/ProjectItem.cpp \
@@ -68,8 +67,6 @@ SOURCES += main.cpp \
     Entity/EntityToolbox.cpp \
     Entity/EntityTreeModel.cpp \
     Project/ProjectItemMimeData.cpp \
-    Project/ProjectWidget.cpp \
-    Explorer/ExplorerTreeWidget.cpp \
     Entity/EntityCommon.cpp \
     Entity/EntityUndoCmds.cpp \
     Shared/Global.cpp \
@@ -79,7 +76,10 @@ SOURCES += main.cpp \
     Shared/Properties/PropertiesTreeItem.cpp \
     Shared/Properties/PropertiesTreeModel.cpp \
     Widget/WidgetVectorSpinBox.cpp \
-    Sprite/SpriteTableView.cpp
+    Sprite/SpriteTableView.cpp \
+    Explorer/ExplorerWidget.cpp \
+    Explorer/ExplorerTreeWidget.cpp \
+    Explorer/ExplorerTreeItem.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -116,7 +116,6 @@ HEADERS  += \
     Font/FontModelView.h \
     Font/FontUndoCmds.h \
     Font/FontWidget.h \
-    Project/DataExplorerItem.h \
     Project/Project.h \
     Project/ProjectDraw.h \
     Project/ProjectItem.h \
@@ -133,7 +132,6 @@ HEADERS  += \
     Entity/EntityToolbox.h \
     Entity/EntityTreeModel.h \
     Project/ProjectItemMimeData.h \
-    Project/ProjectWidget.h \
     Explorer/ExplorerTreeWidget.h \
     Entity/EntityCommon.h \
     Entity/EntityUndoCmds.h \
@@ -147,7 +145,9 @@ HEADERS  += \
     Shared/Properties/PropertiesTreeItem.h \
     Shared/Properties/PropertiesTreeModel.h \
     Widget/WidgetVectorSpinBox.h \
-    Sprite/SpriteTableView.h
+    Sprite/SpriteTableView.h \
+    Explorer/ExplorerWidget.h \
+    Explorer/ExplorerTreeItem.h
 
 FORMS    += \
     MainWindow.ui \
@@ -174,9 +174,9 @@ FORMS    += \
     Widget/WidgetOutputLog.ui \
     Widget/WidgetRangedSlider.ui \
     Entity/EntityToolbox.ui \
-    Project/ProjectWidget.ui \
     Entity/EntityCommon.ui \
-    Widget/WidgetVectorSpinBox.ui
+    Widget/WidgetVectorSpinBox.ui \
+    Explorer/ExplorerWidget.ui
 
 RC_FILE = DesignerTool.rc
 

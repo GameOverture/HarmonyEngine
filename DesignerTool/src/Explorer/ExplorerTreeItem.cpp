@@ -1,5 +1,5 @@
 /**************************************************************************
- *	DataExplorerItem.cpp
+ *	ExplorerTreeItem.cpp
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "DataExplorerItem.h"
+#include "ExplorerTreeItem.h"
 #include "SpriteWidget.h"
 #include "Global.h"
 #include "Project.h"
@@ -17,7 +17,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-DataExplorerItem::DataExplorerItem(HyGuiItemType eType, const QString sPath) :  m_eTYPE(eType),
+ExplorerTreeItem::ExplorerTreeItem(HyGuiItemType eType, const QString sPath) :  m_eTYPE(eType),
                                                                                 m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str()),
                                                                                 m_bIsProjectItem(false)
 {
@@ -30,17 +30,17 @@ DataExplorerItem::DataExplorerItem(HyGuiItemType eType, const QString sPath) :  
     m_pTreeItemPtr->setData(0, Qt::UserRole, v);
 }
 
-DataExplorerItem::~DataExplorerItem()
+ExplorerTreeItem::~ExplorerTreeItem()
 {
     delete m_pTreeItemPtr;
 }
 
-bool DataExplorerItem::IsProjectItem() const
+bool ExplorerTreeItem::IsProjectItem() const
 {
     return m_bIsProjectItem;
 }
 
-QString DataExplorerItem::GetName(bool bWithPrefix) const
+QString ExplorerTreeItem::GetName(bool bWithPrefix) const
 {
     QString sPrefix;
     if(bWithPrefix)
@@ -57,7 +57,7 @@ QString DataExplorerItem::GetName(bool bWithPrefix) const
     return sName;
 }
 
-QString DataExplorerItem::GetPrefix() const
+QString ExplorerTreeItem::GetPrefix() const
 {
     // Check to see if this item can have a valid prefix
     if(m_eTYPE == ITEM_Project)
@@ -116,18 +116,18 @@ QString DataExplorerItem::GetPrefix() const
     return sPrefix;
 }
 
-void DataExplorerItem::SetTreeItemSubIcon(SubIcon eSubIcon)
+void ExplorerTreeItem::SetTreeItemSubIcon(SubIcon eSubIcon)
 {
     m_pTreeItemPtr->setIcon(0, GetIcon(eSubIcon));
 }
 
-QDataStream &operator<<(QDataStream &out, DataExplorerItem *const &rhs)
+QDataStream &operator<<(QDataStream &out, ExplorerTreeItem *const &rhs)
 {
     out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
     return out;
 }
 
-QDataStream &operator>>(QDataStream &in, DataExplorerItem *rhs)
+QDataStream &operator>>(QDataStream &in, ExplorerTreeItem *rhs)
 {
     in.readRawData(reinterpret_cast<char *>(rhs), sizeof(rhs));
     return in;

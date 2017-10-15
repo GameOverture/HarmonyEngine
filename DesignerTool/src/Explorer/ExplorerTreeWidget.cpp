@@ -8,8 +8,8 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "ExplorerTreeWidget.h"
-#include "ProjectWidget.h"
-#include "DataExplorerItem.h"
+#include "ExplorerWidget.h"
+#include "ExplorerTreeItem.h"
 #include "ProjectItemMimeData.h"
 #include "Project.h"
 
@@ -27,7 +27,7 @@ ExplorerTreeWidget::ExplorerTreeWidget(QWidget *pParent) :  QTreeWidget(pParent)
 {
 }
 
-void ExplorerTreeWidget::SetOwner(ProjectWidget *pOwner)
+void ExplorerTreeWidget::SetOwner(ExplorerWidget *pOwner)
 {
     m_pOwnerWidget = pOwner;
 }
@@ -39,7 +39,7 @@ void ExplorerTreeWidget::SetOwner(ProjectWidget *pOwner)
         QTreeWidgetItem *pClickedTreeItem = itemAt(mapFromGlobal(QCursor::pos()));
         if(pClickedTreeItem)
         {
-            DataExplorerItem *pExplorerItem = pClickedTreeItem->data(0, Qt::UserRole).value<DataExplorerItem *>();
+            ExplorerTreeItem *pExplorerItem = pClickedTreeItem->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
 
             if(pExplorerItem->IsProjectItem())
             {

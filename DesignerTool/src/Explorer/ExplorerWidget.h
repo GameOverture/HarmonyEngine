@@ -1,5 +1,5 @@
 /**************************************************************************
- *	DataExplorerWidget.h
+ *	ExplorerWidget.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef DATAEXPLORERWIDGET_H
-#define DATAEXPLORERWIDGET_H
+#ifndef EXPLORERWIDGET_H
+#define EXPLORERWIDGET_H
 
 #include "Global.h"
 
@@ -22,12 +22,12 @@
 using std::vector;
 
 namespace Ui {
-class ProjectWidget;
+class ExplorerWidget;
 }
 
 class Project;
 class ProjectItem;
-class DataExplorerItem;
+class ExplorerTreeItem;
 class AtlasFrame;
 
 class DataExplorerLoadThread : public QThread
@@ -47,32 +47,32 @@ Q_SIGNALS:
     void LoadFinished(Project *pLoadedItemProject);
 };
 
-class ProjectWidget : public QWidget
+class ExplorerWidget : public QWidget
 {
     Q_OBJECT
 
     static QByteArray       sm_sInternalClipboard;
 
 public:
-    explicit ProjectWidget(QWidget *parent = 0);
-    ~ProjectWidget();
+    explicit ExplorerWidget(QWidget *parent = 0);
+    ~ExplorerWidget();
     
     Project *AddItemProject(const QString sNewProjectFilePath);
 
     ProjectItem *AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue);
-    void RemoveItem(DataExplorerItem *pItem);
-    void SelectItem(DataExplorerItem *pItem);
+    void RemoveItem(ExplorerTreeItem *pItem);
+    void SelectItem(ExplorerTreeItem *pItem);
     
     QStringList GetOpenProjectPaths();
 
     Project *GetCurProjSelected();
-    DataExplorerItem *GetCurItemSelected();
-    DataExplorerItem *GetCurSubDirSelected();
+    ExplorerTreeItem *GetCurItemSelected();
+    ExplorerTreeItem *GetCurSubDirSelected();
 
     void PasteItemSrc(QByteArray sSrc, Project *pProject);
 
 private:
-    Ui::ProjectWidget *ui;
+    Ui::ExplorerWidget *ui;
 
     QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 

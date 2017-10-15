@@ -14,11 +14,11 @@
 
 #include <QTreeWidget>
 
-class ProjectWidget;
+class ExplorerWidget;
 
 class ExplorerTreeWidget : public QTreeWidget
 {
-    ProjectWidget *         m_pOwnerWidget;
+    ExplorerWidget *         m_pOwnerWidget;
 
     ProjectItem *           m_pDraggedProjItem;
     QPoint                  m_ptDragStart;
@@ -27,7 +27,7 @@ public:
     ExplorerTreeWidget(QWidget *pParent = nullptr);
     virtual ~ExplorerTreeWidget();
 
-    void SetOwner(ProjectWidget *pOwner);
+    void SetOwner(ExplorerWidget *pOwner);
 
 protected:
     virtual void mousePressEvent(QMouseEvent *pEvent) override;

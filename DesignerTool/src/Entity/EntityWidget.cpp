@@ -131,7 +131,7 @@ void EntityWidget::UpdateActions()
     ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
     ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
 
-    DataExplorerItem *pExplorerItem = m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
+    ExplorerTreeItem *pExplorerItem = m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
     ui->actionAddSelectedChild->setEnabled(pExplorerItem && pExplorerItem->IsProjectItem());
 
     bool bFrameIsSelected = ui->propertyTree->model() != nullptr && ui->propertyTree->currentIndex().row() >= 0;
@@ -148,7 +148,7 @@ void EntityWidget::on_actionAddSelectedChild_triggered()
         return;
     }
 
-    DataExplorerItem *pExplorerItem = m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
+    ExplorerTreeItem *pExplorerItem = m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
     if(pExplorerItem->IsProjectItem() == false)
     {
         HyGuiLog("Currently selected item in Explorer is not a ProjectItem. Cannot add child to entity.", LOGTYPE_Error);
