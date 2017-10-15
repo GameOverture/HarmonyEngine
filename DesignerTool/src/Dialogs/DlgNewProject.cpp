@@ -113,6 +113,12 @@ void DlgNewProject::on_buttonBox_accepted()
     projDir.setPath(GetProjDirPath());
     projDir.mkdir(ui->txtRelativeSourceLocation->text());
     projDir.cd(ui->txtRelativeSourceLocation->text());
+    QDir slnDir(projDir);
+    if(ui->chkCreateProjectDir->isChecked())
+    {
+        projDir.mkdir(ui->txtTitleName->text());
+        projDir.cd(ui->txtTitleName->text());
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Insert the minimum required fields for settings file. The project's DlgProjectSettings will fill in the rest of the defaults
@@ -123,13 +129,18 @@ void DlgNewProject::on_buttonBox_accepted()
     jsonObj.insert("MetaDataPath", QString(ui->txtRelativeMetaDataLocation->text() + "/"));
     jsonObj.insert("SourcePath", QString(ui->txtRelativeSourceLocation->text() + "/"));
 
-    // Development .hyproj which sits in the src directory, has only one field which indicates the relative path to the actual settings file
+    // Development .hyproj which sits in the source .proj directory, has only one field which indicates the relative path to the actual settings file
     QJsonObject jsonObjForSrc;
-    QDir srcDir(GetProjDirPath() % ui->txtRelativeSourceLocation->text());
-    jsonObjForSrc.insert("AdjustWorkingDirectory", QJsonValue(srcDir.relativeFilePath(GetProjDirPath())));
-    //jsonObjForSrc.insert("DataPath", QJsonValue(srcDir.relativeFilePath(GetProjDirPath()) % sRelDataPath));
-    //jsonObjForSrc.insert("MetaDataPath", QJsonValue(srcDir.relativeFilePath(GetProjDirPath()) % sRelMetaDataPath));
-    //jsonObjForSrc.insert("SourcePath", QJsonValue(srcDir.relativeFilePath(GetProjDirPath()) % sRelSourcePath));
+    if(ui->chkCreateProjectDir->isChecked())
+    {
+        QDir srcDir(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % ui->txtTitleName->text());
+        jsonObjForSrc.insert("AdjustWorkingDirectory", QJsonValue(srcDir.relativeFilePath(GetProjDirPath())));
+    }
+    else
+    {
+        QDir srcDir(GetProjDirPath() % ui->txtRelativeSourceLocation->text());
+        jsonObjForSrc.insert("AdjustWorkingDirectory", QJsonValue(srcDir.relativeFilePath(GetProjDirPath())));
+    }
 
     QFile newProjectFile(GetProjFilePath());
     if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
@@ -148,22 +159,28 @@ void DlgNewProject::on_buttonBox_accepted()
         newProjectFile.close();
     }
 
-    QFile newProjectFileForSrc(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % GetProjFileName());
-    if(newProjectFileForSrc.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+    QFile *pNewProjectFileForSrc = nullptr;
+    if(ui->chkCreateProjectDir->isChecked())
+        pNewProjectFileForSrc = new QFile(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % ui->txtTitleName->text() % "/" % GetProjFileName());
+    else
+        pNewProjectFileForSrc = new QFile(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % GetProjFileName());
+
+    if(pNewProjectFileForSrc->open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
     {
        HyGuiLog("Couldn't open new project file for writing", LOGTYPE_Error);
     }
     else
     {
         QJsonDocument newProjectDoc(jsonObjForSrc);
-        qint64 iBytesWritten = newProjectFileForSrc.write(newProjectDoc.toJson());
+        qint64 iBytesWritten = pNewProjectFileForSrc->write(newProjectDoc.toJson());
         if(0 == iBytesWritten || -1 == iBytesWritten)
         {
-            HyGuiLog("Could not write new project file: " % newProjectFileForSrc.errorString(), LOGTYPE_Error);
+            HyGuiLog("Could not write new project file: " % pNewProjectFileForSrc->errorString(), LOGTYPE_Error);
         }
 
-        newProjectFileForSrc.close();
+        pNewProjectFileForSrc->close();
     }
+    delete pNewProjectFileForSrc;
     
     /////////////////////////////////////////////////////////////////////////////////////////////////
     QList<QDir> templateDirList;
@@ -199,12 +216,20 @@ void DlgNewProject::on_buttonBox_accepted()
     {
         QFileInfoList templateContentsList = templateDirList[iTemplateIndex].entryInfoList();
         for(int i = 0; i < templateContentsList.size(); ++i)
-            QFile::copy(templateContentsList[i].absoluteFilePath(), projDir.absoluteFilePath(templateContentsList[i].fileName()));
+        {
+            if(ui->chkCreateProjectDir->isChecked() && templateContentsList[i].suffix().toLower() == "sln")
+                QFile::copy(templateContentsList[i].absoluteFilePath(), slnDir.absoluteFilePath(templateContentsList[i].fileName()));
+            else // Everything goes in the projDir when chkCreateProjectDir isn't checked
+                QFile::copy(templateContentsList[i].absoluteFilePath(), projDir.absoluteFilePath(templateContentsList[i].fileName()));
+        }
 
         // Convert the template to use the desired game name
         //
         // Rename the files themselves
         QFileInfoList srcFileList = projDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+        if(ui->chkCreateProjectDir->isChecked())
+            srcFileList += slnDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+
         for(int i = 0; i < srcFileList.size(); ++i)
         {
             if(srcFileList[i].fileName().contains("HyTitle"))
@@ -226,6 +251,9 @@ void DlgNewProject::on_buttonBox_accepted()
         // Then replace the contents
         QUuid projGUID = QUuid::createUuid();
         srcFileList = projDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+        if(ui->chkCreateProjectDir->isChecked())
+            srcFileList += slnDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+
         QTextCodec *pCodec = QTextCodec::codecForLocale();
         for(int i = 0; i < srcFileList.size(); ++i)
         {

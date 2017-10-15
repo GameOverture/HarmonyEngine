@@ -592,7 +592,7 @@
   <customwidget>
    <class>SpriteTableView</class>
    <extends>QTableView</extends>
-   <header>SpriteModelView.h</header>
+   <header>SpriteTableView.h</header>
   </customwidget>
  </customwidgets>
  <resources>

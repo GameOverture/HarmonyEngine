@@ -42,7 +42,8 @@ QMap<QString, QJsonValue> DlgProjectSettings::sm_DefaultValues;
 
 DlgProjectSettings::DlgProjectSettings(const QString sProjectFilePath, QWidget *parent) :   QDialog(parent),
                                                                                             ui(new Ui::DlgProjectSettings),
-                                                                                            m_sPROJ_SETTINGS_FILE_PATH(sProjectFilePath)
+                                                                                            m_sPROJ_SETTINGS_FILE_PATH(sProjectFilePath),
+                                                                                            m_bHasError(false)
 {
     ui->setupUi(this);
 
@@ -50,15 +51,35 @@ DlgProjectSettings::DlgProjectSettings(const QString sProjectFilePath, QWidget *
     if(projFile.exists())
     {
         if(!projFile.open(QIODevice::ReadOnly))
-            HyGuiLog("DlgProjectSettings::DlgProjectSettings() could not open " % m_sPROJ_SETTINGS_FILE_PATH % ": " % projFile.errorString(), LOGTYPE_Error);
+        {
+            HyGuiLog("DlgProjectSettings::DlgProjectSettings() could not open\n" % m_sPROJ_SETTINGS_FILE_PATH % ": " % projFile.errorString(), LOGTYPE_Error);
+            m_bHasError = true;
+        }
     }
     else
-        HyGuiLog("DlgProjectSettings::DlgProjectSettings() could not find the project file: " % m_sPROJ_SETTINGS_FILE_PATH, LOGTYPE_Error);
+    {
+        HyGuiLog("DlgProjectSettings::DlgProjectSettings() could not find the project file:\n" % m_sPROJ_SETTINGS_FILE_PATH, LOGTYPE_Error);
+        m_bHasError = true;
+    }
 
     QJsonDocument settingsDoc = QJsonDocument::fromJson(projFile.readAll());
     projFile.close();
-
     m_SettingsObj = settingsDoc.object();
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Determine if the "source" .hyproj was opened, and if so, redirect to the proper .hyproj
+    if(m_SettingsObj.contains("AdjustWorkingDirectory"))
+    {
+        QFileInfo tmpFile(m_sPROJ_SETTINGS_FILE_PATH);
+        QString sAdjustedFilePath(tmpFile.absoluteDir().absoluteFilePath(m_SettingsObj["AdjustWorkingDirectory"].toString()));
+        sAdjustedFilePath += "/" + tmpFile.fileName();
+        tmpFile.setFile(sAdjustedFilePath);
+
+        HyGuiLog("Wrong .hyproj specified. Don't use the .hyproj located in the source directory. Instead use the .hyproj found here:\n" % tmpFile.absoluteFilePath(), LOGTYPE_Warning);
+        m_bHasError = true;
+        return;
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     if(MakeValid(m_SettingsObj) == false)
         SaveSettings();
@@ -72,9 +93,80 @@ DlgProjectSettings::~DlgProjectSettings()
     delete ui;
 }
 
+bool DlgProjectSettings::HasError() const
+{
+    return m_bHasError;
+}
+
 QJsonObject DlgProjectSettings::GetSettingsObj() const
 {
     return m_SettingsObj;
+}
+
+void DlgProjectSettings::SetDefaults()
+{
+    for(auto iter = m_SettingsObj.begin(); iter != m_SettingsObj.end();)
+    {
+        if(iter.key() == "GameName" ||
+           iter.key() == "ClassName" ||
+           iter.key() == "DataPath" ||
+           iter.key() == "MetaDataPath" ||
+           iter.key() == "SourcePath")
+        {
+            ++iter;
+            continue;
+        }
+
+        iter = m_SettingsObj.erase(iter);
+    }
+
+    MakeValid(m_SettingsObj);
+}
+
+void DlgProjectSettings::SaveSettings()
+{
+    QFile settingsFile(m_sPROJ_SETTINGS_FILE_PATH);
+    if(settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+    {
+       HyGuiLog(QString("Couldn't open ") % m_sPROJ_SETTINGS_FILE_PATH % " for writing: " % settingsFile.errorString(), LOGTYPE_Error);
+       m_bHasError = true;
+    }
+    else
+    {
+        QJsonDocument settingsDoc;
+        settingsDoc.setObject(m_SettingsObj);
+        qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
+        if(0 == iBytesWritten || -1 == iBytesWritten)
+        {
+            HyGuiLog(QString("Could not write to ") % m_sPROJ_SETTINGS_FILE_PATH % " file: " % settingsFile.errorString(), LOGTYPE_Error);
+            m_bHasError = true;
+        }
+
+        settingsFile.close();
+    }
+}
+
+void DlgProjectSettings::InitWidgets(QJsonObject &settingsObjRef)
+{
+    ui->txtTitleName->setText(m_SettingsObj["GameName"].toString());
+    ui->txtClassName->setText(m_SettingsObj["ClassName"].toString());
+
+    ui->txtAssetsLocation->setText(m_SettingsObj["DataPath"].toString());
+    ui->txtMetaDataLocation->setText(m_SettingsObj["MetaDataPath"].toString());
+    ui->txtSourceLocation->setText(m_SettingsObj["SourcePath"].toString());
+
+    ui->sbInputMaps->setValue(m_SettingsObj["NumInputMappings"].toInt());
+    ui->sbUpdateFpsCap->setValue(m_SettingsObj["UpdateFpsCap"].toInt());
+    ui->sbPixelsPerMeter->setValue(m_SettingsObj["PixelsPerMeter"].toInt());
+    ui->chkShowCursor->setChecked(m_SettingsObj["ShowCursor"].toBool());
+}
+
+/*virtual*/ int DlgProjectSettings::exec() /*override*/
+{
+    MakeValid(m_SettingsObj);
+    InitWidgets(m_SettingsObj);
+
+    return QDialog::exec();
 }
 
 bool DlgProjectSettings::MakeValid(QJsonObject &settingsObjRef)
@@ -86,6 +178,7 @@ bool DlgProjectSettings::MakeValid(QJsonObject &settingsObjRef)
        settingsObjRef.contains("SourcePath") == false)
     {
         HyGuiLog("DlgProjectSettings::CheckValidity() doesn't have the minimum requirements for a valid settings file", LOGTYPE_Error);
+        m_bHasError = true;
     }
 
     bool bIsValid = true;
@@ -139,66 +232,4 @@ bool DlgProjectSettings::MakeValid(QJsonObject &settingsObjRef)
     }
 
     return bIsValid;
-}
-
-void DlgProjectSettings::SetDefaults()
-{
-    for(auto iter = m_SettingsObj.begin(); iter != m_SettingsObj.end();)
-    {
-        if(iter.key() == "GameName" ||
-           iter.key() == "ClassName" ||
-           iter.key() == "DataPath" ||
-           iter.key() == "MetaDataPath" ||
-           iter.key() == "SourcePath")
-        {
-            ++iter;
-            continue;
-        }
-
-        iter = m_SettingsObj.erase(iter);
-    }
-
-    MakeValid(m_SettingsObj);
-}
-
-void DlgProjectSettings::SaveSettings()
-{
-    QFile settingsFile(m_sPROJ_SETTINGS_FILE_PATH);
-    if(settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
-       HyGuiLog(QString("Couldn't open ") % m_sPROJ_SETTINGS_FILE_PATH % " for writing: " % settingsFile.errorString(), LOGTYPE_Error);
-    }
-    else
-    {
-        QJsonDocument settingsDoc;
-        settingsDoc.setObject(m_SettingsObj);
-        qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
-        if(0 == iBytesWritten || -1 == iBytesWritten) {
-            HyGuiLog(QString("Could not write to ") % m_sPROJ_SETTINGS_FILE_PATH % " file: " % settingsFile.errorString(), LOGTYPE_Error);
-        }
-
-        settingsFile.close();
-    }
-}
-
-void DlgProjectSettings::InitWidgets(QJsonObject &settingsObjRef)
-{
-    ui->txtTitleName->setText(m_SettingsObj["GameName"].toString());
-    ui->txtClassName->setText(m_SettingsObj["ClassName"].toString());
-
-    ui->txtAssetsLocation->setText(m_SettingsObj["DataPath"].toString());
-    ui->txtMetaDataLocation->setText(m_SettingsObj["MetaDataPath"].toString());
-    ui->txtSourceLocation->setText(m_SettingsObj["SourcePath"].toString());
-
-    ui->sbInputMaps->setValue(m_SettingsObj["NumInputMappings"].toInt());
-    ui->sbUpdateFpsCap->setValue(m_SettingsObj["UpdateFpsCap"].toInt());
-    ui->sbPixelsPerMeter->setValue(m_SettingsObj["PixelsPerMeter"].toInt());
-    ui->chkShowCursor->setChecked(m_SettingsObj["ShowCursor"].toBool());
-}
-
-/*virtual*/ int DlgProjectSettings::exec() /*override*/
-{
-    MakeValid(m_SettingsObj);
-    InitWidgets(m_SettingsObj);
-
-    return QDialog::exec();
 }
