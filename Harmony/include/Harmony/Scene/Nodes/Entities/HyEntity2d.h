@@ -70,7 +70,7 @@ protected:
 	virtual void NodeUpdate() override final;
 
 	// Optional user overrides below
-	virtual void OnUpdate() { };
+	virtual void OnUpdate() { }
 	virtual void OnMouseEnter(void *pUserParam) { }
 	virtual void OnMouseLeave(void *pUserParam) { }
 	virtual void OnMouseDown(void *pUserParam) { }

@@ -21,7 +21,7 @@
 
 // NOTE: This class should contain a copy of all the functions/members of IHyLeaf2d. Multiple inheritance is not an option
 class IHyLeafDraw2d : public IHyNodeDraw2d
-{	
+{
 	friend class HyScene;
 	friend class HyAssets;
 	friend class HyShape2d;
