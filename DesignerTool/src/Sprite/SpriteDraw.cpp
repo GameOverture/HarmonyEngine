@@ -1,6 +1,8 @@
 #include "SpriteDraw.h"
 #include "SpriteWidget.h"
 
+#include <QKeyEvent>
+
 SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
                                                                         m_Sprite("", "+GuiPreview", this)
 {
@@ -18,6 +20,8 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
 {
+    if(pEvent->key() == Qt::Key_Left)
+        int asdf =0;
     IDraw::OnKeyPressEvent(pEvent);
 }
 
