@@ -100,7 +100,7 @@ enum MdiArea
     MDI_Managers        = (MDI_AtlasManager | MDI_AudioManager),
     MDI_All             = (MDI_MainWindow | MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties | MDI_Output),
 
-    MDILOAD_Renderer     = (MDI_Explorer | MDI_Managers | MDI_ItemProperties)
+    MDILOAD_Renderer    = MDI_MainWindow//(MDI_Explorer | MDI_Managers | MDI_ItemProperties)
 };
 
 enum SubIcon
