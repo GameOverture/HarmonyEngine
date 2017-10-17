@@ -50,6 +50,8 @@ public:
     void FocusState(int iStateIndex, QVariant subState);
     void UpdateActions();
 
+    void ApplyTransform(QPoint &vTransformAmtRef);
+
 private:
     SpriteStateData *GetCurStateData();
     

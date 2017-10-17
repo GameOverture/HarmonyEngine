@@ -162,6 +162,12 @@ void SpriteWidget::UpdateActions()
     ui->actionRemoveFrames->setEnabled(bFrameIsSelected);
 }
 
+void SpriteWidget::ApplyTransform(QPoint &vTransformAmtRef)
+{
+    QUndoCommand *pCmd = new SpriteUndoCmd_OffsetFrame(ui->framesView, ui->actionApplyToAll->isChecked() ? -1 : ui->framesView->currentIndex().row(), vTransformAmtRef);
+    m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
 SpriteStateData *SpriteWidget::GetCurStateData()
 {
     return static_cast<SpriteStateData *>(static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(ui->cmbStates->currentIndex()));

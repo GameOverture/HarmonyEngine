@@ -8,6 +8,9 @@ class SpriteDraw : public IDraw
 {
     HySprite2d                              m_Sprite;
 
+    QPoint                                  m_vTranslateAmt;
+
+
 public:
     SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
     virtual ~SpriteDraw();

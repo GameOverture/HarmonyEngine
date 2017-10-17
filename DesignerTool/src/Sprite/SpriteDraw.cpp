@@ -1,5 +1,6 @@
 #include "SpriteDraw.h"
 #include "SpriteWidget.h"
+#include "SpriteUndoCmds.h"
 
 #include <QKeyEvent>
 
@@ -20,13 +21,44 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
 {
-    if(pEvent->key() == Qt::Key_Left)
-        int asdf =0;
+    if(m_Sprite.AnimIsPaused())
+    {
+        if(pEvent->key() == Qt::Key_Left)
+            m_vTranslateAmt.setX(m_vTranslateAmt.x() - 1);
+        if(pEvent->key() == Qt::Key_Right)
+            m_vTranslateAmt.setX(m_vTranslateAmt.x() + 1);
+        if(pEvent->key() == Qt::Key_Up)
+            m_vTranslateAmt.setY(m_vTranslateAmt.y() + 1);
+        if(pEvent->key() == Qt::Key_Down)
+            m_vTranslateAmt.setY(m_vTranslateAmt.y() - 1);
+    }
+
     IDraw::OnKeyPressEvent(pEvent);
 }
 
 /*virtual*/ void SpriteDraw::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/
 {
+    if(pEvent->isAutoRepeat() == false &&
+       (pEvent->key() == Qt::Key_Left ||
+        pEvent->key() == Qt::Key_Right ||
+        pEvent->key() == Qt::Key_Up ||
+        pEvent->key() == Qt::Key_Down))
+    {
+        if(pEvent->key() == Qt::Key_Left)
+            HyGuiLog("left released", LOGTYPE_Normal);
+
+        if(pEvent->key() == Qt::Key_Up)
+            HyGuiLog("up released", LOGTYPE_Normal);
+
+        // Submit the pending transform to the model and reset it
+        if(m_pProjItem->GetWidget())
+            static_cast<SpriteWidget *>(m_pProjItem->GetWidget())->ApplyTransform(m_vTranslateAmt);
+
+        m_vTranslateAmt.setX(0);
+        m_vTranslateAmt.setY(0);
+    }
+
+
     IDraw::OnKeyReleaseEvent(pEvent);
 }
 
