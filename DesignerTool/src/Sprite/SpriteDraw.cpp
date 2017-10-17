@@ -128,6 +128,8 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
     
     m_Sprite.AnimSetPause(pWidget->IsPlayingAnim() == false);
 
+    m_Sprite.pos.Set(m_vTranslateAmt.x(), m_vTranslateAmt.y());
+
     // NOTE: Data in sprite may be invalid/null because of GUI usage
     if(m_Sprite.AcquireData() == nullptr)
         return;

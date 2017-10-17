@@ -34,13 +34,13 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class SpriteUndoCmd_OffsetFrame : public QUndoCommand
 {
-    SpriteTableView *     m_pSpriteTableView;
+    SpriteTableView *           m_pSpriteTableView;
     int                         m_iFrameIndex;
     QList<QPoint>               m_OriginalOffsetList;
-    QPoint                      m_vNewOffset;
+    QList<QPoint>               m_vNewOffsetList;
     
 public:
-    SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint vOffset, QUndoCommand *pParent = 0);
+    SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint vOffset, bool bAddOffset, QUndoCommand *pParent = 0);
     virtual ~SpriteUndoCmd_OffsetFrame();
 
     void redo() override;

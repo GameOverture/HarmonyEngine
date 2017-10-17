@@ -70,7 +70,8 @@ public:
     void Remove(AtlasFrame *pFrame);
     void MoveRowUp(int iIndex);
     void MoveRowDown(int iIndex);
-    void OffsetFrame(int iIndex, QPoint vOffset);       // iIndex of -1 will apply to all
+    void SetFrameOffset(int iIndex, QPoint vOffset);    // iIndex of -1 will apply to all
+    void AddFrameOffset(int iIndex, QPoint vOffset);    // iIndex of -1 will apply to all
     void DurationFrame(int iIndex, float fDuration);    // iIndex of -1 will apply to all
 
     QJsonArray GetFramesInfo(float &fTotalDurationRef);

@@ -164,7 +164,7 @@ void SpriteWidget::UpdateActions()
 
 void SpriteWidget::ApplyTransform(QPoint &vTransformAmtRef)
 {
-    QUndoCommand *pCmd = new SpriteUndoCmd_OffsetFrame(ui->framesView, ui->actionApplyToAll->isChecked() ? -1 : ui->framesView->currentIndex().row(), vTransformAmtRef);
+    QUndoCommand *pCmd = new SpriteUndoCmd_OffsetFrame(ui->framesView, ui->actionApplyToAll->isChecked() ? -1 : ui->framesView->currentIndex().row(), vTransformAmtRef, true);
     m_ItemRef.GetUndoStack()->push(pCmd);
 }
 

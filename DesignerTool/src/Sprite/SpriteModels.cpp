@@ -73,7 +73,7 @@ void SpriteFramesModel::MoveRowDown(int iIndex)
 }
 
 // iIndex of -1 will apply to all
-void SpriteFramesModel::OffsetFrame(int iIndex, QPoint vOffset)
+void SpriteFramesModel::SetFrameOffset(int iIndex, QPoint vOffset)
 {
     if(iIndex == -1)
     {
@@ -85,6 +85,23 @@ void SpriteFramesModel::OffsetFrame(int iIndex, QPoint vOffset)
     else
     {
         m_FramesList[iIndex]->m_vOffset = vOffset;
+        dataChanged(createIndex(iIndex, COLUMN_OffsetX), createIndex(iIndex, COLUMN_OffsetY));
+    }
+}
+
+// iIndex of -1 will apply to all
+void SpriteFramesModel::AddFrameOffset(int iIndex, QPoint vOffset)
+{
+    if(iIndex == -1)
+    {
+        for(int i = 0; i < m_FramesList.count(); ++i)
+            m_FramesList[i]->m_vOffset += vOffset;
+
+        dataChanged(createIndex(0, COLUMN_OffsetX), createIndex(m_FramesList.count() - 1, COLUMN_OffsetY));
+    }
+    else
+    {
+        m_FramesList[iIndex]->m_vOffset += vOffset;
         dataChanged(createIndex(iIndex, COLUMN_OffsetX), createIndex(iIndex, COLUMN_OffsetY));
     }
 }
@@ -279,7 +296,7 @@ SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, QJsonObject 
             QPoint vOffset(spriteFrameObj["offsetX"].toInt() - requestedAtlasFramesList[i]->GetCrop().left(),
                            spriteFrameObj["offsetY"].toInt() - ((requestedAtlasFramesList[i]->GetSize().height() - 1) - requestedAtlasFramesList[i]->GetCrop().bottom()));  // -1 on height because it's NOT zero based like everything else
 
-            m_pFramesModel->OffsetFrame(i, vOffset);
+            m_pFramesModel->SetFrameOffset(i, vOffset);
             m_pFramesModel->DurationFrame(i, spriteFrameObj["duration"].toDouble());
         }
     }

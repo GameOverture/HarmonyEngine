@@ -69,10 +69,9 @@ void SpriteUndoCmd_OrderFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SpriteUndoCmd_OffsetFrame::SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint vOffset, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
+SpriteUndoCmd_OffsetFrame::SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint vOffset, bool bAddOffset, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
                                                                                                                                                                         m_pSpriteTableView(pSpriteTableView),
-                                                                                                                                                                        m_iFrameIndex(iIndex),
-                                                                                                                                                                        m_vNewOffset(vOffset)
+                                                                                                                                                                        m_iFrameIndex(iIndex)
 {
 
     
@@ -83,12 +82,16 @@ SpriteUndoCmd_OffsetFrame::SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTab
         setText("Translate Every Frame Offset");
 
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
+        {
             m_OriginalOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_vOffset);
+            m_vNewOffsetList.append(bAddOffset ? pSpriteFramesModel->GetFrameAt(i)->m_vOffset + vOffset : vOffset);
+        }
     }
     else
     {
         setText("Translate Frame Offset");
         m_OriginalOffsetList.append(pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_vOffset);
+        m_vNewOffsetList.append(bAddOffset ? pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_vOffset + vOffset : vOffset);
     }
 }
 
@@ -103,11 +106,11 @@ void SpriteUndoCmd_OffsetFrame::redo()
     if(m_iFrameIndex == -1)
     {
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
-            pSpriteFramesModel->OffsetFrame(i, m_vNewOffset);
+            pSpriteFramesModel->SetFrameOffset(i, m_vNewOffsetList[i]);
     }
     else
     {
-        pSpriteFramesModel->OffsetFrame(m_iFrameIndex, m_vNewOffset);
+        pSpriteFramesModel->SetFrameOffset(m_iFrameIndex, m_vNewOffsetList[0]);
         m_pSpriteTableView->selectRow(m_iFrameIndex);
     }
 }
@@ -119,11 +122,11 @@ void SpriteUndoCmd_OffsetFrame::undo()
     if(m_iFrameIndex == -1)
     {
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
-            pSpriteFramesModel->OffsetFrame(i, m_OriginalOffsetList[i]);
+            pSpriteFramesModel->SetFrameOffset(i, m_OriginalOffsetList[i]);
     }
     else
     {
-        pSpriteFramesModel->OffsetFrame(m_iFrameIndex, m_OriginalOffsetList[0]);
+        pSpriteFramesModel->SetFrameOffset(m_iFrameIndex, m_OriginalOffsetList[0]);
         m_pSpriteTableView->selectRow(m_iFrameIndex);
     }
 }
@@ -163,13 +166,13 @@ void SpriteUndoCmd_OffsetXFrame::redo()
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
         {
             QPoint vOffset(m_NewOffsetList[i], m_OriginalOffsetList[i].y());
-            pSpriteFramesModel->OffsetFrame(i, vOffset);
+            pSpriteFramesModel->SetFrameOffset(i, vOffset);
         }
     }
     else
     {
         QPoint vOffset(m_NewOffsetList[0], m_OriginalOffsetList[0].y());
-        pSpriteFramesModel->OffsetFrame(m_iFrameIndex, vOffset);
+        pSpriteFramesModel->SetFrameOffset(m_iFrameIndex, vOffset);
         m_pSpriteTableView->selectRow(m_iFrameIndex);
     }
 }
@@ -181,11 +184,11 @@ void SpriteUndoCmd_OffsetXFrame::undo()
     if(m_iFrameIndex == -1)
     {
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
-            pSpriteFramesModel->OffsetFrame(i, m_OriginalOffsetList[i]);
+            pSpriteFramesModel->SetFrameOffset(i, m_OriginalOffsetList[i]);
     }
     else
     {
-        pSpriteFramesModel->OffsetFrame(m_iFrameIndex, m_OriginalOffsetList[0]);
+        pSpriteFramesModel->SetFrameOffset(m_iFrameIndex, m_OriginalOffsetList[0]);
         m_pSpriteTableView->selectRow(m_iFrameIndex);
     }
 }
@@ -225,13 +228,13 @@ void SpriteUndoCmd_OffsetYFrame::redo()
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
         {
             QPoint vOffset(m_OriginalOffsetList[i].x(), m_NewOffsetList[i]);
-            pSpriteFramesModel->OffsetFrame(i, vOffset);
+            pSpriteFramesModel->SetFrameOffset(i, vOffset);
         }
     }
     else
     {
         QPoint vOffset(m_OriginalOffsetList[0].x(), m_NewOffsetList[0]);
-        pSpriteFramesModel->OffsetFrame(m_iFrameIndex, vOffset);
+        pSpriteFramesModel->SetFrameOffset(m_iFrameIndex, vOffset);
         m_pSpriteTableView->selectRow(m_iFrameIndex);
     }
 }
@@ -243,11 +246,11 @@ void SpriteUndoCmd_OffsetYFrame::undo()
     if(m_iFrameIndex == -1)
     {
         for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
-            pSpriteFramesModel->OffsetFrame(i, m_OriginalOffsetList[i]);
+            pSpriteFramesModel->SetFrameOffset(i, m_OriginalOffsetList[i]);
     }
     else
     {
-        pSpriteFramesModel->OffsetFrame(m_iFrameIndex, m_OriginalOffsetList[0]);
+        pSpriteFramesModel->SetFrameOffset(m_iFrameIndex, m_OriginalOffsetList[0]);
         m_pSpriteTableView->selectRow(m_iFrameIndex);
     }
 }
