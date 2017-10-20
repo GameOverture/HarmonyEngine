@@ -36,6 +36,7 @@ std::string MakeStringProperPath(const char *szPath, const char *szExtension, bo
 			sPath += sExtension;
 	}
 
+	// Get rid of any double slashes
 	size_t uiIndex = 0;
 	while(true)
 	{

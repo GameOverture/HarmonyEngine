@@ -66,6 +66,7 @@ public:
 	static float PixelsPerMeter();
 
 	std::string GameName() const;
+	std::string DataDir() const;
 
 	HyWindow &Window(uint32 uiIndex = 0);
 	uint32 GetNumWindows();
