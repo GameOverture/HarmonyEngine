@@ -81,6 +81,9 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		sProjectDir = ".";
 		sDataDir = projObject.get<jsonxx::String>("DataPath");
 	}
+
+	sProjectDir = MakeStringProperPath(sProjectDir.c_str(), "", true);
+	sDataDir = MakeStringProperPath(sDataDir.c_str(), "", true);
 	
 	sGameName				= projObject.get<jsonxx::String>("GameName");
 	eDefaultCoordinateUnit	= static_cast<HyCoordinateUnit>(static_cast<int32>(projObject.get<jsonxx::Number>("DefaultCoordinateUnit")));
