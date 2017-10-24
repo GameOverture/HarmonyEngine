@@ -126,15 +126,13 @@ void SpriteWidget::FocusState(int iStateIndex, QVariant subState)
         pCurStateData->GetBounceMapper()->AddCheckBoxMapping(ui->chkBounce);
 
         // iSubStateIndex represents which row to select
-        if(subState.toInt() >= 0)
+        if(subState.toInt() >= 0 && ui->framesView->model()->rowCount() > 0)
         {
-            if(subState.toInt() >= ui->framesView->model()->rowCount() &&
-               ui->framesView->model()->rowCount() > 0)
-            {
-                ui->framesView->selectRow(0);
-            }
+            int iRowToSelect = subState.toInt();
+            if(iRowToSelect < ui->framesView->model()->rowCount())
+                ui->framesView->selectRow(iRowToSelect);
             else
-                ui->framesView->selectRow(subState.toInt());
+                ui->framesView->selectRow(0);
         }
     }
     
@@ -175,7 +173,9 @@ SpriteStateData *SpriteWidget::GetCurStateData()
 
 void SpriteWidget::on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
 {
-    static_cast<SpriteDraw *>(m_ItemRef.GetDraw())->SetFrame(ui->cmbStates->currentIndex(), ui->framesView->currentIndex().row());
+    if(m_ItemRef.GetDraw())
+        static_cast<SpriteDraw *>(m_ItemRef.GetDraw())->SetFrame(ui->cmbStates->currentIndex(), ui->framesView->currentIndex().row());
+
     UpdateActions();
 }
 
@@ -217,7 +217,7 @@ void SpriteWidget::on_actionOrderStateForwards_triggered()
 
 void SpriteWidget::on_cmbStates_currentIndexChanged(int index)
 {
-    FocusState(index, -1);
+    FocusState(index, 0);
 }
 
 void SpriteWidget::on_actionAlignLeft_triggered()
