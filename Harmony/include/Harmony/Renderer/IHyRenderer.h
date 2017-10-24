@@ -54,9 +54,6 @@ protected:
 	static std::map<int32, IHyShader *>		sm_ShaderMap;
 
 	HyRenderState *							m_pCurRenderState;
-	HyRenderState							m_PrevRenderState;
-	
-	//std::vector<HyRenderSurface>			m_RenderSurfaceList;
 
 	uint32									m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
 
@@ -95,9 +92,6 @@ public:
 	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
-
-	//uint32 GetNumRenderSurfaces();
-	//std::vector<HyRenderSurface> &GetRenderSurfaceList();
 
 	// 2D buffer accessors
 	uint32 GetNumCameras2d();

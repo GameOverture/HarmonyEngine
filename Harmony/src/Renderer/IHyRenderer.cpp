@@ -72,16 +72,6 @@ uint32 IHyRenderer::GetNumWindows()
 	m_pCurWindow = m_WindowListRef[uiIndex];
 }
 
-//uint32 IHyRenderer::GetNumRenderSurfaces()
-//{
-//	return static_cast<uint32>(m_RenderSurfaceList.size());
-//}
-//
-//std::vector<HyRenderSurface> &IHyRenderer::GetRenderSurfaceList()
-//{
-//	return m_RenderSurfaceList;
-//}
-
 uint32 IHyRenderer::GetNumCameras2d()
 {
 	return *(reinterpret_cast<uint32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras2d));
@@ -218,12 +208,14 @@ void IHyRenderer::Draw2d()
 	// Each render state will require its own draw. The order of these render states should be 
 	// depth sorted with render states batched together to reduce state changes.
 	m_pCurRenderState = GetRenderStatesPtr2d();
-	memset(&m_PrevRenderState, 0, sizeof(HyRenderState));
 
 	m_uiNumRenderStates = GetNumRenderStates2d();
 	for(uint32 i = 0; i < m_uiNumRenderStates; ++i, ++m_pCurRenderState)
 	{
-		DrawRenderState_2d(*m_pCurRenderState);
-		m_PrevRenderState = *m_pCurRenderState;
+		if(m_pCurRenderState->IsUsingCameraCoordinates() ||
+		   m_pCurRenderState->GetAssignedWindow() == m_pCurWindow->GetIndex())
+		{
+			DrawRenderState_2d(*m_pCurRenderState);
+		}
 	}
 }
