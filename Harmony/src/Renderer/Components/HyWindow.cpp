@@ -32,7 +32,7 @@
 	}
 #endif
 
-HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, HyWindowHandle hSharedContext) : m_uiINDEX(uiIndex)
+HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext) : m_uiINDEX(uiIndex)
 {
 	m_Info = windowInfoRef;
 	m_vFramebufferSize = m_Info.vSize;
@@ -78,6 +78,10 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, HyWindowHa
 
 	glfwSetWindowUserPointer(m_hData, this);
 	glfwSetWindowPos(m_hData, m_Info.ptLocation.x, m_Info.ptLocation.y);
+
+	if(bShowCursor == false)
+		glfwSetInputMode(m_hData, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	glfwShowWindow(m_hData);
 
 	// Set callbacks

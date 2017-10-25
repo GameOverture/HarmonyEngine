@@ -32,7 +32,7 @@ protected:
 	GLenum						m_eDrawMode;
 
 public:
-	HyOpenGL(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
+	HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~HyOpenGL(void);
 
 	void GenVAOs(HyOpenGLShader *pShaderKey);

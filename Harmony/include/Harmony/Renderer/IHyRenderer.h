@@ -41,7 +41,6 @@ public:
 
 protected:
 	HyDiagnostics &							m_DiagnosticsRef;
-	bool									m_bShowCursor;
 	std::vector<HyWindow *> &				m_WindowListRef;
 	HyWindow *								m_pCurWindow;
 
@@ -61,7 +60,7 @@ protected:
 	uint32									m_uiNumRenderStates;
 
 public:
-	IHyRenderer(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef);
+	IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
 	char *GetDrawBuffer();

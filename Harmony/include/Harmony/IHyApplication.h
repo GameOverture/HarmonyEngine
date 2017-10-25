@@ -67,6 +67,7 @@ public:
 
 	std::string GameName() const;
 	std::string DataDir() const;
+	bool IsShowCursor() const;
 
 	HyWindow &Window(uint32 uiIndex = 0);
 	uint32 GetNumWindows();

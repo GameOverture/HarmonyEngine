@@ -16,11 +16,10 @@
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
 int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 
-IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
-																													m_bShowCursor(bShowCursor),
-																													m_WindowListRef(windowListRef),
-																													m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8),
-																													m_uiNumRenderStates(0)
+IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
+																									m_WindowListRef(windowListRef),
+																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8),
+																									m_uiNumRenderStates(0)
 {
 	m_pDrawBuffer = HY_NEW char[HY_GFX_BUFFER_SIZE];
 	memset(m_pDrawBuffer, 0, HY_GFX_BUFFER_SIZE);

@@ -26,10 +26,10 @@ class HyWindow
 	std::vector<HyCamera2d *>				m_Cams2dList;
 	std::vector<HyCamera3d *>				m_Cams3dList;
 
-	HyWindowHandle			m_hData;
+	HyWindowHandle							m_hData;
 
 public:
-	HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, HyWindowHandle hSharedContext);
+	HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext);
 	~HyWindow(void);
 
 	uint32							GetIndex() const;

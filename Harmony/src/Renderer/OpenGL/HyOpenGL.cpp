@@ -12,8 +12,8 @@
 #include "Renderer/Components/HyWindow.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, bool bShowCursor, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(diagnosticsRef, bShowCursor, windowListRef),
-																												m_mtxView(1.0f)
+HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(diagnosticsRef, windowListRef),
+																							m_mtxView(1.0f)
 {
 	HyLog("OpenGL is initializing...");
 
