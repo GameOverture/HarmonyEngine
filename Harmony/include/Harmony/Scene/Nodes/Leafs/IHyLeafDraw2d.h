@@ -84,6 +84,8 @@ protected:
 
 	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
+	virtual void _UseCameraCoordinates() override;
+	virtual void _UseWindowCoordinates(uint32 uiWindowIndex) override;
 
 	IHyNodeData *UncheckedGetData();
 	const HyRenderState &GetRenderState() const;

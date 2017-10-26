@@ -110,6 +110,18 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	}
 }
 
+/*virtual*/ void HyEntity2d::UseCameraCoordinates() /*override*/
+{
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->_UseCameraCoordinates();
+}
+
+/*virtual*/ void HyEntity2d::UseWindowCoordinates(uint32 uiWindowIndex /*= 0*/) /*override*/
+{
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->_UseWindowCoordinates(uiWindowIndex);
+}
+
 void HyEntity2d::ChildAppend(IHyNode2d &childInst)
 {
 	childInst.ParentDetach();
@@ -401,4 +413,14 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	}
 
 	return iOrderValue;
+}
+
+/*virtual*/ void HyEntity2d::_UseCameraCoordinates() /*override*/
+{
+	UseCameraCoordinates();
+}
+
+/*virtual*/ void HyEntity2d::_UseWindowCoordinates(uint32 uiWindowIndex) /*override*/
+{
+	UseWindowCoordinates(uiWindowIndex);
 }

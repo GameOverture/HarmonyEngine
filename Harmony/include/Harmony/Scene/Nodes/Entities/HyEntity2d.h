@@ -47,6 +47,8 @@ public:
 	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren = true);
 	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren = true);
 	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren = true);
+	void UseCameraCoordinates();
+	void UseWindowCoordinates(uint32 uiWindowIndex = 0);
 
 	void ChildAppend(IHyNode2d &childRef);
 	virtual bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef);
@@ -83,6 +85,8 @@ protected:
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override;
 	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
+	virtual void _UseCameraCoordinates() override;
+	virtual void _UseWindowCoordinates(uint32 uiWindowIndex) override;
 
 	virtual void SetNewChildAttributes(IHyNode2d &childInst);
 };

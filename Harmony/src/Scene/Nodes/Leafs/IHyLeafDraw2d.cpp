@@ -257,6 +257,16 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 	return iOrderValue;
 }
 
+/*virtual*/ void IHyLeafDraw2d::_UseCameraCoordinates() /*override*/
+{
+	UseCameraCoordinates();
+}
+
+/*virtual*/ void IHyLeafDraw2d::_UseWindowCoordinates(uint32 uiWindowIndex) /*override*/
+{
+	UseWindowCoordinates(uiWindowIndex);
+}
+
 IHyNodeData *IHyLeafDraw2d::UncheckedGetData()
 {
 	return m_pData;
