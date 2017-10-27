@@ -71,7 +71,7 @@ HyGuiRenderer::~HyGuiRenderer()
     }
     
     // TODO: FIX THIS SHIT
-    //delete m_pHyEngine;
+    delete m_pHyEngine;
     m_pHyEngine = nullptr;
 }
 
