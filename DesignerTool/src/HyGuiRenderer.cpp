@@ -70,7 +70,8 @@ HyGuiRenderer::~HyGuiRenderer()
         m_pHyEngine->Shutdown();
     }
     
-    delete m_pHyEngine;
+    // TODO: FIX THIS SHIT
+    //delete m_pHyEngine;
     m_pHyEngine = nullptr;
 }
 
