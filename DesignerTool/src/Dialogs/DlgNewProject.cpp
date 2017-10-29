@@ -186,7 +186,7 @@ void DlgNewProject::on_buttonBox_accepted()
     QList<QDir> templateDirList;
     if(ui->chkVs2013->isChecked())
     {
-        QDir templateDir(MainWindow::EngineLocation() % "templates");
+        QDir templateDir(MainWindow::EngineSrcLocation() % "templates");
         templateDir.cd("vs2013");
 
         templateDirList.append(templateDir);
@@ -194,7 +194,7 @@ void DlgNewProject::on_buttonBox_accepted()
 
     if(ui->chkVs2015->isChecked())
     {
-        QDir templateDir(MainWindow::EngineLocation() % "templates");
+        QDir templateDir(MainWindow::EngineSrcLocation() % "templates");
         templateDir.cd("vs2015");
 
         templateDirList.append(templateDir);
@@ -202,13 +202,13 @@ void DlgNewProject::on_buttonBox_accepted()
 
     if(ui->chkVs2017->isChecked())
     {
-        QDir templateDir(MainWindow::EngineLocation() % "templates");
+        QDir templateDir(MainWindow::EngineSrcLocation() % "templates");
         templateDir.cd("vs2017");
 
         templateDirList.append(templateDir);
     }
 
-    QDir templateDir(MainWindow::EngineLocation() % "templates");
+    QDir templateDir(MainWindow::EngineSrcLocation() % "templates");
     templateDir.cd("common");
     templateDirList.append(templateDir);
     
@@ -272,8 +272,8 @@ void DlgNewProject::on_buttonBox_accepted()
             sContents.replace("[HyTitle]", ui->txtTitleName->text());
             sContents.replace("HyTemplate", ui->txtClassName->text());
             sContents.replace("HyProjGUID", projGUID.toString());
-            sContents.replace("[HyHarmonyProjLocation]", srcFileList[i].dir().relativeFilePath(MainWindow::EngineLocation()) % "/");
-            sContents.replace("HyHarmonyInclude", srcFileList[i].dir().relativeFilePath(MainWindow::EngineLocation() % "include"));
+            sContents.replace("[HyHarmonyProjLocation]", srcFileList[i].dir().relativeFilePath(MainWindow::EngineSrcLocation()) % "/");
+            sContents.replace("HyHarmonyInclude", srcFileList[i].dir().relativeFilePath(MainWindow::EngineSrcLocation() % "include"));
             sContents.replace("HyWorkingDirectory", projDir.relativeFilePath(GetProjDirPath()) % "/");
 
             if(!file.open(QFile::WriteOnly))

@@ -33,8 +33,6 @@
 
 class HyEngine
 {
-	friend class HyGuiRenderer;	// lol
-
 	static HyEngine *			sm_pInstance;
 
 	// The order of these member declarations matter
@@ -53,7 +51,9 @@ class HyEngine
 // If HY_PLATFORM_GUI, make this ctor public as gui tool requires special usage.
 #ifdef HY_PLATFORM_GUI
 public:
+	static HyEngine *GuiCreate(IHyApplication *pProject);
 #endif
+
 	// Otherwise, private ctor invoked from RunGame(), once.
 	HyEngine(IHyApplication &gameRef);
 

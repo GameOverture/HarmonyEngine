@@ -7,19 +7,18 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "HyGuiDebugger.h"
+#include "HarmonyConnection.h"
 
 #include "Global.h"
 #include "Harmony/HyEngine.h"
 
 #include <QDateTime>
 
-HyGuiDebugger::HyGuiDebugger(QAction &actionConnectRef, QObject *parent) :  QObject(parent),
-                                                                            m_ActionConnectRef(actionConnectRef),
-                                                                            m_Socket(this),
-                                                                            m_Address(QHostAddress::LocalHost),
-                                                                            m_uiPort(1313),
-                                                                            m_uiPacketSize(0)
+HarmonyConnection::HarmonyConnection(QObject *parent) : QObject(parent),
+                                                        m_Socket(this),
+                                                        m_Address(QHostAddress::LocalHost),
+                                                        m_uiPort(1313),
+                                                        m_uiPacketSize(0)
 {
     //m_Socket.connect(
     //connect(m_pTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
@@ -29,7 +28,7 @@ HyGuiDebugger::HyGuiDebugger(QAction &actionConnectRef, QObject *parent) :  QObj
     connect(&m_Socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnError(QAbstractSocket::SocketError)));
 }
 
-void HyGuiDebugger::Connect()
+void HarmonyConnection::Connect()
 {
     if(m_Socket.isOpen())
     {
@@ -42,7 +41,7 @@ void HyGuiDebugger::Connect()
     m_Socket.connectToHost(m_Address, m_uiPort);
 }
 
-void HyGuiDebugger::Write(eHyPacketType eType, quint32 uiSize, void *pData)
+void HarmonyConnection::Write(eHyPacketType eType, quint32 uiSize, void *pData)
 {
     QByteArray packetData;
     
@@ -57,7 +56,7 @@ void HyGuiDebugger::Write(eHyPacketType eType, quint32 uiSize, void *pData)
     m_Socket.write(packetData);
 }
 
-void HyGuiDebugger::WriteReloadPacket(QStringList &sPaths)
+void HarmonyConnection::WriteReloadPacket(QStringList &sPaths)
 {
     if(m_Socket.isOpen() == false)
         return;
@@ -78,12 +77,12 @@ void HyGuiDebugger::WriteReloadPacket(QStringList &sPaths)
     Write(HYPACKET_ReloadEnd, 4, &id);
 }
 
-void HyGuiDebugger::OnHostFound()
+void HarmonyConnection::OnHostFound()
 {
     HyGuiLog("Host lookup has succeeded", LOGTYPE_Normal);
 }
 
-void HyGuiDebugger::ReadData()
+void HarmonyConnection::ReadData()
 {
     QDataStream in(&m_Socket);
     in.setVersion(QDataStream::Qt_4_0);
@@ -142,7 +141,7 @@ void HyGuiDebugger::ReadData()
 //    getFortuneButton->setEnabled(true);
 }
 
-void HyGuiDebugger::OnError(QAbstractSocket::SocketError socketError)
+void HarmonyConnection::OnError(QAbstractSocket::SocketError socketError)
 {
     switch (socketError)
     {
@@ -162,6 +161,4 @@ void HyGuiDebugger::OnError(QAbstractSocket::SocketError socketError)
         HyGuiLog("Debugger Socket Error: " % m_Socket.errorString(), LOGTYPE_Error);
         break;
     }
-    
-    m_ActionConnectRef.setChecked(false);
 }

@@ -16,12 +16,14 @@
 #include "AtlasModel.h"
 #include "ExplorerTreeItem.h"
 #include "DlgProjectSettings.h"
+
 #include <QQueue>
 #include <QJsonObject>
 
 // Forward declaration
 class AtlasWidget;
 class AudioWidgetManager;
+class Harmony;
 
 class AtlasTreeItem;
 
@@ -42,7 +44,7 @@ class Project : public ExplorerTreeItem, public IHyApplication
 {
     Q_OBJECT
 
-    ExplorerWidget *                                 m_pWidget;
+    ExplorerWidget *                                m_pWidget;
     ProjectDraw *                                   m_pDraw;
     DlgProjectSettings                              m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
 
@@ -88,18 +90,9 @@ public:
     ExplorerWidget *GetExplorerWidget();
     ProjectItem *GetCurrentOpenItem();
 
-    void OpenItem(ProjectItem *pItem);
-
-    // IHyApplication overrides
-    virtual bool Initialize();
-    virtual bool Update();
-    virtual void Shutdown();
-
     void SetRenderSize(int iWidth, int iHeight);
     
     void OnHarmonyLoaded();
-
-    void ApplySaveEnables();
 
     void SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal);
     void SaveGameData();
@@ -110,6 +103,18 @@ public:
     QJsonObject GetSubDirObj(HyGuiItemType eType);
 
     bool CloseAllTabs();
+
+
+
+    void OpenItem(ProjectItem *pItem);
+
+    void ApplySaveEnables();
+    void ReloadHarmony();
+
+    // IHyApplication overrides
+    virtual bool Initialize();
+    virtual bool Update();
+    virtual void Shutdown();
 
 public Q_SLOTS:
     void OnTabBarCurrentChanged(int iIndex);

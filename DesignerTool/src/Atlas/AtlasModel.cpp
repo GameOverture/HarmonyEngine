@@ -1135,7 +1135,7 @@ void AtlasModel::Refresh()
     // REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)
     SaveData();
 
-    MainWindow::ReloadHarmony();
+    m_pProjOwner->ReloadHarmony();
 
 //    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
 //    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());

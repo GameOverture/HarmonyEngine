@@ -11,10 +11,18 @@
 
 #include <stdio.h>
 
-HyEngine *		HyEngine::sm_pInstance = NULL;
+HyEngine *		HyEngine::sm_pInstance = nullptr;
 
 #ifdef HY_PLATFORM_GUI
 	#define HyThrottleUpdate
+
+/*static*/ HyEngine *HyEngine::GuiCreate(IHyApplication *pProject)
+{
+	if(pProject == nullptr || sm_pInstance != nullptr)
+		return nullptr;
+
+	sm_pInstance = new HyEngine(*pProject);
+}
 #else
 	#define HyThrottleUpdate while(m_Time.ThrottleUpdate())
 #endif
@@ -30,7 +38,7 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Renderer(m_Diagnostics, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList)
 {
-	HyAssert(sm_pInstance == NULL, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
+	HyAssert(sm_pInstance == nullptr, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 }
 
 HyEngine::~HyEngine()

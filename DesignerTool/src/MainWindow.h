@@ -7,8 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HYGUI_H
-#define HYGUI_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include "Project.h"
 
 #include <QMainWindow>
 #include <QSettings>
@@ -16,33 +18,29 @@
 #include <QStackedWidget>
 #include <QThread>
 
-#include "Project.h"
-#include "HyGuiDebugger.h"
-
-#include "_Dependencies/QtWaitingSpinner/waitingspinnerwidget.h"
 
 namespace Ui {
 class MainWindow;
 }
 
-class HyGuiRenderer;
+class Harmony;
 
-class SwitchRendererThread : public QThread
-{
-    Q_OBJECT
+//class SwitchRendererThread : public QThread
+//{
+//    Q_OBJECT
 
-    HyGuiRenderer *m_pCurrentRenderer;
+//    HyGuiRenderer *m_pCurrentRenderer;
 
-public:
-    SwitchRendererThread(HyGuiRenderer *pCurrentRenderer, QObject *pParent) :   QThread(pParent),
-                                                                                m_pCurrentRenderer(pCurrentRenderer)
-    { }
+//public:
+//    SwitchRendererThread(HyGuiRenderer *pCurrentRenderer, QObject *pParent) :   QThread(pParent),
+//                                                                                m_pCurrentRenderer(pCurrentRenderer)
+//    { }
 
-    virtual void run() override;
+//    virtual void run() override;
 
-Q_SIGNALS:
-      void SwitchIsReady(HyGuiRenderer *pRenderer);
-};
+//Q_SIGNALS:
+//      void SwitchIsReady(HyGuiRenderer *pRenderer);
+//};
 
 class MainWindow : public QMainWindow
 {
@@ -50,48 +48,38 @@ class MainWindow : public QMainWindow
 
     static MainWindow *     sm_pInstance;
 
-    WaitingSpinnerWidget *  m_pLoadingSpinners[NUM_MDI];
-    uint                    m_uiLoadingSpinnerRefCounts[NUM_MDI];
+    Harmony *               m_Harmony;
 
     QSettings               m_Settings;
     QString                 m_sEngineLocation;
     QString                 m_sDefaultProjectLocation;
 
-    bool                    m_bIsInitialized;
+    bool                    m_bIsInitialized;   // TODO: Get rid of this
 
     Project *               m_pCurSelectedProj;
-    HyGuiRenderer *         m_pCurRenderer;
-
-    HyGuiDebugger *         m_pDebugConnection;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void SetSelectedProj(Project *pProj);
+
     void showEvent(QShowEvent *pEvent);
 
     static MainWindow *GetInstance();   // Should only be used to set QWidget parents
     
-    static QString EngineLocation();
-    
+    static QString EngineSrcLocation();
+
+//    static void StartLoading(uint uiAreaFlags);
+//    static void StopLoading(uint uiAreaFlags);
+
+    static void PasteItemSrc(QByteArray sSrc, Project *pProject);
+
+    static void ApplySaveEnables(bool bCurItemDirty, bool bAnyItemDirty);
     static void OpenItem(ProjectItem *pItem);
     static void CloseItem(ProjectItem *pItem);
 
-    static void SetSaveEnabled(bool bCurItemDirty, bool bAnyItemDirty);
-    
-    static void SetSelectedProj(Project *pProj);
-    static void SetSelectedProjWidgets(Project *pProj);
-    static void ReloadHarmony();
-
-    static void StartLoading(uint uiAreaFlags);
-    static void StopLoading(uint uiAreaFlags);
-
-    static void PasteItemSrc(QByteArray sSrc, Project *pProject);
-    
-    static HyGuiRenderer *GetCurrentRenderer();
-
 private Q_SLOTS:
-
     void OnCtrlTab();
 
     void on_actionNewProject_triggered();
@@ -137,4 +125,4 @@ private:
     void SaveSettings();
 };
 
-#endif // HYGUI_H
+#endif // MAINWINDOW_H

@@ -11,6 +11,7 @@
 #include "ui_MainWindow.h"
 
 #include "Global.h"
+#include "Harmony.h"
 #include "DlgSetEngineLocation.h"
 #include "DlgNewProject.h"
 #include "DlgNewItem.h"
@@ -19,7 +20,6 @@
 #include "ExplorerWidget.h"
 #include "AtlasWidget.h"
 #include "AudioWidgetManager.h"
-#include "HyGuiRenderer.h"
 
 #include <QFileDialog>
 #include <QShowEvent>
@@ -34,20 +34,19 @@
 
 /*static*/ MainWindow * MainWindow::sm_pInstance = NULL;
 
-/*virtual*/ void SwitchRendererThread::run() /*override*/
-{
-    while(m_pCurrentRenderer && m_pCurrentRenderer->IsLoading())
-    { }
+///*virtual*/ void SwitchRendererThread::run() /*override*/
+//{
+//    while(m_pCurrentRenderer && m_pCurrentRenderer->IsLoading())
+//    { }
 
-    Q_EMIT SwitchIsReady(m_pCurrentRenderer);
-}
+//    Q_EMIT SwitchIsReady(m_pCurrentRenderer);
+//}
 
 MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
                                             ui(new Ui::MainWindow),
                                             m_Settings("Overture Games", "Harmony Designer Tool"),
                                             m_bIsInitialized(false),
-                                            m_pCurSelectedProj(nullptr),
-                                            m_pCurRenderer(nullptr)
+                                            m_pCurSelectedProj(nullptr)
 {
     ui->setupUi(this);
     sm_pInstance = this;
@@ -55,8 +54,10 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     while(ui->stackedTabWidgets->count())
         ui->stackedTabWidgets->removeWidget(ui->stackedTabWidgets->currentWidget());
 
-    m_pCurRenderer = new HyGuiRenderer(nullptr, this);
-    ui->centralVerticalLayout->addWidget(m_pCurRenderer);
+    m_Harmony = new Harmony(this);
+
+//    m_pCurRenderer = new HyGuiRenderer(nullptr, this);
+//    ui->centralVerticalLayout->addWidget(m_pCurRenderer);
 
     m_pLoadingSpinners[0 /*MDI_MainWindow*/] = new WaitingSpinnerWidget(this, true, true);
     m_pLoadingSpinners[1 /*MDI_Explorer*/] = new WaitingSpinnerWidget(ui->dockWidgetExplorer, true, true);
@@ -115,8 +116,6 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->explorer->addAction(ui->actionRemove);
     ui->explorer->addAction(ui->actionRename);
     ui->explorer->addAction(ui->actionLaunchIDE);
-
-    m_pDebugConnection = new HyGuiDebugger(*ui->actionConnect, this);
     
     ui->dockWidgetAtlas->hide();
     ui->dockWidgetCurrentItem->hide();
@@ -213,6 +212,38 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::SetSelectedProj(Project *pProj)
+{
+    if(m_pCurSelectedProj == pProj)
+        return;
+
+    m_pCurSelectedProj = pProj;
+
+    // Insert the project's TabBar
+    bool bTabsFound = false;
+    for(int i = 0; i < ui->stackedTabWidgets->count(); ++i)
+    {
+        if(ui->stackedTabWidgets->widget(i) == m_pCurSelectedProj->GetTabBar())
+        {
+            ui->stackedTabWidgets->setCurrentIndex(i);
+            bTabsFound = true;
+        }
+    }
+    if(bTabsFound == false)
+    {
+        ui->stackedTabWidgets->addWidget(m_pCurSelectedProj->GetTabBar());
+        ui->stackedTabWidgets->setCurrentWidget(m_pCurSelectedProj->GetTabBar());
+        m_pCurSelectedProj->GetTabBar()->setParent(ui->stackedTabWidgets);
+    }
+
+    // Project manager widgets
+    ui->dockWidgetAtlas->setWidget(m_pCurSelectedProj->GetAtlasWidget());
+    ui->dockWidgetAtlas->widget()->show();
+
+    ui->dockWidgetAudio->setWidget(m_pCurSelectedProj->GetAudioWidget());
+    ui->dockWidgetAudio->widget()->show();
+}
+
 void MainWindow::showEvent(QShowEvent *pEvent)
 {
     QMainWindow::showEvent(pEvent);
@@ -234,24 +265,47 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     return sm_pInstance;
 }
 
-/*static*/ QString MainWindow::EngineLocation()
+/*static*/ QString MainWindow::EngineSrcLocation()
 {
     return sm_pInstance->m_sEngineLocation;
 }
 
+///*static*/ void MainWindow::StartLoading(uint uiAreaFlags)
+//{
+//    for(uint i = 0; i < NUM_MDI; ++i)
+//    {
+//        if((uiAreaFlags & (1 << i)) != 0)
+//            sm_pInstance->m_pLoadingSpinners[i]->start();
+//    }
+//}
+
+///*static*/ void MainWindow::StopLoading(uint uiAreaFlags)
+//{
+//    for(uint i = 0; i < NUM_MDI; ++i)
+//    {
+//        if((uiAreaFlags & (1 << i)) != 0)
+//            sm_pInstance->m_pLoadingSpinners[i]->stop();
+//    }
+//}
+
+/*static*/ void MainWindow::PasteItemSrc(QByteArray sSrc, Project *pProject)
+{
+    sm_pInstance->ui->explorer->PasteItemSrc(sSrc, pProject);
+}
+
+/*static*/ void MainWindow::ApplySaveEnables(bool bCurItemDirty, bool bAnyItemDirty)
+{
+    sm_pInstance->ui->actionSave->setEnabled(bCurItemDirty);
+    sm_pInstance->ui->actionSaveAll->setEnabled(bAnyItemDirty);
+}
+
 /*static*/ void MainWindow::OpenItem(ProjectItem *pItem)
 {
-    if(pItem == nullptr || pItem->GetType() == ITEM_Project)
-        return;
-    
-    Project *pCurProject = sm_pInstance->ui->explorer->GetCurProjSelected();
-    pCurProject->OpenItem(pItem);
-    
     sm_pInstance->ui->explorer->SelectItem(pItem);
 
     // Setup the item properties docking window to be the current item
     QString sWindowTitle = HyGlobal::ItemName(pItem->GetType()) % " Properties";
-    
+
     sm_pInstance->ui->actionViewProperties->setVisible(true);
     sm_pInstance->ui->actionViewProperties->setText(sWindowTitle);
 
@@ -287,99 +341,9 @@ void MainWindow::showEvent(QShowEvent *pEvent)
             sm_pInstance->ui->mainToolBar->removeAction(editActionList[i]);
 
         sm_pInstance->ui->menu_Edit->clear();
-        
+
         pItem->BlockAllWidgetSignals(false);
     }
-}
-
-/*static*/ void MainWindow::SetSaveEnabled(bool bCurItemDirty, bool bAnyItemDirty)
-{
-    sm_pInstance->ui->actionSave->setEnabled(bCurItemDirty);
-    sm_pInstance->ui->actionSaveAll->setEnabled(bAnyItemDirty);
-}
-
-/*static*/ void MainWindow::SetSelectedProj(Project *pProj)
-{
-    if(sm_pInstance->m_pCurSelectedProj == pProj)
-        return;
-
-    sm_pInstance->m_pCurSelectedProj = pProj;
-
-    MainWindow::StartLoading(MDILOAD_Renderer);
-    SwitchRendererThread *pWorkerThread = new SwitchRendererThread(sm_pInstance->m_pCurRenderer, sm_pInstance);
-    connect(pWorkerThread, &SwitchRendererThread::finished, pWorkerThread, &QObject::deleteLater);
-    connect(pWorkerThread, &SwitchRendererThread::SwitchIsReady, sm_pInstance, &MainWindow::OnSwitchRendererReady);
-    pWorkerThread->start();
-
-    // Below will be set when HyEngine is fully loaded
-    sm_pInstance->ui->dockWidgetAtlas->setWidget(nullptr);
-    sm_pInstance->ui->dockWidgetAudio->setWidget(nullptr);
-}
-
-/*static*/ void MainWindow::SetSelectedProjWidgets(Project *pProj)
-{
-    if(sm_pInstance->m_pCurSelectedProj != pProj)
-        HyGuiLog("MainWindow::SetSelectedProjWidgets was passed a project that wasn't the currently selected one", LOGTYPE_Error);
-    
-    // Insert the project's TabBar
-    bool bTabsFound = false;
-    for(int i = 0; i < sm_pInstance->ui->stackedTabWidgets->count(); ++i)
-    {
-        if(sm_pInstance->ui->stackedTabWidgets->widget(i) == sm_pInstance->m_pCurSelectedProj->GetTabBar())
-        {
-            sm_pInstance->ui->stackedTabWidgets->setCurrentIndex(i);
-            bTabsFound = true;
-        }
-    }
-    if(bTabsFound == false)
-    {
-        sm_pInstance->ui->stackedTabWidgets->addWidget(sm_pInstance->m_pCurSelectedProj->GetTabBar());
-        sm_pInstance->ui->stackedTabWidgets->setCurrentWidget(sm_pInstance->m_pCurSelectedProj->GetTabBar());
-        sm_pInstance->m_pCurSelectedProj->GetTabBar()->setParent(sm_pInstance->ui->stackedTabWidgets);
-    }
-    
-    // Project manager widgets
-    sm_pInstance->ui->dockWidgetAtlas->setWidget(sm_pInstance->m_pCurSelectedProj->GetAtlasWidget());
-    sm_pInstance->ui->dockWidgetAtlas->widget()->show();
-    
-    sm_pInstance->ui->dockWidgetAudio->setWidget(sm_pInstance->m_pCurSelectedProj->GetAudioWidget());
-    sm_pInstance->ui->dockWidgetAudio->widget()->show();
-}
-
-/*static*/ void MainWindow::ReloadHarmony()
-{
-    Project *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
-    sm_pInstance->m_pCurSelectedProj = nullptr;    // Set m_pCurSelectedProj to 'nullptr' so SetSelectedProj() doesn't imediately return
-    
-    SetSelectedProj(pCurItemProj);
-}
-
-/*static*/ void MainWindow::StartLoading(uint uiAreaFlags)
-{
-    for(uint i = 0; i < NUM_MDI; ++i)
-    {
-        if((uiAreaFlags & (1 << i)) != 0)
-            sm_pInstance->m_pLoadingSpinners[i]->start();
-    }
-}
-
-/*static*/ void MainWindow::StopLoading(uint uiAreaFlags)
-{
-    for(uint i = 0; i < NUM_MDI; ++i)
-    {
-        if((uiAreaFlags & (1 << i)) != 0)
-            sm_pInstance->m_pLoadingSpinners[i]->stop();
-    }
-}
-
-/*static*/ void MainWindow::PasteItemSrc(QByteArray sSrc, Project *pProject)
-{
-    sm_pInstance->ui->explorer->PasteItemSrc(sSrc, pProject);
-}
-
-/*static*/ HyGuiRenderer *MainWindow::GetCurrentRenderer()
-{
-    return sm_pInstance->m_pCurRenderer;
 }
 
 void MainWindow::OnCtrlTab()

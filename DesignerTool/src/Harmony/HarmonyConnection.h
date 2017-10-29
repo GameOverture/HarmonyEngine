@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HYGUIDEBUGGER_H
-#define HYGUIDEBUGGER_H
+#ifndef HARMONYCONNECTION_H
+#define HARMONYCONNECTION_H
 
 #include <QObject>
 #include <QAction>
@@ -19,11 +19,9 @@
 
 #include "Harmony/HyEngine.h"
 
-class HyGuiDebugger : public QObject
+class HarmonyConnection : public QObject
 {
     Q_OBJECT
-
-    QAction &       m_ActionConnectRef;
 
     QTcpSocket      m_Socket;
 
@@ -34,7 +32,7 @@ class HyGuiDebugger : public QObject
     quint32         m_uiPacketSize;
 
 public:
-    explicit HyGuiDebugger(QAction &actionConnectRef, QObject *parent = 0);
+    explicit HarmonyConnection(QObject *parent = 0);
 
     void Connect();
 
@@ -53,4 +51,4 @@ private Q_SLOTS:
     
 };
 
-#endif // HYGUIDEBUGGER_H
+#endif // HARMONYCONNECTION_H

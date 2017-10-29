@@ -11,8 +11,8 @@
 #include "ProjectItem.h"
 #include "IModel.h"
 #include "MainWindow.h"
-#include "HyGuiRenderer.h"
 #include "Global.h"
+#include "Harmony.h"
 
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -102,7 +102,7 @@ void IDraw::ResizeRenderer()
 {
     if(pEvent->key() == KEY_PanCamera)
     {
-        MainWindow::GetCurrentRenderer()->SetCursor(Qt::OpenHandCursor);
+        Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursor(Qt::OpenHandCursor);
         m_bPanCameraKeyDown = true;
     }
 }
@@ -114,7 +114,7 @@ void IDraw::ResizeRenderer()
         m_bPanCameraKeyDown = false;
 
         if(m_bIsCameraPanning == false)
-            MainWindow::GetCurrentRenderer()->RestoreCursor();
+            Harmony::GetWidget(&m_pProjItem->GetProject())->RestoreCursor();
     }
 }
 
@@ -126,7 +126,7 @@ void IDraw::ResizeRenderer()
         {
             m_bIsCameraPanning = true;
             m_ptOldMousePos = pEvent->localPos();
-            MainWindow::GetCurrentRenderer()->SetCursor(Qt::ClosedHandCursor);
+            Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursor(Qt::ClosedHandCursor);
         }
     }
 }
@@ -139,9 +139,9 @@ void IDraw::ResizeRenderer()
         {
             m_bIsCameraPanning = false;
             if(m_bPanCameraKeyDown)
-                MainWindow::GetCurrentRenderer()->SetCursor(Qt::OpenHandCursor);
+                Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursor(Qt::OpenHandCursor);
             else
-                MainWindow::GetCurrentRenderer()->RestoreCursor();
+                Harmony::GetWidget(&m_pProjItem->GetProject())->RestoreCursor();
         }
     }
 }

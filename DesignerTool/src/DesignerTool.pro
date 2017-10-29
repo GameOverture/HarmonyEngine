@@ -16,8 +16,6 @@ CONFIG += no_keywords
 
 SOURCES += main.cpp \
     MainWindow.cpp \
-    HyGuiRenderer.cpp \
-    HyGuiDebugger.cpp \
     _Dependencies/QtWaitingSpinner/waitingspinnerwidget.cpp \
     _Dependencies/scriptum/imagecrop.cpp \
     _Dependencies/scriptum/imagepacker.cpp \
@@ -79,12 +77,13 @@ SOURCES += main.cpp \
     Sprite/SpriteTableView.cpp \
     Explorer/ExplorerWidget.cpp \
     Explorer/ExplorerTreeWidget.cpp \
-    Explorer/ExplorerTreeItem.cpp
+    Explorer/ExplorerTreeItem.cpp \
+    Harmony/Harmony.cpp \
+    Harmony/HarmonyConnection.cpp \
+    Harmony/HarmonyWidget.cpp
 
 HEADERS  += \
     MainWindow.h \
-    HyGuiRenderer.h \
-    HyGuiDebugger.h \
     _Dependencies/QtWaitingSpinner/waitingspinnerwidget.h \
     _Dependencies/scriptum/imagepacker.h \
     _Dependencies/scriptum/maxrects.h \
@@ -147,7 +146,10 @@ HEADERS  += \
     Widget/WidgetVectorSpinBox.h \
     Sprite/SpriteTableView.h \
     Explorer/ExplorerWidget.h \
-    Explorer/ExplorerTreeItem.h
+    Explorer/ExplorerTreeItem.h \
+    Harmony/Harmony.h \
+    Harmony/HarmonyConnection.h \
+    Harmony/HarmonyWidget.h
 
 FORMS    += \
     MainWindow.ui \
@@ -190,6 +192,7 @@ INCLUDEPATH += "$$PWD/Audio"
 INCLUDEPATH += "$$PWD/Dialogs"
 INCLUDEPATH += "$$PWD/Entity"
 INCLUDEPATH += "$$PWD/Font"
+INCLUDEPATH += "$$PWD/Harmony"
 INCLUDEPATH += "$$PWD/Project"
 INCLUDEPATH += "$$PWD/Sprite"
 INCLUDEPATH += "$$PWD/Widget"

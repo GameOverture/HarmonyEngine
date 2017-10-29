@@ -61,7 +61,7 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProject
         }
 
         ProjectItem *pProjItem = static_cast<ProjectItem *>(pEvent->source());
-        MainWindow::OpenItem(pProjItem);
+        m_pProjectOwner->OpenItem(pProjItem);
 
         pEvent->acceptProposedAction();
     }
@@ -71,7 +71,7 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProject
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) :  ExplorerTreeItem(ITEM_Project, sProjectFilePath),
+Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : ExplorerTreeItem(ITEM_Project, sProjectFilePath),
                                                                                 IHyApplication(g_DefaultInit),
                                                                                 m_pWidget(pProjWidget),
                                                                                 m_pDraw(nullptr),
@@ -248,7 +248,7 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 
     if(bDefaultFontFound == false)
     {
-        QDir templateDataDir(MainWindow::EngineLocation() % "templates/data");
+        QDir templateDataDir(MainWindow::EngineSrcLocation() % "templates/data");
         QFile srcFile(templateDataDir.absoluteFilePath("src.json"));
         if(!srcFile.open(QFile::ReadOnly))
         {
@@ -261,7 +261,7 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
         srcFile.close();
 
         QByteArray sBefore("[HyHarmonyTemplateDataDir]");
-        QByteArray sAfter(QString(MainWindow::EngineLocation() % "templates/data/").toLocal8Bit());
+        QByteArray sAfter(QString(MainWindow::EngineSrcLocation() % "templates/data/").toLocal8Bit());
         sContents.replace(sBefore, sAfter);
         MainWindow::PasteItemSrc(sContents, this);
     }
@@ -365,85 +365,6 @@ ExplorerWidget *Project::GetExplorerWidget()
     return m_pWidget;
 }
 
-void Project::OpenItem(ProjectItem *pItem)
-{
-    if(m_pCurOpenItem && m_pCurOpenItem != pItem)
-        m_pCurOpenItem->DrawHide();
-
-    if(m_pCurOpenItem == pItem)
-        return;
-
-    m_pCurOpenItem = pItem;
-
-    bool bAlreadyLoaded = false;
-    // Search for existing tab
-    for(int i = 0; i < m_pTabBar->count(); ++i)
-    {
-        if(m_pTabBar->tabData(i).value<ProjectItem *>() == m_pCurOpenItem)
-        {
-            bAlreadyLoaded = true;
-
-            m_pTabBar->blockSignals(true);
-            m_pTabBar->setCurrentIndex(i);
-            m_pTabBar->blockSignals(false);
-
-            m_pCurOpenItem->DrawShow();
-            break;
-        }
-    }
-
-    // Add tab, otherwise
-    if(bAlreadyLoaded == false)
-    {
-        m_pCurOpenItem->WidgetLoad();
-        m_pCurOpenItem->DrawLoad(*this);
-
-        m_pTabBar->blockSignals(true);
-        int iIndex = m_pTabBar->addTab(m_pCurOpenItem->GetIcon(m_pCurOpenItem->IsExistencePendingSave() ? SUBICON_New : SUBICON_None), m_pCurOpenItem->GetName(false));
-        QVariant v;
-        v.setValue(m_pCurOpenItem);
-        m_pTabBar->setTabData(iIndex, v);
-        m_pTabBar->setCurrentIndex(iIndex);
-        m_pTabBar->blockSignals(false);
-
-        m_pCurOpenItem->DrawShow();
-    }
-
-    ApplySaveEnables();
-}
-
-// IHyApplication override
-/*virtual*/ bool Project::Initialize()
-{
-    m_pDraw = new ProjectDraw(*this);
-    m_pDraw->Load();
-    return true;
-}
-
-// IHyApplication override
-/*virtual*/ bool Project::Update()
-{
-    if(m_pAtlasWidget)
-        m_pAtlasWidget->DrawUpdate(*this);
-
-    if(m_pTabBar->count() > 0)
-    {
-        m_pDraw->Hide();
-        //m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetUpdate(*this);
-    }
-    else
-        m_pDraw->Show();
-
-    return true;
-}
-
-// IHyApplication override
-/*virtual*/ void Project::Shutdown()
-{
-    delete m_pDraw;
-    m_pDraw = nullptr;
-}
-
 void Project::SetRenderSize(int iWidth, int iHeight)
 {
     Window().SetWindowSize(glm::ivec2(iWidth, iHeight));
@@ -457,7 +378,7 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 
 void Project::OnHarmonyLoaded()
 {
-    // IHyApplication::Initialize() override
+    // This is the IHyApplication::Initialize() override
     Initialize();
 
     m_Init.sGameName = GetName(false).toStdString();
@@ -495,24 +416,6 @@ void Project::OnHarmonyLoaded()
     }
     
     MainWindow::SetSelectedProjWidgets(this);
-}
-
-void Project::ApplySaveEnables()
-{
-    bool bCurItemDirty = false;
-    bool bAnyItemDirty = false;
-    for(int i = 0; i < m_pTabBar->count(); ++i)
-    {
-        ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();
-        if(pItem->IsSaveClean() == false)
-        {
-            bAnyItemDirty = true;
-            if(m_pTabBar->currentIndex() == i)
-                bCurItemDirty = true;
-        }
-    }
-
-    MainWindow::SetSaveEnabled(bCurItemDirty, bAnyItemDirty);
 }
 
 void Project::SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal)
@@ -619,6 +522,116 @@ bool Project::CloseAllTabs()
         OnCloseTab(i);
     
     return m_pTabBar->count() == 0;
+}
+
+void Project::OpenItem(ProjectItem *pItem)
+{
+    if(pItem == nullptr || pItem->GetType() == ITEM_Project)
+        return;
+
+    if(m_pCurOpenItem && m_pCurOpenItem != pItem)
+        m_pCurOpenItem->DrawHide();
+
+    if(m_pCurOpenItem == pItem)
+        return;
+
+    m_pCurOpenItem = pItem;
+
+    bool bAlreadyLoaded = false;
+    // Search for existing tab
+    for(int i = 0; i < m_pTabBar->count(); ++i)
+    {
+        if(m_pTabBar->tabData(i).value<ProjectItem *>() == m_pCurOpenItem)
+        {
+            bAlreadyLoaded = true;
+
+            m_pTabBar->blockSignals(true);
+            m_pTabBar->setCurrentIndex(i);
+            m_pTabBar->blockSignals(false);
+
+            m_pCurOpenItem->DrawShow();
+            break;
+        }
+    }
+
+    // Add tab, otherwise
+    if(bAlreadyLoaded == false)
+    {
+        m_pCurOpenItem->WidgetLoad();
+        m_pCurOpenItem->DrawLoad(*this);
+
+        m_pTabBar->blockSignals(true);
+        int iIndex = m_pTabBar->addTab(m_pCurOpenItem->GetIcon(m_pCurOpenItem->IsExistencePendingSave() ? SUBICON_New : SUBICON_None), m_pCurOpenItem->GetName(false));
+        QVariant v;
+        v.setValue(m_pCurOpenItem);
+        m_pTabBar->setTabData(iIndex, v);
+        m_pTabBar->setCurrentIndex(iIndex);
+        m_pTabBar->blockSignals(false);
+
+        m_pCurOpenItem->DrawShow();
+    }
+
+    ApplySaveEnables();
+    MainWindow::OpenItem(pItem);
+}
+
+void Project::ApplySaveEnables()
+{
+    bool bCurItemDirty = false;
+    bool bAnyItemDirty = false;
+    for(int i = 0; i < m_pTabBar->count(); ++i)
+    {
+        ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();
+        if(pItem->IsSaveClean() == false)
+        {
+            bAnyItemDirty = true;
+            if(m_pTabBar->currentIndex() == i)
+                bCurItemDirty = true;
+        }
+    }
+
+    MainWindow::ApplySaveEnables(bCurItemDirty, bAnyItemDirty);
+}
+
+void Project::ReloadHarmony()
+{
+    // TODO: handle this
+//    Project *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
+//    sm_pInstance->m_pCurSelectedProj = nullptr;    // Set m_pCurSelectedProj to 'nullptr' so SetSelectedProj() doesn't imediately return
+
+//    SetSelectedProj(pCurItemProj);
+}
+
+// IHyApplication override
+/*virtual*/ bool Project::Initialize()
+{
+    m_pDraw = new ProjectDraw(*this);
+    m_pDraw->Load();
+    return true;
+}
+
+// IHyApplication override
+/*virtual*/ bool Project::Update()
+{
+    if(m_pAtlasWidget)
+        m_pAtlasWidget->DrawUpdate(*this);
+
+    if(m_pTabBar->count() > 0)
+    {
+        m_pDraw->Hide();
+        //m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetUpdate(*this);
+    }
+    else
+        m_pDraw->Show();
+
+    return true;
+}
+
+// IHyApplication override
+/*virtual*/ void Project::Shutdown()
+{
+    delete m_pDraw;
+    m_pDraw = nullptr;
 }
 
 void Project::OnTabBarCurrentChanged(int iIndex)
