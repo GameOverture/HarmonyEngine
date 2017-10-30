@@ -282,7 +282,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     if(pItem == nullptr || pItem->GetType() == ITEM_Project)
         return;
 
-    sm_pInstance->pCurProject->OpenTab(pItem);
+    Harmony::GetProject()->OpenTab(pItem);
 
     sm_pInstance->ui->explorer->SelectItem(pItem);
 
@@ -340,7 +340,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
         pItem->BlockAllWidgetSignals(false);
     }
 
-    sm_pInstance->pCurProject->CloseTab(pItem);
+    Harmony::GetProject()->CloseTab(pItem);
 
     if(pItem->IsExistencePendingSave() && pItem->GetTreeItem()->parent() != nullptr)
         pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
@@ -348,11 +348,11 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 void MainWindow::OnCtrlTab()
 {
-    if(pCurProject == nullptr)
-        return;
+//    if(pCurProject == nullptr)
+//        return;
 
-    ProjectTabBar *pTabBar = pCurProject->GetTabBar();
-    //pTabBar
+//    ProjectTabBar *pTabBar = pCurProject->GetTabBar();
+//    //pTabBar
 }
 
 void MainWindow::on_actionNewProject_triggered()
@@ -390,7 +390,10 @@ void MainWindow::on_actionOpenProject_triggered()
 void MainWindow::on_actionCloseProject_triggered()
 {
     Harmony::CloseProject();
-    SetSelectedProj(nullptr);
+
+    ui->dockWidgetAtlas->setWidget(nullptr);
+    ui->dockWidgetAudio->setWidget(nullptr);
+
     ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
 }
 
@@ -421,7 +424,7 @@ void MainWindow::on_actionNewFont_triggered()
 
 void MainWindow::NewItem(HyGuiItemType eItem)
 {
-    DlgNewItem *pDlg = new DlgNewItem(pCurProject, eItem, this);
+    DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, this);
     if(pDlg->exec())
         ui->explorer->AddNewItem(ui->explorer->GetCurProjSelected(), eItem, pDlg->GetPrefix(), pDlg->GetName(), true, QJsonValue());
 
@@ -431,7 +434,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 void MainWindow::closeEvent(QCloseEvent *pEvent)
 {
     // This will ensure that the user has a chance to save all unsaved open documents, or cancel which will abort the close
-    if(pCurProject && pCurProject->CloseAllTabs() == false)
+    if(Harmony::GetProject() && Harmony::GetProject()->CloseAllTabs() == false)
     {
         pEvent->ignore();
         return;
@@ -498,6 +501,7 @@ void MainWindow::on_actionViewProperties_triggered()
 
 void MainWindow::on_actionSave_triggered()
 {
+    Project *pCurProject = Harmony::GetProject();
     if(pCurProject == nullptr)
     {
         HyGuiLog("No valid project is active to save.", LOGTYPE_Error);
@@ -521,6 +525,7 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_actionSaveAll_triggered()
 {
+    Project *pCurProject = Harmony::GetProject();
     if(pCurProject == nullptr)
     {
         HyGuiLog("No valid project is active to save all.", LOGTYPE_Error);

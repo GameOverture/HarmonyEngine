@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "AtlasModel.h"
 
+#include "Harmony.h"
 #include "Project.h"
 #include "AtlasWidget.h"
 #include "MainWindow.h"
@@ -1135,7 +1136,8 @@ void AtlasModel::Refresh()
     // REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)
     SaveData();
 
-    m_pProjOwner->ReloadHarmony();
+    // Reload Harmony
+    Harmony::SetProject(*m_pProjOwner);
 
 //    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
 //    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());

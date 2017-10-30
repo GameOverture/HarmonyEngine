@@ -40,6 +40,12 @@ Harmony::Harmony(MainWindow *pMainWindow) : QObject(pMainWindow),
 //    pWorkerThread->start();
 }
 
+/*static*/ void Harmony::CloseProject()
+{
+    delete sm_pInstance->m_pLoadedWidget;
+    sm_pInstance->m_pLoadedWidget = nullptr;
+}
+
 /*static*/ HarmonyWidget *Harmony::GetWidget(Project &projectRef)
 {
     if(sm_pInstance->m_pLoadedWidget == nullptr || sm_pInstance->m_pLoadedWidget->IsProject(projectRef) == false)

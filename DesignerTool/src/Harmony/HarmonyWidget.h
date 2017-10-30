@@ -10,6 +10,8 @@
 
 class HarmonyWidget : public QOpenGLWidget//, protected QOpenGLFunctions
 {
+    Q_OBJECT
+
     Project &                   m_ProjectRef;
 
     HyEngine *                  m_pHyEngine;

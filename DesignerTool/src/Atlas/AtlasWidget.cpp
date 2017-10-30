@@ -10,6 +10,7 @@
 #include "AtlasWidget.h"
 #include "ui_AtlasWidget.h"
 #include "Global.h"
+#include "Project.h"
 #include "SpriteWidget.h"
 #include "ExplorerTreeItem.h"
 

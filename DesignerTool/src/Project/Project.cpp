@@ -569,15 +569,6 @@ void Project::ApplySaveEnables()
     MainWindow::ApplySaveEnables(bCurItemDirty, bAnyItemDirty);
 }
 
-void Project::ReloadHarmony()
-{
-    // TODO: handle this
-//    Project *pCurItemProj = sm_pInstance->m_pCurSelectedProj;
-//    sm_pInstance->m_pCurSelectedProj = nullptr;    // Set m_pCurSelectedProj to 'nullptr' so SetSelectedProj() doesn't imediately return
-
-//    SetSelectedProj(pCurItemProj);
-}
-
 // IHyApplication override
 /*virtual*/ bool Project::Initialize()
 {

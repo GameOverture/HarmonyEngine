@@ -5,7 +5,8 @@
 #include <QDragEnterEvent>
 
 HarmonyWidget::HarmonyWidget(Project &projectRef) : QOpenGLWidget(nullptr),
-                                                    m_ProjectRef(projectRef)
+                                                    m_ProjectRef(projectRef),
+                                                    m_pHyEngine(nullptr)
 {
     m_pTimer = new QTimer(this);
     connect(m_pTimer, SIGNAL(timeout()), this, SLOT(OnBootCheck()));

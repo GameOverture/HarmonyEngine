@@ -106,7 +106,6 @@ public:
     bool CloseAllTabs();
 
     void ApplySaveEnables();
-    void ReloadHarmony();
 
     // IHyApplication overrides
     virtual bool Initialize();

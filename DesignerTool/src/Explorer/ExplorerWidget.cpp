@@ -12,6 +12,7 @@
 
 #include "Global.h"
 #include "MainWindow.h"
+#include "Harmony.h"
 #include "FontItem.h"
 #include "Project.h"
 #include "ProjectItemMimeData.h"
@@ -553,7 +554,7 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
     ui->actionPasteItem->setEnabled(sm_sInternalClipboard.isEmpty() == false);
     
     if(bValidItem)
-        MainWindow::SetSelectedProj(GetCurProjSelected());
+        Harmony::SetProject(*GetCurProjSelected());
 }
 
 void ExplorerWidget::on_actionRename_triggered()
