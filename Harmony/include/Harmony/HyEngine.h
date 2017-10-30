@@ -52,6 +52,7 @@ class HyEngine
 #ifdef HY_PLATFORM_GUI
 public:
 	static HyEngine *GuiCreate(IHyApplication &projectRef);
+	static void GuiDelete();
 #endif
 
 	// Otherwise, private ctor invoked from RunGame(), once.

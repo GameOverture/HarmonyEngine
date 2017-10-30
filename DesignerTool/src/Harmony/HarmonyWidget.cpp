@@ -6,7 +6,8 @@
 
 HarmonyWidget::HarmonyWidget(Project &projectRef) : QOpenGLWidget(nullptr),
                                                     m_ProjectRef(projectRef),
-                                                    m_pHyEngine(nullptr)
+                                                    m_pHyEngine(nullptr),
+                                                    m_bHarmonyLoaded(false)
 {
     m_pTimer = new QTimer(this);
     connect(m_pTimer, SIGNAL(timeout()), this, SLOT(OnBootCheck()));
@@ -21,16 +22,7 @@ HarmonyWidget::HarmonyWidget(Project &projectRef) : QOpenGLWidget(nullptr),
     m_pTimer->stop();
 
     makeCurrent();
-
-    if(m_pHyEngine)
-    {
-        m_ProjectRef.Shutdown();
-        m_pHyEngine->Shutdown();
-    }
-
-    // TODO: FIX THIS SHIT
-    delete m_pHyEngine;
-    m_pHyEngine = nullptr;
+    HyEngine::GuiDelete();
 }
 
 Project &HarmonyWidget::GetProject()
@@ -89,7 +81,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::paintGL() /*override*/
 {
-    if(m_pHyEngine && m_pHyEngine->IsInitialized())
+    if(m_bHarmonyLoaded)
     {
         if(m_pHyEngine->Update() == false)
             HyGuiLog("Harmony Gfx requested exit program.", LOGTYPE_Info);
@@ -205,5 +197,7 @@ void HarmonyWidget::OnBootCheck()
 
         connect(m_pTimer, SIGNAL(timeout()), this, SLOT(update()));
         m_pTimer->start(10);
+
+        m_bHarmonyLoaded = true;
     }
 }

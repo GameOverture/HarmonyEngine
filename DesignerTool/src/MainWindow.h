@@ -26,6 +26,7 @@ class MainWindow;
 }
 
 class Harmony;
+class HarmonyWidget;
 class Project;
 class ProjectItem;
 
@@ -68,6 +69,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void SetHarmonyWidget(HarmonyWidget *pWidget);
     void SetLoading(QString sMsg);
     void ClearLoading();
 

@@ -28,10 +28,18 @@ Harmony::Harmony(MainWindow *pMainWindow) : QObject(pMainWindow),
 
 /*static*/ void Harmony::SetProject(Project &projectRef)
 {
+    if(sm_pInstance->m_pLoadedWidget &&
+       &sm_pInstance->m_pLoadedWidget->GetProject() == &projectRef)
+    {
+        return;
+    }
+
     // TODO: Thread this
     delete sm_pInstance->m_pLoadedWidget;
     sm_pInstance->m_pLoadedWidget = new HarmonyWidget(projectRef);
+    connect(sm_pInstance->m_pLoadedWidget, &HarmonyWidget::HarmonyWidgetReady, sm_pInstance, &Harmony::HarmonyWidgetReady);
 
+    sm_pInstance->m_pMainWindow->SetHarmonyWidget(sm_pInstance->m_pLoadedWidget);
     sm_pInstance->m_pMainWindow->SetLoading("Loading new Harmony instance");
 
 //    SwitchRendererThread *pWorkerThread = new SwitchRendererThread(sm_pInstance->m_pCurRenderer, sm_pInstance);

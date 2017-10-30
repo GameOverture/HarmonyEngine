@@ -24,6 +24,19 @@ HyEngine *		HyEngine::sm_pInstance = nullptr;
 	sm_pInstance = new HyEngine(projectRef);
 	return sm_pInstance;
 }
+
+/*static*/ void HyEngine::GuiDelete()
+{
+	if(sm_pInstance)
+	{
+		sm_pInstance->m_AppRef.Shutdown();
+		sm_pInstance->Shutdown();
+	}
+
+	delete sm_pInstance;
+	sm_pInstance = nullptr;
+}
+
 #else
 	#define HyThrottleUpdate while(m_Time.ThrottleUpdate())
 #endif
@@ -73,6 +86,8 @@ HyEngine::~HyEngine()
 	sm_pInstance->Shutdown();
 
 	delete sm_pInstance;
+	sm_pInstance = nullptr;
+
 	delete pGame;
 
 	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler)

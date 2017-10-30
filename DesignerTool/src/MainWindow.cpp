@@ -197,6 +197,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::SetHarmonyWidget(HarmonyWidget *pWidget)
+{
+    ui->centralVerticalLayout->addWidget(pWidget);
+}
+
 void MainWindow::SetLoading(QString sMsg)
 {
     m_LoadingMsg.setText(sMsg);

@@ -15,6 +15,8 @@ class HarmonyWidget : public QOpenGLWidget//, protected QOpenGLFunctions
     Project &                   m_ProjectRef;
 
     HyEngine *                  m_pHyEngine;
+    bool                        m_bHarmonyLoaded;
+
     QTimer *                    m_pTimer;
 
 public:
