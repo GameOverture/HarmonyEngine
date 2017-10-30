@@ -10,20 +10,24 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "Project.h"
+#include "Global.h"
+#include "_Dependencies/QtWaitingSpinner/waitingspinnerwidget.h"
 
 #include <QMainWindow>
 #include <QSettings>
 #include <QTcpServer>
 #include <QStackedWidget>
 #include <QThread>
-
+#include <QLabel>
+#include <QProgressBar>
 
 namespace Ui {
 class MainWindow;
 }
 
 class Harmony;
+class Project;
+class ProjectItem;
 
 //class SwitchRendererThread : public QThread
 //{
@@ -56,22 +60,24 @@ class MainWindow : public QMainWindow
 
     bool                    m_bIsInitialized;   // TODO: Get rid of this
 
-    Project *               m_pCurSelectedProj;
+    WaitingSpinnerWidget    m_LoadingSpinner;
+    QLabel                  m_LoadingMsg;
+    QProgressBar            m_LoadingBar;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void SetSelectedProj(Project *pProj);
+    void SetLoading(QString sMsg);
+    void ClearLoading();
+
+    void SetCurrentProject(Project &newCurrentProjectRef);
 
     void showEvent(QShowEvent *pEvent);
 
-    static MainWindow *GetInstance();   // Should only be used to set QWidget parents
+    static MainWindow *GetInstance();   // Should only be used to set QWidget parents // TODO: Check if messageboxes even care about their parent set, if not then remove this
     
     static QString EngineSrcLocation();
-
-//    static void StartLoading(uint uiAreaFlags);
-//    static void StopLoading(uint uiAreaFlags);
 
     static void PasteItemSrc(QByteArray sSrc, Project *pProject);
 
@@ -112,8 +118,6 @@ private Q_SLOTS:
     void on_actionExit_triggered();
 
     void on_actionProjectSettings_triggered();
-
-    void OnSwitchRendererReady(HyGuiRenderer *pRenderer);
 
 private:
     Ui::MainWindow *ui;

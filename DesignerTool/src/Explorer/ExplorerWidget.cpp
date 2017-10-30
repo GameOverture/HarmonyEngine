@@ -74,7 +74,6 @@ Project *ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
     ui->treeWidget->insertTopLevelItem(0, pProjTreeItem);
     ui->treeWidget->expandItem(pProjTreeItem);
     
-    OnProjectLoaded(pNewProject);
     return pNewProject;
 
     // BELOW BREAKS QTABBAR and UNDOSTACK SIGNAL/SLOT CONNECTIONS (I guess because QObject must be created on main thread?.. fucking waste of time)
@@ -415,12 +414,6 @@ QTreeWidgetItem *ExplorerWidget::GetSelectedTreeItem()
         pCurSelected = ui->treeWidget->selectedItems()[0];  // Only single selection is allowed in explorer because two projects may be opened
 
     return pCurSelected;
-}
-
-void ExplorerWidget::OnProjectLoaded(Project *pLoadedProj)
-{
-    //pLoadedProj->moveToThread(QApplication::instance()->thread());
-    MainWindow::StopLoading(MDI_Explorer);
 }
 
 void ExplorerWidget::OnContextMenu(const QPoint &pos)

@@ -10,16 +10,18 @@
 
 class HarmonyWidget : public QOpenGLWidget//, protected QOpenGLFunctions
 {
-    Project *                   m_pProjectOwner;
+    Project &                   m_ProjectRef;
 
     HyEngine *                  m_pHyEngine;
     QTimer *                    m_pTimer;
 
 public:
-    HarmonyWidget(Project *pProject);
+    HarmonyWidget(Project &projectRef);
     virtual ~HarmonyWidget();
 
-    bool IsProject(Project *pProj);
+    Project &GetProject();
+
+    bool IsProject(Project &projectRef);
 
     void SetCursor(Qt::CursorShape eShape);
     void RestoreCursor();
@@ -46,6 +48,9 @@ protected:
 
 private Q_SLOTS:
     void OnBootCheck();
+
+Q_SIGNALS:
+    void HarmonyWidgetReady(HarmonyWidget *pWidget);
 };
 
 #endif // HARMONYWIDGET_H

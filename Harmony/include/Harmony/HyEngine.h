@@ -51,7 +51,7 @@ class HyEngine
 // If HY_PLATFORM_GUI, make this ctor public as gui tool requires special usage.
 #ifdef HY_PLATFORM_GUI
 public:
-	static HyEngine *GuiCreate(IHyApplication *pProject);
+	static HyEngine *GuiCreate(IHyApplication &projectRef);
 #endif
 
 	// Otherwise, private ctor invoked from RunGame(), once.

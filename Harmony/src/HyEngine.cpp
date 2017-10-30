@@ -16,12 +16,13 @@ HyEngine *		HyEngine::sm_pInstance = nullptr;
 #ifdef HY_PLATFORM_GUI
 	#define HyThrottleUpdate
 
-/*static*/ HyEngine *HyEngine::GuiCreate(IHyApplication *pProject)
+/*static*/ HyEngine *HyEngine::GuiCreate(IHyApplication &projectRef)
 {
-	if(pProject == nullptr || sm_pInstance != nullptr)
+	if(sm_pInstance != nullptr)
 		return nullptr;
 
-	sm_pInstance = new HyEngine(*pProject);
+	sm_pInstance = new HyEngine(projectRef);
+	return sm_pInstance;
 }
 #else
 	#define HyThrottleUpdate while(m_Time.ThrottleUpdate())

@@ -12,6 +12,7 @@
 
 #include "Global.h"
 #include "Harmony.h"
+#include "Project.h"
 #include "DlgSetEngineLocation.h"
 #include "DlgNewProject.h"
 #include "DlgNewItem.h"
@@ -46,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
                                             ui(new Ui::MainWindow),
                                             m_Settings("Overture Games", "Harmony Designer Tool"),
                                             m_bIsInitialized(false),
-                                            m_pCurSelectedProj(nullptr)
+                                            m_LoadingSpinner(this)
 {
     ui->setupUi(this);
     sm_pInstance = this;
@@ -56,35 +57,18 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
 
     m_Harmony = new Harmony(this);
 
+    m_LoadingSpinner.setRoundness(50.0);
+    m_LoadingSpinner.setMinimumTrailOpacity(15.0);
+    m_LoadingSpinner.setTrailFadePercentage(70.0);
+    m_LoadingSpinner.setNumberOfLines(20);
+    m_LoadingSpinner.setLineLength(24);
+    m_LoadingSpinner.setLineWidth(4);
+    m_LoadingSpinner.setInnerRadius(12);
+    m_LoadingSpinner.setRevolutionsPerSecond(1.5);
+    m_LoadingSpinner.setColor(QColor(25, 255, 25));
+
 //    m_pCurRenderer = new HyGuiRenderer(nullptr, this);
 //    ui->centralVerticalLayout->addWidget(m_pCurRenderer);
-
-    m_pLoadingSpinners[0 /*MDI_MainWindow*/] = new WaitingSpinnerWidget(this, true, true);
-    m_pLoadingSpinners[1 /*MDI_Explorer*/] = new WaitingSpinnerWidget(ui->dockWidgetExplorer, true, true);
-    m_pLoadingSpinners[2 /*MDI_AtlasManager*/] = new WaitingSpinnerWidget(ui->dockWidgetAtlas, true, true);
-    m_pLoadingSpinners[3 /*MDI_AudioManager*/] = new WaitingSpinnerWidget(ui->dockWidgetAudio, true, true);
-    m_pLoadingSpinners[4 /*MDI_ItemProperties*/] = new WaitingSpinnerWidget(ui->dockWidgetCurrentItem, true, true);
-    m_pLoadingSpinners[5 /*MDI_Output*/] = new WaitingSpinnerWidget(ui->dockWidgetOutputLog, true, true);
-
-    for(uint i = 0; i < NUM_MDI; ++i)
-    {
-        m_pLoadingSpinners[i]->setRoundness(50.0);
-        m_pLoadingSpinners[i]->setMinimumTrailOpacity(15.0);
-        m_pLoadingSpinners[i]->setTrailFadePercentage(70.0);
-        m_pLoadingSpinners[i]->setNumberOfLines(20);
-        m_pLoadingSpinners[i]->setLineLength(24);
-        m_pLoadingSpinners[i]->setLineWidth(4);
-        m_pLoadingSpinners[i]->setInnerRadius(12);
-        m_pLoadingSpinners[i]->setRevolutionsPerSecond(1.5);
-        m_pLoadingSpinners[i]->setColor(QColor(25, 255, 25));
-
-        m_uiLoadingSpinnerRefCounts[i] = 0;
-    }
-
-    //StartLoading(MDI_Explorer);
-    //StartLoading(MDI_MainWindow | MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties);
-    
-    SetSelectedProj(nullptr);
 
     HyGuiLog("Harmony Designer Tool", LOGTYPE_Title);
     HyGuiLog("Initializing...", LOGTYPE_Normal);
@@ -188,8 +172,9 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     // TODO: Restore opened items/tabs here
     //
 
-    QLabel *pStatusLbl = new QLabel;
-    statusBar()->showMessage("Ready");
+    m_LoadingMsg.setText("Ready");
+    statusBar()->addWidget(&m_LoadingMsg);
+    statusBar()->addWidget(&m_LoadingBar);
 
     QPixmap *pPixmap = new QPixmap(":/icons16x16/smiley-sad.gif");
     QLabel *pSvnStatusIcon = new QLabel;
@@ -212,18 +197,27 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::SetSelectedProj(Project *pProj)
+void MainWindow::SetLoading(QString sMsg)
 {
-    if(m_pCurSelectedProj == pProj)
-        return;
+    m_LoadingMsg.setText(sMsg);
 
-    m_pCurSelectedProj = pProj;
+    if(m_LoadingSpinner.isSpinning() == false)
+        m_LoadingSpinner.start();
+}
 
+void MainWindow::ClearLoading()
+{
+    statusBar()->showMessage("Ready");
+    m_LoadingSpinner.stop();
+}
+
+void MainWindow::SetCurrentProject(Project &newCurrentProjectRef)
+{
     // Insert the project's TabBar
     bool bTabsFound = false;
     for(int i = 0; i < ui->stackedTabWidgets->count(); ++i)
     {
-        if(ui->stackedTabWidgets->widget(i) == m_pCurSelectedProj->GetTabBar())
+        if(ui->stackedTabWidgets->widget(i) == newCurrentProjectRef.GetTabBar())
         {
             ui->stackedTabWidgets->setCurrentIndex(i);
             bTabsFound = true;
@@ -231,17 +225,19 @@ void MainWindow::SetSelectedProj(Project *pProj)
     }
     if(bTabsFound == false)
     {
-        ui->stackedTabWidgets->addWidget(m_pCurSelectedProj->GetTabBar());
-        ui->stackedTabWidgets->setCurrentWidget(m_pCurSelectedProj->GetTabBar());
-        m_pCurSelectedProj->GetTabBar()->setParent(ui->stackedTabWidgets);
+        ui->stackedTabWidgets->addWidget(newCurrentProjectRef.GetTabBar());
+        ui->stackedTabWidgets->setCurrentWidget(newCurrentProjectRef.GetTabBar());
+        newCurrentProjectRef.GetTabBar()->setParent(ui->stackedTabWidgets);
     }
 
     // Project manager widgets
-    ui->dockWidgetAtlas->setWidget(m_pCurSelectedProj->GetAtlasWidget());
+    ui->dockWidgetAtlas->setWidget(newCurrentProjectRef.GetAtlasWidget());
     ui->dockWidgetAtlas->widget()->show();
 
-    ui->dockWidgetAudio->setWidget(m_pCurSelectedProj->GetAudioWidget());
+    ui->dockWidgetAudio->setWidget(newCurrentProjectRef.GetAudioWidget());
     ui->dockWidgetAudio->widget()->show();
+
+    ui->centralVerticalLayout->addWidget(Harmony::GetWidget(newCurrentProjectRef));
 }
 
 void MainWindow::showEvent(QShowEvent *pEvent)
@@ -270,24 +266,6 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     return sm_pInstance->m_sEngineLocation;
 }
 
-///*static*/ void MainWindow::StartLoading(uint uiAreaFlags)
-//{
-//    for(uint i = 0; i < NUM_MDI; ++i)
-//    {
-//        if((uiAreaFlags & (1 << i)) != 0)
-//            sm_pInstance->m_pLoadingSpinners[i]->start();
-//    }
-//}
-
-///*static*/ void MainWindow::StopLoading(uint uiAreaFlags)
-//{
-//    for(uint i = 0; i < NUM_MDI; ++i)
-//    {
-//        if((uiAreaFlags & (1 << i)) != 0)
-//            sm_pInstance->m_pLoadingSpinners[i]->stop();
-//    }
-//}
-
 /*static*/ void MainWindow::PasteItemSrc(QByteArray sSrc, Project *pProject)
 {
     sm_pInstance->ui->explorer->PasteItemSrc(sSrc, pProject);
@@ -301,6 +279,11 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
 /*static*/ void MainWindow::OpenItem(ProjectItem *pItem)
 {
+    if(pItem == nullptr || pItem->GetType() == ITEM_Project)
+        return;
+
+    sm_pInstance->pCurProject->OpenTab(pItem);
+
     sm_pInstance->ui->explorer->SelectItem(pItem);
 
     // Setup the item properties docking window to be the current item
@@ -329,6 +312,18 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     if(pItem == nullptr || pItem->GetType() == ITEM_Project)
         return;
 
+    if(pItem->IsSaveClean() == false)
+    {
+        int iDlgReturn = QMessageBox::question(nullptr, "Save Changes", pItem->GetName(true) % " has unsaved changes. Do you want to save before closing?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+
+        if(iDlgReturn == QMessageBox::Save)
+            pItem->Save();
+        else if(iDlgReturn == QMessageBox::Discard)
+            pItem->DiscardChanges();
+        else if(iDlgReturn == QMessageBox::Cancel)
+            return;
+    }
+
     // If this is the item that is currently being shown, unhook all its actions and widget
     if(sm_pInstance->ui->dockWidgetCurrentItem->widget() == pItem->GetWidget())
     {
@@ -344,14 +339,19 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
         pItem->BlockAllWidgetSignals(false);
     }
+
+    sm_pInstance->pCurProject->CloseTab(pItem);
+
+    if(pItem->IsExistencePendingSave() && pItem->GetTreeItem()->parent() != nullptr)
+        pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
 }
 
 void MainWindow::OnCtrlTab()
 {
-    if(m_pCurSelectedProj == nullptr)
+    if(pCurProject == nullptr)
         return;
 
-    ProjectTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
+    ProjectTabBar *pTabBar = pCurProject->GetTabBar();
     //pTabBar
 }
 
@@ -389,8 +389,7 @@ void MainWindow::on_actionOpenProject_triggered()
 
 void MainWindow::on_actionCloseProject_triggered()
 {
-    MainWindow::StopLoading(MDILOAD_Renderer);
-
+    Harmony::CloseProject();
     SetSelectedProj(nullptr);
     ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
 }
@@ -422,7 +421,7 @@ void MainWindow::on_actionNewFont_triggered()
 
 void MainWindow::NewItem(HyGuiItemType eItem)
 {
-    DlgNewItem *pDlg = new DlgNewItem(m_pCurSelectedProj, eItem, this);
+    DlgNewItem *pDlg = new DlgNewItem(pCurProject, eItem, this);
     if(pDlg->exec())
         ui->explorer->AddNewItem(ui->explorer->GetCurProjSelected(), eItem, pDlg->GetPrefix(), pDlg->GetName(), true, QJsonValue());
 
@@ -432,7 +431,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 void MainWindow::closeEvent(QCloseEvent *pEvent)
 {
     // This will ensure that the user has a chance to save all unsaved open documents, or cancel which will abort the close
-    if(m_pCurSelectedProj && m_pCurSelectedProj->CloseAllTabs() == false)
+    if(pCurProject && pCurProject->CloseAllTabs() == false)
     {
         pEvent->ignore();
         return;
@@ -489,7 +488,7 @@ void MainWindow::on_actionConnect_triggered()
 //    else
 //        HYLOG("TCP server initialized", LOGTYPE_Normal);
 
-    m_pDebugConnection->Connect();
+    //m_pDebugConnection->Connect();
 }
 
 void MainWindow::on_actionViewProperties_triggered()
@@ -499,13 +498,13 @@ void MainWindow::on_actionViewProperties_triggered()
 
 void MainWindow::on_actionSave_triggered()
 {
-    if(m_pCurSelectedProj == nullptr)
+    if(pCurProject == nullptr)
     {
         HyGuiLog("No valid project is active to save.", LOGTYPE_Error);
         return;
     }
 
-    ProjectTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
+    ProjectTabBar *pTabBar = pCurProject->GetTabBar();
     int iIndex = pTabBar->currentIndex();
     if(iIndex < 0)
     {
@@ -522,13 +521,13 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_actionSaveAll_triggered()
 {
-    if(m_pCurSelectedProj == nullptr)
+    if(pCurProject == nullptr)
     {
         HyGuiLog("No valid project is active to save all.", LOGTYPE_Error);
         return;
     }
 
-    ProjectTabBar *pTabBar = m_pCurSelectedProj->GetTabBar();
+    ProjectTabBar *pTabBar = pCurProject->GetTabBar();
     for(int i = 0; i < pTabBar->count(); ++i)
     {
         ProjectItem *pItem = pTabBar->tabData(i).value<ProjectItem *>();
@@ -664,13 +663,4 @@ void MainWindow::on_actionProjectSettings_triggered()
         return;
 
     ui->explorer->GetCurProjSelected()->ExecProjSettingsDlg();
-}
-
-void MainWindow::OnSwitchRendererReady(HyGuiRenderer *pRenderer)
-{
-    delete pRenderer;
-
-    // Swap the harmony engine renderers
-    sm_pInstance->m_pCurRenderer = new HyGuiRenderer(sm_pInstance->m_pCurSelectedProj, sm_pInstance);
-    sm_pInstance->ui->centralVerticalLayout->addWidget(sm_pInstance->m_pCurRenderer);
 }

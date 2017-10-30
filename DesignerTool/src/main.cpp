@@ -12,6 +12,7 @@
 
 #include "Global.h"
 #include "AtlasFrame.h"
+#include "DlgProjectSettings.h"
 
 int main(int argc, char *argv[])
 {

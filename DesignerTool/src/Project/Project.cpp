@@ -61,7 +61,7 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProject
         }
 
         ProjectItem *pProjItem = static_cast<ProjectItem *>(pEvent->source());
-        m_pProjectOwner->OpenItem(pProjItem);
+        MainWindow::OpenItem(pProjItem);
 
         pEvent->acceptProposedAction();
     }
@@ -376,48 +376,6 @@ void Project::SetRenderSize(int iWidth, int iHeight)
     }
 }
 
-void Project::OnHarmonyLoaded()
-{
-    // This is the IHyApplication::Initialize() override
-    Initialize();
-
-    m_Init.sGameName = GetName(false).toStdString();
-    m_Init.sDataDir = GetAssetsAbsPath().toStdString();
-    
-    if(m_pAtlasWidget)
-        m_pAtlasWidget->StashTreeWidgets();
-
-    delete m_pAtlasWidget;
-    delete m_pAudioMan;
-    m_pAtlasWidget = new AtlasWidget(m_pAtlasModel, this, nullptr);
-    m_pAudioMan = new AudioWidgetManager(this, nullptr);
-    
-    if(m_pTabBar == nullptr)
-    {
-        m_pTabBar = new ProjectTabBar(this);
-        m_pTabBar->setTabsClosable(true);
-        m_pTabBar->setShape(QTabBar::TriangularNorth);
-        m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
-        m_pTabBar->setAcceptDrops(true);
-        m_pTabBar->setMovable(true);
-        m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
-        m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(OnCloseTab(int)));
-    }
-    else
-    {
-        for(int i = 0; i < m_pTabBar->count(); ++i)
-        {
-            ProjectItem *pOpenItem = m_pTabBar->tabData(i).value<ProjectItem *>();
-            pOpenItem->DrawLoad(*this);
-        }
-
-        if(m_pTabBar->currentIndex() >= 0)
-            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->DrawShow();
-    }
-    
-    MainWindow::SetSelectedProjWidgets(this);
-}
-
 void Project::SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal)
 {
     HyGuiItemType eSubDirType = HyGlobal::GetDirFromItem(eType);
@@ -485,7 +443,11 @@ void Project::DeleteGameData(HyGuiItemType eType, QString sPath)
         ProjectItem *pItem = v.value<ProjectItem *>();
         
         if(pItem->GetName(true) == sPath)
-            OnCloseTab(i);
+        {
+            ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();
+            MainWindow::CloseItem(pItem);
+            break;
+        }
     }
 }
 
@@ -515,25 +477,13 @@ QJsonObject Project::GetSubDirObj(HyGuiItemType eType)
     return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetDirFromItem(eType))].toObject();
 }
 
-bool Project::CloseAllTabs()
+void Project::OpenTab(ProjectItem *pItem)
 {
-    int iNumTabsOpened = m_pTabBar->count();
-    for(int i = iNumTabsOpened - 1; i >= 0; --i)
-        OnCloseTab(i);
-    
-    return m_pTabBar->count() == 0;
-}
-
-void Project::OpenItem(ProjectItem *pItem)
-{
-    if(pItem == nullptr || pItem->GetType() == ITEM_Project)
-        return;
-
-    if(m_pCurOpenItem && m_pCurOpenItem != pItem)
-        m_pCurOpenItem->DrawHide();
-
     if(m_pCurOpenItem == pItem)
         return;
+
+    if(m_pCurOpenItem)
+        m_pCurOpenItem->DrawHide();
 
     m_pCurOpenItem = pItem;
 
@@ -572,7 +522,33 @@ void Project::OpenItem(ProjectItem *pItem)
     }
 
     ApplySaveEnables();
-    MainWindow::OpenItem(pItem);
+}
+
+void Project::CloseTab(ProjectItem *pItem)
+{
+    pItem->WidgetUnload();
+    pItem->DrawUnload();
+
+    if(pItem == m_pCurOpenItem)
+        m_pCurOpenItem = nullptr;
+
+    for(int i = 0; i < m_pTabBar->count(); ++i)
+    {
+        if(m_pTabBar->tabData(i).value<ProjectItem *>() == m_pCurOpenItem)
+        {
+            m_pTabBar->removeTab(i);
+            break;
+        }
+    }
+}
+
+bool Project::CloseAllTabs()
+{
+    int iNumTabsOpened = m_pTabBar->count();
+    for(int i = iNumTabsOpened - 1; i >= 0; --i)
+        OnCloseTab(i);
+
+    return m_pTabBar->count() == 0;
 }
 
 void Project::ApplySaveEnables()
@@ -607,6 +583,38 @@ void Project::ReloadHarmony()
 {
     m_pDraw = new ProjectDraw(*this);
     m_pDraw->Load();
+
+    if(m_pAtlasWidget)
+        m_pAtlasWidget->StashTreeWidgets();
+
+    delete m_pAtlasWidget;
+    delete m_pAudioMan;
+    m_pAtlasWidget = new AtlasWidget(m_pAtlasModel, this, nullptr);
+    m_pAudioMan = new AudioWidgetManager(this, nullptr);
+
+    if(m_pTabBar == nullptr)
+    {
+        m_pTabBar = new ProjectTabBar(this);
+        m_pTabBar->setTabsClosable(true);
+        m_pTabBar->setShape(QTabBar::TriangularNorth);
+        m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
+        m_pTabBar->setAcceptDrops(true);
+        m_pTabBar->setMovable(true);
+        m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
+        m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(OnCloseTab(int)));
+    }
+    else
+    {
+        for(int i = 0; i < m_pTabBar->count(); ++i)
+        {
+            ProjectItem *pOpenItem = m_pTabBar->tabData(i).value<ProjectItem *>();
+            pOpenItem->DrawLoad(*this);
+        }
+
+        if(m_pTabBar->currentIndex() >= 0)
+            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->DrawShow();
+    }
+
     return true;
 }
 
@@ -649,28 +657,5 @@ void Project::OnTabBarCurrentChanged(int iIndex)
 void Project::OnCloseTab(int iIndex)
 {
     ProjectItem *pItem = m_pTabBar->tabData(iIndex).value<ProjectItem *>();
-
-    if(pItem->IsSaveClean() == false)
-    {
-        int iDlgReturn = QMessageBox::question(nullptr, "Save Changes", pItem->GetName(true) % " has unsaved changes. Do you want to save before closing?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-
-        if(iDlgReturn == QMessageBox::Save)
-            pItem->Save();
-        else if(iDlgReturn == QMessageBox::Discard)
-            pItem->DiscardChanges();
-        else if(iDlgReturn == QMessageBox::Cancel)
-            return;
-    }
-
     MainWindow::CloseItem(pItem);
-    pItem->WidgetUnload();
-    pItem->DrawUnload();
-
-    if(pItem == m_pCurOpenItem)
-        m_pCurOpenItem = nullptr;
-
-    m_pTabBar->removeTab(iIndex);
-
-    if(pItem->IsExistencePendingSave() && pItem->GetTreeItem()->parent() != nullptr)
-        pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
 }

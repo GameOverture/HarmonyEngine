@@ -91,8 +91,6 @@ public:
     ProjectItem *GetCurrentOpenItem();
 
     void SetRenderSize(int iWidth, int iHeight);
-    
-    void OnHarmonyLoaded();
 
     void SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal);
     void SaveGameData();
@@ -102,11 +100,10 @@ public:
 
     QJsonObject GetSubDirObj(HyGuiItemType eType);
 
+    // These tab functions are only called from MainWindow
+    void OpenTab(ProjectItem *pItem);
+    void CloseTab(ProjectItem *pItem);
     bool CloseAllTabs();
-
-
-
-    void OpenItem(ProjectItem *pItem);
 
     void ApplySaveEnables();
     void ReloadHarmony();

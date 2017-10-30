@@ -5,7 +5,6 @@
 #include "Project.h"
 #include "HarmonyWidget.h"
 #include "HarmonyConnection.h"
-#include "_Dependencies/QtWaitingSpinner/waitingspinnerwidget.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
@@ -17,24 +16,20 @@ class Harmony : public QObject
     static Harmony *        sm_pInstance;
 
     MainWindow *            m_pMainWindow;
-
-    WaitingSpinnerWidget    m_LoadingSpinner;
     HarmonyConnection       m_Connection;
-
-    HarmonyWidget *         m_pCurrentWidget;
+    HarmonyWidget *         m_pLoadedWidget;
 
 public:
     Harmony(MainWindow *pMainWindow);
     virtual ~Harmony();
 
-    static void SetProject(Project *pProject);
-    static HarmonyWidget *GetWidget(Project *pProject);
+    static Project *GetProject();
+    static void SetProject(Project &projectRef);
 
-Q_SIGNALS:
-      void SetProjectFinished(Project *pProject);
+    static HarmonyWidget *GetWidget(Project &projectRef);
 
 private Q_SLOTS:
-      void HarmonyWidgetReady();
+      void HarmonyWidgetReady(HarmonyWidget *pWidget);
 };
 
 #endif // HARMONY_H

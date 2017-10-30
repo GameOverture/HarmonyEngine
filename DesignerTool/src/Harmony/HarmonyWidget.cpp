@@ -4,8 +4,8 @@
 
 #include <QDragEnterEvent>
 
-HarmonyWidget::HarmonyWidget(Project *pProject) :   QOpenGLWidget(nullptr),
-                                                    m_pProjectOwner(pProject)
+HarmonyWidget::HarmonyWidget(Project &projectRef) : QOpenGLWidget(nullptr),
+                                                    m_ProjectRef(projectRef)
 {
     m_pTimer = new QTimer(this);
     connect(m_pTimer, SIGNAL(timeout()), this, SLOT(OnBootCheck()));
@@ -23,7 +23,7 @@ HarmonyWidget::HarmonyWidget(Project *pProject) :   QOpenGLWidget(nullptr),
 
     if(m_pHyEngine)
     {
-        m_pProjectOwner->Shutdown();
+        m_ProjectRef.Shutdown();
         m_pHyEngine->Shutdown();
     }
 
@@ -32,9 +32,14 @@ HarmonyWidget::HarmonyWidget(Project *pProject) :   QOpenGLWidget(nullptr),
     m_pHyEngine = nullptr;
 }
 
-bool HarmonyWidget::IsProject(Project *pProj)
+Project &HarmonyWidget::GetProject()
 {
-    return m_pProjectOwner == pProj;
+    return m_ProjectRef;
+}
+
+bool HarmonyWidget::IsProject(Project &projectRef)
+{
+    return &m_ProjectRef == &projectRef;
 }
 
 void HarmonyWidget::SetCursor(Qt::CursorShape eShape)
@@ -75,7 +80,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
     HyGuiLog("Version: " % QString(reinterpret_cast<const char *>(glGetString(GL_VERSION))), LOGTYPE_Normal);
     HyGuiLog("GLSL: " % QString(reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION))), LOGTYPE_Normal);
 
-    m_pHyEngine = HyEngine::GuiCreate(m_pProjectOwner);
+    m_pHyEngine = HyEngine::GuiCreate(m_ProjectRef);
 
     if(m_pHyEngine == nullptr)
         HyGuiLog("HyEngine::GuiCreate returned nullptr", LOGTYPE_Error);
@@ -92,8 +97,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::resizeGL(int w, int h) /*override*/
 {
-    if(m_pProjectOwner)
-        m_pProjectOwner->SetRenderSize(w, h);
+    m_ProjectRef.SetRenderSize(w, h);
 }
 
 /*virtual*/ void HarmonyWidget::enterEvent(QEvent *pEvent) /*override*/
@@ -107,7 +111,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::dragEnterEvent(QDragEnterEvent *pEvent) /*override*/
 {
-    ProjectTabBar *pTabBar = m_pProjectOwner->GetTabBar();
+    ProjectTabBar *pTabBar = m_ProjectRef.GetTabBar();
     ProjectItem *pCurProjItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
 
     if(pCurProjItem &&
@@ -121,7 +125,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::dropEvent(QDropEvent *pEvent) /*override*/
 {
-    ProjectTabBar *pTabBar = m_pProjectOwner->GetTabBar();
+    ProjectTabBar *pTabBar = m_ProjectRef.GetTabBar();
     ProjectItem *pCurProjItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
 
     if(pCurProjItem &&
@@ -136,10 +140,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::keyPressEvent(QKeyEvent *pEvent) /*override*/
 {
-    if(m_pProjectOwner == nullptr)
-        return;
-
-    ProjectItem *pCurItem = m_pProjectOwner->GetCurrentOpenItem();
+    ProjectItem *pCurItem = m_ProjectRef.GetCurrentOpenItem();
     if(pCurItem == nullptr)
         return;
 
@@ -148,10 +149,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::keyReleaseEvent(QKeyEvent *pEvent) /*override*/
 {
-    if(m_pProjectOwner == nullptr)
-        return;
-
-    ProjectItem *pCurItem = m_pProjectOwner->GetCurrentOpenItem();
+    ProjectItem *pCurItem = m_ProjectRef.GetCurrentOpenItem();
     if(pCurItem == nullptr)
         return;
 
@@ -160,10 +158,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::mousePressEvent(QMouseEvent *pEvent) /*override*/
 {
-    if(m_pProjectOwner == nullptr)
-        return;
-
-    ProjectItem *pCurItem = m_pProjectOwner->GetCurrentOpenItem();
+    ProjectItem *pCurItem = m_ProjectRef.GetCurrentOpenItem();
     if(pCurItem == nullptr)
         return;
 
@@ -172,10 +167,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::wheelEvent(QWheelEvent *pEvent) /*override*/
 {
-    if(m_pProjectOwner == nullptr)
-        return;
-
-    ProjectItem *pCurItem = m_pProjectOwner->GetCurrentOpenItem();
+    ProjectItem *pCurItem = m_ProjectRef.GetCurrentOpenItem();
     if(pCurItem == nullptr)
         return;
 
@@ -184,10 +176,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {
-    if(m_pProjectOwner == nullptr)
-        return;
-
-    ProjectItem *pCurItem = m_pProjectOwner->GetCurrentOpenItem();
+    ProjectItem *pCurItem = m_ProjectRef.GetCurrentOpenItem();
     if(pCurItem == nullptr)
         return;
 
@@ -196,10 +185,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/
 {
-    if(m_pProjectOwner == nullptr)
-        return;
-
-    ProjectItem *pCurItem = m_pProjectOwner->GetCurrentOpenItem();
+    ProjectItem *pCurItem = m_ProjectRef.GetCurrentOpenItem();
     if(pCurItem == nullptr)
         return;
 
@@ -210,7 +196,7 @@ void HarmonyWidget::OnBootCheck()
 {
     if(m_pHyEngine && m_pHyEngine->IsInitialized())
     {
-        m_pProjectOwner->OnHarmonyLoaded();
+        Q_EMIT HarmonyWidgetReady(this);
 
         m_pTimer->stop();
         if(false == m_pTimer->disconnect())
