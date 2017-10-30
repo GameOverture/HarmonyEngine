@@ -41,7 +41,7 @@ IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pPro
     m_primOriginHorz.SetLineThickness(2.0f);
     m_primOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
     m_primOriginHorz.SetEnabled(false);
-    m_primOriginHorz.GetShape().SetAsLineChain(&lineList[0], lineList.size());
+    m_primOriginHorz.GetShape().SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 
     lineList[0].x = 0.0f;
     lineList[0].y = -5000.0f;
@@ -50,7 +50,7 @@ IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pPro
     m_primOriginVert.SetLineThickness(2.0f);
     m_primOriginVert.SetTint(1.0f, 1.0f, 1.0f);
     m_primOriginVert.SetEnabled(false);
-    m_primOriginVert.GetShape().SetAsLineChain(&lineList[0], lineList.size());
+    m_primOriginVert.GetShape().SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 }
 
 /*virtual*/ IDraw::~IDraw()
@@ -122,7 +122,7 @@ void IDraw::ResizeRenderer()
 {
     if(pEvent->button() == Qt::LeftButton)
     {
-        if(m_bPanCameraKeyDown && m_bIsCameraPanning == false);
+        if(m_bPanCameraKeyDown && m_bIsCameraPanning == false)
         {
             m_bIsCameraPanning = true;
             m_ptOldMousePos = pEvent->localPos();
@@ -135,7 +135,7 @@ void IDraw::ResizeRenderer()
 {
     if(pEvent->button() == Qt::LeftButton)
     {
-        if(m_bIsCameraPanning);
+        if(m_bIsCameraPanning)
         {
             m_bIsCameraPanning = false;
             if(m_bPanCameraKeyDown)

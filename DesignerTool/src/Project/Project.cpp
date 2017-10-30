@@ -534,7 +534,7 @@ void Project::CloseTab(ProjectItem *pItem)
 
     for(int i = 0; i < m_pTabBar->count(); ++i)
     {
-        if(m_pTabBar->tabData(i).value<ProjectItem *>() == m_pCurOpenItem)
+        if(m_pTabBar->tabData(i).value<ProjectItem *>() == pItem)
         {
             m_pTabBar->removeTab(i);
             break;

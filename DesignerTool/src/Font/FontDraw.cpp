@@ -37,7 +37,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
     lineList[0].y = PreviewOffsetY;
     lineList[1].x = 5000.0f;
     lineList[1].y = PreviewOffsetY;
-    m_PreviewOriginHorz.GetShape().SetAsLineChain(&lineList[0], lineList.size());
+    m_PreviewOriginHorz.GetShape().SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
     m_PreviewOriginHorz.SetLineThickness(2.0f);
     m_PreviewOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
     m_PreviewOriginHorz.SetEnabled(false);

@@ -56,7 +56,7 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :   IDraw(nu
 
             uint32 uiTextureIndex = frameList[j]->GetTextureIndex();
             
-            while(m_MasterList.size() <= uiTextureIndex)
+            while(m_MasterList.size() <= static_cast<int>(uiTextureIndex))
                 m_MasterList.append(new TextureEnt(this));
             
             HyTexturedQuad2d *pNewTexQuad = new HyTexturedQuad2d(frameList[j]->GetAtlasGrpId(), uiTextureIndex, m_MasterList[uiTextureIndex]);
