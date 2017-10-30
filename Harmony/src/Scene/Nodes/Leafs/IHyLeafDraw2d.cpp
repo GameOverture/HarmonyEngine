@@ -185,9 +185,6 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 	if(m_sNAME.empty() && m_eTYPE != HYTYPE_Entity2d && m_eTYPE != HYTYPE_Primitive2d && m_eTYPE != HYTYPE_TexturedQuad2d)
 		return;
 
-	if(GetCoordinateUnit() == HYCOORDUNIT_Default)
-		SetCoordinateUnit(HyDefaultCoordinateUnit(), false);
-
 	if(m_eTYPE != HYTYPE_Entity2d)
 		sm_pHyAssets->LoadNodeData(this);
 }

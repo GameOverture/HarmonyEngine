@@ -9,25 +9,27 @@
 *************************************************************************/
 #include "Diagnostics/HyDiagnostics.h"
 #include "IHyApplication.h"
+#include "Time/HyTime.h"
 #include "Assets/HyAssets.h"
 #include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 #include "Scene/Nodes/Leafs/Draws/HyText2d.h"
 #include "HyEngine.h"
 
-HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef) :	m_InitStructRef(initStruct),
-																								m_AssetsRef(assetsRef),
-																								m_SceneRef(sceneRef),
-																								m_sPlatform("Unknown"),
-																								m_uiNumCpuCores(0),
-																								m_uiTotalMemBytes(0),
-																								m_sGfxApi("Unknown"),
-																								m_sVersion("Unknown"),
-																								m_sVendor("Unknown"),
-																								m_sRenderer("Unknown"),
-																								m_sShader("Unknown"),
-																								m_iMaxTextureSize(0),
-																								m_sCompressedTextures("Unknown"),
-																								m_bInitialMemCheckpointSet(false)
+HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef) :	m_InitStructRef(initStruct),
+																													m_TimeRef(timeRef),
+																													m_AssetsRef(assetsRef),
+																													m_SceneRef(sceneRef),
+																													m_sPlatform("Unknown"),
+																													m_uiNumCpuCores(0),
+																													m_uiTotalMemBytes(0),
+																													m_sGfxApi("Unknown"),
+																													m_sVersion("Unknown"),
+																													m_sVendor("Unknown"),
+																													m_sRenderer("Unknown"),
+																													m_sShader("Unknown"),
+																													m_iMaxTextureSize(0),
+																													m_sCompressedTextures("Unknown"),
+																													m_bInitialMemCheckpointSet(false)
 {
 #if defined(HY_PLATFORM_WINDOWS)
 	m_sPlatform = "Windows";
@@ -86,9 +88,8 @@ void HyDiagnostics::BootMessage()
 #endif
 
 	HyLog("");
-	HyLogTitle(sGameTitle << "\n\t" << HyDateTime());
+	HyLogTitle(sGameTitle << "\n\t" << Hy_DateTime());
 	HyLog("Data Dir:         " << m_InitStructRef.sDataDir);
-	HyLog("Default Unit:     " << (m_InitStructRef.eDefaultCoordinateUnit == HYCOORDUNIT_Pixels) ? "Pixels" : "Meters");
 	HyLog("Pixels/Meter:     " << m_InitStructRef.fPixelsPerMeter);
 	HyLog("Num Input Maps:   " << m_InitStructRef.uiNumInputMappings);
 	
@@ -285,7 +286,7 @@ void HyDiagnostics::ProfileEnd()
 
 void HyDiagnostics::ApplyTimeDelta()
 {
-	m_DiagOutput.ApplyTimeDelta(Hy_TimeDelta());
+	m_DiagOutput.ApplyTimeDelta(m_TimeRef.GetFrameDelta());
 }
 
 void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures)

@@ -111,7 +111,6 @@
     <ClCompile Include="Utilities\Crc32.cpp" />
     <ClCompile Include="Utilities\HyBitManip.cpp" />
     <ClCompile Include="Utilities\HyFileIO.cpp" />
-    <ClCompile Include="Utilities\HyHardwareInfo.cpp" />
     <ClCompile Include="Utilities\HyImage.cpp" />
     <ClCompile Include="Utilities\HyMath.cpp" />
     <ClCompile Include="Utilities\HyStrManip.cpp" />
@@ -219,7 +218,6 @@
     <ClInclude Include="..\include\Harmony\Utilities\Crc32.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyBitManip.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyFileIO.h" />
-    <ClInclude Include="..\include\Harmony\Utilities\HyHardwareInfo.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyImage.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyMath.h" />
     <ClInclude Include="..\include\Harmony\Utilities\HyStrManip.h" />

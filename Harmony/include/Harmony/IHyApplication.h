@@ -23,7 +23,6 @@ struct HarmonyInit
 	std::string				sDataDir;
 	uint32					uiNumWindows;
 	HyWindowInfo			windowInfo[HY_MAXWINDOWS];
-	HyCoordinateUnit		eDefaultCoordinateUnit;
 	uint32					uiUpdateTickMs;
 	float					fPixelsPerMeter;
 	uint32					uiNumInputMappings;
@@ -40,9 +39,6 @@ struct HarmonyInit
 class IHyApplication
 {
 	friend class HyEngine;
-
-	static HyCoordinateUnit				sm_eDefaultCoordinateUnit;
-	static float						sm_fPixelsPerMeter;
 
 #ifdef HY_PLATFORM_GUI
 protected:
@@ -61,9 +57,6 @@ protected:
 public:
 	IHyApplication(HarmonyInit &initStruct);
 	virtual ~IHyApplication();
-
-	static HyCoordinateUnit DefaultCoordinateUnit();
-	static float PixelsPerMeter();
 
 	std::string GameName() const;
 	std::string DataDir() const;

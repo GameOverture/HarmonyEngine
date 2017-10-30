@@ -244,7 +244,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 		return;
 
 	if(m_bIsAnimPaused == false)
-		m_fElapsedFrameTime += HyUpdateDelta() * m_fAnimPlayRate;
+		m_fElapsedFrameTime += Hy_UpdateStep() * m_fAnimPlayRate;
 
 	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiCurAnimState];

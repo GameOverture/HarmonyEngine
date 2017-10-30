@@ -35,8 +35,8 @@ int32 HyPhysEntity2d::AddBoxFixture(float fHalfWidth, float fHalfHeight, float f
 {
 	HyAssert(m_b2Body, "HyPhysEntity2d::AddBoxFixture() was invoked with an uninitialized instance");
 
-	if(m_eCoordUnit == HYCOORDUNIT_Pixels)
-		vOffset /= HyPixelsPerMeter();
+	//if(m_eCoordUnit == HYCOORDUNIT_Pixels)
+	//	vOffset /= Hy_PixelsPerMeter();
 
 	b2PolygonShape poly;
 	poly.SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(vOffset.x, vOffset.y), fAngleOffset);
@@ -57,8 +57,8 @@ int32 HyPhysEntity2d::AddCircleFixture(float fRadius, float fDensity, glm::vec2 
 {
 	HyAssert(m_b2Body, "HyPhysEntity2d::SetAsBox() was invoked with an uninitialized instance");
 
-	if(m_eCoordUnit == HYCOORDUNIT_Pixels)
-		vOffset /= HyPixelsPerMeter();
+	//if(m_eCoordUnit == HYCOORDUNIT_Pixels)
+	//	vOffset /= Hy_PixelsPerMeter();
 
 	b2CircleShape poly;
 	poly.m_radius = fRadius;
@@ -81,12 +81,12 @@ int32 HyPhysEntity2d::AddEdgeChainFixture(glm::vec2 *pVertices, uint32 uiNumVert
 {
 	HyAssert(m_b2Body, "HyPhysEntity2d::SetAsBox() was invoked with an uninitialized instance");
 
-	if(m_eCoordUnit == HYCOORDUNIT_Pixels)
-	{
-		vOffset /= HyPixelsPerMeter();
-		for(uint32 i = 0; i < uiNumVerts; ++i)
-			pVertices[i] /= HyPixelsPerMeter();
-	}
+	//if(m_eCoordUnit == HYCOORDUNIT_Pixels)
+	//{
+	//	vOffset /= Hy_PixelsPerMeter();
+	//	for(uint32 i = 0; i < uiNumVerts; ++i)
+	//		pVertices[i] /= Hy_PixelsPerMeter();
+	//}
 
 	b2ChainShape chain;
 	if(bChainLoop)
@@ -122,10 +122,10 @@ int32 HyPhysEntity2d::AddEdgeChainFixture(glm::vec2 *pVertices, uint32 uiNumVert
 		if(m_fPrevRotation == rot.Get())
 			rot.Set(b2Trans.q.GetAngle());
 
-		if(m_eCoordUnit == HYCOORDUNIT_Pixels)
-			m_b2Body->SetTransform(b2Vec2(pos.X() / HyPixelsPerMeter(), pos.Y() / HyPixelsPerMeter()), rot.Get());
-		else
-			m_b2Body->SetTransform(b2Vec2(pos.X(), pos.Y()), rot.Get());
+		//if(m_eCoordUnit == HYCOORDUNIT_Pixels)
+		//	m_b2Body->SetTransform(b2Vec2(pos.X() / Hy_PixelsPerMeter(), pos.Y() / Hy_PixelsPerMeter()), rot.Get());
+		//else
+		//	m_b2Body->SetTransform(b2Vec2(pos.X(), pos.Y()), rot.Get());
 	}
 	else
 	{
@@ -134,17 +134,17 @@ int32 HyPhysEntity2d::AddEdgeChainFixture(glm::vec2 *pVertices, uint32 uiNumVert
 		else
 			rot.Set(b2Trans.q.GetAngle());
 
-		// Grab position and convert it if necessary from box2d 
-		if(m_eCoordUnit == HYCOORDUNIT_Pixels)
-		{
-			pos.X(b2Trans.p.x * HyPixelsPerMeter());
-			pos.Y(b2Trans.p.y * HyPixelsPerMeter());
-		}
-		else
-		{
-			pos.X(b2Trans.p.x);
-			pos.Y(b2Trans.p.y);
-		}
+		//// Grab position and convert it if necessary from box2d 
+		//if(m_eCoordUnit == HYCOORDUNIT_Pixels)
+		//{
+		//	pos.X(b2Trans.p.x * Hy_PixelsPerMeter());
+		//	pos.Y(b2Trans.p.y * Hy_PixelsPerMeter());
+		//}
+		//else
+		//{
+		//	pos.X(b2Trans.p.x);
+		//	pos.Y(b2Trans.p.y);
+		//}
 	}
 
 	m_ptPrevPos = pos.Get();

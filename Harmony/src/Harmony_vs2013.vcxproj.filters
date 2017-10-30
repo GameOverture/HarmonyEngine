@@ -13,9 +13,6 @@
     <ClCompile Include="Utilities\HyStrManip.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\HyHardwareInfo.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\HyMath.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -390,9 +387,6 @@
       <Filter>Time\Watches</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Utilities\HyBitManip.h">
-      <Filter>Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Utilities\HyHardwareInfo.h">
       <Filter>Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Utilities\HyMath.h">

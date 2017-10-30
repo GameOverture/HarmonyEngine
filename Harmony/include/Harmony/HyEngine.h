@@ -41,9 +41,9 @@ class HyEngine
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
 	HyGuiComms					m_GuiComms;
+	HyTime						m_Time;
 	HyDiagnostics				m_Diagnostics;
 	HyInput						m_Input;
-	HyTime						m_Time;
 
 	HyRendererInterop			m_Renderer;
 	HyAudioInterop				m_Audio;
@@ -74,18 +74,12 @@ private:
 
 	HyRendererInterop &GetRenderer();
 
-	// TODO: Rename these better when in LG game project
-	friend float HyUpdateDelta();
-	friend float Hy_TimeDelta();
-	friend void Hy_SetUpdateTickMs(uint32 uiUpdateTickMs);
-	friend void HyPauseGame(bool bPause);
-
-	friend HyInput &Hy_Input();
-	friend b2World &Hy_Physics2d();
-	friend HyDiagnostics &HyGetDiagnostics();
-	friend float HyPixelsPerMeter();
-	friend HyCoordinateUnit HyDefaultCoordinateUnit();
-	friend std::string HyDateTime();
+	friend float			Hy_UpdateStep();
+	friend void				Hy_PauseGame(bool bPause);
+	friend HyInput &		Hy_Input();
+	friend b2World &		Hy_Physics2d();
+	friend HyDiagnostics &	Hy_Diagnostics();
+	friend std::string		Hy_DateTime();
 };
 
 #endif /* HyEngine_h__ */

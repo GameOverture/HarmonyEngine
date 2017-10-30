@@ -11,7 +11,6 @@ QMap<QString, QJsonValue> DlgProjectSettings::sm_DefaultValues;
 
 /*static*/ void DlgProjectSettings::InitDefaultValues()
 {
-    sm_DefaultValues["DefaultCoordinateUnit"] = QJsonValue(HYCOORDUNIT_Pixels);
     sm_DefaultValues["UpdateFpsCap"] = QJsonValue(0);
     sm_DefaultValues["PixelsPerMeter"] = QJsonValue(80.0f);
     sm_DefaultValues["ShowCursor"] = QJsonValue(true);

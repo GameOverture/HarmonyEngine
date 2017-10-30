@@ -155,14 +155,6 @@ enum HyCoordinateType
 	HYCOORDTYPE_Window
 };
 
-enum HyCoordinateUnit
-{
-	HYCOORDUNIT_Default = 0,
-
-	HYCOORDUNIT_Pixels,
-	HYCOORDUNIT_Meters
-};
-
 enum HyWindowType
 {
 	HYWINDOW_WindowedFixed,

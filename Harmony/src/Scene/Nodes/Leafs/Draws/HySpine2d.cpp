@@ -167,14 +167,14 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 		return;
 
 	// Update the time field used for attachments and such
-	spSkeleton_update(m_pSpineSkeleton, HyUpdateDelta());
+	spSkeleton_update(m_pSpineSkeleton, Hy_UpdateStep());
 
 	// Calculate the animation state
 	for(uint32 i = 0; i < m_uiNumAnimStates; ++i)
 	{
 		if(m_pIsAnimStateEnabled[i])
 		{
-			spAnimationState_update(m_ppAnimStates[i], HyUpdateDelta() * m_fAnimPlayRate);
+			spAnimationState_update(m_ppAnimStates[i], Hy_UpdateStep() * m_fAnimPlayRate);
 			spAnimationState_apply(m_ppAnimStates[i], m_pSpineSkeleton);
 		}
 	}

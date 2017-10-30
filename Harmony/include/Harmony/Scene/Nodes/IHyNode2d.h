@@ -28,8 +28,6 @@ protected:
 	HyEntity2d *					m_pParent;
 
 	glm::mat4						m_mtxCached;
-	HyCoordinateUnit				m_eCoordUnit;
-
 	float							m_fRotation;		// Reference value used in 'rot' HyTweenFloat
 
 	b2Body *						m_pPhysicsBody;
@@ -47,10 +45,6 @@ public:
 
 	void ParentDetach();
 	HyEntity2d *ParentGet();
-
-	HyCoordinateUnit GetCoordinateUnit();
-	// TODO: This needs to apply to everything in its hierarchy
-	void SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion);
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
 	void GetWorldTransform(glm::mat4 &outMtx);

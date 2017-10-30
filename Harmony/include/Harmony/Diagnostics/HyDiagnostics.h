@@ -14,6 +14,7 @@
 #include "Diagnostics/Output/HyDiagOutput.h"
 
 struct HarmonyInit;
+class HyTime;
 class HyAssets;
 class HyScene;
 
@@ -24,8 +25,8 @@ class HyScene;
 	#undef HYSETTING_ProfilerEnabled
 #endif
 #ifdef HYSETTING_ProfilerEnabled
-	#define HY_PROFILE_BEGIN(name) HyGetDiagnostics().ProfileBegin(name);
-	#define HY_PROFILE_END HyGetDiagnostics().ProfileEnd();
+	#define HY_PROFILE_BEGIN(name) Hy_Diagnostics().ProfileBegin(name);
+	#define HY_PROFILE_END Hy_Diagnostics().ProfileEnd();
 #else
 	#define HY_PROFILE_BEGIN(name) 
 	#define HY_PROFILE_END 
@@ -37,6 +38,7 @@ class HyDiagnostics
 	friend class IHyRenderer;
 
 	HarmonyInit &				m_InitStructRef;
+	HyTime &					m_TimeRef;
 	HyAssets &					m_AssetsRef;
 	HyScene &					m_SceneRef;
 
@@ -62,7 +64,7 @@ class HyDiagnostics
 	HyDiagOutput				m_DiagOutput;
 
 public:
-	HyDiagnostics(HarmonyInit &initStruct, HyAssets &assetsRef, HyScene &sceneRef);
+	HyDiagnostics(HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef);
 	~HyDiagnostics();
 
 	void BootMessage();

@@ -12,9 +12,6 @@
 #include "Renderer/Components/HyWindow.h"
 #include "Utilities/HyStrManip.h"
 
-HyCoordinateUnit IHyApplication::sm_eDefaultCoordinateUnit = HYCOORDUNIT_Default;
-float IHyApplication::sm_fPixelsPerMeter = 0.0f;
-
 #ifdef HY_PLATFORM_DESKTOP
 void glfw_ErrorCallback(int iError, const char *szDescription)
 {
@@ -28,7 +25,6 @@ HarmonyInit::HarmonyInit()
 
 	sGameName = "Untitled Game";
 	sDataDir = "/data";
-	eDefaultCoordinateUnit = HYCOORDUNIT_Pixels;
 	uiUpdateTickMs = 0;
 	fPixelsPerMeter = 80.0f;
 	bShowCursor = true;
@@ -86,7 +82,6 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	sDataDir = MakeStringProperPath(sDataDir.c_str(), "", true);
 	
 	sGameName				= projObject.get<jsonxx::String>("GameName");
-	eDefaultCoordinateUnit	= static_cast<HyCoordinateUnit>(static_cast<int32>(projObject.get<jsonxx::Number>("DefaultCoordinateUnit")));
 	uiUpdateTickMs			= static_cast<uint32>(projObject.get<jsonxx::Number>("UpdateFpsCap")); // TODO: Change name
 	fPixelsPerMeter			= static_cast<float>(projObject.get<jsonxx::Number>("PixelsPerMeter"));
 	bShowCursor				= projObject.get<jsonxx::Boolean>("ShowCursor");
@@ -151,7 +146,6 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(nullptr),
 															m_Console(initStruct.bUseConsole, initStruct.consoleInfo)
 {
-	HyAssert(m_Init.eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HarmonyInit's actual 'eDefaultCoordinateUnit' cannot be 'HYCOORDUNIT_Default'");
 	HyAssert(m_Init.fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 
 #ifdef HY_PLATFORM_DESKTOP
@@ -163,8 +157,6 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(nullptr),
 #endif
 	
 	m_Init = initStruct;
-	sm_eDefaultCoordinateUnit = m_Init.eDefaultCoordinateUnit;
-	sm_fPixelsPerMeter = m_Init.fPixelsPerMeter;
 	
 	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
 		m_WindowList.push_back(HY_NEW HyWindow(i, m_Init.windowInfo[i], m_Init.bShowCursor, i != 0 ? m_WindowList[0]->GetHandle() : nullptr));
@@ -178,18 +170,6 @@ IHyApplication::~IHyApplication()
 
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowList.size()); ++i)
 		delete m_WindowList[i];
-}
-
-HyCoordinateUnit IHyApplication::DefaultCoordinateUnit()
-{
-	HyAssert(sm_eDefaultCoordinateUnit != HYCOORDUNIT_Default, "HyScene::DefaultCoordinateUnit() invoked before IHyApplication initialized");
-	return sm_eDefaultCoordinateUnit;
-}
-
-float IHyApplication::PixelsPerMeter()
-{
-	HyAssert(sm_fPixelsPerMeter > 0.0f, "HyScene::PixelsPerMeter() invoked before IHyApplication initialized");
-	return sm_fPixelsPerMeter;
 }
 
 std::string IHyApplication::GameName() const

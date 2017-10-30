@@ -222,7 +222,7 @@ bool HyTweenFloat::UpdateFloat()
 //////////////////////////////////////////////////////////////////////////
 bool HyTweenFloat::Tween()
 {
-	m_fElapsedTime = HyClamp(m_fElapsedTime + HyUpdateDelta(), 0.0f, m_fDuration);
+	m_fElapsedTime = HyClamp(m_fElapsedTime + Hy_UpdateStep(), 0.0f, m_fDuration);
 	
 	float fFromVal = m_fValueRef;
 	m_fValueRef = m_fStart + (m_fTarget - m_fStart) * m_fpTweenFunc(m_fElapsedTime / m_fDuration);

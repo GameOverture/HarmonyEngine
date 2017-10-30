@@ -118,7 +118,7 @@ void HyScene::SetPause(bool bPause)
 void HyScene::UpdatePhysics()
 {
 	HY_PROFILE_BEGIN("Physics")
-		m_b2World.Step(HyUpdateDelta(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+		m_b2World.Step(Hy_UpdateStep(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 	HY_PROFILE_END
 }
 

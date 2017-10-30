@@ -30,7 +30,6 @@ HyPrimitive2d::~HyPrimitive2d(void)
 const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 {
 	m_RenderState = p.m_RenderState;
-	m_eCoordUnit = p.m_eCoordUnit;
 	m_BoundingVolume = p.m_BoundingVolume;
 
 	ClearData();

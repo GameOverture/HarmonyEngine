@@ -13,7 +13,6 @@
 
 IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType),
 																m_pParent(pParent),
-																m_eCoordUnit(HYCOORDUNIT_Default),
 																m_fRotation(0.0f),
 																m_pPhysicsBody(nullptr),
 																pos(*this, DIRTY_Transform | DIRTY_WorldAABB),
@@ -58,33 +57,6 @@ HyEntity2d *IHyNode2d::ParentGet()
 	return m_pParent;
 }
 
-HyCoordinateUnit IHyNode2d::GetCoordinateUnit()
-{
-	return m_eCoordUnit;
-}
-
-// TODO: This needs to apply to everything in its hierarchy
-void IHyNode2d::SetCoordinateUnit(HyCoordinateUnit eCoordUnit, bool bDoConversion)
-{
-	if(eCoordUnit == HYCOORDUNIT_Default)
-		eCoordUnit = HyDefaultCoordinateUnit();
-
-	if(m_eCoordUnit == eCoordUnit)
-		return;
-
-	if(bDoConversion)
-	{
-		switch(eCoordUnit)
-		{
-		case HYCOORDUNIT_Meters:	pos *= HyPixelsPerMeter();	break;
-		case HYCOORDUNIT_Pixels:	pos /= HyPixelsPerMeter();	break;
-		}
-	}
-	m_eCoordUnit = eCoordUnit;
-
-	SetDirty(DIRTY_Transform);
-}
-
 void IHyNode2d::GetLocalTransform(glm::mat4 &outMtx) const
 {
 	outMtx = glm::mat4(1.0f);
@@ -95,10 +67,7 @@ void IHyNode2d::GetLocalTransform(glm::mat4 &outMtx) const
 	glm::vec3 ptRotPivot = rot_pivot.Extrapolate();
 	glm::vec3 ptScalePivot = scale_pivot.Extrapolate();
 	
-	if(m_eCoordUnit == HYCOORDUNIT_Meters)
-		outMtx = glm::translate(outMtx, ptPos * HyPixelsPerMeter());
-	else
-		outMtx = glm::translate(outMtx, ptPos);
+	outMtx = glm::translate(outMtx, ptPos);
 
 	outMtx = glm::translate(outMtx, ptRotPivot);
 	outMtx = glm::rotate(outMtx, rot.Get(), glm::vec3(0, 0, 1));

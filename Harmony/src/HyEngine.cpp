@@ -46,9 +46,9 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_AppRef.m_WindowList),
 												m_Assets(m_AppRef.m_Init.sDataDir, m_Scene),
 												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_Assets),
-												m_Diagnostics(m_AppRef.m_Init, m_Assets, m_Scene),
-												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList),
 												m_Time(m_AppRef.m_Init.uiUpdateTickMs),
+												m_Diagnostics(m_AppRef.m_Init, m_Time, m_Assets, m_Scene),
+												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList),
 												m_Renderer(m_Diagnostics, m_AppRef.m_WindowList),
 												m_Audio(m_AppRef.m_WindowList)
 {
@@ -162,27 +162,15 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return m_Renderer;
 }
 
-/*friend*/ float HyUpdateDelta()
+/*friend*/ float Hy_UpdateStep()
 {
-	HyAssert(HyEngine::sm_pInstance != nullptr, "HyUpdateDelta() was invoked before engine has been initialized.");
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_UpdateStep() was invoked before engine has been initialized.");
 	return HyEngine::sm_pInstance->m_Time.GetUpdateStepSeconds();
 }
 
-/*friend*/ float Hy_TimeDelta()
+/*friend*/ void Hy_PauseGame(bool bPause)
 {
-	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_TimeDelta() was invoked before engine has been initialized.");
-	return HyEngine::sm_pInstance->m_Time.GetFrameDelta();
-}
-
-/*friend*/ void Hy_SetUpdateTickMs(uint32 uiUpdateTickMs)
-{
-	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_SetUpdateTickMs() was invoked before engine has been initialized.");
-	HyEngine::sm_pInstance->m_Time.SetUpdateTickMs(uiUpdateTickMs);
-}
-
-/*friend*/ void HyPauseGame(bool bPause)
-{
-	HyAssert(HyEngine::sm_pInstance != nullptr, "HyPauseGame() was invoked before engine has been initialized.");
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_PauseGame() was invoked before engine has been initialized.");
 	HyEngine::sm_pInstance->m_Scene.SetPause(bPause);
 }
 
@@ -198,24 +186,14 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return HyEngine::sm_pInstance->m_Scene.GetPhysics2d();
 }
 
-/*friend*/ HyDiagnostics &HyGetDiagnostics()
+/*friend*/ HyDiagnostics &Hy_Diagnostics()
 {
-	HyAssert(HyEngine::sm_pInstance != nullptr, "HyGetDiagnostics() was invoked before engine has been initialized.");
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_Diagnostics() was invoked before engine has been initialized.");
 	return HyEngine::sm_pInstance->m_Diagnostics;
 }
 
-/*friend*/ float HyPixelsPerMeter()
+/*friend*/ std::string Hy_DateTime()
 {
-	return IHyApplication::PixelsPerMeter();
-}
-
-/*friend*/ HyCoordinateUnit HyDefaultCoordinateUnit()
-{
-	return IHyApplication::DefaultCoordinateUnit();
-}
-
-/*friend*/ std::string HyDateTime()
-{
-	HyAssert(HyEngine::sm_pInstance != nullptr, "HyDateTime() was invoked before engine has been initialized.");
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_DateTime() was invoked before engine has been initialized.");
 	return HyEngine::sm_pInstance->m_Time.GetDateTime();
 }
