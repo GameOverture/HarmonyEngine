@@ -57,6 +57,8 @@ public:
 private:
     Ui::ExplorerWidget *ui;
 
+    void RecursiveRemoveItem(ExplorerTreeItem *pItem);
+
     QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 
     QTreeWidgetItem *GetSelectedTreeItem();
