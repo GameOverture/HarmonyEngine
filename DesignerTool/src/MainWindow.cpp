@@ -46,7 +46,6 @@
 MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
                                             ui(new Ui::MainWindow),
                                             m_Settings("Overture Games", "Harmony Designer Tool"),
-                                            m_bIsInitialized(false),
                                             m_LoadingSpinner(this)
 {
     ui->setupUi(this);
@@ -54,6 +53,8 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
 
     while(ui->stackedTabWidgets->count())
         ui->stackedTabWidgets->removeWidget(ui->stackedTabWidgets->currentWidget());
+
+    connect(ui->menu_View, SIGNAL(aboutToShow), this, SLOT(on_menu_View_aboutToShow));
 
     m_Harmony = new Harmony(this);
 
@@ -142,15 +143,9 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     }
     m_Settings.endGroup();
     
-    ui->actionViewAtlasManager->setChecked(!ui->dockWidgetAtlas->isHidden());
-    ui->actionViewExplorer->setChecked(!ui->dockWidgetExplorer->isHidden());
-    ui->actionViewOutputLog->setChecked(!ui->dockWidgetOutputLog->isHidden());
-    ui->actionAudioManager->setChecked(!ui->dockWidgetAudio->isHidden());
-    
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Start with no open items. "OpenData" below will make this docking window (and Action menu item) visible if any items are to be opened
     ui->dockWidgetCurrentItem->hide();
-    ui->actionViewProperties->setVisible(false);
 
     m_Settings.beginGroup("OpenData");
     {
@@ -195,6 +190,11 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+/*static*/ MainWindow *MainWindow::GetInstance()
+{
+    return sm_pInstance;
 }
 
 void MainWindow::SetHarmonyWidget(HarmonyWidget *pWidget)
@@ -245,27 +245,6 @@ void MainWindow::SetCurrentProject(Project &newCurrentProjectRef)
     ui->centralVerticalLayout->addWidget(Harmony::GetWidget(newCurrentProjectRef));
 }
 
-void MainWindow::showEvent(QShowEvent *pEvent)
-{
-    QMainWindow::showEvent(pEvent);
-    if(pEvent->spontaneous())
-        return;
-
-    if(m_bIsInitialized == false)
-    {
-        ui->actionViewExplorer->setChecked(ui->dockWidgetExplorer->isVisible());
-        ui->actionViewProperties->setChecked(ui->dockWidgetCurrentItem->isVisible());
-        ui->actionViewOutputLog->setChecked(ui->dockWidgetOutputLog->isVisible());
-
-        m_bIsInitialized = true;
-    }
-}
-
-/*static*/ MainWindow *MainWindow::GetInstance()
-{
-    return sm_pInstance;
-}
-
 /*static*/ QString MainWindow::EngineSrcLocation()
 {
     return sm_pInstance->m_sEngineLocation;
@@ -292,10 +271,7 @@ void MainWindow::showEvent(QShowEvent *pEvent)
     sm_pInstance->ui->explorer->SelectItem(pItem);
 
     // Setup the item properties docking window to be the current item
-    QString sWindowTitle = HyGlobal::ItemName(pItem->GetType()) % " Properties";
-
-    sm_pInstance->ui->actionViewProperties->setVisible(true);
-    sm_pInstance->ui->actionViewProperties->setText(sWindowTitle);
+    QString sWindowTitle = pItem->GetName(true) % " Properties";
 
     sm_pInstance->ui->dockWidgetCurrentItem->show();
     sm_pInstance->ui->dockWidgetCurrentItem->setWindowTitle(sWindowTitle);
@@ -349,6 +325,19 @@ void MainWindow::showEvent(QShowEvent *pEvent)
 
     if(pItem->IsExistencePendingSave() && pItem->GetTreeItem()->parent() != nullptr)
         pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
+}
+
+/*virtual*/ void MainWindow::closeEvent(QCloseEvent *pEvent) /*override*/
+{
+    // This will ensure that the user has a chance to save all unsaved open documents, or cancel which will abort the close
+    if(Harmony::GetProject() && Harmony::GetProject()->CloseAllTabs() == false)
+    {
+        pEvent->ignore();
+        return;
+    }
+
+    SaveSettings();
+    QMainWindow::closeEvent(pEvent);
 }
 
 void MainWindow::OnCtrlTab()
@@ -427,83 +416,6 @@ void MainWindow::on_actionNewFont_triggered()
     NewItem(ITEM_Font);
 }
 
-void MainWindow::NewItem(HyGuiItemType eItem)
-{
-    DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, this);
-    if(pDlg->exec())
-        ui->explorer->AddNewItem(ui->explorer->GetCurProjSelected(), eItem, pDlg->GetPrefix(), pDlg->GetName(), true, QJsonValue());
-
-    delete pDlg;
-}
-
-void MainWindow::closeEvent(QCloseEvent *pEvent)
-{
-    // This will ensure that the user has a chance to save all unsaved open documents, or cancel which will abort the close
-    if(Harmony::GetProject() && Harmony::GetProject()->CloseAllTabs() == false)
-    {
-        pEvent->ignore();
-        return;
-    }
-    
-    SaveSettings();
-    QMainWindow::closeEvent(pEvent);
-}
-
-void MainWindow::SaveSettings()
-{
-    m_Settings.beginGroup("MainWindow");
-    {
-        m_Settings.setValue("geometry", saveGeometry());
-        m_Settings.setValue("windowState", saveState());
-    }
-    m_Settings.endGroup();
-
-    m_Settings.beginGroup("OpenData");
-    {
-        m_Settings.setValue("openProjs", QVariant(ui->explorer->GetOpenProjectPaths()));
-    }
-    m_Settings.endGroup();
-
-    m_Settings.beginGroup("Misc");
-    {
-        m_Settings.setValue("defaultProjectLocation", QVariant(m_sDefaultProjectLocation));
-    }
-    m_Settings.endGroup();
-}
-
-void MainWindow::on_actionViewExplorer_triggered()
-{
-    ui->dockWidgetExplorer->setHidden(!ui->dockWidgetExplorer->isHidden());
-}
-
-void MainWindow::on_actionViewAtlasManager_triggered()
-{
-    ui->dockWidgetAtlas->setHidden(!ui->dockWidgetAtlas->isHidden());
-}
-
-void MainWindow::on_actionViewOutputLog_triggered()
-{
-    ui->dockWidgetOutputLog->setHidden(!ui->dockWidgetOutputLog->isHidden());
-}
-
-void MainWindow::on_actionConnect_triggered()
-{
-//    // Network initialization
-//    m_pTcpServer = new QTcpServer(this);
-//    connect(m_pTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
-//    if(!m_pTcpServer->listen(QHostAddress::LocalHost, HY_TCP_PORT))
-//        HYLOG("Cannot start TCP server", LOGTYPE_Error)
-//    else
-//        HYLOG("TCP server initialized", LOGTYPE_Normal);
-
-    //m_pDebugConnection->Connect();
-}
-
-void MainWindow::on_actionViewProperties_triggered()
-{
-    ui->dockWidgetCurrentItem->setHidden(!ui->dockWidgetCurrentItem->isHidden());
-}
-
 void MainWindow::on_actionSave_triggered()
 {
     Project *pCurProject = Harmony::GetProject();
@@ -520,7 +432,7 @@ void MainWindow::on_actionSave_triggered()
         HyGuiLog("on_actionSave triggered with tab index of '-1'. Aborting save.", LOGTYPE_Error);
         return;
     }
-    
+
     QVariant v = pTabBar->tabData(iIndex);
     ProjectItem *pItem = v.value<ProjectItem *>();
     pItem->Save();
@@ -549,6 +461,14 @@ void MainWindow::on_actionSaveAll_triggered()
     }
 }
 
+void MainWindow::on_menu_View_aboutToShow()
+{
+    QMenu *pPopupMenu = this->createPopupMenu();
+
+    ui->menu_View->clear();
+    ui->menu_View->addActions(pPopupMenu->actions());
+}
+
 void MainWindow::on_actionLaunchIDE_triggered()
 {
     QStringList sFilterList;
@@ -556,11 +476,11 @@ void MainWindow::on_actionLaunchIDE_triggered()
 #if defined(Q_OS_WIN)
     sFilterList << "*.sln";
 #endif
-    
+
     QDir srcDir(ui->explorer->GetCurProjSelected()->GetSourceAbsPath());
     srcDir.setNameFilters(sFilterList);
     QFileInfoList ideFileInfoList = srcDir.entryInfoList();
-    
+
     if(ideFileInfoList.empty())
     {
         HyGuiLog("Could not find appropriate IDE file to launch", LOGTYPE_Error);
@@ -652,14 +572,22 @@ void MainWindow::on_actionLaunchIDE_triggered()
     QDesktopServices::openUrl(QUrl(ideFileInfoList[0].absoluteFilePath()));
 }
 
+void MainWindow::on_actionConnect_triggered()
+{
+//    // Network initialization
+//    m_pTcpServer = new QTcpServer(this);
+//    connect(m_pTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
+//    if(!m_pTcpServer->listen(QHostAddress::LocalHost, HY_TCP_PORT))
+//        HYLOG("Cannot start TCP server", LOGTYPE_Error)
+//    else
+//        HYLOG("TCP server initialized", LOGTYPE_Normal);
+
+    //m_pDebugConnection->Connect();
+}
+
 void MainWindow::on_actionAbout_triggered()
 {
     QMessageBox::about(this, HyDesignerToolName, "Harmony Engine and Designer Tool\n\nJason Knobler " % QString::number(QDate::currentDate().year()));
-}
-
-void MainWindow::on_actionAudioManager_triggered()
-{
-    ui->dockWidgetAudio->setHidden(!ui->dockWidgetAudio->isHidden());
 }
 
 void MainWindow::on_actionExit_triggered()
@@ -673,4 +601,35 @@ void MainWindow::on_actionProjectSettings_triggered()
         return;
 
     ui->explorer->GetCurProjSelected()->ExecProjSettingsDlg();
+}
+
+void MainWindow::NewItem(HyGuiItemType eItem)
+{
+    DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, this);
+    if(pDlg->exec())
+        ui->explorer->AddNewItem(ui->explorer->GetCurProjSelected(), eItem, pDlg->GetPrefix(), pDlg->GetName(), true, QJsonValue());
+
+    delete pDlg;
+}
+
+void MainWindow::SaveSettings()
+{
+    m_Settings.beginGroup("MainWindow");
+    {
+        m_Settings.setValue("geometry", saveGeometry());
+        m_Settings.setValue("windowState", saveState());
+    }
+    m_Settings.endGroup();
+
+    m_Settings.beginGroup("OpenData");
+    {
+        m_Settings.setValue("openProjs", QVariant(ui->explorer->GetOpenProjectPaths()));
+    }
+    m_Settings.endGroup();
+
+    m_Settings.beginGroup("Misc");
+    {
+        m_Settings.setValue("defaultProjectLocation", QVariant(m_sDefaultProjectLocation));
+    }
+    m_Settings.endGroup();
 }
