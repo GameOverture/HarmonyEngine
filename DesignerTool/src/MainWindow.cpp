@@ -12,6 +12,7 @@
 
 #include "Global.h"
 #include "Harmony.h"
+#include "HarmonyWidget.h"
 #include "Project.h"
 #include "DlgSetEngineLocation.h"
 #include "DlgNewProject.h"
@@ -45,6 +46,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
                                             ui(new Ui::MainWindow),
+                                            m_Harmony(*this),
                                             m_Settings("Overture Games", "Harmony Designer Tool"),
                                             m_LoadingSpinner(this)
 {
@@ -55,35 +57,10 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
         ui->stackedTabWidgets->removeWidget(ui->stackedTabWidgets->currentWidget());
 
     connect(ui->menu_View, SIGNAL(aboutToShow), this, SLOT(on_menu_View_aboutToShow));
-
-    m_Harmony = new Harmony(this);
-
-    m_LoadingSpinner.setRoundness(50.0);
-    m_LoadingSpinner.setMinimumTrailOpacity(15.0);
-    m_LoadingSpinner.setTrailFadePercentage(70.0);
-    m_LoadingSpinner.setNumberOfLines(20);
-    m_LoadingSpinner.setLineLength(24);
-    m_LoadingSpinner.setLineWidth(4);
-    m_LoadingSpinner.setInnerRadius(12);
-    m_LoadingSpinner.setRevolutionsPerSecond(1.5);
-    m_LoadingSpinner.setColor(QColor(25, 255, 25));
-
-//    m_pCurRenderer = new HyGuiRenderer(nullptr, this);
-//    ui->centralVerticalLayout->addWidget(m_pCurRenderer);
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this, SLOT(OnCtrlTab()));
 
     HyGuiLog("Harmony Designer Tool", LOGTYPE_Title);
     HyGuiLog("Initializing...", LOGTYPE_Normal);
-    
-    ui->actionProjectSettings->setEnabled(false);
-    ui->actionCloseProject->setEnabled(false);
-    ui->actionNewSprite->setEnabled(false);
-    ui->actionNewFont->setEnabled(false);
-    ui->actionNewParticle->setEnabled(false);
-    ui->actionNewAudio->setEnabled(false);
-    ui->actionNewEntity->setEnabled(false);
-    ui->actionSave->setEnabled(false);
-    ui->actionSaveAll->setEnabled(false);
-    ui->actionLaunchIDE->setEnabled(false);
     
     // Link the actions to their proper widgets
     ui->explorer->addAction(ui->actionProjectSettings);
@@ -102,9 +79,9 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     ui->explorer->addAction(ui->actionRename);
     ui->explorer->addAction(ui->actionLaunchIDE);
     
-    ui->dockWidgetAtlas->hide();
-    ui->dockWidgetCurrentItem->hide();
-    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // FIRST RUN CHECK - Ensure Harmony Engine propject location has been specified
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     HyGuiLog("Checking required initialization parameters...", LOGTYPE_Normal);
     m_Settings.beginGroup("RequiredParams");
     {
@@ -135,6 +112,12 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Restore workspace
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ui->dockWidgetExplorer->show();
+    ui->dockWidgetAtlas->hide();
+    ui->dockWidgetAudio->hide();
+    ui->dockWidgetProperties->hide();
+
     HyGuiLog("Recovering previously opened session...", LOGTYPE_Normal);
     m_Settings.beginGroup("MainWindow");
     {
@@ -143,10 +126,6 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     }
     m_Settings.endGroup();
     
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Start with no open items. "OpenData" below will make this docking window (and Action menu item) visible if any items are to be opened
-    ui->dockWidgetCurrentItem->hide();
-
     m_Settings.beginGroup("OpenData");
     {
         QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
@@ -164,8 +143,19 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     }
     m_Settings.endGroup();
 
-    // TODO: Restore opened items/tabs here
-    //
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Status bar (and loading indication) initialization
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    m_LoadingSpinner.setRoundness(50.0);
+    m_LoadingSpinner.setMinimumTrailOpacity(15.0);
+    m_LoadingSpinner.setTrailFadePercentage(70.0);
+    m_LoadingSpinner.setNumberOfLines(20);
+    m_LoadingSpinner.setLineLength(24);
+    m_LoadingSpinner.setLineWidth(4);
+    m_LoadingSpinner.setInnerRadius(12);
+    m_LoadingSpinner.setRevolutionsPerSecond(1.5);
+    m_LoadingSpinner.setColor(QColor(25, 255, 25));
 
     m_LoadingMsg.setText("Ready");
     statusBar()->addWidget(&m_LoadingMsg);
@@ -179,8 +169,6 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     QLabel *pSvnLoginLabel = new QLabel;
     pSvnLoginLabel->setText("SVN Not Detected");
     statusBar()->addPermanentWidget(pSvnLoginLabel);
-
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this, SLOT(OnCtrlTab()));
 
     //setStyleSheet("background-color:black;");
 
@@ -273,9 +261,9 @@ void MainWindow::SetCurrentProject(Project &newCurrentProjectRef)
     // Setup the item properties docking window to be the current item
     QString sWindowTitle = pItem->GetName(true) % " Properties";
 
-    sm_pInstance->ui->dockWidgetCurrentItem->show();
-    sm_pInstance->ui->dockWidgetCurrentItem->setWindowTitle(sWindowTitle);
-    sm_pInstance->ui->dockWidgetCurrentItem->setWidget(pItem->GetWidget());
+    sm_pInstance->ui->dockWidgetProperties->show();
+    sm_pInstance->ui->dockWidgetProperties->setWindowTitle(sWindowTitle);
+    sm_pInstance->ui->dockWidgetProperties->setWidget(pItem->GetWidget());
 
     // Remove all the actions in the "Edit" menu, and replace it with the current item's actions
     QList<QAction *> editActionList = sm_pInstance->ui->menu_Edit->actions();
@@ -306,11 +294,11 @@ void MainWindow::SetCurrentProject(Project &newCurrentProjectRef)
     }
 
     // If this is the item that is currently being shown, unhook all its actions and widget
-    if(sm_pInstance->ui->dockWidgetCurrentItem->widget() == pItem->GetWidget())
+    if(sm_pInstance->ui->dockWidgetProperties->widget() == pItem->GetWidget())
     {
         pItem->BlockAllWidgetSignals(true);
 
-        sm_pInstance->ui->dockWidgetCurrentItem->hide();
+        sm_pInstance->ui->dockWidgetProperties->hide();
 
         QList<QAction *> editActionList = sm_pInstance->ui->menu_Edit->actions();
         for(uint i = 0; i < editActionList.size(); ++i)

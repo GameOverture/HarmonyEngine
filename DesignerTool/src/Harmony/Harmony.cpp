@@ -1,11 +1,13 @@
 #include "Harmony.h"
+#include "MainWindow.h"
+#include "HarmonyWidget.h"
 
 Harmony *Harmony::sm_pInstance = nullptr;
 
-Harmony::Harmony(MainWindow *pMainWindow) : QObject(pMainWindow),
-                                            m_pMainWindow(pMainWindow),
-                                            m_Connection(this),
-                                            m_pLoadedWidget(nullptr)
+Harmony::Harmony(MainWindow &mainWindowRef) :  QObject(&mainWindowRef),
+                                               m_MainWindowRef(mainWindowRef),
+                                               m_Connection(this),
+                                               m_pLoadedWidget(nullptr)
 {
     if(sm_pInstance != nullptr)
         HyGuiLog("Harmony instance created when the static 'sm_pInstance' was not nullptr", LOGTYPE_Error);
@@ -39,8 +41,8 @@ Harmony::Harmony(MainWindow *pMainWindow) : QObject(pMainWindow),
     sm_pInstance->m_pLoadedWidget = new HarmonyWidget(projectRef);
     connect(sm_pInstance->m_pLoadedWidget, &HarmonyWidget::HarmonyWidgetReady, sm_pInstance, &Harmony::HarmonyWidgetReady);
 
-    sm_pInstance->m_pMainWindow->SetHarmonyWidget(sm_pInstance->m_pLoadedWidget);
-    sm_pInstance->m_pMainWindow->SetLoading("Loading new Harmony instance");
+    sm_pInstance->m_MainWindowRef.SetHarmonyWidget(sm_pInstance->m_pLoadedWidget);
+    sm_pInstance->m_MainWindowRef.SetLoading("Loading new Harmony instance");
 
 //    SwitchRendererThread *pWorkerThread = new SwitchRendererThread(sm_pInstance->m_pCurRenderer, sm_pInstance);
 //    connect(pWorkerThread, &SwitchRendererThread::finished, pWorkerThread, &QObject::deleteLater);
@@ -70,9 +72,9 @@ Harmony::Harmony(MainWindow *pMainWindow) : QObject(pMainWindow),
     m_pLoadedWidget = pWidget;
 
     m_pLoadedWidget->GetProject().Initialize();
-    m_pMainWindow->SetCurrentProject(m_pLoadedWidget->GetProject());
+    m_MainWindowRef.SetCurrentProject(m_pLoadedWidget->GetProject());
 
-    m_pMainWindow->ClearLoading();
+    m_MainWindowRef.ClearLoading();
 }
 //void MainWindow::OnSwitchRendererReady(HyGuiRenderer *pRenderer)
 //{

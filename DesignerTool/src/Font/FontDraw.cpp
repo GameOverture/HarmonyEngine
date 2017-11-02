@@ -2,6 +2,7 @@
 #include "FontWidget.h"
 #include "MainWindow.h"
 #include "Harmony.h"
+#include "HarmonyWidget.h"
 
 #define PreviewOffsetY -2500.0f
 

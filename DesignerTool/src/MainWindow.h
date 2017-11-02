@@ -11,6 +11,7 @@
 #define MAINWINDOW_H
 
 #include "Global.h"
+#include "Harmony.h"
 #include "_Dependencies/QtWaitingSpinner/waitingspinnerwidget.h"
 
 #include <QMainWindow>
@@ -25,7 +26,6 @@ namespace Ui {
 class MainWindow;
 }
 
-class Harmony;
 class HarmonyWidget;
 class Project;
 class ProjectItem;
@@ -53,13 +53,14 @@ class MainWindow : public QMainWindow
 
     static MainWindow *     sm_pInstance;
 
-    Harmony *               m_Harmony;
+    Harmony                 m_Harmony;
 
     QSettings               m_Settings;
+    WaitingSpinnerWidget    m_LoadingSpinner;
+
     QString                 m_sEngineLocation;
     QString                 m_sDefaultProjectLocation;
 
-    WaitingSpinnerWidget    m_LoadingSpinner;
     QLabel                  m_LoadingMsg;
     QProgressBar            m_LoadingBar;
 

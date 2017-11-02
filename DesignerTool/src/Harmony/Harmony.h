@@ -1,13 +1,14 @@
 #ifndef HARMONY_H
 #define HARMONY_H
 
-#include "MainWindow.h"
 #include "Project.h"
-#include "HarmonyWidget.h"
 #include "HarmonyConnection.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
+
+class MainWindow;
+class HarmonyWidget;
 
 class Harmony : public QObject
 {
@@ -15,12 +16,12 @@ class Harmony : public QObject
 
     static Harmony *        sm_pInstance;
 
-    MainWindow *            m_pMainWindow;
+    MainWindow &            m_MainWindowRef;
     HarmonyConnection       m_Connection;
     HarmonyWidget *         m_pLoadedWidget;
 
 public:
-    Harmony(MainWindow *pMainWindow);
+    Harmony(MainWindow &mainWindowRef);
     virtual ~Harmony();
 
     static Project *GetProject();

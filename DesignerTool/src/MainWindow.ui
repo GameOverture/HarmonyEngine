@@ -145,7 +145,7 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_3">
+   <widget class="QWidget" name="explorerContents">
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <property name="leftMargin">
       <number>0</number>
@@ -165,7 +165,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidgetCurrentItem">
+  <widget class="QDockWidget" name="dockWidgetProperties">
    <property name="features">
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
@@ -178,7 +178,7 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_4">
+   <widget class="QWidget" name="propertiesContents">
     <layout class="QVBoxLayout" name="verticalLayout_5">
      <property name="leftMargin">
       <number>2</number>
@@ -205,7 +205,7 @@
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_5">
+   <widget class="QWidget" name="outputLogContents">
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <property name="leftMargin">
       <number>0</number>
@@ -235,7 +235,7 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
+   <widget class="QWidget" name="atlasContents">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <property name="leftMargin">
       <number>2</number>
@@ -259,7 +259,7 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_9">
+   <widget class="QWidget" name="audioContents">
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="leftMargin">
       <number>0</number>
@@ -355,6 +355,9 @@
    </property>
   </action>
   <action name="actionCloseProject">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/items/Project-Close.png</normaloff>:/icons16x16/items/Project-Close.png</iconset>
@@ -382,6 +385,9 @@
    </property>
   </action>
   <action name="actionSave">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/file-save.png</normaloff>:/icons16x16/file-save.png</iconset>
@@ -397,6 +403,9 @@
    </property>
   </action>
   <action name="actionSaveAll">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/file-saveAll.png</normaloff>:/icons16x16/file-saveAll.png</iconset>
@@ -412,6 +421,9 @@
    </property>
   </action>
   <action name="actionNewSprite">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/items/Sprite-New.png</normaloff>:/icons16x16/items/Sprite-New.png</iconset>
@@ -439,6 +451,9 @@
    </property>
   </action>
   <action name="actionNewFont">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/items/Font-New.png</normaloff>:/icons16x16/items/Font-New.png</iconset>
@@ -451,6 +466,9 @@
    </property>
   </action>
   <action name="actionNewParticle">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/items/Particles-New.png</normaloff>:/icons16x16/items/Particles-New.png</iconset>
@@ -466,6 +484,9 @@
    </property>
   </action>
   <action name="actionNewAudio">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/items/Audio-New.png</normaloff>:/icons16x16/items/Audio-New.png</iconset>
@@ -497,6 +518,9 @@
    </property>
   </action>
   <action name="actionLaunchIDE">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/code.png</normaloff>:/icons16x16/code.png</iconset>
@@ -514,6 +538,9 @@
    </property>
   </action>
   <action name="actionProjectSettings">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/items/Project-Settings.png</normaloff>:/icons16x16/items/Project-Settings.png</iconset>
@@ -526,6 +553,9 @@
    </property>
   </action>
   <action name="actionNewEntity">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
      <normaloff>:/icons16x16/items/Entity-New.png</normaloff>:/icons16x16/items/Entity-New.png</iconset>

@@ -13,6 +13,7 @@
 #include "MainWindow.h"
 #include "Global.h"
 #include "Harmony.h"
+#include "HarmonyWidget.h"
 
 #include <QJsonDocument>
 #include <QJsonArray>
