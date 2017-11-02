@@ -57,6 +57,9 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
     while(ui->stackedTabWidgets->count())
         ui->stackedTabWidgets->removeWidget(ui->stackedTabWidgets->currentWidget());
 
+    SetHarmonyWidget(m_Harmony.GetWidget(nullptr));
+    SetCurrentProject(nullptr);
+
     connect(ui->menu_View, SIGNAL(aboutToShow), this, SLOT(on_menu_View_aboutToShow));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this, SLOT(OnCtrlTab()));
 
@@ -199,11 +202,6 @@ MainWindow::~MainWindow()
     return sm_pInstance;
 }
 
-void MainWindow::SetHarmonyWidget(HarmonyWidget *pWidget)
-{
-    ui->centralVerticalLayout->addWidget(pWidget);
-}
-
 void MainWindow::SetLoading(QString sMsg)
 {
     m_LoadingMsg.setText(sMsg);
@@ -218,13 +216,25 @@ void MainWindow::ClearLoading()
     m_LoadingSpinner.stop();
 }
 
-void MainWindow::SetCurrentProject(Project &newCurrentProjectRef)
+void MainWindow::SetHarmonyWidget(HarmonyWidget *pWidget)
 {
+    ui->centralVerticalLayout->addWidget(pWidget);
+}
+
+void MainWindow::SetCurrentProject(Project *pProject)
+{
+    if(pProject == nullptr)
+    {
+        ui->dockWidgetAtlas->setWidget(nullptr);
+        ui->dockWidgetAudio->setWidget(nullptr);
+        return;
+    }
+
     // Insert the project's TabBar
     bool bTabsFound = false;
     for(int i = 0; i < ui->stackedTabWidgets->count(); ++i)
     {
-        if(ui->stackedTabWidgets->widget(i) == newCurrentProjectRef.GetTabBar())
+        if(ui->stackedTabWidgets->widget(i) == pProject->GetTabBar())
         {
             ui->stackedTabWidgets->setCurrentIndex(i);
             bTabsFound = true;
@@ -232,19 +242,17 @@ void MainWindow::SetCurrentProject(Project &newCurrentProjectRef)
     }
     if(bTabsFound == false)
     {
-        ui->stackedTabWidgets->addWidget(newCurrentProjectRef.GetTabBar());
-        ui->stackedTabWidgets->setCurrentWidget(newCurrentProjectRef.GetTabBar());
-        newCurrentProjectRef.GetTabBar()->setParent(ui->stackedTabWidgets);
+        ui->stackedTabWidgets->addWidget(pProject->GetTabBar());
+        ui->stackedTabWidgets->setCurrentWidget(pProject->GetTabBar());
+        pProject->GetTabBar()->setParent(ui->stackedTabWidgets);
     }
 
     // Project manager widgets
-    ui->dockWidgetAtlas->setWidget(newCurrentProjectRef.GetAtlasWidget());
+    ui->dockWidgetAtlas->setWidget(pProject->GetAtlasWidget());
     ui->dockWidgetAtlas->widget()->show();
 
-    ui->dockWidgetAudio->setWidget(newCurrentProjectRef.GetAudioWidget());
+    ui->dockWidgetAudio->setWidget(pProject->GetAudioWidget());
     ui->dockWidgetAudio->widget()->show();
-
-    ui->centralVerticalLayout->addWidget(Harmony::GetWidget(newCurrentProjectRef));
 }
 
 /*static*/ QString MainWindow::EngineSrcLocation()
@@ -385,11 +393,7 @@ void MainWindow::on_actionOpenProject_triggered()
 
 void MainWindow::on_actionCloseProject_triggered()
 {
-    Harmony::CloseProject();
-
-    ui->dockWidgetAtlas->setWidget(nullptr);
-    ui->dockWidgetAudio->setWidget(nullptr);
-
+    Harmony::SetProject(nullptr);
     ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
 }
 

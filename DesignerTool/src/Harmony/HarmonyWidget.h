@@ -12,7 +12,7 @@ class HarmonyWidget : public QOpenGLWidget//, protected QOpenGLFunctions
 {
     Q_OBJECT
 
-    Project &                   m_ProjectRef;
+    Project *                   m_pProject;
 
     HyEngine *                  m_pHyEngine;
     bool                        m_bHarmonyLoaded;
@@ -20,12 +20,12 @@ class HarmonyWidget : public QOpenGLWidget//, protected QOpenGLFunctions
     QTimer *                    m_pTimer;
 
 public:
-    HarmonyWidget(Project &projectRef);
+    HarmonyWidget(Project *pProject);
     virtual ~HarmonyWidget();
 
-    Project &GetProject();
+    Project *GetProject();
 
-    bool IsProject(Project &projectRef);
+    bool IsProject(Project *pProjectToTest);
 
     void SetCursor(Qt::CursorShape eShape);
     void RestoreCursor();

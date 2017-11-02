@@ -103,7 +103,7 @@ void IDraw::ResizeRenderer()
 {
     if(pEvent->key() == KEY_PanCamera)
     {
-        Harmony::GetWidget(m_pProjItem->GetProject())->SetCursor(Qt::OpenHandCursor);
+        Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursor(Qt::OpenHandCursor);
         m_bPanCameraKeyDown = true;
     }
 }
@@ -115,7 +115,7 @@ void IDraw::ResizeRenderer()
         m_bPanCameraKeyDown = false;
 
         if(m_bIsCameraPanning == false)
-            Harmony::GetWidget(m_pProjItem->GetProject())->RestoreCursor();
+            Harmony::GetWidget(&m_pProjItem->GetProject())->RestoreCursor();
     }
 }
 
@@ -127,7 +127,7 @@ void IDraw::ResizeRenderer()
         {
             m_bIsCameraPanning = true;
             m_ptOldMousePos = pEvent->localPos();
-            Harmony::GetWidget(m_pProjItem->GetProject())->SetCursor(Qt::ClosedHandCursor);
+            Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursor(Qt::ClosedHandCursor);
         }
     }
 }
@@ -140,9 +140,9 @@ void IDraw::ResizeRenderer()
         {
             m_bIsCameraPanning = false;
             if(m_bPanCameraKeyDown)
-                Harmony::GetWidget(m_pProjItem->GetProject())->SetCursor(Qt::OpenHandCursor);
+                Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursor(Qt::OpenHandCursor);
             else
-                Harmony::GetWidget(m_pProjItem->GetProject())->RestoreCursor();
+                Harmony::GetWidget(&m_pProjItem->GetProject())->RestoreCursor();
         }
     }
 }

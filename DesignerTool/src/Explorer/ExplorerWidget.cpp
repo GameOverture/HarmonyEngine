@@ -565,7 +565,7 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
     ui->actionPasteItem->setEnabled(sm_sInternalClipboard.isEmpty() == false);
     
     if(bValidItem)
-        Harmony::SetProject(*GetCurProjSelected());
+        Harmony::SetProject(GetCurProjSelected());
 }
 
 void ExplorerWidget::on_actionRename_triggered()

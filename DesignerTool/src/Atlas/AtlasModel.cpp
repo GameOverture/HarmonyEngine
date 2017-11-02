@@ -1137,7 +1137,7 @@ void AtlasModel::Refresh()
     SaveData();
 
     // Reload Harmony
-    Harmony::SetProject(*m_pProjOwner);
+    Harmony::Reload(m_pProjOwner);
 
 //    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
 //    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());

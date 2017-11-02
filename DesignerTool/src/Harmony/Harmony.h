@@ -17,18 +17,19 @@ class Harmony : public QObject
     static Harmony *        sm_pInstance;
 
     MainWindow &            m_MainWindowRef;
+    HarmonyWidget *         m_pWidget;
     HarmonyConnection       m_Connection;
-    HarmonyWidget *         m_pLoadedWidget;
 
 public:
     Harmony(MainWindow &mainWindowRef);
     virtual ~Harmony();
 
     static Project *GetProject();
-    static void SetProject(Project &projectRef);
-    static void CloseProject();
+    static void SetProject(Project *pProject);
+    //static void CloseProject(Project *pProject);
+    static void Reload(Project *pProject);
 
-    static HarmonyWidget *GetWidget(Project &projectRef);
+    static HarmonyWidget *GetWidget(Project *pProject);
 
 private Q_SLOTS:
       void HarmonyWidgetReady(HarmonyWidget *pWidget);

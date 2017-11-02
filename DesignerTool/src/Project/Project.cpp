@@ -93,6 +93,15 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
     m_Init.sGameName = GetGameName().toStdString();
     m_Init.sDataDir = GetAssetsAbsPath().toStdString();
 
+    m_pTabBar = new ProjectTabBar(this);
+    m_pTabBar->setTabsClosable(true);
+    m_pTabBar->setShape(QTabBar::TriangularNorth);
+    m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
+    m_pTabBar->setAcceptDrops(true);
+    m_pTabBar->setMovable(true);
+    m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
+    m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(OnCloseTab(int)));
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Load game data items
@@ -583,28 +592,14 @@ void Project::ApplySaveEnables()
     m_pAtlasWidget = new AtlasWidget(m_pAtlasModel, this, nullptr);
     m_pAudioMan = new AudioWidgetManager(this, nullptr);
 
-    if(m_pTabBar == nullptr)
+    for(int i = 0; i < m_pTabBar->count(); ++i)
     {
-        m_pTabBar = new ProjectTabBar(this);
-        m_pTabBar->setTabsClosable(true);
-        m_pTabBar->setShape(QTabBar::TriangularNorth);
-        m_pTabBar->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
-        m_pTabBar->setAcceptDrops(true);
-        m_pTabBar->setMovable(true);
-        m_pTabBar->connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarCurrentChanged(int)));
-        m_pTabBar->connect(m_pTabBar, SIGNAL(tabCloseRequested(int)), this, SLOT(OnCloseTab(int)));
+        ProjectItem *pOpenItem = m_pTabBar->tabData(i).value<ProjectItem *>();
+        pOpenItem->DrawLoad(*this);
     }
-    else
-    {
-        for(int i = 0; i < m_pTabBar->count(); ++i)
-        {
-            ProjectItem *pOpenItem = m_pTabBar->tabData(i).value<ProjectItem *>();
-            pOpenItem->DrawLoad(*this);
-        }
 
-        if(m_pTabBar->currentIndex() >= 0)
-            m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->DrawShow();
-    }
+    if(m_pTabBar->currentIndex() >= 0)
+        m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->DrawShow();
 
     return true;
 }
