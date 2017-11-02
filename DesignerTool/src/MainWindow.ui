@@ -570,6 +570,22 @@
     <string>Ctrl+N, Ctrl+E</string>
    </property>
   </action>
+  <action name="actionTheme_Lappy486">
+   <property name="text">
+    <string>Lappy 486</string>
+   </property>
+   <property name="toolTip">
+    <string>Now that is a classy computing beige theme</string>
+   </property>
+  </action>
+  <action name="actionTheme_Compe">
+   <property name="text">
+    <string>Compé</string>
+   </property>
+   <property name="toolTip">
+    <string>So sleek! So-phisticated! So... Compé!</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

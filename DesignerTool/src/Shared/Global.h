@@ -118,6 +118,14 @@ enum SubIcon
     NUM_SUBICONS
 };
 
+enum Theme
+{
+    THEME_Lappy486 = 0,
+    THEME_Compe,
+
+    NUMTHEMES
+};
+
 #define HYTREEWIDGETITEM_IsFilter               "HyTreeFilter"
 
 #define HYDEFAULT_PrefixChar                    '+' // Names prefixed with a '+' are engine defaults that are automatically added to project
@@ -151,6 +159,8 @@ class HyGlobal
     static QIcon                    sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
     static QColor                   sm_ItemColors[NUMTYPES];
 
+    static QString                  sm_Themes[NUMTHEMES];
+
     static QRegExpValidator *       sm_pCodeNameValidator;
     static QRegExpValidator *       sm_pFileNameValidator;
     static QRegExpValidator *       sm_pFilePathValidator;
@@ -173,6 +183,7 @@ public:
     static const QString ItemExt(HyGuiItemType eItem);
     static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)  { return sm_ItemIcons[eItm][eSubIcon]; }
     static const QColor ItemColor(HyGuiItemType eItem)                  { return sm_ItemColors[eItem]; }
+    static const QString ThemeString(Theme eTheme)                      { return sm_Themes[eTheme]; }
 
     static const QRegExpValidator *CodeNameValidator()                  { return sm_pCodeNameValidator; }
     static const QRegExpValidator *FileNameValidator()                  { return sm_pFileNameValidator; }

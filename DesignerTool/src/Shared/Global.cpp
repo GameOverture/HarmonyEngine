@@ -16,6 +16,8 @@
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
 /*static*/ QColor HyGlobal::sm_ItemColors[NUMTYPES];
 
+/*static*/ QString HyGlobal::sm_Themes[NUMTHEMES];
+
 /*static*/ QRegExpValidator *HyGlobal::sm_pCodeNameValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFileNameValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFilePathValidator = nullptr;
@@ -90,6 +92,9 @@
     sm_ItemColors[ITEM_Prefix] = QColor(228, 212, 128);
     sm_ItemColors[ITEM_BoundingVolume] = QColor(234, 232, 58);
     sm_ItemColors[ITEM_Physics] = QColor(201, 58, 203);
+
+    sm_Themes[THEME_Lappy486] = "Lappy486";
+    sm_Themes[THEME_Compe] = "Compe";
 
     sm_pCodeNameValidator = new QRegExpValidator(QRegExp("[A-Za-z_]+[A-Za-z0-9_]*"));
     sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-]*"));

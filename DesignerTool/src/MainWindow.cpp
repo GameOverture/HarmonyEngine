@@ -34,7 +34,7 @@
 #include <QLabel>
 #include <QShortcut>
 
-/*static*/ MainWindow * MainWindow::sm_pInstance = NULL;
+/*static*/ MainWindow *MainWindow::sm_pInstance = nullptr;
 
 ///*virtual*/ void SwitchRendererThread::run() /*override*/
 //{
@@ -44,9 +44,10 @@
 //    Q_EMIT SwitchIsReady(m_pCurrentRenderer);
 //}
 
-MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
+MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
                                             ui(new Ui::MainWindow),
                                             m_Harmony(*this),
+                                            m_eTheme(THEME_Lappy486),
                                             m_Settings("Overture Games", "Harmony Designer Tool"),
                                             m_LoadingSpinner(this)
 {
@@ -62,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     HyGuiLog("Harmony Designer Tool", LOGTYPE_Title);
     HyGuiLog("Initializing...", LOGTYPE_Normal);
     
-    // Link the actions to their proper widgets
+    // TODO: Don't copy action pointers to other widgets, have function here that manipulates them instead
     ui->explorer->addAction(ui->actionProjectSettings);
     ui->explorer->addAction(ui->actionCloseProject);
     ui->explorer->addAction(ui->actionCopy);
@@ -140,6 +141,21 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
         QDir defaultProjDir(m_sDefaultProjectLocation);
         if(m_sDefaultProjectLocation.isEmpty() || defaultProjDir.exists() == false)
             m_sDefaultProjectLocation = QDir::current().path();
+
+        bool bThemeFound = false;
+        QString sTheme = m_Settings.value("theme").toString();
+        for(int i = 0; i < NUMTHEMES; ++i)
+        {
+            if(sTheme == HyGlobal::ThemeString(static_cast<Theme>(i)))
+            {
+                SelectTheme(static_cast<Theme>(i));
+                bThemeFound = true;
+                break;
+            }
+        }
+
+        if(bThemeFound == false)
+            SelectTheme(m_eTheme);  // Default theme
     }
     m_Settings.endGroup();
 
@@ -169,8 +185,6 @@ MainWindow::MainWindow(QWidget *parent) :   QMainWindow(parent),
     QLabel *pSvnLoginLabel = new QLabel;
     pSvnLoginLabel->setText("SVN Not Detected");
     statusBar()->addPermanentWidget(pSvnLoginLabel);
-
-    //setStyleSheet("background-color:black;");
 
     HyGuiLog("Ready to go!", LOGTYPE_Normal);
 }
@@ -454,6 +468,13 @@ void MainWindow::on_menu_View_aboutToShow()
     QMenu *pPopupMenu = this->createPopupMenu();
 
     ui->menu_View->clear();
+
+    QMenu *pThemesMenu = new QMenu("Themes");
+    pThemesMenu->addAction(ui->actionTheme_Lappy486);
+    pThemesMenu->addAction(ui->actionTheme_Compe);
+
+    ui->menu_View->addMenu(pThemesMenu);
+    ui->menu_View->addSeparator();
     ui->menu_View->addActions(pPopupMenu->actions());
 }
 
@@ -591,6 +612,16 @@ void MainWindow::on_actionProjectSettings_triggered()
     ui->explorer->GetCurProjSelected()->ExecProjSettingsDlg();
 }
 
+void MainWindow::on_actionTheme_Lappy486_triggered()
+{
+    SelectTheme(THEME_Lappy486);
+}
+
+void MainWindow::on_actionTheme_Compe_triggered()
+{
+    SelectTheme(THEME_Compe);
+}
+
 void MainWindow::NewItem(HyGuiItemType eItem)
 {
     DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, this);
@@ -618,6 +649,24 @@ void MainWindow::SaveSettings()
     m_Settings.beginGroup("Misc");
     {
         m_Settings.setValue("defaultProjectLocation", QVariant(m_sDefaultProjectLocation));
+        m_Settings.setValue("theme", HyGlobal::ThemeString(m_eTheme));
     }
     m_Settings.endGroup();
+}
+
+void MainWindow::SelectTheme(Theme eTheme)
+{
+    m_eTheme = eTheme;
+    switch(m_eTheme)
+    {
+    case THEME_Lappy486:
+        setStyleSheet("");
+        break;
+    case THEME_Compe:
+        setStyleSheet("background-color:black;");
+        break;
+    default:
+        HyGuiLog("MainWindow::SelectTheme was given unknown theme", LOGTYPE_Error);
+        break;
+    }
 }

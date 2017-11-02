@@ -448,7 +448,7 @@ void AtlasWidget::OnContextMenu(const QPoint &pos)
                 atlasGrpMenu.addAction(pActionAtlasGrpMove);
             }
             
-             connect(&atlasGrpMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_actionAtlasGrpTransfer_triggered(QAction*)));
+            connect(&atlasGrpMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_actionAtlasGrpTransfer_triggered(QAction*)));
             
             contextMenu.addMenu(&atlasGrpMenu);
             contextMenu.addSeparator();

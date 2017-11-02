@@ -54,6 +54,7 @@ class MainWindow : public QMainWindow
     static MainWindow *     sm_pInstance;
 
     Harmony                 m_Harmony;
+    Theme                   m_eTheme;
 
     QSettings               m_Settings;
     WaitingSpinnerWidget    m_LoadingSpinner;
@@ -65,7 +66,7 @@ class MainWindow : public QMainWindow
     QProgressBar            m_LoadingBar;
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *pParent = 0);
     ~MainWindow();
 
     static MainWindow *GetInstance();   // Should only be used to set QWidget parents // TODO: Check if messageboxes even care about their parent set, if not then remove this
@@ -114,12 +115,17 @@ private Q_SLOTS:
 
     void on_actionProjectSettings_triggered();
 
+    void on_actionTheme_Lappy486_triggered();
+
+    void on_actionTheme_Compe_triggered();
+
 private:
     Ui::MainWindow *ui;
 
     void NewItem(HyGuiItemType eItem);
 
     void SaveSettings();
+    void SelectTheme(Theme eTheme);
 };
 
 #endif // MAINWINDOW_H
