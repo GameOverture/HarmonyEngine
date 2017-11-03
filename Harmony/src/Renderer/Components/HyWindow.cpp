@@ -80,7 +80,7 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShow
 	glfwSetWindowPos(m_hData, m_Info.ptLocation.x, m_Info.ptLocation.y);
 
 	if(bShowCursor == false)
-		glfwSetInputMode(m_hData, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(m_hData, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	glfwShowWindow(m_hData);
 
