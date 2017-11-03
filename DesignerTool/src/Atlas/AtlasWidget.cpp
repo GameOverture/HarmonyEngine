@@ -298,6 +298,7 @@ void AtlasWidget::on_actionReplaceImages_triggered()
         selectedFrameList.append(selectedTreeItemFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>());
 
     QFileDialog dlg(this);
+    dlg.setDirectory("");
 
     if(selectedFrameList.count() == 1)
     {
