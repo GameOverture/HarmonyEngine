@@ -163,7 +163,7 @@ void HyText2d::TextSetState(uint32 uiStateIndex)
 	if(IsLoaded() && m_uiCurFontState != uiStateIndex)
 		m_bIsDirty = true;
 	
-	HyAssert(uiStateIndex < static_cast<HyText2dData *>(AcquireData())->GetNumStates(), "HyText2d::TextSetState set state to invalid index: " << uiStateIndex);
+	//HyAssert(uiStateIndex < static_cast<HyText2dData *>(AcquireData())->GetNumStates(), "HyText2d::TextSetState set state to invalid index: " << uiStateIndex);
 	m_uiCurFontState = uiStateIndex;
 }
 

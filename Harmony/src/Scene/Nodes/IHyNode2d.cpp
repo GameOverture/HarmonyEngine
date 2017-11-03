@@ -21,6 +21,8 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 																scale(*this, DIRTY_Transform | DIRTY_WorldAABB),
 																scale_pivot(*this, DIRTY_Transform | DIRTY_WorldAABB)
 {
+	HyAssert(m_pParent != this, "HyEntity2d 'pParent' has been specified as itself!");
+
 	scale.Set(1.0f);
 
 	HyScene::AddNode(this);
