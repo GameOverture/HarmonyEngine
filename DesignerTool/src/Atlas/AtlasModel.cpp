@@ -825,6 +825,13 @@ void AtlasModel::RepackAll(uint uiAtlasGrpIndex)
 
 void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
 {
+    // TODO: Thread this
+//    AtlasRepackThread *pWorkerThread = new AtlasRepackThread(sm_pInstance->m_pCurRenderer, sm_pInstance);
+//    connect(pWorkerThread, &AtlasRepackThread::finished, pWorkerThread, &QObject::deleteLater);
+//    connect(pWorkerThread, &AtlasRepackThread::RepackIsFinished, sm_pInstance, &AtlasModel::OnRepackFinished);
+//    pWorkerThread->start();
+
+
     // Always repack the last texture to ensure it gets filled as much as it can
     QFileInfoList existingTexturesInfoList = GetExistingTextureInfoList(uiAtlasGrpIndex);
     for(int i = HyClamp(existingTexturesInfoList.size() - 1, 0, existingTexturesInfoList.size()); i < existingTexturesInfoList.size(); ++i)
@@ -1143,7 +1150,6 @@ void AtlasModel::Refresh()
 //    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
 
     HyGuiLog("Atlas Refresh finished", LOGTYPE_Normal);
-
 }
 
 /*virtual*/ int AtlasModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
@@ -1170,4 +1176,8 @@ void AtlasModel::Refresh()
 /*virtual*/ QVariant AtlasModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
 {
     return QVariant();
+}
+
+/*slot*/ void AtlasModel::OnRepackFinished()
+{
 }

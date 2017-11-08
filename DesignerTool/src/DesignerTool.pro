@@ -80,7 +80,8 @@ SOURCES += main.cpp \
     Explorer/ExplorerTreeItem.cpp \
     Harmony/Harmony.cpp \
     Harmony/HarmonyConnection.cpp \
-    Harmony/HarmonyWidget.cpp
+    Harmony/HarmonyWidget.cpp \
+    Atlas/AtlasRepackThread.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -149,7 +150,8 @@ HEADERS  += \
     Explorer/ExplorerTreeItem.h \
     Harmony/Harmony.h \
     Harmony/HarmonyConnection.h \
-    Harmony/HarmonyWidget.h
+    Harmony/HarmonyWidget.h \
+    Atlas/AtlasRepackThread.h
 
 FORMS    += \
     MainWindow.ui \

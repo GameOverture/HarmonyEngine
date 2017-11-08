@@ -30,23 +30,6 @@ class HarmonyWidget;
 class Project;
 class ProjectItem;
 
-//class SwitchRendererThread : public QThread
-//{
-//    Q_OBJECT
-
-//    HyGuiRenderer *m_pCurrentRenderer;
-
-//public:
-//    SwitchRendererThread(HyGuiRenderer *pCurrentRenderer, QObject *pParent) :   QThread(pParent),
-//                                                                                m_pCurrentRenderer(pCurrentRenderer)
-//    { }
-
-//    virtual void run() override;
-
-//Q_SIGNALS:
-//      void SwitchIsReady(HyGuiRenderer *pRenderer);
-//};
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT

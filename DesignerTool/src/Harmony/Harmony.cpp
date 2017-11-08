@@ -29,12 +29,6 @@ Harmony::Harmony(MainWindow &mainWindowRef) :  QObject(&mainWindowRef),
     if(sm_pInstance->m_pWidget->GetProject() == pProject)
         return;
 
-    // TODO: Thread this
-//    SwitchRendererThread *pWorkerThread = new SwitchRendererThread(sm_pInstance->m_pCurRenderer, sm_pInstance);
-//    connect(pWorkerThread, &SwitchRendererThread::finished, pWorkerThread, &QObject::deleteLater);
-//    connect(pWorkerThread, &SwitchRendererThread::SwitchIsReady, sm_pInstance, &MainWindow::OnSwitchRendererReady);
-//    pWorkerThread->start();
-
     // Delete the current reference and replace it with a newly allocated widget
     delete sm_pInstance->m_pWidget;
     sm_pInstance->m_pWidget = new HarmonyWidget(pProject);
@@ -79,11 +73,3 @@ Harmony::Harmony(MainWindow &mainWindowRef) :  QObject(&mainWindowRef),
     m_MainWindowRef.SetCurrentProject(m_pWidget->GetProject());
     m_MainWindowRef.ClearLoading();
 }
-//void MainWindow::OnSwitchRendererReady(HyGuiRenderer *pRenderer)
-//{
-//    delete pRenderer;
-
-//    // Swap the harmony engine renderers
-//    sm_pInstance->m_pCurRenderer = new HyGuiRenderer(sm_pInstance->m_pCurSelectedProj, sm_pInstance);
-//    sm_pInstance->ui->centralVerticalLayout->addWidget(sm_pInstance->m_pCurRenderer);
-//}

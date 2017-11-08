@@ -139,6 +139,9 @@ public:
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+
+private Q_SLOTS:
+    void OnRepackFinished();
 };
 
 #endif // ATLASMODEL_H

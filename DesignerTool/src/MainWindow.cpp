@@ -36,14 +36,6 @@
 
 /*static*/ MainWindow *MainWindow::sm_pInstance = nullptr;
 
-///*virtual*/ void SwitchRendererThread::run() /*override*/
-//{
-//    while(m_pCurrentRenderer && m_pCurrentRenderer->IsLoading())
-//    { }
-
-//    Q_EMIT SwitchIsReady(m_pCurrentRenderer);
-//}
-
 MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
                                             ui(new Ui::MainWindow),
                                             m_Harmony(*this),
