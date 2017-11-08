@@ -39,6 +39,7 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent
 HyText2d::~HyText2d(void)
 {
 	delete[] m_pGlyphInfos;
+	m_pGlyphInfos = nullptr;
 
 	for(uint32 i = 0; i < static_cast<uint32>(m_StateColors.size()); ++i)
 	{
@@ -47,6 +48,11 @@ HyText2d::~HyText2d(void)
 
 		delete m_StateColors[i];
 	}
+}
+
+/*virtual*/ bool HyText2d::IsEnabled() /*override*/
+{
+	return (IHyNode::IsEnabled() && m_uiNumValidCharacters > 0);
 }
 
 // Assumes UTF-8 encoding. Accepts newline characters '\n'
@@ -68,8 +74,7 @@ void HyText2d::TextSet(const std::string sText)
 		HyAssert(uiNumBytesUsed > 0, "HyText2d::TextSet failed to convert utf8 -> utf32");
 	}
 
-	if(IsLoaded())
-		m_bIsDirty = true;
+	MarkAsDirty();
 }
 
 const std::string &HyText2d::TextGet() const
@@ -89,16 +94,13 @@ uint32 HyText2d::TextGetNumShownCharacters()
 
 float HyText2d::TextGetScaleBoxModifer()
 {
-	if(m_bIsDirty)
-		DrawUpdate();
-
+	DrawUpdate();
 	return m_fScaleBoxModifier;
 }
 
 glm::vec2 HyText2d::TextGetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex)
 {
-	if(m_bIsDirty)
-		DrawUpdate();
+	DrawUpdate();
 
 	if(m_pGlyphInfos == nullptr)
 		return glm::vec2(0);
@@ -112,8 +114,7 @@ glm::vec2 HyText2d::TextGetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex)
 
 glm::vec2 HyText2d::TextGetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex)
 {
-	if(m_bIsDirty)
-		DrawUpdate();
+	DrawUpdate();
 
 	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
 	const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
@@ -137,8 +138,7 @@ float HyText2d::TextGetGlyphAlpha(uint32 uiCharIndex)
 
 void HyText2d::TextSetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
 {
-	if(m_bIsDirty)
-		DrawUpdate();
+	DrawUpdate();
 
 	if(m_pGlyphInfos == nullptr)
 		return;
@@ -160,8 +160,8 @@ uint32 HyText2d::TextGetState()
 
 void HyText2d::TextSetState(uint32 uiStateIndex)
 {
-	if(IsLoaded() && m_uiCurFontState != uiStateIndex)
-		m_bIsDirty = true;
+	if(m_uiCurFontState != uiStateIndex)
+		MarkAsDirty();
 	
 	//HyAssert(uiStateIndex < static_cast<HyText2dData *>(AcquireData())->GetNumStates(), "HyText2d::TextSetState set state to invalid index: " << uiStateIndex);
 	m_uiCurFontState = uiStateIndex;
@@ -222,8 +222,8 @@ HyAlign HyText2d::TextGetAlignment()
 
 void HyText2d::TextSetAlignment(HyAlign eAlignment)
 {
-	if(IsLoaded() && m_eAlignment != eAlignment)
-		m_bIsDirty = true;
+	if(m_eAlignment != eAlignment)
+		MarkAsDirty();
 	
 	m_eAlignment = eAlignment;
 }
@@ -235,8 +235,8 @@ bool HyText2d::TextIsMonospacedDigits()
 
 void HyText2d::TextSetMonospacedDigits(bool bSet)
 {
-	if(IsLoaded() && m_bMonospacedDigits != bSet)
-		m_bIsDirty = true;
+	if(m_bMonospacedDigits != bSet)
+		MarkAsDirty();
 	
 	m_bMonospacedDigits = bSet;
 }
@@ -252,8 +252,7 @@ void HyText2d::SetAsLine()
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
-	if(IsLoaded())
-		m_bIsDirty = true;
+	MarkAsDirty();
 }
 
 void HyText2d::SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitWordsToFit /*= false*/)
@@ -274,8 +273,7 @@ void HyText2d::SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitW
 
 	m_uiBoxAttributes = iFlags;
 
-	if(IsLoaded())
-		m_bIsDirty = true;
+	MarkAsDirty();
 }
 
 void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
@@ -293,8 +291,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 	m_uiBoxAttributes = iFlags;
 
-	if(IsLoaded())
-		m_bIsDirty = true;
+	MarkAsDirty();
 }
 
 /*virtual*/ void HyText2d::OnDataAcquired()
@@ -323,7 +320,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 		}
 	}
 
-	m_bIsDirty = true;
+	MarkAsDirty();
 }
 
 /*virtual*/ void HyText2d::OnLoaded()
@@ -335,7 +332,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	if(pTextData->GetAtlas())
 		m_RenderState.SetTextureHandle(pTextData->GetAtlas()->GetGfxApiHandle());
 
-	m_bIsDirty = true;
+	MarkAsDirty();
 }
 
 /*virtual*/ void HyText2d::CalcBoundingVolume() /*override*/
@@ -374,8 +371,12 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	if(m_pGlyphInfos == nullptr || m_uiNumReservedGlyphs < uiSTR_SIZE * uiNUM_LAYERS)
 	{
 		delete[] m_pGlyphInfos;
+		m_pGlyphInfos = nullptr;
 		
 		m_uiNumReservedGlyphs = uiSTR_SIZE * uiNUM_LAYERS;
+		if(m_uiNumReservedGlyphs == 0)
+			return;
+
 		m_pGlyphInfos = HY_NEW GlyphInfo[m_uiNumReservedGlyphs];
 	}
 
@@ -819,4 +820,10 @@ offsetCalculation:
 			pRefDataWritePos += sizeof(glm::mat4);
 		}
 	}
+}
+
+void HyText2d::MarkAsDirty()
+{
+	if(IsLoaded())
+		m_bIsDirty = true;
 }
