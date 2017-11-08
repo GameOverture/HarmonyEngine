@@ -26,7 +26,6 @@ public:
 
     static Project *GetProject();
     static void SetProject(Project *pProject);
-    //static void CloseProject(Project *pProject);
     static void Reload(Project *pProject);
 
     static HarmonyWidget *GetWidget(Project *pProject);

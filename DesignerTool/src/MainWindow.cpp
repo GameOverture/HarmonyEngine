@@ -48,8 +48,7 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
                                             ui(new Ui::MainWindow),
                                             m_Harmony(*this),
                                             m_eTheme(THEME_Lappy486),
-                                            m_Settings("Overture Games", "Harmony Designer Tool"),
-                                            m_LoadingSpinner(this)
+                                            m_Settings("Overture Games", "Harmony Designer Tool")
 {
     ui->setupUi(this);
     sm_pInstance = this;
@@ -166,15 +165,27 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Status bar (and loading indication) initialization
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    m_LoadingSpinner.setRoundness(50.0);
-    m_LoadingSpinner.setMinimumTrailOpacity(15.0);
-    m_LoadingSpinner.setTrailFadePercentage(70.0);
-    m_LoadingSpinner.setNumberOfLines(20);
-    m_LoadingSpinner.setLineLength(24);
-    m_LoadingSpinner.setLineWidth(4);
-    m_LoadingSpinner.setInnerRadius(12);
-    m_LoadingSpinner.setRevolutionsPerSecond(1.5);
-    m_LoadingSpinner.setColor(QColor(25, 255, 25));
+    // Create a loading spinner per docking window. The number of docking windows is predefined and their widgets are contextually replaced to what project/item is active.
+    m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetAtlas));
+    m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetAudio));
+    m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetExplorer));
+    //m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetOutputLog));   // No need
+    m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetProperties));
+
+    for(int i = 0; i < m_LoadingSpinnerList.size(); ++i)
+    {
+        WaitingSpinnerWidget *pLoadingSpinner = m_LoadingSpinnerList[i];
+
+        pLoadingSpinner->setRoundness(50.0);
+        pLoadingSpinner->setMinimumTrailOpacity(15.0);
+        pLoadingSpinner->setTrailFadePercentage(70.0);
+        pLoadingSpinner->setNumberOfLines(20);
+        pLoadingSpinner->setLineLength(24);
+        pLoadingSpinner->setLineWidth(4);
+        pLoadingSpinner->setInnerRadius(12);
+        pLoadingSpinner->setRevolutionsPerSecond(1.5);
+        pLoadingSpinner->setColor(QColor(25, 255, 25));
+    }
 
     m_LoadingMsg.setText("Ready");
     statusBar()->addWidget(&m_LoadingMsg);
@@ -206,14 +217,30 @@ void MainWindow::SetLoading(QString sMsg)
 {
     m_LoadingMsg.setText(sMsg);
 
-    if(m_LoadingSpinner.isSpinning() == false)
-        m_LoadingSpinner.start();
+    for(int i = 0; i < m_LoadingSpinnerList.size(); ++i)
+    {
+        WaitingSpinnerWidget *pLoadingSpinner = m_LoadingSpinnerList[i];
+
+        if(pLoadingSpinner->isSpinning() == false)
+            pLoadingSpinner->start();
+    }
+
+    ui->mainToolBar->setEnabled(false);
+    ui->menuBar->setEnabled(false);
 }
 
 void MainWindow::ClearLoading()
 {
     statusBar()->showMessage("Ready");
-    m_LoadingSpinner.stop();
+
+    for(int i = 0; i < m_LoadingSpinnerList.size(); ++i)
+    {
+        WaitingSpinnerWidget *pLoadingSpinner = m_LoadingSpinnerList[i];
+        pLoadingSpinner->stop();
+    }
+
+    ui->mainToolBar->setEnabled(true);
+    ui->menuBar->setEnabled(true);
 }
 
 void MainWindow::SetHarmonyWidget(HarmonyWidget *pWidget)

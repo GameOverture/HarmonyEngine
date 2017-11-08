@@ -49,21 +49,6 @@ Harmony::Harmony(MainWindow &mainWindowRef) :  QObject(&mainWindowRef),
         sm_pInstance->m_MainWindowRef.SetCurrentProject(nullptr);
 }
 
-///*static*/ void Harmony::CloseProject(Project *pProject)
-//{
-//    if(sm_pInstance->m_pWidget->IsProject(pProject) == false)
-//    {
-//        HyGuiLog("Harmony::CloseProject passed a project that is not the currently set project", LOGTYPE_Error);
-//        return;
-//    }
-
-//    // Delete the current reference and replace it with a newly allocated widget
-//    delete sm_pInstance->m_pWidget;
-//    sm_pInstance->m_pWidget = new HarmonyWidget(nullptr);
-
-//    sm_pInstance->m_MainWindowRef.SetCurrentProject(nullptr);
-//}
-
 /*static*/ void Harmony::Reload(Project *pProject)
 {
     if(sm_pInstance->m_pWidget->IsProject(pProject) == false)

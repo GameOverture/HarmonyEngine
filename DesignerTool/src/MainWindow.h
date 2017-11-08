@@ -51,19 +51,19 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    static MainWindow *     sm_pInstance;
+    static MainWindow *             sm_pInstance;
 
-    Harmony                 m_Harmony;
-    Theme                   m_eTheme;
+    Harmony                         m_Harmony;
+    Theme                           m_eTheme;
 
-    QSettings               m_Settings;
-    WaitingSpinnerWidget    m_LoadingSpinner;
+    QSettings                       m_Settings;
 
-    QString                 m_sEngineLocation;
-    QString                 m_sDefaultProjectLocation;
+    QString                         m_sEngineLocation;
+    QString                         m_sDefaultProjectLocation;
 
-    QLabel                  m_LoadingMsg;
-    QProgressBar            m_LoadingBar;
+    QList<WaitingSpinnerWidget *>   m_LoadingSpinnerList;
+    QLabel                          m_LoadingMsg;
+    QProgressBar                    m_LoadingBar;
 
 public:
     explicit MainWindow(QWidget *pParent = 0);
