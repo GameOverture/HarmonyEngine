@@ -7,8 +7,8 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HyRequiredAssets_h__
-#define HyRequiredAssets_h__
+#ifndef HyAtlasIndices_h__
+#define HyAtlasIndices_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -32,4 +32,4 @@ public:
 	bool IsEmpty() const;
 };
 
-#endif /* HyRequiredAssets_h__ */
+#endif /* HyAtlasIndices_h__ */
