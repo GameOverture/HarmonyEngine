@@ -12,6 +12,7 @@
 #include "HyEngine.h"
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyNodeDraw2d(HYTYPE_Entity2d, pParent),
+															m_iCoordinateSystem(-1),
 															m_uiAttributes(0),
 															m_eMouseInputState(MOUSEINPUT_None),
 															m_pMouseInputUserParam(nullptr),
@@ -110,16 +111,25 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	}
 }
 
-/*virtual*/ void HyEntity2d::UseCameraCoordinates() /*override*/
+int32 HyEntity2d::GetCoordinateSystem()
 {
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->_UseCameraCoordinates();
+	return m_iCoordinateSystem;
 }
 
-/*virtual*/ void HyEntity2d::UseWindowCoordinates(uint32 uiWindowIndex /*= 0*/) /*override*/
+void HyEntity2d::UseCameraCoordinates(bool bOverrideExplicitChildren /*= true*/)
 {
+	m_iCoordinateSystem = -1;
+
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->_UseWindowCoordinates(uiWindowIndex);
+		m_ChildList[i]->_UseCameraCoordinates(bOverrideExplicitChildren);
+}
+
+void HyEntity2d::UseWindowCoordinates(uint32 uiWindowIndex /*= 0*/, bool bOverrideExplicitChildren /*= true*/)
+{
+	m_iCoordinateSystem = static_cast<int32>(uiWindowIndex);
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->_UseWindowCoordinates(uiWindowIndex, bOverrideExplicitChildren);
 }
 
 void HyEntity2d::ChildAppend(IHyNode2d &childInst)
@@ -415,12 +425,30 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	return iOrderValue;
 }
 
-/*virtual*/ void HyEntity2d::_UseCameraCoordinates() /*override*/
+/*virtual*/ void HyEntity2d::_UseCameraCoordinates(bool bIsOverriding) /*override*/
 {
-	UseCameraCoordinates();
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
+	{
+		m_iCoordinateSystem = -1;
+
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+			m_ChildList[i]->_UseCameraCoordinates(bIsOverriding);
+	}
 }
 
-/*virtual*/ void HyEntity2d::_UseWindowCoordinates(uint32 uiWindowIndex) /*override*/
+/*virtual*/ void HyEntity2d::_UseWindowCoordinates(uint32 uiWindowIndex, bool bIsOverriding) /*override*/
 {
-	UseWindowCoordinates(uiWindowIndex);
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
+	{
+		m_iCoordinateSystem = static_cast<int32>(uiWindowIndex);
+
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+			m_ChildList[i]->_UseWindowCoordinates(uiWindowIndex, bIsOverriding);
+	}
 }

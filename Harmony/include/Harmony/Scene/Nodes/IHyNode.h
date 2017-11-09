@@ -25,11 +25,11 @@ protected:
 
 	enum HyNodeDirtyFlag
 	{
-		DIRTY_BoundingVolume	= 1 << 0,
-		DIRTY_WorldAABB			= 1 << 1,
-		DIRTY_Transform			= 1 << 2,
-		DIRTY_Color				= 1 << 3,
-		DIRTY_DontCare			= 1 << 4
+		DIRTY_BoundingVolume		= 1 << 0,
+		DIRTY_WorldAABB				= 1 << 1,
+		DIRTY_Transform				= 1 << 2,
+		DIRTY_Color					= 1 << 3,
+		DIRTY_DontCare				= 1 << 4
 	};
 	uint32							m_uiDirtyFlags;
 
@@ -37,10 +37,11 @@ protected:
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
 	enum ExplicitFlags
 	{
-		EXPLICIT_Enabled		= 1 << 0,
-		EXPLICIT_PauseUpdate	= 1 << 1,
-		EXPLICIT_Scissor		= 1 << 2,
-		EXPLICIT_DisplayOrder	= 1 << 3
+		EXPLICIT_Enabled			= 1 << 0,
+		EXPLICIT_PauseUpdate		= 1 << 1,
+		EXPLICIT_Scissor			= 1 << 2,
+		EXPLICIT_DisplayOrder		= 1 << 3,
+		EXPLICIT_CoordinateSystem	= 1 << 4
 	};
 	uint32							m_uiExplicitFlags;
 

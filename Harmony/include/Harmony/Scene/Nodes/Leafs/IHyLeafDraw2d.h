@@ -63,7 +63,7 @@ public:
 	const b2AABB &GetWorldAABB();
 	b2Shape *GetUserBoundingVolume(uint32 uiIndex);
 
-	HyCoordinateType GetCoordinateType();
+	int32 GetCoordinateSystem();	// Returns -1 if using camera coordinates
 	void UseCameraCoordinates();
 	void UseWindowCoordinates(uint32 uiWindowIndex = 0);
 
@@ -84,8 +84,8 @@ protected:
 
 	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
-	virtual void _UseCameraCoordinates() override;
-	virtual void _UseWindowCoordinates(uint32 uiWindowIndex) override;
+	virtual void _UseCameraCoordinates(bool bIsOverriding) override;
+	virtual void _UseWindowCoordinates(uint32 uiWindowIndex, bool bIsOverriding) override;
 
 	IHyNodeData *UncheckedGetData();
 	const HyRenderState &GetRenderState() const;

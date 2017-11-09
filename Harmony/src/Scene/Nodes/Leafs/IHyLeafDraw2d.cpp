@@ -141,9 +141,9 @@ b2Shape *IHyLeafDraw2d::GetUserBoundingVolume(uint32 uiIndex)
 	//return m_BoundingVolumeList[uiIndex].Get;
 }
 
-HyCoordinateType IHyLeafDraw2d::GetCoordinateType()
+int32 IHyLeafDraw2d::GetCoordinateSystem()
 {
-	return m_RenderState.IsUsingCameraCoordinates() ? HYCOORDTYPE_Camera : HYCOORDTYPE_Window;
+	return m_RenderState.GetAssignedWindow();
 }
 
 void IHyLeafDraw2d::UseCameraCoordinates()
@@ -254,14 +254,22 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 	return iOrderValue;
 }
 
-/*virtual*/ void IHyLeafDraw2d::_UseCameraCoordinates() /*override*/
+/*virtual*/ void IHyLeafDraw2d::_UseCameraCoordinates(bool bIsOverriding) /*override*/
 {
-	UseCameraCoordinates();
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
+		UseCameraCoordinates();
 }
 
-/*virtual*/ void IHyLeafDraw2d::_UseWindowCoordinates(uint32 uiWindowIndex) /*override*/
+/*virtual*/ void IHyLeafDraw2d::_UseWindowCoordinates(uint32 uiWindowIndex, bool bIsOverriding) /*override*/
 {
-	UseWindowCoordinates(uiWindowIndex);
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
+		UseWindowCoordinates(uiWindowIndex);
 }
 
 IHyNodeData *IHyLeafDraw2d::UncheckedGetData()

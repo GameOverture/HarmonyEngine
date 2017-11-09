@@ -149,12 +149,6 @@ enum HyShaderVariable
 	HYSHADERVAR_mat4
 };
 
-enum HyCoordinateType
-{
-	HYCOORDTYPE_Camera = 0,
-	HYCOORDTYPE_Window
-};
-
 enum HyWindowType
 {
 	HYWINDOW_WindowedFixed,

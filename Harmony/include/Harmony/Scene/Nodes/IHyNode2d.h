@@ -59,8 +59,8 @@ protected:
 	// '_' functions are used to propagate values down from parent, and are overridden with proper functionality later in hierarchy
 	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) 	{ }
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)							{ return iOrderValue; }
-	virtual void _UseCameraCoordinates()															{ }
-	virtual void _UseWindowCoordinates(uint32 uiWindowIndex)										{ }
+	virtual void _UseCameraCoordinates(bool bIsOverriding)											{ }
+	virtual void _UseWindowCoordinates(uint32 uiWindowIndex, bool bIsOverriding)					{ }
 
 private:
 	virtual bool IsLoaded() const { return true; }
