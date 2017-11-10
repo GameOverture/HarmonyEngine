@@ -468,7 +468,7 @@ bool AtlasModel::TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId)
 AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType)
 {
     // This will also create a meta image
-    AtlasFrame *pFrame = ImportImage(sName, newImage, m_AtlasGrpList[uiAtlasGrpIndex]->GetId(), eType);
+    AtlasFrame *pFrame = ImportImage(sName, newImage, m_AtlasGrpList[uiAtlasGrpIndex]->GetId(), eType, nullptr);
 
     QSet<AtlasFrame *> newFrameSet;
     newFrameSet.insert(pFrame);
@@ -582,23 +582,24 @@ void AtlasModel::RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinq
 //    RemoveDependency(relinquishList[i], pItem);
 }
 
-QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId, HyGuiItemType eType)
+QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId, HyGuiItemType eType, QList<AtlasTreeItem *> correspondingParentList)
 {
-    QSet<AtlasFrame *> returnSet;
+    if(correspondingParentList.size() != sImportImgList.size())
+        HyGuiLog("AtlasModel::ImportImages was passed a correspondingParentList that isn't the same size as the sImportImgList", LOGTYPE_Error);
 
+    QSet<AtlasFrame *> returnSet;
     for(int i = 0; i < sImportImgList.size(); ++i)
     {
         QFileInfo fileInfo(sImportImgList[i]);
-
         QImage newImage(fileInfo.absoluteFilePath());
 
-        returnSet.insert(ImportImage(fileInfo.baseName(), newImage, uiAtlasGrpId, eType));
+        returnSet.insert(ImportImage(fileInfo.baseName(), newImage, uiAtlasGrpId, eType, correspondingParentList[i]));
     }
 
     return returnSet;
 }
 
-AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, HyGuiItemType eType)
+AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, HyGuiItemType eType, AtlasTreeItem *pParent)
 {
     quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
 
@@ -609,27 +610,40 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiA
     AtlasFrame *pNewFrame = CreateFrame(ATLASFRAMEID_NotSet, uiChecksum, uiAtlasGrpId, sName, rAlphaCrop, HyGlobal::GetAtlasItemFromItem(eType), newImage.width(), newImage.height(), -1, -1, -1, 0);
     if(pNewFrame)
     {
-        // TODO: Should I care about overwriting a duplicate image?
         newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
 
         if(sName[0] != HYDEFAULT_PrefixChar)
         {
-            QList<QTreeWidgetItem *> selectedList = m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->selectedItems();
-            if(selectedList.empty() == false)
-            {
-                if(selectedList[0]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
-                    selectedList[0]->addChild(pNewFrame->GetTreeItem());
-                else if(selectedList[0]->parent() != nullptr) // Parent tree item is always a filter
-                    selectedList[0]->parent()->addChild(pNewFrame->GetTreeItem());
-                else
-                    m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
-            }
-            else
+            if(pParent == nullptr)
                 m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
+            else
+            {
+                if(pParent->data(0, Qt::UserRole).toString() != HYTREEWIDGETITEM_IsFilter)
+                    HyGuiLog("AtlasModel::ImportImage was passed parent that wasn't a filter", LOGTYPE_Error);
+
+                pParent->addChild(pNewFrame->GetTreeItem());
+            }
         }
     }
 
     return pNewFrame;
+}
+
+AtlasTreeItem *AtlasModel::CreateFilter(QString sName, AtlasTreeItem *pParent)
+{
+    AtlasTreeItem *pNewTreeItem = nullptr;
+    if(pParent == nullptr)
+        pNewTreeItem = new AtlasTreeItem(m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget());
+    else
+        pNewTreeItem = new AtlasTreeItem(pParent);
+
+    pNewTreeItem->setText(0, sName);
+    pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
+    pNewTreeItem->setData(0, Qt::UserRole, QVariant(QString(HYTREEWIDGETITEM_IsFilter)));
+
+    WriteMetaSettings();
+
+    return pNewTreeItem;
 }
 
 bool AtlasModel::DoesImageExist(quint32 uiChecksum)

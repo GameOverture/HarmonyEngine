@@ -339,8 +339,13 @@ void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
     if(pProject->GetAtlasWidget())
         uiAtlasGrpId = pProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
 
+    // TODO: Create filters that match the source of the pasted images
+    QList<AtlasTreeItem *> correspondingParentList;
+    for(int i = 0; i < importImageList.size(); ++i)
+        correspondingParentList.push_back(nullptr);
+
     // Repack this atlas group with imported images
-    QSet<AtlasFrame *> importedFramesSet = pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId, (ePasteItemType == ITEM_Font) ? ITEM_Font : ITEM_AtlasImage);
+    QSet<AtlasFrame *> importedFramesSet = pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId, (ePasteItemType == ITEM_Font) ? ITEM_Font : ITEM_AtlasImage, correspondingParentList);
     if(importedFramesSet.empty() == false)
         pProject->GetAtlasModel().Repack(pProject->GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId), QSet<int>(), importedFramesSet);
 

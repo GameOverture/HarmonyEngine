@@ -133,7 +133,7 @@ AtlasModel &AtlasWidget::GetData()
     return *m_pModel;
 }
 
-QTreeWidget *AtlasWidget::GetFramesTreeWidget()
+AtlasTreeWidget *AtlasWidget::GetFramesTreeWidget()
 {
     return ui->atlasList;
 }
@@ -355,47 +355,6 @@ void AtlasWidget::on_actionReplaceImages_triggered()
         affectedItemList[i]->Save();
 }
 
-void AtlasWidget::on_actionAddFilter_triggered()
-{
-    AtlasTreeItem *pNewTreeItem = nullptr;
-
-    DlgInputName *pDlg = new DlgInputName("Enter Atlas Group Filter Name", "New Filter");
-    if(pDlg->exec() == QDialog::Accepted)
-    {
-        QList<QTreeWidgetItem *> selectedItemList = ui->atlasList->selectedItems();
-        if(selectedItemList.empty())
-            pNewTreeItem = new AtlasTreeItem(ui->atlasList);
-        else
-        {
-            if(selectedItemList[0]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
-                pNewTreeItem = new AtlasTreeItem(static_cast<AtlasTreeItem *>(selectedItemList[0]));
-            else if(selectedItemList[0]->parent())  // Parent must either be a filter or nullptr
-                pNewTreeItem = new AtlasTreeItem(static_cast<AtlasTreeItem *>(selectedItemList[0]->parent()));
-            else
-                pNewTreeItem = new AtlasTreeItem(ui->atlasList);
-        }
-
-        pNewTreeItem->setText(0, pDlg->GetName());
-    }
-    else
-    {
-        delete pDlg;
-        return;
-    }
-
-    delete pDlg;
-
-    pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
-    pNewTreeItem->setData(0, Qt::UserRole, QVariant(QString(HYTREEWIDGETITEM_IsFilter)));
-
-    ui->atlasList->sortItems(0, Qt::AscendingOrder);
-    m_pModel->WriteMetaSettings();
-
-    ui->atlasList->clearSelection();
-    ui->atlasList->expandItem(pNewTreeItem);
-    pNewTreeItem->setSelected(true);
-}
-
 void AtlasWidget::on_atlasList_itemSelectionChanged()
 {
     m_Draw.SetSelected(ui->atlasList->selectedItems());
@@ -590,11 +549,25 @@ void AtlasWidget::on_actionImportImages_triggered()
                                                                tr("All files (*.*);;PNG (*.png)"),
                                                                &sSelectedFilter);
 
+    AtlasTreeItem *pParent = nullptr;
+    QList<QTreeWidgetItem *> selectedList = ui->atlasList->selectedItems();
+    if(selectedList.empty() == false)
+    {
+        if(selectedList[0]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+            pParent = static_cast<AtlasTreeItem *>(selectedList[0]);
+        else if(selectedList[0]->parent() != nullptr) // Parent tree item is always a filter
+            pParent = static_cast<AtlasTreeItem *>(selectedList[0]->parent());
+    }
+
+    QList<AtlasTreeItem *> correspondingParentList;
+    for(int i = 0; i < sImportImgList.size(); ++i)
+        correspondingParentList.append(pParent);
+
     if(sImportImgList.empty() == false)
     {
         m_pModel->Repack(ui->cmbAtlasGroups->currentIndex(),
                          QSet<int>(),
-                         m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex()), ITEM_AtlasImage));
+                         m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex()), ITEM_AtlasImage, correspondingParentList));
     }
 
     RefreshLcds();
@@ -612,22 +585,91 @@ void AtlasWidget::on_actionImportDirectory_triggered()
     if(dlg.exec() == QDialog::Rejected)
         return;
 
-    QStringList sDirs = dlg.selectedFiles();
+    // The 'pImportParent' will be the root point for all new AtlasTreeItem insertions (both filters and images)
+    AtlasTreeItem *pImportParent = nullptr;
+    QList<QTreeWidgetItem *> selectedList = ui->atlasList->selectedItems();
+    if(selectedList.empty() == false)
+    {
+        if(selectedList[0]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+            pImportParent = static_cast<AtlasTreeItem *>(selectedList[0]);
+        else if(selectedList[0]->parent() != nullptr) // Parent tree item is always a filter
+            pImportParent = static_cast<AtlasTreeItem *>(selectedList[0]->parent());
+    }
+
+    // Store all the specified imported image paths and their corresponding parent tree items they should be inserted into
     QStringList sImportImgList;
+    QList<AtlasTreeItem *> correspondingParentList;
+
+    // Loop through all the specified import directories
+    QStringList sDirs = dlg.selectedFiles();
     for(int iDirIndex = 0; iDirIndex < sDirs.size(); ++iDirIndex)
     {
+        // Dig recursively through this directory and grab all the image files (while creating filters that resemble the folder structure they're stored in)
         QDir dirEntry(sDirs[iDirIndex]);
-        HyGlobal::RecursiveFindFileOfExt("png", sImportImgList, dirEntry);
+        AtlasTreeItem *pCurFilter = m_pModel->CreateFilter(dirEntry.dirName(), pImportParent);
+
+        QStack<QPair<QFileInfoList, AtlasTreeItem *>> dirStack;
+        dirStack.push(QPair<QFileInfoList, AtlasTreeItem *>(dirEntry.entryInfoList(), pCurFilter));
+
+        while(dirStack.isEmpty() == false)
+        {
+            QPair<QFileInfoList, AtlasTreeItem *> curDir = dirStack.pop();
+            QFileInfoList list = curDir.first;
+
+            for(int i = 0; i < list.count(); i++)
+            {
+                QFileInfo info = list[i];
+                if(info.isDir() && info.fileName() != ".." && info.fileName() != ".")
+                {
+                    QDir subDir(info.filePath());
+                    dirStack.push(QPair<QFileInfoList, AtlasTreeItem *>(subDir.entryInfoList(), m_pModel->CreateFilter(subDir.dirName(), curDir.second)));
+                }
+                else if(info.suffix().toLower() == "png")
+                {
+                    sImportImgList.push_back(info.filePath());
+                    correspondingParentList.push_back(curDir.second);
+                }
+            }
+        }
     }
 
     if(sImportImgList.empty() == false)
     {
         m_pModel->Repack(ui->cmbAtlasGroups->currentIndex(),
                          QSet<int>(),
-                         m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex()), ITEM_AtlasImage));
+                         m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex()), ITEM_AtlasImage, correspondingParentList));
     }
 
     RefreshLcds();
+}
+
+void AtlasWidget::on_actionAddFilter_triggered()
+{
+    DlgInputName *pDlg = new DlgInputName("Enter Atlas Group Filter Name", "New Filter");
+    if(pDlg->exec() == QDialog::Accepted)
+    {
+        AtlasTreeItem *pNewFilter = nullptr;
+
+        QList<QTreeWidgetItem *> selectedItemList = ui->atlasList->selectedItems();
+        if(selectedItemList.empty())
+            pNewFilter = m_pModel->CreateFilter(pDlg->GetName(), nullptr);
+        else
+        {
+            if(selectedItemList[0]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+                pNewFilter = m_pModel->CreateFilter(pDlg->GetName(), static_cast<AtlasTreeItem *>(selectedItemList[0]));
+            else if(selectedItemList[0]->parent())  // Parent must either be a filter or nullptr
+                pNewFilter = m_pModel->CreateFilter(pDlg->GetName(), static_cast<AtlasTreeItem *>(selectedItemList[0]->parent()));
+            else
+                pNewFilter = m_pModel->CreateFilter(pDlg->GetName(), nullptr);
+        }
+
+        ui->atlasList->sortItems(0, Qt::AscendingOrder);
+        ui->atlasList->clearSelection();
+        ui->atlasList->expandItem(pNewFilter);
+        pNewFilter->setSelected(true);
+    }
+
+    delete pDlg;
 }
 
 void AtlasWidget::on_actionGroupSettings_triggered()

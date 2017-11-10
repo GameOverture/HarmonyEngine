@@ -68,7 +68,7 @@ public:
     quint32 GetSelectedAtlasGrpId();
 
     AtlasModel &GetData();
-    QTreeWidget *GetFramesTreeWidget();
+    AtlasTreeWidget *GetFramesTreeWidget();
 
     void DrawUpdate(IHyApplication &hyApp);
 
@@ -85,8 +85,6 @@ private Q_SLOTS:
     void on_actionDeleteImages_triggered();
 
     void on_actionReplaceImages_triggered();
-
-    void on_actionAddFilter_triggered();
 
     void on_atlasList_itemSelectionChanged();
 
@@ -105,6 +103,8 @@ private Q_SLOTS:
     void on_actionImportImages_triggered();
 
     void on_actionImportDirectory_triggered();
+
+    void on_actionAddFilter_triggered();
 
     void on_actionGroupSettings_triggered();
 
