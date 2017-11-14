@@ -8,7 +8,6 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGL.h"
-#include "Renderer/Components/HyRenderSurface.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Diagnostics/Console/HyConsole.h"
 

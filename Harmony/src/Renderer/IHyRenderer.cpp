@@ -10,7 +10,6 @@
 #include "Afx/HyInteropAfx.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyWindow.h"
-#include "Renderer/Components/HyRenderSurface.h"
 #include "HyEngine.h"
 
 std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
