@@ -52,7 +52,7 @@ public:
 
 	int32 GetCoordinateSystem();
 	void UseCameraCoordinates(bool bOverrideExplicitChildren = true);
-	void UseWindowCoordinates(uint32 uiWindowIndex = 0, bool bOverrideExplicitChildren = true);
+	void UseWindowCoordinates(int32 iWindowIndex = 0, bool bOverrideExplicitChildren = true);
 
 	void ChildAppend(IHyNode2d &childRef);
 	virtual bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef);
@@ -90,7 +90,7 @@ protected:
 	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
 	virtual void _UseCameraCoordinates(bool bIsOverriding) override;
-	virtual void _UseWindowCoordinates(uint32 uiWindowIndex, bool bIsOverriding) override;
+	virtual void _UseWindowCoordinates(int32 iWindowIndex, bool bIsOverriding) override;
 
 	virtual void SetNewChildAttributes(IHyNode2d &childInst);
 };

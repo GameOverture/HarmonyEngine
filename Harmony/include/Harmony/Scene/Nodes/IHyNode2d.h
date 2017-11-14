@@ -60,7 +60,7 @@ protected:
 	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) 	{ }
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)							{ return iOrderValue; }
 	virtual void _UseCameraCoordinates(bool bIsOverriding)											{ }
-	virtual void _UseWindowCoordinates(uint32 uiWindowIndex, bool bIsOverriding)					{ }
+	virtual void _UseWindowCoordinates(int32 iWindowIndex, bool bIsOverriding)						{ }
 
 private:
 	virtual bool IsLoaded() const { return true; }

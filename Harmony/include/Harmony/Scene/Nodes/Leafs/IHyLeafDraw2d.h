@@ -65,7 +65,7 @@ public:
 
 	int32 GetCoordinateSystem();	// Returns -1 if using camera coordinates
 	void UseCameraCoordinates();
-	void UseWindowCoordinates(uint32 uiWindowIndex = 0);
+	void UseWindowCoordinates(int32 iWindowIndex = 0);
 
 	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);
@@ -85,7 +85,7 @@ protected:
 	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
 	virtual void _UseCameraCoordinates(bool bIsOverriding) override;
-	virtual void _UseWindowCoordinates(uint32 uiWindowIndex, bool bIsOverriding) override;
+	virtual void _UseWindowCoordinates(int32 iWindowIndex, bool bIsOverriding) override;
 
 	IHyNodeData *UncheckedGetData();
 	const HyRenderState &GetRenderState() const;

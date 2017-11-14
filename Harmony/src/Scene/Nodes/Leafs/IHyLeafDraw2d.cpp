@@ -106,7 +106,6 @@ IHyNodeData *IHyLeafDraw2d::AcquireData()
 	return m_pData;
 }
 
-
 const HyShape2d &IHyLeafDraw2d::GetBoundingVolume()
 {
 	if(IsDirty(DIRTY_BoundingVolume) || m_BoundingVolume.IsValid() == false)
@@ -151,9 +150,9 @@ void IHyLeafDraw2d::UseCameraCoordinates()
 	m_RenderState.SetCoordinateSystem(-1);
 }
 
-void IHyLeafDraw2d::UseWindowCoordinates(uint32 uiWindowIndex /*= 0*/)
+void IHyLeafDraw2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
 {
-	m_RenderState.SetCoordinateSystem(static_cast<int32>(uiWindowIndex));
+	m_RenderState.SetCoordinateSystem(iWindowIndex);
 }
 
 int32 IHyLeafDraw2d::GetShaderId()
@@ -263,13 +262,13 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 		UseCameraCoordinates();
 }
 
-/*virtual*/ void IHyLeafDraw2d::_UseWindowCoordinates(uint32 uiWindowIndex, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyLeafDraw2d::_UseWindowCoordinates(int32 iWindowIndex, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
-		UseWindowCoordinates(uiWindowIndex);
+		UseWindowCoordinates(iWindowIndex);
 }
 
 IHyNodeData *IHyLeafDraw2d::UncheckedGetData()

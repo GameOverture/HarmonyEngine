@@ -108,7 +108,7 @@ void HyRenderState::ClearScissorRect()
 
 bool HyRenderState::IsUsingCameraCoordinates()
 {
-	return m_iWindowIndex == -1;
+	return m_iWindowIndex < 0;
 }
 
 void HyRenderState::SetCoordinateSystem(int32 iWindowIndex)
