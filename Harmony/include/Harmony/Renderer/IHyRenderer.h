@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/IHyLoadableData.h"
 #include "Renderer/Components/HyRenderState.h"
+#include "Renderer/Components/HyStencil.h"
 
 #include <queue>
 
@@ -45,6 +46,7 @@ protected:
 	HyWindow *								m_pCurWindow;
 
 	char *									m_pDrawBuffer;
+	HyRenderState *							m_pCurRenderState;
 
 	std::queue<IHyLoadableData *>			m_TxDataQueue;
 	std::queue<IHyLoadableData *>			m_RxDataQueue;
@@ -52,11 +54,10 @@ protected:
 	static int32							sm_iShaderIdCount;
 	static std::map<int32, IHyShader *>		sm_ShaderMap;
 
-	HyRenderState *							m_pCurRenderState;
-
-	uint32									m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
+	std::vector<HyStencil>					m_StencilList;
 
 	// Diagnostics/Metrics
+	uint32									m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
 	uint32									m_uiNumRenderStates;
 
 public:

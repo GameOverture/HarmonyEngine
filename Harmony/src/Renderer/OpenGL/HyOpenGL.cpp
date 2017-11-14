@@ -229,7 +229,7 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 		return false;
 	
 	// TODO: Without disabling glDepthMask, sprites fragments that overlap will be discarded, and primitive draws don't work
-	glDepthMask(false);
+	glDepthMask(GL_FALSE);
 	HyErrorCheck_OpenGL("HyOpenGL:BeginPass_2d", "glDepthMask");
 
 	return true;
@@ -459,7 +459,7 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 /*virtual*/ void HyOpenGL::End_2d()
 {
 	m_iCurCamIndex++;
-	glDepthMask(true);	// TODO: Get rid of this once you implement proper depth
+	glDepthMask(GL_TRUE);	// TODO: Get rid of this once you implement proper depth
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);

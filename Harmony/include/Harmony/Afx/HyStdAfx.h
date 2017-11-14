@@ -61,7 +61,7 @@ enum HyShapeType
 	HYNUM_SHAPE
 };
 
-enum HyGfxType
+enum HyLoadableType
 {
 	HYGFXTYPE_AtlasGroup = 0,
 	HYGFXTYPE_CustomShader

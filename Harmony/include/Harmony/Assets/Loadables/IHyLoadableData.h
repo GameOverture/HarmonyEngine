@@ -7,8 +7,8 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __IHyLoadableData_h__
-#define __IHyLoadableData_h__
+#ifndef IHyLoadableData_h__
+#define IHyLoadableData_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -18,23 +18,22 @@ class IHyLoadableData
 {
 	friend class HyAssets;
 
-	const HyGfxType			m_eTYPE;
+	const HyLoadableType			m_eLOADABLE_TYPE;
 
-	HyLoadState				m_eLoadState;
-	uint32					m_uiRefCount;
+	HyLoadState						m_eLoadState;
+	uint32							m_uiRefCount;
 
 public:
-	IHyLoadableData(HyGfxType eType) :	m_eTYPE(eType),
-										m_eLoadState(HYLOADSTATE_Inactive),
-										m_uiRefCount(0)
+	IHyLoadableData(HyLoadableType eType) :	m_eLOADABLE_TYPE(eType),
+											m_eLoadState(HYLOADSTATE_Inactive),
+											m_uiRefCount(0)
 	{ }
 
-	HyGfxType GetType()											{ return m_eTYPE; }
-
-	HyLoadState GetLoadState()									{ return m_eLoadState; }
+	HyLoadableType GetLoadableType()							{ return m_eLOADABLE_TYPE; }
+	HyLoadState GetLoadableState()									{ return m_eLoadState; }
 
 	virtual void OnLoadThread() = 0;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) = 0;
 };
 
-#endif /* __IHyLoadableData_h__ */
+#endif /* IHyLoadableData_h__ */

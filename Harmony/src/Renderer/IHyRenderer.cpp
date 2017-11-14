@@ -17,14 +17,14 @@ int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
+																									m_pCurWindow(nullptr),
+																									m_pDrawBuffer(nullptr),
+																									m_pCurRenderState(nullptr),
 																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8),
 																									m_uiNumRenderStates(0)
 {
 	m_pDrawBuffer = HY_NEW char[HY_GFX_BUFFER_SIZE];
 	memset(m_pDrawBuffer, 0, HY_GFX_BUFFER_SIZE);
-
-	//for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
-	//	m_RenderSurfaceList.push_back(HyRenderSurface(HYRENDERSURFACE_Window, i, m_WindowListRef[i]->GetResolution().x, m_WindowListRef[i]->GetResolution().y));
 }
 
 IHyRenderer::~IHyRenderer(void)
@@ -157,11 +157,6 @@ uint32 IHyRenderer::GetNumInsts3d()
 void IHyRenderer::Render()
 {
 	HY_PROFILE_BEGIN("Render")
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//// Iterate through 'm_WindowListRef' to find any dirty RenderSurface's that need processing
-	//for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
-	//	m_WindowListRef[i]->Update_Render(m_RenderSurfaceList[i]);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)

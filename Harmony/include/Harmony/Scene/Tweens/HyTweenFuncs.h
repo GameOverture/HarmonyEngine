@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyTweenFuncs_h__
-#define __HyTweenFuncs_h__
+#ifndef HyTweenFuncs_h__
+#define HyTweenFuncs_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -31,197 +31,91 @@ class HyTween
 
 public:
 	// Linear, no easing
-	static float Linear(float fRatio)
-	{
-		return fRatio;
-	}
+	static float Linear(float fRatio);
 
 	// Quadratic in
-	static float QuadIn(float fRatio)
-	{
-		return fRatio * fRatio;
-	}
+	static float QuadIn(float fRatio);
 
 	// Quadratic out
-	static float QuadOut(float fRatio)
-	{
-		return fRatio * (2 - fRatio);
-	}
+	static float QuadOut(float fRatio);
 
 	// Quadratic in and out
-	static float QuadInOut(float fRatio)
-	{
-		return fRatio <= 0.5f ? fRatio * fRatio * 2.0f : 1.0f - (--fRatio) * fRatio * 2.0f;
-	}
+	static float QuadInOut(float fRatio);
 
 	// Cubic in
-	static float CubeIn(float fRatio)
-	{
-		return fRatio * fRatio * fRatio;
-	}
+	static float CubeIn(float fRatio);
 
 	// Cubic out
-	static float CubeOut(float fRatio)
-	{
-		return 1.0f + (--fRatio) * fRatio * fRatio;
-	}
+	static float CubeOut(float fRatio);
 
 	// Cubic in and out
-	static float CubeInOut(float fRatio)
-	{
-		return fRatio <= 0.5f ? fRatio * fRatio * fRatio * 4.0f : 1.0f + (--fRatio) * fRatio * fRatio * 4.0f;
-	}
+	static float CubeInOut(float fRatio);
 
 	// Quartic in
-	static float QuartIn(float fRatio)
-	{
-		return fRatio * fRatio * fRatio * fRatio;
-	}
+	static float QuartIn(float fRatio);
 
 	// Quartic out
-	static float QuartOut(float fRatio)
-	{
-		return 1.0f - (--fRatio) * fRatio * fRatio * fRatio;
-	}
+	static float QuartOut(float fRatio);
 
 	// Quartic in and out
-	static float QuartInOut(float fRatio)
-	{
-		return fRatio <= 0.5f ? fRatio * fRatio * fRatio * fRatio * 8.0f : (1.0f - (fRatio = fRatio * 2.0f - 2.0f) * fRatio * fRatio * fRatio) / 2.0f + 0.5f;
-	}
+	static float QuartInOut(float fRatio);
 
 	// Quintic in
-	static float QuintIn(float fRatio)
-	{
-		return fRatio * fRatio * fRatio * fRatio * fRatio;
-	}
+	static float QuintIn(float fRatio);
 
 	// Quintic out
-	static float QuintOut(float fRatio)
-	{
-		return (fRatio = fRatio - 1.0f) * fRatio * fRatio * fRatio * fRatio + 1.0f;
-	}
+	static float QuintOut(float fRatio);
 
 	// Quintic in and out
-	static float QuintInOut(float fRatio)
-	{
-		return ((fRatio *= 2.0f) < 1.0f) ? (fRatio * fRatio * fRatio * fRatio * fRatio) / 2.0f : ((fRatio -= 2.0f) * fRatio * fRatio * fRatio * fRatio + 2.0f) / 2.0f;
-	}
+	static float QuintInOut(float fRatio);
 
 	// Sine in
-	static float SineIn(float fRatio)
-	{
-		return 1.0f - cos(PI2 * fRatio);
-	}
+	static float SineIn(float fRatio);
 
 	// Sine out
-	static float SineOut(float fRatio)
-	{
-		return sin(PI2 * fRatio);
-	}
+	static float SineOut(float fRatio);
 
 	// Sine in and out
-	static float SineInOut(float fRatio)
-	{
-		return 0.5f - cos(PI * fRatio) / 2.0f;
-	}
+	static float SineInOut(float fRatio);
 
 	// Bounce in
-	static float BounceIn(float fRatio)
-	{
-		fRatio = 1.0f - fRatio;
-		if (fRatio < B1) return 1.0f - 7.5625f * fRatio * fRatio;
-		if (fRatio < B2) return 1.0f - (7.5625f * (fRatio - B3) * (fRatio - B3) + 0.75f);
-		if (fRatio < B4) return 1.0f - (7.5625f * (fRatio - B5) * (fRatio - B5) + 0.9375f);
-		return 1.0f - (7.5625f * (fRatio - B6) * (fRatio - B6) + 0.984375f);
-	}
+	static float BounceIn(float fRatio);
 
 	// Bounce out
-	static float BounceOut(float fRatio)
-	{
-		if (fRatio < B1) return 7.5625f * fRatio * fRatio;
-		if (fRatio < B2) return 7.5625f * (fRatio - B3) * (fRatio - B3) + 0.75f;
-		if (fRatio < B4) return 7.5625f * (fRatio - B5) * (fRatio - B5) + 0.9375f;
-		return 7.5625f * (fRatio - B6) * (fRatio - B6) + 0.984375f;
-	}
+	static float BounceOut(float fRatio);
 
 	// Bounce in and out
-	static float BounceInOut(float fRatio)
-	{
-		if (fRatio < 0.5f) {
-			fRatio = 1.0f - fRatio * 2.0f;
-			if (fRatio < B1) return (1.0f - 7.5625f * fRatio * fRatio) / 2.0f;
-			if (fRatio < B2) return (1.0f - (7.5625f * (fRatio - B3) * (fRatio - B3) + 0.75f)) / 2.0f;
-			if (fRatio < B4) return (1.0f - (7.5625f * (fRatio - B5) * (fRatio - B5) + 0.9375f)) / 2.0f;
-			return (1.0f - (7.5625f * (fRatio - B6) * (fRatio - B6) + 0.984375f)) / 2.0f;
-		}
-		fRatio = fRatio * 2.0f - 1.0f;
-		if (fRatio < B1) return (7.5625f * fRatio * fRatio) / 2.0f + 0.5f;
-		if (fRatio < B2) return (7.5625f * (fRatio - B3) * (fRatio - B3) + 0.75f) / 2.0f + 0.5f;
-		if (fRatio < B4) return (7.5625f * (fRatio - B5) * (fRatio - B5) + 0.9375f) / 2.0f + 0.5f;
-		return (7.5625f * (fRatio - B6) * (fRatio - B6) + 0.984375f) / 2.0f + 0.5f;
-	}
+	static float BounceInOut(float fRatio);
 
 	// Circle in
-	static float CircIn(float fRatio)
-	{
-		return 1.0f - sqrt(1.0f - fRatio * fRatio);
-	}
+	static float CircIn(float fRatio);
 
 	// Circle out
-	static float CircOut(float fRatio)
-	{
-		--fRatio;
-		return sqrt(1.0f - fRatio * fRatio);
-	}
+	static float CircOut(float fRatio);
 
 	// Circle in and out
-	static float CircInOut(float fRatio)
-	{
-		return fRatio <= 0.5f ? (sqrt(1.0f - fRatio * fRatio * 4.0f) - 1.0f) / -2.0f : (sqrt(1.0f - (fRatio * 2.0f - 2.0f) * (fRatio * 2.0f - 2.0f)) + 1.0f) / 2.0f;
-	}
+	static float CircInOut(float fRatio);
 
 	// Exponential in
-	static float ExpoIn(float fRatio)
-	{
-		return pow(2.0f, 10.0f * (fRatio - 1.0f));
-	}
+	static float ExpoIn(float fRatio);
 
 	// Exponential out
-	static float ExpoOut(float fRatio)
-	{
-		return -pow(2.0f, -10.0f * fRatio) + 1.0f;
-	}
+	static float ExpoOut(float fRatio);
 
 	// Exponential in and out
-	static float ExpoInOut(float fRatio)
-	{
-		return fRatio < 0.5f ? pow(2.0f, 10.0f * (fRatio * 2.0f - 1.0f)) / 2.0f : (-pow(2.0f, -10.0f * (fRatio * 2.0f - 1.0f)) + 2.0f) / 2.0f;
-	}
+	static float ExpoInOut(float fRatio);
 
 	// Back in
-	static float BackIn(float fRatio)
-	{
-		return fRatio * fRatio * (2.70158f * fRatio - 1.70158f);
-	}
+	static float BackIn(float fRatio);
 
 	// Back out
-	static float BackOut(float fRatio)
-	{
-		return 1.0f - (--fRatio) * (fRatio) * (-2.70158f * fRatio - 1.70158f);
-	}
+	static float BackOut(float fRatio);
 
 	// Back in and out
-	static float BackInOut(float fRatio)
-	{
-		fRatio *= 2.0f;
-		if (fRatio < 1.0f) return fRatio * fRatio * (2.70158f * fRatio - 1.70158f) / 2.0f;
-		fRatio -= 2.0f;
-		return (1.0f - fRatio * fRatio * (-2.70158f * fRatio - 1.70158f)) / 2.0f + 0.5f;
-	}
+	static float BackInOut(float fRatio);
 
 	// Default (do-nothing) callback when tween finishes
 	static void NullTweenCallback(IHyNode *)
 	{ }
 };
-#endif /* __HyTweenFuncs_h__ */
+#endif /* HyTweenFuncs_h__ */

@@ -8,6 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Assets/Nodes/HySpine2dData.h"
+#include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
 #include "Diagnostics/Console/HyConsole.h"
 

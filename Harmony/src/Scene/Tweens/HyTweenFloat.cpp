@@ -8,6 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Tweens/HyTweenFloat.h"
+#include "Scene/Nodes/IHyNode.h"
 #include "HyEngine.h"
 #include "Utilities/HyMath.h"
 

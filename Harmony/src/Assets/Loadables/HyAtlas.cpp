@@ -120,7 +120,7 @@ void HyAtlas::OnLoadThread()
 {
 	m_csPixelData.Lock();
 
-	if(GetLoadState() == HYLOADSTATE_Queued)
+	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
 		if(m_pPixelData)
 		{
@@ -147,12 +147,12 @@ void HyAtlas::OnLoadThread()
 void HyAtlas::OnRenderThread(IHyRenderer &rendererRef)
 {
 	m_csPixelData.Lock();
-	if(GetLoadState() == HYLOADSTATE_Queued)
+	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
 		m_uiGfxApiHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, 0, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
 		DeletePixelData();
 	}
-	else // GetLoadState() == HYLOADSTATE_Discarded
+	else // GetLoadableState() == HYLOADSTATE_Discarded
 	{
 		rendererRef.DeleteTexture(m_uiGfxApiHandle);
 	}

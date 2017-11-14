@@ -140,13 +140,13 @@ void IHyShader::OnLoadThread()
 void IHyShader::OnRenderThread(IHyRenderer &rendererRef)
 {
 	// Load state can be HYLOADSTATE_Inactive if it's a default shader being loaded by the Renderer
-	if(GetLoadState() == HYLOADSTATE_Inactive)
+	if(GetLoadableState() == HYLOADSTATE_Inactive)
 	{
 		OnUpload(rendererRef);
 		return;
 	}
 
-	if(GetLoadState() == HYLOADSTATE_Queued)
+	if(GetLoadableState() == HYLOADSTATE_Queued)
 		OnUpload(rendererRef);
 	else
 		OnDelete(rendererRef);

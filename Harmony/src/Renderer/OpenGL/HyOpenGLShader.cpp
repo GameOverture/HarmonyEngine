@@ -480,7 +480,7 @@ void HyOpenGLShader::PrintActiveAttribs()
 
 /*virtual*/ void HyOpenGLShader::OnUpload(IHyRenderer &rendererRef)
 {
-	HyAssert(GetLoadState() != HYLOADSTATE_Discarded, "HyOpenGLShader::OnRenderThread() invoked on a discarded shader");
+	HyAssert(GetLoadableState() != HYLOADSTATE_Discarded, "HyOpenGLShader::OnRenderThread() invoked on a discarded shader");
 
 	HyOpenGL &gl = static_cast<HyOpenGL &>(rendererRef);
 

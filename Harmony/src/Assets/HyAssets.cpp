@@ -281,7 +281,7 @@ void HyAssets::LoadNodeData(IHyLeafDraw2d *pDrawNode2d)
 				HyAtlas *pAtlas = GetAtlas(i);
 				QueueData(pAtlas);
 
-				if(pAtlas->GetLoadState() != HYLOADSTATE_Loaded)
+				if(pAtlas->GetLoadableState() != HYLOADSTATE_Loaded)
 					bFullyLoaded = false;
 			}
 		}
@@ -293,7 +293,7 @@ void HyAssets::LoadNodeData(IHyLeafDraw2d *pDrawNode2d)
 		IHyShader *pShader = IHyRenderer::FindShader(*iter);
 		QueueData(pShader);
 
-		if(pShader->GetLoadState() != HYLOADSTATE_Loaded)
+		if(pShader->GetLoadableState() != HYLOADSTATE_Loaded)
 			bFullyLoaded = false;
 	}
 
@@ -364,7 +364,7 @@ bool HyAssets::IsNodeLoaded(IHyLeafDraw2d *pDrawNode2d)
 	for(auto iter = pDrawNode2d->m_RequiredCustomShaders.begin(); iter != pDrawNode2d->m_RequiredCustomShaders.end(); ++iter)
 	{
 		IHyShader *pShader = IHyRenderer::FindShader(*iter);
-		if(pShader->GetLoadState() != HYLOADSTATE_Loaded)
+		if(pShader->GetLoadableState() != HYLOADSTATE_Loaded)
 			return false;
 	}
 
@@ -475,7 +475,7 @@ void HyAssets::DequeData(IHyLoadableData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Discarded;
 
-			if(pData->GetType() == HYGFXTYPE_AtlasGroup)
+			if(pData->GetLoadableType() == HYGFXTYPE_AtlasGroup)
 				m_pLoadedAtlasIndices->Clear(static_cast<HyAtlas *>(pData)->GetMasterIndex());
 
 			m_Load_Prepare.push(pData);
@@ -508,7 +508,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Loaded;
 
-			if(pData->GetType() == HYGFXTYPE_AtlasGroup)
+			if(pData->GetLoadableType() == HYGFXTYPE_AtlasGroup)
 			{
 				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] loaded");
 				m_pLoadedAtlasIndices->Set(static_cast<HyAtlas *>(pData)->GetMasterIndex());
@@ -539,7 +539,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 			{
 				pData->m_eLoadState = HYLOADSTATE_Queued;
 
-				if(pData->GetType() == HYGFXTYPE_AtlasGroup) {
+				if(pData->GetLoadableType() == HYGFXTYPE_AtlasGroup) {
 					HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] reloading");
 				}
 				else {
@@ -558,7 +558,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Inactive;
 
-			if(pData->GetType() == HYGFXTYPE_AtlasGroup) {
+			if(pData->GetLoadableType() == HYGFXTYPE_AtlasGroup) {
 				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] deleted");
 			}
 			else {

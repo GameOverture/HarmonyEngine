@@ -237,6 +237,9 @@
     <ClCompile Include="Time\HyTime.cpp">
       <Filter>Time</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Components\HyStencil.cpp">
+      <Filter>Renderer\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -647,6 +650,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Time\HyTime.h">
       <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyStencil.h">
+      <Filter>Renderer\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

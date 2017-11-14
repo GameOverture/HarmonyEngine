@@ -11,12 +11,12 @@
 #define HyEnt2dData_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Assets/Nodes/IHyNodeData.h"
-#include "Assets/HyAssets.h"
 
 #include "spine/spine.h"
 #include "spine/extension.h"
+
+class HyAssets;
 
 class HySpine2dData : public IHyNodeData
 {

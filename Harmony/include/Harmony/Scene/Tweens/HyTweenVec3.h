@@ -7,11 +7,10 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyTweenVec3_h__
-#define __HyTweenVec3_h__
+#ifndef HyTweenVec3_h__
+#define HyTweenVec3_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Scene/Tweens/HyTweenFloat.h"
 
 #include <vector>
@@ -68,4 +67,4 @@ public:
 	float operator[](int i) const;
 };
 
-#endif /* __HyTweenVec3_h__ */
+#endif /* HyTweenVec3_h__ */

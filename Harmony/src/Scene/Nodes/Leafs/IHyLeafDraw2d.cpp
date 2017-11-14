@@ -134,7 +134,7 @@ const b2AABB &IHyLeafDraw2d::GetWorldAABB()
 	return m_aabbCached;
 }
 
-b2Shape *IHyLeafDraw2d::GetUserBoundingVolume(uint32 uiIndex)
+HyShape2d *IHyLeafDraw2d::GetUserBoundingVolume(uint32 uiIndex)
 {
 	return nullptr;
 	//return m_BoundingVolumeList[uiIndex].Get;

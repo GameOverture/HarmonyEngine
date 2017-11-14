@@ -7,8 +7,8 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 **************************************************************************/
-#ifndef __IHyShader_h__
-#define __IHyShader_h__
+#ifndef IHyShader_h__
+#define IHyShader_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/IHyLoadableData.h"
@@ -54,4 +54,4 @@ public:
 	virtual void OnDelete(IHyRenderer &rendererRef) = 0;
 };
 
-#endif /* __IHyShader_h__ */
+#endif /* IHyShader_h__ */

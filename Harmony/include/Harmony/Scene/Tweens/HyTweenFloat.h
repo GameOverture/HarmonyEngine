@@ -7,15 +7,16 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyTweenFloat_h__
-#define __HyTweenFloat_h__
+#ifndef HyTweenFloat_h__
+#define HyTweenFloat_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/IHyNode.h"
 #include "Scene/Tweens/HyTweenFuncs.h"
+
 #include <functional>
 
 class IHyNode;
+
 typedef std::function<void(IHyNode *)> HyTweenFinishedCallback;
 
 class HyTweenFloat
@@ -75,4 +76,4 @@ private:
 	bool Follow();
 };
 
-#endif /* __HyTweenFloat_h__ */
+#endif /* HyTweenFloat_h__ */
