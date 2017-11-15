@@ -44,11 +44,19 @@ public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// NOTE: Below mutators manipulate data from derived classes "IHyNodeDraw2d" and "IHyNode". Handled in regard to being an "entity"
 	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren = true);
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren = true);
+	
 	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren = true);
 	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren = true);
+
+	void SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren = true);
+	void ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren = true);
+	
 	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren = true);
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	int32 GetCoordinateSystem();
 	void UseCameraCoordinates(bool bOverrideExplicitChildren = true);
@@ -75,6 +83,17 @@ public:
 protected:
 	virtual void NodeUpdate() override final;
 
+	void SetNewChildAttributes(IHyNode2d &childInst);
+
+	virtual void SetDirty(uint32 uiDirtyFlags) override;
+
+	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding) override;
+	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override;
+	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
+	virtual void _SetStencil(HyStencil *pStencil, bool bIsOverriding) override;
+	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override;
+	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
+
 	// Optional user overrides below
 	virtual void OnUpdate() { }
 	virtual void OnMouseEnter(void *pUserParam) { }
@@ -82,17 +101,6 @@ protected:
 	virtual void OnMouseDown(void *pUserParam) { }
 	virtual void OnMouseUp(void *pUserParam) { }
 	virtual void OnMouseClicked(void *pUserParam) { }
-
-	virtual void SetDirty(uint32 uiDirtyFlags) override;
-
-	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding) override;
-	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override;
-	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
-	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
-	virtual void _UseCameraCoordinates(bool bIsOverriding) override;
-	virtual void _UseWindowCoordinates(int32 iWindowIndex, bool bIsOverriding) override;
-
-	virtual void SetNewChildAttributes(IHyNode2d &childInst);
 };
 
 #endif /* HyEntity2d_h__ */

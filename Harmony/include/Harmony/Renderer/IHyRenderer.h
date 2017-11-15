@@ -13,11 +13,11 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/IHyLoadableData.h"
 #include "Renderer/Components/HyRenderState.h"
-#include "Renderer/Components/HyStencil.h"
 
 #include <queue>
 
 class IHyShader;
+class HyStencil;
 class HyWindow;
 class HyGfxComms;
 class HyDiagnostics;
@@ -54,7 +54,7 @@ protected:
 	static int32							sm_iShaderIdCount;
 	static std::map<int32, IHyShader *>		sm_ShaderMap;
 
-	std::vector<HyStencil>					m_StencilList;
+	static std::map<uint32, HyStencil *>	sm_StencilMap;
 
 	// Diagnostics/Metrics
 	uint32									m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
@@ -109,6 +109,10 @@ public:
 	static IHyShader *FindShader(int32 iId);
 	static IHyShader *MakeCustomShader();
 	static IHyShader *MakeCustomShader(const char *szPrefix, const char *szName);
+
+	static HyStencil *FindStencil(uint32 uiId);
+	static void AddStencil(HyStencil *pNewStencil);
+	static void RemoveStencil(HyStencil *pNewStencil);
 
 	void Render();
 	void Draw2d();

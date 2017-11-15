@@ -13,6 +13,7 @@
 IHyNodeDraw2d::IHyNodeDraw2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent),
 																		m_fAlpha(1.0f),
 																		m_fCachedAlpha(1.0f),
+																		m_pStencil(nullptr),
 																		m_iDisplayOrder(0),
 																		topColor(*this, DIRTY_Color),
 																		botColor(*this, DIRTY_Color),
@@ -59,14 +60,24 @@ const glm::vec3 &IHyNodeDraw2d::CalculateBotTint()
 	return m_CachedBotColor;
 }
 
-bool IHyNodeDraw2d::IsScissorSet()
+bool IHyNodeDraw2d::IsScissorSet() const
 {
-	return (m_LocalScissorRect.iTag == 1);
+	return (m_LocalScissorRect.iTag == 1);	// Tag indicates whether it's used
 }
 
-const HyScreenRect<int32> &IHyNodeDraw2d::GetScissor()
+const HyScreenRect<int32> &IHyNodeDraw2d::GetScissor() const
 {
 	return m_LocalScissorRect;
+}
+
+bool IHyNodeDraw2d::IsStencilSet() const
+{
+	return m_pStencil != nullptr;
+}
+
+HyStencil *IHyNodeDraw2d::GetStencil() const
+{
+	return m_pStencil;
 }
 
 int32 IHyNodeDraw2d::GetDisplayOrder() const

@@ -17,6 +17,8 @@
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
+class HyStencil;
+
 #include <set>
 
 // NOTE: This class should contain a copy of all the functions/members of IHyLeaf2d. Multiple inheritance is not an option
@@ -46,13 +48,19 @@ public:
 	IHyLeafDraw2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	virtual ~IHyLeafDraw2d();
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// NOTE: Below mutators manipulate data from derived classes "IHyNodeDraw2d" and "IHyNode". Handled in regard to being a "leaf"
 	void SetEnabled(bool bEnabled);
 	void SetPauseUpdate(bool bUpdateWhenPaused);
 
 	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
 	void ClearScissor(bool bUseParentScissor);
 
+	void SetStencil(HyStencil *pStencil);
+	void ClearStencil(bool bUseParentStencil);
+
 	void SetDisplayOrder(int32 iOrderValue);
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	const std::string &GetName();
 	const std::string &GetPrefix();
@@ -83,9 +91,9 @@ protected:
 	virtual void NodeUpdate() override final;
 
 	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
+	virtual void _SetStencil(HyStencil *pStencil, bool bIsOverriding) override;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
-	virtual void _UseCameraCoordinates(bool bIsOverriding) override;
-	virtual void _UseWindowCoordinates(int32 iWindowIndex, bool bIsOverriding) override;
+	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override;
 
 	IHyNodeData *UncheckedGetData();
 	const HyRenderState &GetRenderState() const;

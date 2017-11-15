@@ -10,10 +10,12 @@
 #include "Afx/HyInteropAfx.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyWindow.h"
+#include "Renderer/Components/HyStencil.h"
 #include "HyEngine.h"
 
-std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
 int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
+std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
+std::map<uint32, HyStencil *>	IHyRenderer::sm_StencilMap;
 
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
@@ -133,7 +135,7 @@ uint32 IHyRenderer::GetNumInsts3d()
 		return sm_ShaderMap[iId];
 
 	HyError("IHyRenderer::FindShader could not find a valid shader");
-	return NULL;
+	return nullptr;
 }
 
 /*static*/ IHyShader *IHyRenderer::MakeCustomShader()
@@ -152,6 +154,25 @@ uint32 IHyRenderer::GetNumInsts3d()
 
 	sm_iShaderIdCount++;
 	return pNewShader;
+}
+
+/*static*/ HyStencil *IHyRenderer::FindStencil(uint32 uiId)
+{
+	if(sm_StencilMap.find(uiId) != sm_StencilMap.end())
+		return sm_StencilMap[uiId];
+
+	HyError("IHyRenderer::FindStencil could not find a valid stencil with ID: " << uiId);
+	return nullptr;
+}
+
+/*static*/ void IHyRenderer::AddStencil(HyStencil *pNewStencil)
+{
+	sm_StencilMap[pNewStencil->GetId()] = pNewStencil;
+}
+
+/*static*/ void IHyRenderer::RemoveStencil(HyStencil *pNewStencil)
+{
+	sm_StencilMap.erase(sm_StencilMap.find(pNewStencil->GetId()));
 }
 
 void IHyRenderer::Render()

@@ -15,12 +15,16 @@
 
 class HyStencil
 {
-	HyPrimitive2d		m_Shape;
+	static uint32					sm_iIdCount;
+
+	const int32						m_iID;
+	HyPrimitive2d					m_Shape;
 
 public:
 	HyStencil();
 	~HyStencil();
 
+	int32 GetId();
 	HyShape2d &GetShape();
 };
 

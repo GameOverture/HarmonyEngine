@@ -8,6 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Renderer/Components/HyStencil.h"
 #include "HyEngine.h"
 
 /*static*/ HyAssets *IHyLeafDraw2d::sm_pHyAssets = nullptr;
@@ -57,19 +58,44 @@ void IHyLeafDraw2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, u
 	m_LocalScissorRect.width = uiWidth;
 	m_LocalScissorRect.height = uiHeight;
 
-	m_LocalScissorRect.iTag = 1;
+	m_LocalScissorRect.iTag = 1;	// Tag indicates whether it's used
 	m_uiExplicitFlags |= EXPLICIT_Scissor;
 }
 
 void IHyLeafDraw2d::ClearScissor(bool bUseParentScissor)
 {
-	m_LocalScissorRect.iTag = 0;
+	m_LocalScissorRect.iTag = 0;	// Tag indicates whether it's used
 	m_RenderState.ClearScissorRect();
 
 	if(bUseParentScissor == false)
 		m_uiExplicitFlags |= EXPLICIT_Scissor;
 	else
 		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+}
+
+void IHyLeafDraw2d::SetStencil(HyStencil *pStencil)
+{
+	m_pStencil = pStencil;
+	m_RenderState.SetStencilId(m_pStencil ? m_pStencil->GetId() : 0);
+
+	m_uiExplicitFlags |= EXPLICIT_Stencil;
+}
+
+void IHyLeafDraw2d::ClearStencil(bool bUseParentStencil)
+{
+	m_RenderState.ClearStencilTest();
+
+	if(bUseParentStencil == false)
+		m_uiExplicitFlags |= EXPLICIT_Stencil;
+	else
+	{
+		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
+		if(m_pParent)
+		{
+			m_pStencil = m_pParent->GetStencil();
+			m_RenderState.SetStencilId(m_pStencil ? m_pStencil->GetId() : 0);
+		}
+	}
 }
 
 void IHyLeafDraw2d::SetDisplayOrder(int32 iOrderValue)
@@ -198,7 +224,7 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 {
 	if((m_uiExplicitFlags & EXPLICIT_Scissor) != 0)
 	{
-		if(m_LocalScissorRect.iTag == 1)
+		if(m_LocalScissorRect.iTag == 1)	// Tag indicates whether it's used
 		{
 			glm::mat4 mtx;
 			GetWorldTransform(mtx);
@@ -230,10 +256,22 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
 	{
-		if(worldScissorRectRef.iTag == 1)
+		if(worldScissorRectRef.iTag == 1) // Tag indicates whether it's used
 			m_RenderState.SetScissorRect(worldScissorRectRef);
 		else
 			m_RenderState.ClearScissorRect();
+	}
+}
+
+/*virtual*/ void IHyLeafDraw2d::_SetStencil(HyStencil *pStencil, bool bIsOverriding) /*override*/
+{
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_Stencil))
+	{
+		m_pStencil = pStencil;
+		m_RenderState.SetStencilId(m_pStencil ? m_pStencil->GetId() : 0);
 	}
 }
 
@@ -253,16 +291,7 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 	return iOrderValue;
 }
 
-/*virtual*/ void IHyLeafDraw2d::_UseCameraCoordinates(bool bIsOverriding) /*override*/
-{
-	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
-
-	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
-		UseCameraCoordinates();
-}
-
-/*virtual*/ void IHyLeafDraw2d::_UseWindowCoordinates(int32 iWindowIndex, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyLeafDraw2d::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;

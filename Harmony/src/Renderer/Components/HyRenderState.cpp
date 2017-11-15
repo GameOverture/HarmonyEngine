@@ -19,6 +19,7 @@ HyRenderState::HyRenderState() :	m_iRenderMode(HYRENDERMODE_Unknown),
 									m_uiNumVerticesPerInstance(0),
 									m_uiDataOffset(0),
 									m_ScissorRect(0, 0, 0, 0),
+									m_iStencilId(0),
 									m_iWindowIndex(-1)
 {
 }
@@ -104,6 +105,34 @@ void HyRenderState::ClearScissorRect()
 {
 	memset(&m_ScissorRect, 0, sizeof(HyScreenRect<uint32>));
 	m_uiAttributeFlags &= ~SCISSORTEST;
+}
+
+bool HyRenderState::IsStencilTest()
+{
+	return (m_uiAttributeFlags & STENCILTEST) != 0;
+}
+
+int32 HyRenderState::GetStencilId()
+{
+	return m_iStencilId;
+}
+
+void HyRenderState::SetStencilId(int32 iId)
+{
+	if(iId == 0)
+	{
+		ClearStencilTest();
+		return;
+	}
+
+	m_iStencilId = iId;
+	m_uiAttributeFlags |= STENCILTEST;
+}
+
+void HyRenderState::ClearStencilTest()
+{
+	m_iStencilId = 0;
+	m_uiAttributeFlags &= ~STENCILTEST;
 }
 
 bool HyRenderState::IsUsingCameraCoordinates()

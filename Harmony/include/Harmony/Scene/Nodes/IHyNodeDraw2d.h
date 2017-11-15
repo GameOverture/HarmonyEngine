@@ -23,6 +23,7 @@ protected:
 	glm::vec3						m_CachedBotColor;
 
 	HyScreenRect<int32>				m_LocalScissorRect;
+	HyStencil *						m_pStencil;
 
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
 
@@ -42,8 +43,13 @@ public:
 	const glm::vec3 &CalculateTopTint();
 	const glm::vec3 &CalculateBotTint();
 
-	bool IsScissorSet();
-	const HyScreenRect<int32> &GetScissor();
+	// NOTE: Below accessors return the data declared in this class. Respective derived classes have the corresponding mutators (whether it's a "leaf" or "entity")
+
+	bool IsScissorSet() const;
+	const HyScreenRect<int32> &GetScissor() const;
+
+	bool IsStencilSet() const;
+	HyStencil *GetStencil() const;
 
 	int32 GetDisplayOrder() const;
 

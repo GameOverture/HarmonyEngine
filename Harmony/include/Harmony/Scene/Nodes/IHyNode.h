@@ -40,8 +40,9 @@ protected:
 		EXPLICIT_Enabled			= 1 << 0,
 		EXPLICIT_PauseUpdate		= 1 << 1,
 		EXPLICIT_Scissor			= 1 << 2,
-		EXPLICIT_DisplayOrder		= 1 << 3,
-		EXPLICIT_CoordinateSystem	= 1 << 4
+		EXPLICIT_Stencil			= 1 << 3,
+		EXPLICIT_DisplayOrder		= 1 << 4,
+		EXPLICIT_CoordinateSystem	= 1 << 5
 	};
 	uint32							m_uiExplicitFlags;
 

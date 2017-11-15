@@ -94,6 +94,20 @@ void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChil
 		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
 }
 
+void HyEntity2d::SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren /*= true*/)
+{
+	m_pStencil = pStencil;
+
+	m_uiExplicitFlags |= EXPLICIT_Stencil;
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->_SetStencil(m_pStencil, bOverrideExplicitChildren);
+}
+
+void HyEntity2d::ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren /*= true*/)
+{
+}
+
 void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren /*= true*/)
 {
 	m_iDisplayOrder = iOrderValue;
@@ -121,7 +135,7 @@ void HyEntity2d::UseCameraCoordinates(bool bOverrideExplicitChildren /*= true*/)
 	m_iCoordinateSystem = -1;
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->_UseCameraCoordinates(bOverrideExplicitChildren);
+		m_ChildList[i]->_SetCoordinateSystem(m_iCoordinateSystem, bOverrideExplicitChildren);
 }
 
 void HyEntity2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/, bool bOverrideExplicitChildren /*= true*/)
@@ -129,7 +143,7 @@ void HyEntity2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/, bool bOverride
 	m_iCoordinateSystem = iWindowIndex;
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->_UseWindowCoordinates(iWindowIndex, bOverrideExplicitChildren);
+		m_ChildList[i]->_SetCoordinateSystem(iWindowIndex, bOverrideExplicitChildren);
 }
 
 void HyEntity2d::ChildAppend(IHyNode2d &childInst)
@@ -352,25 +366,26 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	OnUpdate();
 }
 
-/*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)
-{
-	IHyNode2d::SetDirty(uiDirtyFlags);
-
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->SetDirty(uiDirtyFlags);
-}
-
-/*virtual*/ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
+void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
 	SetDirty(DIRTY_Transform | DIRTY_Color);
 
 	childInst._SetEnabled(m_bEnabled, false);
 	childInst._SetPauseUpdate(m_bPauseOverride, false);
 	childInst._SetScissor(m_WorldScissorRect, false);
+	childInst._SetCoordinateSystem(m_iCoordinateSystem, false);
 
 	int32 iOrderValue = m_iDisplayOrder;
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, false);
+}
+
+/*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)
+{
+	IHyNode2d::SetDirty(uiDirtyFlags);
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->SetDirty(uiDirtyFlags);
 }
 
 /*virtual*/ void HyEntity2d::_SetEnabled(bool bEnabled, bool bIsOverriding) /*override*/
@@ -409,6 +424,34 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	}
 }
 
+/*virtual*/ void HyEntity2d::_SetStencil(HyStencil *pStencil, bool bIsOverriding) /*override*/
+{
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_Stencil))
+	{
+		m_pStencil = pStencil;
+
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+			m_ChildList[i]->_SetStencil(m_pStencil, bIsOverriding);
+	}
+}
+
+/*virtual*/ void HyEntity2d::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override*/
+{
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
+	{
+		m_iCoordinateSystem = iWindowIndex;
+
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+			m_ChildList[i]->_SetCoordinateSystem(iWindowIndex, bIsOverriding);
+	}
+}
+
 /*virtual*/ int32 HyEntity2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
@@ -423,32 +466,4 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	}
 
 	return iOrderValue;
-}
-
-/*virtual*/ void HyEntity2d::_UseCameraCoordinates(bool bIsOverriding) /*override*/
-{
-	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
-
-	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
-	{
-		m_iCoordinateSystem = -1;
-
-		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_UseCameraCoordinates(bIsOverriding);
-	}
-}
-
-/*virtual*/ void HyEntity2d::_UseWindowCoordinates(int32 iWindowIndex, bool bIsOverriding) /*override*/
-{
-	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
-
-	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
-	{
-		m_iCoordinateSystem = iWindowIndex;
-
-		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_UseWindowCoordinates(iWindowIndex, bIsOverriding);
-	}
 }
