@@ -41,24 +41,24 @@ public:
 	};
 
 protected:
-	HyDiagnostics &							m_DiagnosticsRef;
-	std::vector<HyWindow *> &				m_WindowListRef;
-	HyWindow *								m_pCurWindow;
+	HyDiagnostics &									m_DiagnosticsRef;
+	std::vector<HyWindow *> &						m_WindowListRef;
+	HyWindow *										m_pCurWindow;
 
-	char *									m_pDrawBuffer;
-	HyRenderState *							m_pCurRenderState;
+	char *											m_pDrawBuffer;
+	HyRenderState *									m_pCurRenderState;
 
-	std::queue<IHyLoadableData *>			m_TxDataQueue;
-	std::queue<IHyLoadableData *>			m_RxDataQueue;
+	std::queue<IHyLoadableData *>					m_TxDataQueue;
+	std::queue<IHyLoadableData *>					m_RxDataQueue;
 
-	static int32							sm_iShaderIdCount;
-	static std::map<int32, IHyShader *>		sm_ShaderMap;
+	static int32									sm_iShaderIdCount;
+	static std::map<int32, IHyShader *>				sm_ShaderMap;
 
-	static std::map<uint32, HyStencil *>	sm_StencilMap;
+	static std::map<HyStencilHandle, HyStencil *>	sm_StencilMap;
 
 	// Diagnostics/Metrics
-	uint32									m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
-	uint32									m_uiNumRenderStates;
+	uint32											m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
+	uint32											m_uiNumRenderStates;
 
 public:
 	IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
@@ -110,7 +110,7 @@ public:
 	static IHyShader *MakeCustomShader();
 	static IHyShader *MakeCustomShader(const char *szPrefix, const char *szName);
 
-	static HyStencil *FindStencil(uint32 uiId);
+	static HyStencil *FindStencil(HyStencilHandle hHandle);
 	static void AddStencil(HyStencil *pNewStencil);
 	static void RemoveStencil(HyStencil *pNewStencil);
 

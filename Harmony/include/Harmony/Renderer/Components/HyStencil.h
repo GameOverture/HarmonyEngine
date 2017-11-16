@@ -15,16 +15,16 @@
 
 class HyStencil
 {
-	static uint32					sm_iIdCount;
+	static HyStencilHandle			sm_hHandleCount;
 
-	const int32						m_iID;
+	const HyStencilHandle			m_hHANDLE;
 	HyPrimitive2d					m_Shape;
 
 public:
 	HyStencil();
 	~HyStencil();
 
-	int32 GetId();
+	HyStencilHandle GetHandle();
 	HyShape2d &GetShape();
 };
 

@@ -156,23 +156,22 @@ uint32 IHyRenderer::GetNumInsts3d()
 	return pNewShader;
 }
 
-/*static*/ HyStencil *IHyRenderer::FindStencil(uint32 uiId)
+/*static*/ HyStencil *IHyRenderer::FindStencil(HyStencilHandle hHandle)
 {
-	if(sm_StencilMap.find(uiId) != sm_StencilMap.end())
-		return sm_StencilMap[uiId];
+	if(hHandle != HY_UNUSED_HANDLE && sm_StencilMap.find(hHandle) != sm_StencilMap.end())
+		return sm_StencilMap[hHandle];
 
-	HyError("IHyRenderer::FindStencil could not find a valid stencil with ID: " << uiId);
 	return nullptr;
 }
 
 /*static*/ void IHyRenderer::AddStencil(HyStencil *pNewStencil)
 {
-	sm_StencilMap[pNewStencil->GetId()] = pNewStencil;
+	sm_StencilMap[pNewStencil->GetHandle()] = pNewStencil;
 }
 
 /*static*/ void IHyRenderer::RemoveStencil(HyStencil *pNewStencil)
 {
-	sm_StencilMap.erase(sm_StencilMap.find(pNewStencil->GetId()));
+	sm_StencilMap.erase(sm_StencilMap.find(pNewStencil->GetHandle()));
 }
 
 void IHyRenderer::Render()

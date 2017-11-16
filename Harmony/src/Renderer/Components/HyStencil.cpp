@@ -10,9 +10,9 @@
 #include "Renderer/Components/HyStencil.h"
 #include "Renderer/IHyRenderer.h"
 
-uint32 HyStencil::sm_iIdCount = 0;
+HyStencilHandle HyStencil::sm_hHandleCount = 0;
 
-HyStencil::HyStencil() :	m_iID(++sm_iIdCount)
+HyStencil::HyStencil() :	m_hHANDLE(++sm_hHandleCount)
 {
 	IHyRenderer::AddStencil(this);
 }
@@ -22,7 +22,12 @@ HyStencil::~HyStencil()
 	IHyRenderer::RemoveStencil(this);
 }
 
-int32 HyStencil::GetId()
+HyStencilHandle HyStencil::GetHandle()
 {
-	return m_iID;
+	return m_hHANDLE;
+}
+
+HyShape2d &HyStencil::GetShape()
+{
+	return m_Shape.GetShape();
 }

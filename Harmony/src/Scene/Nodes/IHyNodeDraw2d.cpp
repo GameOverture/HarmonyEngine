@@ -9,11 +9,12 @@
 *************************************************************************/
 #include "Scene/Nodes/IHyNodeDraw2d.h"
 #include "Scene/Nodes/Entities/HyEntity2d.h"
+#include "Renderer/IHyRenderer.h"
 
 IHyNodeDraw2d::IHyNodeDraw2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent),
 																		m_fAlpha(1.0f),
 																		m_fCachedAlpha(1.0f),
-																		m_pStencil(nullptr),
+																		m_hStencil(HY_UNUSED_HANDLE),
 																		m_iDisplayOrder(0),
 																		topColor(*this, DIRTY_Color),
 																		botColor(*this, DIRTY_Color),
@@ -72,12 +73,12 @@ const HyScreenRect<int32> &IHyNodeDraw2d::GetScissor() const
 
 bool IHyNodeDraw2d::IsStencilSet() const
 {
-	return m_pStencil != nullptr;
+	return m_hStencil != HY_UNUSED_HANDLE;
 }
 
 HyStencil *IHyNodeDraw2d::GetStencil() const
 {
-	return m_pStencil;
+	return IHyRenderer::FindStencil(m_hStencil);
 }
 
 int32 IHyNodeDraw2d::GetDisplayOrder() const

@@ -23,7 +23,7 @@ protected:
 	glm::vec3						m_CachedBotColor;
 
 	HyScreenRect<int32>				m_LocalScissorRect;
-	HyStencil *						m_pStencil;
+	HyStencilHandle					m_hStencil;
 
 	int32							m_iDisplayOrder;	// Higher values are displayed front-most
 

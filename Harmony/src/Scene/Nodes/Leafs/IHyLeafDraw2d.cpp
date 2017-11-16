@@ -75,15 +75,18 @@ void IHyLeafDraw2d::ClearScissor(bool bUseParentScissor)
 
 void IHyLeafDraw2d::SetStencil(HyStencil *pStencil)
 {
-	m_pStencil = pStencil;
-	m_RenderState.SetStencilId(m_pStencil ? m_pStencil->GetId() : 0);
+	if(pStencil == nullptr)
+		m_hStencil = HY_UNUSED_HANDLE;
+	else
+		m_hStencil = pStencil->GetHandle();
 
+	m_RenderState.SetStencilHandle(m_hStencil);
 	m_uiExplicitFlags |= EXPLICIT_Stencil;
 }
 
 void IHyLeafDraw2d::ClearStencil(bool bUseParentStencil)
 {
-	m_RenderState.ClearStencilTest();
+	m_RenderState.SetStencilHandle(HY_UNUSED_HANDLE);
 
 	if(bUseParentStencil == false)
 		m_uiExplicitFlags |= EXPLICIT_Stencil;
@@ -92,8 +95,8 @@ void IHyLeafDraw2d::ClearStencil(bool bUseParentStencil)
 		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
 		if(m_pParent)
 		{
-			m_pStencil = m_pParent->GetStencil();
-			m_RenderState.SetStencilId(m_pStencil ? m_pStencil->GetId() : 0);
+			HyStencil *pStencil = m_pParent->GetStencil();
+			m_RenderState.SetStencilHandle(pStencil ? pStencil->GetHandle() : HY_UNUSED_HANDLE);
 		}
 	}
 }
@@ -263,15 +266,15 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 	}
 }
 
-/*virtual*/ void IHyLeafDraw2d::_SetStencil(HyStencil *pStencil, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyLeafDraw2d::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_Stencil))
 	{
-		m_pStencil = pStencil;
-		m_RenderState.SetStencilId(m_pStencil ? m_pStencil->GetId() : 0);
+		m_hStencil = hHandle;
+		m_RenderState.SetStencilHandle(m_hStencil);
 	}
 }
 
