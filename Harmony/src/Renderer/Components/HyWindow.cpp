@@ -175,6 +175,17 @@ HyCamera3d *HyWindow::CreateCamera3d()
 	return pNewCam;
 }
 
+uint32 HyWindow::GetNumCameras2d()
+{
+	return static_cast<uint32>(m_Cams2dList.size());
+}
+
+HyCamera2d *HyWindow::GetCamera2d(uint32 uiIndex)
+{
+	HyAssert(uiIndex < static_cast<uint32>(m_Cams2dList.size()), "HyWindow::GetCamera2d was passed an invalid index: " << uiIndex);
+	return m_Cams2dList[uiIndex];
+}
+
 void HyWindow::RemoveCamera(HyCamera2d *&pCam)
 {
 	for(std::vector<HyCamera2d *>::iterator iter = m_Cams2dList.begin(); iter != m_Cams2dList.end(); ++iter)

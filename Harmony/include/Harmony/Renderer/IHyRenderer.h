@@ -22,30 +22,32 @@ class HyWindow;
 class HyGfxComms;
 class HyDiagnostics;
 
-#define HY_GFX_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
-#define HYDRAWBUFFERHEADER reinterpret_cast<DrawBufferHeader *>(m_pDrawBuffer)
+#define HY_RENDERSTATE_BUFFER_SIZE ((1024 * 1024) * 1) // 1MB
+#define HY_VERTEX_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
 
 class IHyRenderer
 {
-public:
-	// Note: All offsets below are from the beginning of the buffer pointer, containing this structure
-	struct DrawBufferHeader
-	{
-		uint32		uiReturnFlags;
-		size_t		uiOffsetTo3d;
-		size_t		uiOffsetTo2d;
-		size_t		uiOffsetToVertexData2d;
-		size_t		uiVertexBufferSize2d;
-		size_t		uiOffsetToCameras3d;
-		size_t		uiOffsetToCameras2d;
-	};
+//public:
+//	// Note: All offsets below are from the beginning of the buffer pointer, containing this structure
+//	struct DrawBufferHeader
+//	{
+//		uint32		uiReturnFlags;
+//		size_t		uiOffsetTo3d;
+//		size_t		uiOffsetTo2d;
+//		size_t		uiOffsetToVertexData2d;
+//		size_t		uiVertexBufferSize2d;
+//		size_t		uiOffsetToCameras3d;
+//		size_t		uiOffsetToCameras2d;
+//	};
 
 protected:
 	HyDiagnostics &									m_DiagnosticsRef;
 	std::vector<HyWindow *> &						m_WindowListRef;
-	HyWindow *										m_pCurWindow;
 
-	char *											m_pDrawBuffer;
+	char *											m_pRenderStateBuffer;
+	char *											m_pVertexBuffer;
+
+	HyWindow *										m_pCurWindow;
 	HyRenderState *									m_pCurRenderState;
 
 	std::queue<IHyLoadableData *>					m_TxDataQueue;
@@ -64,7 +66,8 @@ public:
 	IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
-	char *GetDrawBuffer();
+	char *GetRenderStateBuffer();
+	char *GetVertexBuffer();
 
 	void TxData(IHyLoadableData *pData);
 	std::queue<IHyLoadableData *> &RxData();
@@ -81,10 +84,10 @@ public:
 	virtual void SetRenderState_3d(uint32 uiNewRenderState) = 0;
 	virtual void End_3d() = 0;
 
-	virtual void Init_2d() = 0;
-	virtual bool BeginPass_2d() = 0;
+	virtual void Begin_2d() = 0;
+	virtual void CameraPass_2d(HyCamera2d *pCamera) = 0;
 	virtual void DrawRenderState_2d(HyRenderState &renderState) = 0;
-	virtual void End_2d() = 0;
+	//virtual void End_2d() = 0;
 
 	virtual void FinishRender() = 0;
 
@@ -94,17 +97,18 @@ public:
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
 
 	// 2D buffer accessors
-	uint32 GetNumCameras2d();
+	//uint32 GetNumCameras2d();
+	//uint32 GetCameraWindowId2d(int iCameraIndex);
+	//HyRectangle<float> *GetCameraViewportRect2d(int iIndex);
+	//glm::mat4 *GetCameraView2d(int iIndex);
+
 	uint32 GetNumRenderStates2d();
-	uint32 GetCameraWindowId2d(int iCameraIndex);
-	HyRectangle<float> *GetCameraViewportRect2d(int iIndex);
-	glm::mat4 *GetCameraView2d(int iIndex);
 	HyRenderState *GetRenderStatesPtr2d();
 	char *GetVertexData2d();
 
-	// 3D buffer accessors
-	uint32 GetNumCameras3d();
-	uint32 GetNumInsts3d();
+	//// 3D buffer accessors
+	//uint32 GetNumCameras3d();
+	//uint32 GetNumInsts3d();
 
 	static IHyShader *FindShader(int32 iId);
 	static IHyShader *MakeCustomShader();

@@ -19,19 +19,25 @@ std::map<uint32, HyStencil *>	IHyRenderer::sm_StencilMap;
 
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
+																									m_pRenderStateBuffer(nullptr),
+																									m_pVertexBuffer(nullptr),
 																									m_pCurWindow(nullptr),
-																									m_pDrawBuffer(nullptr),
+																									m_pCurCamera(nullptr),
 																									m_pCurRenderState(nullptr),
 																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8),
 																									m_uiNumRenderStates(0)
 {
-	m_pDrawBuffer = HY_NEW char[HY_GFX_BUFFER_SIZE];
-	memset(m_pDrawBuffer, 0, HY_GFX_BUFFER_SIZE);
+	m_pVertexBuffer = HY_NEW char[HY_VERTEX_BUFFER_SIZE];
+	memset(m_pVertexBuffer, 0, HY_VERTEX_BUFFER_SIZE);
+
+	m_pRenderStateBuffer = HY_NEW char[HY_RENDERSTATE_BUFFER_SIZE];
+	memset(m_pRenderStateBuffer, 0, HY_RENDERSTATE_BUFFER_SIZE);
 }
 
 IHyRenderer::~IHyRenderer(void)
 {
-	delete[] m_pDrawBuffer;
+	delete[] m_pVertexBuffer;
+	delete[] m_pRenderStateBuffer;
 
 	std::map<int32, IHyShader *>::iterator iter;
 	for(iter = sm_ShaderMap.begin(); iter != sm_ShaderMap.end(); ++iter)
@@ -42,9 +48,14 @@ IHyRenderer::~IHyRenderer(void)
 	sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 }
 
-char *IHyRenderer::GetDrawBuffer()
+char *IHyRenderer::GetRenderStateBuffer()
 {
-	return m_pDrawBuffer;
+	return m_pRenderStateBuffer;
+}
+
+char *IHyRenderer::GetVertexBuffer()
+{
+	return m_pVertexBuffer;
 }
 
 void IHyRenderer::TxData(IHyLoadableData *pData)
@@ -72,62 +83,62 @@ uint32 IHyRenderer::GetNumWindows()
 	m_pCurWindow = m_WindowListRef[uiIndex];
 }
 
-uint32 IHyRenderer::GetNumCameras2d()
-{
-	return *(reinterpret_cast<uint32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras2d));
-}
+//uint32 IHyRenderer::GetNumCameras2d()
+//{
+//	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras2d));
+//}
+//
+//uint32 IHyRenderer::GetCameraWindowId2d(int iCameraIndex)
+//{
+//	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer +
+//										HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
+//										sizeof(uint32) +
+//										(iCameraIndex * (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4)))));
+//}
+//
+//HyRectangle<float> *IHyRenderer::GetCameraViewportRect2d(int iIndex)
+//{
+//	return reinterpret_cast<HyRectangle<float> *>(m_pVertexBuffer +
+//												  HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
+//												  sizeof(uint32) +
+//												  (iIndex * (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) +
+//												  sizeof(uint32));
+//}
+//
+//glm::mat4 *IHyRenderer::GetCameraView2d(int iIndex)
+//{
+//	return reinterpret_cast<glm::mat4 *>(m_pVertexBuffer +
+//										 HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
+//										 sizeof(uint32) +
+//										 (iIndex * (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) +
+//										 sizeof(uint32) +
+//										 sizeof(HyRectangle<float>));
+//}
 
 uint32 IHyRenderer::GetNumRenderStates2d()
 {
-	return *(reinterpret_cast<uint32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetTo2d));
-}
-
-uint32 IHyRenderer::GetCameraWindowId2d(int iCameraIndex)
-{
-	return *(reinterpret_cast<uint32 *>(m_pDrawBuffer +
-										HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
-										sizeof(uint32) +
-										(iCameraIndex * (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4)))));
-}
-
-HyRectangle<float> *IHyRenderer::GetCameraViewportRect2d(int iIndex)
-{
-	return reinterpret_cast<HyRectangle<float> *>(m_pDrawBuffer +
-												  HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
-												  sizeof(uint32) +
-												  (iIndex * (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) +
-												  sizeof(uint32));
-}
-
-glm::mat4 *IHyRenderer::GetCameraView2d(int iIndex)
-{
-	return reinterpret_cast<glm::mat4 *>(m_pDrawBuffer +
-										 HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
-										 sizeof(uint32) +
-										 (iIndex * (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) +
-										 sizeof(uint32) +
-										 sizeof(HyRectangle<float>));
+	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetTo2d));
 }
 
 HyRenderState *IHyRenderer::GetRenderStatesPtr2d()
 {
-	return reinterpret_cast<HyRenderState *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetTo2d + sizeof(uint32)); // Last sizeof(uint32) is skipping number of 2dInsts
+	return reinterpret_cast<HyRenderState *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetTo2d + sizeof(uint32)); // Last sizeof(uint32) is skipping number of 2dInsts
 }
 
 char *IHyRenderer::GetVertexData2d()
 {
-	return reinterpret_cast<char *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToVertexData2d);
+	return reinterpret_cast<char *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetToVertexData2d);
 }
 
-uint32 IHyRenderer::GetNumCameras3d()
-{
-	return *(reinterpret_cast<uint32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras3d));
-}
-
-uint32 IHyRenderer::GetNumInsts3d()
-{
-	return *(reinterpret_cast<uint32 *>(m_pDrawBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras3d));
-}
+//uint32 IHyRenderer::GetNumCameras3d()
+//{
+//	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras3d));
+//}
+//
+//uint32 IHyRenderer::GetNumInsts3d()
+//{
+//	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras3d));
+//}
 
 /*static*/ IHyShader *IHyRenderer::FindShader(int32 iId)
 {
@@ -203,11 +214,12 @@ void IHyRenderer::Render()
 			End_3d();
 		}
 
-		Init_2d();
-		while(BeginPass_2d())
+		Begin_2d();
+		for(uint32 j = 0; j < m_pCurWindow->GetNumCameras2d(); ++j)
 		{
+			CameraPass_2d(m_pCurWindow->GetCamera2d(j));
 			Draw2d();
-			End_2d();
+			//End_2d();
 		}
 
 		FinishRender();

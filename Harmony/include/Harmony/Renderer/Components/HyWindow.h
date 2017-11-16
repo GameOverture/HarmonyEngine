@@ -48,6 +48,9 @@ public:
 	HyCamera2d *					CreateCamera2d();
 	HyCamera3d *					CreateCamera3d();
 
+	uint32							GetNumCameras2d();
+	HyCamera2d *					GetCamera2d(uint32 uiIndex);
+
 	void							RemoveCamera(HyCamera2d *&pCam);
 	void							RemoveCamera(HyCamera3d *&pCam);
 

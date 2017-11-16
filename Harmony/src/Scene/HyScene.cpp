@@ -305,7 +305,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	pDrawHeader->uiVertexBufferSize2d = pCurVertexWritePos - pStartVertexWritePos;
 
 	// Do final check to see if we wrote passed our bounds
-	HyAssert(pDrawHeader->uiVertexBufferSize2d < HY_GFX_BUFFER_SIZE, "HyScene::WriteUpdateBuffer() has written passed its bounds! Embiggen 'HY_GFX_BUFFER_SIZE'");
+	HyAssert(pDrawHeader->uiVertexBufferSize2d < HY_VERTEX_BUFFER_SIZE, "HyScene::WriteUpdateBuffer() has written passed its bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
 
 	HY_PROFILE_END
 }
