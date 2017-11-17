@@ -38,7 +38,7 @@ protected:
 	const std::string				m_sNAME;
 	const std::string				m_sPREFIX;
 
-	HyRenderState					m_RenderState;
+	//HyRenderState					m_RenderState;
 	HyShaderUniforms 				m_ShaderUniforms;
 
 	HyShape2d						m_BoundingVolume;
@@ -59,6 +59,9 @@ public:
 	void SetStencil(HyStencil *pStencil);
 	void ClearStencil(bool bUseParentStencil);
 
+	void UseCameraCoordinates();
+	void UseWindowCoordinates(int32 iWindowIndex = 0);
+
 	void SetDisplayOrder(int32 iOrderValue);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -71,11 +74,6 @@ public:
 	const b2AABB &GetWorldAABB();
 	HyShape2d *GetUserBoundingVolume(uint32 uiIndex);
 
-	int32 GetCoordinateSystem();	// Returns -1 if using camera coordinates
-	void UseCameraCoordinates();
-	void UseWindowCoordinates(int32 iWindowIndex = 0);
-
-	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);
 
 	virtual bool IsLoaded() const override;

@@ -13,16 +13,15 @@
 #include "Renderer/Components/HyStencil.h"
 #include "HyEngine.h"
 
-int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
-std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
-std::map<uint32, HyStencil *>	IHyRenderer::sm_StencilMap;
+int32												IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
+std::map<int32, IHyShader *>						IHyRenderer::sm_ShaderMap;
+std::map<HyStencilHandle, HyStencil *>				IHyRenderer::sm_StencilMap;
 
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
 																									m_pRenderStateBuffer(nullptr),
 																									m_pVertexBuffer(nullptr),
 																									m_pCurWindow(nullptr),
-																									m_pCurCamera(nullptr),
 																									m_pCurRenderState(nullptr),
 																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8),
 																									m_uiNumRenderStates(0)
@@ -115,20 +114,20 @@ uint32 IHyRenderer::GetNumWindows()
 //										 sizeof(HyRectangle<float>));
 //}
 
-uint32 IHyRenderer::GetNumRenderStates2d()
-{
-	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetTo2d));
-}
-
-HyRenderState *IHyRenderer::GetRenderStatesPtr2d()
-{
-	return reinterpret_cast<HyRenderState *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetTo2d + sizeof(uint32)); // Last sizeof(uint32) is skipping number of 2dInsts
-}
-
-char *IHyRenderer::GetVertexData2d()
-{
-	return reinterpret_cast<char *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetToVertexData2d);
-}
+//uint32 IHyRenderer::GetNumRenderStates2d()
+//{
+//	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetTo2d));
+//}
+//
+//HyRenderState *IHyRenderer::GetRenderStatesPtr2d()
+//{
+//	return reinterpret_cast<HyRenderState *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetTo2d + sizeof(uint32)); // Last sizeof(uint32) is skipping number of 2dInsts
+//}
+//
+//char *IHyRenderer::GetVertexData2d()
+//{
+//	return reinterpret_cast<char *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetToVertexData2d);
+//}
 
 //uint32 IHyRenderer::GetNumCameras3d()
 //{

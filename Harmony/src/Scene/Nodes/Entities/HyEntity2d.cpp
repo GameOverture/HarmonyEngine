@@ -58,41 +58,42 @@ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitCh
 
 void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren /*= true*/)
 {
-	m_LocalScissorRect.x = uiLocalX;
-	m_LocalScissorRect.y = uiLocalY;
-	m_LocalScissorRect.width = uiWidth;
-	m_LocalScissorRect.height = uiHeight;
+	if(m_hScissor == HY_UNUSED_HANDLE)
+		m_hScissor = HY_NEW ScissorRect();
 
-	m_LocalScissorRect.iTag = 1;
+	m_hScissor->m_LocalScissorRect.x = uiLocalX;
+	m_hScissor->m_LocalScissorRect.y = uiLocalY;
+	m_hScissor->m_LocalScissorRect.width = uiWidth;
+	m_hScissor->m_LocalScissorRect.height = uiHeight;
+	m_hScissor->m_LocalScissorRect.iTag = SCISSORTAG_Enabled;
+
 	m_uiExplicitFlags |= EXPLICIT_Scissor;
 
-	glm::mat4 mtx;
-	GetWorldTransform(mtx);
-	m_WorldScissorRect.x = static_cast<int32>(mtx[3].x + m_LocalScissorRect.x);
-	m_WorldScissorRect.y = static_cast<int32>(mtx[3].y + m_LocalScissorRect.y);
-	m_WorldScissorRect.width = static_cast<int32>(mtx[0].x * m_LocalScissorRect.width);
-	m_WorldScissorRect.height = static_cast<int32>(mtx[1].y * m_LocalScissorRect.height);
-	m_WorldScissorRect.iTag = 1;
+	GetWorldScissor(m_hScissor->m_WorldScissorRect);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->_SetScissor(m_WorldScissorRect, bOverrideExplicitChildren);
+		m_ChildList[i]->_SetScissor(m_hScissor->m_WorldScissorRect, bOverrideExplicitChildren);
 }
 
 void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren /*= true*/)
 {
-	m_LocalScissorRect.iTag = 0;
+	if(m_hScissor == HY_UNUSED_HANDLE)
+		return;
+
+	m_hScissor->m_LocalScissorRect.iTag = SCISSORTAG_Disabled;
+	m_hScissor->m_WorldScissorRect.iTag = SCISSORTAG_Disabled;
 
 	if(bUseParentScissor == false)
-	{
 		m_uiExplicitFlags |= EXPLICIT_Scissor;
-
-		m_WorldScissorRect.iTag = 0;
-
-		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_SetScissor(m_WorldScissorRect, bOverrideExplicitChildren);
-	}
 	else
+	{
 		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+		if(m_pParent)
+			m_pParent->GetWorldScissor(m_hScissor->m_WorldScissorRect);
+	}
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->_SetScissor(m_hScissor->m_WorldScissorRect, bOverrideExplicitChildren);
 }
 
 void HyEntity2d::SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren /*= true*/)
@@ -112,6 +113,24 @@ void HyEntity2d::ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChil
 {
 }
 
+void HyEntity2d::UseCameraCoordinates(bool bOverrideExplicitChildren /*= true*/)
+{
+	m_iCoordinateSystem = -1;
+	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->_SetCoordinateSystem(m_iCoordinateSystem, bOverrideExplicitChildren);
+}
+
+void HyEntity2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/, bool bOverrideExplicitChildren /*= true*/)
+{
+	m_iCoordinateSystem = iWindowIndex;
+	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->_SetCoordinateSystem(iWindowIndex, bOverrideExplicitChildren);
+}
+
 void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren /*= true*/)
 {
 	m_iDisplayOrder = iOrderValue;
@@ -127,27 +146,6 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 		for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
 			iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
 	}
-}
-
-int32 HyEntity2d::GetCoordinateSystem()
-{
-	return m_iCoordinateSystem;
-}
-
-void HyEntity2d::UseCameraCoordinates(bool bOverrideExplicitChildren /*= true*/)
-{
-	m_iCoordinateSystem = -1;
-
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->_SetCoordinateSystem(m_iCoordinateSystem, bOverrideExplicitChildren);
-}
-
-void HyEntity2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/, bool bOverrideExplicitChildren /*= true*/)
-{
-	m_iCoordinateSystem = iWindowIndex;
-
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->_SetCoordinateSystem(iWindowIndex, bOverrideExplicitChildren);
 }
 
 void HyEntity2d::ChildAppend(IHyNode2d &childInst)
@@ -296,26 +294,6 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 
 /*virtual*/ void HyEntity2d::NodeUpdate() /*override final*/
 {
-	if((m_uiExplicitFlags & EXPLICIT_Scissor) != 0)
-	{
-		if(m_LocalScissorRect.iTag == 1)
-		{
-			glm::mat4 mtx;
-			GetWorldTransform(mtx);
-
-			m_WorldScissorRect.x = static_cast<int32>(mtx[3].x + m_LocalScissorRect.x);
-			m_WorldScissorRect.y = static_cast<int32>(mtx[3].y + m_LocalScissorRect.y);
-			m_WorldScissorRect.width = static_cast<int32>(mtx[0].x * m_LocalScissorRect.width);
-			m_WorldScissorRect.height = static_cast<int32>(mtx[1].y * m_LocalScissorRect.height);
-			m_WorldScissorRect.iTag = 1;
-		}
-		else
-			m_WorldScissorRect.iTag = 0;
-
-		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_SetScissor(m_WorldScissorRect, false);
-	}
-
 	if((m_uiAttributes & ATTRIBFLAG_MouseInput) != 0)
 	{
 		bool bLeftClickDown = Hy_Input().IsMouseBtnDown(HYMOUSE_BtnLeft);
@@ -372,12 +350,14 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 
 void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
-	SetDirty(DIRTY_Transform | DIRTY_Color);
+	SetDirty(DIRTY_Transform | DIRTY_Scissor | DIRTY_Color);
 
 	childInst._SetEnabled(m_bEnabled, false);
 	childInst._SetPauseUpdate(m_bPauseOverride, false);
-	childInst._SetScissor(m_WorldScissorRect, false);
 	childInst._SetCoordinateSystem(m_iCoordinateSystem, false);
+
+	if(m_hScissor != HY_UNUSED_HANDLE)
+		childInst._SetScissor(m_hScissor->m_WorldScissorRect, false);
 
 	int32 iOrderValue = m_iDisplayOrder;
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
@@ -421,10 +401,13 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
 	{
-		m_WorldScissorRect = worldScissorRectRef;
+		if(m_hScissor == HY_UNUSED_HANDLE)
+			m_hScissor = HY_NEW ScissorRect();
+
+		m_hScissor->m_WorldScissorRect = worldScissorRectRef;
 
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_SetScissor(worldScissorRectRef, bIsOverriding);
+			m_ChildList[i]->_SetScissor(m_hScissor->m_WorldScissorRect, bIsOverriding);
 	}
 }
 

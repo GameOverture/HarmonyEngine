@@ -19,8 +19,7 @@ class HyEntity2d : public IHyNodeDraw2d
 protected:
 	std::vector<IHyNode2d *>		m_ChildList;
 
-	int32							m_iCoordinateSystem;
-
+	// TODO: Change these attributes to be "Updatable components" that can attach to any specific entity.
 	enum Attributes
 	{
 		ATTRIBFLAG_MouseInput				= 1 << 1,
@@ -38,7 +37,7 @@ protected:
 	void *							m_pMouseInputUserParam;
 	IHyLeafDraw2d *					m_pMouseInputNode;
 
-	HyScreenRect<int32>				m_WorldScissorRect;
+	//HyScreenRect<int32>				m_WorldScissorRect;
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
@@ -54,13 +53,12 @@ public:
 
 	void SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren = true);
 	void ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren = true);
+
+	void UseCameraCoordinates(bool bOverrideExplicitChildren = true);
+	void UseWindowCoordinates(int32 iWindowIndex = 0, bool bOverrideExplicitChildren = true);
 	
 	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren = true);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	int32 GetCoordinateSystem();
-	void UseCameraCoordinates(bool bOverrideExplicitChildren = true);
-	void UseWindowCoordinates(int32 iWindowIndex = 0, bool bOverrideExplicitChildren = true);
 
 	void ChildAppend(IHyNode2d &childRef);
 	virtual bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef);

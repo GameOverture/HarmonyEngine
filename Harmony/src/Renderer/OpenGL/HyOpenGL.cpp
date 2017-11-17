@@ -10,6 +10,7 @@
 #include "Renderer/OpenGL/HyOpenGL.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Diagnostics/Console/HyConsole.h"
+#include "Scene/Nodes/Leafs/Misc/HyCamera.h"
 
 HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(diagnosticsRef, windowListRef),
 																							m_mtxCamera(1.0f),

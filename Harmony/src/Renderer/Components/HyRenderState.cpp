@@ -20,7 +20,7 @@ HyRenderState::HyRenderState() :	m_iRenderMode(HYRENDERMODE_Unknown),
 									m_uiDataOffset(0),
 									m_ScissorRect(0, 0, 0, 0),
 									m_hStencil(HY_UNUSED_HANDLE),
-									m_iWindowIndex(-1)
+									m_iCoordinateSystem(-1)
 {
 }
 
@@ -118,17 +118,17 @@ void HyRenderState::SetStencilHandle(HyStencilHandle hHandle)
 
 bool HyRenderState::IsUsingCameraCoordinates()
 {
-	return m_iWindowIndex < 0;
+	return m_iCoordinateSystem < 0;
 }
 
 void HyRenderState::SetCoordinateSystem(int32 iWindowIndex)
 {
-	m_iWindowIndex = iWindowIndex;
+	m_iCoordinateSystem = iWindowIndex;
 }
 
 int32 HyRenderState::GetAssignedWindow()
 {
-	return m_iWindowIndex;
+	return m_iCoordinateSystem;
 }
 
 void HyRenderState::Enable(uint32 uiAttributes)

@@ -147,95 +147,24 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		sm_bInst2dOrderingDirty = false;
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// BUFFER HEADER (contains offsets from here)-| Num 3d Cams (4bytes)-|-Cam3d-|-Cam3d-|...|-Num 2d Cams (4bytes)-|-Cam2d-|-Cam2d-|...|-Num 3d RenderStates (4bytes)-|-RenderState-|-RenderState-|-RenderState...-|-Num 2d RenderStates (4bytes)-|-RenderState-|-RenderState-|-RenderState...-|-<possible blank/empty data since we skip non-enabled instances>-|-Uniform/Vertex Data-|-Uniform/Vertex Data...
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	// RENDER STATE BUFFER
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Buffer Header (contains uiNum3dRenderStates; uiNum2dRenderStates; uiOffsetTo2d) || RenderState3D/UniformData-|-RenderState2D/UniformData-|
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
 
-	// GET BUFFER HEADER (and write to its members as data offsets become known below)
-	m_pCurWritePos = rendererRef.GetDrawBuffer();
+	char *pRsBufferWritePos = rendererRef.GetRenderStateBuffer();
+	char *pVertexBuffer = rendererRef.GetVertexBuffer();
 
-	IHyRenderer::DrawBufferHeader *pDrawHeader = new (m_pCurWritePos)IHyRenderer::DrawBufferHeader;
+	IHyRenderer::RenderStateBufferHeader *pHeader = reinterpret_cast<IHyRenderer::RenderStateBufferHeader *>(pRsBufferWritePos);
+	memset(pHeader, 0, sizeof(IHyRenderer::RenderStateBufferHeader));
 
-	pDrawHeader->uiReturnFlags = 0;
-	m_pCurWritePos += sizeof(IHyRenderer::DrawBufferHeader);
-
-	glm::mat4 mtxView;
-	uint32 uiNumWindows = static_cast<uint32>(m_WindowListRef.size());
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// WRITE 3d CAMERA(S) BUFFER
-	pDrawHeader->uiOffsetToCameras3d = m_pCurWritePos - rendererRef.GetDrawBuffer();
-	char *pWriteNum3dCamsHere = m_pCurWritePos;
-	m_pCurWritePos += sizeof(int32);
-
-	int32 iCount = 0;
-	for(uint32 i = 0; i < uiNumWindows; ++i)
-	{
-		uint32 uiNumCameras3d = static_cast<uint32>(m_WindowListRef[i]->m_Cams3dList.size());
-		for(uint32 j = 0; j < uiNumCameras3d; ++j)
-		{
-			if(m_WindowListRef[i]->m_Cams3dList[j]->IsEnabled())
-			{
-				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = m_WindowListRef[i]->GetIndex();
-				m_pCurWritePos += sizeof(uint32);
-
-				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_WindowListRef[i]->m_Cams3dList[j]->GetViewport();
-				m_pCurWritePos += sizeof(HyRectangle<float>);
-
-				HyError("GetLocalTransform should be 3d");
-				m_WindowListRef[i]->m_Cams3dList[j]->GetLocalTransform(mtxView);
-				*(reinterpret_cast<glm::mat4 *>(m_pCurWritePos)) = mtxView;
-				m_pCurWritePos += sizeof(glm::mat4);
-
-				iCount++;
-			}
-		}
-	}
-	*(reinterpret_cast<uint32 *>(pWriteNum3dCamsHere)) = iCount;
+	pRsBufferWritePos += sizeof(IHyRenderer::RenderStateBufferHeader);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// WRITE 2d CAMERA(S) BUFFER
-	pDrawHeader->uiOffsetToCameras2d = m_pCurWritePos - rendererRef.GetDrawBuffer();
-	char *pWriteNum2dCamsHere = m_pCurWritePos;
-	m_pCurWritePos += sizeof(int32);
-
-	iCount = 0;
-	for(uint32 i = 0; i < uiNumWindows; ++i)
-	{
-		uint32 uiNumCameras2d = static_cast<uint32>(m_WindowListRef[i]->m_Cams2dList.size());
-		for(uint32 j = 0; j < uiNumCameras2d; ++j)
-		{
-			if(m_WindowListRef[i]->m_Cams2dList[j]->IsEnabled())
-			{
-				*(reinterpret_cast<uint32 *>(m_pCurWritePos)) = m_WindowListRef[i]->GetIndex();
-				m_pCurWritePos += sizeof(uint32);
-
-				*(reinterpret_cast<HyRectangle<float> *>(m_pCurWritePos)) = m_WindowListRef[i]->m_Cams2dList[j]->GetViewport();
-				m_pCurWritePos += sizeof(HyRectangle<float>);
-
-				m_WindowListRef[i]->m_Cams2dList[j]->GetLocalTransform(mtxView);
-
-				// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly above or in the shader)
-				mtxView[3].x *= -1;
-				mtxView[3].y *= -1;
-
-				*(reinterpret_cast<glm::mat4 *>(m_pCurWritePos)) = mtxView;
-				m_pCurWritePos += sizeof(glm::mat4);
-
-				iCount++;
-			}
-		}
-	}
-	*(reinterpret_cast<uint32 *>(pWriteNum2dCamsHere)) = iCount;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// WRITE 3d DRAW BUFFER
-	pDrawHeader->uiOffsetTo3d = m_pCurWritePos - rendererRef.GetDrawBuffer();
-	char *pWriteNum3dRenderStatesHere = m_pCurWritePos;
-	m_pCurWritePos += sizeof(int32);
-
-	iCount = 0;
+	// WRITE 3d Render States
 	uint32 uiTotalNumInsts = static_cast<uint32>(m_LoadedInst3dList.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
@@ -243,36 +172,23 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		{
 			// TODO: 
 			//new (m_pCurWritePos) HyDrawText2d(reinterpret_cast<HyText2d *>(m_NodeList_Loaded[i]), uiVertexDataOffset, pCurVertexWritePos);
-			//m_pCurWritePos += sizeof(HyDrawText2d);
-			iCount++;
+			//pRsBufferWritePos += sizeof(HyRenderState);
+			pHeader->uiNum3dRenderStates++;
 		}
 	}
-	*(reinterpret_cast<uint32 *>(pWriteNum3dRenderStatesHere)) = iCount;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// WRITE 2d DRAW BUFFER
-	pDrawHeader->uiOffsetTo2d = m_pCurWritePos - rendererRef.GetDrawBuffer();
-	char *pWriteNum2dRenderStatesHere = m_pCurWritePos;
-	m_pCurWritePos += sizeof(int32);
-
-	iCount = 0;
+	// WRITE 2d Render States
 	uiTotalNumInsts = static_cast<uint32>(m_NodeList_Loaded.size());
-
-	char *pStartVertexWritePos = m_pCurWritePos + (uiTotalNumInsts * sizeof(HyRenderState));
-	pDrawHeader->uiOffsetToVertexData2d = pStartVertexWritePos - rendererRef.GetDrawBuffer();
-	char *pCurVertexWritePos = pStartVertexWritePos;
 
 	size_t	uiVertexDataOffset = 0;
 	HyRenderState *pCurRenderState2d = nullptr;
-
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
 		if(m_NodeList_Loaded[i]->IsEnabled() == false)
 			continue;
 
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// TODO: BELOW BATCH CHECK IS CAUSING SPRITES/TEXT TO GLITCH OUT BY SAMPLING THE INCORRECT TEXTURE. FORCING NEW BATCH EVERY RENDERSTATE SEEMS TO FIX IT FOR NOW
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		m_NodeList_Loaded[i]
 
 		// If previously written instance has equal render state by "operator ==" then it's to be assumed the instance data can be batched and doesn't need to write another render state
 		//if(pCurRenderState2d == nullptr ||

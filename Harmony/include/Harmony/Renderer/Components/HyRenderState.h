@@ -56,7 +56,7 @@ private:
 	HyScreenRect<int32>	m_ScissorRect;
 	HyStencilHandle		m_hStencil;
 
-	int32				m_iWindowIndex;	// -1 (or any negative value) means using world/camera coordinates
+	int32				m_iCoordinateSystem;	// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
 
 public:
 	HyRenderState();

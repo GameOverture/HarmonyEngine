@@ -29,7 +29,7 @@ protected:
 		DIRTY_WorldAABB				= 1 << 1,
 		DIRTY_Transform				= 1 << 2,
 		DIRTY_Color					= 1 << 3,
-		DIRTY_DontCare				= 1 << 4
+		DIRTY_Scissor				= 1 << 4
 	};
 	uint32							m_uiDirtyFlags;
 

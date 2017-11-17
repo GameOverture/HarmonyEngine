@@ -22,10 +22,21 @@ protected:
 	glm::vec3						m_CachedTopColor;
 	glm::vec3						m_CachedBotColor;
 
-	HyScreenRect<int32>				m_LocalScissorRect;
+	enum ScissorTag
+	{
+		SCISSORTAG_Disabled = 0,
+		SCISSORTAG_Enabled,
+	};
+	struct ScissorRect
+	{
+		HyScreenRect<int32>			m_LocalScissorRect;
+		HyScreenRect<int32>			m_WorldScissorRect;
+	}; typedef ScissorRect* HyScissorHandle;
+	HyScissorHandle					m_hScissor;
 	HyStencilHandle					m_hStencil;
 
-	int32							m_iDisplayOrder;	// Higher values are displayed front-most
+	int32							m_iCoordinateSystem;	// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
+	int32							m_iDisplayOrder;		// Higher values are displayed front-most
 
 public:
 	HyTweenVec3						topColor;
@@ -46,12 +57,15 @@ public:
 	// NOTE: Below accessors return the data declared in this class. Respective derived classes have the corresponding mutators (whether it's a "leaf" or "entity")
 
 	bool IsScissorSet() const;
-	const HyScreenRect<int32> &GetScissor() const;
+	void GetLocalScissor(HyScreenRect<int32> &scissorOut) const;
+	void GetWorldScissor(HyScreenRect<int32> &scissorOut);
 
 	bool IsStencilSet() const;
 	HyStencil *GetStencil() const;
 
+	int32 GetCoordinateSystem() const;
 	int32 GetDisplayOrder() const;
+
 
 protected:
 	virtual void NodeUpdate() = 0;

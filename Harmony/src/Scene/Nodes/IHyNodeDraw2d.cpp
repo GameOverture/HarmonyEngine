@@ -14,6 +14,7 @@
 IHyNodeDraw2d::IHyNodeDraw2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent),
 																		m_fAlpha(1.0f),
 																		m_fCachedAlpha(1.0f),
+																		m_hScissor(HY_UNUSED_HANDLE),
 																		m_hStencil(HY_UNUSED_HANDLE),
 																		m_iDisplayOrder(0),
 																		topColor(*this, DIRTY_Color),
@@ -28,6 +29,7 @@ IHyNodeDraw2d::IHyNodeDraw2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode2d(
 
 IHyNodeDraw2d::~IHyNodeDraw2d()
 {
+	delete m_hScissor;
 }
 
 void IHyNodeDraw2d::SetTint(float fR, float fG, float fB)
@@ -63,12 +65,49 @@ const glm::vec3 &IHyNodeDraw2d::CalculateBotTint()
 
 bool IHyNodeDraw2d::IsScissorSet() const
 {
-	return (m_LocalScissorRect.iTag == 1);	// Tag indicates whether it's used
+	return m_hScissor != HY_UNUSED_HANDLE;
 }
 
-const HyScreenRect<int32> &IHyNodeDraw2d::GetScissor() const
+void IHyNodeDraw2d::GetLocalScissor(HyScreenRect<int32> &scissorOut) const
 {
-	return m_LocalScissorRect;
+	if(m_hScissor == HY_UNUSED_HANDLE)
+		return;
+
+	scissorOut = m_hScissor->m_LocalScissorRect;
+}
+
+void IHyNodeDraw2d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
+{
+	if(m_hScissor == HY_UNUSED_HANDLE)
+		return;
+
+	if(IsDirty(DIRTY_Scissor))
+	{
+		if((m_uiExplicitFlags & EXPLICIT_Scissor) == 0 && m_pParent)
+			m_pParent->GetWorldScissor(m_hScissor->m_WorldScissorRect);
+		else
+		{
+			if(m_hScissor->m_LocalScissorRect.iTag == SCISSORTAG_Enabled)
+			{
+				glm::mat4 mtx;
+				GetWorldTransform(mtx);
+
+				m_hScissor->m_WorldScissorRect.x = static_cast<int32>(mtx[3].x + m_hScissor->m_LocalScissorRect.x);
+				m_hScissor->m_WorldScissorRect.y = static_cast<int32>(mtx[3].y + m_hScissor->m_LocalScissorRect.y);
+				m_hScissor->m_WorldScissorRect.width = static_cast<uint32>(mtx[0].x * m_hScissor->m_LocalScissorRect.width);
+				m_hScissor->m_WorldScissorRect.height = static_cast<uint32>(mtx[1].y * m_hScissor->m_LocalScissorRect.height);
+				m_hScissor->m_WorldScissorRect.iTag = SCISSORTAG_Enabled;
+			}
+			else
+			{
+				m_hScissor->m_WorldScissorRect.iTag = SCISSORTAG_Disabled;
+			}
+		}
+
+		ClearDirty(DIRTY_Scissor);
+	}
+
+	scissorOut = m_hScissor->m_WorldScissorRect;
 }
 
 bool IHyNodeDraw2d::IsStencilSet() const
@@ -79,6 +118,11 @@ bool IHyNodeDraw2d::IsStencilSet() const
 HyStencil *IHyNodeDraw2d::GetStencil() const
 {
 	return IHyRenderer::FindStencil(m_hStencil);
+}
+
+int32 IHyNodeDraw2d::GetCoordinateSystem() const
+{
+	return m_iCoordinateSystem;
 }
 
 int32 IHyNodeDraw2d::GetDisplayOrder() const

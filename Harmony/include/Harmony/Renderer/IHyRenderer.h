@@ -21,24 +21,21 @@ class HyStencil;
 class HyWindow;
 class HyGfxComms;
 class HyDiagnostics;
+class HyCamera2d;
 
 #define HY_RENDERSTATE_BUFFER_SIZE ((1024 * 1024) * 1) // 1MB
 #define HY_VERTEX_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
 
 class IHyRenderer
 {
-//public:
-//	// Note: All offsets below are from the beginning of the buffer pointer, containing this structure
-//	struct DrawBufferHeader
-//	{
-//		uint32		uiReturnFlags;
-//		size_t		uiOffsetTo3d;
-//		size_t		uiOffsetTo2d;
-//		size_t		uiOffsetToVertexData2d;
-//		size_t		uiVertexBufferSize2d;
-//		size_t		uiOffsetToCameras3d;
-//		size_t		uiOffsetToCameras2d;
-//	};
+public:
+	// Note: All offsets below are from the beginning of the buffer pointer, containing this structure
+	struct RenderStateBufferHeader
+	{
+		uint32		uiNum3dRenderStates;
+		uint32		uiNum2dRenderStates;
+		size_t		uiOffsetTo2d;
+	};
 
 protected:
 	HyDiagnostics &									m_DiagnosticsRef;
@@ -102,9 +99,9 @@ public:
 	//HyRectangle<float> *GetCameraViewportRect2d(int iIndex);
 	//glm::mat4 *GetCameraView2d(int iIndex);
 
-	uint32 GetNumRenderStates2d();
-	HyRenderState *GetRenderStatesPtr2d();
-	char *GetVertexData2d();
+	//uint32 GetNumRenderStates2d();
+	//HyRenderState *GetRenderStatesPtr2d();
+	//char *GetVertexData2d();
 
 	//// 3D buffer accessors
 	//uint32 GetNumCameras3d();
