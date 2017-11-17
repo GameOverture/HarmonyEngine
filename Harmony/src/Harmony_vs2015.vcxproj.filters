@@ -189,9 +189,6 @@
     <ClCompile Include="Scene\Tweens\HyTweenVec3.cpp">
       <Filter>Scene\Tweens</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Components\HyRenderSurface.cpp">
-      <Filter>Renderer\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Diagnostics\HyDiagnostics.cpp">
       <Filter>Diagnostics</Filter>
     </ClCompile>
@@ -236,6 +233,9 @@
     </ClCompile>
     <ClCompile Include="Time\HyTime.cpp">
       <Filter>Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Components\HyStencil.cpp">
+      <Filter>Renderer\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -647,6 +647,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Time\HyTime.h">
       <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyStencil.h">
+      <Filter>Renderer\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
