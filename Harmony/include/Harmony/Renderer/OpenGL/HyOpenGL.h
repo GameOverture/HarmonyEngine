@@ -20,12 +20,12 @@
 class HyOpenGL : public IHyRenderer
 {
 protected:
+	// VAO's cannot be shared between windows (aka OpenGL contexts)
 	std::vector<std::map<HyOpenGLShader *, uint32> >	m_VaoMapList;
 
-	glm::mat4					m_mtxView;
+	glm::mat4					m_mtxCamera;
+	glm::mat4					m_mtxWindow;
 	glm::mat4					m_mtxProj;
-
-	int32						m_iCurCamIndex;
 
 	///////// 2D MEMBERS ////////////////////
 	GLuint						m_hVBO2d;
@@ -47,10 +47,10 @@ public:
 	virtual void SetRenderState_3d(uint32 uiNewRenderState) override;
 	virtual void End_3d() override;
 
-	virtual void Init_2d() override;
-	virtual bool BeginPass_2d() override;
+	virtual void Begin_2d() override;
+	virtual void CameraPass_2d(HyCamera2d *pCamera) override;
 	virtual void DrawRenderState_2d(HyRenderState &renderState) override;
-	virtual void End_2d() override;
+	//virtual void End_2d() override;
 
 	virtual void FinishRender() override;
 

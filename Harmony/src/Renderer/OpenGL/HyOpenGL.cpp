@@ -12,7 +12,9 @@
 #include "Diagnostics/Console/HyConsole.h"
 
 HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(diagnosticsRef, windowListRef),
-																							m_mtxView(1.0f)
+																							m_mtxCamera(1.0f),
+																							m_mtxWindow(1.0f),
+																							m_mtxProj(1.0f)
 {
 	HyLog("OpenGL is initializing...");
 
@@ -205,34 +207,65 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 {
 }
 
-/*virtual*/ void HyOpenGL::Init_2d()
+/*virtual*/ void HyOpenGL::Begin_2d()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
-	HyErrorCheck_OpenGL("HyOpenGL:Init_2d", "glBindBuffer");
+	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBindBuffer");
 
 	glBufferData(GL_ARRAY_BUFFER, HYDRAWBUFFERHEADER->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
-	HyErrorCheck_OpenGL("HyOpenGL:Init_2d", "glBufferData");
-
-	m_iCurCamIndex = 0;
+	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBufferData");
 }
 
-/*virtual*/ bool HyOpenGL::BeginPass_2d()
+/*virtual*/ void HyOpenGL::CameraPass_2d(HyCamera2d *pCamera)
 {
-	int32 iNumCameras2d = GetNumCameras2d();
-	int32 iNumRenderStates2d = GetNumRenderStates2d();
+	glm::ivec2 vFramebufferSize = m_pCurWindow->GetFramebufferSize();
 
-	// Only draw cameras that are apart of this HyWindow
-	while(m_pCurWindow->GetIndex() != GetCameraWindowId2d(m_iCurCamIndex) && m_iCurCamIndex < iNumCameras2d)
-		m_iCurCamIndex++;
+	HyRectangle<float> viewportRect;
+	if(renderState.IsUsingCameraCoordinates())
+	{
+		viewportRect = *GetCameraViewportRect2d(m_iCurCamIndex);
+		m_mtxCamera = pCamera->GetVi *GetCameraView2d(m_iCurCamIndex);
+	}
+	else // Using window coordinates (origin is bottom left corner)
+	{
+		viewportRect.left = 0.0f;
+		viewportRect.bottom = 0.0f;
+		viewportRect.right = 1.0f;
+		viewportRect.top = 1.0f;
 
-	if(iNumRenderStates2d == 0 || m_iCurCamIndex >= iNumCameras2d)
-		return false;
-	
-	// TODO: Without disabling glDepthMask, sprites fragments that overlap will be discarded, and primitive draws don't work
-	glDepthMask(GL_FALSE);
-	HyErrorCheck_OpenGL("HyOpenGL:BeginPass_2d", "glDepthMask");
+		m_mtxWindow = glm::mat4(1.0f);
+		m_mtxWindow = glm::translate(m_mtxWindow, vFramebufferSize.x * -0.5f, vFramebufferSize.y * -0.5f, 0.0f);
+	}
 
-	return true;
+	float fWidth = (viewportRect.Width() * vFramebufferSize.x);
+	float fHeight = (viewportRect.Height() * vFramebufferSize.y);
+
+	glViewport(static_cast<GLint>(viewportRect.left * vFramebufferSize.x),
+		static_cast<GLint>(viewportRect.bottom * vFramebufferSize.y),
+		static_cast<GLsizei>(fWidth),
+		static_cast<GLsizei>(fHeight));
+
+	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glViewport");
+
+	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f, 0.0f, 1.0f);
+
+
+
+	//int32 iNumCameras2d = GetNumCameras2d();
+	//int32 iNumRenderStates2d = GetNumRenderStates2d();
+
+	//// Only draw cameras that are apart of this HyWindow
+	//while(m_pCurWindow->GetIndex() != GetCameraWindowId2d(m_iCurCamIndex) && m_iCurCamIndex < iNumCameras2d)
+	//	m_iCurCamIndex++;
+
+	//if(iNumRenderStates2d == 0 || m_iCurCamIndex >= iNumCameras2d)
+	//	return false;
+	//
+	//// TODO: Without disabling glDepthMask, sprites fragments that overlap will be discarded, and primitive draws don't work
+	//glDepthMask(GL_FALSE);
+	//HyErrorCheck_OpenGL("HyOpenGL:CameraPass_2d", "glDepthMask");
+
+	//return true;
 }
 
 /*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderState &renderState)
@@ -277,39 +310,6 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Set camera matrices
-	glm::ivec2 vFramebufferSize = m_pCurWindow->GetFramebufferSize();
-
-	HyRectangle<float> viewportRect;
-	if(renderState.IsUsingCameraCoordinates())
-	{
-		viewportRect = *GetCameraViewportRect2d(m_iCurCamIndex);
-		m_mtxView = *GetCameraView2d(m_iCurCamIndex);
-	}
-	else // Using window coordinates (origin is bottom left corner)
-	{
-		viewportRect.left = 0.0f;
-		viewportRect.bottom = 0.0f;
-		viewportRect.right = 1.0f;
-		viewportRect.top = 1.0f;
-
-		m_mtxView = glm::mat4(1.0f);
-		m_mtxView = glm::translate(m_mtxView, vFramebufferSize.x * -0.5f, vFramebufferSize.y * -0.5f, 0.0f);
-	}
-
-	float fWidth = (viewportRect.Width() * vFramebufferSize.x);
-	float fHeight = (viewportRect.Height() * vFramebufferSize.y);
-
-	glViewport(static_cast<GLint>(viewportRect.left * vFramebufferSize.x),
-			   static_cast<GLint>(viewportRect.bottom * vFramebufferSize.y),
-			   static_cast<GLsizei>(fWidth),
-			   static_cast<GLsizei>(fHeight));
-
-	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glViewport");
-
-	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f, 0.0f, 1.0f);
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_ShaderMap[renderState.GetShaderId()]);
 	BindVao(pShader);
 	pShader->Use();
@@ -337,10 +337,10 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	{
 		const HyScreenRect<int32> &scissorRectRef = renderState.GetScissorRect();
 
-		glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_pCurWindow->GetFramebufferSize().x / 2),
-				  static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_pCurWindow->GetFramebufferSize().y / 2),
-				  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
-				  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
+		glScissor(static_cast<GLint>(m_mtxCamera[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxCamera[3].x) + (m_pCurWindow->GetFramebufferSize().x / 2),
+				  static_cast<GLint>(m_mtxCamera[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxCamera[3].y) + (m_pCurWindow->GetFramebufferSize().y / 2),
+				  static_cast<GLsizei>(m_mtxCamera[0].x * scissorRectRef.width),
+				  static_cast<GLsizei>(m_mtxCamera[1].y * scissorRectRef.height));
 
 		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glScissor");
 
@@ -355,7 +355,7 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Always attempt to assign these uniforms if the shader chooses to use them
-	pShader->SetUniformGLSL("u_mtxWorldToCamera", m_mtxView);
+	pShader->SetUniformGLSL("u_mtxWorldToCamera", m_mtxCamera);
 	pShader->SetUniformGLSL("u_mtxCameraToClip", m_mtxProj);
 
 	char *pDrawBuffer = GetVertexData2d();
@@ -511,15 +511,12 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-/*virtual*/ void HyOpenGL::End_2d()
-{
-	m_iCurCamIndex++;
-	glDepthMask(GL_TRUE);	// TODO: Get rid of this once you implement proper depth
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindVertexArray(0);
-	glUseProgram(0);
-}
+///*virtual*/ void HyOpenGL::End_2d()
+//{
+//	glBindTexture(GL_TEXTURE_2D, 0);
+//	glBindVertexArray(0);
+//	glUseProgram(0);
+//}
 
 /*virtual*/ void HyOpenGL::FinishRender()
 {
