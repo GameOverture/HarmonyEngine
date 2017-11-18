@@ -11,17 +11,20 @@
 #define IHyRenderer_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Loadables/IHyLoadableData.h"
-#include "Renderer/Components/HyRenderState.h"
 
 #include <queue>
 
+class HyRenderState;
 class IHyShader;
 class HyStencil;
 class HyWindow;
 class HyGfxComms;
 class HyDiagnostics;
 class HyCamera2d;
+class IHyLoadableData;
+
+#define HY_MAX_PASSES_PER_BUFFER 32
+#define HY_MAX_SHADER_PASSES_PER_INSTANCE 4
 
 #define HY_RENDERSTATE_BUFFER_SIZE ((1024 * 1024) * 1) // 1MB
 #define HY_VERTEX_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
@@ -43,6 +46,7 @@ protected:
 
 	char *											m_pRenderStateBuffer;
 	char *											m_pVertexBuffer;
+	size_t											m_uiVertexBufferUsedBytes;
 
 	HyWindow *										m_pCurWindow;
 	HyRenderState *									m_pCurRenderState;
@@ -51,7 +55,7 @@ protected:
 	std::queue<IHyLoadableData *>					m_RxDataQueue;
 
 	static int32									sm_iShaderIdCount;
-	static std::map<int32, IHyShader *>				sm_ShaderMap;
+	static std::map<HyShaderHandle, IHyShader *>	sm_ShaderMap;
 
 	static std::map<HyStencilHandle, HyStencil *>	sm_StencilMap;
 
@@ -65,6 +69,7 @@ public:
 
 	char *GetRenderStateBuffer();
 	char *GetVertexBuffer();
+	void SetVertexBufferUsed(size_t uiNumBytes);
 
 	void TxData(IHyLoadableData *pData);
 	std::queue<IHyLoadableData *> &RxData();
@@ -107,7 +112,7 @@ public:
 	//uint32 GetNumCameras3d();
 	//uint32 GetNumInsts3d();
 
-	static IHyShader *FindShader(int32 iId);
+	static IHyShader *FindShader(HyShaderHandle hHandle);
 	static IHyShader *MakeCustomShader();
 	static IHyShader *MakeCustomShader(const char *szPrefix, const char *szName);
 

@@ -13,7 +13,6 @@
 #include "HyEngine.h"
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyNodeDraw2d(HYTYPE_Entity2d, pParent),
-															m_iCoordinateSystem(-1),
 															m_uiAttributes(0),
 															m_eMouseInputState(MOUSEINPUT_None),
 															m_pMouseInputUserParam(nullptr),

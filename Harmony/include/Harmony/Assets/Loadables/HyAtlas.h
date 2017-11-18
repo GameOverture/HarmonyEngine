@@ -29,7 +29,7 @@ class HyAtlas : public IHyLoadableData
 	const uint32							m_uiHEIGHT;
 	const HyTextureFormat					m_eTEXTURE_FORMAT;
 
-	uint32									m_uiGfxApiHandle;
+	HyTextureHandle							m_hTextureHandle;
 
 	const uint32							m_uiNUM_FRAMES;
 
@@ -59,7 +59,7 @@ public:
 	uint32 GetMasterIndex() const;
 	uint32 GetWidth() const;
 	uint32 GetHeight() const;
-	uint32 GetGfxApiHandle() const;
+	HyTextureHandle GetTextureHandle() const;
 	bool GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const;
 
 	void DeletePixelData();

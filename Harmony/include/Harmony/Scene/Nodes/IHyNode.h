@@ -57,11 +57,11 @@ public:
 	IHyNode(HyType eNodeType);
 	virtual ~IHyNode();
 
-	HyType GetType();
+	HyType GetType() const;
 
 	virtual bool IsEnabled();
 
-	int64 GetTag();
+	int64 GetTag() const;
 	void SetTag(int64 iTag);
 
 protected:

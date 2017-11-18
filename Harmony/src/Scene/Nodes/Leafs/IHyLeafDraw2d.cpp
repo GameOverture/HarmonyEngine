@@ -18,6 +18,8 @@ IHyLeafDraw2d::IHyLeafDraw2d(HyType eNodeType, const char *szPrefix, const char 
 																												m_pData(nullptr),
 																												m_sNAME(szName ? szName : ""),
 																												m_sPREFIX(szPrefix ? szPrefix : ""),
+																												m_eRenderMode(HYRENDERMODE_Unknown),
+																												m_hTextureHandle(HY_UNUSED_HANDLE),
 																												m_BoundingVolume(*this)
 {
 }
@@ -26,6 +28,18 @@ IHyLeafDraw2d::~IHyLeafDraw2d()
 {
 	if(m_eLoadState != HYLOADSTATE_Inactive)
 		Unload();
+}
+
+const IHyLeafDraw2d &IHyLeafDraw2d::operator=(const IHyLeafDraw2d &rhs)
+{
+	// TODO: Decided whether I copy the underlying data or not, which would require unloading/loading and unlinking/linking from things like HyScene and HyAssets
+	//m_eLoadState;
+	//m_RequiredCustomShaders;
+	//m_pData;
+	//m_sNAME;
+	//m_sPREFIX;
+
+	return *this;
 }
 
 void IHyLeafDraw2d::SetEnabled(bool bEnabled)
@@ -142,6 +156,16 @@ const std::string &IHyLeafDraw2d::GetPrefix()
 	return m_sPREFIX;
 }
 
+HyRenderMode IHyLeafDraw2d::GetRenderMode() const
+{
+	return m_eRenderMode;
+}
+
+HyTextureHandle IHyLeafDraw2d::GetTextureHandle() const
+{
+	return m_hTextureHandle;
+}
+
 IHyNodeData *IHyLeafDraw2d::AcquireData()
 {
 	if(m_pData == nullptr)
@@ -194,11 +218,11 @@ HyShape2d *IHyLeafDraw2d::GetUserBoundingVolume(uint32 uiIndex)
 
 void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 {
-	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyDraw2d::SetCustomShader was used on an already loaded instance - I can make this work I just haven't yet");
-	HyAssert(pShader->IsFinalized(), "IHyDraw2d::SetCustomShader tried to set a non-finalized shader");
-	HyAssert(pShader->GetId() >= HYSHADERPROG_CustomStartIndex, "HyGfxData::SetRequiredCustomShaderId was passed an invalid custom shader Id");
+	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyLeafDraw2d::SetCustomShader was used on an already loaded instance - I can make this work I just haven't yet");
+	HyAssert(pShader->IsFinalized(), "IHyLeafDraw2d::SetCustomShader tried to set a non-finalized shader");
+	HyAssert(pShader->GetId() >= HYSHADERPROG_CustomStartIndex, "IHyLeafDraw2d::SetCustomShader was passed an invalid custom shader Id");
+	HyAssert(m_RequiredCustomShaders.size() < HY_MAX_SHADER_PASSES_PER_INSTANCE, "IHyLeafDraw2d::SetCustomShader has taken too many shaders. Max = " << HY_MAX_SHADER_PASSES_PER_INSTANCE);
 
-	m_RequiredCustomShaders.clear();
 	m_RequiredCustomShaders.insert(pShader->GetId());
 }
 
@@ -256,10 +280,7 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_Stencil))
-	{
 		m_hStencil = hHandle;
-		m_RenderState.SetStencilHandle(m_hStencil);
-	}
 }
 
 /*virtual*/ int32 IHyLeafDraw2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
@@ -290,11 +311,6 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 IHyNodeData *IHyLeafDraw2d::UncheckedGetData()
 {
 	return m_pData;
-}
-
-const HyRenderState &IHyLeafDraw2d::GetRenderState() const
-{
-	return m_RenderState;
 }
 
 void IHyLeafDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)

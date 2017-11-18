@@ -14,7 +14,6 @@
 #include "Scene/Nodes/IHyNodeDraw2d.h"
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/Loadables/IHyShader.h"
-#include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
 class HyStencil;
@@ -32,13 +31,15 @@ protected:
 	static HyAssets *				sm_pHyAssets;
 
 	HyLoadState						m_eLoadState;
-	std::set<int32>					m_RequiredCustomShaders;
+	std::set<HyShaderHandle>		m_RequiredCustomShaders;
 
 	IHyNodeData *					m_pData;
 	const std::string				m_sNAME;
 	const std::string				m_sPREFIX;
 
 	//HyRenderState					m_RenderState;
+	HyRenderMode					m_eRenderMode;
+	HyTextureHandle					m_hTextureHandle;
 	HyShaderUniforms 				m_ShaderUniforms;
 
 	HyShape2d						m_BoundingVolume;
@@ -47,6 +48,8 @@ protected:
 public:
 	IHyLeafDraw2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	virtual ~IHyLeafDraw2d();
+
+	virtual const IHyLeafDraw2d &operator=(const IHyLeafDraw2d &rhs);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// NOTE: Below mutators manipulate data from derived classes "IHyNodeDraw2d" and "IHyNode". Handled in regard to being a "leaf"
@@ -67,6 +70,9 @@ public:
 
 	const std::string &GetName();
 	const std::string &GetPrefix();
+
+	HyRenderMode GetRenderMode() const;
+	HyTextureHandle GetTextureHandle() const;
 
 	IHyNodeData *AcquireData();
 
@@ -94,7 +100,6 @@ protected:
 	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override;
 
 	IHyNodeData *UncheckedGetData();
-	const HyRenderState &GetRenderState() const;
 
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 

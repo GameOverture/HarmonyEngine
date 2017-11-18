@@ -20,11 +20,12 @@ HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pPa
 																										m_uiCurAnimState(0),
 																										m_uiCurFrame(0)
 {
-	m_RenderState.SetRenderMode(HYRENDERMODE_TriangleStrip);
-	m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
-	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
-	m_RenderState.SetNumVerticesPerInstance(4);
-	m_RenderState.SetNumInstances(1);
+	m_eRenderMode = HYRENDERMODE_TriangleStrip;
+
+	//m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
+	//m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
+	//m_RenderState.SetNumVerticesPerInstance(4);
+	//m_RenderState.SetNumInstances(1);
 }
 
 HySprite2d::~HySprite2d(void)
@@ -123,7 +124,8 @@ void HySprite2d::AnimSetFrame(uint32 uiFrameIndex)
 	m_uiCurFrame = uiFrameIndex;
 
 	const HySprite2dFrame &UpdatedFrameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
-	m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
+	m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
+	
 	SetDirty(DIRTY_BoundingVolume);
 }
 
@@ -163,7 +165,8 @@ void HySprite2d::AnimSetState(uint32 uiStateIndex)
 
 	// NOTE: UncheckedGetData() is safe because the above AnimGetNumFrames() calls AcquireData()
 	const HySprite2dFrame &UpdatedFrameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
-	m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
+	m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
+
 	SetDirty(DIRTY_BoundingVolume);
 }
 
@@ -351,7 +354,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	}
 
 	const HySprite2dFrame &UpdatedFrameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
-	m_RenderState.SetTextureHandle(UpdatedFrameRef.GetGfxApiHandle());
+	m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
 }
 
 /*virtual*/ void HySprite2d::OnDataAcquired() /*override*/

@@ -10,9 +10,9 @@
 #include "Assets/Nodes/HySprite2dData.h"
 #include "Renderer/IHyRenderer.h"
 
-uint32 HySprite2dFrame::GetGfxApiHandle() const
+HyTextureHandle HySprite2dFrame::GetGfxApiHandle() const
 {
-	return pAtlas ? pAtlas->GetGfxApiHandle() : 0;
+	return pAtlas ? pAtlas->GetTextureHandle() : HY_UNUSED_HANDLE;
 }
 
 bool HySprite2dFrame::IsValid() const

@@ -18,8 +18,8 @@ class HyAtlasGroupData;
 class HyPrimitive2d : public IHyLeafDraw2d
 {
 protected:
-	glm::vec2 *		m_pDrawBuffer;
-	uint32			m_uiBufferSize;
+	glm::vec2 *		m_pVertBuffer;
+	uint32			m_uiNumVerts;
 
 	bool			m_bWireframe;
 	float			m_fLineThickness;
@@ -34,6 +34,8 @@ public:
 	virtual bool IsEnabled() override;
 
 	HyShape2d &GetShape();
+
+	uint32 GetNumVerts() const;
 
 	bool IsWireframe();
 	void SetWireframe(bool bIsWireframe);

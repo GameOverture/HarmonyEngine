@@ -31,7 +31,7 @@ protected:
 	{
 		HyScreenRect<int32>			m_LocalScissorRect;
 		HyScreenRect<int32>			m_WorldScissorRect;
-	}; typedef ScissorRect* HyScissorHandle;
+	};	typedef ScissorRect* HyScissorHandle;
 	HyScissorHandle					m_hScissor;
 	HyStencilHandle					m_hStencil;
 

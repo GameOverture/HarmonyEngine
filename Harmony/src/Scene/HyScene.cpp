@@ -10,8 +10,8 @@
 #include "Scene/HyScene.h"
 #include "HyEngine.h"
 #include "Renderer/IHyRenderer.h"
-#include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyWindow.h"
+#include "Renderer/Components/HyRenderState.h"
 #include "Scene/Nodes/Leafs/Draws/HySprite2d.h"
 #include "Scene/Nodes/Leafs/Draws/HySpine2d.h"
 #include "Scene/Nodes/Leafs/Draws/HyPrimitive2d.h"
@@ -146,7 +146,6 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		std::sort(m_NodeList_Loaded.begin(), m_NodeList_Loaded.end(), &Node2dSortPredicate);
 		sm_bInst2dOrderingDirty = false;
 	}
-
 	
 	// RENDER STATE BUFFER
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -156,7 +155,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
 
 	char *pRsBufferWritePos = rendererRef.GetRenderStateBuffer();
-	char *pVertexBuffer = rendererRef.GetVertexBuffer();
+	char *pVertBufferWritePos = rendererRef.GetVertexBuffer();
 
 	IHyRenderer::RenderStateBufferHeader *pHeader = reinterpret_cast<IHyRenderer::RenderStateBufferHeader *>(pRsBufferWritePos);
 	memset(pHeader, 0, sizeof(IHyRenderer::RenderStateBufferHeader));
@@ -168,72 +167,79 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	uint32 uiTotalNumInsts = static_cast<uint32>(m_LoadedInst3dList.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_LoadedInst3dList[i]->IsEnabled())
-		{
-			// TODO: 
-			//new (m_pCurWritePos) HyDrawText2d(reinterpret_cast<HyText2d *>(m_NodeList_Loaded[i]), uiVertexDataOffset, pCurVertexWritePos);
-			//pRsBufferWritePos += sizeof(HyRenderState);
-			pHeader->uiNum3dRenderStates++;
-		}
+		if(m_LoadedInst3dList[i]->IsEnabled() == false)
+			continue;
+
+		// TODO: 
+		//new (m_pCurWritePos) HyDrawText2d(reinterpret_cast<HyText2d *>(m_NodeList_Loaded[i]), uiVertexDataOffset, pCurVertexWritePos);
+		pRsBufferWritePos += sizeof(HyRenderState);
+		pHeader->uiNum3dRenderStates++;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 2d Render States
+	pHeader->uiOffsetTo2d = pRsBufferWritePos - rendererRef.GetRenderStateBuffer();
+	
+	// TODO: Determine whether I can multi-thread these HyRenderState instantiations
 	uiTotalNumInsts = static_cast<uint32>(m_NodeList_Loaded.size());
-
-	size_t	uiVertexDataOffset = 0;
-	HyRenderState *pCurRenderState2d = nullptr;
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
 		if(m_NodeList_Loaded[i]->IsEnabled() == false)
 			continue;
 
-		m_NodeList_Loaded[i]
+		new (pRsBufferWritePos) HyRenderState(*m_NodeList_Loaded[i],
+											  CalculateCullPasses(*m_NodeList_Loaded[i]),
+											  reinterpret_cast<size_t>(pVertBufferWritePos) - reinterpret_cast<size_t>(rendererRef.GetVertexBuffer()));
 
-		// If previously written instance has equal render state by "operator ==" then it's to be assumed the instance data can be batched and doesn't need to write another render state
-		//if(pCurRenderState2d == nullptr ||
-		//   m_NodeList_Loaded[i]->GetRenderState() != *pCurRenderState2d ||
-		//   m_NodeList_Loaded[i]->GetRenderState().IsEnabled(HyRenderState::DRAWINSTANCED) == false)
-		{
-			// Start a new draw. Write render state to buffer to be sent to render thread
-			memcpy(m_pCurWritePos, &m_NodeList_Loaded[i]->GetRenderState(), sizeof(HyRenderState));
-			pCurRenderState2d = reinterpret_cast<HyRenderState *>(m_pCurWritePos);
-			pCurRenderState2d->SetDataOffset(uiVertexDataOffset);
+		pRsBufferWritePos += sizeof(HyRenderState);
 
-			// This function is responsible for incrementing the draw pointer to after what's written
-			m_NodeList_Loaded[i]->WriteShaderUniformBuffer(pCurVertexWritePos);
-
-			m_pCurWritePos += sizeof(HyRenderState);
-			iCount++;
-		}
-		//else
-		//{
-		//	// This instance will be batched with the current render state
-		//	pCurRenderState2d->AppendInstances(m_NodeList_Loaded[i]->GetRenderState().GetNumInstances());
-		//}
+		// This function is responsible for incrementing the draw pointer to after what's written
+		m_NodeList_Loaded[i]->WriteShaderUniformBuffer(pRsBufferWritePos);
 
 		// OnWriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
-		m_NodeList_Loaded[i]->OnWriteDrawBufferData(pCurVertexWritePos);
-		uiVertexDataOffset = pCurVertexWritePos - pStartVertexWritePos;
+		m_NodeList_Loaded[i]->OnWriteDrawBufferData(pVertBufferWritePos);
+
+		pHeader->uiNum2dRenderStates++;
 	}
 
-	*(reinterpret_cast<uint32 *>(pWriteNum2dRenderStatesHere)) = iCount;
-	pDrawHeader->uiVertexBufferSize2d = pCurVertexWritePos - pStartVertexWritePos;
-
-	// Do final check to see if we wrote passed our bounds
-	HyAssert(pDrawHeader->uiVertexBufferSize2d < HY_VERTEX_BUFFER_SIZE, "HyScene::WriteUpdateBuffer() has written passed its bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
+	rendererRef.SetVertexBufferUsed(reinterpret_cast<size_t>(pVertBufferWritePos) - reinterpret_cast<size_t>(rendererRef.GetVertexBuffer()));
 
 	HY_PROFILE_END
+}
+
+uint32 HyScene::CalculateCullPasses(/*const*/ IHyLeafDraw2d &instanceRef)
+{
+	uint32 uiCullMask = 0;
+
+	uint32 iBit = 0;
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
+	{
+		HyCamera2d *pCamera = nullptr;
+		for(uint32 j = 0; j < m_WindowListRef[i]->GetNumCameras2d(); ++j)
+		{
+			pCamera = m_WindowListRef[i]->GetCamera2d(j);
+			if(pCamera->IsEnabled())
+			{
+				if(pCamera->GetWorldViewBounds().Contains(instanceRef.GetWorldAABB()))
+					uiCullMask |= (1 << iBit);
+
+				iBit++;
+				HyAssert(iBit > HY_MAX_PASSES_PER_BUFFER, "HyScene::CalculateCullPasses exceeded maximum number of passes. There are too many cameras enabled.");
+			}
+		}
+	}
+
+	return uiCullMask;
 }
 
 /*static*/ bool HyScene::Node2dSortPredicate(const IHyLeafDraw2d *pInst1, const IHyLeafDraw2d *pInst2)
 {
 	if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
 	{
-		if(pInst1->GetRenderState() == pInst2->GetRenderState())
+		if(pInst1->GetTextureHandle() == pInst2->GetTextureHandle())
 			return reinterpret_cast<const char *>(pInst1) < reinterpret_cast<const char *>(pInst2);
 
-		return pInst1->GetRenderState() < pInst2->GetRenderState();
+		return pInst1->GetTextureHandle() < pInst2->GetTextureHandle();
 	}
 
 	return pInst1->GetDisplayOrder() < pInst2->GetDisplayOrder();

@@ -213,7 +213,7 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBindBuffer");
 
-	glBufferData(GL_ARRAY_BUFFER, HYDRAWBUFFERHEADER->uiVertexBufferSize2d, GetVertexData2d(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_uiVertexBufferUsedBytes, m_pVertexBuffer, GL_DYNAMIC_DRAW);
 	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBufferData");
 }
 

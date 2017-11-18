@@ -9,18 +9,21 @@
  *************************************************************************/
 #include "Afx/HyInteropAfx.h"
 #include "Renderer/IHyRenderer.h"
+#include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyStencil.h"
+#include "Assets/Loadables/IHyLoadableData.h"
 #include "HyEngine.h"
 
 int32												IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
-std::map<int32, IHyShader *>						IHyRenderer::sm_ShaderMap;
+std::map<HyShaderHandle, IHyShader *>				IHyRenderer::sm_ShaderMap;
 std::map<HyStencilHandle, HyStencil *>				IHyRenderer::sm_StencilMap;
 
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
 																									m_pRenderStateBuffer(nullptr),
 																									m_pVertexBuffer(nullptr),
+																									m_uiVertexBufferUsedBytes(0),
 																									m_pCurWindow(nullptr),
 																									m_pCurRenderState(nullptr),
 																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8),
@@ -38,7 +41,7 @@ IHyRenderer::~IHyRenderer(void)
 	delete[] m_pVertexBuffer;
 	delete[] m_pRenderStateBuffer;
 
-	std::map<int32, IHyShader *>::iterator iter;
+	std::map<HyShaderHandle, IHyShader *>::iterator iter;
 	for(iter = sm_ShaderMap.begin(); iter != sm_ShaderMap.end(); ++iter)
 		delete iter->second;
 
@@ -55,6 +58,12 @@ char *IHyRenderer::GetRenderStateBuffer()
 char *IHyRenderer::GetVertexBuffer()
 {
 	return m_pVertexBuffer;
+}
+
+void IHyRenderer::SetVertexBufferUsed(size_t uiNumBytes)
+{
+	m_uiVertexBufferUsedBytes = uiNumBytes;
+	HyAssert(m_uiVertexBufferUsedBytes < HY_VERTEX_BUFFER_SIZE, "HyScene::WriteUpdateBuffer() has written passed its bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
 }
 
 void IHyRenderer::TxData(IHyLoadableData *pData)
@@ -139,10 +148,10 @@ uint32 IHyRenderer::GetNumWindows()
 //	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras3d));
 //}
 
-/*static*/ IHyShader *IHyRenderer::FindShader(int32 iId)
+/*static*/ IHyShader *IHyRenderer::FindShader(HyShaderHandle hHandle)
 {
-	if(sm_ShaderMap.find(iId) != sm_ShaderMap.end())
-		return sm_ShaderMap[iId];
+	if(sm_ShaderMap.find(hHandle) != sm_ShaderMap.end())
+		return sm_ShaderMap[hHandle];
 
 	HyError("IHyRenderer::FindShader could not find a valid shader");
 	return nullptr;

@@ -24,7 +24,7 @@ IHyNode::~IHyNode()
 {
 }
 
-HyType IHyNode::GetType()
+HyType IHyNode::GetType() const
 {
 	return m_eTYPE;
 }
@@ -34,7 +34,7 @@ bool IHyNode::IsEnabled()
 	return m_bEnabled;
 }
 
-int64 IHyNode::GetTag()
+int64 IHyNode::GetTag() const
 {
 	return m_iTag;
 }

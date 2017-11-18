@@ -67,7 +67,8 @@ protected:
 	GlyphInfo *			m_pGlyphInfos;
 	uint32				m_uiNumReservedGlyphs;		// Essentially NUM_LAYERS * NUM_UTF32_CHARACTERS
 
-	uint32				m_uiNumValidCharacters;		// How many graphically shown characters
+	uint32				m_uiNumValidCharacters;		// How many characters (with their effects) were rendered
+	uint32				m_uiNumRenderQuads;
 
 	float				m_fUsedPixelWidth;
 
@@ -81,8 +82,9 @@ public:
 	void TextSet(const std::string sText);
 	const std::string &TextGet() const;
 
-	uint32 TextGetNumCharacters();
-	uint32 TextGetNumShownCharacters();
+	uint32 TextGetNumCharacters() const;
+	uint32 TextGetNumShownCharacters() const;
+	uint32 GetNumRenderQuads() const;
 	float TextGetScaleBoxModifer();
 
 	glm::vec2 TextGetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);

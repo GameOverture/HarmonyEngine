@@ -34,7 +34,7 @@ struct HySprite2dFrame
 										fDURATION(fDuration)
 	{ }
 
-	uint32 GetGfxApiHandle() const;
+	HyTextureHandle GetGfxApiHandle() const;
 	bool IsValid() const;
 };
 

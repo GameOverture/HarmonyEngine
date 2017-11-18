@@ -22,10 +22,11 @@ HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pPare
 																									m_uiCurAnimState(0),
 																									m_spSkeletonBounds(NULL)
 {
-	m_RenderState.SetRenderMode(HYRENDERMODE_TriangleStrip);
-	m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
-	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
-	m_RenderState.SetNumVerticesPerInstance(4);
+	m_eRenderMode = HYRENDERMODE_TriangleStrip;
+	
+	//m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
+	//m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
+	//m_RenderState.SetNumVerticesPerInstance(4);
 }
 
 HySpine2d::~HySpine2d(void)

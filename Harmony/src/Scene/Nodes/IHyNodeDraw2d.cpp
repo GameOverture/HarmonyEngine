@@ -16,6 +16,7 @@ IHyNodeDraw2d::IHyNodeDraw2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode2d(
 																		m_fCachedAlpha(1.0f),
 																		m_hScissor(HY_UNUSED_HANDLE),
 																		m_hStencil(HY_UNUSED_HANDLE),
+																		m_iCoordinateSystem(-1),
 																		m_iDisplayOrder(0),
 																		topColor(*this, DIRTY_Color),
 																		botColor(*this, DIRTY_Color),

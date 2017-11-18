@@ -30,10 +30,11 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent
 																									m_uiNumValidCharacters(0),
 																									m_fUsedPixelWidth(0.0f)
 {
-	m_RenderState.SetRenderMode(HYRENDERMODE_TriangleStrip);
-	m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
-	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
-	m_RenderState.SetNumVerticesPerInstance(4);
+	m_eRenderMode = HYRENDERMODE_TriangleStrip;
+
+	//m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
+	//m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
+	//m_RenderState.SetNumVerticesPerInstance(4);
 }
 
 HyText2d::~HyText2d(void)
@@ -82,14 +83,19 @@ const std::string &HyText2d::TextGet() const
 	return m_sRawString;
 }
 
-uint32 HyText2d::TextGetNumCharacters()
+uint32 HyText2d::TextGetNumCharacters() const
 {
 	return static_cast<uint32>(m_Utf32CodeList.size());
 }
 
-uint32 HyText2d::TextGetNumShownCharacters()
+uint32 HyText2d::TextGetNumShownCharacters() const
 {
 	return m_uiNumValidCharacters;
+}
+
+uint32 HyText2d::GetNumRenderQuads() const
+{
+	return m_uiNumRenderQuads;
 }
 
 float HyText2d::TextGetScaleBoxModifer()
@@ -330,7 +336,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 		return;
 
 	if(pTextData->GetAtlas())
-		m_RenderState.SetTextureHandle(pTextData->GetAtlas()->GetGfxApiHandle());
+		m_hTextureHandle = pTextData->GetAtlas()->GetTextureHandle();
 
 	MarkAsDirty();
 }
@@ -637,7 +643,8 @@ offsetCalculation:
 		vNewlineInfo.push_back(LineInfo(fCurLineWidth, (fCurLineAscender + fCurLineDecender), uiNewlineIndex));	// Push the final line (row)
 	}
 
-	m_RenderState.SetNumInstances((m_uiNumValidCharacters * uiNUM_LAYERS) - uiNumNewlineCharacters);
+	//m_RenderState.SetNumInstances((m_uiNumValidCharacters * uiNUM_LAYERS) - uiNumNewlineCharacters);
+	m_uiNumRenderQuads = (m_uiNumValidCharacters * uiNUM_LAYERS) - uiNumNewlineCharacters;
 
 	// Fix each text line to match proper alignment (HYALIGN_Left is already set at this point)
 	if(m_eAlignment != HYALIGN_Left)

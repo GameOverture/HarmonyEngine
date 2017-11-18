@@ -30,7 +30,7 @@ HyAtlas::HyAtlas(std::string sFilePath,
 														m_uiWIDTH(uiWidth),
 														m_uiHEIGHT(uiHeight),
 														m_eTEXTURE_FORMAT(eTextureFormat),
-														m_uiGfxApiHandle(0),
+														m_hTextureHandle(0),
 														m_uiNUM_FRAMES(static_cast<uint32>(srcFramesArrayRef.size())),
 														m_pPixelData(nullptr),
 														m_uiPixelDataSize(0)
@@ -81,9 +81,9 @@ uint32 HyAtlas::GetHeight() const
 	return m_uiHEIGHT;
 }
 
-uint32 HyAtlas::GetGfxApiHandle() const
+HyTextureHandle HyAtlas::GetTextureHandle() const
 {
-	return m_uiGfxApiHandle;
+	return m_hTextureHandle;
 }
 
 bool HyAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
@@ -149,12 +149,12 @@ void HyAtlas::OnRenderThread(IHyRenderer &rendererRef)
 	m_csPixelData.Lock();
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		m_uiGfxApiHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, 0, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
+		m_hTextureHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, 0, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
 		DeletePixelData();
 	}
 	else // GetLoadableState() == HYLOADSTATE_Discarded
 	{
-		rendererRef.DeleteTexture(m_uiGfxApiHandle);
+		rendererRef.DeleteTexture(m_hTextureHandle);
 	}
 	m_csPixelData.Unlock();
 }
