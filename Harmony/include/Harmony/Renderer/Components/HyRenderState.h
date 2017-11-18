@@ -15,13 +15,11 @@
 #include "Utilities/HyMath.h"
 
 class IHyLeafDraw2d;
-class HyShaderUniforms;
-class IHyShader;
 
 class HyRenderState
 {
-	const size_t		m_uiDATA_OFFSET;
 	const uint32		m_uiCULL_PASS_MASK;
+	const size_t		m_uiDATA_OFFSET;
 
 	HyRenderMode		m_eRenderMode;
 	HyTextureHandle		m_hTextureHandle;
@@ -36,12 +34,15 @@ class HyRenderState
 	uint32				m_uiNumInstances;
 	uint32				m_uiNumVerticesPerInstance;		// Or total number of vertices if single instance
 
+	size_t				m_uiExDataSize;
+
 public:
 	HyRenderState(/*const*/ IHyLeafDraw2d &instanceRef, uint32 uiCullPassMask, size_t uiDataOffset);
 	~HyRenderState(void);
 
-	HyRenderMode GetRenderMode() const;
 	size_t GetDataOffset() const;
+	uint32 GetCullMask() const;
+	HyRenderMode GetRenderMode() const;
 
 	void AppendInstances(uint32 uiNumInstsToAppend);
 	uint32 GetNumInstances() const;
@@ -57,6 +58,9 @@ public:
 	HyShaderHandle GetShaderId(uint32 uiShaderPass) const;
 
 	HyTextureHandle GetTextureHandle() const;
+
+	void SetExSize(size_t uiSize);
+	size_t GetExSize() const;
 
 	//bool operator==(const HyRenderState &right) const;
 	//bool operator!=(const HyRenderState &right) const;

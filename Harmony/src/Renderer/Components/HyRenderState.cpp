@@ -13,8 +13,9 @@
 #include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 #include "Scene/Nodes/Leafs/Draws/HyText2d.h"
 
-HyRenderState::HyRenderState(/*const*/ IHyLeafDraw2d &instanceRef, uint32 uiCullPassMask, size_t uiDataOffset) :	m_uiDATA_OFFSET(uiDataOffset),
-																													m_uiCULL_PASS_MASK(uiCullPassMask)
+HyRenderState::HyRenderState(/*const*/ IHyLeafDraw2d &instanceRef, uint32 uiCullPassMask, size_t uiDataOffset) :	m_uiCULL_PASS_MASK(uiCullPassMask),
+																													m_uiDATA_OFFSET(uiDataOffset),
+																													m_uiExDataSize(0)
 {
 	m_eRenderMode = instanceRef.GetRenderMode();
 	m_hTextureHandle = instanceRef.GetTextureHandle();
@@ -62,14 +63,19 @@ HyRenderState::~HyRenderState(void)
 	HyError("~HyRenderState dtor was called somehow");
 }
 
-HyRenderMode HyRenderState::GetRenderMode() const
-{
-	return m_eRenderMode;
-}
-
 size_t HyRenderState::GetDataOffset() const
 {
 	return m_uiDATA_OFFSET;
+}
+
+uint32 HyRenderState::GetCullMask() const
+{
+	return m_uiCULL_PASS_MASK;
+}
+
+HyRenderMode HyRenderState::GetRenderMode() const
+{
+	return m_eRenderMode;
 }
 
 void HyRenderState::AppendInstances(uint32 uiNumInstsToAppend)
@@ -116,6 +122,16 @@ HyShaderHandle HyRenderState::GetShaderId(uint32 uiShaderPass) const
 HyTextureHandle HyRenderState::GetTextureHandle() const
 {
 	return m_hTextureHandle;
+}
+
+void HyRenderState::SetExSize(size_t uiSize)
+{
+	m_uiExDataSize = uiSize;
+}
+
+size_t HyRenderState::GetExSize() const
+{
+	return m_uiExDataSize;
 }
 
 //bool HyRenderState::operator==(const HyRenderState &right) const

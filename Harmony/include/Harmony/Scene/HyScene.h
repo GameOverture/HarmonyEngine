@@ -71,7 +71,7 @@ public:
 	void UpdateNodes();
 	void PrepareRender(IHyRenderer &rendererRef);
 
-	uint32 CalculateCullPasses(/*const*/ IHyLeafDraw2d &instanceRef);
+	bool CalculateCullPasses(/*const*/ IHyLeafDraw2d &instanceRef, uint32 &uiCullMaskOut);
 	
 	static bool Node2dSortPredicate(const IHyLeafDraw2d *pInst1, const IHyLeafDraw2d *pInst2);
 };

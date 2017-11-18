@@ -162,6 +162,8 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 
 	pRsBufferWritePos += sizeof(IHyRenderer::RenderStateBufferHeader);
 
+	// TODO: Determine whether I can multi-thread these HyRenderState instantiations
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 3d Render States
 	uint32 uiTotalNumInsts = static_cast<uint32>(m_LoadedInst3dList.size());
@@ -178,23 +180,22 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 2d Render States
-	pHeader->uiOffsetTo2d = pRsBufferWritePos - rendererRef.GetRenderStateBuffer();
-	
-	// TODO: Determine whether I can multi-thread these HyRenderState instantiations
+	uint32 uiCullMask = 0;
 	uiTotalNumInsts = static_cast<uint32>(m_NodeList_Loaded.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_NodeList_Loaded[i]->IsEnabled() == false)
+		if(m_NodeList_Loaded[i]->IsEnabled() == false || CalculateCullPasses(*m_NodeList_Loaded[i], uiCullMask) == false)
 			continue;
 
-		new (pRsBufferWritePos) HyRenderState(*m_NodeList_Loaded[i],
-											  CalculateCullPasses(*m_NodeList_Loaded[i]),
-											  reinterpret_cast<size_t>(pVertBufferWritePos) - reinterpret_cast<size_t>(rendererRef.GetVertexBuffer()));
+		HyRenderState *pRenderState = new (pRsBufferWritePos) HyRenderState(*m_NodeList_Loaded[i],
+																			uiCullMask,
+																			reinterpret_cast<size_t>(pVertBufferWritePos) - reinterpret_cast<size_t>(rendererRef.GetVertexBuffer()));
 
 		pRsBufferWritePos += sizeof(HyRenderState);
 
-		// This function is responsible for incrementing the draw pointer to after what's written
-		m_NodeList_Loaded[i]->WriteShaderUniformBuffer(pRsBufferWritePos);
+		char *pStartOfExData = pRsBufferWritePos;
+		m_NodeList_Loaded[i]->WriteShaderUniformBuffer(pRsBufferWritePos);	// This function is responsible for incrementing the draw pointer to after what's written
+		pRenderState->SetExSize(reinterpret_cast<size_t>(pRsBufferWritePos) - reinterpret_cast<size_t>(pStartOfExData));
 
 		// OnWriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
 		m_NodeList_Loaded[i]->OnWriteDrawBufferData(pVertBufferWritePos);
@@ -204,32 +205,44 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 
 	rendererRef.SetVertexBufferUsed(reinterpret_cast<size_t>(pVertBufferWritePos) - reinterpret_cast<size_t>(rendererRef.GetVertexBuffer()));
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// SetCullMaskStartBit for each window
+	uint32 iBit = 0;
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
+	{
+		m_WindowListRef[i]->SetCullMaskStartBit(iBit);
+
+		HyWindow::CameraIterator2d iter = m_WindowListRef[i]->GetCamera2dIterator();
+		while(iter.IsEnd() == false)
+			++iBit;
+	}
+
 	HY_PROFILE_END
 }
 
-uint32 HyScene::CalculateCullPasses(/*const*/ IHyLeafDraw2d &instanceRef)
+bool HyScene::CalculateCullPasses(/*const*/ IHyLeafDraw2d &instanceRef, uint32 &uiCullMaskOut)
 {
-	uint32 uiCullMask = 0;
+	uiCullMaskOut = 0;
+	if(instanceRef.GetCoordinateSystem() >= 0)
+		return true;
 
 	uint32 iBit = 0;
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
-		HyCamera2d *pCamera = nullptr;
-		for(uint32 j = 0; j < m_WindowListRef[i]->GetNumCameras2d(); ++j)
+		HyWindow::CameraIterator2d iter = m_WindowListRef[i]->GetCamera2dIterator();
+		while(iter.IsEnd() == false)
 		{
-			pCamera = m_WindowListRef[i]->GetCamera2d(j);
-			if(pCamera->IsEnabled())
-			{
-				if(pCamera->GetWorldViewBounds().Contains(instanceRef.GetWorldAABB()))
-					uiCullMask |= (1 << iBit);
+			if(iter.Get()->GetWorldViewBounds().Contains(instanceRef.GetWorldAABB()))
+				uiCullMaskOut |= (1 << iBit);
 
-				iBit++;
-				HyAssert(iBit > HY_MAX_PASSES_PER_BUFFER, "HyScene::CalculateCullPasses exceeded maximum number of passes. There are too many cameras enabled.");
-			}
+			iBit++;
+			HyAssert(iBit > HY_MAX_PASSES_PER_BUFFER, "HyScene::CalculateCullPasses exceeded maximum number of passes. There are too many cameras enabled.");
+
+			++iter;
 		}
 	}
 
-	return uiCullMask;
+	return uiCullMaskOut != 0;
 }
 
 /*static*/ bool HyScene::Node2dSortPredicate(const IHyLeafDraw2d *pInst1, const IHyLeafDraw2d *pInst2)

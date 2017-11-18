@@ -317,4 +317,3 @@ void IHyLeafDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 {
 	m_ShaderUniforms.WriteUniformsBufferData(pRefDataWritePos);
 }
-

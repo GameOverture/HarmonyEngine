@@ -25,9 +25,7 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> 
 																									m_pVertexBuffer(nullptr),
 																									m_uiVertexBufferUsedBytes(0),
 																									m_pCurWindow(nullptr),
-																									m_pCurRenderState(nullptr),
-																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8),
-																									m_uiNumRenderStates(0)
+																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8)
 {
 	m_pVertexBuffer = HY_NEW char[HY_VERTEX_BUFFER_SIZE];
 	memset(m_pVertexBuffer, 0, HY_VERTEX_BUFFER_SIZE);
@@ -209,46 +207,39 @@ void IHyRenderer::Render()
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Setup render state buffer
+	char *pRsBufferPos = m_pRenderStateBuffer;
+	RenderStateBufferHeader *pRsHeader = reinterpret_cast<RenderStateBufferHeader *>(pRsBufferPos);
+	pRsBufferPos += sizeof(RenderStateBufferHeader);
+
+	HyRenderState *pCurRenderState = nullptr;
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Render all Windows
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		SetCurrentWindow(i);
 		StartRender();
 
-		Init_3d();
-		while(BeginPass_3d())
+		Begin_3d();
+		for(uint32 k = 0; k < pRsHeader->uiNum3dRenderStates; k++)
 		{
-			//Draw3d();
-			End_3d();
+			pCurRenderState = reinterpret_cast<HyRenderState *>(pRsBufferPos);
+			DrawRenderState_3d(pCurRenderState);
+			pRsBufferPos += pCurRenderState->GetExSize() + sizeof(HyRenderState);
 		}
 
 		Begin_2d();
-		for(uint32 j = 0; j < m_pCurWindow->GetNumCameras2d(); ++j)
+		for(uint32 k = 0; k < pRsHeader->uiNum2dRenderStates; k++)
 		{
-			CameraPass_2d(m_pCurWindow->GetCamera2d(j));
-			Draw2d();
-			//End_2d();
+			pCurRenderState = reinterpret_cast<HyRenderState *>(pRsBufferPos);
+			if(pCurRenderState->GetCoordinateSystem() < 0 || pCurRenderState->GetCoordinateSystem() == m_pCurWindow->GetIndex())
+				DrawRenderState_2d(pCurRenderState);
+
+			pRsBufferPos += pCurRenderState->GetExSize() + sizeof(HyRenderState);
 		}
 
 		FinishRender();
 	}
 	
 	HY_PROFILE_END
-}
-
-void IHyRenderer::Draw2d()
-{
-	// Each render state will require its own draw. The order of these render states should be 
-	// depth sorted with render states batched together to reduce state changes.
-	m_pCurRenderState = GetRenderStatesPtr2d();
-
-	m_uiNumRenderStates = GetNumRenderStates2d();
-	for(uint32 i = 0; i < m_uiNumRenderStates; ++i, ++m_pCurRenderState)
-	{
-		if(m_pCurRenderState->IsUsingCameraCoordinates() ||
-		   m_pCurRenderState->GetAssignedWindow() == m_pCurWindow->GetIndex())
-		{
-			DrawRenderState_2d(*m_pCurRenderState);
-		}
-	}
 }

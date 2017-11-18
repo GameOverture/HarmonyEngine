@@ -32,7 +32,8 @@
 	}
 #endif
 
-HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext) : m_uiINDEX(uiIndex)
+HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext) :	m_uiINDEX(uiIndex),
+																															m_uiCullMaskStartBit(0)
 {
 	m_Info = windowInfoRef;
 	m_vFramebufferSize = m_Info.vSize;
@@ -186,6 +187,22 @@ HyCamera2d *HyWindow::GetCamera2d(uint32 uiIndex)
 	return m_Cams2dList[uiIndex];
 }
 
+HyWindow::CameraIterator2d HyWindow::GetCamera2dIterator()
+{
+	return CameraIterator2d(m_Cams2dList);
+}
+
+uint32 HyWindow::GetNumCameras3d()
+{
+	return static_cast<uint32>(m_Cams3dList.size());
+}
+
+HyCamera3d *HyWindow::GetCamera3d(uint32 uiIndex)
+{
+	HyAssert(uiIndex < static_cast<uint32>(m_Cams3dList.size()), "HyWindow::GetCamera3d was passed an invalid index: " << uiIndex);
+	return m_Cams3dList[uiIndex];
+}
+
 void HyWindow::RemoveCamera(HyCamera2d *&pCam)
 {
 	for(std::vector<HyCamera2d *>::iterator iter = m_Cams2dList.begin(); iter != m_Cams2dList.end(); ++iter)
@@ -270,6 +287,16 @@ glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoor
 HyWindowHandle HyWindow::GetHandle()
 {
 	return m_hData;
+}
+
+void HyWindow::SetCullMaskStartBit(uint32 uiStartBit)
+{
+	m_uiCullMaskStartBit = uiStartBit;
+}
+
+uint32 HyWindow::GetCullMaskStartBit()
+{
+	return m_uiCullMaskStartBit;
 }
 
 #ifdef HY_PLATFORM_DESKTOP

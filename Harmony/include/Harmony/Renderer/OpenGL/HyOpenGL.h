@@ -42,15 +42,11 @@ public:
 
 	virtual void StartRender() override;
 	
-	virtual void Init_3d() override;
-	virtual bool BeginPass_3d() override;
-	virtual void SetRenderState_3d(uint32 uiNewRenderState) override;
-	virtual void End_3d() override;
+	virtual void Begin_3d() override;
+	virtual void DrawRenderState_3d(HyRenderState *pRenderState) override;
 
 	virtual void Begin_2d() override;
-	virtual void CameraPass_2d(HyCamera2d *pCamera) override;
-	virtual void DrawRenderState_2d(HyRenderState &renderState) override;
-	//virtual void End_2d() override;
+	virtual void DrawRenderState_2d(HyRenderState *pRenderState) override;
 
 	virtual void FinishRender() override;
 

@@ -37,7 +37,6 @@ public:
 	{
 		uint32		uiNum3dRenderStates;
 		uint32		uiNum2dRenderStates;
-		size_t		uiOffsetTo2d;
 	};
 
 protected:
@@ -49,7 +48,6 @@ protected:
 	size_t											m_uiVertexBufferUsedBytes;
 
 	HyWindow *										m_pCurWindow;
-	HyRenderState *									m_pCurRenderState;
 
 	std::queue<IHyLoadableData *>					m_TxDataQueue;
 	std::queue<IHyLoadableData *>					m_RxDataQueue;
@@ -61,7 +59,6 @@ protected:
 
 	// Diagnostics/Metrics
 	uint32											m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
-	uint32											m_uiNumRenderStates;
 
 public:
 	IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
@@ -81,15 +78,11 @@ public:
 
 	virtual void StartRender() = 0;
 
-	virtual void Init_3d() = 0;
-	virtual bool BeginPass_3d() = 0;
-	virtual void SetRenderState_3d(uint32 uiNewRenderState) = 0;
-	virtual void End_3d() = 0;
+	virtual void Begin_3d() = 0;
+	virtual void DrawRenderState_3d(HyRenderState *pRenderState) = 0;
 
 	virtual void Begin_2d() = 0;
-	virtual void CameraPass_2d(HyCamera2d *pCamera) = 0;
-	virtual void DrawRenderState_2d(HyRenderState &renderState) = 0;
-	//virtual void End_2d() = 0;
+	virtual void DrawRenderState_2d(HyRenderState *pRenderState) = 0;
 
 	virtual void FinishRender() = 0;
 
@@ -121,7 +114,6 @@ public:
 	static void RemoveStencil(HyStencil *pNewStencil);
 
 	void Render();
-	void Draw2d();
 };
 
 #endif /* IHyRenderer_h__ */

@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGL.h"
 #include "Renderer/Components/HyWindow.h"
+#include "Renderer/Components/HyRenderState.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Scene/Nodes/Leafs/Misc/HyCamera.h"
 
@@ -191,20 +192,11 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	HyErrorCheck_OpenGL("HyOpenGL:StartRender", "glClear");
 }
 
-/*virtual*/ void HyOpenGL::Init_3d()
+/*virtual*/ void HyOpenGL::Begin_3d()
 {
 }
 
-/*virtual*/ bool HyOpenGL::BeginPass_3d()
-{
-	return false;
-}
-
-/*virtual*/ void HyOpenGL::SetRenderState_3d(uint32 uiNewRenderState)
-{
-}
-
-/*virtual*/ void HyOpenGL::End_3d()
+/*virtual*/ void HyOpenGL::DrawRenderState_3d(HyRenderState *pRenderState) /*override*/
 {
 }
 
@@ -269,8 +261,48 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	//return true;
 }
 
-/*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderState &renderState)
+/*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderState *pRenderState)
 {
+	HyWindow::CameraIterator2d iter = m_pCurWindow->GetCamera2dIterator();
+	do
+	{
+		if(pRenderState->GetCoordinateSystem() >= 0)
+		{
+		}
+
+		//render
+		bool bAnotherPass;
+		if(pRenderState->GetCoordinateSystem() < 0)
+		{
+			++iter;
+			bAnotherPass = iter.IsEnd() == false;
+		}
+	} while(more camera passes);
+
+
+	if(pCurRenderState->GetCoordinateSystem() == i)
+		DrawRenderState_2d(pCurRenderState, nullptr);
+	else if(pCurRenderState->GetCoordinateSystem() < 0)
+	{
+		uint32 uiBit = m_pCurWindow->GetCullMaskStartBit();
+		HyWindow::CameraIterator2d iter = m_pCurWindow->GetCamera2dIterator();
+		while(iter.IsEnd() == false)
+		{
+			if(0 != (pCurRenderState->GetCullMask() & (1 << uiBit)))
+				DrawRenderState_2d(pCurRenderState, *iter);
+		}
+	}
+
+	for(uint32 j = 0; j < m_pCurWindow->GetNumCameras2d(); ++j)
+	{
+		CameraPass_2d(m_pCurWindow->GetCamera2d(j));
+		pRenderState->GetCullMask()
+	}
+	
+
+
+
+
 	if(renderState.GetStencilHandle() != HY_UNUSED_HANDLE)
 	{
 		HyStencil *pStencil = FindStencil(renderState.GetStencilHandle());
