@@ -23,7 +23,11 @@ HyRenderState::HyRenderState(/*const*/ IHyLeafDraw2d &instanceRef, uint32 uiCull
 	m_ScissorRect.iTag = 0;
 	instanceRef.GetWorldScissor(m_ScissorRect);
 
-	m_hStencil = instanceRef.GetStencil()->GetHandle();
+	if(instanceRef.GetStencil())
+		m_hStencil = instanceRef.GetStencil()->GetHandle();
+	else
+		m_hStencil = HY_UNUSED_HANDLE;
+
 	m_iCoordinateSystem = instanceRef.GetCoordinateSystem();
 
 	memset(m_hShaderList, 0, sizeof(HyShaderHandle) * HY_MAX_SHADER_PASSES_PER_INSTANCE);
@@ -113,9 +117,9 @@ int32 HyRenderState::GetCoordinateSystem() const
 	return m_iCoordinateSystem;
 }
 
-HyShaderHandle HyRenderState::GetShaderId(uint32 uiShaderPass) const
+HyShaderHandle HyRenderState::GetShaderHandle(uint32 uiShaderPass) const
 {
-	HyAssert(uiShaderPass < HY_MAX_SHADER_PASSES_PER_INSTANCE, "HyRenderState::GetShaderId was passed an invalid index");
+	HyAssert(uiShaderPass < HY_MAX_SHADER_PASSES_PER_INSTANCE, "HyRenderState::GetShaderHandle was passed an invalid index");
 	return m_hShaderList[uiShaderPass];
 }
 

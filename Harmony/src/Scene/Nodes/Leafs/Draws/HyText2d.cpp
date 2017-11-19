@@ -28,7 +28,8 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent
 																									m_pGlyphInfos(nullptr),
 																									m_uiNumReservedGlyphs(0),
 																									m_uiNumValidCharacters(0),
-																									m_fUsedPixelWidth(0.0f)
+																									m_fUsedPixelWidth(0.0f),
+																									m_fUsedPixelHeight(0.0f)
 {
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 
@@ -343,7 +344,8 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::CalcBoundingVolume() /*override*/
 {
-	HyError("HyText2d::CalcBoundingVolume() not implemented");
+	// TODO: Fix this to actually fit the text
+	m_BoundingVolume.SetAsBox(m_fUsedPixelWidth /** 0.5f*/, m_fUsedPixelHeight /** 0.5f*/);//, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
 }
 
 /*virtual*/ void HyText2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/
@@ -431,6 +433,7 @@ offsetCalculation:
 	memset(pWritePos, 0, sizeof(glm::vec2) * uiNUM_LAYERS);
 
 	// vNewlineInfo is used to set text alignment of center, right, or justified. (left alignment is already accomplished by default)
+	//				It can also be used to calculate the total used space
 	struct LineInfo
 	{
 		const float fUSED_WIDTH;
@@ -722,16 +725,16 @@ offsetCalculation:
 			m_fUsedPixelWidth = vNewlineInfo[i].fUSED_WIDTH;
 	}
 
+	m_fUsedPixelHeight = 0.0f;
+	for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
+		m_fUsedPixelHeight += vNewlineInfo[i].fUSED_HEIGHT;
+
 	if(0 != (m_uiBoxAttributes & BOXATTRIB_IsScaleBox))
 	{
-		float fTotalHeight = 0.0f;
-		for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
-			fTotalHeight += vNewlineInfo[i].fUSED_HEIGHT;
-
 		if(bScaleBoxModiferIsSet == false)
 		{
 			float fScaleX = m_vBoxDimensions.x / m_fUsedPixelWidth;
-			float fScaleY = m_vBoxDimensions.y / fTotalHeight;
+			float fScaleY = m_vBoxDimensions.y / m_fUsedPixelHeight;
 
 			m_fScaleBoxModifier = HyMin(fScaleX, fScaleY);
 
@@ -740,7 +743,7 @@ offsetCalculation:
 		}
 		else if(0 != (m_uiBoxAttributes & BOXATTRIB_CenterVertically))
 		{
-			float fCenterNudgeAmt = (m_vBoxDimensions.y - fTotalHeight) * 0.5f;
+			float fCenterNudgeAmt = (m_vBoxDimensions.y - m_fUsedPixelHeight) * 0.5f;
 			for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
 				m_pGlyphInfos[i].vOffset.y -= fCenterNudgeAmt;
 		}

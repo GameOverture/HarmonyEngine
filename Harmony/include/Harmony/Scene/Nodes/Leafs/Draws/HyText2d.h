@@ -71,6 +71,8 @@ protected:
 	uint32				m_uiNumRenderQuads;
 
 	float				m_fUsedPixelWidth;
+	float				m_fUsedPixelHeight;
+	glm::vec2			m_ptPivotPoint;
 
 public:
 	HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);

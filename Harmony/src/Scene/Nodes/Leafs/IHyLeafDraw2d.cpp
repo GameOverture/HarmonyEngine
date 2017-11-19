@@ -220,10 +220,10 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 {
 	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyLeafDraw2d::SetCustomShader was used on an already loaded instance - I can make this work I just haven't yet");
 	HyAssert(pShader->IsFinalized(), "IHyLeafDraw2d::SetCustomShader tried to set a non-finalized shader");
-	HyAssert(pShader->GetId() >= HYSHADERPROG_CustomStartIndex, "IHyLeafDraw2d::SetCustomShader was passed an invalid custom shader Id");
+	HyAssert(pShader->GetHandle() >= HYSHADERPROG_CustomStartIndex, "IHyLeafDraw2d::SetCustomShader was passed an invalid custom shader Id");
 	HyAssert(m_RequiredCustomShaders.size() < HY_MAX_SHADER_PASSES_PER_INSTANCE, "IHyLeafDraw2d::SetCustomShader has taken too many shaders. Max = " << HY_MAX_SHADER_PASSES_PER_INSTANCE);
 
-	m_RequiredCustomShaders.insert(pShader->GetId());
+	m_RequiredCustomShaders.insert(pShader->GetHandle());
 }
 
 /*virtual*/ bool IHyLeafDraw2d::IsLoaded() const /*override*/

@@ -37,6 +37,8 @@ HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiText
 {
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 	m_hTextureHandle = hTextureHandle;
+
+	m_BoundingVolume.SetAsBox(m_uiRAW_TEXTURE_WIDTH * 0.5f, m_uiRAW_TEXTURE_HEIGHT * 0.5f, glm::vec2(m_uiRAW_TEXTURE_WIDTH * 0.5f, m_uiRAW_TEXTURE_HEIGHT * 0.5f), 0.0f);
 	
 	//m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
 	//m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
@@ -61,6 +63,8 @@ void HyTexturedQuad2d::SetTextureSource(int iX, int iY, int iWidth, int iHeight)
 	m_SrcRect.top = fY / fTexHeight;
 	m_SrcRect.right = (fX + fWidth) / fTexWidth;
 	m_SrcRect.bottom = (fY + fHeight) / fTexHeight;
+
+	m_BoundingVolume.SetAsBox(iWidth * 0.5f, iHeight * 0.5f, glm::vec2(iWidth * 0.5f, iHeight * 0.5f), 0.0f);
 }
 
 uint32 HyTexturedQuad2d::GetAtlasIndexInGroup()
@@ -96,7 +100,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 
 /*virtual*/ void HyTexturedQuad2d::CalcBoundingVolume() /*override*/
 {
-	HyError("HyText2d::CalcBoundingVolume() not implemented");
+	// Already calculated
 }
 
 /*virtual*/ void HyTexturedQuad2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/

@@ -55,7 +55,7 @@ public:
 
 	int32 GetCoordinateSystem() const;
 
-	HyShaderHandle GetShaderId(uint32 uiShaderPass) const;
+	HyShaderHandle GetShaderHandle(uint32 uiShaderPass) const;
 
 	HyTextureHandle GetTextureHandle() const;
 

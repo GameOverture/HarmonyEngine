@@ -23,13 +23,11 @@ protected:
 	// VAO's cannot be shared between windows (aka OpenGL contexts)
 	std::vector<std::map<HyOpenGLShader *, uint32> >	m_VaoMapList;
 
-	glm::mat4					m_mtxCamera;
-	glm::mat4					m_mtxWindow;
+	glm::mat4					m_mtxView;
 	glm::mat4					m_mtxProj;
 
 	///////// 2D MEMBERS ////////////////////
 	GLuint						m_hVBO2d;
-	GLenum						m_eDrawMode;
 
 public:
 	HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);

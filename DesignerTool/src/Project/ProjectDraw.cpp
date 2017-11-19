@@ -82,12 +82,12 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
 
 /*virtual*/ void CheckerGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-    if(m_RenderState.GetNumVerticesPerInstance() != 6)
+    if(GetNumVerts() != 6)
         HyGuiLog("CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad", LOGTYPE_Error);
 
     for(int i = 0; i < 6; ++i)
     {
-        *reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pDrawBuffer[i];
+        *reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pVertBuffer[i];
         pRefDataWritePos += sizeof(glm::vec2);
 
         glm::vec2 vUV;

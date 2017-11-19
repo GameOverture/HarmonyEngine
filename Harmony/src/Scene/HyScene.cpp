@@ -212,9 +212,12 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	{
 		m_WindowListRef[i]->SetCullMaskStartBit(iBit);
 
-		HyWindow::CameraIterator2d iter = m_WindowListRef[i]->GetCamera2dIterator();
+		HyWindow::CameraIterator2d iter(m_WindowListRef[i]->GetCamera2dList());
 		while(iter.IsEnd() == false)
+		{
+			++iter;
 			++iBit;
+		}
 	}
 
 	HY_PROFILE_END
@@ -229,14 +232,14 @@ bool HyScene::CalculateCullPasses(/*const*/ IHyLeafDraw2d &instanceRef, uint32 &
 	uint32 iBit = 0;
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
-		HyWindow::CameraIterator2d iter = m_WindowListRef[i]->GetCamera2dIterator();
+		HyWindow::CameraIterator2d iter(m_WindowListRef[i]->GetCamera2dList());
 		while(iter.IsEnd() == false)
 		{
-			if(iter.Get()->GetWorldViewBounds().Contains(instanceRef.GetWorldAABB()))
+			if(b2TestOverlap(iter.Get()->GetWorldViewBounds(), instanceRef.GetWorldAABB()))
 				uiCullMaskOut |= (1 << iBit);
 
 			iBit++;
-			HyAssert(iBit > HY_MAX_PASSES_PER_BUFFER, "HyScene::CalculateCullPasses exceeded maximum number of passes. There are too many cameras enabled.");
+			HyAssert(iBit <= HY_MAX_PASSES_PER_BUFFER, "HyScene::CalculateCullPasses exceeded maximum number of passes. There are too many cameras enabled.");
 
 			++iter;
 		}

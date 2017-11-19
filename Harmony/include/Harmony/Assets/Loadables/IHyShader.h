@@ -16,7 +16,7 @@
 class IHyShader : public IHyLoadableData
 {
 protected:
-	const int32						m_iID;
+	const HyShaderHandle			m_hHANDLE;
 	const std::string				m_sOPTIONAL_LOAD_PATH;
 
 	bool							m_bIsFinalized;
@@ -33,12 +33,12 @@ protected:
 	std::vector<VertexAttribute>	m_VertexAttributeList;
 
 public:
-	IHyShader(int32 iId);
-	IHyShader(int32 iId, std::string sPrefix, std::string sName);
+	IHyShader(HyShaderHandle eHandle);
+	IHyShader(HyShaderHandle eHandle, std::string sPrefix, std::string sName);
 
 	virtual ~IHyShader();
 
-	int32 GetId();
+	HyShaderHandle GetHandle();
 	bool IsFinalized();
 
 	void SetSourceCode(std::string sSource, HyShaderType eType);

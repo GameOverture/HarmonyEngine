@@ -187,9 +187,9 @@ HyCamera2d *HyWindow::GetCamera2d(uint32 uiIndex)
 	return m_Cams2dList[uiIndex];
 }
 
-HyWindow::CameraIterator2d HyWindow::GetCamera2dIterator()
+const std::vector<HyCamera2d *> &HyWindow::GetCamera2dList()
 {
-	return CameraIterator2d(m_Cams2dList);
+	return m_Cams2dList;
 }
 
 uint32 HyWindow::GetNumCameras3d()

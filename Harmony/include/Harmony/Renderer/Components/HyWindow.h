@@ -33,12 +33,12 @@ class HyWindow
 public:
 	class CameraIterator2d
 	{
-		std::vector<HyCamera2d *> &					m_CamsListRef;
-		std::vector<HyCamera2d *>::iterator			m_iter;
+		const std::vector<HyCamera2d *> &			m_CamsListRef;
+		std::vector<HyCamera2d *>::const_iterator	m_iter;
 
 	public:
-		CameraIterator2d(std::vector<HyCamera2d *> &camListRef) :	m_CamsListRef(camListRef),
-																	m_iter(m_CamsListRef.begin())
+		CameraIterator2d(const std::vector<HyCamera2d *> &camListRef) :	m_CamsListRef(camListRef),
+																		m_iter(m_CamsListRef.begin())
 		{
 			while(m_iter != m_CamsListRef.end() && (*m_iter)->IsEnabled() == false)
 				++m_iter;
@@ -97,7 +97,7 @@ public:
 
 	uint32							GetNumCameras2d();
 	HyCamera2d *					GetCamera2d(uint32 uiIndex);
-	HyWindow::CameraIterator2d		GetCamera2dIterator();
+	const std::vector<HyCamera2d *> &GetCamera2dList();
 
 	uint32							GetNumCameras3d();
 	HyCamera3d *					GetCamera3d(uint32 uiIndex);

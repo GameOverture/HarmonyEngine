@@ -19,7 +19,7 @@ class HyOpenGLShader : public IHyShader
 	GLsizei								m_uiStride;
 
 	// Shader creation
-	GLuint								m_hProgHandle;
+	GLuint								m_uiGlHandle;
 	bool								m_bLinked;
 
 public:
@@ -33,7 +33,7 @@ public:
 	void Use();
 	void SetVertexAttributePtrs(size_t uiStartOffset);
 
-	int GetHandle();
+	GLuint GetGlHandle();
 	bool IsLinked();
 
 	void BindAttribLocation(GLuint location, const char *szName);
