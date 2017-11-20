@@ -205,17 +205,20 @@ void IHyRenderer::Render()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup render state buffer
-	char *pRsBufferPos = m_pRenderStatesUserStartPos;
-	RenderStateBufferHeader *pRsHeader = reinterpret_cast<RenderStateBufferHeader *>(pRsBufferPos);
-	pRsBufferPos += sizeof(RenderStateBufferHeader);
-
+	RenderStateBufferHeader *pRsHeader = reinterpret_cast<RenderStateBufferHeader *>(m_pRenderStatesUserStartPos);
+	
+	char *pRsBufferPos = nullptr;
 	HyRenderState *pCurRenderState = nullptr;
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Render all Windows
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		SetCurrentWindow(i);
 		StartRender();
+
+		pRsBufferPos = m_pRenderStatesUserStartPos;
+		pRsBufferPos += sizeof(RenderStateBufferHeader);
 
 		Begin_3d();
 		for(uint32 k = 0; k < pRsHeader->uiNum3dRenderStates; k++)
