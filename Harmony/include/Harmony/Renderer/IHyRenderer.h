@@ -15,6 +15,7 @@
 #include <queue>
 
 class HyRenderState;
+class IHyLeafDraw2d;
 class IHyShader;
 class HyStencil;
 class HyWindow;
@@ -23,7 +24,10 @@ class HyDiagnostics;
 class HyCamera2d;
 class IHyLoadableData;
 
-#define HY_MAX_PASSES_PER_BUFFER 32
+#define HY_MAX_PASSES_PER_BUFFER 32	// Number of bits held in the cull mask
+typedef uint32 HyCullMask;
+#define HY_FULL_CULL_MASK 0xFFFFFFFF
+
 #define HY_MAX_SHADER_PASSES_PER_INSTANCE 4
 
 #define HY_RENDERSTATE_BUFFER_SIZE ((1024 * 1024) * 1) // 1MB
@@ -45,7 +49,9 @@ protected:
 
 	char * const									m_pBUFFER_RENDERSTATES;
 	char * const									m_pBUFFER_VERTEX;
-	char *											m_pRenderStatesUserStartPos;
+	char *											m_pRenderStatesUserStartPos; // Includes RenderStateBufferHeader
+	char *											m_pCurRenderStateWritePos;
+	char *											m_pCurVertexWritePos;
 	size_t											m_uiVertexBufferUsedBytes;
 
 	HyWindow *										m_pCurWindow;
@@ -65,8 +71,8 @@ public:
 	IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
-	void PrepareBuffers(char *&pRenderStateBufferOut, char *&pVertexBufferOut, uint32 &uiStartVertOffsetOut);
-	void SetVertexBufferUsed(size_t uiNumBytes);
+	void PrepareBuffers();
+	void AppendRenderState(/*const*/ IHyLeafDraw2d &instanceRef, HyCullMask uiCullMask);
 
 	void TxData(IHyLoadableData *pData);
 	std::queue<IHyLoadableData *> &RxData();

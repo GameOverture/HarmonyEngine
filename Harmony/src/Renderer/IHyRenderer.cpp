@@ -12,6 +12,7 @@
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyStencil.h"
+#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 #include "Assets/Loadables/IHyLoadableData.h"
 #include "HyEngine.h"
 
@@ -23,7 +24,9 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> 
 																									m_WindowListRef(windowListRef),
 																									m_pBUFFER_RENDERSTATES(HY_NEW char[HY_RENDERSTATE_BUFFER_SIZE]),
 																									m_pBUFFER_VERTEX(HY_NEW char[HY_VERTEX_BUFFER_SIZE]),
-																									m_pRenderStatesUserStartPos(m_pBUFFER_RENDERSTATES),
+																									m_pRenderStatesUserStartPos(nullptr),
+																									m_pCurRenderStateWritePos(nullptr),
+																									m_pCurVertexWritePos(nullptr),
 																									m_uiVertexBufferUsedBytes(0),
 																									m_pCurWindow(nullptr),
 																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8)
@@ -46,20 +49,63 @@ IHyRenderer::~IHyRenderer(void)
 	sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 }
 
-void IHyRenderer::PrepareBuffers(char *&pRenderStateBufferOut, char *&pVertexBufferOut, uint32 &uiStartVertOffsetOut)
+void IHyRenderer::PrepareBuffers()
 {
-	pRenderStateBufferOut = m_pBUFFER_RENDERSTATES;
-	m_pRenderStatesUserStartPos = m_pBUFFER_RENDERSTATES;
+	m_pCurRenderStateWritePos = m_pBUFFER_RENDERSTATES;
+	m_pCurVertexWritePos = m_pBUFFER_VERTEX;
 
-	pVertexBufferOut = m_pBUFFER_VERTEX;
-	uiStartVertOffsetOut = 0;
+	m_pRenderStatesUserStartPos = nullptr;
+	m_uiVertexBufferUsedBytes = 0;
+
+	for(auto iter = sm_StencilMap.begin(); iter != sm_StencilMap.end(); ++iter)
+	{
+		HyStencil *pStencil = iter->second;
+		pStencil->SetRenderStatePtr(reinterpret_cast<HyRenderState *>(m_pCurRenderStateWritePos));
+
+		const std::vector<IHyLeafDraw2d *> &instanceListRef = pStencil->GetInstanceList();
+		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
+		{
+			AppendRenderState(*instanceListRef[i], HY_FULL_CULL_MASK);
+		}
+	}
+
+	m_pRenderStatesUserStartPos = m_pCurRenderStateWritePos;
+	IHyRenderer::RenderStateBufferHeader *pHeader = reinterpret_cast<IHyRenderer::RenderStateBufferHeader *>(m_pRenderStatesUserStartPos);
+	memset(pHeader, 0, sizeof(IHyRenderer::RenderStateBufferHeader));
+
+	m_pCurRenderStateWritePos += sizeof(IHyRenderer::RenderStateBufferHeader);
 }
 
-void IHyRenderer::SetVertexBufferUsed(size_t uiNumBytes)
+void IHyRenderer::AppendRenderState(/*const*/ IHyLeafDraw2d &instanceRef, HyCullMask uiCullMask)
 {
-	m_uiVertexBufferUsedBytes = uiNumBytes;
-	HyAssert(m_uiVertexBufferUsedBytes < HY_VERTEX_BUFFER_SIZE, "HyScene::WriteUpdateBuffer() has written passed its bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
+	HyRenderState *pRenderState = new (m_pCurRenderStateWritePos)HyRenderState(instanceRef,
+																			   uiCullMask,
+																			   m_uiVertexBufferUsedBytes);
+
+	m_pCurRenderStateWritePos += sizeof(HyRenderState);
+
+	char *pStartOfExData = m_pCurRenderStateWritePos;
+	instanceRef.WriteShaderUniformBuffer(m_pCurRenderStateWritePos);	// This function is responsible for incrementing the draw pointer to after what's written
+	pRenderState->SetExSize(reinterpret_cast<size_t>(m_pCurRenderStateWritePos) - reinterpret_cast<size_t>(pStartOfExData));
+	HyAssert(reinterpret_cast<size_t>(m_pCurRenderStateWritePos) - reinterpret_cast<size_t>(m_pBUFFER_RENDERSTATES) < HY_RENDERSTATE_BUFFER_SIZE, "IHyRenderer::AppendRenderState() has written passed its render state bounds! Embiggen 'HY_RENDERSTATE_BUFFER_SIZE'");
+
+	// OnWriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
+	instanceRef.OnWriteDrawBufferData(m_pCurVertexWritePos);
+	m_uiVertexBufferUsedBytes = reinterpret_cast<size_t>(m_pCurVertexWritePos) - reinterpret_cast<size_t>(m_pBUFFER_VERTEX);
+	HyAssert(m_uiVertexBufferUsedBytes < HY_VERTEX_BUFFER_SIZE, "IHyRenderer::AppendRenderState() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
+
+	if(m_pRenderStatesUserStartPos)
+	{
+		IHyRenderer::RenderStateBufferHeader *pHeader = reinterpret_cast<IHyRenderer::RenderStateBufferHeader *>(m_pRenderStatesUserStartPos);
+		pHeader->uiNum2dRenderStates++;
+	}
 }
+
+//void IHyRenderer::SetVertexBufferUsed(size_t uiNumBytes)
+//{
+//	m_uiVertexBufferUsedBytes = uiNumBytes;
+//	HyAssert(m_uiVertexBufferUsedBytes < HY_VERTEX_BUFFER_SIZE, "HyScene::WriteUpdateBuffer() has written passed its bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
+//}
 
 void IHyRenderer::TxData(IHyLoadableData *pData)
 {

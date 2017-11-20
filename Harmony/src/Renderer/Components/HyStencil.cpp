@@ -9,12 +9,14 @@
 *************************************************************************/
 #include "Renderer/Components/HyStencil.h"
 #include "Renderer/IHyRenderer.h"
+#include "Renderer/Components/HyRenderState.h"
 
 HyStencilHandle HyStencil::sm_hHandleCount = 0;
 
 HyStencil::HyStencil() :	m_hHANDLE(++sm_hHandleCount),
 							m_pRenderStateBuffer(nullptr),
-							m_bInstanceListDirty(false)
+							m_bInstanceListDirty(false),
+							m_pRenderStatePtr(nullptr)
 {
 	IHyRenderer::AddStencil(this);
 }
@@ -50,4 +52,22 @@ bool HyStencil::RemoveInstance(IHyLeafDraw2d *pInstance)
 	}
 
 	return false;
+}
+
+void HyStencil::SetAsCullMask()
+{
+}
+
+void HyStencil::SetAsInvertedCullMask()
+{
+}
+
+const std::vector<IHyLeafDraw2d *> &HyStencil::GetInstanceList()
+{
+	return m_InstanceList;
+}
+
+void HyStencil::SetRenderStatePtr(HyRenderState *pPtr)
+{
+	m_pRenderStatePtr = pPtr;
 }

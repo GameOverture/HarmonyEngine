@@ -77,6 +77,8 @@ HyAssets::HyAssets(std::string sDataDirPath, HyScene &sceneRef) :	m_sDATADIR(Mak
 
 HyAssets::~HyAssets()
 {
+	IHyLeafDraw2d::sm_pHyAssets = nullptr;
+
 	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
 
 	for(uint32 i = 0; i < m_uiNumAtlases; ++i)

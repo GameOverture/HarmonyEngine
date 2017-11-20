@@ -11,7 +11,6 @@
 #include "HyEngine.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyWindow.h"
-#include "Renderer/Components/HyRenderState.h"
 #include "Scene/Nodes/Leafs/Draws/HySprite2d.h"
 #include "Scene/Nodes/Leafs/Draws/HySpine2d.h"
 #include "Scene/Nodes/Leafs/Draws/HyPrimitive2d.h"
@@ -40,7 +39,6 @@ HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f
 
 HyScene::~HyScene(void)
 {
-	IHyLeafDraw2d::sm_pHyAssets = nullptr;
 }
 
 /*static*/ void HyScene::AddNode(IHyNode *pNode)
@@ -140,6 +138,8 @@ void HyScene::UpdateNodes()
 
 void HyScene::PrepareRender(IHyRenderer &rendererRef)
 {
+	// TODO: Determine whether I can multi-thread this buffer prep and HyRenderState instantiations... Make everything take const references!
+
 	HY_PROFILE_BEGIN("PrepareRender")
 	if(sm_bInst2dOrderingDirty)
 	{
@@ -149,25 +149,11 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	
 	// RENDER STATE BUFFER
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Buffer Header (contains uiNum3dRenderStates; uiNum2dRenderStates; uiOffsetTo2d) || RenderState3D/UniformData-|-RenderState2D/UniformData-|
+	// Buffer Header (contains uiNum3dRenderStates; uiNum2dRenderStates) || RenderState3D/UniformData-|-RenderState2D/UniformData-|
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
 
-	char *pRsBufferWritePos;
-	char *pVertBufferWritePos;
-	char *pVertBuffer_Start;
-	uint32 uiStartVertOffset = 0;
-	rendererRef.PrepareBuffers(pRsBufferWritePos, pVertBufferWritePos, uiStartVertOffset);
-
-	pVertBuffer_Start = pVertBufferWritePos;
-
-	IHyRenderer::RenderStateBufferHeader *pHeader = reinterpret_cast<IHyRenderer::RenderStateBufferHeader *>(pRsBufferWritePos);
-	memset(pHeader, 0, sizeof(IHyRenderer::RenderStateBufferHeader));
-
-	pRsBufferWritePos += sizeof(IHyRenderer::RenderStateBufferHeader);
-
-	// TODO: Determine whether I can multi-thread these HyRenderState instantiations
+	rendererRef.PrepareBuffers();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WRITE 3d Render States
@@ -177,10 +163,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		if(m_LoadedInst3dList[i]->IsEnabled() == false)
 			continue;
 
-		// TODO: 
-		//new (m_pCurWritePos) HyDrawText2d(reinterpret_cast<HyText2d *>(m_NodeList_Loaded[i]), uiVertexDataOffset, pCurVertexWritePos);
-		pRsBufferWritePos += sizeof(HyRenderState);
-		pHeader->uiNum3dRenderStates++;
+		rendererRef.AppendRenderState(*m_NodeList_Loaded[i], HY_FULL_CULL_MASK);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -192,26 +175,11 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		if(m_NodeList_Loaded[i]->IsEnabled() == false || CalculateCullPasses(*m_NodeList_Loaded[i], uiCullMask) == false)
 			continue;
 
-		HyRenderState *pRenderState = new (pRsBufferWritePos) HyRenderState(*m_NodeList_Loaded[i],
-																			uiCullMask,
-																			uiStartVertOffset + reinterpret_cast<size_t>(pVertBufferWritePos) - reinterpret_cast<size_t>(pVertBuffer_Start));
-
-		pRsBufferWritePos += sizeof(HyRenderState);
-
-		char *pStartOfExData = pRsBufferWritePos;
-		m_NodeList_Loaded[i]->WriteShaderUniformBuffer(pRsBufferWritePos);	// This function is responsible for incrementing the draw pointer to after what's written
-		pRenderState->SetExSize(reinterpret_cast<size_t>(pRsBufferWritePos) - reinterpret_cast<size_t>(pStartOfExData));
-
-		// OnWriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
-		m_NodeList_Loaded[i]->OnWriteDrawBufferData(pVertBufferWritePos);
-
-		pHeader->uiNum2dRenderStates++;
+		rendererRef.AppendRenderState(*m_NodeList_Loaded[i], uiCullMask);
 	}
 
-	rendererRef.SetVertexBufferUsed(uiStartVertOffset + reinterpret_cast<size_t>(pVertBufferWritePos) - reinterpret_cast<size_t>(pVertBuffer_Start));
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// SetCullMaskStartBit for each window
+	// SetCullMaskBit for each camera
 	uint32 iBit = 0;
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
