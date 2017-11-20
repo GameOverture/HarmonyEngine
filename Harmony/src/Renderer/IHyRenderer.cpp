@@ -21,23 +21,21 @@ std::map<HyStencilHandle, HyStencil *>				IHyRenderer::sm_StencilMap;
 
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
-																									m_pRenderStateBuffer(nullptr),
-																									m_pVertexBuffer(nullptr),
+																									m_pBUFFER_RENDERSTATES(HY_NEW char[HY_RENDERSTATE_BUFFER_SIZE]),
+																									m_pBUFFER_VERTEX(HY_NEW char[HY_VERTEX_BUFFER_SIZE]),
+																									m_pRenderStatesUserStartPos(m_pBUFFER_RENDERSTATES),
 																									m_uiVertexBufferUsedBytes(0),
 																									m_pCurWindow(nullptr),
 																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8)
 {
-	m_pVertexBuffer = HY_NEW char[HY_VERTEX_BUFFER_SIZE];
-	memset(m_pVertexBuffer, 0, HY_VERTEX_BUFFER_SIZE);
-
-	m_pRenderStateBuffer = HY_NEW char[HY_RENDERSTATE_BUFFER_SIZE];
-	memset(m_pRenderStateBuffer, 0, HY_RENDERSTATE_BUFFER_SIZE);
+	memset(m_pBUFFER_VERTEX, 0, HY_VERTEX_BUFFER_SIZE);
+	memset(m_pBUFFER_RENDERSTATES, 0, HY_RENDERSTATE_BUFFER_SIZE);
 }
 
 IHyRenderer::~IHyRenderer(void)
 {
-	delete[] m_pVertexBuffer;
-	delete[] m_pRenderStateBuffer;
+	delete[] m_pBUFFER_VERTEX;
+	delete[] m_pBUFFER_RENDERSTATES;
 
 	std::map<HyShaderHandle, IHyShader *>::iterator iter;
 	for(iter = sm_ShaderMap.begin(); iter != sm_ShaderMap.end(); ++iter)
@@ -48,14 +46,13 @@ IHyRenderer::~IHyRenderer(void)
 	sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 }
 
-char *IHyRenderer::GetRenderStateBuffer()
+void IHyRenderer::PrepareBuffers(char *&pRenderStateBufferOut, char *&pVertexBufferOut, uint32 &uiStartVertOffsetOut)
 {
-	return m_pRenderStateBuffer;
-}
+	pRenderStateBufferOut = m_pBUFFER_RENDERSTATES;
+	m_pRenderStatesUserStartPos = m_pBUFFER_RENDERSTATES;
 
-char *IHyRenderer::GetVertexBuffer()
-{
-	return m_pVertexBuffer;
+	pVertexBufferOut = m_pBUFFER_VERTEX;
+	uiStartVertOffsetOut = 0;
 }
 
 void IHyRenderer::SetVertexBufferUsed(size_t uiNumBytes)
@@ -208,7 +205,7 @@ void IHyRenderer::Render()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup render state buffer
-	char *pRsBufferPos = m_pRenderStateBuffer;
+	char *pRsBufferPos = m_pRenderStatesUserStartPos;
 	RenderStateBufferHeader *pRsHeader = reinterpret_cast<RenderStateBufferHeader *>(pRsBufferPos);
 	pRsBufferPos += sizeof(RenderStateBufferHeader);
 

@@ -32,8 +32,7 @@
 	}
 #endif
 
-HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext) :	m_uiINDEX(uiIndex),
-																															m_uiCullMaskStartBit(0)
+HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext) :	m_uiINDEX(uiIndex)
 {
 	m_Info = windowInfoRef;
 	m_vFramebufferSize = m_Info.vSize;
@@ -287,16 +286,6 @@ glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoor
 HyWindowHandle HyWindow::GetHandle()
 {
 	return m_hData;
-}
-
-void HyWindow::SetCullMaskStartBit(uint32 uiStartBit)
-{
-	m_uiCullMaskStartBit = uiStartBit;
-}
-
-uint32 HyWindow::GetCullMaskStartBit()
-{
-	return m_uiCullMaskStartBit;
 }
 
 #ifdef HY_PLATFORM_DESKTOP

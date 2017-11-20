@@ -43,8 +43,9 @@ protected:
 	HyDiagnostics &									m_DiagnosticsRef;
 	std::vector<HyWindow *> &						m_WindowListRef;
 
-	char *											m_pRenderStateBuffer;
-	char *											m_pVertexBuffer;
+	char * const									m_pBUFFER_RENDERSTATES;
+	char * const									m_pBUFFER_VERTEX;
+	char *											m_pRenderStatesUserStartPos;
 	size_t											m_uiVertexBufferUsedBytes;
 
 	HyWindow *										m_pCurWindow;
@@ -64,8 +65,7 @@ public:
 	IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
-	char *GetRenderStateBuffer();
-	char *GetVertexBuffer();
+	void PrepareBuffers(char *&pRenderStateBufferOut, char *&pVertexBufferOut, uint32 &uiStartVertOffsetOut);
 	void SetVertexBufferUsed(size_t uiNumBytes);
 
 	void TxData(IHyLoadableData *pData);

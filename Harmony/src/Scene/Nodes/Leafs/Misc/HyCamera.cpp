@@ -10,12 +10,12 @@
 #include "Scene/Nodes/Leafs/Misc/HyCamera.h"
 #include "Renderer/Components/HyWindow.h"
 
-IHyCamera::IHyCamera(HyWindow *pWindow) : m_pWindowPtr(pWindow)
+IHyCamera::IHyCamera(HyWindow *pWindow) :	m_pWindowPtr(pWindow),
+											m_uiCullMaskBit(0)
 {
 	m_ViewportRect.left = m_ViewportRect.bottom = 0.0f;
 	m_ViewportRect.right = m_ViewportRect.top = 1.0f;
 }
-
 
 IHyCamera::~IHyCamera()
 {
@@ -28,6 +28,16 @@ void IHyCamera::SetViewport(float fPosX, float fPosY, float fWidth, float fHeigh
 	m_ViewportRect.bottom = fPosY;
 	m_ViewportRect.right = m_ViewportRect.left + fWidth;
 	m_ViewportRect.top = m_ViewportRect.bottom + fHeight;
+}
+
+void IHyCamera::SetCullMaskBit(uint32 uiBit)
+{
+	m_uiCullMaskBit = uiBit;
+}
+
+uint32 IHyCamera::GetCullMaskBit()
+{
+	return m_uiCullMaskBit;
 }
 
 HyCamera2d::HyCamera2d(HyWindow *pWindow) : IHyLeaf2d(HYTYPE_Camera2d, nullptr),

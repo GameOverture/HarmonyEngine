@@ -12,7 +12,9 @@
 
 HyStencilHandle HyStencil::sm_hHandleCount = 0;
 
-HyStencil::HyStencil() :	m_hHANDLE(++sm_hHandleCount)
+HyStencil::HyStencil() :	m_hHANDLE(++sm_hHandleCount),
+							m_pRenderStateBuffer(nullptr),
+							m_bInstanceListDirty(false)
 {
 	IHyRenderer::AddStencil(this);
 }
@@ -20,6 +22,8 @@ HyStencil::HyStencil() :	m_hHANDLE(++sm_hHandleCount)
 HyStencil::~HyStencil()
 {
 	IHyRenderer::RemoveStencil(this);
+
+	delete m_pRenderStateBuffer;
 }
 
 HyStencilHandle HyStencil::GetHandle()
@@ -27,7 +31,23 @@ HyStencilHandle HyStencil::GetHandle()
 	return m_hHANDLE;
 }
 
-HyShape2d &HyStencil::GetShape()
+void HyStencil::AddInstance(IHyLeafDraw2d *pInstance)
 {
-	return m_Shape.GetShape();
+	m_InstanceList.push_back(pInstance);
+	m_bInstanceListDirty = true;
+}
+
+bool HyStencil::RemoveInstance(IHyLeafDraw2d *pInstance)
+{
+	for(auto it = m_InstanceList.begin(); it != m_InstanceList.end(); ++it)
+	{
+		if((*it) == pInstance)
+		{
+			m_InstanceList.erase(it);
+			m_bInstanceListDirty = true;
+			return true;
+		}
+	}
+
+	return false;
 }

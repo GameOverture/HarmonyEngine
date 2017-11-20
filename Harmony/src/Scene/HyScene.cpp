@@ -54,7 +54,7 @@ HyScene::~HyScene(void)
 	{
 		if((*it) == pNode)
 		{
-			// TODO: Log about erasing Node
+			//HyLog("RemoveNode type: " << pNode->GetType());
 			sm_MasterNodeList.erase(it);
 			break;
 		}
@@ -154,8 +154,13 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
 
-	char *pRsBufferWritePos = rendererRef.GetRenderStateBuffer();
-	char *pVertBufferWritePos = rendererRef.GetVertexBuffer();
+	char *pRsBufferWritePos;
+	char *pVertBufferWritePos;
+	char *pVertBuffer_Start;
+	uint32 uiStartVertOffset = 0;
+	rendererRef.PrepareBuffers(pRsBufferWritePos, pVertBufferWritePos, uiStartVertOffset);
+
+	pVertBuffer_Start = pVertBufferWritePos;
 
 	IHyRenderer::RenderStateBufferHeader *pHeader = reinterpret_cast<IHyRenderer::RenderStateBufferHeader *>(pRsBufferWritePos);
 	memset(pHeader, 0, sizeof(IHyRenderer::RenderStateBufferHeader));
@@ -189,7 +194,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 
 		HyRenderState *pRenderState = new (pRsBufferWritePos) HyRenderState(*m_NodeList_Loaded[i],
 																			uiCullMask,
-																			reinterpret_cast<size_t>(pVertBufferWritePos) - reinterpret_cast<size_t>(rendererRef.GetVertexBuffer()));
+																			uiStartVertOffset + reinterpret_cast<size_t>(pVertBufferWritePos) - reinterpret_cast<size_t>(pVertBuffer_Start));
 
 		pRsBufferWritePos += sizeof(HyRenderState);
 
@@ -203,18 +208,17 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		pHeader->uiNum2dRenderStates++;
 	}
 
-	rendererRef.SetVertexBufferUsed(reinterpret_cast<size_t>(pVertBufferWritePos) - reinterpret_cast<size_t>(rendererRef.GetVertexBuffer()));
+	rendererRef.SetVertexBufferUsed(uiStartVertOffset + reinterpret_cast<size_t>(pVertBufferWritePos) - reinterpret_cast<size_t>(pVertBuffer_Start));
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// SetCullMaskStartBit for each window
 	uint32 iBit = 0;
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
-		m_WindowListRef[i]->SetCullMaskStartBit(iBit);
-
 		HyWindow::CameraIterator2d iter(m_WindowListRef[i]->GetCamera2dList());
 		while(iter.IsEnd() == false)
 		{
+			iter.Get()->SetCullMaskBit(iBit);
 			++iter;
 			++iBit;
 		}

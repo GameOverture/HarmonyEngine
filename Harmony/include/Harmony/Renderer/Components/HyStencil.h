@@ -18,14 +18,22 @@ class HyStencil
 	static HyStencilHandle			sm_hHandleCount;
 
 	const HyStencilHandle			m_hHANDLE;
-	HyPrimitive2d					m_Shape;
+	std::vector<IHyLeafDraw2d *>	m_InstanceList;
+
+	char *							m_pRenderStateBuffer;
+	bool							m_bInstanceListDirty;
 
 public:
 	HyStencil();
 	~HyStencil();
 
 	HyStencilHandle GetHandle();
-	HyShape2d &GetShape();
+
+	void AddInstance(IHyLeafDraw2d *pInstance);
+	bool RemoveInstance(IHyLeafDraw2d *pInstance);
+
+	void SetAsCullMask();
+	void SetAsInvertedCullMask();
 };
 
 #endif /* HyStencil_h__ */

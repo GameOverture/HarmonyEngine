@@ -204,10 +204,11 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBindBuffer");
 
-	glBufferData(GL_ARRAY_BUFFER, m_uiVertexBufferUsedBytes, m_pVertexBuffer, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_uiVertexBufferUsedBytes, m_pBUFFER_VERTEX, GL_DYNAMIC_DRAW);
 	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBufferData");
 
 	glDisable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
 }
 
 ///*virtual*/ void HyOpenGL::CameraPass_2d(HyCamera2d *pCamera)
@@ -262,56 +263,19 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 
 /*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderState *pRenderState)
 {
-	glm::ivec2 vFramebufferSize = m_pCurWindow->GetFramebufferSize();
-	HyRectangle<float> viewportRect;
-
-	HyWindow::CameraIterator2d iter(m_pCurWindow->GetCamera2dList());
+	HyWindow::CameraIterator2d cameraIter(m_pCurWindow->GetCamera2dList());
 	do
 	{
 		//////////////////////////////////////////////////////////////////////////
-		// Set glViewport based on coordinate system
-		if(pRenderState->GetCoordinateSystem() < 0)
+		// Check the cull mask to exit rendering under this camera early if not in frustum
+		if(pRenderState->GetCoordinateSystem() < 0 && 0 == (pRenderState->GetCullMask() & (1 << cameraIter.Get()->GetCullMaskBit())))
 		{
-			//////////////////////////////////////////////////////////////////////////
-			// Check the cull mask to exit rendering under this camera early if not in frustum
-			uint32 uiBit = m_pCurWindow->GetCullMaskStartBit();
-			if(0 == (pRenderState->GetCullMask() & (1 << uiBit)))
-			{
-				++iter;
-				continue;
-			}
-
-			viewportRect = iter.Get()->GetViewport();
-			iter.Get()->GetWorldTransform(m_mtxView);
-
-			// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly somewhere here or in the shader)
-			m_mtxView[3].x *= -1;
-			m_mtxView[3].y *= -1;
+			++cameraIter;
+			continue;
 		}
-		else // Using window coordinates (origin is bottom left corner)
-		{
-			viewportRect.left = 0.0f;
-			viewportRect.bottom = 0.0f;
-			viewportRect.right = 1.0f;
-			viewportRect.top = 1.0f;
-
-			m_mtxView = glm::mat4(1.0f);
-			m_mtxView = glm::translate(m_mtxView, vFramebufferSize.x * -0.5f, vFramebufferSize.y * -0.5f, 0.0f);
-		}
-
-		float fWidth = (viewportRect.Width() * vFramebufferSize.x);
-		float fHeight = (viewportRect.Height() * vFramebufferSize.y);
-
-		m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f, 0.0f, 1.0f);
-
-		glViewport(static_cast<GLint>(viewportRect.left * vFramebufferSize.x),
-				   static_cast<GLint>(viewportRect.bottom * vFramebufferSize.y),
-				   static_cast<GLsizei>(fWidth),
-				   static_cast<GLsizei>(fHeight));
-		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glViewport");
 
 		//////////////////////////////////////////////////////////////////////////
-		// Setup stencil buffer
+		// Setup stencil buffer if required
 		if(pRenderState->GetStencilHandle() != HY_UNUSED_HANDLE)
 		{
 			HyStencil *pStencil = FindStencil(pRenderState->GetStencilHandle());
@@ -337,205 +301,13 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDisable");
 		}
 
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// TODO: Handle all the shader passes
-		//
-		// HY_MAX_SHADER_PASSES_PER_INSTANCE
-		HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_ShaderMap[pRenderState->GetShaderHandle(0)]);
-		BindVao(pShader);
-		pShader->Use();
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		glActiveTexture(GL_TEXTURE0);
-		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glActiveTexture");
-
-		if(HYSHADERPROG_QuadBatch == pShader->GetHandle())
-		{
-			glBindTexture(GL_TEXTURE_2D, pRenderState->GetTextureHandle());
-			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
-
-			if(pRenderState->GetTextureHandle() != 0)
-				pShader->SetUniformGLSL("Tex", 0);
-		}
-		else
-		{
-			glBindTexture(GL_TEXTURE_2D, 0);
-			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
-		}
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		if(pRenderState->IsScissorRect())
-		{
-			const HyScreenRect<int32> &scissorRectRef = pRenderState->GetScissorRect();
-
-			glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_pCurWindow->GetFramebufferSize().x / 2),
-					  static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_pCurWindow->GetFramebufferSize().y / 2),
-					  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
-					  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
-
-			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glScissor");
-
-			glEnable(GL_SCISSOR_TEST);
-			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glEnable");
-		}
-		else
-		{
-			glDisable(GL_SCISSOR_TEST);
-			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDisable");
-		}
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Always attempt to assign these uniforms if the shader chooses to use them
-		pShader->SetUniformGLSL("u_mtxWorldToCamera", m_mtxView);
-		pShader->SetUniformGLSL("u_mtxCameraToClip", m_mtxProj);
-
-		char *pExBuffer = reinterpret_cast<char *>(pRenderState) + sizeof(HyRenderState);
-		uint32 uiNumUniforms = *reinterpret_cast<uint32 *>(pExBuffer);
-		pExBuffer += sizeof(uint32);
-
-		for(uint32 i = 0; i < uiNumUniforms; ++i)
-		{
-			const char *szUniformName = pExBuffer;
-			size_t uiStrLen = strlen(szUniformName) + 1;	// +1 for NULL terminator
-			pExBuffer += uiStrLen;
-			
-
-			HyShaderVariable eVarType = static_cast<HyShaderVariable>(*reinterpret_cast<uint32 *>(pExBuffer));
-			pExBuffer += sizeof(uint32);
-			
-			switch(eVarType)
-			{
-			case HYSHADERVAR_bool:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<bool *>(pExBuffer));
-				pExBuffer += sizeof(bool);
-				break;
-			case HYSHADERVAR_int:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<int32 *>(pExBuffer));
-				pExBuffer += sizeof(int32);
-				break;
-			case HYSHADERVAR_uint:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<uint32 *>(pExBuffer));
-				pExBuffer += sizeof(uint32);
-				break;
-			case HYSHADERVAR_float:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<float *>(pExBuffer));
-				pExBuffer += sizeof(float);
-				break;
-			case HYSHADERVAR_double:
-				HyError("GLSL Shader uniform does not support type double yet!");
-				//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<double *>(pExBuffer));
-				//pExBuffer += sizeof(double);
-				break;
-			case HYSHADERVAR_bvec2:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::bvec2 *>(pExBuffer));
-				pExBuffer += sizeof(glm::bvec2);
-				break;
-			case HYSHADERVAR_bvec3:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::bvec3 *>(pExBuffer));
-				pExBuffer += sizeof(glm::bvec3);
-				break;
-			case HYSHADERVAR_bvec4:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::bvec4 *>(pExBuffer));
-				pExBuffer += sizeof(glm::bvec4);
-				break;
-			case HYSHADERVAR_ivec2:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::ivec2 *>(pExBuffer));
-				pExBuffer += sizeof(glm::ivec2);
-				break;
-			case HYSHADERVAR_ivec3:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::ivec3 *>(pExBuffer));
-				pExBuffer += sizeof(glm::ivec3);
-				break;
-			case HYSHADERVAR_ivec4:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::ivec4 *>(pExBuffer));
-				pExBuffer += sizeof(glm::ivec4);
-				break;
-			case HYSHADERVAR_vec2:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::vec2 *>(pExBuffer));
-				pExBuffer += sizeof(glm::vec2);
-				break;
-			case HYSHADERVAR_vec3:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::vec3 *>(pExBuffer));
-				pExBuffer += sizeof(glm::vec3);
-				break;
-			case HYSHADERVAR_vec4:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::vec4 *>(pExBuffer));
-				pExBuffer += sizeof(glm::vec4);
-				break;
-			case HYSHADERVAR_dvec2:
-				HyError("GLSL Shader uniform does not support type double yet!");
-				//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::dvec2 *>(pExBuffer));
-				//pExBuffer += sizeof(glm::dvec2);
-				break;
-			case HYSHADERVAR_dvec3:
-				HyError("GLSL Shader uniform does not support type double yet!");
-				//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::dvec3 *>(pExBuffer));
-				//pExBuffer += sizeof(glm::dvec3);
-				break;
-			case HYSHADERVAR_dvec4:
-				HyError("GLSL Shader uniform does not support type double yet!");
-				//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::dvec4 *>(pExBuffer));
-				//pExBuffer += sizeof(glm::dvec4);
-				break;
-			case HYSHADERVAR_mat3:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::mat3 *>(pExBuffer));
-				pExBuffer += sizeof(glm::mat3);
-				break;
-			case HYSHADERVAR_mat4:
-				pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::mat4 *>(pExBuffer));
-				pExBuffer += sizeof(glm::mat4);
-				break;
-			}
-		}
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Points to the vertex data locations in bound buffer
-		pShader->SetVertexAttributePtrs(static_cast<uint32>(pRenderState->GetDataOffset()));
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		GLenum eDrawMode;
-		switch(pRenderState->GetRenderMode())
-		{
-		case HYRENDERMODE_Triangles:		eDrawMode = GL_TRIANGLES;		break;
-		case HYRENDERMODE_TriangleStrip:	eDrawMode = GL_TRIANGLE_STRIP;	break;
-		case HYRENDERMODE_TriangleFan:		eDrawMode = GL_TRIANGLE_FAN;	break;
-		case HYRENDERMODE_LineLoop:			eDrawMode = GL_LINE_LOOP;		break;
-		case HYRENDERMODE_LineStrip:		eDrawMode = GL_LINE_STRIP;		break;
-
-		default:
-			HyError("Unknown draw mode in render state");
-			return;
-		}
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Everything is prepared, do the drawing
-		if(pRenderState->GetNumInstances() > 1)
-		{
-			glDrawArraysInstanced(eDrawMode, 0, pRenderState->GetNumVerticesPerInstance(), pRenderState->GetNumInstances());
-			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDrawArraysInstanced");
-		}
-		else
-		{
-			uint32 uiStartVertex = 0;
-			for(uint32 i = 0; i < pRenderState->GetNumInstances(); ++i)
-			{
-				glDrawArrays(eDrawMode, uiStartVertex, pRenderState->GetNumVerticesPerInstance());
-				HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDrawArrays");
-
-				uiStartVertex += pRenderState->GetNumVerticesPerInstance();
-			}
-		}
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Reset OpenGL states
-		glBindVertexArray(0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		RenderPass2d(pRenderState, 0, pRenderState->GetCoordinateSystem() < 0 ? cameraIter.Get() : nullptr);
+		
 		
 		//////////////////////////////////////////////////////////////////////////
 		// Check whether there are other cameras to render from
-		++iter;
-	} while(pRenderState->GetCoordinateSystem() < 0 && iter.IsEnd() == false);
+		++cameraIter;
+	} while(pRenderState->GetCoordinateSystem() < 0 && cameraIter.IsEnd() == false);
 }
 
 ///*virtual*/ void HyOpenGL::End_2d()
@@ -696,4 +468,238 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 {
 	glDeleteTextures(1, &uiTextureHandle);
 	HyErrorCheck_OpenGL("HyOpenGL:DeleteTexture", "glDeleteTextures");
+}
+
+void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, uint32 uiShaderPassIndex, HyCamera2d *pCamera)
+{
+	glm::ivec2 vFramebufferSize = m_pCurWindow->GetFramebufferSize();
+	HyRectangle<float> viewportRect;
+
+	//////////////////////////////////////////////////////////////////////////
+	// Set glViewport based on coordinate system
+	if(pCamera)// pRenderState->GetCoordinateSystem() < 0)
+	{
+		viewportRect = pCamera->GetViewport();
+		pCamera->GetWorldTransform(m_mtxView);
+
+		// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly somewhere here or in the shader)
+		m_mtxView[3].x *= -1;
+		m_mtxView[3].y *= -1;
+	}
+	else // Using window coordinates (origin is bottom left corner)
+	{
+		viewportRect.left = 0.0f;
+		viewportRect.bottom = 0.0f;
+		viewportRect.right = 1.0f;
+		viewportRect.top = 1.0f;
+
+		m_mtxView = glm::mat4(1.0f);
+		m_mtxView = glm::translate(m_mtxView, vFramebufferSize.x * -0.5f, vFramebufferSize.y * -0.5f, 0.0f);
+	}
+
+	float fWidth = (viewportRect.Width() * vFramebufferSize.x);
+	float fHeight = (viewportRect.Height() * vFramebufferSize.y);
+
+	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f, 0.0f, 1.0f);
+
+	glViewport(static_cast<GLint>(viewportRect.left * vFramebufferSize.x),
+			   static_cast<GLint>(viewportRect.bottom * vFramebufferSize.y),
+			   static_cast<GLsizei>(fWidth),
+			   static_cast<GLsizei>(fHeight));
+	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glViewport");
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// TODO: Handle all the shader passes
+	//
+	// HY_MAX_SHADER_PASSES_PER_INSTANCE
+	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_ShaderMap[pRenderState->GetShaderHandle(0)]);
+	BindVao(pShader);
+	pShader->Use();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	glActiveTexture(GL_TEXTURE0);
+	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glActiveTexture");
+
+	if(HYSHADERPROG_QuadBatch == pShader->GetHandle())
+	{
+		glBindTexture(GL_TEXTURE_2D, pRenderState->GetTextureHandle());
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
+
+		if(pRenderState->GetTextureHandle() != 0)
+			pShader->SetUniformGLSL("Tex", 0);
+	}
+	else
+	{
+		glBindTexture(GL_TEXTURE_2D, 0);
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if(pRenderState->IsScissorRect())
+	{
+		const HyScreenRect<int32> &scissorRectRef = pRenderState->GetScissorRect();
+
+		glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_pCurWindow->GetFramebufferSize().x / 2),
+			static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_pCurWindow->GetFramebufferSize().y / 2),
+			static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
+			static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
+
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glScissor");
+
+		glEnable(GL_SCISSOR_TEST);
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glEnable");
+	}
+	else
+	{
+		glDisable(GL_SCISSOR_TEST);
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDisable");
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Always attempt to assign these uniforms if the shader chooses to use them
+	pShader->SetUniformGLSL("u_mtxWorldToCamera", m_mtxView);
+	pShader->SetUniformGLSL("u_mtxCameraToClip", m_mtxProj);
+
+	char *pExBuffer = reinterpret_cast<char *>(pRenderState) + sizeof(HyRenderState);
+	uint32 uiNumUniforms = *reinterpret_cast<uint32 *>(pExBuffer);
+	pExBuffer += sizeof(uint32);
+
+	for(uint32 i = 0; i < uiNumUniforms; ++i)
+	{
+		const char *szUniformName = pExBuffer;
+		size_t uiStrLen = strlen(szUniformName) + 1;	// +1 for NULL terminator
+		pExBuffer += uiStrLen;
+
+
+		HyShaderVariable eVarType = static_cast<HyShaderVariable>(*reinterpret_cast<uint32 *>(pExBuffer));
+		pExBuffer += sizeof(uint32);
+
+		switch(eVarType)
+		{
+		case HYSHADERVAR_bool:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<bool *>(pExBuffer));
+			pExBuffer += sizeof(bool);
+			break;
+		case HYSHADERVAR_int:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<int32 *>(pExBuffer));
+			pExBuffer += sizeof(int32);
+			break;
+		case HYSHADERVAR_uint:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<uint32 *>(pExBuffer));
+			pExBuffer += sizeof(uint32);
+			break;
+		case HYSHADERVAR_float:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<float *>(pExBuffer));
+			pExBuffer += sizeof(float);
+			break;
+		case HYSHADERVAR_double:
+			HyError("GLSL Shader uniform does not support type double yet!");
+			//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<double *>(pExBuffer));
+			//pExBuffer += sizeof(double);
+			break;
+		case HYSHADERVAR_bvec2:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::bvec2 *>(pExBuffer));
+			pExBuffer += sizeof(glm::bvec2);
+			break;
+		case HYSHADERVAR_bvec3:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::bvec3 *>(pExBuffer));
+			pExBuffer += sizeof(glm::bvec3);
+			break;
+		case HYSHADERVAR_bvec4:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::bvec4 *>(pExBuffer));
+			pExBuffer += sizeof(glm::bvec4);
+			break;
+		case HYSHADERVAR_ivec2:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::ivec2 *>(pExBuffer));
+			pExBuffer += sizeof(glm::ivec2);
+			break;
+		case HYSHADERVAR_ivec3:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::ivec3 *>(pExBuffer));
+			pExBuffer += sizeof(glm::ivec3);
+			break;
+		case HYSHADERVAR_ivec4:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::ivec4 *>(pExBuffer));
+			pExBuffer += sizeof(glm::ivec4);
+			break;
+		case HYSHADERVAR_vec2:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::vec2 *>(pExBuffer));
+			pExBuffer += sizeof(glm::vec2);
+			break;
+		case HYSHADERVAR_vec3:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::vec3 *>(pExBuffer));
+			pExBuffer += sizeof(glm::vec3);
+			break;
+		case HYSHADERVAR_vec4:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::vec4 *>(pExBuffer));
+			pExBuffer += sizeof(glm::vec4);
+			break;
+		case HYSHADERVAR_dvec2:
+			HyError("GLSL Shader uniform does not support type double yet!");
+			//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::dvec2 *>(pExBuffer));
+			//pExBuffer += sizeof(glm::dvec2);
+			break;
+		case HYSHADERVAR_dvec3:
+			HyError("GLSL Shader uniform does not support type double yet!");
+			//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::dvec3 *>(pExBuffer));
+			//pExBuffer += sizeof(glm::dvec3);
+			break;
+		case HYSHADERVAR_dvec4:
+			HyError("GLSL Shader uniform does not support type double yet!");
+			//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::dvec4 *>(pExBuffer));
+			//pExBuffer += sizeof(glm::dvec4);
+			break;
+		case HYSHADERVAR_mat3:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::mat3 *>(pExBuffer));
+			pExBuffer += sizeof(glm::mat3);
+			break;
+		case HYSHADERVAR_mat4:
+			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::mat4 *>(pExBuffer));
+			pExBuffer += sizeof(glm::mat4);
+			break;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Points to the vertex data locations in bound buffer
+	pShader->SetVertexAttributePtrs(static_cast<uint32>(pRenderState->GetDataOffset()));
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	GLenum eDrawMode;
+	switch(pRenderState->GetRenderMode())
+	{
+	case HYRENDERMODE_Triangles:		eDrawMode = GL_TRIANGLES;		break;
+	case HYRENDERMODE_TriangleStrip:	eDrawMode = GL_TRIANGLE_STRIP;	break;
+	case HYRENDERMODE_TriangleFan:		eDrawMode = GL_TRIANGLE_FAN;	break;
+	case HYRENDERMODE_LineLoop:			eDrawMode = GL_LINE_LOOP;		break;
+	case HYRENDERMODE_LineStrip:		eDrawMode = GL_LINE_STRIP;		break;
+
+	default:
+		HyError("Unknown draw mode in render state");
+		return;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Everything is prepared, do the drawing
+	if(pRenderState->GetNumInstances() > 1)
+	{
+		glDrawArraysInstanced(eDrawMode, 0, pRenderState->GetNumVerticesPerInstance(), pRenderState->GetNumInstances());
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDrawArraysInstanced");
+	}
+	else
+	{
+		uint32 uiStartVertex = 0;
+		for(uint32 i = 0; i < pRenderState->GetNumInstances(); ++i)
+		{
+			glDrawArrays(eDrawMode, uiStartVertex, pRenderState->GetNumVerticesPerInstance());
+			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDrawArrays");
+
+			uiStartVertex += pRenderState->GetNumVerticesPerInstance();
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Reset OpenGL states
+	glBindVertexArray(0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }

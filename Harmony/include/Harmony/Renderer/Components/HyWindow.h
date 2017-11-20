@@ -28,8 +28,6 @@ class HyWindow
 
 	HyWindowHandle							m_hData;
 
-	uint32									m_uiCullMaskStartBit;
-
 public:
 	class CameraIterator2d
 	{
@@ -108,9 +106,6 @@ public:
 	glm::vec2						ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
 
 	HyWindowHandle					GetHandle();
-
-	void SetCullMaskStartBit(uint32 uiStartBit);
-	uint32 GetCullMaskStartBit();
 
 #ifdef HY_PLATFORM_DESKTOP
 	// Returns the monitor this window is currently associated with.
