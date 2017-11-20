@@ -61,7 +61,7 @@ protected:
 	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) 	{ }
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)							{ return iOrderValue; }
 	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding)						{ }
-	virtual void _SetStencil(HyStencil *pStencil, bool bIsOverriding)								{ }
+	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding)							{ }
 
 private:
 	virtual bool IsLoaded() const { return true; }

@@ -45,9 +45,6 @@ class HyScene
 	std::vector<IHyLeafDraw2d *>						m_NodeList_Loaded;			// List of nodes who can be drawn, and their graphics assets are fully loaded
 	std::vector<IHyNode3d *>							m_LoadedInst3dList;	// TODO: rename this
 
-	// Used when writing the graphics draw buffer
-	char *												m_pCurWritePos;
-
 public:
 	HyScene(std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
@@ -73,6 +70,8 @@ public:
 	void UpdatePhysics();
 	void UpdateNodes();
 	void PrepareRender(IHyRenderer &rendererRef);
+
+	bool CalculateCullPasses(/*const*/ IHyLeafDraw2d &instanceRef, uint32 &uiCullMaskOut);
 	
 	static bool Node2dSortPredicate(const IHyLeafDraw2d *pInst1, const IHyLeafDraw2d *pInst2);
 };

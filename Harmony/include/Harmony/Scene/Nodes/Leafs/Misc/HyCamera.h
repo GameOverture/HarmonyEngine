@@ -24,6 +24,8 @@ protected:
 	HyWindow *			m_pWindowPtr;
 	HyRectangle<float>	m_ViewportRect;	// Values are [0.0-1.0] representing percentages
 
+	uint32				m_uiCullMaskBit;
+
 protected:
 	IHyCamera(HyWindow *pWindow);
 	virtual ~IHyCamera();
@@ -37,6 +39,9 @@ public:
 
 	virtual void SetZoom(const float fZoom) = 0;
 	virtual float GetZoom() const = 0;
+
+	void SetCullMaskBit(uint32 uiBit);
+	uint32 GetCullMaskBit();
 };
 
 class HyCamera2d final : public IHyLeaf2d, public IHyCamera

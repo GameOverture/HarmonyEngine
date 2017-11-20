@@ -13,19 +13,37 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Leafs/Draws/HyPrimitive2d.h"
 
+class HyRenderState;
+
 class HyStencil
 {
-	static uint32					sm_iIdCount;
+	friend class IHyRenderer;
 
-	const int32						m_iID;
-	HyPrimitive2d					m_Shape;
+	static HyStencilHandle			sm_hHandleCount;
+
+	const HyStencilHandle			m_hHANDLE;
+	std::vector<IHyLeafDraw2d *>	m_InstanceList;
+
+	char *							m_pRenderStateBuffer;
+	bool							m_bInstanceListDirty;
+
+	HyRenderState *					m_pRenderStatePtr;
 
 public:
 	HyStencil();
 	~HyStencil();
 
-	int32 GetId();
-	HyShape2d &GetShape();
+	HyStencilHandle GetHandle();
+
+	void AddInstance(IHyLeafDraw2d *pInstance);
+	bool RemoveInstance(IHyLeafDraw2d *pInstance);
+
+	void SetAsCullMask();
+	void SetAsInvertedCullMask();
+
+private:
+	const std::vector<IHyLeafDraw2d *> &GetInstanceList();
+	void SetRenderStatePtr(HyRenderState *pPtr);
 };
 
 #endif /* HyStencil_h__ */

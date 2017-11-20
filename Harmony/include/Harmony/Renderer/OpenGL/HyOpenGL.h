@@ -23,13 +23,11 @@ protected:
 	// VAO's cannot be shared between windows (aka OpenGL contexts)
 	std::vector<std::map<HyOpenGLShader *, uint32> >	m_VaoMapList;
 
-	glm::mat4					m_mtxCamera;
-	glm::mat4					m_mtxWindow;
+	glm::mat4					m_mtxView;
 	glm::mat4					m_mtxProj;
 
 	///////// 2D MEMBERS ////////////////////
 	GLuint						m_hVBO2d;
-	GLenum						m_eDrawMode;
 
 public:
 	HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
@@ -42,15 +40,11 @@ public:
 
 	virtual void StartRender() override;
 	
-	virtual void Init_3d() override;
-	virtual bool BeginPass_3d() override;
-	virtual void SetRenderState_3d(uint32 uiNewRenderState) override;
-	virtual void End_3d() override;
+	virtual void Begin_3d() override;
+	virtual void DrawRenderState_3d(HyRenderState *pRenderState) override;
 
 	virtual void Begin_2d() override;
-	virtual void CameraPass_2d(HyCamera2d *pCamera) override;
-	virtual void DrawRenderState_2d(HyRenderState &renderState) override;
-	//virtual void End_2d() override;
+	virtual void DrawRenderState_2d(HyRenderState *pRenderState) override;
 
 	virtual void FinishRender() override;
 
@@ -59,8 +53,8 @@ public:
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) override;
 	virtual void DeleteTexture(uint32 uiTextureHandle) override;
 
-protected:
-	void SetCameraMatrices_2d(bool bUseCameraView);
+private:
+	void RenderPass2d(HyRenderState *pRenderState, uint32 uiShaderPassIndex, HyCamera2d *pCamera);
 };
 
 #endif /* HyOpenGL_h__ */

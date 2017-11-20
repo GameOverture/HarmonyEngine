@@ -13,8 +13,8 @@
 #include "Utilities/HyMath.h"
 
 HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
-																	m_pDrawBuffer(nullptr),
-																	m_uiBufferSize(0),
+																	m_pVertBuffer(nullptr),
+																	m_uiNumVerts(0),
 																	m_bWireframe(false),
 																	m_fLineThickness(1.0f),
 																	m_bDirty(false)
@@ -27,17 +27,19 @@ HyPrimitive2d::~HyPrimitive2d(void)
 	ClearData();
 }
 
-const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
+const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &p)
 {
-	m_RenderState = p.m_RenderState;
+	IHyLeafDraw2d::operator=(p);
+
+	m_eRenderMode = p.m_eRenderMode;
 	m_BoundingVolume = p.m_BoundingVolume;
+	m_uiNumVerts = p.m_uiNumVerts;
 
 	ClearData();
-	if(m_RenderState.GetNumVerticesPerInstance() != 0)
+	if(m_uiNumVerts != 0)
 	{
-		m_pDrawBuffer = HY_NEW glm::vec2[p.m_uiBufferSize / sizeof(glm::vec2)];
-		m_uiBufferSize = p.m_uiBufferSize;
-		memcpy(m_pDrawBuffer, p.m_pDrawBuffer, m_uiBufferSize);
+		m_pVertBuffer = HY_NEW glm::vec2[m_uiNumVerts];
+		memcpy(m_pVertBuffer, p.m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
 	}
 	
 	return *this;
@@ -45,13 +47,18 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p)
 
 /*virtual*/ bool HyPrimitive2d::IsEnabled() /*override*/
 {
-	return (IHyNode::IsEnabled() && m_pDrawBuffer != nullptr && m_BoundingVolume.IsValid());
+	return (IHyNode::IsEnabled() && m_pVertBuffer != nullptr && m_BoundingVolume.IsValid());
 }
 
 HyShape2d &HyPrimitive2d::GetShape()
 {
 	// The bounding volume in HyPrimitive2d also doubles as the actual shape and type of this primitive
 	return m_BoundingVolume;
+}
+
+uint32 HyPrimitive2d::GetNumVerts() const
+{
+	return m_uiNumVerts;
 }
 
 bool HyPrimitive2d::IsWireframe()
@@ -155,13 +162,13 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 
 void HyPrimitive2d::ClearData()
 {
-	delete [] m_pDrawBuffer;
-	m_pDrawBuffer = nullptr;
-	m_uiBufferSize = 0;
+	delete [] m_pVertBuffer;
+	m_pVertBuffer = nullptr;
+	m_uiNumVerts = 0;
 
-	m_RenderState.SetRenderMode(HYRENDERMODE_Unknown);
-	m_RenderState.SetNumVerticesPerInstance(0);
-	m_RenderState.SetNumInstances(1);
+	m_eRenderMode = HYRENDERMODE_Unknown;
+	//m_RenderState.SetNumVerticesPerInstance(0);
+	//m_RenderState.SetNumInstances(1);
 	//m_RenderState.Disable(HyRenderState::DRAWINSTANCED);
 
 	m_ShaderUniforms.Clear();
@@ -172,13 +179,13 @@ void HyPrimitive2d::SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 	HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
 	ClearData();
 
-	m_RenderState.SetRenderMode(HYRENDERMODE_Triangles);
-	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
-	m_RenderState.SetNumVerticesPerInstance((uiNumVertices - 1) * 6);
-	m_RenderState.SetNumInstances(1);
-	
-	m_pDrawBuffer = HY_NEW glm::vec2[m_RenderState.GetNumVerticesPerInstance()];
-	m_uiBufferSize = m_RenderState.GetNumVerticesPerInstance() * sizeof(glm::vec2);
+	m_eRenderMode = HYRENDERMODE_Triangles;
+	//m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
+	//m_RenderState.SetNumVerticesPerInstance();
+	//m_RenderState.SetNumInstances(1);
+
+	m_uiNumVerts = (uiNumVertices - 1) * 6;
+	m_pVertBuffer = HY_NEW glm::vec2[m_uiNumVerts];
 
 	uint32 uiBufferIndex = 0;
 
@@ -208,16 +215,16 @@ void HyPrimitive2d::SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 
 		for(uint32 i = 1; i < 3; ++i)
 		{
-			m_pDrawBuffer[uiBufferIndex].x = ptExtents[0].x;
-			m_pDrawBuffer[uiBufferIndex].y = ptExtents[0].y;
+			m_pVertBuffer[uiBufferIndex].x = ptExtents[0].x;
+			m_pVertBuffer[uiBufferIndex].y = ptExtents[0].y;
 			uiBufferIndex++;
 
-			m_pDrawBuffer[uiBufferIndex].x = ptExtents[i].x;
-			m_pDrawBuffer[uiBufferIndex].y = ptExtents[i].y;
+			m_pVertBuffer[uiBufferIndex].x = ptExtents[i].x;
+			m_pVertBuffer[uiBufferIndex].y = ptExtents[i].y;
 			uiBufferIndex++;
 
-			m_pDrawBuffer[uiBufferIndex].x = ptExtents[i + 1].x;
-			m_pDrawBuffer[uiBufferIndex].y = ptExtents[i + 1].y;
+			m_pVertBuffer[uiBufferIndex].x = ptExtents[i + 1].x;
+			m_pVertBuffer[uiBufferIndex].y = ptExtents[i + 1].y;
 			uiBufferIndex++;
 		}
 	}
@@ -233,7 +240,7 @@ void HyPrimitive2d::SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 	//m_RenderState.SetNumInstances(uiNumVertices - 1);
 	//m_RenderState.SetNumVerticesPerInstance(4);				// 8 vertices per instance because of '2' duplicate vertex positions and normals on each end of line segment
 
-	//m_pDrawBuffer = HY_NEW glm::vec2[m_RenderState.GetNumInstances() * 8];	// size*4 = Each vertex of segment has '2' duplicate vertex positions that are offset by '2' corresponding normals within vertex shader 
+	//m_pVertBuffer = HY_NEW glm::vec2[m_RenderState.GetNumInstances() * 8];	// size*4 = Each vertex of segment has '2' duplicate vertex positions that are offset by '2' corresponding normals within vertex shader 
 	//m_uiBufferSize = (m_RenderState.GetNumInstances() * 8) * sizeof(glm::vec2);
 
 	//if(m_eCoordUnit == HYCOORDUNIT_Default)
@@ -248,19 +255,19 @@ void HyPrimitive2d::SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 	//	glm::vec2 ptVertScaled(pVertexList[i + 0].x, pVertexList[i + 0].y);
 	//	ptVertScaled *= fCoordMod;
 
-	//	/*postion 1    */ m_pDrawBuffer[j + 0] = ptVertScaled;
-	//	/*Normal  1    */ m_pDrawBuffer[j + 1] = glm::normalize(glm::vec2(-vVecDirection.y, vVecDirection.x));
-	//	/*postion 1 dup*/ m_pDrawBuffer[j + 2] = m_pDrawBuffer[j + 0];
-	//	/*Normal  1 inv*/ m_pDrawBuffer[j + 3] = m_pDrawBuffer[j + 1] * -1.0f;
+	//	/*postion 1    */ m_pVertBuffer[j + 0] = ptVertScaled;
+	//	/*Normal  1    */ m_pVertBuffer[j + 1] = glm::normalize(glm::vec2(-vVecDirection.y, vVecDirection.x));
+	//	/*postion 1 dup*/ m_pVertBuffer[j + 2] = m_pVertBuffer[j + 0];
+	//	/*Normal  1 inv*/ m_pVertBuffer[j + 3] = m_pVertBuffer[j + 1] * -1.0f;
 
 	//	ptVertScaled.x = pVertexList[i + 1].x;
 	//	ptVertScaled.y = pVertexList[i + 1].y;
 	//	ptVertScaled *= fCoordMod;
 
-	//	/*postion 2    */ m_pDrawBuffer[j + 4] = ptVertScaled;
-	//	/*Normal  2    */ m_pDrawBuffer[j + 5] = glm::normalize(glm::vec2(vVecDirection.y, -vVecDirection.x)) * -1.0f;
-	//	/*postion 2 dup*/ m_pDrawBuffer[j + 6] = m_pDrawBuffer[j + 4];
-	//	/*Normal  2 inv*/ m_pDrawBuffer[j + 7] = m_pDrawBuffer[j + 5] * -1.0f;
+	//	/*postion 2    */ m_pVertBuffer[j + 4] = ptVertScaled;
+	//	/*Normal  2    */ m_pVertBuffer[j + 5] = glm::normalize(glm::vec2(vVecDirection.y, -vVecDirection.x)) * -1.0f;
+	//	/*postion 2 dup*/ m_pVertBuffer[j + 6] = m_pVertBuffer[j + 4];
+	//	/*Normal  2 inv*/ m_pVertBuffer[j + 7] = m_pVertBuffer[j + 5] * -1.0f;
 	//}
 }
 
@@ -276,14 +283,13 @@ void HyPrimitive2d::SetAsCircle(glm::vec2 &ptCenter, float fRadius)
 	if(m_bWireframe == false)
 	{
 		ClearData();
-		uint32 uiNumVerts = static_cast<uint32>(k_segments) * 3;
 
-		m_RenderState.SetRenderMode(HYRENDERMODE_Triangles);
-		m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
-		m_RenderState.SetNumVerticesPerInstance(uiNumVerts);
+		m_eRenderMode = HYRENDERMODE_Triangles;
+		m_uiNumVerts = static_cast<uint32>(k_segments) * 3;
+		m_pVertBuffer = HY_NEW glm::vec2[m_uiNumVerts];
 
-		m_pDrawBuffer = HY_NEW glm::vec2[uiNumVerts];
-		m_uiBufferSize = uiNumVerts * sizeof(glm::vec2);
+		//m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
+		//m_RenderState.SetNumVerticesPerInstance(uiNumVerts);
 
 		uint32 uiBufferIndex = 0;
 		for(int32 i = 0; i < k_segments; ++i)
@@ -294,9 +300,9 @@ void HyPrimitive2d::SetAsCircle(glm::vec2 &ptCenter, float fRadius)
 			r2.y = sinInc * r1.x + cosInc * r1.y;
 			glm::vec2 v2 = ptCenter + fRadius * r2;
 
-			m_pDrawBuffer[uiBufferIndex++] = ptCenter;
-			m_pDrawBuffer[uiBufferIndex++] = v1;
-			m_pDrawBuffer[uiBufferIndex++] = v2;
+			m_pVertBuffer[uiBufferIndex++] = ptCenter;
+			m_pVertBuffer[uiBufferIndex++] = v1;
+			m_pVertBuffer[uiBufferIndex++] = v2;
 
 			r1 = r2;
 			v1 = v2;
@@ -334,28 +340,26 @@ void HyPrimitive2d::SetAsPolygon(b2Vec2 *pVertexList, uint32 uiNumVertices)
 {
 	ClearData();
 
-	uint32 uiNumBufferVerts = (uiNumVertices - 2) * 3;
+	m_eRenderMode = HYRENDERMODE_Triangles;
+	m_uiNumVerts = (uiNumVertices - 2) * 3;
+	m_pVertBuffer = HY_NEW glm::vec2[m_uiNumVerts];
 
-	m_RenderState.SetRenderMode(HYRENDERMODE_Triangles);
-	m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
-	m_RenderState.SetNumVerticesPerInstance(uiNumBufferVerts);
-
-	m_pDrawBuffer = HY_NEW glm::vec2[uiNumBufferVerts];
-	m_uiBufferSize = uiNumBufferVerts * sizeof(glm::vec2);
+	//m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
+	//m_RenderState.SetNumVerticesPerInstance(uiNumBufferVerts);
 
 	uint32 uiBufferIndex = 0;
 	for(uint32 i = 1; i < uiNumVertices - 1; ++i)
 	{
-		m_pDrawBuffer[uiBufferIndex].x = pVertexList[0].x;
-		m_pDrawBuffer[uiBufferIndex].y = pVertexList[0].y;
+		m_pVertBuffer[uiBufferIndex].x = pVertexList[0].x;
+		m_pVertBuffer[uiBufferIndex].y = pVertexList[0].y;
 		uiBufferIndex++;
 
-		m_pDrawBuffer[uiBufferIndex].x = pVertexList[i].x;
-		m_pDrawBuffer[uiBufferIndex].y = pVertexList[i].y;
+		m_pVertBuffer[uiBufferIndex].x = pVertexList[i].x;
+		m_pVertBuffer[uiBufferIndex].y = pVertexList[i].y;
 		uiBufferIndex++;
 
-		m_pDrawBuffer[uiBufferIndex].x = pVertexList[i+1].x;
-		m_pDrawBuffer[uiBufferIndex].y = pVertexList[i+1].y;
+		m_pVertBuffer[uiBufferIndex].x = pVertexList[i+1].x;
+		m_pVertBuffer[uiBufferIndex].y = pVertexList[i+1].y;
 		uiBufferIndex++;
 	}
 }
@@ -385,6 +389,6 @@ void HyPrimitive2d::SetAsPolygon(b2Vec2 *pVertexList, uint32 uiNumVertices)
 
 /*virtual*/ void HyPrimitive2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-	memcpy(pRefDataWritePos, m_pDrawBuffer, m_uiBufferSize);
-	pRefDataWritePos += m_uiBufferSize;
+	memcpy(pRefDataWritePos, m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
+	pRefDataWritePos += m_uiNumVerts * sizeof(glm::vec2);
 }

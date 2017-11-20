@@ -9,37 +9,38 @@
  *************************************************************************/
 #include "Afx/HyInteropAfx.h"
 #include "Renderer/IHyRenderer.h"
+#include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyStencil.h"
+#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Assets/Loadables/IHyLoadableData.h"
 #include "HyEngine.h"
 
-int32							IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
-std::map<int32, IHyShader *>	IHyRenderer::sm_ShaderMap;
-std::map<uint32, HyStencil *>	IHyRenderer::sm_StencilMap;
+int32												IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
+std::map<HyShaderHandle, IHyShader *>				IHyRenderer::sm_ShaderMap;
+std::map<HyStencilHandle, HyStencil *>				IHyRenderer::sm_StencilMap;
 
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
-																									m_pRenderStateBuffer(nullptr),
-																									m_pVertexBuffer(nullptr),
+																									m_pBUFFER_RENDERSTATES(HY_NEW char[HY_RENDERSTATE_BUFFER_SIZE]),
+																									m_pBUFFER_VERTEX(HY_NEW char[HY_VERTEX_BUFFER_SIZE]),
+																									m_pRenderStatesUserStartPos(nullptr),
+																									m_pCurRenderStateWritePos(nullptr),
+																									m_pCurVertexWritePos(nullptr),
+																									m_uiVertexBufferUsedBytes(0),
 																									m_pCurWindow(nullptr),
-																									m_pCurCamera(nullptr),
-																									m_pCurRenderState(nullptr),
-																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8),
-																									m_uiNumRenderStates(0)
+																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8)
 {
-	m_pVertexBuffer = HY_NEW char[HY_VERTEX_BUFFER_SIZE];
-	memset(m_pVertexBuffer, 0, HY_VERTEX_BUFFER_SIZE);
-
-	m_pRenderStateBuffer = HY_NEW char[HY_RENDERSTATE_BUFFER_SIZE];
-	memset(m_pRenderStateBuffer, 0, HY_RENDERSTATE_BUFFER_SIZE);
+	memset(m_pBUFFER_VERTEX, 0, HY_VERTEX_BUFFER_SIZE);
+	memset(m_pBUFFER_RENDERSTATES, 0, HY_RENDERSTATE_BUFFER_SIZE);
 }
 
 IHyRenderer::~IHyRenderer(void)
 {
-	delete[] m_pVertexBuffer;
-	delete[] m_pRenderStateBuffer;
+	delete[] m_pBUFFER_VERTEX;
+	delete[] m_pBUFFER_RENDERSTATES;
 
-	std::map<int32, IHyShader *>::iterator iter;
+	std::map<HyShaderHandle, IHyShader *>::iterator iter;
 	for(iter = sm_ShaderMap.begin(); iter != sm_ShaderMap.end(); ++iter)
 		delete iter->second;
 
@@ -48,14 +49,56 @@ IHyRenderer::~IHyRenderer(void)
 	sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
 }
 
-char *IHyRenderer::GetRenderStateBuffer()
+void IHyRenderer::PrepareBuffers()
 {
-	return m_pRenderStateBuffer;
+	m_pCurRenderStateWritePos = m_pBUFFER_RENDERSTATES;
+	m_pCurVertexWritePos = m_pBUFFER_VERTEX;
+
+	m_pRenderStatesUserStartPos = nullptr;
+	m_uiVertexBufferUsedBytes = 0;
+
+	for(auto iter = sm_StencilMap.begin(); iter != sm_StencilMap.end(); ++iter)
+	{
+		HyStencil *pStencil = iter->second;
+		pStencil->SetRenderStatePtr(reinterpret_cast<HyRenderState *>(m_pCurRenderStateWritePos));
+
+		const std::vector<IHyLeafDraw2d *> &instanceListRef = pStencil->GetInstanceList();
+		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
+		{
+			AppendRenderState(*instanceListRef[i], HY_FULL_CULL_MASK);
+		}
+	}
+
+	m_pRenderStatesUserStartPos = m_pCurRenderStateWritePos;
+	IHyRenderer::RenderStateBufferHeader *pHeader = reinterpret_cast<IHyRenderer::RenderStateBufferHeader *>(m_pRenderStatesUserStartPos);
+	memset(pHeader, 0, sizeof(IHyRenderer::RenderStateBufferHeader));
+
+	m_pCurRenderStateWritePos += sizeof(IHyRenderer::RenderStateBufferHeader);
 }
 
-char *IHyRenderer::GetVertexBuffer()
+void IHyRenderer::AppendRenderState(/*const*/ IHyLeafDraw2d &instanceRef, HyCullMask uiCullMask)
 {
-	return m_pVertexBuffer;
+	HyRenderState *pRenderState = new (m_pCurRenderStateWritePos)HyRenderState(instanceRef,
+																			   uiCullMask,
+																			   m_uiVertexBufferUsedBytes);
+
+	m_pCurRenderStateWritePos += sizeof(HyRenderState);
+
+	char *pStartOfExData = m_pCurRenderStateWritePos;
+	instanceRef.WriteShaderUniformBuffer(m_pCurRenderStateWritePos);	// This function is responsible for incrementing the draw pointer to after what's written
+	pRenderState->SetExSize(reinterpret_cast<size_t>(m_pCurRenderStateWritePos) - reinterpret_cast<size_t>(pStartOfExData));
+	HyAssert(reinterpret_cast<size_t>(m_pCurRenderStateWritePos) - reinterpret_cast<size_t>(m_pBUFFER_RENDERSTATES) < HY_RENDERSTATE_BUFFER_SIZE, "IHyRenderer::AppendRenderState() has written passed its render state bounds! Embiggen 'HY_RENDERSTATE_BUFFER_SIZE'");
+
+	// OnWriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
+	instanceRef.OnWriteDrawBufferData(m_pCurVertexWritePos);
+	m_uiVertexBufferUsedBytes = reinterpret_cast<size_t>(m_pCurVertexWritePos) - reinterpret_cast<size_t>(m_pBUFFER_VERTEX);
+	HyAssert(m_uiVertexBufferUsedBytes < HY_VERTEX_BUFFER_SIZE, "IHyRenderer::AppendRenderState() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
+
+	if(m_pRenderStatesUserStartPos)
+	{
+		IHyRenderer::RenderStateBufferHeader *pHeader = reinterpret_cast<IHyRenderer::RenderStateBufferHeader *>(m_pRenderStatesUserStartPos);
+		pHeader->uiNum2dRenderStates++;
+	}
 }
 
 void IHyRenderer::TxData(IHyLoadableData *pData)
@@ -83,67 +126,10 @@ uint32 IHyRenderer::GetNumWindows()
 	m_pCurWindow = m_WindowListRef[uiIndex];
 }
 
-//uint32 IHyRenderer::GetNumCameras2d()
-//{
-//	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras2d));
-//}
-//
-//uint32 IHyRenderer::GetCameraWindowId2d(int iCameraIndex)
-//{
-//	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer +
-//										HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
-//										sizeof(uint32) +
-//										(iCameraIndex * (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4)))));
-//}
-//
-//HyRectangle<float> *IHyRenderer::GetCameraViewportRect2d(int iIndex)
-//{
-//	return reinterpret_cast<HyRectangle<float> *>(m_pVertexBuffer +
-//												  HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
-//												  sizeof(uint32) +
-//												  (iIndex * (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) +
-//												  sizeof(uint32));
-//}
-//
-//glm::mat4 *IHyRenderer::GetCameraView2d(int iIndex)
-//{
-//	return reinterpret_cast<glm::mat4 *>(m_pVertexBuffer +
-//										 HYDRAWBUFFERHEADER->uiOffsetToCameras2d +
-//										 sizeof(uint32) +
-//										 (iIndex * (sizeof(uint32) + sizeof(HyRectangle<float>) + sizeof(glm::mat4))) +
-//										 sizeof(uint32) +
-//										 sizeof(HyRectangle<float>));
-//}
-
-uint32 IHyRenderer::GetNumRenderStates2d()
+/*static*/ IHyShader *IHyRenderer::FindShader(HyShaderHandle hHandle)
 {
-	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetTo2d));
-}
-
-HyRenderState *IHyRenderer::GetRenderStatesPtr2d()
-{
-	return reinterpret_cast<HyRenderState *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetTo2d + sizeof(uint32)); // Last sizeof(uint32) is skipping number of 2dInsts
-}
-
-char *IHyRenderer::GetVertexData2d()
-{
-	return reinterpret_cast<char *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetToVertexData2d);
-}
-
-//uint32 IHyRenderer::GetNumCameras3d()
-//{
-//	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras3d));
-//}
-//
-//uint32 IHyRenderer::GetNumInsts3d()
-//{
-//	return *(reinterpret_cast<uint32 *>(m_pVertexBuffer + HYDRAWBUFFERHEADER->uiOffsetToCameras3d));
-//}
-
-/*static*/ IHyShader *IHyRenderer::FindShader(int32 iId)
-{
-	if(sm_ShaderMap.find(iId) != sm_ShaderMap.end())
-		return sm_ShaderMap[iId];
+	if(sm_ShaderMap.find(hHandle) != sm_ShaderMap.end())
+		return sm_ShaderMap[hHandle];
 
 	HyError("IHyRenderer::FindShader could not find a valid shader");
 	return nullptr;
@@ -167,23 +153,22 @@ char *IHyRenderer::GetVertexData2d()
 	return pNewShader;
 }
 
-/*static*/ HyStencil *IHyRenderer::FindStencil(uint32 uiId)
+/*static*/ HyStencil *IHyRenderer::FindStencil(HyStencilHandle hHandle)
 {
-	if(sm_StencilMap.find(uiId) != sm_StencilMap.end())
-		return sm_StencilMap[uiId];
+	if(hHandle != HY_UNUSED_HANDLE && sm_StencilMap.find(hHandle) != sm_StencilMap.end())
+		return sm_StencilMap[hHandle];
 
-	HyError("IHyRenderer::FindStencil could not find a valid stencil with ID: " << uiId);
 	return nullptr;
 }
 
 /*static*/ void IHyRenderer::AddStencil(HyStencil *pNewStencil)
 {
-	sm_StencilMap[pNewStencil->GetId()] = pNewStencil;
+	sm_StencilMap[pNewStencil->GetHandle()] = pNewStencil;
 }
 
 /*static*/ void IHyRenderer::RemoveStencil(HyStencil *pNewStencil)
 {
-	sm_StencilMap.erase(sm_StencilMap.find(pNewStencil->GetId()));
+	sm_StencilMap.erase(sm_StencilMap.find(pNewStencil->GetHandle()));
 }
 
 void IHyRenderer::Render()
@@ -202,46 +187,42 @@ void IHyRenderer::Render()
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Setup render state buffer
+	RenderStateBufferHeader *pRsHeader = reinterpret_cast<RenderStateBufferHeader *>(m_pRenderStatesUserStartPos);
+	
+	char *pRsBufferPos = nullptr;
+	HyRenderState *pCurRenderState = nullptr;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Render all Windows
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		SetCurrentWindow(i);
 		StartRender();
 
-		Init_3d();
-		while(BeginPass_3d())
+		pRsBufferPos = m_pRenderStatesUserStartPos;
+		pRsBufferPos += sizeof(RenderStateBufferHeader);
+
+		Begin_3d();
+		for(uint32 k = 0; k < pRsHeader->uiNum3dRenderStates; k++)
 		{
-			//Draw3d();
-			End_3d();
+			pCurRenderState = reinterpret_cast<HyRenderState *>(pRsBufferPos);
+			DrawRenderState_3d(pCurRenderState);
+			pRsBufferPos += pCurRenderState->GetExSize() + sizeof(HyRenderState);
 		}
 
 		Begin_2d();
-		for(uint32 j = 0; j < m_pCurWindow->GetNumCameras2d(); ++j)
+		for(uint32 k = 0; k < pRsHeader->uiNum2dRenderStates; k++)
 		{
-			CameraPass_2d(m_pCurWindow->GetCamera2d(j));
-			Draw2d();
-			//End_2d();
+			pCurRenderState = reinterpret_cast<HyRenderState *>(pRsBufferPos);
+			if(pCurRenderState->GetCoordinateSystem() < 0 || pCurRenderState->GetCoordinateSystem() == m_pCurWindow->GetIndex())
+				DrawRenderState_2d(pCurRenderState);
+
+			pRsBufferPos += pCurRenderState->GetExSize() + sizeof(HyRenderState);
 		}
 
 		FinishRender();
 	}
 	
 	HY_PROFILE_END
-}
-
-void IHyRenderer::Draw2d()
-{
-	// Each render state will require its own draw. The order of these render states should be 
-	// depth sorted with render states batched together to reduce state changes.
-	m_pCurRenderState = GetRenderStatesPtr2d();
-
-	m_uiNumRenderStates = GetNumRenderStates2d();
-	for(uint32 i = 0; i < m_uiNumRenderStates; ++i, ++m_pCurRenderState)
-	{
-		if(m_pCurRenderState->IsUsingCameraCoordinates() ||
-		   m_pCurRenderState->GetAssignedWindow() == m_pCurWindow->GetIndex())
-		{
-			DrawRenderState_2d(*m_pCurRenderState);
-		}
-	}
 }

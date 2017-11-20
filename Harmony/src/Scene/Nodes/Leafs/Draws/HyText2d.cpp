@@ -28,12 +28,14 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent
 																									m_pGlyphInfos(nullptr),
 																									m_uiNumReservedGlyphs(0),
 																									m_uiNumValidCharacters(0),
-																									m_fUsedPixelWidth(0.0f)
+																									m_fUsedPixelWidth(0.0f),
+																									m_fUsedPixelHeight(0.0f)
 {
-	m_RenderState.SetRenderMode(HYRENDERMODE_TriangleStrip);
-	m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
-	m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
-	m_RenderState.SetNumVerticesPerInstance(4);
+	m_eRenderMode = HYRENDERMODE_TriangleStrip;
+
+	//m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
+	//m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
+	//m_RenderState.SetNumVerticesPerInstance(4);
 }
 
 HyText2d::~HyText2d(void)
@@ -82,14 +84,19 @@ const std::string &HyText2d::TextGet() const
 	return m_sRawString;
 }
 
-uint32 HyText2d::TextGetNumCharacters()
+uint32 HyText2d::TextGetNumCharacters() const
 {
 	return static_cast<uint32>(m_Utf32CodeList.size());
 }
 
-uint32 HyText2d::TextGetNumShownCharacters()
+uint32 HyText2d::TextGetNumShownCharacters() const
 {
 	return m_uiNumValidCharacters;
+}
+
+uint32 HyText2d::GetNumRenderQuads() const
+{
+	return m_uiNumRenderQuads;
 }
 
 float HyText2d::TextGetScaleBoxModifer()
@@ -330,14 +337,15 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 		return;
 
 	if(pTextData->GetAtlas())
-		m_RenderState.SetTextureHandle(pTextData->GetAtlas()->GetGfxApiHandle());
+		m_hTextureHandle = pTextData->GetAtlas()->GetTextureHandle();
 
 	MarkAsDirty();
 }
 
 /*virtual*/ void HyText2d::CalcBoundingVolume() /*override*/
 {
-	HyError("HyText2d::CalcBoundingVolume() not implemented");
+	// TODO: Fix this to actually fit the text
+	m_BoundingVolume.SetAsBox(m_fUsedPixelWidth /** 0.5f*/, m_fUsedPixelHeight /** 0.5f*/);//, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
 }
 
 /*virtual*/ void HyText2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/
@@ -425,6 +433,7 @@ offsetCalculation:
 	memset(pWritePos, 0, sizeof(glm::vec2) * uiNUM_LAYERS);
 
 	// vNewlineInfo is used to set text alignment of center, right, or justified. (left alignment is already accomplished by default)
+	//				It can also be used to calculate the total used space
 	struct LineInfo
 	{
 		const float fUSED_WIDTH;
@@ -637,7 +646,8 @@ offsetCalculation:
 		vNewlineInfo.push_back(LineInfo(fCurLineWidth, (fCurLineAscender + fCurLineDecender), uiNewlineIndex));	// Push the final line (row)
 	}
 
-	m_RenderState.SetNumInstances((m_uiNumValidCharacters * uiNUM_LAYERS) - uiNumNewlineCharacters);
+	//m_RenderState.SetNumInstances((m_uiNumValidCharacters * uiNUM_LAYERS) - uiNumNewlineCharacters);
+	m_uiNumRenderQuads = (m_uiNumValidCharacters * uiNUM_LAYERS) - uiNumNewlineCharacters;
 
 	// Fix each text line to match proper alignment (HYALIGN_Left is already set at this point)
 	if(m_eAlignment != HYALIGN_Left)
@@ -715,16 +725,16 @@ offsetCalculation:
 			m_fUsedPixelWidth = vNewlineInfo[i].fUSED_WIDTH;
 	}
 
+	m_fUsedPixelHeight = 0.0f;
+	for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
+		m_fUsedPixelHeight += vNewlineInfo[i].fUSED_HEIGHT;
+
 	if(0 != (m_uiBoxAttributes & BOXATTRIB_IsScaleBox))
 	{
-		float fTotalHeight = 0.0f;
-		for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
-			fTotalHeight += vNewlineInfo[i].fUSED_HEIGHT;
-
 		if(bScaleBoxModiferIsSet == false)
 		{
 			float fScaleX = m_vBoxDimensions.x / m_fUsedPixelWidth;
-			float fScaleY = m_vBoxDimensions.y / fTotalHeight;
+			float fScaleY = m_vBoxDimensions.y / m_fUsedPixelHeight;
 
 			m_fScaleBoxModifier = HyMin(fScaleX, fScaleY);
 
@@ -733,7 +743,7 @@ offsetCalculation:
 		}
 		else if(0 != (m_uiBoxAttributes & BOXATTRIB_CenterVertically))
 		{
-			float fCenterNudgeAmt = (m_vBoxDimensions.y - fTotalHeight) * 0.5f;
+			float fCenterNudgeAmt = (m_vBoxDimensions.y - m_fUsedPixelHeight) * 0.5f;
 			for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
 				m_pGlyphInfos[i].vOffset.y -= fCenterNudgeAmt;
 		}

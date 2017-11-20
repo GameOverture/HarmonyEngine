@@ -32,7 +32,7 @@
 	}
 #endif
 
-HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext) : m_uiINDEX(uiIndex)
+HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext) :	m_uiINDEX(uiIndex)
 {
 	m_Info = windowInfoRef;
 	m_vFramebufferSize = m_Info.vSize;
@@ -184,6 +184,22 @@ HyCamera2d *HyWindow::GetCamera2d(uint32 uiIndex)
 {
 	HyAssert(uiIndex < static_cast<uint32>(m_Cams2dList.size()), "HyWindow::GetCamera2d was passed an invalid index: " << uiIndex);
 	return m_Cams2dList[uiIndex];
+}
+
+const std::vector<HyCamera2d *> &HyWindow::GetCamera2dList()
+{
+	return m_Cams2dList;
+}
+
+uint32 HyWindow::GetNumCameras3d()
+{
+	return static_cast<uint32>(m_Cams3dList.size());
+}
+
+HyCamera3d *HyWindow::GetCamera3d(uint32 uiIndex)
+{
+	HyAssert(uiIndex < static_cast<uint32>(m_Cams3dList.size()), "HyWindow::GetCamera3d was passed an invalid index: " << uiIndex);
+	return m_Cams3dList[uiIndex];
 }
 
 void HyWindow::RemoveCamera(HyCamera2d *&pCam)

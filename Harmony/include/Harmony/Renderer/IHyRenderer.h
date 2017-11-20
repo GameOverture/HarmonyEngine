@@ -11,72 +11,68 @@
 #define IHyRenderer_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Loadables/IHyLoadableData.h"
-#include "Renderer/Components/HyRenderState.h"
 
 #include <queue>
 
+class HyRenderState;
+class IHyLeafDraw2d;
 class IHyShader;
 class HyStencil;
 class HyWindow;
 class HyGfxComms;
 class HyDiagnostics;
+class HyCamera2d;
+class IHyLoadableData;
+
+#define HY_MAX_PASSES_PER_BUFFER 32	// Number of bits held in the cull mask
+typedef uint32 HyCullMask;
+#define HY_FULL_CULL_MASK 0xFFFFFFFF
+
+#define HY_MAX_SHADER_PASSES_PER_INSTANCE 4
 
 #define HY_RENDERSTATE_BUFFER_SIZE ((1024 * 1024) * 1) // 1MB
 #define HY_VERTEX_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
 
 class IHyRenderer
 {
-//public:
-//	// Note: All offsets below are from the beginning of the buffer pointer, containing this structure
-//	struct DrawBufferHeader
-//	{
-//		uint32		uiReturnFlags;
-//		size_t		uiOffsetTo3d;
-//		size_t		uiOffsetTo2d;
-//		size_t		uiOffsetToVertexData2d;
-//		size_t		uiVertexBufferSize2d;
-//		size_t		uiOffsetToCameras3d;
-//		size_t		uiOffsetToCameras2d;
-//	};
+public:
+	// Note: All offsets below are from the beginning of the buffer pointer, containing this structure
+	struct RenderStateBufferHeader
+	{
+		uint32		uiNum3dRenderStates;
+		uint32		uiNum2dRenderStates;
+	};
 
 protected:
-<<<<<<< HEAD
 	HyDiagnostics &									m_DiagnosticsRef;
 	std::vector<HyWindow *> &						m_WindowListRef;
 
-	char *											m_pRenderStateBuffer;
-	char *											m_pVertexBuffer;
+	char * const									m_pBUFFER_RENDERSTATES;
+	char * const									m_pBUFFER_VERTEX;
+	char *											m_pRenderStatesUserStartPos; // Includes RenderStateBufferHeader
+	char *											m_pCurRenderStateWritePos;
+	char *											m_pCurVertexWritePos;
+	size_t											m_uiVertexBufferUsedBytes;
 
 	HyWindow *										m_pCurWindow;
-	HyRenderState *									m_pCurRenderState;
-=======
-	HyDiagnostics &							m_DiagnosticsRef;
-	std::vector<HyWindow *> &				m_WindowListRef;
-	HyWindow *								m_pCurWindow;
 
-	char *									m_pDrawBuffer;
-	HyRenderState *							m_pCurRenderState;
->>>>>>> parent of 4faa629c... Commiting working state of engine to fallback on - Branching to a new render buffer refactor
+	std::queue<IHyLoadableData *>					m_TxDataQueue;
+	std::queue<IHyLoadableData *>					m_RxDataQueue;
 
-	std::queue<IHyLoadableData *>			m_TxDataQueue;
-	std::queue<IHyLoadableData *>			m_RxDataQueue;
+	static int32									sm_iShaderIdCount;
+	static std::map<HyShaderHandle, IHyShader *>	sm_ShaderMap;
 
-	static int32							sm_iShaderIdCount;
-	static std::map<int32, IHyShader *>		sm_ShaderMap;
-
-	static std::map<uint32, HyStencil *>	sm_StencilMap;
+	static std::map<HyStencilHandle, HyStencil *>	sm_StencilMap;
 
 	// Diagnostics/Metrics
-	uint32									m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
-	uint32									m_uiNumRenderStates;
+	uint32											m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
 
 public:
 	IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
-	char *GetRenderStateBuffer();
-	char *GetVertexBuffer();
+	void PrepareBuffers();
+	void AppendRenderState(/*const*/ IHyLeafDraw2d &instanceRef, HyCullMask uiCullMask);
 
 	void TxData(IHyLoadableData *pData);
 	std::queue<IHyLoadableData *> &RxData();
@@ -88,15 +84,11 @@ public:
 
 	virtual void StartRender() = 0;
 
-	virtual void Init_3d() = 0;
-	virtual bool BeginPass_3d() = 0;
-	virtual void SetRenderState_3d(uint32 uiNewRenderState) = 0;
-	virtual void End_3d() = 0;
+	virtual void Begin_3d() = 0;
+	virtual void DrawRenderState_3d(HyRenderState *pRenderState) = 0;
 
 	virtual void Begin_2d() = 0;
-	virtual void CameraPass_2d(HyCamera2d *pCamera) = 0;
-	virtual void DrawRenderState_2d(HyRenderState &renderState) = 0;
-	//virtual void End_2d() = 0;
+	virtual void DrawRenderState_2d(HyRenderState *pRenderState) = 0;
 
 	virtual void FinishRender() = 0;
 
@@ -105,30 +97,15 @@ public:
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
 
-	// 2D buffer accessors
-	//uint32 GetNumCameras2d();
-	//uint32 GetCameraWindowId2d(int iCameraIndex);
-	//HyRectangle<float> *GetCameraViewportRect2d(int iIndex);
-	//glm::mat4 *GetCameraView2d(int iIndex);
-
-	uint32 GetNumRenderStates2d();
-	HyRenderState *GetRenderStatesPtr2d();
-	char *GetVertexData2d();
-
-	//// 3D buffer accessors
-	//uint32 GetNumCameras3d();
-	//uint32 GetNumInsts3d();
-
-	static IHyShader *FindShader(int32 iId);
+	static IHyShader *FindShader(HyShaderHandle hHandle);
 	static IHyShader *MakeCustomShader();
 	static IHyShader *MakeCustomShader(const char *szPrefix, const char *szName);
 
-	static HyStencil *FindStencil(uint32 uiId);
+	static HyStencil *FindStencil(HyStencilHandle hHandle);
 	static void AddStencil(HyStencil *pNewStencil);
 	static void RemoveStencil(HyStencil *pNewStencil);
 
 	void Render();
-	void Draw2d();
 };
 
 #endif /* IHyRenderer_h__ */

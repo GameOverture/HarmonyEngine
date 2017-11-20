@@ -30,6 +30,11 @@
 #include "GL/glew.h"
 #endif
 
+#define HY_UNUSED_HANDLE 0
+typedef uint32 HyStencilHandle;
+typedef uint32 HyTextureHandle;
+typedef uint8 HyShaderHandle;
+
 enum HyType
 {
 	HYTYPE_Unknown = 0,
@@ -106,9 +111,20 @@ enum HyTextureFormat
 	HYNUMTEXTUREFORMATS
 };
 
+enum HyRenderMode
+{
+	HYRENDERMODE_Unknown = -1,
+
+	HYRENDERMODE_Triangles = 0,
+	HYRENDERMODE_TriangleStrip,
+	HYRENDERMODE_TriangleFan,
+	HYRENDERMODE_LineLoop,
+	HYRENDERMODE_LineStrip
+};
+
 enum HyShaderProgram
 {
-	HYSHADERPROG_QuadBatch = 0,
+	HYSHADERPROG_QuadBatch = 1,
 	HYSHADERPROG_Primitive,
 	HYSHADERPROG_Lines2d,
 

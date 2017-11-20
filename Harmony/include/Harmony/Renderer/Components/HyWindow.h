@@ -29,6 +29,51 @@ class HyWindow
 	HyWindowHandle							m_hData;
 
 public:
+	class CameraIterator2d
+	{
+		const std::vector<HyCamera2d *> &			m_CamsListRef;
+		std::vector<HyCamera2d *>::const_iterator	m_iter;
+
+	public:
+		CameraIterator2d(const std::vector<HyCamera2d *> &camListRef) :	m_CamsListRef(camListRef),
+																		m_iter(m_CamsListRef.begin())
+		{
+			while(m_iter != m_CamsListRef.end() && (*m_iter)->IsEnabled() == false)
+				++m_iter;
+		}
+
+		CameraIterator2d(CameraIterator2d &iterRef) :	m_CamsListRef(iterRef.m_CamsListRef),
+														m_iter(m_CamsListRef.begin())
+		{
+			while(m_iter != m_CamsListRef.end() && (*m_iter)->IsEnabled() == false)
+				++m_iter;
+		}
+
+		CameraIterator2d &operator++()	// Prefix increment operator
+		{
+			do 
+			{
+				++m_iter;
+			} while(m_iter != m_CamsListRef.end() && (*m_iter)->IsEnabled() == false);
+
+			return *this;
+		}
+
+		CameraIterator2d operator++(int)	// Postfix increment operator
+		{
+			do 
+			{
+				++m_iter;
+			} while(m_iter != m_CamsListRef.end() && (*m_iter)->IsEnabled() == false);
+
+			return *this;
+		}
+
+		bool IsEnd()		{ return m_iter == m_CamsListRef.end(); }
+		HyCamera2d *Get()	{ return *m_iter; }
+	};
+
+public:
 	HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext);
 	~HyWindow(void);
 
@@ -50,13 +95,17 @@ public:
 
 	uint32							GetNumCameras2d();
 	HyCamera2d *					GetCamera2d(uint32 uiIndex);
+	const std::vector<HyCamera2d *> &GetCamera2dList();
+
+	uint32							GetNumCameras3d();
+	HyCamera3d *					GetCamera3d(uint32 uiIndex);
 
 	void							RemoveCamera(HyCamera2d *&pCam);
 	void							RemoveCamera(HyCamera3d *&pCam);
 
 	glm::vec2						ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
 
-	HyWindowHandle	GetHandle();
+	HyWindowHandle					GetHandle();
 
 #ifdef HY_PLATFORM_DESKTOP
 	// Returns the monitor this window is currently associated with.

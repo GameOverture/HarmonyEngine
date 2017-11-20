@@ -18,6 +18,8 @@ IHyLeafDraw2d::IHyLeafDraw2d(HyType eNodeType, const char *szPrefix, const char 
 																												m_pData(nullptr),
 																												m_sNAME(szName ? szName : ""),
 																												m_sPREFIX(szPrefix ? szPrefix : ""),
+																												m_eRenderMode(HYRENDERMODE_Unknown),
+																												m_hTextureHandle(HY_UNUSED_HANDLE),
 																												m_BoundingVolume(*this)
 {
 }
@@ -26,6 +28,18 @@ IHyLeafDraw2d::~IHyLeafDraw2d()
 {
 	if(m_eLoadState != HYLOADSTATE_Inactive)
 		Unload();
+}
+
+const IHyLeafDraw2d &IHyLeafDraw2d::operator=(const IHyLeafDraw2d &rhs)
+{
+	// TODO: Decided whether I copy the underlying data or not, which would require unloading/loading and unlinking/linking from things like HyScene and HyAssets
+	//m_eLoadState;
+	//m_RequiredCustomShaders;
+	//m_pData;
+	//m_sNAME;
+	//m_sPREFIX;
+
+	return *this;
 }
 
 void IHyLeafDraw2d::SetEnabled(bool bEnabled)
@@ -53,37 +67,51 @@ void IHyLeafDraw2d::SetPauseUpdate(bool bUpdateWhenPaused)
 
 void IHyLeafDraw2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
 {
-	m_LocalScissorRect.x = uiLocalX;
-	m_LocalScissorRect.y = uiLocalY;
-	m_LocalScissorRect.width = uiWidth;
-	m_LocalScissorRect.height = uiHeight;
+	if(m_hScissor == HY_UNUSED_HANDLE)
+		m_hScissor = HY_NEW ScissorRect();
 
-	m_LocalScissorRect.iTag = 1;	// Tag indicates whether it's used
+	m_hScissor->m_LocalScissorRect.x = uiLocalX;
+	m_hScissor->m_LocalScissorRect.y = uiLocalY;
+	m_hScissor->m_LocalScissorRect.width = uiWidth;
+	m_hScissor->m_LocalScissorRect.height = uiHeight;
+	m_hScissor->m_LocalScissorRect.iTag = SCISSORTAG_Enabled;
+
 	m_uiExplicitFlags |= EXPLICIT_Scissor;
+
+	GetWorldScissor(m_hScissor->m_WorldScissorRect);
 }
 
 void IHyLeafDraw2d::ClearScissor(bool bUseParentScissor)
 {
-	m_LocalScissorRect.iTag = 0;	// Tag indicates whether it's used
-	m_RenderState.ClearScissorRect();
+	if(m_hScissor == HY_UNUSED_HANDLE)
+		return;
+
+	m_hScissor->m_LocalScissorRect.iTag = SCISSORTAG_Disabled;
+	m_hScissor->m_WorldScissorRect.iTag = SCISSORTAG_Disabled;
 
 	if(bUseParentScissor == false)
 		m_uiExplicitFlags |= EXPLICIT_Scissor;
 	else
+	{
 		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+		if(m_pParent)
+			m_pParent->GetWorldScissor(m_hScissor->m_WorldScissorRect);
+	}
 }
 
 void IHyLeafDraw2d::SetStencil(HyStencil *pStencil)
 {
-	m_pStencil = pStencil;
-	m_RenderState.SetStencilId(m_pStencil ? m_pStencil->GetId() : 0);
+	if(pStencil == nullptr)
+		m_hStencil = HY_UNUSED_HANDLE;
+	else
+		m_hStencil = pStencil->GetHandle();
 
 	m_uiExplicitFlags |= EXPLICIT_Stencil;
 }
 
 void IHyLeafDraw2d::ClearStencil(bool bUseParentStencil)
 {
-	m_RenderState.ClearStencilTest();
+	m_hStencil = HY_UNUSED_HANDLE;
 
 	if(bUseParentStencil == false)
 		m_uiExplicitFlags |= EXPLICIT_Stencil;
@@ -92,10 +120,22 @@ void IHyLeafDraw2d::ClearStencil(bool bUseParentStencil)
 		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
 		if(m_pParent)
 		{
-			m_pStencil = m_pParent->GetStencil();
-			m_RenderState.SetStencilId(m_pStencil ? m_pStencil->GetId() : 0);
+			HyStencil *pStencil = m_pParent->GetStencil();
+			m_hStencil = pStencil ? pStencil->GetHandle() : HY_UNUSED_HANDLE;
 		}
 	}
+}
+
+void IHyLeafDraw2d::UseCameraCoordinates()
+{
+	m_iCoordinateSystem = -1;
+	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+}
+
+void IHyLeafDraw2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
+{
+	m_iCoordinateSystem = iWindowIndex;
+	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
 }
 
 void IHyLeafDraw2d::SetDisplayOrder(int32 iOrderValue)
@@ -114,6 +154,16 @@ const std::string &IHyLeafDraw2d::GetName()
 const std::string &IHyLeafDraw2d::GetPrefix()
 {
 	return m_sPREFIX;
+}
+
+HyRenderMode IHyLeafDraw2d::GetRenderMode() const
+{
+	return m_eRenderMode;
+}
+
+HyTextureHandle IHyLeafDraw2d::GetTextureHandle() const
+{
+	return m_hTextureHandle;
 }
 
 IHyNodeData *IHyLeafDraw2d::AcquireData()
@@ -166,35 +216,14 @@ HyShape2d *IHyLeafDraw2d::GetUserBoundingVolume(uint32 uiIndex)
 	//return m_BoundingVolumeList[uiIndex].Get;
 }
 
-int32 IHyLeafDraw2d::GetCoordinateSystem()
-{
-	return m_RenderState.GetAssignedWindow();
-}
-
-void IHyLeafDraw2d::UseCameraCoordinates()
-{
-	m_RenderState.SetCoordinateSystem(-1);
-}
-
-void IHyLeafDraw2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
-{
-	m_RenderState.SetCoordinateSystem(iWindowIndex);
-}
-
-int32 IHyLeafDraw2d::GetShaderId()
-{
-	return m_RenderState.GetShaderId();
-}
-
 void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 {
-	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyDraw2d::SetCustomShader was used on an already loaded instance - I can make this work I just haven't yet");
-	HyAssert(pShader->IsFinalized(), "IHyDraw2d::SetCustomShader tried to set a non-finalized shader");
-	HyAssert(pShader->GetId() >= HYSHADERPROG_CustomStartIndex, "HyGfxData::SetRequiredCustomShaderId was passed an invalid custom shader Id");
+	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyLeafDraw2d::SetCustomShader was used on an already loaded instance - I can make this work I just haven't yet");
+	HyAssert(pShader->IsFinalized(), "IHyLeafDraw2d::SetCustomShader tried to set a non-finalized shader");
+	HyAssert(pShader->GetHandle() >= HYSHADERPROG_CustomStartIndex, "IHyLeafDraw2d::SetCustomShader was passed an invalid custom shader Id");
+	HyAssert(m_RequiredCustomShaders.size() < HY_MAX_SHADER_PASSES_PER_INSTANCE, "IHyLeafDraw2d::SetCustomShader has taken too many shaders. Max = " << HY_MAX_SHADER_PASSES_PER_INSTANCE);
 
-	m_RequiredCustomShaders.clear();
-	m_RequiredCustomShaders.insert(pShader->GetId());
-	m_RenderState.SetShaderId(pShader->GetId());
+	m_RequiredCustomShaders.insert(pShader->GetHandle());
 }
 
 /*virtual*/ bool IHyLeafDraw2d::IsLoaded() const /*override*/
@@ -222,30 +251,12 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 
 /*virtual*/ void IHyLeafDraw2d::NodeUpdate() /*override final*/
 {
-	if((m_uiExplicitFlags & EXPLICIT_Scissor) != 0)
-	{
-		if(m_LocalScissorRect.iTag == 1)	// Tag indicates whether it's used
-		{
-			glm::mat4 mtx;
-			GetWorldTransform(mtx);
-
-			m_RenderState.SetScissorRect(static_cast<int32>(mtx[3].x + m_LocalScissorRect.x),
-										 static_cast<int32>(mtx[3].y + m_LocalScissorRect.y),
-										 static_cast<uint32>(mtx[0].x * m_LocalScissorRect.width),
-										 static_cast<uint32>(mtx[1].y * m_LocalScissorRect.height));
-		}
-		else
-		{
-			m_RenderState.ClearScissorRect();
-		}
-	}
-
 	DrawUpdate();
 
 	if(m_eLoadState == HYLOADSTATE_Loaded)
 	{
 		OnUpdateUniforms();
-		m_RenderState.SetUniformCrc32(m_ShaderUniforms.GetCrc32());
+		//m_RenderState.SetUniformCrc32(m_ShaderUniforms.GetCrc32());
 	}
 }
 
@@ -256,23 +267,20 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
 	{
-		if(worldScissorRectRef.iTag == 1) // Tag indicates whether it's used
-			m_RenderState.SetScissorRect(worldScissorRectRef);
-		else
-			m_RenderState.ClearScissorRect();
+		if(m_hScissor == HY_UNUSED_HANDLE)
+			m_hScissor = HY_NEW ScissorRect();
+
+		m_hScissor->m_WorldScissorRect = worldScissorRectRef;
 	}
 }
 
-/*virtual*/ void IHyLeafDraw2d::_SetStencil(HyStencil *pStencil, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyLeafDraw2d::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_Stencil))
-	{
-		m_pStencil = pStencil;
-		m_RenderState.SetStencilId(m_pStencil ? m_pStencil->GetId() : 0);
-	}
+		m_hStencil = hHandle;
 }
 
 /*virtual*/ int32 IHyLeafDraw2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
@@ -305,13 +313,7 @@ IHyNodeData *IHyLeafDraw2d::UncheckedGetData()
 	return m_pData;
 }
 
-const HyRenderState &IHyLeafDraw2d::GetRenderState() const
-{
-	return m_RenderState;
-}
-
 void IHyLeafDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 {
 	m_ShaderUniforms.WriteUniformsBufferData(pRefDataWritePos);
 }
-

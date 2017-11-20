@@ -14,7 +14,6 @@
 #include "Scene/Nodes/IHyNodeDraw2d.h"
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/Loadables/IHyShader.h"
-#include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
 class HyStencil;
@@ -24,7 +23,7 @@ class HyStencil;
 // NOTE: This class should contain a copy of all the functions/members of IHyLeaf2d. Multiple inheritance is not an option
 class IHyLeafDraw2d : public IHyNodeDraw2d
 {
-	friend class HyScene;
+	friend class IHyRenderer;
 	friend class HyAssets;
 	friend class HyShape2d;
 
@@ -32,13 +31,15 @@ protected:
 	static HyAssets *				sm_pHyAssets;
 
 	HyLoadState						m_eLoadState;
-	std::set<int32>					m_RequiredCustomShaders;
+	std::set<HyShaderHandle>		m_RequiredCustomShaders;
 
 	IHyNodeData *					m_pData;
 	const std::string				m_sNAME;
 	const std::string				m_sPREFIX;
 
-	HyRenderState					m_RenderState;
+	//HyRenderState					m_RenderState;
+	HyRenderMode					m_eRenderMode;
+	HyTextureHandle					m_hTextureHandle;
 	HyShaderUniforms 				m_ShaderUniforms;
 
 	HyShape2d						m_BoundingVolume;
@@ -47,6 +48,8 @@ protected:
 public:
 	IHyLeafDraw2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	virtual ~IHyLeafDraw2d();
+
+	virtual const IHyLeafDraw2d &operator=(const IHyLeafDraw2d &rhs);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// NOTE: Below mutators manipulate data from derived classes "IHyNodeDraw2d" and "IHyNode". Handled in regard to being a "leaf"
@@ -59,11 +62,17 @@ public:
 	void SetStencil(HyStencil *pStencil);
 	void ClearStencil(bool bUseParentStencil);
 
+	void UseCameraCoordinates();
+	void UseWindowCoordinates(int32 iWindowIndex = 0);
+
 	void SetDisplayOrder(int32 iOrderValue);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	const std::string &GetName();
 	const std::string &GetPrefix();
+
+	HyRenderMode GetRenderMode() const;
+	HyTextureHandle GetTextureHandle() const;
 
 	IHyNodeData *AcquireData();
 
@@ -71,11 +80,6 @@ public:
 	const b2AABB &GetWorldAABB();
 	HyShape2d *GetUserBoundingVolume(uint32 uiIndex);
 
-	int32 GetCoordinateSystem();	// Returns -1 if using camera coordinates
-	void UseCameraCoordinates();
-	void UseWindowCoordinates(int32 iWindowIndex = 0);
-
-	int32 GetShaderId();
 	void SetCustomShader(IHyShader *pShader);
 
 	virtual bool IsLoaded() const override;
@@ -91,12 +95,11 @@ protected:
 	virtual void NodeUpdate() override final;
 
 	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
-	virtual void _SetStencil(HyStencil *pStencil, bool bIsOverriding) override;
+	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
 	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override;
 
 	IHyNodeData *UncheckedGetData();
-	const HyRenderState &GetRenderState() const;
 
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 

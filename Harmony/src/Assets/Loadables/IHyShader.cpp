@@ -11,18 +11,18 @@
 #include "Utilities/HyStrManip.h"
 #include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
 
-IHyShader::IHyShader(int32 iId) :	IHyLoadableData(HYGFXTYPE_CustomShader),
-									m_iID(iId),
-									m_sOPTIONAL_LOAD_PATH(""),
-									m_bIsFinalized(false)
+IHyShader::IHyShader(HyShaderHandle eHandle) :	IHyLoadableData(HYGFXTYPE_CustomShader),
+												m_hHANDLE(eHandle),
+												m_sOPTIONAL_LOAD_PATH(""),
+												m_bIsFinalized(false)
 {
 	for(int i = 0; i < HYNUMSHADERTYPES; ++i)
 		m_sSourceCode[i].clear();
 }
 
-IHyShader::IHyShader(int32 iId, std::string sPrefix, std::string sName) :	IHyLoadableData(HYGFXTYPE_CustomShader),
-																			m_iID(iId),
-																			m_sOPTIONAL_LOAD_PATH(MakeStringProperPath(std::string(sPrefix + "/" + sName).c_str(), ".hyglsl", false))
+IHyShader::IHyShader(HyShaderHandle eHandle, std::string sPrefix, std::string sName) :	IHyLoadableData(HYGFXTYPE_CustomShader),
+																						m_hHANDLE(eHandle),
+																						m_sOPTIONAL_LOAD_PATH(MakeStringProperPath(std::string(sPrefix + "/" + sName).c_str(), ".hyglsl", false))
 {
 	for(int i = 0; i < HYNUMSHADERTYPES; ++i)
 		m_sSourceCode[i].clear();
@@ -32,9 +32,9 @@ IHyShader::~IHyShader()
 {
 }
 
-int32 IHyShader::GetId()
+HyShaderHandle IHyShader::GetHandle()
 {
-	return m_iID;
+	return m_hHANDLE;
 }
 
 bool IHyShader::IsFinalized()

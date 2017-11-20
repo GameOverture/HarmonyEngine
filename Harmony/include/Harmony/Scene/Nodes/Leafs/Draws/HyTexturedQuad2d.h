@@ -27,10 +27,8 @@ protected:
 
 public:
 	HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyEntity2d *pParent);
-	HyTexturedQuad2d(uint32 uiGfxApiHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent);
+	HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent);
 	virtual ~HyTexturedQuad2d();
-
-	uint32 GetGraphicsApiHandle() const;
 
 	void SetTextureSource(int iX, int iY, int iWidth, int iHeight);
 
