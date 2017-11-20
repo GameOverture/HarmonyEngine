@@ -51,12 +51,13 @@ IHyRenderer::~IHyRenderer(void)
 
 void IHyRenderer::PrepareBuffers()
 {
+	// Init everything to beginning of buffers
 	m_pCurRenderStateWritePos = m_pBUFFER_RENDERSTATES;
 	m_pCurVertexWritePos = m_pBUFFER_VERTEX;
-
 	m_pRenderStatesUserStartPos = nullptr;
 	m_uiVertexBufferUsedBytes = 0;
 
+	// Write internal render states first, used by things like HyStencil
 	for(auto iter = sm_StencilMap.begin(); iter != sm_StencilMap.end(); ++iter)
 	{
 		HyStencil *pStencil = iter->second;
@@ -65,10 +66,12 @@ void IHyRenderer::PrepareBuffers()
 		const std::vector<IHyLeafDraw2d *> &instanceListRef = pStencil->GetInstanceList();
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
 		{
+			instanceListRef[i]->OnUpdateUniforms();
 			AppendRenderState(*instanceListRef[i], HY_FULL_CULL_MASK);
 		}
 	}
 
+	// Set pointers to be ready for HyScene to call AppendRenderState()
 	m_pRenderStatesUserStartPos = m_pCurRenderStateWritePos;
 	IHyRenderer::RenderStateBufferHeader *pHeader = reinterpret_cast<IHyRenderer::RenderStateBufferHeader *>(m_pRenderStatesUserStartPos);
 	memset(pHeader, 0, sizeof(IHyRenderer::RenderStateBufferHeader));

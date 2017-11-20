@@ -15,9 +15,9 @@
 #include <queue>
 
 class HyRenderState;
+class HyStencil;
 class IHyLeafDraw2d;
 class IHyShader;
-class HyStencil;
 class HyWindow;
 class HyGfxComms;
 class HyDiagnostics;

@@ -10,6 +10,7 @@
 #include "Renderer/OpenGL/HyOpenGL.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyRenderState.h"
+#include "Renderer/Components/HyStencil.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Scene/Nodes/Leafs/Misc/HyCamera.h"
 
@@ -234,16 +235,26 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 			// Disable rendering color while we determine the stencil buffer
 			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
-			glStencilFunc(GL_ALWAYS, 1, 0xFF); // never pass stencil test
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);
 			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  // replace stencil buffer values to ref=1
 			glStencilMask(0xFF); // stencil buffer free to write
 			glClear(GL_STENCIL_BUFFER_BIT);  // first clear stencil buffer by writing default stencil value (0) to all of stencil buffer.
 
-											 //pStencil
-											 //	draw_stencil_shape(); // at stencil shape pixel locations in stencil buffer replace stencil buffer values to ref = 1
+			// at stencil shape pixel locations in stencil buffer replace stencil buffer values to ref = 1
+			uint32 uiNumStencilInstance = static_cast<uint32>(pStencil->GetInstanceList().size());
+			char *pStencilRenderStateBufferPos = reinterpret_cast<char *>(pStencil->GetRenderStatePtr());
+			for(uint32 i = 0; i < uiNumStencilInstance; ++i)
+			{
+				HyRenderState *pCurRenderState = reinterpret_cast<HyRenderState *>(pStencilRenderStateBufferPos);
+				if(pCurRenderState->GetCoordinateSystem() < 0 || pCurRenderState->GetCoordinateSystem() == m_pCurWindow->GetIndex())
+					RenderPass2d(pCurRenderState, 0, pRenderState->GetCoordinateSystem() < 0 ? cameraIter.Get() : nullptr);
 
-											 // Re-enable the color buffer
-			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+				pStencilRenderStateBufferPos += pCurRenderState->GetExSize() + sizeof(HyRenderState);
+			}
+
+			glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
+			glStencilMask(0x00); // Don't write anything to stencil buffer
+			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);	// Re-enable the color buffer
 		}
 		else
 		{

@@ -10,6 +10,7 @@
 #include "Renderer/Components/HyStencil.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyRenderState.h"
+#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 
 HyStencilHandle HyStencil::sm_hHandleCount = 0;
 
@@ -65,6 +66,11 @@ void HyStencil::SetAsInvertedCullMask()
 const std::vector<IHyLeafDraw2d *> &HyStencil::GetInstanceList()
 {
 	return m_InstanceList;
+}
+
+HyRenderState *HyStencil::GetRenderStatePtr()
+{
+	return m_pRenderStatePtr;
 }
 
 void HyStencil::SetRenderStatePtr(HyRenderState *pPtr)

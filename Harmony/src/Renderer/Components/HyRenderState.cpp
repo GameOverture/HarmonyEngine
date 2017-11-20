@@ -12,6 +12,7 @@
 #include "Renderer/Components/HyStencil.h"
 #include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
 #include "Scene/Nodes/Leafs/Draws/HyText2d.h"
+#include "Scene/Nodes/Leafs/Draws/HyPrimitive2d.h"
 
 HyRenderState::HyRenderState(/*const*/ IHyLeafDraw2d &instanceRef, uint32 uiCullPassMask, size_t uiDataOffset) :	m_uiCULL_PASS_MASK(uiCullPassMask),
 																													m_uiDATA_OFFSET(uiDataOffset),

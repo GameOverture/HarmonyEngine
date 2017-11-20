@@ -18,6 +18,7 @@
 #include "Input/HyInput.h"
 #include "Time/HyTime.h"
 #include "Renderer/Components/HyWindow.h"
+#include "Renderer/Components/HyStencil.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Leafs/Misc/HyAudio2d.h"
 #include "Scene/Nodes/Leafs/Draws/HySprite2d.h"
