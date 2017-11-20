@@ -97,20 +97,6 @@ public:
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
 
-	// 2D buffer accessors
-	//uint32 GetNumCameras2d();
-	//uint32 GetCameraWindowId2d(int iCameraIndex);
-	//HyRectangle<float> *GetCameraViewportRect2d(int iIndex);
-	//glm::mat4 *GetCameraView2d(int iIndex);
-
-	//uint32 GetNumRenderStates2d();
-	//HyRenderState *GetRenderStatesPtr2d();
-	//char *GetVertexData2d();
-
-	//// 3D buffer accessors
-	//uint32 GetNumCameras3d();
-	//uint32 GetNumInsts3d();
-
 	static IHyShader *FindShader(HyShaderHandle hHandle);
 	static IHyShader *MakeCustomShader();
 	static IHyShader *MakeCustomShader(const char *szPrefix, const char *szName);

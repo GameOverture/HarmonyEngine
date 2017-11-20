@@ -211,56 +211,6 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	glDepthMask(GL_FALSE);
 }
 
-///*virtual*/ void HyOpenGL::CameraPass_2d(HyCamera2d *pCamera)
-//{
-//	glm::ivec2 vFramebufferSize = m_pCurWindow->GetFramebufferSize();
-//
-//	HyRectangle<float> viewportRect;
-//	if(renderState.IsUsingCameraCoordinates())
-//	{
-//		viewportRect = *GetCameraViewportRect2d(m_iCurCamIndex);
-//		m_mtxCamera = pCamera->GetVi *GetCameraView2d(m_iCurCamIndex);
-//	}
-//	else // Using window coordinates (origin is bottom left corner)
-//	{
-//		viewportRect.left = 0.0f;
-//		viewportRect.bottom = 0.0f;
-//		viewportRect.right = 1.0f;
-//		viewportRect.top = 1.0f;
-//
-//		m_mtxWindow = glm::mat4(1.0f);
-//		m_mtxWindow = glm::translate(m_mtxWindow, vFramebufferSize.x * -0.5f, vFramebufferSize.y * -0.5f, 0.0f);
-//	}
-//
-//	float fWidth = (viewportRect.Width() * vFramebufferSize.x);
-//	float fHeight = (viewportRect.Height() * vFramebufferSize.y);
-//
-//	glViewport(static_cast<GLint>(viewportRect.left * vFramebufferSize.x),
-//		static_cast<GLint>(viewportRect.bottom * vFramebufferSize.y),
-//		static_cast<GLsizei>(fWidth),
-//		static_cast<GLsizei>(fHeight));
-//
-//	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glViewport");
-//
-//
-//
-//	//int32 iNumCameras2d = GetNumCameras2d();
-//	//int32 iNumRenderStates2d = GetNumRenderStates2d();
-//
-//	//// Only draw cameras that are apart of this HyWindow
-//	//while(m_pCurWindow->GetIndex() != GetCameraWindowId2d(m_iCurCamIndex) && m_iCurCamIndex < iNumCameras2d)
-//	//	m_iCurCamIndex++;
-//
-//	//if(iNumRenderStates2d == 0 || m_iCurCamIndex >= iNumCameras2d)
-//	//	return false;
-//	//
-//	//// TODO: Without disabling glDepthMask, sprites fragments that overlap will be discarded, and primitive draws don't work
-//	//glDepthMask(GL_FALSE);
-//	//HyErrorCheck_OpenGL("HyOpenGL:CameraPass_2d", "glDepthMask");
-//
-//	//return true;
-//}
-
 /*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderState *pRenderState)
 {
 	HyWindow::CameraIterator2d cameraIter(m_pCurWindow->GetCamera2dList());
@@ -309,13 +259,6 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 		++cameraIter;
 	} while(pRenderState->GetCoordinateSystem() < 0 && cameraIter.IsEnd() == false);
 }
-
-///*virtual*/ void HyOpenGL::End_2d()
-//{
-//	glBindTexture(GL_TEXTURE_2D, 0);
-//	glBindVertexArray(0);
-//	glUseProgram(0);
-//}
 
 /*virtual*/ void HyOpenGL::FinishRender()
 {
