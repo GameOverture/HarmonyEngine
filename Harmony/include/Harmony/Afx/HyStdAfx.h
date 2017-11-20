@@ -30,9 +30,6 @@
 #include "GL/glew.h"
 #endif
 
-#define HY_UNUSED_HANDLE 0
-typedef uint32 HyStencilHandle;
-
 enum HyType
 {
 	HYTYPE_Unknown = 0,

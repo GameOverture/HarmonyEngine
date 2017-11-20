@@ -58,6 +58,9 @@ public:
 	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) override;
 	virtual void DeleteTexture(uint32 uiTextureHandle) override;
+
+protected:
+	void SetCameraMatrices_2d(bool bUseCameraView);
 };
 
 #endif /* HyOpenGL_h__ */

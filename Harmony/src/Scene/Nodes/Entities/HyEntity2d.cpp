@@ -9,7 +9,6 @@
  *************************************************************************/
 #include "Scene/Nodes/Entities/HyEntity2d.h"
 #include "Scene/HyScene.h"
-#include "Renderer/Components/HyStencil.h"
 #include "HyEngine.h"
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyNodeDraw2d(HYTYPE_Entity2d, pParent),
@@ -97,15 +96,12 @@ void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChil
 
 void HyEntity2d::SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren /*= true*/)
 {
-	if(pStencil == nullptr)
-		m_hStencil = HY_UNUSED_HANDLE;
-	else
-		m_hStencil = pStencil->GetHandle();
+	m_pStencil = pStencil;
 
 	m_uiExplicitFlags |= EXPLICIT_Stencil;
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->_SetStencil(m_hStencil, bOverrideExplicitChildren);
+		m_ChildList[i]->_SetStencil(m_pStencil, bOverrideExplicitChildren);
 }
 
 void HyEntity2d::ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren /*= true*/)
@@ -428,17 +424,17 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 	}
 }
 
-/*virtual*/ void HyEntity2d::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override*/
+/*virtual*/ void HyEntity2d::_SetStencil(HyStencil *pStencil, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_Stencil))
 	{
-		m_hStencil = hHandle;
+		m_pStencil = pStencil;
 
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_SetStencil(m_hStencil, bIsOverriding);
+			m_ChildList[i]->_SetStencil(m_pStencil, bIsOverriding);
 	}
 }
 

@@ -41,6 +41,7 @@ class IHyRenderer
 //	};
 
 protected:
+<<<<<<< HEAD
 	HyDiagnostics &									m_DiagnosticsRef;
 	std::vector<HyWindow *> &						m_WindowListRef;
 
@@ -49,18 +50,26 @@ protected:
 
 	HyWindow *										m_pCurWindow;
 	HyRenderState *									m_pCurRenderState;
+=======
+	HyDiagnostics &							m_DiagnosticsRef;
+	std::vector<HyWindow *> &				m_WindowListRef;
+	HyWindow *								m_pCurWindow;
 
-	std::queue<IHyLoadableData *>					m_TxDataQueue;
-	std::queue<IHyLoadableData *>					m_RxDataQueue;
+	char *									m_pDrawBuffer;
+	HyRenderState *							m_pCurRenderState;
+>>>>>>> parent of 4faa629c... Commiting working state of engine to fallback on - Branching to a new render buffer refactor
 
-	static int32									sm_iShaderIdCount;
-	static std::map<int32, IHyShader *>				sm_ShaderMap;
+	std::queue<IHyLoadableData *>			m_TxDataQueue;
+	std::queue<IHyLoadableData *>			m_RxDataQueue;
 
-	static std::map<HyStencilHandle, HyStencil *>	sm_StencilMap;
+	static int32							sm_iShaderIdCount;
+	static std::map<int32, IHyShader *>		sm_ShaderMap;
+
+	static std::map<uint32, HyStencil *>	sm_StencilMap;
 
 	// Diagnostics/Metrics
-	uint32											m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
-	uint32											m_uiNumRenderStates;
+	uint32									m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
+	uint32									m_uiNumRenderStates;
 
 public:
 	IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
@@ -114,7 +123,7 @@ public:
 	static IHyShader *MakeCustomShader();
 	static IHyShader *MakeCustomShader(const char *szPrefix, const char *szName);
 
-	static HyStencil *FindStencil(HyStencilHandle hHandle);
+	static HyStencil *FindStencil(uint32 uiId);
 	static void AddStencil(HyStencil *pNewStencil);
 	static void RemoveStencil(HyStencil *pNewStencil);
 

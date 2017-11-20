@@ -38,7 +38,8 @@ public:
 	enum Attributes
 	{
 		SCISSORTEST				= 1 << 0,
-		DRAWINSTANCED			= 1 << 1,	// If enabled, will attempt to batch render multiple instances if they have matching HyRenderStates
+		STENCILTEST				= 1 << 1,
+		DRAWINSTANCED			= 1 << 2,	// If enabled, will attempt to batch render multiple instances if they have matching HyRenderStates
 	};
 
 private:
@@ -54,7 +55,7 @@ private:
 	size_t				m_uiDataOffset;
 
 	HyScreenRect<int32>	m_ScissorRect;
-	HyStencilHandle		m_hStencil;
+	int32				m_iStencilId;
 
 	int32				m_iWindowIndex;	// -1 (or any negative value) means using world/camera coordinates
 
@@ -81,8 +82,10 @@ public:
 	void SetScissorRect(int32 uiX, int32 uiY, uint32 uiWidth, uint32 uiHeight);
 	void ClearScissorRect();
 
-	HyStencilHandle GetStencilHandle();
-	void SetStencilHandle(HyStencilHandle hHandle);
+	bool IsStencilTest();
+	int32 GetStencilId();
+	void SetStencilId(int32 iId);
+	void ClearStencilTest();
 
 	bool IsUsingCameraCoordinates();
 	void SetCoordinateSystem(int32 iWindowIndex);	// -1 Means use world space, otherwise specify a window index to be the local coordinates

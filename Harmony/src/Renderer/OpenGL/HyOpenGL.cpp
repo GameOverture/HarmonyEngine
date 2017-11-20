@@ -104,12 +104,12 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	delete[] pFormatArray;
 
 	SetRendererInfo("OpenGL",
-					reinterpret_cast<const char *>(glGetString(GL_VERSION)),
-					reinterpret_cast<const char *>(glGetString(GL_VENDOR)),
-					reinterpret_cast<const char *>(glGetString(GL_RENDERER)),
-					reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION)),
-					iMaxTextureSize,
-					sCompressedTextureFormats);
+		reinterpret_cast<const char *>(glGetString(GL_VERSION)),
+		reinterpret_cast<const char *>(glGetString(GL_VENDOR)),
+		reinterpret_cast<const char *>(glGetString(GL_RENDERER)),
+		reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION)),
+		iMaxTextureSize,
+		sCompressedTextureFormats);
 
 	glEnable(GL_DEPTH_TEST);
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
@@ -270,32 +270,6 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 
 /*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderState &renderState)
 {
-	if(renderState.GetStencilHandle() != HY_UNUSED_HANDLE)
-	{
-		HyStencil *pStencil = FindStencil(renderState.GetStencilHandle());
-		glEnable(GL_STENCIL_TEST);
-
-		// Disable rendering color while we determine the stencil buffer
-		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
-		glStencilFunc(GL_ALWAYS, 1, 0xFF); // never pass stencil test
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  // replace stencil buffer values to ref=1
-		glStencilMask(0xFF); // stencil buffer free to write
-		glClear(GL_STENCIL_BUFFER_BIT);  // first clear stencil buffer by writing default stencil value (0) to all of stencil buffer.
-
-		//pStencil
-		//	draw_stencil_shape(); // at stencil shape pixel locations in stencil buffer replace stencil buffer values to ref = 1
-
-		// Re-enable the color buffer
-		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-	}
-	else
-	{
-		glDisable(GL_STENCIL_TEST);
-		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDisable");
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	switch(renderState.GetRenderMode())
 	{
 	case HYRENDERMODE_Triangles:		m_eDrawMode = GL_TRIANGLES;			break;
@@ -310,11 +284,20 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+<<<<<<< HEAD
+=======
+
+	SetCameraMatrices_2d(renderState.IsUsingCameraCoordinates());
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+>>>>>>> parent of 4faa629c... Commiting working state of engine to fallback on - Branching to a new render buffer refactor
 	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_ShaderMap[renderState.GetShaderId()]);
 	BindVao(pShader);
 	pShader->Use();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	glActiveTexture(GL_TEXTURE0);
 	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glActiveTexture");
 
@@ -333,14 +316,22 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	if(renderState.IsScissorRect())
 	{
 		const HyScreenRect<int32> &scissorRectRef = renderState.GetScissorRect();
 
+<<<<<<< HEAD
 		glScissor(static_cast<GLint>(m_mtxCamera[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxCamera[3].x) + (m_pCurWindow->GetFramebufferSize().x / 2),
 				  static_cast<GLint>(m_mtxCamera[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxCamera[3].y) + (m_pCurWindow->GetFramebufferSize().y / 2),
 				  static_cast<GLsizei>(m_mtxCamera[0].x * scissorRectRef.width),
 				  static_cast<GLsizei>(m_mtxCamera[1].y * scissorRectRef.height));
+=======
+		glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_pCurWindow->GetFramebufferSize().x / 2),
+			static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_pCurWindow->GetFramebufferSize().y / 2),
+				  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
+				  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
+>>>>>>> parent of 4faa629c... Commiting working state of engine to fallback on - Branching to a new render buffer refactor
 
 		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glScissor");
 
@@ -354,9 +345,11 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	// Always attempt to assign these uniforms if the shader chooses to use them
 	pShader->SetUniformGLSL("u_mtxWorldToCamera", m_mtxCamera);
 	pShader->SetUniformGLSL("u_mtxCameraToClip", m_mtxProj);
+	//pShader->SetUniformGLSL("Tex", 0);//renderState.GetTextureHandle());
 
 	char *pDrawBuffer = GetVertexData2d();
 	uint32 uiDataOffset = static_cast<uint32>(renderState.GetDataOffset());
@@ -482,11 +475,8 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Points to the vertex data locations in bound buffer
 	pShader->SetVertexAttributePtrs(uiDataOffset);
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Everything is prepared, do the drawing
 	if(renderState.IsEnabled(HyRenderState::DRAWINSTANCED))
 	{
 		glDrawArraysInstanced(m_eDrawMode, 0, renderState.GetNumVerticesPerInstance(), renderState.GetNumInstances());
@@ -504,8 +494,6 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 		}
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Reset OpenGL states
 	glBindVertexArray(0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -669,4 +657,38 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 {
 	glDeleteTextures(1, &uiTextureHandle);
 	HyErrorCheck_OpenGL("HyOpenGL:DeleteTexture", "glDeleteTextures");
+}
+
+void HyOpenGL::SetCameraMatrices_2d(bool bUseCameraView)
+{
+	glm::ivec2 vFramebufferSize = m_pCurWindow->GetFramebufferSize();
+
+	HyRectangle<float> viewportRect;
+	if(bUseCameraView)
+	{
+		viewportRect = *GetCameraViewportRect2d(m_iCurCamIndex);
+		m_mtxView = *GetCameraView2d(m_iCurCamIndex);
+	}
+	else // Using window coordinates
+	{
+		viewportRect.left = 0.0f;
+		viewportRect.bottom = 0.0f;
+		viewportRect.right = 1.0f;
+		viewportRect.top = 1.0f;
+
+		m_mtxView = glm::mat4(1.0f);
+		m_mtxView = glm::translate(m_mtxView, vFramebufferSize.x * -0.5f, vFramebufferSize.y * -0.5f, 0.0f);
+	}
+
+	float fWidth = (viewportRect.Width() * vFramebufferSize.x);
+	float fHeight = (viewportRect.Height() * vFramebufferSize.y);
+
+	glViewport(static_cast<GLint>(viewportRect.left * vFramebufferSize.x),
+			   static_cast<GLint>(viewportRect.bottom * vFramebufferSize.y),
+			   static_cast<GLsizei>(fWidth),
+			   static_cast<GLsizei>(fHeight));
+
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetCameraMatrices_2d", "glViewport");
+
+	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f, 0.0f, 1.0f);
 }
