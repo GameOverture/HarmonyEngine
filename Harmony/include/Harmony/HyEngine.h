@@ -20,7 +20,7 @@
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyStencil.h"
 #include "Scene/HyScene.h"
-#include "Scene/Nodes/Instances/HyAudio2d.h"
+#include "Scene/Nodes/Misc/HyAudio2d.h"
 #include "Scene/Nodes/Draws/Instances/HySprite2d.h"
 #include "Scene/Nodes/Draws/Instances/HySpine2d.h"
 #include "Scene/Nodes/Draws/Instances/HyPrimitive2d.h"

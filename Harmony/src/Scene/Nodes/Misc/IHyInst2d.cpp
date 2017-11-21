@@ -7,7 +7,7 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Nodes/Instances/IHyInst2d.h"
+#include "Scene/Nodes/Misc/IHyInst2d.h"
 #include "Scene/HyScene.h"
 
 IHyInst2d::IHyInst2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent)

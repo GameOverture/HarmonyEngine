@@ -7,5 +7,5 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Instances/HyAudio2d.h"
+#include "Scene/Nodes/Misc/HyAudio2d.h"
 

@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Instances/HyCamera.h"
+#include "Scene/Nodes/Misc/HyCamera.h"
 #include "Renderer/Components/HyWindow.h"
 
 IHyCamera::IHyCamera(HyWindow *pWindow) :	m_pWindowPtr(pWindow),
