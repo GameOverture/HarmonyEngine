@@ -230,11 +230,12 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 		if(pRenderState->GetStencilHandle() != HY_UNUSED_HANDLE)
 		{
 			glEnable(GL_STENCIL_TEST);
+			glStencilMask(0xFF);									// This mask allows any 8bit value to be written to the stencil buffer (and allows clears to work)
 
-			glClear(GL_STENCIL_BUFFER_BIT);							// First clear stencil buffer by writing default stencil value (0) to entire buffer.
+			glDisable(GL_SCISSOR_TEST);								// Ensure scissor test isn't affecting our initial stencil clear
+			glClear(GL_STENCIL_BUFFER_BIT);							// Clear stencil buffer by writing default stencil value '0' to entire buffer.
 			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);	// Disable rendering color while we determine the stencil buffer
 
-			glStencilMask(0xFF);									// This mask allows any 8bit value to be written to the stencil buffer
 			glStencilFunc(GL_ALWAYS, 1, 0xFF);						// All fragments rendered next will "pass" the stencil test, and 'ref' is set to '1'
 			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);				// Fragments that "passed" will write the 'ref' value in the stencil buffer
 

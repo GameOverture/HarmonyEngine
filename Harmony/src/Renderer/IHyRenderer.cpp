@@ -93,6 +93,7 @@ void IHyRenderer::AppendRenderState(/*const*/ IHyDrawInst2d &instanceRef, HyCull
 	HyAssert(reinterpret_cast<size_t>(m_pCurRenderStateWritePos) - reinterpret_cast<size_t>(m_pBUFFER_RENDERSTATES) < HY_RENDERSTATE_BUFFER_SIZE, "IHyRenderer::AppendRenderState() has written passed its render state bounds! Embiggen 'HY_RENDERSTATE_BUFFER_SIZE'");
 
 	// OnWriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
+	instanceRef.AcquireData();
 	instanceRef.OnWriteDrawBufferData(m_pCurVertexWritePos);
 	m_uiVertexBufferUsedBytes = reinterpret_cast<size_t>(m_pCurVertexWritePos) - reinterpret_cast<size_t>(m_pBUFFER_VERTEX);
 	HyAssert(m_uiVertexBufferUsedBytes < HY_VERTEX_BUFFER_SIZE, "IHyRenderer::AppendRenderState() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");

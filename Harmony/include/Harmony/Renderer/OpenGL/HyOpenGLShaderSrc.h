@@ -85,6 +85,10 @@ void main()
 	vec4 texelClr = texture(Tex, interpUV);
 
 	outputColor = interpColor * texelClr;
+
+	// Discard fully transparent pixels so any potential stencil test isn't affected
+	if(outputColor.a == 0.0)
+		discard;
 }
 )src";
 

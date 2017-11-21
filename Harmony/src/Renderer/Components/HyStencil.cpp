@@ -34,6 +34,9 @@ HyStencilHandle HyStencil::GetHandle()
 
 void HyStencil::AddInstance(IHyDrawInst2d *pInstance)
 {
+	// TODO: Make this safer by copying instance... user might go ahead and Unload() or delete the instance in here otherwise
+	pInstance->Load();
+
 	m_InstanceList.push_back(pInstance);
 	m_bInstanceListDirty = true;
 }
