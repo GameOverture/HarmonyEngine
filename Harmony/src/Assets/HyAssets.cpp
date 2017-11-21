@@ -10,7 +10,7 @@
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
-#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Nodes/HySpine2dData.h"
 #include "Assets/Nodes/HySprite2dData.h"
@@ -70,14 +70,14 @@ HyAssets::HyAssets(std::string sDataDirPath, HyScene &sceneRef) :	m_sDATADIR(Mak
 																	m_pLoadedAtlasIndices(nullptr),
 																	m_LoadingCtrl(m_Load_Shared, m_Load_Retrieval)
 {
-	IHyLeafDraw2d::sm_pHyAssets = this;
+	IHyDrawInst2d::sm_pHyAssets = this;
 
 	m_InitFuture = std::async(std::launch::async, &HyAssetInit, this);
 }
 
 HyAssets::~HyAssets()
 {
-	IHyLeafDraw2d::sm_pHyAssets = nullptr;
+	IHyDrawInst2d::sm_pHyAssets = nullptr;
 
 	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
 
@@ -236,7 +236,7 @@ HyAtlasIndices *HyAssets::GetLoadedAtlases()
 	return m_pLoadedAtlasIndices;
 }
 
-void HyAssets::GetNodeData(IHyLeafDraw2d *pDrawNode2d, IHyNodeData *&pDataOut)
+void HyAssets::GetNodeData(IHyDrawInst2d *pDrawNode2d, IHyNodeData *&pDataOut)
 {
 	switch(pDrawNode2d->GetType())
 	{
@@ -264,7 +264,7 @@ void HyAssets::GetNodeData(IHyLeafDraw2d *pDrawNode2d, IHyNodeData *&pDataOut)
 	}
 }
 
-void HyAssets::LoadNodeData(IHyLeafDraw2d *pDrawNode2d)
+void HyAssets::LoadNodeData(IHyDrawInst2d *pDrawNode2d)
 {
 	if(pDrawNode2d->m_eLoadState != HYLOADSTATE_Inactive || pDrawNode2d->IsLoadDataValid() == false)
 		return;
@@ -311,7 +311,7 @@ void HyAssets::LoadNodeData(IHyLeafDraw2d *pDrawNode2d)
 	}
 }
 
-void HyAssets::RemoveNodeData(IHyLeafDraw2d *pDrawNode2d)
+void HyAssets::RemoveNodeData(IHyDrawInst2d *pDrawNode2d)
 {
 	if(pDrawNode2d->m_eLoadState == HYLOADSTATE_Inactive)
 		return;
@@ -352,7 +352,7 @@ void HyAssets::RemoveNodeData(IHyLeafDraw2d *pDrawNode2d)
 	pDrawNode2d->m_eLoadState = HYLOADSTATE_Inactive;
 }
 
-bool HyAssets::IsNodeLoaded(IHyLeafDraw2d *pDrawNode2d)
+bool HyAssets::IsNodeLoaded(IHyDrawInst2d *pDrawNode2d)
 {
 	// Atlases check
 	if(pDrawNode2d->AcquireData() != nullptr)
@@ -376,7 +376,7 @@ bool HyAssets::IsNodeLoaded(IHyLeafDraw2d *pDrawNode2d)
 // Unload everything
 void HyAssets::Shutdown()
 {
-	std::vector<IHyLeafDraw2d *> vReloadInsts;
+	std::vector<IHyDrawInst2d *> vReloadInsts;
 	m_SceneRef.CopyAllLoadedNodes(vReloadInsts);
 
 	for(uint32 i = 0; i < m_QueuedInst2dList.size(); ++i)
@@ -570,7 +570,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 	}
 }
 
-void HyAssets::SetNodeAsLoaded(IHyLeafDraw2d *pDrawNode2d)
+void HyAssets::SetNodeAsLoaded(IHyDrawInst2d *pDrawNode2d)
 {
 	m_SceneRef.AddNode_Loaded(pDrawNode2d);
 	pDrawNode2d->m_eLoadState = HYLOADSTATE_Loaded;

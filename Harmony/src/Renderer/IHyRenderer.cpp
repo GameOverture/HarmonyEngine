@@ -12,7 +12,7 @@
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyStencil.h"
-#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Assets/Loadables/IHyLoadableData.h"
 #include "HyEngine.h"
 
@@ -63,7 +63,7 @@ void IHyRenderer::PrepareBuffers()
 		HyStencil *pStencil = iter->second;
 		pStencil->SetRenderStatePtr(reinterpret_cast<HyRenderState *>(m_pCurRenderStateWritePos));
 
-		const std::vector<IHyLeafDraw2d *> &instanceListRef = pStencil->GetInstanceList();
+		const std::vector<IHyDrawInst2d *> &instanceListRef = pStencil->GetInstanceList();
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
 		{
 			instanceListRef[i]->OnUpdateUniforms();
@@ -79,7 +79,7 @@ void IHyRenderer::PrepareBuffers()
 	m_pCurRenderStateWritePos += sizeof(IHyRenderer::RenderStateBufferHeader);
 }
 
-void IHyRenderer::AppendRenderState(/*const*/ IHyLeafDraw2d &instanceRef, HyCullMask uiCullMask)
+void IHyRenderer::AppendRenderState(/*const*/ IHyDrawInst2d &instanceRef, HyCullMask uiCullMask)
 {
 	HyRenderState *pRenderState = new (m_pCurRenderStateWritePos)HyRenderState(instanceRef,
 																			   uiCullMask,

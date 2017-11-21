@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyLeafDraw2d.h
+*	IHyDrawInst2d.h
 *
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
@@ -11,7 +11,7 @@
 #define IHyLeafDraw2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/IHyNodeDraw2d.h"
+#include "Scene/Nodes/Draws/IHyDraw2d.h"
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/Loadables/IHyShader.h"
 #include "Renderer/Components/HyShaderUniforms.h"
@@ -21,7 +21,7 @@ class HyStencil;
 #include <set>
 
 // NOTE: This class should contain a copy of all the functions/members of IHyLeaf2d. Multiple inheritance is not an option
-class IHyLeafDraw2d : public IHyNodeDraw2d
+class IHyDrawInst2d : public IHyDraw2d
 {
 	friend class IHyRenderer;
 	friend class HyAssets;
@@ -37,7 +37,6 @@ protected:
 	const std::string				m_sNAME;
 	const std::string				m_sPREFIX;
 
-	//HyRenderState					m_RenderState;
 	HyRenderMode					m_eRenderMode;
 	HyTextureHandle					m_hTextureHandle;
 	HyShaderUniforms 				m_ShaderUniforms;
@@ -46,13 +45,13 @@ protected:
 	b2AABB							m_aabbCached;
 
 public:
-	IHyLeafDraw2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
-	virtual ~IHyLeafDraw2d();
+	IHyDrawInst2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
+	virtual ~IHyDrawInst2d();
 
-	virtual const IHyLeafDraw2d &operator=(const IHyLeafDraw2d &rhs);
+	virtual const IHyDrawInst2d &operator=(const IHyDrawInst2d &rhs);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// NOTE: Below mutators manipulate data from derived classes "IHyNodeDraw2d" and "IHyNode". Handled in regard to being a "leaf"
+	// NOTE: Below mutators manipulate data from derived classes "IHyDraw2d" and "IHyNode". Handled in regard to being a "leaf"
 	void SetEnabled(bool bEnabled);
 	void SetPauseUpdate(bool bUpdateWhenPaused);
 

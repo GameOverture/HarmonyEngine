@@ -8,10 +8,10 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Physics/HyShape2d.h"
-#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-HyShape2d::HyShape2d(IHyLeafDraw2d &ownerRef) :	m_OwnerRef(ownerRef),
+HyShape2d::HyShape2d(IHyDrawInst2d &ownerRef) :	m_OwnerRef(ownerRef),
 												m_eType(HYSHAPE_Unknown),
 												m_pShape(nullptr)
 {

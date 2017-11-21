@@ -7,11 +7,11 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Nodes/Leafs/Draws/HyTexturedQuad2d.h"
-#include "Scene/Nodes/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Draws/Instances/HyTexturedQuad2d.h"
+#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyEntity2d *pParent) :	IHyLeafDraw2d(HYTYPE_TexturedQuad2d, std::to_string(uiAtlasGrpId).c_str(), std::to_string(uiIndexInGroup).c_str(), pParent),
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_TexturedQuad2d, std::to_string(uiAtlasGrpId).c_str(), std::to_string(uiIndexInGroup).c_str(), pParent),
 																										m_bIS_RAW(false),
 																										m_uiATLAS_GROUP_ID(uiAtlasGrpId),
 																										m_uiATLAS_INDEX_IN_GROUP(uiIndexInGroup),
@@ -27,7 +27,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, H
 	//m_RenderState.SetNumVerticesPerInstance(4);
 }
 
-HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent) :	IHyLeafDraw2d(HYTYPE_TexturedQuad2d, nullptr, "raw", pParent),
+HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_TexturedQuad2d, nullptr, "raw", pParent),
 																																			m_bIS_RAW(true),
 																																			m_uiATLAS_GROUP_ID(0),
 																																			m_uiATLAS_INDEX_IN_GROUP(0),

@@ -16,7 +16,7 @@
 
 class HyRenderState;
 class HyStencil;
-class IHyLeafDraw2d;
+class IHyDrawInst2d;
 class IHyShader;
 class HyWindow;
 class HyGfxComms;
@@ -72,7 +72,7 @@ public:
 	virtual ~IHyRenderer(void);
 
 	void PrepareBuffers();
-	void AppendRenderState(/*const*/ IHyLeafDraw2d &instanceRef, HyCullMask uiCullMask);
+	void AppendRenderState(/*const*/ IHyDrawInst2d &instanceRef, HyCullMask uiCullMask);
 
 	void TxData(IHyLoadableData *pData);
 	std::queue<IHyLoadableData *> &RxData();

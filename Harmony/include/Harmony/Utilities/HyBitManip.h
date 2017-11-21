@@ -7,17 +7,14 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyBitManip_h__
-#define __HyBitManip_h__
+#ifndef HyBitManip_h__
+#define HyBitManip_h__
 
 #include "Afx/HyStdAfx.h"
-//-------------------
 
 #include <stddef.h>
-//#include <assert.h>
 #include <memory.h>
 
-//-------------------
 // FindSetBitInRange will return the first bit in the specified range that is on, or will return bitEnd+1.
 uint32 FindFirst1BitInRange(void const *root, uint32 bitStart, uint32 bitEnd);
 uint32 FindFirst0BitInRange(void const *root, uint32 bitStart, uint32 bitEnd);
@@ -28,7 +25,6 @@ uint32 FindFirst0BitInRange(void const *root, uint32 bitStart, uint32 bitEnd);
 void SetBitRangeTo1(void *root, uint32 bitStart, uint32 bitEnd);
 void SetBitRangeTo0(void *root, uint32 bitStart, uint32 bitEnd);
 
-//-------------------
 // These always work in 32-bit aligned memory, specifically so we don't have to worry about endianness when porting.
 // If all memory is 32-bit aligned, and you access it as 32-bits always, the byte order doesn't really matter.
 // It does matter if you treat the memory as bytes sometimes and 32-bit other times.
@@ -42,8 +38,6 @@ inline void SetBitTo1(void *root, uint32 bitStart)
 	*currentWord |= 1<<(bitStart & 31);
 }
 
-//-------------------
-
 inline void SetBitTo0(void *root, uint32 bitStart)
 {
 	// we require root to be 4-byte address aligned, for memory performance reasons.
@@ -54,6 +48,4 @@ inline void SetBitTo0(void *root, uint32 bitStart)
 	*currentWord &= ~(1<<(bitStart & 31));
 }
 
-//-------------------
-
-#endif /* __HyBitManip_h__ */
+#endif /* HyBitManip_h__ */

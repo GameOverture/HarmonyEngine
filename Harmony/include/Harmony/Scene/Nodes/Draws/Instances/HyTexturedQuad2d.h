@@ -11,10 +11,10 @@
 #define HyTexturedQuad2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Utilities/HyMath.h"
 
-class HyTexturedQuad2d : public IHyLeafDraw2d
+class HyTexturedQuad2d : public IHyDrawInst2d
 {
 protected:
 	const bool				m_bIS_RAW;	// This is 'true' when using the raw ctor which by-passes the traditional loading and instead takes info directly from the gfx api

@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyLeaf2d.cpp
+*	IHyInst2d.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
@@ -7,24 +7,24 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Nodes/Leafs/IHyLeaf2d.h"
+#include "Scene/Nodes/Instances/IHyInst2d.h"
 #include "Scene/HyScene.h"
 
-IHyLeaf2d::IHyLeaf2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent)
+IHyInst2d::IHyInst2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent)
 {
 }
 
-IHyLeaf2d::~IHyLeaf2d()
+IHyInst2d::~IHyInst2d()
 {
 }
 
-void IHyLeaf2d::SetEnabled(bool bEnabled)
+void IHyInst2d::SetEnabled(bool bEnabled)
 {
 	m_bEnabled = bEnabled;
 	m_uiExplicitFlags |= EXPLICIT_Enabled;
 }
 
-void IHyLeaf2d::SetPauseUpdate(bool bUpdateWhenPaused)
+void IHyInst2d::SetPauseUpdate(bool bUpdateWhenPaused)
 {
 	if(bUpdateWhenPaused)
 	{

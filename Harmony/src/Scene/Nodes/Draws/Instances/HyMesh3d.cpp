@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Leafs/Draws/HyMesh3d.h"
+#include "Scene/Nodes/Draws/Instances/HyMesh3d.h"
 
 //HyMesh3d::HyMesh3d(const char *szPrefix, const char *szName, IHyNode2d *pParent /*= nullptr*/) : IHyDraw2d(HYTYPE_Mesh3d, szPrefix, szName, pParent)
 //{

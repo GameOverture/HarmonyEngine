@@ -18,7 +18,7 @@
 
 // Forward declarations
 class IHyNode;
-class IHyLeafDraw2d;
+class IHyDrawInst2d;
 class IHyNode3d;
 class HyWindow;
 class IHyRenderer;
@@ -42,7 +42,7 @@ class HyScene
 	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;	// List of nodes who will update when the game is paused
 	bool												m_bPauseGame;
 
-	std::vector<IHyLeafDraw2d *>						m_NodeList_Loaded;			// List of nodes who can be drawn, and their graphics assets are fully loaded
+	std::vector<IHyDrawInst2d *>						m_NodeList_Loaded;			// List of nodes who can be drawn, and their graphics assets are fully loaded
 	std::vector<IHyNode3d *>							m_LoadedInst3dList;	// TODO: rename this
 
 public:
@@ -57,10 +57,10 @@ public:
 	static void AddNode_PauseUpdate(IHyNode *pNode);
 	static void RemoveNode_PauseUpdate(IHyNode *pNode);
 
-	void AddNode_Loaded(IHyLeafDraw2d *pInst);
-	void RemoveNode_Loaded(IHyLeafDraw2d *pInst);
+	void AddNode_Loaded(IHyDrawInst2d *pInst);
+	void RemoveNode_Loaded(IHyDrawInst2d *pInst);
 
-	void CopyAllLoadedNodes(std::vector<IHyLeafDraw2d *> &nodeListOut);
+	void CopyAllLoadedNodes(std::vector<IHyDrawInst2d *> &nodeListOut);
 
 	b2World &GetPhysics2d();
 	void DebugDrawPhysics2d(bool bDraw)					{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
@@ -71,9 +71,9 @@ public:
 	void UpdateNodes();
 	void PrepareRender(IHyRenderer &rendererRef);
 
-	bool CalculateCullPasses(/*const*/ IHyLeafDraw2d &instanceRef, uint32 &uiCullMaskOut);
+	bool CalculateCullPasses(/*const*/ IHyDrawInst2d &instanceRef, uint32 &uiCullMaskOut);
 	
-	static bool Node2dSortPredicate(const IHyLeafDraw2d *pInst1, const IHyLeafDraw2d *pInst2);
+	static bool Node2dSortPredicate(const IHyDrawInst2d *pInst1, const IHyDrawInst2d *pInst2);
 };
 
 #endif /* HyScene_h__ */

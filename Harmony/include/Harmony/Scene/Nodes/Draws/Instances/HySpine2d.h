@@ -7,14 +7,14 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HySpine2d_h__
-#define __HySpine2d_h__
+#ifndef HySpine2d_h__
+#define HySpine2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Assets/Nodes/HySpine2dData.h"
 
-class HySpine2d : public IHyLeafDraw2d
+class HySpine2d : public IHyDrawInst2d
 {
 protected:
 	spSkeleton*				m_pSpineSkeleton;
@@ -115,4 +115,4 @@ private:
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 };
 
-#endif /* __HySpine2d_h__ */
+#endif /* HySpine2d_h__ */

@@ -11,11 +11,11 @@
 #define HyPrimitive2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 
 class HyAtlasGroupData;
 
-class HyPrimitive2d : public IHyLeafDraw2d
+class HyPrimitive2d : public IHyDrawInst2d
 {
 protected:
 	glm::vec2 *		m_pVertBuffer;

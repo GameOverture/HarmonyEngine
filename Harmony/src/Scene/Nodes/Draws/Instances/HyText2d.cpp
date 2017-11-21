@@ -7,8 +7,8 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Leafs/Draws/HyText2d.h"
-#include "Scene/Nodes/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Draws/Instances/HyText2d.h"
+#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
 #include "Utilities/HyStrManip.h"
 #include "Diagnostics/Console/HyConsole.h"
 
@@ -16,7 +16,7 @@
 
 #define HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex) static_cast<uint32>(uiCharIndex + (m_Utf32CodeList.size() * ((uiNumLayers - 1) - uiLayerIndex)))
 
-HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_Text2d, szPrefix, szName, pParent),
+HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyDrawInst2d(HYTYPE_Text2d, szPrefix, szName, pParent),
 																									m_bIsDirty(false),
 																									m_sRawString(""),
 																									m_uiCurFontState(0),

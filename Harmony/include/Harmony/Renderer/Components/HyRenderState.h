@@ -14,7 +14,7 @@
 #include "Renderer/IHyRenderer.h"
 #include "Utilities/HyMath.h"
 
-class IHyLeafDraw2d;
+class IHyDrawInst2d;
 
 class HyRenderState
 {
@@ -37,7 +37,7 @@ class HyRenderState
 	size_t				m_uiExDataSize;
 
 public:
-	HyRenderState(/*const*/ IHyLeafDraw2d &instanceRef, uint32 uiCullPassMask, size_t uiDataOffset);
+	HyRenderState(/*const*/ IHyDrawInst2d &instanceRef, uint32 uiCullPassMask, size_t uiDataOffset);
 	~HyRenderState(void);
 
 	size_t GetDataOffset() const;

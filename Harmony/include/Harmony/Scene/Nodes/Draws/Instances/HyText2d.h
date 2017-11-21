@@ -10,12 +10,12 @@
 #ifndef HyText2d_h__
 #define HyText2d_h__
 
-#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Assets/Nodes/HyText2dData.h"
 
 #include <vector>
 
-class HyText2d : public IHyLeafDraw2d
+class HyText2d : public IHyDrawInst2d
 {
 protected:
 	bool							m_bIsDirty;

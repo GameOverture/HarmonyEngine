@@ -12,9 +12,9 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Scene/Nodes/IHyNodeDraw2d.h"
+#include "Scene/Nodes/Draws/IHyDraw2d.h"
 
-class HyEntity2d : public IHyNodeDraw2d
+class HyEntity2d : public IHyDraw2d
 {
 protected:
 	std::vector<IHyNode2d *>		m_ChildList;
@@ -35,14 +35,14 @@ protected:
 	};
 	MouseInputState					m_eMouseInputState;
 	void *							m_pMouseInputUserParam;
-	IHyLeafDraw2d *					m_pMouseInputNode;
+	IHyDrawInst2d *					m_pMouseInputNode;
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// NOTE: Below mutators manipulate data from derived classes "IHyNodeDraw2d" and "IHyNode". Handled in regard to being an "entity"
+	// NOTE: Below mutators manipulate data from derived classes "IHyDraw2d" and "IHyNode". Handled in regard to being an "entity"
 	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren = true);
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren = true);
 	
@@ -67,7 +67,7 @@ public:
 	virtual IHyNode2d *ChildGet(uint32 uiIndex);
 	void ForEachChild(std::function<void(IHyNode2d *)> func);
 
-	bool EnableMouseInput(IHyLeafDraw2d *pInputChildNode, void *pUserParam = nullptr);
+	bool EnableMouseInput(IHyDrawInst2d *pInputChildNode, void *pUserParam = nullptr);
 	void DisableMouseInput();
 
 	void ReverseDisplayOrder(bool bReverse);

@@ -11,7 +11,7 @@
 #define HySprite2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Assets/Nodes/HySprite2dData.h"
 
 #include "Utilities/HyMath.h"
@@ -19,7 +19,7 @@
 class HySprite2d;
 typedef std::function<void(HySprite2d *pSelf, void *pParam)> HySprite2dAnimFinishedCallback;
 
-class HySprite2d : public IHyLeafDraw2d
+class HySprite2d : public IHyDrawInst2d
 {
 protected:
 	// Array of BYTE's where each BYTE describes how each animation state is supposed to play

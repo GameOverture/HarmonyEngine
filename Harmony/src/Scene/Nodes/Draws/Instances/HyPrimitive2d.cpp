@@ -7,12 +7,12 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Leafs/Draws/HyPrimitive2d.h"
-#include "Scene/Nodes/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Draws/Instances/HyPrimitive2d.h"
+#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
 #include "HyEngine.h"
 #include "Utilities/HyMath.h"
 
-HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
+HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :	IHyDrawInst2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
 																	m_pVertBuffer(nullptr),
 																	m_uiNumVerts(0),
 																	m_bWireframe(false),
@@ -29,7 +29,7 @@ HyPrimitive2d::~HyPrimitive2d(void)
 
 const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &p)
 {
-	IHyLeafDraw2d::operator=(p);
+	IHyDrawInst2d::operator=(p);
 
 	m_eRenderMode = p.m_eRenderMode;
 	m_BoundingVolume = p.m_BoundingVolume;
@@ -101,7 +101,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 
 /*virtual*/ void HyPrimitive2d::OnShapeSet(HyShape2d *pShape) /*override*/
 {
-	IHyLeafDraw2d::OnShapeSet(pShape);
+	IHyDrawInst2d::OnShapeSet(pShape);
 
 	if(pShape == &m_BoundingVolume)
 		m_bDirty = true;

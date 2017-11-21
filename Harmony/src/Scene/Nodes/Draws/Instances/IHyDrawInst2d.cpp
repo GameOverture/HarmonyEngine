@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyLeafDraw2d.cpp
+*	IHyDrawInst2d.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
@@ -7,13 +7,13 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Renderer/Components/HyStencil.h"
 #include "HyEngine.h"
 
-/*static*/ HyAssets *IHyLeafDraw2d::sm_pHyAssets = nullptr;
+/*static*/ HyAssets *IHyDrawInst2d::sm_pHyAssets = nullptr;
 
-IHyLeafDraw2d::IHyLeafDraw2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyNodeDraw2d(eNodeType, pParent),
+IHyDrawInst2d::IHyDrawInst2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDraw2d(eNodeType, pParent),
 																												m_eLoadState(HYLOADSTATE_Inactive),
 																												m_pData(nullptr),
 																												m_sNAME(szName ? szName : ""),
@@ -24,13 +24,13 @@ IHyLeafDraw2d::IHyLeafDraw2d(HyType eNodeType, const char *szPrefix, const char 
 {
 }
 
-IHyLeafDraw2d::~IHyLeafDraw2d()
+IHyDrawInst2d::~IHyDrawInst2d()
 {
 	if(m_eLoadState != HYLOADSTATE_Inactive)
 		Unload();
 }
 
-const IHyLeafDraw2d &IHyLeafDraw2d::operator=(const IHyLeafDraw2d &rhs)
+const IHyDrawInst2d &IHyDrawInst2d::operator=(const IHyDrawInst2d &rhs)
 {
 	// TODO: Decided whether I copy the underlying data or not, which would require unloading/loading and unlinking/linking from things like HyScene and HyAssets
 	//m_eLoadState;
@@ -42,13 +42,13 @@ const IHyLeafDraw2d &IHyLeafDraw2d::operator=(const IHyLeafDraw2d &rhs)
 	return *this;
 }
 
-void IHyLeafDraw2d::SetEnabled(bool bEnabled)
+void IHyDrawInst2d::SetEnabled(bool bEnabled)
 {
 	m_bEnabled = bEnabled;
 	m_uiExplicitFlags |= EXPLICIT_Enabled;
 }
 
-void IHyLeafDraw2d::SetPauseUpdate(bool bUpdateWhenPaused)
+void IHyDrawInst2d::SetPauseUpdate(bool bUpdateWhenPaused)
 {
 	if(bUpdateWhenPaused)
 	{
@@ -65,7 +65,7 @@ void IHyLeafDraw2d::SetPauseUpdate(bool bUpdateWhenPaused)
 	m_uiExplicitFlags |= EXPLICIT_PauseUpdate;
 }
 
-void IHyLeafDraw2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
+void IHyDrawInst2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
 {
 	if(m_hScissor == HY_UNUSED_HANDLE)
 		m_hScissor = HY_NEW ScissorRect();
@@ -81,7 +81,7 @@ void IHyLeafDraw2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, u
 	GetWorldScissor(m_hScissor->m_WorldScissorRect);
 }
 
-void IHyLeafDraw2d::ClearScissor(bool bUseParentScissor)
+void IHyDrawInst2d::ClearScissor(bool bUseParentScissor)
 {
 	if(m_hScissor == HY_UNUSED_HANDLE)
 		return;
@@ -99,7 +99,7 @@ void IHyLeafDraw2d::ClearScissor(bool bUseParentScissor)
 	}
 }
 
-void IHyLeafDraw2d::SetStencil(HyStencil *pStencil)
+void IHyDrawInst2d::SetStencil(HyStencil *pStencil)
 {
 	if(pStencil == nullptr)
 		m_hStencil = HY_UNUSED_HANDLE;
@@ -109,7 +109,7 @@ void IHyLeafDraw2d::SetStencil(HyStencil *pStencil)
 	m_uiExplicitFlags |= EXPLICIT_Stencil;
 }
 
-void IHyLeafDraw2d::ClearStencil(bool bUseParentStencil)
+void IHyDrawInst2d::ClearStencil(bool bUseParentStencil)
 {
 	m_hStencil = HY_UNUSED_HANDLE;
 
@@ -126,19 +126,19 @@ void IHyLeafDraw2d::ClearStencil(bool bUseParentStencil)
 	}
 }
 
-void IHyLeafDraw2d::UseCameraCoordinates()
+void IHyDrawInst2d::UseCameraCoordinates()
 {
 	m_iCoordinateSystem = -1;
 	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
 }
 
-void IHyLeafDraw2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
+void IHyDrawInst2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
 {
 	m_iCoordinateSystem = iWindowIndex;
 	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
 }
 
-void IHyLeafDraw2d::SetDisplayOrder(int32 iOrderValue)
+void IHyDrawInst2d::SetDisplayOrder(int32 iOrderValue)
 {
 	m_iDisplayOrder = iOrderValue;
 	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
@@ -146,27 +146,27 @@ void IHyLeafDraw2d::SetDisplayOrder(int32 iOrderValue)
 	HyScene::SetInstOrderingDirty();
 }
 
-const std::string &IHyLeafDraw2d::GetName()
+const std::string &IHyDrawInst2d::GetName()
 {
 	return m_sNAME;
 }
 
-const std::string &IHyLeafDraw2d::GetPrefix()
+const std::string &IHyDrawInst2d::GetPrefix()
 {
 	return m_sPREFIX;
 }
 
-HyRenderMode IHyLeafDraw2d::GetRenderMode() const
+HyRenderMode IHyDrawInst2d::GetRenderMode() const
 {
 	return m_eRenderMode;
 }
 
-HyTextureHandle IHyLeafDraw2d::GetTextureHandle() const
+HyTextureHandle IHyDrawInst2d::GetTextureHandle() const
 {
 	return m_hTextureHandle;
 }
 
-IHyNodeData *IHyLeafDraw2d::AcquireData()
+IHyNodeData *IHyDrawInst2d::AcquireData()
 {
 	if(m_pData == nullptr)
 	{
@@ -182,7 +182,7 @@ IHyNodeData *IHyLeafDraw2d::AcquireData()
 	return m_pData;
 }
 
-const HyShape2d &IHyLeafDraw2d::GetBoundingVolume()
+const HyShape2d &IHyDrawInst2d::GetBoundingVolume()
 {
 	if(IsDirty(DIRTY_BoundingVolume) || m_BoundingVolume.IsValid() == false)
 	{
@@ -193,7 +193,7 @@ const HyShape2d &IHyLeafDraw2d::GetBoundingVolume()
 	return m_BoundingVolume;
 }
 
-const b2AABB &IHyLeafDraw2d::GetWorldAABB()
+const b2AABB &IHyDrawInst2d::GetWorldAABB()
 {
 	if(IsDirty(DIRTY_WorldAABB))
 	{
@@ -210,28 +210,28 @@ const b2AABB &IHyLeafDraw2d::GetWorldAABB()
 	return m_aabbCached;
 }
 
-HyShape2d *IHyLeafDraw2d::GetUserBoundingVolume(uint32 uiIndex)
+HyShape2d *IHyDrawInst2d::GetUserBoundingVolume(uint32 uiIndex)
 {
 	return nullptr;
 	//return m_BoundingVolumeList[uiIndex].Get;
 }
 
-void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
+void IHyDrawInst2d::SetCustomShader(IHyShader *pShader)
 {
-	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyLeafDraw2d::SetCustomShader was used on an already loaded instance - I can make this work I just haven't yet");
-	HyAssert(pShader->IsFinalized(), "IHyLeafDraw2d::SetCustomShader tried to set a non-finalized shader");
-	HyAssert(pShader->GetHandle() >= HYSHADERPROG_CustomStartIndex, "IHyLeafDraw2d::SetCustomShader was passed an invalid custom shader Id");
-	HyAssert(m_RequiredCustomShaders.size() < HY_MAX_SHADER_PASSES_PER_INSTANCE, "IHyLeafDraw2d::SetCustomShader has taken too many shaders. Max = " << HY_MAX_SHADER_PASSES_PER_INSTANCE);
+	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyDrawInst2d::SetCustomShader was used on an already loaded instance - I can make this work I just haven't yet");
+	HyAssert(pShader->IsFinalized(), "IHyDrawInst2d::SetCustomShader tried to set a non-finalized shader");
+	HyAssert(pShader->GetHandle() >= HYSHADERPROG_CustomStartIndex, "IHyDrawInst2d::SetCustomShader was passed an invalid custom shader Id");
+	HyAssert(m_RequiredCustomShaders.size() < HY_MAX_SHADER_PASSES_PER_INSTANCE, "IHyDrawInst2d::SetCustomShader has taken too many shaders. Max = " << HY_MAX_SHADER_PASSES_PER_INSTANCE);
 
 	m_RequiredCustomShaders.insert(pShader->GetHandle());
 }
 
-/*virtual*/ bool IHyLeafDraw2d::IsLoaded() const /*override*/
+/*virtual*/ bool IHyDrawInst2d::IsLoaded() const /*override*/
 {
 	return m_eLoadState == HYLOADSTATE_Loaded;
 }
 
-/*virtual*/ void IHyLeafDraw2d::Load() /*override*/
+/*virtual*/ void IHyDrawInst2d::Load() /*override*/
 {
 	HyAssert(sm_pHyAssets, "IHyDraw2d::Load was invoked before engine has been initialized");
 
@@ -243,13 +243,13 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 		sm_pHyAssets->LoadNodeData(this);
 }
 
-/*virtual*/ void IHyLeafDraw2d::Unload() /*override*/
+/*virtual*/ void IHyDrawInst2d::Unload() /*override*/
 {
 	HyAssert(sm_pHyAssets, "IHyDraw2d::Unload was invoked before engine has been initialized");	
 	sm_pHyAssets->RemoveNodeData(this);
 }
 
-/*virtual*/ void IHyLeafDraw2d::NodeUpdate() /*override final*/
+/*virtual*/ void IHyDrawInst2d::NodeUpdate() /*override final*/
 {
 	DrawUpdate();
 
@@ -260,7 +260,7 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 	}
 }
 
-/*virtual*/ void IHyLeafDraw2d::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyDrawInst2d::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
@@ -274,7 +274,7 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 	}
 }
 
-/*virtual*/ void IHyLeafDraw2d::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyDrawInst2d::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
@@ -283,7 +283,7 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 		m_hStencil = hHandle;
 }
 
-/*virtual*/ int32 IHyLeafDraw2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
+/*virtual*/ int32 IHyDrawInst2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_DisplayOrder;
@@ -299,7 +299,7 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 	return iOrderValue;
 }
 
-/*virtual*/ void IHyLeafDraw2d::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyDrawInst2d::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
@@ -308,12 +308,12 @@ void IHyLeafDraw2d::SetCustomShader(IHyShader *pShader)
 		UseWindowCoordinates(iWindowIndex);
 }
 
-IHyNodeData *IHyLeafDraw2d::UncheckedGetData()
+IHyNodeData *IHyDrawInst2d::UncheckedGetData()
 {
 	return m_pData;
 }
 
-void IHyLeafDraw2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
+void IHyDrawInst2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 {
 	m_ShaderUniforms.WriteUniformsBufferData(pRefDataWritePos);
 }

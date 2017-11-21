@@ -10,7 +10,7 @@
 #include "Renderer/Components/HyStencil.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyRenderState.h"
-#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 
 HyStencilHandle HyStencil::sm_hHandleCount = 0;
 
@@ -34,13 +34,13 @@ HyStencilHandle HyStencil::GetHandle()
 	return m_hHANDLE;
 }
 
-void HyStencil::AddInstance(IHyLeafDraw2d *pInstance)
+void HyStencil::AddInstance(IHyDrawInst2d *pInstance)
 {
 	m_InstanceList.push_back(pInstance);
 	m_bInstanceListDirty = true;
 }
 
-bool HyStencil::RemoveInstance(IHyLeafDraw2d *pInstance)
+bool HyStencil::RemoveInstance(IHyDrawInst2d *pInstance)
 {
 	for(auto it = m_InstanceList.begin(); it != m_InstanceList.end(); ++it)
 	{
@@ -63,7 +63,7 @@ void HyStencil::SetAsInvertedCullMask()
 {
 }
 
-const std::vector<IHyLeafDraw2d *> &HyStencil::GetInstanceList()
+const std::vector<IHyDrawInst2d *> &HyStencil::GetInstanceList()
 {
 	return m_InstanceList;
 }

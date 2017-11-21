@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 class HyRenderState;
-class IHyLeafDraw2d;
+class IHyDrawInst2d;
 
 class HyStencil
 {
@@ -22,7 +22,7 @@ class HyStencil
 	static HyStencilHandle			sm_hHandleCount;
 
 	const HyStencilHandle			m_hHANDLE;
-	std::vector<IHyLeafDraw2d *>	m_InstanceList;
+	std::vector<IHyDrawInst2d *>	m_InstanceList;
 
 	char *							m_pRenderStateBuffer;
 	bool							m_bInstanceListDirty;
@@ -35,13 +35,13 @@ public:
 
 	HyStencilHandle GetHandle();
 
-	void AddInstance(IHyLeafDraw2d *pInstance);
-	bool RemoveInstance(IHyLeafDraw2d *pInstance);
+	void AddInstance(IHyDrawInst2d *pInstance);
+	bool RemoveInstance(IHyDrawInst2d *pInstance);
 
 	void SetAsCullMask();
 	void SetAsInvertedCullMask();
 
-	const std::vector<IHyLeafDraw2d *> &GetInstanceList();
+	const std::vector<IHyDrawInst2d *> &GetInstanceList();
 	HyRenderState *GetRenderStatePtr();
 
 private:

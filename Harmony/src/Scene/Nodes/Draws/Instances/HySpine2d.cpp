@@ -7,12 +7,12 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Leafs/Draws/HySpine2d.h"
+#include "Scene/Nodes/Draws/Instances/HySpine2d.h"
 #include "HyEngine.h"
-#include "Scene/Nodes/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
 #include "Scene/HyScene.h"
 
-HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyLeafDraw2d(HYTYPE_Spine2d, szPrefix, szName, pParent),
+HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyDrawInst2d(HYTYPE_Spine2d, szPrefix, szName, pParent),
 																									m_pSpineSkeleton(NULL),
 																									m_ppSpineAnims(NULL),
 																									m_ppAnimStates(NULL),

@@ -12,17 +12,17 @@
 
 #include "Afx/HyStdAfx.h"
 
-class IHyLeafDraw2d;
+class IHyDrawInst2d;
 
 class HyShape2d
 {
-	IHyLeafDraw2d &					m_OwnerRef;
+	IHyDrawInst2d &					m_OwnerRef;
 
 	HyShapeType						m_eType;
 	b2Shape *						m_pShape;
 
 public:
-	HyShape2d(IHyLeafDraw2d &ownerRef);
+	HyShape2d(IHyDrawInst2d &ownerRef);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);

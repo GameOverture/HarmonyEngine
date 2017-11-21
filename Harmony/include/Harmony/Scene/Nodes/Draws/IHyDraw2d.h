@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyNodeDraw2d.h
+*	IHyDraw2d.h
 *
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
@@ -14,7 +14,7 @@
 #include "Scene/Nodes/IHyNode2d.h"
 #include "Scene/Tweens/HyTweenVec3.h"
 
-class IHyNodeDraw2d : public IHyNode2d
+class IHyDraw2d : public IHyNode2d
 {
 protected:
 	float							m_fAlpha;
@@ -44,8 +44,8 @@ public:
 	HyTweenFloat					alpha;
 
 public:
-	IHyNodeDraw2d(HyType eNodeType, HyEntity2d *pParent);
-	virtual ~IHyNodeDraw2d();
+	IHyDraw2d(HyType eNodeType, HyEntity2d *pParent);
+	virtual ~IHyDraw2d();
 
 	void SetTint(float fR, float fG, float fB);
 	void SetTint(uint32 uiColor);

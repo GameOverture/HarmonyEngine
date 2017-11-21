@@ -20,7 +20,7 @@
 #include <future>
 
 class IHyRenderer;
-class IHyLeafDraw2d;
+class IHyDrawInst2d;
 class IHyNodeData;
 class HyAudioData;
 class HySprite2dData;
@@ -61,7 +61,7 @@ class HyAssets
 	NodeData<HyText2dData>										m_Txt2d;
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
-	std::vector<IHyLeafDraw2d *>								m_QueuedInst2dList;
+	std::vector<IHyDrawInst2d *>								m_QueuedInst2dList;
 	std::vector<IHyLoadableData *>								m_ReloadDataList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
@@ -108,10 +108,10 @@ public:
 	uint32 GetNumAtlases();
 	HyAtlasIndices *GetLoadedAtlases();
 
-	void GetNodeData(IHyLeafDraw2d *pDrawNode2d, IHyNodeData *&pDataOut);
-	void LoadNodeData(IHyLeafDraw2d *pDrawNode2d);
-	void RemoveNodeData(IHyLeafDraw2d *pDrawNode2d);
-	bool IsNodeLoaded(IHyLeafDraw2d *pDrawNode2d);
+	void GetNodeData(IHyDrawInst2d *pDrawNode2d, IHyNodeData *&pDataOut);
+	void LoadNodeData(IHyDrawInst2d *pDrawNode2d);
+	void RemoveNodeData(IHyDrawInst2d *pDrawNode2d);
+	bool IsNodeLoaded(IHyDrawInst2d *pDrawNode2d);
 
 	void Shutdown();
 	bool IsShutdown();
@@ -123,7 +123,7 @@ private:
 	void DequeData(IHyLoadableData *pData);
 	void FinalizeData(IHyLoadableData *pData);
 
-	void SetNodeAsLoaded(IHyLeafDraw2d *pDrawNode2d);
+	void SetNodeAsLoaded(IHyDrawInst2d *pDrawNode2d);
 
 	static void LoadingThread(void *pParam);
 };

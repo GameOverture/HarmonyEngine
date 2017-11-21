@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyLeaf2d.h
+*	IHyInst2d.h
 *
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
@@ -12,12 +12,12 @@
 
 #include "Scene/Nodes/IHyNode2d.h"
 
-class IHyLeaf2d : public IHyNode2d
+class IHyInst2d : public IHyNode2d
 {
 
 public:
-	IHyLeaf2d(HyType eNodeType, HyEntity2d *pParent);
-	virtual ~IHyLeaf2d();
+	IHyInst2d(HyType eNodeType, HyEntity2d *pParent);
+	virtual ~IHyInst2d();
 
 	void SetEnabled(bool bEnabled);
 	void SetPauseUpdate(bool bUpdateWhenPaused);

@@ -7,7 +7,7 @@
  *	The zlib License (zlib)
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Leafs/Misc/HyCamera.h"
+#include "Scene/Nodes/Instances/HyCamera.h"
 #include "Renderer/Components/HyWindow.h"
 
 IHyCamera::IHyCamera(HyWindow *pWindow) :	m_pWindowPtr(pWindow),
@@ -40,7 +40,7 @@ uint32 IHyCamera::GetCullMaskBit()
 	return m_uiCullMaskBit;
 }
 
-HyCamera2d::HyCamera2d(HyWindow *pWindow) : IHyLeaf2d(HYTYPE_Camera2d, nullptr),
+HyCamera2d::HyCamera2d(HyWindow *pWindow) : IHyInst2d(HYTYPE_Camera2d, nullptr),
 											IHyCamera(pWindow)
 { }
 

@@ -54,7 +54,6 @@ inline tUINT32 FindFirstSetBit(tUINT32 v)
 	}
 }
 #else
-//-------------------
 // This returns an index to an 'on' bit in data.  Presumably the lowest on bit.
 inline uint32 FindFirstSetBit(uint32 data)
 {
@@ -96,7 +95,6 @@ nobits:
 	return bitIndex;
 }
 #endif
-//-------------------
 // This scans looking for any set bits, but changes nothing.
 uint32 FindFirst1BitInRange(void const *root, uint32 bitStart, uint32 bitEnd)
 {
@@ -235,7 +233,6 @@ uint32 FindFirst0BitInRange(void const *root, uint32 bitStart, uint32 bitEnd)
 	return bitEnd + 1;
 }
 
-//-------------------
 // This is a little helper that can set a range of bits for us.
 // Note: We CANNOT assume that root is 32-bit aligned.  We have 
 // to handle that ourselves by adjusting bitStart and bitEnd to be 
@@ -284,8 +281,6 @@ void SetBitRangeTo1(void *root, uint32 bitStart, uint32 bitEnd)
 	}
 }
 
-//-------------------
-
 void SetBitRangeTo0(void *root, uint32 bitStart, uint32 bitEnd)
 {
 	// we require root to be 4-byte address aligned, for memory performance reasons.
@@ -329,5 +324,3 @@ void SetBitRangeTo0(void *root, uint32 bitStart, uint32 bitEnd)
 		*currentWord = value;
 	}
 }
-
-//-------------------

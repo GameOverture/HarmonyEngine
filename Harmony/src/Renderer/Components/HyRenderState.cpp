@@ -10,11 +10,11 @@
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 #include "Renderer/Components/HyStencil.h"
-#include "Scene/Nodes/Leafs/IHyLeafDraw2d.h"
-#include "Scene/Nodes/Leafs/Draws/HyText2d.h"
-#include "Scene/Nodes/Leafs/Draws/HyPrimitive2d.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
+#include "Scene/Nodes/Draws/Instances/HyText2d.h"
+#include "Scene/Nodes/Draws/Instances/HyPrimitive2d.h"
 
-HyRenderState::HyRenderState(/*const*/ IHyLeafDraw2d &instanceRef, uint32 uiCullPassMask, size_t uiDataOffset) :	m_uiCULL_PASS_MASK(uiCullPassMask),
+HyRenderState::HyRenderState(/*const*/ IHyDrawInst2d &instanceRef, uint32 uiCullPassMask, size_t uiDataOffset) :	m_uiCULL_PASS_MASK(uiCullPassMask),
 																													m_uiDATA_OFFSET(uiDataOffset),
 																													m_uiExDataSize(0)
 {

@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 #include "Utilities/HyMath.h"
-#include "Scene/Nodes/Leafs/IHyLeaf2d.h"
+#include "Scene/Nodes/Instances/IHyInst2d.h"
 #include "Scene/Nodes/IHyNode3d.h"
 
 class HyWindow;
@@ -44,7 +44,7 @@ public:
 	uint32 GetCullMaskBit();
 };
 
-class HyCamera2d final : public IHyLeaf2d, public IHyCamera
+class HyCamera2d final : public IHyInst2d, public IHyCamera
 {
 	friend class HyWindow;
 
