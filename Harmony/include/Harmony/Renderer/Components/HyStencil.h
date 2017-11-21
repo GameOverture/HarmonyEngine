@@ -15,6 +15,12 @@
 class HyRenderState;
 class IHyDrawInst2d;
 
+enum HyStencilBehavior
+{
+	HYSTENCILBEHAVIOR_Mask = 0,
+	HYSTENCILBEHAVIOR_InvertedMask
+};
+
 class HyStencil
 {
 	friend class IHyRenderer;
@@ -22,12 +28,12 @@ class HyStencil
 	static HyStencilHandle			sm_hHandleCount;
 
 	const HyStencilHandle			m_hHANDLE;
+
 	std::vector<IHyDrawInst2d *>	m_InstanceList;
-
-	char *							m_pRenderStateBuffer;
 	bool							m_bInstanceListDirty;
-
 	HyRenderState *					m_pRenderStatePtr;
+
+	HyStencilBehavior				m_eBehavior;
 
 public:
 	HyStencil();
@@ -38,8 +44,10 @@ public:
 	void AddInstance(IHyDrawInst2d *pInstance);
 	bool RemoveInstance(IHyDrawInst2d *pInstance);
 
-	void SetAsCullMask();
-	void SetAsInvertedCullMask();
+	HyStencilBehavior GetBehavior();
+
+	void SetAsMask();
+	void SetAsInvertedMask();
 
 	const std::vector<IHyDrawInst2d *> &GetInstanceList();
 	HyRenderState *GetRenderStatePtr();

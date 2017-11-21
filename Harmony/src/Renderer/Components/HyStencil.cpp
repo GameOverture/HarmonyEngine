@@ -15,9 +15,9 @@
 HyStencilHandle HyStencil::sm_hHandleCount = 0;
 
 HyStencil::HyStencil() :	m_hHANDLE(++sm_hHandleCount),
-							m_pRenderStateBuffer(nullptr),
 							m_bInstanceListDirty(false),
-							m_pRenderStatePtr(nullptr)
+							m_pRenderStatePtr(nullptr),
+							m_eBehavior(HYSTENCILBEHAVIOR_Mask)
 {
 	IHyRenderer::AddStencil(this);
 }
@@ -25,8 +25,6 @@ HyStencil::HyStencil() :	m_hHANDLE(++sm_hHandleCount),
 HyStencil::~HyStencil()
 {
 	IHyRenderer::RemoveStencil(this);
-
-	delete m_pRenderStateBuffer;
 }
 
 HyStencilHandle HyStencil::GetHandle()
@@ -55,12 +53,19 @@ bool HyStencil::RemoveInstance(IHyDrawInst2d *pInstance)
 	return false;
 }
 
-void HyStencil::SetAsCullMask()
+HyStencilBehavior HyStencil::GetBehavior()
 {
+	return m_eBehavior;
 }
 
-void HyStencil::SetAsInvertedCullMask()
+void HyStencil::SetAsMask()
 {
+	m_eBehavior = HYSTENCILBEHAVIOR_Mask;
+}
+
+void HyStencil::SetAsInvertedMask()
+{
+	m_eBehavior = HYSTENCILBEHAVIOR_InvertedMask;
 }
 
 const std::vector<IHyDrawInst2d *> &HyStencil::GetInstanceList()

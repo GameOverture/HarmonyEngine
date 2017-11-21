@@ -229,18 +229,17 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 		// Setup stencil buffer if required
 		if(pRenderState->GetStencilHandle() != HY_UNUSED_HANDLE)
 		{
-			HyStencil *pStencil = FindStencil(pRenderState->GetStencilHandle());
 			glEnable(GL_STENCIL_TEST);
 
-			// Disable rendering color while we determine the stencil buffer
-			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+			glClear(GL_STENCIL_BUFFER_BIT);							// First clear stencil buffer by writing default stencil value (0) to entire buffer.
+			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);	// Disable rendering color while we determine the stencil buffer
 
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);
-			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  // replace stencil buffer values to ref=1
-			glStencilMask(0xFF); // stencil buffer free to write
-			glClear(GL_STENCIL_BUFFER_BIT);  // first clear stencil buffer by writing default stencil value (0) to all of stencil buffer.
+			glStencilMask(0xFF);									// This mask allows any 8bit value to be written to the stencil buffer
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);						// All fragments rendered next will "pass" the stencil test, and 'ref' is set to '1'
+			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);				// Fragments that "passed" will write the 'ref' value in the stencil buffer
 
-			// at stencil shape pixel locations in stencil buffer replace stencil buffer values to ref = 1
+			// Render all instances stored in the HyStencil, and affect their pixel locations in stencil buffer
+			HyStencil *pStencil = FindStencil(pRenderState->GetStencilHandle());
 			uint32 uiNumStencilInstance = static_cast<uint32>(pStencil->GetInstanceList().size());
 			char *pStencilRenderStateBufferPos = reinterpret_cast<char *>(pStencil->GetRenderStatePtr());
 			for(uint32 i = 0; i < uiNumStencilInstance; ++i)
@@ -252,9 +251,18 @@ void HyOpenGL::BindVao(HyOpenGLShader *pShaderKey)
 				pStencilRenderStateBufferPos += pCurRenderState->GetExSize() + sizeof(HyRenderState);
 			}
 
-			glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
-			glStencilMask(0x00); // Don't write anything to stencil buffer
-			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);	// Re-enable the color buffer
+			switch(pStencil->GetBehavior())
+			{
+			case HYSTENCILBEHAVIOR_Mask:
+				glStencilFunc(GL_EQUAL, 1, 0xFF);					// Only render pixels that pass this check while stencil test is enabled
+				break;
+			case HYSTENCILBEHAVIOR_InvertedMask:
+				glStencilFunc(GL_NOTEQUAL, 1, 0xFF);				// Only render pixels that pass this check while stencil test is enabled
+				break;
+			}
+
+			glStencilMask(0x00);									// Disable further writing to the the stencil buffer
+			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);		// Re-enable the color buffer
 		}
 		else
 		{
