@@ -52,7 +52,7 @@ HyText2d::~HyText2d(void)
 	}
 }
 
-/*virtual*/ bool HyText2d::IsEnabled() /*override*/
+/*virtual*/ bool HyText2d::IsEnabled() const /*override*/
 {
 	return (IHyNode::IsEnabled() && m_uiNumValidCharacters > 0);
 }

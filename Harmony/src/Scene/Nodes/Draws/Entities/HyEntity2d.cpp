@@ -26,7 +26,17 @@ HyEntity2d::~HyEntity2d(void)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 }
 
-void HyEntity2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren /*= true*/)
+/*virtual*/ void HyEntity2d::SetEnabled(bool bEnabled) /*override*/
+{
+	SetEnabled(bEnabled, true);
+}
+
+/*virtual*/ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused) /*override*/
+{
+	SetPauseUpdate(bUpdateWhenPaused, true);
+}
+
+void HyEntity2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
 {
 	m_bEnabled = bEnabled;
 	m_uiExplicitFlags |= EXPLICIT_Enabled;
@@ -35,7 +45,7 @@ void HyEntity2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren /*= tr
 		m_ChildList[i]->_SetEnabled(bEnabled, bOverrideExplicitChildren);
 }
 
-void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren /*= true*/)
+void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren)
 {
 	if(bUpdateWhenPaused)
 	{

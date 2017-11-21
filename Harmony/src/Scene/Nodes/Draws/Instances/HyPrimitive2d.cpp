@@ -45,7 +45,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &p)
 	return *this;
 }
 
-/*virtual*/ bool HyPrimitive2d::IsEnabled() /*override*/
+/*virtual*/ bool HyPrimitive2d::IsEnabled() const /*override*/
 {
 	return (IHyNode::IsEnabled() && m_pVertBuffer != nullptr && m_BoundingVolume.IsValid());
 }

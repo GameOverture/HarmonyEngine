@@ -30,7 +30,7 @@ public:
 	HyShapeType GetType() const;
 	b2Shape *GetB2Shape();
 
-	bool IsValid();
+	bool IsValid() const;
 
 	// Set as an isolated edge.
 	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2);

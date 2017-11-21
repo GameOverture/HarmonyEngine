@@ -95,7 +95,6 @@
     <ClCompile Include="Scene\Nodes\IHyNode3d.cpp" />
     <ClCompile Include="Scene\Nodes\Misc\HyAudio2d.cpp" />
     <ClCompile Include="Scene\Nodes\Misc\HyCamera.cpp" />
-    <ClCompile Include="Scene\Nodes\Misc\IHyInst2d.cpp" />
     <ClCompile Include="Scene\Physics\HyBox2dRuntime.cpp" />
     <ClCompile Include="Scene\Physics\HyDebugPhys2d.cpp" />
     <ClCompile Include="Scene\Physics\HyPhysEntity2d.cpp" />
@@ -188,7 +187,6 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\IHyNode3d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyAudio2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyCamera.h" />
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\IHyInst2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyBox2dRuntime.h" />
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyDebugPhys2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Physics\HyPhysEntity2d.h" />

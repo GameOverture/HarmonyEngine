@@ -31,7 +31,7 @@ public:
 
 	const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p);
 
-	virtual bool IsEnabled() override;
+	virtual bool IsEnabled() const override;
 
 	HyShape2d &GetShape();
 

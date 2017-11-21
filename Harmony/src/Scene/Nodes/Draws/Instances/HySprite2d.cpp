@@ -32,7 +32,7 @@ HySprite2d::~HySprite2d(void)
 {
 }
 
-/*virtual*/ bool HySprite2d::IsEnabled() /*override*/
+/*virtual*/ bool HySprite2d::IsEnabled() const /*override*/
 {
 	return (IHyNode::IsEnabled() && ((m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Invalid) == 0));
 }

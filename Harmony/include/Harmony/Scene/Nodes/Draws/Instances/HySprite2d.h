@@ -50,7 +50,7 @@ public:
 	HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	virtual ~HySprite2d(void);
 
-	virtual bool IsEnabled() override;
+	virtual bool IsEnabled() const override;
 
 	//--------------------------------------------------------------------------------------
 	// Set how to playback the animation on the current (or specified) state/animation.

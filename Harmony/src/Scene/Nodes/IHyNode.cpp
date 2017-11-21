@@ -29,9 +29,32 @@ HyType IHyNode::GetType() const
 	return m_eTYPE;
 }
 
-bool IHyNode::IsEnabled()
+/*virtual*/ bool IHyNode::IsEnabled() const
 {
 	return m_bEnabled;
+}
+
+/*virtual*/ void IHyNode::SetEnabled(bool bEnabled)
+{
+	m_bEnabled = bEnabled;
+	m_uiExplicitFlags |= EXPLICIT_Enabled;
+}
+
+/*virtual*/ void IHyNode::SetPauseUpdate(bool bUpdateWhenPaused)
+{
+	if(bUpdateWhenPaused)
+	{
+		if(m_bPauseOverride == false)
+			HyScene::AddNode_PauseUpdate(this);
+	}
+	else
+	{
+		if(m_bPauseOverride == true)
+			HyScene::RemoveNode_PauseUpdate(this);
+	}
+
+	m_bPauseOverride = bUpdateWhenPaused;
+	m_uiExplicitFlags |= EXPLICIT_PauseUpdate;
 }
 
 int64 IHyNode::GetTag() const

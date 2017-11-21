@@ -41,10 +41,14 @@ public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
 
+	// This overridden method will just behave as "bool bOverrideExplicitChildren = true"
+	virtual void SetEnabled(bool bEnabled) override;
+	virtual void SetPauseUpdate(bool bUpdateWhenPaused) override;
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// NOTE: Below mutators manipulate data from derived classes "IHyDraw2d" and "IHyNode". Handled in regard to being an "entity"
-	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren = true);
-	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren = true);
+	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
+	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
 	
 	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren = true);
 	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren = true);

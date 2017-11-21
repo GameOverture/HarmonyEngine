@@ -210,9 +210,6 @@
     <ClCompile Include="Scene\Nodes\Misc\HyCamera.cpp">
       <Filter>Scene\Nodes\Misc</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Misc\IHyInst2d.cpp">
-      <Filter>Scene\Nodes\Misc</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Nodes\Draws\Entities\HyEntity2d.cpp">
       <Filter>Scene\Nodes\Draws\Entities</Filter>
     </ClCompile>
@@ -649,9 +646,6 @@
       <Filter>Scene\Nodes\Misc</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyCamera.h">
-      <Filter>Scene\Nodes\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\IHyInst2d.h">
       <Filter>Scene\Nodes\Misc</Filter>
     </ClInclude>
   </ItemGroup>

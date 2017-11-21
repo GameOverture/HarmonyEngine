@@ -89,7 +89,7 @@ b2Shape *HyShape2d::GetB2Shape()
 	return m_pShape;
 }
 
-bool HyShape2d::IsValid()
+bool HyShape2d::IsValid() const
 {
 	return m_pShape != nullptr && m_eType != HYSHAPE_Unknown;
 }

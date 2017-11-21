@@ -51,10 +51,7 @@ public:
 	virtual const IHyDrawInst2d &operator=(const IHyDrawInst2d &rhs);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// NOTE: Below mutators manipulate data from derived classes "IHyDraw2d" and "IHyNode". Handled in regard to being a "leaf"
-	void SetEnabled(bool bEnabled);
-	void SetPauseUpdate(bool bUpdateWhenPaused);
-
+	// NOTE: Below mutators manipulate data from derived class "IHyDraw2d". Handled in regard to being a "leaf"
 	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
 	void ClearScissor(bool bUseParentScissor);
 

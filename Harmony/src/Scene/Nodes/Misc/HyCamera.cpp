@@ -40,7 +40,7 @@ uint32 IHyCamera::GetCullMaskBit()
 	return m_uiCullMaskBit;
 }
 
-HyCamera2d::HyCamera2d(HyWindow *pWindow) : IHyInst2d(HYTYPE_Camera2d, nullptr),
+HyCamera2d::HyCamera2d(HyWindow *pWindow) : IHyNode2d(HYTYPE_Camera2d, nullptr),
 											IHyCamera(pWindow)
 { }
 

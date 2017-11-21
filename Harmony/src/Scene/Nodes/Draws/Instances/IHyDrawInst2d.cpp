@@ -42,29 +42,6 @@ const IHyDrawInst2d &IHyDrawInst2d::operator=(const IHyDrawInst2d &rhs)
 	return *this;
 }
 
-void IHyDrawInst2d::SetEnabled(bool bEnabled)
-{
-	m_bEnabled = bEnabled;
-	m_uiExplicitFlags |= EXPLICIT_Enabled;
-}
-
-void IHyDrawInst2d::SetPauseUpdate(bool bUpdateWhenPaused)
-{
-	if(bUpdateWhenPaused)
-	{
-		if(m_bPauseOverride == false)
-			HyScene::AddNode_PauseUpdate(this);
-	}
-	else
-	{
-		if(m_bPauseOverride == true)
-			HyScene::RemoveNode_PauseUpdate(this);
-	}
-
-	m_bPauseOverride = bUpdateWhenPaused;
-	m_uiExplicitFlags |= EXPLICIT_PauseUpdate;
-}
-
 void IHyDrawInst2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
 {
 	if(m_hScissor == HY_UNUSED_HANDLE)

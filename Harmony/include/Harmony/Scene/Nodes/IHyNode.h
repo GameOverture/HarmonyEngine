@@ -59,7 +59,10 @@ public:
 
 	HyType GetType() const;
 
-	virtual bool IsEnabled();
+	virtual bool IsEnabled() const;
+	virtual void SetEnabled(bool bEnabled);
+
+	virtual void SetPauseUpdate(bool bUpdateWhenPaused);
 
 	int64 GetTag() const;
 	void SetTag(int64 iTag);

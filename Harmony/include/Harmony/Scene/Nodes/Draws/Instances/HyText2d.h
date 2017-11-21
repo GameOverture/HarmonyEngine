@@ -78,7 +78,7 @@ public:
 	HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	virtual ~HyText2d(void);
 
-	virtual bool IsEnabled() override;
+	virtual bool IsEnabled() const override;
 
 	// Assumes UTF-8 encoding. Accepts newline characters '\n'
 	void TextSet(const std::string sText);
