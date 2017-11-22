@@ -17,9 +17,15 @@
     <ClCompile Include="CustomShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CheckerGrid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CustomShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CheckerGrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
