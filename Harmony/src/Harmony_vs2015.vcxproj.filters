@@ -225,17 +225,14 @@
     <ClCompile Include="Scene\Nodes\Draws\Entities\HyEntity2d.cpp">
       <Filter>Scene\Nodes\Draws\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Instances\HyAudio2d.cpp">
-      <Filter>Scene\Nodes\Instances</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Instances\HyCamera.cpp">
-      <Filter>Scene\Nodes\Instances</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Nodes\Draws\Instances\IHyDrawInst2d.cpp">
       <Filter>Scene\Nodes\Draws\Instances</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Instances\IHyInst2d.cpp">
-      <Filter>Scene\Nodes\Instances</Filter>
+    <ClCompile Include="Scene\Nodes\Misc\HyAudio2d.cpp">
+      <Filter>Scene\Nodes\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Misc\HyCamera.cpp">
+      <Filter>Scene\Nodes\Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -332,11 +329,11 @@
     <Filter Include="Scene\Nodes\Draws\Entities">
       <UniqueIdentifier>{4d58b19a-aa1e-4ae7-a2e4-e5faefec850d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scene\Nodes\Instances">
-      <UniqueIdentifier>{98611ffd-b5a8-49e2-b424-d5b709f0d3a4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scene\Nodes\Draws\Instances">
       <UniqueIdentifier>{349a2a36-91ba-43d4-b3c3-a6148899f7c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Nodes\Misc">
+      <UniqueIdentifier>{01bbb433-45bd-442d-a075-dfccb24ad483}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -636,20 +633,17 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\Entities\HyEntity2d.h">
       <Filter>Scene\Nodes\Draws\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Instances\HyAudio2d.h">
-      <Filter>Scene\Nodes\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Instances\HyCamera.h">
-      <Filter>Scene\Nodes\Instances</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\Instances\IHyDrawInst2d.h">
       <Filter>Scene\Nodes\Draws\Instances</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Scene\Nodes\Instances\IHyInst2d.h">
-      <Filter>Scene\Nodes\Instances</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\Entities\HyEntityLeaf2d.h">
       <Filter>Scene\Nodes\Draws\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyAudio2d.h">
+      <Filter>Scene\Nodes\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyCamera.h">
+      <Filter>Scene\Nodes\Misc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
