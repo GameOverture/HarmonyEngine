@@ -236,23 +236,23 @@ HyAtlasIndices *HyAssets::GetLoadedAtlases()
 	return m_pLoadedAtlasIndices;
 }
 
-void HyAssets::GetNodeData(IHyDrawInst2d *pDrawNode2d, IHyNodeData *&pDataOut)
+void HyAssets::GetNodeData(IHyDrawInst2d *pDrawInst2d, IHyNodeData *&pDataOut)
 {
-	switch(pDrawNode2d->GetType())
+	switch(pDrawInst2d->GetType())
 	{
 	case HYTYPE_Sprite2d:
-		pDataOut = m_Sprite2d.GetData(pDrawNode2d->GetPrefix(), pDrawNode2d->GetName());
+		pDataOut = m_Sprite2d.GetData(pDrawInst2d->GetPrefix(), pDrawInst2d->GetName());
 		break;
 	case HYTYPE_Spine2d:
-		pDataOut = m_Spine2d.GetData(pDrawNode2d->GetPrefix(), pDrawNode2d->GetName());
+		pDataOut = m_Spine2d.GetData(pDrawInst2d->GetPrefix(), pDrawInst2d->GetName());
 		break;
 	case HYTYPE_Text2d:
-		pDataOut = m_Txt2d.GetData(pDrawNode2d->GetPrefix(), pDrawNode2d->GetName());
+		pDataOut = m_Txt2d.GetData(pDrawInst2d->GetPrefix(), pDrawInst2d->GetName());
 		break;
 	case HYTYPE_TexturedQuad2d:
-		if(pDrawNode2d->GetName() != "raw")
+		if(pDrawInst2d->GetName() != "raw")
 		{
-			std::pair<uint32, uint32> key(std::stoi(pDrawNode2d->GetPrefix()), std::stoi(pDrawNode2d->GetName()));
+			std::pair<uint32, uint32> key(std::stoi(pDrawInst2d->GetPrefix()), std::stoi(pDrawInst2d->GetName()));
 			if(m_Quad2d.find(key) == m_Quad2d.end())
 			{
 				HyTexturedQuad2dData *pNewQuadData = HY_NEW HyTexturedQuad2dData(key.first, key.second, *this);
@@ -264,18 +264,18 @@ void HyAssets::GetNodeData(IHyDrawInst2d *pDrawNode2d, IHyNodeData *&pDataOut)
 	}
 }
 
-void HyAssets::LoadNodeData(IHyDrawInst2d *pDrawNode2d)
+void HyAssets::LoadNodeData(IHyDrawInst2d *pDrawInst2d)
 {
-	if(pDrawNode2d->m_eLoadState != HYLOADSTATE_Inactive || pDrawNode2d->IsLoadDataValid() == false)
+	if(pDrawInst2d->m_eLoadState != HYLOADSTATE_Inactive || pDrawInst2d->IsLoadDataValid() == false)
 		return;
 
 	bool bFullyLoaded = true;
 
 	// Check whether all the required atlases are loaded
-	if(pDrawNode2d->AcquireData() != nullptr)
+	if(pDrawInst2d->AcquireData() != nullptr)
 	{
 		// TODO: Perhaps make this more efficient by skipping entire 32 bits when those equal '0'
-		const HyAtlasIndices &requiredAtlases = pDrawNode2d->UncheckedGetData()->GetRequiredAtlasIndices();
+		const HyAtlasIndices &requiredAtlases = pDrawInst2d->UncheckedGetData()->GetRequiredAtlasIndices();
 		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 		{
 			if(requiredAtlases.IsSet(i))
@@ -290,7 +290,7 @@ void HyAssets::LoadNodeData(IHyDrawInst2d *pDrawNode2d)
 	}
 
 	// Check whether we need to load custom shaders
-	for(auto iter = pDrawNode2d->m_RequiredCustomShaders.begin(); iter != pDrawNode2d->m_RequiredCustomShaders.end(); ++iter)
+	for(auto iter = pDrawInst2d->m_RequiredCustomShaders.begin(); iter != pDrawInst2d->m_RequiredCustomShaders.end(); ++iter)
 	{
 		IHyShader *pShader = IHyRenderer::FindShader(*iter);
 		QueueData(pShader);
@@ -300,26 +300,26 @@ void HyAssets::LoadNodeData(IHyDrawInst2d *pDrawNode2d)
 	}
 
 	// Set the node's 'm_eLoadState' appropriately below to prevent additional Loads
-	if(bFullyLoaded == false) // Could also use IsNodeLoaded() here
+	if(bFullyLoaded == false) // Could also use IsInstLoaded() here
 	{
-		pDrawNode2d->m_eLoadState = HYLOADSTATE_Queued;
-		m_QueuedInst2dList.push_back(pDrawNode2d);
+		pDrawInst2d->m_eLoadState = HYLOADSTATE_Queued;
+		m_QueuedInst2dList.push_back(pDrawInst2d);
 	}
 	else
 	{
-		SetNodeAsLoaded(pDrawNode2d);
+		SetInstAsLoaded(pDrawInst2d);
 	}
 }
 
-void HyAssets::RemoveNodeData(IHyDrawInst2d *pDrawNode2d)
+void HyAssets::RemoveNodeData(IHyDrawInst2d *pDrawInst2d)
 {
-	if(pDrawNode2d->m_eLoadState == HYLOADSTATE_Inactive)
+	if(pDrawInst2d->m_eLoadState == HYLOADSTATE_Inactive)
 		return;
 
-	if(pDrawNode2d->AcquireData() != nullptr)
+	if(pDrawInst2d->AcquireData() != nullptr)
 	{
 		// TODO: Perhaps make this more efficient by skipping entire 32 bits when those equal '0'
-		const HyAtlasIndices &requiredAtlases = pDrawNode2d->UncheckedGetData()->GetRequiredAtlasIndices();
+		const HyAtlasIndices &requiredAtlases = pDrawInst2d->UncheckedGetData()->GetRequiredAtlasIndices();
 		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 		{
 			if(requiredAtlases.IsSet(i))
@@ -330,17 +330,17 @@ void HyAssets::RemoveNodeData(IHyDrawInst2d *pDrawNode2d)
 		}
 	}
 
-	for(auto iter = pDrawNode2d->m_RequiredCustomShaders.begin(); iter != pDrawNode2d->m_RequiredCustomShaders.end(); ++iter)
+	for(auto iter = pDrawInst2d->m_RequiredCustomShaders.begin(); iter != pDrawInst2d->m_RequiredCustomShaders.end(); ++iter)
 	{
 		IHyShader *pShader = IHyRenderer::FindShader(*iter);
 		DequeData(pShader);
 	}
 
-	if(pDrawNode2d->m_eLoadState == HYLOADSTATE_Queued)
+	if(pDrawInst2d->m_eLoadState == HYLOADSTATE_Queued)
 	{
 		for(auto it = m_QueuedInst2dList.begin(); it != m_QueuedInst2dList.end(); ++it)
 		{
-			if((*it) == pDrawNode2d)
+			if((*it) == pDrawInst2d)
 			{
 				m_QueuedInst2dList.erase(it);
 				break;
@@ -348,22 +348,22 @@ void HyAssets::RemoveNodeData(IHyDrawInst2d *pDrawNode2d)
 		}
 	}
 
-	m_SceneRef.RemoveNode_Loaded(pDrawNode2d);
-	pDrawNode2d->m_eLoadState = HYLOADSTATE_Inactive;
+	m_SceneRef.RemoveNode_Loaded(pDrawInst2d);
+	pDrawInst2d->m_eLoadState = HYLOADSTATE_Inactive;
 }
 
-bool HyAssets::IsNodeLoaded(IHyDrawInst2d *pDrawNode2d)
+bool HyAssets::IsInstLoaded(IHyDrawInst2d *pDrawInst2d)
 {
 	// Atlases check
-	if(pDrawNode2d->AcquireData() != nullptr)
+	if(pDrawInst2d->AcquireData() != nullptr)
 	{
-		const HyAtlasIndices &requiredAtlases = pDrawNode2d->UncheckedGetData()->GetRequiredAtlasIndices();
+		const HyAtlasIndices &requiredAtlases = pDrawInst2d->UncheckedGetData()->GetRequiredAtlasIndices();
 		if(m_pLoadedAtlasIndices->IsSet(requiredAtlases) == false)
 			return false;
 	}
 
 	// Custom shaders check
-	for(auto iter = pDrawNode2d->m_RequiredCustomShaders.begin(); iter != pDrawNode2d->m_RequiredCustomShaders.end(); ++iter)
+	for(auto iter = pDrawInst2d->m_RequiredCustomShaders.begin(); iter != pDrawInst2d->m_RequiredCustomShaders.end(); ++iter)
 	{
 		IHyShader *pShader = IHyRenderer::FindShader(*iter);
 		if(pShader->GetLoadableState() != HYLOADSTATE_Loaded)
@@ -522,9 +522,9 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 			// TODO: Check if there's lots of overhead here checking queued list upon every loaded piece of data that comes through
 			for(auto iter = m_QueuedInst2dList.begin(); iter != m_QueuedInst2dList.end(); /*++iter*/) // Increment is handled within loop
 			{
-				if(IsNodeLoaded(*iter))
+				if(IsInstLoaded(*iter))
 				{
-					SetNodeAsLoaded(*iter);
+					SetInstAsLoaded(*iter);
 					iter = m_QueuedInst2dList.erase(iter);
 				}
 				else
@@ -570,11 +570,11 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 	}
 }
 
-void HyAssets::SetNodeAsLoaded(IHyDrawInst2d *pDrawNode2d)
+void HyAssets::SetInstAsLoaded(IHyDrawInst2d *pDrawInst2d)
 {
-	m_SceneRef.AddNode_Loaded(pDrawNode2d);
-	pDrawNode2d->m_eLoadState = HYLOADSTATE_Loaded;
-	pDrawNode2d->OnLoaded();
+	m_SceneRef.AddNode_Loaded(pDrawInst2d);
+	pDrawInst2d->m_eLoadState = HYLOADSTATE_Loaded;
+	pDrawInst2d->OnLoaded();
 }
 
 /*static*/ void HyAssets::LoadingThread(void *pParam)

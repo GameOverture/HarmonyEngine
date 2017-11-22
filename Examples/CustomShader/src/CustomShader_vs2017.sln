@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CustomShader", "CustomShader_vs2017.vcxproj", "{d618ea62-2cce-429d-9c78-b8c90b2cb3a4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B4471160-742A-4571-BCC5-3EF8163C10E1} = {B4471160-742A-4571-BCC5-3EF8163C10E1}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Harmony", "../../../Harmony/src/Harmony_vs2017.vcxproj", "{B4471160-742A-4571-BCC5-3EF8163C10E1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{d618ea62-2cce-429d-9c78-b8c90b2cb3a4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{d618ea62-2cce-429d-9c78-b8c90b2cb3a4}.Debug|Win32.Build.0 = Debug|Win32
+		{d618ea62-2cce-429d-9c78-b8c90b2cb3a4}.Debug|x64.ActiveCfg = Debug|Win32
+		{d618ea62-2cce-429d-9c78-b8c90b2cb3a4}.Release|Win32.ActiveCfg = Release|Win32
+		{d618ea62-2cce-429d-9c78-b8c90b2cb3a4}.Release|Win32.Build.0 = Release|Win32
+		{d618ea62-2cce-429d-9c78-b8c90b2cb3a4}.Release|x64.ActiveCfg = Release|Win32
+		{B4471160-742A-4571-BCC5-3EF8163C10E1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B4471160-742A-4571-BCC5-3EF8163C10E1}.Debug|Win32.Build.0 = Debug|Win32
+		{B4471160-742A-4571-BCC5-3EF8163C10E1}.Debug|x64.ActiveCfg = Debug|x64
+		{B4471160-742A-4571-BCC5-3EF8163C10E1}.Debug|x64.Build.0 = Debug|x64
+		{B4471160-742A-4571-BCC5-3EF8163C10E1}.Release|Win32.ActiveCfg = Release|Win32
+		{B4471160-742A-4571-BCC5-3EF8163C10E1}.Release|Win32.Build.0 = Release|Win32
+		{B4471160-742A-4571-BCC5-3EF8163C10E1}.Release|x64.ActiveCfg = Release|x64
+		{B4471160-742A-4571-BCC5-3EF8163C10E1}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

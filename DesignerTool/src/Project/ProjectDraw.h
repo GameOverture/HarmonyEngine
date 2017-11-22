@@ -14,13 +14,13 @@
 
 class CheckerGrid : public HyPrimitive2d
 {
-    glm::vec2		m_Resolution;
+    glm::vec2		m_vDimensions;
 
 public:
     CheckerGrid();
     virtual ~CheckerGrid();
 
-    void SetSurfaceSize(int iWidth, int iHeight);
+    void SetDimensions(int iWidth, int iHeight);
 
     virtual void OnUpdateUniforms();
     virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);

@@ -10,47 +10,49 @@
 #include "ProjectDraw.h"
 #include "GlobalUndoCmds.h"
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const char * const szCHECKERGRID_VERTEXSHADER = R"src(
-#version 400
+#version 430
 
-/*layout(location = 0)*/ in vec2 position;
-/*layout(location = 1)*/ in vec2 UVcoord;
+uniform mat4					u_mtxTransform;
+uniform mat4					u_mtxWorldToCamera;
+uniform mat4					u_mtxCameraToClip;
 
-smooth out vec2 interpUV;
+layout(location = 0) in vec2    attr_vPosition;
+layout(location = 1) in vec2    attr_vUVcoord;
 
-uniform mat4 transformMtx;
-uniform mat4 u_mtxWorldToCamera;
-uniform mat4 u_mtxCameraToClip;
+smooth out vec2                 interp_vUV;
 
 void main()
 {
-    interpUV.x = UVcoord.x;
-    interpUV.y = UVcoord.y;
+    interp_vUV.x = UVcoord.x;
+    interp_vUV.y = UVcoord.y;
 
-    vec4 temp = transformMtx * vec4(position, 0, 1);
-    temp = u_mtxWorldToCamera * temp;
-    gl_Position = u_mtxCameraToClip * temp;
+    vec4 vTemp = u_mtxTransform * vec4(attr_vPosition, 0, 1);
+    vTemp = u_mtxWorldToCamera * vTemp;
+    gl_Position = u_mtxCameraToClip * vTemp;
 }
 )src";
-
-
+//-------------------------------------------------------------------------------------------------------------------------------------------------
 const char *const szCHECKERGRID_FRAGMENTSHADER = R"src(
 #version 400
 
-in vec2 interpUV;
-out vec4 FragColor;
+uniform float                   u_fGridSize;
+uniform vec2                    u_vDimensions;
+uniform vec4                    u_vGridColor1;
+uniform vec4                    u_vGridColor2;
 
-uniform float uGridSize;
-uniform vec2 uResolution;
-uniform vec4 gridColor1;
-uniform vec4 gridColor2;
+smooth in vec2                  interp_vUV;
+out vec4                        out_vColor;
 
 void main()
 {
-    vec2 screenCoords = (interpUV.xy * (uResolution /** 0.5f*/)) / uGridSize;
-    FragColor = mix(gridColor1, gridColor2, step((float(int(floor(screenCoords.x) + floor(screenCoords.y)) & 1)), 0.9));
+    vec2 vScreenCoords = (interp_vUV.xy * (u_vDimensions /** 0.5f*/)) / u_fGridSize;
+    out_vColor = mix(u_vGridColor1, u_vGridColor2, step((float(int(floor(vScreenCoords.x) + floor(vScreenCoords.y)) & 1)), 0.9));
+    out_vColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }
 )src";
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CheckerGrid::CheckerGrid()
 {
@@ -60,12 +62,11 @@ CheckerGrid::~CheckerGrid()
 {
 }
 
-void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
+void CheckerGrid::SetDimensions(int iWidth, int iHeight)
 {
-    m_Resolution.x = iWidth;
-    m_Resolution.y = iHeight;
-    GetShape().SetAsBox(m_Resolution.x * 0.5f, m_Resolution.y * 0.5f);
-    //pos.Set(m_Resolution.x * -0.5f, m_Resolution.y * -0.5f);
+    m_vDimensions.x = iWidth;
+    m_vDimensions.y = iHeight;
+    GetShape().SetAsBox(m_vDimensions.x * 0.5f, m_vDimensions.y * 0.5f);
 }
 
 /*virtual*/ void CheckerGrid::OnUpdateUniforms()
@@ -73,11 +74,11 @@ void CheckerGrid::SetSurfaceSize(int iWidth, int iHeight)
     glm::mat4 mtx;
     HyPrimitive2d::GetWorldTransform(mtx);
 
-    m_ShaderUniforms.Set("transformMtx", mtx);
-    m_ShaderUniforms.Set("uGridSize", 25.0f);
-    m_ShaderUniforms.Set("uResolution", m_Resolution);
-    m_ShaderUniforms.Set("gridColor1", glm::vec4(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f, 1.0f));
-    m_ShaderUniforms.Set("gridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
+    m_ShaderUniforms.Set("u_mtxTransform", mtx);
+    m_ShaderUniforms.Set("u_fGridSize", 25.0f);
+    m_ShaderUniforms.Set("u_vDimensions", m_vDimensions);
+    m_ShaderUniforms.Set("u_vGridColor1", glm::vec4(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f, 1.0f));
+    m_ShaderUniforms.Set("u_vGridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
 }
 
 /*virtual*/ void CheckerGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)
@@ -128,14 +129,14 @@ ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp)
 {
     IHyShader *pShader_CheckerGrid = IHyRenderer::MakeCustomShader();
     pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
-    pShader_CheckerGrid->SetVertexAttribute("position", HYSHADERVAR_vec2);
-    pShader_CheckerGrid->SetVertexAttribute("UVcoord", HYSHADERVAR_vec2);
+    pShader_CheckerGrid->SetVertexAttribute("attr_vPosition", HYSHADERVAR_vec2);
+    pShader_CheckerGrid->SetVertexAttribute("attr_vUVcoord", HYSHADERVAR_vec2);
     pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
     pShader_CheckerGrid->Finalize(HYSHADERPROG_Primitive);
 
     m_CheckerGrid.SetCustomShader(pShader_CheckerGrid);
     m_CheckerGrid.SetDisplayOrder(-1000);
-    m_CheckerGrid.SetSurfaceSize(10000, 10000);  // Use a large size that is a multiple of grid size (25)
+    m_CheckerGrid.SetDimensions(10000, 10000);  // Use a large size that is a multiple of grid size (25)
 
     ChildAppend(m_CheckerGrid);
 }

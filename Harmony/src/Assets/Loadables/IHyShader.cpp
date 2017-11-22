@@ -81,26 +81,26 @@ void IHyShader::Finalize(HyShaderProgram eDefaultsFrom)
 		{
 		case HYSHADERPROG_QuadBatch:
 			SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
-			SetVertexAttribute("size", HYSHADERVAR_vec2, false, 1);
-			SetVertexAttribute("offset", HYSHADERVAR_vec2, false, 1);
-			SetVertexAttribute("topTint", HYSHADERVAR_vec4, false, 1);
-			SetVertexAttribute("botTint", HYSHADERVAR_vec4, false, 1);
-			SetVertexAttribute("UVcoord0", HYSHADERVAR_vec2, false, 1);
-			SetVertexAttribute("UVcoord1", HYSHADERVAR_vec2, false, 1);
-			SetVertexAttribute("UVcoord2", HYSHADERVAR_vec2, false, 1);
-			SetVertexAttribute("UVcoord3", HYSHADERVAR_vec2, false, 1);
-			SetVertexAttribute("mtxLocalToWorld", HYSHADERVAR_mat4, false, 1);
+			SetVertexAttribute("attr_vSize", HYSHADERVAR_vec2, false, 1);
+			SetVertexAttribute("attr_vOffset", HYSHADERVAR_vec2, false, 1);
+			SetVertexAttribute("attr_vTopTint", HYSHADERVAR_vec4, false, 1);
+			SetVertexAttribute("attr_vBotTint", HYSHADERVAR_vec4, false, 1);
+			SetVertexAttribute("attr_vUVcoord0", HYSHADERVAR_vec2, false, 1);
+			SetVertexAttribute("attr_vUVcoord1", HYSHADERVAR_vec2, false, 1);
+			SetVertexAttribute("attr_vUVcoord2", HYSHADERVAR_vec2, false, 1);
+			SetVertexAttribute("attr_vUVcoord3", HYSHADERVAR_vec2, false, 1);
+			SetVertexAttribute("attr_mtxLocalToWorld", HYSHADERVAR_mat4, false, 1);
 			break;
 
 		case HYSHADERPROG_Primitive:
 			SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);
-			SetVertexAttribute("a_vPosition", HYSHADERVAR_vec2);
+			SetVertexAttribute("attr_vPosition", HYSHADERVAR_vec2);
 			break;
 
 		case HYSHADERPROG_Lines2d:
 			SetSourceCode(szHYLINES2D_VERTEXSHADER, HYSHADER_Vertex);
-			SetVertexAttribute("a_vPosition", HYSHADERVAR_vec2);
-			SetVertexAttribute("a_vNormal", HYSHADERVAR_vec2);
+			SetVertexAttribute("attr_vPosition", HYSHADERVAR_vec2);
+			SetVertexAttribute("attr_vNormal", HYSHADERVAR_vec2);
 			break;
 		}
 	}

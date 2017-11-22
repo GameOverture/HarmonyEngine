@@ -31,6 +31,9 @@ HyRenderState::HyRenderState(/*const*/ IHyDrawInst2d &instanceRef, uint32 uiCull
 
 	m_iCoordinateSystem = instanceRef.GetCoordinateSystem();
 
+
+	//instanceRef.SetCustomShader
+
 	memset(m_hShaderList, 0, sizeof(HyShaderHandle) * HY_MAX_SHADER_PASSES_PER_INSTANCE);
 	switch(instanceRef.GetType())
 	{

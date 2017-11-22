@@ -108,10 +108,10 @@ public:
 	uint32 GetNumAtlases();
 	HyAtlasIndices *GetLoadedAtlases();
 
-	void GetNodeData(IHyDrawInst2d *pDrawNode2d, IHyNodeData *&pDataOut);
-	void LoadNodeData(IHyDrawInst2d *pDrawNode2d);
-	void RemoveNodeData(IHyDrawInst2d *pDrawNode2d);
-	bool IsNodeLoaded(IHyDrawInst2d *pDrawNode2d);
+	void GetNodeData(IHyDrawInst2d *pDrawInst2d, IHyNodeData *&pDataOut);
+	void LoadNodeData(IHyDrawInst2d *pDrawInst2d);
+	void RemoveNodeData(IHyDrawInst2d *pDrawInst2d);
+	bool IsInstLoaded(IHyDrawInst2d *pDrawInst2d);
 
 	void Shutdown();
 	bool IsShutdown();
@@ -123,7 +123,7 @@ private:
 	void DequeData(IHyLoadableData *pData);
 	void FinalizeData(IHyLoadableData *pData);
 
-	void SetNodeAsLoaded(IHyDrawInst2d *pDrawNode2d);
+	void SetInstAsLoaded(IHyDrawInst2d *pDrawInst2d);
 
 	static void LoadingThread(void *pParam);
 };

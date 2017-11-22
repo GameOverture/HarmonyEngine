@@ -17,77 +17,74 @@
 const char * const szHYQUADBATCH_VERTEXSHADER = R"src(
 #version 430
 
-layout(location = 0) in vec2 size;
-layout(location = 1) in vec2 offset;
-layout(location = 2) in vec4 topTint;
-layout(location = 3) in vec4 botTint;
-layout(location = 4) in vec2 UVcoord0;
-layout(location = 5) in vec2 UVcoord1;
-layout(location = 6) in vec2 UVcoord2;
-layout(location = 7) in vec2 UVcoord3;
-layout(location = 8) in mat4 mtxLocalToWorld;
+uniform mat4					u_mtxWorldToCamera;
+uniform mat4					u_mtxCameraToClip;
 
-smooth out vec2 interpUV;
-smooth out vec4 interpColor;
+layout(location = 0) in vec2	attr_vSize;
+layout(location = 1) in vec2	attr_vOffset;
+layout(location = 2) in vec4	attr_vTopTint;
+layout(location = 3) in vec4	attr_vBotTint;
+layout(location = 4) in vec2	attr_vUVcoord0;
+layout(location = 5) in vec2	attr_vUVcoord1;
+layout(location = 6) in vec2	attr_vUVcoord2;
+layout(location = 7) in vec2	attr_vUVcoord3;
+layout(location = 8) in mat4	attr_mtxLocalToWorld;
 
-uniform mat4 u_mtxWorldToCamera;
-uniform mat4 u_mtxCameraToClip;
+smooth out vec2					interp_vUV;
+smooth out vec4					interp_vColor;
 
-const vec2 g_Position[] = vec2[4](vec2(1.0f, 1.0f),
-								  vec2(0.0f, 1.0f),
-								  vec2(1.0f, 0.0f),
-								  vec2(0.0f, 0.0f));
+//////////////////////////////////////////////////////////////////////////
+const vec2 g_vPOSITION[] = vec2[4](vec2(1.0f, 1.0f),
+								   vec2(0.0f, 1.0f),
+								   vec2(1.0f, 0.0f),
+								   vec2(0.0f, 0.0f));
 
-vec2 g_UVCoords[] = vec2[4](UVcoord0,
-							UVcoord1,
-							UVcoord2,
-							UVcoord3);
+vec2 g_vUVCOORDS[] = vec2[4](attr_vUVcoord0,
+							 attr_vUVcoord1,
+							 attr_vUVcoord2,
+							 attr_vUVcoord3);
 
-vec4 g_Colors[] = vec4[4](topTint,
-						  topTint,
-						  botTint,
-						  botTint);
+vec4 g_vCOLORS[] = vec4[4](attr_vTopTint,
+						   attr_vTopTint,
+						   attr_vBotTint,
+						   attr_vBotTint);
 
+//////////////////////////////////////////////////////////////////////////
 void main()
 {
-	interpUV = g_UVCoords[gl_VertexID];
-	interpColor = g_Colors[gl_VertexID];
+	interp_vUV = g_vUVCOORDS[gl_VertexID];
+	interp_vColor = g_vCOLORS[gl_VertexID];
 
-	vec4 pos = vec4((g_Position[gl_VertexID].x * size.x) + offset.x,
-					(g_Position[gl_VertexID].y * size.y) + offset.y,
-					0.0, 1.0);
+	vec4 vPos = vec4((g_vPOSITION[gl_VertexID].x * attr_vSize.x) + attr_vOffset.x,
+					 (g_vPOSITION[gl_VertexID].y * attr_vSize.y) + attr_vOffset.y,
+					 0.0, 1.0);
 
-	pos = mtxLocalToWorld * pos;
-	pos = u_mtxWorldToCamera * pos;
-	gl_Position = u_mtxCameraToClip * pos;
+	vPos = attr_mtxLocalToWorld * vPos;
+	vPos = u_mtxWorldToCamera * vPos;
+	gl_Position = u_mtxCameraToClip * vPos;
 }
-
-//vec4 when_greaterThan(vec4 x, vec4 y) // Can also overload to take vec2, vec3, and float
-//{
-//	return max(sign(x - y), 0.0);
-//}
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(
 #version 430
-//#extension GL_EXT_texture_array : enable
 
-smooth in vec2 interpUV;
-smooth in vec4 interpColor;
+uniform sampler2D	u_Tex;
 
-uniform sampler2D Tex;
+smooth in vec2		interp_vUV;
+smooth in vec4		interp_vColor;
 
-out vec4 outputColor;
+out vec4			out_vColor;
 
+//////////////////////////////////////////////////////////////////////////
 void main()
 {
-	// Blend interpColor with whatever texel I get from interpUV
-	vec4 texelClr = texture(Tex, interpUV);
+	// Blend interp_vColor with whatever texel I get from interp_vUV
+	vec4 texelClr = texture(u_Tex, interp_vUV);
 
-	outputColor = interpColor * texelClr;
+	out_vColor = interp_vColor * texelClr;
 
 	// Discard fully transparent pixels so any potential stencil test isn't affected
-	if(outputColor.a == 0.0)
+	if(out_vColor.a == 0.0)
 		discard;
 }
 )src";
@@ -95,79 +92,88 @@ void main()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // PRIMITIVE
 const char * const szHYPRIMATIVE_VERTEXSHADER = R"src(
-#version 130
+#version 430
 
-/*layout(location = 0)*/ in vec2 a_vPosition;
+uniform mat4					u_mtxTransform;
+uniform mat4					u_mtxWorldToCamera;
+uniform mat4					u_mtxCameraToClip;
+uniform vec4					u_vColor;
 
-uniform mat4 u_mtxTransform;
-uniform mat4 u_mtxWorldToCamera;
-uniform mat4 u_mtxCameraToClip;
-uniform vec4 u_vColor;
+layout(location = 0) in vec2	attr_vPosition;
 
+//////////////////////////////////////////////////////////////////////////
 void main()
 {
-	vec4 temp = u_mtxTransform * vec4(a_vPosition, 0, 1);
-	temp = u_mtxWorldToCamera * temp;
-	gl_Position = u_mtxCameraToClip * temp;
+	vec4 vTemp = u_mtxTransform * vec4(attr_vPosition, 0, 1);
+	vTemp = u_mtxWorldToCamera * vTemp;
+	gl_Position = u_mtxCameraToClip * vTemp;
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYPRIMATIVE_FRAGMENTSHADER = R"src(
-#version 130
+#version 430
 
-out vec4 vFragColorOut;
+uniform vec4	u_vColor;
+out vec4		out_vColor;
 
-uniform vec4 u_vColor;
-
+//////////////////////////////////////////////////////////////////////////
 void main()
 {
-	vFragColorOut = u_vColor;
+	out_vColor = u_vColor;
 }
 )src";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // LINES2D
 const char * const szHYLINES2D_VERTEXSHADER = R"src(
-#version 130
+#version 430
 
-in vec2 a_vPosition;
-in vec2 a_vNormal;
+uniform float					u_fHalfWidth;
+uniform float					u_fFeatherAmt;
+uniform vec4					u_vColor;
+uniform mat4					u_mtxTransform;
+uniform mat4					u_mtxWorldToCamera;
+uniform mat4					u_mtxCameraToClip;
 
-out vec2 vNormalOut;
+layout(location = 0) in vec2	attr_vPosition;
+layout(location = 1) in vec2	attr_vNormal;
 
-uniform float u_fHalfWidth;
-uniform float u_fFeatherAmt;
-uniform vec4 u_vColor;
-uniform mat4 u_mtxTransform;
-uniform mat4 u_mtxWorldToCamera;
-uniform mat4 u_mtxCameraToClip;
+out vec2						interp_vNormal;
 
+//////////////////////////////////////////////////////////////////////////
 void main()
 {
-	vNormalOut = a_vNormal;
+	interp_vNormal = attr_vNormal;
 
-	vec4 vPos = u_mtxTransform * vec4(a_vPosition, 0, 1);
+	vec4 vPos = u_mtxTransform * vec4(attr_vPosition, 0, 1);
 	vPos = u_mtxWorldToCamera * vPos;
-	gl_Position = u_mtxCameraToClip * (vPos + vec4(a_vNormal * (u_fHalfWidth + (u_fFeatherAmt * 0.5f)), 0, 0));
+	gl_Position = u_mtxCameraToClip * (vPos + vec4(attr_vNormal * (u_fHalfWidth + (u_fFeatherAmt * 0.5f)), 0, 0));
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYLINES2D_FRAGMENTSHADER = R"src(
-#version 130
+#version 430
 
-in vec2 vNormalOut;
+uniform float		u_fHalfWidth;
+uniform float		u_fFeatherAmt;
+uniform vec4		u_vColor;
 
-out vec4 vFragColorOut;
+in vec2				interp_vNormal;
+out vec4			out_vColor;
 
-uniform float u_fHalfWidth;
-uniform float u_fFeatherAmt;
-uniform vec4 u_vColor;
-
+//////////////////////////////////////////////////////////////////////////
 void main()
 {
-	vFragColorOut = u_vColor;
-	vFragColorOut.w = smoothstep(u_fHalfWidth, u_fHalfWidth - u_fFeatherAmt, length(vNormalOut) * u_fHalfWidth);
+	out_vColor = u_vColor;
+	out_vColor.w = smoothstep(u_fHalfWidth, u_fHalfWidth - u_fFeatherAmt, length(interp_vNormal) * u_fHalfWidth);
 }
 )src";
+
+// Scratch/Sample functions
+//////////////////////////////////////////////////////////////////////////
+//vec4 when_greaterThan(vec4 x, vec4 y) // Can also overload to take vec2, vec3, and float
+//{
+//	return max(sign(x - y), 0.0);
+//}
 
 #endif /* HyOpenGLShaderSrc_h__ */

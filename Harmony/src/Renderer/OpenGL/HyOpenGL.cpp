@@ -489,7 +489,7 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, uint32 uiShaderPassInde
 		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
 
 		if(pRenderState->GetTextureHandle() != 0)
-			pShader->SetUniformGLSL("Tex", 0);
+			pShader->SetUniformGLSL("u_Tex", 0);
 	}
 	else
 	{
