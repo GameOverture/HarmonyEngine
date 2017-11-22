@@ -131,6 +131,11 @@ HyTextureHandle HyRenderState::GetTextureHandle() const
 	return m_hTextureHandle;
 }
 
+char *HyRenderState::GetExPtr()
+{
+	return reinterpret_cast<char *>(this) + sizeof(HyRenderState);
+}
+
 void HyRenderState::SetExSize(size_t uiSize)
 {
 	m_uiExDataSize = uiSize;

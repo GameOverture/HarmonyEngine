@@ -523,7 +523,7 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, uint32 uiShaderPassInde
 	pShader->SetUniformGLSL("u_mtxWorldToCamera", m_mtxView);
 	pShader->SetUniformGLSL("u_mtxCameraToClip", m_mtxProj);
 
-	char *pExBuffer = reinterpret_cast<char *>(pRenderState) + sizeof(HyRenderState);
+	char *pExBuffer = pRenderState->GetExPtr();
 	uint32 uiNumUniforms = *reinterpret_cast<uint32 *>(pExBuffer);
 	pExBuffer += sizeof(uint32);
 

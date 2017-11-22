@@ -59,6 +59,8 @@ public:
 
 	HyTextureHandle GetTextureHandle() const;
 
+	char *GetExPtr();
+
 	void SetExSize(size_t uiSize);
 	size_t GetExSize() const;
 };
