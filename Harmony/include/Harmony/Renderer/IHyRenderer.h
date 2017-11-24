@@ -17,7 +17,6 @@
 class HyRenderState;
 class HyStencil;
 class IHyDrawInst2d;
-class IHyShader;
 class HyWindow;
 class HyGfxComms;
 class HyDiagnostics;
@@ -59,9 +58,11 @@ protected:
 	std::queue<IHyLoadableData *>					m_TxDataQueue;
 	std::queue<IHyLoadableData *>					m_RxDataQueue;
 
-	static int32									sm_iShaderIdCount;
-	static std::map<HyShaderHandle, IHyShader *>	sm_ShaderMap;
+	// Built-in shaders
+	HyShader										m_ShaderQuadBatch;
+	HyShader										m_ShaderPrimitive;
 
+	static std::map<HyShaderHandle, HyShader *>		sm_ShaderMap;
 	static std::map<HyStencilHandle, HyStencil *>	sm_StencilMap;
 
 	// Diagnostics/Metrics
@@ -92,18 +93,18 @@ public:
 
 	virtual void FinishRender() = 0;
 
+	virtual void UploadShader(HyShaderProgram eDefaultsFrom, HyShader *pShader) = 0;
 	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) = 0;
-	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
-	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;
+	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
 
-	static IHyShader *FindShader(HyShaderHandle hHandle);
-	static IHyShader *MakeCustomShader();
-	static IHyShader *MakeCustomShader(const char *szPrefix, const char *szName);
+	static HyShader *FindShader(HyShaderHandle hHandle);
+	static void AddShader(HyShader *pShader);
+	static void RemoveShader(HyShader *pShader);
 
 	static HyStencil *FindStencil(HyStencilHandle hHandle);
-	static void AddStencil(HyStencil *pNewStencil);
-	static void RemoveStencil(HyStencil *pNewStencil);
+	static void AddStencil(HyStencil *pStencil);
+	static void RemoveStencil(HyStencil *pStencil);
 
 	void Render();
 };

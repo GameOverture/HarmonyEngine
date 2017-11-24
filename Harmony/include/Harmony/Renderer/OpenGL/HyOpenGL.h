@@ -21,7 +21,7 @@ class HyOpenGL : public IHyRenderer
 {
 protected:
 	// VAO's cannot be shared between windows (aka OpenGL contexts)
-	std::vector<std::map<HyOpenGLShader *, uint32> >	m_VaoMapList;
+	std::vector<std::map<HyShaderHandle, uint32> >	m_VaoMapList;
 
 	glm::mat4					m_mtxView;
 	glm::mat4					m_mtxProj;
@@ -33,8 +33,8 @@ public:
 	HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~HyOpenGL(void);
 
-	void GenVAOs(HyOpenGLShader *pShaderKey);
-	void BindVao(HyOpenGLShader *pShaderKey);
+	void GenVao(HyShaderHandle eShaderHandle);
+	void BindVao(HyShaderHandle eShaderHandle);
 
 	virtual void SetCurrentWindow(uint32 uiIndex);
 
@@ -48,12 +48,13 @@ public:
 
 	virtual void FinishRender() override;
 
+	virtual void UploadShader(HyShaderProgram eDefaultsFrom, HyShader *pShader) override;
 	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) override;
-	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
-	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) override;
+	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) override;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
 	virtual void DeleteTexture(uint32 uiTextureHandle) override;
 
 private:
+	void CompileShader(HyShader *pShader, HyShaderType eType);
 	void RenderPass2d(HyRenderState *pRenderState, uint32 uiShaderPassIndex, HyCamera2d *pCamera);
 };
 

@@ -292,7 +292,7 @@ void HyAssets::LoadNodeData(IHyDrawInst2d *pDrawInst2d)
 	// Check whether we need to load custom shaders
 	for(auto iter = pDrawInst2d->m_RequiredCustomShaders.begin(); iter != pDrawInst2d->m_RequiredCustomShaders.end(); ++iter)
 	{
-		IHyShader *pShader = IHyRenderer::FindShader(*iter);
+		HyShader *pShader = IHyRenderer::FindShader(*iter);
 		QueueData(pShader);
 
 		if(pShader->GetLoadableState() != HYLOADSTATE_Loaded)
@@ -332,7 +332,7 @@ void HyAssets::RemoveNodeData(IHyDrawInst2d *pDrawInst2d)
 
 	for(auto iter = pDrawInst2d->m_RequiredCustomShaders.begin(); iter != pDrawInst2d->m_RequiredCustomShaders.end(); ++iter)
 	{
-		IHyShader *pShader = IHyRenderer::FindShader(*iter);
+		HyShader *pShader = IHyRenderer::FindShader(*iter);
 		DequeData(pShader);
 	}
 
@@ -365,7 +365,7 @@ bool HyAssets::IsInstLoaded(IHyDrawInst2d *pDrawInst2d)
 	// Custom shaders check
 	for(auto iter = pDrawInst2d->m_RequiredCustomShaders.begin(); iter != pDrawInst2d->m_RequiredCustomShaders.end(); ++iter)
 	{
-		IHyShader *pShader = IHyRenderer::FindShader(*iter);
+		HyShader *pShader = IHyRenderer::FindShader(*iter);
 		if(pShader->GetLoadableState() != HYLOADSTATE_Loaded)
 			return false;
 	}

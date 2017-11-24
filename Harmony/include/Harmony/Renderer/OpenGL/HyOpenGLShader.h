@@ -11,10 +11,9 @@
 #define HyOpenGLShader_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Renderer/Components/HyShader.h"
 
-#include "Assets/Loadables/IHyShader.h"
-
-class HyOpenGLShader : public IHyShader
+class HyOpenGLShader : public HyShader
 {
 	GLsizei								m_uiStride;
 
@@ -60,7 +59,6 @@ public:
 	void PrintActiveUniforms();
 	void PrintActiveAttribs();
 
-	virtual void OnSetVertexAttribute(const char *szName, uint32 uiLocation) override;
 	virtual void OnUpload(IHyRenderer &rendererRef) override;
 	virtual void OnDelete(IHyRenderer &rendererRef) override;
 };

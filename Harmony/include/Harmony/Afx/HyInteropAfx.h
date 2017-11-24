@@ -16,9 +16,6 @@
 #include "Renderer/OpenGL/HyOpenGL.h"
 typedef HyOpenGL HyRendererInterop;
 
-#include "Renderer/OpenGL/HyOpenGLShader.h"
-typedef HyOpenGLShader HyShaderInterop;
-
 #if defined(HY_PLATFORM_GUI)
 	#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
 	typedef HyConsole_Gui HyConsoleInterop;
