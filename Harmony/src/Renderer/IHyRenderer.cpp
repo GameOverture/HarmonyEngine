@@ -16,9 +16,8 @@
 #include "Assets/Loadables/IHyLoadableData.h"
 #include "HyEngine.h"
 
-int32												IHyRenderer::sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
-std::map<HyShaderHandle, IHyShader *>				IHyRenderer::sm_ShaderMap;
-std::map<HyStencilHandle, HyStencil *>				IHyRenderer::sm_StencilMap;
+std::map<HyShaderHandle, HyShader *>	IHyRenderer::sm_ShaderMap;
+std::map<HyStencilHandle, HyStencil *>	IHyRenderer::sm_StencilMap;
 
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
@@ -31,22 +30,26 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> 
 																									m_pCurWindow(nullptr),
 																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8)
 {
+	HyShader::sm_pRenderer = this;
+
 	memset(m_pBUFFER_VERTEX, 0, HY_VERTEX_BUFFER_SIZE);
 	memset(m_pBUFFER_RENDERSTATES, 0, HY_RENDERSTATE_BUFFER_SIZE);
 }
 
 IHyRenderer::~IHyRenderer(void)
 {
+	HyShader::sm_pRenderer = nullptr;
+
 	delete[] m_pBUFFER_VERTEX;
 	delete[] m_pBUFFER_RENDERSTATES;
 
-	std::map<HyShaderHandle, IHyShader *>::iterator iter;
-	for(iter = sm_ShaderMap.begin(); iter != sm_ShaderMap.end(); ++iter)
+	for(auto iter = sm_ShaderMap.begin(); iter != sm_ShaderMap.end(); ++iter)
 		delete iter->second;
-
-	// Needed for GUI reloads
 	sm_ShaderMap.clear();
-	sm_iShaderIdCount = HYSHADERPROG_CustomStartIndex;
+
+	for(auto iter = sm_StencilMap.begin(); iter != sm_StencilMap.end(); ++iter)
+		delete iter->second;
+	sm_StencilMap.clear();
 }
 
 void IHyRenderer::PrepareBuffers()
@@ -130,31 +133,22 @@ uint32 IHyRenderer::GetNumWindows()
 	m_pCurWindow = m_WindowListRef[uiIndex];
 }
 
-/*static*/ IHyShader *IHyRenderer::FindShader(HyShaderHandle hHandle)
+/*static*/ HyShader *IHyRenderer::FindShader(HyShaderHandle hHandle)
 {
-	if(sm_ShaderMap.find(hHandle) != sm_ShaderMap.end())
+	if(hHandle != HY_UNUSED_HANDLE && sm_ShaderMap.find(hHandle) != sm_ShaderMap.end())
 		return sm_ShaderMap[hHandle];
 
-	HyError("IHyRenderer::FindShader could not find a valid shader");
 	return nullptr;
 }
 
-/*static*/ IHyShader *IHyRenderer::MakeCustomShader()
+/*static*/ void IHyRenderer::AddShader(HyShader *pShader)
 {
-	IHyShader *pNewShader = HY_NEW HyShaderInterop(sm_iShaderIdCount);
-	sm_ShaderMap[sm_iShaderIdCount] = pNewShader;
-
-	sm_iShaderIdCount++;
-	return pNewShader;
+	sm_ShaderMap[pShader->GetHandle()] = pShader;
 }
 
-/*static*/ IHyShader *IHyRenderer::MakeCustomShader(const char *szPrefix, const char *szName)
+/*static*/ void IHyRenderer::RemoveShader(HyShader *pShader)
 {
-	IHyShader *pNewShader = HY_NEW HyShaderInterop(sm_iShaderIdCount, szPrefix, szName);
-	sm_ShaderMap[sm_iShaderIdCount] = pNewShader;
-
-	sm_iShaderIdCount++;
-	return pNewShader;
+	sm_ShaderMap.erase(sm_ShaderMap.find(pShader->GetHandle()));
 }
 
 /*static*/ HyStencil *IHyRenderer::FindStencil(HyStencilHandle hHandle)
@@ -165,14 +159,14 @@ uint32 IHyRenderer::GetNumWindows()
 	return nullptr;
 }
 
-/*static*/ void IHyRenderer::AddStencil(HyStencil *pNewStencil)
+/*static*/ void IHyRenderer::AddStencil(HyStencil *pStencil)
 {
-	sm_StencilMap[pNewStencil->GetHandle()] = pNewStencil;
+	sm_StencilMap[pStencil->GetHandle()] = pStencil;
 }
 
-/*static*/ void IHyRenderer::RemoveStencil(HyStencil *pNewStencil)
+/*static*/ void IHyRenderer::RemoveStencil(HyStencil *pStencil)
 {
-	sm_StencilMap.erase(sm_StencilMap.find(pNewStencil->GetHandle()));
+	sm_StencilMap.erase(sm_StencilMap.find(pStencil->GetHandle()));
 }
 
 void IHyRenderer::Render()

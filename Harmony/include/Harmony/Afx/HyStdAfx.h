@@ -69,7 +69,6 @@ enum HyShapeType
 enum HyLoadableType
 {
 	HYGFXTYPE_AtlasGroup = 0,
-	HYGFXTYPE_CustomShader
 };
 
 enum HyAnimCtrl

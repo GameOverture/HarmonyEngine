@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
 #include "Assets/Nodes/IHyNodeData.h"
-#include "Assets/Loadables/IHyShader.h"
+#include "Renderer/Components/HyShader.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
 class HyStencil;
@@ -76,7 +76,7 @@ public:
 	const b2AABB &GetWorldAABB();
 	HyShape2d *GetUserBoundingVolume(uint32 uiIndex);
 
-	void SetCustomShader(IHyShader *pShader);
+	void SetCustomShader(HyShader *pShader);
 
 	virtual bool IsLoaded() const override;
 	virtual void Load() override;
