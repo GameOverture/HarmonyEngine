@@ -12,10 +12,11 @@ class HarmonyWidget : public QOpenGLWidget//, protected QOpenGLFunctions
 {
     Q_OBJECT
 
+    static bool                 sm_bHarmonyLoaded;
+
     Project *                   m_pProject;
 
     HyEngine *                  m_pHyEngine;
-    bool                        m_bHarmonyLoaded;
 
     QTimer *                    m_pTimer;
 

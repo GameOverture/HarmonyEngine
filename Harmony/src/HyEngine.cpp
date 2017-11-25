@@ -124,6 +124,7 @@ bool HyEngine::Update()
 	}
 
 	m_Scene.PrepareRender(m_Renderer);
+	m_Renderer.ProcessMsgs();
 	m_Renderer.Render();
 
 	return true;
@@ -136,8 +137,7 @@ void HyEngine::Shutdown()
 	while(m_Assets.IsShutdown() == false)
 	{
 		m_Assets.Update(m_Renderer);
-		m_Scene.PrepareRender(m_Renderer);
-		m_Renderer.Render();
+		m_Renderer.ProcessMsgs();
 	}
 }
 

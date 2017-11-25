@@ -25,7 +25,6 @@ HyShader::HyShader() :	m_hHANDLE(++sm_hHandleCount),
 
 HyShader::~HyShader()
 {
-	IHyRenderer::RemoveShader(this);
 }
 
 HyShaderHandle HyShader::GetHandle()

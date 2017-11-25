@@ -38,8 +38,8 @@ class HyShader
 
 public:
 	HyShader();
-
-	virtual ~HyShader();
+private: ~HyShader();
+public:
 
 	HyShaderHandle GetHandle();
 	bool IsFinalized();
@@ -52,12 +52,6 @@ public:
 	std::vector<HyShaderVertexAttribute> &GetVertextAttributes();
 
 	void Finalize(HyShaderProgramDefaults eDefaultsFrom);
-
-	//virtual void OnRenderThread(IHyRenderer &rendererRef) override; // ::IHyLoadableData
-
-//protected:
-//	virtual void OnUpload(IHyRenderer &rendererRef) = 0;
-//	virtual void OnDelete(IHyRenderer &rendererRef) = 0;
 };
 
 #endif /* HyShader_h__ */

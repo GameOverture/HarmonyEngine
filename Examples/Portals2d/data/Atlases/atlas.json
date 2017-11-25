@@ -1,0 +1,19 @@
+[
+    {
+        "atlasGrpId": 0,
+        "height": 2048,
+        "textureType": 0,
+        "textures": [
+            [
+                {
+                    "bottom": 220,
+                    "checksum": 1059189656,
+                    "left": 0,
+                    "right": 220,
+                    "top": 0
+                }
+            ]
+        ],
+        "width": 2048
+    }
+]

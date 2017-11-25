@@ -25,8 +25,8 @@ smooth out vec2                 interp_vUV;
 
 void main()
 {
-    interp_vUV.x = UVcoord.x;
-    interp_vUV.y = UVcoord.y;
+    interp_vUV.x = attr_vUVcoord.x;
+    interp_vUV.y = attr_vUVcoord.y;
 
     vec4 vTemp = u_mtxTransform * vec4(attr_vPosition, 0, 1);
     vTemp = u_mtxWorldToCamera * vTemp;
@@ -47,26 +47,21 @@ out vec4                        out_vColor;
 
 void main()
 {
-    vec2 vScreenCoords = (interp_vUV.xy * (u_vDimensions /** 0.5f*/)) / u_fGridSize;
+    vec2 vScreenCoords = (interp_vUV * u_vDimensions) / u_fGridSize;
     out_vColor = mix(u_vGridColor1, u_vGridColor2, step((float(int(floor(vScreenCoords.x) + floor(vScreenCoords.y)) & 1)), 0.9));
-    out_vColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }
 )src";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CheckerGrid::CheckerGrid()
+CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize, HyEntity2d *pParent) :   HyPrimitive2d(pParent),
+                                                                                                m_vDIMENSIONS(fWidth, fHeight),
+                                                                                                m_fGridSize(fGridSize)
 {
+    GetShape().SetAsBox(m_vDIMENSIONS.x * 0.5f, m_vDIMENSIONS.y * 0.5f);
 }
 
 CheckerGrid::~CheckerGrid()
 {
-}
-
-void CheckerGrid::SetDimensions(int iWidth, int iHeight)
-{
-    m_vDimensions.x = iWidth;
-    m_vDimensions.y = iHeight;
-    GetShape().SetAsBox(m_vDimensions.x * 0.5f, m_vDimensions.y * 0.5f);
 }
 
 /*virtual*/ void CheckerGrid::OnUpdateUniforms()
@@ -75,16 +70,15 @@ void CheckerGrid::SetDimensions(int iWidth, int iHeight)
     HyPrimitive2d::GetWorldTransform(mtx);
 
     m_ShaderUniforms.Set("u_mtxTransform", mtx);
-    m_ShaderUniforms.Set("u_fGridSize", 25.0f);
-    m_ShaderUniforms.Set("u_vDimensions", m_vDimensions);
+    m_ShaderUniforms.Set("u_fGridSize", m_fGridSize);
+    m_ShaderUniforms.Set("u_vDimensions", m_vDIMENSIONS);
     m_ShaderUniforms.Set("u_vGridColor1", glm::vec4(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f, 1.0f));
     m_ShaderUniforms.Set("u_vGridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
 }
 
 /*virtual*/ void CheckerGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)
 {
-    if(GetNumVerts() != 6)
-        HyGuiLog("CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad", LOGTYPE_Error);
+    HyAssert(GetNumVerts() == 6, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
 
     for(int i = 0; i < 6; ++i)
     {
@@ -125,20 +119,18 @@ void CheckerGrid::SetDimensions(int iWidth, int iHeight)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp)
+ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp),
+                                                    m_CheckerGrid(400.0f, 400.0f, 25.0f, this)
 {
-    IHyShader *pShader_CheckerGrid = IHyRenderer::MakeCustomShader();
-    pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
-    pShader_CheckerGrid->SetVertexAttribute("attr_vPosition", HYSHADERVAR_vec2);
-    pShader_CheckerGrid->SetVertexAttribute("attr_vUVcoord", HYSHADERVAR_vec2);
-    pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
-    pShader_CheckerGrid->Finalize(HYSHADERPROG_Primitive);
+    m_pCheckerGridShader = HY_NEW HyShader();
+    m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
+    m_pCheckerGridShader->AddVertexAttribute("attr_vPosition", HYSHADERVAR_vec2);
+    m_pCheckerGridShader->AddVertexAttribute("attr_vUVcoord", HYSHADERVAR_vec2);
+    m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
+    m_pCheckerGridShader->Finalize(HYSHADERPROG_Primitive);
 
-    m_CheckerGrid.SetCustomShader(pShader_CheckerGrid);
+    m_CheckerGrid.SetCustomShader(m_pCheckerGridShader);
     m_CheckerGrid.SetDisplayOrder(-1000);
-    m_CheckerGrid.SetDimensions(10000, 10000);  // Use a large size that is a multiple of grid size (25)
-
-    ChildAppend(m_CheckerGrid);
 }
 
 /*virtual*/ ProjectDraw::~ProjectDraw()

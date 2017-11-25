@@ -275,6 +275,8 @@ class ComboBoxMapper : public QDataWidgetMapper
                 if(sName == m_sItemList[i])
                     return i;
             }
+
+            return -1;
         }
 
         virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override {

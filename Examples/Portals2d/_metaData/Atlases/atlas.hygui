@@ -1,0 +1,46 @@
+{
+    "filters": [
+    ],
+    "frames": [
+        {
+            "atlasGrpId": 0,
+            "checksum": 1059189656,
+            "cropBottom": 219,
+            "cropLeft": 0,
+            "cropRight": 219,
+            "cropTop": 0,
+            "errors": 0,
+            "filter": "",
+            "height": 220,
+            "id": 0,
+            "name": "+HyFont",
+            "textureIndex": 0,
+            "type": 2,
+            "width": 220,
+            "x": 0,
+            "y": 0
+        }
+    ],
+    "groups": [
+        {
+            "atlasGrpId": 0,
+            "chkAutosize": true,
+            "chkMerge": true,
+            "chkSquare": true,
+            "cmbHeuristic": 1,
+            "cmbSortOrder": 0,
+            "extrude": 1,
+            "minFillRate": 80,
+            "sbFrameMarginBottom": 1,
+            "sbFrameMarginLeft": 0,
+            "sbFrameMarginRight": 1,
+            "sbFrameMarginTop": 0,
+            "sbTextureHeight": 2048,
+            "sbTextureWidth": 2048,
+            "textureType": 0,
+            "txtName": "Default"
+        }
+    ],
+    "startAtlasId": 1,
+    "startFrameId": 1
+}

@@ -125,8 +125,8 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBindBuffer");
 
 	// Built-in shaders
-	m_ShaderQuadBatch.Finalize(HYSHADERPROG_QuadBatch);
-	m_ShaderPrimitive.Finalize(HYSHADERPROG_Primitive);
+	m_pShaderQuadBatch->Finalize(HYSHADERPROG_QuadBatch);
+	m_pShaderPrimitive->Finalize(HYSHADERPROG_Primitive);
 }
 
 HyOpenGL::~HyOpenGL(void)
@@ -735,7 +735,7 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera)
 	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glActiveTexture");
 
 	// TODO: This seems hacky, fix it
-	if(m_ShaderQuadBatch.GetHandle() == hShaderHandle)
+	if(m_pShaderQuadBatch->GetHandle() == hShaderHandle)
 	{
 		glBindTexture(GL_TEXTURE_2D, pRenderState->GetTextureHandle());
 		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");

@@ -58,8 +58,8 @@ protected:
 	std::queue<IHyLoadableData *>					m_RxDataQueue;
 
 	// Built-in shaders
-	HyShader										m_ShaderQuadBatch;
-	HyShader										m_ShaderPrimitive;
+	HyShader *										m_pShaderQuadBatch;
+	HyShader *										m_pShaderPrimitive;
 
 	static std::map<HyShaderHandle, HyShader *>		sm_ShaderMap;
 	static std::map<HyStencilHandle, HyStencil *>	sm_StencilMap;
@@ -101,12 +101,12 @@ public:
 
 	static HyShader *FindShader(HyShaderHandle hHandle);
 	static void AddShader(HyShader *pShader);
-	static void RemoveShader(HyShader *pShader);
 
 	static HyStencil *FindStencil(HyStencilHandle hHandle);
 	static void AddStencil(HyStencil *pStencil);
 	static void RemoveStencil(HyStencil *pStencil);
 
+	void ProcessMsgs();
 	void Render();
 };
 

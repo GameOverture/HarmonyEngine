@@ -4,10 +4,11 @@
 
 #include <QDragEnterEvent>
 
+bool HarmonyWidget::sm_bHarmonyLoaded = false;
+
 HarmonyWidget::HarmonyWidget(Project *pProject) :   QOpenGLWidget(nullptr),
                                                     m_pProject(pProject),
-                                                    m_pHyEngine(nullptr),
-                                                    m_bHarmonyLoaded(false)
+                                                    m_pHyEngine(nullptr)
 {
     m_pTimer = new QTimer(this);
     connect(m_pTimer, SIGNAL(timeout()), this, SLOT(OnBootCheck()));
@@ -23,6 +24,7 @@ HarmonyWidget::HarmonyWidget(Project *pProject) :   QOpenGLWidget(nullptr),
 
     makeCurrent();
     HyEngine::GuiDelete();
+    sm_bHarmonyLoaded = false;
 }
 
 Project *HarmonyWidget::GetProject()
@@ -84,7 +86,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::paintGL() /*override*/
 {
-    if(m_bHarmonyLoaded)
+    if(sm_bHarmonyLoaded)
     {
         if(m_pHyEngine->Update() == false)
             HyGuiLog("Harmony Gfx requested exit program.", LOGTYPE_Info);
@@ -226,6 +228,6 @@ void HarmonyWidget::OnBootCheck()
         connect(m_pTimer, SIGNAL(timeout()), this, SLOT(update()));
         m_pTimer->start(10);
 
-        m_bHarmonyLoaded = true;
+        sm_bHarmonyLoaded = true;
     }
 }

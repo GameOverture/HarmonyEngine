@@ -7,8 +7,8 @@ class CustomShader : public IHyApplication
 {
 	HyCamera2d *	m_pCamera;
 
-	HyShader		m_CheckerGridShader;
 	CheckerGrid		m_CheckerGrid;
+	HyShader *		m_pCheckerGridShader;
 
 public:
 	CustomShader(HarmonyInit &initStruct);

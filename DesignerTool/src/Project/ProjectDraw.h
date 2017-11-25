@@ -14,13 +14,12 @@
 
 class CheckerGrid : public HyPrimitive2d
 {
-    glm::vec2		m_vDimensions;
+    const glm::vec2     m_vDIMENSIONS;
+    float               m_fGridSize;
 
 public:
-    CheckerGrid();
+    CheckerGrid(float fWidth, float fHeight, float fGridSize, HyEntity2d *pParent);
     virtual ~CheckerGrid();
-
-    void SetDimensions(int iWidth, int iHeight);
 
     virtual void OnUpdateUniforms();
     virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
@@ -29,6 +28,7 @@ public:
 class ProjectDraw : public IDraw
 {
     CheckerGrid         m_CheckerGrid;
+    HyShader *          m_pCheckerGridShader;
 
 public:
     ProjectDraw(IHyApplication &hyApp);

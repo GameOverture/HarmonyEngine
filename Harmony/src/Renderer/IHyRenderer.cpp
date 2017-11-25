@@ -27,6 +27,8 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> 
 																									m_pCurRenderStateWritePos(nullptr),
 																									m_pCurVertexWritePos(nullptr),
 																									m_uiVertexBufferUsedBytes(0),
+																									m_pShaderQuadBatch(HY_NEW HyShader()),
+																									m_pShaderPrimitive(HY_NEW HyShader()),
 																									m_pCurWindow(nullptr),
 																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8)
 {
@@ -47,9 +49,8 @@ IHyRenderer::~IHyRenderer(void)
 		delete iter->second;
 	sm_ShaderMap.clear();
 
-	for(auto iter = sm_StencilMap.begin(); iter != sm_StencilMap.end(); ++iter)
-		delete iter->second;
-	sm_StencilMap.clear();
+	while(sm_StencilMap.empty() == false)
+		delete sm_StencilMap.begin()->second;
 }
 
 void IHyRenderer::PrepareBuffers()
@@ -130,14 +131,16 @@ HyShaderHandle IHyRenderer::GetDefaultShaderHandle(HyType eType)
 	case HYTYPE_Sprite2d:
 	case HYTYPE_TexturedQuad2d:
 	case HYTYPE_Text2d:
-		return m_ShaderQuadBatch.GetHandle();
+		return m_pShaderQuadBatch->GetHandle();
 
 	case HYTYPE_Primitive2d:
-		return m_ShaderPrimitive.GetHandle();
+		return m_pShaderPrimitive->GetHandle();
 
 	default:
 		HyError("IHyRenderer::GetDefaultShaderHandle - Unknown instance type");
 	}
+
+	return HYTYPE_Unknown;
 }
 
 uint32 IHyRenderer::GetNumWindows()
@@ -163,11 +166,6 @@ uint32 IHyRenderer::GetNumWindows()
 	sm_ShaderMap[pShader->GetHandle()] = pShader;
 }
 
-/*static*/ void IHyRenderer::RemoveShader(HyShader *pShader)
-{
-	sm_ShaderMap.erase(sm_ShaderMap.find(pShader->GetHandle()));
-}
-
 /*static*/ HyStencil *IHyRenderer::FindStencil(HyStencilHandle hHandle)
 {
 	if(hHandle != HY_UNUSED_HANDLE && sm_StencilMap.find(hHandle) != sm_StencilMap.end())
@@ -186,11 +184,8 @@ uint32 IHyRenderer::GetNumWindows()
 	sm_StencilMap.erase(sm_StencilMap.find(pStencil->GetHandle()));
 }
 
-void IHyRenderer::Render()
+void IHyRenderer::ProcessMsgs()
 {
-	HY_PROFILE_BEGIN("Render")
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
 	while(m_RxDataQueue.empty() == false)
 	{
@@ -200,6 +195,11 @@ void IHyRenderer::Render()
 		pData->OnRenderThread(*this);
 		m_TxDataQueue.push(pData);
 	}
+}
+
+void IHyRenderer::Render()
+{
+	HY_PROFILE_BEGIN("Render")
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup render state buffer
