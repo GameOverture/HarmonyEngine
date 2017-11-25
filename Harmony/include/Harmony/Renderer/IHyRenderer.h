@@ -11,6 +11,7 @@
 #define IHyRenderer_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Renderer/Components/HyShader.h"
 
 #include <queue>
 

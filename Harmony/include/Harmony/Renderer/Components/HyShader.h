@@ -13,27 +13,28 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/IHyLoadableData.h"
 
+struct HyShaderVertexAttribute
+{
+	std::string					sName;
+	HyShaderVariable			eVarType;
+	bool						bNormalized;
+	uint32						uiInstanceDivisor;
+};
+
 class HyShader
 {
 	friend class IHyRenderer;
 
-	static HyShaderHandle			sm_hHandleCount;
-	static IHyRenderer *			sm_pRenderer;
+	static HyShaderHandle					sm_hHandleCount;
+	static IHyRenderer *					sm_pRenderer;
 
-protected:
-	const HyShaderHandle			m_hHANDLE;
+	const HyShaderHandle					m_hHANDLE;
 
-	bool							m_bIsFinalized;
-	std::string						m_sSourceCode[HYNUMSHADERTYPES];
+	bool									m_bIsFinalized;
+	std::string								m_sSourceCode[HYNUMSHADERTYPES];
 
-	struct VertexAttribute
-	{
-		std::string					sName;
-		HyShaderVariable			eVarType;
-		bool						bNormalized;
-		uint32						uiInstanceDivisor;
-	};
-	std::vector<VertexAttribute>	m_VertexAttributeList;
+	std::vector<HyShaderVertexAttribute>	m_VertexAttributeList;
+	size_t									m_uiStride;
 
 public:
 	HyShader();
@@ -42,12 +43,13 @@ public:
 
 	HyShaderHandle GetHandle();
 	bool IsFinalized();
+	int32 GetStride();
 
 	const std::string &GetSourceCode(HyShaderType eType);
 	void SetSourceCode(std::string sSource, HyShaderType eType);
 
 	void AddVertexAttribute(const char *szName, HyShaderVariable eVarType, bool bNormalize = false, uint32 uiInstanceDivisor = 0);
-	void ClearVertextAttributes();
+	std::vector<HyShaderVertexAttribute> &GetVertextAttributes();
 
 	void Finalize(HyShaderProgram eDefaultsFrom);
 

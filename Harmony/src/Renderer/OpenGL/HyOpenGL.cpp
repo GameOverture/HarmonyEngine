@@ -22,7 +22,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	HyLog("OpenGL is initializing...");
 
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
-		m_VaoMapList.push_back(std::map<HyOpenGLShader *, uint32>());
+		m_VaoMapList.push_back(std::map<HyShaderHandle, GLuint>());
 
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
@@ -39,14 +39,14 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 		}
 		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
 
-		glEnable(GL_DEPTH_TEST);
-		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
+		//glEnable(GL_DEPTH_TEST);
+		//HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
 
-		glEnable(GL_BLEND);
-		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
+		//glEnable(GL_BLEND);
+		//HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
 
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	}
@@ -114,10 +114,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 					iMaxTextureSize,
 					sCompressedTextureFormats);
 
-	glEnable(GL_DEPTH_TEST);
-	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
-
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	//glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
 	//////////////////////////////////////////////////////////////////////////
 	// 2D setup
@@ -127,55 +124,13 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBindBuffer");
 
-	// Quad batch //////////////////////////////////////////////////////////////////////////
-	HyOpenGLShader *pShaderQuadBatch = HY_NEW HyOpenGLShader(HYSHADERPROG_QuadBatch);
-	sm_ShaderMap[HYSHADERPROG_QuadBatch] = pShaderQuadBatch;
-	pShaderQuadBatch->Finalize(HYSHADERPROG_QuadBatch);
-	pShaderQuadBatch->OnRenderThread(*this);
-
-	// Primitive //////////////////////////////////////////////////////////////////////////
-	HyOpenGLShader *pShaderPrimitive = HY_NEW HyOpenGLShader(HYSHADERPROG_Primitive);
-	sm_ShaderMap[HYSHADERPROG_Primitive] = pShaderPrimitive;
-	pShaderPrimitive->Finalize(HYSHADERPROG_Primitive);
-	pShaderPrimitive->OnRenderThread(*this);
-
-	// Line2D //////////////////////////////////////////////////////////////////////////
-	HyOpenGLShader *pShaderLine2d = HY_NEW HyOpenGLShader(HYSHADERPROG_Lines2d);
-	sm_ShaderMap[HYSHADERPROG_Lines2d] = pShaderLine2d;
-	pShaderLine2d->Finalize(HYSHADERPROG_Lines2d);
-	pShaderLine2d->OnRenderThread(*this);
-
-	glEnable(GL_BLEND);
-	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
+	// Built-in shaders
+	m_ShaderQuadBatch.Finalize(HYSHADERPROG_QuadBatch);
+	m_ShaderPrimitive.Finalize(HYSHADERPROG_Primitive);
 }
 
 HyOpenGL::~HyOpenGL(void)
 {
-}
-
-void HyOpenGL::GenVao(HyShaderHandle eShaderHandle)
-{
-	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
-	{
-		if(m_VaoMapList[i].find(eShaderHandle) == m_VaoMapList[i].end())
-		{
-			SetCurrentWindow(i);
-
-			m_VaoMapList[i][eShaderHandle] = 0;
-			glGenVertexArrays(1, &m_VaoMapList[i][eShaderHandle]);
-			HyErrorCheck_OpenGL("HyOpenGLShader::OnUpload", "glGenVertexArrays");
-		}
-	}
-}
-
-void HyOpenGL::BindVao(HyShaderHandle eShaderHandle)
-{
-	uint32 uiVao = m_VaoMapList[m_pCurWindow->GetIndex()][eShaderHandle];
-	glBindVertexArray(uiVao);
-	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
 }
 
 /*virtual*/ void HyOpenGL::SetCurrentWindow(uint32 uiIndex)
@@ -195,6 +150,8 @@ void HyOpenGL::BindVao(HyShaderHandle eShaderHandle)
 
 /*virtual*/ void HyOpenGL::Begin_3d()
 {
+	glEnable(GL_DEPTH_TEST);
+	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
 }
 
 /*virtual*/ void HyOpenGL::DrawRenderState_3d(HyRenderState *pRenderState) /*override*/
@@ -211,6 +168,10 @@ void HyOpenGL::BindVao(HyShaderHandle eShaderHandle)
 
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
 }
 
 /*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderState *pRenderState)
@@ -291,11 +252,13 @@ void HyOpenGL::BindVao(HyShaderHandle eShaderHandle)
 
 /*virtual*/ void HyOpenGL::UploadShader(HyShaderProgram eDefaultsFrom, HyShader *pShader) /*override*/
 {
+	std::vector<HyShaderVertexAttribute> &shaderVertexAttribListRef = pShader->GetVertextAttributes();
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// If unassigned vertex shader, fill in defaults
 	if(pShader->GetSourceCode(HYSHADER_Vertex).empty())
 	{
-		pShader->ClearVertextAttributes();
+		shaderVertexAttribListRef.clear();
 
 		switch(eDefaultsFrom)
 		{
@@ -352,21 +315,19 @@ void HyOpenGL::BindVao(HyShaderHandle eShaderHandle)
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Generate VAO to associate with this shader program
-	GenVao(pShader->GetHandle());
-
+	// Error check attribute list
 #ifdef HY_DEBUG
 	GLint iMaxVertexAttribs;
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &iMaxVertexAttribs);
 
 	int32 iTotalVertexAttribs = 0;
-	for(uint32 i = 0; i < m_VertexAttributeList.size(); ++i)
+	for(uint32 i = 0; i < shaderVertexAttribListRef.size(); ++i)
 	{
-		if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec2 || m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec3 || m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec4)
+		if(shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_dvec2 || shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_dvec3 || shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_dvec4)
 			iTotalVertexAttribs += 2;
-		else if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_mat3)
+		else if(shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_mat3)
 			iTotalVertexAttribs += 3;
-		else if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_mat4)
+		else if(shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_mat4)
 			iTotalVertexAttribs += 4;
 		else
 			iTotalVertexAttribs += 1;
@@ -375,88 +336,121 @@ void HyOpenGL::BindVao(HyShaderHandle eShaderHandle)
 	HyAssert(iMaxVertexAttribs >= iTotalVertexAttribs, "GL_MAX_VERTEX_ATTRIBS is < " << iTotalVertexAttribs);
 #endif
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Generate the shader program and generate the corresponding VAO(s) for each context/window
+	if(m_GLShaderMap.find(pShader->GetHandle()) == m_GLShaderMap.end())
+	{
+		m_GLShaderMap[pShader->GetHandle()] = glCreateProgram();
+		HyAssert(m_GLShaderMap[pShader->GetHandle()] != 0, "Unable to create shader program");
+		HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glCreateProgram");
+	}
+	GLuint hGLShaderProg = m_GLShaderMap[pShader->GetHandle()];
+
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
+	{
+		if(m_VaoMapList[i].find(pShader->GetHandle()) == m_VaoMapList[i].end())
+		{
+			SetCurrentWindow(i);
+
+			glGenVertexArrays(1, &m_VaoMapList[i][pShader->GetHandle()]);
+			HyErrorCheck_OpenGL("HyOpenGLShader::OnUpload", "glGenVertexArrays");
+		}
+	}
+
 	CompileShader(pShader, HYSHADER_Vertex);
 	CompileShader(pShader, HYSHADER_Fragment);
 
-	// TODO: Explicitly bind 
-	for(uint32 i = 0; i < m_VertexAttributeList.size(); ++i)
-		BindAttribLocation(i, m_VertexAttributeList[i].sName.c_str());
-
-	Link();
-
-	for(uint32 i = 0; i < gl.GetNumWindows(); ++i)
+	// TODO: IS THIS NEEDED? 
+	for(uint32 i = 0; i < shaderVertexAttribListRef.size(); ++i)
 	{
-		gl.SetCurrentWindow(i);
-		gl.BindVao(this);
+		//BindAttribLocation(i, );
+		glEnableVertexAttribArray(i);
+		HyErrorCheck_OpenGL("HyOpenGLShader::BindAttribLocation", "glEnableVertexAttribArray");
 
-		m_uiStride = 0;
+		glBindAttribLocation(hGLShaderProg, i, shaderVertexAttribListRef[i].sName.c_str());
+		HyErrorCheck_OpenGL("HyOpenGLShader::BindAttribLocation", "glBindAttribLocation");
+	}
 
-		for(uint32 i = 0; i < m_VertexAttributeList.size(); ++i)
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Link all the shaders in the program together
+	glLinkProgram(hGLShaderProg);
+	HyErrorCheck_OpenGL("HyOpenGLShader::Link", "glLinkProgram");
+
+#ifdef HY_DEBUG
+	GLint status = 0;
+	glGetProgramiv(hGLShaderProg, GL_LINK_STATUS, &status);
+	if(GL_FALSE == status)
+	{
+		GLint iLength = 0;
+		glGetProgramiv(hGLShaderProg, GL_INFO_LOG_LENGTH, &iLength);
+
+		if(iLength > 0)
 		{
-			GLuint uiLocation = GetAttribLocation(m_VertexAttributeList[i].sName.c_str());
+			char *szlog = HY_NEW char[iLength];
+			GLint written = 0;
+			glGetProgramInfoLog(hGLShaderProg, iLength, &written, szlog);
 
-			if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec2 || m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec3 || m_VertexAttributeList[i].eVarType == HYSHADERVAR_dvec4)
+			HyError("Shader program failed to link!\n" << szlog);
+			delete [] szlog;	// Not that this matters
+		}
+	}
+#endif
+	// TODO: After linking (whether successfully or not), it is a good idea to detach all shader objects from the program. Call glDetachShader and glDeleteShader (If not intended to use shader object to link another program)
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// For each context/window, setup the vertex attributes per VAO
+	for(uint32 i = 0; i < GetNumWindows(); ++i)
+	{
+		SetCurrentWindow(i);
+
+		//BindVao(this);
+		glBindVertexArray(m_VaoMapList[m_pCurWindow->GetIndex()][pShader->GetHandle()]);
+		HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
+
+		for(uint32 i = 0; i < shaderVertexAttribListRef.size(); ++i)
+		{
+			GLuint uiLocation = glGetAttribLocation(hGLShaderProg, shaderVertexAttribListRef[i].sName.c_str());
+			HyErrorCheck_OpenGL("HyOpenGLShader::GetAttribLocation", "glGetAttribLocation");
+
+			if(shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_dvec2 || shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_dvec3 || shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_dvec4)
 			{
 				HyError("HYSHADERVAR_dvec2, HYSHADERVAR_dvec3, or HYSHADERVAR_dvec4 is not implemented");
 
 				glEnableVertexAttribArray(uiLocation + 0);
 				glEnableVertexAttribArray(uiLocation + 1);
 
-				glVertexAttribDivisor(uiLocation + 0, m_VertexAttributeList[i].uiInstanceDivisor);
-				glVertexAttribDivisor(uiLocation + 1, m_VertexAttributeList[i].uiInstanceDivisor);
+				glVertexAttribDivisor(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisor(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
-			else if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_mat3)
+			else if(shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_mat3)
 			{
 				glEnableVertexAttribArray(uiLocation + 0);
 				glEnableVertexAttribArray(uiLocation + 1);
 				glEnableVertexAttribArray(uiLocation + 2);
 
-				glVertexAttribDivisor(uiLocation + 0, m_VertexAttributeList[i].uiInstanceDivisor);
-				glVertexAttribDivisor(uiLocation + 1, m_VertexAttributeList[i].uiInstanceDivisor);
-				glVertexAttribDivisor(uiLocation + 2, m_VertexAttributeList[i].uiInstanceDivisor);
+				glVertexAttribDivisor(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisor(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisor(uiLocation + 2, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
-			else if(m_VertexAttributeList[i].eVarType == HYSHADERVAR_mat4)
+			else if(shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_mat4)
 			{
 				glEnableVertexAttribArray(uiLocation + 0);
 				glEnableVertexAttribArray(uiLocation + 1);
 				glEnableVertexAttribArray(uiLocation + 2);
 				glEnableVertexAttribArray(uiLocation + 3);
 
-				glVertexAttribDivisor(uiLocation + 0, m_VertexAttributeList[i].uiInstanceDivisor);
-				glVertexAttribDivisor(uiLocation + 1, m_VertexAttributeList[i].uiInstanceDivisor);
-				glVertexAttribDivisor(uiLocation + 2, m_VertexAttributeList[i].uiInstanceDivisor);
-				glVertexAttribDivisor(uiLocation + 3, m_VertexAttributeList[i].uiInstanceDivisor);
+				glVertexAttribDivisor(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisor(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisor(uiLocation + 2, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisor(uiLocation + 3, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
 			else
 			{
 				glEnableVertexAttribArray(uiLocation);
-				glVertexAttribDivisor(uiLocation, m_VertexAttributeList[i].uiInstanceDivisor);
+				glVertexAttribDivisor(uiLocation, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
 
 			HyErrorCheck_OpenGL("HyOpenGLShader::OnUpload", "glEnableVertexAttribArray or glVertexAttribDivisor");
-
-			switch(m_VertexAttributeList[i].eVarType)
-			{
-			case HYSHADERVAR_bool:		m_uiStride += sizeof(bool);			break;
-			case HYSHADERVAR_int:		m_uiStride += sizeof(int32);		break;
-			case HYSHADERVAR_uint:		m_uiStride += sizeof(uint32);		break;
-			case HYSHADERVAR_float:		m_uiStride += sizeof(float);		break;
-			case HYSHADERVAR_double:	m_uiStride += sizeof(double);		break;
-			case HYSHADERVAR_bvec2:		m_uiStride += sizeof(glm::bvec2);	break;
-			case HYSHADERVAR_bvec3:		m_uiStride += sizeof(glm::bvec3);	break;
-			case HYSHADERVAR_bvec4:		m_uiStride += sizeof(glm::bvec4);	break;
-			case HYSHADERVAR_ivec2:		m_uiStride += sizeof(glm::ivec2);	break;
-			case HYSHADERVAR_ivec3:		m_uiStride += sizeof(glm::ivec3);	break;
-			case HYSHADERVAR_ivec4:		m_uiStride += sizeof(glm::ivec4);	break;
-			case HYSHADERVAR_vec2:		m_uiStride += sizeof(glm::vec2);	break;
-			case HYSHADERVAR_vec3:		m_uiStride += sizeof(glm::vec3);	break;
-			case HYSHADERVAR_vec4:		m_uiStride += sizeof(glm::vec4);	break;
-			case HYSHADERVAR_dvec2:		m_uiStride += sizeof(glm::dvec2);	break;
-			case HYSHADERVAR_dvec3:		m_uiStride += sizeof(glm::dvec3);	break;
-			case HYSHADERVAR_dvec4:		m_uiStride += sizeof(glm::dvec4);	break;
-			case HYSHADERVAR_mat3:		m_uiStride += sizeof(glm::mat3);	break;
-			case HYSHADERVAR_mat4:		m_uiStride += sizeof(glm::mat4);	break;
-			}
 		}
 
 		glBindVertexArray(0);
@@ -638,14 +632,6 @@ void HyOpenGL::BindVao(HyShaderHandle eShaderHandle)
 
 void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 {
-	// Create main program handle if one hasn't been created yet (first shader compile)
-	if(m_uiGlHandle <= 0)
-	{
-		m_uiGlHandle = glCreateProgram();
-		HyAssert(m_uiGlHandle != 0, "Unable to create shader program");
-		HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glCreateProgram");
-	}
-
 	GLuint iShaderHandle = 0;
 
 	switch(eType)
@@ -661,7 +647,7 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glCreateShader");
 
 	// Compile the shader from the passed in source code
-	const char *szSrc = m_sSourceCode[eType].c_str();
+	const char *szSrc = pShader->GetSourceCode(eType).c_str();
 	glShaderSource(iShaderHandle, 1, &szSrc, NULL);
 	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glShaderSource");
 
@@ -692,7 +678,7 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 #endif
 
 	// Compile succeeded, attach shader
-	glAttachShader(m_uiGlHandle, iShaderHandle);
+	glAttachShader(m_GLShaderMap[pShader->GetHandle()], iShaderHandle);
 	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glAttachShader");
 }
 
@@ -735,24 +721,34 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, uint32 uiShaderPassInde
 	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glViewport");
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// TODO: Handle all the shader passes
-	//
-	// HY_MAX_SHADER_PASSES_PER_INSTANCE
-	HyOpenGLShader *pShader = static_cast<HyOpenGLShader *>(sm_ShaderMap[pRenderState->GetShaderHandle(0)]);
-	BindVao(pShader);
-	pShader->Use();
+	// Set the proper shader program
+	HyShaderHandle hShaderHandle = pRenderState->GetShaderHandle(uiShaderPassIndex);
+	glBindVertexArray(m_VaoMapList[m_pCurWindow->GetIndex()][hShaderHandle]);
+	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
+
+	GLuint hGlHandle = m_GLShaderMap[hShaderHandle];
+	glUseProgram(hGlHandle);
+	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glUseProgram");
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	glActiveTexture(GL_TEXTURE0);
 	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glActiveTexture");
 
-	if(HYSHADERPROG_QuadBatch == pShader->GetHandle())
+	// TODO: This seems hacky, fix it
+	if(m_ShaderQuadBatch.GetHandle() == hShaderHandle)
 	{
 		glBindTexture(GL_TEXTURE_2D, pRenderState->GetTextureHandle());
 		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
 
 		if(pRenderState->GetTextureHandle() != 0)
-			pShader->SetUniformGLSL("u_Tex", 0);
+		{
+			GLint loc = glGetUniformLocation(hGlHandle, "u_Tex");
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
+			HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << "u_Tex" << "\"");
+
+			glUniform1ui(loc, 0);
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1ui");
+		}
 	}
 	else
 	{
@@ -766,9 +762,9 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, uint32 uiShaderPassInde
 		const HyScreenRect<int32> &scissorRectRef = pRenderState->GetScissorRect();
 
 		glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_pCurWindow->GetFramebufferSize().x / 2),
-			static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_pCurWindow->GetFramebufferSize().y / 2),
-			static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
-			static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
+				  static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_pCurWindow->GetFramebufferSize().y / 2),
+				  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
+				  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
 
 		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glScissor");
 
@@ -783,111 +779,265 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, uint32 uiShaderPassInde
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Always attempt to assign these uniforms if the shader chooses to use them
-	pShader->SetUniformGLSL("u_mtxWorldToCamera", m_mtxView);
-	pShader->SetUniformGLSL("u_mtxCameraToClip", m_mtxProj);
+	GLint iUniLocation = glGetUniformLocation(hGlHandle, "u_mtxWorldToCamera");
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
+	if(iUniLocation >= 0)
+	{
+		glUniformMatrix4fv(iUniLocation, 1, GL_FALSE, &m_mtxView[0][0]);
+		HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniformMatrix4fv");
+	}
 
+	iUniLocation = glGetUniformLocation(hGlHandle, "u_mtxCameraToClip");
+	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
+	if(iUniLocation >= 0)
+	{
+		glUniformMatrix4fv(iUniLocation, 1, GL_FALSE, &m_mtxProj[0][0]);
+		HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniformMatrix4fv");
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Assign any other uniforms by parsing the RenderState's ex buffer portion
 	char *pExBuffer = pRenderState->GetExPtr();
+
 	uint32 uiNumUniforms = *reinterpret_cast<uint32 *>(pExBuffer);
 	pExBuffer += sizeof(uint32);
-
 	for(uint32 i = 0; i < uiNumUniforms; ++i)
 	{
 		const char *szUniformName = pExBuffer;
 		size_t uiStrLen = strlen(szUniformName) + 1;	// +1 for NULL terminator
 		pExBuffer += uiStrLen;
 
+		iUniLocation = glGetUniformLocation(hGlHandle, szUniformName);
+		HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
+		HyAssert(iUniLocation >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szUniformName << "\"");
 
 		HyShaderVariable eVarType = static_cast<HyShaderVariable>(*reinterpret_cast<uint32 *>(pExBuffer));
 		pExBuffer += sizeof(uint32);
-
 		switch(eVarType)
 		{
 		case HYSHADERVAR_bool:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<bool *>(pExBuffer));
+			glUniform1i(iUniLocation, *reinterpret_cast<bool *>(pExBuffer));
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1i");
 			pExBuffer += sizeof(bool);
 			break;
+
 		case HYSHADERVAR_int:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<int32 *>(pExBuffer));
+			glUniform1i(iUniLocation, *reinterpret_cast<int32 *>(pExBuffer));
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1i");
 			pExBuffer += sizeof(int32);
 			break;
+
 		case HYSHADERVAR_uint:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<uint32 *>(pExBuffer));
+			glUniform1ui(iUniLocation, *reinterpret_cast<uint32 *>(pExBuffer));
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1ui");
 			pExBuffer += sizeof(uint32);
 			break;
+
 		case HYSHADERVAR_float:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<float *>(pExBuffer));
+			glUniform1f(iUniLocation, *reinterpret_cast<float *>(pExBuffer));
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1f");
 			pExBuffer += sizeof(float);
 			break;
+
 		case HYSHADERVAR_double:
 			HyError("GLSL Shader uniform does not support type double yet!");
-			//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<double *>(pExBuffer));
-			//pExBuffer += sizeof(double);
 			break;
+
 		case HYSHADERVAR_bvec2:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::bvec2 *>(pExBuffer));
+			glUniform2i(iUniLocation, reinterpret_cast<glm::bvec2 *>(pExBuffer)->x, reinterpret_cast<glm::bvec2 *>(pExBuffer)->y);
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform2i");
 			pExBuffer += sizeof(glm::bvec2);
 			break;
+
 		case HYSHADERVAR_bvec3:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::bvec3 *>(pExBuffer));
+			glUniform3i(iUniLocation, reinterpret_cast<glm::bvec3 *>(pExBuffer)->x,
+									  reinterpret_cast<glm::bvec3 *>(pExBuffer)->y,
+									  reinterpret_cast<glm::bvec3 *>(pExBuffer)->z);
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform3i");
 			pExBuffer += sizeof(glm::bvec3);
 			break;
+
 		case HYSHADERVAR_bvec4:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::bvec4 *>(pExBuffer));
+			glUniform4i(iUniLocation, reinterpret_cast<glm::bvec4 *>(pExBuffer)->x,
+									  reinterpret_cast<glm::bvec4 *>(pExBuffer)->y,
+									  reinterpret_cast<glm::bvec4 *>(pExBuffer)->z,
+									  reinterpret_cast<glm::bvec4 *>(pExBuffer)->w);
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform4i");
 			pExBuffer += sizeof(glm::bvec4);
 			break;
+
 		case HYSHADERVAR_ivec2:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::ivec2 *>(pExBuffer));
+			glUniform2i(iUniLocation, reinterpret_cast<glm::ivec2 *>(pExBuffer)->x, reinterpret_cast<glm::ivec2 *>(pExBuffer)->y);
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform2i");
 			pExBuffer += sizeof(glm::ivec2);
 			break;
+
 		case HYSHADERVAR_ivec3:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::ivec3 *>(pExBuffer));
+			glUniform3i(iUniLocation, reinterpret_cast<glm::ivec3 *>(pExBuffer)->x,
+									  reinterpret_cast<glm::ivec3 *>(pExBuffer)->y,
+									  reinterpret_cast<glm::ivec3 *>(pExBuffer)->z);
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform3i");
 			pExBuffer += sizeof(glm::ivec3);
 			break;
+
 		case HYSHADERVAR_ivec4:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::ivec4 *>(pExBuffer));
+			glUniform4i(iUniLocation, reinterpret_cast<glm::ivec4 *>(pExBuffer)->x,
+									  reinterpret_cast<glm::ivec4 *>(pExBuffer)->y,
+									  reinterpret_cast<glm::ivec4 *>(pExBuffer)->z,
+									  reinterpret_cast<glm::ivec4 *>(pExBuffer)->w);
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform4i");
 			pExBuffer += sizeof(glm::ivec4);
 			break;
+
 		case HYSHADERVAR_vec2:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::vec2 *>(pExBuffer));
+			glUniform2f(iUniLocation, reinterpret_cast<glm::vec2 *>(pExBuffer)->x, reinterpret_cast<glm::vec2 *>(pExBuffer)->y);
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform2f");
 			pExBuffer += sizeof(glm::vec2);
 			break;
+
 		case HYSHADERVAR_vec3:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::vec3 *>(pExBuffer));
+			glUniform3f(iUniLocation, reinterpret_cast<glm::vec3 *>(pExBuffer)->x,
+									  reinterpret_cast<glm::vec3 *>(pExBuffer)->y,
+									  reinterpret_cast<glm::vec3 *>(pExBuffer)->z);
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform3f");
 			pExBuffer += sizeof(glm::vec3);
 			break;
+
 		case HYSHADERVAR_vec4:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::vec4 *>(pExBuffer));
+			glUniform4f(iUniLocation, reinterpret_cast<glm::vec4 *>(pExBuffer)->x,
+									  reinterpret_cast<glm::vec4 *>(pExBuffer)->y,
+									  reinterpret_cast<glm::vec4 *>(pExBuffer)->z,
+									  reinterpret_cast<glm::vec4 *>(pExBuffer)->w);
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform4f");
 			pExBuffer += sizeof(glm::vec4);
 			break;
+
 		case HYSHADERVAR_dvec2:
-			HyError("GLSL Shader uniform does not support type double yet!");
-			//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::dvec2 *>(pExBuffer));
-			//pExBuffer += sizeof(glm::dvec2);
-			break;
 		case HYSHADERVAR_dvec3:
-			HyError("GLSL Shader uniform does not support type double yet!");
-			//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::dvec3 *>(pExBuffer));
-			//pExBuffer += sizeof(glm::dvec3);
-			break;
 		case HYSHADERVAR_dvec4:
 			HyError("GLSL Shader uniform does not support type double yet!");
-			//pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::dvec4 *>(pExBuffer));
-			//pExBuffer += sizeof(glm::dvec4);
 			break;
+
 		case HYSHADERVAR_mat3:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::mat3 *>(pExBuffer));
+			glUniformMatrix3fv(iUniLocation, 1, GL_FALSE, &(*reinterpret_cast<glm::mat3 *>(pExBuffer))[0][0]);
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniformMatrix3fv");
 			pExBuffer += sizeof(glm::mat3);
 			break;
+
 		case HYSHADERVAR_mat4:
-			pShader->SetUniformGLSL(szUniformName, *reinterpret_cast<glm::mat4 *>(pExBuffer));
+			glUniformMatrix4fv(iUniLocation, 1, GL_FALSE, &(*reinterpret_cast<glm::mat4 *>(pExBuffer))[0][0]);
+			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniformMatrix4fv");
 			pExBuffer += sizeof(glm::mat4);
 			break;
 		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Points to the vertex data locations in bound buffer
-	pShader->SetVertexAttributePtrs(static_cast<uint32>(pRenderState->GetDataOffset()));
+	// Set vertex attribute pointers to the vertex data locations in bound buffer
+	size_t uiStartOffset = pRenderState->GetDataOffset();
+	HyShader *pShader = sm_ShaderMap[hShaderHandle];
+	std::vector<HyShaderVertexAttribute> &shaderVertexAttribListRef = pShader->GetVertextAttributes();
+
+	// TODO: if OpenGL 4.3 is available
+	//glBindVertexBuffer(QUADBATCH, m_hVBO2d, uiDataOffset, 132);
+
+	size_t uiOffset = 0;
+	for(size_t i = 0; i < shaderVertexAttribListRef.size(); ++i)
+	{
+		GLuint uiLocation = glGetAttribLocation(hGlHandle, shaderVertexAttribListRef[i].sName.c_str());
+
+		switch(shaderVertexAttribListRef[i].eVarType)
+		{
+		case HYSHADERVAR_bool:
+			glVertexAttribPointer(uiLocation, 1, GL_BYTE, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(GLboolean);
+			break;
+		case HYSHADERVAR_int:
+			glVertexAttribPointer(uiLocation, 1, GL_INT, shaderVertexAttribListRef[i].bNormalized, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(GLint);
+			break;
+		case HYSHADERVAR_uint:
+			glVertexAttribPointer(uiLocation, 1, GL_UNSIGNED_INT, shaderVertexAttribListRef[i].bNormalized, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(GLuint);
+			break;
+		case HYSHADERVAR_float:
+			glVertexAttribPointer(uiLocation, 1, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(GLfloat);
+			break;
+		case HYSHADERVAR_double:
+			glVertexAttribLPointer(uiLocation, 1, GL_DOUBLE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(GLdouble);
+			break;
+		case HYSHADERVAR_bvec2:
+			glVertexAttribPointer(uiLocation, 2, GL_BYTE, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::bvec2);
+			break;
+		case HYSHADERVAR_bvec3:
+			glVertexAttribPointer(uiLocation, 3, GL_BYTE, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::bvec3);
+			break;
+		case HYSHADERVAR_bvec4:
+			glVertexAttribPointer(uiLocation, 4, GL_BYTE, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::bvec4);
+			break;
+		case HYSHADERVAR_ivec2:
+			glVertexAttribPointer(uiLocation, 2, GL_INT, shaderVertexAttribListRef[i].bNormalized ? GL_TRUE : GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::ivec2);
+			break;
+		case HYSHADERVAR_ivec3:
+			glVertexAttribPointer(uiLocation, 3, GL_INT, shaderVertexAttribListRef[i].bNormalized ? GL_TRUE : GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::ivec3);
+			break;
+		case HYSHADERVAR_ivec4:
+			glVertexAttribPointer(uiLocation, 4, GL_INT, shaderVertexAttribListRef[i].bNormalized ? GL_TRUE : GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::ivec4);
+			break;
+		case HYSHADERVAR_vec2:
+			glVertexAttribPointer(uiLocation, 2, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec2);
+			break;
+		case HYSHADERVAR_vec3:
+			glVertexAttribPointer(uiLocation, 3, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec3);
+			break;
+		case HYSHADERVAR_vec4:
+			glVertexAttribPointer(uiLocation, 4, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec4);
+			break;
+		case HYSHADERVAR_dvec2:
+			glVertexAttribLPointer(uiLocation, 2, GL_DOUBLE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::dvec2);
+			break;
+		case HYSHADERVAR_dvec3:
+			glVertexAttribLPointer(uiLocation, 3, GL_DOUBLE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::dvec3);
+			break;
+		case HYSHADERVAR_dvec4:
+			glVertexAttribLPointer(uiLocation, 4, GL_DOUBLE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::dvec4);
+			break;
+		case HYSHADERVAR_mat3:
+			glVertexAttribPointer(uiLocation, 3, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec3);
+			glVertexAttribPointer(uiLocation + 1, 3, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec3);
+			glVertexAttribPointer(uiLocation + 2, 3, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec3);
+			break;
+		case HYSHADERVAR_mat4:
+			glVertexAttribPointer(uiLocation, 4, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec4);
+			glVertexAttribPointer(uiLocation + 1, 4, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec4);
+			glVertexAttribPointer(uiLocation + 2, 4, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec4);
+			glVertexAttribPointer(uiLocation + 3, 4, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(glm::vec4);
+			break;
+		}
+
+		HyErrorCheck_OpenGL("HyOpenGLShader::SetVertexAttributePtrs", "glVertexAttribPointer[" << shaderVertexAttribListRef[i].eVarType << "]");
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	GLenum eDrawMode;

@@ -31,12 +31,12 @@ protected:
 	static HyAssets *				sm_pHyAssets;
 
 	HyLoadState						m_eLoadState;
-	std::set<HyShaderHandle>		m_RequiredCustomShaders;
 
 	IHyNodeData *					m_pData;
 	const std::string				m_sNAME;
 	const std::string				m_sPREFIX;
 
+	HyShaderHandle					m_hShaders[HY_MAX_SHADER_PASSES_PER_INSTANCE];
 	HyRenderMode					m_eRenderMode;
 	HyTextureHandle					m_hTextureHandle;
 	HyShaderUniforms 				m_ShaderUniforms;
