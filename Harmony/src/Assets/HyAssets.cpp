@@ -289,16 +289,6 @@ void HyAssets::LoadNodeData(IHyDrawInst2d *pDrawInst2d)
 		}
 	}
 
-	// Check whether we need to load custom shaders
-	for(auto iter = pDrawInst2d->m_RequiredCustomShaders.begin(); iter != pDrawInst2d->m_RequiredCustomShaders.end(); ++iter)
-	{
-		HyShader *pShader = IHyRenderer::FindShader(*iter);
-		QueueData(pShader);
-
-		if(pShader->GetLoadableState() != HYLOADSTATE_Loaded)
-			bFullyLoaded = false;
-	}
-
 	// Set the node's 'm_eLoadState' appropriately below to prevent additional Loads
 	if(bFullyLoaded == false) // Could also use IsInstLoaded() here
 	{
@@ -330,12 +320,6 @@ void HyAssets::RemoveNodeData(IHyDrawInst2d *pDrawInst2d)
 		}
 	}
 
-	for(auto iter = pDrawInst2d->m_RequiredCustomShaders.begin(); iter != pDrawInst2d->m_RequiredCustomShaders.end(); ++iter)
-	{
-		HyShader *pShader = IHyRenderer::FindShader(*iter);
-		DequeData(pShader);
-	}
-
 	if(pDrawInst2d->m_eLoadState == HYLOADSTATE_Queued)
 	{
 		for(auto it = m_QueuedInst2dList.begin(); it != m_QueuedInst2dList.end(); ++it)
@@ -359,14 +343,6 @@ bool HyAssets::IsInstLoaded(IHyDrawInst2d *pDrawInst2d)
 	{
 		const HyAtlasIndices &requiredAtlases = pDrawInst2d->UncheckedGetData()->GetRequiredAtlasIndices();
 		if(m_pLoadedAtlasIndices->IsSet(requiredAtlases) == false)
-			return false;
-	}
-
-	// Custom shaders check
-	for(auto iter = pDrawInst2d->m_RequiredCustomShaders.begin(); iter != pDrawInst2d->m_RequiredCustomShaders.end(); ++iter)
-	{
-		HyShader *pShader = IHyRenderer::FindShader(*iter);
-		if(pShader->GetLoadableState() != HYLOADSTATE_Loaded)
 			return false;
 	}
 

@@ -18,6 +18,7 @@ IHyDrawInst2d::IHyDrawInst2d(HyType eNodeType, const char *szPrefix, const char 
 																												m_pData(nullptr),
 																												m_sNAME(szName ? szName : ""),
 																												m_sPREFIX(szPrefix ? szPrefix : ""),
+																												m_hShader(IHyRenderer::GetDefaultShaderHandle(m_eTYPE)),
 																												m_eRenderMode(HYRENDERMODE_Unknown),
 																												m_hTextureHandle(HY_UNUSED_HANDLE),
 																												m_BoundingVolume(*this)
@@ -195,12 +196,18 @@ HyShape2d *IHyDrawInst2d::GetUserBoundingVolume(uint32 uiIndex)
 
 void IHyDrawInst2d::SetCustomShader(HyShader *pShader)
 {
-	HyAssert(m_eLoadState == HYLOADSTATE_Inactive, "IHyDrawInst2d::SetCustomShader was used on an already loaded instance - I can make this work I just haven't yet");
-	HyAssert(pShader->IsFinalized(), "IHyDrawInst2d::SetCustomShader tried to set a non-finalized shader");
-	HyAssert(pShader->GetHandle() >= HYSHADERPROG_CustomStartIndex, "IHyDrawInst2d::SetCustomShader was passed an invalid custom shader Id");
-	HyAssert(m_RequiredCustomShaders.size() < HY_MAX_SHADER_PASSES_PER_INSTANCE, "IHyDrawInst2d::SetCustomShader has taken too many shaders. Max = " << HY_MAX_SHADER_PASSES_PER_INSTANCE);
+	if(pShader)
+	{
+		HyAssert(pShader->IsFinalized(), "IHyDrawInst2d::SetCustomShader tried to set a non-finalized shader");
+		m_hShader = pShader->GetHandle();
+	}
+	else
+		m_hShader = IHyRenderer::GetDefaultShaderHandle(m_eTYPE);
+}
 
-	m_RequiredCustomShaders.insert(pShader->GetHandle());
+HyShaderHandle IHyDrawInst2d::GetShaderHandle()
+{
+	return m_hShader;
 }
 
 /*virtual*/ bool IHyDrawInst2d::IsLoaded() const /*override*/

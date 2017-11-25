@@ -26,10 +26,9 @@ class HyRenderState
 
 	HyScreenRect<int32>	m_ScissorRect;
 	HyStencilHandle		m_hStencil;
+	HyShaderHandle		m_hShader;
 
 	int32				m_iCoordinateSystem;	// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
-
-	HyShaderHandle		m_hShaderList[HY_MAX_SHADER_PASSES_PER_INSTANCE];
 
 	uint32				m_uiNumInstances;
 	uint32				m_uiNumVerticesPerInstance;		// Or total number of vertices if single instance
@@ -55,7 +54,7 @@ public:
 
 	int32 GetCoordinateSystem() const;
 
-	HyShaderHandle GetShaderHandle(uint32 uiShaderPass) const;
+	HyShaderHandle GetShaderHandle() const;
 
 	HyTextureHandle GetTextureHandle() const;
 

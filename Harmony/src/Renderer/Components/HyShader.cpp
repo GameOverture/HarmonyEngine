@@ -78,7 +78,7 @@ std::vector<HyShaderVertexAttribute> &HyShader::GetVertextAttributes()
 	return m_VertexAttributeList;
 }
 
-void HyShader::Finalize(HyShaderProgram eDefaultsFrom)
+void HyShader::Finalize(HyShaderProgramDefaults eDefaultsFrom)
 {
 	HyAssert(sm_pRenderer, "HyShader::Finalize was invoked before the renderer has been instanciated");
 

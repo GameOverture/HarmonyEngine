@@ -28,34 +28,24 @@ HyRenderState::HyRenderState(/*const*/ IHyDrawInst2d &instanceRef, uint32 uiCull
 	else
 		m_hStencil = HY_UNUSED_HANDLE;
 
+	m_hShader = instanceRef.GetShaderHandle();
+
 	m_iCoordinateSystem = instanceRef.GetCoordinateSystem();
 
-
-	//instanceRef.SetCustomShader
-
-	memset(m_hShaderList, 0, sizeof(HyShaderHandle) * HY_MAX_SHADER_PASSES_PER_INSTANCE);
 	switch(instanceRef.GetType())
 	{
 	case HYTYPE_Sprite2d:
-		m_hShaderList[0] = HYSHADERPROG_QuadBatch;
-		m_uiNumInstances = 1;
-		m_uiNumVerticesPerInstance = 4;
-		break;
-
 	case HYTYPE_TexturedQuad2d:
-		m_hShaderList[0] = HYSHADERPROG_QuadBatch;
 		m_uiNumInstances = 1;
 		m_uiNumVerticesPerInstance = 4;
 		break;
 
 	case HYTYPE_Primitive2d:
-		m_hShaderList[0] = HYSHADERPROG_Primitive;
 		m_uiNumInstances = 1;
 		m_uiNumVerticesPerInstance = static_cast<HyPrimitive2d &>(instanceRef).GetNumVerts();
 		break;
 		
 	case HYTYPE_Text2d:
-		m_hShaderList[0] = HYSHADERPROG_QuadBatch;
 		m_uiNumInstances = static_cast<HyText2d &>(instanceRef).GetNumRenderQuads();
 		m_uiNumVerticesPerInstance = 4;
 		break;
@@ -120,10 +110,9 @@ int32 HyRenderState::GetCoordinateSystem() const
 	return m_iCoordinateSystem;
 }
 
-HyShaderHandle HyRenderState::GetShaderHandle(uint32 uiShaderPass) const
+HyShaderHandle HyRenderState::GetShaderHandle() const
 {
-	HyAssert(uiShaderPass < HY_MAX_SHADER_PASSES_PER_INSTANCE, "HyRenderState::GetShaderHandle was passed an invalid index");
-	return m_hShaderList[uiShaderPass];
+	return m_hShader;
 }
 
 HyTextureHandle HyRenderState::GetTextureHandle() const

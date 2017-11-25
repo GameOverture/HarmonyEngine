@@ -209,7 +209,7 @@ HyOpenGL::~HyOpenGL(void)
 			{
 				HyRenderState *pCurRenderState = reinterpret_cast<HyRenderState *>(pStencilRenderStateBufferPos);
 				if(pCurRenderState->GetCoordinateSystem() < 0 || pCurRenderState->GetCoordinateSystem() == m_pCurWindow->GetIndex())
-					RenderPass2d(pCurRenderState, 0, pRenderState->GetCoordinateSystem() < 0 ? cameraIter.Get() : nullptr);
+					RenderPass2d(pCurRenderState, pRenderState->GetCoordinateSystem() < 0 ? cameraIter.Get() : nullptr);
 
 				pStencilRenderStateBufferPos += pCurRenderState->GetExSize() + sizeof(HyRenderState);
 			}
@@ -233,7 +233,7 @@ HyOpenGL::~HyOpenGL(void)
 			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDisable");
 		}
 
-		RenderPass2d(pRenderState, 0, pRenderState->GetCoordinateSystem() < 0 ? cameraIter.Get() : nullptr);
+		RenderPass2d(pRenderState, pRenderState->GetCoordinateSystem() < 0 ? cameraIter.Get() : nullptr);
 		
 		
 		//////////////////////////////////////////////////////////////////////////
@@ -250,7 +250,7 @@ HyOpenGL::~HyOpenGL(void)
 #endif
 }
 
-/*virtual*/ void HyOpenGL::UploadShader(HyShaderProgram eDefaultsFrom, HyShader *pShader) /*override*/
+/*virtual*/ void HyOpenGL::UploadShader(HyShaderProgramDefaults eDefaultsFrom, HyShader *pShader) /*override*/
 {
 	std::vector<HyShaderVertexAttribute> &shaderVertexAttribListRef = pShader->GetVertextAttributes();
 
@@ -682,7 +682,7 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glAttachShader");
 }
 
-void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, uint32 uiShaderPassIndex, HyCamera2d *pCamera)
+void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera)
 {
 	glm::ivec2 vFramebufferSize = m_pCurWindow->GetFramebufferSize();
 	HyRectangle<float> viewportRect;
@@ -722,7 +722,7 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, uint32 uiShaderPassInde
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set the proper shader program
-	HyShaderHandle hShaderHandle = pRenderState->GetShaderHandle(uiShaderPassIndex);
+	HyShaderHandle hShaderHandle = pRenderState->GetShaderHandle();
 	glBindVertexArray(m_VaoMapList[m_pCurWindow->GetIndex()][hShaderHandle]);
 	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
 

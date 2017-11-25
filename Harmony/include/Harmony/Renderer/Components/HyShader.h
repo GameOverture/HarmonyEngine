@@ -51,7 +51,7 @@ public:
 	void AddVertexAttribute(const char *szName, HyShaderVariable eVarType, bool bNormalize = false, uint32 uiInstanceDivisor = 0);
 	std::vector<HyShaderVertexAttribute> &GetVertextAttributes();
 
-	void Finalize(HyShaderProgram eDefaultsFrom);
+	void Finalize(HyShaderProgramDefaults eDefaultsFrom);
 
 	//virtual void OnRenderThread(IHyRenderer &rendererRef) override; // ::IHyLoadableData
 

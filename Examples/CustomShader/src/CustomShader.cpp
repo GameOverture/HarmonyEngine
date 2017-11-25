@@ -56,14 +56,13 @@ CustomShader::~CustomShader()
 {
 	m_pCamera = Window().CreateCamera2d();
 
-	HyShader *pShader_CheckerGrid = IHyRenderer::MakeCustomShader();
-	pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
-	pShader_CheckerGrid->AddVertexAttribute("attr_vPosition", HYSHADERVAR_vec2);
-	pShader_CheckerGrid->AddVertexAttribute("attr_vUVcoord", HYSHADERVAR_vec2);
-	pShader_CheckerGrid->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
-	pShader_CheckerGrid->Finalize(HYSHADERPROG_Primitive);
+	m_CheckerGridShader.SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
+	m_CheckerGridShader.AddVertexAttribute("attr_vPosition", HYSHADERVAR_vec2);
+	m_CheckerGridShader.AddVertexAttribute("attr_vUVcoord", HYSHADERVAR_vec2);
+	m_CheckerGridShader.SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
+	m_CheckerGridShader.Finalize(HYSHADERPROG_Primitive);
 
-	m_CheckerGrid.SetCustomShader(pShader_CheckerGrid);
+	m_CheckerGrid.SetCustomShader(&m_CheckerGridShader);
 	m_CheckerGrid.Load();
 
 	return true;

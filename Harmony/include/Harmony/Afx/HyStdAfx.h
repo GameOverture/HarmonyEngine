@@ -121,13 +121,11 @@ enum HyRenderMode
 	HYRENDERMODE_LineStrip
 };
 
-enum HyShaderProgram
+enum HyShaderProgramDefaults
 {
 	HYSHADERPROG_QuadBatch = 1,
 	HYSHADERPROG_Primitive,
 	HYSHADERPROG_Lines2d,
-
-	HYSHADERPROG_CustomStartIndex
 };
 
 enum HyShaderType

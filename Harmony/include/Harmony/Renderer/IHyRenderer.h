@@ -28,8 +28,6 @@ class IHyLoadableData;
 typedef uint32 HyCullMask;
 #define HY_FULL_CULL_MASK 0xFFFFFFFF
 
-#define HY_MAX_SHADER_PASSES_PER_INSTANCE 4
-
 #define HY_RENDERSTATE_BUFFER_SIZE ((1024 * 1024) * 1) // 1MB
 #define HY_VERTEX_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
 
@@ -94,12 +92,13 @@ public:
 
 	virtual void FinishRender() = 0;
 
-	virtual void UploadShader(HyShaderProgram eDefaultsFrom, HyShader *pShader) = 0;
+	virtual void UploadShader(HyShaderProgramDefaults eDefaultsFrom, HyShader *pShader) = 0;
 	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) = 0;
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
 
 	static HyShader *FindShader(HyShaderHandle hHandle);
+	static HyShaderHandle GetDefaultShaderHandle(HyType eType);
 	static void AddShader(HyShader *pShader);
 	static void RemoveShader(HyShader *pShader);
 

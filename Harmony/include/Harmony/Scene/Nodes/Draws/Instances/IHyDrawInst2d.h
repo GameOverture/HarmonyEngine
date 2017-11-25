@@ -18,8 +18,6 @@
 
 class HyStencil;
 
-#include <set>
-
 // NOTE: This class should contain a copy of all the functions/members of IHyLeaf2d. Multiple inheritance is not an option
 class IHyDrawInst2d : public IHyDraw2d
 {
@@ -36,7 +34,7 @@ protected:
 	const std::string				m_sNAME;
 	const std::string				m_sPREFIX;
 
-	HyShaderHandle					m_hShaders[HY_MAX_SHADER_PASSES_PER_INSTANCE];
+	HyShaderHandle					m_hShader;
 	HyRenderMode					m_eRenderMode;
 	HyTextureHandle					m_hTextureHandle;
 	HyShaderUniforms 				m_ShaderUniforms;
@@ -76,7 +74,9 @@ public:
 	const b2AABB &GetWorldAABB();
 	HyShape2d *GetUserBoundingVolume(uint32 uiIndex);
 
+	// Passing nullptr will use built-in default shader
 	void SetCustomShader(HyShader *pShader);
+	HyShaderHandle GetShaderHandle();
 
 	virtual bool IsLoaded() const override;
 	virtual void Load() override;

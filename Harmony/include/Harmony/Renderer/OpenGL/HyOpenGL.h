@@ -46,14 +46,14 @@ public:
 
 	virtual void FinishRender() override;
 
-	virtual void UploadShader(HyShaderProgram eDefaultsFrom, HyShader *pShader) override;
+	virtual void UploadShader(HyShaderProgramDefaults eDefaultsFrom, HyShader *pShader) override;
 	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) override;
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) override;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
 	virtual void DeleteTexture(uint32 uiTextureHandle) override;
 
 private:
 	void CompileShader(HyShader *pShader, HyShaderType eType);
-	void RenderPass2d(HyRenderState *pRenderState, uint32 uiShaderPassIndex, HyCamera2d *pCamera);
+	void RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera);
 };
 
 #endif /* HyOpenGL_h__ */

@@ -141,6 +141,23 @@ uint32 IHyRenderer::GetNumWindows()
 	return nullptr;
 }
 
+/*static*/ HyShaderHandle IHyRenderer::GetDefaultShaderHandle(HyType eType)
+{
+	switch(eType)
+	{
+	case HYTYPE_Sprite2d:
+	case HYTYPE_TexturedQuad2d:
+	case HYTYPE_Text2d:
+		return m_ShaderQuadBatch.GetHandle();
+
+	case HYTYPE_Primitive2d:
+		return m_ShaderPrimitive.GetHandle();
+
+	default:
+		HyError("HyRenderState - Unknown instance type");
+	}
+}
+
 /*static*/ void IHyRenderer::AddShader(HyShader *pShader)
 {
 	sm_ShaderMap[pShader->GetHandle()] = pShader;
