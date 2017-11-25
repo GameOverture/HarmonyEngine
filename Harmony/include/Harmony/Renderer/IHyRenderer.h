@@ -78,6 +78,8 @@ public:
 	std::queue<IHyLoadableData *> &RxData();
 
 	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
+
+	HyShaderHandle GetDefaultShaderHandle(HyType eType);
 	
 	uint32 GetNumWindows();
 	virtual void SetCurrentWindow(uint32 uiIndex);
@@ -98,7 +100,6 @@ public:
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
 
 	static HyShader *FindShader(HyShaderHandle hHandle);
-	static HyShaderHandle GetDefaultShaderHandle(HyType eType);
 	static void AddShader(HyShader *pShader);
 	static void RemoveShader(HyShader *pShader);
 

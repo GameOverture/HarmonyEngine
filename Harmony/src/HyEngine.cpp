@@ -192,6 +192,12 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return HyEngine::sm_pInstance->m_Diagnostics;
 }
 
+/*friend*/ HyShaderHandle Hy_DefaultShaderHandle(HyType eType)
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_DefaultShaderHandle() was invoked before engine has been initialized.");
+	return HyEngine::sm_pInstance->m_Renderer.GetDefaultShaderHandle(eType);
+}
+
 /*friend*/ std::string Hy_DateTime()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_DateTime() was invoked before engine has been initialized.");

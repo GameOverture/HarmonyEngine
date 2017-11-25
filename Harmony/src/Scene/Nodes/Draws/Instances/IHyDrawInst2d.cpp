@@ -18,7 +18,7 @@ IHyDrawInst2d::IHyDrawInst2d(HyType eNodeType, const char *szPrefix, const char 
 																												m_pData(nullptr),
 																												m_sNAME(szName ? szName : ""),
 																												m_sPREFIX(szPrefix ? szPrefix : ""),
-																												m_hShader(IHyRenderer::GetDefaultShaderHandle(m_eTYPE)),
+																												m_hShader(HY_UNUSED_HANDLE),
 																												m_eRenderMode(HYRENDERMODE_Unknown),
 																												m_hTextureHandle(HY_UNUSED_HANDLE),
 																												m_BoundingVolume(*this)
@@ -155,6 +155,9 @@ IHyNodeData *IHyDrawInst2d::AcquireData()
 			OnDataAcquired();
 		else
 			HyAssert(m_eTYPE == HYTYPE_Primitive2d, "Could not find data for: " << GetPrefix() << "/" << GetName());
+
+		if(m_hShader == HY_UNUSED_HANDLE)
+			m_hShader = Hy_DefaultShaderHandle(m_eTYPE);
 	}
 
 	return m_pData;
@@ -202,7 +205,7 @@ void IHyDrawInst2d::SetCustomShader(HyShader *pShader)
 		m_hShader = pShader->GetHandle();
 	}
 	else
-		m_hShader = IHyRenderer::GetDefaultShaderHandle(m_eTYPE);
+		m_hShader = Hy_DefaultShaderHandle(m_eTYPE);
 }
 
 HyShaderHandle IHyDrawInst2d::GetShaderHandle()
