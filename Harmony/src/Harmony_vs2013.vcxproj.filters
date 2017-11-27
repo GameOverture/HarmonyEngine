@@ -105,9 +105,6 @@
     <ClCompile Include="Renderer\Components\HyShaderUniforms.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\Loadables\IHyShader.cpp">
-      <Filter>Assets\Loadables</Filter>
-    </ClCompile>
     <ClCompile Include="Assets\Nodes\HyAudioData.cpp">
       <Filter>Assets\Nodes</Filter>
     </ClCompile>
@@ -238,6 +235,9 @@
       <Filter>Scene\Nodes\Draws</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\Components\HyPortal2d.cpp">
+      <Filter>Renderer\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Components\HyShader.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -513,9 +513,6 @@
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyShaderUniforms.h">
       <Filter>Renderer\Components</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\Loadables\IHyShader.h">
-      <Filter>Assets\Loadables</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Assets\Nodes\HyAudioData.h">
       <Filter>Assets\Nodes</Filter>
     </ClInclude>
@@ -652,6 +649,9 @@
       <Filter>Scene\Nodes\Misc</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyPortal2d.h">
+      <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyShader.h">
       <Filter>Renderer\Components</Filter>
     </ClInclude>
   </ItemGroup>

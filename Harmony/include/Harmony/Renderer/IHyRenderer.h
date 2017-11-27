@@ -101,6 +101,7 @@ public:
 
 	static HyShader *FindShader(HyShaderHandle hHandle);
 	static void AddShader(HyShader *pShader);
+	static void RemoveShader(HyShader *pShader);
 
 	static HyStencil *FindStencil(HyStencilHandle hHandle);
 	static void AddStencil(HyStencil *pStencil);

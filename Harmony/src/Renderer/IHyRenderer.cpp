@@ -49,8 +49,9 @@ IHyRenderer::~IHyRenderer(void)
 		delete iter->second;
 	sm_ShaderMap.clear();
 
-	while(sm_StencilMap.empty() == false)
-		delete sm_StencilMap.begin()->second;
+	for(auto iter = sm_StencilMap.begin(); iter != sm_StencilMap.end(); ++iter)
+		delete iter->second;
+	sm_StencilMap.clear();
 }
 
 void IHyRenderer::PrepareBuffers()
@@ -164,6 +165,12 @@ uint32 IHyRenderer::GetNumWindows()
 /*static*/ void IHyRenderer::AddShader(HyShader *pShader)
 {
 	sm_ShaderMap[pShader->GetHandle()] = pShader;
+}
+
+/*static*/ void IHyRenderer::RemoveShader(HyShader *pShader)
+{
+	// TODO: Unload shader in graphics API
+	sm_ShaderMap.erase(sm_ShaderMap.find(pShader->GetHandle()));
 }
 
 /*static*/ HyStencil *IHyRenderer::FindStencil(HyStencilHandle hHandle)

@@ -37,7 +37,9 @@ class HyStencil
 
 public:
 	HyStencil();
-	~HyStencil();
+private: ~HyStencil();
+public:
+	void Destroy();
 
 	HyStencilHandle GetHandle();
 

@@ -24,7 +24,12 @@ HyStencil::HyStencil() :	m_hHANDLE(++sm_hHandleCount),
 
 HyStencil::~HyStencil()
 {
+}
+
+void HyStencil::Destroy()
+{
 	IHyRenderer::RemoveStencil(this);
+	delete this;
 }
 
 HyStencilHandle HyStencil::GetHandle()

@@ -40,6 +40,7 @@ public:
 	HyShader();
 private: ~HyShader();
 public:
+	void Destroy();
 
 	HyShaderHandle GetHandle();
 	bool IsFinalized();

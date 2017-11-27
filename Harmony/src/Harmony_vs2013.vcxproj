@@ -46,7 +46,6 @@
     <ClCompile Include="Assets\HyAssets.cpp" />
     <ClCompile Include="Assets\Loadables\HyAtlas.cpp" />
     <ClCompile Include="Assets\Loadables\HyAtlasIndices.cpp" />
-    <ClCompile Include="Assets\Loadables\IHyShader.cpp" />
     <ClCompile Include="Assets\Nodes\HyAudioData.cpp" />
     <ClCompile Include="Assets\Nodes\HyMesh3dData.cpp" />
     <ClCompile Include="Assets\Nodes\HyPrimitive2dData.cpp" />
@@ -75,6 +74,7 @@
     <ClCompile Include="Memory\HyMemoryHeap.cpp" />
     <ClCompile Include="Renderer\Components\HyPortal2d.cpp" />
     <ClCompile Include="Renderer\Components\HyRenderState.cpp" />
+    <ClCompile Include="Renderer\Components\HyShader.cpp" />
     <ClCompile Include="Renderer\Components\HyStencil.cpp" />
     <ClCompile Include="Renderer\Components\HyWindow.cpp" />
     <ClCompile Include="Renderer\Components\HyShaderUniforms.cpp" />
@@ -133,7 +133,6 @@
     <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlas.h" />
     <ClInclude Include="..\include\Harmony\Assets\Loadables\HyAtlasIndices.h" />
     <ClInclude Include="..\include\Harmony\Assets\Loadables\IHyLoadableData.h" />
-    <ClInclude Include="..\include\Harmony\Assets\Loadables\IHyShader.h" />
     <ClInclude Include="..\include\Harmony\Assets\Nodes\HyAudioData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Nodes\HyMesh3dData.h" />
     <ClInclude Include="..\include\Harmony\Assets\Nodes\HyPrimitive2dData.h" />
@@ -166,6 +165,7 @@
     <ClInclude Include="..\include\Harmony\Memory\PageTypes\HySmlHeapPage.h" />
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyPortal2d.h" />
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyRenderState.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyShader.h" />
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyStencil.h" />
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyWindow.h" />
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyShaderUniforms.h" />

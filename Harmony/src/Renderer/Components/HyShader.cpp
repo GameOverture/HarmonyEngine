@@ -27,6 +27,12 @@ HyShader::~HyShader()
 {
 }
 
+void HyShader::Destroy()
+{
+	IHyRenderer::RemoveShader(this);
+	delete this;
+}
+
 HyShaderHandle HyShader::GetHandle()
 {
 	return m_hHANDLE;

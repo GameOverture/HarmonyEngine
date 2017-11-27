@@ -120,7 +120,7 @@ CheckerGrid::~CheckerGrid()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp),
-                                                    m_CheckerGrid(400.0f, 400.0f, 25.0f, this)
+                                                    m_CheckerGrid(20000.0f, 20000.0f, 25.0f, this)
 {
     m_pCheckerGridShader = HY_NEW HyShader();
     m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
