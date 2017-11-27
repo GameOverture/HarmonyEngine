@@ -11,14 +11,31 @@
 #define HyPortal2d_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Scene/Nodes/Draws/Instances/HyPrimitive2d.h"
+#include "Renderer/Components/HyStencil.h"
 
 class HyPortalGate2d
 {
+	bool				m_bPOSITIVE_NORMAL;
+	HyStencil *			m_pStencil;
+	HyPrimitive2d		m_StencilShape;
+	HyShape2d			m_BoundingVolume;
+
 public:
-	HyPortalGate2d(const glm::vec2 &pt1, const glm::vec2 &pt2, bool bPositiveDirection)
-	{ }
+	HyPortalGate2d(const glm::vec2 &pt1, const glm::vec2 &pt2, bool bPositiveNormal) :	m_bPOSITIVE_NORMAL(bPositiveNormal),
+																						m_pStencil(HY_NEW HyStencil()),
+																						m_StencilShape(nullptr),
+																						m_BoundingVolume(nullptr)
+	{
+		//m_StencilShape.GetShape().SetAsBox(2500.0f, 2500.0f, 
+
+		m_BoundingVolume.SetAsLineSegment(pt1, pt2);
+	}
+
 	~HyPortalGate2d()
-	{ }
+	{
+		m_pStencil->Destroy();
+	}
 };
 
 class HyPortal2d

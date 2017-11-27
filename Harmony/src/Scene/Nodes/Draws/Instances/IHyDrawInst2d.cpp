@@ -21,7 +21,7 @@ IHyDrawInst2d::IHyDrawInst2d(HyType eNodeType, const char *szPrefix, const char 
 																												m_hShader(HY_UNUSED_HANDLE),
 																												m_eRenderMode(HYRENDERMODE_Unknown),
 																												m_hTextureHandle(HY_UNUSED_HANDLE),
-																												m_BoundingVolume(*this)
+																												m_BoundingVolume(this)
 {
 }
 
