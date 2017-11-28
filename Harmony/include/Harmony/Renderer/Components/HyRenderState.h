@@ -28,7 +28,7 @@ class HyRenderState
 	HyStencilHandle		m_hStencil;
 	HyShaderHandle		m_hShader;
 
-	int32				m_iCoordinateSystem;	// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
+	int32				m_iCoordinateSystem;			// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
 
 	uint32				m_uiNumInstances;
 	uint32				m_uiNumVerticesPerInstance;		// Or total number of vertices if single instance

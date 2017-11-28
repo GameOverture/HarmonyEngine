@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
-#include "Renderer/Components/HyStencil.h"
+#include "Renderer/Effects/HyStencil.h"
 #include "HyEngine.h"
 
 /*static*/ HyAssets *IHyDrawInst2d::sm_pHyAssets = nullptr;

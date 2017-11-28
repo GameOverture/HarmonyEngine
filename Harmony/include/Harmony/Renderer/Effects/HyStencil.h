@@ -26,7 +26,6 @@ class HyStencil
 	friend class IHyRenderer;
 
 	static HyStencilHandle			sm_hHandleCount;
-
 	const HyStencilHandle			m_hHANDLE;
 
 	std::vector<IHyDrawInst2d *>	m_InstanceList;

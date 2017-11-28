@@ -11,8 +11,9 @@
 #define HyEntity2d_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
+
+class HyPortal2d;
 
 class HyEntity2d : public IHyDraw2d
 {
@@ -23,7 +24,8 @@ protected:
 	enum Attributes
 	{
 		ATTRIBFLAG_MouseInput				= 1 << 1,
-		ATTRIBFLAG_ReverseDisplayOrder		= 1 << 2
+		ATTRIBFLAG_ReverseDisplayOrder		= 1 << 2,
+		ATTRIBFLAG_Portal					= 1 << 3
 	};
 	uint32							m_uiAttributes;
 
@@ -36,6 +38,8 @@ protected:
 	MouseInputState					m_eMouseInputState;
 	void *							m_pMouseInputUserParam;
 	IHyDrawInst2d *					m_pMouseInputNode;
+	
+	HyPortal2dHandle				m_hPortal;
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
@@ -73,6 +77,9 @@ public:
 
 	bool EnableMouseInput(IHyDrawInst2d *pInputChildNode, void *pUserParam = nullptr);
 	void DisableMouseInput();
+
+	void EnablePortal(HyPortal2d *pPortal);
+	void DisablePortal();
 
 	void ReverseDisplayOrder(bool bReverse);
 

@@ -7,11 +7,11 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 **************************************************************************/
-#include "Renderer/Components/HyShader.h"
+#include "Renderer/Effects/HyShader.h"
 #include "Renderer/IHyRenderer.h"
 
-/*static*/ HyShaderHandle HyShader::sm_hHandleCount = 0;
 /*static*/ IHyRenderer *HyShader::sm_pRenderer = nullptr;
+/*static*/ HyShaderHandle HyShader::sm_hHandleCount = 0;
 
 HyShader::HyShader() :	m_hHANDLE(++sm_hHandleCount),
 						m_bIsFinalized(false),

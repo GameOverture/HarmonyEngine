@@ -11,7 +11,7 @@
 #include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Components/HyRenderState.h"
-#include "Renderer/Components/HyStencil.h"
+#include "Renderer/Effects/HyStencil.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Scene/Nodes/Misc/HyCamera.h"
 

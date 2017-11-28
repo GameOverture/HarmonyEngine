@@ -11,13 +11,15 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyWindow.h"
-#include "Renderer/Components/HyStencil.h"
+#include "Renderer/Effects/HyStencil.h"
+#include "Renderer/Effects/HyPortal2d.h"
 #include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Assets/Loadables/IHyLoadableData.h"
 #include "HyEngine.h"
 
-std::map<HyShaderHandle, HyShader *>	IHyRenderer::sm_ShaderMap;
-std::map<HyStencilHandle, HyStencil *>	IHyRenderer::sm_StencilMap;
+std::map<HyShaderHandle, HyShader *>		IHyRenderer::sm_ShaderMap;
+std::map<HyStencilHandle, HyStencil *>		IHyRenderer::sm_StencilMap;
+std::map<HyPortal2dHandle, HyPortal2d *>	IHyRenderer::sm_Portal2dMap;
 
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
@@ -27,9 +29,9 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> 
 																									m_pCurRenderStateWritePos(nullptr),
 																									m_pCurVertexWritePos(nullptr),
 																									m_uiVertexBufferUsedBytes(0),
+																									m_pCurWindow(nullptr),
 																									m_pShaderQuadBatch(HY_NEW HyShader()),
 																									m_pShaderPrimitive(HY_NEW HyShader()),
-																									m_pCurWindow(nullptr),
 																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8)
 {
 	HyShader::sm_pRenderer = this;
@@ -52,17 +54,23 @@ IHyRenderer::~IHyRenderer(void)
 	for(auto iter = sm_StencilMap.begin(); iter != sm_StencilMap.end(); ++iter)
 		delete iter->second;
 	sm_StencilMap.clear();
+
+	for(auto iter = sm_Portal2dMap.begin(); iter != sm_Portal2dMap.end(); ++iter)
+		delete iter->second;
+	sm_Portal2dMap.clear();
 }
 
 void IHyRenderer::PrepareBuffers()
 {
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Init everything to beginning of buffers
 	m_pCurRenderStateWritePos = m_pBUFFER_RENDERSTATES;
 	m_pCurVertexWritePos = m_pBUFFER_VERTEX;
 	m_pRenderStatesUserStartPos = nullptr;
 	m_uiVertexBufferUsedBytes = 0;
 
-	// Write internal render states first, used by things like HyStencil
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Write internal render states first, used by things like HyStencil and HyPortal
 	for(auto iter = sm_StencilMap.begin(); iter != sm_StencilMap.end(); ++iter)
 	{
 		HyStencil *pStencil = iter->second;
@@ -76,6 +84,9 @@ void IHyRenderer::PrepareBuffers()
 		}
 	}
 
+	//for(auto iter = sm_Portal2dMap.begin();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set pointers to be ready for HyScene to call AppendRenderState()
 	m_pRenderStatesUserStartPos = m_pCurRenderStateWritePos;
 	IHyRenderer::RenderStateBufferHeader *pHeader = reinterpret_cast<IHyRenderer::RenderStateBufferHeader *>(m_pRenderStatesUserStartPos);
@@ -189,6 +200,24 @@ uint32 IHyRenderer::GetNumWindows()
 /*static*/ void IHyRenderer::RemoveStencil(HyStencil *pStencil)
 {
 	sm_StencilMap.erase(sm_StencilMap.find(pStencil->GetHandle()));
+}
+
+/*static*/ HyPortal2d *IHyRenderer::FindPortal2d(HyPortal2dHandle hHandle)
+{
+	if(hHandle != HY_UNUSED_HANDLE && sm_Portal2dMap.find(hHandle) != sm_Portal2dMap.end())
+		return sm_Portal2dMap[hHandle];
+
+	return nullptr;
+}
+
+/*static*/ void IHyRenderer::AddPortal2d(HyPortal2d *pPortal2d)
+{
+	sm_Portal2dMap[pPortal2d->GetHandle()] = pPortal2d;
+}
+
+/*static*/ void IHyRenderer::RemovePortal2d(HyPortal2d *pPortal2d)
+{
+	sm_Portal2dMap.erase(sm_Portal2dMap.find(pPortal2d->GetHandle()));
 }
 
 void IHyRenderer::ProcessMsgs()

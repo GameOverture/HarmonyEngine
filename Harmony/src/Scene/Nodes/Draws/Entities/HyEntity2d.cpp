@@ -9,14 +9,16 @@
  *************************************************************************/
 #include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
 #include "Scene/HyScene.h"
-#include "Renderer/Components/HyStencil.h"
+#include "Renderer/Effects/HyStencil.h"
+#include "Renderer/Effects/HyPortal2d.h"
 #include "HyEngine.h"
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Entity2d, pParent),
 															m_uiAttributes(0),
 															m_eMouseInputState(MOUSEINPUT_None),
 															m_pMouseInputUserParam(nullptr),
-															m_pMouseInputNode(nullptr)
+															m_pMouseInputNode(nullptr),
+															m_hPortal(HY_UNUSED_HANDLE)
 {
 }
 
@@ -266,6 +268,18 @@ void HyEntity2d::DisableMouseInput()
 	m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
 }
 
+void HyEntity2d::EnablePortal(HyPortal2d *pPortal)
+{
+	m_hPortal = pPortal->GetHandle();
+	m_uiAttributes |= ATTRIBFLAG_Portal;
+}
+
+void HyEntity2d::DisablePortal()
+{
+	m_hPortal = HY_UNUSED_HANDLE;
+	m_uiAttributes &= ~ATTRIBFLAG_Portal;
+}
+
 void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 {
 	if(bReverse)
@@ -352,6 +366,11 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 				
 			break;
 		}
+	}
+
+	if((m_uiAttributes & ATTRIBFLAG_Portal) != 0)
+	{
+		IHyRenderer::FindPortal2d(m_hPortal);
 	}
 
 	OnUpdate();

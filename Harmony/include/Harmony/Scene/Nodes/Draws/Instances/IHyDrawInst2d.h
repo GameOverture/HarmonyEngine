@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
 #include "Assets/Nodes/IHyNodeData.h"
-#include "Renderer/Components/HyShader.h"
+#include "Renderer/Effects/HyShader.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
 class HyStencil;

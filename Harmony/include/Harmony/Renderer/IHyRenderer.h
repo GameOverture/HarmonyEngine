@@ -11,12 +11,13 @@
 #define IHyRenderer_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Renderer/Components/HyShader.h"
+#include "Renderer/Effects/HyShader.h"
 
 #include <queue>
 
 class HyRenderState;
 class HyStencil;
+class HyPortal2d;
 class IHyDrawInst2d;
 class HyWindow;
 class HyGfxComms;
@@ -24,17 +25,16 @@ class HyDiagnostics;
 class HyCamera2d;
 class IHyLoadableData;
 
-#define HY_MAX_PASSES_PER_BUFFER 32	// Number of bits held in the cull mask
 typedef uint32 HyCullMask;
+#define HY_MAX_PASSES_PER_BUFFER 32						// Number of bits held in 'HyCullMask'
 #define HY_FULL_CULL_MASK 0xFFFFFFFF
 
-#define HY_RENDERSTATE_BUFFER_SIZE ((1024 * 1024) * 1) // 1MB
-#define HY_VERTEX_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
+#define HY_RENDERSTATE_BUFFER_SIZE ((1024 * 1024) * 1)	// 1MB
+#define HY_VERTEX_BUFFER_SIZE ((1024 * 1024) * 2)		// 2MB
 
 class IHyRenderer
 {
 public:
-	// Note: All offsets below are from the beginning of the buffer pointer, containing this structure
 	struct RenderStateBufferHeader
 	{
 		uint32		uiNum3dRenderStates;
@@ -45,24 +45,29 @@ protected:
 	HyDiagnostics &									m_DiagnosticsRef;
 	std::vector<HyWindow *> &						m_WindowListRef;
 
+	// Preallocated buffers
 	char * const									m_pBUFFER_RENDERSTATES;
 	char * const									m_pBUFFER_VERTEX;
+
+	// Message queues (transfer and receive)
+	std::queue<IHyLoadableData *>					m_TxDataQueue;
+	std::queue<IHyLoadableData *>					m_RxDataQueue;
+
+	// Render states and their vertex data
 	char *											m_pRenderStatesUserStartPos; // Includes RenderStateBufferHeader
 	char *											m_pCurRenderStateWritePos;
 	char *											m_pCurVertexWritePos;
 	size_t											m_uiVertexBufferUsedBytes;
-
 	HyWindow *										m_pCurWindow;
 
-	std::queue<IHyLoadableData *>					m_TxDataQueue;
-	std::queue<IHyLoadableData *>					m_RxDataQueue;
+	// Effects containers
+	static std::map<HyShaderHandle, HyShader *>		sm_ShaderMap;
+	static std::map<HyStencilHandle, HyStencil *>	sm_StencilMap;
+	static std::map<HyPortal2dHandle, HyPortal2d *>	sm_Portal2dMap;
 
 	// Built-in shaders
 	HyShader *										m_pShaderQuadBatch;
 	HyShader *										m_pShaderPrimitive;
-
-	static std::map<HyShaderHandle, HyShader *>		sm_ShaderMap;
-	static std::map<HyStencilHandle, HyStencil *>	sm_StencilMap;
 
 	// Diagnostics/Metrics
 	uint32											m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
@@ -106,6 +111,10 @@ public:
 	static HyStencil *FindStencil(HyStencilHandle hHandle);
 	static void AddStencil(HyStencil *pStencil);
 	static void RemoveStencil(HyStencil *pStencil);
+
+	static HyPortal2d *FindPortal2d(HyPortal2dHandle hHandle);
+	static void AddPortal2d(HyPortal2d *pPortal2d);
+	static void RemovePortal2d(HyPortal2d *pPortal2d);
 
 	void ProcessMsgs();
 	void Render();
