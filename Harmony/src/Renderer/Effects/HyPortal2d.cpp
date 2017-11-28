@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Renderer/Effects/HyPortal2d.h"
 #include "Renderer/IHyRenderer.h"
+#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
 
 HyPortal2dHandle HyPortal2d::sm_hHandleCount = 0;
 
@@ -32,4 +33,14 @@ void HyPortal2d::Destroy()
 HyPortal2dHandle HyPortal2d::GetHandle() const
 {
 	return m_hHANDLE;
+}
+
+void HyPortal2d::TestEntity(HyEntity2d *pEnt)
+{
+	for(uint32 i = 0; i < pEnt->ChildCount(); ++i)
+	{
+		switch(pEnt->ChildGet(i)->GetType())
+		{
+		}
+	}
 }

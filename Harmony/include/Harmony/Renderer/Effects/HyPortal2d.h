@@ -14,6 +14,8 @@
 #include "Scene/Nodes/Draws/Instances/HyPrimitive2d.h"
 #include "Renderer/Effects/HyStencil.h"
 
+class HyEntity2d;
+
 class HyPortalGate2d
 {
 	HyStencil *			m_pStencil;
@@ -72,6 +74,8 @@ class HyPortal2d
 	HyPortalGate2d					m_Gate1;
 	HyPortalGate2d					m_Gate2;
 
+	std::vector<IHyDrawInst2d *>	m_DrawInstList;
+
 public:
 	HyPortal2d(const HyPortalGate2d &gate1Ref, const HyPortalGate2d &gate2Ref);
 private: ~HyPortal2d();
@@ -79,6 +83,9 @@ public:
 	void Destroy();
 
 	HyPortal2dHandle GetHandle() const;
+
+private:
+	void TestEntity(HyEntity2d *pEnt);
 };
 
 #endif /* HyPortal2d_h__ */

@@ -370,7 +370,8 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 
 	if((m_uiAttributes & ATTRIBFLAG_Portal) != 0)
 	{
-		IHyRenderer::FindPortal2d(m_hPortal);
+		HyPortal2d *pPortal = IHyRenderer::FindPortal2d(m_hPortal);
+		pPortal->TestEntity(this);
 	}
 
 	OnUpdate();
