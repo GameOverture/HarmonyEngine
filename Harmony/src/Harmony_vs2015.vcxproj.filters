@@ -234,6 +234,9 @@
     <ClCompile Include="Renderer\Components\HyShader.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Components\HyPortal2d.cpp">
+      <Filter>Renderer\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -643,6 +646,9 @@
       <Filter>Scene\Nodes\Misc</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyShader.h">
+      <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyPortal2d.h">
       <Filter>Renderer\Components</Filter>
     </ClInclude>
   </ItemGroup>

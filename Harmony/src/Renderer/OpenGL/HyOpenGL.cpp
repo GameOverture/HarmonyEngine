@@ -731,24 +731,14 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera)
 	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glUseProgram");
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Bind texture(s)
 	glActiveTexture(GL_TEXTURE0);
 	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glActiveTexture");
 
-	// TODO: This seems hacky, fix it
 	if(m_pShaderQuadBatch->GetHandle() == hShaderHandle)
 	{
 		glBindTexture(GL_TEXTURE_2D, pRenderState->GetTextureHandle());
 		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
-
-		if(pRenderState->GetTextureHandle() != 0)
-		{
-			GLint loc = glGetUniformLocation(hGlHandle, "u_Tex");
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
-			HyAssert(loc >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << "u_Tex" << "\"");
-
-			glUniform1ui(loc, 0);
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1ui");
-		}
 	}
 	else
 	{

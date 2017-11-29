@@ -2922,5 +2922,23 @@
     "Spine": {
     },
     "Sprites": {
+        "Test": [
+            {
+                "bounce": false,
+                "duration": 0.01600000075995922,
+                "frames": [
+                    {
+                        "checksum": 3835149450,
+                        "duration": 0.01600000075995922,
+                        "id": 1,
+                        "offsetX": -80,
+                        "offsetY": -399
+                    }
+                ],
+                "loop": false,
+                "name": "",
+                "reverse": false
+            }
+        ]
     }
 }

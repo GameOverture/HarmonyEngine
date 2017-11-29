@@ -17,6 +17,24 @@
             "textureIndex": 0,
             "type": 2,
             "width": 220,
+            "x": 163,
+            "y": 0
+        },
+        {
+            "atlasGrpId": 0,
+            "checksum": 3835149450,
+            "cropBottom": 798,
+            "cropLeft": 0,
+            "cropRight": 159,
+            "cropTop": 11,
+            "errors": 0,
+            "filter": "",
+            "height": 800,
+            "id": 1,
+            "name": "3835149450",
+            "textureIndex": 0,
+            "type": 1,
+            "width": 160,
             "x": 0,
             "y": 0
         }
@@ -42,5 +60,5 @@
         }
     ],
     "startAtlasId": 1,
-    "startFrameId": 1
+    "startFrameId": 2
 }
